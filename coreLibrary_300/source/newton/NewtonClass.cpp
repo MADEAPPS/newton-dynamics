@@ -34,14 +34,11 @@ NewtonDeadBodies::NewtonDeadBodies(dgMemoryAllocator* const allocator)
 
 void NewtonDeadBodies::DestroyBodies(Newton& world)
 {
-	dgBody* body;
-	dgTreeNode* node;
-
 	Iterator iter (*this);
 	for (iter.Begin(); iter; ) {
-		node = iter.GetNode();
+		dgTreeNode* const node = iter.GetNode();
 		iter ++;
-		body = node->GetInfo();
+		dgBody* const body = node->GetInfo();
 		if (body) {
 			Remove (node);
 			world.DestroyBody(body);
@@ -59,14 +56,11 @@ NewtonDeadJoints::NewtonDeadJoints(dgMemoryAllocator* const allocator)
 
 void NewtonDeadJoints::DestroyJoints(Newton& world)
 {
-	dgTreeNode* node;
-	dgConstraint* joint;
-
 	Iterator iter (*this);
 	for (iter.Begin(); iter; ) {
-		node = iter.GetNode();
+		dgTreeNode* const node = iter.GetNode();
 		iter ++;
-		joint = node->GetInfo();
+		dgConstraint* const joint = node->GetInfo();
 		if (joint) {
 			Remove (node);
 			world.DestroyConstraint (joint);
@@ -230,15 +224,12 @@ void NewtonUserJoint::SetAcceleration (dgFloat32 acceleration)
 	}
 }
 
-void NewtonUserJoint::SetSpringDamperAcceleration (dFloat springK, dFloat springD)
+void NewtonUserJoint::SetSpringDamperAcceleration (dFloat springK, dFloat damperD)
 {
 	dgInt32 index; 
 	index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
-		dgFloat32 accel;
-		accel = CalculateSpringDamperAcceleration (index, *m_param, m_lastJointAngle, m_lastPosit0, m_lastPosit1, springK, springD);
-		dgAssert (0);
-//		m_param->m_jointAccel[index] = accel;
+		dgFloat32 accel = CalculateSpringDamperAcceleration (index, *m_param, m_lastJointAngle, m_lastPosit0, m_lastPosit1, springK, damperD);
 		SetMotorAcceleration (index, accel, *m_param);
 	}
 }
@@ -247,8 +238,7 @@ void NewtonUserJoint::SetSpringDamperAcceleration (dFloat springK, dFloat spring
 
 void NewtonUserJoint::SetHighFriction (dgFloat32 friction)
 {
-	dgInt32 index; 
-	index = m_rows - 1;
+	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
 		m_param->m_forceBounds[index].m_upper = dgClamp (friction, dgFloat32(0.001f), dgFloat32(DG_MAX_BOUND));
 		m_param->m_forceBounds[index].m_normalIndex = DG_BILATERAL_FRICTION_CONSTRAINT;
@@ -257,8 +247,7 @@ void NewtonUserJoint::SetHighFriction (dgFloat32 friction)
 
 void NewtonUserJoint::SetLowerFriction (dgFloat32 friction)
 {
-	dgInt32 index; 
-	index = m_rows - 1;
+	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
 		m_param->m_forceBounds[index].m_low = dgClamp (friction, dgFloat32(DG_MIN_BOUND), dgFloat32(-0.001f));
 		m_param->m_forceBounds[index].m_normalIndex = DG_BILATERAL_FRICTION_CONSTRAINT;
@@ -268,8 +257,7 @@ void NewtonUserJoint::SetLowerFriction (dgFloat32 friction)
 
 void NewtonUserJoint::SetRowStiffness (dgFloat32 stiffness)
 {
-	dgInt32 index; 
-	index = m_rows - 1;
+	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
 		stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
 		stiffness = 100.0f - stiffness * 99.0f; 
@@ -281,9 +269,7 @@ void NewtonUserJoint::SetRowStiffness (dgFloat32 stiffness)
 
 dgFloat32 NewtonUserJoint::GetRowForce (dgInt32 row) const
 {
-	dgFloat32 force;
-
-	force = 0.0f;
+	dgFloat32 force = 0.0f;
 	if ((row >= 0) && (row < dgInt32 (m_maxDOF))) {
 		force = m_forceArray[row].m_force; 
 	}

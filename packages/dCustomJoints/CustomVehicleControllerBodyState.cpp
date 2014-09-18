@@ -315,13 +315,6 @@ void CustomVehicleControllerBodyStateChassis::PutToSleep()
 {
 	NewtonBody* const body = m_controller->GetBody();
 
-//	dVector force;
-//	dVector torque;
-//	NewtonBodyGetForceAcc (body, &force[0]);
-//	NewtonBodyGetTorqueAcc (body, &torque[0]);
-//	NewtonBodySetForce (body, &force[0]);
-//	NewtonBodySetTorque(body, &torque[0]);
-
 	dVector zero (0.0f, 0.0f, 0.0f, 0.0f); 
 	NewtonBodySetForce (body, &zero[0]);
 	NewtonBodySetTorque(body, &zero[0]);
@@ -401,6 +394,7 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_invMass = 1.0f / m_mass;
 	m_radio = tireInfo.m_radio;
 	m_width = tireInfo.m_width;
+	m_locationSign = dSign (m_localFrame.m_posit % m_localFrame.m_front);
 	m_lateralStiffness = tireInfo.m_lateralStiffness;
 	m_longitudialStiffness = tireInfo.m_longitudialStiffness;
 	m_aligningMomentTrail = tireInfo.m_aligningMomentTrail;

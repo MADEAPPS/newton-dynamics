@@ -85,19 +85,20 @@ void CustomVehicleControllerComponentSteering::CalculateAkermanParameters (
 void CustomVehicleControllerComponentSteering::Update (dFloat timestep)
 {
 	dFloat angle = m_maxAngle * m_param;
-	if ((m_akermanWheelBaseWidth == 0.0f) || (dAbs (angle) < (2.0f * 2.141592f / 180.0f))) {
+	if ((m_akermanWheelBaseWidth == 0.0f) || (dAbs (angle) < (2.0f * 3.141592f / 180.0f))) {
 		for (dList<CustomVehicleControllerBodyStateTire*>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire& tire = *node->GetInfo();
 			tire.m_steeringAngle = angle;
 		}
 	} else {
-		dAssert (dAbs (angle) >= (2.0f * 2.141592f / 180.0f));
-		dFloat posit = m_akermanAxelSeparation / dTan (angle);
-		dFloat leftAngle = dAtan2 (m_akermanAxelSeparation, posit + m_akermanWheelBaseWidth);
-		dFloat righAngle = dAtan2 (m_akermanAxelSeparation, posit - m_akermanWheelBaseWidth);
+		dAssert (dAbs (angle) >= (2.0f * 3.141592f / 180.0f));
+		dFloat posit = m_akermanAxelSeparation / dTan (dAbs (angle));
+		dFloat sign = dSign (angle);
+		dFloat leftAngle = sign * dAtan2 (m_akermanAxelSeparation, posit + m_akermanWheelBaseWidth);
+		dFloat righAngle = sign * dAtan2 (m_akermanAxelSeparation, posit - m_akermanWheelBaseWidth);
 		for (dList<CustomVehicleControllerBodyStateTire*>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {		
 			CustomVehicleControllerBodyStateTire& tire = *node->GetInfo();
-			tire.m_steeringAngle = angle;
+			tire.m_steeringAngle = (sign * tire.m_locationSign > 0.0f) ? leftAngle: righAngle;
 		}
 	}
 }

@@ -188,6 +188,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_width;
 	dFloat m_posit;
 	dFloat m_speed;
+	dFloat m_locationSign;
 	dFloat m_brakeTorque;
 	dFloat m_engineTorque;
 	dFloat m_rotationalSpeed;
@@ -201,6 +202,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_maxAngularVelocity;
 	dFloat m_aligningMomentTrail;
 	dFloat m_longitudialStiffness;
+	
 	void* m_userData;
 	NewtonCollision* m_shape;
 

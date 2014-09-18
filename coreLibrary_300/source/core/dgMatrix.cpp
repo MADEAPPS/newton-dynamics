@@ -266,35 +266,7 @@ dgMatrix dgMatrix::Symetric3by3Inverse () const
 void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 {
 	const dgMatrix& matrix = *this;
-/*
-	const dgFloat32 minSin = dgFloat32(0.99995f);
-	dgFloat32 roll = dgFloat32(0.0f);
-	dgFloat32 pitch  = dgFloat32(0.0f);
-	dgFloat32 yaw = dgAsin (-dgClamp (matrix[0][2], dgFloat32(-0.999999f), dgFloat32(0.999999f)));
-
-	dgAssert (dgCheckFloat (yaw));
-	if (matrix[0][2] < minSin) {
-		if (matrix[0][2] > (-minSin)) {
-			roll = dgAtan2 (matrix[0][1], matrix[0][0]);
-			pitch = dgAtan2 (matrix[1][2], matrix[2][2]);
-		} else {
-			pitch = dgAtan2 (matrix[1][0], matrix[1][1]);
-		}
-	} else {
-		pitch = -dgAtan2 (matrix[1][0], matrix[1][1]);
-	}
-
-#ifdef _DEBUG
-	dgMatrix m (dgPitchMatrix (pitch) * dgYawMatrix(yaw) * dgRollMatrix(roll));
-	for (dgInt32 i = 0; i < 3; i ++) {
-		for (dgInt32 j = 0; j < 3; j ++) {
-			dgFloat32 error = dgAbsf (m[i][j] - matrix[i][j]);
-			dgAssert (error < 5.0e-2f);
-		}
-	}
-#endif
-	return dgVector (pitch, yaw, roll, dgFloat32(0.0f));
-*/
+	dgAssert (dgAbsf (((matrix[0] * matrix[1]) % matrix[2]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > 0.99995f) {

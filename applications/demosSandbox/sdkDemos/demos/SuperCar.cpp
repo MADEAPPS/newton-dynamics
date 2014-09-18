@@ -1173,7 +1173,7 @@ void SuperCar (DemoEntityManager* const scene)
 	//SuperCarEntity* const vehicle = new SuperCarEntity (scene, manager, location, "lambDiablo.ngd");
 	
 	// build a muscle car from this vehicle controller
-	//vehicle->BuildReadWheelDriveMuscleCar();
+	//vehicle->BuildRearWheelDriveMuscleCar();
 	vehicle->BuildFourWheelDriveSuperCar();
 
 	// set this vehicle as the player
