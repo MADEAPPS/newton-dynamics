@@ -301,8 +301,6 @@ class dMousePickClass
 			dAssert (NewtonCollisionGetSubCollisionHandle (collisionHit));
 		}
 
-
-
 		dMousePickClass* const data = (dMousePickClass*) userData;
 		NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
 		if ((mass > 0.0f) || (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY)) {
@@ -322,36 +320,9 @@ class dMousePickClass
 	const NewtonBody* m_body;
 };
 
-/*
-NewtonBody* MousePickByForce (NewtonWorld* const nWorld, int mouseX, int mouseY, dFloat& paramter, dVector& position, dVector& normal, dFloat witdh, dFloat length)
-{
-	dAssert (0);
-	return NULL;
-
-	float x = dFloat (mouseX);
-	float y = dFloat (mouseY);
-	dVector p0 (ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
-	dVector p1 (ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
-
-	dMousePickClass rayCast;
-	NewtonWorldRayCast(nWorld, &p0[0], &p1[0], dMousePickClass::RayCastFilter, &rayCast, dMousePickClass::RayCastPrefilter);
-
-	if (rayCast.m_body) {
-		position = p0 + (p1 - p0).Scale (rayCast.m_param);
-		normal = rayCast.m_normal;
-		paramter = rayCast.m_param;
-	}
-	return (NewtonBody*) rayCast.m_body;
-}
-*/
 
 NewtonBody* MousePickByForce (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat& paramterOut, dVector& positionOut, dVector& normalOut)
 {
-//	float x = dFloat (mouseX);
-//	float y = dFloat (mouseY);
-//	dVector p0 (ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
-//	dVector p1 (ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
-
 	dMousePickClass rayCast;
 	NewtonWorldRayCast(nWorld, &origin[0], &end[0], dMousePickClass::RayCastFilter, &rayCast, dMousePickClass::RayCastPrefilter, 0);
 

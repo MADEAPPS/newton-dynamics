@@ -182,7 +182,6 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 
 				// save point local to the body matrix
 				m_pickedBodyParam = param;
-				matrix.m_posit = posit;
 				m_pickedBodyLocalAtachmentPoint = matrix.UntransformVector (posit);
 
 				// convert normal to local space

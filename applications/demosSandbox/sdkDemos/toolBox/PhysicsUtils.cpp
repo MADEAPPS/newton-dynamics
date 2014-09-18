@@ -1260,7 +1260,6 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 	NewtonBodyAddTorque(body, &torque[0]);
 
 	// make sure the body is unfrozen, if it is picked
-	//NewtonBodySetFreezeState (body, 0);
 	NewtonBodySetSleepState (body, 0);
 
 	NewtonWorldCriticalSectionUnlock (world);
