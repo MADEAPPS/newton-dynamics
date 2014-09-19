@@ -94,7 +94,8 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			m_objCollision->CalcAABB (scaleMatrix, m_p0, m_p1);
 
 			m_posit += matrix.RotateVector (collision->GetObbOrigin().CompProduct4(m_objCollision->GetScale()));
-			m_size = collision->GetObbSize().CompProduct4(m_objCollision->GetScale()) + dgCollisionInstance::m_padding;
+			//m_size = collision->GetObbSize().CompProduct4(m_objCollision->GetScale()) + dgCollisionInstance::m_padding;
+			m_size = collision->GetObbSize() + dgCollisionInstance::m_padding;
 			break;
 		}
 
