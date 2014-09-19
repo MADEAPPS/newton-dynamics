@@ -51,8 +51,6 @@ class dgCollisionBox: public dgCollisionConvex
 
 	static dgInt32 CalculateSignature (dgFloat32 dx, dgFloat32 dy, dgFloat32 dz);
 
-	
-
 	dgVector m_size[2];
 	dgVector m_vertex[8];
 	static dgVector m_indexMark;
