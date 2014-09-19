@@ -473,7 +473,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 	dgStack<dgInt32> vertexMap(vertexCount);
 	memset (&vertexMap[0], -1, vertexCount * sizeof (dgInt32));
 
-	dgInt32 mark = polyhedra.IncLRU();;
+	dgInt32 mark = polyhedra.IncLRU();
 	dgPolyhedra::Iterator iter (polyhedra);
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &iter.GetNode()->GetInfo();

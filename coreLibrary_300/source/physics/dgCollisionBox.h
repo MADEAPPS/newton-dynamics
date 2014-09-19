@@ -53,8 +53,11 @@ class dgCollisionBox: public dgCollisionConvex
 
 	dgVector m_size[2];
 	dgVector m_vertex[8];
+	static dgInt32 m_initSimplex;
+	static dgInt32 m_faces[][4];
 	static dgVector m_indexMark;
 	static dgConvexSimplexEdge m_edgeArray[];
+	static dgConvexSimplexEdge* m_edgeEdgeMap[];
 	static dgConvexSimplexEdge* m_vertexToEdgeMap[];
 	friend class dgWorld;
 };
