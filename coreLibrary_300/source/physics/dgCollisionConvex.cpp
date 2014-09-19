@@ -2983,10 +2983,17 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 		proxy.m_contactJoint->m_contactActive = retVal;
 		return retVal;
 	} else {
+		dgCollisionInstance* const collConicConvexInstance = proxy.m_referenceCollision;
+
 		minkHull.CalculateClosestPoints ();
 		minkHull.m_p = ConvexConicSupporVertex(minkHull.m_p, minkHull.m_normal);
+
+		const dgVector& scale = collConicConvexInstance->GetScale();
+		const dgVector& invScale = collConicConvexInstance->GetInvScale();
+
 		//dgFloat32 penetration = minkHull.m_normal % (minkHull.m_p - minkHull.m_q) + proxy.m_skinThickness;
-		dgFloat32 penetration = minkHull.m_normal % (minkHull.m_q - minkHull.m_p) - proxy.m_skinThickness;
+		//dgFloat32 penetration = minkHull.m_normal % (minkHull.m_q - minkHull.m_p) - proxy.m_skinThickness;
+		dgFloat32 penetration = minkHull.m_normal % ((minkHull.m_q - minkHull.m_p).CompProduct4(scale)) - proxy.m_skinThickness;
 		if (penetration <= dgFloat32 (0.0f)) {
 			proxy.m_contactJoint->m_contactActive = 1;
 			if (proxy.m_referenceCollision->GetCollisionMode() & proxy.m_floatingCollision->GetCollisionMode()) {
@@ -2995,12 +3002,7 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 				count = CalculateContacts (contactPoint, minkHull.m_normal.Scale4 (-1.0f), proxy, minkHull.m_hullDiff);
 			}
 		}
-
-		dgCollisionInstance* const collConicConvexInstance = proxy.m_referenceCollision;
-		penetration *= collConicConvexInstance->m_maxScale.GetScalar();
 		proxy.m_contactJoint->m_closestDistance = penetration;
-		const dgVector& scale = collConicConvexInstance->GetScale();
-		const dgVector& invScale = collConicConvexInstance->GetInvScale();
 		const dgMatrix& matrix = collConicConvexInstance->GetGlobalMatrix();
 		if (collConicConvexInstance->GetScaleType() != dgCollisionInstance::m_global) {
 			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale4 (dgFloat32(-1.0f))));
