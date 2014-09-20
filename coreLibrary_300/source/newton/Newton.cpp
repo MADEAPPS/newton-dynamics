@@ -552,7 +552,7 @@ int NewtonGetMultiThreadSolverOnSingleIsland(const NewtonWorld* const newtonWorl
 //
 // Parameters:
 // *const NewtonWorld* *newtonWorld - is the pointer to the Newton world
-// *int* model - model of operation 0 = exact, 1 = adaptive, n = linear. The default is exact.
+// *int* model - model of operation 0 = exact, 1 = adaptive, n = linear. The default is adaptive.
 // 
 // Return: Nothing
 //
@@ -560,7 +560,7 @@ int NewtonGetMultiThreadSolverOnSingleIsland(const NewtonWorld* const newtonWorl
 //
 // 0: Is the exact mode. This is good for application where precision is more important than speed, ex: realistic simulation.
 //
-// 1: Is the adaptive mode, the solver is not as exact but the simulation will still maintain a high degree of accuracy. 
+// 1 (default): Is the adaptive mode, the solver is not as exact but the simulation will still maintain a high degree of accuracy.
 // This mode is good for applications were a good degree of stability is important but not as important as speed. 
 //
 // n: Linear mode. The solver will not try to reduce the joints relative acceleration errors to below some limit, 
