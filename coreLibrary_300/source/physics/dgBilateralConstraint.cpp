@@ -231,31 +231,30 @@ dgFloat32 dgBilateralConstraint::CalculateSpringDamperAcceleration (
 	dgFloat32 springK, 
 	dgFloat32 springD)
 {
-	dgAssert (m_body1);
+	dgFloat32 accel = 0.0f;
+	if (desc.m_timestep > dgFloat32 (0.0f)) {
+		dgAssert (m_body1);
+		const dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 
+		const dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1; 
 
-	const dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 
-	const dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1; 
+		dgVector veloc0 (m_body0->m_veloc);
+		dgVector omega0 (m_body0->m_omega);
+		dgVector veloc1 (m_body1->m_veloc);
+		dgVector omega1 (m_body1->m_omega);
 
-	dgVector veloc0 (m_body0->m_veloc);
-	dgVector omega0 (m_body0->m_omega);
+		dgFloat32 relPosit = (p1Global - p0Global) % jacobian0.m_linear + jointAngle;
+		dgFloat32 relVeloc = - (veloc0 % jacobian0.m_linear + veloc1 % jacobian1.m_linear +	omega0 % jacobian0.m_angular + omega1 % jacobian1.m_angular);
 
-//	dgVector veloc1 (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-//	dgVector omega1 (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));;
-	dgVector veloc1 (m_body1->m_veloc);
-	dgVector omega1 (m_body1->m_omega);
-
-	dgFloat32 relPosit = (p1Global - p0Global) % jacobian0.m_linear + jointAngle;
-	dgFloat32 relVeloc = - (veloc0 % jacobian0.m_linear + veloc1 % jacobian1.m_linear +	omega0 % jacobian0.m_angular + omega1 % jacobian1.m_angular);
-
-	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
-	dgFloat32 dt = desc.m_timestep;
-	dgFloat32 ks = springK;
-	dgFloat32 kd = springD;
-	dgFloat32 ksd = dt * ks;
-	dgFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
-	dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
-
-	return num / den;
+		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
+		dgFloat32 dt = desc.m_timestep;
+		dgFloat32 ks = springK;
+		dgFloat32 kd = springD;
+		dgFloat32 ksd = dt * ks;
+		dgFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
+		dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
+		accel = num / den;
+	}
+	return accel;
 }
 
 
