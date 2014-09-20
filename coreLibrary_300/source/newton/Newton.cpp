@@ -4528,13 +4528,43 @@ void NewtonBodyDisableSimulation(const NewtonBody* const bodyPtr)
 	world->BodyDisableSimulation (body);
 }
 
-int NewtonBodyGetEnableDisableSimulationState(const NewtonBody* const bodyPtr)
+// Name: NewtonBodyGetSimulationState
+// Gets the current simulation state of the specified body.
+//
+// Parameters:
+// *const NewtonBody* *bodyPtr - pointer to the body to be inspected.
+//
+// Return: the current simulation state 0: disabled 1: active.
+//
+// See also: NewtonBodySetSimulationState
+int NewtonBodyGetSimulationState(const NewtonBody* const bodyPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 	dgWorld* const world = body->GetWorld();
 	return world->GetBodyEnableDisableSimulationState(body) ? 1 : 0;
+}
 
+// Name: NewtonBodySetSimulationState
+// Sets the current simulation state of the specified body.
+//
+// Parameters:
+// *const NewtonBody* *bodyPtr - pointer to the body to be changed.
+// *const int* state - the new similation state 0: disabled 1: active
+//
+// Return: Nothing.
+//
+// See also: NewtonBodyGetSimulationState
+void NewtonBodySetSimulationState(const NewtonBody* const bodyPtr, const int state)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	dgWorld* const world = body->GetWorld();
+
+	if (state)
+		world->BodyEnableSimulation(body);
+	else
+		world->BodyDisableSimulation(body);
 }
 
 int NewtonBodyGetCollidable (const NewtonBody* const bodyPtr)

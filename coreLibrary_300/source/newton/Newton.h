@@ -855,9 +855,10 @@ extern "C" {
 
 	NEWTON_API void NewtonDestroyBody(const NewtonBody* const body);
 
-	NEWTON_API void NewtonBodyEnableSimulation(const NewtonBody* const body);
-	NEWTON_API void NewtonBodyDisableSimulation(const NewtonBody* const body);
-	NEWTON_API int NewtonBodyGetEnableDisableSimulationState(const NewtonBody* const body);
+	NEWTON_DEPRECATED_API void NewtonBodyEnableSimulation(const NewtonBody* const body);
+	NEWTON_DEPRECATED_API void NewtonBodyDisableSimulation(const NewtonBody* const body);
+	NEWTON_API int NewtonBodyGetSimulationState(const NewtonBody* const body);
+	NEWTON_API void NewtonBodySetSimulationState(const NewtonBody* const bodyPtr, const int state);
 
 	NEWTON_API int NewtonBodyGetType (const NewtonBody* const body);
 	NEWTON_API int NewtonBodyGetCollidable (const NewtonBody* const body);
