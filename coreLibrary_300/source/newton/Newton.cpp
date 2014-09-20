@@ -4550,7 +4550,7 @@ int NewtonBodyGetSimulationState(const NewtonBody* const bodyPtr)
 //
 // Parameters:
 // *const NewtonBody* *bodyPtr - pointer to the body to be changed.
-// *const int* state - the new similation state 0: disabled 1: active
+// *const int* state - the new simulation state 0: disabled 1: active
 //
 // Return: Nothing.
 //
@@ -4561,10 +4561,12 @@ void NewtonBodySetSimulationState(const NewtonBody* const bodyPtr, const int sta
 	dgBody* const body = (dgBody *)bodyPtr;
 	dgWorld* const world = body->GetWorld();
 
-	if (state)
+	if (state) {
 		world->BodyEnableSimulation(body);
-	else
+	}
+	else {
 		world->BodyDisableSimulation(body);
+	}
 }
 
 int NewtonBodyGetCollidable (const NewtonBody* const bodyPtr)
