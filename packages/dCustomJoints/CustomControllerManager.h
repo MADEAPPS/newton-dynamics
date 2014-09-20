@@ -120,6 +120,12 @@ class CustomControllerBase
 		return m_manager;
 	}
 
+	bool operator== (const CustomControllerBase& copy) const
+	{
+		dAssert (0);
+		return false;
+	}
+
 	virtual void PreUpdate (dFloat timestep, int threadIndex) = 0;
 	virtual void PostUpdate (dFloat timestep, int threadIndex) = 0;
 

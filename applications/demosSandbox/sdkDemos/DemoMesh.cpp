@@ -897,8 +897,7 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 			p0 = p1;
 		}
 		glEnd();
-
-
+/*
 		glPointSize(4.0f);
 		glBegin(GL_POINTS);
 		glColor3f(1.0f, 0.0f, 0.0f);
@@ -909,7 +908,7 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 		}
 		glEnd();
-
+*/
 		glEnable (GL_LIGHTING);
 	}
 }
