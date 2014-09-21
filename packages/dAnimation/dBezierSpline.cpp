@@ -539,37 +539,51 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 void dBezierSpline::InsertkNot (dFloat64 u)
 {
 	int k = GetSpan(u);
-	int s = 0;
 
-	dFloat64 uq[D_BEZIER_LOCAL_BUFFER_SIZE];
+	dFloat64 newKnotVector[D_BEZIER_LOCAL_BUFFER_SIZE];
 	dAssert ((m_knotsCount + 1)< D_BEZIER_LOCAL_BUFFER_SIZE);
 
 	for (int i = 0; i <= k; i ++) {
-		uq[i] = m_knotVector[i];
+		newKnotVector[i] = m_knotVector[i];
 	}
-	uq[k + 1] = u;
+	newKnotVector[k + 1] = u;
 	for (int i = k + 1; i < m_knotsCount; i ++) {
-		uq[i + 1] = m_knotVector[i];
+		newKnotVector[i + 1] = m_knotVector[i];
 	}
-
 
 	dBigVector Rw[16];
-	dBigVector Qw____[D_BEZIER_LOCAL_BUFFER_SIZE];
+	dBigVector newControlPoints[D_BEZIER_LOCAL_BUFFER_SIZE];
 	for (int i = 0; i <= (k - m_degree); i ++) {
-		Qw____[i] = m_controlPoints[i];
+		newControlPoints[i] = m_controlPoints[i];
 	}
 
-	for (int i = k - s; i < m_controlPointsCount; i ++) {
-		Qw____[i + 1] = m_controlPoints[i];
+	for (int i = k; i < m_controlPointsCount; i ++) {
+		newControlPoints[i + 1] = m_controlPoints[i];
 	}
 
 	for (int i = 0; i <= m_degree; i ++) {
-//		Rw[i] = m_controlPoints[k - p + i];
+		Rw[i] = m_controlPoints[k - m_degree + i];
 	}
 
+	int m = k - m_degree + 1;
+	for (int i = 0; i <= (m_degree - 1); i ++) {
+		dFloat64 alpha = (u  - m_knotVector[m + i]) / (m_knotVector[i + k + 1] - m_knotVector[m + i]);
+		Rw[i] = Rw[i + 1].Scale (alpha) + Rw[i].Scale (dFloat64 (1.0f) - alpha);
+	}
+	newControlPoints[m] = Rw[0];
+	newControlPoints[k + 1 - 1 - 0] = Rw[m_degree - 1 - 0];
 
-//	Clear();
-//	m_controlPointsCount ++;
-//	m_knotsCount ++;
-	
+	for (int i = m + 1; i < k; i ++) {
+		newControlPoints[i] = Rw[i - m];
+	}
+
+	Clear();
+	m_knotsCount ++;
+	m_controlPointsCount ++;
+
+	m_knotVector = (dFloat64*) Alloc (m_knotsCount * sizeof (dFloat64));
+	m_controlPoints = (dBigVector*) Alloc (m_controlPointsCount * sizeof (dBigVector));
+
+	memcpy (m_knotVector, newKnotVector, m_knotsCount * sizeof (dFloat64));
+	memcpy (m_controlPoints, newControlPoints, m_controlPointsCount * sizeof (dBigVector));
 }

@@ -1201,6 +1201,10 @@ dFloat64 knots[] = {0.0f, 1.0f};
 		if (!spline.GetControlPointArray()) {
 			spline.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, control);
 			spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
+			spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
+			spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
+			//spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
+			//spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
 		}
 
 		const int segments = 20;
@@ -1224,8 +1228,8 @@ dFloat64 knots[] = {0.0f, 1.0f};
 		}
 		glEnd();
 
-		// recreate the spline form some sample points
-		int xxx = 4;
+		// recreate the spline from sample points at equally spaced distance 
+		int pointCount = 4;
 		dBigVector points[5];
 		points[0] = spline.CurvePoint(0.0f / 3.0f) + dBigVector (300.0f, 0.0f, 0.0f, 0.0f);
 		points[1] = spline.CurvePoint(1.0f / 3.0f) + dBigVector (300.0f, 0.0f, 0.0f, 0.0f);
@@ -1236,7 +1240,7 @@ dFloat64 knots[] = {0.0f, 1.0f};
 		dBigVector derivP1 (spline.CurveDerivative(1.0f));
 
 		static dBezierSpline spline1;
-		spline1.GlobalCubicInterpolation (xxx, points, derivP0, derivP1);
+		spline1.GlobalCubicInterpolation (pointCount, points, derivP0, derivP1);
 
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glBegin(GL_LINES);
@@ -1260,7 +1264,7 @@ dFloat64 knots[] = {0.0f, 1.0f};
 		}
 
 		glColor3f(1.0f, 0.0f, 0.0f);
-		for (int i = 0; i < xxx; i ++) {
+		for (int i = 0; i < pointCount; i ++) {
 			glVertex3f (points[i].m_x, points[i].m_y, points[i].m_z);
 		}
 		glEnd();
