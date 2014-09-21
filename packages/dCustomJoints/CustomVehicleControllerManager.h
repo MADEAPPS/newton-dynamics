@@ -36,15 +36,6 @@ class CustomVehicleController: public CustomControllerBase
 	public:
 	class dTireForceSolverSolver;
 	class dWeightDistibutionSolver;
-	class dTireList: public dList<CustomVehicleControllerBodyStateTire>
-	{
-		public:
-		dTireList()
-			:dList<CustomVehicleControllerBodyStateTire>()
-		{
-		}
-	};
-
 
 	public:
 	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateTire* GetFirstTire () const ;
@@ -84,11 +75,11 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
-
-	dTireList m_tireList;
+	
 	CustomVehicleControllerBodyStateChassis m_chassisState;
-	dList<CustomVehicleControllerBodyState*> m_stateList;
 
+	dList<CustomVehicleControllerBodyState*> m_stateList;
+	dList<CustomVehicleControllerBodyStateTire> m_tireList;
 	dList<CustomVehicleControllerEngineDifferencialJoint> m_tankTireLinks;
 	dList<CustomVehicleControllerBodyStateContact> m_externalContactStatesPoll;
 	dList<CustomVehicleControllerBodyStateContact>::dListNode* m_freeContactList;
