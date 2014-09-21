@@ -1200,11 +1200,12 @@ dFloat64 knots[] = {0.0f, 1.0f};
 		static dBezierSpline spline;
 		if (!spline.GetControlPointArray()) {
 			spline.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, control);
-			spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
-			spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
-			spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
+			int span = spline.InsertKnot ((knots[1] + knots[2]) * 0.5f);
+			//span = spline.InsertKnot ((knots[1] + knots[2]) * 0.5f);
+			//span = spline.InsertKnot ((knots[1] + knots[2]) * 0.5f);
 			//spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
 			//spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
+			spline.RemoveKnot (span);
 		}
 
 		const int segments = 20;

@@ -536,7 +536,7 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 	return u0;
 }
 
-void dBezierSpline::InsertkNot (dFloat64 u)
+int dBezierSpline::InsertKnot (dFloat64 u)
 {
 	int k = GetSpan(u);
 
@@ -586,4 +586,12 @@ void dBezierSpline::InsertkNot (dFloat64 u)
 
 	memcpy (m_knotVector, newKnotVector, m_knotsCount * sizeof (dFloat64));
 	memcpy (m_controlPoints, newControlPoints, m_controlPointsCount * sizeof (dBigVector));
+
+	return k + 1;
+}
+
+
+bool dBezierSpline::RemoveKnot (int span)
+{
+	return true;
 }

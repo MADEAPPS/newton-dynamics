@@ -38,7 +38,8 @@ class dBezierSpline : public dContainersAlloc
 	void GlobalCubicInterpolation (int count, const dBigVector* const points, const dBigVector& firstTangent, const dBigVector& lastTangent);
 	void CreateFromKnotVectorAndControlPoints (int degree, int knotCount, const dFloat64* const knotVector, const dBigVector* const controlPoints);
 
-	void InsertkNot (dFloat64 u);
+	int InsertKnot (dFloat64 u);
+	bool RemoveKnot (int span);
 	
 
 	int GetControlPointCount() const;
