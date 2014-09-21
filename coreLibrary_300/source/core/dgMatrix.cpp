@@ -293,7 +293,7 @@ void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 		euler1[1] = yaw0;
 		euler1[2] = roll0;
 	} else {
-		dgFloat32 yaw0 = -dgSin ( matrix[0][2]);
+		dgFloat32 yaw0 = -dgAsin ( matrix[0][2]);
 		dgFloat32 yaw1 = 3.141592f - yaw0;
 		dgFloat32 sign0 = dgSign(dgCos (yaw0));
 		dgFloat32 sign1 = dgSign(dgCos (yaw1));
