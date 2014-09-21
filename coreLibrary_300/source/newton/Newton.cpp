@@ -5420,13 +5420,13 @@ int NewtonContactJointGetContactCount(const NewtonJoint* const contactJoint)
 }
 
 
-// Name: NewtonContactJointGetFirstContact 
-// Return to the next contact from the contact array of the contact joint.
+// Name: NewtonContactJointGetFirstContact
+// Return to pointer to the first contact from the contact array of the contact joint.
 //
 // Parameters:
-// *const NewtonJoint* *contactJoint - pointer to corrent contact joint.
+// *const NewtonJoint* *contactJoint - pointer to a contact joint.
 //
-// Return: first contact contact array of the joint contact exist, NULL otherwise
+// Return: a pointer to the first contact from the contact array, NULL if no contacts exist
 //
 // See also: NewtonContactJointGetNextContact, NewtonContactGetMaterial, NewtonContactJointRemoveContact
 void* NewtonContactJointGetFirstContact(const NewtonJoint* const contactJoint)
@@ -5441,13 +5441,13 @@ void* NewtonContactJointGetFirstContact(const NewtonJoint* const contactJoint)
 }
 
 // Name: NewtonContactJointGetNextContact
-// Return to the first contact from the contact array of the contact joint.
+// Return a pointer to the next contact from the contact array of the contact joint.
 //
 // Parameters:
-// *const NewtonJoint* *contactJoint - pointer to corrent contact joint.
+// *const NewtonJoint* *contactJoint - pointer to a contact joint.
 // *void* *contact - pointer to current contact.
 //
-// Return: a handle to the next contact contact in the contact array if contact exist, NULL otherwise.
+// Return: a pointer to the next contact in the contact array,  NULL if no contacts exist.
 //
 // See also: NewtonContactJointGetFirstContact, NewtonContactGetMaterial, NewtonContactJointRemoveContact
 void* NewtonContactJointGetNextContact(const NewtonJoint* const contactJoint, void* const contact)
