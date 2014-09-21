@@ -35,6 +35,26 @@ dBezierSpline::dBezierSpline (const dBezierSpline& src)
 	}
 }
 
+
+dBezierSpline::~dBezierSpline ()
+{
+	Clear();
+}
+
+void dBezierSpline::Clear()
+{
+	if (m_knotVector) {
+		Free (m_knotVector);
+	}
+
+	if (m_controlPoints) {
+		Free (m_controlPoints);
+	}
+	m_knotVector = NULL;
+	m_controlPoints = NULL;
+}
+
+
 dBezierSpline& dBezierSpline::operator = (const dBezierSpline &copy)
 {
 	Clear();
@@ -44,10 +64,6 @@ dBezierSpline& dBezierSpline::operator = (const dBezierSpline &copy)
 	return *this;
 }
 
-dBezierSpline::~dBezierSpline ()
-{
-	Clear();
-}
 
 int dBezierSpline::GetDegree () const
 {
@@ -124,19 +140,6 @@ dBigVector* dBezierSpline::GetControlPointArray()
 const dBigVector* dBezierSpline::GetControlPointArray() const
 {
 	return m_controlPoints;
-}
-
-void dBezierSpline::Clear()
-{
-	if (m_knotVector) {
-		Free (m_knotVector);
-	}
-
-	if (m_controlPoints) {
-		Free (m_controlPoints);
-	}
-	m_knotVector = NULL;
-	m_controlPoints = NULL;
 }
 
 int dBezierSpline::GetSpan(dFloat64 u) const
@@ -272,14 +275,14 @@ dBigVector dBezierSpline::CurvePoint (dFloat64 u, int span) const
 
 dBigVector dBezierSpline::CurvePoint (dFloat64 u) const
 {
-	u = dMod (u, 1.0f);
+	u = dClamp (u, dFloat64 (0.0f), dFloat64 (1.0f));
 	int span = GetSpan(u);
 	return CurvePoint (u, span);
 }
 
 dBigVector dBezierSpline::CurveDerivative (dFloat64 u, int index) const
 {
-	u = dMod (u, 1.0f);
+	u = dClamp (u, dFloat64 (0.0f), dFloat64 (1.0f));
 	dAssert (index <= m_degree);
 	
 	dFloat64 basicsFuncDerivatives[D_BEZIER_LOCAL_BUFFER_SIZE];
@@ -531,4 +534,42 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 
 	closestPoint = closestControlPoint;
 	return u0;
+}
+
+void dBezierSpline::InsertkNot (dFloat64 u)
+{
+	int k = GetSpan(u);
+	int s = 0;
+
+	dFloat64 uq[D_BEZIER_LOCAL_BUFFER_SIZE];
+	dAssert ((m_knotsCount + 1)< D_BEZIER_LOCAL_BUFFER_SIZE);
+
+	for (int i = 0; i <= k; i ++) {
+		uq[i] = m_knotVector[i];
+	}
+	uq[k + 1] = u;
+	for (int i = k + 1; i < m_knotsCount; i ++) {
+		uq[i + 1] = m_knotVector[i];
+	}
+
+
+	dBigVector Rw[16];
+	dBigVector Qw____[D_BEZIER_LOCAL_BUFFER_SIZE];
+	for (int i = 0; i <= (k - m_degree); i ++) {
+		Qw____[i] = m_controlPoints[i];
+	}
+
+	for (int i = k - s; i < m_controlPointsCount; i ++) {
+		Qw____[i + 1] = m_controlPoints[i];
+	}
+
+	for (int i = 0; i <= m_degree; i ++) {
+//		Rw[i] = m_controlPoints[k - p + i];
+	}
+
+
+//	Clear();
+//	m_controlPointsCount ++;
+//	m_knotsCount ++;
+	
 }

@@ -1180,6 +1180,92 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 		me->RenderVehicleHud (scene, lineNumber);
 	}
 
+
+	void TestSpline () const
+	{
+		glDisable (GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
+
+		//dFloat64 knots[] = {0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f};
+dFloat64 knots[] = {0.0f, 1.0f};
+		dBigVector control[] = 
+		{
+			dBigVector (200.0f, 200.0f, 0.0f, 1.0f),
+			dBigVector (150.0f, 250.0f, 0.0f, 1.0f),
+			dBigVector (250.0f, 300.0f, 0.0f, 1.0f),
+			dBigVector (350.0f, 250.0f, 0.0f, 1.0f),
+			dBigVector (250.0f, 150.0f, 0.0f, 1.0f),
+			dBigVector (200.0f, 200.0f, 0.0f, 1.0f),
+		};
+		static dBezierSpline spline;
+		if (!spline.GetControlPointArray()) {
+			spline.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, control);
+			spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
+		}
+
+		const int segments = 20;
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glBegin(GL_LINES);
+		dBigVector p0 (spline.CurvePoint(0.0f)) ;
+		for (int i = 1; i <= segments; i ++) {
+			dBigVector p1 (spline.CurvePoint(float (i) / segments)) ;
+			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+			p0 = p1;
+		}
+		glEnd();
+
+		glColor3f(0.0f, 1.0f, 1.0f);
+		glPointSize(4.0f);
+		glBegin(GL_POINTS);
+		for (int i = 0; i < spline.GetControlPointCount(); i ++) {
+			dBigVector p (spline.GetControlPoint(i));
+			glVertex3f (p.m_x, p.m_y, p.m_z);
+		}
+		glEnd();
+
+		// recreate the spline form some sample points
+		int xxx = 4;
+		dBigVector points[5];
+		points[0] = spline.CurvePoint(0.0f / 3.0f) + dBigVector (300.0f, 0.0f, 0.0f, 0.0f);
+		points[1] = spline.CurvePoint(1.0f / 3.0f) + dBigVector (300.0f, 0.0f, 0.0f, 0.0f);
+		points[2] = spline.CurvePoint(2.0f / 3.0f) + dBigVector (300.0f, 0.0f, 0.0f, 0.0f);
+		points[3] = spline.CurvePoint(3.0f / 3.0f) + dBigVector (300.0f, 0.0f, 0.0f, 0.0f);
+
+		dBigVector derivP0 (spline.CurveDerivative(0.0f));
+		dBigVector derivP1 (spline.CurveDerivative(1.0f));
+
+		static dBezierSpline spline1;
+		spline1.GlobalCubicInterpolation (xxx, points, derivP0, derivP1);
+
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glBegin(GL_LINES);
+		p0 = spline1.CurvePoint(0.0f);
+		for (int i = 1; i <= segments; i ++) {
+			dFloat64 u = float (i) / segments;
+			dBigVector p1 (spline1.CurvePoint(u));
+			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+			p0 = p1;
+		}
+		glEnd();
+
+
+		glPointSize(4.0f);
+		glBegin(GL_POINTS);
+		glColor3f(0.0f, 1.0f, 1.0f);
+		for (int i = 0; i < spline.GetControlPointCount(); i ++) {
+			dBigVector p (spline1.GetControlPoint(i));
+			glVertex3f (p.m_x, p.m_y, p.m_z);
+		}
+
+		glColor3f(1.0f, 0.0f, 0.0f);
+		for (int i = 0; i < xxx; i ++) {
+			glVertex3f (points[i].m_x, points[i].m_y, points[i].m_z);
+		}
+		glEnd();
+	}
+
 	void DrawHelp(DemoEntityManager* const scene, int lineNumber) const
 	{
 		if (m_player->m_helpKey.GetPushButtonState()) {
@@ -1210,88 +1296,8 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 			// restore color and blend mode
 			glDisable (GL_BLEND);
 		}
-/*
-const int segments = 20;
-glDisable (GL_LIGHTING);
-glDisable(GL_TEXTURE_2D);
 
-dFloat knots[] = {0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f};
-dVector control[] = 
-{
-	dVector (200.0f, 200.0f, 0.0f, 1.0f),
-	dVector (150.0f, 250.0f, 0.0f, 1.0f),
-	dVector (250.0f, 300.0f, 0.0f, 1.0f),
-	dVector (350.0f, 250.0f, 0.0f, 1.0f),
-	dVector (250.0f, 150.0f, 0.0f, 1.0f),
-	dVector (200.0f, 200.0f, 0.0f, 1.0f),
-};
-static dBezierSpline spline;
-if (!spline.GetControlPointArray()) {
-	spline.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, control);
-}
-
-glColor3f(1.0f, 1.0f, 1.0f);
-glBegin(GL_LINES);
-dVector p0 (spline.CurvePoint(0.0f)) ;
-for (int i = 1; i <= segments; i ++) {
-	dVector p1 (spline.CurvePoint(float (i) / segments)) ;
-	glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-	glVertex3f (p1.m_x, p1.m_y, p1.m_z);
-	p0 = p1;
-}
-glEnd();
-
-glColor3f(1.0f, 1.0f, 0.0f);
-glPointSize(4.0f);
-glBegin(GL_POINTS);
-for (int i = 0; i < spline.GetControlPointCount(); i ++) {
-	dVector p (spline.GetControlPoint(i));
-	glVertex3f (p.m_x, p.m_y, p.m_z);
-}
-glEnd();
-
-
-int xxx = 4;
-dVector points[5];
-points[0] = spline.CurvePoint(0.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
-points[1] = spline.CurvePoint(1.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
-points[2] = spline.CurvePoint(2.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
-points[3] = spline.CurvePoint(3.0f / 3.0f) + dVector (300.0f, 0.0f, 0.0f, 0.0f);
-
-dVector derivP0 (spline.CurveDerivative(0.0f));
-dVector derivP1 (spline.CurveDerivative(1.0f));
-
-static dBezierSpline spline1;
-spline1.GlobalCubicInterpolation (xxx, points, derivP0, derivP1);
-
-
-glColor3f(1.0f, 1.0f, 1.0f);
-glBegin(GL_LINES);
-p0 = spline1.CurvePoint(0.0f);
-for (int i = 1; i <= segments; i ++) {
-	dFloat u = float (i) / segments;
-	dVector p1 (spline1.CurvePoint(u));
-	glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-	glVertex3f (p1.m_x, p1.m_y, p1.m_z);
-	p0 = p1;
-}
-glEnd();
-
-
-glPointSize(4.0f);
-glBegin(GL_POINTS);
-glColor3f(1.0f, 1.0f, 0.0f);
-for (int i = 0; i < spline.GetControlPointCount(); i ++) {
-	dVector p (spline1.GetControlPoint(i));
-	glVertex3f (p.m_x, p.m_y, p.m_z);
-}
-
-glColor3f(1.0f, 0.0f, 0.0f);
-for (int i = 0; i < xxx; i ++) {
-	glVertex3f (points[i].m_x, points[i].m_y, points[i].m_z);
-}
-glEnd();
-*/
+		TestSpline();
 	}
 
 	void SetAsPlayer (HeavyVehicleEntity* const player)
@@ -1423,7 +1429,7 @@ location.m_posit.m_z = 50.0f;
 
 	// create a vehicle controller manager
 	HeavyVehicleControllerManager* const manager = new HeavyVehicleControllerManager (world);
-	
+/*	
 	HeavyVehicleEntity* const heavyVehicle = new HeavyVehicleEntity (scene, manager, location, "lav-25.ngd", heavyTruck);
 	heavyVehicle->BuildAllWheelDriveVehicle (heavyTruck);
 
@@ -1433,7 +1439,7 @@ location.m_posit.m_z = 50.0f;
 	location.m_posit.m_y += 2.0f;
 	HeavyVehicleEntity* const lightVehicle = new HeavyVehicleEntity (scene, manager, location, "buggy_.ngd", lightTruck);
 	lightVehicle->BuildLightTruckVehicle (lightTruck);
-
+*/
 	location.m_posit.m_z -= 12.0f;
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 3.0f;

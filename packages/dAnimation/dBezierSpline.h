@@ -35,9 +35,11 @@ class dBezierSpline : public dContainersAlloc
 
 	dFloat64 CalculateLength (dFloat64 tol) const;
 
+	void GlobalCubicInterpolation (int count, const dBigVector* const points, const dBigVector& firstTangent, const dBigVector& lastTangent);
 	void CreateFromKnotVectorAndControlPoints (int degree, int knotCount, const dFloat64* const knotVector, const dBigVector* const controlPoints);
 
-	void GlobalCubicInterpolation (int count, const dBigVector* const points, const dBigVector& firstTangent, const dBigVector& lastTangent);
+	void InsertkNot (dFloat64 u);
+	
 
 	int GetControlPointCount() const;
 	dBigVector* GetControlPointArray();
