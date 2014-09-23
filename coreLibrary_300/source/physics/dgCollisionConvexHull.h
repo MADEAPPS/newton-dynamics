@@ -38,7 +38,6 @@ class dgCollisionConvexHull: public dgCollisionConvex
 	dgInt32 GetFaceIndices (dgInt32 index, dgInt32* const indices) const;
 
 	static dgInt32 CalculateSignature (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes);
-	static dgInt32 CalculatePinNumber (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes);
 
 	protected:
 	void BuildHull (dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray);

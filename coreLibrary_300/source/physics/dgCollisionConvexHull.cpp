@@ -741,22 +741,6 @@ dgInt32 dgCollisionConvexHull::CalculateSignature (dgInt32 vertexCount, const dg
 	return Quantize(&buffer[0], buffer.GetSizeInBytes());
 }
 
-dgInt32 dgCollisionConvexHull::CalculatePinNumber (dgInt32 vertexCount, const dgFloat32* const vertexArray, dgInt32 strideInBytes)
-{
-	dgStack<dgUnsigned32> buffer(1 + 3 * vertexCount);  
-	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
-
-	memset (&buffer[0], 0, size_t (buffer.GetSizeInBytes()));
-	buffer[0] = m_convexHullCollision;
-
-	for (dgInt32 i = 0; i < vertexCount; i ++) {
-		buffer[1 + i * 3 + 0] = dgCollision::Quantize (vertexArray[i * stride + 2]);
-		buffer[1 + i * 3 + 1] = dgCollision::Quantize (vertexArray[i * stride + 0]);
-		buffer[1 + i * 3 + 2] = dgCollision::Quantize (vertexArray[i * stride + 1]);
-	}
-
-	return Quantize(&buffer[0], buffer.GetSizeInBytes());
-}
 
 dgInt32 dgCollisionConvexHull::CalculateSignature () const
 {

@@ -55,23 +55,12 @@ class dgUniversalConstraint;
 class dgCorkscrewConstraint;
 class dgCollisionDeformableMesh;
 
-class CollisionKeyPair
-{
-	public:
-	CollisionKeyPair(const dgCollision* collision, dgUnsigned32 pinNumber)
-		:m_collision(collision)
-		,m_pinNumber(pinNumber)
-	{
-	}
-	const dgCollision* m_collision;
-	dgUnsigned32 m_pinNumber;
-};
 
-class dgBodyCollisionList: public dgTree<CollisionKeyPair, dgUnsigned32>
+class dgBodyCollisionList: public dgTree<const dgCollision*, dgUnsigned32>
 {
 	public:
 	dgBodyCollisionList (dgMemoryAllocator* const allocator)
-		:dgTree<CollisionKeyPair, dgUnsigned32>(allocator)
+		:dgTree<const dgCollision*, dgUnsigned32>(allocator)
 	{
 	}
 };

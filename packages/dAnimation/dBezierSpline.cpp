@@ -536,9 +536,16 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 	return u0;
 }
 
-int dBezierSpline::InsertKnot (dFloat64 u)
+void dBezierSpline::InsertKnot (dFloat64 u)
 {
 	int k = GetSpan(u);
+	int multiplicity = 0;
+	for (int i = 0; i < m_degree; i ++) {
+		multiplicity += (dAbs (m_knotVector[k + i + 1] - u) < dFloat64 (1.0e-5f)) ? 1 : 0;
+	}
+	if (multiplicity == m_degree) {
+		return;
+	}
 
 	dFloat64 newKnotVector[D_BEZIER_LOCAL_BUFFER_SIZE];
 	dAssert ((m_knotsCount + 1)< D_BEZIER_LOCAL_BUFFER_SIZE);
@@ -586,12 +593,93 @@ int dBezierSpline::InsertKnot (dFloat64 u)
 
 	memcpy (m_knotVector, newKnotVector, m_knotsCount * sizeof (dFloat64));
 	memcpy (m_controlPoints, newControlPoints, m_controlPointsCount * sizeof (dBigVector));
-
-	return k + 1;
 }
 
 
-bool dBezierSpline::RemoveKnot (int span)
+bool dBezierSpline::RemoveKnot (dFloat64 u, dFloat64 tol)
 {
-	return true;
+	int r = GetSpan(u) + 1;
+	dAssert (m_knotVector[r - 1] < u);
+	if (dAbs (m_knotVector[r] - u) > 1.0e-5f) {
+		return false;
+	}
+
+	int s = 1;
+	int last = r - s;
+	int first = r - m_degree;
+	int ord = m_degree + 1;
+	dBigVector temp[16];
+
+	bool removableFlag = false;
+	int t = 0;
+	for ( ; t < m_degree; t ++) {
+		int off = first - 1;
+		temp[0] = m_controlPoints[off];
+		temp[last + 1 - off] = m_controlPoints[last + 1];
+		int i = first;
+		int j = last;
+		int ii = 1;
+		int jj = last - off;
+
+		while ((j - i) > t) {
+			dFloat64 alpha_i = (u - m_knotVector[i]) / (m_knotVector[i + ord + t] - m_knotVector[i]);
+			dFloat64 alpha_j = (u - m_knotVector[j - t]) / (m_knotVector[j + ord] - m_knotVector[j - t]);
+			temp[ii] = (m_controlPoints[i] - temp[ii - 1].Scale (dFloat64 (1.0f) - alpha_i)).Scale (dFloat64 (1.0f) / alpha_i);
+			temp[jj] = (m_controlPoints[j] - temp[jj + 1].Scale (alpha_j)).Scale (dFloat64 (1.0f) / (dFloat64 (1.0f) - alpha_j));
+			i ++;
+			j --;
+			ii ++;
+			jj --;
+		}
+		if ((j - i) < t) {
+			dBigVector diff (temp[ii - 1] - temp[jj + 1]);
+			removableFlag = (diff % diff) < (tol * tol);
+		} else {
+			dFloat64 alpha_i = (u - m_knotVector[i]) / (m_knotVector[i + ord + t] - m_knotVector[i]);
+			dBigVector p (temp[ii + t + 1].Scale (alpha_i) + temp[ii - 1].Scale (dFloat64 (1.0f) - alpha_i));
+			dBigVector diff (m_controlPoints[i] - p);
+			removableFlag = (diff % diff) < (tol * tol);
+		}
+		if (!removableFlag) {
+			break;
+		}
+
+		i = first;
+		j = last;
+		while ((j - 1) > t) {
+			m_controlPoints[i] = temp[i - off];
+			m_controlPoints[j] = temp[j - off];
+			i ++;
+			j --;
+		}
+		first --;
+		last ++;
+	}
+
+	if (t) {
+		for (int k = r + t; k < m_knotsCount; k ++) {
+			m_knotVector[k - t] = m_knotVector[k];
+		}
+
+		int fOut = (2 * r - s - m_degree) / 2;
+		int j = fOut;
+		int i = j;
+		for (int k = 1; k < t; k ++) {
+			if ((k % 2) == 1) {
+				i ++;
+			} else {
+				j = j - 1;
+			}
+		}
+		for (int k = i + 1; k < m_controlPointsCount; k ++) {
+			m_controlPoints[j] = m_controlPoints[k];
+			j ++;
+		}
+
+		m_knotsCount -= t;
+		m_controlPointsCount -= t;
+	}
+
+
+	return removableFlag;
 }

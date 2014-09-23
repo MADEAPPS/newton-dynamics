@@ -54,7 +54,7 @@ struct VehicleParameters
 	dFloat LONGITUDINAL_STIFFNESS;
 	dFloat ALIGNING_MOMENT_TRAIL;
 
-	dMatrix m_tireaLigment;
+	dMatrix m_tireAligment;
 };
 
 static VehicleParameters heavyTruck = 
@@ -617,8 +617,8 @@ class HeavyVehicleEntity: public DemoEntity
 			aligmentMatrix = dYawMatrix(3.141592f);
 		}
 
-		TireAligmentTransform* const m_ligmentMatrix = new TireAligmentTransform (tireAligmentMatrix * aligmentMatrix);
-		tirePart->SetUserData(m_ligmentMatrix);
+		TireAligmentTransform* const ligmentMatrix = new TireAligmentTransform (tireAligmentMatrix * aligmentMatrix);
+		tirePart->SetUserData(ligmentMatrix);
 
 		// add the tire to the vehicle
 		CustomVehicleControllerBodyStateTire::TireCreationInfo tireInfo;
@@ -687,17 +687,17 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// add left tires
 		CustomVehicleControllerBodyStateTire* leftTire[4]; 
-		leftTire[0] = AddTire ("ltire_0", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		leftTire[1] = AddTire ("ltire_1", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		leftTire[2] = AddTire ("ltire_2", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		leftTire[3] = AddTire ("ltire_3", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		leftTire[0] = AddTire ("ltire_0", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
+		leftTire[1] = AddTire ("ltire_1", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
+		leftTire[2] = AddTire ("ltire_2", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
+		leftTire[3] = AddTire ("ltire_3", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
 
 		// add right tires
 		CustomVehicleControllerBodyStateTire* rightTire[4]; 
-		rightTire[0] = AddTire ("rtire_0", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		rightTire[1] = AddTire ("rtire_1", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		rightTire[2] = AddTire ("rtire_2", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		rightTire[3] = AddTire ("rtire_3", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		rightTire[0] = AddTire ("rtire_0", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
+		rightTire[1] = AddTire ("rtire_1", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
+		rightTire[2] = AddTire ("rtire_2", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
+		rightTire[3] = AddTire ("rtire_3", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
 
 		// add a steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
@@ -768,14 +768,14 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// add left tires
 		CustomVehicleControllerBodyStateTire* leftTire[2]; 
-		leftTire[0] = AddTire ("fl_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		leftTire[1] = AddTire ("rl_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		leftTire[0] = AddTire ("fl_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
+		leftTire[1] = AddTire ("rl_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
 
 		// add right tires
 		CustomVehicleControllerBodyStateTire* rightTire[2];
 		CalculateTireDimensions ("rl_tire", width, radius);
-		rightTire[0] = AddTire ("fr_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		rightTire[1] = AddTire ("rr_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		rightTire[0] = AddTire ("fr_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
+		rightTire[1] = AddTire ("rr_tire", offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
 
 		// add a steering Wheel
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
@@ -854,9 +854,9 @@ class HeavyVehicleEntity: public DemoEntity
 			// add the tire thread thickness
 			radius += 0.1f;
 
-			leftTire[i] = AddTire (name, offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+			leftTire[i] = AddTire (name, offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
 			sprintf (name, "r_tire%d", i);
-			rightTire[i] = AddTire (name, offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+			rightTire[i] = AddTire (name, offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
 		}
 
 		m_controller->LinksTiresKinematically (8, leftTire);
@@ -1186,8 +1186,8 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 		glDisable (GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
 
-		//dFloat64 knots[] = {0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f};
-dFloat64 knots[] = {0.0f, 1.0f};
+		dFloat64 knots[] = {0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f};
+//dFloat64 knots[] = {0.0f, 1.0f};
 		dBigVector control[] = 
 		{
 			dBigVector (200.0f, 200.0f, 0.0f, 1.0f),
@@ -1200,12 +1200,14 @@ dFloat64 knots[] = {0.0f, 1.0f};
 		static dBezierSpline spline;
 		if (!spline.GetControlPointArray()) {
 			spline.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, control);
-			int span = spline.InsertKnot ((knots[1] + knots[2]) * 0.5f);
-			//span = spline.InsertKnot ((knots[1] + knots[2]) * 0.5f);
-			//span = spline.InsertKnot ((knots[1] + knots[2]) * 0.5f);
-			//spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
-			//spline.InsertkNot ((knots[1] + knots[2]) * 0.5f);
-			spline.RemoveKnot (span);
+			dFloat64 u = (knots[1] + knots[2]) * 0.5f;
+			spline.InsertKnot (u);
+			spline.InsertKnot (u);
+			spline.InsertKnot (u);
+			spline.InsertKnot (u);
+			spline.InsertKnot (u);
+			spline.RemoveKnot (u, 1.0e-3f);
+			//spline.RemoveKnot (u, 1.0e-3f);
 		}
 
 		const int segments = 20;

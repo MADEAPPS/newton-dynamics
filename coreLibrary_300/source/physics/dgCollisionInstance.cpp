@@ -176,7 +176,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 		dgBodyCollisionList::dgTreeNode* node = world->dgBodyCollisionList::Find (dgUnsigned32 (signature));
 
 		if (node) {
-			collision = node->GetInfo().m_collision;
+			collision = node->GetInfo();
 			collision->AddRef();
 
 		} else {
@@ -220,7 +220,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_sphereCollision:
 				{
 					collision = new (allocator) dgCollisionSphere (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -228,7 +228,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_boxCollision:
 				{
 					collision = new (allocator) dgCollisionBox (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -236,7 +236,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_coneCollision:
 				{
 					collision = new (allocator) dgCollisionCone (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -244,7 +244,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_capsuleCollision:
 				{
 					collision = new (allocator) dgCollisionCapsule (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -252,7 +252,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_taperedCapsuleCollision:
 				{
 					collision = new (allocator) dgCollisionTaperedCapsule (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -260,7 +260,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_cylinderCollision:
 				{
 					collision = new (allocator) dgCollisionCylinder (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -268,7 +268,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_chamferCylinderCollision:
 				{
 					collision = new (allocator) dgCollisionChamferCylinder (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -276,7 +276,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_taperedCylinderCollision:
 				{
 					collision = new (allocator) dgCollisionTaperedCylinder (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -284,7 +284,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_convexHullCollision:
 				{
 					collision = new (allocator) dgCollisionConvexHull (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
@@ -292,7 +292,7 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_nullCollision:
 				{
 					collision = new (allocator) dgCollisionNull (world, deserialization, userData);
-					node = world->dgBodyCollisionList::Insert (CollisionKeyPair(collision, collision->GetSignature()), collision->GetSignature());
+					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
 				}
