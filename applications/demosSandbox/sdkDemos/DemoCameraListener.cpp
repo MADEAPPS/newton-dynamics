@@ -26,9 +26,10 @@
 //////////////////////////////////////////////////////////////////////
 
 
+#define D_CAMERA_LISTENER_NAMNE "cameraListener"
 
 DemoCameraListener::DemoCameraListener(DemoEntityManager* const scene)
-	:DemoListenerBase(scene, "cameraListener")
+	:DemoListenerBase(scene, D_CAMERA_LISTENER_NAMNE)
 	,m_camera (new DemoCamera())
 	,m_mousePosX(0)
 	,m_mousePosY(0)
@@ -42,6 +43,7 @@ DemoCameraListener::DemoCameraListener(DemoEntityManager* const scene)
 	,m_prevMouseState(false)
 	,m_mouseLockState(false)
 	,m_targetPicked(NULL)
+	,m_bodyDestructor(NULL)
 {
 }
 
@@ -158,6 +160,26 @@ void DemoCameraListener::InterpolateMatrices (DemoEntityManager* const scene, dF
 }
 
 
+void DemoCameraListener::OnPickedBodyDestroyedNotify (const NewtonBody* body)
+{
+	NewtonWorld* const world =  NewtonBodyGetWorld(body);
+	dAssert (world);
+
+	void* const preListenerHandle = NewtonWorldGetPreListener (world, D_CAMERA_LISTENER_NAMNE);
+	dAssert (preListenerHandle);
+
+	DemoCameraListener* const camManager = (DemoCameraListener*) NewtonWorldGetListenerUserData (world, preListenerHandle);
+	dAssert (camManager);
+
+	if (camManager->m_bodyDestructor) {
+		camManager->m_bodyDestructor (body);
+	}
+
+	// the body was destroyed, set the pointer and call back to NULL
+	camManager->m_targetPicked = NULL;
+	camManager->m_bodyDestructor = NULL;
+}
+
 void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float timestep) 
 {
 	NewtonDemos* const mainWin = scene->GetRootWindow();
@@ -186,6 +208,11 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 
 				// convert normal to local space
 				m_pickedBodyLocalAtachmentNormal = matrix.UnrotateVector(normal);
+
+
+				// link the a destructor callback
+				m_bodyDestructor = NewtonBodyGetDestructorCallback(m_targetPicked);
+				NewtonBodySetDestructorCallback(m_targetPicked, OnPickedBodyDestroyedNotify);
 			}
 		}
 
@@ -205,7 +232,10 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 			if (m_targetPicked) {
 				NewtonBodySetSleepState (m_targetPicked, 0);
 			}
+			// unchain the callbacks
+			NewtonBodySetDestructorCallback(m_targetPicked, m_bodyDestructor);
 			m_targetPicked = NULL; 
+			m_bodyDestructor = NULL;
 		}
 	}
 

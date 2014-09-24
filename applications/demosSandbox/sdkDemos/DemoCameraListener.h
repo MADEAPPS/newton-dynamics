@@ -51,6 +51,7 @@ class DemoCameraListener: public DemoListenerBase
 
 	void UpdatePickBody (DemoEntityManager* const scene, float timestep); 
 
+	static void OnPickedBodyDestroyedNotify (const NewtonBody* body);
 	
 	DemoCamera* m_camera;
 
@@ -70,6 +71,7 @@ class DemoCameraListener: public DemoListenerBase
 	dVector m_pickedBodyLocalAtachmentPoint;
 	dVector m_pickedBodyLocalAtachmentNormal;
 	NewtonBody* m_targetPicked;
+	NewtonBodyDestructor m_bodyDestructor;
 	friend class DemoCamera;
 };
 
