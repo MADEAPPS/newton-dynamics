@@ -242,8 +242,8 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 
 			// unchain the callbacks
 			//NewtonBodySetDestructorCallback(m_targetPicked, m_bodyDestructor);
-			//m_targetPicked = NULL; 
-			//m_bodyDestructor = NULL;
+			m_targetPicked = NULL; 
+			m_bodyDestructor = NULL;
 		}
 	}
 
