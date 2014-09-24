@@ -159,7 +159,14 @@ void DemoCameraListener::InterpolateMatrices (DemoEntityManager* const scene, dF
 	}
 }
 
+void DemoCameraListener::OnBodyDestroy (NewtonBody* const body)
+{
+	// remove the references pointer because the body is going to be destroyed
+	m_targetPicked = NULL;
+	m_bodyDestructor = NULL;
+}
 
+/*
 void DemoCameraListener::OnPickedBodyDestroyedNotify (const NewtonBody* body)
 {
 	NewtonWorld* const world =  NewtonBodyGetWorld(body);
@@ -179,6 +186,7 @@ void DemoCameraListener::OnPickedBodyDestroyedNotify (const NewtonBody* body)
 	camManager->m_targetPicked = NULL;
 	camManager->m_bodyDestructor = NULL;
 }
+*/
 
 void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float timestep) 
 {
@@ -209,10 +217,9 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 				// convert normal to local space
 				m_pickedBodyLocalAtachmentNormal = matrix.UnrotateVector(normal);
 
-
 				// link the a destructor callback
-				m_bodyDestructor = NewtonBodyGetDestructorCallback(m_targetPicked);
-				NewtonBodySetDestructorCallback(m_targetPicked, OnPickedBodyDestroyedNotify);
+				//m_bodyDestructor = NewtonBodyGetDestructorCallback(m_targetPicked);
+				//NewtonBodySetDestructorCallback(m_targetPicked, OnPickedBodyDestroyedNotify);
 			}
 		}
 
@@ -232,10 +239,11 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 			if (m_targetPicked) {
 				NewtonBodySetSleepState (m_targetPicked, 0);
 			}
+
 			// unchain the callbacks
-			NewtonBodySetDestructorCallback(m_targetPicked, m_bodyDestructor);
-			m_targetPicked = NULL; 
-			m_bodyDestructor = NULL;
+			//NewtonBodySetDestructorCallback(m_targetPicked, m_bodyDestructor);
+			//m_targetPicked = NULL; 
+			//m_bodyDestructor = NULL;
 		}
 	}
 

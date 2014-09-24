@@ -25,10 +25,13 @@ class DemoListenerBase
 	virtual void PreUpdate (const NewtonWorld* const world, dFloat timestep) = 0;
 	virtual void PostUpdate (const NewtonWorld* const world, dFloat timestep) = 0;
 
+	virtual void OnBodyDestroy (NewtonBody* const body);
+
 	private:
 	static void PreUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void PostUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
+	static void OnBodyDetroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body);
 
 //	protected:
 //	DemoEntityManager* m_scene; 

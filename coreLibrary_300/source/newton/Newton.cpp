@@ -1099,12 +1099,27 @@ void NewtonWorldSetCollisionConstructorDestructorCallback (const NewtonWorld* co
 }
 
 
-NEWTON_API void* NewtonWorldGetListenerUserData (const NewtonWorld* const newtonWorld, void* const listener)
+void* NewtonWorldGetListenerUserData (const NewtonWorld* const newtonWorld, void* const listener)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
 	return world->GetListenerUserData (listener);
 }
+
+NewtonWorldListenerBodyDestroyCallback NewtonWorldListenerGetBodyDestroyCallback (const NewtonWorld* const newtonWorld, void* const listener)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	return (NewtonWorldListenerBodyDestroyCallback) world->GetListenerBodyDestroyCallback (listener);
+}
+
+void NewtonWorldListenerSetBodyDestroyCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerBodyDestroyCallback bodyDestroyCallback)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	world->SetListenerBodyDestroyCallback (listener, (dgWorld::OnListenerBodyDestroyCallback) bodyDestroyCallback);
+}
+
 
 void* NewtonWorldAddPreListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData, NewtonWorldUpdateListenerCallback update, NewtonWorldDestroyListenerCallback destroy)
 {
@@ -1218,7 +1233,7 @@ void NewtonWorldRayCast(const NewtonWorld* const newtonWorld, const dFloat* cons
 	}
 }
 
-NEWTON_API void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const NewtonCollision* const shape, const dFloat* const matrix, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, int threadIndex)
+void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const NewtonCollision* const shape, const dFloat* const matrix, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	if (filter) {
@@ -3574,9 +3589,8 @@ int NewtonTreeCollisionGetVertexListTriangleListInAABB(const NewtonCollision* co
 //NewtonCollision* NewtonCreateHeightFieldCollision(const NewtonWorld* const newtonWorld, int width, int height, int cellsDiagonals,
 //												  const dFloat* const elevationMap, const char* const atributeMap,
 //												  dFloat horizontalScale, int shapeID)
- NEWTON_API NewtonCollision* NewtonCreateHeightFieldCollision (const NewtonWorld* const newtonWorld, int width, int height, int gridsDiagonals, dgInt32 elevationdatType,
-															   const void* const elevationMap, const char* const attributeMap, dFloat verticalScale, dFloat horizontalScale, int shapeID)
-
+  NewtonCollision* NewtonCreateHeightFieldCollision (const NewtonWorld* const newtonWorld, int width, int height, int gridsDiagonals, dgInt32 elevationdatType,
+												    const void* const elevationMap, const char* const attributeMap, dFloat verticalScale, dFloat horizontalScale, int shapeID)
 {
 	Newton* const world = (Newton *)newtonWorld;
 
@@ -3684,13 +3698,13 @@ NewtonCollision* NewtonSceneCollisionGetCollisionFromNode (NewtonCollision* cons
 	return NewtonCompoundCollisionGetCollisionFromNode (sceneCollision, node);
 }
 
-NEWTON_API void* NewtonSceneCollisionGetFirstNode (NewtonCollision* const sceneCollision)
+void* NewtonSceneCollisionGetFirstNode (NewtonCollision* const sceneCollision)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	return NewtonCompoundCollisionGetFirstNode (sceneCollision);
 }
 
-NEWTON_API void* NewtonSceneCollisionGetNextNode (NewtonCollision* const sceneCollision, const void* const node)
+void* NewtonSceneCollisionGetNextNode (NewtonCollision* const sceneCollision, const void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	return NewtonCompoundCollisionGetNextNode (sceneCollision, node);
@@ -5502,11 +5516,6 @@ NewtonMaterial* NewtonContactGetMaterial(const void* const contact)
 	dgContactMaterial& contactMaterial = node->GetInfo();
 	return (NewtonMaterial*) &contactMaterial;
 }
-
-//NEWTON_API NewtonCollision* NewtonContactGetCollision0 (const void* const contact);	
-//NEWTON_API NewtonCollision* NewtonContactGetCollision1 (const void* const contact);	
-//NEWTON_API void* NewtonContactGetCollisionID0 (const void* const contact);	
-//NEWTON_API void* NewtonContactGetCollisionID1 (const void* const contact);	
 
 NewtonCollision* NewtonContactGetCollision0(const void* const contact)
 {
@@ -7815,7 +7824,7 @@ NewtonMesh* NewtonMeshCreateVoronoiConvexDecomposition (const NewtonWorld* const
 	return (NewtonMesh*) dgMeshEffect::CreateVoronoiConvexDecomposition (world->dgWorld::GetAllocator(), pointCount, strideInBytes, vertexCloud, materialID, dgMatrix (textureMatrix));
 }
 
-NEWTON_API NewtonMesh* NewtonMeshCreateFromSerialization (const NewtonWorld* const newtonWorld, NewtonDeserializeCallback deserializeFunction, void* const serializeHandle)
+NewtonMesh* NewtonMeshCreateFromSerialization (const NewtonWorld* const newtonWorld, NewtonDeserializeCallback deserializeFunction, void* const serializeHandle)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;

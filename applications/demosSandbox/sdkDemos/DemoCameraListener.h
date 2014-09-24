@@ -49,12 +49,10 @@ class DemoCameraListener: public DemoListenerBase
 	virtual void PreUpdate (const NewtonWorld* const world, dFloat timestep);
 	virtual void PostUpdate (const NewtonWorld* const world, dFloat timestep);
 
+	virtual void OnBodyDestroy (NewtonBody* const body);
 	void UpdatePickBody (DemoEntityManager* const scene, float timestep); 
-
-	static void OnPickedBodyDestroyedNotify (const NewtonBody* body);
 	
 	DemoCamera* m_camera;
-
 	int m_mousePosX;
 	int m_mousePosY;
 	dFloat m_yaw;

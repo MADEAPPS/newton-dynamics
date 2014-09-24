@@ -15,16 +15,21 @@
 #include "DemoListenerBase.h"
 
 DemoListenerBase::DemoListenerBase(DemoEntityManager* const scene, const char* const listenerName)
-//	:m_scene (scene)
 {
-	NewtonWorldAddPreListener (scene->GetNewton(), listenerName, this, PreUpdate, NULL);
-	NewtonWorldAddPostListener (scene->GetNewton(), listenerName, this, PostUpdate, Destroy);
+	NewtonWorld* const world = scene->GetNewton();
+	void* const prelistener = NewtonWorldAddPreListener (world, listenerName, this, PreUpdate, NULL);
+	NewtonWorldAddPostListener (world, listenerName, this, PostUpdate, Destroy);
+
+	NewtonWorldListenerSetBodyDestroyCallback (world, prelistener, OnBodyDetroy);
 }
 
 DemoListenerBase::~DemoListenerBase()
 {
 }
 
+void DemoListenerBase::OnBodyDestroy (NewtonBody* const body)
+{
+}
 
 void DemoListenerBase::PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep)
 {
@@ -45,3 +50,8 @@ void DemoListenerBase::Destroy (const NewtonWorld* const world, void* const list
 	delete me;
 }
 
+void DemoListenerBase::OnBodyDetroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body)
+{
+	DemoListenerBase* const me = (DemoListenerBase*) NewtonWorldGetListenerUserData(world, listener);
+	me->OnBodyDestroy(body);
+}

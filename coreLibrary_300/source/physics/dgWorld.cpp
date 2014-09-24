@@ -570,6 +570,21 @@ dgBody* dgWorld::CreateDeformableBody(dgCollisionInstance* const collision, cons
 
 void dgWorld::DestroyBody(dgBody* const body)
 {
+	for (dgListenerList::dgListNode* node = m_postListener.GetLast(); node; node = node->GetPrev()) {
+		dgListener& listener = node->GetInfo();
+		if (listener.m_onBodyDestroy) {
+			listener.m_onBodyDestroy (this, node, body);
+		}
+	}
+
+	for (dgListenerList::dgListNode* node = m_preListener.GetLast(); node; node = node->GetPrev()) {
+		dgListener& listener = node->GetInfo();
+		if (listener.m_onBodyDestroy) {
+			listener.m_onBodyDestroy (this, node, body);
+		}
+	}
+
+
 	if (body->m_destructor) {
 		body->m_destructor (*body);
 	}
@@ -676,6 +691,19 @@ void* dgWorld::GetListenerUserData (void* const listenerNode) const
 	dgListener& listener = ((dgListenerList::dgListNode*) listenerNode)->GetInfo();
 	return listener.m_userData;
 }
+
+void dgWorld::SetListenerBodyDestroyCallback (void* const listenerNode, OnListenerBodyDestroyCallback callback)
+{
+	dgListener& listener = ((dgListenerList::dgListNode*) listenerNode)->GetInfo();
+	listener.m_onBodyDestroy = callback;
+}
+
+dgWorld::OnListenerBodyDestroyCallback dgWorld::GetListenerBodyDestroyCallback (void* const listenerNode) const
+{
+	dgListener& listener = ((dgListenerList::dgListNode*) listenerNode)->GetInfo();
+	return listener.m_onBodyDestroy;
+}
+
 
 void* dgWorld::FindPreListener (const char* const nameid) const
 {
