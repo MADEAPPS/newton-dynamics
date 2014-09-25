@@ -428,6 +428,9 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_posit = m_suspensionlenght;
 	m_matrix = CalculateSteeringMatrix ();
 
+	m_lateralSlip = 0.0f;
+	m_longitudinalSlip = 0.0f;
+
 	UpdateInertia();
 
 	// initialize the joints that connect tghsi tire to other vehicle componets;

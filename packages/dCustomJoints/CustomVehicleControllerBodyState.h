@@ -170,6 +170,17 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 		return m_longitudinalForce;
 	}
 
+	CUSTOM_JOINTS_API dFloat GetLateralSlip () const
+	{
+		return m_lateralSlip;
+	}
+
+	CUSTOM_JOINTS_API dFloat GetLongitudinalSlip () const
+	{
+		return m_longitudinalSlip;
+	}
+
+
 	private:
 	CUSTOM_JOINTS_API void UpdateTransform ();
 	CUSTOM_JOINTS_API void UpdateDynamicInputs(dFloat timestep);
@@ -202,6 +213,9 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_maxAngularVelocity;
 	dFloat m_aligningMomentTrail;
 	dFloat m_longitudialStiffness;
+
+	dFloat m_lateralSlip;
+	dFloat m_longitudinalSlip;
 	
 	void* m_userData;
 	NewtonCollision* m_shape;

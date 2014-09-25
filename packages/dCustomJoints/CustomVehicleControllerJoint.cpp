@@ -219,6 +219,9 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 
 	const dVector& upPin = chassis.m_matrix[1];
 	dFloat tireLoad = tire->m_tireLoad % upPin;
+
+	tire->m_lateralSlip = 0.0f;
+	tire->m_longitudinalSlip = 0.0f;
 	if (tireLoad > 0.01f) {
 		dFloat restTireLoad = chassis.m_gravityMag * tire->m_restSprunMass;
 		for (int i = 0; i < m_contactCount; i ++) {
@@ -270,6 +273,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 						sideSlipAngle = (3.141592f * 90.0f / 180.0f) ;
 					}
 				}
+				tire->m_lateralSlip = sideSlipAngle * (1.0f / (3.141592f * 90.0f / 180.0f));
 
 				// calculate longitudinal slip ratio 
 				dFloat longitudinalSlipRatio = 1.0f;
@@ -282,6 +286,9 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 						longitudinalSlipRatio = dSign(Rw);
 					}
 				}
+				
+				tire->m_longitudinalSlip = longitudinalSlipRatio;
+
 
 				// get the normalize tire load
 				dFloat normalizedTireLoad = dClamp (tireLoad / restTireLoad, 0.0f, 4.0f);
