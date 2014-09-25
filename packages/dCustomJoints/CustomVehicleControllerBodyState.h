@@ -222,13 +222,13 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerTireJoint;
-	friend class CustomVehicleControllerTireContactJoint;
-	friend class CustomVehicleControllerEngineDifferencialJoint;
-	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerComponentEngine;
-	friend class CustomVehicleControllerComponentSteering;
+	friend class CustomVehicleControllerEngineIdleJoint;
+	friend class CustomVehicleControllerTireContactJoint;
 	friend class CustomVehicleControllerBodyStateChassis;
+	friend class CustomVehicleControllerComponentSteering;
+	friend class CustomVehicleControllerEngineDifferencialJoint;
 };
 
 
