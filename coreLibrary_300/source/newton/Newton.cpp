@@ -5584,17 +5584,18 @@ void NewtonBodySetCollisionScale (const NewtonBody* const bodyPtr, dFloat scaleX
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 	dgWorld* const world = body->GetWorld();
+	NewtonCollision* const collision = NewtonBodyGetCollision(bodyPtr);
 
-    NewtonCollision* const collision = NewtonBodyGetCollision(bodyPtr);
+	dgFloat32 mass = body->GetInvMass().m_w > dgFloat32 (0.0f) ? body->GetMass().m_w : dgFloat32 (0.0f);
 	NewtonCollisionSetScale (collision, scaleX, scaleY, scaleZ);
-    NewtonBodySetMassProperties (bodyPtr, body->GetMass().m_w, collision);
-	world->GetBroadPhase()->ResetEntropy ();
 
 	NewtonJoint* nextJoint;
 	for (NewtonJoint* contactJoint = NewtonBodyGetFirstContactJoint(bodyPtr); contactJoint; contactJoint = nextJoint) {
 		nextJoint = NewtonBodyGetNextContactJoint(bodyPtr, contactJoint);
 		world->DestroyConstraint ((dgConstraint*)contactJoint);
 	}
+    NewtonBodySetMassProperties (bodyPtr, mass, collision);
+	world->GetBroadPhase()->ResetEntropy ();
 }
 
 

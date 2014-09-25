@@ -60,6 +60,9 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 		// bypass the entire Post Update call by not calling the base class
 	}
 
+	CUSTOM_JOINTS_API virtual void OnDestroyBody (NewtonBody* const body); 
+
+
 	virtual void Debug () const {};
 	CUSTOM_JOINTS_API virtual CustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData);
 

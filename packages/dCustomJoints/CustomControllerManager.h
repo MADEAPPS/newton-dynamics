@@ -153,10 +153,14 @@ class CustomControllerManager: public dList<CONTROLLER_BASE>
 
 	virtual CONTROLLER_BASE* CreateController ();
 	virtual void DestroyController (CONTROLLER_BASE* const controller);
+	virtual void OnDestroyBody (NewtonBody* const body) 
+	{
+	}
 
     virtual void Debug () const;
 	virtual void PreUpdate(dFloat timestep);
 	virtual void PostUpdate(dFloat timestep);
+	
 
 	private:
 	void DestroyAllController ();
@@ -164,6 +168,7 @@ class CustomControllerManager: public dList<CONTROLLER_BASE>
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
 	static void PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
 	static void PostUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
+	static void OnBodyDestroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body);
 
 	static void PreUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex);
 	static void PostUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex);
@@ -179,8 +184,9 @@ CustomControllerManager<CONTROLLER_BASE>::CustomControllerManager(NewtonWorld* c
 	:m_world(world)
 	,m_curTimestep(0.0f)
 {
-	NewtonWorldAddPreListener (world, managerName, this, PreUpdate, NULL);
+	void* const prelistener = NewtonWorldAddPreListener (world, managerName, this, PreUpdate, NULL);
 	NewtonWorldAddPostListener (world, managerName, this, PostUpdate, Destroy);
+	NewtonWorldListenerSetBodyDestroyCallback (world, prelistener, OnBodyDestroy);
 }
 
 template<class CONTROLLER_BASE>
@@ -244,6 +250,22 @@ void CustomControllerManager<CONTROLLER_BASE>::Destroy (const NewtonWorld* const
 	delete me;
 }
 
+template<class CONTROLLER_BASE>
+void CustomControllerManager<CONTROLLER_BASE>::OnBodyDestroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body)
+{
+	CustomControllerManager* const me = (CustomControllerManager*) NewtonWorldGetListenerUserData(world, listener);
+	me->OnDestroyBody(body);
+/*
+	for (typename dList<CONTROLLER_BASE>::dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
+		CONTROLLER_BASE& controller = node->GetInfo();
+		if (controller.GetBody() == body) {
+			me->DestroyController (&controller);
+		}
+	}
+*/
+}
+
+
 
 template<class CONTROLLER_BASE>
 void CustomControllerManager<CONTROLLER_BASE>::PreUpdateKernel (NewtonWorld* const world, void* const context, int threadIndex)
@@ -258,8 +280,6 @@ void CustomControllerManager<CONTROLLER_BASE>::PostUpdateKernel (NewtonWorld* co
 	class CustomControllerBase* const controller = (CustomControllerBase*) context;
 	controller->PostUpdate(((CustomControllerManager*)controller->m_manager)->GetTimeStep(), threadIndex);
 }
-
-
 
 template<class CONTROLLER_BASE>
 CONTROLLER_BASE* CustomControllerManager<CONTROLLER_BASE>::CreateController ()
@@ -276,6 +296,8 @@ void CustomControllerManager<CONTROLLER_BASE>::DestroyController (CONTROLLER_BAS
 	typename CustomControllerManager<CONTROLLER_BASE>::dListNode* const node = CustomControllerManager<CONTROLLER_BASE>::GetNodeFromInfo (*controller);
 	CustomControllerManager<CONTROLLER_BASE>::Remove (node);
 }
+
+
 
 #endif 
 

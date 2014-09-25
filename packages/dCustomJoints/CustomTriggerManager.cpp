@@ -17,9 +17,6 @@
 #include <CustomJoint.h>
 #include <CustomTriggerManager.h>
 
-
-
-
 CustomTriggerManager::CustomTriggerManager(NewtonWorld* const world)
 	:CustomControllerManager<CustomTriggerController>(world, TRIGGER_PLUGIN_NAME)
 	,m_lock(0)
@@ -49,6 +46,21 @@ void CustomTriggerManager::PreUpdate(dFloat timestep)
 	//CustomControllerManager<CustomTriggerController>::PreUpdate(timestep);
 }
 
+
+void CustomTriggerManager::OnDestroyBody (NewtonBody* const body)
+{
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		CustomTriggerController& controller = node->GetInfo();
+		dTree<NewtonBody*,NewtonBody*>& manifest = controller.m_manifest;
+		dTree<NewtonBody*,NewtonBody*>::dTreeNode* const passengerNode = manifest.Find (body);
+		if (passengerNode) {
+			EventCallback (&controller, m_exitTrigger, body);
+
+			CustomScopeLock lock (&m_lock);
+			manifest.Remove (passengerNode);
+		}
+	}
+}
 
 void CustomTriggerManager::UpdateTrigger (CustomTriggerController* const controller)
 {
@@ -81,7 +93,6 @@ void CustomTriggerManager::UpdateTrigger (CustomTriggerController* const control
 			}
 		}
 	}
-
 }
 
 
