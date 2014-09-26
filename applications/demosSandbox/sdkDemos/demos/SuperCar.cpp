@@ -1279,13 +1279,14 @@ void SuperCar (DemoEntityManager* const scene)
 	vehicle0->BuildFourWheelDriveSuperCar();
 
 	location.m_posit += location.m_right.Scale (-6.0f);
+	location.m_posit += location.m_front.Scale (10.0f);
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.0f;
 	SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location, "viper.ngd", -3.0f);
 	vehicle1->BuildFourWheelDriveSuperCar();
 
-	location.m_posit += location.m_right.Scale (3.0f);
-	location.m_posit += location.m_front.Scale (-8.0f);
+	location.m_posit += location.m_right.Scale ( 3.0f);
+	location.m_posit += location.m_front.Scale (-20.0f);
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.0f;
 	SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location, "f1.ngd", 0.0f);
