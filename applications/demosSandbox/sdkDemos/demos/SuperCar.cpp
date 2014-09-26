@@ -657,21 +657,37 @@ class SuperCarEntity: public DemoEntity
 		p1.m_y = 0.0f;
 		dVector dist (p1 - p0);
 		if ((dist % dist) < (pathWidth * pathWidth)) {
-			return steering->GetParam() * 0.92f;
-		}
+			dBigVector averageTangent (0.0f, 0.0f, 0.0f, 0.0f);
+			for(int i = 0; i < 4; i ++) {
+				dBigVector tangent (path->m_curve.CurveDerivative (u));
+				tangent = tangent.Scale (1.0f / dSqrt (tangent % tangent));
+				averageTangent += tangent;
+				q += tangent.Scale (5.0f);
+				u = path->m_curve.FindClosestKnot (q, q, 4);
+			}
+			averageTangent = averageTangent.Scale (1.0f / dSqrt (averageTangent % averageTangent));
+			dVector heading (pathMatrix.RotateVector(dVector (averageTangent.m_x, averageTangent.m_y, averageTangent.m_z, averageTangent.m_w)));
+			heading.m_y = 0.0;
+			heading = vehicleMatrix.UnrotateVector(heading);
+			dFloat angle = dAtan2 (heading.m_z, heading.m_x);
+			dFloat maxAngle = steering->GetMaxSteeringAngle ();
+			angle = dClamp (angle, -maxAngle, maxAngle);
+			return -angle / maxAngle;
+		} else {
 
-		// find a point in the past at some distance ahead
-		for(int i = 0; i < 5; i ++) {
-			dBigVector tangent (path->m_curve.CurveDerivative (u));
-			q += tangent.Scale (5.0f / dSqrt (tangent % tangent));
-			path->m_curve.FindClosestKnot (q, q, 4);
-		}
+			// find a point in the past at some distance ahead
+			for(int i = 0; i < 5; i ++) {
+				dBigVector tangent (path->m_curve.CurveDerivative (u));
+				q += tangent.Scale (5.0f / dSqrt (tangent % tangent));
+				path->m_curve.FindClosestKnot (q, q, 4);
+			}
 
-		m_debugTargetHeading = pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w));
-		dVector localDir (vehicleMatrix.UntransformVector(m_debugTargetHeading));
-		dFloat maxAngle = steering->GetMaxSteeringAngle ();
-		dFloat angle = dClamp (dAtan2 (localDir.m_z, localDir.m_x), -maxAngle, maxAngle);
-		return -angle / maxAngle;
+			m_debugTargetHeading = pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+			dVector localDir (vehicleMatrix.UntransformVector(m_debugTargetHeading));
+			dFloat maxAngle = steering->GetMaxSteeringAngle ();
+			dFloat angle = dClamp (dAtan2 (localDir.m_z, localDir.m_x), -maxAngle, maxAngle);
+			return -angle / maxAngle;
+		}
 	}
 
 	void ApplyNPCControl (dFloat timestep, DemoEntity* const pathEntity, void* const startEngineSoundHandle)
@@ -1264,7 +1280,7 @@ void SuperCar (DemoEntityManager* const scene)
 
 	// create a vehicle controller manager
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world);
-
+/*
 	dMatrix location0 (manager->CalculateSplineMatrix (0.02f));
 	// create a simple vehicle
 	location0.m_posit += location0.m_right.Scale (3.0f);
@@ -1278,7 +1294,7 @@ void SuperCar (DemoEntityManager* const scene)
 	location1.m_posit.m_y += 1.0f;
 	SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
 	vehicle1->BuildFourWheelDriveSuperCar();
-
+*/
 	dMatrix location2 (manager->CalculateSplineMatrix (0.0f));
 	location2.m_posit += location2.m_right.Scale ( 3.0f);
 	location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
@@ -1290,7 +1306,7 @@ void SuperCar (DemoEntityManager* const scene)
 	//vehicle->BuildRearWheelDriveMuscleCar();
 
 	// set this vehicle as the player
-	manager->SetAsPlayer(vehicle2);
+//	manager->SetAsPlayer(vehicle2);
 
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
 	dMatrix camMatrix (vehicle2->GetNextMatrix());
