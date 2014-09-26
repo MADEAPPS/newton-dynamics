@@ -420,7 +420,7 @@ void dSoundManager::SetChannelPitch(void* const channelHandle, dFloat pitch)
 	}
 }
 
-dFloat dSoundManager::GetChannelSecPosition(void* const channelHandle) const
+dFloat dSoundManager::GetChannelGetPosition(void* const channelHandle) const
 {
 	if (m_device) {
 		dSoundChannelList::dListNode* const node = (dSoundChannelList::dListNode*)channelHandle;

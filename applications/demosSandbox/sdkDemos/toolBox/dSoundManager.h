@@ -92,7 +92,7 @@ class dSoundManager
 
 	void* GetAsset(void* const channelHandle) const;
 	dFloat GetChannelVolume(void* const channelHandle) const;
-	dFloat GetChannelSecPosition(void* const channelHandle) const;
+	dFloat GetChannelGetPosition(void* const channelHandle) const;
 
 	void PlayChannel (void* const channelHandle);
 	void StopChannel (void* const channelHandle);

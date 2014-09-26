@@ -593,16 +593,18 @@ class SuperCarEntity: public DemoEntity
 #endif
 
 		if (engine) {
-			m_engineOldKeyState = engine->GetKey();
-			if (m_engineKeySwitchCounter) {
+			bool key = (m_engineKeySwitchCounter & 1) ? true : false;
+			if (!m_engineOldKeyState && key) {
 				// play the start engine sound
 				dSoundManager* const soundManager = scene->GetSoundManager();
 				soundManager->PlayChannel(startEngineSoundHandle);
 				engine->SetKey (true);
-			} else {
+			} else if (m_engineOldKeyState && !key) {
+				dSoundManager* const soundManager = scene->GetSoundManager();
+				soundManager->StopChannel(startEngineSoundHandle);
 				engine->SetKey (false);
 			}
-			
+			m_engineOldKeyState = key;
 
 			if (toggleTransmission) {
 				engine->SetTransmissionMode (!engine->GetTransmissionMode());
@@ -1039,33 +1041,27 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			CustomVehicleControllerComponentEngine* const engine = vehicleEntity->m_controller->GetEngine();
 			if (engine && engine->GetKey()) {
 				// see if the player started the engine
-				void* const startEngine = m_engineSounds[0];
-
-				if (!vehicleEntity->m_engineOldKeyState) {
-					// play engine start sound;
-					//soundManager->PlayChannel(startEngine);
-
-					for (int i = 2; i < m_soundsCount; i ++) {
-						void* const rpmEngine = m_engineSounds[i];
-						soundManager->PlayChannel(rpmEngine);
-						soundManager->SetChannelPitch (rpmEngine, 1.0f);
-						soundManager->SetChannelVolume(rpmEngine, 0.0f);
-						soundManager->SetChannelLoopMode(rpmEngine, true);
-					}
-				} 
+				for (int i = 2; i < m_soundsCount; i ++) {
+					void* const rpmEngine = m_engineSounds[i];
+					soundManager->PlayChannel(rpmEngine);
+					soundManager->SetChannelPitch (rpmEngine, 1.0f);
+					soundManager->SetChannelVolume(rpmEngine, 0.0f);
+					soundManager->SetChannelLoopMode(rpmEngine, true);
+				}
 
 				// player need to check if the start engine sound is still on
+				void* const startEngine = m_engineSounds[0];
 				void* const startEngineSoundAsset = soundManager->GetAsset(startEngine);
 				dFloat length = soundManager->GetSoundlength (startEngineSoundAsset);
-				dFloat posit = soundManager->GetChannelSecPosition(startEngine);
+				dFloat posit = soundManager->GetChannelGetPosition(startEngine);
 				
-				if (posit >= length * 0.5f) {
+				if (posit >= length * 0.7f) {
 					// attenuate star engine volume 
 					dFloat volume = soundManager->GetChannelVolume(startEngine);
 					if (volume < 1.0e-3f) {
 						volume = 0.0f;
 					}
-					soundManager->SetChannelVolume(startEngine, volume * 0.98f);
+					soundManager->SetChannelVolume(startEngine, volume * 0.95f);
 					vehicleEntity->m_engineRPMOn = true;
 				}
 
@@ -1087,14 +1083,11 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 				}
 			} else {
 				vehicleEntity->m_engineRPMOn = false;
-				if (vehicleEntity->m_engineOldKeyState) {
-					for (int i = 0; i < m_soundsCount; i ++) {
-						soundManager->SetChannelVolume(m_engineSounds[i], 0.0f);
-						soundManager->StopChannel(m_engineSounds[i]);
-					}
+				for (int i = 0; i < m_soundsCount; i ++) {
+					soundManager->SetChannelVolume(m_engineSounds[i], 0.0f);
+					soundManager->StopChannel(m_engineSounds[i]);
 				}
 			}
-
 		}
 
 		// do the base class post update
@@ -1114,11 +1107,13 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			vehicleEntity->UpdateTireTransforms();
 		}
 
-//		if (m_player) {
+		if (m_player) {
+			UpdateCamera (m_player, timestep);
+		} else {
 			CustomVehicleController* const controller = &GetLast()->GetInfo();
 			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
 			UpdateCamera (vehicleEntity, timestep);
-//		}
+		}
 	}
 
 
@@ -1270,36 +1265,35 @@ void SuperCar (DemoEntityManager* const scene)
 	// create a vehicle controller manager
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world);
 
+	dMatrix location0 (manager->CalculateSplineMatrix (0.02f));
 	// create a simple vehicle
-	dMatrix location (manager->CalculateSplineMatrix (0.0f));
-	location.m_posit += location.m_right.Scale (3.0f);
-	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
-	location.m_posit.m_y += 1.0f;
-	SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location, "lambDiablo.ngd", 3.0f);
+	location0.m_posit += location0.m_right.Scale (3.0f);
+	location0.m_posit.m_y += 1.0f;
+	SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
 	vehicle0->BuildFourWheelDriveSuperCar();
 
-	location.m_posit += location.m_right.Scale (-6.0f);
-	location.m_posit += location.m_front.Scale (10.0f);
-	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
-	location.m_posit.m_y += 1.0f;
-	SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location, "viper.ngd", -3.0f);
+	dMatrix location1 (manager->CalculateSplineMatrix (0.01f));
+	location1.m_posit += location1.m_right.Scale (-3.0f);
+	location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
+	location1.m_posit.m_y += 1.0f;
+	SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
 	vehicle1->BuildFourWheelDriveSuperCar();
 
-	location.m_posit += location.m_right.Scale ( 3.0f);
-	location.m_posit += location.m_front.Scale (-20.0f);
-	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
-	location.m_posit.m_y += 1.0f;
-	SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location, "f1.ngd", 0.0f);
+	dMatrix location2 (manager->CalculateSplineMatrix (0.0f));
+	location2.m_posit += location2.m_right.Scale ( 3.0f);
+	location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
+	location2.m_posit.m_y += 1.0f;
+	SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
 	vehicle2->BuildFourWheelDriveSuperCar();
 	
 	// build a muscle car from this vehicle controller
 	//vehicle->BuildRearWheelDriveMuscleCar();
 
 	// set this vehicle as the player
-//	manager->SetAsPlayer(vehicle);
+	manager->SetAsPlayer(vehicle2);
 
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
-	dMatrix camMatrix (vehicle0->GetNextMatrix());
+	dMatrix camMatrix (vehicle2->GetNextMatrix());
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
