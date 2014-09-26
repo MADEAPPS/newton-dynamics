@@ -48,10 +48,6 @@
 #include "dgCorkscrewConstraint.h"
 
 
-#ifdef _NEWTON_OPENCL
-#include "dgOpenclInstance.h"
-#endif
-
 
 #define DG_INITIAL_ISLAND_SIZE		(1024 * 4)
 #define DG_INITIAL_BODIES_SIZE		(1024 * 4)
@@ -219,7 +215,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgMutexThread("dgMutexThread", DG_MUTEX_THREAD_ID)
 	,dgAsyncThread("dgAsyncThread", DG_ASYNC_THREAD_ID)
 	,dgWorldThreadPool(allocator)
-	,m_openCL(NULL)
 	,m_broadPhase(NULL)
 	,m_sentinelBody(NULL)
 	,m_pointCollision(NULL)
@@ -308,11 +303,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 
 	AddSentinelBody();
 	SetPerfomanceCounter(NULL);
-
-	#ifdef _NEWTON_OPENCL
-	//m_openCL = dgOpencl::GetOpenCL(GetAllocator());
-	m_openCL = new (GetAllocator()) dgOpenclInstance(this);
-	#endif
 }
 
 dgWorld::~dgWorld()
@@ -320,12 +310,6 @@ dgWorld::~dgWorld()
 	Sync();
 	dgAsyncThread::Terminate();
 	dgMutexThread::Terminate();
-
-	#ifdef _NEWTON_OPENCL
-	if (m_openCL) {
-		delete m_openCL;
-	}
-	#endif
 
 	m_preListener.RemoveAll();
 	m_postListener.RemoveAll();
@@ -380,11 +364,6 @@ void dgWorld::SetFrictionMode (dgInt32 mode)
 dgInt32 dgWorld::EnumerateHardwareModes() const
 {
 	dgInt32 count = 1;
-	#ifdef _NEWTON_OPENCL
-		if (m_openCL) {
-			count += m_openCL->GetPlatformsCount();
-		}
-	#endif
 	return count;
 }
 
@@ -393,29 +372,14 @@ void dgWorld::GetHardwareVendorString (dgInt32 deviceIndex, char* const descript
 	deviceIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
 	if (deviceIndex == 0) {
 		sprintf (description, "cpu");
-
-	} else if (m_openCL) {
-		#ifdef _NEWTON_OPENCL
-			m_openCL->GetVendorString (deviceIndex - 1, description, maxlength);
-		#endif
 	}
 }
 
 void dgWorld::SetCurrentHardwareMode(dgInt32 deviceIndex)
 {
-	#ifdef _NEWTON_OPENCL
-		if (m_openCL) {
-			m_openCL->CleanUp();
-		}
-	#endif
-
 	m_hardwaredIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
-	if ((m_hardwaredIndex > 0) && m_openCL){
-		#ifdef _NEWTON_OPENCL
-			m_openCL->SelectPlaform (m_hardwaredIndex - 1);
-		#endif
+	if (m_hardwaredIndex > 0){
 	}
-
 }
 
 

@@ -45,7 +45,6 @@ class dgKinematicBody;
 class dgCollisionPoint;
 class dgUserConstraint;
 class dgBallConstraint;
-class dgOpenclInstance;
 class dgHingeConstraint;
 class dgUserMeshCreation;
 class dgSlidingConstraint;
@@ -437,8 +436,6 @@ class dgWorld
 
 	dgSolverSleepTherfesholds m_sleepTable[DG_SLEEP_ENTRIES];
 	
-	
-	dgOpenclInstance* m_openCL;
 	dgBroadPhase* m_broadPhase; 
 	dgDynamicBody* m_sentinelBody;
 	dgCollisionInstance* m_pointCollision;
