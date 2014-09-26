@@ -656,6 +656,8 @@ class SuperCarEntity: public DemoEntity
 		dVector p1 (pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w)));
 		p1.m_y = 0.0f;
 		dVector dist (p1 - p0);
+		dFloat angle = 0.0f;
+		dFloat maxAngle = steering->GetMaxSteeringAngle ();
 		if ((dist % dist) < (pathWidth * pathWidth)) {
 			dBigVector averageTangent (0.0f, 0.0f, 0.0f, 0.0f);
 			for(int i = 0; i < 4; i ++) {
@@ -669,10 +671,7 @@ class SuperCarEntity: public DemoEntity
 			dVector heading (pathMatrix.RotateVector(dVector (averageTangent.m_x, averageTangent.m_y, averageTangent.m_z, averageTangent.m_w)));
 			heading.m_y = 0.0;
 			heading = vehicleMatrix.UnrotateVector(heading);
-			dFloat angle = dAtan2 (heading.m_z, heading.m_x);
-			dFloat maxAngle = steering->GetMaxSteeringAngle ();
-			angle = dClamp (angle, -maxAngle, maxAngle);
-			return -angle / maxAngle;
+			angle = dClamp (dAtan2 (heading.m_z, heading.m_x), -maxAngle, maxAngle);
 		} else {
 
 			// find a point in the past at some distance ahead
@@ -684,10 +683,10 @@ class SuperCarEntity: public DemoEntity
 
 			m_debugTargetHeading = pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w));
 			dVector localDir (vehicleMatrix.UntransformVector(m_debugTargetHeading));
-			dFloat maxAngle = steering->GetMaxSteeringAngle ();
-			dFloat angle = dClamp (dAtan2 (localDir.m_z, localDir.m_x), -maxAngle, maxAngle);
-			return -angle / maxAngle;
+			angle = dClamp (dAtan2 (localDir.m_z, localDir.m_x), -maxAngle, maxAngle);
 		}
+		dFloat param = steering->GetParam();
+		return param + (-angle / maxAngle - param) * 0.25f;
 	}
 
 	void ApplyNPCControl (dFloat timestep, DemoEntity* const pathEntity, void* const startEngineSoundHandle)
@@ -712,7 +711,7 @@ class SuperCarEntity: public DemoEntity
 			engine->SetTransmissionMode (0);
 
 			// engage first Gear 
-			engine->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 1);
+			engine->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 3);
 
 			// play the start engine sound
 			dSoundManager* const soundManager = scene->GetSoundManager();
@@ -728,12 +727,12 @@ class SuperCarEntity: public DemoEntity
 
 		if ((veloc % veloc) < 0.02f) {
 			// if the vehicle is no moving start the motion
-			engine->SetParam (0.5f);
+			engine->SetParam (0.75f);
 			//steering->SetParam (-0.5f);
 			return;
 		}
 
-		dFloat steeringParam = CalculateNPCControlSteerinValue (10.0f, 5.0f, pathEntity, startEngineSoundHandle);
+		dFloat steeringParam = CalculateNPCControlSteerinValue (2.0f, 2.0f, pathEntity, startEngineSoundHandle);
 		steering->SetParam (steeringParam);
 	}
 
@@ -1280,7 +1279,7 @@ void SuperCar (DemoEntityManager* const scene)
 
 	// create a vehicle controller manager
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world);
-/*
+
 	dMatrix location0 (manager->CalculateSplineMatrix (0.02f));
 	// create a simple vehicle
 	location0.m_posit += location0.m_right.Scale (3.0f);
@@ -1294,7 +1293,7 @@ void SuperCar (DemoEntityManager* const scene)
 	location1.m_posit.m_y += 1.0f;
 	SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
 	vehicle1->BuildFourWheelDriveSuperCar();
-*/
+
 	dMatrix location2 (manager->CalculateSplineMatrix (0.0f));
 	location2.m_posit += location2.m_right.Scale ( 3.0f);
 	location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
