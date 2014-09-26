@@ -631,6 +631,53 @@ class SuperCarEntity: public DemoEntity
 		}
 	}
 
+	dFloat CalculateNPCControlSteerinValue (dFloat timestep, DemoEntity* const pathEntity, void* const startEngineSoundHandle)
+	{
+		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
+		dVector veloc (chassis.GetVelocity());
+
+		dFloat lookAheadTime = timestep / 0.25f;
+
+		dVector lookAheadDir(veloc.Scale (lookAheadTime));
+		dFloat mag2 = lookAheadDir % lookAheadDir; 
+
+		const dFloat loakAheadDist = 8.0f;
+		if (mag2 < (loakAheadDist * loakAheadDist)) {
+			lookAheadDir = lookAheadDir.Scale (loakAheadDist / dSqrt (mag2));
+		}
+
+		dVector p0 (m_debugTargetHeading + lookAheadDir);
+		p0.m_y = 0.0f;
+
+		// find the closet point to the past on the spline
+		dMatrix matrix (chassis.GetLocalMatrix() * chassis.GetMatrix());
+
+		dMatrix pathMatrix (pathEntity->GetMeshMatrix() * pathEntity->GetCurrentMatrix());
+		dBigVector q; 
+		DemoBezierCurve* const path = (DemoBezierCurve*) pathEntity->GetMesh();
+		dFloat64 u = path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
+		dBigVector tangent (path->m_curve.CurveDerivative (u));
+		dVector p1 (pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w)));
+		dVector curveTangent (pathMatrix.RotateVector(dVector (tangent.m_x, tangent.m_y, tangent.m_z, tangent.m_w)));
+		dVector binormal = curveTangent * dVector (0.0f, 1.0f, 0.0f, 0.0f);
+		p1 += binormal.Scale (m_distanceToPath / dSqrt(binormal % binormal));
+
+		dVector error (p1 - p0);
+		mag2 = error % error;
+		if (mag2 > 0.5f) {
+			p0 += error.Scale (0.3f);
+		} 
+		// project a point ahead, say 0.25 of a second 
+		m_debugTargetHeading = p0;
+
+		CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
+		dVector localDir (matrix.UntransformVector(m_debugTargetHeading));
+		dFloat maxAngle = steering->GetMaxSteeringAngle ();
+		dFloat angle = dClamp (dAtan2 (localDir.m_z, localDir.m_x), -maxAngle, maxAngle);
+		//steering->SetParam (-angle / steering->GetMaxSteeringAngle ());
+		return -angle / maxAngle;
+	}
+
 	void ApplyNPCControl (dFloat timestep, DemoEntity* const pathEntity, void* const startEngineSoundHandle)
 	{
 		//drive the vehicle by trying to follow the spline path as close as possible 
@@ -643,7 +690,6 @@ class SuperCarEntity: public DemoEntity
 		CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
 		CustomVehicleControllerComponentBrake* const brakes = m_controller->GetBrakes();
 		CustomVehicleControllerComponentBrake* const handBrakes = m_controller->GetHandBrakes();
-
 		
 		if (!engine->GetKey()) {
 			// start engine
@@ -676,6 +722,9 @@ class SuperCarEntity: public DemoEntity
 			return;
 		}
 
+		dFloat steeringParam = CalculateNPCControlSteerinValue (timestep, pathEntity, startEngineSoundHandle);
+		steering->SetParam (steeringParam);
+/*
 		// calculate steering value to state with in the path
 		dFloat lookAheadTime = timestep / 0.25f;
 		
@@ -712,6 +761,7 @@ class SuperCarEntity: public DemoEntity
 		dVector localDir (matrix.UntransformVector(m_debugTargetHeading));
 		dFloat angle (dAtan2 (localDir.m_z, localDir.m_x));
 		steering->SetParam (-angle / steering->GetMaxSteeringAngle ());
+*/
 	}
 
 
@@ -1271,8 +1321,7 @@ void SuperCar (DemoEntityManager* const scene)
 	location.m_posit.m_y += 1.0f;
 	SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location, "lambDiablo.ngd", 3.0f);
 	vehicle0->BuildFourWheelDriveSuperCar();
-
-
+/*
 	location.m_posit += location.m_right.Scale (-6.0f);
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.0f;
@@ -1285,7 +1334,7 @@ void SuperCar (DemoEntityManager* const scene)
 	location.m_posit.m_y += 1.0f;
 	SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location, "f1.ngd", 0.0f);
 	vehicle2->BuildFourWheelDriveSuperCar();
-	
+*/	
 	// build a muscle car from this vehicle controller
 	//vehicle->BuildRearWheelDriveMuscleCar();
 
@@ -1293,7 +1342,7 @@ void SuperCar (DemoEntityManager* const scene)
 //	manager->SetAsPlayer(vehicle);
 
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
-	dMatrix camMatrix (vehicle1->GetNextMatrix());
+	dMatrix camMatrix (vehicle0->GetNextMatrix());
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
