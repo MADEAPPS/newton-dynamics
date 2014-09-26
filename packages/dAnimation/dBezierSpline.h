@@ -53,7 +53,7 @@ class dBezierSpline : public dContainersAlloc
 	const dFloat64* GetKnotArray() const;
 	dFloat64 GetKnot(int i) const;
 
-	dFloat64 FindClosestKnot (dBigVector& closestPoint, const dBigVector& point, int subdivitionSteps = 2) const;
+	dFloat64 FindClosestKnot (dBigVector& closestPointOnCurve, const dBigVector& point, int subdivitionSteps = 2) const;
 
 	private:
 	void Clear();

@@ -631,50 +631,44 @@ class SuperCarEntity: public DemoEntity
 		}
 	}
 
-	dFloat CalculateNPCControlSteerinValue (dFloat timestep, DemoEntity* const pathEntity, void* const startEngineSoundHandle)
+	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/
+	dFloat CalculateNPCControlSteerinValue (dFloat distanceAhead, dFloat pathWidth, DemoEntity* const pathEntity, void* const startEngineSoundHandle)
 	{
 		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
+		CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
+
 		dVector veloc (chassis.GetVelocity());
 
-		dFloat lookAheadTime = timestep / 0.25f;
-
-		dVector lookAheadDir(veloc.Scale (lookAheadTime));
-		dFloat mag2 = lookAheadDir % lookAheadDir; 
-
-		const dFloat loakAheadDist = 8.0f;
-		if (mag2 < (loakAheadDist * loakAheadDist)) {
-			lookAheadDir = lookAheadDir.Scale (loakAheadDist / dSqrt (mag2));
-		}
-
-		dVector p0 (m_debugTargetHeading + lookAheadDir);
-		p0.m_y = 0.0f;
+		dVector lookAheadPoint (veloc.Scale (distanceAhead / dSqrt (veloc % veloc)));
 
 		// find the closet point to the past on the spline
-		dMatrix matrix (chassis.GetLocalMatrix() * chassis.GetMatrix());
-
+		dMatrix vehicleMatrix (chassis.GetLocalMatrix() * chassis.GetMatrix());
 		dMatrix pathMatrix (pathEntity->GetMeshMatrix() * pathEntity->GetCurrentMatrix());
+
+		dVector p0 (vehicleMatrix.m_posit + lookAheadPoint);
+		p0.m_y = 0.0f;
+		
 		dBigVector q; 
 		DemoBezierCurve* const path = (DemoBezierCurve*) pathEntity->GetMesh();
 		dFloat64 u = path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
-		dBigVector tangent (path->m_curve.CurveDerivative (u));
 		dVector p1 (pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w)));
-		dVector curveTangent (pathMatrix.RotateVector(dVector (tangent.m_x, tangent.m_y, tangent.m_z, tangent.m_w)));
-		dVector binormal = curveTangent * dVector (0.0f, 1.0f, 0.0f, 0.0f);
-		p1 += binormal.Scale (m_distanceToPath / dSqrt(binormal % binormal));
+		p1.m_y = 0.0f;
+		dVector dist (p1 - p0);
+		if ((dist % dist) < (pathWidth * pathWidth)) {
+			return steering->GetParam() * 0.92f;
+		}
 
-		dVector error (p1 - p0);
-		mag2 = error % error;
-		if (mag2 > 0.5f) {
-			p0 += error.Scale (0.3f);
-		} 
-		// project a point ahead, say 0.25 of a second 
-		m_debugTargetHeading = p0;
+		// find a point in the past at some distance ahead
+		for(int i = 0; i < 5; i ++) {
+			dBigVector tangent (path->m_curve.CurveDerivative (u));
+			q += tangent.Scale (5.0f / dSqrt (tangent % tangent));
+			path->m_curve.FindClosestKnot (q, q, 4);
+		}
 
-		CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
-		dVector localDir (matrix.UntransformVector(m_debugTargetHeading));
+		m_debugTargetHeading = pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+		dVector localDir (vehicleMatrix.UntransformVector(m_debugTargetHeading));
 		dFloat maxAngle = steering->GetMaxSteeringAngle ();
 		dFloat angle = dClamp (dAtan2 (localDir.m_z, localDir.m_x), -maxAngle, maxAngle);
-		//steering->SetParam (-angle / steering->GetMaxSteeringAngle ());
 		return -angle / maxAngle;
 	}
 
@@ -713,7 +707,6 @@ class SuperCarEntity: public DemoEntity
 
 		dVector veloc (chassis.GetVelocity());
 		veloc.m_y = 0.0f;
-		m_debugTargetHeading = chassis.GetCenterOfMass();
 
 		if ((veloc % veloc) < 0.02f) {
 			// if the vehicle is no moving start the motion
@@ -722,46 +715,8 @@ class SuperCarEntity: public DemoEntity
 			return;
 		}
 
-		dFloat steeringParam = CalculateNPCControlSteerinValue (timestep, pathEntity, startEngineSoundHandle);
+		dFloat steeringParam = CalculateNPCControlSteerinValue (10.0f, 5.0f, pathEntity, startEngineSoundHandle);
 		steering->SetParam (steeringParam);
-/*
-		// calculate steering value to state with in the path
-		dFloat lookAheadTime = timestep / 0.25f;
-		
-		dVector lookAheadDir(veloc.Scale (lookAheadTime));
-		dFloat mag2 = lookAheadDir % lookAheadDir; 
-
-		const dFloat loakAheadDist = 8.0f;
-		if (mag2 < (loakAheadDist * loakAheadDist)) {
-			lookAheadDir = lookAheadDir.Scale (loakAheadDist / dSqrt (mag2));
-		}
-
-		dVector p0 (m_debugTargetHeading + lookAheadDir);
-		p0.m_y = 0.0f;
-
-		// find the closet point to the past on the spline
-		dMatrix pathMatrix (pathEntity->GetMeshMatrix() * pathEntity->GetCurrentMatrix());
-		dBigVector q; 
-		DemoBezierCurve* const path = (DemoBezierCurve*) pathEntity->GetMesh();
-		dFloat64 u = path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
-		dBigVector tangent (path->m_curve.CurveDerivative (u));
-		dVector p1 (pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w)));
-		dVector curveTangent (pathMatrix.RotateVector(dVector (tangent.m_x, tangent.m_y, tangent.m_z, tangent.m_w)));
-		dVector binormal = curveTangent * dVector (0.0f, 1.0f, 0.0f, 0.0f);
-		p1 += binormal.Scale (m_distanceToPath / dSqrt(binormal % binormal));
-
-		dVector error (p1 - p0);
-		mag2 = error % error;
-		if (mag2 > 0.5f) {
-			p0 += error.Scale (0.3f);
-		} 
-		// project a point ahead, say 0.25 of a second 
-		m_debugTargetHeading = p0;
-
-		dVector localDir (matrix.UntransformVector(m_debugTargetHeading));
-		dFloat angle (dAtan2 (localDir.m_z, localDir.m_x));
-		steering->SetParam (-angle / steering->GetMaxSteeringAngle ());
-*/
 	}
 
 
@@ -833,6 +788,7 @@ class SuperCarEntity: public DemoEntity
 		glLineWidth(1.0f);
 
 		// render AI information
+/*
 		dMatrix pathMatrix (m_aiPath->GetMeshMatrix() * m_aiPath->GetCurrentMatrix());
 		dBigVector q; 
 		DemoBezierCurve* const path = (DemoBezierCurve*) m_aiPath->GetMesh();
@@ -844,12 +800,12 @@ class SuperCarEntity: public DemoEntity
 		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 		glVertex3f (p1.m_x, p1.m_y, p1.m_z);
 		glEnd();
-
+*/
 
 		glBegin(GL_LINES);
 		glColor3f (1.0f, 0.0f, 1.0f);
-		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-		glVertex3f (m_debugTargetHeading.m_x, m_debugTargetHeading.m_y, m_debugTargetHeading.m_z);
+		glVertex3f (p0.m_x, p0.m_y + 1.0f, p0.m_z);
+		glVertex3f (m_debugTargetHeading.m_x, m_debugTargetHeading.m_y + 1.0f, m_debugTargetHeading.m_z);
 		glEnd();
 
 		 
@@ -1159,7 +1115,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		}
 
 //		if (m_player) {
-			CustomVehicleController* const controller = &GetFirst()->GetInfo();
+			CustomVehicleController* const controller = &GetLast()->GetInfo();
 			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
 			UpdateCamera (vehicleEntity, timestep);
 //		}
@@ -1321,7 +1277,7 @@ void SuperCar (DemoEntityManager* const scene)
 	location.m_posit.m_y += 1.0f;
 	SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location, "lambDiablo.ngd", 3.0f);
 	vehicle0->BuildFourWheelDriveSuperCar();
-/*
+
 	location.m_posit += location.m_right.Scale (-6.0f);
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.0f;
@@ -1334,7 +1290,7 @@ void SuperCar (DemoEntityManager* const scene)
 	location.m_posit.m_y += 1.0f;
 	SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location, "f1.ngd", 0.0f);
 	vehicle2->BuildFourWheelDriveSuperCar();
-*/	
+	
 	// build a muscle car from this vehicle controller
 	//vehicle->BuildRearWheelDriveMuscleCar();
 
