@@ -22,41 +22,10 @@
 #ifndef _DG_AMP_H_
 #define _DG_AMP_H_
 
+#include <amp.h>
+#include <dgPhysicsStdafx.h>
+#include <dgWorld.h>
 
-#include "dgPhysicsStdafx.h"
-
-class dgMemoryAllocator;
-
-class dgAMP
-{
-	public:
-	static dgAMP* GetAMP(dgMemoryAllocator* const allocator); 
-/*
-	dgInt32 GetPlatformsCount() const;
-	void SelectPlaform(dgInt32 deviceIndex);
-	void GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const;
-	void CleanUp();
-*/
-	private:
-	dgAMP(dgMemoryAllocator* const allocator);
-	~dgAMP(void);
-
-	dgMemoryAllocator* m_allocator;
-/*	
-	void CompileProgram ();
-
-	
-	void* m_currentPlatform;
-	void* m_context;
-	void* m_program;
-	
-	void* m_devices[16];
-	void* m_platforms[16];
-	char m_platformName[128];
-	dgInt32 m_devicesCount;
-	dgInt32 m_platformsCount;
-	dgInt32 m_aligment;
-*/
-};
+using namespace concurrency;
 
 #endif

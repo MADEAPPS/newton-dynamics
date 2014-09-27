@@ -21,39 +21,117 @@
 
 
 #include "dgAMP.h"
-#include "dgWorld.h"
 #include "dgAmpInstance.h"
+
 
 dgAmpInstance::dgAmpInstance(dgWorld* const world)
 	:m_world (world)
-	,m_amp (dgAMP::GetAMP(world->GetAllocator()))
+	,m_accelerator()
+	,m_acceleratorList(world->GetAllocator())
 {
+	const wchar_t* reference = accelerator::direct3d_ref;
+	const wchar_t* cpuAccel = accelerator::cpu_accelerator;
+
+    std::vector<accelerator> accs = accelerator::get_all();
+    for (int i = 0; i < int (accs.size()); i++) {
+		accelerator &accel = accs[i];
+		std::wstring path  (accel.get_device_path());
+		if (!((path == reference) || (path == cpuAccel))) { 
+			std::wstring desc  (accel.get_description());
+			std::string p (path.begin(), path.end() );
+			std::string d (desc.begin(), desc.end() );
+			dgAcceleratorDescription& info = m_acceleratorList.Append()->GetInfo();
+			strncpy (info.m_path, p.c_str(), sizeof (info.m_path));
+			strncpy (info.m_description, d.c_str(), sizeof (info.m_description));
+		}
+    }
+
+//SelectPlaform(1);
+//AddArraysWithFunction();
 }
+
 
 dgAmpInstance::~dgAmpInstance(void)
 {
-//	m_amp->CleanUp();
+	CleanUp();
 }
 
-/*
+
 void dgAmpInstance::CleanUp()
 {
-	m_amp->CleanUp();
+	//m_acceleratorList.RemoveAll();
 }
 
-void dgAmpInstance::SelectPlaform(dgInt32 deviceIndex)
-{
-	m_amp->SelectPlaform(deviceIndex);
-}
 
 dgInt32 dgAmpInstance::GetPlatformsCount() const
 {
-	return m_amp->GetPlatformsCount();
+	return m_acceleratorList.GetCount();
 }
+
+
+void dgAmpInstance::SelectPlaform(dgInt32 deviceIndex)
+{
+	int index = 0;
+	for (dgList<dgAcceleratorDescription>::dgListNode* node = m_acceleratorList.GetFirst(); node; node = node->GetNext()) {
+		if (index == deviceIndex) {
+			const dgAcceleratorDescription &accel = node->GetInfo();
+			std::string p (accel.m_path);
+			std::wstring path (p.begin(), p.end());
+			accelerator::set_default (path);  
+			m_accelerator = accelerator (path);
+			break;
+		}
+		index ++;
+	}
+}
+
 
 void dgAmpInstance::GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const
 {
-	m_amp->GetVendorString (deviceIndex, name, maxlength);
+	name[0] = 0;
+	int index = 0;
+	for (dgList<dgAcceleratorDescription>::dgListNode* node = m_acceleratorList.GetFirst(); node; node = node->GetNext()) {
+		if (index == deviceIndex) {
+			const dgAcceleratorDescription &accel = node->GetInfo();
+			strncpy (name, accel.m_description, maxlength);
+			break;
+		}
+		index ++;
+	}
 }
 
-*/
+  #include <iostream> 
+
+
+
+
+
+void dgAmpInstance::AddElements(index<1> idx, array_view<int, 1> sum, array_view<int, 1> a, array_view<int, 1> b) restrict(amp)
+{
+    sum[idx] = a[idx] + b[idx];
+}
+
+
+void dgAmpInstance::AddArraysWithFunction() 
+{
+    int aCPP[] = {1, 2, 3, 4, 5};
+    int bCPP[] = {6, 7, 8, 9, 10};
+    int sumCPP[5] = {0, 0, 0, 0, 0};
+
+    array_view<int, 1> a(5, aCPP);
+    array_view<int, 1> b(5, bCPP);
+    array_view<int, 1> sum(5, sumCPP);
+
+    parallel_for_each (sum.extent, [=](index<1> idx) restrict(amp)
+    {
+        AddElements(idx, sum, a, b);
+    });
+
+    for (int i = 0; i < 5; i++) {
+        std::cout << sum[i] << "\n";
+    }
+}
+
+
+
+

@@ -22,25 +22,37 @@
 #ifndef _DG_AMP_INSTANCE_H_
 #define _DG_AMP_INSTANCE_H_
 
-class dgAMP;
-class dgWorld;
+#include "dgAMP.h"
 
+using namespace concurrency;
 class dgAmpInstance
 {
 	public:
+	class dgAcceleratorDescription
+	{
+		public:
+		char m_path[128];
+		char m_description[128];
+	};
+
 	DG_CLASS_ALLOCATOR(allocator);
 
 	dgAmpInstance(dgWorld* const world);
 	~dgAmpInstance(void);
 
-//	void CleanUp();
-//	void SelectPlaform(dgInt32 deviceIndex);
-//	dgInt32 GetPlatformsCount() const;
-//	void GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const;
+	void CleanUp();
+	dgInt32 GetPlatformsCount() const;
+	void SelectPlaform(dgInt32 deviceIndex);
+	void GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const;
 
 	private:
+	void AddArraysWithFunction() ;
+	static void AddElements(index<1> idx, array_view<int, 1> sum, array_view<int, 1> a, array_view<int, 1> b) restrict(amp);
+
+
 	dgWorld* m_world;
-	dgAMP* m_amp;
+	accelerator m_accelerator;
+	dgList<dgAcceleratorDescription> m_acceleratorList;
 };
 
 

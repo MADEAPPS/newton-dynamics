@@ -378,6 +378,13 @@ void dgWorld::SetFrictionMode (dgInt32 mode)
 dgInt32 dgWorld::EnumerateHardwareModes() const
 {
 	dgInt32 count = 1;
+
+	#ifdef _NEWTON_AMP
+		if (m_amp) {
+			count += m_amp->GetPlatformsCount();
+		}
+	#endif
+
 	return count;
 }
 
@@ -385,14 +392,30 @@ void dgWorld::GetHardwareVendorString (dgInt32 deviceIndex, char* const descript
 {
 	deviceIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
 	if (deviceIndex == 0) {
-		sprintf (description, "cpu");
+		sprintf (description, "newton cpu");
+
+	} else if (m_amp) {
+		#ifdef _NEWTON_AMP
+			m_amp->GetVendorString (deviceIndex - 1, description, maxlength);
+		#endif
 	}
+
+
 }
 
 void dgWorld::SetCurrentHardwareMode(dgInt32 deviceIndex)
 {
+	#ifdef _NEWTON_AMP
+	if (m_amp) {
+		m_amp->CleanUp();
+	}
+	#endif
+
 	m_hardwaredIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
-	if (m_hardwaredIndex > 0){
+	if ((m_hardwaredIndex > 0) && m_amp){
+		#ifdef _NEWTON_AMP
+			m_amp->SelectPlaform (m_hardwaredIndex - 1);
+		#endif
 	}
 }
 
