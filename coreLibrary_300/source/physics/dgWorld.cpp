@@ -48,6 +48,10 @@
 #include "dgCorkscrewConstraint.h"
 
 
+#ifdef _NEWTON_AMP
+#include "dgAmpInstance.h"
+#endif
+
 
 #define DG_INITIAL_ISLAND_SIZE		(1024 * 4)
 #define DG_INITIAL_BODIES_SIZE		(1024 * 4)
@@ -303,6 +307,10 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 
 	AddSentinelBody();
 	SetPerfomanceCounter(NULL);
+
+	#ifdef _NEWTON_AMP
+	m_amp = new (GetAllocator()) dgAmpInstance(this);
+	#endif
 }
 
 dgWorld::~dgWorld()
@@ -310,6 +318,12 @@ dgWorld::~dgWorld()
 	Sync();
 	dgAsyncThread::Terminate();
 	dgMutexThread::Terminate();
+
+	#ifdef _NEWTON_AMP
+	if (m_amp) {
+		delete m_amp;
+	}
+	#endif
 
 	m_preListener.RemoveAll();
 	m_postListener.RemoveAll();

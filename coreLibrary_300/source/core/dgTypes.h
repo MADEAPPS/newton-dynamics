@@ -179,6 +179,10 @@
 
 #define DG_VECTOR_SIMD_SIZE		16
 
+#if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1700))
+	/// starting Visual studio 2012 an up we cna use high performance computing using AMP
+	#define _NEWTON_AMP
+#endif
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#define	DG_GCC_VECTOR_ALIGMENT	
@@ -201,7 +205,6 @@
 
 	typedef int64_t dgInt64;
 	typedef uint64_t dgUnsigned64;
-
 #else
 	typedef char dgInt8;
 	typedef unsigned char dgUnsigned8;

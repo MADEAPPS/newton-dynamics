@@ -39,7 +39,9 @@
 #define DG_SLEEP_ENTRIES					8
 #define DG_MAX_DESTROYED_BODIES_BY_FORCE	8
 
+
 class dgBody;
+class dgAmpInstance;
 class dgDynamicBody;
 class dgKinematicBody;
 class dgCollisionPoint;
@@ -439,7 +441,8 @@ class dgWorld
 	dgBroadPhase* m_broadPhase; 
 	dgDynamicBody* m_sentinelBody;
 	dgCollisionInstance* m_pointCollision;
-	
+
+	dgAmpInstance* m_amp;
 	void* m_userData;
 	dgMemoryAllocator* m_allocator;
 	dgInt32 m_hardwaredIndex;

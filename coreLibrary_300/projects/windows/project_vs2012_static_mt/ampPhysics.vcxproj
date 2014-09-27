@@ -23,9 +23,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\ampPhysics\dgAmpInstance.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\ampPhysics\dgAMP.h" />
+    <ClInclude Include="..\..\..\source\ampPhysics\dgAmpInstance.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4798DA95-FE1B-4160-B752-24C4B1FABA49}</ProjectGuid>

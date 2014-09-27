@@ -37,25 +37,26 @@
 		#error "No OpenCL SDK" 
 	#endif
 #endif
+*/
 
 
 
-dgOpencl* dgOpencl::GetOpenCL(dgMemoryAllocator* allocator)
+dgAMP* dgAMP::GetAMP(dgMemoryAllocator* const allocator) 
 {
-	static dgOpencl opencl(allocator);
-	return &opencl;
+	static dgAMP amp(allocator);
+	return &amp;
 }
 
 
-dgOpencl::dgOpencl(dgMemoryAllocator* const allocator)
+dgAMP::dgAMP(dgMemoryAllocator* const allocator)
 	:m_allocator(allocator)
-	,m_currentPlatform(NULL)
-	,m_context(NULL)
-//	,m_cmd_queue(NULL)
-	,m_program(NULL)
-	,m_platformsCount(0)
-	,m_aligment(0)
+//	,m_currentPlatform(NULL)
+//	,m_context(NULL)
+//	,m_program(NULL)
+//	,m_platformsCount(0)
+//	,m_aligment(0)
 {
+/*
 	char buffer[2048];
 	DWORD varCount = GetEnvironmentVariable(NEWTON_OPENCL_SOURCE, buffer, sizeof (buffer));
 
@@ -69,21 +70,22 @@ dgOpencl::dgOpencl(dgMemoryAllocator* const allocator)
 	}
 
 SelectPlaform(0);
+*/
 }
 
 
-dgOpencl::~dgOpencl(void)
+dgAMP::~dgAMP(void)
 {
-	CleanUp();
+//	CleanUp();
 }
 
-
-dgInt32 dgOpencl::GetPlatformsCount() const
+/*
+dgInt32 dgAMP::GetPlatformsCount() const
 {
 	return m_platformsCount;
 }
 
-void dgOpencl::CleanUp()
+void dgAMP::CleanUp()
 {
 	if (m_program) {
 		clReleaseProgram(cl_program (m_program));
@@ -98,7 +100,7 @@ void dgOpencl::CleanUp()
 	}
 }
 
-void dgOpencl::GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const
+void dgAMP::GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const
 {
 	deviceIndex = dgClamp(deviceIndex, 0, m_platformsCount - 1);
 	//clGetPlatformInfo(cl_platform_id (m_platforms[deviceIndex]), CL_PLATFORM_NAME, maxlength, name, NULL);
@@ -106,7 +108,7 @@ void dgOpencl::GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 ma
 }
 
 
-void dgOpencl::SelectPlaform(dgInt32 platform)
+void dgAMP::SelectPlaform(dgInt32 platform)
 {
 	dgInt32 index = dgClamp(platform, 0, dgInt32 (m_platformsCount - 1)); 
 	m_currentPlatform = m_platforms[index];
@@ -157,7 +159,7 @@ void dgOpencl::SelectPlaform(dgInt32 platform)
 }
 
 
-void dgOpencl::CompileProgram ()
+void dgAMP::CompileProgram ()
 {
 	char tmp[2048];
 	char path[2048];

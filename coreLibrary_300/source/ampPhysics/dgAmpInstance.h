@@ -19,44 +19,29 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_AMP_H_
-#define _DG_AMP_H_
+#ifndef _DG_AMP_INSTANCE_H_
+#define _DG_AMP_INSTANCE_H_
 
+class dgAMP;
+class dgWorld;
 
-#include "dgPhysicsStdafx.h"
-
-class dgMemoryAllocator;
-
-class dgAMP
+class dgAmpInstance
 {
 	public:
-	static dgAMP* GetAMP(dgMemoryAllocator* const allocator); 
-/*
-	dgInt32 GetPlatformsCount() const;
-	void SelectPlaform(dgInt32 deviceIndex);
-	void GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const;
-	void CleanUp();
-*/
+	DG_CLASS_ALLOCATOR(allocator);
+
+	dgAmpInstance(dgWorld* const world);
+	~dgAmpInstance(void);
+
+//	void CleanUp();
+//	void SelectPlaform(dgInt32 deviceIndex);
+//	dgInt32 GetPlatformsCount() const;
+//	void GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const;
+
 	private:
-	dgAMP(dgMemoryAllocator* const allocator);
-	~dgAMP(void);
-
-	dgMemoryAllocator* m_allocator;
-/*	
-	void CompileProgram ();
-
-	
-	void* m_currentPlatform;
-	void* m_context;
-	void* m_program;
-	
-	void* m_devices[16];
-	void* m_platforms[16];
-	char m_platformName[128];
-	dgInt32 m_devicesCount;
-	dgInt32 m_platformsCount;
-	dgInt32 m_aligment;
-*/
+	dgWorld* m_world;
+	dgAMP* m_amp;
 };
+
 
 #endif
