@@ -40,6 +40,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "enet", "..\..\..\..\package
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2012_static_mt\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ampPhysics", "..\..\..\..\coreLibrary_300\projects\windows\project_vs2012_static_mt\ampPhysics.vcxproj", "{4798DA95-FE1B-4160-B752-24C4B1FABA49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -208,6 +210,14 @@ Global
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|Win32.Build.0 = release|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|x64.ActiveCfg = release|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|x64.Build.0 = release|x64
+		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Debug|Win32.Build.0 = Debug|Win32
+		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Debug|x64.ActiveCfg = debug|x64
+		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Debug|x64.Build.0 = debug|x64
+		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Release|Win32.ActiveCfg = release|Win32
+		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Release|Win32.Build.0 = release|Win32
+		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Release|x64.ActiveCfg = release|x64
+		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
