@@ -695,12 +695,12 @@ class SuperCarEntity: public DemoEntity
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		NewtonDemos* const mainWindow = scene->GetRootWindow();
+		//NewtonDemos* const mainWindow = scene->GetRootWindow();
 
 		CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
 		CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
-		CustomVehicleControllerComponentBrake* const brakes = m_controller->GetBrakes();
-		CustomVehicleControllerComponentBrake* const handBrakes = m_controller->GetHandBrakes();
+		//CustomVehicleControllerComponentBrake* const brakes = m_controller->GetBrakes();
+		//CustomVehicleControllerComponentBrake* const handBrakes = m_controller->GetHandBrakes();
 		
 		if (!engine->GetKey()) {
 			// start engine
@@ -1280,35 +1280,43 @@ void SuperCar (DemoEntityManager* const scene)
 	// create a vehicle controller manager
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world);
 
-	dMatrix location0 (manager->CalculateSplineMatrix (0.02f));
-	// create a simple vehicle
-	location0.m_posit += location0.m_right.Scale (3.0f);
-	location0.m_posit.m_y += 1.0f;
-	SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
-	vehicle0->BuildFourWheelDriveSuperCar();
+	dFloat u = 1.0f;
+	for (int i = 0; i < 1; i ++) {
+		dMatrix location0 (manager->CalculateSplineMatrix (u));
+		location0.m_posit += location0.m_right.Scale (3.0f);
+		location0.m_posit.m_y += 1.0f;
+		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
+		vehicle0->BuildFourWheelDriveSuperCar();
+		u -= 0.01f;
 
-	dMatrix location1 (manager->CalculateSplineMatrix (0.01f));
-	location1.m_posit += location1.m_right.Scale (-3.0f);
-	location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
-	location1.m_posit.m_y += 1.0f;
-	SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
-	vehicle1->BuildFourWheelDriveSuperCar();
+		dMatrix location1 (manager->CalculateSplineMatrix (u));
+		location1.m_posit += location1.m_right.Scale (-3.0f);
+		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
+		location1.m_posit.m_y += 1.0f;
+		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
+		vehicle1->BuildFourWheelDriveSuperCar();
+		u -= 0.01f;
 
-	dMatrix location2 (manager->CalculateSplineMatrix (0.0f));
-	location2.m_posit += location2.m_right.Scale ( 3.0f);
-	location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
-	location2.m_posit.m_y += 1.0f;
-	SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
-	vehicle2->BuildFourWheelDriveSuperCar();
-	
+		dMatrix location2 (manager->CalculateSplineMatrix (u));
+		location2.m_posit += location2.m_right.Scale ( 3.0f);
+		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
+		location2.m_posit.m_y += 1.0f;
+		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
+		vehicle2->BuildFourWheelDriveSuperCar();
+		u -= 0.01f;
+	}
+		
 	// build a muscle car from this vehicle controller
 	//vehicle->BuildRearWheelDriveMuscleCar();
 
+	CustomVehicleController* const controller = &manager->GetLast()->GetInfo();
+	SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
+
 	// set this vehicle as the player
-//	manager->SetAsPlayer(vehicle2);
+	manager->SetAsPlayer(vehicleEntity);
 
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
-	dMatrix camMatrix (vehicle2->GetNextMatrix());
+	dMatrix camMatrix (vehicleEntity->GetNextMatrix());
 	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
