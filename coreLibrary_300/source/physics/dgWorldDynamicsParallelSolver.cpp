@@ -29,7 +29,7 @@
 
 
 
-void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* const islandArray, dgFloat32 timestep) const
+void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* const island, dgFloat32 timestep) const
 {
 	dgParallelSolverSyncData syncData;
 
@@ -45,9 +45,9 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 
 	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 
-	dgInt32 bodyCount = islandArray->m_bodyCount - 1;
-	dgInt32 jointsCount = islandArray->m_jointCount;
-	LinearizeJointParallelArray (&syncData, constraintArray, islandArray);
+	dgInt32 bodyCount = island->m_bodyCount - 1;
+	dgInt32 jointsCount = island->m_jointCount;
+	LinearizeJointParallelArray (&syncData, constraintArray, island);
 	
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
 	dgVector zero(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -69,7 +69,7 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 	syncData.m_atomicIndex = 0;
 //	syncData.m_islandCount = islandsCount;
 	syncData.m_islandCount = 1;
-	syncData.m_islandArray = islandArray;
+	syncData.m_islandArray = island;
 
 	InitilizeBodyArrayParallel (&syncData);
 	BuildJacobianMatrixParallel (&syncData);

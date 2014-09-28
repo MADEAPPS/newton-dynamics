@@ -32,6 +32,11 @@
 #include "dgCollisionDeformableMesh.h"
 
 
+#ifdef _NEWTON_AMP
+#include "dgAmpInstance.h"
+#endif
+
+
 #define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(4 * DG_MAX_THREADS_HIVE_COUNT)
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
 
@@ -161,25 +166,30 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	dgUnsigned32 dynamicsTime = world->m_getPerformanceCount();
 	world->m_perfomanceCounters[m_dynamicsBuildSpanningTreeTicks] = dynamicsTime - updateTime;
 
-	dgInt32 index = 0;
-	if (world->m_useParallelSolver && (threadCount > 1)) {
-		for ( ; (index < m_islands) && (islands[index].m_jointCount >= DG_PARALLEL_JOINT_COUNT_CUT_OFF); index ++) {
-			int i = index + 1;
-			if ((i < m_islands) && (islands[index].m_jointCount < (2 * islands[i].m_jointCount))) { 
-				break;
+	if (!(world->m_amp && (world->m_hardwaredIndex > 0))) {
+		dgInt32 index = 0;
+		if (world->m_useParallelSolver && (threadCount > 1)) {
+			for ( ; (index < m_islands) && (islands[index].m_jointCount >= DG_PARALLEL_JOINT_COUNT_CUT_OFF); index ++) {
+				int i = index + 1;
+				if ((i < m_islands) && (islands[index].m_jointCount < (2 * islands[i].m_jointCount))) { 
+					break;
+				}
+				CalculateReactionForcesParallel (&islands[index], timestep);
 			}
-			CalculateReactionForcesParallel (&islands[index], timestep);
 		}
-	}
 
-	descriptor.m_firstIsland = index;
-	descriptor.m_islandCount = m_islands - index;
-	descriptor.m_atomicCounter = 0;
-	for (dgInt32 i = 0; i < threadCount; i ++) {
-		world->QueueJob (CalculateIslandReactionForcesKernel, &descriptor, world);
+		descriptor.m_firstIsland = index;
+		descriptor.m_islandCount = m_islands - index;
+		descriptor.m_atomicCounter = 0;
+		for (dgInt32 i = 0; i < threadCount; i ++) {
+			world->QueueJob (CalculateIslandReactionForcesKernel, &descriptor, world);
+		}
+		world->SynchronizationBarrier();
+	} else {
+		#ifdef _NEWTON_AMP 
+			world->m_amp->ConstraintSolver (islands, timestep);
+		#endif
 	}
-	world->SynchronizationBarrier();
-
 
 	dgUnsigned32 ticks = world->m_getPerformanceCount();
 	world->m_perfomanceCounters[m_dynamicsSolveSpanningTreeTicks] = ticks - dynamicsTime;

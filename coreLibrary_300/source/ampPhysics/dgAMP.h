@@ -22,9 +22,17 @@
 #ifndef _DG_AMP_H_
 #define _DG_AMP_H_
 
+#pragma warning (disable: 4505) //'Concurrency::details::_Array_view_projection_helper<_T,_R>::_Project0' : unreferenced local function has been removed
+#pragma warning (disable: 4530) //: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+
 #include <amp.h>
 #include <dgPhysicsStdafx.h>
+#include <dgBody.h>
 #include <dgWorld.h>
+#include <dgConstraint.h>
+#include <dgDynamicBody.h>
+#include <dgWorldDynamicUpdate.h>
+
 
 using namespace concurrency;
 

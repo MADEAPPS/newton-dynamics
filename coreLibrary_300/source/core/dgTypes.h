@@ -61,6 +61,7 @@
 	#pragma warning (disable: 4100) //unreferenced formal parameter
 	#pragma warning (disable: 4201) //nonstandard extension used : nameless struct/union
 	#pragma warning (disable: 4324) //structure was padded due to __declspec(align())
+	#pragma warning (disable: 4530) //: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
 
 	#include <io.h> 
 	#include <direct.h> 

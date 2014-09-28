@@ -399,8 +399,6 @@ void dgWorld::GetHardwareVendorString (dgInt32 deviceIndex, char* const descript
 			m_amp->GetVendorString (deviceIndex - 1, description, maxlength);
 		#endif
 	}
-
-
 }
 
 void dgWorld::SetCurrentHardwareMode(dgInt32 deviceIndex)

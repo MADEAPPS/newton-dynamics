@@ -45,6 +45,8 @@ class dgAmpInstance
 	void SelectPlaform(dgInt32 deviceIndex);
 	void GetVendorString(dgInt32 deviceIndex, char* const name, dgInt32 maxlength) const;
 
+	void ConstraintSolver (dgInt32 islandCount, const dgIsland* const islandArray, dgFloat32 timestep);
+	
 	private:
 	void AddArraysWithFunction() ;
 	static void AddElements(index<1> idx, array_view<int, 1> sum, array_view<int, 1> a, array_view<int, 1> b) restrict(amp);
