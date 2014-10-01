@@ -35,8 +35,6 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 
 	dgWorld* const world = (dgWorld*) this;
 
-//	dgInt32 size = m_joints + m_bodies + 1024;   
-//	world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (size, sizeof (dgParallelJointMap) + sizeof (dgInt32));
 	world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (m_joints + 1024, sizeof (dgParallelJointMap));
 
 //	syncData.m_bodyAtomic = (dgThread::dgCriticalSection*) (&world->m_pairMemoryBuffer[0]);
@@ -47,7 +45,7 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 
 	dgInt32 bodyCount = island->m_bodyCount - 1;
 	dgInt32 jointsCount = island->m_jointCount;
-	LinearizeJointParallelArray (&syncData, constraintArray, island);
+	CreateParallelArrayBatchArrays (&syncData, constraintArray, island);
 	
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
 	dgVector zero(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -67,7 +65,6 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 	syncData.m_bodyCount = bodyCount;
 	syncData.m_jointCount = jointsCount;
 	syncData.m_atomicIndex = 0;
-//	syncData.m_islandCount = islandsCount;
 	syncData.m_islandCount = 1;
 	syncData.m_islandArray = island;
 
@@ -78,6 +75,85 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 	IntegrateInslandParallel(&syncData); 
 }
 
+
+
+void dgWorldDynamicUpdate::CreateParallelArrayBatchArrays(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const
+{
+	dgParallelJointMap* const jointInfoMap = solverSyncData->m_jointInfoMap;
+	dgInt32 count = island->m_jointCount;
+	dgInt32 index = island->m_jointStart;
+	for (dgInt32 j = 0; j < count; j ++) {
+		dgConstraint* const joint = constraintArray[index].m_joint;
+		constraintArray[index].m_color = 0;
+		jointInfoMap[j].m_jointIndex = index;
+		joint->m_index = index;
+		index ++;
+	}
+
+	jointInfoMap[count].m_bashIndex = 0x7fffffff;
+	jointInfoMap[count].m_jointIndex= -1;
+
+	for (dgInt32 i = 0; i < count; i ++) {
+		dgJointInfo& jointInfo = constraintArray[jointInfoMap[i].m_jointIndex];
+
+		dgInt32 index = 0; 
+		dgInt32 color = jointInfo.m_color;
+		for (dgInt32 n = 1; n & color; n <<= 1) {
+			index ++;
+			dgAssert (index < 32);
+		}
+		jointInfoMap[i].m_bashIndex = index;
+
+		color = 1 << index;
+		dgConstraint* const constraint = jointInfo.m_joint;
+		dgDynamicBody* const body0 = (dgDynamicBody*) constraint->m_body0;
+		dgAssert (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+
+		if (body0->m_invMass.m_w > dgFloat32 (0.0f)) {
+			for (dgBodyMasterListRow::dgListNode* jointNode = body0->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+				dgBodyMasterListCell& cell = jointNode->GetInfo();
+
+				dgConstraint* const neiborgLink = cell.m_joint;
+				if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF) && neiborgLink->IsActive()) {
+					dgJointInfo& info = constraintArray[neiborgLink->m_index];
+					info.m_color |= color;
+				}
+			}
+		}
+
+		dgDynamicBody* const body1 = (dgDynamicBody*)constraint->m_body1;
+		dgAssert (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+		if (body1->m_invMass.m_w > dgFloat32 (0.0f)) {
+			for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+				dgBodyMasterListCell& cell = jointNode->GetInfo();
+
+				dgConstraint* const neiborgLink = cell.m_joint;
+				if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF) && neiborgLink->IsActive()) {
+					dgJointInfo& info = constraintArray[neiborgLink->m_index];
+					info.m_color |= color;
+				}
+			}
+		}
+	}
+
+	dgSort (jointInfoMap, count, SortJointInfoByColor, constraintArray);
+
+	dgInt32 bash = 0;
+	for (int index = 0; index < count; index ++) {
+		dgInt32 count = 0; 
+		solverSyncData->m_jointBatches[bash].m_start = index;
+		while (jointInfoMap[index].m_bashIndex == bash) {
+			count ++;
+			index ++;
+		}
+		solverSyncData->m_jointBatches[bash].m_count = count;
+		bash ++;
+		index --;
+	}
+	solverSyncData->m_batchesCount = bash;
+}
+
+
 void dgWorldDynamicUpdate::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData) const
 {
 	dgWorld* const world = (dgWorld*) this;
@@ -85,13 +161,13 @@ void dgWorldDynamicUpdate::InitilizeBodyArrayParallel (dgParallelSolverSyncData*
 
 	syncData->m_atomicIndex = 0;
 	for (dgInt32 j = 0; j < threadCounts; j ++) {
-		world->QueueJob (InitilizeBodyArrayParallelKernel, syncData, world);
+		world->QueueJob (InitializeBodyArrayParallelKernel, syncData, world);
 	}
 	world->SynchronizationBarrier();
 }
 
 
-void dgWorldDynamicUpdate::InitilizeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
+void dgWorldDynamicUpdate::InitializeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;

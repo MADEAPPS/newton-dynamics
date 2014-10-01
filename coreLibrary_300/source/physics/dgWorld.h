@@ -470,6 +470,7 @@ class dgWorld
 	
 	friend class dgBody;
 	friend class dgBroadPhase;
+	friend class dgAmpInstance;
 	friend class dgDeformableBody;
 	friend class dgActiveContacts;
 	friend class dgUserConstraint;

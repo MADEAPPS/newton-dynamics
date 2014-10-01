@@ -254,6 +254,7 @@ class dgBody
 	friend class dgContact;
 	friend class dgConstraint;
 	friend class dgBroadPhase;
+	friend class dgAmpInstance;
 	friend class dgCollisionBVH;
 	friend class dgBroadPhaseNode;
 	friend class dgBodyMasterList;

@@ -229,6 +229,7 @@ class dgConstraint
 	dgUnsigned32 m_contactActive	:  1;
 	
 	friend class dgWorld;
+	friend class dgAmpInstance;
 	friend class dgJacobianMemory;
 	friend class dgBodyMasterList;
 	friend class dgWorldDynamicUpdate;

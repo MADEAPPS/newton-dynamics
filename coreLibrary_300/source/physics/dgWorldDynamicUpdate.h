@@ -78,6 +78,7 @@ class dgBodyInfo
 {
 	public:
 	dgBody* m_body;
+	dgInt32 m_index;
 };
 
 class dgIsland
@@ -139,19 +140,19 @@ class dgParallelSolverSyncData
 	dgFloat32 m_invTimestepRK;
 	dgFloat32 m_firstPassCoef;
 
+	dgInt32 m_maxPasses;
 	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
 	dgInt32 m_batchesCount;
 	dgInt32 m_atomicIndex;
 	dgInt32 m_jointsInBatch;
-	dgInt32 m_jacobianMatrixRowAtomicIndex;
 	dgInt32 m_islandCount;
 	dgInt32 m_islandCountCounter;
-	dgInt32 m_maxPasses;
+	dgInt32 m_jacobianMatrixRowAtomicIndex;
 
 	const dgIsland* m_islandArray;
+	dgBody** m_bodyInfoMap;
 	dgParallelJointMap* m_jointInfoMap;
-//	dgThread::dgCriticalSection* m_bodyAtomic;
 	JointsBashes m_jointBatches[64];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
 };
@@ -267,7 +268,7 @@ class dgWorldDynamicUpdate
 	static void CalculateIslandReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 
 	static void IntegrateInslandParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void InitilizeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
+	static void InitializeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void BuildJacobianMatrixParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void SolverInitInternalForcesParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void CalculateJointsForceParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
@@ -281,11 +282,11 @@ class dgWorldDynamicUpdate
 	static dgInt32 SortJointInfoByColor (const dgParallelJointMap* const indirectIndexA, const dgParallelJointMap* const indirectIndexB, void* const constraintArray);
 
 	void GetJacobianDerivativesParallel (dgJointInfo* const jointInfo, dgInt32 threadID, dgInt32 rowBase, dgFloat32 timestep) const;	
-	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;
+	void CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;
 
 	void FindActiveJointAndBodies (dgIsland* const island); 
 	void IntegrateInslandParallel(dgParallelSolverSyncData* const syncData) const; 
-	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const yncData) const; 
+	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData) const; 
 	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData) const; 
 	void SolverInitInternalForcesParallel (dgParallelSolverSyncData* const syncData) const; 
 	void CalculateForcesGameModeParallel (dgParallelSolverSyncData* const syncData) const; 
@@ -314,6 +315,7 @@ class dgWorldDynamicUpdate
 	static dgVector m_velocTol;
 
 	friend class dgWorld;
+	friend class dgAmpInstance;
 	friend class dgJacobianMemory;
 	friend class dgSolverWorlkerThreads;
 };

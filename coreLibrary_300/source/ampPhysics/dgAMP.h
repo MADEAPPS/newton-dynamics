@@ -26,6 +26,12 @@
 #pragma warning (disable: 4530) //: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
 
 #include <amp.h>
+#include <ppl.h>
+#include <amprt.h>
+#include <amp_math.h>
+//#include <amp_graphics.h>
+#include <amp_short_vectors.h>
+
 #include <dgPhysicsStdafx.h>
 #include <dgBody.h>
 #include <dgWorld.h>

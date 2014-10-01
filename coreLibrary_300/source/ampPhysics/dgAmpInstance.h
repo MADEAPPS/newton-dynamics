@@ -25,9 +25,25 @@
 #include "dgAMP.h"
 
 using namespace concurrency;
+using namespace concurrency::graphics;
+
 class dgAmpInstance
 {
 	public:
+	class Jacobial
+	{
+		public:
+		float_4 m_linear;
+		float_4 m_angular;
+	};
+
+	class Matrix4x4 
+	{
+		public:
+		float_4 m_row[4];
+	};
+
+
 	class dgAcceleratorDescription
 	{
 		public:
@@ -48,13 +64,25 @@ class dgAmpInstance
 	void ConstraintSolver (dgInt32 islandCount, const dgIsland* const islandArray, dgFloat32 timestep);
 	
 	private:
-	void AddArraysWithFunction() ;
-	static void AddElements(index<1> idx, array_view<int, 1> sum, array_view<int, 1> a, array_view<int, 1> b) restrict(amp);
+	//void AddArraysWithFunction() ;
+	//static void AddElements(index<1> idx, array_view<int, 1> sum, array_view<int, 1> a, array_view<int, 1> b) restrict(amp);
 
+	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData); 
+	void CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islandCount);
+
+
+	//static void InitilizeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID);
+	static void CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix, Matrix4x4& invInertiaMatrix) restrict(amp);
 
 	dgWorld* m_world;
 	accelerator m_accelerator;
 	dgList<dgAcceleratorDescription> m_acceleratorList;
+
+	array<Matrix4x4 , 1> m_bodyMatrix;
+	array<Matrix4x4 , 1> m_bodyInvInertiaMatrix;
+
+	array_view<Matrix4x4, 1> m_bodyMatrix_view;
+	
 };
 
 

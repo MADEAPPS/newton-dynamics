@@ -24,6 +24,7 @@
 #include "dgAmpInstance.h"
 
 
+
 /*
 void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* const islandArray, dgFloat32 timestep) const
 {
@@ -74,50 +75,8 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 	IntegrateInslandParallel(&syncData); 
 }
 
-void dgWorldDynamicUpdate::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData) const
-{
-	dgWorld* const world = (dgWorld*) this;
-	dgInt32 threadCounts = world->GetThreadCount();	
-
-	syncData->m_atomicIndex = 0;
-	for (dgInt32 j = 0; j < threadCounts; j ++) {
-		world->QueueJob (InitilizeBodyArrayParallelKernel, syncData, world);
-	}
-	world->SynchronizationBarrier();
-}
 
 
-void dgWorldDynamicUpdate::InitilizeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
-	dgWorld* const world = (dgWorld*) worldContext;
-	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
-
-	const dgIsland* const island = syncData->m_islandArray;
-	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
-
-	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
-	dgVector zero(dgFloat32 (0.0f));
-
-	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-		dgAssert (bodyArray[0].m_body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bodyArray[0].m_body)->m_accel % ((dgDynamicBody*)bodyArray[0].m_body)->m_accel) == dgFloat32 (0.0f));
-		dgAssert (bodyArray[0].m_body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bodyArray[0].m_body)->m_alpha % ((dgDynamicBody*)bodyArray[0].m_body)->m_alpha) == dgFloat32 (0.0f));
-
-		dgInt32 index = i + 1;
-		dgBody* const body = bodyArray[index].m_body;
-		dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
-		body->AddDampingAcceleration();
-		body->CalcInvInertiaMatrix ();
-
-		// re use these variables for temp storage 
-		body->m_netForce = body->m_veloc;
-		body->m_netTorque = body->m_omega;
-
-		internalForces[index].m_linear = zero;
-		internalForces[index].m_angular = zero;
-	}
-}
 
 
 void dgWorldDynamicUpdate::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData) const
@@ -853,32 +812,26 @@ void dgWorldDynamicUpdate::CalculateForcesGameModeParallel (dgParallelSolverSync
 //void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* const islandArray, dgFloat32 timestep) const
 void dgAmpInstance::ConstraintSolver (dgInt32 islandCount, const dgIsland* const islandArray, dgFloat32 timestep)
 {
-/*
 	dgParallelSolverSyncData syncData;
+	const dgWorldDynamicUpdate& dynUpdate = *m_world;
+	m_world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (dynUpdate.m_bodies + dynUpdate.m_joints + 1024, sizeof (dgParallelJointMap));
 
-	dgWorld* const world = (dgWorld*) this;
+//	dgParallelJointMap* const jointInfoMap = (dgParallelJointMap*) (&m_world->m_pairMemoryBuffer[0]);
+	syncData.m_jointInfoMap = (dgParallelJointMap*) (&m_world->m_pairMemoryBuffer[0]);
+	syncData.m_bodyInfoMap = (dgBody**) (&m_world->m_pairMemoryBuffer[dynUpdate.m_joints + 32]);
 
-//	dgInt32 size = m_joints + m_bodies + 1024;   
-//	world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (size, sizeof (dgParallelJointMap) + sizeof (dgInt32));
-	world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (m_joints + 1024, sizeof (dgParallelJointMap));
+//	dgJointInfo* const constraintArray = (dgJointInfo*) &m_world->m_jointsMemory[0];
+//	dgInt32 bodyCount = islandArray->m_bodyCount - 1;
+//	dgInt32 jointsCount = islandArray->m_jointCount;
 
-//	syncData.m_bodyAtomic = (dgThread::dgCriticalSection*) (&world->m_pairMemoryBuffer[0]);
-//	syncData.m_jointInfoMap = (dgParallelJointMap*) (&syncData.m_bodyAtomic[(m_bodies + 31) & ~0x0f]);
-	syncData.m_jointInfoMap = (dgParallelJointMap*) (&world->m_pairMemoryBuffer[0]);
+	CreateParallelArrayBatchArrays (&syncData, islandArray, islandCount);
 
-	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
-
-	dgInt32 bodyCount = islandArray->m_bodyCount - 1;
-	dgInt32 jointsCount = islandArray->m_jointCount;
-	LinearizeJointParallelArray (&syncData, constraintArray, islandArray);
-	
+/*
 	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
 	dgVector zero(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	internalForces[0].m_linear = zero;
 	internalForces[0].m_angular = zero;
-
 	dgInt32 maxPasses = dgInt32 (world->m_solverMode + LINEAR_SOLVER_SUB_STEPS);
-
 
 	syncData.m_timestep = timestep;
 	syncData.m_invTimestep = (timestep > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) / timestep : dgFloat32 (0.0f);
@@ -893,11 +846,217 @@ void dgAmpInstance::ConstraintSolver (dgInt32 islandCount, const dgIsland* const
 //	syncData.m_islandCount = islandsCount;
 	syncData.m_islandCount = 1;
 	syncData.m_islandArray = islandArray;
-
+*/
 	InitilizeBodyArrayParallel (&syncData);
+/*
 	BuildJacobianMatrixParallel (&syncData);
 	SolverInitInternalForcesParallel (&syncData);
 	CalculateForcesGameModeParallel (&syncData);
 	IntegrateInslandParallel(&syncData); 
 */
+}
+
+
+
+void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islanCount)
+{
+	dgBodyInfo* const bodyArray = (dgBodyInfo*) &m_world->m_bodiesMemory[0]; 
+	dgJointInfo* const constraintArray = (dgJointInfo*) &m_world->m_jointsMemory[0];
+	dgParallelJointMap* const jointInfoMap = syncData->m_jointInfoMap;
+	dgBody** const bodyInfoMap = syncData->m_bodyInfoMap;
+
+	dgInt32 bodyCount = 1;
+	dgInt32 jointCount = 0;
+	bodyInfoMap[0] = m_world->GetSentinelBody();
+	for (dgInt32 i = 0; i < islanCount; i ++) {
+		const dgIsland* const island = &islandArray[i];
+		dgInt32 count = island->m_jointCount;
+		dgInt32 index = island->m_jointStart;
+		for (dgInt32 j = 0; j < count; j ++) {
+			const dgJointInfo& jointInfo = constraintArray[index];
+			dgConstraint* const joint = jointInfo.m_joint;
+			constraintArray[index].m_color = 0;
+			jointInfoMap[jointCount + j].m_jointIndex = index;
+			joint->m_index = index;
+			index ++;
+		}
+		jointCount += count;
+		
+		count = island->m_bodyCount;
+		index = island->m_bodyStart;
+		bodyArray[index].m_index = 0;
+		dgAssert (bodyArray[index].m_body == bodyInfoMap[0]);
+		for (dgInt32 j = 1; j < count; j ++) {
+			dgBodyInfo& bodyInfo = bodyArray[index + 1];
+			bodyInfo.m_index = bodyCount + j - 1;
+			bodyInfoMap[bodyInfo.m_index] = bodyInfo.m_body;
+			index ++;
+		}
+		bodyCount += count - 1;
+	}
+
+	syncData->m_bodyCount = bodyCount;
+	syncData->m_jointCount = jointCount;
+
+	dgInt32 size = m_bodyMatrix.get_extent().size();
+	while (size < syncData->m_bodyCount) {
+		size *= 2;
+		m_bodyMatrix = array<Matrix4x4 , 1> (size);
+		m_bodyInvInertiaMatrix = array<Matrix4x4 , 1> (size);
+
+		m_bodyMatrix_view = array_view<Matrix4x4, 1> (m_bodyMatrix);
+	}
+
+
+	jointInfoMap[jointCount].m_bashIndex = 0x7fffffff;
+	jointInfoMap[jointCount].m_jointIndex= -1;
+
+	for (dgInt32 i = 0; i < jointCount; i ++) {
+		dgInt32 j = jointInfoMap[i].m_jointIndex;
+		dgJointInfo& jointInfo = constraintArray[j];
+
+		dgInt32 index = 0; 
+		dgInt32 color = jointInfo.m_color;
+		for (dgInt32 n = 1; n & color; n <<= 1) {
+			index ++;
+			dgAssert (index < 32);
+		}
+		jointInfoMap[i].m_bashIndex = index;
+
+		color = 1 << index;
+		dgConstraint* const constraint = jointInfo.m_joint;
+		dgDynamicBody* const body0 = (dgDynamicBody*) constraint->m_body0;
+		dgAssert (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+
+		if (body0->m_invMass.m_w > dgFloat32 (0.0f)) {
+			for (dgBodyMasterListRow::dgListNode* jointNode = body0->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+				dgBodyMasterListCell& cell = jointNode->GetInfo();
+
+				dgConstraint* const neiborgLink = cell.m_joint;
+				//if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF)) {
+				if ((neiborgLink != constraint) & neiborgLink->IsActive()) {
+					dgJointInfo& info = constraintArray[neiborgLink->m_index];
+					info.m_color |= color;
+				}
+			}
+		}
+
+		dgDynamicBody* const body1 = (dgDynamicBody*)constraint->m_body1;
+		dgAssert (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+		if (body1->m_invMass.m_w > dgFloat32 (0.0f)) {
+			for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+				dgBodyMasterListCell& cell = jointNode->GetInfo();
+
+				dgConstraint* const neiborgLink = cell.m_joint;
+				//if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF)) {
+				if ((neiborgLink != constraint) & neiborgLink->IsActive()) {
+					dgJointInfo& info = constraintArray[neiborgLink->m_index];
+					info.m_color |= color;
+				}
+			}
+		}
+	}
+
+	dgSort (jointInfoMap, jointCount, dgWorldDynamicUpdate::SortJointInfoByColor, constraintArray);
+
+	dgInt32 bash = 0;
+	for (int index = 0; index < jointCount; index ++) {
+		dgInt32 count = 0; 
+		syncData->m_jointBatches[bash].m_start = index;
+		while (jointInfoMap[index].m_bashIndex == bash) {
+			count ++;
+			index ++;
+		}
+		syncData->m_jointBatches[bash].m_count = count;
+		bash ++;
+		index --;
+	}
+	syncData->m_batchesCount = bash;
+}
+
+
+
+void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData)
+{
+/*
+	dgWorld* const world = (dgWorld*) this;
+	dgInt32 threadCounts = world->GetThreadCount();	
+
+	syncData->m_atomicIndex = 0;
+	for (dgInt32 j = 0; j < threadCounts; j ++) {
+		world->QueueJob (InitilizeBodyArrayParallelKernel, syncData, world);
+	}
+	world->SynchronizationBarrier();
+*/
+	dgBody** const bopyMapInfo = syncData->m_bodyInfoMap;
+	const int bodyCount = syncData->m_bodyCount;
+
+// 	array_view<Matrix4x4, 1> matrixArray (m_bodyMatrix);
+// 	array_view<Matrix4x4, 1> invInertiaMatrix (m_bodyInvInertiaMatrix);
+
+	for (int i = 0; i < bodyCount; i ++) {
+		const dgBody* const body = bopyMapInfo[i];
+		Matrix4x4& matrix = m_bodyMatrix_view[i];
+		matrix.m_row[0] = float_4 (body->m_matrix[0][0], body->m_matrix[0][1], body->m_matrix[0][2], body->m_matrix[0][3]);
+		matrix.m_row[1] = float_4 (body->m_matrix[1][0], body->m_matrix[1][1], body->m_matrix[1][2], body->m_matrix[1][3]);
+		matrix.m_row[2] = float_4 (body->m_matrix[2][0], body->m_matrix[2][1], body->m_matrix[2][2], body->m_matrix[2][3]);
+		matrix.m_row[3] = float_4 (body->m_matrix[3][0], body->m_matrix[3][1], body->m_matrix[3][2], body->m_matrix[3][3]);
+	}
+
+	extent<1> compute_domain(bodyCount);
+	const array<Matrix4x4 , 1>& bodyMatrix = m_bodyMatrix;
+	array<Matrix4x4 , 1>& bodyInvInertiaMatrix = m_bodyInvInertiaMatrix;
+    parallel_for_each (compute_domain, [=, &bodyMatrix, &bodyInvInertiaMatrix] (index<1> idx) restrict(amp)
+    {
+        CalcuateInvInertiaMatrixKernel (bodyMatrix[idx], bodyInvInertiaMatrix[idx]);
+    });
+/*
+array_view<Matrix4x4, 1> xxx (m_bodyInvInertiaMatrix);
+//xxx.synchronize();
+	for (int i = 0; i < bodyCount; i ++) {
+		Matrix4x4& matrix = xxx[i];
+		Matrix4x4& matrix1 = xxx[i];
+	}
+array_view<Matrix4x4, 1> xxx1 (m_bodyInvInertiaMatrix);
+*/
+}
+
+
+
+void dgAmpInstance::CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix, Matrix4x4& invInertiaMatrix) restrict(amp)
+{
+/*
+	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
+	dgWorld* const world = (dgWorld*) worldContext;
+	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
+
+	const dgIsland* const island = syncData->m_islandArray;
+	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
+	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
+
+	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
+	dgVector zero(dgFloat32 (0.0f));
+
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+		dgAssert (bodyArray[0].m_body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bodyArray[0].m_body)->m_accel % ((dgDynamicBody*)bodyArray[0].m_body)->m_accel) == dgFloat32 (0.0f));
+		dgAssert (bodyArray[0].m_body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bodyArray[0].m_body)->m_alpha % ((dgDynamicBody*)bodyArray[0].m_body)->m_alpha) == dgFloat32 (0.0f));
+
+		dgInt32 index = i + 1;
+		dgBody* const body = bodyArray[index].m_body;
+		dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
+		body->AddDampingAcceleration();
+		body->CalcInvInertiaMatrix ();
+
+		// re use these variables for temp storage 
+		body->m_netForce = body->m_veloc;
+		body->m_netTorque = body->m_omega;
+
+		internalForces[index].m_linear = zero;
+		internalForces[index].m_angular = zero;
+	}
+*/
+	invInertiaMatrix.m_row[0] = bodyMatrix.m_row[0];
+	invInertiaMatrix.m_row[1] = bodyMatrix.m_row[1];
+	invInertiaMatrix.m_row[2] = bodyMatrix.m_row[2];
+	invInertiaMatrix.m_row[3] = bodyMatrix.m_row[3];
 }

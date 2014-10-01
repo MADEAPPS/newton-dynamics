@@ -136,10 +136,10 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	}
 
 	dgInt32 maxRowCount = 0;
-	dgIsland* const islands = (dgIsland*) &world->m_islandMemory[0];
+	dgIsland* const islandsArray = (dgIsland*) &world->m_islandMemory[0];
 	for (dgInt32 i = 0; i < m_islands; i ++) {
-		islands[i].m_rowsStart = maxRowCount;
-		maxRowCount += islands[i].m_rowsCount;
+		islandsArray[i].m_rowsStart = maxRowCount;
+		maxRowCount += islandsArray[i].m_rowsCount;
 	}
 	m_solverMemory.Init (world, maxRowCount, m_bodies);
 
@@ -161,7 +161,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	}
 	world->SynchronizationBarrier();
 
-	dgSort (islands, m_islands, CompareIslands); 
+	dgSort (islandsArray, m_islands, CompareIslands); 
 
 	dgUnsigned32 dynamicsTime = world->m_getPerformanceCount();
 	world->m_perfomanceCounters[m_dynamicsBuildSpanningTreeTicks] = dynamicsTime - updateTime;
@@ -169,12 +169,12 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	if (!(world->m_amp && (world->m_hardwaredIndex > 0))) {
 		dgInt32 index = 0;
 		if (world->m_useParallelSolver && (threadCount > 1)) {
-			for ( ; (index < m_islands) && (islands[index].m_jointCount >= DG_PARALLEL_JOINT_COUNT_CUT_OFF); index ++) {
+			for ( ; (index < m_islands) && (islandsArray[index].m_jointCount >= DG_PARALLEL_JOINT_COUNT_CUT_OFF); index ++) {
 				int i = index + 1;
-				if ((i < m_islands) && (islands[index].m_jointCount < (2 * islands[i].m_jointCount))) { 
+				if ((i < m_islands) && (islandsArray[index].m_jointCount < (2 * islandsArray[i].m_jointCount))) { 
 					break;
 				}
-				CalculateReactionForcesParallel (&islands[index], timestep);
+				CalculateReactionForcesParallel (&islandsArray[index], timestep);
 			}
 		}
 
@@ -187,7 +187,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		world->SynchronizationBarrier();
 	} else {
 		#ifdef _NEWTON_AMP 
-			world->m_amp->ConstraintSolver (islands, timestep);
+			
+			world->m_amp->ConstraintSolver (m_islands, islandsArray, timestep);
 		#endif
 	}
 
@@ -1033,82 +1034,4 @@ dgInt32 dgWorldDynamicUpdate::SortJointInfoByColor (const dgParallelJointMap* co
 }
 
 
-
-void dgWorldDynamicUpdate::LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const
-{
-//	memset (solverSyncData->m_bodyAtomic, 0, island->m_bodyCount * sizeof (solverSyncData->m_bodyAtomic[0]));
-
-	dgParallelJointMap* const jointInfoMap = solverSyncData->m_jointInfoMap;
-	dgInt32 count = island->m_jointCount;
-	dgInt32 index = island->m_jointStart;
-	for (dgInt32 j = 0; j < count; j ++) {
-		dgConstraint* const joint = constraintArray[index].m_joint;
-		constraintArray[index].m_color = 0;
-		jointInfoMap[j].m_jointIndex = index;
-		joint->m_index = index;
-		index ++;
-	}
-
-	jointInfoMap[count].m_bashIndex = 0x7fffffff;
-	jointInfoMap[count].m_jointIndex= -1;
-
-	for (dgInt32 i = 0; i < count; i ++) {
-		dgJointInfo& jointInfo = constraintArray[jointInfoMap[i].m_jointIndex];
-
-		dgInt32 index = 0; 
-		dgInt32 color = jointInfo.m_color;
-		for (dgInt32 n = 1; n & color; n <<= 1) {
-			index ++;
-			dgAssert (index < 32);
-		}
-		jointInfoMap[i].m_bashIndex = index;
-
-		color = 1 << index;
-		dgConstraint* const constraint = jointInfo.m_joint;
-		dgDynamicBody* const body0 = (dgDynamicBody*) constraint->m_body0;
-		dgAssert (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-
-		if (body0->m_invMass.m_w > dgFloat32 (0.0f)) {
-			for (dgBodyMasterListRow::dgListNode* jointNode = body0->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-				dgBodyMasterListCell& cell = jointNode->GetInfo();
-
-				dgConstraint* const neiborgLink = cell.m_joint;
-				if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF)) {
-					dgJointInfo& info = constraintArray[neiborgLink->m_index];
-					info.m_color |= color;
-				}
-			}
-		}
-
-		dgDynamicBody* const body1 = (dgDynamicBody*)constraint->m_body1;
-		dgAssert (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-		if (body1->m_invMass.m_w > dgFloat32 (0.0f)) {
-			for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-				dgBodyMasterListCell& cell = jointNode->GetInfo();
-
-				dgConstraint* const neiborgLink = cell.m_joint;
-				if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF)) {
-					dgJointInfo& info = constraintArray[neiborgLink->m_index];
-					info.m_color |= color;
-				}
-			}
-		}
-	}
-
-	dgSort (jointInfoMap, count, SortJointInfoByColor, constraintArray);
-
-	dgInt32 bash = 0;
-	for (int index = 0; index < count; index ++) {
-		dgInt32 count = 0; 
-		solverSyncData->m_jointBatches[bash].m_start = index;
-		while (jointInfoMap[index].m_bashIndex == bash) {
-			count ++;
-			index ++;
-		}
-		solverSyncData->m_jointBatches[bash].m_count = count;
-		bash ++;
-		index --;
-	}
-	solverSyncData->m_batchesCount = bash;
-}
 

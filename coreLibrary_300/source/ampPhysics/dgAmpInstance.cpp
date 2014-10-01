@@ -23,11 +23,15 @@
 #include "dgAMP.h"
 #include "dgAmpInstance.h"
 
+#define DG_BODY_START_ARRAY_SIZE	1
 
 dgAmpInstance::dgAmpInstance(dgWorld* const world)
 	:m_world (world)
 	,m_accelerator()
 	,m_acceleratorList(world->GetAllocator())
+	,m_bodyMatrix(DG_BODY_START_ARRAY_SIZE)
+	,m_bodyInvInertiaMatrix(DG_BODY_START_ARRAY_SIZE)
+	,m_bodyMatrix_view (m_bodyMatrix)
 {
 	const wchar_t* reference = accelerator::direct3d_ref;
 	const wchar_t* cpuAccel = accelerator::cpu_accelerator;
@@ -46,7 +50,7 @@ dgAmpInstance::dgAmpInstance(dgWorld* const world)
 		}
     }
 
-//SelectPlaform(1);
+//SelectPlaform(0);
 //AddArraysWithFunction();
 }
 
@@ -60,6 +64,10 @@ dgAmpInstance::~dgAmpInstance(void)
 void dgAmpInstance::CleanUp()
 {
 	//m_acceleratorList.RemoveAll();
+//	if (m_bodyMatrix) {
+//		delete m_bodyMatrix;
+//		delete m_bodyInvInertiaMatrix;
+//	}
 }
 
 
@@ -100,12 +108,9 @@ void dgAmpInstance::GetVendorString(dgInt32 deviceIndex, char* const name, dgInt
 	}
 }
 
-  #include <iostream> 
 
-
-
-
-
+/*
+#include <iostream> 
 void dgAmpInstance::AddElements(index<1> idx, array_view<int, 1> sum, array_view<int, 1> a, array_view<int, 1> b) restrict(amp)
 {
     sum[idx] = a[idx] + b[idx];
@@ -131,7 +136,7 @@ void dgAmpInstance::AddArraysWithFunction()
         std::cout << sum[i] << "\n";
     }
 }
-
+*/
 
 
 

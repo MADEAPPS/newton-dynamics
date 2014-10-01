@@ -43,9 +43,8 @@ dgBilateralConstraint::dgBilateralConstraint ()
 	dgAssert (dgInt32 (sizeof (dgBilateralConstraint) & 15) == 0);
 	dgAssert ((((dgUnsigned64) &m_localMatrix0) & 15) == 0);
 
-//	dgConstraint::Init ();
-
 	m_maxDOF = 6;
+	m_contactActive = true;
 	m_destructor = NULL;
 	m_localMatrix0 = dgGetIdentityMatrix();
 	m_localMatrix1 = dgGetIdentityMatrix();
