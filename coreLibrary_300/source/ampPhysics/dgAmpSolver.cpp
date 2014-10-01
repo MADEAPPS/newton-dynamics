@@ -818,7 +818,7 @@ void dgAmpInstance::ConstraintSolver (dgInt32 islandCount, const dgIsland* const
 
 //	dgParallelJointMap* const jointInfoMap = (dgParallelJointMap*) (&m_world->m_pairMemoryBuffer[0]);
 	syncData.m_jointInfoMap = (dgParallelJointMap*) (&m_world->m_pairMemoryBuffer[0]);
-	syncData.m_bodyInfoMap = (dgBody**) (&m_world->m_pairMemoryBuffer[dynUpdate.m_joints + 32]);
+	syncData.m_bodyInfoMap = (dgBody**) (&syncData.m_jointInfoMap[dynUpdate.m_joints + 32]);
 
 //	dgJointInfo* const constraintArray = (dgJointInfo*) &m_world->m_jointsMemory[0];
 //	dgInt32 bodyCount = islandArray->m_bodyCount - 1;
@@ -901,14 +901,8 @@ void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* co
 	dgInt32 size = m_bodyMatrix.get_extent().size();
 	while (size < syncData->m_bodyCount) {
 		size *= 2;
-		m_bodyDamp = array<Jacobian, 1>(size);
-		m_bodyVelocity = array<Jacobian, 1>(size);
-		m_bodyMatrix = array<Matrix4x4 , 1> (size);
-		m_bodyInvInertiaMatrix = array<Matrix4x4 , 1> (size);
+		AllocateBodyArray (size);
 
-		m_bodyDamp_view = array_view<Jacobian, 1> (m_bodyDamp);
-		m_bodyMatrix_view = array_view<Matrix4x4, 1> (m_bodyMatrix);
-		m_bodyVelocity_view = array_view<Jacobian, 1> (m_bodyVelocity);
 	}
 
 

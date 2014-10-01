@@ -69,6 +69,8 @@ class dgAmpInstance
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData); 
 	void CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islandCount);
 
+	void AllocateBodyArray (dgInt32 count);
+
 	static void AddDamingAccel (const Jacobian& damping, Jacobian& veloc) restrict(amp);
 	static void CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix, Matrix4x4& invInertiaMatrix) restrict(amp);
 

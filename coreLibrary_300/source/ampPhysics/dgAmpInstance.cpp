@@ -23,7 +23,7 @@
 #include "dgAMP.h"
 #include "dgAmpInstance.h"
 
-#define DG_BODY_START_ARRAY_SIZE	1
+#define DG_BODY_START_ARRAY_SIZE	256
 
 dgAmpInstance::dgAmpInstance(dgWorld* const world)
 	:m_world (world)
@@ -58,15 +58,12 @@ dgAmpInstance::dgAmpInstance(dgWorld* const world)
 
 dgAmpInstance::~dgAmpInstance(void)
 {
-	CleanUp();
 }
-
 
 void dgAmpInstance::CleanUp()
 {
-	//m_acceleratorList.RemoveAll();
+	AllocateBodyArray (DG_BODY_START_ARRAY_SIZE);
 }
-
 
 dgInt32 dgAmpInstance::GetPlatformsCount() const
 {
@@ -74,8 +71,22 @@ dgInt32 dgAmpInstance::GetPlatformsCount() const
 }
 
 
+void dgAmpInstance::AllocateBodyArray (dgInt32 size)
+{
+	m_bodyDamp = array<Jacobian, 1>(size);
+	m_bodyVelocity = array<Jacobian, 1>(size);
+	m_bodyMatrix = array<Matrix4x4 , 1> (size);
+	m_bodyInvInertiaMatrix = array<Matrix4x4 , 1> (size);
+
+	m_bodyDamp_view = array_view<Jacobian, 1> (m_bodyDamp);
+	m_bodyMatrix_view = array_view<Matrix4x4, 1> (m_bodyMatrix);
+	m_bodyVelocity_view = array_view<Jacobian, 1> (m_bodyVelocity);
+}
+
 void dgAmpInstance::SelectPlaform(dgInt32 deviceIndex)
 {
+	AllocateBodyArray (DG_BODY_START_ARRAY_SIZE);
+
 	int index = 0;
 	for (dgList<dgAcceleratorDescription>::dgListNode* node = m_acceleratorList.GetFirst(); node; node = node->GetNext()) {
 		if (index == deviceIndex) {

@@ -106,14 +106,11 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	dFloat stepz = maxP.m_z - minP.m_z + 0.01f;
 	dFloat stepy = maxP.m_y - minP.m_y;
 
-	float y0 = matrix.m_posit.m_z + stepy / 2.0f;
+	float y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	float z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 	matrix.m_posit.m_y = y0;
 	for (int j = 0; j < count; j ++) {
-	//for (int j = 0; j < count/2; j ++) {
-	//for (int j = 0; j < 8; j ++) {
-
 		matrix.m_posit.m_z = z0;
 		for (int i = 0; i < (count - j) ; i ++) {
 			CreateSimpleSolid (scene, geometry, mass, matrix, collision, defaultMaterialID);
@@ -160,10 +157,10 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 			shapeMatrix = dGetIdentityMatrix();
 		}
 		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, selection[index], shapeMatrix);
-//		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _BOX_PRIMITIVE);
-//		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
-//		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _TAPERED_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
-//		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
+//		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _BOX_PRIMITIVE);
+//		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
+//		BuildPyramid (scene, 10.0f, dVector( 20.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _TAPERED_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
+//		BuildPyramid (scene, 10.0f, dVector( 30.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 	}
 
 	high = 20;
