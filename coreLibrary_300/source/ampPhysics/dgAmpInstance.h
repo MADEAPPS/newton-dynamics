@@ -30,7 +30,7 @@ using namespace concurrency::graphics;
 class dgAmpInstance
 {
 	public:
-	class Jacobial
+	class Jacobian
 	{
 		public:
 		float_4 m_linear;
@@ -64,25 +64,27 @@ class dgAmpInstance
 	void ConstraintSolver (dgInt32 islandCount, const dgIsland* const islandArray, dgFloat32 timestep);
 	
 	private:
-	//void AddArraysWithFunction() ;
-	//static void AddElements(index<1> idx, array_view<int, 1> sum, array_view<int, 1> a, array_view<int, 1> b) restrict(amp);
+	float_4 ToFloat4 (const dgVector& v) const { return float_4 (v[0], v[1], v[2], v[3]);}
 
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData); 
 	void CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islandCount);
 
-
-	//static void InitilizeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID);
+	static void AddDamingAccel (const Jacobian& damping, Jacobian& veloc) restrict(amp);
 	static void CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix, Matrix4x4& invInertiaMatrix) restrict(amp);
 
 	dgWorld* m_world;
 	accelerator m_accelerator;
 	dgList<dgAcceleratorDescription> m_acceleratorList;
 
+	
+	array<Jacobian, 1> m_bodyDamp;
+	array<Jacobian, 1> m_bodyVelocity;
 	array<Matrix4x4 , 1> m_bodyMatrix;
 	array<Matrix4x4 , 1> m_bodyInvInertiaMatrix;
 
+	array_view<Jacobian, 1> m_bodyDamp_view;
+	array_view<Jacobian, 1> m_bodyVelocity_view;
 	array_view<Matrix4x4, 1> m_bodyMatrix_view;
-	
 };
 
 

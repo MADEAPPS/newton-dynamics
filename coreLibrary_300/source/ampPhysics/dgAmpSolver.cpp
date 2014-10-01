@@ -901,10 +901,14 @@ void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* co
 	dgInt32 size = m_bodyMatrix.get_extent().size();
 	while (size < syncData->m_bodyCount) {
 		size *= 2;
+		m_bodyDamp = array<Jacobian, 1>(size);
+		m_bodyVelocity = array<Jacobian, 1>(size);
 		m_bodyMatrix = array<Matrix4x4 , 1> (size);
 		m_bodyInvInertiaMatrix = array<Matrix4x4 , 1> (size);
 
+		m_bodyDamp_view = array_view<Jacobian, 1> (m_bodyDamp);
 		m_bodyMatrix_view = array_view<Matrix4x4, 1> (m_bodyMatrix);
+		m_bodyVelocity_view = array_view<Jacobian, 1> (m_bodyVelocity);
 	}
 
 
@@ -997,17 +1001,27 @@ void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const 
 	for (int i = 0; i < bodyCount; i ++) {
 		const dgBody* const body = bopyMapInfo[i];
 		Matrix4x4& matrix = m_bodyMatrix_view[i];
-		matrix.m_row[0] = float_4 (body->m_matrix[0][0], body->m_matrix[0][1], body->m_matrix[0][2], body->m_matrix[0][3]);
-		matrix.m_row[1] = float_4 (body->m_matrix[1][0], body->m_matrix[1][1], body->m_matrix[1][2], body->m_matrix[1][3]);
-		matrix.m_row[2] = float_4 (body->m_matrix[2][0], body->m_matrix[2][1], body->m_matrix[2][2], body->m_matrix[2][3]);
-		matrix.m_row[3] = float_4 (body->m_matrix[3][0], body->m_matrix[3][1], body->m_matrix[3][2], body->m_matrix[3][3]);
+		matrix.m_row[0] = ToFloat4 (body->m_matrix[0]);
+		matrix.m_row[1] = ToFloat4 (body->m_matrix[1]);
+		matrix.m_row[2] = ToFloat4 (body->m_matrix[2]);
+		matrix.m_row[3] = ToFloat4 (body->m_matrix[3]);
+
+		m_bodyDamp_view[i].m_linear = ToFloat4 (body->GetLinearDamping());
+		m_bodyDamp_view[i].m_angular = ToFloat4 (body->GetAngularDamping());
+
+		m_bodyVelocity_view[i].m_linear = ToFloat4 (body->GetVelocity());
+		m_bodyVelocity_view[i].m_angular = ToFloat4 (body->GetOmega());
 	}
 
 	extent<1> compute_domain(bodyCount);
 	const array<Matrix4x4 , 1>& bodyMatrix = m_bodyMatrix;
+	const array<Jacobian, 1>& bodyDamp = m_bodyDamp;
+	array<Jacobian, 1>& bodyVelocity = m_bodyVelocity;
 	array<Matrix4x4 , 1>& bodyInvInertiaMatrix = m_bodyInvInertiaMatrix;
-    parallel_for_each (compute_domain, [=, &bodyMatrix, &bodyInvInertiaMatrix] (index<1> idx) restrict(amp)
+
+    parallel_for_each (compute_domain, [=, &bodyDamp, &bodyVelocity, &bodyMatrix, &bodyInvInertiaMatrix] (index<1> idx) restrict(amp)
     {
+		AddDamingAccel (bodyDamp[idx], bodyVelocity[idx]);
         CalcuateInvInertiaMatrixKernel (bodyMatrix[idx], bodyInvInertiaMatrix[idx]);
     });
 /*
@@ -1059,4 +1073,13 @@ void dgAmpInstance::CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix,
 	invInertiaMatrix.m_row[1] = bodyMatrix.m_row[1];
 	invInertiaMatrix.m_row[2] = bodyMatrix.m_row[2];
 	invInertiaMatrix.m_row[3] = bodyMatrix.m_row[3];
+}
+
+
+void dgAmpInstance::AddDamingAccel (const Jacobian& damping, Jacobian& veloc) restrict(amp)
+{
+//	m_veloc -= m_veloc.Scale4 (m_dampCoef.m_w);
+//	dgVector omega (m_matrix.UnrotateVector (m_omega));
+//	omega -= omega.CompProduct4 (m_dampCoef);
+//	m_omega = m_matrix.RotateVector (omega);
 }

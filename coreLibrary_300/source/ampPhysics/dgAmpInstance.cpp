@@ -29,9 +29,13 @@ dgAmpInstance::dgAmpInstance(dgWorld* const world)
 	:m_world (world)
 	,m_accelerator()
 	,m_acceleratorList(world->GetAllocator())
+	,m_bodyDamp(DG_BODY_START_ARRAY_SIZE)
+	,m_bodyVelocity(DG_BODY_START_ARRAY_SIZE)
 	,m_bodyMatrix(DG_BODY_START_ARRAY_SIZE)
 	,m_bodyInvInertiaMatrix(DG_BODY_START_ARRAY_SIZE)
 	,m_bodyMatrix_view (m_bodyMatrix)
+	,m_bodyDamp_view(m_bodyDamp)
+	,m_bodyVelocity_view(m_bodyVelocity)
 {
 	const wchar_t* reference = accelerator::direct3d_ref;
 	const wchar_t* cpuAccel = accelerator::cpu_accelerator;
@@ -49,9 +53,6 @@ dgAmpInstance::dgAmpInstance(dgWorld* const world)
 			strncpy (info.m_description, d.c_str(), sizeof (info.m_description));
 		}
     }
-
-//SelectPlaform(0);
-//AddArraysWithFunction();
 }
 
 
@@ -64,10 +65,6 @@ dgAmpInstance::~dgAmpInstance(void)
 void dgAmpInstance::CleanUp()
 {
 	//m_acceleratorList.RemoveAll();
-//	if (m_bodyMatrix) {
-//		delete m_bodyMatrix;
-//		delete m_bodyInvInertiaMatrix;
-//	}
 }
 
 
@@ -107,36 +104,3 @@ void dgAmpInstance::GetVendorString(dgInt32 deviceIndex, char* const name, dgInt
 		index ++;
 	}
 }
-
-
-/*
-#include <iostream> 
-void dgAmpInstance::AddElements(index<1> idx, array_view<int, 1> sum, array_view<int, 1> a, array_view<int, 1> b) restrict(amp)
-{
-    sum[idx] = a[idx] + b[idx];
-}
-
-
-void dgAmpInstance::AddArraysWithFunction() 
-{
-    int aCPP[] = {1, 2, 3, 4, 5};
-    int bCPP[] = {6, 7, 8, 9, 10};
-    int sumCPP[5] = {0, 0, 0, 0, 0};
-
-    array_view<int, 1> a(5, aCPP);
-    array_view<int, 1> b(5, bCPP);
-    array_view<int, 1> sum(5, sumCPP);
-
-    parallel_for_each (sum.extent, [=](index<1> idx) restrict(amp)
-    {
-        AddElements(idx, sum, a, b);
-    });
-
-    for (int i = 0; i < 5; i++) {
-        std::cout << sum[i] << "\n";
-    }
-}
-*/
-
-
-
