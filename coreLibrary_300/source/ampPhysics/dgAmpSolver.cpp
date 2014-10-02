@@ -1005,18 +1005,28 @@ void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const 
 
 		m_bodyVelocity_view[i].m_linear = ToFloat4 (body->GetVelocity());
 		m_bodyVelocity_view[i].m_angular = ToFloat4 (body->GetOmega());
+
+		m_bodyInvMass_view[i] = ToFloat4 (body->GetInvMass());
 	}
 
 	extent<1> compute_domain(bodyCount);
+
+	const array<float_4, 1>& bodyInvMass = m_bodyInvMass;
 	const array<Matrix4x4 , 1>& bodyMatrix = m_bodyMatrix;
 	const array<Jacobian, 1>& bodyDamp = m_bodyDamp;
 	array<Jacobian, 1>& bodyVelocity = m_bodyVelocity;
+	array<Jacobian, 1>& bodyNetForce = m_bodyNetForce;
+	array<Jacobian, 1>& bodyInternalForce = m_bodyInternalForce;
 	array<Matrix4x4 , 1>& bodyInvInertiaMatrix = m_bodyInvInertiaMatrix;
 
-    parallel_for_each (compute_domain, [=, &bodyDamp, &bodyVelocity, &bodyMatrix, &bodyInvInertiaMatrix] (index<1> idx) restrict(amp)
+    parallel_for_each (compute_domain, [=, &bodyDamp, &bodyVelocity, &bodyMatrix, &bodyInvInertiaMatrix, &bodyInvMass, &bodyNetForce, &bodyInternalForce] (index<1> idx) restrict(amp,cpu)
     {
-		AddDamingAccel (bodyDamp[idx], bodyVelocity[idx]);
-        CalcuateInvInertiaMatrixKernel (bodyMatrix[idx], bodyInvInertiaMatrix[idx]);
+		AddDamingAccelKernel (bodyMatrix[idx], bodyDamp[idx], bodyVelocity[idx]);
+        CalcuateInvInertiaMatrixKernel (bodyMatrix[idx], bodyInvInertiaMatrix[idx], bodyInvMass[idx]);
+
+		bodyNetForce[idx] = bodyVelocity[idx];
+		bodyInternalForce[idx].m_linear = float_4 (0.0f, 0.0f, 0.0f, 0.0f);
+		bodyInternalForce[idx].m_angular = float_4 (0.0f, 0.0f, 0.0f, 0.0f);
     });
 /*
 array_view<Matrix4x4, 1> xxx (m_bodyInvInertiaMatrix);
@@ -1031,49 +1041,35 @@ array_view<Matrix4x4, 1> xxx1 (m_bodyInvInertiaMatrix);
 
 
 
-void dgAmpInstance::CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix, Matrix4x4& invInertiaMatrix) restrict(amp)
+void dgAmpInstance::CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix, Matrix4x4& invInertiaMatrix, const float_4& invInertia) restrict(amp,cpu)
 {
-/*
-	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
-	dgWorld* const world = (dgWorld*) worldContext;
-	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
+//	dgMatrix tmp (m_matrix.Transpose4X4());
+//	tmp[0] = tmp[0].CompProduct4(m_invMass);
+//	tmp[1] = tmp[1].CompProduct4(m_invMass);
+//	tmp[2] = tmp[2].CompProduct4(m_invMass);
+//	return dgMatrix (m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
 
-	const dgIsland* const island = syncData->m_islandArray;
-	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
-
-	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
-	dgVector zero(dgFloat32 (0.0f));
-
-	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-		dgAssert (bodyArray[0].m_body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bodyArray[0].m_body)->m_accel % ((dgDynamicBody*)bodyArray[0].m_body)->m_accel) == dgFloat32 (0.0f));
-		dgAssert (bodyArray[0].m_body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bodyArray[0].m_body)->m_alpha % ((dgDynamicBody*)bodyArray[0].m_body)->m_alpha) == dgFloat32 (0.0f));
-
-		dgInt32 index = i + 1;
-		dgBody* const body = bodyArray[index].m_body;
-		dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
-		body->AddDampingAcceleration();
-		body->CalcInvInertiaMatrix ();
-
-		// re use these variables for temp storage 
-		body->m_netForce = body->m_veloc;
-		body->m_netTorque = body->m_omega;
-
-		internalForces[index].m_linear = zero;
-		internalForces[index].m_angular = zero;
-	}
-*/
-	invInertiaMatrix.m_row[0] = bodyMatrix.m_row[0];
-	invInertiaMatrix.m_row[1] = bodyMatrix.m_row[1];
-	invInertiaMatrix.m_row[2] = bodyMatrix.m_row[2];
-	invInertiaMatrix.m_row[3] = bodyMatrix.m_row[3];
+	Matrix4x4 tmp (Transpose(bodyMatrix));
+	tmp.m_row[0] *= invInertia;
+	tmp.m_row[1] *= invInertia;
+	tmp.m_row[2] *= invInertia;
+	invInertiaMatrix.m_row[0] = RotateVector(bodyMatrix, tmp.m_row[0]);
+	invInertiaMatrix.m_row[1] = RotateVector(bodyMatrix, tmp.m_row[1]);
+	invInertiaMatrix.m_row[2] = RotateVector(bodyMatrix, tmp.m_row[2]);
+	invInertiaMatrix.m_row[3] = float_4 (0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 
-void dgAmpInstance::AddDamingAccel (const Jacobian& damping, Jacobian& veloc) restrict(amp)
+void dgAmpInstance::AddDamingAccelKernel (const Matrix4x4& bodyMatrix, const Jacobian& damping, Jacobian& veloc) restrict(amp,cpu)
 {
 //	m_veloc -= m_veloc.Scale4 (m_dampCoef.m_w);
 //	dgVector omega (m_matrix.UnrotateVector (m_omega));
 //	omega -= omega.CompProduct4 (m_dampCoef);
 //	m_omega = m_matrix.RotateVector (omega);
+
+	float_4 localOmega (UnrotateVector (bodyMatrix, veloc.m_angular));
+	localOmega -= localOmega * damping.m_angular;
+
+	veloc.m_linear -= veloc.m_linear * damping.m_linear;
+	veloc.m_angular = RotateVector (bodyMatrix, localOmega);
 }

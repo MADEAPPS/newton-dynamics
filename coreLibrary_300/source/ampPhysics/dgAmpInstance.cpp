@@ -29,13 +29,17 @@ dgAmpInstance::dgAmpInstance(dgWorld* const world)
 	:m_world (world)
 	,m_accelerator()
 	,m_acceleratorList(world->GetAllocator())
+	,m_bodyInvMass(DG_BODY_START_ARRAY_SIZE)
 	,m_bodyDamp(DG_BODY_START_ARRAY_SIZE)
 	,m_bodyVelocity(DG_BODY_START_ARRAY_SIZE)
+	,m_bodyNetForce(DG_BODY_START_ARRAY_SIZE)
+	,m_bodyInternalForce(DG_BODY_START_ARRAY_SIZE)
 	,m_bodyMatrix(DG_BODY_START_ARRAY_SIZE)
 	,m_bodyInvInertiaMatrix(DG_BODY_START_ARRAY_SIZE)
-	,m_bodyMatrix_view (m_bodyMatrix)
 	,m_bodyDamp_view(m_bodyDamp)
+	,m_bodyInvMass_view (m_bodyInvMass)
 	,m_bodyVelocity_view(m_bodyVelocity)
+	,m_bodyMatrix_view (m_bodyMatrix)
 {
 	const wchar_t* reference = accelerator::direct3d_ref;
 	const wchar_t* cpuAccel = accelerator::cpu_accelerator;
@@ -73,14 +77,20 @@ dgInt32 dgAmpInstance::GetPlatformsCount() const
 
 void dgAmpInstance::AllocateBodyArray (dgInt32 size)
 {
+	m_bodyInvMass = array<float_4, 1> (size);
 	m_bodyDamp = array<Jacobian, 1>(size);
 	m_bodyVelocity = array<Jacobian, 1>(size);
+	m_bodyNetForce = array<Jacobian, 1>(size);
+	m_bodyInternalForce = array<Jacobian, 1>(size);
 	m_bodyMatrix = array<Matrix4x4 , 1> (size);
 	m_bodyInvInertiaMatrix = array<Matrix4x4 , 1> (size);
 
+	
 	m_bodyDamp_view = array_view<Jacobian, 1> (m_bodyDamp);
+	m_bodyInvMass_view = array_view<float_4, 1> (m_bodyInvMass);
 	m_bodyMatrix_view = array_view<Matrix4x4, 1> (m_bodyMatrix);
 	m_bodyVelocity_view = array_view<Jacobian, 1> (m_bodyVelocity);
+	
 }
 
 void dgAmpInstance::SelectPlaform(dgInt32 deviceIndex)
