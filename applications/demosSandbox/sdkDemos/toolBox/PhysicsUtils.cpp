@@ -1214,6 +1214,7 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 	dVector pointVeloc;
 
 	const dFloat stiffness = 0.3f;
+	const dFloat angularDamp = 0.95f;
 
 	dFloat invTimeStep = 1.0f / timestep;
 	NewtonWorld* const world = NewtonBodyGetWorld (body);
@@ -1237,7 +1238,7 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 	// damp angular velocity
 	NewtonBodyGetOmega (body, &omega1[0]);
 	NewtonBodyGetVelocity (body, &veloc1[0]);
-	omega1 = omega1.Scale (0.95f);
+	omega1 = omega1.Scale (angularDamp);
 
 	// restore body velocity and angular velocity
 	NewtonBodySetOmega (body, &omega0[0]);
