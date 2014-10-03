@@ -143,6 +143,7 @@ class dgParallelSolverSyncData
 	dgInt32 m_maxPasses;
 	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
+	dgInt32 m_rowCount;
 	dgInt32 m_batchesCount;
 	dgInt32 m_atomicIndex;
 	dgInt32 m_jointsInBatch;

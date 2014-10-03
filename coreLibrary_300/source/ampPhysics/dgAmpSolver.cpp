@@ -782,13 +782,15 @@ void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* co
 
 	syncData->m_bodyCount = bodyCount;
 	syncData->m_jointCount = jointCount;
+	syncData->m_rowCount = maxRowCount;
 
-	dgInt32 size = m_bodyMatrix.get_extent().size();
-	while (size < syncData->m_bodyCount) {
-		size *= 2;
-		AllocateBodyArray (size);
+	for (dgInt32 size = m_bodySOA.m_bodyMatrix.get_extent().size(); size < syncData->m_bodyCount; size = m_bodySOA.m_bodyMatrix.get_extent().size()) {
+		m_bodySOA.Alloc (size * 2);
 	}
 
+	for (dgInt32 size = m_constraintSOA.m_jacobians.get_extent().size(); size < syncData->m_rowCount; size = m_constraintSOA.m_jacobians.get_extent().size()) {
+		m_constraintSOA.Alloc (size * 2);
+	}
 
 	jointInfoMap[jointCount].m_bashIndex = 0x7fffffff;
 	jointInfoMap[jointCount].m_jointIndex= -1;
@@ -898,30 +900,30 @@ void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const 
 	const int bodyCount = syncData->m_bodyCount;
 	for (int i = 0; i < bodyCount; i ++) {
 		const dgBody* const body = bopyMapInfo[i];
-		Matrix4x4& matrix = m_bodyMatrix_view[i];
+		Matrix4x4& matrix = m_bodySOA.m_bodyMatrix_view[i];
 		matrix.m_row[0] = ToFloat4 (body->m_matrix[0]);
 		matrix.m_row[1] = ToFloat4 (body->m_matrix[1]);
 		matrix.m_row[2] = ToFloat4 (body->m_matrix[2]);
 		matrix.m_row[3] = ToFloat4 (body->m_matrix[3]);
 
-		m_bodyDamp_view[i].m_linear = ToFloat4 (body->GetLinearDamping());
-		m_bodyDamp_view[i].m_angular = ToFloat4 (body->GetAngularDamping());
+		m_bodySOA.m_bodyDamp_view[i].m_linear = ToFloat4 (body->GetLinearDamping());
+		m_bodySOA.m_bodyDamp_view[i].m_angular = ToFloat4 (body->GetAngularDamping());
 
-		m_bodyVelocity_view[i].m_linear = ToFloat4 (body->GetVelocity());
-		m_bodyVelocity_view[i].m_angular = ToFloat4 (body->GetOmega());
+		m_bodySOA.m_bodyVelocity_view[i].m_linear = ToFloat4 (body->GetVelocity());
+		m_bodySOA.m_bodyVelocity_view[i].m_angular = ToFloat4 (body->GetOmega());
 
-		m_bodyInvMass_view[i] = ToFloat4 (body->GetInvMass());
+		m_bodySOA.m_bodyInvMass_view[i] = ToFloat4 (body->GetInvMass());
 	}
 
 	extent<1> compute_domain(bodyCount);
 
-	const array<float_4, 1>& bodyInvMass = m_bodyInvMass;
-	const array<Matrix4x4 , 1>& bodyMatrix = m_bodyMatrix;
-	const array<Jacobian, 1>& bodyDamp = m_bodyDamp;
-	array<Jacobian, 1>& bodyVelocity = m_bodyVelocity;
-	array<Jacobian, 1>& bodyNetForce = m_bodyNetForce;
-	array<Jacobian, 1>& bodyInternalForce = m_bodyInternalForce;
-	array<Matrix4x4 , 1>& bodyInvInertiaMatrix = m_bodyInvInertiaMatrix;
+	const array<float_4, 1>& bodyInvMass = m_bodySOA.m_bodyInvMass;
+	const array<Matrix4x4, 1>& bodyMatrix = m_bodySOA.m_bodyMatrix;
+	const array<Jacobian, 1>& bodyDamp = m_bodySOA.m_bodyDamp;
+	array<Jacobian, 1>& bodyVelocity = m_bodySOA.m_bodyVelocity;
+	array<Jacobian, 1>& bodyNetForce = m_bodySOA.m_bodyNetForce;
+	array<Jacobian, 1>& bodyInternalForce = m_bodySOA.m_bodyInternalForce;
+	array<Matrix4x4, 1>& bodyInvInertiaMatrix = m_bodySOA.m_bodyInvInertiaMatrix;
 
     parallel_for_each (compute_domain, [=, &bodyDamp, &bodyVelocity, &bodyMatrix, &bodyInvInertiaMatrix, &bodyInvMass, &bodyNetForce, &bodyInternalForce] (index<1> idx) restrict(amp,cpu)
     {

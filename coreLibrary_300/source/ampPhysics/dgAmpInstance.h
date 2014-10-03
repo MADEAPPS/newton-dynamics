@@ -47,7 +47,6 @@ class dgAmpInstance
 			m_row[2] = v2;
 			m_row[3] = v3;
 		}
-
 		float_4 m_row[4];
 	};
 
@@ -57,6 +56,36 @@ class dgAmpInstance
 		public:
 		char m_path[128];
 		char m_description[128];
+	};
+
+	class dgBodySoA
+	{
+		public:
+		dgBodySoA ();
+		void Alloc (dgInt32 size);
+
+		array<float_4, 1> m_bodyInvMass;
+		array<Jacobian, 1> m_bodyDamp;
+		array<Jacobian, 1> m_bodyVelocity;
+		array<Jacobian, 1> m_bodyNetForce;
+		array<Jacobian, 1> m_bodyInternalForce;
+		array<Matrix4x4 , 1> m_bodyMatrix;
+		array<Matrix4x4 , 1> m_bodyInvInertiaMatrix;
+	
+		array_view<Jacobian, 1> m_bodyDamp_view;
+		array_view<float_4, 1> m_bodyInvMass_view;
+		array_view<Jacobian, 1> m_bodyVelocity_view;
+		array_view<Matrix4x4, 1> m_bodyMatrix_view;
+	};
+
+	class dgConstraintSoA
+	{
+		public:
+		dgConstraintSoA ();
+		void Alloc (dgInt32 size);
+
+		array<Jacobian, 1> m_jacobians;
+		array_view<Jacobian, 1> m_jacobians_view;
 	};
 
 	DG_CLASS_ALLOCATOR(allocator);
@@ -87,8 +116,6 @@ class dgAmpInstance
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData); 
 	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData);
 	void CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islandCount);
-
-	void AllocateBodyArray (dgInt32 count);
 	
 	static void AddDamingAccelKernel (const Matrix4x4& bodyMatrix, const Jacobian& damping, Jacobian& veloc) restrict(amp,cpu);
 	static void CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix, Matrix4x4& invInertiaMatrix, const float_4& invInertia) restrict(amp,cpu);
@@ -97,18 +124,8 @@ class dgAmpInstance
 	accelerator m_accelerator;
 	dgList<dgAcceleratorDescription> m_acceleratorList;
 	
-	array<float_4, 1> m_bodyInvMass;
-	array<Jacobian, 1> m_bodyDamp;
-	array<Jacobian, 1> m_bodyVelocity;
-	array<Jacobian, 1> m_bodyNetForce;
-	array<Jacobian, 1> m_bodyInternalForce;
-	array<Matrix4x4 , 1> m_bodyMatrix;
-	array<Matrix4x4 , 1> m_bodyInvInertiaMatrix;
-	
-	array_view<Jacobian, 1> m_bodyDamp_view;
-	array_view<float_4, 1> m_bodyInvMass_view;
-	array_view<Jacobian, 1> m_bodyVelocity_view;
-	array_view<Matrix4x4, 1> m_bodyMatrix_view;
+	dgBodySoA m_bodySOA;
+	dgConstraintSoA m_constraintSOA;
 };
 
 inline float_4 dgAmpInstance::ToFloat4 (const dgVector& v) const 
