@@ -617,6 +617,7 @@ class dgVector
 	static dgVector m_one;
 	static dgVector m_wOne;
 	static dgVector m_half;
+	static dgVector m_two;
 	static dgVector m_three;
 	static dgVector m_negOne;
 	static dgVector m_signMask;
@@ -1023,6 +1024,7 @@ class dgVector
 
 	static dgVector m_one;
 	static dgVector m_wOne;
+	static dgVector m_two;
 	static dgVector m_half;
 	static dgVector m_three;
 	static dgVector m_negOne;

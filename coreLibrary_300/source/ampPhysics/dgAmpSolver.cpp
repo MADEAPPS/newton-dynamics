@@ -79,125 +79,8 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 
 
 
-void dgWorldDynamicUpdate::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData) const
-{
-	dgWorld* const world = (dgWorld*) this;
-	dgInt32 threadCounts = world->GetThreadCount();	
-
-//	for (int i = 0; i < syncData->m_batchesCount; i ++) {
-//		syncData->m_atomicIndex = syncData->m_jointBatches[i].m_start;
-//		syncData->m_jointsInBatch = syncData->m_jointBatches[i].m_count + syncData->m_atomicIndex;
-//		for (dgInt32 j = 0; j < threadCounts; j ++) {
-//			world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, world);
-//		}
-//		world->SynchronizationBarrier();
-//	}
-
-	syncData->m_atomicIndex = 0;
-	for (dgInt32 j = 0; j < threadCounts; j ++) {
-		world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, world);
-	}
-	world->SynchronizationBarrier();
-}
 
 
-void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
-	dgWorld* const world = (dgWorld*) worldContext;
-	const dgParallelJointMap* const jointInfoIndexArray = syncData->m_jointInfoMap;
-	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
-	const dgIsland* const island = syncData->m_islandArray;
-	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
-
-	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
-	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
-
-	dgVector zero (dgFloat32 (0.0f));
-//	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-
-		dgInt32 jointIndex = jointInfoIndexArray[i].m_jointIndex;
-		dgJointInfo* const jointInfo = &constraintArray[jointIndex];
-
-		dgInt32 rowBase = dgAtomicExchangeAndAdd(&syncData->m_jacobianMatrixRowAtomicIndex, jointInfo->m_autoPaircount);
-		world->GetJacobianDerivativesParallel (jointInfo, threadID, rowBase, syncData->m_timestep);
-
-		dgInt32 index = jointInfo->m_autoPairstart;
-		dgInt32 count = jointInfo->m_autoPaircount;
-		dgInt32 m0 = jointInfo->m_m0;
-		dgInt32 m1 = jointInfo->m_m1;
-		dgAssert (m0 >= 0);
-		dgAssert (m1 >= 0);
-		dgAssert (m0 != m1);
-		dgAssert (m0 < island->m_bodyCount);
-		dgAssert (m1 < island->m_bodyCount);
-
-		const dgBody* const body0 = bodyArray[m0].m_body;
-		const dgBody* const body1 = bodyArray[m1].m_body;
-
-		const dgVector invMass0 (body0->m_invMass[3]);
-		const dgMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
-		const dgVector invMass1 (body1->m_invMass[3]);
-		const dgMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
-
-		dgVector accel0 (zero); 
-		dgVector alpha0 (zero); 
-		if (body0->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-			accel0 = ((dgDynamicBody*)body0)->m_accel;
-			alpha0 = ((dgDynamicBody*)body0)->m_alpha;
-		}
-
-		dgVector accel1 (zero); 
-		dgVector alpha1 (zero); 
-		if (body1->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-			accel1 = ((dgDynamicBody*)body1)->m_accel;
-			alpha1 = ((dgDynamicBody*)body1)->m_alpha;
-		}
-
-		// the parallel solve will not deal with impulse phase, only for large solution solution
-		for (dgInt32 i = 0; i < count; i ++) {
-			dgJacobianMatrixElement* const row = &matrixRow[index];
-
-			//dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.Scale3 (invMass0));
-			//dgVector JMinvJacobianAngularM0 (invInertia0.UnrotateVector (row->m_Jt.m_jacobianM0.m_angular));
-			//dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale3 (invMass1));
-			//dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
-
-			dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.CompProduct4 (invMass0));
-			dgVector JMinvJacobianAngularM0 (invInertia0.RotateVector (row->m_Jt.m_jacobianM0.m_angular));
-			dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.CompProduct4 (invMass1));
-			dgVector JMinvJacobianAngularM1 (invInertia1.RotateVector (row->m_Jt.m_jacobianM1.m_angular));
-
-			dgVector tmpDiag (JMinvJacobianLinearM0.CompProduct4(row->m_Jt.m_jacobianM0.m_linear) + JMinvJacobianAngularM0.CompProduct4(row->m_Jt.m_jacobianM0.m_angular) +
-							  JMinvJacobianLinearM1.CompProduct4(row->m_Jt.m_jacobianM1.m_linear) + JMinvJacobianAngularM1.CompProduct4(row->m_Jt.m_jacobianM1.m_angular));
-
-			dgVector tmpAccel (JMinvJacobianLinearM0.CompProduct4(accel0) + JMinvJacobianAngularM0.CompProduct4(alpha0) + JMinvJacobianLinearM1.CompProduct4(accel1) + JMinvJacobianAngularM1.CompProduct4(alpha1));
-
-			dgFloat32 extenalAcceleration = -(tmpAccel.m_x + tmpAccel.m_y + tmpAccel.m_z);
-			//row->m_extAccel = extenalAcceleration;
-			row->m_deltaAccel = extenalAcceleration;
-			row->m_coordenateAccel += extenalAcceleration;
-			row->m_force = row->m_jointFeebackForce[0].m_force;
-			row->m_maxImpact = dgFloat32 (0.0f);
-
-			dgAssert (row->m_diagDamp >= dgFloat32(0.1f));
-			dgAssert (row->m_diagDamp <= dgFloat32(100.0f));
-			dgFloat32 stiffness = DG_PSD_DAMP_TOL * row->m_diagDamp;
-
-			dgFloat32 diag = (tmpDiag.m_x + tmpDiag.m_y + tmpDiag.m_z);
-			dgAssert (diag > dgFloat32 (0.0f));
-			row->m_diagDamp = diag * stiffness;
-
-			diag *= (dgFloat32(1.0f) + stiffness);
-			//solverMemory.m_diagJMinvJt[index] = diag;
-			row->m_invDJMinvJt = dgFloat32(1.0f) / diag;
-
-			index ++;
-		}
-	}
-}
 
 
 void dgWorldDynamicUpdate::SolverInitInternalForcesParallel (dgParallelSolverSyncData* const syncData) const
@@ -848,8 +731,8 @@ void dgAmpInstance::ConstraintSolver (dgInt32 islandCount, const dgIsland* const
 	syncData.m_islandArray = islandArray;
 */
 	InitilizeBodyArrayParallel (&syncData);
-/*
 	BuildJacobianMatrixParallel (&syncData);
+/*
 	SolverInitInternalForcesParallel (&syncData);
 	CalculateForcesGameModeParallel (&syncData);
 	IntegrateInslandParallel(&syncData); 
@@ -867,6 +750,7 @@ void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* co
 
 	dgInt32 bodyCount = 1;
 	dgInt32 jointCount = 0;
+	dgInt32 maxRowCount = 0;
 	bodyInfoMap[0] = m_world->GetSentinelBody();
 	for (dgInt32 i = 0; i < islanCount; i ++) {
 		const dgIsland* const island = &islandArray[i];
@@ -881,6 +765,7 @@ void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* co
 			index ++;
 		}
 		jointCount += count;
+		maxRowCount += island->m_rowsCount;
 		
 		count = island->m_bodyCount;
 		index = island->m_bodyStart;
@@ -902,7 +787,6 @@ void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* co
 	while (size < syncData->m_bodyCount) {
 		size *= 2;
 		AllocateBodyArray (size);
-
 	}
 
 
@@ -973,25 +857,45 @@ void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* co
 }
 
 
+void dgAmpInstance::AddDamingAccelKernel (const Matrix4x4& bodyMatrix, const Jacobian& damping, Jacobian& veloc) restrict(amp,cpu)
+{
+//	m_veloc -= m_veloc.Scale4 (m_dampCoef.m_w);
+//	dgVector omega (m_matrix.UnrotateVector (m_omega));
+//	omega -= omega.CompProduct4 (m_dampCoef);
+//	m_omega = m_matrix.RotateVector (omega);
+
+	float_4 localOmega (UnrotateVector (bodyMatrix, veloc.m_angular));
+	localOmega -= localOmega * damping.m_angular;
+
+	veloc.m_linear -= veloc.m_linear * damping.m_linear;
+	veloc.m_angular = RotateVector (bodyMatrix, localOmega);
+}
+
+
+void dgAmpInstance::CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix, Matrix4x4& invInertiaMatrix, const float_4& invInertia) restrict(amp,cpu)
+{
+//	dgMatrix tmp (m_matrix.Transpose4X4());
+//	tmp[0] = tmp[0].CompProduct4(m_invMass);
+//	tmp[1] = tmp[1].CompProduct4(m_invMass);
+//	tmp[2] = tmp[2].CompProduct4(m_invMass);
+//	return dgMatrix (m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
+
+	Matrix4x4 tmp (Transpose(bodyMatrix));
+	tmp.m_row[0] *= invInertia;
+	tmp.m_row[1] *= invInertia;
+	tmp.m_row[2] *= invInertia;
+	invInertiaMatrix.m_row[0] = RotateVector(bodyMatrix, tmp.m_row[0]);
+	invInertiaMatrix.m_row[1] = RotateVector(bodyMatrix, tmp.m_row[1]);
+	invInertiaMatrix.m_row[2] = RotateVector(bodyMatrix, tmp.m_row[2]);
+	invInertiaMatrix.m_row[3] = float_4 (0.0f, 0.0f, 0.0f, 1.0f);
+}
+
+
 
 void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData)
 {
-/*
-	dgWorld* const world = (dgWorld*) this;
-	dgInt32 threadCounts = world->GetThreadCount();	
-
-	syncData->m_atomicIndex = 0;
-	for (dgInt32 j = 0; j < threadCounts; j ++) {
-		world->QueueJob (InitilizeBodyArrayParallelKernel, syncData, world);
-	}
-	world->SynchronizationBarrier();
-*/
 	dgBody** const bopyMapInfo = syncData->m_bodyInfoMap;
 	const int bodyCount = syncData->m_bodyCount;
-
-// 	array_view<Matrix4x4, 1> matrixArray (m_bodyMatrix);
-// 	array_view<Matrix4x4, 1> invInertiaMatrix (m_bodyInvInertiaMatrix);
-
 	for (int i = 0; i < bodyCount; i ++) {
 		const dgBody* const body = bopyMapInfo[i];
 		Matrix4x4& matrix = m_bodyMatrix_view[i];
@@ -1028,6 +932,7 @@ void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const 
 		bodyInternalForce[idx].m_linear = float_4 (0.0f, 0.0f, 0.0f, 0.0f);
 		bodyInternalForce[idx].m_angular = float_4 (0.0f, 0.0f, 0.0f, 0.0f);
     });
+
 /*
 array_view<Matrix4x4, 1> xxx (m_bodyInvInertiaMatrix);
 //xxx.synchronize();
@@ -1039,37 +944,117 @@ array_view<Matrix4x4, 1> xxx1 (m_bodyInvInertiaMatrix);
 */
 }
 
-
-
-void dgAmpInstance::CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix, Matrix4x4& invInertiaMatrix, const float_4& invInertia) restrict(amp,cpu)
+void dgAmpInstance::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData)
 {
-//	dgMatrix tmp (m_matrix.Transpose4X4());
-//	tmp[0] = tmp[0].CompProduct4(m_invMass);
-//	tmp[1] = tmp[1].CompProduct4(m_invMass);
-//	tmp[2] = tmp[2].CompProduct4(m_invMass);
-//	return dgMatrix (m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
+/*
+	dgWorld* const world = (dgWorld*) this;
+	dgInt32 threadCounts = world->GetThreadCount();	
 
-	Matrix4x4 tmp (Transpose(bodyMatrix));
-	tmp.m_row[0] *= invInertia;
-	tmp.m_row[1] *= invInertia;
-	tmp.m_row[2] *= invInertia;
-	invInertiaMatrix.m_row[0] = RotateVector(bodyMatrix, tmp.m_row[0]);
-	invInertiaMatrix.m_row[1] = RotateVector(bodyMatrix, tmp.m_row[1]);
-	invInertiaMatrix.m_row[2] = RotateVector(bodyMatrix, tmp.m_row[2]);
-	invInertiaMatrix.m_row[3] = float_4 (0.0f, 0.0f, 0.0f, 1.0f);
+	syncData->m_atomicIndex = 0;
+	for (dgInt32 j = 0; j < threadCounts; j ++) {
+		world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, world);
+	}
+	world->SynchronizationBarrier();
+*/
 }
 
 
-void dgAmpInstance::AddDamingAccelKernel (const Matrix4x4& bodyMatrix, const Jacobian& damping, Jacobian& veloc) restrict(amp,cpu)
+/*
+void dgAmpInstance::BuildJacobianMatrixParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
-//	m_veloc -= m_veloc.Scale4 (m_dampCoef.m_w);
-//	dgVector omega (m_matrix.UnrotateVector (m_omega));
-//	omega -= omega.CompProduct4 (m_dampCoef);
-//	m_omega = m_matrix.RotateVector (omega);
+	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
+	dgWorld* const world = (dgWorld*) worldContext;
+	const dgParallelJointMap* const jointInfoIndexArray = syncData->m_jointInfoMap;
+	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
+	const dgIsland* const island = syncData->m_islandArray;
+	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
+	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 
-	float_4 localOmega (UnrotateVector (bodyMatrix, veloc.m_angular));
-	localOmega -= localOmega * damping.m_angular;
+	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
+	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
 
-	veloc.m_linear -= veloc.m_linear * damping.m_linear;
-	veloc.m_angular = RotateVector (bodyMatrix, localOmega);
+	dgVector zero (dgFloat32 (0.0f));
+//	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+
+		dgInt32 jointIndex = jointInfoIndexArray[i].m_jointIndex;
+		dgJointInfo* const jointInfo = &constraintArray[jointIndex];
+
+		dgInt32 rowBase = dgAtomicExchangeAndAdd(&syncData->m_jacobianMatrixRowAtomicIndex, jointInfo->m_autoPaircount);
+		world->GetJacobianDerivativesParallel (jointInfo, threadID, rowBase, syncData->m_timestep);
+
+		dgInt32 index = jointInfo->m_autoPairstart;
+		dgInt32 count = jointInfo->m_autoPaircount;
+		dgInt32 m0 = jointInfo->m_m0;
+		dgInt32 m1 = jointInfo->m_m1;
+		dgAssert (m0 >= 0);
+		dgAssert (m1 >= 0);
+		dgAssert (m0 != m1);
+		dgAssert (m0 < island->m_bodyCount);
+		dgAssert (m1 < island->m_bodyCount);
+
+		const dgBody* const body0 = bodyArray[m0].m_body;
+		const dgBody* const body1 = bodyArray[m1].m_body;
+
+		const dgVector invMass0 (body0->m_invMass[3]);
+		const dgMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
+		const dgVector invMass1 (body1->m_invMass[3]);
+		const dgMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
+
+		dgVector accel0 (zero); 
+		dgVector alpha0 (zero); 
+		if (body0->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+			accel0 = ((dgDynamicBody*)body0)->m_accel;
+			alpha0 = ((dgDynamicBody*)body0)->m_alpha;
+		}
+
+		dgVector accel1 (zero); 
+		dgVector alpha1 (zero); 
+		if (body1->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+			accel1 = ((dgDynamicBody*)body1)->m_accel;
+			alpha1 = ((dgDynamicBody*)body1)->m_alpha;
+		}
+
+		// the parallel solve will not deal with impulse phase, only for large solution solution
+		for (dgInt32 i = 0; i < count; i ++) {
+			dgJacobianMatrixElement* const row = &matrixRow[index];
+
+			//dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.Scale3 (invMass0));
+			//dgVector JMinvJacobianAngularM0 (invInertia0.UnrotateVector (row->m_Jt.m_jacobianM0.m_angular));
+			//dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.Scale3 (invMass1));
+			//dgVector JMinvJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_jacobianM1.m_angular));
+
+			dgVector JMinvJacobianLinearM0 (row->m_Jt.m_jacobianM0.m_linear.CompProduct4 (invMass0));
+			dgVector JMinvJacobianAngularM0 (invInertia0.RotateVector (row->m_Jt.m_jacobianM0.m_angular));
+			dgVector JMinvJacobianLinearM1 (row->m_Jt.m_jacobianM1.m_linear.CompProduct4 (invMass1));
+			dgVector JMinvJacobianAngularM1 (invInertia1.RotateVector (row->m_Jt.m_jacobianM1.m_angular));
+
+			dgVector tmpDiag (JMinvJacobianLinearM0.CompProduct4(row->m_Jt.m_jacobianM0.m_linear) + JMinvJacobianAngularM0.CompProduct4(row->m_Jt.m_jacobianM0.m_angular) +
+							  JMinvJacobianLinearM1.CompProduct4(row->m_Jt.m_jacobianM1.m_linear) + JMinvJacobianAngularM1.CompProduct4(row->m_Jt.m_jacobianM1.m_angular));
+
+			dgVector tmpAccel (JMinvJacobianLinearM0.CompProduct4(accel0) + JMinvJacobianAngularM0.CompProduct4(alpha0) + JMinvJacobianLinearM1.CompProduct4(accel1) + JMinvJacobianAngularM1.CompProduct4(alpha1));
+
+			dgFloat32 extenalAcceleration = -(tmpAccel.m_x + tmpAccel.m_y + tmpAccel.m_z);
+			//row->m_extAccel = extenalAcceleration;
+			row->m_deltaAccel = extenalAcceleration;
+			row->m_coordenateAccel += extenalAcceleration;
+			row->m_force = row->m_jointFeebackForce[0].m_force;
+			row->m_maxImpact = dgFloat32 (0.0f);
+
+			dgAssert (row->m_diagDamp >= dgFloat32(0.1f));
+			dgAssert (row->m_diagDamp <= dgFloat32(100.0f));
+			dgFloat32 stiffness = DG_PSD_DAMP_TOL * row->m_diagDamp;
+
+			dgFloat32 diag = (tmpDiag.m_x + tmpDiag.m_y + tmpDiag.m_z);
+			dgAssert (diag > dgFloat32 (0.0f));
+			row->m_diagDamp = diag * stiffness;
+
+			diag *= (dgFloat32(1.0f) + stiffness);
+			//solverMemory.m_diagJMinvJt[index] = diag;
+			row->m_invDJMinvJt = dgFloat32(1.0f) / diag;
+
+			index ++;
+		}
+	}
 }
+*/

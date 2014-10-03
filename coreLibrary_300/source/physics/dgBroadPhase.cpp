@@ -1206,6 +1206,7 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 			ret = (distance < dgFloat32 (1.0f));
 
 		} else {
+#if 0
 			dgVector size0;
 			dgVector size1;
 			dgVector origin0;
@@ -1213,7 +1214,6 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 
 			instance0->CalcObb (origin0, size0);
 			instance1->CalcObb (origin1, size1);
-
 			dgMatrix matrix (instance1->GetGlobalMatrix() * instance0->GetGlobalMatrix().Inverse());
 			dgMatrix matrixAbs;
 			matrixAbs[0] = matrix[0].Abs();
@@ -1268,6 +1268,43 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 					}
 				}
 			}
+#else
+
+			dgVector size0;
+			dgVector size1;
+			dgVector origin0;
+			dgVector origin1;
+			instance0->CalcObb (origin0, size0);
+			instance1->CalcObb (origin1, size1);
+			const dgMatrix& matrix0 = instance0->GetGlobalMatrix();
+			const dgMatrix& matrix1 = instance1->GetGlobalMatrix();
+			origin0 = matrix0.TransformVector(origin0);
+			origin1 = matrix1.TransformVector(origin1);
+			const dgVector base (origin1 - origin0);
+			dgVector dir0 (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
+			for (dgInt32 i = 0; i < 4; i ++) {
+				dgVector negDir (dir0.CompProduct4(dgVector::m_negOne));
+				dgVector tmpDir (matrix1.UnrotateVector(matrix0.RotateVector(dir0)));
+
+				dgVector mask0 (negDir < dgVector (dgFloat32 (0.0f)));
+				dgVector mask1 (tmpDir < dgVector (dgFloat32 (0.0f)));
+
+				dgVector q0(size0.AndNot(mask0) - (size0 & mask0));
+				dgVector p0(matrix0.UnrotateVector(matrix1.RotateVector (size1.AndNot(mask1) - (size1 & mask1)) + base));
+				
+				dgVector q0p0 (q0 - p0);
+				dgVector dot (q0p0.DotProduct4 (dir0));
+				ret = (dot.GetSignMask() & 0x01) == 0x01;
+				if (!ret) { 
+					break;
+				}
+				dgAssert ((q0p0 % q0p0) > dgFloat32 (0.0f));
+				q0p0 = q0p0.CompProduct4 (q0p0.InvMagSqrt());
+				dot = q0p0.DotProduct4 (dir0);
+				dir0 -= q0p0.CompProduct4 (dot.CompProduct4 (dgVector::m_two)); 
+				dgAssert (dgAbsf(dir0 % dir0 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+			}
+#endif
 		}
 	}
 	return ret;

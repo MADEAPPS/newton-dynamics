@@ -85,6 +85,7 @@ class dgAmpInstance
 
 
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData); 
+	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData);
 	void CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islandCount);
 
 	void AllocateBodyArray (dgInt32 count);
