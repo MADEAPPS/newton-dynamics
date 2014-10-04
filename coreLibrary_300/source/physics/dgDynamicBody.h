@@ -91,6 +91,7 @@ class dgDynamicBody : public dgBody
 
 	friend class dgWorld;
 	friend class dgBroadPhase;
+	friend class dgAmpInstance;
 	friend class dgBodyMasterList;
 	friend class dgWorldDynamicUpdate;
 } DG_GCC_VECTOR_ALIGMENT;

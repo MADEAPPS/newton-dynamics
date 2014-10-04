@@ -29,7 +29,6 @@
 #include <ppl.h>
 #include <amprt.h>
 #include <amp_math.h>
-//#include <amp_graphics.h>
 #include <amp_short_vectors.h>
 
 #include <dgPhysicsStdafx.h>
@@ -38,8 +37,5 @@
 #include <dgConstraint.h>
 #include <dgDynamicBody.h>
 #include <dgWorldDynamicUpdate.h>
-
-
-using namespace concurrency;
 
 #endif

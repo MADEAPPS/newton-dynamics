@@ -24,6 +24,7 @@
 
 #include "dgAMP.h"
 
+
 using namespace concurrency;
 using namespace concurrency::graphics;
 
@@ -101,7 +102,8 @@ class dgAmpInstance
 	void ConstraintSolver (dgInt32 islandCount, const dgIsland* const islandArray, dgFloat32 timestep);
 	
 	private:
-	float_4 ToFloat4 (const dgVector& v) const;
+	static float_4 ToFloat4 (const dgVector& v);
+
 	static Matrix4x4 Transpose (const Matrix4x4& matrix) restrict(amp,cpu);
 	static Matrix4x4 Multiply (const Matrix4x4& matrixA, const Matrix4x4& matrixB) restrict(amp,cpu);
 	
@@ -111,6 +113,9 @@ class dgAmpInstance
 	static float_4 UnrotateVector (const Matrix4x4& matrix, const float_4& vector) restrict(amp,cpu);
 	static float_4 TransformVector (const Matrix4x4& matrix, const float_4& vector) restrict(amp,cpu);
 	static float_4 UntransformVector (const Matrix4x4& matrix, const float_4& vector) restrict(amp,cpu);
+
+
+	static void InitializeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID);
 
 
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData); 
@@ -128,7 +133,7 @@ class dgAmpInstance
 	dgConstraintSoA m_constraintSOA;
 };
 
-inline float_4 dgAmpInstance::ToFloat4 (const dgVector& v) const 
+inline float_4 dgAmpInstance::ToFloat4 (const dgVector& v)
 { 
 	return float_4 (v[0], v[1], v[2], v[3]);
 }

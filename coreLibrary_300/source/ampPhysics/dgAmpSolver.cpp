@@ -22,7 +22,7 @@
 
 #include "dgAMP.h"
 #include "dgAmpInstance.h"
-
+#include "dgAmpAllocator.h"
 
 
 /*
@@ -893,30 +893,87 @@ void dgAmpInstance::CalcuateInvInertiaMatrixKernel (const Matrix4x4& bodyMatrix,
 }
 
 
+void dgAmpInstance::InitializeBodyArrayParallelKernel (void* const context, void* const ampContext, dgInt32 threadID)
+{
+	dgAmpInstance* const ampInstance = (dgAmpInstance*) ampContext;
+	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
+//	dgWorld* const world = ampInstance->m_world;
+	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
+/*
+	const dgIsland* const island = syncData->m_islandArray;
+	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
+	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
+
+	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
+	dgVector zero(dgFloat32 (0.0f));
+
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+		dgAssert (bodyArray[0].m_body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bodyArray[0].m_body)->m_accel % ((dgDynamicBody*)bodyArray[0].m_body)->m_accel) == dgFloat32 (0.0f));
+		dgAssert (bodyArray[0].m_body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bodyArray[0].m_body)->m_alpha % ((dgDynamicBody*)bodyArray[0].m_body)->m_alpha) == dgFloat32 (0.0f));
+
+		dgInt32 index = i + 1;
+		dgBody* const body = bodyArray[index].m_body;
+		dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
+		body->AddDampingAcceleration();
+		body->CalcInvInertiaMatrix ();
+
+		// re use these variables for temp storage 
+		body->m_netForce = body->m_veloc;
+		body->m_netTorque = body->m_omega;
+
+		internalForces[index].m_linear = zero;
+		internalForces[index].m_angular = zero;
+	}
+*/
+
+	dgBodySoA& bodySOA = ampInstance->m_bodySOA;
+	const int bodyCount = syncData->m_bodyCount;
+	dgBody** const bopyMapInfo = syncData->m_bodyInfoMap;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+		const dgBody* const body = bopyMapInfo[i];
+		Matrix4x4& matrix = bodySOA.m_bodyMatrix_view[i];
+		matrix.m_row[0] = dgAmpInstance::ToFloat4 (body->m_matrix[0]);
+		matrix.m_row[1] = dgAmpInstance::ToFloat4 (body->m_matrix[1]);
+		matrix.m_row[2] = dgAmpInstance::ToFloat4 (body->m_matrix[2]);
+		matrix.m_row[3] = dgAmpInstance::ToFloat4 (body->m_matrix[3]);
+	
+
+		bodySOA.m_bodyDamp_view[i].m_linear = ToFloat4 (body->GetLinearDamping());
+		bodySOA.m_bodyDamp_view[i].m_angular = ToFloat4 (body->GetAngularDamping());
+
+		bodySOA.m_bodyVelocity_view[i].m_linear = ToFloat4 (body->GetVelocity());
+		bodySOA.m_bodyVelocity_view[i].m_angular = ToFloat4 (body->GetOmega());
+
+		bodySOA.m_bodyInvMass_view[i] = ToFloat4 (body->GetInvMass());
+	}
+
+	dgAssert (bopyMapInfo[0]->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bopyMapInfo[0])->m_accel % ((dgDynamicBody*)bopyMapInfo[0])->m_accel) == dgFloat32 (0.0f));
+	dgAssert (bopyMapInfo[0]->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bopyMapInfo[0])->m_alpha % ((dgDynamicBody*)bopyMapInfo[0])->m_alpha) == dgFloat32 (0.0f));
+}
+
 
 void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData)
 {
-	dgBody** const bopyMapInfo = syncData->m_bodyInfoMap;
-	const int bodyCount = syncData->m_bodyCount;
-	for (int i = 0; i < bodyCount; i ++) {
-		const dgBody* const body = bopyMapInfo[i];
-		Matrix4x4& matrix = m_bodySOA.m_bodyMatrix_view[i];
-		matrix.m_row[0] = ToFloat4 (body->m_matrix[0]);
-		matrix.m_row[1] = ToFloat4 (body->m_matrix[1]);
-		matrix.m_row[2] = ToFloat4 (body->m_matrix[2]);
-		matrix.m_row[3] = ToFloat4 (body->m_matrix[3]);
+	int buffer[32];
+	dgAmpAllocator<int> xxxxx(buffer);
 
-		m_bodySOA.m_bodyDamp_view[i].m_linear = ToFloat4 (body->GetLinearDamping());
-		m_bodySOA.m_bodyDamp_view[i].m_angular = ToFloat4 (body->GetAngularDamping());
+//std::vector<int, dgAmpAllocator<int> > xxx1 (dgAmpAllocator<int>(buffer));
 
-		m_bodySOA.m_bodyVelocity_view[i].m_linear = ToFloat4 (body->GetVelocity());
-		m_bodySOA.m_bodyVelocity_view[i].m_angular = ToFloat4 (body->GetOmega());
+	std::vector<int, dgAmpAllocator<int> > xxx (xxxxx);
+	xxx.resize (1);
+	xxx[0] = 1;
 
-		m_bodySOA.m_bodyInvMass_view[i] = ToFloat4 (body->GetInvMass());
+
+	dgWorld* const world = m_world;
+	dgInt32 threadCounts = world->GetThreadCount();	
+	syncData->m_atomicIndex = 0;
+	for (dgInt32 j = 0; j < threadCounts; j ++) {
+		world->QueueJob (InitializeBodyArrayParallelKernel, syncData, this);
 	}
+	world->SynchronizationBarrier();
 
+	const int bodyCount = syncData->m_bodyCount;
 	extent<1> compute_domain(bodyCount);
-
 	const array<float_4, 1>& bodyInvMass = m_bodySOA.m_bodyInvMass;
 	const array<Matrix4x4, 1>& bodyMatrix = m_bodySOA.m_bodyMatrix;
 	const array<Jacobian, 1>& bodyDamp = m_bodySOA.m_bodyDamp;

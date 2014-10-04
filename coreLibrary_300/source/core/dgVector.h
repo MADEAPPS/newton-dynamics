@@ -309,6 +309,14 @@ class dgVector
 		return m_x;
 	}
 
+	DG_INLINE void Store (dgFloat32* const dst) const
+	{
+		dst[0] = m_x;
+		dst[1] = m_y;
+		dst[2] = m_z;
+		dst[3] = m_w;
+	}
+
 	DG_INLINE dgVector BroadcastX () const
 	{
 		return dgVector (m_x);
@@ -685,6 +693,11 @@ class dgVector
 		dgFloat32 scalar;
 		_mm_store_ss(&scalar, m_type);
 		return scalar;
+	}
+
+	DG_INLINE void Store (dgFloat32* const dst) const
+	{
+		_mm_storeu_ps(dst, m_type);
 	}
 
 	DG_INLINE dgVector BroadcastX () const
