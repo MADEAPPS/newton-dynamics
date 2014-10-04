@@ -244,12 +244,6 @@ class dgJacobianMemory
 	public:
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount);
 
-	dgInt32 CalculateIntenalMemorySize() const 
-	{
-		//return sizeof (dgJacobian) +  sizeof (dgJacobian);    
-		return sizeof (dgJacobian);    
-	}
-
 	//dgJacobian* m_internalVeloc;
 	dgJacobian* m_internalForces;
 	dgJacobianMatrixElement* m_memory;

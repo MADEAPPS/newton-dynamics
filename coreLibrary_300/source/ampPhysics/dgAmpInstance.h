@@ -23,7 +23,7 @@
 #define _DG_AMP_INSTANCE_H_
 
 #include "dgAMP.h"
-
+#include "dgAmpAllocator.h"
 
 using namespace concurrency;
 using namespace concurrency::graphics;
@@ -63,7 +63,7 @@ class dgAmpInstance
 	{
 		public:
 		dgBodySoA ();
-		void Alloc (dgInt32 size);
+		void Alloc (dgWorld* const world, dgInt32 count);
 
 		array<float_4, 1> m_bodyInvMass;
 		array<Jacobian, 1> m_bodyDamp;
@@ -73,10 +73,12 @@ class dgAmpInstance
 		array<Matrix4x4 , 1> m_bodyMatrix;
 		array<Matrix4x4 , 1> m_bodyInvInertiaMatrix;
 	
-		array_view<Jacobian, 1> m_bodyDamp_view;
-		array_view<float_4, 1> m_bodyInvMass_view;
-		array_view<Jacobian, 1> m_bodyVelocity_view;
-		array_view<Matrix4x4, 1> m_bodyMatrix_view;
+		std::vector<Jacobian> m_bodyDampCpu;
+		//array_view<Jacobian, 1> m_bodyDamp_view;
+		//array_view<float_4, 1> m_bodyInvMass_view;
+		//array_view<Jacobian, 1> m_bodyVelocity_view;
+		//array_view<Matrix4x4, 1> m_bodyMatrix_view;
+
 	};
 
 	class dgConstraintSoA

@@ -33,29 +33,41 @@ dgAmpInstance::dgBodySoA::dgBodySoA ()
 	,m_bodyInternalForce(DG_BODY_START_ARRAY_SIZE)
 	,m_bodyMatrix(DG_BODY_START_ARRAY_SIZE)
 	,m_bodyInvInertiaMatrix(DG_BODY_START_ARRAY_SIZE)
-	,m_bodyDamp_view(m_bodyDamp)
-	,m_bodyInvMass_view (m_bodyInvMass)
-	,m_bodyVelocity_view(m_bodyVelocity)
-	,m_bodyMatrix_view (m_bodyMatrix)
+	,m_bodyDampCpu()
+//	,m_bodyDamp_view(m_bodyDamp)
+//	,m_bodyInvMass_view (m_bodyInvMass)
+//	,m_bodyVelocity_view(m_bodyVelocity)
+//	,m_bodyMatrix_view (m_bodyMatrix)
 {
 }
 
-void dgAmpInstance::dgBodySoA::Alloc (dgInt32 size)
-{
-	m_bodyInvMass = array<float_4, 1> (size);
-	m_bodyDamp = array<Jacobian, 1>(size);
-	m_bodyVelocity = array<Jacobian, 1>(size);
-	m_bodyNetForce = array<Jacobian, 1>(size);
-	m_bodyInternalForce = array<Jacobian, 1>(size);
-	m_bodyMatrix = array<Matrix4x4 , 1> (size);
-	m_bodyInvInertiaMatrix = array<Matrix4x4 , 1> (size);
-	
-	m_bodyDamp_view = array_view<Jacobian, 1> (m_bodyDamp);
-	m_bodyInvMass_view = array_view<float_4, 1> (m_bodyInvMass);
-	m_bodyMatrix_view = array_view<Matrix4x4, 1> (m_bodyMatrix);
-	m_bodyVelocity_view = array_view<Jacobian, 1> (m_bodyVelocity);
-}
 
+void dgAmpInstance::dgBodySoA::Alloc (dgWorld* const world, dgInt32 count)
+{
+	dgInt32 size = m_bodyMatrix.get_extent().size();
+	if (size < count) {
+		while (size < count) {
+			size *= 2;
+		}
+		m_bodyInvMass = array<float_4, 1> (size);
+		m_bodyDamp = array<Jacobian, 1>(size);
+		m_bodyVelocity = array<Jacobian, 1>(size);
+		m_bodyNetForce = array<Jacobian, 1>(size);
+		m_bodyInternalForce = array<Jacobian, 1>(size);
+		m_bodyMatrix = array<Matrix4x4 , 1> (size);
+		m_bodyInvInertiaMatrix = array<Matrix4x4 , 1> (size);
+
+		m_bodyDampCpu.resize (size);
+	}
+
+//	dgInt32 stride = sizeof (m_bodyDampCpu[0]);
+//	world->m_solverRightSideMemory.ExpandCapacityIfNeessesary (count + 4, stride);
+//	m_bodyDampCpu = (Jacobian*) &world->m_solverMatrixMemory[0];
+//	m_bodyDamp_view = array_view<Jacobian, 1> (m_bodyDamp);
+//	m_bodyInvMass_view = array_view<float_4, 1> (m_bodyInvMass);
+//	m_bodyMatrix_view = array_view<Matrix4x4, 1> (m_bodyMatrix);
+//	m_bodyVelocity_view = array_view<Jacobian, 1> (m_bodyVelocity);
+}
 
 dgAmpInstance::dgConstraintSoA::dgConstraintSoA ()
 	:m_jacobians(DG_BODY_START_ARRAY_SIZE)
@@ -104,7 +116,7 @@ dgAmpInstance::~dgAmpInstance(void)
 
 void dgAmpInstance::CleanUp()
 {
-	m_bodySOA.Alloc (DG_BODY_START_ARRAY_SIZE);
+	m_bodySOA.Alloc (m_world, DG_BODY_START_ARRAY_SIZE);
 	m_constraintSOA.Alloc (DG_BODY_START_ARRAY_SIZE);
 }
 
@@ -116,7 +128,7 @@ dgInt32 dgAmpInstance::GetPlatformsCount() const
 
 void dgAmpInstance::SelectPlaform(dgInt32 deviceIndex)
 {
-	m_bodySOA.Alloc (DG_BODY_START_ARRAY_SIZE);
+	m_bodySOA.Alloc (m_world, DG_BODY_START_ARRAY_SIZE);
 	m_constraintSOA.Alloc (DG_BODY_START_ARRAY_SIZE);
 
 	int index = 0;

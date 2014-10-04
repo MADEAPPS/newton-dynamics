@@ -462,8 +462,8 @@ class dgWorld
 	dgArray<dgUnsigned8> m_bodiesMemory; 
 	dgArray<dgUnsigned8> m_jointsMemory; 
 	dgArray<dgUnsigned8> m_pairMemoryBuffer;
-	dgArray<dgUnsigned8> m_internalForcesMemory;  
 	dgArray<dgUnsigned8> m_solverMatrixMemory;  
+	dgArray<dgUnsigned8> m_solverRightSideMemory;
 	
 	static dgVector m_linearContactError2;
 	static dgVector m_angularContactError2;

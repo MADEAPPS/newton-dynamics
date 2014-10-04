@@ -209,19 +209,12 @@ void dgJacobianMemory::Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bo
 	world->m_solverMatrixMemory.ExpandCapacityIfNeessesary (rowsCount, sizeof (dgJacobianMatrixElement));
 	m_memory = (dgJacobianMatrixElement*) &world->m_solverMatrixMemory[0];
 
+	world->m_solverRightSideMemory.ExpandCapacityIfNeessesary (bodyCount + 8, sizeof (dgJacobian));
+	m_internalForces = (dgJacobian*) &world->m_solverRightSideMemory[0];
+	dgAssert (bodyCount <= (((world->m_solverRightSideMemory.GetBytesCapacity() - 16) / dgInt32 (sizeof (dgJacobian))) & (-8)));
 
-	dgInt32 stride = CalculateIntenalMemorySize();
-	if (world->m_internalForcesMemory.ExpandCapacityIfNeessesary (bodyCount + 8, stride)) {
-		//dgInt32 newCount = ((world->m_internalForcesMemory.GetBytesCapacity() - 16)/ stride) & (-8);
-		dgAssert (bodyCount <= (((world->m_internalForcesMemory.GetBytesCapacity() - 16)/ stride) & (-8)));
-		dgInt8* const memory = (dgInt8*) &world->m_internalForcesMemory[0];
-
-		m_internalForces = (dgJacobian*) memory;
-		//m_internalVeloc = (dgJacobian*) &m_internalForces[newCount];
-
-		dgAssert ((dgUnsigned64(m_internalForces) & 0x01f) == 0);
-		//dgAssert ((dgUnsigned64(m_internalVeloc) & 0x01f) == 0);
-	}
+	dgAssert ((dgUnsigned64(m_memory) & 0x01f) == 0);
+	dgAssert ((dgUnsigned64(m_internalForces) & 0x01f) == 0);
 }
 
 // sort from high to low

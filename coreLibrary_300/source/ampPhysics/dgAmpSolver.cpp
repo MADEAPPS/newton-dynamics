@@ -22,7 +22,7 @@
 
 #include "dgAMP.h"
 #include "dgAmpInstance.h"
-#include "dgAmpAllocator.h"
+
 
 
 /*
@@ -741,122 +741,6 @@ void dgAmpInstance::ConstraintSolver (dgInt32 islandCount, const dgIsland* const
 
 
 
-void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islanCount)
-{
-	dgBodyInfo* const bodyArray = (dgBodyInfo*) &m_world->m_bodiesMemory[0]; 
-	dgJointInfo* const constraintArray = (dgJointInfo*) &m_world->m_jointsMemory[0];
-	dgParallelJointMap* const jointInfoMap = syncData->m_jointInfoMap;
-	dgBody** const bodyInfoMap = syncData->m_bodyInfoMap;
-
-	dgInt32 bodyCount = 1;
-	dgInt32 jointCount = 0;
-	dgInt32 maxRowCount = 0;
-	bodyInfoMap[0] = m_world->GetSentinelBody();
-	for (dgInt32 i = 0; i < islanCount; i ++) {
-		const dgIsland* const island = &islandArray[i];
-		dgInt32 count = island->m_jointCount;
-		dgInt32 index = island->m_jointStart;
-		for (dgInt32 j = 0; j < count; j ++) {
-			const dgJointInfo& jointInfo = constraintArray[index];
-			dgConstraint* const joint = jointInfo.m_joint;
-			constraintArray[index].m_color = 0;
-			jointInfoMap[jointCount + j].m_jointIndex = index;
-			joint->m_index = index;
-			index ++;
-		}
-		jointCount += count;
-		maxRowCount += island->m_rowsCount;
-		
-		count = island->m_bodyCount;
-		index = island->m_bodyStart;
-		bodyArray[index].m_index = 0;
-		dgAssert (bodyArray[index].m_body == bodyInfoMap[0]);
-		for (dgInt32 j = 1; j < count; j ++) {
-			dgBodyInfo& bodyInfo = bodyArray[index + 1];
-			bodyInfo.m_index = bodyCount + j - 1;
-			bodyInfoMap[bodyInfo.m_index] = bodyInfo.m_body;
-			index ++;
-		}
-		bodyCount += count - 1;
-	}
-
-	syncData->m_bodyCount = bodyCount;
-	syncData->m_jointCount = jointCount;
-	syncData->m_rowCount = maxRowCount;
-
-	for (dgInt32 size = m_bodySOA.m_bodyMatrix.get_extent().size(); size < syncData->m_bodyCount; size = m_bodySOA.m_bodyMatrix.get_extent().size()) {
-		m_bodySOA.Alloc (size * 2);
-	}
-
-	for (dgInt32 size = m_constraintSOA.m_jacobians.get_extent().size(); size < syncData->m_rowCount; size = m_constraintSOA.m_jacobians.get_extent().size()) {
-		m_constraintSOA.Alloc (size * 2);
-	}
-
-	jointInfoMap[jointCount].m_bashIndex = 0x7fffffff;
-	jointInfoMap[jointCount].m_jointIndex= -1;
-
-	for (dgInt32 i = 0; i < jointCount; i ++) {
-		dgInt32 j = jointInfoMap[i].m_jointIndex;
-		dgJointInfo& jointInfo = constraintArray[j];
-
-		dgInt32 index = 0; 
-		dgInt32 color = jointInfo.m_color;
-		for (dgInt32 n = 1; n & color; n <<= 1) {
-			index ++;
-			dgAssert (index < 32);
-		}
-		jointInfoMap[i].m_bashIndex = index;
-
-		color = 1 << index;
-		dgConstraint* const constraint = jointInfo.m_joint;
-		dgDynamicBody* const body0 = (dgDynamicBody*) constraint->m_body0;
-		dgAssert (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-
-		if (body0->m_invMass.m_w > dgFloat32 (0.0f)) {
-			for (dgBodyMasterListRow::dgListNode* jointNode = body0->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-				dgBodyMasterListCell& cell = jointNode->GetInfo();
-
-				dgConstraint* const neiborgLink = cell.m_joint;
-				//if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF)) {
-				if ((neiborgLink != constraint) & neiborgLink->IsActive()) {
-					dgJointInfo& info = constraintArray[neiborgLink->m_index];
-					info.m_color |= color;
-				}
-			}
-		}
-
-		dgDynamicBody* const body1 = (dgDynamicBody*)constraint->m_body1;
-		dgAssert (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-		if (body1->m_invMass.m_w > dgFloat32 (0.0f)) {
-			for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-				dgBodyMasterListCell& cell = jointNode->GetInfo();
-
-				dgConstraint* const neiborgLink = cell.m_joint;
-				//if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF)) {
-				if ((neiborgLink != constraint) & neiborgLink->IsActive()) {
-					dgJointInfo& info = constraintArray[neiborgLink->m_index];
-					info.m_color |= color;
-				}
-			}
-		}
-	}
-
-	dgSort (jointInfoMap, jointCount, dgWorldDynamicUpdate::SortJointInfoByColor, constraintArray);
-
-	dgInt32 bash = 0;
-	for (int index = 0; index < jointCount; index ++) {
-		dgInt32 count = 0; 
-		syncData->m_jointBatches[bash].m_start = index;
-		while (jointInfoMap[index].m_bashIndex == bash) {
-			count ++;
-			index ++;
-		}
-		syncData->m_jointBatches[bash].m_count = count;
-		bash ++;
-		index --;
-	}
-	syncData->m_batchesCount = bash;
-}
 
 
 void dgAmpInstance::AddDamingAccelKernel (const Matrix4x4& bodyMatrix, const Jacobian& damping, Jacobian& veloc) restrict(amp,cpu)
@@ -926,25 +810,25 @@ void dgAmpInstance::InitializeBodyArrayParallelKernel (void* const context, void
 	}
 */
 
-	dgBodySoA& bodySOA = ampInstance->m_bodySOA;
 	const int bodyCount = syncData->m_bodyCount;
+	dgBodySoA& bodySOA = ampInstance->m_bodySOA;
 	dgBody** const bopyMapInfo = syncData->m_bodyInfoMap;
+	Jacobian* const bodyDampCpu = bodySOA.m_bodyDampCpu.data();
+
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		const dgBody* const body = bopyMapInfo[i];
-		Matrix4x4& matrix = bodySOA.m_bodyMatrix_view[i];
-		matrix.m_row[0] = dgAmpInstance::ToFloat4 (body->m_matrix[0]);
-		matrix.m_row[1] = dgAmpInstance::ToFloat4 (body->m_matrix[1]);
-		matrix.m_row[2] = dgAmpInstance::ToFloat4 (body->m_matrix[2]);
-		matrix.m_row[3] = dgAmpInstance::ToFloat4 (body->m_matrix[3]);
+//		Matrix4x4& matrix = bodySOA.m_bodyMatrix_view[i];
+//		matrix.m_row[0] = dgAmpInstance::ToFloat4 (body->m_matrix[0]);
+//		matrix.m_row[1] = dgAmpInstance::ToFloat4 (body->m_matrix[1]);
+//		matrix.m_row[2] = dgAmpInstance::ToFloat4 (body->m_matrix[2]);
+//		matrix.m_row[3] = dgAmpInstance::ToFloat4 (body->m_matrix[3]);
 	
+		bodyDampCpu[i].m_linear = ToFloat4 (body->GetLinearDamping());
+		bodyDampCpu[i].m_angular = ToFloat4 (body->GetAngularDamping());
 
-		bodySOA.m_bodyDamp_view[i].m_linear = ToFloat4 (body->GetLinearDamping());
-		bodySOA.m_bodyDamp_view[i].m_angular = ToFloat4 (body->GetAngularDamping());
-
-		bodySOA.m_bodyVelocity_view[i].m_linear = ToFloat4 (body->GetVelocity());
-		bodySOA.m_bodyVelocity_view[i].m_angular = ToFloat4 (body->GetOmega());
-
-		bodySOA.m_bodyInvMass_view[i] = ToFloat4 (body->GetInvMass());
+//		bodySOA.m_bodyVelocity_view[i].m_linear = ToFloat4 (body->GetVelocity());
+//		bodySOA.m_bodyVelocity_view[i].m_angular = ToFloat4 (body->GetOmega());
+//		bodySOA.m_bodyInvMass_view[i] = ToFloat4 (body->GetInvMass());
 	}
 
 	dgAssert (bopyMapInfo[0]->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bopyMapInfo[0])->m_accel % ((dgDynamicBody*)bopyMapInfo[0])->m_accel) == dgFloat32 (0.0f));
@@ -954,16 +838,6 @@ void dgAmpInstance::InitializeBodyArrayParallelKernel (void* const context, void
 
 void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData)
 {
-	int buffer[32];
-	dgAmpAllocator<int> xxxxx(buffer);
-
-//std::vector<int, dgAmpAllocator<int> > xxx1 (dgAmpAllocator<int>(buffer));
-
-	std::vector<int, dgAmpAllocator<int> > xxx (xxxxx);
-	xxx.resize (1);
-	xxx[0] = 1;
-
-
 	dgWorld* const world = m_world;
 	dgInt32 threadCounts = world->GetThreadCount();	
 	syncData->m_atomicIndex = 0;
@@ -1117,3 +991,120 @@ void dgAmpInstance::BuildJacobianMatrixParallelKernel (void* const context, void
 	}
 }
 */
+
+
+	void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islanCount)
+{
+	dgBodyInfo* const bodyArray = (dgBodyInfo*) &m_world->m_bodiesMemory[0]; 
+	dgJointInfo* const constraintArray = (dgJointInfo*) &m_world->m_jointsMemory[0];
+	dgParallelJointMap* const jointInfoMap = syncData->m_jointInfoMap;
+	dgBody** const bodyInfoMap = syncData->m_bodyInfoMap;
+
+	dgInt32 bodyCount = 1;
+	dgInt32 jointCount = 0;
+	dgInt32 maxRowCount = 0;
+	bodyInfoMap[0] = m_world->GetSentinelBody();
+	for (dgInt32 i = 0; i < islanCount; i ++) {
+		const dgIsland* const island = &islandArray[i];
+		dgInt32 count = island->m_jointCount;
+		dgInt32 index = island->m_jointStart;
+		for (dgInt32 j = 0; j < count; j ++) {
+			const dgJointInfo& jointInfo = constraintArray[index];
+			dgConstraint* const joint = jointInfo.m_joint;
+			constraintArray[index].m_color = 0;
+			jointInfoMap[jointCount + j].m_jointIndex = index;
+			joint->m_index = index;
+			index ++;
+		}
+		jointCount += count;
+		maxRowCount += island->m_rowsCount;
+		
+		count = island->m_bodyCount;
+		index = island->m_bodyStart;
+		bodyArray[index].m_index = 0;
+		dgAssert (bodyArray[index].m_body == bodyInfoMap[0]);
+		for (dgInt32 j = 1; j < count; j ++) {
+			dgBodyInfo& bodyInfo = bodyArray[index + 1];
+			bodyInfo.m_index = bodyCount + j - 1;
+			bodyInfoMap[bodyInfo.m_index] = bodyInfo.m_body;
+			index ++;
+		}
+		bodyCount += count - 1;
+	}
+
+	syncData->m_bodyCount = bodyCount;
+	syncData->m_jointCount = jointCount;
+	syncData->m_rowCount = maxRowCount;
+
+	m_bodySOA.Alloc (m_world, bodyCount);
+/*
+	for (dgInt32 size = m_constraintSOA.m_jacobians.get_extent().size(); size < syncData->m_rowCount; size = m_constraintSOA.m_jacobians.get_extent().size()) {
+		m_constraintSOA.Alloc (size * 2);
+	}
+
+	jointInfoMap[jointCount].m_bashIndex = 0x7fffffff;
+	jointInfoMap[jointCount].m_jointIndex= -1;
+
+	for (dgInt32 i = 0; i < jointCount; i ++) {
+		dgInt32 j = jointInfoMap[i].m_jointIndex;
+		dgJointInfo& jointInfo = constraintArray[j];
+
+		dgInt32 index = 0; 
+		dgInt32 color = jointInfo.m_color;
+		for (dgInt32 n = 1; n & color; n <<= 1) {
+			index ++;
+			dgAssert (index < 32);
+		}
+		jointInfoMap[i].m_bashIndex = index;
+
+		color = 1 << index;
+		dgConstraint* const constraint = jointInfo.m_joint;
+		dgDynamicBody* const body0 = (dgDynamicBody*) constraint->m_body0;
+		dgAssert (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+
+		if (body0->m_invMass.m_w > dgFloat32 (0.0f)) {
+			for (dgBodyMasterListRow::dgListNode* jointNode = body0->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+				dgBodyMasterListCell& cell = jointNode->GetInfo();
+
+				dgConstraint* const neiborgLink = cell.m_joint;
+				//if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF)) {
+				if ((neiborgLink != constraint) & neiborgLink->IsActive()) {
+					dgJointInfo& info = constraintArray[neiborgLink->m_index];
+					info.m_color |= color;
+				}
+			}
+		}
+
+		dgDynamicBody* const body1 = (dgDynamicBody*)constraint->m_body1;
+		dgAssert (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+		if (body1->m_invMass.m_w > dgFloat32 (0.0f)) {
+			for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+				dgBodyMasterListCell& cell = jointNode->GetInfo();
+
+				dgConstraint* const neiborgLink = cell.m_joint;
+				//if ((neiborgLink != constraint) && (neiborgLink->m_maxDOF)) {
+				if ((neiborgLink != constraint) & neiborgLink->IsActive()) {
+					dgJointInfo& info = constraintArray[neiborgLink->m_index];
+					info.m_color |= color;
+				}
+			}
+		}
+	}
+
+	dgSort (jointInfoMap, jointCount, dgWorldDynamicUpdate::SortJointInfoByColor, constraintArray);
+
+	dgInt32 bash = 0;
+	for (int index = 0; index < jointCount; index ++) {
+		dgInt32 count = 0; 
+		syncData->m_jointBatches[bash].m_start = index;
+		while (jointInfoMap[index].m_bashIndex == bash) {
+			count ++;
+			index ++;
+		}
+		syncData->m_jointBatches[bash].m_count = count;
+		bash ++;
+		index --;
+	}
+	syncData->m_batchesCount = bash;
+*/
+}

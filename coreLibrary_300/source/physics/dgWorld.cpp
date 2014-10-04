@@ -229,8 +229,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_bodiesMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
 	,m_jointsMemory (DG_INITIAL_JOINTS_SIZE, allocator, 64)
 	,m_pairMemoryBuffer (DG_INITIAL_CONTACT_SIZE, allocator, 64)
-	,m_internalForcesMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
 	,m_solverMatrixMemory (DG_INITIAL_JACOBIAN_SIZE, allocator, 64)
+	,m_solverRightSideMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
 {
 	dgMutexThread* const mutexThread = this;
 	SetMatertThread (mutexThread);

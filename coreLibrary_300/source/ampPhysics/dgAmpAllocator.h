@@ -23,7 +23,7 @@
 #define _DG_AMP_ALLOCATOR_H_
 
 #include "dgAMP.h"
-
+/*
 template <typename T>
 class dgAmpAllocator: public std::allocator<T>
 {
@@ -61,7 +61,7 @@ class dgAmpAllocator: public std::allocator<T>
 
 	dgAmpAllocator(const dgAmpAllocator &a) throw()
 		:std::allocator<T>(a) 
-		,m_memory(a.m_memory)
+		,m_memory((pointer)a.m_memory)
 	{ 
 	}
 
@@ -76,13 +76,8 @@ class dgAmpAllocator: public std::allocator<T>
 	{ 
 	}
 
-	void SetPointer(void* const memory)
-	{
-		m_memory = (pointer) memory;
-	}
-
 	pointer m_memory;
 };
-
+*/
 
 #endif
