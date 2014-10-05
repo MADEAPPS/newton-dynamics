@@ -715,8 +715,9 @@ void dgAmpInstance::ConstraintSolver (dgInt32 islandCount, const dgIsland* const
 	internalForces[0].m_linear = zero;
 	internalForces[0].m_angular = zero;
 	dgInt32 maxPasses = dgInt32 (world->m_solverMode + LINEAR_SOLVER_SUB_STEPS);
-
+*/
 	syncData.m_timestep = timestep;
+/*
 	syncData.m_invTimestep = (timestep > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) / timestep : dgFloat32 (0.0f);
 	syncData.m_invStepRK = (dgFloat32 (1.0f) / dgFloat32 (maxPasses));
 	syncData.m_timestepRK = syncData.m_timestep * syncData.m_invStepRK;
@@ -984,9 +985,93 @@ void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const 
 
 
 
-/*
-void dgAmpInstance::BuilddgAmpJacobianMatrixParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
+void dgAmpInstance::GetJacobianDerivativesParallel (dgJointInfo* const jointInfo, dgInt32 threadIndex, dgInt32 rowBase, dgFloat32 timestep)
 {
+	dgWorld* const world = m_world;
+
+	dgContraintDescritor constraintParams;
+	constraintParams.m_world = world; 
+	constraintParams.m_threadIndex = threadIndex;
+	constraintParams.m_timestep = timestep;
+	constraintParams.m_invTimestep = dgFloat32 (1.0f / timestep);
+
+//	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[rowBase];
+	dgConstraint* const constraint = jointInfo->m_joint;
+
+	dgInt32 dof = dgInt32 (constraint->m_maxDOF);
+	dgAssert (dof <= DG_CONSTRAINT_MAX_ROWS);
+	for (dgInt32 i = 0; i < dof; i ++) {
+		constraintParams.m_forceBounds[i].m_low = DG_MIN_BOUND;
+		constraintParams.m_forceBounds[i].m_upper = DG_MAX_BOUND;
+		constraintParams.m_forceBounds[i].m_jointForce = NULL;
+		constraintParams.m_forceBounds[i].m_normalIndex = DG_BILATERAL_CONSTRAINT;
+	}
+
+	dgAssert (constraint->m_body0);
+	dgAssert (constraint->m_body1);
+
+	constraint->m_body0->m_inCallback = true;
+	constraint->m_body1->m_inCallback = true;
+
+	dof = dgInt32 (constraint->JacobianDerivative (constraintParams)); 
+
+	constraint->m_body0->m_inCallback = false;
+	constraint->m_body1->m_inCallback = false;
+
+	dgInt32 m0 = (constraint->m_body0->GetInvMass().m_w != dgFloat32(0.0f)) ? constraint->m_body0->m_index: 0;
+	dgInt32 m1 = (constraint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? constraint->m_body1->m_index: 0;
+
+	jointInfo->m_autoPairstart = rowBase;
+	jointInfo->m_autoPaircount = dof;
+	jointInfo->m_autoPairActiveCount = dof;
+	jointInfo->m_m0 = m0;
+	jointInfo->m_m1 = m1;
+
+	dgJacobianPair* const jacobianPairsCpu = &((dgJacobianPair*) m_jacobianPairsCpu.data())[rowBase];
+	dgAmpMatrixRightSide* const matrixRightSideCpu = &m_matrixRightSideCpu.data() [rowBase];
+
+	dgDoubleInt ptr; 
+	ptr.m_float = 0;
+	for (dgInt32 i = 0; i < dof; i ++) {
+		//dgJacobianMatrixElement* const row = &matrixRow[i];
+
+		dgAssert (constraintParams.m_forceBounds[i].m_jointForce);
+		//row->m_Jt = constraintParams.m_jacobian[i]; 
+		jacobianPairsCpu[i] = constraintParams.m_jacobian[i]; 
+
+		dgAssert (constraintParams.m_jointStiffness[i] >= dgFloat32(0.1f));
+		dgAssert (constraintParams.m_jointStiffness[i] <= dgFloat32(100.0f));
+
+		//row->m_diagDamp = constraintParams.m_jointStiffness[i];
+		//row->m_coordenateAccel = constraintParams.m_jointAccel[i];
+		//row->m_restitution = constraintParams.m_restitution[i];
+		//row->m_penetration = constraintParams.m_penetration[i];
+		//row->m_penetrationStiffness = constraintParams.m_penetrationStiffness[i];
+		//row->m_lowerBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_low;
+		//row->m_upperBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_upper;
+		//row->m_accelIsMotor = constraintParams.m_isMotor[i];
+		//row->m_normalForceIndex = constraintParams.m_forceBounds[i].m_normalIndex; 
+		//row->m_jointFeebackForce = constraintParams.m_forceBounds[i].m_jointForce;
+	
+		matrixRightSideCpu[i].m_diagDamp = constraintParams.m_jointStiffness[i];
+		matrixRightSideCpu[i].m_coordenateAccel = constraintParams.m_jointAccel[i];
+		matrixRightSideCpu[i].m_restitution = constraintParams.m_restitution[i];
+		matrixRightSideCpu[i].m_penetration = constraintParams.m_penetration[i];
+		matrixRightSideCpu[i].m_penetrationStiffness = constraintParams.m_penetrationStiffness[i];
+		matrixRightSideCpu[i].m_lowerBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_low;
+		matrixRightSideCpu[i].m_upperBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_upper;
+		matrixRightSideCpu[i].m_accelIsMotor = constraintParams.m_isMotor[i] ? 1 : 0;
+		matrixRightSideCpu[i].m_normalForceIndex = constraintParams.m_forceBounds[i].m_normalIndex; 
+		ptr.m_ptr = constraintParams.m_forceBounds[i].m_jointForce;
+		matrixRightSideCpu[i].m_jointFeebackForce[0] = ptr.m_intL;
+		matrixRightSideCpu[i].m_jointFeebackForce[1] = ptr.m_intH;
+	}
+}
+
+
+void dgAmpInstance::BuildJacobianMatrixParallelKernel (void* const context, void* const ampContext, dgInt32 threadID)
+{
+/*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	const dgParallelJointMap* const jointInfoIndexArray = syncData->m_jointInfoMap;
@@ -999,14 +1084,13 @@ void dgAmpInstance::BuilddgAmpJacobianMatrixParallelKernel (void* const context,
 	dgdgAmpJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
 
 	dgVector zero (dgFloat32 (0.0f));
-//	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 
 		dgInt32 jointIndex = jointInfoIndexArray[i].m_jointIndex;
 		dgJointInfo* const jointInfo = &constraintArray[jointIndex];
 
 		dgInt32 rowBase = dgAtomicExchangeAndAdd(&syncData->m_dgAmpJacobianMatrixRowAtomicIndex, jointInfo->m_autoPaircount);
-		world->GetdgAmpJacobianDerivativesParallel (jointInfo, threadID, rowBase, syncData->m_timestep);
+		world->GetJacobianDerivativesParallel (jointInfo, threadID, rowBase, syncData->m_timestep);
 
 		dgInt32 index = jointInfo->m_autoPairstart;
 		dgInt32 count = jointInfo->m_autoPaircount;
@@ -1081,21 +1165,36 @@ void dgAmpInstance::BuilddgAmpJacobianMatrixParallelKernel (void* const context,
 			index ++;
 		}
 	}
-}
 */
+
+	dgAmpInstance* const ampInstance = (dgAmpInstance*) ampContext;
+	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
+	dgWorld* const world = ampInstance->m_world;
+	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
+	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
+	const dgParallelJointMap* const jointInfoIndexArray = syncData->m_jointInfoMap;
+
+//	dgVector zero (dgFloat32 (0.0f));
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+
+		dgInt32 jointIndex = jointInfoIndexArray[i].m_jointIndex;
+		dgJointInfo* const jointInfo = &constraintArray[jointIndex];
+		dgInt32 rowBase = dgAtomicExchangeAndAdd(&syncData->m_jacobianMatrixRowAtomicIndex, jointInfo->m_autoPaircount);
+		ampInstance->GetJacobianDerivativesParallel (jointInfo, threadID, rowBase, syncData->m_timestep);
+	}
+}
 
 
 void dgAmpInstance::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData)
 {
-/*
 	dgWorld* const world = (dgWorld*) this;
 	dgInt32 threadCounts = world->GetThreadCount();	
 
 	syncData->m_atomicIndex = 0;
 	for (dgInt32 j = 0; j < threadCounts; j ++) {
-		world->QueueJob (BuilddgAmpJacobianMatrixParallelKernel, syncData, world);
+		world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, this);
 	}
 	world->SynchronizationBarrier();
-*/
+
 }
 

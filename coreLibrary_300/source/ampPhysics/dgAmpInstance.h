@@ -35,6 +35,39 @@ class dgAmpJacobian
 	float_4 m_angular;
 };
 
+class dgAmpJacobianPair
+{
+	public:
+	dgAmpJacobian m_jacobianM0;
+	dgAmpJacobian m_jacobianM1;
+};
+
+class dgAmpMatrixRightSide
+{
+	public:
+//	float m_force;
+//	float m_accel;
+//	float m_deltaAccel;
+//	float m_deltaForce;
+//	float m_invDJMinvJt;
+//	float m_maxImpact;
+
+	float m_diagDamp;
+	float m_restitution;
+	float m_penetration;
+	float m_penetrationStiffness;
+
+	float m_coordenateAccel;
+	float m_lowerBoundFrictionCoefficent;
+	float m_upperBoundFrictionCoefficent;
+
+	//dgForceImpactPair* m_jointFeebackForce;
+	int m_jointFeebackForce[2];
+	int m_normalForceIndex;
+	int m_accelIsMotor;
+};
+
+
 class dgAmpMatrix4x4 
 {
 	public:
@@ -83,8 +116,11 @@ class dgAmpConstraintData
 	void CLean ();
 
 	dgInt32 m_currentSize;
-	array<dgAmpJacobian, 1> m_jacobians;
-	std::vector<dgAmpJacobian, dgAmpAllocator<dgAmpJacobian>> m_jacobiansCpu;
+	array<dgAmpJacobianPair, 1> m_jacobianPairs;
+	array<dgAmpMatrixRightSide, 1> m_matrixRightSide;
+
+	std::vector<dgAmpJacobianPair, dgAmpAllocator<dgAmpJacobianPair>> m_jacobianPairsCpu;
+	std::vector<dgAmpMatrixRightSide, dgAmpAllocator<dgAmpMatrixRightSide>> m_matrixRightSideCpu;
 };
 
 
@@ -123,9 +159,10 @@ class dgAmpInstance: public dgAmpBodyData, public dgAmpConstraintData
 	static float_4 TransformVector (const dgAmpMatrix4x4& matrix, const float_4& vector) restrict(amp,cpu);
 	static float_4 UntransformVector (const dgAmpMatrix4x4& matrix, const float_4& vector) restrict(amp,cpu);
 
-
+	
 	static void InitializeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID);
-
+	static void BuildJacobianMatrixParallelKernel (void* const context, void* const worldContext, dgInt32 threadID);
+	void GetJacobianDerivativesParallel (dgJointInfo* const jointInfo, dgInt32 threadIndex, dgInt32 rowBase, dgFloat32 timestep);
 
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData); 
 	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData);
@@ -137,9 +174,6 @@ class dgAmpInstance: public dgAmpBodyData, public dgAmpConstraintData
 	dgWorld* m_world;
 	accelerator m_accelerator;
 	dgList<dgAcceleratorDescription> m_acceleratorList;
-	
-//	dgAmpBodyData m_bodySOA;
-//	dgAmpConstraintData m_constraintSOA;
 };
 
 inline float_4 dgAmpInstance::ToFloat4 (const dgVector& v)

@@ -598,6 +598,7 @@ union dgDoubleInt
 		dgInt32 m_intL;
 		dgInt32 m_intH;
 	};
+	void* m_ptr;
 	dgInt64 m_int;
 	dgFloat64 m_float;
 };

@@ -74,8 +74,10 @@ void dgAmpBodyData::Alloc (dgInt32 count)
 
 dgAmpConstraintData::dgAmpConstraintData (dgMemoryAllocator* const allocator)
 	:m_currentSize(1)
-	,m_jacobians(m_currentSize)
-	,m_jacobiansCpu(dgAmpAllocator<dgAmpJacobian> (allocator))
+	,m_jacobianPairs(m_currentSize)
+	,m_matrixRightSide(m_currentSize)
+	,m_jacobianPairsCpu(dgAmpAllocator<dgAmpJacobianPair> (allocator))
+	,m_matrixRightSideCpu(dgAmpAllocator<dgAmpMatrixRightSide> (allocator))
 {
 }
 
@@ -83,7 +85,9 @@ void dgAmpConstraintData::CLean ()
 {
 	m_currentSize = 1;
 	Alloc (2);
-	m_jacobiansCpu.shrink_to_fit();
+
+	m_jacobianPairsCpu.shrink_to_fit();
+	m_matrixRightSideCpu.shrink_to_fit();
 }
 
 void dgAmpConstraintData::Alloc (dgInt32 count)
@@ -92,9 +96,10 @@ void dgAmpConstraintData::Alloc (dgInt32 count)
 		while (m_currentSize < count) {
 			m_currentSize *= 2;
 		}
-		m_jacobians = array<dgAmpJacobian, 1> (m_currentSize);
+		m_jacobianPairs = array<dgAmpJacobianPair, 1> (m_currentSize);
 
-		m_jacobiansCpu.resize (m_currentSize);
+		m_jacobianPairsCpu.resize (m_currentSize);
+		m_matrixRightSideCpu.resize (m_currentSize);
 	}
 }
 
