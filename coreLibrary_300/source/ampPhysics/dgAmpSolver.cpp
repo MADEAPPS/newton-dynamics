@@ -874,11 +874,9 @@ void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* co
 	syncData->m_bodyCount = bodyCount;
 	syncData->m_jointCount = jointCount;
 	syncData->m_rowCount = maxRowCount;
-	dgAmpBodyData::Alloc (bodyCount);
-/*
-	for (dgInt32 size = m_constraintSOA.m_dgAmpJacobians.get_extent().size(); size < syncData->m_rowCount; size = m_constraintSOA.m_dgAmpJacobians.get_extent().size()) {
-		m_constraintSOA.Alloc (size * 2);
-	}
+
+	dgAmpBodyData::Alloc (syncData->m_bodyCount);
+	dgAmpConstraintData::Alloc (syncData->m_rowCount);
 
 	jointInfoMap[jointCount].m_bashIndex = 0x7fffffff;
 	jointInfoMap[jointCount].m_jointIndex= -1;
@@ -944,7 +942,6 @@ void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* co
 		index --;
 	}
 	syncData->m_batchesCount = bash;
-*/
 }
 
 

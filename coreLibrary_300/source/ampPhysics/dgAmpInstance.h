@@ -58,7 +58,9 @@ class dgAmpBodyData
 	public:
 	dgAmpBodyData (dgMemoryAllocator* const allocator);
 	void Alloc (dgInt32 count);
+	void CLean ();
 
+	dgInt32 m_currentSize;
 	array<float_4, 1> m_bodyInvMass;
 	array<dgAmpJacobian, 1> m_bodyDamp;
 	array<dgAmpJacobian, 1> m_bodyVelocity;
@@ -78,9 +80,11 @@ class dgAmpConstraintData
 	public:
 	dgAmpConstraintData (dgMemoryAllocator* const allocator);
 	void Alloc (dgInt32 size);
+	void CLean ();
 
-	array<dgAmpJacobian, 1> m_dgAmpJacobians;
-	array_view<dgAmpJacobian, 1> m_dgAmpJacobians_view;
+	dgInt32 m_currentSize;
+	array<dgAmpJacobian, 1> m_jacobians;
+	std::vector<dgAmpJacobian, dgAmpAllocator<dgAmpJacobian>> m_jacobiansCpu;
 };
 
 
