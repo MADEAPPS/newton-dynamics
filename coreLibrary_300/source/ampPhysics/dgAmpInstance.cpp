@@ -33,11 +33,10 @@ dgAmpBodyData::dgAmpBodyData (dgMemoryAllocator* const allocator)
 	,m_bodyInternalForce(1)
 	,m_bodyMatrix(1)
 	,m_bodyInvInertiaMatrix(1)
+	,m_bodyInvMassCpu(dgAmpAllocator<float_4> (allocator))
 	,m_bodyDampCpu(dgAmpAllocator<dgAmpJacobian> (allocator))
-//	,m_bodyDamp_view(m_bodyDamp)
-//	,m_bodyInvMass_view (m_bodyInvMass)
-//	,m_bodyVelocity_view(m_bodyVelocity)
-//	,m_bodyMatrix_view (m_bodyMatrix)
+	,m_bodyMatrixCpu(dgAmpAllocator<dgAmpJacobian> (allocator))
+	,m_bodyVelocityCpu(dgAmpAllocator<dgAmpJacobian> (allocator))
 {
 }
 
@@ -56,17 +55,12 @@ void dgAmpBodyData::Alloc (dgInt32 count)
 		m_bodyInternalForce = array<dgAmpJacobian, 1>(size);
 		m_bodyMatrix = array<dgAmpMatrix4x4 , 1> (size);
 		m_bodyInvInertiaMatrix = array<dgAmpMatrix4x4 , 1> (size);
-
+		
 		m_bodyDampCpu.resize (size);
+		m_bodyMatrixCpu.resize (size);
+		m_bodyInvMassCpu.resize (size);
+		m_bodyVelocityCpu.resize (size);
 	}
-
-//	dgInt32 stride = sizeof (m_bodyDampCpu[0]);
-//	world->m_solverRightSideMemory.ExpandCapacityIfNeessesary (count + 4, stride);
-//	m_bodyDampCpu = (dgAmpJacobian*) &world->m_solverMatrixMemory[0];
-//	m_bodyDamp_view = array_view<dgAmpJacobian, 1> (m_bodyDamp);
-//	m_bodyInvMass_view = array_view<float_4, 1> (m_bodyInvMass);
-//	m_bodyMatrix_view = array_view<dgAmpMatrix4x4, 1> (m_bodyMatrix);
-//	m_bodyVelocity_view = array_view<dgAmpJacobian, 1> (m_bodyVelocity);
 }
 
 dgAmpConstraintData::dgAmpConstraintData (dgMemoryAllocator* const allocator)

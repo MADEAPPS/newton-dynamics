@@ -740,9 +740,6 @@ void dgAmpInstance::ConstraintSolver (dgInt32 islandCount, const dgIsland* const
 }
 
 
-
-
-
 void dgAmpInstance::AddDamingAccelKernel (const dgAmpMatrix4x4& bodyMatrix, const dgAmpJacobian& damping, dgAmpJacobian& veloc) restrict(amp,cpu)
 {
 //	m_veloc -= m_veloc.Scale4 (m_dampCoef.m_w);
@@ -814,21 +811,19 @@ void dgAmpInstance::InitializeBodyArrayParallelKernel (void* const context, void
 	dgBody** const bopyMapInfo = syncData->m_bodyInfoMap;
 	//dgAmpJacobian* const bodyDampCpu = ampInstance->m_bodyDampCpu.data();
 	dgJacobian* const bodyDampCpu = (dgJacobian*) ampInstance->m_bodyDampCpu.data();
+	dgMatrix* const bodyMatrixCpu = (dgMatrix*) ampInstance->m_bodyMatrixCpu.data();
+	dgVector* const bodyInvMassCpu = (dgVector*) ampInstance->m_bodyInvMassCpu.data();
+	dgJacobian* const bodyVelocityCpu = (dgJacobian*) ampInstance->m_bodyVelocityCpu.data();
 
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		const dgBody* const body = bopyMapInfo[i];
-//		dgAmpMatrix4x4& matrix = bodySOA.m_bodyMatrix_view[i];
-//		matrix.m_row[0] = dgAmpInstance::ToFloat4 (body->m_matrix[0]);
-//		matrix.m_row[1] = dgAmpInstance::ToFloat4 (body->m_matrix[1]);
-//		matrix.m_row[2] = dgAmpInstance::ToFloat4 (body->m_matrix[2]);
-//		matrix.m_row[3] = dgAmpInstance::ToFloat4 (body->m_matrix[3]);
-	
+
+		bodyMatrixCpu[i] = body->m_matrix;
 		bodyDampCpu[i].m_linear = dgVector (body->GetLinearDamping());
 		bodyDampCpu[i].m_angular = body->GetAngularDamping();
-
-//		bodySOA.m_bodyVelocity_view[i].m_linear = ToFloat4 (body->GetVelocity());
-//		bodySOA.m_bodyVelocity_view[i].m_angular = ToFloat4 (body->GetOmega());
-//		bodySOA.m_bodyInvMass_view[i] = ToFloat4 (body->GetInvMass());
+		bodyVelocityCpu[i].m_linear = body->GetVelocity();
+		bodyVelocityCpu[i].m_angular = body->GetOmega();
+		bodyInvMassCpu[i] = body->GetInvMass();
 	}
 
 	dgAssert (bopyMapInfo[0]->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bopyMapInfo[0])->m_accel % ((dgDynamicBody*)bopyMapInfo[0])->m_accel) == dgFloat32 (0.0f));
@@ -836,164 +831,8 @@ void dgAmpInstance::InitializeBodyArrayParallelKernel (void* const context, void
 }
 
 
-void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData)
-{
-	dgWorld* const world = m_world;
-	dgInt32 threadCounts = world->GetThreadCount();	
-	syncData->m_atomicIndex = 0;
-	for (dgInt32 j = 0; j < threadCounts; j ++) {
-		world->QueueJob (InitializeBodyArrayParallelKernel, syncData, this);
-	}
-	world->SynchronizationBarrier();
-/*
-	const int bodyCount = syncData->m_bodyCount;
-	extent<1> compute_domain(bodyCount);
-	const array<float_4, 1>& bodyInvMass = m_bodySOA.m_bodyInvMass;
-	const array<dgAmpMatrix4x4, 1>& bodyMatrix = m_bodySOA.m_bodyMatrix;
-	const array<dgAmpJacobian, 1>& bodyDamp = m_bodySOA.m_bodyDamp;
-	array<dgAmpJacobian, 1>& bodyVelocity = m_bodySOA.m_bodyVelocity;
-	array<dgAmpJacobian, 1>& bodyNetForce = m_bodySOA.m_bodyNetForce;
-	array<dgAmpJacobian, 1>& bodyInternalForce = m_bodySOA.m_bodyInternalForce;
-	array<dgAmpMatrix4x4, 1>& bodyInvInertiaMatrix = m_bodySOA.m_bodyInvInertiaMatrix;
 
-    parallel_for_each (compute_domain, [=, &bodyDamp, &bodyVelocity, &bodyMatrix, &bodyInvInertiaMatrix, &bodyInvMass, &bodyNetForce, &bodyInternalForce] (index<1> idx) restrict(amp,cpu)
-    {
-		AddDamingAccelKernel (bodyMatrix[idx], bodyDamp[idx], bodyVelocity[idx]);
-        CalcuateInvInertiaMatrixKernel (bodyMatrix[idx], bodyInvInertiaMatrix[idx], bodyInvMass[idx]);
-
-		bodyNetForce[idx] = bodyVelocity[idx];
-		bodyInternalForce[idx].m_linear = float_4 (0.0f, 0.0f, 0.0f, 0.0f);
-		bodyInternalForce[idx].m_angular = float_4 (0.0f, 0.0f, 0.0f, 0.0f);
-    });
-*/
-/*
-array_view<dgAmpMatrix4x4, 1> xxx (m_bodyInvInertiaMatrix);
-//xxx.synchronize();
-	for (int i = 0; i < bodyCount; i ++) {
-		dgAmpMatrix4x4& matrix = xxx[i];
-		dgAmpMatrix4x4& matrix1 = xxx[i];
-	}
-array_view<dgAmpMatrix4x4, 1> xxx1 (m_bodyInvInertiaMatrix);
-*/
-}
-
-void dgAmpInstance::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData)
-{
-/*
-	dgWorld* const world = (dgWorld*) this;
-	dgInt32 threadCounts = world->GetThreadCount();	
-
-	syncData->m_atomicIndex = 0;
-	for (dgInt32 j = 0; j < threadCounts; j ++) {
-		world->QueueJob (BuilddgAmpJacobianMatrixParallelKernel, syncData, world);
-	}
-	world->SynchronizationBarrier();
-*/
-}
-
-
-/*
-void dgAmpInstance::BuilddgAmpJacobianMatrixParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
-	dgWorld* const world = (dgWorld*) worldContext;
-	const dgParallelJointMap* const jointInfoIndexArray = syncData->m_jointInfoMap;
-	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
-	const dgIsland* const island = syncData->m_islandArray;
-	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
-
-	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
-	dgdgAmpJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
-
-	dgVector zero (dgFloat32 (0.0f));
-//	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-
-		dgInt32 jointIndex = jointInfoIndexArray[i].m_jointIndex;
-		dgJointInfo* const jointInfo = &constraintArray[jointIndex];
-
-		dgInt32 rowBase = dgAtomicExchangeAndAdd(&syncData->m_dgAmpJacobianMatrixRowAtomicIndex, jointInfo->m_autoPaircount);
-		world->GetdgAmpJacobianDerivativesParallel (jointInfo, threadID, rowBase, syncData->m_timestep);
-
-		dgInt32 index = jointInfo->m_autoPairstart;
-		dgInt32 count = jointInfo->m_autoPaircount;
-		dgInt32 m0 = jointInfo->m_m0;
-		dgInt32 m1 = jointInfo->m_m1;
-		dgAssert (m0 >= 0);
-		dgAssert (m1 >= 0);
-		dgAssert (m0 != m1);
-		dgAssert (m0 < island->m_bodyCount);
-		dgAssert (m1 < island->m_bodyCount);
-
-		const dgBody* const body0 = bodyArray[m0].m_body;
-		const dgBody* const body1 = bodyArray[m1].m_body;
-
-		const dgVector invMass0 (body0->m_invMass[3]);
-		const dgMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
-		const dgVector invMass1 (body1->m_invMass[3]);
-		const dgMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
-
-		dgVector accel0 (zero); 
-		dgVector alpha0 (zero); 
-		if (body0->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-			accel0 = ((dgDynamicBody*)body0)->m_accel;
-			alpha0 = ((dgDynamicBody*)body0)->m_alpha;
-		}
-
-		dgVector accel1 (zero); 
-		dgVector alpha1 (zero); 
-		if (body1->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-			accel1 = ((dgDynamicBody*)body1)->m_accel;
-			alpha1 = ((dgDynamicBody*)body1)->m_alpha;
-		}
-
-		// the parallel solve will not deal with impulse phase, only for large solution solution
-		for (dgInt32 i = 0; i < count; i ++) {
-			dgdgAmpJacobianMatrixElement* const row = &matrixRow[index];
-
-			//dgVector JMinvdgAmpJacobianLinearM0 (row->m_Jt.m_dgAmpJacobianM0.m_linear.Scale3 (invMass0));
-			//dgVector JMinvdgAmpJacobianAngularM0 (invInertia0.UnrotateVector (row->m_Jt.m_dgAmpJacobianM0.m_angular));
-			//dgVector JMinvdgAmpJacobianLinearM1 (row->m_Jt.m_dgAmpJacobianM1.m_linear.Scale3 (invMass1));
-			//dgVector JMinvdgAmpJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_dgAmpJacobianM1.m_angular));
-
-			dgVector JMinvdgAmpJacobianLinearM0 (row->m_Jt.m_dgAmpJacobianM0.m_linear.CompProduct4 (invMass0));
-			dgVector JMinvdgAmpJacobianAngularM0 (invInertia0.RotateVector (row->m_Jt.m_dgAmpJacobianM0.m_angular));
-			dgVector JMinvdgAmpJacobianLinearM1 (row->m_Jt.m_dgAmpJacobianM1.m_linear.CompProduct4 (invMass1));
-			dgVector JMinvdgAmpJacobianAngularM1 (invInertia1.RotateVector (row->m_Jt.m_dgAmpJacobianM1.m_angular));
-
-			dgVector tmpDiag (JMinvdgAmpJacobianLinearM0.CompProduct4(row->m_Jt.m_dgAmpJacobianM0.m_linear) + JMinvdgAmpJacobianAngularM0.CompProduct4(row->m_Jt.m_dgAmpJacobianM0.m_angular) +
-							  JMinvdgAmpJacobianLinearM1.CompProduct4(row->m_Jt.m_dgAmpJacobianM1.m_linear) + JMinvdgAmpJacobianAngularM1.CompProduct4(row->m_Jt.m_dgAmpJacobianM1.m_angular));
-
-			dgVector tmpAccel (JMinvdgAmpJacobianLinearM0.CompProduct4(accel0) + JMinvdgAmpJacobianAngularM0.CompProduct4(alpha0) + JMinvdgAmpJacobianLinearM1.CompProduct4(accel1) + JMinvdgAmpJacobianAngularM1.CompProduct4(alpha1));
-
-			dgFloat32 extenalAcceleration = -(tmpAccel.m_x + tmpAccel.m_y + tmpAccel.m_z);
-			//row->m_extAccel = extenalAcceleration;
-			row->m_deltaAccel = extenalAcceleration;
-			row->m_coordenateAccel += extenalAcceleration;
-			row->m_force = row->m_jointFeebackForce[0].m_force;
-			row->m_maxImpact = dgFloat32 (0.0f);
-
-			dgAssert (row->m_diagDamp >= dgFloat32(0.1f));
-			dgAssert (row->m_diagDamp <= dgFloat32(100.0f));
-			dgFloat32 stiffness = DG_PSD_DAMP_TOL * row->m_diagDamp;
-
-			dgFloat32 diag = (tmpDiag.m_x + tmpDiag.m_y + tmpDiag.m_z);
-			dgAssert (diag > dgFloat32 (0.0f));
-			row->m_diagDamp = diag * stiffness;
-
-			diag *= (dgFloat32(1.0f) + stiffness);
-			//solverMemory.m_diagJMinvJt[index] = diag;
-			row->m_invDJMinvJt = dgFloat32(1.0f) / diag;
-
-			index ++;
-		}
-	}
-}
-*/
-
-
-	void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islanCount)
+void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islanCount)
 {
 	dgBodyInfo* const bodyArray = (dgBodyInfo*) &m_world->m_bodiesMemory[0]; 
 	dgJointInfo* const constraintArray = (dgJointInfo*) &m_world->m_jointsMemory[0];
@@ -1107,3 +946,159 @@ void dgAmpInstance::BuilddgAmpJacobianMatrixParallelKernel (void* const context,
 	syncData->m_batchesCount = bash;
 */
 }
+
+
+void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData)
+{
+	dgWorld* const world = m_world;
+	dgInt32 threadCounts = world->GetThreadCount();	
+	syncData->m_atomicIndex = 0;
+	for (dgInt32 j = 0; j < threadCounts; j ++) {
+		world->QueueJob (InitializeBodyArrayParallelKernel, syncData, this);
+	}
+	world->SynchronizationBarrier();
+
+	const int bodyCount = syncData->m_bodyCount;
+	extent<1> compute_domain(bodyCount);
+
+	copy (m_bodyDampCpu.begin(), m_bodyDampCpu.begin() + bodyCount, m_bodyDamp);
+	copy (m_bodyMatrixCpu.begin(), m_bodyMatrixCpu.begin() + bodyCount, m_bodyMatrix);
+	copy (m_bodyInvMassCpu.begin(), m_bodyInvMassCpu.begin() + bodyCount, m_bodyInvMass);
+	copy (m_bodyVelocityCpu.begin(), m_bodyVelocityCpu.begin() + bodyCount, m_bodyVelocity);
+	
+	const array<float_4, 1>& bodyInvMass = m_bodyInvMass;
+	const array<dgAmpMatrix4x4, 1>& bodyMatrix = m_bodyMatrix;
+	const array<dgAmpJacobian, 1>& bodyDamp = m_bodyDamp;
+	array<dgAmpJacobian, 1>& bodyVelocity = m_bodyVelocity;
+	array<dgAmpJacobian, 1>& bodyNetForce = m_bodyNetForce;
+	array<dgAmpJacobian, 1>& bodyInternalForce = m_bodyInternalForce;
+	array<dgAmpMatrix4x4, 1>& bodyInvInertiaMatrix = m_bodyInvInertiaMatrix;
+
+    parallel_for_each (compute_domain, [=, &bodyDamp, &bodyVelocity, &bodyMatrix, &bodyInvInertiaMatrix, &bodyInvMass, &bodyNetForce, &bodyInternalForce] (index<1> idx) restrict(amp,cpu)
+    {
+		AddDamingAccelKernel (bodyMatrix[idx], bodyDamp[idx], bodyVelocity[idx]);
+        CalcuateInvInertiaMatrixKernel (bodyMatrix[idx], bodyInvInertiaMatrix[idx], bodyInvMass[idx]);
+
+		bodyNetForce[idx] = bodyVelocity[idx];
+		bodyInternalForce[idx].m_linear = float_4 (0.0f, 0.0f, 0.0f, 0.0f);
+		bodyInternalForce[idx].m_angular = float_4 (0.0f, 0.0f, 0.0f, 0.0f);
+    });
+}
+
+
+
+/*
+void dgAmpInstance::BuilddgAmpJacobianMatrixParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
+{
+	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
+	dgWorld* const world = (dgWorld*) worldContext;
+	const dgParallelJointMap* const jointInfoIndexArray = syncData->m_jointInfoMap;
+	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
+	const dgIsland* const island = syncData->m_islandArray;
+	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
+	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
+
+	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
+	dgdgAmpJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
+
+	dgVector zero (dgFloat32 (0.0f));
+//	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+
+		dgInt32 jointIndex = jointInfoIndexArray[i].m_jointIndex;
+		dgJointInfo* const jointInfo = &constraintArray[jointIndex];
+
+		dgInt32 rowBase = dgAtomicExchangeAndAdd(&syncData->m_dgAmpJacobianMatrixRowAtomicIndex, jointInfo->m_autoPaircount);
+		world->GetdgAmpJacobianDerivativesParallel (jointInfo, threadID, rowBase, syncData->m_timestep);
+
+		dgInt32 index = jointInfo->m_autoPairstart;
+		dgInt32 count = jointInfo->m_autoPaircount;
+		dgInt32 m0 = jointInfo->m_m0;
+		dgInt32 m1 = jointInfo->m_m1;
+		dgAssert (m0 >= 0);
+		dgAssert (m1 >= 0);
+		dgAssert (m0 != m1);
+		dgAssert (m0 < island->m_bodyCount);
+		dgAssert (m1 < island->m_bodyCount);
+
+		const dgBody* const body0 = bodyArray[m0].m_body;
+		const dgBody* const body1 = bodyArray[m1].m_body;
+
+		const dgVector invMass0 (body0->m_invMass[3]);
+		const dgMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
+		const dgVector invMass1 (body1->m_invMass[3]);
+		const dgMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
+
+		dgVector accel0 (zero); 
+		dgVector alpha0 (zero); 
+		if (body0->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+			accel0 = ((dgDynamicBody*)body0)->m_accel;
+			alpha0 = ((dgDynamicBody*)body0)->m_alpha;
+		}
+
+		dgVector accel1 (zero); 
+		dgVector alpha1 (zero); 
+		if (body1->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+			accel1 = ((dgDynamicBody*)body1)->m_accel;
+			alpha1 = ((dgDynamicBody*)body1)->m_alpha;
+		}
+
+		// the parallel solve will not deal with impulse phase, only for large solution solution
+		for (dgInt32 i = 0; i < count; i ++) {
+			dgdgAmpJacobianMatrixElement* const row = &matrixRow[index];
+
+			//dgVector JMinvdgAmpJacobianLinearM0 (row->m_Jt.m_dgAmpJacobianM0.m_linear.Scale3 (invMass0));
+			//dgVector JMinvdgAmpJacobianAngularM0 (invInertia0.UnrotateVector (row->m_Jt.m_dgAmpJacobianM0.m_angular));
+			//dgVector JMinvdgAmpJacobianLinearM1 (row->m_Jt.m_dgAmpJacobianM1.m_linear.Scale3 (invMass1));
+			//dgVector JMinvdgAmpJacobianAngularM1 (invInertia1.UnrotateVector (row->m_Jt.m_dgAmpJacobianM1.m_angular));
+
+			dgVector JMinvdgAmpJacobianLinearM0 (row->m_Jt.m_dgAmpJacobianM0.m_linear.CompProduct4 (invMass0));
+			dgVector JMinvdgAmpJacobianAngularM0 (invInertia0.RotateVector (row->m_Jt.m_dgAmpJacobianM0.m_angular));
+			dgVector JMinvdgAmpJacobianLinearM1 (row->m_Jt.m_dgAmpJacobianM1.m_linear.CompProduct4 (invMass1));
+			dgVector JMinvdgAmpJacobianAngularM1 (invInertia1.RotateVector (row->m_Jt.m_dgAmpJacobianM1.m_angular));
+
+			dgVector tmpDiag (JMinvdgAmpJacobianLinearM0.CompProduct4(row->m_Jt.m_dgAmpJacobianM0.m_linear) + JMinvdgAmpJacobianAngularM0.CompProduct4(row->m_Jt.m_dgAmpJacobianM0.m_angular) +
+							  JMinvdgAmpJacobianLinearM1.CompProduct4(row->m_Jt.m_dgAmpJacobianM1.m_linear) + JMinvdgAmpJacobianAngularM1.CompProduct4(row->m_Jt.m_dgAmpJacobianM1.m_angular));
+
+			dgVector tmpAccel (JMinvdgAmpJacobianLinearM0.CompProduct4(accel0) + JMinvdgAmpJacobianAngularM0.CompProduct4(alpha0) + JMinvdgAmpJacobianLinearM1.CompProduct4(accel1) + JMinvdgAmpJacobianAngularM1.CompProduct4(alpha1));
+
+			dgFloat32 extenalAcceleration = -(tmpAccel.m_x + tmpAccel.m_y + tmpAccel.m_z);
+			//row->m_extAccel = extenalAcceleration;
+			row->m_deltaAccel = extenalAcceleration;
+			row->m_coordenateAccel += extenalAcceleration;
+			row->m_force = row->m_jointFeebackForce[0].m_force;
+			row->m_maxImpact = dgFloat32 (0.0f);
+
+			dgAssert (row->m_diagDamp >= dgFloat32(0.1f));
+			dgAssert (row->m_diagDamp <= dgFloat32(100.0f));
+			dgFloat32 stiffness = DG_PSD_DAMP_TOL * row->m_diagDamp;
+
+			dgFloat32 diag = (tmpDiag.m_x + tmpDiag.m_y + tmpDiag.m_z);
+			dgAssert (diag > dgFloat32 (0.0f));
+			row->m_diagDamp = diag * stiffness;
+
+			diag *= (dgFloat32(1.0f) + stiffness);
+			//solverMemory.m_diagJMinvJt[index] = diag;
+			row->m_invDJMinvJt = dgFloat32(1.0f) / diag;
+
+			index ++;
+		}
+	}
+}
+*/
+
+
+void dgAmpInstance::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData)
+{
+/*
+	dgWorld* const world = (dgWorld*) this;
+	dgInt32 threadCounts = world->GetThreadCount();	
+
+	syncData->m_atomicIndex = 0;
+	for (dgInt32 j = 0; j < threadCounts; j ++) {
+		world->QueueJob (BuilddgAmpJacobianMatrixParallelKernel, syncData, world);
+	}
+	world->SynchronizationBarrier();
+*/
+}
+

@@ -40,7 +40,7 @@ class dgAmpAllocator: public std::allocator<T>
 
 	pointer allocate(size_type n, const void *hint=0)
 	{
-		return (pointer)m_allocator->Malloc(n * sizeof (T));
+		return (pointer)m_allocator->Malloc(dgInt32 (n * sizeof (T)));
 	}
 
 	void deallocate(pointer p, size_type n)

@@ -38,6 +38,10 @@ class dgAmpJacobian
 class dgAmpMatrix4x4 
 {
 	public:
+	dgAmpMatrix4x4()
+	{
+	}
+
 	dgAmpMatrix4x4 (const float_4& v0, const float_4& v1, const float_4& v2, const float_4& v3)  restrict(amp,cpu)
 	{
 		m_row[0] = v0;
@@ -63,11 +67,10 @@ class dgAmpBodyData
 	array<dgAmpMatrix4x4 , 1> m_bodyMatrix;
 	array<dgAmpMatrix4x4 , 1> m_bodyInvInertiaMatrix;
 	
-	std::vector<dgAmpJacobian, dgAmpAllocator<dgAmpJacobian> > m_bodyDampCpu;
-	//array_view<dgAmpJacobian, 1> m_bodyDamp_view;
-	//array_view<float_4, 1> m_bodyInvMass_view;
-	//array_view<dgAmpJacobian, 1> m_bodyVelocity_view;
-	//array_view<dgAmpMatrix4x4, 1> m_bodyMatrix_view;
+	std::vector<float_4, dgAmpAllocator<float_4>> m_bodyInvMassCpu;
+	std::vector<dgAmpJacobian, dgAmpAllocator<dgAmpJacobian>> m_bodyDampCpu;
+	std::vector<dgAmpMatrix4x4, dgAmpAllocator<dgAmpJacobian>> m_bodyMatrixCpu;
+	std::vector<dgAmpJacobian, dgAmpAllocator<dgAmpJacobian>> m_bodyVelocityCpu;
 };
 
 class dgAmpConstraintData
