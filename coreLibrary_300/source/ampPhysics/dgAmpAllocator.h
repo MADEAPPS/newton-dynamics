@@ -23,7 +23,7 @@
 #define _DG_AMP_ALLOCATOR_H_
 
 #include "dgAMP.h"
-/*
+
 template <typename T>
 class dgAmpAllocator: public std::allocator<T>
 {
@@ -40,44 +40,46 @@ class dgAmpAllocator: public std::allocator<T>
 
 	pointer allocate(size_type n, const void *hint=0)
 	{
-		return m_memory;
+		return (pointer)m_allocator->Malloc(n * sizeof (T));
 	}
 
 	void deallocate(pointer p, size_type n)
 	{
+		m_allocator->Free(p);
 	}
 
-	dgAmpAllocator(void* const buffer) throw()
+	dgAmpAllocator(dgMemoryAllocator* const allocator) throw()
 		:std::allocator<T>() 
-		,m_memory((pointer)buffer)
+		,m_allocator(allocator)
 	{ 
 	}
 
 	dgAmpAllocator() throw()
 		:std::allocator<T>() 
-		,m_memory(NULL)
+		,m_allocator(NULL)
 	{ 
+		dgAssert (0);
 	}
 
 	dgAmpAllocator(const dgAmpAllocator &a) throw()
 		:std::allocator<T>(a) 
-		,m_memory((pointer)a.m_memory)
+		,m_allocator(a.m_allocator)
 	{ 
 	}
 
 	template <class U>                    
 	dgAmpAllocator(const dgAmpAllocator<U> &a) throw()
 		:std::allocator<T>(a) 
-		,m_memory((pointer)a.m_memory)
+		,m_allocator(a.m_allocator)
 	{ 
 	}
 
 	~dgAmpAllocator() throw() 
 	{ 
 	}
-
-	pointer m_memory;
+	
+	dgMemoryAllocator* m_allocator;
 };
-*/
+
 
 #endif
