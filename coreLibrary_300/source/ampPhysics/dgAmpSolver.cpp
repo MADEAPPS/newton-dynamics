@@ -1027,17 +1027,17 @@ void dgAmpInstance::GetJacobianDerivativesParallel (dgJointInfo* const jointInfo
 	jointInfo->m_m0 = m0;
 	jointInfo->m_m1 = m1;
 
-	dgJacobianPair* const jacobianPairsCpu = &((dgJacobianPair*) m_jacobianPairsCpu.data())[rowBase];
-	dgAmpMatrixRightSide* const matrixRightSideCpu = &m_matrixRightSideCpu.data() [rowBase];
-
 	dgDoubleInt ptr; 
 	ptr.m_float = 0;
+	dgAmpJacobianMatrixElement* const matrixRow = &m_matrixDataCpu.data()[rowBase];
 	for (dgInt32 i = 0; i < dof; i ++) {
-		//dgJacobianMatrixElement* const row = &matrixRow[i];
+		//dgAmpJacobianMatrixElement* const row = &matrixRow[i];
+		dgJacobianPair& jacobianPair = *((dgJacobianPair*)&matrixRow[i].m_Jt); 
+		dgAmpMatrixRightSide& rightSide = *((dgAmpMatrixRightSide*)&matrixRow[i].m_data); 
 
 		dgAssert (constraintParams.m_forceBounds[i].m_jointForce);
 		//row->m_Jt = constraintParams.m_jacobian[i]; 
-		jacobianPairsCpu[i] = constraintParams.m_jacobian[i]; 
+		jacobianPair = constraintParams.m_jacobian[i]; 
 
 		dgAssert (constraintParams.m_jointStiffness[i] >= dgFloat32(0.1f));
 		dgAssert (constraintParams.m_jointStiffness[i] <= dgFloat32(100.0f));
@@ -1053,18 +1053,19 @@ void dgAmpInstance::GetJacobianDerivativesParallel (dgJointInfo* const jointInfo
 		//row->m_normalForceIndex = constraintParams.m_forceBounds[i].m_normalIndex; 
 		//row->m_jointFeebackForce = constraintParams.m_forceBounds[i].m_jointForce;
 	
-		matrixRightSideCpu[i].m_diagDamp = constraintParams.m_jointStiffness[i];
-		matrixRightSideCpu[i].m_coordenateAccel = constraintParams.m_jointAccel[i];
-		matrixRightSideCpu[i].m_restitution = constraintParams.m_restitution[i];
-		matrixRightSideCpu[i].m_penetration = constraintParams.m_penetration[i];
-		matrixRightSideCpu[i].m_penetrationStiffness = constraintParams.m_penetrationStiffness[i];
-		matrixRightSideCpu[i].m_lowerBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_low;
-		matrixRightSideCpu[i].m_upperBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_upper;
-		matrixRightSideCpu[i].m_accelIsMotor = constraintParams.m_isMotor[i] ? 1 : 0;
-		matrixRightSideCpu[i].m_normalForceIndex = constraintParams.m_forceBounds[i].m_normalIndex; 
+		rightSide.m_diagDamp = constraintParams.m_jointStiffness[i];
+		rightSide.m_coordenateAccel = constraintParams.m_jointAccel[i];
+		rightSide.m_restitution = constraintParams.m_restitution[i];
+		rightSide.m_penetration = constraintParams.m_penetration[i];
+		rightSide.m_accelIsMotor = constraintParams.m_isMotor[i] ? 1 : 0;
+		rightSide.m_penetrationStiffness = constraintParams.m_penetrationStiffness[i];
+
 		ptr.m_ptr = constraintParams.m_forceBounds[i].m_jointForce;
-		matrixRightSideCpu[i].m_jointFeebackForce[0] = ptr.m_intL;
-		matrixRightSideCpu[i].m_jointFeebackForce[1] = ptr.m_intH;
+		rightSide.m_jointFeebackForce[0] = ptr.m_intL;
+		rightSide.m_jointFeebackForce[1] = ptr.m_intH;
+		rightSide.m_normalForceIndex = constraintParams.m_forceBounds[i].m_normalIndex; 
+		rightSide.m_lowerBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_low;
+		rightSide.m_upperBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_upper;
 	}
 }
 
@@ -1187,7 +1188,7 @@ void dgAmpInstance::BuildJacobianMatrixParallelKernel (void* const context, void
 
 void dgAmpInstance::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData)
 {
-	dgWorld* const world = (dgWorld*) this;
+	dgWorld* const world = m_world;
 	dgInt32 threadCounts = world->GetThreadCount();	
 
 	syncData->m_atomicIndex = 0;
@@ -1195,6 +1196,10 @@ void dgAmpInstance::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const
 		world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, this);
 	}
 	world->SynchronizationBarrier();
+
+	dgAssert (syncData->m_jacobianMatrixRowAtomicIndex == syncData->m_rowCount);
+	dgInt32 rowCount = syncData->m_rowCount;
+	copy (m_matrixDataCpu.begin(), m_matrixDataCpu.begin() + rowCount, m_matrixData);
 
 }
 

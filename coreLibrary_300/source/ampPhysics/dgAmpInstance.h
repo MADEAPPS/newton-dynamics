@@ -45,26 +45,40 @@ class dgAmpJacobianPair
 class dgAmpMatrixRightSide
 {
 	public:
+	union 
+	{
+		struct 
+		{
 //	float m_force;
 //	float m_accel;
 //	float m_deltaAccel;
 //	float m_deltaForce;
 //	float m_invDJMinvJt;
 //	float m_maxImpact;
+			float m_diagDamp;
+			float m_restitution;
+			float m_penetration;
+			float m_penetrationStiffness;
 
-	float m_diagDamp;
-	float m_restitution;
-	float m_penetration;
-	float m_penetrationStiffness;
+			float m_coordenateAccel;
+			float m_lowerBoundFrictionCoefficent;
+			float m_upperBoundFrictionCoefficent;
 
-	float m_coordenateAccel;
-	float m_lowerBoundFrictionCoefficent;
-	float m_upperBoundFrictionCoefficent;
+			//dgForceImpactPair* m_jointFeebackForce;
+			int m_jointFeebackForce[2];
+			int m_normalForceIndex;
+			int m_accelIsMotor;
+		};
+		float m_data[3][4];
+	};
+};
 
-	//dgForceImpactPair* m_jointFeebackForce;
-	int m_jointFeebackForce[2];
-	int m_normalForceIndex;
-	int m_accelIsMotor;
+
+class dgAmpJacobianMatrixElement
+{
+	public:
+	dgAmpJacobianPair m_Jt;
+	dgAmpMatrixRightSide m_data;
 };
 
 
@@ -116,11 +130,9 @@ class dgAmpConstraintData
 	void CLean ();
 
 	dgInt32 m_currentSize;
-	array<dgAmpJacobianPair, 1> m_jacobianPairs;
-	array<dgAmpMatrixRightSide, 1> m_matrixRightSide;
+	array<dgAmpJacobianMatrixElement, 1> m_matrixData;
 
-	std::vector<dgAmpJacobianPair, dgAmpAllocator<dgAmpJacobianPair>> m_jacobianPairsCpu;
-	std::vector<dgAmpMatrixRightSide, dgAmpAllocator<dgAmpMatrixRightSide>> m_matrixRightSideCpu;
+	std::vector<dgAmpJacobianMatrixElement, dgAmpAllocator<dgAmpJacobianMatrixElement>> m_matrixDataCpu;
 };
 
 
