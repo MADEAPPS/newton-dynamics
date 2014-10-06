@@ -228,7 +228,7 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 		dgVector localP0 (globalMatrix.UntransformVector (l0));
 		dgVector localP1 (globalMatrix.UntransformVector (l1));
 		dgVector p1p0 (localP1 - localP0);
-		if ((p1p0 % p1p0) > dgFloat32 (1.0e-6f)) {
+		if ((p1p0 % p1p0) > dgFloat32 (1.0e-12f)) {
 			dgFloat32 t = m_collision->RayCast (localP0, localP1, dgFloat32 (1.0f), contactOut, preFilter, this, userData);
 			if (t < dgFloat32 (1.0f)) {
 				dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale3(t)));

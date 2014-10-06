@@ -1598,7 +1598,7 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 							dgFloat32 param = me->m_body->RayCast (line, filter, prefilter, userData, maxParam);
 							if (param < maxParam) {
 								maxParam = param;
-								if (maxParam < dgFloat32 (1.0e-3f)) {
+								if (maxParam < dgFloat32 (1.0e-8f)) {
 									break;
 								}
 							}
@@ -1802,7 +1802,7 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 										totalCount++;
 									}
 								}
-								if (maxParam < 1.0e-4f) {
+								if (maxParam < 1.0e-8f) {
 									break;
 								}
 							}
