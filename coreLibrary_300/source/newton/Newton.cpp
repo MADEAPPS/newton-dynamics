@@ -5586,7 +5586,6 @@ void NewtonBodySetCollisionScale (const NewtonBody* const bodyPtr, dFloat scaleX
 	dgWorld* const world = body->GetWorld();
 	NewtonCollision* const collision = NewtonBodyGetCollision(bodyPtr);
 
-	world->Sync ();
 	dgFloat32 mass = body->GetInvMass().m_w > dgFloat32 (0.0f) ? body->GetMass().m_w : dgFloat32 (0.0f);
 	NewtonCollisionSetScale (collision, scaleX, scaleY, scaleZ);
 
