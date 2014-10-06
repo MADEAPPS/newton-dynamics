@@ -181,7 +181,7 @@
 #define DG_VECTOR_SIMD_SIZE		16
 
 #if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1700))
-	/// starting Visual studio 2012 an up we cna use high performance computing using AMP
+	// starting Visual studio 2012 an up we can use high performance computing using AMP
 	#define _NEWTON_AMP
 #endif
 
