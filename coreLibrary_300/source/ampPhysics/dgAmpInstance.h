@@ -74,14 +74,6 @@ class dgAmpMatrixRightSide
 };
 
 
-class dgAmpJacobianMatrixElement
-{
-	public:
-	dgAmpJacobianPair m_Jt;
-	dgAmpMatrixRightSide m_data;
-};
-
-
 class dgAmpMatrix4x4 
 {
 	public:
@@ -116,15 +108,26 @@ class dgAmpBodyData
 	array<dgAmpMatrix4x4 , 1> m_bodyMatrix;
 	array<dgAmpMatrix4x4 , 1> m_bodyInvInertiaMatrix;
 	
-	std::vector<float_4, dgAmpAllocator<float_4>> m_bodyInvMassCpu;
-	std::vector<dgAmpJacobian, dgAmpAllocator<dgAmpJacobian>> m_bodyDampCpu;
-	std::vector<dgAmpMatrix4x4, dgAmpAllocator<dgAmpJacobian>> m_bodyMatrixCpu;
-	std::vector<dgAmpJacobian, dgAmpAllocator<dgAmpJacobian>> m_bodyVelocityCpu;
+	//std::vector<float_4, dgAmpAllocator<float_4>> m_bodyInvMassCpu;
+	//std::vector<dgAmpJacobian, dgAmpAllocator<dgAmpJacobian>> m_bodyDampCpu;
+	//std::vector<dgAmpMatrix4x4, dgAmpAllocator<dgAmpJacobian>> m_bodyMatrixCpu;
+	//std::vector<dgAmpJacobian, dgAmpAllocator<dgAmpJacobian>> m_bodyVelocityCpu;
+	array_view<float_4, 1> m_bodyInvMassCpu;
+	array_view<dgAmpJacobian, 1> m_bodyDampCpu;
+	array_view<dgAmpMatrix4x4, 1> m_bodyMatrixCpu;
+	array_view<dgAmpJacobian, 1> m_bodyVelocityCpu;
 };
 
 class dgAmpConstraintData
 {
 	public:
+	class dgAmpJacobianMatrixElement
+	{
+		public:
+		dgAmpJacobianPair m_Jt;
+		dgAmpMatrixRightSide m_data;
+	};
+
 	dgAmpConstraintData (dgMemoryAllocator* const allocator);
 	void Alloc (dgInt32 size);
 	void CLean ();
@@ -132,7 +135,8 @@ class dgAmpConstraintData
 	dgInt32 m_currentSize;
 	array<dgAmpJacobianMatrixElement, 1> m_matrixData;
 
-	std::vector<dgAmpJacobianMatrixElement, dgAmpAllocator<dgAmpJacobianMatrixElement>> m_matrixDataCpu;
+	//std::vector<dgAmpJacobianMatrixElement, dgAmpAllocator<dgAmpJacobianMatrixElement>> m_matrixDataCpu;
+	array_view<dgAmpJacobianMatrixElement, 1> m_matrixDataCpu;
 };
 
 

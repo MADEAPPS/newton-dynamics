@@ -33,10 +33,10 @@ dgAmpBodyData::dgAmpBodyData (dgMemoryAllocator* const allocator)
 	,m_bodyInternalForce(m_currentSize)
 	,m_bodyMatrix(m_currentSize)
 	,m_bodyInvInertiaMatrix(m_currentSize)
-	,m_bodyInvMassCpu(dgAmpAllocator<float_4> (allocator))
-	,m_bodyDampCpu(dgAmpAllocator<dgAmpJacobian> (allocator))
-	,m_bodyMatrixCpu(dgAmpAllocator<dgAmpJacobian> (allocator))
-	,m_bodyVelocityCpu(dgAmpAllocator<dgAmpJacobian> (allocator))
+	,m_bodyInvMassCpu(m_bodyInvMass)
+	,m_bodyDampCpu(m_bodyDamp)
+	,m_bodyMatrixCpu(m_bodyMatrix)
+	,m_bodyVelocityCpu(m_bodyVelocity)
 {
 }
 
@@ -45,10 +45,10 @@ void dgAmpBodyData::CLean ()
 	m_currentSize = 1;
 	Alloc (2);
 
-	m_bodyInvMassCpu.shrink_to_fit();
-	m_bodyDampCpu.shrink_to_fit();
-	m_bodyMatrixCpu.shrink_to_fit();
-	m_bodyVelocityCpu.shrink_to_fit();
+	//m_bodyInvMassCpu.shrink_to_fit();
+	//m_bodyDampCpu.shrink_to_fit();
+	//m_bodyMatrixCpu.shrink_to_fit();
+	//m_bodyVelocityCpu.shrink_to_fit();
 }
 
 void dgAmpBodyData::Alloc (dgInt32 count)
@@ -62,20 +62,26 @@ void dgAmpBodyData::Alloc (dgInt32 count)
 		m_bodyVelocity = array<dgAmpJacobian, 1>(m_currentSize);
 		m_bodyNetForce = array<dgAmpJacobian, 1>(m_currentSize);
 		m_bodyInternalForce = array<dgAmpJacobian, 1>(m_currentSize);
-		m_bodyMatrix = array<dgAmpMatrix4x4 , 1> (m_currentSize);
+		m_bodyMatrix = array<dgAmpMatrix4x4, 1> (m_currentSize);
 		m_bodyInvInertiaMatrix = array<dgAmpMatrix4x4 , 1> (m_currentSize);
 		
-		m_bodyDampCpu.resize (m_currentSize);
-		m_bodyMatrixCpu.resize (m_currentSize);
-		m_bodyInvMassCpu.resize (m_currentSize);
-		m_bodyVelocityCpu.resize (m_currentSize);
+		//m_bodyDampCpu.resize (m_currentSize);
+		//m_bodyMatrixCpu.resize (m_currentSize);
+		//m_bodyInvMassCpu.resize (m_currentSize);
+		//m_bodyVelocityCpu.resize (m_currentSize);
+
+		m_bodyDampCpu = array_view<dgAmpJacobian, 1>(m_bodyDamp);
+		m_bodyMatrixCpu = array_view<dgAmpMatrix4x4, 1>(m_bodyMatrix);
+		m_bodyInvMassCpu = array_view<float_4, 1>(m_bodyInvMass);
+		m_bodyVelocityCpu = array_view<dgAmpJacobian, 1>(m_bodyVelocity);
 	}
 }
 
 dgAmpConstraintData::dgAmpConstraintData (dgMemoryAllocator* const allocator)
 	:m_currentSize(1)
 	,m_matrixData(m_currentSize)
-	,m_matrixDataCpu(dgAmpAllocator<dgAmpJacobianMatrixElement> (allocator))
+//	,m_matrixDataCpu(dgAmpAllocator<dgAmpJacobianMatrixElement> (allocator))
+	,m_matrixDataCpu(m_matrixData)
 {
 	dgAssert ((sizeof (dgAmpJacobianMatrixElement) & 0x0f) == 0);
 }
@@ -84,8 +90,7 @@ void dgAmpConstraintData::CLean ()
 {
 	m_currentSize = 1;
 	Alloc (2);
-
-	m_matrixDataCpu.shrink_to_fit();
+//	m_matrixDataCpu.shrink_to_fit();
 }
 
 void dgAmpConstraintData::Alloc (dgInt32 count)
@@ -96,7 +101,8 @@ void dgAmpConstraintData::Alloc (dgInt32 count)
 		}
 		m_matrixData = array<dgAmpJacobianMatrixElement, 1> (m_currentSize);
 
-		m_matrixDataCpu.resize (m_currentSize);
+		//m_matrixDataCpu.resize (m_currentSize);
+		m_matrixDataCpu = array_view<dgAmpJacobianMatrixElement, 1> (m_matrixData);
 	}
 }
 

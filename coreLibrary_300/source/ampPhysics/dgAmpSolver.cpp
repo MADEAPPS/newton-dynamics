@@ -959,10 +959,10 @@ void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const 
 	const int bodyCount = syncData->m_bodyCount;
 	extent<1> compute_domain(bodyCount);
 
-	copy (m_bodyDampCpu.begin(), m_bodyDampCpu.begin() + bodyCount, m_bodyDamp);
-	copy (m_bodyMatrixCpu.begin(), m_bodyMatrixCpu.begin() + bodyCount, m_bodyMatrix);
-	copy (m_bodyInvMassCpu.begin(), m_bodyInvMassCpu.begin() + bodyCount, m_bodyInvMass);
-	copy (m_bodyVelocityCpu.begin(), m_bodyVelocityCpu.begin() + bodyCount, m_bodyVelocity);
+	//copy (m_bodyDampCpu.begin(), m_bodyDampCpu.begin() + bodyCount, m_bodyDamp);
+	//copy (m_bodyMatrixCpu.begin(), m_bodyMatrixCpu.begin() + bodyCount, m_bodyMatrix);
+	//copy (m_bodyInvMassCpu.begin(), m_bodyInvMassCpu.begin() + bodyCount, m_bodyInvMass);
+	//copy (m_bodyVelocityCpu.begin(), m_bodyVelocityCpu.begin() + bodyCount, m_bodyVelocity);
 	
 	const array<float_4, 1>& bodyInvMass = m_bodyInvMass;
 	const array<dgAmpMatrix4x4, 1>& bodyMatrix = m_bodyMatrix;
@@ -1198,8 +1198,8 @@ void dgAmpInstance::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const
 	world->SynchronizationBarrier();
 
 	dgAssert (syncData->m_jacobianMatrixRowAtomicIndex == syncData->m_rowCount);
-	dgInt32 rowCount = syncData->m_rowCount;
-	copy (m_matrixDataCpu.begin(), m_matrixDataCpu.begin() + rowCount, m_matrixData);
+//	dgInt32 rowCount = syncData->m_rowCount;
+//	copy (m_matrixDataCpu.begin(), m_matrixDataCpu.begin() + rowCount, m_matrixData);
 
 }
 
