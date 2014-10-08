@@ -188,7 +188,7 @@
     </ClCompile>
     <ClCompile Include="..\dIntermediateLanguage\dDataFlowGraph.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dThreeAdressStmt.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILInstr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dIntermediateLanguage\dBasicBlockList.h" />
@@ -196,7 +196,7 @@
     <ClInclude Include="..\dIntermediateLanguage\dCILstdafx.h" />
     <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dThreeAdressStmt.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILInstr.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\projects\visualStudio_2010_static_mt\dContainers.vcxproj">

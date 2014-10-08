@@ -15,7 +15,7 @@
 
 #include "dCILstdafx.h"
 #include "dCIL.h"
-#include "dThreeAdressStmt.h"
+#include "dCILInstr.h"
 
 class dBasicBlock
 {

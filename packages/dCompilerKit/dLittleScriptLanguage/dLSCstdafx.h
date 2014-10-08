@@ -25,11 +25,12 @@
 #include <dRtti.h>
 #include <dString.h>
 #include <dCILstdafx.h>
+#include <dCILInstr.h>
 #include <dRefCounter.h>
 #include <dDataFlowGraph.h>
 #include <dBasicBlockList.h>
 #include <dVirtualMachine.h>
-#include <dThreeAdressStmt.h>
+
 #include <dContainersStdAfx.h>
 
 

@@ -11,7 +11,7 @@
 
 #include "dCILstdafx.h"
 #include "dCIL.h"
-#include "dThreeAdressStmt.h"
+#include "dCILInstr.h"
 
 #ifdef _DEBUG
 int dThreeAdressStmt::m_debugCount = 0;
