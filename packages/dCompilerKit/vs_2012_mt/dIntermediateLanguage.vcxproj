@@ -180,6 +180,8 @@
   <ItemGroup>
     <ClCompile Include="..\dIntermediateLanguage\dBasicBlockList.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCIL.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILInstrLoadStore.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILInstrMiscellaneous.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCILstdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -193,6 +195,8 @@
   <ItemGroup>
     <ClInclude Include="..\dIntermediateLanguage\dBasicBlockList.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCIL.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILInstrLoadStore.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILInstrMiscellaneous.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILstdafx.h" />
     <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.h" />

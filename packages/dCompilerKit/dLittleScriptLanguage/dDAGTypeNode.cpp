@@ -21,7 +21,7 @@ dInitRtti(dDAGTypeNode);
 dDAGTypeNode::dDAGTypeNode(dList<dDAG*>& allNodes, const dString& typeName)
 	:dDAG(allNodes)
 	,m_dimensions()
-	,m_type (dThreeAdressStmt::GetTypeID (typeName))
+	,m_type (dCILInstr::GetTypeID (typeName))
 {
 }
 
@@ -49,7 +49,7 @@ dDAG* dDAGTypeNode::Clone (dList<dDAG*>& allNodes) const
 }
 
 
-const dThreeAdressStmt::dArgType& dDAGTypeNode::GetArgType() const
+const dCILInstr::dArgType& dDAGTypeNode::GetArgType() const
 {
 	return m_type;
 }

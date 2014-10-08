@@ -39,6 +39,8 @@ void dDAGExpressionNodePrefixPostfix::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 {
+dAssert (0);
+/*
 	m_expression->CompileCIL(cil);
 	dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
 
@@ -63,5 +65,6 @@ void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 	} else {
 		m_result = arg1;
 	}
+*/
 }
 

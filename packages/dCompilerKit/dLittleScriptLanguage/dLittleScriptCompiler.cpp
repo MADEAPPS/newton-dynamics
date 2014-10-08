@@ -258,20 +258,20 @@ dDAGScopeBlockNode* dScriptCompiler::GetCurrentScope() const
 dScriptCompiler::dUserVariable dScriptCompiler::NewExpressionNodeConstant (const dUserVariable& value)
 {
 	dUserVariable returnNode;
-	dThreeAdressStmt::dArgType type (dThreeAdressStmt::m_constInt);
+	dCILInstr::dArgType type (dCILInstr::m_constInt);
 
 	switch (int (value.m_token))
 	{
 		case _THIS:
-			type = dThreeAdressStmt::m_classPointer;
+			type = dCILInstr::m_classPointer;
 			break;
 
 		case _FLOAT_CONST:
-			type = dThreeAdressStmt::m_constFloat;
+			type = dCILInstr::m_constFloat;
 			break;
 
 		case _INTEGER_CONST:
-			type = dThreeAdressStmt::m_constInt;
+			type = dCILInstr::m_constInt;
 			break;
 
 //		case STRING_VALUE:

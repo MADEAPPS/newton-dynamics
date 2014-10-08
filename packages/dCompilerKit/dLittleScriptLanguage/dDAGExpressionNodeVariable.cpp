@@ -93,7 +93,7 @@ void dDAGExpressionNodeVariable::ConnectParent(dDAG* const parent)
 dCIL::dReturnValue dDAGExpressionNodeVariable::Evalue(const dDAGFunctionNode* const function)
 {
 	if (function) {
-		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const node = FindLocalVariable (m_name);
+		dTree<dCILInstr::dArg, dString>::dTreeNode* const node = FindLocalVariable (m_name);
 		dAssert (node);
 
 	} else {
@@ -119,6 +119,8 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 {
 //	dDAGFunctionNode* const function = GetFunction();
 	if (m_dimExpressions.GetCount()) {
+dAssert (0);
+/*
 		dDAGDimensionNode* const dim = m_dimExpressions.GetFirst()->GetInfo();
 		dim->CompileCIL(cil);
 
@@ -163,8 +165,9 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 		tmp.m_arg2.m_label = result;
 		DTRACE_INTRUCTION (&tmp);
 		m_result = tmp.m_arg0; 
+*/
 	} else {
-		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_name);
+		dTree<dCILInstr::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_name);
 		dAssert (variable);
 		m_result = variable->GetInfo();
 	}

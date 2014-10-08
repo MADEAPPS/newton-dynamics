@@ -36,6 +36,8 @@ dAssert (0);
 
 void dDAGFunctionStatementBREAK::CompileCIL(dCIL& cil)  
 {
+dAssert (0);
+/*
 	for (dDAG* node = m_parent; node && (node->GetTypeId() != dDAGFunctionNode::GetRttiType()); node = node->m_parent) {
 		if (node->IsType(dDAGScopeBlockNode::GetRttiType())) {
 			dDAGScopeBlockNode* const scope = (dDAGScopeBlockNode*)node;
@@ -60,4 +62,5 @@ void dDAGFunctionStatementBREAK::CompileCIL(dCIL& cil)
 
 	// warning break instruction outside of a flow control statement
 	dAssert (0);
+*/
 }

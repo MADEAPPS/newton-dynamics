@@ -49,6 +49,8 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 {
 	m_expression->CompileCIL(cil);
 
+	dAssert (0);
+/*
 	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 	stmt.m_instruction = dThreeAdressStmt::m_if;
 	stmt.m_operator = dThreeAdressStmt::m_nothing;
@@ -105,4 +107,5 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 		exitLabel.m_arg0.m_label = gotoExitStmt0.m_arg0.m_label;
 		DTRACE_INTRUCTION (&exitLabel);
 	}
+*/
 }

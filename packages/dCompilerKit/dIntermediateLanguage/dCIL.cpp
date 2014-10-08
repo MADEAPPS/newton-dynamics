@@ -120,12 +120,15 @@ dCIL::dListNode* dCIL::NewStatement()
 
 void dCIL::Trace()
 {
+dAssert (0);
+/*
 	for (dCIL::dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		const dThreeAdressStmt& stmt = node->GetInfo();
 //		DTRACE_INTRUCTION(&stmt);
 		stmt.Trace();
 	}
 	dTrace(("\n"));
+*/
 }
 
 
@@ -273,6 +276,9 @@ dString dCIL::GetName (llvm::Value* const value) const
 
 dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFunction)
 {
+dAssert (0);
+return NULL;
+/*
 	const llvm::StringRef& functionName = llvmFunction.getName();
 	const llvm::Type* const returnType = llvmFunction.getReturnType();
 	llvm::Type::TypeID returnTypeID = returnType->getTypeID();
@@ -335,6 +341,7 @@ dCIL::dListNode* dCIL::EmitFunctionDeclaration (const llvm::Function& llvmFuncti
 		DTRACE_INTRUCTION (&stmt);
 	}
 	return functionNode;
+*/
 }
 
 void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& visited, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions)
@@ -355,6 +362,8 @@ void dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicB
 
 void dCIL::ConvertLLVMFunctionToNVMFunction (const llvm::Function& llvmFunction)
 {
+dAssert (0);
+/*
 	// emet function decalaration
 	dCIL::dListNode* const function = EmitFunctionDeclaration (llvmFunction);
 
@@ -446,11 +455,15 @@ DTRACE_INTRUCTION (&stmt);
 
 //Trace();
 	RegisterAllocation (function);
+*/
 }
 
 
-dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions)
+dCIL::dListNode* dCIL::EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions)
 {
+dAssert (0);
+return NULL;
+/*
 	const llvm::StringRef& blockName = block->getName ();
 
 	dCIL::dListNode* const blockLabelNode = NewStatement();
@@ -532,10 +545,14 @@ dCIL::dListNode*dCIL::EmitBasicBlockBody(const llvm::Function& function, const l
 	}
 
 	return blockLabelNode;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitCall (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::CallInst* const instr =  (llvm::CallInst*) intruction;
 
 	int argCount = instr->getNumOperands();
@@ -578,10 +595,14 @@ dCIL::dListNode* dCIL::EmitCall (const llvm::Instruction* const intruction)
 		node = copyNode;
 	}
 	return node;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::ReturnInst* const instr =  (llvm::ReturnInst*) intruction;
 
 
@@ -597,7 +618,7 @@ dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
 			case dThreeAdressStmt::m_constInt:
 			{
 				dAssert (0);
-	/*
+#if 0
 				dCIL::dListNode* const node = NewStatement();
 				dThreeAdressStmt& stmt = node->GetInfo();
 
@@ -614,7 +635,7 @@ dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
 				arg1Label = stmt.m_arg0.m_label;
 
 				DTRACE_INTRUCTION (&stmt);
-	*/
+#endif
 				break;
 			}
 
@@ -636,10 +657,15 @@ dCIL::dListNode* dCIL::EmitReturn (const llvm::Instruction* const intruction)
 
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
+
 	llvm::ICmpInst* const instr =  (llvm::ICmpInst*) intruction;
 
 	llvm::CmpInst::Predicate predicate = instr->getPredicate();
@@ -701,10 +727,15 @@ dCIL::dListNode* dCIL::EmitIntegerCompare (const llvm::Instruction* const intruc
 	stmt.m_arg2.m_label = GetName (arg1);
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
+
 	llvm::BranchInst* const instr =  (llvm::BranchInst*) intruction;
 
 	dCIL::dListNode* const node = NewStatement();
@@ -741,10 +772,14 @@ dCIL::dListNode* dCIL::EmitIntegerBranch (const llvm::Instruction* const intruct
 
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitPhiNode (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::PHINode* const instr =  (llvm::PHINode*) intruction;
 	int agrCount = instr->getNumIncomingValues();
 
@@ -774,10 +809,14 @@ dCIL::dListNode* dCIL::EmitPhiNode (const llvm::Instruction* const intruction)
 	DTRACE_INTRUCTION (&stmt);
 
 	return  node;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitLoad (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::LoadInst* const instr =  (llvm::LoadInst*) intruction;
 
 	dAssert (instr->getNumOperands() == 1);
@@ -797,10 +836,15 @@ dCIL::dListNode* dCIL::EmitLoad (const llvm::Instruction* const intruction)
 
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+*/
 }
 
 dCIL::dListNode* dCIL::EmitStore (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
+
 	llvm::StoreInst* const instr =  (llvm::StoreInst*) intruction;
 
 	dAssert (instr->getNumOperands() == 2);
@@ -822,11 +866,15 @@ dCIL::dListNode* dCIL::EmitStore (const llvm::Instruction* const intruction)
 
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+*/
 }
 
 
 dCIL::dListNode* dCIL::EmitGetElementPtr (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::GetElementPtrInst* const instr =  (llvm::GetElementPtrInst*) intruction;
 
 	int agrCount = instr->getNumOperands();
@@ -862,11 +910,15 @@ dCIL::dListNode* dCIL::EmitGetElementPtr (const llvm::Instruction* const intruct
 	stmt.m_arg2.m_label = GetName (arg1);
 	DTRACE_INTRUCTION (&stmt);
 	return  node;
+*/
 }
 
 
 dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intruction)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::BinaryOperator* const instr = (llvm::BinaryOperator*) intruction;
 
 	dThreeAdressStmt::dOperator operation = dThreeAdressStmt::m_nothing;
@@ -915,6 +967,7 @@ dCIL::dListNode* dCIL::EmitIntegerAritmetic (const llvm::Instruction* const intr
 	stmt.m_arg2.m_label = GetName (arg1);
 	DTRACE_INTRUCTION (&stmt);
 	return node;
+*/
 }
 
 
@@ -928,6 +981,4 @@ void dCIL::RegisterAllocation (dListNode* const functionNode)
 
 	// do register allocation before removing dead jumps and nops
 	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
-
-
 }

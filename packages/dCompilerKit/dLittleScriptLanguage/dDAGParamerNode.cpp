@@ -61,6 +61,8 @@ void dDAGParameterNode::ConnectParent(dDAG* const parent)
 
 void dDAGParameterNode::CompileCIL(dCIL& cil)  
 {
+	dAssert (0);
+/*
 	dDAGScopeBlockNode* const scope = GetScope();
 	dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const varNameNode = scope->FindVariable(m_name);
 	dAssert (varNameNode);
@@ -71,4 +73,5 @@ void dDAGParameterNode::CompileCIL(dCIL& cil)
 	fntArg.m_arg1 = fntArg.m_arg0;
 	m_result = fntArg.m_arg0;
 	DTRACE_INTRUCTION (&fntArg);
+*/
 }

@@ -30,8 +30,9 @@
 #include <dDataFlowGraph.h>
 #include <dBasicBlockList.h>
 #include <dVirtualMachine.h>
-
 #include <dContainersStdAfx.h>
+#include <dCILInstrLoadStore.h>
+#include <dCILInstrMiscellaneous.h>
 
 
 #define D_DEBUG_PARCEL

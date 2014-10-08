@@ -55,6 +55,8 @@ void dDAGExpressionNodeFunctionCall::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)  
 {
+dAssert (0);
+/*
 	dDAGClassNode* const myClass = GetClass();
 	dAssert (myClass);
 	//dDAGFunctionNode* const myFunction = myClass->GetCurrentFunction ();
@@ -95,4 +97,5 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 	call.m_arg0 = m_result;
 	call.m_arg1.m_label = name;
 	DTRACE_INTRUCTION (&call);
+*/
 }

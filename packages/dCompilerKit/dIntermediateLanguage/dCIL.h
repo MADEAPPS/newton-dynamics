@@ -31,9 +31,11 @@ inline dString GetReturnVariableName()
 	return GetTemporaryVariableName(0);
 }
 
+class dCILInstr;
 class dDataFlowGraph; 
 
-class dCIL: public dList<dThreeAdressStmt>
+//class dCIL: public dList<dThreeAdressStmt>
+class dCIL: public  dList<dCILInstr*>
 {
 	public:
 

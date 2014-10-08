@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef  __dTreeAdressStmt_H_
-#define  __dTreeAdressStmt_H_
+#ifndef  _DCIL_INSTRUC_H_
+#define  _DCIL_INSTRUC_H_
 
 #ifdef _DEBUG
 	#define TRACE_INTERMEDIATE_CODE
@@ -21,6 +21,9 @@
 #else
 	#define DTRACE_INTRUCTION(x)
 #endif
+
+
+class dCIL;
 
 class dThreeAdressStmt
 {
@@ -46,18 +49,21 @@ class dThreeAdressStmt
 		dString m_name;
 	};
 
-	struct dArgType
+	class dArgType
 	{
+		public:
 		dArgType ()
 			:m_intrinsicType(m_int)
 			,m_isPointer(false)
 		{
+			dAssert (0);
 		}
 
 		dArgType (dIntrisicType intrinsicType)
 			:m_intrinsicType(intrinsicType)
 			,m_isPointer(false)
 		{
+			dAssert (0);
 		}
 
 		int GetSizeInByte() const;
@@ -69,12 +75,14 @@ class dThreeAdressStmt
 		bool m_isPointer;
 	};
 
-	struct dArg: public dArgType
+	class dArg: public dArgType
 	{
+		public:
 		dArg ()
 			:dArgType()
 			,m_label("")
 		{
+			dAssert (0);
 		}
 
 		const dArgType& GetType () const
@@ -162,6 +170,97 @@ class dThreeAdressStmt
 //	static dString GetTypeString (const dArgType argType);
 	static dIntrisicType GetTypeID (const dString& typeName);
 
+	static dMapTable m_maptable[];
+};
+
+
+
+class dCILInstr
+{
+	public:
+	enum dIntrisicType
+	{
+		m_void,
+		m_bool,
+		m_byte,
+		m_short,
+		m_int,
+		m_long,
+		m_float,
+		m_double,
+		m_classPointer,
+		m_constInt,
+		m_constFloat,
+	};
+
+	class dMapTable 
+	{
+		public:
+		dIntrisicType m_intrinsicType;
+		dString m_name;
+	};
+
+	class dArgType
+	{
+		public:
+		dArgType ()
+			:m_intrinsicType(m_int)
+			,m_isPointer(false)
+		{
+		}
+
+		dArgType (dIntrisicType intrinsicType)
+			:m_intrinsicType(intrinsicType)
+			,m_isPointer(false)
+		{
+		}
+
+		int GetSizeInByte() const;
+
+		dString GetTypeName () const;
+		void SetType (const dArgType& type);
+
+		dIntrisicType m_intrinsicType;
+		bool m_isPointer;
+	};
+
+	class dArg: public dArgType
+	{
+		public:
+		dArg ()
+			:dArgType()
+			,m_label("")
+		{
+		}
+
+		dArg (const dString& label, const dArgType& type)
+			:dArgType(type)
+			,m_label(label)
+		{
+		}
+
+		const dArgType& GetType () const
+		{
+			return *this;
+		}
+
+		void SetType (const dArgType& type);
+		void SetType (dIntrisicType intrinsicType, bool pointer);
+		dString m_label;
+	};
+
+
+	dCILInstr (dCIL& program);
+	virtual ~dCILInstr ();
+
+	void Trace() const;
+	virtual void Serialize(char* const textOut) const;
+
+	dList<dCILInstr*>::dListNode* GetNode() const;
+
+
+	dList<dCILInstr*>::dListNode* m_myNode;
+	static dIntrisicType GetTypeID (const dString& typeName);
 	static dMapTable m_maptable[];
 };
 

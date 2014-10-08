@@ -55,6 +55,8 @@ return dCIL::dReturnValue();
 
 void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)  
 {
+dAssert (0);
+/*
 	m_expression->CompileCIL(cil); 
 	if (m_leftVariable->m_dimExpressions.GetCount()) {
 		dDAGDimensionNode* const dim = m_leftVariable->m_dimExpressions.GetFirst()->GetInfo();
@@ -65,7 +67,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 			dAssert (0);
 			dDAGDimensionNode* const dim = node->GetInfo();
 			dim->CompileCIL(cil);
-/*			
+#if 0			
 			dThreeAdressStmt& stmtMul = cil.NewStatement()->GetInfo();
 			stmtMul.m_instruction = dThreeAdressStmt::m_assigment;
 			stmtMul.m_operator = dThreeAdressStmt::m_mul;
@@ -85,7 +87,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 			result = stmtAdd.m_arg0.m_label;
 
 			DTRACE_INTRUCTION (&stmtAdd);
-*/
+#endif
 		}
 
 		dAssert (m_leftVariable->m_parent);
@@ -112,6 +114,7 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 		stmt.m_arg1 = arg1;
 		DTRACE_INTRUCTION (&stmt);
 	}
+*/
 }
 
 

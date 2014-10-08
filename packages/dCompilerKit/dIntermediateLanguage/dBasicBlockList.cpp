@@ -54,6 +54,8 @@ void dBasicBlocksList::Clear ()
 
 void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 {
+dAssert (0);
+/*
 	m_begin = functionNode;
 	m_end = functionNode->GetNext();
 	for (; m_end && (m_end->GetInfo().m_instruction != dThreeAdressStmt::m_function); m_end = m_end->GetNext());
@@ -96,5 +98,6 @@ void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 			}
 		} 
 	}
+*/
 }
 

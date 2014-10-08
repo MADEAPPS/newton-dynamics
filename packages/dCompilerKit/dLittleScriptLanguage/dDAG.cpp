@@ -47,10 +47,10 @@ dDAGScopeBlockNode* dDAG::GetScope() const
 	return NULL;
 }
 
-dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* dDAG::FindLocalVariable(const dString& name) const
+dTree<dCILInstr::dArg, dString>::dTreeNode* dDAG::FindLocalVariable(const dString& name) const
 {
 	for (const dDAGScopeBlockNode* scope = GetScope(); scope; scope = scope->m_parent->GetScope()) {
-		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const variableNode = scope->m_localVariables.Find(name);	
+		dTree<dCILInstr::dArg, dString>::dTreeNode* const variableNode = scope->m_localVariables.Find(name);	
 		if (variableNode) {
 			return variableNode;
 		}
@@ -59,9 +59,10 @@ dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* dDAG::FindLocalVariable(const
 }
 
 
-dThreeAdressStmt::dArg dDAG::LoadLocalVariable (dCIL& cil, const dThreeAdressStmt::dArg& arg) const
+dCILInstr::dArg dDAG::LoadLocalVariable (dCIL& cil, const dCILInstr::dArg& arg) const
 {
 	if (arg.m_label.Find(m_scopePrefix) == 0) {
+/*
 		dThreeAdressStmt& loadVar = cil.NewStatement()->GetInfo();
 		loadVar.m_instruction = dThreeAdressStmt::m_loadBase;
 		loadVar.m_arg1 = arg;
@@ -69,6 +70,10 @@ dThreeAdressStmt::dArg dDAG::LoadLocalVariable (dCIL& cil, const dThreeAdressStm
 		loadVar.m_arg0.SetType (loadVar.m_arg1);
 		DTRACE_INTRUCTION (&loadVar);
 		return loadVar.m_arg0;
+*/
+		dCILInstrLoad* const load = new dCILInstrLoad (cil, arg.m_label, arg);
+		DTRACE_INTRUCTION (load);
+		return load->GetResult();
 	}
 	return arg;
 }

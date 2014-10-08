@@ -80,6 +80,8 @@ m_flowGraph->m_cil->Trace();
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
 {
+	dAssert (0);
+/*
 	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dThreeAdressStmt& stmt = stmtNode->GetInfo();	
 
@@ -233,6 +235,7 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 //			}
 //		}
 //	}
+*/
 }
 
 
@@ -269,6 +272,8 @@ bool dRegisterInterferenceGraph::IsTempVariable (const dString& name) const
 
 void dRegisterInterferenceGraph::Build()
 {
+	dAssert (0);
+/*
 	dTree<dDataFlowGraph::dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_flowGraph->m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowGraph::dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -446,6 +451,7 @@ void dRegisterInterferenceGraph::Build()
 			}
 		}
 	}
+*/
 }
 
 dRegisterInterferenceGraph::dTreeNode* dRegisterInterferenceGraph::GetBestNode()
@@ -569,6 +575,9 @@ void dRegisterInterferenceGraph::CoalesceNodes()
 
 int dRegisterInterferenceGraph::ColorGraph ()
 {
+dAssert (0);
+return 0;
+/*
 	dList<dTreeNode*> registerOrder;
 
 //	m_flowGraph->m_savedRegistersMask = 0;
@@ -689,7 +698,7 @@ int dRegisterInterferenceGraph::ColorGraph ()
 		//m_flowGraph->m_registersUsedMask |= (1 << variable.m_registerIndex);
 		registersUsed = dMax (registersUsed, variable.m_registerIndex);
 	}
-/*
+#if 0
 	// remap register
 	int count = 0;
 	int* registerCost = new int[registerOrder.GetCount()];
@@ -749,8 +758,9 @@ int dRegisterInterferenceGraph::ColorGraph ()
 	
 	delete[] registerCost;
 	delete[] registerNode;
-*/
+#endif
 	return registersUsed + 1;
+*/
 }
 
 

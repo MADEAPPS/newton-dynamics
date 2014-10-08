@@ -431,3 +431,101 @@ void dThreeAdressStmt::Trace () const
 	dTrace ((text));
 //	#endif
 }
+
+
+
+
+
+
+
+
+
+dCILInstr::dMapTable dCILInstr::m_maptable[] = 
+{
+	{dCILInstr::m_void, "void"}, 
+	{dCILInstr::m_bool, "bool"}, 
+	{dCILInstr::m_byte, "byte"}, 
+	{dCILInstr::m_short, "short"}, 
+	{dCILInstr::m_int, "int"}, 
+	{dCILInstr::m_long, "long"}, 
+	{dCILInstr::m_float, "float"}, 
+	{dCILInstr::m_double, "double"}, 
+	{dCILInstr::m_classPointer, "classPointer"},
+	{dCILInstr::m_constInt, "constInt"},
+	{dCILInstr::m_constFloat, "constFloat"}
+};
+
+
+
+
+
+void dCILInstr::dArgType::SetType (const dCILInstr::dArgType& type)
+{
+	m_isPointer = type.m_isPointer;
+	m_intrinsicType = type.m_intrinsicType;
+}
+
+
+
+dCILInstr::dIntrisicType dCILInstr::GetTypeID (const dString& typeName)
+{
+	for (int i = 0; i < sizeof (m_maptable) / sizeof (m_maptable[0]); i ++) {
+		if (m_maptable[i].m_name == typeName) {
+			return m_maptable[i].m_intrinsicType;
+		}
+	}
+	return dCILInstr::m_int;
+}
+
+
+
+dString dCILInstr::dArgType::GetTypeName () const 
+{
+	dAssert (m_intrinsicType < sizeof (m_maptable) / sizeof (m_maptable[0]));
+	if (m_isPointer) {
+		return m_maptable[m_intrinsicType].m_name + dCIL::m_pointerDecoration;
+	} else {
+		return m_maptable[m_intrinsicType].m_name;
+	}
+}
+
+void dCILInstr::dArg::SetType (const dArgType& type)
+{
+	dArgType::SetType (type);
+}
+
+void dCILInstr::dArg::SetType (dIntrisicType intrinsicType, bool pointer)
+{
+	m_isPointer = pointer;
+	m_intrinsicType = intrinsicType;
+}
+
+
+
+dCILInstr::dCILInstr (dCIL& program)
+	:m_myNode (program.Append (this))
+{
+
+}
+
+dCILInstr::~dCILInstr ()
+{
+}
+
+
+dList<dCILInstr*>::dListNode* dCILInstr::GetNode() const
+{
+	return m_myNode;
+}
+
+void dCILInstr::Serialize(char* const textOut) const
+{
+	textOut[0] = 0;
+}
+
+void dCILInstr::Trace() const
+{
+	char text[4096];
+	Serialize(text);
+	dTrace ((text));
+}

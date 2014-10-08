@@ -19,14 +19,14 @@
 class dDAGExpressionNodeConstant: public dDAGExpressionNode
 {
 	public:
-	dDAGExpressionNodeConstant (dList<dDAG*>& allNodes, dThreeAdressStmt::dArgType type, const char* const identifier);
+	dDAGExpressionNodeConstant (dList<dDAG*>& allNodes, dCILInstr::dArgType type, const char* const identifier);
 	~dDAGExpressionNodeConstant(void);
 
 	virtual dCIL::dReturnValue Evalue(const dDAGFunctionNode* const function);
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
-	dThreeAdressStmt::dArgType m_type;
+	dCILInstr::dArgType m_type;
 	dDAGRtti(dDAGExpressionNode);
 };
 

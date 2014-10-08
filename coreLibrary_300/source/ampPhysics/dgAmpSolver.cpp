@@ -1177,7 +1177,6 @@ void dgAmpInstance::BuildJacobianMatrixParallelKernel (void* const context, void
 
 //	dgVector zero (dgFloat32 (0.0f));
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-
 		dgInt32 jointIndex = jointInfoIndexArray[i].m_jointIndex;
 		dgJointInfo* const jointInfo = &constraintArray[jointIndex];
 		dgInt32 rowBase = dgAtomicExchangeAndAdd(&syncData->m_jacobianMatrixRowAtomicIndex, jointInfo->m_autoPaircount);
@@ -1201,5 +1200,13 @@ void dgAmpInstance::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const
 //	dgInt32 rowCount = syncData->m_rowCount;
 //	copy (m_matrixDataCpu.begin(), m_matrixDataCpu.begin() + rowCount, m_matrixData);
 
+	const int jountCount = syncData->m_jointCount;
+	extent<1> compute_domain(jountCount);
+
+	array<dgAmpJacobianMatrixElement, 1>& matrixData = m_matrixData;
+    parallel_for_each (compute_domain, [=, &matrixData] (index<1> idx) restrict(amp,cpu)
+	{
+
+	});
 }
 

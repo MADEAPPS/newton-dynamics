@@ -39,6 +39,8 @@ void dDAGFunctionStatementDO::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementDO::CompileCIL(dCIL& cil)  
 {
+dAssert (0);
+/*
 	dCIL::dListNode* const blockTerminatorNode = cil.NewStatement();
 	dThreeAdressStmt& blockTerminator = blockTerminatorNode->GetInfo();
 	blockTerminator.m_instruction = dThreeAdressStmt::m_goto;
@@ -52,4 +54,5 @@ void dDAGFunctionStatementDO::CompileCIL(dCIL& cil)
 	entryLabel.m_arg0 = blockTerminator.m_arg0;
 	DTRACE_INTRUCTION (&entryLabel);
 	CompileCILLoopBody(cil, entryLabelNode, NULL);
+*/
 }

@@ -60,10 +60,13 @@ void dDAGDimensionNode::ConnectParent(dDAG* const parent)
 
 void dDAGDimensionNode::CompileCIL(dCIL& cil)  
 {
+dAssert (0);
+/*
 	if (m_dimExp) {
 		m_dimExp->CompileCIL(cil) ;
 		m_result = LoadLocalVariable(cil, m_dimExp->m_result);
 	} else {
 		dAssert (0);
 	}
+*/
 }

@@ -40,6 +40,8 @@ void dDAGFunctionStatementWHILE::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)  
 {
+	dAssert (0);
+/*
 	dCIL::dListNode* startExpressionTestNode = NULL;
 
 	dString startLabel (cil.NewLabel());
@@ -75,4 +77,5 @@ void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)
 		stmt.m_falseTargetJump = exitLabelStmtNode;
 		stmt.m_arg2 = exitLabelStmtNode->GetInfo().m_arg0; 
 	}
+*/
 }

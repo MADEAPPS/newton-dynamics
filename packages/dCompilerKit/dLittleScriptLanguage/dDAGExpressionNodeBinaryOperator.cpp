@@ -208,10 +208,13 @@ return dCIL::dReturnValue();
 void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)  
 {
 	m_expressionA->CompileCIL(cil);
-	dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expressionA->m_result));
 
+	dCILInstr::dArg arg1 (LoadLocalVariable(cil, m_expressionA->m_result));
 	m_expressionB->CompileCIL(cil);
-	dThreeAdressStmt::dArg arg2 (LoadLocalVariable(cil, m_expressionB->m_result));
+	dCILInstr::dArg arg2 (LoadLocalVariable(cil, m_expressionB->m_result));
+
+dAssert (0);
+/*
 
 	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
 	m_result.m_label = cil.NewTemp ();		
@@ -300,4 +303,5 @@ void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)
 	}
 
 	DTRACE_INTRUCTION (&stmt);
+*/
 }

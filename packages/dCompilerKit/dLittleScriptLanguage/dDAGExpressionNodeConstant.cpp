@@ -19,7 +19,7 @@
 dInitRtti(dDAGExpressionNodeConstant);
 dInitRtti(dDAGExpressionNodeOperatorThisConstant);
 
-dDAGExpressionNodeConstant::dDAGExpressionNodeConstant(dList<dDAG*>& allNodes, dThreeAdressStmt::dArgType type, const char* const value)
+dDAGExpressionNodeConstant::dDAGExpressionNodeConstant(dList<dDAG*>& allNodes, dCILInstr::dArgType type, const char* const value)
 	:dDAGExpressionNode(allNodes)
 	,m_type(type)
 {
@@ -112,8 +112,7 @@ void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 
 
 dDAGExpressionNodeOperatorThisConstant::dDAGExpressionNodeOperatorThisConstant (dList<dDAG*>& allNodes)
-//	:dDAGExpressionNodeConstant(allNodes, dThreeAdressStmt::m_classPointer, "this")
-	:dDAGExpressionNodeConstant(allNodes, dThreeAdressStmt::dArgType(), "this")
+	:dDAGExpressionNodeConstant(allNodes, dCILInstr::dArgType(), "this")
 {
 	dAssert (0);
 }
