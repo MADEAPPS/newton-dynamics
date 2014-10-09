@@ -180,6 +180,8 @@
   <ItemGroup>
     <ClCompile Include="..\dIntermediateLanguage\dBasicBlockList.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCIL.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILInstrAritmetic.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILInstrBranch.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCILInstrLoadStore.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCILInstrMiscellaneous.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCILstdafx.cpp">
@@ -195,6 +197,8 @@
   <ItemGroup>
     <ClInclude Include="..\dIntermediateLanguage\dBasicBlockList.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCIL.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILInstrArithmetic.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILInstrBranch.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILInstrLoadStore.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILInstrMiscellaneous.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILstdafx.h" />

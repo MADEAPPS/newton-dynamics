@@ -41,20 +41,20 @@ void dDAGExpressionNodeBinaryOperator::ConnectParent(dDAG* const parent)
 }
 
 //void dDAGExpressionNodeBinaryOperator::PromoteTypes (dCIL::dReturnValue& typeA, dCIL::dReturnValue& typeB) const
-dThreeAdressStmt::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const dThreeAdressStmt::dArgType typeA, const dThreeAdressStmt::dArgType typeB) const
+dCILInstr::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const dCILInstr::dArgType typeA, const dCILInstr::dArgType typeB) const
 {
-	dThreeAdressStmt::dArgType type (typeA);
+	dCILInstr::dArgType type (typeA);
 	dAssert (!typeA.m_isPointer);
 	dAssert (!typeB.m_isPointer);
 	if (typeA.m_intrinsicType != typeB.m_intrinsicType) {
 		switch (typeA.m_intrinsicType) 
 		{
-			case dThreeAdressStmt::m_constInt:
+			case dCILInstr::m_constInt:
 			{
 				switch (typeB.m_intrinsicType) 
 				{
-					case dThreeAdressStmt::m_int:
-						type.m_intrinsicType = dThreeAdressStmt::m_int;
+					case dCILInstr::m_int:
+						type.m_intrinsicType = dCILInstr::m_int;
 						break;
 					default:;
 						dAssert (0);
@@ -62,12 +62,12 @@ dThreeAdressStmt::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const
 				break;
 			}
 
-			case dThreeAdressStmt::m_int:
+			case dCILInstr::m_int:
 			{
 				switch (typeB.m_intrinsicType) 
 				{
-					case dThreeAdressStmt::m_constInt:
-						type.m_intrinsicType = dThreeAdressStmt::m_int;
+					case dCILInstr::m_constInt:
+						type.m_intrinsicType = dCILInstr::m_int;
 						break;
 
 					default:;
@@ -83,11 +83,11 @@ dThreeAdressStmt::dArgType dDAGExpressionNodeBinaryOperator::PromoteTypes (const
 
 	switch (type.m_intrinsicType) 
 	{
-		case dThreeAdressStmt::m_constInt:
-			type.m_intrinsicType = dThreeAdressStmt::m_int;
+		case dCILInstr::m_constInt:
+			type.m_intrinsicType = dCILInstr::m_int;
 			break;
 
-		case dThreeAdressStmt::m_int:
+		case dCILInstr::m_int:
 			break;
 
 		default:;
@@ -213,88 +213,73 @@ void dDAGExpressionNodeBinaryOperator::CompileCIL(dCIL& cil)
 	m_expressionB->CompileCIL(cil);
 	dCILInstr::dArg arg2 (LoadLocalVariable(cil, m_expressionB->m_result));
 
-dAssert (0);
-/*
-
-	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-	m_result.m_label = cil.NewTemp ();		
-	stmt.m_instruction = dThreeAdressStmt::m_assigment;
-	stmt.m_arg0 = m_result;
-	//stmt.m_arg0.m_type = m_expressionA->m_result.m_type;
-	stmt.m_arg0.SetType (PromoteTypes (m_expressionA->m_result, m_expressionB->m_result));
-
-	stmt.m_arg1 = arg1;
-	stmt.m_arg2 = arg2;
-	//dAssert (stmt.m_arg1.m_type == stmt.m_arg2.m_type);
-
-
+	dCILThreeArgInstr::dOperator operation = dCILThreeArgInstr::m_add;
 	switch (m_operator) 
 	{
 		case m_add:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_add;
+			operation = dCILThreeArgInstr::m_add;
 			break;
 		}
 
-
 		case m_sub:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_sub;
+			operation = dCILThreeArgInstr::m_sub;
 			break;
 		}
 
 		case m_mul:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_mul;
+			operation = dCILThreeArgInstr::m_mul;
 			break;
 		}
 
 		case m_div:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_div;
+			operation = dCILThreeArgInstr::m_div;
 			break;
 		}
 
 		case m_mod:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_mod;
+			operation = dCILThreeArgInstr::m_mod;
 			break;
 		}
 
 		case m_identical:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_identical;
+			operation = dCILThreeArgInstr::m_identical;
 			break;
 		}
 
 		case m_different:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_different;
+			operation = dCILThreeArgInstr::m_different;
 			break;
 		}
 
 
 		case m_less:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_less;
+			operation = dCILThreeArgInstr::m_less;
 			break;
 		}
 
 		case m_lessEqual:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_lessEqual;
+			operation = dCILThreeArgInstr::m_lessEqual;
 			break;
 		}
 		
 		case m_greather:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_greather;
+			operation = dCILThreeArgInstr::m_greather;
 			break;
 		}
 	
 		case m_greatherEqual:
 		{
-			stmt.m_operator = dThreeAdressStmt::m_greatherEqual;
+			operation = dCILThreeArgInstr::m_greatherEqual;
 			break;
 		}
 		
@@ -302,6 +287,7 @@ dAssert (0);
 			dAssert (0);
 	}
 
-	DTRACE_INTRUCTION (&stmt);
-*/
+	m_result.m_label = cil.NewTemp ();		
+	dCILInstrIntergerLogical* const instr = new dCILInstrIntergerLogical(cil, operation, m_result.m_label, PromoteTypes (m_expressionA->m_result, m_expressionB->m_result), arg1.m_label, arg1.GetType(), arg2.m_label, arg2.GetType()); 
+	instr->Trace();
 }

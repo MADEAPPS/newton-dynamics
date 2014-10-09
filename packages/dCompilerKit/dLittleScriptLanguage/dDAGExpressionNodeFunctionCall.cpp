@@ -55,32 +55,30 @@ void dDAGExpressionNodeFunctionCall::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)  
 {
-dAssert (0);
-/*
 	dDAGClassNode* const myClass = GetClass();
 	dAssert (myClass);
 	//dDAGFunctionNode* const myFunction = myClass->GetCurrentFunction ();
 
 	dString name (m_name);
-	dList<dThreeAdressStmt::dArg> paramList;
+	dList<dCILInstr::dArg> paramList;
 	for (dList<dDAGExpressionNode*>::dListNode* node = m_argumentList.GetLast(); node; node = node->GetPrev()) {
 		dDAGExpressionNode* const expNode = node->GetInfo();
 		expNode->CompileCIL(cil);
 		paramList.Append (LoadLocalVariable(cil, expNode->m_result));
 	}
 
-	for (dList<dThreeAdressStmt::dArg>::dListNode* node = paramList.GetFirst(); node; node = node->GetNext()) {
-		dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-		stmt.m_instruction = dThreeAdressStmt::m_param;
-		stmt.m_arg0 = node->GetInfo();
-		DTRACE_INTRUCTION (&stmt);
-	}
 
-	for (dList<dThreeAdressStmt::dArg>::dListNode* node = paramList.GetLast(); node; node = node->GetPrev()) {
+//	for (dList<dThreeAdressStmt::dArg>::dListNode* node = paramList.GetFirst(); node; node = node->GetNext()) {
+//		dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
+//		stmt.m_instruction = dThreeAdressStmt::m_param;
+//		stmt.m_arg0 = node->GetInfo();
+//		DTRACE_INTRUCTION (&stmt);
+//	}
+
+	for (dList<dCILInstr::dArg>::dListNode* node = paramList.GetLast(); node; node = node->GetPrev()) {
 		//name += m_prototypeSeparator + expNode->GetTypeName();
 		name += m_prototypeSeparator +node->GetInfo().GetTypeName();
 	}
-
 
 	dDAGFunctionNode* const function = myClass->GetFunction (name);
 	dAssert (function);
@@ -89,13 +87,8 @@ dAssert (0);
 	}
 
 	dDAGTypeNode* const returnType = function->m_returnType;
-
 	m_result.m_label = cil.NewTemp ();
 	m_result.SetType (returnType->GetArgType());
-	dThreeAdressStmt& call = cil.NewStatement()->GetInfo();
-	call.m_instruction = dThreeAdressStmt::m_call;
-	call.m_arg0 = m_result;
-	call.m_arg1.m_label = name;
-	DTRACE_INTRUCTION (&call);
-*/
+	dCILInstrCall* const instr = new dCILInstrCall (cil, m_result.m_label, m_result.GetType(), name, paramList);
+	instr->Trace();
 }

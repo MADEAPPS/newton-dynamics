@@ -168,14 +168,20 @@ int dScriptCompiler::CompileSource (const char* const source)
 		llvm::Module* const module = m_module.get();
 		dCIL cil (module);
 
-		dDAG::dLLVMSymbols globalLLVMSymbols;
+
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
 			scripClass->CompileCIL (cil);
-			scripClass->AddLLVMGlobalSymbols (cil, module, m_context, globalLLVMSymbols);
 		}
 
+#if 0
 		cil.Trace();
+		dDAG::dLLVMSymbols globalLLVMSymbols;
+		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
+			dDAGClassNode* const scripClass = node->GetInfo();
+			scripClass->AddLLVMGlobalSymbols (cil, module, m_context, globalLLVMSymbols);
+		}
+		
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
 			scripClass->TranslateToLLVM (cil, module, m_context, globalLLVMSymbols);
@@ -189,16 +195,20 @@ int dScriptCompiler::CompileSource (const char* const source)
 			dAssert (0);
 		}
 		llvm::errs() << *module;
-
 		//CreateLLVMTargetMachine (module);
-
 		cil.Clear();
 		llvm::Module::FunctionListType& funtionList = module->getFunctionList();
 		for (llvm::Module::FunctionListType::iterator iter (funtionList.begin()); iter != funtionList.end(); iter ++) {
 			const llvm::Function& funtion = *iter;
 			cil.ConvertLLVMFunctionToNVMFunction (funtion);
 		}
+#endif
 
+		cil.Trace();
+		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
+			dDAGClassNode* const scripClass = node->GetInfo();
+			dAssert (0);
+		}
 	}
 	return 0;
 }

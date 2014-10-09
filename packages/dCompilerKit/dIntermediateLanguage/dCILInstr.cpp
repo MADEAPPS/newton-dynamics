@@ -525,7 +525,9 @@ void dCILInstr::Serialize(char* const textOut) const
 
 void dCILInstr::Trace() const
 {
+#if 1
 	char text[4096];
 	Serialize(text);
 	dTrace ((text));
+#endif
 }

@@ -120,15 +120,6 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 	dString returnVariable (cil.NewTemp());
 
 	dString functionName (myClass->GetFunctionName (m_name, m_parameters));
-/*
-	dCIL::dListNode* const functionNode = cil.NewStatement();
-	m_functionStart = functionNode;
-	dThreeAdressStmt& function = functionNode->GetInfo();
-	function.m_instruction = dThreeAdressStmt::m_function;
-	function.m_arg0.m_label = functionName;
-	function.m_arg0.SetType (m_returnType->GetArgType());
-	DTRACE_INTRUCTION (&function);
-*/
 	dCILInstrFunction* const function = new dCILInstrFunction (cil, functionName, m_returnType->GetArgType());
 	m_functionStart = function->GetNode();
 
@@ -139,11 +130,8 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 //		m_opertatorThis = arg->m_result.m_label;
 	}
 
-
-//	dThreeAdressStmt& entryPoint = cil.NewStatement()->GetInfo();
-//	entryPoint.m_instruction = dThreeAdressStmt::m_label;
-//	entryPoint.m_arg0.m_label = cil.NewLabel();
-//	DTRACE_INTRUCTION (&entryPoint);
+	dCILInstrLabel* const entryPoint = new dCILInstrLabel (cil, cil.NewLabel());
+	entryPoint->Trace();
 
 	// emit the function arguments
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
@@ -156,7 +144,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		arg->m_result = function->AddParameter (arg->m_name, arg->m_type->GetArgType())->GetInfo();
 //		DTRACE_INTRUCTION (&fntArg);
 	}
-	DTRACE_INTRUCTION (function);
+	function->Trace();
 
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
@@ -172,7 +160,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		DTRACE_INTRUCTION (&fntArg);
 */
 		dCILInstrLocal* const localVariable = new dCILInstrLocal(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType());
-		DTRACE_INTRUCTION (localVariable);
+		localVariable->Trace();
 	}
 
 
@@ -191,7 +179,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 */
 		dCILInstrStore* const store = new dCILInstrStore(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType(), arg->m_name, arg->GetType()->GetArgType());
 		arg->m_result =  store->GetArg0();
-		DTRACE_INTRUCTION (store);
+		store->Trace();
 	}
 
 	m_body->CompileCIL(cil);

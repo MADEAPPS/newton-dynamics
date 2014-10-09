@@ -43,7 +43,7 @@ class dDAGExpressionNodeBinaryOperator: public dDAGExpressionNode
 	virtual void ConnectParent(dDAG* const parent);
 
 	//void PromoteTypes (dCIL::dReturnValue& typeA, dCIL::dReturnValue& typeB) const;
-	dThreeAdressStmt::dArgType PromoteTypes (const dThreeAdressStmt::dArgType typeA, const dThreeAdressStmt::dArgType typeB) const;
+	dCILInstr::dArgType PromoteTypes (const dCILInstr::dArgType typeA, const dCILInstr::dArgType typeB) const;
 
 	dBinaryOperator m_operator;
 	dDAGExpressionNode* m_expressionA;

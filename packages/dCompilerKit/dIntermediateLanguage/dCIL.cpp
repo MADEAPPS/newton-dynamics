@@ -120,15 +120,10 @@ dCIL::dListNode* dCIL::NewStatement()
 
 void dCIL::Trace()
 {
-dAssert (0);
-/*
 	for (dCIL::dListNode* node = GetFirst(); node; node = node->GetNext()) {
-		const dThreeAdressStmt& stmt = node->GetInfo();
-//		DTRACE_INTRUCTION(&stmt);
-		stmt.Trace();
+		node->GetInfo()->Trace();
 	}
 	dTrace(("\n"));
-*/
 }
 
 

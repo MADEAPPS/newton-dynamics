@@ -12,16 +12,6 @@
 #ifndef  _DCIL_INSTRUC_H_
 #define  _DCIL_INSTRUC_H_
 
-#ifdef _DEBUG
-	#define TRACE_INTERMEDIATE_CODE
-#endif
-
-#ifdef TRACE_INTERMEDIATE_CODE
-	#define DTRACE_INTRUCTION(x) (x)->Trace();
-#else
-	#define DTRACE_INTRUCTION(x)
-#endif
-
 
 class dCIL;
 
@@ -297,6 +287,40 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 	}
 
 	dArg m_arg1;
+};
+
+class dCILThreeArgInstr: public dCILTwoArgInstr
+{
+	public:
+	enum dOperator
+	{
+		m_add,
+		m_sub,
+		m_mul,
+		m_div,
+		m_mod,
+		m_equal,
+		m_identical,
+		m_different,
+		m_less,
+		m_lessEqual,
+		m_greather,
+		m_greatherEqual,
+		m_operatorsCount,
+	};
+
+	dCILThreeArgInstr (dCIL& program, const dArg& arg0, const dArg& arg1, const dArg& arg2)
+		:dCILTwoArgInstr (program, arg0, arg1)
+		,m_arg2(arg2)
+	{
+	}
+
+	const dArg& GetArg2 () const 
+	{
+		return m_arg2;
+	}
+
+	dArg m_arg2;
 };
 
 

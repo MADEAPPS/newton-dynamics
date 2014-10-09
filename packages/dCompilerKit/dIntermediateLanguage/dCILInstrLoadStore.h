@@ -16,6 +16,7 @@
 #include "dCIL.h"
 #include "dCILInstr.h"
 
+
 class dCILInstrLocal: public dCILSingleArgInstr
 {
 	public:
@@ -23,6 +24,16 @@ class dCILInstrLocal: public dCILSingleArgInstr
 
 	void Serialize(char* const textOut) const;
 };
+
+
+class dCILInstrMove: public dCILTwoArgInstr
+{
+	public:
+	dCILInstrMove (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1);
+
+	void Serialize(char* const textOut) const;
+};
+
 
 class dCILInstrStore: public dCILTwoArgInstr
 {

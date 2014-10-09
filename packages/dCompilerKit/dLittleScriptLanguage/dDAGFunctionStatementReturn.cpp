@@ -40,16 +40,11 @@ void dDAGFunctionStatementReturn::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementReturn::CompileCIL(dCIL& cil)
 {
-dAssert (0);
-/*
-	dThreeAdressStmt::dArg retValue;
-	retValue.m_type = dThreeAdressStmt::m_void;
-
+	dCILInstr::dArg retValue;
 	if (m_expression) {
 		m_expression->CompileCIL(cil);
 		retValue = m_expression->m_result;
 	}
-
 	
 
 	for (dDAG* node = m_parent; node && (node->GetTypeId() != dDAGFunctionNode::GetRttiType()); node = node->m_parent) {
@@ -65,10 +60,8 @@ dAssert (0);
 		}
 	}
 
-	dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, retValue));
-	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_ret;
-	stmt.m_arg0 = arg1;
-	DTRACE_INTRUCTION (&stmt);
-*/
+
+	dCILInstr::dArg arg1 (LoadLocalVariable(cil, retValue));
+	dCILInstrReturn* const instr = new dCILInstrReturn (cil, arg1.m_label, arg1.GetType());
+	instr->Trace();
 }

@@ -31,7 +31,10 @@
 #include <dBasicBlockList.h>
 #include <dVirtualMachine.h>
 #include <dContainersStdAfx.h>
+
+#include <dCILInstrBranch.h>
 #include <dCILInstrLoadStore.h>
+#include <dCILInstrArithmetic.h>
 #include <dCILInstrMiscellaneous.h>
 
 

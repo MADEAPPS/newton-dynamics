@@ -1187,26 +1187,29 @@ void dgAmpInstance::BuildJacobianMatrixParallelKernel (void* const context, void
 
 void dgAmpInstance::BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData)
 {
-	dgWorld* const world = m_world;
-	dgInt32 threadCounts = world->GetThreadCount();	
-
-	syncData->m_atomicIndex = 0;
-	for (dgInt32 j = 0; j < threadCounts; j ++) {
-		world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, this);
-	}
-	world->SynchronizationBarrier();
-
-	dgAssert (syncData->m_jacobianMatrixRowAtomicIndex == syncData->m_rowCount);
-//	dgInt32 rowCount = syncData->m_rowCount;
-//	copy (m_matrixDataCpu.begin(), m_matrixDataCpu.begin() + rowCount, m_matrixData);
-
 	const int jountCount = syncData->m_jointCount;
-	extent<1> compute_domain(jountCount);
+	if (jountCount) {
+		dgWorld* const world = m_world;
+		dgInt32 threadCounts = world->GetThreadCount();	
 
-	array<dgAmpJacobianMatrixElement, 1>& matrixData = m_matrixData;
-    parallel_for_each (compute_domain, [=, &matrixData] (index<1> idx) restrict(amp,cpu)
-	{
+	
+		syncData->m_atomicIndex = 0;
+		for (dgInt32 j = 0; j < threadCounts; j ++) {
+			world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, this);
+		}
+		world->SynchronizationBarrier();
 
-	});
+		dgAssert (syncData->m_jacobianMatrixRowAtomicIndex == syncData->m_rowCount);
+	//	dgInt32 rowCount = syncData->m_rowCount;
+	//	copy (m_matrixDataCpu.begin(), m_matrixDataCpu.begin() + rowCount, m_matrixData);
+			
+		extent<1> compute_domain(jountCount);
+
+		array<dgAmpJacobianMatrixElement, 1>& matrixData = m_matrixData;
+		parallel_for_each (compute_domain, [=, &matrixData] (index<1> idx) restrict(amp,cpu)
+		{
+
+		});
+	}
 }
 
