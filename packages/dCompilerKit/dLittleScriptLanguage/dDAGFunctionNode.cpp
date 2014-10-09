@@ -156,27 +156,31 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		arg->m_result = function->AddParameter (arg->m_name, arg->m_type->GetArgType())->GetInfo();
 //		DTRACE_INTRUCTION (&fntArg);
 	}
+	DTRACE_INTRUCTION (function);
 
-/*
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
-		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
-		dAssert (varNameNode);
 
+		dTree<dCILInstr::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
+		dAssert (varNameNode);
+/*
 		dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
 		fntArg.m_instruction = dThreeAdressStmt::m_local;
 		fntArg.m_arg0 = varNameNode->GetInfo();
 		fntArg.m_arg1 = fntArg.m_arg0;
 		arg->m_result = fntArg.m_arg1;
 		DTRACE_INTRUCTION (&fntArg);
+*/
+		dCILInstrLocal* const localVariable = new dCILInstrLocal(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType());
+		DTRACE_INTRUCTION (localVariable);
 	}
 
 
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
-		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
+		dTree<dCILInstr::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
 		dAssert (varNameNode);
-
+/*
 		dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
 		fntArg.m_instruction = dThreeAdressStmt::m_storeBase;
 		fntArg.m_arg0 = varNameNode->GetInfo();
@@ -184,10 +188,11 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		fntArg.m_arg1.SetType (arg->GetType()->GetArgType());
 		arg->m_result = fntArg.m_arg1;
 		DTRACE_INTRUCTION (&fntArg);
-	}
 */
-
-	DTRACE_INTRUCTION (function);
+		dCILInstrStore* const store = new dCILInstrStore(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType(), arg->m_name, arg->GetType()->GetArgType());
+		arg->m_result =  store->GetArg0();
+		DTRACE_INTRUCTION (store);
+	}
 
 	m_body->CompileCIL(cil);
 	if (m_returnType->GetArgType().m_intrinsicType == dThreeAdressStmt::m_void) {

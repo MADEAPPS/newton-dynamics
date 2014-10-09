@@ -265,4 +265,39 @@ class dCILInstr
 };
 
 
+class dCILSingleArgInstr: public dCILInstr
+{
+	public:
+	dCILSingleArgInstr (dCIL& program, const dArg &arg)
+		:dCILInstr (program)
+		,m_arg0(arg)
+	{
+	}
+
+	const dArg& GetArg0 () const 
+	{
+		return m_arg0;
+	}
+
+	dArg m_arg0;
+};
+
+class dCILTwoArgInstr: public dCILSingleArgInstr
+{
+	public:
+	dCILTwoArgInstr (dCIL& program, const dArg& arg0, const dArg& arg1)
+		:dCILSingleArgInstr (program, arg0)
+		,m_arg1(arg1)
+	{
+	}
+
+	const dArg& GetArg1 () const 
+	{
+		return m_arg1;
+	}
+
+	dArg m_arg1;
+};
+
+
 #endif
