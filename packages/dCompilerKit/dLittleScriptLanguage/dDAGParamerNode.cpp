@@ -64,11 +64,11 @@ void dDAGParameterNode::CompileCIL(dCIL& cil)
 	dAssert (0);
 /*
 	dDAGScopeBlockNode* const scope = GetScope();
-	dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const varNameNode = scope->FindVariable(m_name);
+	dTree<dCILInstr::dArg, dString>::dTreeNode* const varNameNode = scope->FindVariable(m_name);
 	dAssert (varNameNode);
 
-	dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
-	fntArg.m_instruction = dThreeAdressStmt::m_local;
+	dCILInstr& fntArg = cil.NewStatement()->GetInfo();
+	fntArg.m_instruction = dCILInstr::m_local;
 	fntArg.m_arg0 = varNameNode->GetInfo();
 	fntArg.m_arg1 = fntArg.m_arg0;
 	m_result = fntArg.m_arg0;

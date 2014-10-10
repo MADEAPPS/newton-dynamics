@@ -190,3 +190,12 @@ void dDAGClassNode::TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm
 		function->TranslateToLLVM (cil, module, context, globalLLVMSymbols);
 	}
 }
+
+
+void dDAGClassNode::ConvertToTarget (dCIL& cil)
+{
+	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
+		dDAGFunctionNode* const function = node->GetInfo();
+		function->ConvertToTarget (cil);
+	}
+}

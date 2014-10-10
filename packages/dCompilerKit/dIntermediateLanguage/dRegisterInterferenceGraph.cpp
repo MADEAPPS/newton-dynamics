@@ -80,9 +80,10 @@ m_flowGraph->m_cil->Trace();
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
 {
-	dAssert (0);
-/*
 	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
+		dAssert (0);
+/*
+
 		dThreeAdressStmt& stmt = stmtNode->GetInfo();	
 
 //DTRACE_INTRUCTION (&stmt);
@@ -215,8 +216,8 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 				dAssert (0);
 		}
 //stmt.Trace();
+*/
 	}
-
 
 //	m_flowGraph->CalculateLiveInputLiveOutput ();
 //	dTree<int, dString> callerSaveRegisterRemap;
@@ -235,7 +236,6 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 //			}
 //		}
 //	}
-*/
 }
 
 
@@ -942,7 +942,7 @@ void dRegisterInterferenceGraph::SelectSpillVariableAndReWriteFunction()
 }
 
 
-void dRegisterInterferenceGraph::SaveSpillRegister(dCIL::dListNode* const node, dThreeAdressStmt::dArg& argument, const dString& spillVariable, const dString& spillMemory)
+void dRegisterInterferenceGraph::SaveSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory)
 {
 dAssert (0);
 /*
@@ -974,7 +974,7 @@ dAssert (0);
 */
 }
 
-void dRegisterInterferenceGraph::LoadSpillRegister(dCIL::dListNode* const node, dThreeAdressStmt::dArg& argument, const dString& spillVariable, const dString& spillMemory)
+void dRegisterInterferenceGraph::LoadSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory)
 {
 dAssert (0);
 /*

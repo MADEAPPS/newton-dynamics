@@ -57,7 +57,7 @@ class dDAG
 	dCILInstr::dArg LoadLocalVariable (dCIL& cil, const dCILInstr::dArg& arg) const;
 	
 	dString m_name;
-//	dThreeAdressStmt::dArg m_result;
+//	dCILInstr::dArg m_result;
 	dCILInstr::dArg m_result;
 	dDAG* m_next;
 	dDAG* m_parent;

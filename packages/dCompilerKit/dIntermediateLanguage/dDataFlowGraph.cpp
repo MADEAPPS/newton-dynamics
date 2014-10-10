@@ -12,6 +12,7 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dDataFlowGraph.h"
+#include "dCILInstrBranch.h"
 #include "dRegisterInterferenceGraph.h"
 
 #define D_OPTIMIZE_REDUNDANCE_COPY_ON_ARRAYS
@@ -33,13 +34,12 @@ dDataFlowGraph::~dDataFlowGraph(void)
 
 void dDataFlowGraph::BuildBasicBlockGraph()
 {
-dAssert (0);
-/*
 	m_basicBlocks.Clear();
 	m_basicBlocks.Build (*m_cil, m_function);
 
 	// build leading block map table
 	m_dataFlowGraph.RemoveAll();
+
 
 	dTree<dBasicBlock*, dCIL::dListNode*> blockMap;
 	for (dBasicBlocksList::dListNode* blockNode = m_basicBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
@@ -65,6 +65,7 @@ dAssert (0);
 		}
 	}
 
+//m_cil->Trace();
 	m_mark += 1;  
 	dList<dBasicBlock*> stack;
 	stack.Append(&m_basicBlocks.GetFirst()->GetInfo());
@@ -76,44 +77,47 @@ dAssert (0);
 			block->m_mark = m_mark;
 			m_traversalBlocksOrder.Addtop(block);
 
-			const dThreeAdressStmt& stmt = block->m_end->GetInfo();
-
-			if (stmt.m_instruction == dThreeAdressStmt::m_if) {
+			dCILInstr* const instruction = block->m_end->GetInfo();
+			if (instruction->GetAsIF()) {
+				dCILInstrIF* const ifInstr = instruction->GetAsIF();
 				dAssert (m_dataFlowGraph.Find(block->m_end));
-				dAssert (m_dataFlowGraph.Find(stmt.m_trueTargetJump));
-				dAssert (m_dataFlowGraph.Find(stmt.m_falseTargetJump));
-				dAssert (blockMap.Find(stmt.m_trueTargetJump));
-				dAssert (blockMap.Find(stmt.m_falseTargetJump));
+				dAssert (m_dataFlowGraph.Find(ifInstr->GetTrueTarget()));
+				dAssert (m_dataFlowGraph.Find(ifInstr->GetFalseTarget()));
+				dAssert (blockMap.Find(ifInstr->GetTrueTarget()));
+				dAssert (blockMap.Find(ifInstr->GetFalseTarget()));
 				dAssert (m_dataFlowGraph.Find(block->m_end->GetNext()));
 				dAssert (blockMap.Find(block->m_end->GetNext()));
 
 				dDataFlowPoint* const graphStatement = &m_dataFlowGraph.Find(block->m_end)->GetInfo();
-				dDataFlowPoint* const child0 = &m_dataFlowGraph.Find(stmt.m_trueTargetJump)->GetInfo();
-				dDataFlowPoint* const child1 = &m_dataFlowGraph.Find(stmt.m_falseTargetJump)->GetInfo();
+				dDataFlowPoint* const child0 = &m_dataFlowGraph.Find(ifInstr->GetTrueTarget())->GetInfo();
+				dDataFlowPoint* const child1 = &m_dataFlowGraph.Find(ifInstr->GetFalseTarget())->GetInfo();
 
 				graphStatement->m_successors.Append(child0);
 				graphStatement->m_successors.Append(child1);
 				child0->m_predecessors.Append(graphStatement);
 				child1->m_predecessors.Append(graphStatement);
 
-				stack.Append(blockMap.Find(stmt.m_trueTargetJump)->GetInfo());
-				stack.Append(blockMap.Find(stmt.m_falseTargetJump)->GetInfo());
+				stack.Append(blockMap.Find(ifInstr->GetTrueTarget())->GetInfo());
+				stack.Append(blockMap.Find(ifInstr->GetFalseTarget())->GetInfo());
 
-			} else if (stmt.m_instruction == dThreeAdressStmt::m_goto) {
+			} else if (instruction->GetAsGoto()) {
+				dAssert (0);
+				dCILInstrGoto* const gotoInst = instruction->GetAsGoto();
+
 				dAssert (m_dataFlowGraph.Find(block->m_end));
-				dAssert (m_dataFlowGraph.Find(stmt.m_trueTargetJump));
-				dAssert (blockMap.Find(stmt.m_trueTargetJump));
+				dAssert (m_dataFlowGraph.Find(gotoInst->GetTarget()));
+				dAssert (blockMap.Find(gotoInst->GetTarget()));
 
 				dDataFlowPoint* const graphStatement = &m_dataFlowGraph.Find(block->m_end)->GetInfo();
-				dDataFlowPoint* const child0 = &m_dataFlowGraph.Find(stmt.m_trueTargetJump)->GetInfo();
+				dDataFlowPoint* const child0 = &m_dataFlowGraph.Find(gotoInst->GetTarget())->GetInfo();
 
 				graphStatement->m_successors.Append(child0);
 				child0->m_predecessors.Append(graphStatement);
 
-				stack.Append(blockMap.Find(stmt.m_trueTargetJump)->GetInfo());
+				stack.Append(blockMap.Find(gotoInst->GetTarget())->GetInfo());
 
-			} else if (stmt.m_instruction != dThreeAdressStmt::m_ret) {
-dAssert (0);
+			} else if (instruction->GetAsReturn()) {
+/*
 				dAssert (m_dataFlowGraph.Find(block->m_end));
 				dAssert (m_dataFlowGraph.Find(block->m_end->GetNext()));
 				dAssert (blockMap.Find(block->m_end->GetNext()));
@@ -125,10 +129,10 @@ dAssert (0);
 				child0->m_predecessors.Append(graphStatement);
 
 				stack.Append(blockMap.Find(block->m_end->GetNext())->GetInfo());
+*/
 			}
 		}
 	}
-*/
 }
 
 #if 0
@@ -1718,55 +1722,11 @@ return 0;
 
 bool dDataFlowGraph::ApplyInstructionSematicOrdering()
 {
-dAssert (0);
-return 0;
-/*
 	bool ret = false;
-	for (dCIL::dListNode* stmtNode = m_function->GetNext(); stmtNode && (stmtNode->GetInfo().m_instruction != dThreeAdressStmt::m_function); stmtNode = stmtNode->GetNext()) {
-		dThreeAdressStmt& stmt = stmtNode->GetInfo();
-//DTRACE_INTRUCTION (&stmt);		
-
-		switch (stmt.m_instruction) 
-		{
-			case dThreeAdressStmt::m_assigment:
-			{
-				if (stmt.m_operator != dThreeAdressStmt::m_nothing) {
-					switch (stmt.m_arg1.GetType().m_intrinsicType)
-					{
-						case dThreeAdressStmt::m_constInt:
-						{
-							if (m_cil->m_commutativeOperator[stmt.m_operator]) {
-								dAssert (stmt.m_arg2.GetType().m_intrinsicType != dThreeAdressStmt::m_constInt);
-								dSwap (stmt.m_arg1, stmt.m_arg2);
-							} else {
-								dCIL::dListNode* const node = m_cil->NewStatement();
-								m_cil->InsertAfter (stmtNode, node);
-
-								dThreeAdressStmt& tmpStmt = node->GetInfo();
-								tmpStmt = stmt;
-								
-								stmt.m_instruction = dThreeAdressStmt::m_assigment;
-								stmt.m_operator = dThreeAdressStmt::m_nothing;
-								stmt.m_arg0.m_label += dCIL::m_variableUndercore; 
-								stmt.m_arg2.m_label = "";
-								tmpStmt.m_arg1 = stmt.m_arg0;
-							}
-							ret = 1;
-							break;
-						}
-
-						default:
-							break;
-					}
-				}
-				break;
-			}
-		}
+	for (dCIL::dListNode* stmtNode = m_function->GetNext(); stmtNode && !stmtNode->GetInfo()->GetAsFunction(); stmtNode = stmtNode->GetNext()) {
+		ret |= stmtNode->GetInfo()->ApplyRemanticReordering ();
 	}
-
-//m_cil->Trace();
 	return ret;
-*/
 }
 
 

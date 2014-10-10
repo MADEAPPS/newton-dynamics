@@ -27,26 +27,26 @@ dCIL::dCIL(llvm::Module* const module)
     ,m_optimizer(module)
 {
 	memset (m_conditionals, 0, sizeof (m_conditionals));
-	m_conditionals[dThreeAdressStmt::m_identical] = dThreeAdressStmt::m_identical;
-	m_conditionals[dThreeAdressStmt::m_different] = dThreeAdressStmt::m_different;
-	m_conditionals[dThreeAdressStmt::m_less] = dThreeAdressStmt::m_less;
-	m_conditionals[dThreeAdressStmt::m_lessEqual] = dThreeAdressStmt::m_lessEqual;
-	m_conditionals[dThreeAdressStmt::m_greather] = dThreeAdressStmt::m_greather;
-	m_conditionals[dThreeAdressStmt::m_greatherEqual] = dThreeAdressStmt::m_greatherEqual;
+	m_conditionals[dCILThreeArgInstr::m_identical] = dCILThreeArgInstr::m_identical;
+	m_conditionals[dCILThreeArgInstr::m_different] = dCILThreeArgInstr::m_different;
+	m_conditionals[dCILThreeArgInstr::m_less] = dCILThreeArgInstr::m_less;
+	m_conditionals[dCILThreeArgInstr::m_lessEqual] = dCILThreeArgInstr::m_lessEqual;
+	m_conditionals[dCILThreeArgInstr::m_greather] = dCILThreeArgInstr::m_greather;
+	m_conditionals[dCILThreeArgInstr::m_greatherEqual] = dCILThreeArgInstr::m_greatherEqual;
 
 	memset (m_operatorComplement, 0, sizeof (m_operatorComplement));
-	m_operatorComplement[dThreeAdressStmt::m_identical] = dThreeAdressStmt::m_different;
-	m_operatorComplement[dThreeAdressStmt::m_different] = dThreeAdressStmt::m_identical;
-	m_operatorComplement[dThreeAdressStmt::m_less] = dThreeAdressStmt::m_greatherEqual;
-	m_operatorComplement[dThreeAdressStmt::m_lessEqual] = dThreeAdressStmt::m_greather;
-	m_operatorComplement[dThreeAdressStmt::m_greather] = dThreeAdressStmt::m_lessEqual;
-	m_operatorComplement[dThreeAdressStmt::m_greatherEqual] = dThreeAdressStmt::m_less;
+	m_operatorComplement[dCILThreeArgInstr::m_identical] = dCILThreeArgInstr::m_different;
+	m_operatorComplement[dCILThreeArgInstr::m_different] = dCILThreeArgInstr::m_identical;
+	m_operatorComplement[dCILThreeArgInstr::m_less] = dCILThreeArgInstr::m_greatherEqual;
+	m_operatorComplement[dCILThreeArgInstr::m_lessEqual] = dCILThreeArgInstr::m_greather;
+	m_operatorComplement[dCILThreeArgInstr::m_greather] = dCILThreeArgInstr::m_lessEqual;
+	m_operatorComplement[dCILThreeArgInstr::m_greatherEqual] = dCILThreeArgInstr::m_less;
 
 	memset (m_commutativeOperator, false, sizeof (m_commutativeOperator));
-	m_commutativeOperator[dThreeAdressStmt::m_add] = true;
-	m_commutativeOperator[dThreeAdressStmt::m_mul] = true;
-	m_commutativeOperator[dThreeAdressStmt::m_identical] = true;
-	m_commutativeOperator[dThreeAdressStmt::m_different] = true;
+	m_commutativeOperator[dCILThreeArgInstr::m_add] = true;
+	m_commutativeOperator[dCILThreeArgInstr::m_mul] = true;
+	m_commutativeOperator[dCILThreeArgInstr::m_identical] = true;
+	m_commutativeOperator[dCILThreeArgInstr::m_different] = true;
 
 
     // Promote allocas to registers.
@@ -173,10 +173,10 @@ void dCIL::Optimize (llvm::Function* const function)
 	}
 }
 
-dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
+dCILInstr::dArgType dCIL::GetType (const llvm::Type* const type) const
 {
 	const llvm::Type* myType = type;
-	dThreeAdressStmt::dArgType intrinsicType (dThreeAdressStmt::m_int);
+	dCILInstr::dArgType intrinsicType (dCILInstr::m_int);
 	llvm::Type::TypeID typeId = myType->getTypeID();
 
 	if (typeId == llvm::Type::TypeID::PointerTyID) {
@@ -190,7 +190,7 @@ dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 	{
 		case llvm::Type::TypeID::VoidTyID:
 		{
-			intrinsicType.m_intrinsicType = dThreeAdressStmt::m_void;
+			intrinsicType.m_intrinsicType = dCILInstr::m_void;
 			break;
 		}
 
@@ -200,7 +200,7 @@ dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 			const llvm::Type* const xxx = myType->getScalarType() ;
 
 			if (myType->isIntegerTy (32)) {
-				intrinsicType.m_intrinsicType = dThreeAdressStmt::m_int;
+				intrinsicType.m_intrinsicType = dCILInstr::m_int;
 			} else {
 				dAssert (0);
 			}
@@ -229,15 +229,15 @@ dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Type* const type) const
 }
 
 
-dThreeAdressStmt::dArgType dCIL::GetType (const llvm::Value* const value) const
+dCILInstr::dArgType dCIL::GetType (const llvm::Value* const value) const
 {
-	dThreeAdressStmt::dArgType intrinsicType (dThreeAdressStmt::m_int);
+	dCILInstr::dArgType intrinsicType (dCILInstr::m_int);
 	llvm::Value::ValueTy valueId = llvm::Value::ValueTy (value->getValueID());
 	switch (valueId)
 	{
 		case llvm::Value::ConstantIntVal:
 		{
-			intrinsicType.m_intrinsicType = dThreeAdressStmt::m_constInt;
+			intrinsicType.m_intrinsicType = dCILInstr::m_constInt;
 			break;
 		}
 
@@ -279,15 +279,15 @@ return NULL;
 	llvm::Type::TypeID returnTypeID = returnType->getTypeID();
 
 	dCIL::dListNode* const functionNode = NewStatement();
-	dThreeAdressStmt& function = functionNode->GetInfo();
-	function.m_instruction = dThreeAdressStmt::m_function;
+	dCILInstr& function = functionNode->GetInfo();
+	function.m_instruction = dCILInstr::m_function;
 	function.m_arg0.m_label = functionName.data();
 	function.m_arg0.SetType (GetType (returnType));
 	DTRACE_INTRUCTION (&function);
 
 	dCIL::dListNode* const entryPointNode = NewStatement();
-	dThreeAdressStmt& entryPoint = entryPointNode->GetInfo();
-	entryPoint.m_instruction = dThreeAdressStmt::m_label;
+	dCILInstr& entryPoint = entryPointNode->GetInfo();
+	entryPoint.m_instruction = dCILInstr::m_label;
 	entryPoint.m_arg0.m_label = "entryPoint";
 	DTRACE_INTRUCTION (&entryPoint);
 
@@ -298,9 +298,9 @@ return NULL;
 
 		const llvm::Type* const argType = argument->getType();
 		dCIL::dListNode* const argNode = NewStatement();
-		dThreeAdressStmt& stmt = argNode->GetInfo();
+		dCILInstr& stmt = argNode->GetInfo();
 
-		stmt.m_instruction = dThreeAdressStmt::m_argument;
+		stmt.m_instruction = dCILInstr::m_argument;
 		stmt.m_arg0.SetType (GetType (argType));
 		if (isFirst && (returnTypeID != llvm::Type::TypeID::VoidTyID)) {
 			stmt.m_arg0.m_label = GetReturnVariableName();		
@@ -319,10 +319,10 @@ return NULL;
 		const llvm::Type* const argType = argument->getType();
 
 		dCIL::dListNode* const argNode = NewStatement();
-		dThreeAdressStmt& stmt = argNode->GetInfo();
+		dCILInstr& stmt = argNode->GetInfo();
 
-		stmt.m_instruction = dThreeAdressStmt::m_assigment;
-		stmt.m_operator = dThreeAdressStmt::m_nothing;
+		stmt.m_instruction = dCILInstr::m_assigment;
+		stmt.m_operator = dCILInstr::m_nothing;
 		stmt.m_arg0.SetType (GetType (argType));
 		stmt.m_arg0.m_label = name.data();
 
@@ -373,12 +373,12 @@ dAssert (0);
 	dTree<dCIL::dListNode*, const llvm::BasicBlock*>::Iterator iter(terminalInstructions);
 	for (iter.Begin(); iter; iter ++) {
 		dCIL::dListNode* const node = iter.GetNode()->GetInfo();
-		dThreeAdressStmt& stmt = node->GetInfo();
+		dCILInstr& stmt = node->GetInfo();
 
 DTRACE_INTRUCTION (&stmt);
 		switch (stmt.m_instruction)
 		{
-			case dThreeAdressStmt::m_if:
+			case dCILInstr::m_if:
 			{
 				llvm::BasicBlock* const trueTargetJump = (llvm::BasicBlock*) stmt.m_trueTargetJump;
 				llvm::BasicBlock* const falseTargetJump = (llvm::BasicBlock*) stmt.m_falseTargetJump;
@@ -386,26 +386,26 @@ DTRACE_INTRUCTION (&stmt);
 				stmt.m_falseTargetJump = (dCIL::dListNode*) visited.Find (falseTargetJump)->GetInfo();
 
 				dCIL::dListNode* ptr = node->GetNext();
-				for (; ptr && ptr->GetInfo().m_instruction != dThreeAdressStmt::m_label; ptr = ptr->GetNext());
+				for (; ptr && ptr->GetInfo().m_instruction != dCILInstr::m_label; ptr = ptr->GetNext());
 				if (stmt.m_falseTargetJump != ptr) {
 					dAssert (stmt.m_trueTargetJump == ptr);
 					dSwap (stmt.m_falseTargetJump, stmt.m_trueTargetJump);
 					dSwap (stmt.m_arg1, stmt.m_arg2);
-					stmt.m_instruction = dThreeAdressStmt::m_ifnot;
+					stmt.m_instruction = dCILInstr::m_ifnot;
 					DTRACE_INTRUCTION (&stmt);
 				}
 
 				break;
 			}
 
-			case dThreeAdressStmt::m_goto:
+			case dCILInstr::m_goto:
 			{
 				llvm::BasicBlock* const trueTargetJump = (llvm::BasicBlock*) stmt.m_trueTargetJump;
 				stmt.m_trueTargetJump = (dCIL::dListNode*) visited.Find (trueTargetJump)->GetInfo();
 				break;
 			}
 
-			case dThreeAdressStmt::m_ret:
+			case dCILInstr::m_ret:
 				break;
 
 			default:
@@ -419,13 +419,13 @@ DTRACE_INTRUCTION (&stmt);
 	dCIL::dListNode* nextNode;
 	for (dCIL::dListNode* node = function; node; node = nextNode) {
 		nextNode = node->GetNext();
-		dThreeAdressStmt& stmt = node->GetInfo();
+		dCILInstr& stmt = node->GetInfo();
 //DTRACE_INTRUCTION (&stmt);
-		if (stmt.m_instruction == dThreeAdressStmt::m_phi) {
+		if (stmt.m_instruction == dCILInstr::m_phi) {
 			dCIL::dListNode* nextNode1;
-			for (dCIL::dListNode* node1 = node->GetPrev(); node1 && (node1->GetInfo().m_instruction == dThreeAdressStmt::m_nop); node1 = nextNode1) {
+			for (dCIL::dListNode* node1 = node->GetPrev(); node1 && (node1->GetInfo().m_instruction == dCILInstr::m_nop); node1 = nextNode1) {
 				nextNode1 = node1->GetPrev();
-				dThreeAdressStmt& variableStmt = node1->GetInfo();
+				dCILInstr& variableStmt = node1->GetInfo();
 				dAssert (variableStmt.m_arg0.m_label == m_phiSource);
 				llvm::BasicBlock* const sourceBlock = (llvm::BasicBlock*) variableStmt.m_trueTargetJump;
 				dAssert (sourceBlock);
@@ -435,9 +435,9 @@ DTRACE_INTRUCTION (&stmt);
 				dCIL::dListNode* const assigmentNode = NewStatement();
 				InsertAfter (terminalNode->GetPrev(), assigmentNode);
 
-				dThreeAdressStmt& assigmentStmt = assigmentNode->GetInfo();
-				assigmentStmt.m_instruction = dThreeAdressStmt::m_assigment;
-				assigmentStmt.m_operator = dThreeAdressStmt::m_nothing;
+				dCILInstr& assigmentStmt = assigmentNode->GetInfo();
+				assigmentStmt.m_instruction = dCILInstr::m_assigment;
+				assigmentStmt.m_operator = dCILInstr::m_nothing;
 				assigmentStmt.m_arg0 = stmt.m_arg0;
 				assigmentStmt.m_arg1 = variableStmt.m_arg1;
 				dAssert (assigmentStmt.m_arg0.m_intrinsicType == assigmentStmt.m_arg1.m_intrinsicType);
@@ -462,8 +462,8 @@ return NULL;
 	const llvm::StringRef& blockName = block->getName ();
 
 	dCIL::dListNode* const blockLabelNode = NewStatement();
-	dThreeAdressStmt& blockLabel = blockLabelNode->GetInfo();
-	blockLabel.m_instruction = dThreeAdressStmt::m_label;
+	dCILInstr& blockLabel = blockLabelNode->GetInfo();
+	blockLabel.m_instruction = dCILInstr::m_label;
 	blockLabel.m_arg0.m_label = blockName.data();
 	DTRACE_INTRUCTION (&blockLabel);
 
@@ -555,18 +555,18 @@ return NULL;
 		llvm::Value* const arg = instr->getOperand(i);
 
 		dCIL::dListNode* const node = NewStatement();
-		dThreeAdressStmt& stmt = node->GetInfo();
-		stmt.m_instruction = dThreeAdressStmt::m_param;
+		dCILInstr& stmt = node->GetInfo();
+		stmt.m_instruction = dCILInstr::m_param;
 		stmt.m_arg0.SetType (GetType (arg));
 		stmt.m_arg0.m_label = GetName (arg);
 		DTRACE_INTRUCTION (&stmt);
 	}
 
 	dCIL::dListNode* node = NewStatement();
-	dThreeAdressStmt& stmt = node->GetInfo();
+	dCILInstr& stmt = node->GetInfo();
 
 	llvm::Value* const arg = instr->getOperand(argCount - 1);
-	stmt.m_instruction = dThreeAdressStmt::m_call;
+	stmt.m_instruction = dCILInstr::m_call;
 
 	stmt.m_arg0.SetType (GetType (instr));
 	stmt.m_arg0.m_label = GetReturnVariableName();
@@ -575,12 +575,12 @@ return NULL;
 	stmt.m_arg1.m_label = GetName (arg);
 	DTRACE_INTRUCTION (&stmt);
 
-	if ((stmt.m_arg0.m_isPointer) || (stmt.m_arg0.m_intrinsicType != dThreeAdressStmt::m_void)) { 
+	if ((stmt.m_arg0.m_isPointer) || (stmt.m_arg0.m_intrinsicType != dCILInstr::m_void)) { 
 		dCIL::dListNode* const copyNode = NewStatement();
-		dThreeAdressStmt& copyStmt = copyNode->GetInfo();
+		dCILInstr& copyStmt = copyNode->GetInfo();
 
-		copyStmt.m_instruction = dThreeAdressStmt::m_assigment;
-		copyStmt.m_operator = dThreeAdressStmt::m_nothing;
+		copyStmt.m_instruction = dCILInstr::m_assigment;
+		copyStmt.m_operator = dCILInstr::m_nothing;
 		copyStmt.m_arg0.SetType(stmt.m_arg0.GetType());
 		copyStmt.m_arg0.m_label = instr->getName().data();
 
@@ -601,7 +601,7 @@ return NULL;
 	llvm::ReturnInst* const instr =  (llvm::ReturnInst*) intruction;
 
 
-	dThreeAdressStmt::dArgType type (dThreeAdressStmt::m_void);
+	dCILInstr::dArgType type (dCILInstr::m_void);
 	dString arg1Label ("");
 	if (instr->getNumOperands() == 1) {
 		llvm::Value* const arg0 = instr->getOperand(0);
@@ -610,23 +610,23 @@ return NULL;
 		type = GetType (arg0);
 		switch (type.m_intrinsicType) 
 		{
-			case dThreeAdressStmt::m_constInt:
+			case dCILInstr::m_constInt:
 			{
 				dAssert (0);
 #if 0
 				dCIL::dListNode* const node = NewStatement();
-				dThreeAdressStmt& stmt = node->GetInfo();
+				dCILInstr& stmt = node->GetInfo();
 
-				stmt.m_instruction = dThreeAdressStmt::m_assigment;
-				stmt.m_operator = dThreeAdressStmt::m_nothing;
+				stmt.m_instruction = dCILInstr::m_assigment;
+				stmt.m_operator = dCILInstr::m_nothing;
 
-				stmt.m_arg0.m_type = dThreeAdressStmt::m_int;
+				stmt.m_arg0.m_type = dCILInstr::m_int;
 				stmt.m_arg0.m_label = GetReturnVariableName();
 
 				stmt.m_arg1.m_type = type;
 				stmt.m_arg1.m_label = arg1Label;
 
-				type = dThreeAdressStmt::m_int;
+				type = dCILInstr::m_int;
 				arg1Label = stmt.m_arg0.m_label;
 
 				DTRACE_INTRUCTION (&stmt);
@@ -634,7 +634,7 @@ return NULL;
 				break;
 			}
 
-			case dThreeAdressStmt::m_int:
+			case dCILInstr::m_int:
 				dAssert (0);
 				break;
 
@@ -644,9 +644,9 @@ return NULL;
 	}
 
 	dCIL::dListNode* const node = NewStatement();
-	dThreeAdressStmt& stmt = node->GetInfo();
+	dCILInstr& stmt = node->GetInfo();
 
-	stmt.m_instruction = dThreeAdressStmt::m_ret;
+	stmt.m_instruction = dCILInstr::m_ret;
 	stmt.m_arg0.SetType(type);
 	stmt.m_arg0.m_label = arg1Label;
 
@@ -664,36 +664,36 @@ return NULL;
 	llvm::ICmpInst* const instr =  (llvm::ICmpInst*) intruction;
 
 	llvm::CmpInst::Predicate predicate = instr->getPredicate();
-	dThreeAdressStmt::dOperator predicateOperator = dThreeAdressStmt::m_identical;
+	dCILInstr::dOperator predicateOperator = dCILInstr::m_identical;
 	switch (predicate)
 	{
 		case llvm::CmpInst::ICMP_EQ:
 		{
-			predicateOperator = dThreeAdressStmt::m_identical;
+			predicateOperator = dCILInstr::m_identical;
 			break;
 		}
 
 		case llvm::CmpInst::ICMP_SLE:
 		{
-			predicateOperator = dThreeAdressStmt::m_lessEqual;
+			predicateOperator = dCILInstr::m_lessEqual;
 			break;
 		}
 
 		case llvm::CmpInst::ICMP_SGE:
 		{
-			predicateOperator = dThreeAdressStmt::m_greatherEqual;
+			predicateOperator = dCILInstr::m_greatherEqual;
 			break;
 		}
 
 		case llvm::CmpInst::ICMP_SLT:
 		{
-			predicateOperator = dThreeAdressStmt::m_less;
+			predicateOperator = dCILInstr::m_less;
 			break;
 		}
 		
 		case llvm::CmpInst::ICMP_SGT:
 		{
-			predicateOperator = dThreeAdressStmt::m_greather;
+			predicateOperator = dCILInstr::m_greather;
 			break;
 		}
 
@@ -707,15 +707,15 @@ return NULL;
 	llvm::Value* const arg1 = instr->getOperand(1);
 
 	dCIL::dListNode* const node = NewStatement();
-	dThreeAdressStmt& stmt = node->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_assigment;
+	dCILInstr& stmt = node->GetInfo();
+	stmt.m_instruction = dCILInstr::m_assigment;
 
 	stmt.m_operator = predicateOperator;
 
-	stmt.m_arg0.SetType (dThreeAdressStmt::m_int);
+	stmt.m_arg0.SetType (dCILInstr::m_int);
 	stmt.m_arg0.m_label = instr->getName().data();
 
-	stmt.m_arg1.SetType (dThreeAdressStmt::m_int);
+	stmt.m_arg1.SetType (dCILInstr::m_int);
 	stmt.m_arg1.m_label = GetName (arg0);
 
 	stmt.m_arg2.SetType (GetType (arg1));
@@ -734,7 +734,7 @@ return NULL;
 	llvm::BranchInst* const instr =  (llvm::BranchInst*) intruction;
 
 	dCIL::dListNode* const node = NewStatement();
-	dThreeAdressStmt& stmt = node->GetInfo();
+	dCILInstr& stmt = node->GetInfo();
 	llvm::Value* const arg0 = instr->getOperand(0);
 	if (instr->getNumOperands() == 3) {
 		llvm::Value* const arg2 = instr->getOperand(1);
@@ -747,22 +747,22 @@ return NULL;
 		 const llvm::BasicBlock* const block1 = instr->getSuccessor(0);
 		 const llvm::BasicBlock* const block2 = instr->getSuccessor(1);
 
-		stmt.m_instruction = dThreeAdressStmt::m_if;
-		stmt.m_arg0.SetType (dThreeAdressStmt::m_int);
+		stmt.m_instruction = dCILInstr::m_if;
+		stmt.m_arg0.SetType (dCILInstr::m_int);
 		stmt.m_arg0.m_label = arg0->getName().data();
 		stmt.m_arg1.m_label = arg1->getName().data();
 		stmt.m_arg2.m_label = arg2->getName().data();
 
 		// use thsi to save the link later
-		stmt.m_trueTargetJump = (dList<dThreeAdressStmt>::dListNode*) arg1;
-		stmt.m_falseTargetJump = (dList<dThreeAdressStmt>::dListNode*) arg2;
+		stmt.m_trueTargetJump = (dList<dCILInstr>::dListNode*) arg1;
+		stmt.m_falseTargetJump = (dList<dCILInstr>::dListNode*) arg2;
 	} else {
 		dAssert (instr->getNumOperands() == 1);
-		stmt.m_instruction = dThreeAdressStmt::m_goto;
-		stmt.m_operator = dThreeAdressStmt::m_nothing;
+		stmt.m_instruction = dCILInstr::m_goto;
+		stmt.m_operator = dCILInstr::m_nothing;
 		stmt.m_arg0.m_label = arg0->getName().data();
 		// use thsi to save the link later
-		stmt.m_trueTargetJump = (dList<dThreeAdressStmt>::dListNode*) arg0;
+		stmt.m_trueTargetJump = (dList<dCILInstr>::dListNode*) arg0;
 	}
 
 	DTRACE_INTRUCTION (&stmt);
@@ -784,8 +784,8 @@ return NULL;
 		const llvm::StringRef& variableName = variable->getName ();
 
 		dCIL::dListNode* const node = NewStatement();
-		dThreeAdressStmt& stmt = node->GetInfo();
-		stmt.m_instruction = dThreeAdressStmt::m_nop;
+		dCILInstr& stmt = node->GetInfo();
+		stmt.m_instruction = dCILInstr::m_nop;
 		stmt.m_arg0.m_label = m_phiSource;
 		stmt.m_arg1.m_label = variable->getName().data();
 		stmt.m_arg2.m_label = block->getName().data();
@@ -797,8 +797,8 @@ return NULL;
 	const llvm::StringRef& name = instr->getName ();
 
 	dCIL::dListNode* const node = NewStatement();
-	dThreeAdressStmt& stmt = node->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_phi;
+	dCILInstr& stmt = node->GetInfo();
+	stmt.m_instruction = dCILInstr::m_phi;
 	stmt.m_arg0.SetType (GetType (type));
 	stmt.m_arg0.m_label = name.data();
 	DTRACE_INTRUCTION (&stmt);
@@ -817,12 +817,12 @@ return NULL;
 	dAssert (instr->getNumOperands() == 1);
 	llvm::Value* const arg0 = instr->getOperand(0);
 
-	dThreeAdressStmt::dArgType type (GetType(instr->getType()));
+	dCILInstr::dArgType type (GetType(instr->getType()));
 
 	dCIL::dListNode* const node = NewStatement();
-	dThreeAdressStmt& stmt = node->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_loadBase;
-	stmt.m_operator = dThreeAdressStmt::m_nothing;
+	dCILInstr& stmt = node->GetInfo();
+	stmt.m_instruction = dCILInstr::m_loadBase;
+	stmt.m_operator = dCILInstr::m_nothing;
 	stmt.m_arg0.SetType(type);
 	stmt.m_arg0.m_label = instr->getName().data();
 
@@ -846,12 +846,12 @@ return NULL;
 	llvm::Value* const arg0 = instr->getOperand(1);
 	llvm::Value* const arg1 = instr->getOperand(0);
 
-	dThreeAdressStmt::dArgType type (GetType(instr->getType()));
+	dCILInstr::dArgType type (GetType(instr->getType()));
 
 	dCIL::dListNode* const node = NewStatement();
-	dThreeAdressStmt& stmt = node->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_storeBase;
-	stmt.m_operator = dThreeAdressStmt::m_nothing;
+	dCILInstr& stmt = node->GetInfo();
+	stmt.m_instruction = dCILInstr::m_storeBase;
+	stmt.m_operator = dCILInstr::m_nothing;
 
 	stmt.m_arg0.SetType(GetType (arg0));
 	stmt.m_arg0.m_label = GetName (arg0);
@@ -878,23 +878,23 @@ return NULL;
 	llvm::Value* const arg0 = instr->getOperand(0);
 	llvm::Value* const arg1 = instr->getOperand(1);
 
-	dThreeAdressStmt::dArgType type (GetType(instr->getType()));
+	dCILInstr::dArgType type (GetType(instr->getType()));
 
 	dCIL::dListNode* const node1 = NewStatement();
-	dThreeAdressStmt& stmt1 = node1->GetInfo();
-	stmt1.m_instruction = dThreeAdressStmt::m_assigment;
-	stmt1.m_operator = dThreeAdressStmt::m_mul;
+	dCILInstr& stmt1 = node1->GetInfo();
+	stmt1.m_instruction = dCILInstr::m_assigment;
+	stmt1.m_operator = dCILInstr::m_mul;
 	stmt1.m_arg0.SetType(GetType (arg1));
 	stmt1.m_arg0.m_label = GetName (arg1);
 	stmt1.m_arg1 = stmt1.m_arg0;
-	stmt1.m_arg2.SetType(dThreeAdressStmt::m_constInt);
+	stmt1.m_arg2.SetType(dCILInstr::m_constInt);
 	stmt1.m_arg2.m_label = dString (GetType(arg0).GetSizeInByte());
 	DTRACE_INTRUCTION (&stmt1);
 
 	dCIL::dListNode* const node = NewStatement();
-	dThreeAdressStmt& stmt = node->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_assigment;
-	stmt.m_operator = dThreeAdressStmt::m_add;
+	dCILInstr& stmt = node->GetInfo();
+	stmt.m_instruction = dCILInstr::m_assigment;
+	stmt.m_operator = dCILInstr::m_add;
 	stmt.m_arg0.SetType(type);
 	stmt.m_arg0.m_label = instr->getName().data();
 
@@ -916,25 +916,25 @@ return NULL;
 /*
 	llvm::BinaryOperator* const instr = (llvm::BinaryOperator*) intruction;
 
-	dThreeAdressStmt::dOperator operation = dThreeAdressStmt::m_nothing;
+	dCILInstr::dOperator operation = dCILInstr::m_nothing;
 	llvm::BinaryOperator::BinaryOps opcode = instr->getOpcode();
 	switch (opcode) 
 	{
 		case llvm::Instruction::Add:
 		{
-			operation = dThreeAdressStmt::m_add;
+			operation = dCILInstr::m_add;
 			break;
 		}
 
 		case llvm::Instruction::Sub:
 		{
-			operation = dThreeAdressStmt::m_sub;
+			operation = dCILInstr::m_sub;
 			break;
 		}
 
 		case llvm::Instruction::SDiv:
 		{
-			operation = dThreeAdressStmt::m_div;
+			operation = dCILInstr::m_div;
 			break;
 		}
 
@@ -948,8 +948,8 @@ return NULL;
 	llvm::Value* const arg1 = instr->getOperand(1);
 
 	dCIL::dListNode* const node = NewStatement();
-	dThreeAdressStmt& stmt = node->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_assigment;
+	dCILInstr& stmt = node->GetInfo();
+	stmt.m_instruction = dCILInstr::m_assigment;
 	stmt.m_operator = operation;
 
 	stmt.m_arg0.SetType(GetType(instr->getType()));

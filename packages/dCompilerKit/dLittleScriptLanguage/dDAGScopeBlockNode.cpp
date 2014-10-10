@@ -81,8 +81,8 @@ void dDAGScopeBlockNode::CompileCIL(dCIL& cil)
 
 	for (dList<dString>::dListNode* node = m_allocations.GetLast(); node; node = node->GetPrev()) {
 		dAssert (0);
-		//dThreeAdressStmt& allocationStmt = cil.NewStatement()->GetInfo();
-		//allocationStmt.m_instruction = dThreeAdressStmt::m_release;
+		//dCILInstr& allocationStmt = cil.NewStatement()->GetInfo();
+		//allocationStmt.m_instruction = dCILInstr::m_release;
 		//allocationStmt.m_arg0.m_label = node->GetInfo();
 		//DTRACE_INTRUCTION (&allocationStmt);
 	}

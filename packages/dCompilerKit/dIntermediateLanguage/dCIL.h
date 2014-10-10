@@ -70,10 +70,12 @@ class dCIL: public  dList<dCILInstr*>
 	void ConvertLLVMFunctionToNVMFunction (const llvm::Function& funtion);
     void Optimize (llvm::Function* const function);
 
+	void RegisterAllocation (dListNode* const functionNode);
+
 	private:
 	dString GetName (llvm::Value* const value) const;
-	dThreeAdressStmt::dArgType GetType (const llvm::Type* const type) const;
-	dThreeAdressStmt::dArgType GetType (const llvm::Value* const value) const;
+	dCILInstr::dArgType GetType (const llvm::Type* const type) const;
+	dCILInstr::dArgType GetType (const llvm::Value* const value) const;
 
 	dCIL::dListNode* EmitLoad (const llvm::Instruction* const intruction);
 	dCIL::dListNode* EmitStore (const llvm::Instruction* const intruction);
@@ -89,16 +91,12 @@ class dCIL: public  dList<dCILInstr*>
 	dCIL::dListNode* EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions);
 	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& visited, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions);
 
-	void RegisterAllocation (dListNode* const functionNode);
-	
-	
-
 	int m_mark;
 	int m_tempIndex;
 	int m_labelIndex;
-	bool m_commutativeOperator[dThreeAdressStmt::m_operatorsCount];
-	dThreeAdressStmt::dOperator m_conditionals[dThreeAdressStmt::m_operatorsCount];
-	dThreeAdressStmt::dOperator m_operatorComplement[dThreeAdressStmt::m_operatorsCount];
+	bool m_commutativeOperator[dCILThreeArgInstr::m_operatorsCount];
+	dCILThreeArgInstr::dOperator m_conditionals[dCILThreeArgInstr::m_operatorsCount];
+	dCILThreeArgInstr::dOperator m_operatorComplement[dCILThreeArgInstr::m_operatorsCount];
 
     llvm::legacy::FunctionPassManager m_optimizer;
 	
@@ -109,7 +107,8 @@ class dCIL: public  dList<dCILInstr*>
 	static dString m_variableUndercore;
 	static dString m_functionArgument;
 	
-	friend dDataFlowGraph;
+	friend class dDataFlowGraph;
+	friend class dCILInstrIntergerLogical;
 };
 
 

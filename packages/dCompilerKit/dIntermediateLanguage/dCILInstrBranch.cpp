@@ -20,6 +20,16 @@ dCILInstrLabel::dCILInstrLabel(dCIL& program, const dString& label)
 {
 }
 
+bool dCILInstrLabel::IsBasicBlockBegin() const
+{
+	return true;
+}
+
+dCILInstrLabel* dCILInstrLabel::GetAsLabel()
+{
+	return this;
+}
+
 void dCILInstrLabel::Serialize(char* const textOut) const
 {
 	sprintf (textOut, "%s:\n", m_arg0.m_label.GetStr());
@@ -29,6 +39,11 @@ dCILInstrGoto::dCILInstrGoto(dCIL& program, const dString& label)
 	:dCILSingleArgInstr (program, dArg (label, dArgType()))
 	,m_tagetNode(NULL)
 {
+}
+
+bool dCILInstrGoto::IsBasicBlockEnd() const
+{
+	return true;
 }
 
 void dCILInstrGoto::Serialize(char* const textOut) const
@@ -42,6 +57,15 @@ void dCILInstrGoto::SetTarget (dCILInstrLabel* const target)
 	dAssert (target->GetArg0().m_label == GetArg0().m_label);
 }
 
+dList<dCILInstr*>::dListNode* dCILInstrGoto::GetTarget () const
+{
+	return m_tagetNode;
+}
+
+dCILInstrGoto* dCILInstrGoto::GetAsGoto()
+{
+	return this;
+}
 
 dCILInstrIF::dCILInstrIF(dCIL& program, const dString& name, const dArgType& type, const dString& target0, const dString& target1)
 	:dCILThreeArgInstr (program, dArg (name, type), dArg (target0, dArgType()), dArg (target1, dArgType()))
@@ -65,6 +89,27 @@ void dCILInstrIF::SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* con
 	m_tagetNode1 = target1->GetNode();
 }
 
+dList<dCILInstr*>::dListNode* dCILInstrIF::GetTrueTarget () const
+{
+	return m_tagetNode0;
+}
+
+dList<dCILInstr*>::dListNode* dCILInstrIF::GetFalseTarget () const
+{
+	return m_tagetNode1;
+}
+
+
+dCILInstrIF* dCILInstrIF::GetAsIF()
+{
+	return this;
+}
+
+bool dCILInstrIF::IsBasicBlockEnd() const
+{
+	return true;
+}
+
 
 dCILInstrReturn::dCILInstrReturn(dCIL& program, const dString& name, const dArgType& type)
 	:dCILSingleArgInstr (program, dArg (name, type))
@@ -74,6 +119,17 @@ dCILInstrReturn::dCILInstrReturn(dCIL& program, const dString& name, const dArgT
 void dCILInstrReturn::Serialize(char* const textOut) const
 {
 	sprintf (textOut, "\tret %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
+}
+
+bool dCILInstrReturn::IsBasicBlockEnd() const
+{
+	return true;
+}
+
+
+dCILInstrReturn* dCILInstrReturn::GetAsReturn()
+{
+	return this;
 }
 
 /*

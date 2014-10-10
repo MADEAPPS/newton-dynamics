@@ -46,13 +46,13 @@ void dDAGExpressionNodeNew::CompileCIL(dCIL& cil)
 
 	m_dimension->CompileCIL(cil);
 
-	dThreeAdressStmt& arraySizeInBytes = cil.NewStatement()->GetInfo();
-	arraySizeInBytes.m_instruction = dThreeAdressStmt::m_assigment;
-	arraySizeInBytes.m_operator = dThreeAdressStmt::m_mul;
+	dCILInstr& arraySizeInBytes = cil.NewStatement()->GetInfo();
+	arraySizeInBytes.m_instruction = dCILInstr::m_assigment;
+	arraySizeInBytes.m_operator = dCILInstr::m_mul;
 	arraySizeInBytes.m_arg0.m_label = cil.NewTemp();
 	arraySizeInBytes.m_arg1 = m_dimension->m_result;
 
-	arraySizeInBytes.m_arg2.m_type = dThreeAdressStmt::m_intConst;
+	arraySizeInBytes.m_arg2.m_type = dCILInstr::m_intConst;
 	arraySizeInBytes.m_arg2.m_label = "1";
 	if (m_name == "int") {
 		arraySizeInBytes.m_arg2.m_label = "4"; 
@@ -61,8 +61,8 @@ void dDAGExpressionNodeNew::CompileCIL(dCIL& cil)
 	}
 	DTRACE_INTRUCTION (&arraySizeInBytes);
 
-	dThreeAdressStmt& operatorNewInstruction = cil.NewStatement()->GetInfo();
-	operatorNewInstruction.m_instruction = dThreeAdressStmt::m_new;
+	dCILInstr& operatorNewInstruction = cil.NewStatement()->GetInfo();
+	operatorNewInstruction.m_instruction = dCILInstr::m_new;
 	operatorNewInstruction.m_arg0.m_label = cil.NewTemp();
 	operatorNewInstruction.m_arg1.m_label = arraySizeInBytes.m_arg0.m_label; 
 	DTRACE_INTRUCTION (&operatorNewInstruction);

@@ -163,7 +163,11 @@ class dThreeAdressStmt
 	static dMapTable m_maptable[];
 };
 
-
+class dCILInstrIF;
+class dCILInstrGoto;
+class dCILInstrLabel;
+class dCILInstrReturn;
+class dCILInstrFunction;
 
 class dCILInstr
 {
@@ -243,12 +247,27 @@ class dCILInstr
 	dCILInstr (dCIL& program);
 	virtual ~dCILInstr ();
 
+	virtual bool IsBasicBlockBegin() const;
+	virtual bool IsBasicBlockEnd() const;
+
+	virtual dCILInstrIF* GetAsIF();
+	virtual dCILInstrGoto* GetAsGoto();
+	virtual dCILInstrLabel* GetAsLabel();
+	virtual dCILInstrReturn* GetAsReturn();
+	virtual dCILInstrFunction* GetAsFunction();
+	
+
+	virtual bool ApplyRemanticReordering ()
+	{
+		return false;
+	}
+
 	void Trace() const;
 	virtual void Serialize(char* const textOut) const;
 
 	dList<dCILInstr*>::dListNode* GetNode() const;
 
-
+	dCIL* m_cil;
 	dList<dCILInstr*>::dListNode* m_myNode;
 	static dIntrisicType GetTypeID (const dString& typeName);
 	static dMapTable m_maptable[];
@@ -319,6 +338,9 @@ class dCILThreeArgInstr: public dCILTwoArgInstr
 	{
 		return m_arg2;
 	}
+
+	
+
 
 	dArg m_arg2;
 };

@@ -68,18 +68,18 @@ dAssert (0);
 			dDAGDimensionNode* const dim = node->GetInfo();
 			dim->CompileCIL(cil);
 #if 0			
-			dThreeAdressStmt& stmtMul = cil.NewStatement()->GetInfo();
-			stmtMul.m_instruction = dThreeAdressStmt::m_assigment;
-			stmtMul.m_operator = dThreeAdressStmt::m_mul;
+			dCILInstr& stmtMul = cil.NewStatement()->GetInfo();
+			stmtMul.m_instruction = dCILInstr::m_assigment;
+			stmtMul.m_operator = dCILInstr::m_mul;
 			stmtMul.m_arg0.m_label = cil.NewTemp();
 			stmtMul.m_arg1.m_label = result;
 			stmtMul.m_arg2.m_label = dim->m_arraySize;
 
 			DTRACE_INTRUCTION (&stmtMul);
 
-			dThreeAdressStmt& stmtAdd = cil.NewStatement()->GetInfo();
-			stmtAdd.m_instruction = dThreeAdressStmt::m_assigment;
-			stmtAdd.m_operator = dThreeAdressStmt::m_add;
+			dCILInstr& stmtAdd = cil.NewStatement()->GetInfo();
+			stmtAdd.m_instruction = dCILInstr::m_assigment;
+			stmtAdd.m_operator = dCILInstr::m_add;
 			stmtAdd.m_arg0.m_label = cil.NewTemp();
 			stmtAdd.m_arg1.m_label = stmtMul.m_arg0.m_label;
 			stmtAdd.m_arg2 = dim->m_result;
@@ -91,15 +91,15 @@ dAssert (0);
 		}
 
 		dAssert (m_leftVariable->m_parent);
-		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_leftVariable->m_name);
+		dTree<dCILInstr::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_leftVariable->m_name);
 		dAssert (variable);
-		dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, variable->GetInfo()));
-		dThreeAdressStmt::dArg arg0 (LoadLocalVariable(cil, m_expression->m_result));
+		dCILInstr::dArg arg1 (LoadLocalVariable(cil, variable->GetInfo()));
+		dCILInstr::dArg arg0 (LoadLocalVariable(cil, m_expression->m_result));
 
 		dAssert (m_parent);
 		// emit an indirect addressing mode
-		dThreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
-		tmp.m_instruction = dThreeAdressStmt::m_store;
+		dCILInstr& tmp = cil.NewStatement()->GetInfo();
+		tmp.m_instruction = dCILInstr::m_store;
 		tmp.m_arg0 = arg0;
 		tmp.m_arg1 = arg1;
 		tmp.m_arg2 = dim->m_result;
@@ -107,9 +107,9 @@ dAssert (0);
 		m_result = tmp.m_arg0; 
 	} else {
 		m_leftVariable->CompileCIL(cil); 
-		dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
-		dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-		stmt.m_instruction = (m_leftVariable->m_result.m_label.Find(m_scopePrefix) == 0) ? dThreeAdressStmt::m_storeBase : stmt.m_instruction = dThreeAdressStmt::m_assigment;
+		dCILInstr::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
+		dCILInstr& stmt = cil.NewStatement()->GetInfo();
+		stmt.m_instruction = (m_leftVariable->m_result.m_label.Find(m_scopePrefix) == 0) ? dCILInstr::m_storeBase : stmt.m_instruction = dCILInstr::m_assigment;
 		stmt.m_arg0 = m_leftVariable->m_result;
 		stmt.m_arg1 = arg1;
 		DTRACE_INTRUCTION (&stmt);

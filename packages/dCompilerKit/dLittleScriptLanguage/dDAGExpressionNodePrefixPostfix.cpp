@@ -42,20 +42,20 @@ void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 dAssert (0);
 /*
 	m_expression->CompileCIL(cil);
-	dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
+	dCILInstr::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
 
-	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_assigment;
-	stmt.m_operator = m_isIncrement ? dThreeAdressStmt::m_add : dThreeAdressStmt::m_sub;
+	dCILInstr& stmt = cil.NewStatement()->GetInfo();
+	stmt.m_instruction = dCILInstr::m_assigment;
+	stmt.m_operator = m_isIncrement ? dCILInstr::m_add : dCILInstr::m_sub;
 	stmt.m_arg0.m_label = cil.NewTemp();
 	stmt.m_arg0.SetType (arg1.GetType());
 	stmt.m_arg1 = arg1;
-	stmt.m_arg2.SetType (dThreeAdressStmt::m_constInt, false);
+	stmt.m_arg2.SetType (dCILInstr::m_constInt, false);
 	stmt.m_arg2.m_label = "1";
 	DTRACE_INTRUCTION (&stmt);
 
-	dThreeAdressStmt& stmt1 = cil.NewStatement()->GetInfo();
-	stmt1.m_instruction = dThreeAdressStmt::m_storeBase;
+	dCILInstr& stmt1 = cil.NewStatement()->GetInfo();
+	stmt1.m_instruction = dCILInstr::m_storeBase;
 	stmt1.m_arg0 = m_expression->m_result;
 	stmt1.m_arg1 = stmt.m_arg0;
 	DTRACE_INTRUCTION (&stmt1);

@@ -65,9 +65,9 @@ dString dDAGTypeNode::GetIntrisicTypeString() const
 {
 
 	if (IsPointer()) {
-		return dThreeAdressStmt::GetTypeString (GetIntrinsicType()) + dCIL::m_pointerDecoration;
+		return dCILInstr::GetTypeString (GetIntrinsicType()) + dCIL::m_pointerDecoration;
 	} else {
-		return dThreeAdressStmt::GetTypeString (GetIntrinsicType());
+		return dCILInstr::GetTypeString (GetIntrinsicType());
 	}
 }
 */

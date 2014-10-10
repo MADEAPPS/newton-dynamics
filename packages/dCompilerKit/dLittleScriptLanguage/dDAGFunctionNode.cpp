@@ -290,8 +290,11 @@ dString dDAGFunctionNode::GetLLVMArgName (const dThreeAdressStmt::dArg& arg)
 }
 */
 
-llvm::Type* dDAGFunctionNode::GetLLVMType (const dThreeAdressStmt::dArg& arg, llvm::LLVMContext &context)
+llvm::Type* dDAGFunctionNode::GetLLVMType (const dCILInstr::dArg& arg, llvm::LLVMContext &context)
 {
+dAssert (0);
+return NULL;
+/*
 	llvm::Type* type = NULL;
 	if (arg.m_isPointer) {
 		switch (arg.m_intrinsicType)
@@ -334,6 +337,7 @@ llvm::Type* dDAGFunctionNode::GetLLVMType (const dThreeAdressStmt::dArg& arg, ll
 
 	dAssert (type);
 	return type;
+*/
 }
 
 llvm::Function* dDAGFunctionNode::CreateLLVMfunctionDeclaration (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
@@ -381,8 +385,12 @@ return NULL;
 
 
 
-llvm::Value* dDAGFunctionNode::GetLLVMConstantOrValue (dLLVMSymbols& localSymbols, const dThreeAdressStmt::dArg& arg, llvm::LLVMContext &context)
+llvm::Value* dDAGFunctionNode::GetLLVMConstantOrValue (dLLVMSymbols& localSymbols, const dCILInstr::dArg& arg, llvm::LLVMContext &context)
 {
+dAssert (0);
+return NULL;
+
+/*
 	dLLVMSymbols::dTreeNode* node = localSymbols.Find (arg.m_label);
 	if (!node) {
 		llvm::Value* value = NULL;
@@ -401,6 +409,7 @@ llvm::Value* dDAGFunctionNode::GetLLVMConstantOrValue (dLLVMSymbols& localSymbol
 	}
 
 	return node->GetInfo();
+*/
 }
 
 llvm::Function* dDAGFunctionNode::EmitLLVMfunction (dLLVMSymbols& localSymbols, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols)
@@ -832,4 +841,10 @@ dAssert (0);
 
     cil.Optimize (llvmFunction);
 */
+}
+
+
+void dDAGFunctionNode::ConvertToTarget (dCIL& cil)
+{
+	cil.RegisterAllocation (m_functionStart);
 }

@@ -47,16 +47,16 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 	memset (tmp, 0, size * sizeof (dVirtualMachine::dOpCode));
 
 	for (dCIL::dListNode* node = classCode.GetFirst(); node; node = node->GetNext()) {
-		dThreeAdressStmt& stmt = node->GetInfo();
+		dCILInstr& stmt = node->GetInfo();
 		switch (stmt.m_instruction) 
 		{
-			case dThreeAdressStmt::m_function:	
+			case dCILInstr::m_function:	
 			{
 				m_symbolTable.Insert(count, (char*)stmt.m_arg0.m_label.GetStr());
 				break;
 			}
 
-			case dThreeAdressStmt::m_enter:	
+			case dCILInstr::m_enter:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::enter;
 				tmp[count].m_imm1 = stmt.m_extraInformation;
@@ -67,7 +67,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dThreeAdressStmt::m_leave:	
+			case dCILInstr::m_leave:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::leave;
 				tmp[count].m_imm1 = stmt.m_extraInformation;
@@ -76,14 +76,14 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			}
 
 
-			case dThreeAdressStmt::m_argument:	
+			case dCILInstr::m_argument:	
 			{
 				parameters.Insert(paramIndex * sizeof (unsigned) + stackOffset + sizeof (unsigned), stmt.m_arg0.m_label.GetStr());
 				paramIndex ++;
 				break;
 			}
 
-			case dThreeAdressStmt::m_loadBase:	
+			case dCILInstr::m_loadBase:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::loadBase;
 				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
@@ -93,7 +93,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dThreeAdressStmt::m_storeBase:	
+			case dCILInstr::m_storeBase:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::storeBase;
 				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
@@ -104,13 +104,13 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			}
 
 
-			case dThreeAdressStmt::m_label:	
+			case dCILInstr::m_label:	
 			{
 				jumpTargets.Insert(count, stmt.m_arg0.m_label.GetStr());
 				break;
 			}
 
-			case dThreeAdressStmt::m_goto:	
+			case dCILInstr::m_goto:	
 			{
 				jumpsOrigin.Insert(stmt.m_arg0.m_label.GetStr(), count);
 				tmp[count].m_opcode = dVirtualMachine::jump;
@@ -119,7 +119,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dThreeAdressStmt::m_load:	
+			case dCILInstr::m_load:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::loadw;
 				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
@@ -130,7 +130,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dThreeAdressStmt::m_store:	
+			case dCILInstr::m_store:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::storew;
 				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
@@ -141,7 +141,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dThreeAdressStmt::m_if:	
+			case dCILInstr::m_if:	
 			{
 				jumpsOrigin.Insert(stmt.m_arg2.m_label.GetStr(), count);
 				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
@@ -149,27 +149,27 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				tmp[count].m_imm3 = 0;
 				switch (stmt.m_operator)
 				{
-					case dThreeAdressStmt::m_different:
+					case dCILInstr::m_different:
 						tmp[count].m_opcode = dVirtualMachine::bne;
 						break;
 
-					case dThreeAdressStmt::m_identical:
+					case dCILInstr::m_identical:
 						tmp[count].m_opcode = dVirtualMachine::beq;
 						break;
 
-					case dThreeAdressStmt::m_less:
+					case dCILInstr::m_less:
 						tmp[count].m_opcode = dVirtualMachine::blt;
 						break;
 
-					case dThreeAdressStmt::m_greather:
+					case dCILInstr::m_greather:
 						tmp[count].m_opcode = dVirtualMachine::bgt;
 						break;
 				
-					case dThreeAdressStmt::m_lessEqual:
+					case dCILInstr::m_lessEqual:
 						tmp[count].m_opcode = dVirtualMachine::ble;
 						break;
 
-					case dThreeAdressStmt::m_greatherEqual:
+					case dCILInstr::m_greatherEqual:
 						tmp[count].m_opcode = dVirtualMachine::bge;
 						break;
 
@@ -181,11 +181,11 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dThreeAdressStmt::m_assigment:	
+			case dCILInstr::m_assigment:	
 			{
 				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
-				if (stmt.m_operator == dThreeAdressStmt::m_nothing) {
-					if (stmt.m_arg1.m_type == dThreeAdressStmt::m_intConst) {
+				if (stmt.m_operator == dCILInstr::m_nothing) {
+					if (stmt.m_arg1.m_type == dCILInstr::m_intConst) {
 						tmp[count].m_opcode = dVirtualMachine::movi;
 						dString value (stmt.m_arg1.m_label.GetStr());
 						tmp[count].m_imm3 = value.ToInteger();
@@ -195,32 +195,32 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 					}
 				} else {
 					tmp[count].m_reg1 = RegisterToIndex (stmt.m_arg1.m_label.GetStr());
-					if (stmt.m_arg2.m_type == dThreeAdressStmt::m_intConst) {
+					if (stmt.m_arg2.m_type == dCILInstr::m_intConst) {
 						dString value (stmt.m_arg2.m_label.GetStr());
 						switch (stmt.m_operator) 
 						{
-							case dThreeAdressStmt::m_add:
+							case dCILInstr::m_add:
 							{
 								tmp[count].m_opcode = dVirtualMachine::addi;
 								tmp[count].m_imm3 = value.ToInteger();
 								break;
 							}
 
-							case dThreeAdressStmt::m_sub:
+							case dCILInstr::m_sub:
 							{
 								tmp[count].m_opcode = dVirtualMachine::addi;
 								tmp[count].m_imm3 = -value.ToInteger();
 								break;
 							}
 
-							case dThreeAdressStmt::m_mul:
+							case dCILInstr::m_mul:
 							{
 								tmp[count].m_opcode = dVirtualMachine::muli;
 								tmp[count].m_imm3 = -value.ToInteger();
 								break;
 							}
 
-							case dThreeAdressStmt::m_div:
+							case dCILInstr::m_div:
 							{
 								tmp[count].m_opcode = dVirtualMachine::divi;
 								tmp[count].m_imm3 = -value.ToInteger();
@@ -234,50 +234,50 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 						tmp[count].m_reg2 = RegisterToIndex (stmt.m_arg2.m_label.GetStr());
 						switch (stmt.m_operator) 
 						{
-							case dThreeAdressStmt::m_identical:
+							case dCILInstr::m_identical:
 							{
 								tmp[count].m_opcode = dVirtualMachine::eq;
 								break;
 							}
 
-							case dThreeAdressStmt::m_lessEqual:
+							case dCILInstr::m_lessEqual:
 							{
 								tmp[count].m_opcode = dVirtualMachine::le;
 								break;
 							}
 
-							case dThreeAdressStmt::m_less:
+							case dCILInstr::m_less:
 							{
 								tmp[count].m_opcode = dVirtualMachine::lt;
 								break;
 							}
-							case dThreeAdressStmt::m_greather:
+							case dCILInstr::m_greather:
 							{
 								tmp[count].m_opcode = dVirtualMachine::gt;
 								break;
 							}
 
 
-							case dThreeAdressStmt::m_add:
+							case dCILInstr::m_add:
 							{
 								tmp[count].m_opcode = dVirtualMachine::add;
 								break;
 							}
 
-							case dThreeAdressStmt::m_sub:
+							case dCILInstr::m_sub:
 							{
 								tmp[count].m_opcode = dVirtualMachine::sub;
 								break;
 							}
 
-							case dThreeAdressStmt::m_mul:
+							case dCILInstr::m_mul:
 							{
 								tmp[count].m_opcode = dVirtualMachine::mul;
 								break;
 							}
 
 
-							case dThreeAdressStmt::m_div:
+							case dCILInstr::m_div:
 							{
 								tmp[count].m_opcode = dVirtualMachine::div;
 								break;
@@ -293,7 +293,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dThreeAdressStmt::m_call:	
+			case dCILInstr::m_call:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::call;
 				tmp[count].m_reg0 = D_STACK_REGISTER_INDEX;
@@ -303,7 +303,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dThreeAdressStmt::m_ret:	
+			case dCILInstr::m_ret:	
 			{
 				dString value (stmt.m_arg1.m_label.GetStr());
 				tmp[count].m_opcode = dVirtualMachine::ret;
@@ -314,7 +314,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			}
 
 
-			case dThreeAdressStmt::m_push:	
+			case dCILInstr::m_push:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::push;
 				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
@@ -323,7 +323,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 				break;
 			}
 
-			case dThreeAdressStmt::m_pop:	
+			case dCILInstr::m_pop:	
 			{
 				tmp[count].m_opcode = dVirtualMachine::pop;
 				tmp[count].m_reg0 = RegisterToIndex (stmt.m_arg0.m_label.GetStr());
@@ -333,7 +333,7 @@ void dScriptClass::AddCode (dDAGClassNode* const classSymbols, dCIL& classCode)
 			}
 
 
-			case dThreeAdressStmt::m_nop:	
+			case dCILInstr::m_nop:	
 				break;
 			
 			default: 

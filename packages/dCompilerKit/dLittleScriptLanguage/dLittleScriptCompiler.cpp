@@ -207,7 +207,7 @@ int dScriptCompiler::CompileSource (const char* const source)
 		cil.Trace();
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
-			dAssert (0);
+			scripClass->ConvertToTarget (cil);
 		}
 	}
 	return 0;

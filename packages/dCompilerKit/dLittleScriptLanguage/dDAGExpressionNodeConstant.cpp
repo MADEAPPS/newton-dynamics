@@ -70,16 +70,16 @@ dCIL::dReturnValue dDAGExpressionNodeConstant::Evalue(const dDAGFunctionNode* co
 void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 {
 /*
-	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_assigment;
-	stmt.m_operator = dThreeAdressStmt::m_nothing;
+	dCILInstr& stmt = cil.NewStatement()->GetInfo();
+	stmt.m_instruction = dCILInstr::m_assigment;
+	stmt.m_operator = dCILInstr::m_nothing;
 	stmt.m_arg0.m_label = cil.NewTemp();
 
 	switch (m_type) 
 	{
-		case dThreeAdressStmt::m_int:
+		case dCILInstr::m_int:
 		{
-			stmt.m_arg1.m_type = dThreeAdressStmt::m_intConst;
+			stmt.m_arg1.m_type = dCILInstr::m_intConst;
 			arg.m_type = 
 			break;
 		}
@@ -87,13 +87,13 @@ void dDAGExpressionNodeConstant::CompileCIL(dCIL& cil)
 		case m_floatValue:
 		{
 			dAssert (0);
-			stmt.m_arg1.m_type = dThreeAdressStmt::m_floatConst;
+			stmt.m_arg1.m_type = dCILInstr::m_floatConst;
 			break;
 		}
 
 		case m_classPointer:
 		{
-			stmt.m_arg1.m_type = dThreeAdressStmt::m_classPointer;
+			stmt.m_arg1.m_type = dCILInstr::m_classPointer;
 			break;
 		}
 
@@ -123,7 +123,7 @@ void dDAGExpressionNodeOperatorThisConstant::CompileCIL(dCIL& cil)
 dAssert (0);
 /*
 	dDAGFunctionNode* const function = GetFunction();
-	m_result.m_type = dThreeAdressStmt::m_classPointer;
+	m_result.m_type = dCILInstr::m_classPointer;
 	m_result.m_label = function->m_opertatorThis;
 */
 }

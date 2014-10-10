@@ -42,8 +42,8 @@ dAssert (0);
 		if (node->IsType(dDAGScopeBlockNode::GetRttiType())) {
 			dDAGScopeBlockNode* const scope = (dDAGScopeBlockNode*)node;
 			for (dList<dString>::dListNode* node = scope->m_allocations.GetLast(); node; node = node->GetPrev()) {
-				dThreeAdressStmt& allocationStmt = cil.NewStatement()->GetInfo();
-				allocationStmt.m_instruction = dThreeAdressStmt::m_release;
+				dCILInstr& allocationStmt = cil.NewStatement()->GetInfo();
+				allocationStmt.m_instruction = dCILInstr::m_release;
 				allocationStmt.m_arg0.m_label = node->GetInfo();
 				DTRACE_INTRUCTION (&allocationStmt);
 			}
@@ -51,8 +51,8 @@ dAssert (0);
 
 		if (node->IsType(dDAGFunctionStatementFlow::GetRttiType())) {
 			dDAGFunctionStatementFlow* const flowControl = (dDAGFunctionStatementFlow*) node;
-			dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-			stmt.m_instruction = dThreeAdressStmt::m_goto;
+			dCILInstr& stmt = cil.NewStatement()->GetInfo();
+			stmt.m_instruction = dCILInstr::m_goto;
 			stmt.m_arg0.m_label = flowControl->m_currentBreakLabel;
 			stmt.m_arg2.m_label = "break";
 			DTRACE_INTRUCTION (&stmt);

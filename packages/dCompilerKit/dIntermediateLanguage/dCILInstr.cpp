@@ -503,13 +503,51 @@ void dCILInstr::dArg::SetType (dIntrisicType intrinsicType, bool pointer)
 
 
 dCILInstr::dCILInstr (dCIL& program)
-	:m_myNode (program.Append (this))
+	:m_cil(&program)
+	,m_myNode (program.Append (this))
 {
 
 }
 
 dCILInstr::~dCILInstr ()
 {
+	m_cil->Remove (m_myNode);
+}
+
+
+bool dCILInstr::IsBasicBlockBegin() const
+{
+	return false;
+}
+
+bool dCILInstr::IsBasicBlockEnd() const
+{
+	return false;
+}
+
+dCILInstrIF* dCILInstr::GetAsIF()
+{
+	return NULL;
+}
+
+dCILInstrGoto* dCILInstr::GetAsGoto()
+{
+	return NULL;
+}
+
+dCILInstrLabel* dCILInstr::GetAsLabel()
+{
+	return NULL;
+}
+
+dCILInstrReturn* dCILInstr::GetAsReturn()
+{
+	return NULL;
+}
+
+dCILInstrFunction* dCILInstr::GetAsFunction()
+{
+	return NULL;
 }
 
 
@@ -531,3 +569,5 @@ void dCILInstr::Trace() const
 	dTrace ((text));
 #endif
 }
+
+

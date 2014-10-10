@@ -11,6 +11,7 @@
 
 
 #include "dCILstdafx.h"
+#include "dCILInstrBranch.h"
 #include "dBasicBlockList.h"
 
 dBasicBlock::dBasicBlock (dCIL::dListNode* const begin)
@@ -54,50 +55,38 @@ void dBasicBlocksList::Clear ()
 
 void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 {
-dAssert (0);
-/*
 	m_begin = functionNode;
 	m_end = functionNode->GetNext();
-	for (; m_end && (m_end->GetInfo().m_instruction != dThreeAdressStmt::m_function); m_end = m_end->GetNext());
+	//for (; m_end && (m_end->GetInfo().m_instruction != dCILInstr::m_function); m_end = m_end->GetNext());
+	for (; m_end && !m_end->GetInfo()->GetAsFunction(); m_end = m_end->GetNext());
 
 	// remove redundant jumps
-	dCIL::dListNode* nextNode;
-	for (dCIL::dListNode* node = m_begin; node != m_end; node = nextNode) {
-		nextNode = node->GetNext(); 
-		const dThreeAdressStmt& stmt = node->GetInfo();
-		if (stmt.m_instruction == dThreeAdressStmt::m_goto) {
-			dCIL::dListNode* const prevNode = node->GetPrev();
-			const dThreeAdressStmt& prevStmt = prevNode->GetInfo();
-			if (prevStmt.m_instruction == dThreeAdressStmt::m_ret) {
-				cil.Remove(node);
+	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+		dCILInstrReturn* const returnInst = node->GetInfo()->GetAsReturn();
+		if (returnInst && node->GetNext()) {
+			const dCILInstrGoto* const gotoInst = node->GetNext()->GetInfo()->GetAsGoto();
+			if (gotoInst) {
+				delete gotoInst;
 			}
 		}
 	}
 
+	//cil.Trace();
+
 	// find the root of all basic blocks leaders
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
-		const dThreeAdressStmt& stmt = node->GetInfo();
-
-		if (stmt.m_instruction == dThreeAdressStmt::m_label) {
+		if (node->GetInfo()->IsBasicBlockBegin()) {
 			Append(dBasicBlock(node));
 		}
 	}
 
 	for (dList<dBasicBlock>::dListNode* blockNode = GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
 		dBasicBlock& block = blockNode->GetInfo();
-
-		for (dCIL::dListNode* stmtNode = block.m_begin; !block.m_end && stmtNode; stmtNode = stmtNode->GetNext()) {
-			const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-			switch (stmt.m_instruction)
-			{
-				case dThreeAdressStmt::m_if:
-				case dThreeAdressStmt::m_goto:
-				case dThreeAdressStmt::m_ret:
-					block.m_end = stmtNode;
-					break;
+		for (dCIL::dListNode* node = block.m_begin; !block.m_end && node; node = node->GetNext()) {
+			if (node->GetInfo()->IsBasicBlockEnd()) {
+				block.m_end = node;
 			}
 		} 
 	}
-*/
 }
 

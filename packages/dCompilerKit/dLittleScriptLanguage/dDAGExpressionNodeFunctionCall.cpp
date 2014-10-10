@@ -68,9 +68,9 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 	}
 
 
-//	for (dList<dThreeAdressStmt::dArg>::dListNode* node = paramList.GetFirst(); node; node = node->GetNext()) {
-//		dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-//		stmt.m_instruction = dThreeAdressStmt::m_param;
+//	for (dList<dCILInstr::dArg>::dListNode* node = paramList.GetFirst(); node; node = node->GetNext()) {
+//		dCILInstr& stmt = cil.NewStatement()->GetInfo();
+//		stmt.m_instruction = dCILInstr::m_param;
 //		stmt.m_arg0 = node->GetInfo();
 //		DTRACE_INTRUCTION (&stmt);
 //	}

@@ -154,3 +154,39 @@ void dCILInstrIntergerLogical::Serialize(char* const textOut) const
 
 	sprintf(textOut, "\t%s %s = %s %s%s%s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr(), assignOperator, m_arg2.GetTypeName().GetStr(), m_arg2.m_label.GetStr() );
 }
+
+
+
+bool dCILInstrIntergerLogical::ApplyRemanticReordering ()
+{
+	const dArg& arg1 = GetArg1();
+	switch (arg1.GetType().m_intrinsicType)
+	{
+		case m_constInt:
+		{
+			dAssert (0);
+			if (m_cil->m_commutativeOperator[m_operator]) {
+//				dAssert (stmt.m_arg2.GetType().m_intrinsicType != dThreeAdressStmt::m_constInt);
+//				dSwap (stmt.m_arg1, stmt.m_arg2);
+			} else {
+/*
+				dCIL::dListNode* const node = m_cil->NewStatement();
+				m_cil->InsertAfter (stmtNode, node);
+
+				dThreeAdressStmt& tmpStmt = node->GetInfo();
+				tmpStmt = stmt;
+								
+				stmt.m_instruction = dThreeAdressStmt::m_assigment;
+				stmt.m_operator = dThreeAdressStmt::m_nothing;
+				stmt.m_arg0.m_label += dCIL::m_variableUndercore; 
+				stmt.m_arg2.m_label = "";
+				tmpStmt.m_arg1 = stmt.m_arg0;
+*/
+			}
+			return true;
+		}
+		default:
+			break;
+	}
+	return false;
+}

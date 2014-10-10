@@ -234,7 +234,7 @@ class dDataFlowGraph
 	void FindNodesInPathway(dCIL::dListNode* const source, dCIL::dListNode* const destination, dTree<int, dCIL::dListNode*>& pathOut) const;
 
 	bool DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const;
-	int EvaluateBinaryExpression (const dString& arg1, dThreeAdressStmt::dOperator operation, const dString& arg2) const;
+	int EvaluateBinaryExpression (const dString& arg1, dCILThreeArgInstr::dOperator operation, const dString& arg2) const;
 
 	void GetLoops (dList<dLoop>& loops) const;
 	bool CheckBackEdgePreReachInLoop(dCIL::dListNode* const stmt, const dLoop& loop) const;

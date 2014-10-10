@@ -49,9 +49,9 @@ void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)
 		m_testExpression->CompileCIL(cil);
 
 		startExpressionTestNode = cil.NewStatement();
-		dThreeAdressStmt& stmt = startExpressionTestNode->GetInfo();
-		stmt.m_instruction = dThreeAdressStmt::m_if;
-		stmt.m_operator = dThreeAdressStmt::m_nothing;
+		dCILInstr& stmt = startExpressionTestNode->GetInfo();
+		stmt.m_instruction = dCILInstr::m_if;
+		stmt.m_operator = dCILInstr::m_nothing;
 		stmt.m_arg0 = m_testExpression->m_result;
 		stmt.m_arg1.m_label = startLabel;
 		stmt.m_arg2.m_label = "";
@@ -64,8 +64,8 @@ void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)
 	if (startExpressionTestNode) {
 		startExpressionTestNode->GetInfo().m_trueTargetJump = entryLabelNode;
 	}
-	dThreeAdressStmt& entryLabel = entryLabelNode->GetInfo();
-	entryLabel.m_instruction = dThreeAdressStmt::m_label;
+	dCILInstr& entryLabel = entryLabelNode->GetInfo();
+	entryLabel.m_instruction = dCILInstr::m_label;
 	entryLabel.m_arg0.m_label = startLabel;
 	DTRACE_INTRUCTION (&entryLabel);
 
@@ -73,7 +73,7 @@ void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)
 	dCIL::dListNode* const exitLabelStmtNode = CompileCILLoopBody(cil, entryLabelNode, NULL);
 
 	if (startExpressionTestNode) {
-		dThreeAdressStmt& stmt = startExpressionTestNode->GetInfo();
+		dCILInstr& stmt = startExpressionTestNode->GetInfo();
 		stmt.m_falseTargetJump = exitLabelStmtNode;
 		stmt.m_arg2 = exitLabelStmtNode->GetInfo().m_arg0; 
 	}

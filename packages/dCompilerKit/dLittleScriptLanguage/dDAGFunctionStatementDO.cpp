@@ -42,15 +42,15 @@ void dDAGFunctionStatementDO::CompileCIL(dCIL& cil)
 dAssert (0);
 /*
 	dCIL::dListNode* const blockTerminatorNode = cil.NewStatement();
-	dThreeAdressStmt& blockTerminator = blockTerminatorNode->GetInfo();
-	blockTerminator.m_instruction = dThreeAdressStmt::m_goto;
+	dCILInstr& blockTerminator = blockTerminatorNode->GetInfo();
+	blockTerminator.m_instruction = dCILInstr::m_goto;
 	blockTerminator.m_arg0.m_label = cil.NewLabel();
 	DTRACE_INTRUCTION (&blockTerminator);
 
 	dCIL::dListNode* const entryLabelNode = cil.NewStatement();
 	blockTerminator.m_trueTargetJump = entryLabelNode;
-	dThreeAdressStmt& entryLabel = entryLabelNode->GetInfo();
-	entryLabel.m_instruction = dThreeAdressStmt::m_label;
+	dCILInstr& entryLabel = entryLabelNode->GetInfo();
+	entryLabel.m_instruction = dCILInstr::m_label;
 	entryLabel.m_arg0 = blockTerminator.m_arg0;
 	DTRACE_INTRUCTION (&entryLabel);
 	CompileCILLoopBody(cil, entryLabelNode, NULL);

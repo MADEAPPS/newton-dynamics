@@ -22,6 +22,9 @@ class dCILInstrLabel: public dCILSingleArgInstr
 	public:
 	dCILInstrLabel(dCIL& program, const dString& label);
 	void Serialize(char* const textOut) const;
+
+	virtual bool IsBasicBlockBegin() const;
+	virtual dCILInstrLabel* GetAsLabel();
 };
 
 class dCILInstrGoto: public dCILSingleArgInstr
@@ -30,7 +33,11 @@ class dCILInstrGoto: public dCILSingleArgInstr
 	dCILInstrGoto(dCIL& program, const dString& label);
 	void Serialize(char* const textOut) const;
 
+	virtual bool IsBasicBlockEnd() const;
+	virtual dCILInstrGoto* GetAsGoto();
+
 	void SetTarget (dCILInstrLabel* const target0);
+	dList<dCILInstr*>::dListNode* GetTarget () const;
 
 	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
@@ -41,7 +48,14 @@ class dCILInstrIF: public dCILThreeArgInstr
 	dCILInstrIF (dCIL& program, const dString& name, const dArgType& type, const dString& target0, const dString& target1);
 	void Serialize(char* const textOut) const;
 
+	virtual dCILInstrIF* GetAsIF();
+	virtual bool IsBasicBlockEnd() const;
 	void SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1) ;
+
+	dList<dCILInstr*>::dListNode* GetTrueTarget () const;
+	dList<dCILInstr*>::dListNode* GetFalseTarget () const;
+
+	dList<dCILInstr*>::dListNode* GetTrue ();
 	dList<dCILInstr*>::dListNode* m_tagetNode0;
 	dList<dCILInstr*>::dListNode* m_tagetNode1;
 };
@@ -52,6 +66,9 @@ class dCILInstrReturn: public dCILSingleArgInstr
 	public:
 	dCILInstrReturn(dCIL& program, const dString& name, const dArgType& type);
 	void Serialize(char* const textOut) const;
+
+	virtual bool IsBasicBlockEnd() const;
+	virtual dCILInstrReturn* GetAsReturn();
 };
 
 class dCILInstrCall: public dCILTwoArgInstr

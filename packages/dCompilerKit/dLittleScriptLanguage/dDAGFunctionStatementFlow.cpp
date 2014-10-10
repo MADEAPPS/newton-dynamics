@@ -70,18 +70,18 @@ dAssert (0);
 	do {
 		node = node->GetNext();
 		if (node) {
-			dThreeAdressStmt& stmt = node->GetInfo();
-			if ((stmt.m_instruction == dThreeAdressStmt::m_goto) && (stmt.m_arg2.m_label == "break")) {
+			dCILInstr& stmt = node->GetInfo();
+			if ((stmt.m_instruction == dCILInstr::m_goto) && (stmt.m_arg2.m_label == "break")) {
 				dAssert (0);
 #if 0
 				dCIL::dListNode* const target = cil.NewStatement();
-				dThreeAdressStmt& jmpTarget = target->GetInfo();
-				jmpTarget.m_instruction = dThreeAdressStmt::m_label;
+				dCILInstr& jmpTarget = target->GetInfo();
+				jmpTarget.m_instruction = dCILInstr::m_label;
 				jmpTarget.m_arg0.m_label = m_currentBreakLabel;
 				DTRACE_INTRUCTION (&jmpTarget);
 				for (; node; node = node->GetNext()) {
-					dThreeAdressStmt& stmt = node->GetInfo();
-					if ((stmt.m_instruction == dThreeAdressStmt::m_goto) && (stmt.m_arg2.m_label == "break")){
+					dCILInstr& stmt = node->GetInfo();
+					if ((stmt.m_instruction == dCILInstr::m_goto) && (stmt.m_arg2.m_label == "break")){
 						stmt.m_jmpTarget = target;
 						stmt.m_arg2.m_label = "";
 					}
@@ -93,8 +93,8 @@ dAssert (0);
 
 
 	for (dCIL::dListNode* node = m_backPatchStart; node; node = node->GetNext()) {
-		dThreeAdressStmt& stmt = node->GetInfo();
-		if ((stmt.m_instruction == dThreeAdressStmt::m_goto) && (stmt.m_arg2.m_label == "continue")) {
+		dCILInstr& stmt = node->GetInfo();
+		if ((stmt.m_instruction == dCILInstr::m_goto) && (stmt.m_arg2.m_label == "continue")) {
 			dAssert (0);
 #if 0
 			stmt.m_jmpTarget = m_continueTarget;
@@ -115,8 +115,8 @@ dAssert (0);
 	function->m_loopLayer ++ ;
 	int layer = function->m_loopLayer;
 
-	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_nop;
+	dCILInstr& stmt = cil.NewStatement()->GetInfo();
+	stmt.m_instruction = dCILInstr::m_nop;
 	stmt.m_arg0.m_label = m_loopHeadMetaData;
 	stmt.m_arg1.m_label = dString (layer);
 	//stmt.m_extraInformation = layer;
@@ -131,12 +131,12 @@ dAssert (0);
 	dDAGFunctionNode* const function = GetFunction();
 	int layer = function->m_loopLayer;
 
-	dThreeAdressStmt& stmt0 = cil.NewStatement()->GetInfo();
-	stmt0.m_instruction = dThreeAdressStmt::m_nop;
+	dCILInstr& stmt0 = cil.NewStatement()->GetInfo();
+	stmt0.m_instruction = dCILInstr::m_nop;
 	DTRACE_INTRUCTION (&stmt0);
 
-	dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-	stmt.m_instruction = dThreeAdressStmt::m_nop;
+	dCILInstr& stmt = cil.NewStatement()->GetInfo();
+	stmt.m_instruction = dCILInstr::m_nop;
 	stmt.m_arg0.m_label = m_loopTailMetaData;
 	stmt.m_arg1.m_label = dString (layer);
 	DTRACE_INTRUCTION (&stmt);
@@ -152,7 +152,7 @@ return NULL;
 /*
 	OpenPreHeaderBlock(cil);
 
-	dAssert (entryLabelNode && (entryLabelNode->GetInfo().m_instruction == dThreeAdressStmt::m_label));
+	dAssert (entryLabelNode && (entryLabelNode->GetInfo().m_instruction == dCILInstr::m_label));
 
 	dString exitLabel (cil.NewLabel());
 
@@ -163,8 +163,8 @@ return NULL;
 
 	if (m_currentContinueLabel != "") {
 		m_continueTarget = cil.NewStatement();
-		dThreeAdressStmt& continueTargeStmt = m_continueTarget->GetInfo();
-		continueTargeStmt.m_instruction = dThreeAdressStmt::m_label;
+		dCILInstr& continueTargeStmt = m_continueTarget->GetInfo();
+		continueTargeStmt.m_instruction = dCILInstr::m_label;
 		continueTargeStmt.m_arg0.m_label = m_currentContinueLabel;
 		DTRACE_INTRUCTION (&continueTargeStmt);
 	}
@@ -178,12 +178,12 @@ return NULL;
 	if (m_testExpression) {
 		m_testExpression->CompileCIL(cil);
 
-		dThreeAdressStmt& entryLabel = entryLabelNode->GetInfo();
+		dCILInstr& entryLabel = entryLabelNode->GetInfo();
 
 		expressionTestNode = cil.NewStatement();
-		dThreeAdressStmt& stmt = expressionTestNode->GetInfo();
-		stmt.m_instruction = dThreeAdressStmt::m_if;
-		stmt.m_operator = dThreeAdressStmt::m_nothing;
+		dCILInstr& stmt = expressionTestNode->GetInfo();
+		stmt.m_instruction = dCILInstr::m_if;
+		stmt.m_operator = dCILInstr::m_nothing;
 		stmt.m_arg0 = m_testExpression->m_result;
 		stmt.m_arg1 = entryLabel.m_arg0;
 		stmt.m_trueTargetJump = entryLabelNode;
@@ -193,8 +193,8 @@ return NULL;
 	} else {
 		dAssert (0);
 #if 0
-		dThreeAdressStmt& stmt = cil.NewStatement()->GetInfo();
-		stmt.m_instruction = dThreeAdressStmt::m_goto;
+		dCILInstr& stmt = cil.NewStatement()->GetInfo();
+		stmt.m_instruction = dCILInstr::m_goto;
 		stmt.m_arg0.m_label = loopHeaderLabel; 
 		stmt.m_jmpTarget = loopStartNode;
 		DTRACE_INTRUCTION (&stmt);
@@ -209,8 +209,8 @@ return NULL;
 		expressionTestNode->GetInfo().m_falseTargetJump = exitLabelStmtNode;
 	}
 
-	dThreeAdressStmt& exitLabelStmt = exitLabelStmtNode->GetInfo();
-	exitLabelStmt.m_instruction = dThreeAdressStmt::m_label;
+	dCILInstr& exitLabelStmt = exitLabelStmtNode->GetInfo();
+	exitLabelStmt.m_instruction = dCILInstr::m_label;
 	exitLabelStmt.m_arg0.m_label = exitLabel;
 	DTRACE_INTRUCTION (&exitLabelStmt);
 

@@ -29,9 +29,14 @@ class dCILInstrFunction: public dCILInstr
 	public:
 	dCILInstrFunction (dCIL& program, const dString& name, const dArgType& type);
 
-
 	void Serialize (char* const textOut) const;
 	dList<dArg>::dListNode* AddParameter (const dString& name, const dArgType& type); 
+
+
+	virtual dCILInstrFunction* GetAsFunction()
+	{
+		return this;
+	}
 
 	dArg m_name;
 	dList<dArg> m_parameters;
