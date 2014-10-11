@@ -22,6 +22,8 @@ class dCILInstrNop: public dCILInstr
 {
 	public:
 	dCILInstrNop(dCIL& program);
+	virtual bool ApplySemanticReordering () { return false;}
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
 };
 
 class dCILInstrFunction: public dCILInstr
@@ -32,11 +34,13 @@ class dCILInstrFunction: public dCILInstr
 	void Serialize (char* const textOut) const;
 	dList<dArg>::dListNode* AddParameter (const dString& name, const dArgType& type); 
 
-
 	virtual dCILInstrFunction* GetAsFunction()
 	{
 		return this;
 	}
+
+	virtual bool ApplySemanticReordering () {return false;} 
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 
 	dArg m_name;
 	dList<dArg> m_parameters;

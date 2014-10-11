@@ -71,7 +71,7 @@ void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 		}
 	}
 
-	//cil.Trace();
+//cil.Trace();
 
 	// find the root of all basic blocks leaders
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {

@@ -50,3 +50,9 @@ void dCILInstrFunction::Serialize(char* const textOut) const
 
 	strcat (textOut, ")\n");
 }
+
+
+void dCILInstrFunction::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
+{
+	dAssert (0);
+}

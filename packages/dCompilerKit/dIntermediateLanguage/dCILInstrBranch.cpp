@@ -12,6 +12,7 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dCILInstr.h"
+#include "dDataFlowGraph.h"
 #include "dCILInstrBranch.h"
 
 
@@ -110,6 +111,18 @@ bool dCILInstrIF::IsBasicBlockEnd() const
 	return true;
 }
 
+void dCILInstrIF::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
+{
+	dAssert (m_arg0.GetType().m_intrinsicType == m_int);
+//	if (m_arg0.GetType().m_intrinsicType == m_int) {
+	datFloatPoint.m_usedVariableSet.Insert (m_arg0.m_label);
+
+//	} else {
+//		dAssert (0);
+//	}
+}
+
+
 
 dCILInstrReturn::dCILInstrReturn(dCIL& program, const dString& name, const dArgType& type)
 	:dCILSingleArgInstr (program, dArg (name, type))
@@ -131,6 +144,25 @@ dCILInstrReturn* dCILInstrReturn::GetAsReturn()
 {
 	return this;
 }
+
+void dCILInstrReturn::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
+{
+	switch (m_arg0.GetType().m_intrinsicType)
+	{
+		case m_int:
+			//point.m_usedVariableSet.Insert(m_returnVariableName);
+			datFloatPoint.m_usedVariableSet.Insert(m_arg0.m_label);
+			break;
+
+		case m_void:
+		case m_constInt:
+			break;
+
+		default:	
+			dAssert (0);
+	}
+}
+
 
 /*
 dCILInstrCall::dCILInstrCall(dCIL& program, const dString& name, const dArgType& type, dList<dArg>& parameters)
@@ -169,4 +201,17 @@ void dCILInstrCall::Serialize(char* const textOut) const
 		strcat (textOut, text);
 	}
 	strcat (textOut, ")\n");
+}
+
+
+void dCILInstrCall::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
+{
+	if (m_arg0.GetType().m_intrinsicType != m_void) {
+		datFloatPoint.m_generatedVariable = m_arg0.m_label;
+	}
+
+	for (dList<dArg>::dListNode* node = m_parameters.GetFirst(); node; node = node->GetNext()) { 
+		const dArg& arg = node->GetInfo();
+		datFloatPoint.m_usedVariableSet.Insert (arg.m_label);
+	}
 }

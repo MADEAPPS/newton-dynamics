@@ -21,8 +21,10 @@ class dCILInstrLocal: public dCILSingleArgInstr
 {
 	public:
 	dCILInstrLocal (dCIL& program, const dString& name, const dArgType& type);
-
 	void Serialize(char* const textOut) const;
+
+	virtual bool ApplySemanticReordering () {return false;}
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 };
 
 
@@ -32,30 +34,32 @@ class dCILInstrMove: public dCILTwoArgInstr
 	dCILInstrMove (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1);
 
 	void Serialize(char* const textOut) const;
+
+	virtual bool ApplySemanticReordering () {return false;}
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
 };
 
+
+class dCILInstrLoad: public dCILTwoArgInstr
+{
+	public:
+	dCILInstrLoad (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1);
+	void Serialize(char* const textOut) const;
+
+	virtual bool ApplySemanticReordering () {return false;};
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
+};
 
 class dCILInstrStore: public dCILTwoArgInstr
 {
 	public:
 	dCILInstrStore (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1);
-
-	void Serialize(char* const textOut) const;
-};
-
-
-class dCILInstrLoad: public dCILInstr
-{
-	public:
-	dCILInstrLoad (dCIL& program, const dString& name, const dArgType& type);
-
 	void Serialize(char* const textOut) const;
 
-	const dArg& GetResult() const; 
-
-	dArg m_source;
-	dArg m_destination;
+	virtual bool ApplySemanticReordering () {return false;}
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 };
+
 
 
 

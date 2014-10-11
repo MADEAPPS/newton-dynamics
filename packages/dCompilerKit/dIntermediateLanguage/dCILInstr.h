@@ -168,6 +168,7 @@ class dCILInstrGoto;
 class dCILInstrLabel;
 class dCILInstrReturn;
 class dCILInstrFunction;
+class dDataFlowPoint;
 
 class dCILInstr
 {
@@ -247,20 +248,17 @@ class dCILInstr
 	dCILInstr (dCIL& program);
 	virtual ~dCILInstr ();
 
-	virtual bool IsBasicBlockBegin() const;
 	virtual bool IsBasicBlockEnd() const;
+	virtual bool IsBasicBlockBegin() const;
 
 	virtual dCILInstrIF* GetAsIF();
 	virtual dCILInstrGoto* GetAsGoto();
 	virtual dCILInstrLabel* GetAsLabel();
 	virtual dCILInstrReturn* GetAsReturn();
 	virtual dCILInstrFunction* GetAsFunction();
-	
 
-	virtual bool ApplyRemanticReordering ()
-	{
-		return false;
-	}
+	virtual bool ApplySemanticReordering () = 0;
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
 
 	void Trace() const;
 	virtual void Serialize(char* const textOut) const;
@@ -283,6 +281,11 @@ class dCILSingleArgInstr: public dCILInstr
 	{
 	}
 
+	virtual bool ApplySemanticReordering ()
+	{
+		return false;
+	}
+
 	const dArg& GetArg0 () const 
 	{
 		return m_arg0;
@@ -299,6 +302,9 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 		,m_arg1(arg1)
 	{
 	}
+
+	virtual bool ApplySemanticReordering () = 0;
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
 
 	const dArg& GetArg1 () const 
 	{
@@ -339,8 +345,8 @@ class dCILThreeArgInstr: public dCILTwoArgInstr
 		return m_arg2;
 	}
 
-	
-
+	virtual bool ApplySemanticReordering () = 0;
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
 
 	dArg m_arg2;
 };

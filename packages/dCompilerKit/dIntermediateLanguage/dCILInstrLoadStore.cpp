@@ -12,6 +12,7 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dCILInstr.h"
+#include "dDataFlowGraph.h"
 #include "dCILInstrLoadStore.h"
 
 
@@ -25,6 +26,10 @@ void dCILInstrLocal::Serialize(char* const textOut) const
 	sprintf (textOut, "\tlocal %s %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
 }
 
+void dCILInstrLocal::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
+{
+	datFloatPoint.m_generatedVariable = m_arg0.m_label;
+}
 
 dCILInstrMove::dCILInstrMove (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)
 	:dCILTwoArgInstr (program, dArg (name0, type0), dArg (name1, type1))
@@ -39,6 +44,23 @@ void dCILInstrMove::Serialize(char* const textOut) const
 }
 
 
+dCILInstrLoad::dCILInstrLoad (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)
+	:dCILTwoArgInstr (program, dArg (name0, type0), dArg (name1, type1))
+{
+}
+
+void dCILInstrLoad::Serialize(char* const textOut) const
+{
+	sprintf (textOut, "\t%s %s = [%s %s]\n", m_arg0.GetTypeName().GetStr(),  m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
+}
+
+void dCILInstrLoad::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
+{
+	datFloatPoint.m_generatedVariable = m_arg0.m_label;
+	datFloatPoint.m_usedVariableSet.Insert (m_arg1.m_label);
+}
+
+
 dCILInstrStore::dCILInstrStore (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)
 	:dCILTwoArgInstr (program, dArg (name0, type0), dArg (name1, type1))
 {
@@ -49,21 +71,8 @@ void dCILInstrStore::Serialize(char* const textOut) const
 	sprintf (textOut, "\t[%s %s] = %s %s\n", m_arg0.GetTypeName().GetStr(),  m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
 }
 
-
-dCILInstrLoad::dCILInstrLoad (dCIL& program, const dString& name, const dArgType& type)
-	:dCILInstr (program)
-	,m_source (name, type)
+void dCILInstrStore::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
-	m_destination.m_label = program.NewTemp();
-	m_destination.SetType (m_source);
-}
-
-const dCILInstr::dArg& dCILInstrLoad::GetResult() const
-{
-	return m_destination;
-}
-
-void dCILInstrLoad::Serialize(char* const textOut) const
-{
-	sprintf (textOut, "\t%s %s = [%s %s]\n", m_destination.GetTypeName().GetStr(), m_destination.m_label.GetStr(), m_source.GetTypeName().GetStr(), m_source.m_label.GetStr());
+	datFloatPoint.m_usedVariableSet.Insert(m_arg0.m_label);
+	datFloatPoint.m_usedVariableSet.Insert(m_arg1.m_label);
 }

@@ -23,6 +23,9 @@ class dCILInstrLabel: public dCILSingleArgInstr
 	dCILInstrLabel(dCIL& program, const dString& label);
 	void Serialize(char* const textOut) const;
 
+	virtual bool ApplySemanticReordering () {return false;}
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
+
 	virtual bool IsBasicBlockBegin() const;
 	virtual dCILInstrLabel* GetAsLabel();
 };
@@ -39,6 +42,9 @@ class dCILInstrGoto: public dCILSingleArgInstr
 	void SetTarget (dCILInstrLabel* const target0);
 	dList<dCILInstr*>::dListNode* GetTarget () const;
 
+	virtual bool ApplySemanticReordering () {return false;};
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
+
 	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
 
@@ -51,6 +57,10 @@ class dCILInstrIF: public dCILThreeArgInstr
 	virtual dCILInstrIF* GetAsIF();
 	virtual bool IsBasicBlockEnd() const;
 	void SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1) ;
+
+	virtual bool ApplySemanticReordering () {return false;}
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
+
 
 	dList<dCILInstr*>::dListNode* GetTrueTarget () const;
 	dList<dCILInstr*>::dListNode* GetFalseTarget () const;
@@ -69,6 +79,9 @@ class dCILInstrReturn: public dCILSingleArgInstr
 
 	virtual bool IsBasicBlockEnd() const;
 	virtual dCILInstrReturn* GetAsReturn();
+
+	virtual bool ApplySemanticReordering () {return false;}
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 };
 
 class dCILInstrCall: public dCILTwoArgInstr
@@ -77,6 +90,9 @@ class dCILInstrCall: public dCILTwoArgInstr
 	dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& target, dList<dArg>& parameters);
 //	dCILInstrCall(dCIL& program, const dString& name, const dArgType& type, dList<dArg>& parameters);
 	void Serialize(char* const textOut) const;
+
+	virtual bool ApplySemanticReordering () {return false;}
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 
 	dList<dArg> m_parameters;
 };

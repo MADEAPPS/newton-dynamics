@@ -12,6 +12,7 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dCILInstr.h"
+#include "dDataFlowGraph.h"
 #include "dCILInstrArithmetic.h"
 
 /*
@@ -157,7 +158,7 @@ void dCILInstrIntergerLogical::Serialize(char* const textOut) const
 
 
 
-bool dCILInstrIntergerLogical::ApplyRemanticReordering ()
+bool dCILInstrIntergerLogical::ApplySemanticReordering ()
 {
 	const dArg& arg1 = GetArg1();
 	switch (arg1.GetType().m_intrinsicType)
@@ -189,4 +190,29 @@ bool dCILInstrIntergerLogical::ApplyRemanticReordering ()
 			break;
 	}
 	return false;
+}
+
+
+void dCILInstrIntergerLogical::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
+{
+	datFloatPoint.m_generatedVariable = m_arg0.m_label;
+
+	dAssert (m_arg1.GetType().m_intrinsicType != m_constInt);
+	datFloatPoint.m_usedVariableSet.Insert(m_arg1.m_label);
+	
+	switch (m_arg2.GetType().m_intrinsicType)
+	{
+		case dThreeAdressStmt::m_int:
+		//case dThreeAdressStmt::m_classPointer:
+		{
+			datFloatPoint.m_usedVariableSet.Insert (m_arg2.m_label);
+			break;
+		}
+
+		case dThreeAdressStmt::m_constInt:
+			break;
+
+		default:	
+			dAssert (0);
+	}
 }

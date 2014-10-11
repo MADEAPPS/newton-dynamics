@@ -849,16 +849,16 @@ m_cil->Trace();
 #endif
 
 
-void dDataFlowGraph::BuildGeneratedAndKillStatementSets()
+void dDataFlowGraph::BuildDefinedAndKilledStatementSets()
 {
-dAssert (0);
-/*
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
 		point.m_killStmtSet.RemoveAll();
 	}
 
+dAssert (0);
+/*
 	m_variableDefinitions.RemoveAll();
 //	dDataFlowPoint::dVariableSet<dCIL::dListNode*> statementUsingReturnVariable;
 	for (dCIL::dListNode* ptr = m_basicBlocks.m_begin; ptr != m_basicBlocks.m_end; ptr = ptr->GetNext()) {
@@ -1094,7 +1094,7 @@ dAssert (0);
 
 void dDataFlowGraph::CalculateReachingDefinitions()
 {
-	BuildGeneratedAndKillStatementSets ();
+	BuildDefinedAndKilledStatementSets ();
 
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
@@ -1190,8 +1190,6 @@ void dDataFlowGraph::UpdateReachingDefinitions()
 
 void dDataFlowGraph::BuildGeneratedAndUsedVariableSets()
 {
-dAssert (0);
-/*
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -1200,6 +1198,11 @@ dAssert (0);
 
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
+		dCILInstr* const instruc = point.m_statement->GetInfo();
+instruc->Trace();
+		instruc->AddGeneratedAndUsedSymbols(point);	
+
+/*
 		dThreeAdressStmt& stmt = point.m_statement->GetInfo();	
 //DTRACE_INTRUCTION (&stmt);		
 
@@ -1209,22 +1212,6 @@ dAssert (0);
 			case dThreeAdressStmt::m_argument:
 			{
 				point.m_generatedVariable = stmt.m_arg0.m_label;
-				break;
-			}
-
-
-			case dThreeAdressStmt::m_loadBase:
-			{
-				point.m_generatedVariable = stmt.m_arg0.m_label;
-				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
-				break;
-			}
-
-			case dThreeAdressStmt::m_storeBase:
-			{
-				//point.m_generatedVariable = stmt.m_arg0.m_label;
-				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-				point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
 				break;
 			}
 
@@ -1246,44 +1233,6 @@ dAssert (0);
 				break;
 			}
 
-			case dThreeAdressStmt::m_assigment:
-			{
-				point.m_generatedVariable = stmt.m_arg0.m_label;
-				switch (stmt.m_arg1.GetType().m_intrinsicType)
-				{
-					case dThreeAdressStmt::m_int:
-					//case dThreeAdressStmt::m_classPointer:
-					{
-						point.m_usedVariableSet.Insert(stmt.m_arg1.m_label);
-						break;
-					}
-
-					case dThreeAdressStmt::m_constInt:
-						break;
-
-					default:	
-						dAssert (0);
-				}
-
-				if (stmt.m_operator != dThreeAdressStmt::m_nothing) {
-					switch (stmt.m_arg2.GetType().m_intrinsicType)
-					{
-						case dThreeAdressStmt::m_int:
-						//case dThreeAdressStmt::m_classPointer:
-						{
-							point.m_usedVariableSet.Insert(stmt.m_arg2.m_label);
-							break;
-						}
-
-						case dThreeAdressStmt::m_constInt:
-							break;
-
-						default:	
-							dAssert (0);
-					}
-				}
-				break;
-			}
 
 			case dThreeAdressStmt::m_new:
 			{
@@ -1298,41 +1247,6 @@ dAssert (0);
 				break;
 			}
 
-
-			case dThreeAdressStmt::m_call:
-			{
-				if (stmt.m_arg0.GetType().m_intrinsicType != dThreeAdressStmt::m_void) {
-					point.m_generatedVariable = stmt.m_arg0.m_label;
-				}
-				break;
-			}
-
-			case dThreeAdressStmt::m_ret:
-			{
-				switch (stmt.m_arg0.GetType().m_intrinsicType)
-				{
-					case dThreeAdressStmt::m_int:
-						//point.m_usedVariableSet.Insert(m_returnVariableName);
-						point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-						break;
-
-					case dThreeAdressStmt::m_void:
-					case dThreeAdressStmt::m_constInt:
-						break;
-
-					default:	
-						dAssert (0);
-				}
-				break;
-			}
-
-			case dThreeAdressStmt::m_param:
-			{
-				point.m_usedVariableSet.Insert(stmt.m_arg0.m_label);
-				break;
-			}
-
-			case dThreeAdressStmt::m_if:
 			case dThreeAdressStmt::m_ifnot:
 			{
 				if (stmt.m_arg0.GetType().m_intrinsicType == dThreeAdressStmt::m_int) {
@@ -1362,8 +1276,8 @@ dAssert (0);
 			default:
 				dAssert (0);
 		}
-	}
 */
+	}
 }
 
 
@@ -1724,7 +1638,7 @@ bool dDataFlowGraph::ApplyInstructionSematicOrdering()
 {
 	bool ret = false;
 	for (dCIL::dListNode* stmtNode = m_function->GetNext(); stmtNode && !stmtNode->GetInfo()->GetAsFunction(); stmtNode = stmtNode->GetNext()) {
-		ret |= stmtNode->GetInfo()->ApplyRemanticReordering ();
+		ret |= stmtNode->GetInfo()->ApplySemanticReordering ();
 	}
 	return ret;
 }

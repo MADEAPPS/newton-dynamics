@@ -71,9 +71,9 @@ dCILInstr::dArg dDAG::LoadLocalVariable (dCIL& cil, const dCILInstr::dArg& arg) 
 		DTRACE_INTRUCTION (&loadVar);
 		return loadVar.m_arg0;
 */
-		dCILInstrLoad* const load = new dCILInstrLoad (cil, arg.m_label, arg);
+		dCILInstrLoad* const load = new dCILInstrLoad (cil, cil.NewTemp(), arg, arg.m_label, arg);
 		load->Trace();
-		return load->GetResult();
+		return load->GetArg0();
 	}
 	return arg;
 }

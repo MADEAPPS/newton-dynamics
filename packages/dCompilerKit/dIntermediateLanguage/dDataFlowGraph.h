@@ -39,108 +39,111 @@ inline dString IndexToLocal(int index)
 
 class dRegisterInterferenceGraph;
 
+
+class dDataFlowPoint
+{
+	public:
+
+	template <class SET_TYPE>
+	class dVariableSet: public dTree<int, SET_TYPE>
+	{	
+		public:
+		dVariableSet()
+			:dTree<int, SET_TYPE>()
+		{
+		}
+
+		dVariableSet(const dVariableSet& copy)
+			:dTree<int, SET_TYPE>()
+		{
+			Iterator iter (copy);
+			for (iter.Begin(); iter; iter ++) {
+				Insert(0, iter.GetKey());
+			}
+		}
+
+		void Difference (const dVariableSet& b, const dVariableSet& c)
+		{
+			Iterator iter0 (b);
+			for (iter0.Begin(); iter0; iter0 ++) {
+				Insert(0, iter0.GetKey());
+			}
+
+			Iterator iter1 (c);
+			for (iter1.Begin(); iter1; iter1 ++) {
+				dTreeNode* const node = Find (iter1.GetKey());
+				if (node) {
+					Remove (node);
+				}
+			}
+		}
+
+
+		void Union (const dVariableSet& or)
+		{
+			Iterator iter (or);
+			for (iter.Begin(); iter; iter ++) {
+				Insert(0, iter.GetKey());
+			}
+		}
+
+
+		bool Compare (const dVariableSet& cmp) const
+		{
+			if (GetCount() == cmp.GetCount()) {
+				Iterator iter0 (cmp);
+				Iterator iter1 (*this);
+				for (iter0.Begin(), iter1.Begin(); iter0 && iter1 ; iter0 ++, iter1 ++) {
+					if (iter0.GetKey() != iter1.GetKey()) {
+						return false;
+					}
+				}
+				return true;
+			}
+			return false;
+		}
+
+		void Trace() const
+		{
+			#ifdef TRACE_INTERMEDIATE_CODE
+				Iterator iter (*this);
+				for (iter.Begin(); iter; iter ++) {
+					dTrace (("%s ", iter.GetKey().GetStr()));
+				}
+				dTrace (("\n"));
+			#endif
+		}
+	};
+
+
+	void Init(dCIL::dListNode* const statementNode)
+	{
+		m_mark = 0;
+		m_generateStmt = false;
+		m_statement = statementNode;
+	}
+		
+	dList<dDataFlowPoint*> m_successors;
+	dList<dDataFlowPoint*> m_predecessors; 
+	
+	dString m_generatedVariable;
+	dVariableSet<dString> m_liveInputSet;
+	dVariableSet<dString> m_liveOutputSet;
+	dVariableSet<dString> m_usedVariableSet;
+
+	int m_mark;
+	bool m_generateStmt;
+		
+	dCIL::dListNode* m_statement;
+	dVariableSet<dCIL::dListNode*> m_killStmtSet;
+	dVariableSet<dCIL::dListNode*> m_reachStmtInputSet;
+	dVariableSet<dCIL::dListNode*> m_reachStmtOutputSet;
+};
+
 class dDataFlowGraph 
 {
 	public:
-	class dDataFlowPoint
-	{
-		public:
-
-		template <class SET_TYPE>
-		class dVariableSet: public dTree<int, SET_TYPE>
-		{	
-			public:
-			dVariableSet()
-				:dTree<int, SET_TYPE>()
-			{
-			}
-
-			dVariableSet(const dVariableSet& copy)
-				:dTree<int, SET_TYPE>()
-			{
-				Iterator iter (copy);
-				for (iter.Begin(); iter; iter ++) {
-					Insert(0, iter.GetKey());
-				}
-			}
-
-			void Difference (const dVariableSet& b, const dVariableSet& c)
-			{
-				Iterator iter0 (b);
-				for (iter0.Begin(); iter0; iter0 ++) {
-					Insert(0, iter0.GetKey());
-				}
-
-				Iterator iter1 (c);
-				for (iter1.Begin(); iter1; iter1 ++) {
-					dTreeNode* const node = Find (iter1.GetKey());
-					if (node) {
-						Remove (node);
-					}
-				}
-			}
-
-
-			void Union (const dVariableSet& or)
-			{
-				Iterator iter (or);
-				for (iter.Begin(); iter; iter ++) {
-					Insert(0, iter.GetKey());
-				}
-			}
-
-
-			bool Compare (const dVariableSet& cmp) const
-			{
-				if (GetCount() == cmp.GetCount()) {
-					Iterator iter0 (cmp);
-					Iterator iter1 (*this);
-					for (iter0.Begin(), iter1.Begin(); iter0 && iter1 ; iter0 ++, iter1 ++) {
-						if (iter0.GetKey() != iter1.GetKey()) {
-							return false;
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-
-			void Trace() const
-			{
-				#ifdef TRACE_INTERMEDIATE_CODE
-					Iterator iter (*this);
-					for (iter.Begin(); iter; iter ++) {
-						dTrace (("%s ", iter.GetKey().GetStr()));
-					}
-					dTrace (("\n"));
-				#endif
-			}
-		};
-
-
-		void Init(dCIL::dListNode* const statementNode)
-		{
-			m_mark = 0;
-			m_generateStmt = false;
-			m_statement = statementNode;
-		}
-		
-		dList<dDataFlowPoint*> m_successors;
-		dList<dDataFlowPoint*> m_predecessors; 
 	
-		dString m_generatedVariable;
-		dVariableSet<dString> m_liveInputSet;
-		dVariableSet<dString> m_liveOutputSet;
-		dVariableSet<dString> m_usedVariableSet;
-
-		int m_mark;
-		bool m_generateStmt;
-		
-		dCIL::dListNode* m_statement;
-		dVariableSet<dCIL::dListNode*> m_killStmtSet;
-		dVariableSet<dCIL::dListNode*> m_reachStmtInputSet;
-		dVariableSet<dCIL::dListNode*> m_reachStmtOutputSet;
-	};
 
 	class dLoop 
 	{
@@ -215,7 +218,7 @@ class dDataFlowGraph
 
 	
 	void BuildGeneratedAndUsedVariableSets();
-	void BuildGeneratedAndKillStatementSets();
+	void BuildDefinedAndKilledStatementSets();
 	void UpdateReachingDefinitions();
 
 	bool ApplyRemoveDeadCode();

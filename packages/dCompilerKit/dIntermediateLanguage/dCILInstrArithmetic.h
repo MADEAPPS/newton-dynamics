@@ -24,7 +24,8 @@ class dCILInstrIntergerLogical: public dCILThreeArgInstr
 
 	void Serialize(char* const textOut) const;
 
-	virtual bool ApplyRemanticReordering ();
+	virtual bool ApplySemanticReordering ();
+	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 	dOperator m_operator;
 };
 
