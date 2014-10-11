@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dContainers", "dContainers.vcxproj", "{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dJointLibrary", "dJointLibrary.vcxproj", "{721C99CE-4716-4146-9817-59BC2671B844}"
@@ -22,8 +24,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\coreLibrary_300\source\pthreads.2\VS_2012_static_mt\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\thirdParty\tinyxml\vs2012\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ampPhysics", "..\..\..\coreLibrary_300\projects\windows\project_vs2012_dll\ampPhysics.vcxproj", "{4798DA95-FE1B-4160-B752-24C4B1FABA49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,14 +121,6 @@ Global
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|Win32.Build.0 = release|Win32
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|x64.ActiveCfg = release|x64
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|x64.Build.0 = release|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|Win32.ActiveCfg = Debug|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|Win32.Build.0 = Debug|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|x64.ActiveCfg = debug|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|x64.Build.0 = debug|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|Win32.ActiveCfg = release|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|Win32.Build.0 = release|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|x64.ActiveCfg = release|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
