@@ -1,0 +1,384 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|Win32">
+      <Configuration>debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|Win32">
+      <Configuration>release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{39737A8F-6151-4259-8E39-25530345D4B4}</ProjectGuid>
+    <RootNamespace>physics</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../source/ampPhysics</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dgPhysicsStdafx.h</PrecompiledHeaderFile>
+      <AssemblerOutput>
+      </AssemblerOutput>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../source/ampPhysics</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dgPhysicsStdafx.h</PrecompiledHeaderFile>
+      <AssemblerOutput>
+      </AssemblerOutput>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../source/ampPhysics</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dgPhysicsStdafx.h</PrecompiledHeaderFile>
+      <AssemblerOutput>
+      </AssemblerOutput>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <AdditionalOptions>
+      </AdditionalOptions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../source/ampPhysics</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dgPhysicsStdafx.h</PrecompiledHeaderFile>
+      <AssemblerOutput>
+      </AssemblerOutput>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <AdditionalOptions>
+      </AdditionalOptions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect5.cpp" />
+    <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect6.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgBallConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgBilateralConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgBroadPhase.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundFractured.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionInstance.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCapsule.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCylinder.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgContact.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCorkscrewConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgDeformableContact.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgDynamicBody.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgHingeConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgKinematicBody.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgSlidingConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgUniversalConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgUpVectorConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgUserConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollision.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionBox.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionBVH.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCapsule.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionChamferCylinder.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCompound.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCone.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionConvex.cpp">
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='release|Win32'">NoListing</AssemblerOutput>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='release|x64'">NoListing</AssemblerOutput>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgCollisionConvexHull.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionConvexPolygon.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCylinder.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableMesh.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionHeightField.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionMesh.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionNull.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionScene.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionSphere.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionUserMesh.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgBody.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgBodyMasterList.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgDeformableBody.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgNarrowPhaseCollision.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgWorld.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgWorldDynamicsParallelSolver.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgWorldDynamicsSimpleSolver.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgWorldDynamicUpdate.cpp" />
+    <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect1.cpp" />
+    <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect2.cpp" />
+    <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect3.cpp" />
+    <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect4.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\source\physics\dgBallConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgBroadPhase.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundFractured.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionInstance.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCapsule.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCylinder.h" />
+    <ClInclude Include="..\..\..\source\physics\dgConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgContact.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCorkscrewConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h" />
+    <ClInclude Include="..\..\..\source\physics\dgDeformableContact.h" />
+    <ClInclude Include="..\..\..\source\physics\dgDynamicBody.h" />
+    <ClInclude Include="..\..\..\source\physics\dgHingeConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h" />
+    <ClInclude Include="..\..\..\source\physics\dgSlidingConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgUniversalConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgUpVectorConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgUserConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollision.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionBox.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionBVH.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCapsule.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionChamferCylinder.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCompound.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCone.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionConvex.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionConvexHull.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionConvexPolygon.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCylinder.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableMesh.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionHeightField.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionMesh.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionNull.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionScene.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionSphere.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionUserMesh.h" />
+    <ClInclude Include="..\..\..\source\physics\dgBody.h" />
+    <ClInclude Include="..\..\..\source\physics\dgBodyMasterList.h" />
+    <ClInclude Include="..\..\..\source\physics\dgDeformableBody.h" />
+    <ClInclude Include="..\..\..\source\physics\dgPhysics.h" />
+    <ClInclude Include="..\..\..\source\physics\dgPhysicsStdafx.h" />
+    <ClInclude Include="..\..\..\source\physics\dgWorld.h" />
+    <ClInclude Include="..\..\..\source\physics\dgWorldDynamicUpdate.h" />
+    <ClInclude Include="..\..\..\source\meshUtil\dgMeshEffect.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
