@@ -55,7 +55,7 @@ void dBasicBlocksList::Clear ()
 
 void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 {
-	m_begin = functionNode;
+	m_begin = functionNode->GetNext();
 	m_end = functionNode->GetNext();
 	//for (; m_end && (m_end->GetInfo().m_instruction != dCILInstr::m_function); m_end = m_end->GetNext());
 	for (; m_end && !m_end->GetInfo()->GetAsFunction(); m_end = m_end->GetNext());

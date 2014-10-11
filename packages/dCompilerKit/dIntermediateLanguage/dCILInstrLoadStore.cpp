@@ -31,6 +31,12 @@ void dCILInstrLocal::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) 
 	datFloatPoint.m_generatedVariable = m_arg0.m_label;
 }
 
+void dCILInstrLocal::AddDefinedVariable (dDefinedVariableDictionary& dictionady) const  
+{
+	dDefinedVariableDictionary::dTreeNode* const node = dictionady.Insert (m_arg0.m_label);
+	node->GetInfo().Append (m_myNode);
+}
+
 dCILInstrMove::dCILInstrMove (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)
 	:dCILTwoArgInstr (program, dArg (name0, type0), dArg (name1, type1))
 {
@@ -58,6 +64,12 @@ void dCILInstrLoad::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) c
 {
 	datFloatPoint.m_generatedVariable = m_arg0.m_label;
 	datFloatPoint.m_usedVariableSet.Insert (m_arg1.m_label);
+}
+
+void dCILInstrLoad::AddDefinedVariable (dDefinedVariableDictionary& dictionady) const  
+{
+	dDefinedVariableDictionary::dTreeNode* const node = dictionady.Insert (m_arg0.m_label);
+	node->GetInfo().Append (m_myNode);
 }
 
 

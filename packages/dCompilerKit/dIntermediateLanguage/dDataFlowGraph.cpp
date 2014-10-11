@@ -24,6 +24,7 @@ dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function
 	,m_cil (cil)
 //	,m_returnType(returnType)
 	,m_function(function)
+	,m_variableDefinitions()
 {
 }
 
@@ -857,11 +858,14 @@ void dDataFlowGraph::BuildDefinedAndKilledStatementSets()
 		point.m_killStmtSet.RemoveAll();
 	}
 
-dAssert (0);
-/*
 	m_variableDefinitions.RemoveAll();
 //	dDataFlowPoint::dVariableSet<dCIL::dListNode*> statementUsingReturnVariable;
 	for (dCIL::dListNode* ptr = m_basicBlocks.m_begin; ptr != m_basicBlocks.m_end; ptr = ptr->GetNext()) {
+		dCILInstr* const instruc = ptr->GetInfo();
+instruc->Trace();
+		instruc->AddDefinedVariable (m_variableDefinitions);
+
+/*
 
 		dThreeAdressStmt& stmt = ptr->GetInfo();	
 
@@ -991,14 +995,17 @@ dAssert (0);
 			default:
 				dAssert (0);
 		}
+*/
 	}
-
 
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
 
 		point.m_generateStmt = false;
-		dThreeAdressStmt& stmt = point.m_statement->GetInfo();	
+		//dThreeAdressStmt& stmt = point.m_statement->GetInfo();	
+		dCILInstr* const instruc = point.m_statement->GetInfo();
+		instruc->AddKilledStatements (point);
+/*
 //DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
@@ -1086,8 +1093,8 @@ dAssert (0);
 			default:
 				dAssert (0);
 		}
-	}
 */
+	}
 }
 
 
@@ -1199,7 +1206,7 @@ void dDataFlowGraph::BuildGeneratedAndUsedVariableSets()
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
 		dCILInstr* const instruc = point.m_statement->GetInfo();
-instruc->Trace();
+//instruc->Trace();
 		instruc->AddGeneratedAndUsedSymbols(point);	
 
 /*

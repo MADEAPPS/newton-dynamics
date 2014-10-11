@@ -215,3 +215,12 @@ void dCILInstrCall::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) c
 		datFloatPoint.m_usedVariableSet.Insert (arg.m_label);
 	}
 }
+
+
+void dCILInstrCall::AddDefinedVariable (dDefinedVariableDictionary& dictionady) const 
+{
+	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != dThreeAdressStmt::m_void)) {
+		dDefinedVariableDictionary::dTreeNode* const node = dictionady.Insert (m_arg0.m_label);
+		node->GetInfo().Append (m_myNode);
+	}
+}

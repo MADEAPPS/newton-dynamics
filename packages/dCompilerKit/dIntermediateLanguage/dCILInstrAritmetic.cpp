@@ -216,3 +216,10 @@ void dCILInstrIntergerLogical::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFl
 			dAssert (0);
 	}
 }
+
+
+void dCILInstrIntergerLogical::AddDefinedVariable (dDefinedVariableDictionary& dictionady) const 
+{
+	dDefinedVariableDictionary::dTreeNode* const node = dictionady.Insert (m_arg0.m_label);
+	node->GetInfo().Append (m_myNode);
+}

@@ -25,6 +25,9 @@ class dCILInstrLocal: public dCILSingleArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const;
+
+	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const {dAssert (0);}
 };
 
 
@@ -37,6 +40,8 @@ class dCILInstrMove: public dCILTwoArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const {dAssert (0);}
+	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const {dAssert (0);}
 };
 
 
@@ -48,6 +53,9 @@ class dCILInstrLoad: public dCILTwoArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;};
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const;
+
+	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const {dAssert (0);}
 };
 
 class dCILInstrStore: public dCILTwoArgInstr
@@ -58,6 +66,9 @@ class dCILInstrStore: public dCILTwoArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const {}
+
+	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const {dAssert (0);}
 };
 
 

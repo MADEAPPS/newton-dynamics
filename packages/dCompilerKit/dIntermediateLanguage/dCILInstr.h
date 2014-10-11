@@ -169,6 +169,7 @@ class dCILInstrLabel;
 class dCILInstrReturn;
 class dCILInstrFunction;
 class dDataFlowPoint;
+class dDefinedVariableDictionary;
 
 class dCILInstr
 {
@@ -258,7 +259,10 @@ class dCILInstr
 	virtual dCILInstrFunction* GetAsFunction();
 
 	virtual bool ApplySemanticReordering () = 0;
+	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const = 0;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
+	
 
 	void Trace() const;
 	virtual void Serialize(char* const textOut) const;
@@ -304,7 +308,10 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 	}
 
 	virtual bool ApplySemanticReordering () = 0;
+	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const = 0;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
+	
 
 	const dArg& GetArg1 () const 
 	{
@@ -346,7 +353,10 @@ class dCILThreeArgInstr: public dCILTwoArgInstr
 	}
 
 	virtual bool ApplySemanticReordering () = 0;
+	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const = 0;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
+	
 
 	dArg m_arg2;
 };

@@ -115,7 +115,6 @@ class dDataFlowPoint
 		}
 	};
 
-
 	void Init(dCIL::dListNode* const statementNode)
 	{
 		m_mark = 0;
@@ -140,11 +139,18 @@ class dDataFlowPoint
 	dVariableSet<dCIL::dListNode*> m_reachStmtOutputSet;
 };
 
+class dDefinedVariableDictionary: public dTree<dList<dCIL::dListNode*>, dString>
+{
+	public:
+	dDefinedVariableDictionary ()
+		:dTree<dList<dCIL::dListNode*>, dString>()
+	{
+	}
+};
+
 class dDataFlowGraph 
 {
 	public:
-	
-
 	class dLoop 
 	{
 		public:
@@ -253,7 +259,7 @@ class dDataFlowGraph
 //	dTree<int , dString> m_returnVariables;
 	dList<dBasicBlock*> m_traversalBlocksOrder; 
 	dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
-	dTree<dList<dCIL::dListNode*>, dString> m_variableDefinitions;
+	dDefinedVariableDictionary m_variableDefinitions;
 	friend dRegisterInterferenceGraph;
 };
 

@@ -17,13 +17,14 @@
 #include "dCILInstr.h"
 
 
-
 class dCILInstrNop: public dCILInstr
 {
 	public:
 	dCILInstrNop(dCIL& program);
 	virtual bool ApplySemanticReordering () { return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const {}
+	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const {}
 };
 
 class dCILInstrFunction: public dCILInstr
@@ -41,6 +42,9 @@ class dCILInstrFunction: public dCILInstr
 
 	virtual bool ApplySemanticReordering () {return false;} 
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const {dAssert (0);}
+
+	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const {dAssert (0);}
 
 	dArg m_name;
 	dList<dArg> m_parameters;

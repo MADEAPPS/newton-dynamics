@@ -26,6 +26,10 @@ class dCILInstrIntergerLogical: public dCILThreeArgInstr
 
 	virtual bool ApplySemanticReordering ();
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const;
+
+	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const {dAssert (0);}
+
 	dOperator m_operator;
 };
 
