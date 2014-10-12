@@ -23,8 +23,8 @@ class dCILInstrNop: public dCILInstr
 	dCILInstrNop(dCIL& program);
 	virtual bool ApplySemanticReordering () { return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const {}
-	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const {}
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
+	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 };
 
 class dCILInstrFunction: public dCILInstr
@@ -42,9 +42,9 @@ class dCILInstrFunction: public dCILInstr
 
 	virtual bool ApplySemanticReordering () {return false;} 
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const {dAssert (0);}
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {dAssert (0);}
 
-	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const {dAssert (0);}
+	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {dAssert (0);}
 
 	dArg m_name;
 	dList<dArg> m_parameters;

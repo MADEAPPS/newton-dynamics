@@ -57,7 +57,7 @@ void dCILInstrLoad::Serialize(char* const textOut) const
 */
 
 dCILInstrIntergerLogical::dCILInstrIntergerLogical (dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2)
-	:dCILThreeArgInstr (program, dArg (name0, type0), dArg (name1, type1), dArg (name2, type2))
+	:dCILInstrThreeArgArithmetic(program, dArg(name0, type0), dArg(name1, type1), dArg(name2, type2))
 	,m_operator(operation)
 {
 
@@ -218,8 +218,14 @@ void dCILInstrIntergerLogical::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFl
 }
 
 
-void dCILInstrIntergerLogical::AddDefinedVariable (dDefinedVariableDictionary& dictionady) const 
+void dCILInstrIntergerLogical::AddDefinedVariable (dDefinedVariableDictionary& dictionary) const 
 {
-	dDefinedVariableDictionary::dTreeNode* const node = dictionady.Insert (m_arg0.m_label);
+	dDefinedVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
 	node->GetInfo().Append (m_myNode);
+}
+
+
+void dCILInstrIntergerLogical::AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
+{ 
+	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
 }

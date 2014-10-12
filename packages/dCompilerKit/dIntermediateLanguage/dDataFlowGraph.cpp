@@ -13,6 +13,8 @@
 #include "dCIL.h"
 #include "dDataFlowGraph.h"
 #include "dCILInstrBranch.h"
+#include "dCILInstrLoadStore.h"
+#include "dCILInstrArithmetic.h"
 #include "dRegisterInterferenceGraph.h"
 
 #define D_OPTIMIZE_REDUNDANCE_COPY_ON_ARRAYS
@@ -862,7 +864,7 @@ void dDataFlowGraph::BuildDefinedAndKilledStatementSets()
 //	dDataFlowPoint::dVariableSet<dCIL::dListNode*> statementUsingReturnVariable;
 	for (dCIL::dListNode* ptr = m_basicBlocks.m_begin; ptr != m_basicBlocks.m_end; ptr = ptr->GetNext()) {
 		dCILInstr* const instruc = ptr->GetInfo();
-instruc->Trace();
+//instruc->Trace();
 		instruc->AddDefinedVariable (m_variableDefinitions);
 
 /*
@@ -1004,14 +1006,14 @@ instruc->Trace();
 		point.m_generateStmt = false;
 		//dThreeAdressStmt& stmt = point.m_statement->GetInfo();	
 		dCILInstr* const instruc = point.m_statement->GetInfo();
-		instruc->AddKilledStatements (point);
+//instruc->Trace();
+		instruc->AddKilledStatements(m_variableDefinitions, point);
+		
 /*
 //DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
 			case dThreeAdressStmt::m_param:
-			case dThreeAdressStmt::m_loadBase:
-			case dThreeAdressStmt::m_assigment:
 			{
 				point.m_generateStmt = true;
 				dAssert (m_variableDefinitions.Find(stmt.m_arg0.m_label));
@@ -1054,24 +1056,6 @@ instruc->Trace();
 //				break;
 //			}
 
-			case dThreeAdressStmt::m_call:
-			{
-				if (stmt.m_arg0.GetType().m_isPointer || (stmt.m_arg0.GetType().m_intrinsicType != dThreeAdressStmt::m_void)) {
-					point.m_generateStmt = true;
-					dAssert (m_variableDefinitions.Find(stmt.m_arg0.m_label));
-
-					dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const retRegisterNode = m_variableDefinitions.Find(stmt.m_arg0.m_label);
-					dList<dCIL::dListNode*>& defsList = retRegisterNode->GetInfo();
-					for (dList<dCIL::dListNode*>::dListNode* defNode = defsList.GetFirst(); defNode; defNode = defNode->GetNext()) {
-						dCIL::dListNode* const killStement = defNode->GetInfo();
-						if (killStement != point.m_statement) {
-							point.m_killStmtSet.Insert(killStement);
-						}
-					}
-				}
-
-				break;
-			}
 
 			//case dThreeAdressStmt::m_enter:
 			//case dThreeAdressStmt::m_leave:
@@ -1425,14 +1409,15 @@ return false;
 
 bool dDataFlowGraph::ApplyCopyPropagation()
 {
-dAssert (0);
-return 0;
-/*
 	bool ret = false;
 	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
-		dThreeAdressStmt& stmt = stmtNode->GetInfo();
-//DTRACE_INTRUCTION (&stmt);		
-
+		//dThreeAdressStmt& stmt = stmtNode->GetInfo();
+		dCILInstrMove* const moveInst = stmtNode->GetInfo()->GetAsMove();
+		if (moveInst) {
+			moveInst->Trace();
+			dAssert(0);
+		}
+		/*
 		switch (stmt.m_instruction)
 		{
 			case dThreeAdressStmt::m_assigment:
@@ -1635,10 +1620,10 @@ return 0;
 			}
 #endif
 		}
+*/
 	}
 
 	return ret;
-*/
 }
 
 bool dDataFlowGraph::ApplyInstructionSematicOrdering()
@@ -1653,18 +1638,28 @@ bool dDataFlowGraph::ApplyInstructionSematicOrdering()
 
 bool dDataFlowGraph::ApplyRemoveDeadCode()
 {
-dAssert (0);
-return 0;
-/*
 	CalculateLiveInputLiveOutput ();
-
 	bool ret = false;
-//	dCIL::dListNode* nextStmtNode;
-	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
-		dThreeAdressStmt& stmt = stmtNode->GetInfo();
+	dCIL::dListNode* nextNode;
+	for (dCIL::dListNode* node = m_basicBlocks.m_begin; node != m_basicBlocks.m_end; node = nextNode) {
+		nextNode = node->GetNext();
+		dCILInstr* const instr = node->GetInfo();
+		if (instr->CanBeEliminated()) {
+			dAssert(instr->GetAsSingleArg());
+			dCILSingleArgInstr* const singleArg = instr->GetAsSingleArg();
+			//singleArg->Trace();
 
-//DTRACE_INTRUCTION (&stmt);		
-//		nextStmtNode = stmtNode->GetNext();
+			dDataFlowPoint& info = m_dataFlowGraph.Find(node)->GetInfo();
+			dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
+			const dCILInstr::dArg arg = singleArg->GetArg0();
+			if (!liveOut.Find (arg.m_label)) {
+				dAssert(0);
+				ret = true;
+				delete singleArg;
+				UpdateLiveInputLiveOutput();
+			}
+	/*
+		dThreeAdressStmt& stmt = stmtNode->GetInfo();
 		switch (stmt.m_instruction) 
 		{
 			case dThreeAdressStmt::m_assigment:
@@ -1714,10 +1709,10 @@ return 0;
 				break;
 			}
 #endif
+*/
 		}
 	}
 	return ret;
-*/
 }
 
 bool dDataFlowGraph::RemoveDeadInstructions()

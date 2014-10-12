@@ -12,10 +12,8 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dCILInstr.h"
+#include "dDataFlowGraph.h"
 
-#ifdef _DEBUG
-int dThreeAdressStmt::m_debugCount = 0;
-#endif
 
 
 dThreeAdressStmt::dMapTable dThreeAdressStmt::m_maptable[] = {
@@ -42,10 +40,6 @@ dThreeAdressStmt::dThreeAdressStmt(void)
     ,m_trueTargetJump(NULL)
     ,m_falseTargetJump(NULL)
 {
-#ifdef _DEBUG
-	m_debug = m_debugCount;
-	m_debugCount ++;;
-#endif
 }
 
 dThreeAdressStmt::~dThreeAdressStmt(void)
@@ -515,47 +509,6 @@ dCILInstr::~dCILInstr ()
 }
 
 
-bool dCILInstr::IsBasicBlockBegin() const
-{
-	return false;
-}
-
-bool dCILInstr::IsBasicBlockEnd() const
-{
-	return false;
-}
-
-dCILInstrIF* dCILInstr::GetAsIF()
-{
-	return NULL;
-}
-
-dCILInstrGoto* dCILInstr::GetAsGoto()
-{
-	return NULL;
-}
-
-dCILInstrLabel* dCILInstr::GetAsLabel()
-{
-	return NULL;
-}
-
-dCILInstrReturn* dCILInstr::GetAsReturn()
-{
-	return NULL;
-}
-
-dCILInstrFunction* dCILInstr::GetAsFunction()
-{
-	return NULL;
-}
-
-
-dList<dCILInstr*>::dListNode* dCILInstr::GetNode() const
-{
-	return m_myNode;
-}
-
 void dCILInstr::Serialize(char* const textOut) const
 {
 	textOut[0] = 0;
@@ -570,4 +523,15 @@ void dCILInstr::Trace() const
 #endif
 }
 
-
+void dCILInstr::AddKilledStatementLow(const dArg& arg, const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
+{
+	datFloatPoint.m_generateStmt = true;
+	dAssert(dictionary.Find(arg.m_label));
+	dList<dCIL::dListNode*>& defsList = dictionary.Find(arg.m_label)->GetInfo();
+	for (dList<dCIL::dListNode*>::dListNode* defNode = defsList.GetFirst(); defNode; defNode = defNode->GetNext()) {
+		dCIL::dListNode* const killStement = defNode->GetInfo();
+		if (killStement != datFloatPoint.m_statement) {
+			datFloatPoint.m_killStmtSet.Insert(killStement);
+		}
+	}
+}

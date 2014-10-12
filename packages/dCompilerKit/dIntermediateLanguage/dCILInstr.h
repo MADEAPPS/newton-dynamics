@@ -145,11 +145,6 @@ class dThreeAdressStmt
 	dList<dThreeAdressStmt>::dListNode* m_trueTargetJump;
     dList<dThreeAdressStmt>::dListNode* m_falseTargetJump;
 
-#ifdef _DEBUG
-	int m_debug;
-	static int m_debugCount;
-#endif
-
 	void Trace () const;
 	void Trace (char* const textOut) const;
 	void TraceAssigment (char* const textOut) const;
@@ -164,10 +159,13 @@ class dThreeAdressStmt
 };
 
 class dCILInstrIF;
+class dCILInstrMove;
 class dCILInstrGoto;
 class dCILInstrLabel;
 class dCILInstrReturn;
 class dCILInstrFunction;
+class dCILSingleArgInstr;
+class dCILInstrThreeArgArithmetic;
 class dDataFlowPoint;
 class dDefinedVariableDictionary;
 
@@ -249,29 +247,37 @@ class dCILInstr
 	dCILInstr (dCIL& program);
 	virtual ~dCILInstr ();
 
-	virtual bool IsBasicBlockEnd() const;
-	virtual bool IsBasicBlockBegin() const;
+	dList<dCILInstr*>::dListNode* GetNode() const { return m_myNode; }
 
-	virtual dCILInstrIF* GetAsIF();
-	virtual dCILInstrGoto* GetAsGoto();
-	virtual dCILInstrLabel* GetAsLabel();
-	virtual dCILInstrReturn* GetAsReturn();
-	virtual dCILInstrFunction* GetAsFunction();
+	virtual bool CanBeEliminated() const { return false; }
+	virtual bool IsBasicBlockEnd() const { return false; }
+	virtual bool IsBasicBlockBegin() const { return false; }
+
+	virtual dCILInstrIF* GetAsIF() {return NULL; }
+	virtual dCILInstrMove* GetAsMove() { return NULL; }
+	virtual dCILInstrGoto* GetAsGoto() { return NULL; }
+	virtual dCILInstrLabel* GetAsLabel() { return NULL; }
+	virtual dCILInstrReturn* GetAsReturn() { return NULL; }
+	virtual dCILInstrFunction* GetAsFunction() { return NULL; }
+	virtual dCILSingleArgInstr* GetAsSingleArg()  { return NULL; }
+	virtual dCILInstrThreeArgArithmetic* GetAsThreeArgArithmetic() { return NULL; }
 
 	virtual bool ApplySemanticReordering () = 0;
-	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const = 0;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
+	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
 	
-
-	void Trace() const;
 	virtual void Serialize(char* const textOut) const;
 
-	dList<dCILInstr*>::dListNode* GetNode() const;
+	virtual void Trace() const;
+
+	static dIntrisicType GetTypeID(const dString& typeName);
+
+	protected:
+	virtual void AddKilledStatementLow(const dArg& arg, const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
 	dCIL* m_cil;
 	dList<dCILInstr*>::dListNode* m_myNode;
-	static dIntrisicType GetTypeID (const dString& typeName);
 	static dMapTable m_maptable[];
 };
 
@@ -283,6 +289,11 @@ class dCILSingleArgInstr: public dCILInstr
 		:dCILInstr (program)
 		,m_arg0(arg)
 	{
+	}
+
+	virtual dCILSingleArgInstr* GetAsSingleArg()  
+	{ 
+		return this; 
 	}
 
 	virtual bool ApplySemanticReordering ()
@@ -308,10 +319,9 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 	}
 
 	virtual bool ApplySemanticReordering () = 0;
-	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const = 0;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
-	
+	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
 
 	const dArg& GetArg1 () const 
 	{
@@ -353,9 +363,9 @@ class dCILThreeArgInstr: public dCILTwoArgInstr
 	}
 
 	virtual bool ApplySemanticReordering () = 0;
-	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const = 0;
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
+	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
 	
 
 	dArg m_arg2;

@@ -217,10 +217,24 @@ void dCILInstrCall::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) c
 }
 
 
-void dCILInstrCall::AddDefinedVariable (dDefinedVariableDictionary& dictionady) const 
+void dCILInstrCall::AddDefinedVariable (dDefinedVariableDictionary& dictionary) const 
 {
 	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != dThreeAdressStmt::m_void)) {
-		dDefinedVariableDictionary::dTreeNode* const node = dictionady.Insert (m_arg0.m_label);
+		dDefinedVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
 		node->GetInfo().Append (m_myNode);
 	}
+}
+
+
+void dCILInstrCall::AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
+{ 
+	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
+		dCILInstr::AddKilledStatementLow (m_arg0, dictionary, datFloatPoint);
+	}
+
+	for (dList<dArg>::dListNode* node = m_parameters.GetFirst(); node; node = node->GetNext()) {
+		const dArg& arg = node->GetInfo();
+		dCILInstr::AddKilledStatementLow (arg, dictionary, datFloatPoint);
+	}
+
 }

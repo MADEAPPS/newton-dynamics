@@ -17,7 +17,26 @@
 #include "dCILInstr.h"
 
 
-class dCILInstrIntergerLogical: public dCILThreeArgInstr
+class dCILInstrThreeArgArithmetic: public dCILThreeArgInstr
+{
+	public: 
+	dCILInstrThreeArgArithmetic(dCIL& program, const dArg& arg0, const dArg& arg1, const dArg& arg2)
+		:dCILThreeArgInstr(program, arg0, arg1, arg2)
+	{
+	}
+
+	dCILInstrThreeArgArithmetic* GetAsThreeArgArithmetic()
+	{
+		return this;
+	}
+
+	virtual bool CanBeEliminated() const 
+	{ 
+		return true; 
+	}
+};
+
+class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 {
 	public:
 	dCILInstrIntergerLogical (dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2);
@@ -26,9 +45,8 @@ class dCILInstrIntergerLogical: public dCILThreeArgInstr
 
 	virtual bool ApplySemanticReordering ();
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionady) const;
-
-	virtual void AddKilledStatements (dDataFlowPoint& datFloatPoint) const {dAssert (0);}
+	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
+	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
 	dOperator m_operator;
 };

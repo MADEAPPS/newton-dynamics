@@ -37,7 +37,7 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 		m_flowGraph->UpdateReachingDefinitions();
 		optimized |= m_flowGraph->ApplyCopyPropagation();
 //m_flowGraph->m_cil->Trace();
-		m_flowGraph->CalculateLiveInputLiveOutput();
+		//m_flowGraph->CalculateLiveInputLiveOutput();
 		optimized |= m_flowGraph->ApplyRemoveDeadCode();
 //m_flowGraph->m_cil->Trace();
 	}

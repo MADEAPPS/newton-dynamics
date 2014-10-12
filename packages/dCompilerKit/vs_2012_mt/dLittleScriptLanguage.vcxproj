@@ -259,9 +259,6 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\projects\visualStudio_2010_static_mt\dContainers.vcxproj">
-      <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
-    </ProjectReference>
     <ProjectReference Include="dAssembleCompiler.vcxproj">
       <Project>{e77610c5-a79b-4bbd-b5d8-76fba50b1adb}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
