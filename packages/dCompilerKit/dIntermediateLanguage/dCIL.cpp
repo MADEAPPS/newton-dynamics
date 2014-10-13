@@ -82,15 +82,17 @@ dCIL::dCIL(llvm::Module* const module)
 
 dCIL::~dCIL(void)
 {
+	Clear();
 }
 
 
 void dCIL::Clear()
 {
 	ResetTemporaries();
-	RemoveAll();
+	while (GetLast()) {
+		delete GetLast()->GetInfo();
+	}
 }
-
 
 void dCIL::ResetTemporaries()
 {

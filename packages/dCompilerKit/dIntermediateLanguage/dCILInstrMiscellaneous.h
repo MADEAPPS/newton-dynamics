@@ -16,6 +16,47 @@
 #include "dCIL.h"
 #include "dCILInstr.h"
 
+class dCILInstrReturn;
+class dCILInstrFunction;
+
+class dCILInstrEnter: public dCILInstr
+{
+	public:
+	dCILInstrEnter(dCIL& program, dCILInstrFunction* const parent, int registerMask, int localMemorySize);
+
+	virtual bool ApplySemanticReordering() { return false; }
+	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const {}
+	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const {}
+	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+	void Serialize(char* const textOut) const;
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+
+	virtual dCILInstrEnter* GetAsEnter() { return this; }
+
+	int m_registerMask;
+	int m_localMemorySize;
+};
+
+class dCILInstrExit : public dCILInstr
+{
+	public:
+	dCILInstrExit (dCILInstrEnter* const enter, dCILInstrReturn* const successor);
+
+	virtual bool ApplySemanticReordering() { return false; }
+	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const {}
+	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const {}
+	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+	void Serialize(char* const textOut) const;
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+
+	virtual dCILInstrExit* GetAsExit() { return this; }
+
+	int m_registerMask;
+	int m_localMemorySize;
+};
+
 
 class dCILInstrNop: public dCILInstr
 {

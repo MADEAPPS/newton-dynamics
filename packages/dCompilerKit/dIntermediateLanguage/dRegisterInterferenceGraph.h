@@ -101,15 +101,16 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	void CoalesceNodes();
 	dTreeNode* GetBestNode();
 	void AllocateRegisters ();
+	void InsertEpilogAndProlog();
 	void SelectSpillVariableAndReWriteFunction();
     bool IsTempVariable (const dString& name) const;
 	int GetRegisterIndex (const dString& varName) const;
+	
 	bool CoalesceNodesRule1 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	bool CoalesceNodesRule2 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	void ReWriteFunctionSpillingVarible(const dString& spillVariable);
 	void SaveSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory);
 	void LoadSpillRegister(dCIL::dListNode* const node, dCILInstr::dArg& argument, const dString& spillVariable, const dString& spillMemory);
-
 	
 	dTree<int, dString> m_spillPenalty;
 	dList<dCoalescedNodePair> m_coalescedNodes;
@@ -117,8 +118,6 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	int m_spillCount;
 	int m_registerCount;
 	int m_spillPenatryFactor;
-
-	
 };
 
 #endif

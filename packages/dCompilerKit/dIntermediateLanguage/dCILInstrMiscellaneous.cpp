@@ -12,7 +12,36 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dCILInstr.h"
+#include "dCILInstrBranch.h"
 #include "dCILInstrMiscellaneous.h"
+
+
+dCILInstrEnter::dCILInstrEnter(dCIL& program, dCILInstrFunction* const parent, int registerMask, int localMemorySize)
+	:dCILInstr(program)
+	,m_registerMask(registerMask)
+	,m_localMemorySize(localMemorySize)
+{
+	program.InsertAfter(parent->GetNode(), m_myNode);
+}
+
+void dCILInstrEnter::Serialize(char* const textOut) const
+{
+	sprintf(textOut, "\tenter %d, %d\n", m_registerMask, m_localMemorySize);
+}
+
+dCILInstrExit::dCILInstrExit(dCILInstrEnter* const enter, dCILInstrReturn* const successor)
+	:dCILInstr(*enter->GetCil())
+	,m_registerMask (enter->m_registerMask)
+	,m_localMemorySize(enter->m_localMemorySize)
+{
+	enter->GetCil()->InsertAfter(successor->GetNode()->GetPrev(), m_myNode);
+}
+
+
+void dCILInstrExit::Serialize(char* const textOut) const
+{
+	sprintf(textOut, "\texit %d, %d\n", m_registerMask, m_localMemorySize);
+}
 
 
 dCILInstrNop::dCILInstrNop()

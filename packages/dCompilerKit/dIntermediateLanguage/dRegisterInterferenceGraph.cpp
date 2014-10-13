@@ -14,6 +14,7 @@
 #include "dDataFlowGraph.h"
 #include "dCILInstrBranch.h"
 #include "dCILInstrLoadStore.h"
+#include "dCILInstrMiscellaneous.h"
 #include "dRegisterInterferenceGraph.h"
 
 
@@ -79,6 +80,8 @@ dAssert (0);
 //m_flowGraph->m_cil->Trace();
 
 	m_flowGraph->RemoveNop();
+
+	InsertEpilogAndProlog();
 m_flowGraph->m_cil->Trace();
 }
 
@@ -975,3 +978,36 @@ dAssert (0);
 */
 }
 
+void dRegisterInterferenceGraph::InsertEpilogAndProlog()
+{
+	int registerMask = 0;
+	int lastReg = 0;
+	Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) {
+		dRegisterInterferenceNode& node = iter.GetNode()->GetInfo();
+		lastReg = dMax(node.m_registerIndex, lastReg);
+	}
+
+	lastReg = lastReg - D_CALLER_SAVE_REGISTER_COUNT;
+	if (lastReg >= 0) {
+		registerMask = (1 << (lastReg + 1)) - 1;
+	}
+
+	int localMemory = 0;
+
+	if (registerMask || localMemory) {
+
+		dCILInstrFunction* const entryPoint = m_flowGraph->m_function->GetInfo()->GetAsFunction();
+		dAssert(entryPoint);
+		dCILInstrEnter* const enter = new dCILInstrEnter(*m_flowGraph->m_cil, entryPoint, registerMask, localMemory);
+		
+		for (dCIL::dListNode* node = m_flowGraph->m_function; node != m_flowGraph->m_basicBlocks.m_end; node = node->GetNext()) {
+			dCILInstr* const instr = node->GetInfo();
+			if (instr->GetAsReturn()) {
+				new dCILInstrExit(enter, instr->GetAsReturn());
+			}
+		}
+
+//		m_flowGraph->m_cil->Trace();
+	}
+}

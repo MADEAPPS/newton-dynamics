@@ -35,7 +35,7 @@ class dCILInstr;
 class dDataFlowGraph; 
 
 //class dCIL: public dList<dThreeAdressStmt>
-class dCIL: public  dList<dCILInstr*>
+class dCIL: public dList<dCILInstr*>
 {
 	public:
 

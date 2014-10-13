@@ -158,12 +158,14 @@ class dThreeAdressStmt
 */
 
 class dCIL;
-class dCILInstrIFNot;
 class dCILInstrNop;
+class dCILInstrExit;
+class dCILInstrEnter;
 class dCILInstrCall;
 class dCILInstrMove;
 class dCILInstrGoto;
 class dCILInstrLabel;
+class dCILInstrIFNot;
 class dCILInstrReturn;
 class dCILInstrArgument;
 class dCILInstrFunction;
@@ -253,14 +255,17 @@ class dCILInstr
 	dCILInstr (dCIL& program);
 	virtual ~dCILInstr ();
 
+	dCIL* GetCil() const { return m_cil; }
 	dList<dCILInstr*>::dListNode* GetNode() const { return m_myNode; }
 
 	virtual bool CanBeEliminated() const { return false; }
 	virtual bool IsBasicBlockEnd() const { return false; }
 	virtual bool IsBasicBlockBegin() const { return false; }
 
-	virtual dCILInstrIFNot* GetAsIF() {return NULL; }
+	virtual dCILInstrExit* GetAsExit() { return NULL; }
+	virtual dCILInstrEnter* GetAsEnter() { return NULL; }
 	virtual dCILInstrNop* GetAsNop() { return NULL; }
+	virtual dCILInstrIFNot* GetAsIF() { return NULL; }
 	virtual dCILInstrMove* GetAsMove() { return NULL; }
 	virtual dCILInstrCall* GetAsCall() { return NULL; }
 	virtual dCILInstrGoto* GetAsGoto() { return NULL; }
@@ -283,6 +288,7 @@ class dCILInstr
 
 	virtual void Trace() const;
 
+	
 	void Nullify();
 
 	static dIntrisicType GetTypeID(const dString& typeName);

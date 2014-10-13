@@ -24,9 +24,9 @@ void *operator new(size_t s)
 		#endif
 	}
 	void* const mem = malloc (s);
-	unsigned long xxx = unsigned long (mem);
-	if (((xxx & 0xffff) == 0xEF90) && (s == 12))
-		dAssert(0);
+//	unsigned long xxx = unsigned long (mem);
+//	if (((xxx & 0xffff) == 0x8598) && (s == 16))
+//		dAssert(0);
 	return mem;
 }
 
