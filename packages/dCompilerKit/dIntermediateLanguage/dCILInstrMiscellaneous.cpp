@@ -15,11 +15,23 @@
 #include "dCILInstrMiscellaneous.h"
 
 
-dCILInstrNop::dCILInstrNop(dCIL& program)
-	:dCILInstr (program)
-	
+dCILInstrNop::dCILInstrNop()
+	:dCILInstr()
 {
 }
+
+dCILInstrNop::dCILInstrNop(dCIL& program)
+	:dCILInstr (program)
+{
+}
+
+void dCILInstrNop::Serialize(char* const textOut) const
+{
+	//	sprintf(textOut, "\tnop\n");
+	textOut[0] = 0;
+}
+
+
 
 dCILInstrFunction::dCILInstrFunction (dCIL& program, const dString& name, const dArgType& type)
 	:dCILInstr (program)
@@ -27,6 +39,7 @@ dCILInstrFunction::dCILInstrFunction (dCIL& program, const dString& name, const 
 	,m_parameters()
 {
 }
+
 
 dList<dCILInstr::dArg>::dListNode* dCILInstrFunction::AddParameter (const dString& name, const dArgType& type)
 {

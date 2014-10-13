@@ -202,14 +202,14 @@ void dCILInstrIntergerLogical::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFl
 	
 	switch (m_arg2.GetType().m_intrinsicType)
 	{
-		case dThreeAdressStmt::m_int:
+		case m_int:
 		//case dThreeAdressStmt::m_classPointer:
 		{
 			datFloatPoint.m_usedVariableSet.Insert (m_arg2.m_label);
 			break;
 		}
 
-		case dThreeAdressStmt::m_constInt:
+		case m_constInt:
 			break;
 
 		default:	

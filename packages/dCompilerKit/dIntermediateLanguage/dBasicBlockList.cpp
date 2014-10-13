@@ -64,8 +64,10 @@ void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
 		dCILInstrReturn* const returnInst = node->GetInfo()->GetAsReturn();
 		if (returnInst && node->GetNext()) {
-			const dCILInstrGoto* const gotoInst = node->GetNext()->GetInfo()->GetAsGoto();
+			dCIL::dListNode* const nextNode = node->GetNext();
+			dCILInstrGoto* const gotoInst = nextNode->GetInfo()->GetAsGoto();
 			if (gotoInst) {
+				//gotoInst->Nullify();
 				delete gotoInst;
 			}
 		}

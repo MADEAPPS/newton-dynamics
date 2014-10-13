@@ -13,9 +13,10 @@
 #include "dCIL.h"
 #include "dCILInstr.h"
 #include "dDataFlowGraph.h"
+#include "dCILInstrMiscellaneous.h"
+#include "dRegisterInterferenceGraph.h"
 
-
-
+/*
 dThreeAdressStmt::dMapTable dThreeAdressStmt::m_maptable[] = {
 	{dThreeAdressStmt::m_void, "void"}, 
 	{dThreeAdressStmt::m_bool, "bool"}, 
@@ -60,14 +61,14 @@ dThreeAdressStmt::dIntrisicType dThreeAdressStmt::GetTypeID (const dString& type
 	return dThreeAdressStmt::m_int;
 }
 
-/*
+
 dString dThreeAdressStmt::GetTypeString (const dArgType argType)
 {
 	dAssert (0);
 	dAssert (argType.m_intrinsicType < sizeof (m_maptable) / sizeof (m_maptable[0]));
 	return m_maptable[argType.m_intrinsicType].m_name;
 }
-*/
+
 
 
 dString dThreeAdressStmt::dArgType::GetTypeName () const 
@@ -224,7 +225,7 @@ void dThreeAdressStmt::TraceAssigment (char* const text) const
 	}
 }
 
-/*
+
 void dThreeAdressStmt::TraceConditional (char* const textOut) const
 {
 	textOut[0] = 0;
@@ -267,7 +268,7 @@ void dThreeAdressStmt::TraceConditional (char* const textOut) const
 		}
 	}
 }
-*/
+
 
 void dThreeAdressStmt::Trace (char* const textOut) const
 {
@@ -425,13 +426,7 @@ void dThreeAdressStmt::Trace () const
 	dTrace ((text));
 //	#endif
 }
-
-
-
-
-
-
-
+*/
 
 
 dCILInstr::dMapTable dCILInstr::m_maptable[] = 
@@ -448,10 +443,6 @@ dCILInstr::dMapTable dCILInstr::m_maptable[] =
 	{dCILInstr::m_constInt, "constInt"},
 	{dCILInstr::m_constFloat, "constFloat"}
 };
-
-
-
-
 
 void dCILInstr::dArgType::SetType (const dCILInstr::dArgType& type)
 {
@@ -500,14 +491,32 @@ dCILInstr::dCILInstr (dCIL& program)
 	:m_cil(&program)
 	,m_myNode (program.Append (this))
 {
+}
 
+dCILInstr::dCILInstr()
+	:m_cil(NULL)
+	, m_myNode(NULL)
+{
 }
 
 dCILInstr::~dCILInstr ()
 {
-	m_cil->Remove (m_myNode);
+	if (m_myNode) {
+		m_cil->Remove(m_myNode);
+	}
 }
 
+void dCILInstr::Nullify()
+{
+	dCIL* const cil = m_cil;
+	dList<dCILInstr*>::dListNode* const node = m_myNode;
+	m_myNode = NULL;
+	delete this;
+	dCILInstrNop* const nop = new dCILInstrNop();
+	node->GetInfo() = nop;
+	nop->m_cil = cil;
+	nop->m_myNode = node;
+}
 
 void dCILInstr::Serialize(char* const textOut) const
 {
@@ -534,4 +543,25 @@ void dCILInstr::AddKilledStatementLow(const dArg& arg, const dDefinedVariableDic
 			datFloatPoint.m_killStmtSet.Insert(killStement);
 		}
 	}
+}
+
+
+
+void dCILSingleArgInstr::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+{
+	m_arg0.m_label = interferenceGraph.GetRegisterName(m_arg0.m_label);
+}
+
+void dCILTwoArgInstr::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+{
+	m_arg1.m_label = interferenceGraph.GetRegisterName(m_arg1.m_label);
+	dCILSingleArgInstr::AsignRegisterName(interferenceGraph);
+}
+
+void dCILThreeArgInstr::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+{
+	if ((m_arg2.m_intrinsicType != m_constInt) && (m_arg2.m_intrinsicType != m_constFloat)) {
+		m_arg2.m_label = interferenceGraph.GetRegisterName(m_arg2.m_label);
+	}
+	dCILTwoArgInstr::AsignRegisterName(interferenceGraph);
 }

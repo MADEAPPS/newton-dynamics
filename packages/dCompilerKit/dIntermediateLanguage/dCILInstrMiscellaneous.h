@@ -20,11 +20,14 @@
 class dCILInstrNop: public dCILInstr
 {
 	public:
+	dCILInstrNop();
 	dCILInstrNop(dCIL& program);
 	virtual bool ApplySemanticReordering () { return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+	void Serialize(char* const textOut) const;
 };
 
 class dCILInstrFunction: public dCILInstr
@@ -43,8 +46,8 @@ class dCILInstrFunction: public dCILInstr
 	virtual bool ApplySemanticReordering () {return false;} 
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {dAssert (0);}
-
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {dAssert (0);}
+	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
 
 	dArg m_name;
 	dList<dArg> m_parameters;

@@ -130,36 +130,22 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 //		m_opertatorThis = arg->m_result.m_label;
 	}
 
-	dCILInstrLabel* const entryPoint = new dCILInstrLabel (cil, cil.NewLabel());
-	entryPoint->Trace();
-
 	// emit the function arguments
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
-		//dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
-		//fntArg.m_instruction = dThreeAdressStmt::m_argument;
-		//fntArg.m_arg0.m_label = arg->m_name;
-		//fntArg.m_arg0.SetType (arg->m_type->GetArgType());
-		//fntArg.m_arg1 = fntArg.m_arg0;
 		arg->m_result = function->AddParameter (arg->m_name, arg->m_type->GetArgType())->GetInfo();
-//		DTRACE_INTRUCTION (&fntArg);
 	}
 	function->Trace();
+
+	dCILInstrLabel* const entryPoint = new dCILInstrLabel(cil, cil.NewLabel());
+	entryPoint->Trace();
 
 	for (dList<dDAGParameterNode*>::dListNode* argNode = m_parameters.GetFirst(); argNode; argNode = argNode->GetNext()) {
 		dDAGParameterNode* const arg = argNode->GetInfo();
 
 		dTree<dCILInstr::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
 		dAssert (varNameNode);
-/*
-		dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
-		fntArg.m_instruction = dThreeAdressStmt::m_local;
-		fntArg.m_arg0 = varNameNode->GetInfo();
-		fntArg.m_arg1 = fntArg.m_arg0;
-		arg->m_result = fntArg.m_arg1;
-		DTRACE_INTRUCTION (&fntArg);
-*/
-		dCILInstrLocal* const localVariable = new dCILInstrLocal(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType());
+		dCILInstrArgument* const localVariable = new dCILInstrArgument(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType());
 		localVariable->Trace();
 	}
 
@@ -168,22 +154,17 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		dDAGParameterNode* const arg = argNode->GetInfo();
 		dTree<dCILInstr::dArg, dString>::dTreeNode* const varNameNode = m_body->FindVariable(arg->m_name);
 		dAssert (varNameNode);
-/*
-		dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
-		fntArg.m_instruction = dThreeAdressStmt::m_storeBase;
-		fntArg.m_arg0 = varNameNode->GetInfo();
-		fntArg.m_arg1.m_label = arg->m_name;
-		fntArg.m_arg1.SetType (arg->GetType()->GetArgType());
-		arg->m_result = fntArg.m_arg1;
-		DTRACE_INTRUCTION (&fntArg);
-*/
-		dCILInstrStore* const store = new dCILInstrStore(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType(), arg->m_name, arg->GetType()->GetArgType());
-		arg->m_result =  store->GetArg0();
+		//dCILInstrStore* const store = new dCILInstrStore(cil, varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType(), arg->m_name, arg->GetType()->GetArgType());
+		dString localVariableAliasName(cil.NewTemp());
+		dCILInstrMove* const store = new dCILInstrMove(cil, localVariableAliasName, arg->GetType()->GetArgType(), varNameNode->GetInfo().m_label, varNameNode->GetInfo().GetType());
+		//arg->m_result =  store->GetArg0();
+		varNameNode->GetInfo().m_label = localVariableAliasName;
 		store->Trace();
 	}
 
+
 	m_body->CompileCIL(cil);
-	if (m_returnType->GetArgType().m_intrinsicType == dThreeAdressStmt::m_void) {
+	if (m_returnType->GetArgType().m_intrinsicType == dCILInstr::m_void) {
 		dAssert (0);
 /*
 		const dThreeAdressStmt& lastInstruction = cil.GetLast()->GetInfo();

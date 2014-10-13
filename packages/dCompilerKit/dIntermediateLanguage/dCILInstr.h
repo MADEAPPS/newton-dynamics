@@ -12,9 +12,7 @@
 #ifndef  _DCIL_INSTRUC_H_
 #define  _DCIL_INSTRUC_H_
 
-
-class dCIL;
-
+/*
 class dThreeAdressStmt
 {
 	public:
@@ -157,16 +155,22 @@ class dThreeAdressStmt
 
 	static dMapTable m_maptable[];
 };
+*/
 
+class dCIL;
 class dCILInstrIF;
 class dCILInstrMove;
 class dCILInstrGoto;
 class dCILInstrLabel;
+class dCILInstrCall;
 class dCILInstrReturn;
+class dCILInstrArgument;
 class dCILInstrFunction;
 class dCILSingleArgInstr;
 class dCILInstrThreeArgArithmetic;
+
 class dDataFlowPoint;
+class dRegisterInterferenceGraph;
 class dDefinedVariableDictionary;
 
 class dCILInstr
@@ -255,9 +259,11 @@ class dCILInstr
 
 	virtual dCILInstrIF* GetAsIF() {return NULL; }
 	virtual dCILInstrMove* GetAsMove() { return NULL; }
+	virtual dCILInstrCall* GetAsCall() { return NULL; }
 	virtual dCILInstrGoto* GetAsGoto() { return NULL; }
 	virtual dCILInstrLabel* GetAsLabel() { return NULL; }
 	virtual dCILInstrReturn* GetAsReturn() { return NULL; }
+	virtual dCILInstrArgument* GetAsArgument() { return NULL; }
 	virtual dCILInstrFunction* GetAsFunction() { return NULL; }
 	virtual dCILSingleArgInstr* GetAsSingleArg()  { return NULL; }
 	virtual dCILInstrThreeArgArithmetic* GetAsThreeArgArithmetic() { return NULL; }
@@ -266,14 +272,19 @@ class dCILInstr
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
+
+	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) = 0;
 	
 	virtual void Serialize(char* const textOut) const;
 
 	virtual void Trace() const;
 
+	void Nullify();
+
 	static dIntrisicType GetTypeID(const dString& typeName);
 
 	protected:
+	dCILInstr();
 	virtual void AddKilledStatementLow(const dArg& arg, const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
 	dCIL* m_cil;
@@ -301,6 +312,7 @@ class dCILSingleArgInstr: public dCILInstr
 		return false;
 	}
 
+	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 	const dArg& GetArg0 () const 
 	{
 		return m_arg0;
@@ -322,6 +334,8 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
+
+	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	const dArg& GetArg1 () const 
 	{
@@ -366,7 +380,7 @@ class dCILThreeArgInstr: public dCILTwoArgInstr
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
-	
+	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	dArg m_arg2;
 };

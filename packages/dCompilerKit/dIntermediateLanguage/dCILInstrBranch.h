@@ -26,7 +26,9 @@ class dCILInstrLabel: public dCILSingleArgInstr
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
+	void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {}
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	
 
 	virtual bool IsBasicBlockBegin() const;
 	virtual dCILInstrLabel* GetAsLabel();
@@ -66,6 +68,7 @@ class dCILInstrIF: public dCILThreeArgInstr
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
 
+	void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 
 	dList<dCILInstr*>::dListNode* GetTrueTarget () const;
@@ -90,6 +93,7 @@ class dCILInstrReturn: public dCILSingleArgInstr
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
 
+	void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 };
 
@@ -100,10 +104,14 @@ class dCILInstrCall: public dCILTwoArgInstr
 //	dCILInstrCall(dCIL& program, const dString& name, const dArgType& type, dList<dArg>& parameters);
 	void Serialize(char* const textOut) const;
 
+	virtual dCILInstrCall* GetAsCall() { return this; }
+
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+
+	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	dList<dArg> m_parameters;
 };

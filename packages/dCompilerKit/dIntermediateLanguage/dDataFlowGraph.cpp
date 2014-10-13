@@ -1189,6 +1189,7 @@ void dDataFlowGraph::BuildGeneratedAndUsedVariableSets()
 
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
+		point.m_generatedVariable.Empty();
 		dCILInstr* const instruc = point.m_statement->GetInfo();
 //instruc->Trace();
 		instruc->AddGeneratedAndUsedSymbols(point);	
@@ -1291,11 +1292,11 @@ void dDataFlowGraph::CalculateLiveInputLiveOutput ()
 			dBasicBlock* const block = blockNode->GetInfo();
 
 			int test = 1;
-			for (dCIL::dListNode* stmtNode = block->m_end; test; stmtNode = stmtNode->GetPrev()) {
-				test = (stmtNode != block->m_begin);
+			for (dCIL::dListNode* node = block->m_end; test; node = node->GetPrev()) {
+				test = (node != block->m_begin);
 
-				dAssert (m_dataFlowGraph.Find(stmtNode));
-				dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNode)->GetInfo();
+				dAssert (m_dataFlowGraph.Find(node));
+				dDataFlowPoint& info = m_dataFlowGraph.Find(node)->GetInfo();
 				dDataFlowPoint::dVariableSet<dString> oldInput (info.m_liveInputSet);
 				dDataFlowPoint::dVariableSet<dString> oldOutput (info.m_liveOutputSet);
 
@@ -1315,6 +1316,26 @@ void dDataFlowGraph::CalculateLiveInputLiveOutput ()
 			}
 		}
 	}
+
+#if 0
+	for (dCIL::dListNode* node = m_basicBlocks.m_begin; node != m_basicBlocks.m_end; node = node->GetNext()) {
+		dTree<dDataFlowPoint, dCIL::dListNode*>::dTreeNode* const pointNode = m_dataFlowGraph.Find(node);
+		if (pointNode) {
+			dDataFlowPoint& info = pointNode->GetInfo();
+			node->GetInfo()->Trace();
+
+			dDataFlowPoint::dVariableSet<dString>::Iterator iter(info.m_liveOutputSet);
+			if (info.m_liveOutputSet.GetCount()) {
+				dTrace(("           :"));
+				info.m_liveOutputSet.Trace();
+				//for (iter.Begin(); iter; iter++) {
+				//				dTrace(("%s ", iter.GetKey().GetStr()));
+				//}
+				//dTrace(("\n"));
+			}
+		}
+	}
+#endif
 }
 
 void dDataFlowGraph::FindNodesInPathway(dCIL::dListNode* const source, dCIL::dListNode* const destination, dTree<int, dCIL::dListNode*>& pathOut) const
@@ -1645,18 +1666,20 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 		nextNode = node->GetNext();
 		dCILInstr* const instr = node->GetInfo();
 		if (instr->CanBeEliminated()) {
-			dAssert(instr->GetAsSingleArg());
-			dCILSingleArgInstr* const singleArg = instr->GetAsSingleArg();
-			//singleArg->Trace();
-
-			dDataFlowPoint& info = m_dataFlowGraph.Find(node)->GetInfo();
-			dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
-			const dCILInstr::dArg arg = singleArg->GetArg0();
-			if (!liveOut.Find (arg.m_label)) {
-				dAssert(0);
-				ret = true;
-				delete singleArg;
-				UpdateLiveInputLiveOutput();
+			if (instr->GetAsMove()) {
+				dCILInstrMove* const move = instr->GetAsMove();
+				dDataFlowPoint& info = m_dataFlowGraph.Find(node)->GetInfo();
+				dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
+				const dCILInstr::dArg arg0 = move->GetArg0();
+				const dCILInstr::dArg arg1 = move->GetArg1();
+				bool xxx = liveOut.Find(arg0.m_label);
+				if (!liveOut.Find(arg0.m_label) || (arg0.m_label == arg1.m_label)) {
+					ret = true;
+					//m_dataFlowGraph.Remove(node);
+					//delete move;
+					move->Nullify();
+					UpdateLiveInputLiveOutput();
+				}
 			}
 	/*
 		dThreeAdressStmt& stmt = stmtNode->GetInfo();

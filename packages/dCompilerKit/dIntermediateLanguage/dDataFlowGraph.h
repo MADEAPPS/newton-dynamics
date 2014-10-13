@@ -105,13 +105,11 @@ class dDataFlowPoint
 
 		void Trace() const
 		{
-			#ifdef TRACE_INTERMEDIATE_CODE
-				Iterator iter (*this);
-				for (iter.Begin(); iter; iter ++) {
-					dTrace (("%s ", iter.GetKey().GetStr()));
-				}
-				dTrace (("\n"));
-			#endif
+			Iterator iter (*this);
+			for (iter.Begin(); iter; iter ++) {
+				dTrace (("%s ", iter.GetKey().GetStr()));
+			}
+			dTrace (("\n"));
 		}
 	};
 

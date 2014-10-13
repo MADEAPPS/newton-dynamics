@@ -162,7 +162,7 @@ void dDAGClassNode::CompileCIL(dCIL& cil)
 
 	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
 		//m_cilCodeList.Append (cil.NewStatement());
-		new dCILInstrNop (cil);
+		//new dCILInstrNop (cil);
 
 		dDAGFunctionNode* const function = node->GetInfo();
 

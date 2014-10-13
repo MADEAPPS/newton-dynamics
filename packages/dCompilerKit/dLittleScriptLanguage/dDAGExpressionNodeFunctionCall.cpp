@@ -87,8 +87,13 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 	}
 
 	dDAGTypeNode* const returnType = function->m_returnType;
-	m_result.m_label = cil.NewTemp ();
+	//m_result.m_label = cil.NewTemp ();
+	dString tmp (cil.NewTemp());
 	m_result.SetType (returnType->GetArgType());
-	dCILInstrCall* const instr = new dCILInstrCall (cil, m_result.m_label, m_result.GetType(), name, paramList);
+	dCILInstrCall* const instr = new dCILInstrCall(cil, tmp, m_result.GetType(), name, paramList);
 	instr->Trace();
+
+	m_result.m_label = cil.NewTemp();
+	dCILInstrMove* const move = new dCILInstrMove(cil, m_result.m_label, m_result.GetType(), tmp, m_result.GetType());
+	move->Trace();
 }

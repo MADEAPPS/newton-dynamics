@@ -17,6 +17,23 @@
 #include "dCILInstr.h"
 
 
+
+class dCILInstrArgument: public dCILSingleArgInstr
+{
+	public:
+	dCILInstrArgument(dCIL& program, const dString& name, const dArgType& type);
+
+	void Serialize(char* const textOut) const;
+	virtual dCILInstrArgument* GetAsArgument() { return this; }
+
+	virtual bool ApplySemanticReordering() { return false; }
+	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const;
+	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const;
+	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {};
+};
+
+
+
 class dCILInstrLocal: public dCILSingleArgInstr
 {
 	public:
@@ -38,16 +55,12 @@ class dCILInstrMove: public dCILTwoArgInstr
 	void Serialize(char* const textOut) const;
 
 	virtual dCILInstrMove* GetAsMove() { return this; }
+	virtual bool CanBeEliminated() const { return true; }
 
 	virtual bool ApplySemanticReordering () {return false;}
-	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {dAssert (0);}
-	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {dAssert (0);}
-
-	virtual bool CanBeEliminated() const
-	{
-		return true;
-	}
+	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const;
+	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const;
+	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 };
 
 

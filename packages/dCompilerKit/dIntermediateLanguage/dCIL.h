@@ -43,12 +43,12 @@ class dCIL: public  dList<dCILInstr*>
 	{
 		public:
 		dReturnValue ()
-			:m_type(dThreeAdressStmt::m_int)
+			:m_type(dCILInstr::m_int)
 		{
 			m_f = 0.0;
 		}
 
-		dThreeAdressStmt::dIntrisicType m_type;
+		dCILInstr::dIntrisicType m_type;
 		union {;
 			dMachineIntRegister m_i;
 			dMachineFloatRegister m_f;

@@ -92,8 +92,10 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	};
 
 	dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
-	private:
 
+	dString GetRegisterName(const dString& varName) const;
+
+	private:
 	void Build();
 	int ColorGraph ();
 	void CoalesceNodes();
@@ -102,7 +104,6 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	void SelectSpillVariableAndReWriteFunction();
     bool IsTempVariable (const dString& name) const;
 	int GetRegisterIndex (const dString& varName) const;
-	dString GetRegisterName (const dString& varName) const;
 	bool CoalesceNodesRule1 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	bool CoalesceNodesRule2 (dTreeNode* const nodeA, dTreeNode* const nodeB);
 	void ReWriteFunctionSpillingVarible(const dString& spillVariable);
@@ -116,6 +117,8 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	int m_spillCount;
 	int m_registerCount;
 	int m_spillPenatryFactor;
+
+	
 };
 
 #endif
