@@ -28,7 +28,7 @@ class dCILInstrLabel: public dCILSingleArgInstr
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
 	void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {}
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
-	
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 
 	virtual bool IsBasicBlockBegin() const;
 	virtual dCILInstrLabel* GetAsLabel();
@@ -50,17 +50,18 @@ class dCILInstrGoto: public dCILSingleArgInstr
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
 
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {dAssert (0);}
 	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
 
-class dCILInstrIF: public dCILThreeArgInstr
+class dCILInstrIFNot: public dCILThreeArgInstr
 {
 	public:
-	dCILInstrIF (dCIL& program, const dString& name, const dArgType& type, const dString& target0, const dString& target1);
+	dCILInstrIFNot (dCIL& program, const dString& name, const dArgType& type, const dString& target0, const dString& target1);
 	void Serialize(char* const textOut) const;
 
-	virtual dCILInstrIF* GetAsIF();
+	virtual dCILInstrIFNot* GetAsIF();
 	virtual bool IsBasicBlockEnd() const;
 	void SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1) ;
 
@@ -70,6 +71,8 @@ class dCILInstrIF: public dCILThreeArgInstr
 
 	void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
 
 	dList<dCILInstr*>::dListNode* GetTrueTarget () const;
 	dList<dCILInstr*>::dListNode* GetFalseTarget () const;
@@ -93,6 +96,8 @@ class dCILInstrReturn: public dCILSingleArgInstr
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
 
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+
 	void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 };
@@ -111,6 +116,7 @@ class dCILInstrCall: public dCILTwoArgInstr
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	dList<dArg> m_parameters;

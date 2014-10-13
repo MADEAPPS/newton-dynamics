@@ -71,6 +71,8 @@ dAssert (0);
 
 m_flowGraph->m_cil->Trace();	
 	while (m_flowGraph->RemoveRedundantJumps());
+m_flowGraph->m_cil->Trace();
+
 	m_flowGraph->ApplyRemoveDeadCode();
 //m_flowGraph->m_cil->Trace();
 	m_flowGraph->RemoveDeadInstructions();

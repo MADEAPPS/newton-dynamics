@@ -68,50 +68,59 @@ dCILInstrGoto* dCILInstrGoto::GetAsGoto()
 	return this;
 }
 
-dCILInstrIF::dCILInstrIF(dCIL& program, const dString& name, const dArgType& type, const dString& target0, const dString& target1)
+dCILInstrIFNot::dCILInstrIFNot(dCIL& program, const dString& name, const dArgType& type, const dString& target0, const dString& target1)
 	:dCILThreeArgInstr (program, dArg (name, type), dArg (target0, dArgType()), dArg (target1, dArgType()))
 	,m_tagetNode0(NULL)
 	,m_tagetNode1(NULL)
 {
 }
 
-void dCILInstrIF::Serialize(char* const textOut) const
+void dCILInstrIFNot::Serialize(char* const textOut) const
 {
-	sprintf (textOut, "\tif (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+	if (m_tagetNode1) {
+		sprintf(textOut, "\tifnot (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+	} else {
+		sprintf(textOut, "\tifnot (%s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+	}
 }
 
 
-void dCILInstrIF::SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1)
+void dCILInstrIFNot::SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1)
 {
+	dAssert(target0);
 	dAssert (target0->GetArg0().m_label == GetArg1().m_label);
-	dAssert (target1->GetArg0().m_label == GetArg2().m_label);
-
 	m_tagetNode0 = target0->GetNode();
-	m_tagetNode1 = target1->GetNode();
+
+	if (target1) {
+		dAssert(target1->GetArg0().m_label == GetArg2().m_label);
+		m_tagetNode1 = target1->GetNode();
+	} else {
+		m_tagetNode1 = NULL;
+	}
 }
 
-dList<dCILInstr*>::dListNode* dCILInstrIF::GetTrueTarget () const
+dList<dCILInstr*>::dListNode* dCILInstrIFNot::GetTrueTarget () const
 {
 	return m_tagetNode0;
 }
 
-dList<dCILInstr*>::dListNode* dCILInstrIF::GetFalseTarget () const
+dList<dCILInstr*>::dListNode* dCILInstrIFNot::GetFalseTarget () const
 {
 	return m_tagetNode1;
 }
 
 
-dCILInstrIF* dCILInstrIF::GetAsIF()
+dCILInstrIFNot* dCILInstrIFNot::GetAsIF()
 {
 	return this;
 }
 
-bool dCILInstrIF::IsBasicBlockEnd() const
+bool dCILInstrIFNot::IsBasicBlockEnd() const
 {
 	return true;
 }
 
-void dCILInstrIF::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
+void dCILInstrIFNot::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
 	dAssert (m_arg0.GetType().m_intrinsicType == m_int);
 //	if (m_arg0.GetType().m_intrinsicType == m_int) {
@@ -122,7 +131,7 @@ void dCILInstrIF::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) con
 //	}
 }
 
-void dCILInstrIF::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+void dCILInstrIFNot::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
 	dCILSingleArgInstr::AsignRegisterName(interferenceGraph);
 }

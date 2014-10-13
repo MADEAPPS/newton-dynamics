@@ -30,8 +30,9 @@ class dCILInstrArgument: public dCILSingleArgInstr
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {};
-};
 
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+};
 
 
 class dCILInstrLocal: public dCILSingleArgInstr
@@ -44,6 +45,7 @@ class dCILInstrLocal: public dCILSingleArgInstr
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 };
 
 
@@ -61,6 +63,8 @@ class dCILInstrMove: public dCILTwoArgInstr
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
 };
 
 
@@ -79,6 +83,8 @@ class dCILInstrLoad: public dCILTwoArgInstr
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
 };
 
 class dCILInstrStore: public dCILTwoArgInstr
@@ -91,6 +97,8 @@ class dCILInstrStore: public dCILTwoArgInstr
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
 };
 
 

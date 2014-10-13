@@ -48,6 +48,7 @@ class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
 	dOperator m_operator;
 };
 

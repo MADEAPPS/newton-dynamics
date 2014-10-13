@@ -28,6 +28,10 @@ class dCILInstrNop: public dCILInstr
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
 	void Serialize(char* const textOut) const;
+
+	virtual dCILInstrNop* GetAsNop() { return this; }
+
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 };
 
 class dCILInstrFunction: public dCILInstr
@@ -48,6 +52,8 @@ class dCILInstrFunction: public dCILInstr
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {dAssert (0);}
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {dAssert (0);}
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 
 	dArg m_name;
 	dList<dArg> m_parameters;

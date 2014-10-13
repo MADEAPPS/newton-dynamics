@@ -158,11 +158,12 @@ class dThreeAdressStmt
 */
 
 class dCIL;
-class dCILInstrIF;
+class dCILInstrIFNot;
+class dCILInstrNop;
+class dCILInstrCall;
 class dCILInstrMove;
 class dCILInstrGoto;
 class dCILInstrLabel;
-class dCILInstrCall;
 class dCILInstrReturn;
 class dCILInstrArgument;
 class dCILInstrFunction;
@@ -170,6 +171,7 @@ class dCILSingleArgInstr;
 class dCILInstrThreeArgArithmetic;
 
 class dDataFlowPoint;
+class dDataFlowGraph;
 class dRegisterInterferenceGraph;
 class dDefinedVariableDictionary;
 
@@ -257,7 +259,8 @@ class dCILInstr
 	virtual bool IsBasicBlockEnd() const { return false; }
 	virtual bool IsBasicBlockBegin() const { return false; }
 
-	virtual dCILInstrIF* GetAsIF() {return NULL; }
+	virtual dCILInstrIFNot* GetAsIF() {return NULL; }
+	virtual dCILInstrNop* GetAsNop() { return NULL; }
 	virtual dCILInstrMove* GetAsMove() { return NULL; }
 	virtual dCILInstrCall* GetAsCall() { return NULL; }
 	virtual dCILInstrGoto* GetAsGoto() { return NULL; }
@@ -272,8 +275,9 @@ class dCILInstr
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
-
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) = 0;
+
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const = 0;
 	
 	virtual void Serialize(char* const textOut) const;
 
