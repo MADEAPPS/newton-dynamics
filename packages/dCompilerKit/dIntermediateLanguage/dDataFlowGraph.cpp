@@ -1432,13 +1432,14 @@ bool dDataFlowGraph::ApplyCopyPropagation()
 	for (dCIL::dListNode* node = m_basicBlocks.m_begin; node != m_basicBlocks.m_end; node = node->GetNext()) {
 		dCILInstrMove* const moveInst = node->GetInfo()->GetAsMove();
 		if (moveInst) {
-			moveInst->Trace();
+			//moveInst->Trace();
 			for (dCIL::dListNode* node1 = node->GetNext(); node1 != m_basicBlocks.m_end; node1 = node1->GetNext()) {
 				dCILInstr* const inst = node1->GetInfo();
 				if (DoStatementAreachesStatementB(node1, node)) {
-					inst->Trace();
+					dAssert(0);
+					//inst->Trace();
 					ret |= inst->ApplyCopyPropagation(moveInst, *this);
-					inst->Trace();
+					//inst->Trace();
 				}
 			}
 		}
@@ -1745,17 +1746,20 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 
 bool dDataFlowGraph::RemoveDeadInstructions()
 {
-dAssert (0);
-return 0;
-/*
 	bool ret = false;
+
 	int count = 0;
-	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin->GetNext()->GetNext(); (stmtNode != m_basicBlocks.m_end) && (stmtNode->GetInfo().m_instruction == dThreeAdressStmt::m_argument) && (count < D_CALLER_SAVE_REGISTER_COUNT); stmtNode = stmtNode->GetNext()) {
-		dThreeAdressStmt& stmt = stmtNode->GetInfo();
-		stmt.m_instruction = dThreeAdressStmt::m_nop;
-		count ++;
+	for (dCIL::dListNode* node = m_basicBlocks.m_begin; (node != m_basicBlocks.m_end) && (node->GetInfo()->GetAsNop() || node->GetInfo()->GetAsArgument()) && (count < D_CALLER_SAVE_REGISTER_COUNT); node = node->GetNext()) {
+		//dThreeAdressStmt& stmt = node->GetInfo();
+		//dCILInstrArgument* const argInstr = node->GetInfo()->GetAsArgument();
+		//stmt.m_instruction = dThreeAdressStmt::m_nop;
+		if (node->GetInfo()->GetAsArgument()) {
+			node->GetInfo()->Nullify();
+			count++;
+		}
 	}
 
+/*
 	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin->GetNext()->GetNext(); stmtNode != m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
 		dThreeAdressStmt& stmt = stmtNode->GetInfo();
 		if (stmt.m_instruction == dThreeAdressStmt::m_call) {
@@ -1767,28 +1771,25 @@ return 0;
 			}
 		}
 	}
-
-	return ret;
 */
+	return ret;
 }
 
 bool dDataFlowGraph::RemoveNop()
 {
-dAssert (0);
-return 0;
-/*
 	bool ret = false;
-	dCIL::dListNode* nextStmtNode;
-	for (dCIL::dListNode* stmtNode = m_basicBlocks.m_begin; stmtNode != m_basicBlocks.m_end; stmtNode = nextStmtNode) {
-		nextStmtNode = stmtNode->GetNext();
-		dThreeAdressStmt& stmt = stmtNode->GetInfo();	
-		if (stmt.m_instruction == dThreeAdressStmt::m_nop) {
-			m_cil->Remove(stmtNode);
+	dCIL::dListNode* nextNode;
+	for (dCIL::dListNode* node = m_basicBlocks.m_begin; node != m_basicBlocks.m_end; node = nextNode) {
+		nextNode = node->GetNext();
+		//dThreeAdressStmt& stmt = stmtNode->GetInfo();	
+		//if (stmt.m_instruction == dThreeAdressStmt::m_nop) {
+		if (node->GetInfo()->GetAsNop()) {
+			//m_cil->Remove(stmtNode);
+			delete node->GetInfo();
 			ret = true;
 		}
 	}
 	return ret;
-*/
 }
 
 
@@ -1811,16 +1812,13 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 	// remove if else to immediate label
 	for (iter.Begin(); iter; iter ++) {
 		dCIL::dListNode* const node = iter.GetKey();
-		//dThreeAdressStmt& stmt = node->GetInfo();
 		dCILInstr* const instr = node->GetInfo();
-		//if (stmt.m_instruction == dThreeAdressStmt::m_if) {
 		if (instr->GetAsIF()) {
 			dCILInstrIFNot* const ifInstr = instr->GetAsIF();
 			dCIL::dListNode* const elseTarget = ifInstr->GetFalseTarget();
 			if (elseTarget) {
 				dAssert(jumpMap.Find(elseTarget));
 				dCIL::dListNode* const falseTargetJump = jumpMap.Find(elseTarget)->GetKey();
-				//dThreeAdressStmt& stmt1 = falseTargetJump->GetInfo();
 
 				dCILInstr* const instr1 = falseTargetJump->GetInfo();
 				dCIL::dListNode* nextGotoNode = node->GetNext();
@@ -1828,19 +1826,15 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 					nextGotoNode = nextGotoNode->GetNext();
 				}
 
-				dCILInstrLabel* const const label = nextGotoNode->GetInfo()->GetAsLabel();
-				//dThreeAdressStmt& nextStmt = nextGotoNode->GetInfo();
+				dCILInstrLabel* const label = nextGotoNode->GetInfo()->GetAsLabel();
 				dAssert(label);
 				if (nextGotoNode == falseTargetJump) {
-					//stmt.m_falseTargetJump = NULL;
-					//stmt.m_arg2.m_label = "";
 					ifInstr->SetTargets(ifInstr->GetTrueTarget()->GetInfo()->GetAsLabel(), NULL);
 					label->Nullify();
 				}
 			}
 		}
 	}
-
 
 #if 0
 	// remove redundant adjacent labels
@@ -1954,60 +1948,77 @@ DTRACE_INTRUCTION (&stmt);
 
 #endif
 
-dAssert(0);
-return 0;
-/*
 	// redirect double indirect if
 	for (iter.Begin(); iter; iter ++) {
 		dCIL::dListNode* const node = iter.GetKey();
-		dThreeAdressStmt& stmt = node->GetInfo();
-//DTRACE_INTRUCTION (&stmt);
-		if (stmt.m_instruction == dThreeAdressStmt::m_if) {
-			dAssert (jumpMap.Find (stmt.m_trueTargetJump));
-			dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
-			//dThreeAdressStmt& stmt1 = trueTargetNode->GetInfo();
+		dCILInstr* const instr = node->GetInfo();
+		if (instr->GetAsIF()) {
+			dCILInstrIFNot* const ifInstr = instr->GetAsIF();
+			//dAssert(jumpMap.Find(stmt.m_trueTargetJump));
+			dCIL::dListNode* const trueTarget = ifInstr->GetTrueTarget();
+			dAssert(jumpMap.Find(trueTarget));
 
-			dCIL::dListNode* nextGotoNode = trueTargetNode;
-			while ((nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) || (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_label)) {
+			dAssert(jumpMap.Find(trueTarget)->GetKey() == trueTarget);
+			//dCIL::dListNode* const trueTargetNode = jumpMap.Find(trueTarget)->GetKey();
+			dCIL::dListNode* nextGotoNode = trueTarget;
+			//while ((nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) || (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_label)) {
+			while (nextGotoNode->GetInfo()->GetAsNop() || nextGotoNode->GetInfo()->GetAsLabel()) {
 				nextGotoNode = nextGotoNode->GetNext();
 			}
-
-			dThreeAdressStmt& stmt1 = nextGotoNode->GetInfo();
-			if (stmt1.m_instruction == dThreeAdressStmt::m_goto) {
+				
+			//	dThreeAdressStmt& stmt1 = nextGotoNode->GetInfo();
+			//if (stmt1.m_instruction == dThreeAdressStmt::m_goto) {
+			if (nextGotoNode->GetInfo()->GetAsGoto()) {
+				dAssert(0);
 				//const dThreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
-				stmt.m_arg1.m_label = stmt1.m_arg0.m_label;
-				stmt.m_trueTargetJump = stmt1.m_trueTargetJump;
-				ret = true;
+				//stmt.m_arg1.m_label = stmt1.m_arg0.m_label;
+				//stmt.m_trueTargetJump = stmt1.m_trueTargetJump;
+				//ret = true;
 			}
 		}
 	}
 
 
-	// delete goto to immidiate label
-	for (iter.Begin(); iter; iter ++) {
+	// delete goto to immediate label
+	for (iter.Begin(); iter; iter++) {
 		dCIL::dListNode* const node = iter.GetKey();
-		dThreeAdressStmt& stmt = node->GetInfo();
-		if (stmt.m_instruction == dThreeAdressStmt::m_goto) {
-			dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
+		dCILInstr* const instr = node->GetInfo();
+		if (instr->GetAsGoto()) {
+			dAssert(0);
+/*
+			dCILInstrGoto* const gotoInst = instr->GetAsGoto();
+			//dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
+			dList<dCILInstr*>::dListNode* const trueTargetNode = gotoInst->GetTarget();
+			dAssert(trueTargetNode == jumpMap.Find(trueTargetNode)->GetKey());
+
 			dCIL::dListNode* nextGotoNode = trueTargetNode;
-			while (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) {
+			//while (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) {
+			while (nextGotoNode->GetInfo()->GetAsNop()) {
 				nextGotoNode = nextGotoNode->GetNext();
 			}
-			dThreeAdressStmt& stmt1 = nextGotoNode->GetInfo();
-			dAssert (stmt1.m_instruction == dThreeAdressStmt::m_label);
+
+			//dThreeAdressStmt& stmt1 = nextGotoNode->GetInfo();
+			//dAssert (stmt1.m_instruction == dThreeAdressStmt::m_label);
+			dAssert(nextGotoNode->GetInfo()->GetAsLabel());
 			if (stmt1.m_trueTargetJump == nextGotoNode) {
 				ret = true;
 				stmt.m_instruction = dThreeAdressStmt::m_nop;
 				jumpMap.Remove(node);
 			}
+*/
 		}
 	}
-
-	// delete unreacheble goto
+	
+	// delete unreachable goto
 	for (iter.Begin(); iter; iter ++) {
 		dCIL::dListNode* const node = iter.GetKey();
-		dThreeAdressStmt& stmt = node->GetInfo();
-		if (stmt.m_instruction == dThreeAdressStmt::m_goto) {
+		dCILInstr* const instr = node->GetInfo();
+
+		//dThreeAdressStmt& stmt = node->GetInfo();
+		//if (stmt.m_instruction == dThreeAdressStmt::m_goto) {
+		if (instr->GetAsGoto()) {
+			dAssert(0);
+			/*
 			//dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
 			dCIL::dListNode* prevNode = node->GetPrev();
 			while (prevNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) {
@@ -2019,76 +2030,102 @@ return 0;
 				stmt.m_instruction = dThreeAdressStmt::m_nop;
 				jumpMap.Remove(node);
 			}
+*/
 		}
 	}
 
 
-	// redirect if to immideate label
-	for (iter.Begin(); iter; ) {
+	// redirect if to immediate label
+	for (iter.Begin(); iter; iter++) {
 		dCIL::dListNode* const node = iter.GetKey();
-		dThreeAdressStmt& stmt = node->GetInfo();
-		iter ++;
-//DTRACE_INTRUCTION (&stmt);
-		if (stmt.m_instruction == dThreeAdressStmt::m_if) {
-			dAssert (jumpMap.Find (stmt.m_trueTargetJump));
-			dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
-			dCIL::dListNode* nextGotoNode = trueTargetNode;
-			while ((nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) || (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_label)) {
+		//dThreeAdressStmt& stmt = node->GetInfo();
+		//iter ++;
+		//if (stmt.m_instruction == dThreeAdressStmt::m_if) {
+		dCILInstr* const instr = node->GetInfo();
+		if (instr->GetAsIF()) {
+			dCILInstrIFNot* const ifInstr = instr->GetAsIF();
+			//dAssert (jumpMap.Find (stmt.m_trueTargetJump));
+			//dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
+
+			dCIL::dListNode* const trueTarget = ifInstr->GetTrueTarget();
+			dAssert(jumpMap.Find(trueTarget));
+			dAssert(jumpMap.Find(trueTarget)->GetKey() == trueTarget);
+
+			
+			dCIL::dListNode* nextGotoNode = trueTarget;
+			//while ((nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) || (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_label)) {
+			while (nextGotoNode->GetInfo()->GetAsNop() || nextGotoNode->GetInfo()->GetAsLabel()) {
 				nextGotoNode = nextGotoNode->GetNext();
 			}
 
 			bool islive = false;
 			for (dCIL::dListNode* node1 = node->GetNext(); node1 != nextGotoNode; node1 = node1->GetNext()) {
-				dThreeAdressStmt& stmt1 = node1->GetInfo();
-				if (!((stmt1.m_instruction == dThreeAdressStmt::m_nop) || (stmt1.m_instruction == dThreeAdressStmt::m_label))) {
+				//dThreeAdressStmt& stmt1 = node1->GetInfo();
+				dCILInstr* const instr1 = node1->GetInfo();
+				//if (!((stmt1.m_instruction == dThreeAdressStmt::m_nop) || (stmt1.m_instruction == dThreeAdressStmt::m_label))) {
+				if (!(instr1->GetAsNop() || nextGotoNode->GetInfo()->GetAsLabel())) {
 					islive = true;
 					break;
 				}
 			}
 			if (!islive) {
-				stmt.m_instruction = dThreeAdressStmt::m_nop;
-				jumpMap.Remove(node);
-				ret = true;
+				dAssert(0);
+				//stmt.m_instruction = dThreeAdressStmt::m_nop;
+				//jumpMap.Remove(node);
+				//ret = true;
 			}
 		}
 	}
 
+//m_cil->Trace();
+
 	// delete unreferenced labels
 	for (iter.Begin(); iter; ) {
 		dCIL::dListNode* const node = iter.GetKey();
-		dThreeAdressStmt& stmt = node->GetInfo();
-		iter ++;
-//DTRACE_INTRUCTION (&stmt);		
-		if (stmt.m_instruction == dThreeAdressStmt::m_label) {		
+		//dThreeAdressStmt& stmt = node->GetInfo();
+		dCILInstr* const instr = node->GetInfo();
+		iter++;
+
+		//if (stmt.m_instruction == dThreeAdressStmt::m_label) {		
+		if (instr->GetAsLabel()) {
+			//instr->Trace();
+
 			dTree<int, dCIL::dListNode*>::Iterator iter1 (jumpMap);
 			bool isReferenced = false;
 			for (iter1.Begin(); iter1; iter1 ++) {
 				dCIL::dListNode* const node1 = iter1.GetKey();
-				dThreeAdressStmt& stmt1 = node1->GetInfo();
-				if (stmt1.m_instruction == dThreeAdressStmt::m_goto){
-					if (stmt1.m_trueTargetJump == node) {
+				//dThreeAdressStmt& stmt1 = node1->GetInfo();
+				dCILInstr* const instr1 = node1->GetInfo();
+				//if (stmt1.m_instruction == dThreeAdressStmt::m_goto){
+				if (instr1->GetAsGoto()){
+					//if (stmt1.m_trueTargetJump == node) {
+					dCILInstrGoto* const gotoInstru = instr1->GetAsGoto();
+					if (gotoInstru->GetTarget() == node) {
 						isReferenced = true;
 						break;
 					}
-				} else if (stmt1.m_instruction == dThreeAdressStmt::m_if) {
-					if ((stmt1.m_trueTargetJump == node) || (stmt1.m_falseTargetJump == node)) {
+				//} else if (stmt1.m_instruction == dThreeAdressStmt::m_if) {
+				} else if (instr1->GetAsIF()) {
+					dCILInstrIFNot* const ifInstru = instr1->GetAsIF();
+					//if ((stmt1.m_trueTargetJump == node) || (stmt1.m_falseTargetJump == node)) {
+					if ((ifInstru->GetTrueTarget() == node) || (ifInstru->GetFalseTarget()  == node)) {
 						isReferenced = true;
 						break;
 					}
 				}
 			}
 			if (!isReferenced) {
+				//instr->Trace();
 				ret = true;
-				stmt.m_instruction = dThreeAdressStmt::m_nop;
+				//stmt.m_instruction = dThreeAdressStmt::m_nop;
 				jumpMap.Remove(node);
+				instr->Nullify();
 			}
 		}
 	}
 
-
 //m_cil->Trace();	
 	return ret;
-*/
 }
 
 
