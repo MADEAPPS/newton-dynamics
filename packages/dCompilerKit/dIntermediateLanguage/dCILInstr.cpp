@@ -495,7 +495,8 @@ dCILInstr::dCILInstr (dCIL& program)
 
 dCILInstr::dCILInstr()
 	:m_cil(NULL)
-	, m_myNode(NULL)
+	,m_myNode(NULL)
+	,m_byteCodeOffset(-1)
 {
 }
 

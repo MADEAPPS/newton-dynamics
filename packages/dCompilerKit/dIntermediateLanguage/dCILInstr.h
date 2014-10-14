@@ -258,6 +258,12 @@ class dCILInstr
 	dCIL* GetCil() const { return m_cil; }
 	dList<dCILInstr*>::dListNode* GetNode() const { return m_myNode; }
 
+	virtual int GetByteCodeSize() const { return 1; }
+	virtual int GetByteCodeOffset () const { return m_byteCodeOffset; }
+	virtual void SetByteCodeOffset (int offset) { m_byteCodeOffset = offset; }
+
+	
+
 	virtual bool CanBeEliminated() const { return false; }
 	virtual bool IsBasicBlockEnd() const { return false; }
 	virtual bool IsBasicBlockBegin() const { return false; }
@@ -276,12 +282,20 @@ class dCILInstr
 	virtual dCILSingleArgInstr* GetAsSingleArg()  { return NULL; }
 	virtual dCILInstrThreeArgArithmetic* GetAsThreeArgArithmetic() { return NULL; }
 
+	//virtual dVirtualMachine::dOpCode EmitOpcode() const = 0;
+	virtual dVirtualMachine::dOpCode EmitOpcode() const 
+	{
+		dAssert(0); 
+		dVirtualMachine::dOpCode code;
+		code.m_bytecode = 0;
+		return code;
+	}
+
 	virtual bool ApplySemanticReordering () = 0;
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) = 0;
-
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const = 0;
 	
 	virtual void Serialize(char* const textOut) const;
@@ -299,6 +313,7 @@ class dCILInstr
 
 	dCIL* m_cil;
 	dList<dCILInstr*>::dListNode* m_myNode;
+	int m_byteCodeOffset;
 	static dMapTable m_maptable[];
 };
 

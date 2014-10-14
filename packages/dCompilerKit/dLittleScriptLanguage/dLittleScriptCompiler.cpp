@@ -209,6 +209,10 @@ int dScriptCompiler::CompileSource (const char* const source)
 			dDAGClassNode* const scripClass = node->GetInfo();
 			scripClass->ConvertToTarget (cil);
 		}
+
+		dVirtualMachine* const program = cil.BuilExecutable();
+
+		delete program;
 	}
 	return 0;
 }

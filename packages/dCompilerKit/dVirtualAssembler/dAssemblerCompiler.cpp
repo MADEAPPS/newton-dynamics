@@ -21,39 +21,47 @@
 
 dAssemblerCompiler::dAssemblerCompiler()
 	:dAssemblerParser ()
-	,m_virtualMachine (NULL)
-	,m_globalSymbols ()
-	,m_codeSegmentSize(0)
-	,m_codeSegment (NULL)
-	,m_currentFunction(NULL)
+//	,m_virtualMachine (NULL)
+//	,m_globalSymbols ()
+//	,m_codeSegmentSize(0)
+//	,m_codeSegment (NULL)
+//	,m_currentFunction(NULL)
 {
+	dAssert(0);
 }
 
 dAssemblerCompiler::~dAssemblerCompiler()
 {
-	if (m_codeSegment) {
-		delete[] m_codeSegment;
-	}
+	dAssert(0);
+//	if (m_codeSegment) {
+//		delete[] m_codeSegment;
+//	}
 }
 
 int dAssemblerCompiler::CompileSource (dVirtualMachine* const virtualMachine, const char* const source)
 {
+	dAssert(0);
+/*
 	dAssemblerLexical scanner (source);
 
 	m_virtualMachine = virtualMachine;
 	Parse(scanner);
+*/
 	return 0;
 }
 
+#if 0
 bool dAssemblerCompiler::Parse(dAssemblerLexical& scanner)
 {
+	dAssert(0);
+/*
 	m_codeSegmentSize = 0;
 	m_codeSegment = new short[D_CODE_SEGMNET_ALLOC_SHUNK_SIZE];
 	dAssemblerParser::Parse(scanner);
 
 //	scanner.ReStartScanner();
 //	dAssemblerParser::Parse(scanner);
-
+*/
 	return true;
 }
 
@@ -319,3 +327,4 @@ void dAssemblerCompiler::EmitEndFunction ()
 		dAssert (0);
 	}
 }
+#endif

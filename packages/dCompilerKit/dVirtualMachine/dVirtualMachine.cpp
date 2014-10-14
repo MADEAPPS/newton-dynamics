@@ -15,6 +15,10 @@
 
 dVirtualMachine::dNemonic dVirtualMachine::m_nemonics[] = 
 {
+	{ m_nop, "nop" },
+	{ m_enter, "enter" },
+	{ m_leave, "leave" },
+
 /*
 	{mov,		"mov"},
 
@@ -52,25 +56,47 @@ dVirtualMachine::dNemonic dVirtualMachine::m_nemonics[] =
 	{syscall,	"syscall"},		
 	{jump,		"jump"},		
 
-	{enter,		"enter"},		
-	{exit,		"exit"},		
 	{push,		"push"},		 
 	{pop,		"pop"},		
 */
-	{nop,		"nop"},
+	
 };
 
 dVirtualMachine::dVirtualMachine(void)
-	:m_codeSegementSize(0)
+	:m_functionTable()
+	,m_codeSegmentSize(0)
 	,m_codeSegment(NULL)
 {	
-	dAssert (nop <= 1 << D_OPCODE_FIELD);
+//	m_codeSegment = new dOpCode[m_codeMaxSize];
+	dAssert(m_count <= (1 << D_OPCODE_FIELD));
 }
 
 dVirtualMachine::~dVirtualMachine(void)
 {
 	if (m_codeSegment) {
-		delete m_codeSegment;
+		delete[] m_codeSegment;
 	}
 }
 
+dVirtualMachine::dOpCode* dVirtualMachine::AllocCodeSegement(int sizeInWords)
+{
+/*
+	while ((m_codeSegmentSize + sizeInWords) > m_codeMaxSize) {
+		m_codeMaxSize *= 2;
+		dOpCode* const codeSegment = new dOpCode[m_codeMaxSize];
+		memcpy(codeSegment, m_codeSegment, m_codeSegmentSize * sizeof (dOpCode));
+		delete[] m_codeSegment;
+		m_codeSegment = codeSegment;
+	}
+*/	
+	return new dOpCode[sizeInWords];
+}
+
+void dVirtualMachine::AddFunction(const dString& name, int byteCodeOffset)
+{
+	//AllocCodeSegement(codeSize);
+	m_functionTable.Insert(byteCodeOffset, name);
+
+	//memcpy(&m_codeSegment[m_codeSegmentSize], byteCode, codeSize * sizeof (dOpCode));
+	//m_codeSegmentSize += codeSize;
+}

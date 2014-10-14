@@ -80,13 +80,12 @@ class dAssemblerCompiler: public dAssemblerParser
 	int CompileSource (dVirtualMachine* const virtualMachine, const char* const source);
 
 	protected:
+/*
 	virtual bool Parse(dAssemblerLexical& scanner);
 	void EmitByteCode (int count, const dVirtualMachine::dOpCode* const code);
 
 	void EmitBeginFunction (const dUserVariable& name, const dUserVariable& functionScope);
 	void EmitEndFunction ();
-
-
 
 	void EmitInstructionType0 (const dUserVariable& instruction);
 	void EmitInstructionType1 (const dUserVariable& instruction, const dUserVariable& immediate);
@@ -120,9 +119,6 @@ class dAssemblerCompiler: public dAssemblerParser
 
 	// pseudo instructions
 	void EmitPushAndPop (const dUserVariable& instruction, const dUserVariable& regMask);
-
-
-
 	
 	dVirtualMachine* m_virtualMachine;
 
@@ -136,6 +132,7 @@ class dAssemblerCompiler: public dAssemblerParser
 	dGlobalSymbol* m_currentFunction;
 
 	friend dAssemblerParser;
+*/
 };
 
 #endif

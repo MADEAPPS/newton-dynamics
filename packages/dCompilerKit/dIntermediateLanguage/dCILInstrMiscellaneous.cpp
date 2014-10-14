@@ -29,6 +29,15 @@ void dCILInstrEnter::Serialize(char* const textOut) const
 	sprintf(textOut, "\tenter %d, %d\n", m_registerMask, m_localMemorySize);
 }
 
+dVirtualMachine::dOpCode dCILInstrEnter::EmitOpcode() const
+{
+	dVirtualMachine::dOpCode code;
+	code.m_type1.m_opcode = unsigned(dVirtualMachine::m_enter);
+	code.m_type1.m_imm1 = m_registerMask;
+	code.m_type1.m_imm2 = m_localMemorySize;
+	return code;
+}
+
 dCILInstrExit::dCILInstrExit(dCILInstrEnter* const enter, dCILInstrReturn* const successor)
 	:dCILInstr(*enter->GetCil())
 	,m_registerMask (enter->m_registerMask)

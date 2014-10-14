@@ -38,7 +38,6 @@ class dDataFlowGraph;
 class dCIL: public dList<dCILInstr*>
 {
 	public:
-
 	class dReturnValue
 	{
 		public:
@@ -58,6 +57,8 @@ class dCIL: public dList<dCILInstr*>
 	
 	dCIL(llvm::Module* const module);
 	virtual ~dCIL(void);
+
+	dVirtualMachine* BuilExecutable();
 
 	void Clear();
 	void Trace();

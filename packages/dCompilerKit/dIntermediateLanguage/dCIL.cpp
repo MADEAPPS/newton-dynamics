@@ -979,3 +979,33 @@ void dCIL::RegisterAllocation (dListNode* const functionNode)
 	// do register allocation before removing dead jumps and nops
 	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
 }
+
+
+dVirtualMachine* dCIL::BuilExecutable()
+{
+	dVirtualMachine* const program = new dVirtualMachine;
+
+	int byteCodeOffset = 0;
+	dList <dListNode*> instructionList;
+	
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		dCILInstr* const instr = node->GetInfo();
+		if (instr->GetAsFunction()) {
+			instructionList.Append (node);
+		}
+		instr->SetByteCodeOffset(byteCodeOffset);
+		byteCodeOffset += instr->GetByteCodeSize();
+	}
+
+	dVirtualMachine::dOpCode* const byteCode = program->AllocCodeSegement(byteCodeOffset);
+
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		dCILInstr* const instr = node->GetInfo();
+		if (instr->GetByteCodeSize()) {
+			int offset = instr->GetByteCodeOffset();
+			byteCode[offset] = instr->EmitOpcode();
+		}
+	}
+
+	return program;
+}
