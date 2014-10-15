@@ -16,12 +16,12 @@
 #include "dCILInstrMiscellaneous.h"
 
 
-dCILInstrEnter::dCILInstrEnter(dCIL& program, dCILInstrFunction* const parent, int registerMask, int localMemorySize)
+dCILInstrEnter::dCILInstrEnter(dCIL& program, dCILInstrFunction* const predecessor, int registerMask, int localMemorySize)
 	:dCILInstr(program)
 	,m_registerMask(registerMask)
 	,m_localMemorySize(localMemorySize)
 {
-	program.InsertAfter(parent->GetNode(), m_myNode);
+	program.InsertAfter(predecessor->GetNode(), m_myNode);
 }
 
 void dCILInstrEnter::Serialize(char* const textOut) const
@@ -29,16 +29,15 @@ void dCILInstrEnter::Serialize(char* const textOut) const
 	sprintf(textOut, "\tenter %d, %d\n", m_registerMask, m_localMemorySize);
 }
 
-dVirtualMachine::dOpCode dCILInstrEnter::EmitOpcode() const
+void dCILInstrEnter::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 {
-	dVirtualMachine::dOpCode code;
+	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
 	code.m_type1.m_opcode = unsigned(dVirtualMachine::m_enter);
 	code.m_type1.m_imm1 = m_registerMask;
 	code.m_type1.m_imm2 = m_localMemorySize;
-	return code;
 }
 
-dCILInstrExit::dCILInstrExit(dCILInstrEnter* const enter, dCILInstrReturn* const successor)
+dCILInstrLeave::dCILInstrLeave(dCILInstrEnter* const enter, dCILInstrReturn* const successor)
 	:dCILInstr(*enter->GetCil())
 	,m_registerMask (enter->m_registerMask)
 	,m_localMemorySize(enter->m_localMemorySize)
@@ -47,9 +46,18 @@ dCILInstrExit::dCILInstrExit(dCILInstrEnter* const enter, dCILInstrReturn* const
 }
 
 
-void dCILInstrExit::Serialize(char* const textOut) const
+void dCILInstrLeave::Serialize(char* const textOut) const
 {
-	sprintf(textOut, "\texit %d, %d\n", m_registerMask, m_localMemorySize);
+	sprintf(textOut, "\tleave %d, %d\n", m_registerMask, m_localMemorySize);
+}
+
+
+void dCILInstrLeave::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
+{
+	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
+	code.m_type1.m_opcode = unsigned(dVirtualMachine::m_leave);
+	code.m_type1.m_imm1 = m_registerMask;
+	code.m_type1.m_imm2 = m_localMemorySize;
 }
 
 
@@ -87,7 +95,7 @@ dList<dCILInstr::dArg>::dListNode* dCILInstrFunction::AddParameter (const dStrin
 
 void dCILInstrFunction::Serialize(char* const textOut) const
 {
-	sprintf (textOut, "\nfunction %s %s (", m_name.GetTypeName().GetStr(), m_name.m_label.GetStr());
+	sprintf (textOut, "function %s %s (", m_name.GetTypeName().GetStr(), m_name.m_label.GetStr());
 	for (dList<dArg>::dListNode* node = m_parameters.GetFirst(); node; node = node->GetNext()) { 
 		char text[2048];
 		const dArg& arg = node->GetInfo();
@@ -107,3 +115,17 @@ void dCILInstrFunction::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoin
 {
 	dAssert (0);
 }
+
+
+dCILInstrFunctionEnd::dCILInstrFunctionEnd(dCILInstrFunction* const functionBegin)
+	:dCILInstr(*functionBegin->GetCil())
+	,m_function(functionBegin)
+{
+}
+
+void dCILInstrFunctionEnd::Serialize(char* const textOut) const
+{
+	textOut[0] = '\n';
+	textOut[1] = 0;
+}
+

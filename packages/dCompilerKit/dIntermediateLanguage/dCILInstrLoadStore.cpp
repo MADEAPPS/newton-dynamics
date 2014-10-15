@@ -93,6 +93,16 @@ void dCILInstrMove::AddKilledStatements(const dDefinedVariableDictionary& dictio
 	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
 }
 
+void dCILInstrMove::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
+{
+	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
+	code.m_type3.m_opcode = unsigned (dVirtualMachine::m_mov);
+	code.m_type3.m_reg0 = RegisterToIndex(m_arg0.m_label);
+	code.m_type3.m_reg1 = RegisterToIndex(m_arg1.m_label);
+	code.m_type3.m_imm3 = 0;
+}
+
+
 
 dCILInstrLoad::dCILInstrLoad (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)
 	:dCILTwoArgInstr (program, dArg (name0, type0), dArg (name1, type1))

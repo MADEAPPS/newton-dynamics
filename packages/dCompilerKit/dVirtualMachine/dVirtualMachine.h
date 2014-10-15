@@ -62,15 +62,21 @@ class dVirtualMachine
 		m_nop,				// do nothing 
 		m_enter,			//enter		imm1, imm2					imm1 = registerMask, imm2 local variable stack size 
 		m_leave,			//exit		imm1, imm2					imm1 = registerMask, imm2 local variable stack size 
+		m_mov,				//mov		Ri, Rj						R(i) = R(j)
+		m_cmpeq,			//mov		Ri, Rj, Rk					R(i) = R(j) == R(j)
+		m_cmpeqi,			//mov		Ri, Rj, imm3				R(i) = R(j) == imm3
+
+		//m_beq,			//beq		Ri, imm2					if (R(i) == 0) PC = PC + imm2
+		m_bneq,				//bneq		Ri, imm2					if (R(i) != 0) PC = PC + imm2
 		/*
-		beq,			//beq		Ri, Rj, imm3				if (R(i) == R(j)) PC = PC + imm3
+		
 		bne,			//bneq		Ri, Rj, imm3				if (R(i) != R(j)) PC = PC + imm3
 		ble,			//ble		Ri, Rj, imm3 				if (R(i) <= R(j)) PC = PC + imm3  (signed comparison)
 		blt,			//blt		Ri, Rj, imm3  				if (R(i) <  R(j)) PC = PC + imm3  (signed comparison)
 		bgt,			//bgt		Ri, Rj, imm3  				if (R(i) >  R(j)) PC = PC + imm3  (signed comparison)
 		bge,			//bge		Ri, Rj, imm3  				if (R(i) >= R(j)) PC = PC + imm3  (signed comparison)
 		jump,			//jump		imm1						pc += imm1
-		mov,			//mov		Ri, Rj						R(i) = R(j)
+		
 		movi,			//mov		Ri, imm1					R(i) = imm2
 		addi,			//addi 		Ri, Rj, imm2				R(i) = R(j) + imm3
 		muli,			//muli 		Ri, Rj, imm2				R(i) = R(j) + imm3

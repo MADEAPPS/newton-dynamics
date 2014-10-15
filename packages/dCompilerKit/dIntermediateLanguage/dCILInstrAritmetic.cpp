@@ -229,3 +229,120 @@ void dCILInstrIntergerLogical::AddKilledStatements(const dDefinedVariableDiction
 { 
 	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
 }
+
+
+void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
+{
+	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
+
+	bool isRegister = true;
+	switch (m_arg2.GetType().m_intrinsicType)
+	{
+		case m_constInt:
+			isRegister = false;
+			break;
+
+		case m_int:
+			break;
+
+		default:
+			dAssert(0);
+	}
+
+	switch (m_operator)
+	{
+		case m_identical:
+		{
+			//dTrace ((" == "));
+			code.m_type3.m_opcode = isRegister ? unsigned (dVirtualMachine::m_cmpeq) : unsigned (dVirtualMachine::m_cmpeqi);
+			break;
+		}
+
+	/*
+		case m_equal:
+		{
+			break;
+		}
+
+	case m_add:
+	{
+				  //dTrace ((" + "));
+				  assignOperator = " + ";
+				  break;
+	}
+	case m_sub:
+	{
+				  //dTrace ((" - "));
+				  assignOperator = " - ";
+				  break;
+	}
+
+	case m_mul:
+	{
+				  //dTrace ((" * "));
+				  assignOperator = " * ";
+				  break;
+	}
+	case m_div:
+	{
+				  //dTrace ((" / "));
+				  assignOperator = " / ";
+				  break;
+	}
+
+	case m_mod:
+	{
+				  //dTrace ((" %c ", '%'));
+				  assignOperator = " %% ";
+				  break;
+	}
+
+
+	case m_different:
+	{
+						//dTrace ((" != "));
+						assignOperator = " != ";
+						break;
+	}
+
+	case m_less:
+	{
+				   //dTrace ((" < "));
+				   assignOperator = " < ";
+				   break;
+	}
+
+	case m_greather:
+	{
+					   //dTrace ((" > "));
+					   assignOperator = " > ";
+					   break;
+	}
+
+	case m_lessEqual:
+	{
+						//dTrace ((" <= "));
+						assignOperator = " <= ";
+						break;
+	}
+
+	case m_greatherEqual:
+	{
+							//dTrace ((" >= "));
+							assignOperator = " >= ";
+							break;
+	}
+*/
+	default:;
+		dAssert(0);
+	}
+
+	code.m_type3.m_reg0 = RegisterToIndex(m_arg0.m_label);
+	code.m_type3.m_reg1 = RegisterToIndex(m_arg1.m_label);
+	if (isRegister) {
+		code.m_type4.m_reg2 = RegisterToIndex(m_arg2.m_label);
+		code.m_type4.m_imm4 = 0;
+	} else {
+		code.m_type3.m_imm3 = m_arg2.m_label.ToInteger();
+	}
+}

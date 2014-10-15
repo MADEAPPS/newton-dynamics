@@ -42,6 +42,7 @@ class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 	dCILInstrIntergerLogical (dCIL& program, dOperator operation, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1, const dString& name2, const dArgType& type2);
 
 	void Serialize(char* const textOut) const;
+	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
 	virtual bool ApplySemanticReordering ();
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;

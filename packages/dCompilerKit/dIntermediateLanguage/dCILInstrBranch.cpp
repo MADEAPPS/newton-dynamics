@@ -137,6 +137,16 @@ void dCILInstrIFNot::AsignRegisterName(const dRegisterInterferenceGraph& interfe
 }
 
 
+void dCILInstrIFNot::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
+{
+	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
+	code.m_type2.m_opcode = unsigned(dVirtualMachine::m_bneq);
+	code.m_type2.m_reg0 = RegisterToIndex(m_arg0.m_label);
+	code.m_type2.m_imm2 = m_tagetNode0->GetInfo()->GetByteCodeOffset() - (m_byteCodeOffset + GetByteCodeSize()); 
+}
+
+
+
 
 dCILInstrReturn::dCILInstrReturn(dCIL& program, const dString& name, const dArgType& type)
 	:dCILSingleArgInstr (program, dArg (name, type))
@@ -192,6 +202,17 @@ void dCILInstrReturn::AsignRegisterName(const dRegisterInterferenceGraph& interf
 		default:
 			dAssert(0);
 	}
+}
+
+int dCILInstrReturn::GetByteCodeSize() const 
+{ 
+	dAssert (0);
+	return 1; 
+}
+
+void dCILInstrReturn::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const
+{
+	dAssert (0);
 }
 
 /*

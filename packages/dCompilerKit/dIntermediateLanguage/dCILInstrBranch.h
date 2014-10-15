@@ -61,6 +61,7 @@ class dCILInstrIFNot: public dCILThreeArgInstr
 	public:
 	dCILInstrIFNot (dCIL& program, const dString& name, const dArgType& type, const dString& target0, const dString& target1);
 	void Serialize(char* const textOut) const;
+	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
 	virtual dCILInstrIFNot* GetAsIF();
 	virtual bool IsBasicBlockEnd() const;
@@ -89,7 +90,9 @@ class dCILInstrReturn: public dCILSingleArgInstr
 	public:
 	dCILInstrReturn(dCIL& program, const dString& name, const dArgType& type);
 	void Serialize(char* const textOut) const;
+	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const; 
 
+	virtual int GetByteCodeSize() const;
 	virtual bool IsBasicBlockEnd() const;
 	virtual dCILInstrReturn* GetAsReturn();
 

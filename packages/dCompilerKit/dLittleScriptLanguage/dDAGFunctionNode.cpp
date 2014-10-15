@@ -178,6 +178,8 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 */
 	}
 
+	new dCILInstrFunctionEnd(function);
+
 //	cil.Trace();
 }
 

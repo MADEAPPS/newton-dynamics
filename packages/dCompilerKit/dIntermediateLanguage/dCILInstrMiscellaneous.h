@@ -22,39 +22,41 @@ class dCILInstrFunction;
 class dCILInstrEnter: public dCILInstr
 {
 	public:
-	dCILInstrEnter(dCIL& program, dCILInstrFunction* const parent, int registerMask, int localMemorySize);
+	dCILInstrEnter(dCIL& program, dCILInstrFunction* const predecessor, int registerMask, int localMemorySize);
+
+	void Serialize(char* const textOut) const;
+	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
 	virtual bool ApplySemanticReordering() { return false; }
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const {}
 	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const {}
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
-	void Serialize(char* const textOut) const;
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
-
 	virtual dCILInstrEnter* GetAsEnter() { return this; }
-
-	virtual dVirtualMachine::dOpCode EmitOpcode() const;
 
 	int m_registerMask;
 	int m_localMemorySize;
 };
 
-class dCILInstrExit : public dCILInstr
+class dCILInstrLeave : public dCILInstr
 {
 	public:
-	dCILInstrExit (dCILInstrEnter* const enter, dCILInstrReturn* const successor);
+	dCILInstrLeave (dCILInstrEnter* const enter, dCILInstrReturn* const successor);
+
+	void Serialize(char* const textOut) const;
+	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
 	virtual bool ApplySemanticReordering() { return false; }
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const {}
 	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const {}
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
-	void Serialize(char* const textOut) const;
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 
-	virtual dCILInstrExit* GetAsExit() { return this; }
+	virtual dCILInstrLeave* GetAsLeave() { return this; }
 
+	dCILInstrEnter* m_enter;
 	int m_registerMask;
 	int m_localMemorySize;
 };
@@ -84,6 +86,7 @@ class dCILInstrFunction: public dCILInstr
 	dCILInstrFunction (dCIL& program, const dString& name, const dArgType& type);
 
 	void Serialize (char* const textOut) const;
+	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const {}
 	dList<dArg>::dListNode* AddParameter (const dString& name, const dArgType& type); 
 
 	virtual dCILInstrFunction* GetAsFunction()
@@ -99,13 +102,31 @@ class dCILInstrFunction: public dCILInstr
 
 	virtual int GetByteCodeSize() const { return 0; }
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
-
 	
-
 	dArg m_name;
 	dList<dArg> m_parameters;
 };
 
+class dCILInstrFunctionEnd : public dCILInstr
+{
+	public: 
+	dCILInstrFunctionEnd (dCILInstrFunction* const functionBegin);
 
+	void Serialize(char* const textOut) const;
+	virtual void EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const {}
+
+	virtual bool ApplySemanticReordering() { return false; }
+	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const {}
+	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const {}
+	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+
+	virtual int GetByteCodeSize() const { return 0; }
+	virtual dCILInstrFunctionEnd* GetAsFunctionEnd() { return this; }
+
+	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+
+	dCILInstrFunction* m_function;
+};
 
 #endif

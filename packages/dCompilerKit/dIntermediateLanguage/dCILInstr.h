@@ -159,7 +159,7 @@ class dThreeAdressStmt
 
 class dCIL;
 class dCILInstrNop;
-class dCILInstrExit;
+class dCILInstrLeave;
 class dCILInstrEnter;
 class dCILInstrCall;
 class dCILInstrMove;
@@ -170,6 +170,7 @@ class dCILInstrReturn;
 class dCILInstrArgument;
 class dCILInstrFunction;
 class dCILSingleArgInstr;
+class dCILInstrFunctionEnd;
 class dCILInstrThreeArgArithmetic;
 
 class dDataFlowPoint;
@@ -268,7 +269,7 @@ class dCILInstr
 	virtual bool IsBasicBlockEnd() const { return false; }
 	virtual bool IsBasicBlockBegin() const { return false; }
 
-	virtual dCILInstrExit* GetAsExit() { return NULL; }
+	virtual dCILInstrLeave* GetAsLeave() { return NULL; }
 	virtual dCILInstrEnter* GetAsEnter() { return NULL; }
 	virtual dCILInstrNop* GetAsNop() { return NULL; }
 	virtual dCILInstrIFNot* GetAsIF() { return NULL; }
@@ -279,16 +280,15 @@ class dCILInstr
 	virtual dCILInstrReturn* GetAsReturn() { return NULL; }
 	virtual dCILInstrArgument* GetAsArgument() { return NULL; }
 	virtual dCILInstrFunction* GetAsFunction() { return NULL; }
+	virtual dCILInstrFunctionEnd* GetAsFunctionEnd() { return NULL; }
 	virtual dCILSingleArgInstr* GetAsSingleArg()  { return NULL; }
 	virtual dCILInstrThreeArgArithmetic* GetAsThreeArgArithmetic() { return NULL; }
 
-	//virtual dVirtualMachine::dOpCode EmitOpcode() const = 0;
-	virtual dVirtualMachine::dOpCode EmitOpcode() const 
+
+	//virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const = 0;
+	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const 
 	{
 		dAssert(0); 
-		dVirtualMachine::dOpCode code;
-		code.m_bytecode = 0;
-		return code;
 	}
 
 	virtual bool ApplySemanticReordering () = 0;

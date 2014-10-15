@@ -82,7 +82,7 @@ dAssert (0);
 	m_flowGraph->RemoveNop();
 
 	InsertEpilogAndProlog();
-m_flowGraph->m_cil->Trace();
+//m_flowGraph->m_cil->Trace();
 }
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
@@ -1004,7 +1004,7 @@ void dRegisterInterferenceGraph::InsertEpilogAndProlog()
 		for (dCIL::dListNode* node = m_flowGraph->m_function; node != m_flowGraph->m_basicBlocks.m_end; node = node->GetNext()) {
 			dCILInstr* const instr = node->GetInfo();
 			if (instr->GetAsReturn()) {
-				new dCILInstrExit(enter, instr->GetAsReturn());
+				new dCILInstrLeave(enter, instr->GetAsReturn());
 			}
 		}
 

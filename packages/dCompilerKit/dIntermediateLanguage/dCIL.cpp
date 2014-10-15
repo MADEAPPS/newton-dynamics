@@ -125,7 +125,6 @@ void dCIL::Trace()
 	for (dCIL::dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		node->GetInfo()->Trace();
 	}
-	dTrace(("\n"));
 }
 
 
@@ -999,12 +998,11 @@ dVirtualMachine* dCIL::BuilExecutable()
 
 	dVirtualMachine::dOpCode* const byteCode = program->AllocCodeSegement(byteCodeOffset);
 
+Trace();
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		dCILInstr* const instr = node->GetInfo();
-		if (instr->GetByteCodeSize()) {
-			int offset = instr->GetByteCodeOffset();
-			byteCode[offset] = instr->EmitOpcode();
-		}
+instr->Trace();
+		instr->EmitOpcode(byteCode);
 	}
 
 	return program;

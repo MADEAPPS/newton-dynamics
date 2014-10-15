@@ -54,12 +54,12 @@ class dCILInstrMove: public dCILTwoArgInstr
 {
 	public:
 	dCILInstrMove (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1);
-
+	
 	void Serialize(char* const textOut) const;
+	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
 	virtual dCILInstrMove* GetAsMove() { return this; }
 	virtual bool CanBeEliminated() const { return true; }
-
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const;
