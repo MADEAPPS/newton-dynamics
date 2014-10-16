@@ -11,7 +11,11 @@
 
 #include "dCILstdafx.h"
 #include "dCIL.h"
+#include "dCILInstr.h"
 #include "dDataFlowGraph.h"
+#include "dCILInstrBranch.h"
+#include "dCILInstrMiscellaneous.h"
+
 
 dString dCIL::m_variableUndercore ("_");
 dString dCIL::m_pointerDecoration ("*");
@@ -985,15 +989,27 @@ dVirtualMachine* dCIL::BuilExecutable()
 	dVirtualMachine* const program = new dVirtualMachine;
 
 	int byteCodeOffset = 0;
-	dList <dListNode*> instructionList;
+	dTree <dListNode*, dString> instructionList;
 	
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		dCILInstr* const instr = node->GetInfo();
 		if (instr->GetAsFunction()) {
-			instructionList.Append (node);
+			dCILInstrFunction* const function = instr->GetAsFunction();
+			instructionList.Insert (node, function->m_name.m_label);
 		}
 		instr->SetByteCodeOffset(byteCodeOffset);
 		byteCodeOffset += instr->GetByteCodeSize();
+	}
+
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		dCILInstr* const instr = node->GetInfo();
+		if (instr->GetAsCall()) {
+			dCILInstrCall* const call = instr->GetAsCall();
+			dTree <dListNode*, dString>::dTreeNode* const targetNode = instructionList.Find(call->GetArg1().m_label);
+			if (targetNode) {
+				call->SetTarget(targetNode->GetInfo());
+			}
+		}
 	}
 
 	dVirtualMachine::dOpCode* const byteCode = program->AllocCodeSegement(byteCodeOffset);

@@ -62,12 +62,22 @@ class dVirtualMachine
 		m_nop,				// do nothing 
 		m_enter,			//enter		imm1, imm2					imm1 = registerMask, imm2 local variable stack size 
 		m_leave,			//exit		imm1, imm2					imm1 = registerMask, imm2 local variable stack size 
+
 		m_mov,				//mov		Ri, Rj						R(i) = R(j)
+		m_movi,				//mov		Ri, m_imm2					R(i) = R(j)
+
 		m_cmpeq,			//mov		Ri, Rj, Rk					R(i) = R(j) == R(j)
 		m_cmpeqi,			//mov		Ri, Rj, imm3				R(i) = R(j) == imm3
 
 		//m_beq,			//beq		Ri, imm2					if (R(i) == 0) PC = PC + imm2
 		m_bneq,				//bneq		Ri, imm2					if (R(i) != 0) PC = PC + imm2
+
+		m_addi,				//addi 		Ri, Rj, imm2				R(i) = R(j) + imm3
+		m_add,				//add  		Ri, Rj, Rk					R(i) = R(j) + R(k)
+		m_sub,				//sub  		Ri, Rj, Rk					R(i) = R(j) - R(k)
+
+		m_calli,			//call		Ri, imm2					R(stack) -= sizeof (dOpCode); [R(sizeof (dOpCode))] = pc; pc == pc + imm2
+		m_ret,				//ret		R1							pc = [R(stack)]; R(stack) += sizeof (dOpCode)
 		/*
 		
 		bne,			//bneq		Ri, Rj, imm3				if (R(i) != R(j)) PC = PC + imm3
@@ -77,20 +87,18 @@ class dVirtualMachine
 		bge,			//bge		Ri, Rj, imm3  				if (R(i) >= R(j)) PC = PC + imm3  (signed comparison)
 		jump,			//jump		imm1						pc += imm1
 		
-		movi,			//mov		Ri, imm1					R(i) = imm2
-		addi,			//addi 		Ri, Rj, imm2				R(i) = R(j) + imm3
+		
+		
 		muli,			//muli 		Ri, Rj, imm2				R(i) = R(j) + imm3
 		divi,			//divi 		Ri, Rj, imm2				R(i) = R(j) + imm3
 		eq,				//le		Ri, Rj, Rk,   				R(i) = (R(j) <= R(k)) ? -1, 0
 		le,				//le		Ri, Rj, Rk,   				R(i) = (R(j) <= R(k)) ? -1, 0
 		lt,				//le		Ri, Rj, Rk,   				R(i) = (R(j) <  R(k)) ? -1, 0
 		gt,				//ge		Ri, Rj, Rk,   				R(i) = (R(j) <  R(k)) ? -1, 0
-		add,			//add  		Ri, Rj, Rk					R(i) = R(j) + R(k)
-		sub,			//sub  		Ri, Rj, Rk					R(i) = R(j) - R(k)
 		push,			//push		Ri, Rj						R(j) -= 4; [R(j)] = Ri;
 		pop,			//pop		Ri, Rj						Ri = [R(j)]; R(j) += 4;
-		call,			//call		Ri, m_imm2					R(i) -= 4; [R(i)] = pc + 4; pc == imm2
-		ret,			//ret		R1,	m_imm2					pc = [R(i)]; R(i) += 4 + imm2
+		
+		
 		loadBase,		//loadbase	Ri, Rj, imm1				R(i) = dword at memory [R(j) + imm1]
 		storeBase,		//storebase	Ri, Rj, imm1				dword at memory [R(j) + imm1] = R(i)
 		loadw,			//loadw		Ri, [Rj + Rk * 4 + imm4]	R(i) = dword at memory [R(j) + R(k) * 4 + imm4]

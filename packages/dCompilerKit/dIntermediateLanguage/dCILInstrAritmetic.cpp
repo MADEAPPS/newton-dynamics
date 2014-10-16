@@ -236,6 +236,7 @@ void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOu
 	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
 
 	bool isRegister = true;
+	int immediateSign = 1;
 	switch (m_arg2.GetType().m_intrinsicType)
 	{
 		case m_constInt:
@@ -258,6 +259,21 @@ void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOu
 			break;
 		}
 
+		case m_add:
+		{
+			//dTrace ((" == "));
+			code.m_type3.m_opcode = isRegister ? unsigned(dVirtualMachine::m_add) : unsigned(dVirtualMachine::m_addi);
+			break;
+		}
+
+		case m_sub:
+		{
+			dAssert (RegisterToIndex(m_arg2.m_label) >= 0);
+			immediateSign = isRegister ? 1 : -1;
+			code.m_type3.m_opcode = isRegister ? unsigned (dVirtualMachine::m_sub) : unsigned(dVirtualMachine::m_addi);
+			break;
+		}
+
 	/*
 		case m_equal:
 		{
@@ -268,12 +284,6 @@ void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOu
 	{
 				  //dTrace ((" + "));
 				  assignOperator = " + ";
-				  break;
-	}
-	case m_sub:
-	{
-				  //dTrace ((" - "));
-				  assignOperator = " - ";
 				  break;
 	}
 
@@ -343,6 +353,6 @@ void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOu
 		code.m_type4.m_reg2 = RegisterToIndex(m_arg2.m_label);
 		code.m_type4.m_imm4 = 0;
 	} else {
-		code.m_type3.m_imm3 = m_arg2.m_label.ToInteger();
+		code.m_type3.m_imm3 = m_arg2.m_label.ToInteger() * immediateSign;
 	}
 }

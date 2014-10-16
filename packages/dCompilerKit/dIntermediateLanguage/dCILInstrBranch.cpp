@@ -206,13 +206,46 @@ void dCILInstrReturn::AsignRegisterName(const dRegisterInterferenceGraph& interf
 
 int dCILInstrReturn::GetByteCodeSize() const 
 { 
-	dAssert (0);
+	switch (m_arg0.GetType().m_intrinsicType)
+	{
+		case m_constInt:
+			return 2;
+
+		case m_int:
+			break;
+
+		default:
+			dAssert(0);
+	}
+
 	return 1; 
 }
 
 void dCILInstrReturn::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const
 {
-	dAssert (0);
+	switch (m_arg0.GetType().m_intrinsicType)
+	{
+		case m_constInt:
+		{
+			dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
+			code.m_type2.m_opcode = unsigned(dVirtualMachine::m_movi);
+			code.m_type2.m_reg0 = D_RETURN_REGISTER_INDEX;
+			code.m_type2.m_imm2 = m_arg0.m_label.ToInteger();
+			break;
+		}
+
+		case m_int:
+			break;
+
+		default:
+			dAssert(0);
+	}
+
+
+	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset + 1];
+	code.m_type2.m_opcode = unsigned(dVirtualMachine::m_ret);
+	code.m_type2.m_reg0 = D_STACK_REGISTER_INDEX;
+	code.m_type2.m_imm2 = 0;
 }
 
 /*
@@ -227,6 +260,7 @@ dCILInstrCall::dCILInstrCall(dCIL& program, const dString& name, const dArgType&
 
 dCILInstrCall::dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& target, dList<dArg>& parameters)
 	:dCILTwoArgInstr (program, dArg (returnValue, type), dArg (target, dArgType()))
+	,m_tagetNode(NULL)
 {
 	for (dList<dArg>::dListNode* node = parameters.GetFirst(); node; node = node->GetNext()) {
 		m_parameters.Append (node->GetInfo());
@@ -299,4 +333,13 @@ void dCILInstrCall::AsignRegisterName(const dRegisterInterferenceGraph& interfer
 		dArg& arg = node->GetInfo();
 		arg.m_label = interferenceGraph.GetRegisterName(arg.m_label);
 	}
+}
+
+void dCILInstrCall::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const 
+{
+	dAssert (m_tagetNode);
+	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
+	code.m_type2.m_opcode = unsigned(dVirtualMachine::m_calli);
+	code.m_type2.m_reg0 = D_STACK_REGISTER_INDEX;
+	code.m_type2.m_imm2 = m_tagetNode->GetInfo()->GetByteCodeOffset() - (m_byteCodeOffset + GetByteCodeSize()); 
 }

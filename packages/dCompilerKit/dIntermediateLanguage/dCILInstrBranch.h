@@ -22,6 +22,8 @@ class dCILInstrLabel: public dCILSingleArgInstr
 	public:
 	dCILInstrLabel(dCIL& program, const dString& label);
 	void Serialize(char* const textOut) const;
+	virtual int GetByteCodeSize() const { return 0; }
+	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const {}
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
@@ -30,7 +32,7 @@ class dCILInstrLabel: public dCILSingleArgInstr
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 
-	virtual int GetByteCodeSize() const { return 0; }
+	
 	virtual bool IsBasicBlockBegin() const;
 	virtual dCILInstrLabel* GetAsLabel();
 };
@@ -112,6 +114,10 @@ class dCILInstrCall: public dCILTwoArgInstr
 	dCILInstrCall(dCIL& program, const dString& returnValue, const dArgType& type, const dString& target, dList<dArg>& parameters);
 //	dCILInstrCall(dCIL& program, const dString& name, const dArgType& type, dList<dArg>& parameters);
 	void Serialize(char* const textOut) const;
+	void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
+
+	void SetTarget(dList<dCILInstr*>::dListNode* const node) {m_tagetNode = node; }
+	//dList<dCILInstr*>::dListNode* GetFalseTarget() const;
 
 	virtual dCILInstrCall* GetAsCall() { return this; }
 
@@ -124,6 +130,7 @@ class dCILInstrCall: public dCILTwoArgInstr
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	dList<dArg> m_parameters;
+	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
 
 

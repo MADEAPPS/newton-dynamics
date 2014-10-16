@@ -89,7 +89,12 @@ dVirtualMachine::dOpCode* dVirtualMachine::AllocCodeSegement(int sizeInWords)
 		m_codeSegment = codeSegment;
 	}
 */	
-	return new dOpCode[sizeInWords];
+	if (m_codeSegment) {
+		delete[] m_codeSegment;
+	}
+	m_codeSegmentSize = sizeInWords;
+	m_codeSegment = new dOpCode[sizeInWords];
+	return m_codeSegment;
 }
 
 void dVirtualMachine::AddFunction(const dString& name, int byteCodeOffset)
