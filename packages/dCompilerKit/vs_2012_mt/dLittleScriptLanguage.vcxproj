@@ -259,14 +259,6 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="dAssembleCompiler.vcxproj">
-      <Project>{e77610c5-a79b-4bbd-b5d8-76fba50b1adb}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="dAssembler.vcxproj">
-      <Project>{c2df8489-bb02-470e-bd2a-a728784158e5}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="dFiniteAutomata.vcxproj">
       <Project>{a84e1056-fd95-416b-badd-e180e8be7aec}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

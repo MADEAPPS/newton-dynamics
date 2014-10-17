@@ -203,7 +203,6 @@ int stackMem[100] ;
 				break;
 			}
 
-
 			//call		Ri, imm2					R(stack) -= sizeof (dOpCode); [R(sizeof (dOpCode))] = pc; pc == pc + imm2
 			case m_calli:
 			{
@@ -212,7 +211,6 @@ int stackMem[100] ;
 				m_programCounter += code.m_type2.m_imm2;
 				break;
 			}
-
 
 			//ret		R1							R(stack) += sizeof (dOpCode); pc = [R(stack)]; 
 			case m_ret:
