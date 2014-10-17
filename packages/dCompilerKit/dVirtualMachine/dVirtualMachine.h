@@ -64,10 +64,10 @@ class dVirtualMachine
 		m_leave,			//exit		imm1, imm2					imm1 = registerMask, imm2 local variable stack size 
 
 		m_mov,				//mov		Ri, Rj						R(i) = R(j)
-		m_movi,				//mov		Ri, m_imm2					R(i) = R(j)
+		m_movi,				//mov		Ri, m_imm1					R(i) = m_imm1
 
-		m_cmpeq,			//mov		Ri, Rj, Rk					R(i) = R(j) == R(j)
-		m_cmpeqi,			//mov		Ri, Rj, imm3				R(i) = R(j) == imm3
+		m_cmpeq,			//m_cmpeq	Ri, Rj, Rk					R(i) = R(j) == R(j)
+		m_cmpeqi,			//m_cmpeqi	Ri, Rj, imm3				R(i) = R(j) == imm3
 
 		//m_beq,			//beq		Ri, imm2					if (R(i) == 0) PC = PC + imm2
 		m_bneq,				//bneq		Ri, imm2					if (R(i) != 0) PC = PC + imm2
@@ -174,11 +174,25 @@ class dVirtualMachine
 		} m_type4;
 	};
 
-	class dFunctionTable: public dTree<int, dString>
+	class dFunctionDescription
+	{
+		public:
+		enum dReturnType
+		{
+			m_void,
+			m_intReg,
+			m_floatReg
+		};
+
+		int m_entryPoint;
+		dReturnType m_returnType;
+	};
+
+	class dFunctionTable: public dTree<dFunctionDescription, dString>
 	{
 		public: 
 		dFunctionTable()
-			:dTree<int, dString>()
+			:dTree<dFunctionDescription, dString>()
 		{
 		}
 	};
@@ -187,14 +201,22 @@ class dVirtualMachine
 	virtual ~dVirtualMachine(void);
 
 	dOpCode* AllocCodeSegement(int sizeInWords);
-	void AddFunction (const dString& name, int byteCodeOffset);
+	void AddFunction (const dString& name, int byteCodeOffset, dFunctionDescription::dReturnType type);
+
+	bool ExecuteFunction (int entryPoint, const char* const paramFormat, ...);
+	bool ExecuteFunction (const dString& name, const char* const paramFormat, ...);
 
 	protected:
+	bool ExecuteFunction (int entryPoint, const char* const paramFormat, va_list argptr);
+
+	bool Run (int entryPoint);
+
 	dFunctionTable m_functionTable;
 	dMachineIntRegister m_integerRegisters[D_INTEGER_REGISTER_COUNT];
 	dMachineFloatRegister m_floatRegisters[D_FLOAT_REGISTER_COUNT];
-	int m_codeSegmentSize;
 	dOpCode* m_codeSegment;
+	int m_codeSegmentSize;
+	int m_programCounter;
 
 	static dNemonic m_nemonics[]; 
 };

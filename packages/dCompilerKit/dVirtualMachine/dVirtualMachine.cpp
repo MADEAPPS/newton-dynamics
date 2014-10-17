@@ -64,11 +64,14 @@ dVirtualMachine::dNemonic dVirtualMachine::m_nemonics[] =
 
 dVirtualMachine::dVirtualMachine(void)
 	:m_functionTable()
-	,m_codeSegmentSize(0)
 	,m_codeSegment(NULL)
+	,m_codeSegmentSize(0)
+	,m_programCounter(0)
 {	
 //	m_codeSegment = new dOpCode[m_codeMaxSize];
 	dAssert(m_count <= (1 << D_OPCODE_FIELD));
+	memset (m_integerRegisters, 0, sizeof (m_integerRegisters));
+	//memset (m_integerRegisters, 0, sizeof (m_integerRegisters));
 }
 
 dVirtualMachine::~dVirtualMachine(void)
@@ -97,11 +100,155 @@ dVirtualMachine::dOpCode* dVirtualMachine::AllocCodeSegement(int sizeInWords)
 	return m_codeSegment;
 }
 
-void dVirtualMachine::AddFunction(const dString& name, int byteCodeOffset)
+void dVirtualMachine::AddFunction (const dString& name, int byteCodeOffset, dFunctionDescription::dReturnType type)
 {
-	//AllocCodeSegement(codeSize);
-	m_functionTable.Insert(byteCodeOffset, name);
+	dFunctionDescription desc;
+	desc.m_entryPoint = byteCodeOffset;
+	desc.m_returnType = type;
+	m_functionTable.Insert (desc, name);
+}
 
-	//memcpy(&m_codeSegment[m_codeSegmentSize], byteCode, codeSize * sizeof (dOpCode));
-	//m_codeSegmentSize += codeSize;
+
+
+bool dVirtualMachine::ExecuteFunction(const dString& name, const char* const paramFormat, ...)
+{
+	dFunctionTable::dTreeNode* const node = m_functionTable.Find(name);
+	if (node) {
+		va_list v_args;
+		va_start(v_args, paramFormat);
+		bool ret = ExecuteFunction (node->GetInfo().m_entryPoint, paramFormat, v_args);
+		va_end(v_args);
+		return ret;
+	}
+
+	return false;
+}
+
+
+bool dVirtualMachine::ExecuteFunction(int entryPoint, const char* const paramFormat, ...)
+{
+	va_list v_args;
+	va_start(v_args, paramFormat);
+	bool ret = ExecuteFunction (entryPoint, paramFormat, v_args);
+	va_end(v_args);
+	return ret;
+}
+
+
+bool dVirtualMachine::ExecuteFunction (int entryPoint, const char* const paramFormat, va_list argList)
+{
+//	unsigned int i = 0;
+	for (int i = 0; i < 1; i++)
+	{
+		int arg = va_arg (argList, int);
+		m_integerRegisters[1] = arg;
+	}
+
+	m_integerRegisters[D_STACK_REGISTER_INDEX] = 1;
+	return Run (entryPoint);
+}
+
+
+bool dVirtualMachine::Run (int entryPoint)
+{
+	m_programCounter = entryPoint;
+
+int stackMem[100] ;
+
+	while (m_integerRegisters[D_STACK_REGISTER_INDEX] > 0) {
+		dOpCode code (m_codeSegment[m_programCounter]);
+		m_programCounter ++;
+		dInstruction instruction = dInstruction (code.m_type0.m_opcode);
+		switch (instruction) 
+		{
+			//enter	imm1, imm2					imm1 = registerMask, imm2 local variable stack size 
+			case m_enter:
+			{
+				int stack = m_integerRegisters[D_STACK_REGISTER_INDEX];
+				int saveRegIndex = D_CALLER_SAVE_REGISTER_COUNT;
+				for (unsigned mask = code.m_type1.m_imm1; mask; mask = mask >>= 1) {
+					if (mask & 1) {
+						stackMem[stack] = m_integerRegisters[saveRegIndex];
+						stack ++;
+					}
+					saveRegIndex ++;
+				}
+				if (code.m_type1.m_imm2) {
+					dAssert (0);
+				}
+
+				m_integerRegisters[D_STACK_REGISTER_INDEX] = stack;
+				break;
+			}
+
+			//leave imm1, imm2					imm1 = registerMask, imm2 local variable stack size 
+			case m_leave:
+			{
+				int stack = m_integerRegisters[D_STACK_REGISTER_INDEX];
+				int saveRegIndex = D_INTEGER_REGISTER_COUNT;
+
+				if (code.m_type1.m_imm2) {
+					dAssert(0);
+				}
+
+				for (unsigned mask = (code.m_type1.m_imm1 << D_CALLER_SAVE_REGISTER_COUNT); mask; mask = mask <<= 1) {
+					saveRegIndex --;
+					if (mask & (1<<(D_INTEGER_REGISTER_COUNT - 1))) {
+						stack --;
+						m_integerRegisters[saveRegIndex] = stackMem[stack];
+					}
+				}
+
+				m_integerRegisters[D_STACK_REGISTER_INDEX] = stack;
+				break;
+			}
+
+			//ret		R1							R(stack) += sizeof (dOpCode); pc = [R(stack)]; 
+			case m_ret:
+			{
+				m_integerRegisters[D_STACK_REGISTER_INDEX] -= 1;
+				m_programCounter = stackMem[m_integerRegisters[D_STACK_REGISTER_INDEX]];
+				break;
+			}
+
+			//mov Ri, Rj						R(i) = R(j)
+			case m_mov:
+			{
+				m_integerRegisters[code.m_type3.m_reg0] = m_integerRegisters[code.m_type3.m_reg1];
+				break;
+			}
+
+			//movi Ri, m_imm1						R(i) = m_imm1
+			case m_movi:
+			{
+				unsigned temp = code.m_type2.m_imm2;
+				m_integerRegisters[code.m_type2.m_reg0] = temp;
+				break;
+			}
+
+
+			//m_cmpeqi	Ri, Rj, imm3				R(i) = R(j) == imm3
+			case m_cmpeqi:
+			{
+				 unsigned temp = code.m_type3.m_imm3;
+				 m_integerRegisters[code.m_type3.m_reg0] = (m_integerRegisters[code.m_type3.m_reg1] == temp) ? ~0 : 0;
+				 break;
+			}
+
+			//bneq		Ri, imm2					if (R(i) != 0) PC = PC + imm2
+			case m_bneq:
+			{
+				if (!m_integerRegisters[code.m_type2.m_reg0]) {
+					int offset = code.m_type2.m_imm2;
+					m_programCounter += offset;
+				}
+				break;
+			}
+
+			case m_nop:
+			default:
+				dAssert (0);
+		}
+	}
+	return true;
 }

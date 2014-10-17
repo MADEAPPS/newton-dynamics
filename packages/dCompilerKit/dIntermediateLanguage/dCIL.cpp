@@ -989,13 +989,13 @@ dVirtualMachine* dCIL::BuilExecutable()
 	dVirtualMachine* const program = new dVirtualMachine;
 
 	int byteCodeOffset = 0;
-	dTree <dListNode*, dString> instructionList;
+	dTree <dListNode*, dString> fuctionList;
 	
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		dCILInstr* const instr = node->GetInfo();
 		if (instr->GetAsFunction()) {
 			dCILInstrFunction* const function = instr->GetAsFunction();
-			instructionList.Insert (node, function->m_name.m_label);
+			fuctionList.Insert (node, function->m_name.m_label);
 		}
 		instr->SetByteCodeOffset(byteCodeOffset);
 		byteCodeOffset += instr->GetByteCodeSize();
@@ -1005,12 +1005,37 @@ dVirtualMachine* dCIL::BuilExecutable()
 		dCILInstr* const instr = node->GetInfo();
 		if (instr->GetAsCall()) {
 			dCILInstrCall* const call = instr->GetAsCall();
-			dTree <dListNode*, dString>::dTreeNode* const targetNode = instructionList.Find(call->GetArg1().m_label);
+			dTree <dListNode*, dString>::dTreeNode* const targetNode = fuctionList.Find(call->GetArg1().m_label);
 			if (targetNode) {
 				call->SetTarget(targetNode->GetInfo());
 			}
 		}
 	}
+
+	dTree <dListNode*, dString>::Iterator iter (fuctionList);
+	for (iter.Begin(); iter; iter ++) {
+		dListNode* const node = iter.GetNode()->GetInfo();
+		dCILInstrFunction* const function = node->GetInfo()->GetAsFunction();
+
+		dVirtualMachine::dFunctionDescription::dReturnType type = dVirtualMachine::dFunctionDescription::m_void;
+		if (!function->m_name.m_isPointer) {
+			switch (function->m_name.m_intrinsicType)
+			{
+				case dCILInstr::m_int:
+					type = dVirtualMachine::dFunctionDescription::m_intReg;
+					break;
+
+				case dCILInstr::m_void:
+					break;
+				default: 
+					dAssert (0);
+			}
+		} else {
+			type = dVirtualMachine::dFunctionDescription::m_intReg;
+		}
+		program->AddFunction (function->m_name.m_label, function->GetByteCodeOffset(), type);
+	}
+
 
 	dVirtualMachine::dOpCode* const byteCode = program->AllocCodeSegement(byteCodeOffset);
 
@@ -1020,6 +1045,9 @@ Trace();
 instr->Trace();
 		instr->EmitOpcode(byteCode);
 	}
+
+	program->ExecuteFunction ("_Fibonacci::_Fibonacci::int", "::int" , 2);
+
 
 	return program;
 }
