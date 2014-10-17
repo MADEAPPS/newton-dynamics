@@ -223,14 +223,16 @@ int dCILInstrReturn::GetByteCodeSize() const
 
 void dCILInstrReturn::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const
 {
+	int offset = m_byteCodeOffset;
 	switch (m_arg0.GetType().m_intrinsicType)
 	{
 		case m_constInt:
 		{
-			dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
+			dVirtualMachine::dOpCode& code = codeOutPtr[offset];
 			code.m_type2.m_opcode = unsigned(dVirtualMachine::m_movi);
 			code.m_type2.m_reg0 = D_RETURN_REGISTER_INDEX;
 			code.m_type2.m_imm2 = m_arg0.m_label.ToInteger();
+			offset ++; 
 			break;
 		}
 
@@ -242,7 +244,7 @@ void dCILInstrReturn::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) co
 	}
 
 
-	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset + 1];
+	dVirtualMachine::dOpCode& code = codeOutPtr[offset];
 	code.m_type2.m_opcode = unsigned(dVirtualMachine::m_ret);
 	code.m_type2.m_reg0 = D_STACK_REGISTER_INDEX;
 	code.m_type2.m_imm2 = 0;

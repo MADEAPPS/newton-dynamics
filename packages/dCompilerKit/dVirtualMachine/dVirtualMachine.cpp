@@ -181,7 +181,7 @@ int stackMem[100] ;
 				break;
 			}
 
-			//leave imm1, imm2					imm1 = registerMask, imm2 local variable stack size 
+			//leave imm1, imm2			imm1 = registerMask, imm2 local variable stack size 
 			case m_leave:
 			{
 				int stack = m_integerRegisters[D_STACK_REGISTER_INDEX];
@@ -202,6 +202,17 @@ int stackMem[100] ;
 				m_integerRegisters[D_STACK_REGISTER_INDEX] = stack;
 				break;
 			}
+
+
+			//call		Ri, imm2					R(stack) -= sizeof (dOpCode); [R(sizeof (dOpCode))] = pc; pc == pc + imm2
+			case m_calli:
+			{
+				stackMem[m_integerRegisters[D_STACK_REGISTER_INDEX]] = m_programCounter;
+				m_integerRegisters[D_STACK_REGISTER_INDEX] ++;
+				m_programCounter += code.m_type2.m_imm2;
+				break;
+			}
+
 
 			//ret		R1							R(stack) += sizeof (dOpCode); pc = [R(stack)]; 
 			case m_ret:
@@ -242,6 +253,21 @@ int stackMem[100] ;
 					int offset = code.m_type2.m_imm2;
 					m_programCounter += offset;
 				}
+				break;
+			}
+
+			//addi 		Ri, Rj, imm2				R(i) = R(j) + imm3
+			case m_addi:				
+			{
+			   int tmp = code.m_type3.m_imm3;
+			   m_integerRegisters[code.m_type3.m_reg0] = unsigned (int (m_integerRegisters[code.m_type3.m_reg1]) + tmp);
+			   break;
+			}
+
+			//add  		Ri, Rj, Rk					R(i) = R(j) + R(k)
+			case m_add:
+			{
+				m_integerRegisters[code.m_type4.m_reg0] = m_integerRegisters[code.m_type4.m_reg1] + m_integerRegisters[code.m_type4.m_reg2];
 				break;
 			}
 

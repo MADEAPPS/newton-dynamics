@@ -1046,7 +1046,7 @@ instr->Trace();
 		instr->EmitOpcode(byteCode);
 	}
 
-	program->ExecuteFunction ("_Fibonacci::_Fibonacci::int", "::int" , 2);
+	program->ExecuteFunction ("_Fibonacci::_Fibonacci::int", "::int" , 10);
 
 
 	return program;
