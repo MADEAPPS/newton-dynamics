@@ -15,11 +15,11 @@ public class qsort
 
 	public static void qsort (int[] a, int left, int right)
 	{
-	a[0] = a[1];
-/*
       int i = left, j = right;
       int pivot = a[(left + right) / 2];
+
       while (i <= j) {
+/*
 		i--;
 		do {} while (a[++i] < pivot);
 			
@@ -33,7 +33,9 @@ public class qsort
              i++;
              j--;
         }
+*/
       }
+/*
       if (left < j)
 		qsort (a, left, j);
 	  if (i < right)

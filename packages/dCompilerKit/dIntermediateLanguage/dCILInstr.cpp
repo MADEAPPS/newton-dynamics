@@ -462,6 +462,10 @@ dCILInstr::dIntrisicType dCILInstr::GetTypeID (const dString& typeName)
 	return dCILInstr::m_int;
 }
 
+int dCILInstr::dArgType::GetSizeInByte() const
+{
+	return sizeof (int);
+}
 
 
 dString dCILInstr::dArgType::GetTypeName () const 
@@ -473,6 +477,7 @@ dString dCILInstr::dArgType::GetTypeName () const
 		return m_maptable[m_intrinsicType].m_name;
 	}
 }
+
 
 void dCILInstr::dArg::SetType (const dArgType& type)
 {

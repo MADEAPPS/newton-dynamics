@@ -119,14 +119,14 @@ void dDAGExpressionNodeVariable::CompileCIL(dCIL& cil)
 {
 //	dDAGFunctionNode* const function = GetFunction();
 	if (m_dimExpressions.GetCount()) {
-dAssert (0);
-/*
 		dDAGDimensionNode* const dim = m_dimExpressions.GetFirst()->GetInfo();
 		dim->CompileCIL(cil);
 
 		dString result = dim->m_result.m_label;
+
 		for (dList<dDAGDimensionNode*>::dListNode* node = m_dimExpressions.GetFirst()->GetNext(); node; node = node->GetNext()) {
 			dAssert (0);
+/*
 			dDAGDimensionNode* const dim = node->GetInfo();
 			dim->CompileCIL(cil);
 			
@@ -149,23 +149,28 @@ dAssert (0);
 			result = stmtAdd.m_arg0.m_label;
 
 			DTRACE_INTRUCTION (&stmtAdd);
+*/
 		}
 
-		dAssert (m_parent);
-		dTree<dThreeAdressStmt::dArg, dString>::dTreeNode* const variable1 = dDAG::FindLocalVariable(m_name);
+		dTree<dCILInstr::dArg, dString>::dTreeNode* const variable1 = dDAG::FindLocalVariable(m_name);
 		dAssert (variable1);
-		dThreeAdressStmt::dArg arg1 (LoadLocalVariable(cil, variable1->GetInfo()));
 
+		dCILInstr::dArg arg1 (LoadLocalVariable(cil, variable1->GetInfo()));
 		dAssert (m_parent);
-		// emit an indirect addressing mode
-		dThreeAdressStmt& tmp = cil.NewStatement()->GetInfo();
-		tmp.m_instruction = dThreeAdressStmt::m_load;
-		tmp.m_arg0.m_label = cil.NewTemp();
-		tmp.m_arg1 = arg1;
-		tmp.m_arg2.m_label = result;
-		DTRACE_INTRUCTION (&tmp);
-		m_result = tmp.m_arg0; 
-*/
+
+		int size = arg1.GetSizeInByte();
+		dCILInstrIntergerLogical* const mulOffset = new dCILInstrIntergerLogical (cil, dCILThreeArgInstr::m_mul, cil.NewTemp(), dCILInstr::dArgType (dCILInstr::m_int), result, dCILInstr::dArgType (dCILInstr::m_int), dString(size), dCILInstr::m_constInt);
+		mulOffset->Trace();
+
+		dCILInstrIntergerLogical* const address = new dCILInstrIntergerLogical (cil, dCILThreeArgInstr::m_add, cil.NewTemp(), arg1.GetType(), arg1.m_label, arg1.GetType(), mulOffset->GetArg0().m_label, mulOffset->GetArg0().GetType());
+		address->Trace();
+
+		m_result = dCILInstr::dArg (cil.NewTemp(), arg1.GetType());
+		m_result.m_isPointer = false;
+		dCILInstrLoad* const load = new dCILInstrLoad (cil, m_result.m_label, m_result.GetType(), address->GetArg0().m_label, address->GetArg0().GetType()); 
+		load->Trace();
+		m_result = load->GetArg0();
+		
 	} else {
 		dTree<dCILInstr::dArg, dString>::dTreeNode* const variable = dDAG::FindLocalVariable(m_name);
 		dAssert (variable);

@@ -61,12 +61,11 @@ dTree<dCILInstr::dArg, dString>::dTreeNode* dDAG::FindLocalVariable(const dStrin
 
 dCILInstr::dArg dDAG::LoadLocalVariable (dCIL& cil, const dCILInstr::dArg& arg) const
 {
-	if (arg.m_label.Find(m_scopePrefix) == 0) {
-		dAssert(0);
+//	if (arg.m_label.Find(m_scopePrefix) == 0) {
 //		dCILInstrLoad* const load = new dCILInstrLoad (cil, cil.NewTemp(), arg, arg.m_label, arg);
 //		load->Trace();
 //		return load->GetArg0();
-	}
+//	}
 	return arg;
 }
 

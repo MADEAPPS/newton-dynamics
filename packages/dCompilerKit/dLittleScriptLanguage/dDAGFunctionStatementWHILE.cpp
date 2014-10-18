@@ -40,14 +40,13 @@ void dDAGFunctionStatementWHILE::ConnectParent(dDAG* const parent)
 
 void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)  
 {
-	dAssert (0);
-/*
 	dCIL::dListNode* startExpressionTestNode = NULL;
 
 	dString startLabel (cil.NewLabel());
 	if (m_testExpression) {
 		m_testExpression->CompileCIL(cil);
-
+		dAssert (0);
+/*
 		startExpressionTestNode = cil.NewStatement();
 		dCILInstr& stmt = startExpressionTestNode->GetInfo();
 		stmt.m_instruction = dCILInstr::m_if;
@@ -58,8 +57,11 @@ void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)
 		//stmt.m_arg1 = tmpTest.m_arg0;
 		//stmt.m_arg2.m_label = cil.NewLabel();
 		DTRACE_INTRUCTION (&stmt);
+*/
 	}
 
+	dAssert(0);
+	/*
 	dCIL::dListNode* const entryLabelNode = cil.NewStatement();
 	if (startExpressionTestNode) {
 		startExpressionTestNode->GetInfo().m_trueTargetJump = entryLabelNode;
