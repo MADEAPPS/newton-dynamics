@@ -78,6 +78,9 @@ class dCILInstrNop: public dCILInstr
 	virtual dCILInstrNop* GetAsNop() { return this; }
 
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+
+
+	dString m_comment;
 };
 
 class dCILInstrFunction: public dCILInstr

@@ -39,32 +39,25 @@ void dDAGExpressionNodePrefixPostfix::ConnectParent(dDAG* const parent)
 
 void dDAGExpressionNodePrefixPostfix::CompileCIL(dCIL& cil)
 {
-dAssert (0);
-/*
 	m_expression->CompileCIL(cil);
 	dCILInstr::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
 
-	dCILInstr& stmt = cil.NewStatement()->GetInfo();
-	stmt.m_instruction = dCILInstr::m_assigment;
-	stmt.m_operator = m_isIncrement ? dCILInstr::m_add : dCILInstr::m_sub;
-	stmt.m_arg0.m_label = cil.NewTemp();
-	stmt.m_arg0.SetType (arg1.GetType());
-	stmt.m_arg1 = arg1;
-	stmt.m_arg2.SetType (dCILInstr::m_constInt, false);
-	stmt.m_arg2.m_label = "1";
-	DTRACE_INTRUCTION (&stmt);
-
-	dCILInstr& stmt1 = cil.NewStatement()->GetInfo();
-	stmt1.m_instruction = dCILInstr::m_storeBase;
-	stmt1.m_arg0 = m_expression->m_result;
-	stmt1.m_arg1 = stmt.m_arg0;
-	DTRACE_INTRUCTION (&stmt1);
-
+	dCILInstrMove* move = NULL;
 	if (m_isPrefix) {
-		m_result = stmt.m_arg0;
+		dCILInstrIntergerLogical* const stmt = new dCILInstrIntergerLogical (cil, m_isIncrement ? dCILThreeArgInstr::m_add : dCILThreeArgInstr::m_sub, cil.NewTemp(), arg1.GetType(), arg1.m_label, arg1.GetType(), "1", dCILInstr::dArgType (dCILInstr::m_constInt));
+		stmt->Trace();
+
+		move = new dCILInstrMove (cil, arg1.m_label, arg1.GetType(), stmt->GetArg0().m_label, stmt->GetArg0().GetType());
+		move->Trace();
+
 	} else {
-		m_result = arg1;
+		move = new dCILInstrMove(cil, cil.NewTemp(), arg1.GetType(), arg1.m_label, arg1.GetType());
+		move->Trace();
+
+		dCILInstrIntergerLogical* const stmt = new dCILInstrIntergerLogical(cil, m_isIncrement ? dCILThreeArgInstr::m_add : dCILThreeArgInstr::m_sub, arg1.m_label, arg1.GetType(), arg1.m_label, arg1.GetType(), "1", dCILInstr::dArgType(dCILInstr::m_constInt));
+		stmt->Trace();
 	}
-*/
+
+	m_result = move->GetArg0();
 }
 

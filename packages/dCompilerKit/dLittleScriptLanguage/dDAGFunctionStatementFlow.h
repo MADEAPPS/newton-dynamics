@@ -28,17 +28,17 @@ class dDAGFunctionStatementFlow: public dDAGFunctionStatement
 
 	void BackPatch (dCIL& cil);
 
-	void OpenPreHeaderBlock(dCIL& cil);
-	void ClosePreHeaderBlock(dCIL& cil);
-
-	dCIL::dListNode* CompileCILLoopBody(dCIL& cil, dCIL::dListNode* const entryLabel, dDAGFunctionStatement* const posFixStmt);
+	virtual dDAGFunctionStatement* const GetPostFixStatement() const = 0;
+	//void OpenPreHeaderBlock(dCIL& cil);
+	//void ClosePreHeaderBlock(dCIL& cil);
+//	dCIL::dListNode* CompileCILLoopBody (dCIL& cil, dCILInstrConditional* const preConditinalTest, dCILInstrLabel* const loopStart, dDAGFunctionStatement* const posFixStmt);
 
 	dDAGRtti(dDAGFunctionStatement);
 
-	dString m_currentBreakLabel;
-	dString m_currentContinueLabel;
-	dCIL::dListNode* m_continueTarget;
-	dCIL::dListNode* m_backPatchStart;
+	//dString m_currentBreakLabel;
+	//dString m_currentContinueLabel;
+	//dCIL::dListNode* m_continueTarget;
+	//dCIL::dListNode* m_backPatchStart;
 	dDAGExpressionNode* m_testExpression;
 	dDAGFunctionStatement* m_loopBodyStmt;
 };

@@ -43,6 +43,14 @@ dAssert (0);
 	}
 }
 
+
+dDAGFunctionStatement* const dDAGFunctionStatementFOR::GetPostFixStatement() const
+{
+	dAssert(0);
+	return NULL;
+}
+
+
 void dDAGFunctionStatementFOR::CompileCIL(dCIL& cil)  
 {
 	dAssert (0);

@@ -58,16 +58,23 @@ class dCILInstrGoto: public dCILSingleArgInstr
 	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
 
-class dCILInstrIFNot: public dCILThreeArgInstr
+class dCILInstrConditional: public dCILThreeArgInstr
 {
 	public:
-	dCILInstrIFNot (dCIL& program, const dString& name, const dArgType& type, const dString& target0, const dString& target1);
+	enum dBranchMode
+	{
+		m_if,
+		m_ifnot,
+	};
+
+	dCILInstrConditional (dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, const dString& target0, const dString& target1);
 	void Serialize(char* const textOut) const;
 	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
-	virtual dCILInstrIFNot* GetAsIF();
+	virtual dCILInstrConditional* GetAsIF();
 	virtual bool IsBasicBlockEnd() const;
-	void SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1) ;
+	void SetLabels (const dString& label0, const dString& label1);
+	void SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1);
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
@@ -80,8 +87,9 @@ class dCILInstrIFNot: public dCILThreeArgInstr
 
 	dList<dCILInstr*>::dListNode* GetTrueTarget () const;
 	dList<dCILInstr*>::dListNode* GetFalseTarget () const;
+	//dList<dCILInstr*>::dListNode* GetTrue ();
 
-	dList<dCILInstr*>::dListNode* GetTrue ();
+	dBranchMode m_mode;
 	dList<dCILInstr*>::dListNode* m_tagetNode0;
 	dList<dCILInstr*>::dListNode* m_tagetNode1;
 };

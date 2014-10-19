@@ -27,8 +27,8 @@ class dDAGFunctionStatement: public dDAG
 	virtual void ConnectParent(dDAG* const parent);
 
 	dDAGRtti(dDAG);
-	static dString m_loopHeadMetaData;
-	static dString m_loopTailMetaData;
+	//static dString m_loopHeadMetaData;
+	//static dString m_loopTailMetaData;
 };
 
 

@@ -82,7 +82,7 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 
 			dCILInstr* const instruction = block->m_end->GetInfo();
 			if (instruction->GetAsIF()) {
-				dCILInstrIFNot* const ifInstr = instruction->GetAsIF();
+				dCILInstrConditional* const ifInstr = instruction->GetAsIF();
 				dAssert (m_dataFlowGraph.Find(block->m_end));
 				dAssert (m_dataFlowGraph.Find(ifInstr->GetTrueTarget()));
 				dAssert (m_dataFlowGraph.Find(ifInstr->GetFalseTarget()));
@@ -1814,7 +1814,7 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 		dCIL::dListNode* const node = iter.GetKey();
 		dCILInstr* const instr = node->GetInfo();
 		if (instr->GetAsIF()) {
-			dCILInstrIFNot* const ifInstr = instr->GetAsIF();
+			dCILInstrConditional* const ifInstr = instr->GetAsIF();
 			dCIL::dListNode* const elseTarget = ifInstr->GetFalseTarget();
 			if (elseTarget) {
 				dAssert(jumpMap.Find(elseTarget));
@@ -1953,7 +1953,7 @@ DTRACE_INTRUCTION (&stmt);
 		dCIL::dListNode* const node = iter.GetKey();
 		dCILInstr* const instr = node->GetInfo();
 		if (instr->GetAsIF()) {
-			dCILInstrIFNot* const ifInstr = instr->GetAsIF();
+			dCILInstrConditional* const ifInstr = instr->GetAsIF();
 			//dAssert(jumpMap.Find(stmt.m_trueTargetJump));
 			dCIL::dListNode* const trueTarget = ifInstr->GetTrueTarget();
 			dAssert(jumpMap.Find(trueTarget));
@@ -2043,7 +2043,7 @@ DTRACE_INTRUCTION (&stmt);
 		//if (stmt.m_instruction == dThreeAdressStmt::m_if) {
 		dCILInstr* const instr = node->GetInfo();
 		if (instr->GetAsIF()) {
-			dCILInstrIFNot* const ifInstr = instr->GetAsIF();
+			dCILInstrConditional* const ifInstr = instr->GetAsIF();
 			//dAssert (jumpMap.Find (stmt.m_trueTargetJump));
 			//dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
 
@@ -2106,7 +2106,7 @@ DTRACE_INTRUCTION (&stmt);
 					}
 				//} else if (stmt1.m_instruction == dThreeAdressStmt::m_if) {
 				} else if (instr1->GetAsIF()) {
-					dCILInstrIFNot* const ifInstru = instr1->GetAsIF();
+					dCILInstrConditional* const ifInstru = instr1->GetAsIF();
 					//if ((stmt1.m_trueTargetJump == node) || (stmt1.m_falseTargetJump == node)) {
 					if ((ifInstru->GetTrueTarget() == node) || (ifInstru->GetFalseTarget()  == node)) {
 						isReferenced = true;

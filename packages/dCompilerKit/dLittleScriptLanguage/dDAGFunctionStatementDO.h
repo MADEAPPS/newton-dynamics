@@ -26,6 +26,8 @@ class dDAGFunctionStatementDO: public dDAGFunctionStatementFlow
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
+	virtual dDAGFunctionStatement* const GetPostFixStatement() const;
+
 	dDAGRtti(dDAGFunctionStatementFlow);
 	dDAGExpressionNode* m_expression;
 };

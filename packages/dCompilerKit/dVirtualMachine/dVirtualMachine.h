@@ -69,7 +69,7 @@ class dVirtualMachine
 		m_cmpeq,			//m_cmpeq	Ri, Rj, Rk					R(i) = R(j) == R(j)
 		m_cmpeqi,			//m_cmpeqi	Ri, Rj, imm3				R(i) = R(j) == imm3
 
-		//m_beq,			//beq		Ri, imm2					if (R(i) == 0) PC = PC + imm2
+		m_beq,				//beq		Ri, imm2					if (R(i) == 0) PC = PC + imm2
 		m_bneq,				//bneq		Ri, imm2					if (R(i) != 0) PC = PC + imm2
 
 		m_addi,				//addi 		Ri, Rj, imm2				R(i) = R(j) + imm3

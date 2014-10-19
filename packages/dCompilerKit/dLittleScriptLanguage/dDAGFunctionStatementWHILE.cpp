@@ -38,46 +38,31 @@ void dDAGFunctionStatementWHILE::ConnectParent(dDAG* const parent)
 }
 
 
+dDAGFunctionStatement* const dDAGFunctionStatementWHILE::GetPostFixStatement() const
+{
+	return NULL;
+}
+
 void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)  
 {
-	dCIL::dListNode* startExpressionTestNode = NULL;
-
-	dString startLabel (cil.NewLabel());
+	dCILInstrConditional* conditional = NULL;
 	if (m_testExpression) {
 		m_testExpression->CompileCIL(cil);
-		dAssert (0);
-/*
-		startExpressionTestNode = cil.NewStatement();
-		dCILInstr& stmt = startExpressionTestNode->GetInfo();
-		stmt.m_instruction = dCILInstr::m_if;
-		stmt.m_operator = dCILInstr::m_nothing;
-		stmt.m_arg0 = m_testExpression->m_result;
-		stmt.m_arg1.m_label = startLabel;
-		stmt.m_arg2.m_label = "";
-		//stmt.m_arg1 = tmpTest.m_arg0;
-		//stmt.m_arg2.m_label = cil.NewLabel();
-		DTRACE_INTRUCTION (&stmt);
-*/
+		conditional = new dCILInstrConditional (cil, dCILInstrConditional::m_ifnot, m_expression->m_result.m_label, m_expression->m_result.GetType(), "xxx", "xxx");
+		conditional->Trace();
 	}
 
-	dAssert(0);
-	/*
-	dCIL::dListNode* const entryLabelNode = cil.NewStatement();
-	if (startExpressionTestNode) {
-		startExpressionTestNode->GetInfo().m_trueTargetJump = entryLabelNode;
+	dDAGFunctionStatementFlow::CompileCIL(cil);
+
+	if (conditional) {
+		dCILInstrLabel* const exitLabel = cil.GetLast()->GetInfo()->GetAsLabel();
+		dCILInstrLabel* const entryLabel = conditional->GetNode()->GetNext()->GetInfo()->GetAsLabel();
+		dAssert (exitLabel);
+		dAssert (entryLabel);
+		conditional->SetLabels (exitLabel->GetArg0().m_label, entryLabel->GetArg0().m_label);
+		conditional->SetTargets (exitLabel, entryLabel);
+		//conditional->Trace();
 	}
-	dCILInstr& entryLabel = entryLabelNode->GetInfo();
-	entryLabel.m_instruction = dCILInstr::m_label;
-	entryLabel.m_arg0.m_label = startLabel;
-	DTRACE_INTRUCTION (&entryLabel);
 
-
-	dCIL::dListNode* const exitLabelStmtNode = CompileCILLoopBody(cil, entryLabelNode, NULL);
-
-	if (startExpressionTestNode) {
-		dCILInstr& stmt = startExpressionTestNode->GetInfo();
-		stmt.m_falseTargetJump = exitLabelStmtNode;
-		stmt.m_arg2 = exitLabelStmtNode->GetInfo().m_arg0; 
-	}
-*/
+	//cil.Trace();
 }

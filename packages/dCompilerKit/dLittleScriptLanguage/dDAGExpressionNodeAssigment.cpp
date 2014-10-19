@@ -110,13 +110,6 @@ void dDAGExpressionNodeAssigment::CompileCIL(dCIL& cil)
 	} else {
 		m_leftVariable->CompileCIL(cil); 
 		dCILInstr::dArg arg1 (LoadLocalVariable(cil, m_expression->m_result));
-/*
-		dCILInstr& stmt = cil.NewStatement()->GetInfo();
-		stmt.m_instruction = (m_leftVariable->m_result.m_label.Find(m_scopePrefix) == 0) ? dCILInstr::m_storeBase : stmt.m_instruction = dCILInstr::m_assigment;
-		stmt.m_arg0 = m_leftVariable->m_result;
-		stmt.m_arg1 = arg1;
-		DTRACE_INTRUCTION (&stmt);
-*/
 		dCILInstrMove* const move = new dCILInstrMove (cil, m_leftVariable->m_result.m_label, m_leftVariable->m_result.GetType(), arg1.m_label, arg1.GetType());
 		move->Trace();
 	}

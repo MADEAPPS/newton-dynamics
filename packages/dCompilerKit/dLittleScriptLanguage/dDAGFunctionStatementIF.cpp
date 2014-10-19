@@ -51,7 +51,7 @@ void dDAGFunctionStatementIF::CompileCIL(dCIL& cil)
 
 	dString label0 (cil.NewLabel());
 	dString label1 (cil.NewLabel());
-	dCILInstrIFNot* const branch = new dCILInstrIFNot (cil, m_expression->m_result.m_label, m_expression->m_result.GetType(), label1, label0);
+	dCILInstrConditional* const branch = new dCILInstrConditional (cil, dCILInstrConditional::m_ifnot, m_expression->m_result.m_label, m_expression->m_result.GetType(), label1, label0);
 	branch->Trace();
 
 	dCILInstrLabel* const target0 = new dCILInstrLabel (cil, label0);

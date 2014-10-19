@@ -63,6 +63,7 @@ void dCILInstrLeave::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) cons
 
 dCILInstrNop::dCILInstrNop()
 	:dCILInstr()
+	,m_comment()
 {
 }
 

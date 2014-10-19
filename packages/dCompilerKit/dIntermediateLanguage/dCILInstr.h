@@ -165,12 +165,12 @@ class dCILInstrCall;
 class dCILInstrMove;
 class dCILInstrGoto;
 class dCILInstrLabel;
-class dCILInstrIFNot;
 class dCILInstrReturn;
 class dCILInstrArgument;
 class dCILInstrFunction;
 class dCILSingleArgInstr;
 class dCILInstrFunctionEnd;
+class dCILInstrConditional;
 class dCILInstrThreeArgArithmetic;
 
 class dDataFlowPoint;
@@ -272,7 +272,7 @@ class dCILInstr
 	virtual dCILInstrLeave* GetAsLeave() { return NULL; }
 	virtual dCILInstrEnter* GetAsEnter() { return NULL; }
 	virtual dCILInstrNop* GetAsNop() { return NULL; }
-	virtual dCILInstrIFNot* GetAsIF() { return NULL; }
+	virtual dCILInstrConditional* GetAsIF() { return NULL; }
 	virtual dCILInstrMove* GetAsMove() { return NULL; }
 	virtual dCILInstrCall* GetAsCall() { return NULL; }
 	virtual dCILInstrGoto* GetAsGoto() { return NULL; }

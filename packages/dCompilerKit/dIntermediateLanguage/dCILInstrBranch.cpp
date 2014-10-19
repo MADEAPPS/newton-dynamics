@@ -68,24 +68,38 @@ dCILInstrGoto* dCILInstrGoto::GetAsGoto()
 	return this;
 }
 
-dCILInstrIFNot::dCILInstrIFNot(dCIL& program, const dString& name, const dArgType& type, const dString& target0, const dString& target1)
+dCILInstrConditional::dCILInstrConditional(dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, const dString& target0, const dString& target1)
 	:dCILThreeArgInstr (program, dArg (name, type), dArg (target0, dArgType()), dArg (target1, dArgType()))
+	,m_mode (mode)
 	,m_tagetNode0(NULL)
 	,m_tagetNode1(NULL)
 {
 }
 
-void dCILInstrIFNot::Serialize(char* const textOut) const
+void dCILInstrConditional::Serialize(char* const textOut) const
 {
 	if (m_tagetNode1) {
-		sprintf(textOut, "\tifnot (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+		if (m_mode == m_ifnot) {
+			sprintf(textOut, "\tifnot (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+		} else {
+			sprintf(textOut, "\tif (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+		}
 	} else {
-		sprintf(textOut, "\tifnot (%s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+		if (m_mode == m_ifnot) {
+			sprintf(textOut, "\tifnot (%s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
+		} else {
+			sprintf(textOut, "\tif (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+		}
 	}
 }
 
+void dCILInstrConditional::SetLabels (const dString& label0, const dString& label1)
+{
+	m_arg1.m_label = label0;
+	m_arg2.m_label = label1;
+}
 
-void dCILInstrIFNot::SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1)
+void dCILInstrConditional::SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* const target1)
 {
 	dAssert(target0);
 	dAssert (target0->GetArg0().m_label == GetArg1().m_label);
@@ -99,28 +113,28 @@ void dCILInstrIFNot::SetTargets (dCILInstrLabel* const target0, dCILInstrLabel* 
 	}
 }
 
-dList<dCILInstr*>::dListNode* dCILInstrIFNot::GetTrueTarget () const
+dList<dCILInstr*>::dListNode* dCILInstrConditional::GetTrueTarget () const
 {
 	return m_tagetNode0;
 }
 
-dList<dCILInstr*>::dListNode* dCILInstrIFNot::GetFalseTarget () const
+dList<dCILInstr*>::dListNode* dCILInstrConditional::GetFalseTarget () const
 {
 	return m_tagetNode1;
 }
 
 
-dCILInstrIFNot* dCILInstrIFNot::GetAsIF()
+dCILInstrConditional* dCILInstrConditional::GetAsIF()
 {
 	return this;
 }
 
-bool dCILInstrIFNot::IsBasicBlockEnd() const
+bool dCILInstrConditional::IsBasicBlockEnd() const
 {
 	return true;
 }
 
-void dCILInstrIFNot::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
+void dCILInstrConditional::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
 	dAssert (m_arg0.GetType().m_intrinsicType == m_int);
 //	if (m_arg0.GetType().m_intrinsicType == m_int) {
@@ -131,16 +145,16 @@ void dCILInstrIFNot::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) 
 //	}
 }
 
-void dCILInstrIFNot::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+void dCILInstrConditional::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
 	dCILSingleArgInstr::AsignRegisterName(interferenceGraph);
 }
 
 
-void dCILInstrIFNot::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
+void dCILInstrConditional::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 {
 	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
-	code.m_type2.m_opcode = unsigned(dVirtualMachine::m_bneq);
+	code.m_type2.m_opcode = m_mode == m_ifnot ? unsigned(dVirtualMachine::m_bneq) : unsigned(dVirtualMachine::m_beq);
 	code.m_type2.m_reg0 = RegisterToIndex(m_arg0.m_label);
 	code.m_type2.m_imm2 = m_tagetNode0->GetInfo()->GetByteCodeOffset() - (m_byteCodeOffset + GetByteCodeSize()); 
 }

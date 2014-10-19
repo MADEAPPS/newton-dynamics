@@ -23,6 +23,8 @@ class dDAGFunctionStatementWHILE: public dDAGFunctionStatementFlow
 	dDAGFunctionStatementWHILE(dList<dDAG*>& allNodes, dDAGExpressionNode* const expression, dDAGFunctionStatement* const stmt);
 	~dDAGFunctionStatementWHILE();
 
+	virtual dDAGFunctionStatement* const GetPostFixStatement() const;
+
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
