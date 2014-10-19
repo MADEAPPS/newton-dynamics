@@ -50,6 +50,8 @@ void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)
 		m_testExpression->CompileCIL(cil);
 		conditional = new dCILInstrConditional (cil, dCILInstrConditional::m_ifnot, m_expression->m_result.m_label, m_expression->m_result.GetType(), "xxx", "xxx");
 		conditional->Trace();
+	} else {
+		dAssert (0);
 	}
 
 	dDAGFunctionStatementFlow::CompileCIL(cil);

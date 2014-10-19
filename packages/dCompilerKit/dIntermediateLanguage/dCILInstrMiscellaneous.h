@@ -32,6 +32,8 @@ class dCILInstrEnter: public dCILInstr
 	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const {}
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 	virtual dCILInstrEnter* GetAsEnter() { return this; }
 
@@ -52,6 +54,8 @@ class dCILInstrLeave : public dCILInstr
 	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const {}
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 
 	virtual dCILInstrLeave* GetAsLeave() { return this; }
@@ -77,6 +81,7 @@ class dCILInstrNop: public dCILInstr
 	virtual int GetByteCodeSize() const { return 0; }
 	virtual dCILInstrNop* GetAsNop() { return this; }
 
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 
 
@@ -104,6 +109,8 @@ class dCILInstrFunction: public dCILInstr
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
 
 	virtual int GetByteCodeSize() const { return 0; }
+
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 	
 	dArg m_name;
@@ -127,6 +134,7 @@ class dCILInstrFunctionEnd : public dCILInstr
 	virtual int GetByteCodeSize() const { return 0; }
 	virtual dCILInstrFunctionEnd* GetAsFunctionEnd() { return this; }
 
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 
 	dCILInstrFunction* m_function;

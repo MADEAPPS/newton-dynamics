@@ -33,20 +33,19 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 {
 	m_flowGraph->ApplyInstructionSematicOrdering();
 	m_flowGraph->BuildBasicBlockGraph();
-/*
+
 	for (bool optimized = true; optimized;) {
 		optimized = false;
-		m_flowGraph->CalculateLiveInputLiveOutput();
-		m_flowGraph->UpdateReachingDefinitions();
-		optimized |= m_flowGraph->ApplyCopyPropagation();
+//		m_flowGraph->CalculateLiveInputLiveOutput();
+//		m_flowGraph->UpdateReachingDefinitions();
+//		optimized |= m_flowGraph->ApplyCopyPropagation();
 //m_flowGraph->m_cil->Trace();
 		//m_flowGraph->CalculateLiveInputLiveOutput();
 		optimized |= m_flowGraph->ApplyRemoveDeadCode();
 //m_flowGraph->m_cil->Trace();
 	}
-*/
 
-	m_flowGraph->CalculateLiveInputLiveOutput();
+	//m_flowGraph->CalculateLiveInputLiveOutput();
 	Build();
 	while (ColorGraph () > m_registerCount) {
 		// we have a spill, find a good spill node and try graph coloring again
@@ -60,11 +59,11 @@ dAssert (0);
 	m_flowGraph->BuildBasicBlockGraph();
 	for (bool optimized = true; optimized;) {
 		optimized = false;
-		m_flowGraph->CalculateLiveInputLiveOutput();
-		m_flowGraph->UpdateReachingDefinitions();
-		optimized |= m_flowGraph->ApplyCopyPropagation();
+//		m_flowGraph->CalculateLiveInputLiveOutput();
+//		m_flowGraph->UpdateReachingDefinitions();
+//		optimized |= m_flowGraph->ApplyCopyPropagation();
 //m_flowGraph->m_cil->Trace();
-		m_flowGraph->CalculateLiveInputLiveOutput();
+//		m_flowGraph->CalculateLiveInputLiveOutput();
 //m_flowGraph->m_cil->Trace();
 		optimized |= m_flowGraph->ApplyRemoveDeadCode();
 //m_flowGraph->m_cil->Trace();
@@ -82,7 +81,7 @@ dAssert (0);
 	m_flowGraph->RemoveNop();
 
 	InsertEpilogAndProlog();
-//m_flowGraph->m_cil->Trace();
+m_flowGraph->m_cil->Trace();
 }
 
 void dRegisterInterferenceGraph::AllocateRegisters ()
@@ -93,24 +92,6 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 		instr->AsignRegisterName(*this);
 //instr->Trace();
 	}
-
-//	m_flowGraph->CalculateLiveInputLiveOutput ();
-//	dTree<int, dString> callerSaveRegisterRemap;
-//	for (dCIL::dListNode* stmtNode = m_flowGraph->m_basicBlocks.m_begin; stmtNode != m_flowGraph->m_basicBlocks.m_end; stmtNode = stmtNode->GetNext()) {
-//		dThreeAdressStmt& stmt = stmtNode->GetInfo();
-//DTRACE_INTRUCTION (&stmt);
-//		if (stmt.m_instruction == dThreeAdressStmt::m_call) {
-//			dAssert (m_flowGraph->m_dataFlowGraph.Find (stmtNode));
-//			dDataFlowGraph::dDataFlowPoint& point = m_flowGraph->m_dataFlowGraph.Find (stmtNode)->GetInfo();
-//			dDataFlowGraph::dDataFlowPoint::dVariableSet<dString>::Iterator iter (point.m_liveOutputSet);
-//			for (iter.Begin(); iter; iter ++) {
-//				const dString& varName = iter.GetKey();
-//				if (varName != stmt.m_arg0.m_label) {
-//					callerSaveRegisterRemap.Insert (0, varName);
-//				}
-//			}
-//		}
-//	}
 }
 
 
@@ -147,6 +128,8 @@ bool dRegisterInterferenceGraph::IsTempVariable (const dString& name) const
 
 void dRegisterInterferenceGraph::Build()
 {
+	m_flowGraph->CalculateLiveInputLiveOutput();
+
 	dTree<dDataFlowPoint, dCIL::dListNode*>::Iterator iter (m_flowGraph->m_dataFlowGraph);
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
@@ -159,14 +142,14 @@ void dRegisterInterferenceGraph::Build()
 				if (!interferanceGraphNode) {
 					interferanceGraphNode = Insert(variable);
 					interferanceGraphNode->GetInfo().m_name = variable;
-//dTrace (("%s\n", variable.GetStr()));
+dTrace (("%s\n", variable.GetStr()));
 				}
 			}
 		}
 	}
 
 	// pre-color some special nodes
-	int intArgumentIndex = D_CALLER_SAVE_REGISTER_INDEX + 1; 
+	int intArgumentIndex = D_CALLER_SAVE_REGISTER_INDEX; 
 	for (dCIL::dListNode* node = m_flowGraph->m_basicBlocks.m_begin; node != m_flowGraph->m_basicBlocks.m_end; node = node->GetNext()) {
 		dCILInstr* const instr = node->GetInfo();
 //instr->Trace();
@@ -239,15 +222,15 @@ void dRegisterInterferenceGraph::Build()
 				}
 			}
 			
-			int index = D_CALLER_SAVE_REGISTER_INDEX + 1;
-			//for (dCIL::dListNode* node = stmtNode->GetPrev(); (node->GetInfo().m_instruction == dThreeAdressStmt::m_param) && (index < D_CALLER_SAVE_REGISTER_COUNT); node = node->GetPrev()) {
+			int index = D_CALLER_SAVE_REGISTER_INDEX;
 			for (dList<dCILInstr::dArg>::dListNode* node = callInstr->m_parameters.GetLast(); node && (index < D_CALLER_SAVE_REGISTER_COUNT); node = node->GetPrev()) {
 				const dCILInstr::dArg& arg = node->GetInfo();
 				dTreeNode* const regNode = Find (arg.m_label);
 				dAssert(regNode);
 				dRegisterInterferenceNode& registerInfo = regNode->GetInfo();
 				registerInfo.m_registerIndex = index;
-				//registerInfo.m_isPrecolored = true;
+				index ++;
+				dAssert (index < D_CALLER_SAVE_REGISTER_COUNT);
 			}
 		}
 	}

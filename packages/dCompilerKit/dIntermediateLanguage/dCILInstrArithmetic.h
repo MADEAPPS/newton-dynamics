@@ -30,7 +30,7 @@ class dCILInstrThreeArgArithmetic: public dCILThreeArgInstr
 		return this;
 	}
 
-	virtual bool CanBeEliminated() const 
+	virtual bool ApplyDeadElimination() const 
 	{ 
 		return true; 
 	}
@@ -49,6 +49,7 @@ class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow);
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
 	dOperator m_operator;
 };

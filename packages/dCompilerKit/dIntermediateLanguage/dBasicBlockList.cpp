@@ -21,7 +21,13 @@ dBasicBlock::dBasicBlock (dCIL::dListNode* const begin)
 {
 }
 
-//void Trace() const;
+void dBasicBlock::Trace() const
+{
+	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+		node->GetInfo()->Trace();
+	}
+	dTrace (("\n"));
+}
 
 dBasicBlocksList::dBasicBlocksList()
 	:dList<dBasicBlock> ()
@@ -36,17 +42,6 @@ dBasicBlocksList::dBasicBlocksList(dCIL& cil, dCIL::dListNode* const functionNod
 	Build (cil, functionNode);
 }
 
-/*
-void Trace() const
-{
-	#ifdef TRACE_INTERMEDIATE_CODE
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			node->GetInfo().Trace();
-		}
-	#endif
-}
-*/
-
 
 void dBasicBlocksList::Clear ()
 {
@@ -57,8 +52,7 @@ void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 {
 	m_begin = functionNode->GetNext();
 	m_end = functionNode->GetNext();
-	//for (; m_end && (m_end->GetInfo().m_instruction != dCILInstr::m_function); m_end = m_end->GetNext());
-	for (; m_end && !m_end->GetInfo()->GetAsFunction(); m_end = m_end->GetNext());
+	for ( ;!m_end->GetInfo()->GetAsFunctionEnd(); m_end = m_end->GetNext());
 
 	// remove redundant jumps
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
@@ -67,13 +61,11 @@ void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 			dCIL::dListNode* const nextNode = node->GetNext();
 			dCILInstrGoto* const gotoInst = nextNode->GetInfo()->GetAsGoto();
 			if (gotoInst) {
-				//gotoInst->Nullify();
+				dAssert (0);
 				delete gotoInst;
 			}
 		}
 	}
-
-//cil.Trace();
 
 	// find the root of all basic blocks leaders
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
@@ -86,9 +78,19 @@ void dBasicBlocksList::Build(dCIL& cil, dCIL::dListNode* const functionNode)
 		dBasicBlock& block = blockNode->GetInfo();
 		for (dCIL::dListNode* node = block.m_begin; !block.m_end && node; node = node->GetNext()) {
 			if (node->GetInfo()->IsBasicBlockEnd()) {
-				block.m_end = node;
+				block.m_end = node->GetNext();
 			}
 		} 
 	}
+
+//	cil.Trace();
+//	Trace();
 }
 
+void dBasicBlocksList::Trace() const
+{
+	for (dList<dBasicBlock>::dListNode* blockNode = GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+		dBasicBlock& block = blockNode->GetInfo();
+		block.Trace();
+	}
+}

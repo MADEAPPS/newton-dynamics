@@ -68,16 +68,16 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 	}
 
 
-//	for (dList<dCILInstr::dArg>::dListNode* node = paramList.GetFirst(); node; node = node->GetNext()) {
-//		dCILInstr& stmt = cil.NewStatement()->GetInfo();
-//		stmt.m_instruction = dCILInstr::m_param;
-//		stmt.m_arg0 = node->GetInfo();
-//		DTRACE_INTRUCTION (&stmt);
-//	}
+	for (dList<dCILInstr::dArg>::dListNode* node = paramList.GetFirst(); node; node = node->GetNext()) {
+		dCILInstr::dArg& arg = node->GetInfo();
+		dCILInstrMove* const move = new dCILInstrMove (cil, cil.NewTemp(), arg.GetType(), arg.m_label, arg.GetType());
+		move->Trace();
+		arg.m_label = move->GetArg0().m_label;
+	}
 
 	for (dList<dCILInstr::dArg>::dListNode* node = paramList.GetLast(); node; node = node->GetPrev()) {
-		//name += m_prototypeSeparator + expNode->GetTypeName();
-		name += m_prototypeSeparator +node->GetInfo().GetTypeName();
+		const dCILInstr::dArg& arg = node->GetInfo();
+		name += m_prototypeSeparator + arg.GetTypeName();
 	}
 
 	dDAGFunctionNode* const function = myClass->GetFunction (name);
@@ -87,13 +87,14 @@ void dDAGExpressionNodeFunctionCall::CompileCIL(dCIL& cil)
 	}
 
 	dDAGTypeNode* const returnType = function->m_returnType;
-	//m_result.m_label = cil.NewTemp ();
 	dString tmp (cil.NewTemp());
 	m_result.SetType (returnType->GetArgType());
 	dCILInstrCall* const instr = new dCILInstrCall(cil, tmp, m_result.GetType(), name, paramList);
 	instr->Trace();
 
-	m_result.m_label = cil.NewTemp();
-	dCILInstrMove* const move = new dCILInstrMove(cil, m_result.m_label, m_result.GetType(), tmp, m_result.GetType());
-	move->Trace();
+	if (returnType->GetArgType().m_isPointer || (returnType->GetArgType().m_intrinsicType != dCILInstr::m_void)) {
+		m_result.m_label = cil.NewTemp();
+		dCILInstrMove* const move = new dCILInstrMove(cil, m_result.m_label, m_result.GetType(), tmp, m_result.GetType());
+		move->Trace();
+	}
 }

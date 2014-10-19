@@ -218,6 +218,11 @@ void dCILInstrIntergerLogical::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFl
 }
 
 
+bool dCILInstrIntergerLogical::ApplyDeadElimination (dDataFlowGraph& dataFlow)
+{
+	return DeadElimination (dataFlow);
+}
+
 void dCILInstrIntergerLogical::AddDefinedVariable (dDefinedVariableDictionary& dictionary) const 
 {
 	dDefinedVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
@@ -356,3 +361,5 @@ void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOu
 		code.m_type3.m_imm3 = m_arg2.m_label.ToInteger() * immediateSign;
 	}
 }
+
+

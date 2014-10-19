@@ -60,5 +60,14 @@ void dDAGFunctionStatementDO::CompileCIL(dCIL& cil)
 	CompileCILLoopBody(cil, entryLabelNode, NULL);
 */
 
+	dCILInstrGoto* const endBlock = new dCILInstrGoto(cil, "xxx");
+	endBlock->Trace();
+
 	dDAGFunctionStatementFlow::CompileCIL(cil);
+
+	dCILInstrLabel* const entryLabel = endBlock->GetNode()->GetNext()->GetInfo()->GetAsLabel();
+	dAssert(entryLabel);
+	endBlock->SetLabel (entryLabel->GetArg0().m_label);
+	endBlock->SetTarget (entryLabel);
+
 }

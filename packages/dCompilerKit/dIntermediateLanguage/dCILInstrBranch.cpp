@@ -52,6 +52,11 @@ void dCILInstrGoto::Serialize(char* const textOut) const
 	sprintf (textOut, "\tgoto %s\n", m_arg0.m_label.GetStr());
 }
 
+void dCILInstrGoto::SetLabel (const dString& label)
+{
+	m_arg0.m_label = label;
+}
+
 void dCILInstrGoto::SetTarget (dCILInstrLabel* const target)
 {
 	m_tagetNode = target->GetNode();
@@ -88,7 +93,7 @@ void dCILInstrConditional::Serialize(char* const textOut) const
 		if (m_mode == m_ifnot) {
 			sprintf(textOut, "\tifnot (%s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 		} else {
-			sprintf(textOut, "\tif (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
+			sprintf(textOut, "\tif (%s %s) goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr());
 		}
 	}
 }
@@ -291,10 +296,11 @@ void dCILInstrCall::Serialize(char* const textOut) const
 		sprintf (textOut, "\t%s call %s (", m_arg0.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
 	}
 
-	for (dList<dArg>::dListNode* node = m_parameters.GetFirst(); node; node = node->GetNext()) { 
+
+	for (dList<dArg>::dListNode* node = m_parameters.GetLast(); node; node = node->GetPrev()) { 
 		char text[2048];
 		const dArg& arg = node->GetInfo();
-		if (node->GetNext()) {
+		if (node->GetPrev()) {
 			sprintf (text, "%s %s, ", arg.GetTypeName().GetStr(), arg.m_label.GetStr());
 		} else {
 			sprintf (text, "%s %s", arg.GetTypeName().GetStr(), arg.m_label.GetStr());

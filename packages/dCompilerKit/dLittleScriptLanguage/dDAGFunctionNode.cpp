@@ -164,23 +164,16 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 
 
 	m_body->CompileCIL(cil);
-	if (m_returnType->GetArgType().m_intrinsicType == dCILInstr::m_void) {
-		dAssert (0);
-/*
-		const dThreeAdressStmt& lastInstruction = cil.GetLast()->GetInfo();
-		if (lastInstruction.m_instruction != dThreeAdressStmt::m_ret) {
-			dThreeAdressStmt& fntArg = cil.NewStatement()->GetInfo();
-			fntArg.m_instruction = dThreeAdressStmt::m_ret;
-			fntArg.m_arg0.m_label = "";
-			fntArg.m_arg0.SetType (m_returnType->GetArgType());
-			DTRACE_INTRUCTION (&fntArg);
+	if (!m_returnType->GetArgType().m_isPointer && (m_returnType->GetArgType().m_intrinsicType == dCILInstr::m_void)) {
+		 if (!cil.GetLast()->GetInfo()->GetAsReturn()) {
+			dCILInstrReturn* const ret = new dCILInstrReturn(cil, "", dCILInstr::dArgType (dCILInstr::m_void));
+			ret->Trace();
 		}
-*/
 	}
 
 	new dCILInstrFunctionEnd(function);
 
-//	cil.Trace();
+	cil.Trace();
 }
 
 /*

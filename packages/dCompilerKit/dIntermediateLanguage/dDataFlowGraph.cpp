@@ -50,21 +50,19 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 
 		blockMap.Insert(&block, block.m_begin);
 
-		int test = 1;
-		for (dCIL::dListNode* stmtNode = block.m_begin; test; stmtNode = stmtNode->GetNext()) {
-			test = (stmtNode != block.m_end);
-			dTree<dDataFlowPoint, dCIL::dListNode*>::dTreeNode* const graphNode = m_dataFlowGraph.Insert(stmtNode);
-			graphNode->GetInfo().Init(stmtNode);
+		for (dCIL::dListNode* node = block.m_begin; node != block.m_end; node = node->GetNext()) {
+			dTree<dDataFlowPoint, dCIL::dListNode*>::dTreeNode* const graphNode = m_dataFlowGraph.Insert(node);
+			graphNode->GetInfo().Init(node);
 		} 
 
-		for (dCIL::dListNode* stmtNode = block.m_begin; stmtNode != block.m_end; stmtNode = stmtNode->GetNext()) {
-			dDataFlowPoint& graphStatement = m_dataFlowGraph.Find(stmtNode)->GetInfo();
-			graphStatement.m_successors.Append(&m_dataFlowGraph.Find(stmtNode->GetNext())->GetInfo());
+		for (dCIL::dListNode* node = block.m_begin; node != block.m_end->GetPrev(); node = node->GetNext()) {
+			dDataFlowPoint& graphStatement = m_dataFlowGraph.Find(node)->GetInfo();
+			graphStatement.m_successors.Append(&m_dataFlowGraph.Find(node->GetNext())->GetInfo());
 		}
 
-		for (dCIL::dListNode* stmtNode = block.m_end; stmtNode != block.m_begin; stmtNode = stmtNode->GetPrev()) {
-			dDataFlowPoint& graphStatement = m_dataFlowGraph.Find(stmtNode)->GetInfo();
-			graphStatement.m_predecessors.Append(&m_dataFlowGraph.Find(stmtNode->GetPrev())->GetInfo());
+		for (dCIL::dListNode* node = block.m_end->GetPrev(); node != block.m_begin; node = node->GetPrev()) {
+			dDataFlowPoint& graphStatement = m_dataFlowGraph.Find(node)->GetInfo();
+			graphStatement.m_predecessors.Append(&m_dataFlowGraph.Find(node->GetPrev())->GetInfo());
 		}
 	}
 
@@ -74,24 +72,25 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 	stack.Append(&m_basicBlocks.GetFirst()->GetInfo());
 	while (stack.GetCount()) {
 		dBasicBlock* const block = stack.GetLast()->GetInfo();
+//block->Trace();
 
 		stack.Remove(stack.GetLast()->GetInfo());
 		if (block->m_mark < m_mark) {
 			block->m_mark = m_mark;
 			m_traversalBlocksOrder.Addtop(block);
 
-			dCILInstr* const instruction = block->m_end->GetInfo();
+			dCILInstr* const instruction = block->m_end->GetPrev()->GetInfo();
 			if (instruction->GetAsIF()) {
 				dCILInstrConditional* const ifInstr = instruction->GetAsIF();
-				dAssert (m_dataFlowGraph.Find(block->m_end));
+				dAssert (m_dataFlowGraph.Find(block->m_end->GetPrev()));
 				dAssert (m_dataFlowGraph.Find(ifInstr->GetTrueTarget()));
 				dAssert (m_dataFlowGraph.Find(ifInstr->GetFalseTarget()));
 				dAssert (blockMap.Find(ifInstr->GetTrueTarget()));
 				dAssert (blockMap.Find(ifInstr->GetFalseTarget()));
-				dAssert (m_dataFlowGraph.Find(block->m_end->GetNext()));
-				dAssert (blockMap.Find(block->m_end->GetNext()));
+				dAssert (m_dataFlowGraph.Find(block->m_end->GetPrev()->GetNext()));
+				dAssert (blockMap.Find(block->m_end->GetPrev()->GetNext()));
 
-				dDataFlowPoint* const graphStatement = &m_dataFlowGraph.Find(block->m_end)->GetInfo();
+				dDataFlowPoint* const graphStatement = &m_dataFlowGraph.Find(block->m_end->GetPrev())->GetInfo();
 				dDataFlowPoint* const child0 = &m_dataFlowGraph.Find(ifInstr->GetTrueTarget())->GetInfo();
 				dDataFlowPoint* const child1 = &m_dataFlowGraph.Find(ifInstr->GetFalseTarget())->GetInfo();
 
@@ -104,14 +103,13 @@ void dDataFlowGraph::BuildBasicBlockGraph()
 				stack.Append(blockMap.Find(ifInstr->GetFalseTarget())->GetInfo());
 
 			} else if (instruction->GetAsGoto()) {
-				dAssert (0);
 				dCILInstrGoto* const gotoInst = instruction->GetAsGoto();
 
-				dAssert (m_dataFlowGraph.Find(block->m_end));
+				dAssert (m_dataFlowGraph.Find(block->m_end->GetPrev()));
 				dAssert (m_dataFlowGraph.Find(gotoInst->GetTarget()));
 				dAssert (blockMap.Find(gotoInst->GetTarget()));
 
-				dDataFlowPoint* const graphStatement = &m_dataFlowGraph.Find(block->m_end)->GetInfo();
+				dDataFlowPoint* const graphStatement = &m_dataFlowGraph.Find(block->m_end->GetPrev())->GetInfo();
 				dDataFlowPoint* const child0 = &m_dataFlowGraph.Find(gotoInst->GetTarget())->GetInfo();
 
 				graphStatement->m_successors.Append(child0);
@@ -1292,7 +1290,7 @@ void dDataFlowGraph::CalculateLiveInputLiveOutput ()
 			dBasicBlock* const block = blockNode->GetInfo();
 
 			int test = 1;
-			for (dCIL::dListNode* node = block->m_end; test; node = node->GetPrev()) {
+			for (dCIL::dListNode* node = block->m_end->GetPrev(); test; node = node->GetPrev()) {
 				test = (node != block->m_begin);
 
 				dAssert (m_dataFlowGraph.Find(node));
@@ -1316,26 +1314,6 @@ void dDataFlowGraph::CalculateLiveInputLiveOutput ()
 			}
 		}
 	}
-
-#if 0
-	for (dCIL::dListNode* node = m_basicBlocks.m_begin; node != m_basicBlocks.m_end; node = node->GetNext()) {
-		dTree<dDataFlowPoint, dCIL::dListNode*>::dTreeNode* const pointNode = m_dataFlowGraph.Find(node);
-		if (pointNode) {
-			dDataFlowPoint& info = pointNode->GetInfo();
-			node->GetInfo()->Trace();
-
-			dDataFlowPoint::dVariableSet<dString>::Iterator iter(info.m_liveOutputSet);
-			if (info.m_liveOutputSet.GetCount()) {
-				dTrace(("           :"));
-				info.m_liveOutputSet.Trace();
-				//for (iter.Begin(); iter; iter++) {
-				//				dTrace(("%s ", iter.GetKey().GetStr()));
-				//}
-				//dTrace(("\n"));
-			}
-		}
-	}
-#endif
 }
 
 void dDataFlowGraph::FindNodesInPathway(dCIL::dListNode* const source, dCIL::dListNode* const destination, dTree<int, dCIL::dListNode*>& pathOut) const
@@ -1671,75 +1649,8 @@ bool dDataFlowGraph::ApplyRemoveDeadCode()
 	for (dCIL::dListNode* node = m_basicBlocks.m_begin; node != m_basicBlocks.m_end; node = nextNode) {
 		nextNode = node->GetNext();
 		dCILInstr* const instr = node->GetInfo();
-		if (instr->CanBeEliminated()) {
-			if (instr->GetAsMove()) {
-				dCILInstrMove* const move = instr->GetAsMove();
-				dDataFlowPoint& info = m_dataFlowGraph.Find(node)->GetInfo();
-				dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
-				const dCILInstr::dArg arg0 = move->GetArg0();
-				const dCILInstr::dArg arg1 = move->GetArg1();
-				bool xxx = liveOut.Find(arg0.m_label);
-				if (!liveOut.Find(arg0.m_label) || (arg0.m_label == arg1.m_label)) {
-					ret = true;
-					//m_dataFlowGraph.Remove(node);
-					//delete move;
-					move->Nullify();
-					UpdateLiveInputLiveOutput();
-				}
-			}
-	/*
-		dThreeAdressStmt& stmt = stmtNode->GetInfo();
-		switch (stmt.m_instruction) 
-		{
-			case dThreeAdressStmt::m_assigment:
-			{
-				dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNode)->GetInfo();
-				dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
-				if (!liveOut.Find (stmt.m_arg0.m_label)) {
-					ret = true;
-					stmt.m_instruction = dThreeAdressStmt::m_nop;
-					UpdateLiveInputLiveOutput();
-				} else if ((stmt.m_operator == dThreeAdressStmt::m_nothing) && (stmt.m_arg0.m_label == stmt.m_arg1.m_label)){
-					ret = true;
-					stmt.m_instruction = dThreeAdressStmt::m_nop;
-					UpdateLiveInputLiveOutput();
-				}
-				break;
-			}
-#if 0
-			case dThreeAdressStmt::m_load:
-			case dThreeAdressStmt::m_loadBase:
-			{
-				dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNode)->GetInfo();
-				dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
-				if (!liveOut.Find (stmt.m_arg0.m_label)) {
-					ret = true;
-					stmt.m_instruction = dThreeAdressStmt::m_nop;
-					UpdateLiveInputLiveOutput();
-				}
-				break;
-			}
-
-			case dThreeAdressStmt::m_store:
-			{
-				dAssert (0);
-				break;
-			}
-
-			case dThreeAdressStmt::m_storeBase:
-			{
-				dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNode)->GetInfo();
-				dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
-				if (!liveOut.Find (stmt.m_arg0.m_label)) {
-					ret = true;
-					stmt.m_instruction = dThreeAdressStmt::m_nop;
-					UpdateLiveInputLiveOutput();
-				}
-				break;
-			}
-#endif
-*/
-		}
+		//instr->Trace();
+		ret |= instr->ApplyDeadElimination (*this);
 	}
 	return ret;
 }
@@ -1813,6 +1724,7 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 	for (iter.Begin(); iter; iter ++) {
 		dCIL::dListNode* const node = iter.GetKey();
 		dCILInstr* const instr = node->GetInfo();
+//instr->Trace();
 		if (instr->GetAsIF()) {
 			dCILInstrConditional* const ifInstr = instr->GetAsIF();
 			dCIL::dListNode* const elseTarget = ifInstr->GetFalseTarget();
@@ -1830,7 +1742,6 @@ bool dDataFlowGraph::RemoveRedundantJumps ()
 				dAssert(label);
 				if (nextGotoNode == falseTargetJump) {
 					ifInstr->SetTargets(ifInstr->GetTrueTarget()->GetInfo()->GetAsLabel(), NULL);
-					label->Nullify();
 				}
 			}
 		}
@@ -1984,28 +1895,25 @@ DTRACE_INTRUCTION (&stmt);
 		dCIL::dListNode* const node = iter.GetKey();
 		dCILInstr* const instr = node->GetInfo();
 		if (instr->GetAsGoto()) {
-			dAssert(0);
-/*
-			dCILInstrGoto* const gotoInst = instr->GetAsGoto();
-			//dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
-			dList<dCILInstr*>::dListNode* const trueTargetNode = gotoInst->GetTarget();
-			dAssert(trueTargetNode == jumpMap.Find(trueTargetNode)->GetKey());
+//instr->Trace();
+			dCILInstrGoto* const gotoInstr = instr->GetAsGoto();
 
-			dCIL::dListNode* nextGotoNode = trueTargetNode;
-			//while (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) {
+			dCIL::dListNode* const target = gotoInstr->GetTarget();
+			dAssert(jumpMap.Find(target));
+			dCIL::dListNode* const destTarget = jumpMap.Find(target)->GetKey();
+
+			dCILInstr* const instr1 = destTarget->GetInfo();
+			dCIL::dListNode* nextGotoNode = node->GetNext();
 			while (nextGotoNode->GetInfo()->GetAsNop()) {
 				nextGotoNode = nextGotoNode->GetNext();
 			}
 
-			//dThreeAdressStmt& stmt1 = nextGotoNode->GetInfo();
-			//dAssert (stmt1.m_instruction == dThreeAdressStmt::m_label);
-			dAssert(nextGotoNode->GetInfo()->GetAsLabel());
-			if (stmt1.m_trueTargetJump == nextGotoNode) {
-				ret = true;
-				stmt.m_instruction = dThreeAdressStmt::m_nop;
-				jumpMap.Remove(node);
+			dCILInstrLabel* const label = destTarget->GetInfo()->GetAsLabel();
+			dAssert(label);
+			if (nextGotoNode == nextGotoNode) {
+				//ifInstr->SetTargets(ifInstr->GetTrueTarget()->GetInfo()->GetAsLabel(), NULL);
+				gotoInstr->Nullify();
 			}
-*/
 		}
 	}
 	

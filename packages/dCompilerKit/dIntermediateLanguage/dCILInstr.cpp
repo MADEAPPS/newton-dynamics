@@ -551,7 +551,24 @@ void dCILInstr::AddKilledStatementLow(const dArg& arg, const dDefinedVariableDic
 	}
 }
 
+bool dCILSingleArgInstr::DeadElimination (dDataFlowGraph& dataFlow)
+{
+//	dCILInstrMove* const move = instr->GetAsMove();
+	dDataFlowPoint& info = dataFlow.m_dataFlowGraph.Find(GetNode())->GetInfo();
+	dDataFlowPoint::dVariableSet<dString>& liveOut = info.m_liveOutputSet;
 
+	bool ret = false;
+	const dCILInstr::dArg arg0 = m_arg0;
+	//const dCILInstr::dArg arg1 = move->GetArg1();
+	//if (!liveOut.Find(arg0.m_label) || (arg0.m_label == arg1.m_label)) {
+	if (!liveOut.Find(arg0.m_label)) {
+		ret = true;
+		Nullify();
+		dataFlow.UpdateLiveInputLiveOutput();
+	}
+
+	return ret;
+}
 
 void dCILSingleArgInstr::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {

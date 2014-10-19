@@ -38,6 +38,11 @@ void dCILInstrArgument::AddDefinedVariable(dDefinedVariableDictionary& dictionar
 	node->GetInfo().Append(m_myNode);
 }
 
+bool dCILInstrArgument::ApplyDeadElimination (dDataFlowGraph& dataFlow) 
+{
+	return DeadElimination (dataFlow);
+}
+
 
 dCILInstrLocal::dCILInstrLocal (dCIL& program, const dString& name, const dArgType& type)
 	:dCILSingleArgInstr (program, dArg (name, type))
@@ -88,6 +93,16 @@ void dCILInstrMove::AddDefinedVariable(dDefinedVariableDictionary& dictionary) c
 	node->GetInfo().Append(m_myNode);
 }
 
+bool dCILInstrMove::ApplyDeadElimination (dDataFlowGraph& dataFlow)
+{ 
+	if (m_arg0.m_label == m_arg1.m_label) {
+		Nullify();
+		dataFlow.UpdateLiveInputLiveOutput();
+		return true;
+	}
+	return DeadElimination (dataFlow);
+}
+
 void dCILInstrMove::AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
 { 
 	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
@@ -129,6 +144,11 @@ void dCILInstrLoad::AddDefinedVariable (dDefinedVariableDictionary& dictionary) 
 void dCILInstrLoad::AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
 { 
 	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
+}
+
+bool dCILInstrLoad::ApplyDeadElimination (dDataFlowGraph& dataFlow)
+{
+	return DeadElimination (dataFlow);
 }
 
 dCILInstrStore::dCILInstrStore (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)

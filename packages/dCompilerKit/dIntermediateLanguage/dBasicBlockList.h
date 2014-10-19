@@ -34,6 +34,8 @@ class dBasicBlocksList: public dList<dBasicBlock>
 	dBasicBlocksList();
 	dBasicBlocksList(dCIL& cil, dCIL::dListNode* const functionNode);
 
+	void Trace() const;
+
 	void Clear ();
 	void Build(dCIL& cil, dCIL::dListNode* const functionNode);
 	dCIL::dListNode* m_begin;

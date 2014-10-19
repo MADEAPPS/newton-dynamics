@@ -263,9 +263,6 @@ class dCILInstr
 	virtual int GetByteCodeOffset () const { return m_byteCodeOffset; }
 	virtual void SetByteCodeOffset (int offset) { m_byteCodeOffset = offset; }
 
-	
-
-	virtual bool CanBeEliminated() const { return false; }
 	virtual bool IsBasicBlockEnd() const { return false; }
 	virtual bool IsBasicBlockBegin() const { return false; }
 
@@ -296,7 +293,10 @@ class dCILInstr
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) = 0;
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const = 0;
+
+
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow)  = 0;
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const = 0;
 	
 	virtual void Serialize(char* const textOut) const;
 
@@ -337,11 +337,14 @@ class dCILSingleArgInstr: public dCILInstr
 		return false;
 	}
 
+	virtual bool DeadElimination (dDataFlowGraph& dataFlow);
 	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 	const dArg& GetArg0 () const 
 	{
 		return m_arg0;
 	}
+
+	
 
 	dArg m_arg0;
 };

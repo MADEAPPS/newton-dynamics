@@ -32,6 +32,8 @@ class dCILInstrArgument: public dCILSingleArgInstr
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {};
 
 	virtual int GetByteCodeSize() const { return 0; }
+
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) ;
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 };
 
@@ -46,6 +48,8 @@ class dCILInstrLocal: public dCILSingleArgInstr
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
 };
 
@@ -59,12 +63,13 @@ class dCILInstrMove: public dCILTwoArgInstr
 	virtual void EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const;
 
 	virtual dCILInstrMove* GetAsMove() { return this; }
-	virtual bool CanBeEliminated() const { return true; }
+	virtual bool ApplyDeadElimination() const { return true; }
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const;
 	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow)  ;
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
 };
 
@@ -75,7 +80,7 @@ class dCILInstrLoad: public dCILTwoArgInstr
 	dCILInstrLoad (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1);
 	void Serialize(char* const textOut) const;
 
-	virtual bool CanBeEliminated() const 
+	virtual bool ApplyDeadElimination() const 
 	{
 		return true;
 	}
@@ -85,6 +90,7 @@ class dCILInstrLoad: public dCILTwoArgInstr
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
 	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow);
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
 };
 
@@ -99,6 +105,7 @@ class dCILInstrStore: public dCILTwoArgInstr
 	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
 	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 
+	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) {return false; }
 	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
 };
 
