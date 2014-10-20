@@ -538,7 +538,7 @@ void dCILInstr::Trace() const
 #endif
 }
 
-void dCILInstr::AddKilledStatementLow(const dArg& arg, const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
+void dCILInstr::AddKilledStatementLow(const dArg& arg, const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
 {
 	datFloatPoint.m_generateStmt = true;
 	dAssert(dictionary.Find(arg.m_label));
@@ -570,21 +570,21 @@ bool dCILSingleArgInstr::DeadElimination (dDataFlowGraph& dataFlow)
 	return ret;
 }
 
-void dCILSingleArgInstr::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+void dCILSingleArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
 	m_arg0.m_label = interferenceGraph.GetRegisterName(m_arg0.m_label);
 }
 
-void dCILTwoArgInstr::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+void dCILTwoArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
 	m_arg1.m_label = interferenceGraph.GetRegisterName(m_arg1.m_label);
-	dCILSingleArgInstr::AsignRegisterName(interferenceGraph);
+	dCILSingleArgInstr::AssignRegisterName(interferenceGraph);
 }
 
-void dCILThreeArgInstr::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+void dCILThreeArgInstr::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
 	if ((m_arg2.m_intrinsicType != m_constInt) && (m_arg2.m_intrinsicType != m_constFloat)) {
 		m_arg2.m_label = interferenceGraph.GetRegisterName(m_arg2.m_label);
 	}
-	dCILTwoArgInstr::AsignRegisterName(interferenceGraph);
+	dCILTwoArgInstr::AssignRegisterName(interferenceGraph);
 }

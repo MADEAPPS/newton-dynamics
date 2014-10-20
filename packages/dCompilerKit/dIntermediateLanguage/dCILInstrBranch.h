@@ -27,12 +27,13 @@ class dCILInstrLabel: public dCILSingleArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
-	void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {}
-	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {}
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
+	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {}
+	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
 	
 	virtual bool IsBasicBlockBegin() const;
@@ -52,14 +53,15 @@ class dCILInstrGoto: public dCILSingleArgInstr
 	void SetTarget (dCILInstrLabel* const target0);
 	dList<dCILInstr*>::dListNode* GetTarget () const;
 
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {}
 	virtual bool ApplySemanticReordering () {return false;};
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
 
-	void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {}
+	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {}
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
-	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {dAssert (0);}
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
+	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
 
@@ -83,13 +85,15 @@ class dCILInstrConditional: public dCILThreeArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
 
-	void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
-	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
+
+	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
+	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { dAssert(0);  return false; }
 
 	dList<dCILInstr*>::dListNode* GetTrueTarget () const;
 	dList<dCILInstr*>::dListNode* GetFalseTarget () const;
@@ -114,13 +118,15 @@ class dCILInstrReturn: public dCILSingleArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
+
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
-	void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
-	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
+	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 };
 
 class dCILInstrCall: public dCILTwoArgInstr
@@ -138,12 +144,14 @@ class dCILInstrCall: public dCILTwoArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
-	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const;
+	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
-	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	dList<dArg> m_parameters;
 	dList<dCILInstr*>::dListNode* m_tagetNode;

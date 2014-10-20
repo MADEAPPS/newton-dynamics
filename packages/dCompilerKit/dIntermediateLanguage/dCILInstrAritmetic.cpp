@@ -13,6 +13,7 @@
 #include "dCIL.h"
 #include "dCILInstr.h"
 #include "dDataFlowGraph.h"
+#include "dCILInstrLoadStore.h"
 #include "dCILInstrArithmetic.h"
 
 /*
@@ -223,14 +224,65 @@ bool dCILInstrIntergerLogical::ApplyDeadElimination (dDataFlowGraph& dataFlow)
 	return DeadElimination (dataFlow);
 }
 
-void dCILInstrIntergerLogical::AddDefinedVariable (dDefinedVariableDictionary& dictionary) const 
+void dCILInstrIntergerLogical::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const 
 {
-	dDefinedVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
+	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
 	node->GetInfo().Append (m_myNode);
 }
 
+void dCILInstrIntergerLogical::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
+{
+	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg1.m_label);
+	node->GetInfo().Append(m_myNode);
 
-void dCILInstrIntergerLogical::AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
+	switch (m_arg2.GetType().m_intrinsicType) 
+	{
+		case m_int:
+		{
+			dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg2.m_label);
+			node->GetInfo().Append(m_myNode);
+			break;
+		}
+
+		case m_constInt:
+			break;
+
+		default:
+			dAssert(0);
+	}
+}
+
+bool dCILInstrIntergerLogical::ApplyCopyPropagation(dCILInstrMove* const moveInst)
+{
+	bool ret = false;
+	if (moveInst->m_arg0.m_label == m_arg1.m_label) {
+		ret = true;
+		m_arg1.m_label = moveInst->m_arg1.m_label;
+	}
+
+	switch (m_arg2.GetType().m_intrinsicType) 
+	{
+		case m_int:
+		{
+		  	if (moveInst->m_arg0.m_label == m_arg2.m_label) {
+				ret = true;
+				m_arg2.m_label = moveInst->m_arg1.m_label;
+			}
+			break;
+		}
+
+		case m_constInt:
+			break;
+
+		default:
+			dAssert(0);
+	}
+
+	dAssert (ret);
+	return ret; 
+}
+
+void dCILInstrIntergerLogical::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
 { 
 	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
 }

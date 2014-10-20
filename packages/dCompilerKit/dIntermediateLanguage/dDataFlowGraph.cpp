@@ -17,14 +17,14 @@
 #include "dCILInstrArithmetic.h"
 #include "dRegisterInterferenceGraph.h"
 
-#define D_OPTIMIZE_REDUNDANCE_COPY_ON_ARRAYS
+//#define D_OPTIMIZE_REDUNDANCE_COPY_ON_ARRAYS
 
-//dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function, dCIL::dReturnType returnType)
+
+
+
 dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function)
 	:m_mark (0)
-//	,m_savedRegistersMask(0)
 	,m_cil (cil)
-//	,m_returnType(returnType)
 	,m_function(function)
 	,m_variableDefinitions()
 {
@@ -230,35 +230,35 @@ bool dDataFlowGraph::ApplyConstantPropagation()
 					case dThreeAdressStmt::m_assigment:
 					{
 						if (stmt1.m_operator == dThreeAdressStmt::m_nothing) {
-							if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+							if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoMoveReachInstruction(stmtNode1, stmtNode)) {
 								ret = true;
 								stmt1.m_arg1 = stmt.m_arg1;
 								UpdateReachingDefinitions();
 							}
 						} else if (m_cil->m_commutativeOperator[stmt1.m_operator]) {
 							
-							if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+							if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoMoveReachInstruction(stmtNode1, stmtNode)) {
 								ret = true;
 								stmt1.m_arg1 = stmt1.m_arg2;
 								stmt1.m_arg2 = stmt.m_arg1;
-								if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+								if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoMoveReachInstruction(stmtNode1, stmtNode)) {
 									stmt1.m_arg1 = stmt.m_arg1;
 								}
 								UpdateReachingDefinitions();
-							} else if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+							} else if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoMoveReachInstruction(stmtNode1, stmtNode)) {
 								ret = true;
 								stmt1.m_arg2 = stmt.m_arg1;
 								UpdateReachingDefinitions();
 							}
 							
 						} else {
-							if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+							if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoMoveReachInstruction(stmtNode1, stmtNode)) {
 								ret = true;
 								stmt1.m_arg2 = stmt.m_arg1;
 								UpdateReachingDefinitions();
 							}
 
-							if ((stmt1.m_arg2.m_type == dThreeAdressStmt::m_intConst) && (stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+							if ((stmt1.m_arg2.m_type == dThreeAdressStmt::m_intConst) && (stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoMoveReachInstruction(stmtNode1, stmtNode)) {
 								ret = true;
 								stmt1.m_arg1 = stmt.m_arg1;
 								UpdateReachingDefinitions();
@@ -282,7 +282,7 @@ bool dDataFlowGraph::ApplyConstantPropagation()
 
 					case dThreeAdressStmt::m_if:
 					{
-						if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && (stmt1.m_arg1.m_type == dThreeAdressStmt::m_intConst) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+						if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && (stmt1.m_arg1.m_type == dThreeAdressStmt::m_intConst) && DoMoveReachInstruction(stmtNode1, stmtNode)) {
 							ret = true;
 							stmt1.m_arg0 = stmt.m_arg1;
 							UpdateReachingDefinitions();
@@ -353,7 +353,7 @@ bool dDataFlowGraph::ApplySubExpresionToCopyPropagation()
 					{
 						case dThreeAdressStmt::m_assigment:
 						{
-							if ((stmt1.m_operator == dThreeAdressStmt::m_nothing) && (stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode) ){
+							if ((stmt1.m_operator == dThreeAdressStmt::m_nothing) && (stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoMoveReachInstruction(stmtNode1, stmtNode) ){
 								ret = true;
 								stmt1.m_operator = stmt.m_operator;
 								stmt1.m_arg1 = stmt.m_arg1;
@@ -365,7 +365,7 @@ bool dDataFlowGraph::ApplySubExpresionToCopyPropagation()
 
 						case dThreeAdressStmt::m_if:
 						{
-							if (m_cil->m_conditionals[stmt.m_operator] && (stmt1.m_arg1.m_label == "0") && (stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+							if (m_cil->m_conditionals[stmt.m_operator] && (stmt1.m_arg1.m_label == "0") && (stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoMoveReachInstruction(stmtNode1, stmtNode)) {
 								switch (stmt1.m_operator) 
 								{
 									case dThreeAdressStmt::m_identical:
@@ -411,7 +411,7 @@ bool dDataFlowGraph::ApplyCommonSubExpresion()
 				dThreeAdressStmt& stmt1 = stmtNode1->GetInfo();
 				if ((stmt1.m_instruction == dThreeAdressStmt::m_assigment) && (stmt1.m_operator == stmt.m_operator)) {
 					if ((stmt.m_arg1.m_label == stmt1.m_arg1.m_label) && (stmt.m_arg2.m_label == stmt1.m_arg2.m_label)) {
-						if (DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
+						if (DoMoveReachInstruction(stmtNode1, stmtNode)) {
 							ret = true;
 							stmt1.m_operator = stmt.m_nothing;
 							stmt1.m_arg1 = stmt.m_arg0;
@@ -859,16 +859,13 @@ void dDataFlowGraph::BuildDefinedAndKilledStatementSets()
 	}
 
 	m_variableDefinitions.RemoveAll();
-//	dDataFlowPoint::dVariableSet<dCIL::dListNode*> statementUsingReturnVariable;
 	for (dCIL::dListNode* ptr = m_basicBlocks.m_begin; ptr != m_basicBlocks.m_end; ptr = ptr->GetNext()) {
 		dCILInstr* const instruc = ptr->GetInfo();
 //instruc->Trace();
 		instruc->AddDefinedVariable (m_variableDefinitions);
 
 /*
-
 		dThreeAdressStmt& stmt = ptr->GetInfo();	
-
 //DTRACE_INTRUCTION (&stmt);		
 		switch (stmt.m_instruction)
 		{
@@ -1080,6 +1077,44 @@ void dDataFlowGraph::BuildDefinedAndKilledStatementSets()
 }
 
 
+void dDataFlowGraph::TraceReachIn (dCIL::dListNode* const node) const
+{
+	dCILInstr* const stmt = node->GetInfo();	
+	stmt->Trace();
+	const dDataFlowPoint& point = m_dataFlowGraph.Find(node)->GetInfo();
+	if (point.m_reachStmtInputSet.GetCount()) {
+		dTrace(("\t\t\treached by:\n"));
+
+		dDataFlowPoint::dVariableSet<dCIL::dListNode*>::Iterator iter(point.m_reachStmtInputSet);
+		for (iter.Begin(); iter; iter++) {
+			dCIL::dListNode* const reachNode = iter.GetKey();
+			dCILInstr* const reachInstr = reachNode->GetInfo();
+			dTrace(("\t\t\t"));
+			reachInstr->Trace();
+		}
+		dTrace(("\n"));
+	}
+}
+
+void dDataFlowGraph::TraceReachOutput(dCIL::dListNode* const node) const
+{
+	dCILInstr* const stmt = node->GetInfo();
+	stmt->Trace();
+	const dDataFlowPoint& point = m_dataFlowGraph.Find(node)->GetInfo();
+	if (point.m_reachStmtInputSet.GetCount()) {
+		dTrace(("\t\t\treach to:\n"));
+
+		dDataFlowPoint::dVariableSet<dCIL::dListNode*>::Iterator iter(point.m_reachStmtOutputSet);
+		for (iter.Begin(); iter; iter++) {
+			dCIL::dListNode* const reachedNode = iter.GetKey();
+			dCILInstr* const reachedInstr = reachedNode->GetInfo();
+			dTrace(("\t\t\t"));
+			reachedInstr->Trace();
+		}
+		dTrace(("\n"));
+	}
+}
+
 
 void dDataFlowGraph::CalculateReachingDefinitions()
 {
@@ -1098,11 +1133,12 @@ void dDataFlowGraph::CalculateReachingDefinitions()
 		for (dList<dBasicBlock*>::dListNode* blockNode = m_traversalBlocksOrder.GetLast(); blockNode; blockNode = blockNode->GetPrev()) {
 			dBasicBlock* const block = blockNode->GetInfo();
 
-			int test = 1;
-			for (dCIL::dListNode* stmtNode = block->m_begin; test; stmtNode = stmtNode->GetNext()) {
-				test = (stmtNode != block->m_end);
-				dAssert (m_dataFlowGraph.Find(stmtNode));
-				dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNode)->GetInfo();
+			//int test = 1;
+			//for (dCIL::dListNode* stmtNode = block->m_begin; test; stmtNode = stmtNode->GetNext()) {
+			for (dCIL::dListNode* node = block->m_begin; node != block->m_end; node = node->GetNext()) {
+				//test = (stmtNode != block->m_end);
+				dAssert (m_dataFlowGraph.Find(node));
+				dDataFlowPoint& info = m_dataFlowGraph.Find(node)->GetInfo();
 
 				//DTRACE_INTRUCTION (&info.m_statement->GetInfo());		
 
@@ -1128,39 +1164,16 @@ void dDataFlowGraph::CalculateReachingDefinitions()
 	}
 
 
-//#ifdef _DEBUG
 #if 0
-	for (dCIL::dListNode* ptr = m_function; ptr; ptr = ptr->GetNext()) {
-		dThreeAdressStmt& stmt = ptr->GetInfo();	
-		if ((stmt.m_instruction != dThreeAdressStmt::m_nop) && (stmt.m_instruction != dThreeAdressStmt::m_function)) {
-			dTrace (("%d ", stmt.m_debug));
-			DTRACE_INTRUCTION(&stmt);
-		}
+	for (dCIL::dListNode* node = m_basicBlocks.m_begin; node != m_basicBlocks.m_end; node = node->GetNext()) {
+		TraceReachIn (node);
 	}
+#endif
 
-	dTrace (("\n\n"));
-
-	for (dCIL::dListNode* ptr = m_function; ptr; ptr = ptr->GetNext()) {
-		dThreeAdressStmt& stmt = ptr->GetInfo();	
-		if ((stmt.m_instruction != dThreeAdressStmt::m_nop) && (stmt.m_instruction != dThreeAdressStmt::m_function)) {
-			dTrace (("%d ", stmt.m_debug));
-			DTRACE_INTRUCTION(&stmt);
-			const dDataFlowPoint& point = m_dataFlowGraph.Find(ptr)->GetInfo() ;
-
-			if (point.m_reachStmtInputSet.GetCount()) {
-
-				dTrace (("\t\t"));
-				dDataFlowPoint::dVariableSet<dCIL::dListNode*>::Iterator iter(point.m_reachStmtInputSet);
-				for (iter.Begin(); iter; iter ++) {
-					dCIL::dListNode* const stmtNode = iter.GetKey();
-					dThreeAdressStmt& stmt1 = stmtNode->GetInfo();
-					dTrace (("%d ", stmt1.m_debug));
-				}
-				dTrace (("\n"));
-			}
-		}
+#if 0
+	for (dCIL::dListNode* node = m_basicBlocks.m_begin; node != m_basicBlocks.m_end; node = node->GetNext()) {
+		TraceReachOutput (node);
 	}
-
 #endif
 
 }
@@ -1185,11 +1198,13 @@ void dDataFlowGraph::BuildGeneratedAndUsedVariableSets()
 		point.m_usedVariableSet.RemoveAll();
 	}
 
+	m_variableUsed.RemoveAll();
 	for (iter.Begin(); iter; iter ++) {
 		dDataFlowPoint& point = iter.GetNode()->GetInfo();
 		point.m_generatedVariable.Empty();
 		dCILInstr* const instruc = point.m_statement->GetInfo();
 //instruc->Trace();
+		instruc->AddUsedVariable (m_variableUsed);
 		instruc->AddGeneratedAndUsedSymbols(point);	
 
 /*
@@ -1342,64 +1357,49 @@ void dDataFlowGraph::FindNodesInPathway(dCIL::dListNode* const source, dCIL::dLi
 }
 
 
-bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const
+//bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const
+bool dDataFlowGraph::DoMoveReachInstruction(dCIL::dListNode* const stmtNodeB, dCILInstrMove* const move) const
 {
 	bool canApplyPropagation = false;	
-/*
+
 	dDataFlowPoint& info = m_dataFlowGraph.Find(stmtNodeB)->GetInfo();
 	dDataFlowPoint::dVariableSet<dCIL::dListNode*>& reachingInputs = info.m_reachStmtInputSet;
 
-	if (reachingInputs.Find (stmtNodeA)) {
+//	if (reachingInputs.Find (stmtNodeA)) {
+	if (reachingInputs.Find (move->GetNode())) {
 		canApplyPropagation = true;
 
-		const dThreeAdressStmt& constStmt = stmtNodeA->GetInfo();
-		dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definitions = m_variableDefinitions.Find(constStmt.m_arg0.m_label);
+		//const dThreeAdressStmt& constStmt = stmtNodeA->GetInfo();
+		//dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definitions = m_variableDefinitions.Find (constStmt.m_arg0.m_label);
+		dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definitions = m_variableDefinitions.Find (move->GetArg0().m_label);
 		dAssert (definitions);
 
 		dList<dCIL::dListNode*>& defintionList = definitions->GetInfo();
 		for (dList<dCIL::dListNode*>::dListNode* otherStmtNode = defintionList.GetFirst(); otherStmtNode; otherStmtNode = otherStmtNode->GetNext()){
 			dCIL::dListNode* const duplicateDefinition = otherStmtNode->GetInfo();
-			if (duplicateDefinition != stmtNodeA) {
+			//if (duplicateDefinition != stmtNodeA) {
+			if (duplicateDefinition != move->GetNode()) {
 				if (reachingInputs.Find(duplicateDefinition)) {
-					if (stmtNodeB->GetInfo().m_instruction != dThreeAdressStmt::m_loadBase) {
-						return false;
-					}
+					return false;
 				}
 			}
 		}
 		
-        bool isSpecialStoreType = (constStmt.m_instruction == dThreeAdressStmt::m_storeBase);
-		if (isSpecialStoreType || (constStmt.m_arg1.GetType().m_intrinsicType == dThreeAdressStmt::m_int) || (constStmt.m_arg1.GetType().m_intrinsicType == dThreeAdressStmt::m_float)) {
-			dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = isSpecialStoreType ? m_variableDefinitions.Find(constStmt.m_arg2.m_label) : m_variableDefinitions.Find(constStmt.m_arg1.m_label);
-			if (definedStatements) {
-				dTree<int, dCIL::dListNode*> path;
-				FindNodesInPathway(stmtNodeA, stmtNodeB, path);
-				dList<dCIL::dListNode*>& statementList = definedStatements->GetInfo();
-				for (dList<dCIL::dListNode*>::dListNode* ptr = statementList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-					dCIL::dListNode* const stmt = ptr->GetInfo();
+		dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = m_variableDefinitions.Find(move->GetArg1().m_label);
+		if (definedStatements) {
+			dTree<int, dCIL::dListNode*> path;
+			FindNodesInPathway(move->GetNode(), stmtNodeB, path);
 
-//DTRACE_INTRUCTION (&stmt);		
-					if (path.Find(stmt)) {
-						return false;
-					}
-				}
-				
-				if ((constStmt.m_instruction == dThreeAdressStmt::m_load) || ((constStmt.m_operator != dThreeAdressStmt::m_nothing) && ((constStmt.m_arg2.GetType().m_intrinsicType == dThreeAdressStmt::m_int) || (constStmt.m_arg2.GetType().m_intrinsicType == dThreeAdressStmt::m_float)))) {
-					dTree<dList<dCIL::dListNode*>, dString>::dTreeNode* const definedStatements = m_variableDefinitions.Find(constStmt.m_arg2.m_label);
-					if (definedStatements) {
-						dList<dCIL::dListNode*>& statementList = definedStatements->GetInfo();
-						for (dList<dCIL::dListNode*>::dListNode* ptr = statementList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-							dCIL::dListNode* const stmt = ptr->GetInfo();
-							if (path.Find(stmt)) {
-								return false;
-							}
-						}
-					}
+			dList<dCIL::dListNode*>& statementList = definedStatements->GetInfo();
+			for (dList<dCIL::dListNode*>::dListNode* ptr = statementList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+				dCIL::dListNode* const stmt = ptr->GetInfo();
+				if (path.Find(stmt)) {
+					return false;
 				}
 			}
 		}
 	}
-*/
+
 	return canApplyPropagation;
 }
 
@@ -1407,225 +1407,31 @@ bool dDataFlowGraph::DoStatementAreachesStatementB(dCIL::dListNode* const stmtNo
 bool dDataFlowGraph::ApplyCopyPropagation()
 {
 	bool ret = false;
+	UpdateReachingDefinitions();
+//m_cil->Trace();
+
 	for (dCIL::dListNode* node = m_basicBlocks.m_begin; node != m_basicBlocks.m_end; node = node->GetNext()) {
 		dCILInstrMove* const moveInst = node->GetInfo()->GetAsMove();
 		if (moveInst) {
-			//moveInst->Trace();
-			for (dCIL::dListNode* node1 = node->GetNext(); node1 != m_basicBlocks.m_end; node1 = node1->GetNext()) {
-				dCILInstr* const inst = node1->GetInfo();
-				if (DoStatementAreachesStatementB(node1, node)) {
-					dAssert(0);
-					//inst->Trace();
-					ret |= inst->ApplyCopyPropagation(moveInst, *this);
-					//inst->Trace();
-				}
-			}
-		}
+moveInst->Trace();
+			dInstructionVariableDictionary::dTreeNode* const usedVariableNode = m_variableUsed.Find (moveInst->GetArg0().m_label);
+			if (usedVariableNode) {
+				const dList<dCIL::dListNode*>& usedVariableList = usedVariableNode->GetInfo();
+				for (const dList<dCIL::dListNode*>::dListNode* useVariableNode = usedVariableList.GetFirst() ; useVariableNode; useVariableNode = useVariableNode->GetNext()) {
+					dCIL::dListNode* const node1 = useVariableNode->GetInfo();
+					dCILInstr* const inst = node1->GetInfo();
+					dTrace (("\t\t"));
+					inst->Trace();
+					//TraceReachIn (node1);
 
-		/*
-		switch (stmt.m_instruction)
-		{
-			case dThreeAdressStmt::m_assigment:
-			{
-				//if ((stmt.m_operator == dThreeAdressStmt::m_nothing) && (stmt.m_arg1.m_type == dThreeAdressStmt::m_intVar)) {
-				if ((stmt.m_operator == dThreeAdressStmt::m_nothing) && (stmt.m_arg1.GetType().m_intrinsicType != dThreeAdressStmt::m_constInt) && (stmt.m_arg1.GetType().m_intrinsicType != dThreeAdressStmt::m_constFloat)){
-					for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
-						dThreeAdressStmt& stmt1 = stmtNode1->GetInfo();
-//DTRACE_INTRUCTION (&stmt1);		
-						switch (stmt1.m_instruction)
-						{
-							case dThreeAdressStmt::m_assigment:
-							{
-								if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)){
-									ret = true;
-									stmt1.m_arg1 = stmt.m_arg1;
-									UpdateReachingDefinitions();
-								}
-								if ((stmt1.m_operator != dThreeAdressStmt::m_nothing) && (stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-									ret = true;
-									stmt1.m_arg2 = stmt.m_arg1;
-									UpdateReachingDefinitions();
-								}
-								break;
-							}
-
-							case dThreeAdressStmt::m_load:
-							{
-								if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-									ret = true;		
-									stmt1.m_arg2 = stmt.m_arg1;
-									UpdateReachingDefinitions();
-								} else if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-									ret = true;		
-									stmt1.m_arg1 = stmt.m_arg1;
-									UpdateReachingDefinitions();
-								}
-								break;
-							}
-
-							case dThreeAdressStmt::m_storeBase:
-							{
-								if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-									ret = true;
-									stmt1.m_arg0 = stmt.m_arg1;
-									UpdateReachingDefinitions();
-								}
-								break;
-							}
-
-							case dThreeAdressStmt::m_store:
-							{
-								if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-									ret = true;
-									stmt1.m_arg0 = stmt.m_arg1;
-									UpdateReachingDefinitions();
-								} else if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-									ret = true;		
-									stmt1.m_arg2 = stmt.m_arg1;
-									UpdateReachingDefinitions();
-								} else if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-									ret = true;		
-									stmt1.m_arg1 = stmt.m_arg1;
-									UpdateReachingDefinitions();
-								}
-								break;
-							}
-
-							case dThreeAdressStmt::m_if:
-							{
-								if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)){
-									ret = true;
-									stmt1.m_arg0 = stmt.m_arg1;
-									UpdateReachingDefinitions();
-								}
-								if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-									ret = true;
-									stmt1.m_arg1 = stmt.m_arg1;
-									UpdateReachingDefinitions();
-								}
-								break;
-							}
-						}
+					if (DoMoveReachInstruction(node1, moveInst)) {
+						ret |= inst->ApplyCopyPropagation(moveInst);
 					}
 				}
-				break;
 			}
-#if 0
-            case dThreeAdressStmt::m_storeBase:
-            {
-                for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
-                    dThreeAdressStmt& stmt1 = stmtNode1->GetInfo();
-//DTRACE_INTRUCTION (&stmt1);		
-                    switch (stmt1.m_instruction)
-                    {
-                        case dThreeAdressStmt::m_assigment:
-                        {
-                            if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)){
-                                ret = true;
-                                stmt1.m_arg1 = stmt.m_arg0;
-                                UpdateReachingDefinitions();
-                            }
-                            if ((stmt1.m_operator != dThreeAdressStmt::m_nothing) && (stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-                                ret = true;
-                                stmt1.m_arg2 = stmt.m_arg0;
-                                UpdateReachingDefinitions();
-                            }
-                            break;
-                        }
 
-                        case dThreeAdressStmt::m_load:
-                        {
-                            if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-                                ret = true;		
-                                stmt1.m_arg2 = stmt.m_arg0;
-                                UpdateReachingDefinitions();
-                            } else if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-                                ret = true;		
-                                stmt1.m_arg1 = stmt.m_arg0;
-                                UpdateReachingDefinitions();
-                            }
-                            break;
-                        }
-
-                        case dThreeAdressStmt::m_loadBase:
-                        {
-                            if ((stmt1.m_arg2.m_label == stmt.m_arg2.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-                                ret = true;
-                                stmt1.m_arg1 = stmt.m_arg0;
-								stmt1.m_arg2.m_label = dString("");
-								stmt1.m_instruction = dThreeAdressStmt::m_assigment;
-								stmt1.m_operator = dThreeAdressStmt::m_nothing;
-                                UpdateReachingDefinitions();
-                            }
-                            break;
-                        }
-
-                        case dThreeAdressStmt::m_store:
-                        {
-                            if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-                                ret = true;
-                                stmt1.m_arg0 = stmt.m_arg0;
-                                UpdateReachingDefinitions();
-                            } else if ((stmt1.m_arg2.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-                                ret = true;		
-                                stmt1.m_arg2 = stmt.m_arg0;
-                                UpdateReachingDefinitions();
-                            } else if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-                                ret = true;		
-                                stmt1.m_arg1 = stmt.m_arg0;
-                                UpdateReachingDefinitions();
-                            }
-                            break;
-                        }
-
-                        case dThreeAdressStmt::m_if:
-                        {
-                            if ((stmt1.m_arg0.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)){
-                                ret = true;
-                                stmt1.m_arg0 = stmt.m_arg0;
-                                UpdateReachingDefinitions();
-                            }
-                            if ((stmt1.m_arg1.m_label == stmt.m_arg0.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)) {
-                                ret = true;
-                                stmt1.m_arg1 = stmt.m_arg0;
-                                UpdateReachingDefinitions();
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                break;
-            }
-
-			case dThreeAdressStmt::m_load:
-			{
-				#ifdef D_OPTIMIZE_REDUNDANCE_COPY_ON_ARRAYS
-					for (dCIL::dListNode* stmtNode1 = stmtNode->GetNext(); stmtNode1; stmtNode1 = stmtNode1->GetNext()) {
-						dThreeAdressStmt& stmt1 = stmtNode1->GetInfo();
-						switch (stmt1.m_instruction)
-						{
-							case dThreeAdressStmt::m_load:
-							{
-								if ((stmt1.m_arg1.m_label == stmt.m_arg1.m_label) && (stmt1.m_arg2.m_label == stmt.m_arg2.m_label) && DoStatementAreachesStatementB(stmtNode1, stmtNode)){
-									ret = true;
-									stmt1.m_instruction = dThreeAdressStmt::m_assigment;
-									stmt1.m_operator = dThreeAdressStmt::m_nothing;
-									stmt1.m_arg1 = stmt.m_arg0;
-									stmt1.m_arg2.m_label = "";
-									stmt1.m_extraInformation = 0;
-									UpdateReachingDefinitions();
-								}
-								break;
-							}
-						}
-					}
-				#endif
-				break;
-			}
-#endif
+m_cil->Trace();
 		}
-*/
 	}
 
 	return ret;

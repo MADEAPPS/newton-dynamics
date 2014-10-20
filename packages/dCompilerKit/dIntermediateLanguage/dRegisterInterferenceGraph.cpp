@@ -34,13 +34,11 @@ dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const fl
 	m_flowGraph->ApplyInstructionSematicOrdering();
 	m_flowGraph->BuildBasicBlockGraph();
 
+	m_flowGraph->CalculateLiveInputLiveOutput();
 	for (bool optimized = true; optimized;) {
 		optimized = false;
-//		m_flowGraph->CalculateLiveInputLiveOutput();
-//		m_flowGraph->UpdateReachingDefinitions();
-//		optimized |= m_flowGraph->ApplyCopyPropagation();
+		optimized |= m_flowGraph->ApplyCopyPropagation();
 //m_flowGraph->m_cil->Trace();
-		//m_flowGraph->CalculateLiveInputLiveOutput();
 		optimized |= m_flowGraph->ApplyRemoveDeadCode();
 //m_flowGraph->m_cil->Trace();
 	}
@@ -89,7 +87,7 @@ void dRegisterInterferenceGraph::AllocateRegisters ()
 	for (dCIL::dListNode* node = m_flowGraph->m_basicBlocks.m_begin; node != m_flowGraph->m_basicBlocks.m_end; node = node->GetNext()) {
 		dCILInstr* const instr = node->GetInfo();
 //instr->Trace();
-		instr->AsignRegisterName(*this);
+		instr->AssignRegisterName(*this);
 //instr->Trace();
 	}
 }

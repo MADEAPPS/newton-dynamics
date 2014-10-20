@@ -973,13 +973,7 @@ return NULL;
 
 void dCIL::RegisterAllocation (dListNode* const functionNode)
 {
-	//dDataFlowGraph datFlowGraph (this, functionNode, returnType);
 	dDataFlowGraph datFlowGraph (this, functionNode);
-
-	// apply all basic blocks peephole optimizations 
-	//datFlowGraph.ApplyLocalOptimizations();
-
-	// do register allocation before removing dead jumps and nops
 	datFlowGraph.RegistersAllocation (D_INTEGER_REGISTER_COUNT - 1);
 }
 

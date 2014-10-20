@@ -28,13 +28,15 @@ class dCILInstrArgument: public dCILSingleArgInstr
 
 	virtual bool ApplySemanticReordering() { return false; }
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const;
-	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {};
+
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {}
+	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const;
+	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {};
 
 	virtual int GetByteCodeSize() const { return 0; }
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) ;
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 };
 
 
@@ -46,11 +48,13 @@ class dCILInstrLocal: public dCILSingleArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
-	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {dAssert (0);}
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const;
+	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 };
 
 
@@ -66,11 +70,13 @@ class dCILInstrMove: public dCILTwoArgInstr
 	virtual bool ApplyDeadElimination() const { return true; }
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const;
-	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const; 
+	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const;
+	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow)  ;
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst);
 };
 
 
@@ -87,11 +93,13 @@ class dCILInstrLoad: public dCILTwoArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;};
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
-	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const;
+	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow);
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { dAssert(0);  return false; }
 };
 
 class dCILInstrStore: public dCILTwoArgInstr
@@ -102,14 +110,13 @@ class dCILInstrStore: public dCILTwoArgInstr
 
 	virtual bool ApplySemanticReordering () {return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
-	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
+	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) {return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst);
 };
-
-
-
 
 #endif

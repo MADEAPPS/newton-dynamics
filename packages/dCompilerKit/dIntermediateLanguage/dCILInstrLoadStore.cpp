@@ -32,9 +32,9 @@ void dCILInstrArgument::AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint
 	datFloatPoint.m_generatedVariable = m_arg0.m_label;
 }
 
-void dCILInstrArgument::AddDefinedVariable(dDefinedVariableDictionary& dictionary) const 
+void dCILInstrArgument::AddDefinedVariable(dInstructionVariableDictionary& dictionary) const 
 { 
-	dDefinedVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
+	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
 	node->GetInfo().Append(m_myNode);
 }
 
@@ -63,10 +63,10 @@ void dCILInstrLocal::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) 
 	datFloatPoint.m_generatedVariable = m_arg0.m_label;
 }
 
-void dCILInstrLocal::AddDefinedVariable (dDefinedVariableDictionary& dictionary) const  
+void dCILInstrLocal::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const  
 {
 	dAssert(0);
-	dDefinedVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
+	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
 	node->GetInfo().Append (m_myNode);
 }
 
@@ -87,9 +87,28 @@ void dCILInstrMove::AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) co
 	datFloatPoint.m_usedVariableSet.Insert(m_arg1.m_label);
 }
 
-void dCILInstrMove::AddDefinedVariable(dDefinedVariableDictionary& dictionary) const
+void dCILInstrMove::AddDefinedVariable(dInstructionVariableDictionary& dictionary) const
 { 
-	dDefinedVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
+	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
+	node->GetInfo().Append(m_myNode);
+}
+
+
+bool dCILInstrMove::ApplyCopyPropagation (dCILInstrMove* const moveInst) 
+{ 
+	bool ret = false;
+	if (moveInst->m_arg0.m_label == m_arg1.m_label) {
+		ret = true;
+		m_arg1.m_label = moveInst->m_arg1.m_label;
+	}
+	
+	dAssert(ret);
+	return ret;
+}
+
+void dCILInstrMove::AddUsedVariable (dInstructionVariableDictionary& dictionary) const
+{
+	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg1.m_label);
 	node->GetInfo().Append(m_myNode);
 }
 
@@ -103,7 +122,7 @@ bool dCILInstrMove::ApplyDeadElimination (dDataFlowGraph& dataFlow)
 	return DeadElimination (dataFlow);
 }
 
-void dCILInstrMove::AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
+void dCILInstrMove::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
 { 
 	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
 }
@@ -135,13 +154,19 @@ void dCILInstrLoad::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) c
 	datFloatPoint.m_usedVariableSet.Insert (m_arg1.m_label);
 }
 
-void dCILInstrLoad::AddDefinedVariable (dDefinedVariableDictionary& dictionary) const  
+void dCILInstrLoad::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const  
 {
-	dDefinedVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
+	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
 	node->GetInfo().Append (m_myNode);
 }
 
-void dCILInstrLoad::AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
+void dCILInstrLoad::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
+{
+	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg1.m_label);
+	node->GetInfo().Append(m_myNode);
+}
+
+void dCILInstrLoad::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
 { 
 	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
 }
@@ -159,6 +184,21 @@ dCILInstrStore::dCILInstrStore (dCIL& program, const dString& name0, const dArgT
 void dCILInstrStore::Serialize(char* const textOut) const
 {
 	sprintf (textOut, "\t[%s %s] = %s %s\n", m_arg0.GetTypeName().GetStr(),  m_arg0.m_label.GetStr(), m_arg1.GetTypeName().GetStr(), m_arg1.m_label.GetStr());
+}
+
+bool dCILInstrStore::ApplyCopyPropagation (dCILInstrMove* const moveInst) 
+{ 
+	dAssert(0);  
+	return false; 
+}
+
+void dCILInstrStore::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
+{
+	dInstructionVariableDictionary::dTreeNode* const node0 = dictionary.Insert(m_arg0.m_label);
+	node0->GetInfo().Append(m_myNode);
+
+	dInstructionVariableDictionary::dTreeNode* const node1 = dictionary.Insert(m_arg1.m_label);
+	node1->GetInfo().Append(m_myNode);
 }
 
 void dCILInstrStore::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const

@@ -176,7 +176,7 @@ class dCILInstrThreeArgArithmetic;
 class dDataFlowPoint;
 class dDataFlowGraph;
 class dRegisterInterferenceGraph;
-class dDefinedVariableDictionary;
+class dInstructionVariableDictionary;
 
 class dCILInstr
 {
@@ -289,14 +289,15 @@ class dCILInstr
 	}
 
 	virtual bool ApplySemanticReordering () = 0;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const = 0;
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) = 0;
+	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) = 0;
 
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow)  = 0;
-	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const = 0;
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) = 0;
 	
 	virtual void Serialize(char* const textOut) const;
 
@@ -309,7 +310,7 @@ class dCILInstr
 
 	protected:
 	dCILInstr();
-	virtual void AddKilledStatementLow(const dArg& arg, const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+	virtual void AddKilledStatementLow(const dArg& arg, const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
 	dCIL* m_cil;
 	dList<dCILInstr*>::dListNode* m_myNode;
@@ -338,7 +339,7 @@ class dCILSingleArgInstr: public dCILInstr
 	}
 
 	virtual bool DeadElimination (dDataFlowGraph& dataFlow);
-	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 	const dArg& GetArg0 () const 
 	{
 		return m_arg0;
@@ -359,11 +360,11 @@ class dCILTwoArgInstr: public dCILSingleArgInstr
 	}
 
 	virtual bool ApplySemanticReordering () = 0;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
+	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
 
-	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	const dArg& GetArg1 () const 
 	{
@@ -405,10 +406,10 @@ class dCILThreeArgInstr: public dCILTwoArgInstr
 	}
 
 	virtual bool ApplySemanticReordering () = 0;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const = 0;
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const = 0;
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
-	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
+	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
 	dArg m_arg2;
 };

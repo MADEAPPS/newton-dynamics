@@ -139,6 +139,12 @@ bool dCILInstrConditional::IsBasicBlockEnd() const
 	return true;
 }
 
+void dCILInstrConditional::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
+{
+	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
+	node->GetInfo().Append(m_myNode);
+}
+
 void dCILInstrConditional::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
 	dAssert (m_arg0.GetType().m_intrinsicType == m_int);
@@ -150,9 +156,9 @@ void dCILInstrConditional::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatP
 //	}
 }
 
-void dCILInstrConditional::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+void dCILInstrConditional::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
-	dCILSingleArgInstr::AsignRegisterName(interferenceGraph);
+	dCILSingleArgInstr::AssignRegisterName(interferenceGraph);
 }
 
 
@@ -188,14 +194,38 @@ dCILInstrReturn* dCILInstrReturn::GetAsReturn()
 	return this;
 }
 
+void dCILInstrReturn::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
+{
+	dAssert (!m_arg0.GetType().m_isPointer);
+	switch (m_arg0.GetType().m_intrinsicType) 
+	{
+		case m_int:
+		{
+			dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
+			node->GetInfo().Append(m_myNode);
+			break;
+		}
+
+		case m_void:
+		case m_constInt:
+			break;
+
+		default:
+			dAssert(0);
+		}
+
+}
+
 void dCILInstrReturn::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
+	dAssert (!m_arg0.GetType().m_isPointer);
 	switch (m_arg0.GetType().m_intrinsicType)
 	{
 		case m_int:
-			//point.m_usedVariableSet.Insert(m_returnVariableName);
+		{
 			datFloatPoint.m_usedVariableSet.Insert(m_arg0.m_label);
 			break;
+		}
 
 		case m_void:
 		case m_constInt:
@@ -206,12 +236,12 @@ void dCILInstrReturn::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint)
 	}
 }
 
-void dCILInstrReturn::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+void dCILInstrReturn::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
 	switch (m_arg0.GetType().m_intrinsicType)
 	{
 		case m_int:
-			dCILSingleArgInstr::AsignRegisterName(interferenceGraph);
+			dCILSingleArgInstr::AssignRegisterName(interferenceGraph);
 		break;
 
 		case m_void:
@@ -311,6 +341,15 @@ void dCILInstrCall::Serialize(char* const textOut) const
 }
 
 
+void dCILInstrCall::AddUsedVariable (dInstructionVariableDictionary& dictionary) const
+{
+	for (dList<dArg>::dListNode* node = m_parameters.GetFirst(); node; node = node->GetNext()) {
+		const dArg& arg = node->GetInfo();
+		dInstructionVariableDictionary::dTreeNode* const node0 = dictionary.Insert(arg.m_label);
+		node0->GetInfo().Append(m_myNode);
+	}
+}
+
 void dCILInstrCall::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
 	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
@@ -324,16 +363,16 @@ void dCILInstrCall::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) c
 }
 
 
-void dCILInstrCall::AddDefinedVariable (dDefinedVariableDictionary& dictionary) const 
+void dCILInstrCall::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const 
 {
 	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
-		dDefinedVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
+		dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
 		node->GetInfo().Append (m_myNode);
 	}
 }
 
 
-void dCILInstrCall::AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
+void dCILInstrCall::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
 { 
 	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
 		dCILInstr::AddKilledStatementLow (m_arg0, dictionary, datFloatPoint);
@@ -345,7 +384,7 @@ void dCILInstrCall::AddKilledStatements(const dDefinedVariableDictionary& dictio
 	}
 }
 
-void dCILInstrCall::AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
+void dCILInstrCall::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
 	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
 		m_arg0.m_label = interferenceGraph.GetRegisterName(m_arg0.m_label);

@@ -29,12 +29,13 @@ class dCILInstrEnter: public dCILInstr
 
 	virtual bool ApplySemanticReordering() { return false; }
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const {}
-	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const {}
-	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
-	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {dAssert (0);}
+	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const {}
+	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 	virtual dCILInstrEnter* GetAsEnter() { return this; }
 
 	int m_registerMask;
@@ -51,12 +52,13 @@ class dCILInstrLeave : public dCILInstr
 
 	virtual bool ApplySemanticReordering() { return false; }
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const {}
-	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const {}
-	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
-	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {dAssert (0);}
+	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const {}
+	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
 	virtual dCILInstrLeave* GetAsLeave() { return this; }
 
@@ -73,16 +75,17 @@ class dCILInstrNop: public dCILInstr
 	dCILInstrNop(dCIL& program);
 	virtual bool ApplySemanticReordering () { return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {}
-	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
-	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {}
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {}
+	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
 	void Serialize(char* const textOut) const;
 
 	virtual int GetByteCodeSize() const { return 0; }
 	virtual dCILInstrNop* GetAsNop() { return this; }
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
 
 	dString m_comment;
@@ -104,14 +107,15 @@ class dCILInstrFunction: public dCILInstr
 
 	virtual bool ApplySemanticReordering () {return false;} 
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const {dAssert (0);}
-	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {dAssert (0);}
-	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {dAssert (0);}
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const {dAssert (0);}
+	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {dAssert (0);}
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
 
 	virtual int GetByteCodeSize() const { return 0; }
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 	
 	dArg m_name;
 	dList<dArg> m_parameters;
@@ -127,15 +131,16 @@ class dCILInstrFunctionEnd : public dCILInstr
 
 	virtual bool ApplySemanticReordering() { return false; }
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const {}
-	virtual void AddDefinedVariable(dDefinedVariableDictionary& dictionary) const {}
-	virtual void AddKilledStatements(const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
-	virtual void AsignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const {dAssert (0);}
+	virtual void AddDefinedVariable(dInstructionVariableDictionary& dictionary) const {}
+	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) {};
 
 	virtual int GetByteCodeSize() const { return 0; }
 	virtual dCILInstrFunctionEnd* GetAsFunctionEnd() { return this; }
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
 	dCILInstrFunction* m_function;
 };

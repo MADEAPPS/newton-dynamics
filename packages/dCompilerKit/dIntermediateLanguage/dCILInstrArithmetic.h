@@ -46,11 +46,13 @@ class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 
 	virtual bool ApplySemanticReordering ();
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const;
-	virtual void AddDefinedVariable (dDefinedVariableDictionary& dictionary) const;
-	virtual void AddKilledStatements (const dDefinedVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+
+	virtual void AddUsedVariable (dInstructionVariableDictionary& dictionary) const;
+	virtual void AddDefinedVariable (dInstructionVariableDictionary& dictionary) const;
+	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow);
-	virtual bool ApplyCopyPropagation(dCILInstrMove* const moveInst, dDataFlowGraph& dataFlow) const { dAssert(0);  return false; }
+	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst);
 	dOperator m_operator;
 };
 

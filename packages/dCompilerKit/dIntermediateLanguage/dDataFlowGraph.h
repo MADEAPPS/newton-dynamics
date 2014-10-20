@@ -78,7 +78,6 @@ class dDataFlowPoint
 			}
 		}
 
-
 		void Union (const dVariableSet& or)
 		{
 			Iterator iter (or);
@@ -137,10 +136,10 @@ class dDataFlowPoint
 	dVariableSet<dCIL::dListNode*> m_reachStmtOutputSet;
 };
 
-class dDefinedVariableDictionary: public dTree<dList<dCIL::dListNode*>, dString>
+class dInstructionVariableDictionary: public dTree<dList<dCIL::dListNode*>, dString>
 {
 	public:
-	dDefinedVariableDictionary ()
+	dInstructionVariableDictionary ()
 		:dTree<dList<dCIL::dListNode*>, dString>()
 	{
 	}
@@ -205,8 +204,6 @@ class dDataFlowGraph
 	};
 
 
-
-//	dDataFlowGraph(dCIL* const cil, dCIL::dListNode* const function, dCIL::dReturnType returnType);
 	dDataFlowGraph(dCIL* const cil, dCIL::dListNode* const function);
 	virtual ~dDataFlowGraph(void);
 
@@ -240,24 +237,25 @@ class dDataFlowGraph
 	bool RemoveRedundantJumps ();
 	void FindNodesInPathway(dCIL::dListNode* const source, dCIL::dListNode* const destination, dTree<int, dCIL::dListNode*>& pathOut) const;
 
-	bool DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const;
+	//bool DoStatementAreachesStatementB(dCIL::dListNode* const stmtNodeB, dCIL::dListNode* const stmtNodeA) const;
+	bool DoMoveReachInstruction(dCIL::dListNode* const stmtNodeB, dCILInstrMove* const move) const;
 	int EvaluateBinaryExpression (const dString& arg1, dCILThreeArgInstr::dOperator operation, const dString& arg2) const;
 
 	void GetLoops (dList<dLoop>& loops) const;
 	bool CheckBackEdgePreReachInLoop(dCIL::dListNode* const stmt, const dLoop& loop) const;
 	bool IsStatementInReachList(dCIL::dListNode* const node, dList<dCIL::dListNode*>& definitionList, dCIL::dListNode* const me) const;
 
+	void TraceReachIn (dCIL::dListNode* const node) const;
+	void TraceReachOutput (dCIL::dListNode* const node) const;
+
 	mutable int m_mark;
-//	int m_savedRegistersMask;
 	dCIL* m_cil;
-//	dCIL::dReturnType m_returnType;
-//	dString m_returnVariableName;
 	dCIL::dListNode* m_function;
 	dBasicBlocksList m_basicBlocks; 
-//	dTree<int , dString> m_returnVariables;
 	dList<dBasicBlock*> m_traversalBlocksOrder; 
+	dInstructionVariableDictionary m_variableUsed;
+	dInstructionVariableDictionary m_variableDefinitions;
 	dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
-	dDefinedVariableDictionary m_variableDefinitions;
 
 	friend dCILInstrMove;
 	friend dCILSingleArgInstr;
