@@ -638,7 +638,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 				if (i0 == 0){
 					i0 = box.m_vertexCount / 2;
 				}
-				if (i0 == (box.m_vertexCount - 1)){
+				if (i0 >= (box.m_vertexCount - 1)){
 					i0 = box.m_vertexCount / 2;
 				}
 
