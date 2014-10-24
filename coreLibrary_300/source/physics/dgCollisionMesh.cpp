@@ -110,17 +110,16 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			const dgCollision* const collision = m_objCollision->GetChildShape();
 			m_invScale = m_objCollision->GetScale().CompProduct4(m_polySoupCollision->GetInvScale()); 
 			m_scale = m_objCollision->GetInvScale().CompProduct4(m_polySoupCollision->GetScale()); 
-			//m_posit += matrix.RotateVector (collision->GetObbOrigin().CompProduct4(m_objCollision->GetScale()));
-			//m_size = collision->GetObbSize().CompProduct4(m_objCollision->GetScale()) + dgCollisionInstance::m_padding;
-			m_posit += matrix.RotateVector (collision->GetObbOrigin().CompProduct4(m_invScale));
 
-			dgVector shift (m_invScale.ShiftTripleRight());
-			dgVector maxScale ((m_invScale.GetMax (shift)).GetMax(shift.ShiftTripleRight()));
-			m_size = collision->GetObbSize().CompProduct4(m_invScale) + dgCollisionInstance::m_padding;
+			dgMatrix obbScaledMatrix (scaleMatrix * matrix.Inverse());
+			dgVector obbP0;
+			dgVector obbP1;
+			m_objCollision->CalcAABB (obbScaledMatrix, obbP0, obbP1);
+			m_size = (obbP1 - obbP0).CompProduct4(dgVector::m_half);
+			m_posit += matrix.RotateVector ((obbP1 + obbP0).CompProduct4(dgVector::m_half));
 			break;
 		}
-
-
+		
 
 		default:
 		{
