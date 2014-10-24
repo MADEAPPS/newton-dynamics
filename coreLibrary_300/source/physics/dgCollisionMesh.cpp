@@ -66,10 +66,7 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			matrix = proxy.m_matrix;
 			SetTransposeAbsMatrix (matrix);
 
-			m_scale = dgVector (dgFloat32 (1.0f));
-			m_invScale = dgVector (dgFloat32 (1.0f));
 			const dgCollision* const collision = m_objCollision->GetChildShape();
-
 			m_objCollision->CalcAABB (*this, m_p0, m_p1);
 			m_posit += matrix.RotateVector (collision->GetObbOrigin());
 			m_size = collision->GetObbSize() + dgCollisionInstance::m_padding;
@@ -87,12 +84,10 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			dgMatrix scaleMatrix (meshInvScale.CompProduct4(m_front), meshInvScale.CompProduct4(m_up), meshInvScale.CompProduct4(m_right), m_posit);
 			m_objCollision->CalcAABB (scaleMatrix, m_p0, m_p1);
 
-			m_invScale = m_objCollision->GetScale().CompProduct4(m_polySoupCollision->GetInvScale()); 
-			m_scale = m_objCollision->GetInvScale().CompProduct4(m_polySoupCollision->GetScale()); 
-
+			dgVector scale (m_objCollision->GetScale().CompProduct4(m_polySoupCollision->GetInvScale())); 
 			const dgCollision* const collision = m_objCollision->GetChildShape();
-			m_posit += matrix.RotateVector (collision->GetObbOrigin().CompProduct4(m_invScale));
-			m_size = collision->GetObbSize().CompProduct4(m_invScale) + dgCollisionInstance::m_padding;
+			m_posit += matrix.RotateVector (collision->GetObbOrigin().CompProduct4(scale));
+			m_size = collision->GetObbSize().CompProduct4(scale) + dgCollisionInstance::m_padding;
 			break;
 		}
 
@@ -108,8 +103,12 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			m_objCollision->CalcAABB (scaleMatrix, m_p0, m_p1);
 
 			const dgCollision* const collision = m_objCollision->GetChildShape();
-			m_invScale = m_objCollision->GetScale().CompProduct4(m_polySoupCollision->GetInvScale()); 
-			m_scale = m_objCollision->GetInvScale().CompProduct4(m_polySoupCollision->GetScale()); 
+
+			// this is a mistake because calcAABB does eh scaling already
+			//const dgVector& objScale = m_objCollision->GetScale();
+			//scaleMatrix[0] = scaleMatrix[0].Scale4(objScale[0]);
+			//scaleMatrix[1] = scaleMatrix[1].Scale4(objScale[1]);
+			//scaleMatrix[2] = scaleMatrix[2].Scale4(objScale[2]);
 
 			dgMatrix obbScaledMatrix (scaleMatrix * matrix.Inverse());
 			dgVector obbP0;

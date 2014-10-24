@@ -248,15 +248,11 @@ class dgFastAABBInfo: public dgObb
 	DG_INLINE dgFastAABBInfo()
 		:dgObb()
 		,m_absDir(dgGetIdentityMatrix())
-		,m_scale (dgFloat32 (1.0f))
-		,m_invScale (dgFloat32 (1.0f))
 	{
 	}
 
 	DG_INLINE dgFastAABBInfo(const dgMatrix& matrix, const dgVector& size)
 		:dgObb(matrix, size)
-		,m_scale (dgFloat32 (1.0f))
-		,m_invScale (dgFloat32 (1.0f))
 	{
 		SetTransposeAbsMatrix (matrix);
 		dgVector size1 (matrix[0].Abs().Scale4(size.m_x) + matrix[1].Abs().Scale4(size.m_y) + matrix[2].Abs().Scale4(size.m_z));
@@ -267,8 +263,6 @@ class dgFastAABBInfo: public dgObb
 	DG_INLINE dgFastAABBInfo(const dgVector& p0, const dgVector& p1)
 		:dgObb(dgGetIdentityMatrix(), (p1 - p0).CompProduct4(dgVector::m_half))
 		,m_absDir(dgGetIdentityMatrix())
-		,m_scale (dgFloat32 (1.0f))
-		,m_invScale (dgFloat32 (1.0f))
 		,m_p0(p0)
 		,m_p1(p1)
 	{
@@ -376,8 +370,6 @@ class dgFastAABBInfo: public dgObb
 
 	protected:
 	dgMatrix m_absDir;
-	dgVector m_scale;
-	dgVector m_invScale;
 	dgVector m_p0;
 	dgVector m_p1;
 
