@@ -97,16 +97,12 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix)
 
 
 dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, const dgVector& localOrigin, const dgVector& localSize)
-//	:m_matrix (matrix), m_localP0(p0), m_localP1(p1)
 	:m_matrix (matrix)
 	,m_origin(localOrigin)
 	,m_size(localSize)
 	,m_localP0 (localOrigin - localSize)
 	,m_localP1 (localOrigin + localSize)
 {
-//	m_size = (m_localP1 - m_localP0).CompProduct4 (dgVector::m_half);
-//	m_origin = (m_localP1 + m_localP0).CompProduct4 (dgVector::m_half);
-
 	m_absMatrix[0] = m_matrix[0].Abs();
 	m_absMatrix[1] = m_matrix[1].Abs();
 	m_absMatrix[2] = m_matrix[2].Abs();
@@ -133,10 +129,6 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 		for (dgInt32 j = 0; j < 3; j ++) {
 			const dgVector& axis = m_crossAxis[index];
 			dgAssert (axis.m_w == dgFloat32 (0.0f));
-
-//			dgFloat32 d = m_size.m_x * dgAbsf (axis % m_matrix[0]) + m_size.m_y * dgAbsf (axis % m_matrix[1]) + m_size.m_z * dgAbsf (axis % m_matrix[2]) + dgFloat32 (1.0e-3f); 
-//			dgFloat32 c = origin % axis;
-//			extends[index] = dgVector (c - d, c + d, dgFloat32 (0.0f), dgFloat32 (0.0f));
 			dgVector tmp (m_matrix.UnrotateVector(axis));
 			dgVector d (m_size.DotProduct4(tmp.Abs()) + m_padding);
 			dgVector c (origin.DotProduct4(axis));
@@ -1861,10 +1853,11 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 		dgVector size (data.m_absMatrix.UnrotateVector(me->m_size));
 		dgVector p0 (origin - size);
 		dgVector p1 (origin + size);
-
 		terrainCollision->GetLocalAABB (p0, p1, nodeProxi.m_p0, nodeProxi.m_p1);
-		nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).Scale3 (dgFloat32 (0.5f));
-		nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).Scale3 (dgFloat32 (0.5f));
+		//nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).Scale3 (dgFloat32 (0.5f));
+		//nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).Scale3 (dgFloat32 (0.5f));
+		nodeProxi.m_size = (nodeProxi.m_p1 - nodeProxi.m_p0).CompProduct4(dgVector::m_half);
+		nodeProxi.m_origin = (nodeProxi.m_p1 + nodeProxi.m_p0).CompProduct4(dgVector::m_half);
 
 		if (me->BoxTest (data, &nodeProxi)) {
 			if (me->m_type == m_leaf) {
@@ -2758,7 +2751,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgCollidi
 		nodeProxi.m_size = p1 - p0;
 		nodeProxi.m_origin = p1 + p0;
 		nodeProxi.m_area = nodeProxi.m_size.ShiftTripleRight().DotProduct4(nodeProxi.m_size).GetScalar();
-
 
 		dgFloat32 dist = me->RayBoxDistance (data, myCompoundRay, otherTreedRay, &nodeProxi);
 //		if (me->BoxTest (data, &nodeProxi)) {
