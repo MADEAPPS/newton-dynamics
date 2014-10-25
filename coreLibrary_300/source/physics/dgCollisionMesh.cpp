@@ -77,10 +77,12 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 		{
 			dgMatrix& matrix = *this;
 			matrix = proxy.m_matrix;
-			matrix.m_posit = matrix.m_posit.CompProduct4(m_polySoupCollision->GetInvScale()) | dgVector::m_wOne;
-			SetTransposeAbsMatrix (matrix);
-			
+
 			const dgVector& meshInvScale = m_polySoupCollision->GetInvScale();
+
+			matrix.m_posit = matrix.m_posit.CompProduct4(meshInvScale) | dgVector::m_wOne;
+			SetTransposeAbsMatrix (matrix);
+
 			dgMatrix scaleMatrix (meshInvScale.CompProduct4(m_front), meshInvScale.CompProduct4(m_up), meshInvScale.CompProduct4(m_right), m_posit);
 			m_objCollision->CalcAABB (scaleMatrix, m_p0, m_p1);
 
@@ -95,20 +97,15 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 		{
 			dgMatrix& matrix = *this;
 			matrix = proxy.m_matrix;
-			matrix.m_posit = matrix.m_posit.CompProduct4(m_polySoupCollision->GetInvScale()) | dgVector::m_wOne;
-			SetTransposeAbsMatrix (matrix);
-
 			const dgVector& meshInvScale = m_polySoupCollision->GetInvScale();
+
+			matrix.m_posit = matrix.m_posit.CompProduct4(meshInvScale) | dgVector::m_wOne;
+			SetTransposeAbsMatrix (matrix);
+			
 			dgMatrix scaleMatrix (meshInvScale.CompProduct4(m_front), meshInvScale.CompProduct4(m_up), meshInvScale.CompProduct4(m_right), m_posit);
 			m_objCollision->CalcAABB (scaleMatrix, m_p0, m_p1);
 
 			const dgCollision* const collision = m_objCollision->GetChildShape();
-
-			// this is a mistake because calcAABB does eh scaling already
-			//const dgVector& objScale = m_objCollision->GetScale();
-			//scaleMatrix[0] = scaleMatrix[0].Scale4(objScale[0]);
-			//scaleMatrix[1] = scaleMatrix[1].Scale4(objScale[1]);
-			//scaleMatrix[2] = scaleMatrix[2].Scale4(objScale[2]);
 
 			dgMatrix obbScaledMatrix (scaleMatrix * matrix.Inverse());
 			dgVector obbP0;
@@ -118,7 +115,6 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			m_posit += matrix.RotateVector ((obbP1 + obbP0).CompProduct4(dgVector::m_half));
 			break;
 		}
-		
 
 		default:
 		{

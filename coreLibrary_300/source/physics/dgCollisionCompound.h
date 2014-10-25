@@ -121,14 +121,9 @@ class dgCollisionCompound: public dgCollision
 	class dgNodePairs
 	{
 		public:
-		dgVector m_treeNodeP0;
-		dgVector m_treeNodeP1;
-		dgVector m_treeNodeSize;
-		dgVector m_treeNodeOrigin;
-		dgInt32 m_treeNodeIsLeaf;
-		dgFloat32 m_treeNodeArea;
 		const void* m_treeNode;
 		dgNodeBase* m_myNode;
+		dgInt32 m_treeNodeIsLeaf;
 	};
 
 
@@ -218,7 +213,6 @@ class dgCollisionCompound: public dgCollision
 
 	dgFloat64 CalculateEntropy (dgList<dgNodeBase*>& list);
 
-	void CalculateCollisionTreeArea(dgNodePairs& pairOut, const dgCollisionBVH* const collisionTree, const void* const treeNode) const;
 	void ImproveNodeFitness (dgNodeBase* const node) const;
 	dgFloat32 CalculateSurfaceArea (dgNodeBase* const node0, dgNodeBase* const node1, dgVector& minBox, dgVector& maxBox) const;
 
