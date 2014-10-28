@@ -299,13 +299,16 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		dgVector dp (p1 - p0);
 		dgVector v;
 
-		dgFloat32 mag2 = dp % dp;
+		dgAssert (dp.m_w == dgFloat32 (0.0f));
+		dgFloat32 mag2 = dp.DotProduct4(dp).GetScalar();
 		if (mag2 < dgFloat32 (1.0e-24f)) {
 			v = p0;
 			indexOut = 1;
 		} else {
-			dgFloat32 alpha0 = - (p0 % dp) / mag2;
-			if (alpha0 > dgFloat32 (1.0f)) {
+			//dgFloat32 alpha0 = - (p0 % dp) / mag2;
+			//if (alpha0 > dgFloat32 (1.0f)) {
+			dgFloat32 alpha0 = - p0.DotProduct4(dp).GetScalar();
+			if (alpha0 > mag2) {
 				v = p1;
 				indexOut = 1;
 				lineSum[0] = lineSum[1];
@@ -315,7 +318,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 				v = p0;
 				indexOut = 1;
 			} else {
-				v = p0 + dp.Scale3 (alpha0);
+				v = p0 + dp.Scale4 (alpha0 / mag2);
 			}
 		}
 		return v;
@@ -333,8 +336,10 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 			v = p0;
 			indexOut = 1;
 		} else {
-			dgFloat64 alpha0 = - (p0 % dp) / mag2;
-			if (alpha0 > dgFloat32 (1.0f)) {
+			//dgFloat64 alpha0 = - (p0 % dp) / mag2;
+			//if (alpha0 > dgFloat32 (1.0f)) {
+			dgFloat64 alpha0 = - (p0 % dp);
+			if (alpha0 > mag2) {
 				v = p1;
 				indexOut = 1;
 				lineSum[0] = lineSum[1];
@@ -344,7 +349,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 				v = p0;
 				indexOut = 1;
 			} else {
-				v = p0 + dp.Scale3 (alpha0);
+				v = p0 + dp.Scale4 (alpha0 / mag2);
 			}
 		}
 		return v;
@@ -373,20 +378,27 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		dgVector e10 (triangleDiff[1] - triangleDiff[0]);
 		dgVector e20 (triangleDiff[2] - triangleDiff[0]);
 		dgVector normal (e10 * e20);
-		if ((normal % normal) > dgFloat32 (1.0e-14f)) {
+		dgAssert (normal.m_w == dgFloat32 (0.0f));
+		//if ((normal % normal) > dgFloat32 (1.0e-14f)) {
+		if (normal.DotProduct4(normal).GetScalar() > dgFloat32 (1.0e-14f)) {
 			dgInt32 i0 = 2;
 			dgInt32 minIndex = -1;
 			for (dgInt32 i1 = 0; i1 < 3; i1 ++) {
 				const dgVector& p1p0 = triangleDiff[i0];
 				const dgVector& p2p0 = triangleDiff[i1];
 
-				dgFloat32 volume = (p1p0 * p2p0) % normal;
+				//dgFloat32 volume = (p1p0 * p2p0) % normal;
+				dgFloat32 volume = normal.DotProduct4 (p1p0 * p2p0).GetScalar();
 				if (volume < dgFloat32 (0.0f)) {
 					dgVector segment (triangleDiff[i1] - triangleDiff[i0]);
-					dgVector poinP0 (triangleDiff[i0].Scale3 (dgFloat32 (-1.0f)));
-					dgFloat32 den = segment % segment;
+					dgAssert (segment.m_w == dgFloat32 (0.0f));
+					//dgVector poinP0 (triangleDiff[i0].Scale3 (dgFloat32 (-1.0f)));
+					dgVector poinP0 (triangleDiff[i0].CompProduct4 (dgVector::m_negOne));
+					//dgFloat32 den = segment % segment;
+					dgFloat32 den = segment.DotProduct4(segment).GetScalar();
 					dgAssert (den > dgFloat32 (0.0f));
-					dgFloat32 num = poinP0 % segment;
+					//dgFloat32 num = poinP0 % segment;
+					dgFloat32 num = poinP0.DotProduct4(segment).GetScalar();
 					if (num < dgFloat32 (0.0f)) {
 						minIndex = i0;
 					} else if (num > den){
@@ -407,7 +419,8 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 						i1 = shapeFaceIndex[i1];
 						shapeFaceIndex[0] = i0;
 						shapeFaceIndex[1] = i1;
-						return triangleDiff[0] + segment.Scale3 (num / den);
+						//return triangleDiff[0] + segment.Scale3 (num / den);
+						return triangleDiff[0] + segment.Scale4 (num / den);
 					}
 				}
 				i0 = i1;
@@ -420,7 +433,8 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 				return triangleDiff[0];
 			} else {
 				indexOut = 3;
-				return normal.Scale3((normal % triangleDiff[0]) / (normal % normal));
+				//return normal.Scale3((normal % triangleDiff[0]) / (normal % normal));
+				return normal.Scale4(normal.DotProduct4(triangleDiff[0]).GetScalar() / normal.DotProduct4(normal).GetScalar());
 			}
 		} else {
 			indexOut = 2;
@@ -517,7 +531,9 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		dgVector p20 (p2 - p0);
 		dgVector p30 (p3 - p0);
 		dgVector n (p10 * p20);
-		dgFloat32 volume = p30 % n;
+		dgAssert (n.m_w == dgFloat32 (0.0f));
+		//dgFloat32 volume = p30 % n;
+		dgFloat32 volume = n.DotProduct4 (p30).GetScalar();
 		if (volume < dgFloat32 (0.0f)) {
 			volume = -volume;
 			dgSwap (tetraSum[i2], tetraSum[i3]);
@@ -525,7 +541,7 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 			dgSwap (shapeFaceIndex[i2], shapeFaceIndex[i3]);
 		}
 		if (volume < dgFloat32 (1.0e-8f)) {
-			dgTrace (("very import to finsh this\n"));
+			dgTrace (("very import to finish this\n"));
 			//		dgAssert (0);
 		}
 
@@ -544,14 +560,21 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 			dgVector p10 (p1 - p0);
 			dgVector p20 (p2 - p0);
 			dgVector normal (p10 * p20);
+			dgAssert (normal.m_w == dgFloat32 (0.0f));
 
-			dgFloat32 area = normal % normal;
-			dgAssert (dgAbsf (area) > dgFloat32 (0.0f));
-			normal = normal.Scale3 (dgRsqrt (area));
-			dgFloat32 dist = normal % (origin - p0);
-			if (dist <= minDist) {
-				minDist = dist;
-				faceIndex = i;
+			//dgFloat32 area = normal % normal;
+			//dgAssert (dgAbsf (area) > dgFloat32 (0.0f));
+			//normal = normal.Scale3 (dgRsqrt (area));
+			dgVector normalDot4 (normal.DotProduct4(normal));
+			dgAssert (normalDot4.GetScalar() > dgFloat32 (0.0f));
+			if (normalDot4.GetScalar() > dgFloat32 (1.0e-24f)) {
+				normal = normal.CompProduct4(normalDot4.InvSqrt());
+				//dgFloat32 dist = normal % (origin - p0);
+				dgFloat32 dist = normal.DotProduct4(origin - p0).GetScalar();
+				if (dist <= minDist) {
+					minDist = dist;
+					faceIndex = i;
+				}
 			}
 		}
 
