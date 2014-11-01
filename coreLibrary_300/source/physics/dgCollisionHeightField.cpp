@@ -962,9 +962,9 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 		dgInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
 		dgInt32 faceSize = dgInt32 (m_horizontalScale * dgFloat32 (2.0f)); 
 
-		for (dgInt32 z = z0; z < z1; z ++) {
+		for (dgInt32 z = z0; (z < z1) && (faceCount < DG_MAX_COLLIDING_FACES); z ++) {
 			dgInt32 zStep = z * m_width;
-			for (dgInt32 x = x0; x < x1; x ++) {
+			for (dgInt32 x = x0; (x < x1) && (faceCount < DG_MAX_COLLIDING_FACES); x ++) {
 				const dgInt32* const indirectIndex = &m_cellIndices[dgInt32 (m_diagonals[zStep + x])][0];
 
 				dgInt32 vIndex[4];
