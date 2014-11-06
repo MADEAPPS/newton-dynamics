@@ -56,15 +56,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	source.LoadFile(sourceFile);
 	fclose (sourceFile);
 
-
-
-
-
 	const char* const packacgeName = "demos";
 	dScriptCompiler compiler(packacgeName);
 	compiler.CompileSource (source.GetStr());
-
-	llvm::llvm_shutdown();
 	return 0;
 }
 

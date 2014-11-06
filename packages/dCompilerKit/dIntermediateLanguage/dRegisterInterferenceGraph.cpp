@@ -24,14 +24,16 @@
 
 dRegisterInterferenceGraph::dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount)
 	:dTree<dRegisterInterferenceNode, dString>()
-	,m_spillPenalty()
-	,m_coalescedNodes()
-	,m_flowGraph(flowGraph)
-	,m_spillCount(0)
-	,m_registerCount(registerCount)
-	,m_spillPenatryFactor(0)
+//	,m_spillPenalty()
+//	,m_coalescedNodes()
+//	,m_flowGraph(flowGraph)
+//	,m_spillCount(0)
+//	,m_registerCount(registerCount)
+//	,m_spillPenatryFactor(0)
 {
-	m_flowGraph->ApplyInstructionSematicOrdering();
+	dAssert (0);
+/*
+	m_flowGraph->ApplySemanticInstructionReordering();
 	m_flowGraph->BuildBasicBlockGraph();
 
 	m_flowGraph->CalculateLiveInputLiveOutput();
@@ -80,8 +82,10 @@ dAssert (0);
 
 	InsertEpilogAndProlog();
 m_flowGraph->m_cil->Trace();
+*/
 }
 
+#if 0
 void dRegisterInterferenceGraph::AllocateRegisters ()
 {
 	for (dCIL::dListNode* node = m_flowGraph->m_basicBlocks.m_begin; node != m_flowGraph->m_basicBlocks.m_end; node = node->GetNext()) {
@@ -992,3 +996,5 @@ void dRegisterInterferenceGraph::InsertEpilogAndProlog()
 //		m_flowGraph->m_cil->Trace();
 	}
 }
+
+#endif

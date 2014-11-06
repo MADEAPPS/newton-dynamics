@@ -32,16 +32,6 @@ class dDAGScopeBlockNode;
 class dDAG
 {
 	public:
-	class dLLVMSymbols: public dTree <llvm::Value*, dString>
-	{
-		public:
-		dLLVMSymbols ()
-			:dTree <llvm::Value*, dString>()
-		{
-		}
-	};
-
-
 	dDAG(dList<dDAG*>& allNodes);
 	virtual ~dDAG(void);
 	
@@ -57,7 +47,6 @@ class dDAG
 	dCILInstr::dArg LoadLocalVariable (dCIL& cil, const dCILInstr::dArg& arg) const;
 	
 	dString m_name;
-//	dCILInstr::dArg m_result;
 	dCILInstr::dArg m_result;
 	dDAG* m_next;
 	dDAG* m_parent;
@@ -67,7 +56,6 @@ class dDAG
 	static dString m_prototypeSeparator;
 
 	dDAGRttiRootClassSupportDeclare(dDAG);
-	
 };
 
 

@@ -112,10 +112,6 @@ class dScriptCompiler: public dLittleScriptParser
 	dUserVariable NewSwitchStatement(const dUserVariable& expression, const dUserVariable& caseStatementList);
 	dUserVariable NewForStatement(const dUserVariable& init_exp, const dUserVariable& conditional, const dUserVariable& step_Exp, const dUserVariable& statement);
 
-
-	void CreateLLVMTargetMachine (llvm::Module* const module);
-
-
 	dString m_packageFileName;
 	dString m_packageRootDirectory;
 	dScriptPackage* m_currentPackage;
@@ -123,11 +119,7 @@ class dScriptCompiler: public dLittleScriptParser
 	dList<dDAGClassNode*> m_classList;
 	dList<dDAGScopeBlockNode*> m_scopeStack;
 	dList<dDAG*> m_allNodes;
-
-	llvm::LLVMContext m_context;
-	std::unique_ptr<llvm::Module> m_module;
-
-
+	
 	friend class dLittleScriptParser;
 };
 

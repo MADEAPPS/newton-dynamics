@@ -12,158 +12,14 @@
 #ifndef  _DCIL_INSTRUC_H_
 #define  _DCIL_INSTRUC_H_
 
-/*
-class dThreeAdressStmt
-{
-	public:
-	enum dIntrisicType
-	{
-		m_void,
-		m_bool,
-		m_byte,
-		m_short,
-		m_int,
-		m_long,
-		m_float,
-		m_double,
-		m_classPointer,
-		m_constInt,
-		m_constFloat,
-	};
-
-	struct dMapTable 
-	{
-		dIntrisicType m_intrinsicType;
-		dString m_name;
-	};
-
-	class dArgType
-	{
-		public:
-		dArgType ()
-			:m_intrinsicType(m_int)
-			,m_isPointer(false)
-		{
-			dAssert (0);
-		}
-
-		dArgType (dIntrisicType intrinsicType)
-			:m_intrinsicType(intrinsicType)
-			,m_isPointer(false)
-		{
-			dAssert (0);
-		}
-
-		int GetSizeInByte() const;
-
-		dString GetTypeName () const;
-		void SetType (const dArgType& type);
-
-		dIntrisicType m_intrinsicType;
-		bool m_isPointer;
-	};
-
-	class dArg: public dArgType
-	{
-		public:
-		dArg ()
-			:dArgType()
-			,m_label("")
-		{
-			dAssert (0);
-		}
-
-		const dArgType& GetType () const
-		{
-			return *this;
-		}
-
-		void SetType (const dArgType& type);
-		void SetType (dIntrisicType intrinsicType, bool pointer);
-
-		dString m_label;
-	};
-
-
-	enum dOperator
-	{
-		m_nothing,
-		m_add,
-		m_sub,
-		m_mul,
-		m_div,
-		m_mod,
-		m_equal,
-		m_identical,
-		m_different,
-		m_less,
-		m_lessEqual,
-		m_greather,
-		m_greatherEqual,
-		m_operatorsCount,
-	};
-
-	enum dInstruction
-	{
-		m_nop,
-		m_call,
-        m_ret,
-		
-		m_function,
-		m_assigment,
-
-		m_if, 
-		m_ifnot, 
-		m_goto,
-		m_label,
-
-		m_new,
-		m_release,
-        m_reference,
-
-		m_argument,
-		m_load,
-		m_store,
-
-		m_local,
-		m_param,
-		m_loadBase,
-		m_storeBase,
-
-		m_phi,
-	};
-	dThreeAdressStmt(void);
-	~dThreeAdressStmt(void);
-
-	dInstruction m_instruction;
-	dOperator m_operator;
-	dArg m_arg0;
-	dArg m_arg1;
-	dArg m_arg2;
-	dList<dThreeAdressStmt>::dListNode* m_trueTargetJump;
-    dList<dThreeAdressStmt>::dListNode* m_falseTargetJump;
-
-	void Trace () const;
-	void Trace (char* const textOut) const;
-	void TraceAssigment (char* const textOut) const;
-//	void TraceConditional (char* const textOut) const;
-
-	
-	dString GetTypeString (const dArg& arg) const;
-//	static dString GetTypeString (const dArgType argType);
-	static dIntrisicType GetTypeID (const dString& typeName);
-
-	static dMapTable m_maptable[];
-};
-*/
-
 class dCIL;
 class dCILInstrNop;
-class dCILInstrLeave;
-class dCILInstrEnter;
+class dCILInstrPhy;
 class dCILInstrCall;
 class dCILInstrMove;
 class dCILInstrGoto;
+class dCILInstrLeave;
+class dCILInstrEnter;
 class dCILInstrLabel;
 class dCILInstrReturn;
 class dCILInstrArgument;
@@ -270,6 +126,7 @@ class dCILInstr
 	virtual dCILInstrEnter* GetAsEnter() { return NULL; }
 	virtual dCILInstrNop* GetAsNop() { return NULL; }
 	virtual dCILInstrConditional* GetAsIF() { return NULL; }
+	virtual dCILInstrPhy* GetAsPhy() { return NULL; }
 	virtual dCILInstrMove* GetAsMove() { return NULL; }
 	virtual dCILInstrCall* GetAsCall() { return NULL; }
 	virtual dCILInstrGoto* GetAsGoto() { return NULL; }
@@ -302,20 +159,32 @@ class dCILInstr
 	virtual void Serialize(char* const textOut) const;
 
 	virtual void Trace() const;
-
-	
 	void Nullify();
-
 	static dIntrisicType GetTypeID(const dString& typeName);
+
+
+
+	// ****************************
+	virtual dArg* GetGeneratedVariable () {dAssert (0); return NULL;}
+	virtual void GetUsedVariables (dList<dArg*>& variablesList) {dAssert (0);}
+
+
+	dString RemoveSSAPostfix(const dString& name) const;
+	dString MakeSSAName(const dString& name, int ssaPostfix) const;
 
 	protected:
 	dCILInstr();
+
+	
+
 	virtual void AddKilledStatementLow(const dArg& arg, const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+	
 
 	dCIL* m_cil;
 	dList<dCILInstr*>::dListNode* m_myNode;
 	int m_byteCodeOffset;
 	static dMapTable m_maptable[];
+	static dString m_ssaPosfix;
 };
 
 
@@ -344,9 +213,7 @@ class dCILSingleArgInstr: public dCILInstr
 	{
 		return m_arg0;
 	}
-
 	
-
 	dArg m_arg0;
 };
 

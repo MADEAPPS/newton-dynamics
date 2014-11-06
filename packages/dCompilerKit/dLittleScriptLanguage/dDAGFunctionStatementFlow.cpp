@@ -238,5 +238,4 @@ void dDAGFunctionStatementFlow::CompileCIL(dCIL& cil)
 	} else {
 		dAssert (0);
 	}
-
 }

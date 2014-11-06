@@ -43,7 +43,6 @@ class dRegisterInterferenceGraph;
 class dDataFlowPoint
 {
 	public:
-
 	template <class SET_TYPE>
 	class dVariableSet: public dTree<int, SET_TYPE>
 	{	
@@ -112,16 +111,21 @@ class dDataFlowPoint
 		}
 	};
 
-	void Init(dCIL::dListNode* const statementNode)
+	void Init(dCIL::dListNode* const statementNode, dBasicBlocksList::dListNode* const basicBlock)
 	{
-		m_mark = 0;
-		m_generateStmt = false;
+		//m_mark = 0;
+		//m_generateStmt = false;
+		m_basicBlockNode = basicBlock;
 		m_statement = statementNode;
 	}
-		
+	
 	dList<dDataFlowPoint*> m_successors;
 	dList<dDataFlowPoint*> m_predecessors; 
-	
+
+	dCIL::dListNode* m_statement;
+	dBasicBlocksList::dListNode* m_basicBlockNode;
+
+/*	
 	dString m_generatedVariable;
 	dVariableSet<dString> m_liveInputSet;
 	dVariableSet<dString> m_liveOutputSet;
@@ -130,12 +134,14 @@ class dDataFlowPoint
 	int m_mark;
 	bool m_generateStmt;
 		
-	dCIL::dListNode* m_statement;
+	
 	dVariableSet<dCIL::dListNode*> m_killStmtSet;
 	dVariableSet<dCIL::dListNode*> m_reachStmtInputSet;
 	dVariableSet<dCIL::dListNode*> m_reachStmtOutputSet;
+*/
 };
 
+/*
 class dInstructionVariableDictionary: public dTree<dList<dCIL::dListNode*>, dString>
 {
 	public:
@@ -144,9 +150,11 @@ class dInstructionVariableDictionary: public dTree<dList<dCIL::dListNode*>, dStr
 	{
 	}
 };
+*/
 
 class dDataFlowGraph 
 {
+/*
 	public:
 	class dLoop 
 	{
@@ -202,16 +210,31 @@ class dDataFlowGraph
 		}
 		bool m_isLoopInvariant;	
 	};
+*/
+	public:
+
+	class dTransformation
+	{
+		public: 
+		dTransformation ()
+		{
+		}
+
+		virtual ~dTransformation ()
+		{
+		}
+	};
 
 
-	dDataFlowGraph(dCIL* const cil, dCIL::dListNode* const function);
+	dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function);
 	virtual ~dDataFlowGraph(void);
 
+	void ConvertToSSA ();
+/*
 	void ApplyLocalOptimizations();
 	void RegistersAllocation (int registerCount);
-
 	private:
-	void BuildBasicBlockGraph();
+	
 
 	void CalculateReachingDefinitions();
 	void CalculateLiveInputLiveOutput();
@@ -227,7 +250,6 @@ class dDataFlowGraph
 	bool ApplyConstantFolding();
 	bool ApplyCommonSubExpresion();
 	bool ApplyConstantPropagation();
-	bool ApplyInstructionSematicOrdering();
 	bool ApplyIfStatementsSimplification();
 	bool ApplySubExpresionToCopyPropagation();
 	bool ApplyLoopOptimization(dLoop& loop);
@@ -248,18 +270,33 @@ class dDataFlowGraph
 	void TraceReachIn (dCIL::dListNode* const node) const;
 	void TraceReachOutput (dCIL::dListNode* const node) const;
 
-	mutable int m_mark;
-	dCIL* m_cil;
-	dCIL::dListNode* m_function;
-	dBasicBlocksList m_basicBlocks; 
-	dList<dBasicBlock*> m_traversalBlocksOrder; 
+	
+	
+	
+	
+	
 	dInstructionVariableDictionary m_variableUsed;
 	dInstructionVariableDictionary m_variableDefinitions;
-	dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
+	
 
 	friend dCILInstrMove;
 	friend dCILSingleArgInstr;
 	friend dRegisterInterferenceGraph;
+*/
+	private:
+	void BuildBasicBlockGraph();
+	void DeleteUnreachedBlocks();
+	void CalculateSuccessorsAndPredecessors();
+
+	dCIL* m_cil;
+	dCIL::dListNode* m_function;
+	dBasicBlocksList m_basicBlocks; 
+	dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
+	//dList<dBasicBlock*> m_traversalBlocksOrder; 
+
+	mutable int m_mark;
+	friend class dBasicBlock;
+	friend class dBasicBlocksList;
 };
 
 

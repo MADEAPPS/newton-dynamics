@@ -43,11 +43,9 @@ class dDAGClassNode: public dDAG
 	virtual void CompileCIL(dCIL& cil);
 	virtual void ConnectParent(dDAG* const parent);
 
+	void Optimize (dCIL& cil);
 	void ConvertToTarget (dCIL& cil);
 
-	void TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols);
-	void AddLLVMGlobalSymbols (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols);
-	
 
 	bool m_isFinal;
 	bool m_isPublic;

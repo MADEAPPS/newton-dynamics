@@ -16,7 +16,6 @@
 #include "dCILstdafx.h"
 #include "dCILInstr.h"
 
-
 class dDataFlowGraph;
 class dRegisterInterferenceNode;
 
@@ -45,7 +44,6 @@ class dRegisterInterferenceNode
 		,m_registerIndex (-1)
 		,m_inSet (false)
 		,m_isMove(false)
-		//,m_isPrecolored(false)
 		,m_saveRegisterOnEntry(false)
 	{
 	}
@@ -56,7 +54,6 @@ class dRegisterInterferenceNode
 	int m_registerIndex;
 	bool m_inSet;
 	bool m_isMove;
-	//bool m_isPrecolored;
 	bool m_saveRegisterOnEntry;
 };
 
@@ -93,6 +90,7 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 
 	dRegisterInterferenceGraph (dDataFlowGraph* const flowGraph, int registerCount);
 
+/*
 	dString GetRegisterName(const dString& varName) const;
 
 	private:
@@ -118,6 +116,7 @@ class dRegisterInterferenceGraph: public dTree<dRegisterInterferenceNode, dStrin
 	int m_spillCount;
 	int m_registerCount;
 	int m_spillPenatryFactor;
+*/
 };
 
 #endif

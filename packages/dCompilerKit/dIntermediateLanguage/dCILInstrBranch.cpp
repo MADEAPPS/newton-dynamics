@@ -139,21 +139,29 @@ bool dCILInstrConditional::IsBasicBlockEnd() const
 	return true;
 }
 
+
+void dCILInstrConditional::GetUsedVariables (dList<dArg*>& variablesList)
+{
+	variablesList.Append(&m_arg0);
+
+}
+
 void dCILInstrConditional::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
 {
+	dAssert(0);
+/*
 	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
 	node->GetInfo().Append(m_myNode);
+*/
 }
 
 void dCILInstrConditional::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
+	dAssert(0);
+/*
 	dAssert (m_arg0.GetType().m_intrinsicType == m_int);
-//	if (m_arg0.GetType().m_intrinsicType == m_int) {
 	datFloatPoint.m_usedVariableSet.Insert (m_arg0.m_label);
-
-//	} else {
-//		dAssert (0);
-//	}
+*/
 }
 
 void dCILInstrConditional::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
@@ -196,6 +204,8 @@ dCILInstrReturn* dCILInstrReturn::GetAsReturn()
 
 void dCILInstrReturn::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
 {
+	dAssert(0);
+/*
 	dAssert (!m_arg0.GetType().m_isPointer);
 	switch (m_arg0.GetType().m_intrinsicType) 
 	{
@@ -213,11 +223,13 @@ void dCILInstrReturn::AddUsedVariable (dInstructionVariableDictionary& dictionar
 		default:
 			dAssert(0);
 		}
-
+*/
 }
 
 void dCILInstrReturn::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
+	dAssert(0);
+/*
 	dAssert (!m_arg0.GetType().m_isPointer);
 	switch (m_arg0.GetType().m_intrinsicType)
 	{
@@ -234,6 +246,7 @@ void dCILInstrReturn::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint)
 		default:	
 			dAssert (0);
 	}
+*/
 }
 
 void dCILInstrReturn::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
@@ -270,6 +283,27 @@ int dCILInstrReturn::GetByteCodeSize() const
 	return 1; 
 }
 
+void dCILInstrReturn::GetUsedVariables (dList<dArg*>& variablesList)
+{
+	if (m_arg0.GetType().m_isPointer) {
+		variablesList.Append(&m_arg0);
+	} else {
+		switch (m_arg0.GetType().m_intrinsicType) 
+		{
+			case m_void:
+				break;
+
+			case m_constInt:
+			case m_constFloat:
+				dAssert (0);
+				break;
+
+			default:
+				variablesList.Append(&m_arg0);
+		}
+	}
+}
+
 void dCILInstrReturn::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const
 {
 	int offset = m_byteCodeOffset;
@@ -298,6 +332,8 @@ void dCILInstrReturn::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) co
 	code.m_type2.m_reg0 = D_STACK_REGISTER_INDEX;
 	code.m_type2.m_imm2 = 0;
 }
+
+
 
 /*
 dCILInstrCall::dCILInstrCall(dCIL& program, const dString& name, const dArgType& type, dList<dArg>& parameters)
@@ -343,15 +379,20 @@ void dCILInstrCall::Serialize(char* const textOut) const
 
 void dCILInstrCall::AddUsedVariable (dInstructionVariableDictionary& dictionary) const
 {
+	dAssert(0);
+/*
 	for (dList<dArg>::dListNode* node = m_parameters.GetFirst(); node; node = node->GetNext()) {
 		const dArg& arg = node->GetInfo();
 		dInstructionVariableDictionary::dTreeNode* const node0 = dictionary.Insert(arg.m_label);
 		node0->GetInfo().Append(m_myNode);
 	}
+*/
 }
 
 void dCILInstrCall::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
+	dAssert(0);
+/*
 	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
 		datFloatPoint.m_generatedVariable = m_arg0.m_label;
 	}
@@ -360,16 +401,39 @@ void dCILInstrCall::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) c
 		const dArg& arg = node->GetInfo();
 		datFloatPoint.m_usedVariableSet.Insert (arg.m_label);
 	}
+*/	
 }
 
 
 void dCILInstrCall::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const 
 {
+	dAssert(0);
+/*
 	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
 		dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
 		node->GetInfo().Append (m_myNode);
 	}
+*/	
 }
+
+void dCILInstrCall::GetUsedVariables(dList<dArg*>& variablesList)
+{
+	for (dList<dArg>::dListNode* node = m_parameters.GetFirst(); node; node = node->GetNext()) {
+		variablesList.Append(&node->GetInfo());
+	}
+}
+
+
+
+dCILInstr::dArg* dCILInstrCall::GetGeneratedVariable()
+{
+	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
+		return &m_arg0;
+	} else {
+		return NULL;
+	}
+}
+
 
 
 void dCILInstrCall::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
@@ -384,8 +448,11 @@ void dCILInstrCall::AddKilledStatements(const dInstructionVariableDictionary& di
 	}
 }
 
+
 void dCILInstrCall::AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph)
 {
+	dAssert (0);
+/*
 	if (m_arg0.GetType().m_isPointer || (m_arg0.GetType().m_intrinsicType != m_void)) {
 		m_arg0.m_label = interferenceGraph.GetRegisterName(m_arg0.m_label);
 	}
@@ -394,6 +461,7 @@ void dCILInstrCall::AssignRegisterName(const dRegisterInterferenceGraph& interfe
 		dArg& arg = node->GetInfo();
 		arg.m_label = interferenceGraph.GetRegisterName(arg.m_label);
 	}
+*/
 }
 
 void dCILInstrCall::EmitOpcode (dVirtualMachine::dOpCode* const codeOutPtr) const 

@@ -29,13 +29,15 @@ void dCILInstrArgument::Serialize(char* const textOut) const
 
 void dCILInstrArgument::AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const
 {
-	datFloatPoint.m_generatedVariable = m_arg0.m_label;
+	dAssert(0);
+//	datFloatPoint.m_generatedVariable = m_arg0.m_label;
 }
 
 void dCILInstrArgument::AddDefinedVariable(dInstructionVariableDictionary& dictionary) const 
 { 
-	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
-	node->GetInfo().Append(m_myNode);
+	dAssert(0);
+//	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
+//	node->GetInfo().Append(m_myNode);
 }
 
 bool dCILInstrArgument::ApplyDeadElimination (dDataFlowGraph& dataFlow) 
@@ -60,14 +62,16 @@ void dCILInstrLocal::Serialize(char* const textOut) const
 void dCILInstrLocal::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
 	dAssert(0);
-	datFloatPoint.m_generatedVariable = m_arg0.m_label;
+//	datFloatPoint.m_generatedVariable = m_arg0.m_label;
 }
 
 void dCILInstrLocal::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const  
 {
 	dAssert(0);
+/*
 	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
 	node->GetInfo().Append (m_myNode);
+*/
 }
 
 dCILInstrMove::dCILInstrMove (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)
@@ -82,15 +86,21 @@ void dCILInstrMove::Serialize(char* const textOut) const
 
 void dCILInstrMove::AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const
 {
+	dAssert(0);
+/*
 	datFloatPoint.m_generatedVariable = m_arg0.m_label;
 	dAssert(m_arg1.GetType().m_intrinsicType != m_constInt);
 	datFloatPoint.m_usedVariableSet.Insert(m_arg1.m_label);
+*/
 }
 
 void dCILInstrMove::AddDefinedVariable(dInstructionVariableDictionary& dictionary) const
 { 
+	dAssert(0);
+/*
 	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg0.m_label);
 	node->GetInfo().Append(m_myNode);
+*/
 }
 
 
@@ -108,18 +118,42 @@ bool dCILInstrMove::ApplyCopyPropagation (dCILInstrMove* const moveInst)
 
 void dCILInstrMove::AddUsedVariable (dInstructionVariableDictionary& dictionary) const
 {
+	dAssert(0);
+/*
 	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg1.m_label);
 	node->GetInfo().Append(m_myNode);
+*/
 }
 
 bool dCILInstrMove::ApplyDeadElimination (dDataFlowGraph& dataFlow)
 { 
+	dAssert(0);
+	return 0;
+/*
 	if (m_arg0.m_label == m_arg1.m_label) {
 		Nullify();
 		dataFlow.UpdateLiveInputLiveOutput();
 		return true;
 	}
 	return DeadElimination (dataFlow);
+*/
+}
+
+void dCILInstrMove::GetUsedVariables (dList<dArg*>& variablesList)
+{
+	if (m_arg1.m_isPointer) {
+		variablesList.Append(&m_arg1);
+	} else {
+		switch (m_arg1.GetType().m_intrinsicType) 
+		{
+			case m_constInt:
+			case m_constFloat:
+				break;
+
+			default:
+				variablesList.Append(&m_arg1);
+		}
+	}
 }
 
 void dCILInstrMove::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
@@ -137,7 +171,6 @@ void dCILInstrMove::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 }
 
 
-
 dCILInstrLoad::dCILInstrLoad (dCIL& program, const dString& name0, const dArgType& type0, const dString& name1, const dArgType& type1)
 	:dCILTwoArgInstr (program, dArg (name0, type0), dArg (name1, type1))
 {
@@ -150,20 +183,34 @@ void dCILInstrLoad::Serialize(char* const textOut) const
 
 void dCILInstrLoad::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
+	dAssert(0);
+/*
 	datFloatPoint.m_generatedVariable = m_arg0.m_label;
 	datFloatPoint.m_usedVariableSet.Insert (m_arg1.m_label);
+*/
+}
+
+void dCILInstrLoad::GetUsedVariables (dList<dArg*>& variablesList)
+{
+	variablesList.Append(&m_arg1);
 }
 
 void dCILInstrLoad::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const  
 {
+	dAssert(0);
+/*
 	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
 	node->GetInfo().Append (m_myNode);
+*/
 }
 
 void dCILInstrLoad::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
 {
+	dAssert(0);
+/*
 	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg1.m_label);
 	node->GetInfo().Append(m_myNode);
+*/
 }
 
 void dCILInstrLoad::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const 
@@ -194,15 +241,56 @@ bool dCILInstrStore::ApplyCopyPropagation (dCILInstrMove* const moveInst)
 
 void dCILInstrStore::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
 {
+	dAssert(0);
+/*
 	dInstructionVariableDictionary::dTreeNode* const node0 = dictionary.Insert(m_arg0.m_label);
 	node0->GetInfo().Append(m_myNode);
 
 	dInstructionVariableDictionary::dTreeNode* const node1 = dictionary.Insert(m_arg1.m_label);
 	node1->GetInfo().Append(m_myNode);
+*/
 }
+
+
+void dCILInstrStore::GetUsedVariables(dList<dArg*>& variablesList)
+{
+	variablesList.Append(&m_arg0);
+	variablesList.Append(&m_arg1);
+}
+
 
 void dCILInstrStore::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
-	datFloatPoint.m_usedVariableSet.Insert(m_arg0.m_label);
-	datFloatPoint.m_usedVariableSet.Insert(m_arg1.m_label);
+	dAssert(0);
+//	datFloatPoint.m_usedVariableSet.Insert(m_arg0.m_label);
+//	datFloatPoint.m_usedVariableSet.Insert(m_arg1.m_label);
 }
+
+
+dCILInstrPhy::dCILInstrPhy (dCIL& program, const dString& name, const dArgType& type, dList<dCILInstr*>& source)
+	:dCILSingleArgInstr(program, dArg(name, type))
+{
+	for (dList<dCILInstr*>::dListNode* node = source.GetFirst(); node; node = node->GetNext()) {
+		m_sources.Append(node->GetInfo());
+	}
+}
+
+
+void dCILInstrPhy::Serialize(char* const textOut) const
+{
+	sprintf(textOut, "\t%s %s = phy (", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
+	for (dList<dCILInstr*>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
+		const dArg* const arg = node->GetInfo()->GetGeneratedVariable();
+		dAssert (arg);
+		char tmp[1024]; 
+		if (node->GetNext()) {
+			sprintf(tmp, "%s %s, ", arg->GetTypeName().GetStr(), arg->m_label.GetStr());
+		}
+		else {
+			sprintf(tmp, "%s %s", arg->GetTypeName().GetStr(), arg->m_label.GetStr());
+		}
+		strcat(textOut, tmp);
+	}
+	strcat(textOut, ")\n");
+}
+

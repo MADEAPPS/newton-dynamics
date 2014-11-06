@@ -34,10 +34,12 @@ class dCILInstrLabel: public dCILSingleArgInstr
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
-
-	
 	virtual bool IsBasicBlockBegin() const;
 	virtual dCILInstrLabel* GetAsLabel();
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable () {return NULL;}
+	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
 };
 
 class dCILInstrGoto: public dCILSingleArgInstr
@@ -63,6 +65,10 @@ class dCILInstrGoto: public dCILSingleArgInstr
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
 	dList<dCILInstr*>::dListNode* m_tagetNode;
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable () { return NULL; }
+	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
 };
 
 class dCILInstrConditional: public dCILThreeArgInstr
@@ -97,7 +103,11 @@ class dCILInstrConditional: public dCILThreeArgInstr
 
 	dList<dCILInstr*>::dListNode* GetTrueTarget () const;
 	dList<dCILInstr*>::dListNode* GetFalseTarget () const;
-	//dList<dCILInstr*>::dListNode* GetTrue ();
+
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable () { return NULL; }
+	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 
 	dBranchMode m_mode;
 	dList<dCILInstr*>::dListNode* m_tagetNode0;
@@ -127,6 +137,11 @@ class dCILInstrReturn: public dCILSingleArgInstr
 
 	void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 	virtual void AddKilledStatements (const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const {}
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable () { return NULL; }
+	virtual void GetUsedVariables (dList<dArg*>& variablesList);
+
 };
 
 class dCILInstrCall: public dCILTwoArgInstr
@@ -153,9 +168,12 @@ class dCILInstrCall: public dCILTwoArgInstr
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph);
 
+	// ***********************
+	virtual dArg* GetGeneratedVariable ();
+	virtual void GetUsedVariables (dList<dArg*>& variablesList);
+
 	dList<dArg> m_parameters;
 	dList<dCILInstr*>::dListNode* m_tagetNode;
 };
-
 
 #endif

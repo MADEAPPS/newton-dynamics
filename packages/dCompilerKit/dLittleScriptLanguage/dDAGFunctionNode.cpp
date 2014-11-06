@@ -35,7 +35,6 @@ dDAGFunctionNode::dDAGFunctionNode(dList<dDAG*>& allNodes, dDAGTypeNode* const t
 	,m_modifier(NULL)
 	,m_functionStart(NULL)
 	,m_parameters() 
-	,m_blockMap()
 {
 	m_name = name;
 
@@ -161,8 +160,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		varNameNode->GetInfo().m_label = localVariableAliasName;
 		store->Trace();
 	}
-
-
+	
 	m_body->CompileCIL(cil);
 	if (!m_returnType->GetArgType().m_isPointer && (m_returnType->GetArgType().m_intrinsicType == dCILInstr::m_void)) {
 		 if (!cil.GetLast()->GetInfo()->GetAsReturn()) {
@@ -171,9 +169,369 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		}
 	}
 
-	new dCILInstrFunctionEnd(function);
-//	cil.Trace();
+	dCILInstrFunctionEnd* const end = new dCILInstrFunctionEnd(function);
+
+	dCILInstrReturn* const ret = end->GetNode()->GetPrev()->GetInfo()->GetAsReturn();
+	dAssert (ret);
+	dCILInstr::dArg returnArg (ret->GetArg0());
+	
+	dString exitLabel (cil.NewLabel());
+	dCILInstrLabel* const returnLabel = new dCILInstrLabel (cil, exitLabel);
+	cil.InsertAfter(ret->GetNode()->GetPrev(), returnLabel->GetNode());
+
+	dCILInstrGoto* const jumpToReturn = new dCILInstrGoto(cil, exitLabel);
+	cil.InsertAfter (returnLabel->GetNode()->GetPrev(), jumpToReturn->GetNode());
+	jumpToReturn->SetTarget(returnLabel);
+
+	dCIL::dListNode* prev;
+	for (dCIL::dListNode* node = returnLabel->GetNode(); node; node = prev) {
+		dCILInstrReturn* const ret = node->GetInfo()->GetAsReturn();
+		prev = node->GetPrev();
+		if (ret) {
+			dCILInstrLabel* const dommyLabel = new dCILInstrLabel (cil, cil.NewLabel());
+			cil.InsertAfter(ret->GetNode()->GetPrev(), dommyLabel->GetNode());
+	
+			dCILInstrGoto* const jumpToReturn = new dCILInstrGoto (cil, exitLabel);
+			cil.InsertAfter(dommyLabel->GetNode()->GetPrev(), jumpToReturn->GetNode());
+			jumpToReturn->SetTarget(returnLabel);
+
+			if (returnArg.m_isPointer || returnArg.GetType().m_intrinsicType != dCILInstr::m_void) {
+				dCILInstrMove* const move = new dCILInstrMove (cil, returnArg.m_label, returnArg.GetType(), ret->GetArg0().m_label, returnArg.GetType());
+				cil.InsertAfter (jumpToReturn->GetNode()->GetPrev(), move->GetNode());
+			}
+			cil.Remove (node);
+		}
+	}
+
+	ConvertToSSA (cil);
 }
+
+void dDAGFunctionNode::ConvertToSSA(dCIL& cil)
+{
+//cil.Trace();
+	dDataFlowGraph dataFlow (&cil, m_functionStart);
+//cil.Trace();
+	dataFlow.ConvertToSSA ();
+//cil.Trace();
+
+//	while (RemoveRedundantJumps (cil));
+}
+
+void dDAGFunctionNode::Optimize (dCIL& cil)
+{
+	dDataFlowGraph dataFlow (&cil, m_functionStart);
+
+}
+
+bool dDAGFunctionNode::RemoveRedundantJumps (dCIL& cil)
+{
+	bool ret = false;
+dAssert (0);
+#if 0
+	dTree<int, dCIL::dListNode*> jumpMap;
+
+	// create jump and label map;
+	for (dCIL::dListNode* stmtNode = m_functionStart; stmtNode; stmtNode = stmtNode->GetNext()) {
+		dCILInstr* const instr = stmtNode->GetInfo();
+		if (instr->GetAsIF() || instr->GetAsLabel() || instr->GetAsGoto()) {
+			jumpMap.Insert(0, stmtNode);
+		}
+	}
+
+	dTree<int, dCIL::dListNode*>::Iterator iter (jumpMap);
+
+#if 0
+	// remove redundant adjacent labels
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		const dThreeAdressStmt& stmt = node->GetInfo();
+
+		if (stmt.m_instruction == dThreeAdressStmt::m_label) {
+			dCIL::dListNode* const labelNode = node->GetNext();
+			if (labelNode && (labelNode->GetInfo().m_instruction == dThreeAdressStmt::m_label)) {
+				dTree<int, dCIL::dListNode*>::Iterator iter1 (jumpMap);
+				for (iter1.Begin(); iter1; iter1 ++) {
+					dCIL::dListNode* const node1 = iter1.GetKey();
+					dThreeAdressStmt& stmt1 = node1->GetInfo();
+					if (stmt1.m_instruction == dThreeAdressStmt::m_goto) {
+						dAssert (0);
+//						if (stmt1.m_jmpTarget == labelNode)	{
+//							stmt1.m_jmpTarget = node;
+//							stmt1.m_arg0.m_label = stmt.m_arg0.m_label;
+//						}
+					} else if (stmt1.m_instruction == dThreeAdressStmt::m_if) { 
+						dAssert (0);
+//						if (stmt1.m_jmpTarget == labelNode)	{
+//							stmt1.m_jmpTarget = node;	
+//							stmt1.m_arg2.m_label = stmt.m_arg0.m_label;
+//						}
+					}
+				}
+				ret = true;
+				dAssert (0);
+				//m_cil->Remove(labelNode);
+				//jumpMap.Remove(labelNode);
+			}
+		}
+	}
+
+
+	// redirect double indirect goto
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dThreeAdressStmt& stmt = node->GetInfo();
+DTRACE_INTRUCTION (&stmt);
+		if (stmt.m_instruction == dThreeAdressStmt::m_goto) {
+			dAssert (jumpMap.Find (stmt.m_trueTargetJump));
+			dCIL::dListNode* const targetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
+			dThreeAdressStmt& stmt1 = targetNode->GetInfo();
+			dCIL::dListNode* nextGotoNode = targetNode->GetNext();
+			while (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) {
+				nextGotoNode = nextGotoNode->GetNext();
+			}
+			if ((stmt1.m_instruction == dThreeAdressStmt::m_label) && (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_goto)) {
+				const dThreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
+				stmt.m_arg0.m_label = stmt2.m_arg0.m_label;
+				stmt.m_trueTargetJump = stmt2.m_trueTargetJump;
+				ret = true;
+			}
+
+		} else if (stmt.m_instruction == dThreeAdressStmt::m_if) {
+			if (stmt.m_falseTargetJump) {
+				dAssert (jumpMap.Find (stmt.m_falseTargetJump));
+				dCIL::dListNode* const falseTargetJump = jumpMap.Find (stmt.m_falseTargetJump)->GetKey();
+				dThreeAdressStmt& stmt1 = falseTargetJump->GetInfo();
+
+				dCIL::dListNode* nextGotoNode = falseTargetJump->GetNext();
+				while (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) {
+					nextGotoNode = nextGotoNode->GetNext();
+				}
+
+				dThreeAdressStmt& nextStmt = nextGotoNode->GetInfo();
+				dAssert (nextStmt.m_instruction != dThreeAdressStmt::m_label);
+				stmt.m_falseTargetJump = NULL;
+				stmt.m_arg2.m_label = "";
+			}
+#if 0
+			dAssert (jumpMap.Find (stmt.m_trueTargetJump));
+			dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
+			dThreeAdressStmt& stmt1 = trueTargetNode->GetInfo();
+
+			dCIL::dListNode* nextGotoNode = trueTargetNode->GetNext();
+			while (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) {
+				nextGotoNode = nextGotoNode->GetNext();
+			}
+			if ((stmt1.m_instruction == dThreeAdressStmt::m_label) && (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_goto)) {
+				dAssert (0);
+
+				const dThreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
+				stmt.m_arg2.m_label = stmt2.m_arg0.m_label;
+				stmt.m_jmpTarget = stmt2.m_jmpTarget;
+				ret = true;
+			}
+#endif
+		}
+	}
+	
+
+	// remove goto to immediate labels
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dThreeAdressStmt& stmt = node->GetInfo();
+		dCIL::dListNode* const nextNode = node->GetNext();
+		dAssert (0);
+
+		//if (((stmt.m_instruction == dThreeAdressStmt::m_if) || (stmt.m_instruction == dThreeAdressStmt::m_goto)) && (stmt.m_jmpTarget == nextNode)) {
+			dAssert (0);
+			ret = true;
+			//Remove(node);
+			//jumpMap.Remove(node);
+		//}
+	}
+#endif
+
+	// redirect double indirect if
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dCILInstr* const instr = node->GetInfo();
+		if (instr->GetAsIF()) {
+			dCILInstrConditional* const ifInstr = instr->GetAsIF();
+			//dAssert(jumpMap.Find(stmt.m_trueTargetJump));
+			dCIL::dListNode* const trueTarget = ifInstr->GetTrueTarget();
+			dAssert(jumpMap.Find(trueTarget));
+
+			dAssert(jumpMap.Find(trueTarget)->GetKey() == trueTarget);
+			//dCIL::dListNode* const trueTargetNode = jumpMap.Find(trueTarget)->GetKey();
+			dCIL::dListNode* nextGotoNode = trueTarget;
+			//while ((nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) || (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_label)) {
+			while (nextGotoNode->GetInfo()->GetAsNop() || nextGotoNode->GetInfo()->GetAsLabel()) {
+				nextGotoNode = nextGotoNode->GetNext();
+			}
+				
+			//	dThreeAdressStmt& stmt1 = nextGotoNode->GetInfo();
+			//if (stmt1.m_instruction == dThreeAdressStmt::m_goto) {
+			if (nextGotoNode->GetInfo()->GetAsGoto()) {
+				dAssert(0);
+				//const dThreeAdressStmt& stmt2 = nextGotoNode->GetInfo();
+				//stmt.m_arg1.m_label = stmt1.m_arg0.m_label;
+				//stmt.m_trueTargetJump = stmt1.m_trueTargetJump;
+				//ret = true;
+			}
+		}
+	}
+
+cil.Trace();
+	// delete goto to immediate label
+	for (iter.Begin(); iter; iter++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dCILInstr* const instr = node->GetInfo();
+		if (instr->GetAsGoto()) {
+//instr->Trace();
+
+			dCILInstrGoto* const gotoInstr = instr->GetAsGoto();
+
+			dCIL::dListNode* const target = gotoInstr->GetTarget();
+			dAssert(jumpMap.Find(target));
+			dCIL::dListNode* const destTarget = jumpMap.Find(target)->GetKey();
+
+			dCILInstr* const instr1 = destTarget->GetInfo();
+			dCIL::dListNode* nextGotoNode = node->GetNext();
+			while (nextGotoNode->GetInfo()->GetAsNop()) {
+				nextGotoNode = nextGotoNode->GetNext();
+			}
+
+			dCILInstrLabel* const label = destTarget->GetInfo()->GetAsLabel();
+			dAssert(label);
+			if (nextGotoNode == nextGotoNode) {
+				//ifInstr->SetTargets(ifInstr->GetTrueTarget()->GetInfo()->GetAsLabel(), NULL);
+				gotoInstr->Nullify();
+cil.Trace();
+			}
+		}
+	}
+cil.Trace();
+
+	
+	// delete unreachable goto
+	for (iter.Begin(); iter; iter ++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		dCILInstr* const instr = node->GetInfo();
+
+		//dThreeAdressStmt& stmt = node->GetInfo();
+		//if (stmt.m_instruction == dThreeAdressStmt::m_goto) {
+		if (instr->GetAsGoto()) {
+			dAssert(0);
+			/*
+			//dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
+			dCIL::dListNode* prevNode = node->GetPrev();
+			while (prevNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) {
+				prevNode = prevNode->GetPrev();
+			}
+			dThreeAdressStmt& stmt1 = prevNode->GetInfo();
+			if ((stmt1.m_instruction == dThreeAdressStmt::m_ret) || (stmt1.m_instruction == dThreeAdressStmt::m_goto)){
+				ret = true;
+				stmt.m_instruction = dThreeAdressStmt::m_nop;
+				jumpMap.Remove(node);
+			}
+*/
+		}
+	}
+
+
+	// redirect if to immediate label
+	for (iter.Begin(); iter; iter++) {
+		dCIL::dListNode* const node = iter.GetKey();
+		//dThreeAdressStmt& stmt = node->GetInfo();
+		//iter ++;
+		//if (stmt.m_instruction == dThreeAdressStmt::m_if) {
+		dCILInstr* const instr = node->GetInfo();
+		if (instr->GetAsIF()) {
+			dCILInstrConditional* const ifInstr = instr->GetAsIF();
+			//dAssert (jumpMap.Find (stmt.m_trueTargetJump));
+			//dCIL::dListNode* const trueTargetNode = jumpMap.Find (stmt.m_trueTargetJump)->GetKey();
+
+			dCIL::dListNode* const trueTarget = ifInstr->GetTrueTarget();
+			dAssert(jumpMap.Find(trueTarget));
+			dAssert(jumpMap.Find(trueTarget)->GetKey() == trueTarget);
+
+			
+			dCIL::dListNode* nextGotoNode = trueTarget;
+			//while ((nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_nop) || (nextGotoNode->GetInfo().m_instruction == dThreeAdressStmt::m_label)) {
+			while (nextGotoNode->GetInfo()->GetAsNop() || nextGotoNode->GetInfo()->GetAsLabel()) {
+				nextGotoNode = nextGotoNode->GetNext();
+			}
+
+			bool islive = false;
+			for (dCIL::dListNode* node1 = node->GetNext(); node1 != nextGotoNode; node1 = node1->GetNext()) {
+				//dThreeAdressStmt& stmt1 = node1->GetInfo();
+				dCILInstr* const instr1 = node1->GetInfo();
+				//if (!((stmt1.m_instruction == dThreeAdressStmt::m_nop) || (stmt1.m_instruction == dThreeAdressStmt::m_label))) {
+				if (!(instr1->GetAsNop() || nextGotoNode->GetInfo()->GetAsLabel())) {
+					islive = true;
+					break;
+				}
+			}
+			if (!islive) {
+				dAssert(0);
+				//stmt.m_instruction = dThreeAdressStmt::m_nop;
+				//jumpMap.Remove(node);
+				//ret = true;
+			}
+		}
+	}
+
+//m_cil->Trace();
+
+	// delete unreferenced labels
+	for (iter.Begin(); iter; ) {
+		dCIL::dListNode* const node = iter.GetKey();
+		//dThreeAdressStmt& stmt = node->GetInfo();
+		dCILInstr* const instr = node->GetInfo();
+		iter++;
+
+		//if (stmt.m_instruction == dThreeAdressStmt::m_label) {		
+		if (instr->GetAsLabel()) {
+			//instr->Trace();
+
+			dTree<int, dCIL::dListNode*>::Iterator iter1 (jumpMap);
+			bool isReferenced = false;
+			for (iter1.Begin(); iter1; iter1 ++) {
+				dCIL::dListNode* const node1 = iter1.GetKey();
+				//dThreeAdressStmt& stmt1 = node1->GetInfo();
+				dCILInstr* const instr1 = node1->GetInfo();
+				//if (stmt1.m_instruction == dThreeAdressStmt::m_goto){
+				if (instr1->GetAsGoto()){
+					//if (stmt1.m_trueTargetJump == node) {
+					dCILInstrGoto* const gotoInstru = instr1->GetAsGoto();
+					if (gotoInstru->GetTarget() == node) {
+						isReferenced = true;
+						break;
+					}
+				//} else if (stmt1.m_instruction == dThreeAdressStmt::m_if) {
+				} else if (instr1->GetAsIF()) {
+					dCILInstrConditional* const ifInstru = instr1->GetAsIF();
+					//if ((stmt1.m_trueTargetJump == node) || (stmt1.m_falseTargetJump == node)) {
+					if ((ifInstru->GetTrueTarget() == node) || (ifInstru->GetFalseTarget()  == node)) {
+						isReferenced = true;
+						break;
+					}
+				}
+			}
+			if (!isReferenced) {
+				//instr->Trace();
+				ret = true;
+				//stmt.m_instruction = dThreeAdressStmt::m_nop;
+				jumpMap.Remove(node);
+				instr->Nullify();
+			}
+		}
+	}
+
+cil.Trace();
+#endif
+	return ret;
+}
+
 
 /*
 void dDAGFunctionNode::ClearBasicBlocks ()
@@ -228,598 +586,12 @@ void dDAGFunctionNode::BuildBasicBlocks(dCIL& cil, dCIL::dListNode* const functi
 */
 
 
-void dDAGFunctionNode::CreateLLVMBasicBlocks (llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-	dBasicBlocksList basicBlocks (cil, m_functionStart);
-	for (dList<dBasicBlock>::dListNode* blockNode = basicBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
-		dBasicBlock& block = blockNode->GetInfo();
-		dCIL::dListNode* const blockNameNode = block.m_begin;
-		const dThreeAdressStmt& blockStmt = blockNameNode->GetInfo();
-		dAssert (blockStmt.m_instruction == dThreeAdressStmt::m_label);
-		llvm::BasicBlock* const llvmBlock = llvm::BasicBlock::Create(context, blockStmt.m_arg0.m_label.GetStr(), function);
-		dAssert (llvmBlock);
-		m_blockMap.Append(LLVMBlockScripBlockPair (llvmBlock, blockNode));
-	}
-*/
-}
 
-/*
-dString dDAGFunctionNode::GetLLVMArgName (const dThreeAdressStmt::dArg& arg)
-{
-	dString name (stmt.m_arg0.m_label);
-	if (arg.m_intrinsicType) {
-	}
-	switch (arg.m_intrinsicType)
-	{
-		case dThreeAdressStmt::m_int:
-		{
-			llvm::Argument* const funtionArg = argumnetIter;
-			funtionArg->setName (stmt.m_arg0.m_label.GetStr());
-			break;
-		}
-
-		default:
-			dAssert(0);
-}
-*/
-
-llvm::Type* dDAGFunctionNode::GetLLVMType (const dCILInstr::dArg& arg, llvm::LLVMContext &context)
-{
-dAssert (0);
-return NULL;
-/*
-	llvm::Type* type = NULL;
-	if (arg.m_isPointer) {
-		switch (arg.m_intrinsicType)
-		{
-			case dThreeAdressStmt::m_int:
-
-				type = llvm::Type::getInt32PtrTy(context);
-				break;
-
-			case dThreeAdressStmt::m_void:
-			{
-				return llvm::Type::getVoidTy(context)->getPointerTo();
-				break;
-			}
-
-
-			default:
-				dAssert(0);
-		}
-
-	} else {
-		switch (arg.m_intrinsicType)
-		{
-			case dThreeAdressStmt::m_int:
-
-				type = llvm::Type::getInt32Ty(context);
-				break;
-
-			case dThreeAdressStmt::m_void:
-			{
-				type = llvm::Type::getVoidTy (context);
-				break;
-			}
-
-
-			default:
-				dAssert(0);
-		}
-	}
-
-	dAssert (type);
-	return type;
-*/
-}
-
-llvm::Function* dDAGFunctionNode::CreateLLVMfunctionDeclaration (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context)
-{
-dAssert (0);
-return NULL;
-/*
-
-	std::vector<llvm::Type *> argumentList;
-	for (dCIL::dListNode* argNode = m_functionStart->GetNext()->GetNext(); argNode && (argNode->GetInfo().m_instruction == dThreeAdressStmt::m_argument); argNode = argNode->GetNext()) {
-		const dThreeAdressStmt& stmt = argNode->GetInfo();
-		argumentList.push_back (GetLLVMType (stmt.m_arg0, context));
-	}
-
-	const dThreeAdressStmt& functionProto = m_functionStart->GetInfo();
-	dAssert (functionProto.m_instruction == dThreeAdressStmt::m_function);	
-	llvm::Type* const returnTypeVal = GetLLVMType (functionProto.m_arg0, context);
-
-	// create the function prototype
-	llvm::FunctionType* const funtionParametersAndType = llvm::FunctionType::get (returnTypeVal, argumentList, false);
-	llvm::Function* const llvmFunction = llvm::cast<llvm::Function>(module->getOrInsertFunction(functionProto.m_arg0.m_label.GetStr(), funtionParametersAndType));
-
-	// set arguments names.
-	llvm::Function::arg_iterator argumnetIter = llvmFunction->arg_begin();  
-	for (dCIL::dListNode* argNode = m_functionStart->GetNext()->GetNext(); argNode && (argNode->GetInfo().m_instruction == dThreeAdressStmt::m_argument); argNode = argNode->GetNext()) {
-		const dThreeAdressStmt& stmt = argNode->GetInfo();
-		switch (stmt.m_arg0.m_intrinsicType)
-		{
-			case dThreeAdressStmt::m_int:
-			{
-				llvm::Argument* const funtionArg = argumnetIter;
-				funtionArg->setName (stmt.m_arg0.m_label.GetStr());
-				break;
-			}
-
-			default:
-				dAssert(0);
-		}
-		argumnetIter ++;
-	}
-
-	return llvmFunction;
-*/
-}
-
-
-
-llvm::Value* dDAGFunctionNode::GetLLVMConstantOrValue (dLLVMSymbols& localSymbols, const dCILInstr::dArg& arg, llvm::LLVMContext &context)
-{
-dAssert (0);
-return NULL;
-
-/*
-	dLLVMSymbols::dTreeNode* node = localSymbols.Find (arg.m_label);
-	if (!node) {
-		llvm::Value* value = NULL;
-		dAssert (!arg.m_isPointer);
-		switch (arg.m_intrinsicType) 
-		{
-			case dThreeAdressStmt::m_constInt:
-				value = llvm::ConstantInt::get(context, llvm::APInt(32, llvm::StringRef(arg.m_label.GetStr()), 10));
-				break;
-
-			default:
-				dAssert (0);
-		}
-
-		node = localSymbols.Insert(value, arg.m_label);
-	}
-
-	return node->GetInfo();
-*/
-}
-
-llvm::Function* dDAGFunctionNode::EmitLLVMfunction (dLLVMSymbols& localSymbols, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols)
-{
-dAssert (0);
-return NULL;
-/*
-	const dThreeAdressStmt& functionProto = m_functionStart->GetInfo();
-	dAssert (globalLLVMSymbols.Find (functionProto.m_arg0.m_label));
-	llvm::Function* const llvmFunction = (llvm::Function*) globalLLVMSymbols.Find (functionProto.m_arg0.m_label)->GetInfo();
-
-	// set arguments names.
-	dCIL::dListNode* argNode = m_functionStart->GetNext()->GetNext();
-	for (llvm::Function::arg_iterator iter (llvmFunction->arg_begin()); iter != llvmFunction->arg_end(); iter ++) {
-		dThreeAdressStmt& stmt = argNode->GetInfo();
-		dAssert (stmt.m_instruction == dThreeAdressStmt::m_argument);
-		const llvm::Argument* const argument = iter;
-		const llvm::StringRef& name = argument->getName();
-		dAssert (stmt.m_arg0.m_label == name.data());
-		localSymbols.Insert(iter, stmt.m_arg0.m_label);
-		argNode = argNode->GetNext();
-	}
-
-	return llvmFunction;
-*/
-}
-
-
-void dDAGFunctionNode::EmitLLVMLocalVariable (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-
-	if (stmt.m_arg0.m_isPointer) {
-		switch (stmt.m_arg0.m_intrinsicType)
-		{
-			case dThreeAdressStmt::m_int:
-			{
-				//llvm::AllocaInst* const local = new llvm::AllocaInst(llvm::IntegerType::get(context, 8 * sizeof (int)), stmt.m_arg0.m_label.GetStr(), llvmBlock);
-				llvm::IntegerType* const intType = llvm::IntegerType::get(context, 8 * sizeof (int));
-				llvm::AllocaInst* const local = new llvm::AllocaInst(llvm::PointerType::get(intType, 0), stmt.m_arg0.m_label.GetStr(), llvmBlock);
-				local->setAlignment (sizeof (int));
-				localSymbols.Insert(local, stmt.m_arg0.m_label.GetStr()) ;
-				break;
-			}
-
-			default:
-				dAssert(0);
-		}
-
-	} else {
-		switch (stmt.m_arg0.m_intrinsicType)
-		{
-			case dThreeAdressStmt::m_int:
-			{
-				llvm::AllocaInst* const local = new llvm::AllocaInst(llvm::IntegerType::get(context, 8 * sizeof (int)), stmt.m_arg0.m_label.GetStr(), llvmBlock);
-				local->setAlignment (sizeof (int));
-				localSymbols.Insert(local, stmt.m_arg0.m_label.GetStr()) ;
-				break;
-			}
-
-			default:
-				dAssert(0);
-		}
-	}
-*/
-}
-
-void dDAGFunctionNode::EmitLLVMStoreBase (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-	dAssert (localSymbols.Find (stmt.m_arg0.m_label));
-	llvm::Value* const dst = localSymbols.Find (stmt.m_arg0.m_label)->GetInfo();
-	llvm::Value* const src = GetLLVMConstantOrValue (localSymbols, stmt.m_arg1, context);
-
-	llvm::StoreInst* const local = new llvm::StoreInst(src, dst, false, llvmBlock);
-	local->setAlignment(4);
-*/
-}
-
-void dDAGFunctionNode::EmitLLVMLoad (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-	dAssert (localSymbols.Find (stmt.m_arg1.m_label));
-	dAssert (localSymbols.Find (stmt.m_arg2.m_label));
-	dAssert (stmt.m_arg1.m_isPointer);
-	dAssert (!stmt.m_arg2.m_isPointer);
-	dAssert (stmt.m_arg0.m_intrinsicType == stmt.m_arg1.m_intrinsicType);
-
-	llvm::Value* const src = localSymbols.Find (stmt.m_arg1.m_label)->GetInfo();
-	llvm::Value* const index = localSymbols.Find (stmt.m_arg2.m_label)->GetInfo();
-
-	dString baseAdress (stmt.m_arg0.m_label + dCIL::m_variableUndercore);
-	llvm::GetElementPtrInst* const load = llvm::GetElementPtrInst::Create (src, index, baseAdress.GetStr(), llvmBlock);
-	llvm::LoadInst* const local = new llvm::LoadInst (load, stmt.m_arg0.m_label.GetStr(), false, llvmBlock);
-	local->setAlignment(4);
-	localSymbols.Insert(local, stmt.m_arg0.m_label.GetStr()) ;
-*/
-}
-
-void dDAGFunctionNode::EmitLLVMStore (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-	dAssert (localSymbols.Find (stmt.m_arg0.m_label));
-	dAssert (localSymbols.Find (stmt.m_arg1.m_label));
-	dAssert (localSymbols.Find (stmt.m_arg2.m_label));
-	dAssert (stmt.m_arg1.m_isPointer);
-	dAssert (!stmt.m_arg2.m_isPointer);
-	dAssert (stmt.m_arg0.m_intrinsicType == stmt.m_arg1.m_intrinsicType);
-
-	llvm::Value* const src = localSymbols.Find (stmt.m_arg0.m_label)->GetInfo();
-	llvm::Value* const dst = localSymbols.Find (stmt.m_arg1.m_label)->GetInfo();
-	llvm::Value* const index = localSymbols.Find (stmt.m_arg2.m_label)->GetInfo();
-
-	dString baseAdress (stmt.m_arg1.m_label + dCIL::m_variableUndercore);
-	llvm::GetElementPtrInst* const store = llvm::GetElementPtrInst::Create (dst, index, baseAdress.GetStr(), llvmBlock);
-	llvm::StoreInst* const local = new llvm::StoreInst (src, store, false, llvmBlock);
-	local->setAlignment(4);
-//	localSymbols.Insert(local, stmt.m_arg0.m_label.GetStr()) ;
-*/
-}
-
-
-void dDAGFunctionNode::EmitLLVMLoadBase (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-	dAssert (localSymbols.Find (stmt.m_arg1.m_label));
-	llvm::Value* const src = localSymbols.Find (stmt.m_arg1.m_label)->GetInfo();
-	llvm::LoadInst* const local = new llvm::LoadInst (src, stmt.m_arg0.m_label.GetStr(), false, llvmBlock);
-	local->setAlignment(4);
-	localSymbols.Insert(local, stmt.m_arg0.m_label.GetStr()) ;
-*/
-}
-
-
-void dDAGFunctionNode::EmitLLVMReturn (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-//	dAssert (localSymbols.Find (stmt.m_arg0.m_label));
-//	llvm::Value* const src = localSymbols.Find (stmt.m_arg0.m_label)->GetInfo();
-	if (!stmt.m_arg0.m_isPointer && (stmt.m_arg0.m_intrinsicType == dThreeAdressStmt::m_void)) {
-		llvm::ReturnInst::Create(context, NULL, llvmBlock);
-	} else {
-		llvm::Value* const src = GetLLVMConstantOrValue (localSymbols, stmt.m_arg0, context);
-		llvm::ReturnInst::Create(context, src, llvmBlock);
-	}
-*/
-}
-
-
-void dDAGFunctionNode::EmitLLVMIf (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-	dAssert (stmt.m_operator == dThreeAdressStmt::m_nothing);
-	dAssert (localSymbols.Find (stmt.m_arg0.m_label));
-
-	llvm::Value* const arg0 = localSymbols.Find (stmt.m_arg0.m_label)->GetInfo();
-	llvm::BasicBlock* const thenBlock = m_blockMap.Find (stmt.m_trueTargetJump);
-	llvm::BasicBlock* const continueBlock = m_blockMap.Find(stmt.m_falseTargetJump);
-	dAssert (thenBlock);
-	dAssert (continueBlock);
-	dAssert (stmt.m_arg0.m_intrinsicType == dThreeAdressStmt::m_int);
-	llvm::BranchInst::Create (thenBlock, continueBlock, arg0, llvmBlock);
-*/
-}
-
-void dDAGFunctionNode::EmitLLVMGoto (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-	dAssert (stmt.m_operator == dThreeAdressStmt::m_nothing);
-	llvm::BasicBlock* const targetBlock = m_blockMap.Find (stmt.m_trueTargetJump);
-	dAssert (targetBlock);
-	llvm::BranchInst::Create (targetBlock, llvmBlock);
-*/
-}
-
-void dDAGFunctionNode::EmitLLVMParam (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-	llvm::Value* const src = GetLLVMConstantOrValue (localSymbols, stmt.m_arg0, context);
-	m_paramList.Append(src);
-*/
-}
-
-void dDAGFunctionNode::EmitLLVMCall (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols)
-{
-dAssert (0);
-/*
-
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-	dAssert (stmt.m_operator == dThreeAdressStmt::m_nothing);
-
-	dAssert (globalLLVMSymbols.Find (stmt.m_arg1.m_label));
-	llvm::Value* const function = globalLLVMSymbols.Find (stmt.m_arg1.m_label)->GetInfo();
-
-	int count = 0;
-	llvm::Value* buffer[128];
-	for (dList<llvm::Value*>::dListNode* node = m_paramList.GetLast(); node; node = node->GetPrev()) {
-		buffer[count] = node->GetInfo();
-		count ++;
-	}
-
-	llvm::CallInst* call = NULL;
-	llvm::ArrayRef<llvm::Value *> paramList (buffer, count);
-	if (stmt.m_arg0.m_isPointer || (stmt.m_arg0.m_intrinsicType != dThreeAdressStmt::m_void)) {
-		call = llvm::CallInst::Create(function, paramList, stmt.m_arg0.m_label.GetStr(), llvmBlock);
-		localSymbols.Insert(call, stmt.m_arg0.m_label.GetStr()) ;
-	} else {
-		call = llvm::CallInst::Create(function, paramList, "", llvmBlock);
-	}
-	call->setCallingConv(llvm::CallingConv::C);
-	call->setTailCall (true);
-	llvm::AttributeSet callAttrib;
-	call->setAttributes (callAttrib);
-	m_paramList.RemoveAll();
-*/
-}
-
-
-void dDAGFunctionNode::EmitLLVMAssignment (dLLVMSymbols& localSymbols, dCIL::dListNode* const stmtNode, llvm::BasicBlock* const llvmBlock, llvm::LLVMContext &context)
-{
-dAssert (0);
-/*
-
-	const dThreeAdressStmt& stmt = stmtNode->GetInfo();
-	dAssert (stmt.m_operator != dThreeAdressStmt::m_nothing);
-	llvm::Value* const arg1 = GetLLVMConstantOrValue (localSymbols, stmt.m_arg1, context);
-	llvm::Value* const arg2 = GetLLVMConstantOrValue (localSymbols, stmt.m_arg2, context);
-
-	llvm::Value* arg0 = NULL;
-	switch (stmt.m_operator)
-	{
-		case dThreeAdressStmt::m_add:
-		{
-			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::Add, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
-			break;
-		}
-
-		case dThreeAdressStmt::m_sub:
-		{
-			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::Sub, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
-			break;
-		}
-
-		case dThreeAdressStmt::m_mul:
-		{
-			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::Mul, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
-			break;
-		}
-
-		case dThreeAdressStmt::m_div:
-		{
-			arg0 = llvm::BinaryOperator::Create (llvm::Instruction::SDiv, arg1, arg2, stmt.m_arg0.m_label.GetStr(), llvmBlock);
-			break;
-		}
-
-		case dThreeAdressStmt::m_identical:
-		{
-			arg0 = new llvm::ICmpInst (*llvmBlock, llvm::ICmpInst::ICMP_EQ, arg1, arg2, stmt.m_arg0.m_label.GetStr());
-			break;
-		}
-
-		case dThreeAdressStmt::m_less:
-		{
-			arg0 = new llvm::ICmpInst (*llvmBlock, llvm::ICmpInst::ICMP_SLT, arg1, arg2, stmt.m_arg0.m_label.GetStr());
-			break;
-		}
-
-		case dThreeAdressStmt::m_lessEqual:
-		{
-			arg0 = new llvm::ICmpInst (*llvmBlock, llvm::ICmpInst::ICMP_SLE, arg1, arg2, stmt.m_arg0.m_label.GetStr());
-			break;
-		}
-
-
-		default:
-			dAssert(0);
-	}
-	localSymbols.Insert(arg0, stmt.m_arg0.m_label.GetStr()) ;
-*/
-}
-
-void dDAGFunctionNode::TranslateLLVMBlock (dLLVMSymbols& localSymbols, const LLVMBlockScripBlockPair& llvmBlockPair, llvm::Function* const function, dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols)
-{
-dAssert (0);
-/*
-
-	llvm::BasicBlock* const llvmBlock = llvmBlockPair.m_llvmBlock;
-	const dBasicBlock& block = llvmBlockPair.m_blockNode->GetInfo();
-	
-	dCIL::dListNode* const endNode = block.m_end->GetNext();
-	for (dCIL::dListNode* argNode = block.m_begin->GetNext(); argNode != endNode; argNode = argNode->GetNext()) {
-		const dThreeAdressStmt& stmt = argNode->GetInfo();
-DTRACE_INTRUCTION (&stmt);
-		dAssert (stmt.m_instruction != dThreeAdressStmt::m_label);	
-
-		switch (stmt.m_instruction)
-		{
-			case dThreeAdressStmt::m_local:
-			{
-				EmitLLVMLocalVariable (localSymbols, argNode, llvmBlock, context);
-				break;
-			}
-
-			case dThreeAdressStmt::m_load:
-			{
-				EmitLLVMLoad (localSymbols, argNode, llvmBlock, context);
-				break;
-			}
-
-			case dThreeAdressStmt::m_store:
-			{
-				EmitLLVMStore (localSymbols, argNode, llvmBlock, context);
-				break;
-			}
-
-			case dThreeAdressStmt::m_loadBase:
-			{
-				EmitLLVMLoadBase (localSymbols, argNode, llvmBlock, context);
-				break;
-			}
-
-			case dThreeAdressStmt::m_storeBase:
-			{
-				EmitLLVMStoreBase (localSymbols, argNode, llvmBlock, context);
-				break;
-			}
-
-
-			case dThreeAdressStmt::m_ret:
-			{
-				EmitLLVMReturn (localSymbols, argNode, llvmBlock, context);
-				break;
-			}
-
-			case dThreeAdressStmt::m_assigment:
-			{
-				EmitLLVMAssignment (localSymbols, argNode, llvmBlock, context);
-				break;
-			}
-
-			case dThreeAdressStmt::m_if:
-			{
-				EmitLLVMIf (localSymbols, argNode, llvmBlock, context);
-				break;
-			}
-
-			case dThreeAdressStmt::m_goto:
-			{
-				EmitLLVMGoto (localSymbols, argNode, llvmBlock, context);
-				break;
-			}
-
-			case dThreeAdressStmt::m_param:
-			{
-				EmitLLVMParam(localSymbols, argNode, llvmBlock, context);
-				break;
-			}
-
-			case dThreeAdressStmt::m_call:
-			{
-				EmitLLVMCall (localSymbols, argNode, llvmBlock, context, globalLLVMSymbols);
-				break;
-			}
-
-			case dThreeAdressStmt::m_nop:
-			case dThreeAdressStmt::m_argument:
-				break;
-
-
-			default:
-				dAssert (0);
-		}
-	} 
-*/
-}
-
-void dDAGFunctionNode::AddLLVMGlobalSymbols (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols)
-{
-dAssert (0);
-/*
-	const dThreeAdressStmt& functionProto = m_functionStart->GetInfo();
-	llvm::Function* const llvmFunction = CreateLLVMfunctionDeclaration (cil, module, context);
-	globalLLVMSymbols.Insert (llvmFunction, functionProto.m_arg0.m_label.GetStr());
-*/
-}
-
-void dDAGFunctionNode::TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols)
-{
-dAssert (0);
-/*
-	dLLVMSymbols localSymbols;
-	llvm::Function* const llvmFunction = EmitLLVMfunction (localSymbols, cil, module, context, globalLLVMSymbols);
-
-	CreateLLVMBasicBlocks (llvmFunction, cil, module, context);
-
-//	cil.Trace();
-	for (LLVMBlockScripBlockPairMap::dListNode* node = m_blockMap.GetFirst(); node; node = node->GetNext()) {
-		const LLVMBlockScripBlockPair& pair = node->GetInfo();
-		TranslateLLVMBlock (localSymbols, pair, llvmFunction, cil, module, context, globalLLVMSymbols);
-	}
-
-    // Validate the generated code, checking for consistency.
-    dAssert (!llvm::verifyFunction(*llvmFunction));
-
-    cil.Optimize (llvmFunction);
-*/
-}
 
 
 void dDAGFunctionNode::ConvertToTarget (dCIL& cil)
 {
 	cil.RegisterAllocation (m_functionStart);
 }
+
+

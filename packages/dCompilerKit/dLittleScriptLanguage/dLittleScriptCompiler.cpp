@@ -61,26 +61,8 @@ dScriptCompiler::dScriptCompiler(const char* const pakacgesRootNameDirectory)
 	,m_classList()
 	,m_scopeStack()
 	,m_allNodes()
-	,m_context()
-	,m_module()
 {
 	_mkdir(m_packageRootDirectory.GetStr());
-
-	m_module = std::unique_ptr<llvm::Module> (new llvm::Module("test", m_context));
-
-/*
-//formatted_raw_ostream out;
-//std::string errorInfo;
-//raw_fd_ostream out ("xxxxxxx.bc", errorInfo);
-//WriteBitcodeToFile (M.get(), out);
-//out.close();
-//formatted_raw_ostream input;
-//ReadBitcodeToFile (M.get(), input);
-//dCIL* const cil = dCIL::CreateTargetMachine();
-//scripClass->CompileCIL (cil);
-//M->dump();
-	dAssert (0);
-*/
 }
 
 dScriptCompiler::~dScriptCompiler()
@@ -98,53 +80,6 @@ dScriptCompiler::~dScriptCompiler()
 */
 }
 
-
-#if 0
-
-
-void dScriptCompiler::DisplayError (const char* format, ...) const
-{
-	va_list v_args;
-	char* const text = (char*) malloc (strlen (format) + 2048);
-
-	text[0] = 0;
-	va_start (v_args, format);     
-	vsprintf(text, format, v_args);
-	va_end (v_args);            
-
-	fprintf (stderr, text);
-#ifdef _MSC_VER  
-	OutputDebugStringA (text);
-#endif	
-
-	free (text);
-}
-
-void dScriptCompiler::SyntaxError (const dLittleScriptLexical& scanner, const dUserVariable& errorToken, const dUserVariable& errorTokenMarker)
-{
-	const char* const data = scanner.GetData();
-	int start = errorToken.m_scannerIndex;
-	int lineNumber = errorToken.m_scannerLine + 1;
-	while (data[start] && isspace (data[start])) {
-		if (data[start] == '\n') {
-			lineNumber ++;
-		}
-		start ++;
-	}
-
-	int end = errorTokenMarker.m_scannerIndex;
-	while (data[end] && isspace (data[end])) {
-		end --;
-	}
-	dAssert (end >= start);
-
-	int length = end - start + 1;
-	dString errorLine (&data[start], length);
-	DisplayError ("%s (%d) : syntax error on line: %s\n", m_fileName, lineNumber, errorLine.GetStr());
-}
-
-
-#endif
 
 // parcel callbacks section
 bool dScriptCompiler::Parse(dLittleScriptLexical& scanner)
@@ -165,92 +100,30 @@ int dScriptCompiler::CompileSource (const char* const source)
 			scripClass->ConnectParent (NULL);
 		}
 
-		llvm::Module* const module = m_module.get();
-		dCIL cil (module);
-
-
+		dCIL cil;
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
 			scripClass->CompileCIL (cil);
 		}
 
-#if 0
-		cil.Trace();
-		dDAG::dLLVMSymbols globalLLVMSymbols;
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
-			scripClass->AddLLVMGlobalSymbols (cil, module, m_context, globalLLVMSymbols);
-		}
-		
-		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
-			dDAGClassNode* const scripClass = node->GetInfo();
-			scripClass->TranslateToLLVM (cil, module, m_context, globalLLVMSymbols);
-			//_ASSERTE (m_currentPackage);
-			//m_currentPackage->AddClass(scripClass, cil);
+			scripClass->Optimize(cil);
 		}
 
-
-		if (llvm::verifyModule(*module)) {
-			llvm::errs() << ": Error constructing function!\n";
-			dAssert (0);
-		}
-		llvm::errs() << *module;
-		//CreateLLVMTargetMachine (module);
-		cil.Clear();
-		llvm::Module::FunctionListType& funtionList = module->getFunctionList();
-		for (llvm::Module::FunctionListType::iterator iter (funtionList.begin()); iter != funtionList.end(); iter ++) {
-			const llvm::Function& funtion = *iter;
-			cil.ConvertLLVMFunctionToNVMFunction (funtion);
-		}
-#endif
-
-		//cil.Trace();
+/*
 		for (dList<dDAGClassNode*>::dListNode* node = m_classList.GetFirst(); node; node = node->GetNext()) {
 			dDAGClassNode* const scripClass = node->GetInfo();
 			scripClass->ConvertToTarget (cil);
 		}
 
 		dVirtualMachine* const program = cil.BuilExecutable();
-
 		delete program;
+*/
 	}
 	return 0;
 }
 
-void dScriptCompiler::CreateLLVMTargetMachine (llvm::Module* const module)
-{
-	std::string error; 
-	const std::string archName (D_VIRTUAL_MACHINE_NAME);
-	const llvm::Target* const target = llvm::TargetRegistry::lookupTarget(archName, error);
-	dAssert (target);
-
-	llvm::StringRef mcpu("");
-	llvm::StringRef triple("");
-	llvm::StringRef feature("");
-	llvm::TargetOptions options;
-//		InitTargetOptionsFromCodeGenFlags();
-//		options.DisableIntegratedAS = NoIntegratedAssembler;
-//		options.MCOptions.ShowMCEncoding = ShowMCEncoding;
-//		options.MCOptions.MCUseDwarfDirectory = EnableDwarfDirectory;
-//		options.MCOptions.AsmVerbose = AsmVerbose;
-		
-	std::unique_ptr<llvm::TargetMachine> targetMachinePtr(target->createTargetMachine(triple, mcpu, feature, options));
-	dAssert (targetMachinePtr.get());
-	llvm::TargetMachine &targetMachine = *targetMachinePtr.get();
-
-	llvm::legacy::PassManager passManager;
-
-	// Newton Virtual machine does no have subtarget 
-	const llvm::DataLayout* const dataLayout = targetMachine.getSubtargetImpl()->getDataLayout();
-	dAssert (dataLayout);
-	m_module->setDataLayout(dataLayout);
-
-	passManager.add(new llvm::DataLayoutPass(module));
-
-	llvm::formatted_raw_ostream outputStream;
-	targetMachine.addPassesToEmitFile (passManager, outputStream, llvm::TargetMachine::CGFT_AssemblyFile, false, NULL, NULL);
-	passManager.run(*module);
-}
 
 
 void dScriptCompiler::ImportClass (const dString& className)
@@ -1076,5 +949,3 @@ void dScriptCompiler::OpenPackage (const dString& packageName)
 */
 }
 
-
-void CompileToLLVM ();

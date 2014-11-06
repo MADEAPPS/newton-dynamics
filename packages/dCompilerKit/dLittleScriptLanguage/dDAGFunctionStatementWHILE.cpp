@@ -66,5 +66,5 @@ void dDAGFunctionStatementWHILE::CompileCIL(dCIL& cil)
 		//conditional->Trace();
 	}
 
-	//cil.Trace();
+//cil.Trace();
 }

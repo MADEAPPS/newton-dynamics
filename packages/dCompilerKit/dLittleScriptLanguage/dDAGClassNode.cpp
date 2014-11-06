@@ -161,41 +161,23 @@ void dDAGClassNode::CompileCIL(dCIL& cil)
 	}
 
 	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
-		//m_cilCodeList.Append (cil.NewStatement());
-		//new dCILInstrNop (cil);
-
 		dDAGFunctionNode* const function = node->GetInfo();
-
-		//dCIL::dListNode* const functionNode = cil.GetLast();
 		function->CompileCIL(cil);
-
-		//cil.Optimize(functionNode->GetNext(), function->m_argumentsCount, returnType);
-		//cil.Optimize(functionNode->GetNext(), 0, returnType);
 	}
 }
-
-
-void dDAGClassNode::AddLLVMGlobalSymbols (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols)
-{
-	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
-		dDAGFunctionNode* const function = node->GetInfo();
-		function->AddLLVMGlobalSymbols (cil, module, context, globalLLVMSymbols);
-	}
-}
-
-void dDAGClassNode::TranslateToLLVM (dCIL& cil, llvm::Module* const module, llvm::LLVMContext &context, dDAG::dLLVMSymbols& globalLLVMSymbols)
-{
-	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
-		dDAGFunctionNode* const function = node->GetInfo();
-		function->TranslateToLLVM (cil, module, context, globalLLVMSymbols);
-	}
-}
-
 
 void dDAGClassNode::ConvertToTarget (dCIL& cil)
 {
 	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
 		dDAGFunctionNode* const function = node->GetInfo();
 		function->ConvertToTarget (cil);
+	}
+}
+
+void dDAGClassNode::Optimize (dCIL& cil)
+{
+	for (dList<dDAGFunctionNode*>::dListNode* node = m_functionList.GetFirst(); node; node = node->GetNext()) {
+		dDAGFunctionNode* const function = node->GetInfo();
+		function->Optimize(cil);
 	}
 }

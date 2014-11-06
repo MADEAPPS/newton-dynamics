@@ -55,7 +55,7 @@ class dCIL: public dList<dCILInstr*>
 	};
 
 	
-	dCIL(llvm::Module* const module);
+	dCIL();
 	virtual ~dCIL(void);
 
 	dVirtualMachine* BuilExecutable();
@@ -68,30 +68,9 @@ class dCIL: public dList<dCILInstr*>
 	void ResetTemporaries();
 	dListNode* NewStatement();
 
-	void ConvertLLVMFunctionToNVMFunction (const llvm::Function& funtion);
-    void Optimize (llvm::Function* const function);
-
 	void RegisterAllocation (dListNode* const functionNode);
 
 	private:
-	dString GetName (llvm::Value* const value) const;
-	dCILInstr::dArgType GetType (const llvm::Type* const type) const;
-	dCILInstr::dArgType GetType (const llvm::Value* const value) const;
-
-	dCIL::dListNode* EmitLoad (const llvm::Instruction* const intruction);
-	dCIL::dListNode* EmitStore (const llvm::Instruction* const intruction);
-	dCIL::dListNode* EmitCall (const llvm::Instruction* const intruction);
-	dCIL::dListNode* EmitReturn (const llvm::Instruction* const intruction);
-	dCIL::dListNode* EmitPhiNode (const llvm::Instruction* const intruction);
-	dCIL::dListNode* EmitGetElementPtr (const llvm::Instruction* const intruction);
-	dCIL::dListNode* EmitIntegerAritmetic (const llvm::Instruction* const intruction);
-	dCIL::dListNode* EmitIntegerCompare (const llvm::Instruction* const intruction);
-	dCIL::dListNode* EmitIntegerBranch (const llvm::Instruction* const intruction);
-
-	dCIL::dListNode* EmitFunctionDeclaration(const llvm::Function& function);
-	dCIL::dListNode* EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions);
-	void EmitBasicBlockBody(const llvm::Function& function, const llvm::BasicBlock* const block, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& visited, dTree<dCIL::dListNode*, const llvm::BasicBlock*>& terminalInstructions);
-
 	int m_mark;
 	int m_tempIndex;
 	int m_labelIndex;
@@ -99,14 +78,14 @@ class dCIL: public dList<dCILInstr*>
 	dCILThreeArgInstr::dOperator m_conditionals[dCILThreeArgInstr::m_operatorsCount];
 	dCILThreeArgInstr::dOperator m_operatorComplement[dCILThreeArgInstr::m_operatorsCount];
 
-    llvm::legacy::FunctionPassManager m_optimizer;
-	
 	public:
 	static dString m_phiSource;
 	static dString m_pointerSize;
 	static dString m_pointerDecoration;
 	static dString m_variableUndercore;
 	static dString m_functionArgument;
+
+	static dString m_ssaPosifix;
 	
 	friend class dDataFlowGraph;
 	friend class dCILInstrIntergerLogical;

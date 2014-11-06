@@ -23,23 +23,66 @@ class dBasicBlock
 	dBasicBlock (dCIL::dListNode* const begin);
 	void Trace() const;
 
+	void ReplaceDominator(const dTree<int, const dBasicBlock*>& dominators);
+	bool ComparedDominator(const dTree<int, const dBasicBlock*>& dominators) const;
+	
 	int m_mark;
 	dCIL::dListNode* m_begin;
 	dCIL::dListNode* m_end;
+	const dBasicBlock* m_idom;
+	mutable dList<const dBasicBlock*> m_children;
+	mutable dTree<int, const dBasicBlock*> m_dominators; 
+	mutable dList<const dBasicBlock*> m_dominanceFrontier; 
+
+	dList<const dBasicBlock*> m_successors;
+	dList<const dBasicBlock*> m_predecessors;
 };
 
 class dBasicBlocksList: public dList<dBasicBlock> 
 {
+	class dStatementBucket: public dTree <const dCILInstr*, const dBasicBlock*>
+	{
+		public:
+		dStatementBucket()
+			:dTree <const dCILInstr*, const dBasicBlock*>()
+			,m_index (0)
+		{
+		}
+
+		int m_index;
+		dList<int> m_stack;
+		dCILInstr::dArg m_variable;
+	};
+
+	class dVariablesDictionary: public dTree <dStatementBucket, dString>
+	{
+		public:
+		dVariablesDictionary()
+			:dTree <dStatementBucket, dString>()
+		{
+		}
+
+		void Build (const dBasicBlocksList& list);
+	};
+
 	public:
 	dBasicBlocksList();
-	dBasicBlocksList(dCIL& cil, dCIL::dListNode* const functionNode);
 
 	void Trace() const;
+	void BuildBegin (dCIL::dListNode* const functionNode);
+	void BuildDominatorTree (dDataFlowGraph* const dataFlow);
+	void CalculateSuccessorsAndPredecessors(dDataFlowGraph* const dataFlow);
 
-	void Clear ();
-	void Build(dCIL& cil, dCIL::dListNode* const functionNode);
+	void ConvertToSSA (dDataFlowGraph* const dataFlow);
+
+	private:
+	void BuildDomicanceFrontier (const dBasicBlock* const root, dDataFlowGraph* const dataFlow) const;
+
+	void RenameVariables (const dBasicBlock* const root, dDataFlowGraph* const dataFlow, dVariablesDictionary& stack) const;
+
 	dCIL::dListNode* m_begin;
 	dCIL::dListNode* m_end;
+	dBasicBlock* m_dominatorTree;
 };
 
 

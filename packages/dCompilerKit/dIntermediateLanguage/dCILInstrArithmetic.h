@@ -34,6 +34,10 @@ class dCILInstrThreeArgArithmetic: public dCILThreeArgInstr
 	{ 
 		return true; 
 	}
+
+	// ***********************
+//	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
+	
 };
 
 class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
@@ -53,6 +57,11 @@ class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow);
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst);
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
+	virtual void GetUsedVariables (dList<dArg*>& variablesList);
+
 	dOperator m_operator;
 };
 

@@ -19,6 +19,7 @@
 class dCILInstrReturn;
 class dCILInstrFunction;
 
+
 class dCILInstrEnter: public dCILInstr
 {
 	public:
@@ -37,6 +38,10 @@ class dCILInstrEnter: public dCILInstr
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 	virtual dCILInstrEnter* GetAsEnter() { return this; }
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable () { return NULL; }
+
 
 	int m_registerMask;
 	int m_localMemorySize;
@@ -61,6 +66,10 @@ class dCILInstrLeave : public dCILInstr
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
 	virtual dCILInstrLeave* GetAsLeave() { return this; }
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable () { return NULL; }
+
 
 	dCILInstrEnter* m_enter;
 	int m_registerMask;
@@ -87,6 +96,8 @@ class dCILInstrNop: public dCILInstr
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
 
+	// ***********************
+	virtual dArg* GetGeneratedVariable () { return NULL; }
 
 	dString m_comment;
 };
@@ -116,6 +127,10 @@ class dCILInstrFunction: public dCILInstr
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable () { return NULL; }
+
 	
 	dArg m_name;
 	dList<dArg> m_parameters;
@@ -141,6 +156,9 @@ class dCILInstrFunctionEnd : public dCILInstr
 
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow) { return false; }
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) { return false; }
+
+	// ***********************
+	virtual dArg* GetGeneratedVariable () { return NULL; }
 
 	dCILInstrFunction* m_function;
 };

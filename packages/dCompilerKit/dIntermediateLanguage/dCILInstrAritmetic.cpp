@@ -196,6 +196,8 @@ bool dCILInstrIntergerLogical::ApplySemanticReordering ()
 
 void dCILInstrIntergerLogical::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const
 {
+	dAssert(0);
+/*
 	datFloatPoint.m_generatedVariable = m_arg0.m_label;
 
 	dAssert (m_arg1.GetType().m_intrinsicType != m_constInt);
@@ -216,6 +218,7 @@ void dCILInstrIntergerLogical::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFl
 		default:	
 			dAssert (0);
 	}
+*/	
 }
 
 
@@ -226,12 +229,15 @@ bool dCILInstrIntergerLogical::ApplyDeadElimination (dDataFlowGraph& dataFlow)
 
 void dCILInstrIntergerLogical::AddDefinedVariable (dInstructionVariableDictionary& dictionary) const 
 {
-	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
-	node->GetInfo().Append (m_myNode);
+	dAssert(0);
+//	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert (m_arg0.m_label);
+//	node->GetInfo().Append (m_myNode);
 }
 
 void dCILInstrIntergerLogical::AddUsedVariable (dInstructionVariableDictionary& dictionary) const 
 {
+	dAssert(0);
+/*
 	dInstructionVariableDictionary::dTreeNode* const node = dictionary.Insert(m_arg1.m_label);
 	node->GetInfo().Append(m_myNode);
 
@@ -250,6 +256,7 @@ void dCILInstrIntergerLogical::AddUsedVariable (dInstructionVariableDictionary& 
 		default:
 			dAssert(0);
 	}
+*/
 }
 
 bool dCILInstrIntergerLogical::ApplyCopyPropagation(dCILInstrMove* const moveInst)
@@ -415,3 +422,20 @@ void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOu
 }
 
 
+void dCILInstrIntergerLogical::GetUsedVariables (dList<dArg*>& variablesList)
+{
+	variablesList.Append(&m_arg1);
+	if (m_arg1.m_isPointer) {
+		variablesList.Append(&m_arg1);
+	} else {
+		switch (m_arg2.GetType().m_intrinsicType) 
+		{
+			case m_constInt:
+			case m_constFloat:			
+				break;
+
+			default:
+				variablesList.Append(&m_arg2);
+		}
+	}
+}
