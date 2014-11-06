@@ -160,6 +160,11 @@
     <ClInclude Include="..\dFiniteAutomata\dFiniteAutomata.h" />
     <ClInclude Include="..\dFiniteAutomata\dNonDeterministicFiniteAutonata.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\projects\visualStudio_2012_static_mt\dContainers.vcxproj">
+      <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
