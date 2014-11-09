@@ -18,6 +18,33 @@
 #include "dRegisterInterferenceGraph.h"
 #include "dTransformationSemanticOrdering.h"
 
+
+void dVariablesDictionary::BuildUsedVariableWorklist (dBasicBlocksList& list)
+{
+	RemoveAll();
+
+	for (dBasicBlocksList::dListNode* node = list.GetFirst(); node; node = node->GetNext()) {
+		dBasicBlock& block = node->GetInfo();
+
+		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
+			dCILInstr* const instruction = node->GetInfo();
+		//instruction->Trace();
+
+			dList<dCILInstr::dArg*> variablesList;
+			instruction->GetUsedVariables(variablesList);
+			for (dList<dCILInstr::dArg*>::dListNode* varNode = variablesList.GetFirst(); varNode; varNode = varNode->GetNext()) {
+				const dCILInstr::dArg* const variable = varNode->GetInfo();
+				dVariablesDictionary::dTreeNode* entry = Find(variable->m_label);
+				if (!entry) {
+					entry = Insert(variable->m_label);
+				}
+				dStatementBucket& buckect = entry->GetInfo();
+				buckect.Insert (&block, node);
+			}
+		}
+	}
+}
+
 dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function)
 	:m_cil (cil)
 	,m_function(function)
@@ -1567,3 +1594,193 @@ void dDataFlowGraph::RegistersAllocation (int registerCount)
 }
 
 #endif
+
+
+void dDataFlowGraph::GeneratedVariableWorklist (dTree <int, dCIL::dListNode*>& list) const
+{
+	for (dCIL::dListNode* node = m_function; !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
+		if (variable) {
+			list.Insert(0, node);
+		}
+	}
+}
+
+void dDataFlowGraph::GetStatementsWorklist(dTree <int, dCIL::dListNode*>& list) const
+{
+	for (dCIL::dListNode* node = m_function; !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		list.Insert(0, node);
+	}
+}
+
+
+bool dDataFlowGraph::ApplyDeadCodeEliminationSSA()
+{
+	bool anyChanges = false;
+
+	dWorkList workList;
+	dVariablesDictionary usedVariablesList;
+	usedVariablesList.BuildUsedVariableWorklist(m_basicBlocks);
+
+	dTree<dCIL::dListNode*, dString> map;
+	for (dCIL::dListNode* node = m_function; !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
+		if (variable) {
+			map.Insert(node, variable->m_label);
+		}
+	}
+	
+	GetStatementsWorklist(workList);
+	while (workList.GetCount()) {
+		dCIL::dListNode* const node = workList.GetRoot()->GetKey();
+		workList.Remove(workList.GetRoot());
+		dCILInstr* const instruction = node->GetInfo();
+		if (!instruction->GetAsCall()) {
+			const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
+			if (variable) {
+				dVariablesDictionary::dTreeNode* const usesNodeBuckect = usedVariablesList.Find(variable->m_label);
+				dAssert(!usesNodeBuckect || usesNodeBuckect->GetInfo().GetCount());
+				if (!usesNodeBuckect) {
+					anyChanges = true;
+					dList<dCILInstr::dArg*> variablesList;
+					instruction->GetUsedVariables(variablesList);
+					for (dList<dCILInstr::dArg*>::dListNode* varNode = variablesList.GetFirst(); varNode; varNode = varNode->GetNext()) {
+						const dCILInstr::dArg* const variable = varNode->GetInfo();
+						dAssert(usedVariablesList.Find(variable->m_label));
+						dVariablesDictionary::dTreeNode* const entry = usedVariablesList.Find(variable->m_label);
+						if (entry) {
+							dStatementBucket& buckect = entry->GetInfo();
+							buckect.Remove(node);
+							dAssert(map.Find(variable->m_label));
+							workList.Insert(map.Find(variable->m_label)->GetInfo());
+							if (!buckect.GetCount()) {
+								usedVariablesList.Remove(usesNodeBuckect);
+							}
+						}
+					}
+					instruction->Nullify();
+				}
+			}
+		}
+	}
+	return anyChanges;
+}
+
+
+bool dDataFlowGraph::ApplyConstantConditionalSSA()
+{
+	bool anyChanges = false;
+
+	dTree<int, dCIL::dListNode*> phyMap;
+	for (dCIL::dListNode* node = m_function; !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		if (instruction->GetAsPhy()) {
+			phyMap.Insert(0, node);
+		}
+	}
+	
+	for (dCIL::dListNode* node = m_function; !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		if (instruction->GetAsIF()) {
+			dCILInstrConditional* const conditinal = instruction->GetAsIF();
+
+			const dCILInstr::dArg& arg0 = conditinal->GetArg0();
+			if ((arg0.GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg0.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
+				dAssert(conditinal->GetTrueTarget());
+				dAssert(conditinal->GetFalseTarget());
+				int condition = arg0.m_label.ToInteger();
+				if (conditinal->m_mode == dCILInstrConditional::m_ifnot) {
+					condition = !condition;
+				}
+
+				dCILInstrLabel* label;
+				if (condition) {
+					label = conditinal->GetTrueTarget()->GetInfo()->GetAsLabel();
+				}
+				else {
+					label = conditinal->GetFalseTarget()->GetInfo()->GetAsLabel();
+				}
+
+				dCILInstrGoto* const jump = new dCILInstrGoto(*m_cil, label->GetArg0().m_label);
+				jump->SetTarget(label);
+				conditinal->ReplaceInstruction(jump);
+				anyChanges = true;
+			}
+		}
+	}
+
+	return anyChanges;
+}
+
+
+bool dDataFlowGraph::ApplyConstantPropagationSSA()
+{
+	bool anyChanges = false;
+
+	dWorkList workList;
+	dVariablesDictionary usedVariablesList;
+	usedVariablesList.BuildUsedVariableWorklist(m_basicBlocks);
+	
+	GetStatementsWorklist(workList);
+	while (workList.GetCount()) {
+		dCIL::dListNode* const node = workList.GetRoot()->GetKey();
+		workList.Remove(workList.GetRoot());
+		dCILInstr* const instruction = node->GetInfo();
+		anyChanges |= instruction->ApplyConstantPropagationSSA(workList, usedVariablesList);
+	}
+
+	if (anyChanges) {
+		for (dCIL::dListNode* node = m_function; !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
+			dCILInstr* const instruction = node->GetInfo();
+			instruction->ApplyConstantFoldingSSA();
+		}
+	}
+	return anyChanges;
+}
+
+bool dDataFlowGraph::ApplyCopyPropagationSSA()
+{
+	bool anyChanges = false;
+
+	dWorkList workList;
+	dVariablesDictionary usedVariablesList;
+	usedVariablesList.BuildUsedVariableWorklist(m_basicBlocks);
+	
+	GetStatementsWorklist(workList);
+	while (workList.GetCount()) {
+		dCIL::dListNode* const node = workList.GetRoot()->GetKey();
+		workList.Remove(workList.GetRoot());
+		dCILInstr* const instruction = node->GetInfo();
+		anyChanges |= instruction->ApplyCopyPropagationSSA(workList, usedVariablesList);
+	}
+	return anyChanges;
+}
+
+
+bool dDataFlowGraph::ApplyConditionalConstantPropagationSSA()
+{
+	bool anyChanges = false;
+/*
+	dWorkList workList;
+	dVariablesDictionary usedVariablesList;
+	usedVariablesList.BuildUsedVariableWorklist(m_basicBlocks);
+	GetStatementsWorklist(workList);
+	while (workList.GetCount()) {
+		dCIL::dListNode* const node = workList.GetRoot()->GetKey();
+		workList.Remove(workList.GetRoot());
+		dCILInstr* const instruction = node->GetInfo();
+		anyChanges |= instruction->ApplyConstantPropagationSSA(workList, usedVariablesList);
+	}
+
+	if (anyChanges) {
+		for (dCIL::dListNode* node = m_function; !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
+			dCILInstr* const instruction = node->GetInfo();
+			instruction->ApplyConstantFoldingSSA();
+		}
+	}
+*/
+	return anyChanges;
+}

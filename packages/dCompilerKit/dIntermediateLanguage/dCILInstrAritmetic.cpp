@@ -407,8 +407,8 @@ void dCILInstrIntergerLogical::EmitOpcode(dVirtualMachine::dOpCode* const codeOu
 							break;
 	}
 */
-	default:;
-		dAssert(0);
+		default:;
+			dAssert(0);
 	}
 
 	code.m_type3.m_reg0 = RegisterToIndex(m_arg0.m_label);
@@ -438,4 +438,45 @@ void dCILInstrIntergerLogical::GetUsedVariables (dList<dArg*>& variablesList)
 				variablesList.Append(&m_arg2);
 		}
 	}
+}
+
+void dCILInstrIntergerLogical::ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg)
+{
+	if (arg.m_label == m_arg1.m_label) {
+		m_arg1 = newArg;
+	}
+	if (arg.m_label == m_arg2.m_label) {
+		m_arg2 = newArg;
+	}
+}
+
+bool dCILInstrIntergerLogical::ApplyConstantFoldingSSA ()
+{
+	bool ret = false;
+
+	bool arg1 = !m_arg1.m_isPointer && ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat));
+	bool arg2 = !m_arg2.m_isPointer && ((m_arg2.GetType().m_intrinsicType == m_constInt) || (m_arg2.GetType().m_intrinsicType == m_constFloat));
+	
+	if (arg1 && arg2) {
+		int c = 0;
+		switch (m_operator) 
+		{
+			case m_less:
+			{
+				int a = m_arg1.m_label.ToInteger();
+				int b = m_arg2.m_label.ToInteger();
+				c = a < b ? 1 : 0;
+				break;
+			}
+
+			default:;
+				dAssert(0);
+		}
+
+		dCILInstrMove* const move = new dCILInstrMove (*m_cil, m_arg0.m_label, m_arg0.GetType(), dString (c), dArgType (dCILInstr::m_constInt));
+		ReplaceInstruction (move);
+		ret = true;
+	}
+
+	return ret;
 }

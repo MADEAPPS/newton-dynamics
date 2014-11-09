@@ -77,7 +77,6 @@ class dBasicBlocksList: public dList<dBasicBlock>
 
 	private:
 	void BuildDomicanceFrontier (const dBasicBlock* const root, dDataFlowGraph* const dataFlow) const;
-
 	void RenameVariables (const dBasicBlock* const root, dDataFlowGraph* const dataFlow, dVariablesDictionary& stack) const;
 
 	dCIL::dListNode* m_begin;

@@ -43,7 +43,7 @@ public class insertPhy
 	{
 		int i = 1;
 		int j = 1;
-		int k = 1;
+		int k = 0;
 		while (k < 100) {
 			if (j < 20) {
 				j = 1;

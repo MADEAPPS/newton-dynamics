@@ -34,7 +34,6 @@ inline dString GetReturnVariableName()
 class dCILInstr;
 class dDataFlowGraph; 
 
-//class dCIL: public dList<dThreeAdressStmt>
 class dCIL: public dList<dCILInstr*>
 {
 	public:
@@ -68,6 +67,7 @@ class dCIL: public dList<dCILInstr*>
 	void ResetTemporaries();
 	dListNode* NewStatement();
 
+	void OptimizeSSA (dListNode* const functionNode);
 	void RegisterAllocation (dListNode* const functionNode);
 
 	private:

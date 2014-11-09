@@ -125,6 +125,14 @@ void dCILInstrMove::AddUsedVariable (dInstructionVariableDictionary& dictionary)
 */
 }
 
+
+void dCILInstrMove::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
+{
+	dAssert(0);
+//	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
+}
+
+
 bool dCILInstrMove::ApplyDeadElimination (dDataFlowGraph& dataFlow)
 { 
 	dAssert(0);
@@ -156,10 +164,50 @@ void dCILInstrMove::GetUsedVariables (dList<dArg*>& variablesList)
 	}
 }
 
-void dCILInstrMove::AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const
-{ 
-	dCILInstr::AddKilledStatementLow(m_arg0, dictionary, datFloatPoint);
+bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary)
+{
+//Trace();
+	bool ret = false;
+	if ((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
+		dVariablesDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
+		if (node) {
+			dStatementBucket::Iterator iter (node->GetInfo());
+			for (iter.Begin(); iter; iter ++) {
+				dCILInstr* const instrution = iter.GetKey()->GetInfo();
+				//instrution->Trace();
+				instrution->ReplaceArgument (m_arg0, NULL, m_arg1);
+				//instrution->Trace();
+				workList.Insert(instrution->GetNode());
+			}
+		}
+		Nullify();
+		ret = true;
+	}
+	return ret;
 }
+
+bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary)
+{
+	bool ret = false;
+	if (!((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat))) {
+		dVariablesDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
+		if (node) {
+//Trace();
+			dStatementBucket::Iterator iter(node->GetInfo());
+			for (iter.Begin(); iter; iter++) {
+				dCILInstr* const instrution = iter.GetKey()->GetInfo();
+//instrution->Trace();
+				instrution->ReplaceArgument(m_arg0, NULL, m_arg1);
+//instrution->Trace();
+				workList.Insert(instrution->GetNode());
+			}
+		}
+		Nullify();
+		ret = true;
+	}
+	return ret;
+}
+
 
 void dCILInstrMove::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const
 {
@@ -271,7 +319,7 @@ dCILInstrPhy::dCILInstrPhy (dCIL& program, const dString& name, const dArgType& 
 	:dCILSingleArgInstr(program, dArg(name, type))
 {
 	for (dList<dCILInstr*>::dListNode* node = source.GetFirst(); node; node = node->GetNext()) {
-		m_sources.Append(node->GetInfo());
+		m_sources.Append(node->GetInfo()->GetNode());
 	}
 }
 
@@ -279,8 +327,8 @@ dCILInstrPhy::dCILInstrPhy (dCIL& program, const dString& name, const dArgType& 
 void dCILInstrPhy::Serialize(char* const textOut) const
 {
 	sprintf(textOut, "\t%s %s = phy (", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
-	for (dList<dCILInstr*>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
-		const dArg* const arg = node->GetInfo()->GetGeneratedVariable();
+	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
+		dArg* const arg = node->GetInfo().m_intructionNode ? node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : &node->GetInfo().m_arg;
 		dAssert (arg);
 		char tmp[1024]; 
 		if (node->GetNext()) {
@@ -294,3 +342,55 @@ void dCILInstrPhy::Serialize(char* const textOut) const
 	strcat(textOut, ")\n");
 }
 
+void dCILInstrPhy::GetUsedVariables (dList<dArg*>& variablesList)
+{
+	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
+		dArg* const arg = node->GetInfo().m_intructionNode ? node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : &node->GetInfo().m_arg;
+		if (arg->GetType().m_isPointer) {
+			variablesList.Append(arg);
+		} else {
+			switch (arg->GetType().m_intrinsicType) 
+			{
+				case m_constInt:
+				case m_constFloat:
+					break;
+
+				default:
+					variablesList.Append(arg);
+			}
+		}
+	}
+}
+
+void dCILInstrPhy::ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg)
+{
+	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
+		dArg* const srcArg = node->GetInfo().m_intructionNode ? node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : &node->GetInfo().m_arg;
+		if (arg.m_label == srcArg->m_label) {
+			node->GetInfo().m_arg = newArg;
+			node->GetInfo().m_intructionNode = newInstruction ? newInstruction->GetNode() : NULL;
+		}
+	}
+}
+
+bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary)
+{
+	bool ret = false;
+	if (!m_sources.GetFirst()->GetInfo().m_intructionNode) {
+		const dArg& arg = m_sources.GetFirst()->GetInfo().m_arg;
+		if ((arg.GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
+			ret = true;
+			for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
+				const dArg& srcArg = node->GetInfo().m_intructionNode ? *node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : node->GetInfo().m_arg;
+				ret &= ((srcArg.m_label == arg.m_label) && !node->GetInfo().m_intructionNode);
+			}
+		}
+	}
+
+	if (ret) {
+		Trace();
+		dAssert (0);
+	}
+
+	return ret;
+}

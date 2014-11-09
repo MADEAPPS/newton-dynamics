@@ -152,67 +152,40 @@ class dInstructionVariableDictionary: public dTree<dList<dCIL::dListNode*>, dStr
 };
 */
 
+
+class dWorkList: public dTree <int, dCIL::dListNode*>
+{
+	public:
+	dWorkList ()
+		:dTree <int, dCIL::dListNode*>()
+	{
+	}
+};
+
+class dStatementBucket: public dTree <const dBasicBlock*, const dCIL::dListNode*>
+{
+	public:
+	dStatementBucket()
+		:dTree <const dBasicBlock*, const dCIL::dListNode*>()
+	{
+	}
+};
+
+class dVariablesDictionary: public dTree <dStatementBucket, dString>
+{
+	public:
+	dVariablesDictionary()
+		:dTree <dStatementBucket, dString>()
+	{
+		}
+
+	void BuildUsedVariableWorklist(dBasicBlocksList& list);
+};
+
+
 class dDataFlowGraph 
 {
-/*
 	public:
-	class dLoop 
-	{
-		public:
-		dCIL::dListNode* m_head;
-		dCIL::dListNode* m_tail;
-	};
-
-	class dDominator: public dTree<int, dCIL::dListNode*> 
-	{
-		public:
-		dDominator()
-			:dTree<int, dCIL::dListNode*>()
-			,m_isLoopInvariant(false)
-		{
-		}
-
-		dDominator(const dDominator& copy)
-			:dTree<int, dCIL::dListNode*>()
-			,m_isLoopInvariant(false)
-		{
-			Iterator iter (copy);
-			for (iter.Begin(); iter; iter ++) {
-				Insert(0, iter.GetKey());
-			}
-		}
-
-		void Intersection (const dDominator& parent)
-		{
-			Iterator iter (*this);
-			for (iter.Begin(); iter; ) {
-				dTreeNode* const node = iter.GetNode();
-				iter ++;
-				if (!parent.Find (node->GetKey())){
-					Remove (node);
-				}
-			}
-		}
-
-		bool Compare (const dDominator& cmp) const
-		{
-			if (GetCount() == cmp.GetCount()) {
-				Iterator iter0 (cmp);
-				Iterator iter1 (*this);
-				for (iter0.Begin(), iter1.Begin(); iter0 && iter1 ; iter0 ++, iter1 ++) {
-					if (iter0.GetKey() != iter1.GetKey()) {
-						return false;
-					}
-				}
-				return true;
-			}
-			return false;
-		}
-		bool m_isLoopInvariant;	
-	};
-*/
-	public:
-
 	class dTransformation
 	{
 		public: 
@@ -225,7 +198,6 @@ class dDataFlowGraph
 		}
 	};
 
-
 	dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function);
 	virtual ~dDataFlowGraph(void);
 
@@ -234,17 +206,12 @@ class dDataFlowGraph
 	void ApplyLocalOptimizations();
 	void RegistersAllocation (int registerCount);
 	private:
-	
-
 	void CalculateReachingDefinitions();
 	void CalculateLiveInputLiveOutput();
 	void UpdateLiveInputLiveOutput();
-
-	
 	void BuildGeneratedAndUsedVariableSets();
 	void BuildDefinedAndKilledStatementSets();
 	void UpdateReachingDefinitions();
-
 	bool ApplyRemoveDeadCode();
 	bool ApplyCopyPropagation();
 	bool ApplyConstantFolding();
@@ -270,23 +237,29 @@ class dDataFlowGraph
 	void TraceReachIn (dCIL::dListNode* const node) const;
 	void TraceReachOutput (dCIL::dListNode* const node) const;
 
-	
-	
-	
-	
-	
 	dInstructionVariableDictionary m_variableUsed;
 	dInstructionVariableDictionary m_variableDefinitions;
-	
+
 
 	friend dCILInstrMove;
 	friend dCILSingleArgInstr;
 	friend dRegisterInterferenceGraph;
 */
+
+	bool ApplyCopyPropagationSSA();
+	bool ApplyDeadCodeEliminationSSA();
+	bool ApplyConstantPropagationSSA();
+	bool ApplyConstantConditionalSSA();
+	bool ApplyConditionalConstantPropagationSSA();
+	
+
 	private:
 	void BuildBasicBlockGraph();
 	void DeleteUnreachedBlocks();
 	void CalculateSuccessorsAndPredecessors();
+
+	void GetStatementsWorklist (dTree <int, dCIL::dListNode*>& list) const;
+	void GeneratedVariableWorklist (dTree <int, dCIL::dListNode*>& list) const;
 
 	dCIL* m_cil;
 	dCIL::dListNode* m_function;

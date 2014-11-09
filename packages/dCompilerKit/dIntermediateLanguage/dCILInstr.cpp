@@ -118,14 +118,19 @@ dString dCILInstr::RemoveSSAPostfix(const dString& name) const
 
 void dCILInstr::Nullify()
 {
+	ReplaceInstruction (new dCILInstrNop(*m_cil));
+}
+
+void dCILInstr::ReplaceInstruction (dCILInstr* const newIntruction)
+{
+	newIntruction->GetCil()->Remove(newIntruction->GetNode());
 	dCIL* const cil = m_cil;
 	dList<dCILInstr*>::dListNode* const node = m_myNode;
 	m_myNode = NULL;
 	delete this;
-	dCILInstrNop* const nop = new dCILInstrNop();
-	node->GetInfo() = nop;
-	nop->m_cil = cil;
-	nop->m_myNode = node;
+	node->GetInfo() = newIntruction;
+	newIntruction->m_cil = cil;
+	newIntruction->m_myNode = node;
 }
 
 void dCILInstr::Serialize(char* const textOut) const

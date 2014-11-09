@@ -219,8 +219,7 @@ void dDAGFunctionNode::ConvertToSSA(dCIL& cil)
 
 void dDAGFunctionNode::Optimize (dCIL& cil)
 {
-	dDataFlowGraph dataFlow (&cil, m_functionStart);
-
+	cil.OptimizeSSA (m_functionStart);
 }
 
 bool dDAGFunctionNode::RemoveRedundantJumps (dCIL& cil)

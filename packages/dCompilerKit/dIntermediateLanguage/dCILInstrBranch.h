@@ -108,6 +108,8 @@ class dCILInstrConditional: public dCILThreeArgInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
+	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg);
+
 
 	dBranchMode m_mode;
 	dList<dCILInstr*>::dListNode* m_tagetNode0;

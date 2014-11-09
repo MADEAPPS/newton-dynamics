@@ -179,6 +179,13 @@ void dCILInstrConditional::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr
 }
 
 
+void dCILInstrConditional::ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg)
+{
+//Trace ();
+	if (arg.m_label == m_arg0.m_label) {
+		m_arg0 = newArg;
+	}
+}
 
 
 dCILInstrReturn::dCILInstrReturn(dCIL& program, const dString& name, const dArgType& type)

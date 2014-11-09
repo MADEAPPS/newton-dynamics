@@ -80,7 +80,6 @@ class dCILInstrLeave : public dCILInstr
 class dCILInstrNop: public dCILInstr
 {
 	public:
-	dCILInstrNop();
 	dCILInstrNop(dCIL& program);
 	virtual bool ApplySemanticReordering () { return false;}
 	virtual void AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) const {}
@@ -98,6 +97,9 @@ class dCILInstrNop: public dCILInstr
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
+	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
+	virtual void ReplaceArgument(const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg) {}
+
 
 	dString m_comment;
 };

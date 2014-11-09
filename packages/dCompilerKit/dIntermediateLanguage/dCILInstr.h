@@ -29,8 +29,10 @@ class dCILInstrFunctionEnd;
 class dCILInstrConditional;
 class dCILInstrThreeArgArithmetic;
 
+class dWorkList;
 class dDataFlowPoint;
 class dDataFlowGraph;
+class dVariablesDictionary;
 class dRegisterInterferenceGraph;
 class dInstructionVariableDictionary;
 
@@ -158,8 +160,9 @@ class dCILInstr
 	
 	virtual void Serialize(char* const textOut) const;
 
-	virtual void Trace() const;
 	void Nullify();
+	void ReplaceInstruction(dCILInstr* const newIntruction);
+	virtual void Trace() const;
 	static dIntrisicType GetTypeID(const dString& typeName);
 
 
@@ -167,7 +170,11 @@ class dCILInstr
 	// ****************************
 	virtual dArg* GetGeneratedVariable () {dAssert (0); return NULL;}
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {dAssert (0);}
+	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg) {dAssert (0);}
 
+	virtual bool ApplyConstantFoldingSSA () {return false;}
+	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary) {return false;}
+	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary) {return false;}
 
 	dString RemoveSSAPostfix(const dString& name) const;
 	dString MakeSSAName(const dString& name, int ssaPostfix) const;
