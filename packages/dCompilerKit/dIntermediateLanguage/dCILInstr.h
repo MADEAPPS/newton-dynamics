@@ -30,6 +30,7 @@ class dCILInstrConditional;
 class dCILInstrThreeArgArithmetic;
 
 class dWorkList;
+class dBasicBlock;
 class dDataFlowPoint;
 class dDataFlowGraph;
 class dVariablesDictionary;
@@ -180,18 +181,17 @@ class dCILInstr
 	dString MakeSSAName(const dString& name, int ssaPostfix) const;
 
 	protected:
-	dCILInstr();
-
-	
-
 	virtual void AddKilledStatementLow(const dArg& arg, const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
-	
 
 	dCIL* m_cil;
+	dBasicBlock* m_basicBlock;
 	dList<dCILInstr*>::dListNode* m_myNode;
 	int m_byteCodeOffset;
 	static dMapTable m_maptable[];
 	static dString m_ssaPosfix;
+
+	friend class dBasicBlock;
+	friend class dBasicBlocksList;
 };
 
 

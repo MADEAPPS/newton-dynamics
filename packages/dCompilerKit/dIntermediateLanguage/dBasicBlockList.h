@@ -21,6 +21,7 @@ class dBasicBlock
 {
 	public:
 	dBasicBlock (dCIL::dListNode* const begin);
+	dBasicBlock (const dBasicBlock& src);
 	void Trace() const;
 
 	void ReplaceDominator(const dTree<int, const dBasicBlock*>& dominators);
@@ -69,9 +70,10 @@ class dBasicBlocksList: public dList<dBasicBlock>
 	dBasicBlocksList();
 
 	void Trace() const;
-	void BuildBegin (dCIL::dListNode* const functionNode);
-	void BuildDominatorTree (dDataFlowGraph* const dataFlow);
-	void CalculateSuccessorsAndPredecessors(dDataFlowGraph* const dataFlow);
+
+	void Build (dCIL::dListNode* const functionNode);
+	
+	//void CalculateSuccessorsAndPredecessors(dDataFlowGraph* const dataFlow);
 
 	void ConvertToSSA (dDataFlowGraph* const dataFlow);
 
@@ -79,9 +81,14 @@ class dBasicBlocksList: public dList<dBasicBlock>
 	void BuildDomicanceFrontier (const dBasicBlock* const root, dDataFlowGraph* const dataFlow) const;
 	void RenameVariables (const dBasicBlock* const root, dDataFlowGraph* const dataFlow, dVariablesDictionary& stack) const;
 
+	void BuildDominatorTree ();
+	void DeleteUnreachedBlocks();
+	void CalculateSuccessorsAndPredecessors ();
+
 	dCIL::dListNode* m_begin;
 	dCIL::dListNode* m_end;
 	dBasicBlock* m_dominatorTree;
+	int m_mark;
 };
 
 

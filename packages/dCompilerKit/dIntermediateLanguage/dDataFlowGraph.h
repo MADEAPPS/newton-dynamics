@@ -255,16 +255,13 @@ class dDataFlowGraph
 
 	private:
 	void BuildBasicBlockGraph();
-	void DeleteUnreachedBlocks();
-	void CalculateSuccessorsAndPredecessors();
-
 	void GetStatementsWorklist (dTree <int, dCIL::dListNode*>& list) const;
 	void GeneratedVariableWorklist (dTree <int, dCIL::dListNode*>& list) const;
 
 	dCIL* m_cil;
 	dCIL::dListNode* m_function;
 	dBasicBlocksList m_basicBlocks; 
-	dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
+	//dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
 	//dList<dBasicBlock*> m_traversalBlocksOrder; 
 
 	mutable int m_mark;

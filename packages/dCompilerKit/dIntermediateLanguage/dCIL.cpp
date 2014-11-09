@@ -223,6 +223,8 @@ Trace();
 		pass |= dataFlow.ApplyConstantConditionalSSA();
 Trace();
 		pass |= dataFlow.ApplyCopyPropagationSSA ();
+Trace();
+		pass |= dataFlow.ApplyConditionalConstantPropagationSSA();
 	}
 }
 

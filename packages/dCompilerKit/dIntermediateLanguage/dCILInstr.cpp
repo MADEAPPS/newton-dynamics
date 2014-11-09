@@ -83,13 +83,7 @@ void dCILInstr::dArg::SetType (dIntrisicType intrinsicType, bool pointer)
 dCILInstr::dCILInstr (dCIL& program)
 	:m_cil(&program)
 	,m_myNode (program.Append (this))
-{
-}
-
-dCILInstr::dCILInstr()
-	:m_cil(NULL)
-	,m_myNode(NULL)
-	,m_byteCodeOffset(-1)
+	,m_basicBlock (NULL)
 {
 }
 

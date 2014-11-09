@@ -85,7 +85,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dCILstdafx.h</PrecompiledHeaderFile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -193,8 +193,6 @@
     <ClCompile Include="..\dIntermediateLanguage\dDataFlowGraph.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCILInstr.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dTransformation.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dTransformationSemanticOrdering.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dIntermediateLanguage\dBasicBlockList.h" />
@@ -207,8 +205,6 @@
     <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILInstr.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dTransformation.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dTransformationSemanticOrdering.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="dFiniteAutomata.vcxproj">

@@ -25,6 +25,19 @@ dBasicBlock::dBasicBlock (dCIL::dListNode* const begin)
 {
 }
 
+dBasicBlock::dBasicBlock(const dBasicBlock& src)
+	:m_mark(0)
+	,m_begin(src.m_begin)
+	,m_end(NULL)
+	,m_idom(NULL)
+{
+	for (m_end = m_begin; m_end && !m_end->GetInfo()->IsBasicBlockEnd(); m_end = m_end->GetNext()) {
+		m_end->GetInfo()->m_basicBlock = this;
+	}
+	m_end->GetInfo()->m_basicBlock = this;
+}
+
+
 void dBasicBlock::Trace() const
 {
 	bool terminate = false;
@@ -125,6 +138,7 @@ void dBasicBlocksList::dVariablesDictionary::Build(const dBasicBlocksList& list)
 dBasicBlocksList::dBasicBlocksList()
 	:dList<dBasicBlock> ()
 	,m_dominatorTree(NULL)
+	,m_mark(0)
 {
 }
 
@@ -137,7 +151,7 @@ void dBasicBlocksList::Trace() const
 	}
 }
 
-void dBasicBlocksList::BuildBegin (dCIL::dListNode* const functionNode)
+void dBasicBlocksList::Build (dCIL::dListNode* const functionNode)
 {
 	RemoveAll();
 	m_begin = functionNode->GetNext();
@@ -151,43 +165,124 @@ void dBasicBlocksList::BuildBegin (dCIL::dListNode* const functionNode)
 			Append(dBasicBlock(node));
 		}
 	}
-
-	for (dList<dBasicBlock>::dListNode* blockNode = GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
-		dBasicBlock& block = blockNode->GetInfo();
-		for (dCIL::dListNode* node = block.m_begin; node; node = node->GetNext()) {
-//node->GetInfo()->Trace();
-			if (node->GetInfo()->IsBasicBlockEnd()) {
-				block.m_end = node;
-				break;
-			}
-		} 
-//block.Trace();
-	}
-
-//cil.Trace();
+	CalculateSuccessorsAndPredecessors ();
+	BuildDominatorTree ();
 //Trace();
 }
 
-void dBasicBlocksList::CalculateSuccessorsAndPredecessors(dDataFlowGraph* const dataFlow)
+
+void dBasicBlocksList::CalculateSuccessorsAndPredecessors ()
 {
-	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-		dBasicBlock& block =  node->GetInfo();
-		block.m_successors.RemoveAll();
-		block.m_predecessors.RemoveAll();
+	m_mark += 1;
+	dList<dBasicBlock*> stack;
+	stack.Append(&GetFirst()->GetInfo());
 
-		const dDataFlowPoint& blockEndDatapoint = dataFlow->m_dataFlowGraph.Find(block.m_end)->GetInfo();
-		for (dList<dDataFlowPoint*>::dListNode* succNode = blockEndDatapoint.m_successors.GetFirst(); succNode; succNode = succNode->GetNext()) {
-			block.m_successors.Append(&succNode->GetInfo()->m_basicBlockNode->GetInfo());
+	while (stack.GetCount()) {
+		dBasicBlock* const block = stack.GetLast()->GetInfo();
+
+		stack.Remove(stack.GetLast()->GetInfo());
+		if (block->m_mark < m_mark) {
+
+			block->m_mark = m_mark;
+			//m_traversalBlocksOrder.Addtop(block);
+//block->Trace();
+
+			dCILInstr* const instruction = block->m_end->GetInfo();
+			dAssert(instruction->IsBasicBlockEnd());
+			if (instruction->GetAsIF()) {
+				dCILInstrConditional* const ifInstr = instruction->GetAsIF();
+
+				dAssert (ifInstr->GetTrueTarget());
+				dAssert (ifInstr->GetFalseTarget());
+
+				dCILInstrLabel* const target0 = ifInstr->GetTrueTarget()->GetInfo()->GetAsLabel();
+				dCILInstrLabel* const target1 = ifInstr->GetFalseTarget()->GetInfo()->GetAsLabel();
+
+				dBasicBlock* const block0 = target0->m_basicBlock;
+				dAssert (block0);
+				block->m_successors.Append (block0);
+				block0->m_predecessors.Append(block);
+				stack.Append (block0);
+
+				dBasicBlock* const block1 = target1->m_basicBlock;
+				dAssert(block1);
+				block->m_successors.Append(block1);
+				block1->m_predecessors.Append(block);
+				stack.Append(block1);
+
+			} else if (instruction->GetAsGoto()) {
+				dCILInstrGoto* const gotoInst = instruction->GetAsGoto();
+
+				dAssert(gotoInst->GetTarget());
+				dCILInstrLabel* const target = gotoInst->GetTarget()->GetInfo()->GetAsLabel();
+				dBasicBlock* const block0 = target->m_basicBlock;
+
+				dAssert(block0);
+				block->m_successors.Append(block0);
+				block0->m_predecessors.Append(block);
+				stack.Append(block0);
+			}
 		}
+	}
 
-		const dDataFlowPoint& blockBeginDatapoint = dataFlow->m_dataFlowGraph.Find(block.m_begin)->GetInfo();
-		for (dList<dDataFlowPoint*>::dListNode* preceNode = blockBeginDatapoint.m_predecessors.GetFirst(); preceNode; preceNode = preceNode->GetNext()) {
-			block.m_predecessors.Append(&preceNode->GetInfo()->m_basicBlockNode->GetInfo());
+	DeleteUnreachedBlocks();
+}
+
+void dBasicBlocksList::DeleteUnreachedBlocks()
+{
+	dTree<dBasicBlock*, dCIL::dListNode*> blockMap;
+	for (dBasicBlocksList::dListNode* blockNode = GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+		dBasicBlock& block = blockNode->GetInfo();
+		blockMap.Insert(&block, block.m_begin);
+	}
+
+	
+	m_mark += 1;
+	dList<dBasicBlock*> stack;
+	stack.Append(&GetFirst()->GetInfo());
+	while (stack.GetCount()) {
+		dBasicBlock* const block = stack.GetLast()->GetInfo();
+
+		stack.Remove(stack.GetLast()->GetInfo());
+		if (block->m_mark < m_mark) {
+			block->m_mark = m_mark;
+
+			dCILInstr* const instruction = block->m_end->GetInfo();
+			dAssert(instruction->IsBasicBlockEnd());
+			if (instruction->GetAsIF()) {
+				dCILInstrConditional* const ifInstr = instruction->GetAsIF();
+				stack.Append(blockMap.Find(ifInstr->GetTrueTarget())->GetInfo());
+				stack.Append(blockMap.Find(ifInstr->GetFalseTarget())->GetInfo());
+
+			} else if (instruction->GetAsGoto()) {
+				dCILInstrGoto* const gotoInst = instruction->GetAsGoto();
+				stack.Append(blockMap.Find(gotoInst->GetTarget())->GetInfo());
+			}
+		}
+	}
+
+	dCIL* const cil = m_begin->GetInfo()->GetCil();
+	dBasicBlocksList::dListNode* nextBlockNode;
+	for (dBasicBlocksList::dListNode* blockNode = GetFirst(); blockNode; blockNode = nextBlockNode) {
+		dBasicBlock& block = blockNode->GetInfo();
+		nextBlockNode = blockNode->GetNext();
+		if (block.m_mark != m_mark) {
+			//block.Trace();
+			bool terminate = false;
+			dCIL::dListNode* nextNode;
+			for (dCIL::dListNode* node = block.m_begin; !terminate; node = nextNode) {
+				terminate = (node == block.m_end);
+				nextNode = node->GetNext();
+				cil->Remove(node);
+			}
+			Remove(blockNode);
 		}
 	}
 }
 
-void dBasicBlocksList::BuildDominatorTree (dDataFlowGraph* const dataFlow)
+
+
+void dBasicBlocksList::BuildDominatorTree ()
 {
 	// dominator of the start node is the start itself
 	//Dom(n0) = { n0 }
@@ -378,11 +473,10 @@ void dBasicBlocksList::ConvertToSSA (dDataFlowGraph* const dataFlow)
 		}
 	}
 
-	dataFlow->CalculateSuccessorsAndPredecessors();
-	variableList.Build (*this);
 
-//Trace ();
 	dTree<int, dString> stack;
+	//dataFlow->CalculateSuccessorsAndPredecessors();
+	variableList.Build (*this);
 	RenameVariables (&GetFirst()->GetInfo(), dataFlow, variableList);
 }
 

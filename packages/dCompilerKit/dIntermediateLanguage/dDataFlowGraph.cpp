@@ -16,7 +16,6 @@
 #include "dCILInstrLoadStore.h"
 #include "dCILInstrArithmetic.h"
 #include "dRegisterInterferenceGraph.h"
-#include "dTransformationSemanticOrdering.h"
 
 
 void dVariablesDictionary::BuildUsedVariableWorklist (dBasicBlocksList& list)
@@ -48,11 +47,8 @@ void dVariablesDictionary::BuildUsedVariableWorklist (dBasicBlocksList& list)
 dDataFlowGraph::dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function)
 	:m_cil (cil)
 	,m_function(function)
-//	,m_variableDefinitions()
 	,m_mark (0)
 {
-//	dTransformationSemanticOrdering reorderInstructions (cil, function->GetInfo()->GetAsFunction());
-//	reorderInstructions.Update();
 	BuildBasicBlockGraph();
 }
 
@@ -60,9 +56,11 @@ dDataFlowGraph::~dDataFlowGraph(void)
 {
 }
 
-
+/*
 void dDataFlowGraph::CalculateSuccessorsAndPredecessors()
 {
+dAssert (0);
+
 	m_dataFlowGraph.RemoveAll();
 	dTree<dBasicBlock*, dCIL::dListNode*> blockMap;
 	for (dBasicBlocksList::dListNode* blockNode = m_basicBlocks.GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
@@ -145,6 +143,7 @@ void dDataFlowGraph::CalculateSuccessorsAndPredecessors()
 			}
 		}
 	}
+
 }
 
 void dDataFlowGraph::DeleteUnreachedBlocks()
@@ -196,20 +195,11 @@ void dDataFlowGraph::DeleteUnreachedBlocks()
 		}
 	}
 }
+*/
 
 void dDataFlowGraph::BuildBasicBlockGraph()
 {
-	m_basicBlocks.BuildBegin (m_function);
-
-	CalculateSuccessorsAndPredecessors();
-	DeleteUnreachedBlocks();
-
-	m_basicBlocks.CalculateSuccessorsAndPredecessors(this);
-
-//m_cil->Trace();
-	m_basicBlocks.BuildDominatorTree (this);
-
-//m_basicBlocks.Trace();
+	m_basicBlocks.Build (m_function);
 }
 
 void dDataFlowGraph::ConvertToSSA ()
@@ -1610,7 +1600,6 @@ void dDataFlowGraph::GeneratedVariableWorklist (dTree <int, dCIL::dListNode*>& l
 void dDataFlowGraph::GetStatementsWorklist(dTree <int, dCIL::dListNode*>& list) const
 {
 	for (dCIL::dListNode* node = m_function; !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
-		dCILInstr* const instruction = node->GetInfo();
 		list.Insert(0, node);
 	}
 }
