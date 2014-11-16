@@ -178,7 +178,7 @@
     </CustomBuild>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\dIntermediateLanguage\dBasicBlockList.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dBasicBlocksGraph.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCIL.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCILInstrAritmetic.cpp" />
     <ClCompile Include="..\dIntermediateLanguage\dCILInstrBranch.cpp" />
@@ -196,7 +196,7 @@
     <ClCompile Include="..\dIntermediateLanguage\dCILInstr.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\dIntermediateLanguage\dBasicBlockList.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dBasicBlocksGraph.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCIL.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILInstrArithmetic.h" />
     <ClInclude Include="..\dIntermediateLanguage\dCILInstrBranch.h" />

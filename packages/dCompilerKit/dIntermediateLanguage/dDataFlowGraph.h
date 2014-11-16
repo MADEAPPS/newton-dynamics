@@ -15,7 +15,7 @@
 
 #include "dCILstdafx.h"
 #include "dCILInstr.h"
-#include "dBasicBlockList.h"
+#include "dBasicBlocksGraph.h"
 
 inline dString IndexToRegister(int index)
 {

@@ -28,8 +28,8 @@
 #include <dCILInstr.h>
 #include <dRefCounter.h>
 #include <dDataFlowGraph.h>
-#include <dBasicBlockList.h>
 #include <dVirtualMachine.h>
+#include <dBasicBlocksGraph.h>
 #include <dContainersStdAfx.h>
 
 #include <dCILInstrBranch.h>

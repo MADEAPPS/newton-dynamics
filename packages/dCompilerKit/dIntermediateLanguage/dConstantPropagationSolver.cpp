@@ -13,7 +13,7 @@
 #include "dCILstdafx.h"
 #include "dDataFlowGraph.h"
 #include "dCILInstrBranch.h"
-#include "dBasicBlockList.h"
+#include "dBasicBlocksGraph.h"
 #include "dCILInstrLoadStore.h"
 #include "dConstantPropagationSolver.h"
 
@@ -59,7 +59,7 @@ dConstantPropagationSolver::dConstantPropagationSolver (dBasicBlocksGraph* const
 		instruction->GetUsedVariables(variablesList);
 		for (dList<dCILInstr::dArg*>::dListNode* varNode = variablesList.GetFirst(); varNode; varNode = varNode->GetNext()) {
 			dCILInstr::dArg* const arg = varNode->GetInfo();
-			dTree<dTree<int, dCILInstr*>, dString>::dTreeNode* bucketNode = m_uses.Find(arg->m_label);
+			dTree<dInstructionMap, dString>::dTreeNode* bucketNode = m_uses.Find(arg->m_label);
 			if (!bucketNode) {
 				bucketNode =  m_uses.Insert(arg->m_label);
 			}

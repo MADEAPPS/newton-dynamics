@@ -16,12 +16,21 @@
 #include "dCILstdafx.h"
 #include "dCIL.h"
 #include "dCILInstr.h"
-#include "dBasicBlockList.h"
+#include "dBasicBlocksGraph.h"
 
 
 class dConstantPropagationSolver
 {
 	public:
+	class dInstructionMap: public dTree<int, dCILInstr*>
+	{
+		public:
+		dInstructionMap ()
+			:dTree<int, dCILInstr*>()
+		{
+		}
+	};
+
 	class dVariable
 	{
 		public:
@@ -87,11 +96,11 @@ class dConstantPropagationSolver
 
 	dBasicBlocksGraph* m_graph; 
 	dTree<int, dBasicBlock*> m_visited;
+	dTree<dInstructionMap, dString> m_uses;
+	dInstructionMap m_instructionsWorklist;
 	dTree<int, dBasicBlock*> m_blockWorklist;
-	dTree<int, dCILInstr*> m_instructionsWorklist;
 	dTree<dVariable, dString> m_variablesList;
 	dTree<int, dBlockEdgeKey> m_executableEdges;
-	dTree<dTree<int, dCILInstr*>, dString> m_uses;
 };
 
 #endif
