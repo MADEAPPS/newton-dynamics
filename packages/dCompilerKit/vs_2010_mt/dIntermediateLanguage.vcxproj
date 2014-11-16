@@ -138,39 +138,6 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\dIntermediateLanguage\dBasicBlockList.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dCIL.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dCILInstr.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dCILInstrAritmetic.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dCILInstrBranch.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dCILInstrLoadStore.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dCILInstrMiscellaneous.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dCILstdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\dIntermediateLanguage\dDataFlowGraph.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dTransformation.cpp" />
-    <ClCompile Include="..\dIntermediateLanguage\dTransformationSemanticOrdering.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\dIntermediateLanguage\dBasicBlockList.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dCIL.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dCILInstr.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dCILInstrArithmetic.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dCILInstrBranch.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dCILInstrLoadStore.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dCILInstrMiscellaneous.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dCILstdafx.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dTransformation.h" />
-    <ClInclude Include="..\dIntermediateLanguage\dTransformationSemanticOrdering.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\projects\visualStudio_2010_static_mt\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
@@ -186,6 +153,32 @@
       <Project>{b27af501-3f19-49ff-9db0-ff60b17508f6}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\dIntermediateLanguage\dBasicBlocksGraph.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCIL.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILInstr.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILInstrArithmetic.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILInstrBranch.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILInstrLoadStore.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILInstrMiscellaneous.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dCILstdafx.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dConstantPropagationSolver.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dDataFlowGraph.h" />
+    <ClInclude Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\dIntermediateLanguage\dBasicBlocksGraph.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCIL.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILInstr.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILInstrAritmetic.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILInstrBranch.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILInstrLoadStore.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILInstrMiscellaneous.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dCILstdafx.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dConstantPropagationSolver.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dDataFlowGraph.cpp" />
+    <ClCompile Include="..\dIntermediateLanguage\dRegisterInterferenceGraph.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
