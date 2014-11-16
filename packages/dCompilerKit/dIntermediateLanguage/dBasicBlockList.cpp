@@ -15,6 +15,35 @@
 #include "dCILInstrBranch.h"
 #include "dBasicBlockList.h"
 #include "dCILInstrLoadStore.h"
+#include "dConstantPropagationSolver.h"
+
+
+void dStatementBlockDictionary::BuildUsedVariableWorklist(dBasicBlocksGraph& list)
+{
+	RemoveAll();
+
+	for (dBasicBlocksGraph::dListNode* node = list.GetFirst(); node; node = node->GetNext()) {
+		dBasicBlock& block = node->GetInfo();
+
+		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
+			dCILInstr* const instruction = node->GetInfo();
+			//instruction->Trace();
+
+			dList<dCILInstr::dArg*> variablesList;
+			instruction->GetUsedVariables(variablesList);
+			for (dList<dCILInstr::dArg*>::dListNode* varNode = variablesList.GetFirst(); varNode; varNode = varNode->GetNext()) {
+				const dCILInstr::dArg* const variable = varNode->GetInfo();
+				dTreeNode* entry = Find(variable->m_label);
+				if (!entry) {
+					entry = Insert(variable->m_label);
+				}
+				dStatementBlockBucket& buckect = entry->GetInfo();
+				buckect.Insert(&block, node);
+			}
+		}
+	}
+}
+
 
 
 dBasicBlock::dBasicBlock (dCIL::dListNode* const begin)
@@ -45,7 +74,7 @@ void dBasicBlock::Trace() const
 		terminate = (node == m_end);
 		node->GetInfo()->Trace();
 	}
-
+/*
 	dCILInstrLabel* const label = m_begin->GetInfo()->GetAsLabel();
 	dTrace ((" block-> %s\n", label->GetArg0().m_label.GetStr()));
 
@@ -80,7 +109,7 @@ void dBasicBlock::Trace() const
 		dTrace(("%s ", label->GetArg0().m_label.GetStr()));
 	}
 	dTrace (("\n"));
-
+*/
 	dTrace (("\n"));
 }
 
@@ -111,31 +140,7 @@ void dBasicBlock::ReplaceDominator (const dTree<int, const dBasicBlock*>& newdom
 }
 
 
-
-void dBasicBlocksList::dVariablesDictionary::Build(const dBasicBlocksList& list)
-{
-	RemoveAll();
-	for (dListNode* node = list.GetFirst(); node; node = node->GetNext()) {
-		dBasicBlock& block = node->GetInfo();
-
-		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
-			dCILInstr* const instruction = node->GetInfo();
-			//instruction->Trace();
-			const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
-			if (variable) {
-				dVariablesDictionary::dTreeNode* entry = Find(variable->m_label);
-				if (!entry) {
-					entry = Insert(variable->m_label);
-					entry->GetInfo().m_variable = dCILInstr::dArg(variable->m_label, variable->GetType());
-				}
-				dStatementBucket& buckect = entry->GetInfo();
-				buckect.Insert(instruction, &block);
-			}
-		}
-	}
-}
-
-dBasicBlocksList::dBasicBlocksList()
+dBasicBlocksGraph::dBasicBlocksGraph()
 	:dList<dBasicBlock> ()
 	,m_dominatorTree(NULL)
 	,m_mark(0)
@@ -143,7 +148,7 @@ dBasicBlocksList::dBasicBlocksList()
 }
 
 
-void dBasicBlocksList::Trace() const
+void dBasicBlocksGraph::Trace() const
 {
 	for (dList<dBasicBlock>::dListNode* blockNode = GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
 		dBasicBlock& block = blockNode->GetInfo();
@@ -151,9 +156,11 @@ void dBasicBlocksList::Trace() const
 	}
 }
 
-void dBasicBlocksList::Build (dCIL::dListNode* const functionNode)
+void dBasicBlocksGraph::Build (dCIL::dListNode* const functionNode)
 {
-	RemoveAll();
+	//RemoveAll();
+	dAssert (!GetCount());
+
 	m_begin = functionNode->GetNext();
 	dAssert (m_begin->GetInfo()->GetAsLabel());
 	for (m_end = functionNode->GetNext(); !m_end->GetInfo()->GetAsFunctionEnd(); m_end = m_end->GetNext());
@@ -171,7 +178,7 @@ void dBasicBlocksList::Build (dCIL::dListNode* const functionNode)
 }
 
 
-void dBasicBlocksList::CalculateSuccessorsAndPredecessors ()
+void dBasicBlocksGraph::CalculateSuccessorsAndPredecessors ()
 {
 	m_mark += 1;
 	dList<dBasicBlock*> stack;
@@ -228,10 +235,10 @@ void dBasicBlocksList::CalculateSuccessorsAndPredecessors ()
 	DeleteUnreachedBlocks();
 }
 
-void dBasicBlocksList::DeleteUnreachedBlocks()
+void dBasicBlocksGraph::DeleteUnreachedBlocks()
 {
 	dTree<dBasicBlock*, dCIL::dListNode*> blockMap;
-	for (dBasicBlocksList::dListNode* blockNode = GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
+	for (dBasicBlocksGraph::dListNode* blockNode = GetFirst(); blockNode; blockNode = blockNode->GetNext()) {
 		dBasicBlock& block = blockNode->GetInfo();
 		blockMap.Insert(&block, block.m_begin);
 	}
@@ -262,8 +269,8 @@ void dBasicBlocksList::DeleteUnreachedBlocks()
 	}
 
 	dCIL* const cil = m_begin->GetInfo()->GetCil();
-	dBasicBlocksList::dListNode* nextBlockNode;
-	for (dBasicBlocksList::dListNode* blockNode = GetFirst(); blockNode; blockNode = nextBlockNode) {
+	dBasicBlocksGraph::dListNode* nextBlockNode;
+	for (dBasicBlocksGraph::dListNode* blockNode = GetFirst(); blockNode; blockNode = nextBlockNode) {
 		dBasicBlock& block = blockNode->GetInfo();
 		nextBlockNode = blockNode->GetNext();
 		if (block.m_mark != m_mark) {
@@ -282,7 +289,7 @@ void dBasicBlocksList::DeleteUnreachedBlocks()
 
 
 
-void dBasicBlocksList::BuildDominatorTree ()
+void dBasicBlocksGraph::BuildDominatorTree ()
 {
 	// dominator of the start node is the start itself
 	//Dom(n0) = { n0 }
@@ -382,7 +389,7 @@ void dBasicBlocksList::BuildDominatorTree ()
 }
 
 
-void dBasicBlocksList::BuildDomicanceFrontier (const dBasicBlock* const root, dDataFlowGraph* const dataFlow) const
+void dBasicBlocksGraph::BuildDomicanceFrontier (const dBasicBlock* const root) const
 {
 	dTree<int, const dBasicBlock*> frontier;
 	for (dList<const dBasicBlock*>::dListNode* succNode = root->m_successors.GetFirst(); succNode; succNode = succNode->GetNext()) {
@@ -395,7 +402,7 @@ void dBasicBlocksList::BuildDomicanceFrontier (const dBasicBlock* const root, dD
 
 	for (dList<const dBasicBlock*>::dListNode* node = root->m_children.GetFirst(); node; node = node->GetNext()) {
 		const dBasicBlock* const childBlock = node->GetInfo();
-		BuildDomicanceFrontier (childBlock, dataFlow);
+		BuildDomicanceFrontier (childBlock);
 		for (dList<const dBasicBlock*>::dListNode* childFrontierNode = childBlock->m_dominanceFrontier.GetFirst(); childFrontierNode; childFrontierNode = childFrontierNode->GetNext()) {
 			const dBasicBlock* const childBlock = childFrontierNode->GetInfo();
 			if (childBlock->m_idom != root) {
@@ -410,21 +417,39 @@ void dBasicBlocksList::BuildDomicanceFrontier (const dBasicBlock* const root, dD
 	}
 }
 
-void dBasicBlocksList::ConvertToSSA (dDataFlowGraph* const dataFlow)
+void dBasicBlocksGraph::ConvertToSSA ()
 {
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		dBasicBlock& block = node->GetInfo();
 		block.m_dominanceFrontier.RemoveAll();
 	}
-	BuildDomicanceFrontier (m_dominatorTree, dataFlow);
+	BuildDomicanceFrontier (m_dominatorTree);
 
 //Trace();
 
-	dVariablesDictionary variableList;
-	variableList.Build (*this);
+	dCIL* const cil = m_begin->GetInfo()->GetCil();
+	dTree <dStatementBucket, dString> variableList;
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		dBasicBlock& block = node->GetInfo();
 
-	dVariablesDictionary phyVariables;
-	dVariablesDictionary::Iterator iter (variableList);
+		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
+			dCILInstr* const instruction = node->GetInfo();
+			//instruction->Trace();
+			const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
+			if (variable) {
+				dTree <dStatementBucket, dString>::dTreeNode* entry = variableList.Find(variable->m_label);
+				if (!entry) {
+					entry = variableList.Insert(variable->m_label);
+					entry->GetInfo().m_variable = dCILInstr::dArg(variable->m_label, variable->GetType());
+				}
+				dStatementBucket& buckect = entry->GetInfo();
+				buckect.Insert(instruction, &block);
+			}
+		}
+	}
+
+	dTree <dStatementBucket, dString> phyVariables;
+	dTree <dStatementBucket, dString>::Iterator iter (variableList);
 	for (iter.Begin(); iter; iter ++) {
 		dStatementBucket w;
 		dStatementBucket::Iterator bucketIter (iter.GetNode()->GetInfo());
@@ -459,8 +484,8 @@ void dBasicBlocksList::ConvertToSSA (dDataFlowGraph* const dataFlow)
 						}
 					}
 					if (sources.GetCount() > 1) {
-						dCILInstrPhy* const phyInstruction = new dCILInstrPhy (*dataFlow->m_cil, name.m_label, name.GetType(), sources);
-						dataFlow->m_cil->InsertAfter(frontier->m_begin, phyInstruction->GetNode());
+						dCILInstrPhy* const phyInstruction = new dCILInstrPhy (*cil, name.m_label, name.GetType(), sources, frontier);
+						cil->InsertAfter(frontier->m_begin, phyInstruction->GetNode());
 	//frontier->Trace();
 
 						wPhy.Insert(instruction, frontier);
@@ -473,15 +498,31 @@ void dBasicBlocksList::ConvertToSSA (dDataFlowGraph* const dataFlow)
 		}
 	}
 
+	variableList.RemoveAll ();
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		dBasicBlock& block = node->GetInfo();
 
-	dTree<int, dString> stack;
-	//dataFlow->CalculateSuccessorsAndPredecessors();
-	variableList.Build (*this);
-	RenameVariables (&GetFirst()->GetInfo(), dataFlow, variableList);
+		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
+			dCILInstr* const instruction = node->GetInfo();
+			//instruction->Trace();
+			const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
+			if (variable) {
+				dTree <dStatementBucket, dString>::dTreeNode* entry = variableList.Find(variable->m_label);
+				if (!entry) {
+					entry = variableList.Insert(variable->m_label);
+					entry->GetInfo().m_variable = dCILInstr::dArg(variable->m_label, variable->GetType());
+				}
+				dStatementBucket& buckect = entry->GetInfo();
+				buckect.Insert(instruction, &block);
+			}
+		}
+	}
+	
+	RenameVariables (&GetFirst()->GetInfo(), variableList);
 }
 
 
-void dBasicBlocksList::RenameVariables (const dBasicBlock* const root, dDataFlowGraph* const dataFlow, dVariablesDictionary& stack) const
+void dBasicBlocksGraph::RenameVariables (const dBasicBlock* const root, dTree <dStatementBucket, dString>& stack) const
 {
 //root->Trace();
 	bool terminate = false;
@@ -519,7 +560,7 @@ void dBasicBlocksList::RenameVariables (const dBasicBlock* const root, dDataFlow
 	}
 
 	for (dList<const dBasicBlock*>::dListNode* node = root->m_children.GetFirst(); node; node = node->GetNext()) {
-		RenameVariables (node->GetInfo(), dataFlow, stack);
+		RenameVariables (node->GetInfo(), stack);
 	}
 
 	for (dCIL::dListNode* node = root->m_end; node != root->m_begin; node = node->GetPrev()) {
@@ -535,4 +576,209 @@ void dBasicBlocksList::RenameVariables (const dBasicBlock* const root, dDataFlow
 
 //root->Trace();
 //dataFlow->m_cil->Trace();
+}
+
+
+
+//void dCIL::OptimizeSSA(dListNode* const functionStart)
+void dBasicBlocksGraph::OptimizeSSA ()
+{
+//	dDataFlowGraph dataFlow(this, functionStart);
+	Trace();
+
+	bool pass = true;
+	while (pass) {
+		pass = false;
+		pass |= ApplyConstantPropagationSSA();
+
+		pass |= ApplyConditionalConstantPropagationSSA();
+
+		//Trace();
+		//pass |= ApplyDeadCodeEliminationSSA ();
+		//Trace();
+		
+		//Trace();
+		//pass |= ApplyConstantConditionalSSA();
+		//Trace();
+		//pass |= ApplyCopyPropagationSSA ();
+		//Trace();
+		//pass |= dataFlow.ApplyConditionalConstantPropagationSSA();
+	}
+
+Trace();
+}
+
+/*
+void dDataFlowGraph::GeneratedVariableWorklist(dTree <int, dCIL::dListNode*>& list) const
+{
+	for (dCIL::dListNode* node = m_function; !node->GetInfo()->GetAsFunctionEnd(); node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
+		if (variable) {
+			list.Insert(0, node);
+		}
+	}
+}
+*/
+
+void dBasicBlocksGraph::GetStatementsWorklist(dTree <int, dCIL::dListNode*>& list) const
+{
+	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+		list.Insert(0, node);
+	}
+}
+
+
+bool dBasicBlocksGraph::ApplyConstantConditionalSSA()
+{
+	bool anyChanges = false;
+
+	dTree<int, dCIL::dListNode*> phyMap;
+	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		if (instruction->GetAsPhy()) {
+			phyMap.Insert(0, node);
+		}
+	}
+
+	dCIL* const cil = m_begin->GetInfo()->GetCil();
+	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		if (instruction->GetAsIF()) {
+			dCILInstrConditional* const conditinal = instruction->GetAsIF();
+
+			const dCILInstr::dArg& arg0 = conditinal->GetArg0();
+			if ((arg0.GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg0.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
+				dAssert(conditinal->GetTrueTarget());
+				dAssert(conditinal->GetFalseTarget());
+				int condition = arg0.m_label.ToInteger();
+				if (conditinal->m_mode == dCILInstrConditional::m_ifnot) {
+					condition = !condition;
+				}
+
+				dCILInstrLabel* label;
+				if (condition) {
+					label = conditinal->GetTrueTarget()->GetInfo()->GetAsLabel();
+				}
+				else {
+					label = conditinal->GetFalseTarget()->GetInfo()->GetAsLabel();
+				}
+
+				dCILInstrGoto* const jump = new dCILInstrGoto(*cil, label->GetArg0().m_label);
+				jump->SetTarget(label);
+				conditinal->ReplaceInstruction(jump);
+				anyChanges = true;
+			}
+		}
+	}
+
+	return anyChanges;
+}
+
+
+
+bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
+{
+	bool anyChanges = false;
+
+	dWorkList workList;
+	dStatementBlockDictionary usedVariablesList;
+	usedVariablesList.BuildUsedVariableWorklist(*this);
+
+	dTree<dCIL::dListNode*, dString> map;
+	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+		dCILInstr* const instruction = node->GetInfo();
+		const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
+		if (variable) {
+			map.Insert(node, variable->m_label);
+		}
+	}
+
+	GetStatementsWorklist(workList);
+	while (workList.GetCount()) {
+		dCIL::dListNode* const node = workList.GetRoot()->GetKey();
+		workList.Remove(workList.GetRoot());
+		dCILInstr* const instruction = node->GetInfo();
+		if (!instruction->GetAsCall()) {
+			const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
+			if (variable) {
+				dStatementBlockDictionary::dTreeNode* const usesNodeBuckect = usedVariablesList.Find(variable->m_label);
+				dAssert(!usesNodeBuckect || usesNodeBuckect->GetInfo().GetCount());
+				if (!usesNodeBuckect) {
+					anyChanges = true;
+					dList<dCILInstr::dArg*> variablesList;
+					instruction->GetUsedVariables(variablesList);
+					for (dList<dCILInstr::dArg*>::dListNode* varNode = variablesList.GetFirst(); varNode; varNode = varNode->GetNext()) {
+						const dCILInstr::dArg* const variable = varNode->GetInfo();
+						dAssert(usedVariablesList.Find(variable->m_label));
+						dStatementBlockDictionary::dTreeNode* const entry = usedVariablesList.Find(variable->m_label);
+						if (entry) {
+							dStatementBlockBucket& buckect = entry->GetInfo();
+							buckect.Remove(node);
+							dAssert(map.Find(variable->m_label));
+							workList.Insert(map.Find(variable->m_label)->GetInfo());
+							if (!buckect.GetCount()) {
+								usedVariablesList.Remove(usesNodeBuckect);
+							}
+						}
+					}
+					instruction->Nullify();
+				}
+			}
+		}
+	}
+	return anyChanges;
+}
+
+
+bool dBasicBlocksGraph::ApplyCopyPropagationSSA()
+{
+	bool anyChanges = false;
+
+	dWorkList workList;
+	dStatementBlockDictionary usedVariablesList;
+	usedVariablesList.BuildUsedVariableWorklist (*this);
+
+	GetStatementsWorklist(workList);
+	while (workList.GetCount()) {
+		dCIL::dListNode* const node = workList.GetRoot()->GetKey();
+		workList.Remove(workList.GetRoot());
+		dCILInstr* const instruction = node->GetInfo();
+		anyChanges |= instruction->ApplyCopyPropagationSSA(workList, usedVariablesList);
+	}
+	return anyChanges;
+}
+
+
+bool dBasicBlocksGraph::ApplyConstantPropagationSSA()
+{
+	bool anyChanges = false;
+
+	dWorkList workList;
+	dStatementBlockDictionary usedVariablesList;
+	usedVariablesList.BuildUsedVariableWorklist(*this);
+
+	GetStatementsWorklist(workList);
+	while (workList.GetCount()) {
+		dCIL::dListNode* const node = workList.GetRoot()->GetKey();
+		workList.Remove(workList.GetRoot());
+		dCILInstr* const instruction = node->GetInfo();
+		anyChanges |= instruction->ApplyConstantPropagationSSA(workList, usedVariablesList);
+	}
+
+	if (anyChanges) {
+		for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
+			dCILInstr* const instruction = node->GetInfo();
+			instruction->ApplyConstantFoldingSSA();
+		}
+	}
+	return anyChanges;
+}
+
+
+
+bool dBasicBlocksGraph::ApplyConditionalConstantPropagationSSA()
+{
+	dConstantPropagationSolver constantPropagation (this);
+	return constantPropagation.Solve();
 }

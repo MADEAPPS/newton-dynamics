@@ -203,23 +203,15 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		}
 	}
 
-	ConvertToSSA (cil);
+	m_basicBlocks.Build (m_functionStart);
+	m_basicBlocks.ConvertToSSA ();
+	//cil.Trace();
 }
 
-void dDAGFunctionNode::ConvertToSSA(dCIL& cil)
-{
-//cil.Trace();
-	dDataFlowGraph dataFlow (&cil, m_functionStart);
-//cil.Trace();
-	dataFlow.ConvertToSSA ();
-//cil.Trace();
-
-//	while (RemoveRedundantJumps (cil));
-}
 
 void dDAGFunctionNode::Optimize (dCIL& cil)
 {
-	cil.OptimizeSSA (m_functionStart);
+	m_basicBlocks.OptimizeSSA ();
 }
 
 bool dDAGFunctionNode::RemoveRedundantJumps (dCIL& cil)

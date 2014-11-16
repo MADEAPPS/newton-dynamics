@@ -15,6 +15,7 @@
 #include "dDataFlowGraph.h"
 #include "dCILInstrLoadStore.h"
 #include "dCILInstrArithmetic.h"
+#include "dConstantPropagationSolver.h"
 
 /*
 dCILInstrLocal::dCILInstrLocal (dCIL& program, const dString& name, const dArgType& type)
@@ -479,4 +480,35 @@ bool dCILInstrIntergerLogical::ApplyConstantFoldingSSA ()
 	}
 
 	return ret;
+}
+
+
+bool dCILInstrIntergerLogical::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+{
+/*
+	dAssert(solver.m_variablesList.Find(m_arg0.m_label));
+	dConstantPropagationsolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
+
+	bool change = false;
+	if ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat)) {
+		change = true;
+		variable.m_value = dConstantPropagationsolver::dVariable::m_constant;
+		variable.m_constValue = m_arg1.m_label;
+	}
+	else {
+		dAssert(0);
+	}
+
+	if (change) {
+		dAssert(solver.m_uses.Find(m_arg0.m_label));
+		dTree<int, dCILInstr*>& uses = solver.m_uses.Find(m_arg0.m_label)->GetInfo();
+		dTree<int, dCILInstr*>::Iterator iter(uses);
+		for (iter.Begin(); iter; iter++) {
+			dCILInstr* const instruction = iter.GetKey();
+			instruction->Trace();
+			solver.m_instructionsWorklist.Insert(0, instruction);
+		}
+	}
+*/	
+	return true;
 }

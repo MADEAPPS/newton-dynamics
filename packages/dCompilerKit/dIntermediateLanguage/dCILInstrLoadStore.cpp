@@ -13,8 +13,9 @@
 #include "dCIL.h"
 #include "dCILInstr.h"
 #include "dDataFlowGraph.h"
+#include "dCILInstrBranch.h"
 #include "dCILInstrLoadStore.h"
-
+#include "dConstantPropagationSolver.h"
 
 dCILInstrArgument::dCILInstrArgument(dCIL& program, const dString& name, const dArgType& type)
 	:dCILSingleArgInstr(program, dArg(name, type))
@@ -164,14 +165,14 @@ void dCILInstrMove::GetUsedVariables (dList<dArg*>& variablesList)
 	}
 }
 
-bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary)
+bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
 {
 //Trace();
 	bool ret = false;
 	if ((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
-		dVariablesDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
+		dStatementBlockDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
 		if (node) {
-			dStatementBucket::Iterator iter (node->GetInfo());
+			dStatementBlockBucket::Iterator iter (node->GetInfo());
 			for (iter.Begin(); iter; iter ++) {
 				dCILInstr* const instrution = iter.GetKey()->GetInfo();
 				//instrution->Trace();
@@ -186,14 +187,42 @@ bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dVariables
 	return ret;
 }
 
-bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary)
+bool dCILInstrMove::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+{
+	dAssert(solver.m_variablesList.Find(m_arg0.m_label));
+	dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
+
+	bool change = false;
+	if ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat)) {
+		change = true;
+		variable.m_value = dConstantPropagationSolver::dVariable::m_constant;
+		variable.m_constValue = m_arg1.m_label;
+	} else {
+		dAssert (0);
+	}
+
+	if (change) {
+		dAssert (solver.m_uses.Find(m_arg0.m_label));
+		dTree<int, dCILInstr*>& uses = solver.m_uses.Find(m_arg0.m_label)->GetInfo();
+		dTree<int, dCILInstr*>::Iterator iter (uses);
+		for (iter.Begin(); iter; iter ++) {
+			dCILInstr* const instruction = iter.GetKey();
+instruction->Trace();
+			solver.m_instructionsWorklist.Insert (0, instruction);
+		}
+	}
+
+	return true;
+}
+
+bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
 {
 	bool ret = false;
 	if (!((m_arg1.GetType().m_intrinsicType == dCILInstr::m_constInt) || (m_arg1.GetType().m_intrinsicType == dCILInstr::m_constFloat))) {
-		dVariablesDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
+		dStatementBlockDictionary::dTreeNode* const node = usedVariablesDictionary.Find(m_arg0.m_label);
 		if (node) {
 //Trace();
-			dStatementBucket::Iterator iter(node->GetInfo());
+			dStatementBlockBucket::Iterator iter(node->GetInfo());
 			for (iter.Begin(); iter; iter++) {
 				dCILInstr* const instrution = iter.GetKey()->GetInfo();
 //instrution->Trace();
@@ -315,27 +344,32 @@ void dCILInstrStore::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) 
 }
 
 
-dCILInstrPhy::dCILInstrPhy (dCIL& program, const dString& name, const dArgType& type, dList<dCILInstr*>& source)
+dCILInstrPhy::dCILInstrPhy (dCIL& program, const dString& name, const dArgType& type, dList<dCILInstr*>& source, const dBasicBlock* const basicBlock)
 	:dCILSingleArgInstr(program, dArg(name, type))
 {
+	m_basicBlock = (dBasicBlock*)basicBlock;
 	for (dList<dCILInstr*>::dListNode* node = source.GetFirst(); node; node = node->GetNext()) {
-		m_sources.Append(node->GetInfo()->GetNode());
+		dCILInstr* const instruction = node->GetInfo();
+		m_sources.Append (instruction->GetNode());
 	}
 }
 
 
 void dCILInstrPhy::Serialize(char* const textOut) const
 {
-	sprintf(textOut, "\t%s %s = phy (", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
+	sprintf(textOut, "\t%s %s = phi (", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr());
 	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
-		dArg* const arg = node->GetInfo().m_intructionNode ? node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : &node->GetInfo().m_arg;
-		dAssert (arg);
 		char tmp[1024]; 
+
+		dArgPair& pair = node->GetInfo();
+		dArg* const arg = pair.m_intructionNode ? pair.m_intructionNode->GetInfo()->GetGeneratedVariable() : &pair.m_arg;
+		dAssert (arg);
+		dCILInstrLabel* const block = pair.m_block->m_begin->GetInfo()->GetAsLabel();
+		dAssert(block);
 		if (node->GetNext()) {
-			sprintf(tmp, "%s %s, ", arg->GetTypeName().GetStr(), arg->m_label.GetStr());
-		}
-		else {
-			sprintf(tmp, "%s %s", arg->GetTypeName().GetStr(), arg->m_label.GetStr());
+			sprintf(tmp, "[%s %s, %s], ", arg->GetTypeName().GetStr(), arg->m_label.GetStr(), block->GetArg0().m_label.GetStr());
+		} else {
+			sprintf(tmp, "[%s %s, %s]", arg->GetTypeName().GetStr(), arg->m_label.GetStr(), block->GetArg0().m_label.GetStr());
 		}
 		strcat(textOut, tmp);
 	}
@@ -373,7 +407,7 @@ void dCILInstrPhy::ReplaceArgument (const dArg& arg, dCILInstr* const newInstruc
 	}
 }
 
-bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary)
+bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
 {
 	bool ret = false;
 	if (!m_sources.GetFirst()->GetInfo().m_intructionNode) {
@@ -393,4 +427,48 @@ bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dVariablesD
 	}
 
 	return ret;
+}
+
+
+bool dCILInstrPhy::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+{
+//	dAssert(solver.m_variablesList.Find(m_arg0.m_label));
+//	dConstantPropagationsolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
+
+	int count = 0;
+	const dArg* array[128];
+
+	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
+		const dArg* const arg = node->GetInfo().m_intructionNode ? node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : &node->GetInfo().m_arg;
+
+		if ((arg->GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg->GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
+			array[count] = arg;
+			count++;
+		} else {
+			dAssert (solver.m_variablesList.Find(arg->m_label));
+			dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(arg->m_label)->GetInfo();
+			if (variable.m_value == dConstantPropagationSolver::dVariable::m_variableValue) {
+				return false;
+			} else if (variable.m_value == dConstantPropagationSolver::dVariable::m_constant) {
+				dAssert (0);
+			}
+		}
+	}
+
+	if (count) {
+		bool allEqual = true;
+		const dArg* const arg = array[0];
+		for (int i = 1; i < count; i ++) {
+			const dArg* const arg1 = array[i];
+			allEqual &= (arg->m_label == arg1->m_label);
+		}
+		if (allEqual) {
+			dAssert(solver.m_variablesList.Find(m_arg0.m_label));
+			dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
+			variable.m_value = dConstantPropagationSolver::dVariable::m_constant;
+			variable.m_constValue = arg->m_label;
+		}
+	}
+
+	return false;
 }

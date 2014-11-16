@@ -64,6 +64,7 @@ class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg);
 
 	virtual bool ApplyConstantFoldingSSA ();
+	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 
 	dOperator m_operator;
 };

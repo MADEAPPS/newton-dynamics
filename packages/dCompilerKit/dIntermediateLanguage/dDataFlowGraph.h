@@ -39,7 +39,7 @@ inline dString IndexToLocal(int index)
 
 class dRegisterInterferenceGraph;
 
-
+/*
 class dDataFlowPoint
 {
 	public:
@@ -124,8 +124,7 @@ class dDataFlowPoint
 
 	dCIL::dListNode* m_statement;
 	dBasicBlocksList::dListNode* m_basicBlockNode;
-
-/*	
+	
 	dString m_generatedVariable;
 	dVariableSet<dString> m_liveInputSet;
 	dVariableSet<dString> m_liveOutputSet;
@@ -138,10 +137,10 @@ class dDataFlowPoint
 	dVariableSet<dCIL::dListNode*> m_killStmtSet;
 	dVariableSet<dCIL::dListNode*> m_reachStmtInputSet;
 	dVariableSet<dCIL::dListNode*> m_reachStmtOutputSet;
-*/
+
 };
 
-/*
+
 class dInstructionVariableDictionary: public dTree<dList<dCIL::dListNode*>, dString>
 {
 	public:
@@ -153,6 +152,7 @@ class dInstructionVariableDictionary: public dTree<dList<dCIL::dListNode*>, dStr
 */
 
 
+
 class dWorkList: public dTree <int, dCIL::dListNode*>
 {
 	public:
@@ -161,27 +161,6 @@ class dWorkList: public dTree <int, dCIL::dListNode*>
 	{
 	}
 };
-
-class dStatementBucket: public dTree <const dBasicBlock*, const dCIL::dListNode*>
-{
-	public:
-	dStatementBucket()
-		:dTree <const dBasicBlock*, const dCIL::dListNode*>()
-	{
-	}
-};
-
-class dVariablesDictionary: public dTree <dStatementBucket, dString>
-{
-	public:
-	dVariablesDictionary()
-		:dTree <dStatementBucket, dString>()
-	{
-		}
-
-	void BuildUsedVariableWorklist(dBasicBlocksList& list);
-};
-
 
 class dDataFlowGraph 
 {
@@ -200,9 +179,8 @@ class dDataFlowGraph
 
 	dDataFlowGraph (dCIL* const cil, dCIL::dListNode* const function);
 	virtual ~dDataFlowGraph(void);
-
-	void ConvertToSSA ();
 /*
+	void ConvertToSSA ();
 	void ApplyLocalOptimizations();
 	void RegistersAllocation (int registerCount);
 	private:
@@ -246,27 +224,22 @@ class dDataFlowGraph
 	friend dRegisterInterferenceGraph;
 */
 
-	bool ApplyCopyPropagationSSA();
-	bool ApplyDeadCodeEliminationSSA();
-	bool ApplyConstantPropagationSSA();
-	bool ApplyConstantConditionalSSA();
-	bool ApplyConditionalConstantPropagationSSA();
-	
 
 	private:
-	void BuildBasicBlockGraph();
-	void GetStatementsWorklist (dTree <int, dCIL::dListNode*>& list) const;
-	void GeneratedVariableWorklist (dTree <int, dCIL::dListNode*>& list) const;
+	//void BuildBasicBlockGraph();
+	//void GetStatementsWorklist (dTree <int, dCIL::dListNode*>& list) const;
+	//void GeneratedVariableWorklist (dTree <int, dCIL::dListNode*>& list) const;
 
 	dCIL* m_cil;
 	dCIL::dListNode* m_function;
-	dBasicBlocksList m_basicBlocks; 
+	//dBasicBlocksGraph m_basicBlocks; 
 	//dTree<dDataFlowPoint, dCIL::dListNode*> m_dataFlowGraph;
 	//dList<dBasicBlock*> m_traversalBlocksOrder; 
 
 	mutable int m_mark;
+	friend class dCIL;
 	friend class dBasicBlock;
-	friend class dBasicBlocksList;
+	friend class dBasicBlocksGraph;
 };
 
 

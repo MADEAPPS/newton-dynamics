@@ -17,6 +17,7 @@
 #include "dCIL.h"
 #include "dCILInstr.h"
 
+
 class dBasicBlock
 {
 	public:
@@ -39,7 +40,29 @@ class dBasicBlock
 	dList<const dBasicBlock*> m_predecessors;
 };
 
-class dBasicBlocksList: public dList<dBasicBlock> 
+
+class dStatementBlockBucket: public dTree <const dBasicBlock*, const dCIL::dListNode*>
+{
+	public:
+	dStatementBlockBucket()
+		:dTree <const dBasicBlock*, const dCIL::dListNode*>()
+	{
+	}
+};
+
+class dStatementBlockDictionary: public dTree <dStatementBlockBucket, dString>
+{
+	public:
+	dStatementBlockDictionary()
+		:dTree <dStatementBlockBucket, dString>()
+	{
+	}
+
+	void BuildUsedVariableWorklist(dBasicBlocksGraph& list);
+};
+
+
+class dBasicBlocksGraph: public dList<dBasicBlock> 
 {
 	class dStatementBucket: public dTree <const dCILInstr*, const dBasicBlock*>
 	{
@@ -55,40 +78,37 @@ class dBasicBlocksList: public dList<dBasicBlock>
 		dCILInstr::dArg m_variable;
 	};
 
-	class dVariablesDictionary: public dTree <dStatementBucket, dString>
-	{
-		public:
-		dVariablesDictionary()
-			:dTree <dStatementBucket, dString>()
-		{
-		}
-
-		void Build (const dBasicBlocksList& list);
-	};
-
 	public:
-	dBasicBlocksList();
+	dBasicBlocksGraph();
 
 	void Trace() const;
 
 	void Build (dCIL::dListNode* const functionNode);
-	
-	//void CalculateSuccessorsAndPredecessors(dDataFlowGraph* const dataFlow);
 
-	void ConvertToSSA (dDataFlowGraph* const dataFlow);
+	void OptimizeSSA ();
+	void ConvertToSSA ();
 
 	private:
-	void BuildDomicanceFrontier (const dBasicBlock* const root, dDataFlowGraph* const dataFlow) const;
-	void RenameVariables (const dBasicBlock* const root, dDataFlowGraph* const dataFlow, dVariablesDictionary& stack) const;
+	void GetStatementsWorklist (dTree <int, dCIL::dListNode*>& list) const;
+	void BuildDomicanceFrontier (const dBasicBlock* const root) const;
+	void RenameVariables (const dBasicBlock* const root, dTree <dStatementBucket, dString>& stack) const;
 
 	void BuildDominatorTree ();
 	void DeleteUnreachedBlocks();
 	void CalculateSuccessorsAndPredecessors ();
 
+	bool ApplyCopyPropagationSSA();
+	bool ApplyConstantPropagationSSA();
+	bool ApplyDeadCodeEliminationSSA();
+	bool ApplyConstantConditionalSSA();
+	bool ApplyConditionalConstantPropagationSSA();
+
 	dCIL::dListNode* m_begin;
 	dCIL::dListNode* m_end;
 	dBasicBlock* m_dominatorTree;
 	int m_mark;
+
+	friend class dConstantPropagationSolver;
 };
 
 

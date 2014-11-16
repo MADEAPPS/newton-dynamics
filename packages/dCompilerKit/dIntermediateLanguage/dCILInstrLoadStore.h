@@ -85,8 +85,9 @@ class dCILInstrMove: public dCILTwoArgInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
-	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary);
-	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary);
+	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
+	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
+	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 };
 
 
@@ -98,21 +99,27 @@ class dCILInstrPhy: public dCILSingleArgInstr
 		public:
 		dArgPair (dList<dCILInstr*>::dListNode* const intructionNode)
 			:m_intructionNode(intructionNode)
+			,m_block(m_intructionNode->GetInfo()->GetBasicBlock()) 
 			,m_arg (*intructionNode->GetInfo()->GetGeneratedVariable())
 		{
+			dAssert (m_block);
 		}
 
 		dArgPair (const dArgPair& copy)
 			:m_intructionNode(copy.m_intructionNode)
-			,m_arg (*copy.m_intructionNode->GetInfo()->GetGeneratedVariable())
+			,m_block (copy.m_block)
+			,m_arg (copy.m_arg)
 		{
+			dAssert (m_block);
+			dAssert (m_block == m_intructionNode->GetInfo()->GetBasicBlock());
 		}
-
+		
 		dList<dCILInstr*>::dListNode* m_intructionNode;
+		dBasicBlock* m_block;
 		dArg m_arg;
 	};
 
-	dCILInstrPhy (dCIL& program, const dString& name0, const dArgType& type0, dList<dCILInstr*>& sources);
+	dCILInstrPhy (dCIL& program, const dString& name0, const dArgType& type0, dList<dCILInstr*>& sources, const dBasicBlock* const basicBlock);
 
 	void Serialize(char* const textOut) const;
 	virtual void EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const {}
@@ -133,7 +140,8 @@ class dCILInstrPhy: public dCILSingleArgInstr
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg);
-	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary);
+	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
+	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 
 	dList<dArgPair> m_sources;
 };

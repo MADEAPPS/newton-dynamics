@@ -15,6 +15,7 @@
 #include "dDataFlowGraph.h"
 #include "dCILInstrBranch.h"
 #include "dRegisterInterferenceGraph.h"
+#include "dConstantPropagationSolver.h"
 
 dCILInstrLabel::dCILInstrLabel(dCIL& program, const dString& label)
 	:dCILSingleArgInstr (program, dArg (label, dArgType()))
@@ -187,6 +188,36 @@ void dCILInstrConditional::ReplaceArgument (const dArg& arg, dCILInstr* const ne
 	}
 }
 
+
+bool dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+{
+	if ((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat)) {
+		dAssert (0);
+		return true;
+	} else {
+		dAssert (solver.m_variablesList.Find(m_arg0.m_label));
+		dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
+
+		if (variable.m_value == dConstantPropagationSolver::dVariable::m_constant) {
+			dAssert (0);
+		} else if (variable.m_value == dConstantPropagationSolver::dVariable::m_variableValue) {
+			dAssert (0);
+		} else {
+			dConstantPropagationSolver::dBlockEdgeKey key0 (GetBasicBlock(), m_tagetNode0->GetInfo()->GetBasicBlock());
+			if (!solver.m_executableEdges.Find(key0)) {
+				solver.m_executableEdges.Insert(1, key0);
+				solver.m_blockWorklist.Insert(0, m_tagetNode0->GetInfo()->GetBasicBlock());
+			}
+
+			dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), m_tagetNode1->GetInfo()->GetBasicBlock());
+			if (!solver.m_executableEdges.Find(key1)) {
+				solver.m_executableEdges.Insert(1, key1);
+				solver.m_blockWorklist.Insert(0, m_tagetNode1->GetInfo()->GetBasicBlock());
+			}
+		}
+	}
+	return false;
+}
 
 dCILInstrReturn::dCILInstrReturn(dCIL& program, const dString& name, const dArgType& type)
 	:dCILSingleArgInstr (program, dArg (name, type))

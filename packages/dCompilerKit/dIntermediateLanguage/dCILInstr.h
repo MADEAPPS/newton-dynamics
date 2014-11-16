@@ -27,6 +27,7 @@ class dCILInstrFunction;
 class dCILSingleArgInstr;
 class dCILInstrFunctionEnd;
 class dCILInstrConditional;
+class dConstantPropagationSolver;
 class dCILInstrThreeArgArithmetic;
 
 class dWorkList;
@@ -34,6 +35,7 @@ class dBasicBlock;
 class dDataFlowPoint;
 class dDataFlowGraph;
 class dVariablesDictionary;
+class dStatementBlockDictionary;
 class dRegisterInterferenceGraph;
 class dInstructionVariableDictionary;
 
@@ -116,6 +118,7 @@ class dCILInstr
 	virtual ~dCILInstr ();
 
 	dCIL* GetCil() const { return m_cil; }
+	dBasicBlock* GetBasicBlock() const {return m_basicBlock; }
 	dList<dCILInstr*>::dListNode* GetNode() const { return m_myNode; }
 
 	virtual int GetByteCodeSize() const { return 1; }
@@ -155,7 +158,6 @@ class dCILInstr
 	virtual void AddKilledStatements(const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const = 0;
 	virtual void AssignRegisterName(const dRegisterInterferenceGraph& interferenceGraph) = 0;
 
-
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow)  = 0;
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst) = 0;
 	
@@ -174,8 +176,9 @@ class dCILInstr
 	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg) {dAssert (0);}
 
 	virtual bool ApplyConstantFoldingSSA () {return false;}
-	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary) {return false;}
-	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dVariablesDictionary& usedVariablesDictionary) {return false;}
+	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}
+	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}
+	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {dAssert (0); return false;}
 
 	dString RemoveSSAPostfix(const dString& name) const;
 	dString MakeSSAName(const dString& name, int ssaPostfix) const;
@@ -191,7 +194,7 @@ class dCILInstr
 	static dString m_ssaPosfix;
 
 	friend class dBasicBlock;
-	friend class dBasicBlocksList;
+	friend class dBasicBlocksGraph;
 };
 
 

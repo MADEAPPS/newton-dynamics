@@ -67,7 +67,7 @@ class dCIL: public dList<dCILInstr*>
 	void ResetTemporaries();
 	dListNode* NewStatement();
 
-	void OptimizeSSA (dListNode* const functionNode);
+	//void OptimizeSSA (dListNode* const functionNode);
 	void RegisterAllocation (dListNode* const functionNode);
 
 	private:

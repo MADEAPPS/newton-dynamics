@@ -41,6 +41,7 @@ class dCILInstrEnter: public dCILInstr
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
+	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {return false;}
 
 
 	int m_registerMask;
@@ -69,6 +70,7 @@ class dCILInstrLeave : public dCILInstr
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
+	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {return false;}
 
 
 	dCILInstrEnter* m_enter;
@@ -99,7 +101,7 @@ class dCILInstrNop: public dCILInstr
 	virtual dArg* GetGeneratedVariable () { return NULL; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
 	virtual void ReplaceArgument(const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg) {}
-
+	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {return false;}
 
 	dString m_comment;
 };
@@ -132,7 +134,8 @@ class dCILInstrFunction: public dCILInstr
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
-
+	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
+	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {return false;}
 	
 	dArg m_name;
 	dList<dArg> m_parameters;
@@ -161,6 +164,8 @@ class dCILInstrFunctionEnd : public dCILInstr
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
+	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
+	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {return false;}
 
 	dCILInstrFunction* m_function;
 };

@@ -208,25 +208,6 @@ void dCIL::RegisterAllocation(dListNode* const functionNode)
 
 
 
-void dCIL::OptimizeSSA (dListNode* const functionStart)
-{
-	dDataFlowGraph dataFlow (this, functionStart);
-
-	bool pass = true;
-	while (pass) {
-		pass = false;
-Trace();
-		pass |= dataFlow.ApplyDeadCodeEliminationSSA ();
-Trace();
-		pass |= dataFlow.ApplyConstantPropagationSSA ();
-Trace();
-		pass |= dataFlow.ApplyConstantConditionalSSA();
-Trace();
-		pass |= dataFlow.ApplyCopyPropagationSSA ();
-Trace();
-		pass |= dataFlow.ApplyConditionalConstantPropagationSSA();
-	}
-}
 
 
 

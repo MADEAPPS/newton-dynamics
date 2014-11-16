@@ -39,7 +39,6 @@ class dDAGFunctionNode: public dDAG
 	dDAGParameterNode* FindArgumentVariable(const char* const name) const;
 
 	void Optimize (dCIL& cil);
-	void ConvertToSSA (dCIL& cil);
 	void ConvertToTarget (dCIL& cil);
 
 
@@ -58,6 +57,7 @@ class dDAGFunctionNode: public dDAG
 	dDAGFunctionModifier* m_modifier;
 	dCIL::dListNode* m_functionStart;
 	dList<dDAGParameterNode*> m_parameters; 
+	dBasicBlocksGraph m_basicBlocks;
 
 	dDAGRtti(dDAG);
 };
