@@ -178,13 +178,14 @@ class dCILInstr
 	virtual bool ApplyConstantFoldingSSA () {return false;}
 	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}
 	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}
-	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {dAssert (0); return false;}
+	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {dAssert (0);}
 
 	dString RemoveSSAPostfix(const dString& name) const;
 	dString MakeSSAName(const dString& name, int ssaPostfix) const;
 
 	protected:
 	virtual void AddKilledStatementLow(const dArg& arg, const dInstructionVariableDictionary& dictionary, dDataFlowPoint& datFloatPoint) const;
+	
 
 	dCIL* m_cil;
 	dBasicBlock* m_basicBlock;

@@ -40,7 +40,7 @@ class dCILInstrLabel: public dCILSingleArgInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable () {return NULL;}
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
-	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {return false;}
+	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {}
 };
 
 class dCILInstrGoto: public dCILSingleArgInstr
@@ -70,7 +70,8 @@ class dCILInstrGoto: public dCILSingleArgInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
-	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {return false;}
+	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
+
 };
 
 class dCILInstrConditional: public dCILThreeArgInstr
@@ -111,11 +112,11 @@ class dCILInstrConditional: public dCILThreeArgInstr
 	virtual dArg* GetGeneratedVariable () { return NULL; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg);
-	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
+	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 
 	dBranchMode m_mode;
-	dList<dCILInstr*>::dListNode* m_tagetNode0;
-	dList<dCILInstr*>::dListNode* m_tagetNode1;
+	dList<dCILInstr*>::dListNode* m_targetNode0;
+	dList<dCILInstr*>::dListNode* m_targetNode1;
 };
 
 

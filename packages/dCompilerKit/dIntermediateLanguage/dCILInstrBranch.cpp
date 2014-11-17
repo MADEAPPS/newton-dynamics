@@ -74,17 +74,27 @@ dCILInstrGoto* dCILInstrGoto::GetAsGoto()
 	return this;
 }
 
+void dCILInstrGoto::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+{
+	dCILInstrLabel* const target = GetTarget()->GetInfo()->GetAsLabel();
+	dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), target->GetBasicBlock());
+	if (!solver.m_executableEdges.Find(key1)) {
+		solver.m_executableEdges.Insert(1, key1);
+		solver.m_blockWorklist.Insert(0, target->GetBasicBlock());
+	}
+}
+
 dCILInstrConditional::dCILInstrConditional(dCIL& program, dBranchMode mode, const dString& name, const dArgType& type, const dString& target0, const dString& target1)
 	:dCILThreeArgInstr (program, dArg (name, type), dArg (target0, dArgType()), dArg (target1, dArgType()))
 	,m_mode (mode)
-	,m_tagetNode0(NULL)
-	,m_tagetNode1(NULL)
+	,m_targetNode0(NULL)
+	,m_targetNode1(NULL)
 {
 }
 
 void dCILInstrConditional::Serialize(char* const textOut) const
 {
-	if (m_tagetNode1) {
+	if (m_targetNode1) {
 		if (m_mode == m_ifnot) {
 			sprintf(textOut, "\tifnot (%s %s) goto %s else goto %s\n", m_arg0.GetTypeName().GetStr(), m_arg0.m_label.GetStr(), m_arg1.m_label.GetStr(), m_arg2.m_label.GetStr());
 		} else {
@@ -109,24 +119,24 @@ void dCILInstrConditional::SetTargets (dCILInstrLabel* const target0, dCILInstrL
 {
 	dAssert(target0);
 	dAssert (target0->GetArg0().m_label == GetArg1().m_label);
-	m_tagetNode0 = target0->GetNode();
+	m_targetNode0 = target0->GetNode();
 
 	if (target1) {
 		dAssert(target1->GetArg0().m_label == GetArg2().m_label);
-		m_tagetNode1 = target1->GetNode();
+		m_targetNode1 = target1->GetNode();
 	} else {
-		m_tagetNode1 = NULL;
+		m_targetNode1 = NULL;
 	}
 }
 
 dList<dCILInstr*>::dListNode* dCILInstrConditional::GetTrueTarget () const
 {
-	return m_tagetNode0;
+	return m_targetNode0;
 }
 
 dList<dCILInstr*>::dListNode* dCILInstrConditional::GetFalseTarget () const
 {
-	return m_tagetNode1;
+	return m_targetNode1;
 }
 
 
@@ -176,7 +186,7 @@ void dCILInstrConditional::EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr
 	dVirtualMachine::dOpCode& code = codeOutPtr[m_byteCodeOffset];
 	code.m_type2.m_opcode = m_mode == m_ifnot ? unsigned(dVirtualMachine::m_bneq) : unsigned(dVirtualMachine::m_beq);
 	code.m_type2.m_reg0 = RegisterToIndex(m_arg0.m_label);
-	code.m_type2.m_imm2 = m_tagetNode0->GetInfo()->GetByteCodeOffset() - (m_byteCodeOffset + GetByteCodeSize()); 
+	code.m_type2.m_imm2 = m_targetNode0->GetInfo()->GetByteCodeOffset() - (m_byteCodeOffset + GetByteCodeSize()); 
 }
 
 
@@ -189,34 +199,54 @@ void dCILInstrConditional::ReplaceArgument (const dArg& arg, dCILInstr* const ne
 }
 
 
-bool dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
 	if ((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat)) {
 		dAssert (0);
-		return true;
+		return;
 	} else {
 		dAssert (solver.m_variablesList.Find(m_arg0.m_label));
 		dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
 
-		if (variable.m_value == dConstantPropagationSolver::dVariable::m_constant) {
-			dAssert (0);
-		} else if (variable.m_value == dConstantPropagationSolver::dVariable::m_variableValue) {
-			dAssert (0);
-		} else {
-			dConstantPropagationSolver::dBlockEdgeKey key0 (GetBasicBlock(), m_tagetNode0->GetInfo()->GetBasicBlock());
-			if (!solver.m_executableEdges.Find(key0)) {
-				solver.m_executableEdges.Insert(1, key0);
-				solver.m_blockWorklist.Insert(0, m_tagetNode0->GetInfo()->GetBasicBlock());
+		if (variable.m_type == dConstantPropagationSolver::dVariable::m_constant) {
+			dAssert(GetTrueTarget());
+			dAssert(GetFalseTarget());
+
+			int condition = variable.m_constValue.ToInteger();
+			if (m_mode == dCILInstrConditional::m_ifnot) {
+				condition = !condition;
 			}
 
-			dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), m_tagetNode1->GetInfo()->GetBasicBlock());
+			dCILInstrLabel* target;
+			if (condition) {
+				target = GetTrueTarget()->GetInfo()->GetAsLabel();
+			}
+			else {
+				target = GetFalseTarget()->GetInfo()->GetAsLabel();
+			}
+
+			dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), target->GetBasicBlock());
 			if (!solver.m_executableEdges.Find(key1)) {
 				solver.m_executableEdges.Insert(1, key1);
-				solver.m_blockWorklist.Insert(0, m_tagetNode1->GetInfo()->GetBasicBlock());
+				solver.m_blockWorklist.Insert(0, target->GetBasicBlock());
+			}
+
+		} else if (variable.m_type == dConstantPropagationSolver::dVariable::m_variableValue) {
+			dAssert (0);
+		} else {
+			dConstantPropagationSolver::dBlockEdgeKey key0 (GetBasicBlock(), m_targetNode0->GetInfo()->GetBasicBlock());
+			if (!solver.m_executableEdges.Find(key0)) {
+				solver.m_executableEdges.Insert(1, key0);
+				solver.m_blockWorklist.Insert(0, m_targetNode0->GetInfo()->GetBasicBlock());
+			}
+
+			dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), m_targetNode1->GetInfo()->GetBasicBlock());
+			if (!solver.m_executableEdges.Find(key1)) {
+				solver.m_executableEdges.Insert(1, key1);
+				solver.m_blockWorklist.Insert(0, m_targetNode1->GetInfo()->GetBasicBlock());
 			}
 		}
 	}
-	return false;
 }
 
 dCILInstrReturn::dCILInstrReturn(dCIL& program, const dString& name, const dArgType& type)

@@ -42,7 +42,7 @@ class dConstantPropagationSolver
 		};
 
 		dVariable(dCILInstr* const instruction, dCILInstr::dArg* const variable)
-			:m_value(m_undefined)
+			:m_type(m_undefined)
 			,m_constValue ("")
 			,m_instruction(instruction)
 			,m_variable(variable)
@@ -55,7 +55,7 @@ class dConstantPropagationSolver
 			return *this;
 		}
 
-		dValueTypes m_value;
+		dValueTypes m_type;
 		dString m_constValue;
 		dCILInstr::dArg* m_variable;
 		dCILInstr* const m_instruction;
@@ -93,6 +93,7 @@ class dConstantPropagationSolver
 
 	dConstantPropagationSolver (dBasicBlocksGraph* const graph);
 	bool Solve();
+	void UpdateLatice (const dCILInstr::dArg& arg, const dString& value, dVariable::dValueTypes type);
 
 	dBasicBlocksGraph* m_graph; 
 	dTree<int, dBasicBlock*> m_visited;

@@ -187,32 +187,27 @@ bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dStatement
 	return ret;
 }
 
-bool dCILInstrMove::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+void dCILInstrMove::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
-	dAssert(solver.m_variablesList.Find(m_arg0.m_label));
-	dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
+	//dAssert(solver.m_variablesList.Find(m_arg0.m_label));
+	//dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
 
-	bool change = false;
+	dConstantPropagationSolver::dVariable::dValueTypes type = dConstantPropagationSolver::dVariable::m_undefined;
+	dString value ("");
 	if ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat)) {
-		change = true;
-		variable.m_value = dConstantPropagationSolver::dVariable::m_constant;
-		variable.m_constValue = m_arg1.m_label;
+		type = dConstantPropagationSolver::dVariable::m_constant;
+		value = m_arg1.m_label;
+		//variable.m_value = dConstantPropagationSolver::dVariable::m_constant;
+		//variable.m_constValue = m_arg1.m_label;
 	} else {
-		dAssert (0);
+		dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg1.m_label)->GetInfo();
+		type = variable.m_type;
+		value = variable.m_constValue;
 	}
 
-	if (change) {
-		dAssert (solver.m_uses.Find(m_arg0.m_label));
-		dTree<int, dCILInstr*>& uses = solver.m_uses.Find(m_arg0.m_label)->GetInfo();
-		dTree<int, dCILInstr*>::Iterator iter (uses);
-		for (iter.Begin(); iter; iter ++) {
-			dCILInstr* const instruction = iter.GetKey();
-instruction->Trace();
-			solver.m_instructionsWorklist.Insert (0, instruction);
-		}
+	if (type != dConstantPropagationSolver::dVariable::m_undefined) {
+		solver.UpdateLatice (m_arg0, value, type);
 	}
-
-	return true;
 }
 
 bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
@@ -430,45 +425,38 @@ bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dStatementB
 }
 
 
-bool dCILInstrPhy::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+void dCILInstrPhy::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
-//	dAssert(solver.m_variablesList.Find(m_arg0.m_label));
-//	dConstantPropagationsolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
-
-	int count = 0;
-	const dArg* array[128];
-
+	dList<dArg> constList;
 	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
 		const dArg* const arg = node->GetInfo().m_intructionNode ? node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : &node->GetInfo().m_arg;
 
 		if ((arg->GetType().m_intrinsicType == dCILInstr::m_constInt) || (arg->GetType().m_intrinsicType == dCILInstr::m_constFloat)) {
-			array[count] = arg;
-			count++;
+			constList.Append(*arg);
 		} else {
-			dAssert (solver.m_variablesList.Find(arg->m_label));
+			dAssert(solver.m_variablesList.Find(arg->m_label));
 			dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(arg->m_label)->GetInfo();
-			if (variable.m_value == dConstantPropagationSolver::dVariable::m_variableValue) {
-				return false;
-			} else if (variable.m_value == dConstantPropagationSolver::dVariable::m_constant) {
+			if (variable.m_type == dConstantPropagationSolver::dVariable::m_variableValue) {
 				dAssert (0);
+				return; 
+			}
+			if (variable.m_type != dConstantPropagationSolver::dVariable::m_undefined) {
+				dAssert (variable.m_type == dConstantPropagationSolver::dVariable::m_constant);
+				constList.Append (dArg (variable.m_constValue, arg->GetType()));
 			}
 		}
 	}
 
-	if (count) {
-		bool allEqual = true;
-		const dArg* const arg = array[0];
-		for (int i = 1; i < count; i ++) {
-			const dArg* const arg1 = array[i];
-			allEqual &= (arg->m_label == arg1->m_label);
+	if (constList.GetCount()) {
+		bool equal = true;
+		const dString& value = constList.GetFirst()->GetInfo().m_label; 
+		for (dList<dArg>::dListNode* node = constList.GetFirst()->GetNext(); node; node = node->GetNext()) {
+			equal &= (value == node->GetInfo().m_label);
 		}
-		if (allEqual) {
-			dAssert(solver.m_variablesList.Find(m_arg0.m_label));
-			dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
-			variable.m_value = dConstantPropagationSolver::dVariable::m_constant;
-			variable.m_constValue = arg->m_label;
+		if (equal) {
+			solver.UpdateLatice (m_arg0, value, dConstantPropagationSolver::dVariable::m_constant);
+		} else {
+			solver.UpdateLatice (m_arg0, value, dConstantPropagationSolver::dVariable::m_variableValue);
 		}
 	}
-
-	return false;
 }

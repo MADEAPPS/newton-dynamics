@@ -87,7 +87,7 @@ class dCILInstrMove: public dCILTwoArgInstr
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
 	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
-	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
+	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 };
 
 
@@ -141,7 +141,7 @@ class dCILInstrPhy: public dCILSingleArgInstr
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg);
 	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
-	virtual bool ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
+	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 
 	dList<dArgPair> m_sources;
 };

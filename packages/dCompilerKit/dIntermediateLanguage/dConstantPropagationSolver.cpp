@@ -97,13 +97,42 @@ dConstantPropagationSolver::dConstantPropagationSolver (dBasicBlocksGraph* const
 */
 }
 
+
+
+void dConstantPropagationSolver::UpdateLatice (const dCILInstr::dArg& arg, const dString& newValue, dVariable::dValueTypes type)
+{
+	dAssert (m_variablesList.Find(arg.m_label));
+	dConstantPropagationSolver::dVariable& variable = m_variablesList.Find(arg.m_label)->GetInfo();
+	if (type != variable.m_type) {
+		variable.m_type = type;
+		variable.m_constValue = newValue;
+		
+		dTree<dInstructionMap, dString>::dTreeNode* const usesNode = m_uses.Find(arg.m_label);
+		if (usesNode) {
+			dInstructionMap::Iterator iter(usesNode->GetInfo());
+			for (iter.Begin(); iter; iter++) {
+				dCILInstr* const instruction = iter.GetKey();
+		instruction->Trace();
+				m_instructionsWorklist.Insert(0, instruction);
+			}
+		}
+	}
+}
+
+
 bool dConstantPropagationSolver::Solve ()
 {
+m_graph->Trace();
+
 	m_blockWorklist.Insert(0, &m_graph->GetFirst()->GetInfo());
 
 	while (m_blockWorklist.GetCount() || m_instructionsWorklist.GetCount()) {
+
 		while (m_instructionsWorklist.GetCount()) {
-			dAssert (0);
+			dCILInstr* const instruction = m_instructionsWorklist.GetRoot()->GetKey();
+			m_instructionsWorklist.Remove(m_instructionsWorklist.GetRoot());
+instruction->Trace();
+			instruction->ApplyConstantPropagationSSA(*this);
 		}
 
 		while (m_blockWorklist.GetCount()) {
@@ -111,8 +140,9 @@ bool dConstantPropagationSolver::Solve ()
 			m_blockWorklist.Remove(m_blockWorklist.GetRoot());
 block->Trace();
 
-
-			for (dCIL::dListNode* node = block->m_end; node != block->m_begin; node = node->GetPrev()) {
+			bool done = false;
+			for (dCIL::dListNode* node = block->m_begin; !done; node = node->GetNext()) {
+				done = (node == block->m_end);
 				dCILInstrPhy* const phy = node->GetInfo()->GetAsPhy();
 				if (phy) {
 	phy->Trace();
@@ -122,8 +152,11 @@ block->Trace();
 
 			if (!m_visited.Find(block)) {
 				m_visited.Insert(block);
-				for (dCIL::dListNode* node = block->m_end; node != block->m_begin; node = node->GetPrev()) {
+				bool done = false;
+				for (dCIL::dListNode* node = block->m_begin; !done; node = node->GetNext()) {
+					done = (node == block->m_end);
 					dCILInstr* const instruction = node->GetInfo();
+					
 instruction->Trace();
 					instruction->ApplyConstantPropagationSSA (*this);
 				}

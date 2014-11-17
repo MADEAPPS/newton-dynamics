@@ -16,6 +16,7 @@
 #include "dCILInstrLoadStore.h"
 #include "dCILInstrArithmetic.h"
 #include "dConstantPropagationSolver.h"
+#include "dConstantPropagationSolver.h"
 
 /*
 dCILInstrLocal::dCILInstrLocal (dCIL& program, const dString& name, const dArgType& type)
@@ -451,6 +452,32 @@ void dCILInstrIntergerLogical::ReplaceArgument (const dArg& arg, dCILInstr* cons
 	}
 }
 
+dString dCILInstrIntergerLogical::Evalue (const dString& arg1, const dString& arg2) const
+{
+	int c = 0;
+	int a = m_arg1.m_label.ToInteger();
+	int b = m_arg2.m_label.ToInteger();
+
+	switch (m_operator) 
+	{
+		case m_add:
+		{
+			c = a + b;
+			break;
+		}
+
+		case m_less:
+		{
+		   c = a < b ? 1 : 0;
+		   break;
+		}
+
+		default:;
+		dAssert(0);
+	}
+	return dString (c);
+}
+
 bool dCILInstrIntergerLogical::ApplyConstantFoldingSSA ()
 {
 	bool ret = false;
@@ -459,6 +486,7 @@ bool dCILInstrIntergerLogical::ApplyConstantFoldingSSA ()
 	bool arg2 = !m_arg2.m_isPointer && ((m_arg2.GetType().m_intrinsicType == m_constInt) || (m_arg2.GetType().m_intrinsicType == m_constFloat));
 	
 	if (arg1 && arg2) {
+/*
 		int c = 0;
 		switch (m_operator) 
 		{
@@ -473,8 +501,9 @@ bool dCILInstrIntergerLogical::ApplyConstantFoldingSSA ()
 			default:;
 				dAssert(0);
 		}
+*/
 
-		dCILInstrMove* const move = new dCILInstrMove (*m_cil, m_arg0.m_label, m_arg0.GetType(), dString (c), dArgType (dCILInstr::m_constInt));
+		dCILInstrMove* const move = new dCILInstrMove (*m_cil, m_arg0.m_label, m_arg0.GetType(), Evalue(m_arg1.m_label, m_arg2.m_label), dArgType (dCILInstr::m_constInt));
 		ReplaceInstruction (move);
 		ret = true;
 	}
@@ -483,32 +512,28 @@ bool dCILInstrIntergerLogical::ApplyConstantFoldingSSA ()
 }
 
 
-bool dCILInstrIntergerLogical::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
+void dCILInstrIntergerLogical::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
-/*
-	dAssert(solver.m_variablesList.Find(m_arg0.m_label));
-	dConstantPropagationsolver::dVariable& variable = solver.m_variablesList.Find(m_arg0.m_label)->GetInfo();
-
-	bool change = false;
-	if ((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat)) {
-		change = true;
-		variable.m_value = dConstantPropagationsolver::dVariable::m_constant;
-		variable.m_constValue = m_arg1.m_label;
-	}
-	else {
-		dAssert(0);
+	dArg arg1(m_arg1);
+	dConstantPropagationSolver::dVariable::dValueTypes type1 = dConstantPropagationSolver::dVariable::m_constant;
+	if (!((m_arg1.GetType().m_intrinsicType == m_constInt) || (m_arg1.GetType().m_intrinsicType == m_constFloat))) {
+		dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg1.m_label)->GetInfo();
+		type1 = variable.m_type;
+		arg1.m_label = variable.m_constValue;
 	}
 
-	if (change) {
-		dAssert(solver.m_uses.Find(m_arg0.m_label));
-		dTree<int, dCILInstr*>& uses = solver.m_uses.Find(m_arg0.m_label)->GetInfo();
-		dTree<int, dCILInstr*>::Iterator iter(uses);
-		for (iter.Begin(); iter; iter++) {
-			dCILInstr* const instruction = iter.GetKey();
-			instruction->Trace();
-			solver.m_instructionsWorklist.Insert(0, instruction);
-		}
+	dArg arg2(m_arg2);
+	dConstantPropagationSolver::dVariable::dValueTypes type2 = dConstantPropagationSolver::dVariable::m_constant;
+	if (!((m_arg2.GetType().m_intrinsicType == m_constInt) || (m_arg2.GetType().m_intrinsicType == m_constFloat))) {
+		dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(m_arg2.m_label)->GetInfo();
+		type2 = variable.m_type;
+		arg2.m_label = variable.m_constValue;
 	}
-*/	
-	return true;
+
+	if ((type1 == dConstantPropagationSolver::dVariable::m_constant) && (type2 == dConstantPropagationSolver::dVariable::m_constant)) {
+		solver.UpdateLatice (m_arg0, Evalue(arg1.m_label, arg2.m_label), dConstantPropagationSolver::dVariable::m_constant);
+	} else {
+		dAssert (0);
+	}
+
 }
