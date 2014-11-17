@@ -25,10 +25,7 @@ class dConstantPropagationSolver
 	class dInstructionMap: public dTree<int, dCILInstr*>
 	{
 		public:
-		dInstructionMap ()
-			:dTree<int, dCILInstr*>()
-		{
-		}
+		dInstructionMap ();
 	};
 
 	class dVariable
@@ -41,19 +38,8 @@ class dConstantPropagationSolver
 			m_variableValue,
 		};
 
-		dVariable(dCILInstr* const instruction, dCILInstr::dArg* const variable)
-			:m_type(m_undefined)
-			,m_constValue ("")
-			,m_instruction(instruction)
-			,m_variable(variable)
-		{
-		}
-
-		dVariable& operator= (const dVariable& copy)
-		{
-			dAssert(0);
-			return *this;
-		}
+		dVariable(dCILInstr* const instruction, dCILInstr::dArg* const variable);
+		dVariable& operator= (const dVariable& copy);
 
 		dValueTypes m_type;
 		dString m_constValue;
@@ -64,27 +50,9 @@ class dConstantPropagationSolver
 	class dBlockEdgeKey
 	{
 		public:
-		dBlockEdgeKey(const dBasicBlock* const blockHigh, const dBasicBlock* const blockLow)
-			:m_blockHigh(blockHigh)
-			, m_blockLow(blockLow)
-		{
-		}
-
-		bool operator< (const dBlockEdgeKey& src) const
-		{
-			if (m_blockHigh < src.m_blockHigh) {
-				return true;
-			}
-			return m_blockLow < src.m_blockLow;
-		}
-
-		bool operator>(const dBlockEdgeKey& src) const
-		{
-			if (m_blockHigh > src.m_blockHigh) {
-				return true;
-			}
-			return m_blockLow > src.m_blockLow;
-		}
+		dBlockEdgeKey(const dBasicBlock* const blockHigh, const dBasicBlock* const blockLow);
+		bool operator<(const dBlockEdgeKey& src) const;
+		bool operator>(const dBlockEdgeKey& src) const;
 
 		const dBasicBlock* m_blockHigh;
 		const dBasicBlock* m_blockLow;

@@ -18,14 +18,35 @@
 #include "dConstantPropagationSolver.h"
 
 
-/*
-dConstantPropagationsolver::dBlockEdgeKey(const dBasicBlock* const blockHigh, const dBasicBlock* const blockLow)
-	:m_blockHigh(blockHigh)
-	, m_blockLow(blockLow)
+dConstantPropagationSolver::dInstructionMap::dInstructionMap():dTree<int, dCILInstr*>()
 {
 }
 
-bool dConstantPropagationsolver::dBlockEdgeKey::operator< (const dBlockEdgeKey& src) const
+dConstantPropagationSolver::dVariable::dVariable(dCILInstr* const instruction, dCILInstr::dArg* const variable)
+	:m_type(m_undefined)
+	,m_constValue("")
+	,m_instruction(instruction)
+	,m_variable(variable)
+{
+}
+
+dConstantPropagationSolver::dVariable& dConstantPropagationSolver::dVariable::operator=(const dVariable& copy)
+{
+	dAssert(0);
+	return *this;
+}
+
+
+
+dConstantPropagationSolver::dBlockEdgeKey::dBlockEdgeKey(const dBasicBlock* const blockHigh, const dBasicBlock* const blockLow)
+	:m_blockHigh(blockHigh)
+	,m_blockLow(blockLow)
+{
+}
+
+
+
+bool dConstantPropagationSolver::dBlockEdgeKey::operator<(const dBlockEdgeKey& src) const
 {
 	if (m_blockHigh < src.m_blockHigh) {
 		return true;
@@ -33,14 +54,14 @@ bool dConstantPropagationsolver::dBlockEdgeKey::operator< (const dBlockEdgeKey& 
 	return m_blockLow < src.m_blockLow;
 }
 
-bool dConstantPropagationsolver::dBlockEdgeKey::operator>(const dBlockEdgeKey& src) const
+bool dConstantPropagationSolver::dBlockEdgeKey::operator>(const dBlockEdgeKey& src) const
 {
 	if (m_blockHigh > src.m_blockHigh) {
 		return true;
 	}
 	return m_blockLow > src.m_blockLow;
 }
-*/
+
 
 
 
@@ -96,6 +117,8 @@ dConstantPropagationSolver::dConstantPropagationSolver (dBasicBlocksGraph* const
 	}
 */
 }
+
+
 
 
 
@@ -165,5 +188,8 @@ instruction->Trace();
 	}
 	return false;
 }
+
+
+
 
 
