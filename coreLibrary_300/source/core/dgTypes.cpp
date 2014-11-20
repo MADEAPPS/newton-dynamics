@@ -294,7 +294,10 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 				k += stride;
 			}
 
-			memcpy (&vertexList[count * stride + 2], &vertexList[m + 2], (stride - 2) * sizeof (dgFloat64));
+			dgAssert (&vertexList[count * stride + 2] <= &vertexList[m + 2]);
+			if (&vertexList[count * stride + 2] < &vertexList[m + 2]) {
+				memcpy (&vertexList[count * stride + 2], &vertexList[m + 2], (stride - 2) * sizeof (dgFloat64));
+			}
 			vertexList[m + 0] = dgFloat64 (count);
 			count ++;
 		}
