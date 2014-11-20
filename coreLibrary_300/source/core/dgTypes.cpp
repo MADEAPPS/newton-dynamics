@@ -224,10 +224,12 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 				while (cmp_vertex (&vertexList[j * stride], val, firstSortAxis) > 0) j --;
 
 				if (i <= j)	{
-					dgFloat64 tmp[64]; 
-					memcpy (tmp, &vertexList[i * stride], stride * sizeof (dgFloat64));
-					memcpy (&vertexList[i * stride], &vertexList[j * stride], stride * sizeof (dgFloat64)); 
-					memcpy (&vertexList[j * stride], tmp, stride * sizeof (dgFloat64)); 
+					if (i < j) {
+						dgFloat64 tmp[64]; 
+						memcpy (tmp, &vertexList[i * stride], stride * sizeof (dgFloat64));
+						memcpy (&vertexList[i * stride], &vertexList[j * stride], stride * sizeof (dgFloat64)); 
+						memcpy (&vertexList[j * stride], tmp, stride * sizeof (dgFloat64)); 
+					}
 					i++; 
 					j--;
 				}
