@@ -2806,7 +2806,7 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 		}
 	}
 
-	if (!count & proxy.m_continueCollision) {
+	if (!count && proxy.m_continueCollision) {
 		count = 1;
 		contactsOut[0] = point;
 	}
