@@ -1437,17 +1437,17 @@ void dgBroadPhase::FindCollidingPairsGeneric (dgBroadphaseSyncDescriptor* const 
 			if (left == right) {
 				if (!left->m_body) {
 
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack+1 < (sizeof (pool) / sizeof (pool[0]))) ;
 					pool[stack] = left->m_left;	
 					pool[stack + 1] = left->m_right;	
 					stack += (-dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox) >> 4) & 2;
 
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
 					pool[stack] = left->m_left;	
 					pool[stack + 1] = left->m_left;	
 					stack += 2;
 
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
 					pool[stack] = left->m_right;	
 					pool[stack + 1] = left->m_right;	
 					stack += 2;
@@ -1463,22 +1463,22 @@ void dgBroadPhase::FindCollidingPairsGeneric (dgBroadphaseSyncDescriptor* const 
 
 				} else if (!(left->m_body || right->m_body)) {
 
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
 					pool[stack] = left->m_left;	
 					pool[stack + 1] = right->m_left;	
 					stack += (-dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4) & 2;
 
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
 					pool[stack] = left->m_left;	
 					pool[stack + 1] = right->m_right;	
 					stack += (-dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4) & 2;
 
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
 					pool[stack] = left->m_right;	
 					pool[stack + 1] = right->m_left;	
 					stack += (-dgOverlapTest (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4) & 2;
 
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
 					pool[stack] = left->m_right;	
 					pool[stack + 1] = right->m_right;	
 					stack += (-dgOverlapTest (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4) & 2;
@@ -1487,12 +1487,12 @@ void dgBroadPhase::FindCollidingPairsGeneric (dgBroadphaseSyncDescriptor* const 
 				} else if (left->m_body) {
 
 					dgAssert (!right->m_body);
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
 					pool[stack] = right->m_left;	
 					pool[stack + 1] = left;	
 					stack += (-dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4) & 2;
 
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
 					pool[stack] = right->m_right;	
 					pool[stack + 1] = left;	
 					stack += (-dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4) & 2;
@@ -1500,12 +1500,12 @@ void dgBroadPhase::FindCollidingPairsGeneric (dgBroadphaseSyncDescriptor* const 
 				} else {
 
 					dgAssert (right->m_body);
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
 					pool[stack] = left->m_left;	
 					pool[stack + 1] = right;	
 					stack += (-dgOverlapTest (right->m_minBox, right->m_maxBox, left->m_left->m_minBox, left->m_left->m_maxBox) >> 4) & 2;
 
-					dgAssert (stack < (sizeof (pool) / sizeof (pool[0]))) ;
+					dgAssert (stack+1 < (sizeof (pool) / sizeof (pool[0]))) ;
 					pool[stack] = left->m_right;	
 					pool[stack + 1] = right;	
 					stack += (-dgOverlapTest (right->m_minBox, right->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox) >> 4) & 2;
