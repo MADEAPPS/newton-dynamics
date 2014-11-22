@@ -631,6 +631,7 @@ dgAABBPolygonSoup::dgNodeBuilder* dgAABBPolygonSoup::BuildTopDown (dgNodeBuilder
 		dgNodeBuilder* const parent = new (*allocator) dgNodeBuilder (info.m_p0, info.m_p1);
 		*allocator = *allocator + 1;
 
+		dgAssert (parent);
 		parent->m_right = BuildTopDown (leafArray, firstBox + info.m_axis, lastBox, allocator);
 		parent->m_right->m_parent = parent;
 

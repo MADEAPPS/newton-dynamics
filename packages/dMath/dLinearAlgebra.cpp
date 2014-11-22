@@ -544,6 +544,7 @@ int dComplemtaritySolver::dFrictionLessContactJoint::ReduceContacts (int count, 
 	dFloat window2 = window * window;
 	memset (mask, 0, size_t (count));
 	dSort (contacts, count, CompareContact, NULL);
+	dAssert (count <= D_MAX_PLACEMENT_CONTACTS);
 	for (int i = 0; i < count; i ++) {
 		if (!mask[i]) {
 			dFloat val = contacts[i].m_point[index] + window;
@@ -563,6 +564,7 @@ int dComplemtaritySolver::dFrictionLessContactJoint::ReduceContacts (int count, 
 	if (packContacts) {
 		int j = 0;
 		for (int i = 0; i < count; i ++) {
+			dAssert (i < D_MAX_PLACEMENT_CONTACTS);
 			if (!mask[i]) {
 				contacts[j] = contacts[i];
 				j ++;

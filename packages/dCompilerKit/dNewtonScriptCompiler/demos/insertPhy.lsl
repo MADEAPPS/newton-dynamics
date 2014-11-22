@@ -38,24 +38,67 @@ public class insertPhy
 		return c;
 	}
 */
-
+/*
 	public static int insertPhy ()
 	{
 		int i = 1;
 		int j = 1;
 		int k = 0;
-		while (k < 100) {
+		//while (k < 100) {
+		do {
 			if (j < 20) {
-				//j = i;
-				j = 1;
+				j = i;
 				k = k + 1;
 			} else {
 				j = k;
 				k = k + 2;
 			}
-		}
+		} while (k < 100);
 		return j;
 	}
+*/
+	public static int insertPhy ()
+	{
+		int i = 6;
+		int k = 1;
+		int j = 100;
+		do {
+			i = i + k;
+		} while (i == j);
+		return i;
+	}
+
+/*
+	public static int insertPhy ()
+	{
+		int i = 6;
+		int j = 1;
+		int k = 1;
+		do {
+			if (i == 6) {
+				k = 0;
+			} else {
+				i = i + 1;
+			}
+			i = i + k;
+			j = j + 1;
+		} while (i == j);
+		return i;
+	}
+
+
+	
+	public static int insertPhy ()
+	{
+		int i = 12;
+		do {
+			int x = i + 17;
+			int j = i;
+			i = j;
+		} while (i < 10 );
+		return i;
+	}
+*/
 }
 
 

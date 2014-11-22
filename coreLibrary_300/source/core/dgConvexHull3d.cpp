@@ -222,7 +222,7 @@ dgAABBPointTree3d* dgConvexHull3d::BuildTree (dgAABBPointTree3d* const parent, d
 		maxMemSize -= sizeof (dgAABBPointTree3dClump);
 		dgAssert (maxMemSize >= 0);
 
-
+		dgAssert (clump);
 		clump->m_count = count;
 		for (dgInt32 i = 0; i < count; i ++) {
 			clump->m_indices[i] = i + baseIndex;

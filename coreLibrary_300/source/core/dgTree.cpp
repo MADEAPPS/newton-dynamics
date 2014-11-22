@@ -95,6 +95,7 @@ void dgRedBackNode::RotateLeft(dgRedBackNode** const head)
 	}
 	
 	// link child and me 
+	dgAssert (child);
 	child->m_left = me;
 	if (me != NULL) {
 		me->m_parent = child;
@@ -129,6 +130,7 @@ void dgRedBackNode::RotateRight(dgRedBackNode ** const head)
 	}
 
 	// link me and child 
+	dgAssert (child);
 	child->m_right = me;
 	if (me != NULL) {
 		me->m_parent = child;
@@ -143,6 +145,8 @@ void dgRedBackNode::InsertFixup(dgRedBackNode ** const head)
 	// check Red-Black properties 
 	while ((ptr != *head) && (ptr->m_parent->GetColor() == RED)) {
 		// we have a violation 
+		dgAssert (ptr->m_parent);
+		dgAssert (ptr->m_parent->m_parent);
 		if (ptr->m_parent == ptr->m_parent->m_parent->m_left) {
 			dgRedBackNode* const tmp = ptr->m_parent->m_parent->m_right;
 			if (tmp && (tmp->GetColor() == RED)) {

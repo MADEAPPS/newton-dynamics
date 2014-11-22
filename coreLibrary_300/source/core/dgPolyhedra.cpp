@@ -231,6 +231,7 @@ dgInt32 dgPolyhedra::GetFaceCount() const
 
 
 
+#pragma warning(suppress: 6262)
 dgEdge* dgPolyhedra::AddFace ( dgInt32 count, const dgInt32* const index, const dgInt64* const userdata)
 {
 	class IntersectionFilter
@@ -379,6 +380,7 @@ void dgPolyhedra::EndFace ()
 }
 
 
+#pragma warning(suppress: 6262)
 void dgPolyhedra::DeleteFace(dgEdge* const face)
 {
 	dgEdge* edgeList[1024 * 16];
@@ -629,6 +631,7 @@ bool dgPolyhedra::FlipEdge (dgEdge* const edge)
 
 
 
+#pragma warning(suppress: 6262)
 bool dgPolyhedra::GetConectedSurface (dgPolyhedra &polyhedra) const
 {
 	if (!GetCount()) {
@@ -661,7 +664,7 @@ bool dgPolyhedra::GetConectedSurface (dgPolyhedra &polyhedra) const
 	while (index) {
 		index --;
 		dgEdge* const edge = stack[index];
-
+		dgAssert (edge);
 		if (edge->m_mark == mark) {
 			continue;
 		}
@@ -669,6 +672,7 @@ bool dgPolyhedra::GetConectedSurface (dgPolyhedra &polyhedra) const
 		dgInt32 count = 0;
 		dgEdge* ptr = edge;
 		do {
+			dgAssert (ptr);
 			ptr->m_mark = mark;
 			faceIndex[count] = ptr->m_incidentVertex;
 			faceDataIndex[count] = dgInt64 (ptr->m_userData);

@@ -165,6 +165,14 @@ void dCILInstrMove::GetUsedVariables (dList<dArg*>& variablesList)
 	}
 }
 
+void dCILInstrMove::ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg)
+{
+	if (arg.m_label == m_arg1.m_label) {
+		m_arg1 = newArg;
+	}
+}
+
+/*
 bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
 {
 //Trace();
@@ -186,6 +194,7 @@ bool dCILInstrMove::ApplyConstantPropagationSSA (dWorkList& workList, dStatement
 	}
 	return ret;
 }
+*/
 
 void dCILInstrMove::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
@@ -402,6 +411,7 @@ void dCILInstrPhy::ReplaceArgument (const dArg& arg, dCILInstr* const newInstruc
 	}
 }
 
+/*
 bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
 {
 	bool ret = false;
@@ -423,7 +433,7 @@ bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dStatementB
 
 	return ret;
 }
-
+*/
 
 void dCILInstrPhy::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
@@ -437,7 +447,7 @@ void dCILInstrPhy::ApplyConstantPropagationSSA (dConstantPropagationSolver& solv
 			dAssert(solver.m_variablesList.Find(arg->m_label));
 			dConstantPropagationSolver::dVariable& variable = solver.m_variablesList.Find(arg->m_label)->GetInfo();
 			if (variable.m_type == dConstantPropagationSolver::dVariable::m_variableValue) {
-				dAssert (0);
+				solver.UpdateLatice (m_arg0, m_arg0.m_label, dConstantPropagationSolver::dVariable::m_variableValue);
 				return; 
 			}
 			if (variable.m_type != dConstantPropagationSolver::dVariable::m_undefined) {

@@ -270,6 +270,7 @@ void dgMemoryAllocator::Free (void* const retPtr)
 
 		dgMemoryBin* const bin = (dgMemoryBin *) info->m_ptr;
 
+		dgAssert (bin);
 #ifdef _DEBUG
 		dgAssert ((bin->m_info.m_stepInBites - DG_MEMORY_GRANULARITY) > 0);
 		memset (retPtr, 0, bin->m_info.m_stepInBites - DG_MEMORY_GRANULARITY);
@@ -301,6 +302,7 @@ void dgMemoryAllocator::Free (void* const retPtr)
 			if (m_memoryDirectory[entry].m_first == bin) {
 				m_memoryDirectory[entry].m_first = bin->m_info.m_next;
 			}
+
 			if (bin->m_info.m_next) {
 				bin->m_info.m_next->m_info.m_prev = bin->m_info.m_prev;
 			}

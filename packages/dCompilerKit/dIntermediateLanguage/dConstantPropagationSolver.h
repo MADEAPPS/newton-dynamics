@@ -63,11 +63,13 @@ class dConstantPropagationSolver
 	bool Solve();
 	void UpdateLatice (const dCILInstr::dArg& arg, const dString& value, dVariable::dValueTypes type);
 
+	void Trace();
+
 	dBasicBlocksGraph* m_graph; 
 	dTree<int, dBasicBlock*> m_visited;
+	dList<dBasicBlock*> m_blockWorklist;
 	dTree<dInstructionMap, dString> m_uses;
-	dInstructionMap m_instructionsWorklist;
-	dTree<int, dBasicBlock*> m_blockWorklist;
+	dList<dCILInstr*> m_instructionsWorklist;
 	dTree<dVariable, dString> m_variablesList;
 	dTree<int, dBlockEdgeKey> m_executableEdges;
 };

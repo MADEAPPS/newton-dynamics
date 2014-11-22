@@ -287,7 +287,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgFloat32 ti
 			for (dgBodyMasterListRow::dgListNode* jointNode = srcBody->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 				dgConstraint* const constraint = cell->m_joint;
-
+				dgAssert (constraint);
 				dgBody* const linkBody = cell->m_bodyNode;
 				dgAssert ((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
 				dgAssert ((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
@@ -487,7 +487,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 			for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 				dgConstraint* const constraint = cell->m_joint;
-
+				dgAssert (constraint);
 				dgBody* const linkBody = cell->m_bodyNode;
 				dgAssert ((constraint->m_body0 == body) || (constraint->m_body1 == body));
 				dgAssert ((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));

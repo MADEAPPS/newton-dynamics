@@ -149,6 +149,7 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 	}
 
 	clippedFace[1].m_next = &clippedFace[m_count * 2 - 2 + 1];
+	dgAssert ((m_count * 2 - 2) >= 0);
 	clippedFace[m_count * 2 - 2].m_next = &clippedFace[0];
 	clippedFace[m_count * 2 - 2 + 1].m_incidentVertex = 0;
 

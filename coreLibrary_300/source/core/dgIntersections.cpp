@@ -554,6 +554,7 @@ class dgSweepSphereToPolygon
 			m_vertexIndex[m_count + i + 1] = i;
 		}
 		m_prevVertex[0] = m_count - 1;
+		dgAssert ((m_count - 1) > 0);
 		m_nextVertex[m_count - 1] = 0;
 	}
 

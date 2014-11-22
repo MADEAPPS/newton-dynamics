@@ -1525,6 +1525,7 @@ void dgCollisionConvex::SetUserData (void* const userData)
 }
 
 
+#pragma warning(suppress: 6262)
 void dgCollisionConvex::SetVolumeAndCG ()
 {
 	dgVector faceVertex[DG_MAX_EDGE_COUNT];
@@ -1618,6 +1619,7 @@ bool dgCollisionConvex::SanityCheck (dgPolyhedra& hull) const
 }
 
 
+#pragma warning(suppress: 6262)
 void dgCollisionConvex::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgInt8 mark[DG_MAX_EDGE_COUNT];
@@ -1826,6 +1828,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatri
 }
 
 
+#pragma warning(suppress: 6262)
 dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const 
 {
 	dgInt8 mark[DG_MAX_EDGE_COUNT];
@@ -1866,6 +1869,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 			dgConvexSimplexEdge* const face = &m_simplex[i];
 			dgConvexSimplexEdge* edge = face;
 			dgInt32 count = 0;
+#pragma warning(suppress: 6001)
 			dgFloat32 size0 = test[edge->m_prev->m_vertex];
 			do {
 				//edge->m_mark = m_mark;
@@ -2060,7 +2064,9 @@ dgInt32 dgCollisionConvex::SimplifyClipPolygon (dgInt32 count, const dgVector& n
 
 			dgInt32 i0 = (i1 - 1) >= 0 ? i1 - 1 : count - 1;
 			dgInt32 i2 = (i1 + 1) < count ? i1 + 1 : 0;
+			dgAssert (i0 >= 0);
 
+#pragma warning(suppress: 6001)
 			if (!(mark[i0] || mark[i2])) {
 				mark[i1] = 1;
 				removeCount --;
@@ -2565,12 +2571,16 @@ dgInt32 dgCollisionConvex::ConvexPolygonsIntersection (const dgVector& normal, d
 
 		dgPerimenterEdge subdivision[128];
 		dgAssert ((2 * (count1 + count2)) < dgInt32 (sizeof (subdivision) / sizeof (subdivision[0])));
-		for (dgInt32 i0 = 0; i0 < count2; i0 ++) {
+
+		for (dgInt32 i0 = 1; i0 < count2; i0 ++) {
 			subdivision[i0].m_vertex = &shape2[i0];
 			subdivision[i0].m_prev = &subdivision[i0 - 1];
 			subdivision[i0].m_next = &subdivision[i0 + 1];
 		}
+		subdivision[0].m_vertex = &shape2[0];
 		subdivision[0].m_prev = &subdivision[count2 - 1];
+		subdivision[0].m_next = &subdivision[1];
+		
 		subdivision[count2 - 1].m_next = &subdivision[0];
 
 		dgPerimenterEdge* edgeClipped[2];
@@ -2814,6 +2824,7 @@ dgInt32 dgCollisionConvex::CalculateContactsGeneric (const dgVector& point, cons
 	return count;
 }
 
+#pragma warning(suppress: 6262)
 bool dgCollisionConvex::CalculateClosestPoints (dgCollisionParamProxy& proxy) const
 {
 	dgAssert (this == proxy.m_referenceCollision->m_childShape);
@@ -2871,6 +2882,7 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 }
 
 
+#pragma warning(suppress: 6262)
 dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance* const convexConicShape, const dgMatrix& conicShapeMatrix, const dgCollisionInstance* const otherConvexShapeInstance, const dgMatrix& otherShapeGlobalMatrix, const dgVector& castingVeloc, dgFloat32 maxT, dgContactPoint& contactOut) const 
 {
 	dgAssert (convexConicShape->GetChildShape() == this);
@@ -2987,6 +2999,7 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 }
 
 
+#pragma warning(suppress: 6262)
 dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy& proxy) const
 {
 	dgInt32 count = 0;
@@ -3064,6 +3077,7 @@ dgInt32 dgCollisionConvex::CalculateConvexToConvexContact (dgCollisionParamProxy
 
 
 
+#pragma warning(suppress: 6262)
 dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& proxy) const
 {
 	dgBody* const floatingBody = proxy.m_floatingBody;

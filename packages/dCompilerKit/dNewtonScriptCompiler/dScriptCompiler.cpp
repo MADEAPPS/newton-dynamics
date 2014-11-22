@@ -48,7 +48,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	const char* const sourceFileName = argv[1];
 	FILE* const sourceFile = fopen (sourceFileName, "r");
 	if (!sourceFile) {
-		fprintf (stdout, "script source file: \"%s\" not found\n", sourceFile);
+		fprintf (stdout, "script source file: \"%s\" not found\n", sourceFileName);
 		exit (0);
 	}
 

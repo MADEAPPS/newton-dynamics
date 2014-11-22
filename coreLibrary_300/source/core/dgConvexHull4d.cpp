@@ -496,6 +496,7 @@ dgAABBPointTree4d* dgConvexHull4d::BuildTree (dgAABBPointTree4d* const parent, d
 		maxMemSize -= sizeof (dgAABBPointTree4dClump);
 		dgAssert (maxMemSize >= 0);
 
+		dgAssert (clump);
 		clump->m_count = count;
 		for (dgInt32 i = 0; i < count; i ++) {
 			clump->m_indices[i] = i + baseIndex;
@@ -939,6 +940,7 @@ void dgConvexHull4d::InsertNewVertex(dgInt32 vertexIndex, dgListNode* const fron
 
 
 
+#pragma warning(suppress: 6262)
 dgConvexHull4d::dgListNode* dgConvexHull4d::FindFacingNode(const dgBigVector& vertex)
 {
 	const dgHullVector* const hullVertexArray = &m_points[0];

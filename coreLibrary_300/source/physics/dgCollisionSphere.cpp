@@ -222,6 +222,7 @@ dgInt32 dgCollisionSphere::CalculatePlaneIntersection (const dgVector& normal, c
 }
 
 
+#pragma warning(suppress: 6262)
 void dgCollisionSphere::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgTriplex pool[1024 * 2];

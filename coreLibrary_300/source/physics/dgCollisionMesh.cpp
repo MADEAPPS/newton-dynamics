@@ -105,7 +105,7 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			dgMatrix scaleMatrix (meshInvScale.CompProduct4(m_front), meshInvScale.CompProduct4(m_up), meshInvScale.CompProduct4(m_right), m_posit);
 			m_objCollision->CalcAABB (scaleMatrix, m_p0, m_p1);
 
-			const dgCollision* const collision = m_objCollision->GetChildShape();
+			//const dgCollision* const collision = m_objCollision->GetChildShape();
 
 			dgMatrix obbScaledMatrix (scaleMatrix * matrix.Inverse());
 			dgVector obbP0;
@@ -374,6 +374,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 
 
 
+#pragma warning(suppress: 6262)
 dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceCollision, void* const userData, dgInt32 threadId) const
 {
 	dgAssert (castingShape->IsType (dgCollision::dgCollisionConvexShape_RTTI));

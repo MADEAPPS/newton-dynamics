@@ -1218,6 +1218,7 @@ void dgWorld::DeserializeBodyArray (OnBodyDeserialize bodyCallback, dgDeserializ
 			}
 		}
 
+		dgAssert (body);
 		m_bodiesUniqueID ++;
 		body->m_freeze = false;
 		body->m_sleeping = false;

@@ -63,6 +63,7 @@ void dRedBackNode::RotateLeft(dRedBackNode** const head)
 	dRedBackNode* const me = this;
 	dRedBackNode* const child = me->m_right;
 	
+	dAssert (child);
 	//establish me->m_right link 
 	me->m_right = child->m_left;
 	if (child->m_left != NULL) {
@@ -97,6 +98,7 @@ void dRedBackNode::RotateRight(dRedBackNode** const head)
 	dRedBackNode* const me = this;
 	dRedBackNode* const child = me->m_left;
 
+	dAssert (child);
 	// establish me->m_left link 
 	me->m_left = child->m_right;
 	if (child->m_right != NULL) {
@@ -130,8 +132,11 @@ void dRedBackNode::InsertFixup(dRedBackNode** const head)
 {
 	dRedBackNode* ptr = this;
 	// check Red-Black properties 
+	dAssert ((ptr == *head) || ptr->m_parent);
 	while ((ptr != *head) && (ptr->m_parent->GetColor() == RED)) {
 		// we have a violation 
+		dAssert (ptr->m_parent);
+		dAssert (ptr->m_parent->m_parent);
 		if (ptr->m_parent == ptr->m_parent->m_parent->m_left) {
 			dRedBackNode* const tmp = ptr->m_parent->m_parent->m_right;
 			if (tmp && (tmp->GetColor() == RED)) {

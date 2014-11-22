@@ -150,23 +150,26 @@ void dLexScannerGenerator::LoadTemplateFile(const char* const templateName, dStr
 	char path[2048];
 
 	// in windows
-	GetModuleFileName(NULL, path, sizeof(path)); 
+	if (GetModuleFileName(NULL, path, sizeof(path))) { 
 
-	//	for Linux:
-	//	char szTmp[32]; 
-	//	sprintf(szTmp, "/proc/%d/exe", getpid()); 
-	//	int bytes = MIN(readlink(szTmp, pBuf, len), len - 1); 
-	//	if(bytes >= 0)
-	//		pBuf[bytes] = '\0'; 
+		//	for Linux:
+		//	char szTmp[32]; 
+		//	sprintf(szTmp, "/proc/%d/exe", getpid()); 
+		//	int bytes = MIN(readlink(szTmp, pBuf, len), len - 1); 
+		//	if(bytes >= 0)
+		//		pBuf[bytes] = '\0'; 
 
-	char* const ptr = strrchr (path, '\\') + 1;
-	sprintf (ptr, templateName);
+		char* const ptr = strrchr (path, '\\') + 1;
+		sprintf (ptr, templateName);
 
-	FILE* const templateFile = fopen (path, "rb");
-	dAssert (templateFile);
+		FILE* const templateFile = fopen (path, "rb");
+		dAssert (templateFile);
 
-	templateOuput.LoadFile(templateFile);
-	fclose (templateFile);	
+		templateOuput.LoadFile(templateFile);
+		fclose (templateFile);	
+	} else {
+		dAssert (0);
+	}
 }
 
 

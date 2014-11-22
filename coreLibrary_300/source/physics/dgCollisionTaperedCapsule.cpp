@@ -234,6 +234,7 @@ void dgCollisionTaperedCapsule::TesselateTriangle (dgInt32 level, const dgVector
 }
 
 
+#pragma warning(suppress: 6262)
 void dgCollisionTaperedCapsule::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	#define POWER 2

@@ -317,6 +317,7 @@ void dgPolygonSoupDatabaseBuilder::Finalize()
 }
 
 
+#pragma warning(suppress: 6262)
 void dgPolygonSoupDatabaseBuilder::FinalizeAndOptimize()
 {
 	Finalize();

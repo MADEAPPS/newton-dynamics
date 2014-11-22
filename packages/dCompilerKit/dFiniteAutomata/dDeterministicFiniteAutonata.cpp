@@ -218,6 +218,7 @@ void dDeterministicFiniteAutonata::CreateDeterministicFiniteAutomaton (const dNo
 					dAutomataState* foundState = NULL;
 					for (dList<dAutomataState*>::dListNode* node = newStatesList.GetFirst(); node; node = node->GetNext()) {
 						dAutomataState* const state = node->GetInfo();
+						dAssert (state);
 						if (CompareSets(state->m_myNFANullStates, subSet)) {
 							foundState = state;
 							break;

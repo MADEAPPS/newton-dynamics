@@ -1024,7 +1024,8 @@ void dgWorld::DeformableContacts (dgCollidingPairCollector::dgPair* const pair, 
 		//return ;
 		//}
 	}
-
+	dgAssert (constraint);
+	dgAssert (constraint->m_body0);
 	dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) constraint->m_body0->GetCollision()->GetChildShape();
 	dgAssert (constraint->m_body0->GetCollision()->IsType(dgCollision::dgCollisionDeformableMesh_RTTI));
 	deformable->CalculateContacts (pair, proxy);
@@ -1653,6 +1654,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 }
 
 
+#pragma warning(suppress: 6262)
 dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& proxy) const
 {
 	dgInt32 count = 0;

@@ -780,8 +780,10 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 		m_faceNormals[i] = n;
 	} 
 
+	dgAssert (m_visualVertexData);
 	for (dgInt32 i = 0; i < m_visualVertexCount; i ++)	{
 		m_visualVertexData[i].m_normals[0] = dgFloat32 (0.0f);
+#pragma warning(suppress: 6011)
 		m_visualVertexData[i].m_normals[1] = dgFloat32 (0.0f);
 		m_visualVertexData[i].m_normals[2] = dgFloat32 (0.0f);
 	}

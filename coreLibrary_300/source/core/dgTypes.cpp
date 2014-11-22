@@ -147,8 +147,8 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 
 	dgBigVector minP (dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (0.0f));
 	dgBigVector maxP (dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (0.0f));
-	dgInt32 k = 0;
-	for (dgInt32 i = 0; i < vertexCount; i ++) {
+	//dgInt32 k = 0;
+	for (dgInt32 k = 0, i = 0; i < vertexCount; i ++) {
 		dgFloat64 x  = vertexList[k + 2];
 		dgFloat64 y  = vertexList[k + 3];
 		dgFloat64 z  = vertexList[k + 4];
@@ -284,7 +284,7 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 					}
 					bool test = true;
 					for (dgInt32 t = 0; test && (t < compareCount); t ++) {
-						dgFloat64 val = fabs (vertexList[m + t + 2] - vertexList[k + t + 2]);
+						val = fabs (vertexList[m + t + 2] - vertexList[k + t + 2]);
 						test = test && (val <= tol);
 					}
 					if (test) {

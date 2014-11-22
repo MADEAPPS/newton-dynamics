@@ -98,10 +98,10 @@ class dBasicBlocksGraph: public dList<dBasicBlock>
 	void CalculateSuccessorsAndPredecessors ();
 
 	bool ApplyCopyPropagationSSA();
-	bool ApplyConstantPropagationSSA();
+	//bool ApplyConstantPropagationSSA();
 	bool ApplyDeadCodeEliminationSSA();
 	bool ApplyConstantConditionalSSA();
-	bool ApplyConditionalConstantPropagationSSA();
+	bool ApplyConstantPropagationSSA();
 
 	dCIL::dListNode* m_begin;
 	dCIL::dListNode* m_end;

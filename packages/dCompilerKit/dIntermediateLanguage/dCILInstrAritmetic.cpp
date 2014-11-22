@@ -455,8 +455,8 @@ void dCILInstrIntergerLogical::ReplaceArgument (const dArg& arg, dCILInstr* cons
 dString dCILInstrIntergerLogical::Evalue (const dString& arg1, const dString& arg2) const
 {
 	int c = 0;
-	int a = m_arg1.m_label.ToInteger();
-	int b = m_arg2.m_label.ToInteger();
+	int a = arg1.ToInteger();
+	int b = arg2.ToInteger();
 
 	switch (m_operator) 
 	{
@@ -466,9 +466,15 @@ dString dCILInstrIntergerLogical::Evalue (const dString& arg1, const dString& ar
 			break;
 		}
 
+		case m_identical:
+		{
+			c = (a == b) ? 1 : 0;
+			break;
+		}
+
 		case m_less:
 		{
-		   c = a < b ? 1 : 0;
+		   c = (a < b) ? 1 : 0;
 		   break;
 		}
 
@@ -533,7 +539,6 @@ void dCILInstrIntergerLogical::ApplyConstantPropagationSSA (dConstantPropagation
 	if ((type1 == dConstantPropagationSolver::dVariable::m_constant) && (type2 == dConstantPropagationSolver::dVariable::m_constant)) {
 		solver.UpdateLatice (m_arg0, Evalue(arg1.m_label, arg2.m_label), dConstantPropagationSolver::dVariable::m_constant);
 	} else {
-		dAssert (0);
+		solver.UpdateLatice (m_arg0, m_arg0.m_label, dConstantPropagationSolver::dVariable::m_variableValue);
 	}
-
 }

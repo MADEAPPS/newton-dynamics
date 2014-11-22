@@ -82,11 +82,13 @@ class dCILInstrMove: public dCILTwoArgInstr
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow)  ;
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst);
 
+	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg);
+
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
-	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
+	//virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 };
 
@@ -140,7 +142,7 @@ class dCILInstrPhy: public dCILSingleArgInstr
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
 	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg);
-	virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
+	//virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 
 	dList<dArgPair> m_sources;

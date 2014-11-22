@@ -80,7 +80,7 @@ void dCILInstrGoto::ApplyConstantPropagationSSA (dConstantPropagationSolver& sol
 	dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), target->GetBasicBlock());
 	if (!solver.m_executableEdges.Find(key1)) {
 		solver.m_executableEdges.Insert(1, key1);
-		solver.m_blockWorklist.Insert(0, target->GetBasicBlock());
+		solver.m_blockWorklist.Append(target->GetBasicBlock());
 	}
 }
 
@@ -201,6 +201,7 @@ void dCILInstrConditional::ReplaceArgument (const dArg& arg, dCILInstr* const ne
 
 void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
+//Trace();
 	if ((m_arg0.GetType().m_intrinsicType == m_constInt) || (m_arg0.GetType().m_intrinsicType == m_constFloat)) {
 		dAssert (0);
 		return;
@@ -220,32 +221,33 @@ void dCILInstrConditional::ApplyConstantPropagationSSA (dConstantPropagationSolv
 			dCILInstrLabel* target;
 			if (condition) {
 				target = GetTrueTarget()->GetInfo()->GetAsLabel();
-			}
-			else {
+			} else {
 				target = GetFalseTarget()->GetInfo()->GetAsLabel();
 			}
 
 			dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), target->GetBasicBlock());
 			if (!solver.m_executableEdges.Find(key1)) {
 				solver.m_executableEdges.Insert(1, key1);
-				solver.m_blockWorklist.Insert(0, target->GetBasicBlock());
+				solver.m_blockWorklist.Append(target->GetBasicBlock());
 			}
 
 		} else if (variable.m_type == dConstantPropagationSolver::dVariable::m_variableValue) {
-			dAssert (0);
-		} else {
 			dConstantPropagationSolver::dBlockEdgeKey key0 (GetBasicBlock(), m_targetNode0->GetInfo()->GetBasicBlock());
 			if (!solver.m_executableEdges.Find(key0)) {
 				solver.m_executableEdges.Insert(1, key0);
-				solver.m_blockWorklist.Insert(0, m_targetNode0->GetInfo()->GetBasicBlock());
+				solver.m_blockWorklist.Append(m_targetNode0->GetInfo()->GetBasicBlock());
 			}
 
 			dConstantPropagationSolver::dBlockEdgeKey key1(GetBasicBlock(), m_targetNode1->GetInfo()->GetBasicBlock());
 			if (!solver.m_executableEdges.Find(key1)) {
 				solver.m_executableEdges.Insert(1, key1);
-				solver.m_blockWorklist.Insert(0, m_targetNode1->GetInfo()->GetBasicBlock());
+				solver.m_blockWorklist.Append(m_targetNode1->GetInfo()->GetBasicBlock());
 			}
+
+//		} else if (variable.m_type == dConstantPropagationSolver::dVariable::m_variableValue) {
+//			dAssert(0);
 		}
+
 	}
 }
 

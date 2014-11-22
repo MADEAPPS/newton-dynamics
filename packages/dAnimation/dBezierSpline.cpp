@@ -577,10 +577,15 @@ void dBezierSpline::InsertKnot (dFloat64 u)
 		dFloat64 alpha = (u  - m_knotVector[m + i]) / (m_knotVector[i + k + 1] - m_knotVector[m + i]);
 		Rw[i] = Rw[i + 1].Scale (alpha) + Rw[i].Scale (dFloat64 (1.0f) - alpha);
 	}
+	dAssert(m >= 0);
+	dAssert((k + 1 - 1 - 0) >= 0);
+	dAssert((m_degree - 1 - 0) >= 0);
+
 	newControlPoints[m] = Rw[0];
 	newControlPoints[k + 1 - 1 - 0] = Rw[m_degree - 1 - 0];
 
 	for (int i = m + 1; i < k; i ++) {
+		dAssert ((i - m) >= 0);
 		newControlPoints[i] = Rw[i - m];
 	}
 

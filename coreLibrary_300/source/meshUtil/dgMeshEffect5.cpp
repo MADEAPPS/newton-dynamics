@@ -2034,8 +2034,10 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 
 				if (!nexEdge) {
 					dgEdge* ptr1 = ptr->m_next;
+					dgAssert (ptr1);
 					dgGoogol test0 (normal % (clipperMeshBVH->m_vertexAlias[ptr1->m_incidentVertex] - origin));
 					do {
+						dgAssert (ptr1->m_next);
 						dgGoogol test1 (normal % (clipperMeshBVH->m_vertexAlias[ptr1->m_next->m_incidentVertex] - origin));
 						if (test0 >= m_posTol) {
 							if (test1.Abs() < m_posTol) {
