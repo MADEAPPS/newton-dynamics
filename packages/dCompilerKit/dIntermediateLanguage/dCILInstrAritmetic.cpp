@@ -442,7 +442,7 @@ void dCILInstrIntergerLogical::GetUsedVariables (dList<dArg*>& variablesList)
 	}
 }
 
-void dCILInstrIntergerLogical::ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg)
+void dCILInstrIntergerLogical::ReplaceArgument (const dArg& arg, const dArg& newArg)
 {
 	if (arg.m_label == m_arg1.m_label) {
 		m_arg1 = newArg;

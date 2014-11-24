@@ -165,7 +165,7 @@ void dCILInstrMove::GetUsedVariables (dList<dArg*>& variablesList)
 	}
 }
 
-void dCILInstrMove::ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg)
+void dCILInstrMove::ReplaceArgument (const dArg& arg, const dArg& newArg)
 {
 	if (arg.m_label == m_arg1.m_label) {
 		m_arg1 = newArg;
@@ -230,7 +230,7 @@ bool dCILInstrMove::ApplyCopyPropagationSSA (dWorkList& workList, dStatementBloc
 			for (iter.Begin(); iter; iter++) {
 				dCILInstr* const instrution = iter.GetKey()->GetInfo();
 //instrution->Trace();
-				instrution->ReplaceArgument(m_arg0, NULL, m_arg1);
+				instrution->ReplaceArgument(m_arg0, m_arg1);
 //instrution->Trace();
 				workList.Insert(instrution->GetNode());
 			}
@@ -348,13 +348,12 @@ void dCILInstrStore::AddGeneratedAndUsedSymbols (dDataFlowPoint& datFloatPoint) 
 }
 
 
-dCILInstrPhy::dCILInstrPhy (dCIL& program, const dString& name, const dArgType& type, dList<dCILInstr*>& source, const dBasicBlock* const basicBlock)
+dCILInstrPhy::dCILInstrPhy (dCIL& program, const dString& name, const dArgType& type, const dBasicBlock* const basicBlock, dList<const dBasicBlock*>& sources)
 	:dCILSingleArgInstr(program, dArg(name, type))
 {
 	m_basicBlock = (dBasicBlock*)basicBlock;
-	for (dList<dCILInstr*>::dListNode* node = source.GetFirst(); node; node = node->GetNext()) {
-		dCILInstr* const instruction = node->GetInfo();
-		m_sources.Append (instruction->GetNode());
+	for (dList<const dBasicBlock*>::dListNode* node = sources.GetFirst(); node; node = node->GetNext()) {
+		m_sources.Append (dArgPair (m_arg0, node->GetInfo()));
 	}
 }
 
@@ -366,14 +365,12 @@ void dCILInstrPhy::Serialize(char* const textOut) const
 		char tmp[1024]; 
 
 		dArgPair& pair = node->GetInfo();
-		dArg* const arg = pair.m_intructionNode ? pair.m_intructionNode->GetInfo()->GetGeneratedVariable() : &pair.m_arg;
-		dAssert (arg);
 		dCILInstrLabel* const block = pair.m_block->m_begin->GetInfo()->GetAsLabel();
 		dAssert(block);
 		if (node->GetNext()) {
-			sprintf(tmp, "[%s %s, %s], ", arg->GetTypeName().GetStr(), arg->m_label.GetStr(), block->GetArg0().m_label.GetStr());
+			sprintf(tmp, "[%s %s, %s], ", pair.m_arg.GetTypeName().GetStr(), pair.m_arg.m_label.GetStr(), block->GetArg0().m_label.GetStr());
 		} else {
-			sprintf(tmp, "[%s %s, %s]", arg->GetTypeName().GetStr(), arg->m_label.GetStr(), block->GetArg0().m_label.GetStr());
+			sprintf(tmp, "[%s %s, %s]", pair.m_arg.GetTypeName().GetStr(), pair.m_arg.m_label.GetStr(), block->GetArg0().m_label.GetStr());
 		}
 		strcat(textOut, tmp);
 	}
@@ -383,7 +380,7 @@ void dCILInstrPhy::Serialize(char* const textOut) const
 void dCILInstrPhy::GetUsedVariables (dList<dArg*>& variablesList)
 {
 	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
-		dArg* const arg = node->GetInfo().m_intructionNode ? node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : &node->GetInfo().m_arg;
+		dArg* const arg = &node->GetInfo().m_arg;
 		if (arg->GetType().m_isPointer) {
 			variablesList.Append(arg);
 		} else {
@@ -400,16 +397,6 @@ void dCILInstrPhy::GetUsedVariables (dList<dArg*>& variablesList)
 	}
 }
 
-void dCILInstrPhy::ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg)
-{
-	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
-		dArg* const srcArg = node->GetInfo().m_intructionNode ? node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : &node->GetInfo().m_arg;
-		if (arg.m_label == srcArg->m_label) {
-			node->GetInfo().m_arg = newArg;
-			node->GetInfo().m_intructionNode = newInstruction ? newInstruction->GetNode() : NULL;
-		}
-	}
-}
 
 /*
 bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary)
@@ -437,6 +424,8 @@ bool dCILInstrPhy::ApplyConstantPropagationSSA (dWorkList& workList, dStatementB
 
 void dCILInstrPhy::ApplyConstantPropagationSSA (dConstantPropagationSolver& solver)
 {
+dAssert (0);
+/*
 	dList<dArg> constList;
 	for (dList<dArgPair>::dListNode* node = m_sources.GetFirst(); node; node = node->GetNext()) {
 		const dArg* const arg = node->GetInfo().m_intructionNode ? node->GetInfo().m_intructionNode->GetInfo()->GetGeneratedVariable() : &node->GetInfo().m_arg;
@@ -469,4 +458,6 @@ void dCILInstrPhy::ApplyConstantPropagationSSA (dConstantPropagationSolver& solv
 			solver.UpdateLatice (m_arg0, value, dConstantPropagationSolver::dVariable::m_variableValue);
 		}
 	}
+*/	
+
 }

@@ -82,7 +82,7 @@ class dCILInstrMove: public dCILTwoArgInstr
 	virtual bool ApplyDeadElimination (dDataFlowGraph& dataFlow)  ;
 	virtual bool ApplyCopyPropagation (dCILInstrMove* const moveInst);
 
-	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg);
+	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg);
 
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
@@ -99,34 +99,30 @@ class dCILInstrPhy: public dCILSingleArgInstr
 	class dArgPair
 	{
 		public:
-		dArgPair (dList<dCILInstr*>::dListNode* const intructionNode)
-			:m_intructionNode(intructionNode)
-			,m_block(m_intructionNode->GetInfo()->GetBasicBlock()) 
-			,m_arg (*intructionNode->GetInfo()->GetGeneratedVariable())
+		dArgPair (const dArg& arg, const dBasicBlock* block)
+			:m_block(block) 
+			,m_arg (arg)
 		{
 			dAssert (m_block);
 		}
 
 		dArgPair (const dArgPair& copy)
-			:m_intructionNode(copy.m_intructionNode)
-			,m_block (copy.m_block)
+			:m_block (copy.m_block)
 			,m_arg (copy.m_arg)
 		{
 			dAssert (m_block);
-			dAssert (m_block == m_intructionNode->GetInfo()->GetBasicBlock());
 		}
-		
-		dList<dCILInstr*>::dListNode* m_intructionNode;
-		dBasicBlock* m_block;
+
+		const dBasicBlock* m_block;
 		dArg m_arg;
 	};
 
-	dCILInstrPhy (dCIL& program, const dString& name0, const dArgType& type0, dList<dCILInstr*>& sources, const dBasicBlock* const basicBlock);
+	dCILInstrPhy (dCIL& program, const dString& name, const dArgType& type, const dBasicBlock* const basicBlock, dList<const dBasicBlock*>& sources);
 
 	void Serialize(char* const textOut) const;
 	virtual void EmitOpcode(dVirtualMachine::dOpCode* const codeOutPtr) const {}
 
-	virtual dCILInstrPhy* GetAsPhy() { return this; }
+	virtual dCILInstrPhy* GetAsPhi() { return this; }
 	virtual bool ApplyDeadElimination() const { return true; }
 	virtual bool ApplySemanticReordering() { return false; }
 	virtual void AddGeneratedAndUsedSymbols(dDataFlowPoint& datFloatPoint) const {dAssert(0);}
@@ -141,7 +137,7 @@ class dCILInstrPhy: public dCILSingleArgInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
-	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg);
+	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg) {}
 	//virtual bool ApplyConstantPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary);
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);
 

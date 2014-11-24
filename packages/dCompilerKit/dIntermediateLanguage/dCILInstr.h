@@ -132,7 +132,7 @@ class dCILInstr
 	virtual dCILInstrEnter* GetAsEnter() { return NULL; }
 	virtual dCILInstrNop* GetAsNop() { return NULL; }
 	virtual dCILInstrConditional* GetAsIF() { return NULL; }
-	virtual dCILInstrPhy* GetAsPhy() { return NULL; }
+	virtual dCILInstrPhy* GetAsPhi() { return NULL; }
 	virtual dCILInstrMove* GetAsMove() { return NULL; }
 	virtual dCILInstrCall* GetAsCall() { return NULL; }
 	virtual dCILInstrGoto* GetAsGoto() { return NULL; }
@@ -173,7 +173,7 @@ class dCILInstr
 	// ****************************
 	virtual dArg* GetGeneratedVariable () {dAssert (0); return NULL;}
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {dAssert (0);}
-	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg) {dAssert (0);}
+	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg) {dAssert (0);}
 
 	virtual bool ApplyConstantFoldingSSA () {return false;}
 	virtual bool ApplyCopyPropagationSSA (dWorkList& workList, dStatementBlockDictionary& usedVariablesDictionary) {return false;}

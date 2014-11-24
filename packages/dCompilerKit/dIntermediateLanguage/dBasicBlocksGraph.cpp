@@ -15,6 +15,7 @@
 #include "dCILInstrBranch.h"
 #include "dBasicBlocksGraph.h"
 #include "dCILInstrLoadStore.h"
+#include "dConvertToSSASolver.h"
 #include "dConstantPropagationSolver.h"
 
 
@@ -74,6 +75,7 @@ void dBasicBlock::Trace() const
 		terminate = (node == m_end);
 		node->GetInfo()->Trace();
 	}
+
 /*
 	dCILInstrLabel* const label = m_begin->GetInfo()->GetAsLabel();
 	dTrace ((" block-> %s\n", label->GetArg0().m_label.GetStr()));
@@ -101,7 +103,8 @@ void dBasicBlock::Trace() const
 		dTrace (("%s ", label->GetArg0().m_label.GetStr()));
 	}
 	dTrace (("\n"));
-
+*/
+/*
 	dTrace(("   dominanceFrontier-> "));
 	for (dList<const dBasicBlock*>::dListNode* childFrontierNode = m_dominanceFrontier.GetFirst(); childFrontierNode; childFrontierNode = childFrontierNode->GetNext()) {
 		const dBasicBlock* const childBlock = childFrontierNode->GetInfo();
@@ -390,201 +393,12 @@ void dBasicBlocksGraph::BuildDominatorTree ()
 }
 
 
-void dBasicBlocksGraph::BuildDomicanceFrontier (const dBasicBlock* const root) const
-{
-	dTree<int, const dBasicBlock*> frontier;
-	for (dList<const dBasicBlock*>::dListNode* succNode = root->m_successors.GetFirst(); succNode; succNode = succNode->GetNext()) {
-		const dBasicBlock& succBlock = *succNode->GetInfo();
-		if (succBlock.m_idom != root) {
-			frontier.Insert(0, &succBlock);
-		}
-//succBlock.Trace();
-	}
-
-	for (dList<const dBasicBlock*>::dListNode* node = root->m_children.GetFirst(); node; node = node->GetNext()) {
-		const dBasicBlock* const childBlock = node->GetInfo();
-		BuildDomicanceFrontier (childBlock);
-		for (dList<const dBasicBlock*>::dListNode* childFrontierNode = childBlock->m_dominanceFrontier.GetFirst(); childFrontierNode; childFrontierNode = childFrontierNode->GetNext()) {
-			const dBasicBlock* const childBlock = childFrontierNode->GetInfo();
-			if (childBlock->m_idom != root) {
-				frontier.Insert(0, childBlock);
-			}
-		}
-	}
-
-	dTree<int, const dBasicBlock*>::Iterator iter (frontier);
-	for (iter.Begin(); iter; iter ++) {
-		root->m_dominanceFrontier.Append(iter.GetKey());
-	}
-}
-
 void dBasicBlocksGraph::ConvertToSSA ()
 {
-	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-		dBasicBlock& block = node->GetInfo();
-		block.m_dominanceFrontier.RemoveAll();
-	}
-	BuildDomicanceFrontier (m_dominatorTree);
-
-	dCIL* const cil = m_begin->GetInfo()->GetCil();
-	dTree <dStatementBucket, dString> variableList;
-	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-		dBasicBlock& block = node->GetInfo();
-
-		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
-			dCILInstr* const instruction = node->GetInfo();
-			//instruction->Trace();
-			const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
-			if (variable) {
-				dTree <dStatementBucket, dString>::dTreeNode* entry = variableList.Find(variable->m_label);
-				if (!entry) {
-					entry = variableList.Insert(variable->m_label);
-					entry->GetInfo().m_variable = dCILInstr::dArg(variable->m_label, variable->GetType());
-				}
-				dStatementBucket& buckect = entry->GetInfo();
-				buckect.Insert(instruction, &block);
-			}
-		}
-	}
-
-Trace();
-
-	dTree <dStatementBucket, dString> phiVariables;
-	dTree <dStatementBucket, dString>::Iterator iter (variableList);
-	for (iter.Begin(); iter; iter ++) {
-		dStatementBucket w;
-		dStatementBucket::Iterator bucketIter (iter.GetNode()->GetInfo());
-		for (bucketIter.Begin(); bucketIter; bucketIter ++) {
-			w.Insert(bucketIter.GetNode()->GetInfo(), bucketIter.GetKey());
-		}
-
-		//const dString& name = iter.GetKey();
-		dCILInstr::dArg name (iter.GetNode()->GetInfo().m_variable);
-dTrace (("\n%s\n", name.m_label.GetStr()));
-
-		dStatementBucket& wPhi = phiVariables.Insert(name.m_label)->GetInfo();
-		while (w.GetCount()) {
-			const dBasicBlock* const block = w.GetRoot()->GetKey();
-			const dCILInstr* const instruction = w.GetRoot()->GetInfo();
-			w.Remove(w.GetRoot());
-
-instruction->Trace();
-//block->Trace();
-			for (dList<const dBasicBlock*>::dListNode* node = block->m_dominanceFrontier.GetFirst(); node; node = node->GetNext()) {
-				const dBasicBlock* const frontier = node->GetInfo();
-				if (!wPhi.Find(frontier)) {
-					dList<dCILInstr*> sources;
-
-					for (dList<const dBasicBlock*>::dListNode* predNode = frontier->m_predecessors.GetFirst(); predNode; predNode = predNode->GetNext()) {
-						const dBasicBlock& predBlock = *predNode->GetInfo();
-						for (dCIL::dListNode* node = predBlock.m_end; node != predBlock.m_begin; node = node->GetPrev()) {
-							dCILInstr* const instruction = node->GetInfo();
-							const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
-							if (variable && variable->m_label == name.m_label) {
-								sources.Append(instruction);
-								break;
-							}
-						}
-					}
-					//if (sources.GetCount() > 1) {
-					if (sources.GetCount()) {
-						dCILInstrPhy* const phyInstruction = new dCILInstrPhy (*cil, name.m_label, name.GetType(), sources, frontier);
-						cil->InsertAfter(frontier->m_begin, phyInstruction->GetNode());
-//frontier->Trace();
-Trace();
-
-						wPhi.Insert(instruction, frontier);
-						if (!iter.GetNode()->GetInfo().Find(frontier)) {
-							w.Insert(instruction, frontier);
-						}
-					}
-				}
-			}
-		}
-	}
-
-Trace();
-
-	variableList.RemoveAll ();
-	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-		dBasicBlock& block = node->GetInfo();
-
-		for (dCIL::dListNode* node = block.m_end; node != block.m_begin; node = node->GetPrev()) {
-			dCILInstr* const instruction = node->GetInfo();
-			//instruction->Trace();
-			const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
-			if (variable) {
-				dTree <dStatementBucket, dString>::dTreeNode* entry = variableList.Find(variable->m_label);
-				if (!entry) {
-					entry = variableList.Insert(variable->m_label);
-					entry->GetInfo().m_variable = dCILInstr::dArg(variable->m_label, variable->GetType());
-				}
-				dStatementBucket& buckect = entry->GetInfo();
-				buckect.Insert(instruction, &block);
-			}
-		}
-	}
-	
-	RenameVariables (&GetFirst()->GetInfo(), variableList);
-Trace();
+	dConvertToSSASolver ssa (this);
+	ssa.Solve();
 }
 
-
-void dBasicBlocksGraph::RenameVariables (const dBasicBlock* const root, dTree <dStatementBucket, dString>& stack) const
-{
-//root->Trace();
-	bool terminate = false;
-	for (dCIL::dListNode* node = root->m_begin; !terminate; node = node->GetNext()) {
-		terminate = (node == root->m_end);
-		dCILInstr* const instruction = node->GetInfo();
-//instruction->Trace();
-		if (!instruction->GetAsPhy()) {
-			dList<dCILInstr::dArg*> variablesList;
-			instruction->GetUsedVariables (variablesList);
-			for (dList<dCILInstr::dArg*>::dListNode* argNode = variablesList.GetFirst(); argNode; argNode = argNode->GetNext()) {
-				dCILInstr::dArg* const variable = argNode->GetInfo();
-				dString name (instruction->RemoveSSAPostfix(variable->m_label));
-				dAssert(stack.Find(name));
-				dStatementBucket& topStack = stack.Find(name)->GetInfo();
-				if (topStack.m_stack.GetCount()) {
-					int stackLevel = topStack.m_stack.GetLast()->GetInfo();
-					variable->m_label = instruction->MakeSSAName(name, stackLevel);
-				}
-			}
-		}
-		
-		dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
-		if (variable) {
-			dString name(instruction->RemoveSSAPostfix(variable->m_label));
-			dAssert(stack.Find(name));
-			dStatementBucket& topStack = stack.Find(name)->GetInfo();
-
-			int i = topStack.m_index;
-			variable->m_label = instruction->MakeSSAName(name, i);
-			topStack.m_stack.Append(i);
-			topStack.m_index = i + 1;
-		}
-		//instruction->Trace();
-	}
-
-	for (dList<const dBasicBlock*>::dListNode* node = root->m_children.GetFirst(); node; node = node->GetNext()) {
-		RenameVariables (node->GetInfo(), stack);
-	}
-
-	for (dCIL::dListNode* node = root->m_end; node != root->m_begin; node = node->GetPrev()) {
-		dCILInstr* const instruction = node->GetInfo();
-		const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
-		if (variable) {
-			dString name (instruction->RemoveSSAPostfix(variable->m_label));
-			dStatementBucket& topStack = stack.Find(name)->GetInfo();
-			dAssert (topStack.m_stack.GetLast());
-			topStack.m_stack.Remove(topStack.m_stack.GetLast());
-		}
-	}
-
-//root->Trace();
-//dataFlow->m_cil->Trace();
-}
 
 
 
@@ -599,11 +413,11 @@ void dBasicBlocksGraph::OptimizeSSA ()
 		pass = false;
 //ApplyDeadCodeEliminationSSA ();
 		//pass |= ApplyConstantPropagationSSA();
-		pass |= ApplyConstantPropagationSSA();
+//		pass |= ApplyConstantPropagationSSA();
 
 		//Trace();
-		//pass |= ApplyDeadCodeEliminationSSA ();
-		//Trace();
+//		pass |= ApplyDeadCodeEliminationSSA ();
+//		Trace();
 		
 		//Trace();
 		//pass |= ApplyConstantConditionalSSA();
@@ -632,7 +446,7 @@ bool dBasicBlocksGraph::ApplyConstantConditionalSSA()
 	dTree<int, dCIL::dListNode*> phyMap;
 	for (dCIL::dListNode* node = m_begin; node != m_end; node = node->GetNext()) {
 		dCILInstr* const instruction = node->GetInfo();
-		if (instruction->GetAsPhy()) {
+		if (instruction->GetAsPhi()) {
 			phyMap.Insert(0, node);
 		}
 	}
@@ -695,6 +509,7 @@ bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
 		dCIL::dListNode* const node = workList.GetRoot()->GetKey();
 		workList.Remove(workList.GetRoot());
 		dCILInstr* const instruction = node->GetInfo();
+//instruction->Trace();
 		if (!instruction->GetAsCall()) {
 			const dCILInstr::dArg* const variable = instruction->GetGeneratedVariable();
 			if (variable) {
@@ -711,10 +526,12 @@ bool dBasicBlocksGraph::ApplyDeadCodeEliminationSSA()
 						if (entry) {
 							dStatementBlockBucket& buckect = entry->GetInfo();
 							buckect.Remove(node);
-							dAssert(map.Find(variable->m_label));
-							workList.Insert(map.Find(variable->m_label)->GetInfo());
-							if (!buckect.GetCount()) {
-								usedVariablesList.Remove(usesNodeBuckect);
+							dAssert(map.Find(variable->m_label) || instruction->GetAsPhi());
+							if (map.Find(variable->m_label)) {
+								workList.Insert(map.Find(variable->m_label)->GetInfo());
+								if (!buckect.GetCount()) {
+									usedVariablesList.Remove(usesNodeBuckect);
+								}
 							}
 						}
 					}

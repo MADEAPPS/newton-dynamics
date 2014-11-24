@@ -34,7 +34,7 @@ class dBasicBlock
 	const dBasicBlock* m_idom;
 	mutable dList<const dBasicBlock*> m_children;
 	mutable dTree<int, const dBasicBlock*> m_dominators; 
-	mutable dList<const dBasicBlock*> m_dominanceFrontier; 
+	//mutable dList<const dBasicBlock*> m_dominanceFrontier; 
 
 	dList<const dBasicBlock*> m_successors;
 	dList<const dBasicBlock*> m_predecessors;
@@ -64,20 +64,6 @@ class dStatementBlockDictionary: public dTree <dStatementBlockBucket, dString>
 
 class dBasicBlocksGraph: public dList<dBasicBlock> 
 {
-	class dStatementBucket: public dTree <const dCILInstr*, const dBasicBlock*>
-	{
-		public:
-		dStatementBucket()
-			:dTree <const dCILInstr*, const dBasicBlock*>()
-			,m_index (0)
-		{
-		}
-
-		int m_index;
-		dList<int> m_stack;
-		dCILInstr::dArg m_variable;
-	};
-
 	public:
 	dBasicBlocksGraph();
 
@@ -90,8 +76,6 @@ class dBasicBlocksGraph: public dList<dBasicBlock>
 
 	private:
 	void GetStatementsWorklist (dTree <int, dCIL::dListNode*>& list) const;
-	void BuildDomicanceFrontier (const dBasicBlock* const root) const;
-	void RenameVariables (const dBasicBlock* const root, dTree <dStatementBucket, dString>& stack) const;
 
 	void BuildDominatorTree ();
 	void DeleteUnreachedBlocks();
@@ -108,6 +92,7 @@ class dBasicBlocksGraph: public dList<dBasicBlock>
 	dBasicBlock* m_dominatorTree;
 	int m_mark;
 
+	friend class dConvertToSSASolver;
 	friend class dConstantPropagationSolver;
 };
 

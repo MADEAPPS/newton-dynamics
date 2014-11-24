@@ -198,7 +198,7 @@ block->Trace();
 			bool done = false;
 			for (dCIL::dListNode* node = block->m_begin; !done; node = node->GetNext()) {
 				done = (node == block->m_end);
-				dCILInstrPhy* const phy = node->GetInfo()->GetAsPhy();
+				dCILInstrPhy* const phy = node->GetInfo()->GetAsPhi();
 				if (phy) {
 //phy->Trace();
 					phy->ApplyConstantPropagationSSA (*this);

@@ -160,8 +160,10 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 		varNameNode->GetInfo().m_label = localVariableAliasName;
 		store->Trace();
 	}
-	
+
+//cil.Trace();
 	m_body->CompileCIL(cil);
+//cil.Trace();
 	if (!m_returnType->GetArgType().m_isPointer && (m_returnType->GetArgType().m_intrinsicType == dCILInstr::m_void)) {
 		 if (!cil.GetLast()->GetInfo()->GetAsReturn()) {
 			dCILInstrReturn* const ret = new dCILInstrReturn(cil, "", dCILInstr::dArgType (dCILInstr::m_void));
@@ -184,7 +186,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 	jumpToReturn->SetTarget(returnLabel);
 
 	dCIL::dListNode* prev;
-	for (dCIL::dListNode* node = returnLabel->GetNode(); node; node = prev) {
+	for (dCIL::dListNode* node = returnLabel->GetNode(); node && !node->GetInfo()->GetAsFunction(); node = prev) {
 		dCILInstrReturn* const ret = node->GetInfo()->GetAsReturn();
 		prev = node->GetPrev();
 		if (ret) {
@@ -205,7 +207,7 @@ void dDAGFunctionNode::CompileCIL(dCIL& cil)
 
 	m_basicBlocks.Build (m_functionStart);
 	m_basicBlocks.ConvertToSSA ();
-	//cil.Trace();
+//cil.Trace();
 }
 
 

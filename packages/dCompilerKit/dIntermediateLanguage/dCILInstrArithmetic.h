@@ -61,7 +61,7 @@ class dCILInstrIntergerLogical : public dCILInstrThreeArgArithmetic
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return &m_arg0; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList);
-	virtual void ReplaceArgument (const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg);
+	virtual void ReplaceArgument (const dArg& arg, const dArg& newArg);
 
 	virtual bool ApplyConstantFoldingSSA ();
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver);

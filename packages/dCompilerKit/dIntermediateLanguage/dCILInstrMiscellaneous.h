@@ -100,7 +100,7 @@ class dCILInstrNop: public dCILInstr
 	// ***********************
 	virtual dArg* GetGeneratedVariable () { return NULL; }
 	virtual void GetUsedVariables (dList<dArg*>& variablesList) {}
-	virtual void ReplaceArgument(const dArg& arg, dCILInstr* const newInstruction, const dArg& newArg) {}
+	virtual void ReplaceArgument(const dArg& arg, const dArg& newArg) {}
 	virtual void ApplyConstantPropagationSSA (dConstantPropagationSolver& solver) {}
 
 	dString m_comment;
