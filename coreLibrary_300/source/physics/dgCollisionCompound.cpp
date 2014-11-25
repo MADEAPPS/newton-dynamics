@@ -740,14 +740,15 @@ dgFloat32 dgCollisionCompound::GetBoxMaxRadius () const
 
 
 
-dgVector dgCollisionCompound::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
+dgVector dgCollisionCompound::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane, const dgCollisionInstance& parentScale) const
 {
 	dgVector totalVolume (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgTreeArray::Iterator iter (m_array);
 	for (iter.Begin(); iter; iter ++) {
-		dgCollisionConvex* const collision = (dgCollisionConvex*)iter.GetNode()->GetInfo()->GetShape()->GetChildShape();
-		dgMatrix matrix (iter.GetNode()->GetInfo()->GetShape()->m_localMatrix * globalMatrix);
-		dgVector vol (collision->CalculateVolumeIntegral (matrix, plane));
+		const dgCollisionInstance* const childInstance = iter.GetNode()->GetInfo()->GetShape();
+		dgCollisionConvex* const collision = (dgCollisionConvex*)childInstance->GetChildShape();
+		dgMatrix matrix (childInstance->m_localMatrix * globalMatrix);
+		dgVector vol (collision->CalculateVolumeIntegral (matrix, plane, *childInstance));
 		totalVolume.m_x += vol.m_x * vol.m_w;
 		totalVolume.m_y += vol.m_y * vol.m_w;
 		totalVolume.m_z += vol.m_z * vol.m_w;

@@ -1794,7 +1794,7 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat64* const vertexList,
 }
 
 #ifndef _NEWTON_USE_DOUBLE
-#pragma warning(suppress: 6262)
+
 void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat32* const vertexList, dgInt32 strideIndBytes, dgInt32 material)
 {
 	dgVertexAtribute points[256];
@@ -2630,7 +2630,6 @@ dgMeshEffect::dgIndexArray* dgMeshEffect::MaterialGeometryBegin()
 	count = 0;
 	for (dgInt32 i = 0; i < 256;i ++) {
 		if (streamIndexMap[i]) {
-#pragma warning(suppress: 6001)
 			array->m_materials[count] = materials[i];
 			array->m_materialsIndexCount[count] = streamIndexMap[i] * 3;
 			count ++;
@@ -3081,7 +3080,7 @@ dgMeshEffect* dgMeshEffect::GetNextLayer (dgInt32 mark)
 }
 
 
-#pragma warning(suppress: 6262)
+
 void dgMeshEffect::MergeFaces (const dgMeshEffect* const source)
 {
 	dgInt32 mark = source->IncLRU();

@@ -273,7 +273,7 @@ class dgCollision
 	virtual dgFloat32 GetBoxMinRadius () const = 0; 
 	virtual dgFloat32 GetBoxMaxRadius () const = 0; 
 	
-	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const = 0;
+	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& globalPlane, const dgCollisionInstance& parentScale) const = 0;
 	virtual void Serialize(dgSerialize callback, void* const userData) const = 0;
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;

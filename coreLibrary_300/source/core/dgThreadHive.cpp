@@ -195,7 +195,6 @@ void dgThreadHive::SetThreadsCount (dgInt32 threads)
 		for (dgInt32 i = 0; i < m_beesCount; i ++) {
 			char name[256];
 			sprintf (name, "dgThreadBee%d", i);
-#pragma warning(suppress: 6385)
 			m_workerBees[i].SetUp(m_allocator, name, i, this);
 		}
 	}

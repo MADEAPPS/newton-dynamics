@@ -172,7 +172,7 @@ class dgCollisionCompound: public dgCollision
 
 	
 	
-	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const;
+	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane, const dgCollisionInstance& parentScale) const;
 
 	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;

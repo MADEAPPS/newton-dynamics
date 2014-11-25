@@ -86,7 +86,7 @@ dgMeshEffect* dgMeshEffect::CreateDelaunayTetrahedralization (dgMemoryAllocator*
 
 
 
-#pragma warning(suppress: 6262)
+
 dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix)
 {
 	dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;

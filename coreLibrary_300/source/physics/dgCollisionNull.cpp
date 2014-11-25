@@ -93,7 +93,7 @@ dgFloat32 dgCollisionNull::RayCast (const dgVector& localP0, const dgVector& loc
 }
 
 
-dgVector dgCollisionNull::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const
+dgVector dgCollisionNull::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane, const dgCollisionInstance& parentScale) const
 {
 	dgAssert (0);
 	return dgVector (dgFloat32 (0.0f));

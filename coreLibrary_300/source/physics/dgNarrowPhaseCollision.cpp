@@ -1654,7 +1654,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) 
 }
 
 
-#pragma warning(suppress: 6262)
+
 dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& proxy) const
 {
 	dgInt32 count = 0;

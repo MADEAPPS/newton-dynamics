@@ -142,7 +142,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		{
 		}
 
-#pragma warning(suppress: 6262)
+
 		dgFloat64 CalculateTriangleConcavity(const dgBigVector& normal, dgInt32 i0, dgInt32 i1, dgInt32 i2, const dgBigVector* const points)
 		{
 			dgUnsigned32 head = 1;
@@ -850,7 +850,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 	};
 */
 
-#pragma warning(suppress: 6262)
+
 	dgMeshEffect* CreatePartitionMesh (dgMeshEffect& mesh, dgInt32 maxVertexPerHull)
 	{
 		dgMemoryAllocator* const allocator = mesh.GetAllocator();

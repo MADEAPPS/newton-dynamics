@@ -940,7 +940,7 @@ void dgConvexHull4d::InsertNewVertex(dgInt32 vertexIndex, dgListNode* const fron
 
 
 
-#pragma warning(suppress: 6262)
+
 dgConvexHull4d::dgListNode* dgConvexHull4d::FindFacingNode(const dgBigVector& vertex)
 {
 	const dgHullVector* const hullVertexArray = &m_points[0];

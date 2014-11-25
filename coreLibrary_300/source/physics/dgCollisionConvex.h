@@ -90,7 +90,7 @@ class dgCollisionConvex: public dgCollision
 
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
 
-	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane) const;
+	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane, const dgCollisionInstance& parentScale) const;
 	static void CalculateInertia (void *userData, int vertexCount, const dgFloat32* const FaceArray, int faceId);
 
 	virtual dgFloat32 GetVolume () const;

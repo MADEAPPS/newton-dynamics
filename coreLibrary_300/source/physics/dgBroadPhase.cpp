@@ -1863,7 +1863,7 @@ dgUnsigned32 dgBroadPhase::GetLRU () const
     return m_lru;
 }
 
-#pragma warning(suppress: 6262)
+
 void dgBroadPhase::UpdateContacts (dgFloat32 timestep)
 {
 	dgUnsigned32 ticks = m_world->m_getPerformanceCount();
