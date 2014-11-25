@@ -1848,6 +1848,7 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatri
 	
 	dgFloat32 volume = cg.m_w;
 	cg = globalMatrix.TransformVector (cg);
+	cg = cg.CompProduct4(scale);
 	cg.m_w = volume * scale.m_x * scale.m_y * scale.m_z;
 	return cg;
 }
