@@ -479,8 +479,8 @@ dFloat64 dBezierSpline::CalculateLength (dFloat64 tol) const
 
 dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVector& point, int subdivitionSteps) const
 {
-	int startSpan = 0;
-	dFloat64 bestU = 0.0f;;
+	int startSpan = m_degree;
+	dFloat64 bestU = 0.0f;
 	dFloat64 distance2 = 1.0e10f;
 	dBigVector closestControlPoint (m_controlPoints[0]);
 	subdivitionSteps = dMax (subdivitionSteps, 1);
@@ -522,6 +522,8 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 			dAssert (startSpan < (m_knotsCount - m_degree));
 		} 
 
+		dAssert (startSpan >= m_degree);
+		dAssert (startSpan <= (m_knotsCount - m_degree - 1));
 		closestControlPoint = CurvePoint (u1, startSpan);
 		//dFloat64 xxx0 = num * num;
 		//dFloat64 xxx1 = dist % dist;
