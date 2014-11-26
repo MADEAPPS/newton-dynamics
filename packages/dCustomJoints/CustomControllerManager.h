@@ -24,19 +24,29 @@
 class CustomControllerConvexCastPreFilter
 {	
 	public:
-	CUSTOM_JOINTS_API CustomControllerConvexCastPreFilter (const NewtonBody* const me)
-		:m_bodiesToSkipCount(1)
+	CUSTOM_JOINTS_API CustomControllerConvexCastPreFilter ()
+		:m_me(NULL)
+		,m_bodiesToSkipCount(0)
 	{
-		m_bodiesToSkip[0] = me;
 	}
 
-	CUSTOM_JOINTS_API static unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision, void* const userData)
+	CUSTOM_JOINTS_API CustomControllerConvexCastPreFilter (const NewtonBody* const me)
+		:m_me(me)
+		,m_bodiesToSkipCount(0)
 	{
-		CustomControllerConvexCastPreFilter* const filter = (CustomControllerConvexCastPreFilter*) userData;
+	}
+
+
+	CUSTOM_JOINTS_API ~CustomControllerConvexCastPreFilter ()
+	{
+	}
+
+	CUSTOM_JOINTS_API virtual unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
+	{
 		const NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		if (NewtonCollisionGetMode(collision)) {
-			for (int i = 0; i < filter->m_bodiesToSkipCount; i ++) {
-				if (body == filter->m_bodiesToSkip[i]) {
+			for (int i = 0; i < m_bodiesToSkipCount; i ++) {
+				if (body == m_bodiesToSkip[i]) {
 					return 0;
 				}
 			}
@@ -45,7 +55,14 @@ class CustomControllerConvexCastPreFilter
 		return 0;
 	}
 
+	CUSTOM_JOINTS_API static unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision, void* const userData)
+	{
+		CustomControllerConvexCastPreFilter* const filter = (CustomControllerConvexCastPreFilter*) userData;
+		return (body != filter->m_me) ? filter->Prefilter (body, myCollision) : 0;
+	}
+	
 	const NewtonBody* m_bodiesToSkip[16];
+	const NewtonBody* m_me;
 	int m_bodiesToSkipCount;
 };
 
@@ -54,12 +71,13 @@ class CustomControllerConvexRayFilter: public CustomControllerConvexCastPreFilte
 {	
 	public:
 	CUSTOM_JOINTS_API CustomControllerConvexRayFilter (const NewtonBody* const me)
-		:CustomControllerConvexCastPreFilter(me)
+		:CustomControllerConvexCastPreFilter()
 		,m_hitBody(NULL)
 		,m_shapeHit(NULL)
 		,m_collisionID(0) 
 		,m_intersectParam(1.2f)
 	{
+		m_me = me;
 	}
 
 	CUSTOM_JOINTS_API static dFloat Filter (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)

@@ -61,6 +61,7 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetEngine(CustomVehicleControllerComponentEngine* const engine);
 	CUSTOM_JOINTS_API void SetHandBrakes(CustomVehicleControllerComponentBrake* const brakes);
 	CUSTOM_JOINTS_API void SetSteering(CustomVehicleControllerComponentSteering* const steering);
+	CUSTOM_JOINTS_API void SetContactFilter(CustomControllerConvexCastPreFilter* const filter);
 
 	CUSTOM_JOINTS_API void LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires);
 	CUSTOM_JOINTS_API void Finalize();
@@ -88,6 +89,7 @@ class CustomVehicleController: public CustomControllerBase
 	CustomVehicleControllerComponentEngine* m_engine;
 	CustomVehicleControllerComponentBrake* m_handBrakes;
 	CustomVehicleControllerComponentSteering* m_steering; 
+	CustomControllerConvexCastPreFilter* m_contactFilter;
 	CustomVehicleControllerBodyStateContact* m_externalContactStates[16];
 	int m_sleepCounter;
 	int m_externalContactStatesCount;

@@ -83,10 +83,13 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 
 		} else {
 			NewtonBody* const body = controller->GetBody();
-			CustomControllerConvexCastPreFilter castFilter (body);
+			//CustomControllerConvexCastPreFilter castFilter (body);
+			dAssert (controller->m_contactFilter);
+			controller->m_contactFilter->m_me = body;
+			controller->m_contactFilter->m_bodiesToSkipCount = 0;
 			for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 				CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-				tire->Collide(castFilter, timestepInv, threadId);
+				tire->Collide(*controller->m_contactFilter, timestepInv, threadId);
 				tire->UpdateDynamicInputs(timestep);
 			}
 
@@ -323,6 +326,7 @@ void CustomVehicleController::Init (NewtonBody* const body, const dMatrix& vehic
 	m_brakes = NULL;
 	m_steering = NULL;
 	m_handBrakes = NULL;
+	m_contactFilter = new CustomControllerConvexCastPreFilter;
 
 	SetDryRollingFrictionTorque (100.0f/4.0f);
 	SetAerodynamicsDownforceCoefficient (0.5f * dSqrt (gravityVector % gravityVector), 60.0f * 0.447f);
@@ -335,6 +339,7 @@ void CustomVehicleController::Cleanup()
 	SetEngine(NULL);
 	SetSteering(NULL);
 	SetHandBrakes(NULL);
+	SetContactFilter (NULL);
 	NewtonDestroyCollision(m_tireCastShape);
 }
 
@@ -432,6 +437,13 @@ void CustomVehicleController::SetSteering(CustomVehicleControllerComponentSteeri
 	m_steering = steering;
 }
 
+void CustomVehicleController::SetContactFilter(CustomControllerConvexCastPreFilter* const filter)
+{
+	if (m_contactFilter) {
+		delete m_contactFilter;
+	}
+	m_contactFilter = filter;
+}
 
 void CustomVehicleController::SetBrakes(CustomVehicleControllerComponentBrake* const brakes)
 {
