@@ -54,7 +54,7 @@
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SIDESLIP_RATIO	dFloat(0.95f)
 
 
-CustomVehicleControllerTireCollsionFilter::CustomVehicleControllerTireCollsionFilter (const CustomVehicleController* const controller)
+CustomVehicleControllerTireCollisionFilter::CustomVehicleControllerTireCollisionFilter (const CustomVehicleController* const controller)
 	:CustomControllerConvexCastPreFilter(controller->GetBody())
 	,m_controller(controller)
 {
@@ -330,7 +330,7 @@ void CustomVehicleController::Init (NewtonBody* const body, const dMatrix& vehic
 	m_brakes = NULL;
 	m_steering = NULL;
 	m_handBrakes = NULL;
-	m_contactFilter = new CustomVehicleControllerTireCollsionFilter (this);
+	m_contactFilter = new CustomVehicleControllerTireCollisionFilter (this);
 
 	SetDryRollingFrictionTorque (100.0f/4.0f);
 	SetAerodynamicsDownforceCoefficient (0.5f * dSqrt (gravityVector % gravityVector), 60.0f * 0.447f);
@@ -441,7 +441,7 @@ void CustomVehicleController::SetSteering(CustomVehicleControllerComponentSteeri
 	m_steering = steering;
 }
 
-void CustomVehicleController::SetContactFilter(CustomVehicleControllerTireCollsionFilter* const filter)
+void CustomVehicleController::SetContactFilter(CustomVehicleControllerTireCollisionFilter* const filter)
 {
 	if (m_contactFilter) {
 		delete m_contactFilter;

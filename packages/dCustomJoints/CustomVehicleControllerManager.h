@@ -32,26 +32,14 @@ class CustomVehicleControllerComponentEngine;
 class CustomVehicleControllerComponentSteering;
 
 
-class CustomVehicleControllerTireCollsionFilter: public CustomControllerConvexCastPreFilter
+class CustomVehicleControllerTireCollisionFilter: public CustomControllerConvexCastPreFilter
 {	
 	public:
-	CUSTOM_JOINTS_API CustomVehicleControllerTireCollsionFilter (const CustomVehicleController* const controller);
+	CUSTOM_JOINTS_API CustomVehicleControllerTireCollisionFilter (const CustomVehicleController* const controller);
 
 	CUSTOM_JOINTS_API virtual unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
 	{
 		return 1;
-/*
-		const NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		if (NewtonCollisionGetMode(collision)) {
-			for (int i = 0; i < m_bodiesToSkipCount; i ++) {
-				if (body == m_bodiesToSkip[i]) {
-					return 0;
-				}
-			}
-			return 1;
-		}
-		return 0;
-*/
 	}
 
 	CUSTOM_JOINTS_API dFloat GetTireFrictionCoefficient (const CustomVehicleControllerBodyStateTire& tire, const NewtonBody* const body, const NewtonCollision* const myCollision, dLong contacID) const
@@ -94,7 +82,7 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetEngine(CustomVehicleControllerComponentEngine* const engine);
 	CUSTOM_JOINTS_API void SetHandBrakes(CustomVehicleControllerComponentBrake* const brakes);
 	CUSTOM_JOINTS_API void SetSteering(CustomVehicleControllerComponentSteering* const steering);
-	CUSTOM_JOINTS_API void SetContactFilter(CustomVehicleControllerTireCollsionFilter* const filter);
+	CUSTOM_JOINTS_API void SetContactFilter(CustomVehicleControllerTireCollisionFilter* const filter);
 
 	CUSTOM_JOINTS_API void LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires);
 	CUSTOM_JOINTS_API void Finalize();
@@ -122,7 +110,7 @@ class CustomVehicleController: public CustomControllerBase
 	CustomVehicleControllerComponentEngine* m_engine;
 	CustomVehicleControllerComponentBrake* m_handBrakes;
 	CustomVehicleControllerComponentSteering* m_steering; 
-	CustomVehicleControllerTireCollsionFilter* m_contactFilter;
+	CustomVehicleControllerTireCollisionFilter* m_contactFilter;
 	CustomVehicleControllerBodyStateContact* m_externalContactStates[16];
 	int m_sleepCounter;
 	int m_externalContactStatesCount;

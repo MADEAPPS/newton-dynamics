@@ -136,7 +136,7 @@ CustomVehicleControllerTireContactJoint::CustomVehicleControllerTireContactJoint
 void CustomVehicleControllerTireContactJoint::SetContacts (int count, const NewtonWorldConvexCastReturnInfo* const contacts)
 {
 	const CustomVehicleControllerBodyStateTire& tire = *((CustomVehicleControllerBodyStateTire*) m_state1);
-	const CustomVehicleControllerTireCollsionFilter* const filter = m_controller->m_contactFilter;
+	const CustomVehicleControllerTireCollisionFilter* const filter = m_controller->m_contactFilter;
 	dAssert (filter);
 	count = dMin(count, int (sizeof (m_contactsPoint) / sizeof (m_contactsPoint[0])));
 	for (int i = 0; i < count; i ++) {
