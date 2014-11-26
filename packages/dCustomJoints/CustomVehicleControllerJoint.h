@@ -66,12 +66,12 @@ class CustomVehicleControllerTireJoint: public CustomVehicleControllerJoint
 class CustomVehicleControllerTireContactJoint: public CustomVehicleControllerJoint
 {
 	public:
-	class dContact
-	{
-		public: 
-		dVector m_point;
-		dVector m_normal;
-	};
+//	class dContact
+//	{
+//		public: 
+//		dVector m_point;
+//		dVector m_normal;
+//	};
 
 	CUSTOM_JOINTS_API CustomVehicleControllerTireContactJoint ();
 
@@ -80,8 +80,11 @@ class CustomVehicleControllerTireContactJoint: public CustomVehicleControllerJoi
 	CUSTOM_JOINTS_API virtual void JacobianDerivative (dComplemtaritySolver::dParamInfo* const constraintParams); 
 	CUSTOM_JOINTS_API virtual void JointAccelerations (dComplemtaritySolver::dJointAccelerationDecriptor* const accelParam);
 
+	dVector m_contactsPoint[8];
+	dVector m_contactsNormal[8];
+	dFloat m_contactFriction[8];
 	int m_contactCount;
-	dContact m_contacts[8];
+//	dContact m_contacts[8];
 };
 
 class CustomVehicleControllerEngineDifferencialJoint: public CustomVehicleControllerJoint

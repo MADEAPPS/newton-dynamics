@@ -60,6 +60,13 @@ class CustomControllerConvexCastPreFilter
 		CustomControllerConvexCastPreFilter* const filter = (CustomControllerConvexCastPreFilter*) userData;
 		return (body != filter->m_me) ? filter->Prefilter (body, myCollision) : 0;
 	}
+
+	CUSTOM_JOINTS_API dFloat GetTireFrictionCoeficient(const NewtonBody* const body, const NewtonCollision* const myCollision, dLong contacID) const
+	{
+		//return 1.5f;
+		return 0.5f;
+	}
+
 	
 	const NewtonBody* m_bodiesToSkip[16];
 	const NewtonBody* m_me;

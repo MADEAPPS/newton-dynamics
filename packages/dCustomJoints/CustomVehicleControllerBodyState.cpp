@@ -536,11 +536,11 @@ int xxx3 = NewtonWorldConvexCast (world, &xxxx0[0][0], &xxxx1[0], xxx, &hitParam
 	for (int i = 0; i < m_contactCount; i ++) {
 		CustomVehicleControllerTireContactJoint& contact = m_contactJoint[i];
 		for (int j = 0; j < contact.m_contactCount; j ++) {
-			dVector radius (contact.m_contacts[j].m_point - m_matrix[3]);
+			dVector radius (contact.m_contactsPoint[j] - m_matrix[3]);
 			radius -= m_matrix[0].Scale (m_matrix[0] % radius);
 			dAssert ((radius % radius) > 0.0f);
 			radius = radius.Scale (m_radio / dSqrt (radius % radius));
-			contact.m_contacts[j].m_point = m_matrix[3] + radius;
+			contact.m_contactsPoint[j] = m_matrix[3] + radius;
 		}
 	}
 }

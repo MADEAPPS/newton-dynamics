@@ -135,10 +135,13 @@ CustomVehicleControllerTireContactJoint::CustomVehicleControllerTireContactJoint
 
 void CustomVehicleControllerTireContactJoint::SetContacts (int count, const NewtonWorldConvexCastReturnInfo* const contacts)
 {
-	count = dMin(count, int (sizeof (m_contacts) / sizeof (m_contacts[0])));
+	const CustomControllerConvexCastPreFilter* const filter = m_controller->m_contactFilter;
+	dAssert (filter);
+	count = dMin(count, int (sizeof (m_contactsPoint) / sizeof (m_contactsPoint[0])));
 	for (int i = 0; i < count; i ++) {
-		m_contacts[i].m_point = dVector (&contacts[i].m_point[0]);
-		m_contacts[i].m_normal = dVector (&contacts[i].m_normal[0]);
+		m_contactFriction[i] = filter->GetTireFrictionCoeficient (contacts[i].m_hitBody, NULL, contacts[i].m_contactID);
+		m_contactsPoint[i] = dVector (&contacts[i].m_point[0]);
+		m_contactsNormal[i] = dVector (&contacts[i].m_normal[0]);
 	}
 	m_contactCount = count;
 }
@@ -226,7 +229,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 		dFloat restTireLoad = chassis.m_gravityMag * tire->m_restSprunMass;
 		for (int i = 0; i < m_contactCount; i ++) {
 			// rubber tire traction friction model
-			dVector normal (m_contacts[i].m_normal);
+			dVector normal (m_contactsNormal[i]);
 			dVector lateralPin (tireMatrix[0]);
 			dVector longitudinalPin (normal * lateralPin);
 			dFloat pinMag2 = longitudinalPin % longitudinalPin;
@@ -235,7 +238,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 				longitudinalPin = longitudinalPin.Scale (1.0f / dSqrt(pinMag2));
 				lateralPin = longitudinalPin * normal;
 
-				dVector contactPoint (m_contacts[i].m_point);
+				dVector contactPoint (m_contactsPoint[i]);
 				dVector hitBodyPointVelocity;
 
 				NewtonBody* const hitBody = externalBody->m_newtonBody;
@@ -303,7 +306,8 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 				dFloat Fx0 = longitudinalStiffness * longitudinalSlipRatio;
 
 				// for now assume tire/road friction is 1.0
-				dFloat contactGroundFriction = 1.5f;
+				//dFloat contactGroundFriction = 1.5f;
+				dFloat contactGroundFriction = m_contactFriction[i];
 
 				dFloat tireLoadFriction = contactGroundFriction * tireLoad;
 				dFloat K = dSqrt (Fx0 * Fx0 + Fy0 * Fy0) / tireLoadFriction;
