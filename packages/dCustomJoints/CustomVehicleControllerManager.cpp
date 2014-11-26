@@ -54,6 +54,14 @@
 #define VEHICLE_SIDESLEP_NORMALIZED_FRICTION_AT_MAX_SIDESLIP_RATIO	dFloat(0.95f)
 
 
+CustomVehicleControllerTireCollsionFilter::CustomVehicleControllerTireCollsionFilter (const CustomVehicleController* const controller)
+	:CustomControllerConvexCastPreFilter(controller->GetBody())
+	,m_controller(controller)
+{
+
+}
+
+
 class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolver
 {
 	public:
@@ -82,11 +90,7 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 			m_controller->m_chassisState.PutToSleep();
 
 		} else {
-			NewtonBody* const body = controller->GetBody();
-			//CustomControllerConvexCastPreFilter castFilter (body);
 			dAssert (controller->m_contactFilter);
-			controller->m_contactFilter->m_me = body;
-			controller->m_contactFilter->m_bodiesToSkipCount = 0;
 			for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_controller->m_tireList.GetFirst(); node; node = node->GetNext()) {
 				CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 				tire->Collide(*controller->m_contactFilter, timestepInv, threadId);
@@ -326,7 +330,7 @@ void CustomVehicleController::Init (NewtonBody* const body, const dMatrix& vehic
 	m_brakes = NULL;
 	m_steering = NULL;
 	m_handBrakes = NULL;
-	m_contactFilter = new CustomControllerConvexCastPreFilter;
+	m_contactFilter = new CustomVehicleControllerTireCollsionFilter (this);
 
 	SetDryRollingFrictionTorque (100.0f/4.0f);
 	SetAerodynamicsDownforceCoefficient (0.5f * dSqrt (gravityVector % gravityVector), 60.0f * 0.447f);
@@ -437,7 +441,7 @@ void CustomVehicleController::SetSteering(CustomVehicleControllerComponentSteeri
 	m_steering = steering;
 }
 
-void CustomVehicleController::SetContactFilter(CustomControllerConvexCastPreFilter* const filter)
+void CustomVehicleController::SetContactFilter(CustomVehicleControllerTireCollsionFilter* const filter)
 {
 	if (m_contactFilter) {
 		delete m_contactFilter;

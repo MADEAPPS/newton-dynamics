@@ -66,13 +66,6 @@ class CustomVehicleControllerTireJoint: public CustomVehicleControllerJoint
 class CustomVehicleControllerTireContactJoint: public CustomVehicleControllerJoint
 {
 	public:
-//	class dContact
-//	{
-//		public: 
-//		dVector m_point;
-//		dVector m_normal;
-//	};
-
 	CUSTOM_JOINTS_API CustomVehicleControllerTireContactJoint ();
 
 	CUSTOM_JOINTS_API virtual void SetContacts (int count, const NewtonWorldConvexCastReturnInfo* const contacts);

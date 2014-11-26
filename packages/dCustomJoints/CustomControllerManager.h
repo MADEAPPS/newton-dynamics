@@ -26,13 +26,11 @@ class CustomControllerConvexCastPreFilter
 	public:
 	CUSTOM_JOINTS_API CustomControllerConvexCastPreFilter ()
 		:m_me(NULL)
-		,m_bodiesToSkipCount(0)
 	{
 	}
 
 	CUSTOM_JOINTS_API CustomControllerConvexCastPreFilter (const NewtonBody* const me)
 		:m_me(me)
-		,m_bodiesToSkipCount(0)
 	{
 	}
 
@@ -42,6 +40,10 @@ class CustomControllerConvexCastPreFilter
 	}
 
 	CUSTOM_JOINTS_API virtual unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
+	{
+		return 1;
+	}
+/*
 	{
 		const NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		if (NewtonCollisionGetMode(collision)) {
@@ -54,23 +56,20 @@ class CustomControllerConvexCastPreFilter
 		}
 		return 0;
 	}
-
+*/
+	private:
 	CUSTOM_JOINTS_API static unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision, void* const userData)
 	{
 		CustomControllerConvexCastPreFilter* const filter = (CustomControllerConvexCastPreFilter*) userData;
 		return (body != filter->m_me) ? filter->Prefilter (body, myCollision) : 0;
 	}
 
-	CUSTOM_JOINTS_API dFloat GetTireFrictionCoeficient(const NewtonBody* const body, const NewtonCollision* const myCollision, dLong contacID) const
-	{
-		//return 1.5f;
-		return 0.5f;
-	}
-
-	
-	const NewtonBody* m_bodiesToSkip[16];
+	protected:
+	//const NewtonBody* m_bodiesToSkip[16];
 	const NewtonBody* m_me;
-	int m_bodiesToSkipCount;
+//	int m_bodiesToSkipCount;
+	friend class CustomPlayerController;
+	friend class CustomVehicleControllerBodyStateTire;
 };
 
 
@@ -90,7 +89,8 @@ class CustomControllerConvexRayFilter: public CustomControllerConvexCastPreFilte
 	CUSTOM_JOINTS_API static dFloat Filter (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
 	{
 		CustomControllerConvexRayFilter* const filter = (CustomControllerConvexRayFilter*) userData;
-		dAssert (body != filter->m_bodiesToSkip[0]);
+//		dAssert (body != filter->m_bodiesToSkip[0]);
+		dAssert (body != filter->m_me);
 		if (intersectParam < filter->m_intersectParam) {
 			filter->m_hitBody = body;	
 			filter->m_shapeHit = shapeHit;
