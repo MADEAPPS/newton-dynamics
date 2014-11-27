@@ -177,6 +177,26 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	dVector size (1.0f, 0.25f, 0.5f);
 	dVector location (10.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+/*
+test boiyancy on scaled collisions
+dVector plane (0.0f, 1.0f, 0.0f, 0.0f);
+NewtonCollision* xxx0 = NewtonCreateBox(scene->GetNewton(), 2.0f, 4.0f, 6.0f, 0, NULL);
+NewtonCollision* xxx1 = NewtonCreateBox(scene->GetNewton(), 1.0f, 1.0f, 1.0f, 0, NULL);
+NewtonCollisionSetScale(xxx1, 2.0f, 4.0f, 6.0f);
+
+dMatrix m (dPitchMatrix(45.0f * 3.141692f / 180.0f) * dYawMatrix(40.0f * 3.141692f / 180.0f) * dRollMatrix(70.0f * 3.141692f / 180.0f));
+
+dVector gravity (0.0f, 0.0f, -9.8f, 0.0f);
+dVector cog0 (0.0f, 0.0f, 0.0f, 0.0f);
+dVector accelPerUnitMass0;
+dVector torquePerUnitMass0;
+NewtonConvexCollisionCalculateBuoyancyAcceleration (xxx0, &m[0][0], &cog0[0], &gravity[0], &plane[0], 1.0f, 0.1f, &accelPerUnitMass0[0], &torquePerUnitMass0[0]);
+
+dVector cog1 (0.0f, 0.0f, 0.0f, 0.0f);
+dVector accelPerUnitMass1;
+dVector torquePerUnitMass1;
+NewtonConvexCollisionCalculateBuoyancyAcceleration (xxx1, &m[0][0], &cog1[0], &gravity[0], &plane[0], 1.0f, 0.1f, &accelPerUnitMass1[0], &torquePerUnitMass1[0]);
+*/
 
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
