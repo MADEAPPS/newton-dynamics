@@ -402,6 +402,12 @@ void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
 		m_localMatrix = m_aligmentMatrix * m_localMatrix;
 		m_aligmentMatrix = m_aligmentMatrix.Transpose();
 
+//dgMatrix xxx1 (dgGetIdentityMatrix());
+//xxx1[0][0] = m_scale.m_x;
+//xxx1[1][1] = m_scale.m_y;
+//xxx1[2][2] = m_scale.m_z;
+//dgMatrix xxx (m_aligmentMatrix * xxx1 * m_localMatrix);
+
 		bool isIdentity = true;
 		for (dgInt32 i = 0; i < 3; i ++) {
 			isIdentity &= dgAbsf (m_aligmentMatrix[i][i] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f);
@@ -669,26 +675,11 @@ dgFloat32 dgCollisionInstance::ConvexRayCast (const dgCollisionInstance* const c
 
 void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix, const dgVector& origin, const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgFloat32 fluidViscosity, dgVector& accel, dgVector& alpha)
 {
-	dgMatrix scaledMatrix (m_localMatrix * matrix);
-/*
-	switch (m_scaleType)
-	{
-		case m_unit:
-		case m_uniform:
-		case m_nonUniform:
-		{
-			scaledMatrix[0] = scaledMatrix[0].Scale4 (m_scale[0]);
-			scaledMatrix[1] = scaledMatrix[1].Scale4 (m_scale[1]);
-			scaledMatrix[2] = scaledMatrix[2].Scale4 (m_scale[2]);
-			break;
-		}
-		default:
-			dgAssert(0);
-	}
-*/
+	dgMatrix globalMatrix (m_localMatrix * matrix);
+
 	accel = dgVector (dgFloat32 (0.0f));
 	alpha = dgVector (dgFloat32 (0.0f));
-	dgVector volumeIntegral (m_childShape->CalculateVolumeIntegral (scaledMatrix, fluidPlane, *this));
+	dgVector volumeIntegral (m_childShape->CalculateVolumeIntegral (globalMatrix, fluidPlane, *this));
 	if (volumeIntegral.m_w > dgFloat32 (0.0f)) {
 		dgVector buoyanceCenter (volumeIntegral - origin);
 

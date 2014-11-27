@@ -1832,24 +1832,27 @@ dgVector dgCollisionConvex::CalculateVolumeIntegral (const dgMatrix& globalMatri
 		}
 		case dgCollisionInstance::m_nonUniform:
 		{
-			//scaledMatrix[0] = scaledMatrix[0].Scale4 (m_scale[0]);
-			//scaledMatrix[1] = scaledMatrix[1].Scale4 (m_scale[1]);
-			//scaledMatrix[2] = scaledMatrix[2].Scale4 (m_scale[2]);
 			localPlane = localPlane.CompProduct4 (scale | dgVector::m_wOne);
 			dgFloat32 mag2 = localPlane % localPlane;
 			localPlane = localPlane.Scale4 (dgRsqrt(mag2));
 			break;
 		}
 		default:
-			dgAssert(0);
+		{
+			localPlane = localPlane.CompProduct4 (scale | dgVector::m_wOne);
+			dgFloat32 mag2 = localPlane % localPlane;
+			localPlane = localPlane.Scale4 (dgRsqrt(mag2));
+			localPlane = parentScale.m_aligmentMatrix.UntransformPlane (localPlane);
+		}
 	}
 
 	dgVector cg (CalculateVolumeIntegral (localPlane));
 	
-	dgFloat32 volume = cg.m_w;
-	cg = globalMatrix.TransformVector (cg);
+	dgFloat32 volume = cg.m_w * scale.m_x * scale.m_y * scale.m_z;
+	cg = parentScale.m_aligmentMatrix.RotateVector (cg);
 	cg = cg.CompProduct4(scale);
-	cg.m_w = volume * scale.m_x * scale.m_y * scale.m_z;
+	cg = globalMatrix.TransformVector (cg);
+	cg.m_w = volume;
 	return cg;
 }
 
