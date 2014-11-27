@@ -35,6 +35,7 @@ class CustomVehicleControllerComponentSteering;
 class CustomVehicleControllerTireCollisionFilter: public CustomControllerConvexCastPreFilter
 {	
 	public:
+	CustomVehicleControllerTireCollisionFilter (){}
 	CUSTOM_JOINTS_API CustomVehicleControllerTireCollisionFilter (const CustomVehicleController* const controller);
 
 	CUSTOM_JOINTS_API virtual unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
