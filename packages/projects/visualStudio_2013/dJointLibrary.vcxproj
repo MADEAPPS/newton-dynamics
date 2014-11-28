@@ -613,9 +613,6 @@
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2013\newton.vcxproj">
-      <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
-    </ProjectReference>
     <ProjectReference Include="dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>

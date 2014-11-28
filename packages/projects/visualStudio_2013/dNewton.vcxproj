@@ -395,6 +395,26 @@
     <ClInclude Include="..\..\dNewton\dNewtonTriggerManager.h" />
     <ClInclude Include="..\..\dNewton\dStdAfxNewton.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\thirdParty\tinyxml\vs2013\tinyxml.vcxproj">
+      <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dAnimation.vcxproj">
+      <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dContainers.vcxproj">
+      <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dJointLibrary.vcxproj">
+      <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dMath.vcxproj">
+      <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dScene.vcxproj">
+      <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

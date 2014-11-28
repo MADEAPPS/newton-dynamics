@@ -53,6 +53,14 @@
     <ClInclude Include="..\..\..\source\ampPhysics\dgAmpAllocator.h" />
     <ClInclude Include="..\..\..\source\ampPhysics\dgAmpInstance.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\source\pthreads.2\VS_2013\pthread.vcxproj">
+      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
+    </ProjectReference>
+    <ProjectReference Include="physics.vcxproj">
+      <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4798DA95-FE1B-4160-B752-24C4B1FABA49}</ProjectGuid>
     <RootNamespace>physics</RootNamespace>
