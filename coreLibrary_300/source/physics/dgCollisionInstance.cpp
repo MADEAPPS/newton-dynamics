@@ -382,12 +382,26 @@ void dgCollisionInstance::SetScale (const dgVector& scale)
 
 void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
 {
+	// calculate current matrix
+	dgMatrix matrix(dgGetIdentityMatrix());
+	matrix[0][0] = m_scale.m_x;
+	matrix[1][1] = m_scale.m_y;
+	matrix[2][2] = m_scale.m_z;
+	matrix = m_aligmentMatrix * matrix * m_localMatrix;
+
+	// extract the original local matrix
+	dgMatrix transpose (matrix.Transpose());
+	dgVector globalScale (dgSqrt (transpose[0] % transpose[0]), dgSqrt (transpose[1] % transpose[1]), dgSqrt (transpose[2] % transpose[2]), dgFloat32 (1.0f));
+	dgVector invGlobalScale (dgFloat32 (1.0f) / globalScale.m_x, dgFloat32 (1.0f) / globalScale.m_y, dgFloat32 (1.0f) / globalScale.m_z, dgFloat32 (1.0f));
+	dgMatrix localMatrix (m_aligmentMatrix.Transpose() * m_localMatrix);
+	localMatrix.m_posit = matrix.m_posit.CompProduct4(invGlobalScale) | dgVector::m_wOne;
+
 	if ((dgAbsf (scale[0] - scale[1]) < dgFloat32 (1.0e-4f)) && (dgAbsf (scale[0] - scale[2]) < dgFloat32 (1.0e-4f))) {
-		m_localMatrix.m_posit =  m_localMatrix.m_posit.Scale3 (scale.m_x * m_invScale.m_x);
+		m_localMatrix = localMatrix;
+		m_localMatrix.m_posit = m_localMatrix.m_posit.CompProduct4(scale) | dgVector::m_wOne;
+		m_aligmentMatrix = dgGetIdentityMatrix();
 		SetScale (scale);
 	} else {
-		// extract the original local matrix
-		dgMatrix localMatrix (m_aligmentMatrix.Transpose() * m_localMatrix);
 		
 		// create a new scale matrix 
 		localMatrix[0] = localMatrix[0].CompProduct4 (scale);
