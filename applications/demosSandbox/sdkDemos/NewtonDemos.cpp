@@ -38,10 +38,10 @@
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
-#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non Uniform Scaled Collision
-//#define DEFAULT_SCENE	18			// scaled mesh collision
+#define DEFAULT_SCENE	18			// scaled mesh collision
 //#define DEFAULT_SCENE	19			// simple convex decomposition
 //#define DEFAULT_SCENE	20			// scene Collision
 //#define DEFAULT_SCENE	21          // simple boolean operators 
@@ -308,7 +308,8 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_showCenterOfMass = true;
 //m_hideVisualMeshes = true;
 //m_physicsUpdateMode = 1;
-//m_hardwareDevice = 2;
+m_hardwareDevice = 2;
+//m_debugDisplayMode = 2;
 
 	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));
 
