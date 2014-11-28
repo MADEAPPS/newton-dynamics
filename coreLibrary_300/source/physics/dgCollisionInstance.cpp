@@ -387,7 +387,7 @@ void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
 		SetScale (scale);
 	} else {
 		// extract the original local matrix
-		dgMatrix localMatrix (m_aligmentMatrix * m_localMatrix);
+		dgMatrix localMatrix (m_aligmentMatrix.Transpose() * m_localMatrix);
 		
 		// create a new scale matrix 
 		localMatrix[0] = localMatrix[0].CompProduct4 (scale);
@@ -401,6 +401,9 @@ void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
 
 		m_localMatrix = m_aligmentMatrix * m_localMatrix;
 		m_aligmentMatrix = m_aligmentMatrix.Transpose();
+
+		dgAssert (m_localMatrix.TestOrthogonal());
+		dgAssert (m_aligmentMatrix.TestOrthogonal());
 
 //dgMatrix xxx1 (dgGetIdentityMatrix());
 //xxx1[0][0] = m_scale.m_x;

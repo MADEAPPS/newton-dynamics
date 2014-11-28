@@ -968,8 +968,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 							dgAssert (((frictionIndex < 0) && (normalForce[frictionIndex] == dgFloat32 (1.0f))) || ((frictionIndex >= 0) && (normalForce[frictionIndex] >= dgFloat32 (0.0f))));
 
 							dgFloat32 frictionNormal = normalForce[frictionIndex];
-							dgVector lowerFrictionForce = (frictionNormal * row->m_lowerBoundFrictionCoefficent);
-							dgVector upperFrictionForce = (frictionNormal * row->m_upperBoundFrictionCoefficent);
+							dgVector lowerFrictionForce (frictionNormal * row->m_lowerBoundFrictionCoefficent);
+							dgVector upperFrictionForce (frictionNormal * row->m_upperBoundFrictionCoefficent);
 
 							//if (f > upperFrictionForce) {
 							//	a = dgFloat32 (0.0f);
