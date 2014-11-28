@@ -358,6 +358,9 @@ void dgCollisionInstance::SetScale (const dgVector& scale)
 
 	if (IsType(dgCollision::dgCollisionCompound_RTTI)) {
 		dgAssert (m_scaleType == m_unit);
+		m_maxScale = dgMax(scaleX, scaleY, scaleZ);
+		m_scale = dgVector(scaleX, scaleY, scaleZ, dgFloat32(0.0f));
+		m_invScale = dgVector(dgFloat32(1.0f) / scaleX, dgFloat32(1.0f) / scaleY, dgFloat32(1.0f) / scaleZ, dgFloat32(0.0f));
 		dgCollisionCompound* const compound = (dgCollisionCompound*) m_childShape;
 		compound->ApplyScale(scale);
 	} else if ((dgAbsf (scaleX - scaleY) < dgFloat32 (1.0e-4f)) && (dgAbsf (scaleX - scaleZ) < dgFloat32 (1.0e-4f))) {
