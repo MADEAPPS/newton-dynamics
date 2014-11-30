@@ -223,7 +223,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 for (NewtonBody* bodyPtr = NewtonWorldGetFirstBody(scene->GetNewton()); bodyPtr; bodyPtr = NewtonWorldGetNextBody(scene->GetNewton(), bodyPtr)) {
 	NewtonCollision* collision = NewtonBodyGetCollision(bodyPtr);
 	if (NewtonCollisionGetType(collision) == SERIALIZE_ID_COMPOUND) {
-		NewtonCollisionSetScale (collision, 2.0f, 2.0f, 2.0f);
+		NewtonCollisionSetScale (collision, 0.5f, 0.5f, 0.5f);
 	}
 }
 

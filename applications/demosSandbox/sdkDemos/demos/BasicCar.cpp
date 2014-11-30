@@ -227,7 +227,7 @@ class BasicCarEntity: public DemoEntity
 	{
 		NewtonBody* const body = m_controller->GetBody();
 
-		// make the tire matrix form the offset and the body matrix
+		// make the tire matrix from the offset and the body matrix
 		dMatrix tireMatrix (GetNextMatrix());
 		tireMatrix.m_posit = offset;
 

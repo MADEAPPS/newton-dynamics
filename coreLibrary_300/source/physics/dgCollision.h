@@ -35,8 +35,7 @@ class dgPolygonSoupRayHitDesc;
 
 
 
-#define DG_RESTING_CONTACT_PENETRATION			dgFloat32 (1.0f / 256.0f)
-#define DG_IMPULSIVE_CONTACT_PENETRATION		dgFloat32 (1.0f / 256.0f + DG_RESTING_CONTACT_PENETRATION)
+
 
 
 //typedef dgInt32 (*dgCollisionCompoundBreakableCallback) (dgMeshEffect* const solid, void* userData, dgMatrix& planeMatrixOut);

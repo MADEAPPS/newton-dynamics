@@ -247,7 +247,7 @@ class SuperCarEntity: public DemoEntity
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
 		DemoEntity* const tirePart = entity->Find (tireName);
 
-		// add this tire, get local position and rise it by the suspension length 
+		// the tire is located at position of the tire mesh relative to the chassis mesh
 		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(entity));
 
 		// add the offset location

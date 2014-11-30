@@ -630,7 +630,7 @@ dgInt32 dgWorld::ReduceContacts (dgInt32 count, dgContactPoint* const contact,  
 
 dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount) const
 {
-	if (count > 0) {
+	if (count > 1) {
 		dgUnsigned8 mask[DG_MAX_CONTATCS];
 
 		dgInt32 index = 0;
@@ -649,6 +649,11 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contact, dg
 						dgVector dp (contact[j].m_point - contact[i].m_point);
 						dgFloat32 dist2 = dp % dp;
 						if (dist2 < window2) {
+							if (contact[i].m_penetration < contact[j].m_penetration ) {
+								contact[i].m_point = contact[j].m_point;
+								contact[i].m_normal = contact[j].m_normal;
+								contact[i].m_penetration =contact[j].m_penetration;
+							}
 							mask[j] = 1;
 							packContacts = 1;
 						}
