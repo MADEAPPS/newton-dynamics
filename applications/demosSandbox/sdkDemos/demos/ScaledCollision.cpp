@@ -229,7 +229,6 @@ void UniformScaledCollision(DemoEntityManager* const scene)
 
 void ScaledMeshCollision (DemoEntityManager* const scene)
 {
-/*
 	// load the skybox
 	scene->CreateSkyBox();
 
@@ -306,7 +305,8 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddNonUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-*/
+
+/*
 	// load the skybox
 	scene->CreateSkyBox();
 	NewtonBody* const body = CreateLevelMesh (scene, "flatPlane.ngd", true);
@@ -392,7 +392,7 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 		NewtonMeshDestroy(nmesh);
 		NewtonDestroyCollision(groundcol);
 	}
-
+*/
 	origin.m_x += 1.0f;
 	origin.m_y += 1.0f;
 	scene->SetCameraMatrix(rot, origin);	
