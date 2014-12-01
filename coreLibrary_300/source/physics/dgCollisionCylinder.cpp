@@ -31,7 +31,7 @@
 //////////////////////////////////////////////////////////////////////
 
 //#define DG_CYLINDER_SKIN_PADDING dgFloat32 (0.05f)
-#define DG_CYLINDER_SKIN_PADDING (DG_RESTING_CONTACT_PENETRATION * dgFloat32 (0.25f))
+//#define DG_CYLINDER_SKIN_PADDING (DG_RESTING_CONTACT_PENETRATION * dgFloat32 (0.25f))
 
 dgInt32 dgCollisionCylinder::m_shapeRefCount = 0;
 dgConvexSimplexEdge dgCollisionCylinder::m_edgeArray[DG_CYLINDER_SEGMENTS * 2 * 3];
@@ -56,6 +56,7 @@ void dgCollisionCylinder::Init (dgFloat32 radius, dgFloat32 height)
 	m_rtti |= dgCollisionCylinder_RTTI;
 	m_radius = dgAbsf (radius);
 	m_height = dgAbsf (height * dgFloat32 (0.5f));
+	m_skinthickness = dgMin (m_radius * dgFloat32 (0.005f), dgFloat32 (1.0f / 64.0f));
 
 	dgFloat32 angle = dgFloat32 (0.0f);
 	for (dgInt32 i = 0; i < DG_CYLINDER_SEGMENTS; i ++) {
@@ -238,15 +239,17 @@ void dgCollisionCylinder::MassProperties ()
 
 dgFloat32 dgCollisionCylinder::GetSkinThickness () const
 {
-	return DG_CYLINDER_SKIN_PADDING;
+	return m_skinthickness;
 }
 
 dgVector dgCollisionCylinder::ConvexConicSupporVertex (const dgVector& dir) const
 {
 	dgAssert (dgAbsf ((dir % dir - dgFloat32 (1.0f))) < dgFloat32 (1.0e-3f));
 
-	dgFloat32 radius = (m_radius > DG_CYLINDER_SKIN_PADDING) ? m_radius - DG_CYLINDER_SKIN_PADDING : m_radius;
-	dgFloat32 height = (m_height > DG_CYLINDER_SKIN_PADDING) ? m_height - DG_CYLINDER_SKIN_PADDING : m_height;
+	//dgFloat32 radius = (m_radius > DG_CYLINDER_SKIN_PADDING) ? m_radius - DG_CYLINDER_SKIN_PADDING : m_radius;
+	//dgFloat32 height = (m_height > DG_CYLINDER_SKIN_PADDING) ? m_height - DG_CYLINDER_SKIN_PADDING : m_height;
+	const dgFloat32 radius = m_radius - m_skinthickness;
+	const dgFloat32 height = m_height - m_skinthickness;
 
 	dgFloat32 y0 = radius;
 	dgFloat32 z0 = dgFloat32 (0.0f);
@@ -287,13 +290,13 @@ dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, 
 	dgFloat32 t = maxT;
 	dgVector p0 (q0);
 	p0.m_x = dgFloat32 (0.0f);
-	dgFloat32 c = (p0 % p0) - m_radius * m_radius;
+	const dgFloat32 radius2 = m_radius * m_radius;
+	const dgFloat32 c = (p0 % p0) - radius2;
 	if (c > dgFloat32 (0.0f)) {
-
 		dgVector dp (q1 - q0);
 		dp.m_x = dgFloat32 (0.0f);
 		dgFloat32 a = dp % dp;
-		dgFloat32 b = dgFloat32 (2.0f) * (p0 % dp);
+		const dgFloat32 b = dgFloat32 (2.0f) * (p0 % dp);
 
 		dgFloat32 desc = b * b - dgFloat32 (4.0f) * a * c;
 		if (desc > dgFloat32 (1.0e-8f)) {
@@ -309,7 +312,7 @@ dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, 
 						t1 = (m_height - q0.m_x) / (q1.m_x - q0.m_x);
 						dgFloat32 y = q0.m_y + (q1.m_y - q0.m_y) * t1;
 						dgFloat32 z = q0.m_z + (q1.m_z - q0.m_z) * t1;
-						if ((y * y + z * z - m_radius * m_radius) < dgFloat32 (0.0f)) {
+						if ((y * y + z * z - radius2) < dgFloat32 (0.0f)) {
 							t = t1;
 							contactOut.m_normal = dgVector (dgFloat32 (dgFloat32 (1.0f)), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 							//contactOut.m_userId = SetUserDataID();
@@ -320,7 +323,7 @@ dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, 
 						t1 = (-m_height - q0.m_x) / (q1.m_x - q0.m_x);
 						dgFloat32 y = q0.m_y + (q1.m_y - q0.m_y) * t1;
 						dgFloat32 z = q0.m_z + (q1.m_z - q0.m_z) * t1;
-						if ((y * y + z * z - m_radius * m_radius) < dgFloat32 (0.0f)) {
+						if ((y * y + z * z - radius2) < dgFloat32 (0.0f)) {
 							t = t1;
 							contactOut.m_normal = dgVector (-dgFloat32 (dgFloat32 (1.0f)), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 							//contactOut.m_userId = SetUserDataID();
@@ -341,7 +344,7 @@ dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, 
 				dgFloat32 t1 = (m_height - q0.m_x) / (q1.m_x - q0.m_x);
 				dgFloat32 y = q0.m_y + (q1.m_y - q0.m_y) * t1;
 				dgFloat32 z = q0.m_z + (q1.m_z - q0.m_z) * t1;
-				if ((y * y + z * z - m_radius * m_radius) < dgFloat32 (0.0f)) {
+				if ((y * y + z * z - radius2) < dgFloat32 (0.0f)) {
 					t = t1;
 					contactOut.m_normal = dgVector (dgFloat32 (dgFloat32 (1.0f)), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 					//contactOut.m_userId = SetUserDataID();
@@ -352,7 +355,7 @@ dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, 
 				dgFloat32 t1 = (-m_height - q0.m_x) / (q1.m_x - q0.m_x);
 				dgFloat32 y = q0.m_y + (q1.m_y - q0.m_y) * t1;
 				dgFloat32 z = q0.m_z + (q1.m_z - q0.m_z) * t1;
-				if ((y * y + z * z - m_radius * m_radius) < dgFloat32 (0.0f)) {
+				if ((y * y + z * z - radius2) < dgFloat32 (0.0f)) {
 					t = t1;
 					contactOut.m_normal = dgVector (-dgFloat32 (dgFloat32 (1.0f)), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 					//contactOut.m_userId = SetUserDataID();
@@ -377,7 +380,7 @@ void dgCollisionCylinder::Serialize(dgSerialize callback, void* const userData) 
 {
 	SerializeLow(callback, userData);
 
-	dgVector size (dgAbsf (m_radius), m_height * dgFloat32 (2.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector size (dgAbsf (m_radius), m_height * dgFloat32 (2.0f), m_skinthickness, dgFloat32 (0.0f));
 	callback (userData, &size, sizeof (dgVector));
 }
 
