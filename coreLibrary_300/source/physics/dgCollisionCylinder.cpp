@@ -30,7 +30,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define DG_CYLINDER_SKIN_PADDING dgFloat32 (0.05f)
+//#define DG_CYLINDER_SKIN_PADDING dgFloat32 (0.05f)
+#define DG_CYLINDER_SKIN_PADDING (DG_RESTING_CONTACT_PENETRATION * dgFloat32 (0.25f))
 
 dgInt32 dgCollisionCylinder::m_shapeRefCount = 0;
 dgConvexSimplexEdge dgCollisionCylinder::m_edgeArray[DG_CYLINDER_SEGMENTS * 2 * 3];

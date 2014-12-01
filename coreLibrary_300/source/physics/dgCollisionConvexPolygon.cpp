@@ -834,8 +834,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 			contactsOut[i].m_shapeId1 = m_faceId;
 			contactsOut[i].m_penetration = penetration;
 		}
-	}
-	else {
+	} else {
 		dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
 		if (m_faceClipSize > convexSphapeUmbra) {
 			//const dgBody* const refBody = proxy.m_referenceBody;
@@ -857,16 +856,14 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 					contactsOut[i].m_shapeId0 = hullId;
 					contactsOut[i].m_shapeId1 = m_faceId;
 				}
-			}
-			else {
+			} else {
 				dgVector normal(polygonInstance->m_globalMatrix.UnrotateVector(contactsOut[0].m_normal));
 				if ((normal % savedFaceNormal) < dgFloat32(0.9995f)) {
 					dgInt32 index = m_adjacentFaceEdgeNormalIndex[m_closestFeatureStartIndex];
 					dgVector n(&m_vertex[index * m_stride]);
 					if ((savedFaceNormal.DotProduct4(n).GetScalar() > dgFloat32(0.9995f))) {
 						normal = n;
-					}
-					else {
+					} else {
 						dgVector dir0(n * savedFaceNormal);
 						dgVector dir1(n * normal);
 						dgFloat32 projection = dir0 % dir1;
@@ -882,8 +879,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 						contactsOut[i].m_shapeId0 = hullId;
 						contactsOut[i].m_shapeId1 = m_faceId;
 					}
-				}
-				else {
+				} else {
 					for (dgInt32 i = 0; i < count; i++) {
 						//contactsOut[i].m_userId = m_faceId;
 						contactsOut[i].m_shapeId0 = hullId;
