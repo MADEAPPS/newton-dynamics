@@ -32,7 +32,7 @@
 //////////////////////////////////////////////////////////////////////
 
 //#define DG_TAPED_CYLINDER_SKIN_PADDING dgFloat32 (0.05f)
-#define DG_TAPED_CYLINDER_SKIN_PADDING (DG_RESTING_CONTACT_PENETRATION * 0.25f)
+//#define DG_TAPED_CYLINDER_SKIN_PADDING (DG_RESTING_CONTACT_PENETRATION * 0.25f)
 
 dgInt32 dgCollisionTaperedCylinder::m_shapeRefCount = 0;
 dgConvexSimplexEdge dgCollisionTaperedCylinder::m_edgeArray[DG_CYLINDER_SEGMENTS * 2 * 3];
@@ -58,6 +58,7 @@ void dgCollisionTaperedCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFlo
 	m_radio0 = dgAbsf (radio0);
 	m_radio1 = dgAbsf (radio1);
 	m_height = dgAbsf (height * dgFloat32 (0.5f));
+	m_skinthickness = dgMin (dgMin (m_radio0, m_radio1, m_height) * dgFloat32 (0.005f), dgFloat32 (1.0f / 64.0f));
 
 	m_dirVector.m_x = radio1 - radio0;
 	m_dirVector.m_y = m_height * dgFloat32 (2.0f);
@@ -235,7 +236,7 @@ dgVector dgCollisionTaperedCylinder::SupportVertex (const dgVector& dir, dgInt32
 
 dgFloat32 dgCollisionTaperedCylinder::GetSkinThickness () const
 {
-	return DG_TAPED_CYLINDER_SKIN_PADDING;
+	return m_skinthickness;
 }
 
 
@@ -243,9 +244,12 @@ dgVector dgCollisionTaperedCylinder::ConvexConicSupporVertex (const dgVector& di
 {
 	dgAssert (dgAbsf ((dir % dir - dgFloat32 (1.0f))) < dgFloat32 (1.0e-3f));
 
-	dgFloat32 height = (m_height > DG_TAPED_CYLINDER_SKIN_PADDING) ? m_height - DG_TAPED_CYLINDER_SKIN_PADDING : m_height;
-	dgFloat32 radio0 = (m_radio0 > DG_TAPED_CYLINDER_SKIN_PADDING) ? m_radio0 - DG_TAPED_CYLINDER_SKIN_PADDING : m_radio0;
-	dgFloat32 radio1 = (m_radio1 > DG_TAPED_CYLINDER_SKIN_PADDING) ? m_radio1 - DG_TAPED_CYLINDER_SKIN_PADDING : m_radio1;
+	//dgFloat32 height = (m_height > DG_TAPED_CYLINDER_SKIN_PADDING) ? m_height - DG_TAPED_CYLINDER_SKIN_PADDING : m_height;
+	//dgFloat32 radio0 = (m_radio0 > DG_TAPED_CYLINDER_SKIN_PADDING) ? m_radio0 - DG_TAPED_CYLINDER_SKIN_PADDING : m_radio0;
+	//dgFloat32 radio1 = (m_radio1 > DG_TAPED_CYLINDER_SKIN_PADDING) ? m_radio1 - DG_TAPED_CYLINDER_SKIN_PADDING : m_radio1;
+	const dgFloat32 height = m_height - m_skinthickness;
+	const dgFloat32 radio0 = m_radio0 - m_skinthickness;
+	const dgFloat32 radio1 = m_radio1 - m_skinthickness;
 
 	dgAssert (dgAbsf ((dir % dir - dgFloat32 (1.0f))) < dgFloat32 (1.0e-3f));
 	dgFloat32 y0 = radio0;

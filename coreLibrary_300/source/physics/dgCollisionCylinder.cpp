@@ -56,7 +56,7 @@ void dgCollisionCylinder::Init (dgFloat32 radius, dgFloat32 height)
 	m_rtti |= dgCollisionCylinder_RTTI;
 	m_radius = dgAbsf (radius);
 	m_height = dgAbsf (height * dgFloat32 (0.5f));
-	m_skinthickness = dgMin (m_radius * dgFloat32 (0.005f), dgFloat32 (1.0f / 64.0f));
+	m_skinthickness = dgMin (dgMin (m_radius, m_height) * dgFloat32 (0.005f), dgFloat32 (1.0f / 64.0f));
 
 	dgFloat32 angle = dgFloat32 (0.0f);
 	for (dgInt32 i = 0; i < DG_CYLINDER_SEGMENTS; i ++) {
@@ -380,7 +380,7 @@ void dgCollisionCylinder::Serialize(dgSerialize callback, void* const userData) 
 {
 	SerializeLow(callback, userData);
 
-	dgVector size (dgAbsf (m_radius), m_height * dgFloat32 (2.0f), m_skinthickness, dgFloat32 (0.0f));
+	dgVector size (dgAbsf (m_radius), m_height * dgFloat32 (2.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	callback (userData, &size, sizeof (dgVector));
 }
 
