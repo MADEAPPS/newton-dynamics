@@ -293,7 +293,7 @@
 		FFD2A789172E123500114513 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Newton Dynamics";
 			};
 			buildConfigurationList = FFD2A78C172E123500114513 /* Build configuration list for PBXProject "dCustomJoints" */;

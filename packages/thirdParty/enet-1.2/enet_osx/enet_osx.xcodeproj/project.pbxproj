@@ -107,7 +107,7 @@
 		FF3B29CD173014AE007E6FEC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Newton Dynamics";
 			};
 			buildConfigurationList = FF3B29D0173014AE007E6FEC /* Build configuration list for PBXProject "enet_osx" */;

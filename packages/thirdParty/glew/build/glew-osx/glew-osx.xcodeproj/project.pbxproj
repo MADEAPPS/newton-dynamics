@@ -86,7 +86,7 @@
 		FF0A4FE3173160E6005D6C12 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Newton Dynamics";
 			};
 			buildConfigurationList = FF0A4FE6173160E6005D6C12 /* Build configuration list for PBXProject "glew-osx" */;

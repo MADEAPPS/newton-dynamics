@@ -92,7 +92,7 @@
 		FFD27496172E08F400114513 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Newton Dynamics";
 			};
 			buildConfigurationList = FFD27499172E08F400114513 /* Build configuration list for PBXProject "dVisualDebuggerServer" */;

@@ -98,7 +98,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0610;
 			};
 			buildConfigurationList = 1DEB920508733DBB0010E9CD /* Build configuration list for PBXProject "tinyxml" */;
 			compatibilityVersion = "Xcode 3.2";
