@@ -168,8 +168,9 @@ class dgConstraint
 	bool IsActive() const;
 	bool IsCollidable () const;
 	
-
+	virtual void ResetMaxDOF();
 	dgInt32 GetMaxDOF() const;
+	
 	void SetUserData (void *userData);
 	void SetCollidable (bool state);
 	virtual void SetDestructorCallback (OnConstraintDestroy destructor) = 0;
@@ -315,6 +316,11 @@ inline dgFloat32 dgConstraint::GetStiffness() const
 }
 
 inline void dgConstraint::SetStiffness(dgFloat32 stiffness)
+{
+}
+
+
+inline void dgConstraint::ResetMaxDOF()
 {
 }
 

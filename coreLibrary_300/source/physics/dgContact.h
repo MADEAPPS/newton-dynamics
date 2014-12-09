@@ -205,6 +205,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 
 	DG_CLASS_ALLOCATOR(allocator)
 
+	virtual void ResetMaxDOF();
 	virtual void GetInfo (dgConstraintInfo* const info) const;
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
 	virtual void JointAccelerations (dgJointAccelerationDecriptor* const params); 
@@ -266,6 +267,7 @@ inline void dgContactMaterial::SetUserData (void* const userData)
 	m_userData = userData;
 }
 
+
 inline bool dgContact::IsDeformable() const 
 {
 	return false;
@@ -294,5 +296,11 @@ inline dgFloat32 dgContact::GetClosestDistance() const
 {
     return m_closestDistance;
 }
+
+inline void dgContact::ResetMaxDOF()
+{
+	m_maxDOF = 0;
+}
+
 #endif 
 
