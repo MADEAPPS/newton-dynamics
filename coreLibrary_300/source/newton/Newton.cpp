@@ -5590,9 +5590,10 @@ void NewtonBodySetCollisionScale (const NewtonBody* const bodyPtr, dFloat scaleX
 	NewtonCollisionSetScale (collision, scaleX, scaleY, scaleZ);
 
 	NewtonJoint* nextJoint;
-	for (NewtonJoint* contactJoint = NewtonBodyGetFirstContactJoint(bodyPtr); contactJoint; contactJoint = nextJoint) {
-		nextJoint = NewtonBodyGetNextContactJoint(bodyPtr, contactJoint);
-		//world->DestroyConstraint ((dgConstraint*)contactJoint);
+	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(bodyPtr); joint; joint = nextJoint) {
+		dgConstraint* const contactJoint = (dgConstraint*)joint;
+		nextJoint = NewtonBodyGetNextContactJoint(bodyPtr, joint);
+		//world->DestroyConstraint (contactJoint);
 		contactJoint->ResetMaxDOF();
 	}
     NewtonBodySetMassProperties (bodyPtr, mass, collision);
