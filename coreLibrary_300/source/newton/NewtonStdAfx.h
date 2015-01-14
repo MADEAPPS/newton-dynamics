@@ -23,10 +23,9 @@
 #define __NEWTON_STDAFX_H__
 
 
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-
-
-// TODO: reference additional headers your program requires here
+#ifndef WIN32_LEAN_AND_MEAN
+#	define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+#endif
 
 #include "dg.h"
 #include "dgPhysics.h"

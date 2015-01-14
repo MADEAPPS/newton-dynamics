@@ -78,7 +78,9 @@
 	#pragma warning (push, 3) 
 		#include <windows.h>
 		#include <crtdbg.h>
-		#include <tlhelp32.h>
+		#ifndef _DURANGO
+			#include <tlhelp32.h>
+		#endif
 	#pragma warning (pop) 
 #endif
 
@@ -180,7 +182,7 @@
 
 #define DG_VECTOR_SIMD_SIZE		16
 
-#if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1700))
+#if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1700)) && !defined(_DURANGO)
 	// starting Visual studio 2012 an up we can use high performance computing using AMP
 	#define _NEWTON_AMP
 #endif
@@ -811,7 +813,11 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 
 DG_INLINE void dgThreadYield()
 {
+#if defined (DG_USE_THREAD_EMULATION)
+	return;
+#else
 	sched_yield();
+#endif
 }
 
 DG_INLINE void dgPrefetchMem(const void* const mem)

@@ -28,10 +28,10 @@
 #define _DG_PHYSICS_STDAFX_H__
 
 
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+#ifndef WIN32_LEAN_AND_MEAN
+#	define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+#endif
 
-
-// TODO: reference additional headers your program requires here
 #include <dg.h>
 
 
