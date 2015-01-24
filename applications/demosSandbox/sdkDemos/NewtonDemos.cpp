@@ -41,7 +41,7 @@
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non Uniform Scaled Collision
-#define DEFAULT_SCENE	18			// scaled mesh collision
+//#define DEFAULT_SCENE	18			// scaled mesh collision
 //#define DEFAULT_SCENE	19			// simple convex decomposition
 //#define DEFAULT_SCENE	20			// scene Collision
 //#define DEFAULT_SCENE	21          // simple boolean operators 
@@ -56,7 +56,7 @@
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// basic Car
 //#define DEFAULT_SCENE	32			// heavy vehicles
-//#define DEFAULT_SCENE	33			// super Car
+#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// basic player controller
 //#define DEFAULT_SCENE	35			// advanced player controller
 //#define DEFAULT_SCENE	36			// cloth patch			

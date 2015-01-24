@@ -23,7 +23,7 @@
 #include "UserPlaneCollision.h"
 
 // some figures form the 2000 SRT Viper data sheet: http://www.vipercentral.com/specifications/
-//the 2000 Vipers’ 8.4-liter engine generates
+// the 2000 Vipers’ 8.4-liter engine generates
 // max speed: 164 miles per hours					= 73.0f meter per seconds		
 // horse power: 450 hp @ 5,200 rpm                    
 // peak torque: 490 lb-ft @ 3700 rpm				
@@ -804,8 +804,8 @@ class SuperCarEntity: public DemoEntity
 
 		glLineWidth(1.0f);
 
-		// render AI information
 /*
+		// render AI information
 		dMatrix pathMatrix (m_aiPath->GetMeshMatrix() * m_aiPath->GetCurrentMatrix());
 		dBigVector q; 
 		DemoBezierCurve* const path = (DemoBezierCurve*) m_aiPath->GetMesh();
@@ -817,15 +817,13 @@ class SuperCarEntity: public DemoEntity
 		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 		glVertex3f (p1.m_x, p1.m_y, p1.m_z);
 		glEnd();
-*/
 
 		glBegin(GL_LINES);
 		glColor3f (1.0f, 0.0f, 1.0f);
 		glVertex3f (p0.m_x, p0.m_y + 1.0f, p0.m_z);
 		glVertex3f (m_debugTargetHeading.m_x, m_debugTargetHeading.m_y + 1.0f, m_debugTargetHeading.m_z);
 		glEnd();
-
-		 
+*/
 	}
 
 
@@ -876,9 +874,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			m_engineSounds[i] = channel;
 			m_soundsCount ++;
 		}
-
-		// create a Bezier Spline path for AI car to drive
-		CreatedrivingTestCourt(scene);
 	}
 
 	~SuperCarVehicleControllerManager ()
@@ -1178,17 +1173,10 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		return matrix;
 	}
 
-	void CreatedrivingTestCourt(DemoEntityManager* const scene)
-	{
-		// create a Bezier Spline path for AI car to drive
-		m_raceTrackPath = new DemoEntity (dGetIdentityMatrix(), NULL);
-		scene->Append(m_raceTrackPath);
-		m_raceTrackPath->LoadNGD_mesh ("carPath.ngd", scene->GetNewton());
-		DemoBezierCurve* const path = (DemoBezierCurve*) m_raceTrackPath->GetMesh();
-		dAssert (path->IsType(DemoBezierCurve::GetRttiType()));
 
-		path->SetVisible(true);
-		path->SetRenderResolution (500);
+	void AddCones (DemoEntityManager* const scene)
+	{
+		DemoBezierCurve* const path = (DemoBezierCurve*) m_raceTrackPath->GetMesh();
 
 		// load a street cone model and place at equal distance along the path
 		DemoEntity* const coneEnt = new DemoEntity(dGetIdentityMatrix(), NULL);
@@ -1228,6 +1216,19 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 		NewtonDestroyCollision(collision);
 		coneEnt->Release();
+	}
+
+	void CreatedrivingTestCourt(DemoEntityManager* const scene)
+	{
+		// create a Bezier Spline path for AI car to drive
+		m_raceTrackPath = new DemoEntity (dGetIdentityMatrix(), NULL);
+		scene->Append(m_raceTrackPath);
+		m_raceTrackPath->LoadNGD_mesh ("carPath.ngd", scene->GetNewton());
+		DemoBezierCurve* const path = (DemoBezierCurve*) m_raceTrackPath->GetMesh();
+		dAssert (path->IsType(DemoBezierCurve::GetRttiType()));
+
+		path->SetVisible(true);
+		path->SetRenderResolution (500);
 	}
 
 	// use this to display debug information about vehicle 
@@ -1280,21 +1281,25 @@ void SuperCar (DemoEntityManager* const scene)
 	// create a vehicle controller manager
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world);
 
+	// create a Bezier Spline path for AI car to drive
+	manager->CreatedrivingTestCourt (scene);
+	//manager->AddCones (scene);
+
 	dFloat u = 1.0f;
 	for (int i = 0; i < 1; i ++) {
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
-		vehicle0->BuildFourWheelDriveSuperCar();
+//		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
+//		vehicle0->BuildFourWheelDriveSuperCar();
 		u -= 0.01f;
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit += location1.m_right.Scale (-3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
-		vehicle1->BuildFourWheelDriveSuperCar();
+//		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
+//		vehicle1->BuildFourWheelDriveSuperCar();
 		u -= 0.01f;
 
 		dMatrix location2 (manager->CalculateSplineMatrix (u));
@@ -1302,7 +1307,8 @@ void SuperCar (DemoEntityManager* const scene)
 		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
 		location2.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
-		vehicle2->BuildFourWheelDriveSuperCar();
+		//vehicle2->BuildFourWheelDriveSuperCar();
+		vehicle2->BuildRearWheelDriveMuscleCar();
 		u -= 0.01f;
 	}
 		
