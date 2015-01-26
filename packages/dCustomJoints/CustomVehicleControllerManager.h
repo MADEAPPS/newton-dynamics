@@ -142,6 +142,10 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonBody* const body, const dMatrix& vehicleFrame, const dVector& gravityVector);
 	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
 	CUSTOM_JOINTS_API virtual void DestroyController (CustomVehicleController* const controller);
+
+	CUSTOM_JOINTS_API void DrawSchematic (CustomVehicleController* const controller) const;
+	protected:
+	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, dVector& lines) const;
 };
 
 

@@ -255,6 +255,14 @@ CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonCo
 }
 
 
+void CustomVehicleControllerManager::DrawSchematic (CustomVehicleController* const controller) const
+{
+}
+
+void CustomVehicleControllerManager::DrawSchematicCallback (CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, dVector& lines) const
+{
+
+}
 
 void CustomVehicleController::Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector)
 {
@@ -596,3 +604,5 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 		}
 	}
 }
+
+

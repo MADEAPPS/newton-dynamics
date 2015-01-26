@@ -739,6 +739,7 @@ class SuperCarEntity: public DemoEntity
 
 	void Debug (DemoEntity* const m_aiPath) const 
 	{
+/*
 		NewtonBody* const body = m_controller->GetBody();
 		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
 
@@ -803,6 +804,7 @@ class SuperCarEntity: public DemoEntity
 		glEnd();
 
 		glLineWidth(1.0f);
+*/
 
 /*
 		// render AI information
@@ -1234,11 +1236,12 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	// use this to display debug information about vehicle 
 	void Debug () const
 	{
-		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			CustomVehicleController* const controller = &ptr->GetInfo();
-			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
-			vehicleEntity->Debug(m_raceTrackPath);
-		}
+//		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
+//			CustomVehicleController* const controller = &ptr->GetInfo();
+//			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
+//			vehicleEntity->Debug(m_raceTrackPath);
+//		}
+		DrawSchematic (m_player->m_controller);
 	}
 
 	bool m_externalView;
