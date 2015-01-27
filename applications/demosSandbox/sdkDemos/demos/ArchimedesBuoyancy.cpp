@@ -73,11 +73,17 @@ class MyTriggerManager: public CustomTriggerManager
 				
 				dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
 				dFloat fluidDentity = 1.0f / (m_waterToSolidVolumeRatio * shapeVolume);
+				dFloat viscosity = 0.995f;
 
-				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &matrix[0][0], &cog[0], &gravity[0], &m_plane[0], fluidDentity, 0.1f, &accelPerUnitMass[0], &torquePerUnitMass[0]);
+				NewtonConvexCollisionCalculateBuoyancyAcceleration (collision, &matrix[0][0], &cog[0], &gravity[0], &m_plane[0], fluidDentity, viscosity, &accelPerUnitMass[0], &torquePerUnitMass[0]);
 
 				dVector force (accelPerUnitMass.Scale (mass));
 				dVector torque (torquePerUnitMass.Scale (mass));
+
+				dVector omega; 
+				NewtonBodyGetOmega(visitor, &omega[0]);
+				omega = omega.Scale (viscosity);
+				NewtonBodySetOmega(visitor, &omega[0]);
 
 				NewtonBodyAddForce (visitor, &force[0]);
 				NewtonBodyAddTorque (visitor, &torque[0]);
@@ -210,7 +216,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -218,15 +224,16 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
+/*
 for (NewtonBody* bodyPtr = NewtonWorldGetFirstBody(scene->GetNewton()); bodyPtr; bodyPtr = NewtonWorldGetNextBody(scene->GetNewton(), bodyPtr)) {
 	NewtonCollision* collision = NewtonBodyGetCollision(bodyPtr);
 	if (NewtonCollisionGetType(collision) == SERIALIZE_ID_COMPOUND) {
 		NewtonCollisionSetScale (collision, 0.5f, 0.5f, 0.5f);
 	}
 }
-
+*/
 
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }
