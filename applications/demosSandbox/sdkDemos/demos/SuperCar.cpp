@@ -991,7 +991,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 			glPushMatrix();
 			glMultMatrix (&origin[0][0]);
-			DrawSchematic (m_player->m_controller);
+			DrawSchematic (m_player->m_controller, 50.0f);
 			glPopMatrix();
 		}
 		m_drawShematic = false;
@@ -1040,8 +1040,8 @@ glLineWidth(3.0f);
 		dVector p0 (lines[pointCount - 1]);
 		for (int i = 0; i < pointCount; i ++) {
 			dVector p1 (lines[i]);
-			glVertex3f(p0.m_x * 50, p0.m_z * 50, 0.0f);
-			glVertex3f(p1.m_x * 50, p1.m_z * 50, 0.0f);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
 			p0 = p1;
 		}
 glEnd();

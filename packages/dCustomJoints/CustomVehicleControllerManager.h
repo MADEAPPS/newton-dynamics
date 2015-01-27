@@ -98,7 +98,7 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
-	CUSTOM_JOINTS_API void DrawSchematic () const;	
+	CUSTOM_JOINTS_API void DrawSchematic (dFloat scale) const;	
 	
 	CustomVehicleControllerBodyStateChassis m_chassisState;
 
@@ -144,7 +144,7 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
 	CUSTOM_JOINTS_API virtual void DestroyController (CustomVehicleController* const controller);
 
-	CUSTOM_JOINTS_API void DrawSchematic (const CustomVehicleController* const controller) const;
+	CUSTOM_JOINTS_API void DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const;
 	protected:
 	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
 

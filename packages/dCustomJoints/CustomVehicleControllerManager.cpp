@@ -255,9 +255,9 @@ CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonCo
 }
 
 
-void CustomVehicleControllerManager::DrawSchematic (const CustomVehicleController* const controller) const
+void CustomVehicleControllerManager::DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const
 {
-	controller->DrawSchematic();
+	controller->DrawSchematic(scale);
 }
 
 void CustomVehicleControllerManager::DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
@@ -610,15 +610,21 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 	}
 }
 
-void CustomVehicleController::DrawSchematic () const
+void CustomVehicleController::DrawSchematic (dFloat scale) const
 {
 //	const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
 //	dFloat scale = -4.0f / (chassis.GetMass() * DEMO_GRAVITY);
 //	dVector p0 (m_chassisState.GetCenterOfMass());
 
+	dMatrix floorMatrix (dGetIdentityMatrix());
+	floorMatrix[0][0] = scale;
+	floorMatrix[1][1] = 0.0f;
+	floorMatrix[2][1] = scale;
+	floorMatrix[2][2] = 0.0f;;
+
 	int count = 0;
 	dVector array [32];
-	dMatrix worldToComMatrix ((m_chassisState.GetLocalMatrix() * m_chassisState.GetMatrix()).Inverse());
+	dMatrix worldToComMatrix ((m_chassisState.GetLocalMatrix() * m_chassisState.GetMatrix()).Inverse() * floorMatrix);
 
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 	for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
