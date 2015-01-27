@@ -739,7 +739,6 @@ class SuperCarEntity: public DemoEntity
 
 	void Debug (DemoEntity* const m_aiPath) const 
 	{
-/*
 		NewtonBody* const body = m_controller->GetBody();
 		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
 
@@ -804,7 +803,6 @@ class SuperCarEntity: public DemoEntity
 		glEnd();
 
 		glLineWidth(1.0f);
-*/
 
 /*
 		// render AI information
@@ -854,6 +852,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		,m_externalView(true)
 		,m_player (NULL) 
 		,m_soundsCount(0)
+		,m_drawShematic(false)
 		,m_helpKey (true)
 	{
 		// hook a callback for 2d help display
@@ -982,6 +981,22 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
 	{
+
+
+		// draw the player physics model
+		if (m_drawShematic) {
+
+			dMatrix origin (dGetIdentityMatrix());
+			origin.m_posit = dVector(400, 400, 0.0f, 1.0f);
+
+			glPushMatrix();
+			glMultMatrix (&origin[0][0]);
+			DrawSchematic (m_player->m_controller);
+			glPopMatrix();
+		}
+		m_drawShematic = false;
+
+
 		// set to transparent color
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1015,6 +1030,80 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 		// restore color and blend mode
 		glDisable (GL_BLEND);
+	}
+
+
+	void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
+	{
+glLineWidth(3.0f);
+		glBegin(GL_LINES);
+		dVector p0 (lines[pointCount - 1]);
+		for (int i = 0; i < pointCount; i ++) {
+			dVector p1 (lines[i]);
+			glVertex3f(p0.m_x * 50, p0.m_z * 50, 0.0f);
+			glVertex3f(p1.m_x * 50, p1.m_z * 50, 0.0f);
+			p0 = p1;
+		}
+glEnd();
+		glLineWidth(1.0f);
+/*
+		glLineWidth(3.0f);
+		glBegin(GL_LINES);
+
+
+		// draw vehicle weight at the center of mass
+		dFloat lenght = scale * chassis.GetMass() * DEMO_GRAVITY;
+		glColor3f(0.0f, 0.0f, 1.0f);
+		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+		glVertex3f (p0.m_x, p0.m_y - lenght, p0.m_z);
+
+		// draw vehicle front dir
+		glColor3f(1.0f, 1.0f, 1.0f);
+		dVector r0 (p0 + chassis.GetMatrix()[1].Scale (0.5f));
+		dVector r1 (r0 + chassis.GetMatrix()[0].Scale (1.0f));
+		glVertex3f (r0.m_x, r0.m_y, r0.m_z);
+		glVertex3f (r1.m_x, r1.m_y, r1.m_z);
+
+		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
+		dVector veloc;
+		NewtonBodyGetVelocity(body, &veloc[0]);
+		dVector q0 (p0 + chassis.GetMatrix()[1].Scale (1.0f));
+		dVector q1 (q0 + veloc.Scale (0.25f));
+		glColor3f(1.0f, 1.0f, 0.0f);
+		glVertex3f (q0.m_x, q0.m_y, q0.m_z);
+		glVertex3f (q1.m_x, q1.m_y, q1.m_z);
+
+		for (CustomVehicleControllerBodyStateTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			const CustomVehicleControllerBodyStateTire& tire = *node;
+			dVector p0 (tire.GetCenterOfMass());
+
+			// offset the origin of of tire force so that they are visible
+			const dMatrix& tireMatrix = tire.GetLocalMatrix ();
+			p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.25f);
+
+			// draw the tire load 
+			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));
+			glColor3f (0.0f, 0.0f, 1.0f);
+			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+
+			// show tire lateral force
+			dVector p2 (p0 - tire.GetLateralForce().Scale (scale));
+			glColor3f(1.0f, 0.0f, 0.0f);
+			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f (p2.m_x, p2.m_y, p2.m_z);
+
+			// show tire longitudinal force
+			dVector p3 (p0 - tire.GetLongitudinalForce().Scale (scale));
+			glColor3f(0.0f, 1.0f, 0.0f);
+			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
+		}
+		glEnd();
+
+		glLineWidth(1.0f);
+*/
+//		glEnd();
 	}
 
 
@@ -1236,13 +1325,14 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	// use this to display debug information about vehicle 
 	void Debug () const
 	{
-//		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-//			CustomVehicleController* const controller = &ptr->GetInfo();
-//			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
-//			vehicleEntity->Debug(m_raceTrackPath);
-//		}
-		DrawSchematic (m_player->m_controller);
+		m_drawShematic = true;
+		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
+			CustomVehicleController* const controller = &ptr->GetInfo();
+			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
+			vehicleEntity->Debug(m_raceTrackPath);
+		}
 	}
+
 
 	bool m_externalView;
 	SuperCarEntity* m_player;
@@ -1255,6 +1345,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	GLuint m_tachometer;
 	GLuint m_needle;
 	int m_soundsCount;
+	mutable bool m_drawShematic;
 	DemoEntityManager::ButtonKey m_helpKey;
 	void* m_engineSounds[16];
 };

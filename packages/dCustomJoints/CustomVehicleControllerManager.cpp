@@ -70,7 +70,7 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 		,m_controller(controller)
 	{
 		m_controller->m_externalContactStatesCount = 0;
-		m_controller->m_freeContactList = m_controller->m_externalContactStatesPoll.GetFirst();
+		m_controller->m_freeContactList = m_controller->m_externalContactStatesPool.GetFirst();
 
 		// apply all external forces and torques to chassis and all tire velocities
 		dFloat timestepInv = 1.0f / timestep;
@@ -255,11 +255,12 @@ CustomVehicleController* CustomVehicleControllerManager::CreateVehicle (NewtonCo
 }
 
 
-void CustomVehicleControllerManager::DrawSchematic (CustomVehicleController* const controller) const
+void CustomVehicleControllerManager::DrawSchematic (const CustomVehicleController* const controller) const
 {
+	controller->DrawSchematic();
 }
 
-void CustomVehicleControllerManager::DrawSchematicCallback (CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, dVector& lines) const
+void CustomVehicleControllerManager::DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
 {
 
 }
@@ -287,7 +288,7 @@ void CustomVehicleController::Init (NewtonBody* const body, const dMatrix& vehic
 	m_finalized = false;
 	m_externalContactStatesCount = 0;
 	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
-	m_freeContactList = m_externalContactStatesPoll.GetFirst();
+	m_freeContactList = m_externalContactStatesPool.GetFirst();
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager(); 
 	NewtonWorld* const world = manager->GetWorld(); 
 
@@ -544,6 +545,10 @@ void CustomVehicleController::Finalize()
 		index ++;
 	}
 
+	NewtonBody* const body = GetBody();
+	NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
+	m_chassisState.UpdateInertia();
+
 	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
 	m_finalized = true;
 }
@@ -557,9 +562,9 @@ CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody
 		}
 	}
 
-	dAssert (m_externalContactStatesPoll.GetCount() < 32);
+	dAssert (m_externalContactStatesPool.GetCount() < 32);
 	if (!m_freeContactList) {
-		m_freeContactList = m_externalContactStatesPoll.Append();
+		m_freeContactList = m_externalContactStatesPool.Append();
 	}
 	CustomVehicleControllerBodyStateContact* const externalBody = &m_freeContactList->GetInfo();
 	m_freeContactList = m_freeContactList->GetNext(); 
@@ -596,8 +601,8 @@ void CustomVehicleController::PreUpdate (dFloat timestep, int threadIndex)
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
-		NewtonBody* const body = GetBody();
-		NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
+		//NewtonBody* const body = GetBody();
+		//NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
 		for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 			tire->UpdateTransform();
@@ -605,4 +610,52 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 	}
 }
 
+void CustomVehicleController::DrawSchematic () const
+{
+//	const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
+//	dFloat scale = -4.0f / (chassis.GetMass() * DEMO_GRAVITY);
+//	dVector p0 (m_chassisState.GetCenterOfMass());
 
+	int count = 0;
+	dVector array [32];
+	dMatrix worldToComMatrix ((m_chassisState.GetLocalMatrix() * m_chassisState.GetMatrix()).Inverse());
+
+	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
+	for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+		dMatrix matrix (tire->CalculateGlobalMatrix());
+		dVector p (worldToComMatrix.TransformVector(matrix.m_posit));
+		array[count] = p;
+		count ++;
+	}
+
+	manager->DrawSchematicCallback(this, "chassiFloor", 0, 4, array);
+	
+/*
+	glLineWidth(3.0f);
+	glBegin(GL_LINES);
+
+
+	// draw vehicle weight at the center of mass
+	dFloat lenght = scale * chassis.GetMass() * DEMO_GRAVITY;
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+	glVertex3f (p0.m_x, p0.m_y - lenght, p0.m_z);
+
+	// draw vehicle front dir
+	glColor3f(1.0f, 1.0f, 1.0f);
+	dVector r0 (p0 + chassis.GetMatrix()[1].Scale (0.5f));
+	dVector r1 (r0 + chassis.GetMatrix()[0].Scale (1.0f));
+	glVertex3f (r0.m_x, r0.m_y, r0.m_z);
+	glVertex3f (r1.m_x, r1.m_y, r1.m_z);
+
+	// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
+	dVector veloc;
+	NewtonBodyGetVelocity(body, &veloc[0]);
+	dVector q0 (p0 + chassis.GetMatrix()[1].Scale (1.0f));
+	dVector q1 (q0 + veloc.Scale (0.25f));
+	glColor3f(1.0f, 1.0f, 0.0f);
+	glVertex3f (q0.m_x, q0.m_y, q0.m_z);
+	glVertex3f (q1.m_x, q1.m_y, q1.m_z);
+*/
+}

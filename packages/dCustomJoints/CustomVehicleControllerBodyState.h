@@ -142,8 +142,6 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	CUSTOM_JOINTS_API void* GetUserData() const;
 	CUSTOM_JOINTS_API dMatrix CalculateLocalMatrix () const;
 	CUSTOM_JOINTS_API dMatrix CalculateGlobalMatrix () const;
-	CUSTOM_JOINTS_API dMatrix CalculateSteeringMatrix () const;
-	CUSTOM_JOINTS_API dMatrix CalculateSuspensionMatrix () const;
 
 	CUSTOM_JOINTS_API dFloat GetTireRadio () const
 	{
@@ -183,10 +181,13 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 
 	private:
 	CUSTOM_JOINTS_API void UpdateTransform ();
+	CUSTOM_JOINTS_API dMatrix CalculateSteeringMatrix () const;
+	CUSTOM_JOINTS_API dMatrix CalculateSuspensionMatrix () const;
 	CUSTOM_JOINTS_API void UpdateDynamicInputs(dFloat timestep);
 	CUSTOM_JOINTS_API void Collide (CustomControllerConvexCastPreFilter& filter, dFloat timestepInv, int threadId);
 	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 	CUSTOM_JOINTS_API void CalculateRollingResistance (dFloat topSpeed);
+
 
 	dVector m_tireLoad;
 	dVector m_lateralForce;
