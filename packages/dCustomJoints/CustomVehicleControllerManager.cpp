@@ -622,20 +622,40 @@ void CustomVehicleController::DrawSchematic (dFloat scale) const
 	floorMatrix[2][1] = scale;
 	floorMatrix[2][2] = 0.0f;;
 
-	int count = 0;
 	dVector array [32];
 	dMatrix worldToComMatrix ((m_chassisState.GetLocalMatrix() * m_chassisState.GetMatrix()).Inverse() * floorMatrix);
 
+	dVector p0 (1.0e10f, 1.0e10f, 1.0e10f, 0.0f);
+	dVector p1 (-1.0e10f, -1.0e10f, -1.0e10f, 0.0f);
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 	for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		dMatrix matrix (tire->CalculateGlobalMatrix());
+		dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
 		dVector p (worldToComMatrix.TransformVector(matrix.m_posit));
-		array[count] = p;
-		count ++;
+		p0 = dVector (dMin (p.m_x, p0.m_x), dMin (p.m_y, p0.m_y), dMin (p.m_z, p0.m_z), 1.0f);
+		p1 = dVector (dMax (p.m_x, p1.m_x), dMax (p.m_y, p1.m_y), dMax (p.m_z, p1.m_z), 1.0f);
 	}
 
-	manager->DrawSchematicCallback(this, "chassiFloor", 0, 4, array);
+	array[0] = dVector (p0.m_x, p0.m_y, p0.m_z, 1.0f);
+	array[1] = dVector (p1.m_x, p0.m_y, p0.m_z, 1.0f);
+	array[2] = dVector (p1.m_x, p1.m_y, p0.m_z, 1.0f);
+	array[3] = dVector (p0.m_x, p1.m_y, p0.m_z, 1.0f);
+	manager->DrawSchematicCallback(this, "chassis", 0, 4, array);
+
+	for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+
+		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+
+		dFloat width = tire->m_width * 0.5f;
+		dFloat radio = tire->m_radio;
+		dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
+
+		array[0] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector ( width, 0.0f,  radio, 0.0f)));
+		array[1] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector ( width, 0.0f, -radio, 0.0f)));
+		array[2] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector (-width, 0.0f, -radio, 0.0f)));
+		array[3] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector (-width, 0.0f,  radio, 0.0f)));
+		manager->DrawSchematicCallback(this, "tire", 0, 4, array);
+	}
 	
 /*
 	glLineWidth(3.0f);

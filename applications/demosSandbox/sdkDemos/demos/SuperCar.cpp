@@ -979,73 +979,61 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	}
 
 
-	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
+	void RenderVehicleSchematic (DemoEntityManager* const scene) const
 	{
-
-
-		// draw the player physics model
-		if (m_drawShematic) {
-
-			dMatrix origin (dGetIdentityMatrix());
-			origin.m_posit = dVector(400, 400, 0.0f, 1.0f);
-
-			glPushMatrix();
-			glMultMatrix (&origin[0][0]);
-			DrawSchematic (m_player->m_controller, 50.0f);
-			glPopMatrix();
-		}
-		m_drawShematic = false;
-
-
-		// set to transparent color
-		glEnable (GL_BLEND);
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		if (m_player) {
-			CustomVehicleControllerComponentEngine* const engine = m_player->m_controller->GetEngine();
-			if (engine) {
-				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-				dFloat width = scene->GetWidth();
-				//dFloat height = scene->getHeight();
-				dFloat gageSize = 200.0f;
-
-				//dFloat y = -height / 2.0f + gageSize / 2.0f + 60.0f;
-				dFloat y = gageSize / 2.0f + 60.0f;
-
-				// draw the tachometer
-				dFloat x = gageSize / 2 + 80.0f;
-				dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
-				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
-
-				// draw the odometer
-				x = width - gageSize / 2 - 80.0f;
-				dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
-				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
-				DrawGear(speed, x, y, m_player->m_gearMap[engine->GetGear()], gageSize);
-			}
-		}
-
-		//print controllers help 
-		DrawHelp(scene, lineNumber);
-
-		// restore color and blend mode
+		glDisable(GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_DEPTH_TEST);
 		glDisable (GL_BLEND);
+
+		dFloat scale = 100.0f;
+		dFloat width = scene->GetWidth();
+		dFloat height = scene->GetHeight();
+
+		dMatrix origin (dGetIdentityMatrix());
+		origin.m_posit = dVector(width - 300, height - 200, 0.0f, 1.0f);
+
+		glPushMatrix();
+		glMultMatrix (&origin[0][0]);
+		DrawSchematic (m_player->m_controller, scale);
+		glPopMatrix();
+
+		glLineWidth(1.0f);
+		glEnable(GL_TEXTURE_2D);
 	}
 
 
 	void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
 	{
-glLineWidth(3.0f);
-		glBegin(GL_LINES);
-		dVector p0 (lines[pointCount - 1]);
-		for (int i = 0; i < pointCount; i ++) {
-			dVector p1 (lines[i]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
-			p0 = p1;
+		if (!strcmp (partName, "chassis")) {
+			glLineWidth(3.0f);
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0 (lines[pointCount - 1]);
+			for (int i = 0; i < pointCount; i ++) {
+				dVector p1 (lines[i]);
+				glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+				glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+				p0 = p1;
+			}
+			glEnd();
 		}
-glEnd();
-		glLineWidth(1.0f);
+
+		if (!strcmp (partName, "tire")) {
+			glLineWidth(2.0f);
+			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0 (lines[pointCount - 1]);
+			for (int i = 0; i < pointCount; i ++) {
+				dVector p1 (lines[i]);
+				glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+				glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+				p0 = p1;
+			}
+			glEnd();
+		}
+
+
 /*
 		glLineWidth(3.0f);
 		glBegin(GL_LINES);
@@ -1105,6 +1093,52 @@ glEnd();
 */
 //		glEnd();
 	}
+
+
+
+	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
+	{
+		// draw the player physics model
+		if (m_drawShematic) {
+			RenderVehicleSchematic (scene);
+		}
+		m_drawShematic = false;
+
+		// set to transparent color
+		glEnable (GL_BLEND);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		if (m_player) {
+			CustomVehicleControllerComponentEngine* const engine = m_player->m_controller->GetEngine();
+			if (engine) {
+				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+				dFloat width = scene->GetWidth();
+				//dFloat height = scene->getHeight();
+				dFloat gageSize = 200.0f;
+
+				//dFloat y = -height / 2.0f + gageSize / 2.0f + 60.0f;
+				dFloat y = gageSize / 2.0f + 60.0f;
+
+				// draw the tachometer
+				dFloat x = gageSize / 2 + 80.0f;
+				dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
+				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
+
+				// draw the odometer
+				x = width - gageSize / 2 - 80.0f;
+				dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
+				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
+				DrawGear(speed, x, y, m_player->m_gearMap[engine->GetGear()], gageSize);
+			}
+		}
+
+		//print controllers help 
+		DrawHelp(scene, lineNumber);
+
+		// restore color and blend mode
+		glDisable (GL_BLEND);
+	}
+
 
 
 	void SetAsPlayer (SuperCarEntity* const player)
