@@ -1033,6 +1033,16 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glEnd();
 		}
 
+		if (!strcmp (partName, "velocity")) {
+			glLineWidth(2.0f);
+			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0 (lines[0]);
+			dVector p1 (lines[1]);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glEnd();
+		}
 
 /*
 		glLineWidth(3.0f);

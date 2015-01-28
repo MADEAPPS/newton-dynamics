@@ -612,76 +612,75 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void CustomVehicleController::DrawSchematic (dFloat scale) const
 {
-//	const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
-//	dFloat scale = -4.0f / (chassis.GetMass() * DEMO_GRAVITY);
-//	dVector p0 (m_chassisState.GetCenterOfMass());
-
-	dMatrix floorMatrix (dGetIdentityMatrix());
-	floorMatrix[0][0] = scale;
-	floorMatrix[1][1] = 0.0f;
-	floorMatrix[2][1] = scale;
-	floorMatrix[2][2] = 0.0f;;
-
 	dVector array [32];
-	dMatrix worldToComMatrix ((m_chassisState.GetLocalMatrix() * m_chassisState.GetMatrix()).Inverse() * floorMatrix);
 
-	dVector p0 (1.0e10f, 1.0e10f, 1.0e10f, 0.0f);
-	dVector p1 (-1.0e10f, -1.0e10f, -1.0e10f, 0.0f);
+	dMatrix projectionMatrix (dGetIdentityMatrix());
+	projectionMatrix[0][0] = scale;
+	projectionMatrix[1][1] = 0.0f;
+	projectionMatrix[2][1] = scale;
+	projectionMatrix[2][2] = 0.0f;
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
-	for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
-		dVector p (worldToComMatrix.TransformVector(matrix.m_posit));
-		p0 = dVector (dMin (p.m_x, p0.m_x), dMin (p.m_y, p0.m_y), dMin (p.m_z, p0.m_z), 1.0f);
-		p1 = dVector (dMax (p.m_x, p1.m_x), dMax (p.m_y, p1.m_y), dMax (p.m_z, p1.m_z), 1.0f);
+	const dMatrix& chassisMatrix = m_chassisState.GetMatrix();
+	const dMatrix& chassisFrameMatrix = m_chassisState.GetLocalMatrix();
+	dMatrix worldToComMatrix ((chassisFrameMatrix * chassisMatrix).Inverse() * projectionMatrix);
+
+	{
+		// draw vehicle chassis
+		dVector p0 (1.0e10f, 1.0e10f, 1.0e10f, 0.0f);
+		dVector p1 (-1.0e10f, -1.0e10f, -1.0e10f, 0.0f);
+		
+		for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+			dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
+			dVector p (worldToComMatrix.TransformVector(matrix.m_posit));
+			p0 = dVector (dMin (p.m_x, p0.m_x), dMin (p.m_y, p0.m_y), dMin (p.m_z, p0.m_z), 1.0f);
+			p1 = dVector (dMax (p.m_x, p1.m_x), dMax (p.m_y, p1.m_y), dMax (p.m_z, p1.m_z), 1.0f);
+		}
+
+		array[0] = dVector (p0.m_x, p0.m_y, p0.m_z, 1.0f);
+		array[1] = dVector (p1.m_x, p0.m_y, p0.m_z, 1.0f);
+		array[2] = dVector (p1.m_x, p1.m_y, p0.m_z, 1.0f);
+		array[3] = dVector (p0.m_x, p1.m_y, p0.m_z, 1.0f);
+		manager->DrawSchematicCallback(this, "chassis", 0, 4, array);
 	}
 
-	array[0] = dVector (p0.m_x, p0.m_y, p0.m_z, 1.0f);
-	array[1] = dVector (p1.m_x, p0.m_y, p0.m_z, 1.0f);
-	array[2] = dVector (p1.m_x, p1.m_y, p0.m_z, 1.0f);
-	array[3] = dVector (p0.m_x, p1.m_y, p0.m_z, 1.0f);
-	manager->DrawSchematicCallback(this, "chassis", 0, 4, array);
+	{
+		// draw vehicle tires
+		for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 
-	for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
 
-		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+			dFloat width = tire->m_width * 0.5f;
+			dFloat radio = tire->m_radio;
+			dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
 
-		dFloat width = tire->m_width * 0.5f;
-		dFloat radio = tire->m_radio;
-		dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
-
-		array[0] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector ( width, 0.0f,  radio, 0.0f)));
-		array[1] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector ( width, 0.0f, -radio, 0.0f)));
-		array[2] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector (-width, 0.0f, -radio, 0.0f)));
-		array[3] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector (-width, 0.0f,  radio, 0.0f)));
-		manager->DrawSchematicCallback(this, "tire", 0, 4, array);
+			array[0] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector ( width, 0.0f,  radio, 0.0f)));
+			array[1] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector ( width, 0.0f, -radio, 0.0f)));
+			array[2] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector (-width, 0.0f, -radio, 0.0f)));
+			array[3] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector (-width, 0.0f,  radio, 0.0f)));
+			manager->DrawSchematicCallback(this, "tire", 0, 4, array);
+		}
 	}
-	
-/*
-	glLineWidth(3.0f);
-	glBegin(GL_LINES);
+
+	{
+		// draw vehicle velocity
+		dVector veloc;
+		NewtonBodyGetVelocity(GetBody(), &veloc[0]);
+		dVector veloc1 (m_chassisState.GetVelocity());
+		dVector localVelocity (chassisFrameMatrix.UnrotateVector (chassisMatrix.UnrotateVector (veloc)));
+		localVelocity.m_y = 0.0f;
+
+//dTrace (("%f %f %f\n", localVelocity[0], localVelocity[1], localVelocity[2] ));
+		localVelocity = projectionMatrix.RotateVector(localVelocity);
+
+		array[0] = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+		array[1] = localVelocity.Scale (0.25f);
+		manager->DrawSchematicCallback(this, "velocity", 0, 2, array);
+
+	}
 
 
-	// draw vehicle weight at the center of mass
-	dFloat lenght = scale * chassis.GetMass() * DEMO_GRAVITY;
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-	glVertex3f (p0.m_x, p0.m_y - lenght, p0.m_z);
 
-	// draw vehicle front dir
-	glColor3f(1.0f, 1.0f, 1.0f);
-	dVector r0 (p0 + chassis.GetMatrix()[1].Scale (0.5f));
-	dVector r1 (r0 + chassis.GetMatrix()[0].Scale (1.0f));
-	glVertex3f (r0.m_x, r0.m_y, r0.m_z);
-	glVertex3f (r1.m_x, r1.m_y, r1.m_z);
 
-	// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
-	dVector veloc;
-	NewtonBodyGetVelocity(body, &veloc[0]);
-	dVector q0 (p0 + chassis.GetMatrix()[1].Scale (1.0f));
-	dVector q1 (q0 + veloc.Scale (0.25f));
-	glColor3f(1.0f, 1.0f, 0.0f);
-	glVertex3f (q0.m_x, q0.m_y, q0.m_z);
-	glVertex3f (q1.m_x, q1.m_y, q1.m_z);
-*/
+
 }
