@@ -804,13 +804,15 @@ void CustomVehicleControllerComponentEngine::Update (dFloat timestep)
 	gearBox->Update (timestep);
 
 	int gear = gearBox->GetGear();
-//dTrace (("%d\n", gear));
-//if (gear > (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear))
+
+#ifdef  __TEST_VEHICLE_XXX__
+if (gear > (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear))
 {
-	//gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear);
+	gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear);
 //	gearBox->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_reverseGear);
-//	gear = gearBox->GetGear();
+	gear = gearBox->GetGear();
 }
+#endif
 
 	
 	if (m_engineSwitch) {

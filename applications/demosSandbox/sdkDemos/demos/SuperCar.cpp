@@ -318,7 +318,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat radius;
 
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (0.35f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
+		m_controller->SetCenterOfGravity (dVector (0.0f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
 
 		// add front axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
@@ -539,6 +539,10 @@ class SuperCarEntity: public DemoEntity
 			// get the steering input
 			steeringVal = (dFloat (mainWindow->GetKeyState ('A')) - dFloat (mainWindow->GetKeyState ('D')));
 
+#ifdef  __TEST_VEHICLE_XXX__
+steeringVal *= 0.3f;
+#endif
+
 /*
 			// check for gear change (note key code for '>' = '.' and key code for '<' == ',')
 			gear += int (m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int (m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
@@ -562,8 +566,8 @@ class SuperCarEntity: public DemoEntity
 		// check transmission type
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 0
-	#if 0
+#if 1
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
@@ -1021,7 +1025,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 		if (!strcmp (partName, "tire")) {
 			glLineWidth(2.0f);
-			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+			glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 			glBegin(GL_LINES);
 			dVector p0 (lines[pointCount - 1]);
 			for (int i = 0; i < pointCount; i ++) {
@@ -1034,6 +1038,17 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		}
 
 		if (!strcmp (partName, "velocity")) {
+			glLineWidth(2.0f);
+			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0 (lines[0]);
+			dVector p1 (lines[1]);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glEnd();
+		}
+
+		if (!strcmp (partName, "lateralForce")) {
 			glLineWidth(2.0f);
 			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 			glBegin(GL_LINES);

@@ -664,23 +664,70 @@ void CustomVehicleController::DrawSchematic (dFloat scale) const
 
 	{
 		// draw vehicle velocity
-		dVector veloc;
-		NewtonBodyGetVelocity(GetBody(), &veloc[0]);
-		dVector veloc1 (m_chassisState.GetVelocity());
+		//dVector veloc1;
+		//NewtonBodyGetVelocity(GetBody(), &veloc[0]);
+		dVector veloc (m_chassisState.GetVelocity());
+//dVector xxx (veloc1 - veloc);
+//dAssert (dAbs(xxx % xxx) < 1.0e-3f);
+
 		dVector localVelocity (chassisFrameMatrix.UnrotateVector (chassisMatrix.UnrotateVector (veloc)));
 		localVelocity.m_y = 0.0f;
 
-//dTrace (("%f %f %f\n", localVelocity[0], localVelocity[1], localVelocity[2] ));
 		localVelocity = projectionMatrix.RotateVector(localVelocity);
 
 		array[0] = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 		array[1] = localVelocity.Scale (0.25f);
 		manager->DrawSchematicCallback(this, "velocity", 0, 2, array);
-
 	}
 
 
+	{
 
+		dFloat scale (2.0f / (m_chassisState.GetMass() * m_chassisState.m_gravityMag));
+		// draw vehicle forces
+		for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 
+			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
+			//dVector p0 (tire->GetCenterOfMass());
+			dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
 
+//dTrace (("(%f %f %f) (%f %f %f)\n", p0.m_x, p0.m_y, p0.m_z, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z ));
+			dVector origin (worldToComMatrix.TransformVector(matrix.m_posit));
+
+			dVector lateralForce (chassisFrameMatrix.UnrotateVector(chassisMatrix.UnrotateVector(tire->GetLateralForce())));
+			lateralForce = lateralForce.Scale (-scale);
+			lateralForce = projectionMatrix.RotateVector (lateralForce);
+//dTrace (("(%f %f %f)\n", lateralForce.m_x, lateralForce.m_y, lateralForce.m_z ));
+
+			array[0] = origin;
+			array[1] = origin + lateralForce;
+			manager->DrawSchematicCallback(this, "lateralForce", 0, 2, array);
+
+//			dVector p2 (p0 - tire->GetLateralForce().Scale (scale));
+
+/*
+			// offset the origin of of tire force so that they are visible
+			const dMatrix& tireMatrix = tire.GetLocalMatrix ();
+			p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.25f);
+
+			// draw the tire load 
+			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));
+			glColor3f (0.0f, 0.0f, 1.0f);
+			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+
+			// show tire lateral force
+			dVector p2 (p0 - tire.GetLateralForce().Scale (scale));
+			glColor3f(1.0f, 0.0f, 0.0f);
+			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f (p2.m_x, p2.m_y, p2.m_z);
+
+			// show tire longitudinal force
+			dVector p3 (p0 - tire.GetLongitudinalForce().Scale (scale));
+			glColor3f(0.0f, 1.0f, 0.0f);
+			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
+*/
+		}
+	}
 }
