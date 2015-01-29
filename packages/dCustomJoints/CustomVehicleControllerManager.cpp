@@ -703,6 +703,17 @@ void CustomVehicleController::DrawSchematic (dFloat scale) const
 			array[1] = origin + lateralForce;
 			manager->DrawSchematicCallback(this, "lateralForce", 0, 2, array);
 
+
+			dVector longitudinalForce (chassisFrameMatrix.UnrotateVector(chassisMatrix.UnrotateVector(tire->GetLongitudinalForce())));
+			longitudinalForce = longitudinalForce.Scale (-scale);
+			longitudinalForce = projectionMatrix.RotateVector (longitudinalForce);
+			//dTrace (("(%f %f %f)\n", lateralForce.m_x, lateralForce.m_y, lateralForce.m_z ));
+
+			array[0] = origin;
+			array[1] = origin + longitudinalForce;
+			manager->DrawSchematicCallback(this, "longitudinalForce", 0, 2, array);
+
+
 //			dVector p2 (p0 - tire->GetLateralForce().Scale (scale));
 
 /*

@@ -1059,64 +1059,16 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glEnd();
 		}
 
-/*
-		glLineWidth(3.0f);
-		glBegin(GL_LINES);
-
-
-		// draw vehicle weight at the center of mass
-		dFloat lenght = scale * chassis.GetMass() * DEMO_GRAVITY;
-		glColor3f(0.0f, 0.0f, 1.0f);
-		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-		glVertex3f (p0.m_x, p0.m_y - lenght, p0.m_z);
-
-		// draw vehicle front dir
-		glColor3f(1.0f, 1.0f, 1.0f);
-		dVector r0 (p0 + chassis.GetMatrix()[1].Scale (0.5f));
-		dVector r1 (r0 + chassis.GetMatrix()[0].Scale (1.0f));
-		glVertex3f (r0.m_x, r0.m_y, r0.m_z);
-		glVertex3f (r1.m_x, r1.m_y, r1.m_z);
-
-		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
-		dVector veloc;
-		NewtonBodyGetVelocity(body, &veloc[0]);
-		dVector q0 (p0 + chassis.GetMatrix()[1].Scale (1.0f));
-		dVector q1 (q0 + veloc.Scale (0.25f));
-		glColor3f(1.0f, 1.0f, 0.0f);
-		glVertex3f (q0.m_x, q0.m_y, q0.m_z);
-		glVertex3f (q1.m_x, q1.m_y, q1.m_z);
-
-		for (CustomVehicleControllerBodyStateTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			const CustomVehicleControllerBodyStateTire& tire = *node;
-			dVector p0 (tire.GetCenterOfMass());
-
-			// offset the origin of of tire force so that they are visible
-			const dMatrix& tireMatrix = tire.GetLocalMatrix ();
-			p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.25f);
-
-			// draw the tire load 
-			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));
-			glColor3f (0.0f, 0.0f, 1.0f);
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
-
-			// show tire lateral force
-			dVector p2 (p0 - tire.GetLateralForce().Scale (scale));
-			glColor3f(1.0f, 0.0f, 0.0f);
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f (p2.m_x, p2.m_y, p2.m_z);
-
-			// show tire longitudinal force
-			dVector p3 (p0 - tire.GetLongitudinalForce().Scale (scale));
-			glColor3f(0.0f, 1.0f, 0.0f);
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
+		if (!strcmp (partName, "longitudinalForce")) {
+			glLineWidth(2.0f);
+			glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0 (lines[0]);
+			dVector p1 (lines[1]);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glEnd();
 		}
-		glEnd();
-
-		glLineWidth(1.0f);
-*/
-//		glEnd();
 	}
 
 
