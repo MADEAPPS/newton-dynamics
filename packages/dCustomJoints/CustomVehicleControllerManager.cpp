@@ -195,15 +195,16 @@ class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconj
 
 	virtual void MatrixTimeVector (dFloat64* const out, const dFloat64* const v) const
 	{
-		dComplemtaritySolver::dJacobian invMassJacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
+		dComplemtaritySolver::dJacobian invMassJacobians;
+		invMassJacobians.m_linear = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+		invMassJacobians.m_angular = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 		for (int i = 0; i < m_count; i ++) {
-			out[i] = m_diagRegularizer[i] * v[i];
-			invMassJacobians[i].m_linear = m_invMassJacobians[i].m_linear.Scale (dFloat(v[i]));
-			invMassJacobians[i].m_angular = m_invMassJacobians[i].m_angular.Scale (dFloat(v[i]));
+			invMassJacobians.m_linear += m_invMassJacobians[i].m_linear.Scale (dFloat(v[i]));
+			invMassJacobians.m_angular += m_invMassJacobians[i].m_angular.Scale (dFloat(v[i]));
 		}
 
 		for (int i = 0; i < m_count; i ++) {
-			out[i] = invMassJacobians[i].m_linear % m_jacobians[i].m_linear + invMassJacobians[i].m_angular % m_jacobians[i].m_angular;
+			out[i] = m_diagRegularizer[i] * v[i] + invMassJacobians.m_linear % m_jacobians[i].m_linear + invMassJacobians.m_angular % m_jacobians[i].m_angular;
 		}
 	}
 
@@ -323,6 +324,7 @@ void CustomVehicleController::Init (NewtonBody* const body, const dMatrix& vehic
 
 	// initialize vehicle internal components
 	NewtonBodyGetCentreOfMass (m_body, &m_chassisState.m_com[0]);
+	m_chassisState.m_com.m_w = 0.0f;
 	m_chassisState.m_comOffset = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_chassisState.m_gravity = gravityVector;

@@ -49,15 +49,6 @@ dFloat64 dSymmetricBiconjugateGradientSolve::DotProduct (int size, const dFloat6
 
 dFloat64 dSymmetricBiconjugateGradientSolve::Solve (int size, dFloat64 tolerance, dFloat64* const x, const dFloat64* const b) const
 {
-//	dgStack<dFloat64> bufferR0(size);
-//	dgStack<dFloat64> bufferP0(size);
-//	dgStack<dFloat64> matrixTimesP0(size);
-//	dgStack<dFloat64> bufferConditionerInverseTimesR0(size);
-//	dFloat64* const r0 = &bufferR0[0];
-//	dFloat64* const p0 = &bufferP0[0];
-//	dFloat64* const MinvR0 = &bufferConditionerInverseTimesR0[0];
-//	dFloat64* const matrixP0 = &matrixTimesP0[0];
-
 	dFloat64* const r0 = new dFloat64 [size];
 	dFloat64* const p0 = new dFloat64 [size];
 	dFloat64* const MinvR0 = new dFloat64 [size];

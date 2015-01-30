@@ -601,11 +601,15 @@ steeringVal *= 0.3f;
 			if (!m_engineOldKeyState && key) {
 				// play the start engine sound
 				dSoundManager* const soundManager = scene->GetSoundManager();
-				soundManager->PlayChannel(startEngineSoundHandle);
+				if (soundManager) {
+					soundManager->PlayChannel(startEngineSoundHandle);
+				}
 				engine->SetKey (true);
 			} else if (m_engineOldKeyState && !key) {
 				dSoundManager* const soundManager = scene->GetSoundManager();
-				soundManager->StopChannel(startEngineSoundHandle);
+				if (soundManager) {
+					soundManager->StopChannel(startEngineSoundHandle);
+				}
 				engine->SetKey (false);
 			}
 			m_engineOldKeyState = key;
@@ -719,7 +723,9 @@ steeringVal *= 0.3f;
 
 			// play the start engine sound
 			dSoundManager* const soundManager = scene->GetSoundManager();
-			soundManager->PlayChannel(startEngineSoundHandle);
+			if (soundManager) {
+				soundManager->PlayChannel(startEngineSoundHandle);
+			}
 		}
 		
 		
@@ -873,11 +879,13 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		// create the vehicle sound 
 		const char* engineSounds[] = {"starter.wav", "tire_skid.wav", "revLow.wav", "revMiddle.wav", "revHigh.wav"};
 		dSoundManager* const soundManager = scene->GetSoundManager();
-		for (int i = 0; i < int (sizeof (engineSounds) / sizeof (engineSounds[0])); i ++) {
-			void* const sound = soundManager->CreateSound(engineSounds[i]);
-			void* const channel = soundManager->CreatePlayChannel(sound);
-			m_engineSounds[i] = channel;
-			m_soundsCount ++;
+		if (soundManager) {
+			for (int i = 0; i < int (sizeof (engineSounds) / sizeof (engineSounds[0])); i ++) {
+				void* const sound = soundManager->CreateSound(engineSounds[i]);
+				void* const channel = soundManager->CreatePlayChannel(sound);
+				m_engineSounds[i] = channel;
+				m_soundsCount ++;
+			}
 		}
 	}
 
@@ -1134,8 +1142,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		// set the help key
 		m_helpKey.UpdatePushButton (scene->GetRootWindow(), 'H');
 
-
-		dSoundManager* const soundManager = scene->GetSoundManager();
+		
 		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
 			CustomVehicleController* const controller = &ptr->GetInfo();
 		
@@ -1150,54 +1157,57 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 				vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath, m_engineSounds[0]);
 			}
 
-			CustomVehicleControllerComponentEngine* const engine = vehicleEntity->m_controller->GetEngine();
-			if (engine && engine->GetKey()) {
-				// see if the player started the engine
-				for (int i = 2; i < m_soundsCount; i ++) {
-					void* const rpmEngine = m_engineSounds[i];
-					soundManager->PlayChannel(rpmEngine);
-					soundManager->SetChannelPitch (rpmEngine, 1.0f);
-					soundManager->SetChannelVolume(rpmEngine, 0.0f);
-					soundManager->SetChannelLoopMode(rpmEngine, true);
-				}
-
-				// player need to check if the start engine sound is still on
-				void* const startEngine = m_engineSounds[0];
-				void* const startEngineSoundAsset = soundManager->GetAsset(startEngine);
-				dFloat length = soundManager->GetSoundlength (startEngineSoundAsset);
-				dFloat posit = soundManager->GetChannelGetPosition(startEngine);
-				
-				if (posit >= length * 0.7f) {
-					// attenuate star engine volume 
-					dFloat volume = soundManager->GetChannelVolume(startEngine);
-					if (volume < 1.0e-3f) {
-						volume = 0.0f;
+			dSoundManager* const soundManager = scene->GetSoundManager();
+			if (soundManager) {
+				CustomVehicleControllerComponentEngine* const engine = vehicleEntity->m_controller->GetEngine();
+				if (engine && engine->GetKey()) {
+					// see if the player started the engine
+					for (int i = 2; i < m_soundsCount; i ++) {
+						void* const rpmEngine = m_engineSounds[i];
+						soundManager->PlayChannel(rpmEngine);
+						soundManager->SetChannelPitch (rpmEngine, 1.0f);
+						soundManager->SetChannelVolume(rpmEngine, 0.0f);
+						soundManager->SetChannelLoopMode(rpmEngine, true);
 					}
-					soundManager->SetChannelVolume(startEngine, volume * 0.95f);
-					vehicleEntity->m_engineRPMOn = true;
-				}
 
-				// update engine rpm sound for all vehicles
-				if (vehicleEntity->m_engineRPMOn) {
-					int count = m_soundsCount - 3;
-					//dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
-					dFloat rpm = count * (dClamp (engine->GetRPM () / engine->GetRedLineRPM(), 0.0f, 0.999f));
+					// player need to check if the start engine sound is still on
+					void* const startEngine = m_engineSounds[0];
+					void* const startEngineSoundAsset = soundManager->GetAsset(startEngine);
+					dFloat length = soundManager->GetSoundlength (startEngineSoundAsset);
+					dFloat posit = soundManager->GetChannelGetPosition(startEngine);
+				
+					if (posit >= length * 0.7f) {
+						// attenuate star engine volume 
+						dFloat volume = soundManager->GetChannelVolume(startEngine);
+						if (volume < 1.0e-3f) {
+							volume = 0.0f;
+						}
+						soundManager->SetChannelVolume(startEngine, volume * 0.95f);
+						vehicleEntity->m_engineRPMOn = true;
+					}
 
-					int index = dFloor(rpm);
-					rpm = dClamp (rpm - dFloat(index), 0.0f, 1.0f);
-					dAssert (index >= 0);
-					dAssert (index < count);
-					soundManager->SetChannelVolume(m_engineSounds[index + 2], 1.0f - rpm);
-					soundManager->SetChannelPitch (m_engineSounds[index + 2], rpm + 1.0f);
+					// update engine rpm sound for all vehicles
+					if (vehicleEntity->m_engineRPMOn) {
+						int count = m_soundsCount - 3;
+						//dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
+						dFloat rpm = count * (dClamp (engine->GetRPM () / engine->GetRedLineRPM(), 0.0f, 0.999f));
 
-					soundManager->SetChannelVolume(m_engineSounds[index + 3], rpm);
-					soundManager->SetChannelPitch (m_engineSounds[index + 3], rpm * 0.5f + 0.5f);
-				}
-			} else {
-				vehicleEntity->m_engineRPMOn = false;
-				for (int i = 0; i < m_soundsCount; i ++) {
-					soundManager->SetChannelVolume(m_engineSounds[i], 0.0f);
-					soundManager->StopChannel(m_engineSounds[i]);
+						int index = dFloor(rpm);
+						rpm = dClamp (rpm - dFloat(index), 0.0f, 1.0f);
+						dAssert (index >= 0);
+						dAssert (index < count);
+						soundManager->SetChannelVolume(m_engineSounds[index + 2], 1.0f - rpm);
+						soundManager->SetChannelPitch (m_engineSounds[index + 2], rpm + 1.0f);
+
+						soundManager->SetChannelVolume(m_engineSounds[index + 3], rpm);
+						soundManager->SetChannelPitch (m_engineSounds[index + 3], rpm * 0.5f + 0.5f);
+					}
+				} else {
+					vehicleEntity->m_engineRPMOn = false;
+					for (int i = 0; i < m_soundsCount; i ++) {
+						soundManager->SetChannelVolume(m_engineSounds[i], 0.0f);
+						soundManager->StopChannel(m_engineSounds[i]);
+					}
 				}
 			}
 		}
