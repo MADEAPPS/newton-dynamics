@@ -319,7 +319,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 				// basically it replaces the Pajecka equation a series expansions 
 				// f = x - |x| * x / 3 + x * x * x / 27
 				// m = x - |x| * x + x * x * x / 3 + x * x * x * x / 27
-				dFloat tireForceCoef = dMin (K * (1.0f - K / 3.0f + K * K / 27.0f), 1.5f);
+				dFloat tireForceCoef = dMin (K * (1.0f - K / 3.0f + K * K / 27.0f), 1.0f);
 
 				dFloat nu = 1.0f;
 				if (K < 2.0f * 3.141592f) {
