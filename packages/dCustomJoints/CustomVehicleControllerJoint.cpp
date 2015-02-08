@@ -316,7 +316,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 
 				// now use the friction curve approximation 
 				// http://www.ricblues.nl/techniek/Technisch%20Specialist%2093430/6%20Remgedrag%20ABS%20weggedrag/Carsim%20-%20remsimulatieprogramma/Handleiding%20carsim.pdf
-				// basically it replaces the Pajecka equation a series expansions 
+				// basically it replaces Pajecka equation with a series expansion 
 				// f = x - |x| * x / 3 + x * x * x / 27
 				// m = x - |x| * x + x * x * x / 3 + x * x * x * x / 27
 				dFloat tireForceCoef = dMin (K * (1.0f - K / 3.0f + K * K / 27.0f), 1.5f);

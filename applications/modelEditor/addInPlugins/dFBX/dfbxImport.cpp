@@ -203,8 +203,12 @@ void dfbxImport::PopulateScene (FbxScene* const fbxScene, dPluginScene* const ng
 					break;
 				}
 
-
 				case FbxNodeAttribute::eNull:
+				{
+
+					break;
+				}
+				
 				case FbxNodeAttribute::eMarker:
 				case FbxNodeAttribute::eSkeleton: 
 				case FbxNodeAttribute::eNurbs: 
