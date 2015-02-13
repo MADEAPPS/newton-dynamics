@@ -388,6 +388,34 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	// get the collision shape
 	m_shape = NewtonCompoundCollisionGetCollisionFromNode (vehShape, tireShapeNode);
 
+	// update tire info
+	UpdateInfo (tireInfo);
+
+	// initialize the joints that connect this tire to other vehicle componets;
+	m_chassisJoint.Init(m_controller, &m_controller->m_chassisState, this);
+}
+
+void CustomVehicleControllerBodyStateTire::UpdateInfo(const TireCreationInfo& tireInfo)
+{
+	const dMatrix& vehicleFrame = m_controller->m_chassisState.m_localFrame;
+
+	// build a normalized size collision shape and scale to math the tire size, make it is also transparent to collision  
+	NewtonCollisionSetScale (m_controller->m_tireCastShape, tireInfo.m_width, tireInfo.m_radio, tireInfo.m_radio);
+	NewtonCollisionSetCollisionMode (m_controller->m_tireCastShape, 0);
+
+	// calculate the location of the tire matrix
+	m_localFrame = vehicleFrame * dYawMatrix(-3.141592f * 0.5f);
+	m_localFrame.m_posit = tireInfo.m_location + m_localFrame.m_up.Scale (tireInfo.m_suspesionlenght);
+	m_localFrame.m_posit.m_w = 1.0f;
+
+	// restore the cast shape transform to identity
+	dMatrix identMatrix (dGetIdentityMatrix());
+	NewtonCollisionSetCollisionMode (m_controller->m_tireCastShape, 1);
+	NewtonCollisionSetMatrix (m_controller->m_tireCastShape, &identMatrix[0][0]);
+
+	// get the collision shape
+	//m_shape = NewtonCompoundCollisionGetCollisionFromNode (vehShape, tireShapeNode);
+
 	// initialize all constants
 	m_userData = tireInfo.m_userData;
 	m_mass = dMax (tireInfo.m_mass, m_controller->m_chassisState.m_mass / 50.0f); 
@@ -411,31 +439,44 @@ void CustomVehicleControllerBodyStateTire::Init (CustomVehicleController* const 
 	m_restSprunMass = 0.0f;
 	m_dampingRatio = tireInfo.m_dampingRatio;
 	m_springStrength = tireInfo.m_springStrength;
-	m_suspensionlenght = tireInfo.m_suspesionlenght;
-	
+	m_suspensionLenght = tireInfo.m_suspesionlenght;
+
 	// initialize all local variables to default values
 	m_brakeTorque = 0.0f;
 	m_engineTorque = 0.0f;
 	m_rotationalSpeed = 0.0f;
 	m_rotationAngle = 0.0f;
 	m_steeringAngle = 0.0f;
-	
+
 	m_tireLoad = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_lateralForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_longitudinalForce = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_speed = 0.0f;
-	m_posit = m_suspensionlenght;
+	m_posit = m_suspensionLenght;
 	m_matrix = CalculateSteeringMatrix ();
 
 	m_lateralSlip = 0.0f;
 	m_longitudinalSlip = 0.0f;
 
 	UpdateInertia();
-
-	// initialize the joints that connect tghsi tire to other vehicle componets;
-	m_chassisJoint.Init(m_controller, &m_controller->m_chassisState, this);
 }
+
+void CustomVehicleControllerBodyStateTire::GetInfo(TireCreationInfo& tireInfo) const
+{
+	tireInfo.m_location = m_localFrame.m_posit;
+	tireInfo.m_mass = m_mass;
+	tireInfo.m_radio = m_radio;
+	tireInfo.m_width = m_width;
+	tireInfo.m_dampingRatio = m_dampingRatio;
+	tireInfo.m_springStrength = m_springStrength;
+	tireInfo.m_suspesionlenght = m_suspensionLenght;
+	tireInfo.m_lateralStiffness = m_lateralStiffness;
+	tireInfo.m_longitudialStiffness = m_longitudialStiffness;
+	tireInfo.m_aligningMomentTrail = m_aligningMomentTrail;
+	tireInfo.m_userData = m_userData;
+}
+
 
 void* CustomVehicleControllerBodyStateTire::GetUserData() const
 {
@@ -485,11 +526,11 @@ void CustomVehicleControllerBodyStateTire::Collide (CustomControllerConvexCastPr
 	m_posit = 0.0f;
 	m_speed = 0.0f;
 	dMatrix localMatrix (CustomVehicleControllerBodyStateTire::CalculateSteeringMatrix ());
-	m_posit = m_suspensionlenght;
+	m_posit = m_suspensionLenght;
 
 	dFloat hitParam;
 	dMatrix tireMatrix (localMatrix * controllerMatrix);
-	dVector rayDestination (tireMatrix.TransformVector(localMatrix.m_up.Scale(-m_suspensionlenght)));   
+	dVector rayDestination (tireMatrix.TransformVector(localMatrix.m_up.Scale(-m_suspensionLenght)));   
 
 	m_contactCount = 0;
 	NewtonWorldConvexCastReturnInfo contacts[4];
@@ -506,7 +547,7 @@ int xxx3 = NewtonWorldConvexCast (world, &xxxx0[0][0], &xxxx1[0], xxx, &hitParam
 	NewtonCollisionSetScale (m_controller->m_tireCastShape, m_width, m_radio, m_radio);
 	int contactCount = NewtonWorldConvexCast (world, &tireMatrix[0][0], &rayDestination[0], m_controller->m_tireCastShape, &hitParam, &filter, CustomControllerConvexCastPreFilter::Prefilter, contacts, sizeof (contacts) / sizeof (contacts[0]), threadId);
 	if (contactCount) {
-		m_posit = hitParam * m_suspensionlenght;
+		m_posit = hitParam * m_suspensionLenght;
 		m_speed = (posit0 - m_posit) * timestepInv;
 		for (int i = 1; i < contactCount; i ++) {
 			int j = i;
@@ -569,9 +610,9 @@ void CustomVehicleControllerBodyStateTire::UpdateDynamicInputs(dFloat timestep)
 
 	// calculate force an torque generate by the suspension
 	if (m_contactCount) {
-		dFloat distance = m_suspensionlenght - m_posit;
+		dFloat distance = m_suspensionLenght - m_posit;
 		dAssert (distance >= 0.0f);
-		dAssert (distance <= m_suspensionlenght);
+		dAssert (distance <= m_suspensionLenght);
 		if (distance <= dFloat(1.0e-3f)) {
 			// now calculate the tire load at the contact point, tire suspension distance also consider hard limit.
 			//dAssert (0);

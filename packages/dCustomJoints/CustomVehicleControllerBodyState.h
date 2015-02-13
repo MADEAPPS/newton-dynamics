@@ -139,6 +139,9 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 
 	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const TireCreationInfo& tireInfo);
 
+	CUSTOM_JOINTS_API void GetInfo(TireCreationInfo& tireInfo) const;
+	CUSTOM_JOINTS_API void UpdateInfo(const TireCreationInfo& tireInfo);
+
 	CUSTOM_JOINTS_API void* GetUserData() const;
 	CUSTOM_JOINTS_API dMatrix CalculateLocalMatrix () const;
 	CUSTOM_JOINTS_API dMatrix CalculateGlobalMatrix () const;
@@ -178,6 +181,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 		return m_longitudinalSlip;
 	}
 
+	
 
 	private:
 	CUSTOM_JOINTS_API void UpdateTransform ();
@@ -209,7 +213,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 	dFloat m_steeringAngle;
 	dFloat m_restSprunMass;
 	dFloat m_springStrength;
-	dFloat m_suspensionlenght;
+	dFloat m_suspensionLenght;
 	dFloat m_lateralStiffness;
 	dFloat m_maxAngularVelocity;
 	dFloat m_aligningMomentTrail;
