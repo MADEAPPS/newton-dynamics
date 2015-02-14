@@ -32,7 +32,7 @@ class dNewtonVehicleManager: public CustomVehicleControllerManager
 	class dNewtonVehicle: public dNewtonDynamicBody
 	{
 		public:
-		CNEWTON_API dNewtonVehicle (dNewtonVehicleManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir, dLong collisionMask);
+		CNEWTON_API dNewtonVehicle (dNewtonVehicleManager* const manager, const dNewtonCollision& collisiosnShape, void* const userData, const dFloat* const location);
 		CNEWTON_API ~dNewtonVehicle ();
 
 //		virtual void OnVehicleMove (dFloat timestep) = 0;
@@ -46,6 +46,8 @@ class dNewtonVehicleManager: public CustomVehicleControllerManager
 
 	CNEWTON_API dNewtonVehicleManager (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonVehicleManager ();
+
+	CNEWTON_API dNewton* GetWorld() const ;
 
 	CNEWTON_API dNewtonVehicle* GetFirstVehicle() const;
 	CNEWTON_API dNewtonVehicle* GetNextVehicle(const dNewtonVehicle* const Vehicle) const;

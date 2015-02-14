@@ -25,7 +25,7 @@
 #include "dNewtonCollision.h"
 #include "dNewtonVehicleManager.h"
 
-/*
+
 dNewtonVehicleManager::dNewtonVehicleManager (dNewton* const world)
 	:CustomVehicleControllerManager (world->GetNewton())
 {
@@ -35,6 +35,14 @@ dNewtonVehicleManager::~dNewtonVehicleManager ()
 {
 }
 
+dNewton* dNewtonVehicleManager::GetWorld() const 
+{
+	NewtonWorld* const workd = CustomVehicleControllerManager::GetWorld();
+
+	return (dNewton*) NewtonWorldGetUserData(workd);
+}
+
+/*
 dNewtonVehicleManager::dNewtonVehicle* dNewtonVehicleManager::GetFirstVehicle() const
 {
 	CustomListNode* const node = GetFirst();
@@ -62,11 +70,13 @@ void dNewtonVehicleManager::ApplyVehicleMove (CustomVehicleController* const con
 	dNewtonVehicle* const body = (dNewtonVehicle*) NewtonBodyGetUserData(controller->GetBody());
 	body->OnVehicleMove (timestep);
 }
+*/
 
-
-dNewtonVehicleManager::dNewtonVehicle::dNewtonVehicle (dNewtonVehicleManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir, dLong collisionMask)
-	:dNewtonKinematicBody()
+//dNewtonVehicleManager::dNewtonVehicle::dNewtonVehicle (dNewtonVehicleManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir, dLong collisionMask)
+dNewtonVehicleManager::dNewtonVehicle::dNewtonVehicle (dNewtonVehicleManager* const manager, const dNewtonCollision& collisionShape, void* const userData, const dFloat* const location)
+	:dNewtonDynamicBody(NULL)
 {
+/*
 	dMatrix VehicleAxis; 
 	VehicleAxis[0] = dVector (upDir); // the y axis is the character up vector
 	VehicleAxis[1] = dVector (frontDir); // the x axis is the character front direction
@@ -110,8 +120,9 @@ dNewtonVehicleManager::dNewtonVehicle::dNewtonVehicle (dNewtonVehicleManager* co
 				dAssert (0);
 		}
 	}
-
+*/
 }
+
 
 dNewtonVehicleManager::dNewtonVehicle::~dNewtonVehicle ()
 {
@@ -123,7 +134,7 @@ dNewtonVehicleManager::dNewtonVehicle::~dNewtonVehicle ()
 	}
 }
 
-
+/*
 void dNewtonVehicleManager::dNewtonVehicle::SetVehicleVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dFloat* const gravity, dFloat timestep)
 {
 	m_controller->SetVehicleVelocity (forwardSpeed, lateralSpeed, verticalSpeed, headingAngle, dVector(gravity), timestep);
