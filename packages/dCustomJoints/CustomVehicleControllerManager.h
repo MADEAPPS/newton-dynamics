@@ -32,7 +32,7 @@ class CustomVehicleControllerComponentEngine;
 class CustomVehicleControllerComponentSteering;
 
 
-#define __TEST_VEHICLE_XXX__
+//#define __TEST_VEHICLE_XXX__
 
 
 class CustomVehicleControllerTireCollisionFilter: public CustomControllerConvexCastPreFilter

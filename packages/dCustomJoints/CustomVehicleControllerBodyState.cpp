@@ -464,7 +464,7 @@ void CustomVehicleControllerBodyStateTire::UpdateInfo(const TireCreationInfo& ti
 
 void CustomVehicleControllerBodyStateTire::GetInfo(TireCreationInfo& tireInfo) const
 {
-	tireInfo.m_location = m_localFrame.m_posit;
+	tireInfo.m_location = m_localFrame.m_posit - m_localFrame.m_up.Scale (m_suspensionLenght);
 	tireInfo.m_mass = m_mass;
 	tireInfo.m_radio = m_radio;
 	tireInfo.m_width = m_width;

@@ -387,6 +387,29 @@ class BasicCarEntity: public DemoEntity
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
+
+
+/*
+		// test tire update interface
+		for (CustomVehicleControllerBodyStateTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			CustomVehicleControllerBodyStateTire& tire = *node;
+			CustomVehicleControllerBodyStateTire::TireCreationInfo tireInfo;
+			tire.GetInfo(tireInfo);
+			tireInfo.m_location.m_y += 0.1f;
+			tire.UpdateInfo(tireInfo);
+			tire.GetInfo(tireInfo);
+			tire.GetInfo(tireInfo);
+		}
+
+		m_controller->Finalize();
+
+		for (CustomVehicleControllerBodyStateTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			CustomVehicleControllerBodyStateTire& tire = *node;
+			CustomVehicleControllerBodyStateTire::TireCreationInfo tireInfo;
+			tire.GetInfo(tireInfo);
+			tire.GetInfo(tireInfo);
+		}
+*/
 	}
 
 	void ApplyPlayerControl ()
