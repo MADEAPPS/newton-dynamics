@@ -458,6 +458,7 @@ void CustomVehicleControllerBodyStateTire::UpdateInfo(const TireCreationInfo& ti
 
 	m_lateralSlip = 0.0f;
 	m_longitudinalSlip = 0.0f;
+	m_aligningTorque = 0.0f;
 
 	UpdateInertia();
 }

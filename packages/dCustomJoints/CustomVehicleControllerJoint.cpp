@@ -226,6 +226,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 
 	tire->m_lateralSlip = 0.0f;
 	tire->m_longitudinalSlip = 0.0f;
+	tire->m_aligningTorque = 0.0f;
 	if (tireLoad > 0.01f) {
 		dFloat restTireLoad = chassis.m_gravityMag * tire->m_restSprunMass;
 		for (int i = 0; i < m_contactCount; i ++) {
@@ -277,7 +278,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 						sideSlipAngle = (3.141592f * 90.0f / 180.0f) ;
 					}
 				}
-				tire->m_lateralSlip = sideSlipAngle * (1.0f / (3.141592f * 90.0f / 180.0f));
+				tire->m_lateralSlip = sideSlipAngle * (180.0f / (3.141592f * 90.0f));
 
 				// calculate longitudinal slip ratio 
 				dFloat longitudinalSlipRatio = 1.0f;
@@ -301,7 +302,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 				dFloat camberEffect = 0.0f;
 				dFloat longitudinalStiffness = tire->m_longitudialStiffness * chassis.m_gravityMag;
 				dFloat lateralStiffness = restTireLoad * tire->m_lateralStiffness * normalizedTireLoad;
-				dFloat Teff = dTan (sideSlipAngle - camberEffect);
+				dFloat Teff = dTan (sideSlipAngle * dSign (v) - camberEffect);
 
 				dFloat Fy0 = lateralStiffness * Teff;
 				dFloat Fx0 = longitudinalStiffness * longitudinalSlipRatio;
@@ -327,14 +328,14 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 					nu = 0.5f * (1.0f + lateralToLongitudinalRatio - (1.0f - lateralToLongitudinalRatio) * dCos (0.5f * K));
 				}
 			
-				dFloat f0 = tireLoadFriction / dSqrt (longitudinalSlipRatio * longitudinalSlipRatio + nu * Teff * nu * Teff);
+				dFloat f0 = tireLoadFriction / dSqrt (longitudinalSlipRatio * longitudinalSlipRatio + (nu * Teff) * (nu * Teff));
 				dFloat lateralForce = dAbs (nu * Teff * tireForceCoef * f0);
 				dFloat longitudinalForce = dAbs (longitudinalSlipRatio * tireForceCoef * f0);
 
 				// ignore the tire alignment torque for now
-				//dFloat k1 = dMin (K, 3.0f);
-				//dFloat tireMomentCoef = k1 * (1.0f - k1 + k1 * k1 / 3.0f - k1 * k1 * k1 / 27.0f);
-				//dFloat aligningMoment = nu * tire->m_aligningMomentTrail * Teff * tireMomentCoef * f0;
+				dFloat k1 = dMin (K, 3.0f);
+				dFloat tireMomentCoef = k1 * (1.0f - k1 + k1 * k1 / 3.0f - k1 * k1 * k1 / 27.0f);
+				tire->m_aligningTorque = nu * tire->m_aligningMomentTrail * Teff * tireMomentCoef * f0;
 				//chassis.m_externalTorque += upPin.Scale (aligningMoment);
 
 				// add a lateral force constraint row at the contact point

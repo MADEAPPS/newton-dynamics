@@ -181,6 +181,10 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 		return m_longitudinalSlip;
 	}
 
+	CUSTOM_JOINTS_API dFloat GetAligningTorque () const
+	{
+		return m_aligningTorque;
+	}
 	
 
 	private:
@@ -221,6 +225,7 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 
 	dFloat m_lateralSlip;
 	dFloat m_longitudinalSlip;
+	dFloat m_aligningTorque;
 	
 	void* m_userData;
 	NewtonCollision* m_shape;
