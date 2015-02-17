@@ -63,7 +63,10 @@ class CustomVehicleControllerBodyStateContact: public CustomVehicleControllerBod
 {
 	public:
 	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const NewtonBody* const body);
-	CUSTOM_JOINTS_API const NewtonBody* GetNewtonBody() const;
+	CUSTOM_JOINTS_API const NewtonBody* GetNewtonBody() const
+	{
+		return m_newtonBody;
+	}
 
 	private:
 	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
@@ -188,9 +191,24 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 		return m_aligningTorque;
 	}
 	
-	CUSTOM_JOINTS_API int GetContactCount() const;
-	CUSTOM_JOINTS_API const CustomVehicleControllerBodyStateContact* GetContactBody(int index) const;
-	CUSTOM_JOINTS_API const CustomVehicleControllerTireContactJoint* GetContactJoint(int index) const;
+	CUSTOM_JOINTS_API int GetContactCount() const
+	{
+		return m_contactCount;
+	}
+
+
+	CUSTOM_JOINTS_API const CustomVehicleControllerTireContactJoint* GetContactJoint(int index) const
+	{
+		return &m_contactJoint[index];
+	}
+
+	CUSTOM_JOINTS_API const CustomVehicleControllerBodyStateContact* GetContactBody(int index) const	
+	{
+		const CustomVehicleControllerTireContactJoint* const joint = GetContactJoint(index);
+		dAssert (index < m_contactCount);
+		dAssert (joint->m_state0 != this);
+		return (CustomVehicleControllerBodyStateContact*) joint->m_state0;
+	}
 
 
 	private:
