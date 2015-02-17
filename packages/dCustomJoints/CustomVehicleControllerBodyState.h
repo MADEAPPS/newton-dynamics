@@ -47,12 +47,12 @@ class CustomVehicleControllerBodyState: public dComplemtaritySolver::dBodyState
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerJoint;
 	friend class CustomVehicleControllerTireJoint;
-	friend class CustomVehicleControllerTireContactJoint;
 	friend class CustomVehicleControllerBodyStateTire;
 	friend class CustomVehicleControllerComponentBrake;
 	friend class CustomVehicleControllerEngineIdleJoint;
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerBodyStateChassis;
+	friend class CustomVehicleControllerTireContactJoint;
 	friend class CustomVehicleControllerComponentSteering;
 	friend class CustomVehicleControllerEngineDifferencialJoint;
 };
@@ -63,13 +63,15 @@ class CustomVehicleControllerBodyStateContact: public CustomVehicleControllerBod
 {
 	public:
 	CUSTOM_JOINTS_API void Init (CustomVehicleController* const controller, const NewtonBody* const body);
+	CUSTOM_JOINTS_API const NewtonBody* GetNewtonBody() const;
+
 	private:
 	CUSTOM_JOINTS_API virtual void ApplyNetForceAndTorque (dFloat invTimestep, const dVector& veloc, const dVector& omega);
 	CUSTOM_JOINTS_API void UpdateDynamicInputs();
 
 	NewtonBody* m_newtonBody;
-	dFloat m_maxExterenalAccel2;
-	dFloat m_maxExterenalAlpha2;
+	dFloat m_maxExternalAccel2;
+	dFloat m_maxExternalAlpha2;
 
 	friend class CustomVehicleController;
 	friend class CustomVehicleControllerTireJoint;
@@ -186,6 +188,10 @@ class CustomVehicleControllerBodyStateTire: public CustomVehicleControllerBodySt
 		return m_aligningTorque;
 	}
 	
+	CUSTOM_JOINTS_API int GetContactCount() const;
+	CUSTOM_JOINTS_API const CustomVehicleControllerBodyStateContact* GetContactBody(int index) const;
+	CUSTOM_JOINTS_API const CustomVehicleControllerTireContactJoint* GetContactJoint(int index) const;
+
 
 	private:
 	CUSTOM_JOINTS_API void UpdateTransform ();

@@ -76,17 +76,6 @@ class NewtonDemos: public wxFrame
 		LaunchSDKDemoCallback m_launchDemoCallback;
 	};
 
-/*
-	class SDKJoystick: public wxJoystick
-	{
-		public:
-		SDKJoystick ()
-			:wxJoystick(wxJOYSTICK1)
-		{
-
-		}
-	};
-*/
 	
 	wxMenuBar* CreateMainMenu();
 	void LoadDemo (int index);
@@ -137,11 +126,13 @@ class NewtonDemos: public wxFrame
 	void OnSerializeWorld(wxCommandEvent& event);
 	void OnDeserializeWorld(wxCommandEvent& event);
 
+	void OnJoystickEvent(wxJoystickEvent& event);
+
 //	long onLoad(FXObject* sender, FXSelector id, void* eventPtr); 
 //	long onSave(FXObject* sender, FXSelector id, void* eventPtr); 
 
-//	SDKJoystick m_joystick;
 	wxMenuBar* m_mainMenu;
+	wxJoystick* m_joystick;
 	wxStatusBar* m_statusbar;
 	DemoEntityManager* m_scene;
 

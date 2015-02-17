@@ -138,14 +138,19 @@ void CustomVehicleControllerBodyStateContact::Init (CustomVehicleController* con
 	m_externalForce = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_externalTorque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
-	m_maxExterenalAccel2 = 50.0f * 50.0f;
-	m_maxExterenalAlpha2 = 100.0 * 100.0f;
+	m_maxExternalAccel2 = 50.0f * 50.0f;
+	m_maxExternalAlpha2 = 100.0 * 100.0f;
 
 	m_invMass = 0.0f;
 	m_localInvInertia[0] = 0.0f;
 	m_localInvInertia[1] = 0.0f;
 	m_localInvInertia[2] = 0.0f;
 	UpdateInertia();
+}
+
+const NewtonBody* CustomVehicleControllerBodyStateContact::GetNewtonBody() const
+{
+	return m_newtonBody;
 }
 
 void CustomVehicleControllerBodyStateContact::UpdateDynamicInputs()
@@ -459,6 +464,7 @@ void CustomVehicleControllerBodyStateTire::UpdateInfo(const TireCreationInfo& ti
 	m_lateralSlip = 0.0f;
 	m_longitudinalSlip = 0.0f;
 	m_aligningTorque = 0.0f;
+	m_contactCount = 0;
 
 	UpdateInertia();
 }
@@ -660,3 +666,21 @@ void CustomVehicleControllerBodyStateTire::ApplyNetForceAndTorque (dFloat invTim
 	m_rotationAngle = dMod (m_rotationAngle + m_rotationalSpeed / invTimestep, 2.0f * 3.141592f);
 }
 
+
+int CustomVehicleControllerBodyStateTire::GetContactCount() const
+{
+	return m_contactCount;
+}
+
+const CustomVehicleControllerTireContactJoint* CustomVehicleControllerBodyStateTire::GetContactJoint(int index) const
+{
+	return &m_contactJoint[index];
+}
+
+const CustomVehicleControllerBodyStateContact* CustomVehicleControllerBodyStateTire::GetContactBody(int index) const
+{
+	const CustomVehicleControllerTireContactJoint* const joint = GetContactJoint(index);
+	dAssert (index < m_contactCount);
+	dAssert (joint->m_state0 != this);
+	return (CustomVehicleControllerBodyStateContact*) joint->m_state0;
+}

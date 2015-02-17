@@ -506,8 +506,6 @@ class SuperCarEntity: public DemoEntity
 	
 		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
 		if (hasJopytick) {
-			dAssert (0);
-/*
 			// apply a cubic attenuation to the joystick inputs
 			joyPosX = joyPosX * joyPosX * joyPosX;
 			joyPosY = joyPosY * joyPosY * joyPosY;
@@ -518,7 +516,7 @@ class SuperCarEntity: public DemoEntity
 
 			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
 			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
-*/			
+
 		} else {
 	
 			// get keyboard controls
@@ -784,9 +782,15 @@ steeringVal *= 0.3f;
 		glVertex3f (q0.m_x, q0.m_y, q0.m_z);
 		glVertex3f (q1.m_x, q1.m_y, q1.m_z);
 		
+//int xxx = 0;
 		for (CustomVehicleControllerBodyStateTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
 			const CustomVehicleControllerBodyStateTire& tire = *node;
 			dVector p0 (tire.GetCenterOfMass());
+
+if (tire.GetContactCount()) {
+const CustomVehicleControllerBodyStateContact* xxx = tire.GetContactBody(0);
+const CustomVehicleControllerBodyState* xxx1 = tire.GetContactBody(0);
+}
 
 			// offset the origin of of tire force so that they are visible
 			const dMatrix& tireMatrix = tire.GetLocalMatrix ();
@@ -809,8 +813,12 @@ steeringVal *= 0.3f;
 			glColor3f(0.0f, 1.0f, 0.0f);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
+//if (!xxx)
+//dTrace(("%f ", tire.GetAligningTorque()));
+//xxx ++;
 		}
 		glEnd();
+//dTrace(("\n"));
 
 		glLineWidth(1.0f);
 

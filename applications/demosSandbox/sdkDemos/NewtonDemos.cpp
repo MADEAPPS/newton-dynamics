@@ -260,6 +260,7 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_SERIALIZE, NewtonDemos::OnSerializeWorld)
 	EVT_MENU(ID_DESERIALIZE, NewtonDemos::OnDeserializeWorld)
 
+	EVT_JOYSTICK_EVENTS (NewtonDemos::OnJoystickEvent)
 
 
 //	FXMAPFUNC(SEL_COMMAND,		NewtonDemos::ID_LOAD,								NewtonDemos::onLoad),
@@ -271,8 +272,8 @@ END_EVENT_TABLE()
 
 NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize& size)
 	:wxFrame(NULL, -1, title, pos, size)
-//	,m_joystick()
 	,m_mainMenu(NULL)
+	,m_joystick(NULL)
 	,m_statusbar(NULL)
 	,m_scene(NULL)
 	,m_physicsUpdateMode(0)
@@ -367,11 +368,17 @@ m_autoSleepState = false;
 //m_useParallelSolver = true;
 //m_scene->m_showProfiler[6] = 1;
 m_scene->m_showProfiler[0] = 1;
+
+//	fucking wxwidget require a fucking library just to read a fucking joystick fuck you WxWidget
+//	m_joystick = new wxJoystick(wxJOYSTICK1); 
+//	m_joystick->SetCapture(this, 10); 
 }
 
 
 NewtonDemos::~NewtonDemos()
 {
+//	m_joystick->ReleaseCapture(); 
+//	delete m_joystick;
 }
 
 
@@ -951,6 +958,10 @@ void NewtonDemos::OnDeserializeWorld(wxCommandEvent& event)
 	END_MENU_OPTION();
 }
 
+void NewtonDemos::OnJoystickEvent(wxJoystickEvent& event)
+{
+
+}
 
 #if 0
 long NewtonDemos::onLoad(FXObject* sender, FXSelector id, void* eventPtr)
