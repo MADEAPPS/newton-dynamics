@@ -182,6 +182,7 @@ class dgContactMaterial: public dgContactPoint
 	friend class dgBroadPhase;
 	friend class dgCollisionScene;
 	friend class dgCollisionCompound;
+	friend class dgWorldDynamicUpdate;
 	friend class dgSolverWorlkerThreads;
 	friend class dgCollidingPairCollector;
 	friend class dgBroadPhaseMaterialCallbackWorkerThread;

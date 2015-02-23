@@ -285,18 +285,28 @@ void dgWorldDynamicUpdate::CalculateIslandContacts (dgIsland* const island, dgFl
 	for (dgInt32 j = 0; (j < jointCount); j ++) {
 		dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
 		if (contact->GetId() == dgConstraint::m_contactConstraint) {
-			dgContactPoint contactArray[DG_MAX_CONTATCS];
-			dgCollidingPairCollector::dgPair pair;
+			const dgContactMaterial* const material = contact->m_material;
+			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
+				dgInt32 processContacts = 1;
+				if (material->m_aabbOverlap) {
+					processContacts = material->m_aabbOverlap (*material, *contact->GetBody0(), *contact->GetBody1(), threadID);
+				}
 
-			contact->m_maxDOF = 0;
-			contact->m_broadphaseLru = currLru;
-			pair.m_contact = contact;
-			pair.m_cacheIsValid = false;
-			pair.m_contactBuffer = contactArray;
-			world->CalculateContacts (&pair, timestep, threadID, false, false);
-			if (pair.m_contactCount) {
-				dgAssert (pair.m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
-				world->ProcessContacts (&pair, timestep, threadID);
+				if (processContacts) {
+					dgContactPoint contactArray[DG_MAX_CONTATCS];
+					dgCollidingPairCollector::dgPair pair;
+
+					contact->m_maxDOF = 0;
+					contact->m_broadphaseLru = currLru;
+					pair.m_contact = contact;
+					pair.m_cacheIsValid = false;
+					pair.m_contactBuffer = contactArray;
+					world->CalculateContacts (&pair, timestep, threadID, false, false);
+					if (pair.m_contactCount) {
+						dgAssert (pair.m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
+						world->ProcessContacts (&pair, timestep, threadID);
+					}
+				}
 			}
 		}
 	}
