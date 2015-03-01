@@ -22,6 +22,9 @@
 #include "DemoEntityManager.h"
 
 
+#define DEMO_WIDTH	1280
+#define DEMO_HEIGHT  960
+
 
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
@@ -31,7 +34,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-//#define DEFAULT_SCENE	8			// Box stacks
+#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -56,7 +59,7 @@
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// basic Car
 //#define DEFAULT_SCENE	32			// heavy vehicles
-#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// basic player controller
 //#define DEFAULT_SCENE	35			// advanced player controller
 //#define DEFAULT_SCENE	36			// cloth patch			
@@ -172,8 +175,7 @@ class NewtonDemosApp: public wxApp
 		int version = NewtonWorldGetVersion();
 		wxString title;
 		title.Printf (wxT ("Newton %d.%02d SDK demos"), version / 100, version % 100);
-		NewtonDemos* const frame = new NewtonDemos(title, wxDefaultPosition, wxSize(1024, 768));
-		
+		NewtonDemos* const frame = new NewtonDemos(title, wxDefaultPosition, wxSize(DEMO_WIDTH, DEMO_HEIGHT));
 
 		frame->Show(true);
 		SetTopWindow(frame);
@@ -305,7 +307,10 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
-m_showNormalForces = true;
+m_microthreadIndex = 3;
+m_useParallelSolver = true;
+m_threadProfilerState = true;
+//m_showNormalForces = true;
 //m_showCenterOfMass = true;
 //m_hideVisualMeshes = true;
 //m_physicsUpdateMode = 1;

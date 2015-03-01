@@ -321,7 +321,7 @@ void dRuntimeProfiler::RenderThreadPerformance ()
 		m_width = viewport.width;
 		m_height = viewport.height;
 
-		float x0 = m_width - 320.0f; 
+		float x0 = m_width - 600.0f; 
 		float x1 = x0 + 256.0f;
 		float y0 = 50.0f;
 		for (int i = 0; i < threadCount; i ++) {
