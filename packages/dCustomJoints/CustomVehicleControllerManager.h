@@ -46,7 +46,7 @@ class CustomVehicleControllerTireCollisionFilter: public CustomControllerConvexC
 		return 1;
 	}
 
-	CUSTOM_JOINTS_API dFloat GetTireFrictionCoefficient (const CustomVehicleControllerBodyStateTire& tire, const NewtonBody* const body, const NewtonCollision* const myCollision, dLong contacID) const
+	CUSTOM_JOINTS_API virtual dFloat GetTireFrictionCoefficient (const CustomVehicleControllerBodyStateTire& tire, const NewtonBody* const body, const NewtonCollision* const myCollision, dLong contacID) const
 	{
 		//return 1.5f;
 		return 1.0f;
