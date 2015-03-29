@@ -3021,7 +3021,8 @@ dgFloat32 dgCollisionConvex::ConvexConicConvexRayCast (const dgCollisionInstance
 		contactOut.m_point = matrix.TransformVector(scale.CompProduct4(lastContact.m_point));
 	}
 
-	shapeInstance.SetUserData (NULL);
+	shapeInstance.SetUserData0 (NULL);
+	shapeInstance.SetUserData1 (NULL);
 	return param;
 }
 
