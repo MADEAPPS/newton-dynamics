@@ -38,7 +38,7 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 
 	dgCollisionDeformableSolidMesh (const dgCollisionDeformableSolidMesh& source);
 	dgCollisionDeformableSolidMesh (dgWorld* const world, dgMeshEffect* const mesh);
-	dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionDeformableSolidMesh(void);
 
 	void InitClusters();

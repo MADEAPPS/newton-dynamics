@@ -42,8 +42,8 @@ dgCollisionUserMesh::dgCollisionUserMesh(dgWorld* const world, const dgVector& b
 	SetCollisionBBox(boxP0, boxP1);
 }
 
-dgCollisionUserMesh::dgCollisionUserMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionMesh (world, deserialization, userData)
+dgCollisionUserMesh::dgCollisionUserMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionMesh (world, deserialization, userData, revisionNumber)
 {
 dgAssert (0);
 	m_rtti |= dgCollisionUserMesh_RTTI;

@@ -31,7 +31,7 @@ class dgCollisionTaperedCylinder: public dgCollisionConvex
 {
 	public:
 	dgCollisionTaperedCylinder(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height);
-	dgCollisionTaperedCylinder(dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionTaperedCylinder(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionTaperedCylinder();
 
 

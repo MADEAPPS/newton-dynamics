@@ -293,7 +293,7 @@ class dgCollision
 	protected:
 	dgCollision (const dgCollision& source);
 	dgCollision (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id);
-	dgCollision (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollision (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revision);
 	virtual ~dgCollision();
 	
 	void SetSignature (dgInt32 signature);

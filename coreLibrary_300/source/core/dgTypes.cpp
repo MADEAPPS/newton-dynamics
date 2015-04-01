@@ -478,17 +478,31 @@ dgInt32 dgVertexListToIndexList (dgFloat32* const vertList, dgInt32 strideInByte
 //#define SERIALIZE_END	'dne '
 #define SERIALIZE_END   0x646e6520
 
+struct dgSerializeMarkerData
+{
+	dgSerializeMarkerData()
+		:m_maker0(SERIALIZE_END)
+		,m_maker1(SERIALIZE_END)
+		,m_maker2(SERIALIZE_END)
+		,m_revision(m_currentRevision)
+	{
+	}
+	dgInt32 m_maker0;
+	dgInt32 m_maker1;
+	dgInt32 m_maker2;
+	dgInt32 m_revision;
+};
+
 void dgSerializeMarker(dgSerialize serializeCallback, void* const userData)
 {
-	dgInt32 end = SERIALIZE_END;
-	serializeCallback (userData, &end, sizeof (dgInt32));
-	serializeCallback (userData, &end, sizeof (dgInt32));
+	dgSerializeMarkerData marker;
+	serializeCallback (userData, &marker, sizeof (dgSerializeMarkerData));
 }
 
-void dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData)
+dgInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData)
 {
 	dgInt32 state = 0;
-	while (state != 2) {
+	while (state != 3) {
 		dgInt32 marker;
 		serializeCallback (userData, &marker, sizeof (marker));
 		switch (state) 
@@ -514,6 +528,21 @@ void dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData)
 				}
 				break;
 			}
+
+			case 2:
+			{
+				if (marker == SERIALIZE_END) {
+					state = 3;
+					break;
+				} else {
+					state = 0;
+				}
+				break;
+			}
 		}
 	} 
+
+	dgInt32 revision;
+	serializeCallback (userData, &revision, sizeof (revision));
+	return revision;
 }

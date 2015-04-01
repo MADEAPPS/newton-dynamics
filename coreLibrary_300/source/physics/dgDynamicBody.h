@@ -41,7 +41,7 @@ class dgDynamicBody : public dgBody
 {
 	public:
 	dgDynamicBody();
-	dgDynamicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData);
+	dgDynamicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgDynamicBody ();
 
 	virtual const dgVector& GetForce() const;
@@ -71,7 +71,7 @@ class dgDynamicBody : public dgBody
 	virtual OnApplyExtForceAndTorque GetExtForceAndTorqueCallback () const;
 	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback);
 
-	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);
+	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 
 	private:
 	virtual void AddDampingAcceleration();

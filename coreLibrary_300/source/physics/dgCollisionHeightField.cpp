@@ -245,8 +245,8 @@ dgCollisionHeightField::dgCollisionHeightField(
 	SetCollisionBBox(m_minBox, m_maxBox);
 }
 
-dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionMesh (world, deserialization, userData)
+dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionMesh (world, deserialization, userData, revisionNumber)
 {
 	dgAssert (m_rtti | dgCollisionHeightField_RTTI);
 	

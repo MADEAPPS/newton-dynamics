@@ -42,8 +42,8 @@ dgDeformableBody::dgDeformableBody()
 
 //dgDeformableBody::dgDeformableBody(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, OnBodyDeserialize bodyCallback, dgDeserialize serializeCallback, void* const userData)
 //	:dgBody(world, collisionCashe, bodyCallback, serializeCallback, userData)
-dgDeformableBody::dgDeformableBody(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData)
-	:dgBody (world, collisionNode, serializeCallback, userData)
+dgDeformableBody::dgDeformableBody(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
+	:dgBody (world, collisionNode, serializeCallback, userData, revisionNumber)
 {
 	m_type = m_deformableBody;
 	m_rtti |= m_deformableBodyRTTI;
@@ -55,11 +55,10 @@ dgDeformableBody::~dgDeformableBody()
 }
 
 
-//void dgDeformableBody::Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionCashe, OnBodySerialize bodyCallback, dgSerialize serializeCallback, void* const userData)
-void dgDeformableBody::Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionCashe, dgSerialize serializeCallback, void* const userData)
+void dgDeformableBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
 //	dgBody::Serialize (collisionCashe, bodyCallback, serializeCallback, userData);
-	dgBody::Serialize (collisionCashe, serializeCallback, userData);
+	dgBody::Serialize (collisionRemapId, serializeCallback, userData);
 	dgAssert (0);
 }
 

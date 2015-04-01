@@ -49,7 +49,7 @@ class dgPolygonSoupDatabase
 	void SetTagId(const dgInt32* const face, dgInt32 indexCount, dgUnsigned32 newID) const;
 
 	virtual void Serialize (dgSerialize callback, void* const userData) const = 0;
-	virtual void Deserialize (dgDeserialize callback, void* const userData) = 0;
+	virtual void Deserialize (dgDeserialize callback, void* const userData, dgInt32 revisionNumber) = 0;
 
 	
 	protected:

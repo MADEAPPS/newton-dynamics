@@ -45,8 +45,8 @@ dgCollisionSphere::dgCollisionSphere(dgMemoryAllocator* const allocator, dgUnsig
 	Init (radii, allocator);
 }
 
-dgCollisionSphere::dgCollisionSphere(dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionConvex (world, deserialization, userData)
+dgCollisionSphere::dgCollisionSphere(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionConvex (world, deserialization, userData, revisionNumber)
 {
 	dgFloat32 radios;
 	deserialization (userData, &radios, sizeof (radios));

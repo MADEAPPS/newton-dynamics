@@ -32,7 +32,7 @@ class dgCollisionConvexHull: public dgCollisionConvex
 
 	dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature);
 	dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray);
-	dgCollisionConvexHull(dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionConvexHull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionConvexHull();
 
 	dgInt32 GetFaceIndices (dgInt32 index, dgInt32* const indices) const;

@@ -41,8 +41,8 @@ dgCollisionScene::dgCollisionScene (const dgCollisionScene& source, const dgColl
 	m_rtti |= dgCollisionScene_RTTI;
 }
 
-dgCollisionScene::dgCollisionScene (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance)
-	:dgCollisionCompound(world, deserialization, userData, myInstance)
+dgCollisionScene::dgCollisionScene (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance, dgInt32 revisionNumber)
+	:dgCollisionCompound(world, deserialization, userData, myInstance, revisionNumber)
 {
 	dgAssert (m_rtti | dgCollisionScene_RTTI);
 }

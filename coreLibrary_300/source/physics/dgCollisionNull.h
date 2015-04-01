@@ -29,7 +29,7 @@ class dgCollisionNull: public dgCollisionConvex
 {
 	public:
 	dgCollisionNull(dgMemoryAllocator* const allocator, dgUnsigned32 signature);
-	dgCollisionNull(dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionNull();
 
 

@@ -31,7 +31,7 @@ class dgKinematicBody: public dgBody
 {
 	public:
 	dgKinematicBody();
-	dgKinematicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData);
+	dgKinematicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgKinematicBody ();
 	
 	virtual const dgVector& GetForce() const {return m_dummy;}
@@ -55,7 +55,7 @@ class dgKinematicBody: public dgBody
 
 	virtual bool IsInEquilibrium  () const {return true;}
 	virtual void SetCollidable (bool state) {m_collidable = state;}
-	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);
+	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 
 	virtual void AddDampingAcceleration() {}
 

@@ -543,8 +543,8 @@ dgCollisionCompound::dgCollisionCompound (const dgCollisionCompound& source, con
 	}
 }
 
-dgCollisionCompound::dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance)
-	:dgCollision (world, deserialization, userData)
+dgCollisionCompound::dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance, dgInt32 revisionNumber)
+	:dgCollision (world, deserialization, userData, revisionNumber)
 	,m_boxMinRadius (dgFloat32 (0.0f))
 	,m_boxMaxRadius (dgFloat32 (0.0f))
 	,m_treeEntropy (dgFloat32 (0.0f))
@@ -561,7 +561,7 @@ dgCollisionCompound::dgCollisionCompound (dgWorld* const world, dgDeserialize de
 	deserialization (userData, &count, sizeof (count));
 	BeginAddRemove ();
 	for (dgInt32 i = 0; i < count; i ++) {
-		dgCollisionInstance* const collision = new  (world->GetAllocator()) dgCollisionInstance (world, deserialization, userData);
+		dgCollisionInstance* const collision = new  (world->GetAllocator()) dgCollisionInstance (world, deserialization, userData, revisionNumber);
 		AddCollision (collision); 
 		collision->Release();
 	}

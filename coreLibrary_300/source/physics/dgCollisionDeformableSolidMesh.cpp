@@ -76,8 +76,8 @@ class dgCollisionDeformableSolidMesh::dgClusterBuilder: public dgList<dgCluster>
 };
 
 						   
-dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionDeformableMesh (world, deserialization, userData)
+dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionDeformableMesh (world, deserialization, userData, revisionNumber)
 {
 	dgAssert (0);
 }

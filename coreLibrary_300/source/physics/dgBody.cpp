@@ -79,7 +79,7 @@ dgBody::dgBody()
 	m_invWorldInertiaMatrix[3][3] = dgFloat32 (1.0f);
 }
 
-dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, dgDeserialize serializeCallback, void* const userData)
+dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
 	:m_invWorldInertiaMatrix(dgGetZeroMatrix())
 	,m_matrix (dgGetIdentityMatrix())
 	,m_rotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
@@ -134,7 +134,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	const dgCollision* const collision = node->GetInfo();
 	collision->AddRef();
 
-	dgCollisionInstance* const instance = new (world->GetAllocator()) dgCollisionInstance (world, serializeCallback, userData);
+	dgCollisionInstance* const instance = new (world->GetAllocator()) dgCollisionInstance (world, serializeCallback, userData, revisionNumber);
 	instance->m_childShape = collision;
 	m_collision = instance;
 }
@@ -155,7 +155,7 @@ void dgBody::AttachCollision (dgCollisionInstance* const collisionSrc)
 
 
 
-void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionCashe, dgSerialize serializeCallback, void* const userData)
+void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
 	serializeCallback (userData, &m_rotation, sizeof (m_rotation));
 	serializeCallback (userData, &m_matrix.m_posit, sizeof (m_matrix.m_posit));
@@ -164,7 +164,7 @@ void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>* const collisi
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 
-	dgTree<dgInt32, const dgCollision*>::dgTreeNode* const node = collisionCashe->Find(m_collision->GetChildShape());
+	dgTree<dgInt32, const dgCollision*>::dgTreeNode* const node = collisionRemapId.Find(m_collision->GetChildShape());
 	dgAssert (node);
 
 	dgInt32 id = node->GetInfo();

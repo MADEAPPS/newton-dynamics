@@ -52,8 +52,8 @@ dgCollisionBox::dgCollisionBox(dgMemoryAllocator* allocator, dgUnsigned32 signat
 	Init (size_x, size_y, size_z);
 }
 
-dgCollisionBox::dgCollisionBox(dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionConvex (world, deserialization, userData)
+dgCollisionBox::dgCollisionBox(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionConvex (world, deserialization, userData, revisionNumber)
 {
 	dgVector size;
 	deserialization (userData, &size, sizeof (dgVector));

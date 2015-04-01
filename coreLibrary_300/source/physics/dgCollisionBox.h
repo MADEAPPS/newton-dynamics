@@ -31,7 +31,7 @@ class dgCollisionBox: public dgCollisionConvex
 	public:
 
 	dgCollisionBox(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z);
-	dgCollisionBox(dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionBox(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionBox();
 
 	protected:

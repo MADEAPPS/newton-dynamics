@@ -41,8 +41,8 @@ dgCollisionChamferCylinder::dgCollisionChamferCylinder(dgMemoryAllocator* alloca
 	Init (radius, height);
 }
 
-dgCollisionChamferCylinder::dgCollisionChamferCylinder(dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionConvex (world, deserialization, userData)
+dgCollisionChamferCylinder::dgCollisionChamferCylinder(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionConvex (world, deserialization, userData, revisionNumber)
 {
 	dgVector size;
 	deserialization (userData, &size, sizeof (dgVector));

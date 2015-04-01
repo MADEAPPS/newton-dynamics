@@ -53,7 +53,7 @@ class dgCollisionHeightField: public dgCollisionMesh
 							const void* const elevationMap, dgElevationType elevationDataType, dgFloat32 verticalScale, 
 							const dgInt8* const atributeMap, dgFloat32 horizontalScale);
 
-	dgCollisionHeightField (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionHeightField (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 
 	virtual ~dgCollisionHeightField(void);
 

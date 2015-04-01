@@ -247,8 +247,8 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh (const dgCollisionDeformabl
 }
 
 						   
-dgCollisionDeformableMesh::dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionConvex (world, deserialization, userData)
+dgCollisionDeformableMesh::dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionConvex (world, deserialization, userData, revisionNumber)
 	,m_particles (world, deserialization, userData) 
 	,m_visualSegments(world->GetAllocator())
 	,m_skinThickness (DG_DEFORMABLE_DEFAULT_SKIN_THICKNESS)

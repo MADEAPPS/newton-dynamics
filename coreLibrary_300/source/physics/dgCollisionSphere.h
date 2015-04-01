@@ -31,7 +31,7 @@ class dgCollisionSphere: public dgCollisionConvex
 {
 	public:
 	dgCollisionSphere(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radius);
-	dgCollisionSphere(dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionSphere(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionSphere();
 
 

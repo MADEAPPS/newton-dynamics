@@ -33,7 +33,7 @@ class dgCollisionScene: public dgCollisionCompound
 	public:
 	dgCollisionScene(dgWorld* const world);
 	dgCollisionScene (const dgCollisionScene& source, const dgCollisionInstance* const myInstance);
-	dgCollisionScene(dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance);
+	dgCollisionScene(dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance, dgInt32 revisionNumber);
 	virtual ~dgCollisionScene();
 
 	void CollidePair (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;

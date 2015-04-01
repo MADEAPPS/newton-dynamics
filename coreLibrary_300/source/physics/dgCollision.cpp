@@ -59,7 +59,7 @@ dgCollision::dgCollision (const dgCollision& source)
 
 }
 
-dgCollision::dgCollision (dgWorld* const world, dgDeserialize deserialization, void* const userData)
+dgCollision::dgCollision (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revision)
 	:m_inertia(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))	
 	,m_crossInertia(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))		
 	,m_centerOfMass(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))		

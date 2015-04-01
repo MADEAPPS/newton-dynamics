@@ -33,14 +33,15 @@ dgCollisionBVH::dgCollisionBVH(dgWorld* const world)
 	m_userRayCastCallback = NULL;
 }
 
-dgCollisionBVH::dgCollisionBVH (dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionMesh (world, deserialization, userData), dgAABBPolygonSoup()
+dgCollisionBVH::dgCollisionBVH (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionMesh (world, deserialization, userData, revisionNumber)
+	,dgAABBPolygonSoup()
 {
 	dgAssert (m_rtti | dgCollisionBVH_RTTI);
 	m_builder = NULL;;
 	m_userRayCastCallback = NULL;
 
-	dgAABBPolygonSoup::Deserialize (deserialization, userData);
+	dgAABBPolygonSoup::Deserialize (deserialization, userData, revisionNumber);
 
 	dgVector p0; 
 	dgVector p1; 

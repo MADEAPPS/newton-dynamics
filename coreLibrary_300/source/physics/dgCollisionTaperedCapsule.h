@@ -33,7 +33,7 @@ class dgCollisionTaperedCapsule: public dgCollisionConvex
 {
 	public:
 	dgCollisionTaperedCapsule (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height);
-	dgCollisionTaperedCapsule(dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionTaperedCapsule(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionTaperedCapsule();
 
 	private:

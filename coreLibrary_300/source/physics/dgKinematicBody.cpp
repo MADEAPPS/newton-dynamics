@@ -34,8 +34,8 @@ dgKinematicBody::dgKinematicBody()
 	m_rtti |= m_kinematicBodyRTTI;
 }
 
-dgKinematicBody::dgKinematicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData)
-	:dgBody (world, collisionNode, serializeCallback, userData)
+dgKinematicBody::dgKinematicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
+	:dgBody (world, collisionNode, serializeCallback, userData, revisionNumber)
 {
 	m_collidable = false;
 	m_type = m_kinematicBody;
@@ -46,8 +46,8 @@ dgKinematicBody::~dgKinematicBody ()
 {
 }
 
-void dgKinematicBody::Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionCashe, dgSerialize serializeCallback, void* const userData)
+void dgKinematicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
-	dgBody::Serialize (collisionCashe, serializeCallback, userData);
+	dgBody::Serialize (collisionRemapId, serializeCallback, userData);
 }
 

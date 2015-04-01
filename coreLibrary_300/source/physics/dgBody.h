@@ -68,7 +68,7 @@ class dgBody
 
 
 	dgBody();
-	dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData);
+	dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgBody();
 
 	dgType GetType () const;
@@ -177,7 +177,7 @@ class dgBody
 	virtual dgFloat32 ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInstance* const convexShape, const dgVector& shapeMinBox, const dgVector& shapeMaxBox, const dgMatrix& origin, const dgVector& shapeVeloc, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT, dgInt32 threadId) const;
 
 	
-	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionNode, dgSerialize serializeCallback, void* const userData);
+	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 	
 	virtual dgConstraint* GetFirstJoint() const;
 	virtual dgConstraint* GetNextJoint(dgConstraint* const joint) const;

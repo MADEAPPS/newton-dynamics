@@ -39,7 +39,7 @@ class dgCollisionUserMesh: public dgCollisionMesh
 	typedef void (dgApi *OnUserMeshFacesInAABB) (void* userData, const dgFloat32* p0, const dgFloat32* p1, const dgFloat32** vertexArray, dgInt32* vertexCount, dgInt32* vertexStrideInBytes, const dgInt32* indexList, dgInt32 maxIndexCount, const dgInt32* faceAttribute);
 
 	dgCollisionUserMesh(dgWorld* const world, const dgVector& boxP0, const dgVector& boxP1, const dgUserMeshCreation& data);
-	dgCollisionUserMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionUserMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionUserMesh(void);
 
 	void GetVertexListIndexList (const dgVector& p0, const dgVector& p1, dgMeshVertexListIndexList &data) const;

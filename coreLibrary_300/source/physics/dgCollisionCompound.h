@@ -133,7 +133,7 @@ class dgCollisionCompound: public dgCollision
 	public:
 	dgCollisionCompound (dgWorld* const world);
 	dgCollisionCompound (const dgCollisionCompound& source, const dgCollisionInstance* const myInstance);
-	dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance);
+	dgCollisionCompound (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance, dgInt32 revisionNumber);
 
 	void SetParent (const dgCollisionInstance* const myInstance);
 	virtual ~dgCollisionCompound();

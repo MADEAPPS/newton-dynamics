@@ -85,7 +85,7 @@ class dgCollisionConvex: public dgCollision
 
 	protected:
 	dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id);
-	dgCollisionConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	~dgCollisionConvex ();
 
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;

@@ -50,7 +50,7 @@ class dgCollisionBVH: public dgCollisionMesh, public dgAABBPolygonSoup
 	} DG_GCC_VECTOR_ALIGMENT;
 
 	dgCollisionBVH(dgWorld* const world);
-	dgCollisionBVH (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionBVH (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionBVH(void);
 
 	void BeginBuild();

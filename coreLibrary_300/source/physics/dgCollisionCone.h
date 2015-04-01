@@ -31,7 +31,7 @@ class dgCollisionCone: public dgCollisionConvex
 {
 	public:
 	dgCollisionCone (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height);
-	dgCollisionCone(dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionCone(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionCone();
 
 	private:

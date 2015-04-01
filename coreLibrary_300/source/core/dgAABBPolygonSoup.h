@@ -182,7 +182,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 
 	virtual void GetAABB (dgVector& p0, dgVector& p1) const;
 	virtual void Serialize (dgSerialize callback, void* const userData) const;
-	virtual void Deserialize (dgDeserialize callback, void* const userData);
+	virtual void Deserialize (dgDeserialize callback, void* const userData, dgInt32 revisionNumber);
 
 	protected:
 	dgAABBPolygonSoup ();

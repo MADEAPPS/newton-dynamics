@@ -31,7 +31,7 @@ class dgCollisionCapsule: public dgCollisionConvex
 {
 	public:
 	dgCollisionCapsule (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height);
-	dgCollisionCapsule(dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionCapsule(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionCapsule();
 
 	dgFloat32 GetRadius() const {return m_radius;}

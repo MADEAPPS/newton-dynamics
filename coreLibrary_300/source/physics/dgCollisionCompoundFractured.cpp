@@ -958,8 +958,8 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgCollisionCompoundF
 	dgAssert (SanityCheck());
 }
 
-dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance)
-	:dgCollisionCompound (world, deserialization, userData, myInstance)
+dgCollisionCompoundFractured::dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance, dgInt32 revisionNumber)
+	:dgCollisionCompound (world, deserialization, userData, myInstance, revisionNumber)
 	,m_conectivity (world->GetAllocator())
 	,m_conectivityMap (world->GetAllocator())
 {

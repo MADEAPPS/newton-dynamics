@@ -1483,8 +1483,8 @@ dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsi
 }
 
 
-dgCollisionConvex::dgCollisionConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollision (world, deserialization, userData)
+dgCollisionConvex::dgCollisionConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollision (world, deserialization, userData, revisionNumber)
 	,m_userData (userData)
 	,m_vertex (NULL)
 	,m_simplex (NULL)

@@ -78,7 +78,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 	dgCollisionDeformableMesh (const dgCollisionDeformableMesh& source);
 	dgCollisionDeformableMesh (dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collsionID);
-	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionDeformableMesh(void);
 
 	dgBody* GetBody() const;

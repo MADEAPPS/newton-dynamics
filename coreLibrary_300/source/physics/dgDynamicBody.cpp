@@ -48,8 +48,8 @@ dgDynamicBody::dgDynamicBody()
 	dgAssert ( dgInt32 (sizeof (dgDynamicBody) & 0x0f) == 0);
 }
 
-dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, dgDeserialize serializeCallback, void* const userData)
-	:dgBody(world, collisionCashe, serializeCallback, userData)
+dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
+	:dgBody(world, collisionCashe, serializeCallback, userData, revisionNumber)
 	,m_accel(dgFloat32 (0.0))
 	,m_alpha(dgFloat32 (0.0))
 	,m_prevExternalForce(dgFloat32 (0.0))
@@ -79,9 +79,9 @@ dgDynamicBody::~dgDynamicBody()
 
 
 
-void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>* const collisionCashe, dgSerialize serializeCallback, void* const userData)
+void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
-	dgBody::Serialize (collisionCashe, serializeCallback, userData);
+	dgBody::Serialize (collisionRemapId, serializeCallback, userData);
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));

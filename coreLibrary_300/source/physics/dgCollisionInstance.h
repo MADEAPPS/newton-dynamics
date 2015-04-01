@@ -43,7 +43,7 @@ class dgCollisionInstance
 	dgCollisionInstance(const dgCollisionInstance& instance);
 	dgCollisionInstance(const dgCollisionInstance& meshInstance, const dgCollision* const shape);
 	dgCollisionInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix& matrix);
-	dgCollisionInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	~dgCollisionInstance();
 
 	dgCollisionInstance* AddRef ();

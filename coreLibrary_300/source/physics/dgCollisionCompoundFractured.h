@@ -165,7 +165,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	dgCollisionCompoundFractured (dgWorld* const world, dgMeshEffect* const solidMesh, dgInt32 fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& offsetMatrix,
 								 OnEmitFractureChunkCallBack emitFracturedChunk, OnEmitNewCompundFractureCallBack emitNewCompoundFactured, OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 
-	dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance);
+	dgCollisionCompoundFractured (dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance, dgInt32 revisionNumber);
 	virtual ~dgCollisionCompoundFractured(void);
 
 	void SetCallbacks(OnEmitFractureChunkCallBack emitFracturedChunk, OnEmitNewCompundFractureCallBack emitNewCompoundFactured, OnReconstructFractureMainMeshCallBack reconstructMainMesh);

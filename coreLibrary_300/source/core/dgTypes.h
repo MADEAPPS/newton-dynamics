@@ -701,8 +701,16 @@ DG_INLINE dgFloat32 dgRsqrt(dgFloat32 x)
 #define dgControlFP(x,y)	_controlfp(x,y)
 
 
+enum dgSerializeRevisionNumber
+{
+	m_firstRevision = 99,
+	// add new serialization revision number here
+	m_currentRevision 
+};
+
+
 void dgSerializeMarker(dgSerialize serializeCallback, void* const userData);
-void dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData);
+dgInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData);
 
 
 typedef dgUnsigned32 (dgApi *OnGetPerformanceCountCallback) ();

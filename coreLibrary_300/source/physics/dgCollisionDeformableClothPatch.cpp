@@ -115,8 +115,8 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (const dgCollis
 }
 
 
-dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionDeformableMesh (world, deserialization, userData)
+dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionDeformableMesh (world, deserialization, userData, revisionNumber)
 {
 	dgAssert (0);
 }

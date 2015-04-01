@@ -867,7 +867,7 @@ void dgAABBPolygonSoup::Serialize (dgSerialize callback, void* const userData) c
 	}
 }
 
-void dgAABBPolygonSoup::Deserialize (dgDeserialize callback, void* const userData)
+void dgAABBPolygonSoup::Deserialize (dgDeserialize callback, void* const userData, dgInt32 revisionNumber)
 {
 	m_strideInBytes = sizeof (dgTriplex);
 	callback (userData, &m_vertexCount, sizeof (dgInt32));

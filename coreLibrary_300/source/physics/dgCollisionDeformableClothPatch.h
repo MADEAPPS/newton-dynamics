@@ -40,7 +40,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 
 	dgCollisionDeformableClothPatch (const dgCollisionDeformableClothPatch& source);
 	dgCollisionDeformableClothPatch (dgWorld* const world, dgMeshEffect* const mesh, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial);
-	dgCollisionDeformableClothPatch (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionDeformableClothPatch (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionDeformableClothPatch(void);
 
 //	void SetStiffness (dgFloat32 stiffness);

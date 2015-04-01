@@ -334,14 +334,14 @@ dgCollisionInstance* dgWorld::CreateInstance (const dgCollision* const child, dg
 
 void dgWorld::SerializeCollision(dgCollisionInstance* const shape, dgSerialize serialization, void* const userData) const
 {
-	shape->Serialize(serialization, userData);
 	dgSerializeMarker(serialization, userData);
+	shape->Serialize(serialization, userData);
 }
 
 dgCollisionInstance* dgWorld::CreateCollisionFromSerialization (dgDeserialize deserialization, void* const userData)
 {
-	dgCollisionInstance* const instance = new  (m_allocator) dgCollisionInstance (this, deserialization, userData);
-	dgDeserializeMarker (deserialization, userData);
+	dgInt32 revision = dgDeserializeMarker (deserialization, userData);
+	dgCollisionInstance* const instance = new  (m_allocator) dgCollisionInstance (this, deserialization, userData, revision);
 	return instance;
 }
 

@@ -76,8 +76,8 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator,
 	BuildHull (count, strideInBytes, tolerance, vertexArray);
 }
 
-dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize deserialization, void* const userData)
-	:dgCollisionConvex (world, deserialization, userData)
+dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionConvex (world, deserialization, userData, revisionNumber)
 	,m_faceCount (0)
 	,m_supportTreeCount (0)
 	,m_faceArray (NULL)

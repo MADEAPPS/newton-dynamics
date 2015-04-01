@@ -163,11 +163,8 @@ class dgCollisionMesh: public dgCollision
 
 
 	dgCollisionMesh (dgWorld* const world, dgCollisionID type);
-	dgCollisionMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionMesh();
-
-	
-
 
 	virtual dgFloat32 GetVolume () const;
 	virtual dgFloat32 GetBoxMinRadius () const; 

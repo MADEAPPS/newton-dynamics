@@ -31,9 +31,8 @@ class dgCollisionCylinder: public dgCollisionConvex
 {
 	public:
 	dgCollisionCylinder(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height);
-	dgCollisionCylinder(dgWorld* const world, dgDeserialize deserialization, void* const userData);
+	dgCollisionCylinder(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionCylinder();
-
 
 	private:
 	void Init (dgFloat32 radius, dgFloat32 height);
