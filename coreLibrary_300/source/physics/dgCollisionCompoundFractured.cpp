@@ -1286,7 +1286,7 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollecto
 				nodeInfo.m_lru = 1;
 				dgCollisionCompoundFractured* const me = (dgCollisionCompoundFractured*)this;
 
-				m_world->GlobalLock();
+				m_world->GlobalLock(true);
                 if (me->SpawnChunks (myBody, myInstance, rootNode, impulseStimate2, impulseStrength * impulseStrength)) {
 					me->SpawnDisjointChunks (myBody, myInstance, rootNode, impulseStimate2, impulseStrength * impulseStrength);
 

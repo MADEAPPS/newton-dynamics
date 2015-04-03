@@ -343,7 +343,7 @@ void NewtonWorldCriticalSectionLock (const NewtonWorld* const newtonWorld, int t
 	TRACE_FUNCTION(__FUNCTION__);
 
 	Newton* const world = (Newton *)newtonWorld;
-	world->GlobalLock();
+	world->GlobalLock(true);
 }
 
 

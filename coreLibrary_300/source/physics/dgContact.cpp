@@ -381,7 +381,7 @@ void dgCollidingPairCollector::AddPair (dgContact* const contact, dgInt32 thread
 			dgAssert (!body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
 			dgAssert (!body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
 
-			dgThreadHiveScopeLock lock (world, &m_lock);
+			dgThreadHiveScopeLock lock (world, &m_lock, false);
 			if (world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (m_count, sizeof (dgPair))) {
 				m_maxSize = dgInt32 (world->m_pairMemoryBuffer.GetBytesCapacity() / sizeof (dgPair));
 			}

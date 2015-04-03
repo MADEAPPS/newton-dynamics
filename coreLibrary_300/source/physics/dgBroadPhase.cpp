@@ -871,7 +871,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 	bool isCollidable = true;
 	dgContact* contact = NULL;
 	if ((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body0->GetInvMass().m_w != dgFloat32 (0.0f))) {
-		dgThreadHiveScopeLock lock (m_world, &m_contacJointLock);
+		dgThreadHiveScopeLock lock (m_world, &m_contacJointLock, false);
 		for (dgBodyMasterListRow::dgListNode* link = body0->m_masterNode->GetInfo().GetFirst(); link; link = link->GetNext()) {
 			dgConstraint* const constraint = link->GetInfo().m_joint;
 			if (constraint->GetId() != dgConstraint::m_contactConstraint) {
@@ -895,7 +895,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 			}
 		}
 	} else {
-		dgThreadHiveScopeLock lock (m_world, &m_contacJointLock);
+		dgThreadHiveScopeLock lock (m_world, &m_contacJointLock, false);
 		dgAssert ((body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
 		for (dgBodyMasterListRow::dgListNode* link = body1->m_masterNode->GetInfo().GetFirst(); link; link = link->GetNext()) {
 			dgConstraint* const constraint = link->GetInfo().m_joint;
@@ -935,7 +935,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgVe
 
 			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
 				newContact = true;
-				dgThreadHiveScopeLock lock (m_world, &m_contacJointLock);
+				dgThreadHiveScopeLock lock (m_world, &m_contacJointLock, false);
 				if (body0->IsRTTIType (dgBody::m_deformableBodyRTTI) || body1->IsRTTIType (dgBody::m_deformableBodyRTTI)) {
 					contact = new (m_world->m_allocator) dgDeformableContact (m_world, material);
 				} else {
@@ -971,7 +971,7 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 
 	dgBodyMasterList::dgListNode* node = NULL;
 	{
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
+		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
 		node = descriptor->m_forceAndTorqueBodyNode;
 		if (node) {
 			descriptor->m_forceAndTorqueBodyNode = node->GetNext();
@@ -1020,7 +1020,7 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 			body->UpdateMatrix (timestep, threadID);
 		}
 
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
+		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
 		node = descriptor->m_forceAndTorqueBodyNode;
 		if (node) {
 			descriptor->m_forceAndTorqueBodyNode = node->GetNext();
@@ -1041,7 +1041,7 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 					dgVector relOmega (body0->m_omega - body1->m_omega);
 					dgVector mask2 ((relVeloc.DotProduct4(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct4(relOmega) < dgDynamicBody::m_equilibriumError2));
 
-					dgThreadHiveScopeLock lock (m_world, &body1->m_criticalSectionLock);
+					dgThreadHiveScopeLock lock (m_world, &body1->m_criticalSectionLock, false);
 					body1->m_sleeping = false;
 					body1->m_equilibrium = mask2.GetSignMask() ? true : false;
 				}
@@ -1053,7 +1053,7 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 					dgVector relOmega (body0->m_omega - body1->m_omega);
 					dgVector mask2 ((relVeloc.DotProduct4(relVeloc) < dgDynamicBody::m_equilibriumError2) & (relOmega.DotProduct4(relOmega) < dgDynamicBody::m_equilibriumError2));
 
-					dgThreadHiveScopeLock lock (m_world, &body0->m_criticalSectionLock);
+					dgThreadHiveScopeLock lock (m_world, &body0->m_criticalSectionLock, false);
 					body0->m_sleeping = false;
 					body0->m_equilibrium = mask2.GetSignMask() ? true : false;
 				}
@@ -1118,7 +1118,7 @@ void dgBroadPhase::UpdateBodyBroadphase(dgBody* const body, dgInt32 threadIndex)
 					break;
 				}
 
-				dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock);
+				dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
 				parent->m_minBox = minBox;
 				parent->m_maxBox = maxBox;
 				parent->m_surfaceArea = area;
@@ -1383,7 +1383,7 @@ void dgBroadPhase::FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* con
 	dgVector timestep2 (descriptor->m_timestep * descriptor->m_timestep * dgFloat32 (4.0f));
 	dgBodyMasterList::dgListNode* node = NULL;
 	{
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
+		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
 		node = descriptor->m_collindPairBodyNode;
 		if (node) {
 			descriptor->m_collindPairBodyNode = node->GetNext();
@@ -1404,7 +1404,7 @@ void dgBroadPhase::FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* con
 			}
 		}
 
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
+		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
 		node = descriptor->m_collindPairBodyNode;
 		if (node) {
 			descriptor->m_collindPairBodyNode = node->GetNext();
@@ -1416,7 +1416,7 @@ void dgBroadPhase::FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor
 {
 	dgList<dgBody*>::dgListNode* node = NULL;
 	{
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
+		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
 		node = descriptor->m_newBodiesNodes;
 		if (node) {
 			descriptor->m_newBodiesNodes = node->GetNext();
@@ -1443,7 +1443,7 @@ void dgBroadPhase::FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor
 			}
 		}
 
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock);
+		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
 		node = descriptor->m_newBodiesNodes;
 		if (node) {
 			descriptor->m_newBodiesNodes = node->GetNext();

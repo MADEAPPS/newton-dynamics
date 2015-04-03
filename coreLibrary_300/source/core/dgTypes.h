@@ -828,9 +828,13 @@ DG_INLINE void dgThreadYield()
 #endif
 }
 
-DG_INLINE void dgSpinLock (dgInt32* const ptr)
+DG_INLINE void dgSpinLock (dgInt32* const ptr, bool yield)
 {
-	while (dgInterlockedExchange(ptr, 1));
+	while (dgInterlockedExchange(ptr, 1)) {
+		if (yield) {
+			dgThreadYield();
+		}
+	}
 }
 
 DG_INLINE void dgSpinUnlock (dgInt32* const ptr)

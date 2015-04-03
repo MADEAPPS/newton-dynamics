@@ -96,7 +96,7 @@ void dgThreadHive::dgThreadBee::RunNextJobInQueue(dgInt32 threadId)
 	do {
 		dgThreadJob job;
 		dgAssert (threadId == m_id);
-		m_hive->m_jobsCriticalSection.Lock();
+		m_hive->m_jobsCriticalSection.Lock(false);
 		isEmpty = m_hive->m_jobsPool.IsEmpty();
 		if (!isEmpty) {
 			job = m_hive->m_jobsPool.GetHead();

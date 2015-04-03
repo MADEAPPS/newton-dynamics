@@ -926,7 +926,7 @@ void dgCollisionCompound::EndAddRemove (bool flushCache)
 {
 	if (m_root) {
 		dgWorld* const world = m_world;
-		dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
+		dgThreadHiveScopeLock lock (world, &m_criticalSectionLock, true);
 
 		dgTreeArray::Iterator iter (m_array);
 		for (iter.Begin(); iter; iter ++) {
@@ -1082,7 +1082,7 @@ void dgCollisionCompound::SetCollisionMatrix (dgTreeArray::dgTreeNode* const nod
 		dgVector p1;
 		instance->CalcAABB(instance->GetLocalMatrix (), p0, p1);
 		{
-			dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
+			dgThreadHiveScopeLock lock (world, &m_criticalSectionLock, false);
 			baseNode->SetBox (p0, p1);
 		}
 
@@ -1094,7 +1094,7 @@ void dgCollisionCompound::SetCollisionMatrix (dgTreeArray::dgTreeNode* const nod
 				break;
 			}
 			
-			dgThreadHiveScopeLock lock (world, &m_criticalSectionLock);
+			dgThreadHiveScopeLock lock (world, &m_criticalSectionLock, false);
 			parent->SetBox (minBox, maxBox);
 		}
 	}

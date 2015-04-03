@@ -133,19 +133,19 @@ class dgParallelSolverSyncData
 
 	DG_INLINE void Lock(dgInt32 m0, dgInt32 m1)
 	{
-		dgSpinLock(&m_lock0);
+		dgSpinLock(&m_lock0, false);
 		if(m0) {
-			dgSpinLock(&m_bodyLocks[m0]);
+			dgSpinLock(&m_bodyLocks[m0], false);
 		}
 		if (m1) {
-			dgSpinLock(&m_bodyLocks[m1]);
+			dgSpinLock(&m_bodyLocks[m1], false);
 		}
 		dgSpinUnlock(&m_lock0);
 	}
 
 	DG_INLINE void Unlock(dgInt32 m0, dgInt32 m1)
 	{
-		dgSpinLock(&m_lock1);
+		dgSpinLock(&m_lock1, false);
 		dgSpinUnlock(&m_bodyLocks[m0]);
 		dgSpinUnlock(&m_bodyLocks[m1]);
 		dgSpinUnlock(&m_lock1);
