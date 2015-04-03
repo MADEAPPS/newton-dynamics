@@ -285,6 +285,13 @@ class dgBroadphaseSyncDescriptor
 class dgBroadPhase::dgSpliteInfo
 {
 	public:
+	class dgLargeNode
+	{
+		public:
+		dgInt32 m_index;
+		dgFloat32 m_area;
+	};
+
 	dgSpliteInfo (dgNode** const boxArray, dgInt32 boxCount)
 	{
 		dgVector minP ( dgFloat32 (1.0e15f)); 
@@ -302,67 +309,94 @@ class dgBroadPhase::dgSpliteInfo
 			dgVector median (dgFloat32 (0.0f));
 			dgVector varian (dgFloat32 (0.0f));
 
+			//dgFloat32 maxArea = dgFloat32 (0.0f); 
+			//dgFloat32 medianArea = dgFloat32 (0.0f); 
+			//dgFloat32 varianceArea = dgFloat32 (0.0f); 
+			//dgInt32 largeNode = -1;
+
+			dgLargeNode node0;
+			dgLargeNode node1;
+
+			node0.m_index = -1;
+			node0.m_area = dgFloat32 (0.0f);
+			node1.m_index = -1;
+			node1.m_area = dgFloat32 (0.0f);
 			for (dgInt32 i = 0; i < boxCount; i ++) {
 				dgNode* const node = boxArray[i];
 				dgAssert (node->m_body);
 				minP = minP.GetMin (node->m_minBox); 
 				maxP = maxP.GetMax (node->m_maxBox); 
 				dgVector p ((node->m_minBox + node->m_maxBox).CompProduct4(dgVector::m_half));
-
+				if (node->m_surfaceArea > node0.m_index) {
+					node0.m_index = i;
+					node0.m_area = node->m_surfaceArea;
+					if (node0.m_area > node1.m_area) {
+						dgSwap(node0, node1);
+					}
+				}
 				median += p;
 				varian += p.CompProduct4(p);
 			}
 
-			varian = varian.Scale4 (dgFloat32 (boxCount)) - median.CompProduct4(median);
-
-			dgInt32 index = 0;
-			dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
-			for (dgInt32 i = 0; i < 3; i ++) {
-				if (varian[i] > maxVarian) {
-					index = i;
-					maxVarian = varian[i];
-				}
+			dgAssert (node0.m_index >= 0);
+			dgAssert (node1.m_index >= 0);
+			const dgFloat32 scale2 = dgFloat32 (10.0f);
+			if (node1.m_area > (dgFloat32 (3.0f) * scale2 * scale2 * node0.m_area)) {
+				dgSwap (boxArray[node1.m_index], boxArray[0]);
+				m_axis = 1;
 			}
+			else 
+			{
+				varian = varian.Scale4 (dgFloat32 (boxCount)) - median.CompProduct4(median);
 
-			dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
-
-			dgFloat32 test = center[index];
-
-			dgInt32 i0 = 0;
-			dgInt32 i1 = boxCount - 1;
-			do {    
-				for (; i0 <= i1; i0 ++) {
-					dgNode* const node = boxArray[i0];
-					dgFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dgFloat32 (0.5f);
-					if (val > test) {
-						break;
+				dgInt32 index = 0;
+				dgFloat32 maxVarian = dgFloat32 (-1.0e10f);
+				for (dgInt32 i = 0; i < 3; i ++) {
+					if (varian[i] > maxVarian) {
+						index = i;
+						maxVarian = varian[i];
 					}
 				}
 
-				for (; i1 >= i0; i1 --) {
-					dgNode* const node = boxArray[i1];
-					dgFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dgFloat32 (0.5f);
-					if (val < test) {
-						break;
+				dgVector center = median.Scale4 (dgFloat32 (1.0f) / dgFloat32 (boxCount));
+
+				dgFloat32 test = center[index];
+
+				dgInt32 i0 = 0;
+				dgInt32 i1 = boxCount - 1;
+				do {    
+					for (; i0 <= i1; i0 ++) {
+						dgNode* const node = boxArray[i0];
+						dgFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dgFloat32 (0.5f);
+						if (val > test) {
+							break;
+						}
 					}
+
+					for (; i1 >= i0; i1 --) {
+						dgNode* const node = boxArray[i1];
+						dgFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dgFloat32 (0.5f);
+						if (val < test) {
+							break;
+						}
+					}
+
+					if (i0 < i1)	{
+						dgSwap(boxArray[i0], boxArray[i1]);
+						i0++; 
+						i1--;
+					}
+
+				} while (i0 <= i1);
+
+				if (i0 > 0){
+					i0 --;
 				}
-
-				if (i0 < i1)	{
-					dgSwap(boxArray[i0], boxArray[i1]);
-					i0++; 
-					i1--;
+				if ((i0 + 1) >= boxCount) {
+					i0 = boxCount - 2;
 				}
-
-			} while (i0 <= i1);
-
-			if (i0 > 0){
-				i0 --;
+				m_axis = i0 + 1;
 			}
-			if ((i0 + 1) >= boxCount) {
-				i0 = boxCount - 2;
-			}
-
-			m_axis = i0 + 1;
 		}
 
 		dgAssert (maxP.m_x - minP.m_x >= dgFloat32 (0.0f));
@@ -776,11 +810,11 @@ dgBroadPhase::dgNode* dgBroadPhase::BuildTopDown (dgNode** const leafArray, dgIn
 		*nextNode = (*nextNode)->GetNext();
 
 		parent->SetAABB (info.m_p0, info.m_p1);
-		parent->m_right = BuildTopDown (leafArray, firstBox + info.m_axis, lastBox, nextNode);
-		parent->m_right->m_parent = parent;
-
-		parent->m_left = BuildTopDown (leafArray, firstBox, firstBox + info.m_axis - 1, nextNode);
+		parent->m_left = BuildTopDown (leafArray, firstBox + info.m_axis, lastBox, nextNode);
 		parent->m_left->m_parent = parent;
+
+		parent->m_right = BuildTopDown (leafArray, firstBox, firstBox + info.m_axis - 1, nextNode);
+		parent->m_right->m_parent = parent;
 		return parent;
 	}
 }
