@@ -131,6 +131,28 @@ class dgParallelSolverSyncData
 		memset (this, 0, sizeof (dgParallelSolverSyncData));
 	}
 
+	DG_INLINE void Lock(dgInt32 m0, dgInt32 m1)
+	{
+		dgSpinLock(&m_lock0);
+		if(m0) {
+			dgSpinLock(&m_bodyLocks[m0]);
+		}
+		if (m1) {
+			dgSpinLock(&m_bodyLocks[m1]);
+		}
+		dgSpinUnlock(&m_lock0);
+	}
+
+	DG_INLINE void Unlock(dgInt32 m0, dgInt32 m1)
+	{
+		dgSpinLock(&m_lock1);
+		dgSpinUnlock(&m_bodyLocks[m0]);
+		dgSpinUnlock(&m_bodyLocks[m1]);
+		dgSpinUnlock(&m_lock1);
+	}
+
+
+
 	dgVector m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
 
 	dgFloat32 m_timestep;
@@ -140,21 +162,24 @@ class dgParallelSolverSyncData
 	dgFloat32 m_invTimestepRK;
 	dgFloat32 m_firstPassCoef;
 
+	dgInt32 m_lock0;
+	dgInt32 m_lock1;
 	dgInt32 m_maxPasses;
 	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
 	dgInt32 m_rowCount;
-	dgInt32 m_batchesCount;
 	dgInt32 m_atomicIndex;
-	dgInt32 m_jointsInBatch;
 	dgInt32 m_islandCount;
+	dgInt32 m_batchesCount____;
+	dgInt32 m_jointsInBatch____;
 	dgInt32 m_islandCountCounter;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
-
-	const dgIsland* m_islandArray;
+	
+	dgInt32* m_bodyLocks;  
 	dgBody** m_bodyInfoMap;
+	const dgIsland* m_islandArray;
 	dgParallelJointMap* m_jointInfoMap;
-	JointsBashes m_jointBatches[64];
+	JointsBashes m_jointBatches____[64];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
 };
 
@@ -274,7 +299,7 @@ class dgWorldDynamicUpdate
 	static void UpdateFeedbackForcesParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void UpdateBodyVelocityParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void FindActiveJointAndBodies (void* const context, void* const worldContext, dgInt32 threadID); 
-	static dgInt32 SortJointInfoByColor (const dgParallelJointMap* const indirectIndexA, const dgParallelJointMap* const indirectIndexB, void* const constraintArray);
+	static dgInt32 SortJointInfoByBatchIndex (const dgParallelJointMap* const indirectIndexA, const dgParallelJointMap* const indirectIndexB, void* const constraintArray);
 
 	void GetJacobianDerivativesParallel (dgJointInfo* const jointInfo, dgInt32 threadID, dgInt32 rowBase, dgFloat32 timestep) const;	
 	void CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;

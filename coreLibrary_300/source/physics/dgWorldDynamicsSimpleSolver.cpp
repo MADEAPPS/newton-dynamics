@@ -1827,7 +1827,6 @@ void dgWorldDynamicUpdate::CalculateForcesSimulationMode (const dgIsland* const 
 		totalPassesCount ++;
 	}
 	
-//	ApplyExternalForcesAndAcceleration (island, island->m_rowsStart, threadIndex, timestep, maxAccNorm);
 	ApplyExternalForcesAndAcceleration (island, threadIndex, timestep, maxAccNorm);
 }
 

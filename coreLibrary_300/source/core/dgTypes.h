@@ -828,6 +828,16 @@ DG_INLINE void dgThreadYield()
 #endif
 }
 
+DG_INLINE void dgSpinLock (dgInt32* const ptr)
+{
+	while (dgInterlockedExchange(ptr, 1));
+}
+
+DG_INLINE void dgSpinUnlock (dgInt32* const ptr)
+{
+	dgInterlockedExchange(ptr, 0);
+}
+
 DG_INLINE void dgPrefetchMem(const void* const mem)
 {
 	#if !(defined (__ppc__) || defined (ANDROID) || defined (IOS))

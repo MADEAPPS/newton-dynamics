@@ -35,11 +35,13 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 
 	dgWorld* const world = (dgWorld*) this;
 
-	world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (m_joints + 1024, sizeof (dgParallelJointMap));
+	world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (m_joints + 1024, sizeof (dgParallelJointMap) + sizeof (dgInt32));
 
-//	syncData.m_bodyAtomic = (dgThread::dgCriticalSection*) (&world->m_pairMemoryBuffer[0]);
-//	syncData.m_jointInfoMap = (dgParallelJointMap*) (&syncData.m_bodyAtomic[(m_bodies + 31) & ~0x0f]);
-	syncData.m_jointInfoMap = (dgParallelJointMap*) (&world->m_pairMemoryBuffer[0]);
+	syncData.m_bodyLocks = (dgInt32*) (&world->m_pairMemoryBuffer[0]);
+	memset (syncData.m_bodyLocks, 0, m_bodies* sizeof (syncData.m_bodyLocks[0]));
+
+//	syncData.m_jointInfoMap = (dgParallelJointMap*) (&world->m_pairMemoryBuffer[0]);
+	syncData.m_jointInfoMap = (dgParallelJointMap*) (&syncData.m_bodyLocks[(m_bodies + 31) & ~0x0f]);
 
 	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 
@@ -136,8 +138,8 @@ void dgWorldDynamicUpdate::CreateParallelArrayBatchArrays(dgParallelSolverSyncDa
 		}
 	}
 
-	dgSort (jointInfoMap, count, SortJointInfoByColor, constraintArray);
-
+	dgSort (jointInfoMap, count, SortJointInfoByBatchIndex, constraintArray);
+/*
 	dgInt32 bash = 0;
 	for (int index = 0; index < count; index ++) {
 		dgInt32 count = 0; 
@@ -151,6 +153,7 @@ void dgWorldDynamicUpdate::CreateParallelArrayBatchArrays(dgParallelSolverSyncDa
 		index --;
 	}
 	solverSyncData->m_batchesCount = bash;
+*/
 }
 
 
@@ -160,7 +163,7 @@ void dgWorldDynamicUpdate::InitilizeBodyArrayParallel (dgParallelSolverSyncData*
 	dgInt32 threadCounts = world->GetThreadCount();	
 
 	syncData->m_atomicIndex = 0;
-	for (dgInt32 j = 0; j < threadCounts; j ++) {
+	for (dgInt32 i = 0; i < threadCounts; i ++) {
 		world->QueueJob (InitializeBodyArrayParallelKernel, syncData, world);
 	}
 	world->SynchronizationBarrier();
@@ -205,17 +208,8 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallel (dgParallelSolverSyncData
 	dgWorld* const world = (dgWorld*) this;
 	dgInt32 threadCounts = world->GetThreadCount();	
 
-//	for (int i = 0; i < syncData->m_batchesCount; i ++) {
-//		syncData->m_atomicIndex = syncData->m_jointBatches[i].m_start;
-//		syncData->m_jointsInBatch = syncData->m_jointBatches[i].m_count + syncData->m_atomicIndex;
-//		for (dgInt32 j = 0; j < threadCounts; j ++) {
-//			world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, world);
-//		}
-//		world->SynchronizationBarrier();
-//	}
-
 	syncData->m_atomicIndex = 0;
-	for (dgInt32 j = 0; j < threadCounts; j ++) {
+	for (dgInt32 i = 0; i < threadCounts; i ++) {
 		world->QueueJob (BuildJacobianMatrixParallelKernel, syncData, world);
 	}
 	world->SynchronizationBarrier();
@@ -303,7 +297,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const contex
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
 
 	dgVector zero (dgFloat32 (0.0f));
-//	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 
 		dgInt32 jointIndex = jointInfoIndexArray[i].m_jointIndex;
@@ -393,25 +386,14 @@ void dgWorldDynamicUpdate::SolverInitInternalForcesParallel (dgParallelSolverSyn
 	dgWorld* const world = (dgWorld*) this;
 	dgInt32 threadCounts = world->GetThreadCount();	
 
-	for (int i = 0; i < syncData->m_batchesCount; i ++) {
-		syncData->m_atomicIndex = syncData->m_jointBatches[i].m_start;
-		syncData->m_jointsInBatch = syncData->m_jointBatches[i].m_count + syncData->m_atomicIndex;
-		for (dgInt32 j = 0; j < threadCounts; j ++) {
-			world->QueueJob (SolverInitInternalForcesParallelKernel, syncData, world);
-		}
-		world->SynchronizationBarrier();
+	syncData->m_atomicIndex = 0;
+	for (dgInt32 i = 0; i < threadCounts; i ++) {
+		world->QueueJob (SolverInitInternalForcesParallelKernel, syncData, world);
 	}
-
-//	syncData->m_atomicIndex = 0;
-//	for (dgInt32 j = 0; j < threadCounts; j ++) {
-//		world->QueueJob (SolverInitInternalForcesParallelKernel, syncData, world);
-//	}
 	world->SynchronizationBarrier();
-
-//	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
-//	internalForces[0].m_linear = dgVector (dgFloat32 (0.0f));
-//	internalForces[0].m_angular = dgVector (dgFloat32 (0.0f));
-
+	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
+	internalForces[0].m_linear = dgVector (dgFloat32 (0.0f));
+	internalForces[0].m_angular = dgVector (dgFloat32 (0.0f));
 }
 
 
@@ -424,11 +406,9 @@ void dgWorldDynamicUpdate::SolverInitInternalForcesParallelKernel (void* const c
 	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
 	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
-//	dgThread::dgCriticalSection* const bodyAtomic = syncData->m_bodyAtomic;
 
 	dgVector zero(dgFloat32 (0.0f));
-	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-//	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgJacobian y0;
 		dgJacobian y1;
 
@@ -458,20 +438,12 @@ void dgWorldDynamicUpdate::SolverInitInternalForcesParallelKernel (void* const c
 		dgInt32 m1 = jointInfo->m_m1;
 		dgAssert (m0 != m1);
 
-		//bodyAtomic[m0].Lock();
-		//bodyAtomic[m1].Lock();
-		if (m0) {
+		syncData->Lock (m0, m1);
 			internalForces[m0].m_linear += y0.m_linear;
 			internalForces[m0].m_angular += y0.m_angular;
-		}
-
-		if (m1) {
 			internalForces[m1].m_linear += y1.m_linear;
 			internalForces[m1].m_angular += y1.m_angular;
-		}
-
-		//bodyAtomic[m1].Unlock();
-		//bodyAtomic[m0].Unlock();
+		syncData->Unlock (m0, m1);
 	}
 }
 
@@ -512,7 +484,6 @@ void dgWorldDynamicUpdate::CalculateJointsAccelParallelKernel (void* const conte
 		dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 		const dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 
-		//for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {	
 		for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 			dgInt32 curJoint = jointInfoIndexArray[i].m_jointIndex;
 			dgInt32 m0 = constraintArray[curJoint].m_m0;
@@ -553,20 +524,12 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
 
 	dgVector accNorm (syncData->m_accelNorm[threadID]);
-	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-	//for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgInt32 curJoint = jointInfoIndexArray[i].m_jointIndex;
 		dgInt32 m0 = constraintArray[curJoint].m_m0;
 		dgInt32 m1 = constraintArray[curJoint].m_m1;
 
-		//bodyAtomic[m0].Lock();
-		//bodyAtomic[m1].Lock();
-		//if (!m0) {
-			//bodyAtomic[m0].Unlock();
-		//}
-		//if (!m1) {
-			//bodyAtomic[m1].Unlock();
-		//}
+		syncData->Lock(m0, m1);
 
 		const dgBody* const body0 = bodyArray[m0].m_body;
 		const dgBody* const body1 = bodyArray[m1].m_body;
@@ -657,12 +620,7 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 			internalForces[m1].m_angular = angularM1;
 		}
 
-		//if (m0) {
-			//bodyAtomic[m0].Unlock();
-		//}
-		//if (m1) {
-			//bodyAtomic[m1].Unlock();
-		//}
+		syncData->Unlock(m0, m1);
 	}
 	syncData->m_accelNorm[threadID] = accNorm;
 }
@@ -772,7 +730,6 @@ void dgWorldDynamicUpdate::UpdateFeedbackForcesParallelKernel (void* const conte
 
 	dgInt32 hasJointFeeback = 0;
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
-	//for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgInt32 curJoint = jointInfoIndexArray[i].m_jointIndex;
 		dgInt32 first = constraintArray[curJoint].m_autoPairstart;
@@ -848,7 +805,6 @@ void dgWorldDynamicUpdate::KinematicCallbackUpdateParallelKernel (void* const co
 	dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
-	//for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointsInBatch; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgInt32 curJoint = jointInfoIndexArray[i].m_jointIndex;
 		if (constraintArray[curJoint].m_joint->m_updaFeedbackCallback) {
@@ -894,17 +850,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameModeParallel (dgParallelSolverSync
 	syncData->m_firstPassCoef = dgFloat32 (0.0f);
 	for (dgInt32 step = 0; step < maxPasses; step ++) {
 
-		//		for (int i = 0; i < syncData->m_batchesCount; i ++) {
-		//			syncData->m_atomicIndex = syncData->m_jointBatches[i].m_start;
-		//			syncData->m_jointsInBatch = syncData->m_jointBatches[i].m_count + syncData->m_atomicIndex;
-		//			for (dgInt32 j = 0; j < threadCounts; j ++) {
-		//				world->QueueJob (CalculateJointsAccelParallelKernel, syncData, world);
-		//			}
-		//			world->SynchronizationBarrier();
-		//		}
-
 		syncData->m_atomicIndex = 0;
-		for (dgInt32 j = 0; j < threadCounts; j ++) {
+		for (dgInt32 i = 0; i < threadCounts; i ++) {
 			world->QueueJob (CalculateJointsAccelParallelKernel, syncData, world);
 		}
 		world->SynchronizationBarrier();
@@ -915,19 +862,11 @@ void dgWorldDynamicUpdate::CalculateForcesGameModeParallel (dgParallelSolverSync
 			for (dgInt32 i = 0; i < threadCounts; i ++) {
 				syncData->m_accelNorm[i] = dgVector (dgFloat32 (0.0f));
 			}
-			for (int i = 0; i < syncData->m_batchesCount; i ++) {
-				syncData->m_atomicIndex = syncData->m_jointBatches[i].m_start;
-				syncData->m_jointsInBatch = syncData->m_jointBatches[i].m_count + syncData->m_atomicIndex;
-				for (dgInt32 j = 0; j < threadCounts; j ++) {
-					world->QueueJob (CalculateJointsForceParallelKernel, syncData, world);
-				}
-				world->SynchronizationBarrier();
+			syncData->m_atomicIndex = 0;
+			for (dgInt32 i = 0; i < threadCounts; i ++) {
+				world->QueueJob (CalculateJointsForceParallelKernel, syncData, world);
 			}
-			//syncData->m_atomicIndex = 0;
-			//for (dgInt32 j = 0; j < threadCounts; j ++) {
-			//	world->QueueJob (CalculateJointsForceParallelKernel, syncData, world);
-			//}
-			//world->SynchronizationBarrier();
+			world->SynchronizationBarrier();
 
 			accNorm = dgFloat32 (0.0f);
 			for (dgInt32 i = 0; i < threadCounts; i ++) {
@@ -949,16 +888,6 @@ void dgWorldDynamicUpdate::CalculateForcesGameModeParallel (dgParallelSolverSync
 
 	}
 
-
-	//	for (int i = 0; i < syncData->m_batchesCount; i ++) {
-	//		syncData->m_atomicIndex = syncData->m_jointBatches[i].m_start;
-	//		syncData->m_jointsInBatch = syncData->m_jointBatches[i].m_count + syncData->m_atomicIndex;
-	//		for (dgInt32 j = 0; j < threadCounts; j ++) {
-	//			world->QueueJob (UpdateFeedbackForcesParallelKernel, syncData, world);
-	//		}
-	//		world->SynchronizationBarrier();
-	//	}
-
 	syncData->m_atomicIndex = 0;
 	for (dgInt32 j = 0; j < threadCounts; j ++) {
 		world->QueueJob (UpdateFeedbackForcesParallelKernel, syncData, world);
@@ -977,14 +906,6 @@ void dgWorldDynamicUpdate::CalculateForcesGameModeParallel (dgParallelSolverSync
 	world->SynchronizationBarrier();
 
 	if (hasJointFeeback) {
-		//		for (int i = 0; i < syncData->m_batchesCount; i ++) {
-		//			syncData->m_atomicIndex = syncData->m_jointBatches[i].m_start;
-		//			syncData->m_jointsInBatch = syncData->m_jointBatches[i].m_count + syncData->m_atomicIndex;
-		//			for (dgInt32 j = 0; j < threadCounts; j ++) {
-		//				world->QueueJob (KinematicCallbackUpdateParallelKernel, syncData, world);
-		//			}
-		//			world->SynchronizationBarrier();
-		//		}
 
 		syncData->m_atomicIndex = 0;
 		for (dgInt32 j = 0; j < threadCounts; j ++) {
