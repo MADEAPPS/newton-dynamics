@@ -523,13 +523,49 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
 
+static int xxx = 0;
+xxx = 0;
 	dgVector accNorm (syncData->m_accelNorm[threadID]);
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgInt32 curJoint = jointInfoIndexArray[i].m_jointIndex;
 		dgInt32 m0 = constraintArray[curJoint].m_m0;
 		dgInt32 m1 = constraintArray[curJoint].m_m1;
 
-		syncData->Lock(m0, m1);
+//		syncData->Lock(m0, m1);
+		dgSpinLock(&syncData->m_lock0, false);
+		{
+			dgInt32 test0 = 0;
+			dgInt32 test1 = 0;
+			if(m0) {
+				test0 = syncData->m_bodyLocks[m0];
+				syncData->m_bodyLocks[m0] = 1;
+			}
+			if (m1) {
+
+				test1 = syncData->m_bodyLocks[m1];
+				syncData->m_bodyLocks[m1] = 1;
+			}
+
+			if (test0 || test1) {
+				// push on joint stack
+xxx ++;
+				for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_jointCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+					curJoint = jointInfoIndexArray[i].m_jointIndex;
+					m0 = constraintArray[curJoint].m_m0;
+					m1 = constraintArray[curJoint].m_m1;
+					if (!(syncData->m_bodyLocks[m0] | syncData->m_bodyLocks[m1])) {
+						break;
+					}
+					// push on joint stack
+					xxx ++;
+				} 
+				if (i >= syncData->m_jointCount) {
+					Sleep(0);
+					break;
+				}
+			}
+		}
+		dgSpinUnlock(&syncData->m_lock0);
 
 		const dgBody* const body0 = bodyArray[m0].m_body;
 		const dgBody* const body1 = bodyArray[m1].m_body;
@@ -620,7 +656,9 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 			internalForces[m1].m_angular = angularM1;
 		}
 
-		syncData->Unlock(m0, m1);
+		//syncData->Unlock(m0, m1);
+		syncData->m_bodyLocks[m0] = 0;
+		syncData->m_bodyLocks[m1] = 0;
 	}
 	syncData->m_accelNorm[threadID] = accNorm;
 }
