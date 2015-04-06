@@ -84,11 +84,8 @@ class dgMatrix
 	bool TestOrthogonal() const;
 	bool TestSymetric3x3() const;
 
+	dgMatrix Multiply3X3 (const dgMatrix &B) const;
 	dgMatrix operator* (const dgMatrix &B) const;
-
-
-	
-	
 
 	// these function can only be called when dgMatrix is a PDS matrix
 	void EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess = dgGetIdentityMatrix());

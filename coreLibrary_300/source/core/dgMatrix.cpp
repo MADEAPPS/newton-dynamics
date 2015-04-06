@@ -96,6 +96,14 @@ dgMatrix::dgMatrix (const dgMatrix& transformMatrix, const dgVector& scale, cons
 	*this = stretchAxis.Transpose() * scaledAxis * transformMatrix;
 }
 
+dgMatrix dgMatrix::Multiply3X3 (const dgMatrix &B) const
+{
+	return dgMatrix (B.m_front.CompProduct4(m_front.BroadcastX()) + B.m_up.CompProduct4(m_front.BroadcastY()) + B.m_right.CompProduct4(m_front.BroadcastZ()), 
+					 B.m_front.CompProduct4(m_up.BroadcastX())    + B.m_up.CompProduct4(m_up.BroadcastY())    + B.m_right.CompProduct4(m_up.BroadcastZ()), 
+					 B.m_front.CompProduct4(m_right.BroadcastX()) + B.m_up.CompProduct4(m_right.BroadcastY()) + B.m_right.CompProduct4(m_right.BroadcastZ()), 
+					 dgVector::m_wOne); 
+}
+
 dgMatrix dgMatrix::operator* (const dgMatrix &B) const
 {
 #if 0
