@@ -210,6 +210,7 @@ class dgCollisionCompound: public dgCollision
 #endif
 	
 	dgNodeBase* BuildTopDown (dgNodeBase** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgList<dgNodeBase*>::dgListNode** const nextNode);
+	dgNodeBase* BuildTopDownBig (dgNodeBase** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgList<dgNodeBase*>::dgListNode** const nextNode);
 
 	dgFloat64 CalculateEntropy (dgList<dgNodeBase*>& list);
 
@@ -219,6 +220,8 @@ class dgCollisionCompound: public dgCollision
 	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const;
 
 	void PushNode (const dgMatrix& matrix, dgUpHeap<dgHeapNodePair, dgFloat32>& heap, dgNodeBase* const myNode, dgNodeBase* const otehrNode) const;
+
+	static dgInt32 CompareNodes (const dgNodeBase* const nodeA, const dgNodeBase* const nodeB, void* notUsed);
 
 
 	dgFloat32 m_boxMinRadius;

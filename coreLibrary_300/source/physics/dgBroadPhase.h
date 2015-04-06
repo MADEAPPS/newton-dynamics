@@ -139,7 +139,8 @@ class dgBroadPhase
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
 
 	bool TestOverlaping (const dgBody* const body0, const dgBody* const body1) const;
-	dgFloat64 CalculateEmptropy ();
+	dgFloat64 CalculateEntropy ();
+			  
 
 	dgWorld* m_world;
 	dgNode* m_rootNode;
@@ -152,6 +153,7 @@ class dgBroadPhase
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	bool m_recursiveChunks;
 
+	static dgVector m_obbTolerance;
 	static dgVector m_conservativeRotAngle;
 	friend class dgBody;
 	friend class dgWorld;

@@ -772,11 +772,11 @@ class dgVector
 	DG_INLINE dgFloat32 operator% (const dgVector& A) const
 	{
 		#ifdef DG_SSE4_INSTRUCTIONS_SET 
-			return dgVector (_mm_dp_ps (m_type, A.m_type, 0x77)).m_x; 
+			return dgVector (_mm_dp_ps (m_type, A.m_type, 0x77)).GetScalar(); 
 		#else
 			dgVector tmp (A & m_triplexMask);
 			dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
-			return CompProduct4(tmp).AddHorizontal().m_x;
+			return CompProduct4(tmp).AddHorizontal().GetScalar();
 		#endif
 	}
 

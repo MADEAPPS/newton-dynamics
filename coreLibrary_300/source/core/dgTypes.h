@@ -23,16 +23,13 @@
 #define __DGTYPES_H__
 
 
-#ifdef DG_SSE4_INSTRUCTIONS_SET
-	#undef DG_SCALAR_VECTOR_CLASS
-#endif
+#define DG_SSE4_INSTRUCTIONS_SET
 
 
 #if defined (_NEWTON_USE_DOUBLE) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
-	#undef DG_SSE4_INSTRUCTIONS_SET
 	#ifndef DG_SCALAR_VECTOR_CLASS
 		#define DG_SCALAR_VECTOR_CLASS
-	#endif		
+	#endif
 #endif
 
 

@@ -98,10 +98,17 @@ dgMatrix::dgMatrix (const dgMatrix& transformMatrix, const dgVector& scale, cons
 
 dgMatrix dgMatrix::operator* (const dgMatrix &B) const
 {
-	return dgMatrix (dgVector (B.m_front.Scale4(m_front.m_x) + B.m_up.Scale4(m_front.m_y) + B.m_right.Scale4(m_front.m_z) + B.m_posit.Scale4 (m_front.m_w)), 
-					 dgVector (B.m_front.Scale4(m_up.m_x)    + B.m_up.Scale4(m_up.m_y)    + B.m_right.Scale4(m_up.m_z)    + B.m_posit.Scale4 (m_up.m_w)), 
-					 dgVector (B.m_front.Scale4(m_right.m_x) + B.m_up.Scale4(m_right.m_y) + B.m_right.Scale4(m_right.m_z) + B.m_posit.Scale4 (m_right.m_w)), 
-					 dgVector (B.m_front.Scale4(m_posit.m_x) + B.m_up.Scale4(m_posit.m_y) + B.m_right.Scale4(m_posit.m_z) + B.m_posit.Scale4 (m_posit.m_w))); 
+#if 0
+	return dgMatrix (B.m_front.Scale4(m_front.m_x) + B.m_up.Scale4(m_front.m_y) + B.m_right.Scale4(m_front.m_z) + B.m_posit.Scale4 (m_front.m_w), 
+					 B.m_front.Scale4(m_up.m_x)    + B.m_up.Scale4(m_up.m_y)    + B.m_right.Scale4(m_up.m_z)    + B.m_posit.Scale4 (m_up.m_w), 
+					 B.m_front.Scale4(m_right.m_x) + B.m_up.Scale4(m_right.m_y) + B.m_right.Scale4(m_right.m_z) + B.m_posit.Scale4 (m_right.m_w), 
+					 B.m_front.Scale4(m_posit.m_x) + B.m_up.Scale4(m_posit.m_y) + B.m_right.Scale4(m_posit.m_z) + B.m_posit.Scale4 (m_posit.m_w)); 
+#else
+	return dgMatrix (B.m_front.CompProduct4(m_front.BroadcastX()) + B.m_up.CompProduct4(m_front.BroadcastY()) + B.m_right.CompProduct4(m_front.BroadcastZ()) + B.m_posit.CompProduct4 (m_front.BroadcastW()), 
+					 B.m_front.CompProduct4(m_up.BroadcastX())    + B.m_up.CompProduct4(m_up.BroadcastY())    + B.m_right.CompProduct4(m_up.BroadcastZ())    + B.m_posit.CompProduct4 (m_up.BroadcastW()), 
+					 B.m_front.CompProduct4(m_right.BroadcastX()) + B.m_up.CompProduct4(m_right.BroadcastY()) + B.m_right.CompProduct4(m_right.BroadcastZ()) + B.m_posit.CompProduct4 (m_right.BroadcastW()), 
+					 B.m_front.CompProduct4(m_posit.BroadcastX()) + B.m_up.CompProduct4(m_posit.BroadcastY()) + B.m_right.CompProduct4(m_posit.BroadcastZ()) + B.m_posit.CompProduct4 (m_posit.BroadcastW())); 
+#endif
 }
 
 
