@@ -1307,53 +1307,61 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 				dgVector test (box0.CompProduct4((box1)));
 				ret = (test.GetSignMask() & 0x07) == 0x07;
 				if (ret) {
-					dgMatrix crossMatrix (matrix.Transpose());
-					//dgMatrix crosMatrixTrans (matrixAbs.Transpose());
-
-					dgVector crossDirY (crossMatrix[2].CompProduct4(dgVector::m_negOne));
-					dgVector crossDirZ (crossMatrix[1]);
-
+					dgMatrix matrixTransposed (matrix.Transpose());
+					
 					dgVector origin0_y (origin0.BroadcastY());
 					dgVector origin0_z (origin0.BroadcastZ());
-
 					dgVector size0_y (size0.BroadcastY());
 					dgVector size0_z (size0.BroadcastZ());
-
-					dgVector origin2__ (origin0_y.CompProduct4(crossDirY) + origin0_z.CompProduct4(crossDirZ));
-					dgVector size2__ (size0_y.CompProduct4(crossDirY.Abs()) + size0_z.CompProduct4(crossDirZ.Abs()));
-
-					dgVector p0__ (origin2__ - size2__);
-					dgVector p1__ (origin2__ + size2__);
+					dgVector crossDir0_y (matrixTransposed[2]);
+					dgVector crossDir0_z (matrixTransposed[1]);
+					dgVector originCross0__ (origin0_z.CompProduct4(crossDir0_z) - origin0_y.CompProduct4(crossDir0_y));
+					dgVector sizeCross0__ (size0_y.CompProduct4(crossDir0_y.Abs() + m_obbTolerance) + size0_z.CompProduct4(crossDir0_z.Abs() + m_obbTolerance));
+					dgVector pCross0__ (originCross0__ - sizeCross0__);
+					dgVector pCross1__ (originCross0__ + sizeCross0__);
 
 					dgVector origin1_y (origin1.BroadcastY());
 					dgVector origin1_z (origin1.BroadcastZ());
-					dgVector origin3___ (origin1_y.CompProduct4(crossDirY) + origin1_z.CompProduct4(crossDirZ));
+					dgVector originCross1___ (origin1_y.CompProduct4(crossDir0_y) + origin1_z.CompProduct4(crossDir0_z));
+					dgMatrix crossDir1Matrix (matrixTransposed[1].CompProduct4(matrix[0].BroadcastZ()) - matrixTransposed[2].CompProduct4(matrix[0].BroadcastY()), 
+											  matrixTransposed[1].CompProduct4(matrix[1].BroadcastZ()) - matrixTransposed[2].CompProduct4(matrix[1].BroadcastY()), 
+											  matrixTransposed[1].CompProduct4(matrix[2].BroadcastZ()) - matrixTransposed[2].CompProduct4(matrix[2].BroadcastY()), 
+											  dgVector::m_wOne); 
 
-					//dgVector crossDir3_x (crossMatrix[1].DotProduct4(crossA) + crossMatrix[2].DotProduct4(crossB));
-					//dgVector size3__ (size1.CompProduct4 (crossMatrix[1].CompProduct4(crossA_y.Abs()) + crossMatrix[2].CompProduct4(crossB_.AddHorizontal())));
+					dgVector size1_x (size1.BroadcastY());
+					dgVector size1_y (size1.BroadcastY());
+					dgVector size1_z (size1.BroadcastZ());
+					dgVector sizeCross1__ (size1_x.CompProduct4(crossDir1Matrix[0].Abs() + m_obbTolerance) + size1_y.CompProduct4(crossDir1Matrix[1].Abs() + m_obbTolerance) + size1_z.CompProduct4(crossDir1Matrix[2].Abs() + m_obbTolerance));
+
+					dgVector qCross0__ (originCross1___ - sizeCross1__);
+					dgVector qCross1__ (originCross1___ + sizeCross1__);
+
+					dgVector boxCross0__ (pCross0__ - qCross1__);
+					dgVector boxCross1__ (pCross1__ - qCross0__);
+					dgVector testCross__ (boxCross0__.CompProduct4((boxCross1__)));
 
 					for (dgInt32 i = 0; (i < 3) && ret; i ++) {
 						dgVector dir(dgFloat32 (0.0f));
 						dir[i] = dgFloat32 (1.0f);
 						for (dgInt32 j = 0; (j < 3) && ret; j ++) {
 							dgVector crossDir (dir * matrix[j]);
-							if (crossDir.DotProduct4(crossDir).m_x > dgFloat32 (1.0e-7f)) 
+//							if (crossDir.DotProduct4(crossDir).m_x > dgFloat32 (1.0e-7f)) 
 							{
-								dgVector size2 (size0.DotProduct4(crossDir.Abs()));
-								dgVector origin2 (origin0.DotProduct4(crossDir));
-								dgVector p0 (origin2 - size2);
-								dgVector p1 (origin2 + size2);
+								dgVector sizeCross0 (size0.DotProduct4(crossDir.Abs() + m_obbTolerance));
+								dgVector originCross0 (origin0.DotProduct4(crossDir));
+								dgVector pCross0 (originCross0 - sizeCross0);
+								dgVector pCross1 (originCross0 + sizeCross0);
 						
-								dgVector origin3 (origin1.DotProduct4(crossDir));
-								dgVector crossDir3 (matrix[0].DotProduct4(crossDir).m_x, matrix[1].DotProduct4(crossDir).m_x, matrix[2].DotProduct4(crossDir).m_x, dgFloat32 (0.0f));
-								dgVector size3 (size1.DotProduct4(crossDir3.Abs()));
-								dgVector q0 (origin3 - size3);
-								dgVector q1 (origin3 + size3);
+								dgVector originCross1 (origin1.DotProduct4(crossDir));
+								dgVector crossCrossSupport1 (matrix[0].DotProduct4(crossDir).m_x, matrix[1].DotProduct4(crossDir).m_x, matrix[2].DotProduct4(crossDir).m_x, dgFloat32 (0.0f));
+								dgVector sizeCross1 (size1.DotProduct4(crossCrossSupport1.Abs() + m_obbTolerance));
+								dgVector qCross0 (originCross1 - sizeCross1);
+								dgVector qCross1 (originCross1 + sizeCross1);
 
-								dgVector box0 (p0 - q1);
-								dgVector box1 (p1 - q0);
-								dgVector test (box0.CompProduct4((box1)));
-								ret = (test.GetSignMask() & 0x01) == 0x01;
+								dgVector boxCross0 (pCross0 - qCross1);
+								dgVector boxCross1 (pCross1 - qCross0);
+								dgVector testCross (boxCross0.CompProduct4((boxCross1)));
+								ret = (testCross.GetSignMask() & 0x01) == 0x01;
 							}
 						}
 					}
