@@ -1279,6 +1279,9 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 			instance1->CalcObb (origin1, size1);
 			dgMatrix matrix (instance1->GetGlobalMatrix() * instance0->GetGlobalMatrix().Inverse());
 
+matrix = dgPitchMatrix(30.0 * 3.141592f / 180.0f) * dgYawMatrix(30.0 * 3.141592f / 180.0f);
+matrix.m_posit = dgVector (0.0f, 0.5f, 0.0f, 1.0f);
+
 			dgMatrix matrixAbs;
 			matrixAbs[0] = matrix[0].Abs() + m_obbTolerance;
 			matrixAbs[1] = matrix[1].Abs() + m_obbTolerance;
@@ -1322,13 +1325,13 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 
 					dgVector origin1_y (origin1.BroadcastY());
 					dgVector origin1_z (origin1.BroadcastZ());
-					dgVector originCross1___ (origin1_y.CompProduct4(crossDir0_y) + origin1_z.CompProduct4(crossDir0_z));
+					dgVector originCross1___ (origin1_z.CompProduct4(crossDir0_z) - origin1_y.CompProduct4(crossDir0_y));
 					dgMatrix crossDir1Matrix (matrixTransposed[1].CompProduct4(matrix[0].BroadcastZ()) - matrixTransposed[2].CompProduct4(matrix[0].BroadcastY()), 
 											  matrixTransposed[1].CompProduct4(matrix[1].BroadcastZ()) - matrixTransposed[2].CompProduct4(matrix[1].BroadcastY()), 
 											  matrixTransposed[1].CompProduct4(matrix[2].BroadcastZ()) - matrixTransposed[2].CompProduct4(matrix[2].BroadcastY()), 
 											  dgVector::m_wOne); 
 
-					dgVector size1_x (size1.BroadcastY());
+					dgVector size1_x (size1.BroadcastX());
 					dgVector size1_y (size1.BroadcastY());
 					dgVector size1_z (size1.BroadcastZ());
 					dgVector sizeCross1__ (size1_x.CompProduct4(crossDir1Matrix[0].Abs() + m_obbTolerance) + size1_y.CompProduct4(crossDir1Matrix[1].Abs() + m_obbTolerance) + size1_z.CompProduct4(crossDir1Matrix[2].Abs() + m_obbTolerance));
