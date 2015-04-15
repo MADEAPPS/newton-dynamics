@@ -434,7 +434,13 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 			dgFloat32 side1 = plane.Evalue (p1);
 
 			if ((side0 * side1) < dgFloat32 (0.0f)) {
-				contactsOut[count] = p0 - plane.Scale3 (side0);
+				dgVector dp (p1 - p0);
+				dgFloat32 t = plane % dp;
+				dgAssert (dgAbsf (t) >= dgFloat32 (0.0f));
+				if (dgAbsf (t) < dgFloat32 (1.0e-8f)) {
+					t = dgSign(t) * dgFloat32 (1.0e-8f);	
+				}
+				contactsOut[count] = p0 - dp.Scale3 (side0 / t);
 				count ++;
 				if (count > 1) {
 					dgVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
@@ -736,33 +742,20 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 
 	dgInt32 count = 0;
 
+
 	m_normal = m_normal.CompProduct4(polyInstanceInvScale);
 	dgAssert(m_normal.m_w == dgFloat32(0.0f));
 	m_normal = m_normal.CompProduct4(m_normal.DotProduct4(m_normal).InvSqrt());
 	dgVector savedFaceNormal(m_normal);
+
+	dgVector savedPosit (proxy.m_matrix.m_posit);
+	proxy.m_matrix.m_posit = dgVector::m_wOne;
+
+	dgVector hullOrigin(proxy.m_matrix.UnrotateVector (savedPosit));
 	for (dgInt32 i = 0; i < m_count; i++) {
-		m_localPoly[i] = polyInstanceScale.CompProduct4(dgVector(&m_vertex[m_vertexIndex[i] * m_stride]));
+		m_localPoly[i] = hullOrigin + polyInstanceScale.CompProduct4(dgVector(&m_vertex[m_vertexIndex[i] * m_stride]));
 		dgAssert(m_localPoly[i].m_w == dgFloat32(0.0f));
 	}
-
-	dgVector hullOrigin(proxy.m_matrix.UntransformVector(dgVector(dgFloat32(0.0f))));
-
-	dgMatrix polygonMatrix;
-	polygonMatrix[0] = m_localPoly[1] - m_localPoly[0];
-	polygonMatrix[0] = polygonMatrix[0].CompProduct4(polygonMatrix[0].DotProduct4(polygonMatrix[0]).InvSqrt());
-	polygonMatrix[1] = m_normal;
-	polygonMatrix[2] = polygonMatrix[0] * m_normal;
-	polygonMatrix[3] = (hullOrigin - m_normal.CompProduct4(m_normal.DotProduct4(hullOrigin - m_localPoly[0]))) | dgVector::m_wOne;
-
-	dgAssert(polygonMatrix.TestOrthogonal());
-
-	m_normal = polygonMatrix.UnrotateVector(m_normal);
-	for (dgInt32 i = 0; i < m_count; i++) {
-		m_localPoly[i] = polygonMatrix.UntransformVector(m_localPoly[i]);
-		dgAssert(m_localPoly[i].m_w == dgFloat32(0.0f));
-	}
-	dgMatrix savedProxyMatrix(proxy.m_matrix);
-	proxy.m_matrix = polygonMatrix * proxy.m_matrix;
 
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	const dgCollisionInstance* const hull = proxy.m_referenceCollision;
@@ -775,19 +768,19 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 	dgFloat32 penetration = (m_localPoly[0] - p0) % m_normal + proxy.m_skinThickness;
 	if (penetration < dgFloat32(0.0f)) {
 		contactJoint->m_closestDistance = -penetration;
-		proxy.m_matrix = savedProxyMatrix;
+		proxy.m_matrix.m_posit = savedPosit;
 		return 0;
 	}
 
 	contactJoint->m_closestDistance = dgFloat32(0.0f);
 	dgFloat32 distance = (m_localPoly[0] - p1) % m_normal;
 	if (distance >= dgFloat32(0.0f)) {
-		proxy.m_matrix = savedProxyMatrix;
+		proxy.m_matrix.m_posit = savedPosit;
 		return 0;
 	}
 
-	const dgVector& boxSize = hull->GetBoxSize();
-	const dgVector& boxOrigin = hull->GetBoxOrigin();
+	dgVector boxSize (hull->GetBoxSize() & dgVector::m_triplexMask);
+	dgVector boxOrigin ((hull->GetBoxOrigin() & dgVector::m_triplexMask) + dgVector::m_wOne);
 
 	bool inside = true;
 	dgInt32 i0 = m_count - 1;
@@ -795,19 +788,23 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 
 		dgVector e(m_localPoly[i] - m_localPoly[i0]);
 		dgVector n(m_normal * e);
-		dgPlane plane(n, -(m_localPoly[i0] % n));
+		//dgPlane plane(n, -(m_localPoly[i0] % n));
+		dgPlane plane(n, - m_localPoly[i0].DotProduct4 (n).GetScalar());
 		plane = proxy.m_matrix.TransformPlane(plane);
 
-		dgFloat32 supportDist = dgAbsf(plane.m_x) * boxSize.m_x + dgAbsf(plane.m_y) * boxSize.m_y + dgAbsf(plane.m_z) * boxSize.m_z;
-		dgFloat32 centerDist = plane.Evalue(boxOrigin);
+		//dgFloat32 supportDist = dgAbsf(plane.m_x) * boxSize.m_x + dgAbsf(plane.m_y) * boxSize.m_y + dgAbsf(plane.m_z) * boxSize.m_z;
+		//dgFloat32 centerDist = plane.Evalue(boxOrigin);
+		dgFloat32 supportDist = boxSize.DotProduct4 (plane.Abs()).GetScalar();
+		dgFloat32 centerDist = plane.DotProduct4 (boxOrigin).GetScalar();
 
 		if ((centerDist + supportDist) < dgFloat32(0.0f)) {
-			proxy.m_matrix = savedProxyMatrix;
+			proxy.m_matrix.m_posit = savedPosit;
 			return 0;
 		}
 
 		if ((centerDist - supportDist) < dgFloat32(0.0f)) {
 			inside = false;
+			break;
 		}
 		i0 = i;
 	}
@@ -890,6 +887,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 		}
 	}
 
-	proxy.m_matrix = savedProxyMatrix;
+	proxy.m_matrix.m_posit = savedPosit;
 	return count;
 }
