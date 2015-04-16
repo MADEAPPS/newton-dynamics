@@ -151,7 +151,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 
 
 	// load the mesh 
-	CreateLevelMesh (scene, "swimmingPool.ngd", false);
+	CreateLevelMesh (scene, "swimmingPool.ngd", true);
 
 
 	// add a trigger Manager to the world

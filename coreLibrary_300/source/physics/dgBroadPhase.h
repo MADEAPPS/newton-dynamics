@@ -108,6 +108,8 @@ class dgBroadPhase
 	void UpdateBodyBroadphase(dgBody* const body, dgInt32 threadIndex);
 
 	void ImproveFitness();
+	void RotateLeft (dgNode* const node);
+	void RotateRight (dgNode* const node);
 	void ImproveNodeFitness (dgNode* const node);
 	dgNode* InsertNode (dgNode* const node);
 	dgFloat32 CalculateSurfaceArea (const dgNode* const node0, const dgNode* const node1, dgVector& minBox, dgVector& maxBox) const;

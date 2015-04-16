@@ -621,6 +621,133 @@ void dgBroadPhase::Remove (dgBody* const body)
 }
 
 
+void dgBroadPhase::RotateLeft (dgNode* const node)
+{
+	dgVector cost1P0;
+	dgVector cost1P1;		
+	dgFloat32 cost1 = CalculateSurfaceArea (node->m_left, node->m_parent->m_left, cost1P0, cost1P1);
+
+	dgVector cost2P0;
+	dgVector cost2P1;		
+	dgFloat32 cost2 = CalculateSurfaceArea (node->m_right, node->m_parent->m_left, cost2P0, cost2P1);
+
+	dgFloat32 cost0 = node->m_surfaceArea;
+	if ((cost1 <= cost0) && (cost1 <= cost2)) {
+
+		dgNode* const parent = node->m_parent;
+		node->m_minBox = parent->m_minBox;
+		node->m_maxBox = parent->m_maxBox;
+		node->m_surfaceArea = parent->m_surfaceArea; 
+		if (parent->m_parent) {
+			if (parent->m_parent->m_left == parent) {
+				parent->m_parent->m_left = node;
+			} else {
+				dgAssert (parent->m_parent->m_right == parent);
+				parent->m_parent->m_right = node;
+			}
+		} else {
+			m_rootNode = node;
+		}
+		node->m_parent = parent->m_parent;
+		parent->m_parent = node;
+		node->m_left->m_parent = parent;
+		parent->m_right = node->m_left;
+		node->m_left = parent;
+
+		parent->m_minBox = cost1P0;
+		parent->m_maxBox = cost1P1;		
+		parent->m_surfaceArea = cost1;
+
+	} else if ((cost2 <= cost0) && (cost2 <= cost1)) {
+		dgNode* const parent = node->m_parent;
+		node->m_minBox = parent->m_minBox;
+		node->m_maxBox = parent->m_maxBox;
+		node->m_surfaceArea = parent->m_surfaceArea; 
+		if (parent->m_parent) {
+			if (parent->m_parent->m_left == parent) {
+				parent->m_parent->m_left = node;
+			} else {
+				dgAssert (parent->m_parent->m_right == parent);
+				parent->m_parent->m_right = node;
+			}
+		} else {
+			m_rootNode = node;
+		}
+		node->m_parent = parent->m_parent;
+		parent->m_parent = node;
+		node->m_right->m_parent = parent;
+		parent->m_right = node->m_right;
+		node->m_right = parent;
+
+		parent->m_minBox = cost2P0;
+		parent->m_maxBox = cost2P1;		
+		parent->m_surfaceArea = cost2;
+	}
+}
+
+void dgBroadPhase::RotateRight (dgNode* const node)
+{
+	dgVector cost1P0;
+	dgVector cost1P1;		
+	dgFloat32 cost1 = CalculateSurfaceArea (node->m_right, node->m_parent->m_right, cost1P0, cost1P1);
+
+	dgVector cost2P0;
+	dgVector cost2P1;		
+	dgFloat32 cost2 = CalculateSurfaceArea (node->m_left, node->m_parent->m_right, cost2P0, cost2P1);
+
+	dgFloat32 cost0 = node->m_surfaceArea;
+	if ((cost1 <= cost0) && (cost1 <= cost2)) {
+		dgNode* const parent = node->m_parent;
+		node->m_minBox = parent->m_minBox;
+		node->m_maxBox = parent->m_maxBox;
+		node->m_surfaceArea = parent->m_surfaceArea; 
+		if (parent->m_parent) {
+			if (parent->m_parent->m_left == parent) {
+				parent->m_parent->m_left = node;
+			} else {
+				dgAssert (parent->m_parent->m_right == parent);
+				parent->m_parent->m_right = node;
+			}
+		} else {
+			m_rootNode = node;
+		}
+		node->m_parent = parent->m_parent;
+		parent->m_parent = node;
+		node->m_right->m_parent = parent;
+		parent->m_left = node->m_right;
+		node->m_right = parent;
+		parent->m_minBox = cost1P0;
+		parent->m_maxBox = cost1P1;		
+		parent->m_surfaceArea = cost1;
+
+	} else if ((cost2 <= cost0) && (cost2 <= cost1)) {
+		dgNode* const parent = node->m_parent;
+		node->m_minBox = parent->m_minBox;
+		node->m_maxBox = parent->m_maxBox;
+		node->m_surfaceArea = parent->m_surfaceArea; 
+
+		if (parent->m_parent) {
+			if (parent->m_parent->m_left == parent) {
+				parent->m_parent->m_left = node;
+			} else {
+				dgAssert (parent->m_parent->m_right == parent);
+				parent->m_parent->m_right = node;
+			}
+		} else {
+			m_rootNode = node;
+		}
+		node->m_parent = parent->m_parent;
+		parent->m_parent = node;
+		node->m_left->m_parent = parent;
+		parent->m_left = node->m_left;
+		node->m_left = parent;
+
+		parent->m_minBox = cost2P0;
+		parent->m_maxBox = cost2P1;		
+		parent->m_surfaceArea = cost2;
+	}
+}
+
 
 void dgBroadPhase::ImproveNodeFitness (dgNode* const node)
 {
@@ -629,130 +756,9 @@ void dgBroadPhase::ImproveNodeFitness (dgNode* const node)
 
 	if (node->m_parent)	{
 		if (node->m_parent->m_left == node) {
-			dgFloat32 cost0 = node->m_surfaceArea;
-
-			dgVector cost1P0;
-			dgVector cost1P1;		
-			dgFloat32 cost1 = CalculateSurfaceArea (node->m_right, node->m_parent->m_right, cost1P0, cost1P1);
-
-			dgVector cost2P0;
-			dgVector cost2P1;		
-			dgFloat32 cost2 = CalculateSurfaceArea (node->m_left, node->m_parent->m_right, cost2P0, cost2P1);
-
-			if ((cost1 <= cost0) && (cost1 <= cost2)) {
-				dgNode* const parent = node->m_parent;
-				node->m_minBox = parent->m_minBox;
-				node->m_maxBox = parent->m_maxBox;
-				node->m_surfaceArea = parent->m_surfaceArea; 
-				if (parent->m_parent) {
-					if (parent->m_parent->m_left == parent) {
-						parent->m_parent->m_left = node;
-					} else {
-						dgAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				} else {
-					m_rootNode = node;
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_right->m_parent = parent;
-				parent->m_left = node->m_right;
-				node->m_right = parent;
-				parent->m_minBox = cost1P0;
-				parent->m_maxBox = cost1P1;		
-				parent->m_surfaceArea = cost1;
-
-
-			} else if ((cost2 <= cost0) && (cost2 <= cost1)) {
-				dgNode* const parent = node->m_parent;
-				node->m_minBox = parent->m_minBox;
-				node->m_maxBox = parent->m_maxBox;
-				node->m_surfaceArea = parent->m_surfaceArea; 
-
-				if (parent->m_parent) {
-					if (parent->m_parent->m_left == parent) {
-						parent->m_parent->m_left = node;
-					} else {
-						dgAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				} else {
-					m_rootNode = node;
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_left->m_parent = parent;
-				parent->m_left = node->m_left;
-				node->m_left = parent;
-
-				parent->m_minBox = cost2P0;
-				parent->m_maxBox = cost2P1;		
-				parent->m_surfaceArea = cost2;
-			}
+			RotateRight (node);
 		} else {
-			dgFloat32 cost0 = node->m_surfaceArea;
-
-			dgVector cost1P0;
-			dgVector cost1P1;		
-			dgFloat32 cost1 = CalculateSurfaceArea (node->m_left, node->m_parent->m_left, cost1P0, cost1P1);
-
-			dgVector cost2P0;
-			dgVector cost2P1;		
-			dgFloat32 cost2 = CalculateSurfaceArea (node->m_right, node->m_parent->m_left, cost2P0, cost2P1);
-
-
-			if ((cost1 <= cost0) && (cost1 <= cost2)) {
-
-				dgNode* const parent = node->m_parent;
-				node->m_minBox = parent->m_minBox;
-				node->m_maxBox = parent->m_maxBox;
-				node->m_surfaceArea = parent->m_surfaceArea; 
-				if (parent->m_parent) {
-					if (parent->m_parent->m_left == parent) {
-						parent->m_parent->m_left = node;
-					} else {
-						dgAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				} else {
-					m_rootNode = node;
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_left->m_parent = parent;
-				parent->m_right = node->m_left;
-				node->m_left = parent;
-
-				parent->m_minBox = cost1P0;
-				parent->m_maxBox = cost1P1;		
-				parent->m_surfaceArea = cost1;
-
-			} else if ((cost2 <= cost0) && (cost2 <= cost1)) {
-				dgNode* const parent = node->m_parent;
-				node->m_minBox = parent->m_minBox;
-				node->m_maxBox = parent->m_maxBox;
-				node->m_surfaceArea = parent->m_surfaceArea; 
-				if (parent->m_parent) {
-					if (parent->m_parent->m_left == parent) {
-						parent->m_parent->m_left = node;
-					} else {
-						dgAssert (parent->m_parent->m_right == parent);
-						parent->m_parent->m_right = node;
-					}
-				} else {
-					m_rootNode = node;
-				}
-				node->m_parent = parent->m_parent;
-				parent->m_parent = node;
-				node->m_right->m_parent = parent;
-				parent->m_right = node->m_right;
-				node->m_right = parent;
-
-				parent->m_minBox = cost2P0;
-				parent->m_maxBox = cost2P1;		
-				parent->m_surfaceArea = cost2;
-			}
+			RotateLeft (node);
 		}
 	}
 	dgAssert (!m_rootNode->m_parent);
@@ -1677,8 +1683,12 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 			const dgBody* const body0 = contact->m_body0;
 			const dgBody* const body1 = contact->m_body1;
 			if (! ((body0->m_sleeping | body0->m_equilibrium) & (body1->m_sleeping | body1->m_equilibrium)) ) {
-				deadContacs[count] = contact;
-				count ++;
+				if (contact->m_contactActive) {
+					contact->m_contactActive = false;
+				} else {
+					deadContacs[count] = contact;
+					count ++;
+				}
 			} else if ((lru -  contact->m_broadphaseLru) > 200) {
 				dgVector minBox (body0->m_minAABB - body1->m_maxAABB);
 				dgVector maxBox (body0->m_maxAABB - body1->m_minAABB);
@@ -1689,8 +1699,12 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 				if (dist.GetScalar() < dgFloat32(2.0f)) {
 					contact->m_broadphaseLru = lru - 1;
 				} else {
-					deadContacs[count] = contact;
-					count ++;
+					if (contact->m_contactActive) {
+						contact->m_contactActive = false;
+					} else {
+						deadContacs[count] = contact;
+						count ++;
+					}
 				}
 			}
 		}
