@@ -945,7 +945,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	}
 }
 
-
+/*
 dgInt32 dgWorldDynamicUpdate::SortJointInfoByBatchIndex (const dgParallelJointMap* const indirectIndexA, const dgParallelJointMap* const indirectIndexB, void* const context)
 {
 	if (indirectIndexA->m_bashIndex < indirectIndexB->m_bashIndex) {
@@ -956,6 +956,6 @@ dgInt32 dgWorldDynamicUpdate::SortJointInfoByBatchIndex (const dgParallelJointMa
 	}
 	return 0;
 }
-
+*/
 
 

@@ -1136,29 +1136,22 @@ void dgCollisionCompound::RemoveCollision (dgTreeArray::dgTreeNode* const node)
 void dgCollisionCompound::SetCollisionMatrix (dgTreeArray::dgTreeNode* const node, const dgMatrix& matrix)
 {
 	if (node) {
+
 		dgWorld* const world = m_world;
-		dgNodeBase* const baseNode = node->GetInfo();
+		dgNodeBase* baseNode = node->GetInfo();
 		dgCollisionInstance* const instance = baseNode->GetShape();
 		instance->SetLocalMatrix(matrix);
 
 		dgVector p0;
 		dgVector p1;
 		instance->CalcAABB(instance->GetLocalMatrix (), p0, p1);
-		{
-			dgThreadHiveScopeLock lock (world, &m_criticalSectionLock, false);
-			baseNode->SetBox (p0, p1);
-		}
-
-		for (dgNodeBase* parent = baseNode->m_parent; parent; parent = parent->m_parent) {
-			dgVector minBox;
-			dgVector maxBox;
-			CalculateSurfaceArea (parent->m_left, parent->m_right, minBox, maxBox);
-			if (dgBoxInclusionTest (minBox, maxBox, parent->m_p0, parent->m_p1)) {
-				break;
-			}
-			
-			dgThreadHiveScopeLock lock (world, &m_criticalSectionLock, false);
-			parent->SetBox (minBox, maxBox);
+		
+		dgThreadHiveScopeLock lock (world, &m_criticalSectionLock, false);
+		baseNode->SetBox (p0, p1);
+		for (dgNodeBase* parent = baseNode->m_parent; parent && !dgBoxInclusionTest (baseNode->m_p0, baseNode->m_p1, parent->m_p0, parent->m_p1); parent = parent->m_parent) {
+			CalculateSurfaceArea (parent, baseNode, p0, p1);
+			parent->SetBox (p0, p1);
+			baseNode = parent;
 		}
 	}
 }

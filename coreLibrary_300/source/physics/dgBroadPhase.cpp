@@ -1217,7 +1217,7 @@ void dgBroadPhase::UpdateContactsKernel (void* const context, void* const worldC
 }
 
 
-void dgBroadPhase::AddGeneratedBodyesContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
+void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
@@ -2078,7 +2078,7 @@ void dgBroadPhase::UpdateContacts (dgFloat32 timestep)
 	if (m_generatedBodies.GetCount()) {
 		syncPoints.m_newBodiesNodes = m_generatedBodies.GetFirst();
 		for (dgInt32 i = 0; i < threadsCount; i ++) {
-			m_world->QueueJob (AddGeneratedBodyesContactsKernel, &syncPoints, m_world);
+			m_world->QueueJob (AddGeneratedBodiesContactsKernel, &syncPoints, m_world);
 		}
 		m_world->SynchronizationBarrier();
 

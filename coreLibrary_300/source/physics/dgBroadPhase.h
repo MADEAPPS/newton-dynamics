@@ -120,7 +120,7 @@ class dgBroadPhase
 	static void CollidingPairsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void UpdateContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 //	static void UpdateSoftBodyForcesKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
-	static void AddGeneratedBodyesContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void AddGeneratedBodiesContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static dgInt32 CompareNodes (const dgNode* const nodeA, const dgNode* const nodeB, void* notUsed);
 	
 	void UpdateContactsBroadPhaseEnd ();

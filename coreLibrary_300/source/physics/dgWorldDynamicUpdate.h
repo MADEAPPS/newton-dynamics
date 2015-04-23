@@ -104,70 +104,16 @@ class dgJointInfo
 	dgInt32 m_autoPairActiveCount;
 	dgInt32 m_m0;
 	dgInt32 m_m1;
-	dgInt32 m_color;
 };
 
-
-
-class dgParallelJointMap
-{
-	public:
-	dgInt32 m_bashIndex;
-	dgInt32 m_jointIndex;
-};
 
 class dgParallelSolverSyncData
 {
 	public:
-	class JointsBashes
-	{	
-		public:
-		dgInt32 m_start;
-		dgInt32 m_count;
-	};
-
 	dgParallelSolverSyncData()
 	{
 		memset (this, 0, sizeof (dgParallelSolverSyncData));
 	}
-
-	DG_INLINE void Lock(dgInt32 m0, dgInt32 m1)
-	{
-		dgSpinLock(&m_lock0, false);
-//		if (!(m0 | m_bodyLocks[m0]) & !(m1 | m_bodyLocks[m1])) {
-//			m_bodyLocks[m0] = 1;
-//			m_bodyLocks[m1] = 1;
-//		}
-		int test0 = 0;
-		int test1 = 0;
-		if(m0) {
-			//dgSpinLock(&m_bodyLocks[m0], false);
-			test0 = m_bodyLocks[m0];
-			m_bodyLocks[m0] = 1;
-		}
-		if (m1) {
-			//dgSpinLock(&m_bodyLocks[m1], false);
-			test1 = m_bodyLocks[m1];
-			m_bodyLocks[m1] = 1;
-		}
-
-		if (test0 || test1) {
-			dgAssert (0);
-		}
-		dgSpinUnlock(&m_lock0);
-	}
-
-	DG_INLINE void Unlock(dgInt32 m0, dgInt32 m1)
-	{
-		dgSpinLock(&m_lock1, false);
-		//dgSpinUnlock(&m_bodyLocks[m0]);
-		//dgSpinUnlock(&m_bodyLocks[m1]);
-		m_bodyLocks[m0] = 0;
-		m_bodyLocks[m1] = 0;
-		dgSpinUnlock(&m_lock1);
-	}
-
-
 
 	dgVector m_accelNorm[DG_MAX_THREADS_HIVE_COUNT];
 
@@ -178,24 +124,16 @@ class dgParallelSolverSyncData
 	dgFloat32 m_invTimestepRK;
 	dgFloat32 m_firstPassCoef;
 
-	dgInt32 m_lock0;
-	dgInt32 m_lock1;
+	dgInt32 m_lock;
 	dgInt32 m_maxPasses;
 	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
 	dgInt32 m_rowCount;
 	dgInt32 m_atomicIndex;
-	dgInt32 m_islandCount;
-	dgInt32 m_batchesCount____;
-	dgInt32 m_jointsInBatch____;
-	dgInt32 m_islandCountCounter;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
-	
+
 	dgInt32* m_bodyLocks;  
-	dgBody** m_bodyInfoMap;
-	const dgIsland* m_islandArray;
-	dgParallelJointMap* m_jointInfoMap;
-	JointsBashes m_jointBatches____[64];
+	const dgIsland* m_island;
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
 };
 
@@ -315,7 +253,7 @@ class dgWorldDynamicUpdate
 	static void UpdateFeedbackForcesParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void UpdateBodyVelocityParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void FindActiveJointAndBodies (void* const context, void* const worldContext, dgInt32 threadID); 
-	static dgInt32 SortJointInfoByBatchIndex (const dgParallelJointMap* const indirectIndexA, const dgParallelJointMap* const indirectIndexB, void* const constraintArray);
+	//static dgInt32 SortJointInfoByBatchIndex (const dgParallelJointMap* const indirectIndexA, const dgParallelJointMap* const indirectIndexB, void* const constraintArray);
 
 	void GetJacobianDerivativesParallel (dgJointInfo* const jointInfo, dgInt32 threadID, dgInt32 rowBase, dgFloat32 timestep) const;	
 	void CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;

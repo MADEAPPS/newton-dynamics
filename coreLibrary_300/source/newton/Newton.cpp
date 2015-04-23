@@ -207,20 +207,23 @@ void NewtonDestroy(const NewtonWorld* const newtonWorld)
 
 int NewtonGetBroadphaseAlgorithm (const NewtonWorld* const newtonWorld)
 {
-	TRACE_FUNCTION(__FUNCTION__);
+//  this is deprecated
 
-	Newton* const world = (Newton *) newtonWorld;
-	return world->GetBroadPhase()->GetBroadPhaseType();
+//	TRACE_FUNCTION(__FUNCTION__);
+//	Newton* const world = (Newton *) newtonWorld;
+//	return world->GetBroadPhase()->GetBroadPhaseType();
+	return 0;
 }
-
 
 void NewtonSelectBroadphaseAlgorithm (const NewtonWorld* const newtonWorld, int algorithmType)
 {
-	TRACE_FUNCTION(__FUNCTION__);
+//  this is deprecated
 
-	Newton* const world = (Newton *) newtonWorld;
-	world->GetBroadPhase()->SelectBroadPhaseType(algorithmType);
+//	TRACE_FUNCTION(__FUNCTION__);
+//	Newton* const world = (Newton *) newtonWorld;
+//	world->GetBroadPhase()->SelectBroadPhaseType(algorithmType);
 }
+
 
 dFloat NewtonGetContactMergeTolerance (const NewtonWorld* const newtonWorld)
 {
