@@ -1138,7 +1138,7 @@ void dgCollisionCompound::SetCollisionMatrix (dgTreeArray::dgTreeNode* const nod
 	if (node) {
 
 		dgWorld* const world = m_world;
-		dgNodeBase* baseNode = node->GetInfo();
+		dgNodeBase* const baseNode = node->GetInfo();
 		dgCollisionInstance* const instance = baseNode->GetShape();
 		instance->SetLocalMatrix(matrix);
 
@@ -1148,10 +1148,14 @@ void dgCollisionCompound::SetCollisionMatrix (dgTreeArray::dgTreeNode* const nod
 		
 		dgThreadHiveScopeLock lock (world, &m_criticalSectionLock, false);
 		baseNode->SetBox (p0, p1);
-		for (dgNodeBase* parent = baseNode->m_parent; parent && !dgBoxInclusionTest (baseNode->m_p0, baseNode->m_p1, parent->m_p0, parent->m_p1); parent = parent->m_parent) {
-			CalculateSurfaceArea (parent, baseNode, p0, p1);
-			parent->SetBox (p0, p1);
-			baseNode = parent;
+		for (dgNodeBase* parent = baseNode->m_parent; parent; parent = parent->m_parent) {
+			dgVector minBox;
+			dgVector maxBox;
+			CalculateSurfaceArea (parent->m_left, parent->m_right, minBox, maxBox);
+			if (dgBoxInclusionTest (minBox, maxBox, parent->m_p0, parent->m_p1)) {
+				break;
+			}
+			parent->SetBox (minBox, maxBox);
 		}
 	}
 }
@@ -1346,7 +1350,7 @@ dgFloat32 dgCollisionCompound::CalculateSurfaceArea (dgNodeBase* const node0, dg
 	minBox = node0->m_p0.GetMin(node1->m_p0);
 	maxBox = node0->m_p1.GetMax(node1->m_p1);
 	dgVector side0 ((maxBox - minBox).CompProduct4 (dgVector::m_half));
-	return side0.DotProduct4(side0.ShiftTripleRight()).m_x;
+	return side0.DotProduct4(side0.ShiftTripleRight()).GetScalar();
 }
 
 

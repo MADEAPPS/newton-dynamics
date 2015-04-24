@@ -282,7 +282,6 @@ class dgBroadphaseSyncDescriptor
 	dgBroadPhase::dgNode* m_pairs[1024 * 4];	
 };
 
-
 class dgBroadPhase::dgSpliteInfo
 {
 	public:
@@ -480,30 +479,13 @@ void dgBroadPhase::ForEachBodyInAABB (const dgVector& minBox, const dgVector& ma
 }
 
 
-dgInt32 dgBroadPhase::GetBroadPhaseType () const
-{
-	return m_broadPhaseType;
-}
-
-void dgBroadPhase::SelectBroadPhaseType (dgInt32 algorthmType)
-{
-	if (algorthmType == 0) {
-		m_broadPhaseType = m_generic;
-	} else {
-		m_broadPhaseType = m_persistent;
-	}
-}
-
-
 DG_INLINE dgFloat32 dgBroadPhase::CalculateSurfaceArea (const dgNode* const node0, const dgNode* const node1, dgVector& minBox, dgVector& maxBox) const
 {
 	minBox = node0->m_minBox.GetMin(node1->m_minBox);
 	maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
 	dgVector side0 (maxBox - minBox);
-	return side0.DotProduct4(side0.ShiftTripleRight()).m_x;
+	return side0.DotProduct4(side0.ShiftTripleRight()).GetScalar();
 }
-
-
 
 dgBroadPhase::dgNode* dgBroadPhase::InsertNode (dgNode* const node)
 {
@@ -1006,14 +988,14 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 
 	dgBodyMasterList::dgListNode* node = NULL;
 	{
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
+		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
 		node = descriptor->m_forceAndTorqueBodyNode;
 		if (node) {
 			descriptor->m_forceAndTorqueBodyNode = node->GetNext();
 		}
 	}
 
-	for ( ; node; ) {
+	while (node) {
 		dgBody* const body = node->GetInfo().GetBody();
 
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
@@ -1055,7 +1037,7 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 			body->UpdateMatrix (timestep, threadID);
 		}
 
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
+		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
 		node = descriptor->m_forceAndTorqueBodyNode;
 		if (node) {
 			descriptor->m_forceAndTorqueBodyNode = node->GetNext();
@@ -1131,20 +1113,18 @@ void dgBroadPhase::CalculatePairContacts (dgBroadphaseSyncDescriptor* const desc
 	}
 }
 
-
-
-
-
+//#pragma optimize( "", off )
 void dgBroadPhase::UpdateBodyBroadphase(dgBody* const body, dgInt32 threadIndex)
 {
 	if (m_rootNode) {
-
 		dgNode* const node = body->m_collisionCell;
 		dgAssert (!node->m_left);
 		dgAssert (!node->m_right);
 
 		if (!dgBoxInclusionTest (body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) {
+
 			node->SetAABB(body->m_minAABB, body->m_maxAABB);
+			dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
 			for (dgNode* parent = node->m_parent; parent; parent = parent->m_parent) {
 				dgVector minBox;
 				dgVector maxBox;
@@ -1152,8 +1132,6 @@ void dgBroadPhase::UpdateBodyBroadphase(dgBody* const body, dgInt32 threadIndex)
 				if (dgBoxInclusionTest (minBox, maxBox, parent->m_minBox, parent->m_maxBox)) {
 					break;
 				}
-
-				dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
 				parent->m_minBox = minBox;
 				parent->m_maxBox = maxBox;
 				parent->m_surfaceArea = area;
@@ -1509,7 +1487,7 @@ void dgBroadPhase::FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* con
 		}
 	}
 	
-	for ( ;node; ) {
+	while (node) {
 		dgBody* const body = node->GetInfo().GetBody();
 		if (body->m_collisionCell) {
 			if (!body->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
@@ -1543,7 +1521,7 @@ void dgBroadPhase::FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor
 	}
 
 	dgVector timestep2 (descriptor->m_timestep * descriptor->m_timestep * dgFloat32 (4.0f));
-	for ( ;node; ) {
+	while(node) {
 		dgBody* const body = node->GetInfo();
 		if (body->m_collisionCell) {
 			if (!body->m_collision->IsType (dgCollision::dgCollisionNull_RTTI)) {
@@ -2099,5 +2077,6 @@ void dgBroadPhase::UpdateContacts (dgFloat32 timestep)
 	// update soft body dynamics phase 1
     dgDeformableBodiesUpdate* const softBodyList = m_world;
     softBodyList->ApplyExternaForces(timestep);
+
 	m_world->m_perfomanceCounters[m_softBodyTicks] = m_world->m_getPerformanceCount() - endTicks;
 }
