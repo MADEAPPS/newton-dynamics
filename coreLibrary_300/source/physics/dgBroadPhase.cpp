@@ -148,138 +148,40 @@ class dgBroadPhase::dgNode
 
 	friend class dgBody;
 	friend class dgBroadPhase;
-	friend class dgBroadphaseSyncDescriptor;
+//	friend class dgBroadphaseSyncDescriptor;
 	friend class dgFitnessList;
 } DG_GCC_VECTOR_ALIGMENT;
 
 dgVector dgBroadPhase::dgNode::m_broadPhaseScale (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f));
 dgVector dgBroadPhase::dgNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, dgFloat32 (0.0f));
 
-
-
 class dgBroadphaseSyncDescriptor
 {
 	public:
-		dgBroadphaseSyncDescriptor(dgBroadPhase::dgType broadPhaseType, dgThread::dgCriticalSection* const lock)
-		:m_lock(lock)
-		,m_pairsCount(0)
+	dgBroadphaseSyncDescriptor (dgFloat32 timestep, dgBodyMasterList::dgListNode* const firstNode)
+		:m_newBodiesNodes(NULL)
+		,m_collindPairBodyNode (firstNode)
+		,m_forceAndTorqueBodyNode (firstNode)
+		,m_timestep (timestep) 
 		,m_pairsAtomicCounter(0)
-		,m_jointsAtomicCounter(0)
-		,m_timestep(dgFloat32 (0.0f))
-		,m_collindPairBodyNode(NULL)
-		,m_forceAndTorqueBodyNode(NULL)
-		,m_newBodiesNodes(NULL)
-		,m_broadPhaseType(broadPhaseType)
 	{
 	}
 
-	void CreatePairsJobs (dgBroadPhase::dgNode* const rootNode)
-	{
-		dgBroadPhase::dgNode* pool[ DG_BROADPHASE_MAX_STACK_DEPTH];		
-		
-		pool[0] = rootNode;
-		pool[1] = rootNode;
-
-		dgInt32 stack = 2; 
-		dgInt32 stackDpeth = 4 * 2;
-		m_pairsCount = 0;
-		while (stack && (m_pairsCount < dgInt32 (sizeof (m_pairs) / (2 * sizeof (m_pairs[0]))))) {
-
-			while (stack >= stackDpeth) {
-				stack -= 2;
-				m_pairs[m_pairsCount * 2] = pool[stack];
-				m_pairs[m_pairsCount * 2 + 1] = pool[stack + 1];
-				m_pairsCount ++;
-				dgAssert (m_pairsCount < (sizeof (m_pairs) / (2 * sizeof (m_pairs[0]))));
-			}
-
-			stack -= 2;
-			dgBroadPhase::dgNode* const left = pool[stack];
-			dgBroadPhase::dgNode* const right = pool[stack + 1];
-
-			if (left == right) {
-				if (!left->m_body) {
-					pool[stack] = left->m_left;	
-					pool[stack + 1] = left->m_left;	
-					stack += 2;
-
-					pool[stack] = left->m_right;	
-					pool[stack + 1] = left->m_right;	
-					stack += 2; 
-
-					if (dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox)) {
-						pool[stack] = left->m_left;	
-						pool[stack + 1] = left->m_right;	
-						stack += 2;
-					}
-				}
-			} else if (left->m_body || right->m_body) {
-				if (!left->m_body) {
-					dgAssert (right->m_body);
-
-					pool[stack] = left->m_left;	
-					pool[stack + 1] = right;	
-					stack += 2;
-
-					pool[stack] = left->m_right;	
-					pool[stack + 1] = right;	
-					stack += 2; 
-
-				} else if (!right->m_body) {
-					dgAssert (left->m_body);
-
-					pool[stack] = left;	
-					pool[stack + 1] = right->m_left;	
-					stack += 2;
-
-					pool[stack] = left;	
-					pool[stack + 1] = right->m_right;	
-					stack += 2; 
-
-				} else {
-					dgAssert (left->m_body);
-					dgAssert (right->m_body);
-					m_pairs[m_pairsCount * 2] = left;
-					m_pairs[m_pairsCount * 2 + 1] = right;
-					m_pairsCount ++;
-				}
-
-			} else if (dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_minBox, right->m_maxBox)) { 
-				dgAssert (!left->m_body);
-				dgAssert (!right->m_body);
-
-				pool[stack] = left->m_left;	
-				pool[stack + 1] = right->m_left;	
-				stack += 2;
-
-				pool[stack] = left->m_left;	
-				pool[stack + 1] = right->m_right;	
-				stack += 2;
-
-				pool[stack] = left->m_right;	
-				pool[stack + 1] = right->m_left;	
-				stack += 2;
-
-				pool[stack] = left->m_right;	
-				pool[stack + 1] = right->m_right;	
-				stack += 2;
-			}
-		}
-
-		dgAssert (!stack);
-	}
-
-	
-	dgThread::dgCriticalSection* m_lock;
-	dgInt32 m_pairsCount;
-	dgInt32 m_pairsAtomicCounter;
-	dgInt32 m_jointsAtomicCounter;
-	dgFloat32 m_timestep;
+	dgList<dgBody*>::dgListNode* m_newBodiesNodes;
 	dgBodyMasterList::dgListNode* m_collindPairBodyNode;
 	dgBodyMasterList::dgListNode* m_forceAndTorqueBodyNode;
-	dgList<dgBody*>::dgListNode* m_newBodiesNodes;
-	dgBroadPhase::dgType m_broadPhaseType;
-	dgBroadPhase::dgNode* m_pairs[1024 * 4];	
+	dgFloat32 m_timestep;
+	dgInt32 m_pairsAtomicCounter;
+
+	//dgThread::dgCriticalSection* m_lock;
+	//dgInt32 m_pairsCount;
+	//dgInt32 m_pairsAtomicCounter;
+	//dgInt32 m_jointsAtomicCounter;
+	//dgFloat32 m_timestep;
+	//dgBodyMasterList::dgListNode* m_collindPairBodyNode;
+	//dgBodyMasterList::dgListNode* m_forceAndTorqueBodyNode;
+	//dgList<dgBody*>::dgListNode* m_newBodiesNodes;
+	//dgBroadPhase::dgNode* m_pairs[1024 * 4];	
 };
 
 class dgBroadPhase::dgSpliteInfo
@@ -382,7 +284,6 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_lru(0)
 	,m_fitness(world->GetAllocator())
 	,m_generatedBodies(world->GetAllocator())
-	,m_broadPhaseType(m_generic)
 	,m_contacJointLock()
 	,m_criticalSectionLock()
 	,m_recursiveChunks(false)
@@ -477,6 +378,7 @@ void dgBroadPhase::ForEachBodyInAABB (const dgVector& minBox, const dgVector& ma
 		}
 	}
 }
+
 
 
 DG_INLINE dgFloat32 dgBroadPhase::CalculateSurfaceArea (const dgNode* const node0, const dgNode* const node1, dgVector& minBox, dgVector& maxBox) const
@@ -1164,18 +1066,10 @@ void dgBroadPhase::CollidingPairsKernel (void* const context, void* const worldC
 
 	if (!threadID) {
 		dgUnsigned32 ticks0 = world->m_getPerformanceCount();
-		if (descriptor->m_broadPhaseType == dgBroadPhase::m_generic) {
-			broadPhase->FindCollidingPairsGeneric (descriptor, threadID);
-		} else {
-			broadPhase->FindCollidingPairsPersistent (descriptor, threadID);
-		}
+		broadPhase->FindCollidingPairs (descriptor, threadID);
 		world->m_perfomanceCounters[m_broadPhaceTicks] = world->m_getPerformanceCount() - ticks0;
 	} else {
-		if (descriptor->m_broadPhaseType == dgBroadPhase::m_generic) {
-			broadPhase->FindCollidingPairsGeneric (descriptor, threadID);
-		} else {
-			broadPhase->FindCollidingPairsPersistent (descriptor, threadID);
-		}
+		broadPhase->FindCollidingPairs (descriptor, threadID);
 	}
 }
 
@@ -1441,7 +1335,7 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 	return ret;
 }
 
-void dgBroadPhase::SubmitPairsPersistent (dgNode* const bodyNode, dgNode* const node, const dgVector& timeStepBound, dgInt32 threadID)
+void dgBroadPhase::SubmitPairs (dgNode* const bodyNode, dgNode* const node, const dgVector& timeStepBound, dgInt32 threadID)
 {
 	dgNode* pool[DG_BROADPHASE_MAX_STACK_DEPTH];
 	pool[0] = node;
@@ -1475,12 +1369,12 @@ void dgBroadPhase::SubmitPairsPersistent (dgNode* const bodyNode, dgNode* const 
 }
 
 
-void dgBroadPhase::FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
+void dgBroadPhase::FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
 	dgVector timestep2 (descriptor->m_timestep * descriptor->m_timestep * dgFloat32 (4.0f));
 	dgBodyMasterList::dgListNode* node = NULL;
 	{
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
+		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
 		node = descriptor->m_collindPairBodyNode;
 		if (node) {
 			descriptor->m_collindPairBodyNode = node->GetNext();
@@ -1495,13 +1389,13 @@ void dgBroadPhase::FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* con
 				for (dgNode* ptr = bodyNode; ptr->m_parent; ptr = ptr->m_parent) {
 					dgNode* const sibling = ptr->m_parent->m_right;
 					if (sibling != ptr) {
-						SubmitPairsPersistent (bodyNode, sibling, timestep2, threadID);
+						SubmitPairs (bodyNode, sibling, timestep2, threadID);
 					}
 				}
 			}
 		}
 
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
+		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
 		node = descriptor->m_collindPairBodyNode;
 		if (node) {
 			descriptor->m_collindPairBodyNode = node->GetNext();
@@ -1511,9 +1405,11 @@ void dgBroadPhase::FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* con
 
 void dgBroadPhase::FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
+	dgAssert (0);
+
 	dgList<dgBody*>::dgListNode* node = NULL;
 	{
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
+		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
 		node = descriptor->m_newBodiesNodes;
 		if (node) {
 			descriptor->m_newBodiesNodes = node->GetNext();
@@ -1529,18 +1425,18 @@ void dgBroadPhase::FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor
 				for (dgNode* ptr = bodyNode; ptr->m_parent; ptr = ptr->m_parent) {
 					dgNode* const sibling = ptr->m_parent->m_right;
 					if (sibling != ptr) {
-						SubmitPairsPersistent (bodyNode, sibling, timestep2, threadID);
+						SubmitPairs (bodyNode, sibling, timestep2, threadID);
 					} else {
 						dgNode* const sibling = ptr->m_parent->m_left;
 						dgAssert (sibling);
 						dgAssert (sibling != ptr);
-						SubmitPairsPersistent (bodyNode, sibling, timestep2, threadID);
+						SubmitPairs (bodyNode, sibling, timestep2, threadID);
 					}
 				}
 			}
 		}
 
-		dgThreadHiveScopeLock lock (m_world, descriptor->m_lock, false);
+		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
 		node = descriptor->m_newBodiesNodes;
 		if (node) {
 			descriptor->m_newBodiesNodes = node->GetNext();
@@ -1548,103 +1444,6 @@ void dgBroadPhase::FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor
 	}
 }
 
-void dgBroadPhase::FindCollidingPairsGeneric (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
-{
-	dgNode* pool[2 * DG_BROADPHASE_MAX_STACK_DEPTH];		
-	dgInt32 index;
-
-	dgVector timestep2 (descriptor->m_timestep * descriptor->m_timestep * dgFloat32 (4.0f));
-	while ((index = dgAtomicExchangeAndAdd(&descriptor->m_pairsCount, -1)) > 0) {
-		index --;
-		pool[0] = descriptor->m_pairs[index * 2];
-		pool[1] = descriptor->m_pairs[index * 2 + 1];
-
-		dgInt32 stack = 2;
-		while (stack) {
-			stack -=2;
-			dgNode* const left = pool[stack];
-			dgNode* const right = pool[stack + 1];
-
-			if (left == right) {
-				if (!left->m_body) {
-
-					dgAssert (stack+1 < (sizeof (pool) / sizeof (pool[0]))) ;
-					pool[stack] = left->m_left;	
-					pool[stack + 1] = left->m_right;	
-					stack += (-dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox) >> 4) & 2;
-
-					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
-					pool[stack] = left->m_left;	
-					pool[stack + 1] = left->m_left;	
-					stack += 2;
-
-					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
-					pool[stack] = left->m_right;	
-					pool[stack + 1] = left->m_right;	
-					stack += 2;
-				}
-			} else {
-				if (left->m_body && right->m_body) {
-					dgBody* const body0 = left->m_body;
-					dgBody* const body1 = right->m_body;
-
-					if (TestOverlaping (body0, body1)) {
-						AddPair (body0, body1, timestep2, threadID);
-					}
-
-				} else if (!(left->m_body || right->m_body)) {
-
-					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
-					pool[stack] = left->m_left;	
-					pool[stack + 1] = right->m_left;	
-					stack += (-dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4) & 2;
-
-					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
-					pool[stack] = left->m_left;	
-					pool[stack + 1] = right->m_right;	
-					stack += (-dgOverlapTest (left->m_left->m_minBox, left->m_left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4) & 2;
-
-					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
-					pool[stack] = left->m_right;	
-					pool[stack + 1] = right->m_left;	
-					stack += (-dgOverlapTest (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4) & 2;
-
-					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
-					pool[stack] = left->m_right;	
-					pool[stack + 1] = right->m_right;	
-					stack += (-dgOverlapTest (left->m_right->m_minBox, left->m_right->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4) & 2;
-
-
-				} else if (left->m_body) {
-
-					dgAssert (!right->m_body);
-					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
-					pool[stack] = right->m_left;	
-					pool[stack + 1] = left;	
-					stack += (-dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_left->m_minBox, right->m_left->m_maxBox) >> 4) & 2;
-
-					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
-					pool[stack] = right->m_right;	
-					pool[stack + 1] = left;	
-					stack += (-dgOverlapTest (left->m_minBox, left->m_maxBox, right->m_right->m_minBox, right->m_right->m_maxBox) >> 4) & 2;
-
-				} else {
-
-					dgAssert (right->m_body);
-					dgAssert (stack + 1 < (sizeof(pool) / sizeof(pool[0])));
-					pool[stack] = left->m_left;	
-					pool[stack + 1] = right;	
-					stack += (-dgOverlapTest (right->m_minBox, right->m_maxBox, left->m_left->m_minBox, left->m_left->m_maxBox) >> 4) & 2;
-
-					dgAssert (stack+1 < (sizeof (pool) / sizeof (pool[0]))) ;
-					pool[stack] = left->m_right;	
-					pool[stack + 1] = right;	
-					stack += (-dgOverlapTest (right->m_minBox, right->m_maxBox, left->m_right->m_minBox, left->m_right->m_maxBox) >> 4) & 2;
-				}
-			}
-		}
-	}
-}
 
 void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 {
@@ -2014,13 +1813,10 @@ void dgBroadPhase::UpdateContacts (dgFloat32 timestep)
 	m_recursiveChunks = true;
 	dgInt32 threadsCount = m_world->GetThreadCount();	
 
-	dgBroadphaseSyncDescriptor syncPoints(m_broadPhaseType, &m_criticalSectionLock);
-	syncPoints.m_timestep = timestep;
-	
 	const dgBodyMasterList* const masterList = m_world;
 	dgBodyMasterList::dgListNode* const firstBodyNode = masterList->GetFirst()->GetNext();
-	syncPoints.m_collindPairBodyNode = firstBodyNode;
-	syncPoints.m_forceAndTorqueBodyNode = firstBodyNode;
+
+	dgBroadphaseSyncDescriptor syncPoints(timestep, firstBodyNode);
 
 	for (dgInt32 i = 0; i < threadsCount; i ++) {
 		m_world->QueueJob (ForceAndToqueKernel, &syncPoints, m_world);
@@ -2038,9 +1834,6 @@ void dgBroadPhase::UpdateContacts (dgFloat32 timestep)
 	}
 
 	ImproveFitness();
-	if (m_broadPhaseType == m_generic) {
-		syncPoints.CreatePairsJobs (m_rootNode);
-	}
 
 	for (dgInt32 i = 0; i < threadsCount; i ++) {
 		m_world->QueueJob (CollidingPairsKernel, &syncPoints, m_world);

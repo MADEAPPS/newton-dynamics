@@ -67,12 +67,6 @@ class dgBroadPhase
 	public:
 	DG_CLASS_ALLOCATOR(allocator);
 
-	enum dgType
-	{
-		m_generic = 0,
-		m_persistent,
-	};
-
 	class dgNode;
 	class dgSpliteInfo;
 
@@ -86,9 +80,6 @@ class dgBroadPhase
 
 	dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& p0, const dgVector& p1, dgFloat32& timetoImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
 	void ForEachBodyInAABB (const dgVector& q0, const dgVector& q1, OnBodiesInAABB callback, void* const userData) const;
-
-	dgInt32 GetBroadPhaseType () const;
-	void SelectBroadPhaseType (dgInt32 algorthmType);
 
 	void ResetEntropy ();
 
@@ -132,9 +123,8 @@ class dgBroadPhase
 	dgNode* BuildTopDown (dgNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 	dgNode* BuildTopDownBig (dgNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 
-	void FindCollidingPairsGeneric (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
-	void FindCollidingPairsPersistent (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
-	void SubmitPairsPersistent (dgNode* const body, dgNode* const node, const dgVector& timeStepBound, dgInt32 threadID);
+	void FindCollidingPairs (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+	void SubmitPairs (dgNode* const body, dgNode* const node, const dgVector& timeStepBound, dgInt32 threadID);
 
 	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
 
@@ -150,7 +140,6 @@ class dgBroadPhase
 	dgUnsigned32 m_lru;
 	dgFitnessList m_fitness;
 	dgList<dgBody*> m_generatedBodies;
-	dgType m_broadPhaseType;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	bool m_recursiveChunks;
