@@ -196,35 +196,22 @@ DG_INLINE dgMatrix dgMatrix::Transpose4X4 () const
 
 DG_INLINE dgVector dgMatrix::RotateVector (const dgVector &v) const
 {
-	return dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z));
+//	return dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z));
+	return dgVector (m_front.CompProduct4 (v.BroadcastX()) + m_up.CompProduct4 (v.BroadcastY()) + m_right.CompProduct4 (v.BroadcastZ()));
 }
 
 
 DG_INLINE dgVector dgMatrix::UnrotateVector (const dgVector &v) const
 {
-#ifdef DG_SCALAR_VECTOR_CLASS
-	return dgVector (v % m_front, v % m_up, v % m_right, dgFloat32 (0.0f));
-#else
-	dgVector x (v.CompProduct4(m_front));
-	dgVector y (v.CompProduct4(m_up));
-	dgVector z (v.CompProduct4(m_right));
-	dgVector w (dgFloat32 (0.0f));
-	dgVector::Transpose4x4 (x, y, z, w, x, y, z, w); 
-	return x + y + z;
-
-#endif
+//	return dgVector (v.DotProduct4(m_front).GetScalar(), v.DotProduct4(m_up).GetScalar(), v.DotProduct4(m_right).GetScalar(), dgFloat32 (0.0f));
+	return dgVector ((v.DotProduct4(m_front) & dgVector::m_xMask) + (v.DotProduct4(m_up) & dgVector::m_yMask) + (v.DotProduct4(m_right) & dgVector::m_zMask));
 }
 
 
 DG_INLINE dgVector dgMatrix::TransformVector (const dgVector &v) const
 {
-/*
-	dgVector tmp0 (v.m_x * m_front.m_x + v.m_y * m_up.m_x + v.m_z * m_right.m_x + m_posit.m_x,
-				   v.m_x * m_front.m_y + v.m_y * m_up.m_y + v.m_z * m_right.m_y + m_posit.m_y,
-				   v.m_x * m_front.m_z + v.m_y * m_up.m_z + v.m_z * m_right.m_z + m_posit.m_z, v.m_w);
-	reurn dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z) + m_posit.Scale4(v.m_w));
-*/
-	return dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z) + m_posit);
+//	return dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z) + m_posit);
+	return RotateVector(v) + m_posit;
 }
 
 DG_INLINE dgVector dgMatrix::UntransformVector (const dgVector &v) const

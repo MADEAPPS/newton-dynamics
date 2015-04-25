@@ -29,13 +29,13 @@
 	#endif
 #endif
 
+void dgApi dgExpandTraceMessage (const char *fmt, ...);
+
 #ifdef DG_TRACE
-	void dgApi dgExpandTraceMessage (const char *fmt, ...);
 	#define dgTrace(x)	dgExpandTraceMessage x;
 #else
 	#define dgTrace(x)
 #endif
-
 
 
 #ifdef _DEBUG

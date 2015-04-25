@@ -24,9 +24,13 @@
 #include "dgQuaternion.h"
 
 
-
+dgVector dgVector::m_xMask (0xffffffff, 0, 0, 0);
+dgVector dgVector::m_yMask (0,          0xffffffff, 0, 0);
+dgVector dgVector::m_zMask (0,          0,          0xffffffff, 0);
+dgVector dgVector::m_wMask (0,          0,          0,          0xffffffff);
 dgVector dgVector::m_triplexMask (0xffffffff, 0xffffffff, 0xffffffff, 0);
 dgVector dgVector::m_signMask (0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff);
+
 dgVector dgVector::m_one  (dgFloat32 (1.0f));
 dgVector dgVector::m_two  (dgFloat32 (2.0f));
 dgVector dgVector::m_wOne (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f));

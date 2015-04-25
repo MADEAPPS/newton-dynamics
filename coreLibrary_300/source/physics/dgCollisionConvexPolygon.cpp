@@ -122,14 +122,14 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 	dgAssert ((dir % dir) > dgFloat32 (1.0e-8f));
 	dir = dir.CompProduct4 (dir.InvMagSqrt());
 
-	dgFloat32 distH = origin.DotProduct4(dir).m_x;
+	dgFloat32 distH = origin.DotProduct4(dir).GetScalar();
 	planes[0] = dgPlane (dir, dist - distH);
-	planes[2] = dgPlane (dir.Scale4 (dgFloat32 (-1.0f)), dist + distH);
+	planes[2] = dgPlane (dir.DotProduct4 (dgVector::m_negOne), dist + distH);
 
 	dir = m_normal * dir;
-	dgFloat32 distV = origin.DotProduct4(dir).m_x;
+	dgFloat32 distV = origin.DotProduct4(dir).GetScalar();
 	planes[1] = dgPlane (dir, dist - distV);
-	planes[3] = dgPlane (dir.Scale4 (dgFloat32 (-1.0f)), dist + distV);
+	planes[3] = dgPlane (dir.DotProduct4 (dgVector::m_negOne), dist + distV);
 
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		dgInt32 j = i << 1;
