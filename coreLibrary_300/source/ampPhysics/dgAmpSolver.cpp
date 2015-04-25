@@ -695,6 +695,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameModeParallel (dgParallelSolverSync
 //void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* const islandArray, dgFloat32 timestep) const
 void dgAmpInstance::ConstraintSolver (dgInt32 islandCount, const dgIsland* const islandArray, dgFloat32 timestep)
 {
+	dgAssert (0);
+#if 0
 	dgParallelSolverSyncData syncData;
 	const dgWorldDynamicUpdate& dynUpdate = *m_world;
 	m_world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (dynUpdate.m_bodies + dynUpdate.m_joints + 1024, sizeof (dgParallelJointMap));
@@ -738,6 +740,7 @@ void dgAmpInstance::ConstraintSolver (dgInt32 islandCount, const dgIsland* const
 	CalculateForcesGameModeParallel (&syncData);
 	IntegrateInslandParallel(&syncData); 
 */
+#endif
 }
 
 
@@ -777,6 +780,9 @@ void dgAmpInstance::CalcuateInvInertiaMatrixKernel (const dgAmpMatrix4x4& bodyMa
 
 void dgAmpInstance::InitializeBodyArrayParallelKernel (void* const context, void* const ampContext, dgInt32 threadID)
 {
+	dgAssert(0);
+#if 0
+
 	dgAmpInstance* const ampInstance = (dgAmpInstance*) ampContext;
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 //	dgWorld* const world = ampInstance->m_world;
@@ -829,6 +835,7 @@ void dgAmpInstance::InitializeBodyArrayParallelKernel (void* const context, void
 
 	dgAssert (bopyMapInfo[0]->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bopyMapInfo[0])->m_accel % ((dgDynamicBody*)bopyMapInfo[0])->m_accel) == dgFloat32 (0.0f));
 	dgAssert (bopyMapInfo[0]->IsRTTIType (dgBody::m_dynamicBodyRTTI) || (((dgDynamicBody*)bopyMapInfo[0])->m_alpha % ((dgDynamicBody*)bopyMapInfo[0])->m_alpha) == dgFloat32 (0.0f));
+#endif
 }
 
 
@@ -1074,6 +1081,9 @@ void dgAmpInstance::GetJacobianDerivativesParallel (dgJointInfo* const jointInfo
 
 void dgAmpInstance::BuildJacobianMatrixParallelKernel (void* const context, void* const ampContext, dgInt32 threadID)
 {
+	dgAssert(0);
+#if 0
+
 /*
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
@@ -1184,6 +1194,7 @@ void dgAmpInstance::BuildJacobianMatrixParallelKernel (void* const context, void
 		dgInt32 rowBase = dgAtomicExchangeAndAdd(&syncData->m_jacobianMatrixRowAtomicIndex, jointInfo->m_autoPaircount);
 		ampInstance->GetJacobianDerivativesParallel (jointInfo, threadID, rowBase, syncData->m_timestep);
 	}
+#endif
 }
 
 

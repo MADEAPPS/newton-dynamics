@@ -314,8 +314,10 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_showCenterOfMass = true;
 //m_hideVisualMeshes = true;
 //m_physicsUpdateMode = 1;
+//m_showContactPoints = true;
 //m_hardwareDevice = 2;
 //m_debugDisplayMode = 2;
+
 
 	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));
 

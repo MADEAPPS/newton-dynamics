@@ -855,7 +855,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 				}
 			} else {
 				dgVector normal(polygonInstance->m_globalMatrix.UnrotateVector(contactsOut[0].m_normal));
-				if ((normal % savedFaceNormal) < dgFloat32(0.9995f)) {
+				if (normal.DotProduct4(savedFaceNormal).GetScalar() < dgFloat32(0.9995f)) {
 					dgInt32 index = m_adjacentFaceEdgeNormalIndex[m_closestFeatureStartIndex];
 					dgVector n(&m_vertex[index * m_stride]);
 					if ((savedFaceNormal.DotProduct4(n).GetScalar() > dgFloat32(0.9995f))) {
@@ -863,7 +863,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 					} else {
 						dgVector dir0(n * savedFaceNormal);
 						dgVector dir1(n * normal);
-						dgFloat32 projection = dir0 % dir1;
+						dgFloat32 projection = dir0.DotProduct4(dir1).GetScalar();
 						if (projection <= dgFloat32(0.0f)) {
 							normal = n;
 						}

@@ -690,9 +690,9 @@ class dgVector
 
 	DG_INLINE dgFloat32 GetScalar () const
 	{
-		dgFloat32 scalar;
-		_mm_store_ss(&scalar, m_type);
-		return scalar;
+		//dgFloat32 scalar;
+		//_mm_store_ss(&scalar, m_type);
+		return m_x;
 	}
 
 	DG_INLINE void Store (dgFloat32* const dst) const
