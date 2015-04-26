@@ -169,15 +169,15 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 	if (!(world->m_amp && (world->m_hardwaredIndex > 0))) {
 		dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
-useParallel = 1;
+//useParallel = 1;
 
 		useParallel = useParallel && (m_islands > 1) && ((2 * islandsArray[0].m_jointCount) > m_joints);
 		useParallel = useParallel && (islandsArray[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
 
 		dgInt32 index = 0;
 		if (useParallel) {
-//			index = 1;
-//			CalculateReactionForcesParallel (&islandsArray[0], timestep);
+			index = 1;
+			CalculateReactionForcesParallel (&islandsArray[0], timestep);
 		}
 
 		descriptor.m_firstIsland = index;

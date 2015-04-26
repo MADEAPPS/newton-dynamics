@@ -307,7 +307,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
-//m_microthreadIndex = 3;
+m_microthreadIndex = 2;
 //m_useParallelSolver = true;
 //m_threadProfilerState = true;
 //m_showNormalForces = true;

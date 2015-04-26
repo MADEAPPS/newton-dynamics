@@ -147,7 +147,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 #else
 	
 	int high = 30;
-high = 10;
+high = 20;
 	PrimitiveType selection[] = {_BOX_PRIMITIVE, _CYLINDER_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
 	for (int i = 0; i < 1; i ++) {
 		int index = i % (sizeof (selection) / sizeof (selection[0]));
@@ -167,7 +167,7 @@ high = 10;
 	high = 20;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
-			BuildJenga (scene, 5.0f, dVector(-15.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+			//BuildJenga (scene, 5.0f, dVector(-15.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
 		}
 	}
 #endif
