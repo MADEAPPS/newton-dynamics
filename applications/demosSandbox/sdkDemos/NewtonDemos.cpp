@@ -307,14 +307,14 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
-m_microthreadIndex = 2;
+//m_microthreadIndex = 1;
 //m_useParallelSolver = true;
 //m_threadProfilerState = true;
 //m_showNormalForces = true;
 //m_showCenterOfMass = true;
 //m_hideVisualMeshes = true;
 //m_physicsUpdateMode = 1;
-//m_showContactPoints = true;
+m_showContactPoints = true;
 //m_hardwareDevice = 2;
 //m_debugDisplayMode = 2;
 

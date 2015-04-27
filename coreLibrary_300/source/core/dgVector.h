@@ -621,13 +621,17 @@ class dgVector
 		};
 	};
 
-
+	static dgVector m_zero;
 	static dgVector m_one;
 	static dgVector m_wOne;
 	static dgVector m_half;
 	static dgVector m_two;
 	static dgVector m_three;
 	static dgVector m_negOne;
+	static dgVector m_xMask;
+	static dgVector m_yMask;
+	static dgVector m_zMask;
+	static dgVector m_wMask;
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
 }DG_GCC_VECTOR_ALIGMENT;
@@ -1035,6 +1039,7 @@ class dgVector
 		};
 	};
 
+	static dgVector m_zero;
 	static dgVector m_one;
 	static dgVector m_wOne;
 	static dgVector m_two;

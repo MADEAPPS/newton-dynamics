@@ -176,6 +176,8 @@ high = 20;
 	// place camera into position
 	dQuaternion rot;
 	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
+origin.m_x = -10.0f;
+origin.m_y = 8.0f;
 	scene->SetCameraMatrix(rot, origin);
 
 

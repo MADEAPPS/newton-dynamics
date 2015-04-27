@@ -169,24 +169,29 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 	if (!(world->m_amp && (world->m_hardwaredIndex > 0))) {
 		dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
-//useParallel = 1;
-
-		useParallel = useParallel && (m_islands > 1) && ((2 * islandsArray[0].m_jointCount) > m_joints);
-		useParallel = useParallel && (islandsArray[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
 
 		dgInt32 index = 0;
 		if (useParallel) {
-			index = 1;
-			CalculateReactionForcesParallel (&islandsArray[0], timestep);
+			useParallel = useParallel && ((threadCount * islandsArray[0].m_jointCount) >= m_joints);
+			useParallel = useParallel && (islandsArray[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
+			while (useParallel) {
+				CalculateReactionForcesParallel(&islandsArray[index], timestep);
+				index ++;
+				useParallel = useParallel && (index < m_islands);
+				useParallel = useParallel && ((threadCount * islandsArray[index].m_jointCount) >= m_joints);
+				useParallel = useParallel && (islandsArray[index].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
+			}
 		}
 
-		descriptor.m_firstIsland = index;
-		descriptor.m_islandCount = m_islands - index;
-		descriptor.m_atomicCounter = 0;
-		for (dgInt32 i = 0; i < threadCount; i ++) {
-			world->QueueJob (CalculateIslandReactionForcesKernel, &descriptor, world);
+		if (index < m_islands) {
+			descriptor.m_firstIsland = index;
+			descriptor.m_islandCount = m_islands - index;
+			descriptor.m_atomicCounter = 0;
+			for (dgInt32 i = 0; i < threadCount; i ++) {
+				world->QueueJob (CalculateIslandReactionForcesKernel, &descriptor, world);
+			}
+			world->SynchronizationBarrier();
 		}
-		world->SynchronizationBarrier();
 	} else {
 		#ifdef _NEWTON_AMP 
 			
@@ -425,7 +430,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgFloat32 ti
 				dgConstraint* const constraint = constraintArray[m_joints + i].m_joint;
 				constraint->m_dynamicsLru = m_markLru;
 				dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
-				constraintArray[m_joints + i].m_autoPaircount = rows;
+				constraintArray[m_joints + i].m_pairCount = dgInt16 (rows);
 			}
 		} else {
 			dgAssert (heaviestBody);
@@ -513,7 +518,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 						//dgInt32 rows = dgInt32 ((constraint->m_maxDOF & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((constraint->m_maxDOF & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : constraint->m_maxDOF);
 						dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
 						//rowsCount += (rows + (ccdMode ? DG_CCD_EXTRA_CONTACT_COUNT : 0));
- 						constraintArray[jointIndex].m_autoPaircount = rows;
+ 						constraintArray[jointIndex].m_pairCount = dgInt16 (rows);
 
 						jointCount ++;
 
@@ -559,7 +564,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 		dgInt32 isContinueCollisionIsland = 0;
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgConstraint* const joint = constraintArray[i].m_joint;
-			rowsCount += constraintArray[i].m_autoPaircount;
+			rowsCount += constraintArray[i].m_pairCount;
 			if (joint->GetId() == dgConstraint::m_contactConstraint) {
 				const dgBody* const body0 = joint->m_body0;
 				const dgBody* const body1 = joint->m_body1;
@@ -738,6 +743,63 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForcesKernel (void* const cont
 	}
 }
 
+dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgInt32 rowCount) const
+{
+	if (constraint->m_solverActive) {
+		dgInt32 dof = dgInt32(constraint->m_maxDOF);
+		dgAssert(dof <= DG_CONSTRAINT_MAX_ROWS);
+		for (dgInt32 i = 0; i < dof; i++) {
+			constraintParamOut.m_forceBounds[i].m_low = DG_MIN_BOUND;
+			constraintParamOut.m_forceBounds[i].m_upper = DG_MAX_BOUND;
+			constraintParamOut.m_forceBounds[i].m_jointForce = NULL;
+			constraintParamOut.m_forceBounds[i].m_normalIndex = DG_BILATERAL_CONSTRAINT;
+		}
+
+		dgAssert(constraint->m_body0);
+		dgAssert(constraint->m_body1);
+
+		constraint->m_body0->m_inCallback = true;
+		constraint->m_body1->m_inCallback = true;
+
+		dof = dgInt32(constraint->JacobianDerivative(constraintParamOut));
+
+		constraint->m_body0->m_inCallback = false;
+		constraint->m_body1->m_inCallback = false;
+
+		//dgAssert(jointInfo->m_m0 < island->m_bodyCount);
+		//dgAssert(jointInfo->m_m1 < island->m_bodyCount);
+		//dgAssert(constraint->m_index == dgUnsigned32(j));
+
+		jointInfo->m_pairStart = rowCount;
+		jointInfo->m_pairCount = dgInt16 (dof);
+		jointInfo->m_pairActiveCount = dgInt16 (dof);
+
+		for (dgInt32 i = 0; i < dof; i++) {
+			dgJacobianMatrixElement* const row = &matrixRow[rowCount];
+			dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);
+			row->m_Jt = constraintParamOut.m_jacobian[i];
+
+			dgAssert(constraintParamOut.m_jointStiffness[i] >= dgFloat32(0.1f));
+			dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(100.0f));
+
+			row->m_diagDamp = constraintParamOut.m_jointStiffness[i];
+			row->m_coordenateAccel = constraintParamOut.m_jointAccel[i];
+			row->m_accelIsMotor = constraintParamOut.m_isMotor[i];
+			row->m_restitution = constraintParamOut.m_restitution[i];
+			row->m_penetration = constraintParamOut.m_penetration[i];
+			row->m_penetrationStiffness = constraintParamOut.m_penetrationStiffness[i];
+			row->m_lowerBoundFrictionCoefficent = constraintParamOut.m_forceBounds[i].m_low;
+			row->m_upperBoundFrictionCoefficent = constraintParamOut.m_forceBounds[i].m_upper;
+			row->m_jointFeebackForce = constraintParamOut.m_forceBounds[i].m_jointForce;
+
+			row->m_normalForceIndex = constraintParamOut.m_forceBounds[i].m_normalIndex;
+			rowCount++;
+		}
+		rowCount = (rowCount & (dgInt32(sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((rowCount & (-dgInt32(sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32(sizeof (dgVector) / sizeof (dgFloat32))) : rowCount;
+		dgAssert((rowCount & (dgInt32(sizeof (dgVector) / sizeof (dgFloat32)) - 1)) == 0);
+	}
+	return rowCount;
+}
 
 void dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadIndex, dgInt32 rowCount, dgFloat32 timestep) const
 {
@@ -758,67 +820,14 @@ void dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island,
 		dgJointInfo* const jointInfo = &constraintArray[j];
 		dgConstraint* const constraint = jointInfo->m_joint;
 
-		if (constraint->m_solverActive) {
-			dgInt32 dof = dgInt32 (constraint->m_maxDOF);
-			dgAssert (dof <= DG_CONSTRAINT_MAX_ROWS);
-			for (dgInt32 i = 0; i < dof; i ++) {
-				constraintParams.m_forceBounds[i].m_low = DG_MIN_BOUND;
-				constraintParams.m_forceBounds[i].m_upper = DG_MAX_BOUND;
-				constraintParams.m_forceBounds[i].m_jointForce = NULL;
-				constraintParams.m_forceBounds[i].m_normalIndex = DG_BILATERAL_CONSTRAINT;
-			}
+		dgAssert(jointInfo->m_m0 < island->m_bodyCount);
+		dgAssert(jointInfo->m_m1 < island->m_bodyCount);
+		dgAssert (constraint->m_index == dgUnsigned32(j));
 
-			dgAssert (constraint->m_body0);
-			dgAssert (constraint->m_body1);
-
-			constraint->m_body0->m_inCallback = true;
-			constraint->m_body1->m_inCallback = true;
-
-			dof = dgInt32 (constraint->JacobianDerivative (constraintParams)); 
-
-			constraint->m_body0->m_inCallback = false;
-			constraint->m_body1->m_inCallback = false;
-
-			dgAssert (jointInfo->m_m0 < island->m_bodyCount);
-			dgAssert (jointInfo->m_m1 < island->m_bodyCount);
-
-			dgAssert (constraint->m_index == dgUnsigned32(j));
-			jointInfo->m_autoPairstart = rowCount;
-			jointInfo->m_autoPaircount = dof;
-			jointInfo->m_autoPairActiveCount = dof;
-
-			for (dgInt32 i = 0; i < dof; i ++) {
-				dgJacobianMatrixElement* const row = &matrixRow[rowCount];
-				dgAssert (constraintParams.m_forceBounds[i].m_jointForce);
-				row->m_Jt = constraintParams.m_jacobian[i]; 
-
-				dgAssert (constraintParams.m_jointStiffness[i] >= dgFloat32(0.1f));
-				dgAssert (constraintParams.m_jointStiffness[i] <= dgFloat32(100.0f));
-
-				row->m_diagDamp = constraintParams.m_jointStiffness[i];
-				row->m_coordenateAccel = constraintParams.m_jointAccel[i];
-				row->m_accelIsMotor = constraintParams.m_isMotor[i];
-				row->m_restitution = constraintParams.m_restitution[i];
-				row->m_penetration = constraintParams.m_penetration[i];
-				row->m_penetrationStiffness = constraintParams.m_penetrationStiffness[i];
-				row->m_lowerBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_low;
-				row->m_upperBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_upper;
-				row->m_jointFeebackForce = constraintParams.m_forceBounds[i].m_jointForce;
-
-				row->m_normalForceIndex = constraintParams.m_forceBounds[i].m_normalIndex; 
-				rowCount ++;
-			}
-
-			rowCount = (rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) ? ((rowCount & (-dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)))) + dgInt32 (sizeof (dgVector) / sizeof (dgFloat32))) : rowCount;
-			dgAssert ((rowCount & (dgInt32 (sizeof (dgVector) / sizeof (dgFloat32)) - 1)) == 0);
-			dgAssert (rowCount <= island->m_rowsCount);
-		}
+		rowCount = GetJacobianDerivatives (constraintParams, jointInfo, constraint, matrixRow, rowCount);
+		dgAssert (rowCount <= island->m_rowsCount);
 	}
-//	return rowCount;
 }
-
-
-
 
 void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadIndex) const
 {
@@ -827,9 +836,6 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	dgInt32 sleepCounter = 10000;
 
 	dgWorld* const world = (dgWorld*) this;
-
-
-	dgVector zero (dgFloat32 (0.0f));
 
 	dgFloat32 forceDamp = DG_FREEZZING_VELOCITY_DRAG;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
@@ -895,10 +901,10 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 				if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-					body->m_netForce = zero;
-					body->m_netTorque = zero;
-					body->m_veloc = zero;
-					body->m_omega = zero;
+					body->m_netForce = dgVector::m_zero;
+					body->m_netTorque = dgVector::m_zero;
+					body->m_veloc = dgVector::m_zero;
+					body->m_omega = dgVector::m_zero;
 				}
 			}
 		} else {
@@ -929,10 +935,10 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 						if (body->m_active && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-							body->m_netForce = zero;
-							body->m_netTorque = zero;
-							body->m_veloc = zero;
-							body->m_omega = zero;
+							body->m_netForce = dgVector::m_zero;
+							body->m_netTorque = dgVector::m_zero;
+							body->m_veloc = dgVector::m_zero;
+							body->m_omega = dgVector::m_zero;
 							body->m_equilibrium = true;
 						}
 					}

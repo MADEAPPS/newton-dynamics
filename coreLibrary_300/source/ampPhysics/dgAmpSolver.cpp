@@ -996,6 +996,9 @@ void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const 
 
 void dgAmpInstance::GetJacobianDerivativesParallel (dgJointInfo* const jointInfo, dgInt32 threadIndex, dgInt32 rowBase, dgFloat32 timestep)
 {
+	dgAssert(0);
+#if 0
+
 	dgWorld* const world = m_world;
 
 	dgContraintDescritor constraintParams;
@@ -1076,6 +1079,7 @@ void dgAmpInstance::GetJacobianDerivativesParallel (dgJointInfo* const jointInfo
 		rightSide.m_lowerBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_low;
 		rightSide.m_upperBoundFrictionCoefficent = constraintParams.m_forceBounds[i].m_upper;
 	}
+#endif
 }
 
 
