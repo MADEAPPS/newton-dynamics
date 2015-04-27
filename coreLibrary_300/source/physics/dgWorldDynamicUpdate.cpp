@@ -170,8 +170,10 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	if (!(world->m_amp && (world->m_hardwaredIndex > 0))) {
 		dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
 
+useParallel = 0;
 		dgInt32 index = 0;
 		if (useParallel) {
+			useParallel = useParallel && m_joints;
 			useParallel = useParallel && ((threadCount * islandsArray[0].m_jointCount) >= m_joints);
 			useParallel = useParallel && (islandsArray[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
 			while (useParallel) {
