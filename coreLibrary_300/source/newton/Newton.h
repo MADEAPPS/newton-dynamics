@@ -619,7 +619,7 @@ extern "C" {
 	NEWTON_API NewtonCollision* NewtonCreateConvexHullFromMesh (const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, dFloat tolerance, int shapeID);
 
 	NEWTON_API int NewtonCollisionGetMode(const NewtonCollision* const convexCollision);
-	NEWTON_API void NewtonCollisionSetCollisionMode (const NewtonCollision* const convexCollision, int mode);
+	NEWTON_API void NewtonCollisionSetMode (const NewtonCollision* const convexCollision, int mode);
 
 	
 

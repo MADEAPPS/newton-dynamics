@@ -74,8 +74,8 @@ void CustomTriggerManager::UpdateTrigger (CustomTriggerController* const control
 		NewtonBody* const body1 = NewtonJointGetBody1(joint);
 		NewtonBody* const passangerBody = (body0 != triggerBody) ? body0 : body1; 
 		
-		dTree<NewtonBody*,NewtonBody*>::dTreeNode* const passengerNode = manifest.Find (passangerBody);
 		if (isActive) {
+			dTree<NewtonBody*,NewtonBody*>::dTreeNode* const passengerNode = manifest.Find (passangerBody);
 			if (passengerNode) {
 				EventCallback (controller, m_inTrigger, passangerBody);
 
@@ -85,6 +85,8 @@ void CustomTriggerManager::UpdateTrigger (CustomTriggerController* const control
 				EventCallback (controller, m_enterTrigger, passangerBody);
 			} 
 		} else {
+			dTree<NewtonBody*,NewtonBody*>::dTreeNode* const passengerNode = manifest.Find (passangerBody);
+
 			if (passengerNode) {
 				EventCallback (controller, m_exitTrigger, passangerBody);
 
@@ -128,7 +130,7 @@ void CustomTriggerController::Init (NewtonCollision* const convexShape, const dM
 	
 	// set this shape do not collide with other bodies
 	NewtonCollision* const collision = NewtonBodyGetCollision (m_body);
-	NewtonCollisionSetCollisionMode(collision, 0);
+	NewtonCollisionSetMode(collision, 0);
 }
 
 

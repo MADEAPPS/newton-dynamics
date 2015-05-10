@@ -41,19 +41,17 @@ class CustomControllerConvexCastPreFilter
 
 	CUSTOM_JOINTS_API virtual unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
 	{
-/*
 		const NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		if (NewtonCollisionGetMode(collision)) {
-			for (int i = 0; i < m_bodiesToSkipCount; i ++) {
-				if (body == m_bodiesToSkip[i]) {
-					return 0;
-				}
-			}
-			return 1;
-		}
-		return 0;
-*/
-		return 1;
+		unsigned retValue = NewtonCollisionGetMode(collision);
+		//if (retValue) {
+		//	for (int i = 0; i < m_bodiesToSkipCount; i ++) {
+		//		if (body == m_bodiesToSkip[i]) {
+		//			return 0;
+		//		}
+		//	}
+		//	return 1;
+		//}
+		return retValue;
 	}
 
 	private:
