@@ -5037,6 +5037,15 @@ void NewtonBodyGetMatrix(const NewtonBody* const bodyPtr, dFloat* const matrixPt
 	memcpy (matrixPtr, &matrix[0][0], sizeof (dgMatrix));
 }
 
+void NewtonBodyGetPosition(const NewtonBody* const bodyPtr, dFloat* const posPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	const dgVector & rot = body->GetPosition();
+	posPtr[0] = rot.m_x;
+	posPtr[1] = rot.m_y;
+	posPtr[2] = rot.m_z;
+}
 
 // Name: NewtonBodyGetRotation 
 // Get the rotation part of the transformation matrix of a body, in form of a unit quaternion.
@@ -5516,6 +5525,12 @@ void NewtonContactJointRemoveContact(const NewtonJoint* const contactJoint, void
 	}
 }
 
+dFloat NewtonContactJointGetClosestDistance(const NewtonJoint* const contactJoint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgContact* const joint = (dgContact *)contactJoint;
+	return joint->GetClosestDistance();
+}
 
 // Name: NewtonContactGetMaterial 
 // Return to the next contact from the contact array of the contact joint.

@@ -928,6 +928,7 @@ extern "C" {
 	NEWTON_API int  NewtonBodyGetContinuousCollisionMode (const NewtonBody* const body);
 	NEWTON_API int  NewtonBodyGetJointRecursiveCollision (const NewtonBody* const body);
 
+	NEWTON_API void NewtonBodyGetPosition(const NewtonBody* const body, dFloat* const pos);
 	NEWTON_API void NewtonBodyGetMatrix(const NewtonBody* const body, dFloat* const matrix);
 	NEWTON_API void NewtonBodyGetRotation(const NewtonBody* const body, dFloat* const rotation);
 	NEWTON_API void NewtonBodyGetMassMatrix (const NewtonBody* const body, dFloat* mass, dFloat* const Ixx, dFloat* const Iyy, dFloat* const Izz);
@@ -972,6 +973,8 @@ extern "C" {
 
 	NEWTON_API int NewtonContactJointGetContactCount(const NewtonJoint* const contactJoint);
 	NEWTON_API void NewtonContactJointRemoveContact(const NewtonJoint* const contactJoint, void* const contact); 
+
+	NEWTON_API dFloat NewtonContactJointGetClosestDistance(const NewtonJoint* const contactJoint);
 
 	NEWTON_API NewtonMaterial* NewtonContactGetMaterial (const void* const contact);
 
