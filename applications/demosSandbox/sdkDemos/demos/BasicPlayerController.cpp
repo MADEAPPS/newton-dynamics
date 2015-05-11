@@ -58,7 +58,11 @@ class BasicPlayerEntity: public DemoEntity
 
 		// make the player controller, this function makes a kinematic body
 		m_controller = manager->CreatePlayer(PLAYER_MASS, radius, radius * 0.5f, height, height * 0.33f, playerAxis);
-		//m_controller = manager->CreatePlayer(200.0f, 0.4207f, 0.105f, 2.0f, 0.5, playerAxis);
+		//m_controller = manager->CreatePlayer(200.0f, 0.5f, 0.4f, 2.0f, 0.5f, playerAxis);
+
+		// players by default have the origin at the center of mass of the collision shape.
+		// you can change this by calling SetPlayerOrigin, for example if a player has its origin at the lower bottom of its AABB 
+		m_controller->SetPlayerOrigin(height * 0.0f);
 
 		// set a restraining distance that the player can not get closet than
 		m_controller->SetRestrainingDistance(0.1f);

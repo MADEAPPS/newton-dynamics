@@ -119,9 +119,9 @@ class AdvancePlayerEntity: public DemoEntity
 		// make the player controller, this function makes a kinematic body
 		m_controller = manager->CreatePlayer(80.0f, radius, radius * 0.5f, height, height * 0.33f, playerAxis);
 
-		// players by default have the origin at the center of the lower bottom of the collision shape.
+		// players by default have the origin at the center of mass of the collision shape.
 		// you can change this by calling SetPlayerOrigin, for example if a player has it origin at the center of the AABB you can call 
-		//m_controller->SetPlayerOrigin (height * 0.5f);
+		m_controller->SetPlayerOrigin (height * 0.5f);
 
 		// get body from player, and set some parameter
 		NewtonBody* const body = m_controller->GetBody();

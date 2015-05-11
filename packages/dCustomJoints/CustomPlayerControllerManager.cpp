@@ -148,9 +148,9 @@ CustomPlayerController* CustomPlayerControllerManager::CreatePlayer (dFloat mass
 
 
 
-void CustomPlayerController::SetPlayerOrigin (dFloat originHigh)
+void CustomPlayerController::SetPlayerOrigin (dFloat originHeight)
 {
-	dAssert (0);
+/*
 	NewtonCollision* const playerShape = NewtonBodyGetCollision(m_body);
 	NewtonCompoundCollisionBeginAddRemove(playerShape);	
 
@@ -177,6 +177,10 @@ void CustomPlayerController::SetPlayerOrigin (dFloat originHigh)
 	dFloat mass;
 	NewtonBodyGetMassMatrix(m_body, &mass, &Ixx, &Iyy, &Izz);
 	NewtonBodySetMassProperties(m_body, mass, playerShape);
+*/
+	originHeight = dClamp (originHeight, 0.0f, m_height);
+	dVector origin (m_upVector.Scale (originHeight));
+	NewtonBodySetCentreOfMass (m_body, &origin[0]);
 }
 
 
