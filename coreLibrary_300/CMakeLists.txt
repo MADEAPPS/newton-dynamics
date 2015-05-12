@@ -73,7 +73,7 @@ if (${UNIX})
 endif(${UNIX})
 
 if (CMAKE_COMPILER_IS_GNUCC)
-  add_definitions(-fpic -msse -msse3 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant)
+  add_definitions(-fpic -msse -msse3 -msse4 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant)
 endif(CMAKE_COMPILER_IS_GNUCC)
 
 if (MSVC)

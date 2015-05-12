@@ -66,6 +66,6 @@ if (UNIX)
 endif(UNIX)
 
 if (CMAKE_COMPILER_IS_GNUCC)
-  add_definitions(-fpic -msse -msse2 -c -Wall) 
+  add_definitions(-fpic -msse -msse2 -c -Wall -std=c++11) 
 endif(CMAKE_COMPILER_IS_GNUCC)
  

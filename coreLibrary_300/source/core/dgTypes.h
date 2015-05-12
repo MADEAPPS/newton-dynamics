@@ -132,6 +132,7 @@
 		#include <pmmintrin.h> 
 		#include <emmintrin.h> 
 		#include <mmintrin.h> 
+		#include <smmintrin.h>
 	} 
 #endif
 
@@ -142,7 +143,8 @@
     #if (defined __i386__ || defined __x86_64__)
 		#include <pmmintrin.h> 
 		#include <emmintrin.h>  //sse3
-        #include <mmintrin.h>    
+        #include <mmintrin.h> 
+		#include <smmintrin.h>
     #endif
 #endif
 
