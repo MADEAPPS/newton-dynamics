@@ -617,20 +617,19 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 			}
 			bodyLocks[m0] = m0 > 0;
 			bodyLocks[m1] = m1 > 0;
-			if (queue.IsEmpty()) {
-				queue.Insert(dgAtomicExchangeAndAdd(atomicIndex, 1));
-			}
 			dgSpinUnlock(globalLock);
+
 			if (m0 != m1) {
 				dgJointInfo* const jointInfo = &constraintArray[jointIndex];
 				dgAssert(jointInfo->m_m0 == m0);
 				dgAssert(jointInfo->m_m1 == m1);
-
 				world->CalculateJointForce (jointInfo, bodyArray, internalForces, matrixRow, accNorm);
-
-				dgSpinUnlock(&bodyLocks[m0]);
-				dgSpinUnlock(&bodyLocks[m1]);
 			}
+			if (queue.IsEmpty()) {
+				queue.Insert(dgAtomicExchangeAndAdd(atomicIndex, 1));
+			}
+			dgSpinUnlock(&bodyLocks[m0]);
+			dgSpinUnlock(&bodyLocks[m1]);
 		}
 	}
 
