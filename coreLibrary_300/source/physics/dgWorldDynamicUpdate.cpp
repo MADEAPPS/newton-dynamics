@@ -144,8 +144,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	}
 	m_solverMemory.Init (world, maxRowCount, m_bodies);
 
-//	m_rowCountAtomicIndex = 0;
-
 	dgInt32 threadCount = world->GetThreadCount();	
 
 	dgWorldDynamicUpdateSyncDescriptor descriptor;
@@ -168,10 +166,9 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	world->m_perfomanceCounters[m_dynamicsBuildSpanningTreeTicks] = dynamicsTime - updateTime;
 
 	if (!(world->m_amp && (world->m_hardwaredIndex > 0))) {
-		dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
-
-useParallel = 0;
 		dgInt32 index = 0;
+		dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
+		//useParallel = 0;
 		if (useParallel) {
 			useParallel = useParallel && m_joints;
 			useParallel = useParallel && ((threadCount * islandsArray[0].m_jointCount) >= m_joints);
@@ -200,6 +197,7 @@ useParallel = 0;
 			world->m_amp->ConstraintSolver (m_islands, islandsArray, timestep);
 		#endif
 	}
+
 
 	dgUnsigned32 ticks = world->m_getPerformanceCount();
 	world->m_perfomanceCounters[m_dynamicsSolveSpanningTreeTicks] = ticks - dynamicsTime;
