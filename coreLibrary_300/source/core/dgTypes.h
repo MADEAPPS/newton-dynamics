@@ -132,7 +132,9 @@
 		#include <pmmintrin.h> 
 		#include <emmintrin.h> 
 		#include <mmintrin.h> 
-		#include <smmintrin.h>
+		#ifdef DG_SSE4_INSTRUCTIONS_SET
+			#include <smmintrin.h>
+		#endif
 	} 
 #endif
 
@@ -144,7 +146,9 @@
 		#include <pmmintrin.h> 
 		#include <emmintrin.h>  //sse3
         #include <mmintrin.h> 
-		#include <smmintrin.h>
+		#ifdef DG_SSE4_INSTRUCTIONS_SET
+			#include <smmintrin.h>
+		#endif
     #endif
 #endif
 
@@ -342,44 +346,39 @@ DG_INLINE T dgSign(T A)
 }
 
 template <class T> 
-dgInt32 dgBinarySearch (T const* array, dgInt32 elements, dgInt32 entry)
+dgInt32 dgBinarySearch (T const* array, dgInt32 elements, const T& entry, dgInt32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
 	dgInt32 index0 = 0;
 	dgInt32 index2 = elements - 1;
-	dgInt32 entry0 = array[index0].m_Key;
-	dgInt32 entry2 = array[index2].m_Key;
 
-	while ((index2 - index0) > 1) {
+	while ((index2 - index0) > 4) {
 		dgInt32 index1 = (index0 + index2) >> 1;
-		dgInt32 entry1 = array[index1].m_Key;
-		if (entry1 == entry) {
-			dgAssert (array[index1].m_Key <= entry);
-			dgAssert (array[index1 + 1].m_Key >= entry);
-			return index1;
-		} else if (entry < entry1) {
-			index2 = index1;
-			entry2 = entry1;
-		} else {
+		dgInt32 test = compare (&array[index1], &entry, context);
+		if (test < 0) {
 			index0 = index1;
-			entry0 = entry1;
+		} else {
+			index2 = index1;
 		}
 	}
-
-	if (array[index0].m_Key > index0) {
-		index0 --;
+	
+	index0 = (index0 > 0) ? index0 - 1 : 0;
+	index2 = ((index2 + 1) < elements) ? index2 + 1 : elements;
+	dgInt32 index = index0 - 1;
+	for (dgInt32 i = index0; i < index2; i ++) {
+		dgInt32 test = compare (&array[i], &entry, context);
+		if (!test) {
+			return i;
+		} else if (test > 0) {
+			break;
+		}
+		index = i;
 	}
-
-	dgAssert (array[index0].m_Key <= entry);
-	dgAssert (array[index0 + 1].m_Key >= entry);
-	return index0;
+	return index;
 }
 
 
-
-
 template <class T> 
-void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 radixPass, 
-				  dgInt32 (*getRadixKey) (const T* const  A, void* const context), void* const context = NULL)
+void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 radixPass,  dgInt32 (*getRadixKey) (const T* const  A, void* const context), void* const context = NULL)
 {
 	dgInt32 scanCount[256]; 
 	dgInt32 histogram[256][4];
@@ -706,7 +705,7 @@ DG_INLINE dgFloat32 dgRsqrt(dgFloat32 x)
 
 enum dgSerializeRevisionNumber
 {
-	m_firstRevision = 99,
+	m_firstRevision = 100,
 	// add new serialization revision number here
 	m_currentRevision 
 };
