@@ -312,28 +312,7 @@ void dgWorldDynamicUpdate::CalculateJointsVelocParallelKernel (void* const conte
 		for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 			dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 			dgAssert (body->m_index == i);
-			if (body->m_active) {
-				dgVector force(internalForces[i].m_linear);
-				dgVector torque(internalForces[i].m_angular);
-				if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-					force += body->m_accel;
-					torque += body->m_alpha;
-				}
-
-				dgVector velocStep((force.Scale4(body->m_invMass.m_w)).CompProduct4(timestep4));
-				dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)).CompProduct4(timestep4));
-				if (!body->m_resting) {
-					body->m_veloc += velocStep;
-					body->m_omega += omegaStep;
-				} else {
-					dgVector velocStep2(velocStep.DotProduct4(velocStep));
-					dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
-					dgVector test((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2) | forceActiveMask);
-					if (test.GetSignMask()) {
-						body->m_resting = false;
-					}
-				}
-			}
+			world->ApplyNetVelcAndOmega (body, internalForces[i], timestep4, speedFreeze2, forceActiveMask);
 		}
 	} else {
 		for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount;  i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
@@ -433,29 +412,7 @@ void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernel (void* const context
 	dgVector forceActiveMask ((syncData->m_jointCount <= DG_SMALL_ISLAND_COUNT) ?  dgVector (-1, -1, -1, -1) : dgFloat32 (0.0f));
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-		if (body->m_active) {
-			// the initial velocity and angular velocity were stored in net force and net torque, for memory saving
-			dgVector accel = (body->m_veloc - body->m_netForce).CompProduct4(invTime);
-			dgVector alpha = (body->m_omega - body->m_netTorque).CompProduct4(invTime);
-			dgVector accelTest((accel.DotProduct4(accel) > maxAccNorm2) | (alpha.DotProduct4(alpha) > maxAccNorm2) | forceActiveMask);
-			//if ((accel % accel) < maxAccNorm2) {
-			//	accel = dgVector::m_zero;
-			//}
-			//if ((alpha % alpha) < maxAccNorm2) {
-			//	alpha = dgVector::m_zero;
-			//}
-			accel = accel & accelTest;
-			alpha = alpha & accelTest;
-
-			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-				body->m_accel = accel;
-				body->m_alpha = alpha;
-			}
-			body->m_netForce = accel.Scale4(body->m_mass[3]);
-
-			alpha = body->m_matrix.UnrotateVector(alpha);
-			body->m_netTorque = body->m_matrix.RotateVector(alpha.CompProduct4(body->m_mass));
-		}
+		world->ApplyNetTorqueAndForce (body, invTime, maxAccNorm2, forceActiveMask);
 	}
 }
 

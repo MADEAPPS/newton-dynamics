@@ -263,6 +263,9 @@ class dgWorldDynamicUpdate
 	void CalculateForcesGameModeParallel (dgParallelSolverSyncData* const syncData) const; 
 
 	void CalculateReactionForcesParallel (const dgIsland* const island, dgFloat32 timestep) const;
+	void ApplyNetTorqueAndForce (dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& accNorm, const dgVector& mask) const;
+	void ApplyNetVelcAndOmega (dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2, const dgVector& mask) const;
+	
 	dgFloat32 CalculateJointForces (const dgIsland* const island, dgInt32 rowStart, dgInt32 joint, dgFloat32* const forceStep, dgFloat32 maxAccNorm, const dgJacobianPair* const JMinv) const;
 	void CalculateForcesSimulationMode (const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
@@ -273,6 +276,7 @@ class dgWorldDynamicUpdate
 	void CalculateReactionsForces(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void ApplyExternalForcesAndAcceleration(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateSimpleBodyReactionsForces (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
+
 
 	void IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 	void CalculateJointForce (dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgVector& accNorm) const;
