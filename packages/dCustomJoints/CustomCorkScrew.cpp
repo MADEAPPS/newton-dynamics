@@ -133,7 +133,7 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 		if (angle < m_minAngularDist) {
 			dFloat relAngle = angle - m_minAngularDist;
 			// the angle was clipped save the new clip limit
-			m_curJointAngle.m_angle = m_minAngularDist;
+			//m_curJointAngle.m_angle = m_minAngularDist;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
@@ -149,7 +149,7 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 			dFloat relAngle = angle - m_maxAngularDist;
 
 			// the angle was clipped save the new clip limit
-			m_curJointAngle.m_angle = m_maxAngularDist;
+			//m_curJointAngle.m_angle = m_maxAngularDist;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);

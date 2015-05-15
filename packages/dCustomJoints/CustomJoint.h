@@ -34,20 +34,29 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 class CustomJoint: public CustomAlloc  
 {
 	public:
-	struct AngularIntegration
+	class AngularIntegration
 	{
+		public:
 		AngularIntegration()
-			:m_angle(0.0f)
-			,m_sinJointAngle(0.0f)
-			,m_cosJointAngle(1.0f)
 		{
+			SetAngle (0.0f);
 		}
 
 		AngularIntegration(dFloat angle)
-			:m_angle(angle)
-			,m_sinJointAngle(dSin (angle))
-			,m_cosJointAngle(dCos (angle))
 		{
+			SetAngle (angle);
+		}
+
+		dFloat GetAngle () const
+		{
+			return m_angle;
+		}
+
+		void SetAngle (dFloat angle)
+		{
+			m_angle = angle;
+			m_sinJointAngle = dSin(angle);
+			m_cosJointAngle = dCos(angle);
 		}
 
 		dFloat Update (dFloat newAngleCos, dFloat newAngleSin)
@@ -83,6 +92,7 @@ class CustomJoint: public CustomAlloc
 			return Update (dCos (angle), dSin (angle));
 		}
 
+		private:
 		dFloat m_angle;
 		dFloat m_sinJointAngle;
 		dFloat m_cosJointAngle;

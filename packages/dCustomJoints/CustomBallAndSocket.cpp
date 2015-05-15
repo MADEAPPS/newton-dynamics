@@ -438,7 +438,7 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 
 	AngularIntegration pitchStep0 (AngularIntegration (euler0.m_x) - m_pitch);
 	AngularIntegration pitchStep1 (AngularIntegration (euler1.m_x) - m_pitch);
-	if (dAbs (pitchStep0.m_angle) > dAbs (pitchStep1.m_angle)) {
+	if (dAbs (pitchStep0.GetAngle()) > dAbs (pitchStep1.GetAngle())) {
 		euler0 = euler1;
 	}
 

@@ -173,12 +173,12 @@ void CustomUniversal::SetLimis_1(dFloat minAngle, dFloat maxAngle)
 
 dFloat CustomUniversal::GetJointAngle_0 () const
 {
-	return m_curJointAngle_0.m_angle;
+	return m_curJointAngle_0.GetAngle();
 }
 
 dFloat CustomUniversal::GetJointAngle_1 () const
 {
-	return m_curJointAngle_1.m_angle;
+	return m_curJointAngle_1.GetAngle();
 }
 
 dFloat CustomUniversal::GetJointOmega_0 () const
@@ -361,8 +361,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	
 	// check is the joint limit are enable
 	if (m_limit_0_On) {
-		if (m_curJointAngle_0.m_angle < m_minAngle_0) {
-			dFloat relAngle = m_curJointAngle_0.m_angle - m_minAngle_0;
+		if (m_curJointAngle_0.GetAngle() < m_minAngle_0) {
+			dFloat relAngle = m_curJointAngle_0.GetAngle() - m_minAngle_0;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
@@ -373,8 +373,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 			// allow the joint to move back freely
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 
-		} else if (m_curJointAngle_0.m_angle > m_maxAngle_0) {
-			dFloat relAngle = m_curJointAngle_0.m_angle - m_maxAngle_0;
+		} else if (m_curJointAngle_0.GetAngle() > m_maxAngle_0) {
+			dFloat relAngle = m_curJointAngle_0.GetAngle() - m_maxAngle_0;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
@@ -401,8 +401,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// if limit are enable ...
 	if (m_limit_1_On) {
-		if (m_curJointAngle_1.m_angle < m_minAngle_1) {
-			dFloat relAngle = m_curJointAngle_1.m_angle - m_minAngle_1;
+		if (m_curJointAngle_1.GetAngle() < m_minAngle_1) {
+			dFloat relAngle = m_curJointAngle_1.GetAngle() - m_minAngle_1;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
@@ -413,8 +413,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 			// allow the joint to move back freely 
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 
-		} else if (m_curJointAngle_1.m_angle > m_maxAngle_1) {
-			dFloat relAngle = m_curJointAngle_1.m_angle - m_maxAngle_1;
+		} else if (m_curJointAngle_1.GetAngle() > m_maxAngle_1) {
+			dFloat relAngle = m_curJointAngle_1.GetAngle() - m_maxAngle_1;
 			
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);

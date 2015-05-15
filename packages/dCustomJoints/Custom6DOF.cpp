@@ -109,7 +109,7 @@ void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 		}
 	}
 
-	dVector eulerAngles (m_pitch.m_angle, m_yaw.m_angle, m_roll.m_angle, 0.0f);
+	dVector eulerAngles (m_pitch.GetAngle(), m_yaw.GetAngle(), m_roll.GetAngle(), 0.0f);
 	for (int i = 0; i < 3; i ++) {
 		if ((m_minAngularLimits[i] == 0.0f) && (m_maxAngularLimits[i] == 0.0f)) {
 			info->m_minAngularDof[i] = 0.0f;
@@ -185,7 +185,7 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	AngularIntegration pitchStep0 (AngularIntegration (euler0.m_x) - m_pitch);
 	AngularIntegration pitchStep1 (AngularIntegration (euler1.m_x) - m_pitch);
-	if (dAbs (pitchStep0.m_angle) > dAbs (pitchStep1.m_angle)) {
+	if (dAbs (pitchStep0.GetAngle()) > dAbs (pitchStep1.GetAngle())) {
 		euler0 = euler1;
 	}
 
