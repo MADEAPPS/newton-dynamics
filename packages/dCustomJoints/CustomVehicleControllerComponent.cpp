@@ -35,7 +35,7 @@ dFloat CustomVehicleControllerComponent::dInterpolationCurve::GetValue (dFloat p
 {
 	dFloat interplatedValue = 0.0f;
 	if (m_count) {
-		param = dClamp (param, 0.0f, m_nodes[m_count - 1].m_param);
+		param = dClamp(param, dFloat(0.0f), m_nodes[m_count - 1].m_param);
 		interplatedValue = m_nodes[m_count - 1].m_value;
 		for (int i = 1; i < m_count; i ++) {
 			if (param < m_nodes[i].m_param) {
@@ -411,8 +411,8 @@ CustomVehicleControllerComponentEngine::dGearBox::~dGearBox ()
 
 void CustomVehicleControllerComponentEngine::dGearBox::SetOptimalShiftLimits (dFloat minShift, dFloat maxShift)
 {
-	minShift = dMax (minShift - 0.01f, 0.1f);
-	maxShift = dMin (maxShift + 0.01f, 0.9f);
+	minShift = dMax(minShift - dFloat(0.01f), dFloat(0.1f));
+	maxShift = dMin(maxShift + dFloat(0.01f), dFloat(0.9f));
 	for (int i = m_firstGear; i < m_gearsCount; i ++) {
 		dGearState* const state = m_gears[i];
 		state->m_shiftUp = maxShift;
@@ -650,7 +650,7 @@ dFloat CustomVehicleControllerComponentEngine::GetSpeed () const
 
 dFloat CustomVehicleControllerComponentEngine::GetRPM () const
 {
-	return dMax (-m_engineRPS * m_crownGearRatio * 9.55f, 0.0f);
+	return dMax(-m_engineRPS * m_crownGearRatio * 9.55f, dFloat(0.0f));
 }
 
 dFloat CustomVehicleControllerComponentEngine::GetTopRPM () const
@@ -817,10 +817,10 @@ if (gear > (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear))
 	
 	if (m_engineSwitch) {
 		if (gear == CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear) {
-			dFloat param = dMax (GetParam(), 0.05f);
+			dFloat param = dMax(GetParam(), dFloat(0.05f));
 			m_engineToque = GetTorque (m_engineRPS) * param - m_engineIdleResistance1 * m_engineRPS - m_engineIdleResistance2 * m_engineRPS * m_engineRPS;
 			dFloat alpha = m_engineIdleInvInertia * m_engineToque;
-			m_engineRPS = dMin (dMax (m_engineRPS + alpha * timestep, 0.0f), m_radiansPerSecundsAtRedLine);
+			m_engineRPS = dMin(dMax(m_engineRPS + alpha * timestep, dFloat(0.0f)), m_radiansPerSecundsAtRedLine);
 		} else {
 			dFloat gearRatio = gearBox->GetGearRatio(gear);
 			dFloat shaftOmega = m_differencial->GetShaftOmega();
@@ -828,7 +828,7 @@ if (gear > (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear))
 			dFloat torqueResistance = - m_engineInternalFriction * m_engineRPS;
 
 			dFloat param = GetParam();
-			dFloat nominalTorque = -GetTorque (dMax (-m_engineRPS, 0.0f)) * param;
+			dFloat nominalTorque = -GetTorque(dMax(-m_engineRPS, dFloat(0.0f))) * param;
 			dFloat engineTorque = nominalTorque + torqueResistance;
 
 			m_engineToque = m_engineToque + (engineTorque - m_engineToque) * timestep / m_clutchTorqueCouplingTime;

@@ -194,7 +194,7 @@ class dgAmpInstance: public dgAmpBodyData, public dgAmpConstraintData
 
 inline float_4 dgAmpInstance::ToFloat4 (const dgVector& v)
 { 
-	return float_4 (v[0], v[1], v[2], v[3]);
+	return float_4(float_4::value_type(v[0]), float_4::value_type(v[1]), float_4::value_type(v[2]), float_4::value_type(v[3]));
 }
 
 inline float dgAmpInstance::Dot (const float_4& vectorA, const float_4& vectorB) restrict(amp,cpu)

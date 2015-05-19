@@ -178,7 +178,7 @@ void CustomPlayerController::SetPlayerOrigin (dFloat originHeight)
 	NewtonBodyGetMassMatrix(m_body, &mass, &Ixx, &Iyy, &Izz);
 	NewtonBodySetMassProperties(m_body, mass, playerShape);
 */
-	originHeight = dClamp (originHeight, 0.0f, m_height);
+	originHeight = dClamp (originHeight, dFloat(0.0f), m_height);
 	dVector origin (m_upVector.Scale (originHeight));
 	NewtonBodySetCentreOfMass (m_body, &origin[0]);
 }
