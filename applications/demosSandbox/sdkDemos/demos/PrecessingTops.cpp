@@ -22,22 +22,16 @@ static void PhysicsApplyPrecessionTorque (const NewtonBody* body, dFloat timeste
 {
 	PhysicsApplyGravityForce (body, timestep, threadIndex);
 
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
-	
+/*
 	dVector omega;
 	dMatrix rotation;
-	NewtonBodyGetOmega(body, &omega[0]); 
+	dMatrix inertiaMatrix;
+	NewtonBodyGetOmega(body, &omega[0]);
 	NewtonBodyGetMatrix(body, &rotation[0][0]);
-	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
-
-	//apply gyroscope torque   
-	omega = rotation.UnrotateVector(omega);
-	dVector gyro(omega.m_x * Ixx, omega.m_y * Iyy, omega.m_z * Izz, 0.0f);
-	dVector torque (rotation.RotateVector(omega * gyro));
-	NewtonBodySetTorque(body, &torque.m_x);
+	NewtonBodyGetInertiaMatrix(body, &inertiaMatrix[0][0]);
+	dVector angularMomentum(rotation.UnrotateVector(inertiaMatrix.RotateVector(omega)));
+	dTrace(("%f %f %f %f\n", angularMomentum[0], angularMomentum[1], angularMomentum[2], angularMomentum % angularMomentum));
+*/
 }
 
 
@@ -54,17 +48,17 @@ void PrecessingTops (DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector size (1.5f, 2.0f, 2.0f, 0.0f);
+	dVector size (3.0f, 2.0f, 0.0f, 0.0f);
 
 	// create an array of cones 
 	int count = 10;
 
 	// all shapes use the x axis as the  axis of symmetry, to make an upright cone we apply a 90 degree rotation local matrix
 	dMatrix shapeOffsetMatrix (dRollMatrix(-3.141592f/2.0f));
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CONE_PRIMITIVE, 0, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, 0, shapeOffsetMatrix);
 
 	// till the cont 30 degrees, and apply a local high angular velocity
-	dMatrix matrix (dRollMatrix (-15.0f * 3.141592f / 180.0f));
+	dMatrix matrix (dRollMatrix (-25.0f * 3.141592f / 180.0f));
 	dVector omega (0.0f, 50.0f, 0.0f);
 	omega = matrix.RotateVector (omega);
 	dVector damp (0.0f, 0.0f, 0.0f, 0.0f);

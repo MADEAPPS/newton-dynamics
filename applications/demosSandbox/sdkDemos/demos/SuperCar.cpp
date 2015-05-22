@@ -565,7 +565,7 @@ steeringVal *= 0.3f;
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 1
-	#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
@@ -788,8 +788,8 @@ steeringVal *= 0.3f;
 			dVector p0 (tire.GetCenterOfMass());
 
 if (tire.GetContactCount()) {
-const CustomVehicleControllerBodyStateContact* xxx = tire.GetContactBody(0);
-const CustomVehicleControllerBodyState* xxx1 = tire.GetContactBody(0);
+//const CustomVehicleControllerBodyStateContact* xxx = tire.GetContactBody(0);
+//const CustomVehicleControllerBodyState* xxx1 = tire.GetContactBody(0);
 }
 
 			// offset the origin of of tire force so that they are visible

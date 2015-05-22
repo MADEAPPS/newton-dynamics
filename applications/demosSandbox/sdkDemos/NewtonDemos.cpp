@@ -29,12 +29,12 @@
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
-//#define DEFAULT_SCENE	3			// Precessing tops
+#define DEFAULT_SCENE	3			// Precessing tops
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-#define DEFAULT_SCENE	8			// Box stacks
+//#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -310,7 +310,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_microthreadIndex = 1;
 //m_useParallelSolver = true;
 //m_threadProfilerState = true;
-//m_showNormalForces = true;
+m_showNormalForces = true;
 //m_showCenterOfMass = true;
 //m_hideVisualMeshes = true;
 //m_physicsUpdateMode = 1;
