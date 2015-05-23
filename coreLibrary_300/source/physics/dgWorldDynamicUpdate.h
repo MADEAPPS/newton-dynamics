@@ -194,7 +194,7 @@ class dgJacobianMatrixElement
 {
 	public:
 	dgJacobianPair m_Jt;
-//	dgJacobianPair m_JMinv;
+	dgJacobianPair m_JMinv;
 
 	dgFloat32 m_force;
 	dgFloat32 m_accel;
@@ -223,7 +223,6 @@ class dgJacobianMemory
 	public:
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount);
 
-	//dgJacobian* m_internalVeloc;
 	dgJacobian* m_internalForces;
 	dgJacobianMatrixElement* m_memory;
 };
