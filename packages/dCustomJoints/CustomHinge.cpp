@@ -24,6 +24,7 @@
 #define MIN_JOINT_PIN_LENGTH	50.0f
 
 //dInitRtti(CustomHinge);
+IMPLEMENT_CUSTON_JOINT(CustomHinge);
 
 CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
@@ -56,6 +57,34 @@ CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& p
 
 CustomHinge::~CustomHinge()
 {
+}
+
+CustomHinge::CustomHinge (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+	callback (userData, &m_minAngle, sizeof (dFloat));
+	callback (userData, &m_minAngle, sizeof (dFloat));
+	callback (userData, &m_maxAngle, sizeof (dFloat));
+	callback (userData, &m_friction, sizeof (dFloat));
+	callback (userData, &m_jointOmega, sizeof (dFloat));
+	callback (userData, &m_curJointAngle, sizeof (AngularIntegration));
+	int tmp;
+	callback (userData, &tmp, sizeof (int));
+	m_limitsOn = tmp ? true : false; 
+}
+
+void CustomHinge::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize (callback, userData);
+	callback (userData, &m_minAngle, sizeof (dFloat));
+	callback (userData, &m_minAngle, sizeof (dFloat));
+	callback (userData, &m_maxAngle, sizeof (dFloat));
+	callback (userData, &m_friction, sizeof (dFloat));
+	callback (userData, &m_jointOmega, sizeof (dFloat));
+	callback (userData, &m_curJointAngle, sizeof (AngularIntegration));
+
+	int tmp = m_limitsOn;
+	callback (userData, &tmp, sizeof (int));
 }
 
 

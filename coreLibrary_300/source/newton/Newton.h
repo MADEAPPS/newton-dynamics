@@ -356,9 +356,11 @@ extern "C" {
 	typedef void (*NewtonOnBodySerializationCallback) (NewtonBody* const body, NewtonSerializeCallback function, void* const serializeHandle);
 	typedef void (*NewtonOnBodyDeserializationCallback) (NewtonBody* const body, NewtonDeserializeCallback function, void* const serializeHandle);
 
+	typedef void (*NewtonOnJointSerializationCallback) (const NewtonJoint* const joint, NewtonSerializeCallback function, void* const serializeHandle);
+	typedef void (*NewtonOnJointDeserializationCallback) (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback function, void* const serializeHandle);
+
 	typedef void (*NewtonOnUserCollisionSerializationCallback) (void* const userData, NewtonSerializeCallback function, void* const serializeHandle);
 
-	
 	// user collision callbacks	
 	typedef void (*NewtonUserMeshCollisionDestroyCallback) (void* const userData);
 	typedef dFloat (*NewtonUserMeshCollisionRayHitCallback) (NewtonUserMeshCollisionRayHitDesc* const lineDescData);
@@ -464,10 +466,11 @@ extern "C" {
 	NEWTON_API void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep);
 	NEWTON_API void NewtonWaitForUpdateToFinish (const NewtonWorld* const newtonWorld);
 
-	NEWTON_API void NewtonSerializeToFile (const NewtonWorld* const newtonWorld, const char* const filename);
-	NEWTON_API void NewtonSerializeBodyArray (const NewtonWorld* const newtonWorld, NewtonBody** const bodyArray, int bodyCount, NewtonOnBodySerializationCallback serializeBody, NewtonSerializeCallback serializeFunction, void* const serializeHandle);
-	NEWTON_API void NewtonDeserializeBodyArray (const NewtonWorld* const newtonWorld, NewtonOnBodyDeserializationCallback deserializeBody, NewtonDeserializeCallback serializeFunction, void* const serializeHandle);
+	NEWTON_API void NewtonSerializeToFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodySerializationCallback bodyCallback);
+	NEWTON_API void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodyDeserializationCallback bodyCallback);
 
+	NEWTON_API void NewtonSetJointSerializationCallbacks (const NewtonWorld* const newtonWorld, NewtonOnJointSerializationCallback serializeJoint, NewtonOnJointDeserializationCallback deserializeJoint);
+	NEWTON_API void NewtonGetJointSerializationCallbacks (const NewtonWorld* const newtonWorld, NewtonOnJointSerializationCallback* const serializeJoint, NewtonOnJointDeserializationCallback* const deserializeJoint);
 
 	NEWTON_API unsigned NewtonReadThreadPerformanceTicks (const NewtonWorld* newtonWorld, unsigned threadIndex);
 

@@ -30,6 +30,7 @@ class dgBilateralConstraint: public dgConstraint
 {
 	public:
 	virtual void SetDestructorCallback (OnConstraintDestroy destructor);
+	virtual void Serialize (dgSerialize serializeCallback, void* const userData) = 0;
 
 	protected:
 	dgBilateralConstraint ();
@@ -47,7 +48,6 @@ class dgBilateralConstraint: public dgConstraint
 	dgVector CalculateGlobalMatrixAndAngle (dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const;
 	void CalculateMatrixOffset (const dgVector& pivot, const dgVector& dir, dgMatrix& matrix0, dgMatrix& matrix1);
 
-
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); 
 	virtual void JointVelocityCorrection(dgJointAccelerationDecriptor* const params); 
 
@@ -58,6 +58,7 @@ class dgBilateralConstraint: public dgConstraint
 	dgFloat32 CalculateSpringDamperAcceleration (dgInt32 index, const dgContraintDescritor& desc, dgFloat32 jointAngle, const dgVector& p0Global, const dgVector& p1Global, dgFloat32 springK, dgFloat32 springD);
 
 	void SetMaxContactsForExactSolver (bool mode, dgInt32 MaxCount);
+
 
 	dgMatrix m_localMatrix0;
 	dgMatrix m_localMatrix1;

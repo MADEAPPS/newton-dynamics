@@ -40,10 +40,9 @@ class dgSlidingConstraint: public dgBilateralConstraint
 	private:
 	dgSlidingConstraint();
 	virtual ~dgSlidingConstraint();
-//	virtual void Remove(dgWorld* world);
 
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
-//	static dgSlidingConstraint* Create(dgWorld* world);
+	virtual void Serialize (dgSerialize serializeCallback, void* const userData) {dgAssert (0);}
 
 
 	dgFloat32 m_posit;

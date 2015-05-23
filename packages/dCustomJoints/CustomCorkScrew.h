@@ -31,23 +31,24 @@ class CustomCorkScrew: public CustomJoint
 	CUSTOM_JOINTS_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
 
 	protected:
+	CUSTOM_JOINTS_API CustomCorkScrew (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	dMatrix m_localMatrix0;
-	dMatrix m_localMatrix1;
-
-	bool m_limitsLinearOn;
-	bool m_limitsAngularOn;
+	AngularIntegration m_curJointAngle;
 	dFloat m_minLinearDist;
 	dFloat m_maxLinearDist;
 	dFloat m_minAngularDist;
 	dFloat m_maxAngularDist;
-
-	bool m_angularmotorOn;
 	dFloat m_angularDamp;
 	dFloat m_angularAccel;
-	AngularIntegration m_curJointAngle;
+	bool m_limitsLinearOn;
+	bool m_limitsAngularOn;
+	bool m_angularmotorOn;
+
+	DECLARE_CUSTON_JOINT(CustomCorkScrew, CustomJoint)
 };
 
 #endif // !defined(AFX_CUSTOMCORKSCREW_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)

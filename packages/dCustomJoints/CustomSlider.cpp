@@ -24,6 +24,7 @@
 #define MIN_JOINT_PIN_LENGTH	50.0f
 
 //dInitRtti(CustomSlider);
+IMPLEMENT_CUSTON_JOINT(CustomSlider);
 
 CustomSlider::CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
@@ -42,6 +43,36 @@ CustomSlider::CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 
 CustomSlider::~CustomSlider()
 {
+}
+
+
+CustomSlider::CustomSlider (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+	callback (userData, &m_speed, sizeof (dFloat));
+	callback (userData, &m_posit, sizeof (dFloat));
+	callback (userData, &m_minDist, sizeof (dFloat));
+	callback (userData, &m_maxDist, sizeof (dFloat));
+
+	int tmp[2];
+	callback (userData, &tmp, sizeof (int));
+	m_limitsOn = tmp[0] ? true : false; 
+	m_hitLimitOnLastUpdate = tmp[1] ? true : false; 
+}
+
+void CustomSlider::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize (callback, userData);
+
+	callback (userData, &m_speed, sizeof (dFloat));
+	callback (userData, &m_posit, sizeof (dFloat));
+	callback (userData, &m_minDist, sizeof (dFloat));
+	callback (userData, &m_maxDist, sizeof (dFloat));
+
+	int tmp[2];
+	tmp[0] = m_limitsOn; 
+	tmp[1] = m_hitLimitOnLastUpdate; 
+	callback (userData, tmp, sizeof (tmp));
 }
 
 

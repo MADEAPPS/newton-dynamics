@@ -83,7 +83,7 @@ void CustomSlidingContact::GetInfo (NewtonJointRecord* const info) const
 	dMatrix matrix0;
 	dMatrix matrix1;
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	if (m_limitsLinearOn) {
 		dFloat dist;
@@ -136,7 +136,7 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all two orthonormal direction
 	dVector p0 (matrix0.m_posit);

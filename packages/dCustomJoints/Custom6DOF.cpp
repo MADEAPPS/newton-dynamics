@@ -18,6 +18,8 @@
 
 //dInitRtti(Custom6DOF);
 
+IMPLEMENT_CUSTON_JOINT(Custom6DOF);
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -42,6 +44,30 @@ Custom6DOF::Custom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pi
 
 Custom6DOF::~Custom6DOF()
 {
+}
+
+Custom6DOF::Custom6DOF (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+	callback (userData, &m_minLinearLimits, sizeof (dVector));
+	callback (userData, &m_maxLinearLimits, sizeof (dVector));
+	callback (userData, &m_minAngularLimits, sizeof (dVector));
+	callback (userData, &m_maxAngularLimits, sizeof (dVector));
+	callback (userData, &m_pitch, sizeof (AngularIntegration));
+	callback (userData, &m_yaw, sizeof (AngularIntegration));
+	callback (userData, &m_roll, sizeof (AngularIntegration));
+}
+
+void Custom6DOF::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize (callback, userData);
+	callback(userData, &m_minLinearLimits, sizeof (dVector));
+	callback(userData, &m_maxLinearLimits, sizeof (dVector));
+	callback(userData, &m_minAngularLimits, sizeof (dVector));
+	callback(userData, &m_maxAngularLimits, sizeof (dVector));
+	callback(userData, &m_pitch, sizeof (AngularIntegration));
+	callback(userData, &m_yaw, sizeof (AngularIntegration));
+	callback(userData, &m_roll, sizeof (AngularIntegration));
 }
 
 
@@ -87,7 +113,7 @@ void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 	info->m_attachBody_1 = m_body1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	dVector p0 (matrix0.m_posit);
 	dVector p1 (matrix1.m_posit);
@@ -133,7 +159,7 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// add the linear limits
 	const dVector& p0 = matrix0.m_posit;

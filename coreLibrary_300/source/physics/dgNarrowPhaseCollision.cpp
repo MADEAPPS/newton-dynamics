@@ -334,6 +334,7 @@ dgCollisionInstance* dgWorld::CreateInstance (const dgCollision* const child, dg
 
 void dgWorld::SerializeCollision(dgCollisionInstance* const shape, dgSerialize serialization, void* const userData) const
 {
+	dgAssert (0);
 	dgSerializeMarker(serialization, userData);
 	shape->Serialize(serialization, userData);
 }

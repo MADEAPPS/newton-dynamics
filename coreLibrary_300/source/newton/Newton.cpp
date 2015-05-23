@@ -262,13 +262,36 @@ void NewtonInvalidateCache(const NewtonWorld* const newtonWorld)
 	world->FlushCache();
 }
 
-void NewtonSerializeToFile (const NewtonWorld* const newtonWorld, const char* const filename)
+void NewtonSetJointSerializationCallbacks (const NewtonWorld* const newtonWorld, NewtonOnJointSerializationCallback serializeJoint, NewtonOnJointDeserializationCallback deserializeJoint)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->SerializeToFile (filename);
+	world->SetJointSerializationCallbacks (dgWorld::OnJointSerializationCallback(serializeJoint), dgWorld::OnJointDeserializationCallback(deserializeJoint));
 }
 
+void NewtonGetJointSerializationCallbacks (const NewtonWorld* const newtonWorld, NewtonOnJointSerializationCallback* const serializeJoint, NewtonOnJointDeserializationCallback* const deserializeJoint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	world->GetJointSerializationCallbacks ((dgWorld::OnJointSerializationCallback*)serializeJoint, (dgWorld::OnJointDeserializationCallback*)deserializeJoint);
+}
+
+
+void NewtonSerializeToFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodySerializationCallback bodyCallback)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	world->SerializeToFile (filename, dgWorld::OnBodySerialize (bodyCallback));
+}
+
+void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodyDeserializationCallback bodyCallback)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	world->DeserializeFromFile (filename, dgWorld::OnBodyDeserialize (bodyCallback));
+}
+
+/*
 void NewtonSerializeBodyArray (const NewtonWorld* const newtonWorld, NewtonBody** const bodyArray, int bodyCount, NewtonOnBodySerializationCallback serializeBody, NewtonSerializeCallback serializeFunction, void* const serializeHandle)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -282,7 +305,7 @@ void NewtonDeserializeBodyArray (const NewtonWorld* const newtonWorld, NewtonOnB
 	Newton* const world = (Newton *) newtonWorld;
 	world->DeserializeBodyArray (dgWorld::OnBodyDeserialize (deserializeBody), (dgDeserialize) serializeFunction, serializeHandle);
 }
-
+*/
 
 
 int NewtonGetCurrentDevice (const NewtonWorld* const newtonWorld)

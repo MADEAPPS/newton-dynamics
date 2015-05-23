@@ -151,6 +151,9 @@ class dgWorld
 	typedef void (dgApi *OnCollisionInstanceDestroy) (const dgWorld* const world, const dgCollisionInstance* const collision);
 	typedef void (dgApi *OnCollisionInstanceDuplicate) (const dgWorld* const world, dgCollisionInstance* const collision, const dgCollisionInstance* const sourceCollision);
 
+	typedef void (dgApi *OnJointSerializationCallback) (const dgUserConstraint* const joint, dgSerialize funt, void* const serilalizeObject);
+	typedef void (dgApi *OnJointDeserializationCallback) (const dgBody* const body0, const dgBody* const body1, dgDeserialize funt, void* const serilalizeObject);
+
 	class dgListener
 	{
 		public: 
@@ -303,11 +306,22 @@ class dgWorld
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 
 	static void OnSerializeToFile (void* const userData, const void* const buffer, size_t size);
-	static void OnBodySerializeToFile (dgBody& body, dgSerialize serializeCallback, void* const userData);
+	static void OnDeserializeFromFile (void* const userData, void* const buffer, size_t size);
 
-	void SerializeToFile (const char* const fileName) const;
+	static void OnBodySerializeToFile (dgBody& body, dgSerialize serializeCallback, void* const userData);
+	static void OnBodyDeserializeFromFile (dgBody& body, dgDeserialize serializeCallback, void* const userData);
+
+	void SerializeToFile (const char* const fileName, OnBodySerialize bodyCallback) const;
+	void DeserializeFromFile (const char* const fileName, OnBodyDeserialize bodyCallback);
+
+	void SerializeJointArray (dgBody** const array, dgInt32 count, dgSerialize serializeCallback, void* const userData) const;
+	void DeserializeJointArray (const dgTree<dgBody*, dgInt32>&bodyMap, dgDeserialize serializeCallback, void* const userData);
+
 	void SerializeBodyArray (dgBody** const array, dgInt32 count, OnBodySerialize bodyCallback, dgSerialize serializeCallback, void* const userData) const;
-	void DeserializeBodyArray (OnBodyDeserialize bodyCallback, dgDeserialize deserializeCallback, void* const userData);
+	void DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDeserialize bodyCallback, dgDeserialize deserializeCallback, void* const userData);
+
+	void SetJointSerializationCallbacks (OnJointSerializationCallback serializeJoint, OnJointDeserializationCallback deserializeJoint);
+	void GetJointSerializationCallbacks (OnJointSerializationCallback* const serializeJoint, OnJointDeserializationCallback* const deserializeJoint) const;
 
 	void SerializeCollision (dgCollisionInstance* const shape, dgSerialize deserialization, void* const userData) const;
 	dgCollisionInstance* CreateCollisionFromSerialization (dgDeserialize deserialization, void* const userData);
@@ -452,7 +466,8 @@ class dgWorld
 	OnGetPerformanceCountCallback m_getPerformanceCount;
 	OnCollisionInstanceDestroy	m_onCollisionInstanceDestruction;
 	OnCollisionInstanceDuplicate m_onCollisionInstanceCopyConstrutor;
-
+	OnJointSerializationCallback m_serializedJointCallback;	
+	OnJointDeserializationCallback m_deserializedJointCallback;	
 
 	dgUnsigned32 m_perfomanceCounters[m_counterSize];	
 	dgUnsigned32 m_perfomanceCountersBack[m_counterSize];	

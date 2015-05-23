@@ -31,15 +31,15 @@ class CustomRackAndPinion: public CustomJoint
 	CUSTOM_JOINTS_API CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody);
 	CUSTOM_JOINTS_API virtual ~CustomRackAndPinion();
 
-
 	protected:
+	CUSTOM_JOINTS_API CustomRackAndPinion (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	dMatrix m_localMatrix0;
-	dMatrix m_localMatrix1;
-
 	dFloat m_gearRatio;
+	DECLARE_CUSTON_JOINT(CustomRackAndPinion, CustomJoint)
 };
 
 #endif // !defined(AFX_CustomWormGear_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)

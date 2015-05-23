@@ -39,15 +39,12 @@ class dgHingeConstraint: public dgBilateralConstraint
 	dgFloat32 CalculateStopAlpha (dgFloat32 angle, const dgJointCallbackParam* param) const;
 	void SetJointParameterCallback (dgHingeJointAcceleration callback);
 
-	
-	
 	private:
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
-//	virtual void Remove(dgWorld* world);
+	virtual void Serialize (dgSerialize serializeCallback, void* const userData) {dgAssert (0);}
 
 	dgHingeConstraint();
 	virtual ~dgHingeConstraint();
-//	static dgHingeConstraint* Create(dgWorld* world);
 
 	dgFloat32 m_angle;
 	dgHingeJointAcceleration m_jointAccelFnt;

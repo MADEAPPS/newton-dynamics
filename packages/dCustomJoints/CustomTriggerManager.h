@@ -62,7 +62,6 @@ class CustomTriggerManager: public CustomControllerManager<CustomTriggerControll
 
 	CUSTOM_JOINTS_API virtual void OnDestroyBody (NewtonBody* const body); 
 
-
 	virtual void Debug () const {};
 	CUSTOM_JOINTS_API virtual CustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData);
 

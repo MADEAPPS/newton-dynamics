@@ -53,6 +53,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Newton.h>
+#include <dCRC.h>
 #include <dTree.h>
 #include <dList.h>
 #include <dMathDefines.h>

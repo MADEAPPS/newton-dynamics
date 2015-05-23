@@ -25,6 +25,8 @@
 
 //dInitRtti(CustomBallAndSocket);
 //dInitRtti(CustomLimitBallAndSocket);
+IMPLEMENT_CUSTON_JOINT(CustomBallAndSocket);
+IMPLEMENT_CUSTON_JOINT(CustomLimitBallAndSocket);
 
 CustomBallAndSocket::CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
@@ -32,11 +34,30 @@ CustomBallAndSocket::CustomBallAndSocket(const dMatrix& pinAndPivotFrame, Newton
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
+CustomBallAndSocket::CustomBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
+	:CustomJoint(6, child, parent)
+{
+	dMatrix	dummy;
+	CalculateLocalMatrix (pinAndPivotFrame0, m_localMatrix0, dummy);
+	CalculateLocalMatrix (pinAndPivotFrame1, dummy, m_localMatrix1);
+}
 
 
 CustomBallAndSocket::~CustomBallAndSocket()
 {
 }
+
+CustomBallAndSocket::CustomBallAndSocket (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+
+}
+
+void CustomBallAndSocket::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize (callback, userData);
+}
+
 
 void CustomBallAndSocket::GetInfo (NewtonJointRecord* const info) const
 {
@@ -71,7 +92,7 @@ void CustomBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all three orthonormal directions
 	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_front[0]);
@@ -106,6 +127,31 @@ CustomLimitBallAndSocket::CustomLimitBallAndSocket(const dMatrix& childPinAndPiv
 
 CustomLimitBallAndSocket::~CustomLimitBallAndSocket()
 {
+}
+
+CustomLimitBallAndSocket::CustomLimitBallAndSocket (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomBallAndSocket (child, parent, callback, userData)
+{
+	callback (userData, &m_rotationOffset, sizeof (dMatrix));
+	callback (userData, &m_minTwistAngle, sizeof (dFloat));
+	callback (userData, &m_maxTwistAngle, sizeof (dFloat));
+	callback (userData, &m_coneAngleCos, sizeof (dFloat));
+	callback (userData, &m_coneAngleSin, sizeof (dFloat));
+	callback (userData, &m_coneAngleHalfCos, sizeof (dFloat));
+	callback (userData, &m_coneAngleHalfSin, sizeof (dFloat));
+}
+
+void CustomLimitBallAndSocket::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomBallAndSocket::Serialize (callback, userData);
+
+	callback (userData, &m_rotationOffset, sizeof (dMatrix));
+	callback (userData, &m_minTwistAngle, sizeof (dFloat));
+	callback (userData, &m_maxTwistAngle, sizeof (dFloat));
+	callback (userData, &m_coneAngleCos, sizeof (dFloat));
+	callback (userData, &m_coneAngleSin, sizeof (dFloat));
+	callback (userData, &m_coneAngleHalfCos, sizeof (dFloat));
+	callback (userData, &m_coneAngleHalfSin, sizeof (dFloat));
 }
 
 
@@ -162,7 +208,7 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
@@ -420,7 +466,7 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;

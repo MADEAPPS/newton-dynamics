@@ -43,10 +43,9 @@ class dgUpVectorConstraint: public dgBilateralConstraint
 	private:
 	dgUpVectorConstraint();
 	virtual ~dgUpVectorConstraint();
-//	virtual void Remove(dgWorld* world);
 
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
-//	static dgUpVectorConstraint* Create(dgWorld* world);
+	virtual void Serialize (dgSerialize serializeCallback, void* const userData) {dgAssert (0);}
 
 	dgUpVectorJointCallback m_callBack;
 //	dgUnsigned32 m_reserve[3];

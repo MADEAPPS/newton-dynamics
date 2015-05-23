@@ -22,14 +22,17 @@ class CustomBallAndSocket: public CustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API CustomBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~CustomBallAndSocket();
 
 	protected:
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API CustomBallAndSocket (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
-	dMatrix m_localMatrix0;
-	dMatrix m_localMatrix1;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
+
+	DECLARE_CUSTON_JOINT(CustomBallAndSocket, CustomJoint)
 };
 
 
@@ -49,9 +52,11 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 	CUSTOM_JOINTS_API void GetTwistAngle (dFloat& minAngle, dFloat& maxAngle) const;
 
 	protected:
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API CustomLimitBallAndSocket (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dMatrix m_rotationOffset;
 	dFloat m_coneAngle;
@@ -62,6 +67,7 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 	dFloat m_coneAngleHalfCos;
 	dFloat m_coneAngleHalfSin;	
 
+	DECLARE_CUSTON_JOINT(CustomLimitBallAndSocket, CustomBallAndSocket)
 //	AngularIntegration m_pitch;
 //	AngularIntegration m_yaw;
 //	AngularIntegration m_roll;

@@ -38,27 +38,23 @@ class CustomHinge: public CustomJoint
 	CUSTOM_JOINTS_API void SetFriction (dFloat frictionTorque);
 	CUSTOM_JOINTS_API dFloat GetFriction () const;
 
-	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
-	{
-		CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-	}
-
 	protected:
-	void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
-	CUSTOM_JOINTS_API virtual void ProjectError () const;
+	CUSTOM_JOINTS_API CustomHinge (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
+
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-	dMatrix m_localMatrix0;
-	dMatrix m_localMatrix1;
-
+	CUSTOM_JOINTS_API virtual void ProjectError () const;
+	void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
+	
+	AngularIntegration m_curJointAngle;
 	dFloat m_minAngle;
 	dFloat m_maxAngle;
 	dFloat m_friction;
 	dFloat m_jointOmega;
-	AngularIntegration m_curJointAngle;
-	
 	bool m_limitsOn;
+	DECLARE_CUSTON_JOINT(CustomHinge, CustomJoint)
 };
 
 #endif 

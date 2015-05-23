@@ -22,6 +22,7 @@
 //////////////////////////////////////////////////////////////////////
 
 //dInitRtti(CustomRackAndPinion);
+IMPLEMENT_CUSTON_JOINT(CustomRackAndPinion);
 
 CustomRackAndPinion::CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody)
 	:CustomJoint(1, rotationalBody, linearBody)
@@ -44,6 +45,20 @@ CustomRackAndPinion::~CustomRackAndPinion()
 {
 }
 
+CustomRackAndPinion::CustomRackAndPinion (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+	callback (userData, &m_gearRatio, sizeof (dFloat));
+}
+
+void CustomRackAndPinion::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize (callback, userData);
+	callback (userData, &m_gearRatio, sizeof (dFloat));
+}
+
+
+
 void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dVector omega0;
@@ -54,7 +69,7 @@ void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 	dFloat jacobian1[6];
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 	
 	// calculate the angular velocity for both bodies
 	NewtonBodyGetOmega(m_body0, &omega0[0]);

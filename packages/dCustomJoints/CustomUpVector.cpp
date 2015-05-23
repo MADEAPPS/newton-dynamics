@@ -54,7 +54,7 @@ void CustomUpVector::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
   
 	// if the body ha rotated by some amount, the there will be a plane of rotation
 	dVector lateralDir (matrix0.m_front * matrix1.m_front);

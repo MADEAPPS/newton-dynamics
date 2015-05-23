@@ -71,7 +71,6 @@ class Newton:
 
 	dgFloat32 m_maxTimeStep;
 
-
 	NewtonWorldDestructorCallback m_destructor;
 };
 
@@ -84,6 +83,7 @@ class NewtonUserJoint: public dgUserConstraint
 	~NewtonUserJoint ();
 
 	dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
+	void Serialize (dgSerialize serializeCallback, void* const userData);
 
 	void AddAngularRowJacobian (const dgVector& dir, dgFloat32 relAngle);
 	void AddGeneralRowJacobian (const dgFloat32* const jacobian0, const dgFloat32* const jacobian1);

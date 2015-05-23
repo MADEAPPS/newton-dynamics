@@ -33,6 +33,7 @@ class dgUserConstraint: public dgBilateralConstraint
 
 	protected:
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params) = 0; 
+	virtual void Serialize (dgSerialize serializeCallback, void* const userData) = 0;
 	dgUserConstraint (dgWorld* const manager, dgBody* const dyn0, dgBody* const dyn1, dgInt32 constraintID);
 
 	virtual void GetInfo (dgConstraintInfo* const info) const;

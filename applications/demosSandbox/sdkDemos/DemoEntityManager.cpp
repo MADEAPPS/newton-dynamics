@@ -155,8 +155,13 @@ void DemoEntityManager::Cleanup ()
 
 	m_sky = NULL;
 
+	NewtonOnJointSerializationCallback serializeJoint = NULL;
+	NewtonOnJointDeserializationCallback deserializeJoint = NULL;
+
 	// destroy the Newton world
 	if (m_world) {
+		// get serialization call back before destroying the world
+		NewtonGetJointSerializationCallbacks (m_world, &serializeJoint, &deserializeJoint);
 		NewtonDestroy (m_world);
 		m_world = NULL;
 	}
@@ -165,12 +170,14 @@ void DemoEntityManager::Cleanup ()
 	// check that there are no memory leak on exit
 	dAssert (NewtonGetMemoryUsed () == 0);
 
-
 	// create the newton world
 	m_world = NewtonCreate();
 
 	// link the work with this user data
 	NewtonWorldSetUserData(m_world, this);
+
+	// set serialization call back
+	NewtonSetJointSerializationCallbacks (m_world, serializeJoint, deserializeJoint);
 
 	// add all physics pre and post listeners
 	//	m_preListenerManager.Append(new DemoVisualDebugerListener("visualDebuger", m_world));
@@ -473,26 +480,7 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, NewtonDeser
 
 void DemoEntityManager::SerializedPhysicScene (const char* const name)
 {
-	FILE* const file = fopen (name, "wb");
-
-	// we can save anything we want with the serialized data,
-	// I am saving the camera orientation
-	dMatrix camMatrix (m_cameraManager->GetCamera()->GetNextMatrix());
-	SerializeFile (file, &camMatrix, sizeof (camMatrix));
-
-	int bodyCount = NewtonWorldGetBodyCount(m_world);
-	NewtonBody** array = new NewtonBody*[bodyCount];
-
-	int index = 0;
-	for (NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
-		array[index] = body;
-		index ++;
-		dAssert (index <= bodyCount);
-	}
-	NewtonSerializeBodyArray(m_world, array, bodyCount, BodySerialization, SerializeFile, file);
-
-	delete[] array;
-	fclose (file);
+	NewtonSerializeToFile (m_world, name, BodySerialization);
 }
 
 void DemoEntityManager::DeserializedPhysicScene (const char* const name)
@@ -500,22 +488,11 @@ void DemoEntityManager::DeserializedPhysicScene (const char* const name)
 	// add the sky
 	CreateSkyBox();
 
-	FILE* const file = fopen (name, "rb");
-
-	if (file) {
-		dQuaternion rot;
-		dVector origin (-30.0f, 10.0f, 10.0f, 0.0f);
-		SetCameraMatrix(rot, origin);
-
-		NewtonDeserializeBodyArray(m_world, BodyDeserialization, DeserializeFile, file);
-		fclose (file);
-
-//SerializedPhysicScene ("C:/Users/julio/Downloads/serialized_world1.bin");
-		
-	}
+	dQuaternion rot;
+	dVector origin (-30.0f, 10.0f, 10.0f, 0.0f);
+	SetCameraMatrix(rot, origin);
+	NewtonDeserializeFromFile (m_world, name, BodyDeserialization);
 }
-
-
 
 
 void DemoEntityManager::CreateSkyBox()

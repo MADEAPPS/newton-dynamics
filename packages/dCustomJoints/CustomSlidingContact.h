@@ -35,9 +35,6 @@ class CustomSlidingContact: public CustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	dMatrix m_localMatrix0;
-	dMatrix m_localMatrix1;
-
 	bool m_limitsLinearOn;
 	bool m_limitsAngularOn;
 	dFloat m_minLinearDist;

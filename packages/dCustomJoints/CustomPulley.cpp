@@ -18,16 +18,12 @@
 #include "CustomPulley.h"
 
 //dInitRtti(CustomPulley);
+IMPLEMENT_CUSTON_JOINT(CustomPulley);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-CustomPulley::CustomPulley(
-	dFloat gearRatio, 
-	const dVector& childPin, 
-	const dVector& parentPin, 
-	NewtonBody* const child, 
-	NewtonBody* const parent)
+CustomPulley::CustomPulley(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(1, child, parent)
 {
 	m_gearRatio = gearRatio;
@@ -49,17 +45,30 @@ CustomPulley::~CustomPulley()
 {
 }
 
+CustomPulley::CustomPulley (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+	callback (userData, &m_gearRatio, sizeof (dFloat));
+}
+
+void CustomPulley::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize (callback, userData);
+	callback (userData, &m_gearRatio, sizeof (dFloat));
+}
+
+
 void CustomPulley::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-	dVector veloc0;
-	dVector veloc1;
 	dMatrix matrix0;
 	dMatrix matrix1;
+	dVector veloc0;
+	dVector veloc1;
 	dFloat jacobian0[6];
 	dFloat jacobian1[6];
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 	
 	// calculate the angular velocity for both bodies
 	NewtonBodyGetVelocity(m_body0, &veloc0[0]);

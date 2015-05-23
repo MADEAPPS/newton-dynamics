@@ -32,21 +32,20 @@ class Custom6DOF: public CustomJoint
 	CUSTOM_JOINTS_API void GetAngularLimits (dVector& minAngularLimits, dVector& maxAngularLimits);
 
 	protected:
+	CUSTOM_JOINTS_API Custom6DOF (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-
-	dMatrix m_localMatrix0;
-	dMatrix m_localMatrix1;
 
 	dVector m_minLinearLimits;
 	dVector m_maxLinearLimits;
 	dVector m_minAngularLimits;
 	dVector m_maxAngularLimits;
-
 	AngularIntegration m_pitch;
 	AngularIntegration m_yaw;
 	AngularIntegration m_roll;
-
+	DECLARE_CUSTON_JOINT(Custom6DOF, CustomJoint)
 };
 
 #endif // !defined(AFX_Custom6DOF_H__B631F556_B7D7_F85ECF3E9ADE_H)

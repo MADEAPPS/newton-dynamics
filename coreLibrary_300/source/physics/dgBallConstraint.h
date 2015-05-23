@@ -58,11 +58,10 @@ class dgBallConstraint: public dgBilateralConstraint
 	private:
 	dgBallConstraint ();
     virtual ~dgBallConstraint ();
-//	virtual void Remove (dgWorld* world);
 
 	void SetPivotPoint (const dgVector& pivot);
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
-//	static dgBallConstraint* Create(dgWorld* world);
+	virtual void Serialize (dgSerialize serializeCallback, void* const userData) {dgAssert (0);}
 
 	
 	dgVector m_angles;

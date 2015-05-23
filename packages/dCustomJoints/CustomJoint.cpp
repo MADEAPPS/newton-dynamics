@@ -16,13 +16,11 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomJoint.h"
 
+CustomJoint::SerializeMetaData m_metaData("CustomJoint");
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
-
-
-
 CustomJoint::CustomJoint ()
 	:m_userData(NULL)
 	,m_body0(NULL)
@@ -40,6 +38,24 @@ CustomJoint::CustomJoint (int maxDOF, NewtonBody* const body0, NewtonBody* const
 {
 	Init (maxDOF, body0, body1);
 }
+
+CustomJoint::CustomJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData)
+	:m_userData(NULL)
+	,m_body0(body0)
+	,m_body1(body1)
+	,m_joint(NULL)
+	,m_world(NULL)
+	,m_userDestructor(NULL)
+	,m_userConstrationCallback(NULL)
+	,m_maxDof(0)
+	,m_autoDestroy(0)
+{
+	callback (userData, &m_localMatrix0, sizeof (m_localMatrix0));
+	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
+	callback (userData, &m_maxDof, sizeof (m_maxDof));
+	Init (m_maxDof, body0, body1);
+}
+
 
 CustomJoint::~CustomJoint()
 {
@@ -73,11 +89,18 @@ void CustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const b
 	m_body0 = body0;
 	m_body1 = body1;
 	m_maxDof = maxDOF;
-	m_world	= NewtonBodyGetWorld (body0);
+	m_world	= body0 ? NewtonBodyGetWorld (body0) : NewtonBodyGetWorld (body1);
 	m_joint = NewtonConstraintCreateUserJoint (m_world, maxDOF, SubmitConstraints, GetInfo, m_body0, m_body1); 
 
 	NewtonJointSetUserData (m_joint, this);
 	NewtonJointSetDestructor (m_joint, Destructor);
+
+	NewtonOnJointSerializationCallback searializeTmp;
+	NewtonOnJointDeserializationCallback desearializeTmp;
+	NewtonGetJointSerializationCallbacks (m_world, &searializeTmp, &desearializeTmp);
+	if (!(searializeTmp && desearializeTmp)) {
+		NewtonSetJointSerializationCallbacks (m_world, Serialize, Deserialize);
+	}
 
 	m_userData = NULL;
 	m_userDestructor = NULL;
@@ -136,6 +159,33 @@ void CustomJoint::GetInfo (const NewtonJoint* const me, NewtonJointRecord* info)
 	joint->GetInfo(info);
 }
 
+void CustomJoint::Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData)
+{
+	CustomJoint* const joint = (CustomJoint*) NewtonJointGetUserData (me);  
+
+	dCRCTYPE key = joint->GetSerializeKey();
+	callback (userData, &key, sizeof (key));
+
+	const SerializeMetaDataDictionary& dictionary = GetDictionary();
+	SerializeMetaDataDictionary::dTreeNode* const node = dictionary.Find(key); 
+	if (node) {
+		SerializeMetaData* const meta = node->GetInfo();
+		meta->SerializeJoint(joint, callback, userData);
+	}
+}
+
+void CustomJoint::Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData)
+{
+	dCRCTYPE key;
+	callback (userData, &key, sizeof (key));
+	const SerializeMetaDataDictionary& dictionary = GetDictionary();
+
+	SerializeMetaDataDictionary::dTreeNode* const node = dictionary.Find(key); 
+	if (node) {
+		SerializeMetaData* const meta = node->GetInfo();
+		meta->DeserializeJoint (body0, body1, callback, userData);
+	}
+}
 
 void CustomJoint::CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const
 {
@@ -156,7 +206,7 @@ void CustomJoint::CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatri
 }
 
 
-void CustomJoint::CalculateGlobalMatrix (const dMatrix& localMatrix0, const dMatrix& localMatrix1, dMatrix& matrix0, dMatrix& matrix1) const
+void CustomJoint::CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) const
 {
 	dMatrix body0Matrix;
 	// Get the global matrices of each rigid body.
@@ -166,8 +216,8 @@ void CustomJoint::CalculateGlobalMatrix (const dMatrix& localMatrix0, const dMat
 	if (m_body1) {
 		NewtonBodyGetMatrix(m_body1, &body1Matrix[0][0]);
 	}
-	matrix0 = localMatrix0 * body0Matrix;
-	matrix1 = localMatrix1 * body1Matrix;
+	matrix0 = m_localMatrix0 * body0Matrix;
+	matrix1 = m_localMatrix1 * body1Matrix;
 }
 
 
@@ -201,4 +251,40 @@ void CustomJoint::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 }
 
+dCRCTYPE CustomJoint::GetSerializeKey() const
+{
+	return dCRC64("CustomJoint");
+}
+
+
+CustomJoint::SerializeMetaData::SerializeMetaData(const char* const name)
+{
+	CustomJoint::GetDictionary().Insert(this, dCRC64(name));
+}
+
+
+void CustomJoint::SerializeMetaData::SerializeJoint (CustomJoint* const joint, NewtonSerializeCallback callback, void* const userData)
+{
+	dAssert (0);
+}
+
+CustomJoint* CustomJoint::SerializeMetaData::DeserializeJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData)
+{
+	dAssert (0);
+	return NULL;
+}
+
+CustomJoint::SerializeMetaDataDictionary& CustomJoint::GetDictionary()
+{
+	static SerializeMetaDataDictionary dictionary;
+	return dictionary;
+}
+
+
+void CustomJoint::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	callback (userData, &m_localMatrix0, sizeof (m_localMatrix0));
+	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
+	callback (userData, &m_maxDof, sizeof (m_maxDof));
+}
 

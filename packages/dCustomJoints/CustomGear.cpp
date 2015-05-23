@@ -18,6 +18,8 @@
 #include "CustomGear.h"
 
 //dInitRtti(CustomGear);
+IMPLEMENT_CUSTON_JOINT(CustomGear);
+IMPLEMENT_CUSTON_JOINT(CustomGearAndSlide);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -49,6 +51,19 @@ CustomGear::~CustomGear()
 }
 
 
+CustomGear::CustomGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+	callback (userData, &m_gearRatio, sizeof (dFloat));
+}
+
+void CustomGear::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize (callback, userData);
+	callback (userData, &m_gearRatio, sizeof (dFloat));
+}
+
+
 void CustomGear::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dVector omega0;
@@ -59,8 +74,7 @@ void CustomGear::SubmitConstraints (dFloat timestep, int threadIndex)
 	dFloat jacobian1[6];
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-
+	CalculateGlobalMatrix (matrix0, matrix1);
 	
 	// calculate the angular velocity for both bodies
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
@@ -166,17 +180,30 @@ CustomGearAndSlide::~CustomGearAndSlide()
 {
 }
 
+CustomGearAndSlide::CustomGearAndSlide (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomGear(child, parent, callback, userData)
+{
+	callback (userData, &m_slideRatio, sizeof (dFloat));
+}
+
+void CustomGearAndSlide::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomGearAndSlide::Serialize (callback, userData);
+	callback (userData, &m_slideRatio, sizeof (dFloat));
+}
+
+
 void CustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-	dVector omega0;
-	dVector veloc1;
 	dMatrix matrix0;
 	dMatrix matrix1;
+	dVector omega0;
+	dVector veloc1;
 	dFloat jacobian0[6];
 	dFloat jacobian1[6];
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// calculate the angular velocity for both bodies
 	NewtonBodyGetOmega(m_body0, &omega0[0]);

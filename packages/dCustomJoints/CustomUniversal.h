@@ -41,10 +41,6 @@ class CustomUniversal: public CustomJoint
 
 	CUSTOM_JOINTS_API void EnableMotor_0(bool state);
 	CUSTOM_JOINTS_API void EnableMotor_1(bool state);
-	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
-	{
-		CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-	}
 
 	protected:
 	void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
@@ -53,9 +49,7 @@ class CustomUniversal: public CustomJoint
 	CUSTOM_JOINTS_API virtual void ProjectError () const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-
-	dMatrix m_localMatrix0;
-	dMatrix m_localMatrix1;
+	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const {dAssert (0);} 
 
 	bool m_limit_0_On;
 	bool m_limit_1_On;

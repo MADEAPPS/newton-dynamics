@@ -45,12 +45,10 @@ class dgUniversalConstraint: public dgBilateralConstraint
 
 	private:
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
-//	virtual void Remove(dgWorld* world);
-
+	virtual void Serialize (dgSerialize serializeCallback, void* const userData) {dgAssert (0);}
 
 	dgUniversalConstraint();
 	virtual ~dgUniversalConstraint();
-//	static dgUniversalConstraint* Create(dgWorld* world);
 
 	dgFloat32 m_angle0;
 	dgFloat32 m_angle1;

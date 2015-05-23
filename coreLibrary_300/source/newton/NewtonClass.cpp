@@ -178,6 +178,17 @@ dgUnsigned32 NewtonUserJoint::JacobianDerivative (dgContraintDescritor& params)
 	return dgUnsigned32 (m_rows);
 }
 
+void NewtonUserJoint::Serialize (dgSerialize serializeCallback, void* const userData)
+{
+	dgWorld::OnJointSerializationCallback serializeJoint;
+	dgWorld::OnJointDeserializationCallback deserializeJoint;
+
+	Newton* const world = m_body0 ? (Newton*)m_body0->GetWorld() : (Newton*)m_body1->GetWorld();
+	world->GetJointSerializationCallbacks (&serializeJoint, &deserializeJoint);
+	if (serializeJoint) {
+		((NewtonOnJointSerializationCallback)serializeJoint) ((NewtonJoint*)this, (NewtonSerializeCallback)serializeCallback, userData);
+	}
+}
 
 void NewtonUserJoint::AddLinearRowJacobian (const dgVector& pivot0, const dgVector& pivot1, const dgVector& dir)
 {

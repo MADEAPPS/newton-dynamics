@@ -43,8 +43,10 @@ class CustomDistance: public CustomJoint
 		parentMatrix.m_posit.m_w = 1.0f;
 
 		dMatrix dummy;
-		CalculateLocalMatrix (childMatrix, m_localPivot, dummy);
-		CalculateLocalMatrix (parentMatrix, dummy, m_parentPivot);
+		//CalculateLocalMatrix (childMatrix, m_localPivot, dummy);
+		//CalculateLocalMatrix (parentMatrix, dummy, m_parentPivot);
+		CalculateLocalMatrix (childMatrix, m_localMatrix0, dummy);
+		CalculateLocalMatrix (parentMatrix, dummy, m_localMatrix1);
 	}
 
     void SubmitConstraints (dFloat timestep, int threadIndex)
@@ -53,7 +55,7 @@ class CustomDistance: public CustomJoint
 		dMatrix matrix1;
 
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-		CalculateGlobalMatrix (m_localPivot, m_parentPivot, matrix0, matrix1);
+		CalculateGlobalMatrix (matrix0, matrix1);
 
 		dVector p0 (matrix0.m_posit);
 		dVector p1 (matrix1.m_posit);
@@ -71,8 +73,8 @@ class CustomDistance: public CustomJoint
 		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 	}
 
-	dMatrix m_localPivot;
-	dMatrix m_parentPivot;
+	//dMatrix m_localPivot;
+	//dMatrix m_parentPivot;
 	dFloat m_distance;
 };
 

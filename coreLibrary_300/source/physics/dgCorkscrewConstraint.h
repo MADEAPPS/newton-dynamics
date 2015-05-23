@@ -46,11 +46,11 @@ class dgCorkscrewConstraint: public dgBilateralConstraint
 	
 	private:
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
-//	virtual void Remove(dgWorld* world);
+	virtual void Serialize (dgSerialize serializeCallback, void* const userData) {dgAssert (0);}
 
 	dgCorkscrewConstraint();
 	virtual ~dgCorkscrewConstraint();
-//	static dgCorkscrewConstraint* Create(dgWorld* world);
+
 
 	dgFloat32 m_angle;
 	dgFloat32 m_posit;

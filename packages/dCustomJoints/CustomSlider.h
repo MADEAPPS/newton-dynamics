@@ -32,26 +32,22 @@ class CustomSlider: public CustomJoint
 
 	CUSTOM_JOINTS_API dFloat GetJointPosit () const;
 	CUSTOM_JOINTS_API dFloat GetJointSpeed () const;
-	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
-	{
-		CustomJoint::CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-	}
-
 	
 	protected:
+	CUSTOM_JOINTS_API CustomSlider (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-
-	dMatrix m_localMatrix0;
-	dMatrix m_localMatrix1;
 
 	dFloat m_speed;
 	dFloat m_posit;
 	dFloat m_minDist;
 	dFloat m_maxDist;
-
 	bool m_limitsOn;
 	bool m_hitLimitOnLastUpdate;
+
+	DECLARE_CUSTON_JOINT(CustomSlider, CustomJoint)
 };
 
 #endif

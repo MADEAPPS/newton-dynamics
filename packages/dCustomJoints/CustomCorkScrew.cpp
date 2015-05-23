@@ -19,6 +19,7 @@
 #define MIN_JOINT_PIN_LENGTH	50.0f
 
 //dInitRtti(CustomCorkScrew);
+IMPLEMENT_CUSTON_JOINT(CustomCorkScrew);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -35,7 +36,6 @@ CustomCorkScrew::CustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* c
 	m_minAngularDist = -1.0f;
 	m_maxAngularDist = 1.0f;
 
-
 	m_angularmotorOn = false;
 	m_angularDamp = 0.1f;
 	m_angularAccel = 5.0f;
@@ -46,6 +46,43 @@ CustomCorkScrew::CustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* c
 
 CustomCorkScrew::~CustomCorkScrew()
 {
+}
+
+CustomCorkScrew::CustomCorkScrew (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+	callback (userData, &m_minLinearDist, sizeof (dFloat));
+	callback (userData, &m_maxLinearDist, sizeof (dFloat));
+	callback (userData, &m_minAngularDist, sizeof (dFloat));
+	callback (userData, &m_maxAngularDist, sizeof (dFloat));
+	callback (userData, &m_angularDamp, sizeof (dFloat));
+	callback (userData, &m_angularAccel, sizeof (dFloat));
+	callback (userData, &m_curJointAngle, sizeof (AngularIntegration));
+
+	int tmp[3];
+	callback (userData, tmp, sizeof (tmp));
+	m_limitsLinearOn = tmp[0] ? true : false; 
+	m_limitsAngularOn = tmp[1] ? true : false; 
+	m_angularmotorOn = tmp[2] ? true : false; 
+}
+
+void CustomCorkScrew::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize (callback, userData);
+
+	callback (userData, &m_minLinearDist, sizeof (dFloat));
+	callback (userData, &m_maxLinearDist, sizeof (dFloat));
+	callback (userData, &m_minAngularDist, sizeof (dFloat));
+	callback (userData, &m_maxAngularDist, sizeof (dFloat));
+	callback (userData, &m_angularDamp, sizeof (dFloat));
+	callback (userData, &m_angularAccel, sizeof (dFloat));
+	callback (userData, &m_curJointAngle, sizeof (AngularIntegration));
+
+	int tmp[3];
+	tmp[0] = m_limitsLinearOn ; 
+	tmp[1] = m_limitsAngularOn; 
+	tmp[2] = m_angularmotorOn; 
+	callback (userData, tmp, sizeof (tmp));
 }
 
 void CustomCorkScrew::EnableLinearLimits(bool state)
@@ -86,7 +123,7 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all tree orthonormal direction
 	dVector p0 (matrix0.m_posit);
@@ -198,7 +235,7 @@ void CustomCorkScrew::GetInfo (NewtonJointRecord* const info) const
 	dMatrix matrix0;
 	dMatrix matrix1;
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
+	CalculateGlobalMatrix (matrix0, matrix1);
 
 	if (m_limitsLinearOn) {
 		dFloat dist;
