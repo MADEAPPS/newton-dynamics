@@ -188,7 +188,7 @@ CustomGearAndSlide::CustomGearAndSlide (NewtonBody* const child, NewtonBody* con
 
 void CustomGearAndSlide::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomGearAndSlide::Serialize (callback, userData);
+	CustomGear::Serialize (callback, userData);
 	callback (userData, &m_slideRatio, sizeof (dFloat));
 }
 
