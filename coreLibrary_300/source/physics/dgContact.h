@@ -34,8 +34,9 @@ class dgPolygonMeshDesc;
 class dgCollisionInstance;
 
 
-#define DG_MAX_CONTATCS					128
-#define DG_RESTING_CONTACT_PENETRATION	dgFloat32 (1.0f / 256.0f)
+#define DG_MAX_CONTATCS						128
+#define DG_RESTING_CONTACT_PENETRATION		dgFloat32 (1.0f / 256.0f)
+//#define DG_IMPULSIVE_CONTACT_PENETRATION	dgFloat32 (1.0f / 256.0f)
 #define DG_IMPULSIVE_CONTACT_PENETRATION	dgFloat32 (1.0f / 256.0f + DG_RESTING_CONTACT_PENETRATION)
 
 class dgActiveContacts: public dgList<dgContact*>
