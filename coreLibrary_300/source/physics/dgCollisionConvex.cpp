@@ -3152,9 +3152,11 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			// get the closet point and the normal at contact point
 			count = 0;
 			proxy.m_timestep = timestep;
-			proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale4 (-1.0f)));
+			//proxy.m_normal = matrix.RotateVector(invScale.CompProduct4(minkHull.m_normal.Scale4 (-1.0f)));
+			proxy.m_normal = matrix.RotateVector(normal.Scale4 (-1.0f));
 			dgAssert (proxy.m_normal.m_w == dgFloat32 (0.0f));
-			proxy.m_normal = proxy.m_normal.CompProduct4(proxy.m_normal.InvMagSqrt());
+			//proxy.m_normal = proxy.m_normal.CompProduct4(proxy.m_normal.InvMagSqrt());
+			dgAssert (dgAbsf (proxy.m_normal % proxy.m_normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e3f));
 			proxy.m_closestPointBody0 = matrix.TransformVector(scale.CompProduct4(minkHull.m_p)) & dgVector::m_triplexMask;
 			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q)) & dgVector::m_triplexMask;
 			break;
