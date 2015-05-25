@@ -88,7 +88,7 @@ class dgCollisionConvex::dgPerimenterEdge
 	const dgVector* m_vertex;
 	dgPerimenterEdge* m_next;
 	dgPerimenterEdge* m_prev;
-	dgUnsigned32 m_alived;
+	//dgUnsigned32 m_alived;
 } DG_GCC_VECTOR_ALIGMENT;
 
 
@@ -3171,6 +3171,7 @@ dgInt32 dgCollisionConvex::CalculateConvexCastContacts(dgCollisionParamProxy& pr
 			proxy.m_closestPointBody1 = matrix.TransformVector(scale.CompProduct4(minkHull.m_q) - step) & dgVector::m_triplexMask;
 			proxy.m_contactJoint->m_closestDistance = proxy.m_normal.DotProduct4(proxy.m_closestPointBody0 - proxy.m_closestPointBody1).m_x;
 
+			//dgFloat32 penetration = dgMax(num * dgFloat32 (-1.0f) - DG_IMPULSIVE_CONTACT_PENETRATION, dgFloat32 (0.0f));
 			dgFloat32 penetration = dgMax(num * dgFloat32 (-1.0f) - DG_RESTING_CONTACT_PENETRATION, dgFloat32 (0.0f));
 			if (proxy.m_contacts) {
 				if (proxy.m_referenceCollision->GetCollisionMode() & proxy.m_floatingCollision->GetCollisionMode()) {
