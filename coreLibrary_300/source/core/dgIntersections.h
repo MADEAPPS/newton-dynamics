@@ -173,6 +173,8 @@ dgFloat32 dgSweepLineToPolygonTimeOfImpact (const dgVector& p0, const dgVector& 
 dgFloat32 dgRayCastBox (const dgVector& p0, const dgVector& p1, const dgVector& boxP0, const dgVector& boxP1, dgVector& normalOut);
 dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVector& origin, dgFloat32 radius);
 
+bool dgObbTest (const dgVector& origin0, const dgVector& size0, const dgMatrix& matrix0, const dgVector& origin1, const dgVector& size1, const dgMatrix& matrix1);
+
 DG_INLINE dgInt32 dgOverlapTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {
 //	dgInt32 test = ((p0.m_x < q1.m_x) && (p1.m_x > q0.m_x) && (p0.m_z < q1.m_z) && (p1.m_z > q0.m_z) && (p0.m_y < q1.m_y) && (p1.m_y > q0.m_y));
@@ -187,12 +189,10 @@ DG_INLINE dgInt32 dgBoxInclusionTest (const dgVector& p0, const dgVector& p1, co
 {
 //	dgInt32 test = (p0.m_x >= q0.m_x) && (p0.m_y >= q0.m_y) && (p0.m_z >= q0.m_z) && (p1.m_x <= q1.m_x) && (p1.m_y <= q1.m_y) && (p1.m_z <= q1.m_z);
 //	return test;
-
 	dgVector val ((p0 >= q0) & (p1 <= q1));
 	dgInt32 mask = val.GetSignMask();
 	return ((mask & 0x07) == 0x07);
 }
-
 
 DG_INLINE dgInt32 dgCompareBox (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {

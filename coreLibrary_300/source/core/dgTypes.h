@@ -377,6 +377,38 @@ dgInt32 dgBinarySearch (T const* array, dgInt32 elements, const T& entry, dgInt3
 }
 
 
+template <class T>
+dgInt32 dgBinarySearchIndirect(T** const array, dgInt32 elements, const T& entry, dgInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
+{
+	dgInt32 index0 = 0;
+	dgInt32 index2 = elements - 1;
+
+	while ((index2 - index0) > 4) {
+		dgInt32 index1 = (index0 + index2) >> 1;
+		dgInt32 test = compare(array[index1], &entry, context);
+		if (test < 0) {
+			index0 = index1;
+		} else {
+			index2 = index1;
+		}
+	}
+
+	index0 = (index0 > 0) ? index0 - 1 : 0;
+	index2 = ((index2 + 1) < elements) ? index2 + 1 : elements;
+	dgInt32 index = index0 - 1;
+	for (dgInt32 i = index0; i < index2; i++) {
+		dgInt32 test = compare(array[i], &entry, context);
+		if (!test) {
+			return i;
+		} else if (test > 0) {
+			break;
+		}
+		index = i;
+	}
+	return index;
+}
+
+
 template <class T> 
 void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 radixPass,  dgInt32 (*getRadixKey) (const T* const  A, void* const context), void* const context = NULL)
 {

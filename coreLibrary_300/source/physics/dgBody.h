@@ -228,16 +228,16 @@ class dgBody
 		dgUnsigned32 m_flags;
 		struct {
 			dgUnsigned32 m_freeze					: 1;
+			dgUnsigned32 m_active					: 1;
+			dgUnsigned32 m_resting					: 1;
 			dgUnsigned32 m_sleeping					: 1;
 			dgUnsigned32 m_autoSleep				: 1;
-			dgUnsigned32 m_equilibrium				: 1;
-			dgUnsigned32 m_continueCollisionMode    : 1;
-			dgUnsigned32 m_spawnnedFromCallback		: 1;
-			dgUnsigned32 m_collideWithLinkedBodies  : 1;
 			dgUnsigned32 m_inCallback				: 1;
 			dgUnsigned32 m_collidable				: 1;
-			dgUnsigned32 m_resting					: 1;
-			dgUnsigned32 m_active					: 1;
+			dgUnsigned32 m_equilibrium				: 1;
+			dgUnsigned32 m_spawnnedFromCallback		: 1;
+			dgUnsigned32 m_continueCollisionMode	: 1;
+			dgUnsigned32 m_collideWithLinkedBodies	: 1;
 		};
 	};
 

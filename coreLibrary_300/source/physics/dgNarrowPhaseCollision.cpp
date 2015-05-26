@@ -985,7 +985,7 @@ void dgWorld::ProcessDeformableContacts (dgCollidingPairCollector::dgPair* const
 	*/
 }
 
-dgInt32 dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 timestep) const
+bool dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 timestep) const
 {
 	dgAssert (contact && (contact->GetId() == dgConstraint::m_contactConstraint));
 
@@ -1005,10 +1005,11 @@ dgInt32 dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 times
 
 	dgVector mask ((positError2 < m_linearContactError2) & (rotatError2 < m_angularContactError2));
 
-	dgList<dgContactMaterial>& list = *contact;
+//	dgList<dgContactMaterial>& list = *contact;
 	dgInt32 testMask = mask.GetSignMask() ? 1 : 0;
 	contact->m_contactActive |= testMask;
-	return testMask * list.GetCount();
+//	return testMask * list.GetCount();
+	return testMask ? true : false;
 }
 
 
@@ -1046,8 +1047,7 @@ void dgWorld::ConvexContacts (dgCollidingPairCollector::dgPair* const pair, dgCo
 {
 	dgContact* const constraint = pair->m_contact;
 	if (constraint->m_maxDOF != 0) {
-		dgInt32 contactCount = ValidateContactCache (constraint, proxy.m_timestep);
-		if (contactCount) {
+		if (ValidateContactCache (constraint, proxy.m_timestep)) {
 			pair->m_cacheIsValid = true;
 			pair->m_isDeformable = 0;
 			pair->m_contactCount = 0;
@@ -1088,8 +1088,7 @@ void dgWorld::CompoundContacts (dgCollidingPairCollector::dgPair* const pair, dg
 	pair->m_contactCount = 0;
 
 	if (constraint->m_maxDOF != 0) {
-		dgInt32 contactCount = ValidateContactCache (constraint, proxy.m_timestep);
-		if (contactCount) {
+		if (ValidateContactCache (constraint, proxy.m_timestep)) {
 			pair->m_cacheIsValid = true;
 			pair->m_isDeformable = 0;
 			pair->m_contactCount = 0;
@@ -1137,8 +1136,7 @@ void dgWorld::SceneContacts (dgCollidingPairCollector::dgPair* const pair, dgCol
 	pair->m_contactCount = 0;
 
 	if (constraint->m_maxDOF != 0) {
-		dgInt32 contactCount = ValidateContactCache (constraint, proxy.m_timestep);
-		if (contactCount) {
+		if (ValidateContactCache (constraint, proxy.m_timestep)) {
 			pair->m_cacheIsValid = true;
 			pair->m_isDeformable = 0;
 			pair->m_contactCount = 0;
