@@ -19,12 +19,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(AFX_DGBODYMASTER_LIST_35290_35290_A510_A865B2CC0789_H)
-#define AFX_DGBODYMASTER_LIST_35290_35290_A510_A865B2CC0789_H
+#ifndef __DGBODYMASTER_LIST__
+#define __DGBODYMASTER_LIST__
 
 
 class dgBody;
+class dgContact;
 class dgConstraint;
+class dgBilateralConstraint;
 
 class dgBodyMasterListCell
 {
@@ -41,16 +43,27 @@ class dgBodyMasterListRow: public dgList<dgBodyMasterListCell>
 
 	dgBody* GetBody() const	{ return m_body;}
 
-	void RemoveAllJoints ();
+	private:
+	void SortList();
+	void SetBody(dgBody* const body) {m_body = body;}
+
+	dgContact* FindContactJoint (const dgBody* const body) const;
+	dgBilateralConstraint* FindBilateralJoint (const dgBody* const body) const;
+
 	dgListNode* AddContactJoint (dgConstraint* const joint, dgBody* const body);
 	dgListNode* AddBilateralJoint (dgConstraint* const joint, dgBody* const body);
+
+	void RemoveContactJoint (dgListNode* const link);
+	void RemoveBilateralJoint (dgListNode* const link);
+
+	void RemoveAllJoints ();
 	
+	void SetAcceleratedSearch();
 
-	void SortList();
-
-	private:
 	dgBody* m_body;
-
+	dgListNode* m_acceleratedSearch[3];
+	dgInt32 m_contactCount;
+	static dgInt32 m_contactCountReversal[];
 	friend class dgBodyMasterList;
 };
 
@@ -65,8 +78,11 @@ class dgBodyMasterList: public dgList<dgBodyMasterListRow>
 	void RemoveConstraint (dgConstraint* const constraint);
 	void AttachConstraint (dgConstraint* const constraint, dgBody* const body0, dgBody* const body1);
 
+	dgContact* FindContactJoint (const dgBody* body0, const dgBody* body1) const;
+	dgBilateralConstraint* FindBilateralJoint (const dgBody* body0, const dgBody* body1) const;
+
 	dgBodyMasterListRow::dgListNode* FindConstraintLink (const dgBody* const body0, const dgBody* const body1) const;
-	dgBodyMasterListRow::dgListNode* FindConstraintLinkNext (const dgBodyMasterListRow::dgListNode* const me, const dgBody* const body) const;
+	//dgBodyMasterListRow::dgListNode* FindConstraintLinkNext (const dgBodyMasterListRow::dgListNode* const me, const dgBody* const body) const;
 	dgUnsigned32 MakeSortMask(const dgBody* const body) const;
 	void SortMasterList();
 

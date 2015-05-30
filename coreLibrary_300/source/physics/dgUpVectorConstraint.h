@@ -38,8 +38,6 @@ class dgUpVectorConstraint: public dgBilateralConstraint
 	dgVector GetPinDir () const;
 	void SetPinDir (const dgVector& pin);
 
-	virtual bool IsBilateral () const;
-
 	private:
 	dgUpVectorConstraint();
 	virtual ~dgUpVectorConstraint();

@@ -146,8 +146,8 @@ class dgWorld
 	typedef void (dgApi *OnListenerBodyDestroyCallback) (const dgWorld* const world, void* const listener, dgBody* const body);
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listener, dgFloat32 timestep);
 	typedef void (dgApi *OnListenerDestroyCallback) (const dgWorld* const world, void* const listener);
-	typedef void (dgApi *OnBodySerialize) (dgBody& me, dgSerialize funt, void* const serilalizeObject);
-	typedef void (dgApi *OnBodyDeserialize) (dgBody& me, dgDeserialize funt, void* const serilalizeObject);
+	typedef void (dgApi *OnBodySerialize) (dgBody& me, void* const userData, dgSerialize funt, void* const serilalizeObject);
+	typedef void (dgApi *OnBodyDeserialize) (dgBody& me, void* const userData, dgDeserialize funt, void* const serilalizeObject);
 	typedef void (dgApi *OnCollisionInstanceDestroy) (const dgWorld* const world, const dgCollisionInstance* const collision);
 	typedef void (dgApi *OnCollisionInstanceDuplicate) (const dgWorld* const world, dgCollisionInstance* const collision, const dgCollisionInstance* const sourceCollision);
 
@@ -308,17 +308,17 @@ class dgWorld
 	static void OnSerializeToFile (void* const userData, const void* const buffer, size_t size);
 	static void OnDeserializeFromFile (void* const userData, void* const buffer, size_t size);
 
-	static void OnBodySerializeToFile (dgBody& body, dgSerialize serializeCallback, void* const userData);
-	static void OnBodyDeserializeFromFile (dgBody& body, dgDeserialize serializeCallback, void* const userData);
+	static void OnBodySerializeToFile (dgBody& body, void* const userData, dgSerialize serializeCallback, void* const serializeHandle);
+	static void OnBodyDeserializeFromFile (dgBody& body, void* const userData, dgDeserialize serializeCallback, void* const serializeHandle);
 
-	void SerializeToFile (const char* const fileName, OnBodySerialize bodyCallback) const;
-	void DeserializeFromFile (const char* const fileName, OnBodyDeserialize bodyCallback);
+	void SerializeToFile (const char* const fileName, OnBodySerialize bodyCallback, void* const userData) const;
+	void DeserializeFromFile (const char* const fileName, OnBodyDeserialize bodyCallback, void* const userData);
 
-	void SerializeJointArray (dgBody** const array, dgInt32 count, dgSerialize serializeCallback, void* const userData) const;
-	void DeserializeJointArray (const dgTree<dgBody*, dgInt32>&bodyMap, dgDeserialize serializeCallback, void* const userData);
+	void SerializeJointArray (dgBody** const array, dgInt32 count, dgSerialize serializeCallback, void* const serializeHandle) const;
+	void DeserializeJointArray (const dgTree<dgBody*, dgInt32>&bodyMap, dgDeserialize serializeCallback, void* const serializeHandle);
 
-	void SerializeBodyArray (dgBody** const array, dgInt32 count, OnBodySerialize bodyCallback, dgSerialize serializeCallback, void* const userData) const;
-	void DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDeserialize bodyCallback, dgDeserialize deserializeCallback, void* const userData);
+	void SerializeBodyArray (dgBody** const array, dgInt32 count, OnBodySerialize bodyCallback, void* const userData, dgSerialize serializeCallback, void* const serializeHandle) const;
+	void DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDeserialize bodyCallback, void* const userData, dgDeserialize deserializeCallback, void* const serializeHandle);
 
 	void SetJointSerializationCallbacks (OnJointSerializationCallback serializeJoint, OnJointDeserializationCallback deserializeJoint);
 	void GetJointSerializationCallbacks (OnJointSerializationCallback* const serializeJoint, OnJointDeserializationCallback* const deserializeJoint) const;
@@ -384,8 +384,7 @@ class dgWorld
 //	dgInt32 CalculateConvexToConvexContacts (dgFloat32& timestep, dgBody* conv1, dgBody* conv2, dgFloat32 penetrationPadding, dgContactPoint* const contact) const;
 //	dgInt32 CalculateConvexToNonConvexContacts (dgFloat32& timestep, dgBody* conv, dgBody* nConv, dgContactPoint* const contact, dgInt32 maxContacts) const;
 //	dgInt32 CalculatecConvexConvexCastContacts (dgCollisionParamProxy& proxy, bool& algorithmSuccessful) const;
-	
-	bool ValidateContactCache (dgContact* const contact, dgFloat32 timestep) const;
+//	bool ValidateContactCache (dgContact* const contact, dgFloat32 timestep) const;
 	
 	dgInt32 CalculateConvexPolygonToHullContactsDescrete (dgCollisionParamProxy& proxy) const;
 
@@ -481,9 +480,6 @@ class dgWorld
 	dgArray<dgUnsigned8> m_pairMemoryBuffer;
 	dgArray<dgUnsigned8> m_solverMatrixMemory;  
 	dgArray<dgUnsigned8> m_solverRightSideMemory;
-	
-	static dgVector m_linearContactError2;
-	static dgVector m_angularContactError2;
 	
 	friend class dgBody;
 	friend class dgBroadPhase;

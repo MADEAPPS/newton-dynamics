@@ -51,10 +51,6 @@
 #include "dgCollisionDeformableSolidMesh.h"
 #include "dgCollisionDeformableClothPatch.h"
 
-#define DG_CONTACT_TRANSLATION_ERROR (dgFloat32 (1.0e-3f))
-#define DG_CONTACT_ANGULAR_ERROR (dgFloat32 (0.25f * 3.141592f / 180.0f))
-dgVector dgWorld::m_angularContactError2 (DG_CONTACT_ANGULAR_ERROR * DG_CONTACT_ANGULAR_ERROR);
-dgVector dgWorld::m_linearContactError2 (DG_CONTACT_TRANSLATION_ERROR * DG_CONTACT_TRANSLATION_ERROR);
 
 dgCollisionInstance* dgWorld::CreateNull ()
 {
@@ -949,15 +945,14 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 
 void dgWorld::ProcessContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
 {
-	dgContact* const contact = pair->m_contact;
-	dgAssert (contact->m_body0);
-	dgAssert (contact->m_body1);
-	dgAssert (contact->m_body0 != contact->m_body1);
-	dgAssert (contact->m_broadphaseLru == GetBroadPhase()->m_lru);
+	dgAssert (pair->m_contact);
+	dgAssert (pair->m_contact->m_body0);
+	dgAssert (pair->m_contact->m_body1);
+	dgAssert (pair->m_contact->m_body0 != pair->m_contact->m_body1);
+	dgAssert (pair->m_contact->m_broadphaseLru == GetBroadPhase()->m_lru);
 
-	contact->m_positAcc = dgVector (dgFloat32 (0.0f));
-	contact->m_rotationAcc = dgVector (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-
+	pair->m_contact->m_positAcc = dgVector (dgFloat32 (0.0f));
+	pair->m_contact->m_rotationAcc = dgVector (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	PopulateContacts (pair, timestep, threadIndex);
 }
 
@@ -984,34 +979,6 @@ void dgWorld::ProcessDeformableContacts (dgCollidingPairCollector::dgPair* const
 	PopulateContacts (contact, pair, timestep, threadIndex);
 	*/
 }
-
-bool dgWorld::ValidateContactCache (dgContact* const contact, dgFloat32 timestep) const
-{
-	dgAssert (contact && (contact->GetId() == dgConstraint::m_contactConstraint));
-
-	dgBody* const body0 = contact->GetBody0();
-	dgBody* const body1 = contact->GetBody1();
-
-	dgVector deltaTime (timestep);
-	dgVector positStep ((body0->m_veloc - body1->m_veloc).CompProduct4 (deltaTime));
-	dgVector rotationStep ((body0->m_omega - body1->m_omega).CompProduct4 (deltaTime));
-	contact->m_positAcc += positStep;
-	contact->m_rotationAcc = contact->m_rotationAcc * dgQuaternion (dgFloat32 (1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
-
-	dgVector angle (contact->m_rotationAcc.m_q1, contact->m_rotationAcc.m_q2, contact->m_rotationAcc.m_q3, dgFloat32 (0.0f)); 
-
-	dgVector positError2 (contact->m_positAcc.DotProduct4 (contact->m_positAcc));
-	dgVector rotatError2 (angle.DotProduct4(angle));
-
-	dgVector mask ((positError2 < m_linearContactError2) & (rotatError2 < m_angularContactError2));
-
-//	dgList<dgContactMaterial>& list = *contact;
-	dgInt32 testMask = mask.GetSignMask() ? 1 : 0;
-	contact->m_contactActive |= testMask;
-//	return testMask * list.GetCount();
-	return testMask ? true : false;
-}
-
 
 
 void dgWorld::DeformableContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
@@ -1046,6 +1013,7 @@ void dgWorld::DeformableContacts (dgCollidingPairCollector::dgPair* const pair, 
 void dgWorld::ConvexContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContact* const constraint = pair->m_contact;
+/*
 	if (constraint->m_maxDOF != 0) {
 		if (ValidateContactCache (constraint, proxy.m_timestep)) {
 			pair->m_cacheIsValid = true;
@@ -1054,7 +1022,7 @@ void dgWorld::ConvexContacts (dgCollidingPairCollector::dgPair* const pair, dgCo
 			return ;
 		}
 	}
-
+*/
 	dgBody* const convexBody = constraint->m_body0;
 	dgBody* const otherBody = constraint->m_body1;
 	if (otherBody->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
@@ -1086,7 +1054,7 @@ void dgWorld::CompoundContacts (dgCollidingPairCollector::dgPair* const pair, dg
 
 	pair->m_isDeformable = 0;
 	pair->m_contactCount = 0;
-
+/*
 	if (constraint->m_maxDOF != 0) {
 		if (ValidateContactCache (constraint, proxy.m_timestep)) {
 			pair->m_cacheIsValid = true;
@@ -1095,7 +1063,7 @@ void dgWorld::CompoundContacts (dgCollidingPairCollector::dgPair* const pair, dg
 			return ;
 		}
 	}
-
+*/
 	dgCollisionInstance* const instance = constraint->m_body0->GetCollision();
 	dgCollisionCompound* const compound = (dgCollisionCompound*) instance->GetChildShape();
 	dgAssert (compound->IsType(dgCollision::dgCollisionCompound_RTTI));
@@ -1134,7 +1102,7 @@ void dgWorld::SceneContacts (dgCollidingPairCollector::dgPair* const pair, dgCol
 	dgContact* const constraint = pair->m_contact;
 	pair->m_isDeformable = 0;
 	pair->m_contactCount = 0;
-
+/*
 	if (constraint->m_maxDOF != 0) {
 		if (ValidateContactCache (constraint, proxy.m_timestep)) {
 			pair->m_cacheIsValid = true;
@@ -1143,7 +1111,7 @@ void dgWorld::SceneContacts (dgCollidingPairCollector::dgPair* const pair, dgCol
 			return ;
 		}
 	}
-
+*/
 	dgBody* const sceneBody = constraint->m_body1;
 	dgBody* const otherBody = constraint->m_body0;
 

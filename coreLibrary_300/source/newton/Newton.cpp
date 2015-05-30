@@ -277,18 +277,18 @@ void NewtonGetJointSerializationCallbacks (const NewtonWorld* const newtonWorld,
 }
 
 
-void NewtonSerializeToFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodySerializationCallback bodyCallback)
+void NewtonSerializeToFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodySerializationCallback bodyCallback, void* const bodyUserData)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->SerializeToFile (filename, dgWorld::OnBodySerialize (bodyCallback));
+	world->SerializeToFile (filename, dgWorld::OnBodySerialize (bodyCallback), bodyUserData);
 }
 
-void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodyDeserializationCallback bodyCallback)
+void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodyDeserializationCallback bodyCallback, void* const bodyUserData)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->DeserializeFromFile (filename, dgWorld::OnBodyDeserialize (bodyCallback));
+	world->DeserializeFromFile (filename, dgWorld::OnBodyDeserialize (bodyCallback), bodyUserData);
 }
 
 /*
@@ -3616,7 +3616,7 @@ int NewtonTreeCollisionGetVertexListTriangleListInAABB(const NewtonCollision* co
 //												  const dFloat* const elevationMap, const char* const atributeMap,
 //												  dFloat horizontalScale, int shapeID)
   NewtonCollision* NewtonCreateHeightFieldCollision (const NewtonWorld* const newtonWorld, int width, int height, int gridsDiagonals, dgInt32 elevationdatType,
-												    const void* const elevationMap, const char* const attributeMap, dFloat verticalScale, dFloat horizontalScale, int shapeID)
+															   const void* const elevationMap, const char* const attributeMap, dFloat verticalScale, dFloat horizontalScale, int shapeID)
 {
 	Newton* const world = (Newton *)newtonWorld;
 
@@ -5484,7 +5484,7 @@ int NewtonContactJointGetContactCount(const NewtonJoint* const contactJoint)
 }
 
 
-// Name: NewtonContactJointGetFirstContact
+// Name: NewtonContactJointGetFirstContact 
 // Return to pointer to the first contact from the contact array of the contact joint.
 //
 // Parameters:

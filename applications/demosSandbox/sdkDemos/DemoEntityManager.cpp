@@ -428,7 +428,7 @@ void DemoEntityManager::DeserializeFile (void* const serializeHandle, void* cons
 }
 
 
-void DemoEntityManager::BodySerialization (NewtonBody* const body, NewtonSerializeCallback serializeCallback, void* const serializeHandle)
+void DemoEntityManager::BodySerialization (NewtonBody* const body, void* const bodyUserData, NewtonSerializeCallback serializeCallback, void* const serializeHandle)
 {
 	// here the use can save information of this body, ex:
 	// a string naming the body,  
@@ -443,7 +443,7 @@ void DemoEntityManager::BodySerialization (NewtonBody* const body, NewtonSeriali
 }
 
 
-void DemoEntityManager::BodyDeserialization (NewtonBody* const body, NewtonDeserializeCallback deserializecallback, void* const serializeHandle)
+void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const bodyUserData, NewtonDeserializeCallback deserializecallback, void* const serializeHandle)
 {
 	int size;
 	char bodyIndentification[256];
@@ -473,14 +473,23 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, NewtonDeser
 	#endif
 
 	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
-	DemoMeshInterface* const mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
+	dTree <DemoMeshInterface*, const void*>* const cache = (dTree <DemoMeshInterface*, const void*>*)bodyUserData;
+	dTree <DemoMeshInterface*, const void*>::dTreeNode* node = cache->Find(NewtonCollisionDataPointer (collision));
+	if (!node) {
+		DemoMeshInterface* mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
+		node = cache->Insert(mesh, NewtonCollisionDataPointer (collision));
+	} else {
+		node->GetInfo()->AddRef();
+	}
+	
+	DemoMeshInterface* const mesh = node->GetInfo();
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 }
 
 void DemoEntityManager::SerializedPhysicScene (const char* const name)
 {
-	NewtonSerializeToFile (m_world, name, BodySerialization);
+	NewtonSerializeToFile (m_world, name, BodySerialization, NULL);
 }
 
 void DemoEntityManager::DeserializedPhysicScene (const char* const name)
@@ -491,7 +500,9 @@ void DemoEntityManager::DeserializedPhysicScene (const char* const name)
 	dQuaternion rot;
 	dVector origin (-30.0f, 10.0f, 10.0f, 0.0f);
 	SetCameraMatrix(rot, origin);
-	NewtonDeserializeFromFile (m_world, name, BodyDeserialization);
+
+	dTree <DemoMeshInterface*, const void*> cache;
+	NewtonDeserializeFromFile (m_world, name, BodyDeserialization, &cache);
 }
 
 

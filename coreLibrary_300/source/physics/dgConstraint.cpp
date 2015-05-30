@@ -39,11 +39,6 @@ void dgConstraint::SetUserData (void *userData)
 	m_userData = userData;
 }
 
-bool dgConstraint::IsBilateral () const
-{
-	return false;
-}
-
 
 void dgConstraint::InitPointParam (dgPointParam& param, dgFloat32 stiffness, const dgVector& p0Global, const dgVector& p1Global) const
 {

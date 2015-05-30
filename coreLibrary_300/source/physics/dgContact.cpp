@@ -70,6 +70,8 @@ dgContactMaterial::dgContactMaterial()
 
 dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const material)
 	:dgConstraint(), dgList<dgContactMaterial>(world->GetAllocator())
+	,m_positAcc (dgFloat32(0.0f))
+	,m_rotationAcc (dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f))
 	,m_closestDistance (dgFloat32 (0.0f))
 	,m_timeOfImpact(dgFloat32 (0.0f))
 	,m_world(world)

@@ -68,12 +68,6 @@ dgBilateralConstraint::~dgBilateralConstraint ()
 }
 
 
-
-bool dgBilateralConstraint::IsBilateral () const
-{
-	return true;
-}
-
 void dgBilateralConstraint::SetMaxContactsForExactSolver (bool mode, dgInt32 maxJointContactsCount)
 {
 	m_useExactSolver = mode;

@@ -167,8 +167,8 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 		do {
 			dgFloat32 test1 = plane.Evalue(points[ptr->m_next->m_incidentVertex]);
 
-			if (test0 > dgFloat32 (0.0f)) {
-				if (test1 <= dgFloat32 (0.0f)) {
+			if (test0 > dgFloat32 (1.0e-2f)) {
+				if (test1 <= dgFloat32 (-1.0e-2f)) {
 					const dgVector& p0 = points[ptr->m_incidentVertex];
 					const dgVector& p1 = points[ptr->m_next->m_incidentVertex];
 					dgVector dp (p1 - p0); 
@@ -197,7 +197,7 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 					ptr = newEdge;
 				}
 			} else {
-				if (test1 > dgFloat32 (0.0f)) {
+				if (test1 > dgFloat32 (1.0e-2f)) {
 					newFirst = ptr->m_next;
 
 					const dgVector& p0 = points[ptr->m_incidentVertex];
@@ -235,7 +235,7 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 			ptr = ptr->m_next;
 		} while (ptr != first);
 
-		if(conectCount) {
+		if(conectCount > 1) {
 			first = newFirst;
 			dgAssert (conectCount == 2);
 

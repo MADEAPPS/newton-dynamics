@@ -80,7 +80,6 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 	,m_joints(0)
 	,m_islands(0)
 	,m_markLru(0)
-//	,m_rowCountAtomicIndex(0)
 	,m_softBodyCriticalSectionLock()
 {
 }
@@ -640,8 +639,6 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 				}
 			}
 		}
-
-
 
 		m_islands ++;
 		m_bodies += bodyCount;

@@ -131,8 +131,8 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 
 	static void SerializeFile (void* const serializeHandle, const void* const buffer, int size);
 	static void DeserializeFile (void* const serializeHandle, void* const buffer, int size);
-	static void BodySerialization (NewtonBody* const body, NewtonSerializeCallback serializecallback, void* const serializeHandle);
-	static void BodyDeserialization (NewtonBody* const body, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
+	static void BodySerialization (NewtonBody* const body, void* const userData, NewtonSerializeCallback serializecallback, void* const serializeHandle);
+	static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
 
 	private:
 	void OnSize(wxSizeEvent &event);

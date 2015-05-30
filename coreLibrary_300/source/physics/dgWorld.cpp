@@ -1080,7 +1080,7 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 }
 
 
-void dgWorld::SerializeToFile (const char* const fileName, OnBodySerialize bodyCallback) const
+void dgWorld::SerializeToFile (const char* const fileName, OnBodySerialize bodyCallback, void* const userData) const
 {
 	FILE* const file = fopen (fileName, "wb");
 	if (file) {
@@ -1094,7 +1094,7 @@ void dgWorld::SerializeToFile (const char* const fileName, OnBodySerialize bodyC
 			count ++;
 			dgAssert (count <= GetBodiesCount());
 		}
-		SerializeBodyArray (array, count, bodyCallback ? bodyCallback : OnBodySerializeToFile, OnSerializeToFile, file);
+		SerializeBodyArray (array, count, bodyCallback ? bodyCallback : OnBodySerializeToFile, userData, OnSerializeToFile, file);
 		SerializeJointArray (array, count, OnSerializeToFile, file);
 
 		delete[] array;
@@ -1102,12 +1102,12 @@ void dgWorld::SerializeToFile (const char* const fileName, OnBodySerialize bodyC
 	}
 }
 
-void dgWorld::DeserializeFromFile (const char* const fileName, OnBodyDeserialize bodyCallback)
+void dgWorld::DeserializeFromFile (const char* const fileName, OnBodyDeserialize bodyCallback, void* const userData)
 {
 	FILE* const file = fopen (fileName, "rb");
 	if (file) {
 		dgTree<dgBody*, dgInt32> bodyMap (GetAllocator());
-		DeserializeBodyArray (bodyMap, bodyCallback ? bodyCallback : OnBodyDeserializeFromFile, OnDeserializeFromFile, file);
+		DeserializeBodyArray (bodyMap, bodyCallback ? bodyCallback : OnBodyDeserializeFromFile, userData, OnDeserializeFromFile, file);
 		DeserializeJointArray (bodyMap, OnDeserializeFromFile, file);
 		fclose (file);
 	}
@@ -1127,7 +1127,7 @@ void dgWorld::OnDeserializeFromFile (void* const fileHandle, void* const buffer,
 	fread (buffer, size, 1, (FILE*) fileHandle);
 }
 
-void dgWorld::OnBodySerializeToFile (dgBody& body, dgSerialize serializeCallback, void* const fileHandle)
+void dgWorld::OnBodySerializeToFile (dgBody& body, void* const userData, dgSerialize serializeCallback, void* const fileHandle)
 {
 	const char* const bodyIndentification = "NewtonGravityBody\0\0\0\0";
 	int size = (dgInt32 (strlen (bodyIndentification)) + 3) & -4;
@@ -1135,7 +1135,7 @@ void dgWorld::OnBodySerializeToFile (dgBody& body, dgSerialize serializeCallback
 	serializeCallback (fileHandle, bodyIndentification, size);
 }
 
-void dgWorld::OnBodyDeserializeFromFile (dgBody& body, dgDeserialize serializeCallback, void* const userData)
+void dgWorld::OnBodyDeserializeFromFile (dgBody& body, void* const userData, dgDeserialize serializeCallback, void* const fileHandle)
 {
 
 }
@@ -1148,9 +1148,9 @@ void dgWorld::SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDupl
 }
 
 
-void dgWorld::SerializeBodyArray (dgBody** const array, dgInt32 count, OnBodySerialize bodyCallback, dgSerialize serializeCallback, void* const userData) const
+void dgWorld::SerializeBodyArray (dgBody** const array, dgInt32 count, OnBodySerialize bodyCallback, void* const userData, dgSerialize serializeCallback, void* const fileHandle) const
 {
-	dgSerializeMarker (serializeCallback, userData);
+	dgSerializeMarker (serializeCallback, fileHandle);
 
 	// serialize all collisions
 	dgInt32 uniqueShapes = 0;
@@ -1166,49 +1166,49 @@ void dgWorld::SerializeBodyArray (dgBody** const array, dgInt32 count, OnBodySer
 		}
 	}
 
-	serializeCallback(userData, &uniqueShapes, sizeof (uniqueShapes));	
+	serializeCallback(fileHandle, &uniqueShapes, sizeof (uniqueShapes));	
 	dgTree<dgInt32, const dgCollision*>::Iterator iter (shapeMap);
 	for (iter.Begin(); iter; iter ++) {
 		dgInt32 id = iter.GetNode()->GetInfo();
 		const dgCollision* const collision = iter.GetKey();
 		dgCollisionInstance instance (this, collision, 0, dgMatrix (dgGetIdentityMatrix()));
-		serializeCallback(userData, &id, sizeof (id));	
-		instance.Serialize(serializeCallback, userData);
-		dgSerializeMarker(serializeCallback, userData);
+		serializeCallback(fileHandle, &id, sizeof (id));	
+		instance.Serialize(serializeCallback, fileHandle);
+		dgSerializeMarker(serializeCallback, fileHandle);
 	}
 
-	serializeCallback(userData, &count, sizeof (count));	
+	serializeCallback(fileHandle, &count, sizeof (count));	
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgBody* const body = array[i];
 
 		dgInt32 bodyType = body->GetType();
-		serializeCallback(userData, &bodyType, sizeof (bodyType));	
+		serializeCallback(fileHandle, &bodyType, sizeof (bodyType));	
 
 		// serialize the body
-		body->Serialize(shapeMap, serializeCallback, userData);
+		body->Serialize(shapeMap, serializeCallback, fileHandle);
 
 		// serialize body custom data
-		bodyCallback (*body, serializeCallback, userData);
+		bodyCallback (*body, userData, serializeCallback, fileHandle);
 
-		dgSerializeMarker(serializeCallback, userData);
+		dgSerializeMarker(serializeCallback, fileHandle);
 	}
 }
 
 
-void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDeserialize bodyCallback, dgDeserialize deserialization, void* const userData)
+void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDeserialize bodyCallback, void* const userData, dgDeserialize deserialization, void* const fileHandle)
 {
-	dgInt32 revision = dgDeserializeMarker (deserialization, userData);
+	dgInt32 revision = dgDeserializeMarker (deserialization, fileHandle);
 
 	dgTree<const dgCollision*, dgInt32> shapeMap(GetAllocator());
 
 	dgInt32 uniqueShapes;
-	deserialization(userData, &uniqueShapes, sizeof (uniqueShapes));	
+	deserialization(fileHandle, &uniqueShapes, sizeof (uniqueShapes));	
 	for (dgInt32 i = 0; i < uniqueShapes; i ++) {
 		dgInt32 id;
 
-		deserialization(userData, &id, sizeof (id));	
-		dgCollisionInstance instance (this, deserialization, userData, revision);
-		dgDeserializeMarker (deserialization, userData);
+		deserialization(fileHandle, &id, sizeof (id));	
+		dgCollisionInstance instance (this, deserialization, fileHandle, revision);
+		dgDeserializeMarker (deserialization, fileHandle);
 
 		const dgCollision* const shape = instance.GetChildShape();
 		shapeMap.Insert(shape, id);
@@ -1216,22 +1216,22 @@ void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDese
 	}
 
 	dgInt32 bodyCount;
-	deserialization (userData, &bodyCount, sizeof (bodyCount));	
+	deserialization (fileHandle, &bodyCount, sizeof (bodyCount));	
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
 		dgInt32 bodyType;
-		deserialization(userData, &bodyType, sizeof (bodyType));	
+		deserialization(fileHandle, &bodyType, sizeof (bodyType));	
 		dgBody* body = NULL; 
 
 		switch (bodyType)
 		{
 			case dgBody::m_dynamicBody:
 			{
-				body = new (m_allocator) dgDynamicBody(this, &shapeMap, deserialization, userData, revision);
+				body = new (m_allocator) dgDynamicBody(this, &shapeMap, deserialization, fileHandle, revision);
 				break;
 			}
 			case dgBody::m_kinematicBody:
 			{
-				body = new (m_allocator) dgKinematicBody(this, &shapeMap, deserialization, userData, revision);
+				body = new (m_allocator) dgKinematicBody(this, &shapeMap, deserialization, fileHandle, revision);
 				break;
 			}
 
@@ -1259,13 +1259,12 @@ void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDese
 		}
 
 		// load user related data 
-		bodyCallback (*body, deserialization, userData);
+		bodyCallback (*body, userData, deserialization, fileHandle);
 
 		bodyMap.Insert(body, i);
 
 		// sync to next body
-		dgDeserializeMarker (deserialization, userData);
-
+		dgDeserializeMarker (deserialization, fileHandle);
 	}
 
 	dgTree<const dgCollision*, dgInt32>::Iterator iter (shapeMap);

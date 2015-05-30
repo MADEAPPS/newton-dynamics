@@ -456,8 +456,7 @@ void dgCollisionDeformableSolidMesh::SetMass (dgFloat32 mass)
 void dgCollisionDeformableSolidMesh::SetMatrix(const dgMatrix& matrix)
 {
    	dgAssert (m_myBody);
-   	dgBody* const body = GetBody();
-    dgMatrix globalMatrix (body->GetCollision()->GetLocalMatrix() * matrix);
+    //dgMatrix globalMatrix (GetBody()->GetCollision()->GetLocalMatrix() * matrix);
     for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
         m_particles.m_posit[i] = m_shapePosit[i];
         m_posit[i] = matrix.TransformVector(m_shapePosit[i]) & dgVector::m_triplexMask;

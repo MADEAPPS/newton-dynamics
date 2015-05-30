@@ -78,11 +78,6 @@ void dgUpVectorConstraint::Remove(dgWorld* world)
 }
 */
 
-bool dgUpVectorConstraint::IsBilateral () const
-{
-	return false;
-}
-
 void dgUpVectorConstraint::InitPinDir (const dgVector& pin)
 {
 

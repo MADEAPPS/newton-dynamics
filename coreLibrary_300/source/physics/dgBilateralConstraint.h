@@ -38,7 +38,7 @@ class dgBilateralConstraint: public dgConstraint
 
 	virtual void Init (){dgAssert (0);}
 	virtual void Remove (dgWorld* world) {dgAssert (0);}
-	virtual bool IsBilateral () const;
+	virtual bool IsBilateral () const {return true;}
 
 	virtual dgFloat32 GetStiffness() const;
 	virtual void SetStiffness(dgFloat32 stiffness);

@@ -1110,8 +1110,10 @@ class dgCollisionConvex::dgMinkHull: public dgDownHeap<dgMinkFace *, dgFloat32>
 		dgAssert (count >= 1);
 		if (count == 1) {
 			SupportVertex (m_contactJoint->m_separtingVector.Scale3 (dgFloat32 (-1.0f)), 1);
+			#ifdef _DEBUG
 			dgVector err (m_hullDiff[1] - m_hullDiff[0]);
 			dgAssert ((err % err) > dgFloat32 (0.0f));
+			#endif
 			count = 2;
 
 		}
