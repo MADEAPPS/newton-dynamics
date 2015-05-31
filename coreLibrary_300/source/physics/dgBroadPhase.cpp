@@ -37,11 +37,12 @@
 #define DG_BROADPHASE_AABB_SCALE		dgFloat32 (8.0f)
 #define DG_BROADPHASE_AABB_INV_SCALE	(dgFloat32 (1.0f) / DG_BROADPHASE_AABB_SCALE)
 
-
 #define DG_CONTACT_TRANSLATION_ERROR (dgFloat32 (1.0e-3f))
 #define DG_CONTACT_ANGULAR_ERROR (dgFloat32 (0.25f * 3.141592f / 180.0f))
 dgVector dgBroadPhase::m_angularContactError2(DG_CONTACT_ANGULAR_ERROR * DG_CONTACT_ANGULAR_ERROR);
 dgVector dgBroadPhase::m_linearContactError2(DG_CONTACT_TRANSLATION_ERROR * DG_CONTACT_TRANSLATION_ERROR);
+dgVector dgBroadPhase::m_velocTol (dgFloat32 (1.0e-18f));
+
 
 DG_MSC_VECTOR_ALIGMENT
 class dgBroadPhase::dgNode
@@ -792,11 +793,15 @@ bool dgBroadPhase::ValidateContactCache(dgContact* const contact, dgFloat32 time
 
 	dgVector deltaTime(timestep);
 	dgVector positStep((body0->m_veloc - body1->m_veloc).CompProduct4(deltaTime));
+	positStep = ((positStep.DotProduct4(positStep)) > m_velocTol) & positStep;
 	contact->m_positAcc += positStep;
+
 	dgVector positError2(contact->m_positAcc.DotProduct4(contact->m_positAcc));
 	if ((positError2 < m_linearContactError2).GetSignMask()) {
 		dgVector rotationStep((body0->m_omega - body1->m_omega).CompProduct4(deltaTime));
+		rotationStep = ((rotationStep.DotProduct4(rotationStep)) > m_velocTol) & rotationStep;
 		contact->m_rotationAcc = contact->m_rotationAcc * dgQuaternion(dgFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
+
 		dgVector angle(contact->m_rotationAcc.m_q1, contact->m_rotationAcc.m_q2, contact->m_rotationAcc.m_q3, dgFloat32(0.0f));
 		dgVector rotatError2(angle.DotProduct4(angle));
 		if ((rotatError2 < m_angularContactError2).GetSignMask()) {
@@ -829,6 +834,8 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 				} else {
 					dgCollidingPairCollector* const contactPairs = m_world;
 					contact->m_contactActive = 0;
+					contact->m_positAcc = dgVector::m_zero;
+					contact->m_rotationAcc = dgQuaternion();
 					contactPairs->AddPair(contact, threadID);
 				}
 

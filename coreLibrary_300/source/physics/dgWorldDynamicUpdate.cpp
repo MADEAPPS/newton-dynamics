@@ -43,6 +43,7 @@
 
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-18f));
+dgVector dgWorldDynamicUpdate::m_eulerTaylorCorrection (dgFloat32 (1.0f / 12.0f));
 
 class dgWorldDynamicUpdateSyncDescriptor
 {

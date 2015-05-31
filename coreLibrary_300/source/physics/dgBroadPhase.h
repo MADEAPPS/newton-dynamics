@@ -153,6 +153,7 @@ class dgBroadPhase
 
 	static dgVector m_linearContactError2;
 	static dgVector m_angularContactError2;
+	static dgVector m_velocTol;
 
 	friend class dgBody;
 	friend class dgWorld;

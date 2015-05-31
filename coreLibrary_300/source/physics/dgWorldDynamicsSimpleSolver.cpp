@@ -560,7 +560,7 @@ void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* co
 			body->m_netTorque = body->m_alpha;
 
 			body->m_veloc += accel.CompProduct4(timeStepVect);
-			body->m_omega += alpha.CompProduct4(timeStepVect);
+			body->m_omega += alpha.CompProduct4(timeStepVect.CompProduct4 (dgVector::m_half)) + alpha * timeStepVect.CompProduct4(timeStepVect.CompProduct4 (m_eulerTaylorCorrection));
 		}
 
 		if (hasJointFeeback) {

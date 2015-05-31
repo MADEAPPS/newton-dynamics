@@ -293,6 +293,7 @@ class dgWorldDynamicUpdate
 	dgThread::dgCriticalSection m_softBodyCriticalSectionLock;
 	dgBody* m_sentinelBody;
 	static dgVector m_velocTol;
+	static dgVector m_eulerTaylorCorrection;
 
 	friend class dgWorld;
 	friend class dgAmpInstance;

@@ -69,6 +69,7 @@ void PrecessingTops (DemoEntityManager* const scene)
 			dMatrix bodyMatrix;
 			NewtonBodyGetMatrix(body, &bodyMatrix[0][0]);
 			matrix.m_posit = bodyMatrix.m_posit;
+			matrix.m_posit.m_y += 1.0f; 
 			NewtonBodySetMatrix(body, &matrix[0][0]);
 
 			NewtonBodySetOmega (body, &omega[0]);
