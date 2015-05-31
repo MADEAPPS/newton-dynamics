@@ -58,7 +58,7 @@
 #include <dRtti.h>
 #include <dClassInfo.h>
 
-#include <tinyxml.h>
+//#include <tinyxml.h>
 
 
 #define D_DEFINE_ANIMATION_NODE_DEFINE(className,baseClass)	\
