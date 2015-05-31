@@ -49,6 +49,12 @@ dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgConstra
 	dgListNode* const node = Addtop();
 	body->m_world->GlobalUnlock();
 
+#ifdef _DEBUG
+	for (dgListNode* ptr = GetFirst()->GetNext(); ptr && (ptr->GetInfo().m_joint->GetId() == dgConstraint::m_contactConstraint); ptr = ptr->GetNext()) { 
+		dgAssert (ptr->GetInfo().m_bodyNode->m_uniqueID != body->m_uniqueID);
+	}
+#endif
+
 	node->GetInfo().m_joint = joint;
 	node->GetInfo().m_bodyNode = body;
 
@@ -69,7 +75,7 @@ dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgConstra
 	}
 
 #ifdef _DEBUG
-	for (dgListNode* ptr = GetFirst(); ptr->GetNext() && (ptr->GetNext()->GetInfo().m_joint->GetId() == dgConstraint::m_contactConstraint); ptr = ptr->GetNext()) { 
+	for (dgListNode* ptr = GetFirst(); ptr && ptr->GetNext() && (ptr->GetNext()->GetInfo().m_joint->GetId() == dgConstraint::m_contactConstraint); ptr = ptr->GetNext()) { 
 		dgAssert (ptr->GetInfo().m_bodyNode->m_uniqueID < ptr->GetNext()->GetInfo().m_bodyNode->m_uniqueID);
 	}
 #endif

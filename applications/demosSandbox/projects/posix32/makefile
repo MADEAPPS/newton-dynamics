@@ -44,6 +44,7 @@ SDK_TOOLBOX_PATH = ../../sdkDemos/toolBox
 SDK_NEWTON_PATH = ../../../../packages/$(PLATFORM)
 SDK_MATH_PATH = ../../../../packages/dMath
 SDK_SCENE_PATH = ../../../../packages/dScene
+SDK_ANIMATION_PATH = ../../../../packages/dAnimation
 SDK_JOINTS_PATH = ../../../../packages/dCustomJoints
 SDK_CONTAINERS_PATH = ../../../../packages/dContainers
 SDK_VISUALDEBUGGER_PATH = ../../../../packages/dVisualDebuggerServer
@@ -60,6 +61,7 @@ SDK_INCLUDE_PATH = \
 		-I $(SDK_DEMOS_PATH) \
 		-I $(SDK_NEWTON_PATH) \
 		-I $(SDK_MATH_PATH) \
+		-I $(SDK_ANIMATION_PATH \
 		-I $(SDK_CONTAINERS_PATH) \
 		-I $(SDK_SCENE_PATH) \
 		-I $(SDK_JOINTS_PATH) \
