@@ -84,7 +84,7 @@ dgThread::~dgThread ()
 {
 }
 
-void dgThread::Init ()
+void dgThread::Init (int stacksize)
 {
 }
 
