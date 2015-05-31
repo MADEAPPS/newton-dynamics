@@ -21,7 +21,9 @@ LIB_NAME = libdAnimation.a
 SDK_MATH = ../../../dMath
 SDK_JOINTS = ../../../dCustomJoints
 SDK_CONTAINERS = ../../../dContainers
+INCLUDED_PATH = ../../../dAnimation
 
+SRC_PATH = ../../../dAnimation
 NEWTON_SDK = ../../../posix32
 
 
