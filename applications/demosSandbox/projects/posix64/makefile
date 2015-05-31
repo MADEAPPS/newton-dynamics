@@ -72,6 +72,7 @@ SDK_INCLUDE_PATH = \
 NEWTON_CORE_MAKE = ../../../../coreLibrary_300/projects/$(PLATFORM)
 SDK_MATH_MAKE = ../../../../packages/projects/$(PLATFORM)/dMath
 SDK_SCENE_MAKE = ../../../../packages/projects/$(PLATFORM)/dScene
+SDK_ANIMATION_MAKE = ../../../../packages/projects/$(PLATFORM)/dAnimation
 SDK_JOINTS_MAKE = ../../../../packages/projects/$(PLATFORM)/dCustomJoints
 SDK_CONTAINERS_MAKE = ../../../../packages/projects/$(PLATFORM)/dContainers
 SDK_VISUALDEBUGGER_MAKE = ../../../../packages/projects/$(PLATFORM)/dVisualDebuggerServer
@@ -86,6 +87,7 @@ NEWTON_LIB = \
 	$(SDK_NEWTON_PATH)/libNewton.a \
 	$(SDK_NEWTON_PATH)/libdMath.a \
 	$(SDK_NEWTON_PATH)/libdScene.a \
+	$(SDK_NEWTON_PATH)/libdAnimation.a \
 	$(SDK_NEWTON_PATH)/libdContainers.a \
 	$(SDK_NEWTON_PATH)/libdJointLibrary.a \
 	$(SDK_NEWTON_PATH)/libTinyXML.a
@@ -180,7 +182,7 @@ NewtonDemos : $(SDK_OBJS)
 	make -C $(SDK_CONTAINERS_MAKE)
 	make -C $(SDK_JOINTS_MAKE)	
 	make -C $(SDK_XML_MAKE)
-#	make -C $(SDK_AILIBRARY_MAKE)
+	make -C $(SDK_ANIMATION_MAKE)
 #	make -C $(SDK_VISUALDEBUGGER_MAKE)
 	gcc $? $(NEWTON_LIB) $(LIBS) -o $@.elf
 
@@ -194,5 +196,5 @@ clean :
 	make clean -C $(SDK_CONTAINERS_MAKE)
 	make clean -C $(SDK_JOINTS_MAKE)
 	make clean -C $(SDK_XML_MAKE)
-#	make clean -C $(SDK_AILIBRARY_MAKE)
+	make clean -C $(SDK_ANIMATION_MAKE)
 	make clean -C $(SDK_VISUALDEBUGGER_MAKE)

@@ -66,7 +66,6 @@ SDK_INCLUDE_PATH = \
 		-I $(SDK_SCENE_PATH) \
 		-I $(SDK_JOINTS_PATH) \
 		-I $(SDK_VISUALDEBUGGER_PATH) \
-		-I $(SDK_AILIBRARY_PATH) \
 		-I $(SDK_XML_PATH)
 
 
@@ -89,6 +88,7 @@ NEWTON_LIB = \
 	$(SDK_NEWTON_PATH)/libNewton.a \
 	$(SDK_NEWTON_PATH)/libdMath.a \
 	$(SDK_NEWTON_PATH)/libdScene.a \
+	$(SDK_NEWTON_PATH)/libdAnimation.a \
 	$(SDK_NEWTON_PATH)/libdContainers.a \
 	$(SDK_NEWTON_PATH)/libdJointLibrary.a \
 	$(SDK_NEWTON_PATH)/libTinyXML.a	
@@ -161,15 +161,7 @@ SDK_TOOLBOX_SRC = \
 #		$(SDK_TOOLBOX_PATH)/ShaderPrograms.cpp \
 
 
-#NOTE as long as no NewtonAI headers in Newton.h
-DG_AI_PATH = ../../../../coreLibrary_300/source/ai/
-SDK_AI_SRCS = \
-	$(DG_AI_PATH)dgAIAgent.cpp \
-	$(DG_AI_PATH)dgAIStdafx.cpp \
-	$(DG_AI_PATH)dgAIWorld.cpp \
-	$(DG_AI_PATH)NewtonAI.cpp
-
-SDK_SRCS = $(SDK_MAIN_SRC) $(SDK_DEMOS_SRC) $(SDK_TOOLBOX_SRC) $(SDK_AI_SRCS)
+SDK_SRCS = $(SDK_MAIN_SRC) $(SDK_DEMOS_SRC) $(SDK_TOOLBOX_SRC)
 
 
 SDK_OBJS = $(SDK_SRCS:.cpp=.o)
@@ -190,7 +182,7 @@ NewtonDemos : $(SDK_OBJS)
 	make -C $(SDK_CONTAINERS_MAKE)
 	make -C $(SDK_JOINTS_MAKE)	
 	make -C $(SDK_XML_MAKE)
-#	make -C $(SDK_AILIBRARY_MAKE)
+	make -C $(SDK_ANIMATION_MAKE)
 #	make -C $(SDK_VISUALDEBUGGER_MAKE)
 	gcc $? $(NEWTON_LIB) $(LIBS) -o $@.elf
 
@@ -203,6 +195,6 @@ clean :
 	make clean -C $(SDK_MATH_MAKE)
 	make clean -C $(SDK_SCENE_MAKE)
 	make clean -C $(SDK_JOINTS_MAKE)
+	make clean -C $(SDK_ANIMATION_MAKE)
 	make clean -C $(SDK_CONTAINERS_MAKE)
-#	make clean -C $(SDK_AILIBRARY_MAKE)
 	make clean -C $(SDK_VISUALDEBUGGER_MAKE)
