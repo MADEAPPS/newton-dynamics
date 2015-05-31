@@ -22,16 +22,14 @@ static void PhysicsApplyPrecessionTorque (const NewtonBody* body, dFloat timeste
 {
 	PhysicsApplyGravityForce (body, timestep, threadIndex);
 
-/*
 	dVector omega;
-	dMatrix rotation;
 	dMatrix inertiaMatrix;
 	NewtonBodyGetOmega(body, &omega[0]);
-	NewtonBodyGetMatrix(body, &rotation[0][0]);
 	NewtonBodyGetInertiaMatrix(body, &inertiaMatrix[0][0]);
-	dVector angularMomentum(rotation.UnrotateVector(inertiaMatrix.RotateVector(omega)));
-	dTrace(("%f %f %f %f\n", angularMomentum[0], angularMomentum[1], angularMomentum[2], angularMomentum % angularMomentum));
-*/
+	dVector angularMomentum (inertiaMatrix.RotateVector(omega));
+	dVector torque (angularMomentum * omega);
+	NewtonBodySetTorque(body, &torque[0]);
+	//dTrace(("%f %f %f %f\n", angularMomentum[0], angularMomentum[1], angularMomentum[2], sqrt (angularMomentum % angularMomentum)));
 }
 
 
