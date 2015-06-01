@@ -30,6 +30,7 @@ NEWTON_SDK = ../../../posix64
 
 LIB_SRCS = \
 	$(SRC_PATH)/dBoneNodeInfo.cpp \
+	$(SRC_PATH)/dLineNodeInfo.cpp \
 	$(SRC_PATH)/dCollisionBoxNodeInfo.cpp \
 	$(SRC_PATH)/dCollisionCapsuleNodeInfo.cpp \
 	$(SRC_PATH)/dCollisionChamferCylinderNodeInfo.cpp \
