@@ -199,7 +199,7 @@ void dgBodyMasterListRow::SetAcceleratedSearch()
 		dgAssert ((index <= 2) || ((m_acceleratedSearch[0]->GetInfo().m_bodyNode->m_uniqueID > m_acceleratedSearch[1]->GetInfo().m_bodyNode->m_uniqueID) && 
 								   (m_acceleratedSearch[0]->GetInfo().m_bodyNode->m_uniqueID < m_acceleratedSearch[2]->GetInfo().m_bodyNode->m_uniqueID)));
 
-		for (dgInt32 i = index; i < sizeof (m_acceleratedSearch) / sizeof (m_acceleratedSearch[0]); i++) {
+		for (dgInt32 i = index; i < dgInt32 (sizeof (m_acceleratedSearch) / sizeof (m_acceleratedSearch[0])); i++) {
 			dgInt32 j = m_contactCountReversal[i];
 			m_acceleratedSearch[j] = GetFirst();
 		}

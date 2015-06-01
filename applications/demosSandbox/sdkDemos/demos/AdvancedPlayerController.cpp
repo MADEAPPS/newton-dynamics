@@ -722,7 +722,7 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 	}
 }
 
-
+/*
 static void LoadSlide (DemoEntityManager* const scene, TriggerManager* const triggerManager, NewtonCollision* const sceneCollision, const char* const name, const dMatrix& location, NewtonBody* const playGroundBody)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -793,9 +793,8 @@ static void LoadSlide (DemoEntityManager* const scene, TriggerManager* const tri
 			scene->RemoveEntity(entity);
 		}
 	}
-
 }
-
+*/
 
 static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* const triggerManager, NewtonCollision* const sceneCollision, const char* const name, const dMatrix& location, NewtonBody* const playGroundBody)
 {
