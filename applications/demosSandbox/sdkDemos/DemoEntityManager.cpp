@@ -155,13 +155,9 @@ void DemoEntityManager::Cleanup ()
 
 	m_sky = NULL;
 
-	NewtonOnJointSerializationCallback serializeJoint = NULL;
-	NewtonOnJointDeserializationCallback deserializeJoint = NULL;
-
 	// destroy the Newton world
 	if (m_world) {
 		// get serialization call back before destroying the world
-		NewtonGetJointSerializationCallbacks (m_world, &serializeJoint, &deserializeJoint);
 		NewtonDestroy (m_world);
 		m_world = NULL;
 	}
@@ -176,8 +172,8 @@ void DemoEntityManager::Cleanup ()
 	// link the work with this user data
 	NewtonWorldSetUserData(m_world, this);
 
-	// set serialization call back
-	NewtonSetJointSerializationCallbacks (m_world, serializeJoint, deserializeJoint);
+	// set joint serialization call back
+	CustomJoint::Initalize(m_world);
 
 	// add all physics pre and post listeners
 	//	m_preListenerManager.Append(new DemoVisualDebugerListener("visualDebuger", m_world));

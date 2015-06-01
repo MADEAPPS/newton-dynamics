@@ -179,29 +179,30 @@ void dgBodyMasterListRow::SetAcceleratedSearch()
 {
 	if (GetFirst()) {
 		dgInt32 index = 0;
-		dgInt32 dx = m_contactCount;
-		dgInt32 dy = sizeof (m_acceleratedSearch) / sizeof (m_acceleratedSearch[0]);
-		dgInt32 acc = 2 * dy - dx;
-		for (dgListNode* ptr = GetFirst(); ptr && index < dy; ptr = ptr->GetNext()) { 
+		dgInt32 dx = 2 * m_contactCount;
+		dgInt32 dy = 2 * sizeof (m_acceleratedSearch) / sizeof (m_acceleratedSearch[0]);
+		dgInt32 acc = dy - m_contactCount;
+		dgListNode* ptr = GetFirst();
+		for (dgInt32 i = 0; i < m_contactCount; i ++) { 
+			dgAssert (ptr->GetInfo().m_joint->GetId() ==  dgConstraint::m_contactConstraint);
 			if (acc > 0) {
 				dgInt32 j = m_contactCountReversal[index];
 				m_acceleratedSearch[j] = ptr;
 				index++;
 				dgAssert(index <= m_contactCount);
-				acc -= 2 * dx;
+				acc -= dx;
 			}
-			acc += 2 * dy;
+			acc += dy;
+			ptr = ptr->GetNext();
 		}
 
 		dgAssert ((index <= 2) || ((m_acceleratedSearch[0]->GetInfo().m_bodyNode->m_uniqueID > m_acceleratedSearch[1]->GetInfo().m_bodyNode->m_uniqueID) && 
 								   (m_acceleratedSearch[0]->GetInfo().m_bodyNode->m_uniqueID < m_acceleratedSearch[2]->GetInfo().m_bodyNode->m_uniqueID)));
 
-		for (dgInt32 i = index; i < dy; i++) {
+		for (dgInt32 i = index; i < sizeof (m_acceleratedSearch) / sizeof (m_acceleratedSearch[0]); i++) {
 			dgInt32 j = m_contactCountReversal[i];
 			m_acceleratedSearch[j] = GetFirst();
 		}
-
-		
 	}
 }
 

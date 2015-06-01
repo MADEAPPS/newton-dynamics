@@ -80,7 +80,10 @@ CustomJoint::~CustomJoint()
 	}
 }
 
-
+void CustomJoint::Initalize(NewtonWorld* const world)
+{
+	NewtonSetJointSerializationCallbacks (world, Serialize, Deserialize);
+}
 
 void CustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1)
 {
@@ -94,13 +97,6 @@ void CustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const b
 
 	NewtonJointSetUserData (m_joint, this);
 	NewtonJointSetDestructor (m_joint, Destructor);
-
-	NewtonOnJointSerializationCallback searializeTmp;
-	NewtonOnJointDeserializationCallback desearializeTmp;
-	NewtonGetJointSerializationCallbacks (m_world, &searializeTmp, &desearializeTmp);
-	if (!(searializeTmp && desearializeTmp)) {
-		NewtonSetJointSerializationCallbacks (m_world, Serialize, Deserialize);
-	}
 
 	m_userData = NULL;
 	m_userDestructor = NULL;

@@ -147,6 +147,8 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API CustomJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual ~CustomJoint();
 
+	CUSTOM_JOINTS_API static void Initalize(NewtonWorld* const world);
+
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
 	
 	CUSTOM_JOINTS_API void SetBodiesCollisionState (int state);
