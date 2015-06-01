@@ -60,11 +60,7 @@ target_link_libraries(dVisualDebuggerServer ${ENet_LIBRARY})
 
 
 if (UNIX)
-  if (BUILD_64)
-    add_definitions(-D_POSIX_VER_64)
-  else (BUILD_64)
-    add_definitions(-D_POSIX_VER_64)
-  endif (BUILD_64)
+  add_definitions(-D_POSIX_VER)
 endif(UNIX)
 
 if (CMAKE_COMPILER_IS_GNUCC)

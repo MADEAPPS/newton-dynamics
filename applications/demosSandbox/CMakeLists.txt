@@ -59,7 +59,7 @@ if (UNIX)
   add_definitions(-DD_JOINTLIBRARY_STATIC_LIB)
 
   if (BUILD_64)
-    add_definitions(-D_POSIX_VER_64)
+    add_definitions(-D_POSIX_VER -D_POSIX_VER_64)
   else (BUILD_64)
     add_definitions(-D_POSIX_VER)
   endif (BUILD_64)
