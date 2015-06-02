@@ -59,7 +59,7 @@ class dNewtonCollision: virtual public dNewtonAlloc, public dNewtonMaterial
 		{
 		}
 		
-		CNEWTON_API virtual void OnDrawFace (int vertexCount, const dFloat* const faceVertex, int faceId) = NULL;
+		CNEWTON_API virtual void OnDrawFace (int vertexCount, const dFloat* const faceVertex, int faceId) = 0;
 
 		dNewtonCollision* m_collision;
 	};

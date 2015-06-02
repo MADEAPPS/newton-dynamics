@@ -303,7 +303,7 @@ void dNewton::UpdateOffLine (dFloat timestepInSecunds)
 
 void dNewton::Update (dFloat timestepInSecunds)
 {
-	dLong timestepMicrosecunds = dLong (double (timestepInSecunds) * 1000000.0f);
+	dLong timestepMicrosecunds = (dLong) (double (timestepInSecunds) * 1000000.0f);
 	dLong currentTime = GetTimeInMicrosenconds ();
 
 	dLong nextTime = currentTime - m_microseconds;
@@ -318,7 +318,7 @@ void dNewton::Update (dFloat timestepInSecunds)
 
 void dNewton::UpdateAsync (dFloat timestepInSecunds)
 {
-	dLong timestepMicrosecunds = dLong (double (timestepInSecunds) * 1000000.0f);
+	dLong timestepMicrosecunds = (dLong) (double (timestepInSecunds) * 1000000.0f);
 	dLong currentTime = GetTimeInMicrosenconds ();
 
 	dLong nextTime = currentTime - m_microseconds;
