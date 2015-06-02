@@ -23,7 +23,7 @@
 #define __AFX_BROADPHASE_H_
 
 #include "dgPhysicsStdafx.h"
-
+#include "dgBodyMasterList.h"
 
 class dgBody;
 class dgWorld;
@@ -56,7 +56,7 @@ class dgConvexCastReturnInfo
 	dgFloat32 m_normal[4];					// surface normal at collision point in global space
 	//dgFloat32 m_normalOnHitPoint[4];		// surface normal at the surface of the hit body, 
 											// is the same as the normal calculate by a raycast passing by the hit point in the direction of the cast
-	dgInt64  m_contaID;	                // collision ID at contact point
+	dgInt64  m_contaID;						// collision ID at contact point
 	const dgBody* m_hitBody;				// body hit at contact point
 	dgFloat32 m_penetration;                // contact penetration at collision point
 };
@@ -120,20 +120,20 @@ class dgBroadPhase
 	static dgInt32 CompareNodes (const dgNode* const nodeA, const dgNode* const nodeB, void* notUsed);
 
 	void UpdateContactsBroadPhaseEnd ();
-	void ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
-	void ApplyDeformableForceAndtorque (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+	void ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID);
+	void ApplyDeformableForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	void CalculatePairContacts (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 //	void UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	
 	dgNode* BuildTopDown (dgNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 	dgNode* BuildTopDownBig (dgNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 
-	void FindCollidingPairs (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+	void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID);
 	bool ValidateContactCache(dgContact* const contact, dgFloat32 timestep) const;
 	void AddPair (dgBody* const body0, dgBody* const body1, dgFloat32 timestep, dgInt32 threadID);
 	void SubmitPairs (dgNode* const body, dgNode* const node, dgFloat32 timestep, dgInt32 threadID);
 
-	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const desctiptor, dgInt32 threadID);
+	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
 

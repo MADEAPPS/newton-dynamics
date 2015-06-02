@@ -152,7 +152,6 @@ class dgBroadPhase::dgNode
 
 	friend class dgBody;
 	friend class dgBroadPhase;
-//	friend class dgBroadphaseSyncDescriptor;
 	friend class dgFitnessList;
 } DG_GCC_VECTOR_ALIGMENT;
 
@@ -162,30 +161,18 @@ dgVector dgBroadPhase::dgNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCAL
 class dgBroadphaseSyncDescriptor
 {
 	public:
-	dgBroadphaseSyncDescriptor (dgFloat32 timestep, dgBodyMasterList::dgListNode* const firstNode)
-		:m_newBodiesNodes(NULL)
-		,m_collindPairBodyNode (firstNode)
-		,m_forceAndTorqueBodyNode (firstNode)
+	dgBroadphaseSyncDescriptor (dgFloat32 timestep, dgWorld* const world)
+		:m_world (world)
+		,m_newBodiesNodes(NULL)
 		,m_timestep (timestep) 
 		,m_pairsAtomicCounter(0)
 	{
 	}
 
+	dgWorld* m_world;
 	dgList<dgBody*>::dgListNode* m_newBodiesNodes;
-	dgBodyMasterList::dgListNode* m_collindPairBodyNode;
-	dgBodyMasterList::dgListNode* m_forceAndTorqueBodyNode;
 	dgFloat32 m_timestep;
 	dgInt32 m_pairsAtomicCounter;
-
-	//dgThread::dgCriticalSection* m_lock;
-	//dgInt32 m_pairsCount;
-	//dgInt32 m_pairsAtomicCounter;
-	//dgInt32 m_jointsAtomicCounter;
-	//dgFloat32 m_timestep;
-	//dgBodyMasterList::dgListNode* m_collindPairBodyNode;
-	//dgBodyMasterList::dgListNode* m_forceAndTorqueBodyNode;
-	//dgList<dgBody*>::dgListNode* m_newBodiesNodes;
-	//dgBroadPhase::dgNode* m_pairs[1024 * 4];	
 };
 
 class dgBroadPhase::dgSpliteInfo
@@ -878,19 +865,11 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 }
 
 
-void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
+void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
 	dgFloat32 timestep = descriptor->m_timestep; 
 
-	dgBodyMasterList::dgListNode* node = NULL;
-	{
-		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
-		node = descriptor->m_forceAndTorqueBodyNode;
-		if (node) {
-			descriptor->m_forceAndTorqueBodyNode = node->GetNext();
-		}
-	}
-
+	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
 	while (node) {
 		dgBody* const body = node->GetInfo().GetBody();
 
@@ -933,10 +912,8 @@ void dgBroadPhase::ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descri
 			body->UpdateMatrix (timestep, threadID);
 		}
 
-		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
-		node = descriptor->m_forceAndTorqueBodyNode;
-		if (node) {
-			descriptor->m_forceAndTorqueBodyNode = node->GetNext();
+		for(dgInt32 i = 0; i < threadCount; i ++) {
+			node = node ? node->GetNext() : NULL;
 		}
 	}
 }
@@ -1035,33 +1012,33 @@ void dgBroadPhase::UpdateBodyBroadphase(dgBody* const body, dgInt32 threadIndex)
 }
 
 
-void dgBroadPhase::ForceAndToqueKernel (void* const context, void* const worldContext, dgInt32 threadID)
+void dgBroadPhase::ForceAndToqueKernel (void* const context, void* const node, dgInt32 threadID)
 {
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
-	dgWorld* const world = (dgWorld*) worldContext;
+	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
 
 	if (!threadID) {
 		dgUnsigned32 ticks0 = world->m_getPerformanceCount();
-		broadPhase->ApplyForceAndtorque (descriptor, threadID);
+		broadPhase->ApplyForceAndtorque (descriptor, (dgBodyMasterList::dgListNode*) node, threadID);
 		world->m_perfomanceCounters[m_forceCallbackTicks] = world->m_getPerformanceCount() - ticks0;
 	} else {
-		broadPhase->ApplyForceAndtorque (descriptor, threadID);
+		broadPhase->ApplyForceAndtorque (descriptor, (dgBodyMasterList::dgListNode*) node, threadID);
 	}
 }
 
-void dgBroadPhase::CollidingPairsKernel (void* const context, void* const worldContext, dgInt32 threadID)
+void dgBroadPhase::CollidingPairsKernel (void* const context, void* const node, dgInt32 threadID)
 {
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
-	dgWorld* const world = (dgWorld*) worldContext;
+	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
 
 	if (!threadID) {
 		dgUnsigned32 ticks0 = world->m_getPerformanceCount();
-		broadPhase->FindCollidingPairs (descriptor, threadID);
+		broadPhase->FindCollidingPairs (descriptor, (dgBodyMasterList::dgListNode*) node, threadID);
 		world->m_perfomanceCounters[m_broadPhaceTicks] = world->m_getPerformanceCount() - ticks0;
 	} else {
-		broadPhase->FindCollidingPairs (descriptor, threadID);
+		broadPhase->FindCollidingPairs (descriptor, (dgBodyMasterList::dgListNode*) node, threadID);
 	}
 }
 
@@ -1184,19 +1161,11 @@ void dgBroadPhase::SubmitPairs (dgNode* const bodyNode, dgNode* const node, dgFl
 }
 
 
-void dgBroadPhase::FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
+void dgBroadPhase::FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
-//	dgVector timestep2 (descriptor->m_timestep * descriptor->m_timestep * dgFloat32 (4.0f));
 	const dgFloat32 timestep = descriptor->m_timestep;
-	dgBodyMasterList::dgListNode* node = NULL;
-	{
-		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
-		node = descriptor->m_collindPairBodyNode;
-		if (node) {
-			descriptor->m_collindPairBodyNode = node->GetNext();
-		}
-	}
-	
+
+	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
 	while (node) {
 		dgBody* const body = node->GetInfo().GetBody();
 		if (body->m_collisionCell) {
@@ -1210,11 +1179,8 @@ void dgBroadPhase::FindCollidingPairs (dgBroadphaseSyncDescriptor* const descrip
 				}
 			}
 		}
-
-		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, false);
-		node = descriptor->m_collindPairBodyNode;
-		if (node) {
-			descriptor->m_collindPairBodyNode = node->GetNext();
+		for (dgInt32 i = 0; i < threadCount; i++) {
+			node = node ? node->GetNext() : NULL;
 		}
 	}
 }
@@ -1633,14 +1599,15 @@ void dgBroadPhase::UpdateContacts (dgFloat32 timestep)
 	dgInt32 threadsCount = m_world->GetThreadCount();	
 
 	const dgBodyMasterList* const masterList = m_world;
-	dgBodyMasterList::dgListNode* const firstBodyNode = masterList->GetFirst()->GetNext();
+	dgBroadphaseSyncDescriptor syncPoints(timestep, m_world);
 
-	dgBroadphaseSyncDescriptor syncPoints(timestep, firstBodyNode);
-
+	dgBodyMasterList::dgListNode* node = masterList->GetFirst()->GetNext();
 	for (dgInt32 i = 0; i < threadsCount; i ++) {
-		m_world->QueueJob (ForceAndToqueKernel, &syncPoints, m_world);
+		m_world->QueueJob (ForceAndToqueKernel, &syncPoints, node);
+		node = node ? node->GetNext() : NULL; 
 	}
 	m_world->SynchronizationBarrier();
+
 
 	// update pre-listeners after the force and true are applied
 	if (m_world->m_preListener.GetCount()) {
@@ -1654,8 +1621,10 @@ void dgBroadPhase::UpdateContacts (dgFloat32 timestep)
 
 	ImproveFitness();
 
-	for (dgInt32 i = 0; i < threadsCount; i ++) {
-		m_world->QueueJob (CollidingPairsKernel, &syncPoints, m_world);
+	node = masterList->GetFirst()->GetNext();
+	for (dgInt32 i = 0; i < threadsCount; i++) {
+		m_world->QueueJob (CollidingPairsKernel, &syncPoints, node);
+		node = node ? node->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
 
