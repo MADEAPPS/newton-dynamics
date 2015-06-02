@@ -283,7 +283,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 				// calculate longitudinal slip ratio 
 				dFloat longitudinalSlipRatio = 1.0f;
 				if (uAbs > (1.0f/32.0f)) {
-					longitudinalSlipRatio = dClamp((u + Rw) / u, -1.0f, 1.0f);
+					longitudinalSlipRatio = dClamp((u + Rw) / u, dFloat(-1.0f), dFloat(1.0f));
 				} else {
 					if (wrAbs < 1.0e-4f) {
 						longitudinalSlipRatio = 0.0f;
@@ -296,7 +296,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 
 
 				// get the normalize tire load
-				dFloat normalizedTireLoad = dClamp (tireLoad / restTireLoad, 0.0f, 4.0f);
+				dFloat normalizedTireLoad = dClamp(tireLoad / restTireLoad, dFloat(0.0f), dFloat(4.0f));
 
 				// calculate longitudinal and lateral forces magnitude when no friction Limit (for now ignore camber angle effects)
 				dFloat camberEffect = 0.0f;
@@ -320,7 +320,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 				// basically it replaces Pajecka equation with a series expansion 
 				// f = x - |x| * x / 3 + x * x * x / 27
 				// m = x - |x| * x + x * x * x / 3 + x * x * x * x / 27
-				dFloat tireForceCoef = dMin (K * (1.0f - K / 3.0f + K * K / 27.0f), 1.0f);
+				dFloat tireForceCoef = dMin(K * (1.0f - K / 3.0f + K * K / 27.0f), dFloat(1.0f));
 
 				dFloat nu = 1.0f;
 				if (K < 2.0f * 3.141592f) {
@@ -333,7 +333,7 @@ void CustomVehicleControllerTireContactJoint::JacobianDerivative (dComplemtarity
 				dFloat longitudinalForce = dAbs (longitudinalSlipRatio * tireForceCoef * f0);
 
 				// ignore the tire alignment torque for now
-				dFloat k1 = dMin (K, 3.0f);
+				dFloat k1 = dMin(K, dFloat(3.0f));
 				dFloat tireMomentCoef = k1 * (1.0f - k1 + k1 * k1 / 3.0f - k1 * k1 * k1 / 27.0f);
 				tire->m_aligningTorque = nu * tire->m_aligningMomentTrail * Teff * tireMomentCoef * f0;
 				//chassis.m_externalTorque += upPin.Scale (aligningMoment);

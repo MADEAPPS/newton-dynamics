@@ -801,6 +801,10 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 			} 
 		}
 
+		// @TODO Infinite Loop Occur when using Double Precision.
+		// Temporary Suppress with Max Loop Count.
+		static const int MaxLoopCount(200);
+		int LoopCount(0);
 		dgFloat64 newCost = dgFloat32 (1.0e20f);
 		dgFloat64 prevCost = newCost;
 		do {
@@ -815,7 +819,8 @@ void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, boo
 				dgNodeBuilder* const node = listNode->GetInfo();
 				newCost += node->m_area;
 			}
-		} while (newCost < (prevCost * dgFloat32 (0.9999f)));
+			LoopCount++;
+		} while (newCost < (prevCost * dgFloat32(0.9999f)) && LoopCount < MaxLoopCount);
 
 		root = list.GetLast()->GetInfo();
 		while (root->m_parent) {

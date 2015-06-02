@@ -304,7 +304,7 @@ void CustomVehicleControllerBodyStateChassis::UpdateDynamicInputs()
 	}
 */
 
-	dFloat frontSpeed = dMin (m_veloc % m_matrix[0], 50.0f);
+	dFloat frontSpeed = dMin(m_veloc % m_matrix[0], dFloat(50.0f));
 	m_externalForce -= m_matrix[1].Scale (m_aerodynamicsDownForceCoefficient * frontSpeed * frontSpeed);
 
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localFrame.m_posit);

@@ -306,6 +306,10 @@ dgFloat64 dgBroadPhase::dgFitnessList::TotalCost () const
 
 dgFloat64 dgBroadPhase::CalculateEntropy ()
 {
+	// @TODO Infinite Loop Occur when using Double Precision.
+	// Temporary Suppress with Max Loop Count.
+	static const int MaxLoopCount(200);
+	int LoopCount(0);
 	dgFloat64 cost0 = m_fitness.TotalCost ();
 	dgFloat64 cost1 = cost0;
 	do {
@@ -314,7 +318,8 @@ dgFloat64 dgBroadPhase::CalculateEntropy ()
 			ImproveNodeFitness (node->GetInfo());
 		}
 		cost1 = m_fitness.TotalCost ();
-	} while (cost1 < (dgFloat32 (0.99f)) * cost0);
+		LoopCount++;
+	} while (cost1 < (dgFloat32(0.99f)) * cost0 && LoopCount < MaxLoopCount);
 	return cost1;
 }
 
