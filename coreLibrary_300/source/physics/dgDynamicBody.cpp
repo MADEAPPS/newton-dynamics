@@ -75,10 +75,6 @@ dgDynamicBody::~dgDynamicBody()
 {
 }
 
-
-
-
-
 void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
 	dgBody::Serialize (collisionRemapId, serializeCallback, userData);
@@ -139,7 +135,7 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 
 
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen ("replay.bin", "wb");
 		if (file) {
 			fwrite (&m_accel, sizeof (dgVector), 1, file);

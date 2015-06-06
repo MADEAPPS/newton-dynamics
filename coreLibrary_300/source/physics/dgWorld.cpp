@@ -951,7 +951,6 @@ bool dgWorld::AreBodyConnectedByJoints (dgBody* const originSrc, dgBody* const t
 
 void dgWorld::FlushCache()
 {
-
 	// delete all contacts
 	dgActiveContacts& contactList = *this;
 	for (dgActiveContacts::dgListNode* contactNode = contactList.GetFirst(); contactNode; ) {

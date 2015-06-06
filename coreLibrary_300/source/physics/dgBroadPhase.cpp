@@ -50,6 +50,18 @@ class dgBroadPhase::dgNode
 	public: 
 	DG_CLASS_ALLOCATOR(allocator)
 	
+	dgNode ()
+		:m_minBox (dgFloat32 (-1.0e15f))
+		,m_maxBox (dgFloat32 (1.0e15f))
+		,m_surfaceArea (dgFloat32 (1.0e20f))
+		,m_body(NULL)
+		,m_left(NULL)
+		,m_right(NULL)
+		,m_parent(NULL)
+		,m_fitnessNode(NULL)
+	{
+	}
+
 	dgNode (dgBody* const body)
 		:m_minBox (body->m_minAABB)
 		,m_maxBox (body->m_maxAABB)
@@ -270,22 +282,23 @@ class dgBroadPhase::dgSpliteInfo
 
 dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	:m_world(world)
-	,m_rootNode (NULL)
-	,m_treeEntropy(dgFloat32 (0.0f))
-	,m_lru(0)
-	,m_fitness(world->GetAllocator())
+	,m_rootNode (new (world->GetAllocator()) dgNode)
+	,m_staticEntropy(dgFloat32 (0.0f))
+	,m_dynamicsEntropy(dgFloat32 (0.0f))
+	,m_staticFitness(world->GetAllocator())
+	,m_dynamicsFitness(world->GetAllocator())
 	,m_generatedBodies(world->GetAllocator())
 	,m_contacJointLock()
 	,m_criticalSectionLock()
+	,m_lru(0)
 	,m_recursiveChunks(false)
+	,m_staticNeedsUpdate(true)
 {
 }
 
 dgBroadPhase::~dgBroadPhase()
 {
-	if (m_rootNode) {
-		delete m_rootNode;
-	}
+	delete m_rootNode;
 }
 
 
@@ -304,16 +317,16 @@ dgFloat64 dgBroadPhase::dgFitnessList::TotalCost () const
 	return cost;
 }
 
-dgFloat64 dgBroadPhase::CalculateEntropy ()
+dgFloat64 dgBroadPhase::CalculateEntropy (dgFitnessList& fitness, dgBroadPhase::dgNode** root)
 {
-	dgFloat64 cost0 = m_fitness.TotalCost ();
+	dgFloat64 cost0 = fitness.TotalCost ();
 	dgFloat64 cost1 = cost0;
 	do {
 		cost0 = cost1;
-		for (dgFitnessList::dgListNode* node = m_fitness.GetFirst(); node; node = node->GetNext()) {
-			ImproveNodeFitness (node->GetInfo());
+		for (dgFitnessList::dgListNode* node = fitness.GetFirst(); node; node = node->GetNext()) {
+			ImproveNodeFitness (node->GetInfo(), root);
 		}
-		cost1 = m_fitness.TotalCost ();
+		cost1 = fitness.TotalCost ();
 	} while (cost1 < (dgFloat32 (0.99f)) * cost0);
 	return cost1;
 }
@@ -323,7 +336,9 @@ dgFloat64 dgBroadPhase::CalculateEntropy ()
 void dgBroadPhase::InvalidateCache ()
 {
 	ResetEntropy ();
-	ImproveFitness();
+	m_staticNeedsUpdate = false;
+	ImproveFitness(m_staticFitness, m_staticEntropy, &m_rootNode->m_right);
+	ImproveFitness(m_dynamicsFitness, m_dynamicsEntropy, &m_rootNode->m_left);
 }
 
 void dgBroadPhase::GetWorldSize (dgVector& p0, dgVector& p1) const
@@ -334,34 +349,41 @@ void dgBroadPhase::GetWorldSize (dgVector& p0, dgVector& p1) const
 
 void dgBroadPhase::ForEachBodyInAABB (const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const
 {
-	if (m_rootNode) {
-		const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
-		dgInt32 stack = 1;
-		stackPool[0] = m_rootNode;
+	const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
 
-		while (stack) {
-			stack --;
-			const dgNode* const rootNode = stackPool[stack];
-			if (dgOverlapTest (rootNode->m_minBox, rootNode->m_maxBox, minBox, maxBox)) {
+	dgInt32 stack = 0;
+	if (m_rootNode->m_left) {
+		stackPool[stack] = m_rootNode->m_left;
+		stack ++;
+	}
 
-				if (rootNode->m_body) {
-					dgAssert (!rootNode->m_left);
-					dgAssert (!rootNode->m_right);
-					dgBody* const body = rootNode->m_body;
-					if (dgOverlapTest (body->m_minAABB, body->m_maxAABB, minBox, maxBox)) {
-						if (!callback (body, userData)) {
-							break;
-						}
+	if (m_rootNode->m_right) {
+		stackPool[stack] = m_rootNode->m_right;
+		stack ++;
+	}
+
+	while (stack) {
+		stack --;
+		const dgNode* const rootNode = stackPool[stack];
+		if (dgOverlapTest (rootNode->m_minBox, rootNode->m_maxBox, minBox, maxBox)) {
+
+			if (rootNode->m_body) {
+				dgAssert (!rootNode->m_left);
+				dgAssert (!rootNode->m_right);
+				dgBody* const body = rootNode->m_body;
+				if (dgOverlapTest (body->m_minAABB, body->m_maxAABB, minBox, maxBox)) {
+					if (!callback (body, userData)) {
+						break;
 					}
-				} else {
-					stackPool[stack] = rootNode->m_left;
-					stack ++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
-
-					stackPool[stack] = rootNode->m_right;
-					stack ++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 				}
+			} else {
+				stackPool[stack] = rootNode->m_left;
+				stack ++;
+				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+
+				stackPool[stack] = rootNode->m_right;
+				stack ++;
+				dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 			}
 		}
 	}
@@ -377,12 +399,12 @@ DG_INLINE dgFloat32 dgBroadPhase::CalculateSurfaceArea (const dgNode* const node
 	return side0.DotProduct4(side0.ShiftTripleRight()).GetScalar();
 }
 
-dgBroadPhase::dgNode* dgBroadPhase::InsertNode (dgNode* const node)
+dgBroadPhase::dgNode* dgBroadPhase::InsertNode (dgNode* const parent, dgNode* const node)
 {
 	dgVector p0;
 	dgVector p1;
 
-	dgNode* sibling = m_rootNode;
+	dgNode* sibling = parent;
 	dgFloat32 surfaceArea = CalculateSurfaceArea (node, sibling, p0, p1);
 	while(sibling->m_left && sibling->m_right) {
 		if (surfaceArea > sibling->m_surfaceArea) {
@@ -414,24 +436,29 @@ dgBroadPhase::dgNode* dgBroadPhase::InsertNode (dgNode* const node)
 		}
 	} 
 
-	dgNode* const parent = new (m_world->GetAllocator()) dgNode (sibling, node);
-	parent->m_fitnessNode = m_fitness.Append (parent);
-
-	return parent;
+	return new (m_world->GetAllocator()) dgNode (sibling, node);
 }
 
 void dgBroadPhase::Add (dgBody* const body)
 {
 	// create a new leaf node;
-	dgNode* const newNode = new (m_world->GetAllocator()) dgNode (body);
-
-	if (!m_rootNode) {
-		m_rootNode = newNode;
+	if (body->GetInvMass().m_w == dgFloat32 (0.0f)) {
+		m_staticNeedsUpdate = true;
+		if (m_rootNode->m_right) {
+			dgNode* const node = InsertNode(m_rootNode->m_right, new (m_world->GetAllocator()) dgNode (body));
+			node->m_fitnessNode = m_staticFitness.Append (node);
+		} else {
+			m_rootNode->m_right = new (m_world->GetAllocator()) dgNode (body);
+			m_rootNode->m_right->m_parent = m_rootNode;
+		}
 	} else {
-		dgNode* const node = InsertNode(newNode);
-
-		if (!node->m_parent) {
-			m_rootNode = node;
+		if (m_rootNode->m_left) {
+			dgNode* const node = InsertNode(m_rootNode->m_left, new (m_world->GetAllocator()) dgNode(body));
+			node->m_fitnessNode = m_dynamicsFitness.Append (node);
+		}
+		else {
+			m_rootNode->m_left = new (m_world->GetAllocator()) dgNode(body);
+			m_rootNode->m_left->m_parent = m_rootNode;
 		}
 	}
 }
@@ -442,60 +469,60 @@ void dgBroadPhase::Remove (dgBody* const body)
 	if (body->m_collisionCell) {
 		dgNode* const node = body->m_collisionCell;
 
+		dgAssert (node->m_parent);
 		dgAssert (!node->m_fitnessNode);
 
-		if (node->m_parent) {
-			dgNode* const grandParent = node->m_parent->m_parent;
-			if (grandParent) {
-				if (grandParent->m_left == node->m_parent) {
-					if (node->m_parent->m_right == node) {
-						grandParent->m_left = node->m_parent->m_left;
-						node->m_parent->m_left->m_parent = grandParent;
-						node->m_parent->m_left = NULL;
-						node->m_parent->m_parent = NULL;
-					} else {
-						grandParent->m_left = node->m_parent->m_right;
-						node->m_parent->m_right->m_parent = grandParent;
-						node->m_parent->m_right = NULL;
-						node->m_parent->m_parent = NULL;
-					}
+		m_staticNeedsUpdate = (body->GetInvMass().m_w == dgFloat32 (0.0f));
+
+		dgNode* const grandParent = node->m_parent->m_parent;
+		if (grandParent) {
+			if (grandParent->m_left == node->m_parent) {
+				if (node->m_parent->m_right == node) {
+					grandParent->m_left = node->m_parent->m_left;
+					node->m_parent->m_left->m_parent = grandParent;
+					node->m_parent->m_left = NULL;
+					node->m_parent->m_parent = NULL;
 				} else {
-					if (node->m_parent->m_right == node) {
-						grandParent->m_right = node->m_parent->m_left;
-						node->m_parent->m_left->m_parent = grandParent;
-						node->m_parent->m_left = NULL;
-						node->m_parent->m_parent = NULL;
-					} else {
-						grandParent->m_right = node->m_parent->m_right;
-						node->m_parent->m_right->m_parent = grandParent;
-						node->m_parent->m_right = NULL;
-						node->m_parent->m_parent = NULL;
-					}
+					grandParent->m_left = node->m_parent->m_right;
+					node->m_parent->m_right->m_parent = grandParent;
+					node->m_parent->m_right = NULL;
+					node->m_parent->m_parent = NULL;
 				}
 			} else {
 				if (node->m_parent->m_right == node) {
-					m_rootNode = node->m_parent->m_left;
-					m_rootNode->m_parent = NULL;
+					grandParent->m_right = node->m_parent->m_left;
+					node->m_parent->m_left->m_parent = grandParent;
 					node->m_parent->m_left = NULL;
+					node->m_parent->m_parent = NULL;
 				} else {
-					m_rootNode = node->m_parent->m_right;
-					m_rootNode->m_parent = NULL;
+					grandParent->m_right = node->m_parent->m_right;
+					node->m_parent->m_right->m_parent = grandParent;
 					node->m_parent->m_right = NULL;
+					node->m_parent->m_parent = NULL;
 				}
 			}
 
-			dgAssert (node->m_parent->m_fitnessNode);
-			m_fitness.Remove(node->m_parent->m_fitnessNode);
+			dgAssert(node->m_parent->m_fitnessNode);
+			if (body->GetInvMass().m_w == dgFloat32 (0.0f)) {
+				m_staticFitness.Remove(node->m_parent->m_fitnessNode);
+			} else {
+				m_dynamicsFitness.Remove(node->m_parent->m_fitnessNode);
+			}
 			delete node->m_parent;
 		} else {
+			if (node->m_parent->m_right == node) {
+				 m_rootNode->m_right = NULL;
+			} else {
+				m_rootNode->m_left = NULL;
+			}
+			node->m_parent = NULL;
 			delete node;
-			m_rootNode = NULL;
 		}
 	}
 }
 
 
-void dgBroadPhase::RotateLeft (dgNode* const node)
+void dgBroadPhase::RotateLeft (dgNode* const node, dgBroadPhase::dgNode** root)
 {
 	dgVector cost1P0;
 	dgVector cost1P1;		
@@ -512,16 +539,19 @@ void dgBroadPhase::RotateLeft (dgNode* const node)
 		node->m_minBox = parent->m_minBox;
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea; 
+
 		if (parent->m_parent) {
 			if (parent->m_parent->m_left == parent) {
 				parent->m_parent->m_left = node;
-			} else {
-				dgAssert (parent->m_parent->m_right == parent);
+			}
+			else {
+				dgAssert(parent->m_parent->m_right == parent);
 				parent->m_parent->m_right = node;
 			}
 		} else {
-			m_rootNode = node;
+			(*root) = node;
 		}
+
 		node->m_parent = parent->m_parent;
 		parent->m_parent = node;
 		node->m_left->m_parent = parent;
@@ -537,16 +567,19 @@ void dgBroadPhase::RotateLeft (dgNode* const node)
 		node->m_minBox = parent->m_minBox;
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea; 
+
 		if (parent->m_parent) {
 			if (parent->m_parent->m_left == parent) {
 				parent->m_parent->m_left = node;
-			} else {
-				dgAssert (parent->m_parent->m_right == parent);
+			}
+			else {
+				dgAssert(parent->m_parent->m_right == parent);
 				parent->m_parent->m_right = node;
 			}
 		} else {
-			m_rootNode = node;
+			(*root) = node;
 		}
+
 		node->m_parent = parent->m_parent;
 		parent->m_parent = node;
 		node->m_right->m_parent = parent;
@@ -559,7 +592,7 @@ void dgBroadPhase::RotateLeft (dgNode* const node)
 	}
 }
 
-void dgBroadPhase::RotateRight (dgNode* const node)
+void dgBroadPhase::RotateRight (dgNode* const node, dgBroadPhase::dgNode** root)
 {
 	dgVector cost1P0;
 	dgVector cost1P1;		
@@ -575,16 +608,19 @@ void dgBroadPhase::RotateRight (dgNode* const node)
 		node->m_minBox = parent->m_minBox;
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea; 
+		
 		if (parent->m_parent) {
 			if (parent->m_parent->m_left == parent) {
 				parent->m_parent->m_left = node;
-			} else {
-				dgAssert (parent->m_parent->m_right == parent);
+			}
+			else {
+				dgAssert(parent->m_parent->m_right == parent);
 				parent->m_parent->m_right = node;
 			}
 		} else {
-			m_rootNode = node;
+			(*root) = node;
 		}
+
 		node->m_parent = parent->m_parent;
 		parent->m_parent = node;
 		node->m_right->m_parent = parent;
@@ -603,13 +639,15 @@ void dgBroadPhase::RotateRight (dgNode* const node)
 		if (parent->m_parent) {
 			if (parent->m_parent->m_left == parent) {
 				parent->m_parent->m_left = node;
-			} else {
-				dgAssert (parent->m_parent->m_right == parent);
+			}
+			else {
+				dgAssert(parent->m_parent->m_right == parent);
 				parent->m_parent->m_right = node;
 			}
 		} else {
-			m_rootNode = node;
+			(*root) = node;
 		}
+
 		node->m_parent = parent->m_parent;
 		parent->m_parent = node;
 		node->m_left->m_parent = parent;
@@ -623,16 +661,16 @@ void dgBroadPhase::RotateRight (dgNode* const node)
 }
 
 
-void dgBroadPhase::ImproveNodeFitness (dgNode* const node)
+void dgBroadPhase::ImproveNodeFitness (dgNode* const node, dgBroadPhase::dgNode** root)
 {
 	dgAssert (node->m_left);
 	dgAssert (node->m_right);
 
-	if (node->m_parent)	{
+	if (node->m_parent && node->m_parent->m_parent)	{
 		if (node->m_parent->m_left == node) {
-			RotateRight (node);
+			RotateRight (node, root);
 		} else {
-			RotateLeft (node);
+			RotateLeft (node, root);
 		}
 	}
 	dgAssert (!m_rootNode->m_parent);
@@ -728,44 +766,50 @@ dgBroadPhase::dgNode* dgBroadPhase::BuildTopDownBig (dgNode** const leafArray, d
 
 void dgBroadPhase::ResetEntropy ()
 {
-	m_treeEntropy = dgFloat32 (0.0f);
+	m_staticNeedsUpdate = true;
+	m_staticEntropy = dgFloat32 (0.0f);
+	m_dynamicsEntropy = dgFloat32 (0.0f);
 }
 
-void dgBroadPhase::ImproveFitness()
+void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhase::dgNode** root)
 {
-	dgFloat64 entropy = CalculateEntropy();
-	if ((entropy > m_treeEntropy * dgFloat32 (2.0f)) || (entropy < m_treeEntropy * dgFloat32 (0.5f))) {
-		if (m_fitness.GetFirst()) {
-			dgWorld* const world = m_world;
-			dgInt32 count = m_fitness.GetCount() * 2 + 12;
-			world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (count, sizeof (dgNode*));
+	if (*root) {
+		(*root)->m_parent = NULL;
+		dgFloat64 entropy = CalculateEntropy(fitness, root);
+		if ((entropy > oldEntropy * dgFloat32 (2.0f)) || (entropy < oldEntropy * dgFloat32 (0.5f))) {
+			if (fitness.GetFirst()) {
+				dgWorld* const world = m_world;
+				dgInt32 count = fitness.GetCount() * 2 + 12;
+				world->m_pairMemoryBuffer.ExpandCapacityIfNeessesary (count, sizeof (dgNode*));
 
-			dgInt32 leafNodesCount = 0;
-			dgNode** const leafArray = (dgNode**)&world->m_pairMemoryBuffer[0];
-			for (dgFitnessList::dgListNode* nodePtr = m_fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
-				dgNode* const node = nodePtr->GetInfo();
-				dgNode* const leftNode = node->m_left;
-				if (leftNode->m_body) {
-					node->SetAABB(leftNode->m_body->m_minAABB, leftNode->m_body->m_maxAABB);
-					leafArray[leafNodesCount] = leftNode;
-					leafNodesCount ++;
+				dgInt32 leafNodesCount = 0;
+				dgNode** const leafArray = (dgNode**)&world->m_pairMemoryBuffer[0];
+				for (dgFitnessList::dgListNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+					dgNode* const node = nodePtr->GetInfo();
+					dgNode* const leftNode = node->m_left;
+					if (leftNode->m_body) {
+						node->SetAABB(leftNode->m_body->m_minAABB, leftNode->m_body->m_maxAABB);
+						leafArray[leafNodesCount] = leftNode;
+						leafNodesCount ++;
+					}
+					dgNode* const rightNode = node->m_right;
+					if (rightNode->m_body) {
+						rightNode->SetAABB (rightNode->m_body->m_minAABB, rightNode->m_body->m_maxAABB);
+						leafArray[leafNodesCount] = rightNode;
+						leafNodesCount ++;
+					}
 				}
-				dgNode* const rightNode = node->m_right;
-				if (rightNode->m_body) {
-					rightNode->SetAABB (rightNode->m_body->m_minAABB, rightNode->m_body->m_maxAABB);
-					leafArray[leafNodesCount] = rightNode;
-					leafNodesCount ++;
-				}
+
+				dgFitnessList::dgListNode* nodePtr = fitness.GetFirst();
+
+				dgSortIndirect (leafArray, leafNodesCount, CompareNodes); 
+				*root = BuildTopDownBig (leafArray, 0, leafNodesCount - 1, &nodePtr);
+				dgAssert (!(*root)->m_parent);
+				entropy = CalculateEntropy(fitness, root);
 			}
-
-			dgFitnessList::dgListNode* nodePtr = m_fitness.GetFirst();
-
-			dgSortIndirect (leafArray, leafNodesCount, CompareNodes); 
-			m_rootNode = BuildTopDownBig (leafArray, 0, leafNodesCount - 1, &nodePtr);
-			m_treeEntropy = CalculateEntropy();
-		} else {
-			m_treeEntropy = entropy;
 		}
+		(*root)->m_parent = m_rootNode;
+		oldEntropy = entropy;
 	}
 }
 
@@ -987,25 +1031,24 @@ void dgBroadPhase::CalculatePairContacts (dgBroadphaseSyncDescriptor* const desc
 
 void dgBroadPhase::UpdateBodyBroadphase(dgBody* const body, dgInt32 threadIndex)
 {
-	if (m_rootNode) {
-		dgNode* const node = body->m_collisionCell;
-		dgAssert (!node->m_left);
-		dgAssert (!node->m_right);
+	dgNode* const node = body->m_collisionCell;
+	dgAssert (!node->m_left);
+	dgAssert (!node->m_right);
 
-		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, true);
-		if (!dgBoxInclusionTest (body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) {
-			node->SetAABB(body->m_minAABB, body->m_maxAABB);
-			for (dgNode* parent = node->m_parent; parent; parent = parent->m_parent) {
-				dgVector minBox;
-				dgVector maxBox;
-				dgFloat32 area = CalculateSurfaceArea (parent->m_left, parent->m_right, minBox, maxBox);
-				if (dgBoxInclusionTest (minBox, maxBox, parent->m_minBox, parent->m_maxBox)) {
-					break;
-				}
-				parent->m_minBox = minBox;
-				parent->m_maxBox = maxBox;
-				parent->m_surfaceArea = area;
+	dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, true);
+	m_staticNeedsUpdate = (body->GetInvMass().m_w == dgFloat32 (0.0f));
+	if (!dgBoxInclusionTest (body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) {
+		node->SetAABB(body->m_minAABB, body->m_maxAABB);
+		for (dgNode* parent = node->m_parent; parent != m_rootNode; parent = parent->m_parent) {
+			dgVector minBox;
+			dgVector maxBox;
+			dgFloat32 area = CalculateSurfaceArea (parent->m_left, parent->m_right, minBox, maxBox);
+			if (dgBoxInclusionTest (minBox, maxBox, parent->m_minBox, parent->m_maxBox)) {
+				break;
 			}
+			parent->m_minBox = minBox;
+			parent->m_maxBox = maxBox;
+			parent->m_surfaceArea = area;
 		}
 	}
 }
@@ -1179,7 +1222,7 @@ void dgBroadPhase::FindCollidingPairs (dgBroadphaseSyncDescriptor* const descrip
 			}
 		}
 		for (dgInt32 i = 0; i < threadCount; i++) {
-			node = node ? node->GetNext() : NULL;
+			node = (node && (node->GetPrev()->GetInfo().GetBody()->GetInvMass().m_w != dgFloat32 (0.0f))) ? node->GetPrev() : NULL; 
 		}
 	}
 }
@@ -1280,7 +1323,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 
 void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const
 {
-	if (filter && m_rootNode) {
+	if (filter && (m_rootNode->m_left || m_rootNode->m_right)) {
 		dgVector segment (l1 - l0);
 		dgFloat32 dist2 = segment % segment;
 		if (dist2 > dgFloat32 (1.0e-8f)) {
@@ -1290,10 +1333,28 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 
 			dgFastRayTest ray (l0, l1);
 
-			dgInt32 stack = 1;
-			stackPool[0] = m_rootNode;
-			distance[0] = ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox);
+			//dgInt32 stack = 1;
+			//stackPool[0] = m_rootNode____;
+			//distance[0] = ray.BoxIntersect(m_rootNode____->m_minBox, m_rootNode____->m_maxBox);
 			
+			dgInt32 stack = 0;
+			if (m_rootNode->m_left) {
+				stackPool[stack] = m_rootNode->m_left;
+				distance[stack] = ray.BoxIntersect(m_rootNode->m_left->m_minBox, m_rootNode->m_left->m_maxBox);
+				stack ++;
+			}
+			if (m_rootNode->m_right) {
+				stackPool[stack] = m_rootNode->m_right;
+				distance[stack] = ray.BoxIntersect(m_rootNode->m_right->m_minBox, m_rootNode->m_right->m_maxBox);
+				stack++;
+			}
+			if (stack == 2) {
+				if (distance[0] < distance[1]) {
+					dgSwap(distance[0], distance[1]);
+					dgSwap(stackPool[0], stackPool[1]);
+				}
+			}
+						
 			dgFloat32 maxParam = dgFloat32 (1.2f);
 
 			dgLineBox line;	
@@ -1363,13 +1424,13 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 
 void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const
 {
-	if (filter && m_rootNode && shape->IsType(dgCollision::dgCollisionConvexShape_RTTI)) {
+	if (filter && shape->IsType(dgCollision::dgCollisionConvexShape_RTTI) && (m_rootNode->m_left || m_rootNode->m_right)) {
 
 		dgVector boxP0;
 		dgVector boxP1;
 		shape->CalcAABB(shape->GetLocalMatrix() * matrix, boxP0, boxP1);
 
-		dgInt32 stack = 1;
+		
 		dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
 		const dgNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];		
 
@@ -1378,11 +1439,30 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velocA);
 		dgFloat32 quantizeStep = dgMax (dgFloat32 (1.0f) / velocA.DotProduct4(velocA).m_x, dgFloat32 (0.001f));
 
+		//dgVector minBox (m_rootNode->m_minBox - boxP1);
+		//dgVector maxBox (m_rootNode->m_maxBox - boxP0);
+		//stackPool[0] = m_rootNode;
+		//distance[0] = ray.BoxIntersect(minBox, maxBox);
+		//dgInt32 stack = 1; 
+		 
+		dgInt32 stack = 0;
+		if (m_rootNode->m_left) {
+			dgVector minBox(m_rootNode->m_left->m_minBox - boxP1);
+			dgVector maxBox(m_rootNode->m_left->m_maxBox - boxP0);
 
-		dgVector minBox (m_rootNode->m_minBox - boxP1);
-		dgVector maxBox (m_rootNode->m_maxBox - boxP0);
-		stackPool[0] = m_rootNode;
-		distance[0] = ray.BoxIntersect(minBox, maxBox);
+			stackPool[stack] = m_rootNode->m_left;
+			distance[stack] = ray.BoxIntersect(minBox, maxBox);
+			stack++;
+		}
+		if (m_rootNode->m_right) {
+			dgVector minBox(m_rootNode->m_right->m_minBox - boxP1);
+			dgVector maxBox(m_rootNode->m_right->m_maxBox - boxP0);
+
+			stackPool[stack] = m_rootNode->m_right;
+			distance[stack] = ray.BoxIntersect(minBox, maxBox);
+			stack++;
+		}
+
 
 		while (stack) {
 			stack --;
@@ -1447,13 +1527,13 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32& timeToImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
 	dgInt32 totalCount = 0;
-	if (m_rootNode) {
+	if (m_rootNode->m_left || m_rootNode->m_right) {
 		dgVector boxP0;
 		dgVector boxP1;
 		dgAssert (matrix.TestOrthogonal());
 		shape->CalcAABB(matrix, boxP0, boxP1);
 
-		dgInt32 stack = 1;
+		
 		dgTriplex points[DG_CONVEX_CAST_POOLSIZE];
 		dgTriplex normals[DG_CONVEX_CAST_POOLSIZE];
 		dgFloat32 penetration[DG_CONVEX_CAST_POOLSIZE];
@@ -1470,10 +1550,30 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 		dgFloat32 maxParam = dgFloat32 (1.2f);
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velocA);
 
-		dgVector minBox (m_rootNode->m_minBox - boxP1);
-		dgVector maxBox (m_rootNode->m_maxBox - boxP0);
-		stackPool[0] = m_rootNode;
-		distance[0] = ray.BoxIntersect(minBox, maxBox);
+		dgInt32 stack = 0;
+		if (m_rootNode->m_left) {
+			dgVector minBox (m_rootNode->m_left->m_minBox - boxP1);
+			dgVector maxBox (m_rootNode->m_left->m_maxBox - boxP0);
+
+			stackPool[stack] = m_rootNode->m_left;
+			distance[stack] = ray.BoxIntersect(minBox, maxBox);
+			stack++;
+		}
+		if (m_rootNode->m_right) {
+			dgVector minBox(m_rootNode->m_right->m_minBox - boxP1);
+			dgVector maxBox(m_rootNode->m_right->m_maxBox - boxP0);
+
+			stackPool[stack] = m_rootNode->m_right;
+			distance[stack] = ray.BoxIntersect(minBox, maxBox);
+			stack++;
+		}
+
+		if (stack == 2) {
+			if (distance[0] < distance[1]) {
+				dgSwap(distance[0], distance[1]);
+				dgSwap(stackPool[0], stackPool[1]);
+			}
+		}
 
 		while (stack) {
 			stack --;
@@ -1608,12 +1708,16 @@ void dgBroadPhase::UpdateContacts (dgFloat32 timestep)
 		m_world->m_perfomanceCounters[m_preUpdataListerTicks] = m_world->m_getPerformanceCount() - ticks;
 	}
 
-	ImproveFitness();
+	if (m_staticNeedsUpdate) {
+		m_staticNeedsUpdate = false;
+		ImproveFitness(m_staticFitness, m_staticEntropy, &m_rootNode->m_right);
+	}
+	ImproveFitness(m_dynamicsFitness, m_dynamicsEntropy, &m_rootNode->m_left);
 
-	node = masterList->GetFirst()->GetNext();
+	node = (masterList->GetLast()->GetInfo().GetBody()->GetInvMass().m_w != dgFloat32 (0.0f)) ? masterList->GetLast() : NULL;
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob (CollidingPairsKernel, &syncPoints, node);
-		node = node ? node->GetNext() : NULL;
+		m_world->QueueJob(CollidingPairsKernel, &syncPoints, node);
+		node = (node && (node->GetPrev()->GetInfo().GetBody()->GetInvMass().m_w != NULL)) ? node->GetPrev() : NULL;
 	}
 	m_world->SynchronizationBarrier();
 

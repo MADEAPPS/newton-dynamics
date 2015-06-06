@@ -104,12 +104,8 @@ class dgBroadPhase
 	void UpdateContacts (dgFloat32 timestep);
 	void AddInternallyGeneratedBody(dgBody* const body);
 	void UpdateBodyBroadphase(dgBody* const body, dgInt32 threadIndex);
-
-	void ImproveFitness();
-	void RotateLeft (dgNode* const node);
-	void RotateRight (dgNode* const node);
-	void ImproveNodeFitness (dgNode* const node);
-	dgNode* InsertNode (dgNode* const node);
+	
+	dgNode* InsertNode (dgNode* const parent, dgNode* const node);
 	dgFloat32 CalculateSurfaceArea (const dgNode* const node0, const dgNode* const node1, dgVector& minBox, dgVector& maxBox) const;
 
 	static void ForceAndToqueKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
@@ -138,18 +134,26 @@ class dgBroadPhase
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
 
 	bool TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const;
-	dgFloat64 CalculateEntropy ();
+
+	void RotateLeft(dgNode* const node, dgBroadPhase::dgNode** root);
+	void RotateRight(dgNode* const node, dgBroadPhase::dgNode** root);
+	void ImproveNodeFitness(dgNode* const node, dgBroadPhase::dgNode** root);
+	dgFloat64 CalculateEntropy (dgFitnessList& fitness, dgBroadPhase::dgNode** root);
+	void ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhase::dgNode** root);
 			  
 
 	dgWorld* m_world;
 	dgNode* m_rootNode;
-	dgFloat64 m_treeEntropy;
-	dgUnsigned32 m_lru;
-	dgFitnessList m_fitness;
+	dgFloat64 m_staticEntropy;
+	dgFloat64 m_dynamicsEntropy;
+	dgFitnessList m_staticFitness;
+	dgFitnessList m_dynamicsFitness;
 	dgList<dgBody*> m_generatedBodies;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
+	dgUnsigned32 m_lru;
 	bool m_recursiveChunks;
+	bool m_staticNeedsUpdate;
 
 	static dgVector m_linearContactError2;
 	static dgVector m_angularContactError2;

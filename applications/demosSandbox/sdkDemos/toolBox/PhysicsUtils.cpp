@@ -548,19 +548,7 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 //mass*= 0.0f;
 
 	dVector force (0.0f, mass * DEMO_GRAVITY, 0.0f, 0.0f);
-	//dVector force (0.0f, 0.0f, mass * DEMO_GRAVITY, 0.0f);
 	NewtonBodySetForce (body, &force.m_x);
-
-	// uncomment this for more accurate gyroscope torque effect
-/*
-	dVector omega;
-	dMatrix inertiaMatrix;
-	NewtonBodyGetOmega(body, &omega[0]);
-	NewtonBodyGetInertiaMatrix(body, &inertiaMatrix[0][0]);
-	dVector angularMomentum (inertiaMatrix.RotateVector(omega));
-	dVector torque (angularMomentum * omega);
-	NewtonBodySetTorque(body, &torque[0]);
-*/
 }
 
 
