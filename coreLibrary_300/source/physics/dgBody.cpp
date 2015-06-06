@@ -474,12 +474,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 
 	//dgAssert (m_masterNode);
 	if (mass >= DG_INFINITE_MASS) {
-		bool add = false;
-		if (m_invMass.m_w != dgFloat32(0.0f)) {
-			add = true;
-			m_world->GetBroadPhase()->Remove(this);
-		}
-
 		m_mass.m_x = DG_INFINITE_MASS;
 		m_mass.m_y = DG_INFINITE_MASS;
 		m_mass.m_z = DG_INFINITE_MASS;
@@ -496,17 +490,8 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 			}
 		}
 		SetAparentMassMatrix (m_mass);
-		if (add) {
-			m_world->GetBroadPhase()->Add(this);
-		}
 
 	} else {
-		bool add = false;
-		if (m_invMass.m_w == dgFloat32(0.0f)) {
-			add = true;
-			m_world->GetBroadPhase()->Remove(this);
-		}
-
 		Ixx = dgAbsf (Ixx);
 		Iyy = dgAbsf (Iyy);
 		Izz = dgAbsf (Izz);
@@ -535,9 +520,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 			masterList.RotateToEnd (m_masterNode);
 		}
 		SetAparentMassMatrix (dgVector (Ixx, Iyy, Izz, mass));
-		if (add) {
-			m_world->GetBroadPhase()->Add(this);
-		}
 	}
 
 #ifdef _DEBUG

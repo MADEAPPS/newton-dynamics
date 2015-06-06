@@ -527,4 +527,5 @@ inline dgBroadPhase* dgWorld::GetBroadPhase() const
 	return m_broadPhase;
 }
 
+
 #endif
