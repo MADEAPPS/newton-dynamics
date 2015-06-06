@@ -341,9 +341,6 @@ dgCollidingPairCollector::~dgCollidingPairCollector ()
 void dgCollidingPairCollector::Init ()
 {
 	dgWorld* const world = (dgWorld*) this;
-	// need to expand the buffer, clang compile does no like this is actually a function call to expand a buffer 
-	//world->m_pairMemoryBuffer[0];
-	//I am writing 0 to resolve the issue
 	world->m_pairMemoryBuffer[0] = 0;
 	m_count = 0;
 }

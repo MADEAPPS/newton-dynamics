@@ -360,6 +360,7 @@ void dgWorld::AddSentinelBody()
 	m_sentinelBody = CreateDynamicBody(instance, dgGetIdentityMatrix());
 	instance->Release();
 	dgCollidingPairCollector::m_sentinel = m_sentinelBody;
+	m_broadPhase->Remove(m_sentinelBody);
 }
 
 dgBody* dgWorld::GetSentinelBody() const

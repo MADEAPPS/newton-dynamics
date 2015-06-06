@@ -291,7 +291,7 @@ class dgWorldDynamicUpdate
 	dgUnsigned32 m_markLru;
 	dgJacobianMemory m_solverMemory;
 	dgThread::dgCriticalSection m_softBodyCriticalSectionLock;
-	dgBody* m_sentinelBody;
+//	dgBody* m_sentinelBody;
 	static dgVector m_velocTol;
 	static dgVector m_eulerTaylorCorrection;
 

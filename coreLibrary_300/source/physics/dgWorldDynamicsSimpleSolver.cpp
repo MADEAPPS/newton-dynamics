@@ -530,7 +530,7 @@ void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* co
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 
-	dgVector timeStepVect (timestep, timestep, timestep, dgFloat32 (0.0));
+	dgVector timeStepVect (timestep, timestep, timestep, dgFloat32 (0.0f));
 	if (timestep > dgFloat32 (0.0f)) {
 		// apply force
 		dgFloat32 accelTol2 = maxAccNorm * maxAccNorm;
@@ -1864,7 +1864,7 @@ void dgWorldDynamicUpdate::CalculateForcesSimulationMode (const dgIsland* const 
 void dgWorldDynamicUpdate::CalculateReactionsForces(const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
 	if (island->m_jointCount == 0) {
-		ApplyExternalForcesAndAcceleration (island, threadIndex, timestep, 0.0f);
+		ApplyExternalForcesAndAcceleration (island, threadIndex, timestep, dgFloat32 (0.0f));
 
 //	} else if (island->m_jointCount == 1) {
 //		CalculateSimpleBodyReactionsForces (island, rowStart, threadIndex, timestep, maxAccNorm);

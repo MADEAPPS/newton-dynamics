@@ -339,7 +339,6 @@ void dgBroadPhase::ForEachBodyInAABB (const dgVector& minBox, const dgVector& ma
 		dgInt32 stack = 1;
 		stackPool[0] = m_rootNode;
 
-		dgBody* const sentinel = m_world->GetSentinelBody();
 		while (stack) {
 			stack --;
 			const dgNode* const rootNode = stackPool[stack];
@@ -350,10 +349,8 @@ void dgBroadPhase::ForEachBodyInAABB (const dgVector& minBox, const dgVector& ma
 					dgAssert (!rootNode->m_right);
 					dgBody* const body = rootNode->m_body;
 					if (dgOverlapTest (body->m_minAABB, body->m_maxAABB, minBox, maxBox)) {
-						if (body != sentinel) {
-							if (!callback (body, userData)) {
-								break;
-							}
+						if (!callback (body, userData)) {
+							break;
 						}
 					}
 				} else {
@@ -442,56 +439,58 @@ void dgBroadPhase::Add (dgBody* const body)
 
 void dgBroadPhase::Remove (dgBody* const body)
 {
-	dgNode* const node = body->m_collisionCell;
+	if (body->m_collisionCell) {
+		dgNode* const node = body->m_collisionCell;
 
-	dgAssert (!node->m_fitnessNode);
+		dgAssert (!node->m_fitnessNode);
 
-	if (node->m_parent) {
-		dgNode* const grandParent = node->m_parent->m_parent;
-		if (grandParent) {
-			if (grandParent->m_left == node->m_parent) {
-				if (node->m_parent->m_right == node) {
-					grandParent->m_left = node->m_parent->m_left;
-					node->m_parent->m_left->m_parent = grandParent;
-					node->m_parent->m_left = NULL;
-					node->m_parent->m_parent = NULL;
+		if (node->m_parent) {
+			dgNode* const grandParent = node->m_parent->m_parent;
+			if (grandParent) {
+				if (grandParent->m_left == node->m_parent) {
+					if (node->m_parent->m_right == node) {
+						grandParent->m_left = node->m_parent->m_left;
+						node->m_parent->m_left->m_parent = grandParent;
+						node->m_parent->m_left = NULL;
+						node->m_parent->m_parent = NULL;
+					} else {
+						grandParent->m_left = node->m_parent->m_right;
+						node->m_parent->m_right->m_parent = grandParent;
+						node->m_parent->m_right = NULL;
+						node->m_parent->m_parent = NULL;
+					}
 				} else {
-					grandParent->m_left = node->m_parent->m_right;
-					node->m_parent->m_right->m_parent = grandParent;
-					node->m_parent->m_right = NULL;
-					node->m_parent->m_parent = NULL;
+					if (node->m_parent->m_right == node) {
+						grandParent->m_right = node->m_parent->m_left;
+						node->m_parent->m_left->m_parent = grandParent;
+						node->m_parent->m_left = NULL;
+						node->m_parent->m_parent = NULL;
+					} else {
+						grandParent->m_right = node->m_parent->m_right;
+						node->m_parent->m_right->m_parent = grandParent;
+						node->m_parent->m_right = NULL;
+						node->m_parent->m_parent = NULL;
+					}
 				}
 			} else {
 				if (node->m_parent->m_right == node) {
-					grandParent->m_right = node->m_parent->m_left;
-					node->m_parent->m_left->m_parent = grandParent;
+					m_rootNode = node->m_parent->m_left;
+					m_rootNode->m_parent = NULL;
 					node->m_parent->m_left = NULL;
-					node->m_parent->m_parent = NULL;
 				} else {
-					grandParent->m_right = node->m_parent->m_right;
-					node->m_parent->m_right->m_parent = grandParent;
+					m_rootNode = node->m_parent->m_right;
+					m_rootNode->m_parent = NULL;
 					node->m_parent->m_right = NULL;
-					node->m_parent->m_parent = NULL;
 				}
 			}
+
+			dgAssert (node->m_parent->m_fitnessNode);
+			m_fitness.Remove(node->m_parent->m_fitnessNode);
+			delete node->m_parent;
 		} else {
-			if (node->m_parent->m_right == node) {
-				m_rootNode = node->m_parent->m_left;
-				m_rootNode->m_parent = NULL;
-				node->m_parent->m_left = NULL;
-			} else {
-				m_rootNode = node->m_parent->m_right;
-				m_rootNode->m_parent = NULL;
-				node->m_parent->m_right = NULL;
-			}
+			delete node;
+			m_rootNode = NULL;
 		}
-
-		dgAssert (node->m_parent->m_fitnessNode);
-		m_fitness.Remove(node->m_parent->m_fitnessNode);
-		delete node->m_parent;
-	} else {
-		delete node;
-		m_rootNode = NULL;
 	}
 }
 
@@ -1305,7 +1304,6 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 			line.m_boxL0 = (line.m_l0 & test) | line.m_l1.AndNot(test);
 			line.m_boxL1 = (line.m_l1 & test) | line.m_l0.AndNot(test);
 
-			const dgBody* const sentinel = m_world->GetSentinelBody();
 			while (stack) {
 				stack --;
 				dgFloat32 dist = distance[stack];
@@ -1315,15 +1313,13 @@ void dgBroadPhase::RayCast (const dgVector& l0, const dgVector& l1, OnRayCastAct
 					const dgNode* const me = stackPool[stack];
 					dgAssert (me);
 					if (me->m_body) {
-						if (me->m_body != sentinel) {
-							dgAssert (!me->m_left);
-							dgAssert (!me->m_right);
-							dgFloat32 param = me->m_body->RayCast (line, filter, prefilter, userData, maxParam);
-							if (param < maxParam) {
-								maxParam = param;
-								if (maxParam < dgFloat32 (1.0e-8f)) {
-									break;
-								}
+						dgAssert (!me->m_left);
+						dgAssert (!me->m_right);
+						dgFloat32 param = me->m_body->RayCast (line, filter, prefilter, userData, maxParam);
+						if (param < maxParam) {
+							maxParam = param;
+							if (maxParam < dgFloat32 (1.0e-8f)) {
+								break;
 							}
 						}
 					} else {
@@ -1388,7 +1384,6 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 		stackPool[0] = m_rootNode;
 		distance[0] = ray.BoxIntersect(minBox, maxBox);
 
-		const dgBody* const sentinel = m_world->GetSentinelBody();
 		while (stack) {
 			stack --;
 			dgFloat32 dist = distance[stack];
@@ -1398,16 +1393,14 @@ void dgBroadPhase::ConvexRayCast (dgCollisionInstance* const shape, const dgMatr
 				const dgNode* const me = stackPool[stack];
 				dgAssert (me);
 				if (me->m_body) {
-					if (me->m_body != sentinel) {
-						dgAssert (!me->m_left);
-						dgAssert (!me->m_right);
-						dgBody* const body = me->m_body;
-						if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
-							dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
-							if (param < maxParam) {
-								param = dgMin (param + quantizeStep, dgFloat32 (1.0f));
-								maxParam = param;
-							}
+					dgAssert (!me->m_left);
+					dgAssert (!me->m_right);
+					dgBody* const body = me->m_body;
+					if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
+						dgFloat32 param = body->ConvexRayCast (ray, shape,boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
+						if (param < maxParam) {
+							param = dgMin (param + quantizeStep, dgFloat32 (1.0f));
+							maxParam = param;
 						}
 					}
 				} else {
@@ -1482,7 +1475,6 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 		stackPool[0] = m_rootNode;
 		distance[0] = ray.BoxIntersect(minBox, maxBox);
 
-		const dgBody* const sentinel = m_world->GetSentinelBody();
 		while (stack) {
 			stack --;
 
@@ -1493,45 +1485,42 @@ dgInt32 dgBroadPhase::ConvexCast (dgCollisionInstance* const shape, const dgMatr
 			} else {
 				const dgNode* const me = stackPool[stack];
 				if (me->m_body) {
-					if (me->m_body != sentinel) {
-						dgAssert (!me->m_left);
-						dgAssert (!me->m_right);
-						dgBody* const body = me->m_body;
-						if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
-							dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
+					dgAssert (!me->m_left);
+					dgAssert (!me->m_right);
+					dgBody* const body = me->m_body;
+					if (!PREFILTER_RAYCAST (prefilter, body, shape, userData)) {
+						dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
 
-							if (count) {
-								if (time < maxParam) {
-									if ((time - maxParam) < dgFloat32(-1.0e-3f)) {
-										totalCount = 0;
-									}
-									maxParam = time;
-									if (count >= (maxContacts - totalCount)) {
-										count = maxContacts - totalCount;
-									}
+						if (count) {
+							if (time < maxParam) {
+								if ((time - maxParam) < dgFloat32(-1.0e-3f)) {
+									totalCount = 0;
+								}
+								maxParam = time;
+								if (count >= (maxContacts - totalCount)) {
+									count = maxContacts - totalCount;
+								}
 
-									for (dgInt32 i = 0; i < count; i++) {
-										info[totalCount].m_point[0] = points[i].m_x;
-										info[totalCount].m_point[1] = points[i].m_y;
-										info[totalCount].m_point[2] = points[i].m_z;
-                                        info[totalCount].m_point[3] = dgFloat32 (0.0f);
-										info[totalCount].m_normal[0] = normals[i].m_x;
-										info[totalCount].m_normal[1] = normals[i].m_y;
-										info[totalCount].m_normal[2] = normals[i].m_z;
-                                        info[totalCount].m_normal[3] = dgFloat32 (0.0f);
-										info[totalCount].m_penetration = penetration[i];
-										info[totalCount].m_contaID = attributeB[i];
-                                        info[totalCount].m_hitBody = body;
-										totalCount++;
-									}
+								for (dgInt32 i = 0; i < count; i++) {
+									info[totalCount].m_point[0] = points[i].m_x;
+									info[totalCount].m_point[1] = points[i].m_y;
+									info[totalCount].m_point[2] = points[i].m_z;
+                                    info[totalCount].m_point[3] = dgFloat32 (0.0f);
+									info[totalCount].m_normal[0] = normals[i].m_x;
+									info[totalCount].m_normal[1] = normals[i].m_y;
+									info[totalCount].m_normal[2] = normals[i].m_z;
+                                    info[totalCount].m_normal[3] = dgFloat32 (0.0f);
+									info[totalCount].m_penetration = penetration[i];
+									info[totalCount].m_contaID = attributeB[i];
+                                    info[totalCount].m_hitBody = body;
+									totalCount++;
 								}
-								if (maxParam < 1.0e-8f) {
-									break;
-								}
+							}
+							if (maxParam < 1.0e-8f) {
+								break;
 							}
 						}
 					}
-
 				} else {
 					const dgNode* const left = me->m_left;
 					dgAssert (left);
