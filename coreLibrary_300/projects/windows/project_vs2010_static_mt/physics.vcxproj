@@ -264,6 +264,8 @@
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect6.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBallConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBilateralConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgBroadPhaseDefault.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgBroadPhasePersistent.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundFractured.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgContact.cpp" />
@@ -325,6 +327,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBallConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgBroadPhaseDefault.h" />
+    <ClInclude Include="..\..\..\source\physics\dgBroadPhasePersistent.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundFractured.h" />
     <ClInclude Include="..\..\..\source\physics\dgConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgContact.h" />

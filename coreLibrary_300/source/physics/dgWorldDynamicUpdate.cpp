@@ -89,8 +89,6 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
 	dgWorld* const world = (dgWorld*) this;
-	dgUnsigned32 updateTime = world->m_getPerformanceCount();
-
 	world->m_dynamicsLru = world->m_dynamicsLru + DG_BODY_LRU_STEP;
 
 	m_bodies = 0;
@@ -162,9 +160,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 	dgSort (islandsArray, m_islands, CompareIslands); 
 
-	dgUnsigned32 dynamicsTime = world->m_getPerformanceCount();
-	world->m_perfomanceCounters[m_dynamicsBuildSpanningTreeTicks] = dynamicsTime - updateTime;
-
 	if (!(world->m_amp && (world->m_hardwaredIndex > 0))) {
 		dgInt32 index = 0;
 		dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
@@ -198,15 +193,9 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		#endif
 	}
 
-
-	dgUnsigned32 ticks = world->m_getPerformanceCount();
-	world->m_perfomanceCounters[m_dynamicsSolveSpanningTreeTicks] = ticks - dynamicsTime;
-	world->m_perfomanceCounters[m_dynamicsTicks] = ticks - updateTime;
-
 	// integrate soft body dynamics phase 2
 	dgDeformableBodiesUpdate* const softBodyList = world;
     softBodyList->SolveConstraintsAndIntegrate (timestep);
-	world->m_perfomanceCounters[m_softBodyTicks] += (world->m_getPerformanceCount() - ticks);
 }
 
 

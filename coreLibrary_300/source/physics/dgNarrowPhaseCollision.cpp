@@ -1278,7 +1278,7 @@ dgInt32 dgWorld::CollideContinue (
 	collideBodyA.m_matrix = matrixA;
 	collideBodyA.m_collision = &collisionA;
 	collideBodyA.m_masterNode = NULL;
-	collideBodyA.m_collisionCell = NULL;
+	collideBodyA.m_broadPhaseNode = NULL;
 	collideBodyA.m_veloc = dgVector (velocA[0], velocA[1], velocA[2], dgFloat32 (0.0f));
 	collideBodyA.m_omega = dgVector (omegaA[0], omegaA[1], omegaA[2], dgFloat32 (0.0f));
 	collisionA.SetGlobalMatrix(collisionA.GetLocalMatrix() * matrixA);
@@ -1288,7 +1288,7 @@ dgInt32 dgWorld::CollideContinue (
 	collideBodyB.m_matrix = matrixB;
 	collideBodyB.m_collision = &collisionB;
 	collideBodyB.m_masterNode = NULL;
-	collideBodyB.m_collisionCell = NULL;
+	collideBodyB.m_broadPhaseNode = NULL;
 	collideBodyB.m_veloc = dgVector (velocB[0], velocB[1], velocB[2], dgFloat32 (0.0f));
 	collideBodyB.m_omega = dgVector (omegaB[0], omegaB[1], omegaB[2], dgFloat32 (0.0f));
 	collisionB.SetGlobalMatrix(collisionB.GetLocalMatrix() * matrixB);

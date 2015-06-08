@@ -45,6 +45,7 @@ static NewtonMesh* MakeCruz (DemoEntityManager* const scene, dFloat lengh, dFloa
 	// make a elongated Box and combine the along x, y , z axis
 	NewtonMesh* const boxMesh = MakeBox (scene, size, texture);
 return boxMesh;
+/*
 	// rotate 90 degree around y
 	dMatrix yawMatrix (dYawMatrix(3.141592f * 90.0f / 180.0f));
 	NewtonMesh* const auxiliaryMesh = NewtonMeshUnion (boxMesh, boxMesh, &yawMatrix[0][0]);
@@ -60,6 +61,7 @@ return boxMesh;
 
 	NewtonMeshDestroy(auxiliaryMesh);
 	return cruz;
+*/
 }
 
 

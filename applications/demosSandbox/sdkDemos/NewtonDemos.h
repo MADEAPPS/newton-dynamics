@@ -25,6 +25,11 @@ class NewtonDemos: public wxFrame
 		ID_AUTOSLEEP_MODE,
 		ID_SHOW_STATISTICS,
 		ID_USE_PARALLEL_SOLVER,
+
+		ID_BROADPHSE_TYPE0,
+		ID_BROADPHSE_TYPE1,
+		ID_BROADPHSE_COUNT,
+
 		ID_SOLVER_MODE,
 		ID_SOLVER_MODE_COUNT = ID_SOLVER_MODE + 5,
 
@@ -36,7 +41,6 @@ class NewtonDemos: public wxFrame
 		ID_SHOW_AABB,
 		ID_SHOW_JOINTS,
 		ID_SHOW_CENTER_OF_MASS,
-		
 
 		ID_SERIALIZE,
 		ID_DESERIALIZE,
@@ -122,6 +126,8 @@ class NewtonDemos: public wxFrame
 	void OnSelectHardwareDevice(wxCommandEvent& event);
 	void OnShowStatistics(wxCommandEvent& event);
 
+	void OnSelectBroadPhase(wxCommandEvent& event);
+
 	void OnNew(wxCommandEvent& event);
 	void OnSerializeWorld(wxCommandEvent& event);
 	void OnDeserializeWorld(wxCommandEvent& event);
@@ -136,6 +142,7 @@ class NewtonDemos: public wxFrame
 	wxStatusBar* m_statusbar;
 	DemoEntityManager* m_scene;
 
+	unsigned m_broadPhaseType;
 	unsigned m_physicsUpdateMode;
 
 	bool m_suspendVisualUpdates;

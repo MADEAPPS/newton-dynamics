@@ -66,19 +66,15 @@ class dgThreadHive
 		~dgThreadBee();
 
 		bool IsBusy() const;
-		void SetPerfomanceCounter(OnGetPerformanceCountCallback callback);
 		void SetUp(dgMemoryAllocator* const allocator, const char* const name, dgInt32 id, dgThreadHive* const hive);
 		virtual void Execute (dgInt32 threadId);
 
 		void RunNextJobInQueue(dgInt32 threadId);
 
 		dgInt32 m_isBusy;
-
-		dgUnsigned32 m_ticks;
 		dgSemaphore m_myMutex;
 		dgThreadHive* m_hive;
 		dgMemoryAllocator* m_allocator; 
-		OnGetPerformanceCountCallback m_getPerformanceCount;	
 	};
 
 	dgThreadHive(dgMemoryAllocator* const allocator);
@@ -95,17 +91,12 @@ class dgThreadHive
 	void GetIndirectLock (dgThread::dgCriticalSection* const criticalSectionLock, bool yield) const;
 	void ReleaseIndirectLock (dgThread::dgCriticalSection* const criticalSectionLock) const;
 
-	void ClearTimers();
 	dgInt32 GetThreadCount() const;
-
 	dgInt32 GetMaxThreadCount() const;
 	void SetThreadsCount (dgInt32 count);
 
 	void QueueJob (dgWorkerThreadTaskCallback callback, void* const context0, void* const context1);
 	void SynchronizationBarrier ();
-
-	void SetPerfomanceCounter(OnGetPerformanceCountCallback callback);
-	dgUnsigned32 GetPerfomanceTicks (dgUnsigned32 threadIndex) const;
 
 	private:
 	void DestroyThreads();

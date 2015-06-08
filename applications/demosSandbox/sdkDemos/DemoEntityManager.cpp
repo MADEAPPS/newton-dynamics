@@ -100,10 +100,10 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,m_cameraManager(NULL)
     ,m_tranparentHeap()
 //	,m_visualDebugger(NULL)
-	,m_profiler(60, 40)
+//	,m_profiler(60, 40)
 	,m_mainThreadGraphicsTime(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)
-	,m_physThreadTime(0.0f)
+//	,m_physThreadTime(0.0f)
 {
 	// initialized the physics world for the new scene
 	Cleanup ();
@@ -111,8 +111,8 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	ResetTimer();
 
 	// Set performance counters off
-	memset (m_showProfiler, 0, sizeof (m_showProfiler));
-	m_profiler.Init(this);
+	//memset (m_showProfiler, 0, sizeof (m_showProfiler));
+	//m_profiler.Init(this);
 
 	m_context = new wxGLContext(this);
 }
@@ -192,7 +192,7 @@ void DemoEntityManager::Cleanup ()
 	//NewtonSetWorldSize (m_world, &minSize[0], &maxSize[0]); 
 
 	// set the performance track function
-	NewtonSetPerformanceClock (m_world, dRuntimeProfiler::GetTimeInMicrosenconds);
+	//NewtonSetPerformanceClock (m_world, dRuntimeProfiler::GetTimeInMicrosenconds);
 
 	// clean up all caches the engine have saved
 	NewtonInvalidateCache (m_world);
@@ -705,7 +705,7 @@ void DemoEntityManager::UpdatePhysics(float timestep)
 					} else {
 						NewtonUpdateAsync(m_world, timestepInSecunds);
 					}
-					m_physThreadTime = NewtonReadPerformanceTicks (m_world, NEWTON_PROFILER_WORLD_UPDATE) * 1.0e-3f;
+					//m_physThreadTime = NewtonReadPerformanceTicks (m_world, NEWTON_PROFILER_WORLD_UPDATE) * 1.0e-3f;
 				}
 				m_reEntrantUpdate = false;
 			}
@@ -952,18 +952,17 @@ void DemoEntityManager::RenderFrame ()
 	}
 
 	int lineNumber = 130 + 22;
+	//if (m_mainWindow->m_concurrentProfilerState) {
+	//	lineNumber = m_profiler.RenderConcurrentPerformance(lineNumber);
+	//}
 
-	if (m_mainWindow->m_concurrentProfilerState) {
-		lineNumber = m_profiler.RenderConcurrentPerformance(lineNumber);
-	}
+	//if (profileFlags) {
+	//	lineNumber = m_profiler.Render (profileFlags, lineNumber);
+	//}
 
-	if (profileFlags) {
-		lineNumber = m_profiler.Render (profileFlags, lineNumber);
-	}
-
-	if (m_mainWindow->m_threadProfilerState) {
-		m_profiler.RenderThreadPerformance ();
-	}
+	//if (m_mainWindow->m_threadProfilerState) {
+	//	m_profiler.RenderThreadPerformance ();
+	//}
 
 	if (m_renderHood) {
 

@@ -70,8 +70,8 @@ class dgKinematicBody: public dgBody
 	static dgVector m_dummy;
 
 	friend class dgWorld;
-	friend class dgWorldDynamicUpdate;
 	friend class dgBroadPhase;
+	friend class dgWorldDynamicUpdate;
 } DG_GCC_VECTOR_ALIGMENT;
 
 

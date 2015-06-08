@@ -29,11 +29,9 @@
 dgThreadHive::dgThreadBee::dgThreadBee()
 	:dgThread()
 	,m_isBusy(0)
-	,m_ticks (0)
 	,m_myMutex()
 	,m_hive(NULL)
 	,m_allocator(NULL)
-	,m_getPerformanceCount(NULL)
 {
 }
 
@@ -61,11 +59,6 @@ bool dgThreadHive::dgThreadBee::IsBusy() const
 	return m_isBusy ? true : false;
 }
 
-void dgThreadHive::dgThreadBee::SetPerfomanceCounter(OnGetPerformanceCountCallback callback)
-{
-	m_getPerformanceCount = callback;
-}
-
 
 void dgThreadHive::dgThreadBee::Execute (dgInt32 threadId)
 {
@@ -89,8 +82,6 @@ void dgThreadHive::dgThreadBee::Execute (dgInt32 threadId)
 
 void dgThreadHive::dgThreadBee::RunNextJobInQueue(dgInt32 threadId)
 {
-	dgUnsigned32 ticks = m_getPerformanceCount();
-
 	bool isEmpty = false;
 	do {
 		dgThreadJob job;
@@ -107,9 +98,6 @@ void dgThreadHive::dgThreadBee::RunNextJobInQueue(dgInt32 threadId)
 			job.m_callback (job.m_context0, job.m_context1, m_id);
 		}
 	} while (!isEmpty);
-
-	
-	m_ticks += (m_getPerformanceCount() - ticks);
 }
 
 
@@ -144,40 +132,15 @@ void dgThreadHive::DestroyThreads()
 	}
 }
 
-
-void dgThreadHive::SetPerfomanceCounter(OnGetPerformanceCountCallback callback)
-{
-	for (dgInt32 i = 0; i < m_beesCount; i ++) {
-		m_workerBees[i].SetPerfomanceCounter(callback);
-	}
-}
-
-
-dgUnsigned32 dgThreadHive::GetPerfomanceTicks (dgUnsigned32 threadIndex) const
-{
-	return (m_beesCount && (threadIndex < dgUnsigned32(m_beesCount))) ? m_workerBees[threadIndex].m_ticks : 0;
-}
-
-
-
-
 dgInt32 dgThreadHive::GetThreadCount() const
 {
 	return m_beesCount ? m_beesCount : 1;
-}
-
-void dgThreadHive::ClearTimers()
-{
-	for (dgInt32 i = 0; i < m_beesCount; i ++) {
-		m_workerBees[i].m_ticks = 0;
-	}
 }
 
 dgInt32 dgThreadHive::GetMaxThreadCount() const
 {
 	return DG_MAX_THREADS_HIVE_COUNT;
 }
-
 
 void dgThreadHive::SetThreadsCount (dgInt32 threads)
 {

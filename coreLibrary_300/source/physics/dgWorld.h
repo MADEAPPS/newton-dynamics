@@ -76,33 +76,10 @@ class dgBodyMaterialList: public dgTree<dgContactMaterial, dgUnsigned32>
 };
 
 
-class dgCollisionParamProxy;
-
-enum dgPerformanceCounters
-{
-	m_worldTicks = 0,
-
-	m_collisionTicks,
-	m_broadPhaceTicks,
-	m_narrowPhaseTicks,
-
-	m_dynamicsTicks,
-	m_dynamicsBuildSpanningTreeTicks,
-	m_dynamicsSolveSpanningTreeTicks,
-
-	m_forceCallbackTicks,
-	m_softBodyTicks,
-
-	m_preUpdataListerTicks,
-	m_postUpdataListerTicks,
-
-	m_counterSize
-};
-
-
 
 class dgWorld;
 class dgCollisionInstance;
+class dgCollisionParamProxy;
 
 class dgSolverSleepTherfesholds
 {
@@ -113,7 +90,6 @@ class dgSolverSleepTherfesholds
 	dgFloat32 m_maxOmega;
 	dgInt32 m_steps;
 };
-
 
 class dgWorldThreadPool: public dgThreadHive
 {
@@ -153,6 +129,12 @@ class dgWorld
 
 	typedef void (dgApi *OnJointSerializationCallback) (const dgUserConstraint* const joint, dgSerialize funt, void* const serilalizeObject);
 	typedef void (dgApi *OnJointDeserializationCallback) (const dgBody* const body0, const dgBody* const body1, dgDeserialize funt, void* const serilalizeObject);
+
+	enum dgBroadPhaseType
+	{
+		m_defaultBroadphase,
+		m_persistentBroadphase,
+	};
 
 	class dgListener
 	{
@@ -346,13 +328,8 @@ class dgWorld
 	dgContactMaterial* GetFirstMaterial () const;
 	dgContactMaterial* GetNextMaterial (dgContactMaterial* material) const;
 
-	OnGetPerformanceCountCallback GetPerformaceFuntion()const ;
-	void SetPerfomanceCounter(OnGetPerformanceCountCallback callback);
-
 	void SetThreadsCount (dgInt32 count);
-	dgUnsigned32 GetPerfomanceTicks (dgUnsigned32 entry) const;
-	dgUnsigned32 GetThreadPerfomanceTicks (dgUnsigned32 threadIndex) const;
-
+	
 	//Parallel Job dispatcher for user related stuff
 	void ExecuteUserJob (dgWorkerThreadTaskCallback userJobKernel, void* const userJobKernelContext);
 
@@ -363,7 +340,9 @@ class dgWorld
 	dgBody* GetSentinelBody() const;
 	dgMemoryAllocator* GetAllocator() const;
 
-
+	dgInt32 GetBroadPhaseType() const;
+	void SetBroadPhaseType (dgInt32 type);
+	
 	dgFloat32 GetContactMergeTolerance() const;
 	void SetContactMergeTolerance(dgFloat32 tolerenace);
 
@@ -462,14 +441,10 @@ class dgWorld
 	dgMemoryAllocator* m_allocator;
 	dgInt32 m_hardwaredIndex;
 	OnIslandUpdate m_islandUpdate;
-	OnGetPerformanceCountCallback m_getPerformanceCount;
 	OnCollisionInstanceDestroy	m_onCollisionInstanceDestruction;
 	OnCollisionInstanceDuplicate m_onCollisionInstanceCopyConstrutor;
 	OnJointSerializationCallback m_serializedJointCallback;	
 	OnJointDeserializationCallback m_deserializedJointCallback;	
-
-	dgUnsigned32 m_perfomanceCounters[m_counterSize];	
-	dgUnsigned32 m_perfomanceCountersBack[m_counterSize];	
 
 	dgListenerList m_preListener;
 	dgListenerList m_postListener;
@@ -526,6 +501,5 @@ inline dgBroadPhase* dgWorld::GetBroadPhase() const
 {
 	return m_broadPhase;
 }
-
 
 #endif

@@ -10,6 +10,7 @@
 */
 
 #include <toolbox_stdafx.h>
+#if 0
 #include "OpenGlUtil.h"
 #include "dRuntimeProfiler.h"
 #include "dHighResolutionTimer.h"
@@ -479,5 +480,5 @@ int dRuntimeProfiler::RenderConcurrentPerformance (int lineNumber)
 	return m_nextLine + 30;
 }
 
-
+#endif
 

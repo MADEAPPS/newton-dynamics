@@ -76,24 +76,9 @@
 #ifdef __cplusplus 
 extern "C" {
 #endif
-
-	#define NEWTON_PROFILER_WORLD_UPDATE					0
-
-	#define NEWTON_PROFILER_COLLISION_UPDATE				1
-	#define NEWTON_PROFILER_COLLISION_UPDATE_BROAD_PHASE	2
-	#define NEWTON_PROFILER_COLLISION_UPDATE_NARROW_PHASE	3
-
-	#define NEWTON_PROFILER_DYNAMICS_UPDATE					4
-	#define NEWTON_PROFILER_DYNAMICS_CONSTRAINT_GRAPH		5
-	#define NEWTON_PROFILER_DYNAMICS_SOLVE_CONSTRAINT_GRAPH	6
-
-	#define NEWTON_PROFILER_FORCE_CALLBACK_UPDATE			7
-	#define NEWTON_PROFILER_SOFT_BODY_CALLBACK_UPDATE		8
-
-	#define NEWTON_PRE_LISTERNER_CALLBACK_UPDATE			9
-	#define NEWTON_POST_LISTERNER_CALLBACK_UPDATE			10
-
-
+	
+	#define NEWTON_BROADPHASE_DEFAULT						0
+	#define NEWTON_BROADPHASE_PERSINTENT					1
 
 	#define NEWTON_DYNAMIC_BODY								0
 	#define NEWTON_KINEMATIC_BODY							1
@@ -456,8 +441,9 @@ extern "C" {
 	NEWTON_API void NewtonSetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld, int mode);
 	NEWTON_API int NewtonGetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld);
 
-	NEWTON_API void NewtonSetPerformanceClock (const NewtonWorld* const newtonWorld, NewtonGetTicksCountCallback callback);
-	NEWTON_API unsigned NewtonReadPerformanceTicks (const NewtonWorld* const newtonWorld, unsigned performanceEntry);
+	//NEWTON_API void NewtonSetPerformanceClock (const NewtonWorld* const newtonWorld, NewtonGetTicksCountCallback callback);
+	//NEWTON_API unsigned NewtonReadPerformanceTicks (const NewtonWorld* const newtonWorld, unsigned performanceEntry);
+	//NEWTON_API unsigned NewtonReadThreadPerformanceTicks (const NewtonWorld* newtonWorld, unsigned threadIndex);
 
 	NEWTON_API int NewtonGetBroadphaseAlgorithm (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSelectBroadphaseAlgorithm (const NewtonWorld* const newtonWorld, int algorithmType);
@@ -472,7 +458,7 @@ extern "C" {
 	NEWTON_API void NewtonSetJointSerializationCallbacks (const NewtonWorld* const newtonWorld, NewtonOnJointSerializationCallback serializeJoint, NewtonOnJointDeserializationCallback deserializeJoint);
 	NEWTON_API void NewtonGetJointSerializationCallbacks (const NewtonWorld* const newtonWorld, NewtonOnJointSerializationCallback* const serializeJoint, NewtonOnJointDeserializationCallback* const deserializeJoint);
 
-	NEWTON_API unsigned NewtonReadThreadPerformanceTicks (const NewtonWorld* newtonWorld, unsigned threadIndex);
+	
 
 	// multi threading interface 
 	NEWTON_API void NewtonWorldCriticalSectionLock (const NewtonWorld* const newtonWorld, int threadIndex);

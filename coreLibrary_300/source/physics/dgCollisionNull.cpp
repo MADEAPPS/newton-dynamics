@@ -71,8 +71,8 @@ dgInt32 dgCollisionNull::CalculateSignature () const
 
 void dgCollisionNull::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
 {
-	p0 = matrix[3] & dgVector::m_triplexMask;;
-	p1 = matrix[3] & dgVector::m_triplexMask;;
+	p0 = matrix[3] & dgVector::m_triplexMask;
+	p1 = matrix[3] & dgVector::m_triplexMask;
 }
 
 

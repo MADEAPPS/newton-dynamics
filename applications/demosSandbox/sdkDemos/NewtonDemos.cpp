@@ -29,7 +29,7 @@
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
-  #define DEFAULT_SCENE	3			// Precessing tops
+#define DEFAULT_SCENE	3			// Precessing tops
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
@@ -146,7 +146,6 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Advanced player controller"), wxT("demonstrate player interacting with other objects"), AdvancedPlayerController},
 	{wxT("Simple cloth Patch"), wxT("show simple cloth patch"), ClothPatch},
 	{wxT("Simple soft Body"), wxT("show simple soft body"), SoftBodies},
-    
 
 //	{wxT("skinned rag doll"), wxT("demonstrate simple rag doll"), SkinRagDoll},
 };
@@ -230,6 +229,8 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	// game menus events
 	EVT_MENU_RANGE(ID_RUN_DEMO, ID_RUN_DEMO_RANGE, NewtonDemos::OnRunDemo)
 
+	EVT_MENU_RANGE(ID_BROADPHSE_TYPE0, ID_BROADPHSE_COUNT, NewtonDemos::OnSelectBroadPhase)
+
 	EVT_MENU(ID_AUTOSLEEP_MODE,	NewtonDemos::OnAutoSleepMode)
 	EVT_MENU(ID_SHOW_STATISTICS, NewtonDemos::OnShowStatistics)
 	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
@@ -278,6 +279,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_joystick(NULL)
 	,m_statusbar(NULL)
 	,m_scene(NULL)
+	,m_broadPhaseType(0)
 	,m_physicsUpdateMode(0)
 	,m_suspendVisualUpdates(true)
 	,m_autoSleepState(true)
@@ -447,6 +449,10 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->AppendCheckItem(ID_USE_PARALLEL_SOLVER, wxT("Parallel solver on"));
 
 		optionsMenu->AppendSeparator();
+		optionsMenu->AppendRadioItem(ID_BROADPHSE_TYPE0, wxT("Default broaphase"), wxT("for scenes with more dynamics bodies than static"));
+		optionsMenu->AppendRadioItem(ID_BROADPHSE_TYPE1, wxT("Persintent broaphase"), wxT("for scenes with lot more static bodies than dynamics"));
+
+		optionsMenu->AppendSeparator();
 		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 0, wxT("Exact solver on"));
 		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 1, wxT("Iterative solver one passes"));
 		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 2, wxT("Iterative solver two passes"));
@@ -564,6 +570,7 @@ void NewtonDemos::END_MENU_OPTION()
 		SetAutoSleepMode (m_scene->GetNewton(), !m_autoSleepState);
 		NewtonSetSolverModel (m_scene->GetNewton(), m_solverModes[m_solverModeIndex]);
 		NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
+		NewtonSelectBroadphaseAlgorithm (m_scene->GetNewton(), m_broadPhaseType);
 	}
 }
 
@@ -971,7 +978,13 @@ void NewtonDemos::OnDeserializeWorld(wxCommandEvent& event)
 
 void NewtonDemos::OnJoystickEvent(wxJoystickEvent& event)
 {
+}
 
+void NewtonDemos::OnSelectBroadPhase(wxCommandEvent& event)
+{
+	BEGIN_MENU_OPTION();
+	m_broadPhaseType = dClamp (event.GetId() - ID_BROADPHSE_TYPE0, 0, 1);
+	END_MENU_OPTION();
 }
 
 #if 0

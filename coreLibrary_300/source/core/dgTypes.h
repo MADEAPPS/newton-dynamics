@@ -741,9 +741,6 @@ void dgSerializeMarker(dgSerialize serializeCallback, void* const userData);
 dgInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData);
 
 
-typedef dgUnsigned32 (dgApi *OnGetPerformanceCountCallback) ();
-
-
 dgUnsigned64 dgGetTimeInMicrosenconds();
 
 

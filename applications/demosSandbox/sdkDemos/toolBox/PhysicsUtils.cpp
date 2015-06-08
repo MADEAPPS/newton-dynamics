@@ -644,6 +644,12 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 	NewtonCollision* collision = NULL;
 	switch (type) 
 	{
+		case _NULL_PRIMITIVE:
+		{
+			collision = NewtonCreateNull (world); 
+			break;
+		}
+
 		case _SPHERE_PRIMITIVE:
 		{
 			// create the collision 

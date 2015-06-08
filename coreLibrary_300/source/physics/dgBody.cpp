@@ -67,7 +67,7 @@ dgBody::dgBody()
 	,m_userData(NULL)
 	,m_world(NULL)
 	,m_collision(NULL)
-	,m_collisionCell(NULL)
+	,m_broadPhaseNode(NULL)
 	,m_masterNode(NULL)
 	,m_destructor(NULL)
 	,m_matrixUpdate(NULL)
@@ -106,7 +106,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_userData(NULL)
 	,m_world(world)
 	,m_collision(NULL)
-	,m_collisionCell(NULL)
+	,m_broadPhaseNode(NULL)
 	,m_masterNode(NULL)
 	,m_destructor(NULL)
 	,m_matrixUpdate(NULL)
@@ -146,6 +146,7 @@ dgBody::~dgBody()
 void dgBody::AttachCollision (dgCollisionInstance* const collisionSrc)
 {
 	dgCollisionInstance* const instance = new (m_world->GetAllocator()) dgCollisionInstance (*collisionSrc);
+	m_world->GetBroadPhase()->CollisionChange (this, instance);
 	if (m_collision) {
 		m_collision->Release();
 	}
@@ -206,11 +207,11 @@ void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 		dgMovingAABB (m_minAABB, m_maxAABB, predictiveVeloc, predictiveOmega, timestep, m_collision->GetBoxMaxRadius(), m_collision->GetBoxMinRadius());
 	}
 
-	if (m_collisionCell) {
+	if (m_broadPhaseNode) {
 		dgAssert (m_world);
 		
 		if (!m_sleeping) {
-			m_world->GetBroadPhase()->UpdateBodyBroadphase (this, threadIndex);
+			m_world->GetBroadPhase()->UpdateBody (this, threadIndex);
 		}
 	}
 }
@@ -473,6 +474,8 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 	}
 
 	//dgAssert (m_masterNode);
+	m_world->GetBroadPhase()->CheckStaticDynamic(this, mass);
+
 	if (mass >= DG_INFINITE_MASS) {
 		m_mass.m_x = DG_INFINITE_MASS;
 		m_mass.m_y = DG_INFINITE_MASS;

@@ -12,6 +12,7 @@
 #ifndef _D_RUNTINE_PROFILER_
 #define _D_RUNTINE_PROFILER_
 
+#if 0
 #define MAX_FRAMES 350
 #define MAX_FRAMES_STEP 1
 #define MAX_TRACKS (NEWTON_POST_LISTERNER_CALLBACK_UPDATE + 1)
@@ -52,5 +53,5 @@ class dRuntimeProfiler
 	DemoEntityManager* m_scene;
 };
 
-
+#endif
 #endif

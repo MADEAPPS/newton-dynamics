@@ -32,11 +32,13 @@
 #include "dgCollisionScene.h"
 #include "dgCollisionSphere.h"
 #include "dgCollisionCapsule.h"
+#include "dgBroadPhaseDefault.h"
 #include "dgCollisionCylinder.h"
 #include "dgCollisionInstance.h"
 #include "dgCollisionCompound.h"
 #include "dgWorldDynamicUpdate.h"
 #include "dgCollisionConvexHull.h"
+#include "dgBroadPhasePersistent.h"
 #include "dgCollisionChamferCylinder.h"
 
 #include "dgUserConstraint.h"
@@ -238,7 +240,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 
 	m_allocator = allocator;
 	m_islandUpdate = NULL;
-	m_getPerformanceCount = NULL;
 
 	m_onCollisionInstanceDestruction = NULL;
 	m_onCollisionInstanceCopyConstrutor = NULL;
@@ -300,8 +301,9 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_hardwaredIndex = 0;
 	SetThreadsCount (0);
 
-	//dgBroadPhase::Init ();
-	m_broadPhase = new (allocator) dgBroadPhase(this);
+	m_broadPhase = new (allocator) dgBroadPhaseDefault(this);
+	//m_broadPhase = new (allocator) dgBroadPhasePersistent(this);
+
 	dgCollidingPairCollector::Init ();
 	
 	//m_pointCollision = new (m_allocator) dgCollisionPoint(m_allocator);
@@ -310,7 +312,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	pointCollison->Release();
 
 	AddSentinelBody();
-	SetPerfomanceCounter(NULL);
 
 	#ifdef _NEWTON_AMP
 	m_amp = new (GetAllocator()) dgAmpInstance(this);
@@ -337,14 +338,12 @@ dgWorld::~dgWorld()
 	m_pointCollision->Release();
 	DestroyBody (m_sentinelBody);
 
-
 	delete m_broadPhase;
 }
 
 void dgWorld::SetThreadsCount (dgInt32 count)
 {
 	dgThreadHive::SetThreadsCount(count);
-	dgThreadHive::SetPerfomanceCounter(m_getPerformanceCount);
 }
 
 dgUnsigned32 dgWorld::GetPerformanceCount ()
@@ -360,7 +359,6 @@ void dgWorld::AddSentinelBody()
 	m_sentinelBody = CreateDynamicBody(instance, dgGetIdentityMatrix());
 	instance->Release();
 	dgCollidingPairCollector::m_sentinel = m_sentinelBody;
-	m_broadPhase->Remove(m_sentinelBody);
 }
 
 dgBody* dgWorld::GetSentinelBody() const
@@ -511,7 +509,9 @@ void dgWorld::InitBody (dgBody* const body, dgCollisionInstance* const collision
 
 	body->SetMassMatrix (DG_INFINITE_MASS * dgFloat32 (2.0f), DG_INFINITE_MASS, DG_INFINITE_MASS, DG_INFINITE_MASS);
 	body->SetMatrix (matrix);
-	m_broadPhase->Add (body);
+	if (!body->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI)) {
+		m_broadPhase->Add (body);
+	}
 }
 
 void dgWorld::BodyEnableSimulation (dgBody* const body)
@@ -611,36 +611,6 @@ void dgWorld::DestroyConstraint(dgConstraint* const constraint)
 	RemoveConstraint (constraint);
 	delete constraint;
 }
-
-OnGetPerformanceCountCallback dgWorld::GetPerformaceFuntion() const
-{
-	return m_getPerformanceCount;
-};
-
-void dgWorld::SetPerfomanceCounter(OnGetPerformanceCountCallback callback)
-{
-	dgThreadHive::SetPerfomanceCounter (callback);
-
-	if (!callback) {
-		callback = GetPerformanceCount;
-	}
-	m_getPerformanceCount = callback;
-	memset (m_perfomanceCounters, 0, sizeof (m_perfomanceCounters));
-	memset (m_perfomanceCountersBack, 0, sizeof (m_perfomanceCountersBack));
-}
-
-
-dgUnsigned32 dgWorld::GetPerfomanceTicks (dgUnsigned32 entry) const
-{
-	entry = dgClamp(dgUnsigned32 (entry), dgUnsigned32 (0), dgUnsigned32 (m_counterSize - 1));
-	return m_perfomanceCountersBack[entry];
-}
-
-dgUnsigned32 dgWorld::GetThreadPerfomanceTicks (dgUnsigned32 threadIndex) const
-{
-	return dgThreadHive::GetPerfomanceTicks (threadIndex);
-}
-
 
 void dgWorld::ExecuteUserJob (dgWorkerThreadTaskCallback userJobKernel, void* const userJobKernelContext)
 {
@@ -982,10 +952,6 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	dgAssert (m_inUpdate == 0);
 //SerializeToFile ("xxx.bin");
 
-	dgThreadHive::ClearTimers();
-	memset (m_perfomanceCounters, 0, sizeof (m_perfomanceCounters));
-	dgUnsigned32 ticks = m_getPerformanceCount();
-
 	m_inUpdate ++;
 	dgAssert (GetThreadCount() >= 1);
 
@@ -993,16 +959,12 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	UpdateDynamics (timestep);
 
 	if (m_postListener.GetCount()) {
-		dgUnsigned32 ticks = m_getPerformanceCount();
 		for (dgListenerList::dgListNode* node = m_postListener.GetFirst(); node; node = node->GetNext()) {
 			dgListener& listener = node->GetInfo();
 			listener.m_onListenerUpdate (this, listener.m_userData, timestep);
 		}
-		m_perfomanceCounters[m_postUpdataListerTicks] = m_getPerformanceCount() - ticks;
 	}
-
 	m_inUpdate --;
-	m_perfomanceCounters[m_worldTicks] = m_getPerformanceCount() - ticks;
 }
 
 
@@ -1032,7 +994,6 @@ void dgWorld::TickCallback (dgInt32 threadID)
 {
 	if (threadID == DG_MUTEX_THREAD_ID) {
 		StepDynamics (m_savetimestep);
-		memcpy (m_perfomanceCountersBack, m_perfomanceCounters, sizeof (m_perfomanceCounters));
 	} else {
 		Update (m_savetimestep);
 	}
@@ -1364,4 +1325,37 @@ void dgWorld::DeserializeJointArray (const dgTree<dgBody*, dgInt32>&bodyMap, dgD
 	}
 
 	dgDeserializeMarker(serializeCallback, userData);
+}
+
+
+dgInt32 dgWorld::GetBroadPhaseType() const
+{
+	return dgInt32 (m_broadPhase->GetType());
+}
+
+void dgWorld::SetBroadPhaseType(dgInt32 type)
+{
+	if (type != GetBroadPhaseType()) {
+		delete m_broadPhase;
+		switch (type)
+		{
+			case m_persistentBroadphase:
+				m_broadPhase = new (m_allocator) dgBroadPhasePersistent(this);
+				break;
+
+			case m_defaultBroadphase:
+			default:
+				m_broadPhase = new (m_allocator) dgBroadPhaseDefault(this);
+				break;
+		}
+
+		const dgBodyMasterList* const masterList = this;
+		for (dgBodyMasterList::dgListNode* node = masterList->GetFirst(); node; node = node->GetNext()) {
+			dgBody* const body = node->GetInfo().GetBody();
+			dgAssert (!body->GetBroadPhase());
+			if (!body->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI)) {
+				m_broadPhase->Add(body);
+			}
+		}
+	}
 }

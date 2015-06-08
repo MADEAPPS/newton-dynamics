@@ -39,6 +39,7 @@ class dgDeformableBodiesUpdate: public dgList<dgCollisionDeformableMesh*>
     void SolveConstraintsAndIntegrate (dgFloat32 timestep);
 
 	dgTree <dgListNode*, const dgCollisionDeformableMesh*> m_dictionary;
+
     friend class dgBroadPhase;
     friend class dgWorldDynamicUpdate;
 };

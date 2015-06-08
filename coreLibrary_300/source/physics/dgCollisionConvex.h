@@ -168,9 +168,9 @@ class dgCollisionConvex: public dgCollision
 	static dgCollisionPriority m_priorityOrder;
 	
 	friend class dgWorld;
+	friend class dgBroadPhase;
 	friend class dgMinkowskiConv;
 	friend class dgCollisionCompound;
-	friend class dgBroadPhase;
 	friend class dgCollisionConvexModifier;
 } DG_GCC_VECTOR_ALIGMENT;
 

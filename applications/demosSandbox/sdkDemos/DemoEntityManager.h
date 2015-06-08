@@ -171,20 +171,18 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 //	DemoVisualDebugerListener* m_visualDebugger;
 
 	int m_showProfiler[10]; 
-	dRuntimeProfiler m_profiler;
+	//dRuntimeProfiler m_profiler;
 
 	dFloat m_mainThreadGraphicsTime;
 	dFloat m_mainThreadPhysicsTime;
-	dFloat m_physThreadTime;
-
-
+	//dFloat m_physThreadTime;
 
 	static int m_attributes[];
 
 	DECLARE_EVENT_TABLE()
 
 	friend class NewtonDemos;
-	friend class dRuntimeProfiler;
+	//friend class dRuntimeProfiler;
 	friend class DemoEntityListener;
 	friend class DemoListenerManager;
 

@@ -160,6 +160,12 @@
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect6.cpp">
       <Filter>meshUtil</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgBroadPhasePersistent.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgBroadPhaseDefault.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h">
@@ -302,6 +308,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundFractured.h">
       <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgBroadPhasePersistent.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgBroadPhaseDefault.h">
+      <Filter>systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

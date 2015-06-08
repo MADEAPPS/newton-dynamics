@@ -23,7 +23,6 @@
 #define _DG_BODY_H_
 
 #include "dgPhysicsStdafx.h"
-#include "dgBroadPhase.h"
 #include "dgBodyMasterList.h"
 
 class dgLink;
@@ -33,11 +32,25 @@ class dgCollision;
 class dgBroadPhaseNode;
 class dgCollisionInstance;
 
-
 #define DG_MINIMUM_MASS		dgFloat32(1.0e-3f)
 #define DG_INFINITE_MASS	dgFloat32(1.0e15f)
 
 #define OverlapTest(body0,body1) dgOverlapTest ((body0)->m_minAABB, (body0)->m_maxAABB, (body1)->m_minAABB, (body1)->m_maxAABB)
+
+typedef dgInt32(dgApi *OnBodiesInAABB) (dgBody* body, void* const userData);
+typedef dgUnsigned32(dgApi *OnRayPrecastAction) (const dgBody* const body, const dgCollisionInstance* const collision, void* const userData);
+typedef dgFloat32(dgApi *OnRayCastAction) (const dgBody* const body, const dgCollisionInstance* const collision, const dgVector& contact, const dgVector& normal, dgInt64 collisionID, void* const userData, dgFloat32 intersetParam);
+
+
+DG_MSC_VECTOR_ALIGMENT
+struct dgLineBox
+{
+	dgVector m_l0;
+	dgVector m_l1;
+	dgVector m_boxL0;
+	dgVector m_boxL1;
+} DG_GCC_VECTOR_ALIGMENT;
+
 
 //DG_MSC_VECTOR_ALIGMENT
 DG_MSC_VECTOR_ALIGMENT
@@ -63,9 +76,7 @@ class dgBody
 		m_deformableBody,
 	};
 
-
 	DG_CLASS_ALLOCATOR(allocator)
-
 
 	dgBody();
 	dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber);
@@ -78,11 +89,9 @@ class dgBody
 	void SetUserData (void* const userData);
 	dgWorld* GetWorld() const;
 
-
 	const dgMatrix& GetMatrix() const;
 	const dgQuaternion& GetRotation() const;
 	const dgVector& GetPosition() const;
-	
 
 	void SetCentreOfMass (const dgVector& com);
 	const dgVector& GetCentreOfMass () const;
@@ -129,6 +138,7 @@ class dgBody
 
 	dgVector GetMass() const;
 	dgVector GetInvMass() const;
+	void SetInvMass(const dgVector& invMass);
 	const dgMatrix& GetInertiaMatrix () const;
 
 	virtual dgMatrix CalculateInertiaMatrix () const;
@@ -156,7 +166,6 @@ class dgBody
 
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const = 0;
-
 
 	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit);
 	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse);
@@ -186,6 +195,9 @@ class dgBody
 	virtual dgVector CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const;
 
     void SetMatrixOriginAndRotation(const dgMatrix& matrix);
+
+	void SetBroadPhase (dgBroadPhaseNode* const node);
+	dgBroadPhaseNode* GetBroadPhase () const;
 
 	protected:
 	void UpdateWorlCollisionMatrix() const;
@@ -244,7 +256,7 @@ class dgBody
 	void* m_userData;
 	dgWorld* m_world;
 	dgCollisionInstance* m_collision;
-	dgBroadPhase::dgNode* m_collisionCell;
+	dgBroadPhaseNode* m_broadPhaseNode;
 	dgBodyMasterList::dgListNode* m_masterNode;
 	
 	OnBodyDestroy m_destructor;
@@ -280,11 +292,14 @@ DG_INLINE const dgMatrix& dgBody::GetInertiaMatrix () const
 	return m_invWorldInertiaMatrix;
 }
 
-
-
 DG_INLINE dgVector dgBody::GetInvMass() const
 {
 	return m_invMass;
+}
+
+DG_INLINE void dgBody::SetInvMass(const dgVector& invMass)
+{
+	m_invMass = invMass;
 }
 
 DG_INLINE dgVector dgBody::GetMass() const
@@ -538,7 +553,6 @@ DG_INLINE const dgVector& dgBody::GetNetTorque() const
 	return m_netTorque;
 }
 
-
 DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 {
 	dgAssert (m_invWorldInertiaMatrix[0][3] == dgFloat32 (0.0f));
@@ -552,6 +566,16 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
 	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
 	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
+}
+
+DG_INLINE void dgBody::SetBroadPhase(dgBroadPhaseNode* const node)
+{
+	m_broadPhaseNode = node;
+}
+
+DG_INLINE dgBroadPhaseNode* dgBody::GetBroadPhase() const
+{
+	return m_broadPhaseNode;
 }
 
 

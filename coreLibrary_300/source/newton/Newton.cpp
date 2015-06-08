@@ -207,21 +207,16 @@ void NewtonDestroy(const NewtonWorld* const newtonWorld)
 
 int NewtonGetBroadphaseAlgorithm (const NewtonWorld* const newtonWorld)
 {
-//  this is deprecated
-
-//	TRACE_FUNCTION(__FUNCTION__);
-//	Newton* const world = (Newton *) newtonWorld;
-//	return world->GetBroadPhase()->GetBroadPhaseType();
-	return 0;
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	return world->GetBroadPhaseType();
 }
 
 void NewtonSelectBroadphaseAlgorithm (const NewtonWorld* const newtonWorld, int algorithmType)
 {
-//  this is deprecated
-
-//	TRACE_FUNCTION(__FUNCTION__);
-//	Newton* const world = (Newton *) newtonWorld;
-//	world->GetBroadPhase()->SelectBroadPhaseType(algorithmType);
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	world->SetBroadPhaseType(algorithmType);
 }
 
 
@@ -641,69 +636,33 @@ void NewtonSetFrictionModel(const NewtonWorld* const newtonWorld, int model)
 	world->SetFrictionMode (model);
 }
 
-
-// Name: NewtonSetPerformanceClock
-// Set performance Counter callback.
-//
-// Parameters:
-// *const NewtonWorld* *newtonWorld - is the pointer to the Newton world
-// *NewtonGetTicksCountCallback* callback - application define callback 
-// 
-// Remarks: The application can use this function to profile Newton. *NewtonGetTicksCountCallback* callback is a 
-// function call back that should return and absolute time since the the application started.
-//
-// Return: Nothing.
-//
-// See also: NewtonReadPerformanceTicks
+/*
 void NewtonSetPerformanceClock(const NewtonWorld* const newtonWorld, NewtonGetTicksCountCallback callback)
 {
-	Newton* const world = (Newton *)newtonWorld;
-
 	TRACE_FUNCTION(__FUNCTION__);
-	world->SetPerfomanceCounter ((OnGetPerformanceCountCallback) callback);
+	dgAssert (0);
+	//Newton* const world = (Newton *)newtonWorld;
+	//world->SetPerfomanceCounter ((OnGetPerformanceCountCallback) callback);
 }
 
-
-// Name: NewtonReadPerformanceTicks
-// Get the number of ticks used by the engine in one of the major components
-//
-// Parameters:
-// *const NewtonWorld* *newtonWorld - is the pointer to the Newton world
-// *unsigned* performanceEntry - index to one of the engine internal components.
-//
-// Remarks: there are 9 hierarchical counters
-//
-// NEWTON_PROFILER_WORLD_UPDATE: measure total ticks in each update call
-// NEWTON_PROFILER_COLLISION_UPDATE: total ticks in each collision and contact calculation
-// NEWTON_PROFILER_COLLISION_UPDATE_BROAD_PHASE: measure ticks on colliding pairs.	
-// NEWTON_PROFILER_COLLISION_UPDATE_NARROW_PHASE: measure ticks calculating contacts for each colliding pair.	
-// NEWTON_PROFILER_DYNAMICS_UPDATE: measure ticks on solving constraints, contact inter penetration, and integration 					
-// NEWTON_PROFILER_DYNAMICS_CONSTRAINT_GRAPH: measure ticks solving contacts and constraint graph interconnectivity. 
-// NEWTON_PROFILER_DYNAMICS_BUILD_MASS_MATRIX: measure ticks solving preparing constraint matrix 		
-// NEWTON_PROFILER_DYNAMICS_SOLVE_CONSTRAINT_GRAPH: measure tick solving constraint matrix and calculating reaction forces and integration.
-//
-// Remarks: This function will return zero unless the application had previous 
-// set a performance counter callback by calling the function *NewtonSetPerformanceClock*
-//
-// Return: Ticks count used by application in lass call to *NewtonUpdate*
-//
-// See also: NewtonReadPerformanceTicks, NewtonUpdate
 unsigned NewtonReadPerformanceTicks(const NewtonWorld* const newtonWorld, unsigned performanceEntry)
 {
-	Newton* const world = (Newton *)newtonWorld;
-
 	TRACE_FUNCTION(__FUNCTION__);
-	return world->GetPerfomanceTicks (performanceEntry);
+	dgAssert (0);
+	return 0;
+//	Newton* const world = (Newton *)newtonWorld;
+//	return world->GetPerfomanceTicks (performanceEntry);
 }
 
 unsigned NewtonReadThreadPerformanceTicks (const NewtonWorld* newtonWorld, unsigned threadIndex)
 {
-	Newton* const world = (Newton *)newtonWorld;
-
 	TRACE_FUNCTION(__FUNCTION__);
-	return world->GetThreadPerfomanceTicks (threadIndex);
+	dgAssert(0);
+	return 0;
+	//Newton* const world = (Newton *)newtonWorld;
+	//return world->GetThreadPerfomanceTicks (threadIndex);
 }
-
+*/
 
 // Name: NewtonUpdate 
 // Advance the simulation by an amount of time.
