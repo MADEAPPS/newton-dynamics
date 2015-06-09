@@ -195,7 +195,7 @@ class dgBroadPhase
 	class dgFitnessList: public dgList <dgBroadPhaseNode*>
 	{
 		public:
-		dgFitnessList::dgFitnessList(dgMemoryAllocator* const allocator)
+		dgFitnessList(dgMemoryAllocator* const allocator)
 			:dgList <dgBroadPhaseNode*>(allocator)
 		{
 		}

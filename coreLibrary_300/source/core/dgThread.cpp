@@ -60,7 +60,7 @@ bool dgThread::StillBusy() const
 
 dgThread::dgSemaphore::dgSemaphore ()
 {
-	m_sem = NULL;
+	m_sem = 0;
 }
 
 dgThread::dgSemaphore::~dgSemaphore ()
