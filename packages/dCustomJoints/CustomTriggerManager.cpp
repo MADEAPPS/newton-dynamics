@@ -54,7 +54,7 @@ void CustomTriggerManager::OnDestroyBody (NewtonBody* const body)
 		dTree<NewtonBody*,NewtonBody*>& manifest = controller.m_manifest;
 		dTree<NewtonBody*,NewtonBody*>::dTreeNode* const passengerNode = manifest.Find (body);
 		if (passengerNode) {
-			EventCallback (&controller, m_exitTrigger, body);
+			//EventCallback (&controller, m_exitTrigger, body);
 
 			CustomScopeLock lock (&m_lock);
 			manifest.Remove (passengerNode);
