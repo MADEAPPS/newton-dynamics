@@ -33,21 +33,11 @@ class dgPolygonMeshDesc;
 class dgCollisionConvexHull;
 class dgPolygonSoupRayHitDesc;
 
-
-
-
-
-
-//typedef dgInt32 (*dgCollisionCompoundBreakableCallback) (dgMeshEffect* const solid, void* userData, dgMatrix& planeMatrixOut);
-
-
 #ifdef _DEBUG
 //	#define DG_DEBUG_AABB
 #endif
 
 #define PREFILTER_RAYCAST(filter,body,collision,userData) (filter && !filter(body,collision,userData)) 
-
-
 
 enum dgCollisionID
 {

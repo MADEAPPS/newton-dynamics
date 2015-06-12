@@ -1018,7 +1018,6 @@ void dgWorld::Update (dgFloat32 timestep)
 
 		// run update in same thread as the calling application as if it was a separate thread  
 		StepDynamics (m_savetimestep);
-		memcpy (m_perfomanceCountersBack, m_perfomanceCounters, sizeof (m_perfomanceCounters));
 	#else 
 		// runs the update in a separate thread and wait until the update is completed before it returns.
 		// this will run well on single core systems, since the two thread are mutually exclusive 
@@ -1033,7 +1032,6 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 
 	#ifdef DG_USE_THREAD_EMULATION
 		StepDynamics (m_savetimestep);
-		memcpy (m_perfomanceCountersBack, m_perfomanceCounters, sizeof (m_perfomanceCounters));
 	#else 
 		// execute one update, but do not wait for the update to finish, instead return immediately to the caller
 		dgAsyncThread::Tick();
