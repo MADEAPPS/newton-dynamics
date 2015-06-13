@@ -22,6 +22,10 @@ static dCRCTYPE frictionCRC (dCRC64 (FRICTION_VAR_NAME));
 
 static int UserOnAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 {
+static int xxx;
+xxx ++;
+if ((xxx>200) && xxx % 7 == 0)
+return 0;
 	return 1;
 }
 
