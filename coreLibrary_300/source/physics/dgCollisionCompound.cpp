@@ -1502,7 +1502,7 @@ void dgCollisionCompound::ImproveNodeFitness (dgNodeBase* const node) const
 
 
 
-dgInt32 dgCollisionCompound::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+dgInt32 dgCollisionCompound::CalculateContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgInt32 contactCount = 0;
 	if (m_root) {
@@ -1724,7 +1724,7 @@ dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& p
 
 
 
-dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContactPoint* const contacts = proxy.m_contacts;
 	const dgNodeBase* stackPool[4 * DG_COMPOUND_STACK_DEPTH][2];
@@ -1873,7 +1873,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgCollidingPairCollect
 
 
 
-dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContactPoint* const contacts = proxy.m_contacts;
 
@@ -1979,7 +1979,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgCollidingPairColl
 }
 
 
-dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContactPoint* const contacts = proxy.m_contacts;
 
@@ -2080,7 +2080,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgCollidingP
 }
 
 
-dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContactPoint* const contacts = proxy.m_contacts;
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
@@ -2179,7 +2179,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgCollidingPairCollector
 
 
 
-dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContactPoint* const contacts = proxy.m_contacts;
 
@@ -2412,7 +2412,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgCollidingPairCo
 
 
 
-dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	if (proxy.m_timestep < dgFloat32 (1.0e-4f)) {
 		return 0;
@@ -2541,7 +2541,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgCollidingPairCo
 
 
 
-dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	if (proxy.m_timestep < dgFloat32 (1.0e-4f)) {
 		return 0;
@@ -2727,7 +2727,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgCollidingPair
 
 
 
-dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	if (proxy.m_timestep < dgFloat32 (1.0e-4f)) {
 		return 0;

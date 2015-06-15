@@ -846,25 +846,27 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 
 DG_INLINE void dgThreadYield()
 {
-#if defined (DG_USE_THREAD_EMULATION)
-	return;
-#else
+	#ifndef DG_USE_THREAD_EMULATION
 	sched_yield();
 #endif
 }
 
 DG_INLINE void dgSpinLock (dgInt32* const ptr, bool yield)
 {
+	#ifndef DG_USE_THREAD_EMULATION 
 	while (dgInterlockedExchange(ptr, 1)) {
 		if (yield) {
 			dgThreadYield();
 		}
 	}
+	#endif
 }
 
 DG_INLINE void dgSpinUnlock (dgInt32* const ptr)
 {
+	#ifndef DG_USE_THREAD_EMULATION 
 	dgInterlockedExchange(ptr, 0);
+	#endif
 }
 
 DG_INLINE void dgPrefetchMem(const void* const mem)

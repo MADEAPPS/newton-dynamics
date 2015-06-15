@@ -839,10 +839,9 @@ void dgAmpInstance::InitializeBodyArrayParallelKernel (void* const context, void
 }
 
 
-
+/*
 void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const syncData, const dgIsland* const islandArray, dgInt32 islanCount)
 {
-/*
 	dgBodyInfo* const bodyArray = (dgBodyInfo*) &m_world->m_bodiesMemory[0]; 
 	dgJointInfo* const constraintArray = (dgJointInfo*) &m_world->m_jointsMemory[0];
 	dgParallelJointMap* const jointInfoMap = syncData->m_jointInfoMap;
@@ -951,9 +950,8 @@ void dgAmpInstance::CreateParallelArrayBatchArrays (dgParallelSolverSyncData* co
 		index --;
 	}
 	syncData->m_batchesCount = bash;
-*/
 }
-
+*/
 
 void dgAmpInstance::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData)
 {

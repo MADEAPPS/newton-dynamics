@@ -898,7 +898,7 @@ const dgInt32* dgCollisionDeformableMesh::GetSegmentIndexList (void* const segme
 }
 
 
-dgInt32 dgCollisionDeformableMesh::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy)
+dgInt32 dgCollisionDeformableMesh::CalculateContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy)
 {
 //dgAssert (0);
 return 0;

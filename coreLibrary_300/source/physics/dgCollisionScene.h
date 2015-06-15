@@ -36,8 +36,8 @@ class dgCollisionScene: public dgCollisionCompound
 	dgCollisionScene(dgWorld* const world, dgDeserialize deserialization, void* const userData, const dgCollisionInstance* const myInstance, dgInt32 revisionNumber);
 	virtual ~dgCollisionScene();
 
-	void CollidePair (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	void CollideCompoundPair (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	void CollidePair (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	void CollideCompoundPair (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	virtual void MassProperties ();
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 

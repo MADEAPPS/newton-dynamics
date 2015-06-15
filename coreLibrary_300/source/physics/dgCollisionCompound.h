@@ -184,16 +184,16 @@ class dgCollisionCompound: public dgCollision
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
-	virtual dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	virtual dgInt32 CalculateContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
-	dgInt32 CalculateContactsToSingle (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	dgInt32 CalculateContactsToSingleContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	dgInt32 CalculateContactsToCompound (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	dgInt32 CalculateContactsToCompoundContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	dgInt32 CalculateContactsToCollisionTree (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	dgInt32 CalculateContactsToCollisionTreeContinue (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	dgInt32 CalculateContactsToHeightField (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	dgInt32 CalculateContactsUserDefinedCollision (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContactsToSingle (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContactsToSingleContinue (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContactsToCompound (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContactsToCompoundContinue (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContactsToCollisionTree (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContactsToCollisionTreeContinue (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContactsToHeightField (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContactsUserDefinedCollision (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
 	dgFloat32 ConvexRayCastSingleConvex (const dgCollisionInstance* const convexInstance, const dgMatrix& instanceMatrix, const dgVector& instanceVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const; 
 

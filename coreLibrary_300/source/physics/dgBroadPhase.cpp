@@ -213,7 +213,7 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
-	while (node) {
+	while (node && (node->GetInfo().GetBody()->GetExtForceAndTorqueCallback() != NULL)) {
 		dgBody* const body = node->GetInfo().GetBody();
 
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
@@ -234,8 +234,7 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 
 			dynamicBody->m_prevExternalForce = dynamicBody->m_accel;
 			dynamicBody->m_prevExternalTorque = dynamicBody->m_alpha;
-		}
-		else {
+		} else {
 			dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
 
 			if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
@@ -246,8 +245,7 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 			if (body->IsCollidable()) {
 				body->m_sleeping = false;
 				body->m_autoSleep = false;
-			}
-			else {
+			} else {
 				body->m_sleeping = true;
 				body->m_autoSleep = true;
 			}
@@ -258,7 +256,7 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 		}
 
 		for (dgInt32 i = 0; i < threadCount; i++) {
-			node = node ? node->GetNext() : NULL;
+			node = node ? node->GetPrev() : NULL;
 		}
 	}
 }
@@ -325,8 +323,7 @@ void dgBroadPhase::ConvexRayCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 						maxParam = param;
 					}
 				}
-			}
-			else {
+			} else {
 				const dgBroadPhaseNode* const left = me->m_left;
 				dgAssert(left);
 				dgVector minBox(left->m_minBox - boxP1);
@@ -503,8 +500,7 @@ void dgBroadPhase::RayCast(const dgBroadPhaseNode** stackPool, dgFloat32* const 
 						break;
 					}
 				}
-			}
-			else {
+			} else {
 				const dgBroadPhaseNode* const left = me->m_left;
 				dgAssert(left);
 				dgFloat32 dist = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
@@ -947,6 +943,70 @@ bool dgBroadPhase::ValidateContactCache(dgContact* const contact, dgFloat32 time
 }
 
 
+void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgFloat32 timestep, dgInt32 threadID)
+{
+    dgContactPoint contacts[DG_MAX_CONTATCS];
+
+	pair->m_cacheIsValid = false;
+	pair->m_contactBuffer = contacts;
+	m_world->CalculateContacts(pair, timestep, threadID, false, false);
+
+	if (pair->m_contactCount) {
+		dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
+		if (pair->m_isDeformable) {
+			m_world->ProcessDeformableContacts(pair, timestep, threadID);
+		} else {
+			m_world->ProcessContacts(pair, timestep, threadID);
+			KinematicBodyActivation(pair->m_contact);
+		}
+	} else {
+		if (pair->m_cacheIsValid) {
+			//m_world->ProcessCachedContacts (pair->m_contact, timestep, threadID);
+			KinematicBodyActivation(pair->m_contact);
+		} else {
+			pair->m_contact->m_maxDOF = 0;
+		}
+	}
+}
+
+void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex)
+{
+	dgWorld* const world = (dgWorld*) m_world;
+	dgBody* const body0 = contact->m_body0;
+	dgBody* const body1 = contact->m_body1;
+
+	dgAssert (body0 != m_world->m_sentinelBody);
+	dgAssert (body1 != m_world->m_sentinelBody);
+	dgAssert (contact->GetId() == dgConstraint::m_contactConstraint);
+	dgAssert (body0->GetWorld());
+	dgAssert (body1->GetWorld());
+	dgAssert (body0->GetWorld() == world);
+	dgAssert (body1->GetWorld() == world);
+	if (!(body0->m_collideWithLinkedBodies & body1->m_collideWithLinkedBodies)) {
+		if (world->AreBodyConnectedByJoints (body0, body1)) {
+			return;
+		}
+	}
+
+	const dgContactMaterial* const material = contact->m_material;
+	if (material->m_flags & dgContactMaterial::m_collisionEnable) {
+		dgInt32 processContacts = 1;
+		if (material->m_aabbOverlap) {
+			processContacts = material->m_aabbOverlap (*material, *body0, *body1, threadIndex);
+		}
+		if (processContacts) {
+            dgPair pair;
+			dgAssert (!body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
+			dgAssert (!body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
+
+			pair.m_contact = contact;
+			pair.m_isDeformable = 0;
+            CalculatePairContacts (&pair, timestep, threadIndex);
+		}
+	}
+}
+
+
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
 	if (TestOverlaping (body0, body1, timestep)) {
@@ -968,11 +1028,10 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 					// It does not have to set the value because it should be the same ar previous update.
 					//contact->m_contactActive = (contact->m_closestDistance < dgFloat32 (0.0f)) ? true : false;
 				} else {
-					dgCollidingPairCollector* const contactPairs = m_world;
 					contact->m_contactActive = 0;
 					contact->m_positAcc = dgVector::m_zero;
 					contact->m_rotationAcc = dgQuaternion();
-					contactPairs->AddPair(contact, threadID);
+					AddPair(contact, timestep, threadID);
 				}
 
 			} else {
@@ -1004,8 +1063,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 						contact->m_contactActive = 0;
 						contact->m_broadphaseLru = m_lru;
 						contact->m_timeOfImpact = dgFloat32 (1.0e10f);
-						dgCollidingPairCollector* const contactPairs = m_world;
-						contactPairs->AddPair(contact, threadID);
+						AddPair(contact, timestep, threadID);
 					}
 				}
 			}
@@ -1155,39 +1213,6 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 }
 
 
-void dgBroadPhase::CalculatePairContacts(dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
-{
-	dgContactPoint contacts[DG_MAX_CONTATCS];
-
-	dgFloat32 timestep = descriptor->m_timestep;
-	dgCollidingPairCollector* const pairCollector = m_world;
-	const dgInt32 count = pairCollector->m_count;
-	dgCollidingPairCollector::dgPair* const pairs = (dgCollidingPairCollector::dgPair*) &m_world->m_pairMemoryBuffer[0];
-
-	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1)) {
-		dgCollidingPairCollector::dgPair* const pair = &pairs[i];
-		pair->m_cacheIsValid = false;
-		pair->m_contactBuffer = contacts;
-		m_world->CalculateContacts(pair, timestep, threadID, false, false);
-
-		if (pair->m_contactCount) {
-			dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
-			if (pair->m_isDeformable) {
-				m_world->ProcessDeformableContacts(pair, timestep, threadID);
-			} else {
-				m_world->ProcessContacts(pair, timestep, threadID);
-				KinematicBodyActivation(pair->m_contact);
-			}
-		} else {
-			if (pair->m_cacheIsValid) {
-				//m_world->ProcessCachedContacts (pair->m_contact, timestep, threadID);
-				KinematicBodyActivation(pair->m_contact);
-			} else {
-				pair->m_contact->m_maxDOF = 0;
-			}
-		}
-	}
-}
 
 void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, dgInt32 threadID)
 {
@@ -1197,13 +1222,6 @@ void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, d
 	broadPhase->FindCollidingPairs(descriptor, (dgBodyMasterList::dgListNode*) node, threadID);
 }
 
-void dgBroadPhase::UpdateContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
-	dgWorld* const world = (dgWorld*) worldContext;
-	dgBroadPhase* const broadPhase = world->GetBroadPhase();
-	broadPhase->CalculatePairContacts (descriptor, threadID);
-}
 
 void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
@@ -1220,7 +1238,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 	dgUnsigned32 lru = m_lru;
 
 	dgActiveContacts* const contactList = m_world;
-	dgContact** const deadContacs = (dgContact**) &m_world->m_pairMemoryBuffer[0];
+    dgContact** const deadContacs = (dgContact**) alloca ((contactList->GetCount() + 256) * sizeof (dgContact*));
 
 	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
 		dgContact* const contact = contactNode->GetInfo();
@@ -1264,9 +1282,6 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
-	dgCollidingPairCollector* const contactPairs = m_world;
-
-	contactPairs->Init();
 	m_lru = m_lru + 1;
 
 	m_recursiveChunks = true;
@@ -1275,10 +1290,10 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	const dgBodyMasterList* const masterList = m_world;
 	dgBroadphaseSyncDescriptor syncPoints(timestep, m_world);
 
-	dgBodyMasterList::dgListNode* node = masterList->GetFirst()->GetNext();
+	dgBodyMasterList::dgListNode* node = masterList->GetLast();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(ForceAndToqueKernel, &syncPoints, node);
-		node = node ? node->GetNext() : NULL;
+		node = node ? node->GetPrev() : NULL;
 	}
 	m_world->SynchronizationBarrier();
 
@@ -1292,13 +1307,11 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 	UpdateFitness();
 	ScanForContactJoints (syncPoints);
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(UpdateContactsKernel, &syncPoints, m_world);
-	}
-	m_world->SynchronizationBarrier();
 
 	m_recursiveChunks = false;
 	if (m_generatedBodies.GetCount()) {
+        dgAssert (0);
+    /*
 		syncPoints.m_newBodiesNodes = m_generatedBodies.GetFirst();
 		for (dgInt32 i = 0; i < threadsCount; i++) {
 			m_world->QueueJob(AddGeneratedBodiesContactsKernel, &syncPoints, m_world);
@@ -1311,6 +1324,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		m_world->SynchronizationBarrier();
 
 		m_generatedBodies.RemoveAll();
+*/
 	}
 
 	UpdateContactsBroadPhaseEnd();

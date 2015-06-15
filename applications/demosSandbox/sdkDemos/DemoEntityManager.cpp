@@ -184,7 +184,7 @@ void DemoEntityManager::Cleanup ()
 
 	// set the default parameters for the newton world
 	// set the simplified solver mode (faster but less accurate)
-	NewtonSetSolverModel (m_world, 1);
+	NewtonSetSolverModel (m_world, 4);
 
 	// newton 300 does not have world size, this is better controlled by the client application
 	//dVector minSize (-500.0f, -500.0f, -500.0f);

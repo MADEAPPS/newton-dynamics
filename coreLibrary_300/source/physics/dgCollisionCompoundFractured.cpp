@@ -1258,7 +1258,7 @@ void dgCollisionCompoundFractured::CalcAABB (const dgMatrix& matrix, dgVector& p
 }
 
 
-dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgBroadPhase* const broaphaPhase = m_world->GetBroadPhase();
 	dgInt32 count = dgCollisionCompound::CalculateContacts (pair, proxy);

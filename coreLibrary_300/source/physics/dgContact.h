@@ -48,33 +48,6 @@ class dgActiveContacts: public dgList<dgContact*>
 	}
 };
 
-class dgCollidingPairCollector
-{
-	public: 
-	class dgPair 
-	{
-		public:
-		dgContact* m_contact;
-		dgContactPoint* m_contactBuffer;
-		dgFloat32 m_timeOfImpact;
-		dgInt32 m_contactCount				: 16;
-		dgInt32 m_isDeformable				: 1;
-		dgInt32 m_cacheIsValid				: 1;
-	};
-
-
-	dgCollidingPairCollector ();
-	~dgCollidingPairCollector ();
-
-	void Init ();
-	void AddPair (dgContact* const contatJoint, dgInt32 threadIndex);
-	
-	dgInt32 m_count;
-	dgInt32 m_maxSize;
-	dgBody* m_sentinel;
-	dgThread::dgCriticalSection m_lock;
-};
-
 
 DG_MSC_VECTOR_ALIGMENT
 class dgContactPoint 

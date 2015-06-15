@@ -201,7 +201,7 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
-	dgInt32 CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	dgInt32 CalculateContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
 	void ColorDisjoinChunksIsland ();
 	bool SpawnChunks (dgBody* const myBody, const dgCollisionInstance* const myInstance, dgConectivityGraph::dgListNode* const rootNode, dgFloat32 impulseStimate2, dgFloat32 impulseStimateCut2);

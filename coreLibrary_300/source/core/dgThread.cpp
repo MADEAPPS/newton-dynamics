@@ -71,20 +71,12 @@ void dgThread::dgSemaphore::Release ()
 {
 }
 
-dgThread::dgCriticalSection::dgCriticalSection()
-{
-}
-
-dgThread::dgCriticalSection::~dgCriticalSection()
-{
-}
-
 
 dgThread::~dgThread ()
 {
 }
 
-void dgThread::Init (int stacksize)
+void dgThread::Init (dgInt32  stacksize)
 {
 }
 
@@ -168,29 +160,13 @@ void dgThread::dgSemaphore::Wait()
 	#endif
 }
 
-dgThread::dgCriticalSection::dgCriticalSection()
-	#ifdef DG_USE_MUTEX_CRITICAL_SECTION
-		:m_mutex (PTHREAD_MUTEX_INITIALIZER)
-	#else 
-		:m_mutex(0)
-	#endif
-{
-}
-
-dgThread::dgCriticalSection::~dgCriticalSection()
-{
-	#ifdef DG_USE_MUTEX_CRITICAL_SECTION
-		pthread_mutex_destroy(&m_mutex);
-	#endif
-};
-
 
 
 dgThread::~dgThread ()
 {
 }
 
-void dgThread::Init (int stacksize)
+void dgThread::Init (dgInt32  stacksize)
 {
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);

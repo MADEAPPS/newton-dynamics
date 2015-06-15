@@ -573,7 +573,7 @@ void dgBroadPhasePersistent::FindCollidingPairs(dgBroadphaseSyncDescriptor* cons
 		if (broadPhaseNode) {
 			for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
 				dgBroadPhaseNode* const sibling = ptr->m_parent->m_right;
-				if (sibling != ptr) {
+				if (sibling && (sibling != ptr)) {
 					SubmitPairs(broadPhaseNode, sibling, timestep, threadID);
 				}
 			}

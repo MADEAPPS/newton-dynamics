@@ -69,7 +69,7 @@ void dgCollisionScene::MassProperties ()
 	m_crossInertia = dgVector (dgFloat32 (0.0f));
 }
 
-void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 
@@ -229,7 +229,7 @@ void dgCollisionScene::CollidePair (dgCollidingPairCollector::dgPair* const pair
 }
 
 
-void dgCollisionScene::CollideCompoundPair (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	const dgNodeBase* stackPool[4 * DG_COMPOUND_STACK_DEPTH][2];
 

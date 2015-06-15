@@ -26,8 +26,6 @@
 // define DG_USE_THREAD_EMULATION on the command line for platform that do not support hardware multi threading or if multi threading is not stable 
 //#define DG_USE_THREAD_EMULATION
 
-//
-//#define DG_USE_MUTEX_CRITICAL_SECTION
 
 class dgThread
 {
@@ -41,11 +39,7 @@ public:
 		void Unlock();
 
 		private:
-		#if (defined (DG_USE_THREAD_EMULATION) || !defined (DG_USE_MUTEX_CRITICAL_SECTION))
-			dgInt32 m_mutex;
-		#else 
-			pthread_mutex_t  m_mutex;
-		#endif
+		dgInt32 m_lock;
 	};
 
 	class dgSemaphore
@@ -84,8 +78,8 @@ public:
 	void SetPriority(int priority);
 
 	protected:
-	void Init (int stacksize = 0);
-	void Init (const char* const name, dgInt32 id, int stacksize);
+	void Init (dgInt32 stacksize = 0);
+	void Init (const char* const name, dgInt32 id, dgInt32 stacksize);
 	void Close ();
 
 	static void* dgThreadSystemCallback(void* threadData);
@@ -99,25 +93,28 @@ public:
 };
 
 
+DG_INLINE dgThread::dgCriticalSection::dgCriticalSection()
+	:m_lock(0)
+{
+}
+
+DG_INLINE dgThread::dgCriticalSection::~dgCriticalSection()
+{
+};
+
+
+
 DG_INLINE void dgThread::dgCriticalSection::Lock(bool yield)
 {
 	#ifndef DG_USE_THREAD_EMULATION 
-		#ifdef DG_USE_MUTEX_CRITICAL_SECTION
-			pthread_mutex_lock(&m_mutex);
-		#else 
-			dgSpinLock (&m_mutex, yield);
-		#endif
+		dgSpinLock (&m_lock, yield);
 	#endif
 }
 
 DG_INLINE void dgThread::dgCriticalSection::Unlock()
 {
 	#ifndef DG_USE_THREAD_EMULATION 
-		#ifdef DG_USE_MUTEX_CRITICAL_SECTION
-			pthread_mutex_unlock(&m_mutex);
-		#else 
-			dgSpinUnlock (&m_mutex);
-		#endif
+		dgSpinUnlock (&m_lock);
 	#endif
 }
 

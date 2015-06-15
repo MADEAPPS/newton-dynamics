@@ -110,7 +110,6 @@ class dgWorld
 	,public dgBodyCollisionList
 	,public dgDeformableBodiesUpdate
 	,public dgActiveContacts 
-	,public dgCollidingPairCollector
 	,public dgWorldDynamicUpdate
 	,public dgMutexThread
 	,public dgAsyncThread
@@ -226,10 +225,6 @@ class dgWorld
 
 
 	void SetFrictionThreshold (dgFloat32 acceletion);
-
-
-	dgBody* GetIslandBody (const void* const island, dgInt32 index) const;
-
 
 	void* GetListenerUserData (void* const listener) const;
 	void* FindPreListener (const char* const nameid) const;
@@ -350,12 +345,12 @@ class dgWorld
 	
 	private:
 	
-	void CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
+	void CalculateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
 	dgInt32 PruneContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;
 	dgInt32 ReduceContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount, dgFloat32 tol, dgInt32 arrayIsSorted = 0) const;
 	
 //	dgInt32 CalculateHullToHullContacts (dgCollisionParamProxy& proxy) const;
-//	void PopulateContacts (dgContact* const contact, dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);	
+//	void PopulateContacts (dgContact* const contact, dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);	
 //	dgInt32 CalculateConicConvexToHullContacts (dgCollisionParamProxy& proxy) const;
 //	dgInt32 CalculateConvexToConvexContinuesContacts (dgFloat32& timestep, dgBody* body1, dgBody* body2, dgContactPoint contactOut[]) const; 
 //	dgInt32 CalculateConvexToConvexContinuesContacts (dgCollisionParamProxy& proxy) const; 
@@ -376,17 +371,17 @@ class dgWorld
 
 	//dgInt32 FilterPolygonDuplicateContacts (dgInt32 count, dgContactPoint* const contact) const;
 	
-	void PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);	
-	void ProcessContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);
-	void ProcessDeformableContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);
+	void PopulateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);	
+	void ProcessContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);
+	void ProcessDeformableContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);
 	void ProcessCachedContacts (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex) const;
 
-	void ConvexContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	void CompoundContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	void DeformableContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	void ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	void CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	void DeformableContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
-	void SceneContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	void SceneChildContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	void SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
+	void SceneChildContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
 	dgFloat32 CalculateTimeToImpact (dgContact* const contactJoint, dgFloat32 timestep, dgInt32 threadIndex, dgVector& p, dgVector& q, dgVector& normal) const;
 	dgInt32 ClosestPoint (dgCollisionParamProxy& proxy) const;
@@ -449,10 +444,8 @@ class dgWorld
 	dgListenerList m_preListener;
 	dgListenerList m_postListener;
 	dgTree<void*, unsigned> m_perInstanceData;
-	dgArray<dgUnsigned8> m_islandMemory; 
 	dgArray<dgUnsigned8> m_bodiesMemory; 
 	dgArray<dgUnsigned8> m_jointsMemory; 
-	dgArray<dgUnsigned8> m_pairMemoryBuffer;
 	dgArray<dgUnsigned8> m_solverMatrixMemory;  
 	dgArray<dgUnsigned8> m_solverRightSideMemory;
 	

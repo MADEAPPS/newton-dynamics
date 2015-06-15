@@ -529,7 +529,7 @@ bool dgWorld::IntersectionTest (const dgCollisionInstance* const collisionSrcA, 
 	dgContact contactJoint (this, &material);
 	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
-	dgCollidingPairCollector::dgPair pair;
+	dgBroadPhase::dgPair pair;
 	pair.m_contactCount = 0;
 	pair.m_contact = &contactJoint;
 	pair.m_contactBuffer = NULL; 
@@ -724,7 +724,7 @@ void dgWorld::ProcessCachedContacts (dgContact* const contact, dgFloat32 timeste
 }
 
 
-void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
+void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
 {
 	dgContact* const contact = pair->m_contact;
 	dgBody* const body0 = contact->m_body0;
@@ -943,7 +943,7 @@ void dgWorld::PopulateContacts (dgCollidingPairCollector::dgPair* const pair, dg
 */
 }
 
-void dgWorld::ProcessContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
+void dgWorld::ProcessContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
 {
 	dgAssert (pair->m_contact);
 	dgAssert (pair->m_contact->m_body0);
@@ -957,7 +957,7 @@ void dgWorld::ProcessContacts (dgCollidingPairCollector::dgPair* const pair, dgF
 }
 
 
-void dgWorld::ProcessDeformableContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
+void dgWorld::ProcessDeformableContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
 {
 	dgAssert (0);
 	/*
@@ -981,7 +981,7 @@ void dgWorld::ProcessDeformableContacts (dgCollidingPairCollector::dgPair* const
 }
 
 
-void dgWorld::DeformableContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+void dgWorld::DeformableContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContact* const constraint = pair->m_contact;
 
@@ -1010,7 +1010,7 @@ void dgWorld::DeformableContacts (dgCollidingPairCollector::dgPair* const pair, 
 }
 
 
-void dgWorld::ConvexContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+void dgWorld::ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContact* const constraint = pair->m_contact;
 /*
@@ -1048,7 +1048,7 @@ void dgWorld::ConvexContacts (dgCollidingPairCollector::dgPair* const pair, dgCo
 }
 
 
-void dgWorld::CompoundContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+void dgWorld::CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContact* const constraint = pair->m_contact;
 
@@ -1076,7 +1076,7 @@ void dgWorld::CompoundContacts (dgCollidingPairCollector::dgPair* const pair, dg
 
 
 
-void dgWorld::SceneChildContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+void dgWorld::SceneChildContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgAssert (pair->m_contact->GetBody1()->GetCollision()->IsType(dgCollision::dgCollisionScene_RTTI));
 	dgContactPoint* const savedBuffer = proxy.m_contacts;
@@ -1097,7 +1097,7 @@ void dgWorld::SceneChildContacts (dgCollidingPairCollector::dgPair* const pair, 
 }
 
 
-void dgWorld::SceneContacts (dgCollidingPairCollector::dgPair* const pair, dgCollisionParamProxy& proxy) const
+void dgWorld::SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContact* const constraint = pair->m_contact;
 	pair->m_isDeformable = 0;
@@ -1149,7 +1149,7 @@ void dgWorld::SceneContacts (dgCollidingPairCollector::dgPair* const pair, dgCol
 }
 
 
-void dgWorld::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly)
+void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly)
 {
 	dgContact* const contact = pair->m_contact;
 	dgBody* const body0 = contact->m_body0;
@@ -1189,7 +1189,7 @@ void dgWorld::CalculateContacts (dgCollidingPairCollector::dgPair* const pair, d
 
 dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex, dgVector& p, dgVector& q, dgVector& normal) const
 {
-	dgCollidingPairCollector::dgPair pair;
+	dgBroadPhase::dgPair pair;
 
 	dgInt32 isActive = contact->m_contactActive;
 	dgInt32 contactCount = contact->m_maxDOF;
@@ -1299,7 +1299,7 @@ dgInt32 dgWorld::CollideContinue (
 	dgContact contactJoint (this, &material);
 	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
-	dgCollidingPairCollector::dgPair pair;
+	dgBroadPhase::dgPair pair;
 	pair.m_contact = &contactJoint;
 	pair.m_contactBuffer = contacts;
 	pair.m_timeOfImpact = dgFloat32 (0.0f);
@@ -1372,7 +1372,7 @@ dgInt32 dgWorld::Collide (
 	dgContact contactJoint (this, &material);
 	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
-	dgCollidingPairCollector::dgPair pair;
+	dgBroadPhase::dgPair pair;
 	pair.m_contactCount = 0;
 	pair.m_contact = &contactJoint;
 	pair.m_contactBuffer = contacts; 

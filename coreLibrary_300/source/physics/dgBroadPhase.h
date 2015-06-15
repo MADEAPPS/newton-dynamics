@@ -219,6 +219,17 @@ class dgBroadPhase
 		m_separated,
 	};
 
+	class dgPair
+	{
+    	public:
+		dgContact* m_contact;
+		dgContactPoint* m_contactBuffer;
+		dgFloat32 m_timeOfImpact;
+		dgInt32 m_contactCount : 16;
+		dgInt32 m_isDeformable : 1;
+		dgInt32 m_cacheIsValid : 1;
+	};
+
 	dgBroadPhase(dgWorld* const world);
 	virtual ~dgBroadPhase();
 
@@ -271,6 +282,8 @@ class dgBroadPhase
 	void ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhaseNode** const root);
 
 	bool ValidateContactCache(dgContact* const contact, dgFloat32 timestep) const;
+    void CalculatePairContacts (dgPair* const pair, dgFloat32 timestep, dgInt32 threadID);
+    void AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex);
 	void AddPair (dgBody* const body0, dgBody* const body1, dgFloat32 timestep, dgInt32 threadID);	
 	bool TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const;
 
@@ -290,12 +303,9 @@ class dgBroadPhase
 
 	void UpdateContactsBroadPhaseEnd ();
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
-	void CalculatePairContacts (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threadID);
 	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	
-
-	static void UpdateContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void AddGeneratedBodiesContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
