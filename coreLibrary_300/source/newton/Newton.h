@@ -24,7 +24,7 @@
 
 
 #define NEWTON_MAJOR_VERSION 3 
-#define NEWTON_MINOR_VERSION 13 
+#define NEWTON_MINOR_VERSION 14 
 
 
 #ifdef _NEWTON_STATIC_LIB
@@ -110,6 +110,7 @@ extern "C" {
 	class NewtonJoint;
 	class NewtonMaterial;
 	class NewtonCollision;
+	class NewtonAcyclicArticulation;
 	class NewtonDeformableMeshSegment;
 	class NewtonFracturedCompoundMeshPart;
 #else
@@ -119,6 +120,7 @@ extern "C" {
 	typedef struct NewtonJoint{} NewtonJoint;
 	typedef struct NewtonMaterial{} NewtonMaterial;
 	typedef struct NewtonCollision{} NewtonCollision;
+	typedef struct NewtonAcyclicArticulation{} NewtonAcyclicArticulation;
 	typedef struct NewtonDeformableMeshSegment{} NewtonDeformableMeshSegment;
 	typedef struct NewtonFracturedCompoundMeshPart{} NewtonFracturedCompoundMeshPart;
 #endif
@@ -998,6 +1000,7 @@ extern "C" {
 	NEWTON_API int NewtonJointIsActive (const NewtonJoint* const joint);
 
 
+
 	// **********************************************************************************************
 	//
 	// particle system interface (soft bodies, individual, pressure bodies and cloth)   
@@ -1144,7 +1147,21 @@ extern "C" {
 	NEWTON_API dFloat NewtonUserJointGetRowForce (const NewtonJoint* const joint, int row);
 
 	NEWTON_API void NewtonUserJointSetSolver (const NewtonJoint* const joint, int solver, int maxContactJoints);
-	
+
+
+	// ************************************************************************************************************************
+	// 
+	//	Acyclic articulation offer the same level of accuracy that Feather stone reduced coordinate link chains algorithm  
+	//	these are goo to make near perfect Rag dolls, physically based Created animated bodies, simple robotic contractions with not internal loops,
+	//	Vehicles, Ropes, etc. that all interact seamlessly and natural with the physics world.
+	//	
+	// ************************************************************************************************************************
+	NEWTON_API NewtonAcyclicArticulation* NewtonAcyclicArticulationCreate (NewtonBody* const rootBone);
+	NEWTON_API void NewtonAcyclicArticulationDelete (NewtonAcyclicArticulation* const articulation);
+	NEWTON_API void* NewtonAcyclicArticulationAttachBone (NewtonAcyclicArticulation* const articulation, NewtonBody* const parentBone, NewtonBody* const childBone);
+	NEWTON_API void NewtonAcyclicArticulationDetachBone (NewtonAcyclicArticulation* const articulation, void* const bone);
+	NEWTON_API void NewtonAcyclicArticulationAddJoint (NewtonAcyclicArticulation* const articulation, NewtonJoint* const joint);
+
 
 	// **********************************************************************************************
 	//

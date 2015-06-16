@@ -8661,3 +8661,38 @@ const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const
 	return NULL;
 }
 
+
+
+NewtonAcyclicArticulation* NewtonAcyclicArticulationCreate(NewtonBody* const rootBone)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgAssert (0);
+	return NULL;
+}
+
+void* NewtonAcyclicArticulationAttachBone(NewtonAcyclicArticulation* const articulation, NewtonBody* const parentBone, NewtonBody* const childBone)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgAssert (0);
+
+	return NULL;
+}
+
+
+void NewtonAcyclicArticulationDelete(NewtonAcyclicArticulation* const articulation)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgAssert(0);
+}
+
+
+void NewtonAcyclicArticulationDetachBone(NewtonAcyclicArticulation* const articulation, void* const bone)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgAssert (0);
+}
+
+void NewtonAcyclicArticulationAddJoint(NewtonAcyclicArticulation* const articulation, NewtonJoint* const joint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+}
