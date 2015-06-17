@@ -273,6 +273,7 @@ class dgBroadPhase
 	void CollisionChange (dgBody* const body, dgCollisionInstance* const collisionSrc);
 
 	protected:
+	bool DoNeedUpdate(dgBodyMasterList::dgListNode* const node) const;
 	dgFloat64 CalculateEntropy (dgFitnessList& fitness, dgBroadPhaseNode** const root);
 	dgBroadPhaseNode* InsertNode (dgBroadPhaseNode* const root, dgBroadPhaseNode* const node);
 

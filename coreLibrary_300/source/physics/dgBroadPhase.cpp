@@ -207,13 +207,21 @@ void dgBroadPhase::ForceAndToqueKernel(void* const context, void* const node, dg
 	broadPhase->ApplyForceAndtorque(descriptor, (dgBodyMasterList::dgListNode*) node, threadID);
 }
 
+bool dgBroadPhase::DoNeedUpdate(dgBodyMasterList::dgListNode* const node) const
+{
+	dgBody* const body = node->GetInfo().GetBody();
+
+	bool state = body->GetInvMass().m_w != dgFloat32 (0.0f);
+	state = state || !body->m_equilibrium || (body->GetExtForceAndTorqueCallback() != NULL);
+	return state;
+}
 
 void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
-	while (node && (node->GetInfo().GetBody()->GetExtForceAndTorqueCallback() != NULL)) {
+	while (node && DoNeedUpdate(node)) {
 		dgBody* const body = node->GetInfo().GetBody();
 
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
