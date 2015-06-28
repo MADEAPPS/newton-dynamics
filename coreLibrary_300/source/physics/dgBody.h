@@ -580,5 +580,6 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix()
 	dgAssert(m_invWorldInertiaMatrix[3][3] == dgFloat32(1.0f));
 }
 
+
 #endif 
 
