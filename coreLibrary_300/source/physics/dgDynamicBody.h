@@ -73,8 +73,19 @@ class dgDynamicBody : public dgBody
 
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 
+
+
 	private:
 	virtual void AddDampingAcceleration();
+
+#ifdef DG_USEFULL_INERTIA_MATRIX
+	virtual void SetMassMatrix (dgFloat32 mass, const dgMatrix& inertia);
+	virtual dgMatrix CalculateLocalInertiaMatrix() const;
+	virtual dgMatrix CalculateInertiaMatrix() const;
+	virtual dgMatrix CalculateInvInertiaMatrix() const;
+
+	dgMatrix m_principalAxis;
+#endif
 
 	dgVector m_accel;
 	dgVector m_alpha;

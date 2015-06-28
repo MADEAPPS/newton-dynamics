@@ -462,8 +462,11 @@ void dgBody::SetAparentMassMatrix (const dgVector& massMatrix)
 }
 
 
-void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat32 Izz)
+void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 {
+	dgFloat32 Ixx = inertia[0][0];
+	dgFloat32 Iyy = inertia[1][1];
+	dgFloat32 Izz = inertia[2][2];
 	mass = dgAbsf (mass);
 	if (m_collision->IsType(dgCollision::dgCollisionMesh_RTTI) || m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) {
 		mass = DG_INFINITE_MASS * 2.0f;
@@ -511,7 +514,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 		m_mass.m_y = Iyy1;
 		m_mass.m_z = Izz1;
 		m_mass.m_w = mass;
-
 		
 		m_invMass.m_x = dgFloat32 (1.0f) / Ixx1;
 		m_invMass.m_y = dgFloat32 (1.0f) / Iyy1;
@@ -546,7 +548,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, dgFloat32 Ixx, dgFloat32 Iyy, dgFloat
 void dgBody::SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision)
 {
 	// using general central theorem, to extract the Inertia relative to the center of mass 
-	//IIorigin = IImatrix - unitmass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];
 	dgMatrix inertia (collision->CalculateInertia());
 
 	dgVector origin (inertia.m_posit);
@@ -561,8 +562,19 @@ void dgBody::SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const
 	}
 
 	// although the engine fully supports asymmetric inertia, I will ignore cross inertia for now
-	SetMassMatrix(mass, inertia[0][0], inertia[1][1], inertia[2][2]);
+	//SetMassMatrix(mass, inertia[0][0], inertia[1][1], inertia[2][2]);
+	SetMassMatrix(mass, inertia);
 	SetCentreOfMass(origin);
+}
+
+
+dgMatrix dgBody::CalculateLocalInertiaMatrix () const
+{
+	dgMatrix inertia (dgGetIdentityMatrix());
+	inertia[0][0] = m_mass.m_x;
+	inertia[1][1] = m_mass.m_y;
+	inertia[2][2] = m_mass.m_z;
+	return inertia;
 }
 
 dgMatrix dgBody::CalculateInertiaMatrix () const
@@ -571,11 +583,7 @@ dgMatrix dgBody::CalculateInertiaMatrix () const
 	tmp[0] = tmp[0].CompProduct4 (m_mass);
 	tmp[1] = tmp[1].CompProduct4 (m_mass);
 	tmp[2] = tmp[2].CompProduct4 (m_mass);
-#if 0
-	return tmp * m_matrix;
-#else
 	return dgMatrix (m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
-#endif
 }
 
 dgMatrix dgBody::CalculateInvInertiaMatrix () const
@@ -584,11 +592,7 @@ dgMatrix dgBody::CalculateInvInertiaMatrix () const
 	tmp[0] = tmp[0].CompProduct4(m_invMass);
 	tmp[1] = tmp[1].CompProduct4(m_invMass);
 	tmp[2] = tmp[2].CompProduct4(m_invMass);
-#if 0
-	return tmp * m_matrix;
-#else
 	return dgMatrix (m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
-#endif
 }
 
 void dgBody::InvalidateCache ()
@@ -700,3 +704,4 @@ void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const d
 	m_equilibrium = false;
 	Unfreeze ();
 }
+

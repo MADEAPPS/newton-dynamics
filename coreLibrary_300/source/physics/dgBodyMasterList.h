@@ -90,7 +90,6 @@ class dgBodyMasterList: public dgList<dgBodyMasterListRow>
 	dgTree<int, dgBody*> m_disableBodies;
 	dgInt32 m_deformableCount;
 	dgUnsigned32 m_constraintCount;
-
 };
 
 #endif

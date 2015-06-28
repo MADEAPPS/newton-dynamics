@@ -65,12 +65,13 @@ void dgDeformableBody::Serialize (const dgTree<dgInt32, const dgCollision*>& col
 
 void dgDeformableBody::SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision)
 {
-	SetMassMatrix (mass, dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f));
+	SetMassMatrix (mass, dgGetIdentityMatrix());
 }
 
-void dgDeformableBody::SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz)
+void dgDeformableBody::SetMassMatrix (dgFloat32 mass, const dgMatrix& matrix)
 {
-	dgBody::SetMassMatrix (mass, dgMax(Ix, dgFloat32 (0.1f)), dgMax(Iy, dgFloat32 (0.1f)), dgMax(Iz, dgFloat32 (0.1f)));
+//	dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz
+	dgBody::SetMassMatrix (mass, matrix);
 
 	dgAssert (mass > dgFloat32 (0.0f));
 	if (m_collision && m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {

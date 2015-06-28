@@ -24,7 +24,7 @@
 
 
 #define NEWTON_MAJOR_VERSION 3 
-#define NEWTON_MINOR_VERSION 13 
+#define NEWTON_MINOR_VERSION 14 
 
 
 #ifdef _NEWTON_STATIC_LIB
@@ -110,7 +110,7 @@ extern "C" {
 	class NewtonJoint;
 	class NewtonMaterial;
 	class NewtonCollision;
-	class NewtonAcyclicArticulation;
+	class NewtonSkeletonContainer;
 	class NewtonDeformableMeshSegment;
 	class NewtonFracturedCompoundMeshPart;
 #else
@@ -120,7 +120,7 @@ extern "C" {
 	typedef struct NewtonJoint{} NewtonJoint;
 	typedef struct NewtonMaterial{} NewtonMaterial;
 	typedef struct NewtonCollision{} NewtonCollision;
-	typedef struct NewtonAcyclicArticulation{} NewtonAcyclicArticulation;
+	typedef struct NewtonSkeletonContainer{} NewtonSkeletonContainer;
 	typedef struct NewtonDeformableMeshSegment{} NewtonDeformableMeshSegment;
 	typedef struct NewtonFracturedCompoundMeshPart{} NewtonFracturedCompoundMeshPart;
 #endif
@@ -871,6 +871,7 @@ extern "C" {
 
 	NEWTON_API void  NewtonBodySetCentreOfMass (const NewtonBody* const body, const dFloat* const com);
 	NEWTON_API void  NewtonBodySetMassMatrix (const NewtonBody* const body, dFloat mass, dFloat Ixx, dFloat Iyy, dFloat Izz);
+	NEWTON_API void  NewtonBodySetFullMassMatrix (const NewtonBody* const body, dFloat mass, const dFloat* const inertiaMatrix);
 
 	NEWTON_API void  NewtonBodySetMassProperties (const NewtonBody* const body, dFloat mass, const NewtonCollision* const collision);
 	NEWTON_API void  NewtonBodySetMatrix (const NewtonBody* const body, const dFloat* const matrix);
@@ -1151,16 +1152,16 @@ extern "C" {
 
 	// ************************************************************************************************************************
 	// 
-	//	Acyclic articulation offer the same level of accuracy that Feather stone reduced coordinate link chains algorithm  
-	//	these are goo to make near perfect Rag dolls, physically based Created animated bodies, simple robotic contractions with not internal loops,
-	//	Vehicles, Ropes, etc. that all interact seamlessly and natural with the physics world.
+	//	Acyclic skeleton offer the same level of accuracy that Feather stone reduced coordinate link chains algorithm  
+	//	these are good to make near perfect Rag dolls, physically based and inversed dynamics animated bodies, 
+	//	simple robotic contractions with not internal loops, Vehicles, Ropes, etc. That will all interact seamlessly and naturally with the physics world.
 	//	
 	// ************************************************************************************************************************
-	NEWTON_API NewtonAcyclicArticulation* NewtonAcyclicArticulationCreate (NewtonBody* const rootBone);
-	NEWTON_API void NewtonAcyclicArticulationDelete (NewtonAcyclicArticulation* const articulation);
-	NEWTON_API void* NewtonAcyclicArticulationAttachBone (NewtonAcyclicArticulation* const articulation, NewtonBody* const parentBone, NewtonBody* const childBone);
-	NEWTON_API void NewtonAcyclicArticulationDetachBone (NewtonAcyclicArticulation* const articulation, void* const bone);
-	NEWTON_API void NewtonAcyclicArticulationAddJoint (NewtonAcyclicArticulation* const articulation, NewtonJoint* const joint);
+	NEWTON_API NewtonSkeletonContainer* NewtonSkeletonContainerCreate (NewtonWorld* const world, NewtonBody* const rootBone);
+	NEWTON_API void NewtonSkeletonContainerDelete (NewtonSkeletonContainer* const skeleton);
+	NEWTON_API void NewtonSkeletonContainerAttachBone (NewtonSkeletonContainer* const skeleton, NewtonBody* const childBone, NewtonBody* const parentBone);
+	NEWTON_API void NewtonSkeletonContainernDetachBone (NewtonSkeletonContainer* const skeleton, void* const bone);
+	NEWTON_API void NewtonSkeletonContainerFinalize (NewtonSkeletonContainer* const skeleton);
 
 
 	// **********************************************************************************************

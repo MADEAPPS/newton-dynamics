@@ -501,7 +501,11 @@ void dgWorld::InitBody (dgBody* const body, dgCollisionInstance* const collision
 	body->AttachCollision(collision);
 	body->m_bodyGroupId = dgInt32 (m_defualtBodyGroupID);
 
-	body->SetMassMatrix (DG_INFINITE_MASS * dgFloat32 (2.0f), DG_INFINITE_MASS, DG_INFINITE_MASS, DG_INFINITE_MASS);
+	dgMatrix inertia (dgGetIdentityMatrix());
+	inertia[0][0] = DG_INFINITE_MASS;
+	inertia[1][1] = DG_INFINITE_MASS;
+	inertia[2][2] = DG_INFINITE_MASS;
+	body->SetMassMatrix (DG_INFINITE_MASS * dgFloat32 (2.0f), inertia);
 	body->SetMatrix (matrix);
 	if (!body->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI)) {
 		m_broadPhase->Add (body);
@@ -513,7 +517,7 @@ void dgWorld::BodyEnableSimulation (dgBody* const body)
 	if (!body->m_masterNode) {
 		m_disableBodies.Remove(body);
 		dgBodyMasterList::AddBody(body);
-		body->SetMassMatrix(body->m_mass.m_w, body->m_mass.m_x, body->m_mass.m_y, body->m_mass.m_z);
+		body->SetMassMatrix(body->m_mass.m_w, body->CalculateLocalInertiaMatrix());
 		m_broadPhase->Add (body);
 		dgAssert (body->m_masterNode);
 	}
@@ -702,11 +706,10 @@ dgBallConstraint* dgWorld::CreateBallConstraint (
 	dgBody* const body0, 
 	dgBody* const body1)
 {
-	dgBallConstraint *constraint;
 	
 	dgAssert (body0);
 	dgAssert (body0 != body1);
-	constraint = new (m_allocator) dgBallConstraint;
+	dgBallConstraint* const constraint = new (m_allocator) dgBallConstraint;
 
 	AttachConstraint (constraint, body0, body1);
 	constraint->SetPivotPoint (pivot);
@@ -720,11 +723,9 @@ dgHingeConstraint* dgWorld::CreateHingeConstraint (
 	dgBody* const body0, 
 	dgBody* const body1)
 {
-	dgHingeConstraint *constraint;
-
 	dgAssert (body0);
 	dgAssert (body0 != body1);
-	constraint = new (m_allocator) dgHingeConstraint;
+	dgHingeConstraint* const constraint = new (m_allocator) dgHingeConstraint;
 
 	AttachConstraint (constraint, body0, body1);
 	constraint->SetPivotAndPinDir (pivot, pinDir);
@@ -734,10 +735,8 @@ dgHingeConstraint* dgWorld::CreateHingeConstraint (
 
 dgUpVectorConstraint* dgWorld::CreateUpVectorConstraint (const dgVector& pin, dgBody *body)
 {
-	dgUpVectorConstraint *constraint;
-	
 	dgAssert (body);
-	constraint = new (m_allocator) dgUpVectorConstraint;
+	dgUpVectorConstraint* const constraint = new (m_allocator) dgUpVectorConstraint;
 
 	AttachConstraint (constraint, body, NULL);
 	constraint->InitPinDir (pin);
@@ -752,11 +751,9 @@ dgSlidingConstraint* dgWorld::CreateSlidingConstraint (
 	dgBody* const body0, 
 	dgBody* const body1)
 {
-	dgSlidingConstraint *constraint;
-
 	dgAssert (body0);
 	dgAssert (body0 != body1);
-	constraint = new (m_allocator) dgSlidingConstraint;
+	dgSlidingConstraint* const constraint = new (m_allocator) dgSlidingConstraint;
 
 	AttachConstraint (constraint, body0, body1);
 	constraint->SetPivotAndPinDir (pivot, pinDir);
@@ -770,11 +767,9 @@ dgCorkscrewConstraint* dgWorld::CreateCorkscrewConstraint (
 	dgBody* const body0, 
 	dgBody* const body1)
 {
-	dgCorkscrewConstraint *constraint;
-
 	dgAssert (body0);
 	dgAssert (body0 != body1);
-	constraint = new (m_allocator) dgCorkscrewConstraint;
+	dgCorkscrewConstraint* const constraint = new (m_allocator) dgCorkscrewConstraint;
 
 	AttachConstraint (constraint, body0, body1);
 	constraint->SetPivotAndPinDir (pivot, pinDir);
@@ -789,11 +784,9 @@ dgUniversalConstraint* dgWorld::CreateUniversalConstraint (
 	dgBody* const body0, 
 	dgBody* const body1)
 {
-	dgUniversalConstraint *constraint;
-
 	dgAssert (body0);
 	dgAssert (body0 != body1);
-	constraint = new (m_allocator) dgUniversalConstraint;
+	dgUniversalConstraint* const constraint = new (m_allocator) dgUniversalConstraint;
 
 	AttachConstraint (constraint, body0, body1);
 	constraint->SetPivotAndPinDir(pivot, pin0, pin1);
@@ -1208,7 +1201,8 @@ void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDese
 		m_broadPhase->Add (body);
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 			dgDynamicBody* const dynBody = (dgDynamicBody*)body;
-			dynBody->SetMassMatrix (dynBody->m_mass.m_w, dynBody->m_mass.m_x, dynBody->m_mass.m_y, dynBody->m_mass.m_z);
+			//dynBody->SetMassMatrix (dynBody->m_mass.m_w, dynBody->m_mass.m_x, dynBody->m_mass.m_y, dynBody->m_mass.m_z);
+			dynBody->SetMassMatrix (dynBody->m_mass.m_w, dynBody->CalculateLocalInertiaMatrix());
 		}
 
 		// load user related data 

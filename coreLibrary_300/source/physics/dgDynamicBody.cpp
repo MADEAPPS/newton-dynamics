@@ -43,6 +43,9 @@ dgDynamicBody::dgDynamicBody()
 	,m_isInDestructionArrayLRU(0)
 	,m_applyExtForces(NULL)
 {
+#ifdef DG_USEFULL_INERTIA_MATRIX
+	m_principalAxis = dgGetIdentityMatrix();
+#endif
 	m_type = m_dynamicBody;
 	m_rtti |= m_dynamicBodyRTTI;
 	dgAssert ( dgInt32 (sizeof (dgDynamicBody) & 0x0f) == 0);
@@ -64,11 +67,14 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	m_rtti |= m_dynamicBodyRTTI;
 
 	m_invWorldInertiaMatrix[3][3] = dgFloat32 (1.0f);
-
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
 	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
+
+#ifdef DG_USEFULL_INERTIA_MATRIX
+	serializeCallback(userData, &m_principalAxis, sizeof (m_principalAxis));
+#endif
 }
 
 dgDynamicBody::~dgDynamicBody()
@@ -78,10 +84,15 @@ dgDynamicBody::~dgDynamicBody()
 void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
 	dgBody::Serialize (collisionRemapId, serializeCallback, userData);
+
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
 	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
+
+#ifdef DG_USEFULL_INERTIA_MATRIX
+	serializeCallback(userData, &m_principalAxis, sizeof (m_principalAxis));
+#endif
 }
 
 
@@ -98,7 +109,8 @@ void dgDynamicBody::AttachCollision (dgCollisionInstance* const collision)
 {
 	dgBody::AttachCollision(collision);
 	if (m_collision->IsType(dgCollision::dgCollisionMesh_RTTI) || m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) {
-		SetMassMatrix (m_mass.m_w, m_mass.m_x, m_mass.m_y, m_mass.m_z);
+		//SetMassMatrix (m_mass.m_w, m_mass.m_x, m_mass.m_y, m_mass.m_z);
+		SetMassMatrix (m_mass.m_w, CalculateLocalInertiaMatrix());
 	}
 }
 
@@ -121,8 +133,6 @@ bool dgDynamicBody::IsInEquilibrium () const
 
 	return false;
 }
-
-
 
 
 void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
@@ -158,8 +168,6 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 //_ASSERTE ((m_accel.m_y == -100.0f) || (m_accel.m_y == 0.0f)); 
 }
 
-
-
 void dgDynamicBody::InvalidateCache ()
 {
 	m_sleepingCounter = 0;
@@ -167,3 +175,51 @@ void dgDynamicBody::InvalidateCache ()
 	m_prevExternalTorque = dgVector (dgFloat32 (0.0f));
 	dgBody::InvalidateCache ();
 }
+
+#ifdef DG_USEFULL_INERTIA_MATRIX
+
+void dgDynamicBody::SetMassMatrix (dgFloat32 mass, const dgMatrix& inertia)
+{
+	dgVector II;
+	m_principalAxis = inertia;
+	m_principalAxis.EigenVectors (II);
+	dgMatrix massMatrix (dgGetIdentityMatrix());
+	massMatrix[0][0] = II[0];
+	massMatrix[1][1] = II[1];
+	massMatrix[2][2] = II[2];
+	dgBody::SetMassMatrix (mass, massMatrix);
+}
+
+dgMatrix dgDynamicBody::CalculateLocalInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_mass[0];
+	diagonal[1][1] = m_mass[1];
+	diagonal[2][2] = m_mass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+
+dgMatrix dgDynamicBody::CalculateInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis * m_matrix);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_mass[0];
+	diagonal[1][1] = m_mass[1];
+	diagonal[2][2] = m_mass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+
+dgMatrix dgDynamicBody::CalculateInvInertiaMatrix() const
+{
+	dgMatrix matrix (m_principalAxis * m_matrix);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_invMass[0];
+	diagonal[1][1] = m_invMass[1];
+	diagonal[2][2] = m_invMass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+#endif

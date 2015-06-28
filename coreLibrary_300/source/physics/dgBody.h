@@ -32,6 +32,8 @@ class dgCollision;
 class dgBroadPhaseNode;
 class dgCollisionInstance;
 
+//#define DG_USE_FULL_INERTIA_MATRIX
+
 #define DG_MINIMUM_MASS		dgFloat32(1.0e-3f)
 #define DG_INFINITE_MASS	dgFloat32(1.0e15f)
 
@@ -143,6 +145,7 @@ class dgBody
 
 	virtual dgMatrix CalculateInertiaMatrix () const;
 	virtual dgMatrix CalculateInvInertiaMatrix () const;
+	virtual dgMatrix CalculateLocalInertiaMatrix () const;
 
 	bool IsCollidable() const;
 	virtual void SetCollidable (bool state) = 0;
@@ -161,7 +164,7 @@ class dgBody
 	virtual void SetAngularDamping (const dgVector& angularDamp) = 0;
 	virtual void AddDampingAcceleration() = 0;
 
-	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz);
+	virtual void SetMassMatrix (dgFloat32 mass, const dgMatrix& inertia);
 	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision);
 
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
@@ -184,7 +187,6 @@ class dgBody
 
 	virtual dgFloat32 RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const;
 	virtual dgFloat32 ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInstance* const convexShape, const dgVector& shapeMinBox, const dgVector& shapeMaxBox, const dgMatrix& origin, const dgVector& shapeVeloc, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT, dgInt32 threadId) const;
-
 	
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 	
@@ -210,7 +212,6 @@ class dgBody
 	void CalcInvInertiaMatrix ();
 	dgVector GetApparentMass() const;
 	void SetAparentMassMatrix (const dgVector& massMatrix);
-
 
 	dgMatrix m_invWorldInertiaMatrix;
 	dgMatrix m_matrix;
@@ -553,20 +554,6 @@ DG_INLINE const dgVector& dgBody::GetNetTorque() const
 	return m_netTorque;
 }
 
-DG_INLINE void dgBody::CalcInvInertiaMatrix ()
-{
-	dgAssert (m_invWorldInertiaMatrix[0][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
-
-	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix ();
-
-	dgAssert (m_invWorldInertiaMatrix[0][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
-	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
-}
 
 DG_INLINE void dgBody::SetBroadPhase(dgBroadPhaseNode* const node)
 {
@@ -578,6 +565,20 @@ DG_INLINE dgBroadPhaseNode* dgBody::GetBroadPhase() const
 	return m_broadPhaseNode;
 }
 
+DG_INLINE void dgBody::CalcInvInertiaMatrix()
+{
+	dgAssert(m_invWorldInertiaMatrix[0][3] == dgFloat32(0.0f));
+	dgAssert(m_invWorldInertiaMatrix[1][3] == dgFloat32(0.0f));
+	dgAssert(m_invWorldInertiaMatrix[2][3] == dgFloat32(0.0f));
+	dgAssert(m_invWorldInertiaMatrix[3][3] == dgFloat32(1.0f));
+
+	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix();
+
+	dgAssert(m_invWorldInertiaMatrix[0][3] == dgFloat32(0.0f));
+	dgAssert(m_invWorldInertiaMatrix[1][3] == dgFloat32(0.0f));
+	dgAssert(m_invWorldInertiaMatrix[2][3] == dgFloat32(0.0f));
+	dgAssert(m_invWorldInertiaMatrix[3][3] == dgFloat32(1.0f));
+}
 
 #endif 
 

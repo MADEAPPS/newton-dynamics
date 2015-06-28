@@ -44,7 +44,7 @@ class dgDeformableBody: public dgBody
 	virtual void ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex);
 	virtual void SetVelocity (const dgVector& velocity);
 
-	virtual void SetMassMatrix (dgFloat32 mass, dgFloat32 Ix, dgFloat32 Iy, dgFloat32 Iz);
+	virtual void SetMassMatrix (dgFloat32 mass, const dgMatrix& inertia);
 	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision);
 
 	virtual const dgVector& GetForce() const;
