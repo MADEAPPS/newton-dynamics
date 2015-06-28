@@ -15,7 +15,7 @@
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "DemoMesh.h"
-#include "../toolBox/OpenGlUtil.h"
+#include "OpenGlUtil.h"
 
 
 

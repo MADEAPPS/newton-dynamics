@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(AFX_DGCONSTRAINT_H__F9EC24E0_6E0F_4CD5_909E_A5F5E1AC7C0B_H)
-#define AFX_DGCONSTRAINT_H__F9EC24E0_6E0F_4CD5_909E_A5F5E1AC7C0B_H
+#ifndef __DGCONSTRAINT_H__
+#define __DGCONSTRAINT_H__
 
 #include "dgBodyMasterList.h"
 

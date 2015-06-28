@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DGBILATERALCONSTRAINT_H__
-#define _DGBILATERALCONSTRAINT_H__
+#ifndef __DGBILATERALCONSTRAINT_H__
+#define __DGBILATERALCONSTRAINT_H__
 
 #include "dgConstraint.h"
 

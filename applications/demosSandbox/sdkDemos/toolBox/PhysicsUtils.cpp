@@ -549,6 +549,18 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 
 	dVector force (0.0f, mass * DEMO_GRAVITY, 0.0f, 0.0f);
 	NewtonBodySetForce (body, &force.m_x);
+/*
+// check that angula moemnet is conserved
+dMatrix xxx;
+dVector omega;
+NewtonBodyGetInertiaMatrix(body, &xxx[0][0]);
+NewtonBodyGetOmega(body, &omega[0]);
+//dVector l (xxx.RotateVector(omega));
+NewtonBodyGetMatrix(body, &xxx[0][0]);
+dVector l (xxx.RotateVector(omega));
+dTrace (("%f %f %f\n", omega[0], omega[1], omega[2]));
+*/
+
 }
 
 
