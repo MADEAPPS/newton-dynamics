@@ -279,7 +279,7 @@ class RagDollManager: public CustomArticulaledTransformManager
 
 		// build the ragdoll with rigid bodies connected by joints
 		// create a transform controller
-		CustomArticulatedTransformController* const controller = CreateTransformController (ragDollEntity, false);
+		CustomArticulatedTransformController* const controller = CreateTransformController (ragDollEntity);
 
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);

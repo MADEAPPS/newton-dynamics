@@ -103,13 +103,14 @@ class CustomArticulatedTransformController: public CustomControllerBase
 	CUSTOM_JOINTS_API void MakeNewtonSkeleton () const;
 	
 	protected:
-	CUSTOM_JOINTS_API void Init (void* const userData, bool errorCorrectionMode);
+	CUSTOM_JOINTS_API void Init (void* const userData);
 
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 	
 	private:
 	dSkeletonBone m_bones[D_HIERACHICAL_CONTROLLER_MAX_BONES];
+	void* m_collisionAggregate;
 	int m_boneCount;
 	friend class CustomArticulaledTransformManager;
 };
@@ -122,7 +123,7 @@ class CustomArticulaledTransformManager: public CustomControllerManager<CustomAr
 
 	CUSTOM_JOINTS_API virtual void Debug () const {}
 
-	CUSTOM_JOINTS_API virtual CustomArticulatedTransformController* CreateTransformController (void* const userData, bool errorCorrectionMode);
+	CUSTOM_JOINTS_API virtual CustomArticulatedTransformController* CreateTransformController (void* const userData);
 	
 	CUSTOM_JOINTS_API virtual void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);
 	CUSTOM_JOINTS_API virtual void SetDefaultSelfCollisionMask (CustomArticulatedTransformController* const controller);

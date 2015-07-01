@@ -778,7 +778,6 @@ extern "C" {
 	// General purpose collision library functions
 	//
 	// **********************************************************************************************
-
 	NEWTON_API NewtonCollision* NewtonCollisionCreateInstance (const NewtonCollision* const collision);
 	NEWTON_API int NewtonCollisionGetType (const NewtonCollision* const collision);
 
@@ -834,7 +833,20 @@ extern "C" {
 	NEWTON_API void NewtonCollisionCalculateAABB (const NewtonCollision* const collision, const dFloat* const matrix, dFloat* const p0, dFloat* const p1);
 	NEWTON_API void NewtonCollisionForEachPolygonDo (const NewtonCollision* const collision, const dFloat* const matrix, NewtonCollisionIterator callback, void* const userData);
 
-	
+
+	// **********************************************************************************************
+	// 
+	// collision aggregate, is a collision node on eh broad phase the serve as the root nod for a collection of rigid bodies
+	// that shared the property of being in close proximity all the time, they are similar to compound collision by the group bodies instead of collision instances
+	// These are good for speeding calculation calculation of rag doll, Vehicles or contractions of rigid bodied lined by joints.
+	// also for example if you know that many the life time of a group of bodies like the object on a house of a building will be localize to the confide of the building
+	// then warping the bodies under an aggregate will reduce collision calculation of almost an order of magnitude.
+	//
+	// **********************************************************************************************
+	NEWTON_API void* NewtonCollisionAggregateCreate (NewtonWorld* const world); 	
+	NEWTON_API void NewtonCollisionAggregateDestroy (void* const aggragate); 	
+	NEWTON_API void NewtonCollisionAggregateAddBody (void* const aggregate, const NewtonBody* const body);
+	NEWTON_API void NewtonCollisionAggregateRemoveBody (void* const aggregate, const NewtonBody* const body); 	
 	
 	// **********************************************************************************************
 	//
@@ -947,19 +959,16 @@ extern "C" {
 	NEWTON_API void  NewtonBodyGetAngularDamping (const NewtonBody* const body, dFloat* const vector);
 	NEWTON_API void  NewtonBodyGetAABB (const NewtonBody* const body, dFloat* const p0, dFloat* const p1);
 
-	
 	NEWTON_API NewtonJoint* NewtonBodyGetFirstJoint (const NewtonBody* const body);
 	NEWTON_API NewtonJoint* NewtonBodyGetNextJoint (const NewtonBody* const body, const NewtonJoint* const joint);
 	NEWTON_API NewtonJoint* NewtonBodyGetFirstContactJoint (const NewtonBody* const body);
 	NEWTON_API NewtonJoint* NewtonBodyGetNextContactJoint (const NewtonBody* const body, const NewtonJoint* const contactJoint);
-	
 
 	// **********************************************************************************************
 	//
 	// contact joints interface
 	//
 	// **********************************************************************************************
-
 	NEWTON_API void* NewtonContactJointGetFirstContact (const NewtonJoint* const contactJoint);
 	NEWTON_API void* NewtonContactJointGetNextContact (const NewtonJoint* const contactJoint, void* const contact);
 
@@ -1034,17 +1043,13 @@ extern "C" {
 	NEWTON_API int NewtonDeformableMeshSegmentGetMaterialID (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
 	NEWTON_API int NewtonDeformableMeshSegmentGetIndexCount (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
 	NEWTON_API const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
-
-
-
-
+	
 	// **********************************************************************************************
 	//
 	// Ball and Socket joint functions
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonJoint* NewtonConstraintCreateBall (const NewtonWorld* const newtonWorld, const dFloat* pivotPoint, 
-														const NewtonBody* const childBody, const NewtonBody* const parentBody);
+	NEWTON_API NewtonJoint* NewtonConstraintCreateBall (const NewtonWorld* const newtonWorld, const dFloat* pivotPoint, const NewtonBody* const childBody, const NewtonBody* const parentBody);
 	NEWTON_API void NewtonBallSetUserCallback (const NewtonJoint* const ball, NewtonBallCallback callback);
 	NEWTON_API void NewtonBallGetJointAngle (const NewtonJoint* const ball, dFloat* angle);
 	NEWTON_API void NewtonBallGetJointOmega (const NewtonJoint* const ball, dFloat* omega);
@@ -1056,10 +1061,7 @@ extern "C" {
 	// Hinge joint functions
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonJoint* NewtonConstraintCreateHinge (const NewtonWorld* const newtonWorld, 
-		const dFloat* pivotPoint, const dFloat* pinDir, 
-		const NewtonBody* const childBody, const NewtonBody* const parentBody);
-
+	NEWTON_API NewtonJoint* NewtonConstraintCreateHinge (const NewtonWorld* const newtonWorld, const dFloat* pivotPoint, const dFloat* pinDir, const NewtonBody* const childBody, const NewtonBody* const parentBody);
 	NEWTON_API void NewtonHingeSetUserCallback (const NewtonJoint* const hinge, NewtonHingeCallback callback);
 	NEWTON_API dFloat NewtonHingeGetJointAngle (const NewtonJoint* const hinge);
 	NEWTON_API dFloat NewtonHingeGetJointOmega (const NewtonJoint* const hinge);
@@ -1071,9 +1073,7 @@ extern "C" {
 	// Slider joint functions
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonJoint* NewtonConstraintCreateSlider (const NewtonWorld* const newtonWorld, 
-		const dFloat* pivotPoint, const dFloat* pinDir, 
-		const NewtonBody* const childBody, const NewtonBody* const parentBody);
+	NEWTON_API NewtonJoint* NewtonConstraintCreateSlider (const NewtonWorld* const newtonWorld, const dFloat* pivotPoint, const dFloat* pinDir, const NewtonBody* const childBody, const NewtonBody* const parentBody);
 	NEWTON_API void NewtonSliderSetUserCallback (const NewtonJoint* const slider, NewtonSliderCallback callback);
 	NEWTON_API dFloat NewtonSliderGetJointPosit (const NewtonJoint* slider);
 	NEWTON_API dFloat NewtonSliderGetJointVeloc (const NewtonJoint* slider);
@@ -1086,9 +1086,7 @@ extern "C" {
 	// Corkscrew joint functions
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonJoint* NewtonConstraintCreateCorkscrew (const NewtonWorld* const newtonWorld, 
-		const dFloat* pivotPoint, const dFloat* pinDir, 
-		const NewtonBody* const childBody, const NewtonBody* const parentBody);
+	NEWTON_API NewtonJoint* NewtonConstraintCreateCorkscrew (const NewtonWorld* const newtonWorld, const dFloat* pivotPoint, const dFloat* pinDir, const NewtonBody* const childBody, const NewtonBody* const parentBody);
 	NEWTON_API void NewtonCorkscrewSetUserCallback (const NewtonJoint* const corkscrew, NewtonCorkscrewCallback callback);
 	NEWTON_API dFloat NewtonCorkscrewGetJointPosit (const NewtonJoint* const corkscrew);
 	NEWTON_API dFloat NewtonCorkscrewGetJointAngle (const NewtonJoint* const corkscrew);
@@ -1104,9 +1102,7 @@ extern "C" {
 	// Universal joint functions
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonJoint* NewtonConstraintCreateUniversal (const NewtonWorld* const newtonWorld, 
-		const dFloat* pivotPoint, const dFloat* pinDir0, const dFloat* pinDir1, 
-		const NewtonBody* const childBody, const NewtonBody* const parentBody);
+	NEWTON_API NewtonJoint* NewtonConstraintCreateUniversal (const NewtonWorld* const newtonWorld, const dFloat* pivotPoint, const dFloat* pinDir0, const dFloat* pinDir1, const NewtonBody* const childBody, const NewtonBody* const parentBody);
 	NEWTON_API void NewtonUniversalSetUserCallback (const NewtonJoint* const universal, NewtonUniversalCallback callback);
 	NEWTON_API dFloat NewtonUniversalGetJointAngle0 (const NewtonJoint* const universal);
 	NEWTON_API dFloat NewtonUniversalGetJointAngle1 (const NewtonJoint* const universal);
@@ -1132,10 +1128,7 @@ extern "C" {
 	// User defined bilateral Joint
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonJoint* NewtonConstraintCreateUserJoint (const NewtonWorld* const newtonWorld, int maxDOF, 
-															 NewtonUserBilateralCallback callback,
-															 NewtonUserBilateralGetInfoCallback getInfo,
-															 const NewtonBody* const childBody, const NewtonBody* const parentBody) ; 
+	NEWTON_API NewtonJoint* NewtonConstraintCreateUserJoint (const NewtonWorld* const newtonWorld, int maxDOF, NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo, const NewtonBody* const childBody, const NewtonBody* const parentBody) ; 
 	NEWTON_API void NewtonUserJointSetFeedbackCollectorCallback (const NewtonJoint* const joint, NewtonUserBilateralCallback getFeedback);
 	NEWTON_API void NewtonUserJointAddLinearRow (const NewtonJoint* const joint, const dFloat* const pivot0, const dFloat* const pivot1, const dFloat* const dir);
 	NEWTON_API void NewtonUserJointAddAngularRow (const NewtonJoint* const joint, dFloat relativeAngle, const dFloat* const dir);

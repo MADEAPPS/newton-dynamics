@@ -543,7 +543,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// plane the model at its location
 		vehicleModel->ResetMatrix (*scene, location);
 
-		CustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel, true);
+		CustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel);
 
 		DemoEntity* const rootEntity = (DemoEntity*) vehicleModel->Find (definition[0].m_boneName);
 		NewtonBody* const rootBody = CreateBodyPart (rootEntity, definition[0]);

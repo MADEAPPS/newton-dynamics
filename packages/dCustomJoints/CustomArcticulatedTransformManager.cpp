@@ -25,10 +25,10 @@ CustomArticulaledTransformManager::~CustomArticulaledTransformManager()
 {
 }
 
-CustomArticulatedTransformController* CustomArticulaledTransformManager::CreateTransformController (void* const userData, bool errorCorrectionMode)
+CustomArticulatedTransformController* CustomArticulaledTransformManager::CreateTransformController (void* const userData)
 {
 	CustomArticulatedTransformController* const controller = (CustomArticulatedTransformController*) CreateController();
-	controller->Init (userData, errorCorrectionMode);
+	controller->Init (userData);
 	return controller;
 }
 
@@ -69,10 +69,14 @@ CustomArticulatedTransformController::~CustomArticulatedTransformController()
 }
 
 
-void CustomArticulatedTransformController::Init (void* const userData, bool errorCorrection)
+void CustomArticulatedTransformController::Init (void* const userData)
 {
+	CustomArticulaledTransformManager* const manager = (CustomArticulaledTransformManager*) GetManager();
+	NewtonWorld* const world = manager->GetWorld();
+
 	m_boneCount = 0;
 	m_userData = userData;
+	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 }
 
 void CustomArticulatedTransformController::PreUpdate(dFloat timestep, int threadIndex)
@@ -105,6 +109,8 @@ CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTransformC
 	m_bones[m_boneCount].m_myController = this;
 	m_bones[m_boneCount].m_parent = parentBone;
 	m_bones[m_boneCount].m_bindMatrix = bindMatrix;
+
+	NewtonCollisionAggregateAddBody (m_collisionAggregate, bone);
 
 	m_boneCount ++;
 	dAssert (m_boneCount < D_HIERACHICAL_CONTROLLER_MAX_BONES);
@@ -214,8 +220,7 @@ void CustomArticulatedTransformController::MakeNewtonSkeleton() const
 
 		if (!skeleton) {
 			skeleton = NewtonSkeletonContainerCreate(world, bone);
-		}
-		else {
+		} else {
 			NewtonSkeletonContainerAttachBone(skeleton, bone, parent);
 		}
 
