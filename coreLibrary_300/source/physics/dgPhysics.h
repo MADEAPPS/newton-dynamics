@@ -39,6 +39,7 @@
 #include "dgUserConstraint.h"
 #include "dgBallConstraint.h"
 #include "dgHingeConstraint.h"
+#include "dgSkeletonContainer.h"
 #include "dgCollisionInstance.h"
 #include "dgCollisionUserMesh.h"
 #include "dgSlidingConstraint.h"

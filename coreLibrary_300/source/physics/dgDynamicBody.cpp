@@ -143,28 +143,6 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 		m_applyExtForces(*this, timestep, threadIndex);
 	}
 
-
-#if 0
-	#if 0
-		static FILE* file = fopen ("replay.bin", "wb");
-		if (file) {
-			fwrite (&m_accel, sizeof (dgVector), 1, file);
-			fwrite (&m_alpha, sizeof (dgVector), 1, file);
-			fwrite (&m_veloc, sizeof (dgVector), 1, file);
-			fwrite (&m_omega, sizeof (dgVector), 1, file);
-			fflush(file);
-		}
-	#else 
-		static FILE* file = fopen ("replay.bin", "rb");
-		if (file) {
-			fread (&m_accel, sizeof (dgVector), 1, file);
-			fread (&m_alpha, sizeof (dgVector), 1, file);
-			fread (&m_veloc, sizeof (dgVector), 1, file);
-			fread (&m_omega, sizeof (dgVector), 1, file);
-		}
-	#endif
-#endif
-
 //_ASSERTE ((m_accel.m_y == -100.0f) || (m_accel.m_y == 0.0f)); 
 }
 

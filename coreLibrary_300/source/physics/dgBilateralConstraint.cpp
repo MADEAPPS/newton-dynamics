@@ -52,9 +52,6 @@ dgBilateralConstraint::dgBilateralConstraint ()
 	//SetStiffness (90.0f/99.0f);
 	SetStiffness (dgFloat32 (0.9f));
 
-	m_useExactSolver = false;
-	m_useExactSolverContactLimit = 0;
-
 	memset (m_jointForce, 0, sizeof (m_jointForce));
 	memset (m_rowIsMotor, 0, sizeof (m_rowIsMotor));
 	memset (m_motorAcceleration, 0, sizeof (m_motorAcceleration));
@@ -67,12 +64,6 @@ dgBilateralConstraint::~dgBilateralConstraint ()
 	}
 }
 
-
-void dgBilateralConstraint::SetMaxContactsForExactSolver (bool mode, dgInt32 maxJointContactsCount)
-{
-	m_useExactSolver = mode;
-	m_useExactSolverContactLimit = maxJointContactsCount;
-}
 
 dgFloat32 dgBilateralConstraint::GetStiffness() const
 {

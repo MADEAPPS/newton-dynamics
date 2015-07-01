@@ -244,40 +244,29 @@ dgMatrix dgMatrix::Inverse4x4 () const
 
 dgMatrix dgMatrix::Symetric3by3Inverse () const
 {
-	const dgMatrix& mat = *this;
-	dgFloat64 det = mat[0][0] * mat[1][1] * mat[2][2] + 
-			mat[0][1] * mat[1][2] * mat[0][2] * dgFloat32 (2.0f) -
-			mat[0][2] * mat[1][1] * mat[0][2] -
-			mat[0][1] * mat[0][1] * mat[2][2] -
-			mat[0][0] * mat[1][2] * mat[1][2];
-
-	det = dgFloat32 (1.0f) / det;
-
-	dgFloat32 x11 = (dgFloat32)(det * (mat[1][1] * mat[2][2] - mat[1][2] * mat[1][2]));  
-	dgFloat32 x22 = (dgFloat32)(det * (mat[0][0] * mat[2][2] - mat[0][2] * mat[0][2]));  
-	dgFloat32 x33 = (dgFloat32)(det * (mat[0][0] * mat[1][1] - mat[0][1] * mat[0][1]));  
-
-	dgFloat32 x12 = (dgFloat32)(det * (mat[1][2] * mat[2][0] - mat[1][0] * mat[2][2]));  
-	dgFloat32 x13 = (dgFloat32)(det * (mat[1][0] * mat[2][1] - mat[1][1] * mat[2][0]));  
-	dgFloat32 x23 = (dgFloat32)(det * (mat[0][1] * mat[2][0] - mat[0][0] * mat[2][1]));  
-
+	dgMatrix copy(*this);
+	dgMatrix inverse(dgGetIdentityMatrix());
+	for (dgInt32 i = 0; i < 3; i++) {
+		dgVector den(dgFloat32(1.0f) / copy[i][i]);
+		copy[i] = copy[i].CompProduct4(den);
+		inverse[i] = inverse[i].CompProduct4(den);
+		for (dgInt32 j = 0; j < 3; j++) {
+			if (j != i) {
+				dgVector pivot(copy[j][i]);
+				copy[j] -= copy[i].CompProduct4(pivot);
+				inverse[j] -= inverse[i].CompProduct4(pivot);
+			}
+		}
+	}
 
 #ifdef _DEBUG
-	dgMatrix matInv (dgVector (x11, x12, x13, dgFloat32(0.0f)),
-				     dgVector (x12, x22, x23, dgFloat32(0.0f)),
-					 dgVector (x13, x23, x33, dgFloat32(0.0f)),
-					 dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f)));
-
-	dgMatrix test (matInv * mat);
+	dgMatrix test(*this * inverse);
 	dgAssert (dgAbsf (test[0][0] - dgFloat32(1.0f)) < dgFloat32(0.01f));
 	dgAssert (dgAbsf (test[1][1] - dgFloat32(1.0f)) < dgFloat32(0.01f));
 	dgAssert (dgAbsf (test[2][2] - dgFloat32(1.0f)) < dgFloat32(0.01f));
 #endif
 
-	return dgMatrix (dgVector (x11, x12, x13, dgFloat32(0.0f)),
-					 dgVector (x12, x22, x23, dgFloat32(0.0f)),
-					 dgVector (x13, x23, x33, dgFloat32(0.0f)),
-					 dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f)));
+	return inverse;
 }
 
 

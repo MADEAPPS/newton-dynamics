@@ -467,6 +467,7 @@
     <ClCompile Include="..\..\..\source\physics\dgDynamicBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgHingeConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgKinematicBody.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgSkeletonContainer.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgSlidingConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgUniversalConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgUpVectorConstraint.cpp" />
@@ -536,6 +537,7 @@
     <ClInclude Include="..\..\..\source\physics\dgDynamicBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgHingeConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h" />
+    <ClInclude Include="..\..\..\source\physics\dgSkeletonContainer.h" />
     <ClInclude Include="..\..\..\source\physics\dgSlidingConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgUniversalConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgUpVectorConstraint.h" />

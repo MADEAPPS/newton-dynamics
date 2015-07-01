@@ -14,8 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef D_NEWTON_CUSTOM_JOINT_H_
-#define D_NEWTON_CUSTOM_JOINT_H_
+#ifndef __D_NEWTON_CUSTOM_JOINT_H__
+#define __D_NEWTON_CUSTOM_JOINT_H__
 
 #include "CustomJointLibraryStdAfx.h"
 #include "dMathDefines.h"
@@ -158,12 +158,8 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API NewtonBody* GetBody1 () const;
 	CUSTOM_JOINTS_API NewtonJoint* GetJoint () const;
 
-	CUSTOM_JOINTS_API void JointSetSolverMode (bool mode, int maxContactJoints) const;
-
-
 	// the application needs to implement this function for serialization
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	CUSTOM_JOINTS_API virtual void ProjectError () const;
 
 	// these member function are only used by the C interface or for hooking callback to customize a particular 
 	// joint without deriving a new one
@@ -180,7 +176,7 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API static void GetInfo (const NewtonJoint* const me, NewtonJointRecord* const info);
 	CUSTOM_JOINTS_API static void Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API static void Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
-
+	
 	protected:
 	CUSTOM_JOINTS_API void Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
 

@@ -1313,6 +1313,34 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		}
 	}
 
+
+#if 0
+	for (dgBodyMasterList::dgListNode* node = masterList->GetLast(); node; node = node->GetPrev()) {
+		dgDynamicBody* const body = (dgDynamicBody*)node->GetInfo().GetBody();
+		if ((body->GetType() == dgBody::m_dynamicBody) && (body->GetInvMass().m_w > dgFloat32 (0.0f))) {
+			#if 0
+				static FILE* file = fopen("replay.bin", "wb");
+				if (file) {
+					fwrite(&body->m_accel, sizeof (dgVector), 1, file);
+					fwrite(&body->m_alpha, sizeof (dgVector), 1, file);
+					fwrite(&body->m_veloc, sizeof (dgVector), 1, file);
+					fwrite(&body->m_omega, sizeof (dgVector), 1, file);
+					fflush(file);
+				}
+			#else 
+				static FILE* file = fopen("replay.bin", "rb");
+				if (file) {
+					fread(&body->m_accel, sizeof (dgVector), 1, file);
+					fread(&body->m_alpha, sizeof (dgVector), 1, file);
+					fread(&body->m_veloc, sizeof (dgVector), 1, file);
+					fread(&body->m_omega, sizeof (dgVector), 1, file);
+				}
+			#endif
+		}
+	}
+#endif
+
+
 	UpdateFitness();
 	ScanForContactJoints (syncPoints);
 

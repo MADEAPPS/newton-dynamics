@@ -1147,12 +1147,9 @@ extern "C" {
 	NEWTON_API void NewtonUserJointSetRowStiffness (const NewtonJoint* const joint, dFloat stiffness);
 	NEWTON_API dFloat NewtonUserJointGetRowForce (const NewtonJoint* const joint, int row);
 
-	NEWTON_API void NewtonUserJointSetSolver (const NewtonJoint* const joint, int solver, int maxContactJoints);
-
-
 	// ************************************************************************************************************************
 	// 
-	//	Acyclic skeleton offer the same level of accuracy that Feather stone reduced coordinate link chains algorithm  
+	//	Skeleton offer the same level of accuracy that Feather stone reduced coordinate link chains algorithm  
 	//	these are good to make near perfect Rag dolls, physically based and inversed dynamics animated bodies, 
 	//	simple robotic contractions with not internal loops, Vehicles, Ropes, etc. That will all interact seamlessly and naturally with the physics world.
 	//	

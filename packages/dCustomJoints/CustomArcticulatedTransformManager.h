@@ -85,9 +85,6 @@ class CustomArticulatedTransformController: public CustomControllerBase
 	CUSTOM_JOINTS_API CustomArticulatedTransformController();
 	CUSTOM_JOINTS_API ~CustomArticulatedTransformController();
 
-	CUSTOM_JOINTS_API void SetErrorProjectionMode (bool mode);
-	CUSTOM_JOINTS_API bool GetErrorProjectionMode () const;
-
 	CUSTOM_JOINTS_API void DisableAllSelfCollision ();
 	CUSTOM_JOINTS_API void SetDefaultSelfCollisionMask ();
 	CUSTOM_JOINTS_API void SetSelfCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1, bool mode);
@@ -102,6 +99,8 @@ class CustomArticulatedTransformController: public CustomControllerBase
 	CUSTOM_JOINTS_API NewtonBody* GetBoneBody (const dSkeletonBone* const bone) const;
 
 	CUSTOM_JOINTS_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
+
+	CUSTOM_JOINTS_API void MakeNewtonSkeleton () const;
 	
 	protected:
 	CUSTOM_JOINTS_API void Init (void* const userData, bool errorCorrectionMode);
@@ -112,7 +111,6 @@ class CustomArticulatedTransformController: public CustomControllerBase
 	private:
 	dSkeletonBone m_bones[D_HIERACHICAL_CONTROLLER_MAX_BONES];
 	int m_boneCount;
-	bool m_errorProjectionMode;
 	friend class CustomArticulaledTransformManager;
 };
 

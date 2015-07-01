@@ -610,6 +610,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
 
+		// wrap the skeleton in a newton skeleton for exact accuracy
+		controller->MakeNewtonSkeleton();
+
 		return controller;
 	}
 };

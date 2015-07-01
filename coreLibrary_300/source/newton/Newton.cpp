@@ -7461,20 +7461,6 @@ dFloat NewtonUserJointGetRowForce(const NewtonJoint* const joint, int row)
 	return userJoint->GetRowForce (row);
 }
 
-// Name: NewtonUserJointSetSolver
-// Set the type of solver to use with this joint when the solver mode is set to iterative
-//
-// Parameters:
-// *const NewtonJoint* *joint - pointer to the joint.
-// *int* solver - solver mode, 0 select exact solver, 1 select iterative solver
-// *int* maxContactJoints - select the maximun number of contacst joints that will be consdired for the exact solve mode solution, 
-// when an island has more contacts joints that maxContactJoints, then the island is solve using the iterative mode.
-void NewtonUserJointSetSolver (const NewtonJoint* const joint, int solver, int maxContactJoints)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
-	userJoint->SetMaxContactsForExactSolver (solver ? false : true, maxContactJoints);
-}
 
 // Name: NewtonUserJointSetFeedbackCollectorCallback
 // Set a constrain callback to collect the force calculated by the solver to enforce this constraint
@@ -8674,7 +8660,7 @@ const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const
 }
 
 
-/*
+
 NewtonSkeletonContainer* NewtonSkeletonContainerCreate(NewtonWorld* const worldPtr, NewtonBody* const rootBone)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8709,4 +8695,3 @@ void NewtonSkeletonContainerFinalize (NewtonSkeletonContainer* const skeleton)
 	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*)skeleton;
 	skeletonContainer->Finalize();
 }
-*/

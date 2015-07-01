@@ -24,7 +24,7 @@ class CustomHinge: public CustomJoint
 	public:
 	CUSTOM_JOINTS_API CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 
-	// this is a special contributor that create a hinge with an error between the two matrices, the error is reduce to zero after few iterations 
+	// this is a special constructor that create a hinge with an error between the two matrices, the error is reduce to zero after few iterations 
 	// the error can not be too great, this is more for hinges with wiggle room
 	CUSTOM_JOINTS_API CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~CustomHinge();
@@ -45,7 +45,6 @@ class CustomHinge: public CustomJoint
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-	CUSTOM_JOINTS_API virtual void ProjectError () const;
 	void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
 	
 	AngularIntegration m_curJointAngle;

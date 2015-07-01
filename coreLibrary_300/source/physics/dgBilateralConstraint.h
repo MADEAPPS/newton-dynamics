@@ -57,16 +57,12 @@ class dgBilateralConstraint: public dgConstraint
 	void CalculateAngularDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, dgFloat32 stiffness, dgFloat32 jointAngle, dgForceImpactPair* const jointForce);
 	dgFloat32 CalculateSpringDamperAcceleration (dgInt32 index, const dgContraintDescritor& desc, dgFloat32 jointAngle, const dgVector& p0Global, const dgVector& p1Global, dgFloat32 springK, dgFloat32 springD);
 
-	void SetMaxContactsForExactSolver (bool mode, dgInt32 MaxCount);
-
-
 	dgMatrix m_localMatrix0;
 	dgMatrix m_localMatrix1;
 	dgFloat32 m_stiffness;
 	dgForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
 	dgInt32	  m_rowIsMotor[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
-	dgInt32 m_useExactSolverContactLimit;
 	
 	OnConstraintDestroy m_destructor;
 

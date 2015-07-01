@@ -51,6 +51,7 @@ class dgHingeConstraint;
 class dgUserMeshCreation;
 class dgSlidingConstraint;
 class dgCollisionInstance;
+class dgSkeletonContainer;
 class dgUpVectorConstraint;
 class dgUniversalConstraint;
 class dgCorkscrewConstraint;
@@ -75,6 +76,14 @@ class dgBodyMaterialList: public dgTree<dgContactMaterial, dgUnsigned32>
 	}
 };
 
+class dgSkeletonList: public dgTree<dgSkeletonContainer*, dgInt32>
+{
+	public:
+	dgSkeletonList(dgMemoryAllocator* const allocator)
+		:dgTree<dgSkeletonContainer*, dgInt32>(allocator)
+	{
+	}
+};
 
 
 class dgWorld;
@@ -109,6 +118,7 @@ class dgWorld
 	,public dgBodyMaterialList
 	,public dgBodyCollisionList
 	,public dgDeformableBodiesUpdate
+	,public dgSkeletonList
 	,public dgActiveContacts 
 	,public dgWorldDynamicUpdate
 	,public dgMutexThread
@@ -312,6 +322,7 @@ class dgWorld
 	dgCorkscrewConstraint* CreateCorkscrewConstraint (const dgVector& pivot, const dgVector& pin, dgBody* const body0, dgBody *refBody = NULL);
 	dgUniversalConstraint* CreateUniversalConstraint (const dgVector& pivot, const dgVector& pin0, const dgVector& pin1, dgBody* const body0, dgBody *body1 = NULL);
 
+	dgSkeletonContainer* CreateNewtonSkeletonContainer (dgBody* const rootBone);
 
 	void DestroyConstraint (dgConstraint* constraint);
 	dgUnsigned32 CreateBodyGroupID();

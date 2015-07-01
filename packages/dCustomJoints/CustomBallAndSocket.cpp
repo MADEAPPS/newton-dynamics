@@ -91,7 +91,7 @@ void CustomBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-	// calculate the position of the pivot point and the jacobian direction vectors, in global space. 
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all three orthonormal directions
@@ -367,10 +367,10 @@ void CustomLimitBallAndSocket::SubmitConstraints (dFloat timestep, int threadInd
 	dFloat mag2;
 	mag2 = lateralDir % lateralDir;
 	if (dAbs (mag2) <  1.0e-4f) {
-		if (m_coneAngleSin < 1.0e-4f) {
+	    if (m_coneAngleSin < 1.0e-4f) {
 			NewtonUserJointAddLinearRow (m_joint, &r0[0], &r1[0], &matrix0.m_up[0]);
 			NewtonUserJointAddLinearRow (m_joint, &r0[0], &r1[0], &matrix0.m_right[0]);
-		}
+	    }
 	} else {
 		dFloat cosAngle;
 		cosAngle = coneDir0 % coneDir1;
@@ -475,7 +475,6 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
-
 
 	dVector euler0;
 	dVector euler1;

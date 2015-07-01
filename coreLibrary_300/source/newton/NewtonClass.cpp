@@ -303,7 +303,3 @@ void NewtonUserJoint::SetUpdateFeedbackFunction (NewtonUserBilateralCallback get
 	dgUserConstraint::SetUpdateFeedbackFunction ((ConstraintsForceFeeback) getFeedback);
 }
 
-void NewtonUserJoint::SetMaxContactsForExactSolver (bool mode, dgInt32 MaxCount)
-{
-	dgUserConstraint::SetMaxContactsForExactSolver (mode, MaxCount);
-}

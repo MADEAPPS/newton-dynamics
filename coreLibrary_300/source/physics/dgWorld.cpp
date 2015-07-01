@@ -44,6 +44,7 @@
 #include "dgUserConstraint.h"
 #include "dgBallConstraint.h"
 #include "dgHingeConstraint.h"
+#include "dgSkeletonContainer.h"
 #include "dgSlidingConstraint.h"
 #include "dgUpVectorConstraint.h"
 #include "dgUniversalConstraint.h"
@@ -215,6 +216,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgBodyMaterialList(allocator)
 	,dgBodyCollisionList(allocator)
 	,dgDeformableBodiesUpdate(allocator)
+	,dgSkeletonList(allocator)
 	,dgActiveContacts(allocator) 
 	,dgWorldDynamicUpdate()
 	,dgMutexThread("dgMutexThread", DG_MUTEX_THREAD_ID, DG_ENGINE_STACK_SIZE)
@@ -324,6 +326,10 @@ dgWorld::~dgWorld()
 		delete m_amp;
 	}
 	#endif
+	dgSkeletonList::Iterator iter (*this);
+	for (iter.Begin(); iter; iter ++) {
+		delete iter.GetNode()->GetInfo();
+	}
 
 	m_preListener.RemoveAll();
 	m_postListener.RemoveAll();
@@ -706,7 +712,7 @@ dgBallConstraint* dgWorld::CreateBallConstraint (
 	dgBody* const body0, 
 	dgBody* const body1)
 {
-	
+
 	dgAssert (body0);
 	dgAssert (body0 != body1);
 	dgBallConstraint* const constraint = new (m_allocator) dgBallConstraint;
@@ -1201,7 +1207,6 @@ void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDese
 		m_broadPhase->Add (body);
 		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 			dgDynamicBody* const dynBody = (dgDynamicBody*)body;
-			//dynBody->SetMassMatrix (dynBody->m_mass.m_w, dynBody->m_mass.m_x, dynBody->m_mass.m_y, dynBody->m_mass.m_z);
 			dynBody->SetMassMatrix (dynBody->m_mass.m_w, dynBody->CalculateLocalInertiaMatrix());
 		}
 
@@ -1344,4 +1349,34 @@ void dgWorld::SetBroadPhaseType(dgInt32 type)
 			}
 		}
 	}
+}
+
+
+dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootBone)
+{
+	dgSkeletonList* const list = this;
+	if (dgSkeletonContainer::m_uniqueID > 1014 * 16) {
+		dgList<dgSkeletonContainer*> saveList (GetAllocator());
+		dgSkeletonList::Iterator iter (*list);
+		for (iter.Begin(); iter; iter ++) {
+			saveList.Append(iter.GetNode()->GetInfo());
+		}
+		list->RemoveAll();
+
+		dgInt32 index = 10;
+		for (dgList<dgSkeletonContainer*>::dgListNode* ptr = saveList.GetFirst(); ptr; ptr ++) {
+			dgSkeletonContainer* const skeleton = ptr->GetInfo();
+			skeleton->m_id = index;
+			list->Insert (skeleton, skeleton->GetId());
+			index ++;
+		}
+		dgSkeletonContainer::ResetUniqueId(index);
+	}
+
+	dgBody* const body = rootBone ? rootBone : GetSentinelBody();
+	dgAssert (body->GetType() == dgBody::m_dynamicBody);
+	dgSkeletonContainer* const container = new (m_allocator) dgSkeletonContainer(this, (dgDynamicBody*)body);
+	
+	list->Insert (container, container->GetId());
+	return container;
 }
