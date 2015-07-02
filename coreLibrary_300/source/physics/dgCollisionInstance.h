@@ -130,9 +130,6 @@ class dgCollisionInstance
 	dgVector m_scale;
 	dgVector m_invScale;
 	dgVector m_maxScale;
-	dgUnsigned32 m_userDataID;
-	dgInt32 m_refCount;
-	
 	void* m_userData0;
 	void* m_userData1;
 	const dgWorld* m_world;
@@ -140,6 +137,8 @@ class dgCollisionInstance
 	const void* m_subCollisionHandle;
 	const dgCollisionInstance* m_parent;
 	dgInt32 m_collisionMode;
+	dgUnsigned32 m_userDataID;
+	dgInt32 m_refCount;
 	dgScaleType m_scaleType;
 
 	static dgVector m_padding;
@@ -152,14 +151,14 @@ DG_INLINE dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& me
 	,m_scale(meshInstance.m_scale)
 	,m_invScale(meshInstance.m_invScale)
 	,m_maxScale(meshInstance.m_maxScale)
-	,m_userDataID(meshInstance.m_userDataID)
-	,m_refCount(1)
 	,m_userData0(NULL)
 	,m_userData1(NULL)
 	,m_world(meshInstance.m_world)
 	,m_childShape (shape)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
+	,m_userDataID(meshInstance.m_userDataID)
+	,m_refCount(1)
 	,m_collisionMode(meshInstance.m_collisionMode)
 	,m_scaleType(meshInstance.m_scaleType)
 {

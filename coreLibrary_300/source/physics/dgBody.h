@@ -227,13 +227,6 @@ class dgBody
 	dgVector m_localCentreOfMass;	
 	dgVector m_globalCentreOfMass;	
 	dgVector m_aparentMass;
-	dgInt32 m_index;
-	dgInt32 m_uniqueID;
-	dgInt32 m_bodyGroupId;
-	dgInt32 m_rtti;
-	dgInt32 m_type;
-	dgUnsigned32 m_dynamicsLru;	
-	dgUnsigned32 m_genericLRUMark;
 	
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	union 
@@ -259,9 +252,17 @@ class dgBody
 	dgCollisionInstance* m_collision;
 	dgBroadPhaseNode* m_broadPhaseNode;
 	dgBodyMasterList::dgListNode* m_masterNode;
-	
 	OnBodyDestroy m_destructor;
 	OnMatrixUpdateCallback m_matrixUpdate;
+
+	dgInt32 m_index;
+	dgInt32 m_uniqueID;
+	dgInt32 m_bodyGroupId;
+	dgInt32 m_rtti;
+	dgInt32 m_type;
+	dgUnsigned32 m_dynamicsLru;
+	dgUnsigned32 m_genericLRUMark;
+
 
 	friend class dgWorld;
 	friend class dgContact;

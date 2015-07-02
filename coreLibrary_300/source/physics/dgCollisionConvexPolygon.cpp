@@ -124,12 +124,12 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 
 	dgFloat32 distH = origin.DotProduct4(dir).GetScalar();
 	planes[0] = dgPlane (dir, dist - distH);
-	planes[2] = dgPlane (dir.DotProduct4 (dgVector::m_negOne), dist + distH);
+	planes[2] = dgPlane (dir.CompProduct4 (dgVector::m_negOne), dist + distH);
 
 	dir = m_normal * dir;
 	dgFloat32 distV = origin.DotProduct4(dir).GetScalar();
 	planes[1] = dgPlane (dir, dist - distV);
-	planes[3] = dgPlane (dir.DotProduct4 (dgVector::m_negOne), dist + distV);
+	planes[3] = dgPlane (dir.CompProduct4 (dgVector::m_negOne), dist + distV);
 
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		dgInt32 j = i << 1;
@@ -172,7 +172,7 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 					const dgVector& p0 = points[ptr->m_incidentVertex];
 					const dgVector& p1 = points[ptr->m_next->m_incidentVertex];
 					dgVector dp (p1 - p0); 
-					points[indexCount] = p0 - dp.Scale3 (test0  / (dp % plane));
+					points[indexCount] = p0 - dp.Scale4 (test0 / dp.DotProduct4(plane).GetScalar());
 
 					dgClippedFaceEdge* const newEdge = &clippedFace[edgeCount];
 					newEdge->m_twin = newEdge + 1;
@@ -203,7 +203,7 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 					const dgVector& p0 = points[ptr->m_incidentVertex];
 					const dgVector& p1 = points[ptr->m_next->m_incidentVertex];
 					dgVector dp (p1 - p0); 
-					points[indexCount] = p0 - dp.Scale3 (test0  / (dp % plane));
+					points[indexCount] = p0 - dp.Scale4 (test0 / dp.DotProduct4(plane).GetScalar());
 
 					dgClippedFaceEdge* const newEdge = &clippedFace[edgeCount];
 					newEdge->m_twin = newEdge + 1;
@@ -834,10 +834,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 	} else {
 		dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
 		if (m_faceClipSize > convexSphapeUmbra) {
-			//const dgBody* const refBody = proxy.m_referenceBody;
-			//dgVector origin (polygonInstance->m_globalMatrix.UntransformVector((refBody->m_minAABB + refBody->m_maxAABB).Scale3 (dgFloat32 (0.5f))));
-			//dgVector origin ((refBody->m_minAABB + refBody->m_maxAABB).Scale4 (dgFloat32 (0.5f)));
-			//origin = proxy.m_matrix.UntransformVector(hull->GetGlobalMatrix().UntransformVector(origin));
 			BeamClipping(dgVector(dgFloat32(0.0f)), convexSphapeUmbra);
 			m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 		}

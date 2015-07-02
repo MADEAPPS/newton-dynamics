@@ -836,7 +836,7 @@ extern "C" {
 
 	// **********************************************************************************************
 	// 
-	// collision aggregate, is a collision node on eh broad phase the serve as the root nod for a collection of rigid bodies
+	// collision aggregates, are a collision node on eh broad phase the serve as the root nod for a collection of rigid bodies
 	// that shared the property of being in close proximity all the time, they are similar to compound collision by the group bodies instead of collision instances
 	// These are good for speeding calculation calculation of rag doll, Vehicles or contractions of rigid bodied lined by joints.
 	// also for example if you know that many the life time of a group of bodies like the object on a house of a building will be localize to the confide of the building
