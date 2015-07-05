@@ -47,6 +47,7 @@
 #include "dgCollisionConvexHull.h"
 #include "dgUniversalConstraint.h"
 #include "dgCorkscrewConstraint.h"
+#include "dgBroadPhaseAggregate.h"
 #include "dgCollisionHeightField.h"
 #include "dgCollisionConvexPolygon.h"
 #include "dgCollisionDeformableMesh.h"

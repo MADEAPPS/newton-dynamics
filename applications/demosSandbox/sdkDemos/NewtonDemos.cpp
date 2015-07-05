@@ -309,6 +309,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
+//m_broadPhaseType = 1;
 //m_autoSleepState = false;
 //m_microthreadIndex = 1;
 //m_useParallelSolver = true;

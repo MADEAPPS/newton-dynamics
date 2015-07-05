@@ -269,6 +269,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect5.cpp" />
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect6.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgBroadPhaseAggregate.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgSkeletonContainer.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBallConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBilateralConstraint.cpp" />
@@ -333,6 +334,7 @@
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect4.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\source\physics\dgBroadPhaseAggregate.h" />
     <ClInclude Include="..\..\..\source\physics\dgSkeletonContainer.h" />
     <ClInclude Include="..\..\..\source\physics\dgBallConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h" />

@@ -22,7 +22,6 @@
 #ifndef _DG_WORLD_H_
 #define _DG_WORLD_H_
 
-
 #include "dgBody.h"
 #include "dgContact.h"
 #include "dgCollision.h"
@@ -289,6 +288,9 @@ class dgWorld
 	dgCollisionInstance* CreateStaticUserMesh (const dgVector& boxP0, const dgVector& boxP1, const dgUserMeshCreation& data);
 	dgCollisionInstance* CreateHeightField (dgInt32 width, dgInt32 height, dgInt32 contructionMode, dgInt32 elevationDataType, const void* const elevationMap, const dgInt8* const atributeMap, dgFloat32 verticalScale, dgFloat32 horizontalScale);
 	dgCollisionInstance* CreateScene ();	
+
+	dgBroadPhaseAggregate* CreateAggreGate() const; 
+	void DestroyAggregate(dgBroadPhaseAggregate* const aggregate) const; 
 
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 

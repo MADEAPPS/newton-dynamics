@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __AFX_BROADPHASE_H_
-#define __AFX_BROADPHASE_H_
+#ifndef __DG_BROADPHASE_H_
+#define __DG_BROADPHASE_H_
 
 #include "dgPhysicsStdafx.h"
 #include "dgBody.h"
@@ -31,6 +31,7 @@ class dgWorld;
 class dgContact;
 class dgCollision;
 class dgCollisionInstance;
+class dgBroadPhaseAggregate;
 
 
 #define DG_CACHE_DIST_TOL				dgFloat32 (1.0e-3f)
@@ -48,91 +49,37 @@ class dgConvexCastReturnInfo
 	dgFloat32 m_penetration;                // contact penetration at collision point
 };
 
+
 DG_MSC_VECTOR_ALIGMENT
 class dgBroadPhaseNode
 {
 	public:
 	DG_CLASS_ALLOCATOR(allocator)
-
-	dgBroadPhaseNode()
+	dgBroadPhaseNode(dgBroadPhaseNode* const parent)
 		:m_minBox(dgFloat32(-1.0e15f))
 		,m_maxBox(dgFloat32(1.0e15f))
-		,m_surfaceArea(dgFloat32(1.0e20f))
-		,m_body(NULL)
-		,m_left(NULL)
-		,m_right(NULL)
-		,m_parent(NULL)
-		,m_fitnessNode(NULL)
-	{
-	}
-
-	dgBroadPhaseNode(dgBody* const body)
-		:m_minBox(body->m_minAABB)
-		,m_maxBox(body->m_maxAABB)
-		,m_body(body)
-		,m_left(NULL)
-		,m_right(NULL)
-		,m_parent(NULL)
-		,m_fitnessNode(NULL)
-	{
-		SetAABB(body->m_minAABB, body->m_maxAABB);
-		m_body->SetBroadPhase (this);
-	}
-
-	dgBroadPhaseNode(dgBroadPhaseNode* const sibling, dgBroadPhaseNode* const myNode)
-		:m_body(NULL)
-		,m_left(sibling)
-		,m_right(myNode)
-		,m_parent(sibling->m_parent)
-		,m_fitnessNode(NULL)
-	{
-		if (m_parent) {
-			if (m_parent->m_left == sibling) {
-				m_parent->m_left = this;
-			} else {
-				dgAssert(m_parent->m_right == sibling);
-				m_parent->m_right = this;
-			}
-		}
-		sibling->m_parent = this;
-		myNode->m_parent = this;
-
-		dgBroadPhaseNode* const left = m_left;
-		dgBroadPhaseNode* const right = m_right;
-
-		m_minBox = left->m_minBox.GetMin(right->m_minBox);
-		m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
-		dgVector side0(m_maxBox - m_minBox);
-		m_surfaceArea = side0.DotProduct4(side0.ShiftTripleRight()).m_x;
-	}
-
-	dgBroadPhaseNode(dgBroadPhaseNode* const parent, const dgVector& minBox, const dgVector& maxBox)
-		:m_minBox(minBox)
-		,m_maxBox(maxBox)
-		,m_body(NULL)
-		,m_left(NULL)
-		,m_right(NULL)
 		,m_parent(parent)
-		,m_fitnessNode(NULL)
+		,m_surfaceArea(dgFloat32(1.0e20f))
 	{
 	}
 
-	~dgBroadPhaseNode()
+	virtual ~dgBroadPhaseNode()
 	{
-		if (m_body) {
-			dgAssert(!m_left);
-			dgAssert(!m_right);
-			dgAssert(m_body->GetBroadPhase() == this);
-			m_body->SetBroadPhase(NULL);
-		}
-		else {
-			if (m_left) {
-				delete m_left;
-			}
-			if (m_right) {
-				delete m_right;
-			}
-		}
+	}
+
+	virtual bool IsPersistentRoot() const
+	{
+		return false;
+	}
+
+	virtual bool IsLeafNode() const
+	{
+		return false;
+	}
+
+	virtual bool IsAggregate() const
+	{
+		return false;
 	}
 
 	void SetAABB(const dgVector& minBox, const dgVector& maxBox)
@@ -154,21 +101,120 @@ class dgBroadPhaseNode
 		m_surfaceArea = side0.DotProduct4(side0.ShiftTripleRight()).m_x;
 	}
 
+	virtual dgBody* GetBody() const
+	{
+		return NULL;
+	}
+
+	virtual dgBroadPhaseNode* GetLeft() const
+	{
+		return NULL;
+	}
+
+	virtual dgBroadPhaseNode* GetRight() const
+	{
+		return NULL;
+	}
+
 	dgVector m_minBox;
 	dgVector m_maxBox;
-	dgFloat32 m_surfaceArea;
-	dgBody* m_body;
-	dgBroadPhaseNode* m_left;
-	dgBroadPhaseNode* m_right;
 	dgBroadPhaseNode* m_parent;
-	dgList<dgBroadPhaseNode*>::dgListNode* m_fitnessNode;
+	dgFloat32 m_surfaceArea;
+
 	static dgVector m_broadPhaseScale;
 	static dgVector m_broadInvPhaseScale;
-
-	friend class dgBody;
-	friend class dgBroadPhaseDefault;
-	friend class dgFitnessList;
 } DG_GCC_VECTOR_ALIGMENT;
+
+
+class dgBroadPhaseBodyNode: public dgBroadPhaseNode
+{
+	public:
+	dgBroadPhaseBodyNode(dgBody* const body)
+		:dgBroadPhaseNode(NULL)
+		,m_body(body)
+		,m_updateNode(NULL)
+	{
+		SetAABB(body->m_minAABB, body->m_maxAABB);
+		m_body->SetBroadPhase(this);
+	}
+
+	virtual bool IsLeafNode() const
+	{
+		return true;
+	}
+
+	virtual dgBody* GetBody() const
+	{
+		return m_body;
+	}
+
+	dgBody* m_body;
+	dgList<dgBroadPhaseNode*>::dgListNode* m_updateNode;
+};
+
+class dgBroadPhaseTreeNode: public dgBroadPhaseNode
+{
+	public:
+	dgBroadPhaseTreeNode()
+		:dgBroadPhaseNode(NULL)
+		,m_left(NULL)
+		,m_right(NULL)
+		,m_fitnessNode(NULL)
+	{
+	}
+
+	dgBroadPhaseTreeNode(dgBroadPhaseNode* const sibling, dgBroadPhaseNode* const myNode)
+		:dgBroadPhaseNode(sibling->m_parent)
+		,m_left(sibling)
+		,m_right(myNode)
+		,m_fitnessNode(NULL)
+	{
+		if (m_parent) {
+			dgBroadPhaseTreeNode* const myParent = (dgBroadPhaseTreeNode*)m_parent;
+			if (myParent->m_left == sibling) {
+				myParent->m_left = this;
+			} else {
+				dgAssert(myParent->m_right == sibling);
+				myParent->m_right = this;
+			}
+		}
+
+		sibling->m_parent = this;
+		myNode->m_parent = this;
+
+		dgBroadPhaseNode* const left = m_left;
+		dgBroadPhaseNode* const right = m_right;
+
+		m_minBox = left->m_minBox.GetMin(right->m_minBox);
+		m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
+		dgVector side0(m_maxBox - m_minBox);
+		m_surfaceArea = side0.DotProduct4(side0.ShiftTripleRight()).m_x;
+	}
+
+	virtual ~dgBroadPhaseTreeNode()
+	{
+		if (m_left) {
+			delete m_left;
+		}
+		if (m_right) {
+			delete m_right;
+		}
+	}
+	
+	virtual dgBroadPhaseNode* GetLeft() const
+	{
+		return m_left;
+	}
+
+	virtual dgBroadPhaseNode* GetRight() const
+	{
+		return m_right;
+	}
+
+	dgBroadPhaseNode* m_left;
+	dgBroadPhaseNode* m_right;
+	dgList<dgBroadPhaseTreeNode*>::dgListNode* m_fitnessNode;
+};
 
 
 class dgBroadPhase
@@ -180,9 +226,9 @@ class dgBroadPhase
 		public:
 		dgBroadphaseSyncDescriptor(dgFloat32 timestep, dgWorld* const world)
 			:m_world(world)
-			, m_newBodiesNodes(NULL)
-			, m_timestep(timestep)
-			, m_pairsAtomicCounter(0)
+			,m_newBodiesNodes(NULL)
+			,m_timestep(timestep)
+			,m_pairsAtomicCounter(0)
 		{
 		}
 
@@ -192,11 +238,11 @@ class dgBroadPhase
 		dgInt32 m_pairsAtomicCounter;
 	};
 	
-	class dgFitnessList: public dgList <dgBroadPhaseNode*>
+	class dgFitnessList: public dgList <dgBroadPhaseTreeNode*>
 	{
 		public:
 		dgFitnessList(dgMemoryAllocator* const allocator)
-			:dgList <dgBroadPhaseNode*>(allocator)
+			:dgList <dgBroadPhaseTreeNode*>(allocator)
 		{
 		}
 
@@ -246,13 +292,18 @@ class dgBroadPhase
 		return side0.DotProduct4(side0.ShiftTripleRight()).GetScalar();
 	}
 
+	dgWorld* GetWorld() const { return m_world;}
+
 	virtual dgInt32 GetType() const = 0;
 	
 	virtual void Add(dgBody* const body) = 0;
 	virtual void Remove(dgBody* const body) = 0;
+
 	virtual void ResetEntropy() = 0;
-	virtual void InvalidateCache() = 0;
 	virtual void UpdateFitness() = 0;
+	virtual void InvalidateCache() = 0;
+	virtual dgBroadPhaseAggregate* CreateAggregate() = 0;
+	virtual void DestroyAggregate(dgBroadPhaseAggregate* const aggregate) = 0;
 
 	virtual void CheckStaticDynamic(dgBody* const body, dgFloat32 mass) = 0;
 	virtual void ForEachBodyInAABB (const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const = 0;
@@ -260,8 +311,8 @@ class dgBroadPhase
 	virtual void ConvexRayCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const = 0;
 	virtual dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32& timeToImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
 
-	virtual void ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints) = 0;
-	virtual void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID) = 0;
+	void ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints);
+	void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
 
 	void UpdateBody(dgBody* const body, dgInt32 threadIndex);
 	void AddInternallyGeneratedBody(dgBody* const body)
@@ -272,14 +323,19 @@ class dgBroadPhase
 	void UpdateContacts(dgFloat32 timestep);
 	void CollisionChange (dgBody* const body, dgCollisionInstance* const collisionSrc);
 
+	void MoveNodes (dgBroadPhase* const dest);
+
 	protected:
+	virtual void LinkAggregate (dgBroadPhaseAggregate* const aggregate) = 0; 
+	virtual void UnlinkAggregate (dgBroadPhaseAggregate* const aggregate) = 0; 
+
 	bool DoNeedUpdate(dgBodyMasterList::dgListNode* const node) const;
 	dgFloat64 CalculateEntropy (dgFitnessList& fitness, dgBroadPhaseNode** const root);
-	dgBroadPhaseNode* InsertNode (dgBroadPhaseNode* const root, dgBroadPhaseNode* const node);
+	dgBroadPhaseTreeNode* InsertNode (dgBroadPhaseNode* const root, dgBroadPhaseNode* const node);
 
-	void RotateLeft(dgBroadPhaseNode* const node, dgBroadPhaseNode** const root);
-	void RotateRight(dgBroadPhaseNode* const node, dgBroadPhaseNode** const root);
-	void ImproveNodeFitness(dgBroadPhaseNode* const node, dgBroadPhaseNode** const root);
+	void RotateLeft(dgBroadPhaseTreeNode* const node, dgBroadPhaseNode** const root);
+	void RotateRight(dgBroadPhaseTreeNode* const node, dgBroadPhaseNode** const root);
+	void ImproveNodeFitness(dgBroadPhaseTreeNode* const node, dgBroadPhaseNode** const root);
 	void ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhaseNode** const root);
 
 	bool ValidateContactCache(dgContact* const contact, dgFloat32 timestep) const;
@@ -299,6 +355,8 @@ class dgBroadPhase
 
 	void ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID);
 
+	void UpdateAggregateEntropy (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseAggregate*>::dgListNode* node, dgInt32 threadID);
+
 	dgBroadPhaseNode* BuildTopDown(dgBroadPhaseNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 	dgBroadPhaseNode* BuildTopDownBig(dgBroadPhaseNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 
@@ -306,15 +364,19 @@ class dgBroadPhase
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threadID);
 	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
-	
-	static void CollidingPairsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
+		
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void CollidingPairsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void UpdateAggregateEntropy(void* const descriptor, void* const worldContext, dgInt32 threadID);
+	
 	static void AddGeneratedBodiesContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static dgInt32 CompareNodes(const dgBroadPhaseNode* const nodeA, const dgBroadPhaseNode* const nodeB, void* const notUsed);
 
 	dgWorld* m_world;
 	dgBroadPhaseNode* m_rootNode;
 	dgList<dgBody*> m_generatedBodies;
+	dgList<dgBroadPhaseNode*> m_updateList;
+	dgList<dgBroadPhaseAggregate*> m_aggregateList;
 	dgUnsigned32 m_lru;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
@@ -327,6 +389,7 @@ class dgBroadPhase
 	friend class dgBody;
 	friend class dgWorld;
 	friend class dgWorldDynamicUpdate;
+	friend class dgBroadPhaseAggregate;
 	friend class dgCollisionCompoundFractured;
 };
 

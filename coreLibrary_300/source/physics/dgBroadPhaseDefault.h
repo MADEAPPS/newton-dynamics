@@ -25,17 +25,6 @@
 #include "dgPhysicsStdafx.h"
 #include "dgBroadPhase.h"
 
-/*
-
-class dgBody;
-class dgWorld;
-class dgContact;
-class dgCollision;
-class dgCollisionInstance;
-class dgBroadphaseSyncDescriptor;
-
-*/
-
 
 class dgBroadPhaseDefault: public dgBroadPhase
 {
@@ -51,11 +40,12 @@ class dgBroadPhaseDefault: public dgBroadPhase
 	virtual void Remove(dgBody* const body);
 	virtual void UpdateFitness();
 	virtual void InvalidateCache();
+	virtual dgBroadPhaseAggregate* CreateAggregate();
+	virtual void DestroyAggregate(dgBroadPhaseAggregate* const aggregate);
 
-	protected:
+	virtual void LinkAggregate (dgBroadPhaseAggregate* const aggregate); 
+	virtual void UnlinkAggregate (dgBroadPhaseAggregate* const aggregate); 
 	virtual void CheckStaticDynamic(dgBody* const body, dgFloat32 mass) {}
-	virtual void ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints);
-	virtual void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID);
 
 	void RayCast (const dgVector& p0, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
 	void ConvexRayCast (dgCollisionInstance* const shape, const dgMatrix& matrx, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const;
@@ -63,7 +53,9 @@ class dgBroadPhaseDefault: public dgBroadPhase
 	void ForEachBodyInAABB (const dgVector& q0, const dgVector& q1, OnBodiesInAABB callback, void* const userData) const;
 
 	void ResetEntropy ();
-	
+	void AddNode(dgBroadPhaseNode* const node);	
+	void RemoveNode(dgBroadPhaseNode* const node);	
+
 //	static void UpdateSoftBodyForcesKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	void ApplyDeformableForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 //	void UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);

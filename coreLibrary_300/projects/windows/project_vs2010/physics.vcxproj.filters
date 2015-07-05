@@ -169,6 +169,9 @@
     <ClCompile Include="..\..\..\source\physics\dgSkeletonContainer.cpp">
       <Filter>systems</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgBroadPhaseAggregate.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h">
@@ -319,6 +322,9 @@
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgSkeletonContainer.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgBroadPhaseAggregate.h">
       <Filter>systems</Filter>
     </ClInclude>
   </ItemGroup>

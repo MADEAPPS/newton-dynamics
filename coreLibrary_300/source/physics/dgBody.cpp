@@ -62,6 +62,7 @@ dgBody::dgBody()
 	,m_collision(NULL)
 	,m_broadPhaseNode(NULL)
 	,m_masterNode(NULL)
+	,m_broadPhaseaggregateNode(NULL)
 	,m_destructor(NULL)
 	,m_matrixUpdate(NULL)
 	,m_index(0)
@@ -101,6 +102,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_collision(NULL)
 	,m_broadPhaseNode(NULL)
 	,m_masterNode(NULL)
+	,m_broadPhaseaggregateNode(NULL)
 	,m_destructor(NULL)
 	,m_matrixUpdate(NULL)
 	,m_index(0)
@@ -514,7 +516,7 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 		m_mass.m_y = Iyy1;
 		m_mass.m_z = Izz1;
 		m_mass.m_w = mass;
-		
+
 		m_invMass.m_x = dgFloat32 (1.0f) / Ixx1;
 		m_invMass.m_y = dgFloat32 (1.0f) / Iyy1;
 		m_invMass.m_z = dgFloat32 (1.0f) / Izz1;

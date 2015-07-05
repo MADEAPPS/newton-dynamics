@@ -22,8 +22,6 @@
 #include "HeightFieldPrimitive.h"
 #include "CustomArcticulatedTransformManager.h"
 
-
-
 struct RAGDOLL_BONE_DEFINITION
 {
 	char m_boneName[32];
@@ -366,7 +364,7 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 //	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
-	int count = 5;
+	int count = 2;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
@@ -376,6 +374,14 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 		}
 	}
 	
+
+	const int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	const dVector location(origin);
+	const dVector size(0.5f, 0.5f, 0.75f, 0.0f);
+	const int count1 = 5;
+	const dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
+	AddPrimitiveArray(scene, 10.0f, location, size, count1, count1, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+
 	origin.m_x -= 25.0f;
 	origin.m_y += 5.0f;
 	dQuaternion rot;

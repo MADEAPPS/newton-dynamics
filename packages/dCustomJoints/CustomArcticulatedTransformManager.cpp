@@ -60,12 +60,15 @@ bool CustomArticulaledTransformManager::SelfCollisionTest (const CustomArticulat
 
 
 CustomArticulatedTransformController::CustomArticulatedTransformController()
+	:m_collisionAggregate(NULL)
+	,m_boneCount(0)
 {
 }
 
 CustomArticulatedTransformController::~CustomArticulatedTransformController()
 {
 //	CustomArticulaledTransformManager* const manager = (CustomArticulaledTransformManager*) GetManager();
+	NewtonCollisionAggregateDestroy(m_collisionAggregate);
 }
 
 
@@ -234,4 +237,13 @@ void CustomArticulatedTransformController::MakeNewtonSkeleton() const
 		}
 	}
 	NewtonSkeletonContainerFinalize(skeleton);
+
+/*
+for (int i = 0; i < m_boneCount; i++) {
+const CustomArticulatedTransformController::dSkeletonBone* const child = GetBone(i);
+NewtonCollisionAggregateRemoveBody (m_collisionAggregate, child->m_body);
+}
+NewtonCollisionAggregateDestroy(m_collisionAggregate);
+*/
+
 }

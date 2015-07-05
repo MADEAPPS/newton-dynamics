@@ -836,8 +836,9 @@ void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 		dgBody* body = queue[index];
 		dgAssert (body != m_sentinelBody);
 
-		m_broadPhase->Remove (body);
-		m_broadPhase->Add (body);
+		// why should I do this? I do no remember the reason
+		//m_broadPhase->Remove (body);
+		//m_broadPhase->Add (body);
 
 		dgMatrix matrix (body->GetMatrix() * relMatrix);
 		body->SetVelocity (dgVector (dgFloat32 (0.0f)));    
@@ -1327,27 +1328,23 @@ dgInt32 dgWorld::GetBroadPhaseType() const
 void dgWorld::SetBroadPhaseType(dgInt32 type)
 {
 	if (type != GetBroadPhaseType()) {
-		delete m_broadPhase;
+		dgBroadPhase* newBroadPhase = NULL;
+		
 		switch (type)
 		{
 			case m_persistentBroadphase:
-				m_broadPhase = new (m_allocator) dgBroadPhasePersistent(this);
+				newBroadPhase = new (m_allocator) dgBroadPhasePersistent(this);
 				break;
 
 			case m_defaultBroadphase:
 			default:
-				m_broadPhase = new (m_allocator) dgBroadPhaseDefault(this);
+				newBroadPhase = new (m_allocator) dgBroadPhaseDefault(this);
 				break;
 		}
 
-		const dgBodyMasterList* const masterList = this;
-		for (dgBodyMasterList::dgListNode* node = masterList->GetFirst(); node; node = node->GetNext()) {
-			dgBody* const body = node->GetInfo().GetBody();
-			dgAssert (!body->GetBroadPhase());
-			if (!body->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI)) {
-				m_broadPhase->Add(body);
-			}
-		}
+		m_broadPhase->MoveNodes(newBroadPhase);
+		delete m_broadPhase;
+		m_broadPhase = newBroadPhase;
 	}
 }
 
@@ -1379,4 +1376,15 @@ dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootB
 	
 	list->Insert (container, container->GetId());
 	return container;
+}
+
+
+dgBroadPhaseAggregate* dgWorld::CreateAggreGate() const
+{
+	return m_broadPhase->CreateAggregate();
+}
+
+void dgWorld::DestroyAggregate(dgBroadPhaseAggregate* const aggregate) const
+{
+	m_broadPhase->DestroyAggregate((dgBroadPhaseAggregate*) aggregate);
 }

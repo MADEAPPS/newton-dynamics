@@ -833,7 +833,7 @@ extern "C" {
 	NEWTON_API void NewtonCollisionCalculateAABB (const NewtonCollision* const collision, const dFloat* const matrix, dFloat* const p0, dFloat* const p1);
 	NEWTON_API void NewtonCollisionForEachPolygonDo (const NewtonCollision* const collision, const dFloat* const matrix, NewtonCollisionIterator callback, void* const userData);
 
-
+	
 	// **********************************************************************************************
 	// 
 	// collision aggregates, are a collision node on eh broad phase the serve as the root nod for a collection of rigid bodies
@@ -844,9 +844,12 @@ extern "C" {
 	//
 	// **********************************************************************************************
 	NEWTON_API void* NewtonCollisionAggregateCreate (NewtonWorld* const world); 	
-	NEWTON_API void NewtonCollisionAggregateDestroy (void* const aggragate); 	
+	NEWTON_API void NewtonCollisionAggregateDestroy (void* const aggregate); 	
 	NEWTON_API void NewtonCollisionAggregateAddBody (void* const aggregate, const NewtonBody* const body);
 	NEWTON_API void NewtonCollisionAggregateRemoveBody (void* const aggregate, const NewtonBody* const body); 	
+
+	NEWTON_API int NewtonCollisionAggregateGetSeltCollision (void* const aggregate);
+	NEWTON_API void NewtonCollisionAggregateSetSeltCollision (void* const aggregate, int state);
 	
 	// **********************************************************************************************
 	//
@@ -963,7 +966,7 @@ extern "C" {
 	NEWTON_API NewtonJoint* NewtonBodyGetNextJoint (const NewtonBody* const body, const NewtonJoint* const joint);
 	NEWTON_API NewtonJoint* NewtonBodyGetFirstContactJoint (const NewtonBody* const body);
 	NEWTON_API NewtonJoint* NewtonBodyGetNextContactJoint (const NewtonBody* const body, const NewtonJoint* const contactJoint);
-
+	
 	// **********************************************************************************************
 	//
 	// contact joints interface
@@ -1043,7 +1046,7 @@ extern "C" {
 	NEWTON_API int NewtonDeformableMeshSegmentGetMaterialID (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
 	NEWTON_API int NewtonDeformableMeshSegmentGetIndexCount (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
 	NEWTON_API const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
-	
+
 	// **********************************************************************************************
 	//
 	// Ball and Socket joint functions

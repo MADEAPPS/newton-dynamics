@@ -31,6 +31,7 @@ class dgWorld;
 class dgCollision;
 class dgBroadPhaseNode;
 class dgCollisionInstance;
+class dgBroadPhaseAggregate;
 
 //#define DG_USE_FULL_INERTIA_MATRIX
 
@@ -94,7 +95,7 @@ class dgBody
 	const dgMatrix& GetMatrix() const;
 	const dgQuaternion& GetRotation() const;
 	const dgVector& GetPosition() const;
-
+	
 	void SetCentreOfMass (const dgVector& com);
 	const dgVector& GetCentreOfMass () const;
 
@@ -187,7 +188,7 @@ class dgBody
 
 	virtual dgFloat32 RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const;
 	virtual dgFloat32 ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInstance* const convexShape, const dgVector& shapeMinBox, const dgVector& shapeMaxBox, const dgMatrix& origin, const dgVector& shapeVeloc, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT, dgInt32 threadId) const;
-	
+
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 	
 	virtual dgConstraint* GetFirstJoint() const;
@@ -200,6 +201,8 @@ class dgBody
 
 	void SetBroadPhase (dgBroadPhaseNode* const node);
 	dgBroadPhaseNode* GetBroadPhase () const;
+	dgBroadPhaseAggregate* GetBroadPhaseAggregate() const;
+	void SetBroadPhaseAggregate(dgBroadPhaseAggregate* const aggregate);
 
 	protected:
 	void UpdateWorlCollisionMatrix() const;
@@ -252,6 +255,7 @@ class dgBody
 	dgCollisionInstance* m_collision;
 	dgBroadPhaseNode* m_broadPhaseNode;
 	dgBodyMasterList::dgListNode* m_masterNode;
+	dgBroadPhaseAggregate* m_broadPhaseaggregateNode;
 	OnBodyDestroy m_destructor;
 	OnMatrixUpdateCallback m_matrixUpdate;
 
@@ -278,7 +282,9 @@ class dgBody
 	friend class dgCollisionUserMesh;
 	friend class dgBodyMasterListRow;
 	friend class dgWorldDynamicUpdate;
+	friend class dgBroadPhaseBodyNode;
 	friend class dgBilateralConstraint;
+	friend class dgBroadPhaseAggregate;
 	friend class dgCollisionConvexPolygon;
 	friend class dgCollidingPairCollector;
 
@@ -566,19 +572,29 @@ DG_INLINE dgBroadPhaseNode* dgBody::GetBroadPhase() const
 	return m_broadPhaseNode;
 }
 
-DG_INLINE void dgBody::CalcInvInertiaMatrix()
+DG_INLINE dgBroadPhaseAggregate* dgBody::GetBroadPhaseAggregate() const
 {
-	dgAssert(m_invWorldInertiaMatrix[0][3] == dgFloat32(0.0f));
-	dgAssert(m_invWorldInertiaMatrix[1][3] == dgFloat32(0.0f));
-	dgAssert(m_invWorldInertiaMatrix[2][3] == dgFloat32(0.0f));
-	dgAssert(m_invWorldInertiaMatrix[3][3] == dgFloat32(1.0f));
+	return m_broadPhaseaggregateNode;
+}
 
-	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix();
+DG_INLINE void dgBody::SetBroadPhaseAggregate(dgBroadPhaseAggregate* const aggregate)
+{
+	m_broadPhaseaggregateNode = aggregate;
+}
 
-	dgAssert(m_invWorldInertiaMatrix[0][3] == dgFloat32(0.0f));
-	dgAssert(m_invWorldInertiaMatrix[1][3] == dgFloat32(0.0f));
-	dgAssert(m_invWorldInertiaMatrix[2][3] == dgFloat32(0.0f));
-	dgAssert(m_invWorldInertiaMatrix[3][3] == dgFloat32(1.0f));
+DG_INLINE void dgBody::CalcInvInertiaMatrix ()
+{
+	dgAssert (m_invWorldInertiaMatrix[0][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
+
+	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix ();
+
+	dgAssert (m_invWorldInertiaMatrix[0][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
+	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
 }
 
 

@@ -70,7 +70,7 @@ void dNewtonArticulationManager::DestroyController (CustomArticulatedTransformCo
 dNewtonArticulationManager::dNewtonArticulationController::dNewtonArticulationController (dNewtonArticulationManager* const manager, bool projectError)
 	:dNewtonAlloc()
 {
-	m_controller = manager->CreateTransformController(this, projectError);
+	m_controller = manager->CreateTransformController(this);
 }
 
 dNewtonArticulationManager::dNewtonArticulationController::~dNewtonArticulationController ()

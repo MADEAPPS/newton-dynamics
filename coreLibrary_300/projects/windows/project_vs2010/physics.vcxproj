@@ -452,6 +452,7 @@
     <ClCompile Include="..\..\..\source\physics\dgBallConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBilateralConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBroadPhase.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgBroadPhaseAggregate.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBroadPhaseDefault.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBroadPhasePersistent.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.cpp" />
@@ -522,6 +523,7 @@
     <ClInclude Include="..\..\..\source\physics\dgBallConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgBroadPhase.h" />
+    <ClInclude Include="..\..\..\source\physics\dgBroadPhaseAggregate.h" />
     <ClInclude Include="..\..\..\source\physics\dgBroadPhaseDefault.h" />
     <ClInclude Include="..\..\..\source\physics\dgBroadPhasePersistent.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.h" />
