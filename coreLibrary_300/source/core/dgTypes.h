@@ -340,6 +340,25 @@ DG_INLINE T dgSign(T A)
 }
 
 template <class T> 
+DG_INLINE bool dgAreEqual(T A, T B, T tol)
+{
+	dgInt32 exp0;
+	dgFloat64 mantissa0 = frexp(dgFloat64 (A), &exp0);
+
+	dgInt32 exp1;
+	dgFloat64 mantissa1 = frexp(dgFloat64(B), &exp1);
+
+	if ((exp0 < -12) && (exp1 < -12)) {
+		return true;
+	}
+
+	if (exp0 != exp1) {
+		return false;
+	}
+	return fabs(mantissa0 - mantissa1) < fabs (tol);
+}
+
+template <class T> 
 dgInt32 dgBinarySearch (T const* array, dgInt32 elements, const T& entry, dgInt32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
 	dgInt32 index0 = 0;

@@ -23,6 +23,7 @@
 #define _DG_SKELETON_CONTAINER_H__
 
 #define DG_SKELETON_BIT_SHIFT_KEY	16
+#define DG_SKELETON_BASEW_UNIQUE_ID	10
 
 #include "dgConstraint.h"
 
@@ -31,9 +32,9 @@ class dgDynamicBody;
 class dgSkeletonContainer
 {
 	public:
-	class dgSolverData;
-	class dgSolverJointData;
 	class dgSkeletonGraph;
+	class dgSkeletonBodyGraph;
+	class dgSkeletonJointGraph;
 
 	DG_CLASS_ALLOCATOR(allocator)
 	dgSkeletonContainer(dgWorld* const world, dgDynamicBody* const rootBody);
@@ -50,7 +51,6 @@ class dgSkeletonContainer
 	dgFloat32 CalculateJointForce (dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 
 	protected:
-	bool Sanity () const;
 	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
 	void AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
@@ -58,12 +58,8 @@ class dgSkeletonContainer
 	static void ResetUniqueId(dgInt32 id);
 
 	dgWorld* m_world;
-	dgSolverData* m_solverData;
-	dgSkeletonGraph* m_skeleton;
-	dgSkeletonGraph** m_bodyArray;
-	dgSkeletonGraph** m_jointArray;
-	dgSkeletonGraph** m_bottomTopOrder;
-//	dgSkeletonGraph** m_topBottomOrder;
+	dgSkeletonBodyGraph* m_skeleton;
+	dgSkeletonGraph** m_nodesOrder;
 	dgInt32 m_id;
 	dgInt32 m_nodeCount;
 	static dgInt32 m_uniqueID;

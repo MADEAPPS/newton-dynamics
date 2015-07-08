@@ -1360,7 +1360,7 @@ dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootB
 		}
 		list->RemoveAll();
 
-		dgInt32 index = 10;
+		dgInt32 index = DG_SKELETON_BASEW_UNIQUE_ID;
 		for (dgList<dgSkeletonContainer*>::dgListNode* ptr = saveList.GetFirst(); ptr; ptr ++) {
 			dgSkeletonContainer* const skeleton = ptr->GetInfo();
 			skeleton->m_id = index;

@@ -207,10 +207,10 @@ bool CustomArticulatedTransformController::SelfCollisionTest (const dSkeletonBon
 
 void CustomArticulatedTransformController::MakeNewtonSkeleton() const
 {
-	int stack = 1;
 	NewtonBody* bonePool[32];
 	NewtonBody* boneParent[32];
 
+	int stack = 1;
 	bonePool[0] = GetBoneBody(0);
 	boneParent[0] = NULL;
 	NewtonWorld* const world = ((CustomArticulaledTransformManager*)GetManager())->GetWorld();

@@ -1029,9 +1029,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		dgInt32 j = jointBaseCount;
 		for (dgInt32 i = 0; i < skeletonCount; i ++) {
 			dgSkeletonContainer* const container = skaletonArray[i];
-			container->InitMassMatrix (alignBuffer, &constraintArray[j], matrixRow);
+			//container->InitMassMatrix (alignBuffer, &constraintArray[j], matrixRow);
+			container->InitMassMatrix (alignBuffer, constraintArray, matrixRow);
 			j += container->GetJointCount();
-			//alignBuffer += container->GetBufferSize();
 		}
 	}
 
