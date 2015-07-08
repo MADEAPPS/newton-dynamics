@@ -44,10 +44,9 @@ class dgSkeletonContainer
 	void AddChild (dgBody* const child, dgBody* const parent);
 	
 	void Finalize ();
-	dgInt32 GetBufferSize () const;
 	dgInt32 GetJointCount () const {return (m_nodeCount - 1) / 2;}
 
-	void InitMassMatrix (char* const buffer, dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow);
+	void InitMassMatrix (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow);
 	dgFloat32 CalculateJointForce (dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 
 	protected:
