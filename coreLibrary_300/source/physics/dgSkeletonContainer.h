@@ -28,6 +28,8 @@
 #include "dgConstraint.h"
 
 class dgDynamicBody;
+class dgSkeletonContainer;
+typedef void (dgApi *dgOnSkeletonContainerDestroyCallback) (dgSkeletonContainer* const me);
 
 class dgSkeletonContainer
 {
@@ -40,8 +42,12 @@ class dgSkeletonContainer
 	dgSkeletonContainer(dgWorld* const world, dgDynamicBody* const rootBody);
 	~dgSkeletonContainer();
 
+	dgWorld* GetWorld() const; 
+	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
+
 	dgInt32 GetId () const {return m_id;}
 	void AddChild (dgBody* const child, dgBody* const parent);
+	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
 	
 	void Finalize ();
 	dgInt32 GetJointCount () const {return (m_nodeCount - 1) / 2;}
@@ -52,6 +58,7 @@ class dgSkeletonContainer
 	protected:
 	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
 	void AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
+	
 	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
 
 	static void ResetUniqueId(dgInt32 id);
@@ -59,6 +66,7 @@ class dgSkeletonContainer
 	dgWorld* m_world;
 	dgSkeletonBodyGraph* m_skeleton;
 	dgSkeletonGraph** m_nodesOrder;
+	dgOnSkeletonContainerDestroyCallback m_destructor;
 	dgInt32 m_id;
 	dgInt32 m_nodeCount;
 	static dgInt32 m_uniqueID;

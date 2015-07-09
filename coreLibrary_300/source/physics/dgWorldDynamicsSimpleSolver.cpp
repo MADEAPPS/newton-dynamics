@@ -1002,9 +1002,6 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	dgInt32 skeletonCount = 0;
 	dgSkeletonContainer* skaletonArray[DG_MAX_SKELETON_JOINT_COUNT];
 
-static int xxx;
-xxx ++;
-
 	if (island->m_skeletonCount) {
 		dgSkeletonList* const skeletonList = world;
 		dgInt32 i = jointBaseCount;

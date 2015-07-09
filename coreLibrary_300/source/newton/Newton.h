@@ -402,11 +402,10 @@ extern "C" {
 	typedef void (*NewtonUserBilateralGetInfoCallback) (const NewtonJoint* const userJoint, NewtonJointRecord* const info);
 
 	typedef void (*NewtonConstraintDestructor) (const NewtonJoint* const me);
+	typedef void (*NewtonSkeletontDestructor) (const NewtonSkeletonContainer* const me);
 
 	typedef void (*NewtonJobTask) (NewtonWorld* const world, void* const userData, int threadIndex);
-
 	typedef bool (*NewtonReportProgress) (dFloat normalizedProgressPercent, void* const userData);
-
 
 	// **********************************************************************************************
 	//
@@ -848,8 +847,8 @@ extern "C" {
 	NEWTON_API void NewtonCollisionAggregateAddBody (void* const aggregate, const NewtonBody* const body);
 	NEWTON_API void NewtonCollisionAggregateRemoveBody (void* const aggregate, const NewtonBody* const body); 	
 
-	NEWTON_API int NewtonCollisionAggregateGetSeltCollision (void* const aggregate);
-	NEWTON_API void NewtonCollisionAggregateSetSeltCollision (void* const aggregate, int state);
+	NEWTON_API int NewtonCollisionAggregateGetSelfCollision (void* const aggregate);
+	NEWTON_API void NewtonCollisionAggregateSetSelfCollision (void* const aggregate, int state);
 	
 	// **********************************************************************************************
 	//
@@ -1150,8 +1149,10 @@ extern "C" {
 	//	simple robotic contractions with not internal loops, Vehicles, Ropes, etc. That will all interact seamlessly and naturally with the physics world.
 	//	
 	// ************************************************************************************************************************
-	NEWTON_API NewtonSkeletonContainer* NewtonSkeletonContainerCreate (NewtonWorld* const world, NewtonBody* const rootBone);
+	NEWTON_API NewtonSkeletonContainer* NewtonSkeletonContainerCreate (NewtonWorld* const world, NewtonBody* const rootBone, NewtonSkeletontDestructor onDestroyCallback);
 	NEWTON_API void NewtonSkeletonContainerDelete (NewtonSkeletonContainer* const skeleton);
+
+	NEWTON_API void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray);
 	NEWTON_API void NewtonSkeletonContainerAttachBone (NewtonSkeletonContainer* const skeleton, NewtonBody* const childBone, NewtonBody* const parentBone);
 	NEWTON_API void NewtonSkeletonContainernDetachBone (NewtonSkeletonContainer* const skeleton, void* const bone);
 	NEWTON_API void NewtonSkeletonContainerFinalize (NewtonSkeletonContainer* const skeleton);

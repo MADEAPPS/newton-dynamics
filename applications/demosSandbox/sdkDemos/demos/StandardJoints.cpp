@@ -314,10 +314,11 @@ static void AddPoweredRagDoll (DemoEntityManager* const scene, const dVector& or
 
 
 
-
 void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 {
+#if 0
     dVector size (1.5f, 4.0f, 0.125f);
+
     NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), size);
     NewtonBody* const box1 = CreateBox (scene, origin + dVector (1.5f, 4.0f, 0.0f, 0.0f), size);
     NewtonBody* const box2 = CreateBox (scene, origin + dVector (3.0f, 4.0f, 0.0f, 0.0f), size);
@@ -342,7 +343,7 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
     NewtonBodyGetMatrix (box1, &matrix[0][0]);
     matrix.m_posit += dVector (-size.m_x * 0.5f, 0.0f, 0.0f);
     matrix = localPin * matrix;
-    CustomHinge* const hinge1 = new CustomHinge (matrix, box0, box1);
+    CustomHinge* const hinge1 = new CustomHinge (matrix, box1, box0);
     hinge1->EnableLimits (true);
     hinge1->SetLimis (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
     hinge1->SetFriction (20.0f);
@@ -351,10 +352,54 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
     NewtonBodyGetMatrix (box2, &matrix[0][0]);
     matrix.m_posit += dVector (-size.m_x * 0.5f, 0.0f, 0.0f);
     matrix = localPin * matrix;
-    CustomHinge* const hinge2 = new CustomHinge (matrix, box1, box2);
+    CustomHinge* const hinge2 = new CustomHinge (matrix, box2, box1);
     hinge2->EnableLimits (true);
     hinge2->SetLimis (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
-    //hinge2->SetFriction (20.0f);
+	hinge2->SetFriction (20.0f);
+/*
+	// optionally we can now make this int an skeleton joint 
+//	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), NULL);
+	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), box0);
+
+	dAssert ((hinge1->GetBody0() == box1) && (hinge1->GetBody1() == box0));
+	NewtonSkeletonContainerAttachBone (skeleton, box1, box0);
+
+//	dAssert ((hinge2->GetBody0() == box2) && (hinge2->GetBody1() == box1));
+//	NewtonSkeletonContainerAttachBone (skeleton, box2, box1);
+	NewtonSkeletonContainerFinalize (skeleton);
+*/
+#endif 0
+
+#if 1
+	dVector size(1.0f, 1.0f, 1.0f);
+	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box1 = CreateBox(scene, origin + dVector(0.0f, 3.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box2 = CreateBox(scene, origin + dVector(0.0f, 2.0f, 0.0f, 0.0f), size);
+
+	dMatrix matrix(dGrammSchmidt(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
+	matrix.m_posit = origin + dVector(0.0f, 4.0f + 0.5f, 0.0f, 0.0f);
+	new CustomBallAndSocket(matrix, box0, NULL);
+
+	matrix.m_posit.m_y -= 1.0f;
+	CustomBallAndSocket* const joint01 = new CustomBallAndSocket(matrix, box1, box0);
+
+	matrix.m_posit.m_y -= 1.0f;
+	CustomBallAndSocket* const joint12 = new CustomBallAndSocket(matrix, box2, box1);
+
+	// optionally we can now make this int an skeleton joint 
+	//	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), NULL, NULL);
+	//NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), box0, NULL);
+	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), box2, NULL);
+
+	NewtonJoint* joints[2];
+	joints[0] = joint01->GetJoint();
+	joints[1] = joint12->GetJoint();
+	NewtonSkeletonContainerAttachJointArray (skeleton, 2, joints);
+
+//	NewtonSkeletonContainerAttachBone(skeleton, box1, box0);
+//	NewtonSkeletonContainerAttachBone (skeleton, box2, box1);
+	NewtonSkeletonContainerFinalize(skeleton);
+#endif
 }
 
 static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
@@ -541,19 +586,19 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
-	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -15.0f));
-	Add6DOF (scene, dVector (-20.0f, 0.0f, -10.0f));
-	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -5.0f));
+//	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
+//	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -15.0f));
+//	Add6DOF (scene, dVector (-20.0f, 0.0f, -10.0f));
+//	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -5.0f));
 
 	AddHinge (scene, dVector (-20.0f, 0.0f, -0.0f));
-	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
-	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
+//	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+//	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
 
     //add relational joints example 
-	AddGear (scene, dVector (-20.0f, 0.0f, 15.0f));
-	AddPulley (scene, dVector (-20.0f, 0.0f, 20.0f));
-	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 25.0f));
+//	AddGear (scene, dVector (-20.0f, 0.0f, 15.0f));
+//	AddPulley (scene, dVector (-20.0f, 0.0f, 20.0f));
+//	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 25.0f));
 
 	// this joint is not very stable when using non rotational inertia, like these examples
 	// AddUniversal (mSceneMgr, m_physicsWorld, Vector3 (2.0f, 0.0f, 30.0f));

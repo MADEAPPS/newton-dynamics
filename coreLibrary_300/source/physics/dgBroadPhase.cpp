@@ -1510,7 +1510,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 
 
-#if 1
+#if 0
 	for (dgBodyMasterList::dgListNode* node = masterList->GetLast(); node; node = node->GetPrev()) {
 		dgDynamicBody* const body = (dgDynamicBody*)node->GetInfo().GetBody();
 		if ((body->GetType() == dgBody::m_dynamicBody) && (body->GetInvMass().m_w > dgFloat32 (0.0f))) {

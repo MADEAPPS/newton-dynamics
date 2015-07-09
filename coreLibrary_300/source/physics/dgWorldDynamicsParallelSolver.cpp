@@ -652,12 +652,10 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 		dgFloat32 accel = world->CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
 		accNorm = (accel > accNorm) ? accel : accNorm;
 
-		if (m0) {
-			dgInterlockedExchange(&bodyLocks[m0], 0);
-		}
-		if (m1) {
-			dgInterlockedExchange(&bodyLocks[m1], 0);
-		}
+		dgSpinLock(globalLock, false);
+		bodyLocks[m0] = m0 > 0;
+		bodyLocks[m1] = m1 > 0;
+		dgSpinUnlock(globalLock);
 	}
 
 	syncData->m_accelNorm[threadID] = accNorm;

@@ -137,6 +137,8 @@ class CustomArticulaledTransformManager: public CustomControllerManager<CustomAr
 	private: 
 	bool m_applyLocalTransform;
 
+	static void OnControllerDestroy (const NewtonSkeletonContainer* const me);
+
 	friend class CustomArticulatedTransformController;
 };
 

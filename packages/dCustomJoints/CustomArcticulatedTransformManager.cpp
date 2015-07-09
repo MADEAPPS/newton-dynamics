@@ -59,6 +59,11 @@ bool CustomArticulaledTransformManager::SelfCollisionTest (const CustomArticulat
 }
 
 
+void CustomArticulaledTransformManager::OnControllerDestroy (const NewtonSkeletonContainer* const me)
+{
+//	dAssert (0);
+}
+
 CustomArticulatedTransformController::CustomArticulatedTransformController()
 	:m_collisionAggregate(NULL)
 	,m_boneCount(0)
@@ -222,7 +227,7 @@ void CustomArticulatedTransformController::MakeNewtonSkeleton() const
 		NewtonBody* const parent = boneParent[stack];
 
 		if (!skeleton) {
-			skeleton = NewtonSkeletonContainerCreate(world, bone);
+			skeleton = NewtonSkeletonContainerCreate(world, bone, CustomArticulaledTransformManager::OnControllerDestroy);
 		} else {
 			NewtonSkeletonContainerAttachBone(skeleton, bone, parent);
 		}

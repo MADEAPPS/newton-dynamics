@@ -1378,6 +1378,13 @@ dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootB
 	return container;
 }
 
+void dgWorld::DestroySkeletonContainer (dgSkeletonContainer* const container)
+{
+	dgSkeletonList* const list = this;
+	list->Remove (container->GetId());
+	delete container;
+}
+
 
 dgBroadPhaseAggregate* dgWorld::CreateAggreGate() const
 {

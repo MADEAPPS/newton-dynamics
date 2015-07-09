@@ -8660,13 +8660,30 @@ const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const
 }
 
 
-
-NewtonSkeletonContainer* NewtonSkeletonContainerCreate(NewtonWorld* const worldPtr, NewtonBody* const rootBone)
+NewtonSkeletonContainer* NewtonSkeletonContainerCreate(NewtonWorld* const worldPtr, NewtonBody* const rootBone, NewtonSkeletontDestructor destructor)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)rootBone;
 	dgWorld* const world = (dgWorld*) worldPtr;
-	return (NewtonSkeletonContainer*)world->CreateNewtonSkeletonContainer (body);
+	dgSkeletonContainer* const skeleton = world->CreateNewtonSkeletonContainer (body);
+	skeleton->SetDestructorCallback ((dgOnSkeletonContainerDestroyCallback) destructor);
+	return (NewtonSkeletonContainer*) skeleton;
+}
+
+void NewtonSkeletonContainerDelete(NewtonSkeletonContainer* const skeletonPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*) skeletonPtr;
+	dgWorld* const world = skeleton->GetWorld();
+	world->DestroySkeletonContainer (skeleton);
+}
+
+
+void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*)skeleton;
+	skeletonContainer->AddJointList(jointCount, (dgBilateralConstraint**) jointArray);
 }
 
 void NewtonSkeletonContainerAttachBone(NewtonSkeletonContainer* const skeleton, NewtonBody* const childBone, NewtonBody* const parentBone)
@@ -8683,14 +8700,6 @@ void NewtonSkeletonContainernDetachBone(NewtonSkeletonContainer* const skeleton,
 //	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*)skeleton;
 //skeletonContainer->AddChild((dgBody*)childBone, (dgBody*)parentBone);
 }
-
-
-void NewtonSkeletonContainerDelete(NewtonSkeletonContainer* const skeleton)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert(0);
-}
-
 
 
 void NewtonSkeletonContainerFinalize (NewtonSkeletonContainer* const skeleton)
@@ -8728,14 +8737,14 @@ void NewtonCollisionAggregateRemoveBody(void* const aggregatePtr, const NewtonBo
 	aggregate->RemoveBody((dgBody*)body);
 }
 
-int NewtonCollisionAggregateGetSeltCollision(void* const aggregatePtr)
+int NewtonCollisionAggregateGetSelfCollision(void* const aggregatePtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*) aggregatePtr;
 	return aggregate->GetSelfCollision() ? true : false;
 }
 
-void NewtonCollisionAggregateSetSeltCollision(void* const aggregatePtr, int state)
+void NewtonCollisionAggregateSetSelfCollision(void* const aggregatePtr, int state)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*) aggregatePtr;
