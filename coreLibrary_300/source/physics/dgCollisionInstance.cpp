@@ -62,9 +62,9 @@ dgCollisionInstance::dgCollisionInstance()
 	,m_childShape (NULL)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
+	,m_collisionMode(1)
 	,m_userDataID(0)
 	,m_refCount(1)
-	,m_collisionMode(1)
 	,m_scaleType(m_unit)
 {
 }
@@ -83,9 +83,9 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const world, const dgCol
 	,m_childShape (childCollision)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
+	,m_collisionMode(1)
 	,m_userDataID(shapeID)
 	,m_refCount(1)
-	,m_collisionMode(1)
 	,m_scaleType(m_unit)
 {
 	m_childShape->AddRef();
@@ -104,9 +104,9 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 	,m_childShape (instance.m_childShape)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
+	,m_collisionMode(instance.m_collisionMode)
 	,m_userDataID(instance.m_userDataID)
 	,m_refCount(1)
-	,m_collisionMode(instance.m_collisionMode)
 	,m_scaleType(instance.m_scaleType)
 {
 	if (m_childShape->IsType (dgCollision::dgCollisionCompound_RTTI)) {
@@ -148,9 +148,9 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 	,m_childShape (NULL)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
+	,m_collisionMode(1)
 	,m_userDataID(0)
 	,m_refCount(1)
-	,m_collisionMode(1)
 	,m_scaleType(m_unit)
 {
 	dgInt32 saved;
