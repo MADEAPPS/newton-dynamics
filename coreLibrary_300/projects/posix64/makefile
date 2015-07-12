@@ -70,6 +70,9 @@ DG_PHYSICS_SRCS = \
 	$(DG_PHYSICS_PATH)dgKinematicBody.cpp \
 	$(DG_PHYSICS_PATH)dgBodyMasterList.cpp \
 	$(DG_PHYSICS_PATH)dgBroadPhase.cpp \
+	$(DG_PHYSICS_PATH)dgBroadPhaseDefault.cpp \
+	$(DG_PHYSICS_PATH)dgBroadPhasePersistent.cpp \
+	$(DG_PHYSICS_PATH)dgBroadPhaseAggregate.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionBox.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionBVH.cpp \
 	$(DG_PHYSICS_PATH)dgCollisionCapsule.cpp \
@@ -106,6 +109,7 @@ DG_PHYSICS_SRCS = \
 	$(DG_PHYSICS_PATH)dgUpVectorConstraint.cpp \
 	$(DG_PHYSICS_PATH)dgUserConstraint.cpp \
 	$(DG_PHYSICS_PATH)dgWorld.cpp \
+	$(DG_PHYSICS_PATH)dgSkeletonContainer.cpp \
 	$(DG_PHYSICS_PATH)dgDeformableBodiesUpdate.cpp \
 	$(DG_PHYSICS_PATH)dgWorldDynamicsParallelSolver.cpp \
 	$(DG_PHYSICS_PATH)dgWorldDynamicsSimpleSolver.cpp \
