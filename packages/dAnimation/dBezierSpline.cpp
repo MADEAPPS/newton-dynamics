@@ -439,7 +439,7 @@ dFloat64 dBezierSpline::CalculateLength (dFloat64 tol) const
 		dBigVector p1 (CurvePoint (u1));
 		stackPool[stack][0] = p0;
 		stackPool[stack][1] = p1;
-		stackPool[stack][2] = dBigVector (u0, u1, dFloat64(0.0), dFloat64(0.0));
+		stackPool[stack][2] = dBigVector (u0, u1, dFloat64(0.0f), dFloat64(0.0f));
 		stack ++;
 		while (stack) {
 			stack --;
@@ -460,12 +460,12 @@ dFloat64 dBezierSpline::CalculateLength (dFloat64 tol) const
 			} else {
 				stackPool[stack][0] = q01;
 				stackPool[stack][1] = q1;
-				stackPool[stack][2] = dBigVector (t01, t1, 0.0, 0.0);
+				stackPool[stack][2] = dBigVector (t01, t1, dFloat64(0.0f), dFloat64(0.0f));
 				stack ++;
 
 				stackPool[stack][0] = q0;
 				stackPool[stack][1] = q01;
-				stackPool[stack][2] = dBigVector (t0, t01, 0.0, 0.0);
+				stackPool[stack][2] = dBigVector (t0, t01, dFloat64(0.0f), dFloat64(0.0f));
 				stack ++;
 			}
 		}
