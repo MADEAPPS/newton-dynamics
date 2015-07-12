@@ -439,7 +439,7 @@ dFloat64 dBezierSpline::CalculateLength (dFloat64 tol) const
 		dBigVector p1 (CurvePoint (u1));
 		stackPool[stack][0] = p0;
 		stackPool[stack][1] = p1;
-		stackPool[stack][2] = dBigVector (u0, u1, 0.0, 0.0);
+		stackPool[stack][2] = dBigVector (u0, u1, dFloat64(0.0), dFloat64(0.0));
 		stack ++;
 		while (stack) {
 			stack --;
