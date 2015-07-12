@@ -18,6 +18,60 @@
 		FF80B6861596686E00E8D3B8 /* dgMeshEffect5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF80B6851596686E00E8D3B8 /* dgMeshEffect5.cpp */; };
 		FF85FFB617405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF85FFB217405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp */; };
 		FF85FFB817405B4500BEE80B /* dgCollisionDeformableSolidMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF85FFB417405B4500BEE80B /* dgCollisionDeformableSolidMesh.cpp */; };
+		FF938A6B1B52D89800FEAAE5 /* dgBallConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A351B52D89800FEAAE5 /* dgBallConstraint.h */; };
+		FF938A6C1B52D89800FEAAE5 /* dgBilateralConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A361B52D89800FEAAE5 /* dgBilateralConstraint.h */; };
+		FF938A6D1B52D89800FEAAE5 /* dgBody.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A371B52D89800FEAAE5 /* dgBody.h */; };
+		FF938A6E1B52D89800FEAAE5 /* dgBodyMasterList.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A381B52D89800FEAAE5 /* dgBodyMasterList.h */; };
+		FF938A6F1B52D89800FEAAE5 /* dgBroadPhase.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A391B52D89800FEAAE5 /* dgBroadPhase.h */; };
+		FF938A701B52D89800FEAAE5 /* dgBroadPhaseAggregate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF938A3A1B52D89800FEAAE5 /* dgBroadPhaseAggregate.cpp */; };
+		FF938A711B52D89800FEAAE5 /* dgBroadPhaseAggregate.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A3B1B52D89800FEAAE5 /* dgBroadPhaseAggregate.h */; };
+		FF938A721B52D89800FEAAE5 /* dgBroadPhaseDefault.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF938A3C1B52D89800FEAAE5 /* dgBroadPhaseDefault.cpp */; };
+		FF938A731B52D89800FEAAE5 /* dgBroadPhaseDefault.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A3D1B52D89800FEAAE5 /* dgBroadPhaseDefault.h */; };
+		FF938A741B52D89800FEAAE5 /* dgBroadPhasePersistent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF938A3E1B52D89800FEAAE5 /* dgBroadPhasePersistent.cpp */; };
+		FF938A751B52D89800FEAAE5 /* dgBroadPhasePersistent.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A3F1B52D89800FEAAE5 /* dgBroadPhasePersistent.h */; };
+		FF938A761B52D89800FEAAE5 /* dgCollision.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A401B52D89800FEAAE5 /* dgCollision.h */; };
+		FF938A771B52D89800FEAAE5 /* dgCollisionBox.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A411B52D89800FEAAE5 /* dgCollisionBox.h */; };
+		FF938A781B52D89800FEAAE5 /* dgCollisionBVH.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A421B52D89800FEAAE5 /* dgCollisionBVH.h */; };
+		FF938A791B52D89800FEAAE5 /* dgCollisionCapsule.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A431B52D89800FEAAE5 /* dgCollisionCapsule.h */; };
+		FF938A7A1B52D89800FEAAE5 /* dgCollisionChamferCylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A441B52D89800FEAAE5 /* dgCollisionChamferCylinder.h */; };
+		FF938A7B1B52D89800FEAAE5 /* dgCollisionCompound.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A451B52D89800FEAAE5 /* dgCollisionCompound.h */; };
+		FF938A7C1B52D89800FEAAE5 /* dgCollisionCompoundFractured.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A461B52D89800FEAAE5 /* dgCollisionCompoundFractured.h */; };
+		FF938A7D1B52D89800FEAAE5 /* dgCollisionCone.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A471B52D89800FEAAE5 /* dgCollisionCone.h */; };
+		FF938A7E1B52D89800FEAAE5 /* dgCollisionConvex.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A481B52D89800FEAAE5 /* dgCollisionConvex.h */; };
+		FF938A7F1B52D89800FEAAE5 /* dgCollisionConvexHull.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A491B52D89800FEAAE5 /* dgCollisionConvexHull.h */; };
+		FF938A801B52D89800FEAAE5 /* dgCollisionConvexPolygon.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A4A1B52D89800FEAAE5 /* dgCollisionConvexPolygon.h */; };
+		FF938A811B52D89800FEAAE5 /* dgCollisionCylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A4B1B52D89800FEAAE5 /* dgCollisionCylinder.h */; };
+		FF938A821B52D89800FEAAE5 /* dgCollisionDeformableClothPatch.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A4C1B52D89800FEAAE5 /* dgCollisionDeformableClothPatch.h */; };
+		FF938A831B52D89800FEAAE5 /* dgCollisionDeformableMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A4D1B52D89800FEAAE5 /* dgCollisionDeformableMesh.h */; };
+		FF938A841B52D89800FEAAE5 /* dgCollisionDeformableSolidMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A4E1B52D89800FEAAE5 /* dgCollisionDeformableSolidMesh.h */; };
+		FF938A851B52D89800FEAAE5 /* dgCollisionHeightField.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A4F1B52D89800FEAAE5 /* dgCollisionHeightField.h */; };
+		FF938A861B52D89800FEAAE5 /* dgCollisionInstance.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A501B52D89800FEAAE5 /* dgCollisionInstance.h */; };
+		FF938A871B52D89800FEAAE5 /* dgCollisionMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A511B52D89800FEAAE5 /* dgCollisionMesh.h */; };
+		FF938A881B52D89800FEAAE5 /* dgCollisionNull.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A521B52D89800FEAAE5 /* dgCollisionNull.h */; };
+		FF938A891B52D89800FEAAE5 /* dgCollisionScene.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A531B52D89800FEAAE5 /* dgCollisionScene.h */; };
+		FF938A8A1B52D89800FEAAE5 /* dgCollisionSphere.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A541B52D89800FEAAE5 /* dgCollisionSphere.h */; };
+		FF938A8B1B52D89800FEAAE5 /* dgCollisionTaperedCapsule.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A551B52D89800FEAAE5 /* dgCollisionTaperedCapsule.h */; };
+		FF938A8C1B52D89800FEAAE5 /* dgCollisionTaperedCylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A561B52D89800FEAAE5 /* dgCollisionTaperedCylinder.h */; };
+		FF938A8D1B52D89800FEAAE5 /* dgCollisionUserMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A571B52D89800FEAAE5 /* dgCollisionUserMesh.h */; };
+		FF938A8E1B52D89800FEAAE5 /* dgConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A581B52D89800FEAAE5 /* dgConstraint.h */; };
+		FF938A8F1B52D89800FEAAE5 /* dgContact.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A591B52D89800FEAAE5 /* dgContact.h */; };
+		FF938A901B52D89800FEAAE5 /* dgCorkscrewConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A5A1B52D89800FEAAE5 /* dgCorkscrewConstraint.h */; };
+		FF938A911B52D89800FEAAE5 /* dgDeformableBodiesUpdate.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A5B1B52D89800FEAAE5 /* dgDeformableBodiesUpdate.h */; };
+		FF938A921B52D89800FEAAE5 /* dgDeformableBody.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A5C1B52D89800FEAAE5 /* dgDeformableBody.h */; };
+		FF938A931B52D89800FEAAE5 /* dgDeformableContact.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A5D1B52D89800FEAAE5 /* dgDeformableContact.h */; };
+		FF938A941B52D89800FEAAE5 /* dgDynamicBody.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A5E1B52D89800FEAAE5 /* dgDynamicBody.h */; };
+		FF938A951B52D89800FEAAE5 /* dgHingeConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A5F1B52D89800FEAAE5 /* dgHingeConstraint.h */; };
+		FF938A961B52D89800FEAAE5 /* dgKinematicBody.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A601B52D89800FEAAE5 /* dgKinematicBody.h */; };
+		FF938A971B52D89800FEAAE5 /* dgPhysics.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A611B52D89800FEAAE5 /* dgPhysics.h */; };
+		FF938A981B52D89800FEAAE5 /* dgPhysicsStdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A621B52D89800FEAAE5 /* dgPhysicsStdafx.h */; };
+		FF938A991B52D89800FEAAE5 /* dgSkeletonContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF938A631B52D89800FEAAE5 /* dgSkeletonContainer.cpp */; };
+		FF938A9A1B52D89800FEAAE5 /* dgSkeletonContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A641B52D89800FEAAE5 /* dgSkeletonContainer.h */; };
+		FF938A9B1B52D89800FEAAE5 /* dgSlidingConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A651B52D89800FEAAE5 /* dgSlidingConstraint.h */; };
+		FF938A9C1B52D89800FEAAE5 /* dgUniversalConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A661B52D89800FEAAE5 /* dgUniversalConstraint.h */; };
+		FF938A9D1B52D89800FEAAE5 /* dgUpVectorConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A671B52D89800FEAAE5 /* dgUpVectorConstraint.h */; };
+		FF938A9E1B52D89800FEAAE5 /* dgUserConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A681B52D89800FEAAE5 /* dgUserConstraint.h */; };
+		FF938A9F1B52D89800FEAAE5 /* dgWorld.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A691B52D89800FEAAE5 /* dgWorld.h */; };
+		FF938AA01B52D89800FEAAE5 /* dgWorldDynamicUpdate.h in Headers */ = {isa = PBXBuildFile; fileRef = FF938A6A1B52D89800FEAAE5 /* dgWorldDynamicUpdate.h */; };
 		FF9BBC4918351CB20060F147 /* dgObb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF9BBC4818351CB20060F147 /* dgObb.cpp */; };
 		FF9BBC7E1835206D0060F147 /* dg.h in Headers */ = {isa = PBXBuildFile; fileRef = FF9BBC541835206D0060F147 /* dg.h */; };
 		FF9BBC7F1835206D0060F147 /* dgAABBPolygonSoup.h in Headers */ = {isa = PBXBuildFile; fileRef = FF9BBC551835206D0060F147 /* dgAABBPolygonSoup.h */; };
@@ -155,6 +209,60 @@
 		FF80B6851596686E00E8D3B8 /* dgMeshEffect5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgMeshEffect5.cpp; path = ../../../source/meshUtil/dgMeshEffect5.cpp; sourceTree = SOURCE_ROOT; };
 		FF85FFB217405B4500BEE80B /* dgCollisionDeformableClothPatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionDeformableClothPatch.cpp; path = ../../../source/physics/dgCollisionDeformableClothPatch.cpp; sourceTree = "<group>"; };
 		FF85FFB417405B4500BEE80B /* dgCollisionDeformableSolidMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgCollisionDeformableSolidMesh.cpp; path = ../../../source/physics/dgCollisionDeformableSolidMesh.cpp; sourceTree = "<group>"; };
+		FF938A351B52D89800FEAAE5 /* dgBallConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgBallConstraint.h; path = ../../../source/physics/dgBallConstraint.h; sourceTree = "<group>"; };
+		FF938A361B52D89800FEAAE5 /* dgBilateralConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgBilateralConstraint.h; path = ../../../source/physics/dgBilateralConstraint.h; sourceTree = "<group>"; };
+		FF938A371B52D89800FEAAE5 /* dgBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgBody.h; path = ../../../source/physics/dgBody.h; sourceTree = "<group>"; };
+		FF938A381B52D89800FEAAE5 /* dgBodyMasterList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgBodyMasterList.h; path = ../../../source/physics/dgBodyMasterList.h; sourceTree = "<group>"; };
+		FF938A391B52D89800FEAAE5 /* dgBroadPhase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgBroadPhase.h; path = ../../../source/physics/dgBroadPhase.h; sourceTree = "<group>"; };
+		FF938A3A1B52D89800FEAAE5 /* dgBroadPhaseAggregate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgBroadPhaseAggregate.cpp; path = ../../../source/physics/dgBroadPhaseAggregate.cpp; sourceTree = "<group>"; };
+		FF938A3B1B52D89800FEAAE5 /* dgBroadPhaseAggregate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgBroadPhaseAggregate.h; path = ../../../source/physics/dgBroadPhaseAggregate.h; sourceTree = "<group>"; };
+		FF938A3C1B52D89800FEAAE5 /* dgBroadPhaseDefault.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgBroadPhaseDefault.cpp; path = ../../../source/physics/dgBroadPhaseDefault.cpp; sourceTree = "<group>"; };
+		FF938A3D1B52D89800FEAAE5 /* dgBroadPhaseDefault.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgBroadPhaseDefault.h; path = ../../../source/physics/dgBroadPhaseDefault.h; sourceTree = "<group>"; };
+		FF938A3E1B52D89800FEAAE5 /* dgBroadPhasePersistent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgBroadPhasePersistent.cpp; path = ../../../source/physics/dgBroadPhasePersistent.cpp; sourceTree = "<group>"; };
+		FF938A3F1B52D89800FEAAE5 /* dgBroadPhasePersistent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgBroadPhasePersistent.h; path = ../../../source/physics/dgBroadPhasePersistent.h; sourceTree = "<group>"; };
+		FF938A401B52D89800FEAAE5 /* dgCollision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollision.h; path = ../../../source/physics/dgCollision.h; sourceTree = "<group>"; };
+		FF938A411B52D89800FEAAE5 /* dgCollisionBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionBox.h; path = ../../../source/physics/dgCollisionBox.h; sourceTree = "<group>"; };
+		FF938A421B52D89800FEAAE5 /* dgCollisionBVH.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionBVH.h; path = ../../../source/physics/dgCollisionBVH.h; sourceTree = "<group>"; };
+		FF938A431B52D89800FEAAE5 /* dgCollisionCapsule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionCapsule.h; path = ../../../source/physics/dgCollisionCapsule.h; sourceTree = "<group>"; };
+		FF938A441B52D89800FEAAE5 /* dgCollisionChamferCylinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionChamferCylinder.h; path = ../../../source/physics/dgCollisionChamferCylinder.h; sourceTree = "<group>"; };
+		FF938A451B52D89800FEAAE5 /* dgCollisionCompound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionCompound.h; path = ../../../source/physics/dgCollisionCompound.h; sourceTree = "<group>"; };
+		FF938A461B52D89800FEAAE5 /* dgCollisionCompoundFractured.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionCompoundFractured.h; path = ../../../source/physics/dgCollisionCompoundFractured.h; sourceTree = "<group>"; };
+		FF938A471B52D89800FEAAE5 /* dgCollisionCone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionCone.h; path = ../../../source/physics/dgCollisionCone.h; sourceTree = "<group>"; };
+		FF938A481B52D89800FEAAE5 /* dgCollisionConvex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionConvex.h; path = ../../../source/physics/dgCollisionConvex.h; sourceTree = "<group>"; };
+		FF938A491B52D89800FEAAE5 /* dgCollisionConvexHull.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionConvexHull.h; path = ../../../source/physics/dgCollisionConvexHull.h; sourceTree = "<group>"; };
+		FF938A4A1B52D89800FEAAE5 /* dgCollisionConvexPolygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionConvexPolygon.h; path = ../../../source/physics/dgCollisionConvexPolygon.h; sourceTree = "<group>"; };
+		FF938A4B1B52D89800FEAAE5 /* dgCollisionCylinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionCylinder.h; path = ../../../source/physics/dgCollisionCylinder.h; sourceTree = "<group>"; };
+		FF938A4C1B52D89800FEAAE5 /* dgCollisionDeformableClothPatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionDeformableClothPatch.h; path = ../../../source/physics/dgCollisionDeformableClothPatch.h; sourceTree = "<group>"; };
+		FF938A4D1B52D89800FEAAE5 /* dgCollisionDeformableMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionDeformableMesh.h; path = ../../../source/physics/dgCollisionDeformableMesh.h; sourceTree = "<group>"; };
+		FF938A4E1B52D89800FEAAE5 /* dgCollisionDeformableSolidMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionDeformableSolidMesh.h; path = ../../../source/physics/dgCollisionDeformableSolidMesh.h; sourceTree = "<group>"; };
+		FF938A4F1B52D89800FEAAE5 /* dgCollisionHeightField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionHeightField.h; path = ../../../source/physics/dgCollisionHeightField.h; sourceTree = "<group>"; };
+		FF938A501B52D89800FEAAE5 /* dgCollisionInstance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionInstance.h; path = ../../../source/physics/dgCollisionInstance.h; sourceTree = "<group>"; };
+		FF938A511B52D89800FEAAE5 /* dgCollisionMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionMesh.h; path = ../../../source/physics/dgCollisionMesh.h; sourceTree = "<group>"; };
+		FF938A521B52D89800FEAAE5 /* dgCollisionNull.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionNull.h; path = ../../../source/physics/dgCollisionNull.h; sourceTree = "<group>"; };
+		FF938A531B52D89800FEAAE5 /* dgCollisionScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionScene.h; path = ../../../source/physics/dgCollisionScene.h; sourceTree = "<group>"; };
+		FF938A541B52D89800FEAAE5 /* dgCollisionSphere.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionSphere.h; path = ../../../source/physics/dgCollisionSphere.h; sourceTree = "<group>"; };
+		FF938A551B52D89800FEAAE5 /* dgCollisionTaperedCapsule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionTaperedCapsule.h; path = ../../../source/physics/dgCollisionTaperedCapsule.h; sourceTree = "<group>"; };
+		FF938A561B52D89800FEAAE5 /* dgCollisionTaperedCylinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionTaperedCylinder.h; path = ../../../source/physics/dgCollisionTaperedCylinder.h; sourceTree = "<group>"; };
+		FF938A571B52D89800FEAAE5 /* dgCollisionUserMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCollisionUserMesh.h; path = ../../../source/physics/dgCollisionUserMesh.h; sourceTree = "<group>"; };
+		FF938A581B52D89800FEAAE5 /* dgConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgConstraint.h; path = ../../../source/physics/dgConstraint.h; sourceTree = "<group>"; };
+		FF938A591B52D89800FEAAE5 /* dgContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgContact.h; path = ../../../source/physics/dgContact.h; sourceTree = "<group>"; };
+		FF938A5A1B52D89800FEAAE5 /* dgCorkscrewConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgCorkscrewConstraint.h; path = ../../../source/physics/dgCorkscrewConstraint.h; sourceTree = "<group>"; };
+		FF938A5B1B52D89800FEAAE5 /* dgDeformableBodiesUpdate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgDeformableBodiesUpdate.h; path = ../../../source/physics/dgDeformableBodiesUpdate.h; sourceTree = "<group>"; };
+		FF938A5C1B52D89800FEAAE5 /* dgDeformableBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgDeformableBody.h; path = ../../../source/physics/dgDeformableBody.h; sourceTree = "<group>"; };
+		FF938A5D1B52D89800FEAAE5 /* dgDeformableContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgDeformableContact.h; path = ../../../source/physics/dgDeformableContact.h; sourceTree = "<group>"; };
+		FF938A5E1B52D89800FEAAE5 /* dgDynamicBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgDynamicBody.h; path = ../../../source/physics/dgDynamicBody.h; sourceTree = "<group>"; };
+		FF938A5F1B52D89800FEAAE5 /* dgHingeConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgHingeConstraint.h; path = ../../../source/physics/dgHingeConstraint.h; sourceTree = "<group>"; };
+		FF938A601B52D89800FEAAE5 /* dgKinematicBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgKinematicBody.h; path = ../../../source/physics/dgKinematicBody.h; sourceTree = "<group>"; };
+		FF938A611B52D89800FEAAE5 /* dgPhysics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgPhysics.h; path = ../../../source/physics/dgPhysics.h; sourceTree = "<group>"; };
+		FF938A621B52D89800FEAAE5 /* dgPhysicsStdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgPhysicsStdafx.h; path = ../../../source/physics/dgPhysicsStdafx.h; sourceTree = "<group>"; };
+		FF938A631B52D89800FEAAE5 /* dgSkeletonContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgSkeletonContainer.cpp; path = ../../../source/physics/dgSkeletonContainer.cpp; sourceTree = "<group>"; };
+		FF938A641B52D89800FEAAE5 /* dgSkeletonContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgSkeletonContainer.h; path = ../../../source/physics/dgSkeletonContainer.h; sourceTree = "<group>"; };
+		FF938A651B52D89800FEAAE5 /* dgSlidingConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgSlidingConstraint.h; path = ../../../source/physics/dgSlidingConstraint.h; sourceTree = "<group>"; };
+		FF938A661B52D89800FEAAE5 /* dgUniversalConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgUniversalConstraint.h; path = ../../../source/physics/dgUniversalConstraint.h; sourceTree = "<group>"; };
+		FF938A671B52D89800FEAAE5 /* dgUpVectorConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgUpVectorConstraint.h; path = ../../../source/physics/dgUpVectorConstraint.h; sourceTree = "<group>"; };
+		FF938A681B52D89800FEAAE5 /* dgUserConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgUserConstraint.h; path = ../../../source/physics/dgUserConstraint.h; sourceTree = "<group>"; };
+		FF938A691B52D89800FEAAE5 /* dgWorld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgWorld.h; path = ../../../source/physics/dgWorld.h; sourceTree = "<group>"; };
+		FF938A6A1B52D89800FEAAE5 /* dgWorldDynamicUpdate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgWorldDynamicUpdate.h; path = ../../../source/physics/dgWorldDynamicUpdate.h; sourceTree = "<group>"; };
 		FF9BBC4818351CB20060F147 /* dgObb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dgObb.cpp; path = ../../../source/core/dgObb.cpp; sourceTree = "<group>"; };
 		FF9BBC541835206D0060F147 /* dg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dg.h; path = ../../../source/core/dg.h; sourceTree = "<group>"; };
 		FF9BBC551835206D0060F147 /* dgAABBPolygonSoup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgAABBPolygonSoup.h; path = ../../../source/core/dgAABBPolygonSoup.h; sourceTree = "<group>"; };
@@ -427,6 +535,60 @@
 		FFF899FA132D163E00A262F2 /* physics */ = {
 			isa = PBXGroup;
 			children = (
+				FF938A351B52D89800FEAAE5 /* dgBallConstraint.h */,
+				FF938A361B52D89800FEAAE5 /* dgBilateralConstraint.h */,
+				FF938A371B52D89800FEAAE5 /* dgBody.h */,
+				FF938A381B52D89800FEAAE5 /* dgBodyMasterList.h */,
+				FF938A391B52D89800FEAAE5 /* dgBroadPhase.h */,
+				FF938A3A1B52D89800FEAAE5 /* dgBroadPhaseAggregate.cpp */,
+				FF938A3B1B52D89800FEAAE5 /* dgBroadPhaseAggregate.h */,
+				FF938A3C1B52D89800FEAAE5 /* dgBroadPhaseDefault.cpp */,
+				FF938A3D1B52D89800FEAAE5 /* dgBroadPhaseDefault.h */,
+				FF938A3E1B52D89800FEAAE5 /* dgBroadPhasePersistent.cpp */,
+				FF938A3F1B52D89800FEAAE5 /* dgBroadPhasePersistent.h */,
+				FF938A401B52D89800FEAAE5 /* dgCollision.h */,
+				FF938A411B52D89800FEAAE5 /* dgCollisionBox.h */,
+				FF938A421B52D89800FEAAE5 /* dgCollisionBVH.h */,
+				FF938A431B52D89800FEAAE5 /* dgCollisionCapsule.h */,
+				FF938A441B52D89800FEAAE5 /* dgCollisionChamferCylinder.h */,
+				FF938A451B52D89800FEAAE5 /* dgCollisionCompound.h */,
+				FF938A461B52D89800FEAAE5 /* dgCollisionCompoundFractured.h */,
+				FF938A471B52D89800FEAAE5 /* dgCollisionCone.h */,
+				FF938A481B52D89800FEAAE5 /* dgCollisionConvex.h */,
+				FF938A491B52D89800FEAAE5 /* dgCollisionConvexHull.h */,
+				FF938A4A1B52D89800FEAAE5 /* dgCollisionConvexPolygon.h */,
+				FF938A4B1B52D89800FEAAE5 /* dgCollisionCylinder.h */,
+				FF938A4C1B52D89800FEAAE5 /* dgCollisionDeformableClothPatch.h */,
+				FF938A4D1B52D89800FEAAE5 /* dgCollisionDeformableMesh.h */,
+				FF938A4E1B52D89800FEAAE5 /* dgCollisionDeformableSolidMesh.h */,
+				FF938A4F1B52D89800FEAAE5 /* dgCollisionHeightField.h */,
+				FF938A501B52D89800FEAAE5 /* dgCollisionInstance.h */,
+				FF938A511B52D89800FEAAE5 /* dgCollisionMesh.h */,
+				FF938A521B52D89800FEAAE5 /* dgCollisionNull.h */,
+				FF938A531B52D89800FEAAE5 /* dgCollisionScene.h */,
+				FF938A541B52D89800FEAAE5 /* dgCollisionSphere.h */,
+				FF938A551B52D89800FEAAE5 /* dgCollisionTaperedCapsule.h */,
+				FF938A561B52D89800FEAAE5 /* dgCollisionTaperedCylinder.h */,
+				FF938A571B52D89800FEAAE5 /* dgCollisionUserMesh.h */,
+				FF938A581B52D89800FEAAE5 /* dgConstraint.h */,
+				FF938A591B52D89800FEAAE5 /* dgContact.h */,
+				FF938A5A1B52D89800FEAAE5 /* dgCorkscrewConstraint.h */,
+				FF938A5B1B52D89800FEAAE5 /* dgDeformableBodiesUpdate.h */,
+				FF938A5C1B52D89800FEAAE5 /* dgDeformableBody.h */,
+				FF938A5D1B52D89800FEAAE5 /* dgDeformableContact.h */,
+				FF938A5E1B52D89800FEAAE5 /* dgDynamicBody.h */,
+				FF938A5F1B52D89800FEAAE5 /* dgHingeConstraint.h */,
+				FF938A601B52D89800FEAAE5 /* dgKinematicBody.h */,
+				FF938A611B52D89800FEAAE5 /* dgPhysics.h */,
+				FF938A621B52D89800FEAAE5 /* dgPhysicsStdafx.h */,
+				FF938A631B52D89800FEAAE5 /* dgSkeletonContainer.cpp */,
+				FF938A641B52D89800FEAAE5 /* dgSkeletonContainer.h */,
+				FF938A651B52D89800FEAAE5 /* dgSlidingConstraint.h */,
+				FF938A661B52D89800FEAAE5 /* dgUniversalConstraint.h */,
+				FF938A671B52D89800FEAAE5 /* dgUpVectorConstraint.h */,
+				FF938A681B52D89800FEAAE5 /* dgUserConstraint.h */,
+				FF938A691B52D89800FEAAE5 /* dgWorld.h */,
+				FF938A6A1B52D89800FEAAE5 /* dgWorldDynamicUpdate.h */,
 				FFF89B28132D17F600A262F2 /* dgBallConstraint.cpp */,
 				FFF89B2A132D17F600A262F2 /* dgBilateralConstraint.cpp */,
 				FFF89B2C132D17F600A262F2 /* dgBody.cpp */,
@@ -494,51 +656,101 @@
 			buildActionMask = 2147483647;
 			files = (
 				FFE8C11016304C14008A1215 /* dgOpenclInstance.h in Headers */,
+				FF938A791B52D89800FEAAE5 /* dgCollisionCapsule.h in Headers */,
+				FF938A931B52D89800FEAAE5 /* dgDeformableContact.h in Headers */,
+				FF938A891B52D89800FEAAE5 /* dgCollisionScene.h in Headers */,
 				FF9BBC7E1835206D0060F147 /* dg.h in Headers */,
 				FF9BBC7F1835206D0060F147 /* dgAABBPolygonSoup.h in Headers */,
+				FF938A6D1B52D89800FEAAE5 /* dgBody.h in Headers */,
+				FF938A871B52D89800FEAAE5 /* dgCollisionMesh.h in Headers */,
 				FF9BBC801835206D0060F147 /* dgArray.h in Headers */,
 				FF9BBC811835206D0060F147 /* dgAsyncThread.h in Headers */,
+				FF938A851B52D89800FEAAE5 /* dgCollisionHeightField.h in Headers */,
+				FF938A8F1B52D89800FEAAE5 /* dgContact.h in Headers */,
+				FF938A821B52D89800FEAAE5 /* dgCollisionDeformableClothPatch.h in Headers */,
 				FF9BBC821835206D0060F147 /* dgConvexHull3d.h in Headers */,
+				FF938A881B52D89800FEAAE5 /* dgCollisionNull.h in Headers */,
+				FF938A9A1B52D89800FEAAE5 /* dgSkeletonContainer.h in Headers */,
+				FF938A781B52D89800FEAAE5 /* dgCollisionBVH.h in Headers */,
 				FF9BBC831835206D0060F147 /* dgConvexHull4d.h in Headers */,
 				FF9BBC841835206D0060F147 /* dgCRC.h in Headers */,
+				FF938A9E1B52D89800FEAAE5 /* dgUserConstraint.h in Headers */,
+				FF938A8C1B52D89800FEAAE5 /* dgCollisionTaperedCylinder.h in Headers */,
+				FF938A901B52D89800FEAAE5 /* dgCorkscrewConstraint.h in Headers */,
 				FF9BBC851835206D0060F147 /* dgDebug.h in Headers */,
+				FF938A961B52D89800FEAAE5 /* dgKinematicBody.h in Headers */,
+				FF938A761B52D89800FEAAE5 /* dgCollision.h in Headers */,
+				FF938A7A1B52D89800FEAAE5 /* dgCollisionChamferCylinder.h in Headers */,
 				FF9BBC861835206D0060F147 /* dgDelaunayTetrahedralization.h in Headers */,
 				C5E3826B19C4FD08005B9535 /* NewtonClass.h in Headers */,
+				FF938A801B52D89800FEAAE5 /* dgCollisionConvexPolygon.h in Headers */,
 				FF9BBC871835206D0060F147 /* dgFastQueue.h in Headers */,
 				C5E3826C19C4FD08005B9535 /* NewtonStdAfx.h in Headers */,
 				FF9BBC881835206D0060F147 /* dgGeneralMatrix.h in Headers */,
+				FF938A7E1B52D89800FEAAE5 /* dgCollisionConvex.h in Headers */,
 				FF9BBC891835206D0060F147 /* dgGeneralVector.h in Headers */,
 				FF9BBC8A1835206D0060F147 /* dgGoogol.h in Headers */,
+				FF938A831B52D89800FEAAE5 /* dgCollisionDeformableMesh.h in Headers */,
 				FF9BBC8B1835206D0060F147 /* dgGraph.h in Headers */,
 				FF9BBC8C1835206D0060F147 /* dgHeap.h in Headers */,
+				FF938A7F1B52D89800FEAAE5 /* dgCollisionConvexHull.h in Headers */,
 				FF9BBC8D1835206D0060F147 /* dgIntersections.h in Headers */,
+				FF938A771B52D89800FEAAE5 /* dgCollisionBox.h in Headers */,
+				FF938A6B1B52D89800FEAAE5 /* dgBallConstraint.h in Headers */,
+				FF938A751B52D89800FEAAE5 /* dgBroadPhasePersistent.h in Headers */,
 				C5E3826A19C4FD08005B9535 /* Newton.h in Headers */,
 				FF9BBC8E1835206D0060F147 /* dgList.h in Headers */,
+				FF938A9D1B52D89800FEAAE5 /* dgUpVectorConstraint.h in Headers */,
 				FF9BBC8F1835206D0060F147 /* dgMatrix.h in Headers */,
+				FF938A9B1B52D89800FEAAE5 /* dgSlidingConstraint.h in Headers */,
 				FF9BBC901835206D0060F147 /* dgMemory.h in Headers */,
 				FF9BBC911835206D0060F147 /* dgMutexThread.h in Headers */,
+				FF938A951B52D89800FEAAE5 /* dgHingeConstraint.h in Headers */,
 				FF9BBC921835206D0060F147 /* dgNode.h in Headers */,
 				FF9BBC931835206D0060F147 /* dgObb.h in Headers */,
 				FF9BBC941835206D0060F147 /* dgPlane.h in Headers */,
 				FF9BBC951835206D0060F147 /* dgPolygonSoupBuilder.h in Headers */,
 				FF9BBC961835206D0060F147 /* dgPolygonSoupDatabase.h in Headers */,
 				FF9BBC971835206D0060F147 /* dgPolyhedra.h in Headers */,
+				FF938A921B52D89800FEAAE5 /* dgDeformableBody.h in Headers */,
 				FF9BBC981835206D0060F147 /* dgPolyhedraMassProperties.h in Headers */,
 				FF9BBC991835206D0060F147 /* dgQuaternion.h in Headers */,
 				FF9BBC9A1835206D0060F147 /* dgRandom.h in Headers */,
+				FF938A811B52D89800FEAAE5 /* dgCollisionCylinder.h in Headers */,
+				FF938A8E1B52D89800FEAAE5 /* dgConstraint.h in Headers */,
 				FF9BBC9B1835206D0060F147 /* dgRef.h in Headers */,
+				FF938A6F1B52D89800FEAAE5 /* dgBroadPhase.h in Headers */,
+				FF938A7D1B52D89800FEAAE5 /* dgCollisionCone.h in Headers */,
 				FF9BBC9C1835206D0060F147 /* dgRefCounter.h in Headers */,
+				FF938A941B52D89800FEAAE5 /* dgDynamicBody.h in Headers */,
+				FF938A8A1B52D89800FEAAE5 /* dgCollisionSphere.h in Headers */,
+				FF938A7C1B52D89800FEAAE5 /* dgCollisionCompoundFractured.h in Headers */,
 				FF9BBC9D1835206D0060F147 /* dgRtti.h in Headers */,
 				FF9BBC9E1835206D0060F147 /* dgSmallDeterminant.h in Headers */,
+				FF938A8D1B52D89800FEAAE5 /* dgCollisionUserMesh.h in Headers */,
 				FF9BBC9F1835206D0060F147 /* dgSPDMatrix.h in Headers */,
+				FF938A7B1B52D89800FEAAE5 /* dgCollisionCompound.h in Headers */,
 				FF9BBCA01835206D0060F147 /* dgStack.h in Headers */,
 				FF9BBCA11835206D0060F147 /* dgStdafx.h in Headers */,
+				FF938A971B52D89800FEAAE5 /* dgPhysics.h in Headers */,
 				FF9BBCA21835206D0060F147 /* dgThread.h in Headers */,
 				FF9BBCA31835206D0060F147 /* dgThreadHive.h in Headers */,
+				FF938A911B52D89800FEAAE5 /* dgDeformableBodiesUpdate.h in Headers */,
 				FF9BBCA41835206D0060F147 /* dgThreadProfiler.h in Headers */,
+				FF938A9F1B52D89800FEAAE5 /* dgWorld.h in Headers */,
 				FF9BBCA51835206D0060F147 /* dgTree.h in Headers */,
+				FF938A9C1B52D89800FEAAE5 /* dgUniversalConstraint.h in Headers */,
+				FF938A861B52D89800FEAAE5 /* dgCollisionInstance.h in Headers */,
 				FF9BBCA61835206D0060F147 /* dgTypes.h in Headers */,
+				FF938A6E1B52D89800FEAAE5 /* dgBodyMasterList.h in Headers */,
+				FF938A6C1B52D89800FEAAE5 /* dgBilateralConstraint.h in Headers */,
+				FF938A8B1B52D89800FEAAE5 /* dgCollisionTaperedCapsule.h in Headers */,
 				FF9BBCA71835206D0060F147 /* dgVector.h in Headers */,
+				FF938A981B52D89800FEAAE5 /* dgPhysicsStdafx.h in Headers */,
+				FF938A841B52D89800FEAAE5 /* dgCollisionDeformableSolidMesh.h in Headers */,
+				FF938AA01B52D89800FEAAE5 /* dgWorldDynamicUpdate.h in Headers */,
+				FF938A711B52D89800FEAAE5 /* dgBroadPhaseAggregate.h in Headers */,
+				FF938A731B52D89800FEAAE5 /* dgBroadPhaseDefault.h in Headers */,
 				FF7EDA9C188842FD00CB1FFA /* dgMeshEffect.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -601,6 +813,7 @@
 				FFF89ADF132D17C100A262F2 /* dgConvexHull3d.cpp in Sources */,
 				FFF89AE1132D17C100A262F2 /* dgConvexHull4d.cpp in Sources */,
 				FFF89AE3132D17C100A262F2 /* dgCRC.cpp in Sources */,
+				FF938A701B52D89800FEAAE5 /* dgBroadPhaseAggregate.cpp in Sources */,
 				FFF89AE5132D17C100A262F2 /* dgDebug.cpp in Sources */,
 				FFF89AE7132D17C100A262F2 /* dgDelaunayTetrahedralization.cpp in Sources */,
 				FFF89AE9132D17C100A262F2 /* dgGeneralMatrix.cpp in Sources */,
@@ -619,8 +832,10 @@
 				FFF89B09132D17C100A262F2 /* dgRefCounter.cpp in Sources */,
 				FFF89B0D132D17C100A262F2 /* dgSmallDeterminant.cpp in Sources */,
 				FFF89B0F132D17C100A262F2 /* dgSPDMatrix.cpp in Sources */,
+				FF938A741B52D89800FEAAE5 /* dgBroadPhasePersistent.cpp in Sources */,
 				FFF89B15132D17C100A262F2 /* dgThreadHive.cpp in Sources */,
 				FFF89B17132D17C100A262F2 /* dgTree.cpp in Sources */,
+				FF938A721B52D89800FEAAE5 /* dgBroadPhaseDefault.cpp in Sources */,
 				FFF89B19132D17C100A262F2 /* dgTypes.cpp in Sources */,
 				FFF89B23132D17D800A262F2 /* Newton.cpp in Sources */,
 				FFF89B25132D17D800A262F2 /* NewtonClass.cpp in Sources */,
@@ -637,6 +852,7 @@
 				FFF89B96132D17F600A262F2 /* dgCollisionCone.cpp in Sources */,
 				FFF89B98132D17F600A262F2 /* dgCollisionConvex.cpp in Sources */,
 				FFF89B9A132D17F600A262F2 /* dgCollisionConvexHull.cpp in Sources */,
+				FF938A991B52D89800FEAAE5 /* dgSkeletonContainer.cpp in Sources */,
 				FFF89B9E132D17F600A262F2 /* dgCollisionCylinder.cpp in Sources */,
 				FFF89BA2132D17F600A262F2 /* dgCollisionHeightField.cpp in Sources */,
 				FFF89BA4132D17F600A262F2 /* dgCollisionMesh.cpp in Sources */,
