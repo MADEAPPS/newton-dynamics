@@ -879,6 +879,10 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 	NewtonBody* body0 = iter.GetNode()->GetInfo();
 	NewtonBodyGetMatrix(body0, &matrix0[0][0]);
 
+	int jointCount = 0; 
+	NewtonJoint* jointArray[256];
+	// for more accuracy, wrap the bridge in a Newton skeleton 
+	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), body0, NULL);
 	for (iter ++; iter; iter ++) {
 		NewtonBody* const body1 = iter.GetNode()->GetInfo();
 		
@@ -903,12 +907,22 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		pinMatrix1[3][3] = 1.0f;
 
 		// connect these two plank by a hinge, there a wiggle space between eh hinge that give therefore use the alternate hinge constructor
-		new CustomHinge (pinMatrix0, pinMatrix1, body0, body1);
+		CustomHinge* const joint = new CustomHinge (pinMatrix0, pinMatrix1, body0, body1);
+
+		// save the joint for later used
+		jointArray[jointCount] = joint->GetJoint();
+		jointCount ++;
 
 		body0 = body1;
 		matrix0 = matrix1;
 	}
 
+	// add all the joint to the Newton Skeleton 
+	NewtonSkeletonContainerAttachJointArray (skeleton, jointCount, jointArray);
+
+	// complete the skeleton construction
+	NewtonSkeletonContainerFinalize(skeleton);
+	
 	// connect the last and first plank to the bridge base
 	{
 		iter.Begin();

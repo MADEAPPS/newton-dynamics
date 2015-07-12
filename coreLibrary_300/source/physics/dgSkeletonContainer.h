@@ -35,8 +35,6 @@ class dgSkeletonContainer
 {
 	public:
 	class dgSkeletonGraph;
-	class dgSkeletonBodyGraph;
-	class dgSkeletonJointGraph;
 
 	DG_CLASS_ALLOCATOR(allocator)
 	dgSkeletonContainer(dgWorld* const world, dgDynamicBody* const rootBody);
@@ -46,25 +44,30 @@ class dgSkeletonContainer
 	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
 
 	dgInt32 GetId () const {return m_id;}
-	void AddChild (dgBody* const child, dgBody* const parent);
+	dgSkeletonGraph* AddChild (dgBody* const child, dgBody* const parent);
 	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
 	
 	void Finalize ();
-	dgInt32 GetJointCount () const {return (m_nodeCount - 1) / 2;}
+	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
 
 	void InitMassMatrix (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow);
 	dgFloat32 CalculateJointForce (dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 
-	protected:
+	private:
 	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
-	void AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
+	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	
-	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
+	void SolveFoward () const;
+	void SolveBackward () const;
 
+	dgFloat32 SolveUnilaterals (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	dgFloat32 CalculateJointAccel (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+
+	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
 	static void ResetUniqueId(dgInt32 id);
 
 	dgWorld* m_world;
-	dgSkeletonBodyGraph* m_skeleton;
+	dgSkeletonGraph* m_skeleton;
 	dgSkeletonGraph** m_nodesOrder;
 	dgOnSkeletonContainerDestroyCallback m_destructor;
 	dgInt32 m_id;

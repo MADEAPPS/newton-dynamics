@@ -201,7 +201,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	dgInt32 bodyCount = 0;
 	dgInt32 jointCount = 0;
 	dgInt32 staticCount = 0;
-	dgInt32 skeletonsCount = 0;
+	dgInt32 skeletonBonesCount = 0;
 	dgUnsigned32 lruMark = m_markLru - 1;
 	dgInt32 isInEquilibrium = 1;
 	
@@ -286,7 +286,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 
 							world->m_jointsMemory.ExpandCapacityIfNeessesary(jointIndex, sizeof (dgJointInfo));
 
-							skeletonsCount += (constraint->m_priority != 0);
+							skeletonBonesCount += (constraint->m_priority != 0);
 							
 							dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 							constraintArray[jointIndex].m_joint = constraint;
@@ -309,7 +309,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						dgInt32 jointIndex = m_joints + jointCount; 
 						world->m_jointsMemory.ExpandCapacityIfNeessesary(jointIndex, sizeof (dgJointInfo));
 
-						skeletonsCount += (constraint->m_priority != 0);
+						skeletonBonesCount += (constraint->m_priority != 0);
 						
 						dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 						constraintArray[jointIndex].m_joint = constraint;
@@ -385,11 +385,11 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			heaviestBody->m_dynamicsLru = m_markLru;
 		}
 
-		BuildIsland (queue, timestep, jointCount, skeletonsCount);
+		BuildIsland (queue, timestep, jointCount, skeletonBonesCount);
 	}
 }
 
-void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat32 timestep, dgInt32 jointCount, dgInt32 skeletonsCount)
+void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat32 timestep, dgInt32 jointCount, dgInt32 skeletonBonesCount)
 {
 	dgInt32 bodyCount = 1;
 	dgUnsigned32 lruMark = m_markLru;
@@ -458,7 +458,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 						dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
  						constraintArray[jointIndex].m_pairCount = dgInt16 (rows);
 						jointCount ++;
-						skeletonsCount += (constraint->m_priority != 0);
+						skeletonBonesCount += (constraint->m_priority != 0);
 
 						dgAssert (constraint->m_body0);
 						dgAssert (constraint->m_body1);
@@ -489,7 +489,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 		
 		m_islandMemory[m_islands].m_rowsStart = 0;
 
-		m_islandMemory[m_islands].m_skeletonCount = skeletonsCount;
+		m_islandMemory[m_islands].m_skeletonCount = skeletonBonesCount;
 		m_islandMemory[m_islands].m_isContinueCollision = false;
 
 		dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
@@ -555,7 +555,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 		m_islandMemory[m_islands].m_rowsCount = rowsCount;
 		m_islandMemory[m_islands].m_isContinueCollision = isContinueCollisionIsland;
 
-		if (skeletonsCount) {
+		if (skeletonBonesCount) {
 			for (dgInt32 i = 1; i < jointCount; i++) {
 				dgInt32 j = i;
 				dgJointInfo info (constraintArray[i]);

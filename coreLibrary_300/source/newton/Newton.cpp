@@ -8686,11 +8686,11 @@ void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const ske
 	skeletonContainer->AddJointList(jointCount, (dgBilateralConstraint**) jointArray);
 }
 
-void NewtonSkeletonContainerAttachBone(NewtonSkeletonContainer* const skeleton, NewtonBody* const childBone, NewtonBody* const parentBone)
+void* NewtonSkeletonContainerAttachBone(NewtonSkeletonContainer* const skeleton, NewtonBody* const childBone, NewtonBody* const parentBone)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*) skeleton;
-	skeletonContainer->AddChild((dgBody*) childBone, (dgBody*) parentBone);
+	return skeletonContainer->AddChild((dgBody*) childBone, (dgBody*) parentBone);
 }
 
 void NewtonSkeletonContainernDetachBone(NewtonSkeletonContainer* const skeleton, void* const bone)
