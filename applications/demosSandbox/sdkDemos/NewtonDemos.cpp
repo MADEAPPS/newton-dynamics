@@ -342,7 +342,8 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 
 	m_scene = new DemoEntityManager(this);
 	m_statusbar = CreateStatusBar();
-	int widths[] = {150, 160, 150, 90, 80, 100, 100};
+	//int widths[] = {150, 160, 150, 90, 80, 100, 100};
+	int widths[] = {-1, -1, -1, -1, -1, -1, -1};
 	m_statusbar->SetFieldsCount (sizeof (widths)/sizeof (widths[0]), widths);
 	CalculateFPS(0.0f);
 	m_mainMenu = CreateMainMenu();
@@ -662,9 +663,10 @@ void NewtonDemos::MouseAction(const wxMouseEvent &event)
 	}
 }
 
-bool NewtonDemos::GetKeyState( int key) const
+bool NewtonDemos::GetKeyState(int key) const
 {
-	return m_key[m_keyMap[key & 0xff]] ? true : false;
+	return wxGetKeyState(wxKeyCode(key & 0xff));
+//	return m_key[m_keyMap[key & 0xff]] ? true : false;
 }
 
 bool NewtonDemos::GetMousePosition (int& posX, int& posY) const
@@ -730,14 +732,13 @@ void NewtonDemos::CalculateFPS(float timestep)
 		statusText.Printf (wxT ("threads: %d"), NewtonGetThreadsCount(world));
 		m_statusbar->SetStatusText (statusText, 4);
 
-		statusText.Printf (wxT ("auto sleep: %s"), m_autoSleepState ? "on" : "off");
+		statusText.Printf (wxT ("auto sleep: %s"), m_autoSleepState ? wxT("on") : wxT("off"));
 		m_statusbar->SetStatusText (statusText, 5);
 
 		char floatMode[128];
-		NewtonGetDeviceString (m_scene->GetNewton(), m_hardwareDevice, floatMode, sizeof (floatMode));
-		statusText.Printf (wxT ("instructions: %s"), floatMode);
+		NewtonGetDeviceString (world, m_hardwareDevice, floatMode, sizeof (floatMode));
+		statusText.Printf (wxT ("instructions: %s"),  wxString::FromAscii(floatMode).wc_str());
 		m_statusbar->SetStatusText (statusText, 6);
-
 	}
 }
 
