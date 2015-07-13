@@ -413,9 +413,6 @@ void CustomVehicleControllerBodyStateTire::UpdateInfo(const TireCreationInfo& ti
 	NewtonCollisionSetMode (m_controller->m_tireCastShape, 1);
 	NewtonCollisionSetMatrix (m_controller->m_tireCastShape, &identMatrix[0][0]);
 
-	// get the collision shape
-	//m_shape = NewtonCompoundCollisionGetCollisionFromNode (vehShape, tireShapeNode);
-
 	// initialize all constants
 	m_userData = tireInfo.m_userData;
 	m_mass = dMax (tireInfo.m_mass, m_controller->m_chassisState.m_mass / 50.0f); 
