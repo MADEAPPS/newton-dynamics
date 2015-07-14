@@ -21,7 +21,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define MIN_JOINT_PIN_LENGTH   50.0f
 
 //dInitRtti(CustomUserBlank);
 

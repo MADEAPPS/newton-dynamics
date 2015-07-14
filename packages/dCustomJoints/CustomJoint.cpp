@@ -216,6 +216,24 @@ void CustomJoint::CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) con
 	matrix1 = m_localMatrix1 * body1Matrix;
 }
 
+void CustomJoint::CalculatePitchAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix1.m_front;
+	cosAngle = matrix1.m_up % matrix0.m_up;
+}
+
+void CustomJoint::CalculateYawAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_up;
+	cosAngle = matrix1.m_front % matrix0.m_front;
+}
+
+void CustomJoint::CalculateRollAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_right;
+	cosAngle = matrix1.m_front % matrix0.m_front;
+}
+
 
 void CustomJoint::GetInfo (NewtonJointRecord* const info) const
 {

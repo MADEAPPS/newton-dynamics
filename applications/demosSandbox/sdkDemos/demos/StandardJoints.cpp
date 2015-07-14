@@ -699,18 +699,17 @@ void StandardJoints (DemoEntityManager* const scene)
 
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
-/*
-	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
-	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -15.0f));
-	Add6DOF (scene, dVector (-20.0f, 0.0f, -10.0f));
-	AddUniversal (scene, dVector (-20.0f, 0.0f, -5.0f));
-	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -0.0f));
-*/
-	AddHinge (scene, dVector (-20.0f, 0.0f, 5.0f));
-/*
-	AddSlider (scene, dVector (-20.0f, 0.0f, 10.0f));
-	AddCylindrical (scene, dVector (-20.0f, 0.0f, 15.0f));
 
+//	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
+//	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -15.0f));
+//	Add6DOF (scene, dVector (-20.0f, 0.0f, -10.0f));
+//	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -5.0f));
+
+	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
+	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
+	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
+/*
 	//just to show up add some relational joints example 
 	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));

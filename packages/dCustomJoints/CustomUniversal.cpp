@@ -21,8 +21,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define MIN_JOINT_PIN_LENGTH	50.0f
-
 //dInitRtti(CustomUniversal);
 
 CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
@@ -207,21 +205,6 @@ dVector CustomUniversal::GetPinAxis_1 () const
 	return matrix1.m_up;
 }
 
-void CustomUniversal::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
-{
-//	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix0.m_front;
-//	cosAngle = matrix1.m_up % matrix0.m_up;
-	sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
-	cosAngle = matrix0.m_up % matrix1.m_up;
-}
-
-void CustomUniversal::CalculateYawAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
-{
-//	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_up;
-//	cosAngle = matrix1.m_front % matrix0.m_front;
-	sinAngle = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
-	cosAngle = matrix0.m_front % matrix1.m_front;
-}
 
 void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 {
@@ -231,6 +214,12 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
+	// Restrict the movement on the pivot point along all tree orthonormal direction
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
+
+
 	// get the pin fixed to the first body
 	const dVector& dir0 = matrix0.m_front;
 	// get the pin fixed to the second body
@@ -239,33 +228,21 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	// construct an orthogonal coordinate system with these two vectors
 	dVector dir2 (dir0 * dir1);
 	dir2 = dir2.Scale (1.0f / dSqrt (dir2 % dir2));
+	dVector dir3 (dir1 * dir2);
 
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &dir0[0]);
-	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &dir1[0]);
-	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &dir2[0]);
-	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-
-	dVector dir3 (dir2 * dir0);
-	dVector q0 (p0 + dir3.Scale(MIN_JOINT_PIN_LENGTH));
-	dVector q1 (p1 + dir1.Scale(MIN_JOINT_PIN_LENGTH));
-	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &dir0[0]);
-	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+	dFloat sinAngle = (dir0 * dir3) % dir1;
+	dFloat cosAngle = dir0 % dir3;
+	NewtonUserJointAddAngularRow (m_joint, -dAtan2 (sinAngle, cosAngle), &dir2[0]);
 
 	dFloat sinAngle_0;
 	dFloat cosAngle_0;
 	CalculatePitchAngle (matrix0, matrix1, sinAngle_0, cosAngle_0);
-	m_curJointAngle_0.Update (cosAngle_0, sinAngle_0);
+	dFloat angle0 = -m_curJointAngle_0.Update (cosAngle_0, sinAngle_0);
 
 	dFloat sinAngle_1;
 	dFloat cosAngle_1;
 	CalculateYawAngle (matrix0, matrix1, sinAngle_1, cosAngle_1);
-	m_curJointAngle_1.Update (cosAngle_1, sinAngle_1);
+	dFloat angle1 = -m_curJointAngle_1.Update (cosAngle_1, sinAngle_1);
 
 	dVector omega0 (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector omega1 (0.0f, 0.0f, 0.0f, 0.0f);
@@ -281,8 +258,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	
 	// check is the joint limit are enable
 	if (m_limit_0_On) {
-		if (m_curJointAngle_0.GetAngle() < m_minAngle_0) {
-			dFloat relAngle = m_curJointAngle_0.GetAngle() - m_minAngle_0;
+		if (angle0 < m_minAngle_0) {
+			dFloat relAngle = angle0 - m_minAngle_0;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
@@ -293,8 +270,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 			// allow the joint to move back freely
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 
-		} else if (m_curJointAngle_0.GetAngle() > m_maxAngle_0) {
-			dFloat relAngle = m_curJointAngle_0.GetAngle() - m_maxAngle_0;
+		} else if (angle0 > m_maxAngle_0) {
+			dFloat relAngle = angle0 - m_maxAngle_0;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
@@ -321,8 +298,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// if limit are enable ...
 	if (m_limit_1_On) {
-		if (m_curJointAngle_1.GetAngle() < m_minAngle_1) {
-			dFloat relAngle = m_curJointAngle_1.GetAngle() - m_minAngle_1;
+		if (angle1 < m_minAngle_1) {
+			dFloat relAngle = angle1 - m_minAngle_1;
 
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
@@ -333,8 +310,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 			// allow the joint to move back freely 
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 
-		} else if (m_curJointAngle_1.GetAngle() > m_maxAngle_1) {
-			dFloat relAngle = m_curJointAngle_1.GetAngle() - m_maxAngle_1;
+		} else if (angle1 > m_maxAngle_1) {
+			dFloat relAngle = angle1 - m_maxAngle_1;
 			
 			// tell joint error will minimize the exceeded angle error
 			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);

@@ -21,8 +21,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define MIN_JOINT_PIN_LENGTH	50.0f
-
 //dInitRtti(CustomSlider);
 IMPLEMENT_CUSTON_JOINT(CustomSlider);
 
@@ -103,6 +101,7 @@ dFloat CustomSlider::GetJointSpeed () const
 }
 
 
+
 void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -111,24 +110,22 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
-	// Restrict the movement on the pivot point along all tree orthonormal direction
-	dVector p0 (matrix0.m_posit);
-	dVector p1 (matrix1.m_posit + matrix1.m_front.Scale ((p0 - matrix1.m_posit) % matrix1.m_front));
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
+	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
+	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
+	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
 	
-	// two constraints row perpendicular to the pin
-	// get a point along the ping axis at some reasonable large distance from the pivot
-	dVector q0 (p0 + matrix0.m_front.Scale(MIN_JOINT_PIN_LENGTH));
-	dVector q1 (p1 + matrix1.m_front.Scale(MIN_JOINT_PIN_LENGTH));
- 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_right[0]);
+ 	// three rows to restrict rotation around around the parent coordinate system
+	dFloat sinAngle;
+	dFloat cosAngle;
+	CalculatePitchAngle(matrix0, matrix1, sinAngle, cosAngle);
+	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_front[0]);
 
-	// one constraint row perpendicular to the pin
-	// get a point along the ping axis at some reasonable large distance from the pivot
-	dVector r0 (p0 + matrix0.m_up.Scale(MIN_JOINT_PIN_LENGTH));
-	dVector r1 (p1 + matrix1.m_up.Scale(MIN_JOINT_PIN_LENGTH));
- 	NewtonUserJointAddLinearRow (m_joint, &r0[0], &r1[0], &matrix1.m_right[0]);
+	CalculateYawAngle(matrix0, matrix1, sinAngle, cosAngle);
+	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_up[0]);
+
+	CalculateRollAngle(matrix0, matrix1, sinAngle, cosAngle);
+	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_right[0]);
+
 
 	// calculate position and speed	
 	dVector veloc0(0.0f, 0.0f, 0.0f, 0.0f); 

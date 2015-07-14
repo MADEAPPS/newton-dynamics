@@ -16,7 +16,6 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomCorkScrew.h"
 
-#define MIN_JOINT_PIN_LENGTH	50.0f
 
 //dInitRtti(CustomCorkScrew);
 IMPLEMENT_CUSTON_JOINT(CustomCorkScrew);
@@ -125,20 +124,18 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
-	// Restrict the movement on the pivot point along all tree orthonormal direction
-	dVector p0 (matrix0.m_posit);
-	dVector p1 (matrix1.m_posit + matrix1.m_front.Scale ((p0 - matrix1.m_posit) % matrix1.m_front));
-
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
+	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
+	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_up[0]);
+	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_right[0]);
 	
-	// get a point along the pin axis at some reasonable large distance from the pivot
-	dVector q0 (p0 + matrix0.m_front.Scale(MIN_JOINT_PIN_LENGTH));
-	dVector q1 (p1 + matrix1.m_front.Scale(MIN_JOINT_PIN_LENGTH));
+	// two rows to restrict rotation around around the parent coordinate system
+	dFloat sinAngle;
+	dFloat cosAngle;
+	CalculateYawAngle(matrix0, matrix1, sinAngle, cosAngle);
+	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_up[0]);
 
-	// two constraints row perpendiculars to the hinge pin
- 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_right[0]);
+	CalculateRollAngle(matrix0, matrix1, sinAngle, cosAngle);
+	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_right[0]);
 
 	// if limit are enable ...
 	if (m_limitsLinearOn) {
@@ -158,12 +155,8 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-	dFloat angle;
-	dFloat sinAngle;
-	dFloat cosAngle;
-	sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-	cosAngle = matrix0.m_up % matrix1.m_up;
-	angle = m_curJointAngle.Update (cosAngle, sinAngle);
+	CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
+	dFloat angle = -m_curJointAngle.Update (cosAngle, sinAngle);
 
 	if (m_limitsAngularOn) {
 		// the joint angle can be determine by getting the angle between any two non parallel vectors
@@ -199,11 +192,9 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-
 	if (m_angularmotorOn) {
 		dVector omega0 (0.0f, 0.0f, 0.0f);
 		dVector omega1 (0.0f, 0.0f, 0.0f);
-
 
 		// get relative angular velocity
 		NewtonBodyGetOmega(m_body0, &omega0[0]);
