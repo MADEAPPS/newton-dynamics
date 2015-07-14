@@ -908,6 +908,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 
 		// connect these two plank by a hinge, there a wiggle space between eh hinge that give therefore use the alternate hinge constructor
 		CustomHinge* const joint = new CustomHinge (pinMatrix0, pinMatrix1, body0, body1);
+		joint->SetFriction(1000.0f);
 
 		// save the joint for later used
 		jointArray[jointCount] = joint->GetJoint();
