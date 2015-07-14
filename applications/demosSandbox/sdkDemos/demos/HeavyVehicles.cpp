@@ -18,7 +18,7 @@
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
-#include "../toolBox/DebugDisplay.h"
+#include "DebugDisplay.h"
 
 
 struct VehicleParameters
