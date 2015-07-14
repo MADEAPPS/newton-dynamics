@@ -130,12 +130,21 @@ dFloat CustomHinge::GetFriction () const
 
 void CustomHinge::CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
-//	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix1.m_front;
-//	cosAngle = matrix1.m_up % matrix0.m_up;
 	sinAngle = (matrix0.m_up * matrix1.m_up) % matrix1.m_front;
 	cosAngle = matrix0.m_up % matrix1.m_up;
 }
 
+void CustomHinge::CalculateYawAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_up;
+	cosAngle = matrix1.m_front % matrix0.m_front;
+}
+
+void CustomHinge::CalculateRollAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_right;
+	cosAngle = matrix1.m_front % matrix0.m_front;
+}
 
 
 void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
@@ -156,12 +165,18 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	dVector q1 (matrix1.m_posit + matrix1.m_front.Scale(MIN_JOINT_PIN_LENGTH));
 
 	// two constraints row perpendicular to the pin vector
- 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix1.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix1.m_right[0]);
-
-	// the joint angle can be determine by getting the angle between any two non parallel vectors
+// 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix1.m_up[0]);
+//	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix1.m_right[0]);
+	
 	dFloat sinAngle;
 	dFloat cosAngle;
+	CalculateYawAngle (matrix0, matrix1, sinAngle, cosAngle);
+	NewtonUserJointAddAngularRow (m_joint, -dAtan2 (sinAngle, cosAngle), &matrix1.m_up[0]);
+
+	CalculateRollAngle(matrix0, matrix1, sinAngle, cosAngle);
+	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_right[0]);
+
+	// the joint angle can be determine by getting the angle between any two non parallel vectors
 	CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
 	m_curJointAngle.Update (cosAngle, sinAngle);
 
