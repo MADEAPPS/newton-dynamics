@@ -171,12 +171,12 @@ void CustomUniversal::SetLimis_1(dFloat minAngle, dFloat maxAngle)
 
 dFloat CustomUniversal::GetJointAngle_0 () const
 {
-	return m_curJointAngle_0.GetAngle();
+	return -m_curJointAngle_0.GetAngle();
 }
 
 dFloat CustomUniversal::GetJointAngle_1 () const
 {
-	return m_curJointAngle_1.GetAngle();
+	return -m_curJointAngle_1.GetAngle();
 }
 
 dFloat CustomUniversal::GetJointOmega_0 () const
@@ -230,8 +230,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	dir2 = dir2.Scale (1.0f / dSqrt (dir2 % dir2));
 	dVector dir3 (dir1 * dir2);
 
-	dFloat sinAngle = (dir0 * dir3) % dir1;
-	dFloat cosAngle = dir0 % dir3;
+	dFloat sinAngle = ((dir3 * dir0) % dir2);
+	dFloat cosAngle = dir3 % dir0;
 	NewtonUserJointAddAngularRow (m_joint, -dAtan2 (sinAngle, cosAngle), &dir2[0]);
 
 	dFloat sinAngle_0;
@@ -333,5 +333,4 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowAcceleration (m_joint, relAccel);
 	}
 }
-
 

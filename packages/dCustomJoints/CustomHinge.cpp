@@ -100,7 +100,7 @@ void CustomHinge::SetLimis(dFloat minAngle, dFloat maxAngle)
 
 dFloat CustomHinge::GetJointAngle () const
 {
-	return m_curJointAngle.GetAngle();
+	return -m_curJointAngle.GetAngle();
 }
 
 dVector CustomHinge::GetPinAxis () const
