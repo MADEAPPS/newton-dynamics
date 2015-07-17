@@ -408,7 +408,7 @@ static void AddPoweredRagDoll (DemoEntityManager* const scene, const dVector& or
 	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	CustomControlledBallAndSocket* const joint0 = new CustomControlledBallAndSocket (pinMatrix, box0, NULL);
-	joint0->SetAngularVelocity (1000.0f * 3.141592f / 180.0f);
+	joint0->SetAngularVelocity (2000.0f * 3.141592f / 180.0f);
 	joint0->SetPitchAngle (-45.0f * 3.141592f / 180.0f);
 	joint0->SetYawAngle (-85.0f * 3.141592f / 180.0f);
 	joint0->SetRollAngle (120.0f * 3.141592f / 180.0f);
@@ -798,12 +798,11 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
-//	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
+	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
 
 	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));

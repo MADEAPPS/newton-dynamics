@@ -21,7 +21,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define MIN_JOINT_PIN_LENGTH	50.0f
 
 IMPLEMENT_CUSTON_JOINT(CustomBallAndSocket);
 IMPLEMENT_CUSTON_JOINT(CustomLimitBallAndSocket);
@@ -412,25 +411,16 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 
 	dQuaternion quat (rotation);
 	if (quat.m_q0 > dFloat (0.99995f)) {
-		dVector p0 (matrix0[3] + matrix0[0].Scale (MIN_JOINT_PIN_LENGTH));
-		dVector p1 (matrix1[3] + baseMatrix[0].Scale (MIN_JOINT_PIN_LENGTH));
-		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &baseMatrix[1][0]);
-		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &baseMatrix[2][0]);
-
-		dVector q0 (matrix0[3] + matrix0[1].Scale (MIN_JOINT_PIN_LENGTH));
-		dVector q1 (matrix0[3] + baseMatrix[1].Scale (MIN_JOINT_PIN_LENGTH));
-		NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &baseMatrix[2][0]);
-
+		dVector euler0;
+		dVector euler1;
+		rotation.GetEulerAngles(euler0, euler1);
+		NewtonUserJointAddAngularRow(m_joint, euler0[0], &rotation[0][0]);
+		NewtonUserJointAddAngularRow(m_joint, euler0[1], &rotation[1][0]);
+		NewtonUserJointAddAngularRow(m_joint, euler0[2], &rotation[2][0]);
 	} else {
 		dMatrix basis (dGrammSchmidt (dVector (quat.m_q1, quat.m_q2, quat.m_q3, 0.0f)));
-
-		dVector p0 (matrix1[3] + basis[1].Scale (MIN_JOINT_PIN_LENGTH));
-		dVector p1 (matrix1[3] + rotation.RotateVector(basis[1].Scale (MIN_JOINT_PIN_LENGTH)));
-		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &basis[2][0]);
-		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-
-		dVector q0 (matrix1[3] + basis[0].Scale (MIN_JOINT_PIN_LENGTH));
-		NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &basis[1][0]);
-		NewtonUserJointAddLinearRow (m_joint, &q0[0], &q0[0], &basis[2][0]);
+		NewtonUserJointAddAngularRow (m_joint, 2.0f * dAcos (quat.m_q0), &basis[0][0]);
+		NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[1][0]); 
+		NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[2][0]); 
 	}
 }
