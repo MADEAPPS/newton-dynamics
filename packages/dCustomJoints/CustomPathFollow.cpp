@@ -130,7 +130,7 @@ void CustomPathFollow::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	dMatrix matrix1 (EvalueCurve (matrix0.m_posit));
 
-	// Restrict the movement on the pivot point along all tree the normal and binormal of the path
+	// Restrict the movement on the pivot point along all tree the normal and bi normal of the path
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
 
@@ -141,35 +141,9 @@ void CustomPathFollow::SubmitConstraints (dFloat timestep, int threadIndex)
 	dVector q0 (p0 + matrix0.m_front.Scale(MIN_JOINT_PIN_LENGTH));
 	dVector q1 (p1 + matrix1.m_front.Scale(MIN_JOINT_PIN_LENGTH));
 
-	// two more constraints rows to inforce the normal and binormal 
+	// two more constraints rows to in force the normal and bi normal 
  	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_up[0]);
 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_right[0]);
-
-
-//	Julio: at this point the path follow will maintaing the pivot fixed to the path and will allow it to slide freelly
-//	it will also spin around the path tangent, if more control is needed then more constraion rows need to be submited 
-//	for example friction along the oath tangent be added to make more realistic behavior
-//  or anothet point contration along the binormal to make no spin around the path tangent
-
-/*
-	// example of ading friction
-	dVector veloc0; 
-	dVector omega0; 
-
-	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-
-	veloc0 += omega0 * (matrix0.m_posit - p0);
-
-	dFloat relAccel; 
-	relAccel = - (veloc0 % matrix0.m_front) / timestep;
-
-	#define MaxFriction 10.0f
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p0[0], &matrix0.m_front[0]);
-	NewtonUserJointSetRowAcceleration (m_joint, relAccel);
-	NewtonUserJointSetRowMinimumFriction (m_joint, -MaxFriction);
-	NewtonUserJointSetRowMaximumFriction(m_joint, MaxFriction);
-*/
 }
 
 

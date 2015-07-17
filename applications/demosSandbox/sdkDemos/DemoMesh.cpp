@@ -861,6 +861,16 @@ DemoBezierCurve::DemoBezierCurve(const dScene* const scene, dScene::dTreeNode* c
 	m_curve = bezeriInfo->GetCurve();
 }
 
+
+DemoBezierCurve::DemoBezierCurve (const dBezierSpline& curve)
+	:DemoMeshInterface()
+	,m_curve(curve)
+	,m_renderResolution(50)
+{
+	m_isVisible = false;
+}
+
+
 void DemoBezierCurve::RenderTransparency () const
 {
 }

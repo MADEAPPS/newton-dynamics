@@ -21,6 +21,7 @@
 #include <CustomHinge.h>
 #include <CustomSlider.h>
 #include <CustomPulley.h>
+#include <dBezierSpline.h>
 #include <CustomCorkScrew.h>
 #include <CustomBallAndSocket.h>
 #include <CustomRackAndPinion.h>
@@ -784,6 +785,72 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
 }
 
 
+
+
+/*
+		// render AI information
+		dMatrix pathMatrix (m_aiPath->GetMeshMatrix() * m_aiPath->GetCurrentMatrix());
+		dBigVector q; 
+		DemoBezierCurve* const path = (DemoBezierCurve*) m_aiPath->GetMesh();
+		path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
+		dVector p1 (pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w)));
+
+		glBegin(GL_LINES);
+		glColor3f (1.0f, 0.0f, 1.0f);
+		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+		glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+		glEnd();
+
+		glBegin(GL_LINES);
+		glColor3f (1.0f, 0.0f, 1.0f);
+		glVertex3f (p0.m_x, p0.m_y + 1.0f, p0.m_z);
+		glVertex3f (m_debugTargetHeading.m_x, m_debugTargetHeading.m_y + 1.0f, m_debugTargetHeading.m_z);
+		glEnd();
+*/
+
+
+
+
+static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin)
+{
+	// create a Bezier Spline path for AI car to drive
+	DemoEntity* const rollerCosterPath = new DemoEntity(dGetIdentityMatrix(), NULL);
+	scene->Append(rollerCosterPath);
+	
+	dBezierSpline spline;
+	dFloat64 knots[] = {0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f};
+
+	dBigVector o (origin[0], origin[1],  origin[2],  0.0f);
+	dBigVector control[] =
+	{
+		dBigVector(100.0f - 100.0f, 20.0f, 200.0f - 200.0f, 1.0f) + o,
+		dBigVector(150.0f - 100.0f, 10.0f, 150.0f - 200.0f, 1.0f) + o,
+		dBigVector(200.0f - 100.0f, 70.0f, 250.0f - 200.0f, 1.0f) + o,
+		dBigVector(150.0f - 100.0f, 10.0f, 350.0f - 200.0f, 1.0f) + o,
+		dBigVector( 50.0f - 100.0f, 30.0f, 250.0f - 200.0f, 1.0f) + o,
+		dBigVector(100.0f - 100.0f, 20.0f, 200.0f - 200.0f, 1.0f) + o,
+	};
+
+	spline.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, control);
+	dFloat64 u = (knots[1] + knots[2]) * 0.5f;
+	spline.InsertKnot(u);
+	spline.InsertKnot(u);
+	spline.InsertKnot(u);
+	spline.InsertKnot(u);
+	spline.InsertKnot(u);
+
+	DemoBezierCurve* const mesh = new DemoBezierCurve (spline);
+	rollerCosterPath->SetMesh(mesh, dGetIdentityMatrix());
+	
+	mesh->SetVisible(true);
+	mesh->SetRenderResolution(500);
+
+	mesh->Release();
+}
+
+
+
+
 void StandardJoints (DemoEntityManager* const scene)
 {
     scene->CreateSkyBox();
@@ -797,6 +864,7 @@ void StandardJoints (DemoEntityManager* const scene)
 
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
+
 
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
@@ -814,6 +882,8 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
+
+	AddPathFollow (scene, dVector (-0.0f, 0.0f, 0.0f));
 
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());

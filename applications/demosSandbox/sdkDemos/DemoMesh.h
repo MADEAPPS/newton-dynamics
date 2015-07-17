@@ -110,6 +110,7 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 class DemoBezierCurve: public DemoMeshInterface
 {
 	public:
+	DemoBezierCurve (const dBezierSpline& curve);
 	DemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const meshNode);
 
 	int GetRenderResolution () const;
