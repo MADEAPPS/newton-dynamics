@@ -26,19 +26,16 @@ class CustomPathFollow: public CustomJoint
 	CUSTOM_JOINTS_API CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body);
 	CUSTOM_JOINTS_API virtual ~CustomPathFollow();
 
-
-	CUSTOM_JOINTS_API void GetPathTarget (dVector& posit, dVector& tangent) const;
-	CUSTOM_JOINTS_API void SetPathTarget (const dVector& posit, const dVector& tangent);
-	
-	
+	virtual void GetPointAndTangentAtLocation (const dVector& location,  dVector& positOut, dVector& tangentOut) const = 0;
+//	CUSTOM_JOINTS_API void SetPathTarget (const dVector& posit, const dVector& tangent);
 
 	protected:
-	CUSTOM_JOINTS_API virtual dMatrix EvalueCurve (const dVector& posit);
+	CUSTOM_JOINTS_API dMatrix EvalueCurve (const dVector& posit);
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	dVector m_pathTangent;
-	dVector m_pointOnPath;
+//	dVector m_pathTangent;
+//	dVector m_pointOnPath;
 };
 
 #endif // !defined(AFX_CUSTOM_PATH_FOLLOW_H_H)

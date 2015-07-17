@@ -20,14 +20,11 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define MIN_JOINT_PIN_LENGTH	50.0f
-
-//dInitRtti(CustomPathFollow);
 
 CustomPathFollow::CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const child)
 	:CustomJoint(6, child, NULL)
-	,m_pathTangent (1.0f, 0.0f, 0.0f, 0.0f)
-	,m_pointOnPath (0.0f, 10.0f, 0.0f, 0.0)
+//	,m_pathTangent (1.0f, 0.0f, 0.0f, 0.0f)
+//	,m_pointOnPath (0.0f, 10.0f, 0.0f, 0.0)
 {
 	// calculate the two local matrix of the pivot point
 	dMatrix tmp;
@@ -83,7 +80,7 @@ void CustomPathFollow::GetInfo (NewtonJointRecord* const info) const
 */
 }
 
-
+/*
 void CustomPathFollow::SetPathTarget (const dVector& posit, const dVector& tangent)
 {
 	m_pointOnPath = posit;
@@ -95,13 +92,14 @@ void CustomPathFollow::GetPathTarget (dVector& posit, dVector& tangent) const
 	posit = m_pointOnPath;
 	tangent = m_pathTangent;
 }
+*/
 
 // calculate the closest point from the spline to point point
 dMatrix CustomPathFollow::EvalueCurve (const dVector& posit)
 {
 	dMatrix matrix;
-
-
+	dAssert (0);
+/*
 	// calculate distance for point to list
 	matrix.m_posit = m_pointOnPath + m_pathTangent.Scale ((posit - m_pointOnPath) % m_pathTangent);
 	matrix.m_posit.m_w = 1.0f;
@@ -116,7 +114,7 @@ dMatrix CustomPathFollow::EvalueCurve (const dVector& posit)
 
 	// the binormal is just the cross product;
 	matrix.m_right = matrix.m_front * matrix.m_up;
-
+*/
 	return matrix;
 }
 
@@ -129,7 +127,8 @@ void CustomPathFollow::SubmitConstraints (dFloat timestep, int threadIndex)
 	matrix0 = m_localMatrix0 * matrix0;
 
 	dMatrix matrix1 (EvalueCurve (matrix0.m_posit));
-
+	dAssert (0);
+/*
 	// Restrict the movement on the pivot point along all tree the normal and bi normal of the path
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
@@ -144,6 +143,7 @@ void CustomPathFollow::SubmitConstraints (dFloat timestep, int threadIndex)
 	// two more constraints rows to in force the normal and bi normal 
  	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_up[0]);
 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_right[0]);
+*/
 }
 
 

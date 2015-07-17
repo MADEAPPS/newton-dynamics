@@ -23,6 +23,7 @@
 #include <CustomPulley.h>
 #include <dBezierSpline.h>
 #include <CustomCorkScrew.h>
+#include <CustomPathFollow.h>
 #include <CustomBallAndSocket.h>
 #include <CustomRackAndPinion.h>
 #include <CustomSlidingContact.h>
@@ -808,6 +809,20 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
 		glEnd();
 */
 
+
+class MyPathFollow: public CustomPathFollow
+{
+	public:
+	MyPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body)
+		:CustomPathFollow (pinAndPivotFrame, body)
+	{
+	}
+
+	void GetPointAndTangentAtLocation (const dVector& location,  dVector& positOut, dVector& tangentOut) const
+	{
+		dAssert (0);
+	}
+};
 
 
 
