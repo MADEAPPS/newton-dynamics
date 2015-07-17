@@ -21,9 +21,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define MIN_JOINT_PIN_LENGTH	50.0f
-
-//dInitRtti(CustomSlidingContact);
 
 CustomSlidingContact::CustomSlidingContact (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
@@ -51,26 +48,19 @@ void CustomSlidingContact::EnableAngularLimits(bool state)
 	m_limitsAngularOn = state;
 }
 
-
 void CustomSlidingContact::SetLinearLimis(dFloat minDist, dFloat maxDist)
 {
-	//dAssert (minDist < 0.0f);
-	//dAssert (maxDist > 0.0f);
-
 	m_minLinearDist = minDist;
 	m_maxLinearDist = maxDist;
 }
 
 void CustomSlidingContact::SetAngularLimis(dFloat minDist, dFloat maxDist)
 {
-	//dAssert (minDist < 0.0f);
-	//dAssert (maxDist > 0.0f);
-
+	dAssert (minDist > -80.0f * 3.1416f / 180.0f);
+	dAssert (maxDist <  80.0f * 3.1416f / 180.0f);
 	m_minAngularDist = minDist;
 	m_maxAngularDist = maxDist;
 }
-
-
 
 void CustomSlidingContact::GetInfo (NewtonJointRecord* const info) const
 {
@@ -144,36 +134,45 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 
-	// get a point along the pin axis at some reasonable large distance from the pivot
-	dVector q0 (p0 + matrix0.m_up.Scale(MIN_JOINT_PIN_LENGTH));
-	dVector q1 (p1 + matrix1.m_up.Scale(MIN_JOINT_PIN_LENGTH));
-	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix1.m_right[0]);
-	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix1.m_front[0]);
+	dVector euler0;
+	dVector euler1;
+	dMatrix localMatrix (matrix0 * matrix1.Inverse());
+	localMatrix.GetEulerAngles(euler0, euler1);
 
+	if (dAbs (euler0.m_x) < 0.5f) {
+		NewtonUserJointAddAngularRow(m_joint, -euler0.m_x, &matrix1.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, -euler0.m_z, &matrix1.m_right[0]);
+	} else {
+		NewtonUserJointAddAngularRow(m_joint, euler1.m_x, &matrix1.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, euler1.m_z, &matrix1.m_right[0]);
+	}
 
+	
 	// if limit are enable ...
 	if (m_limitsLinearOn) {
-		dAssert (0);
-/*
-	dist = (matrix0.m_posit - matrix1.m_posit) % matrix0.m_front;
-	if (dist < m_minLinearDist) {
-	// get a point along the up vector and set a constraint  
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix0.m_front[0]);
-	// allow the object to return but not to kick going forward
-	NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-
-
-	} else if (dist > m_maxLinearDist) {
-	// get a point along the up vector and set a constraint  
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix0.m_front[0]);
-	// allow the object to return but not to kick going forward
-	NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-	}
-*/
+		dFloat dist = (matrix0.m_posit - matrix1.m_posit) % matrix1.m_front;
+		if (dist < m_minLinearDist) {
+			// get a point along the up vector and set a constraint  
+			dVector p (matrix1.m_posit + matrix1.m_front.Scale(m_minLinearDist));
+			NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
+			// allow the object to return but not to kick going forward
+			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
+		} else if (dist > m_maxLinearDist) {
+			dVector p(matrix1.m_posit + matrix1.m_front.Scale(m_maxLinearDist));
+			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
+			// allow the object to return but not to kick going forward
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		}
 	}
 
 	if (m_limitsAngularOn) {
-		dAssert (0);
+		if (euler0.m_y < m_minAngularDist) {
+			NewtonUserJointAddAngularRow(m_joint, -(euler0.m_y - m_minAngularDist), &matrix1.m_up[0]);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		} else if (euler0.m_y > m_maxAngularDist) {
+			NewtonUserJointAddAngularRow(m_joint, - (euler0.m_y - m_maxAngularDist), &matrix1.m_up[0]);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		}
 	}
 }
 

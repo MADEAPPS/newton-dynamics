@@ -24,6 +24,7 @@
 #include <CustomCorkScrew.h>
 #include <CustomBallAndSocket.h>
 #include <CustomRackAndPinion.h>
+#include <CustomSlidingContact.h>
 
 // optionally uncomment this for hard joint simulations 
 #define _USE_HARD_JOINTS
@@ -530,8 +531,39 @@ static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
 	NewtonSkeletonContainerAttachBone(skeleton, box1, box0);
 	NewtonSkeletonContainerFinalize(skeleton);
 #endif
-
 }
+
+static void AddSlidingContact(DemoEntityManager* const scene, const dVector& origin)
+{
+	// make a reel static
+	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(8.0f, 0.25f, 0.25f, 0.0f));
+	NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), 1.0f, 0.5f);
+
+	dMatrix matrix;
+
+	//connect the box0 to the base by a fix joint (a hinge with zero limit)
+	NewtonBodyGetMatrix(box0, &matrix[0][0]);
+	CustomHinge* const hinge = new CustomHinge(matrix, box0, NULL);
+	hinge->EnableLimits(true);
+	hinge->SetLimis(0.0f, 0.0f);
+
+	// connect the bodies by a Slider joint
+	NewtonBodyGetMatrix(box1, &matrix[0][0]);
+	CustomSlidingContact* const slider = new CustomSlidingContact(matrix, box1, box0);
+	slider->EnableLinearLimits (true);
+	slider->SetLinearLimis (-4.0f, 4.0f);
+
+	// enable limit of first axis
+	slider->EnableAngularLimits(true);
+	slider->SetAngularLimis (-60.0f * 3.1416f / 180.0f, 60.0f * 3.1416f / 180.0f);
+
+#ifdef _USE_HARD_JOINTS
+	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), box0, NULL);
+	NewtonSkeletonContainerAttachBone(skeleton, box1, box0);
+	NewtonSkeletonContainerFinalize(skeleton);
+#endif
+}
+
 
 static void AddCylindrical (DemoEntityManager* const scene, const dVector& origin)
 {
@@ -782,6 +814,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
+	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
