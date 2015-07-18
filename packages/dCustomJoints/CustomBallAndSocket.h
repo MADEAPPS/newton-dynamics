@@ -66,11 +66,7 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 	dFloat m_coneAngleSin;
 	dFloat m_coneAngleHalfCos;
 	dFloat m_coneAngleHalfSin;	
-
 	DECLARE_CUSTON_JOINT(CustomLimitBallAndSocket, CustomBallAndSocket)
-//	AngularIntegration m_pitch;
-//	AngularIntegration m_yaw;
-//	AngularIntegration m_roll;
 };
 
 
@@ -93,14 +89,19 @@ class CustomControlledBallAndSocket: public CustomBallAndSocket
 	CUSTOM_JOINTS_API dFloat SetRollAngle () const;
 
 	protected:
+	void UpdateTargetMatrix ();
+	CUSTOM_JOINTS_API CustomControlledBallAndSocket (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API void GetInfo (NewtonJointRecord* const info) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
 	dVector m_targetAngles;
+	dMatrix m_targetRotation;
 	AngularIntegration m_pitch;
 	AngularIntegration m_yaw;
 	AngularIntegration m_roll;
 	dFloat m_angulaSpeed;
+	DECLARE_CUSTON_JOINT(CustomControlledBallAndSocket, CustomBallAndSocket)
 };
 
 #endif 

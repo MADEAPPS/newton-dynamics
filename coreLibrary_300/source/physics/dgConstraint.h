@@ -194,7 +194,7 @@ class dgConstraint
 		dgFloat32 m_stiffness;
 	};
 
-	virtual bool IsBilateral () const;
+	bool IsBilateral () const;
 
 	protected:
 	dgConstraint();
@@ -225,6 +225,7 @@ class dgConstraint
 	dgUnsigned32 m_enableCollision		: 1;
 	dgUnsigned32 m_solverActive			: 1;
 	dgUnsigned32 m_contactActive		: 1;
+	dgUnsigned32 m_isBilateral			: 1;
 	
 	friend class dgWorld;
 	friend class dgAmpInstance;
@@ -238,7 +239,7 @@ class dgConstraint
 	friend class dgBroadPhaseMaterialCallbackWorkerThread;
 } DG_GCC_VECTOR_ALIGMENT;
 
-inline dgConstraint::dgConstraint() 
+DG_INLINE dgConstraint::dgConstraint() 
 	:m_userData(NULL)
 	,m_body0(NULL)
 	,m_body1(NULL)
@@ -253,86 +254,87 @@ inline dgConstraint::dgConstraint()
 	,m_enableCollision(false)
 	,m_solverActive(false)
 	,m_contactActive(false)
+	,m_isBilateral(false)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 }
 
-inline dgConstraint::~dgConstraint()
+DG_INLINE dgConstraint::~dgConstraint()
 {
 }
 
-inline void dgConstraint::SetUpdateFeedbackFunction (ConstraintsForceFeeback function)
+DG_INLINE void dgConstraint::SetUpdateFeedbackFunction (ConstraintsForceFeeback function)
 {
 	m_updaFeedbackCallback = function;
 }
 
-inline bool dgConstraint::IsBilateral() const
+DG_INLINE bool dgConstraint::IsBilateral() const
 {
-	return false;
+	return m_isBilateral ? true : false;
 }
 
-inline bool dgConstraint::IsCollidable () const
+DG_INLINE bool dgConstraint::IsCollidable () const
 {
 	return m_enableCollision ? true : false;
 }
 
-inline void dgConstraint::SetCollidable (bool state)
+DG_INLINE void dgConstraint::SetCollidable (bool state)
 {
 	m_enableCollision = dgUnsigned32 (state);
 }
 
-inline dgUnsigned32 dgConstraint::GetId () const
+DG_INLINE dgUnsigned32 dgConstraint::GetId () const
 {
 	return m_constId;
 }
 
-inline dgBody* dgConstraint::GetBody0 () const
+DG_INLINE dgBody* dgConstraint::GetBody0 () const
 {
 	return m_body0;
 }
 
-inline dgBody* dgConstraint::GetBody1 () const
+DG_INLINE dgBody* dgConstraint::GetBody1 () const
 {
 	return m_body1;
 }
 
-inline void dgConstraint::SetBodies (dgBody* const body0, dgBody* const body1)
+DG_INLINE void dgConstraint::SetBodies (dgBody* const body0, dgBody* const body1)
 {
 	m_body0 = body0;
 	m_body1 = body1;
 }
 
 
-inline dgBodyMasterListRow::dgListNode* dgConstraint::GetLink0()	const
+DG_INLINE dgBodyMasterListRow::dgListNode* dgConstraint::GetLink0()	const
 {
 	return m_link0;
 }
-inline dgBodyMasterListRow::dgListNode* dgConstraint::GetLink1()	const
+DG_INLINE dgBodyMasterListRow::dgListNode* dgConstraint::GetLink1()	const
 {
 	return m_link1;
 }
 
 
-inline dgFloat32 dgConstraint::GetStiffness() const
+DG_INLINE dgFloat32 dgConstraint::GetStiffness() const
 {
 	return dgFloat32 (1.0f);
 }
 
-inline void dgConstraint::SetStiffness(dgFloat32 stiffness)
+DG_INLINE void dgConstraint::SetStiffness(dgFloat32 stiffness)
 {
 }
 
 
-inline void dgConstraint::ResetMaxDOF()
+DG_INLINE void dgConstraint::ResetMaxDOF()
 {
 }
 
-inline dgInt32 dgConstraint::GetMaxDOF() const
+DG_INLINE dgInt32 dgConstraint::GetMaxDOF() const
 {
 	return dgInt32 (m_maxDOF);
 }
 
-inline bool dgConstraint::IsActive() const
+DG_INLINE bool dgConstraint::IsActive() const
 {
 	return m_contactActive ? true : false;
 }

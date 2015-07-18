@@ -44,6 +44,8 @@ class dgSlidingConstraint: public dgBilateralConstraint
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
 	virtual void Serialize (dgSerialize serializeCallback, void* const userData) {dgAssert (0);}
 
+	dgMatrix m_localMatrix0;
+	dgMatrix m_localMatrix1;
 
 	dgFloat32 m_posit;
 	dgSlidingJointAcceleration m_jointAccelFnt;

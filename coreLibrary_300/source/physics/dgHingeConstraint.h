@@ -46,6 +46,9 @@ class dgHingeConstraint: public dgBilateralConstraint
 	dgHingeConstraint();
 	virtual ~dgHingeConstraint();
 
+	dgMatrix m_localMatrix0;
+	dgMatrix m_localMatrix1;
+
 	dgFloat32 m_angle;
 	dgHingeJointAcceleration m_jointAccelFnt;
 

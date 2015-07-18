@@ -28,7 +28,7 @@
 #include "dgSkeletonContainer.h"
 #include "dgCollisionInstance.h"
 #include "dgWorldDynamicUpdate.h"
-
+#include "dgBilateralConstraint.h"
 
 void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const
 {
@@ -1066,7 +1066,13 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			accNorm = dgFloat32 (0.0f);
 			for (dgInt32 i = 0; i < jointBaseCount; i ++) {
 				dgJointInfo* const jointInfo = &constraintArray[i];
-				dgFloat32 accel = CalculateJointForce (jointInfo, bodyArray, internalForces, matrixRow);
+				dgConstraint* const constraint = jointInfo->m_joint; 
+				dgFloat32 accel = dgFloat32(0.0f);
+				if (constraint->IsBilateral()) {
+					accel = CalculateJointForce (jointInfo, bodyArray, internalForces, matrixRow);
+				} else {
+					accel = CalculateJointForce (jointInfo, bodyArray, internalForces, matrixRow);
+				}
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 

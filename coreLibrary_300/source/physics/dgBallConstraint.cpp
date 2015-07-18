@@ -37,6 +37,9 @@ dgBallConstraint::dgBallConstraint ()
 //	dgBallConstraintArray& array = * world;
 //	constraint = array.GetElement();
 	dgAssert ((((dgUnsigned64) &m_localMatrix0) & 15) == 0);
+	
+	m_localMatrix0 = dgGetIdentityMatrix();
+	m_localMatrix1 = dgGetIdentityMatrix();
 
 	//constraint->SetStiffness (dgFloat32 (0.5f));
 	m_maxDOF = 6;
@@ -209,10 +212,6 @@ void dgBallConstraint::SetLimits (
 	m_localMatrix0.m_right.m_w = dgFloat32 (0.0f);
 	m_localMatrix0.m_posit.m_w = dgFloat32 (1.0f);
 
-//	dgMatrix body1_Matrix (dgGetIdentityMatrix());
-//	if (m_body1) {
-//		body1_Matrix = m_body1->GetMatrix();
-//	}
 	const dgMatrix& body1_Matrix = m_body1->GetMatrix();
 
 	m_twistAngle = dgClamp (maxTwistAngle, dgFloat32 (5.0f) * dgDEG2RAD, dgFloat32 (90.0f) * dgDEG2RAD);

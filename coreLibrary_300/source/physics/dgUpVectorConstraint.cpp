@@ -35,6 +35,9 @@ dgUpVectorConstraint::dgUpVectorConstraint ()
 	dgAssert ( dgInt32 (sizeof (dgUpVectorConstraint) & 15) == 0);
 	dgAssert ((((dgUnsigned64) &m_localMatrix0) & 15) == 0);
 
+	m_localMatrix0 = dgGetIdentityMatrix();
+	m_localMatrix1 = dgGetIdentityMatrix();
+
 //	dgUpVectorConstraintArray& array = * world;
 //	constraint = array.GetElement();
 

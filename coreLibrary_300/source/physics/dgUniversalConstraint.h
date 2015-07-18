@@ -50,6 +50,9 @@ class dgUniversalConstraint: public dgBilateralConstraint
 	dgUniversalConstraint();
 	virtual ~dgUniversalConstraint();
 
+	dgMatrix m_localMatrix0;
+	dgMatrix m_localMatrix1;
+
 	dgFloat32 m_angle0;
 	dgFloat32 m_angle1;
 	dgUniversalJointAcceleration m_jointAccelFnt;

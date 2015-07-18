@@ -222,10 +222,11 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
 	} else if (m_limitsOn) {
         // only limit are on 
         // the joint angle can be determine by getting the angle between any two non parallel vectors
-        if (angle < m_minAngle) {
+        if ((m_minAngle > -1.e-4f) && (m_maxAngle < 1.e-4f)) {
+            NewtonUserJointAddAngularRow (m_joint, angle, &matrix1.m_front[0]);
+            NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+        } if (angle < m_minAngle) {
             dFloat relAngle = angle - m_minAngle;
-            // the angle was clipped save the new clip limit
-            //m_curJointAngle.m_angle = m_minAngle;
 
             // tell joint error will minimize the exceeded angle error
             NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_front[0]);
@@ -237,9 +238,6 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
             NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
         } else if (angle > m_maxAngle) {
             dFloat relAngle = angle - m_maxAngle;
-
-            // the angle was clipped save the new clip limit
-            //m_curJointAngle.m_angle = m_maxAngle;
 
             // tell joint error will minimize the exceeded angle error
             NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_front[0]);

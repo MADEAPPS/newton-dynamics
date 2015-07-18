@@ -34,6 +34,10 @@ dgUniversalConstraint::dgUniversalConstraint ()
 	:dgBilateralConstraint() 
 {
 	dgAssert ((((dgUnsigned64) &m_localMatrix0) & 15) == 0);
+
+	m_localMatrix0 = dgGetIdentityMatrix();
+	m_localMatrix1 = dgGetIdentityMatrix();
+
 	m_maxDOF = 6;
 	m_constId = m_universalConstraint;
 

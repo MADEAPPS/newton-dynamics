@@ -24,6 +24,7 @@
 
 IMPLEMENT_CUSTON_JOINT(CustomBallAndSocket);
 IMPLEMENT_CUSTON_JOINT(CustomLimitBallAndSocket);
+IMPLEMENT_CUSTON_JOINT(CustomControlledBallAndSocket);
 
 CustomBallAndSocket::CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
@@ -293,10 +294,21 @@ CustomControlledBallAndSocket::CustomControlledBallAndSocket(const dMatrix& pinA
 {
 }
 
+CustomControlledBallAndSocket::CustomControlledBallAndSocket (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomBallAndSocket(child, parent, callback, userData)
+{
+	dAssert (0);
+}
+
 CustomControlledBallAndSocket::~CustomControlledBallAndSocket()
 {
 }
 
+void CustomControlledBallAndSocket::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomBallAndSocket::Serialize (callback, userData);
+	dAssert (0);
+}
 
 void CustomControlledBallAndSocket::GetInfo (NewtonJointRecord* const info) const
 {
@@ -326,6 +338,7 @@ dFloat CustomControlledBallAndSocket::GetAngularVelocity () const
 void CustomControlledBallAndSocket::SetPitchAngle (dFloat angle)
 {
 	m_targetAngles[0] = angle;
+	UpdateTargetMatrix ();
 }
 
 dFloat CustomControlledBallAndSocket::SetPitchAngle () const
@@ -336,6 +349,7 @@ dFloat CustomControlledBallAndSocket::SetPitchAngle () const
 void CustomControlledBallAndSocket::SetYawAngle (dFloat angle)
 {
 	m_targetAngles[1] = angle;
+	UpdateTargetMatrix ();
 }
 
 dFloat CustomControlledBallAndSocket::SetYawAngle () const
@@ -346,6 +360,7 @@ dFloat CustomControlledBallAndSocket::SetYawAngle () const
 void CustomControlledBallAndSocket::SetRollAngle (dFloat angle)
 {
 	m_targetAngles[2] = angle;
+	UpdateTargetMatrix ();
 }
 
 dFloat CustomControlledBallAndSocket::SetRollAngle () const
@@ -353,6 +368,10 @@ dFloat CustomControlledBallAndSocket::SetRollAngle () const
 	return m_targetAngles[2];
 }
 
+void CustomControlledBallAndSocket::UpdateTargetMatrix ()
+{
+	m_targetRotation = dPitchMatrix(m_targetAngles[0]) * dYawMatrix(m_targetAngles[1]) * dRollMatrix(m_targetAngles[2]);
+}
 
 void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
 {
@@ -362,14 +381,12 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-
 	// Restrict the movement on the pivot point along all tree orthonormal direction
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
+	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
+	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
 
+#if 0
 	dVector euler0;
 	dVector euler1;
 	dMatrix localMatrix (matrix0 * matrix1.Inverse());
@@ -380,15 +397,10 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 	if (dAbs (pitchStep0.GetAngle()) > dAbs (pitchStep1.GetAngle())) {
 		euler0 = euler1;
 	}
-
 	dVector euler (m_pitch.Update (euler0.m_x), m_yaw.Update (euler0.m_y), m_roll.Update (euler0.m_z), 0.0f);
-	//dTrace (("(%f %f %f) (%f %f %f)\n", m_pitch.m_angle * 180.0f / 3.141592f, m_yaw.m_angle * 180.0f / 3.141592f, m_roll.m_angle * 180.0f / 3.141592f,  euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f));
-
-	//bool limitViolation = false;
 	for (int i = 0; i < 3; i ++) {
 		dFloat error = m_targetAngles[i] - euler[i];
 		if (dAbs (error) > (0.125f * 3.14159213f / 180.0f) ) {
-			//limitViolation = true;
 			dFloat angularStep = dSign(error) * m_angulaSpeed * timestep;
 			if (angularStep > 0.0f) {
 				if (angularStep > error) {
@@ -402,9 +414,7 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 			euler[i] = euler[i] + angularStep;
 		}
 	}
-
-
-	//dMatrix pyr (dPitchMatrix(m_pitch.m_angle) * dYawMatrix(m_yaw.m_angle) * dRollMatrix(m_roll.m_angle));
+	
 	dMatrix p0y0r0 (dPitchMatrix(euler[0]) * dYawMatrix(euler[1]) * dRollMatrix(euler[2]));
 	dMatrix baseMatrix (p0y0r0 * matrix1);
 	dMatrix rotation (matrix0.Inverse() * baseMatrix);
@@ -423,4 +433,51 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 		NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[1][0]); 
 		NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[2][0]); 
 	}
+#else
+
+	matrix1 = m_targetRotation * matrix1;
+
+	dQuaternion localRotation(matrix1 * matrix0.Inverse());
+	if (localRotation.DotProduct(m_targetRotation) < 0.0f) {
+		localRotation.Scale(-1.0f);
+	}
+
+	dFloat angle = 2.0f * dAcos(localRotation.m_q0);
+	dFloat angleStep = m_angulaSpeed * timestep;
+	if (angleStep < angle) {
+		dVector axis(dVector(localRotation.m_q1, localRotation.m_q2, localRotation.m_q3, 0.0f));
+		axis = axis.Scale(1.0f / dSqrt(axis % axis));
+//		localRotation = dQuaternion(axis, angleStep);
+	}
+
+	dVector axis (matrix1.m_front * matrix1.m_front);
+	dVector axis1 (matrix1.m_front * matrix1.m_front);
+dFloat sinAngle;
+dFloat cosAngle;
+CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
+float xxxx = dAtan2(sinAngle, cosAngle);
+float xxxx1 = dAtan2(sinAngle, cosAngle);
+
+	dQuaternion quat(localRotation);
+	if (quat.m_q0 > dFloat(0.99995f)) {
+//		dAssert (0);
+/*
+		dVector euler0;
+		dVector euler1;
+		rotation.GetEulerAngles(euler0, euler1);
+		NewtonUserJointAddAngularRow(m_joint, euler0[0], &rotation[0][0]);
+		NewtonUserJointAddAngularRow(m_joint, euler0[1], &rotation[1][0]);
+		NewtonUserJointAddAngularRow(m_joint, euler0[2], &rotation[2][0]);
+*/
+	} else {
+		dMatrix basis(dGrammSchmidt(dVector(quat.m_q1, quat.m_q2, quat.m_q3, 0.0f)));
+		NewtonUserJointAddAngularRow(m_joint, -2.0f * dAcos(quat.m_q0), &basis[0][0]);
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &basis[1][0]);
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &basis[2][0]);
+	}
+
+#endif
 }
+
+
+

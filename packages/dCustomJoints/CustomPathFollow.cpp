@@ -98,23 +98,25 @@ void CustomPathFollow::GetPathTarget (dVector& posit, dVector& tangent) const
 dMatrix CustomPathFollow::EvalueCurve (const dVector& posit)
 {
 	dMatrix matrix;
-	dAssert (0);
-/*
+
+	dVector pathPosit;
+	dVector pathTangent;
+	GetPointAndTangentAtLocation (posit,  pathPosit, pathTangent);
+
 	// calculate distance for point to list
-	matrix.m_posit = m_pointOnPath + m_pathTangent.Scale ((posit - m_pointOnPath) % m_pathTangent);
+	matrix.m_posit = pathPosit;
 	matrix.m_posit.m_w = 1.0f;
 
-
 	//the tangent of the path is the line slope, passes in the first matrix dir
-	matrix.m_front = m_pathTangent;
+	matrix.m_front = pathTangent;
 
 	// the normal will be such that it is horizontal to the the floor and perpendicular to the path 
 	dVector normal (dVector (0.0f, 1.0f, 0.0f, 0.0f) * matrix.m_front);
-	matrix.m_up = normal.Scale (1.0f / dSqrt (normal % matrix.m_front));
+	matrix.m_up = normal.Scale (1.0f / dSqrt (normal % normal));
 
 	// the binormal is just the cross product;
 	matrix.m_right = matrix.m_front * matrix.m_up;
-*/
+
 	return matrix;
 }
 
@@ -127,8 +129,7 @@ void CustomPathFollow::SubmitConstraints (dFloat timestep, int threadIndex)
 	matrix0 = m_localMatrix0 * matrix0;
 
 	dMatrix matrix1 (EvalueCurve (matrix0.m_posit));
-	dAssert (0);
-/*
+
 	// Restrict the movement on the pivot point along all tree the normal and bi normal of the path
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
@@ -136,14 +137,9 @@ void CustomPathFollow::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
 	
-	// get a point along the ping axis at some reasonable large distance from the pivot
-	dVector q0 (p0 + matrix0.m_front.Scale(MIN_JOINT_PIN_LENGTH));
-	dVector q1 (p1 + matrix1.m_front.Scale(MIN_JOINT_PIN_LENGTH));
-
 	// two more constraints rows to in force the normal and bi normal 
- 	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &matrix0.m_right[0]);
-*/
+// 	NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_up[0]);
+//	NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_right[0]);
 }
 
 

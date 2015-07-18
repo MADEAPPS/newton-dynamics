@@ -51,6 +51,8 @@ class dgCorkscrewConstraint: public dgBilateralConstraint
 	dgCorkscrewConstraint();
 	virtual ~dgCorkscrewConstraint();
 
+	dgMatrix m_localMatrix0;
+	dgMatrix m_localMatrix1;
 
 	dgFloat32 m_angle;
 	dgFloat32 m_posit;

@@ -46,6 +46,9 @@ class dgUpVectorConstraint: public dgBilateralConstraint
 	virtual void Serialize (dgSerialize serializeCallback, void* const userData) {dgAssert (0);}
 
 	dgUpVectorJointCallback m_callBack;
+
+	dgMatrix m_localMatrix0;
+	dgMatrix m_localMatrix1;
 //	dgUnsigned32 m_reserve[3];
 
 	friend class dgWorld;

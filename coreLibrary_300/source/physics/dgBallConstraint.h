@@ -73,6 +73,9 @@ class dgBallConstraint: public dgBilateralConstraint
 			dgUnsigned32 m_lateralLimit : 1;
 		};
 	};
+
+	dgMatrix m_localMatrix0;
+	dgMatrix m_localMatrix1;
 	dgFloat32 m_coneAngle;
 	dgFloat32 m_twistAngle;
 	dgFloat32 m_coneAngleCos;

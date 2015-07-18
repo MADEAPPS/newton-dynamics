@@ -40,14 +40,10 @@
 dgBilateralConstraint::dgBilateralConstraint ()
 	:dgConstraint () 
 {
-	dgAssert (dgInt32 (sizeof (dgBilateralConstraint) & 15) == 0);
-	dgAssert ((((dgUnsigned64) &m_localMatrix0) & 15) == 0);
-
 	m_maxDOF = 6;
 	m_contactActive = true;
 	m_destructor = NULL;
-	m_localMatrix0 = dgGetIdentityMatrix();
-	m_localMatrix1 = dgGetIdentityMatrix();
+	m_isBilateral = true;
 
 	//SetStiffness (90.0f/99.0f);
 	SetStiffness (dgFloat32 (0.9f));
@@ -109,11 +105,14 @@ void dgBilateralConstraint::CalculateMatrixOffset (const dgVector& pivot, const 
 
 void dgBilateralConstraint::SetPivotAndPinDir(const dgVector &pivot, const dgVector &pinDirection)
 {
-	CalculateMatrixOffset (pivot, pinDirection, m_localMatrix0, m_localMatrix1);
+	dgAssert (0);
+//	CalculateMatrixOffset (pivot, pinDirection, m_localMatrix0, m_localMatrix1);
 }
 
 void dgBilateralConstraint::SetPivotAndPinDir (const dgVector& pivot, const dgVector& pinDirection0, const dgVector& pinDirection1)
 {
+	dgAssert (0);
+/*
 	dgAssert (m_body0);
 	dgAssert (m_body1);
 
@@ -136,11 +135,14 @@ void dgBilateralConstraint::SetPivotAndPinDir (const dgVector& pivot, const dgVe
 
 	m_localMatrix1 = m_localMatrix0 * body1_Matrix.Inverse(); 
 	m_localMatrix0 = m_localMatrix0 * body0_Matrix.Inverse();
-
+*/
 }
 
 dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const
 {
+	dgAssert (0);
+	return dgVector (0.0f);
+/*
 	dgAssert (m_body0);
 	dgAssert (m_body1);
 	const dgMatrix& body0Matrix = m_body0->GetMatrix();
@@ -159,6 +161,7 @@ dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (dgMatrix& globalM
 	dgVector euler1;
 	relMatrix.CalcPitchYawRoll (euler0, euler1);
 	return euler0;
+*/
 }
 
 void dgBilateralConstraint::SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc)

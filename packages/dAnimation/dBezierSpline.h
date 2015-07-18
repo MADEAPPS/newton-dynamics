@@ -40,7 +40,6 @@ class dBezierSpline : public dContainersAlloc
 
 	void InsertKnot (dFloat64 u);
 	bool RemoveKnot (dFloat64 u, dFloat64 tol);
-	
 
 	int GetControlPointCount() const;
 	dBigVector* GetControlPointArray();
