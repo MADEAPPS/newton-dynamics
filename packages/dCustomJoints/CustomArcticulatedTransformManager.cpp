@@ -135,6 +135,11 @@ const CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTran
 	return &m_bones[index];
 }
 
+CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTransformController::GetBone(int index)
+{
+	return &m_bones[index];
+}
+
 const CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTransformController::GetParent(const dSkeletonBone* const bone) const
 {
 	dAssert (bone->m_myController == this);

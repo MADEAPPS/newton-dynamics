@@ -54,8 +54,8 @@
 //#define DEFAULT_SCENE	25			// continuous collision
 //#define DEFAULT_SCENE	26			// paper wall continuous collision
 //#define DEFAULT_SCENE	27			// puck slide continuous collision
-#define DEFAULT_SCENE	28          // standard joints
-//#define DEFAULT_SCENE	29			// articulated joints
+//#define DEFAULT_SCENE	28          // standard joints
+#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// basic Car
 //#define DEFAULT_SCENE	32			// heavy vehicles
