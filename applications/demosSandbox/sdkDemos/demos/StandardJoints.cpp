@@ -364,10 +364,13 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	matrix = dYawMatrix (3.1416f * 0.5f) * matrix; 
 	NewtonBodySetMatrix(box1, &matrix[0][0]);
+	((DemoEntity*) NewtonBodyGetUserData(box1))->ResetMatrix (*scene, matrix);
+
 
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	matrix = dYawMatrix(3.1416f * 0.5f) * matrix;
 	NewtonBodySetMatrix(box2, &matrix[0][0]);
+	((DemoEntity*) NewtonBodyGetUserData(box2))->ResetMatrix (*scene, matrix);
 
 	//connect the box0 to the base by a fix joint (a hinge with zero limit)
 	NewtonBodyGetMatrix(box0, &matrix[0][0]);
@@ -882,7 +885,6 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
-
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -893,7 +895,6 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
 	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
-
 	//just to show up add some relational joints example 
 	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
@@ -901,6 +902,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+
 
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());

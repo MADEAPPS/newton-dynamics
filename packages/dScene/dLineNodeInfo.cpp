@@ -70,7 +70,7 @@ void dLineNodeInfo::BakeTransform (const dMatrix& transform)
 	matrix.PolarDecomposition (m_matrix, scale, stretchMatrix);
 	matrix = transform * dMatrix (dGetIdentityMatrix(), scale, stretchMatrix);
 
-	matrix.TransformTriplex (&m_curve.GetControlPointArray()[0].m_x, sizeof (dVector), &m_curve.GetControlPointArray()[0].m_x, sizeof (dVector), m_curve.GetControlPointCount());
+	matrix.TransformTriplex (&m_curve.GetControlPointArray()[0].m_x, sizeof (dBigVector), &m_curve.GetControlPointArray()[0].m_x, sizeof (dBigVector), m_curve.GetControlPointCount());
 }
 
 void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const

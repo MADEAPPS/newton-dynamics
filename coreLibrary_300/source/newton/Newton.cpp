@@ -691,6 +691,8 @@ void NewtonUpdate(const NewtonWorld* const newtonWorld, dFloat timestep)
 	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
 
 	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
+
+//NewtonSerializeToFile (newtonWorld, "xxx.bin", NULL, NULL);
 	world->UpdatePhysics (timestep);
 }
 

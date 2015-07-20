@@ -225,7 +225,7 @@ void CustomHinge::SubmitConstraints (dFloat timestep, int threadIndex)
         if ((m_minAngle > -1.e-4f) && (m_maxAngle < 1.e-4f)) {
             NewtonUserJointAddAngularRow (m_joint, angle, &matrix1.m_front[0]);
             NewtonUserJointSetRowStiffness (m_joint, 1.0f);
-        } if (angle < m_minAngle) {
+        } else if (angle < m_minAngle) {
             dFloat relAngle = angle - m_minAngle;
 
             // tell joint error will minimize the exceeded angle error

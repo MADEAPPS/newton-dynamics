@@ -265,7 +265,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 				dgInt32 index = jointInfo->m_pairStart + i;
 				const dgJacobianMatrixElement* const row = &matrixRow[index];
 				m_jointMass[i].SetZero();
-				//m_jointMass[i][i] = row->m_diagDamp;
+				m_jointMass[i][i] = -row->m_diagDamp;
 				for (dgInt32 j = 0; j < 3; j++) {
 					m_bodyJt[i][j + 0] = row->m_Jt.m_jacobianM0.m_linear[j];
 					m_bodyJt[i][j + 3] = row->m_Jt.m_jacobianM0.m_angular[j];
@@ -731,11 +731,13 @@ dgFloat32 dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfo
 			dgVector val(f);
 			dgAssert(dgCheckFloat(force[j]));
 			row->m_force += f;
+//dgTrace (("%f \n", row->m_force));
 			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear.CompProduct4(val);
 			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular.CompProduct4(val);
 			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear.CompProduct4(val);
 			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(val);
 		}
+//dgTrace (("\n"));
 		const dgInt32 m0 = jointInfo->m_m0;
 		const dgInt32 m1 = jointInfo->m_m1;
 
@@ -744,7 +746,7 @@ dgFloat32 dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfo
 		internalForces[m1].m_linear += y1.m_linear;
 		internalForces[m1].m_angular += y1.m_angular;
 	}
-
+//dgTrace (("\n"));
 //dgTrace (("%f\n", CalculateJointAccel(jointInfoArray, internalForces, matrixRow)));
 	return retAccel;
 }
