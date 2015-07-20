@@ -201,7 +201,7 @@ void dLineNodeInfo::Serialize (TiXmlElement* const rootNode) const
 	const dBigVector* const controlPoints = m_curve.GetControlPointArray();
 	int bufferSizeInBytes = pointCount * sizeof (dVector) * 3;
 	char* const buffer = new char[bufferSizeInBytes];
-	dFloatArrayToString (&controlPoints[0][0], pointCount * sizeof (dBigVector) / sizeof (dBigVector.m_x), buffer, bufferSizeInBytes);
+	dFloatArrayToString (&controlPoints[0][0], pointCount * sizeof (dBigVector) / sizeof (dFloat64), buffer, bufferSizeInBytes);
 
 	TiXmlElement* const ctrlPoints = new TiXmlElement ("controlPoints");
 	bezierCurve->LinkEndChild (ctrlPoints);
