@@ -43,143 +43,6 @@ class dgSkeletonContainer::dgSkeletonGraph
 {
 	public:
 	DG_CLASS_ALLOCATOR(allocator)
-
-	class dgSpacialVector
-	{
-		public:
-
-		DG_INLINE dgFloat64& operator[] (dgInt32 i)
-		{
-			dgAssert(i < 6);
-			dgAssert(i >= 0);
-			return m_v[i];
-		}
-
-		DG_INLINE const dgFloat64& operator[] (dgInt32 i) const
-		{
-			dgAssert(i < 6);
-			dgAssert(i >= 0);
-			return m_v[i];
-		}
-
-		DG_INLINE void SetZero()
-		{
-			m_v[0] = dgFloat32 (0.0f);
-			m_v[1] = dgFloat32 (0.0f);
-			m_v[2] = dgFloat32 (0.0f);
-			m_v[3] = dgFloat32 (0.0f);
-			m_v[4] = dgFloat32 (0.0f);
-			m_v[5] = dgFloat32 (0.0f);
-		}
-
-		DG_INLINE dgFloat64 DotProduct(const dgSpacialVector& v) const
-		{
-			return m_v[0] * v[0] + m_v[1] * v[1] + m_v[2] * v[2] + m_v[3] * v[3] + m_v[4] * v[4] + m_v[5] * v[5];
-		}
-
-		DG_INLINE void Scale(dgFloat64 s, dgSpacialVector& dst) const
-		{
-			 dst.m_v[0] = m_v[0] * s;
-			 dst.m_v[1] = m_v[1] * s;
-			 dst.m_v[2] = m_v[2] * s;
-			 dst.m_v[3] = m_v[3] * s;
-			 dst.m_v[4] = m_v[4] * s;
-			 dst.m_v[5] = m_v[5] * s;
-		}
-
-		DG_INLINE void ScaleAdd(dgFloat64 s, const dgSpacialVector& b, dgSpacialVector& dst) const
-		{
-			dst.m_v[0] = b[0] + m_v[0] * s;
-			dst.m_v[1] = b[1] + m_v[1] * s;
-			dst.m_v[2] = b[2] + m_v[2] * s;
-			dst.m_v[3] = b[3] + m_v[3] * s;
-			dst.m_v[4] = b[4] + m_v[4] * s;
-			dst.m_v[5] = b[5] + m_v[5] * s;
-		}
-
-		dgFloat64 m_v[6];
-	};
-
-	class dgSpacialMatrix
-	{
-		public:
-		DG_INLINE dgSpacialVector& operator[] (dgInt32 i)
-		{
-			dgAssert(i < 6);
-			dgAssert(i >= 0);
-			return m_rows[i];
-		}
-
-		DG_INLINE const dgSpacialVector& operator[] (dgInt32 i) const
-		{
-			dgAssert(i < 6);
-			dgAssert(i >= 0);
-			return m_rows[i];
-		}
-
-		DG_INLINE void SetZero()
-		{
-			for (dgInt32 i = 0; i < 6; i++) {
-				m_rows[i].SetZero();
-			}
-		}
-
-		DG_INLINE void SetIdentity(dgInt32 rows)
-		{
-			for (dgInt32 i = 0; i < rows; i++) {
-				m_rows[i].SetZero();
-				m_rows[i][i] = dgFloat32(1.0f);
-			}
-		}
-
-		DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpacialVector& jacobian, dgSpacialVector& out, dgInt32 dof) const
-		{
-			dgSpacialVector tmp;
-			tmp.SetZero();
-			for (dgInt32 i = 0; i < dof; i++) {
-				m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
-			}
-			out = tmp;
-		}
-
-		DG_INLINE void Inverse (dgSpacialMatrix& dst, dgInt32 rows) const
-		{
-			dgSpacialMatrix copy;
-			for (dgInt32 i = 0; i < rows; i++) {
-				copy[i] = m_rows[i];
-				dst[i].SetZero();
-				dst[i][i] = dgFloat32 (1.0f);
-			}
-			
-
-			for (dgInt32 i = 0; i < rows; i++) {
-				dgFloat64 val = copy.m_rows[i][i];
-				dgAssert(fabs (val) > dgFloat64(1.0e-12f));
-				dgFloat64 den = dgFloat64(1.0f) / val;
-
-				dst[i].Scale(den, dst[i]);
-				copy[i].Scale(den, copy[i]);
-				copy[i][i] = dgFloat64 (1.0f);
-
-				for (dgInt32 j = 0; j < rows; j++) {
-					if (j != i) {
-						dgFloat64 pivot = -copy[j][i];
-						dst[i].ScaleAdd(pivot, dst[j], dst[j]);
-						copy[i].ScaleAdd(pivot, copy[j], copy[j]);
-					}
-				}
-			}
-			dgAssert (dst.CheckPSD(rows));
-		}
-
-		DG_INLINE bool CheckPSD(dgInt32 rows) const 
-		{
-			return true;
-		}
-
-		dgSpacialVector m_rows[6];
-	};
-
 	dgSkeletonGraph (dgDynamicBody* const body, dgBilateralConstraint* const Joint, dgSkeletonGraph* const parent)
 		:m_parent(parent)
 		,m_body (body)
@@ -281,13 +144,13 @@ class dgSkeletonContainer::dgSkeletonGraph
 	{
 		dgAssert(child->m_joint);
 		
-		dgSpacialMatrix copy;
+		dgSpatialMatrix copy;
 		copy.SetZero();
 		const dgInt32 dof = child->m_dof;
-		const dgSpacialMatrix& jacobianMatrix = child->m_jointJ;
-		const dgSpacialMatrix& childDiagonal = child->m_jointMass;
+		const dgSpatialMatrix& jacobianMatrix = child->m_jointJ;
+		const dgSpatialMatrix& childDiagonal = child->m_jointMass;
 		for (dgInt32 i = 0; i < dof ; i++) {
-			const dgSpacialVector& jacobian = jacobianMatrix[i];
+			const dgSpatialVector& jacobian = jacobianMatrix[i];
 			for (dgInt32 j = 0; j < dof ; j++) {
 				dgAssert(dgAreEqual (childDiagonal[i][j], childDiagonal[j][i], dgFloat64(1.0e-5f)));
 				dgFloat64 val = childDiagonal[i][j];
@@ -296,8 +159,8 @@ class dgSkeletonContainer::dgSkeletonGraph
 		}
 
 		for (dgInt32 i = 0; i < dof; i++) {
-			const dgSpacialVector& Jacobian = copy[i];
-			const dgSpacialVector& JacobianTranspose = jacobianMatrix[i];
+			const dgSpatialVector& Jacobian = copy[i];
+			const dgSpatialVector& JacobianTranspose = jacobianMatrix[i];
 			for (dgInt32 j = 0; j < 6; j++) {
 				dgFloat64 val = -Jacobian[j];
 				JacobianTranspose.ScaleAdd(val, m_bodyMass[j], m_bodyMass[j]);
@@ -307,7 +170,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 
 	DG_INLINE void CalculateJointDiagonal (dgJointInfo* const jointInfoArray)
 	{
-		dgSpacialMatrix tmp;
+		dgSpatialMatrix tmp;
 		for (dgInt32 i = 0; i < m_dof; i++) {
 			m_bodyMass.MultiplyNxNMatrixTimeVector(m_bodyJt[i], tmp[i], 6);
 		}
@@ -327,15 +190,15 @@ class dgSkeletonContainer::dgSkeletonGraph
 
 	DG_INLINE void CalculateJacobianBlock()
 	{
-		dgSpacialMatrix copy;
+		dgSpatialMatrix copy;
 		for (dgInt32 i = 0; i < m_dof; i++) {
 			copy[i] = m_jointJ[i];
 			m_jointJ[i].SetZero();
 		}
 
 		for (dgInt32 i = 0; i < m_dof; i++) {
-			const dgSpacialVector& jacobian = copy[i];
-			const dgSpacialVector& invDiagonalRow = m_jointInvMass[i];
+			const dgSpatialVector& jacobian = copy[i];
+			const dgSpatialVector& invDiagonalRow = m_jointInvMass[i];
 			for (dgInt32 j = 0; j < m_dof; j++) {
 				dgFloat64 val = invDiagonalRow[j];
 				jacobian.ScaleAdd(val, m_jointJ[j], m_jointJ[j]);
@@ -381,7 +244,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 
 	DG_INLINE void JointJacobianTimeSolutionBackward()
 	{
-		const dgSpacialVector& force = m_parent->m_bodyForce;
+		const dgSpatialVector& force = m_parent->m_bodyForce;
 		for (dgInt32 i = 0; i < m_dof; i++) {
 			m_jointForce[i] -= force.DotProduct(m_jointJ[i]);
 		}
@@ -405,14 +268,14 @@ class dgSkeletonContainer::dgSkeletonGraph
 		m_jointInvMass.MultiplyNxNMatrixTimeVector (m_jointForce, m_jointForce, m_dof);
 	}
 
-	dgSpacialMatrix m_bodyMass;
-	dgSpacialMatrix m_jointMass;
-	dgSpacialMatrix m_bodyInvMass;
-	dgSpacialMatrix m_jointInvMass;
-	dgSpacialMatrix m_jointJ;
-	dgSpacialMatrix m_bodyJt;
-	dgSpacialVector m_bodyForce;
-	dgSpacialVector m_jointForce;
+	dgSpatialMatrix m_bodyMass;
+	dgSpatialMatrix m_jointMass;
+	dgSpatialMatrix m_bodyInvMass;
+	dgSpatialMatrix m_jointInvMass;
+	dgSpatialMatrix m_jointJ;
+	dgSpatialMatrix m_bodyJt;
+	dgSpatialVector m_bodyForce;
+	dgSpatialVector m_jointForce;
 	dgDynamicBody* m_body;
 	dgBilateralConstraint* m_joint;
 	dgSkeletonGraph* m_parent;
@@ -685,7 +548,7 @@ dgFloat32 dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const jointInfoA
 		const dgJacobian& y0 = internalForces[m0];
 		const dgJacobian& y1 = internalForces[m1];
 
-		dgSkeletonGraph::dgSpacialVector& accel = node->m_jointForce;
+		dgSpatialVector& accel = node->m_jointForce;
 		for (dgInt32 j = 0; j < count; j++) {
 			dgJacobianMatrixElement* const row = &matrixRow[j + first];
 			dgVector acc(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
@@ -724,20 +587,19 @@ dgFloat32 dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfo
 		dgAssert(jointInfo->m_joint == node->m_joint);
 		const dgInt32 first = jointInfo->m_pairStart;
 		const dgInt32 count = node->m_dof;
-		dgSkeletonGraph::dgSpacialVector& force = node->m_jointForce;
+		dgSpatialVector& force = node->m_jointForce;
 		for (dgInt32 j = 0; j < count; j++) {
 			dgJacobianMatrixElement* const row = &matrixRow[j + first];
 			dgFloat32 f = dgFloat32 (force[j]);
 			dgVector val(f);
 			dgAssert(dgCheckFloat(force[j]));
 			row->m_force += f;
-//dgTrace (("%f \n", row->m_force));
 			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear.CompProduct4(val);
 			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular.CompProduct4(val);
 			y1.m_linear += row->m_Jt.m_jacobianM1.m_linear.CompProduct4(val);
 			y1.m_angular += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(val);
 		}
-//dgTrace (("\n"));
+
 		const dgInt32 m0 = jointInfo->m_m0;
 		const dgInt32 m1 = jointInfo->m_m1;
 

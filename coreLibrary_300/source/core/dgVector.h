@@ -637,6 +637,137 @@ class dgVector
 }DG_GCC_VECTOR_ALIGMENT;
 
 
+
+class dgSpatialVector
+{
+public:
+
+	DG_INLINE dgFloat64& operator[] (dgInt32 i)
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_v[i];
+	}
+
+	DG_INLINE const dgFloat64& operator[] (dgInt32 i) const
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_v[i];
+	}
+
+	DG_INLINE void SetZero()
+	{
+		m_v[0] = dgFloat32(0.0f);
+		m_v[1] = dgFloat32(0.0f);
+		m_v[2] = dgFloat32(0.0f);
+		m_v[3] = dgFloat32(0.0f);
+		m_v[4] = dgFloat32(0.0f);
+		m_v[5] = dgFloat32(0.0f);
+	}
+
+	DG_INLINE dgFloat64 DotProduct(const dgSpatialVector& v) const
+	{
+		return m_v[0] * v[0] + m_v[1] * v[1] + m_v[2] * v[2] + m_v[3] * v[3] + m_v[4] * v[4] + m_v[5] * v[5];
+	}
+
+	DG_INLINE void Scale(dgFloat64 s, dgSpatialVector& dst) const
+	{
+		dst.m_v[0] = m_v[0] * s;
+		dst.m_v[1] = m_v[1] * s;
+		dst.m_v[2] = m_v[2] * s;
+		dst.m_v[3] = m_v[3] * s;
+		dst.m_v[4] = m_v[4] * s;
+		dst.m_v[5] = m_v[5] * s;
+	}
+
+	DG_INLINE void ScaleAdd(dgFloat64 s, const dgSpatialVector& b, dgSpatialVector& dst) const
+	{
+		dst.m_v[0] = b[0] + m_v[0] * s;
+		dst.m_v[1] = b[1] + m_v[1] * s;
+		dst.m_v[2] = b[2] + m_v[2] * s;
+		dst.m_v[3] = b[3] + m_v[3] * s;
+		dst.m_v[4] = b[4] + m_v[4] * s;
+		dst.m_v[5] = b[5] + m_v[5] * s;
+	}
+
+	dgFloat64 m_v[6];
+};
+
+class dgSpatialMatrix
+{
+public:
+	DG_INLINE dgSpatialVector& operator[] (dgInt32 i)
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_rows[i];
+	}
+
+	DG_INLINE const dgSpatialVector& operator[] (dgInt32 i) const
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_rows[i];
+	}
+
+	DG_INLINE void SetZero()
+	{
+		for (dgInt32 i = 0; i < 6; i++) {
+			m_rows[i].SetZero();
+		}
+	}
+
+	DG_INLINE void SetIdentity(dgInt32 rows)
+	{
+		for (dgInt32 i = 0; i < rows; i++) {
+			m_rows[i].SetZero();
+			m_rows[i][i] = dgFloat32(1.0f);
+		}
+	}
+
+	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out, dgInt32 dof) const
+	{
+		dgSpatialVector tmp;
+		m_rows[0].Scale(jacobian[0], tmp);
+		for (dgInt32 i = 1; i < dof; i++) {
+			m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
+		}
+		out = tmp;
+	}
+
+	DG_INLINE void Inverse(dgSpatialMatrix& dst, dgInt32 rows) const
+	{
+		dgSpatialMatrix copy;
+		for (dgInt32 i = 0; i < rows; i++) {
+			copy[i] = m_rows[i];
+			dst[i].SetZero();
+			dst[i][i] = dgFloat32(1.0f);
+		}
+
+		for (dgInt32 i = 0; i < rows; i++) {
+			dgFloat64 val = copy.m_rows[i][i];
+			dgAssert(fabs(val) > dgFloat64(1.0e-12f));
+			dgFloat64 den = dgFloat64(1.0f) / val;
+
+			dst[i].Scale(den, dst[i]);
+			copy[i].Scale(den, copy[i]);
+			copy[i][i] = dgFloat64(1.0f);
+
+			for (dgInt32 j = 0; j < rows; j++) {
+				if (j != i) {
+					dgFloat64 pivot = -copy[j][i];
+					dst[i].ScaleAdd(pivot, dst[j], dst[j]);
+					copy[i].ScaleAdd(pivot, copy[j], copy[j]);
+				}
+			}
+		}
+	}
+
+	dgSpatialVector m_rows[6];
+};
+
+
 #else
 
 DG_MSC_VECTOR_ALIGMENT
@@ -1053,6 +1184,139 @@ class dgVector
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
+
+
+DG_MSC_VECTOR_ALIGMENT
+class dgSpatialVector
+{
+public:
+
+	DG_INLINE dgFloat64& operator[] (dgInt32 i)
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_v[i];
+	}
+
+	DG_INLINE const dgFloat64& operator[] (dgInt32 i) const
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_v[i];
+	}
+
+	DG_INLINE void SetZero()
+	{
+		m_v[0] = dgFloat32(0.0f);
+		m_v[1] = dgFloat32(0.0f);
+		m_v[2] = dgFloat32(0.0f);
+		m_v[3] = dgFloat32(0.0f);
+		m_v[4] = dgFloat32(0.0f);
+		m_v[5] = dgFloat32(0.0f);
+	}
+
+	DG_INLINE dgFloat64 DotProduct(const dgSpatialVector& v) const
+	{
+		return m_v[0] * v[0] + m_v[1] * v[1] + m_v[2] * v[2] + m_v[3] * v[3] + m_v[4] * v[4] + m_v[5] * v[5];
+	}
+
+	DG_INLINE void Scale(dgFloat64 s, dgSpatialVector& dst) const
+	{
+		dst.m_v[0] = m_v[0] * s;
+		dst.m_v[1] = m_v[1] * s;
+		dst.m_v[2] = m_v[2] * s;
+		dst.m_v[3] = m_v[3] * s;
+		dst.m_v[4] = m_v[4] * s;
+		dst.m_v[5] = m_v[5] * s;
+	}
+
+	DG_INLINE void ScaleAdd(dgFloat64 s, const dgSpatialVector& b, dgSpatialVector& dst) const
+	{
+		dst.m_v[0] = b[0] + m_v[0] * s;
+		dst.m_v[1] = b[1] + m_v[1] * s;
+		dst.m_v[2] = b[2] + m_v[2] * s;
+		dst.m_v[3] = b[3] + m_v[3] * s;
+		dst.m_v[4] = b[4] + m_v[4] * s;
+		dst.m_v[5] = b[5] + m_v[5] * s;
+	}
+
+	dgFloat64 m_v[6];
+} DG_GCC_VECTOR_ALIGMENT;
+
+DG_MSC_VECTOR_ALIGMENT
+class dgSpatialMatrix
+{
+	public:
+	DG_INLINE dgSpatialVector& operator[] (dgInt32 i)
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_rows[i];
+	}
+
+	DG_INLINE const dgSpatialVector& operator[] (dgInt32 i) const
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_rows[i];
+	}
+
+	DG_INLINE void SetZero()
+	{
+		for (dgInt32 i = 0; i < 6; i++) {
+			m_rows[i].SetZero();
+		}
+	}
+
+	DG_INLINE void SetIdentity(dgInt32 rows)
+	{
+		for (dgInt32 i = 0; i < rows; i++) {
+			m_rows[i].SetZero();
+			m_rows[i][i] = dgFloat32(1.0f);
+		}
+	}
+
+	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out, dgInt32 dof) const
+	{
+		dgSpatialVector tmp;
+		m_rows[0].Scale(jacobian[0], tmp);
+		for (dgInt32 i = 1; i < dof; i++) {
+			m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
+		}
+		out = tmp;
+	}
+
+	DG_INLINE void Inverse(dgSpatialMatrix& dst, dgInt32 rows) const
+	{
+		dgSpatialMatrix copy;
+		for (dgInt32 i = 0; i < rows; i++) {
+			copy[i] = m_rows[i];
+			dst[i].SetZero();
+			dst[i][i] = dgFloat32(1.0f);
+		}
+
+		for (dgInt32 i = 0; i < rows; i++) {
+			dgFloat64 val = copy.m_rows[i][i];
+			dgAssert(fabs(val) > dgFloat64(1.0e-12f));
+			dgFloat64 den = dgFloat64(1.0f) / val;
+
+			dst[i].Scale(den, dst[i]);
+			copy[i].Scale(den, copy[i]);
+			copy[i][i] = dgFloat64(1.0f);
+
+			for (dgInt32 j = 0; j < rows; j++) {
+				if (j != i) {
+					dgFloat64 pivot = -copy[j][i];
+					dst[i].ScaleAdd(pivot, dst[j], dst[j]);
+					copy[i].ScaleAdd(pivot, copy[j], copy[j]);
+				}
+			}
+		}
+	}
+
+	dgSpatialVector m_rows[6];
+} DG_GCC_VECTOR_ALIGMENT;
+
 
 #endif
 #endif
