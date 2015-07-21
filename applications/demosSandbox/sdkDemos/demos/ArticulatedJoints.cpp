@@ -648,7 +648,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, entName);
 		strcpy(definition.m_shapeTypeName, "tireShape");
 		strcpy(definition.m_articulationName, tireName);
-		definition.m_mass = 50.0f;
+		definition.m_mass = 30.0f;
 		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_tireID;
 
 		NewtonBody* const parentBody = parentBone->m_body;
@@ -700,7 +700,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, entName);
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		strcpy(definition.m_articulationName, "suspension");
-		definition.m_mass = 1000.0f;
+		definition.m_mass = 50.0f;
 		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 	
 		NewtonBody* const parentBody = chassisBone->m_body;
@@ -753,6 +753,143 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 
 
+	
+	class ConstantSpeedKnotInterpolant
+	{
+		public:
+		dFloat m_u;
+		dFloat m_dist;
+	};
+
+
+	dFloat CalculateKnotParam(const ConstantSpeedKnotInterpolant* const interpolants, int interpolantsCount, dFloat t) const
+	{
+		int low = 0;
+		int high = interpolantsCount - 1;
+
+		while ((high - low) >= 4) {
+			int mid = (low + high) >> 1;
+			if (t > interpolants[mid].m_dist) {
+				low = mid;
+			}
+			else {
+				high = mid;
+			}
+		}
+
+		dAssert(interpolants[low].m_dist <= t);
+		for (int i = low; i < interpolantsCount; i++) {
+			if (interpolants[i + 1].m_dist >= t) {
+				low = i;
+				break;
+			}
+		}
+
+		dFloat u0 = interpolants[low].m_u;
+		dFloat h0 = interpolants[low].m_dist;
+		dFloat du = interpolants[low + 1].m_u - u0;
+		dFloat dh = interpolants[low + 1].m_dist - h0;
+		return dMod(u0 + du * (t - h0) / dh, 1.0f);
+	}
+
+
+	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, float offset)
+	{
+		dFloat linkLength = 0.2f;
+
+		DemoEntity* const threadPath = chassis->Find("trackPath");
+		dAssert(threadPath);
+		DemoBezierCurve* const bezierPath = (DemoBezierCurve*) threadPath->GetMesh();
+
+		dFloat length = bezierPath->m_curve.CalculateLength (0.01f);
+		int linksCount = int(length / linkLength) + 1;
+		linkLength = length / linksCount;
+
+		// create the uniform speed knot interpolation table
+		ConstantSpeedKnotInterpolant steps[2048];
+		steps[0].m_u = 0.0f;
+		steps[0].m_dist = 0.0f;
+
+		int count = 0;
+		steps[count].m_u = 0.0f;
+		steps[count].m_dist = 0.0f;
+		count++;
+		int samplingRate = linksCount * 20;
+		dFloat distAcc = 0.0f;
+
+		dFloat stepAcc = linkLength;
+		dBigVector q(bezierPath->m_curve.CurvePoint(0.0f));
+		dVector p0(dVector(q.m_x, q.m_y, q.m_z, q.m_w));
+		for (int i = 1; i < samplingRate + 45; i++) {
+			dFloat u = dFloat(i) / samplingRate;
+			dBigVector q(bezierPath->m_curve.CurvePoint(dMod(u, 1.0f)));
+			dVector p1(dVector(q.m_x, q.m_y, q.m_z, q.m_w));
+			dVector err(p1 - p0);
+			dFloat errMag = dSqrt(err % err);
+			distAcc += errMag;
+			if (distAcc >= stepAcc) {
+				stepAcc += linkLength;
+				steps[count].m_u = u;
+				steps[count].m_dist = distAcc;
+				count++;
+				dAssert(count < int(sizeof (steps) / sizeof (steps[0])));
+			}
+			p0 = p1;
+		}
+
+
+		dMatrix aligmentMatrix (dRollMatrix(180.0f * 3.141592f / 180.0f));
+
+		DemoEntity* const threadLink = chassis->Find("link");
+		dMatrix shapeMatrix (threadPath->GetMeshMatrix() * threadPath->GetCurrentMatrix());
+
+		dFloat s = 0.0f;
+		dMatrix matrix(dGetIdentityMatrix());
+		dFloat u0 = CalculateKnotParam(steps, linksCount, s);
+		dBigVector r(bezierPath->m_curve.CurvePoint(u0));
+		dVector r0(dVector(r.m_x, r.m_y, r.m_z, 1.0f));
+		for (int i = 1; i < linksCount + 1; i++) {
+			s += linkLength;
+			dFloat u1 = CalculateKnotParam(steps, linksCount, dMod (s, length));
+			dBigVector r(bezierPath->m_curve.CurvePoint(u1));
+			dVector r1(dVector(r.m_x, r.m_y, r.m_z, 1.0f));
+			dVector dir(r1 - r0);
+
+			dir = dir.Scale(1.0f / dSqrt(dir % dir));
+			matrix.m_front = dVector(dir.m_z, -dir.m_y, 0.0f, 0.0f);
+			matrix.m_up = dVector(dir.m_y, dir.m_z, 0.0f, 0.0f);
+			matrix.m_right = dVector(0.0f, 0.0f, 1.0f, 0.0f);
+			matrix = aligmentMatrix * matrix;
+			matrix.m_posit = shapeMatrix.TransformVector(r0);
+			matrix.m_posit.m_z = offset;
+			DemoEntity* const threadPart = new DemoEntity(matrix, chassis);
+
+			threadPart->SetMesh(threadLink->GetMesh(), dGetIdentityMatrix());
+
+			r0 = r1;
+			u0 = u1;
+		}
+	}
+
+
+	void MakeLeftThread(CustomArticulatedTransformController* const controller)
+	{
+		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		DemoEntity* const chassis = (DemoEntity*) NewtonBodyGetUserData (chassisBone->m_body);
+		DemoEntity* const pivot = chassis->Find ("leftTire_0");
+		CalculaterUniformSpaceSamples (chassis, pivot->GetCurrentMatrix().m_posit.m_z);
+	}
+
+
+	void MakeRightThread(CustomArticulatedTransformController* const controller)
+	{
+		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		DemoEntity* const chassis = (DemoEntity*)NewtonBodyGetUserData(chassisBone->m_body);
+		DemoEntity* const pivot = chassis->Find("rightTire_0");
+		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z);
+	}
+
+
 	CustomArticulatedTransformController* CreateRobot (const dMatrix& location, const DemoEntity* const model, int , ARTICULATED_VEHICLE_DEFINITION* const )
 	{
 		NewtonWorld* const world = GetWorld();
@@ -783,6 +920,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
+		MakeLeftThread (controller);
+		MakeRightThread(controller);
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
