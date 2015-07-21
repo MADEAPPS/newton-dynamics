@@ -843,6 +843,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		DemoEntity* const threadLink = chassis->Find("link");
 		dMatrix shapeMatrix (threadPath->GetMeshMatrix() * threadPath->GetCurrentMatrix());
 
+		DemoEntity* const threadLinkChild = chassis->Find("Object001");
+		dMatrix shapeChildMatrix (threadLinkChild->GetMeshMatrix() * threadLinkChild->GetCurrentMatrix());
+
 		dFloat s = 0.0f;
 		dMatrix matrix(dGetIdentityMatrix());
 		dFloat u0 = CalculateKnotParam(steps, linksCount, s);
@@ -862,9 +865,12 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			matrix = aligmentMatrix * matrix;
 			matrix.m_posit = shapeMatrix.TransformVector(r0);
 			matrix.m_posit.m_z = offset;
-			DemoEntity* const threadPart = new DemoEntity(matrix, chassis);
 
+			DemoEntity* const threadPart = new DemoEntity(matrix, chassis);
 			threadPart->SetMesh(threadLink->GetMesh(), dGetIdentityMatrix());
+
+			DemoEntity* const threadPartChild = new DemoEntity(shapeChildMatrix, threadPart);
+			threadPartChild->SetMesh(threadLinkChild->GetMesh(), dGetIdentityMatrix());
 
 			r0 = r1;
 			u0 = u1;
