@@ -24,7 +24,8 @@
 
 #define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
-#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			7.0f
+//#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			7.0f
+#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			10.0f
 
 struct ARTICULATED_VEHICLE_DEFINITION
 {
@@ -818,7 +819,37 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 
 
-	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, float offset)
+	class RealJoint: public CustomJoint
+	{
+		public:
+		RealJoint(NewtonBody* const link, NewtonBody* const chassis)
+			:CustomJoint(1, link, chassis)
+		{
+			dMatrix linkMatrix;
+			dMatrix chassisMatrix;
+			
+			NewtonBodyGetMatrix (link, &linkMatrix[0][0]);
+			NewtonBodyGetMatrix (link, &chassisMatrix[0][0]);
+
+			dMatrix pinAndPivotFrame (dGrammSchmidt (chassisMatrix[2]));
+			pinAndPivotFrame.m_posit = linkMatrix.m_posit;
+			CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+		}
+			
+		void SubmitConstraints(dFloat timestep, int threadIndex)
+		{
+			dMatrix matrix0;
+			dMatrix matrix1;
+
+			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+			CalculateGlobalMatrix(matrix0, matrix1);
+
+			// Restrict the movement on the pivot point along all three orthonormal directions
+			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+		}
+	};
+
+	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, float offset, CustomArticulatedTransformController::dSkeletonBone* const rootNode)
 	{
 		dFloat linkLength = 0.2f;
 
@@ -862,9 +893,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			p0 = p1;
 		}
 
-
-		//DemoEntity* const trackRoot = new DemoEntity (dGetIdentityMatrix(), NULL); 
-		//scene->Append(trackRoot);
 		dMatrix rootMatrix (chassis->GetCurrentMatrix());
 
 		dMatrix aligmentMatrix (dRollMatrix(180.0f * 3.141592f / 180.0f));
@@ -949,6 +977,11 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomHinge* const hinge = new CustomHinge (matrix0, matrix1, linkArray[0], linkArray[bodyCount - 1]);
 		hinge->SetFriction(20.0f);
 
+		for (int i = 0; i < 4; i ++) {
+			NewtonBody* const linkBody = linkArray[i * bodyCount / 4];
+			new RealJoint (linkBody, rootNode->m_body);
+		}
+
 		NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (world, link0, NULL);
 		NewtonSkeletonContainerAttachJointArray (skeleton, bodyCount - 1, hingeArray);
 		NewtonSkeletonContainerFinalize (skeleton);
@@ -960,7 +993,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		DemoEntity* const chassis = (DemoEntity*) NewtonBodyGetUserData (chassisBone->m_body);
 		DemoEntity* const pivot = chassis->Find ("leftTire_0");
-		CalculaterUniformSpaceSamples (chassis, pivot->GetCurrentMatrix().m_posit.m_z);
+		CalculaterUniformSpaceSamples (chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
 	}
 
 
@@ -969,7 +1002,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		DemoEntity* const chassis = (DemoEntity*)NewtonBodyGetUserData(chassisBone->m_body);
 		DemoEntity* const pivot = chassis->Find("rightTire_0");
-		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z);
+		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
 	}
 
 
@@ -1208,8 +1241,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
-	ArticulatedEntityModel forkliffModel(scene, "forklift.ngd");
-	
+	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
 
 	// add an input Manage to manage the inputs and user interaction 
 	AriculatedJointInputManager* const inputManager = new AriculatedJointInputManager (scene);
@@ -1223,12 +1255,15 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 0.75f;
-	inputManager->AddPlayer (vehicleManager->CreateForklift (matrix, &forkliffModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition));
 
+	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift (matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 
-
+//	inputManager->AddPlayer (vehicleManager->CreateForklift (matrix, &forkliffModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition));
+//	inputManager->AddPlayer (forklift);
+	
 	matrix.m_posit.m_z += 4.0f;
-	vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
+	CustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
+	inputManager->AddPlayer (robot);
 
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);
