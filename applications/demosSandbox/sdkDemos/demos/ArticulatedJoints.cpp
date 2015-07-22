@@ -642,7 +642,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 	
 
-	void MakeTire(const char* const entName, const char* const tireName, CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const parentBone)
+	CustomArticulatedTransformController::dSkeletonBone* MakeTire(const char* const entName, const char* const tireName, CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const parentBone)
 	{
 		ARTICULATED_VEHICLE_DEFINITION definition;
 		strcpy(definition.m_boneName, entName);
@@ -689,10 +689,32 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// connect the tire tp the body with a hinge
 		dMatrix hingeFrame (dRollMatrix(90.0f * 3.141592f / 180.0f) * matrix);
 		new CustomHinge (hingeFrame, tireBody, parentBody);
+
+		return bone;
+	}
+
+	void LinkTires(CustomArticulatedTransformController::dSkeletonBone* const master, CustomArticulatedTransformController::dSkeletonBone* const slave, CustomArticulatedTransformController::dSkeletonBone* const root)
+	{
+		NewtonCollisionInfoRecord masterTire;
+		NewtonCollisionInfoRecord slaveTire;
+
+		NewtonCollisionGetInfo(NewtonBodyGetCollision(master->m_body), &masterTire);
+		NewtonCollisionGetInfo(NewtonBodyGetCollision(slave->m_body), &slaveTire);
+
+		dAssert(masterTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
+		dAssert(slaveTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
+
+		dFloat masterRadio = masterTire.m_chamferCylinder.m_height * 0.5f + masterTire.m_chamferCylinder.m_radio;
+		dFloat slaveRadio = slaveTire.m_chamferCylinder.m_height * 0.5f + slaveTire.m_chamferCylinder.m_radio;
+
+		dMatrix pinMatrix;
+		NewtonBodyGetMatrix(root->m_body, &pinMatrix[0][0]);
+		new CustomGear(masterRadio / slaveRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
 	}
 
 
-	void MakeSuspension(CustomArticulatedTransformController* const controller, const char* const entName)
+
+	void MakeSuspension(CustomArticulatedTransformController* const controller, const char* const entName, CustomArticulatedTransformController::dSkeletonBone* const masterTire)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 
@@ -715,12 +737,13 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dMatrix matrix;
 		NewtonBodyGetMatrix(suspestionBody, &matrix[0][0]);
 		dMatrix hingeFrame(dYawMatrix(90.0f * 3.141592f / 180.0f) * matrix);
-		new CustomHinge(hingeFrame, suspestionBody, parentBody);
-
-		// remember to set limits
+		CustomHinge* const hinge = new CustomHinge(hingeFrame, suspestionBody, parentBody);
+		hinge->EnableLimits(true);
+		hinge->SetLimis(-45.0f * 3.1416f / 180.0f, 45.0f * 3.1416f / 180.0f);
 
 		for (DemoEntity* child = partModel->GetChild(); child; child = child->GetSibling()) {
-			MakeTire (child->GetName().GetStr(), "tire", controller, suspBone);
+			CustomArticulatedTransformController::dSkeletonBone* const childBone = MakeTire (child->GetName().GetStr(), "tire", controller, suspBone);
+			LinkTires (masterTire, childBone, chassisBone);
 		}
 	}
 
@@ -728,28 +751,32 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		
-		MakeTire ("leftTire_0", "tractionLeftTire", controller, chassisBone);
-		MakeTire ("leftTire_7", "tire", controller, chassisBone);
+		CustomArticulatedTransformController::dSkeletonBone* const leftTire_0 = MakeTire ("leftTire_0", "tractionLeftTire", controller, chassisBone);
+		CustomArticulatedTransformController::dSkeletonBone* const leftTire_7 = MakeTire ("leftTire_7", "tire", controller, chassisBone);
+		LinkTires (leftTire_0, leftTire_7, chassisBone);
+
 		MakeTire ("leftTireSuport_0", "suportTire", controller, chassisBone);
 		MakeTire ("leftTireSuport_1", "suportTire", controller, chassisBone);
 
-		MakeSuspension (controller, "leftSuspension_0");
-		MakeSuspension (controller, "leftSuspension_1");
-		MakeSuspension (controller, "leftSuspension_2");
+		MakeSuspension (controller, "leftSuspension_0", leftTire_0);
+		MakeSuspension (controller, "leftSuspension_1", leftTire_0);
+		MakeSuspension (controller, "leftSuspension_2", leftTire_0);
 	}
 
 	void MakeRightTrack(CustomArticulatedTransformController* const controller)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 
-		MakeTire("rightTire_0", "tractionrightTire", controller, chassisBone);
-		MakeTire("rightTire_7", "tire", controller, chassisBone);
+		CustomArticulatedTransformController::dSkeletonBone* const rightTire_0 = MakeTire("rightTire_0", "tractionrightTire", controller, chassisBone);
+		CustomArticulatedTransformController::dSkeletonBone* const rightTire_7 = MakeTire("rightTire_7", "tire", controller, chassisBone);
+		LinkTires (rightTire_0, rightTire_7, chassisBone);
+
 		MakeTire("rightTireSuport_0", "suportTire", controller, chassisBone);
 		MakeTire("rightTireSuport_1", "suportTire", controller, chassisBone);
 
-		MakeSuspension(controller, "rightSuspension_0");
-		MakeSuspension(controller, "rightSuspension_1");
-		MakeSuspension(controller, "rightSuspension_2");
+		MakeSuspension(controller, "rightSuspension_0", rightTire_0);
+		MakeSuspension(controller, "rightSuspension_1", rightTire_0);
+		MakeSuspension(controller, "rightSuspension_2", rightTire_0);
 	}
 		
 	class ConstantSpeedKnotInterpolant
@@ -861,7 +888,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBody* linkArray[1024];
 
 		int bodyCount = 0;
-		//linksCount -= 1;
+		linksCount -= 0;
 
 		void* const aggregate = NewtonCollisionAggregateCreate(world);
 		NewtonCollisionAggregateSetSelfCollision (aggregate, 0);

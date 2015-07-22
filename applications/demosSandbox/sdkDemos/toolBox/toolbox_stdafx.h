@@ -135,6 +135,7 @@ typedef long long unsigned64;
 
 #include <CustomJoint.h>
 #include <CustomHinge.h>
+#include <CustomGear.h>
 #include <CustomHingeActuator.h>
 #include <CustomBallAndSocket.h>
 #include <CustomSliderActuator.h>
