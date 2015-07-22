@@ -994,8 +994,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomHinge* const hinge = new CustomHinge (matrix0, matrix1, linkArray[0], linkArray[bodyCount - 1]);
 		hinge->SetFriction(20.0f);
 
-		for (int i = 0; i < 4; i ++) {
-			NewtonBody* const linkBody = linkArray[i * bodyCount / 4];
+		int reeltPoints = 8;
+		for (int i = 0; i < reeltPoints; i ++) {
+			NewtonBody* const linkBody = linkArray[i * bodyCount / reeltPoints];
 			new RealJoint (linkBody, rootNode->m_body);
 		}
 
