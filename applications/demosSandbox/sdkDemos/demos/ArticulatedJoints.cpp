@@ -229,14 +229,14 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			dFloat brakeTorque = 0.0f;
 			dFloat engineTorque = 0.0f;
 			if (vehicleModel->m_inputs.m_throttleValue > 0) {
-				engineTorque = -vehicleModel->m_maxEngineTorque; 
+				engineTorque = -vehicleModel->m_maxEngineTorque * 20.0f; 
 			} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
-				engineTorque = vehicleModel->m_maxEngineTorque; 
+				engineTorque = vehicleModel->m_maxEngineTorque * 20.0f;  
 			} else {
 				brakeTorque = 1000.0f;
 			}
 			for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
-				vehicleModel->m_frontTireJoints[i]->SetFriction(brakeTorque);
+//				vehicleModel->m_frontTireJoints[i]->SetFriction(brakeTorque);
 			}
 
 			dMatrix matrix;
@@ -617,8 +617,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return controller;
 	}
 
-
-
 	NewtonCollision* MakeRobotTireShape(DemoEntity* const bodyPart) const
 	{
 		dFloat radius = 0.0f;
@@ -712,8 +710,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBodyGetMatrix(root->m_body, &pinMatrix[0][0]);
 		new CustomGear(masterRadio / slaveRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
 	}
-
-
+	
 
 	void MakeSuspension(CustomArticulatedTransformController* const controller, const char* const entName, CustomArticulatedTransformController::dSkeletonBone* const masterTire)
 	{
@@ -762,6 +759,12 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		MakeSuspension (controller, "leftSuspension_0", leftTire_0);
 		MakeSuspension (controller, "leftSuspension_1", leftTire_0);
 		MakeSuspension (controller, "leftSuspension_2", leftTire_0);
+
+
+		ArticulatedEntityModel* const model = (ArticulatedEntityModel*) NewtonBodyGetUserData (chassisBone->m_body);
+		model->m_fronTires[model->m_frontTiresCount] = leftTire_0->m_body;
+		model->m_frontTiresCount += 1;
+		CalculateEngine (model, chassisBone->m_body, leftTire_0->m_body);
 	}
 
 	void MakeRightTrack(CustomArticulatedTransformController* const controller)
@@ -1239,10 +1242,6 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 
-	// load a the mesh of the articulate vehicle
-	ArticulatedEntityModel robotModel(scene, "robot.ngd");
-	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
-
 	// add an input Manage to manage the inputs and user interaction 
 	AriculatedJointInputManager* const inputManager = new AriculatedJointInputManager (scene);
 
@@ -1256,19 +1255,20 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 0.75f;
 
-	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift (matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
-
-//	inputManager->AddPlayer (vehicleManager->CreateForklift (matrix, &forkliffModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition));
+	// load a the mesh of the articulate vehicle
+//	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
+//	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift (matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 //	inputManager->AddPlayer (forklift);
 	
 	matrix.m_posit.m_z += 4.0f;
+	ArticulatedEntityModel robotModel(scene, "robot.ngd");
 	CustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
 	inputManager->AddPlayer (robot);
 
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);
-//	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
-//	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
+	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 	
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
