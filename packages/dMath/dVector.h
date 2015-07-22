@@ -57,7 +57,7 @@ class dVector: public TemplateVector<dFloat>
 	dVector();
 	dVector (const TemplateVector<dFloat>& v);
 	dVector (const dFloat *ptr);
-	dVector (dFloat x, dFloat y, dFloat z, dFloat w = 1.0); 
+	dVector (dFloat x, dFloat y, dFloat z, dFloat w = 1.0f); 
 };
 
 

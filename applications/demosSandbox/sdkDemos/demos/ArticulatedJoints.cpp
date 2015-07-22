@@ -751,9 +751,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		MakeSuspension(controller, "rightSuspension_1");
 		MakeSuspension(controller, "rightSuspension_2");
 	}
-
-
-	
+		
 	class ConstantSpeedKnotInterpolant
 	{
 		public:
@@ -838,19 +836,35 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		}
 
 
+		//DemoEntity* const trackRoot = new DemoEntity (dGetIdentityMatrix(), NULL); 
+		//scene->Append(trackRoot);
+		dMatrix rootMatrix (chassis->GetCurrentMatrix());
+
 		dMatrix aligmentMatrix (dRollMatrix(180.0f * 3.141592f / 180.0f));
 
 		DemoEntity* const threadLink = chassis->Find("link");
 		dMatrix shapeMatrix (threadPath->GetMeshMatrix() * threadPath->GetCurrentMatrix());
 
 		DemoEntity* const threadLinkChild = chassis->Find("Object001");
-		dMatrix shapeChildMatrix (threadLinkChild->GetMeshMatrix() * threadLinkChild->GetCurrentMatrix());
+		dMatrix shapeChildMatrix (threadLinkChild->GetCurrentMatrix());
 
 		dFloat s = 0.0f;
 		dMatrix matrix(dGetIdentityMatrix());
 		dFloat u0 = CalculateKnotParam(steps, linksCount, s);
 		dBigVector r(bezierPath->m_curve.CurvePoint(u0));
 		dVector r0(dVector(r.m_x, r.m_y, r.m_z, 1.0f));
+
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+		NewtonCollision* const collision = MakeConvexHull(threadLink);
+
+		NewtonBody* linkArray[1024];
+
+		int bodyCount = 0;
+		//linksCount -= 1;
+
+		void* const aggregate = NewtonCollisionAggregateCreate(world);
+		NewtonCollisionAggregateSetSelfCollision (aggregate, 0);
 		for (int i = 1; i < linksCount + 1; i++) {
 			s += linkLength;
 			dFloat u1 = CalculateKnotParam(steps, linksCount, dMod (s, length));
@@ -866,8 +880,12 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			matrix.m_posit = shapeMatrix.TransformVector(r0);
 			matrix.m_posit.m_z = offset;
 
-			DemoEntity* const threadPart = new DemoEntity(matrix, chassis);
-			threadPart->SetMesh(threadLink->GetMesh(), dGetIdentityMatrix());
+			matrix = matrix * rootMatrix;
+			NewtonBody* const link = CreateSimpleSolid (scene, (DemoMesh*)threadLink->GetMesh(), 10.0f, matrix, collision, 0);
+			NewtonCollisionAggregateAddBody (aggregate, link);
+			linkArray[bodyCount] = link;
+			bodyCount ++;
+			DemoEntity* const threadPart = (DemoEntity*) NewtonBodyGetUserData(link);
 
 			DemoEntity* const threadPartChild = new DemoEntity(shapeChildMatrix, threadPart);
 			threadPartChild->SetMesh(threadLinkChild->GetMesh(), dGetIdentityMatrix());
@@ -875,6 +893,38 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			r0 = r1;
 			u0 = u1;
 		}
+		NewtonDestroyCollision(collision);
+
+		dMatrix aligment (dYawMatrix(90.0f * 3.1416f / 180.0f));
+		NewtonBody* link0 = linkArray[0];
+
+		NewtonJoint* hingeArray[1024];
+		for (int i = 1; i < bodyCount; i++) {
+			NewtonBody* const link1 = linkArray[i];
+
+			dMatrix matrix;
+			NewtonBodyGetMatrix(link1, &matrix[0][0]);
+			CustomHinge* const hinge = new CustomHinge (aligment * matrix, link1, link0);
+			hinge->SetFriction(20.0f);
+			hingeArray[i-1] = hinge->GetJoint();
+			link0 = link1;
+		}
+
+		dMatrix matrix0;
+		dMatrix matrix1;
+		dMatrix matrix2;
+		NewtonBodyGetMatrix(linkArray[0], &matrix0[0][0]);
+		NewtonBodyGetMatrix(linkArray[1], &matrix2[0][0]);
+		NewtonBodyGetMatrix(linkArray[bodyCount - 1], &matrix1[0][0]);
+		
+		dVector dist (matrix2.m_posit - matrix0.m_posit);
+		matrix1.m_posit += dist;
+		CustomHinge* const hinge = new CustomHinge (matrix0, matrix1, linkArray[0], linkArray[bodyCount - 1]);
+		hinge->SetFriction(20.0f);
+
+		NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (world, link0, NULL);
+		NewtonSkeletonContainerAttachJointArray (skeleton, bodyCount - 1, hingeArray);
+		NewtonSkeletonContainerFinalize (skeleton);
 	}
 
 

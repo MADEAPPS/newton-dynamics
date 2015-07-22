@@ -1139,16 +1139,15 @@ class dgSpatialVector
 
 	DG_INLINE dgFloat64 DotProduct(const dgSpatialVector& v) const
 	{
-		__m128d tmp (_mm_add_pd(_mm_mul_pd(m_type[0], v.m_type[0]), _mm_add_pd (_mm_mul_pd(m_type[1], v.m_type[1]), _mm_mul_pd(m_type[2], v.m_type[2]))));
-		return tmp.m128d_f64[0] + tmp.m128d_f64[1];
+		dgFloat64 ret;
+		__m128d tmp(_mm_add_pd(_mm_mul_pd(m_type[0], v.m_type[0]), _mm_add_pd(_mm_mul_pd(m_type[1], v.m_type[1]), _mm_mul_pd(m_type[2], v.m_type[2]))));
+		_mm_store_sd(&ret, _mm_hadd_pd(tmp, tmp));
+		return ret;
 	}
-	
 
 	DG_INLINE void Scale(dgFloat64 s, dgSpatialVector& dst) const
 	{
-		__m128d tmp;
-		tmp.m128d_f64[0] = s;
-		tmp.m128d_f64[1] = s;
+		__m128d tmp = _mm_set1_pd(s);
 		dst.m_type[0] = _mm_mul_pd(m_type[0], tmp);
 		dst.m_type[1] = _mm_mul_pd(m_type[1], tmp);
 		dst.m_type[2] = _mm_mul_pd(m_type[2], tmp);
@@ -1156,9 +1155,7 @@ class dgSpatialVector
 
 	DG_INLINE void ScaleAdd(dgFloat64 s, const dgSpatialVector& b, dgSpatialVector& dst) const
 	{
-		__m128d tmp;
-		tmp.m128d_f64[0] = s;
-		tmp.m128d_f64[1] = s;
+		__m128d tmp = _mm_set1_pd(s);
 		dst.m_type[0] = _mm_add_pd(b.m_type[0], _mm_mul_pd(m_type[0], tmp));
 		dst.m_type[1] = _mm_add_pd(b.m_type[1], _mm_mul_pd(m_type[1], tmp));
 		dst.m_type[2] = _mm_add_pd(b.m_type[2], _mm_mul_pd(m_type[2], tmp));
@@ -1170,12 +1167,13 @@ class dgSpatialVector
 		dgFloat64 m_v[6];
 	};
 } DG_GCC_VECTOR_ALIGMENT;
+
 #endif
 
 DG_MSC_VECTOR_ALIGMENT
 class dgSpatialMatrix
 {
-public:
+	public:
 	DG_INLINE dgSpatialVector& operator[] (dgInt32 i)
 	{
 		dgAssert(i < 6);
@@ -1194,14 +1192,6 @@ public:
 	{
 		for (dgInt32 i = 0; i < 6; i++) {
 			m_rows[i].SetZero();
-		}
-	}
-
-	DG_INLINE void SetIdentity(dgInt32 rows)
-	{
-		for (dgInt32 i = 0; i < rows; i++) {
-			m_rows[i].SetZero();
-			m_rows[i][i] = dgFloat32(1.0f);
 		}
 	}
 
