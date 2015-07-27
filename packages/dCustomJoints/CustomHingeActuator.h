@@ -29,6 +29,7 @@
 class CustomHingeActuator: public CustomHinge
 {
 	public:
+	CUSTOM_JOINTS_API CustomHingeActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API CustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~CustomHingeActuator();
 
@@ -53,7 +54,7 @@ class CustomHingeActuator: public CustomHinge
 
 	protected:
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	dFloat m_angle;
 	dFloat m_minAngle;

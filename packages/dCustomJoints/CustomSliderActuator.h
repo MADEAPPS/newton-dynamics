@@ -24,6 +24,7 @@
 class CustomSliderActuator: public CustomSlider
 {
 	public:
+	CUSTOM_JOINTS_API CustomSliderActuator (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~CustomSliderActuator();
 
@@ -47,13 +48,13 @@ class CustomSliderActuator: public CustomSlider
     CUSTOM_JOINTS_API void SetMaxForcePower(dFloat force);
 
 	protected:
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 
-	dFloat m_linearRate;
 	dFloat m_posit;
 	dFloat m_minPosit;
 	dFloat m_maxPosit;
+	dFloat m_linearRate;
     dFloat m_maxForce;
 	bool m_flag;
 };

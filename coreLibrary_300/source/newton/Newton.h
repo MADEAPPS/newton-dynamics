@@ -868,7 +868,7 @@ extern "C" {
 	NEWTON_API NewtonBody* NewtonCreateKinematicBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision, const dFloat* const matrix);
 	NEWTON_API NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const deformableMesh, const dFloat* const matrix);
 
-	NEWTON_API void  NewtonDestroyBody(const NewtonBody* const body);
+	NEWTON_API void NewtonDestroyBody(const NewtonBody* const body);
 
 	NEWTON_DEPRECATED_API void NewtonBodyEnableSimulation(const NewtonBody* const body);
 	NEWTON_DEPRECATED_API void NewtonBodyDisableSimulation(const NewtonBody* const body);
@@ -965,6 +965,8 @@ extern "C" {
 	NEWTON_API NewtonJoint* NewtonBodyGetNextJoint (const NewtonBody* const body, const NewtonJoint* const joint);
 	NEWTON_API NewtonJoint* NewtonBodyGetFirstContactJoint (const NewtonBody* const body);
 	NEWTON_API NewtonJoint* NewtonBodyGetNextContactJoint (const NewtonBody* const body, const NewtonJoint* const contactJoint);
+
+	NEWTON_API NewtonSkeletonContainer* NewtonBodyGetSkeleton(const NewtonBody* const body);
 	
 	// **********************************************************************************************
 	//

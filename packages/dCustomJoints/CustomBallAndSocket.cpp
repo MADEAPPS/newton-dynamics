@@ -455,8 +455,8 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 dFloat sinAngle;
 dFloat cosAngle;
 CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
-float xxxx = dAtan2(sinAngle, cosAngle);
-float xxxx1 = dAtan2(sinAngle, cosAngle);
+//float xxxx = dAtan2(sinAngle, cosAngle);
+//float xxxx1 = dAtan2(sinAngle, cosAngle);
 
 	dQuaternion quat(localRotation);
 	if (quat.m_q0 > dFloat(0.99995f)) {

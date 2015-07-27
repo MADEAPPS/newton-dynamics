@@ -254,9 +254,15 @@ void CustomJoint::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 }
 
+
+const char* CustomJoint::GetTypeName() const
+{
+	return "CustomJoint";
+}
+
 dCRCTYPE CustomJoint::GetSerializeKey() const
 {
-	return dCRC64("CustomJoint");
+	return dCRC64(CustomJoint::GetTypeName());
 }
 
 

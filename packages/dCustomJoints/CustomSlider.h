@@ -27,8 +27,7 @@ class CustomSlider: public CustomJoint
 	CUSTOM_JOINTS_API virtual ~CustomSlider();
 
 	CUSTOM_JOINTS_API void EnableLimits(bool state);
-	CUSTOM_JOINTS_API void SetLimis(dFloat mindist, dFloat maxdist);
-	CUSTOM_JOINTS_API bool JoinHitLimit () const ;
+	CUSTOM_JOINTS_API void SetLimits(dFloat mindist, dFloat maxdist);
 
 	CUSTOM_JOINTS_API dFloat GetJointPosit () const;
 	CUSTOM_JOINTS_API dFloat GetJointSpeed () const;
@@ -37,16 +36,16 @@ class CustomSlider: public CustomJoint
 	CUSTOM_JOINTS_API CustomSlider (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	dFloat m_speed;
 	dFloat m_posit;
 	dFloat m_minDist;
 	dFloat m_maxDist;
 	bool m_limitsOn;
-	bool m_hitLimitOnLastUpdate;
-
+	bool m_lastRowWasUsed;
 	DECLARE_CUSTON_JOINT(CustomSlider, CustomJoint)
 };
 

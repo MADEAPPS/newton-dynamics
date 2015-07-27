@@ -41,6 +41,7 @@ dgDynamicBody::dgDynamicBody()
 	,m_aparentMass(dgFloat32 (0.0))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
+	,m_skeleton(NULL)
 	,m_applyExtForces(NULL)
 {
 #ifdef DG_USEFULL_INERTIA_MATRIX
@@ -61,6 +62,7 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	,m_aparentMass(dgFloat32 (0.0))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
+	,m_skeleton(NULL)
 	,m_applyExtForces(NULL)
 {
 	m_type = m_dynamicBody;
@@ -79,6 +81,11 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 
 dgDynamicBody::~dgDynamicBody()
 {
+	if (m_skeleton) {
+		dgSkeletonContainer* const skel = m_skeleton;
+		m_skeleton = NULL;
+		m_world->DestroySkeletonContainer(skel);
+	}
 }
 
 void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)

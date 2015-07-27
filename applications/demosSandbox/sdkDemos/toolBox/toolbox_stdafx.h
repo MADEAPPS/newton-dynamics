@@ -134,8 +134,8 @@ typedef long long unsigned64;
 #include <NewtonDebuggerServer.h>
 
 #include <CustomJoint.h>
-#include <CustomHinge.h>
 #include <CustomGear.h>
+#include <CustomHinge.h>
 #include <CustomHingeActuator.h>
 #include <CustomBallAndSocket.h>
 #include <CustomSliderActuator.h>

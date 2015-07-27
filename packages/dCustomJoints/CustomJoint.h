@@ -30,8 +30,9 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 
 
 #define DECLARE_CUSTON_JOINT(className,baseClass)																			\
-	virtual dCRCTYPE GetSerializeKey() const {return dCRC64(#className);}													\
 	public:																													\
+	virtual dCRCTYPE GetSerializeKey() const { return dCRC64(#className); }													\
+	virtual const char* GetTypeName() const { return #className; }															\
 	class SerializeMetaData: public baseClass::SerializeMetaData															\
 	{																														\
 		public:																												\
@@ -159,6 +160,8 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API NewtonJoint* GetJoint () const;
 
 	// the application needs to implement this function for serialization
+	CUSTOM_JOINTS_API virtual const char* GetTypeName() const;
+	CUSTOM_JOINTS_API virtual dCRCTYPE GetSerializeKey() const;
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	// these member function are only used by the C interface or for hooking callback to customize a particular 
@@ -186,7 +189,6 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API void CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) const;
 	CUSTOM_JOINTS_API void CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 
-	CUSTOM_JOINTS_API virtual dCRCTYPE GetSerializeKey() const;
 	CUSTOM_JOINTS_API static SerializeMetaDataDictionary& GetDictionary();
 
 	CUSTOM_JOINTS_API void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;

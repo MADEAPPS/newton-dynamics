@@ -22,6 +22,17 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomHingeActuator.h"
 
+CustomHingeActuator::CustomHingeActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+	:CustomHinge (pinAndPivotFrame, child, parent)
+	,m_angle(0.0f)
+	,m_minAngle(-1.0e10f)
+	,m_maxAngle( 1.0e10f)
+	,m_angularRate(0.0f)
+	,m_maxForce(1.0e10f)
+	,m_flag(false)
+{
+	EnableLimits(false);
+}
 
 CustomHingeActuator::CustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, NewtonBody* const child, NewtonBody* const parent)
 	:CustomHinge (pinAndPivotFrame, child, parent)
@@ -113,16 +124,14 @@ void CustomHingeActuator::GetInfo (NewtonJointRecord* const info) const
 }
 
 
-void CustomHingeActuator::SubmitConstraints (dFloat timestep, int threadIndex)
+void CustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	CustomHinge::SubmitConstraints (timestep, threadIndex);
-
 	if (m_flag) {
 		dMatrix matrix0;
 		dMatrix matrix1;
 
 		CalculateGlobalMatrix (matrix0, matrix1);
-		dFloat jointangle = GetJointAngle();
+		dFloat jointangle = GetActuatorAngle();
 		dFloat relAngle = jointangle - m_angle;
 		NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
 
@@ -136,6 +145,8 @@ void CustomHingeActuator::SubmitConstraints (dFloat timestep, int threadIndex)
         NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
         NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+	} else {
+		CustomHinge::SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
 	}
 }
 

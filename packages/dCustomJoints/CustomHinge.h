@@ -30,7 +30,7 @@ class CustomHinge: public CustomJoint
 	CUSTOM_JOINTS_API virtual ~CustomHinge();
 
 	CUSTOM_JOINTS_API void EnableLimits(bool state);
-	CUSTOM_JOINTS_API void SetLimis(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetLimits(dFloat minAngle, dFloat maxAngle);
 	CUSTOM_JOINTS_API dFloat GetJointAngle () const;
 	CUSTOM_JOINTS_API dVector GetPinAxis () const;
 	CUSTOM_JOINTS_API dFloat GetJointOmega () const;
@@ -44,6 +44,7 @@ class CustomHinge: public CustomJoint
 
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 	
 	AngularIntegration m_curJointAngle;
 	dFloat m_minAngle;
@@ -51,6 +52,7 @@ class CustomHinge: public CustomJoint
 	dFloat m_friction;
 	dFloat m_jointOmega;
 	bool m_limitsOn;
+	bool m_lastRowWasUsed;
 	DECLARE_CUSTON_JOINT(CustomHinge, CustomJoint)
 };
 

@@ -33,9 +33,8 @@
 #define DG_ErrTolerance		(1.0e-2f)
 #define DG_ErrTolerance2	(DG_ErrTolerance * DG_ErrTolerance)
 
+class dgSkeletonContainer;
 
-
-//DG_MSC_VECTOR_ALIGMENT
 DG_MSC_VECTOR_ALIGMENT
 class dgDynamicBody : public dgBody 
 {
@@ -70,10 +69,10 @@ class dgDynamicBody : public dgBody
 	virtual void ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex);
 	virtual OnApplyExtForceAndTorque GetExtForceAndTorqueCallback () const;
 	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback);
-
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 
-
+	virtual dgSkeletonContainer* GetSkeleton() const;
+	void SetSkeleton(dgSkeletonContainer* const skeleton);
 
 	private:
 	virtual void AddDampingAcceleration();
@@ -95,7 +94,7 @@ class dgDynamicBody : public dgBody
 	dgVector m_aparentMass;
 	dgInt32 m_sleepingCounter;
 	dgUnsigned32 m_isInDestructionArrayLRU;
-
+	dgSkeletonContainer* m_skeleton;
 	static dgVector m_equilibriumError2;
 
 	OnApplyExtForceAndTorque m_applyExtForces;
@@ -117,9 +116,6 @@ DG_INLINE const dgVector& dgDynamicBody::GetTorque() const
 {
 	return m_alpha;
 }
-
-
-
 
 
 DG_INLINE dgFloat32 dgDynamicBody::GetLinearDamping () const
@@ -216,6 +212,18 @@ DG_INLINE void dgDynamicBody::SetExtForceAndTorqueCallback (OnApplyExtForceAndTo
 {
 	m_applyExtForces = callback;
 }
+
+DG_INLINE dgSkeletonContainer* dgDynamicBody::GetSkeleton() const
+{
+	return m_skeleton;
+}
+
+DG_INLINE void dgDynamicBody::SetSkeleton(dgSkeletonContainer* const skeleton)
+{
+	dgAssert (!(m_skeleton && skeleton));
+	m_skeleton = skeleton;
+}
+
 
 #endif 
 

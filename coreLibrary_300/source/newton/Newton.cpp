@@ -5427,6 +5427,13 @@ NewtonJoint* NewtonBodyGetNextContactJoint(const NewtonBody* const bodyPtr, cons
 }
 
 
+NewtonSkeletonContainer* NewtonBodyGetSkeleton(const NewtonBody* const bodyPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	return (NewtonSkeletonContainer*) body->GetSkeleton();
+}
+
 int NewtonJointIsActive(const NewtonJoint* const jointPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);

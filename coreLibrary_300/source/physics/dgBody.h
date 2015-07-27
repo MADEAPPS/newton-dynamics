@@ -30,6 +30,7 @@ class dgBody;
 class dgWorld;  
 class dgCollision;
 class dgBroadPhaseNode;
+class dgSkeletonContainer;
 class dgCollisionInstance;
 class dgBroadPhaseAggregate;
 
@@ -196,6 +197,7 @@ class dgBody
 	virtual dgConstraint* GetFirstContact() const;
 	virtual dgConstraint* GetNextContact(dgConstraint* const joint) const;
 	virtual dgVector CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const;
+	virtual dgSkeletonContainer* GetSkeleton() const;
 
     void SetMatrixOriginAndRotation(const dgMatrix& matrix);
 
@@ -204,11 +206,12 @@ class dgBody
 	dgBroadPhaseAggregate* GetBroadPhaseAggregate() const;
 	void SetBroadPhaseAggregate(dgBroadPhaseAggregate* const aggregate);
 
+	
+
 	protected:
 	void UpdateWorlCollisionMatrix() const;
 	void UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex);
 	void UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex);
-
 		
 	// member variables:
 	protected:
@@ -597,6 +600,10 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
 }
 
+DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const
+{
+	return NULL;
+}
 
 #endif 
 

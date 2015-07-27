@@ -376,7 +376,7 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodyGetMatrix(box0, &matrix[0][0]);
 	CustomHinge* const fixJoint = new CustomHinge(matrix, box0, NULL);
 	fixJoint->EnableLimits(true);
-	fixJoint->SetLimis(0.0f, 0.0f);
+	fixJoint->SetLimits(0.0f, 0.0f);
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
@@ -483,7 +483,7 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
     // add hinge with limit and friction
     CustomHinge* const hinge0 = new CustomHinge (matrix, box0, NULL);
     hinge0->EnableLimits (true);
-    hinge0->SetLimis(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+    hinge0->SetLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
     hinge0->SetFriction (20.0f);
 
     // link the two boxes
@@ -492,7 +492,7 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
     matrix = localPin * matrix;
     CustomHinge* const hinge1 = new CustomHinge (matrix, box1, box0);
     hinge1->EnableLimits (true);
-    hinge1->SetLimis (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+    hinge1->SetLimits (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
     hinge1->SetFriction (20.0f);
 
     // link the two boxes
@@ -501,7 +501,7 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
     matrix = localPin * matrix;
     CustomHinge* const hinge2 = new CustomHinge (matrix, box2, box1);
     hinge2->EnableLimits (true);
-    hinge2->SetLimis (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+    hinge2->SetLimits (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
 	hinge2->SetFriction (20.0f);
 
 #ifdef _USE_HARD_JOINTS
@@ -526,7 +526,7 @@ static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodyGetMatrix (box0, &matrix[0][0]);
 	CustomHinge* const hinge = new CustomHinge(matrix, box0, NULL);
 	hinge->EnableLimits(true);
-	hinge->SetLimis(0.0f, 0.0f);
+	hinge->SetLimits(0.0f, 0.0f);
 //	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	// connect the bodies by a Slider joint
@@ -537,7 +537,7 @@ static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
     slider->EnableLimits(true);
 
     // set limit on second axis
-    slider->SetLimis (-4.0f, 4.0f);
+    slider->SetLimits (-4.0f, 4.0f);
 
 #ifdef _USE_HARD_JOINTS
 //	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), box0, NULL);
@@ -560,7 +560,7 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 	NewtonBodyGetMatrix(box0, &matrix[0][0]);
 	CustomHinge* const hinge = new CustomHinge(matrix, box0, NULL);
 	hinge->EnableLimits(true);
-	hinge->SetLimis(0.0f, 0.0f);
+	hinge->SetLimits(0.0f, 0.0f);
 
 	// connect the bodies by a Slider joint
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
@@ -638,7 +638,7 @@ static void AddGear (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodyGetMatrix(box0, &matrix[0][0]);
 	CustomHinge* const hinge = new CustomHinge(matrix, box0, NULL);
 	hinge->EnableLimits(true);
-	hinge->SetLimis(0.0f, 0.0f);
+	hinge->SetLimits(0.0f, 0.0f);
 
 	// connect two bodies with a hinge 
     CustomHinge* const hinge0 = AddHingeWheel (scene, origin + dVector (-1.0f, 4.0f, 0.0f), 0.5f, 1.0f, box0);
@@ -695,18 +695,18 @@ void AddPulley (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodyGetMatrix(reel0, &matrix[0][0]);
 	CustomHinge* const fixJoint0 = new CustomHinge(matrix, reel0, NULL);
 	fixJoint0->EnableLimits(true);
-	fixJoint0->SetLimis(0.0f, 0.0f);
+	fixJoint0->SetLimits(0.0f, 0.0f);
 
 	NewtonBodyGetMatrix(reel1, &matrix[0][0]);
 	CustomHinge* const fixJoint1 = new CustomHinge(matrix, reel1, NULL);
 	fixJoint1->EnableLimits(true);
-	fixJoint1->SetLimis(0.0f, 0.0f);
+	fixJoint1->SetLimits(0.0f, 0.0f);
 
     CustomSlider* const slider0 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 2.0f), 0.5f, 1.0f, reel0);
     CustomSlider* const slider1 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel1);
 
     slider0->EnableLimits(true);
-    slider0->SetLimis (-2.0f, 2.0f);
+    slider0->SetLimits (-2.0f, 2.0f);
 
     NewtonBody* const body0 = slider0->GetBody0();
     NewtonBody* const body1 = slider1->GetBody0();
@@ -754,12 +754,12 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
 	NewtonBodyGetMatrix(reel0, &matrix[0][0]);
 	CustomHinge* const fixJoint0 = new CustomHinge(matrix, reel0, NULL);
 	fixJoint0->EnableLimits(true);
-	fixJoint0->SetLimis(0.0f, 0.0f);
+	fixJoint0->SetLimits(0.0f, 0.0f);
 
 	NewtonBodyGetMatrix(reel1, &matrix[0][0]);
 	CustomHinge* const fixJoint1 = new CustomHinge(matrix, reel1, NULL);
 	fixJoint1->EnableLimits(true);
-	fixJoint1->SetLimis(0.0f, 0.0f);
+	fixJoint1->SetLimits(0.0f, 0.0f);
 
     CustomHinge* const hinge0 = AddHingeWheel (scene, origin + dVector (-1.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
     CustomHinge* const hinge1 = AddHingeWheel (scene, origin + dVector ( 1.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);

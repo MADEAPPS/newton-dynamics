@@ -72,6 +72,8 @@ class dgSkeletonContainer::dgSkeletonGraph
 	DG_INLINE ~dgSkeletonGraph()
 	{
 		dgSkeletonGraph* next;
+		m_body->SetSkeleton(NULL);
+
 		for (dgSkeletonGraph* ptr = m_child; ptr; ptr = next) {
 			next = ptr->m_sibling;
 			delete ptr;
@@ -399,6 +401,11 @@ dgSkeletonContainer::dgSkeletonGraph* dgSkeletonContainer::AddChild(dgDynamicBod
 	dgAssert(node->m_joint->GetBody0() == node->m_body);
 	dgAssert(node->m_joint->GetBody1() == node->m_parent->m_body);
 	m_nodeCount ++;
+
+	if (child->GetWorld()->GetSentinelBody() != child) {
+		child->SetSkeleton(this);
+	}
+	
 	return node;
 }
 

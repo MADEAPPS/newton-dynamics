@@ -745,7 +745,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dMatrix hingeFrame(dYawMatrix(90.0f * 3.141592f / 180.0f) * matrix);
 		CustomHinge* const hinge = new CustomHinge(hingeFrame, suspestionBody, parentBody);
 		hinge->EnableLimits(true);
-		hinge->SetLimis(-45.0f * 3.1416f / 180.0f, 45.0f * 3.1416f / 180.0f);
+		hinge->SetLimits(-45.0f * 3.1416f / 180.0f, 45.0f * 3.1416f / 180.0f);
 
 		for (DemoEntity* child = partModel->GetChild(); child; child = child->GetSibling()) {
 			CustomArticulatedTransformController::dSkeletonBone* const childBone = MakeTire (child->GetName().GetStr(), "tire", controller, suspBone);

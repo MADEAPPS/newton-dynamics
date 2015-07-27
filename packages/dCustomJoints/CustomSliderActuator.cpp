@@ -21,16 +21,28 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+	:CustomSlider(pinAndPivotFrame, child, parent)
+	,m_posit(0.0f)
+	,m_minPosit(-1.0e10f)
+	,m_maxPosit( 1.0e10f)
+	,m_linearRate(0.0f)
+	,m_maxForce(1.0e10f)
+	,m_flag(false)
+{
+	EnableLimits(false);
+}
 
 CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, NewtonBody* const child, NewtonBody* const parent)
 	:CustomSlider(pinAndPivotFrame, child, parent)
-	,m_linearRate(speed)
 	,m_posit(0.0f)
 	,m_minPosit(minPosit)
 	,m_maxPosit(maxPosit)
+	,m_linearRate(speed)
     ,m_maxForce(1.0e10f)
 	,m_flag(true)
 {
+	EnableLimits(false);
 }
 
 CustomSliderActuator::~CustomSliderActuator()
@@ -113,10 +125,8 @@ void CustomSliderActuator::GetInfo (NewtonJointRecord* const info) const
 	dAssert (0);
 }
 
-void CustomSliderActuator::SubmitConstraints (dFloat timestep, int threadIndex)
+void CustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	CustomSlider::SubmitConstraints (timestep, threadIndex);
-
 	if (m_flag) {
 		dMatrix matrix0;
 		dMatrix matrix1;
@@ -140,5 +150,9 @@ void CustomSliderActuator::SubmitConstraints (dFloat timestep, int threadIndex)
         NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
         NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
+	} else {
+		CustomSlider::SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
 	}
 }
+
+
