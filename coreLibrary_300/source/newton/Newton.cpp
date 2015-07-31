@@ -310,7 +310,7 @@ int NewtonGetCurrentDevice (const NewtonWorld* const newtonWorld)
 	return world->GetCurrentHardwareMode();
 }
 
-int NewtonEnumrateDevices (const NewtonWorld* const newtonWorld)
+int NewtonEnumerateDevices (const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;

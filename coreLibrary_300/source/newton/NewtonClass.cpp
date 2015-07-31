@@ -253,6 +253,17 @@ void NewtonUserJoint::SetHighFriction (dgFloat32 friction)
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
 		m_param->m_forceBounds[index].m_upper = dgClamp (friction, dgFloat32(0.001f), dgFloat32(DG_MAX_BOUND));
 		m_param->m_forceBounds[index].m_normalIndex = DG_BILATERAL_FRICTION_CONSTRAINT;
+
+		#ifdef _DEBUG
+		dgInt32 i0 = 0; 
+		dgInt32 i1 = m_rows - 1; 
+		while ((i0 <= i1) && (m_param->m_forceBounds[i0].m_normalIndex != DG_BILATERAL_FRICTION_CONSTRAINT)) i0 ++;
+		while ((i1 >= i0) && (m_param->m_forceBounds[i1].m_normalIndex == DG_BILATERAL_FRICTION_CONSTRAINT)) i1 --;
+		dgAssert((i0 - i1) == 1);
+		if ((i0 - i1) != 1) {
+			dgTrace(("make sure that friction joint are issue at last\n"));
+		}
+		#endif
 	}
 }
 
@@ -262,6 +273,17 @@ void NewtonUserJoint::SetLowerFriction (dgFloat32 friction)
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
 		m_param->m_forceBounds[index].m_low = dgClamp (friction, dgFloat32(DG_MIN_BOUND), dgFloat32(-0.001f));
 		m_param->m_forceBounds[index].m_normalIndex = DG_BILATERAL_FRICTION_CONSTRAINT;
+
+		#ifdef _DEBUG
+		dgInt32 i0 = 0;
+		dgInt32 i1 = m_rows - 1;
+		while ((i0 <= i1) && (m_param->m_forceBounds[i0].m_normalIndex != DG_BILATERAL_FRICTION_CONSTRAINT)) i0++;
+		while ((i1 >= i0) && (m_param->m_forceBounds[i1].m_normalIndex == DG_BILATERAL_FRICTION_CONSTRAINT)) i1--;
+		dgAssert((i0 - i1) == 1);
+		if ((i0 - i1) != 1) {
+			dgTrace(("make sure that friction joint are issue at last\n"));
+		}
+		#endif
 	}
 }
 

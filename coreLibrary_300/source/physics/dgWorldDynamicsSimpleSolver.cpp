@@ -882,9 +882,60 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(dgJointInfo* const jointInfo
 			dgVector linearM1(internalForces[m1].m_linear);
 			dgVector angularM1(internalForces[m1].m_angular);
 
-			dgVector maxAccel(dgVector::m_three);
-			dgVector predicateScale(dgVector::m_one);
-			for (dgInt32 i = 0; (i < 4) && (maxAccel.GetScalar() > dgFloat32(1.0f)); i++) {
+			dgInt32 index = jointInfo->m_pairStart;
+			for (dgInt32 k = 0; k < rowsCount; k++) {
+				dgJacobianMatrixElement* const row = &matrixRow[index];
+
+				dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
+				dgAssert(row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32(0.0f));
+				dgAssert(row->m_Jt.m_jacobianM1.m_linear.m_w == dgFloat32(0.0f));
+				dgAssert(row->m_Jt.m_jacobianM1.m_angular.m_w == dgFloat32(0.0f));
+
+				dgVector a(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(linearM0) + row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(angularM0) +
+						   row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(linearM1) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(angularM1));
+
+				//dgFloat32 a = row->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z - row->m_force * row->m_diagDamp;
+				a = dgVector(row->m_coordenateAccel - row->m_force * row->m_diagDamp) - a.AddHorizontal();
+
+				//dgFloat32 f = row->m_force + row->m_invDJMinvJt * a;
+				dgVector f(row->m_force + row->m_invJMinvJt * a.m_x);
+
+				dgInt32 frictionIndex = row->m_normalForceIndex;
+				dgAssert(((frictionIndex < 0) && (normalForce[frictionIndex] == dgFloat32(1.0f))) || ((frictionIndex >= 0) && (normalForce[frictionIndex] >= dgFloat32(0.0f))));
+
+				dgFloat32 frictionNormal = normalForce[frictionIndex];
+				dgVector lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
+				dgVector upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
+
+				//if (f > upperFrictionForce) {
+				//	a = dgFloat32 (0.0f);
+				//	f = upperFrictionForce;
+				//} else if (f < lowerFrictionForce) {
+				//	a = dgFloat32 (0.0f);
+				//	f = lowerFrictionForce;
+				//}
+				a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
+
+				accNorm = accNorm.GetMax(a.Abs());
+				dgAssert(accNorm.m_x >= dgAbsf(a.m_x));
+
+				dgVector prevValue(f - dgVector(row->m_force));
+
+				row->m_force = f.GetScalar();
+				normalForce[k] = f.GetScalar();
+
+				row->m_maxImpact = f.Abs().GetMax(row->m_maxImpact).m_x;
+
+				linearM0 += row->m_Jt.m_jacobianM0.m_linear.CompProduct4(prevValue);
+				angularM0 += row->m_Jt.m_jacobianM0.m_angular.CompProduct4(prevValue);
+				linearM1 += row->m_Jt.m_jacobianM1.m_linear.CompProduct4(prevValue);
+				angularM1 += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(prevValue);
+				index++;
+			}
+
+			dgVector maxAccel(accNorm);
+			for (dgInt32 i = 0; (i < 3) && (maxAccel.GetScalar() > dgFloat32(1.0f)); i++) {
 				maxAccel = dgFloat32(0.0f);
 				dgInt32 index = jointInfo->m_pairStart;
 				for (dgInt32 k = 0; k < rowsCount; k++) {
@@ -924,7 +975,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(dgJointInfo* const jointInfo
 					maxAccel = maxAccel.GetMax(a.Abs());
 					dgAssert(maxAccel.m_x >= dgAbsf(a.m_x));
 
-					accNorm = accNorm.GetMax(maxAccel.CompProduct4(predicateScale));
 					dgVector prevValue(f - dgVector(row->m_force));
 
 					row->m_force = f.GetScalar();
@@ -938,8 +988,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(dgJointInfo* const jointInfo
 					angularM1 += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(prevValue);
 					index++;
 				}
-				predicateScale = dgVector::m_zero;
 			}
+
 			internalForces[m0].m_linear = linearM0;
 			internalForces[m0].m_angular = angularM0;
 			internalForces[m1].m_linear = linearM1;
@@ -1215,7 +1265,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	joindDesc.m_firstPassCoefFlag = dgFloat32 (0.0f);
 
 	dgInt32 skeletonCount = 0;
-	dgSkeletonContainer* skaletonArray[DG_MAX_SKELETON_JOINT_COUNT];
+	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
 
 	if (island->m_skeletonCount) {
 		dgSkeletonList* const skeletonList = world;
@@ -1227,9 +1277,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			dgAssert (constraint->m_priority > 0);
 			dgAssert (skeletonList->Find(constraint->m_priority>>DG_SKELETON_BIT_SHIFT_KEY));
 			dgSkeletonContainer* const container = skeletonList->Find(constraint->m_priority>>DG_SKELETON_BIT_SHIFT_KEY)->GetInfo();
-			skaletonArray[skeletonCount] = container;
+			skeletonArray[skeletonCount] = container;
 			skeletonCount ++;
-			dgAssert (skeletonCount < dgInt32 (sizeof (skaletonArray) / sizeof (skaletonArray[0])));
+			dgAssert (skeletonCount < dgInt32 (sizeof (skeletonArray) / sizeof (skeletonArray[0])));
 			const dgInt32 jointCount = container->GetJointCount ();
 			for (dgInt32 j = 0; j < jointCount; j ++) {
 				constraintArray[i + j].m_joint->m_index = i + j;
@@ -1237,11 +1287,10 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			i += jointCount;
 		} while (i < jointCount);
 
-		dgInt32 j = jointBaseCount;
+
 		for (dgInt32 i = 0; i < skeletonCount; i ++) {
-			dgSkeletonContainer* const container = skaletonArray[i];
+			dgSkeletonContainer* const container = skeletonArray[i];
 			container->InitMassMatrix (constraintArray, matrixRow);
-			j += container->GetJointCount();
 		}
 	}
 
@@ -1286,11 +1335,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 
-			dgInt32 j = jointBaseCount;
 			for (dgInt32 i = 0; i < skeletonCount; i ++) {
-				dgSkeletonContainer* const container = skaletonArray[i];
-				dgFloat32 accel = container->CalculateJointForce (&constraintArray[j], bodyArray, internalForces, matrixRow);
-				j += container->GetJointCount();
+				dgSkeletonContainer* const container = skeletonArray[i];
+				dgFloat32 accel = container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 		}

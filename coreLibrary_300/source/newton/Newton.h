@@ -428,10 +428,13 @@ extern "C" {
 	//	NEWTON_API void NewtonSetPlatformArchitecture (const NewtonWorld* const newtonWorld, int mode);
 	//	NEWTON_API int NewtonGetPlatformArchitecture(const NewtonWorld* const newtonWorld, char* description);
 
-	NEWTON_API int NewtonEnumrateDevices (const NewtonWorld* const newtonWorld);
+	NEWTON_API int NewtonEnumerateDevices (const NewtonWorld* const newtonWorld);
 	NEWTON_API int NewtonGetCurrentDevice (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSetCurrentDevice (const NewtonWorld* const newtonWorld, int deviceIndex);
 	NEWTON_API void NewtonGetDeviceString (const NewtonWorld* const newtonWorld, int deviceIndex, char* const vendorString, int maxSize);
+
+	NEWTON_API dFloat NewtonGetGlobalScale (const NewtonWorld* const newtonWorld);
+	NEWTON_API void NewtonSetGlobalScale (const NewtonWorld* const newtonWorld, dFloat scale);
 
 	NEWTON_API dFloat NewtonGetContactMergeTolerance (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSetContactMergeTolerance (const NewtonWorld* const newtonWorld, dFloat tolerance);

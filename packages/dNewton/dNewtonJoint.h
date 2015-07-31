@@ -96,7 +96,7 @@ class dNewtonHingeJoint: public dNewtonJoint
 	CNEWTON_API void SetFriction (dFloat friction);
 
     CNEWTON_API void EnableLimits(bool state);
-   	CNEWTON_API void SetLimis(dFloat minAngle, dFloat maxAngle);
+   	CNEWTON_API void SetLimits(dFloat minAngle, dFloat maxAngle);
 };
 
 class dNewtonSliderJoint: public dNewtonJoint 
@@ -105,7 +105,7 @@ class dNewtonSliderJoint: public dNewtonJoint
 	CNEWTON_API dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
 
     CNEWTON_API void EnableLimits(bool state);
-    CNEWTON_API void SetLimis(dFloat minDist, dFloat maxDist);
+    CNEWTON_API void SetLimits(dFloat minDist, dFloat maxDist);
 };
 
 

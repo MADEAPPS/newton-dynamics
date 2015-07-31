@@ -40,30 +40,26 @@ class dgSkeletonContainer
 	dgSkeletonContainer(dgWorld* const world, dgDynamicBody* const rootBody);
 	~dgSkeletonContainer();
 
+	void Finalize ();
 	dgWorld* GetWorld() const; 
-	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
-
 	dgInt32 GetId () const {return m_id;}
+	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
 	dgSkeletonGraph* AddChild (dgBody* const child, dgBody* const parent);
 	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
-	
-	void Finalize ();
-	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
-
+	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
 	void InitMassMatrix (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow);
-	dgFloat32 CalculateJointForce (dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	dgFloat32 CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 
 	private:
-	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
-	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
-	
 	void SolveFoward () const;
 	void SolveBackward () const;
-
-	dgFloat32 SolveUnilaterals (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	dgFloat32 CalculateJointAccel (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-
+	void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
+	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
+	dgFloat32 CalculateJointAccel (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	dgFloat32 SolveUnilaterals (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+
 	static void ResetUniqueId(dgInt32 id);
 
 	dgWorld* m_world;

@@ -112,9 +112,9 @@ void dNewtonHingeJoint::EnableLimits(bool state)
     ((CustomHinge*)m_joint)->EnableLimits(state);
 }
 
-void dNewtonHingeJoint::SetLimis(dFloat minAngle, dFloat maxAngle)
+void dNewtonHingeJoint::SetLimits(dFloat minAngle, dFloat maxAngle)
 {
-    ((CustomHinge*)m_joint)->SetLimis(minAngle, maxAngle);
+    ((CustomHinge*)m_joint)->SetLimits(minAngle, maxAngle);
 }
 
 dNewtonSliderJoint::dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
@@ -128,9 +128,9 @@ void dNewtonSliderJoint::EnableLimits(bool state)
     ((CustomSlider*) m_joint)->EnableLimits(state);
 }
 
-void dNewtonSliderJoint::SetLimis(dFloat minDist, dFloat maxDist)
+void dNewtonSliderJoint::SetLimits(dFloat minDist, dFloat maxDist)
 {
-    ((CustomSlider*) m_joint)->SetLimis(minDist, maxDist);
+    ((CustomSlider*) m_joint)->SetLimits(minDist, maxDist);
 }
 
 dNewtonUniversalJoint::dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)

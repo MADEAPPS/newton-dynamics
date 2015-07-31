@@ -480,7 +480,7 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 	
 
 		optionsMenu->AppendSeparator();
-		int platformsCount = NewtonEnumrateDevices (m_scene->GetNewton());
+		int platformsCount = NewtonEnumerateDevices (m_scene->GetNewton());
 		for (int i = 0; i < platformsCount; i ++) {
 			wxString label;
 			char platform[256];
