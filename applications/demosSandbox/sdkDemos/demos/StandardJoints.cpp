@@ -881,26 +881,19 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	scene->Append(rollerCosterPath);
 	
 	dBezierSpline spline;
-	dFloat64 knots[] = {0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f};
+	dFloat64 knots[] = {0.0f, 1.0f / 5.0f, 2.0f / 5.0f, 3.0f / 5.0f, 4.0f / 5.0f, 1.0f};
 
 	dBigVector o (origin[0], origin[1],  origin[2],  0.0f);
 	dBigVector control[] =
 	{
 		dBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f) + o,
 		dBigVector(150.0f - 100.0f, 10.0f, 150.0f - 250.0f, 1.0f) + o,
+		dBigVector(175.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f) + o,
 		dBigVector(200.0f - 100.0f, 70.0f, 250.0f - 250.0f, 1.0f) + o,
-		dBigVector(150.0f - 100.0f, 10.0f, 350.0f - 250.0f, 1.0f) + o,
+		dBigVector(215.0f - 100.0f, 20.0f, 250.0f - 250.0f, 1.0f) + o,
+		dBigVector(150.0f - 100.0f, 50.0f, 350.0f - 250.0f, 1.0f) + o,
 		dBigVector( 50.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f) + o,
 		dBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f) + o,
-
-/*
-		dBigVector(100.0f - 100.0f, 10.0f, 200.0f - 250.0f, 1.0f) + o,
-		dBigVector(150.0f - 100.0f, 10.0f, 150.0f - 250.0f, 1.0f) + o,
-		dBigVector(200.0f - 100.0f, 10.0f, 250.0f - 250.0f, 1.0f) + o,
-		dBigVector(150.0f - 100.0f, 10.0f, 350.0f - 250.0f, 1.0f) + o,
-		dBigVector(50.0f  - 100.0f, 10.0f, 250.0f - 250.0f, 1.0f) + o,
-		dBigVector(100.0f - 100.0f, 10.0f, 200.0f - 250.0f, 1.0f) + o,
-*/
 	};
 
 	spline.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, control);
