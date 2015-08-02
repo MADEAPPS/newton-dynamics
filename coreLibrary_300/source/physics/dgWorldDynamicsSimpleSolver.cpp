@@ -422,7 +422,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 			dgBody* const body = bodyArray[i].m_body;
 			if (!body->m_equilibrium) {
 				dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
-				body->AddDampingAcceleration();
+				body->AddDampingAcceleration(timestep);
 				body->CalcInvInertiaMatrix ();
 			}
 

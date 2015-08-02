@@ -57,7 +57,7 @@ class dgKinematicBody: public dgBody
 	virtual void SetCollidable (bool state) {m_collidable = state;}
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 
-	virtual void AddDampingAcceleration() {}
+	virtual void AddDampingAcceleration(dgFloat32 timestep) {}
 
 /*
 	virtual dgConstraint* GetFirstJoint() const;

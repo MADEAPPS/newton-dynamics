@@ -194,7 +194,7 @@ void dgWorldDynamicUpdate::InitializeBodyArrayParallelKernel (void* const contex
 			dgAssert (body->m_index == i);
 			if (!body->m_equilibrium) {
 				dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
-				body->AddDampingAcceleration();
+				body->AddDampingAcceleration(syncData->m_timestep);
 				body->CalcInvInertiaMatrix ();
 			}
 

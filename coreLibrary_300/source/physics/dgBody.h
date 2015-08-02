@@ -164,7 +164,7 @@ class dgBody
 	virtual dgVector GetAngularDamping () const = 0;
 	virtual void SetLinearDamping (dgFloat32 linearDamp) = 0;
 	virtual void SetAngularDamping (const dgVector& angularDamp) = 0;
-	virtual void AddDampingAcceleration() = 0;
+	virtual void AddDampingAcceleration(dgFloat32 timestep) = 0;
 
 	virtual void SetMassMatrix (dgFloat32 mass, const dgMatrix& inertia);
 	virtual void SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const collision);

@@ -49,7 +49,7 @@ class dgDeformableBody: public dgBody
 
 	virtual const dgVector& GetForce() const;
 	virtual const dgVector& GetTorque() const {return m_dummy;}
-	virtual void AddDampingAcceleration() {}
+	virtual void AddDampingAcceleration(dgFloat32 timestep) {}
 
 	virtual void AddForce (const dgVector& force);
 	virtual void SetForce (const dgVector& force);

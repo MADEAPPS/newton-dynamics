@@ -868,7 +868,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, float offset, CustomArticulatedTransformController::dSkeletonBone* const rootNode)
 	{
-		dFloat linkLength = 0.2f;
+		dFloat linkLength = 0.32f;
 
 		DemoEntity* const threadPath = chassis->Find("trackPath");
 		dAssert(threadPath);
@@ -933,7 +933,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBody* linkArray[1024];
 
 		int bodyCount = 0;
-		linksCount -= 0;
+		linksCount += 1;
 
 		void* const aggregate = NewtonCollisionAggregateCreate(world);
 		NewtonCollisionAggregateSetSelfCollision (aggregate, 0);
