@@ -71,6 +71,7 @@ class dgCollisionCylinder: public dgCollisionConvex
 	dgFloat32 m_radius;
 	dgFloat32 m_skinthickness;
 
+	static dgVector m_unitCircle[];
 	static dgInt32 m_shapeRefCount;
 	static dgConvexSimplexEdge m_edgeArray[];
 

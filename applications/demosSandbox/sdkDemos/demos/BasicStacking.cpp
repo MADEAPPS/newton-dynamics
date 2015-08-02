@@ -72,7 +72,6 @@ static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVect
 }
 
 
-
 static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count, PrimitiveType type, const dMatrix& shapeMatrix = dGetIdentityMatrix())
 {
 	dMatrix matrix (dGetIdentityMatrix());
@@ -127,6 +126,46 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 
 
 
+static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
+{
+	// build a standard block stack of 20 * 3 boxes for a total of 60
+	NewtonWorld* const world = scene->GetNewton();
+
+	dVector blockBoxSize(size);
+	blockBoxSize = blockBoxSize.Scale(2.0f);
+
+	// create the stack
+	dMatrix baseMatrix(dGetIdentityMatrix());
+
+	// for the elevation of the floor at the stack position
+	baseMatrix.m_posit.m_x = origin.m_x;
+	baseMatrix.m_posit.m_z = origin.m_z;
+
+	dFloat startElevation = 100.0f;
+	dVector floor(FindFloor(world, dVector(baseMatrix.m_posit.m_x, startElevation, baseMatrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
+
+	// set realistic mass and inertia matrix for each block
+	mass = 5.0f;
+
+	// create a material to control collision with this objects
+	int defaultMaterialID;
+	defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
+
+	// create the shape and visual mesh as a common data to be re used
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _SPHERE_PRIMITIVE, defaultMaterialID);
+	DemoMesh* const geometry = new DemoMesh("sphere", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+
+	for (int i = 0; i < count; i++) {
+		CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);
+		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
+	}
+
+	// do not forget to release the assets	
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+}
+
 
 void BasicBoxStacks (DemoEntityManager* const scene)
 {
@@ -158,7 +197,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 		}
 //		BuildPyramid (scene, 10.0f, dVector(-10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, selection[index], shapeMatrix);
 		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _BOX_PRIMITIVE);
-//		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
+		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 1.62f/2.0f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 //		BuildPyramid (scene, 10.0f, dVector( 20.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _TAPERED_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 //		BuildPyramid (scene, 10.0f, dVector( 30.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 	}
@@ -169,6 +208,14 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 //			BuildJenga (scene, 5.0f, dVector(-15.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
 		}
 	}
+
+	high = 20;
+	for (int i = 0; i < 1; i ++) {
+		for (int j = 0; j < 1; j ++) {
+			SphereStack(scene, 5.0f, dVector(5.0f + j * 8, 0.0f, -10.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0), high);
+		}
+	}
+
 #endif
 
 

@@ -33,6 +33,14 @@
 //#define DG_CYLINDER_SKIN_PADDING dgFloat32 (0.05f)
 //#define DG_CYLINDER_SKIN_PADDING (DG_RESTING_CONTACT_PENETRATION * dgFloat32 (0.25f))
 
+dgVector dgCollisionCylinder::m_unitCircle[] = {dgVector(dgFloat32(0.0f), dgFloat32( 1.0f), dgFloat32( 0.000000f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32( 0.5f), dgFloat32( 0.866025f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.5f), dgFloat32( 0.866026f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-1.0f), dgFloat32( 0.000000f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.5f), dgFloat32(-0.866025f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32( 0.5f), dgFloat32(-0.866026f), dgFloat32(0.0f))};
+
+
 dgInt32 dgCollisionCylinder::m_shapeRefCount = 0;
 dgConvexSimplexEdge dgCollisionCylinder::m_edgeArray[DG_CYLINDER_SEGMENTS * 2 * 3];
 
@@ -57,6 +65,13 @@ void dgCollisionCylinder::Init (dgFloat32 radius, dgFloat32 height)
 	m_radius = dgAbsf (radius);
 	m_height = dgAbsf (height * dgFloat32 (0.5f));
 	m_skinthickness = dgMin (dgMin (m_radius, m_height) * dgFloat32 (0.005f), dgFloat32 (1.0f / 64.0f));
+
+//	dgVector p(dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+//	dgMatrix rotation (dgPitchMatrix(dgFloat32 (2.0f * 3.141592f / 6.0f)));
+//	for (dgInt32 i = 0; i < 6; i ++){
+//		dgTrace (("dgVector (dgFloat32 (0.0f), dgFloat32 (%f), dgFloat32 (%f), dgFloat32 (0.0f)),\n", p.m_y, p.m_z)); 
+//		p = rotation.RotateVector(p);
+//	}
 
 	dgFloat32 angle = dgFloat32 (0.0f);
 	for (dgInt32 i = 0; i < DG_CYLINDER_SEGMENTS; i ++) {
@@ -451,7 +466,15 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 		}
 
 	} else {
-		count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut, normalSign);
+//		count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut, normalSign);
+		dgMatrix matrix (normal);
+		matrix.m_posit.m_x = origin.m_x;
+		dgVector scale (m_radius);
+		const int n = sizeof (m_unitCircle) / sizeof (m_unitCircle[0]);
+		for (dgInt32 i = 0; i < n; i ++) {
+			contactsOut[i] = matrix.TransformVector(m_unitCircle[i].CompProduct4(scale)) & dgVector::m_triplexMask;
+		}
+		count = RectifyConvexSlice (n, normal, contactsOut);
 	}
 	return count;
 }

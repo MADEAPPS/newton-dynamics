@@ -94,52 +94,35 @@ void CustomPathFollow::GetPathTarget (dVector& posit, dVector& tangent) const
 }
 */
 
-// calculate the closest point from the spline to point point
-dMatrix CustomPathFollow::EvalueCurve (const dVector& posit)
-{
-	dMatrix matrix;
-
-	dVector pathPosit;
-	dVector pathTangent;
-	GetPointAndTangentAtLocation (posit,  pathPosit, pathTangent);
-
-	// calculate distance for point to list
-	matrix.m_posit = pathPosit;
-	matrix.m_posit.m_w = 1.0f;
-
-	//the tangent of the path is the line slope, passes in the first matrix dir
-	matrix.m_front = pathTangent;
-
-	// the normal will be such that it is horizontal to the the floor and perpendicular to the path 
-	dVector normal (dVector (0.0f, 1.0f, 0.0f, 0.0f) * matrix.m_front);
-	matrix.m_up = normal.Scale (1.0f / dSqrt (normal % normal));
-
-	// the binormal is just the cross product;
-	matrix.m_right = matrix.m_front * matrix.m_up;
-
-	return matrix;
-}
 
 void CustomPathFollow::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
+	dMatrix matrix1;
+	dVector pathPosit;
+	dVector pathTangent;
 		
 	// Get the global matrices of each rigid body.
-	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
-	matrix0 = m_localMatrix0 * matrix0;
+	CalculateGlobalMatrix (matrix0, matrix1);
 
-	dMatrix matrix1 (EvalueCurve (matrix0.m_posit));
+	GetPointAndTangentAtLocation(matrix0.m_posit, pathPosit, pathTangent);
+	if ((pathTangent % matrix0.m_front) < 0.0f) {
+		pathTangent = pathTangent.Scale (-1.0f);
+	}
+	matrix1 = dGrammSchmidt(pathTangent);
+	matrix1.m_posit = pathPosit;
+	matrix1.m_posit.m_w = 1.0f;
 
 	// Restrict the movement on the pivot point along all tree the normal and bi normal of the path
 	const dVector& p0 = matrix0.m_posit;
 	const dVector& p1 = matrix1.m_posit;
+	dVector p00 (p0 + matrix0.m_front.Scale(50.0f));
+	dVector p11 (p1 + matrix1.m_front.Scale(50.0f));
 
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
-	
-	// two more constraints rows to in force the normal and bi normal 
-// 	NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_up[0]);
-//	NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_right[0]);
+	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[1][0]);
+	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[2][0]);
+	NewtonUserJointAddLinearRow(m_joint, &p00[0], &p11[0], &matrix1[1][0]);
+	NewtonUserJointAddLinearRow(m_joint, &p00[0], &p11[0], &matrix1[2][0]);
 }
 
 

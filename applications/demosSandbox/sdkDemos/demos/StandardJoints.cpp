@@ -79,8 +79,6 @@ class CustomDistance: public CustomJoint
 		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
 	}
 
-	//dMatrix m_localPivot;
-	//dMatrix m_parentPivot;
 	dFloat m_distance;
 };
 
@@ -828,6 +826,53 @@ class MyPathFollow: public CustomPathFollow
 };
 
 
+class CustomDistanceRope: public CustomPulley
+{
+	public:
+	CustomDistanceRope (NewtonBody* const child, NewtonBody* const parent, DemoEntity* const path)
+		:CustomPulley(1.0f, dVector (1.0f, 1.0f, 0.0f, 1.0f), dVector (1.0f, 1.0f, 0.0f, 1.0f), child, parent)
+		,m_rollerCosterPath (path)
+	{
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		dMatrix dommyMatrix;
+
+		DemoBezierCurve* const mesh = (DemoBezierCurve*)m_rollerCosterPath->GetMesh();
+		const dBezierSpline& spline = mesh->m_curve;
+
+		NewtonBodyGetMatrix (GetBody0(), &matrix0[0][0]);
+		NewtonBodyGetMatrix (GetBody1(), &matrix1[0][0]);
+
+		dBigVector point;
+		dFloat64 knot = spline.FindClosestKnot(point, matrix0.m_posit, 4);
+		dBigVector tangent0(spline.CurveDerivative(knot));
+		tangent0 = tangent0.Scale(1.0 / sqrt(tangent0 % tangent0));
+
+		knot = spline.FindClosestKnot(point, matrix1.m_posit, 4);
+		dBigVector tangent1(spline.CurveDerivative(knot));
+		tangent1 = tangent1.Scale(1.0 / sqrt(tangent1 % tangent1));
+
+		dVector pin0 (tangent0.m_x, tangent0.m_y, tangent0.m_z, 0.0f);
+		dVector pin1 (tangent1.m_x, tangent1.m_y, tangent1.m_z, 0.0f);
+
+		dMatrix pinAndPivot0(dGrammSchmidt(pin0));
+		CalculateLocalMatrix(pinAndPivot0, m_localMatrix0, dommyMatrix);
+		m_localMatrix0.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+
+		dMatrix pinAndPivot1(dGrammSchmidt(pin1.Scale (-1.0f)));
+		CalculateLocalMatrix(pinAndPivot1, dommyMatrix, m_localMatrix1);
+		m_localMatrix1.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+
+		CustomPulley::SubmitConstraints(timestep, threadIndex);
+	}
+
+	DemoEntity* const m_rollerCosterPath;
+};
+
 
 static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin)
 {
@@ -847,6 +892,15 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		dBigVector(150.0f - 100.0f, 10.0f, 350.0f - 250.0f, 1.0f) + o,
 		dBigVector( 50.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f) + o,
 		dBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f) + o,
+
+/*
+		dBigVector(100.0f - 100.0f, 10.0f, 200.0f - 250.0f, 1.0f) + o,
+		dBigVector(150.0f - 100.0f, 10.0f, 150.0f - 250.0f, 1.0f) + o,
+		dBigVector(200.0f - 100.0f, 10.0f, 250.0f - 250.0f, 1.0f) + o,
+		dBigVector(150.0f - 100.0f, 10.0f, 350.0f - 250.0f, 1.0f) + o,
+		dBigVector(50.0f  - 100.0f, 10.0f, 250.0f - 250.0f, 1.0f) + o,
+		dBigVector(100.0f - 100.0f, 10.0f, 200.0f - 250.0f, 1.0f) + o,
+*/
 	};
 
 	spline.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, control);
@@ -858,12 +912,77 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	mesh->SetRenderResolution(500);
 	mesh->Release();
 
-	NewtonBody* const box0 = CreateWheel(scene, origin + dVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 0.0f), 1.0f, 0.5f);
+	const int count = 16;
+	NewtonBody* bodies[count];
 
-	dMatrix matrix;
-    NewtonBodyGetMatrix (box0, &matrix[0][0]);
-	matrix.m_posit.m_y += 0.5f;
-	new MyPathFollow (matrix, box0, rollerCosterPath);
+	dBigVector point0;
+	
+	dVector positions[count + 1];
+	dFloat64 knot = spline.FindClosestKnot(point0, origin + dVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 0.0f), 4);
+	positions[0] = dVector (point0.m_x, point0.m_y, point0.m_z, 0.0);
+	dFloat average = 0.0f;
+	for (int i = 0; i < count; i ++) {
+		dBigVector point1;
+		average += positions[i].m_y;
+		dBigVector tangent(spline.CurveDerivative(knot));
+		tangent = tangent.Scale (1.0 / sqrt (tangent % tangent));
+		knot = spline.FindClosestKnot(point1, dBigVector (point0 + tangent.Scale (2.0f)), 4);
+		point0 = point1;
+		positions[i + 1] = dVector (point0.m_x, point0.m_y, point0.m_z, 0.0);
+	}
+
+	average /= count;
+	for (int i = 0; i < count + 1; i ++) {
+		positions[i].m_y = average;
+	}
+
+
+	for (int i = 0; i < count; i ++) {
+		dMatrix matrix;
+		dVector location0 (positions[i].m_x, positions[i].m_y, positions[i].m_z, 0.0);
+		bodies[i] = CreateWheel(scene, location0, 1.0f, 0.5f);
+		NewtonBodySetLinearDamping(bodies[i], 0.0f);
+		NewtonBody* const box = bodies[i];
+		NewtonBodyGetMatrix(box, &matrix[0][0]);
+
+		dVector location1 (positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, 0.0);
+		dVector dir (location1 - location0);
+		matrix.m_front = dir.Scale (1.0f / dSqrt (dir % dir));
+		matrix.m_right = matrix.m_front * matrix.m_up;
+		dMatrix matrix1 (dYawMatrix(0.5f * 3.141692f) * matrix);
+		NewtonBodySetMatrix(box, &matrix1[0][0]);
+		matrix.m_posit.m_y += 0.8f;		
+		new MyPathFollow(matrix, box, rollerCosterPath);
+	}
+
+	for (int i = 1; i < count; i ++) {
+		NewtonBody* const box0 = bodies[i - 1];
+		NewtonBody* const box1 = bodies[i];
+
+		dMatrix matrix0;
+		dMatrix matrix1;
+		NewtonBodyGetMatrix(box0, &matrix0[0][0]);
+		NewtonBodyGetMatrix(box1, &matrix1[0][0]);
+		matrix0.m_posit = (matrix0.m_posit + matrix0.m_front.Scale (0.5f));
+		matrix1.m_posit = (matrix1.m_posit - matrix1.m_front.Scale (0.5f));
+		new CustomDistanceRope (box1, box0, rollerCosterPath);
+	}
+	
+	void* const aggregate = NewtonCollisionAggregateCreate (scene->GetNewton());
+	for (int i = 0; i < count; i ++) {
+		NewtonCollisionAggregateAddBody(aggregate, bodies[i]);
+	}
+	NewtonCollisionAggregateSetSelfCollision (aggregate, false);
+
+
+#ifdef _USE_HARD_JOINTS
+	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), NULL, NULL);
+	NewtonSkeletonContainerAttachBone(skeleton, bodies[0], NULL);
+	for (int i = 1; i < count; i ++) {
+		NewtonSkeletonContainerAttachBone(skeleton, bodies[i], bodies[i-1]);
+	}
+	NewtonSkeletonContainerFinalize(skeleton);
+#endif
 
 }
 
@@ -884,7 +1003,6 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-//	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -895,14 +1013,12 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
 	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
-	//just to show up add some relational joints example 
 	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 
-//	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
-
+	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
