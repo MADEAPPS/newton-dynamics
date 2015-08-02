@@ -602,6 +602,18 @@ void NewtonSetSolverModel(const NewtonWorld* const newtonWorld, int model)
 	world->SetSolverMode (model);
 }
 
+
+// Name: Set The Iterative solve Convergence Quality  
+// lowOrHigh = 0 the solver is controlled by high acceleration limit 
+// lowOrHigh different than zero the solver controlled by low acceleration limit 
+void NewtonSetSolverConvergenceQuality (const NewtonWorld* const newtonWorld, int lowOrHigh)
+{
+	Newton* const world = (Newton *)newtonWorld;
+
+	TRACE_FUNCTION(__FUNCTION__);
+	world->SetSolverConvergenceQuality(lowOrHigh);
+}
+
 // Name: NewtonSetFrictionModel 
 // Set coulomb model of friction.
 //

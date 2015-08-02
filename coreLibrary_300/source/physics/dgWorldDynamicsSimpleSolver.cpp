@@ -1189,7 +1189,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(dgJointInfo* const jointInfo
 			}
 
 			dgVector maxAccel(accNorm);
-			for (dgInt32 i = 0; (i < 3) && (maxAccel.GetScalar() > dgFloat32(1.0f)); i++) {
+			for (dgInt32 i = 0; (i < 3) && (maxAccel.GetScalar() > m_solverConvergeQuality); i++) {
 				maxAccel = dgFloat32(0.0f);
 				dgInt32 index = jointInfo->m_pairStart;
 				for (dgInt32 k = 0; k < rowsCount; k++) {

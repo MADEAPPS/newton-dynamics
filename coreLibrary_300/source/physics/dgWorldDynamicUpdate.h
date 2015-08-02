@@ -290,7 +290,6 @@ class dgWorldDynamicUpdate
 	void GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, dgInt32 rowCount, dgFloat32 timestep) const;	
 	dgInt32 GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgInt32 rowCount) const;
 	
-
 	dgInt32 m_bodies;
 	dgInt32 m_joints;
 	dgInt32 m_islands;
@@ -298,6 +297,7 @@ class dgWorldDynamicUpdate
 	dgJacobianMemory m_solverMemory;
 	dgThread::dgCriticalSection m_softBodyCriticalSectionLock;
 	dgIsland* m_islandMemory;
+	dgFloat32 m_solverConvergeQuality;
 	static dgVector m_velocTol;
 	static dgVector m_eulerTaylorCorrection;
 

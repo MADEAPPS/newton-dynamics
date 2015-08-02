@@ -85,6 +85,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	m_bodies = 0;
 	m_joints = 0;
 	m_islands = 0;
+	m_solverConvergeQuality = world->m_solverConvergeQuality;
 	world->m_dynamicsLru = world->m_dynamicsLru + DG_BODY_LRU_STEP;
 	m_markLru = world->m_dynamicsLru;
 

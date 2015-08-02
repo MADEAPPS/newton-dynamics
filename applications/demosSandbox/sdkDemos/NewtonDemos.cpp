@@ -236,6 +236,8 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
 	EVT_MENU_RANGE(ID_SOLVER_MODE, ID_SOLVER_MODE_COUNT, NewtonDemos::OnSelectSolverMode)
 
+	EVT_MENU_RANGE(ID_SOLVER_QUALITY, ID_SOLVER_QUALITY_COUNT, NewtonDemos::OnSelectSolverQuality)
+
 	EVT_MENU(ID_HIDE_VISUAL_MESHES,	NewtonDemos::OnHideVisualMeshes)
 
 	EVT_MENU_RANGE(ID_SHOW_COLLISION_MESH, ID_SHOW_COLLISION_MESH_RANGE, NewtonDemos::OnShowCollisionLines)
@@ -297,6 +299,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_shiftKey(false)
 	,m_controlKey(false)
 	,m_solverModeIndex(3)
+	,m_solverModeQuality(0)
 	,m_debugDisplayMode(0)
 	,m_mousePosX(0)
 	,m_mousePosY(0)
@@ -466,6 +469,11 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->Check (ID_SOLVER_MODE + m_solverModeIndex, true);
 
 		optionsMenu->AppendSeparator();
+		optionsMenu->AppendRadioItem(ID_SOLVER_QUALITY + 0, wxT("Iterative Solver Quality Low"));
+		optionsMenu->AppendRadioItem(ID_SOLVER_QUALITY + 1, wxT("Iterative Solver Quality High"));
+		optionsMenu->Check (ID_SOLVER_QUALITY + m_solverModeQuality, true);
+
+		optionsMenu->AppendSeparator();
 		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH, wxT("Hide collision Mesh"));
 		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH + 1, wxT("Show solid collision Mesh"));
 		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH + 2, wxT("Show wire frame collision Mesh"));
@@ -569,6 +577,7 @@ void NewtonDemos::END_MENU_OPTION()
 		NewtonWaitForUpdateToFinish (m_scene->GetNewton());
 		SetAutoSleepMode (m_scene->GetNewton(), !m_autoSleepState);
 		NewtonSetSolverModel (m_scene->GetNewton(), m_solverModes[m_solverModeIndex]);
+		NewtonSetSolverConvergenceQuality (m_scene->GetNewton(), m_solverModeQuality ? 1 : 0);
 		NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
 		NewtonSelectBroadphaseAlgorithm (m_scene->GetNewton(), m_broadPhaseType);
 	}
@@ -848,6 +857,13 @@ void NewtonDemos::OnSelectSolverMode(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
 	m_solverModeIndex = dClamp (event.GetId() - ID_SOLVER_MODE, 0, int (sizeof (m_solverModes)/sizeof (m_solverModes[0])));
+	END_MENU_OPTION();
+}
+
+void NewtonDemos::OnSelectSolverQuality(wxCommandEvent& event)
+{
+	BEGIN_MENU_OPTION();
+	m_solverModeQuality = dClamp(event.GetId() - ID_SOLVER_QUALITY, 0, 1);
 	END_MENU_OPTION();
 }
 

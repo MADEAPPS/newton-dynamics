@@ -33,6 +33,9 @@ class NewtonDemos: public wxFrame
 		ID_SOLVER_MODE,
 		ID_SOLVER_MODE_COUNT = ID_SOLVER_MODE + 5,
 
+		ID_SOLVER_QUALITY,
+		ID_SOLVER_QUALITY_COUNT = ID_SOLVER_QUALITY + 1,
+
 		ID_HIDE_VISUAL_MESHES,
 		ID_SHOW_COLLISION_MESH,
 		ID_SHOW_COLLISION_MESH_RANGE = ID_SHOW_COLLISION_MESH + 4,
@@ -116,6 +119,7 @@ class NewtonDemos: public wxFrame
 	void OnShowCenterOfMass(wxCommandEvent& event);
 	void OnUseParallelSolver(wxCommandEvent& event);
 	void OnSelectSolverMode(wxCommandEvent& event);
+	void OnSelectSolverQuality(wxCommandEvent& event);
 	void OnShowConcurrentProfiler(wxCommandEvent& event);
 	void OnShowThreadProfiler(wxCommandEvent& event);
 	void OnShowProfiler(wxCommandEvent& event);
@@ -164,6 +168,7 @@ class NewtonDemos: public wxFrame
 
 
 	int m_solverModeIndex;
+	int m_solverModeQuality;
 	int m_debugDisplayMode;
 	int m_mousePosX;
 	int m_mousePosY;

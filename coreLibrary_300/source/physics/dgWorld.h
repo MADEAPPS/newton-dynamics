@@ -193,12 +193,12 @@ class dgWorld
 
 	void SetSolverMode (dgInt32 mode);
 	void SetFrictionMode (dgInt32 mode);
+	void SetSolverConvergenceQuality (dgInt32 mode);
 
 	dgInt32 EnumerateHardwareModes() const;
 	dgInt32 GetCurrentHardwareMode() const;
 	void SetCurrentHardwareMode(dgInt32 deviceIndex);
 	void GetHardwareVendorString (dgInt32 deviceIndex, char* const description, dgInt32 maxlength) const;
-
 
 	void EnableThreadOnSingleIsland(dgInt32 mode);
 	dgInt32 GetThreadOnSingleIsland() const;
@@ -439,6 +439,7 @@ class dgWorld
 	dgFloat32 m_frictiomTheshold;
 	dgFloat32 m_savetimestep;
 	dgFloat32 m_contactTolerance;
+	dgFloat32 m_solverConvergeQuality;
 
 	dgSolverSleepTherfesholds m_sleepTable[DG_SLEEP_ENTRIES];
 	
