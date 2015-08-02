@@ -32,7 +32,8 @@ struct ARTICULATED_VEHICLE_DEFINITION
 	enum
 	{
 		m_tireID = 1<<0,
-		m_bodyPart = 2<<0,
+		m_bodyPart = 1<<1,
+		m_LinkPart = 1<<2,
 	};
 	
 	char m_boneName[32];
@@ -118,7 +119,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_liftActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineSpeed(5.0f)
-		,m_maxTurnSpeed(2.0f)
+		,m_maxTurnSpeed(5.0f)
 		,m_tiltAngle(0.0f)
 		,m_liftPosit(0.0f)
 		,m_openPosit(0.0f)
@@ -343,8 +344,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomArticulatedTransformController::dSkeletonBone* const bone0 = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
 		CustomArticulatedTransformController::dSkeletonBone* const bone1 = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
 		if (bone0 && bone1 && (bone0->m_myController == bone1->m_myController)) {
-			dAssert (!bone0->m_myController->SelfCollisionTest (bone0, bone1));
-			return bone0->m_myController->SelfCollisionTest (bone0, bone1) ? 1 : 0;
+//			dAssert (!bone0->m_myController->SelfCollisionTest (bone0, bone1));
+//			return bone0->m_myController->SelfCollisionTest (bone0, bone1) ? 1 : 0;
 		}
 		return 1;
 	}
@@ -362,7 +363,33 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		int id1 = NewtonCollisionGetUserID (collision1);
 
 		NewtonBody* const tireBody = (id0 & ARTICULATED_VEHICLE_DEFINITION::m_tireID) ? body0 : ((id1 & ARTICULATED_VEHICLE_DEFINITION::m_tireID) ? body1 : NULL);
-		if (tireBody) {
+		NewtonBody* const linkBody = (id0 & ARTICULATED_VEHICLE_DEFINITION::m_LinkPart) ? body0 : ((id1 & ARTICULATED_VEHICLE_DEFINITION::m_LinkPart) ? body1 : NULL);
+
+		if (linkBody && !tireBody) {
+			// find the root body from the articulated structure 
+			NewtonCollision* const linkCollsion = NewtonBodyGetCollision(linkBody);
+			const CustomArticulatedTransformController::dSkeletonBone* const rootbone = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData(linkCollsion);
+			CustomArticulatedTransformController* const controller = rootbone->m_myController;
+			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
+
+			// Get the root and tire matrices
+			dMatrix tireMatrix;
+			dMatrix chassisMatrix;
+			NewtonBodyGetMatrix(linkBody, &tireMatrix[0][0]);
+			NewtonBodyGetMatrix(chassiBody, &chassisMatrix[0][0]);
+
+			dVector upDir(chassisMatrix.RotateVector(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
+			dVector tireAxis(tireMatrix.RotateVector(dVector(1.0f, 0.0f, 0.0f, 0.0f)));
+
+			dVector contactDirection(upDir * tireAxis);
+			for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+				NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+				NewtonMaterialContactRotateTangentDirections(material, &contactDirection[0]);
+				NewtonMaterialSetContactFrictionCoef(material, 5.0f, 5.0f, 0);
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+			}
+
+		} else if (tireBody) {
 
 			// find the root body from the articulated structure 
 			NewtonCollision* const tireCollsion = NewtonBodyGetCollision(tireBody);
@@ -935,6 +962,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 		NewtonCollision* const collision = MakeConvexHull(threadLink);
+		NewtonCollisionSetUserID(collision, ARTICULATED_VEHICLE_DEFINITION::m_LinkPart);
+		NewtonCollisionSetUserData (collision, rootNode);
 
 		NewtonBody* linkArray[1024];
 
