@@ -631,15 +631,16 @@ static void AddGear (DemoEntityManager* const scene, const dVector& origin)
 {
     NewtonBody* const box0 = CreateCylinder(scene, origin + dVector (0.0f, 4.0f, 0.0f), 0.25f, 4.0f);
 
-	dMatrix matrix;
-	//connect the box0 to the base by a fix joint (a hinge with zero limit)
-	NewtonBodyGetMatrix(box0, &matrix[0][0]);
-	CustomHinge* const hinge = new CustomHinge(matrix, box0, NULL);
-	hinge->EnableLimits(true);
-	hinge->SetLimits(0.0f, 0.0f);
+	// this si a fix joint
+//	dMatrix matrix;
+//	NewtonBodyGetMatrix(box0, &matrix[0][0]);
+//	CustomHinge* const hinge = new CustomHinge(matrix, box0, NULL);
+//	hinge->EnableLimits(true);
+	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	// connect two bodies with a hinge 
     CustomHinge* const hinge0 = AddHingeWheel (scene, origin + dVector (-1.0f, 4.0f, 0.0f), 0.5f, 1.0f, box0);
+
     CustomHinge* const hinge1 = AddHingeWheel (scene, origin + dVector ( 1.0f, 4.0f, 0.0f), 0.5f, 1.0f, box0);
 
     NewtonBody* const body0 = hinge0->GetBody0();
@@ -662,7 +663,6 @@ static void AddGear (DemoEntityManager* const scene, const dVector& origin)
 	NewtonSkeletonContainerAttachBone(skeleton, hinge1->GetBody0(), box0);
 	NewtonSkeletonContainerFinalize(skeleton);
 #endif
-
 }
 
 
@@ -1002,7 +1002,6 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
 	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-
 	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
 	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
 	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
@@ -1010,7 +1009,6 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
-
 	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
     // place camera into position

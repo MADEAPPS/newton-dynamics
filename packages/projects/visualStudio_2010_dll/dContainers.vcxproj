@@ -205,6 +205,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dContainers\dBaseHierarchy.cpp" />
+    <ClCompile Include="..\..\dContainers\dBezierSpline.cpp" />
     <ClCompile Include="..\..\dContainers\dClassInfo.cpp" />
     <ClCompile Include="..\..\dContainers\dContainersAlloc.cpp" />
     <ClCompile Include="..\..\dContainers\dContainersStdAfx.cpp">
@@ -220,6 +221,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dContainers\dBaseHierarchy.h" />
+    <ClInclude Include="..\..\dContainers\dBezierSpline.h" />
     <ClInclude Include="..\..\dContainers\dClassInfo.h" />
     <ClInclude Include="..\..\dContainers\dContainersAlloc.h" />
     <ClInclude Include="..\..\dContainers\dContainersStdAfx.h" />

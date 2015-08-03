@@ -209,6 +209,8 @@ void CustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 	m_jointOmega = (omega0 - omega1) % matrix1.m_front;
 
+//dTrace (("%f %f\n", GetJointAngle(), GetJointOmega()));
+
 	m_lastRowWasUsed = false;
 	SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
 }
@@ -217,7 +219,7 @@ void CustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 void CustomHinge::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	// four possibilities
-	dFloat angle = -m_curJointAngle.GetAngle();
+	dFloat angle = m_curJointAngle.GetAngle();
 	if (m_friction != 0.0f) {
 		if (m_limitsOn) {
 			// friction and limits at the same time
@@ -225,26 +227,26 @@ void CustomHinge::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matri
 				dFloat relAngle = angle - m_minAngle;
 
 				// tell joint error will minimize the exceeded angle error
-				NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_front[0]);
+				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
 
 				// need high stiffness here
 				NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 
 				// allow the joint to move back freely 
-				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 
 				m_lastRowWasUsed = true;
 			} else if (angle > m_maxAngle) {
 				dFloat relAngle = angle - m_maxAngle;
 
 				// tell joint error will minimize the exceeded angle error
-				NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_front[0]);
+				NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
 
 				// need high stiffness here
 				NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 
 				// allow the joint to move back freely
-				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 
 				m_lastRowWasUsed = true;
 			} else {
@@ -280,25 +282,25 @@ void CustomHinge::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matri
 			dFloat relAngle = angle - m_minAngle;
 
 			// tell joint error will minimize the exceeded angle error
-			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_front[0]);
+			NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
 
 			// need high stiffness here
 			NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 
 			// allow the joint to move back freely 
-			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 			m_lastRowWasUsed = true;
 		} else if (angle > m_maxAngle) {
 			dFloat relAngle = angle - m_maxAngle;
 
 			// tell joint error will minimize the exceeded angle error
-			NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix1.m_front[0]);
+			NewtonUserJointAddAngularRow(m_joint, -relAngle, &matrix1.m_front[0]);
 
 			// need high stiffness here
 			NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 
 			// allow the joint to move back freely
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 			m_lastRowWasUsed = true;
 		}
 	}

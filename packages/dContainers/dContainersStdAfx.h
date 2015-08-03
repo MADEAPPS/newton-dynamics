@@ -22,6 +22,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <dMathDefines.h>
+#include <dVector.h>
+#include <dMatrix.h>
+
 
 
 #ifdef _DCONTAINERS_DLL
