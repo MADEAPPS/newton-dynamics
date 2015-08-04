@@ -968,7 +968,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBody* linkArray[1024];
 
 		int bodyCount = 0;
-		linksCount += 2;
+		linksCount += 1;
 
 		void* const aggregate = NewtonCollisionAggregateCreate(world);
 		NewtonCollisionAggregateSetSelfCollision (aggregate, 0);
@@ -1089,8 +1089,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
-//		MakeLeftThread (controller);
-//		MakeRightThread(controller);
+		MakeLeftThread (controller);
+		MakeRightThread(controller);
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
