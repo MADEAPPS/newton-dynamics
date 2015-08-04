@@ -23,8 +23,6 @@
 
 CustomPathFollow::CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const child)
 	:CustomJoint(6, child, NULL)
-//	,m_pathTangent (1.0f, 0.0f, 0.0f, 0.0f)
-//	,m_pointOnPath (0.0f, 10.0f, 0.0f, 0.0)
 {
 	// calculate the two local matrix of the pivot point
 	dMatrix tmp;

@@ -18,6 +18,26 @@
 #define _CUSTOMBALLANDSOCKET_H_
 
 #include "CustomJoint.h"
+
+
+class CustomPointToPoint: public CustomJoint  
+{
+	public:
+	CUSTOM_JOINTS_API CustomPointToPoint(const dVector& pivotFrame0, const dVector& pivotFrame1, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomPointToPoint();
+
+	protected:
+	CUSTOM_JOINTS_API CustomPointToPoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+
+	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
+
+	dFloat m_distance;
+	DECLARE_CUSTON_JOINT(CustomPointToPoint, CustomJoint)
+};
+
+
 class CustomBallAndSocket: public CustomJoint  
 {
 	public:

@@ -31,57 +31,6 @@
 // optionally uncomment this for hard joint simulations 
 #define _USE_HARD_JOINTS
 
-class CustomDistance: public CustomJoint  
-{
-	public: 
-	CustomDistance (const dVector& pivotInChildInGlobalSpace, const dVector& pivotInParentInGlobalSpace, NewtonBody* const child, NewtonBody* const parent)
-		:CustomJoint(3, child, parent)
-	{
-		dVector dist (pivotInChildInGlobalSpace - pivotInParentInGlobalSpace) ;
-		m_distance = dSqrt (dist % dist);
-
-		dMatrix childMatrix (dGetIdentityMatrix());
-		dMatrix parentMatrix (dGetIdentityMatrix());
-
-		childMatrix.m_posit = pivotInChildInGlobalSpace;
-		parentMatrix.m_posit = pivotInParentInGlobalSpace;
-		childMatrix.m_posit.m_w = 1.0f;
-		parentMatrix.m_posit.m_w = 1.0f;
-
-		dMatrix dummy;
-		//CalculateLocalMatrix (childMatrix, m_localPivot, dummy);
-		//CalculateLocalMatrix (parentMatrix, dummy, m_parentPivot);
-		CalculateLocalMatrix (childMatrix, m_localMatrix0, dummy);
-		CalculateLocalMatrix (parentMatrix, dummy, m_localMatrix1);
-	}
-
-    void SubmitConstraints (dFloat timestep, int threadIndex)
-	{
-		dMatrix matrix0;
-		dMatrix matrix1;
-
-		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-		CalculateGlobalMatrix (matrix0, matrix1);
-
-		dVector p0 (matrix0.m_posit);
-		dVector p1 (matrix1.m_posit);
-
-		dVector dist (p1 - p0);
-		dFloat mag2 = dist % dist;
-		if (mag2 > 0.0f) {
-			dist = dist.Scale (1.0f / dSqrt (mag2));
-			p1 -= dist.Scale(m_distance);
-		}
-
-		// Restrict the movement on the pivot point along all tree orthonormal direction
-		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
-		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
-		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
-	}
-
-	dFloat m_distance;
-};
-
 class CustomBallAndSocketWithFriction: public CustomBallAndSocket
 {
 	public:
@@ -233,11 +182,11 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
 
 	// get the origins
-	dVector pivot0 (matrix0.m_posit);
-	dVector pivot1 (matrix1.m_posit);
+	dVector pivot0 (matrix0.m_posit - dVector (0.0f, size.m_y, 0.0f, 0.0f));
+	dVector pivot1 (matrix1.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f));
 
 	// connect bodies at a corner
-	new CustomDistance (pivot1, pivot0, box1, box0);
+	new CustomPointToPoint (pivot1, pivot0, box1, box0);
 	
 #ifdef _USE_HARD_JOINTS
 	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), NULL, NULL);
@@ -640,7 +589,6 @@ static void AddGear (DemoEntityManager* const scene, const dVector& origin)
 
 	// connect two bodies with a hinge 
     CustomHinge* const hinge0 = AddHingeWheel (scene, origin + dVector (-1.0f, 4.0f, 0.0f), 0.5f, 1.0f, box0);
-
     CustomHinge* const hinge1 = AddHingeWheel (scene, origin + dVector ( 1.0f, 4.0f, 0.0f), 0.5f, 1.0f, box0);
 
     NewtonBody* const body0 = hinge0->GetBody0();
@@ -657,12 +605,13 @@ static void AddGear (DemoEntityManager* const scene, const dVector& origin)
     new CustomGear (4.0f, pin0, pin1, body0, body1);
 
 #ifdef _USE_HARD_JOINTS
-	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), NULL, NULL);
-	NewtonSkeletonContainerAttachBone(skeleton, box0, NULL);
+	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), box0, NULL);
+//	NewtonSkeletonContainerAttachBone(skeleton, box0, NULL);
 	NewtonSkeletonContainerAttachBone(skeleton, hinge0->GetBody0(), box0);
 	NewtonSkeletonContainerAttachBone(skeleton, hinge1->GetBody0(), box0);
 	NewtonSkeletonContainerFinalize(skeleton);
 #endif
+
 }
 
 
@@ -826,12 +775,11 @@ class MyPathFollow: public CustomPathFollow
 };
 
 
-class CustomDistanceRope: public CustomPulley
+class CustomDistanceRope: public CustomPointToPoint
 {
 	public:
-	CustomDistanceRope (NewtonBody* const child, NewtonBody* const parent, DemoEntity* const path)
-		:CustomPulley(1.0f, dVector (1.0f, 1.0f, 0.0f, 1.0f), dVector (1.0f, 1.0f, 0.0f, 1.0f), child, parent)
-		,m_rollerCosterPath (path)
+	CustomDistanceRope (const dVector& pivotFrame0, const dVector& pivotFrame1, NewtonBody* const child, NewtonBody* const parent)
+		:CustomPointToPoint(pivotFrame0, pivotFrame1, child, parent)
 	{
 	}
 
@@ -839,38 +787,61 @@ class CustomDistanceRope: public CustomPulley
 	{
 		dMatrix matrix0;
 		dMatrix matrix1;
-		dMatrix dommyMatrix;
 
-		DemoBezierCurve* const mesh = (DemoBezierCurve*)m_rollerCosterPath->GetMesh();
-		const dBezierSpline& spline = mesh->m_curve;
+		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+		CalculateGlobalMatrix(matrix0, matrix1);
 
-		NewtonBodyGetMatrix (GetBody0(), &matrix0[0][0]);
-		NewtonBodyGetMatrix (GetBody1(), &matrix1[0][0]);
+		dVector p0(matrix0.m_posit);
+		dVector p1(matrix1.m_posit);
 
-		dBigVector point;
-		dFloat64 knot = spline.FindClosestKnot(point, matrix0.m_posit, 4);
-		dBigVector tangent0(spline.CurveDerivative(knot));
-		tangent0 = tangent0.Scale(1.0 / sqrt(tangent0 % tangent0));
+		dVector dir(p1 - p0);
+		dFloat mag2 = dir % dir;
+		dir = dir.Scale(1.0f / dSqrt(mag2));
+		dMatrix matrix(dGrammSchmidt(dir));
+		dFloat x = dSqrt(mag2) - m_distance;
 
-		knot = spline.FindClosestKnot(point, matrix1.m_posit, 4);
-		dBigVector tangent1(spline.CurveDerivative(knot));
-		tangent1 = tangent1.Scale(1.0 / sqrt(tangent1 % tangent1));
+		dVector com0;
+		dVector com1;
+		dVector veloc0;
+		dVector veloc1;
+		dMatrix body0Matrix;
+		dMatrix body1Matrix;
 
-		dVector pin0 (tangent0.m_x, tangent0.m_y, tangent0.m_z, 0.0f);
-		dVector pin1 (tangent1.m_x, tangent1.m_y, tangent1.m_z, 0.0f);
+		NewtonBody* const body0 = GetBody0();
+		NewtonBody* const body1 = GetBody1();
 
-		dMatrix pinAndPivot0(dGrammSchmidt(pin0));
-		CalculateLocalMatrix(pinAndPivot0, m_localMatrix0, dommyMatrix);
-		m_localMatrix0.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+		NewtonBodyGetCentreOfMass(body0, &com0[0]);
+		NewtonBodyGetMatrix(body0, &body0Matrix[0][0]);
+		NewtonBodyGetPointVelocity(body0, &p0[0], &veloc0[0]);
 
-		dMatrix pinAndPivot1(dGrammSchmidt(pin1.Scale (-1.0f)));
-		CalculateLocalMatrix(pinAndPivot1, dommyMatrix, m_localMatrix1);
-		m_localMatrix1.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+		NewtonBodyGetCentreOfMass(body1, &com1[0]);
+		NewtonBodyGetMatrix(body1, &body1Matrix[0][0]);
+		NewtonBodyGetPointVelocity(body1, &p1[0], &veloc1[0]);
 
-		CustomPulley::SubmitConstraints(timestep, threadIndex);
+		dFloat v((veloc0 - veloc1) % dir);
+		dFloat a = (x - v * timestep) / (timestep * timestep);
+
+		dVector r0((p0 - body0Matrix.TransformVector(com0)) * matrix.m_front);
+		dVector r1((p1 - body1Matrix.TransformVector(com1)) * matrix.m_front);
+		dFloat jacobian0[6];
+		dFloat jacobian1[6];
+
+		jacobian0[0] = matrix[0][0];
+		jacobian0[1] = matrix[0][1];
+		jacobian0[2] = matrix[0][2];
+		jacobian0[3] = r0[0];
+		jacobian0[4] = r0[1];
+		jacobian0[5] = r0[2];
+
+		jacobian1[0] = -matrix[0][0];
+		jacobian1[1] = -matrix[0][1];
+		jacobian1[2] = -matrix[0][2];
+		jacobian1[3] = -r1[0];
+		jacobian1[4] = -r1[1];
+		jacobian1[5] = -r1[2];
+		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+		NewtonUserJointSetRowAcceleration(m_joint, a);
 	}
-
-	DemoEntity* const m_rollerCosterPath;
 };
 
 
@@ -905,7 +876,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	mesh->SetRenderResolution(500);
 	mesh->Release();
 
-	const int count = 16;
+	const int count = 32;
 	NewtonBody* bodies[count];
 
 	dBigVector point0;
@@ -929,7 +900,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		positions[i].m_y = average;
 	}
 
-
+	dFloat attachmentOffset = 0.8f;
 	for (int i = 0; i < count; i ++) {
 		dMatrix matrix;
 		dVector location0 (positions[i].m_x, positions[i].m_y, positions[i].m_z, 0.0);
@@ -944,10 +915,13 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		matrix.m_right = matrix.m_front * matrix.m_up;
 		dMatrix matrix1 (dYawMatrix(0.5f * 3.141692f) * matrix);
 		NewtonBodySetMatrix(box, &matrix1[0][0]);
-		matrix.m_posit.m_y += 0.8f;		
+		matrix.m_posit.m_y += attachmentOffset;		
 		new MyPathFollow(matrix, box, rollerCosterPath);
-	}
 
+		dVector veloc (dir.Scale (20.0f));
+		NewtonBodySetVelocity(box, &veloc[0]);
+	}
+	
 	for (int i = 1; i < count; i ++) {
 		NewtonBody* const box0 = bodies[i - 1];
 		NewtonBody* const box1 = bodies[i];
@@ -956,9 +930,9 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		dMatrix matrix1;
 		NewtonBodyGetMatrix(box0, &matrix0[0][0]);
 		NewtonBodyGetMatrix(box1, &matrix1[0][0]);
-		matrix0.m_posit = (matrix0.m_posit + matrix0.m_front.Scale (0.5f));
-		matrix1.m_posit = (matrix1.m_posit - matrix1.m_front.Scale (0.5f));
-		new CustomDistanceRope (box1, box0, rollerCosterPath);
+		matrix0.m_posit.m_y += attachmentOffset;
+		matrix1.m_posit.m_y += attachmentOffset;
+		new CustomDistanceRope (matrix1.m_posit, matrix0.m_posit, box1, box0);
 	}
 	
 	void* const aggregate = NewtonCollisionAggregateCreate (scene->GetNewton());
@@ -976,11 +950,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	}
 	NewtonSkeletonContainerFinalize(skeleton);
 #endif
-
 }
-
-
-
 
 void StandardJoints (DemoEntityManager* const scene)
 {
@@ -995,6 +965,7 @@ void StandardJoints (DemoEntityManager* const scene)
 
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
+
 
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
