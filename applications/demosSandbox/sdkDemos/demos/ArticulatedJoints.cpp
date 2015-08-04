@@ -1079,7 +1079,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		ARTICULATED_VEHICLE_DEFINITION definition;
 		strcpy (definition.m_boneName, "body");
 		strcpy (definition.m_shapeTypeName, "convexHull");
-		definition.m_mass = 200.0f;
+		definition.m_mass = 800.0f;
 		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy (definition.m_articulationName, "mainBody");
 		NewtonBody* const chassis = CreateBodyPart (vehicleModel, definition);
