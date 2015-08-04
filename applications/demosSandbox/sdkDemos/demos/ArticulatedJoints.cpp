@@ -1089,8 +1089,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
-		MakeLeftThread (controller);
-		MakeRightThread(controller);
+//		MakeLeftThread (controller);
+//		MakeRightThread(controller);
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
