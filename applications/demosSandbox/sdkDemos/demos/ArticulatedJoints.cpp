@@ -824,6 +824,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		ArticulatedEntityModel::EngineTire* const engineJoint = (ArticulatedEntityModel::EngineTire*) NewtonJointGetUserData(NewtonBodyGetFirstJoint(leftTire_0->m_body));
 		dAssert (dString (engineJoint->GetTypeName()) == dString ("CustomHinge"));
 		model->m_engineLeftTire = engineJoint;
+
+		MakeLeftThread (controller, leftTire_0);
 	}
 
 	void MakeRightTrack(CustomArticulatedTransformController* const controller)
@@ -848,6 +850,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		ArticulatedEntityModel::EngineTire* const engineJoint = (ArticulatedEntityModel::EngineTire*)NewtonJointGetUserData(NewtonBodyGetFirstJoint(rightTire_0->m_body));
 		dAssert(dString(engineJoint->GetTypeName()) == dString("CustomHinge"));
 		model->m_engineRightTire = engineJoint;
+
+		MakeRightThread(controller, rightTire_0);
 	}
 		
 	class ConstantSpeedKnotInterpolant
@@ -891,18 +895,22 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	class RealJoint: public CustomJoint
 	{
 		public:
-		RealJoint(NewtonBody* const link, NewtonBody* const chassis)
-			:CustomJoint(1, link, chassis)
+		RealJoint(NewtonBody* const link, NewtonBody* const tractionTire)
+			:CustomJoint(1, link, tractionTire)
 		{
 			dMatrix linkMatrix;
-			dMatrix chassisMatrix;
+			dMatrix trationMatrix;
 			
 			NewtonBodyGetMatrix (link, &linkMatrix[0][0]);
-			NewtonBodyGetMatrix (link, &chassisMatrix[0][0]);
+			NewtonBodyGetMatrix (tractionTire, &trationMatrix[0][0]);
 
-			dMatrix pinAndPivotFrame (dGrammSchmidt (chassisMatrix[2]));
-			pinAndPivotFrame.m_posit = linkMatrix.m_posit;
+			dMatrix matrix (dYawMatrix(90.0f * 3.1416f / 180.0f) * linkMatrix);
+
+			dMatrix pinAndPivotFrame (dGrammSchmidt (matrix[0]));
+			pinAndPivotFrame.m_posit = trationMatrix.m_posit;
 			CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+
+			SetBodiesCollisionState (1);
 		}
 			
 		void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -912,15 +920,16 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 			CalculateGlobalMatrix(matrix0, matrix1);
-
-			// Restrict the movement on the pivot point along all three orthonormal directions
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+			dVector dist (matrix1.m_posit - matrix0.m_posit) ;
+			if ((dist % dist) > 1.0f) {
+				NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+			}
 		}
 	};
 
-	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, float offset, CustomArticulatedTransformController::dSkeletonBone* const rootNode)
+	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, float offset, CustomArticulatedTransformController::dSkeletonBone* const rootNode, CustomArticulatedTransformController::dSkeletonBone* const tractionTire)
 	{
-		dFloat linkLength = 0.32f;
+		dFloat linkLength = 0.33f;
 
 		DemoEntity* const threadPath = chassis->Find("trackPath");
 		dAssert(threadPath);
@@ -1034,7 +1043,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 			dMatrix matrix;
 			NewtonBodyGetMatrix(link1, &matrix[0][0]);
-			CustomHinge* const hinge = new CustomHinge (aligment * matrix, link1, link0);
+			dMatrix franmeMatrix (aligment * matrix);
+			CustomHinge* const hinge = new CustomHinge (franmeMatrix, link1, link0);
 			hinge->SetFriction(linkFriction);
 			hingeArray[i-1] = hinge->GetJoint();
 			link0 = link1;
@@ -1049,13 +1059,13 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		
 		dVector dist (matrix2.m_posit - matrix0.m_posit);
 		matrix1.m_posit += dist;
-		CustomHinge* const hinge = new CustomHinge (matrix0, matrix1, linkArray[0], linkArray[bodyCount - 1]);
+		CustomHinge* const hinge = new CustomHinge (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
 		hinge->SetFriction(20.0f);
 
-		//for (int i = 0; i < bodyCount; i++) {
-			//NewtonBody* const linkBody = linkArray[i];
-			//new RealJoint (linkBody, rootNode->m_body);
-		//}
+		for (int i = 0; i < bodyCount; i++) {
+//			NewtonBody* const linkBody = linkArray[i];
+//			new RealJoint (linkBody, tractionTire->m_body);
+		}
 
 		NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (world, link0, NULL);
 		NewtonSkeletonContainerAttachJointArray (skeleton, bodyCount - 1, hingeArray);
@@ -1063,21 +1073,21 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 
 
-	void MakeLeftThread(CustomArticulatedTransformController* const controller)
+	void MakeLeftThread(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const tractionTire)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		DemoEntity* const chassis = (DemoEntity*) NewtonBodyGetUserData (chassisBone->m_body);
 		DemoEntity* const pivot = chassis->Find ("leftTire_0");
-		CalculaterUniformSpaceSamples (chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
+		CalculaterUniformSpaceSamples (chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone, tractionTire);
 	}
 
 
-	void MakeRightThread(CustomArticulatedTransformController* const controller)
+	void MakeRightThread(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const tractionTire)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		DemoEntity* const chassis = (DemoEntity*)NewtonBodyGetUserData(chassisBone->m_body);
 		DemoEntity* const pivot = chassis->Find("rightTire_0");
-		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
+		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone, tractionTire);
 	}
 
 
@@ -1111,8 +1121,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
-		MakeLeftThread (controller);
-		MakeRightThread(controller);
+		
+		
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
