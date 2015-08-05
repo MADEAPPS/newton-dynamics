@@ -797,7 +797,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		for (DemoEntity* child = partModel->GetChild(); child; child = child->GetSibling()) {
 			CustomArticulatedTransformController::dSkeletonBone* const childBone = MakeTire (child->GetName().GetStr(), "tire", controller, suspBone);
-			 //MakeTire (child->GetName().GetStr(), "tire", controller, suspBone);
 			LinkTires (masterTire, childBone, chassisBone);
 		}
 	}
@@ -1060,7 +1059,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dVector dist (matrix2.m_posit - matrix0.m_posit);
 		matrix1.m_posit += dist;
 		CustomHinge* const hinge = new CustomHinge (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
-		hinge->SetFriction(20.0f);
+		hinge->SetFriction(linkFriction);
 
 		for (int i = 0; i < bodyCount; i++) {
 //			NewtonBody* const linkBody = linkArray[i];
