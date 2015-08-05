@@ -82,19 +82,24 @@ static void RenderBodyContactsForces (NewtonBody* const body, float scale)
 
 					NewtonMaterialGetContactForce(material, body, &contactForce.m_x);
 					NewtonMaterialGetContactPositionAndNormal (material, body, &point.m_x, &normal.m_x);
-
-					// these are the components of the tangents forces at the contact point, the can be display at the contact position point.
-					//NewtonMaterialGetContactTangentDirections(material, body, &tangnetDir0[0], &tangnetDir1[0]);
-					//dVector tangentForce1 (tangnetDir0.Scale ((contactForce % tangnetDir0) * scale));
-					//dVector tangentForce2 (tangnetDir1.Scale ((contactForce % tangnetDir1) * scale));
-
 					dVector normalforce (normal.Scale (contactForce % normal));
-
 					dVector p0 (point);
 					dVector p1 (point + normalforce.Scale (scale));
 					glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 					glVertex3f (p1.m_x, p1.m_y, p1.m_z);
 
+					// these are the components of the tangents forces at the contact point, the can be display at the contact position point.
+					NewtonMaterialGetContactTangentDirections(material, body, &tangnetDir0[0], &tangnetDir1[0]);
+					dVector tangentForce1 (tangnetDir0.Scale ((contactForce % tangnetDir0) * scale));
+					dVector tangentForce2 (tangnetDir1.Scale ((contactForce % tangnetDir1) * scale));
+
+					p1 = point + tangentForce1.Scale (scale);
+					glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+					glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+
+					p1 = point + tangentForce2.Scale (scale);
+					glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+					glVertex3f(p1.m_x, p1.m_y, p1.m_z);
 				}
 			}
 		}

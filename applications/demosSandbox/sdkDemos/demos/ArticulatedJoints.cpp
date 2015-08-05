@@ -119,7 +119,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_liftActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineSpeed(5.0f)
-		,m_maxTurnSpeed(5.0f)
+		,m_maxTurnSpeed(3.0f)
 		,m_tiltAngle(0.0f)
 		,m_liftPosit(0.0f)
 		,m_openPosit(0.0f)
@@ -367,27 +367,47 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		if (linkBody && !tireBody) {
 			// find the root body from the articulated structure 
-			NewtonCollision* const linkCollsion = NewtonBodyGetCollision(linkBody);
-			const CustomArticulatedTransformController::dSkeletonBone* const rootbone = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData(linkCollsion);
+			NewtonCollision* const linkCollision = NewtonBodyGetCollision(linkBody);
+			const CustomArticulatedTransformController::dSkeletonBone* const rootbone = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData(linkCollision);
 			CustomArticulatedTransformController* const controller = rootbone->m_myController;
 			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
 
-			// Get the root and tire matrices
+			int countCount = 0;
+			//dVector contactPoint (0.0f, 0.0f, 0.0f, 0.0f);
+			//dVector contactNornal (0.0f, 0.0f, 0.0f, 0.0f);
+
+			void* contactList[32];
+			for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+				contactList[countCount] = contact;
+				countCount ++;
+
+				//NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+				//dVector posit;
+				//dVector normal;
+				//NewtonMaterialGetContactPositionAndNormal (material, linkBody, &posit[0], &normal[0]);
+				//posit.m_w = 0.0f;
+				//normal.m_w = 0.0f;
+				//contactPoint += posit;
+				//contactNornal += normal;
+			}
+
+			for (int i = 1; i < countCount; i++) {
+				NewtonContactJointRemoveContact(contactJoint, contactList[i]);
+			}
+
+
 			dMatrix tireMatrix;
 			dMatrix chassisMatrix;
 			NewtonBodyGetMatrix(linkBody, &tireMatrix[0][0]);
 			NewtonBodyGetMatrix(chassiBody, &chassisMatrix[0][0]);
-
 			dVector upDir(chassisMatrix.RotateVector(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
 			dVector tireAxis(tireMatrix.RotateVector(dVector(1.0f, 0.0f, 0.0f, 0.0f)));
-
 			dVector contactDirection(upDir * tireAxis);
-			for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
-				NewtonMaterial* const material = NewtonContactGetMaterial(contact);
-				NewtonMaterialContactRotateTangentDirections(material, &contactDirection[0]);
-				NewtonMaterialSetContactFrictionCoef(material, 5.0f, 5.0f, 0);
-				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
-			}
+
+			NewtonMaterial* const material = NewtonContactGetMaterial(contactList[0]);
+			NewtonMaterialContactRotateTangentDirections(material, &contactDirection[0]);
+			NewtonMaterialSetContactFrictionCoef(material, 0.5f, 0.5f, 0);
+			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 
 		} else if (tireBody) {
 
@@ -847,8 +867,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			int mid = (low + high) >> 1;
 			if (t > interpolants[mid].m_dist) {
 				low = mid;
-			}
-			else {
+			} else {
 				high = mid;
 			}
 		}
@@ -961,14 +980,17 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-		NewtonCollision* const collision = MakeConvexHull(threadLink);
+//		NewtonCollision* const collision = MakeConvexHull(threadLink);
+		dMatrix linkMatrix (dGetIdentityMatrix());
+		linkMatrix.m_posit.m_y = linkLength * 0.5f;
+		NewtonCollision* const collision = NewtonCreateBox (GetWorld(), 0.06f, linkLength, 0.5f, 0, &linkMatrix[0][0]);
 		NewtonCollisionSetUserID(collision, ARTICULATED_VEHICLE_DEFINITION::m_LinkPart);
 		NewtonCollisionSetUserData (collision, rootNode);
 
 		NewtonBody* linkArray[1024];
 
 		int bodyCount = 0;
-		linksCount += 1;
+		linksCount += 2;
 
 		void* const aggregate = NewtonCollisionAggregateCreate(world);
 		NewtonCollisionAggregateSetSelfCollision (aggregate, 0);
@@ -1012,7 +1034,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			dMatrix matrix;
 			NewtonBodyGetMatrix(link1, &matrix[0][0]);
 			CustomHinge* const hinge = new CustomHinge (aligment * matrix, link1, link0);
-			hinge->SetFriction(20.0f);
+			hinge->SetFriction(15.0f);
 			hingeArray[i-1] = hinge->GetJoint();
 			link0 = link1;
 		}

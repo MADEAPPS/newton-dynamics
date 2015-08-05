@@ -5536,7 +5536,12 @@ void NewtonContactJointRemoveContact(const NewtonJoint* const contactJoint, void
 
 	if ((joint->GetId() == dgConstraint::m_contactConstraint) && joint->GetCount()){
 		dgList<dgContactMaterial>::dgListNode* const node = (dgList<dgContactMaterial>::dgListNode*) contact;
+
+		dgBody* const body = joint->GetBody0() ? joint->GetBody0() : joint->GetBody1();
+		dgWorld* const world = body->GetWorld();
+		world->GlobalLock(false);
 		joint->Remove(node);
+		world->GlobalUnlock();
 	}
 }
 
