@@ -1027,6 +1027,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dMatrix aligment (dYawMatrix(90.0f * 3.1416f / 180.0f));
 		NewtonBody* link0 = linkArray[0];
 
+		float linkFriction = 15.0f;
 		NewtonJoint* hingeArray[1024];
 		for (int i = 1; i < bodyCount; i++) {
 			NewtonBody* const link1 = linkArray[i];
@@ -1034,7 +1035,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			dMatrix matrix;
 			NewtonBodyGetMatrix(link1, &matrix[0][0]);
 			CustomHinge* const hinge = new CustomHinge (aligment * matrix, link1, link0);
-			hinge->SetFriction(15.0f);
+			hinge->SetFriction(linkFriction);
 			hingeArray[i-1] = hinge->GetJoint();
 			link0 = link1;
 		}
@@ -1051,11 +1052,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomHinge* const hinge = new CustomHinge (matrix0, matrix1, linkArray[0], linkArray[bodyCount - 1]);
 		hinge->SetFriction(20.0f);
 
-		int reeltPoints = 8;
-		for (int i = 0; i < reeltPoints; i ++) {
-			NewtonBody* const linkBody = linkArray[i * bodyCount / reeltPoints];
-			new RealJoint (linkBody, rootNode->m_body);
-		}
+		//for (int i = 0; i < bodyCount; i++) {
+			//NewtonBody* const linkBody = linkArray[i];
+			//new RealJoint (linkBody, rootNode->m_body);
+		//}
 
 		NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (world, link0, NULL);
 		NewtonSkeletonContainerAttachJointArray (skeleton, bodyCount - 1, hingeArray);
