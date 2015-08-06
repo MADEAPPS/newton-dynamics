@@ -31,17 +31,21 @@ class CustomSlidingContact: public CustomJoint
 	CUSTOM_JOINTS_API void SetLinearLimis(dFloat minDist, dFloat maxDist);
 	CUSTOM_JOINTS_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
 
+	CUSTOM_JOINTS_API dFloat GetSpeed() const;
+	CUSTOM_JOINTS_API dFloat GetPosition() const;
+
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	bool m_limitsLinearOn;
-	bool m_limitsAngularOn;
+	dFloat m_speed;
+	dFloat m_posit;
 	dFloat m_minLinearDist;
 	dFloat m_maxLinearDist;
 	dFloat m_minAngularDist;
 	dFloat m_maxAngularDist;
-
+	bool m_limitsLinearOn;
+	bool m_limitsAngularOn;
 };
 
 #endif // !defined(AFX_CustomSlidingContact_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)

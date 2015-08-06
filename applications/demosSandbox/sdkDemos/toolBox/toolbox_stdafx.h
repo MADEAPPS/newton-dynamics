@@ -139,6 +139,7 @@ typedef long long unsigned64;
 #include <CustomHingeActuator.h>
 #include <CustomBallAndSocket.h>
 #include <CustomSliderActuator.h>
+#include <CustomSlidingContact.h>
 #include <CustomUniversalActuator.h>
 
 #include <CustomInputManager.h>

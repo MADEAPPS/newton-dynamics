@@ -165,11 +165,10 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 	// calculate position and speed	
 	dVector veloc0(0.0f, 0.0f, 0.0f, 0.0f); 
 	dVector veloc1(0.0f, 0.0f, 0.0f, 0.0f);  
-	if (m_body0) {
-		NewtonBodyGetVelocity(m_body0, &veloc0[0]);
-	}
+	dAssert (m_body0);
+	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
 	if (m_body1) {
-		NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+		NewtonBodyGetPointVelocity(m_body1, &matrix1.m_posit[0], &veloc1[0]);
 	}
 	m_posit = (matrix0.m_posit - matrix1.m_posit) % matrix1.m_front;
 	m_speed = (veloc0 - veloc1) % matrix1.m_front;

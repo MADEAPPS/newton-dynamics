@@ -24,6 +24,8 @@
 
 CustomSlidingContact::CustomSlidingContact (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
+	,m_speed(0.0f)
+	,m_posit(0.0f)
 {
 	EnableLinearLimits(false);
 	EnableAngularLimits(false);
@@ -119,6 +121,15 @@ void CustomSlidingContact::GetInfo (NewtonJointRecord* const info) const
 }
 
 
+dFloat CustomSlidingContact::GetPosition() const
+{
+	return m_posit;
+}
+
+dFloat CustomSlidingContact::GetSpeed() const
+{
+	return m_speed;
+}
 
 void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 {
@@ -147,17 +158,26 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 		NewtonUserJointAddAngularRow(m_joint, euler1.m_z, &matrix1.m_right[0]);
 	}
 
+	dVector veloc0(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector veloc1(0.0f, 0.0f, 0.0f, 0.0f);
+	dAssert(m_body0);
+	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
+	if (m_body1) {
+		NewtonBodyGetPointVelocity(m_body1, &matrix1.m_posit[0], &veloc1[0]);
+	}
+	m_posit = (matrix0.m_posit - matrix1.m_posit) % matrix1.m_front;
+	m_speed = (veloc0 - veloc1) % matrix1.m_front;
+
 	
 	// if limit are enable ...
 	if (m_limitsLinearOn) {
-		dFloat dist = (matrix0.m_posit - matrix1.m_posit) % matrix1.m_front;
-		if (dist < m_minLinearDist) {
+		if (m_posit < m_minLinearDist) {
 			// get a point along the up vector and set a constraint  
 			dVector p (matrix1.m_posit + matrix1.m_front.Scale(m_minLinearDist));
 			NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-		} else if (dist > m_maxLinearDist) {
+		} else if (m_posit > m_maxLinearDist) {
 			dVector p(matrix1.m_posit + matrix1.m_front.Scale(m_maxLinearDist));
 			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
 			// allow the object to return but not to kick going forward
