@@ -24,6 +24,7 @@
 
 CustomSlidingContact::CustomSlidingContact (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
+	,m_curJointAngle()
 	,m_speed(0.0f)
 	,m_posit(0.0f)
 {
@@ -135,28 +136,26 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
+	dFloat sinAngle;
+	dFloat cosAngle;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all two orthonormal direction
-	dVector p0 (matrix0.m_posit);
-	dVector p1 (matrix1.m_posit + matrix1.m_front.Scale ((p0 - matrix1.m_posit) % matrix1.m_front));
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
 
-	dVector euler0;
-	dVector euler1;
-	dMatrix localMatrix (matrix0 * matrix1.Inverse());
-	localMatrix.GetEulerAngles(euler0, euler1);
+	// two rows to restrict rotation around around the parent coordinate system
+	CalculateYawAngle(matrix0, matrix1, sinAngle, cosAngle);
+	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_up[0]);
 
-	if (dAbs (euler0.m_x) < 0.5f) {
-		NewtonUserJointAddAngularRow(m_joint, -euler0.m_x, &matrix1.m_front[0]);
-		NewtonUserJointAddAngularRow(m_joint, -euler0.m_z, &matrix1.m_right[0]);
-	} else {
-		NewtonUserJointAddAngularRow(m_joint, euler1.m_x, &matrix1.m_front[0]);
-		NewtonUserJointAddAngularRow(m_joint, euler1.m_z, &matrix1.m_right[0]);
-	}
+	CalculateRollAngle(matrix0, matrix1, sinAngle, cosAngle);
+	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_right[0]);
+
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
+	CalculatePitchAngle(matrix0, matrix1, sinAngle, cosAngle);
+	m_curJointAngle.Update(cosAngle, sinAngle);
 
 	dVector veloc0(0.0f, 0.0f, 0.0f, 0.0f);
 	dVector veloc1(0.0f, 0.0f, 0.0f, 0.0f);
@@ -165,34 +164,35 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 	if (m_body1) {
 		NewtonBodyGetPointVelocity(m_body1, &matrix1.m_posit[0], &veloc1[0]);
 	}
-	m_posit = (matrix0.m_posit - matrix1.m_posit) % matrix1.m_front;
-	m_speed = (veloc0 - veloc1) % matrix1.m_front;
-
+	m_posit = (matrix0.m_posit - matrix1.m_posit) % matrix1.m_up;
+	m_speed = (veloc0 - veloc1) % matrix1.m_up;
 	
 	// if limit are enable ...
 	if (m_limitsLinearOn) {
 		if (m_posit < m_minLinearDist) {
 			// get a point along the up vector and set a constraint  
-			dVector p (matrix1.m_posit + matrix1.m_front.Scale(m_minLinearDist));
-			NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
+			dVector p (matrix1.m_posit + matrix1.m_up.Scale(m_minLinearDist));
+			NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_up[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
 		} else if (m_posit > m_maxLinearDist) {
-			dVector p(matrix1.m_posit + matrix1.m_front.Scale(m_maxLinearDist));
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
+			dVector p(matrix1.m_posit + matrix1.m_up.Scale(m_maxLinearDist));
+			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_up[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		}
 	}
 
 	if (m_limitsAngularOn) {
+/*
 		if (euler0.m_y < m_minAngularDist) {
-			NewtonUserJointAddAngularRow(m_joint, -(euler0.m_y - m_minAngularDist), &matrix1.m_up[0]);
+			NewtonUserJointAddAngularRow(m_joint, -(euler0.m_y - m_minAngularDist), &matrix1.m_front[0]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		} else if (euler0.m_y > m_maxAngularDist) {
-			NewtonUserJointAddAngularRow(m_joint, - (euler0.m_y - m_maxAngularDist), &matrix1.m_up[0]);
+			NewtonUserJointAddAngularRow(m_joint, - (euler0.m_y - m_maxAngularDist), &matrix1.m_front[0]);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		}
+*/		
 	}
 }
 

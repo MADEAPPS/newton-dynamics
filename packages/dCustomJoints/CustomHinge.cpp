@@ -21,7 +21,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-//dInitRtti(CustomHinge);
 IMPLEMENT_CUSTON_JOINT(CustomHinge);
 
 CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)

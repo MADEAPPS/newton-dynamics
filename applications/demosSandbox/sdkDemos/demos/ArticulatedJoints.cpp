@@ -93,11 +93,11 @@ class ArticulatedEntityModel: public DemoEntity
 
 			dFloat speed = GetSpeed();
 			dFloat posit = GetPosition();
-			dFloat springForce = -10.0f * NewtonCalculateSpringDamperAcceleration (timestep, 1000.0f, posit, 70.0f, speed);
+			dFloat springForce = -20.0f * NewtonCalculateSpringDamperAcceleration (timestep, 600.0f, posit, 50.0f, speed);
 
 			CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 
-			dVector force (chassisMatrix.m_front.Scale (springForce));
+			dVector force (chassisMatrix.m_up.Scale (springForce));
 			dVector torque (tireDistance * force);
 
 			NewtonBodyAddForce(chassis, &force[0]);
@@ -787,7 +787,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
-		dMatrix hingeFrame(matrix);
+		dMatrix hingeFrame(dRollMatrix (-3.141692f * 0.5) * matrix);
 		new ArticulatedEntityModel::SuspensionTire(hingeFrame, bone->m_body, parentBone->m_body);
 
 		return bone;
@@ -852,8 +852,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		ArticulatedEntityModel::EngineTire* const engineJoint = (ArticulatedEntityModel::EngineTire*) NewtonJointGetUserData(NewtonBodyGetFirstJoint(leftTire_0->m_body));
 		dAssert (dString (engineJoint->GetTypeName()) == dString ("CustomHinge"));
 		model->m_engineLeftTire = engineJoint;
-
-		//MakeLeftThread (controller, leftTire_0);
 	}
 
 	void MakeRightTrack(CustomArticulatedTransformController* const controller)
@@ -882,7 +880,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dAssert(dString(engineJoint->GetTypeName()) == dString("CustomHinge"));
 		model->m_engineRightTire = engineJoint;
 
-		//MakeRightThread(controller, rightTire_0);
+
 	}
 		
 	class ConstantSpeedKnotInterpolant
@@ -922,43 +920,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return dMod(u0 + du * (t - h0) / dh, 1.0f);
 	}
 
-
-	class RealJoint: public CustomJoint
-	{
-		public:
-		RealJoint(NewtonBody* const link, NewtonBody* const tractionTire)
-			:CustomJoint(1, link, tractionTire)
-		{
-			dMatrix linkMatrix;
-			dMatrix trationMatrix;
-			
-			NewtonBodyGetMatrix (link, &linkMatrix[0][0]);
-			NewtonBodyGetMatrix (tractionTire, &trationMatrix[0][0]);
-
-			dMatrix matrix (dYawMatrix(90.0f * 3.1416f / 180.0f) * linkMatrix);
-
-			dMatrix pinAndPivotFrame (dGrammSchmidt (matrix[0]));
-			pinAndPivotFrame.m_posit = trationMatrix.m_posit;
-			CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
-
-			SetBodiesCollisionState (1);
-		}
-			
-		void SubmitConstraints(dFloat timestep, int threadIndex)
-		{
-			dMatrix matrix0;
-			dMatrix matrix1;
-
-			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-			CalculateGlobalMatrix(matrix0, matrix1);
-			dVector dist (matrix1.m_posit - matrix0.m_posit) ;
-			if ((dist % dist) > 1.0f) {
-				NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-			}
-		}
-	};
-
-	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, float offset, CustomArticulatedTransformController::dSkeletonBone* const rootNode, CustomArticulatedTransformController::dSkeletonBone* const tractionTire)
+	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, float offset, CustomArticulatedTransformController::dSkeletonBone* const rootNode)
 	{
 		dFloat linkLength = 0.33f;
 
@@ -1093,32 +1055,27 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomHinge* const hinge = new CustomHinge (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
 		hinge->SetFriction(linkFriction);
 
-		for (int i = 0; i < bodyCount; i++) {
-//			NewtonBody* const linkBody = linkArray[i];
-//			new RealJoint (linkBody, tractionTire->m_body);
-		}
-
 		NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (world, link0, NULL);
 		NewtonSkeletonContainerAttachJointArray (skeleton, bodyCount - 1, hingeArray);
 		NewtonSkeletonContainerFinalize (skeleton);
 	}
 
 
-	void MakeLeftThread(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const tractionTire)
+	void MakeLeftThread(CustomArticulatedTransformController* const controller)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		DemoEntity* const chassis = (DemoEntity*) NewtonBodyGetUserData (chassisBone->m_body);
 		DemoEntity* const pivot = chassis->Find ("leftTire_0");
-		CalculaterUniformSpaceSamples (chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone, tractionTire);
+		CalculaterUniformSpaceSamples (chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
 	}
 
 
-	void MakeRightThread(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const tractionTire)
+	void MakeRightThread(CustomArticulatedTransformController* const controller)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		DemoEntity* const chassis = (DemoEntity*)NewtonBodyGetUserData(chassisBone->m_body);
 		DemoEntity* const pivot = chassis->Find("rightTire_0");
-		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone, tractionTire);
+		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
 	}
 
 
@@ -1147,12 +1104,37 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy (definition.m_articulationName, "mainBody");
 		NewtonBody* const chassis = CreateBodyPart (vehicleModel, definition);
 
+		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
+		NewtonCompoundCollisionBeginAddRemove(compound);
+		DemoEntity* const fender1 = vehicleModel->Find("fender0");
+		DemoEntity* const fender2 = vehicleModel->Find("fender1");
+		NewtonCollision* const fenderColl1 = MakeConvexHull (fender1);
+		NewtonCollision* const fenderColl2 = MakeConvexHull (fender2);
+		dMatrix fender1Matrix(fender1->GetCurrentMatrix());
+		dMatrix fender2Matrix(fender2->GetCurrentMatrix());
+		NewtonCollisionSetMatrix (fenderColl1, &fender1Matrix[0][0]);
+		NewtonCollisionSetMatrix (fenderColl2, &fender2Matrix[0][0]);
+		NewtonCompoundCollisionAddSubCollision (compound, NewtonBodyGetCollision(chassis));
+		NewtonCompoundCollisionAddSubCollision (compound, fenderColl1);
+		NewtonCompoundCollisionAddSubCollision (compound, fenderColl2);
+		NewtonDestroyCollision(fenderColl1);
+		NewtonDestroyCollision(fenderColl2);
+		NewtonCompoundCollisionEndAddRemove(compound);	
+		NewtonBodySetCollision(chassis, compound);
+		NewtonDestroyCollision(compound);
+
+		fender1->SetMesh(NULL, dGetIdentityMatrix());
+		fender2->SetMesh(NULL, dGetIdentityMatrix());
+
 		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(chassis, dGetIdentityMatrix());
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(chassis), bone);
 
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
-			
+
+		MakeLeftThread(controller);
+		MakeRightThread(controller);
+
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
@@ -1380,10 +1362,10 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);
 	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
-//	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
-//	LoadLumberYardMesh (scene, entity, dVector(40.0f, 0.0f, 0.0f, 0.0f));
-//	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 10.0f, 0.0f));
-//	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
+	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+	LoadLumberYardMesh (scene, entity, dVector(40.0f, 0.0f, 0.0f, 0.0f));
+	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 10.0f, 0.0f));
+	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
 	
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
