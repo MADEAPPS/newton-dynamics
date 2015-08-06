@@ -1106,25 +1106,21 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
 		NewtonCompoundCollisionBeginAddRemove(compound);
-		DemoEntity* const fender1 = vehicleModel->Find("fender0");
-		DemoEntity* const fender2 = vehicleModel->Find("fender1");
-		NewtonCollision* const fenderColl1 = MakeConvexHull (fender1);
-		NewtonCollision* const fenderColl2 = MakeConvexHull (fender2);
-		dMatrix fender1Matrix(fender1->GetCurrentMatrix());
-		dMatrix fender2Matrix(fender2->GetCurrentMatrix());
-		NewtonCollisionSetMatrix (fenderColl1, &fender1Matrix[0][0]);
-		NewtonCollisionSetMatrix (fenderColl2, &fender2Matrix[0][0]);
 		NewtonCompoundCollisionAddSubCollision (compound, NewtonBodyGetCollision(chassis));
-		NewtonCompoundCollisionAddSubCollision (compound, fenderColl1);
-		NewtonCompoundCollisionAddSubCollision (compound, fenderColl2);
-		NewtonDestroyCollision(fenderColl1);
-		NewtonDestroyCollision(fenderColl2);
+		for (int i = 0; i < 4; i ++) {
+			char name[64];
+			sprintf (name, "fender%d", i);
+			DemoEntity* const fender = vehicleModel->Find(name);
+			NewtonCollision* const collision = MakeConvexHull (fender);
+			dMatrix matrix(fender->GetCurrentMatrix());
+			NewtonCollisionSetMatrix (collision, &matrix[0][0]);
+			NewtonCompoundCollisionAddSubCollision (compound, collision);
+			NewtonDestroyCollision(collision);
+			fender->SetMesh(NULL, dGetIdentityMatrix());
+		}
 		NewtonCompoundCollisionEndAddRemove(compound);	
 		NewtonBodySetCollision(chassis, compound);
 		NewtonDestroyCollision(compound);
-
-		fender1->SetMesh(NULL, dGetIdentityMatrix());
-		fender2->SetMesh(NULL, dGetIdentityMatrix());
 
 		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(chassis, dGetIdentityMatrix());
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(chassis), bone);
