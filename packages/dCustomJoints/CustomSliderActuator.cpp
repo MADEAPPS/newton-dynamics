@@ -27,7 +27,7 @@ CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, New
 	,m_minPosit(-1.0e10f)
 	,m_maxPosit( 1.0e10f)
 	,m_linearRate(0.0f)
-	,m_maxForce(1.0e10f)
+	,m_maxForce(1.0e20f)
 	,m_flag(false)
 {
 	EnableLimits(false);

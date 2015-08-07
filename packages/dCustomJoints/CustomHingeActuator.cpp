@@ -28,7 +28,7 @@ CustomHingeActuator::CustomHingeActuator(const dMatrix& pinAndPivotFrame, Newton
 	,m_minAngle(-1.0e10f)
 	,m_maxAngle( 1.0e10f)
 	,m_angularRate(0.0f)
-	,m_maxForce(1.0e10f)
+	,m_maxForce(1.0e20f)
 	,m_flag(false)
 {
 	EnableLimits(false);
@@ -40,7 +40,7 @@ CustomHingeActuator::CustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat
 	,m_minAngle(minAngle)
 	,m_maxAngle(maxAngle)
 	,m_angularRate(angularRate)
-    ,m_maxForce(1.0e10f)
+    ,m_maxForce(1.0e20f)
 	,m_flag(true)
 {
 	EnableLimits(false);
@@ -137,7 +137,7 @@ void CustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatr
 
 		dFloat step = m_angularRate * timestep;
 		if (dAbs (relAngle) > 2.0f * dAbs (step)) {
-			dFloat desiredSpeed = dSign(relAngle) * m_angularRate;
+			dFloat desiredSpeed = -dSign(relAngle) * m_angularRate;
 			dFloat currentSpeed = GetJointOmega ();
 			dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 			NewtonUserJointSetRowAcceleration (m_joint, accel);
