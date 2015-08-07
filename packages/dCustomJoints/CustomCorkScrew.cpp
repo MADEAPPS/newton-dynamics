@@ -125,8 +125,10 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_right[0]);
+	dVector p0(matrix0.m_posit);
+	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit) % matrix1.m_front));
+	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
+	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 	
 	// two rows to restrict rotation around around the parent coordinate system
 	dFloat sinAngle;

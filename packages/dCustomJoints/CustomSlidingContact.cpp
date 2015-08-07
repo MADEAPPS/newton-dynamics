@@ -142,9 +142,11 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
-	// Restrict the movement on the pivot point along all two orthonormal direction
-	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
+	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
+	dVector p0(matrix0.m_posit);
+	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit) % matrix1.m_front));
+	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 
 	// two rows to restrict rotation around around the parent coordinate system
 	CalculateYawAngle(matrix0, matrix1, sinAngle, cosAngle);
