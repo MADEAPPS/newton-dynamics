@@ -112,8 +112,8 @@ void CustomSlider::GetInfo(NewtonJointRecord* const info) const
 		info->m_maxLinearDof[0] = m_maxDist - dist;
 	}
 	else {
-		info->m_minLinearDof[0] = -FLT_MAX;
-		info->m_maxLinearDof[0] = FLT_MAX;
+		info->m_minLinearDof[0] = -D_CUSTOM_LARGE_VALUE;
+		info->m_maxLinearDof[0] = D_CUSTOM_LARGE_VALUE;
 	}
 
 
@@ -150,19 +150,11 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit) % matrix1.m_front));
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
-	
+
  	// three rows to restrict rotation around around the parent coordinate system
-	dFloat sinAngle;
-	dFloat cosAngle;
-	CalculatePitchAngle(matrix0, matrix1, sinAngle, cosAngle);
-	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_front[0]);
-
-	CalculateYawAngle(matrix0, matrix1, sinAngle, cosAngle);
-	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_up[0]);
-
-	CalculateRollAngle(matrix0, matrix1, sinAngle, cosAngle);
-	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_right[0]);
-
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle (matrix0.m_up, matrix1.m_up, matrix1.m_front), &matrix1.m_front[0]);
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle (matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle (matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 
 	// calculate position and speed	
 	dVector veloc0(0.0f, 0.0f, 0.0f, 0.0f); 

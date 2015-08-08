@@ -36,7 +36,7 @@ CustomPathFollow::~CustomPathFollow()
 void CustomPathFollow::GetInfo (NewtonJointRecord* const info) const
 {
 /*
-	strcpy (info->m_descriptionType, "slider");
+	strcpy (info->m_descriptionType, GetTypeName());
 
 	info->m_attachBody_0 = m_body0;
 	info->m_attachBody_1 = m_body1;
@@ -53,8 +53,8 @@ void CustomPathFollow::GetInfo (NewtonJointRecord* const info) const
 		info->m_minLinearDof[0] = m_minDist - dist;
 		info->m_maxLinearDof[0] = m_maxDist - dist;
 	} else {
-		info->m_minLinearDof[0] = -FLT_MAX ;
-		info->m_maxLinearDof[0] =  FLT_MAX ;
+		info->m_minLinearDof[0] = -D_CUSTOM_LARGE_VALUE ;
+		info->m_maxLinearDof[0] =  D_CUSTOM_LARGE_VALUE ;
 	}
 
 

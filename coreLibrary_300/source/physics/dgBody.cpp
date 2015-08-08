@@ -223,9 +223,12 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 {
 	dgAssert (filter);
 	dgVector l0 (line.m_l0);
-//	dgVector l1 (line.m_l1);
 	dgVector l1 (line.m_l0 + (line.m_l1 - line.m_l0).Scale4 (dgMin(maxT, dgFloat32 (1.0f))));
 	if (dgRayBoxClip (l0, l1, m_minAABB, m_maxAABB)) {
+//	if (1) {
+//l0 = dgVector (-20.3125000f, 3.54991579f, 34.3441200f, 0.0f);
+//l1 = dgVector (-19.6875000f, 3.54257250f, 35.2211456f, 0.0f);
+
 		dgContactPoint contactOut;
 		const dgMatrix& globalMatrix = m_collision->GetGlobalMatrix();
 		dgVector localP0 (globalMatrix.UntransformVector (l0));

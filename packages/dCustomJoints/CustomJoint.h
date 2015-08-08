@@ -29,6 +29,8 @@ typedef void (*JointUserDestructorCallback) (const NewtonUserJoint* const me);
 typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const me, dFloat timestep, int threadIndex);
 
 
+#define D_CUSTOM_LARGE_VALUE		dFloat (1.0e20f)
+
 #define DECLARE_CUSTON_JOINT(className,baseClass)																			\
 	public:																													\
 	virtual dCRCTYPE GetSerializeKey() const { return dCRC64(#className); }													\
@@ -191,9 +193,12 @@ class CustomJoint: public CustomAlloc
 
 	CUSTOM_JOINTS_API static SerializeMetaDataDictionary& GetDictionary();
 
-	CUSTOM_JOINTS_API void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
-	CUSTOM_JOINTS_API void CalculateYawAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
-	CUSTOM_JOINTS_API void CalculateRollAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
+	//CUSTOM_JOINTS_API void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
+	//CUSTOM_JOINTS_API void CalculateYawAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
+	//CUSTOM_JOINTS_API void CalculateRollAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
+
+	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir) const;
+	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const;
 
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;

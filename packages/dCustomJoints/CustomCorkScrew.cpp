@@ -133,11 +133,18 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 	// two rows to restrict rotation around around the parent coordinate system
 	dFloat sinAngle;
 	dFloat cosAngle;
-	CalculateYawAngle(matrix0, matrix1, sinAngle, cosAngle);
-	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_up[0]);
+//	CalculateYawAngle(matrix0, matrix1, sinAngle, cosAngle);
+//	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_up[0]);
+//	CalculateRollAngle(matrix0, matrix1, sinAngle, cosAngle);
+//	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_right[0]);
+	
+	// two rows to restrict rotation around around the parent coordinate system
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 
-	CalculateRollAngle(matrix0, matrix1, sinAngle, cosAngle);
-	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_right[0]);
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
+	CalculateAngle(matrix1.m_up, matrix0.m_up, matrix1.m_front, sinAngle, cosAngle);
+	dFloat angle = -m_curJointAngle.Update(cosAngle, sinAngle);
 
 	// if limit are enable ...
 	if (m_limitsLinearOn) {
@@ -157,8 +164,6 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-	CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
-	dFloat angle = -m_curJointAngle.Update (cosAngle, sinAngle);
 
 	if (m_limitsAngularOn) {
 		// the joint angle can be determine by getting the angle between any two non parallel vectors
@@ -176,8 +181,7 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 			// allow the joint to move back freely 
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 
-
-		} else if (angle  > m_maxAngularDist) {
+		} else if (angle > m_maxAngularDist) {
 			dFloat relAngle = angle - m_maxAngularDist;
 
 			// the angle was clipped save the new clip limit
@@ -219,7 +223,7 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 
 void CustomCorkScrew::GetInfo (NewtonJointRecord* const info) const
 {
-	strcpy (info->m_descriptionType, "corkScrew");
+	strcpy (info->m_descriptionType, GetTypeName());
 
 	info->m_attachBody_0 = m_body0;
 	info->m_attachBody_1 = m_body1;
@@ -236,8 +240,8 @@ void CustomCorkScrew::GetInfo (NewtonJointRecord* const info) const
 		info->m_minLinearDof[0] = m_minLinearDist - dist;
 		info->m_maxLinearDof[0] = m_maxLinearDist - dist;
 	} else {
-		info->m_minLinearDof[0] = -FLT_MAX ;
-		info->m_maxLinearDof[0] = FLT_MAX ;
+		info->m_minLinearDof[0] = -D_CUSTOM_LARGE_VALUE ;
+		info->m_maxLinearDof[0] = D_CUSTOM_LARGE_VALUE ;
 	}
 
 	info->m_minLinearDof[1] = 0.0f;
@@ -246,8 +250,8 @@ void CustomCorkScrew::GetInfo (NewtonJointRecord* const info) const
 	info->m_minLinearDof[2] = 0.0f;
 	info->m_maxLinearDof[2] = 0.0f;
 
-//	info->m_minAngularDof[0] = -FLT_MAX;
-//	info->m_maxAngularDof[0] =  FLT_MAX;
+//	info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE;
+//	info->m_maxAngularDof[0] =  D_CUSTOM_LARGE_VALUE;
 	if (m_limitsAngularOn) {
 		dFloat angle;
 		dFloat sinAngle;
@@ -259,8 +263,8 @@ void CustomCorkScrew::GetInfo (NewtonJointRecord* const info) const
 		info->m_minAngularDof[0] = (m_minAngularDist - angle) * 180.0f / 3.141592f ;
 		info->m_maxAngularDof[0] = (m_maxAngularDist - angle) * 180.0f / 3.141592f ;
 	} else {
-		info->m_minAngularDof[0] = -FLT_MAX ;
-		info->m_maxAngularDof[0] =  FLT_MAX;
+		info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE ;
+		info->m_maxAngularDof[0] =  D_CUSTOM_LARGE_VALUE;
 	}
 
 	info->m_minAngularDof[1] = 0.0f;

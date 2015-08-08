@@ -24,8 +24,8 @@
 CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomSlider(pinAndPivotFrame, child, parent)
 	,m_posit(0.0f)
-	,m_minPosit(-1.0e10f)
-	,m_maxPosit( 1.0e10f)
+	,m_minPosit(-D_CUSTOM_LARGE_VALUE)
+	,m_maxPosit( D_CUSTOM_LARGE_VALUE)
 	,m_linearRate(0.0f)
 	,m_maxForce(1.0e20f)
 	,m_flag(false)
@@ -39,7 +39,7 @@ CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFl
 	,m_minPosit(minPosit)
 	,m_maxPosit(maxPosit)
 	,m_linearRate(speed)
-    ,m_maxForce(1.0e10f)
+    ,m_maxForce(D_CUSTOM_LARGE_VALUE)
 	,m_flag(true)
 {
 	EnableLimits(false);

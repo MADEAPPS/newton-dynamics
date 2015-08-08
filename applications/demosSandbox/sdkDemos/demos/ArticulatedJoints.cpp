@@ -34,6 +34,7 @@ struct ARTICULATED_VEHICLE_DEFINITION
 		m_tireID = 1<<0,
 		m_bodyPart = 1<<1,
 		m_LinkPart = 1<<2,
+		m_fenderPart = 1<<3,
 	};
 	
 	char m_boneName[32];
@@ -93,11 +94,11 @@ class ArticulatedEntityModel: public DemoEntity
 
 			dFloat speed = GetSpeed();
 			dFloat posit = GetPosition();
-			dFloat springForce = -20.0f * NewtonCalculateSpringDamperAcceleration (timestep, 600.0f, posit, 50.0f, speed);
+			dFloat springForce = -50.0f * NewtonCalculateSpringDamperAcceleration (timestep, 200.0f, posit, 30.0f, speed);
 
 			CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 
-			dVector force (chassisMatrix.m_up.Scale (springForce));
+			dVector force (chassisMatrix.m_front.Scale (springForce));
 			dVector torque (tireDistance * force);
 
 			NewtonBodyAddForce(chassis, &force[0]);
@@ -166,8 +167,8 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_angularActuatorsCount1(0)
 		,m_liftActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
-		,m_maxEngineSpeed(5.0f)
-		,m_maxTurnSpeed(3.0f)
+		,m_maxEngineSpeed(6.0f)
+		,m_maxTurnSpeed(2.0f)
 		,m_turnAngle(0.0f)
 		,m_tiltAngle(0.0f)
 		,m_liftPosit(0.0f)
@@ -439,7 +440,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		NewtonBody* const tireBody = (id0 & ARTICULATED_VEHICLE_DEFINITION::m_tireID) ? body0 : ((id1 & ARTICULATED_VEHICLE_DEFINITION::m_tireID) ? body1 : NULL);
 		NewtonBody* const linkBody = (id0 & ARTICULATED_VEHICLE_DEFINITION::m_LinkPart) ? body0 : ((id1 & ARTICULATED_VEHICLE_DEFINITION::m_LinkPart) ? body1 : NULL);
-
+		
 		if (linkBody && !tireBody) {
 			// find the root body from the articulated structure 
 			NewtonCollision* const linkCollision = NewtonBodyGetCollision(linkBody);
@@ -817,9 +818,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
-		dMatrix hingeFrame(dRollMatrix (-3.141692f * 0.5) * matrix);
+		dMatrix hingeFrame(dRollMatrix (-3.141692f * 0.0f) * matrix);
 		new ArticulatedEntityModel::SuspensionTire(hingeFrame, bone->m_body, parentBone->m_body);
-
 		return bone;
 	}
 
@@ -1120,7 +1120,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		ARTICULATED_VEHICLE_DEFINITION definition;
 		strcpy(definition.m_boneName, name);
 		strcpy(definition.m_shapeTypeName, "convexHull");
-		definition.m_mass = 30.0f;
+		definition.m_mass = 10.0f;
 		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, name);
 		NewtonBody* const boomBody = CreateBodyPart(boom, definition);
@@ -1149,7 +1149,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		ARTICULATED_VEHICLE_DEFINITION definition;
 		strcpy(definition.m_boneName, "Boom1");
 		strcpy(definition.m_shapeTypeName, "convexHull");
-		definition.m_mass = 30.0f;
+		definition.m_mass = 10.0f;
 		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, "Boom1");
 		NewtonBody* const boomBody = CreateBodyPart(boom, definition);
@@ -1229,6 +1229,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			sprintf (name, "fender%d", i);
 			DemoEntity* const fender = vehicleModel->Find(name);
 			NewtonCollision* const collision = MakeConvexHull (fender);
+			NewtonCollisionSetUserID (collision, ARTICULATED_VEHICLE_DEFINITION::m_fenderPart);
 			dMatrix matrix(fender->GetCurrentMatrix());
 			NewtonCollisionSetMatrix (collision, &matrix[0][0]);
 			NewtonCompoundCollisionAddSubCollision (compound, collision);
@@ -1246,7 +1247,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		MakeRightTrack (controller);
 		MakeLeftThread(controller);
 		MakeRightThread(controller);
-
 		AddCraneBase (controller);
 
 		// disable self collision between all body parts
@@ -1471,7 +1471,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
-	matrix.m_posit.m_y += 0.75f;
+	matrix.m_posit.m_y += 1.5f;
 
 	// load a the mesh of the articulate vehicle
 //	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");

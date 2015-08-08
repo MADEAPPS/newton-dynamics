@@ -116,6 +116,9 @@ void RenderAABB (NewtonWorld* const world)
 	glColor3f(0.0f, 0.0f, 1.0f);
 
 	glBegin(GL_LINES);
+//glVertex3f (-20.3125000f, 3.54991579f, 34.3441200f);
+//glVertex3f (-19.6875000f, 3.54257250f, 35.2211456f);
+
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		dVector p0; 
 		dVector p1; 

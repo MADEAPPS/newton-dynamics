@@ -216,28 +216,46 @@ void CustomJoint::CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) con
 	matrix1 = m_localMatrix1 * body1Matrix;
 }
 
+dFloat CustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const
+{
+	cosAngle = dir % cosDir;
+	sinAngle = (dir * cosDir) % sinDir;
+	return dAtan2(sinAngle, cosAngle);
+}
+
+dFloat CustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir) const
+{
+	dFloat sinAngle;
+	dFloat cosAngle;
+	return CalculateAngle (dir, cosDir, sinDir, sinAngle, cosAngle);
+}
+
+/*
 void CustomJoint::CalculatePitchAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
+	dAssert (0);
 	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix1.m_front;
 	cosAngle = matrix1.m_up % matrix0.m_up;
 }
 
 void CustomJoint::CalculateYawAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
+	dAssert (0);
 	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_up;
 	cosAngle = matrix1.m_front % matrix0.m_front;
 }
 
 void CustomJoint::CalculateRollAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
 {
+	dAssert (0);
 	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_right;
 	cosAngle = matrix1.m_front % matrix0.m_front;
 }
-
+*/
 
 void CustomJoint::GetInfo (NewtonJointRecord* const info) const
 {
-	strcpy (info->m_descriptionType, "customJointNotInfo");
+	strcpy (info->m_descriptionType, GetTypeName());
 }
 
 void CustomJoint::SetBodiesCollisionState (int state)

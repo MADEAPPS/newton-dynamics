@@ -628,8 +628,8 @@ void CustomVehicleController::DrawSchematic (dFloat scale) const
 
 	{
 		// draw vehicle chassis
-		dVector p0 (1.0e10f, 1.0e10f, 1.0e10f, 0.0f);
-		dVector p1 (-1.0e10f, -1.0e10f, -1.0e10f, 0.0f);
+		dVector p0 (D_CUSTOM_LARGE_VALUE, D_CUSTOM_LARGE_VALUE, D_CUSTOM_LARGE_VALUE, 0.0f);
+		dVector p1 (-D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, 0.0f);
 		
 		for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();

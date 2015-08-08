@@ -286,18 +286,35 @@ dgFloat32 dgCollisionChamferCylinder::RayCast(const dgVector& q0, const dgVector
 		return dgCollisionConvex::RayCast(q0, q1, maxT, contactOut, NULL, NULL, NULL);
 	}
 
-	dgFloat32 t = -q0.m_x / (q1.m_x - q0.m_x);
-	dgVector p0(q0 + (q1 - q0).Scale4(t));
+	dgVector q1q0 (q1 - q0);
+	dgFloat32 t = -q0.m_x / q1q0.m_x;
+	dgVector p0(q0 + q1q0.Scale4(t));
 	if ((p0 % p0) < (m_radius + m_height)) {
 		dgVector origin0(p0.CompProduct4(p0.InvMagSqrt()).Scale4(m_radius));
+		dgVector origin1(origin0.CompProduct4(dgVector::m_negOne));
 		dgFloat32 t0 = dgRayCastSphere(q0, q1, origin0, m_height);
+		dgFloat32 t1 = dgRayCastSphere(q0, q1, origin1, m_height);
+		if(t1 < t0) {
+			t0 = t1;
+			origin0 = origin1;
+		}
+
 		if ((t0 >= 0.0f) && (t0 <= 1.0f)) {
 			contactOut.m_normal = q0 + dq.Scale4(t0) - origin0;
 			dgAssert(contactOut.m_normal.m_w == dgFloat32(0.0f));
-			//contactOut.m_normal = contactOut.m_normal.Scale3 (dgRsqrt (contactOut.m_normal % contactOut.m_normal));
 			contactOut.m_normal = contactOut.m_normal.CompProduct4(contactOut.m_normal.DotProduct4(contactOut.m_normal).InvSqrt());
-			//contactOut.m_userId = SetUserDataID();
 			return t0;
+		} else {
+			q1q0.m_x = dgFloat32(0.0f);
+			q1q0 = q1q0.CompProduct4(q1q0.InvMagSqrt());
+			origin0 = q1q0.Scale4(-m_radius);
+			t0 = dgRayCastSphere(q0, q1, origin0, m_height);
+			if ((t0 >= 0.0f) && (t0 <= 1.0f)) {
+				contactOut.m_normal = q0 + dq.Scale4(t0) - origin0;
+				dgAssert(contactOut.m_normal.m_w == dgFloat32(0.0f));
+				contactOut.m_normal = contactOut.m_normal.CompProduct4(contactOut.m_normal.DotProduct4(contactOut.m_normal).InvSqrt());
+				return t0;
+			}
 		}
 	}
 

@@ -328,12 +328,18 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	CustomUniversal* const joint1 = new CustomUniversal(matrix, box1, box0);
-	joint1->EnableLimit_0(false);
+	joint1->EnableLimit_0(true);
+	joint1->SetLimis_0 (-5.0f * 3.141592f, 2.0f * 3.141592f);
+	joint1->EnableLimit_1(true);
+	joint1->SetLimis_1 (-3.0f * 3.141592f, 4.0f * 3.141592f);
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	CustomUniversal* const joint2 = new CustomUniversal(matrix, box2, box0);
-	joint2->EnableLimit_0(false);
+	joint2->EnableLimit_0(true);
+	joint2->SetLimis_0 (-3.0f * 3.141592f, 5.0f * 3.141592f);
+	joint2->EnableLimit_1(true);
+	joint2->SetLimis_1(-4.0f * 3.141592f, 2.0f * 3.141592f);
 
 
 #ifdef _USE_HARD_JOINTS
@@ -517,7 +523,7 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 
 	// enable limit of first axis
 	slider->EnableAngularLimits(true);
-	slider->SetAngularLimis (-60.0f * 3.1416f / 180.0f, 60.0f * 3.1416f / 180.0f);
+	slider->SetAngularLimis (-7.0f * 3.1416f, 5.0f * 3.1416f);
 
 #ifdef _USE_HARD_JOINTS
 	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), NULL, NULL);
@@ -548,9 +554,11 @@ static void AddCylindrical (DemoEntityManager* const scene, const dVector& origi
 
     // enable limit of first axis
     cylinder->EnableLinearLimits(true);
-
-    // set limit on second axis
     cylinder->SetLinearLimis (-4.0f, 4.0f);
+
+	// set angular limit on second axis
+	cylinder->EnableAngularLimits(true);
+	cylinder->SetAngularLimis(-4.0f * 3.1416f, 6.0f * 3.1416f);
 
 #ifdef _USE_HARD_JOINTS
 	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), box0, NULL);
@@ -966,9 +974,8 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
-	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
+//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));

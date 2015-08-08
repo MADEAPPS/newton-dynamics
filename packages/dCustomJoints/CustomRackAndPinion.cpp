@@ -126,30 +126,30 @@ void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 
 void CustomRackAndPinion::GetInfo (NewtonJointRecord* const info) const
 {
-	strcpy (info->m_descriptionType, "wormGear");
+	strcpy (info->m_descriptionType, GetTypeName());
 
 	info->m_extraParameters[0] = m_gearRatio;
 
 	info->m_attachBody_0 = m_body0;
 	info->m_attachBody_1 = m_body1;
 
-	info->m_minLinearDof[0] = -FLT_MAX;
-	info->m_maxLinearDof[0] = FLT_MAX;
+	info->m_minLinearDof[0] = -D_CUSTOM_LARGE_VALUE;
+	info->m_maxLinearDof[0] = D_CUSTOM_LARGE_VALUE;
 
-	info->m_minLinearDof[1] = -FLT_MAX;
-	info->m_maxLinearDof[1] = FLT_MAX;
+	info->m_minLinearDof[1] = -D_CUSTOM_LARGE_VALUE;
+	info->m_maxLinearDof[1] = D_CUSTOM_LARGE_VALUE;
 
-	info->m_minLinearDof[2] = -FLT_MAX;
-	info->m_maxLinearDof[2] = FLT_MAX;
+	info->m_minLinearDof[2] = -D_CUSTOM_LARGE_VALUE;
+	info->m_maxLinearDof[2] = D_CUSTOM_LARGE_VALUE;
 
-	info->m_minAngularDof[0] = -FLT_MAX;
-	info->m_maxAngularDof[0] =  FLT_MAX;
+	info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE;
+	info->m_maxAngularDof[0] =  D_CUSTOM_LARGE_VALUE;
 
-	info->m_minAngularDof[1] = -FLT_MAX;;
-	info->m_maxAngularDof[1] =  FLT_MAX;
+	info->m_minAngularDof[1] = -D_CUSTOM_LARGE_VALUE;;
+	info->m_maxAngularDof[1] =  D_CUSTOM_LARGE_VALUE;
 
-	info->m_minAngularDof[2] = -FLT_MAX;;
-	info->m_maxAngularDof[2] =  FLT_MAX;
+	info->m_minAngularDof[2] = -D_CUSTOM_LARGE_VALUE;;
+	info->m_maxAngularDof[2] =  D_CUSTOM_LARGE_VALUE;
 
 	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
 	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));

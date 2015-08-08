@@ -171,7 +171,7 @@ void CustomBallAndSocket::Serialize (NewtonSerializeCallback callback, void* con
 
 void CustomBallAndSocket::GetInfo (NewtonJointRecord* const info) const
 {
-	strcpy (info->m_descriptionType, "ballsocket");
+	strcpy (info->m_descriptionType, GetTypeName());
 
 	info->m_attachBody_0 = m_body0;
 	info->m_attachBody_1 = m_body1;
@@ -185,12 +185,12 @@ void CustomBallAndSocket::GetInfo (NewtonJointRecord* const info) const
 	info->m_minLinearDof[2] = 0.0f;
 	info->m_maxLinearDof[2] = 0.0f;
 
-	info->m_minAngularDof[0] = -FLT_MAX ;
-	info->m_maxAngularDof[0] =  FLT_MAX ;
-	info->m_minAngularDof[1] = -FLT_MAX ;
-	info->m_maxAngularDof[1] =  FLT_MAX ;
-	info->m_minAngularDof[2] = -FLT_MAX ;
-	info->m_maxAngularDof[2] =  FLT_MAX ;
+	info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE ;
+	info->m_maxAngularDof[0] =  D_CUSTOM_LARGE_VALUE ;
+	info->m_minAngularDof[1] = -D_CUSTOM_LARGE_VALUE ;
+	info->m_maxAngularDof[1] =  D_CUSTOM_LARGE_VALUE ;
+	info->m_minAngularDof[2] = -D_CUSTOM_LARGE_VALUE ;
+	info->m_maxAngularDof[2] =  D_CUSTOM_LARGE_VALUE ;
 	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
 	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
 }
@@ -306,7 +306,7 @@ void CustomLimitBallAndSocket::GetInfo (NewtonJointRecord* const info) const
 	info->m_minAngularDof[2] = -m_coneAngle; 
 	info->m_maxAngularDof[2] =  m_coneAngle;
 
-	strcpy (info->m_descriptionType, "limitballsocket");
+	strcpy (info->m_descriptionType, GetTypeName());
 }
 
 void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
@@ -329,6 +329,8 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 
 	// handle special case of the joint being a hinge
 	if (m_coneAngleCos > 0.9999f) {
+		dAssert (0);
+/*
 		dFloat cosAngle;
 		dFloat sinAngle;
 
@@ -354,7 +356,10 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 			}
 		}
+*/		
 	} else {
+dAssert (0);
+/*
 		const dVector& coneDir0 = matrix0.m_front;
 		const dVector& coneDir1 = matrix1.m_front;
 		dFloat cosAngle = coneDir0 % coneDir1;
@@ -392,6 +397,7 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 			}
 		}
+*/	
 	}
 }
 
@@ -433,7 +439,7 @@ void CustomControlledBallAndSocket::GetInfo (NewtonJointRecord* const info) cons
 //	info->m_minAngularDof[2] = -m_coneAngle; 
 //	info->m_maxAngularDof[2] =  m_coneAngle;
 
-	strcpy (info->m_descriptionType, "controlledballsocket");
+	strcpy (info->m_descriptionType, GetTypeName());
 }
 
 
@@ -564,9 +570,9 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 
 	dVector axis (matrix1.m_front * matrix1.m_front);
 	dVector axis1 (matrix1.m_front * matrix1.m_front);
-dFloat sinAngle;
-dFloat cosAngle;
-CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
+//dFloat sinAngle;
+//dFloat cosAngle;
+//CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);
 //float xxxx = dAtan2(sinAngle, cosAngle);
 //float xxxx1 = dAtan2(sinAngle, cosAngle);
 

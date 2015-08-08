@@ -67,7 +67,7 @@ CustomUniversal::~CustomUniversal()
 
 void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
 {
-	strcpy (info->m_descriptionType, "universal");
+	strcpy (info->m_descriptionType, GetTypeName());
 
 	info->m_attachBody_0 = m_body0;
 	info->m_attachBody_1 = m_body1;
@@ -99,8 +99,8 @@ void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
 		info->m_minAngularDof[0] = (m_minAngle_0 - angle) * 180.0f / 3.141592f ;
 		info->m_maxAngularDof[0] = (m_maxAngle_0 - angle) * 180.0f / 3.141592f ;
 	} else {
-		info->m_minAngularDof[0] = -FLT_MAX ;
-		info->m_maxAngularDof[0] =  FLT_MAX ;
+		info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE ;
+		info->m_maxAngularDof[0] =  D_CUSTOM_LARGE_VALUE ;
 	}
 
 	//	 info->m_minAngularDof[1] = m_minAngle_1 * 180.0f / 3.141592f;
@@ -118,8 +118,8 @@ void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
 		info->m_minAngularDof[1] = (m_minAngle_1 - angle) * 180.0f / 3.141592f ;
 		info->m_maxAngularDof[1] = (m_maxAngle_1 - angle) * 180.0f / 3.141592f ;
 	} else {
-		info->m_minAngularDof[1] = -FLT_MAX ;
-		info->m_maxAngularDof[1] =  FLT_MAX ;
+		info->m_minAngularDof[1] = -D_CUSTOM_LARGE_VALUE ;
+		info->m_maxAngularDof[1] =  D_CUSTOM_LARGE_VALUE ;
 	}
 
 	info->m_minAngularDof[2] = 0.0f;
@@ -220,29 +220,28 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
 
 
-	// get the pin fixed to the first body
-	const dVector& dir0 = matrix0.m_front;
-	// get the pin fixed to the second body
-	const dVector& dir1 = matrix1.m_up;
-
 	// construct an orthogonal coordinate system with these two vectors
-	dVector dir2 (dir0 * dir1);
-	dir2 = dir2.Scale (1.0f / dSqrt (dir2 % dir2));
-	dVector dir3 (dir1 * dir2);
-
-	dFloat sinAngle = ((dir3 * dir0) % dir2);
-	dFloat cosAngle = dir3 % dir0;
-	NewtonUserJointAddAngularRow (m_joint, -dAtan2 (sinAngle, cosAngle), &dir2[0]);
+	dMatrix matrix1_1;
+	matrix1_1.m_up = matrix1.m_up;
+	matrix1_1.m_right = matrix0.m_front * matrix1.m_up;
+	matrix1_1.m_right = matrix1_1.m_right.Scale (1.0f / dSqrt (matrix1_1.m_right % matrix1_1.m_right));
+	matrix1_1.m_front = matrix1_1.m_up * matrix1_1.m_right;
+	NewtonUserJointAddAngularRow (m_joint, CalculateAngle (matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right), &matrix1_1.m_right[0]);
 
 	dFloat sinAngle_0;
 	dFloat cosAngle_0;
-	CalculatePitchAngle (matrix0, matrix1, sinAngle_0, cosAngle_0);
-	dFloat angle0 = -m_curJointAngle_0.Update (cosAngle_0, sinAngle_0);
+	CalculateAngle (matrix0.m_up, matrix1_1.m_up, matrix1_1.m_front, sinAngle_0, cosAngle_0);
+	dFloat angle0 = m_curJointAngle_0.Update (cosAngle_0, sinAngle_0);
 
 	dFloat sinAngle_1;
 	dFloat cosAngle_1;
-	CalculateYawAngle (matrix0, matrix1, sinAngle_1, cosAngle_1);
-	dFloat angle1 = -m_curJointAngle_1.Update (cosAngle_1, sinAngle_1);
+	CalculateAngle(matrix1_1.m_front, matrix1.m_front, matrix1_1.m_up, sinAngle_1, cosAngle_1);
+	dFloat angle1 = m_curJointAngle_1.Update (cosAngle_1, sinAngle_1);
+
+//dFloat sinAngle;
+//dFloat cosAngle;
+//CalculateAngle(matrix1_1.m_front, matrix1.m_front, matrix1_1.m_up, sinAngle, cosAngle);
+//dTrace(("%f %f %f %f\n", sinAngle, cosAngle, sinAngle_1, cosAngle_1));
 
 	dVector omega0 (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector omega1 (0.0f, 0.0f, 0.0f, 0.0f);

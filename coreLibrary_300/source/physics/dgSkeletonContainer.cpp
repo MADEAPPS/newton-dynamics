@@ -613,8 +613,8 @@ dgFloat32 dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfo
 	dgFloat32 retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
 	dgFloat32 jointAccel = retAccel;
 	for (int i = 0; (i < 4) && (jointAccel > dgFloat32 (1.0e-2f)); i ++) {
-	SolveFoward ();
-	SolveBackward ();
+		SolveFoward ();
+		SolveBackward ();
 		UpdateForces(jointInfoArray, internalForces, matrixRow);
 //jointAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
 //if (jointAccel > 1.0){

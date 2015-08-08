@@ -35,7 +35,7 @@ CustomUserBlank::~CustomUserBlank()
 
 void CustomUserBlank::GetInfo (NewtonJointRecord* const info) const
 {
-   strcpy (info->m_descriptionType, "customuser");
+   strcpy (info->m_descriptionType, GetTypeName());
 
    info->m_attachBody_0 = m_body0;
    info->m_attachBody_1 = m_body1;
@@ -49,12 +49,12 @@ void CustomUserBlank::GetInfo (NewtonJointRecord* const info) const
    info->m_minLinearDof[2] = 0.0f;
    info->m_maxLinearDof[2] = 0.0f;
 
-   info->m_minAngularDof[0] = -FLT_MAX ;
-   info->m_maxAngularDof[0] =  FLT_MAX ;
-   info->m_minAngularDof[1] = -FLT_MAX ;
-   info->m_maxAngularDof[1] =  FLT_MAX ;
-   info->m_minAngularDof[2] = -FLT_MAX ;
-   info->m_maxAngularDof[2] =  FLT_MAX ;
+   info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE ;
+   info->m_maxAngularDof[0] =  D_CUSTOM_LARGE_VALUE ;
+   info->m_minAngularDof[1] = -D_CUSTOM_LARGE_VALUE ;
+   info->m_maxAngularDof[1] =  D_CUSTOM_LARGE_VALUE ;
+   info->m_minAngularDof[2] = -D_CUSTOM_LARGE_VALUE ;
+   info->m_maxAngularDof[2] =  D_CUSTOM_LARGE_VALUE ;
 }
 
 

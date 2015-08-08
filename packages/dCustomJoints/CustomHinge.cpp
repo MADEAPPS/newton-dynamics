@@ -131,7 +131,7 @@ dFloat CustomHinge::GetFriction () const
 
 void CustomHinge::GetInfo (NewtonJointRecord* const info) const
 {
-	strcpy (info->m_descriptionType, "hinge");
+	strcpy (info->m_descriptionType, GetTypeName());
 
 	info->m_attachBody_0 = m_body0;
 	info->m_attachBody_1 = m_body1;
@@ -147,19 +147,16 @@ void CustomHinge::GetInfo (NewtonJointRecord* const info) const
 
 	// the joint angle can be determine by getting the angle between any two non parallel vectors
 	if (m_limitsOn) {
-		dFloat sinAngle;
-		dFloat cosAngle;
 		dMatrix matrix0;
 		dMatrix matrix1;
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix (matrix0, matrix1);
-		CalculatePitchAngle(matrix0, matrix1, sinAngle, cosAngle);
-		dFloat angle = dAtan2 (sinAngle, cosAngle);
+		dFloat angle = m_curJointAngle.GetAngle();
 		info->m_minAngularDof[0] = (m_minAngle - angle) * 180.0f / 3.141592f ;
 		info->m_maxAngularDof[0] = (m_maxAngle - angle) * 180.0f / 3.141592f ;
 	} else {
-		info->m_minAngularDof[0] = -FLT_MAX ;
-		info->m_maxAngularDof[0] = FLT_MAX ;
+		info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE ;
+		info->m_maxAngularDof[0] = D_CUSTOM_LARGE_VALUE ;
 	}
 
 	info->m_minAngularDof[1] = 0.0f;
@@ -189,14 +186,11 @@ void CustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
 
 	// two rows to restrict rotation around around the parent coordinate system
-	CalculateYawAngle(matrix0, matrix1, sinAngle, cosAngle);
-	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_up[0]);
-
-	CalculateRollAngle(matrix0, matrix1, sinAngle, cosAngle);
-	NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_right[0]);
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	CalculatePitchAngle(matrix0, matrix1, sinAngle, cosAngle);
+	CalculateAngle (matrix1.m_up, matrix0.m_up, matrix1.m_front, sinAngle, cosAngle);
 	m_curJointAngle.Update(cosAngle, sinAngle);
 
 	// save the current joint Omega
@@ -273,7 +267,7 @@ void CustomHinge::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matri
 		// only limit are on 
 		// the joint angle can be determine by getting the angle between any two non parallel vectors
 		if ((m_minAngle > -1.e-4f) && (m_maxAngle < 1.e-4f)) {
-			NewtonUserJointAddAngularRow(m_joint, angle, &matrix1.m_front[0]);
+			NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1.m_front[0]);
 			NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 			m_lastRowWasUsed = true;
 

@@ -107,7 +107,7 @@ void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-	strcpy (info->m_descriptionType, "generic6dof");
+	strcpy (info->m_descriptionType, GetTypeName());
 
 	info->m_attachBody_0 = m_body0;
 	info->m_attachBody_1 = m_body1;

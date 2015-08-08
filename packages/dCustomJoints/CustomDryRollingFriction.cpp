@@ -82,28 +82,28 @@ void CustomDryRollingFriction::SubmitConstraints (dFloat timestep, int threadInd
 
 void CustomDryRollingFriction::GetInfo (NewtonJointRecord* const info) const
 {
-	strcpy (info->m_descriptionType, "dryRollingFriction");
+	strcpy (info->m_descriptionType, GetTypeName());
 
 	info->m_attachBody_0 = m_body0;
 	info->m_attachBody_1 = m_body1;
 
-	info->m_minLinearDof[0] = -1.0e10f;
-	info->m_maxLinearDof[0] = 1.0e10f;
+	info->m_minLinearDof[0] = -D_CUSTOM_LARGE_VALUE;
+	info->m_maxLinearDof[0] = D_CUSTOM_LARGE_VALUE;
 
-	info->m_minLinearDof[1] = -1.0e10f;
-	info->m_maxLinearDof[1] = 1.0e10f;
+	info->m_minLinearDof[1] = -D_CUSTOM_LARGE_VALUE;
+	info->m_maxLinearDof[1] = D_CUSTOM_LARGE_VALUE;
 
-	info->m_minLinearDof[2] = -1.0e10f;
-	info->m_maxLinearDof[2] = 1.0e10f;
+	info->m_minLinearDof[2] = -D_CUSTOM_LARGE_VALUE;
+	info->m_maxLinearDof[2] = D_CUSTOM_LARGE_VALUE;
 
-	info->m_minAngularDof[0] = -1.0e10f;
-	info->m_maxAngularDof[0] =  1.0e10f;
+	info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE;
+	info->m_maxAngularDof[0] =  D_CUSTOM_LARGE_VALUE;
 
-	info->m_minAngularDof[1] = -1.0e10f;;
-	info->m_maxAngularDof[1] =  1.0e10f;
+	info->m_minAngularDof[1] = -D_CUSTOM_LARGE_VALUE;;
+	info->m_maxAngularDof[1] =  D_CUSTOM_LARGE_VALUE;
 
-	info->m_minAngularDof[2] = -1.0e10f;;
-	info->m_maxAngularDof[2] =  1.0e10f;
+	info->m_minAngularDof[2] = -D_CUSTOM_LARGE_VALUE;;
+	info->m_maxAngularDof[2] =  D_CUSTOM_LARGE_VALUE;
 
 	dMatrix matrix (dGetIdentityMatrix());
 	memcpy (info->m_attachmenMatrix_0, &matrix[0][0], sizeof (dMatrix));
