@@ -61,9 +61,11 @@ dgCollisionHeightField::dgCollisionHeightField(
 	,m_width(width)
 	,m_height(height)
 	,m_diagonalMode (dgCollisionHeightFieldGridConstruction  (dgClamp (contructionMode, dgInt32 (m_normalDiagonals), dgInt32 (m_starInvertexDiagonals))))
+	,m_horizontalDisplacement(NULL)
 	,m_verticalScale(verticalScale)
 	,m_horizontalScale(horizontalScale)
 	,m_horizontalScaleInv (dgFloat32 (1.0f) / m_horizontalScale)
+	,m_horizontalDisplacementScale(dgFloat32 (1.0f))
 	,m_userRayCastCallback(NULL)
 	,m_elevationDataType(elevationDataType)
 {
@@ -259,6 +261,7 @@ dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserial
 	deserialization (userData, &elevationDataType, sizeof (dgInt32));
 	deserialization (userData, &m_verticalScale, sizeof (dgFloat32));
 	deserialization (userData, &m_horizontalScale, sizeof (dgFloat32));
+	deserialization (userData, &m_horizontalDisplacementScale, sizeof (dgFloat32));
 	deserialization (userData, &m_minBox.m_x, sizeof (dgVector)); 
 	deserialization (userData, &m_maxBox.m_x, sizeof (dgVector)); 
 
@@ -284,9 +287,15 @@ dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserial
 			break;
 		}
 	}
-	
 	deserialization (userData, m_atributeMap, attibutePaddedMapSize * sizeof (dgInt8));
 	deserialization (userData, m_diagonals, attibutePaddedMapSize * sizeof (dgInt8));
+
+	dgInt32 hasDisplacement = m_horizontalDisplacement ? 1 : 0;
+	deserialization (userData, &hasDisplacement, sizeof (hasDisplacement));
+	if (hasDisplacement) {
+		m_horizontalDisplacement = (dgUnsigned16*) dgMallocStack(m_width * m_height * sizeof (dgUnsigned16));
+		deserialization (userData, m_horizontalDisplacement, m_width * m_height * sizeof (dgUnsigned16));
+	}
 
 	m_horizontalScaleInv = dgFloat32 (1.0f) / m_horizontalScale;
 	dgTree<void*, unsigned>::dgTreeNode* nodeData = world->m_perInstanceData.Find(DG_HIGHTFILD_DATA_ID);
@@ -322,6 +331,10 @@ dgCollisionHeightField::~dgCollisionHeightField(void)
 	dgFreeStack(m_elevationMap);
 	dgFreeStack(m_atributeMap);
 	dgFreeStack(m_diagonals);
+
+	if (m_horizontalDisplacement) {
+		dgFreeStack(m_horizontalDisplacement);
+	}
 }
 
 void dgCollisionHeightField::Serialize(dgSerialize callback, void* const userData) const
@@ -336,6 +349,7 @@ void dgCollisionHeightField::Serialize(dgSerialize callback, void* const userDat
 	callback (userData, &elevationDataType, sizeof (dgInt32));
 	callback (userData, &m_verticalScale, sizeof (dgFloat32));
 	callback (userData, &m_horizontalScale, sizeof (dgFloat32));
+	callback (userData, &m_horizontalDisplacementScale, sizeof (dgFloat32));
 	callback (userData, &m_minBox.m_x, sizeof (dgVector)); 
 	callback (userData, &m_maxBox.m_x, sizeof (dgVector)); 
 
@@ -356,11 +370,31 @@ void dgCollisionHeightField::Serialize(dgSerialize callback, void* const userDat
 	dgInt32 attibutePaddedMapSize = (m_width * m_height + 4) & -4; 
 	callback (userData, m_atributeMap, attibutePaddedMapSize * sizeof (dgInt8));
 	callback (userData, m_diagonals, attibutePaddedMapSize * sizeof (dgInt8));
+	
+	dgInt32 hasDisplacement = m_horizontalDisplacement ? 1 : 0;
+	callback (userData, &hasDisplacement, sizeof (hasDisplacement));
+	if (hasDisplacement) {
+		callback (userData, m_horizontalDisplacement, m_width * m_height * sizeof (dgUnsigned16));
+	}
 }
 
 void dgCollisionHeightField::SetCollisionRayCastCallback (dgCollisionHeightFieldRayCastCallback rayCastCallback)
 {
 	m_userRayCastCallback = rayCastCallback;
+}
+
+void dgCollisionHeightField::SetHorizontalDisplacement (const dgUnsigned16* const displacemnet, dgFloat32 scale)
+{
+	if (m_horizontalDisplacement) {
+		dgFreeStack(m_horizontalDisplacement);
+		m_horizontalDisplacement = NULL;
+	}
+
+	m_horizontalDisplacementScale = scale;
+	if (displacemnet) {
+		m_horizontalDisplacement = (dgUnsigned16*)dgMallocStack(m_width * m_height * sizeof (dgUnsigned16));
+		memcpy (m_horizontalDisplacement, displacemnet, m_width * m_height * sizeof (dgUnsigned16));
+	}
 }
 
 void dgCollisionHeightField::AllocateVertex(dgWorld* const world, dgInt32 threadIndex) const
@@ -416,13 +450,13 @@ void dgCollisionHeightField::GetCollisionInfo(dgCollisionInfo* const info) const
 	data.m_height = m_height;
 	data.m_gridsDiagonals = m_diagonalMode;
 	data.m_elevationDataType = m_elevationDataType;
+	data.m_horizotalDisplacement = m_horizontalDisplacement;
 	data.m_verticalScale = m_verticalScale;
 	data.m_horizonalScale = m_horizontalScale;
+	data.m_horizonalDisplacementScale = m_horizontalScale;
 	data.m_atributes = m_atributeMap;
 	data.m_elevation = m_elevationMap;
 }
-
-
 
 
 
@@ -486,7 +520,6 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 
 		dgVector e30 (points[0] - points[1]);
 		normal = e30 * e10;
-		//normal = normal.Scale3 (dgRsqrt (normal % normal));
 		normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
 		t = ray.PolygonIntersect (normal, maxT, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < maxT){
@@ -702,6 +735,19 @@ void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, dgCollision
 				break;
 			}
 		}
+
+		if (m_horizontalDisplacement) {
+			dgUnsigned16 val = m_horizontalDisplacement[base];
+			dgInt8 hor_x = val & 0xff;
+			dgInt8 hor_z = (val >> 8);
+			points[0 * 2 + 0] += dgVector(hor_x * m_horizontalDisplacementScale, dgFloat32(0.0f), hor_z * m_horizontalDisplacementScale, dgFloat32(0.0f));
+
+			val = m_horizontalDisplacement[base + m_width];
+			hor_x = val & 0xff;
+			hor_z = (val >> 8);
+			points[1 * 2 + 0] += dgVector(hor_x * m_horizontalDisplacementScale, dgFloat32(0.0f), hor_z * m_horizontalDisplacementScale, dgFloat32(0.0f));
+		}
+
 		points[0 * 2 + 0] = matrix.TransformVector(points[0 * 2 + 0]);
 		points[1 * 2 + 0] = matrix.TransformVector(points[1 * 2 + 0]);
 
@@ -726,9 +772,21 @@ void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, dgCollision
 					break;
 				}
 			}
+
+			if (m_horizontalDisplacement) {
+				dgUnsigned16 val = m_horizontalDisplacement[base + x + 1];
+				dgInt8 hor_x = val & 0xff;
+				dgInt8 hor_z = (val >> 8);
+				points[0 * 2 + 1] += dgVector(hor_x * m_horizontalDisplacementScale, dgFloat32(0.0f), hor_z * m_horizontalDisplacementScale, dgFloat32(0.0f));
+
+				val = m_horizontalDisplacement[base + m_width + x + 1];
+				hor_x = val & 0xff;
+				hor_z = (val >> 8);
+				points[1 * 2 + 1] += dgVector(hor_x * m_horizontalDisplacementScale, dgFloat32(0.0f), hor_z * m_horizontalDisplacementScale, dgFloat32(0.0f));
+			}
+
 			points[0 * 2 + 1] = matrix.TransformVector(points[0 * 2 + 1]);
 			points[1 * 2 + 1] = matrix.TransformVector(points[1 * 2 + 1]);
-
 
 			const dgInt32* const indirectIndex = &m_cellIndices[dgInt32 (m_diagonals[z * m_width + x])][0];
 
@@ -836,6 +894,23 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& q0, const dgVector& q
 }
 
 
+void dgCollisionHeightField::AddDisplacement (dgVector* const vertex, dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1) const
+{
+	const dgUnsigned16* const displacement = m_horizontalDisplacement;
+	dgInt32 vertexIndex = 0;
+	dgInt32 base = z0 * m_width;
+	for (dgInt32 z = z0; z <= z1; z++) {
+		for (dgInt32 x = x0; x <= x1; x++) {
+			dgUnsigned16 val = displacement[base + x];
+			dgInt8 hor_x = val & 0xff; 
+			dgInt8 hor_z = (val >> 8); 
+			vertex[vertexIndex] += dgVector(hor_x * m_horizontalDisplacementScale, dgFloat32 (0.0f), hor_z * m_horizontalDisplacementScale, dgFloat32(0.0f));
+			vertexIndex++;
+		}
+		base += m_width;
+	}
+}
+
 void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 {
 	dgVector boxP0;
@@ -934,6 +1009,9 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 					}
 					base += m_width;
 				}
+				if (m_horizontalDisplacement) {
+					AddDisplacement (vertex, x0, x1, z0, z1);
+				}
 				break;
 			}
 
@@ -948,6 +1026,9 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 						dgAssert (vertexIndex <= m_instanceData->m_vertexCount[data->m_threadNumber]); 
 					}
 					base += m_width;
+				}
+				if (m_horizontalDisplacement) {
+					AddDisplacement(vertex, x0, x1, z0, z1);
 				}
 				break;
 			}

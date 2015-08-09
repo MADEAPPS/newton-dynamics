@@ -351,9 +351,19 @@ freq *= 0.5f;
 		// release the collision tree (this way the application does not have to do book keeping of Newton objects
 		NewtonDestroyCollision (collision);
 
-		// in newton 300 collision are instance, you need to ready it after you create a body, if you wnat to male call on teh instance
+		// in newton 300 collision are instance, you need to ready it after you create a body, if you want to male call on the instance
 		collision = NewtonBodyGetCollision(terrainBody);
 
+
+#if 0
+		// uncomment this to test horizontal displacement
+		unsigned short* const horizontalDisplacemnet = new unsigned short[size * size];
+		for (int i = 0; i < size * size; i++) {
+			horizontalDisplacemnet[i] = dRand();
+		}
+		NewtonHeightFieldSetHorizontalDisplacement(collision, horizontalDisplacemnet, 0.02f);
+		delete horizontalDisplacemnet;
+#endif
 
 		// save the pointer to the graphic object with the body.
 		NewtonBodySetUserData (terrainBody, entity);

@@ -17,6 +17,7 @@
 #define __HeightFieldPrimitive_H__
 
 #define HEIGHTFIELD_DEFAULT_SIZE		7
+//#define HEIGHTFIELD_DEFAULT_SIZE		6
 #define HEIGHTFIELD_DEFAULT_CELLSIZE	8.0f
 
 class DemoEntityManager;

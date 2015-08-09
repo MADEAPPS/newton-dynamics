@@ -166,7 +166,9 @@ class dgCollisionInfo
 		dgInt32 m_elevationDataType;		// 0 = 32 bit floats, 1 = unsigned 16 bit intergers
 		dgFloat32 m_horizonalScale;
 		dgFloat32 m_verticalScale;
+		dgFloat32 m_horizonalDisplacementScale;
 		void* m_elevation;
+		dgUnsigned16* m_horizotalDisplacement;
 		dgInt8* m_atributes;
 		
 	};

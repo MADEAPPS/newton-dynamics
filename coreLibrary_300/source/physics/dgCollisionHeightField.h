@@ -60,6 +60,7 @@ class dgCollisionHeightField: public dgCollisionMesh
 	void SetCollisionRayCastCallback (dgCollisionHeightFieldRayCastCallback rayCastCallback);
 	dgCollisionHeightFieldRayCastCallback GetDebugRayCastCallback() const { return m_userRayCastCallback;} 
 
+	void SetHorizontalDisplacement (const dgUnsigned16* const displacemnet, dgFloat32 scale);
 
 	private:
 	class dgPerIntanceData
@@ -87,6 +88,8 @@ class dgCollisionHeightField: public dgCollisionMesh
 	virtual void DebugCollision (const dgMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	void GetVertexListIndexList (const dgVector& p0, const dgVector& p1, dgMeshVertexListIndexList &data) const;
 	void GetLocalAABB (const dgVector& p0, const dgVector& p1, dgVector& boxP0, dgVector& boxP1) const;
+	
+	void AddDisplacement (dgVector* const vertex, dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1) const;
 
 	dgVector m_minBox;
 	dgVector m_maxBox;
@@ -97,9 +100,11 @@ class dgCollisionHeightField: public dgCollisionMesh
 	dgInt8* m_atributeMap;
 	dgInt8* m_diagonals;
 	void* m_elevationMap;
+	dgUnsigned16* m_horizontalDisplacement;
 	dgFloat32 m_verticalScale;
 	dgFloat32 m_horizontalScale;
 	dgFloat32 m_horizontalScaleInv;
+	dgFloat32 m_horizontalDisplacementScale;
 	dgCollisionHeightFieldRayCastCallback m_userRayCastCallback;
 	dgElevationType m_elevationDataType;
 
@@ -142,6 +147,11 @@ DG_INLINE void dgCollisionHeightField::CalculateMinExtend3d (const dgVector& p0,
 
 	boxP0 = (q0.Scale4(m_horizontalScaleInv).Floor().Scale4(m_horizontalScale) & m_yMask) + q0.AndNot(m_yMask);
 	boxP1 = ((q1.Scale4(m_horizontalScaleInv).Floor().Scale4(m_horizontalScale) + dgVector(m_horizontalScale)) & m_yMask) + q1.AndNot(m_yMask);
+
+	if (m_horizontalDisplacement) {
+		boxP0 -= dgVector (m_horizontalScale, dgFloat32 (0.0f), m_horizontalScale, dgFloat32 (0.0f)); 
+		boxP1 += dgVector (m_horizontalScale, dgFloat32 (0.0f), m_horizontalScale, dgFloat32 (0.0f)); 
+	}
 
 	dgVector minBox ((m_minBox & m_yMask) + boxP0.AndNot(m_yMask));
 	dgVector maxBox ((m_maxBox & m_yMask) + boxP1.AndNot(m_yMask));
