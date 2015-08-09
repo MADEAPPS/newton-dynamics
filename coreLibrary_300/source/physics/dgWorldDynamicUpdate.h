@@ -124,8 +124,9 @@ class dgParallelSolverSyncData
 	dgFloat32 m_invTimestepRK;
 	dgFloat32 m_firstPassCoef;
 
-	dgInt32 m_lock;
 	dgInt32 m_passes;
+	dgInt32 m_bachIndex;
+	dgInt32 m_bachCount;
 	dgInt32 m_maxPasses;
 	dgInt32 m_bodyCount;
 	dgInt32 m_jointCount;
@@ -136,6 +137,7 @@ class dgParallelSolverSyncData
 	dgInt32* m_bodyLocks;  
 	const dgIsland* m_island;
 	dgParallelJointMap* m_jointConflicts;
+	dgInt32 m_jointBatches[32];
 	dgInt32 m_hasJointFeeback[DG_MAX_THREADS_HIVE_COUNT];
 };
 
