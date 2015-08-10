@@ -193,10 +193,6 @@ class CustomJoint: public CustomAlloc
 
 	CUSTOM_JOINTS_API static SerializeMetaDataDictionary& GetDictionary();
 
-	//CUSTOM_JOINTS_API void CalculatePitchAngle (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
-	//CUSTOM_JOINTS_API void CalculateYawAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
-	//CUSTOM_JOINTS_API void CalculateRollAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const;
-
 	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir) const;
 	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const;
 

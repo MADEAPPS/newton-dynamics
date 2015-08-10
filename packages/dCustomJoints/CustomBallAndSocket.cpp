@@ -329,20 +329,11 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 
 	// handle special case of the joint being a hinge
 	if (m_coneAngleCos > 0.9999f) {
-		dAssert (0);
-/*
-		dFloat cosAngle;
-		dFloat sinAngle;
-
-		CalculateYawAngle(matrix0, matrix1, sinAngle, cosAngle);
-		NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_up[0]);
-
-		CalculateRollAngle(matrix0, matrix1, sinAngle, cosAngle);
-		NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &matrix1.m_right[0]);
+		NewtonUserJointAddAngularRow(m_joint, CalculateAngle (matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 
 		// the joint angle can be determined by getting the angle between any two non parallel vectors
-		CalculatePitchAngle(matrix0, matrix1, sinAngle, cosAngle);
-		dFloat pitchAngle = -dAtan2(sinAngle, cosAngle);
+		dFloat pitchAngle = CalculateAngle (matrix0.m_up, matrix1.m_up, matrix1.m_front);
 		if ((m_maxTwistAngle - m_minTwistAngle) < 1.0e-4f) {
 			NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix1.m_front[0]);
 		} else {
@@ -356,10 +347,8 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 			}
 		}
-*/		
+
 	} else {
-dAssert (0);
-/*
 		const dVector& coneDir0 = matrix0.m_front;
 		const dVector& coneDir1 = matrix1.m_front;
 		dFloat cosAngle = coneDir0 % coneDir1;
@@ -381,9 +370,7 @@ dAssert (0);
 		}
 
 		//handle twist angle
-		dFloat sinAngle;
-		CalculatePitchAngle(matrix0, matrix1, sinAngle, cosAngle);
-		dFloat pitchAngle = -dAtan2(sinAngle, cosAngle);
+		dFloat pitchAngle = CalculateAngle (matrix0.m_up, matrix1.m_up, matrix1.m_front);
 		if ((m_maxTwistAngle - m_minTwistAngle) < 1.0e-4f) {
 			NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix1.m_front[0]);
 		} else {
@@ -397,7 +384,6 @@ dAssert (0);
 				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 			}
 		}
-*/	
 	}
 }
 
