@@ -25,7 +25,7 @@
 #define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
 //#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			7.0f
-#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			10.0f
+#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			15.0f
 
 struct ARTICULATED_VEHICLE_DEFINITION
 {
@@ -138,12 +138,14 @@ class ArticulatedEntityModel: public DemoEntity
 			memset (this, 0, sizeof (InputRecord));
 		}
 
-		int m_steerValue;
-		int m_throttleValue;
 		int m_turnValue;
 		int m_tiltValue;
 		int m_liftValue;
 		int m_openValue;
+		int m_wristAxis0;
+		int m_wristAxis1;
+		int m_steerValue;
+		int m_throttleValue;
 	};
 
 	ArticulatedEntityModel (DemoEntityManager* const scene, const char* const name)
@@ -166,6 +168,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_angularActuatorsCount0(0)
 		,m_angularActuatorsCount1(0)
 		,m_liftActuatorsCount(0)
+		,m_universalActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineSpeed(6.0f)
 		,m_maxTurnSpeed(2.0f)
@@ -174,6 +177,8 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_liftPosit(0.0f)
 		,m_openPosit(0.0f)
 		,m_steeringTorque(0.0f)
+		,m_wristAxis0(0.0f)
+		,m_wristAxis1(0.0f)
 		,m_engineLeftTire(NULL)
 		,m_engineRightTire(NULL)
 	{
@@ -267,6 +272,7 @@ class ArticulatedEntityModel: public DemoEntity
 	int m_angularActuatorsCount0;
 	int m_angularActuatorsCount1;
 	int m_liftActuatorsCount;
+	int m_universalActuatorsCount;
 	int m_paletteActuatorsCount;
 	dFloat m_maxEngineSpeed;
 	dFloat m_maxTurnSpeed;
@@ -275,14 +281,17 @@ class ArticulatedEntityModel: public DemoEntity
 	dFloat m_liftPosit;
 	dFloat m_openPosit;
 	dFloat m_steeringTorque;
+	dFloat m_wristAxis0;
+	dFloat m_wristAxis1;
 		
 	NewtonBody* m_fronTires[4];
 	CustomHinge* m_frontTireJoints[4];
 	CustomSliderActuator* m_liftJoints[4];
 	CustomSliderActuator* m_paletteJoints[4];
-	CustomUniversalActuator* m_rearTireJoints[4];
 	CustomHingeActuator* m_angularActuator0[4];
 	CustomHingeActuator* m_angularActuator1[4];
+	CustomUniversalActuator* m_rearTireJoints[4];
+	CustomUniversalActuator* m_universalActuator[4];
 	EngineTire* m_engineLeftTire;
 	EngineTire* m_engineRightTire;
 
@@ -405,6 +414,32 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			}
 			for (int i = 0; i < vehicleModel->m_paletteActuatorsCount; i ++) {
 				vehicleModel->m_paletteJoints[i]->SetTargetPosit(openPosit);
+			}
+		}
+
+		// open Close palette position
+		if (vehicleModel->m_universalActuatorsCount) {
+			dFloat posit0 = vehicleModel->m_wristAxis0;
+			if (vehicleModel->m_inputs.m_wristAxis0 > 0) {
+				posit0 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit0();
+				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetActuatorAngle0();
+			} else if (vehicleModel->m_inputs.m_wristAxis0 < 0) {
+				posit0 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit0();
+				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetActuatorAngle0();
+			}
+
+			dFloat posit1 = vehicleModel->m_wristAxis1;
+			if (vehicleModel->m_inputs.m_wristAxis1 > 0) {
+				posit1 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit1();
+				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetActuatorAngle1();
+			} else if (vehicleModel->m_inputs.m_wristAxis1 < 0) {
+				posit1 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit1();
+				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetActuatorAngle1();
+			}
+
+			for (int i = 0; i < vehicleModel->m_universalActuatorsCount; i ++) {
+				vehicleModel->m_universalActuator[i]->SetTargetAngle0(posit0);
+				vehicleModel->m_universalActuator[i]->SetTargetAngle1(posit1);
 			}
 		}
 	}
@@ -1107,8 +1142,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		DemoEntity* const pivot = chassis->Find("rightTire_0");
 		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
 	}
-
-
+	
 
 	CustomArticulatedTransformController::dSkeletonBone* AddCraneBoom(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone, const char* name)
 	{
@@ -1139,6 +1173,67 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 
 
+	void AddCranekPaletteActuator(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone, const char* const name)
+	{
+
+		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
+
+		DemoEntity* const palette = vehicleModel->Find(name);
+
+		ARTICULATED_VEHICLE_DEFINITION definition;
+		strcpy(definition.m_boneName, name);
+		strcpy(definition.m_shapeTypeName, "convexHull");
+		definition.m_mass = 10.0f;
+		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		strcpy(definition.m_articulationName, name);
+		NewtonBody* const paletteBody = CreateBodyPart(palette, definition);
+
+		dMatrix matrix;
+		NewtonBodyGetMatrix(paletteBody, &matrix[0][0]);
+		matrix = dRollMatrix(0.5f * 3.141592f) * matrix;
+
+		dFloat minLimit = -0.01f;
+		dFloat maxLimit =  1.25f;
+		dFloat rate = 2.0f;
+
+		vehicleModel->m_paletteJoints[vehicleModel->m_paletteActuatorsCount] = new CustomSliderActuator(&matrix[0][0], rate, minLimit, maxLimit, paletteBody, baseBone->m_body);
+		vehicleModel->m_paletteActuatorsCount++;
+		CustomArticulatedTransformController::dSkeletonBone* const wristBone = controller->AddBone(paletteBody, dGetIdentityMatrix(), baseBone);
+	}
+
+
+	void AddCraneWrist(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone)
+	{
+		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
+
+		DemoEntity* const wrist = vehicleModel->Find("effector");
+
+		ARTICULATED_VEHICLE_DEFINITION definition;
+		strcpy(definition.m_boneName, "effector");
+		strcpy(definition.m_shapeTypeName, "convexHull");
+		definition.m_mass = 10.0f;
+		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		strcpy(definition.m_articulationName, "effector");
+		NewtonBody* const wristBody = CreateBodyPart(wrist, definition);
+
+		dMatrix matrix;
+		NewtonBodyGetMatrix(wristBody, &matrix[0][0]);
+		matrix = dPitchMatrix(0.0f * 3.141592f) * dYawMatrix(0.5f * 3.141592f) * matrix;
+
+		dFloat minAngleLimit = -120.0f * 3.141592f / 180.0f;
+		dFloat maxAngleLimit =  120.0f * 3.141592f / 180.0f;
+		dFloat angularRate = 30.0f * 3.141592f / 180.0f;
+
+		vehicleModel->m_universalActuator[vehicleModel->m_universalActuatorsCount] = new CustomUniversalActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, wristBody, baseBone->m_body);
+		vehicleModel->m_universalActuatorsCount++;
+		CustomArticulatedTransformController::dSkeletonBone* const wristBone = controller->AddBone(wristBody, dGetIdentityMatrix(), baseBone);
+		AddCranekPaletteActuator (controller, wristBone, "leftHand");
+		AddCranekPaletteActuator (controller, wristBone, "rightHand");
+	}
+
+
 	void AddCraneLift(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
@@ -1166,6 +1261,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomArticulatedTransformController::dSkeletonBone* const boomBone1 = controller->AddBone(boomBody, dGetIdentityMatrix(), baseBone);
 		CustomArticulatedTransformController::dSkeletonBone* const boomBone2 = AddCraneBoom (controller, boomBone1, "Boom2");
 		CustomArticulatedTransformController::dSkeletonBone* const boomBone3 = AddCraneBoom (controller, boomBone2, "Boom3");
+		AddCraneWrist(controller, boomBone3);
 	}
 
 	void AddCraneBase(CustomArticulatedTransformController* const controller)
@@ -1286,7 +1382,9 @@ class AriculatedJointInputManager: public CustomInputManager
 
 		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player->GetUserData();
-		
+
+		inputs.m_wristAxis0 = int(mainWindow->GetKeyState('Y')) - int(mainWindow->GetKeyState('U'));
+		inputs.m_wristAxis1 = int(mainWindow->GetKeyState('I')) - int(mainWindow->GetKeyState('O'));
 		inputs.m_turnValue = int (mainWindow->GetKeyState ('R')) - int (mainWindow->GetKeyState ('T'));
 		inputs.m_tiltValue = int (mainWindow->GetKeyState ('Z')) - int (mainWindow->GetKeyState ('X'));
 		inputs.m_liftValue = int (mainWindow->GetKeyState ('Q')) - int (mainWindow->GetKeyState ('E'));
@@ -1299,8 +1397,13 @@ class AriculatedJointInputManager: public CustomInputManager
 			mainWindow->GetKeyState ('D') ||
 			mainWindow->GetKeyState ('W') ||
 			mainWindow->GetKeyState ('S') ||
-			mainWindow->GetKeyState('R')  ||
-			mainWindow->GetKeyState('T')  ||
+
+			mainWindow->GetKeyState ('R') ||
+			mainWindow->GetKeyState ('T') ||
+			mainWindow->GetKeyState ('I') ||
+			mainWindow->GetKeyState ('O') ||
+			mainWindow->GetKeyState ('Y') ||
+			mainWindow->GetKeyState ('U') ||
 			mainWindow->GetKeyState ('F') ||
 			mainWindow->GetKeyState ('G') ||
 			mainWindow->GetKeyState ('Q') ||
@@ -1490,7 +1593,10 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	LoadLumberYardMesh (scene, entity, dVector(40.0f, 0.0f, 0.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 10.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
-	
+	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 20.0f, 0.0f));
+	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 20.0f, 0.0f));
+
+
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  

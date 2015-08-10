@@ -230,18 +230,13 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	dFloat sinAngle_0;
 	dFloat cosAngle_0;
-	CalculateAngle (matrix0.m_up, matrix1_1.m_up, matrix1_1.m_front, sinAngle_0, cosAngle_0);
-	dFloat angle0 = m_curJointAngle_0.Update (cosAngle_0, sinAngle_0);
+	CalculateAngle (matrix1_1.m_up, matrix0.m_up, matrix1_1.m_front, sinAngle_0, cosAngle_0);
+	dFloat angle0 = -m_curJointAngle_0.Update (cosAngle_0, sinAngle_0);
 
 	dFloat sinAngle_1;
 	dFloat cosAngle_1;
-	CalculateAngle(matrix1_1.m_front, matrix1.m_front, matrix1_1.m_up, sinAngle_1, cosAngle_1);
-	dFloat angle1 = m_curJointAngle_1.Update (cosAngle_1, sinAngle_1);
-
-//dFloat sinAngle;
-//dFloat cosAngle;
-//CalculateAngle(matrix1_1.m_front, matrix1.m_front, matrix1_1.m_up, sinAngle, cosAngle);
-//dTrace(("%f %f %f %f\n", sinAngle, cosAngle, sinAngle_1, cosAngle_1));
+	CalculateAngle(matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up, sinAngle_1, cosAngle_1);
+	dFloat angle1 = -m_curJointAngle_1.Update (cosAngle_1, sinAngle_1);
 
 	dVector omega0 (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector omega1 (0.0f, 0.0f, 0.0f, 0.0f);
