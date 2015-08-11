@@ -170,9 +170,8 @@ class dgSkeletonContainer::dgSkeletonGraph
 				}
 			}
 
-			for (dgInt32 k = 0; k < m_dof; k ++) {
-				dgInt32 i = m_forceIndex[k];
-				dgInt32 index = jointInfo->m_pairStart + i;
+			for (dgInt32 i = 0; i < m_dof; i ++) {
+				dgInt32 index = jointInfo->m_pairStart + m_forceIndex[i];
 				const dgJacobianMatrixElement* const row = &matrixRow[index];
 				m_jointMass[i].SetZero();
 				//m_jointMass[i][i] = 0.0f;
@@ -214,9 +213,8 @@ class dgSkeletonContainer::dgSkeletonGraph
 			dgAssert(jointInfo->m_joint->GetBody0() == m_body);
 			dgAssert(jointInfo->m_joint->GetBody1() == m_parent->m_body);
 
-			for (dgInt32 k = 0; k < m_dof; k++) {
-				dgInt32 i = m_forceIndex[k];
-				dgInt32 index = jointInfo->m_pairStart + i;
+			for (dgInt32 i = 0; i < m_dof; i++) {
+				dgInt32 index = jointInfo->m_pairStart + m_forceIndex[i];
 				const dgJacobianMatrixElement* const row = &matrixRow[index];
 				m_jointMass[i].SetZero();
 				//m_jointMass[i][i] = 0.0f;

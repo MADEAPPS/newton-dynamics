@@ -329,6 +329,7 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 
 	// handle special case of the joint being a hinge
 	if (m_coneAngleCos > 0.9999f) {
+//return;
 		NewtonUserJointAddAngularRow(m_joint, CalculateAngle (matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
 		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 
@@ -349,10 +350,13 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 		}
 
 	} else {
+
 		const dVector& coneDir0 = matrix0.m_front;
 		const dVector& coneDir1 = matrix1.m_front;
 		dFloat cosAngle = coneDir0 % coneDir1;
 		if (cosAngle <= m_coneAngleCos) {
+//dTrace (("%f %f\n", cosAngle, m_coneAngleCos));
+
 			dVector lateralDir(coneDir0 * coneDir1);
 			dFloat mag2 = lateralDir % lateralDir;
 			dAssert(mag2 > 1.0e-4f);
@@ -362,10 +366,7 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 			dVector frontDir(rot.UnrotateVector(coneDir1));
 			dVector upDir(lateralDir * frontDir);
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
-
-			dFloat cosAngle = frontDir % coneDir0;
-			dFloat sinAngle = ((frontDir * coneDir0) % lateralDir);
-			NewtonUserJointAddAngularRow(m_joint, -dAtan2(sinAngle, cosAngle), &lateralDir[0]);
+			NewtonUserJointAddAngularRow(m_joint, CalculateAngle(coneDir0, frontDir, lateralDir), &lateralDir[0]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		}
 
