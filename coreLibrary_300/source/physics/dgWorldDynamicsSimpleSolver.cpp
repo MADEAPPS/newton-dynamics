@@ -1330,7 +1330,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 		for (dgInt32 i = 0; i < skeletonCount; i ++) {
 			dgSkeletonContainer* const container = skeletonArray[i];
-			container->InitMassMatrix (constraintArray, matrixRow);
+			container->InitMassMatrix (constraintArray, internalForces, matrixRow);
 		}
 	}
 

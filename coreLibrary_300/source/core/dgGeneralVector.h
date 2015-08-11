@@ -38,9 +38,9 @@ class dgGeneralVector
 
 	public:
 	dgGeneralVector (dgInt32 size);
-	dgGeneralVector (dgInt32 size, T *mem);
+	dgGeneralVector (dgInt32 size, T* const mem);
 	dgGeneralVector (const dgGeneralVector<T> &src);
-	dgGeneralVector (const dgGeneralVector<T> &src, T *mem);
+	dgGeneralVector (const dgGeneralVector<T> &src, T* const mem);
 
 	~dgGeneralVector ();
 
@@ -60,7 +60,6 @@ class dgGeneralVector
 
 	void Scale (T scale);
 	void LinearCombine (T scale, const dgGeneralVector &A, const dgGeneralVector &B);
-
 
 	static dgInt32 GetFloatOps();
 	static dgInt32 GetMemWrites();
@@ -128,7 +127,7 @@ dgGeneralVector<T>::dgGeneralVector (const dgGeneralVector<T> &src)
 }
 
 template<class T>
-dgGeneralVector<T>::dgGeneralVector (const dgGeneralVector<T> &src,  T *mem)
+dgGeneralVector<T>::dgGeneralVector (const dgGeneralVector<T> &src,  T* const mem)
 {
 	m_ownMemory = false;
 	m_colCount = src.m_colCount;
@@ -178,15 +177,12 @@ dgGeneralVector<T>::~dgGeneralVector ()
 template<class T>
 void dgGeneralVector<T>::Trace () const
 {
-	dgInt32 i;
-	for (i = 0; i < m_colCount; i ++) {
+	for (dgInt32 i = 0; i < m_colCount; i ++) {
 		dgTrace (("%f ", m_columns[i]));
 		
 	}
 	dgTrace (("\n"));
 }
-
-
 
 template<class T>
 T& dgGeneralVector<T>::operator[] (dgInt32 i)
@@ -215,11 +211,9 @@ dgInt32 dgGeneralVector<T>::GetRowCount() const
 template<class T>
 T dgGeneralVector<T>::DotProduct (const dgGeneralVector<T> &A) const 
 {
-	dgInt32 i;
-
 	dgAssert (m_colCount == A.m_colCount);
 	T val (0.0);
-	for (i = 0; i < m_colCount; i ++) {
+	for (dgInt32 i = 0; i < m_colCount; i ++) {
 		val = val + m_columns[i] * A.m_columns[i];
 	}
 
@@ -237,8 +231,7 @@ T dgGeneralVector<T>::DotProduct (const dgGeneralVector<T> &A) const
 template<class T>
 void dgGeneralVector<T>::Clear (T val)
 {
-	dgInt32 i;
-	for (i = 0; i < m_colCount; i ++ ) {
+	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] = val;
 	}
 
@@ -250,10 +243,8 @@ void dgGeneralVector<T>::Clear (T val)
 template<class T>
 void dgGeneralVector<T>::Copy (const dgGeneralVector<T> &src)
 {
-	dgInt32 i;
-
 	dgAssert (m_colCount == src.m_colCount);
-	for (i = 0; i < m_colCount; i ++ ) {
+	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] = src.m_columns[i];
 	}
 
@@ -262,13 +253,10 @@ void dgGeneralVector<T>::Copy (const dgGeneralVector<T> &src)
 	#endif
 }
 
-
-
 template<class T>
 void dgGeneralVector<T>::Scale (T scale)
 {
-	dgInt32 i;
-	for (i = 0; i < m_colCount; i ++ ) {
+	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] = m_columns[i] * scale;
 	}
 
@@ -282,12 +270,9 @@ void dgGeneralVector<T>::Scale (T scale)
 template<class T>
 T dgGeneralVector<T>::Norm2 () const
 {
-	dgInt32 i;
-	T max;
-
-	max = 0;
-	for (i = 0; i < m_colCount; i ++ ) {
-		 max = dgMax (m_columns[i] * m_columns[i], max);
+	T norm (0);
+	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
+		 norm = dgMax (m_columns[i] * m_columns[i], norm);
 	}
 
 	#ifdef DG_COUNT_FLOAT_OPS
@@ -295,7 +280,7 @@ T dgGeneralVector<T>::Norm2 () const
 	m_memoryWrite += m_colCount;
 	#endif
 
-	return max;
+	return norm;
 }
 
 template<class T>
@@ -308,11 +293,9 @@ T dgGeneralVector<T>::Norm () const
 template<class T>
 void dgGeneralVector<T>::LinearCombine (T scale, const dgGeneralVector<T> &A, const dgGeneralVector<T> &B)
 {
-	dgInt32 i;
-	
 	dgAssert (A.m_colCount == m_colCount);
 	dgAssert (B.m_colCount == m_colCount);
-	for (i = 0; i < m_colCount; i ++ ) {
+	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] = A.m_columns[i] * scale + B.m_columns[i];
 	}
 
@@ -326,10 +309,8 @@ void dgGeneralVector<T>::LinearCombine (T scale, const dgGeneralVector<T> &A, co
 template<class T>
 void dgGeneralVector<T>::operator+= (const dgGeneralVector<T> &A)
 {
-	dgInt32 i;
-
 	dgAssert (A.m_colCount == m_colCount);
-	for (i = 0; i < m_colCount; i ++ ) {
+	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] += A.m_columns[i];
 	}
 
@@ -342,10 +323,8 @@ void dgGeneralVector<T>::operator+= (const dgGeneralVector<T> &A)
 template<class T>
 void dgGeneralVector<T>::operator-= (const dgGeneralVector<T> &A) 
 {
-	dgInt32 i;
-
 	dgAssert (A.m_colCount == m_colCount);
-	for (i = 0; i < m_colCount; i ++ ) {
+	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] -= A.m_columns[i];
 	}
 
