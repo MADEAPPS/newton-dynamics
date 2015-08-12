@@ -36,6 +36,8 @@ template<class T>
 class dgTemplateVector
 {
 	public:
+	DG_CLASS_ALLOCATOR(allocator)
+
 	DG_INLINE dgTemplateVector () 
 	{
 	}
@@ -188,7 +190,7 @@ class dgTemplateVector
 	}
 #endif
 
-	DG_CLASS_ALLOCATOR(allocator)
+	
 
 	T m_x;
 	T m_y;
@@ -1140,11 +1142,11 @@ class dgSpatialVector
 	DG_INLINE dgFloat64 DotProduct(const dgSpatialVector& v) const
 	{
 		dgFloat64 ret;
-		__m128d tmp(_mm_add_pd(_mm_mul_pd(m_type[0], v.m_type[0]), _mm_add_pd(_mm_mul_pd(m_type[1], v.m_type[1]), _mm_mul_pd(m_type[2], v.m_type[2]))));
+		__m128d tmp (_mm_add_pd(_mm_mul_pd(m_type[0], v.m_type[0]), _mm_add_pd (_mm_mul_pd(m_type[1], v.m_type[1]), _mm_mul_pd(m_type[2], v.m_type[2]))));
 		_mm_store_sd(&ret, _mm_hadd_pd(tmp, tmp));
 		return ret;
 	}
-
+	
 	DG_INLINE void Scale(dgFloat64 s, dgSpatialVector& dst) const
 	{
 		__m128d tmp = _mm_set1_pd(s);
@@ -1173,7 +1175,7 @@ class dgSpatialVector
 DG_MSC_VECTOR_ALIGMENT
 class dgSpatialMatrix
 {
-	public:
+public:
 	DG_INLINE dgSpatialVector& operator[] (dgInt32 i)
 	{
 		dgAssert(i < 6);

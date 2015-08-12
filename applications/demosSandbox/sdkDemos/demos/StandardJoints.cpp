@@ -31,59 +31,6 @@
 // optionally uncomment this for hard joint simulations 
 #define _USE_HARD_JOINTS
 
-class CustomBallAndSocketWithFriction: public CustomBallAndSocket
-{
-	public:
-    CustomBallAndSocketWithFriction (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat dryFriction)
-        :CustomBallAndSocket (pinAndPivotFrame, child, parent)
-        ,m_dryFriction (dryFriction)
-    {
-    }
-
-    void SubmitConstraints (dFloat timestep, int threadIndex)
-    {
-        CustomBallAndSocket::SubmitConstraints (timestep, threadIndex);
-
-        dVector omega0(0.0f, 0.0f, 0.0f, 0.0f);
-        dVector omega1(0.0f, 0.0f, 0.0f, 0.0f);
-
-        // get the omega vector
-        NewtonBodyGetOmega(m_body0, &omega0[0]);
-        if (m_body1) {
-            NewtonBodyGetOmega(m_body1, &omega1[0]);
-        }
-
-        dVector relOmega (omega0 - omega1);
-        dFloat omegaMag = dSqrt (relOmega % relOmega);
-        if (omegaMag > 0.1f) {
-            // tell newton to used this the friction of the omega vector to apply the rolling friction
-            dMatrix basis (dGrammSchmidt (relOmega));
-            NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[2][0]);
-            NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[1][0]);
-            NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[0][0]);
-
-            // calculate the acceleration to stop the ball in one time step
-            dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep: 1.0f;
-
-            // override the desired acceleration, with the desired acceleration for full stop. 
-            NewtonUserJointSetRowAcceleration (m_joint, -omegaMag * invTimestep);
-
-            // set the friction limit proportional the sphere Inertia
-            NewtonUserJointSetRowMinimumFriction (m_joint, -m_dryFriction);
-            NewtonUserJointSetRowMaximumFriction (m_joint,  m_dryFriction);
-        } else {
-            // when omega is too low this is correct but the small angle approximation theorem.
-            dMatrix basis (dGetIdentityMatrix());
-            for (int i = 0; i < 3; i ++) {
-                NewtonUserJointAddAngularRow (m_joint, 0.0f, &basis[i][0]);
-                NewtonUserJointSetRowMinimumFriction (m_joint, -m_dryFriction);
-                NewtonUserJointSetRowMaximumFriction (m_joint,  m_dryFriction);
-            }
-        }
-    }
-
-    dFloat m_dryFriction;
-};
 
 static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& location, const dVector& size)
 {
@@ -975,7 +922,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
-//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
+	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));

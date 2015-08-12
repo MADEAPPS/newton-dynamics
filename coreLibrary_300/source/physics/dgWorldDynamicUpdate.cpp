@@ -816,7 +816,8 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 
 		dgVector isMovingMask = (body->m_veloc | body->m_omega | body->m_accel | body->m_alpha) & dgVector::m_signMask;
-		if (((isMovingMask.TestZero().GetSignMask() & 7) != 7) && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+		//if (((isMovingMask.TestZero().GetSignMask() & 7) != 7) && body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
+		if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI) && (!body->m_equilibrium || ((isMovingMask.TestZero().GetSignMask() & 7) != 7))) {
 			dgAssert (body->m_invMass.m_w);
 			body->IntegrateVelocity(timestep);
 

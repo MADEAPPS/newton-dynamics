@@ -134,29 +134,13 @@ void BackAndForwardSustitition (
 //dgSPDMatrix<dgFloat32> M (8);
 //M.CholeskyDecomposition();
 
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	dgInt32 memCount;
-	dgInt32 floatCount;
-
-	memCount = dgGeneralVector<dgFloat32>::GetMemWrites();
-	floatCount = dgGeneralVector<dgFloat32>::GetFloatOps();
-	#endif
-
 	B[0] = B[0] / rows[0][0];
 	for (i =	1; i < size; i ++) {
 		acc = 0.0f;
 		for (j =	0; j < i; j ++) {
 			acc = acc + rows[j][i] * B[j];
-			#ifdef DG_COUNT_FLOAT_OPS
-			floatCount += 2;
-			#endif
 		}
 		B[i] = (B[i] - acc) / rows[i][i];
-		#ifdef DG_COUNT_FLOAT_OPS
-		floatCount += 2;
-		memCount  += 1;
-		#endif
 	}
 
 	B[size-1] = B[size-1] / rows[size-1][size-1];
@@ -167,26 +151,12 @@ void BackAndForwardSustitition (
 		row = rows[i];
 		for (j = i + 1; j < size; j ++) {
 			acc = acc + row[j] * B[j];
-
-			#ifdef DG_COUNT_FLOAT_OPS
-			floatCount += 2;
-			#endif
 		}
 		B[i] = (B[i] - acc) / rows[i][i];
-
-		#ifdef DG_COUNT_FLOAT_OPS
-		floatCount += 2;
-		memCount  += 1;
-		#endif
 	}
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	dgGeneralVector<dgFloat32>::SetMemWrites(memCount); 
-	dgGeneralVector<dgFloat32>::SetFloatOps(floatCount); 
-	#endif
 }
-
 */
+
 /*
 bool CholeskyDecomposition (dgFloat32 **rows, dgInt32 size)
 {
@@ -195,24 +165,12 @@ bool CholeskyDecomposition (dgFloat32 **rows, dgInt32 size)
 	dgInt32 k;
 	dgFloat32 factor;
 
-	#ifdef DG_COUNT_FLOAT_OPS
-	dgInt32 memCount;
-	dgInt32 floatCount;
-
-	memCount = dgGeneralVector<dgFloat32>::GetMemWrites();
-	floatCount = dgGeneralVector<dgFloat32>::GetFloatOps();
-	#endif
-
 	for (j = 0; j < size; j++) {
 		for (k = 0; k < j; k ++ ) {
 			factor = rows[k][j];
 			if (dgAbsf (factor) > 1.0e-6f) {
 				for (i = j; i < size; i ++) {
 					rows[j][i] -= rows[k][i] * factor;
-					#ifdef DG_COUNT_FLOAT_OPS
-					memCount += 1;
-					floatCount += 2;
-					#endif
 				}
 			}
 		}
@@ -229,25 +187,10 @@ bool CholeskyDecomposition (dgFloat32 **rows, dgInt32 size)
 		rows[j][j] = factor;
 		factor = 1.0f / factor;
 
-		#ifdef DG_COUNT_FLOAT_OPS
-		memCount += 1;
-		floatCount += 1;
-		#endif
-
 		for (k = j + 1; k < size; k ++) {
 			rows[j][k] *= factor;
-			#ifdef DG_COUNT_FLOAT_OPS
-			memCount += 1;
-			floatCount += 1;
-			#endif
 		}
 	}
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	dgGeneralVector<dgFloat32>::SetMemWrites(memCount); 
-	dgGeneralVector<dgFloat32>::SetFloatOps(floatCount); 
-	#endif
-
 	return true;
 }
 */

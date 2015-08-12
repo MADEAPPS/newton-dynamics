@@ -24,8 +24,7 @@
 
 #include "dgStdafx.h"
 #include "dgDebug.h"
-
-#define DG_COUNT_FLOAT_OPS
+#include "dgMemory.h"
 
 template<class T> class dgSPDMatrix;
 template<class T> class dgGeneralMatrix;
@@ -37,6 +36,8 @@ class dgGeneralVector
 	friend class dgGeneralMatrix<T>;
 
 	public:
+	DG_CLASS_ALLOCATOR(allocator)
+
 	dgGeneralVector (dgInt32 size);
 	dgGeneralVector (dgInt32 size, T* const mem);
 	dgGeneralVector (const dgGeneralVector<T> &src);
@@ -77,7 +78,6 @@ class dgGeneralVector
 
 	static dgInt32 m_floatsOp;
 	static dgInt32 m_memoryWrite;
-
 
 	dgGeneralVector();
 };
@@ -216,12 +216,6 @@ T dgGeneralVector<T>::DotProduct (const dgGeneralVector<T> &A) const
 	for (dgInt32 i = 0; i < m_colCount; i ++) {
 		val = val + m_columns[i] * A.m_columns[i];
 	}
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	m_floatsOp += 2 * m_colCount;
-	m_memoryWrite += m_colCount;
-	#endif
-
 	return val;
 }
 
@@ -234,10 +228,6 @@ void dgGeneralVector<T>::Clear (T val)
 	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] = val;
 	}
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	m_memoryWrite += m_colCount;
-	#endif
 }
 
 template<class T>
@@ -247,10 +237,6 @@ void dgGeneralVector<T>::Copy (const dgGeneralVector<T> &src)
 	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] = src.m_columns[i];
 	}
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	m_memoryWrite += m_colCount;
-	#endif
 }
 
 template<class T>
@@ -259,11 +245,6 @@ void dgGeneralVector<T>::Scale (T scale)
 	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] = m_columns[i] * scale;
 	}
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	m_floatsOp += m_colCount;
-	m_memoryWrite += m_colCount;
-	#endif
 }
 
 
@@ -274,12 +255,6 @@ T dgGeneralVector<T>::Norm2 () const
 	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		 norm = dgMax (m_columns[i] * m_columns[i], norm);
 	}
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	m_floatsOp += m_colCount;
-	m_memoryWrite += m_colCount;
-	#endif
-
 	return norm;
 }
 
@@ -298,11 +273,6 @@ void dgGeneralVector<T>::LinearCombine (T scale, const dgGeneralVector<T> &A, co
 	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] = A.m_columns[i] * scale + B.m_columns[i];
 	}
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	m_floatsOp += 3 * m_colCount;
-	m_memoryWrite += m_colCount;
-	#endif
 }
 
 
@@ -313,11 +283,6 @@ void dgGeneralVector<T>::operator+= (const dgGeneralVector<T> &A)
 	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] += A.m_columns[i];
 	}
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	m_floatsOp += m_colCount;
-	m_memoryWrite += m_colCount;
-	#endif
 }
 
 template<class T>
@@ -327,11 +292,6 @@ void dgGeneralVector<T>::operator-= (const dgGeneralVector<T> &A)
 	for (dgInt32 i = 0; i < m_colCount; i ++ ) {
 		m_columns[i] -= A.m_columns[i];
 	}
-
-	#ifdef DG_COUNT_FLOAT_OPS
-	m_floatsOp += m_colCount;
-	m_memoryWrite += m_colCount;
-	#endif
 }
 
 

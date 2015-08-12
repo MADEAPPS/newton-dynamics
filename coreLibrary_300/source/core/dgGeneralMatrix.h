@@ -38,6 +38,7 @@ template<class T>
 class dgGeneralMatrix
 {
 	public:
+	DG_CLASS_ALLOCATOR(allocator)
 	dgGeneralMatrix(dgInt32 row, dgInt32 column);
 	dgGeneralMatrix(const dgGeneralMatrix<T>& src);
 	dgGeneralMatrix(const dgGeneralMatrix<T>& src, T *elemBuffer);
@@ -66,7 +67,6 @@ class dgGeneralMatrix
 	// calculate out = A * transpose (V);
 	void MatrixTimeVectorTranspose(const dgGeneralVector<T> &v, dgGeneralVector<T> &out);
 
-
 	// calculate M = A * B;
 	void MatrixTimeMatrix(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& B);
 
@@ -77,6 +77,7 @@ class dgGeneralMatrix
 
 	bool LDLtDecomposition();
 	bool CholeskyDecomposition();
+
 	bool TestPSD() const;
 	bool TestSymetry() const;
 
@@ -248,10 +249,6 @@ void dgGeneralMatrix<T>::Identity()
 //              T tmp (me[i][j]);
 //              me[i][j] = me[j][i];
 //              me[j][i] = tmp;
-//
-//              #ifdef DG_COUNT_FLOAT_OPS
-//              dgGeneralVector<T>::m_memoryWrite += 2;
-//              #endif
 //         }
 //   }
 //}
@@ -266,11 +263,6 @@ void dgGeneralMatrix<T>::GaussianPivotStep(dgInt32 srcRow, dgInt32 pivotRow, dgI
 	if (T(dgAbsf(num)) > tol) {
 		T den(me[srcRow][pivotCol]);
 		dgAssert(T(dgAbsf(den)) > T(0.0f));
-
-#ifdef DG_COUNT_FLOAT_OPS
-		dgGeneralVector<T>::m_floatsOp += 2;
-#endif
-
 		den = -num / den;
 		me[pivotRow].LinearCombine(den, me[srcRow], me[pivotRow]);
 	}
@@ -298,15 +290,8 @@ void dgGeneralMatrix<T>::VectorTimeMatrix(const dgGeneralVector<T> &v, dgGeneral
 		T acc = T(0.0f);
 		for (dgInt32 j = 0; j < m_rowCount; j++) {
 			acc = acc + inMem[j] * me[j][i];
-
-#ifdef DG_COUNT_FLOAT_OPS
-			dgGeneralVector<T>::m_floatsOp += 2;
-#endif
 		}
 		outMem[i] = acc;
-#ifdef DG_COUNT_FLOAT_OPS
-		dgGeneralVector<T>::m_memoryWrite += 1;
-#endif
 	}
 }
 
@@ -340,16 +325,8 @@ void dgGeneralMatrix<T>::MatrixTimeMatrix(const dgGeneralMatrix<T>& A, const dgG
 			T acc(0.0f);
 			for (dgInt32 k = 0; k < count; k++) {
 				acc = acc + rowA[k] * B.m_rows[k][j];
-
-#ifdef DG_COUNT_FLOAT_OPS
-				dgGeneralVector<T>::m_floatsOp += 2;
-#endif
 			}
 			out[j] = acc;
-
-#ifdef DG_COUNT_FLOAT_OPS
-			dgGeneralVector<T>::m_memoryWrite += 1;
-#endif
 		}
 	}
 }
@@ -374,16 +351,8 @@ void dgGeneralMatrix<T>::MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, 
 			T* const rowB = &Bt.m_rows[j][0];
 			for (dgInt32 k = 0; k < count; k++) {
 				acc = acc + rowA[k] * rowB[k];
-
-#ifdef DG_COUNT_FLOAT_OPS
-				dgGeneralVector<T>::m_floatsOp += 2;
-#endif
 			}
 			out[j] = acc;
-
-#ifdef DG_COUNT_FLOAT_OPS
-			dgGeneralVector<T>::m_memoryWrite += 1;
-#endif
 		}
 	}
 }
@@ -415,18 +384,8 @@ bool dgGeneralMatrix<T>::Solve(dgGeneralVector<T> &b, T tol)
 				num = num / den;
 				for (dgInt32 j = i + 1; j < m_rowCount; j++) {
 					rowK[j] = rowK[j] - rowI[j] * num;
-
-#ifdef DG_COUNT_FLOAT_OPS
-					dgGeneralVector<T>::m_floatsOp += 2;
-					dgGeneralVector<T>::m_memoryWrite += 1;
-#endif
 				}
 				B[k] = B[k] - B[i] * num;
-
-#ifdef DG_COUNT_FLOAT_OPS
-				dgGeneralVector<T>::m_floatsOp += 3;
-				dgGeneralVector<T>::m_memoryWrite += 1;
-#endif
 			}
 		}
 	}
@@ -438,24 +397,9 @@ bool dgGeneralMatrix<T>::Solve(dgGeneralVector<T> &b, T tol)
 		rowI = &m_rows[i][0];
 		for (dgInt32 j = i + 1; j < m_rowCount; j++) {
 			acc = acc + rowI[j] * B[j];
-
-#ifdef DG_COUNT_FLOAT_OPS
-			dgGeneralVector<T>::m_floatsOp += 2;
-#endif
 		}
 		B[i] = (B[i] - acc) / rowI[i];
-
-#ifdef DG_COUNT_FLOAT_OPS
-		dgGeneralVector<T>::m_floatsOp += 2;
-		dgGeneralVector<T>::m_memoryWrite += 1;
-#endif
 	}
-
-#ifdef DG_COUNT_FLOAT_OPS
-	dgGeneralVector<T>::m_floatsOp += 1;
-	dgGeneralVector<T>::m_memoryWrite += 1;
-#endif
-
 	return true;
 }
 
@@ -518,11 +462,6 @@ bool dgGeneralMatrix<T>::TestPSD() const
 template<class T>
 bool dgGeneralMatrix<T>::CholeskyDecomposition()
 {
-#ifdef DG_COUNT_FLOAT_OPS
-	dgInt32 memCount = dgGeneralVector<T>::GetMemWrites();
-	dgInt32 floatCount = dgGeneralVector<T>::GetFloatOps();
-#endif
-
 	for (dgInt32 j = 0; j < m_rowCount; j++) {
 		T* const rowJ = &m_rows[j].m_columns[0];
 		for (dgInt32 k = 0; k < j; k++) {
@@ -530,10 +469,6 @@ bool dgGeneralMatrix<T>::CholeskyDecomposition()
 			T factor = rowK[j];
 			for (dgInt32 i = j; i < m_rowCount; i++) {
 				rowJ[i] -= rowK[i] * factor;
-#ifdef DG_COUNT_FLOAT_OPS
-				memCount += 1;
-				floatCount += 2;
-#endif
 			}
 		}
 
@@ -544,25 +479,10 @@ bool dgGeneralMatrix<T>::CholeskyDecomposition()
 
 		rowJ[j] = T(sqrt(factor));
 		factor = T(1.0f / rowJ[j]);
-#ifdef DG_COUNT_FLOAT_OPS
-		memCount += 1;
-		floatCount += 1;
-#endif
-
 		for (dgInt32 k = j + 1; k < m_rowCount; k++) {
 			rowJ[k] *= factor;
-#ifdef DG_COUNT_FLOAT_OPS
-			memCount += 1;
-			floatCount += 1;
-#endif
 		}
 	}
-
-#ifdef DG_COUNT_FLOAT_OPS
-	dgGeneralVector<T>::SetMemWrites(memCount);
-	dgGeneralVector<T>::SetFloatOps(floatCount);
-#endif
-
 	return true;
 }
 
@@ -570,11 +490,6 @@ bool dgGeneralMatrix<T>::CholeskyDecomposition()
 template<class T>
 bool dgGeneralMatrix<T>::LDLtDecomposition()
 {
-#ifdef DG_COUNT_FLOAT_OPS
-	dgInt32 memCount = dgGeneralVector<T>::GetMemWrites();
-	dgInt32 floatCount = dgGeneralVector<T>::GetFloatOps();
-#endif
-
 	for (dgInt32 j = 0; j < m_rowCount; j++) {
 		T* const rowJ = &m_rows[j].m_columns[0];
 		for (dgInt32 k = 0; k < j; k++) {
@@ -582,10 +497,6 @@ bool dgGeneralMatrix<T>::LDLtDecomposition()
 			T factor = rowK[j];
 			for (dgInt32 i = j; i < m_rowCount; i++) {
 				rowJ[i] -= rowK[i] * factor;
-#ifdef DG_COUNT_FLOAT_OPS
-				memCount += 1;
-				floatCount += 2;
-#endif
 			}
 		}
 
@@ -596,26 +507,10 @@ bool dgGeneralMatrix<T>::LDLtDecomposition()
 
 		rowJ[j] = T(sqrt(factor));
 		factor = T(1.0f / rowJ[j]);
-
-#ifdef DG_COUNT_FLOAT_OPS
-		memCount += 1;
-		floatCount += 1;
-#endif
-
 		for (dgInt32 k = j + 1; k < m_rowCount; k++) {
 			rowJ[k] *= factor;
-#ifdef DG_COUNT_FLOAT_OPS
-			memCount += 1;
-			floatCount += 1;
-#endif
 		}
 	}
-
-#ifdef DG_COUNT_FLOAT_OPS
-	dgGeneralVector<T>::SetMemWrites(memCount);
-	dgGeneralVector<T>::SetFloatOps(floatCount);
-#endif
-
 	return true;
 }
 

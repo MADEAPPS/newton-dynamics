@@ -141,14 +141,6 @@ bool dgSPDMatrix<T>::CholeskyDecomposition()
 	T* rowK;
 	T* rowJ;
 
-	#ifdef DG_COUNT_FLOAT_OPS
-	dgInt32 memCount;
-	dgInt32 floatCount;
-
-	memCount = dgGeneralVector<T>::GetMemWrites();
-	floatCount = dgGeneralVector<T>::GetFloatOps();
-	#endif
-
 	for (j = 0; j < m_rowCount; j++) {
 		rowJ = &m_rows[j].m_columns[0];
 
@@ -159,10 +151,6 @@ bool dgSPDMatrix<T>::CholeskyDecomposition()
 			if (dgAbsf (factor) > 1.0e-6f) {
 				for (i = j; i < m_rowCount; i ++) {
 					rowJ[i] -= rowK[i] * factor;
-					#ifdef DG_COUNT_FLOAT_OPS
-					memCount += 1;
-					floatCount += 2;
-					#endif
 				}
 			}
 		}
@@ -179,27 +167,12 @@ bool dgSPDMatrix<T>::CholeskyDecomposition()
 		rowJ[j] = factor;
 		factor = T(1.0f / dgFloat32(factor));
 
-		#ifdef DG_COUNT_FLOAT_OPS
-		memCount += 1;
-		floatCount += 1;
-		#endif
-
 		for (k = j + 1; k < m_rowCount; k ++) {
 			rowJ[k] *= factor;
-			#ifdef DG_COUNT_FLOAT_OPS
-			memCount += 1;
-			floatCount += 1;
-			#endif
 		}
 	}
 
-	#ifdef DG_COUNT_FLOAT_OPS
-	dgGeneralVector<T>::SetMemWrites(memCount); 
-	dgGeneralVector<T>::SetFloatOps(floatCount); 
-	#endif
-
 	return true;
-
 }
 
 
