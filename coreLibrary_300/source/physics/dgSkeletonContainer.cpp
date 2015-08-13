@@ -698,7 +698,7 @@ dgFloat32 dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfo
 		SolveBackward ();
 		dgInt32 start = UpdateForces(jointInfoArray, internalForces, matrixRow);
 		if (start < m_nodeCount) {
-			RebuildMassMatrix (0, jointInfoArray, internalForces, matrixRow);
+			RebuildMassMatrix (start, jointInfoArray, internalForces, matrixRow);
 		}
 		jointAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
 //dgTrace (("%f ", jointAccel));

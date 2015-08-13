@@ -299,6 +299,167 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 }
 
 
+struct JoesRagdollJoint
+{
+   NewtonBody* m_body0;
+   NewtonBody* m_body1; // parent
+   dMatrix m_localMatrix0;
+   dMatrix m_localMatrix1;
+   NewtonJoint* m_joint;
+
+   dQuaternion m_target; // relative target rotation to reach at next timestep
+
+   float m_reduceError;
+   float m_pin_length;
+   float m_angularFriction;
+   float m_stiffness;
+
+   float m_anim_speed;
+   float m_anim_offset;
+   float m_anim_time;
+
+   JoesRagdollJoint (NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world)
+   {
+      m_body0 = child;
+      m_body1 = parent;
+      m_localMatrix0 = localMatrix0;
+      m_localMatrix1 = localMatrix1;
+      m_target = dQuaternion (dVector(1.0f,0,0), 0.0f);
+      m_joint = NewtonConstraintCreateUserJoint (world, 6, JoesRagdollJoint::Callback, 0, child, parent);
+      NewtonJointSetUserData (m_joint, (void*) this);
+
+      m_reduceError = 0.2f; // amount of error to reduce per timestep (more -> oszillation)
+      m_angularFriction = 300.0f;
+      m_stiffness = 0.9f;
+
+      m_anim_speed = 0.0f;
+      m_anim_offset = 0.0f;
+      m_anim_time = 0.0f;
+
+//	  m_basis = dGetIdentityMatrix();
+   }
+
+   void SubmitConstraints(dFloat timestep, int threadIndex)
+   {
+      float invTimestep = 1.0f / timestep;
+     
+      dMatrix body0Matrix; NewtonBodyGetMatrix(m_body0, &body0Matrix[0][0]);
+      dMatrix body1Matrix; NewtonBodyGetMatrix(m_body1, &body1Matrix[0][0]);     
+      dMatrix matrix0 = m_localMatrix0 * body0Matrix;
+      dMatrix matrix1 = m_localMatrix1 * body1Matrix;
+
+      if (m_anim_speed != 0.0f) // some animation to illustrate purpose
+      {
+         m_anim_time += timestep * m_anim_speed;
+         float a0 = sin (m_anim_time);
+         float a1 = m_anim_offset * 3.14f;
+         dVector axis (sin(a1), 0.0f, cos(a1));
+         //dVector axis (1,0,0);
+         m_target = dQuaternion (axis, a0 * 0.5f);
+      }
+
+      // point to point constraint
+
+      dVector p0 (matrix0.m_posit);
+      dVector p1 (matrix1.m_posit);
+      NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+      NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
+      NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
+
+      // measure error
+      dQuaternion q0 (matrix0);
+      dQuaternion q1 (matrix1);
+      dQuaternion qt0 = m_target * q1;
+      dQuaternion qErr = (q0.DotProduct(qt0) < 0.0f
+         ? dQuaternion (-q0.m_q0,  q0.m_q1,  q0.m_q2,  q0.m_q3)
+         : dQuaternion ( q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
+      
+      float errorAngle = 2.0f * acos (max (-1.0f, min (1.0f, qErr.m_q0)));
+	  dVector errorAngVel (0,0,0);
+
+	   dMatrix basis;
+	   if (errorAngle > 1.0e-10f) {
+         dVector errorAxis (qErr.m_q1, qErr.m_q2, qErr.m_q3, 0.0f);
+         errorAxis = errorAxis.Scale(1.0f / dSqrt (errorAxis % errorAxis));   
+		 errorAngVel = errorAxis.Scale (errorAngle * invTimestep);
+
+		   basis = dGrammSchmidt(errorAxis); 
+		} else {
+		   basis = dMatrix (qt0, dVector (0.0f, 0.0f, 0.0f, 1.0f));
+	  }
+
+		dVector angVel0, angVel1;
+		NewtonBodyGetOmega (m_body0, (float*)&angVel0);
+		NewtonBodyGetOmega (m_body1, (float*)&angVel1);        
+
+		dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);	
+                 
+		// motor
+		for (int n = 0; n < 3; n++) {
+			// calculate the desired acceleration
+			dVector &axis = basis[n];
+			float relAccel = angAcc % axis;
+
+			NewtonUserJointAddAngularRow (m_joint, 0.0f, &axis[0]);
+			NewtonUserJointSetRowAcceleration (m_joint, relAccel);
+			NewtonUserJointSetRowMinimumFriction (m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction (m_joint,  m_angularFriction);
+			NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
+		}      
+   }
+
+   static void Callback (const NewtonJoint* joint, float timestep, int threadIndex)
+   {
+      JoesRagdollJoint *custom = (JoesRagdollJoint*) NewtonJointGetUserData(joint);
+      custom->SubmitConstraints (timestep, threadIndex);
+   }
+};
+
+
+#define xxxxx
+void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const float animSpeed = 0.0f, const int numSegments = 4)
+{
+    float height = 1.0f;
+    float width = 4.0f;
+
+    dVector size (width, height, width);
+    NewtonBody* parent = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
+	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
+
+
+#if (defined (_USE_HARD_JOINTS) && defined (xxxxx))
+    NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), parent, NULL);
+#endif
+
+    for (int i=0; i<numSegments; i++)
+    {
+        float height = 1.0f;
+        float width = 0.5f;
+
+        dVector size (width, height, width);
+        NewtonBody* child = CreateBox (scene, origin + dVector (0.0f,  0.5f + height * float(i+1), 0.0f, 0.0f), size);
+        
+        dMatrix matrix0 = dGetIdentityMatrix(); matrix0.m_posit = dVector (0.0f, height*-0.5f, 0.0f, 1.0f);
+        dMatrix matrix1 = dGetIdentityMatrix(); matrix1.m_posit = dVector (0.0f, height*0.5f, 0.0f, 1.0f);
+        JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
+
+		if (animSpeed != 0.0f) joint->m_anim_speed = animSpeed, joint->m_anim_offset = float(i) / float(numSegments); // animated      
+
+#if (defined (_USE_HARD_JOINTS) && defined (xxxxx))
+        NewtonSkeletonContainerAttachBone (skeleton, child, parent);
+#endif
+         
+        parent = child;
+    }
+
+
+#if (defined (_USE_HARD_JOINTS) && defined (xxxxx))
+    NewtonSkeletonContainerFinalize(skeleton);
+#endif
+}
+
+
+
 static void AddPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size (1.0f, 1.0f, 1.0f);
@@ -920,7 +1081,7 @@ void StandardJoints (DemoEntityManager* const scene)
 
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
-
+/*
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -935,7 +1096,11 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
-
+*/
+//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 1.5f); // animated
+   AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -5.0f));
+//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
+ 
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);

@@ -1374,11 +1374,16 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 
+			//for (dgInt32 i = 0; i < skeletonCount; i ++) {
+				//dgSkeletonContainer* const container = skeletonArray[i];
+				//dgFloat32 accel = container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
+				//accNorm = (accel > accNorm) ? accel : accNorm;
+			//}
+		}
+
 			for (dgInt32 i = 0; i < skeletonCount; i ++) {
 				dgSkeletonContainer* const container = skeletonArray[i];
-				dgFloat32 accel = container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
-				accNorm = (accel > accNorm) ? accel : accNorm;
-			}
+			container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
 		}
 
 		if (timestepRK != dgFloat32 (0.0f)) {
