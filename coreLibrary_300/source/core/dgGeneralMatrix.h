@@ -74,15 +74,7 @@ class dgGeneralMatrix
 	void MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& Bt);
 
 	bool Solve(dgGeneralVector<T> &b, T tol = T(0.0f));
-
-	bool LDLtDecomposition();
-	bool CholeskyDecomposition();
-
-	bool TestPSD() const;
-	bool TestSymetry() const;
-
 	void Trace() const;
-
 
 protected:
 	bool m_ownMemory;
@@ -357,9 +349,6 @@ void dgGeneralMatrix<T>::MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, 
 	}
 }
 
-
-
-
 template<class T>
 bool dgGeneralMatrix<T>::Solve(dgGeneralVector<T> &b, T tol)
 {
@@ -390,7 +379,6 @@ bool dgGeneralMatrix<T>::Solve(dgGeneralVector<T> &b, T tol)
 		}
 	}
 
-
 	B[m_rowCount - 1] = B[m_rowCount - 1] / m_rows[m_rowCount - 1][m_rowCount - 1];
 	for (dgInt32 i = m_rowCount - 2; i >= 0; i--) {
 		T acc(0);
@@ -417,102 +405,16 @@ void dgGeneralMatrix<T>::SwapRows(dgInt32 i, dgInt32 j)
 template<class T>
 void dgGeneralMatrix<T>::SwapColumns(dgInt32 i, dgInt32 j)
 {
-	dgInt32 k;
 	dgAssert(i >= 0);
 	dgAssert(j >= 0);
 	dgAssert(i < m_colCount);
 	dgAssert(j < m_colCount);
-	for (k = 0; k < m_colCount; k++) {
+	for (dgInt32 k = 0; k < m_colCount; k++) {
 		dgSwap(m_rows[k][i], m_rows[k][j]);
 	}
 }
 
 
-
-template<class T>
-bool dgGeneralMatrix<T>::TestSymetry() const
-{
-	if (m_colCount != m_rowCount) {
-		return false;
-	}
-
-	dgGeneralMatrix<T> mat = *this;
-	for (dgInt32 i = 0; i < m_rowCount; i++) {
-		for (dgInt32 j = i + 1; j < m_rowCount; j++) {
-			if (dgAbsf(mat[i][j] - mat[j][i]) > 1.0e-12f) {
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-template<class T>
-bool dgGeneralMatrix<T>::TestPSD() const
-{
-	if (!TestSymetry()) {
-		return false;
-	}
-
-	dgGeneralMatrix<T> tmp(*this);
-	return tmp.CholeskyDecomposition();
-}
-
-
-template<class T>
-bool dgGeneralMatrix<T>::CholeskyDecomposition()
-{
-	for (dgInt32 j = 0; j < m_rowCount; j++) {
-		T* const rowJ = &m_rows[j].m_columns[0];
-		for (dgInt32 k = 0; k < j; k++) {
-			T* const rowK = &m_rows[k].m_columns[0];
-			T factor = rowK[j];
-			for (dgInt32 i = j; i < m_rowCount; i++) {
-				rowJ[i] -= rowK[i] * factor;
-			}
-		}
-
-		T factor = rowJ[j];
-		if (factor <= T(0.0f)) {
-			return false;
-		}
-
-		rowJ[j] = T(sqrt(factor));
-		factor = T(1.0f / rowJ[j]);
-		for (dgInt32 k = j + 1; k < m_rowCount; k++) {
-			rowJ[k] *= factor;
-		}
-	}
-	return true;
-}
-
-
-template<class T>
-bool dgGeneralMatrix<T>::LDLtDecomposition()
-{
-	for (dgInt32 j = 0; j < m_rowCount; j++) {
-		T* const rowJ = &m_rows[j].m_columns[0];
-		for (dgInt32 k = 0; k < j; k++) {
-			T* const rowK = &m_rows[k].m_columns[0];
-			T factor = rowK[j];
-			for (dgInt32 i = j; i < m_rowCount; i++) {
-				rowJ[i] -= rowK[i] * factor;
-			}
-		}
-
-		T factor = rowJ[j];
-		if (factor <= T(0.0f)) {
-			return false;
-		}
-
-		rowJ[j] = T(sqrt(factor));
-		factor = T(1.0f / rowJ[j]);
-		for (dgInt32 k = j + 1; k < m_rowCount; k++) {
-			rowJ[k] *= factor;
-		}
-	}
-	return true;
-}
 
 #endif
 

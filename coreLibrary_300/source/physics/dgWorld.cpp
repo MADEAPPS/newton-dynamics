@@ -1356,6 +1356,7 @@ void dgWorld::SetBroadPhaseType(dgInt32 type)
 
 dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootBone)
 {
+	dgAssert (rootBone);
 	dgSkeletonList* const list = this;
 	if (dgSkeletonContainer::m_uniqueID > 1014 * 16) {
 		dgList<dgSkeletonContainer*> saveList (GetAllocator());
@@ -1375,9 +1376,8 @@ dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootB
 		dgSkeletonContainer::ResetUniqueId(index);
 	}
 
-	dgBody* const body = rootBone ? rootBone : GetSentinelBody();
-	dgAssert (body->GetType() == dgBody::m_dynamicBody);
-	dgSkeletonContainer* const container = new (m_allocator) dgSkeletonContainer(this, (dgDynamicBody*)body);
+	dgAssert (rootBone->GetType() == dgBody::m_dynamicBody);
+	dgSkeletonContainer* const container = new (m_allocator) dgSkeletonContainer(this, (dgDynamicBody*)rootBone);
 	
 	list->Insert (container, container->GetId());
 	return container;

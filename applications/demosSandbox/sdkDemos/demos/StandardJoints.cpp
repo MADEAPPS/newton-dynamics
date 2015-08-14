@@ -113,32 +113,34 @@ static NewtonBody* CreateCylinder (DemoEntityManager* const scene, const dVector
 static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size (1.0f, 1.0f, 1.0f);
-	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0 - size.m_y * 4.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box0 = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
+	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box2 = CreateCapule (scene, origin + dVector (0.0f,  5.0 - size.m_y * 4.0f, 0.0f, 0.0f), size);
 
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
+	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	// connect first box to the world
 	dMatrix matrix0;
-	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
+	NewtonBodyGetMatrix (box1, &matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	new CustomBallAndSocket (pinMatrix, box0, NULL);
+	new CustomBallAndSocket (pinMatrix, box1, box0);
 
 	// link the two boxes with a distance joint
 	dMatrix matrix1;
-	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
+	NewtonBodyGetMatrix (box2, &matrix1[0][0]);
 
 	// get the origins
 	dVector pivot0 (matrix0.m_posit - dVector (0.0f, size.m_y, 0.0f, 0.0f));
 	dVector pivot1 (matrix1.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f));
 
 	// connect bodies at a corner
-	new CustomPointToPoint (pivot1, pivot0, box1, box0);
+	new CustomPointToPoint (pivot1, pivot0, box2, box1);
 	
 #ifdef _USE_HARD_JOINTS
-	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), NULL, NULL);
-	NewtonSkeletonContainerAttachBone(skeleton, box0, NULL);
+	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), box0, NULL);
 	NewtonSkeletonContainerAttachBone(skeleton, box1, box0);
+	NewtonSkeletonContainerAttachBone(skeleton, box2, box1);
 	NewtonSkeletonContainerFinalize(skeleton);
 #endif
 }
@@ -1081,8 +1083,9 @@ void StandardJoints (DemoEntityManager* const scene)
 
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
-/*
+
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
+/*
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
@@ -1098,7 +1101,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 */
 //	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 1.5f); // animated
-   AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -5.0f));
+//   AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -5.0f));
 //	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
  
     // place camera into position

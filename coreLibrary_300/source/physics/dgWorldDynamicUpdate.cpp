@@ -295,6 +295,16 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 
 							dgAssert (constraint->m_body0);
 							dgAssert (constraint->m_body1);
+							if (body->GetSkeleton()) {
+								for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+									dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+									dgDynamicBody* const otherBody = (dgDynamicBody*)cell->m_bodyNode;
+									if ((otherBody->GetSkeleton() == body->GetSkeleton()) && (otherBody->m_dynamicsLru < lruMark)) {
+										queue.Insert (otherBody);
+										otherBody->m_dynamicsLru = lruMark;
+									}
+								}
+							}
 						}
 
 					} else if (body->m_invMass.m_w == dgFloat32 (0.0f)) { 
@@ -318,6 +328,17 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 
 						dgAssert (constraint->m_body0);
 						dgAssert (constraint->m_body1);
+
+						if (body->GetSkeleton()) {
+							for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+								dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+								dgDynamicBody* const otherBody = (dgDynamicBody*)cell->m_bodyNode;
+								if ((otherBody->GetSkeleton() == body->GetSkeleton()) && (otherBody->m_dynamicsLru < lruMark)) {
+									queue.Insert(otherBody);
+									otherBody->m_dynamicsLru = lruMark;
+								}
+							}
+						}
 					}
 				}
 			}

@@ -350,6 +350,7 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_id(m_uniqueID)
 	,m_nodeCount(1)
 {
+	rootBody->SetSkeleton(this);
 	m_uniqueID++;
 }
 
@@ -456,9 +457,8 @@ dgSkeletonContainer::dgSkeletonGraph* dgSkeletonContainer::AddChild(dgDynamicBod
 	dgAssert(node->m_joint->GetBody1() == node->m_parent->m_body);
 	m_nodeCount ++;
 
-	if (child->GetWorld()->GetSentinelBody() != child) {
-		child->SetSkeleton(this);
-	}
+	dgAssert (child->GetWorld()->GetSentinelBody() != child);
+	child->SetSkeleton(this);
 	
 	return node;
 }
