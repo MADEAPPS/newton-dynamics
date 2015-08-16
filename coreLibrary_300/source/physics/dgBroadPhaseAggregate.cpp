@@ -96,7 +96,7 @@ void dgBroadPhaseAggregate::AddBody(dgBody* const body)
 	SetAABB (m_root->m_minBox, m_root->m_maxBox);
 	for (dgBroadPhaseNode* ptr = this; ptr->m_parent; ptr = ptr->m_parent) {
 		if (dgBoxInclusionTest(ptr->m_minBox, ptr->m_maxBox, ptr->m_parent->m_minBox, ptr->m_parent->m_maxBox)) {
-				break;
+			break;
 		}
 		dgVector minBox;
 		dgVector maxBox;
