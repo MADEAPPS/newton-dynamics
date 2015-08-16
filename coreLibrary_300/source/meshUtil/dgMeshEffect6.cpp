@@ -898,7 +898,7 @@ class dgAngleBasedFlatteningMapping: public dgSymmetricBiconjugateGradientSolve
 		CalculateNumberOfVariables();
 		dgInt32 vertexCount = m_mesh->GetVertexCount();
 
-		// alloca intermediate vectors
+		// alloc intermediate vectors
 		m_betaEdge = (dgEdge**) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (dgEdge*));
 		m_interiorIndirectMap = (dgInt32*) m_mesh->GetAllocator()->MallocLow (vertexCount * sizeof (dgInt32));
 		m_beta = (dgFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (dgFloat64));

@@ -93,6 +93,19 @@ void dgBroadPhaseAggregate::AddBody(dgBody* const body)
 		tmp->m_fitnessNode = link;
 	}
 	body->m_broadPhaseaggregateNode = this;
+	SetAABB (m_root->m_minBox, m_root->m_maxBox);
+	for (dgBroadPhaseNode* ptr = this; ptr->m_parent; ptr = ptr->m_parent) {
+		if (dgBoxInclusionTest(ptr->m_minBox, ptr->m_maxBox, ptr->m_parent->m_minBox, ptr->m_parent->m_maxBox)) {
+				break;
+		}
+		dgVector minBox;
+		dgVector maxBox;
+		dgFloat32 area;
+		area = m_broadPhase->CalculateSurfaceArea(ptr->m_parent, ptr, minBox, maxBox);
+		ptr->m_parent->m_minBox = minBox;
+		ptr->m_parent->m_maxBox = maxBox;
+		ptr->m_parent->m_surfaceArea = area;
+	}
 }
 
 void dgBroadPhaseAggregate::RemoveBody(dgBody* const body)

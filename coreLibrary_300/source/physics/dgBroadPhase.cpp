@@ -689,8 +689,7 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 				if (!parent->IsAggregate()) {
 					dgVector minBox;
 					dgVector maxBox;
-					dgFloat32 area;
-					area = CalculateSurfaceArea (parent->GetLeft(), parent->GetRight(), minBox, maxBox);
+					dgFloat32 area = CalculateSurfaceArea (parent->GetLeft(), parent->GetRight(), minBox, maxBox);
 					if (dgBoxInclusionTest (minBox, maxBox, parent->m_minBox, parent->m_maxBox)) {
 						break;
 					}
@@ -805,7 +804,7 @@ void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy,
 
 		if ((entropy > oldEntropy * dgFloat32(2.0f)) || (entropy < oldEntropy * dgFloat32(0.5f))) {
 			if (fitness.GetFirst()) {
-				dgBroadPhaseNode** const leafArray = (dgBroadPhaseNode**) alloca ((fitness.GetCount() * 2 + 12) * sizeof (dgBroadPhaseNode*));
+				dgBroadPhaseNode** const leafArray = dAlloca (dgBroadPhaseNode*, fitness.GetCount() * 2 + 12);
 
 				dgInt32 leafNodesCount = 0;
 				for (dgFitnessList::dgListNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
@@ -1429,7 +1428,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 	dgUnsigned32 lru = m_lru;
 
 	dgActiveContacts* const contactList = m_world;
-    dgContact** const deadContacs = (dgContact**) alloca ((contactList->GetCount() + 256) * sizeof (dgContact*));
+	dgContact** const deadContacs = dAlloca (dgContact*, contactList->GetCount() + 256);
 
 	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
 		dgContact* const contact = contactNode->GetInfo();

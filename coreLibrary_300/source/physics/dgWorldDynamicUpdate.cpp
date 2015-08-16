@@ -93,7 +93,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_index = 0; 
 	sentinelBody->m_dynamicsLru = m_markLru;
 
-	m_islandMemory = (dgIsland*) alloca ((masterList.GetCount() + 256) * sizeof (dgIsland));
+	m_islandMemory = dAlloca (dgIsland, masterList.GetCount() + 256);
 	BuildIslands(timestep);
 
 	dgInt32 maxRowCount = 0;
@@ -168,7 +168,7 @@ void dgWorldDynamicUpdate::BuildIslands(dgFloat32 timestep)
 	dgBodyMasterList& masterList = *world;
 
 	dgAssert (masterList.GetFirst()->GetInfo().GetBody() == world->m_sentinelBody);
-	dgDynamicBody** const stackPoolBuffer = (dgDynamicBody**)alloca (2 * (masterList.m_constraintCount + 1024) * sizeof (dgDynamicBody*));
+	dgDynamicBody** const stackPoolBuffer = dAlloca (dgDynamicBody*, 2 * (masterList.m_constraintCount + 1024));
 
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
 		const dgBodyMasterListRow& graphNode = node->GetInfo();

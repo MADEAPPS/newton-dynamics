@@ -281,6 +281,8 @@ typedef void (dgApi *dgDeserialize) (void* const userData, void* buffer, size_t 
 typedef void (dgApi *dgSerialize) (void* const userData, const void* const buffer, size_t size);
 typedef bool (dgApi *dgReportProgress) (dgFloat32 progressNormalzedPercent, void* const userData);
 
+#define dAlloca(type, size) (type*) alloca ((size) * sizeof (type))
+
 DG_INLINE dgInt32 dgExp2 (dgInt32 x)
 {
 	dgInt32 exp;
