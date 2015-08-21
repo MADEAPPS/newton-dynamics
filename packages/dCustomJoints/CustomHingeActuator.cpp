@@ -127,13 +127,9 @@ void CustomHingeActuator::GetInfo (NewtonJointRecord* const info) const
 void CustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	if (m_flag) {
-		dMatrix matrix0;
-		dMatrix matrix1;
-
-		CalculateGlobalMatrix (matrix0, matrix1);
 		dFloat jointangle = GetActuatorAngle();
 		dFloat relAngle = jointangle - m_angle;
-		NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
+		NewtonUserJointAddAngularRow (m_joint, -relAngle, &matrix0.m_front[0]);
 
 		dFloat step = m_angularRate * timestep;
 		if (dAbs (relAngle) > 2.0f * dAbs (step)) {

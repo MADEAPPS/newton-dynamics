@@ -23,7 +23,7 @@
 class CustomPathFollow: public CustomJoint  
 {
 	public:
-	CUSTOM_JOINTS_API CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body, NewtonBody* const pathBody);
+	CUSTOM_JOINTS_API CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body);
 	CUSTOM_JOINTS_API virtual ~CustomPathFollow();
 
 	virtual void GetPointAndTangentAtLocation (const dVector& location,  dVector& positOut, dVector& tangentOut) const = 0;

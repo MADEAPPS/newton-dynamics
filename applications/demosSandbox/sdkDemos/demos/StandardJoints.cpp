@@ -840,15 +840,15 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
 class MyPathFollow: public CustomPathFollow
 {
 	public:
-	MyPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body, NewtonBody* const path)
-		:CustomPathFollow (pinAndPivotFrame, body, path)
+	MyPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body, DemoEntity* const path)
+		:CustomPathFollow (pinAndPivotFrame, body)
+		,m_rollerCosterPath (path)
 	{
 	}
 
 	void GetPointAndTangentAtLocation (const dVector& location,  dVector& positOut, dVector& tangentOut) const
 	{
-		DemoEntity* const rollerCosterPath = (DemoEntity*) NewtonBodyGetUserData (GetBody1());
-		DemoBezierCurve* const mesh = (DemoBezierCurve*)rollerCosterPath->GetMesh(); 
+		DemoBezierCurve* const mesh = (DemoBezierCurve*)m_rollerCosterPath->GetMesh(); 
 
 		const dBezierSpline& spline = mesh->m_curve;
 
@@ -860,6 +860,8 @@ class MyPathFollow: public CustomPathFollow
 		positOut = dVector (point.m_x, point.m_y, point.m_z);
 		tangentOut = dVector (tangent.m_x, tangent.m_y, tangent.m_z);
 	}
+
+	DemoEntity* const m_rollerCosterPath;
 };
 
 
@@ -936,9 +938,8 @@ class CustomDistanceRope: public CustomPointToPoint
 static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin)
 {
 	// create a Bezier Spline path for AI car to drive
-	NewtonBody* const pathBody = CreateBox(scene, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (0.1f, 0.1f, 0.1f, 0.0f));
-	DemoEntity* const rollerCosterPath = (DemoEntity*) NewtonBodyGetUserData(pathBody);
-	NewtonBodySetMassMatrix(pathBody, 0.0f, 0.0f, 0.0f, 0.0f);
+	DemoEntity* const rollerCosterPath = new DemoEntity(dGetIdentityMatrix(), NULL);
+	scene->Append(rollerCosterPath);
 	
 	dBezierSpline spline;
 	dFloat64 knots[] = {0.0f, 1.0f / 5.0f, 2.0f / 5.0f, 3.0f / 5.0f, 4.0f / 5.0f, 1.0f};
@@ -965,9 +966,9 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	mesh->SetRenderResolution(500);
 	mesh->Release();
 	
-
 	const int count = 32;
 	NewtonBody* bodies[count];
+
 	dBigVector point0;
 	
 	dVector positions[count + 1];
@@ -1005,7 +1006,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		dMatrix matrix1 (dYawMatrix(0.5f * 3.141692f) * matrix);
 		NewtonBodySetMatrix(box, &matrix1[0][0]);
 		matrix.m_posit.m_y += attachmentOffset;		
-		new MyPathFollow(matrix, box, pathBody);
+		new MyPathFollow(matrix, box, rollerCosterPath);
 
 		dVector veloc (dir.Scale (20.0f));
 		NewtonBodySetVelocity(box, &veloc[0]);
@@ -1031,14 +1032,12 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	NewtonCollisionAggregateSetSelfCollision (aggregate, false);
 
 #ifdef _USE_HARD_JOINTS
-	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), pathBody, NULL);
-	NewtonSkeletonContainerAttachBone(skeleton, bodies[0], pathBody);
+	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), bodies[0], NULL);
 	for (int i = 1; i < count; i++) {
 		NewtonSkeletonContainerAttachBone(skeleton, bodies[i], bodies[i - 1]);
 	}
 	NewtonSkeletonContainerFinalize(skeleton);
 #endif
-
 }
 
 void StandardJoints (DemoEntityManager* const scene)

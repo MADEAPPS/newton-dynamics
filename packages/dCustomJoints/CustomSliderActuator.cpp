@@ -128,10 +128,6 @@ void CustomSliderActuator::GetInfo (NewtonJointRecord* const info) const
 void CustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	if (m_flag) {
-		dMatrix matrix0;
-		dMatrix matrix1;
-		CalculateGlobalMatrix (matrix0, matrix1);
-
 		dVector posit1 (matrix1.m_posit);
 		dVector posit0 (matrix0.m_posit - matrix1.m_front.Scale (m_posit));
 		NewtonUserJointAddLinearRow (m_joint, &posit0[0], &posit1[0], &matrix1.m_front[0]);

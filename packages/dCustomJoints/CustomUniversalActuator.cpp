@@ -194,7 +194,7 @@ void CustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadInde
 		if (m_flag0) {
 			dFloat jointAngle = GetJointAngle_0();
 			dFloat relAngle = jointAngle - m_angle0;
-			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix0.m_front[0]);
+			NewtonUserJointAddAngularRow (m_joint, -relAngle, &matrix0.m_front[0]);
 			dFloat step = m_angularRate0 * timestep;
 			if (dAbs (relAngle) > 2.0f * dAbs (step)) {
 				dFloat desiredSpeed = dSign(relAngle) * m_angularRate0;
@@ -210,7 +210,7 @@ void CustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadInde
 		if (m_flag1) {
 			dFloat jointAngle = GetJointAngle_1();
 			dFloat relAngle = jointAngle - m_angle1;
-			NewtonUserJointAddAngularRow (m_joint, relAngle, &matrix1.m_up[0]);
+			NewtonUserJointAddAngularRow (m_joint, -relAngle, &matrix1.m_up[0]);
 			dFloat step = m_angularRate1 * timestep;
 			if (dAbs (relAngle) > 2.0f * dAbs (step)) {
 				dFloat desiredSpeed = dSign(relAngle) * m_angularRate1;

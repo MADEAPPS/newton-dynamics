@@ -21,11 +21,12 @@
 //////////////////////////////////////////////////////////////////////
 
 
-CustomPathFollow::CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const pathBody)
-	:CustomJoint(6, child, pathBody)
+CustomPathFollow::CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const child)
+	:CustomJoint(6, child, NULL)
 {
 	// calculate the two local matrix of the pivot point
-	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+	dMatrix tmp;
+	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, tmp);
 }
 
 CustomPathFollow::~CustomPathFollow()
