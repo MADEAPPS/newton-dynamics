@@ -174,7 +174,7 @@
 #endif
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define DG_INLINE	__forceinline 
+	#define DG_INLINE __forceinline 
 #else 
 	#define DG_INLINE	inline
 	//#define DG_INLINE	 __attribute__((always_inline))
@@ -281,7 +281,7 @@ typedef void (dgApi *dgDeserialize) (void* const userData, void* buffer, size_t 
 typedef void (dgApi *dgSerialize) (void* const userData, const void* const buffer, size_t size);
 typedef bool (dgApi *dgReportProgress) (dgFloat32 progressNormalzedPercent, void* const userData);
 
-#define dAlloca(type, size) (type*) alloca ((size) * sizeof (type))
+#define dgAlloca(type, size) (type*) alloca ((size) * sizeof (type))
 
 DG_INLINE dgInt32 dgExp2 (dgInt32 x)
 {
@@ -890,14 +890,8 @@ DG_INLINE void dgSpinUnlock (dgInt32* const ptr)
 	#endif
 }
 
-DG_INLINE void dgPrefetchMem(const void* const mem)
-{
-	#if !(defined (__ppc__) || defined (ANDROID) || defined (IOS))
-		_mm_prefetch ((const char*)mem, _MM_HINT_T0);
-	#endif
-}
 
-#ifdef __MACH__
+#ifdef _MACOSX_VER
 #include <sys/time.h>
 #define CLOCK_REALTIME 0
 #define CLOCK_MONOTONIC 0

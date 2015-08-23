@@ -22,30 +22,6 @@
 #ifndef __DG_THREAD_PROFILER_H__
 #define __DG_THREAD_PROFILER_H__
 
-#include "dgList.h"
-
-#define DG_PROFILER_EVENT_NAME_SIZE  32
-
-class dgThreadProfiler
-{
-	public:
-	class dgEvent
-	{
-		public:
-		char m_name[ DG_PROFILER_EVENT_NAME_SIZE];
-		dgUnsigned32 m_startTime;
-		dgUnsigned32 m_duration;
-	};
-
-	dgThreadProfiler ();
-	dgThreadProfiler (const char* const name, dgInt32 id);
-	virtual ~dgThreadProfiler ();
-	
-	dgUnsigned32 m_startTime;
-	dgUnsigned32 m_endTime;
-	dgList<dgEvent> m_events;
-};
-
 
 
 #endif

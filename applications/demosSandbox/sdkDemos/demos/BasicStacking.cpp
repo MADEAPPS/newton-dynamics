@@ -36,9 +36,6 @@ static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVect
 	dVector floor (FindFloor (world, dVector (baseMatrix.m_posit.m_x, startElevation, baseMatrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y / 2.0f;
 
-	// set realistic mass and inertia matrix for each block
-	mass = 5.0f;
-
 	// create a 90 degree rotation matrix
 	dMatrix rotMatrix (dYawMatrix (3.141592f * 0.5f));
 
@@ -145,9 +142,6 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 	dVector floor(FindFloor(world, dVector(baseMatrix.m_posit.m_x, startElevation, baseMatrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
 
-	// set realistic mass and inertia matrix for each block
-	mass = 5.0f;
-
 	// create a material to control collision with this objects
 	int defaultMaterialID;
 	defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
@@ -205,7 +199,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	high = 20;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
-//			BuildJenga (scene, 5.0f, dVector(-15.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
+			BuildJenga (scene, 5.0f, dVector(-15.0f + j * 8, 0.0f, 10.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 1.62f/2.0f, 0.0), high);
 		}
 	}
 
@@ -223,7 +217,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	dQuaternion rot;
 	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
 //origin.m_x = -10.0f;
-origin.m_x = -20.0f;
+origin.m_x = -40.0f;
 origin.m_y = 8.0f;
 	scene->SetCameraMatrix(rot, origin);
 

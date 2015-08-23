@@ -215,9 +215,8 @@ class dgJacobianMatrixElement
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
 
-	dgFloat32 m_maxImpact;
-
 	dgForceImpactPair* m_jointFeebackForce;
+	dgFloat32 m_maxImpact;
 	dgInt32 m_normalForceIndex;
 	bool m_accelIsMotor;
 } DG_GCC_VECTOR_ALIGMENT;
@@ -281,7 +280,6 @@ class dgWorldDynamicUpdate
 	void CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateReactionsForces(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void ApplyExternalForcesAndAcceleration(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	void CalculateSimpleBodyReactionsForces (const dgIsland* const island, dgInt32 rowStart, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 
 	dgFloat32 CalculateJointForce(dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	dgFloat32 CalculateJointForces(const dgIsland* const island, dgInt32 rowStart, dgInt32 joint, dgFloat32* const forceStep, dgFloat32 maxAccNorm, const dgJacobianPair* const JMinv) const;

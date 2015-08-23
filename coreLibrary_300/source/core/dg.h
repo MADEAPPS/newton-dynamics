@@ -57,7 +57,6 @@
 #include "dgIntersections.h"
 #include "dgGeneralVector.h"
 #include "dgGeneralMatrix.h"
-#include "dgThreadProfiler.h"
 #include "dgAABBPolygonSoup.h"
 #include "dgSmallDeterminant.h"
 #include "dgPolygonSoupBuilder.h"

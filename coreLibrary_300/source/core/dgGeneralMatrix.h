@@ -32,10 +32,14 @@ template<class T>
 class dgGeneralMatrix
 {
 	public:
-	DG_CLASS_ALLOCATOR(allocator)
 	dgGeneralMatrix(const dgGeneralMatrix<T>& src);
 	dgGeneralMatrix(dgMemoryAllocator* const allocator, dgInt32 row, dgInt32 column);
 	~dgGeneralMatrix();
+
+	void* operator new (size_t size);
+	void operator delete (void* const ptr);
+	void* operator new (size_t size, dgMemoryAllocator* const allocator);
+	void operator delete (void* const ptr, dgMemoryAllocator* const allocator);
 
 	dgGeneralVector<T>& operator[] (dgInt32 i);
 	const dgGeneralVector<T>& operator[] (dgInt32 i) const;
@@ -48,16 +52,12 @@ class dgGeneralMatrix
 
 	void SwapRows(dgInt32 i, dgInt32 j);
 	void SwapColumns(dgInt32 i, dgInt32 j);
+	
+	// calculate out = v * A;
+	void VectorTimeMatrix(const dgGeneralVector<T> &v, dgGeneralVector<T> &out) const;
 
-	//dgGeneralMatrix Transpose ();
-	//void Inverse (dgGeneralMatrix& inverseOut);
-	void GaussianPivotStep(dgInt32 srcRow, dgInt32 pivotRow, dgInt32 pivotCol, T tol = T(1.0e-6f));
-
-	// calculate out = V * A;
-	void VectorTimeMatrix(const dgGeneralVector<T> &v, dgGeneralVector<T> &out);
-
-	// calculate out = A * transpose (V);
-	void MatrixTimeVectorTranspose(const dgGeneralVector<T> &v, dgGeneralVector<T> &out);
+	// calculate out = A * v;
+	void MatrixTimeVector(const dgGeneralVector<T> &v, dgGeneralVector<T> &out) const;
 
 	// calculate M = A * B;
 	void MatrixTimeMatrix(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& B);
@@ -65,15 +65,38 @@ class dgGeneralMatrix
 	// calculate M = A * transpose (B);
 	void MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& Bt);
 
-	bool Solve(dgGeneralVector<T> &x, const dgGeneralVector<T> &b);
 	void Trace() const;
 
+	static dgInt32 CalculateMemorySize (dgInt32 row, dgInt32 column)
+	{
+		return row * dgGeneralVector<T>::CalculateMemorySize (column) + row * sizeof (dgGeneralVector<T>*) + row * sizeof (dgGeneralVector<T>);
+	}
+
 	protected:
+	DG_INLINE void VectorTimeMatrix(const T* const v, T* const out) const;
+	DG_INLINE void MatrixTimeVector(const T* const v, T* const out) const;
+
 	dgGeneralVector<T>** m_rows;
 	dgMemoryAllocator* m_allocator;
 	dgInt32 m_rowCount;
 };
 
+template<class T>
+class dgSquareMatrix: public dgGeneralMatrix<T>
+{
+	public:
+	dgSquareMatrix(const dgGeneralMatrix<T>& src);
+	dgSquareMatrix(dgMemoryAllocator* const allocator, dgInt32 size);
+	~dgSquareMatrix();
+
+	static dgInt32 CalculateMemorySize(dgInt32 row)
+	{
+		return dgGeneralMatrix<T>::CalculateMemorySize(row, row);
+	}
+
+
+	bool SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVector<T> &b);
+};
 
 // ***********************************************************************************************
 //
@@ -96,14 +119,12 @@ dgGeneralMatrix<T>::dgGeneralMatrix(dgMemoryAllocator* const allocator, dgInt32 
 
 template<class T>
 dgGeneralMatrix<T>::dgGeneralMatrix(const dgGeneralMatrix<T>& src)
-	:m_rows((dgGeneralVector<T>**) allocator->MallocLow(src.m_rowCount * sizeof (dgGeneralVector<T>*)))
+	:m_rows((dgGeneralVector<T>**) src.m_allocator->MallocLow(src.m_rowCount * sizeof (dgGeneralVector<T>*)))
 	,m_allocator(src.m_allocator)
 	,m_rowCount(src.m_rowCount)
 {
-	dgInt32 colums = GetColCount();
 	for (dgInt32 i = 0; i < m_rowCount; i++) {
-		m_rows[i] = new (m_allocator) dgGeneralVector<T>(m_allocator, colums);
-		m_rows[i].Copy (src[i]);
+		m_rows[i] = new (m_allocator) dgGeneralVector<T>(src[i]);
 	}
 }
 
@@ -115,6 +136,32 @@ dgGeneralMatrix<T>::~dgGeneralMatrix()
 		delete m_rows[i]; 
 	}
     m_allocator->FreeLow(m_rows);
+}
+
+template<class T>
+void* dgGeneralMatrix<T>::operator new (size_t size)
+{
+	dgAssert(0);
+	return NULL;
+}
+
+template<class T>
+void* dgGeneralMatrix<T>::operator new (size_t size, dgMemoryAllocator* const allocator)
+{
+	return allocator->MallocLow(size);
+}
+
+template<class T>
+void dgGeneralMatrix<T>::operator delete (void* const ptr, dgMemoryAllocator* const allocator)
+{
+	dgAssert(0);
+	//dgFree(ptr); 
+}
+
+template<class T>
+void dgGeneralMatrix<T>::operator delete (void* const ptr)
+{
+	dgAssert(0);
 }
 
 
@@ -172,88 +219,58 @@ void dgGeneralMatrix<T>::Identity()
      }
 }
 
-
-//template<class T>
-//void dgGeneralMatrix<T>::Transpose ()
-//{
-//   dgInt32 i;
-//   dgInt32 j;
-//
-//   dgAssert (m_rowCount == 
-//   dgGeneralMatrix<T>& me = *this;
-//   for (i = 0; i < m_rowCount; i ++) {
-//         for (j = i + 1; j < m_rowCount; j ++) {
-//              T tmp (me[i][j]);
-//              me[i][j] = me[j][i];
-//              me[j][i] = tmp;
-//         }
-//   }
-//}
-
-
 template<class T>
-void dgGeneralMatrix<T>::GaussianPivotStep(dgInt32 srcRow, dgInt32 pivotRow, dgInt32 pivotCol, T tol)
+void dgGeneralMatrix<T>::VectorTimeMatrix(const dgGeneralVector<T> &v, dgGeneralVector<T> &out) const
 {
-     dgGeneralMatrix<T>& me = *this;
-
-     T num(me[pivotRow][pivotCol]);
-     if (T(dgAbsf(num)) > tol) {
-           T den(me[srcRow][pivotCol]);
-           dgAssert(T(dgAbsf(den)) > T(0.0f));
-           den = -num / den;
-           me[pivotRow].LinearCombine(den, me[srcRow], me[pivotRow]);
-     }
-}
-
-
-//template<class T>
-//void dgGeneralMatrix<T>::Inverse (dgGeneralMatrix& inverseOut)
-//{
-//   dgAssert (m_colCount == m_rowCount);
-//}
-
-
-template<class T>
-void dgGeneralMatrix<T>::VectorTimeMatrix(const dgGeneralVector<T> &v, dgGeneralVector<T> &out)
-{
-     dgAssert(&v != &out);
-     dgAssert(m_rowCount == v.m_colCount);
-     dgAssert(m_colCount == out.m_colCount);
-
-     T const* outMem = &out[0];
-     const T* const inMem = &v[0];
-     const dgGeneralMatrix<T>& me = *this;
-     for (dgInt32 i = 0; i < m_colCount; i++) {
-           T acc = T(0.0f);
-           for (dgInt32 j = 0; j < m_rowCount; j++) {
-                acc = acc + inMem[j] * me[j][i];
-           }
-           outMem[i] = acc;
-     }
+	dgAssert(&v != &out);
+	dgAssert(m_rowCount == v.m_colCount);
+	dgAssert(m_colCount == out.m_colCount);
+	VectorTimeMatrix(v, out);
 }
 
 
 template<class T>
-void dgGeneralMatrix<T>::MatrixTimeVectorTranspose(const dgGeneralVector<T> &v, dgGeneralVector<T> &out)
+void dgGeneralMatrix<T>::VectorTimeMatrix(const T* const v, T* const out) const
+{
+	const dgGeneralMatrix<T>& me = *this;
+	for (dgInt32 i = 0; i < m_colCount; i++) {
+		T acc = T(0.0f);
+		for (dgInt32 j = 0; j < m_rowCount; j++) {
+			acc = acc + me[j][i] * v[i];
+		}
+		out[i] = acc;
+	}
+}
+
+
+
+template<class T>
+void dgGeneralMatrix<T>::MatrixTimeVector(const dgGeneralVector<T> &v, dgGeneralVector<T> &out) const
 {
      dgAssert(&v != &out);
      dgAssert(m_rowCount == out.m_colCount);
-     dgAssert(m_colCount == v.m_colCount);
-
-     for (dgInt32 i = 0; i < m_rowCount; i++) {
-           out[i] = v.DotProduct(m_rows[i]);
-     }
+     dgAssert(GetColCount() == v.m_colCount);
+	 MatrixTimeVector (&v[0], &out[0]);
 }
+
+template<class T>
+DG_INLINE void dgGeneralMatrix<T>::MatrixTimeVector(const T* const v, T* const out) const
+{
+	const dgGeneralMatrix<T>& me = *this;
+	for (dgInt32 i = 0; i < m_rowCount; i++) {
+		out[i] = me[i].DotProduct(v);
+	}
+}
+
 
 template<class T>
 void dgGeneralMatrix<T>::MatrixTimeMatrix(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& B)
 {
-     dgAssert(m_rowCount == A.m_rowCount);
-     dgAssert(m_colCount == B.m_colCount);
-     dgAssert(A.m_colCount == B.m_rowCount);
-
-     dgAssert(this != &A);
-
+	dgAssert(this != &A);
+	dgAssert(m_rowCount == A.m_rowCount);
+	dgAssert(GetColCount() == B.GetColCount());
+	dgAssert(A.GetColCount() == B.m_rowCount);
+     
      dgInt32 count = A.m_colCount;
      for (dgInt32 i = 0; i < m_rowCount; i++) {
            T* const out = &m_rows[i][0];
@@ -294,62 +311,8 @@ void dgGeneralMatrix<T>::MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, 
      }
 }
 
-template<class T>
-bool dgGeneralMatrix<T>::Solve(dgGeneralVector<T> &x, const dgGeneralVector<T> &b)
-{
-     dgAssert(GetColCount() == GetRowCount());
-     dgAssert(b.GetRowCount() == GetRowCount());
-	 dgAssert(x.GetRowCount() == GetRowCount());
 
-	 x.Copy(b);
-     T* const B = &x[0];
 
-     // convert to upper triangular matrix by applying gauss partial pivoting
-	 dgGeneralMatrix<T>& me = *this;
-     for (dgInt32 i = 0; i < m_rowCount - 1; i++) {
-           T* const rowI = &me[i][0];
-           T den(rowI[i]);
-
-           if (T(dgAbsf(den)) < T(1.0e-12f)) {
-			   dgInt32 pivot = -1;
-                for (dgInt32 j = i + 1; j < m_rowCount - 1; j++) {
-					if (T(dgAbsf(den)) > T(1.0e-12f)) {
-						pivot = j;
-						break;
-					}
-				}
-				if (pivot == -1) {
-					return false;
-				}
-				me[i] += me[pivot];
-				den = rowI[i];
-           }
-
-		   den = T(1.0f) / den;
-           for (dgInt32 k = i + 1; k < m_rowCount; k++) {
-                T* const rowK = &me[k][0];
-                T factor(-rowK[i] * den);
-                for (dgInt32 j = i + 1; j < m_rowCount; j++) {
-                    rowK[j] += rowI[j] * factor;
-                }
-				rowK[i] = T(0.0f);
-                B[k] += B[i] * factor;
-           }
-     }
-
-     B[m_rowCount - 1] = B[m_rowCount - 1] / me[m_rowCount - 1][m_rowCount - 1];
-     for (dgInt32 i = m_rowCount - 2; i >= 0; i--) {
-           T acc(0);
-           T* const rowI = &me[i][0];
-           for (dgInt32 j = i + 1; j < m_rowCount; j++) {
-                acc = acc + rowI[j] * B[j];
-           }
-           B[i] = (B[i] - acc) / rowI[i];
-     }
-//	Trace();
-//	x.Trace();
-    return true;
-}
 
 template<class T>
 void dgGeneralMatrix<T>::SwapRows(dgInt32 i, dgInt32 j)
@@ -376,6 +339,83 @@ void dgGeneralMatrix<T>::SwapColumns(dgInt32 i, dgInt32 j)
 			dgSwap(me[k][i], me[k][j]);
 		 }
 	 }
+}
+
+template<class T>
+dgSquareMatrix<T>::dgSquareMatrix(const dgGeneralMatrix<T>& src)
+	:dgGeneralMatrix(src)
+{
+}
+
+template<class T>
+dgSquareMatrix<T>::dgSquareMatrix(dgMemoryAllocator* const allocator, dgInt32 size)
+	:dgGeneralMatrix(allocator, size, size)
+{
+}
+
+template<class T>
+dgSquareMatrix<T>::~dgSquareMatrix()
+{
+}
+
+
+template<class T>
+bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVector<T> &b)
+{
+	dgAssert(GetColCount() == GetRowCount());
+	dgAssert(b.GetRowCount() == GetRowCount());
+	dgAssert(x.GetRowCount() == GetRowCount());
+
+	x.Copy(b);
+	T* const B = &x[0];
+
+	// convert to upper triangular matrix by applying gauss partial pivoting
+	dgGeneralMatrix<T>& me = *this;
+	for (dgInt32 i = 0; i < m_rowCount - 1; i++) {
+
+		dgInt32 k = i;
+		T maxVal (fabs(me[i][i]));
+		for (dgInt32 j = i + 1; j < m_rowCount - 1; j++) {
+			T val (fabs(me[j][i]));
+			if (val > maxVal) {
+				k = j;
+				maxVal = val;
+			}
+		}
+
+		if (maxVal < T(1.0e-12f)) {
+			return false;
+		}
+
+		if (k != i) {
+			SwapRows(i, k);
+			dgSwap(B[i], B[k]);
+		}
+
+		T* const rowI = &me[i][0];
+		T den = T(1.0f) / rowI[i];
+		for (dgInt32 k = i + 1; k < m_rowCount; k++) {
+			T* const rowK = &me[k][0];
+			T factor(-rowK[i] * den);
+			for (dgInt32 j = i + 1; j < m_rowCount; j++) {
+				rowK[j] += rowI[j] * factor;
+			}
+			rowK[i] = T(0.0f);
+			B[k] += B[i] * factor;
+		}
+	}
+
+	for (dgInt32 i = m_rowCount - 1; i >= 0; i--) {
+		T acc(0);
+		T* const rowI = &me[i][0];
+		for (dgInt32 j = i + 1; j < m_rowCount; j++) {
+			acc = acc + rowI[j] * B[j];
+		}
+		B[i] = (B[i] - acc) / rowI[i];
+	}
+	//   Trace();
+	//   x.Trace();
+	return true;
 }
 
 #endif

@@ -111,14 +111,8 @@ void SaveCollision (const NewtonCollision* const collisionPtr)
 // See also: NewtonCreate
 int NewtonGetMemoryUsed()
 {
-//	Newton* const world;
-//	dgMemoryAllocator* allocator;
-
 	TRACE_FUNCTION(__FUNCTION__);
-
-//	world = (Newton *) newtonWorld;
-//	allocator = world->dgWorld::GetAllocator();
-	return dgGetMemoryUsed();
+	return dgMemoryAllocator::GetGlobalMemoryUsed();
 }
 
 void NewtonSetMemorySystem (NewtonAllocMemory mallocFnt, NewtonFreeMemory mfreeFnt)
@@ -136,7 +130,7 @@ void NewtonSetMemorySystem (NewtonAllocMemory mallocFnt, NewtonFreeMemory mfreeF
 		_free = (dgMemFree) Newton::DefaultFreeMemory;
 	}
 
-	dgSetGlobalAllocators (_malloc, _free);
+	dgMemoryAllocator::SetGlobalAllocators (_malloc, _free);
 }
 
 

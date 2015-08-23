@@ -26,8 +26,11 @@
 #include "dgDebug.h"
 #include "dgMemory.h"
 
+template<class T> class dgLCP;
 template<class T> class dgSPDMatrix;
+template<class T> class dgSquareMatrix;
 template<class T> class dgGeneralMatrix;
+
 
 template<class T>
 class dgGeneralVector
@@ -35,38 +38,52 @@ class dgGeneralVector
 	friend class dgSPDMatrix<T>;
 	friend class dgGeneralMatrix<T>;
 
-public:
-	DG_CLASS_ALLOCATOR(allocator)
-
+	public:
 	dgGeneralVector(const dgGeneralVector<T> &src);
 	dgGeneralVector(dgMemoryAllocator* const allocator, dgInt32 size);
-
 	~dgGeneralVector();
+
+	void* operator new (size_t size); 
+	void operator delete (void* const ptr); 
+	void* operator new (size_t size, dgMemoryAllocator* const allocator); 
+	void operator delete (void* const ptr, dgMemoryAllocator* const allocator); 
 
 	T& operator[] (dgInt32 i);
 	const T& operator[] (dgInt32 i) const;
+	void operator += (const dgGeneralVector &a);
+	void operator -= (const dgGeneralVector &a);
 
 	dgInt32 GetRowCount() const;
 
-	void Clear(T val);
-	void Copy(const dgGeneralVector<T> &src);
-	T DotProduct(const dgGeneralVector &b) const;
 	T Norm() const;
 	T Norm2() const;
 
-	void operator += (const dgGeneralVector &A);
-	void operator -= (const dgGeneralVector &A);
-
+	void Clear(T val);
 	void Scale(T scale);
-	void LinearCombine(T scale, const dgGeneralVector &A, const dgGeneralVector &B);
+	void Copy(const dgGeneralVector<T> &src);
+	T DotProduct(const dgGeneralVector &b) const;
+	void LinearCombine(T scale, const dgGeneralVector &a, const dgGeneralVector &b);
 
 	void Trace() const;
 
-protected:
+	static dgInt32 CalculateMemorySize(dgInt32 size)
+	{
+		return size * sizeof (T) + 16;
+	}
+
+	protected:
+	DG_INLINE void Add(const T* const a);
+	DG_INLINE void Sub(const T* const a);
+	DG_INLINE T DotProduct (const T* const b) const;
+
 	T* m_columns;
 	dgMemoryAllocator* m_allocator;
 	dgInt32 m_colCount;
 	dgGeneralVector();
+
+	friend class dgLCP<T>;
+	friend class dgSquareMatrix<T>;
+	friend class dgGeneralMatrix<T>;
 };
 
 
@@ -149,9 +166,16 @@ template<class T>
 T dgGeneralVector<T>::DotProduct(const dgGeneralVector<T> &A) const
 {
 	dgAssert(m_colCount == A.m_colCount);
-	T val(0.0);
+	return DotProduct(&A[0]);
+}
+
+template<class T>
+DG_INLINE T dgGeneralVector<T>::DotProduct (const T* const A) const
+{
+	T val(0.0f);
+	const T* const me = m_columns;
 	for (dgInt32 i = 0; i < m_colCount; i++) {
-		val = val + m_columns[i] * A.m_columns[i];
+		val = val + me[i] * A[i];
 	}
 	return val;
 }
@@ -159,25 +183,21 @@ T dgGeneralVector<T>::DotProduct(const dgGeneralVector<T> &A) const
 template<class T>
 void dgGeneralVector<T>::Clear(T val)
 {
-	for (dgInt32 i = 0; i < m_colCount; i++) {
-		m_columns[i] = val;
-	}
+	memset (&m_columns[0], 0, m_colCount * sizeof (T));
 }
 
 template<class T>
 void dgGeneralVector<T>::Copy(const dgGeneralVector<T> &src)
 {
 	dgAssert(m_colCount == src.m_colCount);
-	for (dgInt32 i = 0; i < m_colCount; i++) {
-		m_columns[i] = src.m_columns[i];
-	}
+	memcpy (&m_columns[0], &src[0], m_colCount * sizeof (T));
 }
 
 template<class T>
 void dgGeneralVector<T>::Scale(T scale)
 {
 	for (dgInt32 i = 0; i < m_colCount; i++) {
-		m_columns[i] = m_columns[i] * scale;
+		m_columns[i] *= scale;
 	}
 }
 
@@ -214,18 +234,61 @@ template<class T>
 void dgGeneralVector<T>::operator+= (const dgGeneralVector<T> &A)
 {
 	dgAssert(A.m_colCount == m_colCount);
-	for (dgInt32 i = 0; i < m_colCount; i++) {
-		m_columns[i] += A.m_columns[i];
-	}
+	dgAssert(A.m_colCount == m_colCount);
+	Add(&A[0]);
 }
 
 template<class T>
 void dgGeneralVector<T>::operator-= (const dgGeneralVector<T> &A)
 {
 	dgAssert(A.m_colCount == m_colCount);
+	Sub(& A[0]);
+}
+
+template<class T>
+DG_INLINE void dgGeneralVector<T>::Add(const T* const a)
+{
+	T* const dst = &m_columns[0];
 	for (dgInt32 i = 0; i < m_colCount; i++) {
-		m_columns[i] -= A.m_columns[i];
+		dst[i] -= a[i];
 	}
+}
+
+template<class T>
+DG_INLINE void dgGeneralVector<T>::Sub(const T* const a)
+{
+	T* const dst = &m_columns[0];
+	for (dgInt32 i = 0; i < m_colCount; i++) {
+		dst[i] -= a[i];
+	}
+}
+
+template<class T>
+void* dgGeneralVector<T>::operator new (size_t size)
+{
+	dgAssert(0);
+	return NULL;
+}
+
+template<class T>
+void* dgGeneralVector<T>::operator new (size_t size, dgMemoryAllocator* const allocator)
+{
+	return allocator->MallocLow(dgInt32 (size));
+}
+
+template<class T>
+void dgGeneralVector<T>::operator delete (void* const ptr, dgMemoryAllocator* const allocator)
+{
+	dgAssert(0);
+	dgAssert (((dgGeneralVector<T>*) ptr)->m_allocator == allocator);
+	me->m_allocator->FreeLow(ptr);
+}
+
+template<class T>
+void dgGeneralVector<T>::operator delete (void* const ptr)
+{
+	dgGeneralVector<T>* const me = (dgGeneralVector<T>*) ptr;
+	me->m_allocator->FreeLow(ptr);
 }
 
 #endif

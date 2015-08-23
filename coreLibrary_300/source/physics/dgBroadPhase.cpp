@@ -804,7 +804,7 @@ void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy,
 
 		if ((entropy > oldEntropy * dgFloat32(2.0f)) || (entropy < oldEntropy * dgFloat32(0.5f))) {
 			if (fitness.GetFirst()) {
-				dgBroadPhaseNode** const leafArray = dAlloca (dgBroadPhaseNode*, fitness.GetCount() * 2 + 12);
+				dgBroadPhaseNode** const leafArray = dgAlloca (dgBroadPhaseNode*, fitness.GetCount() * 2 + 12);
 
 				dgInt32 leafNodesCount = 0;
 				for (dgFitnessList::dgListNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
@@ -1428,7 +1428,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 	dgUnsigned32 lru = m_lru;
 
 	dgActiveContacts* const contactList = m_world;
-	dgContact** const deadContacs = dAlloca (dgContact*, contactList->GetCount() + 256);
+	dgContact** const deadContacs = dgAlloca (dgContact*, contactList->GetCount() + 256);
 
 	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
 		dgContact* const contact = contactNode->GetInfo();
@@ -1513,7 +1513,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	for (dgBodyMasterList::dgListNode* node = masterList->GetLast(); node; node = node->GetPrev()) {
 		dgDynamicBody* const body = (dgDynamicBody*)node->GetInfo().GetBody();
 		if ((body->GetType() == dgBody::m_dynamicBody) && (body->GetInvMass().m_w > dgFloat32 (0.0f))) {
-			#if 1
+			#if 0
 				static FILE* file = fopen("replay.bin", "wb");
 				if (file) {
 					fwrite(&body->m_accel, sizeof (dgVector), 1, file);

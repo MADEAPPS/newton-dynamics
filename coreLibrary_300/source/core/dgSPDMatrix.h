@@ -46,7 +46,7 @@ class dgSymmetricBiconjugateGradientSolve
 
 
 template<class T>
-class dgSPDMatrix: public dgGeneralMatrix<T>
+class dgSPDMatrix: public dgSquareMatrix<T>
 {
 	public:
 	dgSPDMatrix(const dgSPDMatrix<T>& src);
@@ -65,53 +65,60 @@ class dgSPDMatrix: public dgGeneralMatrix<T>
 };
 
 
-
-// solve a general Linear complementary program using Danzig algorithm,  
+// solve a general Linear complementary program 
 // A * x = b + r
-// subjected to conditions
+// subjected to constraints
 // x(i) = low(i),  if r(i) >= 0  
 // x(i) = high(i), if r(i) <= 0  
-// low(i) <= x(i) <= high(i),  if r(i) = 0  
-// on exit matrix is all input data is destroyed 
-// return true if the system has a solution
-// 
-// Derived from http://www.cs.cmu.edu/~baraff/papers/sig94.pdf
-// Fast Contact Force Computation for non penetrating Rigid Bodies, by David Baraff
-// by but quite exactly the same. 
+// low(i) <= x(i) <= high(i),  if r(i) == 0  
 template<class T>
-class dgDanzigLCP: public dgSPDMatrix<T>
+class dgLCP: public dgSPDMatrix<T>
 {
 	public:
-	dgDanzigLCP(const dgDanzigLCP& src);
-	dgDanzigLCP(dgMemoryAllocator* const allocator, dgInt32 size);
-	~dgDanzigLCP();
+	dgLCP(const dgLCP& src);
+	dgLCP(dgMemoryAllocator* const allocator, dgInt32 size);
+	~dgLCP();
 
-	dgGeneralVector<T>& GetX() {return m_xOut;}
-	dgGeneralVector<T>& GetB() {return m_bb;}
-	dgGeneralVector<T>& GetLowLimit() {return m_lowLimit;}
-	dgGeneralVector<T>& GetHightLimit(){return m_highLimit;}
+	dgGeneralVector<T>& GetB() { return m_b; }
+	dgGeneralVector<T>& GetX() { return m_x; }
+	dgGeneralVector<T>& GetR() { return m_r; }
+	dgGeneralVector<T>& GetLowLimit() { return m_low; }
+	dgGeneralVector<T>& GetHightLimit() { return m_high; }
 
-	bool Solve();
+	// Using George B. Dantzig algorithm.  
+	// Inspired from David Baraff interpretation of George B. Dantzig algorithm in his paper. 
+	// Fast Contact Force Computation for non penetrating Rigid Bodies, http://www.cs.cmu.edu/~baraff/papers/sig94.pdf
+	// but not quite exactly the same. 
+	// on exit matrix is all input data is destroyed 
+	// return true if the system has a solution
+	bool SolveDantzig();
+
+	// Using Conjugate Gradient Descend method
+	bool SolveConjugateGradient(T tol = T(1.0e-5f));
+
+	// Using Projected Gauss Seidel
+	bool GaussSeidelLCP(dgInt32 maxIterCount, T tol = T(1.0e-5f));
+
+	static dgInt32 CalculateMemorySize(dgInt32 size)
+	{
+		return dgSPDMatrix<T>::CalculateMemorySize(size) + 5 * dgGeneralVector<T>::CalculateMemorySize(size) + 6 * (size * sizeof (T) + sizeof (dgVector));
+	}
 
 	private:
-	DG_INLINE T CalculateRow_r(dgInt32 n)  const;
-	DG_INLINE void PermuteRows(dgInt32 i, dgInt32 j);
-	DG_INLINE void CalculateDelta_r(dgInt32 n) const;
-	DG_INLINE void CalculateDelta_x(T dir, dgInt32 n) const;
-	DG_INLINE void CholeskyRestore(dgInt32 i, dgInt32 size);
-
-	dgGeneralVector<T> m_bb;
-	dgGeneralVector<T> m_xOut;
-	dgGeneralVector<T> m_lowLimit;
-	dgGeneralVector<T> m_highLimit;
-	T* m_x;
-	T* m_b;
-	T* m_low;
-	T* m_high;
-	T* m_delta_x;
-	T* m_delta_r;
-	T* m_scratch;
-	T* m_savedDiagonal;
+	DG_INLINE void PermuteRows (dgInt32 i, dgInt32 j);
+	DG_INLINE void CalculateDelta_x (T* const data_x, T* const tmp, T dir, dgInt32 n) const;
+	DG_INLINE void CalculateDelta_r (T* const delta_r, const T* const delta_x, dgInt32 n) const;
+	DG_INLINE void CholeskyRestore (T* const diagonal, dgInt32 i, dgInt32 size);
+	DG_INLINE T PartialDotProduct (const T* const a, const T* const b, dgInt32 size) const;
+	DG_INLINE void PartialMatrixTimeVector (const T* const v, T* const out, dgInt32 size) const;
+	DG_INLINE void PartialScaleAdd (T* const a, const T* const b, T scale, const T* const c, dgInt32 size) const;
+	
+	dgGeneralVector<T> m_b;
+	dgGeneralVector<T> m_x;
+	dgGeneralVector<T> m_r;
+	dgGeneralVector<T> m_low;
+	dgGeneralVector<T> m_high;
+	T* m_tmp[6];
 	dgInt16* m_permute;
 };
 
@@ -123,13 +130,13 @@ class dgDanzigLCP: public dgSPDMatrix<T>
 // ***********************************************************************************************
 template<class T>
 dgSPDMatrix<T>::dgSPDMatrix(dgMemoryAllocator* const allocator, dgInt32 size)
-	:dgGeneralMatrix<T>(allocator, size, size)
+	:dgSquareMatrix<T>(allocator, size)
 {
 }
 
 template<class T>
 dgSPDMatrix<T>::dgSPDMatrix(const dgSPDMatrix<T>& src)
-	:dgGeneralMatrix<T>(src)
+	:dgSquareMatrix<T>(src)
 {
 }
 
@@ -150,9 +157,6 @@ bool dgSPDMatrix<T>::TestPSD() const
 	return tmp.CholeskyDecomposition();
 }
 
-/*
-
-*/
 
 template<class T>
 bool dgSPDMatrix<T>::LDLtDecomposition()
@@ -227,7 +231,7 @@ template<class T>
 DG_INLINE bool dgSPDMatrix<T>::CholeskyFactorization(dgInt32 n)
 {
 	bool passed = true;
-	for (dgInt32 i = 0; pass && (i < n) ; i++) {
+	for (dgInt32 i = 0; pass && (i < n); i++) {
 		passed = CholeskyFactorizationAddRow(i);
 	}
 	return passed;
@@ -236,7 +240,7 @@ DG_INLINE bool dgSPDMatrix<T>::CholeskyFactorization(dgInt32 n)
 
 // calculate x = inv (A) * b 
 template<class T>
-DG_INLINE void dgSPDMatrix<T>::CholeskySolve (T* const x, const T* const b, dgInt32 n) const
+DG_INLINE void dgSPDMatrix<T>::CholeskySolve(T* const x, const T* const b, dgInt32 n) const
 {
 	const dgGeneralMatrix<T>& me = *this;
 	for (dgInt32 i = 0; i < n; i++) {
@@ -257,260 +261,511 @@ DG_INLINE void dgSPDMatrix<T>::CholeskySolve (T* const x, const T* const b, dgIn
 	}
 }
 
+
+
 template<class T>
-dgDanzigLCP<T>::dgDanzigLCP(const dgDanzigLCP& src)
+dgLCP<T>::dgLCP(const dgLCP& src)
 	:dgSPDMatrix(src)
-	,m_bb(src.m_)
-	,m_xOut(src.m_xOut)
-	,m_lowLimit(src.m_lowLimit)
-	,m_highLimit(src.m_highLimit)
-	,m_x(NULL)
-	,m_b(NULL)
-	,m_low(NULL)
-	,m_high(NULL)
-	,m_delta_x(NULL)
-	,m_delta_r(NULL)
-	,m_scratch(NULL)
-	,m_savedDiagonal(NULL)
-	,m_permute(NULL)
+	,m_b(src.m_b)
+	,m_x(src.m_x)
+	,m_r(src.m_r)
+	,m_low(src.m_low)
+	,m_high(src.m_high)
+	,m_permute((dgInt16*)m_allocator->MallocLow(size * sizeof (dgInt16)))
 {
+	dgInt32 n = dgInt32 (sizeof(m_tmp) / sizeof (m_tmp[0]));
+	for (dgInt32 i = 0; i < n; i ++) {
+		m_tmp[i] = (T*)m_allocator->MallocLow(size * sizeof (T));
+	}
 }
 
 template<class T>
-dgDanzigLCP<T>::dgDanzigLCP(dgMemoryAllocator* const allocator, dgInt32 size)
+dgLCP<T>::dgLCP(dgMemoryAllocator* const allocator, dgInt32 size)
 	:dgSPDMatrix(allocator, size)
-	,m_bb(allocator, size)
-	,m_xOut(allocator, size)
-	,m_lowLimit(allocator, size)
-	,m_highLimit(allocator, size)
-	,m_x(NULL)
-	,m_b(NULL)
-	,m_low(NULL)
-	,m_high(NULL)
-	,m_delta_x(NULL)
-	,m_delta_r(NULL)
-	,m_scratch(NULL)
-	,m_savedDiagonal(NULL)
-	,m_permute(NULL)
+	,m_b(allocator, size)
+	,m_x(allocator, size)
+	,m_r(allocator, size)
+	,m_low(allocator, size)
+	,m_high(allocator, size)
+	,m_permute((dgInt16*)m_allocator->MallocLow(size * sizeof (dgInt16)))
 {
+	dgInt32 n = dgInt32(sizeof(m_tmp) / sizeof (m_tmp[0]));
+	for (dgInt32 i = 0; i < n; i++) {
+		m_tmp[i] = (T*)m_allocator->MallocLow(size * sizeof (T));
+	}
 }
 
 template<class T>
-dgDanzigLCP<T>::~dgDanzigLCP()
+dgLCP<T>::~dgLCP()
 {
+	dgInt32 n = dgInt32(sizeof(m_tmp) / sizeof (m_tmp[0]));
+	for (dgInt32 i = n-1; i >= 0; i--) {
+		m_allocator->FreeLow(m_tmp[i]);
+	}
+	m_allocator->FreeLow(m_permute);
 }
 
+
 template<class T>
-DG_INLINE void dgDanzigLCP<T>::PermuteRows(dgInt32 i, dgInt32 j)
+DG_INLINE void dgLCP<T>::PermuteRows(dgInt32 i, dgInt32 j)
 {
-	SwapRows(i, j);
-	SwapColumns(i, j);
-	dgSwap(m_x[i], m_x[j]);
-	dgSwap(m_b[i], m_b[j]);
-	dgSwap(m_low[i], m_low[j]);
-	dgSwap(m_high[i], m_high[j]);
-	dgSwap(m_savedDiagonal[i], m_savedDiagonal[j]);
-	dgSwap(m_permute[i], m_permute[j]);
+	if (i != j) {
+		SwapRows(i, j);
+		SwapColumns(i, j);
+		dgSwap(m_b[i], m_b[j]);
+		dgSwap(m_low[i], m_low[j]);
+		dgSwap(m_high[i], m_high[j]);
+		dgSwap(m_permute[i], m_permute[j]);
+		for (dgInt32 k = 0; k < 5; k++) {
+			dgSwap(m_tmp[k][i], m_tmp[k][j]);
+		}
+	}
 }
+
 
 // calculate delta_x = int (Acc) * unitStep 
 // unitStep  in vector [-a[c][0] * dir, -a[c][1] * dir, -a[c][2] * dir, ....-a[c][n-1] * dir]
 // on exit delta_x[n] = dir,  delta_x[n.. size] = 0.0f
 template<class T>
-DG_INLINE void dgDanzigLCP<T>::CalculateDelta_x(T dir, dgInt32 n) const
+DG_INLINE void dgLCP<T>::CalculateDelta_x(T* const delta_x, T* const tmp, T dir, dgInt32 n) const
 {
 	const dgInt32 size = m_rowCount;
 	const dgSPDMatrix<T>& me = *this;
 	for (dgInt32 i = 0; i < n; i++) {
-		m_scratch[i] = -me[n][i] * dir;
+		tmp[i] = -me[n][i] * dir;
 	}
-	CholeskySolve(m_delta_x, m_scratch, n);
-	m_delta_x[n] = dir;
+	CholeskySolve(delta_x, tmp, n);
+	delta_x[n] = dir;
 	for (dgInt32 i = n + 1; i < size; i++) {
-		m_delta_x[i] = T(0.0f);
+		delta_x[i] = T(0.0f);
 	}
 }
 
 
 // calculate delta_r = A * delta_x
 template<class T>
-DG_INLINE void dgDanzigLCP<T>::CalculateDelta_r(dgInt32 n) const
+DG_INLINE void dgLCP<T>::CalculateDelta_r(T* const delta_r, const T* const delta_x, dgInt32 n) const
 {
 	const dgInt32 size = m_rowCount;
 	const dgSPDMatrix<T>& me = *this;
-
-	for (dgInt32 i = 0; i < n; i++) {
-		m_delta_r[i] = me[n][i] * m_delta_x[i];
-	}
 	for (dgInt32 i = n; i < size; i++) {
-		T acc(T(0.0f));
-		const T* const row = &me[i][0];
-		for (dgInt32 j = 0; j <= n; j++) {
-			acc += row[j] * m_delta_x[j];
-		}
-		m_delta_r[i] = acc;
+		delta_r[i] = me[i].DotProduct(delta_x);
 	}
 }
 
 
 template<class T>
-DG_INLINE T dgDanzigLCP<T>::CalculateRow_r(dgInt32 index) const
-{
-	const dgInt32 size = m_rowCount;
-	const dgGeneralMatrix<T>& me = *this;
-
-	T acc = 0.0f;
-	const T* const row = &me[index][0];
-	for (dgInt32 j = 0; j < size; j++) {
-		acc += row[j] * m_x[j];
-	}
-	return acc - m_b[index];
-}
-
-template<class T>
-DG_INLINE void dgDanzigLCP<T>::CholeskyRestore(dgInt32 n, dgInt32 size)
+DG_INLINE void dgLCP<T>::CholeskyRestore(T* const diagonal, dgInt32 n, dgInt32 size)
 {
 	dgGeneralMatrix<T>& me = *this;
-	for (dgInt32 i = n; i < size; i ++) {
-		me[i][i] = m_savedDiagonal[i];
+	for (dgInt32 i = n; i < size; i++) {
+		me[i][i] = diagonal[i];
 		T* const row = &me[i][0];
-		for (dgInt32 j = 0; j < i; j ++) {
+		for (dgInt32 j = 0; j < i; j++) {
 			row[j] = me[j][i];
 		}
 	}
 }
 
+
 template<class T>
-bool dgDanzigLCP<T>::Solve()
+DG_INLINE T dgLCP<T>::PartialDotProduct(const T* const a, const T* const b, dgInt32 size) const
 {
-static int xxx;
-static int xxx1;
-xxx ++;
-
-	dgSPDMatrix<T>& me = *this;
-	const dgInt32 size = m_rowCount;
-	m_x = dAlloca (T, size);
-	m_delta_x = dAlloca (T, size);
-	m_delta_r = dAlloca (T, size);
-	m_savedDiagonal = dAlloca (T, size);
-	m_permute = dAlloca (dgInt16, size);
-	
-	m_b = &m_bb[0];
-	m_scratch = &m_xOut[0];
-	m_low = &m_lowLimit[0];
-	m_high = &m_highLimit[0];
-
+	T acc(0.0f);
 	for (dgInt32 i = 0; i < size; i++) {
-		m_x[i] = T(0.0f);
-		m_permute[i] = dgInt16(i);
-		m_savedDiagonal[i] = me[i][i];
+		acc += a[i] * b[i];
+	}
+	return acc;
+}
+
+template<class T>
+DG_INLINE void dgLCP<T>::PartialScaleAdd(T* const a, const T* const b, T scale, const T* const c, dgInt32 size) const
+{
+	for (dgInt32 i = 0; i < size; i++) {
+		a[i] = b[i] + scale * c[i];
+	}
+}
+
+template<class T>
+DG_INLINE void dgLCP<T>::PartialMatrixTimeVector(const T* const v, T* const out, dgInt32 size) const
+{
+	const dgGeneralMatrix<T>& me = *this;
+	for (dgInt32 i = 0; i < size; i++) {
+		out[i] = PartialDotProduct(&me[i][0], v, size);
+	}
+}
+
+
+
+template<class T>
+bool dgLCP<T>::GaussSeidelLCP (dgInt32 maxIterCount, T tol)
+{
+	const dgInt32 count = GetRowCount();
+	const dgSPDMatrix<T>& me = *this;
+
+	T* const x = &m_x[0];
+	T* const invDiag1 = &m_tmp[2][0];
+	const T* const b = &m_b[0];
+	const T* const low = &m_low[0];
+	const T* const high = &m_high[0];
+
+	for (dgInt32 i = 0; i < count; i++) {
+		x[i] = dgClamp(x[i], low[i], high[i]);
+		invDiag1[i] = T(1.0f) / me[i][i];
 	}
 
+	T tolerance(1.0e6f);
+	
+	T tol2 = tol * tol;
+	const T* const invDiag = invDiag1;
+	for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
+		tolerance = T(0.0f);
+		for (dgInt32 j = 0; j < count; j++) {
+			const dgGeneralVector<T>& row = me[j];
+			T a = b[j] - row.DotProduct(x);
+			T x1 = (a + row[j] * x[j]) * invDiag[j];
+			if (x1 > high[j]) {
+				x1 = high[j];
+			} else if (x1 < low[j]) {
+				x1 = low[j];
+			} else {
+				tolerance += a * a;
+			}
+			x[j] = x1;
+		}
+	}
+	return tolerance < tol2;
+}
+
+
+template<class T>
+bool dgLCP<T>::SolveDantzig()
+{
+	dgSPDMatrix<T>& me = *this;
+	const dgInt32 size = m_rowCount;
+
+	T* const r = &m_tmp[0][0];
+	T* const x = &m_tmp[1][0];
+	T* const delta_r = &m_tmp[2][0];
+	T* const delta_x = &m_tmp[3][0];
+	T* const diagonal = &m_tmp[4][0];
+	T* const tmp = &m_tmp[5][0];
+
+	T* const b = &m_b[0];
+	T* const x_out = &m_x[0];
+	T* const r_out = &m_r[0];
+	T* const low = &m_low[0];
+	T* const high = &m_high[0];
+	dgInt16* const permute = m_permute;
+	
+	for (dgInt32 i = 0; i < size; i++) {
+		x[i] = dgClamp(x_out[i], low[i], high[i]);
+		permute[i] = dgInt16(i);
+		diagonal[i] = me[i][i];
+	}
+
+	MatrixTimeVector(x, r);
+	for (dgInt32 i = 0; i < size; i++) {
+		r[i] -= b[i];
+	}
+
+
+static int xxx;
+xxx++;
+if (xxx == 986)
+dgAssert(0);
 
 	dgInt32 index = 0;
 	dgInt32 count = size;
-	dgInt32 clampedIndex = size - 1;
-//Trace ();
-//dgTrace(("\n"));
+	dgInt32 clampedIndex = size;
+
 	while (count) {
-xxx1 ++;
 		bool loop = true;
 		while (loop) {
 			loop = false;
-			T r = CalculateRow_r (index);
-			if (fabs (r) < T(1.0e-6f)) {
-				if (!CholeskyFactorizationAddRow(index)) {
-					return false;
-				}
-				index ++;
-				count --;
-				break;
-			} else {
-				T dir = (r <= T(0.0f)) ? T(1.0f) : T(-1.0f);
-				CalculateDelta_x (dir, index);
-				CalculateDelta_r (index);
+			T clamp_x(0.0f);
+			dgInt32 swapIndex = -1;
+			if (T(fabs(r[index]) > T(1.0e-12f))) {
+				T dir = (r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
+				CalculateDelta_x(delta_x, tmp, dir, index);
+				CalculateDelta_r(delta_r, delta_x, index);
+				delta_r[index] = T(0.0f);
 
-				dgAssert(m_delta_r[index] != T(0.0f));
-				dgAssert(fabs(m_delta_x[index]) == T(1.0f));
-		
-				T clamp_x (0.0f) ;
-				dgInt32 swapIndex = -1;
-				T s = -r / m_delta_r[index];
-				for (dgInt32 i = 0; i <= index; i ++) {
-					if (m_delta_x[i] > T(0.0f)) {
-						T s1 = (m_high[i] - m_x[i]) / m_delta_x[i];
-						dgAssert (s1 >= T(0.0f));
+				dgAssert(delta_r[index] != T(0.0f));
+				dgAssert(T(fabs(delta_x[index])) == T(1.0f));
+
+				T s = -r[index] / delta_r[index];
+				dgAssert(s >= T(0.0f));
+				for (dgInt32 i = 0; i <= index; i++) {
+					T x1 = x[i] + s * delta_x[i];
+					if (x1 > high[i]) {
+						swapIndex = i;
+						clamp_x = high[i];
+						s = (high[i] - x[i]) / delta_x[i];
+					} else if (x1 < low[i]) {
+						swapIndex = i;
+						clamp_x = low[i];
+						s = (low[i] - x[i]) / delta_x[i];
+					}
+					#if _DEBUG
+					else {
+						T r1 = r[i] + s * delta_r[i];
+						dgAssert((swapIndex != -1) || (T(fabs(r1)) < T(1.0e-6f)));
+					}
+					#endif
+				}
+				dgAssert(s >= T(0.0f));
+				dgAssert(s <= - r[index] / delta_r[index]);
+
+				for (dgInt32 i = index + 1; i < size; i++) {
+					T r1 = r[i] + s * delta_r[i];
+					if ((r1 * r[i]) < T(0.0f)) {
+						dgAssert(T(fabs(delta_r[i]) > T(0.0f)));
+						T s1 = - r[i] / delta_r[i];
+						dgAssert(s1 >= T(0.0f));
 						if (s1 < s) {
 							s = s1;
 							swapIndex = i;
-							clamp_x = m_high[i];
-						}
-					} else if (m_delta_x[i] < T(0.0f)) {
-						T s1 = (m_low[i] - m_x[i]) / m_delta_x[i];
-						dgAssert (s1 >= T(0.0f));
-						if (s1 < s) {
-							s = s1;
-							swapIndex = i;
-							clamp_x = m_low[i];
 						}
 					}
 				}
 
-				for (dgInt32 i = 0; i < size; i ++) {
-					dgAssert(m_x[i] >= m_low[i]);
-					dgAssert(m_x[i] <= m_high[i]);
-					m_x[i] += s * m_delta_x[i];
-				}
-
-				if (swapIndex == -1) {
-					if (!CholeskyFactorizationAddRow(index)) {
-						return false;
-					}
-					index++;
-					count--;
-					loop = false;
-				} else if (swapIndex == index) {
-					m_x[index] = clamp_x;
-					PermuteRows(index, clampedIndex);
-					count--;
-					clampedIndex --;
-					loop = count ? true : false;
-				} else if (swapIndex < index) {
-					m_x[swapIndex] = clamp_x;
-					CholeskyRestore(swapIndex, index);
-					index --;
-					PermuteRows(swapIndex, index);
-					for (dgInt32 i = swapIndex; i < index; i ++) {
-						if(!CholeskyFactorizationAddRow(i)) {
-							return false;
-						}
-					}
-					PermuteRows(index, clampedIndex);
-					clampedIndex--;
-					loop = true;
-				} else {
-					dgAssert (0);
+				for (dgInt32 i = 0; i < size; i++) {
+					dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
+					dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
+					x[i] += s * delta_x[i];
+					r[i] += s * delta_r[i];
+					dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
+					dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
 				}
 			}
 
-			#ifdef _DEBUG
-				for (dgInt32 i = 0; i < size; i++) {
-					dgAssert(m_x[i] >= m_low[i]);
-					dgAssert(m_x[i] <= m_high[i]);
+			if (swapIndex == -1) {
+				r[index] = T(0.0f);
+				if (!CholeskyFactorizationAddRow(index)) {
+					return false;
 				}
-			#endif 
+				index++;
+				count--;
+				loop = false;
+			} else if (swapIndex > index) {
+				loop = true;
+				r[swapIndex] = T(0.0f);
+				dgAssert(swapIndex < size);
+				dgAssert(clampedIndex <= size);
+				if (swapIndex < clampedIndex) {
+					count--;
+					clampedIndex--;
+					PermuteRows(clampedIndex, swapIndex);
+					dgAssert(clampedIndex >= index);
+				} else {
+					count++;
+					dgAssert(clampedIndex < size);
+					PermuteRows(clampedIndex, swapIndex);
+					clampedIndex++;
+					dgAssert(clampedIndex <= size);
+					dgAssert(clampedIndex >= index);
+				}
+			} else if (swapIndex == index) {
+				count--;
+				clampedIndex--;
+				x[index] = clamp_x;
+				PermuteRows(index, clampedIndex);
+				loop = count ? true : false;
+			} else {
+				x[swapIndex] = clamp_x;
+				CholeskyRestore(diagonal, swapIndex, index);
+
+				dgAssert(index > 0);
+				PermuteRows(swapIndex, index - 1);
+				PermuteRows(index - 1, index);
+
+				clampedIndex--;
+				PermuteRows(clampedIndex, index);
+
+				index--;
+				for (dgInt32 i = swapIndex; i < index; i++) {
+					#ifdef _DEBUG
+						dgAssert(CholeskyFactorizationAddRow(i));
+					#else
+						CholeskyFactorizationAddRow(i);
+					#endif
+				}
+				loop = true;
+			}
 		}
 	}
 
-	for (dgInt32 i = 0; i < size; i ++) {
-		dgAssert(m_x[i] >= m_low[i]);
-		dgAssert(m_x[i] <= m_high[i]);
-		m_scratch[m_permute[i]] = m_x[i];
+	for (dgInt32 i = 0; i < size; i++) {
+		x_out[m_permute[i]] = x[i];
+		r_out[m_permute[i]] = r[i];
 	}
+
 	return true;
 }
 
 
+template<class T>
+bool dgLCP<T>::SolveConjugateGradient(T tol)
+{
+	dgSPDMatrix<T>& me = *this;
+	const dgInt32 size = m_rowCount;
+
+	T* const r = &m_tmp[0][0];
+	T* const x = &m_tmp[1][0];
+	T* const delta_r = &m_tmp[2][0];
+	T* const delta_x = &m_tmp[3][0];
+	T* const MinvR0 = &m_tmp[4][0];
+	T* const invDiag = &m_tmp[5][0];
+	dgInt16* const permute = m_permute;
+
+	T* const b = &m_b[0];
+	T* const x_out = &m_x[0];
+	T* const r_out = &m_r[0];
+	T* const low = &m_low[0];
+	T* const high = &m_high[0];
+
+	for (dgInt32 i = 0; i < size; i++) {
+		x[i] = dgClamp(x_out[i], low[i], high[i]);
+		permute[i] = dgInt16(i);
+		invDiag[i] = T(1.0f) / me[i][i];
+	}
+
+T xx[20];
+GaussSeidelLCP(100000, T(1.0e-6f));
+memcpy(xx, &x_out[0], size * sizeof (T));
+
+	PartialMatrixTimeVector(x, delta_r, size);
+	for (dgInt32 i = 0; i < size; i++) {
+		r[i] = b[i] - delta_r[i];
+		delta_x[i] = invDiag[i] * r[i];
+	}
+
+	dgInt32 count = size;
+	dgInt32 iter (size);
+
+static int xxx;
+xxx ++;
+
+	const T tol2 = tol * tol;
+	T num = PartialDotProduct (r, delta_x, count);
+	while (iter && (num > tol2)) {
+		iter --;
+		PartialMatrixTimeVector(delta_x, delta_r, count);
+		T den (PartialDotProduct (delta_r, delta_x, count));
+
+		dgAssert(den > T(0.0f));
+		T alpha = num / den;
+
+		T clamp_x(0.0f);
+		dgInt32 swapIndex = -1;
+		for (dgInt32 i = 0; (i < count) && (alpha > T(1.0e-15f)); i++) {
+			T x1 = x[i] + alpha * delta_x[i];
+			if (x1 > high[i]) {
+				swapIndex = i;
+				clamp_x = high[i];
+				dgAssert ((high[i] - x[i]) / delta_x[i] <= alpha);
+				alpha = (high[i] - x[i]) / delta_x[i];
+			} else if (x1 < low[i]) {
+				swapIndex = i;
+				clamp_x = low[i];
+				dgAssert ((low[i] - x[i]) / delta_x[i] <= alpha);
+				alpha = (low[i] - x[i]) / delta_x[i];
+			}
+		} 
+
+		if (alpha > T(1.0e-15f)) {
+			CalculateDelta_r(delta_r, delta_x, count);
+			for (dgInt32 i = count; (i < size) && (alpha > T(1.0e-15f)); i++) {
+				T r1 = r[i] - alpha * delta_r[i];
+				if ((r1 * r[i]) < T(0.0f)) {
+					dgAssert(T(fabs(delta_r[i]) > T(0.0f)));
+					T alpha1 = r[i] / delta_r[i];
+					dgAssert(alpha1 >= T(0.0f));
+					if (alpha1 < alpha) {
+						alpha = alpha1;
+						swapIndex = i;
+					}
+				}
+			}
+		}
+
+		if (alpha > T(1.0e-15f)) {
+			for (dgInt32 i = 0; i < size; i++) {
+				x[i] += alpha * delta_x[i];
+				r[i] -= alpha * delta_r[i];
+			}
+		}
+
+		if (swapIndex == -1) {
+			T num1 (0.0f);
+			for (dgInt32 i = 0; i < count; i++) {
+				MinvR0[i] = invDiag[i] * r[i];
+				num1 += MinvR0[i] * r[i];
+			}
+			T beta (num1 / num);
+			PartialScaleAdd (delta_x, MinvR0, beta, delta_x, count);
+			num = PartialDotProduct (r, MinvR0, count);
+		} else if (swapIndex < count) {
+			count --;
+			iter = count;
+			x[swapIndex] = clamp_x;
+			if (swapIndex != count) {
+				SwapRows(swapIndex, count);
+				SwapColumns(swapIndex, count);
+				dgSwap(x[swapIndex], x[count]);
+				dgSwap(low[swapIndex], low[count]);
+				dgSwap(high[swapIndex], high[count]);
+				dgSwap(invDiag[swapIndex], invDiag[count]);
+				dgSwap(permute[swapIndex], permute[count]);
+			}
+
+			delta_x[count] = T(0.0f);
+			PartialMatrixTimeVector(x, delta_r, count);
+			for (dgInt32 i = 0; i < count; i++) {
+				r[i] = b[i] - delta_r[i];
+				delta_x[i] = invDiag[i] * r[i];
+			}
+			num = PartialDotProduct (r, delta_x, count);
+		} else {
+			if (swapIndex != count) {
+				SwapRows(swapIndex, count);
+				SwapColumns(swapIndex, count);
+				dgSwap(x[swapIndex], x[count]);
+				dgSwap(low[swapIndex], low[count]);
+				dgSwap(high[swapIndex], high[count]);
+				dgSwap(invDiag[swapIndex], invDiag[count]);
+				dgSwap(permute[swapIndex], permute[count]);
+			}
+			count++;
+			iter = count;
+			PartialMatrixTimeVector(x, delta_r, count);
+			for (dgInt32 i = 0; i < count; i++) {
+				r[i] = b[i] - delta_r[i];
+				delta_x[i] = invDiag[i] * r[i];
+			}
+//			r[count] = T(0.0f);
+			num = PartialDotProduct(r, delta_x, count);
+		}
+	}
+
+
+dgTrace (("lcp %d :", xxx));
+	for (dgInt32 i = 0; i < size; i++) {
+		x_out[permute[i]] = x[i];
+		r_out[permute[i]] = r[i];
+dgTrace (("%f ", x_out[permute[i]]));
+	}
+
+dgTrace (("\n"));
+dgTrace (("pgs %d :", xxx));
+for (dgInt32 i = 0; i < size; i++) {
+	dgTrace (("%f ", xx[i]));
+}
+dgTrace (("\n"));
+
+memcpy (&x_out[0], xx, size * sizeof (T));
+	return num < tol2;
+}
+
 #endif
-
-
