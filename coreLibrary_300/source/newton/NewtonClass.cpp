@@ -224,6 +224,24 @@ void NewtonUserJoint::AddGeneralRowJacobian (const dgFloat32* const jacobian0, c
 	dgAssert (m_rows <= dgInt32 (m_maxDOF));
 }
 
+dgInt32 NewtonUserJoint::GetJacobianCount() const
+{
+	return m_rows;
+}
+
+void NewtonUserJoint::GetJacobianAt(dgInt32 index, dgFloat32* const jacobian0, dgFloat32* const jacobian1) const
+{
+	if (index < m_rows) {
+		for (dgInt32 i = 0; i < 3; i ++) {
+			jacobian0[i] = m_param->m_jacobian[index].m_jacobianM0.m_linear[i];
+			jacobian1[i] = m_param->m_jacobian[index].m_jacobianM1.m_linear[i];
+			jacobian0[i + 3] = m_param->m_jacobian[index].m_jacobianM0.m_angular[i];
+			jacobian1[i + 3] = m_param->m_jacobian[index].m_jacobianM1.m_angular[i];
+		}
+	
+	}
+}
+
 
 void NewtonUserJoint::SetAcceleration (dgFloat32 acceleration)
 {

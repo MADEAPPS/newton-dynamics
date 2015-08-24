@@ -7366,6 +7366,19 @@ void NewtonUserJointAddGeneralRow(const NewtonJoint* const joint, const dFloat* 
 	userJoint->AddGeneralRowJacobian (jacobian0, jacobian1);
 }
 
+int NewtonUserJoinRowsCount(const NewtonJoint* const joint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
+	return userJoint->GetJacobianCount();
+}
+
+void NewtonUserJointGetGeneralRow(const NewtonJoint* const joint, int index, dFloat* const jacobian0, dFloat* const jacobian1)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
+	userJoint->GetJacobianAt(index, jacobian0, jacobian1);
+}
 
 // Name: NewtonUserJointSetRowMaximumFriction
 // Set the maximum friction value the solver is allow to apply to the joint row. 

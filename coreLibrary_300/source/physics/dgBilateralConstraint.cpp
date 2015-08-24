@@ -311,12 +311,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (
 	}
 }
 
-void dgBilateralConstraint::CalculatePointDerivative (
-	dgInt32 index,
-	dgContraintDescritor& desc, 
-	const dgVector& dir,	
-	const dgPointParam& param,
-	dgForceImpactPair* const jointForce)
+void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& dir, const dgPointParam& param, dgForceImpactPair* const jointForce)
 {
 	dgAssert (jointForce);
 	dgAssert (m_body0);

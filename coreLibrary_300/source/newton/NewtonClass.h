@@ -89,6 +89,9 @@ class NewtonUserJoint: public dgUserConstraint
 	void AddGeneralRowJacobian (const dgFloat32* const jacobian0, const dgFloat32* const jacobian1);
 	void AddLinearRowJacobian (const dgVector& pivot0, const dgVector& pivot1, const dgVector& dir);
 
+	dgInt32 GetJacobianCount () const;
+	void GetJacobianAt (dgInt32 index, dgFloat32* const jacobian0, dgFloat32* const jacobian1) const;
+
 	dgFloat32 GetRowForce (dgInt32 row) const;
 	void SetHighFriction (dgFloat32 friction);
 	void SetLowerFriction (dgFloat32 friction);
