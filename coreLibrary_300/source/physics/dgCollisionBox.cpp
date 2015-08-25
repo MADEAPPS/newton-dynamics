@@ -324,8 +324,8 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 		support[0] = SupportVertex (normal.Scale4(normalSign), &edgeIndex);
 		edge = vertToEdgeMapping[edgeIndex];
 
-		// 5 degrees
-		const dgFloat32 tiltAngle = dgFloat32 (0.087f);
+		// 0.5 degrees
+		const dgFloat32 tiltAngle = dgFloat32 (0.008736f);
 		const dgFloat32 tiltAngle2 = tiltAngle * tiltAngle ;
 		dgPlane testPlane (normal, - (normal.DotProduct4(support[0]).GetScalar()));
 		const dgConvexSimplexEdge* ptr = edge;

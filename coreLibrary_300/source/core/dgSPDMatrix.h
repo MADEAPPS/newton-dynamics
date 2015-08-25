@@ -611,14 +611,12 @@ bool dgLCP<T>::SolveDantzig()
 	dgSPDMatrix<T>& me = *this;
 	const dgInt32 size = m_rowCount;
 
-/*
-static int xxx;
-xxx++;
-dgLCP<T> gauss(*this);
-gauss.GaussSeidelLCP(100000, T(1.0e-6f));
-dgTrace(("pgs %d :", xxx));
-gauss.GetX().Trace();
-*/
+//static int xxx;
+//xxx++;
+//dgLCP<T> gauss(*this);
+//gauss.GaussSeidelLCP(100000, T(1.0e-6f));
+//dgTrace(("pgs %d :", xxx));
+//gauss.GetX().Trace();
 
 	T* const r = &m_tmp[0][0];
 	T* const x = &m_tmp[1][0];
@@ -640,14 +638,10 @@ gauss.GetX().Trace();
 		diagonal[i] = me[i][i];
 	}
 
-
 	MatrixTimeVector(x, r);
 	for (dgInt32 i = 0; i < size; i++) {
 		r[i] -= b[i];
 	}
-
-//if (xxx == 6)
-//xxx *= 1;
 
 	dgInt32 index = 0;
 	dgInt32 count = size;
@@ -655,13 +649,19 @@ gauss.GetX().Trace();
 
 	while (count) {
 		bool loop = true;
+		bool calculateDelta_x = true;
+		T dir = 0.0f;
+
 		while (loop) {
 			loop = false;
 			T clamp_x(0.0f);
 			dgInt32 swapIndex = -1;
 			if (T(fabs(r[index]) > T(1.0e-12f))) {
-				T dir = (r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
+				if (calculateDelta_x) {
+					dir = (r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
 				CalculateDelta_x(delta_x, tmp, dir, index);
+				}
+				calculateDelta_x = true;
 				CalculateDelta_r(delta_r, delta_x, index);
 
 				dgAssert(delta_r[index] != T(0.0f));
@@ -684,7 +684,7 @@ gauss.GetX().Trace();
 				dgAssert(s >= T(0.0f));
 				dgAssert(s <= -r[index] / delta_r[index]);
 
-				for (dgInt32 i = clampedIndex; i < size; i++) {
+				for (dgInt32 i = clampedIndex; (i < size) && (s > T(1.0e-12f)); i++) {
 					T r1 = r[i] + s * delta_r[i];
 					if ((r1 * r[i]) < T(0.0f)) {
 						dgAssert(T(fabs(delta_r[i]) > T(0.0f)));
@@ -697,6 +697,7 @@ gauss.GetX().Trace();
 					}
 				}
 
+				if (s > T(1.0e-12f)) {
 				for (dgInt32 i = 0; i < size; i++) {
 					dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
 					dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
@@ -705,6 +706,7 @@ gauss.GetX().Trace();
 					dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
 					dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
 				}
+			}
 			}
 
 			if (swapIndex == -1) {
@@ -716,6 +718,13 @@ gauss.GetX().Trace();
 				index++;
 				count--;
 				loop = false;
+			} else if (swapIndex == index) {
+				count--;
+				clampedIndex--;
+				x[index] = clamp_x;
+				delta_x[index] = T(0.0f);
+				PermuteRows(index, clampedIndex);
+				loop = count ? true : false;
 			} else if (swapIndex > index) {
 				loop = true;
 				r[swapIndex] = T(0.0f);
@@ -734,12 +743,8 @@ gauss.GetX().Trace();
 					dgAssert(clampedIndex <= size);
 					dgAssert(clampedIndex >= index);
 				}
-			} else if (swapIndex == index) {
-				count--;
-				clampedIndex--;
-				x[index] = clamp_x;
-				PermuteRows(index, clampedIndex);
-				loop = count ? true : false;
+				calculateDelta_x = false;
+
 			} else {
 				x[swapIndex] = clamp_x;
 				CholeskyRestore(diagonal, swapIndex, index);
@@ -769,11 +774,9 @@ gauss.GetX().Trace();
 		r_out[m_permute[i]] = r[i];
 	}
 
-/*
-dgTrace(("lcp %d :", xxx));
-m_x.Trace();
-m_x.Copy(gauss.GetX());
-*/
+//dgTrace(("lcp %d :", xxx));
+//m_x.Trace();
+//m_x.Copy(gauss.GetX());
 
 	return true;
 }
