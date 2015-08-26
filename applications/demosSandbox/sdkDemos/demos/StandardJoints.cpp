@@ -427,7 +427,7 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 
     dVector size (width, height, width);
     NewtonBody* parent = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
-	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
+//	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
 
 
 #if (defined (_USE_HARD_JOINTS) && defined (xxxxx))
