@@ -368,8 +368,7 @@ void dgBroadPhase::ConvexRayCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 		dgFloat32 dist = distance[stack];
 		if (dist > maxParam) {
 			break;
-		}
-		else {
+		} else {
 			const dgBroadPhaseNode* const me = stackPool[stack];
 			dgAssert(me);
 			dgBody* const body = me->GetBody();
