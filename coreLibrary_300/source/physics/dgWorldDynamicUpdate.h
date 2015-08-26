@@ -76,14 +76,13 @@ class dgBodyInfo
 class dgIsland
 {
 	public:
-	dgInt32 m_bodyCount;
 	dgInt32 m_bodyStart;
+	dgInt32 m_bodyCount;
+	dgInt32 m_jointStart;	
 	dgInt32 m_jointCount;
-	dgInt32 m_jointStart;
-	dgInt32 m_rowsCount;
 	dgInt32 m_rowsStart;
-	dgUnsigned32 m_skeletonCount		: 16;
-	dgUnsigned32 m_isContinueCollision	: 1;
+	dgInt32 m_rowsCount					: 31;
+	dgUnsigned32 m_isContinueCollision	:  1;
 };
 
 
@@ -239,8 +238,9 @@ class dgWorldDynamicUpdate
 
 	private:
 	void BuildIslands(dgFloat32 timestep);
+	void BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat32 timestep, dgInt32 jountCount);
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
-	void BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat32 timestep, dgInt32 jountCount, dgInt32 forceExactSolver);
+	
 
 	static dgInt32 CompareIslands (const dgIsland* const islandA, const dgIsland* const islandB, void* notUsed);
 	static void CalculateIslandReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);

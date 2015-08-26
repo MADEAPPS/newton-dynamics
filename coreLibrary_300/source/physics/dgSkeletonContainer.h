@@ -22,7 +22,6 @@
 #ifndef _DG_SKELETON_CONTAINER_H__
 #define _DG_SKELETON_CONTAINER_H__
 
-#define DG_SKELETON_BIT_SHIFT_KEY	16
 #define DG_SKELETON_BASEW_UNIQUE_ID	10
 
 #include "dgConstraint.h"
@@ -52,14 +51,15 @@ class dgSkeletonContainer
 	dgFloat32 CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
 
 	private:
-	void SolveFoward () const;
-	void SolveBackward () const;
-	dgInt32 UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	DG_INLINE void SolveFoward () const;
+	DG_INLINE void SolveBackward () const;
+	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	DG_INLINE dgFloat32 CalculateJointAccel (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 
 	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
 	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
-	dgFloat32 CalculateJointAccel (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	
 	void RebuildMassMatrix (dgInt32 start, const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow);
 	dgFloat32 SolveUnilaterals (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	

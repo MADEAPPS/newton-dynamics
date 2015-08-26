@@ -1069,9 +1069,9 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
-//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 1.5f); // animated
-//  AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -5.0f));
-//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 1.5f); // animated
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -5.0f));
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
  
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());

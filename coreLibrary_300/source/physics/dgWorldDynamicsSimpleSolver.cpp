@@ -765,7 +765,6 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = island->m_bodyCount;
 	const dgInt32 jointCount = island->m_jointCount;
-	const dgInt32 jointBaseCount = island->m_jointCount - island->m_skeletonCount;
 
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
@@ -777,7 +776,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	for (dgInt32 i = 0; i < jointCount; i ++) {
 		dgJointInfo* const jointInfo = &constraintArray[i];
-		if (jointInfo->m_joint->m_solverActive) {
+		dgConstraint* const constraint = jointInfo->m_joint;
+		constraint->m_index = i;
+		if (constraint->m_solverActive) {
 			dgJacobian y0;
 			dgJacobian y1;
 			InitJointForce (jointInfo,  matrixRow, y0, y1);
@@ -810,33 +811,30 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	dgInt32 skeletonCount = 0;
 	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
-
-	if (island->m_skeletonCount) {
-		dgSkeletonList* const skeletonList = world;
-		dgInt32 i = jointBaseCount;
-		do {
-			dgJointInfo* const jointInfo = &constraintArray[i];
-			dgConstraint* const constraint = jointInfo->m_joint;
-			
-			dgAssert (constraint->m_priority > 0);
-			dgAssert (skeletonList->Find(constraint->m_priority>>DG_SKELETON_BIT_SHIFT_KEY));
-			dgSkeletonContainer* const container = skeletonList->Find(constraint->m_priority>>DG_SKELETON_BIT_SHIFT_KEY)->GetInfo();
+	for (dgInt32 i = 1; i < bodyCount; i ++) {
+		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
+		dgSkeletonContainer* const container = body->GetSkeleton();
+		if (container) {
+			dgInt32 id = container->GetId();
+			bool found = false;
+			for(dgInt32 j = 0; j < skeletonCount; j ++) {
+				if (skeletonArray[j]->GetId() == id) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
 			skeletonArray[skeletonCount] = container;
 			skeletonCount ++;
 			dgAssert (skeletonCount < dgInt32 (sizeof (skeletonArray) / sizeof (skeletonArray[0])));
-			const dgInt32 jointCount = container->GetJointCount ();
-			for (dgInt32 j = 0; j < jointCount; j ++) {
-				constraintArray[i + j].m_joint->m_index = i + j;
 			}
-			i += jointCount;
-		} while (i < jointCount);
-
+		}
+	}
 
 		for (dgInt32 i = 0; i < skeletonCount; i ++) {
 			dgSkeletonContainer* const container = skeletonArray[i];
 			container->InitMassMatrix (constraintArray, internalForces, matrixRow);
 		}
-	}
 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < maxPasses; step ++) {
@@ -872,22 +870,17 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		dgFloat32 accNorm(maxAccNorm * dgFloat32(2.0f));
 		for (dgInt32 k = 0; (k < passes) && (accNorm > maxAccNorm); k++) {
 			accNorm = dgFloat32(0.0f);
-			for (dgInt32 i = 0; i < jointBaseCount; i++) {
+			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgJointInfo* const jointInfo = &constraintArray[i];
 				dgFloat32 accel = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 
-			//for (dgInt32 i = 0; i < skeletonCount; i ++) {
-			//dgSkeletonContainer* const container = skeletonArray[i];
-			//dgFloat32 accel = container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
-			//accNorm = (accel > accNorm) ? accel : accNorm;
-			//}
-		}
-
-		for (dgInt32 i = 0; i < skeletonCount; i++) {
-			dgSkeletonContainer* const container = skeletonArray[i];
-			container->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
+			for (dgInt32 i = 0; i < skeletonCount; i++) {
+				dgSkeletonContainer* const container = skeletonArray[i];
+				dgFloat32 accel = container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
+				accNorm = (accel > accNorm) ? accel : accNorm;
+			}
 		}
 
 		if (timestepRK != dgFloat32 (0.0f)) {

@@ -499,8 +499,7 @@ xxx++;
 				clamp_x = high[i];
 				dgAssert((high[i] - x[i]) / delta_x[i] <= alpha);
 				alpha = (high[i] - x[i]) / delta_x[i];
-			}
-			else if (x1 < low[i]) {
+			} else if (x1 < low[i]) {
 				swapIndex = i;
 				clamp_x = low[i];
 				dgAssert((low[i] - x[i]) / delta_x[i] <= alpha);

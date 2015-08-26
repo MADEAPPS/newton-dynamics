@@ -306,14 +306,6 @@ const dgConvexSimplexEdge** dgCollisionBox::GetVertexToEdgeMapping() const
 
 dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
-	dgFloat32 test[8];
-	dgPlane plane (normal, - (normal % point));
-	for (dgInt32 i = 0; i < 8; i ++) {
-		dgAssert (m_vertex[i].m_w == dgFloat32 (0.0f));
-		test[i] = plane.DotProduct4 (m_vertex[i] | dgVector::m_wOne).m_x;
-	}
-
-
 	dgVector support[4];
 	dgInt32 featureCount = 3;
 	const dgConvexSimplexEdge* edge = &m_simplex[0];
@@ -324,16 +316,16 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 		support[0] = SupportVertex (normal.Scale4(normalSign), &edgeIndex);
 		edge = vertToEdgeMapping[edgeIndex];
 
-		// 0.5 degrees
-		const dgFloat32 tiltAngle = dgFloat32 (0.008736f);
+		// 0.25 degrees
+		const dgFloat32 tiltAngle = dgFloat32 (0.005f);
 		const dgFloat32 tiltAngle2 = tiltAngle * tiltAngle ;
 		dgPlane testPlane (normal, - (normal.DotProduct4(support[0]).GetScalar()));
 		const dgConvexSimplexEdge* ptr = edge;
 		do {
 			const dgVector& p = m_vertex[ptr->m_twin->m_vertex];
-			dgFloat32 test = testPlane.Evalue(p);
+			dgFloat32 test1 = testPlane.Evalue(p);
 			dgVector dist (p - support[0]);
-			dgFloat32 angle2 = test * test / (dist.DotProduct4(dist).GetScalar());
+			dgFloat32 angle2 = test1 * test1 / (dist.DotProduct4(dist).GetScalar());
 			if (angle2 < tiltAngle2) {
 				support[featureCount] = p;
 				featureCount ++;
@@ -342,24 +334,34 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 		} while ((ptr != edge) && (featureCount < 3));
 	}
 
-//featureCount = 3;
 	dgInt32 count = 0;
 	switch (featureCount)
 	{
 		case 1:
+		{
 			contactsOut[0] = support[0] - normal.CompProduct4(normal.DotProduct4(support[0] - point));
 			count = 1;
 			break;
+		}
 
 		case 2:
+		{
 			contactsOut[0] = support[0] - normal.CompProduct4(normal.DotProduct4(support[0] - point));
 			contactsOut[1] = support[1] - normal.CompProduct4(normal.DotProduct4(support[1] - point));
 			count = 2;
 			break;
+		}
 
 
 		default:
 		{
+			dgFloat32 test[8];
+			dgPlane plane(normal, -(normal % point));
+			for (dgInt32 i = 0; i < 8; i++) {
+				dgAssert(m_vertex[i].m_w == dgFloat32(0.0f));
+				test[i] = plane.DotProduct4(m_vertex[i] | dgVector::m_wOne).m_x;
+			}
+
 			dgConvexSimplexEdge* edge = NULL;
 			for (dgInt32 i = 0; i < dgInt32 (sizeof (m_edgeEdgeMap) / sizeof (m_edgeEdgeMap[0])); i ++) {
 				dgConvexSimplexEdge* const ptr = m_edgeEdgeMap[i];
@@ -401,8 +403,6 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 					ptr = edge;
 					do {
 						dgVector dp (m_vertex[ptr->m_twin->m_vertex] - m_vertex[ptr->m_vertex]);
-
-						//dgFloat32 t = plane % dp;
 						dgFloat32 t = plane.DotProduct4(dp).m_x;
 						if (t >= dgFloat32 (-1.e-24f)) {
 							t = dgFloat32 (0.0f);
