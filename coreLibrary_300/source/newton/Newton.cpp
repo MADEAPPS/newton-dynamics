@@ -8718,6 +8718,21 @@ void NewtonSkeletonContainerDelete(NewtonSkeletonContainer* const skeletonPtr)
 }
 
 
+int NewtonSkeletonGetSolverMode(NewtonSkeletonContainer* const skeletonPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
+	return skeleton->GetSolverMode();
+}
+
+void NewtonSkeletonSetSolverMode(NewtonSkeletonContainer* const skeletonPtr, int hardJointMotors)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
+	skeleton->SetSolverMode(hardJointMotors);
+}
+
+
 void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray)
 {
 	TRACE_FUNCTION(__FUNCTION__);

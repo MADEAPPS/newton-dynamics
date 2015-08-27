@@ -1160,6 +1160,8 @@ extern "C" {
 	// ************************************************************************************************************************
 	NEWTON_API NewtonSkeletonContainer* NewtonSkeletonContainerCreate (NewtonWorld* const world, NewtonBody* const rootBone, NewtonSkeletontDestructor onDestroyCallback);
 	NEWTON_API void NewtonSkeletonContainerDelete (NewtonSkeletonContainer* const skeleton);
+	NEWTON_API int NewtonSkeletonGetSolverMode(NewtonSkeletonContainer* const skeleton);
+	NEWTON_API void NewtonSkeletonSetSolverMode(NewtonSkeletonContainer* const skeleton, int hardJointMotors);
 
 	NEWTON_API void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray);
 	NEWTON_API void* NewtonSkeletonContainerAttachBone (NewtonSkeletonContainer* const skeleton, NewtonBody* const childBone, NewtonBody* const parentBone);

@@ -47,8 +47,9 @@ class dgSkeletonContainer
 	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
 	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
 	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
-	
 	dgFloat32 CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
+	bool GetSolverMode () const;
+	void SetSolverMode (bool hardJoint);
 
 	private:
 	DG_INLINE void SolveFoward () const;
@@ -61,7 +62,7 @@ class dgSkeletonContainer
 	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
 	
 	void RebuildMassMatrix (dgInt32 start, const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow);
-	dgFloat32 SolveUnilaterals (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+//	dgFloat32 SolveUnilaterals (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	
 	static void ResetUniqueId(dgInt32 id);
 
@@ -70,10 +71,14 @@ class dgSkeletonContainer
 	dgSkeletonGraph** m_nodesOrder;
 	dgOnSkeletonContainerDestroyCallback m_destructor;
 	dgInt32 m_id;
-	dgInt32 m_nodeCount;
+	dgInt32 m_lru;
+	dgInt8 m_nodeCount;
+	dgInt8 m_skeletonHardMotors;
 	static dgInt32 m_uniqueID;
+	static dgInt32 m_lruMarker;
 
 	friend class dgWorld;
+	friend class dgWorldDynamicUpdate;
 };
 
 #endif

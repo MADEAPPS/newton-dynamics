@@ -810,31 +810,23 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	joindDesc.m_firstPassCoefFlag = dgFloat32 (0.0f);
 
 	dgInt32 skeletonCount = 0;
+	dgInt32 lru = dgAtomicExchangeAndAdd (&dgSkeletonContainer::m_lruMarker, 1);
 	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
 	for (dgInt32 i = 1; i < bodyCount; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 		dgSkeletonContainer* const container = body->GetSkeleton();
-		if (container) {
-			dgInt32 id = container->GetId();
-			bool found = false;
-			for(dgInt32 j = 0; j < skeletonCount; j ++) {
-				if (skeletonArray[j]->GetId() == id) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
+		if (container && (container->m_lru != lru)) {
+			container->m_lru = lru;
 			skeletonArray[skeletonCount] = container;
 			skeletonCount ++;
 			dgAssert (skeletonCount < dgInt32 (sizeof (skeletonArray) / sizeof (skeletonArray[0])));
-			}
 		}
 	}
 
-		for (dgInt32 i = 0; i < skeletonCount; i ++) {
-			dgSkeletonContainer* const container = skeletonArray[i];
-			container->InitMassMatrix (constraintArray, internalForces, matrixRow);
-		}
+	for (dgInt32 i = 0; i < skeletonCount; i ++) {
+		dgSkeletonContainer* const container = skeletonArray[i];
+		container->InitMassMatrix (constraintArray, internalForces, matrixRow);
+	}
 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < maxPasses; step ++) {
@@ -872,6 +864,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgJointInfo* const jointInfo = &constraintArray[i];
+				const dgConstraint* const constraint = jointInfo->m_joint;
 				dgFloat32 accel = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}

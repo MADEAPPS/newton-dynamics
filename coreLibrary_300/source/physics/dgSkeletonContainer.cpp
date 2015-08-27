@@ -36,6 +36,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////// 
+////////////////////////////////////////////////////////////////////// 
+dgInt32 dgSkeletonContainer::m_lruMarker = 1;
 dgInt32 dgSkeletonContainer::m_uniqueID = DG_SKELETON_BASEW_UNIQUE_ID;
 
 DG_MSC_VECTOR_ALIGMENT
@@ -321,7 +323,9 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_nodesOrder(NULL)
 	,m_destructor(NULL)
 	,m_id(m_uniqueID)
+	,m_lru(0)
 	,m_nodeCount(1)
+	,m_skeletonHardMotors(0)
 {
 	rootBody->SetSkeleton(this);
 	m_uniqueID++;
@@ -339,6 +343,17 @@ dgSkeletonContainer::~dgSkeletonContainer()
 	}
 	delete m_skeleton;
 }
+
+bool dgSkeletonContainer::GetSolverMode() const
+{
+	return m_skeletonHardMotors ? true : false;
+}
+
+void dgSkeletonContainer::SetSolverMode(bool hardJointMotors)
+{
+	m_skeletonHardMotors = hardJointMotors ? 1 : 0;
+}
+
 
 dgWorld* dgSkeletonContainer::GetWorld() const
 {
@@ -365,6 +380,9 @@ void dgSkeletonContainer::SortGraph(dgSkeletonGraph* const root, dgSkeletonGraph
 	m_nodesOrder[index] = root;
 	root->m_index = dgInt16(index);
 	index++;
+	if (root->m_joint) {
+		root->m_joint->m_hasSkeleton = true;
+	}
 	dgAssert(index <= m_nodeCount);
 }
 
@@ -513,7 +531,7 @@ void dgSkeletonContainer::RebuildMassMatrix(dgInt32 start, const dgJointInfo* co
 	}
 }
 
-
+/*
 dgFloat32 dgSkeletonContainer::SolveUnilaterals (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const
 {
 	dgFloat32 retAccel = dgFloat32(0.0f);
@@ -535,6 +553,7 @@ dgFloat32 dgSkeletonContainer::SolveUnilaterals (dgJointInfo* const jointInfoArr
 	}
 	return retAccel;
 }
+*/
 
 DG_INLINE void dgSkeletonContainer::SolveFoward () const
 {
@@ -577,6 +596,7 @@ DG_INLINE dgFloat32 dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const 
 		dgAssert(node->m_joint);
 		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
 		dgAssert(jointInfo->m_joint == node->m_joint);
+		
 		const dgInt32 first = jointInfo->m_pairStart;
 		const dgInt32 count = node->m_dof;
 		const dgInt32 m0 = jointInfo->m_m0;
