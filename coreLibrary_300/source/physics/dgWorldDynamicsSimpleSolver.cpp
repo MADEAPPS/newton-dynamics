@@ -825,7 +825,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	for (dgInt32 i = 0; i < skeletonCount; i ++) {
 		dgSkeletonContainer* const container = skeletonArray[i];
-		container->InitMassMatrix (constraintArray, internalForces, matrixRow);
+		if (!container->m_skeletonHardMotors) {
+			container->InitMassMatrix (constraintArray, matrixRow);
+		}
 	}
 
 	const dgInt32 passes = world->m_solverMode;

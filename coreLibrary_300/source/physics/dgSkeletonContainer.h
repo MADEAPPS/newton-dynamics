@@ -46,7 +46,7 @@ class dgSkeletonContainer
 	dgSkeletonGraph* AddChild (dgBody* const child, dgBody* const parent);
 	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
 	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
-	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
+	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow) const;
 	dgFloat32 CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
 	bool GetSolverMode () const;
 	void SetSolverMode (bool hardJoint);
@@ -55,14 +55,15 @@ class dgSkeletonContainer
 	DG_INLINE void SolveFoward () const;
 	DG_INLINE void SolveBackward () const;
 	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	DG_INLINE dgFloat32 CalculateJointAccel (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	DG_INLINE void InitMassMatrixLCP (const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	DG_INLINE dgFloat32 CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	
+	
 
 	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
 	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
 	
-	void RebuildMassMatrix (dgInt32 start, const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow);
-//	dgFloat32 SolveUnilaterals (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	
 	static void ResetUniqueId(dgInt32 id);
 

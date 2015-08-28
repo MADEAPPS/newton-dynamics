@@ -8729,7 +8729,7 @@ void NewtonSkeletonSetSolverMode(NewtonSkeletonContainer* const skeletonPtr, int
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	skeleton->SetSolverMode(hardJointMotors);
+	skeleton->SetSolverMode(hardJointMotors ? true : false);
 }
 
 
