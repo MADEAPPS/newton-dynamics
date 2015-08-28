@@ -866,7 +866,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgJointInfo* const jointInfo = &constraintArray[i];
-				const dgConstraint* const constraint = jointInfo->m_joint;
+				//const dgConstraint* const constraint = jointInfo->m_joint;
 				dgFloat32 accel = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
