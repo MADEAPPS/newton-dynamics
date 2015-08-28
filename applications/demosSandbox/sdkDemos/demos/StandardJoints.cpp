@@ -342,6 +342,17 @@ struct JoesRagdollJoint
 //	  m_basis = dGetIdentityMatrix();
    }
 
+	dVector BodyGetPointVelocity (const NewtonBody* const body, const dVector &point)
+	{
+		dVector v, w, c; 
+		NewtonBodyGetVelocity (body, &v[0]);
+		NewtonBodyGetOmega (body, &w[0]);
+		dMatrix matrix;
+		NewtonBodyGetMatrix (body, &matrix[0][0]);
+		c = matrix.m_posit; // TODO: Does not handle COM offset !!!
+		return v + w * (point - c);
+	}
+
    void SubmitConstraints(dFloat timestep, int threadIndex)
    {
       float invTimestep = 1.0f / timestep;
@@ -365,9 +376,37 @@ struct JoesRagdollJoint
 
       dVector p0 (matrix0.m_posit);
       dVector p1 (matrix1.m_posit);
-      NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
-      NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
-      NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
+
+	  if (0)
+	  {
+		  NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+		  NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
+		  NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
+	  }
+	  else // flexible
+	  {
+			dVector diff = p1 - p0;
+
+			dVector v0 = BodyGetPointVelocity (m_body0, p0);
+			dVector v1 = BodyGetPointVelocity (m_body1, p1);
+			dVector relAcc = (diff.Scale (m_reduceError * invTimestep) - (v0 - v1)).Scale (invTimestep);
+
+			dMatrix basis;			
+			if (diff % diff > 1.0e-10f) 
+				basis = dGrammSchmidt(diff);
+			else
+				basis = matrix1;
+			
+			for (int i=0; i<3; i++)
+			{
+				dVector &axis = basis[i];
+				NewtonUserJointAddLinearRow (m_joint, (float*)&p0, (float*)&p1, (float*)&axis);
+				NewtonUserJointSetRowAcceleration (m_joint, relAcc % axis);
+				//NewtonUserJointSetRowMinimumFriction (joint, -linearFriction);
+				//NewtonUserJointSetRowMaximumFriction (joint,  linearFriction);
+				NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
+			}
+	  }
 
       // measure error
       dQuaternion q0 (matrix0);
@@ -432,6 +471,7 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 
 #if (defined (_USE_HARD_JOINTS) && defined (xxxxx))
     NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), parent, NULL);
+	NewtonSkeletonSetSolverMode(skeleton, 1);
 #endif
 
     for (int i=0; i<numSegments; i++)
