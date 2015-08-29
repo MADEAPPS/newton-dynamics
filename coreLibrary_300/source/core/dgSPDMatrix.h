@@ -161,12 +161,12 @@ bool dgSPDMatrix<T>::TestPSD() const
 template<class T>
 bool dgSPDMatrix<T>::LDLtDecomposition()
 {
-	for (dgInt32 j = 0; j < m_rowCount; j++) {
+	for (dgInt32 j = 0; j < dgGeneralMatrix<T>::m_rowCount; j++) {
 		T* const rowJ = &m_rows[j].m_columns[0];
 		for (dgInt32 k = 0; k < j; k++) {
 			T* const rowK = &m_rows[k].m_columns[0];
 			T factor = rowK[j];
-			for (dgInt32 i = j; i < m_rowCount; i++) {
+			for (dgInt32 i = j; i < dgGeneralMatrix<T>::m_rowCount; i++) {
 				rowJ[i] -= rowK[i] * factor;
 			}
 		}
@@ -178,7 +178,7 @@ bool dgSPDMatrix<T>::LDLtDecomposition()
 
 		rowJ[j] = T(sqrt(factor));
 		factor = T(1.0f / rowJ[j]);
-		for (dgInt32 k = j + 1; k < m_rowCount; k++) {
+		for (dgInt32 k = j + 1; k < dgGeneralMatrix<T>::m_rowCount; k++) {
 			rowJ[k] *= factor;
 		}
 	}
@@ -189,20 +189,20 @@ bool dgSPDMatrix<T>::LDLtDecomposition()
 template<class T>
 bool dgSPDMatrix<T>::CholeskyFactorization()
 {
-	return CholeskyFactorization(m_rowCount);
+	return CholeskyFactorization(dgGeneralMatrix<T>::m_rowCount);
 }
 
 template<class T>
 void dgSPDMatrix<T>::CholeskySolve(dgGeneralVector<T> &x, const dgGeneralVector<T> &b) const
 {
-	CholeskySolve(&x[0], &b[0], m_rowCount);
+	CholeskySolve(&x[0], &b[0], dgGeneralMatrix<T>::m_rowCount);
 }
 
 
 template<class T>
 DG_INLINE bool dgSPDMatrix<T>::CholeskyFactorizationAddRow(dgInt32 n)
 {
-	dgAssert(n <= m_rowCount);
+	dgAssert(n <= dgGeneralMatrix<T>::m_rowCount);
 	dgGeneralMatrix<T>& me = *this;
 	T* const rowI = &me[n][0];
 	for (dgInt32 j = 0; j <= n; j++) {
@@ -310,8 +310,8 @@ template<class T>
 DG_INLINE void dgLCP<T>::PermuteRows(dgInt32 i, dgInt32 j)
 {
 	if (i != j) {
-		SwapRows(i, j);
-		SwapColumns(i, j);
+		dgGeneralMatrix<T>::SwapRows(i, j);
+		dgGeneralMatrix<T>::SwapColumns(i, j);
 		dgSwap(m_b[i], m_b[j]);
 		dgSwap(m_low[i], m_low[j]);
 		dgSwap(m_high[i], m_high[j]);
@@ -329,7 +329,7 @@ DG_INLINE void dgLCP<T>::PermuteRows(dgInt32 i, dgInt32 j)
 template<class T>
 DG_INLINE void dgLCP<T>::CalculateDelta_x(T* const delta_x, T* const tmp, T dir, dgInt32 n) const
 {
-	const dgInt32 size = m_rowCount;
+	const dgInt32 size = dgGeneralMatrix<T>::m_rowCount;
 	const dgSPDMatrix<T>& me = *this;
 	for (dgInt32 i = 0; i < n; i++) {
 		tmp[i] = -me[n][i] * dir;
@@ -346,7 +346,7 @@ DG_INLINE void dgLCP<T>::CalculateDelta_x(T* const delta_x, T* const tmp, T dir,
 template<class T>
 DG_INLINE void dgLCP<T>::CalculateDelta_r(T* const delta_r, const T* const delta_x, dgInt32 n) const
 {
-	const dgInt32 size = m_rowCount;
+	const dgInt32 size = dgGeneralMatrix<T>::m_rowCount;
 	const dgSPDMatrix<T>& me = *this;
 	for (dgInt32 i = n; i < size; i++) {
 		delta_r[i] = me[i].DotProduct(delta_x);
@@ -442,7 +442,7 @@ template<class T>
 bool dgLCP<T>::SolveDantzig()
 {
 	dgSPDMatrix<T>& me = *this;
-	const dgInt32 size = m_rowCount;
+	const dgInt32 size = dgGeneralMatrix<T>::m_rowCount;
 
 //static int xxx;
 //xxx++;
@@ -618,7 +618,7 @@ template<class T>
 bool dgLCP<T>::SolveConjugateGradient(T tol)
 {
      dgSPDMatrix<T>& me = *this;
-     const dgInt32 size = m_rowCount;
+     const dgInt32 size = dgGeneralMatrix<T>::m_rowCount;
 
 static int xxx;
 xxx ++;
