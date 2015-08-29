@@ -371,11 +371,11 @@ bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVect
 
 	// convert to upper triangular matrix by applying gauss partial pivoting
 	dgGeneralMatrix<T>& me = *this;
-	for (dgInt32 i = 0; i < m_rowCount - 1; i++) {
+	for (dgInt32 i = 0; i < dgGeneralMatrix<T>::m_rowCount - 1; i++) {
 
 		dgInt32 k = i;
 		T maxVal (fabs(me[i][i]));
-		for (dgInt32 j = i + 1; j < m_rowCount - 1; j++) {
+		for (dgInt32 j = i + 1; j < dgGeneralMatrix<T>::m_rowCount - 1; j++) {
 			T val (fabs(me[j][i]));
 			if (val > maxVal) {
 				k = j;
@@ -394,10 +394,10 @@ bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVect
 
 		T* const rowI = &me[i][0];
 		T den = T(1.0f) / rowI[i];
-		for (dgInt32 k = i + 1; k < m_rowCount; k++) {
+		for (dgInt32 k = i + 1; k < dgGeneralMatrix<T>::m_rowCount; k++) {
 			T* const rowK = &me[k][0];
 			T factor(-rowK[i] * den);
-			for (dgInt32 j = i + 1; j < m_rowCount; j++) {
+			for (dgInt32 j = i + 1; j < dgGeneralMatrix<T>::m_rowCount; j++) {
 				rowK[j] += rowI[j] * factor;
 			}
 			rowK[i] = T(0.0f);
@@ -405,10 +405,10 @@ bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVect
 		}
 	}
 
-	for (dgInt32 i = m_rowCount - 1; i >= 0; i--) {
+	for (dgInt32 i = dgGeneralMatrix<T>::m_rowCount - 1; i >= 0; i--) {
 		T acc(0);
 		T* const rowI = &me[i][0];
-		for (dgInt32 j = i + 1; j < m_rowCount; j++) {
+		for (dgInt32 j = i + 1; j < dgGeneralMatrix<T>::m_rowCount; j++) {
 			acc = acc + rowI[j] * B[j];
 		}
 		B[i] = (B[i] - acc) / rowI[i];
