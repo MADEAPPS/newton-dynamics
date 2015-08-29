@@ -277,7 +277,7 @@ dgLCP<T>::dgLCP(const dgLCP& src)
 
 template<class T>
 dgLCP<T>::dgLCP(dgMemoryAllocator* const allocator, dgInt32 size)
-	:dgSPDMatrix(allocator, size)
+	:dgSPDMatrix<T>(allocator, size)
 	,m_b(allocator, size)
 	,m_x(allocator, size)
 	,m_r(allocator, size)
@@ -296,9 +296,9 @@ dgLCP<T>::~dgLCP()
 {
 	dgInt32 n = dgInt32(sizeof(m_tmp) / sizeof (m_tmp[0]));
 	for (dgInt32 i = n - 1; i >= 0; i--) {
-		m_allocator->FreeLow(m_tmp[i]);
+		dgGeneralMatrix<T>::m_allocator->FreeLow(m_tmp[i]);
 	}
-	m_allocator->FreeLow(m_permute);
+	dgGeneralMatrix<T>::m_allocator->FreeLow(m_permute);
 }
 
 
@@ -396,7 +396,7 @@ DG_INLINE void dgLCP<T>::PartialMatrixTimeVector(const T* const v, T* const out,
 template<class T>
 bool dgLCP<T>::GaussSeidelLCP(dgInt32 maxIterCount, T tol)
 {
-	const dgInt32 count = GetRowCount();
+	const dgInt32 count = dgGeneralMatrix<T>::GetRowCount();
 	const dgSPDMatrix<T>& me = *this;
 
 	T* const x = &m_x[0];
@@ -488,7 +488,7 @@ bool dgLCP<T>::SolveDantzig()
 			if (T(fabs(r[index]) > T(1.0e-12f))) {
 				if (calculateDelta_x) {
 					dir = (r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
-				CalculateDelta_x(delta_x, tmp, dir, index);
+					CalculateDelta_x(delta_x, tmp, dir, index);
 				}
 				calculateDelta_x = true;
 				CalculateDelta_r(delta_r, delta_x, index);
@@ -541,7 +541,7 @@ bool dgLCP<T>::SolveDantzig()
 			if (swapIndex == -1) {
 				r[index] = T(0.0f);
 				delta_r[index] = T(0.0f);
-				if (!CholeskyFactorizationAddRow(index)) {
+				if (!dgSPDMatrix<T>::CholeskyFactorizationAddRow(index)) {
 					return false;
 				}
 				index++;
@@ -588,9 +588,9 @@ bool dgLCP<T>::SolveDantzig()
 				index--;
 				for (dgInt32 i = swapIndex; i < index; i++) {
 #ifdef _DEBUG
-					dgAssert(CholeskyFactorizationAddRow(i));
+					dgAssert(dgSPDMatrix<T>::CholeskyFactorizationAddRow(i));
 #else
-					CholeskyFactorizationAddRow(i);
+					dgSPDMatrix<T>::CholeskyFactorizationAddRow(i);
 #endif
 				}
 				loop = true;
@@ -720,7 +720,7 @@ gauss.GetX().Trace();
                 iter = index;
                 x[swapIndex] = clamp_x;
                 if (swapIndex != index) {
-                     SwapRows(swapIndex, index);
+                     dgGeneralMatrix<T>::SwapRows(swapIndex, index);
                      SwapColumns(swapIndex, index);
                      dgSwap(x[swapIndex], x[index]);
                      dgSwap(low[swapIndex], low[index]);
