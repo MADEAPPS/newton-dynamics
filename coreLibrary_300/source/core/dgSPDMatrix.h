@@ -149,10 +149,6 @@ dgSPDMatrix<T>::~dgSPDMatrix()
 template<class T>
 bool dgSPDMatrix<T>::TestPSD() const
 {
-	if (!TestSymetry()) {
-		return false;
-	}
-
 	dgSPDMatrix<T> tmp(*this);
 	return tmp.CholeskyDecomposition();
 }
@@ -162,9 +158,9 @@ template<class T>
 bool dgSPDMatrix<T>::LDLtDecomposition()
 {
 	for (dgInt32 j = 0; j < dgGeneralMatrix<T>::m_rowCount; j++) {
-		T* const rowJ = &m_rows[j].m_columns[0];
+		T* const rowJ = &dgGeneralMatrix<T>::m_rows[j].m_columns[0];
 		for (dgInt32 k = 0; k < j; k++) {
-			T* const rowK = &m_rows[k].m_columns[0];
+			T* const rowK = &dgGeneralMatrix<T>::m_rows[k].m_columns[0];
 			T factor = rowK[j];
 			for (dgInt32 i = j; i < dgGeneralMatrix<T>::m_rowCount; i++) {
 				rowJ[i] -= rowK[i] * factor;
@@ -281,7 +277,7 @@ dgLCP<T>::dgLCP(const dgLCP& src)
 
 template<class T>
 dgLCP<T>::dgLCP(dgMemoryAllocator* const allocator, dgInt32 size)
-	:dgSPDMatrix<T>(allocator, size)
+	:dgSPDMatrix(allocator, size)
 	,m_b(allocator, size)
 	,m_x(allocator, size)
 	,m_r(allocator, size)
