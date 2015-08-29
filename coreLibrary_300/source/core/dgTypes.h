@@ -110,8 +110,9 @@
 			#include <emmintrin.h> 
 			#include <mmintrin.h> 
 			#ifdef __SSE4_1__
-				#define DG_SSE4_INSTRUCTIONS_SET
-				#include <smmintrin.h>
+				// some linux systems still do not support dot product operations
+//				#define DG_SSE4_INSTRUCTIONS_SET
+//				#include <smmintrin.h>
 			#endif
 		} 
 	#endif
