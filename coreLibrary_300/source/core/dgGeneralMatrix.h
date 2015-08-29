@@ -343,13 +343,13 @@ void dgGeneralMatrix<T>::SwapColumns(dgInt32 i, dgInt32 j)
 
 template<class T>
 dgSquareMatrix<T>::dgSquareMatrix(const dgGeneralMatrix<T>& src)
-	:dgGeneralMatrix(src)
+	:dgGeneralMatrix<T>(src)
 {
 }
 
 template<class T>
 dgSquareMatrix<T>::dgSquareMatrix(dgMemoryAllocator* const allocator, dgInt32 size)
-	:dgGeneralMatrix(allocator, size, size)
+	:dgGeneralMatrix<T>(allocator, size, size)
 {
 }
 
