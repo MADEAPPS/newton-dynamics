@@ -136,7 +136,7 @@ void dgBroadPhaseAggregate::ImproveEntropy()
 			}
 
 			m_isInEquilibrium = equlibrium;
-			if (!m_isInEquilibrium && (entropy > m_treeEntropy * dgFloat32(2.0f)) || (entropy < m_treeEntropy * dgFloat32(0.5f))) {
+			if (!m_isInEquilibrium && ((entropy > m_treeEntropy * dgFloat32(2.0f)) || (entropy < m_treeEntropy * dgFloat32(0.5f)))) {
 				m_root->m_parent = NULL;
 				dgFloat64 cost0 = entropy;
 				dgFloat64 cost1 = cost0;
