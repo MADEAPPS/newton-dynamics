@@ -268,6 +268,7 @@
 		FF93FBFC19C566EA00F4094D /* m1a1_.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FBFA19C566EA00F4094D /* m1a1_.ngd */; };
 		FF93FC2F19C760A500F4094D /* carPath.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FC2E19C760A500F4094D /* carPath.ngd */; };
 		FF93FC3E19C93C0C00F4094D /* streetCone.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FC3D19C93C0C00F4094D /* streetCone.ngd */; };
+		FF94FCDF1B91689B0073550E /* robot.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF94FCDE1B91689B0073550E /* robot.ngd */; };
 		FF9AEB8919B7FFDA007C1C5C /* revHigh.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8619B7FFDA007C1C5C /* revHigh.wav */; };
 		FF9AEB8A19B7FFDA007C1C5C /* revLow.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8719B7FFDA007C1C5C /* revLow.wav */; };
 		FF9AEB8B19B7FFDA007C1C5C /* revMiddle.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8819B7FFDA007C1C5C /* revMiddle.wav */; };
@@ -700,6 +701,7 @@
 		FF93FBFA19C566EA00F4094D /* m1a1_.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = m1a1_.ngd; path = ../../../../media/m1a1_.ngd; sourceTree = "<group>"; };
 		FF93FC2E19C760A500F4094D /* carPath.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = carPath.ngd; path = ../../../../media/carPath.ngd; sourceTree = "<group>"; };
 		FF93FC3D19C93C0C00F4094D /* streetCone.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = streetCone.ngd; path = ../../../../media/streetCone.ngd; sourceTree = "<group>"; };
+		FF94FCDE1B91689B0073550E /* robot.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = robot.ngd; path = ../../../../media/robot.ngd; sourceTree = "<group>"; };
 		FF9AEB8619B7FFDA007C1C5C /* revHigh.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revHigh.wav; path = ../../../../media/revHigh.wav; sourceTree = "<group>"; };
 		FF9AEB8719B7FFDA007C1C5C /* revLow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revLow.wav; path = ../../../../media/revLow.wav; sourceTree = "<group>"; };
 		FF9AEB8819B7FFDA007C1C5C /* revMiddle.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revMiddle.wav; path = ../../../../media/revMiddle.wav; sourceTree = "<group>"; };
@@ -826,6 +828,7 @@
 		FF506721173F3DDC00D01FDF /* assets */ = {
 			isa = PBXGroup;
 			children = (
+				FF94FCDE1B91689B0073550E /* robot.ngd */,
 				FF506673173F3D8700D01FDF /* 00_skap.tga */,
 				FF506674173F3D8700D01FDF /* 01_S_ba.tga */,
 				FF506675173F3D8700D01FDF /* 01_S_kap.tga */,
@@ -1577,6 +1580,7 @@
 				FF9AEB9119B8015A007C1C5C /* colum.ngd in Resources */,
 				FF5067BF173F3EAD00D01FDF /* lamb5.tga in Resources */,
 				FF9AEB8A19B7FFDA007C1C5C /* revLow.wav in Resources */,
+				FF94FCDF1B91689B0073550E /* robot.ngd in Resources */,
 				FF5067C0173F3EAD00D01FDF /* lamb6.tga in Resources */,
 				FF5067C1173F3EAD00D01FDF /* lambDiablo.ngd in Resources */,
 				FF5067C2173F3EAD00D01FDF /* lav_tire.tga in Resources */,

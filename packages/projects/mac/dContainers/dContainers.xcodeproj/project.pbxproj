@@ -13,6 +13,19 @@
 		FF8C26801313D31E00646B90 /* dCRC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C266F1313D31E00646B90 /* dCRC.cpp */; };
 		FF8C26841313D31E00646B90 /* dRefCounter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26731313D31E00646B90 /* dRefCounter.cpp */; };
 		FF8C26891313D31E00646B90 /* dTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF8C26781313D31E00646B90 /* dTree.cpp */; };
+		FF94FCD11B9163120073550E /* dBaseHierarchy.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCC41B9163120073550E /* dBaseHierarchy.h */; };
+		FF94FCD21B9163120073550E /* dBezierSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF94FCC51B9163120073550E /* dBezierSpline.cpp */; };
+		FF94FCD31B9163120073550E /* dBezierSpline.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCC61B9163120073550E /* dBezierSpline.h */; };
+		FF94FCD41B9163120073550E /* dClassInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCC71B9163120073550E /* dClassInfo.h */; };
+		FF94FCD51B9163120073550E /* dContainersAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCC81B9163120073550E /* dContainersAlloc.h */; };
+		FF94FCD61B9163120073550E /* dContainersStdAfx.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCC91B9163120073550E /* dContainersStdAfx.h */; };
+		FF94FCD71B9163120073550E /* dCRC.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCCA1B9163120073550E /* dCRC.h */; };
+		FF94FCD81B9163120073550E /* dHeap.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCCB1B9163120073550E /* dHeap.h */; };
+		FF94FCD91B9163120073550E /* dList.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCCC1B9163120073550E /* dList.h */; };
+		FF94FCDA1B9163120073550E /* dRefCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCCD1B9163120073550E /* dRefCounter.h */; };
+		FF94FCDB1B9163120073550E /* dRtti.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCCE1B9163120073550E /* dRtti.h */; };
+		FF94FCDC1B9163120073550E /* dString.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCCF1B9163120073550E /* dString.h */; };
+		FF94FCDD1B9163120073550E /* dTree.h in Headers */ = {isa = PBXBuildFile; fileRef = FF94FCD01B9163120073550E /* dTree.h */; };
 		FF9BBC4B18351EA70060F147 /* dContainersAlloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF9BBC4A18351EA70060F147 /* dContainersAlloc.cpp */; };
 		FFD2742B172D9F9000114513 /* dString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFD27429172D9F9000114513 /* dString.cpp */; };
 /* End PBXBuildFile section */
@@ -26,6 +39,19 @@
 		FF8C266F1313D31E00646B90 /* dCRC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dCRC.cpp; path = ../../../dContainers/dCRC.cpp; sourceTree = SOURCE_ROOT; };
 		FF8C26731313D31E00646B90 /* dRefCounter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dRefCounter.cpp; path = ../../../dContainers/dRefCounter.cpp; sourceTree = SOURCE_ROOT; };
 		FF8C26781313D31E00646B90 /* dTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dTree.cpp; path = ../../../dContainers/dTree.cpp; sourceTree = SOURCE_ROOT; };
+		FF94FCC41B9163120073550E /* dBaseHierarchy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dBaseHierarchy.h; path = ../../../dContainers/dBaseHierarchy.h; sourceTree = "<group>"; };
+		FF94FCC51B9163120073550E /* dBezierSpline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dBezierSpline.cpp; path = ../../../dContainers/dBezierSpline.cpp; sourceTree = "<group>"; };
+		FF94FCC61B9163120073550E /* dBezierSpline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dBezierSpline.h; path = ../../../dContainers/dBezierSpline.h; sourceTree = "<group>"; };
+		FF94FCC71B9163120073550E /* dClassInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dClassInfo.h; path = ../../../dContainers/dClassInfo.h; sourceTree = "<group>"; };
+		FF94FCC81B9163120073550E /* dContainersAlloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dContainersAlloc.h; path = ../../../dContainers/dContainersAlloc.h; sourceTree = "<group>"; };
+		FF94FCC91B9163120073550E /* dContainersStdAfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dContainersStdAfx.h; path = ../../../dContainers/dContainersStdAfx.h; sourceTree = "<group>"; };
+		FF94FCCA1B9163120073550E /* dCRC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dCRC.h; path = ../../../dContainers/dCRC.h; sourceTree = "<group>"; };
+		FF94FCCB1B9163120073550E /* dHeap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dHeap.h; path = ../../../dContainers/dHeap.h; sourceTree = "<group>"; };
+		FF94FCCC1B9163120073550E /* dList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dList.h; path = ../../../dContainers/dList.h; sourceTree = "<group>"; };
+		FF94FCCD1B9163120073550E /* dRefCounter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dRefCounter.h; path = ../../../dContainers/dRefCounter.h; sourceTree = "<group>"; };
+		FF94FCCE1B9163120073550E /* dRtti.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dRtti.h; path = ../../../dContainers/dRtti.h; sourceTree = "<group>"; };
+		FF94FCCF1B9163120073550E /* dString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dString.h; path = ../../../dContainers/dString.h; sourceTree = "<group>"; };
+		FF94FCD01B9163120073550E /* dTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dTree.h; path = ../../../dContainers/dTree.h; sourceTree = "<group>"; };
 		FF9BBC4A18351EA70060F147 /* dContainersAlloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dContainersAlloc.cpp; path = ../../../dContainers/dContainersAlloc.cpp; sourceTree = "<group>"; };
 		FFD27429172D9F9000114513 /* dString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dString.cpp; path = ../../../dContainers/dString.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -61,6 +87,19 @@
 		08FB77ACFE841707C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				FF94FCC41B9163120073550E /* dBaseHierarchy.h */,
+				FF94FCC51B9163120073550E /* dBezierSpline.cpp */,
+				FF94FCC61B9163120073550E /* dBezierSpline.h */,
+				FF94FCC71B9163120073550E /* dClassInfo.h */,
+				FF94FCC81B9163120073550E /* dContainersAlloc.h */,
+				FF94FCC91B9163120073550E /* dContainersStdAfx.h */,
+				FF94FCCA1B9163120073550E /* dCRC.h */,
+				FF94FCCB1B9163120073550E /* dHeap.h */,
+				FF94FCCC1B9163120073550E /* dList.h */,
+				FF94FCCD1B9163120073550E /* dRefCounter.h */,
+				FF94FCCE1B9163120073550E /* dRtti.h */,
+				FF94FCCF1B9163120073550E /* dString.h */,
+				FF94FCD01B9163120073550E /* dTree.h */,
 				FF9BBC4A18351EA70060F147 /* dContainersAlloc.cpp */,
 				FFD27429172D9F9000114513 /* dString.cpp */,
 				FF8C26691313D31E00646B90 /* dBaseHierarchy.cpp */,
@@ -81,6 +120,18 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF94FCD61B9163120073550E /* dContainersStdAfx.h in Headers */,
+				FF94FCD11B9163120073550E /* dBaseHierarchy.h in Headers */,
+				FF94FCD71B9163120073550E /* dCRC.h in Headers */,
+				FF94FCDA1B9163120073550E /* dRefCounter.h in Headers */,
+				FF94FCD51B9163120073550E /* dContainersAlloc.h in Headers */,
+				FF94FCDC1B9163120073550E /* dString.h in Headers */,
+				FF94FCD81B9163120073550E /* dHeap.h in Headers */,
+				FF94FCDB1B9163120073550E /* dRtti.h in Headers */,
+				FF94FCD91B9163120073550E /* dList.h in Headers */,
+				FF94FCDD1B9163120073550E /* dTree.h in Headers */,
+				FF94FCD41B9163120073550E /* dClassInfo.h in Headers */,
+				FF94FCD31B9163120073550E /* dBezierSpline.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +194,7 @@
 				FF8C26801313D31E00646B90 /* dCRC.cpp in Sources */,
 				FF8C26841313D31E00646B90 /* dRefCounter.cpp in Sources */,
 				FF8C26891313D31E00646B90 /* dTree.cpp in Sources */,
+				FF94FCD21B9163120073550E /* dBezierSpline.cpp in Sources */,
 				FFD2742B172D9F9000114513 /* dString.cpp in Sources */,
 				FF9BBC4B18351EA70060F147 /* dContainersAlloc.cpp in Sources */,
 			);

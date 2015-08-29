@@ -17,8 +17,6 @@
 		C54AD3A219C31B5200A6C98B /* dAnimationPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = C54AD39619C31B5200A6C98B /* dAnimationPlayer.h */; };
 		C54AD3A319C31B5200A6C98B /* dAnimationStdAfx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C54AD39719C31B5200A6C98B /* dAnimationStdAfx.cpp */; };
 		C54AD3A419C31B5200A6C98B /* dAnimationStdAfx.h in Headers */ = {isa = PBXBuildFile; fileRef = C54AD39819C31B5200A6C98B /* dAnimationStdAfx.h */; };
-		C54AD3A519C31B5200A6C98B /* dBezierSpline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C54AD39919C31B5200A6C98B /* dBezierSpline.cpp */; };
-		C54AD3A619C31B5200A6C98B /* dBezierSpline.h in Headers */ = {isa = PBXBuildFile; fileRef = C54AD39A19C31B5200A6C98B /* dBezierSpline.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,8 +30,6 @@
 		C54AD39619C31B5200A6C98B /* dAnimationPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dAnimationPlayer.h; path = ../../../dAnimation/dAnimationPlayer.h; sourceTree = "<group>"; };
 		C54AD39719C31B5200A6C98B /* dAnimationStdAfx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dAnimationStdAfx.cpp; path = ../../../dAnimation/dAnimationStdAfx.cpp; sourceTree = "<group>"; };
 		C54AD39819C31B5200A6C98B /* dAnimationStdAfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dAnimationStdAfx.h; path = ../../../dAnimation/dAnimationStdAfx.h; sourceTree = "<group>"; };
-		C54AD39919C31B5200A6C98B /* dBezierSpline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dBezierSpline.cpp; path = ../../../dAnimation/dBezierSpline.cpp; sourceTree = "<group>"; };
-		C54AD39A19C31B5200A6C98B /* dBezierSpline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dBezierSpline.h; path = ../../../dAnimation/dBezierSpline.h; sourceTree = "<group>"; };
 		D2AAC06F0554671400DB518D /* libdAnimation.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdAnimation.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -78,8 +74,6 @@
 				C54AD39619C31B5200A6C98B /* dAnimationPlayer.h */,
 				C54AD39719C31B5200A6C98B /* dAnimationStdAfx.cpp */,
 				C54AD39819C31B5200A6C98B /* dAnimationStdAfx.h */,
-				C54AD39919C31B5200A6C98B /* dBezierSpline.cpp */,
-				C54AD39A19C31B5200A6C98B /* dBezierSpline.h */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -92,7 +86,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C54AD3A419C31B5200A6C98B /* dAnimationStdAfx.h in Headers */,
-				C54AD3A619C31B5200A6C98B /* dBezierSpline.h in Headers */,
 				C54AD39E19C31B5200A6C98B /* dAnimationClip.h in Headers */,
 				C54AD3A219C31B5200A6C98B /* dAnimationPlayer.h in Headers */,
 				C54AD3A019C31B5200A6C98B /* dAnimationNode.h in Headers */,
@@ -153,7 +146,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C54AD3A519C31B5200A6C98B /* dBezierSpline.cpp in Sources */,
 				C54AD39B19C31B5200A6C98B /* dAnimationBlendNode.cpp in Sources */,
 				C54AD39F19C31B5200A6C98B /* dAnimationNode.cpp in Sources */,
 				C54AD3A119C31B5200A6C98B /* dAnimationPlayer.cpp in Sources */,
