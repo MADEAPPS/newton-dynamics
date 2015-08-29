@@ -46,9 +46,9 @@ class dgSkeletonContainer::dgSkeletonGraph
 	public:
 	DG_CLASS_ALLOCATOR(allocator)
 	dgSkeletonGraph (dgDynamicBody* const body, dgBilateralConstraint* const Joint, dgSkeletonGraph* const parent)
-		:m_parent(parent)
-		,m_body (body)
+		:m_body (body)
 		,m_joint (Joint)
+		,m_parent(parent)
 		,m_child(NULL)
 		,m_sibling(NULL)
 		,m_index(0)
