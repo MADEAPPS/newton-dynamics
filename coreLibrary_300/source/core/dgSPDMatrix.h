@@ -721,7 +721,7 @@ gauss.GetX().Trace();
                 x[swapIndex] = clamp_x;
                 if (swapIndex != index) {
                      dgGeneralMatrix<T>::SwapRows(swapIndex, index);
-                     SwapColumns(swapIndex, index);
+                     dgGeneralMatrix<T>::SwapColumns(swapIndex, index);
                      dgSwap(x[swapIndex], x[index]);
                      dgSwap(low[swapIndex], low[index]);
                      dgSwap(high[swapIndex], high[index]);
