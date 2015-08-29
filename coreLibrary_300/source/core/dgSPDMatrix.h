@@ -227,7 +227,7 @@ template<class T>
 DG_INLINE bool dgSPDMatrix<T>::CholeskyFactorization(dgInt32 n)
 {
 	bool passed = true;
-	for (dgInt32 i = 0; pass && (i < n); i++) {
+	for (dgInt32 i = 0; passed && (i < n); i++) {
 		passed = CholeskyFactorizationAddRow(i);
 	}
 	return passed;
@@ -267,11 +267,11 @@ dgLCP<T>::dgLCP(const dgLCP& src)
 	,m_r(src.m_r)
 	,m_low(src.m_low)
 	,m_high(src.m_high)
-	,m_permute((dgInt16*)m_allocator->MallocLow(src.m_rowCount * sizeof (dgInt16)))
+	,m_permute((dgInt16*)dgGeneralMatrix<T>::m_allocator->MallocLow(src.m_rowCount * sizeof (dgInt16)))
 {
 	dgInt32 n = dgInt32(sizeof(m_tmp) / sizeof (m_tmp[0]));
 	for (dgInt32 i = 0; i < n; i++) {
-		m_tmp[i] = (T*)m_allocator->MallocLow(src.m_rowCount * sizeof (T));
+		m_tmp[i] = (T*)dgGeneralMatrix<T>::m_allocator->MallocLow(src.m_rowCount * sizeof (T));
 	}
 }
 
@@ -283,11 +283,11 @@ dgLCP<T>::dgLCP(dgMemoryAllocator* const allocator, dgInt32 size)
 	,m_r(allocator, size)
 	,m_low(allocator, size)
 	,m_high(allocator, size)
-	,m_permute((dgInt16*)m_allocator->MallocLow(size * sizeof (dgInt16)))
+	,m_permute((dgInt16*)dgGeneralMatrix<T>::m_allocator->MallocLow(size * sizeof (dgInt16)))
 {
 	dgInt32 n = dgInt32(sizeof(m_tmp) / sizeof (m_tmp[0]));
 	for (dgInt32 i = 0; i < n; i++) {
-		m_tmp[i] = (T*)m_allocator->MallocLow(size * sizeof (T));
+		m_tmp[i] = (T*)dgGeneralMatrix<T>::m_allocator->MallocLow(size * sizeof (T));
 	}
 }
 
