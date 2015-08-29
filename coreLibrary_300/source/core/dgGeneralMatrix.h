@@ -388,7 +388,7 @@ bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVect
 		}
 
 		if (k != i) {
-			SwapRows(i, k);
+			dgGeneralMatrix<T>::SwapRows(i, k);
 			dgSwap(B[i], B[k]);
 		}
 
