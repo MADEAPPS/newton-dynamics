@@ -32,7 +32,6 @@ LIB_SRCS = \
 	$(SRC_PATH)/dAnimationClip.cpp \
 	$(SRC_PATH)/dAnimationNode.cpp \
 	$(SRC_PATH)/dAnimationPlayer.cpp \
-	$(SRC_PATH)/dBezierSpline.cpp \
 	$(SRC_PATH)/dAnimationStdAfx.cpp
 
 # ******************************************************
