@@ -83,7 +83,7 @@ class dgGeneralVector
 
 	friend class dgLCP<T>;
 	friend class dgSquareMatrix<T>;
-	friend class dgGeneralMatrix<T>;
+//	friend class dgGeneralMatrix<T>;
 };
 
 
