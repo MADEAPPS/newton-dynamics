@@ -370,7 +370,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		dQuaternion qt0 = m_target * q1;
 		dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f)	? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
 
-		float errorAngle = 2.0f * acos(max(-1.0f, min(1.0f, qErr.m_q0)));
+		float errorAngle = 2.0f * acos(dMax(-1.0f, dMin(1.0f, qErr.m_q0)));
 		dVector errorAngVel(0, 0, 0);
 
 		dMatrix basis;
