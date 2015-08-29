@@ -302,159 +302,107 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 }
 
 
-struct JoesRagdollJoint
+class JoesRagdollJoint: public CustomBallAndSocket
 {
-   NewtonBody* m_body0;
-   NewtonBody* m_body1; // parent
-   dMatrix m_localMatrix0;
-   dMatrix m_localMatrix1;
-   NewtonJoint* m_joint;
+	public:
+	dQuaternion m_target; // relative target rotation to reach at next timestep
 
-   dQuaternion m_target; // relative target rotation to reach at next timestep
+	float m_reduceError;
+	float m_pin_length;
+	float m_angularFriction;
+	float m_stiffness;
 
-   float m_reduceError;
-   float m_pin_length;
-   float m_angularFriction;
-   float m_stiffness;
+	float m_anim_speed;
+	float m_anim_offset;
+	float m_anim_time;
 
-   float m_anim_speed;
-   float m_anim_offset;
-   float m_anim_time;
-
-   JoesRagdollJoint (NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world)
-   {
-      m_body0 = child;
-      m_body1 = parent;
-      m_localMatrix0 = localMatrix0;
-      m_localMatrix1 = localMatrix1;
-      m_target = dQuaternion (dVector(1.0f,0,0), 0.0f);
-      m_joint = NewtonConstraintCreateUserJoint (world, 6, JoesRagdollJoint::Callback, 0, child, parent);
-      NewtonJointSetUserData (m_joint, (void*) this);
-
-      m_reduceError = 0.2f; // amount of error to reduce per timestep (more -> oszillation)
-      m_angularFriction = 300.0f;
-      m_stiffness = 0.9f;
-
-      m_anim_speed = 0.0f;
-      m_anim_offset = 0.0f;
-      m_anim_time = 0.0f;
-
-//	  m_basis = dGetIdentityMatrix();
-   }
-
-	dVector BodyGetPointVelocity (const NewtonBody* const body, const dVector &point)
+	
+	JoesRagdollJoint(NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world)
+		:CustomBallAndSocket(localMatrix0, localMatrix1, child, parent)
 	{
-		dVector v, w, c; 
-		NewtonBodyGetVelocity (body, &v[0]);
-		NewtonBodyGetOmega (body, &w[0]);
+		m_localMatrix0 = localMatrix0;
+		m_localMatrix1 = localMatrix1;
+
+		m_target = dQuaternion(dVector(1.0f, 0, 0), 0.0f);
+		m_reduceError = 0.2f; // amount of error to reduce per timestep (more -> oszillation)
+		m_angularFriction = 300.0f;
+		m_stiffness = 0.9f;
+
+		m_anim_speed = 0.0f;
+		m_anim_offset = 0.0f;
+		m_anim_time = 0.0f;
+	}
+
+	dVector BodyGetPointVelocity(const NewtonBody* const body, const dVector &point)
+	{
+		dVector v, w, c;
+		NewtonBodyGetVelocity(body, &v[0]);
+		NewtonBodyGetOmega(body, &w[0]);
 		dMatrix matrix;
-		NewtonBodyGetMatrix (body, &matrix[0][0]);
+		NewtonBodyGetMatrix(body, &matrix[0][0]);
 		c = matrix.m_posit; // TODO: Does not handle COM offset !!!
 		return v + w * (point - c);
 	}
 
-   void SubmitConstraints(dFloat timestep, int threadIndex)
-   {
-      float invTimestep = 1.0f / timestep;
-     
-      dMatrix body0Matrix; NewtonBodyGetMatrix(m_body0, &body0Matrix[0][0]);
-      dMatrix body1Matrix; NewtonBodyGetMatrix(m_body1, &body1Matrix[0][0]);     
-      dMatrix matrix0 = m_localMatrix0 * body0Matrix;
-      dMatrix matrix1 = m_localMatrix1 * body1Matrix;
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
+		float invTimestep = 1.0f / timestep;
 
-      if (m_anim_speed != 0.0f) // some animation to illustrate purpose
-      {
-         m_anim_time += timestep * m_anim_speed;
-         float a0 = sin (m_anim_time);
-         float a1 = m_anim_offset * 3.14f;
-         dVector axis (sin(a1), 0.0f, cos(a1));
-         //dVector axis (1,0,0);
-         m_target = dQuaternion (axis, a0 * 0.5f);
-      }
+		dMatrix matrix0;
+		dMatrix matrix1;
 
-      // point to point constraint
+		CalculateGlobalMatrix(matrix0, matrix1);
 
-      dVector p0 (matrix0.m_posit);
-      dVector p1 (matrix1.m_posit);
+		if (m_anim_speed != 0.0f) // some animation to illustrate purpose
+		{
+			m_anim_time += timestep * m_anim_speed;
+			float a0 = sin(m_anim_time);
+			float a1 = m_anim_offset * 3.14f;
+			dVector axis(sin(a1), 0.0f, cos(a1));
+			//dVector axis (1,0,0);
+			m_target = dQuaternion(axis, a0 * 0.5f);
+		}
 
-	  if (0)
-	  {
-		  NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
-		  NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
-		  NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
-	  }
-	  else // flexible
-	  {
-			dVector diff = p1 - p0;
+		// measure error
+		dQuaternion q0(matrix0);
+		dQuaternion q1(matrix1);
+		dQuaternion qt0 = m_target * q1;
+		dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f)	? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
 
-			dVector v0 = BodyGetPointVelocity (m_body0, p0);
-			dVector v1 = BodyGetPointVelocity (m_body1, p1);
-			dVector relAcc = (diff.Scale (m_reduceError * invTimestep) - (v0 - v1)).Scale (invTimestep);
+		float errorAngle = 2.0f * acos(max(-1.0f, min(1.0f, qErr.m_q0)));
+		dVector errorAngVel(0, 0, 0);
 
-			dMatrix basis;			
-			if (diff % diff > 1.0e-10f) 
-				basis = dGrammSchmidt(diff);
-			else
-				basis = matrix1;
-			
-			for (int i=0; i<3; i++)
-			{
-				dVector &axis = basis[i];
-				NewtonUserJointAddLinearRow (m_joint, (float*)&p0, (float*)&p1, (float*)&axis);
-				NewtonUserJointSetRowAcceleration (m_joint, relAcc % axis);
-				//NewtonUserJointSetRowMinimumFriction (joint, -linearFriction);
-				//NewtonUserJointSetRowMaximumFriction (joint,  linearFriction);
-				NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
-			}
-	  }
+		dMatrix basis;
+		if (errorAngle > 1.0e-10f) {
+			dVector errorAxis(qErr.m_q1, qErr.m_q2, qErr.m_q3, 0.0f);
+			errorAxis = errorAxis.Scale(1.0f / dSqrt(errorAxis % errorAxis));
+			errorAngVel = errorAxis.Scale(errorAngle * invTimestep);
 
-      // measure error
-      dQuaternion q0 (matrix0);
-      dQuaternion q1 (matrix1);
-      dQuaternion qt0 = m_target * q1;
-      dQuaternion qErr = (q0.DotProduct(qt0) < 0.0f
-         ? dQuaternion (-q0.m_q0,  q0.m_q1,  q0.m_q2,  q0.m_q3)
-         : dQuaternion ( q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
-      
-      float errorAngle = 2.0f * acos (max (-1.0f, min (1.0f, qErr.m_q0)));
-	  dVector errorAngVel (0,0,0);
-
-	   dMatrix basis;
-	   if (errorAngle > 1.0e-10f) {
-         dVector errorAxis (qErr.m_q1, qErr.m_q2, qErr.m_q3, 0.0f);
-         errorAxis = errorAxis.Scale(1.0f / dSqrt (errorAxis % errorAxis));   
-		 errorAngVel = errorAxis.Scale (errorAngle * invTimestep);
-
-		   basis = dGrammSchmidt(errorAxis); 
+			basis = dGrammSchmidt(errorAxis);
 		} else {
-		   basis = dMatrix (qt0, dVector (0.0f, 0.0f, 0.0f, 1.0f));
-	  }
+			basis = dMatrix(qt0, dVector(0.0f, 0.0f, 0.0f, 1.0f));
+		}
 
 		dVector angVel0, angVel1;
-		NewtonBodyGetOmega (m_body0, (float*)&angVel0);
-		NewtonBodyGetOmega (m_body1, (float*)&angVel1);        
+		NewtonBodyGetOmega(m_body0, (float*)&angVel0);
+		NewtonBodyGetOmega(m_body1, (float*)&angVel1);
 
-		dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);	
-                 
+		dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);
+
 		// motor
 		for (int n = 0; n < 3; n++) {
 			// calculate the desired acceleration
 			dVector &axis = basis[n];
 			float relAccel = angAcc % axis;
 
-			NewtonUserJointAddAngularRow (m_joint, 0.0f, &axis[0]);
-			NewtonUserJointSetRowAcceleration (m_joint, relAccel);
-			NewtonUserJointSetRowMinimumFriction (m_joint, -m_angularFriction);
-			NewtonUserJointSetRowMaximumFriction (m_joint,  m_angularFriction);
-			NewtonUserJointSetRowStiffness (m_joint, m_stiffness);
-		}      
-   }
-
-   static void Callback (const NewtonJoint* joint, float timestep, int threadIndex)
-   {
-      JoesRagdollJoint *custom = (JoesRagdollJoint*) NewtonJointGetUserData(joint);
-      custom->SubmitConstraints (timestep, threadIndex);
-   }
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		}
+	}
 };
 
 
@@ -466,8 +414,6 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 
     dVector size (width, height, width);
     NewtonBody* parent = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
-//	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
-
 
 #if (defined (_USE_HARD_JOINTS) && defined (xxxxx))
     NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), parent, NULL);

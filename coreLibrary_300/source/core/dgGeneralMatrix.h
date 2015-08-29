@@ -233,7 +233,8 @@ template<class T>
 void dgGeneralMatrix<T>::VectorTimeMatrix(const T* const v, T* const out) const
 {
 	const dgGeneralMatrix<T>& me = *this;
-	for (dgInt32 i = 0; i < m_colCount; i++) {
+	const dgInt32 colCount = GetColCount();
+	for (dgInt32 i = 0; i < colCount; i++) {
 		T acc = T(0.0f);
 		for (dgInt32 j = 0; j < m_rowCount; j++) {
 			acc = acc + me[j][i] * v[i];
@@ -270,19 +271,20 @@ void dgGeneralMatrix<T>::MatrixTimeMatrix(const dgGeneralMatrix<T>& A, const dgG
 	dgAssert(m_rowCount == A.m_rowCount);
 	dgAssert(GetColCount() == B.GetColCount());
 	dgAssert(A.GetColCount() == B.m_rowCount);
-     
-     dgInt32 count = A.m_colCount;
-     for (dgInt32 i = 0; i < m_rowCount; i++) {
-           T* const out = &m_rows[i][0];
-           T* const rowA = &A.m_rows[i][0];
-           for (dgInt32 j = 0; j < m_colCount; j++) {
-                T acc(0.0f);
-                for (dgInt32 k = 0; k < count; k++) {
-                     acc = acc + rowA[k] * B.m_rows[k][j];
-                }
-                out[j] = acc;
-           }
-     }
+
+	const dgInt32 colCount = GetColCount();
+	dgInt32 count = A.m_colCount;
+	for (dgInt32 i = 0; i < m_rowCount; i++) {
+		T* const out = &m_rows[i][0];
+		T* const rowA = &A.m_rows[i][0];
+		for (dgInt32 j = 0; j < colCount; j++) {
+			T acc(0.0f);
+			for (dgInt32 k = 0; k < count; k++) {
+				acc = acc + rowA[k] * B.m_rows[k][j];
+			}
+			out[j] = acc;
+		}
+	}
 }
 
 
@@ -290,17 +292,18 @@ template<class T>
 void dgGeneralMatrix<T>::MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& Bt)
 {
      dgAssert(m_rowCount == A.m_rowCount);
-     dgAssert(m_colCount == Bt.m_rowCount);
-     dgAssert(A.m_colCount == Bt.m_colCount);
+     dgAssert(GetColCount() == Bt.m_rowCount);
+     dgAssert(A.GetColCount() == Bt.GetColCount());
 
      dgAssert(this != &A);
      dgAssert(this != &Bt);
 
+	 const dgInt32 colCount = GetColCount();
      dgInt32 count = A.m_colCount;
      for (dgInt32 i = 0; i < m_rowCount; i++) {
            T* const out = &m_rows[i][0];
            T* const rowA = &A.m_rows[i][0];
-           for (dgInt32 j = 0; j < m_colCount; j++) {
+           for (dgInt32 j = 0; j < colCount; j++) {
                 T acc(0.0f);
                 T* const rowB = &Bt.m_rows[j][0];
                 for (dgInt32 k = 0; k < count; k++) {
@@ -310,9 +313,6 @@ void dgGeneralMatrix<T>::MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, 
            }
      }
 }
-
-
-
 
 template<class T>
 void dgGeneralMatrix<T>::SwapRows(dgInt32 i, dgInt32 j)

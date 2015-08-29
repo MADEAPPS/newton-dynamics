@@ -279,8 +279,7 @@ void* dgGeneralVector<T>::operator new (size_t size, dgMemoryAllocator* const al
 template<class T>
 void dgGeneralVector<T>::operator delete (void* const ptr, dgMemoryAllocator* const allocator)
 {
-	dgAssert(0);
-	dgAssert (((dgGeneralVector<T>*) ptr)->m_allocator == allocator);
+	dgGeneralVector<T>* const me = (dgGeneralVector<T>*) ptr;
 	me->m_allocator->FreeLow(ptr);
 }
 
