@@ -265,7 +265,7 @@ DG_INLINE void dgSPDMatrix<T>::CholeskySolve(T* const x, const T* const b, dgInt
 
 template<class T>
 dgLCP<T>::dgLCP(const dgLCP& src)
-	:dgSPDMatrix(src)
+	:dgSPDMatrix<T>(src)
 	,m_b(src.m_b)
 	,m_x(src.m_x)
 	,m_r(src.m_r)
@@ -281,7 +281,7 @@ dgLCP<T>::dgLCP(const dgLCP& src)
 
 template<class T>
 dgLCP<T>::dgLCP(dgMemoryAllocator* const allocator, dgInt32 size)
-	:dgSPDMatrix(allocator, size)
+	:dgSPDMatrix<T>(allocator, size)
 	,m_b(allocator, size)
 	,m_x(allocator, size)
 	,m_r(allocator, size)

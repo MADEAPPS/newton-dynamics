@@ -25,6 +25,7 @@
 
 #include "dgStdafx.h"
 #include "dgDebug.h"
+#include "dgVector.h"
 #include "dgGeneralVector.h"
 
 
