@@ -20,21 +20,21 @@
 #include <CustomJointLibraryStdAfx.h>
 #include <CustomAlloc.h>
 #include <CustomControllerManager.h>
-#include <CustomVehicleControllerComponent.h>
-#include <CustomVehicleControllerBodyState.h>
+//#include <CustomVehicleControllerComponent.h>
+//#include <CustomVehicleControllerBodyState.h>
 
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
 
-class CustomVehicleControllerComponent;
-class CustomVehicleControllerBodyStateTire;
-class CustomVehicleControllerComponentBrake;
-class CustomVehicleControllerComponentEngine;
-class CustomVehicleControllerComponentSteering;
+//class CustomVehicleControllerComponent;
+//class CustomVehicleControllerBodyStateTire;
+//class CustomVehicleControllerComponentBrake;
+//class CustomVehicleControllerComponentEngine;
+//class CustomVehicleControllerComponentSteering;
 
 
 //#define __TEST_VEHICLE_XXX__
 
-
+/*
 class CustomVehicleControllerTireCollisionFilter: public CustomControllerConvexCastPreFilter
 {	
 	public:
@@ -54,15 +54,113 @@ class CustomVehicleControllerTireCollisionFilter: public CustomControllerConvexC
 
 	const CustomVehicleController* m_controller;
 };
-
+*/
 
 class CustomVehicleController: public CustomControllerBase
 {
 	public:
-	class dTireForceSolverSolver;
-	class dWeightDistibutionSolver;
+//	class dTireForceSolverSolver;
+//	class dWeightDistibutionSolver;
+	
+	class BodyPart
+	{
+		public:
+		BodyPart()
+			:m_parent(NULL)
+			,m_body(NULL)
+			,m_joint(NULL)
+			,m_userData(NULL)
+			,m_controller(NULL)
+		{
+		}
+		virtual ~BodyPart()
+		{
+		}
 
-	public:
+		BodyPart* GetParent() const
+		{
+			return m_parent;
+		}
+
+		NewtonBody* GetBody() const
+		{
+			return m_body;
+		}
+
+		CustomJoint* GetJoint() const
+		{
+			return m_joint;
+		}
+
+		void* GetUserData() const
+		{
+			return m_userData;
+		}
+
+		CustomVehicleController* GetController() const
+		{
+			return m_controller;
+		}
+		
+		protected:
+		BodyPart* m_parent;
+		NewtonBody* m_body;
+		CustomJoint* m_joint;
+		
+		void* m_userData;
+		CustomVehicleController* m_controller;
+		friend class CustomVehicleController;
+	};
+
+	class BodyPartChassis: public BodyPart
+	{
+		public:
+		BodyPartChassis ()
+			:BodyPart()
+		{
+		}
+
+		void Init(CustomVehicleController* const controller, void* const userData)
+		{
+			m_joint = NULL;
+			m_userData = userData;
+			m_controller = controller;
+			m_body = controller->GetBody();
+		}
+	};
+
+	class BodyPartTire: public BodyPart
+	{
+		public:
+		class WheelJoint;
+		class CreationInfo
+		{
+			public:
+			dVector m_location;
+			dFloat m_mass;
+			dFloat m_radio;
+			dFloat m_width;
+			dFloat m_dampingRatio;
+			dFloat m_aligningPinDir;
+			dFloat m_springStrength;
+			dFloat m_suspesionlenght;
+			dFloat m_lateralStiffness;
+			dFloat m_longitudialStiffness;
+			dFloat m_aligningMomentTrail;
+			void* m_userData;
+		};
+
+
+		BodyPartTire();
+		~BodyPartTire();
+		void Init (BodyPart* const parentPart, const dMatrix& locationInGlobaSpase, const CreationInfo& info);
+
+		CreationInfo m_data;
+	};
+
+
+
+#if 0
 	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateTire* GetFirstTire () const ;
 	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateTire* GetNextTire (CustomVehicleControllerBodyStateTire* const tire) const;
 
@@ -79,8 +177,8 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API CustomVehicleControllerComponentBrake* GetHandBrakes() const;
 	CUSTOM_JOINTS_API CustomVehicleControllerComponentSteering* GetSteering() const;
 
-	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
-	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateTire* AddTire (const CustomVehicleControllerBodyStateTire::TireCreationInfo& tireInfo);
+	
+	
 
 	CUSTOM_JOINTS_API void SetBrakes(CustomVehicleControllerComponentBrake* const brakes);
 	CUSTOM_JOINTS_API void SetEngine(CustomVehicleControllerComponentEngine* const engine);
@@ -89,17 +187,15 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetContactFilter(CustomVehicleControllerTireCollisionFilter* const filter);
 
 	CUSTOM_JOINTS_API void LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires);
-	CUSTOM_JOINTS_API void Finalize();
+	
 
 	protected:
-	CUSTOM_JOINTS_API void Cleanup();
+	
 	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateContact* GetContactBody (const NewtonBody* const body);
-	CUSTOM_JOINTS_API void Init (NewtonBody* const body, const dMatrix& vehicleFrame, const dVector& gravityVector);
-	CUSTOM_JOINTS_API void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
+	
+	
 	
 	CUSTOM_JOINTS_API bool IsSleeping();
-	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
 	CUSTOM_JOINTS_API void DrawSchematic (dFloat scale) const;	
 	
@@ -110,7 +206,7 @@ class CustomVehicleController: public CustomControllerBase
 	dList<CustomVehicleControllerEngineDifferencialJoint> m_tankTireLinks;
 	dList<CustomVehicleControllerBodyStateContact> m_externalContactStatesPool;
 	dList<CustomVehicleControllerBodyStateContact>::dListNode* m_freeContactList;
-	NewtonCollision* m_tireCastShape;
+	
 	CustomVehicleControllerComponentBrake* m_brakes;
 	CustomVehicleControllerComponentEngine* m_engine;
 	CustomVehicleControllerComponentBrake* m_handBrakes;
@@ -119,9 +215,9 @@ class CustomVehicleController: public CustomControllerBase
 	CustomVehicleControllerBodyStateContact* m_externalContactStates[16];
 	int m_sleepCounter;
 	int m_externalContactStatesCount;
-	bool m_finalized;
+	
 
-	friend class CustomVehicleControllerManager;
+	
 	friend class CustomVehicleControllerTireJoint;
 	
 	friend class CustomVehicleControllerTireContactJoint;
@@ -134,6 +230,36 @@ class CustomVehicleController: public CustomControllerBase
 	friend class CustomVehicleControllerComponentEngine;
 	friend class CustomVehicleControllerComponentSteering;
 	friend class CustomVehicleControllerComponentTrackSkidSteering;
+#endif
+
+
+	CUSTOM_JOINTS_API void Finalize();
+	CUSTOM_JOINTS_API BodyPartTire* AddTire (const BodyPartTire::CreationInfo& tireInfo);
+	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
+
+	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetFirstPart() const;
+	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetNextPart(dList<BodyPart*>::dListNode* const part) const;
+
+	protected:
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
+
+	void Init (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
+	void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
+	
+	void Cleanup();
+	
+	dMatrix m_localFrame;
+	BodyPartChassis m_chassis;
+	dList<BodyPartTire> m_tireList;
+	dList<BodyPart*> m_bodyPartsList;
+	
+	NewtonSkeletonContainer* m_skeleton;
+	void* m_collisionAggregate;
+	NewtonCollision* m_tireCastShape;
+	NewtonApplyForceAndTorque m_forceAndTorque;
+	bool m_finalized;
+	friend class CustomVehicleControllerManager;
 };
 
 
@@ -143,14 +269,14 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 	CUSTOM_JOINTS_API CustomVehicleControllerManager(NewtonWorld* const world);
 	CUSTOM_JOINTS_API virtual ~CustomVehicleControllerManager();
 
-	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonBody* const body, const dMatrix& vehicleFrame, const dVector& gravityVector);
-	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, const dVector& gravityVector);
+	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
+	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	CUSTOM_JOINTS_API virtual void DestroyController (CustomVehicleController* const controller);
 
-	CUSTOM_JOINTS_API void DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const;
+//	CUSTOM_JOINTS_API void DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const;
 	protected:
-	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
-
+//	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
+	
 	friend class CustomVehicleController;
 };
 

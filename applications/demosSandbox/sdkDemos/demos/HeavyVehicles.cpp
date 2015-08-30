@@ -20,7 +20,7 @@
 #include "HeightFieldPrimitive.h"
 #include "DebugDisplay.h"
 
-
+#if 0
 struct VehicleParameters
 {
 	dFloat MASS;
@@ -1412,9 +1412,12 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 	HeavyVehicleEntity* m_player;
 };
 
-
+#endif
 void MilitaryTransport (DemoEntityManager* const scene)
 {
+	dAssert(0);
+/*
+
 	// load the sky box
 	scene->CreateSkyBox();
 
@@ -1458,6 +1461,7 @@ location.m_posit.m_z = 50.0f;
 
 //NewtonDestroyBody (m1a1Tank->m_controller->GetBody());
 //manager->DestroyController(m1a1Tank->m_controller);
+*/
 
 /*
 location.m_posit.m_z += 20.0f;
@@ -1470,9 +1474,9 @@ for (int i = 0; i < 5; i ++){
 }
 */
 	
-	dMatrix camMatrix (manager->m_player->GetNextMatrix());
-	scene->SetCameraMouseLock (true);
-	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
+//	dMatrix camMatrix (manager->m_player->GetNextMatrix());
+//	scene->SetCameraMouseLock (true);
+//	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 	//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	//	int count = 5;

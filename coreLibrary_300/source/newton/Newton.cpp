@@ -8718,6 +8718,43 @@ void NewtonSkeletonContainerDelete(NewtonSkeletonContainer* const skeletonPtr)
 }
 
 
+void* NewtonSkeletonContainerGetRoot(NewtonSkeletonContainer* const skeletonPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
+	return skeleton->GetRoot();
+}
+
+void* NewtonSkeletonContainerGetParent(NewtonSkeletonContainer* const skeletonPtr, void* const node)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
+	return skeleton->GetParent((dgSkeletonContainer::dgSkeletonGraph*) node);
+}
+
+
+void* NewtonSkeletonContainerFirstChild(NewtonSkeletonContainer* const skeletonPtr, void* const parentNode)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
+	return skeleton->GetFirstChild((dgSkeletonContainer::dgSkeletonGraph*) parentNode);
+}
+
+void* NewtonSkeletonContainerNextSibling(NewtonSkeletonContainer* const skeletonPtr, void* const siblingNode)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
+	return skeleton->GetFirstChild((dgSkeletonContainer::dgSkeletonGraph*) siblingNode);
+}
+
+NewtonBody* NewtonSkeletonContainerGetBodyFromNode (NewtonSkeletonContainer* const skeletonPtr, void* const node)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
+	return (NewtonBody*) (skeleton->GetBody((dgSkeletonContainer::dgSkeletonGraph*) node));
+}
+
+
 int NewtonSkeletonGetSolverMode(NewtonSkeletonContainer* const skeletonPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);

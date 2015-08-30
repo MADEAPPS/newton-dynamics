@@ -1165,9 +1165,14 @@ extern "C" {
 
 	NEWTON_API void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray);
 	NEWTON_API void* NewtonSkeletonContainerAttachBone (NewtonSkeletonContainer* const skeleton, NewtonBody* const childBone, NewtonBody* const parentBone);
-	NEWTON_API void NewtonSkeletonContainernDetachBone (NewtonSkeletonContainer* const skeleton, void* const bone);
+	NEWTON_API void NewtonSkeletonContainerDetachBone (NewtonSkeletonContainer* const skeleton, void* const bone);
 	NEWTON_API void NewtonSkeletonContainerFinalize (NewtonSkeletonContainer* const skeleton);
 
+	NEWTON_API void* NewtonSkeletonContainerGetRoot (NewtonSkeletonContainer* const skeleton);
+	NEWTON_API void* NewtonSkeletonContainerGetParent (NewtonSkeletonContainer* const skeleton, void* const node);
+	NEWTON_API void* NewtonSkeletonContainerFirstChild (NewtonSkeletonContainer* const skeleton, void* const parent);
+	NEWTON_API void* NewtonSkeletonContainerNextSibling (NewtonSkeletonContainer* const skeleton, void* const sibling);
+	NEWTON_API NewtonBody* NewtonSkeletonContainerGetBodyFromNode (NewtonSkeletonContainer* const skeleton, void* const node);
 
 	// **********************************************************************************************
 	//

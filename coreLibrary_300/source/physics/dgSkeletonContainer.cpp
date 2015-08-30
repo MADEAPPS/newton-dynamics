@@ -372,6 +372,33 @@ dgSkeletonContainer::~dgSkeletonContainer()
 	delete m_skeleton;
 }
 
+dgSkeletonContainer::dgSkeletonGraph* dgSkeletonContainer::GetRoot () const
+{
+	return m_skeleton;
+}
+
+dgSkeletonContainer::dgSkeletonGraph* dgSkeletonContainer::GetParent (dgSkeletonGraph* const node) const
+{
+	return node->m_parent;
+}
+
+dgBody* dgSkeletonContainer::GetBody(dgSkeletonContainer::dgSkeletonGraph* const node) const
+{
+	return node->m_body;
+}
+
+dgSkeletonContainer::dgSkeletonGraph* dgSkeletonContainer::GetFirstChild(dgSkeletonContainer::dgSkeletonGraph* const parent) const
+{
+	return parent->m_child;
+}
+
+dgSkeletonContainer::dgSkeletonGraph* dgSkeletonContainer::GetNextSiblingChild(dgSkeletonContainer::dgSkeletonGraph* const sibling) const
+{
+	return sibling->m_sibling;
+}
+
+
+
 bool dgSkeletonContainer::GetSolverMode() const
 {
 	return m_skeletonHardMotors ? true : false;

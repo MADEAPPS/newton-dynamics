@@ -20,7 +20,7 @@
 #include "HeightFieldPrimitive.h"
 #include "DebugDisplay.h"
 
-
+#if 0
 struct BasciCarParameters
 {
 	enum DifferentialType
@@ -759,9 +759,11 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 	BasicCarEntity* m_player;
 };
 
+#endif
 
 void BasicCar (DemoEntityManager* const scene)
 {
+/*
 	// load the sky box
 	scene->CreateSkyBox();
 
@@ -818,5 +820,6 @@ void BasicCar (DemoEntityManager* const scene)
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
+*/		
 }
 

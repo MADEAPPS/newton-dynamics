@@ -50,6 +50,12 @@ class dgSkeletonContainer
 	dgFloat32 CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
 	bool GetSolverMode () const;
 	void SetSolverMode (bool hardJoint);
+	
+	dgSkeletonGraph* GetRoot () const;
+	dgBody* GetBody(dgSkeletonGraph* const node) const;
+	dgSkeletonGraph* GetParent (dgSkeletonGraph* const node) const;
+	dgSkeletonGraph* GetFirstChild (dgSkeletonGraph* const parent) const;
+	dgSkeletonGraph* GetNextSiblingChild (dgSkeletonGraph* const sibling) const;
 
 	private:
 	DG_INLINE void SolveFoward () const;
@@ -57,8 +63,6 @@ class dgSkeletonContainer
 	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	DG_INLINE void InitMassMatrixLCP (const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	DG_INLINE dgFloat32 CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	
-	
 
 	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
 	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
