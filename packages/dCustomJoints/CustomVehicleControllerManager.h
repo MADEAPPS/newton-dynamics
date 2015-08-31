@@ -52,7 +52,7 @@ class CustomVehicleController: public CustomControllerBase
 {
 	public:
 //	class dTireForceSolverSolver;
-//	class dWeightDistibutionSolver;
+	class dWeightDistibutionSolver;
 	
 	class BodyPart
 	{

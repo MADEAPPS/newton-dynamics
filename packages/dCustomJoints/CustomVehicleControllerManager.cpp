@@ -44,6 +44,46 @@
 #include <CustomHinge.h>
 #include <CustomVehicleControllerManager.h>
 
+class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
+{
+	public:
+	dWeightDistibutionSolver()
+		:dSymmetricBiconjugateGradientSolve()
+		, m_count(0)
+	{
+	}
+
+	virtual void MatrixTimeVector(dFloat64* const out, const dFloat64* const v) const
+	{
+		dComplemtaritySolver::dJacobian invMassJacobians;
+		invMassJacobians.m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+		invMassJacobians.m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+		for (int i = 0; i < m_count; i++) {
+			invMassJacobians.m_linear += m_invMassJacobians[i].m_linear.Scale(dFloat(v[i]));
+			invMassJacobians.m_angular += m_invMassJacobians[i].m_angular.Scale(dFloat(v[i]));
+		}
+
+		for (int i = 0; i < m_count; i++) {
+			out[i] = m_diagRegularizer[i] * v[i] + invMassJacobians.m_linear % m_jacobians[i].m_linear + invMassJacobians.m_angular % m_jacobians[i].m_angular;
+		}
+	}
+
+	virtual bool InversePrecoditionerTimeVector(dFloat64* const out, const dFloat64* const v) const
+	{
+		for (int i = 0; i < m_count; i++) {
+			out[i] = v[i] * m_invDiag[i];
+		}
+		return true;
+	}
+
+	dComplemtaritySolver::dJacobian m_jacobians[256];
+	dComplemtaritySolver::dJacobian m_invMassJacobians[256];
+	dFloat m_invDiag[256];
+	dFloat m_diagRegularizer[256];
+	int m_count;
+};
+
+
 class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 {
 	public:
@@ -51,8 +91,14 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 		:CustomJoint (6, tire, parentBody)
 		,m_data (tireData)
 		,m_targetAngle(0.0f)
+		,m_restSprunMass(0.0f)
 	{
 		CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+	}
+
+	void ApplySuspetionForce(dFloat timestep, dFloat posit)
+	{
+		
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -111,10 +157,31 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 //		if (dAbs (steeAngle - m_targetAngle) < 1.0e-2f) {
 //		}
 
+		
+		dVector tireVeloc;
+		dVector chassisCom;
+		dVector chassisVeloc;
+		dMatrix chassisMatrix;
+		NewtonBodyGetVelocity(GetBody0(), &tireVeloc[0]);
+		NewtonBodyGetPointVelocity(GetBody1(), &p0[0], &chassisVeloc[0]);
+		NewtonBodyGetCentreOfMass(GetBody1(), &chassisCom[0]);
+		NewtonBodyGetMatrix(GetBody1(), &chassisMatrix[0][0]);
+
+		chassisCom = p0 - chassisMatrix.TransformVector(chassisCom);
+		dFloat speed = (tireVeloc - chassisVeloc) % matrix1.m_up;
+		dFloat load = - NewtonCalculateSpringDamperAcceleration (timestep, m_data->m_data.m_springStrength, posit, m_data->m_data.m_dampingRatio, speed);
+		dVector force (matrix1.m_up.Scale (load * m_restSprunMass));
+		dVector torque (chassisCom  * force);
+
+		NewtonBodyAddForce(GetBody1(), &force[0]);
+		NewtonBodyAddTorque(GetBody1(), &torque[0]);
+		force = force.Scale (-1.0f);
+		NewtonBodyAddForce(GetBody0(), &force[0]);
 	}
 
 	BodyPartTire* m_data;
 	dFloat m_targetAngle;
+	dFloat m_restSprunMass;
 };
 
 
@@ -298,45 +365,6 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 	CustomVehicleController* m_controller;
 };
 
-class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
-{
-	public:
-	dWeightDistibutionSolver ()
-		:dSymmetricBiconjugateGradientSolve()
-		,m_count(0)
-	{
-	}
-
-	virtual void MatrixTimeVector (dFloat64* const out, const dFloat64* const v) const
-	{
-		dComplemtaritySolver::dJacobian invMassJacobians;
-		invMassJacobians.m_linear = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-		invMassJacobians.m_angular = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-		for (int i = 0; i < m_count; i ++) {
-			invMassJacobians.m_linear += m_invMassJacobians[i].m_linear.Scale (dFloat(v[i]));
-			invMassJacobians.m_angular += m_invMassJacobians[i].m_angular.Scale (dFloat(v[i]));
-		}
-
-		for (int i = 0; i < m_count; i ++) {
-			out[i] = m_diagRegularizer[i] * v[i] + invMassJacobians.m_linear % m_jacobians[i].m_linear + invMassJacobians.m_angular % m_jacobians[i].m_angular;
-		}
-	}
-
-	virtual bool InversePrecoditionerTimeVector (dFloat64* const out, const dFloat64* const v) const
-	{
-		for (int i = 0; i < m_count; i ++) {
-			out[i] = v[i] * m_invDiag[i];
-		}
-		return true;
-	}
-
-	dComplemtaritySolver::dJacobian m_jacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
-	dComplemtaritySolver::dJacobian m_invMassJacobians [VEHICLE_CONTROLLER_MAX_JOINTS];
-	dFloat m_invDiag[VEHICLE_CONTROLLER_MAX_JOINTS];
-	dFloat m_diagRegularizer[VEHICLE_CONTROLLER_MAX_JOINTS];
-
-	int m_count;
-};
 
 
 
@@ -813,9 +841,9 @@ void CustomVehicleController::SetCenterOfGravity(const dVector& comRelativeToGeo
 
 void CustomVehicleController::Finalize()
 {
-//	dWeightDistibutionSolver solver;
-//	dFloat64 unitAccel[VEHICLE_CONTROLLER_MAX_JOINTS];
-//	dFloat64 sprungMass[VEHICLE_CONTROLLER_MAX_JOINTS];
+	dWeightDistibutionSolver solver;
+	dFloat64 unitAccel[256];
+	dFloat64 sprungMass[256];
 
 	// make sure tire are aligned
 /*
@@ -833,22 +861,38 @@ void CustomVehicleController::Finalize()
 
 	m_finalized = true;
 	NewtonSkeletonContainerFinalize(m_skeleton);
-/*
+
 	int count = 0;
-	m_chassisState.m_matrix = dGetIdentityMatrix();
-	m_chassisState.UpdateInertia();
-	dVector dir (m_chassisState.m_localFrame[1]);
-	for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		dVector posit  (tire->m_localFrame.m_posit);  
+//	m_chassisState.m_matrix = dGetIdentityMatrix();
+//	m_chassisState.UpdateInertia();
+	dVector dir (0.0f, 1.0f, 0.0f, 0.0f);
+	
+	dMatrix matrix;
+	dVector com;
+	dVector invInertia;
+	dFloat invMass;
+	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+	NewtonBodyGetCentreOfMass(m_body, &com[0]);
+	NewtonBodyGetInvMass(m_body, &invMass, &invInertia[0], &invInertia[1], &invInertia[2]);
+	matrix = matrix.Inverse();
+
+	for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		BodyPartTire* const tire = &node->GetInfo();
+		
+		dMatrix tireMatrix;
+		NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
+		tireMatrix = tireMatrix * matrix;
+
+		dVector posit  (tireMatrix.m_posit - com);  
+
 		dComplemtaritySolver::dJacobian &jacobian0 = solver.m_jacobians[count];
 		dComplemtaritySolver::dJacobian &invMassJacobian0 = solver.m_invMassJacobians[count];
 		jacobian0.m_linear = dir;
 		jacobian0.m_angular = posit * dir;
 		jacobian0.m_angular.m_w = 0.0f;
 
-		invMassJacobian0.m_linear = jacobian0.m_linear.Scale(m_chassisState.m_invMass);
-		invMassJacobian0.m_angular = jacobian0.m_angular.CompProduct(m_chassisState.m_localInvInertia);
+		invMassJacobian0.m_linear = jacobian0.m_linear.Scale(invMass);
+		invMassJacobian0.m_angular = jacobian0.m_angular.CompProduct(invInertia);
 
 		dFloat diagnal = jacobian0.m_linear % invMassJacobian0.m_linear + jacobian0.m_angular % invMassJacobian0.m_angular;
 		solver.m_diagRegularizer[count] = diagnal * 0.005f;
@@ -858,28 +902,29 @@ void CustomVehicleController::Finalize()
 		sprungMass[count] = 0.0f;
 		count ++;
 	}
+
 	if (count) {
 		solver.m_count = count;
 		solver.Solve (count, 1.0e-6f, sprungMass, unitAccel);
 	}
 
 	int index = 0;
-	for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		CustomVehicleControllerBodyStateTire* const tire = &node->GetInfo();
-		tire->m_restSprunMass = dFloat (5.0f * dFloor (sprungMass[index] / 5.0f + 0.5f));
-		if (m_engine) {
-			tire->CalculateRollingResistance (m_engine->GetTopSpeed());
-		}
+	for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		BodyPartTire* const tire = &node->GetInfo();
+		BodyPartTire::WheelJoint* const tireJoint = (BodyPartTire::WheelJoint*) tire->GetJoint();
+		tireJoint->m_restSprunMass = dFloat (5.0f * dFloor (sprungMass[index] / 5.0f + 0.5f));
+//		if (m_engine) {
+//			tire->CalculateRollingResistance (m_engine->GetTopSpeed());
+//		}
 		index ++;
 	}
 
-	NewtonBody* const body = GetBody();
-	NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
-	m_chassisState.UpdateInertia();
+//	NewtonBody* const body = GetBody();
+//	NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
+//	m_chassisState.UpdateInertia();
+//	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
 
-	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
 	m_finalized = true;
-*/
 }
 
 
