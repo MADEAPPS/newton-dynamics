@@ -1512,7 +1512,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	for (dgBodyMasterList::dgListNode* node = masterList->GetLast(); node; node = node->GetPrev()) {
 		dgDynamicBody* const body = (dgDynamicBody*)node->GetInfo().GetBody();
 		if ((body->GetType() == dgBody::m_dynamicBody) && (body->GetInvMass().m_w > dgFloat32 (0.0f))) {
-			#if 0
+			#if 1
 				static FILE* file = fopen("replay.bin", "wb");
 				if (file) {
 					fwrite(&body->m_accel, sizeof (dgVector), 1, file);

@@ -245,13 +245,7 @@ dgFloat32 dgBilateralConstraint::CalculateSpringDamperAcceleration (
 }
 
 
-void dgBilateralConstraint::CalculateAngularDerivative (
-	dgInt32 index,
-	dgContraintDescritor& desc, 
-	const dgVector& dir,	
-	dgFloat32 stiffness,
-	dgFloat32 jointAngle,
-	dgForceImpactPair* const jointForce)
+void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& dir,	dgFloat32 stiffness, dgFloat32 jointAngle, dgForceImpactPair* const jointForce)
 {
 	dgAssert (jointForce);
 	dgAssert (m_body0);
@@ -294,6 +288,10 @@ void dgBilateralConstraint::CalculateAngularDerivative (
 		dgFloat32 num = ks * jointAngle + kd * omegaError + ksd * omegaError;
 		dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 		dgFloat32 alphaError = num / den;
+
+		//dgFloat32 alphaError1 = alphaError;
+		//alphaError = (jointAngle + omegaError * dt) / (dt * dt);
+		//dgTrace(("%f (%f %f)\n", jointAngle, alphaError1, alphaError));
 
 		desc.m_penetration[index] = jointAngle;
 		desc.m_jointAccel[index] = alphaError;

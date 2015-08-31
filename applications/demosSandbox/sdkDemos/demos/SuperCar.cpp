@@ -1274,6 +1274,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void UpdateCamera (SuperCarEntity* const player, dFloat timestep)
 	{
+return;
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 		DemoCamera* const camera = scene->GetCamera();
 		dMatrix camMatrix (camera->GetNextMatrix ());
@@ -1473,7 +1474,7 @@ void SuperCar (DemoEntityManager* const scene)
 
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
 	dMatrix camMatrix (vehicleEntity->GetNextMatrix());
-	scene->SetCameraMouseLock (true);
+//	scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 //	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());

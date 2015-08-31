@@ -219,14 +219,31 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
 
-
 	// construct an orthogonal coordinate system with these two vectors
 	dMatrix matrix1_1;
 	matrix1_1.m_up = matrix1.m_up;
 	matrix1_1.m_right = matrix0.m_front * matrix1.m_up;
 	matrix1_1.m_right = matrix1_1.m_right.Scale (1.0f / dSqrt (matrix1_1.m_right % matrix1_1.m_right));
 	matrix1_1.m_front = matrix1_1.m_up * matrix1_1.m_right;
-	NewtonUserJointAddAngularRow (m_joint, CalculateAngle (matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right), &matrix1_1.m_right[0]);
+	
+
+	// override the normal right side  because the joint is too week due to centripetal accelerations
+	dVector omega0(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector omega1(0.0f, 0.0f, 0.0f, 0.0f);
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	if (m_body1) {
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+	}
+	dVector relOmega(omega0 - omega1);
+
+	dFloat angle = -CalculateAngle(matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right);
+	dFloat omega = (relOmega % matrix1_1.m_right);
+	dFloat alphaError = -(angle + omega * timestep) / (timestep * timestep);
+	//dTrace(("%f  ", alphaError));
+	
+	NewtonUserJointAddAngularRow (m_joint, -angle, &matrix1_1.m_right[0]);
+	NewtonUserJointSetRowAcceleration (m_joint, alphaError);
+	NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 
 	dFloat sinAngle_0;
 	dFloat cosAngle_0;
@@ -238,15 +255,9 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateAngle(matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up, sinAngle_1, cosAngle_1);
 	dFloat angle1 = -m_curJointAngle_1.Update (cosAngle_1, sinAngle_1);
 
-	dVector omega0 (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector omega1 (0.0f, 0.0f, 0.0f, 0.0f);
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	if (m_body1) {
-		NewtonBodyGetOmega(m_body1, &omega1[0]);
-	}
 
 	// calculate the desired acceleration
-	dVector relOmega (omega0 - omega1);
+	
 	m_jointOmega_0 = relOmega % matrix0.m_front;
 	m_jointOmega_1 = relOmega % matrix1.m_up;
 	

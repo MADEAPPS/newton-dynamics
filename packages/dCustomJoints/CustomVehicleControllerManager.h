@@ -20,16 +20,8 @@
 #include <CustomJointLibraryStdAfx.h>
 #include <CustomAlloc.h>
 #include <CustomControllerManager.h>
-//#include <CustomVehicleControllerComponent.h>
-//#include <CustomVehicleControllerBodyState.h>
 
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
-
-//class CustomVehicleControllerComponent;
-//class CustomVehicleControllerBodyStateTire;
-//class CustomVehicleControllerComponentBrake;
-//class CustomVehicleControllerComponentEngine;
-//class CustomVehicleControllerComponentSteering;
 
 
 //#define __TEST_VEHICLE_XXX__

@@ -43,19 +43,78 @@
 
 #include <CustomHinge.h>
 #include <CustomVehicleControllerManager.h>
-//#include <CustomVehicleControllerJoint.h>
-//#include <CustomVehicleControllerComponent.h>
-//#include <CustomVehicleControllerBodyState.h>
-
 
 class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 {
 	public:
-	WheelJoint (const dMatrix& pinAndPivotFrame, NewtonBody* const tire, NewtonBody* const parentBody)
+	WheelJoint (const dMatrix& pinAndPivotFrame, NewtonBody* const tire, NewtonBody* const parentBody, BodyPartTire* const tireData)
 		:CustomJoint (6, tire, parentBody)
+		,m_data (tireData)
+		,m_targetAngle(0.0f)
 	{
+		CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 	}
 
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+
+		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		dFloat posit = (matrix0.m_posit - matrix1.m_posit) % matrix1.m_up;
+
+		// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
+		const dVector& p0 = matrix0.m_posit;
+		dVector p1(matrix1.m_posit + matrix1.m_up.Scale(posit));
+		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
+
+		if (posit >= m_data->m_data.m_suspesionlenght) {
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		} else if (posit <= 0.0f) {
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
+			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
+		}
+
+		dMatrix matrix1_1;
+		matrix1_1.m_up = matrix1.m_up;
+		matrix1_1.m_right = matrix0.m_front * matrix1.m_up;
+		matrix1_1.m_right = matrix1_1.m_right.Scale(1.0f / dSqrt(matrix1_1.m_right % matrix1_1.m_right));
+		matrix1_1.m_front = matrix1_1.m_up * matrix1_1.m_right;
+
+		dVector omega0(0.0f, 0.0f, 0.0f, 0.0f);
+		dVector omega1(0.0f, 0.0f, 0.0f, 0.0f);
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		if (m_body1) {
+			NewtonBodyGetOmega(m_body1, &omega1[0]);
+		}
+		dVector relOmega(omega0 - omega1);
+
+		dFloat angle = -CalculateAngle(matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right);
+		dFloat omega = (relOmega % matrix1_1.m_right);
+		dFloat alphaError = -(angle + omega * timestep) / (timestep * timestep);
+		NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1_1.m_right[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, alphaError);
+		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
+
+
+		dFloat steerAngle = -CalculateAngle (matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up);
+		dFloat steerOmega = (relOmega % matrix1_1.m_up);
+		dFloat alphaSteerError = (steerAngle - steerOmega * timestep) / (timestep * timestep);
+		NewtonUserJointAddAngularRow (m_joint, -steerAngle, &matrix1_1.m_up[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, alphaSteerError);
+		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
+//		dFloat steeAngle = CalculateAngle (matrix1_1.m_front, matrix1.m_front, matrix1.m_up);
+//		if (dAbs (steeAngle - m_targetAngle) < 1.0e-2f) {
+//		}
+
+	}
+
+	BodyPartTire* m_data;
+	dFloat m_targetAngle;
 };
 
 
@@ -96,8 +155,7 @@ void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, co
 
 	//NewtonBodySetMaterialGroupID (body, m_material);
 	//NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
-	 
-m_joint = new CustomHinge (matrix, m_body, parentPart->m_body);
+	m_joint = new WheelJoint (matrix, m_body, parentPart->m_body, this);
 }
 
 
