@@ -118,10 +118,10 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 
 		if (posit >= m_data->m_data.m_suspesionlenght) {
-			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p0[0], &matrix1.m_up[0]);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else if (posit <= 0.0f) {
-			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p0[0], &matrix1.m_up[0]);
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
 		}
 
@@ -167,6 +167,7 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 		NewtonBodyGetCentreOfMass(GetBody1(), &chassisCom[0]);
 		NewtonBodyGetMatrix(GetBody1(), &chassisMatrix[0][0]);
 
+		posit = dClamp(posit, 0.0f, m_data->m_data.m_suspesionlenght);
 		chassisCom = p0 - chassisMatrix.TransformVector(chassisCom);
 		dFloat speed = (tireVeloc - chassisVeloc) % matrix1.m_up;
 		dFloat load = - NewtonCalculateSpringDamperAcceleration (timestep, m_data->m_data.m_springStrength, posit, m_data->m_data.m_dampingRatio, speed);
