@@ -146,17 +146,12 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 		NewtonUserJointSetRowAcceleration(m_joint, alphaError);
 		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 
-
-		dFloat steerAngle = -CalculateAngle (matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up);
+		dFloat steerAngle = m_targetAngle - CalculateAngle (matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up);
 		dFloat steerOmega = (relOmega % matrix1_1.m_up);
 		dFloat alphaSteerError = (steerAngle - steerOmega * timestep) / (timestep * timestep);
 		NewtonUserJointAddAngularRow (m_joint, -steerAngle, &matrix1_1.m_up[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, alphaSteerError);
 		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
-//		dFloat steeAngle = CalculateAngle (matrix1_1.m_front, matrix1.m_front, matrix1.m_up);
-//		if (dAbs (steeAngle - m_targetAngle) < 1.0e-2f) {
-//		}
-
 		
 		dVector tireVeloc;
 		dVector chassisCom;
