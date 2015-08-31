@@ -28,7 +28,8 @@ CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* ch
 	,m_curJointAngle_0()
 	,m_curJointAngle_1()
 {
-	dMatrix matrix0;
+	// calculate the relative matrix of the pin and pivot on each body
+	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 
 	m_limit_0_On = true;
 	m_angularMotor_0_On = false;
@@ -45,19 +46,6 @@ CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* ch
 	m_jointOmega_1 = 0.0f;
 	m_minAngle_1 = -45.0f * 3.141592f / 180.0f;
 	m_maxAngle_1 =  45.0f * 3.141592f / 180.0f;
-
-
-	// Get the global matrices of each rigid body.
-	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
-
-	dMatrix matrix1 (dGetIdentityMatrix());
-	if (m_body1) {
-		NewtonBodyGetMatrix(m_body1, &matrix1[0][0]);
-	}
-
-	// calculate the relative matrix of the pin and pivot on each body
- 	m_localMatrix0 = pinAndPivotFrame * matrix0.Inverse();
-	m_localMatrix1 = pinAndPivotFrame * matrix1.Inverse();
 }
 
 CustomUniversal::~CustomUniversal()

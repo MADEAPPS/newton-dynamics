@@ -51,12 +51,6 @@ class NewtonDemos: public wxFrame
 		ID_PLATFORMS,
 		ID_PLATFORMS_MAX = ID_PLATFORMS + 8,
 
-		ID_SELECT_ALL_PROFILERS,
-		ID_UNSELECT_ALL_PROFILERS,
-
-		ID_SHOW_PHYSICS_PROFILER,
-		ID_SHOW_PHYSICS_PROFILER_COUNT = ID_SHOW_PHYSICS_PROFILER + 16,
-
 		ID_CONCURRENT_PHYSICS_UPDATE,
 
 		ID_SELECT_MICROTHREADS,
@@ -120,11 +114,6 @@ class NewtonDemos: public wxFrame
 	void OnUseParallelSolver(wxCommandEvent& event);
 	void OnSelectSolverMode(wxCommandEvent& event);
 	void OnSelectSolverQuality(wxCommandEvent& event);
-	void OnShowConcurrentProfiler(wxCommandEvent& event);
-	void OnShowThreadProfiler(wxCommandEvent& event);
-	void OnShowProfiler(wxCommandEvent& event);
-	void OnSelectAllPerformanceChart(wxCommandEvent& event);
-	void OnUnselectAllPerformanceChart(wxCommandEvent& event);
 	void OnRunPhysicsConcurrent(wxCommandEvent& event);
 	void OnSelectNumberOfMicroThreads(wxCommandEvent& event);
 	void OnSelectHardwareDevice(wxCommandEvent& event);

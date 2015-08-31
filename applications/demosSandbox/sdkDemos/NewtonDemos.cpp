@@ -248,19 +248,10 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_SHOW_CENTER_OF_MASS, NewtonDemos::OnShowCenterOfMass)
 	EVT_MENU(ID_SHOW_JOINTS, NewtonDemos::OnShowShowJoints)
 	
-
 	EVT_MENU_RANGE(ID_PLATFORMS, ID_PLATFORMS_MAX, NewtonDemos::OnSelectHardwareDevice)
-
-	EVT_MENU(ID_SHOW_CONCURRENCE_PROFILER, NewtonDemos::OnShowConcurrentProfiler)
-	EVT_MENU(ID_SHOW_PROFILER,	NewtonDemos::OnShowThreadProfiler)
-
-	EVT_MENU(ID_SELECT_ALL_PROFILERS, NewtonDemos::OnSelectAllPerformanceChart)
-	EVT_MENU(ID_UNSELECT_ALL_PROFILERS,	NewtonDemos::OnUnselectAllPerformanceChart)
-	EVT_MENU_RANGE (ID_SHOW_PHYSICS_PROFILER, ID_SHOW_PHYSICS_PROFILER_COUNT, NewtonDemos::OnShowProfiler)
 
 	EVT_MENU(ID_CONCURRENT_PHYSICS_UPDATE, NewtonDemos::OnRunPhysicsConcurrent)
 	EVT_MENU_RANGE(ID_SELECT_MICROTHREADS, ID_SELECT_MICROTHREADS_COUNT, NewtonDemos::OnSelectNumberOfMicroThreads)
-
 	
 	EVT_MENU(ID_SERIALIZE, NewtonDemos::OnSerializeWorld)
 	EVT_MENU(ID_DESERIALIZE, NewtonDemos::OnDeserializeWorld)
@@ -323,7 +314,8 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_physicsUpdateMode = 1;
 //m_showContactPoints = true;
 //m_hardwareDevice = 2;
-//m_debugDisplayMode = 2;
+//m_showStatistics = true;
+m_debugDisplayMode = 2;
 
 
 	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));
@@ -369,20 +361,6 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	m_maxX = stick.GetXMax();
 	m_maxY = stick.GetYMax();
 */
-
-m_showStatistics = true;
-#if 0
-m_debugDisplayMode = 2;
-m_hideVisualMeshes = true;
-SetDebugDisplayMode(2);
-
-m_showContactPoints = true;
-
-#endif
-
-//m_useParallelSolver = true;
-//m_scene->m_showProfiler[6] = 1;
-m_scene->m_showProfiler[0] = 1;
 
 //	fucking wxwidget require a fucking library just to read a fucking joystick fuck you WxWidget
 //	m_joystick = new wxJoystick(wxJOYSTICK1); 
@@ -506,31 +484,6 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 			optionsMenu->AppendRadioItem(ID_PLATFORMS + i, label);
 		}
 		//optionsMenu->Check(ID_PLATFORMS, true);
-
-		optionsMenu->AppendSeparator();
-		optionsMenu->Append(ID_SHOW_CONCURRENCE_PROFILER, wxT("Show concurrent profiler"));
-		optionsMenu->Append(ID_SHOW_PROFILER, wxT("Show micro thread profiler"));
-
-		optionsMenu->AppendSeparator();
-		optionsMenu->Append(ID_SELECT_ALL_PROFILERS, wxT("select all profiler"));
-		optionsMenu->Append(ID_UNSELECT_ALL_PROFILERS, wxT("unselect all profiler"));
-
-		wxMenu* const profilerSubMenu = new wxMenu;
-		m_profilerTracksMenu[0] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 0, wxT("show global physics update performance chart"));
-		m_profilerTracksMenu[1] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 1, wxT("global collision update performance chart"));
-		m_profilerTracksMenu[2] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 2, wxT("broad phase collision performance chart"));
-		m_profilerTracksMenu[3] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 3, wxT("narrow phase collision performance chart"));
-		m_profilerTracksMenu[4] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 4, wxT("global dynamics update performance chart"));
-		m_profilerTracksMenu[5] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 5, wxT("dynamics setup performance chart"));
-		m_profilerTracksMenu[6] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 6, wxT("dynamics solver performance chart"));
-		m_profilerTracksMenu[7] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 7, wxT("force and torque callback performance chart"));
-		m_profilerTracksMenu[8] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 8, wxT("pre-simulation listener"));
-		m_profilerTracksMenu[9] = profilerSubMenu->AppendCheckItem(ID_SHOW_PHYSICS_PROFILER + 9, wxT("post-simulation listener"));
-//		if (mainFrame->m_physicProfilerState) {
-//			m_profilerTracksMenu[0]->setCheck(true);
-//		}
-		optionsMenu->AppendSubMenu (profilerSubMenu, wxT("select sub profiler"));
-
 
 		optionsMenu->AppendSeparator();
 		optionsMenu->AppendCheckItem(ID_CONCURRENT_PHYSICS_UPDATE, wxT("Concurrent physics update"));
@@ -864,60 +817,6 @@ void NewtonDemos::OnSelectSolverQuality(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
 	m_solverModeQuality = dClamp(event.GetId() - ID_SOLVER_QUALITY, 0, 1);
-	END_MENU_OPTION();
-}
-
-
-
-void NewtonDemos::OnShowConcurrentProfiler(wxCommandEvent& event)
-{
-	BEGIN_MENU_OPTION();
-	m_concurrentProfilerState = event.IsChecked(); 
-	END_MENU_OPTION();
-}
-
-
-void NewtonDemos::OnShowThreadProfiler(wxCommandEvent& event)
-{
-	BEGIN_MENU_OPTION();
-	m_threadProfilerState = event.IsChecked(); 
-	END_MENU_OPTION();
-}
-
-
-void NewtonDemos::OnShowProfiler(wxCommandEvent& event)
-{
-	BEGIN_MENU_OPTION();
-	int track = event.GetId() - ID_SHOW_PHYSICS_PROFILER;
-	int state = event.IsChecked(); 
-	m_scene->m_showProfiler[track] = state;
-	END_MENU_OPTION();
-}
-
-
-void NewtonDemos::OnSelectAllPerformanceChart(wxCommandEvent& event)
-{
-	BEGIN_MENU_OPTION();
-	int count = sizeof (m_profilerTracksMenu) / sizeof (m_profilerTracksMenu[0]);
-	for (int i = 0; i < count; i ++) {
-		if (m_profilerTracksMenu[i]) {
-			m_scene->m_showProfiler[i] = 1;
-			m_profilerTracksMenu[i]->Check(true);
-		}
-	}
-	END_MENU_OPTION();
-}
-
-void NewtonDemos::OnUnselectAllPerformanceChart(wxCommandEvent& event)
-{
-	BEGIN_MENU_OPTION();
-	int count = sizeof (m_profilerTracksMenu) / sizeof (m_profilerTracksMenu[0]);
-	for (int i = 0; i < count; i ++) {
-		if (m_profilerTracksMenu[i]) {
-			m_scene->m_showProfiler[i] = 0;
-			m_profilerTracksMenu[i]->Check(false);
-		}
-	}
 	END_MENU_OPTION();
 }
 

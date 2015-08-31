@@ -110,9 +110,6 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 
 	ResetTimer();
 
-	// Set performance counters off
-	//memset (m_showProfiler, 0, sizeof (m_showProfiler));
-	//m_profiler.Init(this);
 
 	m_context = new wxGLContext(this);
 }
@@ -933,13 +930,6 @@ void DemoEntityManager::RenderFrame ()
       mode = (m_mainWindow->m_debugDisplayMode == 1) ? m_solid : m_lines;
       DebugRenderWorldCollision (GetNewton(), mode);
    }
-
-	// do all 2d drawing
-	int profileFlags = 0;
-	for (int i = 0; i < int (sizeof (m_showProfiler) / sizeof (m_showProfiler[0])); i ++) {
-		profileFlags |=  m_showProfiler[i] ? (1 << i) : 0;
-	}
-
 
 	if (m_mainWindow->m_showStatistics) {
 		dVector color (1.0f, 1.0f, 1.0f, 0.0f);

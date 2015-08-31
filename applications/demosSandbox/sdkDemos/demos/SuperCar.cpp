@@ -340,18 +340,18 @@ class SuperCarEntity: public DemoEntity
 		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, 1.0f);
 		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, -1.0f);
 
+		// add a differential to link the two rear tires
+		CustomVehicleController::BodyPartDifferential2WD* const differencial = m_controller->AddDifferential2WD (leftRearTire, rightRearTire);
+
 //		dAssert(0);
 		/*
 		//calculate the Ackerman parameters
-	
-
 		// add a steering Wheel component
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, VIPER_TIRE_STEER_ANGLE * 3.141592f / 180.0f);
 		steering->AddSteeringTire(leftFrontTire);
 		steering->AddSteeringTire(rightFrontTire);
 		steering->CalculateAkermanParameters (leftRearTire, rightRearTire, leftFrontTire, rightFrontTire);
 		m_controller->SetSteering(steering);
-	
 
 		// add vehicle brakes
 		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE);
@@ -371,7 +371,7 @@ class SuperCarEntity: public DemoEntity
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
 
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential (m_controller, leftRearTire, rightRearTire);
+
 		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
 
@@ -1444,6 +1444,8 @@ void SuperCar (DemoEntityManager* const scene)
 		u -= 0.01f;
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
+location1 = dGetIdentityMatrix();
+
 		location1.m_posit += location1.m_right.Scale (-3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
@@ -1475,6 +1477,8 @@ void SuperCar (DemoEntityManager* const scene)
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
 	dMatrix camMatrix (vehicleEntity->GetNextMatrix());
 //	scene->SetCameraMouseLock (true);
+
+	camMatrix.m_posit.m_x -= 5.0f;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 //	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());

@@ -38,11 +38,10 @@
 // NewtonCustomJoint.cpp: implementation of the NewtonCustomJoint class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <CustomJointLibraryStdAfx.h>
-#include <CustomJoint.h>
-
-#include <CustomHinge.h>
-#include <CustomVehicleControllerManager.h>
+#include "CustomJointLibraryStdAfx.h"
+#include "CustomJoint.h"
+#include "CustomUniversal.h"
+#include "CustomVehicleControllerManager.h"
 
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
 {
@@ -96,11 +95,6 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 		CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 	}
 
-	void ApplySuspetionForce(dFloat timestep, dFloat posit)
-	{
-		
-	}
-
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dMatrix matrix0;
@@ -118,10 +112,11 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 
 		if (posit >= m_data->m_data.m_suspesionlenght) {
-			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p0[0], &matrix1.m_up[0]);
+			dVector p1 (matrix1.m_posit + matrix1.m_up.Scale (m_data->m_data.m_suspesionlenght));
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else if (posit <= 0.0f) {
-			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p0[0], &matrix1.m_up[0]);
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
 		}
 
@@ -131,12 +126,10 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 		matrix1_1.m_right = matrix1_1.m_right.Scale(1.0f / dSqrt(matrix1_1.m_right % matrix1_1.m_right));
 		matrix1_1.m_front = matrix1_1.m_up * matrix1_1.m_right;
 
-		dVector omega0(0.0f, 0.0f, 0.0f, 0.0f);
-		dVector omega1(0.0f, 0.0f, 0.0f, 0.0f);
+		dVector omega0;
+		dVector omega1;
 		NewtonBodyGetOmega(m_body0, &omega0[0]);
-		if (m_body1) {
-			NewtonBodyGetOmega(m_body1, &omega1[0]);
-		}
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
 		dVector relOmega(omega0 - omega1);
 
 		dFloat angle = -CalculateAngle(matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right);
@@ -181,10 +174,95 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 };
 
 
+class CustomVehicleController::BodyPartDifferential2WD::DifferentialJoint: public CustomJoint
+{
+	public:
+	DifferentialJoint(const dMatrix& matrix, NewtonBody* const tire, NewtonBody* const differentialBody)
+		:CustomJoint(2, tire, differentialBody)
+	{
+		m_localMatrix0 = matrix;
+		m_localMatrix1 = dGetIdentityMatrix();
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dVector omega0;
+		dVector omega1;
+		dMatrix matrix0;
+		dMatrix matrix1;
+		dFloat jacobian0[6];
+		dFloat jacobian1[6];
+
+		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		// calculate the angular velocity for both bodies
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+		// get angular velocity relative to the pin vector
+		dFloat w0 = omega0 % matrix0.m_front;
+		dFloat w1 = omega1 % matrix1.m_front;
+		dFloat w2 = omega1 % matrix1.m_up;
+
+//w2 = 1;
+		// establish the gear equation.
+		dFloat relOmega = w0 + w1 + w2;
+
+		// calculate the relative angular acceleration by dividing by the time step
+		// ideally relative acceleration should be zero, but is practice there will always 
+		// be a small difference in velocity that need to be compensated. 
+		// using the full acceleration will make the to over show a oscillate 
+		// so use only fraction of the acceleration
+		dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
+		dFloat relAccel = -0.3f * relOmega * invTimestep;
+
+		// set the linear part of Jacobian 0 to zero	
+		jacobian0[0] = 0.0f;
+		jacobian0[1] = 0.0f;
+		jacobian0[2] = 0.0f;
+
+		// set the angular part of Jacobian 0 pin vector		
+		jacobian0[3] = matrix0.m_front[0];
+		jacobian0[4] = matrix0.m_front[1];
+		jacobian0[5] = matrix0.m_front[2];
+
+		// set the linear part of Jacobian 1 to zero
+		jacobian1[0] = 0.0f;
+		jacobian1[1] = 0.0f;
+		jacobian1[2] = 0.0f;
+
+		// set the angular part of Jacobian 1 pin vector	
+		jacobian1[3] = matrix1.m_front[0];
+		jacobian1[4] = matrix1.m_front[1];
+		jacobian1[5] = matrix1.m_front[2];
+
+		// add a angular constraint
+		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+
+		// set the angular part of Jacobian 0 pin vector		
+		jacobian0[3] = matrix0.m_front[0];
+		jacobian0[4] = matrix0.m_front[1];
+		jacobian0[5] = matrix0.m_front[2];
+
+		// set the angular part of Jacobian 1 pin vector	
+		jacobian1[3] = matrix1.m_up[0];
+		jacobian1[4] = matrix1.m_up[1];
+		jacobian1[5] = matrix1.m_up[2];
+
+		relOmega = w0 + w1 + w2;
+		relAccel = -0.3f * relOmega * invTimestep;
+		// add a angular constraint
+//		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+//		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+	}
+};
+
+
 CustomVehicleController::BodyPartTire::BodyPartTire()
 	:BodyPart()
 {
-
 }
 
 CustomVehicleController::BodyPartTire::~BodyPartTire()
@@ -205,10 +283,7 @@ void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, co
 	dFloat dir = dSign(m_data.m_aligningPinDir);
 	dMatrix matrix (dYawMatrix(0.5f * 3.1415927f* dir) * locationInGlobaSpase);
 	m_body = NewtonCreateDynamicBody(world, m_controller->m_tireCastShape, &matrix[0][0]);
-
-	// save the user data with the bone body (usually the visual geometry)
-	//NewtonBodySetUserData(m_body, this);
-
+	
 	// set the standard force and torque call back
 	NewtonBodySetForceAndTorqueCallback(m_body, m_controller->m_forceAndTorque);
 
@@ -220,6 +295,49 @@ void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, co
 	//NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
 	m_joint = new WheelJoint (matrix, m_body, parentPart->m_body, this);
 }
+
+
+
+CustomVehicleController::BodyPartDifferential2WD::BodyPartDifferential2WD (BodyPart* const parentPart, const BodyPartTire* const leftTire, const BodyPartTire* const rightTire)
+	:BodyPart()
+{
+	m_parent = parentPart;
+	m_controller = parentPart->m_controller;
+
+	NewtonWorld* const world = ((CustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
+
+	dFloat radio = leftTire->m_data.m_radio;
+	dFloat mass = 2.0f * leftTire->m_data.m_mass;
+	
+//	NewtonCollision* const collision = NewtonCreateNull(world);
+	NewtonCollision* const collision = NewtonCreateChamferCylinder(world, radio, radio, 0, NULL);
+
+	dMatrix matrix;
+	NewtonBodyGetMatrix(m_parent->GetBody(), &matrix[0][0]);
+	matrix = dYawMatrix(-0.5f * 3.1415927f) * matrix;
+	matrix.m_posit.m_y += 1.0f;
+
+	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+	NewtonDestroyCollision(collision);
+
+	dFloat inertia = 2.0f * mass * radio * radio / 5.0f;
+	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
+	NewtonBodySetForceAndTorqueCallback(m_body, m_controller->m_forceAndTorque);
+
+	CustomUniversal* const joint = new CustomUniversal(matrix, m_body, parentPart->GetBody());
+	joint->EnableLimit_0(0);
+	joint->EnableLimit_1(0);
+	m_joint = joint;
+
+	new DifferentialJoint (dYawMatrix ((leftTire->m_data.m_aligningPinDir  > 0.0f ? 1.0f : 0.0f) * 3.1415927f), leftTire->GetBody(), m_body);
+	new DifferentialJoint (dYawMatrix ((rightTire->m_data.m_aligningPinDir > 0.0f ? 1.0f : 0.0f) * 3.1415927f), rightTire->GetBody(), m_body);
+}
+
+
+CustomVehicleController::BodyPartDifferential2WD::~BodyPartDifferential2WD()
+{
+}
+
 
 
 #if 0
@@ -235,10 +353,7 @@ CustomVehicleControllerTireCollisionFilter::CustomVehicleControllerTireCollision
 	:CustomControllerConvexCastPreFilter(controller->GetBody())
 	,m_controller(controller)
 {
-
 }
-
-
 class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolver
 {
 	public:
@@ -758,6 +873,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	m_finalized = false;
 	m_localFrame = vehicleFrame;
 	m_forceAndTorque = forceAndTorque;
+	m_differential = NULL;
 //	m_externalContactStatesCount = 0;
 //	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
 //	m_freeContactList = m_externalContactStatesPool.GetFirst();
@@ -812,6 +928,10 @@ void CustomVehicleController::Cleanup()
 //	SetSteering(NULL);
 //	SetHandBrakes(NULL);
 //	SetContactFilter(NULL);
+	
+	if (m_differential) {
+		delete m_differential;
+	}
 	NewtonDestroyCollision(m_tireCastShape);
 }
 
@@ -919,6 +1039,8 @@ void CustomVehicleController::Finalize()
 //	NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
 //	m_chassisState.UpdateInertia();
 //	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
+//	
+NewtonBodySetMassMatrix (m_body, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_finalized = true;
 }
@@ -929,7 +1051,6 @@ CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const Bo
 	dList<BodyPartTire>::dListNode* const tireNode = m_tireList.Append();
 	BodyPartTire& tire = tireNode->GetInfo();
 
-
 	// calculate the tire matrix location,
 	dMatrix matrix;
 	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
@@ -939,6 +1060,20 @@ CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const Bo
 
 	tire.Init(&m_chassis, matrix, tireInfo);
 	m_bodyPartsList.Append(&tire);
+
+	NewtonCollisionAggregateAddBody (m_collisionAggregate, tire.GetBody());
+	NewtonSkeletonContainerAttachBone (m_skeleton, tire.GetBody(), m_chassis.GetBody());
 	return &tireNode->GetInfo();
 }
 
+CustomVehicleController::BodyPartDifferential2WD* CustomVehicleController::AddDifferential2WD (const BodyPartTire* const leftTire, const BodyPartTire* const rightTire)
+{
+	if (m_differential) {
+		delete m_differential;
+	}
+	m_differential = new BodyPartDifferential2WD (&m_chassis, leftTire, rightTire);
+
+	NewtonCollisionAggregateAddBody (m_collisionAggregate, m_differential->GetBody());
+	NewtonSkeletonContainerAttachBone (m_skeleton, m_differential->GetBody(), m_chassis.GetBody());
+	return m_differential;
+}
