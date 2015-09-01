@@ -111,12 +111,15 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 
-		if (posit >= m_data->m_data.m_suspesionlenght) {
-			dVector p1 (matrix1.m_posit + matrix1.m_up.Scale (m_data->m_data.m_suspesionlenght));
+		if (posit > m_data->m_data.m_suspesionlenght) {
+			dFloat x = dMax (posit, m_data->m_data.m_suspesionlenght + 0.01f);
+			dVector p0 (matrix1.m_posit + matrix1.m_up.Scale (x));
 			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-		} else if (posit <= 0.0f) {
-			NewtonUserJointAddLinearRow(m_joint, &p0[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
+		} else if (posit < 0.0f) {
+			dFloat x = dMax (posit, -0.01f);
+			dVector p0 (matrix1.m_posit + matrix1.m_up.Scale (x));
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
 		}
 
@@ -157,8 +160,9 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 
 		posit = dClamp(posit, 0.0f, m_data->m_data.m_suspesionlenght);
 		chassisCom = p0 - chassisMatrix.TransformVector(chassisCom);
-		dFloat speed = (tireVeloc - chassisVeloc) % matrix1.m_up;
+		dFloat speed = dClamp ((tireVeloc - chassisVeloc) % matrix1.m_up, -20.0f, 20.0f);
 		dFloat load = - NewtonCalculateSpringDamperAcceleration (timestep, m_data->m_data.m_springStrength, posit, m_data->m_data.m_dampingRatio, speed);
+
 		dVector force (matrix1.m_up.Scale (load * m_restSprunMass));
 		dVector torque (chassisCom  * force);
 
@@ -176,7 +180,7 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 
 class CustomVehicleController::BodyPartDifferential2WD::DifferentialJoint: public CustomJoint
 {
-public:
+	public:
 	DifferentialJoint(NewtonBody* const tire, NewtonBody* const differentialBody, CustomVehicleController* const controller)
 		:CustomJoint(1, tire, differentialBody)
 		, m_controller(controller)
@@ -255,6 +259,7 @@ CustomVehicleController::BodyPartTire::~BodyPartTire()
 {
 }
 
+
 void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, const dMatrix& locationInGlobaSpase, const CreationInfo& info)
 {
 	m_data = info;
@@ -282,7 +287,11 @@ void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, co
 	m_joint = new WheelJoint (matrix, m_body, parentPart->m_body, this);
 }
 
-
+void CustomVehicleController::BodyPartTire::SetSteerAngle (dFloat angle)
+{
+	WheelJoint* const tire = (WheelJoint*)m_joint;
+	tire->m_targetAngle = angle;
+}
 
 CustomVehicleController::BodyPartDifferential2WD::BodyPartDifferential2WD (BodyPart* const parentPart, const BodyPartTire* const leftTire, const BodyPartTire* const rightTire)
 	:BodyPart()
@@ -296,14 +305,14 @@ CustomVehicleController::BodyPartDifferential2WD::BodyPartDifferential2WD (BodyP
 	dFloat mass = 2.0f * leftTire->m_data.m_mass;
 	
 	//NewtonCollision* const collision = NewtonCreateNull(world);
-	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.2f, 0.2f, 0, NULL);
 
 	dMatrix matrix;
 	NewtonBodyGetMatrix(m_parent->GetBody(), &matrix[0][0]);
-	matrix = dYawMatrix(-0.5f * 3.1415927f) * matrix;
-	//matrix.m_posit.m_y += 1.0f;
-
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+	ResetTransform ();
+	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 
 	NewtonDestroyCollision(collision);
 
@@ -320,10 +329,81 @@ CustomVehicleController::BodyPartDifferential2WD::BodyPartDifferential2WD (BodyP
 	new DifferentialJoint (rightTire->GetBody(), m_body, m_controller);
 }
 
-
 CustomVehicleController::BodyPartDifferential2WD::~BodyPartDifferential2WD()
 {
 }
+
+void CustomVehicleController::BodyPartDifferential2WD::ResetTransform ()
+{
+	dMatrix matrix;
+dMatrix matrix1;
+NewtonBodyGetMatrix(m_body, &matrix1[0][0]);
+
+	NewtonBodyGetMatrix(m_controller->m_body, &matrix[0][0]);
+	dMatrix offset(dYawMatrix(-0.5f * 3.1415927f));
+	offset.m_posit.m_y = 1.0f;
+
+	matrix = offset * matrix;
+
+	NewtonBodySetMatrix (m_body, &matrix[0][0]);
+}
+
+CustomVehicleController::SteeringController::SteeringController (CustomVehicleController* const controller, dFloat maxAngle)
+	:Controller(controller)
+	,m_maxAngle(dAbs (maxAngle))
+	,m_akermanWheelBaseWidth(0.0f)
+	,m_akermanAxelSeparation(0.0f)
+{
+}
+
+
+void CustomVehicleController::SteeringController::CalculateAkermanParameters(
+	const BodyPartTire* const rearLeftTire, const BodyPartTire* const rearRightTire,
+	const BodyPartTire* const frontLeftTire, const BodyPartTire* const frontRightTire)
+{
+/*
+	const dMatrix& leftRearMatrix = rearLeftTire->GetLocalMatrix();
+	const dMatrix& rightRearMatrix = rearRightTire->GetLocalMatrix();
+	dVector rearDist(rightRearMatrix.m_posit - leftRearMatrix.m_posit);
+	m_akermanWheelBaseWidth = (rearDist % leftRearMatrix.m_front) * 0.5f;
+
+	const dMatrix& frontLeftTireMatrix = frontLeftTire->GetLocalMatrix();
+	dVector akermanAxelSeparation(frontLeftTireMatrix.m_posit - leftRearMatrix.m_posit);
+	m_akermanAxelSeparation = dAbs(akermanAxelSeparation % frontLeftTireMatrix.m_right);
+*/
+}
+
+void CustomVehicleController::SteeringController::Update(dFloat timestep)
+{
+	dFloat angle = m_maxAngle * m_param;
+	if ((m_akermanWheelBaseWidth == 0.0f) || (dAbs(angle) < (2.0f * 3.141592f / 180.0f))) {
+		for (dList<BodyPartTire*>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
+			BodyPartTire& tire = *node->GetInfo();
+			tire.SetSteerAngle(angle);
+		}
+	} else {
+		dAssert (0);
+/*
+		dAssert(dAbs(angle) >= (2.0f * 3.141592f / 180.0f));
+		dFloat posit = m_akermanAxelSeparation / dTan(dAbs(angle));
+		dFloat sign = dSign(angle);
+		dFloat leftAngle = sign * dAtan2(m_akermanAxelSeparation, posit + m_akermanWheelBaseWidth);
+		dFloat righAngle = sign * dAtan2(m_akermanAxelSeparation, posit - m_akermanWheelBaseWidth);
+		for (dList<BodyPartTire*>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
+			BodyPartTire& tire = *node->GetInfo();
+			tire.SetSteerAngle ((sign * tire.m_data.m_l > 0.0f) ? leftAngle : righAngle);
+		}
+*/	
+	}
+}
+
+
+void CustomVehicleController::SteeringController::AddSteeringTire (CustomVehicleController::BodyPartTire* const tire)
+{
+	m_steeringTires.Append(tire);
+}
+
+
 
 
 
@@ -530,10 +610,6 @@ CustomVehicleControllerComponentEngine* CustomVehicleController::GetEngine() con
 	return m_engine;
 }
 
-CustomVehicleControllerComponentSteering* CustomVehicleController::GetSteering() const
-{
-	return m_steering;
-}
 
 CustomVehicleControllerComponentBrake* CustomVehicleController::GetBrakes() const
 {
@@ -553,13 +629,6 @@ void CustomVehicleController::SetEngine(CustomVehicleControllerComponentEngine* 
 	m_engine = engine;
 }
 
-void CustomVehicleController::SetSteering(CustomVehicleControllerComponentSteering* const steering)
-{
-	if (m_steering) {
-		delete m_steering;
-	}
-	m_steering = steering;
-}
 
 void CustomVehicleController::SetContactFilter(CustomVehicleControllerTireCollisionFilter* const filter)
 {
@@ -621,20 +690,6 @@ CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody
 	return externalBody;
 }
 
-
-bool CustomVehicleController::IsSleeping()
-{
-	bool inputChanged = (m_engine && m_engine->ParamChanged()) || (m_steering && m_steering->ParamChanged()) || (m_brakes && m_brakes->ParamChanged()) || (m_handBrakes && m_handBrakes->ParamChanged()); 
-	if (inputChanged) {
-		return false;
-	}
-
-	if (!m_chassisState.IsSleeping()) {
-		return false;
-	}
-
-	return true;
-}
 
 
 void CustomVehicleController::DrawSchematic (dFloat scale) const
@@ -795,7 +850,16 @@ void CustomVehicleControllerManager::DestroyController(CustomVehicleController* 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
-//		dTireForceSolverSolver tireSolver(this, timestep, threadIndex);
+		if (m_steering) {
+			m_steering->Update(timestep);
+		}
+
+		if (ControlStateChanged()) {
+			if (m_differential) {
+//				m_differential->ResetTransform();
+			}
+			NewtonBodySetSleepState(m_body, 0);
+		}
 	}
 }
 
@@ -890,13 +954,15 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	// initialize all components to empty
 	m_engine = NULL;
 	m_brakes = NULL;
-	m_steering = NULL;
+	
 	m_handBrakes = NULL;
 	m_contactFilter = new CustomVehicleControllerTireCollisionFilter(this);
 
 	SetDryRollingFrictionTorque(100.0f / 4.0f);
 	SetAerodynamicsDownforceCoefficient(0.5f * dSqrt(gravityVector % gravityVector), 60.0f * 0.447f);
 */
+
+	m_steering = NULL;
 
 	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 	NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
@@ -912,7 +978,7 @@ void CustomVehicleController::Cleanup()
 {
 //	SetBrakes(NULL);
 //	SetEngine(NULL);
-//	SetSteering(NULL);
+	SetSteering(NULL);
 //	SetHandBrakes(NULL);
 //	SetContactFilter(NULL);
 	
@@ -920,6 +986,21 @@ void CustomVehicleController::Cleanup()
 		delete m_differential;
 	}
 	NewtonDestroyCollision(m_tireCastShape);
+}
+
+
+
+CustomVehicleController::SteeringController* CustomVehicleController::GetSteering() const
+{
+	return m_steering;
+}
+
+void CustomVehicleController::SetSteering(CustomVehicleController::SteeringController* const steering)
+{
+	if (m_steering) {
+		delete m_steering;
+	}
+	m_steering = steering;
 }
 
 
@@ -1031,6 +1112,15 @@ void CustomVehicleController::Finalize()
 
 	m_finalized = true;
 }
+
+
+bool CustomVehicleController::ControlStateChanged() const
+{
+//	bool inputChanged = (m_engine && m_engine->ParamChanged()) || (m_steering && m_steering->ParamChanged()) || (m_brakes && m_brakes->ParamChanged()) || (m_handBrakes && m_handBrakes->ParamChanged());
+	bool inputChanged = (m_steering && m_steering->ParamChanged());
+	return inputChanged;
+}
+
 
 
 CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const BodyPartTire::CreationInfo& tireInfo)

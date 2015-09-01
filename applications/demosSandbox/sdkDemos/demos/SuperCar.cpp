@@ -80,7 +80,7 @@
 #define VIPER_COM_Y_OFFSET					0.0f
 
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
-#define VEHICLE_THIRD_PERSON_VIEW_DIST		10.0f
+#define VEHICLE_THIRD_PERSON_VIEW_DIST		5.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
 class SuperCarEntity: public DemoEntity
@@ -343,16 +343,17 @@ class SuperCarEntity: public DemoEntity
 		// add a differential to link the two rear tires
 		CustomVehicleController::BodyPartDifferential2WD* const differencial = m_controller->AddDifferential2WD (leftRearTire, rightRearTire);
 
-//		dAssert(0);
-		/*
+
+
 		//calculate the Ackerman parameters
 		// add a steering Wheel component
-		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, VIPER_TIRE_STEER_ANGLE * 3.141592f / 180.0f);
+		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller, VIPER_TIRE_STEER_ANGLE * 3.141592f / 180.0f);
 		steering->AddSteeringTire(leftFrontTire);
 		steering->AddSteeringTire(rightFrontTire);
 		steering->CalculateAkermanParameters (leftRearTire, rightRearTire, leftFrontTire, rightFrontTire);
 		m_controller->SetSteering(steering);
 
+		/*
 		// add vehicle brakes
 		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE);
 		brakes->AddBrakeTire (leftFrontTire);
@@ -494,24 +495,23 @@ class SuperCarEntity: public DemoEntity
 
 	void ApplyPlayerControl (void* const startEngineSoundHandle)
 	{
-		dAssert(0);
-		/*
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
-		CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
-		CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
-		CustomVehicleControllerComponentBrake* const brakes = m_controller->GetBrakes();
-		CustomVehicleControllerComponentBrake* const handBrakes = m_controller->GetHandBrakes();
+		//CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
+		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
+		//CustomVehicleControllerComponentBrake* const brakes = m_controller->GetBrakes();
+		//CustomVehicleControllerComponentBrake* const handBrakes = m_controller->GetHandBrakes();
 
 		// get the throttler input
 		dFloat joyPosX;
 		dFloat joyPosY;
 		int joyButtons;
 
-		int gear = engine ? engine->GetGear() : CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear;
+//		int gear = engine ? engine->GetGear() : CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear;
+	int gear = 0;
 		dFloat steeringVal = 0.0f;
 		dFloat engineGasPedal = 0.0f;
 		dFloat brakePedal = 0.0f;
@@ -565,7 +565,7 @@ steeringVal *= 0.3f;
 //					handBrakePedal = 0.5f;
 //				}
 //			}
-/
+
 		}
 
 
@@ -607,6 +607,7 @@ steeringVal *= 0.3f;
 	#endif
 #endif
 
+/*
 		if (engine) {
 			bool key = (m_engineKeySwitchCounter & 1) ? true : false;
 			if (!m_engineOldKeyState && key) {
@@ -641,16 +642,18 @@ steeringVal *= 0.3f;
 
 			engine->SetParam(engineGasPedal);
 		}
+*/		
 		if (steering) {
 			steering->SetParam(steeringVal);
 		}
+/*
 		if (brakes) {
 			brakes->SetParam(brakePedal);
 		}
 		if (handBrakes) {
 			handBrakes->SetParam(handBrakePedal);
 		}
-*/
+*/	
 	}
 
 	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/
@@ -1168,7 +1171,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	virtual void PreUpdate (dFloat timestep)
 	{
-		/*
 		// apply the vehicle controls, and all simulation time effect
 		NewtonWorld* const world = GetWorld(); 
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -1189,7 +1191,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 				// do no player control
 				vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath, m_engineSounds[0]);
 			}
-
+/*
 			dSoundManager* const soundManager = scene->GetSoundManager();
 			if (soundManager) {
 				CustomVehicleControllerComponentEngine* const engine = vehicleEntity->m_controller->GetEngine();
@@ -1243,8 +1245,9 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 					}
 				}
 			}
+*/		
 		}
-*/
+
 		// do the base class post update
 		CustomVehicleControllerManager::PreUpdate(timestep);
 
@@ -1274,7 +1277,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void UpdateCamera (SuperCarEntity* const player, dFloat timestep)
 	{
-return;
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 		DemoCamera* const camera = scene->GetCamera();
 		dMatrix camMatrix (camera->GetNextMatrix ());
