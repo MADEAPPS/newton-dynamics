@@ -341,7 +341,7 @@ class SuperCarEntity: public DemoEntity
 		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, -1.0f);
 
 		// add a differential to link the two rear tires
-		CustomVehicleController::BodyPartDifferential2WD* const differencial = m_controller->AddDifferential2WD (leftRearTire, rightRearTire);
+		CustomVehicleController::BodyPartDifferential* const differencial = m_controller->AddDifferential2WD (leftRearTire, rightRearTire);
 
 
 

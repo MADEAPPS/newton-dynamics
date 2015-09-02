@@ -51,7 +51,6 @@ class CustomVehicleControllerTireCollisionFilter: public CustomControllerConvexC
 class CustomVehicleController: public CustomControllerBase
 {
 	public:
-//	class dTireForceSolverSolver;
 	class dWeightDistibutionSolver;
 	
 	class BodyPart: public CustomAlloc
@@ -131,12 +130,14 @@ class CustomVehicleController: public CustomControllerBase
 		CreationInfo m_data;
 	};
 
-	class BodyPartDifferential2WD: public BodyPart
+	class BodyPartDifferential: public BodyPart
 	{
 		public:
 		class DifferentialJoint;
-		BodyPartDifferential2WD (BodyPart* const parentPart, const BodyPartTire* const leftTire, const BodyPartTire* const rightTire);
-		virtual ~BodyPartDifferential2WD();
+		class DifferentialSpiderGearJoint;
+
+		BodyPartDifferential (BodyPart* const parentPart, const BodyPartTire* const leftTire, const BodyPartTire* const rightTire);
+		virtual ~BodyPartDifferential();
 
 		virtual void ResetTransform () const;
 	};
@@ -275,7 +276,7 @@ class CustomVehicleController: public CustomControllerBase
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 	CUSTOM_JOINTS_API BodyPartTire* AddTire (const BodyPartTire::CreationInfo& tireInfo);
-	CUSTOM_JOINTS_API BodyPartDifferential2WD* AddDifferential2WD (const BodyPartTire* const leftNode, const BodyPartTire* const rightire);
+	CUSTOM_JOINTS_API BodyPartDifferential* AddDifferential2WD (const BodyPartTire* const leftNode, const BodyPartTire* const rightire);
 
 	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetFirstPart() const;
 	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetNextPart(dList<BodyPart*>::dListNode* const part) const;
@@ -303,7 +304,7 @@ class CustomVehicleController: public CustomControllerBase
 	NewtonSkeletonContainer* m_skeleton;
 	void* m_collisionAggregate;
 	NewtonCollision* m_tireCastShape;
-	BodyPartDifferential2WD* m_differential;
+	BodyPartDifferential* m_differential;
 	SteeringController* m_steering; 
 
 	NewtonApplyForceAndTorque m_forceAndTorque;

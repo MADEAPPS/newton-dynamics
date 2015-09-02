@@ -22,7 +22,7 @@
 class CustomUniversal: public CustomJoint  
 {
 	public:
-	CUSTOM_JOINTS_API CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
+	CUSTOM_JOINTS_API CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~CustomUniversal();
 
 	CUSTOM_JOINTS_API void EnableLimit_0(bool state);
