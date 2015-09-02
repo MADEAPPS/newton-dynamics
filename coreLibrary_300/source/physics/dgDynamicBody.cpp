@@ -103,9 +103,9 @@ void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collis
 }
 
 
-void dgDynamicBody::SetMatrixIgnoreSleep(const dgMatrix& matrix)
+void dgDynamicBody::SetMatrixResetSleep(const dgMatrix& matrix)
 {
-	dgBody::SetMatrixIgnoreSleep(matrix);
+	dgBody::SetMatrixResetSleep(matrix);
 	m_prevExternalForce = dgVector (dgFloat32 (0.0f));
 	m_prevExternalTorque = dgVector (dgFloat32 (0.0f));
 	CalcInvInertiaMatrix();

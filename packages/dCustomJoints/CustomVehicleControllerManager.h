@@ -136,7 +136,9 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		class DifferentialJoint;
 		BodyPartDifferential2WD (BodyPart* const parentPart, const BodyPartTire* const leftTire, const BodyPartTire* const rightTire);
-		~BodyPartDifferential2WD();
+		virtual ~BodyPartDifferential2WD();
+
+		virtual void ResetTransform () const;
 	};
 
 	class Controller: public CustomAlloc

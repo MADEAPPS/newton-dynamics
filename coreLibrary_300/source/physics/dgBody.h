@@ -179,7 +179,7 @@ class dgBody
 	virtual void InvalidateCache();
 	
     virtual void SetMatrix(const dgMatrix& matrix);
-    virtual void SetMatrixIgnoreSleep(const dgMatrix& matrix);
+    virtual void SetMatrixResetSleep(const dgMatrix& matrix);
 	virtual void IntegrateVelocity (dgFloat32 timestep);
 	virtual void AttachCollision (dgCollisionInstance* const collision);
     

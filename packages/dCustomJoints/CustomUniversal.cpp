@@ -224,6 +224,10 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 	dVector relOmega(omega0 - omega1);
 
+//static int xxx;
+//dTrace (("%d: %f %f %f\n", xxx, relOmega[0], relOmega[1], relOmega[2]));
+//xxx ++;
+
 	dFloat angle = -CalculateAngle(matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right);
 	dFloat omega = (relOmega % matrix1_1.m_right);
 	dFloat alphaError = -(angle + omega * timestep) / (timestep * timestep);

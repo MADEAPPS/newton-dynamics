@@ -185,7 +185,7 @@ void dgBody::SetMatrix(const dgMatrix& matrix)
 	}
 }
 
-void dgBody::SetMatrixIgnoreSleep(const dgMatrix& matrix)
+void dgBody::SetMatrixResetSleep(const dgMatrix& matrix)
 {
 	m_sleeping = false;
 	SetMatrix(matrix);

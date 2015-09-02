@@ -80,7 +80,7 @@
 #define VIPER_COM_Y_OFFSET					0.0f
 
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
-#define VEHICLE_THIRD_PERSON_VIEW_DIST		5.0f
+#define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
 class SuperCarEntity: public DemoEntity
@@ -1448,7 +1448,7 @@ void SuperCar (DemoEntityManager* const scene)
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 location1 = dGetIdentityMatrix();
 
-		location1.m_posit += location1.m_right.Scale (-3.0f);
+//		location1.m_posit += location1.m_right.Scale (-3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);

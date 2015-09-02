@@ -4985,7 +4985,7 @@ void NewtonBodySetMatrix(const NewtonBody* const bodyPtr, const dFloat* const ma
 	matrix.m_up.m_w    = dgFloat32 (0.0f);
 	matrix.m_right.m_w = dgFloat32 (0.0f);
 	matrix.m_posit.m_w = dgFloat32 (1.0f);
-	body->SetMatrixIgnoreSleep (matrix); 
+	body->SetMatrixResetSleep (matrix); 
 }
 
 
