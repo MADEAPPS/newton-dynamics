@@ -284,7 +284,7 @@ class CustomVehicleController::BodyPartDifferential::DifferentialSpiderGearJoint
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dMatrix tireMatrix;
-		dMatrix diffMatrix (m_diffJoint->GetJointMatrix());
+		dMatrix diffMatrix(m_diffJoint->GetJointMatrix());
 
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		NewtonBody* const tire = m_body0;
@@ -297,11 +297,14 @@ class CustomVehicleController::BodyPartDifferential::DifferentialSpiderGearJoint
 		dMatrix diffPivotMatrix(m_localMatrix1 * diffMatrix);
 
 		// calculate the pivot points
+		dVector tireOmega;
+		dVector diffOmega;
 		dVector tirePivotVeloc;
 		dVector diffPivotVeloc;
-
-		NewtonBodyGetPointVelocity(tire, &tirePivotMatrix.m_posit[0], &tirePivotVeloc[0]);
-		NewtonBodyGetPointVelocity(diff, &diffPivotMatrix.m_posit[0], &diffPivotVeloc[0]);
+		NewtonBodyGetOmega(tire, &tireOmega[0]);
+		NewtonBodyGetOmega(diff, &diffOmega[0]);
+		tirePivotVeloc = tireOmega * (tirePivotMatrix.m_posit - tireMatrix.m_posit);
+		diffPivotVeloc = diffOmega * (diffPivotMatrix.m_posit - diffMatrix.m_posit);
 
 		const dVector& tireDir = tirePivotMatrix.m_front;
 		const dVector& diffDir = diffPivotMatrix.m_front;
@@ -325,11 +328,16 @@ class CustomVehicleController::BodyPartDifferential::DifferentialSpiderGearJoint
 		jacobian1[4] = diff_r1[1];
 		jacobian1[5] = diff_r1[2];
 
-
 		dFloat relSpeed = tirePivotVeloc % tireDir + diffPivotVeloc % diffDir;
-dTrace (("(%f  %f %f)  ", relSpeed, tirePivotVeloc % tireDir, diffPivotVeloc % diffDir));
+
+/*
+dTrace(("(%f  %f %f)  ", relSpeed, tirePivotVeloc % tireDir, diffPivotVeloc % diffDir));
 //dTrace (("(%f %f)  ", m_diffJoint->GetJointOmega_0(), m_diffJoint->GetJointOmega_1()));
 
+//fprintf (file_xxx, "%f, ", tirePivotVeloc % tireDir);
+fprintf(file_xxx, "%f, ", diffPivotVeloc % diffDir);
+fflush(file_xxx);
+*/
 		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
 		NewtonUserJointSetRowAcceleration(m_joint, -relSpeed / timestep);
 	}
@@ -952,9 +960,11 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 */	
 	}
 
+/*
 static int xxx;
 dTrace (("  %d\n", xxx));
 xxx ++;
+*/
 }
 
 CustomVehicleController* CustomVehicleControllerManager::CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData)
