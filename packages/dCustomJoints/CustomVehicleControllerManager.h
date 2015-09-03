@@ -138,8 +138,6 @@ class CustomVehicleController: public CustomControllerBase
 
 		BodyPartDifferential (BodyPart* const parentPart, const BodyPartTire* const leftTire, const BodyPartTire* const rightTire);
 		virtual ~BodyPartDifferential();
-
-		virtual void ResetTransform () const;
 	};
 
 	class Controller: public CustomAlloc

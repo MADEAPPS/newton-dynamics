@@ -80,15 +80,6 @@
     <ClCompile Include="..\..\dCustomJoints\CustomUserBlank.cpp">
       <Filter>joints</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.cpp">
-      <Filter>managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerJoint.cpp">
-      <Filter>managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerComponent.cpp">
-      <Filter>managers</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
@@ -169,15 +160,6 @@
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h">
       <Filter>joints</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.h">
-      <Filter>managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerJoint.h">
-      <Filter>managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerComponent.h">
-      <Filter>managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

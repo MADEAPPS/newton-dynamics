@@ -181,7 +181,7 @@ class CustomVehicleController::BodyPartDifferential::DifferentialJoint: public C
 {
 	public:
 	DifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const diff, NewtonBody* const chassis)
-		:CustomJoint(4, diff, chassis)
+		:CustomJoint(5, diff, chassis)
 	{
 		// calculate the relative matrix of the pin and pivot on each body
 		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -221,44 +221,70 @@ class CustomVehicleController::BodyPartDifferential::DifferentialJoint: public C
 		NewtonUserJointSetRowAcceleration(m_joint, alphaError);
 		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 
-dFloat angle0 = CalculateAngle (matrix1_1.m_up, matrix0.m_up, matrix1_1.m_front);
-dFloat angle1 = CalculateAngle (matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up);
-dTrace (("%f %f", angle0, angle1));
+//NewtonUserJointAddAngularRow(m_joint, -CalculateAngle(matrix1_1.m_up, matrix0.m_up, matrix1_1.m_front), &matrix1_1.m_front[0]);
 
+/*
+dMatrix m0;
+dMatrix m1;
+dFloat angle0 = -CalculateAngle(matrix1_1.m_up, matrix0.m_up, matrix1_1.m_front);
+dFloat angle1 = CalculateAngle(matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up);
+dMatrix pitch(dPitchMatrix(angle0));
+dMatrix yaw(dYawMatrix(angle1));
+NewtonBodyGetMatrix(m_body0, &m0[0][0]);
+NewtonBodyGetMatrix(m_body1, &m1[0][0]);
+m0 = pitch * matrix0;
+m1 = yaw *  matrix1;
+dTrace(("%f %f", angle0, angle1));
+*/
+	}
+
+	dMatrix GetJointMatrix() const
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+
+		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		dMatrix matrix1_1;
+		matrix1_1.m_up = matrix1.m_up;
+		matrix1_1.m_right = matrix0.m_front * matrix1.m_up;
+		matrix1_1.m_right = matrix1_1.m_right.Scale(1.0f / dSqrt(matrix1_1.m_right % matrix1_1.m_right));
+		matrix1_1.m_front = matrix1_1.m_up * matrix1_1.m_right;
+
+		//dFloat angle0 = -CalculateAngle(matrix1_1.m_up, matrix0.m_up, matrix1_1.m_front);
+		dFloat angle1 = CalculateAngle(matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up);
+		return dYawMatrix(angle1) *  matrix1;
 	}
 };
 
 class CustomVehicleController::BodyPartDifferential::DifferentialSpiderGearJoint: public CustomJoint
 {
 	public:
-	DifferentialSpiderGearJoint(NewtonBody* const tire, NewtonBody* const diff, CustomVehicleController* const controller, DifferentialJoint* const diffJoint)
+	DifferentialSpiderGearJoint(NewtonBody* const tire, NewtonBody* const diff, DifferentialJoint* const diffJoint)
 		:CustomJoint(1, tire, diff)
 		,m_diffJoint(diffJoint)
 	{
 		dMatrix diffMatrix;
 		dMatrix tireMatrix;
-		dMatrix globalRotation;
-
-		NewtonBodyGetMatrix(controller->GetBody(), &globalRotation[0][0]);
-		globalRotation = controller->m_localFrame * globalRotation;
 
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
 		NewtonBodyGetMatrix(diff, &diffMatrix[0][0]);
 
-		dMatrix diffMatrixPivot (globalRotation);
-		dMatrix tireMatrixPivot (globalRotation);
-
-		tireMatrixPivot.m_posit = tireMatrix.m_posit + globalRotation[1].Scale (1.0f);
-		diffMatrixPivot.m_posit = diffMatrix.m_posit + globalRotation[1].Scale (1.0f) + globalRotation[2].Scale (dSign((tireMatrix.m_posit - diffMatrix.m_posit) % globalRotation[2]));
-
+		dMatrix tireMatrixPivot (diffMatrix);
+		tireMatrixPivot.m_posit = tireMatrix.m_posit + diffMatrix[1].Scale (1.0f);
 		m_localMatrix0 = tireMatrixPivot * tireMatrix.Inverse();
-		m_localMatrix1 = diffMatrixPivot * diffMatrix.Inverse();
+
+		m_localMatrix1.m_front = dVector (0.0f, 0.0f, 1.0f, 0.0f);
+		m_localMatrix1.m_up = dVector (0.0f, 1.0f, 0.0f, 0.0f);
+		m_localMatrix1.m_right = m_localMatrix1.m_front * m_localMatrix1.m_up;
+		m_localMatrix1.m_posit = dVector (dSign((tireMatrix.m_posit - diffMatrix.m_posit) % diffMatrix[2]), 1.0f, 0.0f, 1.0f);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dMatrix tireMatrix;
-		dMatrix diffMatrix;
+		dMatrix diffMatrix (m_diffJoint->GetJointMatrix());
 
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		NewtonBody* const tire = m_body0;
@@ -266,7 +292,6 @@ class CustomVehicleController::BodyPartDifferential::DifferentialSpiderGearJoint
 
 		// Get the global matrices of each rigid body.
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-		NewtonBodyGetMatrix(diff, &diffMatrix[0][0]);
 
 		dMatrix tirePivotMatrix(m_localMatrix0 * tireMatrix);
 		dMatrix diffPivotMatrix(m_localMatrix1 * diffMatrix);
@@ -274,6 +299,7 @@ class CustomVehicleController::BodyPartDifferential::DifferentialSpiderGearJoint
 		// calculate the pivot points
 		dVector tirePivotVeloc;
 		dVector diffPivotVeloc;
+
 		NewtonBodyGetPointVelocity(tire, &tirePivotMatrix.m_posit[0], &tirePivotVeloc[0]);
 		NewtonBodyGetPointVelocity(diff, &diffPivotMatrix.m_posit[0], &diffPivotVeloc[0]);
 
@@ -299,8 +325,9 @@ class CustomVehicleController::BodyPartDifferential::DifferentialSpiderGearJoint
 		jacobian1[4] = diff_r1[1];
 		jacobian1[5] = diff_r1[2];
 
+
 		dFloat relSpeed = tirePivotVeloc % tireDir + diffPivotVeloc % diffDir;
-//dTrace (("(%f  %f %f)  ", relSpeed, tirePivotVeloc % tireDir, diffPivotVeloc % diffDir));
+dTrace (("(%f  %f %f)  ", relSpeed, tirePivotVeloc % tireDir, diffPivotVeloc % diffDir));
 //dTrace (("(%f %f)  ", m_diffJoint->GetJointOmega_0(), m_diffJoint->GetJointOmega_1()));
 
 		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
@@ -309,8 +336,6 @@ class CustomVehicleController::BodyPartDifferential::DifferentialSpiderGearJoint
 
 	DifferentialJoint* m_diffJoint;
 };
-
-
 
 CustomVehicleController::BodyPartTire::BodyPartTire()
 	:BodyPart()
@@ -371,11 +396,11 @@ CustomVehicleController::BodyPartDifferential::BodyPartDifferential (BodyPart* c
 	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.2f, 0.2f, 0, NULL);
 
 	dMatrix matrix(dGetIdentityMatrix());
+	NewtonBodyGetMatrix(m_controller->GetBody(), &matrix[0][0]);
+	matrix = m_controller->m_localFrame * matrix;
+matrix.m_posit.m_y += 1.0f;
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
-
-	ResetTransform();
-	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 
 	dFloat inertia = 2.0f * mass * radio * radio / 5.0f;
 	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
@@ -384,24 +409,14 @@ CustomVehicleController::BodyPartDifferential::BodyPartDifferential (BodyPart* c
 	DifferentialJoint* const joint = new DifferentialJoint(matrix, m_body, parentPart->GetBody());
 	m_joint = joint;
 	
-	new DifferentialSpiderGearJoint (leftTire->GetBody(), m_body, m_controller, joint);
-	new DifferentialSpiderGearJoint (rightTire->GetBody(), m_body, m_controller, joint);
+	new DifferentialSpiderGearJoint (rightTire->GetBody(), m_body, joint);
+	new DifferentialSpiderGearJoint (leftTire->GetBody(), m_body, joint);
 }
 
 CustomVehicleController::BodyPartDifferential::~BodyPartDifferential()
 {
 }
 
-void CustomVehicleController::BodyPartDifferential::ResetTransform() const
-{
-	dMatrix matrix;
-	dMatrix offset(dYawMatrix(-0.5f * 3.1415927f));
-offset.m_posit.m_y = 1.0f;
-	NewtonBodyGetMatrix(m_controller->GetBody(), &matrix[0][0]);
-	matrix = offset * m_controller->m_localFrame * matrix;
-	NewtonBodySetMatrix(m_body, &matrix[0][0]);
-//	NewtonBodySetSleepState(m_body, 1);
-}
 
 CustomVehicleController::SteeringController::SteeringController (CustomVehicleController* const controller, dFloat maxAngle)
 	:Controller(controller)
@@ -909,10 +924,6 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 			m_steering->Update(timestep);
 		}
 
-//		if (m_differential) {
-//			m_differential->ResetTransform();
-//		}
-
 		if (ControlStateChanged()) {
 			NewtonBodySetSleepState(m_body, 0);
 		}
@@ -941,7 +952,9 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 */	
 	}
 
-//dTrace (("\n"));
+static int xxx;
+dTrace (("  %d\n", xxx));
+xxx ++;
 }
 
 CustomVehicleController* CustomVehicleControllerManager::CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData)
@@ -1165,7 +1178,6 @@ void CustomVehicleController::Finalize()
 //	NewtonBodyGetMatrix(body, &m_chassisState.m_matrix[0][0]);
 //	m_chassisState.UpdateInertia();
 //	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
-
 //NewtonBodySetMassMatrix (m_body, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_finalized = true;

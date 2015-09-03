@@ -86,15 +86,6 @@
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.cpp">
-      <Filter>managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerComponent.cpp">
-      <Filter>managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerJoint.cpp">
-      <Filter>managers</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\Custom6DOF.h">
@@ -174,14 +165,5 @@
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.h">
-      <Filter>managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerComponent.h">
-      <Filter>managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerJoint.h">
-      <Filter>managers</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

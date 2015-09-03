@@ -238,9 +238,6 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
     <ClCompile Include="..\..\dCustomJoints\CustomInputManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerComponent.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp">
@@ -275,9 +272,6 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
     <ClInclude Include="..\..\dCustomJoints\CustomInputManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerComponent.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />

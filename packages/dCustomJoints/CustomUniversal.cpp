@@ -23,7 +23,7 @@
 
 //dInitRtti(CustomUniversal);
 
-CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
+CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
 	,m_curJointAngle_0()
 	,m_curJointAngle_1()

@@ -33,9 +33,6 @@
     <ClCompile Include="..\..\dCustomJoints\CustomJoint.cpp">
       <Filter>joints</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dCustomJoints\CustomKinematicController.cpp">
-      <Filter>joints</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomPathFollow.cpp">
       <Filter>joints</Filter>
     </ClCompile>
@@ -84,15 +81,11 @@
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp">
       <Filter>managers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.cpp">
-      <Filter>managers</Filter>
+    <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp">
+      <Filter>joints</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerComponent.cpp">
-      <Filter>managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerJoint.cpp">
+    <ClCompile Include="..\..\dCustomJoints\CustomKinematicController.cpp">
       <Filter>managers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -119,9 +112,6 @@
       <Filter>joints</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomJoint.h">
-      <Filter>joints</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h">
       <Filter>joints</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h">
@@ -172,15 +162,11 @@
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h">
       <Filter>managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerBodyState.h">
-      <Filter>managers</Filter>
+    <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h">
+      <Filter>joints</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerComponent.h">
-      <Filter>managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerJoint.h">
+    <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h">
       <Filter>managers</Filter>
     </ClInclude>
   </ItemGroup>
