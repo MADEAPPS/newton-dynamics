@@ -269,7 +269,7 @@ class SuperCarEntity: public DemoEntity
 		tirePart->SetUserData(m_ligmentMatrix);
 
 		// add the tire to the vehicle
-		CustomVehicleController::BodyPartTire::CreationInfo tireInfo;
+		CustomVehicleController::BodyPartTire::Info tireInfo;
 		tireInfo.m_location = tireMatrix.m_posit;
 		tireInfo.m_mass = mass;
 		tireInfo.m_radio = radius;
@@ -364,21 +364,25 @@ class SuperCarEntity: public DemoEntity
 
 		// add a differential to link the two rear tires
 		CustomVehicleController::BodyPartDifferential* const differencial = m_controller->AddDifferential2WD(leftRearTire, rightRearTire);
-/*
+
 		// add an engine
 		// first make the gear Box
-		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
+//		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
+//		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
 
+//		CustomVehicleController::BodyPartEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
+		CustomVehicleController::BodyPartEngine::Info engineInfo;
 
-		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
-		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
+		CustomVehicleController::BodyPartEngine* const engine = m_controller->AddEngine (engineInfo, differencial);
+
+		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engine);
 
 		// the the default transmission type
-		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
+//		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
 
-		m_controller->SetEngine(engine);
+		m_controller->SetEngine(engineControl);
 
-
+/*
 		dFloat viperIdleRPM = VIPER_IDLE_TORQUE_RPM;
 		dFloat viperIdleTorquePoundPerFoot = VIPER_IDLE_TORQUE;
 
@@ -497,7 +501,7 @@ class SuperCarEntity: public DemoEntity
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
-		//CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
+		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
 		CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
@@ -604,8 +608,8 @@ steeringVal *= 0.3f;
 	#endif
 #endif
 
-/*
 		if (engine) {
+/*
 			bool key = (m_engineKeySwitchCounter & 1) ? true : false;
 			if (!m_engineOldKeyState && key) {
 				// play the start engine sound
@@ -636,10 +640,10 @@ steeringVal *= 0.3f;
 					engine->SetGear(CustomVehicleControllerComponentEngine::dGearBox::m_reverseGear);
 				}
 			}
-
+*/
 			engine->SetParam(engineGasPedal);
 		}
-*/		
+		
 		if (steering) {
 			steering->SetParam(steeringVal);
 		}

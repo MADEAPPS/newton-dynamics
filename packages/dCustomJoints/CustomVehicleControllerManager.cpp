@@ -179,7 +179,6 @@ class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
 		force = force.Scale (-1.0f);
 		NewtonBodyAddForce(GetBody0(), &force[0]);
 
-
 		m_brakeTorque = 0.0f;
 	}
 
@@ -368,7 +367,7 @@ CustomVehicleController::BodyPartTire::~BodyPartTire()
 }
 
 
-void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, const dMatrix& locationInGlobaSpase, const CreationInfo& info)
+void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, const dMatrix& locationInGlobaSpase, const Info& info)
 {
 	m_data = info;
 	m_parent = parentPart;
@@ -408,11 +407,11 @@ void CustomVehicleController::BodyPartTire::SetBrakeTorque(dFloat torque)
 }
 
 
-CustomVehicleController::BodyPartDifferential::BodyPartDifferential (BodyPart* const parentPart, const BodyPartTire* const leftTire, const BodyPartTire* const rightTire)
+CustomVehicleController::BodyPartDifferential::BodyPartDifferential (BodyPartChassis* const chassis, const BodyPartTire* const leftTire, const BodyPartTire* const rightTire)
 	:BodyPart()
 {
-	m_parent = parentPart;
-	m_controller = parentPart->m_controller;
+	m_parent = chassis;
+	m_controller = chassis->m_controller;
 
 	NewtonWorld* const world = ((CustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
 
@@ -434,7 +433,7 @@ matrix.m_posit.m_y += 1.0f;
 	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
 	NewtonBodySetForceAndTorqueCallback(m_body, m_controller->m_forceAndTorque);
 
-	DifferentialJoint* const joint = new DifferentialJoint(matrix, m_body, parentPart->GetBody());
+	DifferentialJoint* const joint = new DifferentialJoint(matrix, m_body, chassis->GetBody());
 	m_joint = joint;
 	
 	new DifferentialSpiderGearJoint (rightTire->GetBody(), m_body, joint);
@@ -442,6 +441,40 @@ matrix.m_posit.m_y += 1.0f;
 }
 
 CustomVehicleController::BodyPartDifferential::~BodyPartDifferential()
+{
+}
+
+
+#include "CustomHinge.h"
+CustomVehicleController::BodyPartEngine::BodyPartEngine(BodyPartChassis* const chassis, BodyPartDifferential* const differential, const Info& info)
+	:BodyPart()
+{
+	m_parent = chassis;
+	m_controller = chassis->m_controller;
+	NewtonWorld* const world = ((CustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
+
+	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.2f, 0.4f, 0, NULL);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	NewtonBodyGetMatrix(m_controller->GetBody(), &matrix[0][0]);
+	matrix = dYawMatrix (3.141592f * 0.5f) * m_controller->m_localFrame * matrix;
+matrix.m_posit.m_x += 1.0f;
+matrix.m_posit.m_y += 0.75f;
+	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+	NewtonDestroyCollision(collision);
+
+float mass = 100;
+float radio = 0.5f;
+	dFloat inertia = 2.0f * mass * radio * radio / 5.0f;
+	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
+	NewtonBodySetForceAndTorqueCallback(m_body, m_controller->m_forceAndTorque);
+
+	CustomHinge* const joint = new CustomHinge(matrix, m_body, chassis->GetBody());
+	m_joint = joint;
+}
+
+CustomVehicleController::BodyPartEngine::~BodyPartEngine()
 {
 }
 
@@ -523,7 +556,17 @@ void CustomVehicleController::BrakeController::Update(dFloat timestep)
 }
 
 
+CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, BodyPartEngine* const engine)
+	:Controller(controller)
+	,m_engine(engine)
+{
 
+}
+
+void CustomVehicleController::EngineController::Update(dFloat timestep)
+{
+
+}
 
 #if 0
 #define VEHICLE_SLEEP_COUNTER										16
@@ -662,9 +705,6 @@ class CustomVehicleController::dTireForceSolverSolver: public dComplemtaritySolv
 };
 
 
-
-
-
 void CustomVehicleControllerManager::DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const
 {
 	controller->DrawSchematic(scale);
@@ -672,17 +712,6 @@ void CustomVehicleControllerManager::DrawSchematic (const CustomVehicleControlle
 
 void CustomVehicleControllerManager::DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
 {
-
-}
-
-
-
-
-
-
-const CustomVehicleControllerBodyStateChassis& CustomVehicleController::GetChassisState () const
-{
-	return m_chassisState;
 }
 
 dFloat CustomVehicleController::GetAerodynamicsDowforceCoeficient () const
@@ -706,38 +735,6 @@ dFloat CustomVehicleController::GetDryRollingFrictionTorque () const
 	return m_chassisState.GetDryRollingFrictionTorque();
 }
 
-
-CustomVehicleControllerBodyStateTire* CustomVehicleController::GetFirstTire () const
-{
-	return m_tireList.GetFirst() ? &m_tireList.GetFirst()->GetInfo() : NULL;
-}
-
-CustomVehicleControllerBodyStateTire* CustomVehicleController::GetNextTire (CustomVehicleControllerBodyStateTire* const tire) const
-{
-	dList<CustomVehicleControllerBodyStateTire>::dListNode* const tireNode = m_tireList.GetNodeFromInfo(*tire);
-	return tireNode->GetNext() ? &tireNode->GetNext()->GetInfo() : NULL;
-}
-
-
-
-
-
-
-CustomVehicleControllerComponentEngine* CustomVehicleController::GetEngine() const
-{
-	return m_engine;
-}
-
-
-void CustomVehicleController::SetEngine(CustomVehicleControllerComponentEngine* const engine)
-{
-	if (m_engine) {
-		delete m_engine;
-	}
-	m_engine = engine;
-}
-
-
 void CustomVehicleController::SetContactFilter(CustomVehicleControllerTireCollisionFilter* const filter)
 {
 	if (m_contactFilter) {
@@ -745,23 +742,6 @@ void CustomVehicleController::SetContactFilter(CustomVehicleControllerTireCollis
 	}
 	m_contactFilter = filter;
 }
-
-void CustomVehicleController::SetBrakes(CustomVehicleControllerComponentBrake* const brakes)
-{
-	if (m_brakes) {
-		delete m_brakes;
-	}
-	m_brakes = brakes;
-}
-
-void CustomVehicleController::SetHandBrakes(CustomVehicleControllerComponentBrake* const brakes)
-{
-	if (m_handBrakes) {
-		delete m_handBrakes;
-	}
-	m_handBrakes = brakes;
-}
-
 
 void CustomVehicleController::LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires)
 {
@@ -773,8 +753,6 @@ void CustomVehicleController::LinksTiresKinematically (int count, CustomVehicleC
 		link->m_radio1 = tires[i]->m_radio;
 	}
 }
-
-
 
 CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody (const NewtonBody* const body)
 {
@@ -797,8 +775,6 @@ CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody
 
 	return externalBody;
 }
-
-
 
 void CustomVehicleController::DrawSchematic (dFloat scale) const
 {
@@ -869,7 +845,6 @@ void CustomVehicleController::DrawSchematic (dFloat scale) const
 		array[1] = localVelocity.Scale (0.25f);
 		manager->DrawSchematicCallback(this, "velocity", 0, 2, array);
 	}
-
 
 	{
 
@@ -946,7 +921,6 @@ CustomVehicleControllerManager::~CustomVehicleControllerManager()
 }
 
 
-
 void CustomVehicleControllerManager::DestroyController(CustomVehicleController* const controller)
 {
 	controller->Cleanup();
@@ -958,16 +932,20 @@ void CustomVehicleControllerManager::DestroyController(CustomVehicleController* 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
-		if (m_steering) {
-			m_steering->Update(timestep);
+		if (m_engineControl) {
+			m_engineControl->Update(timestep);
 		}
 
-		if (m_brakes) {
-			m_brakes->Update(timestep);
+		if (m_steeringControl) {
+			m_steeringControl->Update(timestep);
 		}
 
-		if (m_handBrakes) {
-			m_handBrakes->Update(timestep);
+		if (m_brakesControl) {
+			m_brakesControl->Update(timestep);
+		}
+
+		if (m_handBrakesControl) {
+			m_handBrakesControl->Update(timestep);
 		}
 
 		if (ControlStateChanged()) {
@@ -1043,11 +1021,9 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	m_finalized = false;
 	m_localFrame = vehicleFrame;
 	m_forceAndTorque = forceAndTorque;
+
+	m_engine = NULL;
 	m_differential = NULL;
-//	m_externalContactStatesCount = 0;
-//	m_sleepCounter = VEHICLE_SLEEP_COUNTER;
-//	m_freeContactList = m_externalContactStatesPool.GetFirst();
-	
 	
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = manager->GetWorld();
@@ -1065,27 +1041,15 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 
 
 /*
-	m_chassisState.Init(this, vehicleFrame);
-
-	m_stateList.Append(&m_chassisState);
-
-
-	// initialize all components to empty
-	m_engine = NULL;
-	m_brakes = NULL;
-	
-	m_handBrakes = NULL;
 	m_contactFilter = new CustomVehicleControllerTireCollisionFilter(this);
-
 	SetDryRollingFrictionTorque(100.0f / 4.0f);
 	SetAerodynamicsDownforceCoefficient(0.5f * dSqrt(gravityVector % gravityVector), 60.0f * 0.447f);
 */
 
-
-	m_brakes = NULL;
-//	CustomVehicleControllerComponentEngine* m_engine;
-	m_handBrakes = NULL;
-	m_steering = NULL;
+	m_brakesControl = NULL;
+	m_engineControl = NULL;
+	m_handBrakesControl = NULL;
+	m_steeringControl = NULL;
 	
 	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 	NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
@@ -1100,7 +1064,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 void CustomVehicleController::Cleanup()
 {
 	SetBrakes(NULL);
-//	SetEngine(NULL);
+	SetEngine(NULL);
 	SetSteering(NULL);
 	SetHandBrakes(NULL);
 //	SetContactFilter(NULL);
@@ -1108,50 +1072,67 @@ void CustomVehicleController::Cleanup()
 	if (m_differential) {
 		delete m_differential;
 	}
+
+	if (m_engine) {
+		delete m_engine;
+	}
+
 	NewtonDestroyCollision(m_tireCastShape);
 }
 
 
+CustomVehicleController::EngineController* CustomVehicleController::GetEngine() const
+{
+	return m_engineControl;
+}
+
 
 CustomVehicleController::SteeringController* CustomVehicleController::GetSteering() const
 {
-	return m_steering;
+	return m_steeringControl;
 }
 
 CustomVehicleController::BrakeController* CustomVehicleController::GetBrakes() const
 {
-	return m_brakes;
+	return m_brakesControl;
 }
 
 CustomVehicleController::BrakeController* CustomVehicleController::GetHandBrakes() const
 {
-	return m_handBrakes;
+	return m_handBrakesControl;
 }
 
+void CustomVehicleController::SetEngine(EngineController* const engineControl)
+{
+	if (m_engineControl) {
+		delete m_engineControl;
+	}
+	m_engineControl = engineControl;
+}
 
 void CustomVehicleController::SetHandBrakes(BrakeController* const handBrakes)
 {
-	if (m_handBrakes) {
-		delete m_handBrakes;
+	if (m_handBrakesControl) {
+		delete m_handBrakesControl;
 	}
-	m_handBrakes = handBrakes;
+	m_handBrakesControl = handBrakes;
 }
 
 void CustomVehicleController::SetBrakes(BrakeController* const brakes)
 {
-	if (m_brakes) {
-		delete m_brakes;
+	if (m_brakesControl) {
+		delete m_brakesControl;
 	}
-	m_brakes = brakes;
+	m_brakesControl = brakes;
 }
 
 
 void CustomVehicleController::SetSteering(SteeringController* const steering)
 {
-	if (m_steering) {
-		delete m_steering;
+	if (m_steeringControl) {
+		delete m_steeringControl;
 	}
-	m_steering = steering;
+	m_steeringControl = steering;
 }
 
 
@@ -1266,13 +1247,14 @@ void CustomVehicleController::Finalize()
 
 bool CustomVehicleController::ControlStateChanged() const
 {
-	bool inputChanged = (m_steering && m_steering->ParamChanged());
-	inputChanged = inputChanged || (m_brakes && m_brakes->ParamChanged());
-	inputChanged = inputChanged || (m_handBrakes && m_handBrakes->ParamChanged());
+	bool inputChanged = (m_steeringControl && m_steeringControl->ParamChanged());
+	inputChanged = inputChanged || (m_engineControl && m_engineControl ->ParamChanged());
+	inputChanged = inputChanged || (m_brakesControl && m_brakesControl->ParamChanged());
+	inputChanged = inputChanged || (m_handBrakesControl && m_handBrakesControl->ParamChanged());
 	return inputChanged;
 }
 
-CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const BodyPartTire::CreationInfo& tireInfo)
+CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const BodyPartTire::Info& tireInfo)
 {
 	dList<BodyPartTire>::dListNode* const tireNode = m_tireList.Append();
 	BodyPartTire& tire = tireNode->GetInfo();
@@ -1303,3 +1285,17 @@ CustomVehicleController::BodyPartDifferential* CustomVehicleController::AddDiffe
 	NewtonSkeletonContainerAttachBone (m_skeleton, m_differential->GetBody(), m_chassis.GetBody());
 	return m_differential;
 }
+
+CustomVehicleController::BodyPartEngine* CustomVehicleController::AddEngine (const BodyPartEngine::Info& engineInfo, BodyPartDifferential* const differential)
+{
+	if (m_engine) {
+		delete m_engine;
+	}
+
+	m_engine = new BodyPartEngine(&m_chassis, m_differential, engineInfo);
+
+	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());
+	NewtonSkeletonContainerAttachBone(m_skeleton, m_engine->GetBody(), m_chassis.GetBody());
+	return m_engine;
+}
+
