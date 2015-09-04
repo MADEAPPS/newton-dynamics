@@ -195,7 +195,7 @@ class SuperCarEntity: public DemoEntity
 	{
 		DemoEntity::InterpolateMatrix (world, param);
 		if (m_controller){
-			for (dList<CustomVehicleController::BodyPart*>::dListNode* node = m_controller->GetFirstPart()->GetNext(); node; node = m_controller->GetNextPart(node)) {
+			for (dList<CustomVehicleController::BodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
 				CustomVehicleController::BodyPart* const part = node->GetInfo();
 				DemoEntity* const entPart = (DemoEntity*) part->GetUserData();
 				entPart->InterpolateMatrix (world, param);
@@ -293,7 +293,7 @@ class SuperCarEntity: public DemoEntity
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
 		//for (BodyPartTire* tire = m_controller->GetFirstTire(); tire; tire = m_controller->GetNextTire(tire)) {
-		for (dList<CustomVehicleController::BodyPart*>::dListNode* node = m_controller->GetFirstPart()->GetNext(); node; node = m_controller->GetNextPart(node)) {
+		for (dList<CustomVehicleController::BodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
 			CustomVehicleController::BodyPart* const part = node->GetInfo();
 			CustomVehicleController::BodyPart* const parent = part->GetParent();
 
@@ -340,34 +340,31 @@ class SuperCarEntity: public DemoEntity
 		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, 1.0f);
 		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", offset1, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, -1.0f);
 
-		// add a differential to link the two rear tires
-		CustomVehicleController::BodyPartDifferential* const differencial = m_controller->AddDifferential2WD (leftRearTire, rightRearTire);
-
-
-
 		//calculate the Ackerman parameters
 		// add a steering Wheel component
 		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller, VIPER_TIRE_STEER_ANGLE * 3.141592f / 180.0f);
-		steering->AddSteeringTire(leftFrontTire);
-		steering->AddSteeringTire(rightFrontTire);
+		steering->AddTire(leftFrontTire);
+		steering->AddTire(rightFrontTire);
 		steering->CalculateAkermanParameters (leftRearTire, rightRearTire, leftFrontTire, rightFrontTire);
 		m_controller->SetSteering(steering);
-
-		/*
+		
 		// add vehicle brakes
-		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE);
-		brakes->AddBrakeTire (leftFrontTire);
-		brakes->AddBrakeTire (rightFrontTire);
-		brakes->AddBrakeTire (leftRearTire);
-		brakes->AddBrakeTire (rightRearTire);
+		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController (m_controller, VIPER_TIRE_BRAKE_TORQUE);
+		brakes->AddTire (leftFrontTire);
+		brakes->AddTire (rightFrontTire);
+		brakes->AddTire (leftRearTire);
+		brakes->AddTire (rightRearTire);
 		m_controller->SetBrakes(brakes);
 
 		// add vehicle hand brakes
-		CustomVehicleControllerComponentBrake* const handBrakes = new CustomVehicleControllerComponentBrake (m_controller, VIPER_TIRE_BRAKE_TORQUE);
-		handBrakes->AddBrakeTire (leftRearTire);
-		handBrakes->AddBrakeTire (rightRearTire);
+		CustomVehicleController::BrakeController* const handBrakes = new CustomVehicleController::BrakeController (m_controller, VIPER_TIRE_BRAKE_TORQUE);
+		handBrakes->AddTire (leftRearTire);
+		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
+		// add a differential to link the two rear tires
+		CustomVehicleController::BodyPartDifferential* const differencial = m_controller->AddDifferential2WD(leftRearTire, rightRearTire);
+/*
 		// add an engine
 		// first make the gear Box
 		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
@@ -501,9 +498,9 @@ class SuperCarEntity: public DemoEntity
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
 		//CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
+		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
+		CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
-		//CustomVehicleControllerComponentBrake* const brakes = m_controller->GetBrakes();
-		//CustomVehicleControllerComponentBrake* const handBrakes = m_controller->GetHandBrakes();
 
 		// get the throttler input
 		dFloat joyPosX;
@@ -513,8 +510,8 @@ class SuperCarEntity: public DemoEntity
 //		int gear = engine ? engine->GetGear() : CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear;
 	int gear = 0;
 		dFloat steeringVal = 0.0f;
-		dFloat engineGasPedal = 0.0f;
 		dFloat brakePedal = 0.0f;
+		dFloat engineGasPedal = 0.0f;
 		dFloat handBrakePedal = 0.0f;
 	
 		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
@@ -537,7 +534,7 @@ class SuperCarEntity: public DemoEntity
 				engineGasPedal = 1.0f;
 			}
 
-			// see if HandBreale is on
+			// see if HandBrake is on
 			if (mainWindow->GetKeyState ('S')) {
 				brakePedal = 1.0f;
 			}
@@ -646,14 +643,13 @@ steeringVal *= 0.3f;
 		if (steering) {
 			steering->SetParam(steeringVal);
 		}
-/*
+
 		if (brakes) {
 			brakes->SetParam(brakePedal);
 		}
 		if (handBrakes) {
 			handBrakes->SetParam(handBrakePedal);
 		}
-*/	
 	}
 
 	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/

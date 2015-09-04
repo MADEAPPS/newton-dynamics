@@ -126,6 +126,7 @@ class CustomVehicleController: public CustomControllerBase
 		void Init (BodyPart* const parentPart, const dMatrix& locationInGlobaSpase, const CreationInfo& info);
 
 		void SetSteerAngle (dFloat angle);
+		void SetBrakeTorque (dFloat torque);
 
 		CreationInfo m_data;
 	};
@@ -191,17 +192,30 @@ class CustomVehicleController: public CustomControllerBase
 	{
 		public:
 		CUSTOM_JOINTS_API SteeringController (CustomVehicleController* const controller, dFloat maxAngle);
-		CUSTOM_JOINTS_API void AddSteeringTire (BodyPartTire* const tire);
+		CUSTOM_JOINTS_API void AddTire (BodyPartTire* const tire);
 		CUSTOM_JOINTS_API void CalculateAkermanParameters(const BodyPartTire* const rearLeftTire, const BodyPartTire* const rearRightTire,
 														  const BodyPartTire* const frontLeftTire, const BodyPartTire* const frontRightTire);
 
 		CUSTOM_JOINTS_API virtual void Update(dFloat timestep);
 
-		dList<BodyPartTire*> m_steeringTires;
+		dList<BodyPartTire*> m_tires;
 		dFloat m_maxAngle;
 		dFloat m_akermanWheelBaseWidth;
 		dFloat m_akermanAxelSeparation;
 	};
+
+	class BrakeController: public Controller
+	{
+		public:
+		CUSTOM_JOINTS_API BrakeController (CustomVehicleController* const controller, dFloat maxBrakeTorque);
+		CUSTOM_JOINTS_API void AddTire (BodyPartTire* const tire);
+
+		CUSTOM_JOINTS_API virtual void Update(dFloat timestep);
+
+		dList<BodyPartTire*> m_tires;
+		dFloat m_brakeTorque;
+	};
+
 
 #if 0
 	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateTire* GetFirstTire () const ;
@@ -274,21 +288,27 @@ class CustomVehicleController: public CustomControllerBase
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 	CUSTOM_JOINTS_API BodyPartTire* AddTire (const BodyPartTire::CreationInfo& tireInfo);
-	CUSTOM_JOINTS_API BodyPartDifferential* AddDifferential2WD (const BodyPartTire* const leftNode, const BodyPartTire* const rightire);
 
-	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetFirstPart() const;
-	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetNextPart(dList<BodyPart*>::dListNode* const part) const;
+	CUSTOM_JOINTS_API BodyPartDifferential* AddDifferential2WD (const BodyPartTire* const leftTire, const BodyPartTire* const rightire);
 
-	CUSTOM_JOINTS_API bool ControlStateChanged() const;
+	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetFirstBodyPart() const;
+	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetNextBodyPart(dList<BodyPart*>::dListNode* const part) const;
 
+	CUSTOM_JOINTS_API BrakeController* GetBrakes() const;
+//	CUSTOM_JOINTS_API CustomVehicleControllerComponentEngine* GetEngine() const;
+	CUSTOM_JOINTS_API BrakeController* GetHandBrakes() const;
 	CUSTOM_JOINTS_API SteeringController* GetSteering() const;
+	
+	CUSTOM_JOINTS_API void SetBrakes(BrakeController* const brakes);
+	CUSTOM_JOINTS_API void SetHandBrakes(BrakeController* const brakes);
 	CUSTOM_JOINTS_API void SetSteering(SteeringController* const steering);
-
+//	CUSTOM_JOINTS_API void SetEngine(CustomVehicleControllerComponentEngine* const engine);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
+	bool ControlStateChanged() const;
 	void Init (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	
@@ -303,10 +323,14 @@ class CustomVehicleController: public CustomControllerBase
 	void* m_collisionAggregate;
 	NewtonCollision* m_tireCastShape;
 	BodyPartDifferential* m_differential;
+	
+	BrakeController* m_brakes;
+//	CustomVehicleControllerComponentEngine* m_engine;
+	BrakeController* m_handBrakes;
 	SteeringController* m_steering; 
 
-	NewtonApplyForceAndTorque m_forceAndTorque;
 
+	NewtonApplyForceAndTorque m_forceAndTorque;
 
 	bool m_finalized;
 	friend class CustomVehicleControllerManager;
