@@ -53,6 +53,34 @@ class CustomVehicleController: public CustomControllerBase
 {
 	public:
 	class dWeightDistibutionSolver;
+
+	class dInterpolationCurve
+	{
+		public:
+		class dNot
+		{
+		public:
+			dFloat m_param;
+			dFloat m_value;
+		};
+
+		dInterpolationCurve()
+		{
+			m_count = 0;
+		}
+
+		~dInterpolationCurve()
+		{
+		}
+
+		CUSTOM_JOINTS_API void InitalizeCurve(int points, const dFloat* const steps, const dFloat* const values);
+		CUSTOM_JOINTS_API dFloat GetValue(dFloat param) const;
+
+		dNot m_nodes[6];
+		int m_count;
+	};
+
+
 	
 	class BodyPart: public CustomAlloc
 	{
@@ -140,6 +168,13 @@ class CustomVehicleController: public CustomControllerBase
 
 		BodyPartDifferential (BodyPartChassis* const chassis, const BodyPartTire* const leftTire, const BodyPartTire* const rightTire);
 		virtual ~BodyPartDifferential();
+		
+		int GetTireCounty() const ;
+		const BodyPartTire* GetTire(int index) const ;
+
+		protected:
+		int m_tireCount;
+		const BodyPartTire* m_tire[8];
 	};
 
 	class BodyPartEngine: public BodyPart
@@ -148,14 +183,38 @@ class CustomVehicleController: public CustomControllerBase
 		class Info
 		{
 			public:
-			//dVector m_location;
 			dFloat m_mass;
 			dFloat m_radio;
+			dFloat m_peakTorque; 
+			dFloat m_rpmAtPeakTorque;
+			dFloat m_peakHorsePower; 
+			dFloat m_rpmAtPeakHorsePower; 
+			dFloat m_redLineTorque; 
+			dFloat m_rpmAtReadLineTorque; 
+			dFloat m_idleTorque; 
+			dFloat m_rpmAtIdleTorque;
+			dFloat m_vehicleTopSpeed;
 			void* m_userData;
+
+			private:
+			dFloat m_crownGearRatio;
+			dFloat m_peakPowerTorque;
+			void ConvertToMetricSystem();
+			friend class BodyPartEngine;
 		};
 
-		BodyPartEngine(BodyPartChassis* const chassis, BodyPartDifferential* const diffrential, const Info& info);
+		BodyPartEngine(BodyPartChassis* const chassis, BodyPartDifferential* const differential, const Info& info, int gearCount, dFloat* const gearRatios, dFloat reverseGear);
 		virtual ~BodyPartEngine();
+
+		protected:
+		void SetTopSpeed(BodyPartDifferential* const differential);
+		void InitEngineTorqueCurve(BodyPartDifferential* const differential);
+		
+		Info m_data;
+		dFloat m_gear[10];
+		int m_gearCount;
+
+		dInterpolationCurve m_torqueRPMCurve;
 	};
 
 	class Controller: public CustomAlloc
@@ -242,6 +301,14 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		CUSTOM_JOINTS_API EngineController (CustomVehicleController* const controller, BodyPartEngine* const engine);
 
+		CUSTOM_JOINTS_API int GetGear() const;
+		CUSTOM_JOINTS_API dFloat GetRPM() const;
+		CUSTOM_JOINTS_API dFloat GetRedLineRPM() const;
+		CUSTOM_JOINTS_API dFloat GetSpeed() const;
+
+		CUSTOM_JOINTS_API bool GetClutch() const;
+		CUSTOM_JOINTS_API void SetClutch(bool state);
+
 		protected:
 		virtual void Update(dFloat timestep);
 		BodyPartEngine* m_engine;
@@ -281,7 +348,7 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 	CUSTOM_JOINTS_API BodyPartTire* AddTire (const BodyPartTire::Info& tireInfo);
 	CUSTOM_JOINTS_API BodyPartDifferential* AddDifferential2WD (const BodyPartTire* const leftTire, const BodyPartTire* const rightire);
-	CUSTOM_JOINTS_API BodyPartEngine* AddEngine (const BodyPartEngine::Info& engineInfo, BodyPartDifferential* const differential);
+	CUSTOM_JOINTS_API BodyPartEngine* AddEngine (const BodyPartEngine::Info& engineInfo, BodyPartDifferential* const differential, int gearCount, dFloat* const gearRatios, dFloat reverseGear);
 
 	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetFirstBodyPart() const;
 	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetNextBodyPart(dList<BodyPart*>::dListNode* const part) const;

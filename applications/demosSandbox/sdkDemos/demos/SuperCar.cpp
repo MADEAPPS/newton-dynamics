@@ -40,6 +40,9 @@
 // Reverse 2.90:1 
 
 // vehicle definition for a Muscle car
+#define VIPER_ENGINE_MASS					200.0f
+#define VIPER_ENGINE_RADIO					0.5f
+
 #define VIPER_IDLE_TORQUE					1200.0f
 #define VIPER_IDLE_TORQUE_RPM				500.0f
 
@@ -52,11 +55,10 @@
 #define VIPER_REDLINE_TORQUE				30.0f
 #define VIPER_REDLINE_TORQUE_RPM			6000.0f
 
-#define VIPER_MASS							3500.0f
+#define VIPER_MASS							3000.0f
 #define VIPER_TIRE_STEER_ANGLE				35.0f
 
-// note: tire unsprung mass (note the engine impose a limit of 1.0 / 50.0 mass ratio between connected bodies 
-//#define VIPER_TIRE_MASS					(VIPER_MASS / 50.0f)  
+
 #define VIPER_TIRE_MASS						40.0f  
 
 //#define VIPER_TIRE_TOP_SPEED				164 mile / hours
@@ -365,15 +367,23 @@ class SuperCarEntity: public DemoEntity
 		// add a differential to link the two rear tires
 		CustomVehicleController::BodyPartDifferential* const differencial = m_controller->AddDifferential2WD(leftRearTire, rightRearTire);
 
-		// add an engine
-		// first make the gear Box
-//		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
-//		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, VIPER_TIRE_REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
-
-//		CustomVehicleController::BodyPartEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
 		CustomVehicleController::BodyPartEngine::Info engineInfo;
+		engineInfo.m_mass = VIPER_ENGINE_MASS; 
+		engineInfo.m_radio = VIPER_ENGINE_RADIO; 
+		engineInfo.m_vehicleTopSpeed = VIPER_TIRE_TOP_SPEED_KMH;
 
-		CustomVehicleController::BodyPartEngine* const engine = m_controller->AddEngine (engineInfo, differencial);
+		engineInfo.m_peakTorque = VIPER_PEAK_TORQUE;
+		engineInfo.m_rpmAtPeakTorque = VIPER_PEAK_TORQUE_RPM;
+		engineInfo.m_peakHorsePower = VIPER_PEAK_HP;
+		engineInfo.m_rpmAtPeakHorsePower = VIPER_PEAK_HP_RPM;
+		engineInfo.m_redLineTorque = VIPER_REDLINE_TORQUE;
+		engineInfo.m_rpmAtReadLineTorque = VIPER_REDLINE_TORQUE_RPM;
+		engineInfo.m_idleTorque = VIPER_IDLE_TORQUE;
+		engineInfo.m_rpmAtIdleTorque = VIPER_IDLE_TORQUE_RPM;
+		
+		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
+		int gearsCount = int (sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]));
+		CustomVehicleController::BodyPartEngine* const engine = m_controller->AddEngine (engineInfo, differencial, gearsCount, fowardSpeedGearsBoxRatios, VIPER_TIRE_REVERSE_GEAR);
 
 		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engine);
 
@@ -382,22 +392,6 @@ class SuperCarEntity: public DemoEntity
 
 		m_controller->SetEngine(engineControl);
 
-/*
-		dFloat viperIdleRPM = VIPER_IDLE_TORQUE_RPM;
-		dFloat viperIdleTorquePoundPerFoot = VIPER_IDLE_TORQUE;
-
-		dFloat viperPeakTorqueRPM = VIPER_PEAK_TORQUE_RPM;
-		dFloat viperPeakTorquePoundPerFoot = VIPER_PEAK_TORQUE;
-
-		dFloat viperPeakHorsePowerRPM = VIPER_PEAK_HP_RPM;
-		dFloat viperPeakHorsePower = VIPER_PEAK_HP;
-		
-		dFloat viperRedLineRPM = VIPER_REDLINE_TORQUE_RPM;
-		dFloat viperRedLineTorquePoundPerFoot = VIPER_REDLINE_TORQUE;
-
-		dFloat vehicleTopSpeedKPH = VIPER_TIRE_TOP_SPEED_KMH;
-		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
-*/
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 	}
@@ -517,6 +511,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat brakePedal = 0.0f;
 		dFloat engineGasPedal = 0.0f;
 		dFloat handBrakePedal = 0.0f;
+		bool cluth = true;
 	
 		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
 		if (hasJopytick) {
@@ -547,6 +542,8 @@ class SuperCarEntity: public DemoEntity
 			if (mainWindow->GetKeyState (' ')) {
 				handBrakePedal = 1.0f;
 			}
+
+			cluth = mainWindow->GetKeyState (0x0d) ? false : true;
 
 			// get the steering input
 			steeringVal = (dFloat (mainWindow->GetKeyState ('A')) - dFloat (mainWindow->GetKeyState ('D')));
@@ -642,6 +639,7 @@ steeringVal *= 0.3f;
 			}
 */
 			engine->SetParam(engineGasPedal);
+			engine->SetClutch(cluth);
 		}
 		
 		if (steering) {
@@ -1117,14 +1115,11 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		}
 	}
 
-
-
 	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
 	{
-/*
 		// draw the player physics model
 		if (m_drawShematic) {
-			RenderVehicleSchematic (scene);
+//			RenderVehicleSchematic (scene);
 		}
 		m_drawShematic = false;
 
@@ -1133,7 +1128,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		if (m_player) {
-			CustomVehicleControllerComponentEngine* const engine = m_player->m_controller->GetEngine();
+			CustomVehicleController::EngineController* const engine = m_player->m_controller->GetEngine();
 			if (engine) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				dFloat width = scene->GetWidth();
@@ -1146,22 +1141,23 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 				// draw the tachometer
 				dFloat x = gageSize / 2 + 80.0f;
 				dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
+rpm = 0;
 				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
 
 				// draw the odometer
 				x = width - gageSize / 2 - 80.0f;
 				dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
+				int gear = engine->GetGear();
 				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
-				DrawGear(speed, x, y, m_player->m_gearMap[engine->GetGear()], gageSize);
+				DrawGear(speed, x, y, m_player->m_gearMap[gear], gageSize);
 			}
 		}
 
 		//print controllers help 
-		DrawHelp(scene, lineNumber);
+//		DrawHelp(scene, lineNumber);
 
 		// restore color and blend mode
 		glDisable (GL_BLEND);
-*/
 	}
 
 	void SetAsPlayer (SuperCarEntity* const player)
@@ -1437,7 +1433,7 @@ void SuperCar (DemoEntityManager* const scene)
 	//manager->AddCones (scene);
 
 	dFloat u = 1.0f;
-	for (int i = 0; i < 50; i ++) {
+	for (int i = 0; i < 1; i ++) {
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
