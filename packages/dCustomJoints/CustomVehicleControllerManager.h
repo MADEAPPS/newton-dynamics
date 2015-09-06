@@ -180,6 +180,7 @@ class CustomVehicleController: public CustomControllerBase
 	class BodyPartEngine: public BodyPart
 	{
 		public:
+		class EngineJoint;
 		class Info
 		{
 			public:
@@ -197,14 +198,20 @@ class CustomVehicleController: public CustomControllerBase
 			void* m_userData;
 
 			private:
+			void ConvertToMetricSystem();
+
 			dFloat m_crownGearRatio;
 			dFloat m_peakPowerTorque;
-			void ConvertToMetricSystem();
+			dFloat m_engineIdleViscuosDrag;
 			friend class BodyPartEngine;
 		};
 
 		BodyPartEngine(BodyPartChassis* const chassis, BodyPartDifferential* const differential, const Info& info, int gearCount, dFloat* const gearRatios, dFloat reverseGear);
 		virtual ~BodyPartEngine();
+		void Update (dFloat timestep, dFloat gasVal);
+
+		dFloat GetRPM() const;
+		dFloat GetRedLineRPM() const;
 
 		protected:
 		void SetTopSpeed(BodyPartDifferential* const differential);
@@ -213,7 +220,6 @@ class CustomVehicleController: public CustomControllerBase
 		Info m_data;
 		dFloat m_gear[10];
 		int m_gearCount;
-
 		dInterpolationCurve m_torqueRPMCurve;
 	};
 
@@ -311,6 +317,7 @@ class CustomVehicleController: public CustomControllerBase
 
 		protected:
 		virtual void Update(dFloat timestep);
+
 		BodyPartEngine* m_engine;
 		friend class CustomVehicleController;
 	};

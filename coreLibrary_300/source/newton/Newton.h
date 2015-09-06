@@ -909,6 +909,9 @@ extern "C" {
 	NEWTON_API void  NewtonBodySetCollision (const NewtonBody* const body, const NewtonCollision* const collision);
 	NEWTON_API void  NewtonBodySetCollisionScale (const NewtonBody* const body, dFloat scaleX, dFloat  scaleY, dFloat scaleZ);
 
+	NEWTON_API dFloat NewtonBodyGetMaxRotationPerStep (const NewtonBody* const body);
+	NEWTON_API void NewtonBodySetMaxRotationPerStep (const NewtonBody* const body, dFloat angleInRadians);
+
 	NEWTON_API int  NewtonBodyGetSleepState (const NewtonBody* const body);
 	NEWTON_API void NewtonBodySetSleepState (const NewtonBody* const body, int state);
 
@@ -953,7 +956,7 @@ extern "C" {
 	NEWTON_API void  NewtonBodyGetForceAcc(const NewtonBody* const body, dFloat* const vector);
 	NEWTON_API void  NewtonBodyGetTorqueAcc(const NewtonBody* const body, dFloat* const vector);
 	NEWTON_API void  NewtonBodyGetCentreOfMass (const NewtonBody* const body, dFloat* const com);
-
+	
 	NEWTON_API void NewtonBodyGetPointVelocity (const NewtonBody* const body, const dFloat* const point, dFloat* const velocOut);
 	NEWTON_API void NewtonBodyAddImpulse (const NewtonBody* const body, const dFloat* const pointDeltaVeloc, const dFloat* const pointPosit);
 	NEWTON_API void NewtonBodyApplyImpulseArray (const NewtonBody* const body, int impuleCount, int strideInByte, const dFloat* const impulseArray, const dFloat* const pointArray);

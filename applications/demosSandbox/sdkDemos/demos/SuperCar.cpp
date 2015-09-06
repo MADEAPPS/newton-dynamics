@@ -1141,7 +1141,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 				// draw the tachometer
 				dFloat x = gageSize / 2 + 80.0f;
 				dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
-rpm = 0;
 				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
 
 				// draw the odometer

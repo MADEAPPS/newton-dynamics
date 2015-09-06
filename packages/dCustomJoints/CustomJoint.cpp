@@ -101,7 +101,17 @@ void CustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const b
 	m_userData = NULL;
 	m_userDestructor = NULL;
 	m_userConstrationCallback = NULL;
+}
 
+
+const dMatrix& CustomJoint::GetMatrix0() const
+{
+	return m_localMatrix0;
+}
+
+const dMatrix& CustomJoint::GetMatrix1() const
+{
+	return m_localMatrix0;
 }
 
 

@@ -160,6 +160,8 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API NewtonBody* GetBody0 () const;
 	CUSTOM_JOINTS_API NewtonBody* GetBody1 () const;
 	CUSTOM_JOINTS_API NewtonJoint* GetJoint () const;
+	CUSTOM_JOINTS_API const dMatrix& GetMatrix0 () const;
+	CUSTOM_JOINTS_API const dMatrix& GetMatrix1 () const;
 
 	// the application needs to implement this function for serialization
 	CUSTOM_JOINTS_API virtual const char* GetTypeName() const;

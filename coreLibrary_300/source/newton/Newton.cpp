@@ -5816,6 +5816,20 @@ int NewtonBodyGetJointRecursiveCollision (const NewtonBody* const bodyPtr)
 }
 
 
+dFloat NewtonBodyGetMaxRotationPerStep(const NewtonBody* const bodyPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	return body->GetMaxRotationPerStep();
+}
+
+void NewtonBodySetMaxRotationPerStep(const NewtonBody* const bodyPtr, dFloat angleInRadians)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	body->SetMaxRotationPerStep(angleInRadians);
+}
+
 
 // Name: NewtonBodyGetFreezeState 
 // get the freeze state of this body
@@ -5859,8 +5873,6 @@ void NewtonBodySetFreezeState(const NewtonBody* const bodyPtr, int state)
 	dgBody* const body = (dgBody *)bodyPtr;
 	body->SetFreeze(state ? true : false);
 }
-
-
 
 // Name: NewtonBodySetAutoSleep 
 // Set the auto-activation mode for this body.

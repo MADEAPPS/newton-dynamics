@@ -35,10 +35,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-//#define DG_AABB_ERROR		dgFloat32 (1.0e-4f)
 #define DG_MAX_ANGLE_STEP   dgFloat32 (45.0f * dgDEG2RAD)
 
-//dgVector dgBody::m_aabbTol (DG_AABB_ERROR, DG_AABB_ERROR, DG_AABB_ERROR, dgFloat32 (0.0));
 
 dgBody::dgBody()
 	:m_invWorldInertiaMatrix(dgGetZeroMatrix())
@@ -55,6 +53,7 @@ dgBody::dgBody()
 	,m_localCentreOfMass(dgFloat32 (0.0))	
 	,m_globalCentreOfMass(dgFloat32 (0.0))	
 	,m_aparentMass(dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS))
+	,m_maxAngulaRotationPerSet2(DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP )
 	,m_criticalSectionLock()
 	,m_flags(0)
 	,m_userData(NULL)
@@ -95,6 +94,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_localCentreOfMass(dgFloat32 (0.0))	
 	,m_globalCentreOfMass(dgFloat32 (0.0))	
 	,m_aparentMass(dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS))
+	,m_maxAngulaRotationPerSet2(DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP )
 	,m_criticalSectionLock()
 	,m_flags(0)
 	,m_userData(NULL)
@@ -123,7 +123,9 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	serializeCallback (userData, &m_veloc, sizeof (m_veloc));
 	serializeCallback (userData, &m_omega, sizeof (m_omega));
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
+	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
+	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
 
 	m_matrix = dgMatrix (m_rotation, m_matrix.m_posit);
 
@@ -156,8 +158,6 @@ void dgBody::AttachCollision (dgCollisionInstance* const collisionSrc)
 	m_equilibrium = 0;
 }
 
-
-
 void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
 	serializeCallback (userData, &m_rotation, sizeof (m_rotation));
@@ -165,7 +165,9 @@ void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRema
 	serializeCallback (userData, &m_veloc, sizeof (m_veloc));
 	serializeCallback (userData, &m_omega, sizeof (m_omega));
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
+	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
+	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
 
 	dgTree<dgInt32, const dgCollision*>::dgTreeNode* const node = collisionRemapId.Find(m_collision->GetChildShape());
 	dgAssert (node);
@@ -174,7 +176,6 @@ void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRema
 	serializeCallback (userData, &id, sizeof (id));
 	m_collision->Serialize(serializeCallback, userData, false);
 }
-
 
 void dgBody::SetMatrix(const dgMatrix& matrix)
 {
@@ -283,7 +284,7 @@ void dgBody::UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
 	m_globalCentreOfMass += m_veloc.Scale3 (timestep); 
-	while (((m_omega % m_omega) * timestep * timestep) > (DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP)) {
+	while (((m_omega % m_omega) * timestep * timestep) > m_maxAngulaRotationPerSet2) {
 		m_omega = m_omega.Scale3 (dgFloat32 (0.8f));
 	}
 

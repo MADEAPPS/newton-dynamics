@@ -121,6 +121,9 @@ class dgBody
 	bool GetCollisionWithLinkedBodies () const;
 	void SetCollisionWithLinkedBodies (bool state);
 
+	dgFloat32 GetMaxRotationPerStep() const;
+	void SetMaxRotationPerStep(dgFloat32 angle);
+
 	void Freeze ();
 	void Unfreeze ();
 	bool GetFreeze () const;
@@ -234,6 +237,7 @@ class dgBody
 	dgVector m_globalCentreOfMass;	
 	dgVector m_aparentMass;
 	
+	dgFloat32 m_maxAngulaRotationPerSet2;
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	union 
 	{
@@ -261,7 +265,7 @@ class dgBody
 	dgBroadPhaseAggregate* m_broadPhaseaggregateNode;
 	OnBodyDestroy m_destructor;
 	OnMatrixUpdateCallback m_matrixUpdate;
-
+	
 	dgInt32 m_index;
 	dgInt32 m_uniqueID;
 	dgInt32 m_bodyGroupId;
@@ -269,7 +273,6 @@ class dgBody
 	dgInt32 m_type;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_genericLRUMark;
-
 
 	friend class dgWorld;
 	friend class dgContact;
@@ -434,7 +437,6 @@ DG_INLINE dgInt32 dgBody::GetUniqueID () const
 	return m_uniqueID;
 }
 
-
 DG_INLINE void dgBody::SetDestructorCallback (OnBodyDestroy destructor)
 {
 	m_destructor = destructor;
@@ -445,7 +447,6 @@ DG_INLINE dgBody::OnBodyDestroy dgBody::GetDestructorCallback () const
 	return m_destructor;
 }
 
-
 DG_INLINE void dgBody::SetMatrixUpdateCallback (OnMatrixUpdateCallback callback)
 {
 	m_matrixUpdate = callback;
@@ -455,8 +456,6 @@ DG_INLINE dgBody::OnMatrixUpdateCallback dgBody::GetMatrixUpdateCallback () cons
 {
 	return m_matrixUpdate;
 }
-
-
 
 DG_INLINE dgCollisionInstance* dgBody::GetCollision () const
 {
@@ -487,6 +486,17 @@ DG_INLINE bool dgBody::GetFreeze () const
 {
 	return m_freeze;
 }
+
+DG_INLINE dgFloat32 dgBody::GetMaxRotationPerStep() const
+{
+	return dgSqrt (m_maxAngulaRotationPerSet2);
+}
+
+DG_INLINE void dgBody::SetMaxRotationPerStep(dgFloat32 angle)
+{
+	m_maxAngulaRotationPerSet2 = angle * angle;
+}
+
 
 DG_INLINE void dgBody::SetAutoSleep (bool state)
 {
@@ -553,7 +563,6 @@ DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 	m_globalCentreOfMass = m_matrix.TransformVector (m_localCentreOfMass);
 }
 
-
 DG_INLINE const dgVector& dgBody::GetNetForce() const
 {
 	return m_netForce; 
@@ -563,7 +572,6 @@ DG_INLINE const dgVector& dgBody::GetNetTorque() const
 {
 	return m_netTorque;
 }
-
 
 DG_INLINE void dgBody::SetBroadPhase(dgBroadPhaseNode* const node)
 {
@@ -604,6 +612,8 @@ DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const
 {
 	return NULL;
 }
+
+
 
 #endif 
 
