@@ -202,7 +202,8 @@ class CustomVehicleController: public CustomControllerBase
 
 			dFloat m_crownGearRatio;
 			dFloat m_peakPowerTorque;
-			dFloat m_engineIdleViscuosDrag;
+			dFloat m_engineIdleDryDrag;
+			dFloat m_engineIdleViscousDrag;
 			friend class BodyPartEngine;
 		};
 

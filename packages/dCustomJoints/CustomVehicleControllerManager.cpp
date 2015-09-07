@@ -118,15 +118,35 @@ dFloat CustomVehicleController::dInterpolationCurve::GetValue(dFloat param) cons
 class CustomVehicleController::BodyPartEngine::EngineJoint: public CustomHinge
 {
 	public:
-	EngineJoint (const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassis)
+	EngineJoint (const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassis, dFloat dryResistance)
 		:CustomHinge (pinAndPivotFrame, engineBody, chassis)
+		,m_dryResistance(dryResistance)
 	{
+		//m_dryResistance *= 10.0f;
 	}
 
 	void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 	{
+		dVector omega0;
+		dVector omega1;
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+		dVector relOmega(omega0 - omega1);
+		dFloat omega = relOmega % matrix1.m_front;
 
+		if (dAbs (omega) < 0.25f) {
+			dVector drag(0.7f, 0.7f, 0.7f, 0.0f);
+			NewtonBodySetAngularDamping(m_body0, &drag[0]);
+		} else {
+			dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
+			NewtonBodySetAngularDamping(m_body0, &drag[0]);
+			NewtonUserJointAddAngularRow(m_joint, -omega / timestep, &matrix1.m_front[0]);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_dryResistance);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_dryResistance);
+		}
 	}
+
+	dFloat m_dryResistance;
 };
 
 class CustomVehicleController::BodyPartTire::WheelJoint: public CustomJoint
@@ -565,7 +585,7 @@ matrix.m_posit.m_y += 0.75f;
 
 	InitEngineTorqueCurve(differential);
 
-	EngineJoint* const joint = new EngineJoint(matrix, m_body, chassis->GetBody());
+	EngineJoint* const joint = new EngineJoint(matrix, m_body, chassis->GetBody(), m_data.m_engineIdleDryDrag);
 	m_joint = joint;
 }
 
@@ -672,13 +692,16 @@ void CustomVehicleController::BodyPartEngine::InitEngineTorqueCurve(BodyPartDiff
 //	m_radiansPerSecundsAtRedLine = rpsTable[4];
 //	m_engineInternalFriction = torqueTable[2] / (m_radiansPerSecundsAtRedLine * 4.0f);
 //	m_engineIdleResistance1 = torqueTable[2] / (m_radiansPerSecundsAtRedLine * 2.0f);
+	
+
+	m_data.m_engineIdleDryDrag = dMin (torqueTable[0], torqueTable[4]) * 0.75f;
 
 	dFloat W = rpsTable[4];
-	dFloat T = m_torqueRPMCurve.GetValue(W);
+	dFloat T = m_torqueRPMCurve.GetValue(W) - m_data.m_engineIdleDryDrag;
 
-	m_data.m_engineIdleViscuosDrag = T / (W * W);
-	if (m_data.m_engineIdleViscuosDrag < 1.0e-4f) {
-		m_data.m_engineIdleViscuosDrag = 1.0e-4f;
+	m_data.m_engineIdleViscousDrag = T / (W * W);
+	if (m_data.m_engineIdleViscousDrag < 1.0e-4f) {
+		m_data.m_engineIdleViscousDrag = 1.0e-4f;
 	}
 
 //	m_gearBox->SetOptimalShiftLimits(rpsTable[2] / rpsTable[4], rpsTable[3] / rpsTable[4]);
@@ -729,13 +752,11 @@ void CustomVehicleController::BodyPartEngine::Update(dFloat timestep, dFloat gas
 
 	dFloat W = (omega % matrix.m_front);
 	dFloat T = m_torqueRPMCurve.GetValue(W) * gasVal;
-	dFloat d = m_data.m_engineIdleViscuosDrag;
-
-//T = 100;
+	dFloat d = m_data.m_engineIdleViscousDrag;
 
 	dFloat torqueMag = T - d * W * W;
 
-dTrace (("%f %f %f\n", W, T, torqueMag));
+//dTrace (("%f %f %f\n", W, T, torqueMag));
 
 	dVector torque (matrix.m_front.Scale (torqueMag));
 	NewtonBodyAddTorque(engine, &torque[0]);
