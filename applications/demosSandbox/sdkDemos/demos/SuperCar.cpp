@@ -1432,7 +1432,7 @@ void SuperCar (DemoEntityManager* const scene)
 	//manager->AddCones (scene);
 
 	dFloat u = 1.0f;
-	for (int i = 0; i < 1; i ++) {
+	for (int i = 0; i < 100; i ++) {
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;

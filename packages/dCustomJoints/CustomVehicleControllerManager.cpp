@@ -122,7 +122,7 @@ class CustomVehicleController::BodyPartEngine::EngineJoint: public CustomHinge
 		:CustomHinge (pinAndPivotFrame, engineBody, chassis)
 		,m_dryResistance(dryResistance)
 	{
-		//m_dryResistance *= 10.0f;
+		m_dryResistance *= 2.0f;
 	}
 
 	void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
@@ -567,9 +567,11 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine(BodyPartChassis* const c
 
 	dMatrix matrix(dGetIdentityMatrix());
 	NewtonBodyGetMatrix(m_controller->GetBody(), &matrix[0][0]);
-	matrix = dYawMatrix (-3.141592f * 0.5f) * m_controller->m_localFrame * matrix;
-matrix.m_posit.m_x += 1.0f;
-matrix.m_posit.m_y += 0.75f;
+	dMatrix offset(dYawMatrix (-3.141592f * 0.5f));
+offset.m_posit.m_x += 1.0f;
+offset.m_posit.m_y += 0.75f;
+
+	matrix = offset * m_controller->m_localFrame * matrix;
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
 
