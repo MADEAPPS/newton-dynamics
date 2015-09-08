@@ -876,6 +876,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 				dgFloat32 accel = container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
+//dgTrace (("%f\n", accNorm));
 		}
 
 		if (timestepRK != dgFloat32 (0.0f)) {

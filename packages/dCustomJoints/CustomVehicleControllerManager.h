@@ -52,14 +52,19 @@ class CustomJoint;
 class CustomVehicleController: public CustomControllerBase
 {
 	public:
+	class WheelJoint;
+	class EngineJoint;
+	class TransmissionJoint;
+	class DifferentialJoint;
 	class dWeightDistibutionSolver;
+	class DifferentialSpiderGearJoint;
 
 	class dInterpolationCurve
 	{
 		public:
 		class dNot
 		{
-		public:
+			public:
 			dFloat m_param;
 			dFloat m_value;
 		};
@@ -79,8 +84,6 @@ class CustomVehicleController: public CustomControllerBase
 		dNot m_nodes[6];
 		int m_count;
 	};
-
-
 	
 	class BodyPart: public CustomAlloc
 	{
@@ -132,7 +135,6 @@ class CustomVehicleController: public CustomControllerBase
 	class BodyPartTire: public BodyPart
 	{
 		public:
-		class WheelJoint;
 		class Info
 		{
 			public:
@@ -163,9 +165,6 @@ class CustomVehicleController: public CustomControllerBase
 	class BodyPartDifferential: public BodyPart
 	{
 		public:
-		class DifferentialJoint;
-		class DifferentialSpiderGearJoint;
-
 		BodyPartDifferential (BodyPartChassis* const chassis, const BodyPartTire* const leftTire, const BodyPartTire* const rightTire);
 		virtual ~BodyPartDifferential();
 		
@@ -180,7 +179,6 @@ class CustomVehicleController: public CustomControllerBase
 	class BodyPartEngine: public BodyPart
 	{
 		public:
-		class EngineJoint;
 		class Info
 		{
 			public:
@@ -219,8 +217,7 @@ class CustomVehicleController: public CustomControllerBase
 		void InitEngineTorqueCurve(BodyPartDifferential* const differential);
 		
 		Info m_data;
-		dFloat m_gear[10];
-		int m_gearCount;
+		TransmissionJoint* m_trasmission;
 		dInterpolationCurve m_torqueRPMCurve;
 	};
 
