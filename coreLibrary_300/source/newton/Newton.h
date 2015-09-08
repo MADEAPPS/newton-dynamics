@@ -894,6 +894,7 @@ extern "C" {
 
 	NEWTON_API void  NewtonBodySetMassProperties (const NewtonBody* const body, dFloat mass, const NewtonCollision* const collision);
 	NEWTON_API void  NewtonBodySetMatrix (const NewtonBody* const body, const dFloat* const matrix);
+	NEWTON_API void  NewtonBodySetMatrixNoSleep (const NewtonBody* const body, const dFloat* const matrix);
 	NEWTON_API void  NewtonBodySetMatrixRecursive (const NewtonBody* const body, const dFloat* const matrix);
 	
 	NEWTON_API void  NewtonBodySetMaterialGroupID (const NewtonBody* const body, int id);

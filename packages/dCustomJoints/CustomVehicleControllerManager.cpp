@@ -388,6 +388,11 @@ class CustomVehicleController::DifferentialJoint: public CustomJoint
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 		dVector relOmega(omega0 - omega1);
 
+dFloat angle1 = -CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+NewtonUserJointAddAngularRow(m_joint, -angle1, &matrix1.m_up[0]);
+
+
+
 		dFloat angle = -CalculateAngle(matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right);
 		dFloat omega = (relOmega % matrix1_1.m_right);
 		dFloat alphaError = -(angle + omega * timestep) / (timestep * timestep);
@@ -604,7 +609,7 @@ CustomVehicleController::BodyPartDifferential::BodyPartDifferential (BodyPartCha
 	dMatrix matrix(dGetIdentityMatrix());
 	NewtonBodyGetMatrix(m_controller->GetBody(), &matrix[0][0]);
 	matrix = m_controller->m_localFrame * matrix;
-//matrix.m_posit.m_y += 1.0f;
+matrix.m_posit.m_y += 1.0f;
 
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
@@ -1541,12 +1546,6 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 		if (ControlStateChanged()) {
 			NewtonBodySetSleepState(m_body, 0);
 		}
-/*
-		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-			BodyPartTire* const tire = &node->GetInfo();
-			BodyPartTire::WheelJoint* const joint = (BodyPartTire::WheelJoint*)tire->GetJoint();
-			joint->ApplySuspensionForce (timestep);
-		}
-*/		
+
 	}
 }

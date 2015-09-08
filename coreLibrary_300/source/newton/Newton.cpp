@@ -4974,13 +4974,6 @@ void NewtonBodySetMatrix(const NewtonBody* const bodyPtr, const dFloat* const ma
 	dgBody* const body = (dgBody *)bodyPtr;
 	dgMatrix matrix (matrixPtr);
 
-#ifdef _DEBUG
-//	matrix.m_front = matrix.m_front.Scale3 (dgRsqrt (matrix.m_front % matrix.m_front));
-//	matrix.m_right = matrix.m_front * matrix.m_up;
-//	matrix.m_right = matrix.m_right.Scale3 (dgRsqrt (matrix.m_right % matrix.m_right));
-//	matrix.m_up = matrix.m_right * matrix.m_front;
-#endif
-
 	matrix.m_front.m_w = dgFloat32 (0.0f);
 	matrix.m_up.m_w    = dgFloat32 (0.0f);
 	matrix.m_right.m_w = dgFloat32 (0.0f);
@@ -4988,6 +4981,18 @@ void NewtonBodySetMatrix(const NewtonBody* const bodyPtr, const dFloat* const ma
 	body->SetMatrixResetSleep (matrix); 
 }
 
+void NewtonBodySetMatrixNoSleep (const NewtonBody* const bodyPtr, const dFloat* const matrixPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	dgMatrix matrix(matrixPtr);
+
+	matrix.m_front.m_w = dgFloat32(0.0f);
+	matrix.m_up.m_w = dgFloat32(0.0f);
+	matrix.m_right.m_w = dgFloat32(0.0f);
+	matrix.m_posit.m_w = dgFloat32(1.0f);
+	body->SetMatrix(matrix);
+}
 
 // Name: NewtonBodySetMatrixRecursive 
 // Apply hierarchical transformation to a body.
