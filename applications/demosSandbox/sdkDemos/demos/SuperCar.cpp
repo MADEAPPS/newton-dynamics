@@ -364,9 +364,7 @@ class SuperCarEntity: public DemoEntity
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
-		// add a differential to link the two rear tires
-		CustomVehicleController::BodyPartDifferential* const differencial = m_controller->AddDifferential2WD(leftRearTire, rightRearTire);
-
+		// add the engine, differential and transmission 
 		CustomVehicleController::BodyPartEngine::Info engineInfo;
 		engineInfo.m_mass = VIPER_ENGINE_MASS; 
 		engineInfo.m_radio = VIPER_ENGINE_RADIO; 
@@ -380,11 +378,21 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_rpmAtReadLineTorque = VIPER_REDLINE_TORQUE_RPM;
 		engineInfo.m_idleTorque = VIPER_IDLE_TORQUE;
 		engineInfo.m_rpmAtIdleTorque = VIPER_IDLE_TORQUE_RPM;
-		
-		dFloat fowardSpeedGearsBoxRatios[] = {VIPER_TIRE_GEAR_1, VIPER_TIRE_GEAR_2, VIPER_TIRE_GEAR_3, VIPER_TIRE_GEAR_4, VIPER_TIRE_GEAR_5, VIPER_TIRE_GEAR_6};
-		int gearsCount = int (sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]));
-		CustomVehicleController::BodyPartEngine* const engine = m_controller->AddEngine (engineInfo, differencial, gearsCount, fowardSpeedGearsBoxRatios, VIPER_TIRE_REVERSE_GEAR);
 
+		engineInfo.m_gearsCount = 6;
+		engineInfo.m_gearRatios[0] = VIPER_TIRE_GEAR_1;
+		engineInfo.m_gearRatios[1] = VIPER_TIRE_GEAR_2;
+		engineInfo.m_gearRatios[2] = VIPER_TIRE_GEAR_3;
+		engineInfo.m_gearRatios[3] = VIPER_TIRE_GEAR_4;
+		engineInfo.m_gearRatios[4] = VIPER_TIRE_GEAR_5;
+		engineInfo.m_gearRatios[5] = VIPER_TIRE_GEAR_6;
+		engineInfo.m_reverseGearRatio = VIPER_TIRE_REVERSE_GEAR;
+
+		engineInfo.m_leftTire = leftRearTire;
+		engineInfo.m_rightTire = rightRearTire;
+		engineInfo.m_userData = this;
+
+		CustomVehicleController::BodyPartEngine* const engine = m_controller->AddEngine (engineInfo);
 		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engine);
 
 		// the the default transmission type
