@@ -61,6 +61,7 @@ class dgDynamicBody : public dgBody
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const;
 
 	virtual void InvalidateCache();
+	virtual void SetMatrixNoSleep(const dgMatrix& matrix);
 	virtual void SetMatrixResetSleep(const dgMatrix& matrix);
 
 	virtual bool IsInEquilibrium () const;

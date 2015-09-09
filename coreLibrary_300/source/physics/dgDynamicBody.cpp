@@ -111,6 +111,12 @@ void dgDynamicBody::SetMatrixResetSleep(const dgMatrix& matrix)
 	CalcInvInertiaMatrix();
 }
 
+void dgDynamicBody::SetMatrixNoSleep(const dgMatrix& matrix)
+{
+	dgBody::SetMatrixNoSleep(matrix);
+	CalcInvInertiaMatrix();
+}
+
 
 void dgDynamicBody::AttachCollision (dgCollisionInstance* const collision)
 {
