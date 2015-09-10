@@ -215,6 +215,9 @@ class CustomVehicleController: public CustomControllerBase
 
 		Info m_data;
 		dInterpolationCurve m_torqueRPMCurve;
+		DifferentialSpiderGearJoint* m_leftGear;
+		DifferentialSpiderGearJoint* m_rigntGear;
+
 	};
 
 	class Controller: public CustomAlloc

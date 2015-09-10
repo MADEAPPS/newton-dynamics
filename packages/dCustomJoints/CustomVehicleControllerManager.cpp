@@ -344,6 +344,7 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 	DifferentialSpiderGearJoint(NewtonBody* const tire, NewtonBody* const diff, EngineJoint* const diffJoint)
 		:CustomJoint(2, tire, diff)
 		,m_diffJoint(diffJoint)
+		,m_gearGain(0.0f)
 	{
 		dMatrix diffMatrix;
 		dMatrix tireMatrix;
@@ -384,17 +385,18 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 
 		tireOmega -= chassisOmega;
 		diffOmega -= chassisOmega;
-		dVector tireDist (tireMatrix.m_up.Scale (1.0f));
-		dVector diffDist (diffMatrix.RotateVector(m_ankle));
 
-		tirePivotVeloc = tireOmega * tireDist;
-		diffPivotVeloc = diffOmega * diffDist;
+		dVector diffPivot (diffMatrix.RotateVector(m_ankle));
+		dVector tirePivot (tireMatrix.m_up.Scale (m_gearGain));
+
+		tirePivotVeloc = tireOmega * tirePivot;
+		diffPivotVeloc = diffOmega * diffPivot;
 
 		dVector tireDir (tireMatrix.RotateVector(m_localMatrix0.m_front).Scale (-1.0f));
 		dVector diffDir (diffMatrix.RotateVector(m_localMatrix1.m_front));
 
-		dVector tire_r0(tireDist * tireDir);
-		dVector diff_r1(diffDist * diffDir);
+		dVector tire_r0(tirePivot * tireDir);
+		dVector diff_r1(diffPivot * diffDir);
 
 		dFloat jacobian0[6];
 		dFloat jacobian1[6];
@@ -414,7 +416,6 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 
 		dFloat relSpeed = tirePivotVeloc % tireDir + diffPivotVeloc % diffDir;
 
-
 //dTrace(("(%f  %f %f) ", relSpeed, tirePivotVeloc % tireDir, diffPivotVeloc % diffDir));
 //dTrace (("(%f %f)  ", m_diffJoint->GetJointOmega_0(), m_diffJoint->GetJointOmega_1()));
 
@@ -432,12 +433,15 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 		NewtonUserJointSetRowAcceleration(m_joint, -relSpeed / timestep);
 	}
 
+	void SetGain (dFloat gain)
+	{
+		m_gearGain = gain;
+	}
+
 	EngineJoint* m_diffJoint;
 	dVector m_ankle; 
+	dFloat m_gearGain;
 };
-
-
-
 
 CustomVehicleController::BodyPartTire::BodyPartTire()
 	:BodyPart()
@@ -447,7 +451,6 @@ CustomVehicleController::BodyPartTire::BodyPartTire()
 CustomVehicleController::BodyPartTire::~BodyPartTire()
 {
 }
-
 
 void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, const dMatrix& locationInGlobaSpase, const Info& info)
 {
@@ -543,8 +546,8 @@ offset.m_posit.m_y += 1.0f;
 	EngineJoint* const joint = new EngineJoint(m_body, m_parent->GetBody(), m_data.m_engineIdleDryDrag);
 	m_joint = joint;
 
-	new DifferentialSpiderGearJoint (m_data.m_rightTire->GetBody(), m_body, joint);
-	new DifferentialSpiderGearJoint (m_data.m_leftTire->GetBody(), m_body, joint);
+	m_leftGear = new DifferentialSpiderGearJoint (m_data.m_leftTire->GetBody(), m_body, joint);
+	m_rigntGear = new DifferentialSpiderGearJoint (m_data.m_rightTire->GetBody(), m_body, joint);
 }
 
 CustomVehicleController::BodyPartEngine::~BodyPartEngine()
@@ -686,6 +689,9 @@ void CustomVehicleController::BodyPartEngine::Update(dFloat timestep, dFloat gas
 {
 	dVector omega;
 	dMatrix matrix;
+
+	m_leftGear->SetGain (m_data.m_gearRatios[2]);
+	m_rigntGear->SetGain (m_data.m_gearRatios[2]);
 
 	EngineJoint* const joint = (EngineJoint*)GetJoint();
 	NewtonBody* const engine = joint->GetBody0();

@@ -159,12 +159,23 @@ class NewtonDemosApp: public wxApp
 {
 	virtual bool OnInit()
 	{
+		if (!wxApp::OnInit())
+			return false;
+
+
 		// check for memory leaks
 		#if defined(_DEBUG) && defined(_MSC_VER)
 			// Track all memory leaks at the operating system level.
 			// make sure no Newton tool or utility leaves leaks behind.
 			_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF));
 		#endif
+
+//		wxJoystick stick(wxJOYSTICK1);
+//		if (!stick.IsOk()) {
+//			wxMessageBox(wxT("No joystick detected!"));
+//			return false;
+//		}
+
 
 		// Set the memory allocation function before creation the newton world
 		// this is the only function that can be called before the creation of the newton world.
