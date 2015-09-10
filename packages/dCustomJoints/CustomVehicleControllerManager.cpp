@@ -515,7 +515,7 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController
 
 	dMatrix matrix;
 	dMatrix offset (dYawMatrix (0.5f * 3.14159213f) * m_controller->m_localFrame);
-offset.m_posit.m_y += 1.0f;
+//offset.m_posit.m_y += 1.0f;
 //offset.m_posit.m_x -= 2.0f;
 
 	NewtonBodyGetMatrix(m_controller->GetBody(), &matrix[0][0]);
