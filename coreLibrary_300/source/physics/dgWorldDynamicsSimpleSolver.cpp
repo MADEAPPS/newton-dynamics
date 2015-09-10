@@ -862,21 +862,20 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		}
 
 		dgFloat32 accNorm(maxAccNorm * dgFloat32(2.0f));
-
 		for (dgInt32 k = 0; (k < passes) && (accNorm > maxAccNorm); k++) {
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgJointInfo* const jointInfo = &constraintArray[i];
+				//const dgConstraint* const constraint = jointInfo->m_joint;
 				dgFloat32 accel = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
-//dgTrace (("%f\n", accNorm));
-		}
 
-		for (dgInt32 i = 0; i < skeletonCount; i++) {
-			dgSkeletonContainer* const container = skeletonArray[i];
-			dgFloat32 accel = container->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
-			accNorm = (accel > accNorm) ? accel : accNorm;
+			for (dgInt32 i = 0; i < skeletonCount; i++) {
+				dgSkeletonContainer* const container = skeletonArray[i];
+				dgFloat32 accel = container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
+				accNorm = (accel > accNorm) ? accel : accNorm;
+			}
 		}
 
 		if (timestepRK != dgFloat32 (0.0f)) {
@@ -961,8 +960,7 @@ void dgWorldDynamicUpdate::ApplyNetVelcAndOmega (dgDynamicBody* const body, cons
 		if (!body->m_resting) {
 			body->m_veloc += velocStep;
 			body->m_omega += omegaStep;
-		}
-		else {
+		} else {
 			dgVector velocStep2(velocStep.DotProduct4(velocStep));
 			dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
 			dgVector test((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2) | forceActiveMask);

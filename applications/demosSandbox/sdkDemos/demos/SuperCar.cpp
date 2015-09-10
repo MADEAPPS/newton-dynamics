@@ -1486,7 +1486,9 @@ location1 = dGetIdentityMatrix();
 	camMatrix.m_posit.m_x -= 5.0f;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
-//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	NewtonMaterialSetDefaultFriction (scene->GetNewton(), defaultMaterialID, defaultMaterialID, 0.9f, 0.9f);
+
 //	location.m_posit.m_z += 4.0f;
 
 //	int count = 1;
