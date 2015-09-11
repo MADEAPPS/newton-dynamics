@@ -19,16 +19,6 @@
 #include "TargaToOpenGl.h"
 
 
-int keyBoardTraceMode = 1;
-#ifdef RECORD_LOG
-	FILE * file;
-#else 
-	#ifdef READ_LOG
-		FILE * file;
-	#endif
-#endif
-
-
 #ifdef _MSC_VER
 #if (_MSC_VER < 1300) 
 		//VC7 or later, building with pre-VC7 runtime libraries
@@ -55,131 +45,13 @@ int keyBoardTraceMode = 1;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
-
+	
 static dMOUSE_POINT mouse0;
-
-
 
 void GetCursorPos(dMOUSE_POINT& point)
 {
 	point = mouse0;
-
-	if (keyBoardTraceMode){
-#ifdef RECORD_LOG
-		fwrite (& point, sizeof (dMOUSE_POINT), 1, file);
-		fflush (file);
-#endif
-
-#ifdef READ_LOG
-		fread (& point, sizeof (dMOUSE_POINT), 1, file);
-#endif
-	}
 }
-
-
-/*
-dMatrix GetModelViewMatrix ()
-{
-	GLdouble modelview[16]; 
-	glGetDoublev(GL_MODELVIEW_MATRIX, modelview); 
-	dMatrix camMatrix (GetIdentityMatrix());
-	for (int i = 0; i < 4; i ++) {
-		for (int j = 0; j < 4; j ++) {
-			camMatrix[i][j] = dFloat (modelview[i * 4 + j]);
-		}
-	}
-	return camMatrix;
-}
-
-dVector WorldToScreen (const dVector& world)
-{
-	dAssert (0);
-	int win[4]; 
-	GLint viewport[4]; 
-
-	//Retrieves the viewport and stores it in the variable
-	// get a point on the display arai of the windows
-	GLUI_Master.get_viewport_area(&win[0], &win[1], &win[2], &win[3]);
-	viewport[0] = GLint (win[0]);
-	viewport[1] = GLint (win[1]);
-	viewport[2] = GLint (win[2]);
-	viewport[3] = GLint (win[3]);
-
-
-	//Where the 16 doubles of the matrix are to be stored
-	GLdouble modelview[16]; 
-
-	//Retrieve the matrix
-	glGetDoublev(GL_MODELVIEW_MATRIX, modelview); 
-
-	GLdouble projection[16]; 
-	glGetDoublev(GL_PROJECTION_MATRIX, projection);
-
-	GLdouble winX;
-	GLdouble winY;
-	GLdouble winZ; //The coordinates to pass in
-
-	//Now windows coordinates start with (0,0) being at the top left 
-	//whereas OpenGL cords start lower left so we have to do this to convert it: 
-	//Remember we got viewport value before 
-	GLdouble objx = world.m_x;
-	GLdouble objy = world.m_y;
-	GLdouble objz = world.m_z;
-
-	// use the real GL view port
-	glGetIntegerv(GL_VIEWPORT, viewport); 
-	gluProject (objx, objy, objz, modelview, projection, viewport, &winX, &winY, &winZ);
-
-	winY = (dFloat)viewport[3] - winY; 
-
-	return dVector (dFloat(winX), dFloat (winY), dFloat(winZ), 0.0f);
-}
-
-
-dVector ScreenToWorld (const dVector& screen)
-{
-	//Where the values will be stored
-
-	GLint viewport[4]; 
-
-	//Retrieves the viewport and stores it in the variable
-	// get a point on the display array of the windows
-	glGetIntegerv(GL_VIEWPORT, viewport); 
-
-	//Where the 16 doubles of the matrix are to be stored
-
-	//Retrieve the matrix
-	GLdouble modelview[16]; 
-	glGetDoublev(GL_MODELVIEW_MATRIX, modelview); 
-
-	GLdouble projection[16]; 
-	glGetDoublev(GL_PROJECTION_MATRIX, projection);
-
-	GLdouble winX = 0.0;
-	GLdouble winY = 0.0;
-	GLdouble winZ = 0.0; //The coordinates to pass in
-
-	winX = screen.m_x; //Store the x cord
-	winY = screen.m_y; //Store the y cord
-	winZ = screen.m_z; //Store the Z cord
-
-	//Now windows coordinates start with (0,0) being at the top left 
-	//whereas OpenGL cords start lower left so we have to do this to convert it: 
-	//Remember we got viewport value before 
-	winY = (dFloat)viewport[3] - winY; 
-
-	GLdouble objx;
-	GLdouble objy;
-	GLdouble objz;
-
-	// use the real GL view port
-	glGetIntegerv(GL_VIEWPORT, viewport); 
-	gluUnProject (winX, winY, winZ, modelview, projection, viewport, &objx, &objy, &objz);
-
-	return dVector (dFloat(objx), dFloat(objy), dFloat(objz));
-}
-*/
 
 void ShowMousePicking (const dVector& p0, const dVector& p1, const dVector& originColor, const dVector& lineColor)
 {

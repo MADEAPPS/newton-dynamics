@@ -13,7 +13,6 @@
 #define __DEMO_ENTITY_MANAGER_H__
 
 #include "DemoMesh.h"
-#include "dRuntimeProfiler.h"
 #include "DemoSoundListener.h"
 #include "DemoEntityListener.h"
 #include "DemoListenerBase.h"

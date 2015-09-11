@@ -20,36 +20,16 @@
 
 #include <toolbox_stdafx.h>
 
-
-//#define RECORD_LOG
-//#define READ_LOG
-
-
-
-
-
-
 struct dMOUSE_POINT
 {
 	int x;
 	int y;
 };
 
-
-//dMatrix GetModelViewMatrix ();
-//dVector ScreenToWorld (const dVector& screen);
-//dVector WorldToScreen (const dVector& world);
-
 void ShowMousePicking (const dVector& p0, const dVector& p1, const dVector& originColor = dVector (1.0f, 1.0f, 0.0f, 0.0f), const dVector& lineColor =  dVector (1.0f, 1.0f, 1.0f, 0.0f)); 
-
-
 void HandleResize(int width, int height);
 int dGetKeyState(int key);
 void GetCursorPos(dMOUSE_POINT& point);
-
-
-
-
 
 #endif 
 

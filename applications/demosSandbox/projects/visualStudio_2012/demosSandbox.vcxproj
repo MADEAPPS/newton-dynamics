@@ -262,7 +262,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\DebugDisplay.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.cpp" />
-    <ClCompile Include="..\..\sdkDemos\toolBox\dRuntimeProfiler.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\dSoundManager.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\MousePick.cpp" />
@@ -305,7 +304,6 @@
     <ClInclude Include="..\..\sdkDemos\DemoVisualDebugerListener.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.h" />
-    <ClInclude Include="..\..\sdkDemos\toolBox\dRuntimeProfiler.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\dSoundManager.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\MousePick.h" />
