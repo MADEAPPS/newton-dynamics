@@ -228,17 +228,17 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 class CustomVehicleController::EngineJoint: public CustomJoint
 {
 	public:
-	EngineJoint(NewtonBody* const diff, NewtonBody* const chassis, dFloat dryResistance)
-		:CustomJoint(6, diff, chassis)
+	EngineJoint(NewtonBody* const engine, NewtonBody* const chassis, dFloat dryResistance)
+		:CustomJoint(6, engine, chassis)
 		,m_baseMatrix(dGetIdentityMatrix())
 		,m_dryResistance(dryResistance)
 	{
-		dMatrix diffMatrix;
+		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
-		NewtonBodyGetMatrix(diff, &diffMatrix[0][0]);
+		NewtonBodyGetMatrix(engine, &engineMatrix[0][0]);
 		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
-		CalculateLocalMatrix(diffMatrix, m_localMatrix0, m_localMatrix1);
-		m_baseMatrix = diffMatrix * chassisMatrix.Inverse();
+		CalculateLocalMatrix(engineMatrix, m_localMatrix0, m_localMatrix1);
+		m_baseMatrix = engineMatrix * chassisMatrix.Inverse();
 		ResetMatrix();
 
 		m_dryResistance *= 2.0f;
@@ -289,10 +289,17 @@ class CustomVehicleController::EngineJoint: public CustomJoint
 		} else {
 			dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
 			NewtonBodySetAngularDamping(m_body0, &drag[0]);
-			NewtonUserJointAddAngularRow(m_joint, -longOmega / timestep, &matrix1.m_front[0]);
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, -longOmega / timestep);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_dryResistance);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_dryResistance);
 		}
+
+//NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+//NewtonUserJointSetRowAcceleration(m_joint, -longOmega / timestep);
+//NewtonUserJointSetRowMinimumFriction(m_joint, -m_dryResistance * 10);
+//NewtonUserJointSetRowMaximumFriction(m_joint, m_dryResistance * 10);
+
 
 /*
 dMatrix m0;
@@ -341,24 +348,25 @@ dTrace(("%f %f", angle0, angle1));
 class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 {
 	public:
-	DifferentialSpiderGearJoint(NewtonBody* const tire, NewtonBody* const diff, EngineJoint* const diffJoint)
-		:CustomJoint(2, tire, diff)
-		,m_diffJoint(diffJoint)
+	DifferentialSpiderGearJoint(NewtonBody* const tire, NewtonBody* const engine, EngineJoint* const engineJoint)
+		:CustomJoint(2, tire, engine)
+		,m_engineJoint(engineJoint)
 		,m_gearGain(0.0f)
 	{
-		dMatrix diffMatrix;
 		dMatrix tireMatrix;
+		dMatrix engineMatrix;
 
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-		NewtonBodyGetMatrix(diff, &diffMatrix[0][0]);
+		NewtonBodyGetMatrix(engine, &engineMatrix[0][0]);
 
-		dMatrix align (dYawMatrix (-0.5f * 3.1415925f));
-		dMatrix tireMatrixPivot (align * diffMatrix);
+		dMatrix align (dYawMatrix (0.5f * 3.1415925f));
+		dMatrix tireMatrixPivot (align * engineMatrix);
+		tireMatrixPivot.m_posit = tireMatrix.m_posit;
 		m_localMatrix0 = tireMatrixPivot * tireMatrix.Inverse();
 
-		m_localMatrix1 = align;
-		m_ankle = dVector (-dSign((tireMatrix.m_posit - diffMatrix.m_posit) % diffMatrix[0]), 1.0f, 0.0f, 1.0f);
-//m_ankle.m_x = 0;
+		tireMatrixPivot.m_posit = engineMatrix.m_posit;
+		m_localMatrix1 = tireMatrixPivot * engineMatrix.Inverse();
+		m_engineAnkle = dVector (dSign((tireMatrix.m_posit - engineMatrix.m_posit) % engineMatrix[0]), 1.0f, 0.0f, 1.0f);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -369,34 +377,34 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 
 		// Get the global matrices of each rigid body.
 		dMatrix tireMatrix;
-		dMatrix diffMatrix(m_diffJoint->GetBaseMatrix());
+		dMatrix engineMatrix(m_engineJoint->GetBaseMatrix());
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
 
 		// calculate the pivot points
 		dVector tireOmega;
-		dVector diffOmega;
+		dVector engineOmega;
 		dVector chassisOmega;
 		dVector tirePivotVeloc;
-		dVector diffPivotVeloc;
+		dVector enginePivotVeloc;
 		
 		NewtonBodyGetOmega(tire, &tireOmega[0]);
-		NewtonBodyGetOmega(diff, &diffOmega[0]);
-		NewtonBodyGetOmega(m_diffJoint->GetBody1(), &chassisOmega[0]);
+		NewtonBodyGetOmega(diff, &engineOmega[0]);
+		NewtonBodyGetOmega(m_engineJoint->GetBody1(), &chassisOmega[0]);
 
 		tireOmega -= chassisOmega;
-		diffOmega -= chassisOmega;
-
-		dVector diffPivot (diffMatrix.RotateVector(m_ankle));
+		engineOmega -= chassisOmega;
+		
 		dVector tirePivot (tireMatrix.m_up.Scale (m_gearGain));
+		dVector enginePivot (engineMatrix.RotateVector(m_engineAnkle));
 
 		tirePivotVeloc = tireOmega * tirePivot;
-		diffPivotVeloc = diffOmega * diffPivot;
+		enginePivotVeloc = engineOmega * enginePivot;
 
-		dVector tireDir (tireMatrix.RotateVector(m_localMatrix0.m_front).Scale (-1.0f));
-		dVector diffDir (diffMatrix.RotateVector(m_localMatrix1.m_front));
+		dVector tireDir (tireMatrix.RotateVector(m_localMatrix0.m_front).Scale (1.0f));
+		dVector diffDir (engineMatrix.RotateVector(m_localMatrix1.m_front));
 
 		dVector tire_r0(tirePivot * tireDir);
-		dVector diff_r1(diffPivot * diffDir);
+		dVector diff_r1(enginePivot * diffDir);
 
 		dFloat jacobian0[6];
 		dFloat jacobian1[6];
@@ -414,7 +422,7 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 		jacobian1[4] = diff_r1[1];
 		jacobian1[5] = diff_r1[2];
 
-		dFloat relSpeed = tirePivotVeloc % tireDir + diffPivotVeloc % diffDir;
+		dFloat relSpeed = tirePivotVeloc % tireDir + enginePivotVeloc % diffDir;
 
 //dTrace(("(%f  %f %f) ", relSpeed, tirePivotVeloc % tireDir, diffPivotVeloc % diffDir));
 //dTrace (("(%f %f)  ", m_diffJoint->GetJointOmega_0(), m_diffJoint->GetJointOmega_1()));
@@ -438,8 +446,8 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 		m_gearGain = gain;
 	}
 
-	EngineJoint* m_diffJoint;
-	dVector m_ankle; 
+	EngineJoint* m_engineJoint;
+	dVector m_engineAnkle; 
 	dFloat m_gearGain;
 };
 
@@ -514,7 +522,7 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController
 	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.2f, 0.2f, 0, NULL);
 
 	dMatrix matrix;
-	dMatrix offset (dYawMatrix (0.5f * 3.14159213f) * m_controller->m_localFrame);
+	dMatrix offset (dYawMatrix (-0.5f * 3.14159213f) * m_controller->m_localFrame);
 //offset.m_posit.m_y += 1.0f;
 //offset.m_posit.m_x -= 2.0f;
 
@@ -643,11 +651,11 @@ void CustomVehicleController::BodyPartEngine::InitEngineTorqueCurve()
 	const int count = sizeof (rpsTable) / sizeof (rpsTable[0]);
 	for (int i = 0; i < count; i++) {
 		rpsTable[i] /= m_data.m_crownGearRatio;
-		torqueTable[i] *= m_data.m_crownGearRatio * 1.0f;
+		torqueTable[i] *= m_data.m_crownGearRatio;
 	}
 
 	m_torqueRPMCurve.InitalizeCurve(sizeof (rpsTable) / sizeof (rpsTable[0]), rpsTable, torqueTable);
-	m_data.m_engineIdleDryDrag = dMin (torqueTable[0], torqueTable[4]) * 0.75f;
+	m_data.m_engineIdleDryDrag = dMin (torqueTable[0], torqueTable[4]) * 0.5f;
 
 	dFloat W = rpsTable[4];
 	dFloat T = m_torqueRPMCurve.GetValue(W) - m_data.m_engineIdleDryDrag;

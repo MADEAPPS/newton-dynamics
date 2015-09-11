@@ -326,7 +326,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_showContactPoints = true;
 //m_hardwareDevice = 2;
 //m_showStatistics = true;
-//m_debugDisplayMode = 2;
+m_debugDisplayMode = 2;
 
 
 	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));

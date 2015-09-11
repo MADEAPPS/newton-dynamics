@@ -43,7 +43,7 @@
 #define VIPER_ENGINE_MASS					200.0f
 #define VIPER_ENGINE_RADIO					0.5f
 
-#define VIPER_IDLE_TORQUE					1200.0f
+#define VIPER_IDLE_TORQUE					220.0f
 #define VIPER_IDLE_TORQUE_RPM				500.0f
 
 #define VIPER_PEAK_TORQUE					490.0f
@@ -52,7 +52,7 @@
 #define VIPER_PEAK_HP						450.0f
 #define VIPER_PEAK_HP_RPM					5200.0f
 
-#define VIPER_REDLINE_TORQUE				30.0f
+#define VIPER_REDLINE_TORQUE				100.0f
 #define VIPER_REDLINE_TORQUE_RPM			6000.0f
 
 #define VIPER_MASS							3000.0f
