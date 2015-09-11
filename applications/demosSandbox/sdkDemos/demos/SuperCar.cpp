@@ -898,8 +898,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 {
 	public:
 
-	SuperCarVehicleControllerManager (NewtonWorld* const world)
-		:CustomVehicleControllerManager (world)
+	SuperCarVehicleControllerManager (NewtonWorld* const world, int materialCount, int* const otherMaterials)
+		:CustomVehicleControllerManager (world, materialCount, otherMaterials)
 		,m_externalView(true)
 		,m_player (NULL) 
 		,m_soundsCount(0)
@@ -1432,8 +1432,18 @@ void SuperCar (DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 
+	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	int materialList[] = {defaulMaterial };
+
 	// create a vehicle controller manager
-	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world);
+	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world, 1, materialList);
+
+	// associate tire Material with the materials the vehicle tire need to collide realistically
+	// 
+
+
+//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+//	NewtonMaterialSetDefaultFriction(scene->GetNewton(), defaultMaterialID, defaultMaterialID, 0.9f, 0.9f);
 
 	// create a Bezier Spline path for AI car to drive
 	manager->CreatedrivingTestCourt (scene);
@@ -1486,16 +1496,13 @@ location1 = dGetIdentityMatrix();
 	camMatrix.m_posit.m_x -= 5.0f;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-	NewtonMaterialSetDefaultFriction (scene->GetNewton(), defaultMaterialID, defaultMaterialID, 0.9f, 0.9f);
-
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
 
 	int count = 1;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 //	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
 //	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

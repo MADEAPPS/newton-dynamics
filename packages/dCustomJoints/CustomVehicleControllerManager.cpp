@@ -475,6 +475,9 @@ void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, co
 	dMatrix matrix (dYawMatrix(0.5f * 3.1415927f* dir) * locationInGlobaSpase);
 	m_body = NewtonCreateDynamicBody(world, m_controller->m_tireCastShape, &matrix[0][0]);
 
+	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)m_controller->GetManager();
+	NewtonBodySetMaterialGroupID(m_body, manager->GetTireMaterial());
+
 	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
 	NewtonBodySetLinearDamping(m_body, 0);
 	NewtonBodySetAngularDamping(m_body, &drag[0]);
@@ -1048,9 +1051,14 @@ void CustomVehicleController::DrawSchematic (dFloat scale) const
 #endif
 
 
-CustomVehicleControllerManager::CustomVehicleControllerManager(NewtonWorld* const world)
+CustomVehicleControllerManager::CustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const otherMaterials)
 	:CustomControllerManager<CustomVehicleController> (world, VEHICLE_PLUGIN_NAME)
+	,m_tireMaterial(NewtonMaterialCreateGroupID(world))
 {
+	// create a tire material and associate with the material the vehicle new to collide 
+	for (int i = 0; i < materialCount; i ++) {
+		NewtonMaterialSetCollisionCallback(world, m_tireMaterial, otherMaterials[i], this, OnTireAABBOverlap, OnTireContactsProcess);
+	}
 }
 
 CustomVehicleControllerManager::~CustomVehicleControllerManager()
@@ -1063,7 +1071,31 @@ void CustomVehicleControllerManager::DestroyController(CustomVehicleController* 
 	CustomControllerManager<CustomVehicleController>::DestroyController(controller);
 }
 
+int CustomVehicleControllerManager::GetTireMaterial() const
+{
+	return m_tireMaterial;
+}
 
+void CustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep)
+{
+
+}
+
+int CustomVehicleControllerManager::OnTireAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
+{
+	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) NewtonMaterialGetMaterialPairUserData(material);
+	return manager->OnTireAABBOverlap(material, body0, body1);
+}
+
+void CustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+{
+	void* const contact = NewtonContactJointGetFirstContact(contactJoint);
+	if (contact) {
+		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+		CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) NewtonMaterialGetMaterialPairUserData(material);
+		manager->OnTireContactsProcess(contactJoint, timestep);
+	}
+}
 
 
 CustomVehicleController* CustomVehicleControllerManager::CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData)

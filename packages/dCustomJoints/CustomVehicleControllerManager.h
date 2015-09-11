@@ -399,17 +399,30 @@ class CustomVehicleController: public CustomControllerBase
 class CustomVehicleControllerManager: public CustomControllerManager<CustomVehicleController> 
 {
 	public:
-	CUSTOM_JOINTS_API CustomVehicleControllerManager(NewtonWorld* const world);
+	CUSTOM_JOINTS_API CustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const otherMaterials);
 	CUSTOM_JOINTS_API virtual ~CustomVehicleControllerManager();
 
 	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	CUSTOM_JOINTS_API virtual void DestroyController (CustomVehicleController* const controller);
 
+	CUSTOM_JOINTS_API int GetTireMaterial() const;
+
+	virtual int OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const tire, const NewtonBody* const otherBody) const
+	{
+		return true;
+	}
+
+	CUSTOM_JOINTS_API void OnTireContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep);
+
 //	CUSTOM_JOINTS_API void DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const;
 	protected:
 //	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
+
+	static void OnTireContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex);
+	static int OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
 	
+	int m_tireMaterial;
 	friend class CustomVehicleController;
 };
 
