@@ -43,10 +43,10 @@
 #define VIPER_ENGINE_MASS					200.0f
 #define VIPER_ENGINE_RADIO					0.5f
 
-#define VIPER_IDLE_TORQUE					220.0f
+#define VIPER_IDLE_TORQUE					500.0f
 #define VIPER_IDLE_TORQUE_RPM				500.0f
 
-#define VIPER_PEAK_TORQUE					490.0f
+#define VIPER_PEAK_TORQUE					590.0f
 #define VIPER_PEAK_TORQUE_RPM				3700.0f
 
 #define VIPER_PEAK_HP						450.0f
@@ -1489,12 +1489,13 @@ location1 = dGetIdentityMatrix();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	NewtonMaterialSetDefaultFriction (scene->GetNewton(), defaultMaterialID, defaultMaterialID, 0.9f, 0.9f);
 
-//	location.m_posit.m_z += 4.0f;
+	dMatrix location (camMatrix);
+	location.m_posit.m_z += 4.0f;
 
-//	int count = 1;
-//	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-//	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-//	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	int count = 1;
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 //	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
 //	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
