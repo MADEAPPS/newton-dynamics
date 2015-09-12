@@ -1499,7 +1499,7 @@ location1 = dGetIdentityMatrix();
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
 
-	int count = 1;
+	int count = 10;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
