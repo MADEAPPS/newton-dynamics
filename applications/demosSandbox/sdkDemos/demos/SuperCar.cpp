@@ -1442,8 +1442,8 @@ void SuperCar (DemoEntityManager* const scene)
 	// 
 
 
-//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
-//	NewtonMaterialSetDefaultFriction(scene->GetNewton(), defaultMaterialID, defaultMaterialID, 0.9f, 0.9f);
+//	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+//	NewtonMaterialSetDefaultFriction(scene->GetNewton(), defaulMaterial, defaulMaterial, 0.9f, 0.9f);
 
 	// create a Bezier Spline path for AI car to drive
 	manager->CreatedrivingTestCourt (scene);
@@ -1498,23 +1498,24 @@ location1 = dGetIdentityMatrix();
 
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
+	location.m_posit.m_x += 44.0f;
 
 	int count = 10;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
-//	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
-//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _CAPSULE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _CYLINDER_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _TAPERED_CAPSULE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _TAPERED_CYLINDER_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _CONE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
 
