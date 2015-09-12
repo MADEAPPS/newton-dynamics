@@ -200,10 +200,7 @@ class CustomVehicleController: public CustomControllerBase
 		BodyPartEngine ();
 		BodyPartEngine(CustomVehicleController* const controller, const Info& info);
 		virtual ~BodyPartEngine();
-		
-//		int GetTireCounty() const ;
-//		const BodyPartTire* GetTire(int index) const ;
-//		
+
 		void Update (dFloat timestep, dFloat gasVal);
 		dFloat GetRPM() const;
 		dFloat GetRedLineRPM() const;
@@ -383,7 +380,7 @@ class CustomVehicleController: public CustomControllerBase
 	
 	NewtonSkeletonContainer* m_skeleton;
 	void* m_collisionAggregate;
-	NewtonCollision* m_tireCastShape;
+	
 	BodyPartEngine* m_engine;
 	BrakeController* m_brakesControl;
 	EngineController* m_engineControl;
@@ -406,14 +403,10 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 	CUSTOM_JOINTS_API virtual CustomVehicleController* CreateVehicle (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	CUSTOM_JOINTS_API virtual void DestroyController (CustomVehicleController* const controller);
 
+	CUSTOM_JOINTS_API virtual int OnTireAABBOverlap(const NewtonMaterial* const material, const CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody) const;
+	CUSTOM_JOINTS_API virtual void OnTireContactsProcess (const NewtonJoint* const contactJoint, const CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody, dFloat timestep);
+
 	CUSTOM_JOINTS_API int GetTireMaterial() const;
-
-	virtual int OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const tire, const NewtonBody* const otherBody) const
-	{
-		return true;
-	}
-
-	CUSTOM_JOINTS_API void OnTireContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep);
 
 //	CUSTOM_JOINTS_API void DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const;
 	protected:
@@ -421,8 +414,11 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 
 	static void OnTireContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex);
 	static int OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
-	
+
+	const void* m_tireShapeTemplateData;
+	NewtonCollision* m_tireShapeTemplate;
 	int m_tireMaterial;
+
 	friend class CustomVehicleController;
 };
 
