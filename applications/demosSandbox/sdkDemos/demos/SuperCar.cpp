@@ -40,13 +40,16 @@
 // Reverse 2.90:1 
 
 // vehicle definition for a Muscle car
+#define VIPER_TIRE_MASS						40.0f  
 #define VIPER_ENGINE_MASS					200.0f
+#define VIPER_MASS							(3380.0f * 0.454f)
 #define VIPER_ENGINE_RADIO					0.5f
 
-#define VIPER_IDLE_TORQUE					500.0f
+#define VIPER_IDLE_TORQUE					350.0f
 #define VIPER_IDLE_TORQUE_RPM				500.0f
 
-#define VIPER_PEAK_TORQUE					590.0f
+// torque in pound per foot
+#define VIPER_PEAK_TORQUE					450.0f
 #define VIPER_PEAK_TORQUE_RPM				3700.0f
 
 #define VIPER_PEAK_HP						450.0f
@@ -55,11 +58,11 @@
 #define VIPER_REDLINE_TORQUE				100.0f
 #define VIPER_REDLINE_TORQUE_RPM			6000.0f
 
-#define VIPER_MASS							3000.0f
+
 #define VIPER_TIRE_STEER_ANGLE				35.0f
 
 
-#define VIPER_TIRE_MASS						40.0f  
+
 
 //#define VIPER_TIRE_TOP_SPEED				164 mile / hours
 #define VIPER_TIRE_TOP_SPEED_KMH			264.0f			 
@@ -70,7 +73,7 @@
 #define VIPER_TIRE_SUSPENSION_SPRING		150.0f
 #define VIPER_TIRE_SUSPENSION_DAMPER		5.0f
 #define VIPER_TIRE_SUSPENSION_LENGTH		0.20f
-#define VIPER_TIRE_BRAKE_TORQUE				5000.0f
+#define VIPER_TIRE_BRAKE_TORQUE				3000.0f
 
 #define VIPER_TIRE_GEAR_1					2.66f
 #define VIPER_TIRE_GEAR_2					1.78f
@@ -1450,7 +1453,7 @@ void SuperCar (DemoEntityManager* const scene)
 	//manager->AddCones (scene);
 
 	dFloat u = 1.0f;
-	for (int i = 0; i < 100; i ++) {
+	for (int i = 0; i < 1; i ++) {
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
@@ -1459,7 +1462,7 @@ void SuperCar (DemoEntityManager* const scene)
 		u -= 0.005f;
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
-//location1 = dGetIdentityMatrix();
+location1 = dGetIdentityMatrix();
 
 //		location1.m_posit += location1.m_right.Scale (-3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
@@ -1496,6 +1499,7 @@ void SuperCar (DemoEntityManager* const scene)
 	camMatrix.m_posit.m_x -= 5.0f;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
+/*
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
 	location.m_posit.m_x += 44.0f;
@@ -1518,6 +1522,6 @@ void SuperCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-
+*/
 }
 
