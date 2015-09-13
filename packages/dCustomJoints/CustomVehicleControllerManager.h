@@ -202,9 +202,13 @@ class CustomVehicleController: public CustomControllerBase
 		virtual ~BodyPartEngine();
 
 		void Update (dFloat timestep, dFloat gasVal);
+
 		dFloat GetRPM() const;
 		dFloat GetSpeed() const;
 		dFloat GetRedLineRPM() const;
+
+		DifferentialSpiderGearJoint* GetLeftGear () const {return m_leftGear;}
+		DifferentialSpiderGearJoint* GetRightGear () const {return m_rigntGear;}
 
 		protected:
 		dFloat GetTopGear() const;
@@ -293,9 +297,23 @@ class CustomVehicleController: public CustomControllerBase
 		virtual void Update(dFloat timestep);
 
 		dList<BodyPartTire*> m_tires;
-		dFloat m_brakeTorque;
+		dFloat m_maxTorque;
 		friend class CustomVehicleController;
 	};
+
+	class ClutchController: public Controller
+	{
+		public:
+		CUSTOM_JOINTS_API ClutchController(CustomVehicleController* const controller, BodyPartEngine* const engine, dFloat maxClutchTorque);
+		
+		protected:
+		virtual void Update(dFloat timestep);
+
+		BodyPartEngine* m_engine;
+		dFloat m_maxTorque;
+		friend class CustomVehicleController;
+	};
+
 
 	class EngineController: public Controller
 	{
@@ -306,9 +324,6 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API dFloat GetRPM() const;
 		CUSTOM_JOINTS_API dFloat GetRedLineRPM() const;
 		CUSTOM_JOINTS_API dFloat GetSpeed() const;
-
-		CUSTOM_JOINTS_API bool GetClutch() const;
-		CUSTOM_JOINTS_API void SetClutch(bool state);
 
 		protected:
 		virtual void Update(dFloat timestep);
@@ -354,11 +369,13 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetFirstBodyPart() const;
 	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetNextBodyPart(dList<BodyPart*>::dListNode* const part) const;
 
+	CUSTOM_JOINTS_API ClutchController* GetClutch() const;
 	CUSTOM_JOINTS_API BrakeController* GetBrakes() const;
 	CUSTOM_JOINTS_API EngineController* GetEngine() const;
 	CUSTOM_JOINTS_API BrakeController* GetHandBrakes() const;
 	CUSTOM_JOINTS_API SteeringController* GetSteering() const;
 	
+	CUSTOM_JOINTS_API void SetClutch(ClutchController* const cluth);
 	CUSTOM_JOINTS_API void SetBrakes(BrakeController* const brakes);
 	CUSTOM_JOINTS_API void SetHandBrakes(BrakeController* const brakes);
 	CUSTOM_JOINTS_API void SetSteering(SteeringController* const steering);
@@ -383,6 +400,7 @@ class CustomVehicleController: public CustomControllerBase
 	void* m_collisionAggregate;
 	
 	BodyPartEngine* m_engine;
+	ClutchController* m_cluthControl;
 	BrakeController* m_brakesControl;
 	EngineController* m_engineControl;
 	BrakeController* m_handBrakesControl;

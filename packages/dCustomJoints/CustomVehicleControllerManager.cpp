@@ -352,6 +352,7 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 	DifferentialSpiderGearJoint(NewtonBody* const tire, NewtonBody* const engine, EngineJoint* const engineJoint)
 		:CustomJoint(2, tire, engine)
 		,m_engineJoint(engineJoint)
+		,m_clutchTorque(D_CUSTOM_LARGE_VALUE)		
 		,m_gearGain(0.0f)
 	{
 		dMatrix tireMatrix;
@@ -432,14 +433,24 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 //fprintf(file_xxx, "%f, ", diffPivotVeloc % diffDir);
 //fflush(file_xxx);
 
+		
 		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
 		NewtonUserJointSetRowAcceleration(m_joint, -relSpeed / timestep);
+		if (m_clutchTorque < (D_CUSTOM_LARGE_VALUE * 0.1f)) {
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_clutchTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_clutchTorque);
+		}
+
 		for (int i = 0; i < 3; i ++) {
 			jacobian0[i] *= -1.0f;
 			jacobian1[i] *= -1.0f;
 		}
 		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
 		NewtonUserJointSetRowAcceleration(m_joint, -relSpeed / timestep);
+		if (m_clutchTorque < (D_CUSTOM_LARGE_VALUE * 0.1f)) {
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_clutchTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_clutchTorque);
+		}
 	}
 
 	void SetGain (dFloat gain)
@@ -447,9 +458,17 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 		m_gearGain = gain;
 	}
 
+	void SetClutch(dFloat torque)
+	{
+		m_clutchTorque = dClamp (torque, dFloat(0.1f), D_CUSTOM_LARGE_VALUE);
+	}
+
+
 	EngineJoint* m_engineJoint;
 	dVector m_engineAnkle; 
+	dFloat m_clutchTorque;
 	dFloat m_gearGain;
+	
 };
 
 CustomVehicleController::BodyPartTire::BodyPartTire()
@@ -802,7 +821,7 @@ void CustomVehicleController::SteeringController::AddTire (CustomVehicleControll
 
 CustomVehicleController::BrakeController::BrakeController(CustomVehicleController* const controller, dFloat maxBrakeTorque)
 	:Controller(controller)
-	,m_brakeTorque(maxBrakeTorque)
+	,m_maxTorque(maxBrakeTorque)
 {
 }
 
@@ -813,7 +832,7 @@ void CustomVehicleController::BrakeController::AddTire(BodyPartTire* const tire)
 
 void CustomVehicleController::BrakeController::Update(dFloat timestep)
 {
-	dFloat torque = m_brakeTorque * m_param;
+	dFloat torque = m_maxTorque * m_param;
 	for (dList<BodyPartTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
 		BodyPartTire& tire = *node->GetInfo();
 		tire.SetBrakeTorque (torque);
@@ -825,7 +844,6 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 	:Controller(controller)
 	,m_engine(engine)
 {
-
 }
 
 void CustomVehicleController::EngineController::Update(dFloat timestep)
@@ -853,17 +871,20 @@ dFloat CustomVehicleController::EngineController::GetSpeed() const
 	return m_engine->GetSpeed();
 }
 
-bool CustomVehicleController::EngineController::GetClutch() const
+
+CustomVehicleController::ClutchController::ClutchController(CustomVehicleController* const controller, BodyPartEngine* const engine, dFloat maxClutchTorque)
+	:Controller(controller)
+	,m_engine(engine)
+	,m_maxTorque(maxClutchTorque)
 {
-	return false;
 }
 
-void CustomVehicleController::EngineController::SetClutch(bool state)
+void CustomVehicleController::ClutchController::Update(dFloat timestep)
 {
-
+	dFloat torque = m_maxTorque * m_param;
+	m_engine->GetLeftGear()->SetClutch(torque);
+	m_engine->GetRightGear()->SetClutch(torque);
 }
-
-
 
 #if 0
 
@@ -1197,7 +1218,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	SetDryRollingFrictionTorque(100.0f / 4.0f);
 	SetAerodynamicsDownforceCoefficient(0.5f * dSqrt(gravityVector % gravityVector), 60.0f * 0.447f);
 */
-
+	m_cluthControl = NULL;
 	m_brakesControl = NULL;
 	m_engineControl = NULL;
 	m_handBrakesControl = NULL;
@@ -1215,6 +1236,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 
 void CustomVehicleController::Cleanup()
 {
+	SetClutch(NULL);
 	SetBrakes(NULL);
 	SetEngine(NULL);
 	SetSteering(NULL);
@@ -1232,6 +1254,10 @@ CustomVehicleController::EngineController* CustomVehicleController::GetEngine() 
 	return m_engineControl;
 }
 
+CustomVehicleController::ClutchController* CustomVehicleController::GetClutch() const
+{
+	return m_cluthControl;
+}
 
 CustomVehicleController::SteeringController* CustomVehicleController::GetSteering() const
 {
@@ -1255,6 +1281,15 @@ void CustomVehicleController::SetEngine(EngineController* const engineControl)
 	}
 	m_engineControl = engineControl;
 }
+
+void CustomVehicleController::SetClutch(ClutchController* const cluth)
+{
+	if (m_cluthControl) {
+		delete m_cluthControl;
+	}
+	m_cluthControl = cluth;
+}
+
 
 void CustomVehicleController::SetHandBrakes(BrakeController* const handBrakes)
 {
@@ -1464,6 +1499,10 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	if (m_finalized) {
 		if (m_engineControl) {
 			m_engineControl->Update(timestep);
+		}
+
+		if (m_cluthControl) {
+			m_cluthControl->Update(timestep);
 		}
 
 		if (m_steeringControl) {

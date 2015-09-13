@@ -65,7 +65,7 @@
 
 
 //#define VIPER_TIRE_TOP_SPEED				164 mile / hours
-#define VIPER_TIRE_TOP_SPEED_KMH			264.0f			 
+#define VIPER_TIRE_TOP_SPEED_KMH			264.0f
 
 #define VIPER_TIRE_LATERAL_STIFFNESS		20.0f
 #define VIPER_TIRE_LONGITUDINAL_STIFFNESS	10000.0f
@@ -74,6 +74,7 @@
 #define VIPER_TIRE_SUSPENSION_DAMPER		5.0f
 #define VIPER_TIRE_SUSPENSION_LENGTH		0.20f
 #define VIPER_TIRE_BRAKE_TORQUE				3000.0f
+#define VIPER_TIRE_CLUTCH_TORQUE			1000000.0f
 
 #define VIPER_TIRE_GEAR_1					2.66f
 #define VIPER_TIRE_GEAR_2					1.78f
@@ -372,7 +373,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_mass = VIPER_ENGINE_MASS; 
 		engineInfo.m_radio = VIPER_ENGINE_RADIO; 
 		engineInfo.m_vehicleTopSpeed = VIPER_TIRE_TOP_SPEED_KMH;
-
+	
 		engineInfo.m_peakTorque = VIPER_PEAK_TORQUE;
 		engineInfo.m_rpmAtPeakTorque = VIPER_PEAK_TORQUE_RPM;
 		engineInfo.m_peakHorsePower = VIPER_PEAK_HP;
@@ -402,6 +403,10 @@ class SuperCarEntity: public DemoEntity
 //		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
 
 		m_controller->SetEngine(engineControl);
+
+		// add clutch controller
+		CustomVehicleController::ClutchController* const clutch = new CustomVehicleController::ClutchController(m_controller, engine, VIPER_TIRE_CLUTCH_TORQUE);
+		m_controller->SetClutch(clutch);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
@@ -507,6 +512,7 @@ class SuperCarEntity: public DemoEntity
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
 		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
+		CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
 		CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
@@ -518,11 +524,12 @@ class SuperCarEntity: public DemoEntity
 
 //		int gear = engine ? engine->GetGear() : CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear;
 	int gear = 0;
+		dFloat cluthVal = 0.0f;
 		dFloat steeringVal = 0.0f;
 		dFloat brakePedal = 0.0f;
 		dFloat engineGasPedal = 0.0f;
 		dFloat handBrakePedal = 0.0f;
-		bool cluth = true;
+		
 	
 		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
 		if (hasJopytick) {
@@ -554,7 +561,7 @@ class SuperCarEntity: public DemoEntity
 				handBrakePedal = 1.0f;
 			}
 
-			cluth = mainWindow->GetKeyState (0x0d) ? false : true;
+			cluthVal = mainWindow->GetKeyState (0x0d) ? 0.0f : 1.0f;
 
 			// get the steering input
 			steeringVal = (dFloat (mainWindow->GetKeyState ('A')) - dFloat (mainWindow->GetKeyState ('D')));
@@ -650,8 +657,12 @@ steeringVal *= 0.3f;
 			}
 */
 			engine->SetParam(engineGasPedal);
-			engine->SetClutch(cluth);
 		}
+
+		if (clutch) {
+			clutch->SetParam(cluthVal);
+		}
+
 		
 		if (steering) {
 			steering->SetParam(steeringVal);
@@ -1499,7 +1510,7 @@ location1 = dGetIdentityMatrix();
 	camMatrix.m_posit.m_x -= 5.0f;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
-
+/*
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
 	location.m_posit.m_x += 44.0f;
@@ -1507,7 +1518,7 @@ location1 = dGetIdentityMatrix();
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
 	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
@@ -1522,6 +1533,6 @@ location1 = dGetIdentityMatrix();
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-
+*/
 }
 
