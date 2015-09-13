@@ -65,10 +65,6 @@ typedef long long unsigned64;
 	#include <GL/wglew.h>
 	#include <gl/gl.h>
 	#include <gl/glu.h>
-
-	// audio library support
-	#include <al/al.h>
-	#include <al/alc.h>
 #endif
 	
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64))

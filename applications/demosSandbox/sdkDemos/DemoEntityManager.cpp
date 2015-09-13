@@ -21,7 +21,6 @@
 #include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "DemoSoundListener.h"
 #include "DemoEntityListener.h"
 #include "DemoCameraListener.h"
 //#include "DemoVisualDebugerListener.h"
@@ -96,7 +95,6 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,m_renderHood(NULL)
 	,m_font(0)
 	,m_fontImage(0)
-	,m_soundManager(NULL)
 	,m_cameraManager(NULL)
     ,m_tranparentHeap()
 //	,m_visualDebugger(NULL)
@@ -176,7 +174,6 @@ void DemoEntityManager::Cleanup ()
 	//	m_preListenerManager.Append(new DemoVisualDebugerListener("visualDebuger", m_world));
 	new DemoEntityListener (this);
 	m_cameraManager = new DemoCameraListener(this);
-	m_soundManager = new DemoSoundListener(this);
 	//	m_postListenerManager.Append (new DemoAIListener("aiManager"));
 
 	// set the default parameters for the newton world

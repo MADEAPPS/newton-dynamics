@@ -236,7 +236,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp" />
-    <ClCompile Include="..\..\sdkDemos\DemoSoundListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp" />
@@ -262,7 +261,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\DebugDisplay.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.cpp" />
-    <ClCompile Include="..\..\sdkDemos\toolBox\dSoundManager.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\MousePick.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\OpenGlUtil.cpp" />
@@ -300,11 +298,9 @@
     <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h" />
-    <ClInclude Include="..\..\sdkDemos\DemoSoundListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoVisualDebugerListener.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.h" />
-    <ClInclude Include="..\..\sdkDemos\toolBox\dSoundManager.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\MousePick.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\OpenGlUtil.h" />
@@ -383,9 +379,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\glew\build\VS_2012_static_mt\glew.vcxproj">
       <Project>{0c9707f5-dec7-42eb-8ea1-a484df1e515b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\openAL\VS_2012_static_mt\openAL.vcxproj">
-      <Project>{9f1fac3f-ff22-41e0-825c-034802f5ea24}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2012_static_mt\tinyxml.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>

@@ -13,7 +13,6 @@
 #define __DEMO_ENTITY_MANAGER_H__
 
 #include "DemoMesh.h"
-#include "DemoSoundListener.h"
 #include "DemoEntityListener.h"
 #include "DemoListenerBase.h"
 #include "dHighResolutionTimer.h"
@@ -125,8 +124,6 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	void RemoveEntity (dList<DemoEntity*>::dListNode* const entNode);
 
 	void CreateSkyBox();
-	dSoundManager* GetSoundManager() const; 
-
 
 	static void SerializeFile (void* const serializeHandle, const void* const buffer, int size);
 	static void DeserializeFile (void* const serializeHandle, void* const buffer, int size);
@@ -163,7 +160,6 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	RenderHoodCallback m_renderHood;
 	GLuint m_font;
 	GLuint m_fontImage;
-	DemoSoundListener* m_soundManager;
 	DemoCameraListener* m_cameraManager;
 
     TransparentHeap m_tranparentHeap;
@@ -209,11 +205,6 @@ inline NewtonDemos* DemoEntityManager::GetRootWindow () const
 	return m_mainWindow;
 };
 
-
-inline dSoundManager* DemoEntityManager::GetSoundManager() const
-{
-	return m_soundManager;
-}
 
 inline int DemoEntityManager::GetWidth() const 
 { 

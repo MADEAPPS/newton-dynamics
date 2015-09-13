@@ -34,9 +34,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoMesh.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\toolBox\dSoundManager.cpp">
-      <Filter>tooBox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\toolBox\MousePick.cpp">
       <Filter>tooBox</Filter>
     </ClCompile>
@@ -121,9 +118,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp">
       <Filter>mainLogic\listeners</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoSoundListener.cpp">
-      <Filter>mainLogic\listeners</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp">
       <Filter>mainLogic\listeners</Filter>
     </ClCompile>
@@ -183,9 +177,6 @@
     <ClInclude Include="..\..\sdkDemos\DemoMesh.h">
       <Filter>mainLogic</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\toolBox\dSoundManager.h">
-      <Filter>tooBox</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\sdkDemos\toolBox\MousePick.h">
       <Filter>tooBox</Filter>
     </ClInclude>
@@ -220,9 +211,6 @@
       <Filter>mainLogic\listeners</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoVisualDebugerListener.h">
-      <Filter>mainLogic\listeners</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\DemoSoundListener.h">
       <Filter>mainLogic\listeners</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h">
