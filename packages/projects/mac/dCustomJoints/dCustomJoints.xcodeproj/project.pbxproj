@@ -39,12 +39,6 @@
 		FF8237CB17CA2209004C80D4 /* CustomInputManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8237C917CA2209004C80D4 /* CustomInputManager.h */; };
 		FF856C041753A0DC00324FDC /* CustomJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF856C031753A0DC00324FDC /* CustomJoint.h */; };
 		FF856C061753BDC300324FDC /* CustomRackAndPinion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF856C051753BDC300324FDC /* CustomRackAndPinion.cpp */; };
-		FF85949819684C7D00301498 /* CustomVehicleControllerBodyState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF85949219684C7D00301498 /* CustomVehicleControllerBodyState.cpp */; };
-		FF85949919684C7D00301498 /* CustomVehicleControllerBodyState.h in Headers */ = {isa = PBXBuildFile; fileRef = FF85949319684C7D00301498 /* CustomVehicleControllerBodyState.h */; };
-		FF85949A19684C7D00301498 /* CustomVehicleControllerComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF85949419684C7D00301498 /* CustomVehicleControllerComponent.cpp */; };
-		FF85949B19684C7D00301498 /* CustomVehicleControllerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = FF85949519684C7D00301498 /* CustomVehicleControllerComponent.h */; };
-		FF85949C19684C7D00301498 /* CustomVehicleControllerJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF85949619684C7D00301498 /* CustomVehicleControllerJoint.cpp */; };
-		FF85949D19684C7D00301498 /* CustomVehicleControllerJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = FF85949719684C7D00301498 /* CustomVehicleControllerJoint.h */; };
 		FFA78DB11789A8670056DE1C /* Custom6DOF.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78D9B1789A8670056DE1C /* Custom6DOF.h */; };
 		FFA78DB21789A8670056DE1C /* CustomBallAndSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78D9C1789A8670056DE1C /* CustomBallAndSocket.h */; };
 		FFA78DB31789A8670056DE1C /* CustomControllerManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA78D9D1789A8670056DE1C /* CustomControllerManager.h */; };
@@ -102,12 +96,6 @@
 		FF8237C917CA2209004C80D4 /* CustomInputManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomInputManager.h; path = ../../../dCustomJoints/CustomInputManager.h; sourceTree = "<group>"; };
 		FF856C031753A0DC00324FDC /* CustomJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomJoint.h; path = ../../../dCustomJoints/CustomJoint.h; sourceTree = "<group>"; };
 		FF856C051753BDC300324FDC /* CustomRackAndPinion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomRackAndPinion.cpp; path = ../../../dCustomJoints/CustomRackAndPinion.cpp; sourceTree = "<group>"; };
-		FF85949219684C7D00301498 /* CustomVehicleControllerBodyState.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomVehicleControllerBodyState.cpp; path = ../../../dCustomJoints/CustomVehicleControllerBodyState.cpp; sourceTree = "<group>"; };
-		FF85949319684C7D00301498 /* CustomVehicleControllerBodyState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomVehicleControllerBodyState.h; path = ../../../dCustomJoints/CustomVehicleControllerBodyState.h; sourceTree = "<group>"; };
-		FF85949419684C7D00301498 /* CustomVehicleControllerComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomVehicleControllerComponent.cpp; path = ../../../dCustomJoints/CustomVehicleControllerComponent.cpp; sourceTree = "<group>"; };
-		FF85949519684C7D00301498 /* CustomVehicleControllerComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomVehicleControllerComponent.h; path = ../../../dCustomJoints/CustomVehicleControllerComponent.h; sourceTree = "<group>"; };
-		FF85949619684C7D00301498 /* CustomVehicleControllerJoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomVehicleControllerJoint.cpp; path = ../../../dCustomJoints/CustomVehicleControllerJoint.cpp; sourceTree = "<group>"; };
-		FF85949719684C7D00301498 /* CustomVehicleControllerJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomVehicleControllerJoint.h; path = ../../../dCustomJoints/CustomVehicleControllerJoint.h; sourceTree = "<group>"; };
 		FFA78D9B1789A8670056DE1C /* Custom6DOF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Custom6DOF.h; path = ../../../dCustomJoints/Custom6DOF.h; sourceTree = "<group>"; };
 		FFA78D9C1789A8670056DE1C /* CustomBallAndSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomBallAndSocket.h; path = ../../../dCustomJoints/CustomBallAndSocket.h; sourceTree = "<group>"; };
 		FFA78D9D1789A8670056DE1C /* CustomControllerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomControllerManager.h; path = ../../../dCustomJoints/CustomControllerManager.h; sourceTree = "<group>"; };
@@ -215,12 +203,6 @@
 				FFA78DAE1789A8670056DE1C /* CustomUpVector.h */,
 				FF32E1FC172E13BF0052D273 /* CustomUserBlank.cpp */,
 				FFA78DAF1789A8670056DE1C /* CustomUserBlank.h */,
-				FF85949219684C7D00301498 /* CustomVehicleControllerBodyState.cpp */,
-				FF85949319684C7D00301498 /* CustomVehicleControllerBodyState.h */,
-				FF85949419684C7D00301498 /* CustomVehicleControllerComponent.cpp */,
-				FF85949519684C7D00301498 /* CustomVehicleControllerComponent.h */,
-				FF85949619684C7D00301498 /* CustomVehicleControllerJoint.cpp */,
-				FF85949719684C7D00301498 /* CustomVehicleControllerJoint.h */,
 				FF32E1FE172E13BF0052D273 /* CustomVehicleControllerManager.cpp */,
 				FFA78DB01789A8670056DE1C /* CustomVehicleControllerManager.h */,
 			);
@@ -261,9 +243,6 @@
 				FF82375717C269BC004C80D4 /* CustomSliderActuator.h in Headers */,
 				FF82375917C269BC004C80D4 /* CustomUniversalActuator.h in Headers */,
 				FF8237CB17CA2209004C80D4 /* CustomInputManager.h in Headers */,
-				FF85949919684C7D00301498 /* CustomVehicleControllerBodyState.h in Headers */,
-				FF85949B19684C7D00301498 /* CustomVehicleControllerComponent.h in Headers */,
-				FF85949D19684C7D00301498 /* CustomVehicleControllerJoint.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,9 +324,6 @@
 				FF82375617C269BC004C80D4 /* CustomSliderActuator.cpp in Sources */,
 				FF82375817C269BC004C80D4 /* CustomUniversalActuator.cpp in Sources */,
 				FF8237CA17CA2209004C80D4 /* CustomInputManager.cpp in Sources */,
-				FF85949819684C7D00301498 /* CustomVehicleControllerBodyState.cpp in Sources */,
-				FF85949A19684C7D00301498 /* CustomVehicleControllerComponent.cpp in Sources */,
-				FF85949C19684C7D00301498 /* CustomVehicleControllerJoint.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

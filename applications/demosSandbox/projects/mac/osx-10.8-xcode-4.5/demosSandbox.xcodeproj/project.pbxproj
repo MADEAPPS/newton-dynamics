@@ -18,15 +18,12 @@
 		FF084A91173F1AD30059C41D /* DemoEntityListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F351556D9F100E7B112 /* DemoEntityListener.cpp */; };
 		FF084A93173F1AD30059C41D /* DemoEntityManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F371556D9F100E7B112 /* DemoEntityManager.cpp */; };
 		FF084A95173F1AD30059C41D /* DemoMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F3D1556D9F100E7B112 /* DemoMesh.cpp */; };
-		FF084A97173F1AD30059C41D /* DemoSoundListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F3F1556D9F100E7B112 /* DemoSoundListener.cpp */; };
 		FF084A99173F1AD30059C41D /* DemoVisualDebugerListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F411556D9F100E7B112 /* DemoVisualDebugerListener.cpp */; };
 		FF084A9B173F1AD30059C41D /* NewtonDemos.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F441556D9F100E7B112 /* NewtonDemos.cpp */; };
 		FF084A9D173F1B090059C41D /* UserHeightFieldCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B297217300CF0007E6FEC /* UserHeightFieldCollision.cpp */; };
 		FF084A9F173F1B090059C41D /* UserPlaneCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF3B297417300CF0007E6FEC /* UserPlaneCollision.cpp */; };
 		FF084AA1173F1B090059C41D /* DebugDisplay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60FA01556DBB400E7B112 /* DebugDisplay.cpp */; };
 		FF084AA3173F1B090059C41D /* dHighResolutionTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60FA21556DBB400E7B112 /* dHighResolutionTimer.cpp */; };
-		FF084AA5173F1B090059C41D /* dRuntimeProfiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60FA41556DBB400E7B112 /* dRuntimeProfiler.cpp */; };
-		FF084AA7173F1B090059C41D /* dSoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60FA61556DBB400E7B112 /* dSoundManager.cpp */; };
 		FF084AA9173F1B090059C41D /* HeightFieldPrimitive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60FA81556DBB400E7B112 /* HeightFieldPrimitive.cpp */; };
 		FF084AAB173F1B090059C41D /* MousePick.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60FAC1556DBB400E7B112 /* MousePick.cpp */; };
 		FF084AAD173F1B090059C41D /* OpenGlUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60FAE1556DBB400E7B112 /* OpenGlUtil.cpp */; };
@@ -67,7 +64,6 @@
 		FF506752173F3EAC00D01FDF /* tekwall2.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF506703173F3D8900D01FDF /* tekwall2.tga */; };
 		FF506753173F3EAC00D01FDF /* textestbmp.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF506704173F3D8900D01FDF /* textestbmp.tga */; };
 		FF506754173F3EAC00D01FDF /* tiles.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF506705173F3D8900D01FDF /* tiles.tga */; };
-		FF506755173F3EAC00D01FDF /* tire_skid.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF506706173F3D8900D01FDF /* tire_skid.wav */; };
 		FF506756173F3EAC00D01FDF /* tire.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF506707173F3D8900D01FDF /* tire.ngd */; };
 		FF506757173F3EAC00D01FDF /* tire20.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF506708173F3D8900D01FDF /* tire20.tga */; };
 		FF506758173F3EAC00D01FDF /* tire21.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF506709173F3D8900D01FDF /* tire21.tga */; };
@@ -112,8 +108,6 @@
 		FF50677F173F3EAC00D01FDF /* platformBridge.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF5066DB173F3D8800D01FDF /* platformBridge.ngd */; };
 		FF506780173F3EAC00D01FDF /* playground.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF5066DC173F3D8800D01FDF /* playground.ngd */; };
 		FF506781173F3EAC00D01FDF /* prozor1.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF5066DD173F3D8800D01FDF /* prozor1.tga */; };
-		FF506782173F3EAC00D01FDF /* pyramid20x20.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF5066DE173F3D8800D01FDF /* pyramid20x20.ngd */; };
-		FF506783173F3EAC00D01FDF /* pyramid40x40.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF5066DF173F3D8800D01FDF /* pyramid40x40.ngd */; };
 		FF506784173F3EAC00D01FDF /* raceTrack1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF5066E0173F3D8800D01FDF /* raceTrack1.ngd */; };
 		FF506785173F3EAC00D01FDF /* raceTrack2.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF5066E1173F3D8800D01FDF /* raceTrack2.ngd */; };
 		FF506786173F3EAC00D01FDF /* reljef.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF5066E2173F3D8800D01FDF /* reljef.tga */; };
@@ -200,9 +194,6 @@
 		FF5067E0173F3EAD00D01FDF /* box_2.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF506684173F3D8800D01FDF /* box_2.ngd */; };
 		FF5067E1173F3EAD00D01FDF /* box_3.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF506685173F3D8800D01FDF /* box_3.ngd */; };
 		FF5067E2173F3EAD00D01FDF /* box.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF506686173F3D8800D01FDF /* box.ngd */; };
-		FF5067E3173F3EAD00D01FDF /* boxStacks_1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF506687173F3D8800D01FDF /* boxStacks_1.ngd */; };
-		FF5067E4173F3EAD00D01FDF /* boxStacks_3.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF506688173F3D8800D01FDF /* boxStacks_3.ngd */; };
-		FF5067E5173F3EAD00D01FDF /* boxStacks.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF506689173F3D8800D01FDF /* boxStacks.ngd */; };
 		FF5067E6173F3EAD00D01FDF /* brickwall.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50668A173F3D8800D01FDF /* brickwall.tga */; };
 		FF5067E7173F3EAD00D01FDF /* buggy_sk.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50668B173F3D8800D01FDF /* buggy_sk.tga */; };
 		FF5067E8173F3EAD00D01FDF /* cabrio_tex.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50668C173F3D8800D01FDF /* cabrio_tex.tga */; };
@@ -220,8 +211,6 @@
 		FF5067F4173F3EAD00D01FDF /* destructionDetail.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF506698173F3D8800D01FDF /* destructionDetail.tga */; };
 		FF5067F5173F3EAD00D01FDF /* dirt.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF506699173F3D8800D01FDF /* dirt.tga */; };
 		FF5067F6173F3EAD00D01FDF /* earthmap.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50669A173F3D8800D01FDF /* earthmap.tga */; };
-		FF5067F7173F3EAD00D01FDF /* engine_rpm.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF50669B173F3D8800D01FDF /* engine_rpm.wav */; };
-		FF5067F8173F3EAD00D01FDF /* engine_start.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF50669C173F3D8800D01FDF /* engine_start.wav */; };
 		FF5067F9173F3EAD00D01FDF /* env1.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50669D173F3D8800D01FDF /* env1.tga */; };
 		FF5067FA173F3EAD00D01FDF /* f1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF50669E173F3D8800D01FDF /* f1.ngd */; };
 		FF6FCF70175156940088B4D3 /* CocoaOpenglGlue.mm in Sources */ = {isa = PBXBuildFile; fileRef = FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */; };
@@ -269,19 +258,14 @@
 		FF93FC2F19C760A500F4094D /* carPath.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FC2E19C760A500F4094D /* carPath.ngd */; };
 		FF93FC3E19C93C0C00F4094D /* streetCone.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FC3D19C93C0C00F4094D /* streetCone.ngd */; };
 		FF94FCDF1B91689B0073550E /* robot.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF94FCDE1B91689B0073550E /* robot.ngd */; };
-		FF9AEB8919B7FFDA007C1C5C /* revHigh.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8619B7FFDA007C1C5C /* revHigh.wav */; };
-		FF9AEB8A19B7FFDA007C1C5C /* revLow.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8719B7FFDA007C1C5C /* revLow.wav */; };
-		FF9AEB8B19B7FFDA007C1C5C /* revMiddle.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8819B7FFDA007C1C5C /* revMiddle.wav */; };
 		FF9AEB9119B8015A007C1C5C /* colum.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8C19B8015A007C1C5C /* colum.ngd */; };
 		FF9AEB9219B8015A007C1C5C /* concreteBrick.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8D19B8015A007C1C5C /* concreteBrick.tga */; };
 		FF9AEB9319B8015A007C1C5C /* softBox.nme in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8E19B8015A007C1C5C /* softBox.nme */; };
 		FF9AEB9419B8015A007C1C5C /* softTPot.nme in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8F19B8015A007C1C5C /* softTPot.nme */; };
-		FF9AEB9519B8015A007C1C5C /* starter.wav in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB9019B8015A007C1C5C /* starter.wav */; };
 		FF9AEB9619B801E4007C1C5C /* DirectionalDiffuse.vs in Resources */ = {isa = PBXBuildFile; fileRef = FF82376717C26F8B004C80D4 /* DirectionalDiffuse.vs */; };
 		FF9AEB9719B801E4007C1C5C /* SkinningDirectionalDiffuse.vs in Resources */ = {isa = PBXBuildFile; fileRef = FF82376917C26F8B004C80D4 /* SkinningDirectionalDiffuse.vs */; };
 		FF9AEB9819B801E4007C1C5C /* SolidColor.vs in Resources */ = {isa = PBXBuildFile; fileRef = FF82376B17C26F8C004C80D4 /* SolidColor.vs */; };
 		FF9AEB9919B801E4007C1C5C /* TextureDecal.vs in Resources */ = {isa = PBXBuildFile; fileRef = FF82376D17C26F8C004C80D4 /* TextureDecal.vs */; };
-		FF9AEB9A19B801E4007C1C5C /* stackPerformance20x20.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF506700173F3D8900D01FDF /* stackPerformance20x20.ngd */; };
 		FF9AEB9B19B801E4007C1C5C /* Arial.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF50667A173F3D8700D01FDF /* Arial.tga */; };
 		FF9BBC5018351FB90060F147 /* lumber.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4C18351FB90060F147 /* lumber.ngd */; };
 		FF9BBC5118351FB90060F147 /* ramp.off in Resources */ = {isa = PBXBuildFile; fileRef = FF9BBC4D18351FB90060F147 /* ramp.off */; };
@@ -505,9 +489,6 @@
 		FF506684173F3D8800D01FDF /* box_2.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = box_2.ngd; path = ../../../../media/box_2.ngd; sourceTree = "<group>"; };
 		FF506685173F3D8800D01FDF /* box_3.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = box_3.ngd; path = ../../../../media/box_3.ngd; sourceTree = "<group>"; };
 		FF506686173F3D8800D01FDF /* box.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = box.ngd; path = ../../../../media/box.ngd; sourceTree = "<group>"; };
-		FF506687173F3D8800D01FDF /* boxStacks_1.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = boxStacks_1.ngd; path = ../../../../media/boxStacks_1.ngd; sourceTree = "<group>"; };
-		FF506688173F3D8800D01FDF /* boxStacks_3.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = boxStacks_3.ngd; path = ../../../../media/boxStacks_3.ngd; sourceTree = "<group>"; };
-		FF506689173F3D8800D01FDF /* boxStacks.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = boxStacks.ngd; path = ../../../../media/boxStacks.ngd; sourceTree = "<group>"; };
 		FF50668A173F3D8800D01FDF /* brickwall.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = brickwall.tga; path = ../../../../media/brickwall.tga; sourceTree = "<group>"; };
 		FF50668B173F3D8800D01FDF /* buggy_sk.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = buggy_sk.tga; path = ../../../../media/buggy_sk.tga; sourceTree = "<group>"; };
 		FF50668C173F3D8800D01FDF /* cabrio_tex.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = cabrio_tex.tga; path = ../../../../media/cabrio_tex.tga; sourceTree = "<group>"; };
@@ -525,8 +506,6 @@
 		FF506698173F3D8800D01FDF /* destructionDetail.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = destructionDetail.tga; path = ../../../../media/destructionDetail.tga; sourceTree = "<group>"; };
 		FF506699173F3D8800D01FDF /* dirt.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = dirt.tga; path = ../../../../media/dirt.tga; sourceTree = "<group>"; };
 		FF50669A173F3D8800D01FDF /* earthmap.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = earthmap.tga; path = ../../../../media/earthmap.tga; sourceTree = "<group>"; };
-		FF50669B173F3D8800D01FDF /* engine_rpm.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = engine_rpm.wav; path = ../../../../media/engine_rpm.wav; sourceTree = "<group>"; };
-		FF50669C173F3D8800D01FDF /* engine_start.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = engine_start.wav; path = ../../../../media/engine_start.wav; sourceTree = "<group>"; };
 		FF50669D173F3D8800D01FDF /* env1.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = env1.tga; path = ../../../../media/env1.tga; sourceTree = "<group>"; };
 		FF50669E173F3D8800D01FDF /* f1.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = f1.ngd; path = ../../../../media/f1.ngd; sourceTree = "<group>"; };
 		FF50669F173F3D8800D01FDF /* f2.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = f2.ngd; path = ../../../../media/f2.ngd; sourceTree = "<group>"; };
@@ -592,8 +571,6 @@
 		FF5066DB173F3D8800D01FDF /* platformBridge.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = platformBridge.ngd; path = ../../../../media/platformBridge.ngd; sourceTree = "<group>"; };
 		FF5066DC173F3D8800D01FDF /* playground.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = playground.ngd; path = ../../../../media/playground.ngd; sourceTree = "<group>"; };
 		FF5066DD173F3D8800D01FDF /* prozor1.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = prozor1.tga; path = ../../../../media/prozor1.tga; sourceTree = "<group>"; };
-		FF5066DE173F3D8800D01FDF /* pyramid20x20.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = pyramid20x20.ngd; path = ../../../../media/pyramid20x20.ngd; sourceTree = "<group>"; };
-		FF5066DF173F3D8800D01FDF /* pyramid40x40.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = pyramid40x40.ngd; path = ../../../../media/pyramid40x40.ngd; sourceTree = "<group>"; };
 		FF5066E0173F3D8800D01FDF /* raceTrack1.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = raceTrack1.ngd; path = ../../../../media/raceTrack1.ngd; sourceTree = "<group>"; };
 		FF5066E1173F3D8800D01FDF /* raceTrack2.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = raceTrack2.ngd; path = ../../../../media/raceTrack2.ngd; sourceTree = "<group>"; };
 		FF5066E2173F3D8800D01FDF /* reljef.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = reljef.tga; path = ../../../../media/reljef.tga; sourceTree = "<group>"; };
@@ -617,13 +594,11 @@
 		FF5066FD173F3D8900D01FDF /* smilli.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = smilli.tga; path = ../../../../media/smilli.tga; sourceTree = "<group>"; };
 		FF5066FE173F3D8900D01FDF /* sp_luk.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = sp_luk.tga; path = ../../../../media/sp_luk.tga; sourceTree = "<group>"; };
 		FF5066FF173F3D8900D01FDF /* sponza.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = sponza.ngd; path = ../../../../media/sponza.ngd; sourceTree = "<group>"; };
-		FF506700173F3D8900D01FDF /* stackPerformance20x20.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = stackPerformance20x20.ngd; path = ../../../../media/stackPerformance20x20.ngd; sourceTree = "<group>"; };
 		FF506701173F3D8900D01FDF /* streaked.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = streaked.tga; path = ../../../../media/streaked.tga; sourceTree = "<group>"; };
 		FF506702173F3D8900D01FDF /* teapot.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = teapot.ngd; path = ../../../../media/teapot.ngd; sourceTree = "<group>"; };
 		FF506703173F3D8900D01FDF /* tekwall2.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tekwall2.tga; path = ../../../../media/tekwall2.tga; sourceTree = "<group>"; };
 		FF506704173F3D8900D01FDF /* textestbmp.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = textestbmp.tga; path = ../../../../media/textestbmp.tga; sourceTree = "<group>"; };
 		FF506705173F3D8900D01FDF /* tiles.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tiles.tga; path = ../../../../media/tiles.tga; sourceTree = "<group>"; };
-		FF506706173F3D8900D01FDF /* tire_skid.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = tire_skid.wav; path = ../../../../media/tire_skid.wav; sourceTree = "<group>"; };
 		FF506707173F3D8900D01FDF /* tire.ngd */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = tire.ngd; path = ../../../../media/tire.ngd; sourceTree = "<group>"; };
 		FF506708173F3D8900D01FDF /* tire20.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tire20.tga; path = ../../../../media/tire20.tga; sourceTree = "<group>"; };
 		FF506709173F3D8900D01FDF /* tire21.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tire21.tga; path = ../../../../media/tire21.tga; sourceTree = "<group>"; };
@@ -679,7 +654,6 @@
 		FF8237C017CA212E004C80D4 /* DemoEntityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoEntityManager.h; path = ../../../sdkDemos/DemoEntityManager.h; sourceTree = "<group>"; };
 		FF8237C117CA212E004C80D4 /* DemoListenerBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoListenerBase.h; path = ../../../sdkDemos/DemoListenerBase.h; sourceTree = "<group>"; };
 		FF8237C217CA212E004C80D4 /* DemoMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoMesh.h; path = ../../../sdkDemos/DemoMesh.h; sourceTree = "<group>"; };
-		FF8237C317CA212E004C80D4 /* DemoSoundListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoSoundListener.h; path = ../../../sdkDemos/DemoSoundListener.h; sourceTree = "<group>"; };
 		FF8237C417CA212E004C80D4 /* DemoVisualDebugerListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoVisualDebugerListener.h; path = ../../../sdkDemos/DemoVisualDebugerListener.h; sourceTree = "<group>"; };
 		FF8237C517CA212E004C80D4 /* NewtonDemos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NewtonDemos.h; path = ../../../sdkDemos/NewtonDemos.h; sourceTree = "<group>"; };
 		FF8237C617CA218A004C80D4 /* StructuredConvexFracturing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StructuredConvexFracturing.cpp; path = ../../../sdkDemos/demos/StructuredConvexFracturing.cpp; sourceTree = "<group>"; };
@@ -702,14 +676,10 @@
 		FF93FC2E19C760A500F4094D /* carPath.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = carPath.ngd; path = ../../../../media/carPath.ngd; sourceTree = "<group>"; };
 		FF93FC3D19C93C0C00F4094D /* streetCone.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = streetCone.ngd; path = ../../../../media/streetCone.ngd; sourceTree = "<group>"; };
 		FF94FCDE1B91689B0073550E /* robot.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = robot.ngd; path = ../../../../media/robot.ngd; sourceTree = "<group>"; };
-		FF9AEB8619B7FFDA007C1C5C /* revHigh.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revHigh.wav; path = ../../../../media/revHigh.wav; sourceTree = "<group>"; };
-		FF9AEB8719B7FFDA007C1C5C /* revLow.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revLow.wav; path = ../../../../media/revLow.wav; sourceTree = "<group>"; };
-		FF9AEB8819B7FFDA007C1C5C /* revMiddle.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = revMiddle.wav; path = ../../../../media/revMiddle.wav; sourceTree = "<group>"; };
 		FF9AEB8C19B8015A007C1C5C /* colum.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = colum.ngd; path = ../../../../media/colum.ngd; sourceTree = "<group>"; };
 		FF9AEB8D19B8015A007C1C5C /* concreteBrick.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = concreteBrick.tga; path = ../../../../media/concreteBrick.tga; sourceTree = "<group>"; };
 		FF9AEB8E19B8015A007C1C5C /* softBox.nme */ = {isa = PBXFileReference; lastKnownFileType = file; name = softBox.nme; path = ../../../../media/softBox.nme; sourceTree = "<group>"; };
 		FF9AEB8F19B8015A007C1C5C /* softTPot.nme */ = {isa = PBXFileReference; lastKnownFileType = file; name = softTPot.nme; path = ../../../../media/softTPot.nme; sourceTree = "<group>"; };
-		FF9AEB9019B8015A007C1C5C /* starter.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = starter.wav; path = ../../../../media/starter.wav; sourceTree = "<group>"; };
 		FF9BBC4C18351FB90060F147 /* lumber.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = lumber.ngd; path = ../../../../media/lumber.ngd; sourceTree = "<group>"; };
 		FF9BBC4D18351FB90060F147 /* ramp.off */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ramp.off; path = ../../../../media/ramp.off; sourceTree = "<group>"; };
 		FF9BBC4E18351FB90060F147 /* ruins.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = ruins.ngd; path = ../../../../media/ruins.ngd; sourceTree = "<group>"; };
@@ -726,7 +696,6 @@
 		FFF60F351556D9F100E7B112 /* DemoEntityListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoEntityListener.cpp; path = ../../../sdkDemos/DemoEntityListener.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F371556D9F100E7B112 /* DemoEntityManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoEntityManager.cpp; path = ../../../sdkDemos/DemoEntityManager.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F3D1556D9F100E7B112 /* DemoMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoMesh.cpp; path = ../../../sdkDemos/DemoMesh.cpp; sourceTree = SOURCE_ROOT; };
-		FFF60F3F1556D9F100E7B112 /* DemoSoundListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoSoundListener.cpp; path = ../../../sdkDemos/DemoSoundListener.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F411556D9F100E7B112 /* DemoVisualDebugerListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoVisualDebugerListener.cpp; path = ../../../sdkDemos/DemoVisualDebugerListener.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F441556D9F100E7B112 /* NewtonDemos.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NewtonDemos.cpp; path = ../../../sdkDemos/NewtonDemos.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60F551556DA2300E7B112 /* BasicFriction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BasicFriction.cpp; path = ../../../sdkDemos/demos/BasicFriction.cpp; sourceTree = SOURCE_ROOT; };
@@ -749,8 +718,6 @@
 		FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UsingNewtonMeshTool.cpp; path = ../../../sdkDemos/demos/UsingNewtonMeshTool.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60FA01556DBB400E7B112 /* DebugDisplay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DebugDisplay.cpp; path = ../../../sdkDemos/toolBox/DebugDisplay.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60FA21556DBB400E7B112 /* dHighResolutionTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dHighResolutionTimer.cpp; path = ../../../sdkDemos/toolBox/dHighResolutionTimer.cpp; sourceTree = SOURCE_ROOT; };
-		FFF60FA41556DBB400E7B112 /* dRuntimeProfiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dRuntimeProfiler.cpp; path = ../../../sdkDemos/toolBox/dRuntimeProfiler.cpp; sourceTree = SOURCE_ROOT; };
-		FFF60FA61556DBB400E7B112 /* dSoundManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dSoundManager.cpp; path = ../../../sdkDemos/toolBox/dSoundManager.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60FA81556DBB400E7B112 /* HeightFieldPrimitive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HeightFieldPrimitive.cpp; path = ../../../sdkDemos/toolBox/HeightFieldPrimitive.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60FAC1556DBB400E7B112 /* MousePick.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MousePick.cpp; path = ../../../sdkDemos/toolBox/MousePick.cpp; sourceTree = SOURCE_ROOT; };
 		FFF60FAE1556DBB400E7B112 /* OpenGlUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGlUtil.cpp; path = ../../../sdkDemos/toolBox/OpenGlUtil.cpp; sourceTree = SOURCE_ROOT; };
@@ -850,9 +817,6 @@
 				FF506686173F3D8800D01FDF /* box.ngd */,
 				FF506684173F3D8800D01FDF /* box_2.ngd */,
 				FF506685173F3D8800D01FDF /* box_3.ngd */,
-				FF506689173F3D8800D01FDF /* boxStacks.ngd */,
-				FF506687173F3D8800D01FDF /* boxStacks_1.ngd */,
-				FF506688173F3D8800D01FDF /* boxStacks_3.ngd */,
 				FF50668A173F3D8800D01FDF /* brickwall.tga */,
 				FF93FBF919C566EA00F4094D /* buggy_.ngd */,
 				FF50668B173F3D8800D01FDF /* buggy_sk.tga */,
@@ -876,8 +840,6 @@
 				FF506698173F3D8800D01FDF /* destructionDetail.tga */,
 				FF506699173F3D8800D01FDF /* dirt.tga */,
 				FF50669A173F3D8800D01FDF /* earthmap.tga */,
-				FF50669B173F3D8800D01FDF /* engine_rpm.wav */,
-				FF50669C173F3D8800D01FDF /* engine_start.wav */,
 				FF50669D173F3D8800D01FDF /* env1.tga */,
 				FF50669E173F3D8800D01FDF /* f1.ngd */,
 				FF50669F173F3D8800D01FDF /* f2.ngd */,
@@ -950,15 +912,10 @@
 				FF5066DB173F3D8800D01FDF /* platformBridge.ngd */,
 				FF5066DC173F3D8800D01FDF /* playground.ngd */,
 				FF5066DD173F3D8800D01FDF /* prozor1.tga */,
-				FF5066DE173F3D8800D01FDF /* pyramid20x20.ngd */,
-				FF5066DF173F3D8800D01FDF /* pyramid40x40.ngd */,
 				FF5066E0173F3D8800D01FDF /* raceTrack1.ngd */,
 				FF5066E1173F3D8800D01FDF /* raceTrack2.ngd */,
 				FF9BBC4D18351FB90060F147 /* ramp.off */,
 				FF5066E2173F3D8800D01FDF /* reljef.tga */,
-				FF9AEB8619B7FFDA007C1C5C /* revHigh.wav */,
-				FF9AEB8719B7FFDA007C1C5C /* revLow.wav */,
-				FF9AEB8819B7FFDA007C1C5C /* revMiddle.wav */,
 				FF5066E3173F3D8800D01FDF /* rimsa1.tga */,
 				FF5066E5173F3D8800D01FDF /* ROAD.TGA */,
 				FF5066E6173F3D8800D01FDF /* ROAD1.TGA */,
@@ -985,8 +942,6 @@
 				FF9AEB8F19B8015A007C1C5C /* softTPot.nme */,
 				FF5066FE173F3D8900D01FDF /* sp_luk.tga */,
 				FF5066FF173F3D8900D01FDF /* sponza.ngd */,
-				FF506700173F3D8900D01FDF /* stackPerformance20x20.ngd */,
-				FF9AEB9019B8015A007C1C5C /* starter.wav */,
 				FF506701173F3D8900D01FDF /* streaked.tga */,
 				FF93FC3D19C93C0C00F4094D /* streetCone.ngd */,
 				FF82376E17C26F8C004C80D4 /* swimmingPool.ngd */,
@@ -997,7 +952,6 @@
 				FF506707173F3D8900D01FDF /* tire.ngd */,
 				FF506708173F3D8900D01FDF /* tire20.tga */,
 				FF506709173F3D8900D01FDF /* tire21.tga */,
-				FF506706173F3D8900D01FDF /* tire_skid.wav */,
 				FF50670A173F3D8900D01FDF /* tirebigc.tga */,
 				FF82376F17C26F8C004C80D4 /* tractor.ngd */,
 				FF50670B173F3D8900D01FDF /* treada1.tga */,
@@ -1205,7 +1159,6 @@
 				FF8237C017CA212E004C80D4 /* DemoEntityManager.h */,
 				FF8237C117CA212E004C80D4 /* DemoListenerBase.h */,
 				FF8237C217CA212E004C80D4 /* DemoMesh.h */,
-				FF8237C317CA212E004C80D4 /* DemoSoundListener.h */,
 				FF8237C417CA212E004C80D4 /* DemoVisualDebugerListener.h */,
 				FF8237C517CA212E004C80D4 /* NewtonDemos.h */,
 				FF6FCF6F175156940088B4D3 /* CocoaOpenglGlue.mm */,
@@ -1216,7 +1169,6 @@
 				FFF60F351556D9F100E7B112 /* DemoEntityListener.cpp */,
 				FFF60F371556D9F100E7B112 /* DemoEntityManager.cpp */,
 				FFF60F3D1556D9F100E7B112 /* DemoMesh.cpp */,
-				FFF60F3F1556D9F100E7B112 /* DemoSoundListener.cpp */,
 				FFF60F411556D9F100E7B112 /* DemoVisualDebugerListener.cpp */,
 				FFF60F441556D9F100E7B112 /* NewtonDemos.cpp */,
 			);
@@ -1243,8 +1195,6 @@
 				FF3B297417300CF0007E6FEC /* UserPlaneCollision.cpp */,
 				FFF60FA01556DBB400E7B112 /* DebugDisplay.cpp */,
 				FFF60FA21556DBB400E7B112 /* dHighResolutionTimer.cpp */,
-				FFF60FA41556DBB400E7B112 /* dRuntimeProfiler.cpp */,
-				FFF60FA61556DBB400E7B112 /* dSoundManager.cpp */,
 				FFF60FA81556DBB400E7B112 /* HeightFieldPrimitive.cpp */,
 				FFF60FAC1556DBB400E7B112 /* MousePick.cpp */,
 				FFF60FAE1556DBB400E7B112 /* OpenGlUtil.cpp */,
@@ -1462,7 +1412,6 @@
 				FF9AEB9719B801E4007C1C5C /* SkinningDirectionalDiffuse.vs in Resources */,
 				FF9AEB9819B801E4007C1C5C /* SolidColor.vs in Resources */,
 				FF9AEB9919B801E4007C1C5C /* TextureDecal.vs in Resources */,
-				FF9AEB9A19B801E4007C1C5C /* stackPerformance20x20.ngd in Resources */,
 				FF9AEB9B19B801E4007C1C5C /* Arial.tga in Resources */,
 				FF856BC41752E07700324FDC /* skeleton.ngd in Resources */,
 				FF8B5E181750F1B80076BE6C /* calibri.ttf in Resources */,
@@ -1473,7 +1422,6 @@
 				FF506752173F3EAC00D01FDF /* tekwall2.tga in Resources */,
 				FF506753173F3EAC00D01FDF /* textestbmp.tga in Resources */,
 				FF506754173F3EAC00D01FDF /* tiles.tga in Resources */,
-				FF506755173F3EAC00D01FDF /* tire_skid.wav in Resources */,
 				FF506756173F3EAC00D01FDF /* tire.ngd in Resources */,
 				FF93FC3E19C93C0C00F4094D /* streetCone.ngd in Resources */,
 				FF506757173F3EAC00D01FDF /* tire20.tga in Resources */,
@@ -1485,7 +1433,6 @@
 				FF50675D173F3EAC00D01FDF /* viper.ngd in Resources */,
 				FF50675E173F3EAC00D01FDF /* viper01.tga in Resources */,
 				FF50675F173F3EAC00D01FDF /* vrata_ko.tga in Resources */,
-				FF9AEB8919B7FFDA007C1C5C /* revHigh.wav in Resources */,
 				FF506760173F3EAC00D01FDF /* vrata_kr.tga in Resources */,
 				FF506761173F3EAC00D01FDF /* wall_4.tga in Resources */,
 				FF506762173F3EAC00D01FDF /* wall_7.tga in Resources */,
@@ -1523,9 +1470,6 @@
 				FF50677F173F3EAC00D01FDF /* platformBridge.ngd in Resources */,
 				FF506780173F3EAC00D01FDF /* playground.ngd in Resources */,
 				FF506781173F3EAC00D01FDF /* prozor1.tga in Resources */,
-				FF9AEB8B19B7FFDA007C1C5C /* revMiddle.wav in Resources */,
-				FF506782173F3EAC00D01FDF /* pyramid20x20.ngd in Resources */,
-				FF506783173F3EAC00D01FDF /* pyramid40x40.ngd in Resources */,
 				FF506784173F3EAC00D01FDF /* raceTrack1.ngd in Resources */,
 				FF506785173F3EAC00D01FDF /* raceTrack2.ngd in Resources */,
 				FF506786173F3EAC00D01FDF /* reljef.tga in Resources */,
@@ -1579,7 +1523,6 @@
 				FF5067BE173F3EAD00D01FDF /* lamb4.tga in Resources */,
 				FF9AEB9119B8015A007C1C5C /* colum.ngd in Resources */,
 				FF5067BF173F3EAD00D01FDF /* lamb5.tga in Resources */,
-				FF9AEB8A19B7FFDA007C1C5C /* revLow.wav in Resources */,
 				FF94FCDF1B91689B0073550E /* robot.ngd in Resources */,
 				FF5067C0173F3EAD00D01FDF /* lamb6.tga in Resources */,
 				FF5067C1173F3EAD00D01FDF /* lambDiablo.ngd in Resources */,
@@ -1615,10 +1558,6 @@
 				FF5067E0173F3EAD00D01FDF /* box_2.ngd in Resources */,
 				FF5067E1173F3EAD00D01FDF /* box_3.ngd in Resources */,
 				FF5067E2173F3EAD00D01FDF /* box.ngd in Resources */,
-				FF5067E3173F3EAD00D01FDF /* boxStacks_1.ngd in Resources */,
-				FF9AEB9519B8015A007C1C5C /* starter.wav in Resources */,
-				FF5067E4173F3EAD00D01FDF /* boxStacks_3.ngd in Resources */,
-				FF5067E5173F3EAD00D01FDF /* boxStacks.ngd in Resources */,
 				FF5067E6173F3EAD00D01FDF /* brickwall.tga in Resources */,
 				FF5067E7173F3EAD00D01FDF /* buggy_sk.tga in Resources */,
 				FF5067E8173F3EAD00D01FDF /* cabrio_tex.tga in Resources */,
@@ -1637,8 +1576,6 @@
 				FF5067F4173F3EAD00D01FDF /* destructionDetail.tga in Resources */,
 				FF5067F5173F3EAD00D01FDF /* dirt.tga in Resources */,
 				FF5067F6173F3EAD00D01FDF /* earthmap.tga in Resources */,
-				FF5067F7173F3EAD00D01FDF /* engine_rpm.wav in Resources */,
-				FF5067F8173F3EAD00D01FDF /* engine_start.wav in Resources */,
 				FF5067F9173F3EAD00D01FDF /* env1.tga in Resources */,
 				FF5067FA173F3EAD00D01FDF /* f1.ngd in Resources */,
 				FF50674F173F3E9E00D01FDF /* sponza.ngd in Resources */,
@@ -1698,8 +1635,6 @@
 				FF084A9F173F1B090059C41D /* UserPlaneCollision.cpp in Sources */,
 				FF084AA1173F1B090059C41D /* DebugDisplay.cpp in Sources */,
 				FF084AA3173F1B090059C41D /* dHighResolutionTimer.cpp in Sources */,
-				FF084AA5173F1B090059C41D /* dRuntimeProfiler.cpp in Sources */,
-				FF084AA7173F1B090059C41D /* dSoundManager.cpp in Sources */,
 				FF084AA9173F1B090059C41D /* HeightFieldPrimitive.cpp in Sources */,
 				FF084AAB173F1B090059C41D /* MousePick.cpp in Sources */,
 				FF084AAD173F1B090059C41D /* OpenGlUtil.cpp in Sources */,
@@ -1715,7 +1650,6 @@
 				FF084A91173F1AD30059C41D /* DemoEntityListener.cpp in Sources */,
 				FF084A93173F1AD30059C41D /* DemoEntityManager.cpp in Sources */,
 				FF084A95173F1AD30059C41D /* DemoMesh.cpp in Sources */,
-				FF084A97173F1AD30059C41D /* DemoSoundListener.cpp in Sources */,
 				FF084A99173F1AD30059C41D /* DemoVisualDebugerListener.cpp in Sources */,
 				FF084A9B173F1AD30059C41D /* NewtonDemos.cpp in Sources */,
 				FF8B5E1C1750F4670076BE6C /* BasicRagDoll.cpp in Sources */,
