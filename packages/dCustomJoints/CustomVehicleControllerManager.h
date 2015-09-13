@@ -203,6 +203,7 @@ class CustomVehicleController: public CustomControllerBase
 
 		void Update (dFloat timestep, dFloat gasVal);
 		dFloat GetRPM() const;
+		dFloat GetSpeed() const;
 		dFloat GetRedLineRPM() const;
 
 		protected:
@@ -214,7 +215,7 @@ class CustomVehicleController: public CustomControllerBase
 		dInterpolationCurve m_torqueRPMCurve;
 		DifferentialSpiderGearJoint* m_leftGear;
 		DifferentialSpiderGearJoint* m_rigntGear;
-
+		int m_currentGear;
 	};
 
 	class Controller: public CustomAlloc

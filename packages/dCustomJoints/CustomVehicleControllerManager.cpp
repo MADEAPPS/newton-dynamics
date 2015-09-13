@@ -515,6 +515,7 @@ void CustomVehicleController::BodyPartTire::SetBrakeTorque(dFloat torque)
 CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController* const controller, const Info& info)
 	:BodyPart()
 	,m_data(info)
+	,m_currentGear(2)
 {
 	m_parent = &controller->m_chassis;
 	m_controller = controller;
@@ -679,11 +680,27 @@ dFloat CustomVehicleController::BodyPartEngine::GetRedLineRPM() const
 	return m_data.m_rpmAtReadLineTorque * 9.55f;
 }
 
+dFloat CustomVehicleController::BodyPartEngine::GetSpeed() const
+{
+	dMatrix matrix;
+	dVector veloc;
+
+	EngineJoint* const joint = (EngineJoint*)GetJoint();
+	NewtonBody* const chassis = joint->GetBody1();
+
+	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
+	NewtonBodyGetVelocity(chassis, &veloc[0]);
+
+	matrix = joint->GetMatrix1() * matrix;
+	return dAbs(matrix.m_front % veloc);
+}
+
 dFloat CustomVehicleController::BodyPartEngine::GetRPM() const
 {
+	dMatrix matrix;
 	dVector omega0;
 	dVector omega1;
-	dMatrix matrix;
+
 
 	EngineJoint* const joint = (EngineJoint*) GetJoint();
 	NewtonBody* const engine = joint->GetBody0();
@@ -705,8 +722,9 @@ void CustomVehicleController::BodyPartEngine::Update(dFloat timestep, dFloat gas
 	dVector omega;
 	dMatrix matrix;
 
-	m_leftGear->SetGain (m_data.m_gearRatios[2]);
-	m_rigntGear->SetGain (m_data.m_gearRatios[2]);
+m_currentGear = 2;
+	m_leftGear->SetGain (m_data.m_gearRatios[m_currentGear]);
+	m_rigntGear->SetGain (m_data.m_gearRatios[m_currentGear]);
 
 	EngineJoint* const joint = (EngineJoint*)GetJoint();
 	NewtonBody* const engine = joint->GetBody0();
@@ -832,7 +850,7 @@ dFloat CustomVehicleController::EngineController::GetRedLineRPM() const
 
 dFloat CustomVehicleController::EngineController::GetSpeed() const
 {
-	return 0.0f;
+	return m_engine->GetSpeed();
 }
 
 bool CustomVehicleController::EngineController::GetClutch() const
