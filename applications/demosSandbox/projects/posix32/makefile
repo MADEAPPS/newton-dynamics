@@ -80,7 +80,7 @@ SDK_VISUALDEBUGGER_MAKE = ../../../../packages/projects/$(PLATFORM)/dVisualDebug
 SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
 
 
-LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lenet -lopenal `wx-config --libs --gl-libs` `freetype-config --libs`
+LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lenet `wx-config --libs --gl-libs` `freetype-config --libs`
 
 
 # this use newton as shared or static library
@@ -98,7 +98,6 @@ SDK_MAIN_SRC = \
 		$(SDK_MAIN_PATH)/DemoCameraListener.cpp \
 		$(SDK_MAIN_PATH)/DemoEntityListener.cpp \
 		$(SDK_MAIN_PATH)/DemoListenerBase.cpp \
-		$(SDK_MAIN_PATH)/DemoSoundListener.cpp \
 		$(SDK_MAIN_PATH)/DemoVisualDebugerListener.cpp \
 		$(SDK_MAIN_PATH)/DemoCamera.cpp \
 		$(SDK_MAIN_PATH)/DemoEntity.cpp \
@@ -146,7 +145,6 @@ SDK_TOOLBOX_SRC = \
 		$(SDK_TOOLBOX_PATH)/DebugDisplay.cpp \
 		$(SDK_TOOLBOX_PATH)/dHighResolutionTimer.cpp \
 		$(SDK_TOOLBOX_PATH)/dRuntimeProfiler.cpp \
-		$(SDK_TOOLBOX_PATH)/dSoundManager.cpp \
 		$(SDK_TOOLBOX_PATH)/HeightFieldPrimitive.cpp \
 		$(SDK_TOOLBOX_PATH)/MousePick.cpp \
 		$(SDK_TOOLBOX_PATH)/OpenGlUtil.cpp \
