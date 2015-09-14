@@ -93,8 +93,8 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 class CustomBallAndSocketWithFriction: public CustomBallAndSocket
 {
 	public:
-	CustomBallAndSocketWithFriction(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat dryFriction);
-	void SubmitConstraints(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API CustomBallAndSocketWithFriction(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat dryFriction);
+	CUSTOM_JOINTS_API void SubmitConstraints(dFloat timestep, int threadIndex);
 
 	dFloat m_dryFriction;
 };

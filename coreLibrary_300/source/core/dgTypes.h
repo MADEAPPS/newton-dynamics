@@ -32,6 +32,10 @@
 			#define _WIN_32_VER
 		#endif
 	#endif
+
+#if _MSC_VER >= 1400
+	#define HAVE_STRUCT_TIMESPEC
+#endif
 #endif
 
 
@@ -45,8 +49,12 @@
 	#pragma warning (disable: 4100) //unreferenced formal parameter
 	#pragma warning (disable: 4201) //nonstandard extension used : nameless struct/union
 	#pragma warning (disable: 4324) //structure was padded due to __declspec(align())
-	#pragma warning (disable: 4530) //: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
-
+	#pragma warning (disable: 4530) // C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+        #if _MSC_VER >= 1400
+ 	  #pragma warning (disable: 4577) // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
+	  #pragma warning (disable: 4456) // declaration of 'key' hides previous local declaration
+	  #pragma warning (disable: 4457) // declaration of 'body' hides function parameter
+        #endif
 	#include <io.h> 
 	#include <direct.h> 
 	#include <malloc.h>

@@ -985,7 +985,7 @@ void dgWorld::DeformableContacts (dgBroadPhase::dgPair* const pair, dgCollisionP
 {
 	dgContact* const constraint = pair->m_contact;
 
-	pair->m_isDeformable = 1;
+	pair->m_isDeformable = -1;
 	pair->m_contactCount = 0;
 
 	if (constraint) {
