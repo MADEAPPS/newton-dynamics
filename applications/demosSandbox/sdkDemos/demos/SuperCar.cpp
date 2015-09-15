@@ -399,9 +399,10 @@ class SuperCarEntity: public DemoEntity
 		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engine);
 
 		// the the default transmission type
-//		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
+		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
 
 		m_controller->SetEngine(engineControl);
+
 
 		// add clutch controller
 		CustomVehicleController::ClutchController* const clutch = new CustomVehicleController::ClutchController(m_controller, engine, VIPER_TIRE_CLUTCH_TORQUE);
@@ -521,8 +522,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat joyPosY;
 		int joyButtons;
 
-//		int gear = engine ? engine->GetGear() : CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear;
-	int gear = 0;
+		int gear = engine->GetGear();
 		dFloat cluthVal = 0.0f;
 		dFloat steeringVal = 0.0f;
 		dFloat brakePedal = 0.0f;
@@ -570,34 +570,33 @@ steeringVal *= 0.3f;
 
 
 			// check for gear change (note key code for '>' = '.' and key code for '<' == ',')
-//			gear += int (m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int (m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
-//			// do driving heuristic for automatic transmission
-//			if (engine->GetTransmissionMode()) {
-//				dFloat speed = engine->GetSpeed();
-//				// check if vehicle is parked
-//				if ((dAbs (speed) < 1.0f) && !engineGasPedal && !brakePedal && !handBrakePedal) {
-//					handBrakePedal = 0.5f;
-//				}
-//			}
-
+			gear += int (m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int (m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
+			// do driving heuristic for automatic transmission
+			if (!engine->GetTransmissionMode()) {
+				dFloat speed = engine->GetSpeed();
+				// check if vehicle is parked
+				if ((dAbs (speed) < 1.0f) && !engineGasPedal && !brakePedal && !handBrakePedal) {
+					handBrakePedal = 0.5f;
+				}
+			}
 		}
 
 
-		int reverseGear = m_reverseGear.UpdateTriggerButton (mainWindow, 'R') ? 1 : 0;
+//		int reverseGear = m_reverseGear.UpdateTriggerButton (mainWindow, 'R') ? 1 : 0;
 
 		// count the engine key switch
 		m_engineKeySwitchCounter += m_engineKeySwitch.UpdateTriggerButton(mainWindow, 'Y');
 
 		// check transmission type
-		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
+//		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
-			fwrite (&toggleTransmission, sizeof (int), 1, file);
-			fwrite (&reverseGear, sizeof (int), 1, file);
+			//fwrite (&toggleTransmission, sizeof (int), 1, file);
+			//fwrite (&reverseGear, sizeof (int), 1, file);
 			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
 			fwrite (&engineGasPedal, sizeof (dFloat), 1, file);
@@ -609,18 +608,18 @@ steeringVal *= 0.3f;
 		static FILE* file = fopen ("log.bin", "rb");
 		if (file) {		
 			fread (&m_engineKeySwitchCounter, sizeof (int), 1, file);
-			fread (&toggleTransmission, sizeof (int), 1, file);
-			fread (&reverseGear, sizeof (int), 1, file);
+			//fread (&toggleTransmission, sizeof (int), 1, file);
+			//fread (&reverseGear, sizeof (int), 1, file);
 			fread (&gear, sizeof (int), 1, file);
 			fread (&steeringVal, sizeof (dFloat), 1, file);
 			fread (&engineGasPedal, sizeof (dFloat), 1, file);
 			fread (&handBrakePedal, sizeof (dFloat), 1, file);
 			fread (&brakePedal, sizeof (dFloat), 1, file);
-
 		}
 	#endif
 #endif
 
+		dTrace (("%d\n", gear));
 		if (engine) {
 /*
 			bool key = (m_engineKeySwitchCounter & 1) ? true : false;
@@ -645,6 +644,7 @@ steeringVal *= 0.3f;
 				}
 			}
 */
+			engine->SetGear(gear);
 			engine->SetParam(engineGasPedal);
 		}
 

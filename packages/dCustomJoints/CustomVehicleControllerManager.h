@@ -76,8 +76,8 @@ class CustomVehicleController: public CustomControllerBase
 		{
 		}
 
-		CUSTOM_JOINTS_API void InitalizeCurve(int points, const dFloat* const steps, const dFloat* const values);
-		CUSTOM_JOINTS_API dFloat GetValue(dFloat param) const;
+		void InitalizeCurve(int points, const dFloat* const steps, const dFloat* const values);
+		dFloat GetValue(dFloat param) const;
 
 		dNot m_nodes[6];
 		int m_count;
@@ -207,6 +207,12 @@ class CustomVehicleController: public CustomControllerBase
 		dFloat GetSpeed() const;
 		dFloat GetRedLineRPM() const;
 
+		int GetGear() const;
+		void SetGear(int gear);
+		int GetNeutralGear() const;
+		int GetReverserGear() const;
+		void UpdateAutomaticGearBox(dFloat timestep);
+
 		DifferentialSpiderGearJoint* GetLeftGear () const {return m_leftGear;}
 		DifferentialSpiderGearJoint* GetRightGear () const {return m_rigntGear;}
 
@@ -320,15 +326,24 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		CUSTOM_JOINTS_API EngineController (CustomVehicleController* const controller, BodyPartEngine* const engine);
 
-		CUSTOM_JOINTS_API int GetGear() const;
 		CUSTOM_JOINTS_API dFloat GetRPM() const;
 		CUSTOM_JOINTS_API dFloat GetRedLineRPM() const;
 		CUSTOM_JOINTS_API dFloat GetSpeed() const;
 
+		CUSTOM_JOINTS_API int GetGear() const;
+		CUSTOM_JOINTS_API void SetGear(int gear);
+		CUSTOM_JOINTS_API int GetNeutralGear() const;
+		CUSTOM_JOINTS_API int GetReverserGear() const;
+
+		CUSTOM_JOINTS_API bool GetTransmissionMode() const;
+		CUSTOM_JOINTS_API void SetTransmissionMode(bool mode);
+
 		protected:
 		virtual void Update(dFloat timestep);
+		
 
 		BodyPartEngine* m_engine;
+		bool m_automaticTransmissionMode;
 		friend class CustomVehicleController;
 	};
 

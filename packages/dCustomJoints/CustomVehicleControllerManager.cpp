@@ -43,6 +43,10 @@
 #include "CustomHinge.h"
 #include "CustomVehicleControllerManager.h"
 
+//#define D_PLOT_ENGINE_CURVE
+#ifdef D_PLOT_ENGINE_CURVE 
+static FILE* file_xxx;
+#endif
 
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
 {
@@ -354,6 +358,8 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 		,m_engineJoint(engineJoint)
 		,m_clutchTorque(D_CUSTOM_LARGE_VALUE)		
 		,m_gearGain(0.0f)
+		,m_tireTorque(0.0f)
+		,m_engineTorque(0.0f)
 	{
 		dMatrix tireMatrix;
 		dMatrix engineMatrix;
@@ -403,48 +409,37 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 		enginePivotVeloc = engineOmega * enginePivot;
 
 		dVector tireDir (tireMatrix.RotateVector(m_localMatrix0.m_front).Scale (1.0f));
-		dVector diffDir (engineMatrix.RotateVector(m_localMatrix1.m_front));
+		dVector engineDir (engineMatrix.RotateVector(m_localMatrix1.m_front));
 
-		dVector tire_r0(tirePivot * tireDir);
-		dVector diff_r1(enginePivot * diffDir);
+		dVector tire_cross(tirePivot * tireDir);
+		dVector engine_cross(enginePivot * engineDir);
+
+		dFloat torque = -NewtonUserJointGetRowForce(m_joint, 0);
+		m_engineTorque = engine_cross.Scale (torque) % engineMatrix.m_front;
+		m_tireTorque = tire_cross.Scale (torque) % tireMatrix.RotateVector(m_localMatrix0.m_right);
 
 		dFloat jacobian0[6];
 		dFloat jacobian1[6];
 		jacobian0[0] = tireDir[0];
 		jacobian0[1] = tireDir[1];
 		jacobian0[2] = tireDir[2];
-		jacobian0[3] = tire_r0[0];
-		jacobian0[4] = tire_r0[1];
-		jacobian0[5] = tire_r0[2];
+		jacobian0[3] = tire_cross[0];
+		jacobian0[4] = tire_cross[1];
+		jacobian0[5] = tire_cross[2];
 
-		jacobian1[0] = diffDir[0];
-		jacobian1[1] = diffDir[1];
-		jacobian1[2] = diffDir[2];
-		jacobian1[3] = diff_r1[0];
-		jacobian1[4] = diff_r1[1];
-		jacobian1[5] = diff_r1[2];
+		jacobian1[0] = engineDir[0];
+		jacobian1[1] = engineDir[1];
+		jacobian1[2] = engineDir[2];
+		jacobian1[3] = engine_cross[0];
+		jacobian1[4] = engine_cross[1];
+		jacobian1[5] = engine_cross[2];
 
-		dFloat relSpeed = tirePivotVeloc % tireDir + enginePivotVeloc % diffDir;
+		dFloat relSpeed = tirePivotVeloc % tireDir + enginePivotVeloc % engineDir;
 
 //dTrace(("(%f  %f %f) ", relSpeed, tirePivotVeloc % tireDir, diffPivotVeloc % diffDir));
 //dTrace (("(%f %f)  ", m_diffJoint->GetJointOmega_0(), m_diffJoint->GetJointOmega_1()));
 
-//fprintf (file_xxx, "%f, ", tirePivotVeloc % tireDir);
-//fprintf(file_xxx, "%f, ", diffPivotVeloc % diffDir);
-//fflush(file_xxx);
-
 		
-		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
-		NewtonUserJointSetRowAcceleration(m_joint, -relSpeed / timestep);
-		if (m_clutchTorque < (D_CUSTOM_LARGE_VALUE * 0.1f)) {
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_clutchTorque);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_clutchTorque);
-		}
-
-		for (int i = 0; i < 3; i ++) {
-			jacobian0[i] *= -1.0f;
-			jacobian1[i] *= -1.0f;
-		}
 		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
 		NewtonUserJointSetRowAcceleration(m_joint, -relSpeed / timestep);
 		if (m_clutchTorque < (D_CUSTOM_LARGE_VALUE * 0.1f)) {
@@ -468,7 +463,8 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 	dVector m_engineAnkle; 
 	dFloat m_clutchTorque;
 	dFloat m_gearGain;
-	
+	dFloat m_tireTorque;
+	dFloat m_engineTorque;
 };
 
 CustomVehicleController::BodyPartTire::BodyPartTire()
@@ -630,7 +626,6 @@ dFloat CustomVehicleController::BodyPartEngine::GetTopGear() const
 
 
 void CustomVehicleController::BodyPartEngine::SetTopSpeed()
-//BodyPartEngine* const differential
 {
 	dAssert(m_data.m_vehicleTopSpeed >= 0.0f);
 	dAssert(m_data.m_vehicleTopSpeed < 100.0f);
@@ -720,7 +715,6 @@ dFloat CustomVehicleController::BodyPartEngine::GetRPM() const
 	dVector omega0;
 	dVector omega1;
 
-
 	EngineJoint* const joint = (EngineJoint*) GetJoint();
 	NewtonBody* const engine = joint->GetBody0();
 	NewtonBody* const chassis = joint->GetBody1();
@@ -741,7 +735,6 @@ void CustomVehicleController::BodyPartEngine::Update(dFloat timestep, dFloat gas
 	dVector omega;
 	dMatrix matrix;
 
-m_currentGear = 2;
 	m_leftGear->SetGain (m_data.m_gearRatios[m_currentGear]);
 	m_rigntGear->SetGain (m_data.m_gearRatios[m_currentGear]);
 
@@ -760,6 +753,75 @@ m_currentGear = 2;
 //dTrace (("%f %f %f\n", W, T, torqueMag));
 	dVector torque (matrix.m_front.Scale (torqueMag));
 	NewtonBodyAddTorque(engine, &torque[0]);
+}
+
+void CustomVehicleController::BodyPartEngine::UpdateAutomaticGearBox(dFloat timestep)
+{
+	dVector omega;
+	dMatrix matrix;
+
+	EngineJoint* const joint = (EngineJoint*)GetJoint();
+	NewtonBody* const engine = joint->GetBody0();
+	NewtonBodyGetOmega(engine, &omega[0]);
+	NewtonBodyGetMatrix(engine, &matrix[0][0]);
+	matrix = joint->GetMatrix0() * matrix;
+
+//	const dFloat rpmToRadiansPerSecunds = 0.105f;
+//	const dFloat radiansPerSecundsToRpm = (1.0f / 0.105f);
+	dFloat W = (omega % matrix.m_front) * m_data.m_crownGearRatio;
+
+	switch (m_currentGear) 
+	{
+		case 0:
+		{
+			dAssert (0);
+			break;
+		}
+
+		case 1:
+		{
+			  dAssert(0);
+			  break;
+		}
+
+		default:
+		{
+/*
+			if (W > m_data.m_rpmAtPeakHorsePower) {
+//				if (m_currentGear < (m_data.m_gearsCount - 1)) {
+				if (m_currentGear < 3) {
+					m_currentGear ++;
+					m_currentGear = 4;
+				}
+			} else if (W < m_data.m_rpmAtPeakHorsePower) {
+				if (m_currentGear > 2) {
+//					m_currentGear --;
+				}
+			}
+*/
+		}
+	}
+}
+
+
+int CustomVehicleController::BodyPartEngine::GetGear() const
+{
+	return m_currentGear;
+}
+
+void CustomVehicleController::BodyPartEngine::SetGear(int gear)
+{
+	m_currentGear = dClamp(gear, 0, m_data.m_gearsCount);
+}
+
+int CustomVehicleController::BodyPartEngine::GetNeutralGear() const
+{
+	return 0;
+}
+
+int CustomVehicleController::BodyPartEngine::GetReverserGear() const
+{
+	return 1;
 }
 
 
@@ -843,18 +905,48 @@ void CustomVehicleController::BrakeController::Update(dFloat timestep)
 CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, BodyPartEngine* const engine)
 	:Controller(controller)
 	,m_engine(engine)
+	,m_automaticTransmissionMode(true)
 {
 }
 
 void CustomVehicleController::EngineController::Update(dFloat timestep)
 {
+	if (m_automaticTransmissionMode) {
+		m_engine->UpdateAutomaticGearBox (timestep);
+	}
 	m_engine->Update (timestep, m_param);
+}
+
+bool CustomVehicleController::EngineController::GetTransmissionMode() const
+{
+	return m_automaticTransmissionMode;
+}
+
+void CustomVehicleController::EngineController::SetTransmissionMode(bool mode)
+{
+	m_automaticTransmissionMode = mode;
 }
 
 int CustomVehicleController::EngineController::GetGear() const
 {
-	return 0;
+	return m_engine->GetGear();
 }
+
+void CustomVehicleController::EngineController::SetGear(int gear)
+{
+	return m_engine->SetGear(gear);
+}
+
+int CustomVehicleController::EngineController::GetNeutralGear() const
+{
+	return m_engine->GetNeutralGear();
+}
+
+int CustomVehicleController::EngineController::GetReverserGear() const
+{
+	return m_engine->GetReverserGear();
+}
+
 
 dFloat CustomVehicleController::EngineController::GetRPM() const
 {
@@ -1232,6 +1324,11 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 
 	m_chassis.Init(this, userData);
 	m_bodyPartsList.Append(&m_chassis);
+
+#ifdef D_PLOT_ENGINE_CURVE 
+	file_xxx = fopen("vehiceLog.csv", "wb");
+	fprintf (file_xxx, "eng_rpm, eng_torque, tire_torque,\n");
+#endif
 }
 
 void CustomVehicleController::Cleanup()
@@ -1484,6 +1581,13 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 			}
 		}
 */	
+
+#ifdef D_PLOT_ENGINE_CURVE 
+		dFloat engineOmega = m_engine->GetRPM();
+		dFloat tireTorque = m_engine->GetLeftGear()->m_tireTorque + m_engine->GetRightGear()->m_tireTorque;
+		dFloat engineTorque = m_engine->GetLeftGear()->m_engineTorque + m_engine->GetRightGear()->m_engineTorque;
+		fprintf (file_xxx, "%f, %f, %f,\n", engineOmega, engineTorque, tireTorque);
+#endif
 	}
 
 
