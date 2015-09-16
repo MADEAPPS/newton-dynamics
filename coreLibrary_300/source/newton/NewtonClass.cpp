@@ -245,24 +245,32 @@ void NewtonUserJoint::GetJacobianAt(dgInt32 index, dgFloat32* const jacobian0, d
 
 void NewtonUserJoint::SetAcceleration (dgFloat32 acceleration)
 {
-	dgInt32 index; 
-	index = m_rows - 1;
+	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
 //		m_param->m_jointAccel[index] = acceleration;
 		SetMotorAcceleration (index, acceleration, *m_param);
 	}
 }
 
+dgFloat32 NewtonUserJoint::CalculateZeroMotorAcceleration() const
+{
+	dgInt32 index = m_rows - 1;
+	dgFloat32 accel = dgFloat32 (0.0f);
+	if ((index >= 0) && (index < dgInt32(m_maxDOF))) {
+		accel = CalculateMotorAcceleration(index, *m_param);
+	}
+	return accel;
+}
+
+
 void NewtonUserJoint::SetSpringDamperAcceleration (dFloat springK, dFloat damperD)
 {
-	dgInt32 index; 
-	index = m_rows - 1;
+	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
 		dgFloat32 accel = CalculateSpringDamperAcceleration (index, *m_param, m_lastJointAngle, m_lastPosit0, m_lastPosit1, springK, damperD);
 		SetMotorAcceleration (index, accel, *m_param);
 	}
 }
-
 
 
 void NewtonUserJoint::SetHighFriction (dgFloat32 friction)

@@ -44,6 +44,7 @@
 #include "CustomVehicleControllerManager.h"
 
 //#define D_PLOT_ENGINE_CURVE
+
 #ifdef D_PLOT_ENGINE_CURVE 
 static FILE* file_xxx;
 #endif
@@ -149,7 +150,9 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		const dVector& p0 = matrix0.m_posit;
 		dVector p1(matrix1.m_posit + matrix1.m_up.Scale(posit));
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+		NewtonUserJointSetRowAcceleration (m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
+		NewtonUserJointSetRowAcceleration (m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
 
 		dMatrix matrix1_1;
 		matrix1_1.m_up = matrix1.m_up;
@@ -259,8 +262,11 @@ class CustomVehicleController::EngineJoint: public CustomJoint
 
 		// Restrict the movement on the pivot point along all tree orthonormal direction
 		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+		NewtonUserJointSetRowAcceleration (m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
 		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
+		NewtonUserJointSetRowAcceleration (m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
 		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
+		NewtonUserJointSetRowAcceleration (m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
 
 		// construct an orthogonal coordinate system with these two vectors
 		dMatrix matrix1_1;
@@ -299,12 +305,6 @@ class CustomVehicleController::EngineJoint: public CustomJoint
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_dryResistance);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_dryResistance);
 		}
-
-//NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-//NewtonUserJointSetRowAcceleration(m_joint, -longOmega / timestep);
-//NewtonUserJointSetRowMinimumFriction(m_joint, -m_dryResistance * 10);
-//NewtonUserJointSetRowMaximumFriction(m_joint, m_dryResistance * 10);
-
 
 /*
 dMatrix m0;
@@ -530,6 +530,7 @@ void CustomVehicleController::BodyPartTire::SetBrakeTorque(dFloat torque)
 CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController* const controller, const Info& info)
 	:BodyPart()
 	,m_data(info)
+	,m_norminalTorque(0.0f)
 	,m_currentGear(2)
 {
 	m_parent = &controller->m_chassis;
@@ -606,10 +607,14 @@ void CustomVehicleController::BodyPartEngine::Info::ConvertToMetricSystem()
 	m_vehicleTopSpeed *= kmhToMetersPerSecunds;
 
 	m_peakPowerTorque = m_peakHorsePower / m_rpmAtPeakHorsePower;
+
+	//m_idleTorque = m_peakTorque * 0.5f;
+	m_peakPowerTorque = m_peakTorque * 0.5f;
 	dAssert(m_rpmAtIdleTorque > 0.0f);
 	dAssert(m_rpmAtIdleTorque < m_rpmAtPeakHorsePower);
 	dAssert(m_rpmAtPeakTorque < m_rpmAtPeakHorsePower);
 	dAssert(m_rpmAtPeakHorsePower < m_rpmAtReadLineTorque);
+
 
 	dAssert(m_idleTorque > 0.0f);
 	dAssert(m_peakTorque > m_peakPowerTorque);
@@ -748,10 +753,9 @@ void CustomVehicleController::BodyPartEngine::Update(dFloat timestep, dFloat gas
 	dFloat T = m_torqueRPMCurve.GetValue(W) * gasVal;
 	dFloat d = m_data.m_engineIdleViscousDrag;
 
-	dFloat torqueMag = T - d * W * W;
+	m_norminalTorque = T - d * W * W;
 
-//dTrace (("%f %f %f\n", W, T, torqueMag));
-	dVector torque (matrix.m_front.Scale (torqueMag));
+	dVector torque (matrix.m_front.Scale (m_norminalTorque));
 	NewtonBodyAddTorque(engine, &torque[0]);
 }
 
@@ -765,7 +769,6 @@ void CustomVehicleController::BodyPartEngine::UpdateAutomaticGearBox(dFloat time
 	NewtonBodyGetOmega(engine, &omega[0]);
 	NewtonBodyGetMatrix(engine, &matrix[0][0]);
 	matrix = joint->GetMatrix0() * matrix;
-
 //	const dFloat rpmToRadiansPerSecunds = 0.105f;
 //	const dFloat radiansPerSecundsToRpm = (1.0f / 0.105f);
 	dFloat W = (omega % matrix.m_front) * m_data.m_crownGearRatio;
@@ -786,19 +789,18 @@ void CustomVehicleController::BodyPartEngine::UpdateAutomaticGearBox(dFloat time
 
 		default:
 		{
-/*
+
 			if (W > m_data.m_rpmAtPeakHorsePower) {
-//				if (m_currentGear < (m_data.m_gearsCount - 1)) {
-				if (m_currentGear < 3) {
+				if (m_currentGear < (m_data.m_gearsCount - 1)) {
+//				if (m_currentGear < 3) {
 					m_currentGear ++;
-					m_currentGear = 4;
+//					m_currentGear = 3;
 				}
-			} else if (W < m_data.m_rpmAtPeakHorsePower) {
+			} else if (W < m_data.m_rpmAtPeakTorque) {
 				if (m_currentGear > 2) {
-//					m_currentGear --;
+					m_currentGear --;
 				}
 			}
-*/
 		}
 	}
 }
@@ -1327,7 +1329,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 
 #ifdef D_PLOT_ENGINE_CURVE 
 	file_xxx = fopen("vehiceLog.csv", "wb");
-	fprintf (file_xxx, "eng_rpm, eng_torque, tire_torque,\n");
+	fprintf (file_xxx, "eng_rpm, eng_torque, eng_nominalTorque,\n");
 #endif
 }
 
@@ -1586,7 +1588,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 		dFloat engineOmega = m_engine->GetRPM();
 		dFloat tireTorque = m_engine->GetLeftGear()->m_tireTorque + m_engine->GetRightGear()->m_tireTorque;
 		dFloat engineTorque = m_engine->GetLeftGear()->m_engineTorque + m_engine->GetRightGear()->m_engineTorque;
-		fprintf (file_xxx, "%f, %f, %f,\n", engineOmega, engineTorque, tireTorque);
+		fprintf (file_xxx, "%f, %f, %f,\n", engineOmega, engineTorque, m_engine->GetNominalTorque());
 #endif
 	}
 

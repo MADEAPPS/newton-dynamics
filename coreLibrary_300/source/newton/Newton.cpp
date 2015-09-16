@@ -7454,6 +7454,13 @@ void NewtonUserJointSetRowAcceleration(const NewtonJoint* const joint, dFloat ac
 	userJoint->SetAcceleration (acceleration);
 }
 
+dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
+	return userJoint->CalculateZeroMotorAcceleration();
+}
+
 // Name: NewtonUserJointSetRowSpringDamperAcceleration
 // Calculates the row acceleration to satisfy the specified the spring damper system. 
 //

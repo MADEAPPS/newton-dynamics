@@ -590,8 +590,8 @@ steeringVal *= 0.3f;
 		// check transmission type
 //		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 0
-	#if 0
+#if 1
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
@@ -619,7 +619,7 @@ steeringVal *= 0.3f;
 	#endif
 #endif
 
-		dTrace (("%d\n", gear));
+//		dTrace (("%d\n", gear));
 		if (engine) {
 /*
 			bool key = (m_engineKeySwitchCounter & 1) ? true : false;
@@ -1362,6 +1362,8 @@ void SuperCar (DemoEntityManager* const scene)
 	NewtonWorld* const world = scene->GetNewton();
 
 	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	NewtonMaterialSetDefaultFriction(world, defaulMaterial, defaulMaterial, 0.6f, 0.5f);
+
 	int materialList[] = {defaulMaterial };
 
 	// create a vehicle controller manager
@@ -1425,7 +1427,7 @@ location1 = dGetIdentityMatrix();
 	camMatrix.m_posit.m_x -= 5.0f;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
-
+/*
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
 	location.m_posit.m_x += 44.0f;
@@ -1448,6 +1450,6 @@ location1 = dGetIdentityMatrix();
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-
+*/
 }
 

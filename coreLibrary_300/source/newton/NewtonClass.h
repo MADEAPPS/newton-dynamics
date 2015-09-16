@@ -97,6 +97,7 @@ class NewtonUserJoint: public dgUserConstraint
 	void SetLowerFriction (dgFloat32 friction);
 	void SetRowStiffness (dgFloat32 stiffness);
 	void SetAcceleration (dgFloat32 acceleration);
+	dgFloat32 CalculateZeroMotorAcceleration() const;
 	void SetSpringDamperAcceleration (dgFloat32 springK, dgFloat32 springD);
 	void GetInfo (dgConstraintInfo* const info) const;
 

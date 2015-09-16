@@ -213,6 +213,7 @@ class CustomVehicleController: public CustomControllerBase
 		int GetReverserGear() const;
 		void UpdateAutomaticGearBox(dFloat timestep);
 
+		dFloat GetNominalTorque() const {return m_norminalTorque;}
 		DifferentialSpiderGearJoint* GetLeftGear () const {return m_leftGear;}
 		DifferentialSpiderGearJoint* GetRightGear () const {return m_rigntGear;}
 
@@ -225,6 +226,7 @@ class CustomVehicleController: public CustomControllerBase
 		dInterpolationCurve m_torqueRPMCurve;
 		DifferentialSpiderGearJoint* m_leftGear;
 		DifferentialSpiderGearJoint* m_rigntGear;
+		dFloat m_norminalTorque;
 		int m_currentGear;
 	};
 

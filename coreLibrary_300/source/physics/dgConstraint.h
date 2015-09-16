@@ -125,6 +125,7 @@ class dgContraintDescritor
 	dgFloat32 m_restitution[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_penetration[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_penetrationStiffness[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_zeroRowAcceleration[DG_CONSTRAINT_MAX_ROWS];
 	bool m_isMotor[DG_CONSTRAINT_MAX_ROWS];
 	dgWorld* m_world;
 	dgInt32 m_threadIndex;
@@ -202,7 +203,7 @@ class dgConstraint
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params) = 0; 
 
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params) = 0; 
-	virtual void JointVelocityCorrection(dgJointAccelerationDecriptor* const params) = 0; 
+
 
 	void SetUpdateFeedbackFunction (ConstraintsForceFeeback function);
 	void InitPointParam (dgPointParam& param, dgFloat32 stiffness, const dgVector& p0Global, const dgVector& p1Global) const;

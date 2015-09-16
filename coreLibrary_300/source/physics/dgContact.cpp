@@ -319,8 +319,3 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 	}
 }
 
-void dgContact::JointVelocityCorrection(dgJointAccelerationDecriptor* const params)
-{
-	dgAssert (0);
-}
-

@@ -48,9 +48,9 @@ class dgBilateralConstraint: public dgConstraint
 	void CalculateMatrixOffset (const dgVector& pivot, const dgVector& dir, dgMatrix& matrix0, dgMatrix& matrix1);
 
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); 
-	virtual void JointVelocityCorrection(dgJointAccelerationDecriptor* const params); 
 
-	void SetMotorAcceleration (dgInt32 index, dgFloat32 accelration, dgContraintDescritor& desc);
+	dgFloat32 CalculateMotorAcceleration (dgInt32 index, dgContraintDescritor& desc) const;
+	void SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc);
 	void SetJacobianDerivative (dgInt32 index, dgContraintDescritor& desc, const dgFloat32* const jacobianA, const dgFloat32* const jacobianB, dgForceImpactPair* const jointForce);
 	void CalculatePointDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, const dgPointParam& param, dgForceImpactPair* const jointForce);
 	void CalculateAngularDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, dgFloat32 stiffness, dgFloat32 jointAngle, dgForceImpactPair* const jointForce);

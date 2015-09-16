@@ -289,9 +289,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 		dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 		dgFloat32 alphaError = num / den;
 
-		//dgFloat32 alphaError1 = alphaError;
-		//alphaError = (jointAngle + omegaError * dt) / (dt * dt);
-		//dgTrace(("%f (%f %f)\n", jointAngle, alphaError1, alphaError));
+		desc.m_zeroRowAcceleration[index] = (jointAngle + omegaError * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep;
 
 		desc.m_penetration[index] = jointAngle;
 		desc.m_jointAccel[index] = alphaError;
@@ -300,11 +298,12 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 		desc.m_penetrationStiffness[index] = dgFloat32 (0.0f);
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	} else {
-		desc.m_penetration[index] = 0.0f;
+		desc.m_penetration[index] = dgFloat32 (0.0f);
 		desc.m_jointAccel[index] = omegaError;
 		desc.m_restitution[index] = dgFloat32 (0.0f);
 		desc.m_jointStiffness[index] = stiffness;
 		desc.m_penetrationStiffness[index] = dgFloat32 (0.0f);
+		desc.m_zeroRowAcceleration[index]  = dgFloat32 (0.0f);
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	}
 }
@@ -352,6 +351,8 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		dgFloat32 relCentr = centrError % dir; 
 		relCentr = dgClamp (relCentr, dgFloat32(-10000.0f), dgFloat32(10000.0f));
 
+		desc.m_zeroRowAcceleration[index] = (relPosit + relVeloc * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep + relCentr;
+
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		dgFloat32 dt = desc.m_timestep;
 		dgFloat32 ks = DG_POS_DAMP;
@@ -369,15 +370,23 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		desc.m_restitution[index] = relCentr;
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	} else {
-		desc.m_penetration[index] = 0.0f;
-		desc.m_penetrationStiffness[index] = 0.0f;
+		desc.m_penetration[index] = dgFloat32 (0.0f);
+		desc.m_penetrationStiffness[index] = dgFloat32 (0.0f);
 		desc.m_jointStiffness[index] = param.m_stiffness;
 		desc.m_jointAccel[index] = relVeloc;
-		desc.m_restitution[index] = 0.0f;
+		desc.m_restitution[index] = dgFloat32 (0.0f);
+		desc.m_zeroRowAcceleration[index]  = dgFloat32 (0.0f);
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	}
 }
 
+dgFloat32 dgBilateralConstraint::CalculateMotorAcceleration (dgInt32 index, dgContraintDescritor& desc) const
+{
+//static int xxx;
+//dgTrace (("%d %f %f\n", xxx, desc.m_zeroRowAcceleration[index], desc.m_jointAccel[index]));
+//xxx ++;
+	return desc.m_zeroRowAcceleration[index];
+}
 
 void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* const params)
 {
@@ -453,28 +462,3 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 	}
 }
 
-void dgBilateralConstraint::JointVelocityCorrection(dgJointAccelerationDecriptor* const params)
-{
-/*
-	const dgJacobianPair* const Jt = params.m_Jt;
-	const dgVector& bodyVeloc0 = params.m_body0->m_correctionVeloc;
-	const dgVector& bodyOmega0 = params.m_body0->m_correctionOmega;
-	const dgVector& bodyVeloc1 = params.m_body1->m_correctionVeloc;
-	const dgVector& bodyOmega1 = params.m_body1->m_correctionOmega;
-
-	for (dgInt32 k = 0; k < params.m_rowsCount; k ++) {
-		dgFloat32 vRel;
-		dgFloat32 penetrationCorrection;
-
-		dgVector relVeloc (Jt[k].m_jacobian_IM0.m_linear.CompProduct3(bodyVeloc0));
-		relVeloc += Jt[k].m_jacobian_IM0.m_angular.CompProduct3(bodyOmega0);
-		relVeloc += Jt[k].m_jacobian_IM1.m_linear.CompProduct3(bodyVeloc1);
-		relVeloc += Jt[k].m_jacobian_IM1.m_angular.CompProduct3(bodyOmega1);
-		vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-		
-		penetrationCorrection = vRel * params.m_timeStep;
-		params.m_penetration[k] -= penetrationCorrection;
-		params.m_coordenateAccel[k] =  - vRel + params.m_penetration[k] * params.m_invTimeStep * 0.25f;
-	}
-*/
-}
