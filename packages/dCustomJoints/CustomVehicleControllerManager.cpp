@@ -43,11 +43,15 @@
 #include "CustomHinge.h"
 #include "CustomVehicleControllerManager.h"
 
-//#define D_PLOT_ENGINE_CURVE
+#define D_PLOT_ENGINE_CURVE
 
 #ifdef D_PLOT_ENGINE_CURVE 
 static FILE* file_xxx;
 #endif
+
+#define D_VEHICLE_NEWTRAL_GEAR		0
+#define D_VEHICLE_REVERSE_GEAR		1
+#define D_VEHICLE_FIRST_GEAR		2
 
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
 {
@@ -532,6 +536,7 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController
 	,m_data(info)
 	,m_norminalTorque(0.0f)
 	,m_currentGear(2)
+	,m_gearTimer(0)
 {
 	m_parent = &controller->m_chassis;
 	m_controller = controller;
@@ -567,12 +572,12 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController
 
 	InitEngineTorqueCurve();
 
-	dAssert(info.m_gearsCount < (int(sizeof (m_data.m_gearRatios) / sizeof (m_data.m_gearRatios[0])) - 2));
-	m_data.m_gearsCount = info.m_gearsCount + 2;
-	m_data.m_gearRatios[0] = 0.0f;
-	m_data.m_gearRatios[1] = -dAbs(info.m_reverseGearRatio);
+	dAssert(info.m_gearsCount < (int(sizeof (m_data.m_gearRatios) / sizeof (m_data.m_gearRatios[0])) - D_VEHICLE_FIRST_GEAR));
+	m_data.m_gearsCount = info.m_gearsCount + D_VEHICLE_FIRST_GEAR;
+	m_data.m_gearRatios[D_VEHICLE_NEWTRAL_GEAR] = 0.0f;
+	m_data.m_gearRatios[D_VEHICLE_REVERSE_GEAR] = -dAbs(info.m_reverseGearRatio);
 	for (int i = 0; i < info.m_gearsCount; i++) {
-		m_data.m_gearRatios[i + 2] = dAbs(info.m_gearRatios[i]);
+		m_data.m_gearRatios[i + D_VEHICLE_FIRST_GEAR] = dAbs(info.m_gearRatios[i]);
 	}
 
 	EngineJoint* const joint = new EngineJoint(m_body, m_parent->GetBody(), m_data.m_engineIdleDryDrag);
@@ -761,44 +766,42 @@ void CustomVehicleController::BodyPartEngine::Update(dFloat timestep, dFloat gas
 
 void CustomVehicleController::BodyPartEngine::UpdateAutomaticGearBox(dFloat timestep)
 {
-	dVector omega;
-	dMatrix matrix;
+	m_gearTimer --;
+	if (m_gearTimer < 0) {
+		dVector omega;
+		dMatrix matrix;
 
-	EngineJoint* const joint = (EngineJoint*)GetJoint();
-	NewtonBody* const engine = joint->GetBody0();
-	NewtonBodyGetOmega(engine, &omega[0]);
-	NewtonBodyGetMatrix(engine, &matrix[0][0]);
-	matrix = joint->GetMatrix0() * matrix;
-//	const dFloat rpmToRadiansPerSecunds = 0.105f;
-//	const dFloat radiansPerSecundsToRpm = (1.0f / 0.105f);
-	dFloat W = (omega % matrix.m_front) * m_data.m_crownGearRatio;
-
-	switch (m_currentGear) 
-	{
-		case 0:
+		EngineJoint* const joint = (EngineJoint*)GetJoint();
+		NewtonBody* const engine = joint->GetBody0();
+		NewtonBodyGetOmega(engine, &omega[0]);
+		NewtonBodyGetMatrix(engine, &matrix[0][0]);
+		omega = matrix.UnrotateVector(omega);
+		dFloat W = omega.m_x * m_data.m_crownGearRatio;
+	
+		switch (m_currentGear) 
 		{
-			dAssert (0);
-			break;
-		}
+			case D_VEHICLE_NEWTRAL_GEAR:
+			{
+				dAssert (0);
+				break;
+			}
 
-		case 1:
-		{
-			  dAssert(0);
-			  break;
-		}
+			case D_VEHICLE_REVERSE_GEAR:
+			{
+				  dAssert(0);
+				  break;
+			}
 
-		default:
-		{
-
-			if (W > m_data.m_rpmAtPeakHorsePower) {
-				if (m_currentGear < (m_data.m_gearsCount - 1)) {
-//				if (m_currentGear < 3) {
-					m_currentGear ++;
-//					m_currentGear = 3;
-				}
-			} else if (W < m_data.m_rpmAtPeakTorque) {
-				if (m_currentGear > 2) {
-					m_currentGear --;
+			default:
+			{
+				if (W > m_data.m_rpmAtPeakHorsePower) {
+					if (m_currentGear < (m_data.m_gearsCount - 1)) {
+						SetGear(m_currentGear + 1);
+					}
+				} else if (W < m_data.m_rpmAtPeakTorque) {
+					if (m_currentGear > D_VEHICLE_FIRST_GEAR) {
+						SetGear(m_currentGear - 1);
+					}
 				}
 			}
 		}
@@ -813,18 +816,23 @@ int CustomVehicleController::BodyPartEngine::GetGear() const
 
 void CustomVehicleController::BodyPartEngine::SetGear(int gear)
 {
+	m_gearTimer = 30;
+	dFloat oldGain = m_data.m_gearRatios[m_currentGear];
 	m_currentGear = dClamp(gear, 0, m_data.m_gearsCount);
+
+	dVector omega;
+	dMatrix matrix;
+
+	EngineJoint* const joint = (EngineJoint*)GetJoint();
+	NewtonBody* const engine = joint->GetBody0();
+	NewtonBodyGetOmega(engine, &omega[0]);
+	NewtonBodyGetMatrix(engine, &matrix[0][0]);
+	omega = matrix.UnrotateVector(omega);
+	omega.m_x *= m_data.m_gearRatios[m_currentGear] / oldGain;
+	omega = matrix.RotateVector(omega);
+	NewtonBodySetOmega(engine, &omega[0]);
 }
 
-int CustomVehicleController::BodyPartEngine::GetNeutralGear() const
-{
-	return 0;
-}
-
-int CustomVehicleController::BodyPartEngine::GetReverserGear() const
-{
-	return 1;
-}
 
 
 CustomVehicleController::SteeringController::SteeringController (CustomVehicleController* const controller, dFloat maxAngle)
@@ -939,15 +947,6 @@ void CustomVehicleController::EngineController::SetGear(int gear)
 	return m_engine->SetGear(gear);
 }
 
-int CustomVehicleController::EngineController::GetNeutralGear() const
-{
-	return m_engine->GetNeutralGear();
-}
-
-int CustomVehicleController::EngineController::GetReverserGear() const
-{
-	return m_engine->GetReverserGear();
-}
 
 
 dFloat CustomVehicleController::EngineController::GetRPM() const

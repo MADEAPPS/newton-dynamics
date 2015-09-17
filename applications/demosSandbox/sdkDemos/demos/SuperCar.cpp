@@ -591,7 +591,7 @@ steeringVal *= 0.3f;
 //		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 1
-	#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
@@ -644,7 +644,7 @@ steeringVal *= 0.3f;
 				}
 			}
 */
-			engine->SetGear(gear);
+//			engine->SetGear(gear);
 			engine->SetParam(engineGasPedal);
 		}
 
@@ -1123,20 +1123,17 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			CustomVehicleController::EngineController* const engine = m_player->m_controller->GetEngine();
 			if (engine) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-				dFloat width = scene->GetWidth();
-				//dFloat height = scene->getHeight();
 				dFloat gageSize = 200.0f;
 
-				//dFloat y = -height / 2.0f + gageSize / 2.0f + 60.0f;
 				dFloat y = gageSize / 2.0f + 60.0f;
 
 				// draw the tachometer
-				dFloat x = gageSize / 2 + 80.0f;
+				dFloat x = gageSize / 2 + 40.0f;
 				dFloat rpm = engine->GetRPM () / engine->GetRedLineRPM();
 				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize);
 
 				// draw the odometer
-				x = width - gageSize / 2 - 80.0f;
+				x += gageSize;
 				dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
 				int gear = engine->GetGear();
 				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
@@ -1391,6 +1388,7 @@ void SuperCar (DemoEntityManager* const scene)
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 location1 = dGetIdentityMatrix();
+location1.m_posit.m_x = -170;
 
 //		location1.m_posit += location1.m_right.Scale (-3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);

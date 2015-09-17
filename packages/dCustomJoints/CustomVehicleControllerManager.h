@@ -209,8 +209,6 @@ class CustomVehicleController: public CustomControllerBase
 
 		int GetGear() const;
 		void SetGear(int gear);
-		int GetNeutralGear() const;
-		int GetReverserGear() const;
 		void UpdateAutomaticGearBox(dFloat timestep);
 
 		dFloat GetNominalTorque() const {return m_norminalTorque;}
@@ -228,6 +226,7 @@ class CustomVehicleController: public CustomControllerBase
 		DifferentialSpiderGearJoint* m_rigntGear;
 		dFloat m_norminalTorque;
 		int m_currentGear;
+		int m_gearTimer;
 	};
 
 	class Controller: public CustomAlloc
@@ -334,15 +333,12 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API int GetGear() const;
 		CUSTOM_JOINTS_API void SetGear(int gear);
-		CUSTOM_JOINTS_API int GetNeutralGear() const;
-		CUSTOM_JOINTS_API int GetReverserGear() const;
 
 		CUSTOM_JOINTS_API bool GetTransmissionMode() const;
 		CUSTOM_JOINTS_API void SetTransmissionMode(bool mode);
 
 		protected:
 		virtual void Update(dFloat timestep);
-		
 
 		BodyPartEngine* m_engine;
 		bool m_automaticTransmissionMode;
