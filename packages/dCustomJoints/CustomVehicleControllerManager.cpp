@@ -133,8 +133,10 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		:CustomJoint (6, tire, parentBody)
 		,m_data (tireData)
 		,m_tireLoad(0.0f)
+		,m_restLoad(0.0f)
 		,m_steerAngle(0.0f)
 		,m_brakeTorque(0.0f)
+		,m_gravityMag(0.0f)
 		,m_restSprunMass(0.0f)
 	{
 		CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -164,11 +166,14 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		matrix1_1.m_right = matrix1_1.m_right.Scale(1.0f / dSqrt(matrix1_1.m_right % matrix1_1.m_right));
 		matrix1_1.m_front = matrix1_1.m_up * matrix1_1.m_right;
 
-		dVector omega0;
-		dVector omega1;
-		NewtonBodyGetOmega(m_body0, &omega0[0]);
-		NewtonBodyGetOmega(m_body1, &omega1[0]);
-		dVector relOmega(omega0 - omega1);
+		NewtonBody* const tire = m_body0;
+		NewtonBody* const chassis = m_body1;
+
+		dVector tireOmega;
+		dVector chassisOmega;
+		NewtonBodyGetOmega(tire, &tireOmega[0]);
+		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
+		dVector relOmega(tireOmega - chassisOmega);
 
 		dFloat angle = -CalculateAngle(matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right);
 		dFloat omega = (relOmega % matrix1_1.m_right);
@@ -208,10 +213,10 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		dVector chassisCom;
 		dVector chassisVeloc;
 		dMatrix chassisMatrix;
-		NewtonBodyGetVelocity(GetBody0(), &tireVeloc[0]);
-		NewtonBodyGetPointVelocity(GetBody1(), &p0[0], &chassisVeloc[0]);
-		NewtonBodyGetCentreOfMass(GetBody1(), &chassisCom[0]);
-		NewtonBodyGetMatrix(GetBody1(), &chassisMatrix[0][0]);
+		NewtonBodyGetVelocity(tire, &tireVeloc[0]);
+		NewtonBodyGetPointVelocity(chassis, &p0[0], &chassisVeloc[0]);
+		NewtonBodyGetCentreOfMass(chassis, &chassisCom[0]);
+		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
 
 		posit = dClamp(posit, 0.0f, m_data->m_data.m_suspesionlenght);
 		chassisCom = p0 - chassisMatrix.TransformVector(chassisCom);
@@ -221,24 +226,42 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		m_tireLoad = load * m_restSprunMass;
 		dVector force (matrix1.m_up.Scale (m_tireLoad));
 		dVector torque (chassisCom  * force);
+		NewtonBodyAddForce(chassis, &force[0]);
+		NewtonBodyAddTorque(chassis, &torque[0]);
 
-		NewtonBodyAddForce(GetBody1(), &force[0]);
-		NewtonBodyAddTorque(GetBody1(), &torque[0]);
 		force = force.Scale (-1.0f);
-		NewtonBodyAddForce(GetBody0(), &force[0]);
+		dVector tireWeight;
+		NewtonBodyGetForceAcc(tire, &tireWeight[0]);
+		NewtonBodyAddForce(tire, &force[0]);
 
+		dFloat weight = -(matrix1.m_up % tireWeight);
+		m_gravityMag = weight / m_data->m_data.m_mass;
+		m_restLoad = (m_data->m_data.m_mass + m_restSprunMass) * gravity;
+		m_tireLoad += weight;
 		m_brakeTorque = 0.0f;
+	}
+
+	dFloat GetGravityMag() const
+	{
+		return m_gravityMag;
+	}
+
+	dFloat GetTireRestLoad() const
+	{
+		return m_restLoad;
 	}
 
 	dFloat GetTireLoad () const
 	{
-		return 0;
+		return m_tireLoad;
 	}
 
 	BodyPartTire* m_data;
 	dFloat m_tireLoad;
+	dFloat m_restLoad;
 	dFloat m_steerAngle;
 	dFloat m_brakeTorque;
+	dFloat m_gravityMag;
 	dFloat m_restSprunMass;
 };
 
@@ -1738,11 +1761,12 @@ xxx *=1;
 //				}
 			}
 			tire->m_longitudinalSlip = longitudinalSlipRatio;
-dTrace (("%f %f\n", u_rel, tire->m_longitudinalSlip));
-
+//dTrace (("%f %f\n", u_rel, tire->m_longitudinalSlip));
 
 			// get the normalize tire load
-//			dFloat normalizedTireLoad = dClamp(tireLoad / restTireLoad, 0.0f, 4.0f);
+			dFloat tireLoad = tireJoint->GetTireLoad();
+			dFloat restTireLoad = tireJoint->GetTireRestLoad();
+			dFloat normalizedTireLoad = dClamp(tireLoad / restTireLoad, 0.0f, 4.0f);
 
 /*
 			// calculate longitudinal and lateral forces magnitude when no friction Limit (for now ignore camber angle effects)
