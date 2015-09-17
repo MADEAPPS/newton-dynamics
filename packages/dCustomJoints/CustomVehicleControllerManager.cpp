@@ -43,7 +43,7 @@
 #include "CustomHinge.h"
 #include "CustomVehicleControllerManager.h"
 
-#define D_PLOT_ENGINE_CURVE
+//#define D_PLOT_ENGINE_CURVE
 
 #ifdef D_PLOT_ENGINE_CURVE 
 static FILE* file_xxx;
