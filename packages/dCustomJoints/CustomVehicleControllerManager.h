@@ -141,7 +141,6 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_radio;
 			dFloat m_width;
 			dFloat m_dampingRatio;
-			dFloat m_aligningPinDir;
 			dFloat m_springStrength;
 			dFloat m_suspesionlenght;
 			dFloat m_lateralStiffness;
@@ -158,6 +157,8 @@ class CustomVehicleController: public CustomControllerBase
 		void SetBrakeTorque (dFloat torque);
 
 		Info m_data;
+		dFloat m_lateralSlip;
+		dFloat m_longitudinalSlip;
 	};
 
 	class BodyPartEngine: public BodyPart
@@ -436,7 +437,7 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 	CUSTOM_JOINTS_API virtual void DestroyController (CustomVehicleController* const controller);
 
 	CUSTOM_JOINTS_API virtual int OnTireAABBOverlap(const NewtonMaterial* const material, const CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody) const;
-	CUSTOM_JOINTS_API virtual void OnTireContactsProcess (const NewtonJoint* const contactJoint, const CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody, dFloat timestep);
+	CUSTOM_JOINTS_API virtual void OnTireContactsProcess (const NewtonJoint* const contactJoint, CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody, dFloat timestep);
 
 	CUSTOM_JOINTS_API int GetTireMaterial() const;
 

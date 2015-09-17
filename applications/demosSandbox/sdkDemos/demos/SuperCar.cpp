@@ -266,10 +266,8 @@ class SuperCarEntity: public DemoEntity
 		tireMatrix.m_posit.m_y -= suspensionLength * 0.25f;
 
 		// add and alignment matrix,to match visual mesh to physics collision shape
-		dMatrix aligmentMatrix (dGetIdentityMatrix());
-		if (tireMatrix[0][2] < 0.0f) {
-			aligmentMatrix = dYawMatrix(3.141592f);
-		}
+		dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dGetIdentityMatrix() : dYawMatrix(3.141592f));
+
 		TireAligmentTransform* const m_ligmentMatrix = new TireAligmentTransform(aligmentMatrix);
 		tirePart->SetUserData(m_ligmentMatrix);
 
@@ -279,7 +277,6 @@ class SuperCarEntity: public DemoEntity
 		tireInfo.m_mass = mass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
-		tireInfo.m_aligningPinDir = pinDir;
 		tireInfo.m_dampingRatio = suspensionDamper;
 		tireInfo.m_springStrength = suspensionSpring;
 		tireInfo.m_suspesionlenght = suspensionLength;
@@ -297,24 +294,21 @@ class SuperCarEntity: public DemoEntity
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
-		//for (BodyPartTire* tire = m_controller->GetFirstTire(); tire; tire = m_controller->GetNextTire(tire)) {
 		for (dList<CustomVehicleController::BodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
 			CustomVehicleController::BodyPart* const part = node->GetInfo();
 			CustomVehicleController::BodyPart* const parent = part->GetParent();
 
 			NewtonBody* const body = part->GetBody();
 			NewtonBody* const parentBody = parent->GetBody();
-			
 
 			dMatrix matrix;
 			dMatrix parentMatrix;
 			NewtonBodyGetMatrix(body, &matrix[0][0]);
 			NewtonBodyGetMatrix(parentBody, &parentMatrix[0][0]);
-			matrix = matrix * parentMatrix.Inverse();
 
 			DemoEntity* const tirePart = (DemoEntity*) part->GetUserData();
-			//TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
-			//dMatrix matrix (aligmentMatrix->m_matrix * tire->CalculateLocalMatrix());
+			TireAligmentTransform* const aligmentMatrix = (TireAligmentTransform*)tirePart->GetUserData();
+			matrix = aligmentMatrix->m_matrix * matrix * parentMatrix.Inverse();
 
 			dQuaternion rot (matrix);
 			tirePart->SetMatrix(*scene, rot, matrix.m_posit);
@@ -590,8 +584,8 @@ steeringVal *= 0.3f;
 		// check transmission type
 //		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 0
-	#if 0
+#if 1
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);

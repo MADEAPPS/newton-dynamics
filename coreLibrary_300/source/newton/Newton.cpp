@@ -2294,7 +2294,7 @@ void NewtonMaterialContactRotateTangentDirections(const NewtonMaterial* const ma
 
 	const dgVector dir0 (alignVector[0], alignVector[1], alignVector[2], dgFloat32 (0.0f));
     	
-	dgVector dir1 = material->m_normal * dir0;
+	dgVector dir1 (material->m_normal * dir0);
 	dFloat mag2 = dir1 % dir1;
 	if (mag2 > 1.0e-6f) {
 		material->m_dir1 = dir1.Scale3 (dgRsqrt (mag2));
