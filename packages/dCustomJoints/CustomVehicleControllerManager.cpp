@@ -10,27 +10,9 @@
 */
 
 
-// most the work for the tire model comes from this paper
-// http://code.eng.buffalo.edu/dat/sites/tire/tire.html 
-// I do not really use their Simplified Tire Model Equations, 
-// instead I use the explanation of the empirical tire model and use the slip and 
-// side slip coefficients to determine friction limits from piecewise normalized tire force curves.
-// I use these friction forces in a full analytical Lagrangian rigid body model of the vehicle. 
+// most the work for the brush tire model comes from this paper
+// https://ddl.stanford.edu/sites/default/files/2013_Thesis_Hindiyeh_Dynamics_and_Control_of_Drifting_in_Automobiles.pdf
 // Surprisingly the results are more realistic than I would expect.
-//
-// the only time the empirical tire model fall far from realistic behaviors 
-// is when the tire liner velocity at the cent is too close to zero.
-// but for this I case is handles with the constraints joints that keep the car stable.
-// in fact the constraint joint effect is negligible so it can be left on during the entire simulation.
-// when the car is moving a at any speed the constraint joint act a dry dolling friction.
-
-// replaced the tire model base of Pacejkas (which seems to always produce a very poor tire behavior) 
-// with the the method use in this paper 
-// http://www.ricblues.nl/techniek/Technisch%20Specialist%2093430/6%20Remgedrag%20ABS%20weggedrag/Carsim%20-%20remsimulatieprogramma/Handleiding%20carsim.pdf
-// basically th replace the Pajecka equation with the with the two series expansions 
-// f = x - |x| * x / 3 + x * x * x / 27
-// T = x - |x| * x + x * x * x / 3 - |x| * x * x * x / 27 
-// they also have a better tire friction model that the naive friction circle projection
 
 // for the differential equation I am using information from here
 // http://web.mit.edu/2.972/www/reports/differential/differential.html
@@ -1719,22 +1701,9 @@ xxx *=1;
 			NewtonMaterialContactRotateTangentDirections (material, &lateralPin[0]);
 			NewtonMaterialGetContactTangentDirections (material, tireBody, &lateralContactDir[0], &longitudinalContactDir[0]);
 
-//			dVector contactPoint(m_contactsPoint[i]);
-//			dVector hitBodyPointVelocity;
-//			NewtonBody* const hitBody = externalBody->m_newtonBody;
-//			NewtonBodyGetPointVelocity(hitBody, &contactPoint[0], &hitBodyPointVelocity[0]);
-//			hitBodyPointVelocity.m_w = 0.0f;
-//			dVector headingVeloc(tire->m_veloc + hitBodyPointVelocity);
-//			headingVeloc -= normal.Scale(headingVeloc % normal);
-//			dFloat v = lateralPin % headingVeloc;
-//			dFloat u = longitudinalPin % headingVeloc;
-
 			dFloat u = tireVeloc % longitudinalContactDir;
 			dFloat u_rel = NewtonMaterialGetContactTangentSpeed (material, 1);
 			dFloat v_rel = NewtonMaterialGetContactTangentSpeed (material, 0);
-
-//			dVector contactRotationalVeloc(tireOmega * radius);
-//			dFloat Rw = longitudinalContactDir % contactRotationalVeloc;
 
 //			dFloat u_relAbs = dAbs(u_rel);
 			dFloat v_relAbs = dAbs(v_rel);
@@ -1772,8 +1741,9 @@ xxx *=1;
 //				}
 			}
 			tire->m_longitudinalSlip = longitudinalSlipRatio;
-//
 
+			// ok the tire mode do not seem correct
+/*
 			// get the normalize tire load
 			dFloat tireLoad = tireJoint->GetTireLoad();
 			dFloat restTireLoad = tireJoint->GetTireRestLoad();
@@ -1795,14 +1765,7 @@ xxx *=1;
 			dFloat tireLoadFriction = contactGroundFriction * tireLoad;
 			dFloat K = dSqrt(Fx0 * Fx0 + Fy0 * Fy0) / tireLoadFriction;
 			dAssert(K >= 0.0f);
-
-			// now use the friction curve approximation 
-			// http://www.ricblues.nl/techniek/Technisch%20Specialist%2093430/6%20Remgedrag%20ABS%20weggedrag/Carsim%20-%20remsimulatieprogramma/Handleiding%20carsim.pdf
-			// basically it replaces Pajecka equation with a series expansion 
-			// f = x - |x| * x / 3 + x * x * x / 27
-			// m = x - |x| * x + x * x * x / 3 + x * x * x * x / 27
 			dFloat tireForceCoef = dMin(K * (1.0f - K / 3.0f + K * K / 27.0f), 1.0f);
-
 
 			dFloat nu = 1.0f;
 			if (K < 2.0f * 3.141592f) {
@@ -1819,20 +1782,21 @@ xxx *=1;
 			dFloat tireMomentCoef = k1 * (1.0f - k1 + k1 * k1 / 3.0f - k1 * k1 * k1 / 27.0f);
 			tire->m_aligningTorque = nu * tire->m_data.m_aligningMomentTrail * Teff * tireMomentCoef * f0;
 
-			NewtonMaterialSetContactElasticity (material, 0.1f);
-//			NewtonMaterialSetContactTangentFriction (material, lateralForce, 0);
-//			NewtonMaterialSetContactTangentFriction (material, longitudinalForce, 1);
+			NewtonMaterialSetContactTangentFriction (material, lateralForce, 0);
+			NewtonMaterialSetContactTangentFriction (material, longitudinalForce, 1);
+*/
+		NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
+		NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 
-			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
-			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
-
-if (tire->m_index == 2){
-dTrace (("%f %f %f\n", K, lateralForce, longitudinalForce));
-}
+//if (tire->m_index == 2){
+//dTrace (("%f %f %f\n", K, lateralForce, longitudinalForce));
+//}
 
 		} else {
 			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 		}
+		
+		NewtonMaterialSetContactElasticity (material, 0.1f);
 	}
 }
