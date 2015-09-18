@@ -120,7 +120,9 @@ class dgContactMaterial: public dgContactPoint
 		m_friction1Enable = 1<<2,
 		m_override0Accel  = 1<<3,
 		m_override1Accel  = 1<<4,
-		m_overrideNormalAccel = 1<<5,
+		m_override0Friction = 1<<5,
+		m_override1Friction = 1<<6,
+		m_overrideNormalAccel = 1<<7,
 	};
 
 	typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dgFloat32 timestep, dgInt32 threadIndex);

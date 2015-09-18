@@ -222,6 +222,9 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		chassisCom = p0 - chassisMatrix.TransformVector(chassisCom);
 		dFloat speed = dClamp ((tireVeloc - chassisVeloc) % matrix1.m_up, -20.0f, 20.0f);
 		dFloat load = - NewtonCalculateSpringDamperAcceleration (timestep, m_data->m_data.m_springStrength, posit, m_data->m_data.m_dampingRatio, speed);
+		if (load < 0.0f) {
+			load = 0.0f;
+		}
 
 		m_tireLoad = load * m_restSprunMass;
 		dVector force (matrix1.m_up.Scale (m_tireLoad));
@@ -236,8 +239,9 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 
 		dFloat weight = -(matrix1.m_up % tireWeight);
 		m_gravityMag = weight / m_data->m_data.m_mass;
-		m_restLoad = (m_data->m_data.m_mass + m_restSprunMass) * gravity;
+		m_restLoad = (m_data->m_data.m_mass + m_restSprunMass) * m_gravityMag;
 		m_tireLoad += weight;
+		dAssert (m_tireLoad > 0.0f);
 		m_brakeTorque = 0.0f;
 	}
 
@@ -516,6 +520,7 @@ void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, co
 	m_controller = parentPart->m_controller;
 
 	m_lateralSlip = 0.0f;
+	m_aligningTorque = 0.0f;
 	m_longitudinalSlip = 0.0f;
 
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)m_controller->GetManager();
@@ -1041,13 +1046,6 @@ dFloat CustomVehicleController::GetDryRollingFrictionTorque () const
 	return m_chassisState.GetDryRollingFrictionTorque();
 }
 
-void CustomVehicleController::SetContactFilter(CustomVehicleControllerTireCollisionFilter* const filter)
-{
-	if (m_contactFilter) {
-		delete m_contactFilter;
-	}
-	m_contactFilter = filter;
-}
 
 void CustomVehicleController::LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires)
 {
@@ -1335,9 +1333,9 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	// set the standard force and torque call back
 	NewtonBodySetForceAndTorqueCallback(body, m_forceAndTorque);
 
+	m_contactFilter = new CustomVehicleControllerTireCollisionFilter(this);
 
 /*
-	m_contactFilter = new CustomVehicleControllerTireCollisionFilter(this);
 	SetDryRollingFrictionTorque(100.0f / 4.0f);
 	SetAerodynamicsDownforceCoefficient(0.5f * dSqrt(gravityVector % gravityVector), 60.0f * 0.447f);
 */
@@ -1369,7 +1367,7 @@ void CustomVehicleController::Cleanup()
 	SetEngine(NULL);
 	SetSteering(NULL);
 	SetHandBrakes(NULL);
-//	SetContactFilter(NULL);
+	SetContactFilter(NULL);
 
 	if (m_engine) {
 		delete m_engine;
@@ -1444,6 +1442,13 @@ void CustomVehicleController::SetSteering(SteeringController* const steering)
 	m_steeringControl = steering;
 }
 
+void CustomVehicleController::SetContactFilter(CustomVehicleControllerTireCollisionFilter* const filter)
+{
+	if (m_contactFilter) {
+		delete m_contactFilter;
+	}
+	m_contactFilter = filter;
+}
 
 
 dList<CustomVehicleController::BodyPart*>::dListNode* CustomVehicleController::GetFirstBodyPart() const
@@ -1567,8 +1572,9 @@ CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const Bo
 	matrix.m_posit.m_w = 1.0f;
 
 	tire.Init(&m_chassis, matrix, tireInfo);
-	m_bodyPartsList.Append(&tire);
+	tire.m_index = m_tireList.GetCount() - 1;
 
+	m_bodyPartsList.Append(&tire);
 	NewtonCollisionAggregateAddBody (m_collisionAggregate, tire.GetBody());
 	NewtonSkeletonContainerAttachBone (m_skeleton, tire.GetBody(), m_chassis.GetBody());
 	return &tireNode->GetInfo();
@@ -1670,8 +1676,9 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 	dMatrix tireMatrix;
 	dVector tireOmega;
 	dVector tireVeloc;
-
+	
 	NewtonBody* const tireBody = tire->GetBody();
+	const CustomVehicleController* const controller = tire->GetController();
 	CustomVehicleController::WheelJoint* const tireJoint = (CustomVehicleController::WheelJoint*) tire->GetJoint();
 
 	dAssert (tireJoint->GetBody0() == tireBody);
@@ -1685,6 +1692,10 @@ static int xxx;
 xxx ++;
 if (xxx > 1100)
 xxx *=1;
+
+	tire->m_lateralSlip = 0.0f;
+	tire->m_aligningTorque = 0.0f;
+	tire->m_longitudinalSlip = 0.0f;
 
 	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 		dVector posit;
@@ -1761,26 +1772,25 @@ xxx *=1;
 //				}
 			}
 			tire->m_longitudinalSlip = longitudinalSlipRatio;
-//dTrace (("%f %f\n", u_rel, tire->m_longitudinalSlip));
+//
 
 			// get the normalize tire load
 			dFloat tireLoad = tireJoint->GetTireLoad();
 			dFloat restTireLoad = tireJoint->GetTireRestLoad();
 			dFloat normalizedTireLoad = dClamp(tireLoad / restTireLoad, 0.0f, 4.0f);
 
-/*
 			// calculate longitudinal and lateral forces magnitude when no friction Limit (for now ignore camber angle effects)
 			dFloat camberEffect = 0.0f;
-			dFloat longitudinalStiffness = tire->m_longitudialStiffness * chassis.m_gravityMag;
-			dFloat lateralStiffness = restTireLoad * tire->m_lateralStiffness * normalizedTireLoad;
-			dFloat Teff = dTan(sideSlipAngle * dSign(v) - camberEffect);
+			dFloat longitudinalStiffness = restTireLoad * tire->m_data.m_longitudialStiffness;
+			dFloat lateralStiffness = restTireLoad * tire->m_data.m_lateralStiffness * normalizedTireLoad;
+			dFloat Teff = dTan(sideSlipAngle - camberEffect);
 
 			dFloat Fy0 = lateralStiffness * Teff;
 			dFloat Fx0 = longitudinalStiffness * longitudinalSlipRatio;
 
 			// for now assume tire/road friction is 1.0
 			//dFloat contactGroundFriction = 1.5f;
-			dFloat contactGroundFriction = m_contactFriction[i];
+			dFloat contactGroundFriction = controller->m_contactFilter->GetTireFrictionCoefficient (material, tireBody, otherBody);
 
 			dFloat tireLoadFriction = contactGroundFriction * tireLoad;
 			dFloat K = dSqrt(Fx0 * Fx0 + Fy0 * Fy0) / tireLoadFriction;
@@ -1792,6 +1802,7 @@ xxx *=1;
 			// f = x - |x| * x / 3 + x * x * x / 27
 			// m = x - |x| * x + x * x * x / 3 + x * x * x * x / 27
 			dFloat tireForceCoef = dMin(K * (1.0f - K / 3.0f + K * K / 27.0f), 1.0f);
+
 
 			dFloat nu = 1.0f;
 			if (K < 2.0f * 3.141592f) {
@@ -1806,44 +1817,22 @@ xxx *=1;
 			// ignore the tire alignment torque for now
 			dFloat k1 = dMin(K, 3.0f);
 			dFloat tireMomentCoef = k1 * (1.0f - k1 + k1 * k1 / 3.0f - k1 * k1 * k1 / 27.0f);
-			tire->m_aligningTorque = nu * tire->m_aligningMomentTrail * Teff * tireMomentCoef * f0;
-			//chassis.m_externalTorque += upPin.Scale (aligningMoment);
-
-			// add a lateral force constraint row at the contact point
-			int index = constraintParams->m_count;
-			AddLinearRowJacobian(constraintParams, contactPoint, lateralPin);
-			constraintParams->m_jointLowFriction[index] = -lateralForce;
-			constraintParams->m_jointHighFriction[index] = lateralForce;
-			constraintParams->m_jointAccel[index] = -0.7f * lateralSpeed * constraintParams->m_timestepInv;
-			index++;
-
-			// add a longitudinal force constraint row at the contact point
-			dFloat longitudinalSpeed = u + Rw;
-			AddLinearRowJacobian(constraintParams, contactPoint, longitudinalPin);
-			constraintParams->m_jointLowFriction[index] = -longitudinalForce;
-			constraintParams->m_jointHighFriction[index] = longitudinalForce;
-			constraintParams->m_jointAccel[index] = -longitudinalSpeed * constraintParams->m_timestepInv;
-			index++;
-
-			// normal force
-			dComplemtaritySolver::dPointDerivativeParam pointData;
-			InitPointParam(pointData, contactPoint);
-			AddLinearRowJacobian(constraintParams, contactPoint, normal.Scale(-1.0f));
-			constraintParams->m_jointLowFriction[index] = 0;
-			dVector velocError(pointData.m_veloc0 - pointData.m_veloc1);
-			dFloat restitution = 0.0f;
-			dFloat relVelocErr = velocError % normal;
-			if (relVelocErr > 0.0f) {
-				relVelocErr *= (restitution + dFloat(1.0f));
-			}
-			constraintParams->m_jointAccel[index] = dMax(dFloat(-4.0f), relVelocErr) * constraintParams->m_timestepInv;
-			index++;
-*/
+			tire->m_aligningTorque = nu * tire->m_data.m_aligningMomentTrail * Teff * tireMomentCoef * f0;
 
 			NewtonMaterialSetContactElasticity (material, 0.1f);
-		}
+//			NewtonMaterialSetContactTangentFriction (material, lateralForce, 0);
+//			NewtonMaterialSetContactTangentFriction (material, longitudinalForce, 1);
 
-		NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
-		NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
+			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+
+if (tire->m_index == 2){
+dTrace (("%f %f %f\n", K, lateralForce, longitudinalForce));
+}
+
+		} else {
+			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
+			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+		}
 	}
 }

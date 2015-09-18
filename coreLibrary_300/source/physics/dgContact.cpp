@@ -208,18 +208,16 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		frictionIndex += 1;
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir0, pointData); 
 		relVelocErr = velocError % contact.m_dir0;
-		params.m_forceBounds[jacobIndex].m_normalIndex = normalIndex;
+		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_BILATERAL_FRICTION_CONSTRAINT : normalIndex;
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (1.0f);
 
 		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
-//		if (contact.m_override0Accel) {
 		if (contact.m_flags & dgContactMaterial::m_override0Accel) {
 			params.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
 			params.m_isMotor[jacobIndex] = 1;
 		} else {
-			//params.m_jointAccel[jacobIndex] = relVelocErr * params.m_invTimestep;
 			params.m_jointAccel[jacobIndex] = relVelocErr * impulseOrForceScale;
 			params.m_isMotor[jacobIndex] = 0;
 		}
@@ -233,21 +231,18 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_forceBounds[jacobIndex].m_jointForce = (dgForceImpactPair*)&contact.m_dir0_Force;
 	}
 
-//	if (contact.m_friction1Enable) {
 	if (contact.m_flags & dgContactMaterial::m_friction1Enable) {
 		dgInt32 jacobIndex = frictionIndex;
 		frictionIndex += 1;
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir1, pointData); 
 		relVelocErr = velocError % contact.m_dir1;
-		params.m_forceBounds[jacobIndex].m_normalIndex = normalIndex;
+		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_BILATERAL_FRICTION_CONSTRAINT : normalIndex;
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (1.0f);
 
 		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
-//		if (contact.m_override1Accel) {
 		if (contact.m_flags & dgContactMaterial::m_override1Accel) {
-			dgAssert (0);
 			params.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 			params.m_isMotor[jacobIndex] = 1;
 		} else {
@@ -264,7 +259,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		}
 		params.m_forceBounds[jacobIndex].m_jointForce = (dgForceImpactPair*)&contact.m_dir1_Force;
 	}
-//dgTrace (("p(%f %f %f)\n", params.m_jointAccel[normalIndex], params.m_jointAccel[normalIndex + 1], params.m_jointAccel[normalIndex + 2]));
 }
 
 

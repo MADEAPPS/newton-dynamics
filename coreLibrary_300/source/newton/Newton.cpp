@@ -2228,6 +2228,23 @@ void NewtonMaterialSetContactTangentAcceleration(const NewtonMaterial* const mat
 	}
 }
 
+void NewtonMaterialSetContactTangentFriction (const NewtonMaterial* const materialHandle, dFloat friction, int index)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
+	friction = dgMax (dFloat(0.01f), dgAbsf (friction));
+	if (index) {
+		material->m_flags |= dgContactMaterial::m_override1Friction;
+		dgAssert (index == 1);
+		material->m_staticFriction1 = friction;
+		material->m_dynamicFriction1 = friction;
+	} else {
+		material->m_flags |= dgContactMaterial::m_override0Friction;
+		material->m_staticFriction0 = friction;
+		material->m_dynamicFriction0 = friction;
+	}
+}
+
 // Name: NewtonMaterialSetContactNormalDirection 
 // Set the new direction of the for this contact point.
 //

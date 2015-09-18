@@ -26,19 +26,18 @@
 
 //#define __TEST_VEHICLE_XXX__
 
-/*
-class CustomVehicleControllerTireCollisionFilter: public CustomControllerConvexCastPreFilter
+
+class CustomVehicleController;
+
+class CustomVehicleControllerTireCollisionFilter
 {	
 	public:
-	CustomVehicleControllerTireCollisionFilter (){}
-	CUSTOM_JOINTS_API CustomVehicleControllerTireCollisionFilter (const CustomVehicleController* const controller);
-
-	CUSTOM_JOINTS_API virtual unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
+	CustomVehicleControllerTireCollisionFilter (const CustomVehicleController* const controller)
+		:m_controller(controller)
 	{
-		return 1;
 	}
 
-	CUSTOM_JOINTS_API virtual dFloat GetTireFrictionCoefficient (const CustomVehicleControllerBodyStateTire& tire, const NewtonBody* const body, const NewtonCollision* const myCollision, dLong contacID) const
+	virtual dFloat GetTireFrictionCoefficient (const NewtonMaterial* const material, const NewtonBody* const tireBody, const NewtonBody* const otherBody) const
 	{
 		//return 1.5f;
 		return 1.0f;
@@ -46,7 +45,7 @@ class CustomVehicleControllerTireCollisionFilter: public CustomControllerConvexC
 
 	const CustomVehicleController* m_controller;
 };
-*/
+
 
 class CustomJoint;
 class CustomVehicleController: public CustomControllerBase
@@ -159,6 +158,8 @@ class CustomVehicleController: public CustomControllerBase
 		Info m_data;
 		dFloat m_lateralSlip;
 		dFloat m_longitudinalSlip;
+		dFloat m_aligningTorque;
+		int m_index;
 	};
 
 	class BodyPartEngine: public BodyPart
@@ -364,13 +365,13 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API CustomVehicleControllerComponentBrake* GetHandBrakes() const;
 	CUSTOM_JOINTS_API void SetEngine(CustomVehicleControllerComponentEngine* const engine);
 
-	CUSTOM_JOINTS_API void SetContactFilter(CustomVehicleControllerTireCollisionFilter* const filter);
+	
 	CUSTOM_JOINTS_API void LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires);
 	
 
 	protected:
-	CustomVehicleControllerTireCollisionFilter* m_contactFilter;
-	CustomVehicleControllerBodyStateContact* m_externalContactStates[16];
+	
+
 
 #endif
 
@@ -389,11 +390,12 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API BrakeController* GetHandBrakes() const;
 	CUSTOM_JOINTS_API SteeringController* GetSteering() const;
 	
+	CUSTOM_JOINTS_API void SetEngine(EngineController* const engine);
 	CUSTOM_JOINTS_API void SetClutch(ClutchController* const cluth);
 	CUSTOM_JOINTS_API void SetBrakes(BrakeController* const brakes);
 	CUSTOM_JOINTS_API void SetHandBrakes(BrakeController* const brakes);
 	CUSTOM_JOINTS_API void SetSteering(SteeringController* const steering);
-	CUSTOM_JOINTS_API void SetEngine(EngineController* const engine);
+	CUSTOM_JOINTS_API void SetContactFilter(CustomVehicleControllerTireCollisionFilter* const filter);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
@@ -419,6 +421,7 @@ class CustomVehicleController: public CustomControllerBase
 	EngineController* m_engineControl;
 	BrakeController* m_handBrakesControl;
 	SteeringController* m_steeringControl; 
+	CustomVehicleControllerTireCollisionFilter* m_contactFilter;
 	NewtonApplyForceAndTorque m_forceAndTorque;
 	bool m_finalized;
 
