@@ -324,7 +324,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat radius;
 
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (0.0f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
+		m_controller->SetCenterOfGravity (dVector (0.5f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
 
 		// add front axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
@@ -585,7 +585,7 @@ steeringVal *= 0.3f;
 		// check transmission type
 //		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 1
+#if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
@@ -778,9 +778,12 @@ steeringVal *= 0.3f;
 		dFloat Izz;
 		dFloat mass;
 		
+		dVector com;
 		dMatrix matrix;
+		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
 		NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
+		matrix.m_posit = matrix.TransformVector(com);
 		matrix = m_controller->GetLocalFrame() * matrix;
 
 		dFloat scale = -4.0f / (mass * DEMO_GRAVITY);
@@ -817,7 +820,6 @@ steeringVal *= 0.3f;
 //int xxx = 0;
 		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
 			const CustomVehicleController::BodyPartTire* const tire = &node->GetInfo();
-//			CustomVehicleController::BodyPart* const parent = part->GetParent();
 			NewtonBody* const tireBody = tire->GetBody();
 
 			dMatrix tireMatrix;

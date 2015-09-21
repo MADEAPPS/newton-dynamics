@@ -1088,10 +1088,14 @@ void CustomVehicleController::DrawSchematic (dFloat scale) const
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
+	dVector com;
 	dMatrix matrix;
 	NewtonBody* const chassisBody = m_chassis.GetBody();
 
+	NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
+	matrix.m_posit = matrix.TransformVector(com);
+
 	NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 	const dMatrix& chassisFrameMatrix = GetLocalFrame();
 	dMatrix chassisMatrix (chassisFrameMatrix * matrix);
@@ -1293,6 +1297,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	m_body = body;
 	m_finalized = false;
 	m_localFrame = vehicleFrame;
+	m_localFrame.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 	m_forceAndTorque = forceAndTorque;
 
 	m_engine = NULL;
@@ -1457,8 +1462,6 @@ dList<CustomVehicleController::BodyPart*>::dListNode* CustomVehicleController::G
 
 void CustomVehicleController::SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter)
 {
-	m_localFrame.m_posit = comRelativeToGeomtriCenter;
-	m_localFrame.m_posit.m_w = 1.0f;
 	NewtonBodySetCentreOfMass(m_body, &comRelativeToGeomtriCenter[0]);
 }
 
