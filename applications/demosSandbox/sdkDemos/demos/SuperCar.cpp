@@ -66,8 +66,8 @@
 //#define VIPER_TIRE_TOP_SPEED				164 mile / hours
 #define VIPER_TIRE_TOP_SPEED_KMH			264.0f
 
-#define VIPER_TIRE_LATERAL_STIFFNESS		10.0f
-#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	1.0f
+#define VIPER_TIRE_LATERAL_STIFFNESS		12000.0f
+#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	10000.0f
 
 #define VIPER_TIRE_ALIGNING_MOMENT_TRAIL	0.5f
 #define VIPER_TIRE_SUSPENSION_SPRING		150.0f
@@ -295,8 +295,8 @@ class SuperCarEntity: public DemoEntity
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
-		for (dList<CustomVehicleController::BodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
-			CustomVehicleController::BodyPart* const part = node->GetInfo();
+		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			const CustomVehicleController::BodyPartTire* const part = &node->GetInfo();
 			CustomVehicleController::BodyPart* const parent = part->GetParent();
 
 			NewtonBody* const body = part->GetBody();
@@ -586,7 +586,7 @@ steeringVal *= 0.3f;
 //		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 1
-	#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
@@ -770,13 +770,21 @@ steeringVal *= 0.3f;
 
 	void Debug (DemoEntity* const m_aiPath) const 
 	{
-		dAssert(0);
-	/*
-		NewtonBody* const body = m_controller->GetBody();
-		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
+		const CustomVehicleController::BodyPart* const chassis = m_controller->GetChassis ();
+		NewtonBody* const chassisBody = chassis->GetBody();
 
-		dFloat scale = -4.0f / (chassis.GetMass() * DEMO_GRAVITY);
-		dVector p0 (chassis.GetCenterOfMass());
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+		
+		dMatrix matrix;
+		NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
+		matrix = m_controller->GetLocalFrame() * matrix;
+
+		dFloat scale = -4.0f / (mass * DEMO_GRAVITY);
+		dVector p0 (matrix.m_posit);
 
 		glDisable (GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
@@ -784,57 +792,59 @@ steeringVal *= 0.3f;
 		glLineWidth(3.0f);
 		glBegin(GL_LINES);
 
-
 		// draw vehicle weight at the center of mass
-		dFloat lenght = scale * chassis.GetMass() * DEMO_GRAVITY;
+		dFloat lenght = scale * mass * DEMO_GRAVITY;
 		glColor3f(0.0f, 0.0f, 1.0f);
 		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 		glVertex3f (p0.m_x, p0.m_y - lenght, p0.m_z);
 
 		// draw vehicle front dir
 		glColor3f(1.0f, 1.0f, 1.0f);
-		dVector r0 (p0 + chassis.GetMatrix()[1].Scale (0.5f));
-		dVector r1 (r0 + chassis.GetMatrix()[0].Scale (1.0f));
+		dVector r0 (p0 + matrix[1].Scale (1.0f));
+		dVector r1 (r0 + matrix[0].Scale (2.0f));
 		glVertex3f (r0.m_x, r0.m_y, r0.m_z);
 		glVertex3f (r1.m_x, r1.m_y, r1.m_z);
 
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
 		dVector veloc;
-		NewtonBodyGetVelocity(body, &veloc[0]);
-		dVector q0 (p0 + chassis.GetMatrix()[1].Scale (1.0f));
+		NewtonBodyGetVelocity(chassisBody, &veloc[0]);
+		dVector q0 (p0 + matrix[1].Scale (1.0f));
 		dVector q1 (q0 + veloc.Scale (0.25f));
 		glColor3f(1.0f, 1.0f, 0.0f);
 		glVertex3f (q0.m_x, q0.m_y, q0.m_z);
 		glVertex3f (q1.m_x, q1.m_y, q1.m_z);
-		
+
 //int xxx = 0;
-		for (BodyPartTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			const BodyPartTire& tire = *node;
-			dVector p0 (tire.GetCenterOfMass());
+		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			const CustomVehicleController::BodyPartTire* const tire = &node->GetInfo();
+//			CustomVehicleController::BodyPart* const parent = part->GetParent();
+			NewtonBody* const tireBody = tire->GetBody();
 
-if (tire.GetContactCount()) {
-//const CustomVehicleControllerBodyStateContact* xxx = tire.GetContactBody(0);
-//const CustomVehicleControllerBodyState* xxx1 = tire.GetContactBody(0);
-}
+			dMatrix tireMatrix;
+			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
 
-			// offset the origin of of tire force so that they are visible
-			const dMatrix& tireMatrix = tire.GetLocalMatrix ();
-			p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.25f);
+			dFloat sign = dSign ((tireMatrix.m_posit - matrix.m_posit) % matrix.m_right);
+			tireMatrix.m_posit += matrix.m_right.Scale (sign * 0.25f);
 
 			// draw the tire load 
-			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));
+			dVector normalLoad (m_controller->GetTireNormalForce(tire));
+			dVector p0 (tireMatrix.m_posit);
+			dVector p1 (p0 + normalLoad.Scale (scale));
+
 			glColor3f (0.0f, 0.0f, 1.0f);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
 
 			// show tire lateral force
-			dVector p2 (p0 - tire.GetLateralForce().Scale (scale));
+			dVector lateralForce (m_controller->GetTireLateralForce(tire));
+			dVector p2 (p0 - lateralForce.Scale (scale));
 			glColor3f(1.0f, 0.0f, 0.0f);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p2.m_x, p2.m_y, p2.m_z);
 
 			// show tire longitudinal force
-			dVector p3 (p0 - tire.GetLongitudinalForce().Scale (scale));
+			dVector longitudinalForce (m_controller->GetTireLongitudinalForce(tire));
+			dVector p3 (p0 - longitudinalForce.Scale (scale));
 			glColor3f(0.0f, 1.0f, 0.0f);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
@@ -842,11 +852,10 @@ if (tire.GetContactCount()) {
 //dTrace(("%f ", tire.GetAligningTorque()));
 //xxx ++;
 		}
+		
 		glEnd();
-//dTrace(("\n"));
-
 		glLineWidth(1.0f);
-*/
+
 /*
 		// render AI information
 		dMatrix pathMatrix (m_aiPath->GetMeshMatrix() * m_aiPath->GetCurrentMatrix());
@@ -1013,8 +1022,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void RenderVehicleSchematic (DemoEntityManager* const scene) const
 	{
-		dAssert(0);
-		/*
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_DEPTH_TEST);
@@ -1034,7 +1041,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 		glLineWidth(1.0f);
 		glEnable(GL_TEXTURE_2D);
-*/
 	}
 
 
@@ -1106,7 +1112,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	{
 		// draw the player physics model
 		if (m_drawShematic) {
-//			RenderVehicleSchematic (scene);
+			RenderVehicleSchematic (scene);
 		}
 		m_drawShematic = false;
 

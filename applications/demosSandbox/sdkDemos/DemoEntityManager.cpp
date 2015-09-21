@@ -895,19 +895,25 @@ void DemoEntityManager::RenderFrame ()
 
 	if (m_mainWindow->m_showNormalForces) {
 		RenderNormalForces (GetNewton());
+	}
+
+//	if (m_mainWindow->m_showNormalForces) {
+	if (1) {
 		// see if there is a vehicle controller and 
-		void* const vehListerNode =  NewtonWorldGetPreListener (GetNewton(), VEHICLE_PLUGIN_NAME);
+		void* const vehListerNode = NewtonWorldGetPreListener(GetNewton(), VEHICLE_PLUGIN_NAME);
 		if (vehListerNode) {
-			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
+			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
 			manager->Debug();
 		}
 
-		void* const characterListerNode =  NewtonWorldGetPreListener (GetNewton(), PLAYER_PLUGIN_NAME);
+		void* const characterListerNode = NewtonWorldGetPreListener(GetNewton(), PLAYER_PLUGIN_NAME);
 		if (characterListerNode) {
-			CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
+			CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
 			manager->Debug();
 		}
 	}
+
+
 
 	if (m_mainWindow->m_showAABB) {
 		RenderAABB (GetNewton());

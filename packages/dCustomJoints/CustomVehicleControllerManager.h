@@ -150,6 +150,7 @@ class CustomVehicleController: public CustomControllerBase
 
 		BodyPartTire();
 		~BodyPartTire();
+
 		void Init (BodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const Info& info);
 
 		void SetSteerAngle (dFloat angle);
@@ -349,30 +350,12 @@ class CustomVehicleController: public CustomControllerBase
 
 
 #if 0
-	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateTire* GetFirstTire () const ;
-	CUSTOM_JOINTS_API CustomVehicleControllerBodyStateTire* GetNextTire (CustomVehicleControllerBodyStateTire* const tire) const;
-
-	CUSTOM_JOINTS_API const CustomVehicleControllerBodyStateChassis& GetChassisState () const;
-
 	CUSTOM_JOINTS_API dFloat GetAerodynamicsDowforceCoeficient () const;
 	CUSTOM_JOINTS_API void SetAerodynamicsDownforceCoefficient (dFloat maxDownforceInGravities, dFloat topSpeed);
 
 	CUSTOM_JOINTS_API void SetDryRollingFrictionTorque (dFloat torque);
 	CUSTOM_JOINTS_API dFloat GetDryRollingFrictionTorque () const;
-
-	CUSTOM_JOINTS_API CustomVehicleControllerComponentBrake* GetBrakes() const;
-	CUSTOM_JOINTS_API CustomVehicleControllerComponentEngine* GetEngine() const;
-	CUSTOM_JOINTS_API CustomVehicleControllerComponentBrake* GetHandBrakes() const;
-	CUSTOM_JOINTS_API void SetEngine(CustomVehicleControllerComponentEngine* const engine);
-
-	
 	CUSTOM_JOINTS_API void LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires);
-	
-
-	protected:
-	
-
-
 #endif
 
 	CUSTOM_JOINTS_API void Finalize();
@@ -381,8 +364,18 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API BodyPartTire* AddTire (const BodyPartTire::Info& tireInfo);
 	CUSTOM_JOINTS_API BodyPartEngine* AddEngine (const BodyPartEngine::Info& engineInfo);
 
+	const CUSTOM_JOINTS_API BodyPart* GetChassis() const;
+	const CUSTOM_JOINTS_API dMatrix& GetLocalFrame() const;
+
+	CUSTOM_JOINTS_API dList<BodyPartTire>::dListNode* GetFirstTire() const;
+	CUSTOM_JOINTS_API dList<BodyPartTire>::dListNode* GetNextTire (dList<BodyPartTire>::dListNode* const tireNode) const;
+
 	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetFirstBodyPart() const;
-	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetNextBodyPart(dList<BodyPart*>::dListNode* const part) const;
+	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetNextBodyPart(dList<BodyPart*>::dListNode* const partNode) const;
+
+	CUSTOM_JOINTS_API dVector GetTireNormalForce(const BodyPartTire* const tire) const;
+	CUSTOM_JOINTS_API dVector GetTireLateralForce(const BodyPartTire* const tire) const;
+	CUSTOM_JOINTS_API dVector GetTireLongitudinalForce(const BodyPartTire* const tire) const;
 
 	CUSTOM_JOINTS_API ClutchController* GetClutch() const;
 	CUSTOM_JOINTS_API BrakeController* GetBrakes() const;
@@ -396,6 +389,8 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetHandBrakes(BrakeController* const brakes);
 	CUSTOM_JOINTS_API void SetSteering(SteeringController* const steering);
 	CUSTOM_JOINTS_API void SetContactFilter(CustomVehicleControllerTireCollisionFilter* const filter);
+
+	CUSTOM_JOINTS_API void DrawSchematic (dFloat scale) const;	
 
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
@@ -444,9 +439,10 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 
 	CUSTOM_JOINTS_API int GetTireMaterial() const;
 
-//	CUSTOM_JOINTS_API void DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const;
+	CUSTOM_JOINTS_API void DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const;
+
 	protected:
-//	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
+	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
 
 	static void OnTireContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex);
 	static int OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
