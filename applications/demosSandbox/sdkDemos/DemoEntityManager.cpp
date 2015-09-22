@@ -898,7 +898,7 @@ void DemoEntityManager::RenderFrame ()
 	}
 
 //	if (m_mainWindow->m_showNormalForces) {
-	if (1) {
+	if (0) {
 		// see if there is a vehicle controller and 
 		void* const vehListerNode = NewtonWorldGetPreListener(GetNewton(), VEHICLE_PLUGIN_NAME);
 		if (vehListerNode) {

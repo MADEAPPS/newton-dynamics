@@ -66,7 +66,7 @@
 //#define VIPER_TIRE_TOP_SPEED				164 mile / hours
 #define VIPER_TIRE_TOP_SPEED_KMH			264.0f
 
-#define VIPER_TIRE_LATERAL_STIFFNESS		12000.0f
+#define VIPER_TIRE_LATERAL_STIFFNESS		40000.0f
 #define VIPER_TIRE_LONGITUDINAL_STIFFNESS	10000.0f
 
 #define VIPER_TIRE_ALIGNING_MOMENT_TRAIL	0.5f
@@ -324,7 +324,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat radius;
 
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (0.5f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
+		m_controller->SetCenterOfGravity (dVector (0.0f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
 
 		// add front axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
@@ -585,8 +585,8 @@ steeringVal *= 0.3f;
 		// check transmission type
 //		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 0
-	#if 0
+#if 1
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
@@ -663,19 +663,20 @@ steeringVal *= 0.3f;
 	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/
 	dFloat CalculateNPCControlSteerinValue (dFloat distanceAhead, dFloat pathWidth, DemoEntity* const pathEntity)
 	{
-		dAssert(0);
-		return 0;
-		/*
+		const CustomVehicleController::BodyPart& chassis = *m_controller->GetChassis();
+		//CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
 
-		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
-		CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
+		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
 
-		dVector veloc (chassis.GetVelocity());
-
+		dMatrix matrix;
+		dVector veloc;
+		NewtonBody* const body = chassis.GetBody();
+		NewtonBodyGetVelocity(body, &veloc[0]);
+		NewtonBodyGetMatrix(body, &matrix[0][0]);
 		dVector lookAheadPoint (veloc.Scale (distanceAhead / dSqrt (veloc % veloc)));
 
 		// find the closet point to the past on the spline
-		dMatrix vehicleMatrix (chassis.GetLocalMatrix() * chassis.GetMatrix());
+		dMatrix vehicleMatrix (m_controller->GetLocalFrame() * matrix);
 		dMatrix pathMatrix (pathEntity->GetMeshMatrix() * pathEntity->GetCurrentMatrix());
 
 		dVector p0 (vehicleMatrix.m_posit + lookAheadPoint);
@@ -688,7 +689,8 @@ steeringVal *= 0.3f;
 		p1.m_y = 0.0f;
 		dVector dist (p1 - p0);
 		dFloat angle = 0.0f;
-		dFloat maxAngle = steering->GetMaxSteeringAngle ();
+//		dFloat maxAngle = steering->GetMaxSteeringAngle ();
+		dFloat maxAngle = 20.0f * 3.1314f / 180.0f;
 		if ((dist % dist) < (pathWidth * pathWidth)) {
 			dBigVector averageTangent (0.0f, 0.0f, 0.0f, 0.0f);
 			for(int i = 0; i < 4; i ++) {
@@ -718,44 +720,46 @@ steeringVal *= 0.3f;
 		}
 		dFloat param = steering->GetParam();
 		return param + (-angle / maxAngle - param) * 0.25f;
-*/
 	}
 
 	void ApplyNPCControl (dFloat timestep, DemoEntity* const pathEntity)
 	{
-		dAssert(0);
-	/*
 		//drive the vehicle by trying to follow the spline path as close as possible 
-		NewtonBody* const body = m_controller->GetBody();
-		NewtonWorld* const world = NewtonBodyGetWorld(body);
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		//NewtonBody* const body = m_controller->GetBody();
+		//NewtonWorld* const world = NewtonBodyGetWorld(body);
+		//DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		//NewtonDemos* const mainWindow = scene->GetRootWindow();
-
-		CustomVehicleControllerComponentEngine* const engine = m_controller->GetEngine();
-		CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
-		//CustomVehicleControllerComponentBrake* const brakes = m_controller->GetBrakes();
-		//CustomVehicleControllerComponentBrake* const handBrakes = m_controller->GetHandBrakes();
+		 
+		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
+		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
+		CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
+		//CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
+		//CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 		
-		if (!engine->GetKey()) {
+		
+//		if (!engine->GetKey()) 
+		{
 			// start engine
-			m_engineOldKeyState = engine->GetKey();
-			engine->SetKey (true);
+//			m_engineOldKeyState = engine->GetKey();
+//			engine->SetKey (true);
 
 			// AI car are manual gears
-			engine->SetTransmissionMode (0);
+			engine->SetTransmissionMode (1);
+			clutch->SetParam(1.0f);
 
 			// engage first Gear 
-			engine->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 3);
+//			engine->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 3);
 		}
 		
 		
-		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
-		dMatrix matrix (chassis.GetLocalMatrix() * chassis.GetMatrix());
+		//const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
+		//dMatrix matrix (chassis.GetLocalMatrix() * chassis.GetMatrix());
+		//dVector veloc (chassis.GetVelocity());
+		//veloc.m_y = 0.0f;
 
-		dVector veloc (chassis.GetVelocity());
-		veloc.m_y = 0.0f;
+		dFloat speed = dAbs(engine->GetSpeed());
 
-		if ((veloc % veloc) < 0.02f) {
+		if (speed < 0.1f) {
 			// if the vehicle is no moving start the motion
 			engine->SetParam (0.75f);
 			//steering->SetParam (-0.5f);
@@ -764,7 +768,6 @@ steeringVal *= 0.3f;
 
 		dFloat steeringParam = CalculateNPCControlSteerinValue (2.0f, 2.0f, pathEntity);
 		steering->SetParam (steeringParam);
-*/
 	}
 
 
@@ -1087,6 +1090,18 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glEnd();
 		}
 
+		if (!strcmp(partName, "omega")) {
+			glLineWidth(2.0f);
+			glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0(lines[0]);
+			dVector p1(lines[1]);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glEnd();
+		}
+
+
 		if (!strcmp (partName, "lateralForce")) {
 			glLineWidth(2.0f);
 			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
@@ -1369,10 +1384,6 @@ void SuperCar (DemoEntityManager* const scene)
 	// create a vehicle controller manager
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world, 1, materialList);
 
-	// associate tire Material with the materials the vehicle tire need to collide realistically
-	// 
-
-
 //	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 //	NewtonMaterialSetDefaultFriction(scene->GetNewton(), defaulMaterial, defaulMaterial, 0.9f, 0.9f);
 
@@ -1381,17 +1392,18 @@ void SuperCar (DemoEntityManager* const scene)
 	//manager->AddCones (scene);
 
 	dFloat u = 1.0f;
-	for (int i = 0; i < 1; i ++) {
+	for (int i = 0; i < 25; i ++) {
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
-//		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
-//		vehicle0->BuildFourWheelDriveSuperCar();
+		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
+		//vehicle0->BuildFourWheelDriveSuperCar();
+		vehicle0->BuildRearWheelDriveMuscleCar();
 		u -= 0.005f;
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
-location1 = dGetIdentityMatrix();
-location1.m_posit.m_x = -170;
+//location1 = dGetIdentityMatrix();
+//location1.m_posit.m_x = -170;
 
 //		location1.m_posit += location1.m_right.Scale (-3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
@@ -1400,7 +1412,7 @@ location1.m_posit.m_x = -170;
 		//vehicle1->BuildFourWheelDriveSuperCar();
 		vehicle1->BuildRearWheelDriveMuscleCar();
 		u -= 0.005f;
-/*
+
 		dMatrix location2 (manager->CalculateSplineMatrix (u));
 		location2.m_posit += location2.m_right.Scale ( 3.0f);
 		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
@@ -1409,7 +1421,7 @@ location1.m_posit.m_x = -170;
 		//vehicle2->BuildFourWheelDriveSuperCar();
 		vehicle2->BuildRearWheelDriveMuscleCar();
 		u -= 0.01f;
-*/
+
 	}
 		
 	// build a muscle car from this vehicle controller
