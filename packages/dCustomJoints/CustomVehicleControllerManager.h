@@ -100,6 +100,7 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		BodyPartChassis ()
 			:BodyPart()
+			,m_aerodynamicsDownForceCoefficient(1.e-4f)
 		{
 		}
 
@@ -110,6 +111,8 @@ class CustomVehicleController: public CustomControllerBase
 			m_controller = controller;
 			m_body = controller->GetBody();
 		}
+
+		dFloat m_aerodynamicsDownForceCoefficient;
 	};
 	
 
@@ -169,7 +172,7 @@ class CustomVehicleController: public CustomControllerBase
 				dFloat F_y = phy_y * fraction;
 
 				if (tire->m_index == 0) {
-					dTrace(("%f %f %f\n", tireLoad, F_x, F_y));
+//					dTrace(("%f %f %f\n", tireLoad, F_x, F_y));
 				}
 				lateralForce = F_y;
 				longitudinalForce = F_x;
@@ -380,11 +383,7 @@ class CustomVehicleController: public CustomControllerBase
 		friend class CustomVehicleController;
 	};
 
-
 #if 0
-	CUSTOM_JOINTS_API dFloat GetAerodynamicsDowforceCoeficient () const;
-	CUSTOM_JOINTS_API void SetAerodynamicsDownforceCoefficient (dFloat maxDownforceInGravities, dFloat topSpeed);
-
 	CUSTOM_JOINTS_API void SetDryRollingFrictionTorque (dFloat torque);
 	CUSTOM_JOINTS_API dFloat GetDryRollingFrictionTorque () const;
 	CUSTOM_JOINTS_API void LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires);
@@ -421,6 +420,9 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetHandBrakes(BrakeController* const brakes);
 	CUSTOM_JOINTS_API void SetSteering(SteeringController* const steering);
 	CUSTOM_JOINTS_API void SetContactFilter(BodyPartTire::FrictionModel* const filter);
+
+	CUSTOM_JOINTS_API dFloat GetAerodynamicsDowforceCoeficient() const;
+	CUSTOM_JOINTS_API void SetAerodynamicsDownforceCoefficient(dFloat maxDownforceInGravities, dFloat topSpeed);
 
 	CUSTOM_JOINTS_API void DrawSchematic (dFloat scale) const;	
 

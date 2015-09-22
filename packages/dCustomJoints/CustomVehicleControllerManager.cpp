@@ -224,7 +224,6 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 
 		dFloat weight = dMax (-(matrix1.m_up % tireWeight), 0.0f);
 		m_tireLoad = m_chassisLoad + weight;
-		dAssert (m_tireLoad > 0.0f);
 		m_brakeTorque = 0.0f;
 	}
 
@@ -330,6 +329,17 @@ class CustomVehicleController::EngineJoint: public CustomJoint
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_dryResistance);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_dryResistance);
 		}
+
+		// add aerodynamics forces
+		dVector veloc;
+		NewtonBodyGetVelocity(m_body1, &veloc[0]);
+		dFloat frontSpeed = dMin(veloc % matrix1[2], 50.0f);
+//		dVector downforce (matrix1[1].Scale(-m_chassis.m_aerodynamicsDownForceCoefficient * frontSpeed * frontSpeed));
+		dVector downforce (matrix1[1].Scale(-10.0f * frontSpeed * frontSpeed));
+		//dVector downforce(matrix1[1].Scale(-100000));
+		dTrace(("%f %f\n", frontSpeed, downforce[1]));
+		NewtonBodyAddForce(m_body1, &downforce[0]);
+
 
 /*
 dMatrix m0;
@@ -1016,17 +1026,6 @@ void CustomVehicleControllerManager::DrawSchematicCallback (const CustomVehicleC
 }
 
 #if 0
-dFloat CustomVehicleController::GetAerodynamicsDowforceCoeficient () const
-{
-	return m_chassisState.GetAerodynamicsDowforceCoeficient();
-}
-
-void CustomVehicleController::SetAerodynamicsDownforceCoefficient (dFloat maxDownforceInGravity, dFloat topSpeed)
-{
-	m_chassisState.SetAerodynamicsDownforceCoefficient (maxDownforceInGravity, topSpeed);
-}
-
-
 void CustomVehicleController::SetDryRollingFrictionTorque (dFloat dryRollingFrictionTorque)
 {
 	m_chassisState.SetDryRollingFrictionTorque (dryRollingFrictionTorque);
@@ -1322,10 +1321,10 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 
 	m_contactFilter = new BodyPartTire::FrictionModel(this);
 
-/*
-	SetDryRollingFrictionTorque(100.0f / 4.0f);
-	SetAerodynamicsDownforceCoefficient(0.5f * dSqrt(gravityVector % gravityVector), 60.0f * 0.447f);
-*/
+//	SetDryRollingFrictionTorque(100.0f / 4.0f);
+	// assume gravity is 10.0f, and a speed of 60 miles/hours
+	SetAerodynamicsDownforceCoefficient(2.0f * 10.0f, 60.0f * 0.447f);
+
 	m_cluthControl = NULL;
 	m_brakesControl = NULL;
 	m_engineControl = NULL;
@@ -1660,6 +1659,23 @@ dVector CustomVehicleController::GetTireLongitudinalForce(const BodyPartTire* co
 	return joint->GetLongitudinalForce();
 }
 
+dFloat CustomVehicleController::GetAerodynamicsDowforceCoeficient() const
+{
+	return m_chassis.m_aerodynamicsDownForceCoefficient;
+}
+
+void CustomVehicleController::SetAerodynamicsDownforceCoefficient(dFloat maxDownforceInGravity, dFloat topSpeed)
+{
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
+	NewtonBody* const body = GetBody();
+	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
+	m_chassis.m_aerodynamicsDownForceCoefficient = mass * maxDownforceInGravity / (topSpeed * topSpeed);
+}
+
+
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
@@ -1694,39 +1710,7 @@ int CustomVehicleControllerManager::OnTireAABBOverlap(const NewtonMaterial* cons
 	return true;
 }
 
-/*
-void CustomVehicleControllerManager::TireModel (const CustomVehicleController::BodyPartTire* const tire, dFloat frictionCoefficient, dFloat tireLoad, dFloat slipRatio, dFloat sideslipAngle, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
-{
-slipRatio = 1.0f;
-sideslipAngle = 0.0;
 
-	dFloat phy_x = slipRatio * tire->m_data.m_longitudialStiffness;
-	dFloat phy_y = dTan (sideslipAngle) * tire->m_data.m_lateralStiffness;
-
-	tireLoad *= frictionCoefficient;
-	dFloat phy = dSqrt(phy_x * phy_x + phy_y * phy_y);
-	dFloat phy_max = 3.0f * tireLoad;
-	dFloat phyRatio = dMin(phy / phy_max, 1.0f);
-	dFloat F = phy_max * phyRatio * (1.0f - phyRatio + phyRatio * phyRatio * (1.0f / 3.0f));
-
-	dFloat F_x = F * phy_x / phy;
-	dFloat F_y = F * phy_y / phy;
-	dFloat F_mag = dSqrt(F_x * F_x + F_y * F_y);
-	if (F_mag > (0.5f * tireLoad)) {
-		dFloat alpha = 0.5f * tireLoad / F_mag;
-		alpha = 2.0f * alpha - alpha * alpha;
-		F_x *= alpha;
-		F_y *= alpha;
-	}
-
-	if (tire->m_index == 3) {
-		dTrace(("%f %f %f\n", F, F_x, F_y));
-	}
-	lateralForce = F_y;
-	longitudinalForce = F_x; 
-	aligningTorque = 0.0f;
-}
-*/
 void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* const contactJoint, CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody, dFloat timestep)
 {
 	dAssert((tire->GetBody() == NewtonJointGetBody0(contactJoint)) || (tire->GetBody() == NewtonJointGetBody1(contactJoint)));

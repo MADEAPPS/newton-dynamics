@@ -58,7 +58,7 @@
 #define VIPER_REDLINE_TORQUE_RPM			6000.0f
 
 
-#define VIPER_TIRE_STEER_ANGLE				35.0f
+#define VIPER_TIRE_STEER_ANGLE				25.0f
 
 
 
@@ -1224,6 +1224,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void UpdateCamera (SuperCarEntity* const player, dFloat timestep)
 	{
+//return;		
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 		DemoCamera* const camera = scene->GetCamera();
 		dMatrix camMatrix (camera->GetNextMatrix ());
@@ -1392,13 +1393,13 @@ void SuperCar (DemoEntityManager* const scene)
 	//manager->AddCones (scene);
 
 	dFloat u = 1.0f;
-	for (int i = 0; i < 25; i ++) {
+	for (int i = 0; i < 10; i ++) {
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
+//		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
 		//vehicle0->BuildFourWheelDriveSuperCar();
-		vehicle0->BuildRearWheelDriveMuscleCar();
+//		vehicle0->BuildRearWheelDriveMuscleCar();
 		u -= 0.005f;
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
@@ -1417,9 +1418,9 @@ void SuperCar (DemoEntityManager* const scene)
 		location2.m_posit += location2.m_right.Scale ( 3.0f);
 		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
 		location2.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
+//		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
 		//vehicle2->BuildFourWheelDriveSuperCar();
-		vehicle2->BuildRearWheelDriveMuscleCar();
+//		vehicle2->BuildRearWheelDriveMuscleCar();
 		u -= 0.01f;
 
 	}
