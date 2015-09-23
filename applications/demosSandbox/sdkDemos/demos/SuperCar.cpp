@@ -908,6 +908,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		:CustomVehicleControllerManager (world, materialCount, otherMaterials)
 		,m_externalView(true)
 		,m_player (NULL) 
+		,m_debugVehicle (NULL) 
 		,m_drawShematic(false)
 		,m_helpKey (true)
 	{
@@ -1027,25 +1028,27 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void RenderVehicleSchematic (DemoEntityManager* const scene) const
 	{
-		glDisable(GL_LIGHTING);
-		glDisable(GL_TEXTURE_2D);
-		glDisable(GL_DEPTH_TEST);
-		glDisable (GL_BLEND);
+		if (m_debugVehicle) {
+			glDisable(GL_LIGHTING);
+			glDisable(GL_TEXTURE_2D);
+			glDisable(GL_DEPTH_TEST);
+			glDisable (GL_BLEND);
 
-		dFloat scale = 100.0f;
-		dFloat width = scene->GetWidth();
-		dFloat height = scene->GetHeight();
+			dFloat scale = 100.0f;
+			dFloat width = scene->GetWidth();
+			dFloat height = scene->GetHeight();
 
-		dMatrix origin (dGetIdentityMatrix());
-		origin.m_posit = dVector(width - 300, height - 200, 0.0f, 1.0f);
+			dMatrix origin (dGetIdentityMatrix());
+			origin.m_posit = dVector(width - 300, height - 200, 0.0f, 1.0f);
 
-		glPushMatrix();
-		glMultMatrix (&origin[0][0]);
-		DrawSchematic (m_player->m_controller, scale);
-		glPopMatrix();
+			glPushMatrix();
+			glMultMatrix (&origin[0][0]);
+			DrawSchematic (m_debugVehicle->m_controller, scale);
+			glPopMatrix();
 
-		glLineWidth(1.0f);
-		glEnable(GL_TEXTURE_2D);
+			glLineWidth(1.0f);
+			glEnable(GL_TEXTURE_2D);
+		}
 	}
 
 
@@ -1137,8 +1140,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		if (m_player) {
-			CustomVehicleController::EngineController* const engine = m_player->m_controller->GetEngine();
+		if (m_debugVehicle) {
+			CustomVehicleController::EngineController* const engine = m_debugVehicle->m_controller->GetEngine();
 			if (engine) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				dFloat gageSize = 200.0f;
@@ -1155,7 +1158,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 				dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
 				int gear = engine->GetGear();
 				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
-				DrawGear(speed, x, y, m_player->m_gearMap[gear], gageSize);
+				DrawGear(speed, x, y, m_debugVehicle->m_gearMap[gear], gageSize);
 			}
 		}
 
@@ -1169,6 +1172,11 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	void SetAsPlayer (SuperCarEntity* const player)
 	{
 		m_player = player;
+	}
+
+	void SetDebucVehicle (SuperCarEntity* const player)
+	{
+		m_debugVehicle = player;
 	}
 
 	virtual void PreUpdate (dFloat timestep)
@@ -1341,6 +1349,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	bool m_externalView;
 	SuperCarEntity* m_player;
+	SuperCarEntity* m_debugVehicle;
 	DemoEntity* m_raceTrackPath;
 
 	GLuint m_gears;
@@ -1388,12 +1397,12 @@ void SuperCar (DemoEntityManager* const scene)
 //	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 //	NewtonMaterialSetDefaultFriction(scene->GetNewton(), defaulMaterial, defaulMaterial, 0.9f, 0.9f);
 
-	// create a Bezier Spline path for AI car to drive
+	// create a Bezier Spline path for AI car to driv                     e
 	manager->CreatedrivingTestCourt (scene);
 	//manager->AddCones (scene);
 
 	dFloat u = 1.0f;
-	for (int i = 0; i < 10; i ++) {
+	for (int i = 0; i < 1; i ++) {
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
@@ -1432,7 +1441,8 @@ void SuperCar (DemoEntityManager* const scene)
 	SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
 
 	// set this vehicle as the player
-	manager->SetAsPlayer(vehicleEntity);
+//	manager->SetAsPlayer(vehicleEntity);
+	manager->SetDebucVehicle(vehicleEntity);
 
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
 	dMatrix camMatrix (vehicleEntity->GetNextMatrix());
