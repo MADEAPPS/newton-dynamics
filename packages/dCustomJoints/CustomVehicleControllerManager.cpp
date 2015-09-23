@@ -337,7 +337,7 @@ class CustomVehicleController::EngineJoint: public CustomJoint
 //		dVector downforce (matrix1[1].Scale(-m_chassis.m_aerodynamicsDownForceCoefficient * frontSpeed * frontSpeed));
 		dVector downforce (matrix1[1].Scale(-10.0f * frontSpeed * frontSpeed));
 		//dVector downforce(matrix1[1].Scale(-100000));
-		dTrace(("%f %f\n", frontSpeed, downforce[1]));
+//		dTrace(("%f %f\n", frontSpeed, downforce[1]));
 		NewtonBodyAddForce(m_body1, &downforce[0]);
 
 
@@ -607,7 +607,7 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController
 	InitEngineTorqueCurve();
 	dAssert(info.m_gearsCount < (int(sizeof (m_data.m_gearRatios) / sizeof (m_data.m_gearRatios[0])) - D_VEHICLE_FIRST_GEAR));
 	m_data.m_gearsCount = info.m_gearsCount + D_VEHICLE_FIRST_GEAR;
-//m_data.m_gearsCount = 2 + D_VEHICLE_FIRST_GEAR;
+m_data.m_gearsCount = 2 + D_VEHICLE_FIRST_GEAR;
 
 	m_data.m_gearRatios[D_VEHICLE_NEWTRAL_GEAR] = 0.0f;
 	m_data.m_gearRatios[D_VEHICLE_REVERSE_GEAR] = -dAbs(info.m_reverseGearRatio);
