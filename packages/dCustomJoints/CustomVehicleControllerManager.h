@@ -239,7 +239,7 @@ class CustomVehicleController: public CustomControllerBase
 		BodyPartEngine(CustomVehicleController* const controller, const Info& info);
 		virtual ~BodyPartEngine();
 
-		void Update (dFloat timestep, dFloat gasVal);
+		virtual void Update (dFloat timestep, dFloat gasVal);
 
 		dFloat GetRPM() const;
 		dFloat GetSpeed() const;
