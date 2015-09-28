@@ -607,7 +607,7 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController
 	InitEngineTorqueCurve();
 	dAssert(info.m_gearsCount < (int(sizeof (m_data.m_gearRatios) / sizeof (m_data.m_gearRatios[0])) - D_VEHICLE_FIRST_GEAR));
 	m_data.m_gearsCount = info.m_gearsCount + D_VEHICLE_FIRST_GEAR;
-m_data.m_gearsCount = 2 + D_VEHICLE_FIRST_GEAR;
+//m_data.m_gearsCount = 2 + D_VEHICLE_FIRST_GEAR;
 
 	m_data.m_gearRatios[D_VEHICLE_NEWTRAL_GEAR] = 0.0f;
 	m_data.m_gearRatios[D_VEHICLE_REVERSE_GEAR] = -dAbs(info.m_reverseGearRatio);
@@ -1586,17 +1586,16 @@ CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const Bo
 }
 
 
-CustomVehicleController::BodyPartEngine* CustomVehicleController::AddEngine (const BodyPartEngine::Info& engineInfo)
+void CustomVehicleController::AddEngineBodyPart (BodyPartEngine* const engine)
 {
 	if (m_engine) {
 		delete m_engine;
 	}
 
-	m_engine = new BodyPartEngine(this, engineInfo);
-
+//	m_engine = new BodyPartEngine(this, engineInfo);
+	m_engine = engine;
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());
 	NewtonSkeletonContainerAttachBone(m_skeleton, m_engine->GetBody(), m_chassis.GetBody());
-	return m_engine;
 }
 
 

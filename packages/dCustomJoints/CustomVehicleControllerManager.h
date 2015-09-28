@@ -158,7 +158,7 @@ class CustomVehicleController: public CustomControllerBase
 				dFloat phy_x = longitudinalSlip * tire->m_data.m_longitudialStiffness;
 				tireLoad *= GetFrictionCoefficient (material, tire->GetBody(), otherBody);
 
-				dFloat phyMax = 3.0f * tireLoad;
+				dFloat phyMax = 3.0f * tireLoad + 1.0f;
 				dFloat phyMag = dSqrt(phy_x * phy_x + phy_y * phy_y);
 				
 				dFloat ratio = phyMag / phyMax;
@@ -393,7 +393,9 @@ class CustomVehicleController: public CustomControllerBase
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 	CUSTOM_JOINTS_API BodyPartTire* AddTire (const BodyPartTire::Info& tireInfo);
-	CUSTOM_JOINTS_API BodyPartEngine* AddEngine (const BodyPartEngine::Info& engineInfo);
+
+	CUSTOM_JOINTS_API void AddEngineBodyPart (BodyPartEngine* const engine);
+//	CUSTOM_JOINTS_API BodyPartEngine* AddEngine (const BodyPartEngine::Info& engineInfo);
 
 	const CUSTOM_JOINTS_API BodyPart* GetChassis() const;
 	const CUSTOM_JOINTS_API dMatrix& GetLocalFrame() const;

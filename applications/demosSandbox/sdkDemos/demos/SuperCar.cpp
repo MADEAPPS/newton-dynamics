@@ -324,7 +324,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat radius;
 
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (-0.25f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
+		m_controller->SetCenterOfGravity (dVector (0.0f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
 
 		// add front axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
@@ -390,7 +390,9 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_rightTire = rightRearTire;
 		engineInfo.m_userData = this;
 
-		CustomVehicleController::BodyPartEngine* const engine = m_controller->AddEngine (engineInfo);
+		//CustomVehicleController::BodyPartEngine* const engine = m_controller->AddEngine (engineInfo);
+		CustomVehicleController::BodyPartEngine* const engine = new CustomVehicleController::BodyPartEngine(m_controller, engineInfo);
+		m_controller->AddEngineBodyPart (engine);
 		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engine);
 
 		// the the default transmission type
