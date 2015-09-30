@@ -552,6 +552,15 @@ void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, co
 	m_joint = new WheelJoint (matrix, m_body, parentPart->m_body, this);
 }
 
+dFloat CustomVehicleController::BodyPartTire::GetRPM() const
+{
+	dVector omega; 
+	WheelJoint* const joint = (WheelJoint*) m_joint;
+	NewtonBodyGetOmega(m_body, &omega[0]);
+	return (joint->m_lateralDir % omega) * 9.55f;
+}
+
+
 void CustomVehicleController::BodyPartTire::SetSteerAngle (dFloat angle)
 {
 	WheelJoint* const tire = (WheelJoint*)m_joint;
@@ -775,6 +784,21 @@ dFloat CustomVehicleController::BodyPartEngine::GetRPM() const
 	return speed;
 }
 
+void CustomVehicleController::BodyPartEngine::ApplyTorque(dFloat torqueMag)
+{
+	dMatrix matrix;
+
+	EngineJoint* const joint = (EngineJoint*)GetJoint();
+	NewtonBody* const engine = joint->GetBody0();
+	NewtonBodyGetMatrix(engine, &matrix[0][0]);
+	matrix = joint->GetMatrix0() * matrix;
+
+	m_norminalTorque = dAbs(torqueMag);
+	dVector torque(matrix.m_front.Scale(m_norminalTorque));
+	NewtonBodyAddTorque(engine, &torque[0]);
+}
+
+
 void CustomVehicleController::BodyPartEngine::Update(dFloat timestep, dFloat gasVal)
 {
 	dVector omega;
@@ -796,6 +820,7 @@ void CustomVehicleController::BodyPartEngine::Update(dFloat timestep, dFloat gas
 	m_norminalTorque = T - d * W * W;
 
 	dVector torque (matrix.m_front.Scale (m_norminalTorque));
+//	ApplyTorque(m_norminalTorque);
 	NewtonBodyAddTorque(engine, &torque[0]);
 }
 
@@ -1010,8 +1035,8 @@ CustomVehicleController::ClutchController::ClutchController(CustomVehicleControl
 void CustomVehicleController::ClutchController::Update(dFloat timestep)
 {
 	dFloat torque = m_maxTorque * m_param;
-	m_engine->GetLeftGear()->SetClutch(torque);
-	m_engine->GetRightGear()->SetClutch(torque);
+	m_engine->GetLeftSpiderGear()->SetClutch(torque);
+	m_engine->GetRightSpiderGear()->SetClutch(torque);
 }
 
 
@@ -1036,18 +1061,6 @@ dFloat CustomVehicleController::GetDryRollingFrictionTorque () const
 	return m_chassisState.GetDryRollingFrictionTorque();
 }
 
-
-void CustomVehicleController::LinksTiresKinematically (int count, CustomVehicleControllerBodyStateTire** const tires)
-{
-	dFloat radio0 = tires[0]->m_radio;
-	for (int i = 1; i < count; i ++) {
-		CustomVehicleControllerEngineDifferencialJoint* const link = &m_tankTireLinks.Append()->GetInfo();
-		link->Init(this, tires[0], tires[i]);
-		link->m_radio0 = radio0;
-		link->m_radio1 = tires[i]->m_radio;
-	}
-}
-
 CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody (const NewtonBody* const body)
 {
 	for (int i = 0; i < m_externalContactStatesCount; i ++) {
@@ -1070,6 +1083,18 @@ CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody
 	return externalBody;
 }
 #endif
+
+
+void CustomVehicleController::LinksTiresKinematically (int count, BodyPartTire** const tires)
+{
+	dFloat radio0 = tires[0]->m_data.m_radio;
+	for (int i = 1; i < count; i ++) {
+//		CustomVehicleControllerEngineDifferencialJoint* const link = &m_tankTireLinks.Append()->GetInfo();
+//		link->Init(this, tires[0], tires[i]);
+//		link->m_radio0 = radio0;
+//		link->m_radio1 = tires[i]->m_radio;
+	}
+}
 
 
 void CustomVehicleController::DrawSchematic(dFloat scale) const
@@ -1585,6 +1610,10 @@ CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const Bo
 	return &tireNode->GetInfo();
 }
 
+CustomVehicleController::BodyPartEngine* CustomVehicleController::GetEngineBodyPart() const
+{
+	return m_engine;
+}
 
 void CustomVehicleController::AddEngineBodyPart (BodyPartEngine* const engine)
 {
@@ -1592,7 +1621,6 @@ void CustomVehicleController::AddEngineBodyPart (BodyPartEngine* const engine)
 		delete m_engine;
 	}
 
-//	m_engine = new BodyPartEngine(this, engineInfo);
 	m_engine = engine;
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());
 	NewtonSkeletonContainerAttachBone(m_skeleton, m_engine->GetBody(), m_chassis.GetBody());
@@ -1625,8 +1653,8 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 #ifdef D_PLOT_ENGINE_CURVE 
 		dFloat engineOmega = m_engine->GetRPM();
-		dFloat tireTorque = m_engine->GetLeftGear()->m_tireTorque + m_engine->GetRightGear()->m_tireTorque;
-		dFloat engineTorque = m_engine->GetLeftGear()->m_engineTorque + m_engine->GetRightGear()->m_engineTorque;
+		dFloat tireTorque = m_engine->GetLeftSpiderGear()->m_tireTorque + m_engine->GetRightSpiderGear()->m_tireTorque;
+		dFloat engineTorque = m_engine->GetLeftSpiderGear()->m_engineTorque + m_engine->GetRightSpiderGear()->m_engineTorque;
 		fprintf (file_xxx, "%f, %f, %f,\n", engineOmega, engineTorque, m_engine->GetNominalTorque());
 #endif
 	}
