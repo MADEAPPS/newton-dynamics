@@ -131,6 +131,8 @@ class dgParallelSolverSyncData
 	dgInt32 m_jointCount;
 	dgInt32 m_rowCount;
 	dgInt32 m_atomicIndex;
+	dgInt32 m_lock0;
+	dgInt32 m_lock1;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
 
 	dgInt32* m_bodyLocks;  

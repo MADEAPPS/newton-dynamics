@@ -39,7 +39,7 @@
 
 
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
-#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(128)
+#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(256)
 
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-18f));
@@ -126,12 +126,15 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
 //useParallel = 1;
 		if (useParallel) {
+			dgInt32 sum = m_joints;
 			useParallel = useParallel && m_joints && m_islands;
-			useParallel = useParallel && ((threadCount * m_islandMemory[0].m_jointCount) >= m_joints);
+			useParallel = useParallel && ((threadCount * m_islandMemory[0].m_jointCount) >= sum);
 			useParallel = useParallel && (m_islandMemory[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
+//useParallel = 1;
 			while (useParallel) {
 				CalculateReactionForcesParallel(&m_islandMemory[index], timestep);
 				index ++;
+				sum -= m_islandMemory[index].m_jointCount;
 				useParallel = useParallel && (index < m_islands);
 				useParallel = useParallel && ((threadCount * m_islandMemory[index].m_jointCount) >= m_joints);
 				useParallel = useParallel && (m_islandMemory[index].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
