@@ -146,16 +146,17 @@ void CustomJoint::Destructor (const NewtonJoint* me)
 void  CustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex)
 {
 	// get the pointer to the joint class
-	CustomJoint* const joint = (CustomJoint*) NewtonJointGetUserData (me);  
+	if (timestep != 0.0f) {
+		CustomJoint* const joint = (CustomJoint*) NewtonJointGetUserData (me);  
 
-	// call the constraint call back
-	joint->SubmitConstraints(timestep, threadIndex);
+		// call the constraint call back
+		joint->SubmitConstraints(timestep, threadIndex);
 
-	// if there is a user define callback call it from here;
-	if (joint->m_userConstrationCallback) {
-		joint->m_userConstrationCallback ((const NewtonUserJoint*) joint, timestep, threadIndex);
+		// if there is a user define callback call it from here;
+		if (joint->m_userConstrationCallback) {
+			joint->m_userConstrationCallback ((const NewtonUserJoint*) joint, timestep, threadIndex);
+		}
 	}
-
 }
 
 void CustomJoint::GetInfo (const NewtonJoint* const me, NewtonJointRecord* info)
