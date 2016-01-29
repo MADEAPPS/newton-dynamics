@@ -56,14 +56,15 @@
 //#define DEFAULT_SCENE	27			// puck slide continuous collision
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
-#define DEFAULT_SCENE	30			// basic rag doll
-//#define DEFAULT_SCENE	31			// basic Car
-//#define DEFAULT_SCENE	32			// heavy vehicles
-//#define DEFAULT_SCENE	33			// super Car
-//#define DEFAULT_SCENE	34			// basic player controller
-//#define DEFAULT_SCENE	35			// advanced player controller
-//#define DEFAULT_SCENE	36			// cloth patch			
-//#define DEFAULT_SCENE	37			// soft bodies			
+//#define DEFAULT_SCENE	30			// basic rag doll
+#define DEFAULT_SCENE	31			// dynamics rag doll
+//#define DEFAULT_SCENE	32			// basic Car
+//#define DEFAULT_SCENE	33			// heavy vehicles
+//#define DEFAULT_SCENE	34			// super Car
+//#define DEFAULT_SCENE	35			// basic player controller
+//#define DEFAULT_SCENE	36			// advanced player controller
+//#define DEFAULT_SCENE	37			// cloth patch			
+//#define DEFAULT_SCENE	38			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);
@@ -101,9 +102,11 @@ void AdvancedPlayerController (DemoEntityManager* const scene);
 void HeightFieldCollision (DemoEntityManager* const scene);
 void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
-void DescreteRagDoll (DemoEntityManager* const scene);
+void PasiveRagDoll (DemoEntityManager* const scene);
+void DynamicRagDoll (DemoEntityManager* const scene);
 void ArticulatedJoints (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
+
 
 
 NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] = 
@@ -138,7 +141,8 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Puck slide"), wxT("show continuous collision"), PuckSlide},
     {wxT("Standard Joints"), wxT("show some of the common joints"), StandardJoints},
 	{wxT("Articulated robotic actuators joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
-	{wxT("Basic rag doll"), wxT("demonstrate simple rag doll"), DescreteRagDoll},
+	{wxT("Pasive rag doll"), wxT("demonstrate parsive rag doll"), PasiveRagDoll},
+	{wxT("Dynamic rag doll"), wxT("demonstrate dynamic rag doll"), DynamicRagDoll},
 	{wxT("Basic Car"), wxT("show how to set up a vehicle controller"), BasicCar},
 	{wxT("Heavy vehicles"), wxT("implement military type heavy Vehicles"), MilitaryTransport},
 	{wxT("Super car"), wxT("implement a hight performance sport car"), SuperCar},
