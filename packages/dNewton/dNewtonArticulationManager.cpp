@@ -26,8 +26,8 @@
 #include "dNewtonArticulationManager.h"
 
 
-dNewtonArticulationManager::dNewtonArticulationManager (dNewton* const world, bool applyLocalTransform)
-	:CustomArticulaledTransformManager (world->GetNewton(), applyLocalTransform)
+dNewtonArticulationManager::dNewtonArticulationManager (dNewton* const world)
+	:CustomArticulaledTransformManager (world->GetNewton())
 {
 }
 
@@ -67,7 +67,7 @@ void dNewtonArticulationManager::DestroyController (CustomArticulatedTransformCo
 	CustomArticulaledTransformManager::DestroyController (controller);
 }
 
-dNewtonArticulationManager::dNewtonArticulationController::dNewtonArticulationController (dNewtonArticulationManager* const manager, bool projectError)
+dNewtonArticulationManager::dNewtonArticulationController::dNewtonArticulationController (dNewtonArticulationManager* const manager)
 	:dNewtonAlloc()
 {
 	m_controller = manager->CreateTransformController(this);

@@ -84,10 +84,10 @@ static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 };
 
 
-class RagDollManager: public CustomArticulaledTransformManager
+class PassiveRagDollManager: public CustomArticulaledTransformManager
 {
 	public: 
-	RagDollManager (DemoEntityManager* const scene)
+	PassiveRagDollManager (DemoEntityManager* const scene)
 		:CustomArticulaledTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
@@ -347,7 +347,7 @@ class RagDollManager: public CustomArticulaledTransformManager
 };
 
 
-void PasiveRagDoll (DemoEntityManager* const scene)
+void PassiveRagDoll (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
@@ -359,7 +359,7 @@ void PasiveRagDoll (DemoEntityManager* const scene)
 	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
 
 	//  create a skeletal transform controller for controlling rag doll
-	RagDollManager* const manager = new RagDollManager (scene);
+	PassiveRagDollManager* const manager = new PassiveRagDollManager (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix matrix (dGetIdentityMatrix());

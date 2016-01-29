@@ -20,7 +20,8 @@
 #include "CustomBallAndSocket.h"
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
-#include "CustomArcticulatedTransformManager.h"
+#include "CustomDynamicRagDollManager.h"
+
 
 struct RAGDOLL_BONE_DEFINITION
 {
@@ -84,11 +85,11 @@ static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 };
 
 
-class RagDollManager: public CustomArticulaledTransformManager
+class DynamicsRagDollManager: public CustomDynamicRagDollManager
 {
 	public: 
-	RagDollManager (DemoEntityManager* const scene)
-		:CustomArticulaledTransformManager (scene->GetNewton())
+	DynamicsRagDollManager (DemoEntityManager* const scene)
+		:CustomDynamicRagDollManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
@@ -97,6 +98,7 @@ class RagDollManager: public CustomArticulaledTransformManager
 
 	virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
 	{
+		CustomDynamicRagDollManager::OnPreUpdate (constroller, timestep, threadIndex);
 	}
 
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
@@ -188,6 +190,8 @@ class RagDollManager: public CustomArticulaledTransformManager
 		
 		dQuaternion rot (localMatrix);
 		ent->SetMatrix (*scene, rot, localMatrix.m_posit);
+
+		CustomDynamicRagDollManager::OnUpdateTransform (bone, localMatrix);
 	}
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
@@ -358,7 +362,7 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
 
 	//  create a skeletal transform controller for controlling rag doll
-	RagDollManager* const manager = new RagDollManager (scene);
+	DynamicsRagDollManager* const manager = new DynamicsRagDollManager (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix matrix (dGetIdentityMatrix());
@@ -385,7 +389,7 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count1, count1, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 */
 //	origin.m_x -= 25.0f;
-	origin.m_x -= 10.0f;
+	origin.m_x -= 7.0f;
 //	origin.m_x -= 2.0f;
 	origin.m_y += 3.0f;
 	dQuaternion rot;

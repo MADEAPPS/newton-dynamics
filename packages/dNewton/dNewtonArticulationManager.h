@@ -33,7 +33,7 @@ class dNewtonArticulationManager: public CustomArticulaledTransformManager
 	class dNewtonArticulationController: public dNewtonAlloc
 	{
 		public:
-		CNEWTON_API dNewtonArticulationController (dNewtonArticulationManager* const manager, bool projectError);
+		CNEWTON_API dNewtonArticulationController (dNewtonArticulationManager* const manager);
 		CNEWTON_API ~dNewtonArticulationController ();
 
 		CNEWTON_API virtual void OnPreUpdate (dFloat timestep) = 0;
@@ -57,7 +57,7 @@ class dNewtonArticulationManager: public CustomArticulaledTransformManager
 		friend class dNewtonArticulationManager;
 	};
 
-	CNEWTON_API dNewtonArticulationManager (dNewton* const world, bool applyLocalTransform = false);
+	CNEWTON_API dNewtonArticulationManager (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonArticulationManager ();
 
 	CNEWTON_API void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);

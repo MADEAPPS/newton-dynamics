@@ -16,12 +16,10 @@
 CustomDynamicRagDollManager::CustomDynamicRagDollManager(NewtonWorld* const world)
 	:CustomArticulaledTransformManager(world, DYNAMIC_RAGDOLL_PLUGIN_NAME)
 {
-	dAssert (0);
 }
 
 CustomDynamicRagDollManager::~CustomDynamicRagDollManager()
 {
-	dAssert (0);
 }
 
 
@@ -32,17 +30,16 @@ void CustomDynamicRagDollManager::Debug() const
 
 CustomArticulatedTransformController* CustomDynamicRagDollManager::CreateTransformController(void* const userData)
 {
-	dAssert (0);
 	CustomArticulatedTransformController* const controller = CustomArticulaledTransformManager::CreateTransformController(userData);
 	return controller;
 }
 
 void CustomDynamicRagDollManager::OnPreUpdate(CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
 {
-	dAssert (0);
+//	dAssert (0);
 }
 
 void CustomDynamicRagDollManager::OnUpdateTransform(const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 {
-	dAssert (0);
+//	dAssert (0);
 }
