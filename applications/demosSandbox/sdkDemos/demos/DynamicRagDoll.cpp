@@ -264,7 +264,7 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 		dMatrix childPinAndPivotInGlobalSpace (dPitchMatrix (definition.m_childPitch * 3.141592f / 180.0f) * dYawMatrix (definition.m_childYaw * 3.141592f / 180.0f) * dRollMatrix (definition.m_childRoll * 3.141592f / 180.0f));
 		childPinAndPivotInGlobalSpace = childPinAndPivotInGlobalSpace * matrix;
 
-		CustomLimitBallAndSocket* const joint = new CustomLimitBallAndSocket (childPinAndPivotInGlobalSpace, bone, parentPinAndPivotInGlobalSpace, parent);
+		DynamicRagDollJoint* const joint = new DynamicRagDollJoint (childPinAndPivotInGlobalSpace, bone, parentPinAndPivotInGlobalSpace, parent);
 
 		joint->SetConeAngle (definition.m_coneAngle * 3.141592f / 180.0f);
 		joint->SetTwistAngle (definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
