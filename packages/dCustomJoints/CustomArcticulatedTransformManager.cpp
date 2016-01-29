@@ -15,9 +15,8 @@
 #include <CustomArcticulatedTransformManager.h>
 
 
-CustomArticulaledTransformManager::CustomArticulaledTransformManager(NewtonWorld* const world, bool applyLocalTransform)
-	:CustomControllerManager<CustomArticulatedTransformController>(world, HIERACHICAL_ARTICULATED_PLUGIN_NAME)
-	,m_applyLocalTransform(applyLocalTransform)
+CustomArticulaledTransformManager::CustomArticulaledTransformManager(NewtonWorld* const world, const char* const name)
+	:CustomControllerManager<CustomArticulatedTransformController>(world, name)
 {
 }
 
@@ -84,6 +83,7 @@ void CustomArticulatedTransformController::Init (void* const userData)
 
 	m_boneCount = 0;
 	m_userData = userData;
+	m_calculateLocalTransform = false;
 	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 }
 
@@ -95,8 +95,8 @@ void CustomArticulatedTransformController::PreUpdate(dFloat timestep, int thread
 
 void CustomArticulatedTransformController::PostUpdate(dFloat timestep, int threadIndex)
 {
-	CustomArticulaledTransformManager* const manager = (CustomArticulaledTransformManager*) GetManager();
-	if (manager->m_applyLocalTransform) {
+	if (m_calculateLocalTransform) {
+		CustomArticulaledTransformManager* const manager = (CustomArticulaledTransformManager*) GetManager();
 		for (int i = 0; i < m_boneCount; i ++) {
 			const dSkeletonBone& bone = m_bones[i];
 			dMatrix matrix;

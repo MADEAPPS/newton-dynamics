@@ -19,10 +19,12 @@
 #include <CustomArcticulatedTransformManager.h>
 
 
+#define DYNAMIC_RAGDOLL_PLUGIN_NAME	"__dynamicRagDollManagerr__"
+
 class CustomDynamicRagDollManager: public CustomArticulaledTransformManager
 {
 	public:
-	CUSTOM_JOINTS_API CustomDynamicRagDollManager(NewtonWorld* const world, bool applyLocalTransform);
+	CUSTOM_JOINTS_API CustomDynamicRagDollManager(NewtonWorld* const world);
 	CUSTOM_JOINTS_API virtual ~CustomDynamicRagDollManager();
 
 	CUSTOM_JOINTS_API virtual void Debug () const;

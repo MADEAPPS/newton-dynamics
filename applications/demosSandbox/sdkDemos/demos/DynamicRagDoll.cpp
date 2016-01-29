@@ -88,7 +88,7 @@ class RagDollManager: public CustomArticulaledTransformManager
 {
 	public: 
 	RagDollManager (DemoEntityManager* const scene)
-		:CustomArticulaledTransformManager (scene->GetNewton(), true)
+		:CustomArticulaledTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
@@ -279,6 +279,7 @@ class RagDollManager: public CustomArticulaledTransformManager
 		// build the ragdoll with rigid bodies connected by joints
 		// create a transform controller
 		CustomArticulatedTransformController* const controller = CreateTransformController (ragDollEntity);
+		controller->SetCalculateLocalTransforms (true);
 
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);

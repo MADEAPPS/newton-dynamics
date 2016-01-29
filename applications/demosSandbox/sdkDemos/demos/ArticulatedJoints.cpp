@@ -303,7 +303,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	public:
 
 	ArticulatedVehicleManagerManager (DemoEntityManager* const scene)
-		:CustomArticulaledTransformManager (scene->GetNewton(), true)
+		:CustomArticulaledTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
@@ -690,6 +690,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		vehicleModel->ResetMatrix (*scene, location);
 
 		CustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel);
+		controller->SetCalculateLocalTransforms (true);
 
 		DemoEntity* const rootEntity = (DemoEntity*) vehicleModel->Find (definition[0].m_boneName);
 		NewtonBody* const rootBody = CreateBodyPart (rootEntity, definition[0]);
@@ -1308,6 +1309,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		vehicleModel->ResetMatrix(*scene, matrix);
 
 		CustomArticulatedTransformController* const controller = CreateTransformController(vehicleModel);
+		controller->SetCalculateLocalTransforms (true);
 
 		ARTICULATED_VEHICLE_DEFINITION definition;
 		strcpy (definition.m_boneName, "body");
@@ -1577,8 +1579,8 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 
 	// load a the mesh of the articulate vehicle
-//	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
-//	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift (matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
+	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
+	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift (matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 //	inputManager->AddPlayer (forklift);
 	
 	matrix.m_posit.m_z += 4.0f;

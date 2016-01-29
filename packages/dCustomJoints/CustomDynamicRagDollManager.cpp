@@ -13,8 +13,8 @@
 #include <CustomJointLibraryStdAfx.h>
 #include <CustomDynamicRagDollManager.h>
 
-CustomDynamicRagDollManager::CustomDynamicRagDollManager(NewtonWorld* const world, bool applyLocalTransform)
-	:CustomArticulaledTransformManager(world, applyLocalTransform)
+CustomDynamicRagDollManager::CustomDynamicRagDollManager(NewtonWorld* const world)
+	:CustomArticulaledTransformManager(world, DYNAMIC_RAGDOLL_PLUGIN_NAME)
 {
 	dAssert (0);
 }
