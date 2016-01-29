@@ -1318,7 +1318,8 @@ void SuperCar (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateLevelMesh (scene, "flatPlane1.ngd", 0);
+	//CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 0);
@@ -1339,7 +1340,7 @@ void SuperCar (DemoEntityManager* const scene)
 //	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 //	NewtonMaterialSetDefaultFriction(scene->GetNewton(), defaulMaterial, defaulMaterial, 0.9f, 0.9f);
 
-	// create a Bezier Spline path for AI car to driv                     e
+	// create a Bezier Spline path for AI car to drive                     e
 	manager->CreatedrivingTestCourt (scene);
 	//manager->AddCones (scene);
 
@@ -1354,12 +1355,16 @@ void SuperCar (DemoEntityManager* const scene)
 		u -= 0.005f;
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
-//location1 = dGetIdentityMatrix();
+location1 = dGetIdentityMatrix();
 //location1.m_posit.m_x = -170;
+location1.m_posit.m_x = 0.0f;
+location1.m_posit.m_z = 0.0f;
 
 //		location1.m_posit += location1.m_right.Scale (-3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
+//location1.m_posit.m_y += 10.0f;
+
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
 		vehicle1->BuildFourWheelDriveSuperCar();
 		//vehicle1->BuildRearWheelDriveMuscleCar();

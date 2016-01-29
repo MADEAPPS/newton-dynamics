@@ -56,10 +56,10 @@
 //#define DEFAULT_SCENE	27			// puck slide continuous collision
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
-//#define DEFAULT_SCENE	30			// basic rag doll
+#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// basic Car
 //#define DEFAULT_SCENE	32			// heavy vehicles
-#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// basic player controller
 //#define DEFAULT_SCENE	35			// advanced player controller
 //#define DEFAULT_SCENE	36			// cloth patch			
@@ -314,20 +314,25 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
+/*
 //m_broadPhaseType = 1;
 //m_autoSleepState = false;
 //m_microthreadIndex = 1;
 //m_useParallelSolver = true;
 //m_threadProfilerState = true;
-//m_showNormalForces = true;
+m_showNormalForces = true;
 //m_showCenterOfMass = true;
-//m_hideVisualMeshes = true;
+m_hideVisualMeshes = true;
 //m_physicsUpdateMode = 1;
-//m_showContactPoints = true;
+m_showContactPoints = true;
 //m_hardwareDevice = 2;
 //m_showStatistics = true;
-//m_debugDisplayMode = 2;
+m_debugDisplayMode = 2;
+*/
 
+//m_autoSleepState = false;
+//m_microthreadIndex = 1;
+//m_useParallelSolver = true;
 
 	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));
 
