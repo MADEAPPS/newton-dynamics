@@ -1345,20 +1345,20 @@ void SuperCar (DemoEntityManager* const scene)
 	//manager->AddCones (scene);
 
 	dFloat u = 1.0f;
-	for (int i = 0; i < 1; i ++) {
+	for (int i = 0; i < 2; i ++) {
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
-//		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
+		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
 		//vehicle0->BuildFourWheelDriveSuperCar();
-//		vehicle0->BuildRearWheelDriveMuscleCar();
+		vehicle0->BuildRearWheelDriveMuscleCar();
 		u -= 0.005f;
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
-location1 = dGetIdentityMatrix();
+//location1 = dGetIdentityMatrix();
 //location1.m_posit.m_x = -170;
-location1.m_posit.m_x = 0.0f;
-location1.m_posit.m_z = 0.0f;
+//location1.m_posit.m_x = 0.0f;
+//location1.m_posit.m_z = 0.0f;
 
 //		location1.m_posit += location1.m_right.Scale (-3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
@@ -1374,9 +1374,9 @@ location1.m_posit.m_z = 0.0f;
 		location2.m_posit += location2.m_right.Scale ( 3.0f);
 		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
 		location2.m_posit.m_y += 1.0f;
-//		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
+		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
 		//vehicle2->BuildFourWheelDriveSuperCar();
-//		vehicle2->BuildRearWheelDriveMuscleCar();
+		vehicle2->BuildRearWheelDriveMuscleCar();
 		u -= 0.01f;
 
 	}
