@@ -51,7 +51,6 @@
 #include "dgCollisionDeformableSolidMesh.h"
 #include "dgCollisionDeformableClothPatch.h"
 
-
 dgCollisionInstance* dgWorld::CreateNull ()
 {
 	dgUnsigned32 crc = dgCollision::dgCollisionNull_RTTI;
@@ -573,7 +572,8 @@ static inline dgInt32 CompareContact (const dgContactPoint* const contactA, cons
 
 dgInt32 dgWorld::ReduceContacts (dgInt32 count, dgContactPoint* const contact,  dgInt32 maxCount, dgFloat32 tol, dgInt32 arrayIsSorted) const
 {
-	if ((count > maxCount) && (maxCount > 1)) {
+//	if ((count > maxCount) && (maxCount > 1)) {
+	if (count > maxCount) {
 		dgUnsigned8 mask[DG_MAX_CONTATCS];
 
 		if (!arrayIsSorted) {
@@ -616,9 +616,6 @@ dgInt32 dgWorld::ReduceContacts (dgInt32 count, dgContactPoint* const contact,  
 			}
 		}
 		dgAssert (j == maxCount);
-
-	} else {
-		maxCount = count;
 	}
 
 	return maxCount;
