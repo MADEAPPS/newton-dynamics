@@ -484,22 +484,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
 
 			int countCount = 0;
-			//dVector contactPoint (0.0f, 0.0f, 0.0f, 0.0f);
-			//dVector contactNornal (0.0f, 0.0f, 0.0f, 0.0f);
-
 			void* contactList[32];
 			for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 				contactList[countCount] = contact;
 				countCount ++;
-
-				//NewtonMaterial* const material = NewtonContactGetMaterial(contact);
-				//dVector posit;
-				//dVector normal;
-				//NewtonMaterialGetContactPositionAndNormal (material, linkBody, &posit[0], &normal[0]);
-				//posit.m_w = 0.0f;
-				//normal.m_w = 0.0f;
-				//contactPoint += posit;
-				//contactNornal += normal;
 			}
 
 			for (int i = 1; i < countCount; i++) {

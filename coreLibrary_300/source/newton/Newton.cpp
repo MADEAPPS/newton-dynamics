@@ -2285,8 +2285,16 @@ void NewtonMaterialSetContactNormalDirection(const NewtonMaterial* const materia
 	dgMatrix matrix (normal);
 	material->m_dir1 = matrix.m_up;
 	material->m_dir0 = matrix.m_right;
-//	NewtonMaterialContactRotateTangentDirections(materialHandle, &material->m_dir0[0]);
 }
+
+void NewtonMaterialSetContactPosition(const NewtonMaterial* const materialHandle, const dFloat* const position)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgContactMaterial* const material = (dgContactMaterial*)materialHandle;
+	dgVector point(position[0], position[1], position[2], dgFloat32(1.0f));
+	material->m_point = point;
+}
+
 
 // Name: NewtonMaterialContactRotateTangentDirections 
 // Rotate the tangent direction of the contacts until the primary direction is aligned with the alignVector.

@@ -591,6 +591,7 @@ extern "C" {
 	
 	NEWTON_API void NewtonMaterialSetContactNormalAcceleration (const NewtonMaterial* const material, dFloat accel);
 	NEWTON_API void NewtonMaterialSetContactNormalDirection (const NewtonMaterial* const material, const dFloat* const directionVector);
+	NEWTON_API void NewtonMaterialSetContactPosition (const NewtonMaterial* const material, const dFloat* const position);
 
 	NEWTON_API void NewtonMaterialSetContactTangentFriction (const NewtonMaterial* const material, dFloat friction, int index);
 	NEWTON_API void NewtonMaterialSetContactTangentAcceleration (const NewtonMaterial* const material, dFloat accel, int index);

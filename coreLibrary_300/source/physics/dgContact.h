@@ -50,21 +50,6 @@ class dgActiveContacts: public dgList<dgContact*>
 
 
 DG_MSC_VECTOR_ALIGMENT
-class dgContactPoint 
-{
-	public:
-	dgVector m_point;
-	dgVector m_normal;
-	const dgBody* m_body0;
-	const dgBody* m_body1;
-	const dgCollisionInstance* m_collision0;
-	const dgCollisionInstance* m_collision1;
-	dgInt64 m_shapeId0;
-	dgInt64 m_shapeId1;
-	dgFloat32 m_penetration;
-}DG_GCC_VECTOR_ALIGMENT;
-
-DG_MSC_VECTOR_ALIGMENT
 class dgCollisionParamProxy
 {	
 	public:
@@ -107,6 +92,22 @@ class dgClothPatchMaterial
 	dgFloat32 m_damper;
 	dgFloat32 m_stiffness;
 };
+
+
+DG_MSC_VECTOR_ALIGMENT
+class dgContactPoint
+{
+	public:
+	dgVector m_point;
+	dgVector m_normal;
+	const dgBody* m_body0;
+	const dgBody* m_body1;
+	const dgCollisionInstance* m_collision0;
+	const dgCollisionInstance* m_collision1;
+	dgInt64 m_shapeId0;
+	dgInt64 m_shapeId1;
+	dgFloat32 m_penetration;
+}DG_GCC_VECTOR_ALIGMENT;
 
 
 DG_MSC_VECTOR_ALIGMENT 
