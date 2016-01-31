@@ -1379,6 +1379,19 @@ const dMatrix& CustomVehicleController::GetLocalFrame() const
 	return m_localFrame;
 }
 
+dMatrix CustomVehicleController::GetTransform() const
+{
+	dMatrix matrix;
+	NewtonBodyGetMatrix (m_chassis.GetBody(), &matrix[0][0]);
+	return matrix;
+}
+
+void CustomVehicleController::SetTransform(const dMatrix& matrix)
+{
+	NewtonBodySetMatrixRecursive (m_chassis.GetBody(), &matrix[0][0]);
+}
+
+
 CustomVehicleController::EngineController* CustomVehicleController::GetEngine() const
 {
 	return m_engineControl;
@@ -1724,6 +1737,8 @@ int CustomVehicleControllerManager::OnTireAABBOverlap(const NewtonMaterial* cons
 
 void CustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 {
+static int xxx = 0;
+
 	void* const contact = NewtonContactJointGetFirstContact(contactJoint);
 	if (contact) {
 		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
@@ -1790,16 +1805,16 @@ void CustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* c
 			dAssert (foundContact);
 
 			if (foundContact) {
-/*
+if (xxx == 2523 && tire->m_index == 1)
 				for (int i = 0; i < countCount; i++) {
 					dVector posit;
 					dVector normal;
 					NewtonMaterial* const material = NewtonContactGetMaterial(contactList[i]);
 					NewtonMaterialGetContactPositionAndNormal(material, tireBody, &posit[0], &normal[0]);
-					dTrace(("%d -> (%f %f %f) (%f %f %f) \n", tire->m_index, posit.m_x, posit.m_y, posit.m_z, normal.m_x, normal.m_y, normal.m_z));
+//					dTrace(("%d -> (%f %f %f) (%f %f %f) \n", tire->m_index, posit.m_x, posit.m_y, posit.m_z, normal.m_x, normal.m_y, normal.m_z));
 				}
 				dTrace(("\n"));
-*/
+
 				NewtonMaterial* const material = NewtonContactGetMaterial(contactList[0]);
 				NewtonMaterialSetContactPosition (material, &contactPoint[0]);
 				NewtonMaterialSetContactNormalDirection (material, &contactNormal[0]);
@@ -1816,6 +1831,19 @@ void CustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* c
 				NewtonContactJointRemoveContact(contactJoint, contactList[i]);
 			}
 		}
+
+
+
+if (tire->m_index == 1) 
+{
+dVector posit;
+dVector normal;
+NewtonMaterialGetContactPositionAndNormal(material, tireBody, &posit[0], &normal[0]);
+//dTrace(("%d -> (%f %f %f) (%f %f %f) \n", xxx, posit.m_x, posit.m_y, posit.m_z, normal.m_x, normal.m_y, normal.m_z));
+//dAssert (normal.m_y > 0.98f);
+xxx ++;
+}
+
 
 		manager->OnTireContactsProcess(contactJoint, tire, otherBody, timestep);
 	}
@@ -1859,7 +1887,6 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			// project the contact point to the surface of the collision shape
 			dVector pointOnPlane(posit - lateralPin.Scale((posit - tireMatrix.m_posit) % lateralPin));
 			dVector dp(pointOnPlane - tireMatrix.m_posit);
-			//              posit = tireMatrix.m_posit + dp.Scale(tire->m_data.m_radio / dSqrt(dp % dp));
 			dVector radius(dp.Scale(tire->m_data.m_radio / dSqrt(dp % dp)));
 
 			dVector lateralContactDir;
@@ -1897,7 +1924,6 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				dAssert(phy_x >= 0.0f);
 				dAssert(phy_x <= 1.0f);
 				dAssert(phy_y >= 0.0f);
-//dTrace (("%f %f\n", phy_x, phy_y));
 
 				dFloat f_x;
 				dFloat f_y;

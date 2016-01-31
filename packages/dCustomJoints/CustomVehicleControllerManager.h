@@ -407,6 +407,9 @@ class CustomVehicleController: public CustomControllerBase
 	const CUSTOM_JOINTS_API BodyPart* GetChassis() const;
 	const CUSTOM_JOINTS_API dMatrix& GetLocalFrame() const;
 
+	CUSTOM_JOINTS_API dMatrix GetTransform() const;
+	CUSTOM_JOINTS_API void SetTransform(const dMatrix& matrix);
+
 	CUSTOM_JOINTS_API dList<BodyPartTire>::dListNode* GetFirstTire() const;
 	CUSTOM_JOINTS_API dList<BodyPartTire>::dListNode* GetNextTire (dList<BodyPartTire>::dListNode* const tireNode) const;
 
