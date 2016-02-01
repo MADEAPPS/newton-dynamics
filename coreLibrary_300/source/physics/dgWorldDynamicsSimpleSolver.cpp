@@ -816,7 +816,7 @@ static int xxx;
 	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
 	for (dgInt32 i = 1; i < bodyCount; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-dgTrace (("%d %f %f %f %f %f %f\n", xxx, body->m_accel[0], body->m_accel[1], body->m_accel[2], body->m_alpha[0], body->m_alpha[1], body->m_alpha[2]));
+//dgTrace (("%d %f %f %f %f %f %f\n", xxx, body->m_accel[0], body->m_accel[1], body->m_accel[2], body->m_alpha[0], body->m_alpha[1], body->m_alpha[2]));
 		dgSkeletonContainer* const container = body->GetSkeleton();
 		if (container && (container->m_lru != lru)) {
 			container->m_lru = lru;
