@@ -4074,6 +4074,14 @@ int NewtonCollisionGetType(const NewtonCollision* const collision)
 	return instance->GetCollisionPrimityType();
 }
 
+int NewtonCollisionIsConveShape(const NewtonCollision* const collision)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const instance = (dgCollisionInstance*)collision;
+	return instance->IsType (dgCollision::dgCollisionConvexShape_RTTI) ? 1 : 0;
+}
+
+
 // Name: NewtonCollisionSetUserID 
 // Store a user defined value with a convex collision primitive.
 //

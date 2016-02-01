@@ -1345,7 +1345,8 @@ void SuperCar (DemoEntityManager* const scene)
 	//manager->AddCones (scene);
 
 	dFloat u = 1.0f;
-	for (int i = 0; i < 10; i ++) {
+	for (int i = 0; i < 1; i ++) {
+/*
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
@@ -1355,21 +1356,14 @@ void SuperCar (DemoEntityManager* const scene)
 		u -= 0.005f;
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
-//location1 = dGetIdentityMatrix();
-//location1.m_posit.m_x = -170;
-//location1.m_posit.m_x = 0.0f;
-//location1.m_posit.m_z = 0.0f;
-
-//		location1.m_posit += location1.m_right.Scale (-3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
-//location1.m_posit.m_y += 10.0f;
 
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
 		vehicle1->BuildFourWheelDriveSuperCar();
 		//vehicle1->BuildRearWheelDriveMuscleCar();
 		u -= 0.005f;
-
+*/
 		dMatrix location2 (manager->CalculateSplineMatrix (u));
 		location2.m_posit += location2.m_right.Scale ( 3.0f);
 		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
@@ -1377,8 +1371,12 @@ void SuperCar (DemoEntityManager* const scene)
 		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
 		//vehicle2->BuildFourWheelDriveSuperCar();
 		vehicle2->BuildRearWheelDriveMuscleCar();
-		u -= 0.01f;
 
+//dMatrix xxx(dPitchMatrix((30.0f * 3.1416f/180.0f)) *  dYawMatrix((60.0f * 3.1416f/180.0f)) * vehicle2->m_controller->GetTransform());
+//vehicle2->m_controller->SetTransform (xxx);
+
+
+		u -= 0.01f;
 	}
 		
 	// build a muscle car from this vehicle controller

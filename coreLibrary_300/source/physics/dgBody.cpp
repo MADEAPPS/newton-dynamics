@@ -290,14 +290,14 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
 	m_globalCentreOfMass += m_veloc.Scale3 (timestep); 
 	while (((m_omega % m_omega) * timestep * timestep) > m_maxAngulaRotationPerSet2) {
-		m_omega = m_omega.Scale3 (dgFloat32 (0.8f));
+		m_omega = m_omega.Scale4 (dgFloat32 (0.8f));
 	}
 
 	// this is correct
 	dgFloat32 omegaMag2 = m_omega % m_omega;
 	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {
 		dgFloat32 invOmegaMag = dgRsqrt (omegaMag2);
-		dgVector omegaAxis (m_omega.Scale3 (invOmegaMag));
+		dgVector omegaAxis (m_omega.Scale4 (invOmegaMag));
 		dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
 		dgQuaternion rotation (omegaAxis, omegaAngle);
 		m_rotation = m_rotation * rotation;
