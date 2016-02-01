@@ -37,6 +37,7 @@ class CustomVehicleController: public CustomControllerBase
 	public:
 	class WheelJoint;
 	class EngineJoint;
+	class WheelContactJoint;
 	class dWeightDistibutionSolver;
 	class DifferentialSpiderGearJoint;
 
@@ -197,6 +198,7 @@ class CustomVehicleController: public CustomControllerBase
 		dFloat m_lateralSlip;
 		dFloat m_longitudinalSlip;
 		dFloat m_aligningTorque;
+		CustomJoint* m_tireContact;
 		int m_index;
 		friend class WheelJoint;
 		friend class CustomVehicleController;

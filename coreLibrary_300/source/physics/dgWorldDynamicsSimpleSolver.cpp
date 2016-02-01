@@ -809,11 +809,14 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	joindDesc.m_invTimeStep = invTimestepRK;
 	joindDesc.m_firstPassCoefFlag = dgFloat32 (0.0f);
 
+static int xxx;
+
 	dgInt32 skeletonCount = 0;
 	dgInt32 lru = dgAtomicExchangeAndAdd (&dgSkeletonContainer::m_lruMarker, 1);
 	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
 	for (dgInt32 i = 1; i < bodyCount; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
+dgTrace (("%d %f %f %f %f %f %f\n", xxx, body->m_accel[0], body->m_accel[1], body->m_accel[2], body->m_alpha[0], body->m_alpha[1], body->m_alpha[2]));
 		dgSkeletonContainer* const container = body->GetSkeleton();
 		if (container && (container->m_lru != lru)) {
 			container->m_lru = lru;
@@ -823,6 +826,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		}
 	}
 
+xxx ++;
 	for (dgInt32 i = 0; i < skeletonCount; i ++) {
 		dgSkeletonContainer* const container = skeletonArray[i];
 		if (!container->m_skeletonHardMotors) {

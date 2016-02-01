@@ -331,8 +331,9 @@ m_hideVisualMeshes = true;
 m_showContactPoints = true;
 //m_hardwareDevice = 2;
 //m_showStatistics = true;
-m_debugDisplayMode = 2;
-*/
+//*/
+//m_debugDisplayMode = 2;
+
 
 //m_autoSleepState = false;
 //m_microthreadIndex = 1;
