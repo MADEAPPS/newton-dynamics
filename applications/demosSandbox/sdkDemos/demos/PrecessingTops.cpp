@@ -38,7 +38,7 @@ void PrecessingTops (DemoEntityManager* const scene)
 
 	// all shapes use the x axis as the  axis of symmetry, to make an upright cone we apply a 90 degree rotation local matrix
 	dMatrix shapeOffsetMatrix (dRollMatrix(-3.141592f/2.0f));
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, 0, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, 0, shapeOffsetMatrix);
 
 	// till the cont 30 degrees, and apply a local high angular velocity
 	dMatrix matrix (dRollMatrix (-25.0f * 3.141592f / 180.0f));
@@ -51,6 +51,7 @@ void PrecessingTops (DemoEntityManager* const scene)
 	NewtonWorld* const world = scene->GetNewton();
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+		dVector com;
 		if (NewtonCollisionGetType (collision) == SERIALIZE_ID_CONE) {
 			array[topscount] = body;
 			topscount ++;

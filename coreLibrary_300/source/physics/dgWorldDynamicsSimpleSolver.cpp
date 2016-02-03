@@ -809,14 +809,11 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	joindDesc.m_invTimeStep = invTimestepRK;
 	joindDesc.m_firstPassCoefFlag = dgFloat32 (0.0f);
 
-static int xxx;
-
 	dgInt32 skeletonCount = 0;
 	dgInt32 lru = dgAtomicExchangeAndAdd (&dgSkeletonContainer::m_lruMarker, 1);
 	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
 	for (dgInt32 i = 1; i < bodyCount; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-//dgTrace (("%d %f %f %f %f %f %f\n", xxx, body->m_accel[0], body->m_accel[1], body->m_accel[2], body->m_alpha[0], body->m_alpha[1], body->m_alpha[2]));
 		dgSkeletonContainer* const container = body->GetSkeleton();
 		if (container && (container->m_lru != lru)) {
 			container->m_lru = lru;
@@ -826,7 +823,6 @@ static int xxx;
 		}
 	}
 
-xxx ++;
 	for (dgInt32 i = 0; i < skeletonCount; i ++) {
 		dgSkeletonContainer* const container = skeletonArray[i];
 		if (!container->m_skeletonHardMotors) {
@@ -958,7 +954,8 @@ void dgWorldDynamicUpdate::ApplyNetVelcAndOmega (dgDynamicBody* const body, cons
 			force += body->m_accel;
 			torque += body->m_alpha;
 		}
-
+#if 1
+		// this method is more accurate numerically 
 		dgVector velocStep((force.Scale4(body->m_invMass.m_w)).CompProduct4(timestep4));
 		dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)).CompProduct4(timestep4));
 		if (!body->m_resting) {
@@ -972,6 +969,25 @@ void dgWorldDynamicUpdate::ApplyNetVelcAndOmega (dgDynamicBody* const body, cons
 				body->m_resting = false;
 			}
 		}
+
+#else
+		// this method is Lagrange-Euler by is more expensive and accumulate more numerical error. 
+		dgVector linearMomentum(force.CompProduct4(timestep4) + body->m_veloc.Scale4 (body->m_mass.m_w));
+		dgVector angularMomentum(torque.CompProduct4(timestep4) + body->m_matrix.RotateVector(body->m_mass.CompProduct4(body->m_matrix.UnrotateVector(body->m_omega))));
+		if (!body->m_resting) {
+			body->m_veloc = linearMomentum.Scale4 (body->m_invMass.m_w);
+			body->m_omega = body->m_invWorldInertiaMatrix.RotateVector(angularMomentum);
+		} else {
+			dgVector velocStep (linearMomentum.Scale4(body->m_invMass.m_w));
+			dgVector omegaStep (body->m_invWorldInertiaMatrix.RotateVector(angularMomentum));
+			dgVector velocStep2(velocStep.DotProduct4(velocStep));
+			dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
+			dgVector test((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2) | forceActiveMask);
+			if (test.GetSignMask()) {
+				body->m_resting = false;
+			}
+		}
+#endif
 	}
 }
 
