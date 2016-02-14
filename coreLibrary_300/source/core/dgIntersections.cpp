@@ -241,8 +241,7 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 			sN = dgFloat32 (0.0f);
 			tN = e;
 			tD = c;
-		}
-		else if (sN > sD) {  // sc > 1 => the s=1 edge is visible
+		} else if (sN > sD) {  // sc > 1 => the s=1 edge is visible
 			sN = sD;
 			tN = e + b;
 			tD = c;
@@ -253,23 +252,22 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 	if (tN < dgFloat32 (0.0f)) {           // tc < 0 => the t=0 edge is visible
 		tN = dgFloat32 (0.0f);
 		// recompute sc for this edge
-		if (-d < dgFloat32 (0.0f))
+		if (-d < dgFloat32 (0.0f)) {
 			sN = dgFloat32 (0.0f);
-		else if (-d > a)
+		} else if (-d > a) {
 			sN = sD;
-		else {
+		} else {
 			sN = -d;
 			sD = a;
 		}
-	}
-	else if (tN > tD) {      // tc > 1 => the t=1 edge is visible
+	} else if (tN > tD) {      // tc > 1 => the t=1 edge is visible
 		tN = tD;
 		// recompute sc for this edge
-		if ((-d + b) < dgFloat32 (0.0f))
+		if ((-d + b) < dgFloat32 (0.0f)) {
 			sN = dgFloat32 (0.0f);
-		else if ((-d + b) > a)
+		} else if ((-d + b) > a) {
 			sN = sD;
-		else {
+		} else {
 			sN = (-d + b);
 			sD = a;
 		}

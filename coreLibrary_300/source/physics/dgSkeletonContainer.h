@@ -53,6 +53,7 @@ class dgSkeletonContainer
 	
 	dgSkeletonGraph* GetRoot () const;
 	dgBody* GetBody(dgSkeletonGraph* const node) const;
+	dgBilateralConstraint* GetParentJoint(dgSkeletonGraph* const node) const;
 	dgSkeletonGraph* GetParent (dgSkeletonGraph* const node) const;
 	dgSkeletonGraph* GetFirstChild (dgSkeletonGraph* const parent) const;
 	dgSkeletonGraph* GetNextSiblingChild (dgSkeletonGraph* const sibling) const;
@@ -67,7 +68,6 @@ class dgSkeletonContainer
 	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
 	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
-	
 	
 	static void ResetUniqueId(dgInt32 id);
 

@@ -173,8 +173,11 @@ class CustomJoint: public CustomAlloc
 	// note: this is not a extension of a virtual function, DO NOT CALL the base class SubmitConstraints!! 
 	CUSTOM_JOINTS_API void SetUserData (void* userData) {m_userData = userData;}
 	CUSTOM_JOINTS_API void* GetUserData () const {return m_userData;}
+
 	CUSTOM_JOINTS_API void SetUserDestructorCallback (JointUserDestructorCallback callback) {m_userDestructor = callback;}
 	CUSTOM_JOINTS_API void SetUserSubmintConstraintCallback (JointUserSubmitConstraintCallback callback) {m_userConstrationCallback = callback;}
+
+	CUSTOM_JOINTS_API virtual void UserUpdate(dFloat timestep, int threadIndex) { dAssert (0);}
 
 	private:
 	// this are the callback needed to have transparent c++ method interfaces 

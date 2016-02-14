@@ -1623,6 +1623,14 @@ void NewtonMaterialSetDefaultSoftness(const NewtonWorld* const newtonWorld, int 
 	material->m_softness = dgClamp (softnessCoef, dFloat(0.01f), dFloat(dgFloat32(1.0f)));
 }
 
+void NewtonMaterialSetCallbackUserData (const NewtonWorld* const newtonWorld, int id0, int id1, void* const userData)
+{
+	Newton* const world = (Newton *)newtonWorld;
+
+	TRACE_FUNCTION(__FUNCTION__);
+	dgContactMaterial* const material = world->GetMaterial(dgUnsigned32(id0), dgUnsigned32(id1));
+	material->SetUserData(userData);
+}
 
 // Name: NewtonMaterialSetCollisionCallback 
 // Set userData and the functions event handlers for the material interaction between two physics materials .
@@ -1656,18 +1664,23 @@ void NewtonMaterialSetDefaultSoftness(const NewtonWorld* const newtonWorld, int 
 // When the application receives the call to *endCallback* the application plays a 3d sound based in the position and strength of the contact.
 //
 // See also: NewtonMaterialAsThreadSafe
-void NewtonMaterialSetCollisionCallback(const NewtonWorld* const newtonWorld, int id0, int id1, void* const userData, NewtonOnAABBOverlap aabbOverlap, NewtonContactsProcess processCallback)
+void NewtonMaterialSetCollisionCallback(const NewtonWorld* const newtonWorld, int id0, int id1, NewtonOnAABBOverlap aabbOverlap, NewtonContactsProcess processCallback)
 {
 	Newton* const world = (Newton *)newtonWorld;
 
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = world->GetMaterial (dgUnsigned32 (id0), dgUnsigned32 (id1));
-
-	material->SetUserData (userData);
 	material->SetCollisionCallback ((dgContactMaterial::OnAABBOverlap) aabbOverlap, (dgContactMaterial::OnContactCallback) processCallback);
-	//material->SetCompoundCollisionCallback ((OnCompoundCollisionPrefilter) compoundAabbOverlap);
 }
 
+void NewtonMaterialSetContactGenerationCallback (const NewtonWorld* const newtonWorld, int id0, int id1, NewtonOnContactGeneration contactGeneration)
+{
+	Newton* const world = (Newton *)newtonWorld;
+
+	TRACE_FUNCTION(__FUNCTION__);
+	dgContactMaterial* const material = world->GetMaterial(dgUnsigned32(id0), dgUnsigned32(id1));
+	material->SetCollisionGenerationCallback ((dgContactMaterial::OnContactGeneration) contactGeneration);
+}
 
 // Name: NewtonMaterialSetCollisionCallback 
 // Set userData and the functions event handlers for the material interaction between two physics materials .
@@ -4074,13 +4087,19 @@ int NewtonCollisionGetType(const NewtonCollision* const collision)
 	return instance->GetCollisionPrimityType();
 }
 
-int NewtonCollisionIsConveShape(const NewtonCollision* const collision)
+int NewtonCollisionIsConvexShape(const NewtonCollision* const collision)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*)collision;
 	return instance->IsType (dgCollision::dgCollisionConvexShape_RTTI) ? 1 : 0;
 }
 
+NEWTON_API int NewtonCollisionIsStaticShape (const NewtonCollision* const collision)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const instance = (dgCollisionInstance*)collision;
+	return (instance->IsType(dgCollision::dgCollisionMesh_RTTI) || instance->IsType(dgCollision::dgCollisionMesh_RTTI)) ? 1 : 0;
+}
 
 // Name: NewtonCollisionSetUserID 
 // Store a user defined value with a convex collision primitive.
@@ -4979,7 +4998,7 @@ void NewtonBodyGetInvInertiaMatrix(const NewtonBody* const bodyPtr, dFloat* cons
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 
-	const dgMatrix& matrix = body->GetInertiaMatrix ();
+	dgMatrix matrix (body->CalculateInvInertiaMatrix ());
 	memcpy (invInertiaMatrix, &matrix[0][0], sizeof (dgMatrix));
 }
 
@@ -6038,8 +6057,6 @@ void NewtonBodyGetVelocity(const NewtonBody* const bodyPtr, dFloat* const veloci
 	TRACE_FUNCTION(__FUNCTION__);
 
 	dgBody* const body = (dgBody *)bodyPtr;
-//	dgVector& vector = *((dgVector*) velocity);
-//	vector = body->GetVelocity();
 
 	dgVector vector (body->GetVelocity());
 	velocity[0] = vector.m_x;
@@ -6078,9 +6095,6 @@ void NewtonBodyGetOmega(const NewtonBody* const bodyPtr, dFloat* const omega)
 	TRACE_FUNCTION(__FUNCTION__);
 
 	dgBody* const body = (dgBody *)bodyPtr;
-
-//	dgVector& vector = *((dgVector*) omega);
-//	vector = body->GetOmega();
 
 	dgVector vector (body->GetOmega());
 	omega[0] = vector.m_x;
@@ -8775,14 +8789,14 @@ void NewtonSkeletonContainerDelete(NewtonSkeletonContainer* const skeletonPtr)
 }
 
 
-void* NewtonSkeletonContainerGetRoot(NewtonSkeletonContainer* const skeletonPtr)
+void* NewtonSkeletonContainerGetRoot(const NewtonSkeletonContainer* const skeletonPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
 	return skeleton->GetRoot();
 }
 
-void* NewtonSkeletonContainerGetParent(NewtonSkeletonContainer* const skeletonPtr, void* const node)
+void* NewtonSkeletonContainerGetParent(const NewtonSkeletonContainer* const skeletonPtr, void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
@@ -8790,29 +8804,35 @@ void* NewtonSkeletonContainerGetParent(NewtonSkeletonContainer* const skeletonPt
 }
 
 
-void* NewtonSkeletonContainerFirstChild(NewtonSkeletonContainer* const skeletonPtr, void* const parentNode)
+void* NewtonSkeletonContainerFirstChild(const NewtonSkeletonContainer* const skeletonPtr, void* const parentNode)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
 	return skeleton->GetFirstChild((dgSkeletonContainer::dgSkeletonGraph*) parentNode);
 }
 
-void* NewtonSkeletonContainerNextSibling(NewtonSkeletonContainer* const skeletonPtr, void* const siblingNode)
+void* NewtonSkeletonContainerNextSibling(const NewtonSkeletonContainer* const skeletonPtr, void* const siblingNode)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetFirstChild((dgSkeletonContainer::dgSkeletonGraph*) siblingNode);
+	return skeleton->GetNextSiblingChild((dgSkeletonContainer::dgSkeletonGraph*) siblingNode);
 }
 
-NewtonBody* NewtonSkeletonContainerGetBodyFromNode (NewtonSkeletonContainer* const skeletonPtr, void* const node)
+NewtonBody* NewtonSkeletonContainerGetBodyFromNode (const NewtonSkeletonContainer* const skeletonPtr, void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
 	return (NewtonBody*) (skeleton->GetBody((dgSkeletonContainer::dgSkeletonGraph*) node));
 }
 
+NewtonJoint* NewtonSkeletonContainerGetParentJointFromNode (const NewtonSkeletonContainer* const skeletonPtr, void* const node)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
+	return (NewtonJoint*)(skeleton->GetParentJoint((dgSkeletonContainer::dgSkeletonGraph*) node));
+}
 
-int NewtonSkeletonGetSolverMode(NewtonSkeletonContainer* const skeletonPtr)
+int NewtonSkeletonGetSolverMode(const NewtonSkeletonContainer* const skeletonPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;

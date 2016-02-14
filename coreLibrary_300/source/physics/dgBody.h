@@ -146,7 +146,7 @@ class dgBody
 	dgVector GetMass() const;
 	dgVector GetInvMass() const;
 	void SetInvMass(const dgVector& invMass);
-	const dgMatrix& GetInertiaMatrix () const;
+	const dgMatrix& GetInvInertiaMatrix () const;
 
 	virtual dgMatrix CalculateInertiaMatrix () const;
 	virtual dgMatrix CalculateInvInertiaMatrix () const;
@@ -182,8 +182,8 @@ class dgBody
 	virtual void InvalidateCache();
 	
     virtual void SetMatrix(const dgMatrix& matrix);
-	virtual void SetMatrixNoSleep(const dgMatrix& matrix);
     virtual void SetMatrixResetSleep(const dgMatrix& matrix);
+	virtual void SetMatrixNoSleep(const dgMatrix& matrix);
 	virtual void IntegrateVelocity (dgFloat32 timestep);
 	virtual void AttachCollision (dgCollisionInstance* const collision);
     
@@ -302,7 +302,7 @@ class dgBody
 //	 Implementation	
 // 
 // *****************************************************************************
-DG_INLINE const dgMatrix& dgBody::GetInertiaMatrix () const 
+DG_INLINE const dgMatrix& dgBody::GetInvInertiaMatrix () const 
 {
 	return m_invWorldInertiaMatrix;
 }
@@ -538,27 +538,7 @@ DG_INLINE dgVector dgBody::GetApparentMass() const
 DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 {
 	m_matrix = matrix;
-
-#ifdef _DEBUG
-	for (int i = 0; i < 4; i ++) {
-		for (int j = 0; j < 4; j ++) {
-			dgAssert (dgCheckFloat(m_matrix[i][j]));
-		}
-	}
-
-	int j0 = 1;
-	int j1 = 2;
-	for (dgInt32 i = 0; i < 3; i ++) {
-		dgAssert (m_matrix[i][3] == 0.0f);
-		dgFloat32 val = m_matrix[i] % m_matrix[i];
-		dgAssert (dgAbsf (val - 1.0f) < 1.0e-4f);
-		dgVector tmp (m_matrix[j0] * m_matrix[j1]);
-		val = tmp % m_matrix[i];
-		dgAssert (dgAbsf (val - 1.0f) < 1.0e-4f);
-		j0 = j1;
-		j1 = i;
-	}
-#endif
+	dgAssert (m_matrix.TestOrthogonal(dgFloat32 (1.0e-5f)));
 
 	m_rotation = dgQuaternion (m_matrix);
 	m_globalCentreOfMass = m_matrix.TransformVector (m_localCentreOfMass);

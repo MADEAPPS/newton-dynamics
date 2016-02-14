@@ -70,7 +70,7 @@ void Friction (DemoEntityManager* const scene)
 	// set a default material call back
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
-	NewtonMaterialSetCollisionCallback (world, defaultMaterialID, defaultMaterialID, NULL, UserOnAABBOverlap, UserContactFriction); 
+	NewtonMaterialSetCollisionCallback (world, defaultMaterialID, defaultMaterialID, UserOnAABBOverlap, UserContactFriction); 
 	//NewtonMaterialSetDefaultCollidable(world, defaultMaterialID, defaultMaterialID, 0);
 
 	// customize the scene after loading

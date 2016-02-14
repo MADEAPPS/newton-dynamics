@@ -81,7 +81,7 @@ class dgMatrix
 						   const dgFloat32* const src, dgInt32 srcStrideInBytes, dgInt32 count) const;
 #endif
 
-	bool TestOrthogonal() const;
+	bool TestOrthogonal(dgFloat32 tol = dgFloat32 (1.0e-4f)) const;
 	bool TestSymetric3x3() const;
 
 	dgMatrix Multiply3X3 (const dgMatrix &B) const;
@@ -245,7 +245,7 @@ DG_INLINE dgMatrix dgMatrix::Inverse () const
 }
 
 
-DG_INLINE bool dgMatrix::TestOrthogonal() const
+DG_INLINE bool dgMatrix::TestOrthogonal(dgFloat32 tol) const
 {
 	dgVector n (m_front * m_up);
 	dgFloat32 a = m_right % m_right;
@@ -253,14 +253,46 @@ DG_INLINE bool dgMatrix::TestOrthogonal() const
 	dgFloat32 c = m_front % m_front;
 	dgFloat32 d = n % m_right;
 
+#if _DEBUG
+	const dgMatrix& me = *this;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			dgAssert(dgCheckFloat(me[i][j]));
+		}
+	}
+#endif
+
 	return (m_front[3] == dgFloat32 (0.0f)) & 
 		   (m_up[3] == dgFloat32 (0.0f)) & 
 		   (m_right[3] == dgFloat32 (0.0f)) & 
 		   (m_posit[3] == dgFloat32 (1.0f)) &
-		   (dgAbsf(a - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)) & 
-		   (dgAbsf(b - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)) &
-		   (dgAbsf(c - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)) &
-		   (dgAbsf(d - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f)); 
+		   (dgAbsf(a - dgFloat32 (1.0f)) < tol) & 
+		   (dgAbsf(b - dgFloat32 (1.0f)) < tol) &
+		   (dgAbsf(c - dgFloat32 (1.0f)) < tol) &
+		   (dgAbsf(d - dgFloat32 (1.0f)) < tol); 
+
+
+/*
+	for (dgInt32 i = 0; i < 4; i++) {
+		for (dgInt32 j = 0; j < 4; j++) {
+			dgAssert(dgCheckFloat(m_matrix[i][j]));
+		}
+	}
+
+	dgInt32 j0 = 1;
+	dgInt32 j1 = 2;
+	for (dgInt32 i = 0; i < 3; i++) {
+		dgAssert(m_matrix[i][3] == 0.0f);
+		dgFloat32 val = m_matrix[i] % m_matrix[i];
+		dgAssert(dgAbsf(val - 1.0f) < 1.0e-5f);
+		dgVector tmp(m_matrix[j0] * m_matrix[j1]);
+		val = tmp % m_matrix[i];
+		dgAssert(dgAbsf(val - 1.0f) < 1.0e-5f);
+		j0 = j1;
+		j1 = i;
+	}
+	return true;		   
+*/
 }
 
 DG_INLINE bool dgMatrix::TestSymetric3x3() const

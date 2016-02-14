@@ -61,8 +61,8 @@ class dgDynamicBody : public dgBody
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const;
 
 	virtual void InvalidateCache();
-	virtual void SetMatrixNoSleep(const dgMatrix& matrix);
 	virtual void SetMatrixResetSleep(const dgMatrix& matrix);
+	virtual void SetMatrixNoSleep(const dgMatrix& matrix);
 
 	virtual bool IsInEquilibrium () const;
 	virtual void SetCollidable (bool state) {}
@@ -104,6 +104,7 @@ class dgDynamicBody : public dgBody
 	friend class dgBroadPhase;
 	friend class dgAmpInstance;
 	friend class dgBodyMasterList;
+	friend class dgSkeletonContainer;
 	friend class dgWorldDynamicUpdate;
 } DG_GCC_VECTOR_ALIGMENT;
 
@@ -165,23 +166,11 @@ DG_INLINE void dgDynamicBody::AddTorque (const dgVector& torque)
 DG_INLINE void dgDynamicBody::SetForce (const dgVector& force)
 {
 	m_accel = force;
-	dgVector error (m_accel - m_prevExternalForce);
-	dgFloat32 errMag2 = (error % error) * m_invMass[3] * m_invMass[3];
-	if (errMag2 > DG_ErrTolerance2) {
-		m_sleepingCounter = 0;
-		m_equilibrium = false;
-	}
 }
 
 DG_INLINE void dgDynamicBody::SetTorque (const dgVector& torque)
 {
 	m_alpha = torque;
-	dgVector error (m_alpha - m_prevExternalTorque);
-	dgFloat32 errMag2 = (error % error) * m_invMass[3] * m_invMass[3];
-	if (errMag2 > DG_ErrTolerance2) {
-		m_sleepingCounter = 0;
-		m_equilibrium = false;
-	}
 }
 
 DG_INLINE void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)

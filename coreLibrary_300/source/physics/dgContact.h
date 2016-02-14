@@ -126,15 +126,31 @@ class dgContactMaterial: public dgContactPoint
 		m_overrideNormalAccel = 1<<7,
 	};
 
+	DG_MSC_VECTOR_ALIGMENT 
+	class dgUserContactPoint
+	{
+		public:
+		dgVector m_point;
+		dgVector m_normal;
+		dgUnsigned64 m_shapeId0;
+		dgUnsigned64 m_shapeId1;
+		dgFloat32 m_penetration;
+		dgUnsigned32 m_unused[3];
+		
+	}DG_GCC_VECTOR_ALIGMENT;
+
 	typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dgFloat32 timestep, dgInt32 threadIndex);
 	typedef bool (dgApi *OnAABBOverlap) (const dgContactMaterial& material, const dgBody& body0, const dgBody& body1, dgInt32 threadIndex);
 	typedef bool (dgApi *OnCompoundCollisionPrefilter) (const dgContactMaterial& material, const dgBody* bodyA, const void* collisionNodeA, const dgBody* bodyB, const void* collisionNodeB, dgInt32 threadIndex);
+	typedef bool (dgApi *OnContactGeneration) (const dgContactMaterial& material, const dgBody& body0, const dgCollisionInstance* collisionIntance0, const dgBody& body1, const dgCollisionInstance* collisionIntance1, dgUserContactPoint* const contacts, dgInt32 maxCount, dgInt32 threadIndex);
 
 	dgContactMaterial();
 	void* GetUserData () const; 
 	void SetUserData (void* const userData); 
+	void SetCollisionGenerationCallback (OnContactGeneration contactGeneration); 
 	void SetCollisionCallback (OnAABBOverlap abbOvelap, OnContactCallback callback); 
 	void SetCompoundCollisionCallback (OnCompoundCollisionPrefilter abbCompounndOvelap); 
+	
 
 	dgVector m_dir0;
 	dgVector m_dir1;
@@ -153,7 +169,8 @@ class dgContactMaterial: public dgContactPoint
 	private:
 	void *m_userData;
 	OnAABBOverlap m_aabbOverlap;
-	OnContactCallback m_contactPoint;
+	OnContactCallback m_processContactPoint;
+	OnContactGeneration m_contactGeneration;
 	OnCompoundCollisionPrefilter m_compoundAABBOverlap;
 
 	friend class dgWorld;
@@ -227,7 +244,12 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 inline void dgContactMaterial::SetCollisionCallback (OnAABBOverlap aabbOverlap, OnContactCallback contact) 
 {
 	m_aabbOverlap = aabbOverlap;
-	m_contactPoint = contact;
+	m_processContactPoint = contact;
+}
+
+inline void dgContactMaterial::SetCollisionGenerationCallback (OnContactGeneration contactGeneration)
+{
+	m_contactGeneration = contactGeneration;
 }
 
 inline void dgContactMaterial::SetCompoundCollisionCallback (OnCompoundCollisionPrefilter aabbOverlap)

@@ -222,7 +222,7 @@ void PuckSlide (DemoEntityManager* const scene)
 
 
 	// setup callbacks for collisions between two material groups
-	NewtonMaterialSetCollisionCallback(world,materialGroupIDs[SBMaterial_WEIGHT],materialGroupIDs[SBMaterial_SURFACE],NULL,NULL,PhysicsNewton_CollisionPuckSurfaceCB);
+	NewtonMaterialSetCollisionCallback(world,materialGroupIDs[SBMaterial_WEIGHT],materialGroupIDs[SBMaterial_SURFACE],NULL,PhysicsNewton_CollisionPuckSurfaceCB);
 
 	///////
 	// Add table

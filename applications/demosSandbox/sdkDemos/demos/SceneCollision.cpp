@@ -340,7 +340,7 @@ void SceneCollision (DemoEntityManager* const scene)
 
 	// add few objects
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
-	NewtonMaterialSetCollisionCallback (world, defaultMaterialID, defaultMaterialID, NULL, OnBodyAABBOverlap, OnContactCollision); 
+	NewtonMaterialSetCollisionCallback (world, defaultMaterialID, defaultMaterialID, OnBodyAABBOverlap, OnContactCollision); 
 	NewtonMaterialSetCompoundCollisionCallback(world, defaultMaterialID, defaultMaterialID, OnSubShapeAABBOverlapTest);
 
 

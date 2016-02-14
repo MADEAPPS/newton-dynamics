@@ -406,7 +406,6 @@ class JoesRagdollJoint: public CustomBallAndSocket
 };
 
 
-#define xxxxx
 void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const float animSpeed = 0.0f, const int numSegments = 4)
 {
     float height = 1.0f;
@@ -415,7 +414,7 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
     dVector size (width, height, width);
     NewtonBody* parent = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
 
-#if (defined (_USE_HARD_JOINTS) && defined (xxxxx))
+#ifdef _USE_HARD_JOINTS
     NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), parent, NULL);
 	NewtonSkeletonSetSolverMode(skeleton, 1);
 #endif
@@ -434,15 +433,13 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 
 		if (animSpeed != 0.0f) joint->m_anim_speed = animSpeed, joint->m_anim_offset = float(i) / float(numSegments); // animated      
 
-#if (defined (_USE_HARD_JOINTS) && defined (xxxxx))
+#ifdef _USE_HARD_JOINTS
         NewtonSkeletonContainerAttachBone (skeleton, child, parent);
 #endif
-         
         parent = child;
     }
 
-
-#if (defined (_USE_HARD_JOINTS) && defined (xxxxx))
+#ifdef _USE_HARD_JOINTS
     NewtonSkeletonContainerFinalize(skeleton);
 #endif
 }

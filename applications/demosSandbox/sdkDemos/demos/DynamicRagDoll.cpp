@@ -93,7 +93,8 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 	{
 		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, this, OnBoneAABBOverlap, NULL);
+		NewtonMaterialSetCallbackUserData (scene->GetNewton(), m_material, m_material, this);
+		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
 	}
 
 	virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const

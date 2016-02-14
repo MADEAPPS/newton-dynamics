@@ -241,6 +241,14 @@ void dgBroadPhase::ForceAndToqueKernel(void* const context, void* const node, dg
 	broadPhase->ApplyForceAndtorque(descriptor, (dgBodyMasterList::dgListNode*) node, threadID);
 }
 
+void dgBroadPhase::SleepingStateKernel(void* const context, void* const node, dgInt32 threadID)
+{
+	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
+	dgWorld* const world = descriptor->m_world;
+	dgBroadPhase* const broadPhase = world->GetBroadPhase();
+	broadPhase->SleepingState(descriptor, (dgBodyMasterList::dgListNode*) node, threadID);
+}
+
 bool dgBroadPhase::DoNeedUpdate(dgBodyMasterList::dgListNode* const node) const
 {
 	dgBody* const body = node->GetInfo().GetBody();
@@ -267,46 +275,88 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
-	while (node && DoNeedUpdate(node)) {
-		dgBody* const body = node->GetInfo().GetBody();
+	while (node) {
+		if (DoNeedUpdate(node)) {
+			dgBody* const body = node->GetInfo().GetBody();
 
-		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-			dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
-
-			dynamicBody->ApplyExtenalForces(timestep, threadID);
-			if (!dynamicBody->IsInEquilibrium()) {
-				dynamicBody->m_sleeping = false;
-				dynamicBody->m_equilibrium = false;
-				// update collision matrix only
-				dynamicBody->UpdateCollisionMatrix(timestep, threadID);
-			}
-			if (dynamicBody->GetInvMass().m_w == dgFloat32(0.0f) || body->m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
-				dynamicBody->m_sleeping = true;
-				dynamicBody->m_autoSleep = true;
-				dynamicBody->m_equilibrium = true;
-			}
-
-			dynamicBody->m_prevExternalForce = dynamicBody->m_accel;
-			dynamicBody->m_prevExternalTorque = dynamicBody->m_alpha;
-		} else {
-			dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
-
-			if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-				body->ApplyExtenalForces(timestep, threadID);
-			}
-
-			// kinematic bodies are always sleeping (skip collision with kinematic bodies)
-			if (body->IsCollidable()) {
-				body->m_sleeping = false;
-				body->m_autoSleep = false;
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
+				dynamicBody->ApplyExtenalForces(timestep, threadID);
 			} else {
-				body->m_sleeping = true;
-				body->m_autoSleep = true;
+				dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
+				if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
+					body->ApplyExtenalForces(timestep, threadID);
+				}
 			}
-			body->m_equilibrium = true;
+		}
 
-			// update collision matrix by calling the transform callback for all kinematic bodies
-			body->UpdateMatrix(timestep, threadID);
+		for (dgInt32 i = 0; i < threadCount; i++) {
+			node = node ? node->GetPrev() : NULL;
+		}
+	}
+}
+
+
+void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
+{
+	dgFloat32 timestep = descriptor->m_timestep;
+
+	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
+	while (node) {
+		if (DoNeedUpdate(node)) {
+			dgBody* const body = node->GetInfo().GetBody();
+
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
+
+				if (dynamicBody->m_equilibrium) {
+					dgVector error ((dynamicBody->m_accel - dynamicBody->m_prevExternalForce).Scale4 (dynamicBody->m_invMass.m_w));
+					dgAssert (error.m_w == 0.0f);
+					dgFloat32 errMag2 = error.DotProduct4(error).m_w;
+					if (errMag2 > DG_ErrTolerance2) {
+						dynamicBody->m_equilibrium = false;
+					}
+				}
+
+				if (dynamicBody->m_equilibrium) {
+					dgVector error (dynamicBody->m_matrix.UnrotateVector(dynamicBody->m_alpha - dynamicBody->m_prevExternalTorque).CompProduct4(dynamicBody->m_invMass));
+					dgAssert (error.m_w == 0.0f);
+					dgFloat32 errMag2 = error.DotProduct4(error).m_w;
+					if (errMag2 > DG_ErrTolerance2) {
+						dynamicBody->m_equilibrium = false;
+					}
+				}
+
+				if (!dynamicBody->IsInEquilibrium()) {
+					dynamicBody->m_sleeping = false;
+					dynamicBody->m_equilibrium = false;
+					// update collision matrix only
+					dynamicBody->UpdateCollisionMatrix(timestep, threadID);
+				}
+				if (dynamicBody->GetInvMass().m_w == dgFloat32(0.0f) || body->m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
+					dynamicBody->m_sleeping = true;
+					dynamicBody->m_autoSleep = true;
+					dynamicBody->m_equilibrium = true;
+				}
+
+				dynamicBody->m_prevExternalForce = dynamicBody->m_accel;
+				dynamicBody->m_prevExternalTorque = dynamicBody->m_alpha;
+			} else {
+				dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
+
+				// kinematic bodies are always sleeping (skip collision with kinematic bodies)
+				if (body->IsCollidable()) {
+					body->m_sleeping = false;
+					body->m_autoSleep = false;
+				} else {
+					body->m_sleeping = true;
+					body->m_autoSleep = true;
+				}
+				body->m_equilibrium = true;
+
+				// update collision matrix by calling the transform callback for all kinematic bodies
+				body->UpdateMatrix(timestep, threadID);
+			}
 		}
 
 		for (dgInt32 i = 0; i < threadCount; i++) {
@@ -1157,10 +1207,9 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 			if (contact) {
 				contact->m_broadphaseLru = m_lru;
 				contact->m_timeOfImpact = dgFloat32(1.0e10f);
-				if (ValidateContactCache (contact, timestep)) {
+				if (!ValidateContactCache (contact, timestep)) {
 					// It does not have to set the value because it should be the same ar previous update.
 					//contact->m_contactActive = (contact->m_closestDistance < dgFloat32 (0.0f)) ? true : false;
-				} else {
 					contact->m_contactActive = 0;
 					contact->m_positAcc = dgVector::m_zero;
 					contact->m_rotationAcc = dgQuaternion();
@@ -1506,6 +1555,13 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 			listener.m_onListenerUpdate(m_world, listener.m_userData, timestep);
 		}
 	}
+
+	node = masterList->GetLast();
+	for (dgInt32 i = 0; i < threadsCount; i++) {
+		m_world->QueueJob(SleepingStateKernel, &syncPoints, node);
+		node = node ? node->GetPrev() : NULL;
+	}
+	m_world->SynchronizationBarrier();
 
 
 #if 0

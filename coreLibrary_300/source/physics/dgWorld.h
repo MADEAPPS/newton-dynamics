@@ -382,6 +382,7 @@ class dgWorld
 	
 	dgInt32 CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) const;
 
+	dgInt32 CalculateUserContacts (dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateConvexToNonConvexContacts (dgCollisionParamProxy& proxy) const;
 
 	//dgInt32 FilterPolygonDuplicateContacts (dgInt32 count, dgContactPoint* const contact) const;

@@ -306,27 +306,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	}
 
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
-
-#ifdef _DEBUG
-	for (dgInt32 i = 0; i < 4; i ++) {
-		for (dgInt32 j = 0; j < 4; j ++) {
-			dgAssert (dgCheckFloat(m_matrix[i][j]));
-		}
-	}
-
-	dgInt32 j0 = 1;
-	dgInt32 j1 = 2;
-	for (dgInt32 i = 0; i < 3; i ++) {
-		dgAssert (m_matrix[i][3] == 0.0f);
-		dgFloat32 val = m_matrix[i] % m_matrix[i];
-		dgAssert (dgAbsf (val - 1.0f) < 1.0e-5f);
-		dgVector tmp (m_matrix[j0] * m_matrix[j1]);
-		val = tmp % m_matrix[i];
-		dgAssert (dgAbsf (val - 1.0f) < 1.0e-5f);
-		j0 = j1;
-		j1 = i;
-	}
-#endif
+	dgAssert (m_matrix.TestOrthogonal());
 }
 
 

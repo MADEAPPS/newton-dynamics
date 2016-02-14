@@ -109,7 +109,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 					}
 				}
 			} else {
-				// island is no sleeping but may be resting with small residual velocity for a long time
+				// island is not sleeping but may be resting with small residual velocity for a long time
 				// see if we can force to go to sleep
 				if ((maxAccel > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel) ||
 					(maxAlpha > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha) ||
@@ -954,6 +954,7 @@ void dgWorldDynamicUpdate::ApplyNetVelcAndOmega (dgDynamicBody* const body, cons
 			force += body->m_accel;
 			torque += body->m_alpha;
 		}
+
 #if 1
 		// this method is more accurate numerically 
 		dgVector velocStep((force.Scale4(body->m_invMass.m_w)).CompProduct4(timestep4));
@@ -989,6 +990,9 @@ void dgWorldDynamicUpdate::ApplyNetVelcAndOmega (dgDynamicBody* const body, cons
 		}
 #endif
 	}
+
+	dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
+	dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
 }
 
 void dgWorldDynamicUpdate::ApplyNetTorqueAndForce (dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& maxAccNorm2, const dgVector& forceActiveMask) const

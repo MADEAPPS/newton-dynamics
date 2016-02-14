@@ -16,8 +16,6 @@
 #define DEMO_GRAVITY  -10.0f
 //#define DEMO_GRAVITY  0.0f
 
-
-
 enum PrimitiveType
 {
 	_NULL_PRIMITIVE,

@@ -41,7 +41,8 @@ dgContactMaterial::dgContactMaterial()
 	,m_dir1 (dgFloat32 (0.0f))
 	,m_userData(NULL)
 	,m_aabbOverlap(NULL)
-	,m_contactPoint(NULL)
+	,m_processContactPoint(NULL)
+	,m_contactGeneration(NULL)
 	,m_compoundAABBOverlap(NULL)
 {
 	//	dgAssert ( dgInt32 (sizeof (dgContactMaterial) & 15) == 0);

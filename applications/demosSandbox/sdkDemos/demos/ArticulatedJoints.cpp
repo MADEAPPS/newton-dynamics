@@ -307,7 +307,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	{
 		// create a material for early collision culling
 		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, this, OnBoneAABBOverlap, OnContactsProcess);
+		NewtonMaterialSetCallbackUserData (scene->GetNewton(), material, material, this);
+		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, OnBoneAABBOverlap, OnContactsProcess);
 	}
 
 	virtual void OnPreUpdate (CustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const

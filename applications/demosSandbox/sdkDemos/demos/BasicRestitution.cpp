@@ -62,7 +62,7 @@ void Restitution (DemoEntityManager* const scene)
 	dMatrix offsetMatrix (dGetIdentityMatrix());
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
-	NewtonMaterialSetCollisionCallback (world, defaultMaterialID, defaultMaterialID, NULL, NULL, UserContactRestitution); 
+	NewtonMaterialSetCollisionCallback (world, defaultMaterialID, defaultMaterialID, NULL, UserContactRestitution); 
 
 
 	CreateLevelMesh (scene, "flatPlane.ngd", 0);

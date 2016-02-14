@@ -353,7 +353,9 @@ class dgBroadPhase
 	dgInt32 ConvexCast (const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& velocA, const dgVector& velocB, dgFastRayTest& ray,  
 						dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32& timeToImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
 
+	void SleepingState (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID);
 	void ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID);
+	
 
 	void UpdateAggregateEntropy (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseAggregate*>::dgListNode* node, dgInt32 threadID);
 
@@ -365,6 +367,7 @@ class dgBroadPhase
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threadID);
 	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 		
+	static void SleepingStateKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void UpdateAggregateEntropy(void* const descriptor, void* const worldContext, dgInt32 threadID);

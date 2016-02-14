@@ -512,6 +512,8 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 		dBigVector dist (closestControlPoint - point);
 		dFloat64 num = derivatives[1] % dist;
 		dFloat64 den = derivatives[2] % dist + derivatives[1] % derivatives[1];
+		if (dAbs (den) < 1.0e-6f)
+			__debugbreak();
 		
 		dFloat64 u1 = dClamp(u0 - num / den, dFloat64(0.0), dFloat64 (1.0));
 		if (u1 < m_knotVector[startSpan]) {

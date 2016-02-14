@@ -351,7 +351,8 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		dgFloat32 relCentr = centrError % dir; 
 		relCentr = dgClamp (relCentr, dgFloat32(-10000.0f), dgFloat32(10000.0f));
 
-		desc.m_zeroRowAcceleration[index] = (relPosit + relVeloc * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep + relCentr;
+//		desc.m_zeroRowAcceleration[index] = (relPosit + relVeloc * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep + relCentr;
+		desc.m_zeroRowAcceleration[index] = (relPosit + relVeloc * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep;
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		dgFloat32 dt = desc.m_timestep;

@@ -86,7 +86,7 @@ class dKinematicPlacement: public CustomControllerBase
 
 
 
-class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlacement>, public dComplemtaritySolver 
+class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlacement>, public dComplentaritySolver 
 {
 	public:
 

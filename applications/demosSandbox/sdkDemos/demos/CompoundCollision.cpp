@@ -301,7 +301,7 @@ void CompoundCollision (DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
 	// set a material callback to get the colliding shape
-	NewtonMaterialSetCollisionCallback (scene->GetNewton(), defaultMaterialID, defaultMaterialID, NULL, NULL, OnGettingTheCollisionSubShapeFromMaterialCallback);
+	NewtonMaterialSetCollisionCallback (scene->GetNewton(), defaultMaterialID, defaultMaterialID, NULL, OnGettingTheCollisionSubShapeFromMaterialCallback);
 	NewtonMaterialSetCompoundCollisionCallback(scene->GetNewton(), defaultMaterialID, defaultMaterialID, OnSubShapeAABBOverlapTest);
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
