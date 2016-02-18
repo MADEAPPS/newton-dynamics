@@ -131,19 +131,34 @@ void dgDynamicBody::AttachCollision (dgCollisionInstance* const collision)
 bool dgDynamicBody::IsInEquilibrium () const
 {
 	if (m_equilibrium) {
-		dgVector forceError (m_accel - m_prevExternalForce);
-		dgVector torqueError (m_alpha - m_prevExternalTorque);
-		dgVector mask0 ((forceError.DotProduct4(forceError) < m_equilibriumError2) & (torqueError.DotProduct4(torqueError) < m_equilibriumError2));
-		if (mask0.GetSignMask()) {
-			dgVector invMassMag2 (m_invMass[3] * m_invMass[3]);
-			dgVector mask1 ((invMassMag2.CompProduct4 (m_netForce.DotProduct4(m_netForce)) < m_equilibriumError2) & (invMassMag2.CompProduct4 (m_netTorque.DotProduct4(m_netTorque)) < m_equilibriumError2));
-			if (mask1.GetSignMask()) {
-				dgVector mask2 ((m_veloc.DotProduct4(m_veloc) < m_equilibriumError2) & (m_omega.DotProduct4(m_omega) < m_equilibriumError2));
-				return mask2.GetSignMask() ? true : false;
+		dgVector deltaAccel((m_accel - m_prevExternalForce).Scale4(m_invMass.m_w));
+		dgAssert(deltaAccel.m_w == 0.0f);
+		dgFloat32 deltaAccel2 = deltaAccel.DotProduct4(deltaAccel).GetScalar();
+		if (deltaAccel2 > DG_ErrTolerance2) {
+			return false;
 			}
+		dgVector netAccel (m_netForce.Scale4 (m_invMass.m_w));
+		dgAssert(netAccel.m_w == 0.0f);
+		dgFloat32 netAccel2 = deltaAccel.DotProduct4(deltaAccel).GetScalar();
+		if (netAccel2 > DG_ErrTolerance2) {
+			return false;
 		}
+
+		dgVector deltaAlpha(m_matrix.UnrotateVector(m_alpha - m_prevExternalTorque).CompProduct4(m_invMass));
+		dgAssert(deltaAlpha.m_w == 0.0f);
+		dgFloat32 deltaAlpha2 = deltaAlpha.DotProduct4(deltaAlpha).GetScalar();
+		if (deltaAlpha2 > DG_ErrTolerance2) {
+			return false;
 	}
 
+		dgVector netAlpha(m_matrix.UnrotateVector(m_alpha - m_prevExternalTorque).CompProduct4(m_invMass));
+		dgAssert(netAlpha.m_w == 0.0f);
+		dgFloat32 netAlpha2 = netAlpha.DotProduct4(netAlpha).GetScalar();
+		if (netAlpha2 > DG_ErrTolerance2) {
+			return false;
+		}
+		return true;
+	}
 	return false;
 }
 

@@ -111,7 +111,7 @@ const dMatrix& CustomJoint::GetMatrix0() const
 
 const dMatrix& CustomJoint::GetMatrix1() const
 {
-	return m_localMatrix0;
+	return m_localMatrix1;
 }
 
 

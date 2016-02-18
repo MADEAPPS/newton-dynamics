@@ -58,9 +58,9 @@
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
-//#define DEFAULT_SCENE	32			// basic Car
-//#define DEFAULT_SCENE	33			// heavy vehicles
-#define DEFAULT_SCENE	34			// super Car
+#define DEFAULT_SCENE	32			// basic Car
+//#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
 //#define DEFAULT_SCENE	37			// cloth patch			
@@ -144,8 +144,8 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Pasive rag doll"), wxT("demonstrate parsive rag doll"), PassiveRagDoll},
 	{wxT("Dynamic rag doll"), wxT("demonstrate dynamic rag doll"), DynamicRagDoll},
 	{wxT("Basic Car"), wxT("show how to set up a vehicle controller"), BasicCar},
-	{wxT("Heavy vehicles"), wxT("implement military type heavy Vehicles"), MilitaryTransport},
 	{wxT("Super car"), wxT("implement a hight performance sport car"), SuperCar},
+	{wxT("Heavy vehicles"), wxT("implement military type heavy Vehicles"), MilitaryTransport},
 	{wxT("Basic player controller"), wxT("demonstrate simple player controller"), BasicPlayerController},
 	{wxT("Advanced player controller"), wxT("demonstrate player interacting with other objects"), AdvancedPlayerController},
 	{wxT("Simple cloth Patch"), wxT("show simple cloth patch"), ClothPatch},

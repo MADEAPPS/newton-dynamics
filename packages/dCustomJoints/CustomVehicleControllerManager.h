@@ -112,6 +112,8 @@ class CustomVehicleController: public CustomControllerBase
 			m_body = controller->GetBody();
 		}
 
+		CUSTOM_JOINTS_API void ApplyDownForce ();
+
 		dFloat m_aerodynamicsDownForceCoefficient;
 	};
 	
@@ -192,6 +194,11 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const; 
 
+		// TODO
+		CUSTOM_JOINTS_API Info GetInfo() const {return m_data;}
+		CUSTOM_JOINTS_API void SetInfo(const Info& info) {};
+
+
 		protected:
 		Info m_data;
 		dFloat m_lateralSlip;
@@ -222,12 +229,6 @@ class CustomVehicleController: public CustomControllerBase
 		class DifferentialGear: public DifferentialAxel
 		{
 			public:
-//			DifferentialGear ()
-//				:DifferentialAxel(NULL, NULL)
-//				,m_leftGear(NULL)
-//				,m_rightGear(NULL)
-//			{
-//			}
 			DifferentialGear(const DifferentialAxel& axel)
 				:DifferentialAxel (axel)
 				,m_leftGear(NULL)
@@ -273,11 +274,9 @@ class CustomVehicleController: public CustomControllerBase
 			friend class BodyPartEngine;
 		};
 
-//		CUSTOM_JOINTS_API BodyPartEngine ();
 		CUSTOM_JOINTS_API BodyPartEngine(CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
 		CUSTOM_JOINTS_API virtual ~BodyPartEngine();
 
-		CUSTOM_JOINTS_API void ApplyTorque(dFloat torque);
 		CUSTOM_JOINTS_API virtual void Update (dFloat timestep, dFloat gasVal);
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const;
@@ -286,6 +285,9 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API int GetGear() const;
 		CUSTOM_JOINTS_API void SetGear(int gear);
+
+		CUSTOM_JOINTS_API int GetNeutralGear() const;
+		CUSTOM_JOINTS_API int GetReverseGear() const;
 
 		CUSTOM_JOINTS_API void UpdateAutomaticGearBox(dFloat timestep);
 
@@ -414,6 +416,9 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API int GetGear() const;
 		CUSTOM_JOINTS_API void SetGear(int gear);
+
+		CUSTOM_JOINTS_API int GetNeutralGear() const;
+		CUSTOM_JOINTS_API int GetReverseGear() const;
 
 		CUSTOM_JOINTS_API bool GetTransmissionMode() const;
 		CUSTOM_JOINTS_API void SetTransmissionMode(bool mode);

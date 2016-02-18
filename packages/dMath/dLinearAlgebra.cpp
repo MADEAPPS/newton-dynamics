@@ -98,7 +98,7 @@ dFloat64 dSymmetricBiconjugateGradientSolve::Solve (int size, dFloat64 tolerance
 	delete[] p0;
 	delete[] r0;
 
-	dAssert (iter < size);
+	dAssert (iter <= size);
 	return num;
 }
 

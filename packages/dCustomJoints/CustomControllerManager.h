@@ -62,11 +62,9 @@ class CustomControllerConvexCastPreFilter
 	}
 
 	protected:
-	//const NewtonBody* m_bodiesToSkip[16];
 	const NewtonBody* m_me;
-//	int m_bodiesToSkipCount;
 	friend class CustomPlayerController;
-	friend class CustomVehicleControllerBodyStateTire;
+//	friend class CustomVehicleControllerBodyStateTire;
 };
 
 

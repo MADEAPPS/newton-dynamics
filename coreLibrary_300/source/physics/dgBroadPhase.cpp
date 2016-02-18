@@ -308,25 +308,6 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
-
-				if (dynamicBody->m_equilibrium) {
-					dgVector error ((dynamicBody->m_accel - dynamicBody->m_prevExternalForce).Scale4 (dynamicBody->m_invMass.m_w));
-					dgAssert (error.m_w == 0.0f);
-					dgFloat32 errMag2 = error.DotProduct4(error).m_w;
-					if (errMag2 > DG_ErrTolerance2) {
-						dynamicBody->m_equilibrium = false;
-					}
-				}
-
-				if (dynamicBody->m_equilibrium) {
-					dgVector error (dynamicBody->m_matrix.UnrotateVector(dynamicBody->m_alpha - dynamicBody->m_prevExternalTorque).CompProduct4(dynamicBody->m_invMass));
-					dgAssert (error.m_w == 0.0f);
-					dgFloat32 errMag2 = error.DotProduct4(error).m_w;
-					if (errMag2 > DG_ErrTolerance2) {
-						dynamicBody->m_equilibrium = false;
-					}
-				}
-
 				if (!dynamicBody->IsInEquilibrium()) {
 					dynamicBody->m_sleeping = false;
 					dynamicBody->m_equilibrium = false;
