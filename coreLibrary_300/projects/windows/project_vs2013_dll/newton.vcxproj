@@ -130,8 +130,8 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
-      <Command>rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\crash/*.*"  /F /Y /R
-rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\julio\Downloads\crash/*.*"  /F /Y /R
+      <Command>rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\O3_2016-02-18c/*.*"  /F /Y /R
+rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\julio\Downloads\O3_2016-02-18c/*.*"  /F /Y /R
 
 </Command>
     </PostBuildEvent>
@@ -247,9 +247,8 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\dev\pengII\pengII\Debug\*.*"  /F /Y 
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
-      <Command>rem xcopy  "$(OutDir)$(TargetName).lib" "C:\Users\Julio\Downloads\NewtonTestApp\lib/*.*"  /F /Y /R
-rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\Julio\Downloads\NewtonTestApp\bin/*.*"  /F /Y /R
-</Command>
+      <Command>rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\O3_2016-02-18c/*.*"  /F /Y /R
+rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\julio\Downloads\O3_2016-02-18c/*.*"  /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
