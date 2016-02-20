@@ -147,14 +147,18 @@ void Newton::DestroyBody(dgBody* const body)
 
 NewtonUserJoint::NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo, dgBody* const dyn0, dgBody* const dyn1)
 	:dgUserConstraint (world, dyn0, dyn1, 1)
+	,m_lastPosit0 (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_lastPosit1 (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
+	,m_forceArray(m_jointForce)
+	,m_param(NULL)
+	,m_lastJointAngle(dgFloat32 (0.0f))
+	,m_rows(0)
 {
-	m_rows = 0;
 	m_maxDOF = dgUnsigned8(maxDof);
 	m_jacobianFnt = callback;
 	m_getInfoCallback = getInfo;
 
 	dgAssert (world);
-	m_forceArray = m_jointForce;
 	if (m_maxDOF > DG_BILATERAL_CONTRAINT_DOF) {
 		m_forceArray = (dgForceImpactPair*) world->GetAllocator()->Malloc (dgInt32 (m_maxDOF * sizeof (dgForceImpactPair)));
 	}
@@ -166,7 +170,6 @@ NewtonUserJoint::~NewtonUserJoint ()
 	if (m_forceArray != m_jointForce) {
 		m_body0->GetWorld()->GetAllocator()->Free (m_forceArray);
 	}
-
 }
 
 
@@ -318,8 +321,8 @@ void NewtonUserJoint::SetRowStiffness (dgFloat32 stiffness)
 {
 	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
-		stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
-		stiffness = 100.0f - stiffness * 99.0f; 
+		//stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
+		//stiffness = 100.0f - stiffness * 99.0f; 
 		m_param->m_jointStiffness[index] = stiffness;
 	}
 }

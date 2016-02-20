@@ -247,8 +247,8 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\dev\pengII\pengII\Debug\*.*"  /F /Y 
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
-      <Command>rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\O3_2016-02-18c/*.*"  /F /Y /R
-rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\julio\Downloads\O3_2016-02-18c/*.*"  /F /Y /R</Command>
+      <Command>rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\O3_2016-02-19/*.*"  /F /Y /R
+rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\julio\Downloads\O3_2016-02-19/*.*"  /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">

@@ -380,9 +380,9 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 			row->m_maxImpact = dgFloat32(0.0f);
 
 			//force[index] = 0.0f;
-			dgAssert(row->m_diagDamp >= dgFloat32(0.1f));
-			dgAssert(row->m_diagDamp <= dgFloat32(100.0f));
-			dgFloat32 stiffness = DG_PSD_DAMP_TOL * row->m_diagDamp;
+			dgAssert(row->m_diagDamp >= dgFloat32(0.0f));
+			dgAssert(row->m_diagDamp <= dgFloat32(1.0f));
+			dgFloat32 stiffness = DG_PSD_DAMP_TOL * (dgFloat32 (1.0f) - row->m_diagDamp) + dgFloat32 (1.0e-6f);
 
 			dgAssert (tmpDiag.m_w == dgFloat32 (0.0f));
 			dgFloat32 diag = (tmpDiag.AddHorizontal()).GetScalar();
@@ -825,6 +825,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	for (dgInt32 i = 0; i < skeletonCount; i ++) {
 		dgSkeletonContainer* const container = skeletonArray[i];
+		//if (container->m_errorCorrection > dgFloat32 (0.0f)) {
+		//	container->ApplpyKinematicErrorCorrection (constraintArray, matrixRow);
+		//}
 		if (!container->m_skeletonHardMotors) {
 			container->InitMassMatrix (constraintArray, matrixRow);
 		}

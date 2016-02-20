@@ -511,54 +511,58 @@ joint0->SetPitchAngle (90.0f * 3.141592f / 180.0f);
 
 void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 {
-    dVector size (1.5f, 4.0f, 0.125f);
-	NewtonBody* const base = CreateBox(scene, origin + dVector (-0.8f, 4.0f, 0.0f, 0.0f), dVector (0.2f, 4.0f, 0.125f));
-    NewtonBody* const box0 = CreateBox (scene, origin + dVector (0.0f, 4.0f, 0.0f, 0.0f), size);
-    NewtonBody* const box1 = CreateBox (scene, origin + dVector (1.5f, 4.0f, 0.0f, 0.0f), size);
-    NewtonBody* const box2 = CreateBox (scene, origin + dVector (3.0f, 4.0f, 0.0f, 0.0f), size);
-
-	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
+    dVector size (1.5f, 0.125f, 0.125f);
+	NewtonBody* parent = CreateBox(scene, origin + dVector (-0.8f, 4.0f, 0.0f, 0.0f), dVector (0.2f, 0.125f, 0.125f));
+	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
     //the joint pin is the first row of the matrix, to make a upright pin we
     //take the x axis and rotate by 90 degree around the y axis
     dMatrix localPin (dRollMatrix(90.0f * 3.141592f / 180.0f));
 
-    // connect first box to the world
-    dMatrix matrix;
-    NewtonBodyGetMatrix (box0, & matrix[0][0]);
-    matrix.m_posit += dVector (-size.m_x * 0.5f, 0.0f, 0.0f);
-    matrix = localPin * matrix;
-
-    // add hinge with limit and friction
-    CustomHinge* const hinge0 = new CustomHinge (matrix, box0, base);
-    hinge0->EnableLimits (true);
-    hinge0->SetLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
-    hinge0->SetFriction (20.0f);
-
-    // link the two boxes
-    NewtonBodyGetMatrix (box1, &matrix[0][0]);
-    matrix.m_posit += dVector (-size.m_x * 0.5f, 0.0f, 0.0f);
-    matrix = localPin * matrix;
-    CustomHinge* const hinge1 = new CustomHinge (matrix, box1, box0);
-    hinge1->EnableLimits (true);
-    hinge1->SetLimits (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
-    hinge1->SetFriction (20.0f);
-
-    // link the two boxes
-    NewtonBodyGetMatrix (box2, &matrix[0][0]);
-    matrix.m_posit += dVector (-size.m_x * 0.5f, 0.0f, 0.0f);
-    matrix = localPin * matrix;
-    CustomHinge* const hinge2 = new CustomHinge (matrix, box2, box1);
-    hinge2->EnableLimits (true);
-    hinge2->SetLimits (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
-	hinge2->SetFriction (20.0f);
+	dMatrix matrix;
+	dVector position (origin);
+	position.m_y += 4.0f;
+	NewtonBody* child = NULL;
 
 #ifdef _USE_HARD_JOINTS
-	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), base, NULL);
-	NewtonSkeletonContainerAttachBone (skeleton, box0, base);	
-	NewtonSkeletonContainerAttachBone (skeleton, box1, box0);
-	NewtonSkeletonContainerAttachBone (skeleton, box2, box1);
+	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), parent, NULL);
+#endif
+
+	int count = 15;
+	for (int i = 0; i < count; i ++) {
+		child = CreateBox (scene, position, size);
+		NewtonBodyGetMatrix(child, &matrix[0][0]);
+		matrix.m_posit += dVector(-size.m_x * 0.5f, 0.0f, 0.0f);
+		matrix = localPin * matrix;
+		CustomHinge* const hinge = new CustomHinge (matrix, child, parent);
+
+#ifdef _USE_HARD_JOINTS
+		NewtonSkeletonContainerAttachBone (skeleton, child, parent);	
+#endif
+
+		hinge->EnableLimits (true);
+		hinge->SetLimits (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+		hinge->SetFriction(20.0f);
+		parent = child;
+		position.m_x += size.m_x;
+	}
+
+
+	// link the two boxes
+	NewtonBody* const heavyBox = CreateBox (scene, position, dVector (1.5f, 1.5f, 1.5f));
+	NewtonBodyGetMatrix(heavyBox, &matrix[0][0]);
+	NewtonBodySetMassProperties(heavyBox, 10.0f, NewtonBodyGetCollision(heavyBox));
+	matrix.m_posit += dVector(-size.m_x * 0.5f, 0.0f, 0.0f);
+	matrix = localPin * matrix;
+	CustomHinge* const hinge = new CustomHinge(matrix, heavyBox, parent);
+	hinge->EnableLimits(true);
+	hinge->SetLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
+	hinge->SetFriction(20.0f);
+
+#ifdef _USE_HARD_JOINTS
+	NewtonSkeletonContainerAttachBone (skeleton, heavyBox, parent);
 	NewtonSkeletonContainerFinalize (skeleton);
 #endif
+
 }
 
 static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
@@ -1033,9 +1037,11 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix offsetMatrix (dGetIdentityMatrix());
 
     CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	//CreateLevelMesh (scene, "flatPlane1.ngd", 1);
 
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
+
 
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
@@ -1055,7 +1061,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 1.5f); // animated
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -5.0f));
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
- 
+
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);

@@ -736,12 +736,13 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 			dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);
 			row->m_Jt = constraintParamOut.m_jacobian[i];
 
-			dgAssert(constraintParamOut.m_jointStiffness[i] >= dgFloat32(0.1f));
-			dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(100.0f));
+			dgAssert(constraintParamOut.m_jointStiffness[i] >= dgFloat32(0.0f));
+			dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(1.0f));
 
 			row->m_diagDamp = constraintParamOut.m_jointStiffness[i];
 			row->m_coordenateAccel = constraintParamOut.m_jointAccel[i];
-			row->m_accelIsMotor = constraintParamOut.m_isMotor[i];
+			row->m_accelIsMotor = constraintParamOut.m_flags[i].m_isMotor ? true : false;
+			row->m_applyCorrection = constraintParamOut.m_flags[i].m_applyCorrection ? true : false;
 			row->m_restitution = constraintParamOut.m_restitution[i];
 			row->m_penetration = constraintParamOut.m_penetration[i];
 			row->m_penetrationStiffness = constraintParamOut.m_penetrationStiffness[i];

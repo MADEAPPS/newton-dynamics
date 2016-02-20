@@ -220,6 +220,7 @@ class dgJacobianMatrixElement
 	dgFloat32 m_maxImpact;
 	dgInt32 m_normalForceIndex;
 	bool m_accelIsMotor;
+	bool m_applyCorrection;
 } DG_GCC_VECTOR_ALIGMENT;
 
 class dgJacobianMemory
