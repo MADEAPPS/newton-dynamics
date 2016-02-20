@@ -1093,6 +1093,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			NewtonBodyGetMatrix(link1, &matrix[0][0]);
 			dMatrix franmeMatrix (aligment * matrix);
 			CustomHinge* const hinge = new CustomHinge (franmeMatrix, link1, link0);
+			hinge->SetStiffness (0.0f);
 			hinge->SetFriction(linkFriction);
 			hingeArray[i-1] = hinge->GetJoint();
 			link0 = link1;
