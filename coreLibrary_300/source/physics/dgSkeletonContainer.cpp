@@ -128,7 +128,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 			const dgInt32 j = m_sourceJacobianIndex[i];
 			const dgJacobianMatrixElement* const row = &matrixRow[start + j];
 			m_jointMass[i].SetZero();
-			m_jointMass[i][i] = 0.0f;
+			m_jointMass[i][i] = -row->m_stiffness;
 			for (dgInt32 j = 0; j < 3; j++) {
 				m_bodyJt[i][j + 0] = -row->m_Jt.m_jacobianM0.m_linear[j];
 				m_bodyJt[i][j + 3] = -row->m_Jt.m_jacobianM0.m_angular[j];
@@ -691,10 +691,13 @@ DG_INLINE dgFloat32 dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const 
 			acc = dgVector(row->m_coordenateAccel) - acc.AddHorizontal();
 			accel[j] = -acc.GetScalar();
 			accNorm = accNorm.GetMax(acc.Abs());
+//dgTrace (("%f ", accel[j]));
 		}
 	}
 	m_nodesOrder[m_nodeCount - 1]->m_bodyForce.SetZero();
 	m_nodesOrder[m_nodeCount - 1]->m_jointForce.SetZero();
+//dgTrace (("\n"));
+
 	return accNorm.GetScalar();
 }
 
@@ -721,8 +724,6 @@ DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 			dgJacobianMatrixElement* const row = &matrixRow[first + k];
 			dgVector jointForce = dgFloat32 (force[j]);
 			row->m_force += jointForce.GetScalar();
-//			dgAssert(row->m_force > row->m_lowerBoundFrictionCoefficent);
-//			dgAssert(row->m_force < row->m_upperBoundFrictionCoefficent);
 
 			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear.CompProduct4(jointForce);
 			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular.CompProduct4(jointForce);
@@ -851,7 +852,7 @@ void dgSkeletonContainer::ApplpyKinematicErrorCorrection (const dgJointInfo* con
 	InitKinematicMassMatrix (jointInfoArray, matrixRow);
 	SolveFoward();
 	SolveBackward();
-//	UpdatePosition (jointInfoArray, matrixRow);
+	UpdatePosition (jointInfoArray, matrixRow);
 }
 
 dgFloat32 dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)

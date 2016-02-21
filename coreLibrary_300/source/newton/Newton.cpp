@@ -7526,11 +7526,11 @@ dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)
 // Remark: for this function to take place the joint stiffness must be set to a values lower than 1.0
 //
 // See also: NewtonUserJointSetRowAcceleration, NewtonUserJointSetRowStiffness  
-void NewtonUserJointSetRowSpringDamperAcceleration(const NewtonJoint* const joint, dFloat springK, dFloat springD)
+void NewtonUserJointSetRowSpringDamperAcceleration(const NewtonJoint* const joint, dFloat spring, dFloat damper)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
-	userJoint->SetSpringDamperAcceleration (springK, springD);
+	userJoint->SetSpringDamperAcceleration (spring, damper);
 }
 
 

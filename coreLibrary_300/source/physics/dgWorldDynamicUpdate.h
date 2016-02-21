@@ -216,8 +216,9 @@ class dgJacobianMatrixElement
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
 
-	dgForceImpactPair* m_jointFeebackForce;
+	dgFloat32 m_stiffness;
 	dgFloat32 m_maxImpact;
+	dgForceImpactPair* m_jointFeebackForce;
 	dgInt32 m_normalForceIndex;
 	bool m_accelIsMotor;
 	bool m_applyCorrection;

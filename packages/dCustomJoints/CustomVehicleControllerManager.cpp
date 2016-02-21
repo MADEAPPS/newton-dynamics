@@ -203,7 +203,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 
 		NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &m_longitudinalDir[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
-
+		
 		NewtonBodyGetOmega(tire, &tireOmega[0]);
 		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
 		dVector relOmega(tireOmega - chassisOmega);
@@ -231,6 +231,9 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		} else if (param <= 0.0f) {
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		} else {
+			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
+			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_tire->m_data.m_springStrength, m_tire->m_data.m_dampingRatio);
 		}
 
 		if (m_brakeTorque > 1.0e-3f) {
@@ -1855,6 +1858,11 @@ int CustomVehicleControllerManager::OnContactGeneration (const CustomVehicleCont
 				contactBuffer[i].m_penetration = penetration;
 				contactBuffer[i].m_shapeId0 = attributeA[i];
 				contactBuffer[i].m_shapeId1 = attributeA[i];
+
+//if (tire->m_index >= 2){
+//dTrace (("%d-> %f (%f %f %f) (%f %f %f) ", tire->m_index, penetration, contactBuffer[i].m_point[0], contactBuffer[i].m_point[1], contactBuffer[i].m_point[2], contactBuffer[i].m_normal[0], contactBuffer[i].m_normal[1], contactBuffer[i].m_normal[2]));
+//}
+			
 			}
 		} else {
 			contactCount = 0;
@@ -1995,15 +2003,6 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
-/*
-		if (!NewtonBodyGetSleepState(m_chassis.GetBody())) 
-		{
-			if (m_engine) {
-				EngineJoint* const joint = (EngineJoint*)m_engine->GetJoint();
-				joint->ResetMatrix();
-			}
-		}
-*/
 #ifdef D_PLOT_ENGINE_CURVE 
 		dFloat engineOmega = m_engine->GetRPM();
 		dFloat tireTorque = m_engine->GetLeftSpiderGear()->m_tireTorque + m_engine->GetRightSpiderGear()->m_tireTorque;
@@ -2011,19 +2010,25 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 		fprintf(file_xxx, "%f, %f, %f,\n", engineOmega, engineTorque, m_engine->GetNominalTorque());
 #endif
 	}
+
+//dTrace (("\n"));
 }
 
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
+static int xxx;
+//dTrace (("%d ", xxx));
+xxx ++;
+
 	if (m_finalized) {
 		m_chassis.ApplyDownForce ();
 
-		for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
-			BodyPartTire& tire = tireNode->GetInfo();
-			WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
-			tireJoint->ApplySpringForce(timestep);
-		}
+//		for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
+//			BodyPartTire& tire = tireNode->GetInfo();
+//			WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
+//			tireJoint->ApplySpringForce(timestep);
+//		}
 
 		if (m_engineControl) {
 			m_engineControl->Update(timestep);

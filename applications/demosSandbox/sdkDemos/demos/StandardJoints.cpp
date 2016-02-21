@@ -527,7 +527,7 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), parent, NULL);
 #endif
 
-	int count = 15;
+	int count = 1;
 	for (int i = 0; i < count; i ++) {
 		child = CreateBox (scene, position, size);
 		NewtonBodyGetMatrix(child, &matrix[0][0]);
@@ -546,7 +546,7 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 		position.m_x += size.m_x;
 	}
 
-
+/*
 	// link the two boxes
 	NewtonBody* const heavyBox = CreateBox (scene, position, dVector (1.5f, 1.5f, 1.5f));
 	NewtonBodyGetMatrix(heavyBox, &matrix[0][0]);
@@ -557,9 +557,9 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 	hinge->EnableLimits(true);
 	hinge->SetLimits(-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
 	hinge->SetFriction(20.0f);
-
+*/
 #ifdef _USE_HARD_JOINTS
-	NewtonSkeletonContainerAttachBone (skeleton, heavyBox, parent);
+//	NewtonSkeletonContainerAttachBone (skeleton, heavyBox, parent);
 	NewtonSkeletonContainerFinalize (skeleton);
 #endif
 
@@ -1042,7 +1042,9 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
+AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 
+/*
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -1061,7 +1063,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 1.5f); // animated
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -5.0f));
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
-
+*/
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);

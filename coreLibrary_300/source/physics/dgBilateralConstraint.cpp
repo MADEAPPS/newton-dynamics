@@ -208,17 +208,10 @@ void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDes
 }
 
 
-dgFloat32 dgBilateralConstraint::CalculateSpringDamperAcceleration (
-	dgInt32 index, 
-	const dgContraintDescritor& desc, 
-	dgFloat32 jointAngle,
-	const dgVector& p0Global, 
-	const dgVector& p1Global,
-	dgFloat32 springK, 
-	dgFloat32 springD)
+void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContraintDescritor& desc, dgFloat32 spring, dgFloat32 damper)
 {
-	dgFloat32 accel = 0.0f;
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
+
 		dgAssert (m_body1);
 		const dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 
 		const dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1; 
@@ -228,19 +221,21 @@ dgFloat32 dgBilateralConstraint::CalculateSpringDamperAcceleration (
 		dgVector veloc1 (m_body1->m_veloc);
 		dgVector omega1 (m_body1->m_omega);
 
-		dgFloat32 relPosit = (p1Global - p0Global) % jacobian0.m_linear + jointAngle;
+		//dgFloat32 relPosit = (p1Global - p0Global) % jacobian0.m_linear + jointAngle;
+		dgFloat32 relPosit = desc.m_penetration[index];
 		dgFloat32 relVeloc = - (veloc0 % jacobian0.m_linear + veloc1 % jacobian1.m_linear +	omega0 % jacobian0.m_angular + omega1 % jacobian1.m_angular);
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		dgFloat32 dt = desc.m_timestep;
-		dgFloat32 ks = springK;
-		dgFloat32 kd = springD;
+		dgFloat32 ks = dgAbsf (spring);
+		dgFloat32 kd = dgAbsf (damper);
 		dgFloat32 ksd = dt * ks;
 		dgFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
-		dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
-		accel = num / den;
+		dgFloat32 den = dt * kd + dt * ksd;
+		float accel = num / (dgFloat32 (1.0f) + den);
+		SetMotorAcceleration (index, accel, desc);
+		desc.m_jointStiffness[index] = - den / DG_PSD_DAMP_TOL ;
 	}
-	return accel;
 }
 
 
