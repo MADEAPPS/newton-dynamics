@@ -351,8 +351,10 @@ class CustomVehicleController::EngineJoint: public CustomJoint
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_right[0]);
 		}
 
+m_dryResistance = 1000.0f;
 		dFloat longOmega = relOmega % engineMatrix.m_front;
-		if (dAbs(longOmega) < 0.25f) {
+//		if (dAbs(longOmega) < 0.25f) {
+		if (0) {
 			dVector drag(0.7f, 0.7f, 0.7f, 0.0f);
 			NewtonBodySetAngularDamping(m_body0, &drag[0]);
 		} else {
@@ -465,6 +467,18 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_clutchTorque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_clutchTorque);
 		}
+
+for (int i = 0; i < 2; i ++) {
+for (int j = 0; j < 2; j ++) {
+	float acc = 0.0f;
+	for (int k = 0; k < 6; k ++) {
+		acc += jacobian0[i][k] * jacobian0[j][k] + jacobian1[i][k] * jacobian1[j][k];
+	}
+	dTrace (("%f ", acc));
+}
+dTrace (("\n"));
+}
+dTrace (("\n"));
 
 		//m_engineTorque = 0.0f;
 		//m_tireTorque = 0.0f;
@@ -2014,14 +2028,14 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 #endif
 	}
 
-dTrace (("\n"));
+//dTrace (("\n"));
 }
 
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
 static int xxx;
-dTrace (("%d: ", xxx));
+//dTrace (("%d: ", xxx));
 xxx ++;
 
 	if (m_finalized) {
