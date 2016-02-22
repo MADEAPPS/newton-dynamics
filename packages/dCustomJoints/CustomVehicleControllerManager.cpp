@@ -300,13 +300,11 @@ class CustomVehicleController::EngineJoint: public CustomJoint
 			engineMatrix.m_right = engineMatrix.m_front * engineMatrix.m_up;
 			engineMatrix.m_right = engineMatrix.m_right.Scale(1.0f / dSqrt(engineMatrix.m_right % engineMatrix.m_right));
 			engineMatrix.m_up = engineMatrix.m_right * engineMatrix.m_front;
-			engineOmega = chassisOmega + engineMatrix.m_front.Scale(engineOmega % engineMatrix.m_front) + engineMatrix.m_up.Scale(engineOmega % engineMatrix.m_up);
+			engineOmega = chassisOmega + engineMatrix.m_front.Scale(engineOmega % engineMatrix.m_front) + chassisMatrix.m_up.Scale(engineOmega % chassisMatrix.m_up);
 		}
 
-		NewtonBodyGetVelocity(engine, &engineVeloc[0]);
-		NewtonBodyGetPointVelocity(chassis, &engineMatrix.m_posit[0], &chassisVeloc[0]);
-		chassisVeloc -= chassisMatrix.m_up.Scale(chassisVeloc % chassisMatrix.m_up);
-		engineVeloc = chassisVeloc + chassisMatrix.m_up.Scale(engineVeloc % chassisMatrix.m_up);
+		//NewtonBodyGetVelocity(engine, &engineVeloc[0]);
+		NewtonBodyGetPointVelocity(chassis, &engineMatrix.m_posit[0], &engineVeloc[0]);
 
 		engineMatrix = GetMatrix0().Inverse() * engineMatrix;
 
@@ -444,7 +442,6 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_clutchTorque);
 		}
 
-/*
 		dVector engineDir1(engineMatrix.m_right.Scale(-1.0f));
 		dVector engineFrictionPadContact1(engineMatrix.RotateVector(m_engineFrictionPadContact.Scale(-1.0f)));
 		dVector engineDir1Cross(engineFrictionPadContact1 * engineDir1);
@@ -468,7 +465,7 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_clutchTorque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_clutchTorque);
 		}
-*/
+
 		//m_engineTorque = 0.0f;
 		//m_tireTorque = 0.0f;
 		//dFloat torque0 = -NewtonUserJointGetRowForce(m_joint, 0);
