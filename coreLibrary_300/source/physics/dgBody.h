@@ -112,6 +112,9 @@ class dgBody
 	void SetOmega (const dgVector& omega);
 	void SetVelocity (const dgVector& velocity);
 
+	void SetOmegaNoSleep(const dgVector& omega);
+	void SetVelocityNoSleep(const dgVector& velocity);
+
 	dgUnsigned32 GetGroupID () const;
 	virtual void SetGroupID (dgUnsigned32 id);
 	dgInt32 GetUniqueID () const;
@@ -386,22 +389,35 @@ DG_INLINE const dgVector& dgBody::GetVelocity() const
 	return m_veloc; 
 }
 
-DG_INLINE void dgBody::SetOmega (const dgVector& omega)
+DG_INLINE void dgBody::SetOmegaNoSleep(const dgVector& omega)
 {
 	m_omega = omega;
+}
+
+
+DG_INLINE void dgBody::SetOmega (const dgVector& omega)
+{
+	SetOmegaNoSleep(omega);
 	m_equilibrium = false;
 }
+
 
 DG_INLINE dgVector dgBody::GetVelocityAtPoint (const dgVector& point) const
 {
 	return m_veloc + m_omega * (point - m_globalCentreOfMass);
 }
 
-DG_INLINE void dgBody::SetVelocity (const dgVector& velocity)
+DG_INLINE void dgBody::SetVelocityNoSleep(const dgVector& velocity)
 {
 	m_veloc = velocity;
+}
+
+DG_INLINE void dgBody::SetVelocity (const dgVector& velocity)
+{
+	SetVelocityNoSleep(velocity);
 	m_equilibrium = false;
 }
+
 
 DG_INLINE const dgMatrix& dgBody::GetMatrix() const
 {

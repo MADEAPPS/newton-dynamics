@@ -6042,6 +6042,16 @@ void NewtonBodySetVelocity(const NewtonBody* const bodyPtr, const dFloat* const 
 	body->SetVelocity (vector);
 }
 
+void NewtonBodySetVelocityNoSleep(const NewtonBody* const bodyPtr, const dFloat* const velocity)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+
+	dgVector vector(velocity[0], velocity[1], velocity[2], dgFloat32(0.0f));
+	body->SetVelocityNoSleep(vector);
+}
+
+
 // Name: NewtonBodyGetVelocity 
 // Get the global linear velocity of the body.
 //
@@ -6079,6 +6089,16 @@ void NewtonBodySetOmega(const NewtonBody* const bodyPtr, const dFloat* const ome
 	dgVector vector (omega[0], omega[1], omega[2], dgFloat32 (0.0f));
 	body->SetOmega (vector);
 }
+
+void NewtonBodySetOmegaNoSleep(const NewtonBody* const bodyPtr, const dFloat* const omega)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+
+	dgVector vector(omega[0], omega[1], omega[2], dgFloat32(0.0f));
+	body->SetOmegaNoSleep(vector);
+}
+
 
 // Name: NewtonBodyGetOmega 
 // Get the global angular velocity of the body.
