@@ -9,11 +9,6 @@
 * freely
 */
 
-// Using brush tire model explained on this paper
-// https://ddl.stanford.edu/sites/default/files/2013_Thesis_Hindiyeh_Dynamics_and_Control_of_Drifting_in_Automobiles.pdf
-
-// for the differential equation I am using information from here
-// http://web.mit.edu/2.972/www/reports/differential/differential.html
 
 // NewtonCustomJoint.cpp: implementation of the NewtonCustomJoint class.
 //
@@ -34,6 +29,7 @@ static FILE* file_xxx;
 #define D_VEHICLE_REVERSE_GEAR		1
 #define D_VEHICLE_FIRST_GEAR		2
 
+/*
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
 {
 	public:
@@ -72,7 +68,7 @@ class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconj
 	dFloat m_diagRegularizer[256];
 	int m_count;
 };
-
+*/
 
 
 void CustomVehicleController::dInterpolationCurve::InitalizeCurve(int points, const dFloat* const steps, const dFloat* const values)
@@ -118,7 +114,6 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		,m_tireLoad(0.0f)
 		,m_steerAngle(0.0f)
 		,m_brakeTorque(0.0f)
-		,m_restSprunMass(0.0f)
 	{
 		CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 	}
@@ -134,46 +129,40 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		return num / den;
 	}
 
-	void ApplySpringForce(dFloat timestep)
+	void RemoveKinematicError()
 	{
 		dMatrix tireMatrix;
 		dMatrix chassisMatrix;
-		dMatrix chassisComMatrix;
 		dVector tireVeloc;
+		dVector tireOmega;
 		dVector chassisVeloc;
-		dVector chassisCom;
+		dVector chassisOmega;
+
+		CalculateGlobalMatrix(tireMatrix, chassisMatrix);
+		tireMatrix.m_front -= chassisMatrix.m_up.Scale (tireMatrix.m_front % chassisMatrix.m_up);
+		tireMatrix.m_front = tireMatrix.m_front.Scale(1.0f / dSqrt(tireMatrix.m_front % tireMatrix.m_front));
+		tireMatrix.m_right = tireMatrix.m_front * tireMatrix.m_up;
+		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right % tireMatrix.m_right));
+		tireMatrix.m_up = tireMatrix.m_right * tireMatrix.m_front;
+		dFloat param = CalcuateTireParametricPosition (tireMatrix, chassisMatrix);
+		tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale (param * m_tire->m_data.m_suspesionlenght);
 
 		NewtonBody* const tire = m_body0;
 		NewtonBody* const chassis = m_body1;
-		dAssert(m_body0 == m_tire->GetBody());
-		dAssert(m_body1 == m_tire->GetParent()->GetBody());
 
-		CalculateGlobalMatrix(tireMatrix, chassisMatrix);
+		tireMatrix = GetMatrix0().Inverse() * tireMatrix;
+		NewtonBodySetMatrixNoSleep(tire, &tireMatrix[0][0]);
 
 		NewtonBodyGetVelocity(tire, &tireVeloc[0]);
-		NewtonBodyGetPointVelocity(chassis, &chassisMatrix.m_posit[0], &chassisVeloc[0]);
-		dFloat speed = dClamp((tireVeloc - chassisVeloc) % chassisMatrix.m_up, -20.0f, 20.0f);
-
-		dFloat param = CalcuateTireParametricPosition(tireMatrix, chassisMatrix);
-		dFloat posit = dClamp (param * m_tire->m_data.m_suspesionlenght, 0.0f, m_tire->m_data.m_suspesionlenght);
-
-		dFloat load = -NewtonCalculateSpringDamperAcceleration(timestep, m_tire->m_data.m_springStrength, posit, m_tire->m_data.m_dampingRatio, speed);
-		if (load < 0.0f) {
-			load = 0.0f;
-		}
+		NewtonBodyGetPointVelocity(chassis, &tireMatrix.m_posit[0], &chassisVeloc[0]);
+		chassisVeloc -= chassisMatrix.m_up.Scale (chassisVeloc % chassisMatrix.m_up);
+		tireVeloc = chassisVeloc + chassisMatrix.m_up.Scale (tireVeloc % chassisMatrix.m_up);
+		NewtonBodySetVelocity(tire, &tireVeloc[0]);
 		
-		NewtonBodyGetCentreOfMass(chassis, &chassisCom[0]);
-		NewtonBodyGetMatrix(chassis, &chassisComMatrix[0][0]);
-		chassisCom = tireMatrix.m_posit - chassisComMatrix.TransformVector(chassisCom);
-
-		m_tireLoad = load * m_restSprunMass;
-		dVector force(chassisMatrix.m_up.Scale(m_tireLoad));
-		dVector torque(chassisCom * force);
-		NewtonBodyAddForce(chassis, &force[0]);
-		NewtonBodyAddTorque(chassis, &torque[0]);
-
-		force = force.Scale(-1.0f);
-		NewtonBodyAddForce(tire, &force[0]);
+		NewtonBodyGetOmega(tire, &tireOmega[0]);
+		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
+		tireOmega = chassisOmega + tireMatrix.m_front.Scale (tireOmega % tireMatrix.m_front);
+		NewtonBodySetOmega(tire, &tireOmega[0]);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -267,7 +256,6 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 	dFloat m_tireLoad;
 	dFloat m_steerAngle;
 	dFloat m_brakeTorque;
-	dFloat m_restSprunMass;
 };
 
 class CustomVehicleController::EngineJoint: public CustomJoint
@@ -280,6 +268,40 @@ class CustomVehicleController::EngineJoint: public CustomJoint
 		dMatrix engineMatrix;
 		NewtonBodyGetMatrix(engine, &engineMatrix[0][0]);
 		CalculateLocalMatrix(engineMatrix, m_localMatrix0, m_localMatrix1);
+	}
+
+	void RemoveKinematicError()
+	{
+		dMatrix engineMatrix;
+		dMatrix chassisMatrix;
+		dVector engineVeloc;
+		dVector engineOmega;
+		dVector chassisVeloc;
+		dVector chassisOmega;
+
+		CalculateGlobalMatrix(engineMatrix, chassisMatrix);
+		engineMatrix.m_front = chassisMatrix.m_front;
+		engineMatrix.m_right = engineMatrix.m_front * engineMatrix.m_up;
+		engineMatrix.m_right = engineMatrix.m_right.Scale(1.0f / dSqrt(engineMatrix.m_right % engineMatrix.m_right));
+		engineMatrix.m_up = engineMatrix.m_right * engineMatrix.m_front;
+		engineMatrix.m_posit = chassisMatrix.m_posit;
+
+		NewtonBody* const engine = m_body0;
+		NewtonBody* const chassis = m_body1;
+
+		engineMatrix = GetMatrix0().Inverse() * engineMatrix;
+		NewtonBodySetMatrixNoSleep(engine, &engineMatrix[0][0]);
+
+		NewtonBodyGetVelocity(engine, &engineVeloc[0]);
+		NewtonBodyGetPointVelocity(chassis, &engineMatrix.m_posit[0], &chassisVeloc[0]);
+		chassisVeloc -= chassisMatrix.m_up.Scale(chassisVeloc % chassisMatrix.m_up);
+		engineVeloc = chassisVeloc + chassisMatrix.m_up.Scale(engineVeloc % chassisMatrix.m_up);
+		NewtonBodySetVelocity(engine, &engineVeloc[0]);
+
+		NewtonBodyGetOmega(engine, &engineOmega[0]);
+		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
+		engineOmega = chassisOmega + engineMatrix.m_front.Scale(engineOmega % engineMatrix.m_front);
+		NewtonBodySetOmega(engine, &engineOmega[0]);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -297,7 +319,6 @@ class CustomVehicleController::EngineJoint: public CustomJoint
 		NewtonUserJointSetRowAcceleration (m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
 		NewtonUserJointAddLinearRow(m_joint, &engineMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_right[0]);
 		NewtonUserJointSetRowAcceleration (m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
-
 
 		dVector omega0;
 		dVector omega1;
@@ -406,8 +427,6 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 		dFloat relSpeed0 = (tireOmega * tireFrictionPadContact0) % tireDir0 + (engineOmega * engineFrictionPadContact0) % engineDir0;
 		NewtonUserJointAddGeneralRow(m_joint, &jacobian0[0][0], &jacobian1[0][0]);
 		NewtonUserJointSetRowAcceleration(m_joint, -relSpeed0 / timestep);
-
-
 
 		dVector tireFrictionPadContact1 (tireMatrix.m_up.Scale (-m_gearGain));
 		dVector engineFrictionPadContact1(engineMatrix.RotateVector(m_engineFrictionPadContact.Scale (-1.0f)));
@@ -876,6 +895,19 @@ dFloat CustomVehicleController::BodyPartEngine::GetRPM() const
 	return speed;
 }
 
+void CustomVehicleController::BodyPartEngine::ApplyTorque(dFloat torqueMag)
+{
+	dMatrix matrix;
+
+	EngineJoint* const joint = (EngineJoint*)GetJoint();
+	NewtonBody* const engine = joint->GetBody0();
+	NewtonBodyGetMatrix(engine, &matrix[0][0]);
+	matrix = joint->GetMatrix0() * matrix;
+
+	m_norminalTorque = dAbs(torqueMag);
+	dVector torque(matrix.m_front.Scale(m_norminalTorque));
+	NewtonBodyAddTorque(engine, &torque[0]);
+}
 
 void CustomVehicleController::BodyPartEngine::Update(dFloat timestep, dFloat gasVal)
 {
@@ -1589,14 +1621,16 @@ void CustomVehicleController::SetCenterOfGravity(const dVector& comRelativeToGeo
 
 void CustomVehicleController::Finalize()
 {
-	dWeightDistibutionSolver solver;
-	dFloat64 unitAccel[256];
-	dFloat64 sprungMass[256];
 
 //NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_finalized = true;
 	NewtonSkeletonContainerFinalize(m_skeleton);
+
+/*
+	dWeightDistibutionSolver solver;
+	dFloat64 unitAccel[256];
+	dFloat64 sprungMass[256];
 
 	int count = 0;
 	dVector dir (0.0f, 1.0f, 0.0f, 0.0f);
@@ -1647,13 +1681,9 @@ void CustomVehicleController::Finalize()
 		BodyPartTire* const tire = &node->GetInfo();
 		WheelJoint* const tireJoint = (WheelJoint*) tire->GetJoint();
 		tireJoint->m_restSprunMass = dFloat (5.0f * dFloor (sprungMass[index] / 5.0f + 0.5f));
-//		if (m_engine) {
-//			tire->CalculateRollingResistance (m_engine->GetTopSpeed());
-//		}
 		index ++;
 	}
-
-//NewtonBodySetMassMatrix (m_body, 0.0f, 0.0f, 0.0f, 0.0f);
+*/
 }
 
 
@@ -1955,35 +1985,23 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 			} else {
-				dFloat phy_x = 0.0f;
-				dFloat phy_y = 0.0f;
 				vw = dMax(vw, 1.0e-3f);
 				vx = dMax(vx, 1.0e-3f);
-				dFloat k = (vw - vx) / vx;
 				dFloat alphaTangent = vy / vx;
-				if (vw > vx) {
-					// tire is driving
-					dFloat k = (vw - vx) / vx;
-					//phy_x = (vw - vx) / vw;
-					//phy_y = (vy / vx) / (1.0f + k);
-					phy_x = k / (1.0f + k);
-					phy_y = alphaTangent / (1.0f + k);
-				} else {
-					// tire is braking
-					phy_x = -k;
-					phy_y = alphaTangent;
-				}
-				dAssert(phy_x >= 0.0f);
-				dAssert(phy_x <= 1.0f);
-				dAssert(phy_y >= 0.0f);
+				dFloat k = (vw > vx) ? (vw - vx) / vx : -(vw - vx) / vx;
 
-				dVector tireLoadForce;
+				// for friction coupling according to Motor  Vehicle dynamics by: Giancarlo Genta 
+				dFloat phy_x = k / (1.0f + k);
+				dFloat phy_y = alphaTangent / (1.0f + k);
+
 				dFloat f_x;
 				dFloat f_y;
 				dFloat moment;
 
-				NewtonBodyGetForceAcc (tireBody, &tireLoadForce[0]);
-				dFloat tireLoad = -(tireLoadForce % normal);
+				dVector tireLoadForce;
+				NewtonMaterialGetContactForce(material, tireBody, &tireLoadForce.m_x);
+				dFloat tireLoad = (tireLoadForce % normal);
+
 				controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, phy_x, phy_y, f_x, f_y, moment);
 
 				NewtonMaterialSetContactTangentFriction(material, f_y, 0);
@@ -2011,26 +2029,30 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 #endif
 	}
 
-//dTrace (("\n"));
+dTrace (("\n"));
 }
 
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
 static int xxx;
-//dTrace (("%d ", xxx));
+dTrace (("%d: ", xxx));
 xxx ++;
 
 	if (m_finalized) {
+		if (!NewtonBodyGetSleepState(m_body)) {
+			for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
+				BodyPartTire& tire = tireNode->GetInfo();
+				WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
+				tireJoint->RemoveKinematicError();
+			}
+		}
+
 		m_chassis.ApplyDownForce ();
 
-//		for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
-//			BodyPartTire& tire = tireNode->GetInfo();
-//			WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
-//			tireJoint->ApplySpringForce(timestep);
-//		}
-
 		if (m_engineControl) {
+			EngineJoint* const joint = (EngineJoint*) m_engineControl->m_engine->GetJoint();
+			joint->RemoveKinematicError();
 			m_engineControl->Update(timestep);
 		}
 

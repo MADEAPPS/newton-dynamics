@@ -69,19 +69,19 @@ struct BasciCarParameters
 
 static BasciCarParameters basicCarParameters = 
 {
-	2000.0f,	// VEHICLE_MASS
-	 50.0f,		// ENGINE_MASS
-	 50.0f,		// TIRE_MASS
+	 900.0f,	// VEHICLE_MASS
+	  40.0f,	// ENGINE_MASS
+	  40.0f,	// TIRE_MASS
 	  0.5f,		// ENGINE_ARMATURE_RADIO;
-	  25.0f,	// STEER_ANGLE
-	5000.0f,	// BRAKE_TORQUE
+	  5.0f,	// STEER_ANGLE
+	2000.0f,	// BRAKE_TORQUE
 	  -0.2f,	// COM_Y_OFFSET
 	120.0f,		// TIRE_TOP_SPEED_KMH
 	 400.0f,	// IDLE_TORQUE
 	500.0f,		// IDLE_TORQUE_RPM
-	 200.0f,	// PEAK_TORQUE
+	 300.0f,	// PEAK_TORQUE
 	3000.0f,	// PEAK_TORQUE_RPM
-	 130.0f,	// PEAK_HP
+	 190.0f,	// PEAK_HP
 	4000.0f,	// PEAK_HP_RPM
 	 30.0f,		// REDLINE_TORQUE
 	4500.0f,	// REDLINE_TORQUE_RPM
@@ -89,11 +89,11 @@ static BasciCarParameters basicCarParameters =
 		2.0f,	// GEAR_2
 		1.5f,	// GEAR_3
 		2.9f,	// REVERSE_GEAR
-	   0.7f,	// SUSPENSION_LENGTH
-	  90.0f,	// SUSPENSION_SPRING
-	   7.0f,	// SUSPENSION_DAMPER
-   200000.0f,	// LATERAL_STIFFNESS
-   200000.0f,	// LONGITUDINAL_STIFFNESS
+	   0.40f,	// SUSPENSION_LENGTH
+	  50.0f,	// SUSPENSION_SPRING
+	   5.0f,	// SUSPENSION_DAMPER
+   7000.0f,		// LATERAL_STIFFNESS
+   7000.0f,		// LONGITUDINAL_STIFFNESS
 	   1.5f,	// ALIGNING_MOMENT_TRAIL
 	   BasciCarParameters::m_4WD,
 

@@ -151,33 +151,27 @@ class CustomVehicleController: public CustomControllerBase
 				return 1.0f;
 			}
 
+			// Using brush tire model explained on this paper
+			// https://ddl.stanford.edu/sites/default/files/2013_Thesis_Hindiyeh_Dynamics_and_Control_of_Drifting_in_Automobiles.pdf
+			// 
 			virtual void GetForces(const BodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat longitudinalSlip, dFloat lateralSlip, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
 			{
-			//longitudinalSlip = 1.0f;
-			//lateralSlip = 0.0f;
-
-				dFloat phy_y = lateralSlip * tire->m_data.m_lateralStiffness;
-				dFloat phy_x = longitudinalSlip * tire->m_data.m_longitudialStiffness;
 				tireLoad *= GetFrictionCoefficient (material, tire->GetBody(), otherBody);
-
+				dFloat phy_z = lateralSlip * tire->m_data.m_lateralStiffness;
+				dFloat phy_x = longitudinalSlip * tire->m_data.m_longitudialStiffness;
+				dFloat gamma = dSqrt(phy_x * phy_x + phy_z * phy_z);
 				dFloat phyMax = 3.0f * tireLoad + 1.0f;
-				dFloat phyMag = dSqrt(phy_x * phy_x + phy_y * phy_y);
-				
-				dFloat ratio = phyMag / phyMax;
-				dFloat F = phyMag * (1.0f - ratio + ratio * ratio * (1.0f / 3.0f));
-				if (ratio > 1.0f) {
-					F = tireLoad;
-				}
 
-				dFloat fraction = F / phyMag;
+				dFloat F = (gamma <= phyMax) ? (gamma * (1.0f - gamma / phyMax  + gamma * gamma / (3.0f * phyMax * phyMax))) : tireLoad;
+
+				dFloat fraction = F / gamma;
 				dFloat F_x = phy_x * fraction;
-				dFloat F_y = phy_y * fraction;
+				dFloat F_z = phy_z * fraction;
 
-				if (tire->m_index == 0) {
-//					dTrace(("%f %f %f\n", tireLoad, F_x, F_y));
-				}
-				lateralForce = F_y;
+				lateralForce = F_z;
 				longitudinalForce = F_x;
+
+dTrace (("(%d %f %f %f) ", tire->m_index, tireLoad, F_x, F_z));
 				aligningTorque = 0.0f;
 			}
 
@@ -277,6 +271,7 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API BodyPartEngine(CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
 		CUSTOM_JOINTS_API virtual ~BodyPartEngine();
 
+		CUSTOM_JOINTS_API void ApplyTorque(dFloat torque);
 		CUSTOM_JOINTS_API virtual void Update (dFloat timestep, dFloat gasVal);
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const;

@@ -2005,9 +2005,7 @@ void NewtonMaterialGetContactForce(const NewtonMaterial* const materialHandle, c
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 
-	dgVector force (material->m_normal.Scale3(material->m_normal_Force.m_force) +
-					material->m_dir0.Scale3 (material->m_dir0_Force.m_force) +
-					material->m_dir1.Scale3 (material->m_dir1_Force.m_force));
+	dgVector force (material->m_normal.Scale4(material->m_normal_Force.m_force) + material->m_dir0.Scale4 (material->m_dir0_Force.m_force) + material->m_dir1.Scale4 (material->m_dir1_Force.m_force));
 
 	forcePtr[0] = force.m_x;
 	forcePtr[1] = force.m_y;
