@@ -252,11 +252,11 @@ dTrace (("(%d %f %f %f) ", tire->m_index, tireLoad, F_x, F_z));
 			dFloat m_idleTorque;
 			dFloat m_rpmAtIdleTorque;
 			dFloat m_vehicleTopSpeed;
-
-			int m_gearsCount;
-			dFloat m_gearRatios[10];
 			dFloat m_reverseGearRatio;
+			dFloat m_gearRatios[10];
+			int m_gearsCount;
 			void* m_userData;
+			bool m_usePoweredDifferential;
 
 			private:
 			void ConvertToMetricSystem();
