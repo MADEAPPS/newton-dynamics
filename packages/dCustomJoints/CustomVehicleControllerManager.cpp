@@ -1825,7 +1825,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 			dFloat vy = tireVeloc % lateralPin;
 			dFloat vx = tireVeloc % longitudinalContactDir;
-			dFloat vw = (tireOmega * radius) % longitudinalContactDir;
+			dFloat vw = -((tireOmega * radius) % longitudinalContactDir);
 
 			if (dAbs(vx) < 0.25f) {
 				// vehicle  moving as a speed for which tire physics is not defined.
@@ -1834,6 +1834,11 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			} else {
 				dFloat alphaTangent = dAbs(vy) / dAbs(vx);
 				dFloat k = (vw - vx) / vx;
+
+if (tire->m_index == 0)
+dTrace (("vx = %f vw = %f vy = %f, k = %f\n", vx, vw, vy, k));
+
+
 
 				// for friction coupling according to Motor  Vehicle dynamics by: Giancarlo Genta 
 				dFloat phy_x = k / (1.0f + k);
