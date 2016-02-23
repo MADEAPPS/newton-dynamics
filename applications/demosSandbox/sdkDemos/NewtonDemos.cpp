@@ -189,9 +189,27 @@ class NewtonDemosApp: public wxApp
 		int version = NewtonWorldGetVersion();
 		wxString title;
 		title.Printf (wxT ("Newton %d.%02d SDK demos"), version / 100, version % 100);
-		NewtonDemos* const frame = new NewtonDemos(title, wxDefaultPosition, wxSize(DEMO_WIDTH, DEMO_HEIGHT));
 
-		frame->Show(true);
+		//This is the case when there are two monitor 
+	// Create Main Display 
+	NewtonDemos* frame = NULL;
+	switch (wxDisplay::GetCount()) 
+	{
+		case 1:
+			frame = new NewtonDemos(title, wxDefaultPosition, wxSize(DEMO_WIDTH, DEMO_HEIGHT));
+			break;
+		default:
+			wxDisplay display(1);
+			wxRect rect (display.GetGeometry());
+			wxPoint location (rect.x + 20, rect.y + 20);
+			frame = new NewtonDemos(title, location, wxSize(DEMO_WIDTH, DEMO_HEIGHT));
+	}
+
+	frame->Show(TRUE);
+
+
+//		NewtonDemos* const frame = new NewtonDemos(title, wxDefaultPosition, wxSize(DEMO_WIDTH, DEMO_HEIGHT));
+//		frame->Show(true);
 		SetTopWindow(frame);
 
 		// initialize opengl graphics

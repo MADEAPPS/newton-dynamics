@@ -101,6 +101,7 @@ typedef long long unsigned64;
 // gui library includes
 #include <wx/wx.h>
 #include <wx/event.h>
+#include <wx/display.h>
 #include <wx/dcclient.h>
 #include <wx/glcanvas.h>
 #include <wx/joystick.h>
