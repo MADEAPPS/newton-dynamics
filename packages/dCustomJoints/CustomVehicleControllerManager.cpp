@@ -1476,7 +1476,7 @@ void CustomVehicleController::SetCenterOfGravity(const dVector& comRelativeToGeo
 void CustomVehicleController::Finalize()
 {
 
-NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
+//NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_finalized = true;
 	NewtonSkeletonContainerFinalize(m_skeleton);
@@ -1823,19 +1823,17 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			NewtonMaterialContactRotateTangentDirections(material, &lateralPin[0]);
 			NewtonMaterialGetContactTangentDirections(material, tireBody, &lateralContactDir[0], &longitudinalContactDir[0]);
 
-			dFloat vy = dAbs(tireVeloc % lateralPin);
-			dFloat vx = dAbs(tireVeloc % longitudinalContactDir);
-			dFloat vw = dAbs((tireOmega * radius) % longitudinalContactDir);
+			dFloat vy = tireVeloc % lateralPin;
+			dFloat vx = tireVeloc % longitudinalContactDir;
+			dFloat vw = (tireOmega * radius) % longitudinalContactDir;
 
-			if (dMax(vw, vx) < 0.25f) {
+			if (dAbs(vx) < 0.25f) {
 				// vehicle  moving as a speed for which tire physics is not defined.
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 			} else {
-				vw = dMax(vw, 1.0e-3f);
-				vx = dMax(vx, 1.0e-3f);
-				dFloat alphaTangent = vy / vx;
-				dFloat k = (vw > vx) ? (vw - vx) / vx : -(vw - vx) / vx;
+				dFloat alphaTangent = dAbs(vy) / dAbs(vx);
+				dFloat k = (vw - vx) / vx;
 
 				// for friction coupling according to Motor  Vehicle dynamics by: Giancarlo Genta 
 				dFloat phy_x = k / (1.0f + k);
