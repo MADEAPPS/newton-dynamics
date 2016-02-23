@@ -256,7 +256,6 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_gearRatios[10];
 			int m_gearsCount;
 			void* m_userData;
-			bool m_usePoweredDifferential;
 
 			private:
 			void ConvertToMetricSystem();
