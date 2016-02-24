@@ -317,7 +317,7 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 		dgFloat32 dist = normal.DotProduct4(support[0] - point).GetScalar();
 		if (dist <= DG_IMPULSIVE_CONTACT_PENETRATION) {
 			dgVector normalAlgin (normal.Abs());
-			if (!((normalAlgin.m_x > dgFloat32 (0.9999f)) || (normalAlgin.m_y > dgFloat32 (0.9999f)) || (normalAlgin.m_x > dgFloat32 (0.9999f)))) {
+			if (!((normalAlgin.m_x > dgFloat32 (0.9999f)) || (normalAlgin.m_y > dgFloat32 (0.9999f)) || (normalAlgin.m_z > dgFloat32 (0.9999f)))) {
 				// 0.25 degrees
 				const dgFloat32 tiltAngle = dgFloat32 (0.005f);
 				const dgFloat32 tiltAngle2 = tiltAngle * tiltAngle ;
