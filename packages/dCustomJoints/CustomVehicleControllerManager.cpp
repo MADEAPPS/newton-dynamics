@@ -141,6 +141,9 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		dVector chassisOmega;
 
 		CalculateGlobalMatrix(tireMatrix, chassisMatrix);
+
+// huge bug here.
+dAssert (0);
 		tireMatrix.m_front -= chassisMatrix.m_up.Scale (tireMatrix.m_front % chassisMatrix.m_up);
 		tireMatrix.m_front = tireMatrix.m_front.Scale(1.0f / dSqrt(tireMatrix.m_front % tireMatrix.m_front));
 		tireMatrix.m_right = tireMatrix.m_front * tireMatrix.m_up;
