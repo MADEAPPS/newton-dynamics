@@ -168,7 +168,7 @@ class CustomVehicleController: public CustomControllerBase
 				dFloat F_x = phy_x * fraction;
 				dFloat F_z = phy_z * fraction;
 
-				lateralForce = F_z;
+				lateralForce = - F_z;
 				longitudinalForce = F_x;
 
 				aligningTorque = 0.0f;

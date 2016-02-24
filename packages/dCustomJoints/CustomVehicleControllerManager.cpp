@@ -1833,9 +1833,9 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 			} else {
-				dFloat alphaTangent = dAbs(vy) / dAbs(vx);
 				// calculating Brush tire model with longitudinal and lateral coupling 
 				// for friction coupling according to Motor Vehicle dynamics by: Giancarlo Genta 
+				// dFloat alphaTangent = vy / dAbs(vx);
 				//dFloat k = (vw - vx) / vx;
 				//dFloat phy_x0 = k / (1.0f + k);
 				//dFloat phy_z0 = alphaTangent / (1.0f + k);
@@ -1845,7 +1845,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 					vw = 0.01f * dSign(vw);
 				}
 				dFloat phy_x = (vw - vx) / vw;
-				dFloat phy_z = alphaTangent * vx / vw;
+				dFloat phy_z = vy / dAbs (vw);
 
 				dFloat f_x;
 				dFloat f_z;
@@ -1857,9 +1857,9 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 				controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, phy_x, phy_z, f_x, f_z, moment);
 
-if (tire->m_index == 0)
-//dTrace(("tire: %d  fy = %f, fx = %f fz = %f, vx = %f vw = %f vy = %f, k = %f, phy_x = %f, phy_x0 = %f\n", tire->m_index, tireLoad, f_x, f_z, vx, vw, vy, k, phy_x, phy_x0));
-dTrace(("tire: %d  fy = %f, fx = %f fz = %f, phy_x = %f\n", tire->m_index, tireLoad, f_x, f_z, phy_x));
+if ((tire->m_index == 0) || (tire->m_index == 1))
+//dTrace(("tire: %d  fy = %f, fx = %f fz = %f, phy_x = %f\n", tire->m_index, tireLoad, f_x, f_z, phy_x));
+dTrace(("tire: %d  fz = %f, phy_z = %f\n", tire->m_index, f_z, phy_z));
 
 
 				dVector force (longitudinalContactDir.Scale (f_x) + lateralPin.Scale (f_z));
