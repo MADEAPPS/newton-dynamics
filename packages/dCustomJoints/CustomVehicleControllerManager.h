@@ -171,7 +171,6 @@ class CustomVehicleController: public CustomControllerBase
 				lateralForce = F_z;
 				longitudinalForce = F_x;
 
-//dTrace (("(%d %f %f %f) ", tire->m_index, tireLoad, F_x, F_z));
 				aligningTorque = 0.0f;
 			}
 

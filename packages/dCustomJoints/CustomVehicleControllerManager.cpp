@@ -29,6 +29,7 @@ static FILE* file_xxx;
 #define D_VEHICLE_REVERSE_GEAR		1
 #define D_VEHICLE_FIRST_GEAR		2
 
+static int xxx;
 
 /*
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
@@ -547,13 +548,13 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController
 	NewtonWorld* const world = ((CustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
 
 	//NewtonCollision* const collision = NewtonCreateNull(world);
-	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.5f, 0.5f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.5f, 0.5f, 0, NULL);
 
 	dMatrix matrix;
 	dMatrix offset (dYawMatrix (-0.5f * 3.14159213f) * m_controller->m_localFrame);
 //offset.m_posit.m_y += 0.25f;
-offset.m_posit.m_y += 2.0f;
+//offset.m_posit.m_y += 2.0f;
 //offset.m_posit.m_x -= 2.0f;
 
 	NewtonBodyGetMatrix(m_controller->GetBody(), &matrix[0][0]);
@@ -1102,7 +1103,7 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 	dMatrix projectionMatrix(dGetIdentityMatrix());
 	projectionMatrix[0][0] = scale;
 	projectionMatrix[1][1] = 0.0f;
-	projectionMatrix[2][1] = scale;
+	projectionMatrix[2][1] = -scale;
 	projectionMatrix[2][2] = 0.0f;
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 
@@ -1827,35 +1828,48 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			dFloat vx = tireVeloc % longitudinalContactDir;
 			dFloat vw = -((tireOmega * radius) % longitudinalContactDir);
 
-			if (dAbs(vx) < 0.25f) {
-				// vehicle  moving as a speed for which tire physics is not defined.
+			if ((dAbs(vx) < 1.0f) || (dAbs(vw) < 0.1f)) {
+				// vehicle  moving at speed for which tire physics is undefined, simple do a kinematic motion
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 			} else {
 				dFloat alphaTangent = dAbs(vy) / dAbs(vx);
-				dFloat k = (vw - vx) / vx;
+				// calculating Brush tire model with longitudinal and lateral coupling 
+				// for friction coupling according to Motor Vehicle dynamics by: Giancarlo Genta 
+				//dFloat k = (vw - vx) / vx;
+				//dFloat phy_x0 = k / (1.0f + k);
+				//dFloat phy_z0 = alphaTangent / (1.0f + k);
 
-if (tire->m_index == 0)
-dTrace (("vx = %f vw = %f vy = %f, k = %f\n", vx, vw, vy, k));
-
-
-
-				// for friction coupling according to Motor  Vehicle dynamics by: Giancarlo Genta 
-				dFloat phy_x = k / (1.0f + k);
-				dFloat phy_y = alphaTangent / (1.0f + k);
+				// reduces to this, which may have a divide by zero locked, so I am cl;amping to some small value
+				if ((vw < 0.01f) && (vw > -0.01f)) {
+					vw = 0.01f * dSign(vw);
+				}
+				dFloat phy_x = (vw - vx) / vw;
+				dFloat phy_z = alphaTangent * vx / vw;
 
 				dFloat f_x;
-				dFloat f_y;
+				dFloat f_z;
 				dFloat moment;
 
 				dVector tireLoadForce;
 				NewtonMaterialGetContactForce(material, tireBody, &tireLoadForce.m_x);
 				dFloat tireLoad = (tireLoadForce % normal);
 
-				controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, phy_x, phy_y, f_x, f_y, moment);
+				controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, phy_x, phy_z, f_x, f_z, moment);
 
-				NewtonMaterialSetContactTangentFriction(material, f_y, 0);
-				NewtonMaterialSetContactTangentFriction(material, f_x, 1);
+if (tire->m_index == 0)
+//dTrace(("tire: %d  fy = %f, fx = %f fz = %f, vx = %f vw = %f vy = %f, k = %f, phy_x = %f, phy_x0 = %f\n", tire->m_index, tireLoad, f_x, f_z, vx, vw, vy, k, phy_x, phy_x0));
+dTrace(("tire: %d  fy = %f, fx = %f fz = %f, phy_x = %f\n", tire->m_index, tireLoad, f_x, f_z, phy_x));
+
+
+				dVector force (longitudinalContactDir.Scale (f_x) + lateralPin.Scale (f_z));
+				dVector torque (radius * force);
+
+				NewtonBodyAddForce(tireBody, &force[0]);
+				NewtonBodyAddForce(tireBody, &torque[0]);
+
+//				NewtonMaterialSetContactTangentFriction(material, f_z, 0);
+//				NewtonMaterialSetContactTangentFriction(material, f_x, 1);
 			}
 
 		} else {
@@ -1884,8 +1898,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
-static int xxx;
-//dTrace (("%d\n", xxx));
+dTrace (("%d\n", xxx));
 xxx ++;
 
 	if (m_finalized) {

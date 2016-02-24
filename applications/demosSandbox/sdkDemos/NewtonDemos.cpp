@@ -190,8 +190,7 @@ class NewtonDemosApp: public wxApp
 		wxString title;
 		title.Printf (wxT ("Newton %d.%02d SDK demos"), version / 100, version % 100);
 
-		//This is the case when there are two monitor 
-	// Create Main Display 
+		//This is the case when there are two monitor, Create Main Display on secund monitor
 	NewtonDemos* frame = NULL;
 	switch (wxDisplay::GetCount()) 
 	{
@@ -207,9 +206,7 @@ class NewtonDemosApp: public wxApp
 
 	frame->Show(TRUE);
 
-
-//		NewtonDemos* const frame = new NewtonDemos(title, wxDefaultPosition, wxSize(DEMO_WIDTH, DEMO_HEIGHT));
-//		frame->Show(true);
+		frame->Show(true);
 		SetTopWindow(frame);
 
 		// initialize opengl graphics
@@ -342,15 +339,15 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_microthreadIndex = 1;
 //m_useParallelSolver = true;
 //m_threadProfilerState = true;
-m_showNormalForces = true;
+//m_showContactPoints = true;
 //m_showCenterOfMass = true;
-m_hideVisualMeshes = true;
+//m_hideVisualMeshes = true;
 //m_physicsUpdateMode = 1;
-m_showContactPoints = true;
 //m_hardwareDevice = 2;
 //m_showStatistics = true;
 //*/
 m_debugDisplayMode = 2;
+m_showNormalForces = true;
 
 
 //m_autoSleepState = false;

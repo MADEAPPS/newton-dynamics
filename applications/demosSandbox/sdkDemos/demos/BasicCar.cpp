@@ -473,7 +473,7 @@ class BasicCarEntity: public DemoEntity
 		// check transmission type
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 0
+#if 1
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
@@ -544,74 +544,90 @@ class BasicCarEntity: public DemoEntity
 	
 	void Debug () const 
 	{
-dAssert (0);
-/*
-		NewtonBody* const body = m_controller->GetBody();
-		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
+		const CustomVehicleController::BodyPart* const chassis = m_controller->GetChassis();
+		NewtonBody* const chassisBody = chassis->GetBody();
 
-		dFloat scale = -4.0f / (chassis.GetMass() * DEMO_GRAVITY);
-		dVector p0 (chassis.GetCenterOfMass());
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
 
-		glDisable (GL_LIGHTING);
+		dVector com;
+		dMatrix matrix;
+		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
+		NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
+		matrix.m_posit = matrix.TransformVector(com);
+		matrix = m_controller->GetLocalFrame() * matrix;
+
+		dFloat scale = -4.0f / (mass * DEMO_GRAVITY);
+		dVector p0(matrix.m_posit);
+
+		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
 
 		glLineWidth(3.0f);
 		glBegin(GL_LINES);
 
-
 		// draw vehicle weight at the center of mass
-		dFloat lenght = scale * chassis.GetMass() * DEMO_GRAVITY;
+		dFloat lenght = scale * mass * DEMO_GRAVITY;
 		glColor3f(0.0f, 0.0f, 1.0f);
-		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-		glVertex3f (p0.m_x, p0.m_y - lenght, p0.m_z);
+		glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+		glVertex3f(p0.m_x, p0.m_y - lenght, p0.m_z);
 
 		// draw vehicle front dir
 		glColor3f(1.0f, 1.0f, 1.0f);
-		dVector r0 (p0 + chassis.GetMatrix()[1].Scale (0.5f));
-		dVector r1 (r0 + chassis.GetMatrix()[0].Scale (1.0f));
-		glVertex3f (r0.m_x, r0.m_y, r0.m_z);
-		glVertex3f (r1.m_x, r1.m_y, r1.m_z);
-
+		dVector r0(p0 + matrix[1].Scale(1.0f));
+		dVector r1(r0 + matrix[0].Scale(2.0f));
+		glVertex3f(r0.m_x, r0.m_y, r0.m_z);
+		glVertex3f(r1.m_x, r1.m_y, r1.m_z);
 
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
 		dVector veloc;
-		NewtonBodyGetVelocity(body, &veloc[0]);
-		dVector q0 (p0 + chassis.GetMatrix()[1].Scale (1.0f));
-		dVector q1 (q0 + veloc.Scale (0.25f));
+		NewtonBodyGetVelocity(chassisBody, &veloc[0]);
+		dVector q0(p0 + matrix[1].Scale(1.0f));
+		dVector q1(q0 + veloc.Scale(0.25f));
 		glColor3f(1.0f, 1.0f, 0.0f);
-		glVertex3f (q0.m_x, q0.m_y, q0.m_z);
-		glVertex3f (q1.m_x, q1.m_y, q1.m_z);
-		
-		for (CustomVehicleControllerBodyStateTire* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			const CustomVehicleControllerBodyStateTire& tire = *node;
-			dVector p0 (tire.GetCenterOfMass());
+		glVertex3f(q0.m_x, q0.m_y, q0.m_z);
+		glVertex3f(q1.m_x, q1.m_y, q1.m_z);
 
-const dMatrix& tireMatrix = tire.GetLocalMatrix ();
-p0 += chassis.GetMatrix()[2].Scale ((tireMatrix.m_posit.m_z > 0.0f ? 1.0f : -1.0f) * 0.25f);
+		//int xxx = 0;
+		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			const CustomVehicleController::BodyPartTire* const tire = &node->GetInfo();
+			NewtonBody* const tireBody = tire->GetBody();
+
+			dMatrix tireMatrix;
+			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
+
+			dFloat sign = dSign((tireMatrix.m_posit - matrix.m_posit) % matrix.m_right);
+			tireMatrix.m_posit += matrix.m_right.Scale(sign * 0.25f);
 
 			// draw the tire load 
-			dVector p1 (p0 + tire.GetTireLoad().Scale (scale));
-			glColor3f (0.0f, 0.0f, 1.0f);
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+			dVector normalLoad(m_controller->GetTireNormalForce(tire));
+			dVector p0(tireMatrix.m_posit);
+			dVector p1(p0 + normalLoad.Scale(scale));
+
+			glColor3f(0.0f, 0.0f, 1.0f);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
 
 			// show tire lateral force
-			dVector p2 (p0 - tire.GetLateralForce().Scale (scale));
+			dVector lateralForce(m_controller->GetTireLateralForce(tire));
+			dVector p2(p0 - lateralForce.Scale(scale));
 			glColor3f(1.0f, 0.0f, 0.0f);
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f (p2.m_x, p2.m_y, p2.m_z);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p2.m_x, p2.m_y, p2.m_z);
 
 			// show tire longitudinal force
-			dVector p3 (p0 - tire.GetLongitudinalForce().Scale (scale));
-			glColor3f (0.0f, 1.0f, 0.0f);
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
+			dVector longitudinalForce(m_controller->GetTireLongitudinalForce(tire));
+			dVector p3(p0 - longitudinalForce.Scale(scale));
+			glColor3f(0.0f, 1.0f, 0.0f);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p3.m_x, p3.m_y, p3.m_z);
 		}
 
 		glEnd();
-
 		glLineWidth(1.0f);
-*/
 	}
 
 	dMatrix m_tireaLigmentMatrix;
@@ -650,6 +666,7 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 	{
 		BasicCarControllerManager* const me = (BasicCarControllerManager*) context;
 		me->RenderVehicleHud (scene, lineNumber);
+		
 	}
 
 	void DrawHelp(DemoEntityManager* const scene, int lineNumber) const
@@ -679,8 +696,31 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 			//print controllers help 
 			DrawHelp(scene, lineNumber);
 
+
+		
+			glDisable(GL_LIGHTING);
+			glDisable(GL_TEXTURE_2D);
+			glDisable(GL_DEPTH_TEST);
+
+			dFloat scale = 100.0f;
+			dFloat width = scene->GetWidth();
+			dFloat height = scene->GetHeight();
+
+			dMatrix origin(dGetIdentityMatrix());
+			origin.m_posit = dVector(width - 300, height - 200, 0.0f, 1.0f);
+
+			glPushMatrix();
+			glMultMatrix(&origin[0][0]);
+			DrawSchematic(m_player->m_controller, scale);
+			glPopMatrix();
+
+			glLineWidth(1.0f);
+			
 			// restore color and blend mode
-			glDisable (GL_BLEND);
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_TEXTURE_2D);
+			glEnable(GL_LIGHTING);
+			glDisable(GL_BLEND);
 		}
 	}
 
@@ -761,6 +801,83 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 			vehicleEntity->Debug();
 		}
 	}
+
+	void DrawSchematicCallback(const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
+	{
+		if (!strcmp(partName, "chassis")) {
+			glLineWidth(3.0f);
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0(lines[pointCount - 1]);
+			for (int i = 0; i < pointCount; i++) {
+				dVector p1(lines[i]);
+				glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+				glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+				p0 = p1;
+			}
+			glEnd();
+		}
+
+		if (!strcmp(partName, "tire")) {
+			glLineWidth(2.0f);
+			glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0(lines[pointCount - 1]);
+			for (int i = 0; i < pointCount; i++) {
+				dVector p1(lines[i]);
+				glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+				glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+				p0 = p1;
+			}
+			glEnd();
+		}
+
+		if (!strcmp(partName, "velocity")) {
+			glLineWidth(2.0f);
+			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0(lines[0]);
+			dVector p1(lines[1]);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glEnd();
+		}
+
+		if (!strcmp(partName, "omega")) {
+			glLineWidth(2.0f);
+			glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0(lines[0]);
+			dVector p1(lines[1]);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glEnd();
+		}
+
+
+		if (!strcmp(partName, "lateralForce")) {
+			glLineWidth(2.0f);
+			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0(lines[0]);
+			dVector p1(lines[1]);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glEnd();
+		}
+
+		if (!strcmp(partName, "longitudinalForce")) {
+			glLineWidth(2.0f);
+			glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0(lines[0]);
+			dVector p1(lines[1]);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glEnd();
+		}
+	}
+
 
 	bool m_externalView;
 	BasicCarEntity* m_player;
