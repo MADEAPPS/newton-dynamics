@@ -66,8 +66,8 @@
 //#define VIPER_TIRE_TOP_SPEED				164 mile / hours
 #define VIPER_TIRE_TOP_SPEED_KMH			264.0f
 
-#define VIPER_TIRE_LATERAL_STIFFNESS		40000.0f
-#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	10000.0f
+#define VIPER_TIRE_LATERAL_STIFFNESS		(VIPER_MASS * DEMO_GRAVITY * 2.0f)
+#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	(VIPER_MASS * DEMO_GRAVITY * 2.0f)
 
 #define VIPER_TIRE_ALIGNING_MOMENT_TRAIL	0.5f
 #define VIPER_TIRE_SUSPENSION_SPRING		150.0f
@@ -281,8 +281,8 @@ class SuperCarEntity: public DemoEntity
 		tireInfo.m_dampingRatio = suspensionDamper;
 		tireInfo.m_springStrength = suspensionSpring;
 		tireInfo.m_suspesionlenght = suspensionLength;
-		tireInfo.m_lateralStiffness = lateralStiffness;
-		tireInfo.m_longitudialStiffness = longitudinalStiffness;
+		tireInfo.m_lateralStiffness = dAbs (lateralStiffness);
+		tireInfo.m_longitudialStiffness = dAbs (longitudinalStiffness);
 		tireInfo.m_aligningMomentTrail =  aligningMOmentTrail;
 		tireInfo.m_userData = tirePart;
 

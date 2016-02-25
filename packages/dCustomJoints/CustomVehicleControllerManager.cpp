@@ -1878,6 +1878,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, phy_x, phy_z, f_x, f_z, moment);
 
 //if ((tire->m_index == 0) || (tire->m_index == 1)) 
+if (tire->m_index == 3) 
 {
 dTrace(("tire: %d  force (%f, %f %f), slip (%f %f)\n", tire->m_index, tireLoad, f_x, f_z, phy_x, phy_z));
 }
@@ -1886,11 +1887,11 @@ dTrace(("tire: %d  force (%f, %f %f), slip (%f %f)\n", tire->m_index, tireLoad, 
 				dVector force (longitudinalContactDir.Scale (f_x) + lateralPin.Scale (f_z));
 				dVector torque (radius * force);
 
-//				NewtonBodyAddForce(tireBody, &force[0]);
-//				NewtonBodyAddForce(tireBody, &torque[0]);
+				NewtonBodyAddForce(tireBody, &force[0]);
+				NewtonBodyAddForce(tireBody, &torque[0]);
 
-				NewtonMaterialSetContactTangentFriction(material, f_z, 0);
-				NewtonMaterialSetContactTangentFriction(material, f_x, 1);
+//				NewtonMaterialSetContactTangentFriction(material, f_z, 0);
+//				NewtonMaterialSetContactTangentFriction(material, f_x, 1);
 			}
 
 		} else {

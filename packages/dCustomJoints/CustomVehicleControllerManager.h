@@ -165,11 +165,8 @@ class CustomVehicleController: public CustomControllerBase
 				dFloat F = (gamma <= phyMax) ? (gamma * (1.0f - gamma / phyMax  + gamma * gamma / (3.0f * phyMax * phyMax))) : tireLoad;
 
 				dFloat fraction = F / gamma;
-				dFloat F_x = phy_x * fraction;
-				dFloat F_z = phy_z * fraction;
-
-				lateralForce = - F_z;
-				longitudinalForce = F_x;
+				lateralForce = - phy_z * fraction;
+				longitudinalForce = - phy_x * fraction;
 
 				aligningTorque = 0.0f;
 			}
