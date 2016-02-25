@@ -346,7 +346,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_hardwareDevice = 2;
 //m_showStatistics = true;
 //*/
-m_debugDisplayMode = 2;
+//m_debugDisplayMode = 2;
 m_showNormalForces = true;
 
 

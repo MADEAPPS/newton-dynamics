@@ -538,8 +538,8 @@ steeringVal *= 0.3f;
 		// check transmission type
 //		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 1
-	#if 0
+#if 0
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
@@ -1046,6 +1046,18 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
 			glEnd();
 		}
+
+		if (!strcmp(partName, "tireVelocity")) {
+			glLineWidth(2.0f);
+			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0(lines[0]);
+			dVector p1(lines[1]);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glEnd();
+		}
+
 
 		if (!strcmp(partName, "omega")) {
 			glLineWidth(2.0f);
