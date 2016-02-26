@@ -251,6 +251,7 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_vehicleTopSpeed;
 			dFloat m_reverseGearRatio;
 			dFloat m_gearRatios[10];
+
 			int m_gearsCount;
 			void* m_userData;
 
@@ -259,8 +260,8 @@ class CustomVehicleController: public CustomControllerBase
 
 			dFloat m_crownGearRatio;
 			dFloat m_peakPowerTorque;
-			dFloat m_engineIdleDryDrag;
-			dFloat m_engineIdleViscousDrag;
+			
+			
 			friend class BodyPartEngine;
 		};
 
@@ -296,6 +297,8 @@ class CustomVehicleController: public CustomControllerBase
 		DifferentialGear m_differential1;
 		dInterpolationCurve m_torqueRPMCurve;
 		dFloat m_norminalTorque;
+		dFloat m_idleDryFriction;
+		dFloat m_idleViscousFriction;
 		int m_currentGear;
 		int m_gearTimer;
 

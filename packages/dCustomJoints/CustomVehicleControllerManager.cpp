@@ -278,9 +278,10 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 class CustomVehicleController::EngineJoint: public CustomJoint
 {
 	public:
-	EngineJoint(NewtonBody* const engine, NewtonBody* const chassis, dFloat dryResistance)
+	EngineJoint(NewtonBody* const engine, NewtonBody* const chassis)
 		:CustomJoint(6, engine, chassis)
-		,m_dryResistance(dryResistance * 2.0f)
+		,m_fowardDryFriction (0.0f)
+		,m_reverseDryFriction(0.0f)
 	{
 		dMatrix engineMatrix;
 		NewtonBodyGetMatrix(engine, &engineMatrix[0][0]);
@@ -353,12 +354,13 @@ class CustomVehicleController::EngineJoint: public CustomJoint
 			NewtonBodySetAngularDamping(m_body0, &drag[0]);
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_front[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, -longOmega / timestep);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_dryResistance);
-			NewtonUserJointSetRowMaximumFriction(m_joint, 1000.0f);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_fowardDryFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_reverseDryFriction);
 		}
 	}
 
-	dFloat m_dryResistance;
+	dFloat m_fowardDryFriction;
+	dFloat m_reverseDryFriction;
 };
 
 
@@ -572,7 +574,7 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
 
-	EngineJoint* const engineJoint = new EngineJoint(m_body, m_parent->GetBody(), m_info.m_engineIdleDryDrag);
+	EngineJoint* const engineJoint = new EngineJoint(m_body, m_parent->GetBody());
 	m_joint = engineJoint;
 
 	m_differential0.m_leftGear = new DifferentialSpiderGearJoint (engineJoint, (WheelJoint*)m_differential0.m_leftTire->GetJoint());
@@ -637,6 +639,9 @@ void CustomVehicleController::BodyPartEngine::SetInfo(const Info& info)
 	m_infoCopy = info;
 	dFloat inertia = 2.0f * m_info.m_mass * m_info.m_radio * m_info.m_radio / 5.0f;
 	NewtonBodySetMassMatrix(m_body, m_info.m_mass, inertia, inertia, inertia);
+
+	EngineJoint* const engineJoint = (EngineJoint*) GetJoint();
+	engineJoint->m_reverseDryFriction = inertia * dAbs (100.0f);
 
 	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
 	NewtonBodySetLinearDamping(m_body, 0);
@@ -721,14 +726,14 @@ void CustomVehicleController::BodyPartEngine::InitEngineTorqueCurve()
 	}
 
 	m_torqueRPMCurve.InitalizeCurve(sizeof (rpsTable) / sizeof (rpsTable[0]), rpsTable, torqueTable);
-	m_info.m_engineIdleDryDrag = dMin (torqueTable[0], torqueTable[4]) * 0.5f;
+	m_idleDryFriction = dMin (torqueTable[0], torqueTable[4]) * 0.5f;
 
 	dFloat W = rpsTable[4];
-	dFloat T = m_torqueRPMCurve.GetValue(W) - m_info.m_engineIdleDryDrag;
+	dFloat T = m_torqueRPMCurve.GetValue(W) - m_idleDryFriction;
 
-	m_info.m_engineIdleViscousDrag = T / (W * W);
-	if (m_info.m_engineIdleViscousDrag < 1.0e-4f) {
-		m_info.m_engineIdleViscousDrag = 1.0e-4f;
+	m_idleViscousFriction = T / (W * W);
+	if (m_idleViscousFriction < 1.0e-4f) {
+		m_idleViscousFriction = 1.0e-4f;
 	}
 }
 
@@ -809,7 +814,7 @@ void CustomVehicleController::BodyPartEngine::Update(dFloat timestep, dFloat gas
 
 	dFloat W = (engineOmega % engineMatrix.m_front);
 	dFloat T = m_torqueRPMCurve.GetValue(W) * gasVal;
-	dFloat d = m_info.m_engineIdleViscousDrag;
+	dFloat d = m_idleViscousFriction;
 
 //T = 30;
 	m_norminalTorque = T - d * W * W;
