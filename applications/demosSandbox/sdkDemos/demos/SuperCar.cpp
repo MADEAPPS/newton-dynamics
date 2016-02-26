@@ -317,7 +317,7 @@ class SuperCarEntity: public DemoEntity
 	}
 
 	// this function is an example of how to make a high performance super car
-	void BuildFourWheelCar (int differentialType)
+	void BuildWheelCar (int differentialType)
 	{
 		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
 		dFloat width;
@@ -430,7 +430,7 @@ class SuperCarEntity: public DemoEntity
 	// this function is an example of how to make a high performance super car
 	void BuildFourWheelDriveSuperCar ()
 	{
-		BuildFourWheelCar (false);
+		BuildWheelCar (false);
 
 		int index = 0;
 		CustomVehicleController::BodyPartTire* tires[4];
@@ -1374,24 +1374,24 @@ void SuperCar (DemoEntityManager* const scene)
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
-		vehicle0->BuildFourWheelCar(2);
+		vehicle0->BuildWheelCar(2);
 		u -= 0.005f;
-*/
+
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
-		vehicle1->BuildFourWheelCar(0);
+		vehicle1->BuildWheelCar(0);
 		u -= 0.005f;
-/*
+*/
 		dMatrix location2 (manager->CalculateSplineMatrix (u));
 		location2.m_posit += location2.m_right.Scale ( 3.0f);
 		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
 		location2.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
-		vehicle2->BuildFourWheelCar(0);
+		vehicle2->BuildWheelCar(0);
 		u -= 0.01f;
-*/
+
 	}
 		
 	// build a muscle car from this vehicle controller
