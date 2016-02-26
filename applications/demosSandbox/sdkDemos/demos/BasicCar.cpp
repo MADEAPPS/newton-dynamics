@@ -73,8 +73,8 @@ static BasciCarParameters basicCarParameters =
 	  40.0f,	// ENGINE_MASS
 	  40.0f,	// TIRE_MASS
 	  0.5f,		// ENGINE_ARMATURE_RADIO;
-	 15.0f,	// STEER_ANGLE
-	2000.0f,	// BRAKE_TORQUE
+	  10.0f,	// STEER_ANGLE
+	4000.0f,	// BRAKE_TORQUE
 	  -0.2f,	// COM_Y_OFFSET
 	120.0f,		// TIRE_TOP_SPEED_KMH
 	 400.0f,	// IDLE_TORQUE
@@ -92,8 +92,8 @@ static BasciCarParameters basicCarParameters =
 	   0.40f,	// SUSPENSION_LENGTH
 	  50.0f,	// SUSPENSION_SPRING
 	   5.0f,	// SUSPENSION_DAMPER
-   7000.0f,		// LATERAL_STIFFNESS
-   7000.0f,		// LONGITUDINAL_STIFFNESS
+	  900.0f * DEMO_GRAVITY *  5.0f,		// LATERAL_STIFFNESS proportional to the vehicle weight
+	  900.0f * DEMO_GRAVITY *  2.0f,		// LONGITUDINAL_STIFFNESS proportional to the vehicle weight
 	   1.5f,	// ALIGNING_MOMENT_TRAIL
 	   BasciCarParameters::m_4WD,
 
@@ -585,11 +585,19 @@ class BasicCarEntity: public DemoEntity
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
 		dVector veloc;
 		NewtonBodyGetVelocity(chassisBody, &veloc[0]);
-		dVector q0(p0 + matrix[1].Scale(1.0f));
+		dVector q0(p0 + matrix[1].Scale(2.0f));
 		dVector q1(q0 + veloc.Scale(0.25f));
 		glColor3f(1.0f, 1.0f, 0.0f);
 		glVertex3f(q0.m_x, q0.m_y, q0.m_z);
 		glVertex3f(q1.m_x, q1.m_y, q1.m_z);
+
+		// draw vehicle front dir
+		dVector s0(p0 + matrix[1].Scale(2.0f));
+		dVector s1(q0 + matrix[0].Scale(1.0f));
+		glColor3f(0.5f, 0.5f, 0.5f);
+		glVertex3f(s0.m_x, s0.m_y, s0.m_z);
+		glVertex3f(s1.m_x, s1.m_y, s1.m_z);
+
 
 		//int xxx = 0;
 		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
@@ -854,6 +862,16 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 			glEnd();
 		}
 
+		if (!strcmp(partName, "lateralForce")) {
+			glLineWidth(2.0f);
+			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+			glBegin(GL_LINES);
+			dVector p0(lines[0]);
+			dVector p1(lines[1]);
+			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
+			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glEnd();
+		}
 
 		if (!strcmp(partName, "lateralForce")) {
 			glLineWidth(2.0f);

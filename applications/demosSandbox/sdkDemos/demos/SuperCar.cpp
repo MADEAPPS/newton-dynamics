@@ -58,7 +58,7 @@
 #define VIPER_REDLINE_TORQUE_RPM			6000.0f
 
 
-#define VIPER_TIRE_STEER_ANGLE				25.0f
+#define VIPER_TIRE_STEER_ANGLE				10.0f
 
 
 
@@ -66,8 +66,8 @@
 //#define VIPER_TIRE_TOP_SPEED				164 mile / hours
 #define VIPER_TIRE_TOP_SPEED_KMH			264.0f
 
-#define VIPER_TIRE_LATERAL_STIFFNESS		(VIPER_MASS * DEMO_GRAVITY * 2.0f)
-#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	(VIPER_MASS * DEMO_GRAVITY * 2.0f)
+#define VIPER_TIRE_LATERAL_STIFFNESS		(VIPER_MASS * DEMO_GRAVITY * 10.0f)
+#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	(VIPER_MASS * DEMO_GRAVITY *  2.0f)
 
 #define VIPER_TIRE_ALIGNING_MOMENT_TRAIL	0.5f
 #define VIPER_TIRE_SUSPENSION_SPRING		150.0f
@@ -563,6 +563,7 @@ steeringVal *= 0.3f;
 			fread (&engineGasPedal, sizeof (dFloat), 1, file);
 			fread (&handBrakePedal, sizeof (dFloat), 1, file);
 			fread (&brakePedal, sizeof (dFloat), 1, file);
+//steeringVal *= -1;
 		}
 	#endif
 #endif
@@ -1058,7 +1059,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glEnd();
 		}
 
-
 		if (!strcmp(partName, "omega")) {
 			glLineWidth(2.0f);
 			glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
@@ -1069,7 +1069,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
 			glEnd();
 		}
-
 
 		if (!strcmp (partName, "lateralForce")) {
 			glLineWidth(2.0f);

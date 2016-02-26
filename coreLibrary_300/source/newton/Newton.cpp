@@ -4096,7 +4096,7 @@ NEWTON_API int NewtonCollisionIsStaticShape (const NewtonCollision* const collis
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*)collision;
-	return (instance->IsType(dgCollision::dgCollisionMesh_RTTI) || instance->IsType(dgCollision::dgCollisionMesh_RTTI)) ? 1 : 0;
+	return (instance->IsType(dgCollision::dgCollisionMesh_RTTI) || instance->IsType(dgCollision::dgCollisionScene_RTTI)) ? 1 : 0;
 }
 
 // Name: NewtonCollisionSetUserID 

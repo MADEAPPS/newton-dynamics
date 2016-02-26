@@ -624,42 +624,41 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 			i0 = i;
 		}
 
-// for the time being for the minkousky contact calculation
-inside = false;
+		dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
+		if (m_faceClipSize > convexSphapeUmbra) {
+			BeamClipping(boxOrigin, convexSphapeUmbra);
+			m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
+		}
+
 		const dgInt32 hullId = hull->GetUserDataID();
 		if (inside) {
+
 			dgVector normalInHull (proxy.m_matrix.RotateVector (m_normal.Scale4 (dgFloat32 (-1.0f))));
 			dgVector pointInHull (hull->SupportVertex (normalInHull, NULL));
 			dgVector p0 (proxy.m_matrix.UntransformVector (pointInHull));
 
 			dgFloat32 timetoImpact = dgFloat32 (0.0f);
-			//dgFloat32 closestDistance = dgFloat32 (0.0f);
-dgAssert (0);			
-//			dgFloat32 penetration = (m_localPoly[0] - p0) % m_normal + proxy.m_skinThickness + DG_IMPULSIVE_CONTACT_PENETRATION;
 			dgFloat32 penetration = (m_localPoly[0] - p0) % m_normal + proxy.m_skinThickness;
 			if (penetration < dgFloat32 (0.0f)) {
 				timetoImpact = penetration / (polyRelativeVeloc % m_normal);
 				dgAssert (timetoImpact >= dgFloat32 (0.0f));
-//				closestDistance = -penetration;
 			}
 
 			if (timetoImpact <= proxy.m_timestep) {
 				dgVector pointsContacts[64];
 
 				contactJoint->m_closestDistance = penetration;
-dgAssert (0);
 //				dgVector point (pointInHull - normalInHull.Scale4(DG_IMPULSIVE_CONTACT_PENETRATION));
 				dgVector point (pointInHull);
 
 				count = hull->CalculatePlaneIntersection (normalInHull, point, pointsContacts, 1.0f);
-dgAssert (0);
 //				dgVector step (hullRelativeVeloc.Scale3 (timetoImpact) + normalInHull.Scale4(DG_IMPULSIVE_CONTACT_PENETRATION));
-				dgVector step (hullRelativeVeloc.Scale3 (timetoImpact));
+				dgVector step (hullRelativeVeloc.Scale4 (timetoImpact));
 
 				penetration = dgMax (penetration, dgFloat32 (0.0f));
 				const dgMatrix& worldMatrix = hull->m_globalMatrix;
 				dgContactPoint* const contactsOut = proxy.m_contacts;
-				dgVector globalNormal (worldMatrix.RotateVector(normalInHull));
+				dgVector globalNormal (worldMatrix.RotateVector(normalInHull.Scale4 (dgFloat32 (-1.0f))));
 				for (dgInt32 i = 0; i < count; i ++) {
 					contactsOut[i].m_point = worldMatrix.TransformVector (pointsContacts[i] + step);
 					contactsOut[i].m_normal = globalNormal;
@@ -669,11 +668,6 @@ dgAssert (0);
 				}
 			}
 		} else {
-			dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize ();
-			if (m_faceClipSize > convexSphapeUmbra) {
-				BeamClipping (boxOrigin, convexSphapeUmbra);
-				m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
-			}
 
 			dgCollisionConvex* const convexShape = (dgCollisionConvex*) hull->m_childShape;
 			count = convexShape->CalculateConvexCastContacts (proxy);
@@ -726,8 +720,6 @@ dgAssert (0);
 	proxy.m_matrix = savedProxyMatrix;
 	return count;
 }
-
-
 
 
 dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisionParamProxy& proxy, const dgVector& polyInstanceScale, const dgVector& polyInstanceInvScale)
@@ -809,6 +801,12 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 		i0 = i;
 	}
 
+	dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
+	if (m_faceClipSize > convexSphapeUmbra) {
+		BeamClipping(dgVector(dgFloat32(0.0f)), convexSphapeUmbra);
+		m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
+	}
+
 	const dgInt32 hullId = hull->GetUserDataID();
 	if (inside & !proxy.m_intersectionTestOnly) {
 		dgAssert(penetration >= dgFloat32(0.0f));
@@ -832,12 +830,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(dgCollisi
 			contactsOut[i].m_penetration = penetration;
 		}
 	} else {
-		dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
-		if (m_faceClipSize > convexSphapeUmbra) {
-			BeamClipping(dgVector(dgFloat32(0.0f)), convexSphapeUmbra);
-			m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
-		}
-
 		dgCollisionConvex* const convexShape = (dgCollisionConvex*)hull->m_childShape;
 		count = convexShape->CalculateConvexToConvexContact(proxy);
 		dgAssert(proxy.m_intersectionTestOnly || (count >= 0));

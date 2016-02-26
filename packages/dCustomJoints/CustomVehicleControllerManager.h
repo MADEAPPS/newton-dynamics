@@ -148,7 +148,7 @@ class CustomVehicleController: public CustomControllerBase
 			virtual dFloat GetFrictionCoefficient(const NewtonMaterial* const material, const NewtonBody* const tireBody, const NewtonBody* const otherBody) const
 			{
 				//return 1.5f;
-				return 1.0f;
+				return 1.2f;
 			}
 
 			// Using brush tire model explained on this paper
@@ -156,10 +156,11 @@ class CustomVehicleController: public CustomControllerBase
 			// 
 			virtual void GetForces(const BodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat longitudinalSlip, dFloat lateralSlip, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
 			{
-				tireLoad *= GetFrictionCoefficient (material, tire->GetBody(), otherBody);
 				dFloat phy_z = lateralSlip * tire->m_data.m_lateralStiffness;
 				dFloat phy_x = longitudinalSlip * tire->m_data.m_longitudialStiffness;
 				dFloat gamma = dSqrt(phy_x * phy_x + phy_z * phy_z);
+
+				tireLoad *= GetFrictionCoefficient (material, tire->GetBody(), otherBody);
 				dFloat phyMax = 3.0f * tireLoad + 1.0f;
 
 				dFloat F = (gamma <= phyMax) ? (gamma * (1.0f - gamma / phyMax  + gamma * gamma / (3.0f * phyMax * phyMax))) : tireLoad;
