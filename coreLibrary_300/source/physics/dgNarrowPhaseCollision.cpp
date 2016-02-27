@@ -1199,7 +1199,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 	dgBody* const body0 = contact->m_body0;
 	dgBody* const body1 = contact->m_body1;
 	const dgContactMaterial* const material = contact->m_material;
-	dgCollisionParamProxy proxy(contact, NULL, threadIndex, true, false);
+	dgCollisionParamProxy proxy(contact, NULL, threadIndex, true, true);
 
 	proxy.m_maxContacts = 0;
 	proxy.m_timestep = timestep;

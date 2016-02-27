@@ -516,8 +516,6 @@ dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& no
 }
 
 
-
-
 dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollisionParamProxy& proxy, const dgVector& polyInstanceScale, const dgVector& polyInstanceInvScale)
 {
 	dgAssert (proxy.m_referenceCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
@@ -648,23 +646,27 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue (dgCollis
 				dgVector pointsContacts[64];
 
 				contactJoint->m_closestDistance = penetration;
-//				dgVector point (pointInHull - normalInHull.Scale4(DG_IMPULSIVE_CONTACT_PENETRATION));
-				dgVector point (pointInHull);
+				proxy.m_timestep = timetoImpact;
 
-				count = hull->CalculatePlaneIntersection (normalInHull, point, pointsContacts, 1.0f);
-//				dgVector step (hullRelativeVeloc.Scale3 (timetoImpact) + normalInHull.Scale4(DG_IMPULSIVE_CONTACT_PENETRATION));
-				dgVector step (hullRelativeVeloc.Scale4 (timetoImpact));
+				if (!proxy.m_intersectionTestOnly) {
+	//				dgVector point (pointInHull - normalInHull.Scale4(DG_IMPULSIVE_CONTACT_PENETRATION));
+					dgVector point (pointInHull);
 
-				penetration = dgMax (penetration, dgFloat32 (0.0f));
-				const dgMatrix& worldMatrix = hull->m_globalMatrix;
-				dgContactPoint* const contactsOut = proxy.m_contacts;
-				dgVector globalNormal (worldMatrix.RotateVector(normalInHull.Scale4 (dgFloat32 (-1.0f))));
-				for (dgInt32 i = 0; i < count; i ++) {
-					contactsOut[i].m_point = worldMatrix.TransformVector (pointsContacts[i] + step);
-					contactsOut[i].m_normal = globalNormal;
-					contactsOut[i].m_shapeId0 = hullId;
-					contactsOut[i].m_shapeId1 = m_faceId;
-					contactsOut[i].m_penetration = penetration;
+					count = hull->CalculatePlaneIntersection (normalInHull, point, pointsContacts, 1.0f);
+	//				dgVector step (hullRelativeVeloc.Scale3 (timetoImpact) + normalInHull.Scale4(DG_IMPULSIVE_CONTACT_PENETRATION));
+					dgVector step (hullRelativeVeloc.Scale4 (timetoImpact));
+
+					penetration = dgMax (penetration, dgFloat32 (0.0f));
+					const dgMatrix& worldMatrix = hull->m_globalMatrix;
+					dgContactPoint* const contactsOut = proxy.m_contacts;
+					dgVector globalNormal (worldMatrix.RotateVector(normalInHull.Scale4 (dgFloat32 (-1.0f))));
+					for (dgInt32 i = 0; i < count; i ++) {
+						contactsOut[i].m_point = worldMatrix.TransformVector (pointsContacts[i] + step);
+						contactsOut[i].m_normal = globalNormal;
+						contactsOut[i].m_shapeId0 = hullId;
+						contactsOut[i].m_shapeId1 = m_faceId;
+						contactsOut[i].m_penetration = penetration;
+					}
 				}
 			}
 		} else {
