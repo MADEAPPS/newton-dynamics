@@ -1393,9 +1393,6 @@ void SuperCar (DemoEntityManager* const scene)
 		u -= 0.01f;
 
 	}
-		
-	// build a muscle car from this vehicle controller
-	//vehicle->BuildRearWheelDriveMuscleCar();
 
 	CustomVehicleController* const controller = &manager->GetLast()->GetInfo();
 	SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());

@@ -596,6 +596,82 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 	return totalCount;
 }
 
+dgInt32 dgBroadPhase::Collide(const dgBroadPhaseNode** stackPool, dgInt32* const ovelapStack, dgInt32 stack, const dgVector& boxP0, const dgVector& boxP1, dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
+{
+	dgTriplex points[DG_CONVEX_CAST_POOLSIZE];
+	dgTriplex normals[DG_CONVEX_CAST_POOLSIZE];
+	dgFloat32 penetration[DG_CONVEX_CAST_POOLSIZE];
+	dgInt64 attributeA[DG_CONVEX_CAST_POOLSIZE];
+	dgInt64 attributeB[DG_CONVEX_CAST_POOLSIZE];
+
+	dgInt32 totalCount = 0;
+	while (stack) {
+		stack--;
+
+		dgInt32 test = ovelapStack[stack];
+		if (test) {
+			const dgBroadPhaseNode* const me = stackPool[stack];
+
+			dgBody* const body = me->GetBody();
+			if (body) {
+				if (!PREFILTER_RAYCAST(prefilter, body, shape, userData)) {
+					dgInt32 count = m_world->Collide(shape, matrix, body->m_collision, body->m_matrix, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
+
+					if (count) {
+						bool teminate = false;
+						if (count >= (maxContacts - totalCount)) {
+							count = maxContacts - totalCount;
+							teminate = true;
+						}
+
+						for (dgInt32 i = 0; i < count; i++) {
+							info[totalCount].m_point[0] = points[i].m_x;
+							info[totalCount].m_point[1] = points[i].m_y;
+							info[totalCount].m_point[2] = points[i].m_z;
+							info[totalCount].m_point[3] = dgFloat32(0.0f);
+							info[totalCount].m_normal[0] = normals[i].m_x;
+							info[totalCount].m_normal[1] = normals[i].m_y;
+							info[totalCount].m_normal[2] = normals[i].m_z;
+							info[totalCount].m_normal[3] = dgFloat32(0.0f);
+							info[totalCount].m_penetration = penetration[i];
+							info[totalCount].m_contaID = attributeB[i];
+							info[totalCount].m_hitBody = body;
+							totalCount++;
+						}
+
+						if (teminate) {
+							break;
+						}
+					}
+				}
+			} else if (me->IsAggregate()) {
+				dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)me;
+				const dgBroadPhaseNode* const node = aggregate->m_root;
+				if (node) {
+					stackPool[stack] = node;
+					ovelapStack[stack] = dgOverlapTest(node->m_minBox, node->m_maxBox, boxP0, boxP1);
+					stack++;
+					dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
+				}
+
+			} else {
+				dgBroadPhaseTreeNode* const node = (dgBroadPhaseTreeNode*)me;
+				const dgBroadPhaseNode* const left = node->m_left;
+				stackPool[stack] = left;
+				ovelapStack[stack] = dgOverlapTest(left->m_minBox, left->m_maxBox, boxP0, boxP1);
+				stack ++;
+				dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
+
+				const dgBroadPhaseNode* const right = node->m_right;
+				stackPool[stack] = right;
+				ovelapStack[stack] = dgOverlapTest(right->m_minBox, right->m_maxBox, boxP0, boxP1);
+				stack++;
+				dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
+			}
+		}
+	}
+	return totalCount;
+}
 
 void dgBroadPhase::RayCast(const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& l0, const dgVector& l1, dgFastRayTest& ray, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const
 {

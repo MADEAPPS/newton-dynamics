@@ -143,6 +143,26 @@ dgInt32 dgBroadPhaseDefault::ConvexCast(dgCollisionInstance* const shape, const 
 	return totalCount;
 }
 
+dgInt32 dgBroadPhaseDefault::Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
+{
+	dgInt32 totalCount = 0;
+	if (m_rootNode) {
+		dgVector boxP0;
+		dgVector boxP1;
+		dgAssert(matrix.TestOrthogonal());
+		shape->CalcAABB(matrix, boxP0, boxP1);
+
+		dgInt32 overlaped[DG_BROADPHASE_MAX_STACK_DEPTH];
+		const dgBroadPhaseNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
+
+		stackPool[0] = m_rootNode;
+		overlaped[0] = dgOverlapTest(m_rootNode->m_minBox, m_rootNode->m_maxBox, boxP0, boxP1);
+
+		totalCount = dgBroadPhase::Collide(stackPool, overlaped, 1, boxP0, boxP1, shape, matrix, prefilter, userData, info, maxContacts, threadIndex);
+	}
+
+	return totalCount;
+}
 
 void dgBroadPhaseDefault::AddNode(dgBroadPhaseNode* const newNode)
 {

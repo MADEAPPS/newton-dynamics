@@ -1291,9 +1291,8 @@ int NewtonWorldCollide (const NewtonWorld* const newtonWorld, const dFloat* cons
 					   NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, int maxContactsCount, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	
-	dgAssert (0);
-	return 0;
+	Newton* const world = (Newton *)newtonWorld;
+	return world->GetBroadPhase()->Collide((dgCollisionInstance*)shape, dgMatrix(matrix), (OnRayPrecastAction)prefilter, userData, (dgConvexCastReturnInfo*)info, maxContactsCount, threadIndex);
 }
 
 

@@ -507,3 +507,34 @@ dgInt32 dgBroadPhasePersistent::ConvexCast(dgCollisionInstance* const shape, con
 	return totalCount;
 }
 
+dgInt32 dgBroadPhasePersistent::Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
+{
+	dgInt32 totalCount = 0;
+	if (m_rootNode) {
+		dgVector boxP0;
+		dgVector boxP1;
+		dgAssert(matrix.TestOrthogonal());
+		shape->CalcAABB(matrix, boxP0, boxP1);
+
+		dgInt32 overlaped[DG_BROADPHASE_MAX_STACK_DEPTH];
+		const dgBroadPhaseNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
+
+		dgInt32 stack = 0;
+		dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
+		if (dgOverlapTest(m_rootNode->m_minBox, m_rootNode->m_maxBox, boxP0, boxP1)) {
+			if (root->m_left) {
+				stackPool[stack] = root->m_left;
+				overlaped[stack] = dgOverlapTest(root->m_left->m_minBox, root->m_left->m_maxBox, boxP0, boxP1);
+				stack ++;
+			}
+			if (root->m_left) {
+				stackPool[stack] = root->m_right;
+				overlaped[stack] = dgOverlapTest(root->m_right->m_minBox, root->m_right->m_maxBox, boxP0, boxP1);
+				stack++;
+			}
+			totalCount = dgBroadPhase::Collide(stackPool, overlaped, 1, boxP0, boxP1, shape, matrix, prefilter, userData, info, maxContacts, threadIndex);
+		}
+	}
+
+	return totalCount;
+}
