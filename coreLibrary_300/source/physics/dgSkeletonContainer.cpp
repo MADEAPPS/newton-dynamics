@@ -369,7 +369,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 	dgSkeletonGraph* m_sibling;
 	dgInt16 m_index;
 	dgInt16 m_dof;
-	dgInt8 m_sourceJacobianIndex[6];
+	dgInt16 m_sourceJacobianIndex[6];
 } DG_GCC_VECTOR_ALIGMENT;
 
 

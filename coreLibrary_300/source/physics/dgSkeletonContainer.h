@@ -81,7 +81,7 @@ class dgSkeletonContainer
 	dgFloat32 m_errorCorrection;
 	dgInt32 m_id;
 	dgInt32 m_lru;
-	dgInt8 m_nodeCount;
+	dgInt16 m_nodeCount;
 	dgInt8 m_skeletonHardMotors;
 	static dgInt32 m_uniqueID;
 	static dgInt32 m_lruMarker;
