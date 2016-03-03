@@ -42,6 +42,10 @@ class SimpleSoftBodyEntity: public DemoEntity
 		dVector origin;
 		dVector inertia;
 		NewtonConvexCollisionCalculateInertialMatrix (softCollision, &inertia[0], &origin[0]);	
+// hack until I get back to this
+inertia[0] = 1.0f;
+inertia[1] = 1.0f;
+inertia[2] = 1.0f;
 
 		dFloat mass = 8.0f;
 		dFloat Ixx = mass * inertia[0];
