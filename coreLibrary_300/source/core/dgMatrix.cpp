@@ -433,56 +433,39 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 
 }
 
-/*
-class EigenVectorMatrix
-{
-	void HouseholderFactorization(void)
-	{
-		dgFloat32 fM00 = mElement[0][0];
-		dgFloat32 fM01 = mElement[0][1];
-		dgFloat32 fM02 = mElement[0][2];
-		dgFloat32 fM11 = mElement[1][1];
-		dgFloat32 fM12 = mElement[1][2];
-		dgFloat32 fM22 = mElement[2][2];
 
-		m_afDiag[0] = fM00;
-		m_afSubd[2] = 0.0f;
-		if (fM02 != 0.0f)
-		{
-			dgFloat32 fLength = sqrtf(fM01*fM01+fM02*fM02);
-			dgFloat32 fInvLength = (1.0f)/fLength;
-			fM01 *= fInvLength;
-			fM02 *= fInvLength;
-			dgFloat32 fQ = (2.0f)*fM01*fM12+fM02*(fM22-fM11);
-			m_afDiag[1] = fM11+fM02*fQ;
-			m_afDiag[2] = fM22-fM02*fQ;
-			m_afSubd[0] = fLength;
-			m_afSubd[1] = fM12-fM01*fQ;
-			mElement[0][0] = 1.0f;
-			mElement[0][1] = 0.0f;
-			mElement[0][2] = 0.0f;
-			mElement[1][0] = 0.0f;
-			mElement[1][1] = fM01;
-			mElement[1][2] = fM02;
-			mElement[2][0] = 0.0f;
-			mElement[2][1] = fM02;
-			mElement[2][2] = -fM01;
-		}
-		else
-		{
-			m_afDiag[1] = fM11;
-			m_afDiag[2] = fM22;
-			m_afSubd[0] = fM01;
-			m_afSubd[1] = fM12;
-			mElement[0][0] = 1.0f;
-			mElement[0][1] = 0.0f;
-			mElement[0][2] = 0.0f;
-			mElement[1][0] = 0.0f;
-			mElement[1][1] = 1.0f;
-			mElement[1][2] = 0.0f;
-			mElement[2][0] = 0.0f;
-			mElement[2][1] = 0.0f;
-			mElement[2][2] = 1.0f;
+class dgEigenVectorMatrix: public dgMatrix
+{
+	void HouseholderFactorization()
+	{
+		dgMatrix& me = *this;
+		m_eigenValues[0] = me[0][0];
+		m_offDiagonal[2] = dgFloat32 (0.0f);
+		if (dgAbsf (me[0][2]) > dgFloat32 (1.0e-6f)) {
+			dgFloat32 a01 = me[0][1];
+			dgFloat32 a02 = me[0][2];
+
+			dgFloat32 mag = dgSqrt(a01 * a01 + a02 * a02);
+			dgFloat32 invMag = (1.0f) / mag;
+			a01 *= invMag;
+			a02 *= invMag;
+
+			dgFloat32 q = dgFloat32 (2.0f) * a01 * me[1][2] + a02 * (me[2][2] - me[1][1]);
+
+			m_offDiagonal[0] = mag;
+			m_offDiagonal[1] = me[1][2] - a01 * q;
+			m_eigenValues[1] = me[1][1] + a02 * q;
+			m_eigenValues[2] = me[2][2] - a02 * q;
+
+			me[0] = dgVector (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
+			me[1] = dgVector (dgFloat32 (0.0f), a01,  a02, dgFloat32 (0.0f)); 
+			me[2] = dgVector (dgFloat32 (0.0f), a02, -a01, dgFloat32 (0.0f)); 
+		} else {
+			m_eigenValues[1] = me[1][1];
+			m_eigenValues[2] = me[2][2];
+			m_offDiagonal[0] = me[0][1];
+			m_offDiagonal[1] = me[1][2];
+			me = dgGetIdentityMatrix();
 		}
 	}
 
@@ -563,21 +546,42 @@ class EigenVectorMatrix
 	}
 
 	public:
-	void DecrSortEigenStuff(void)
+	dgEigenVectorMatrix(const dgMatrix& matrix)
+		:dgMatrix (matrix)
 	{
 		HouseholderFactorization(); 
-		QLFactorizatiuon();
+
+		dgMatrix xxx (dgGetIdentityMatrix());
+		xxx[0][0] = m_eigenValues[0];
+		xxx[1][1] = m_eigenValues[1];
+		xxx[2][2] = m_eigenValues[2];
+
+		xxx[0][1] = m_offDiagonal[0];
+		xxx[1][0] = m_offDiagonal[0];
+		xxx[1][2] = m_offDiagonal[1];
+		xxx[2][1] = m_offDiagonal[1];
+
+		dgMatrix& me = *this;
+		dgMatrix xxx1 (me.Inverse() * xxx * me);
+		dgMatrix xxx2 (me * xxx * me.Inverse());
+		dgMatrix xxx3 (me * xxx * me.Inverse());
+
+//		QLFactorizatiuon();
 	}
 
-	dgFloat32 mElement[3][3];
 	private:
+	dgVector m_eigenValues;
+	dgVector m_offDiagonal;
+	dgFloat32 mElement[3][3];
 	dgFloat32 m_afDiag[3];
 	dgFloat32 m_afSubd[3];
 };
-*/
+
 
 void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess)
 {
+	dgEigenVectorMatrix(*this);
+
 	dgFloat32 b[3];
 	dgFloat32 z[3];
 	dgFloat32 d[3];
