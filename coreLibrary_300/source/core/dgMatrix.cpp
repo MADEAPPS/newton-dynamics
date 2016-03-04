@@ -258,12 +258,12 @@ dgMatrix dgMatrix::Symetric3by3Inverse () const
 			}
 		}
 	}
-
+	
 #ifdef _DEBUG
 	dgMatrix test(*this * inverse);
-	dgAssert (dgAbsf (test[0][0] - dgFloat32(1.0f)) < dgFloat32(0.01f));
-	dgAssert (dgAbsf (test[1][1] - dgFloat32(1.0f)) < dgFloat32(0.01f));
-	dgAssert (dgAbsf (test[2][2] - dgFloat32(1.0f)) < dgFloat32(0.01f));
+	dgAssert(dgAbsf(test[0][0] - dgFloat32(1.0f)) < dgFloat32(0.01f));
+	dgAssert(dgAbsf(test[1][1] - dgFloat32(1.0f)) < dgFloat32(0.01f));
+	dgAssert(dgAbsf(test[2][2] - dgFloat32(1.0f)) < dgFloat32(0.01f));
 #endif
 
 	return inverse;
@@ -407,6 +407,17 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 	}
 */
 
+// test the fucking factorization 
+dgMatrix xxxxx(dgRollMatrix(30.0f * 3.1416f / 180.0f));
+xxxxx = dgYawMatrix(30.0f * 3.1416f / 180.0f) * xxxxx;
+dgMatrix xxxxx1(dgGetIdentityMatrix());
+xxxxx1[0][0] = 2.0f;
+dgMatrix xxxxx2(xxxxx.Inverse() * xxxxx1 * xxxxx);
+dgMatrix xxxxx3 (xxxxx2);
+xxxxx2.EigenVectors(scale);
+dgMatrix xxxxx4(xxxxx2.Inverse() * xxxxx1 * xxxxx2);
+
+
 	//dgFloat32 sign = ((((*this)[0] * (*this)[1]) % (*this)[2]) > 0.0f) ? 1.0f : -1.0f;
 	dgFloat32 sign = dgSign(((*this)[0] * (*this)[1]) % (*this)[2]);
 	stretchAxis = (*this) * Transpose();
@@ -434,111 +445,71 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 }
 
 
-DG_INLINE void dgEigenVectorMatrix::HouseholderFactorization(const dgMatrix& matrix)
+/*
+for some reason I cannot get this to work
+void dgMatrix::EigenVectors (dgVector& eigenValues, const dgMatrix& initialGuess)
 {
-	m_eigenValues[0][0] = matrix[0][0];
-	m_eigenValues[0][2] = dgFloat32 (0.0f);
-	m_eigenValues[2][0] = dgFloat32 (0.0f);
-	m_eigenValues[0][3] = dgFloat32 (0.0f);
-	m_eigenValues[1][3] = dgFloat32 (0.0f);
-	m_eigenValues[2][3] = dgFloat32 (0.0f);
-	m_eigenValues[3] = dgVector::m_wOne; 
-	if (dgAbsf (matrix[0][2]) > dgFloat32 (1.0e-6f)) {
-		dgFloat32 a01 = matrix[0][1];
-		dgFloat32 a02 = matrix[0][2];
+	dgVector xxx1;
+	dgMatrix xxx0 (*this);
+	xxx0.EigenVectors____ (xxx1, initialGuess);
 
-		dgFloat32 mag = dgSqrt(a01 * a01 + a02 * a02);
-		dgFloat32 invMag = (1.0f) / mag;
-		a01 *= invMag;
-		a02 *= invMag;
+	static dgInt32 offDiagonalIndex[][2] = {{0, 1}, {0, 2}, {1, 2}};
 
-		dgFloat32 q = dgFloat32 (2.0f) * a01 * matrix[1][2] + a02 * (matrix[2][2] - matrix[1][1]);
+	dgMatrix eigenVector (dgGetIdentityMatrix());
+	dgMatrix& mat = *this;
 
-		m_eigenValues[0][1] = mag;
-		m_eigenValues[1][0] = mag;
-		m_eigenValues[1][2] = matrix[1][2] - a01 * q;
-		m_eigenValues[2][1] = m_eigenValues[1][2];
-		m_eigenValues[1][1] = matrix[1][1] + a02 * q;
-		m_eigenValues[2][2] = matrix[2][2] - a02 * q;
+	for (dgInt32 m = 0; m < 20; m ++) {
+		dgFloat32 ajk[3];
+		ajk[0] = dgAbsf(mat[0][1]);
+		ajk[1] = dgAbsf(mat[0][2]);
+		ajk[2] = dgAbsf(mat[1][2]);
+		dgFloat32 sm = ajk[0] + ajk[1] + ajk[2];
+		if (sm < dgFloat32 (1.0e-12f)) {
+			eigenValues = dgVector (mat[0][0], mat[1][1], mat[2][2], dgFloat32 (1.0f));
+			*this = eigenVector;
+			return;
+		}
 
-		dgMatrix& me = *this;
-		me[0] = dgVector (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-		me[1] = dgVector (dgFloat32 (0.0f), a01,  a02, dgFloat32 (0.0f)); 
-		me[2] = dgVector (dgFloat32 (0.0f), a02, -a01, dgFloat32 (0.0f)); 
-	} else {
-		m_eigenValues[1][1] = matrix[1][1];
-		m_eigenValues[2][2] = matrix[2][2];
-		m_eigenValues[0][1] = matrix[0][1];
-		m_eigenValues[1][0] = matrix[0][1];
-		m_eigenValues[1][2] = matrix[1][2];
-		m_eigenValues[2][1] = matrix[1][2];
+		dgInt32 index = 0;
+		dgFloat32 maxA = ajk[0];
+		if (maxA < ajk[1]) {
+			index = 1;
+			maxA = ajk[1];
+		}
 
-		dgMatrix& me = *this;
-		me = dgGetIdentityMatrix();
+		if (maxA < ajk[2]) {
+			index = 2;
+			maxA = ajk[2];
+		}
+
+		dgInt32 j = offDiagonalIndex[index][0];
+		dgInt32 k = offDiagonalIndex[index][1];
+
+		dgFloat32 Ajj = mat[j][j];
+		dgFloat32 Akk = mat[k][k];
+		dgFloat32 Ajk = mat[j][k];
+		dgFloat32 phi = dgFloat32 (0.5f) * dgAtan2 (dgFloat32 (2.0f) * Ajk, Akk - Ajj);
+
+		dgFloat32 c = dgCos (phi);
+		dgFloat32 s = dgSin (phi);
+
+		dgMatrix givensRotation (dgGetIdentityMatrix());
+		givensRotation[j][j] = c;
+		givensRotation[k][k] = c;
+		givensRotation[j][k] = -s;
+		givensRotation[k][j] = s;
+
+		eigenVector = eigenVector * givensRotation;
+		mat = givensRotation * mat * givensRotation.Transpose();
+		mat[j][k] = dgFloat32 (0.0f);
+		mat[k][j] = dgFloat32 (0.0f);
 	}
+	dgAssert (0);
 }
-
-DG_INLINE void dgEigenVectorMatrix::RQFactorizatiuon()
-{
-	dgMatrix& eigenVectors = *this;
-	if (dgAbsf (m_eigenValues[1][0]) > dgFloat32 (1.0e-6f)) { 
-		dgMatrix givenRotation (dgGetIdentityMatrix());
-
-		dgFloat32 cosAngle = m_eigenValues[0][0];
-		dgFloat32 sinAngle = m_eigenValues[1][0];
-		dgFloat32 den = dgRsqrt (sinAngle * sinAngle + cosAngle * cosAngle);
-		sinAngle *= den;
-		cosAngle *= den;
-
-		givenRotation[0][0] = cosAngle;
-		givenRotation[1][1] = cosAngle;
-		givenRotation[0][1] = sinAngle;
-		givenRotation[1][0] = -sinAngle;
-
-		m_eigenValues = givenRotation * m_eigenValues;
-		//givenRotation[0][1] = -sinAngle;
-		//givenRotation[1][0] = sinAngle;
-		eigenVectors = eigenVectors * givenRotation;
-	}
-	m_eigenValues[1][0] = dgFloat32 (0.0f);
-
-	if (dgAbsf (m_eigenValues[2][1]) > dgFloat32 (1.0e-6f)) { 
-		dgMatrix givenRotation (dgGetIdentityMatrix());
-		dgFloat32 cosAngle = m_eigenValues[1][1];
-		dgFloat32 sinAngle = m_eigenValues[2][1];
-		dgFloat32 den = dgRsqrt (sinAngle * sinAngle + cosAngle * cosAngle);
-		sinAngle *= den;
-		cosAngle *= den;
-
-		givenRotation[1][1] = cosAngle;
-		givenRotation[2][2] = cosAngle;
-		givenRotation[1][2] = sinAngle;
-		givenRotation[2][1] = -sinAngle;
-
-		m_eigenValues = givenRotation * m_eigenValues;
-		//givenRotation[1][2] = -sinAngle;
-		//givenRotation[2][1] = sinAngle;
-		eigenVectors = eigenVectors * givenRotation;
-	}
-	m_eigenValues[2][1] = dgFloat32 (0.0f);
-}
-
-
-dgEigenVectorMatrix::dgEigenVectorMatrix(const dgMatrix& matrix)
-{
-	HouseholderFactorization(matrix); 
-	RQFactorizatiuon();
-
-//	dgMatrix& me = *this;
-//	dgMatrix xxx2 (me * m_eigenValues * me.Inverse());
-//	dgMatrix xxx3 (me * m_eigenValues * me.Inverse());
-}
-
+*/
 
 void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess)
 {
-	dgEigenVectorMatrix xxx (*this);
-
 	dgFloat32 b[3];
 	dgFloat32 z[3];
 	dgFloat32 d[3];

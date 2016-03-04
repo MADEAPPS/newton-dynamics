@@ -105,22 +105,6 @@ class dgMatrix
 } DG_GCC_VECTOR_ALIGMENT;
 
 
-class dgEigenVectorMatrix: public dgMatrix
-{
-	DG_INLINE void RQFactorizatiuon();
-	DG_INLINE void HouseholderFactorization(const dgMatrix& matrix);
-
-	public:
-	dgEigenVectorMatrix(const dgMatrix& matrix);
-
-	dgVector GetEgineValues () const 
-	{
-		return dgVector (m_eigenValues[0][0], m_eigenValues[0][0], m_eigenValues[0][0], dgFloat32 (0.0f));
-	}
-
-	private:
-	dgMatrix m_eigenValues;
-};
 
 DG_INLINE dgMatrix::dgMatrix ()
 {
