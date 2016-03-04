@@ -196,7 +196,6 @@ void dgMatrix::TransformBBox (const dgVector& p0local, const dgVector& p1local, 
 
 	p0 = center - extends;
 	p1 = center + extends;
-
 }
 
 dgMatrix dgMatrix::Inverse4x4 () const
@@ -269,10 +268,6 @@ dgMatrix dgMatrix::Symetric3by3Inverse () const
 	return inverse;
 }
 
-
-
-
-
 void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 {
 	const dgMatrix& matrix = *this;
@@ -344,8 +339,7 @@ void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 }
 
 
-
-void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix& initialStretchAxis) const
+void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix* const initialStretchAxis) const
 {
 	// a polar decomposition decompose matrix A = O * S
 	// where S = sqrt (transpose (L) * L)
@@ -508,11 +502,14 @@ void dgMatrix::EigenVectors (dgVector& eigenValues, const dgMatrix& initialGuess
 }
 */
 
-void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess)
+void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initialGuess)
 {
 	dgMatrix& mat = *this;
-	dgMatrix eigenVectors (initialGuess);
-	mat = eigenVectors.Transpose4X4() * mat * eigenVectors;
+	dgMatrix eigenVectors (dgGetIdentityMatrix());
+	if (initialGuess) {
+		eigenVectors = *initialGuess;
+		mat = eigenVectors.Transpose4X4() * mat * eigenVectors;
+	}
 
 	dgVector d (mat[0][0], mat[1][1], mat[2][2], dgFloat32 (0.0f)); 
 	dgVector b (d);
