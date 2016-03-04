@@ -480,98 +480,64 @@ DG_INLINE void dgEigenVectorMatrix::HouseholderFactorization(const dgMatrix& mat
 
 DG_INLINE void dgEigenVectorMatrix::RQFactorizatiuon()
 {
-/*
-	const int iMaxIter = 32;
+	dgMatrix& eigenVectors = *this;
+	if (dgAbsf (m_eigenValues[1][0]) > dgFloat32 (1.0e-6f)) { 
+		dgMatrix givenRotation (dgGetIdentityMatrix());
 
-	for (int i0 = 0; i0 <3; i0++)
-	{
-		int i1;
-		for (i1 = 0; i1 < iMaxIter; i1++)
-		{
-			int i2;
-			for (i2 = i0; i2 <= (3-2); i2++)
-			{
-				dgFloat32 fTmp = fabsf(m_afDiag[i2]) + fabsf(m_afDiag[i2+1]);
-				if ( fabsf(m_afSubd[i2]) + fTmp == fTmp )
-					break;
-			}
-			if (i2 == i0)
-			{
-				break;
-			}
+		dgFloat32 cosAngle = m_eigenValues[0][0];
+		dgFloat32 sinAngle = m_eigenValues[1][0];
+		dgFloat32 den = dgRsqrt (sinAngle * sinAngle + cosAngle * cosAngle);
+		sinAngle *= den;
+		cosAngle *= den;
 
-			dgFloat32 fG = (m_afDiag[i0+1] - m_afDiag[i0])/((2.0f) * m_afSubd[i0]);
-			dgFloat32 fR = sqrtf(fG*fG+1.0f);
-			if (fG < 0.0f)
-			{
-				fG = m_afDiag[i2]-m_afDiag[i0]+m_afSubd[i0]/(fG-fR);
-			}
-			else
-			{
-				fG = m_afDiag[i2]-m_afDiag[i0]+m_afSubd[i0]/(fG+fR);
-			}
-			dgFloat32 fSin = 1.0f, fCos = 1.0f, fP = 0.0f;
-			for (int i3 = i2-1; i3 >= i0; i3--)
-			{
-				dgFloat32 fF = fSin*m_afSubd[i3];
-				dgFloat32 fB = fCos*m_afSubd[i3];
-				if (fabsf(fF) >= fabsf(fG))
-				{
-					fCos = fG/fF;
-					fR = sqrtf(fCos*fCos+1.0f);
-					m_afSubd[i3+1] = fF*fR;
-					fSin = (1.0f)/fR;
-					fCos *= fSin;
-				}
-				else
-				{
-					fSin = fF/fG;
-					fR = sqrtf(fSin*fSin+1.0f);
-					m_afSubd[i3+1] = fG*fR;
-					fCos = (1.0f)/fR;
-					fSin *= fCos;
-				}
-				fG = m_afDiag[i3+1]-fP;
-				fR = (m_afDiag[i3]-fG)*fSin+(2.0f)*fB*fCos;
-				fP = fSin*fR;
-				m_afDiag[i3+1] = fG+fP;
-				fG = fCos*fR-fB;
-				for (int i4 = 0; i4 < 3; i4++)
-				{
-					fF = mElement[i4][i3+1];
-					mElement[i4][i3+1] = fSin*mElement[i4][i3]+fCos*fF;
-					mElement[i4][i3] = fCos*mElement[i4][i3]-fSin*fF;
-				}
-			}
-			m_afDiag[i0] -= fP;
-			m_afSubd[i0] = fG;
-			m_afSubd[i2] = 0.0f;
-		}
-		if (i1 == iMaxIter)
-		{
-			return false;
-		}
+		givenRotation[0][0] = cosAngle;
+		givenRotation[1][1] = cosAngle;
+		givenRotation[0][1] = sinAngle;
+		givenRotation[1][0] = -sinAngle;
+
+		m_eigenValues = givenRotation * m_eigenValues;
+		//givenRotation[0][1] = -sinAngle;
+		//givenRotation[1][0] = sinAngle;
+		eigenVectors = eigenVectors * givenRotation;
 	}
-	return true;
-*/
+	m_eigenValues[1][0] = dgFloat32 (0.0f);
+
+	if (dgAbsf (m_eigenValues[2][1]) > dgFloat32 (1.0e-6f)) { 
+		dgMatrix givenRotation (dgGetIdentityMatrix());
+		dgFloat32 cosAngle = m_eigenValues[1][1];
+		dgFloat32 sinAngle = m_eigenValues[2][1];
+		dgFloat32 den = dgRsqrt (sinAngle * sinAngle + cosAngle * cosAngle);
+		sinAngle *= den;
+		cosAngle *= den;
+
+		givenRotation[1][1] = cosAngle;
+		givenRotation[2][2] = cosAngle;
+		givenRotation[1][2] = sinAngle;
+		givenRotation[2][1] = -sinAngle;
+
+		m_eigenValues = givenRotation * m_eigenValues;
+		//givenRotation[1][2] = -sinAngle;
+		//givenRotation[2][1] = sinAngle;
+		eigenVectors = eigenVectors * givenRotation;
+	}
+	m_eigenValues[2][1] = dgFloat32 (0.0f);
 }
 
 
 dgEigenVectorMatrix::dgEigenVectorMatrix(const dgMatrix& matrix)
 {
 	HouseholderFactorization(matrix); 
+	RQFactorizatiuon();
 
-	dgMatrix& me = *this;
-	dgMatrix xxx2 (me * m_eigenValues * me.Inverse());
-	dgMatrix xxx3 (me * m_eigenValues * me.Inverse());
-
-//	QLFactorizatiuon();
+//	dgMatrix& me = *this;
+//	dgMatrix xxx2 (me * m_eigenValues * me.Inverse());
+//	dgMatrix xxx3 (me * m_eigenValues * me.Inverse());
 }
 
 
 void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess)
 {
-	dgEigenVectorMatrix(*this);
+	dgEigenVectorMatrix xxx (*this);
 
 	dgFloat32 b[3];
 	dgFloat32 z[3];
