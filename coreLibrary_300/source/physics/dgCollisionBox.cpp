@@ -30,9 +30,9 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 dgInt32 dgCollisionBox::m_initSimplex = 0;
-dgConvexSimplexEdge dgCollisionBox::m_edgeArray[24];
-dgConvexSimplexEdge* dgCollisionBox::m_edgeEdgeMap[12];
-dgConvexSimplexEdge* dgCollisionBox::m_vertexToEdgeMap[8];
+dgCollisionConvex::dgConvexSimplexEdge dgCollisionBox::m_edgeArray[24];
+dgCollisionConvex::dgConvexSimplexEdge* dgCollisionBox::m_edgeEdgeMap[12];
+dgCollisionConvex::dgConvexSimplexEdge* dgCollisionBox::m_vertexToEdgeMap[8];
 dgInt32 dgCollisionBox::m_faces[][4] =
 {
 	{0, 1, 3, 2},
@@ -200,6 +200,16 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vert
 	return (m_size[1] & mask) + m_size[0].AndNot(mask);
 }
 
+dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	return SupportVertex(dir, vertexIndex);
+}
+
+dgVector dgCollisionBox::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const
+{
+	return point;
+}
+
 
 
 void dgCollisionBox::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
@@ -297,14 +307,14 @@ void dgCollisionBox::Serialize(dgSerialize callback, void* const userData) const
 	callback (userData, &size, sizeof (dgVector));
 }
 
-const dgConvexSimplexEdge** dgCollisionBox::GetVertexToEdgeMapping() const 
+const dgCollisionConvex::dgConvexSimplexEdge** dgCollisionBox::GetVertexToEdgeMapping() const 
 {
 	return (const dgConvexSimplexEdge**)&m_vertexToEdgeMap[0];
 }
 
 
 
-dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
+dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign___) const
 {
 	dgVector support[4];
 	dgInt32 featureCount = 3;
@@ -312,7 +322,8 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 	const dgConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
 	if (vertToEdgeMapping) {
 		dgInt32 edgeIndex;
-		support[0] = SupportVertex (normal.Scale4(normalSign), &edgeIndex);
+		//support[0] = SupportVertex (normal.Scale4(normalSign), &edgeIndex);
+		support[0] = SupportVertex (normal, &edgeIndex);
 
 		dgFloat32 dist = normal.DotProduct4(support[0] - point).GetScalar();
 		if (dist <= DG_IMPULSIVE_CONTACT_PENETRATION) {

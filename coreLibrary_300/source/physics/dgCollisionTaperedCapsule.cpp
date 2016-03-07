@@ -32,7 +32,7 @@
 
 
 dgInt32 dgCollisionTaperedCapsule::m_shapeRefCount = 0;
-dgConvexSimplexEdge dgCollisionTaperedCapsule::m_edgeArray[DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAP_SEGMENTS - 1))];
+dgCollisionConvex::dgConvexSimplexEdge dgCollisionTaperedCapsule::m_edgeArray[DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAP_SEGMENTS - 1))];
 
 dgCollisionTaperedCapsule::dgCollisionTaperedCapsule(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_taperedCapsuleCollision)
@@ -413,10 +413,8 @@ dgFloat32 dgCollisionTaperedCapsule::RayCast (const dgVector& q0, const dgVector
 			return t1;
 		}
 	}
-	return dgCollisionConvex::RayCast (q0, q1, maxT, contactOut, NULL, NULL, NULL);
-
+	return dgCollisionConvex::RayCast (q0, q1, maxT, contactOut, body, NULL, NULL);
 }
-
 
 
 dgFloat32 dgCollisionTaperedCapsule::CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const
@@ -481,8 +479,9 @@ void dgCollisionTaperedCapsule::Serialize(dgSerialize callback, void* const user
 }
 
 
-dgVector dgCollisionTaperedCapsule::ConvexConicSupporVertex (const dgVector& dir) const
+dgVector dgCollisionTaperedCapsule::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
+	*vertexIndex = -1;
 	dgVector p0(dir.Scale3 (m_radio0));
 	dgVector p1(dir.Scale3 (m_radio1));
 	p0.m_x += m_height;
@@ -492,7 +491,7 @@ dgVector dgCollisionTaperedCapsule::ConvexConicSupporVertex (const dgVector& dir
 	return dgVector ((dir0 >= dir1) ? m_height : - m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 }
 
-dgVector dgCollisionTaperedCapsule::ConvexConicSupporVertex (const dgVector& point, const dgVector& dir) const
+dgVector dgCollisionTaperedCapsule::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
 	dgAssert (dgAbsf (dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	dgVector p (SupportVertex(dir, NULL));
@@ -521,6 +520,9 @@ dgInt32 dgCollisionTaperedCapsule::CalculateSphereConicContacts (dgFloat32 posit
 
 dgInt32 dgCollisionTaperedCapsule::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
 {
+	dgAssert (0);
+	return 0;
+/*
 	dgVector n (-normal.m_x, -dgSqrt (normal.m_y * normal.m_y + normal.m_z * normal.m_z), dgFloat32 (0.0), dgFloat32 (0.0f));
 	dgFloat32 project = m_sideNormal % n;
 	if (project > dgFloat32 (0.9998f)) {
@@ -531,6 +533,7 @@ dgInt32 dgCollisionTaperedCapsule::CalculateContacts (const dgVector& point, con
 		return CalculateSphereConicContacts (-m_height, m_radio1, normal, point, contactsOut);
 	}
 	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
+*/
 }
 
 

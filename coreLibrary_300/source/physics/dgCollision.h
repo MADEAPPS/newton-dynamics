@@ -244,7 +244,11 @@ class dgCollision
 	dgInt32 IsType (dgRTTI type) const; 
 	dgUnsigned32 GetSignature () const;
 	dgCollisionID GetCollisionPrimityType () const;
+
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const = 0;
+	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const = 0;
+	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const = 0;
+
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const = 0;
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1) = 0;

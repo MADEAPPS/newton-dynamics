@@ -32,6 +32,7 @@
 #include "dgConstraint.h"
 #include "dgDynamicBody.h"
 #include "dgCollisionBVH.h"
+#include "dgContactSolver.h"
 #include "dgKinematicBody.h"
 #include "dgCollisionMesh.h"
 #include "dgCollisionScene.h"

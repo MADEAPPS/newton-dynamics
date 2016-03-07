@@ -30,7 +30,7 @@
 
 
 dgInt32 dgCollisionCone::m_shapeRefCount = 0;
-dgConvexSimplexEdge dgCollisionCone::m_edgeArray[DG_CONE_SEGMENTS * 4];
+dgCollisionConvex::dgConvexSimplexEdge dgCollisionCone::m_edgeArray[DG_CONE_SEGMENTS * 4];
 
 dgCollisionCone::dgCollisionCone(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_coneCollision)

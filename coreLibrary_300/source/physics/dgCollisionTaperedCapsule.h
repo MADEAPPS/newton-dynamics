@@ -59,8 +59,8 @@ class dgCollisionTaperedCapsule: public dgCollisionConvex
 	// in newton we only deal with sub set of conic function, that can be expressed by the equation
 	// ((x - x0) / a)^2 + ((y - y0) / b)^2 + ((z - z0) / c)^2  = 1   and possible a linear or circular sweep of the same equation
 	// this preclude parabolic and hyperbolic conics 
-	virtual dgVector ConvexConicSupporVertex (const dgVector& dir) const;
-	virtual dgVector ConvexConicSupporVertex (const dgVector& point, const dgVector& dir) const;
+	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
+	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
 	dgInt32 CalculateSphereConicContacts (dgFloat32 posit, dgFloat32 radius, const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 	virtual dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
 

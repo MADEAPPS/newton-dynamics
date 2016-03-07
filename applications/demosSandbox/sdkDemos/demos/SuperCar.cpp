@@ -317,14 +317,14 @@ class SuperCarEntity: public DemoEntity
 	}
 
 	// this function is an example of how to make a high performance super car
-	void BuildWheelCar (int differentialType)
+	void BuildWheelCar (int differentialType, dFloat comHigh)
 	{
 		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
 		dFloat width;
 		dFloat radius;
 
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (0.0f, VIPER_COM_Y_OFFSET, 0.0f, 0.0f)); 
+		m_controller->SetCenterOfGravity (dVector (0.0f, comHigh, 0.0f, 0.0f)); 
 
 		// add front axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
@@ -426,32 +426,6 @@ class SuperCarEntity: public DemoEntity
 		m_controller->Finalize();
 	}
 
-
-	// this function is an example of how to make a high performance super car
-	void BuildFourWheelDriveSuperCar ()
-	{
-		BuildWheelCar (false);
-
-		int index = 0;
-		CustomVehicleController::BodyPartTire* tires[4];
-		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			tires[index] = &node->GetInfo();
-			index ++;
-		}
-
-		CustomVehicleController::BodyPartTire* left[2] = {tires[0], tires[2]};
-		CustomVehicleController::BodyPartTire* right[2] = {tires[1], tires[3]};
-		m_controller->LinksTiresKinematically (2, left);
-		m_controller->LinksTiresKinematically (2, right);
-	}
-
-
-	void BuildRaceCar ()
-	{
-		dAssert (0);
-	}
-
-
 	void ApplyPlayerControl ()
 	{
 		NewtonBody* const body = m_controller->GetBody();
@@ -538,7 +512,7 @@ steeringVal *= 0.3f;
 		// check transmission type
 //		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 0
+#if 1
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
@@ -1374,14 +1348,14 @@ void SuperCar (DemoEntityManager* const scene)
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
-		vehicle0->BuildWheelCar(2);
+		vehicle0->BuildWheelCar(1, -0.35f);
 		u -= 0.005f;
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
-		vehicle1->BuildWheelCar(0);
+		vehicle1->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
 		u -= 0.005f;
 */
 		dMatrix location2 (manager->CalculateSplineMatrix (u));
@@ -1389,16 +1363,15 @@ void SuperCar (DemoEntityManager* const scene)
 		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
 		location2.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
-		vehicle2->BuildWheelCar(0);
+		vehicle2->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
 		u -= 0.01f;
-
 	}
 
 	CustomVehicleController* const controller = &manager->GetLast()->GetInfo();
 	SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
 
 	// set this vehicle as the player
-	manager->SetAsPlayer(vehicleEntity);
+//	manager->SetAsPlayer(vehicleEntity);
 	manager->SetDebugVehicle(vehicleEntity);
 
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle

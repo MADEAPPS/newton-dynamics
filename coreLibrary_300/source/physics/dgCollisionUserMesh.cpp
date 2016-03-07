@@ -131,6 +131,11 @@ dgVector dgCollisionUserMesh::SupportVertex (const dgVector& dir) const
 	return dgVector (0, 0, 0, 0);
 }
 
+dgVector dgCollisionUserMesh::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	dgAssert(0);
+	return dgVector(0, 0, 0, 0);
+}
 
 void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 {
@@ -206,7 +211,10 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 
 			if (GetDebugCollisionCallback()) { 
 				dgTriplex triplex[32];
-				const dgMatrix& matrix = data->m_polySoupCollision->GetGlobalMatrix();
+				//const dgMatrix& matrix = data->m_polySoupInstance->GetGlobalMatrix();
+				const dgVector scale = data->m_polySoupInstance->GetScale();
+				dgMatrix matrix(data->m_polySoupInstance->GetLocalMatrix() * data->m_polySoupBody->GetMatrix());
+
 				for (dgInt32 i = 0; i < data->m_faceCount; i ++) {
 					dgInt32 base = address[i];
 					dgInt32 indexCount = faceIndexCountArray[i];
@@ -214,7 +222,8 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 					for (dgInt32 j = 0; j < indexCount; j ++) {
 						dgInt32 index = vertexFaceIndex[j];
 						dgVector q (&vertex[index * stride]);
-						dgVector p (matrix.TransformVector(q));
+						//dgVector p (matrix.TransformVector(q));
+						dgVector p (matrix.TransformVector(scale.CompProduct4(dgVector(&vertex[index * stride])))); 
 						triplex[j].m_x = p.m_x;
 						triplex[j].m_y = p.m_y;
 						triplex[j].m_z = p.m_z;
@@ -223,7 +232,6 @@ void dgCollisionUserMesh::GetCollidingFaces (dgPolygonMeshDesc* const data) cons
 					GetDebugCollisionCallback() (data->m_polySoupBody, data->m_objBody, faceId, indexCount, &triplex[0].m_x, sizeof (dgTriplex));
 				}
 			}
-
 		}
 	}
 }

@@ -34,7 +34,7 @@
 #define DG_CAPSULE_PERPENDICULAR_NORMAL		dgFloat32 (1.0e-2f)
 
 dgInt32 dgCollisionCapsule::m_shapeRefCount = 0;
-dgConvexSimplexEdge dgCollisionCapsule::m_edgeArray[DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAP_SEGMENTS - 1))];
+dgCollisionConvex::dgConvexSimplexEdge dgCollisionCapsule::m_edgeArray[DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAP_SEGMENTS - 1))];
 
 dgCollisionCapsule::dgCollisionCapsule(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_capsuleCollision)
@@ -432,12 +432,13 @@ void dgCollisionCapsule::MassProperties ()
 }
 
 
-dgVector dgCollisionCapsule::ConvexConicSupporVertex (const dgVector& dir) const
+dgVector dgCollisionCapsule::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
+	*vertexIndex = -1;
 	return dgVector ((dir.m_x >= dgFloat32 (0.0f)) ? m_height : - m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 }
 
-dgVector dgCollisionCapsule::ConvexConicSupporVertex (const dgVector& point, const dgVector& dir) const
+dgVector dgCollisionCapsule::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
 	dgVector p (SupportVertex(dir, NULL));
 	if (dgAbsf(dir.m_x) < dgFloat32 (1.0e-3f)) {
@@ -449,21 +450,16 @@ dgVector dgCollisionCapsule::ConvexConicSupporVertex (const dgVector& point, con
 
 dgInt32 dgCollisionCapsule::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
 {
-//	if (dgAbsf (normal.m_x) <= dgFloat32 (5.0e-2f)) {
-//		return CalculateContactsGeneric (point, normal, proxy, contactsOut);
-//	} else if (point.m_x > m_height) {
-//		return CalculateSphereConicContacts (m_height, normal, point, contactsOut);
-//	} else if (point.m_x < -m_height) {
-//		return CalculateSphereConicContacts (-m_height, normal, point, contactsOut);
-//	}
+	dgAssert(0);
+	return 0;
+/*
 	if (dgAbsf (normal.m_x) > DG_CAPSULE_PERPENDICULAR_NORMAL) {
 		contactsOut[0] = SupportVertex (normal.Scale3 (dgFloat32 (-1.0f)), NULL);
 		return 1;
 	}
 	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
+*/
 }
-
-
 
 dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {

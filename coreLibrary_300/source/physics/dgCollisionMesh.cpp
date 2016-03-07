@@ -39,10 +39,10 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 	,m_vertexStrideInBytes(0)
 	,m_skinThickness(proxy.m_skinThickness)
 	,m_userData (userData)
-	,m_objBody (proxy.m_referenceBody)
-	,m_polySoupBody(proxy.m_floatingBody)
-	,m_objCollision(proxy.m_referenceCollision)
-	,m_polySoupCollision(proxy.m_floatingCollision)
+	,m_objBody (proxy.m_body0)
+	,m_polySoupBody(proxy.m_body1)
+	,m_convexInstance(proxy.m_instance0)
+	,m_polySoupInstance(proxy.m_instance1)
 	,m_vertex(NULL)
 	,m_faceIndexCount(NULL)
 	,m_faceVertexIndex(NULL)
@@ -51,76 +51,59 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 	,m_maxT(dgFloat32 (1.0f))
 	,m_doContinuesCollisionTest(proxy.m_continueCollision)
 {
-	dgAssert (m_polySoupCollision->IsType (dgCollision::dgCollisionMesh_RTTI));
-	dgAssert (m_objCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
+	dgAssert (m_polySoupInstance->IsType (dgCollision::dgCollisionMesh_RTTI));
+	dgAssert (m_convexInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 
-	const dgMatrix& hullMatrix = m_objCollision->GetGlobalMatrix();
-	const dgMatrix& soupMatrix = m_polySoupCollision->GetGlobalMatrix();
-	proxy.m_matrix = hullMatrix * soupMatrix.Inverse();
+	const dgMatrix& hullMatrix = m_convexInstance->GetGlobalMatrix();
+	const dgMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
 
-	switch (m_objCollision->GetCombinedScaleType(m_polySoupCollision->GetScaleType()))
+	dgMatrix& matrix = *this;
+	matrix = hullMatrix * soupMatrix.Inverse();
+	dgMatrix convexMatrix (dgGetIdentityMatrix());
+
+	switch (m_polySoupInstance->GetScaleType())
 	{
 		case dgCollisionInstance::m_unit:
 		{
-			dgMatrix& matrix = *this;
-			matrix = proxy.m_matrix;
-			SetTransposeAbsMatrix (matrix);
-
-			const dgCollision* const collision = m_objCollision->GetChildShape();
-			m_objCollision->CalcAABB (*this, m_p0, m_p1);
-			m_posit += matrix.RotateVector (collision->GetObbOrigin());
-			m_size = collision->GetObbSize() + dgCollisionInstance::m_padding;
 			break;
 		}
 
 		case dgCollisionInstance::m_uniform:
 		{
-			dgMatrix& matrix = *this;
-			matrix = proxy.m_matrix;
-
-			const dgVector& meshInvScale = m_polySoupCollision->GetInvScale();
-
-			matrix.m_posit = matrix.m_posit.CompProduct4(meshInvScale) | dgVector::m_wOne;
-			SetTransposeAbsMatrix (matrix);
-
-			dgMatrix scaleMatrix (meshInvScale.CompProduct4(m_front), meshInvScale.CompProduct4(m_up), meshInvScale.CompProduct4(m_right), m_posit);
-			m_objCollision->CalcAABB (scaleMatrix, m_p0, m_p1);
-
-			dgVector scale (m_objCollision->GetScale().CompProduct4(m_polySoupCollision->GetInvScale())); 
-			const dgCollision* const collision = m_objCollision->GetChildShape();
-			m_posit += matrix.RotateVector (collision->GetObbOrigin().CompProduct4(scale));
-			m_size = collision->GetObbSize().CompProduct4(scale) + dgCollisionInstance::m_padding;
+			const dgVector& invScale = m_polySoupInstance->GetInvScale();
+			convexMatrix[0][0] = invScale.GetScalar();
+			convexMatrix[1][1] = invScale.GetScalar();
+			convexMatrix[2][2] = invScale.GetScalar();
+			matrix.m_posit = matrix.m_posit.CompProduct4(invScale | dgVector::m_wOne);
 			break;
 		}
 
 		case dgCollisionInstance::m_nonUniform:
 		{
-			dgMatrix& matrix = *this;
-			matrix = proxy.m_matrix;
-			const dgVector& meshInvScale = m_polySoupCollision->GetInvScale();
-
-			matrix.m_posit = matrix.m_posit.CompProduct4(meshInvScale) | dgVector::m_wOne;
-			SetTransposeAbsMatrix (matrix);
-			
-			dgMatrix scaleMatrix (meshInvScale.CompProduct4(m_front), meshInvScale.CompProduct4(m_up), meshInvScale.CompProduct4(m_right), m_posit);
-			m_objCollision->CalcAABB (scaleMatrix, m_p0, m_p1);
-
-			//const dgCollision* const collision = m_objCollision->GetChildShape();
-
-			dgMatrix obbScaledMatrix (scaleMatrix * matrix.Inverse());
-			dgVector obbP0;
-			dgVector obbP1;
-			m_objCollision->CalcAABB (obbScaledMatrix, obbP0, obbP1);
-			m_size = (obbP1 - obbP0).CompProduct4(dgVector::m_half);
-			m_posit += matrix.RotateVector ((obbP1 + obbP0).CompProduct4(dgVector::m_half));
+			const dgVector& invScale = m_polySoupInstance->GetInvScale();
+			dgMatrix tmp (matrix[0].CompProduct4(invScale), matrix[1].CompProduct4(invScale), matrix[2].CompProduct4(invScale), dgVector::m_wOne);
+			convexMatrix = tmp * matrix.Inverse();
+			convexMatrix.m_posit = dgVector::m_wOne;
+			matrix.m_posit = matrix.m_posit.CompProduct4(invScale | dgVector::m_wOne);
 			break;
 		}
 
+		case dgCollisionInstance::m_global:
 		default:
 		{
-			dgAssert (0);
+		   dgAssert (0);
 		}
 	}
+
+	dgMatrix fullMatrix (convexMatrix * matrix);
+	m_convexInstance->CalcAABB(fullMatrix, m_p0, m_p1);
+
+	dgVector p0;
+	dgVector p1;
+	SetTransposeAbsMatrix(matrix);
+	m_convexInstance->CalcAABB(convexMatrix, p0, p1);
+	m_size = (p1 - p0).CompProduct4(dgVector::m_half);
+	m_posit = matrix.TransformVector((p1 + p0).CompProduct4(dgVector::m_half));
 }
 
 
@@ -389,22 +372,17 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 
 	proxy.m_continueCollision = true;
 	proxy.m_skinThickness = dgFloat32 (0.0f);
-	proxy.m_floatingBody = NULL;
-	proxy.m_referenceBody = (dgBody*)referenceBody;
-	proxy.m_referenceCollision = &tmpCastingInstance;
-	proxy.m_floatingCollision = (dgCollisionInstance*)referenceCollision;
+	proxy.m_body1 = NULL;
+	proxy.m_body0 = (dgBody*)referenceBody;
+	proxy.m_instance0 = &tmpCastingInstance;
+	proxy.m_instance1 = (dgCollisionInstance*)referenceCollision;
 
-//	dgPolygonMeshDesc data (proxy, referenceCollision->GetUserData());
 	dgPolygonMeshDesc data (proxy, NULL);
-
-//	castingShape->CalcAABB (polySoupScaledMatrix, data.m_boxP0, data.m_b
 
 	data.m_maxT = dgMin (maxT, dgFloat32 (1.0f));
 	dgFloat32 maxTime = (maxT > dgFloat32 (1.0f)) ? dgFloat32 (1.0f) : maxT;
 	dgVector distanceTravel (shapeVeloc.Scale4 (maxTime));
-//	data.m_boxDistanceTravelInMeshSpace = referenceCollision->m_invScale.CompProduct4(soupMatrix.UnrotateVector(distanceTravel.CompProduct4(castingShape->m_invScale)));
 	data.SetDistanceTravel (distanceTravel);
-
 	polysoup->GetCollidingFaces (&data);
 
 	dgCollisionConvexPolygon polygon (m_allocator);
@@ -449,7 +427,7 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 		}
 		polyInstance.m_localMatrix.m_posit = referenceCollision->GetLocalMatrix().TransformVector(origin);
 		polyInstance.m_globalMatrix.m_posit = referenceCollision->GetGlobalMatrix().TransformVector(origin);
-		dgFloat32 t = polygon.ConvexRayCast (castingShape, shapeMatrix, shapeVeloc, maxT, tmpContact, referenceBody, &polyInstance, userData, threadId);
+		dgFloat32 t = polygon.ConvexRayCast (&tmpCastingInstance, shapeMatrix, shapeVeloc, maxT, tmpContact, referenceBody, &polyInstance, userData, threadId);
 		if (t < maxT) {
 			maxT = t;
 			contactOut = tmpContact;

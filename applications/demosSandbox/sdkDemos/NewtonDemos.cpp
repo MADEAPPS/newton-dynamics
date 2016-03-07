@@ -43,23 +43,23 @@
 //#define DEFAULT_SCENE	14			// compound Collision
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
-//#define DEFAULT_SCENE	17			// non Uniform Scaled Collision
+//#define DEFAULT_SCENE	17			// non uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
-//#define DEFAULT_SCENE	19			// simple convex decomposition
-//#define DEFAULT_SCENE	20			// scene Collision
-//#define DEFAULT_SCENE	21          // simple boolean operators 
-//#define DEFAULT_SCENE	22			// simple convex fracturing 
-//#define DEFAULT_SCENE	23			// structured convex fracturing 
-//#define DEFAULT_SCENE	24			// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	25			// continuous collision
-//#define DEFAULT_SCENE	26			// paper wall continuous collision
-//#define DEFAULT_SCENE	27			// puck slide continuous collision
+//#define DEFAULT_SCENE	19			// continuous collision
+//#define DEFAULT_SCENE	20			// paper wall continuous collision
+//#define DEFAULT_SCENE	21			// puck slide continuous collision
+//#define DEFAULT_SCENE	22			// simple convex decomposition
+//#define DEFAULT_SCENE	23			// scene Collision
+//#define DEFAULT_SCENE	24          // simple boolean operators 
+//#define DEFAULT_SCENE	25			// simple convex fracturing 
+//#define DEFAULT_SCENE	26			// structured convex fracturing 
+//#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
-//#define DEFAULT_SCENE	30			// basic rag doll
+#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
 //#define DEFAULT_SCENE	32			// basic Car
-#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
@@ -130,15 +130,15 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Uniform scaled collision shape"), wxT("demonstrate scaling shape"), UniformScaledCollision},
 	{wxT("Non uniform scaled collision shape"), wxT("demonstrate scaling shape"), NonUniformScaledCollision},
 	{wxT("Scaled mesh collision"), wxT("demonstrate scaling mesh scaling collision"), ScaledMeshCollision},
+	{ wxT("Continuous collision"), wxT("show continuous collision"), ContinuousCollision },
+	{ wxT("Paper wall continuous collision"), wxT("show fast continuous collision"), ContinuousCollision1 },
+	{ wxT("Puck slide"), wxT("show continuous collision"), PuckSlide },
 	{wxT("Simple convex decomposition"), wxT("demonstrate convex decomposition and compound collision"), SimpleConvexApproximation},
 	{wxT("Multi geometry collision"), wxT("show static mesh with the ability of moving internal parts"), SceneCollision},
 	{wxT("Simple boolean operations"), wxT("demonstrate simple boolean operations "), SimpleBooleanOperations},
 	{wxT("Simple convex fracture"), wxT("demonstrate simple fracture destruction using Voronoi partition"), SimpleConvexFracturing},
 	{wxT("Structured convex fracture"), wxT("demonstrate structured fracture destruction using Voronoi partition"), StructuredConvexFracturing},
 	{wxT("Parallel ray cast"), wxT("using the threading Job scheduler"), MultiRayCast},
-	{wxT("Continuous collision"), wxT("show continuous collision"), ContinuousCollision},
-    {wxT("Paper wall continuous collision"), wxT("show fast continuous collision"), ContinuousCollision1},
-	{wxT("Puck slide"), wxT("show continuous collision"), PuckSlide},
     {wxT("Standard Joints"), wxT("show some of the common joints"), StandardJoints},
 	{wxT("Articulated robotic actuators joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
 	{wxT("Pasive rag doll"), wxT("demonstrate parsive rag doll"), PassiveRagDoll},
@@ -347,8 +347,9 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_showStatistics = true;
 //*/
 //m_debugDisplayMode = 2;
-m_showNormalForces = true;
-
+//m_showContactPoints = true;
+//SetDebugDisplayMode (m_debugDisplayMode);
+//m_showNormalForces = true;
 
 //m_autoSleepState = false;
 //m_microthreadIndex = 1;

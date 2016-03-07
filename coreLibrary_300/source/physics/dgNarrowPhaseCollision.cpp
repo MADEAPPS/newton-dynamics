@@ -27,6 +27,7 @@
 #include "dgDynamicBody.h"
 #include "dgCollisionBVH.h"
 #include "dgCollisionBox.h"
+#include "dgContactSolver.h"
 #include "dgKinematicBody.h"
 #include "dgCollisionCone.h"
 #include "dgCollisionNull.h"
@@ -51,6 +52,7 @@
 #include "dgCollisionDeformableSolidMesh.h"
 #include "dgCollisionDeformableClothPatch.h"
 
+
 dgCollisionInstance* dgWorld::CreateNull ()
 {
 	dgUnsigned32 crc = dgCollision::dgCollisionNull_RTTI;
@@ -61,7 +63,6 @@ dgCollisionInstance* dgWorld::CreateNull ()
 	}
 	return CreateInstance (node->GetInfo(), 0, dgGetIdentityMatrix());
 }
-
 
 dgCollisionInstance* dgWorld::CreateSphere(dgFloat32 radii, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
@@ -189,23 +190,6 @@ dgCollisionInstance* dgWorld::CreateConvexHull (dgInt32 count, const dgFloat32* 
 
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 
-/*
-	if (node && (node->GetInfo().m_pinNumber != pinNumber)) {
-		// shape was found but it is a CRC collision simple single out this shape as a unique entry in the cache
-		dgTrace (("we have a CRC collision simple single out this shape as a unique entry in the cache\n"));
-		dgCollisionConvexHull* const collision = new (m_allocator) dgCollisionConvexHull (m_allocator, pinNumber, count, strideInBytes, tolerance, vertexArray);
-		if (collision->GetConvexVertexCount()) {
-			node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), pinNumber);
-		} else {
-			//most likely the point cloud is a plane or a line
-			//could not make the shape destroy the shell and return NULL 
-			//note this is the only newton shape that can return NULL;
-			collision->Release();
-			return NULL;
-		}
-	}
-*/
-
 	if (!node) {
 		// shape not found create a new one and add to the cache
 		dgCollisionConvexHull* const collision = new (m_allocator) dgCollisionConvexHull (m_allocator, crc, count, strideInBytes, tolerance, vertexArray);
@@ -224,8 +208,6 @@ dgCollisionInstance* dgWorld::CreateConvexHull (dgInt32 count, const dgFloat32* 
 	// add reference to the shape and return the collision pointer
 	return CreateInstance (node->GetInfo(), shapeID, offsetMatrix);
 }
-
-
 
 dgCollisionInstance* dgWorld::CreateCompound ()
 {
@@ -277,9 +259,6 @@ dgCollisionInstance* dgWorld::CreateDeformableMesh (dgMeshEffect* const mesh, dg
 	return instance;
 }
 
-
-
-
 dgCollisionInstance* dgWorld::CreateBVH ()	
 {
 	// collision tree are not cached
@@ -309,8 +288,6 @@ dgCollisionInstance* dgWorld::CreateHeightField(
 	collision->Release();
 	return instance;
 }
-
-
 
 dgCollisionInstance* dgWorld::CreateInstance (const dgCollision* const child, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
@@ -414,8 +391,6 @@ void dgWorld::ReleaseCollision(const dgCollision* const collision)
 }
 
 
-
-
 // ********************************************************************************
 //
 // separate collision system 
@@ -461,23 +436,20 @@ dgInt32 dgWorld::ClosestPoint(const dgCollisionInstance* const collisionSrcA, co
 
 	dgCollisionParamProxy proxy(&contactJoint, contacts, threadIndex, false, false);
 
-	proxy.m_referenceBody = &collideBodyA;
-	proxy.m_referenceCollision = collideBodyA.m_collision;
-	proxy.m_floatingBody = &collideBodyB;
-	proxy.m_floatingCollision = collideBodyB.m_collision;
+	proxy.m_body0 = &collideBodyA;
+	proxy.m_instance0 = collideBodyA.m_collision;
+	proxy.m_body1 = &collideBodyB;
+	proxy.m_instance1 = collideBodyB.m_collision;
 	proxy.m_timestep = dgFloat32 (0.0f);
 	proxy.m_skinThickness = dgFloat32 (0.0f);
 	proxy.m_maxContacts = 16;
 	
 	dgInt32 flag = 0;
 	if (collisionA.IsType (dgCollision::dgCollisionCompound_RTTI)) {
-		//return ClosestCompoundPoint (&collideBodyA, &collideBodyB, contactA, contactB, normalAB, threadIndex);
 		flag = ClosestCompoundPoint (proxy);
 	} else if (collisionB.IsType (dgCollision::dgCollisionCompound_RTTI)) {
-		dgAssert (0);
-		//dgInt32 flag = ClosestCompoundPoint (&collideBodyB, &collideBodyA, contactB, contactA, normalAB, threadIndex);
-		dgSwap (proxy.m_referenceBody, proxy.m_floatingBody);
-		dgSwap (proxy.m_referenceCollision, proxy.m_floatingCollision);
+		dgSwap (proxy.m_body0, proxy.m_body1);
+		dgSwap (proxy.m_instance0, proxy.m_instance1);
 		flag = ClosestCompoundPoint (proxy);
 		normalAB.m_x *= dgFloat32 (-1.0f);
 		normalAB.m_y *= dgFloat32 (-1.0f);
@@ -544,7 +516,7 @@ bool dgWorld::IntersectionTest (const dgCollisionInstance* const collisionSrcA, 
 dgInt32 dgWorld::ClosestCompoundPoint (dgCollisionParamProxy& proxy) const
 {
 //	dgCollisionInstance* const instance = compoundConvexA->m_collision;
-	dgCollisionInstance* const instance = proxy.m_referenceCollision;
+	dgCollisionInstance* const instance = proxy.m_instance0;
 	dgAssert (instance->IsType(dgCollision::dgCollisionCompound_RTTI));
 	dgCollisionCompound* const collision = (dgCollisionCompound*) instance->GetChildShape();
 //	return collision->ClosestDistance (compoundConvexA, contactA, collisionB, contactB, normalAB);
@@ -1020,26 +992,21 @@ void dgWorld::ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParam
 		}
 	}
 */
-	dgBody* const convexBody = constraint->m_body0;
 	dgBody* const otherBody = constraint->m_body1;
-	if (otherBody->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
+	dgBody* const convexBody = constraint->m_body0;
+	
+	proxy.m_body1 = otherBody;
+	proxy.m_body0 = convexBody;
+	proxy.m_instance0 = proxy.m_body0->m_collision;
+	proxy.m_instance1 = proxy.m_body1->m_collision;
+	dgAssert (proxy.m_instance0->IsType (dgCollision::dgCollisionConvexShape_RTTI));
+	if (proxy.m_instance1->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		dgAssert (convexBody->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 		dgAssert (otherBody->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
-
-		proxy.m_referenceBody = convexBody;
-		proxy.m_floatingBody = otherBody;
-		proxy.m_referenceCollision = convexBody->m_collision;
-		proxy.m_floatingCollision = otherBody->m_collision;
 		pair->m_contactCount = CalculateConvexToConvexContacts (proxy);
-
 	} else {
 		dgAssert (constraint->m_body0->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 		dgAssert (convexBody->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
-
-		proxy.m_referenceBody = convexBody;
-		proxy.m_floatingBody = otherBody;
-		proxy.m_referenceCollision = convexBody->m_collision;
-		proxy.m_floatingCollision = otherBody->m_collision;
 		pair->m_contactCount = CalculateConvexToNonConvexContacts (proxy);
 	}
 }
@@ -1048,7 +1015,6 @@ void dgWorld::ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParam
 void dgWorld::CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContact* const constraint = pair->m_contact;
-
 	pair->m_isDeformable = 0;
 	pair->m_contactCount = 0;
 /*
@@ -1081,7 +1047,7 @@ void dgWorld::SceneChildContacts (dgBroadPhase::dgPair* const pair, dgCollisionP
 	proxy.m_maxContacts = ((DG_MAX_CONTATCS - pair->m_contactCount) > 32) ? 32 : DG_MAX_CONTATCS - pair->m_contactCount;
 	proxy.m_contacts = &savedBuffer[pair->m_contactCount];
 
-	if (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
+	if (proxy.m_instance1->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		pair->m_contactCount += CalculateConvexToConvexContacts (proxy);
 	} else {
 		pair->m_contactCount += CalculateConvexToNonConvexContacts (proxy);
@@ -1117,10 +1083,10 @@ void dgWorld::SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamP
 	dgAssert (sceneInstance->IsType(dgCollision::dgCollisionScene_RTTI));
 	dgAssert (!otherInstance->IsType(dgCollision::dgCollisionScene_RTTI));
 	if (otherInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
-		proxy.m_referenceBody = otherBody;
-		proxy.m_floatingBody = sceneBody;
-		proxy.m_referenceCollision = otherBody->m_collision;
-		proxy.m_floatingCollision = NULL;
+		proxy.m_body0 = otherBody;
+		proxy.m_body1 = sceneBody;
+		proxy.m_instance0 = otherBody->m_collision;
+		proxy.m_instance1 = NULL;
 
 		dgCollisionScene* const scene = (dgCollisionScene*)sceneInstance->GetChildShape();
 		scene->CollidePair (pair, proxy);
@@ -1129,10 +1095,10 @@ void dgWorld::SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamP
 			pair->m_contactCount = dgInt16 (PruneContacts (pair->m_contactCount, proxy.m_contacts));
 		}
 	} else if (otherInstance->IsType (dgCollision::dgCollisionCompound_RTTI) & ~otherInstance->IsType (dgCollision::dgCollisionScene_RTTI)) {
-		proxy.m_referenceBody = otherBody;
-		proxy.m_floatingBody = sceneBody;
-		proxy.m_referenceCollision = NULL;
-		proxy.m_floatingCollision = NULL;
+		proxy.m_body0 = otherBody;
+		proxy.m_body1 = sceneBody;
+		proxy.m_instance0 = NULL;
+		proxy.m_instance1 = NULL;
 
 		dgCollisionScene* const scene = (dgCollisionScene*)sceneInstance->GetChildShape();
 		scene->CollideCompoundPair (pair, proxy);
@@ -1245,10 +1211,6 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 }
 
 
-// ***************************************************************************
-//
-// ***************************************************************************
-
 dgInt32 dgWorld::CollideContinue (
 	const dgCollisionInstance* const collisionSrcA, const dgMatrix& matrixA, const dgVector& velocA, const dgVector& omegaA, 
 	const dgCollisionInstance* const collisionSrcB, const dgMatrix& matrixB, const dgVector& velocB, const dgVector& omegaB, 
@@ -1331,7 +1293,6 @@ dgInt32 dgWorld::CollideContinue (
 }
 
 
-//dgInt32 dgWorld::Collide (const dgCollisionInstance* const collisionSrcA, const dgMatrix& matrixA, const dgCollisionInstance* const collisionSrcB, const dgMatrix& matrixB, dgTriplex* const points, dgTriplex* const normals, dgFloat32* const penetration, dgInt32* const attibute, dgInt32 maxSize, dgInt32 threadIndex)
 dgInt32 dgWorld::Collide (
 	const dgCollisionInstance* const collisionSrcA, const dgMatrix& matrixA, 
 	const dgCollisionInstance* const collisionSrcB, const dgMatrix& matrixB, 
@@ -1402,83 +1363,68 @@ dgInt32 dgWorld::Collide (
 
 
 
+
+// *************************************************************************
+//
+// 
+// *************************************************************************
+ 
 dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const	
 {
-	dgCollisionInstance* const collision1 = proxy.m_referenceCollision;
-	dgCollisionInstance* const collision2 = proxy.m_floatingCollision;
+	dgCollisionInstance* const collision0 = proxy.m_instance0;
+	dgCollisionInstance* const collision1 = proxy.m_instance1;
 
-	dgContact* const contactJoint = proxy.m_contactJoint;
-	dgAssert (contactJoint);
-	contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
-
-	if (!(collision1->GetConvexVertexCount() && collision2->GetConvexVertexCount())) {
+	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount())) {
 		return 0;
 	}
 
-	dgAssert (contactJoint);
-	dgAssert (collision1->GetCollisionPrimityType() != m_nullCollision);
-	dgAssert (collision2->GetCollisionPrimityType() != m_nullCollision);
-	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
+	dgAssert(collision0->GetCollisionPrimityType() < m_nullCollision);
+	dgAssert(collision1->GetCollisionPrimityType() < m_nullCollision);
+	dgAssert(proxy.m_instance1->IsType(dgCollision::dgCollisionConvexShape_RTTI));
 
-	dgCollisionID id1 = collision1->GetCollisionPrimityType();
-	dgCollisionID id2 = collision2->GetCollisionPrimityType();
-	dgAssert (id1 < m_nullCollision);
-	dgAssert (id2 < m_nullCollision);
+	dgContact* const contactJoint = proxy.m_contactJoint;
+	dgAssert(contactJoint);
+	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
 
-	bool flipShape = dgCollisionConvex::m_priorityOrder.m_swapPriority[id1][id2];
-	if (flipShape) {
-		dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_threadIndex, proxy.m_continueCollision, proxy.m_intersectionTestOnly);
-		tmp.m_referenceBody = proxy.m_floatingBody;
-		tmp.m_floatingBody = proxy.m_referenceBody;
-		tmp.m_referenceCollision = proxy.m_floatingCollision;
-		tmp.m_floatingCollision = proxy.m_referenceCollision;
-		tmp.m_timestep = proxy.m_timestep;
-		tmp.m_skinThickness = proxy.m_skinThickness;
-		tmp.m_maxContacts = proxy.m_maxContacts;
-		tmp.m_matrix = collision1->GetGlobalMatrix() * collision2->GetGlobalMatrix().Inverse();
+	dgCollisionInstance instance0(*collision0, collision0->m_childShape);
+	dgCollisionInstance instance1(*collision1, collision1->m_childShape);
+	proxy.m_instance0 = &instance0;
+	proxy.m_instance1 = &instance1;
 
-		dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision2->m_childShape;
+	dgVector origin(instance0.m_globalMatrix.m_posit & dgVector::m_triplexMask);
+	instance0.m_globalMatrix.m_posit = dgVector::m_wOne;
+	instance1.m_globalMatrix.m_posit -= origin;
 
-		dgVector v (tmp.m_matrix.m_posit & dgVector::m_triplexMask);
-		dgFloat32 mag2 = v.DotProduct4(v).m_x;
-		if (mag2 > dgFloat32 (0.0f)) {
-			contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
-		} else {
-			contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		}
+	contactJoint->m_separtingVector = collision0->GetGlobalMatrix().m_up;
 
-		bool state = convexShape->CalculateClosestPoints (tmp);
-		if (state) {
-			proxy.m_contacts[0].m_normal = tmp.m_contacts[0].m_normal.Scale3 (dgFloat32 (-1.0f));
-			proxy.m_contacts[1].m_normal = tmp.m_contacts[1].m_normal.Scale3 (dgFloat32 (-1.0f));
-			dgSwap (proxy.m_contacts[0].m_point, proxy.m_contacts[1].m_point);
-			return 1;
-		}
-	} else {
-		proxy.m_matrix = collision2->GetGlobalMatrix() * collision1->GetGlobalMatrix().Inverse();
-		dgCollisionConvex* const convexShape = (dgCollisionConvex*) collision1->m_childShape;
+	dgContactSolver contactSolver(&proxy);
+	contactSolver.CalculateClosestPoints();
 
-		dgVector v (proxy.m_matrix.m_posit & dgVector::m_triplexMask);
-		dgFloat32 mag2 = v.DotProduct4(v).m_x;
-		if (mag2 > dgFloat32 (0.0f)) {
-			contactJoint->m_separtingVector = v.Scale3 (dgRsqrt (mag2));
-		} else {
-			contactJoint->m_separtingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		}
+	proxy.m_closestPointBody0 = contactSolver.GetPoint0() + origin;
+	proxy.m_closestPointBody1 = contactSolver.GetPoint1() + origin;
+	proxy.m_normal = contactSolver.GetNormal().Scale4(-1.0f);
 
-		bool state = convexShape->CalculateClosestPoints (proxy);
-		return state ? 1 : 0;
-	}
+	dgContactPoint* const contactOut = proxy.m_contacts;
+	contactOut[0].m_normal = proxy.m_normal;
+	contactOut[0].m_point = proxy.m_closestPointBody0;
 
-	return 0;
+	contactOut[1].m_normal = contactSolver.GetNormal();
+	contactOut[1].m_point = proxy.m_closestPointBody1;
+
+	contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct4(proxy.m_normal).GetScalar();
+
+	proxy.m_instance0 = collision0;
+	proxy.m_instance1 = collision1;
+	return 1;
 }
 
 
-dgInt32 dgWorld::CalculateUserContacts (dgCollisionParamProxy& proxy) const
+
+dgInt32 dgWorld::CalculateUserContacts(dgCollisionParamProxy& proxy) const
 {
 	dgContactMaterial::dgUserContactPoint buffer[16];
 	dgContact* const contactJoint = proxy.m_contactJoint;
-	int count = contactJoint->m_material->m_contactGeneration(*contactJoint->m_material, *proxy.m_referenceBody, proxy.m_referenceCollision, *proxy.m_floatingBody, proxy.m_floatingCollision, buffer, sizeof (buffer) / sizeof (buffer[0]), proxy.m_threadIndex);
+	int count = contactJoint->m_material->m_contactGeneration(*contactJoint->m_material, *proxy.m_body0, proxy.m_instance0, *proxy.m_body1, proxy.m_instance1, buffer, sizeof (buffer) / sizeof (buffer[0]), proxy.m_threadIndex);
 	if (count) {
 		proxy.m_contactJoint->m_contactActive = 1;
 		dgContactPoint* const contactOut = proxy.m_contacts;
@@ -1489,188 +1435,116 @@ dgInt32 dgWorld::CalculateUserContacts (dgCollisionParamProxy& proxy) const
 			contactOut[i].m_penetration = buffer[i].m_penetration;
 			contactOut[i].m_shapeId0 = buffer[i].m_shapeId0;
 			contactOut[i].m_shapeId1 = buffer[i].m_shapeId1;
-			contactOut[i].m_body0 = proxy.m_referenceBody;
-			contactOut[i].m_body1 = proxy.m_floatingBody;
-			contactOut[i].m_collision0 = proxy.m_referenceCollision;
-			contactOut[i].m_collision1 = proxy.m_floatingCollision;
+			contactOut[i].m_body0 = proxy.m_body0;
+			contactOut[i].m_body1 = proxy.m_body1;
+			contactOut[i].m_collision0 = proxy.m_instance0;
+			contactOut[i].m_collision1 = proxy.m_instance1;
 		}
 	}
 	return count;
 }
+ 
 
-dgInt32 dgWorld::CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) const
-{
-	dgAssert (proxy.m_referenceCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
-	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
-
-	dgInt32 count = 0;
-
-	dgCollisionInstance* const collision1 = proxy.m_referenceCollision;
-	dgCollisionInstance* const collision2 = proxy.m_floatingCollision;
-	dgContact* const contactJoint = proxy.m_contactJoint;
-	dgAssert (contactJoint);
-	
-	contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
-	if (!(collision1->GetConvexVertexCount() && collision2->GetConvexVertexCount())) {
-		return count;
-	}
-
-	dgAssert (collision1->GetCollisionPrimityType() != m_nullCollision);
-	dgAssert (collision2->GetCollisionPrimityType() != m_nullCollision);
-	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
-
-	if (!contactJoint->m_material->m_contactGeneration) {
-		dgCollisionID id1 = collision1->GetCollisionPrimityType();
-		dgCollisionID id2 = collision2->GetCollisionPrimityType();
-		dgAssert(id1 < m_nullCollision);
-		dgAssert(id2 < m_nullCollision);
-		bool flipShape = dgCollisionConvex::m_priorityOrder.m_swapPriority[id1][id2];
-		if (proxy.m_continueCollision) {
-			if (flipShape) {
-				dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_threadIndex, proxy.m_continueCollision, proxy.m_intersectionTestOnly);
-				tmp.m_referenceBody = proxy.m_floatingBody;
-				tmp.m_floatingBody = proxy.m_referenceBody;
-				tmp.m_referenceCollision = proxy.m_floatingCollision;
-				tmp.m_floatingCollision = proxy.m_referenceCollision;
-				tmp.m_timestep = proxy.m_timestep;
-				tmp.m_skinThickness = proxy.m_skinThickness;
-				tmp.m_maxContacts = proxy.m_maxContacts;
-				tmp.m_matrix = collision1->GetGlobalMatrix() * collision2->GetGlobalMatrix().Inverse();
-
-				dgCollisionConvex* const convexShape = (dgCollisionConvex*)collision2->m_childShape;
-				if (contactJoint->m_isNewContact) {
-					contactJoint->m_isNewContact = false;
-					dgVector v(tmp.m_matrix.m_posit & dgVector::m_triplexMask);
-					dgFloat32 mag2 = v.DotProduct4(v).m_x;
-					if (mag2 > dgFloat32(0.0f)) {
-						contactJoint->m_separtingVector = v.Scale3(dgRsqrt(mag2));
-					} else {
-						contactJoint->m_separtingVector = dgVector(dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-					}
-				}
-				count = convexShape->CalculateConvexCastContacts(tmp);
-				proxy.m_timestep = tmp.m_timestep;
-
-				dgVector step(tmp.m_floatingBody->m_veloc.Scale3(tmp.m_timestep));
-				dgContactPoint* const contactOut = proxy.m_contacts;
-				for (dgInt32 i = 0; i < count; i++) {
-					contactOut[i].m_normal = contactOut[i].m_normal.Scale3(dgFloat32(-1.0f));
-					contactOut[i].m_point += step;
-				}
-
-				proxy.m_normal = tmp.m_normal.Scale3(dgFloat32(-1.0f));
-				proxy.m_closestPointBody0 = tmp.m_closestPointBody1;
-				proxy.m_closestPointBody1 = tmp.m_closestPointBody0;
-
-			} else {
-				proxy.m_matrix = collision2->GetGlobalMatrix() * collision1->GetGlobalMatrix().Inverse();
-				dgCollisionConvex* const convexShape = (dgCollisionConvex*)collision1->m_childShape;
-
-				if (contactJoint->m_isNewContact) {
-					contactJoint->m_isNewContact = false;
-					dgVector v(proxy.m_matrix.m_posit & dgVector::m_triplexMask);
-					dgFloat32 mag2 = v.DotProduct4(v).m_x;
-					if (mag2 > dgFloat32(0.0f)) {
-						contactJoint->m_separtingVector = v.Scale3(dgRsqrt(mag2));
-					} else {
-						contactJoint->m_separtingVector = dgVector(dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-					}
-				}
-				count = convexShape->CalculateConvexCastContacts(proxy);
-			}
-		} else {
-			if (flipShape) {
-				dgCollisionParamProxy tmp(proxy.m_contactJoint, proxy.m_contacts, proxy.m_threadIndex, proxy.m_continueCollision, proxy.m_intersectionTestOnly);
-				tmp.m_referenceBody = proxy.m_floatingBody;
-				tmp.m_floatingBody = proxy.m_referenceBody;
-				tmp.m_referenceCollision = proxy.m_floatingCollision;
-				tmp.m_floatingCollision = proxy.m_referenceCollision;
-				tmp.m_timestep = proxy.m_timestep;
-				tmp.m_skinThickness = proxy.m_skinThickness;
-				tmp.m_maxContacts = proxy.m_maxContacts;
-				tmp.m_matrix = collision1->GetGlobalMatrix() * collision2->GetGlobalMatrix().Inverse();
-
-				dgCollisionConvex* const convexShape = (dgCollisionConvex*)collision2->m_childShape;
-
-				if (contactJoint->m_isNewContact) {
-					contactJoint->m_isNewContact = false;
-					dgVector v(tmp.m_matrix.m_posit & dgVector::m_triplexMask);
-					dgFloat32 mag2 = v.DotProduct4(v).m_x;
-					if (mag2 > dgFloat32(0.0f)) {
-						contactJoint->m_separtingVector = v.Scale3(dgRsqrt(mag2));
-					} else {
-						contactJoint->m_separtingVector = dgVector(dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-					}
-				}
-
-
-				count = convexShape->CalculateConvexToConvexContact(tmp);
-				proxy.m_timestep = tmp.m_timestep;
-
-				dgContactPoint* const contactOut = proxy.m_contacts;
-				for (dgInt32 i = 0; i < count; i++) {
-					contactOut[i].m_normal = contactOut[i].m_normal.Scale3(dgFloat32(-1.0f));
-				}
-
-				proxy.m_normal = tmp.m_normal.Scale3(dgFloat32(-1.0f));
-				proxy.m_closestPointBody0 = tmp.m_closestPointBody1;
-				proxy.m_closestPointBody1 = tmp.m_closestPointBody0;
-
-			} else {
-				proxy.m_matrix = collision2->GetGlobalMatrix() * collision1->GetGlobalMatrix().Inverse();
-				dgCollisionConvex* const convexShape = (dgCollisionConvex*)collision1->m_childShape;
-
-				if (contactJoint->m_isNewContact) {
-					contactJoint->m_isNewContact = false;
-					dgVector v(proxy.m_matrix.m_posit & dgVector::m_triplexMask);
-					dgFloat32 mag2 = v.DotProduct4(v).m_x;
-					if (mag2 > dgFloat32(0.0f)) {
-						contactJoint->m_separtingVector = v.Scale3(dgRsqrt(mag2));
-					} else {
-						contactJoint->m_separtingVector = dgVector(dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-					}
-				}
-				count = convexShape->CalculateConvexToConvexContact(proxy);
-			}
-		}
-	} else {
-		count = CalculateUserContacts (proxy);
-	}
-
-
-	dgContactPoint* const contactOut = proxy.m_contacts;
-	for (dgInt32 i = 0; i < count; i ++) {
-		contactOut[i].m_body0 = proxy.m_referenceBody;
-		contactOut[i].m_body1 = proxy.m_floatingBody;
-		contactOut[i].m_collision0 = collision1;
-		contactOut[i].m_collision1 = collision2;
-		contactOut[i].m_shapeId0 = collision1->GetUserDataID();
-		contactOut[i].m_shapeId1 = collision2->GetUserDataID();
-	}
-	return count;
-}
-
-
-
-dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& proxy) const
+dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) const
 {
 	dgInt32 count = 0;
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	dgAssert(contactJoint);
+
+	dgCollisionInstance* const collision0 = proxy.m_instance0;
+	dgCollisionInstance* const collision1 = proxy.m_instance1;
+	dgAssert(collision0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+	dgAssert(collision1->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
+	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount())) {
+		return count;
+	}
+
+	dgCollisionInstance instance0 (*collision0, collision0->m_childShape);
+	dgCollisionInstance instance1 (*collision1, collision1->m_childShape);
+	proxy.m_instance0 = &instance0;
+	proxy.m_instance1 = &instance1;
+
+	dgVector origin (instance0.m_globalMatrix.m_posit & dgVector::m_triplexMask);
+	instance0.m_globalMatrix.m_posit = dgVector::m_wOne;
+	instance1.m_globalMatrix.m_posit -= origin;
+
+	dgAssert(collision0->GetCollisionPrimityType() != m_nullCollision);
+	dgAssert(collision1->GetCollisionPrimityType() != m_nullCollision);
+	dgAssert(proxy.m_instance1->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+
 	if (!contactJoint->m_material->m_contactGeneration) {
-		if (proxy.m_referenceCollision->GetCollisionMode() & proxy.m_floatingCollision->GetCollisionMode()) {
-			dgCollisionInstance* const convexInstance = proxy.m_referenceCollision;
-
-			contactJoint->m_closestDistance = dgFloat32 (1.0e10f);
-
-			if (!convexInstance->GetConvexVertexCount()) {
-				return count;
+		if (contactJoint->m_isNewContact) {
+			contactJoint->m_isNewContact = false;
+			dgVector v((proxy.m_instance0->m_globalMatrix.m_posit - proxy.m_instance1->m_globalMatrix.m_posit) & dgVector::m_triplexMask);
+			dgFloat32 mag2 = v.DotProduct4(v).m_x;
+			if (mag2 > dgFloat32(0.0f)) {
+				contactJoint->m_separtingVector = v.Scale4(dgRsqrt(mag2));
+			} else {
+				contactJoint->m_separtingVector = proxy.m_instance0->m_globalMatrix.m_up;
 			}
+		}
 
-			dgAssert (proxy.m_timestep <= dgFloat32 (1.0f));
-			dgAssert (proxy.m_timestep >= dgFloat32 (0.0f));
+		dgContactSolver contactSolver(&proxy);
+		if (proxy.m_continueCollision) {
+			count = contactSolver.CalculateConvexCastContacts();
+		} else {
+			count = contactSolver.CalculateConvexToConvexContacts();
+		}
+	} else {
+		count = CalculateUserContacts(proxy);
+	}
 
-			//dgPolygonMeshDesc data(proxy, proxy.m_floatingCollision->GetUserData());
+	proxy.m_closestPointBody0 += origin;
+	proxy.m_closestPointBody1 += origin;
+	dgContactPoint* const contactOut = proxy.m_contacts;
+	for (dgInt32 i = 0; i < count; i++) {
+		contactOut[i].m_point += origin;
+		contactOut[i].m_body0 = proxy.m_body0;
+		contactOut[i].m_body1 = proxy.m_body1;
+		contactOut[i].m_collision0 = collision0;
+		contactOut[i].m_collision1 = collision1;
+		contactOut[i].m_shapeId0 = collision0->GetUserDataID();
+		contactOut[i].m_shapeId1 = collision1->GetUserDataID();
+	}
+
+	proxy.m_instance0 = collision0;
+	proxy.m_instance1 = collision1;
+
+	return count;
+}
+
+dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy) const
+{
+	dgInt32 count = 0;
+	dgContact* const contactJoint = proxy.m_contactJoint;
+	dgAssert(contactJoint);
+
+	dgCollisionInstance* const collision0 = proxy.m_instance0;
+	dgCollisionInstance* const collision1 = proxy.m_instance1;
+	dgAssert(collision1->IsType(dgCollision::dgCollisionMesh_RTTI));
+	dgAssert(collision0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
+	if (!collision0->GetConvexVertexCount()) {
+		return count;
+	}
+
+	dgCollisionInstance instance0(*collision0, collision0->m_childShape);
+	dgCollisionInstance instance1(*collision1, collision1->m_childShape);
+	proxy.m_instance0 = &instance0;
+	proxy.m_instance1 = &instance1;
+
+	dgVector origin(instance0.m_globalMatrix.m_posit & dgVector::m_triplexMask);
+	instance0.m_globalMatrix.m_posit = dgVector::m_wOne;
+	instance1.m_globalMatrix.m_posit -= origin;
+
+	if (!contactJoint->m_material->m_contactGeneration) {
+		if (proxy.m_instance0->GetCollisionMode() & proxy.m_instance1->GetCollisionMode()) {
+			contactJoint->m_closestDistance = dgFloat32(1.0e10f);
+
+			dgAssert(proxy.m_timestep <= dgFloat32(1.0f));
+			dgAssert(proxy.m_timestep >= dgFloat32(0.0f));
+
 			dgPolygonMeshDesc data(proxy, NULL);
 			if (proxy.m_continueCollision) {
 				data.m_doContinuesCollisionTest = true;
@@ -1678,211 +1552,73 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts (dgCollisionParamProxy& prox
 				const dgVector& hullVeloc = data.m_objBody->m_veloc;
 				const dgVector& hullOmega = data.m_objBody->m_omega;
 
-				dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc % hullVeloc);
-				if (baseLinearSpeed > dgFloat32 (1.0e-6f)) {
-					dgFloat32 minRadius = convexInstance->GetBoxMinRadius();
-					dgFloat32 maxAngularSpeed = dgSqrt (hullOmega % hullOmega);
-					dgFloat32 angularSpeedBound = maxAngularSpeed * (convexInstance->GetBoxMaxRadius() - minRadius);
+				dgFloat32 baseLinearSpeed = dgSqrt(hullVeloc % hullVeloc);
+				if (baseLinearSpeed > dgFloat32(1.0e-6f)) {
+					dgFloat32 minRadius = instance0.GetBoxMinRadius();
+					dgFloat32 maxAngularSpeed = dgSqrt(hullOmega % hullOmega);
+					dgFloat32 angularSpeedBound = maxAngularSpeed * (instance0.GetBoxMaxRadius() - minRadius);
 
-					dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt (angularSpeedBound);
-					dgVector upperBoundVeloc (hullVeloc.Scale3 (proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
-
-					//const dgMatrix& soupMatrix = data.m_polySoupCollision->GetGlobalMatrix();
-					//data.m_boxDistanceTravelInMeshSpace = data.m_polySoupCollision->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(data.m_objCollision->GetInvScale())));
-					data.SetDistanceTravel (upperBoundVeloc);
+					dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
+					dgVector upperBoundVeloc(hullVeloc.Scale4(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
+					data.SetDistanceTravel(upperBoundVeloc);
 				}
 			}
 
-			dgCollisionMesh* const polysoup = (dgCollisionMesh *) data.m_polySoupCollision->GetChildShape();
-			polysoup->GetCollidingFaces (&data);
+			dgCollisionMesh* const polysoup = (dgCollisionMesh *)data.m_polySoupInstance->GetChildShape();
+			polysoup->GetCollidingFaces(&data);
 
 			if (data.m_faceCount) {
 				proxy.m_polyMeshData = &data;
-				proxy.m_matrix = proxy.m_matrix.Inverse();
 
 				if (proxy.m_continueCollision) {
-					count = CalculateConvexToNonConvexContactsContinue (proxy);
+					count = CalculateConvexToNonConvexContactsContinue(proxy);
 				} else {
-					count = CalculatePolySoupToHullContactsDescrete (proxy);
+					count = CalculatePolySoupToHullContactsDescrete(proxy);
 				}
 
 				if (count > 0) {
 					proxy.m_contactJoint->m_contactActive = 1;
-					count = PruneContacts (count, proxy.m_contacts);
-					dgContactPoint* const contactOut = proxy.m_contacts;
-					for (dgInt32 i = 0; i < count; i ++) {
-						dgAssert ((dgAbsf(contactOut[i].m_normal % contactOut[i].m_normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-						contactOut[i].m_body0 = proxy.m_referenceBody;
-						contactOut[i].m_body1 = proxy.m_floatingBody;
-						contactOut[i].m_collision0 = proxy.m_referenceCollision;
-						contactOut[i].m_collision1 = proxy.m_floatingCollision;
-					}
+					count = PruneContacts(count, proxy.m_contacts);
+					//dgContactPoint* const contactOut = proxy.m_contacts;
+					//for (dgInt32 i = 0; i < count; i ++) {
+					//dgAssert ((dgAbsf(contactOut[i].m_normal % contactOut[i].m_normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+					//contactOut[i].m_body0 = proxy.m_body0;
+					//contactOut[i].m_body1 = proxy.m_body1;
+					//contactOut[i].m_collision0 = proxy.m_instance0;
+					//contactOut[i].m_collision1 = proxy.m_instance1;
+					//}
 				}
 			}
 		}
 	} else {
-		count = CalculateUserContacts (proxy);
-	}
-	return count;
-}
-
-dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue (dgCollisionParamProxy& proxy) const
-{
-	dgInt32 count = 0;
-
-	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionMesh_RTTI));
-	dgAssert (proxy.m_referenceCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
-
-	dgCollisionInstance* const polySoupInstance = proxy.m_floatingCollision;
-
-	dgPolygonMeshDesc& data = *proxy.m_polyMeshData;
-	dgAssert (data.m_faceCount); 
-
-	dgCollisionConvexPolygon polygon (m_allocator);
-	dgCollisionInstance polyInstance (*polySoupInstance, &polygon);
-	polyInstance.SetScale (dgVector (1.0f));
-
-	proxy.m_floatingCollision = &polyInstance;
-
-	polygon.m_vertex = data.m_vertex;
-	polygon.m_stride = dgInt32 (data.m_vertexStrideInBytes / sizeof (dgFloat32));
-
-	dgInt32 maxContacts = proxy.m_maxContacts;
-	dgInt32 maxReduceLimit = maxContacts >> 2;
-	dgInt32 countleft = maxContacts;
-
-	dgAssert (proxy.m_contactJoint);
-	dgVector separatingVector (proxy.m_matrix.m_posit & dgVector::m_triplexMask);
-	dgFloat32 mag2 = separatingVector.DotProduct4 (separatingVector).m_x;
-	if (mag2 > dgFloat32 (0.0f)) {
-		separatingVector = separatingVector.Scale3 (dgRsqrt (mag2));
-	} else {
-		separatingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		count = CalculateUserContacts(proxy);
 	}
 
-	const dgVector& scale = polySoupInstance->GetScale();
-	const dgVector& invScale = polySoupInstance->GetInvScale();
-	const dgInt32 stride = polygon.m_stride;
-	const dgFloat32* const vertex = polygon.m_vertex;
-
+	proxy.m_closestPointBody0 += origin;
+	proxy.m_closestPointBody1 += origin;
 	dgContactPoint* const contactOut = proxy.m_contacts;
-	dgContact* const contactJoint = proxy.m_contactJoint;
-	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
-	data.SortFaceArray();
-
-	dgVector n (dgFloat32 (0.0f));
-	dgVector p (dgFloat32 (0.0f));
-	dgVector q (dgFloat32 (0.0f));
-	dgUnsigned64 shapeFaceID = dgUnsigned64(-1);
-
-	dgFloat32 closestDist = dgFloat32 (1.0e10f);
-	dgFloat32 minTimeStep = proxy.m_timestep;
-	dgFloat32 timeNormalizer = proxy.m_timestep;
-	dgFloat32 epsilon = dgFloat32 (-1.0e-3f) * proxy.m_timestep;
-
-	for (dgInt32 i = 0; (i < data.m_faceCount) && (proxy.m_timestep >= (data.m_hitDistance[i] * timeNormalizer)); i ++) {
-		dgInt32 address = data.m_faceIndexStart[i];
-		const dgInt32* const localIndexArray = &indexArray[address];
-		polygon.m_vertexIndex = localIndexArray;
-		polygon.m_count = data.m_faceIndexCount[i];
-		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray (localIndexArray, polygon.m_count);
-		polygon.m_faceId = data.GetFaceId (localIndexArray, polygon.m_count);
-		polygon.m_faceClipSize = data.GetFaceSize (localIndexArray, polygon.m_count);
-		polygon.m_faceNormalIndex = data.GetNormalIndex (localIndexArray, polygon.m_count);
-		polygon.m_normal = dgVector (&vertex[polygon.m_faceNormalIndex * stride]);
-		dgAssert (polygon.m_normal.m_w == dgFloat32 (0.0f));
-		contactJoint->m_separtingVector = separatingVector;
-
-		proxy.m_maxContacts = countleft;
-		proxy.m_contacts = &contactOut[count];
-
-		dgInt32 count1 = polygon.CalculateContactToConvexHullContinue(proxy, scale, invScale);
-		if (count1 > 0) {
-			dgFloat32 error = proxy.m_timestep - minTimeStep;
-			if (error < epsilon) {
-				count = 0;
-				countleft = maxContacts;
-				for (dgInt32 i = 0; i < count1; i ++) {
-					contactOut[i] = proxy.m_contacts[i];
-				}
-			}
-			count += count1;
-			countleft -= count1;
-			dgAssert (countleft >= 0); 
-			if (count >= maxReduceLimit) {
-				count = ReduceContacts (count, contactOut, maxReduceLimit >> 1, dgFloat32 (1.0e-2f));
-				countleft = maxContacts - count;
-				dgAssert (countleft >= 0); 
-			}
-		}
-
-		closestDist = dgMin (closestDist, contactJoint->m_closestDistance);
-
-		if (proxy.m_timestep <= minTimeStep) {
-			minTimeStep = proxy.m_timestep;
-			n = proxy.m_normal;
-			p = proxy.m_closestPointBody0;
-			q = proxy.m_closestPointBody1;
-			shapeFaceID = proxy.m_shapeFaceID;
-		}
+	for (dgInt32 i = 0; i < count; i++) {
+		contactOut[i].m_point += origin;
+		contactOut[i].m_body0 = proxy.m_body0;
+		contactOut[i].m_body1 = proxy.m_body1;
+		contactOut[i].m_collision0 = collision0;
+		contactOut[i].m_collision1 = collision1;
+		contactOut[i].m_shapeId0 = collision0->GetUserDataID();
+		contactOut[i].m_shapeId1 = collision1->GetUserDataID();
 	}
 
-
-	// check for extreme obtuse contacts 
-	//	dgFloat32 penetrations[DG_MAX_CONTATCS];
-	//	const dgCollisionInstance* const convexInstance = proxy.m_referenceCollision;
-	//	const dgMatrix& matrix = convexInstance->GetGlobalMatrix();
-	//	for (dgInt32 i = 0; i < count; i ++) {
-	//		const dgVector& normal = contactOut[i].m_normal;
-	//		dgVector minPenetration (contactOut[i].m_point - matrix.TransformVector(convexInstance->SupportVertex (matrix.UnrotateVector(normal.Scale3 (dgFloat32 (-1.0f))), NULL)));
-	//		penetrations[i] = minPenetration % normal;
-	//	}
-	//	for (dgInt32 i = 0; i < count; i ++) {
-	//		const dgVector& n0 = contactOut[i].m_normal;
-	//		for (dgInt32 j = i + 1; j < count; j ++) {
-	//			const dgVector& n1 = contactOut[j].m_normal;
-	//			dgFloat32 dir = n0 % n1;
-	//			if (dir < dgFloat32 (-0.995f)) {
-	//				dgFloat32 dist0 = penetrations[i];
-	//				dgFloat32 dist1 = penetrations[j];
-	//				count --;
-	//				if (dist0 <= dist1) {
-	//					contactOut[j] = contactOut[count];
-	//					penetrations[j] = penetrations[count];
-	//					j --;
-	//				} else {
-	//					contactOut[i] = contactOut[count];
-	//					penetrations[i] = penetrations[count];
-	//					i --;
-	//					break;
-	//				}
-	//			}
-	//		}
-	//	} 
-	//	proxy.m_contacts = contactOut;
-
-	proxy.m_contacts = contactOut;
-	contactJoint->m_closestDistance = closestDist;
-
-	// restore the pointer
-	proxy.m_normal = n;
-	proxy.m_closestPointBody0 = p;
-	proxy.m_closestPointBody1 = q;
-	proxy.m_floatingCollision = polySoupInstance;
-	proxy.m_shapeFaceID = shapeFaceID;
-
+	proxy.m_instance0 = collision0;
+	proxy.m_instance1 = collision1;
 	return count;
 }
-
 
 
 dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy& proxy) const
 {
-	dgInt32 count = 0;
-	dgAssert (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionMesh_RTTI));
-	dgAssert (proxy.m_referenceCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI));
+	dgAssert (proxy.m_instance1->IsType (dgCollision::dgCollisionMesh_RTTI));
+	dgAssert (proxy.m_instance0->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 
-	dgCollisionInstance* const polySoupInstance = proxy.m_floatingCollision;
+	dgCollisionInstance* const polySoupInstance = proxy.m_instance1;
 	dgPolygonMeshDesc& data = *proxy.m_polyMeshData;
 
 	dgAssert (data.m_faceCount); 
@@ -1890,30 +1626,31 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	dgCollisionConvexPolygon polygon (m_allocator);
 	dgCollisionInstance polyInstance (*polySoupInstance, &polygon);
 	polyInstance.SetScale(dgVector (dgFloat32 (1.0f)));
+	polyInstance.m_localMatrix = dgGetIdentityMatrix();
+	polyInstance.m_globalMatrix = dgGetIdentityMatrix();
 
-	proxy.m_floatingCollision = &polyInstance;
-
+	proxy.m_instance1 = &polyInstance;
 	polygon.m_vertex = data.m_vertex;
 	polygon.m_stride = dgInt32 (data.m_vertexStrideInBytes / sizeof (dgFloat32));
 
+	dgInt32 count = 0;
 	dgInt32 maxContacts = proxy.m_maxContacts;
 	dgInt32 maxReduceLimit = maxContacts >> 2;
 	dgInt32 countleft = maxContacts;
 
-	dgAssert (proxy.m_contactJoint);
-	dgVector separatingVector (proxy.m_matrix.m_posit & dgVector::m_triplexMask);
-	dgFloat32 mag2 = separatingVector.DotProduct4 (separatingVector).m_x;
-	if (mag2 > dgFloat32 (0.0f)) {
-		separatingVector = separatingVector.Scale3 (dgRsqrt (mag2));
-	} else {
-		separatingVector =  dgVector(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	}
+	const dgVector& polygonInstanceScale = polySoupInstance->GetScale();
+	const dgMatrix polySoupGlobalMatrix = polySoupInstance->m_globalMatrix;
+	const dgMatrix polySoupGlobalAligmentMatrix = polySoupInstance->m_aligmentMatrix;
 
-	const dgVector& scale = polySoupInstance->GetScale();
-	const dgVector& invScale = polySoupInstance->GetInvScale();
+	dgMatrix polySoupScaledMatrix (polySoupGlobalAligmentMatrix[0].CompProduct4(polygonInstanceScale), polySoupGlobalAligmentMatrix[1].CompProduct4(polygonInstanceScale),
+								   polySoupGlobalAligmentMatrix[2].CompProduct4(polygonInstanceScale), polySoupGlobalAligmentMatrix[3]);
+	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
+
+	dgAssert (proxy.m_contactJoint);
+	dgVector separatingVector (proxy.m_instance0->m_globalMatrix.m_up);
+	
 	const dgInt32 stride = polygon.m_stride;
 	const dgFloat32* const vertex = polygon.m_vertex;
-
 	dgAssert (polyInstance.m_scaleType == dgCollisionInstance::m_unit);
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	dgContactPoint* const contactOut = proxy.m_contacts;
@@ -1924,21 +1661,21 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	for (dgInt32 i = data.m_faceCount - 1; (i >= 0) && (count < 32); i --) {
 		dgInt32 address = data.m_faceIndexStart[i];
 		const dgInt32* const localIndexArray = &indexArray[address];
-
 		polygon.m_vertexIndex = localIndexArray;
 		polygon.m_count = data.m_faceIndexCount[i];
 		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray (localIndexArray, polygon.m_count);
 		polygon.m_faceId = data.GetFaceId (localIndexArray, polygon.m_count);
 		polygon.m_faceClipSize = data.GetFaceSize (localIndexArray, polygon.m_count);
 		polygon.m_faceNormalIndex = data.GetNormalIndex (localIndexArray, polygon.m_count);
-		polygon.m_normal = dgVector (&vertex[polygon.m_faceNormalIndex * stride]);
-		dgAssert (dgAbsf(polygon.m_normal % polygon.m_normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		polygon.m_normal = polygon.CalculateGlobalNormal (polySoupInstance, dgVector (&vertex[polygon.m_faceNormalIndex * stride]));
 		dgAssert (polygon.m_normal.m_w == dgFloat32 (0.0f));
+		for (dgInt32 j = 0; j < polygon.m_count; j++) {
+			polygon.m_localPoly[j] = polySoupScaledMatrix.TransformVector(dgVector(&vertex[localIndexArray[j] * stride]));
+		}
 		contactJoint->m_separtingVector = separatingVector;
-
 		proxy.m_maxContacts = countleft;
 		proxy.m_contacts = &contactOut[count];
-		dgInt32 count1 = polygon.CalculateContactToConvexHullDescrete (proxy, scale, invScale);
+		dgInt32 count1 = polygon.CalculateContactToConvexHullDescrete (this, polySoupInstance, proxy);
 		closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
 
 		if (count1 > 0) {
@@ -1961,7 +1698,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 
 	// check for extreme obtuse contacts 
 	dgFloat32 penetrations[DG_MAX_CONTATCS];
-	const dgCollisionInstance* const convexInstance = proxy.m_referenceCollision;
+	const dgCollisionInstance* const convexInstance = proxy.m_instance0;
 	const dgMatrix& matrix = convexInstance->GetGlobalMatrix();
 	for (dgInt32 i = 0; i < count; i ++) {
 		const dgVector& normal = contactOut[i].m_normal;
@@ -1995,7 +1732,112 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	proxy.m_contacts = contactOut;
 
 	// restore the pointer
-	proxy.m_floatingCollision = polySoupInstance;
+	proxy.m_instance1 = polySoupInstance;
+	return count;
+}
+
+dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProxy& proxy) const
+{
+	dgAssert(proxy.m_instance1->IsType(dgCollision::dgCollisionMesh_RTTI));
+	dgAssert(proxy.m_instance0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+
+	dgCollisionInstance* const polySoupInstance = proxy.m_instance1;
+	dgPolygonMeshDesc& data = *proxy.m_polyMeshData;
+
+	dgAssert(data.m_faceCount);
+
+	dgCollisionConvexPolygon polygon(m_allocator);
+	dgCollisionInstance polyInstance(*polySoupInstance, &polygon);
+	polyInstance.SetScale(dgVector(dgFloat32(1.0f)));
+	polyInstance.m_localMatrix = dgGetIdentityMatrix();
+	polyInstance.m_globalMatrix = dgGetIdentityMatrix();
+
+	proxy.m_instance1 = &polyInstance;
+	polygon.m_vertex = data.m_vertex;
+	polygon.m_stride = dgInt32(data.m_vertexStrideInBytes / sizeof (dgFloat32));
+
+	dgInt32 count = 0;
+	dgInt32 maxContacts = proxy.m_maxContacts;
+	dgInt32 maxReduceLimit = maxContacts >> 2;
+	dgInt32 countleft = maxContacts;
+
+	const dgVector& polygonInstanceScale = polySoupInstance->GetScale();
+	const dgMatrix polySoupGlobalMatrix = polySoupInstance->m_globalMatrix;
+	const dgMatrix polySoupGlobalAligmentMatrix = polySoupInstance->m_aligmentMatrix;
+
+	dgMatrix polySoupScaledMatrix (polySoupGlobalAligmentMatrix[0].CompProduct4(polygonInstanceScale), polySoupGlobalAligmentMatrix[1].CompProduct4(polygonInstanceScale),
+								   polySoupGlobalAligmentMatrix[2].CompProduct4(polygonInstanceScale), polySoupGlobalAligmentMatrix[3]);
+	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
+
+	dgAssert (proxy.m_contactJoint);
+	dgVector separatingVector (proxy.m_instance0->m_globalMatrix.m_up);
+
+	const dgInt32 stride = polygon.m_stride;
+	const dgFloat32* const vertex = polygon.m_vertex;
+	dgAssert(polyInstance.m_scaleType == dgCollisionInstance::m_unit);
+	dgContactPoint* const contactOut = proxy.m_contacts;
+	dgContact* const contactJoint = proxy.m_contactJoint;
+	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
+	data.SortFaceArray();
+
+	dgVector n(dgFloat32(0.0f));
+	dgVector p(dgFloat32(0.0f));
+	dgVector q(dgFloat32(0.0f));
+	dgUnsigned64 shapeFaceID = dgUnsigned64(-1);
+
+	dgFloat32 closestDist = dgFloat32(1.0e10f);
+	dgFloat32 minTimeStep = proxy.m_timestep;
+	dgFloat32 timeNormalizer = proxy.m_timestep;
+	dgFloat32 epsilon = dgFloat32(-1.0e-3f) * proxy.m_timestep;
+
+	for (dgInt32 i = 0; (i < data.m_faceCount) && (proxy.m_timestep >= (data.m_hitDistance[i] * timeNormalizer)); i++) {
+		dgInt32 address = data.m_faceIndexStart[i];
+		const dgInt32* const localIndexArray = &indexArray[address];
+		polygon.m_vertexIndex = localIndexArray;
+		polygon.m_count = data.m_faceIndexCount[i];
+		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray(localIndexArray, polygon.m_count);
+		polygon.m_faceId = data.GetFaceId(localIndexArray, polygon.m_count);
+		polygon.m_faceClipSize = data.GetFaceSize(localIndexArray, polygon.m_count);
+		polygon.m_faceNormalIndex = data.GetNormalIndex(localIndexArray, polygon.m_count);
+		polygon.m_normal = polygon.CalculateGlobalNormal(polySoupInstance, dgVector(&vertex[polygon.m_faceNormalIndex * stride]));
+		dgAssert(polygon.m_normal.m_w == dgFloat32(0.0f));
+		for (dgInt32 j = 0; j < polygon.m_count; j++) {
+			polygon.m_localPoly[j] = polySoupScaledMatrix.TransformVector(dgVector(&vertex[localIndexArray[j] * stride]));
+		}
+		contactJoint->m_separtingVector = separatingVector;
+		proxy.m_maxContacts = countleft;
+		proxy.m_contacts = &contactOut[count];
+		dgInt32 count1 = polygon.CalculateContactToConvexHullContinue(this, polySoupInstance, proxy);
+
+		if (count1 > 0) {
+			dgFloat32 error = proxy.m_timestep - minTimeStep;
+			if (error < epsilon) {
+				count = 0;
+				countleft = maxContacts;
+				for (dgInt32 i = 0; i < count1; i++) {
+					contactOut[i] = proxy.m_contacts[i];
+				}
+			}
+			count += count1;
+			countleft -= count1;
+			dgAssert(countleft >= 0);
+			if (count >= maxReduceLimit) {
+				count = ReduceContacts(count, contactOut, maxReduceLimit >> 1, dgFloat32(1.0e-2f));
+				countleft = maxContacts - count;
+				dgAssert(countleft >= 0);
+			}
+		}
+
+		closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
+		if (proxy.m_timestep <= minTimeStep) {
+			minTimeStep = proxy.m_timestep;
+			n = proxy.m_normal;
+			p = proxy.m_closestPointBody0;
+			q = proxy.m_closestPointBody1;
+			shapeFaceID = proxy.m_shapeFaceID;
+		}
+	}
 
 	return count;
 }
+

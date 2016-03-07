@@ -55,26 +55,25 @@ class dgFastRayTest
 	DG_INLINE dgFastRayTest(const dgVector& l0, const dgVector& l1)
 		:m_p0 (l0)
 		,m_p1(l1)
-		,m_diff ((l1 - l0) | dgVector::m_wOne)
+		,m_diff ((l1 - l0) & dgVector::m_triplexMask)
 		,m_minT(dgFloat32 (0.0f))  
 		,m_maxT(dgFloat32 (1.0f))
 		,m_zero(dgFloat32 (0.0f)) 
 	{
 		dgAssert (m_p0.m_w == dgFloat32 (0.0f));
 		dgAssert (m_p1.m_w == dgFloat32 (0.0f));
-		dgAssert (m_diff.m_w == dgFloat32 (1.0f));
+		dgAssert (m_diff.m_w == dgFloat32 (0.0f));
 
 		m_isParallel = (m_diff.Abs() < dgVector (1.0e-8f));
 
 		m_dpInv = (((dgVector (dgFloat32 (1.0e-20)) & m_isParallel) | m_diff.AndNot(m_isParallel)).Reciproc ()) & dgVector::m_triplexMask;
 		m_dpBaseInv = m_dpInv;
 
-		dgFloat32 mag = dgSqrt (m_diff % m_diff);
+		dgFloat32 mag = dgSqrt (m_diff.DotProduct4(m_diff).GetScalar());
 		m_dirError = -dgFloat32 (0.0175f) * mag;
 		m_magRayTest = dgMax (mag, dgFloat32 (1.0f));
 	}
 	
-
 	dgFloat32 PolygonIntersect (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
 	dgFloat32 PolygonIntersectFallback (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
 

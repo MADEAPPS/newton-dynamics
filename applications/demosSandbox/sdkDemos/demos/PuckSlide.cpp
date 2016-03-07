@@ -147,8 +147,6 @@ class PuckEntity: public DemoEntity
 };
 
 
-
-
 void NewtonRigidBodySetForceCB(const NewtonBody* const body, float timestep, int threadIndex)
 {	
 	float mass;
@@ -159,7 +157,7 @@ void NewtonRigidBodySetForceCB(const NewtonBody* const body, float timestep, int
 	
 	float force[3];
 	force[0] = 0.0f;
-	force[1] = mass * (-9.81f * PHYSICS_WORLD_SCALE);
+	force[1] = mass * (DEMO_GRAVITY * PHYSICS_WORLD_SCALE);
 	force[2] = 0.0f;
 	NewtonBodySetForce(body, force);
 }
@@ -195,10 +193,6 @@ static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoin
 //		NewtonMaterialSetContactFrictionState (material, 0, 1);
 	}
 }
-
-
-
-
 
 // create physics scene
 void PuckSlide (DemoEntityManager* const scene)

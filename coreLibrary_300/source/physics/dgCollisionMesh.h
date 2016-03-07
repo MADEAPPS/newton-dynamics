@@ -64,9 +64,9 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 	DG_INLINE void SetDistanceTravel (const dgVector& distanceInGlobalSpace)
 	{
 		//const dgMatrix& soupMatrix = data.m_polySoupCollision->GetGlobalMatrix();
-		const dgMatrix& soupMatrix = m_polySoupCollision->GetGlobalMatrix();
+		const dgMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
 		//data.m_boxDistanceTravelInMeshSpace = data.m_polySoupCollision->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(data.m_objCollision->GetInvScale())));
-		m_boxDistanceTravelInMeshSpace = m_polySoupCollision->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(distanceInGlobalSpace.CompProduct4(m_objCollision->GetInvScale())));
+		m_boxDistanceTravelInMeshSpace = m_polySoupInstance->GetInvScale().CompProduct4(soupMatrix.UnrotateVector(distanceInGlobalSpace.CompProduct4(m_convexInstance->GetInvScale())));
 	}
 
 
@@ -107,8 +107,8 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 	void* m_userData;
 	dgBody *m_objBody;
 	dgBody *m_polySoupBody;
-	dgCollisionInstance* m_objCollision;
-	dgCollisionInstance* m_polySoupCollision;
+	dgCollisionInstance* m_convexInstance;
+	dgCollisionInstance* m_polySoupInstance;
 	dgFloat32* m_vertex;
 	dgInt32* m_faceIndexCount;
 	dgInt32* m_faceVertexIndex;

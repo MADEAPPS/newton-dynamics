@@ -35,7 +35,7 @@
 //#define DG_TAPED_CYLINDER_SKIN_PADDING (DG_RESTING_CONTACT_PENETRATION * 0.25f)
 
 dgInt32 dgCollisionTaperedCylinder::m_shapeRefCount = 0;
-dgConvexSimplexEdge dgCollisionTaperedCylinder::m_edgeArray[DG_CYLINDER_SEGMENTS * 2 * 3];
+dgCollisionConvex::dgConvexSimplexEdge dgCollisionTaperedCylinder::m_edgeArray[DG_CYLINDER_SEGMENTS * 2 * 3];
 
 dgCollisionTaperedCylinder::dgCollisionTaperedCylinder(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_taperedCylinderCollision)
@@ -240,8 +240,9 @@ dgFloat32 dgCollisionTaperedCylinder::GetSkinThickness () const
 }
 
 
-dgVector dgCollisionTaperedCylinder::ConvexConicSupporVertex (const dgVector& dir) const
+dgVector dgCollisionTaperedCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
+	*vertexIndex = -1;
 	dgAssert (dgAbsf ((dir % dir - dgFloat32 (1.0f))) < dgFloat32 (1.0e-3f));
 
 	//dgFloat32 height = (m_height > DG_TAPED_CYLINDER_SKIN_PADDING) ? m_height - DG_TAPED_CYLINDER_SKIN_PADDING : m_height;
@@ -275,7 +276,7 @@ dgVector dgCollisionTaperedCylinder::ConvexConicSupporVertex (const dgVector& di
 	return p0;
 }
 
-dgVector dgCollisionTaperedCylinder::ConvexConicSupporVertex (const dgVector& point, const dgVector& dir) const
+dgVector dgCollisionTaperedCylinder::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
 	dgVector p (SupportVertex(dir, NULL));
 	if (dgAbsf(dir.m_x) > dgFloat32 (0.9997f)) {
@@ -295,8 +296,10 @@ dgVector dgCollisionTaperedCylinder::ConvexConicSupporVertex (const dgVector& po
 
 dgInt32 dgCollisionTaperedCylinder::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
 {
-	dgAssert (dgAbsf (normal % normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
+	dgAssert(0);
+	return 0;
+//	dgAssert (dgAbsf (normal % normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+//	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
 }
 
 

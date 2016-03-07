@@ -42,7 +42,7 @@ dgVector dgCollisionCylinder::m_unitCircle[] = {dgVector(dgFloat32(0.0f), dgFloa
 
 
 dgInt32 dgCollisionCylinder::m_shapeRefCount = 0;
-dgConvexSimplexEdge dgCollisionCylinder::m_edgeArray[DG_CYLINDER_SEGMENTS * 2 * 3];
+dgCollisionConvex::dgConvexSimplexEdge dgCollisionCylinder::m_edgeArray[DG_CYLINDER_SEGMENTS * 2 * 3];
 
 dgCollisionCylinder::dgCollisionCylinder(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_cylinderCollision)
@@ -257,8 +257,9 @@ dgFloat32 dgCollisionCylinder::GetSkinThickness () const
 	return m_skinthickness;
 }
 
-dgVector dgCollisionCylinder::ConvexConicSupporVertex (const dgVector& dir) const
+dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
+	*vertexIndex = -1;
 	dgAssert (dgAbsf ((dir % dir - dgFloat32 (1.0f))) < dgFloat32 (1.0e-3f));
 
 	//dgFloat32 radius = (m_radius > DG_CYLINDER_SKIN_PADDING) ? m_radius - DG_CYLINDER_SKIN_PADDING : m_radius;
@@ -277,7 +278,7 @@ dgVector dgCollisionCylinder::ConvexConicSupporVertex (const dgVector& dir) cons
 	return dgVector (dir.m_x >= dgFloat32 (0.0f) ? height : - height, y0, z0, dgFloat32 (0.0f));       
 }
 
-dgVector dgCollisionCylinder::ConvexConicSupporVertex (const dgVector& point, const dgVector& dir) const
+dgVector dgCollisionCylinder::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
 	dgVector p (SupportVertex(dir, NULL));
 	if (dgAbsf(dir.m_x) > dgFloat32 (0.9997f)) {
@@ -293,12 +294,11 @@ dgVector dgCollisionCylinder::ConvexConicSupporVertex (const dgVector& point, co
 
 dgInt32 dgCollisionCylinder::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
 {
-	dgAssert (dgAbsf (normal % normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
+	dgAssert(0);
+	return 0;
+//	dgAssert (dgAbsf (normal % normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+//	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
 }
-
-
-
 
 dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
@@ -466,7 +466,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 		}
 
 	} else {
-//		count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut, normalSign);
+		//count = dgCollisionConvex::CalculatePlaneIntersection (normal, origin, contactsOut, normalSign);
 		dgMatrix matrix (normal);
 		matrix.m_posit.m_x = origin.m_x;
 		dgVector scale (m_radius);

@@ -63,16 +63,16 @@ class dgCollisionParamProxy
 	{
 	}
 
-	dgMatrix m_matrix;
+//	dgMatrix m_matrixOld;
 	dgVector m_normal;
 	dgVector m_closestPointBody0;
 	dgVector m_closestPointBody1;
 	dgUnsigned64 m_shapeFaceID;
 	dgContact* m_contactJoint;
-	dgBody* m_floatingBody;
-	dgBody* m_referenceBody;
-	dgCollisionInstance* m_floatingCollision;
-	dgCollisionInstance* m_referenceCollision;
+	dgBody* m_body0;
+	dgBody* m_body1;
+	dgCollisionInstance* m_instance0;
+	dgCollisionInstance* m_instance1;
 	dgContactPoint* m_contacts;
 	dgPolygonMeshDesc* m_polyMeshData;
 	

@@ -1321,6 +1321,12 @@ dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const
 	return supportVertex;
 }
 
+dgVector dgCollisionCompound::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	dgAssert (0);
+	return SupportVertex (dir, vertexIndex);
+}
+
 
 void dgCollisionCompound::GetCollisionInfo(dgCollisionInfo* const info) const
 {
@@ -1551,11 +1557,11 @@ dgInt32 dgCollisionCompound::ClosestDistance (dgCollisionParamProxy& proxy) cons
 {
 	int count = 0;
 	if (m_root) {
-		if (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
+		if (proxy.m_instance1->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 			count = ClosestDistanceToConvex (proxy);
-		} else if (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
+		} else if (proxy.m_instance1->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 			count = ClosestDistanceToCompound (proxy);
-		} else if (proxy.m_floatingCollision->IsType (dgCollision::dgCollisionBVH_RTTI)) {
+		} else if (proxy.m_instance1->IsType (dgCollision::dgCollisionBVH_RTTI)) {
 			dgAssert(0);
 		} else {
 			dgAssert(0);
@@ -1570,8 +1576,8 @@ dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& pro
 {
 	dgInt32 retFlag = 0;
 
-	dgCollisionInstance* const compoundInstance = proxy.m_referenceCollision;
-	dgCollisionInstance* const otherInstance = proxy.m_floatingCollision;
+	dgCollisionInstance* const compoundInstance = proxy.m_instance0;
+	dgCollisionInstance* const otherInstance = proxy.m_instance1;
 
 	const dgMatrix myMatrix = compoundInstance->GetGlobalMatrix();
 	dgMatrix matrix (otherInstance->GetGlobalMatrix() * myMatrix.Inverse());
@@ -1599,7 +1605,7 @@ dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& pro
 			dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 
 			childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
-			proxy.m_referenceCollision = &childInstance; 
+			proxy.m_instance0 = &childInstance; 
 			dgInt32 flag = m_world->ClosestPoint (proxy);
 			if (flag) {
 				retFlag = 1;
@@ -1656,8 +1662,8 @@ dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& p
 	dgUnsigned8 pool[128 * (sizeof (dgHeapNodePair) + sizeof (dgFloat32))];
 	dgUpHeap<dgHeapNodePair, dgFloat32> heap (pool, sizeof (pool));
 
-	dgCollisionInstance* const compoundInstance = proxy.m_referenceCollision;
-	dgCollisionInstance* const otherCompoundInstance = proxy.m_floatingCollision;
+	dgCollisionInstance* const compoundInstance = proxy.m_instance0;
+	dgCollisionInstance* const otherCompoundInstance = proxy.m_instance1;
 
 	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
 	const dgMatrix& otherMatrix = otherCompoundInstance->GetGlobalMatrix();
@@ -1678,12 +1684,12 @@ dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& p
 			dgCollisionInstance* const mySubShape = pair.m_nodeA->GetShape();
 			dgCollisionInstance myChildInstance (*mySubShape, mySubShape->GetChildShape());
 			myChildInstance.m_globalMatrix = myChildInstance.GetLocalMatrix() * myMatrix;
-			proxy.m_referenceCollision = &myChildInstance; 
+			proxy.m_instance0 = &myChildInstance; 
 
 			dgCollisionInstance* const otherSubShape = pair.m_nodeB->GetShape();
 			dgCollisionInstance otherChildInstance (*otherSubShape, otherSubShape->GetChildShape());
 			otherChildInstance.m_globalMatrix = otherChildInstance.GetLocalMatrix() * otherMatrix;
-			proxy.m_floatingCollision = &otherChildInstance; 
+			proxy.m_instance1 = &otherChildInstance; 
 
 			dgInt32 flag = m_world->ClosestPoint (proxy);
 			if (flag) {
@@ -1741,8 +1747,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 	dgAssert (otherCompoundInstance->IsType (dgCollision::dgCollisionCompound_RTTI));
 	dgCollisionCompound* const otherCompound = (dgCollisionCompound*)otherCompoundInstance->GetChildShape();
 
-	proxy.m_referenceBody = myBody;
-	proxy.m_floatingBody = otherBody;
+	proxy.m_body0 = myBody;
+	proxy.m_body1 = otherBody;
 
 	const dgMatrix& myMatrix = myCompoundInstance->GetGlobalMatrix();
 	const dgMatrix& otherMatrix = otherCompoundInstance->GetGlobalMatrix();
@@ -1777,11 +1783,11 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
-						proxy.m_referenceCollision = &childInstance; 
+						proxy.m_instance0 = &childInstance; 
 
 						dgCollisionInstance otherChildInstance (*otherSubShape, otherSubShape->GetChildShape());
 						otherChildInstance.m_globalMatrix = otherChildInstance.GetLocalMatrix() * otherMatrix;
-						proxy.m_floatingCollision = &otherChildInstance; 
+						proxy.m_instance1 = &otherChildInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
 						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
@@ -1806,8 +1812,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 						}
 						//childInstance.SetUserData(NULL);
 						//otherChildInstance.SetUserData(NULL);
-						proxy.m_referenceCollision = NULL;
-						proxy.m_floatingCollision = NULL; 
+						proxy.m_instance0 = NULL;
+						proxy.m_instance1 = NULL; 
 					}
 				}
 
@@ -1891,10 +1897,10 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 	dgAssert (terrainInstance->IsType (dgCollision::dgCollisionHeightField_RTTI));
 	dgCollisionHeightField* const terrainCollision = (dgCollisionHeightField*)terrainInstance->GetChildShape();
 
-	proxy.m_referenceBody = myBody;
-	proxy.m_floatingBody = terrainBody;
+	proxy.m_body0 = myBody;
+	proxy.m_body1 = terrainBody;
 
-	proxy.m_floatingCollision = terrainInstance;
+	proxy.m_instance1 = terrainInstance;
 //	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
 	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
 	dgOOBBTestData data (terrainInstance->GetGlobalMatrix() * myMatrix.Inverse());
@@ -1934,7 +1940,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 					if (processContacts) {
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
-						proxy.m_referenceCollision = &childInstance; 
+						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
 						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
@@ -1958,7 +1964,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 							break;
 						}
 						//childInstance.SetUserData(NULL);
-						proxy.m_referenceCollision = NULL;
+						proxy.m_instance0 = NULL;
 					}
 				}
 
@@ -1997,10 +2003,10 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase
 	dgAssert (userMeshInstance->IsType (dgCollision::dgCollisionUserMesh_RTTI));
 	dgCollisionUserMesh* const userMeshCollision = (dgCollisionUserMesh*)userMeshInstance->GetChildShape();
 
-	proxy.m_referenceBody = myBody;
-	proxy.m_floatingBody = userBody;
+	proxy.m_body0 = myBody;
+	proxy.m_body1 = userBody;
 
-	proxy.m_floatingCollision = userMeshInstance;
+	proxy.m_instance1 = userMeshInstance;
 //	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
 	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
 	dgOOBBTestData data (userMeshInstance->GetGlobalMatrix() * myMatrix.Inverse());
@@ -2035,7 +2041,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase
 					if (processContacts) {
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
-						proxy.m_referenceCollision = &childInstance; 
+						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
 						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
@@ -2059,7 +2065,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase
 							break;
 						}
 						//childInstance.SetUserData(NULL);
-						proxy.m_referenceCollision = NULL;
+						proxy.m_instance0 = NULL;
 					}
 				}
 
@@ -2096,10 +2102,10 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 	dgAssert (compoundInstance->GetChildShape() == this);
 	dgAssert (otherInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 
-	proxy.m_referenceBody = compoundBody;
+	proxy.m_body0 = compoundBody;
 
-	proxy.m_floatingBody = otherBody;
-	proxy.m_floatingCollision = otherBody->m_collision;
+	proxy.m_body1 = otherBody;
+	proxy.m_instance1 = otherBody->m_collision;
 
 	dgInt32 contactCount = 0;
 //	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * compoundBody->m_matrix);
@@ -2134,7 +2140,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 					if (processContacts) {
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
-						proxy.m_referenceCollision = &childInstance; 
+						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
 						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
@@ -2155,7 +2161,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 							break;
 						}
 						//childInstance.SetUserData(NULL);
-						proxy.m_referenceCollision = NULL;
+						proxy.m_instance0 = NULL;
 					}
 				}
 
@@ -2198,9 +2204,9 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 	dgAssert (treeCollisionInstance->IsType (dgCollision::dgCollisionBVH_RTTI));
 	dgCollisionBVH* const treeCollision = (dgCollisionBVH*)treeCollisionInstance->GetChildShape();
 
-	proxy.m_referenceBody = myBody;
-	proxy.m_floatingBody = treeBody;
-	proxy.m_floatingCollision = treeCollisionInstance;
+	proxy.m_body0 = myBody;
+	proxy.m_body1 = treeBody;
+	proxy.m_instance1 = treeCollisionInstance;
 
 //	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
 	const dgMatrix& myMatrix (compoundInstance->GetGlobalMatrix());
@@ -2254,7 +2260,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 					if (processContacts) {
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
-						proxy.m_referenceCollision = &childInstance; 
+						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
 						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
@@ -2276,7 +2282,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 							break;
 						}
 						//childInstance.SetUserData(NULL);
-						proxy.m_referenceCollision = NULL; 
+						proxy.m_instance0 = NULL; 
 					}
 				}
 
@@ -2430,10 +2436,10 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 	dgAssert (compoundInstance->GetChildShape() == this);
 	dgAssert (otherInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 
-	proxy.m_referenceBody = compoundBody;
+	proxy.m_body0 = compoundBody;
 
-	proxy.m_floatingBody = otherBody;
-	proxy.m_floatingCollision = otherBody->m_collision;
+	proxy.m_body1 = otherBody;
+	proxy.m_instance1 = otherBody->m_collision;
 
 	dgInt32 contactCount = 0;
 
@@ -2474,7 +2480,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 					if (processContacts) {
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
-						proxy.m_referenceCollision = &childInstance; 
+						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
 						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
@@ -2518,7 +2524,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 								}
 							}
 						}
-						proxy.m_referenceCollision = NULL; 
+						proxy.m_instance0 = NULL; 
 					}
 				}
 			} else {
@@ -2563,8 +2569,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 	dgAssert (compoundInstance->GetChildShape() == this);
 	dgAssert (otherCompoundInstance->IsType (dgCollision::dgCollisionCompound_RTTI));
 
-	proxy.m_referenceBody = compoundBody;
-	proxy.m_floatingBody = otherCompoundBody;
+	proxy.m_body0 = compoundBody;
+	proxy.m_body1 = otherCompoundBody;
 
 //	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * compoundBody->m_matrix);
 //	dgMatrix otherMatrix (otherCompoundInstance->GetLocalMatrix() * otherCompoundBody->m_matrix);
@@ -2614,11 +2620,11 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
-						proxy.m_referenceCollision = &childInstance; 
+						proxy.m_instance0 = &childInstance; 
 
 						dgCollisionInstance otherChildInstance (*otherSubShape, otherSubShape->GetChildShape());
 						otherChildInstance.m_globalMatrix = otherChildInstance.GetLocalMatrix() * otherMatrix;
-						proxy.m_floatingCollision = &otherChildInstance; 
+						proxy.m_instance1 = &otherChildInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
 						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
@@ -2665,8 +2671,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 								}
 							}
 						}
-						proxy.m_referenceCollision = NULL; 
-						proxy.m_floatingCollision = NULL; 
+						proxy.m_instance0 = NULL; 
+						proxy.m_instance1 = NULL; 
 					}
 				}
 			} else if (me->m_type == m_leaf) {
@@ -2750,9 +2756,9 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 	dgAssert (treeCollisionInstance->IsType (dgCollision::dgCollisionBVH_RTTI));
 	dgCollisionBVH* const treeCollision = (dgCollisionBVH*)treeCollisionInstance->GetChildShape();
 
-	proxy.m_referenceBody = myBody;
-	proxy.m_floatingBody = treeBody;
-	proxy.m_floatingCollision = treeCollisionInstance;
+	proxy.m_body0 = myBody;
+	proxy.m_body1 = treeBody;
+	proxy.m_instance1 = treeCollisionInstance;
 
 //	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * myBody->m_matrix);
 	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
@@ -2833,7 +2839,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
-						proxy.m_referenceCollision = &childInstance; 
+						proxy.m_instance0 = &childInstance; 
 
 						//dgCollisionInstance otherChildInstance (*otherSubShape, otherSubShape->GetChildShape());
 						//otherChildInstance.m_globalMatrix = otherChildInstance.GetLocalMatrix() * otherMatrix;
@@ -2897,7 +2903,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 								}
 							}
 						}
-						proxy.m_referenceCollision = NULL; 
+						proxy.m_instance0 = NULL; 
 					}
 				}
 
