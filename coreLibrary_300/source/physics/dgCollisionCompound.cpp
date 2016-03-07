@@ -3038,6 +3038,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 	return contactCount;
 }
 
+/*
 dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const convexInstance, const dgMatrix& instanceMatrix, const dgVector& instanceVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const
 {
 	dgFloat32 dist = dgFloat32 (1.0e10f);
@@ -3063,6 +3064,7 @@ dgFloat32 dgCollisionCompound::ConvexRayCast (const dgCollisionInstance* const c
 	}
 	return dist;
 }
+
 
 dgFloat32 dgCollisionCompound::ConvexRayCastSingleConvex (const dgCollisionInstance* const convexShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const
 {
@@ -3156,3 +3158,4 @@ dgFloat32 dgCollisionCompound::ConvexRayCastSingleConvex (const dgCollisionInsta
 
 	return maxT;
 }
+*/

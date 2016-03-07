@@ -50,10 +50,9 @@ class dgMinkFace
 DG_MSC_VECTOR_ALIGMENT
 class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>  
 {
-
 	public: 
 	dgContactSolver(dgCollisionParamProxy* const proxy);
-	dgContactSolver(dgCollisionInstance* const instance);
+	dgContactSolver(dgCollisionInstance* const instance0);
 
 	bool CalculateClosestPoints();
 	dgInt32 CalculateConvexCastContacts();

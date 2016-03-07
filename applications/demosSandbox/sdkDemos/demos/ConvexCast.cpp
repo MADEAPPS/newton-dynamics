@@ -240,7 +240,8 @@ public:
 	virtual void PreUpdate (dFloat timestep)
 	{
 		(void)timestep;
-
+		dAssert (0);
+/*
 		//CustomControllerManager<dConvexCastRecord>::PreUpdate (timestep);
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -290,6 +291,7 @@ public:
 			}
 			m_stupidLevel->SetCastingLine (p0, p1);
 		}
+*/
 	}
 
 	DemoEntityManager::ButtonKey m_helpKey;

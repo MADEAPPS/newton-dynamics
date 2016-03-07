@@ -189,6 +189,9 @@
     <ClCompile Include="..\..\..\source\physics\dgBroadPhaseAggregate.cpp">
       <Filter>systems</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgContactSolver.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBallConstraint.h">
@@ -342,6 +345,9 @@
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgBroadPhaseAggregate.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgContactSolver.h">
       <Filter>systems</Filter>
     </ClInclude>
   </ItemGroup>

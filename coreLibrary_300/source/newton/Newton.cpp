@@ -1226,16 +1226,18 @@ void NewtonWorldRayCast(const NewtonWorld* const newtonWorld, const dFloat* cons
 	}
 }
 
-void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const NewtonCollision* const shape, const dFloat* const matrix, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, int threadIndex)
+/*
+void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const dFloat* const matrix, const dFloat* const target, const NewtonCollision* const shape, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	if (filter) {
 		dgMatrix pp0 (matrix);
-		dgVector pp1 (p1[0], p1[1], p1[2], dgFloat32 (0.0f));
+		dgVector pp1 (target[0], target[1], target[2], dgFloat32 (0.0f));
 		Newton* const world = (Newton *) newtonWorld;
 		world->GetBroadPhase()->ConvexRayCast ((dgCollisionInstance*) shape, pp0, pp1, (OnRayCastAction) filter, (OnRayPrecastAction) prefilter, userData, threadIndex);
 	}
 }
+*/
 
 // Name: NewtonWorldConvexCast 
 // cast a simple convex shape along the ray that goes for the matrix position to the destination and get the firsts contacts of collision.
@@ -1275,15 +1277,16 @@ void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const Newto
 // this parameter could be NULL.
 //
 // See also: NewtonWorldRayCast  
-int NewtonWorldConvexCast(const NewtonWorld* const newtonWorld, const dFloat* const matrix, const dFloat* const target, 
-						  const NewtonCollision* const shape, dFloat* const hitParam, void* const userData, 
-						  NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, 
-						  int maxContactsCount, int threadIndex)
+int NewtonWorldConvexCast(const NewtonWorld* const newtonWorld, const dFloat* const matrix, const dFloat* const target, const NewtonCollision* const shape, 
+						 void* const userData, NewtonWorldRayFilterCallback filter, NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, 
+						 int maxContactsCount, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgVector destination (target[0], target[1], target[2], dgFloat32 (0.0f));
 	Newton* const world = (Newton *) newtonWorld;
-	return world->GetBroadPhase()->ConvexCast ((dgCollisionInstance*) shape, dgMatrix (matrix), destination, *hitParam, (OnRayPrecastAction) prefilter, userData, (dgConvexCastReturnInfo*)info, maxContactsCount, threadIndex);
+	dgAssert (0);
+	return 0;
+//	return world->GetBroadPhase()->ConvexCast ((dgCollisionInstance*) shape, dgMatrix (matrix), destination, *hitParam, (OnRayPrecastAction) prefilter, userData, (dgConvexCastReturnInfo*)info, maxContactsCount, threadIndex);
 }
 
 

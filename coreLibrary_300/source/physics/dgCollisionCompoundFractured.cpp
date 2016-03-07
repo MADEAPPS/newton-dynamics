@@ -1260,6 +1260,9 @@ void dgCollisionCompoundFractured::CalcAABB (const dgMatrix& matrix, dgVector& p
 
 dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
+	dgAssert (0);
+	return 0;
+/*
 	dgBroadPhase* const broaphaPhase = m_world->GetBroadPhase();
 	dgInt32 count = dgCollisionCompound::CalculateContacts (pair, proxy);
 	
@@ -1278,7 +1281,9 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgBroadPhase::dgPair* c
 			dgCollisionInstance* const otherInstance = otherBody->GetCollision();
 			dgAssert (myInstance->GetChildShape() == this);
 			dgContactPoint contactOut;
-			dgFloat32 dist = ConvexRayCast (otherInstance, otherInstance->GetGlobalMatrix(), relVeloc, proxy.m_timestep, contactOut, myBody, myInstance, NULL, proxy.m_threadIndex);
+			dgAssert (0);
+//			dgFloat32 dist = ConvexRayCast (otherInstance, otherInstance->GetGlobalMatrix(), relVeloc, proxy.m_timestep, contactOut, myBody, myInstance, NULL, proxy.m_threadIndex);
+			dgFloat32 dist = 0;
 			if (dist < proxy.m_timestep) {
 				dgAssert (m_conectivityMap.Find(contactOut.m_collision0));
 				dgConectivityGraph::dgListNode* const rootNode = m_conectivityMap.Find(contactOut.m_collision0)->GetInfo();
@@ -1304,8 +1309,8 @@ dgInt32 dgCollisionCompoundFractured::CalculateContacts (dgBroadPhase::dgPair* c
 			}
 		}
 	}
-
 	return count;
+*/
 }
 
 void dgCollisionCompoundFractured::BeginAddRemove ()

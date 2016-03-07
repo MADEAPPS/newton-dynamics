@@ -26,7 +26,7 @@
 #define DEMO_HEIGHT  960
 
 
-//#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// Precessing tops
@@ -56,7 +56,7 @@
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
-#define DEFAULT_SCENE	30			// basic rag doll
+//#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
 //#define DEFAULT_SCENE	32			// basic Car
 //#define DEFAULT_SCENE	33			// super Car

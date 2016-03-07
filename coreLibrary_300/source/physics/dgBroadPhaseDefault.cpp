@@ -92,6 +92,7 @@ void dgBroadPhaseDefault::RayCast(const dgVector& l0, const dgVector& l1, OnRayC
 	}
 }
 
+/*
 void dgBroadPhaseDefault::ConvexRayCast(dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const
 {
 	if (filter && m_rootNode && shape->IsType(dgCollision::dgCollisionConvexShape_RTTI)) {
@@ -114,7 +115,7 @@ void dgBroadPhaseDefault::ConvexRayCast(dgCollisionInstance* const shape, const 
 		dgBroadPhase::ConvexRayCast(stackPool, distance, 1, velocA, ray, shape, matrix, target, filter, prefilter, userData, threadId);
 	}
 }
-
+*/
 
 dgInt32 dgBroadPhaseDefault::ConvexCast(dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32& timeToImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {

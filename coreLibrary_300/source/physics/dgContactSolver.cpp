@@ -61,6 +61,7 @@ dgContactSolver::dgContactSolver(dgCollisionInstance* const instance)
 	:dgDownHeap<dgMinkFace*, dgFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
 	,m_proxy (NULL)
 	,m_instance0(instance)
+	,m_instance1(instance)
 	,m_vertexIndex(0)
 {
 }
@@ -1705,9 +1706,6 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point, const dgVecto
 
 	return count;
 }
-
-
-
 
 dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut)
 {

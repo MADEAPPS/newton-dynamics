@@ -355,9 +355,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 	return count;
 }
 
-
-
-
+/*
 dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceCollision, void* const userData, dgInt32 threadId) const
 {
 	dgAssert (castingShape->IsType (dgCollision::dgCollisionConvexShape_RTTI));
@@ -438,6 +436,6 @@ dgFloat32 dgCollisionMesh::ConvexRayCast (const dgCollisionInstance* const casti
 
 	return maxT;
 }
-
+*/
 
 

@@ -786,14 +786,6 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 }
 
 
-dgFloat32 dgCollisionConvex::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
-{
-	dgCollisionInstance instance (*body->GetCollision(), this);
-	dgContactSolver rayCaster (&instance);
-	return rayCaster.RayCast (localP0, localP1, maxT, contactOut);
-}
-
-
 dgVector dgCollisionConvex::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const 
 {
 	return SupportVertex(dir, vertexIndex);
@@ -812,14 +804,16 @@ dgInt32 dgCollisionConvex::CalculateContacts (const dgVector& point, const dgVec
 //	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
 }
 
+dgFloat32 dgCollisionConvex::RayCast(const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
+{
+	dgCollisionInstance instance(*body->GetCollision(), this);
+	dgContactSolver rayCaster(&instance);
+	return rayCaster.RayCast(localP0, localP1, maxT, contactOut);
+}
 
-
-
+/*
 dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceCollision, void* const userData, dgInt32 threadId) const 
 {
-	dgAssert(0);
-	return 0;
-/*
 	dgCollisionID id1 = referenceCollision->GetCollisionPrimityType();
 	dgCollisionID id2 = castingShape->GetCollisionPrimityType();
 	dgAssert ((id1 == m_polygonCollision) || (id1 < m_nullCollision));
@@ -842,9 +836,8 @@ dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const cas
 		dgCollisionConvex* const conicConvexShape = (dgCollisionConvex*)referenceCollision->GetChildShape();
 		return conicConvexShape->ConvexConicConvexRayCast (referenceCollision, referenceBody->m_matrix, castingShape, shapeMatrix, shapeVeloc, maxT, contactOut);
 	}
-*/	
 }
-
+*/
 
 dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {

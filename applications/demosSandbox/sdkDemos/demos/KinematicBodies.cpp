@@ -268,6 +268,8 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 
 	bool CalculateTranslationMatrix (dMatrix& matrix) const
 	{
+		dAssert (0);
+/*
 		matrix.m_posit -= m_castDir.Scale (3.0f);
 		matrix.m_posit.m_w = 1.0f;
 		dVector dest (matrix.m_posit + m_castDir.Scale (6.0f));
@@ -283,6 +285,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
             matrix.m_posit += m_castDir.Scale (D_PLACEMENT_PENETRATION);
 			return true;
 		}
+*/		
 		return false;
 	}
 

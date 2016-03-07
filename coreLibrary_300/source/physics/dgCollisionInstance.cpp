@@ -671,9 +671,9 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 		}
 	}
 	return dgFloat32 (1.2f);
-
 }
 
+/*
 dgFloat32 dgCollisionInstance::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& convexShapeMatrix, const dgVector& localVeloc, dgFloat32 minT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const referenceBody, void* const userData, dgInt32 threadId) const
 {
 	dgFloat32 t = dgFloat32 (1.2f);
@@ -692,6 +692,7 @@ dgFloat32 dgCollisionInstance::ConvexRayCast (const dgCollisionInstance* const c
 	}
 	return t;
 }
+*/
 
 void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix, const dgVector& origin, const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgFloat32 fluidViscosity, dgVector& accel, dgVector& alpha)
 {

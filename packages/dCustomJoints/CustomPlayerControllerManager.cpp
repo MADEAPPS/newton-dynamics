@@ -309,11 +309,13 @@ dFloat CustomPlayerController::CalculateContactKinematics(const dVector& veloc, 
 
 void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& castMatrix, const dVector& dst, int threadIndex)
 {
+	dAssert (0);
+/*
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
 	CustomControllerConvexRayFilter filter(m_body);
-	NewtonWorldConvexRayCast (world, m_castingShape, &castMatrix[0][0], &dst[0], CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexCastPreFilter::Prefilter, threadIndex);
+	NewtonWorldConvexRayCast (world, &castMatrix[0][0], &dst[0], m_castingShape, CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexCastPreFilter::Prefilter, threadIndex);
 
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
@@ -327,6 +329,7 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 		matrix.m_posit = supportPoint;
 		matrix.m_posit.m_w = 1.0f;
 	}
+*/
 }
 
 
@@ -377,6 +380,8 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	upConstratint.m_normal[2] = m_upVector.m_z;
 	upConstratint.m_normal[3] = m_upVector.m_w;
 
+	dAssert (0);
+/*
 	for (int j = 0; (j < D_PLAYER_MAX_INTERGRATION_STEPS) && (normalizedTimeLeft > 1.0e-5f); j ++ ) {
 		if ((veloc % veloc) < 1.0e-6f) {
 			break;
@@ -505,4 +510,5 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	// set player velocity, position and orientation
 	NewtonBodySetVelocity(m_body, &veloc[0]);
 	NewtonBodySetMatrix (m_body, &matrix[0][0]);
+*/
 }

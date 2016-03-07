@@ -1869,7 +1869,9 @@ void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 
 	NewtonCollision* const tireCollision = NewtonBodyGetCollision(tireBody);
 	TireFilter filter(tireBody, vehicleBody);
-	NewtonWorldConvexRayCast (world, tireCollision, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], CustomControllerConvexCastPreFilter::Filter, &filter, CustomControllerConvexCastPreFilter::Prefilter, 0);
+
+	dAssert (0);
+//	NewtonWorldConvexRayCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, CustomControllerConvexCastPreFilter::Filter, &filter, CustomControllerConvexCastPreFilter::Prefilter, 0);
 	for (int i = 0; i < filter.m_hitCount; i ++) {
 		tire->m_collidingBodies[i] = filter.m_hitBodies[i];
 	}
