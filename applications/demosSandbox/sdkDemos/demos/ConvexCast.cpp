@@ -237,18 +237,29 @@ public:
 	{
 	};
 
-	static unsigned RayPrefilterCallback (const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
-	{
-		dAssert (0);
-		return 1;
-	}
 
-	static dFloat RayFilterCallback (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
+	class ConvexCastCallBack
 	{
-		dAssert(0);
-		return 1;
-	}
+		public:
+		ConvexCastCallBack ()
+			:m_param(10.0f)
+		{
+		}
 
+		static unsigned Prefilter (const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
+		{
+			return 1;
+		}
+
+		static dFloat Filter (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
+		{
+			dAssert(0);
+			return 1;
+		}
+
+		//NewtonWorldConvexCastReturnInfo m_contacts[16];
+		dFloat m_param;
+	};
 
 	virtual void PreUpdate (dFloat timestep)
 	{
@@ -287,10 +298,10 @@ public:
 			dMatrix matrix (dGetIdentityMatrix());
 			matrix.m_posit = p0;
 
-			dFloat hitParam = 10.0f;
-			NewtonWorldConvexCastReturnInfo info[16];
+			ConvexCastCallBack filter;
 			NewtonCollision* const shape = m_stupidLevel->GetCurrentShape();
-			int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, RayFilterCallback, &hitParam, RayPrefilterCallback, &info[0], 4, 0);
+			//int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, ConvexCastCallBack::Filter, &filter, ConvexCastCallBack::Prefilter, &filter.m_contacts[0], 4, 0);
+			int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, ConvexCastCallBack::Filter, &filter, ConvexCastCallBack::Prefilter, NULL, 0, 0);
 
 			//if (!count) {
 				//dTrace(("%f, %f, %f\n", p0[0], p0[1], p0[2]));
@@ -298,7 +309,7 @@ public:
 			//}
 
 			if (count) {
-				matrix.m_posit += (p1 - matrix.m_posit).Scale (hitParam);
+				matrix.m_posit += (p1 - matrix.m_posit).Scale (filter.m_param);
 				m_stupidLevel->SetCastEntityMatrix (scene, matrix);
 			}
 			m_stupidLevel->SetCastingLine (p0, p1);

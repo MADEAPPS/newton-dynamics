@@ -1265,7 +1265,7 @@ dgInt32 dgWorld::CollideContinue (
 	pair.m_contactCount = 0;
 	pair.m_isDeformable = 0;
 	pair.m_cacheIsValid = 0;
-	CalculateContacts (&pair, time, threadIndex, true, false);
+	CalculateContacts (&pair, time, threadIndex, true, maxContacts ? false : true);
 
 	if (pair.m_timeOfImpact < dgFloat32 (1.0f)) {
 		retTimeStep = pair.m_timeOfImpact;

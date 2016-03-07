@@ -1955,16 +1955,15 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 		dgFloat32 num = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar();
 		if (num <= dgFloat32(1.0e-5f)) {
 			// bodies collide at time tacc, but we do not set it yet
-			m_proxy->m_normal = m_normal.Scale4 (dgFloat32 (-1.0f));
 			dgVector step(relVeloc.Scale4(tacc));
-
+			m_proxy->m_timestep = tacc;
 			m_proxy->m_closestPointBody0 = m_closestPoint0;
 			m_proxy->m_closestPointBody1 = m_closestPoint1;
+			m_proxy->m_normal = m_normal.Scale4 (dgFloat32 (-1.0f));
 			m_proxy->m_contactJoint->m_closestDistance = m_proxy->m_normal.DotProduct4(m_closestPoint0 - m_closestPoint1).GetScalar();
 			dgFloat32 penetration = dgMax(num * dgFloat32(-1.0f) - DG_RESTING_CONTACT_PENETRATION, dgFloat32(0.0f));
 			m_proxy->m_contactJoint->m_closestDistance = penetration;
-			m_proxy->m_timestep = tacc;
-			if (m_proxy->m_contacts) {
+			if (m_proxy->m_contacts && !m_proxy->m_intersectionTestOnly) {
 				if (m_proxy->m_instance0->GetCollisionMode() & m_proxy->m_instance1->GetCollisionMode()) {
 
 					m_normal = m_normal.Scale4 (dgFloat32 (-1.0f));
@@ -1972,8 +1971,7 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 					dgVector contactPoint((m_closestPoint0 + m_closestPoint1).Scale4(dgFloat32(0.5f)));
 					count = CalculateContacts(contactPoint, m_normal);
 					if (count) {
-
-						m_proxy->m_timestep = tacc;
+			
 						count = dgMin(m_proxy->m_maxContacts, count);
 						dgContactPoint* const contactOut = m_proxy->m_contacts;
 
