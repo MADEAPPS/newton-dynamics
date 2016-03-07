@@ -237,12 +237,23 @@ public:
 	{
 	};
 
+	static unsigned RayPrefilterCallback (const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
+	{
+		dAssert (0);
+		return 1;
+	}
+
+	static dFloat RayFilterCallback (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
+	{
+		dAssert(0);
+		return 1;
+	}
+
+
 	virtual void PreUpdate (dFloat timestep)
 	{
 		(void)timestep;
-		dAssert (0);
-/*
-		//CustomControllerManager<dConvexCastRecord>::PreUpdate (timestep);
+
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
@@ -276,10 +287,11 @@ public:
 			dMatrix matrix (dGetIdentityMatrix());
 			matrix.m_posit = p0;
 
-			dFloat hitParam;
+			dFloat hitParam = 10.0f;
 			NewtonWorldConvexCastReturnInfo info[16];
 			NewtonCollision* const shape = m_stupidLevel->GetCurrentShape();
-			int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &hitParam, NULL, NULL, &info[0], 4, 0);
+			int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, RayFilterCallback, &hitParam, RayPrefilterCallback, &info[0], 4, 0);
+
 			//if (!count) {
 				//dTrace(("%f, %f, %f\n", p0[0], p0[1], p0[2]));
 				//dTrace(("%f, %f, %f\n", p1[0], p1[1], p1[2]));
@@ -291,7 +303,6 @@ public:
 			}
 			m_stupidLevel->SetCastingLine (p0, p1);
 		}
-*/
 	}
 
 	DemoEntityManager::ButtonKey m_helpKey;

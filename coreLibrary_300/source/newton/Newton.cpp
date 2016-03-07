@@ -1278,7 +1278,7 @@ void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const dFloa
 //
 // See also: NewtonWorldRayCast  
 int NewtonWorldConvexCast(const NewtonWorld* const newtonWorld, const dFloat* const matrix, const dFloat* const target, const NewtonCollision* const shape, 
-						 void* const userData, NewtonWorldRayFilterCallback filter, NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, 
+						 NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, 
 						 int maxContactsCount, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
