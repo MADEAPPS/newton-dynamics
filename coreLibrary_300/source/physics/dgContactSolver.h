@@ -88,13 +88,14 @@ class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>
 	DG_INLINE dgInt32 CalculateIntersectingPlane(dgInt32 count);
 	DG_INLINE void CalculateContactFromFeacture(dgInt32 featureType);
 	DG_INLINE dgPerimenterEdge* ReduceContacts(dgPerimenterEdge* poly, dgInt32 maxCount) const;
-	DG_INLINE static dgVector ReduceLine(dgInt32& indexOut, dgVector* const lineDiff, dgVector* const lineSum, dgInt32* const shapeFaceIndex);
-	DG_INLINE static dgVector ReduceLineLarge(dgInt32& indexOut, dgVector* const lineDiff, dgVector* const lineSum, dgInt32* const shapeFaceIndex);
-	DG_INLINE static dgVector ReduceTriangle(dgInt32& indexOut, dgVector* const triangleDiff, dgVector* const triangleSum, dgInt32* const shapeFaceIndex);
-	DG_INLINE static dgVector ReduceTriangleLarge (dgInt32& indexOut, dgVector* const triangleDiff, dgVector* const triangleSum, dgInt32* const shapeFaceIndex);
-	DG_INLINE static dgVector ReduceTetrahedrum(dgInt32& indexOut, dgVector* const tetraDiff, dgVector* const tetraSum, dgInt32* const shapeFaceIndex);
-	DG_INLINE static dgVector ReduceTetrahedrumLarge (dgInt32& indexOut, dgVector* const tetraDiff, dgVector* const tetraSum, dgInt32* const shapeFaceIndex);
-	DG_INLINE static void ReduceDegeneratedTriangle(dgVector& diff0, dgVector& sum0, dgVector& diff1, dgVector& sum1, const dgVector& diff2, const dgVector& sum2);
+
+	DG_INLINE void ReduceDegeneratedTriangle();
+	DG_INLINE dgVector ReduceLine(dgInt32& indexOut);
+	DG_INLINE dgVector ReduceTriangle(dgInt32& indexOut);
+	DG_INLINE dgVector ReduceTetrahedrum(dgInt32& indexOut);
+	DG_INLINE dgVector ReduceLineLarge(dgInt32& indexOut);
+	DG_INLINE dgVector ReduceTriangleLarge (dgInt32& indexOut);
+	DG_INLINE dgVector ReduceTetrahedrumLarge (dgInt32& indexOut);
 
 	bool SanityCheck() const;
 	dgInt32 ConvexPolygonsIntersection(const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgInt32 maxContacts) const;

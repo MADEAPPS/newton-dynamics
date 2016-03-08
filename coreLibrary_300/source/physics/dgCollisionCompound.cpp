@@ -2420,7 +2420,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 
 dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
-	if (proxy.m_timestep < dgFloat32 (1.0e-4f)) {
+	if (proxy.m_timestep____ < dgFloat32 (1.0e-4f)) {
 		return 0;
 	}
 	dgContactPoint* const contacts = proxy.m_contacts;
@@ -2457,7 +2457,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 	stackPool[0] = m_root;
 	const dgContactMaterial* const material = constraint->GetMaterial();
 
-	dgFloat32 maxParam = proxy.m_timestep;
+	dgFloat32 maxParam = proxy.m_timestep____;
 	dgFloat32 invMaxParam = dgFloat32 (1.0f) / maxParam; 
 
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
@@ -2489,7 +2489,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 						if (count) {
-							dgFloat32 param = proxy.m_timestep;
+							dgFloat32 param = proxy.m_timestep____;
 							dgAssert (param >= dgFloat32 (0.0f));
 							if (param < maxParam) {
 								if (proxy.m_intersectionTestOnly) {
@@ -2549,7 +2549,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 
 dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
-	if (proxy.m_timestep < dgFloat32 (1.0e-4f)) {
+	if (proxy.m_timestep____ < dgFloat32 (1.0e-4f)) {
 		return 0;
 	}
 
@@ -2591,7 +2591,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 	stackPool[0][1] = otherCompound->m_root;
 	const dgContactMaterial* const material = constraint->GetMaterial();
 
-	dgFloat32 maxParam = proxy.m_timestep;
+	dgFloat32 maxParam = proxy.m_timestep____;
 	dgFloat32 invMaxParam = dgFloat32 (1.0f) / maxParam; 
 
 	dgFloat32 upperBound = dgFloat32 (1.0f);
@@ -2634,7 +2634,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
 
 						if (count) {
-							dgFloat32 param = proxy.m_timestep;
+							dgFloat32 param = proxy.m_timestep____;
 							dgAssert (param >= dgFloat32 (0.0f));
 							if (param < maxParam) {
 
@@ -2735,7 +2735,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 
 dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
-	if (proxy.m_timestep < dgFloat32 (1.0e-4f)) {
+	if (proxy.m_timestep____ < dgFloat32 (1.0e-4f)) {
 		return 0;
 	}
 
@@ -2781,7 +2781,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 	const dgVector& treeScale = treeCollisionInstance->GetScale();
 	const dgContactMaterial* const material = constraint->GetMaterial();
 
-	dgFloat32 maxParam = proxy.m_timestep;
+	dgFloat32 maxParam = proxy.m_timestep____;
 	dgFloat32 invMaxParam = dgFloat32 (1.0f) / maxParam; 
 
 	dgFloat32 upperBound = dgFloat32 (1.0f);
@@ -2866,7 +2866,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 						//}
 
 						if (count) {
-							dgFloat32 param = proxy.m_timestep;
+							dgFloat32 param = proxy.m_timestep____;
 							dgAssert (param >= dgFloat32 (0.0f));
 							if (param < maxParam) {
 

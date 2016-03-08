@@ -440,7 +440,7 @@ dgInt32 dgWorld::ClosestPoint(const dgCollisionInstance* const collisionSrcA, co
 	proxy.m_instance0 = collideBodyA.m_collision;
 	proxy.m_body1 = &collideBodyB;
 	proxy.m_instance1 = collideBodyB.m_collision;
-	proxy.m_timestep = dgFloat32 (0.0f);
+	proxy.m_timestep____ = dgFloat32 (0.0f);
 	proxy.m_skinThickness = dgFloat32 (0.0f);
 	proxy.m_maxContacts = 16;
 	
@@ -504,10 +504,10 @@ bool dgWorld::IntersectionTest (const dgCollisionInstance* const collisionSrcA, 
 	pair.m_contactCount = 0;
 	pair.m_contact = &contactJoint;
 	pair.m_contactBuffer = NULL; 
-	pair.m_timeOfImpact = dgFloat32 (0.0f);
+	pair.m_timestep = dgFloat32 (0.0f);
 	pair.m_isDeformable = 0;
 	pair.m_cacheIsValid = 0;
-	CalculateContacts (&pair, dgFloat32 (0.0f), threadIndex, false, true);
+	CalculateContacts (&pair, threadIndex, false, true);
 	return (pair.m_contactCount == -1) ? true : false;
 }
 
@@ -693,7 +693,7 @@ void dgWorld::ProcessCachedContacts (dgContact* const contact, dgFloat32 timeste
 }
 
 
-void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
+void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex)
 {
 	dgContact* const contact = pair->m_contact;
 	dgBody* const body0 = contact->m_body0;
@@ -711,7 +711,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 time
 	dgInt32 contactCount = pair->m_contactCount;
 	dgList<dgContactMaterial>& list = *contact;
 
-	contact->m_timeOfImpact = pair->m_timeOfImpact;
+	contact->m_timeOfImpact = pair->m_timestep;
 
 	dgInt32 count = 0;
 	dgVector cachePosition [DG_MAX_CONTATCS];
@@ -892,7 +892,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 time
 
 	contact->m_maxDOF = dgUnsigned32 (3 * contact->GetCount());
 	if (material->m_processContactPoint) {
-		material->m_processContactPoint(*contact, timestep, threadIndex);
+		material->m_processContactPoint(*contact, pair->m_timestep, threadIndex);
 	}
 
 /*
@@ -912,7 +912,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 time
 */
 }
 
-void dgWorld::ProcessContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
+void dgWorld::ProcessContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex)
 {
 	dgAssert (pair->m_contact);
 	dgAssert (pair->m_contact->m_body0);
@@ -922,11 +922,11 @@ void dgWorld::ProcessContacts (dgBroadPhase::dgPair* const pair, dgFloat32 times
 
 	pair->m_contact->m_positAcc = dgVector (dgFloat32 (0.0f));
 	pair->m_contact->m_rotationAcc = dgVector (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	PopulateContacts (pair, timestep, threadIndex);
+	PopulateContacts (pair, threadIndex);
 }
 
 
-void dgWorld::ProcessDeformableContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex)
+void dgWorld::ProcessDeformableContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex)
 {
 	dgAssert (0);
 	/*
@@ -1112,7 +1112,7 @@ void dgWorld::SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamP
 }
 
 
-void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly)
+void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly)
 {
 	dgContact* const contact = pair->m_contact;
 	dgBody* const body0 = contact->m_body0;
@@ -1120,7 +1120,7 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 tim
 	const dgContactMaterial* const material = contact->m_material;
 	dgCollisionParamProxy proxy(contact, pair->m_contactBuffer, threadIndex, ccdMode, intersectionTestOnly);
 
-	proxy.m_timestep = timestep;
+	proxy.m_timestep____ = pair->m_timestep;
 	proxy.m_maxContacts = DG_MAX_CONTATCS;
 	proxy.m_skinThickness = material->m_skinThickness;
 
@@ -1146,7 +1146,7 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 tim
 		ConvexContacts (pair, proxy);
 	}
 
-	pair->m_timeOfImpact = proxy.m_timestep;
+	pair->m_timestep = proxy.m_timestep____;
 }
 
 
@@ -1168,7 +1168,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 	dgCollisionParamProxy proxy(contact, NULL, threadIndex, true, true);
 
 	proxy.m_maxContacts = 0;
-	proxy.m_timestep = timestep;
+	proxy.m_timestep____ = timestep;
 	proxy.m_skinThickness = material->m_skinThickness;
 
 	if (body0->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
@@ -1207,7 +1207,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 
 	contact->m_contactActive = isActive;
 	contact->m_maxDOF = contactCount;
-	return proxy.m_timestep;
+	return proxy.m_timestep____;
 }
 
 
@@ -1228,8 +1228,6 @@ dgInt32 dgWorld::CollideContinue (
 	dgContactPoint contacts[DG_MAX_CONTATCS];
 
 	dgInt32 count = 0;
-	dgFloat32 time = retTimeStep;
-	retTimeStep = dgFloat32 (1.0f);
 	maxContacts = dgMin (DG_MAX_CONTATCS, maxContacts);
 
 	collideBodyA.m_world = this;
@@ -1261,14 +1259,14 @@ dgInt32 dgWorld::CollideContinue (
 	dgBroadPhase::dgPair pair;
 	pair.m_contact = &contactJoint;
 	pair.m_contactBuffer = contacts;
-	pair.m_timeOfImpact = dgFloat32 (0.0f);
+	pair.m_timestep = retTimeStep;
 	pair.m_contactCount = 0;
 	pair.m_isDeformable = 0;
 	pair.m_cacheIsValid = 0;
-	CalculateContacts (&pair, time, threadIndex, true, maxContacts ? false : true);
+	CalculateContacts (&pair, threadIndex, true, maxContacts ? false : true);
 
-	if (pair.m_timeOfImpact < dgFloat32 (1.0f)) {
-		retTimeStep = pair.m_timeOfImpact;
+	if (pair.m_timestep < retTimeStep) {
+		retTimeStep = pair.m_timestep;
 	}
 
 	count = pair.m_contactCount;
@@ -1334,10 +1332,10 @@ dgInt32 dgWorld::Collide (
 	pair.m_contactCount = 0;
 	pair.m_contact = &contactJoint;
 	pair.m_contactBuffer = contacts; 
-	pair.m_timeOfImpact = dgFloat32 (0.0f);
+	pair.m_timestep = dgFloat32 (0.0f);
 	pair.m_isDeformable = 0;
 	pair.m_cacheIsValid = 0;
-	CalculateContacts (&pair, dgFloat32 (0.0f), threadIndex, false, false);
+	CalculateContacts (&pair, threadIndex, false, false);
 
 	count = pair.m_contactCount;
 	if (count > maxContacts) {
@@ -1542,8 +1540,8 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		if (proxy.m_instance0->GetCollisionMode() & proxy.m_instance1->GetCollisionMode()) {
 			contactJoint->m_closestDistance = dgFloat32(1.0e10f);
 
-			dgAssert(proxy.m_timestep <= dgFloat32(1.0f));
-			dgAssert(proxy.m_timestep >= dgFloat32(0.0f));
+			dgAssert(proxy.m_timestep____ <= dgFloat32(1.0f));
+			dgAssert(proxy.m_timestep____ >= dgFloat32(0.0f));
 
 			dgPolygonMeshDesc data(proxy, NULL);
 			if (proxy.m_continueCollision) {
@@ -1559,7 +1557,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 					dgFloat32 angularSpeedBound = maxAngularSpeed * (instance0.GetBoxMaxRadius() - minRadius);
 
 					dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
-					dgVector upperBoundVeloc(hullVeloc.Scale4(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
+					dgVector upperBoundVeloc(hullVeloc.Scale4(proxy.m_timestep____ * upperBoundSpeed / baseLinearSpeed));
 					data.SetDistanceTravel(upperBoundVeloc);
 				}
 			}
@@ -1783,14 +1781,13 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 	dgVector n(dgFloat32(0.0f));
 	dgVector p(dgFloat32(0.0f));
 	dgVector q(dgFloat32(0.0f));
-	dgUnsigned64 shapeFaceID = dgUnsigned64(-1);
 
 	dgFloat32 closestDist = dgFloat32(1.0e10f);
-	dgFloat32 minTimeStep = proxy.m_timestep;
-	dgFloat32 timeNormalizer = proxy.m_timestep;
-	dgFloat32 epsilon = dgFloat32(-1.0e-3f) * proxy.m_timestep;
+	dgFloat32 minTimeStep = proxy.m_timestep____;
+	dgFloat32 timeNormalizer = proxy.m_timestep____;
+	dgFloat32 epsilon = dgFloat32(-1.0e-3f) * proxy.m_timestep____;
 
-	for (dgInt32 i = 0; (i < data.m_faceCount) && (proxy.m_timestep >= (data.m_hitDistance[i] * timeNormalizer)); i++) {
+	for (dgInt32 i = 0; (i < data.m_faceCount) && (proxy.m_timestep____ >= (data.m_hitDistance[i] * timeNormalizer)); i++) {
 		dgInt32 address = data.m_faceIndexStart[i];
 		const dgInt32* const localIndexArray = &indexArray[address];
 		polygon.m_vertexIndex = localIndexArray;
@@ -1810,7 +1807,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 		dgInt32 count1 = polygon.CalculateContactToConvexHullContinue(this, polySoupInstance, proxy);
 
 		if (count1 > 0) {
-			dgFloat32 error = proxy.m_timestep - minTimeStep;
+			dgFloat32 error = proxy.m_timestep____ - minTimeStep;
 			if (error < epsilon) {
 				count = 0;
 				countleft = maxContacts;
@@ -1829,12 +1826,11 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 		}
 
 		closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
-		if (proxy.m_timestep <= minTimeStep) {
-			minTimeStep = proxy.m_timestep;
+		if (proxy.m_timestep____ <= minTimeStep) {
+			minTimeStep = proxy.m_timestep____;
 			n = proxy.m_normal;
 			p = proxy.m_closestPointBody0;
 			q = proxy.m_closestPointBody1;
-			shapeFaceID = proxy.m_shapeFaceID;
 		}
 	}
 

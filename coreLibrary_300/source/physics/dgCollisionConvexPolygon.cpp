@@ -762,10 +762,10 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 				dgAssert(timetoImpact >= dgFloat32(0.0f));
 			}
 
-			if (timetoImpact <= proxy.m_timestep) {
+			if (timetoImpact <= proxy.m_timestep____) {
 				dgVector contactPoints[64];
 				contactJoint->m_closestDistance = penetration;
-				proxy.m_timestep = timetoImpact;
+				proxy.m_timestep____ = timetoImpact;
 
 				if (!proxy.m_intersectionTestOnly) {
 					pointInHull -= normalInHull.Scale4 (DG_ROBUST_PLANE_CLIP);

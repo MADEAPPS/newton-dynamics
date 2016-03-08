@@ -474,7 +474,7 @@ void dgBroadPhase::ConvexRayCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 */
 
 dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& velocA, const dgVector& velocB, dgFastRayTest& ray,
-								 dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
+								 dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
 	dgTriplex points[DG_CONVEX_CAST_POOLSIZE];
 	dgTriplex normals[DG_CONVEX_CAST_POOLSIZE];
@@ -483,7 +483,6 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 	dgInt64 attributeB[DG_CONVEX_CAST_POOLSIZE];
 
 	dgInt32 totalCount = 0;
-	dgFloat32 time = dgFloat32(1.0f);
 	dgFloat32 maxParam = dgFloat32(1.2f);
 
 	dgVector boxP0;
@@ -493,7 +492,7 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 
 	maxContacts = dgMin (maxContacts, DG_CONVEX_CAST_POOLSIZE);
 	dgAssert (!maxContacts || (maxContacts && info));
-	dgFloat32 timeToImpact = dgFloat32 (1.0e10f);
+	dgFloat32 timeToImpact = dgFloat32 (1.0e0f);
 	while (stack) {
 		stack--;
 
@@ -507,36 +506,34 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 			dgBody* const body = me->GetBody();
 			if (body) {
 				if (!PREFILTER_RAYCAST(prefilter, body, shape, userData)) {
-					dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, maxContacts, threadIndex);
+					dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, timeToImpact, points, normals, penetration, attributeA, attributeB, maxContacts, threadIndex);
 
-					if (count) {
-						if (time < maxParam) {
-							if ((time - maxParam) < dgFloat32(-1.0e-3f)) {
-								totalCount = 0;
-							}
-							maxParam = time;
-							if (count >= (maxContacts - totalCount)) {
-								count = maxContacts - totalCount;
-							}
+					if (timeToImpact < maxParam) {
+						if ((timeToImpact - maxParam) < dgFloat32(-1.0e-3f)) {
+							totalCount = 0;
+						}
+						maxParam = timeToImpact;
+						if (count >= (maxContacts - totalCount)) {
+							count = maxContacts - totalCount;
+						}
 
-							for (dgInt32 i = 0; i < count; i++) {
-								info[totalCount].m_point[0] = points[i].m_x;
-								info[totalCount].m_point[1] = points[i].m_y;
-								info[totalCount].m_point[2] = points[i].m_z;
-								info[totalCount].m_point[3] = dgFloat32(0.0f);
-								info[totalCount].m_normal[0] = normals[i].m_x;
-								info[totalCount].m_normal[1] = normals[i].m_y;
-								info[totalCount].m_normal[2] = normals[i].m_z;
-								info[totalCount].m_normal[3] = dgFloat32(0.0f);
-								info[totalCount].m_penetration = penetration[i];
-								info[totalCount].m_contaID = attributeB[i];
-								info[totalCount].m_hitBody = body;
-								totalCount++;
-							}
+						for (dgInt32 i = 0; i < count; i++) {
+							info[totalCount].m_point[0] = points[i].m_x;
+							info[totalCount].m_point[1] = points[i].m_y;
+							info[totalCount].m_point[2] = points[i].m_z;
+							info[totalCount].m_point[3] = dgFloat32(0.0f);
+							info[totalCount].m_normal[0] = normals[i].m_x;
+							info[totalCount].m_normal[1] = normals[i].m_y;
+							info[totalCount].m_normal[2] = normals[i].m_z;
+							info[totalCount].m_normal[3] = dgFloat32(0.0f);
+							info[totalCount].m_penetration = penetration[i];
+							info[totalCount].m_contaID = attributeB[i];
+							info[totalCount].m_hitBody = body;
+							totalCount++;
 						}
-						if (maxParam < 1.0e-8f) {
-							break;
-						}
+					}
+					if (maxParam < 1.0e-8f) {
+						break;
 					}
 				}
 			} else if (me->IsAggregate()) {
@@ -597,7 +594,7 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 			}
 		}
 	}
-	timeToImpact = maxParam;
+	*param = maxParam;
 	return totalCount;
 }
 
@@ -1188,20 +1185,20 @@ bool dgBroadPhase::ValidateContactCache(dgContact* const contact, dgFloat32 time
 }
 
 
-void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgFloat32 timestep, dgInt32 threadID)
+void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 {
     dgContactPoint contacts[DG_MAX_CONTATCS];
 
 	pair->m_cacheIsValid = false;
 	pair->m_contactBuffer = contacts;
-	m_world->CalculateContacts(pair, timestep, threadID, false, false);
+	m_world->CalculateContacts(pair, threadID, false, false);
 
 	if (pair->m_contactCount) {
 		dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
 		if (pair->m_isDeformable) {
-			m_world->ProcessDeformableContacts(pair, timestep, threadID);
+			m_world->ProcessDeformableContacts(pair, threadID);
 		} else {
-			m_world->ProcessContacts(pair, timestep, threadID);
+			m_world->ProcessContacts(pair, threadID);
 			KinematicBodyActivation(pair->m_contact);
 		}
 	} else {
@@ -1246,7 +1243,8 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 
 			pair.m_contact = contact;
 			pair.m_isDeformable = 0;
-            CalculatePairContacts (&pair, timestep, threadIndex);
+			pair.m_timestep = timestep;
+            CalculatePairContacts (&pair, threadIndex);
 		}
 	}
 }

@@ -238,28 +238,10 @@ public:
 	};
 
 
-	class ConvexCastCallBack
+	static unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
 	{
-		public:
-		ConvexCastCallBack ()
-			:m_param(10.0f)
-		{
-		}
-
-		static unsigned Prefilter (const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
-		{
-			return 1;
-		}
-
-		static dFloat Filter (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
-		{
-			dAssert(0);
-			return 1;
-		}
-
-		//NewtonWorldConvexCastReturnInfo m_contacts[16];
-		dFloat m_param;
-	};
+		return 1;
+	}
 
 	virtual void PreUpdate (dFloat timestep)
 	{
@@ -298,18 +280,19 @@ public:
 			dMatrix matrix (dGetIdentityMatrix());
 			matrix.m_posit = p0;
 
-			ConvexCastCallBack filter;
+			
+			dFloat param = 1.2f;
 			NewtonCollision* const shape = m_stupidLevel->GetCurrentShape();
 			//int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, ConvexCastCallBack::Filter, &filter, ConvexCastCallBack::Prefilter, &filter.m_contacts[0], 4, 0);
-			int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, ConvexCastCallBack::Filter, &filter, ConvexCastCallBack::Prefilter, NULL, 0, 0);
+			NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &param, NULL, Prefilter, NULL, 0, 0);
 
 			//if (!count) {
 				//dTrace(("%f, %f, %f\n", p0[0], p0[1], p0[2]));
 				//dTrace(("%f, %f, %f\n", p1[0], p1[1], p1[2]));
 			//}
 
-			if (count) {
-				matrix.m_posit += (p1 - matrix.m_posit).Scale (filter.m_param);
+			if (param < 1.0f) {
+				matrix.m_posit += (p1 - matrix.m_posit).Scale (param);
 				m_stupidLevel->SetCastEntityMatrix (scene, matrix);
 			}
 			m_stupidLevel->SetCastingLine (p0, p1);

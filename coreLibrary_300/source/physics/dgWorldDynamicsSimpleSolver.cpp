@@ -300,11 +300,12 @@ void dgWorldDynamicUpdate::CalculateIslandContacts (dgIsland* const island, dgFl
 					contact->m_broadphaseLru = currLru;
 					pair.m_contact = contact;
 					pair.m_cacheIsValid = false;
+					pair.m_timestep = timestep;
 					pair.m_contactBuffer = contactArray;
-					world->CalculateContacts (&pair, timestep, threadID, false, false);
+					world->CalculateContacts (&pair, threadID, false, false);
 					if (pair.m_contactCount) {
 						dgAssert (pair.m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
-						world->ProcessContacts (&pair, timestep, threadID);
+						world->ProcessContacts (&pair, threadID);
 					}
 				}
 			}
