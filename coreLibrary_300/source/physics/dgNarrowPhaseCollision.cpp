@@ -1782,6 +1782,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 	dgVector p(dgFloat32(0.0f));
 	dgVector q(dgFloat32(0.0f));
 
+dgAssert (0);
 	dgFloat32 closestDist = dgFloat32(1.0e10f);
 	dgFloat32 minTimeStep = proxy.m_timestep____;
 	dgFloat32 timeNormalizer = proxy.m_timestep____;
