@@ -21,41 +21,51 @@
 #ifdef D_TIME_TRACKER
 class dTimeTracker
 {
-	class dTimeTrackerEntry;
-/*
+	public:
+	class dTrackerThread;
 	class dTimeTrackerEntry
 	{
 		public:
-		char* m_name;
+		dTimeTrackerEntry(const char* const name);
+		~dTimeTrackerEntry();
+
+		private:
+		const char* m_name;
 		long long m_startTime;
 		long long m_endTime;
-		dTimeTrackerEntry* m_parent
+		dTrackerThread* m_thread;
+		dTimeTrackerEntry* m_parent;
 	};
-*/
-	public:
+
 	class dTrackerThread
 	{
 		public:
 		dTrackerThread (const char* const name);
 
 		private:
+		dList<dTimeTrackerEntry*> m_stack;
 		const char* m_name;
-		dTimeTrackerEntry* m_root;
-		dTimeTrackerEntry* m_current;
+		long long m_threadId;
+		friend class dTimeTracker;
 	};
 
 	
 	static dTimeTracker* GetIntance();
-//	dTimeTrackerEntry* CreateTrack();
+	void CreateThread (const char* const name);
 
 	private:
 	dTimeTracker ();
-	dList<dTrackerThread*> m_tracks;
+	dList<dTrackerThread> m_tracks;
 };
 
 
 #define dTimeTrackerCreateThread(name)							\
-	static dTimeTracker::dTrackerThread threadHeader (name);
+	dTimeTracker::GetIntance()->CreateThread (name);
+
+
+#define dTimeTrackerTrackTime(name)							\
+	dTimeTracker::dTimeTrackerEntry ___trackerEntyr___(name);	
+
 #endif
 
 #endif

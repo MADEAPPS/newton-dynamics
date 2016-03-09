@@ -25,18 +25,44 @@ dTimeTracker* dTimeTracker::GetIntance()
 
 dTimeTracker::dTrackerThread::dTrackerThread (const char* const name)
 	:m_name (name)
-	,m_root (NULL)
-	,m_current (NULL)
+//	,m_root (NULL)
+//	,m_current (NULL)
+	,m_threadId (GetCurrentThreadId())
 {
-	dTimeTracker::GetIntance()->m_tracks.Append (this);
 }
 
+dTimeTracker::dTimeTrackerEntry::dTimeTrackerEntry(const char* name)
+	:m_name (name)
+{
+	long long threadId = GetCurrentThreadId();
+
+	dList<dTimeTracker::dTrackerThread>::dListNode* tracker = dTimeTracker::GetIntance()->m_tracks.GetFirst();
+	for (dList<dTimeTracker::dTrackerThread>::dListNode* threadPtr = dTimeTracker::GetIntance()->m_tracks.GetFirst(); threadPtr; threadPtr = threadPtr->GetNext()) {
+		if (threadPtr->GetInfo().m_threadId == threadId) {
+			tracker = threadPtr;
+			break;
+		}
+	}
+
+	dTrackerThread& thread = tracker->GetInfo();
+	m_thread = &thread;
+	thread.m_stack.Append (this);
+}
+
+dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
+{
+	dAssert (this == m_thread->m_stack.GetLast()->GetInfo());
+	m_thread->m_stack.Remove (m_thread->m_stack.GetLast());
+}
 
 
 dTimeTracker::dTimeTracker ()
 {
 }
 
-//dTimeTrackerEntry* dTimeTrackerEntry::CreateTrack();
+void dTimeTracker::CreateThread (const char* const name)
+{
+	m_tracks.Append (dTrackerThread (name));
+}
 
 #endif
