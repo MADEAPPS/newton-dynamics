@@ -15,6 +15,8 @@
 
 #include "dContainersAlloc.h"
 #include "dList.h"
+#include "dTree.h"
+#include "dCRC.h"
 
 #define D_TIME_TRACKER
 
@@ -26,11 +28,11 @@ class dTimeTracker
 	class dTimeTrackerEntry
 	{
 		public:
-		dTimeTrackerEntry(const char* const name);
+		dTimeTrackerEntry(dCRCTYPE nameCRC);
 		~dTimeTrackerEntry();
 
 		private:
-		const char* m_name;
+		dCRCTYPE m_nameCRC;
 		long long m_startTime;
 		long long m_endTime;
 		dTrackerThread* m_thread;
@@ -48,23 +50,30 @@ class dTimeTracker
 		long long m_threadId;
 		friend class dTimeTracker;
 	};
-
 	
-	static dTimeTracker* GetIntance();
+	static dTimeTracker* GetInstance();
 	void CreateThread (const char* const name);
+	dCRCTYPE RegisterName (const char* const name);
+
+	long long GetTimeInMicrosenconds();
 
 	private:
 	dTimeTracker ();
 	dList<dTrackerThread> m_tracks;
+	dTree<const char*, dCRCTYPE> m_dictionary;
+
+	LARGE_INTEGER m_frequency;
+	LARGE_INTEGER m_baseCount;
 };
 
 
 #define dTimeTrackerCreateThread(name)							\
-	dTimeTracker::GetIntance()->CreateThread (name);
+	dTimeTracker::GetInstance()->CreateThread (name);
 
 
-#define dTimeTrackerTrackTime(name)							\
-	dTimeTracker::dTimeTrackerEntry ___trackerEntyr___(name);	
+#define dTimeTrackerTrackTime(name)													\
+	static dCRCTYPE __crcName__ = dTimeTracker::GetInstance()->RegisterName (name);	\
+	dTimeTracker::dTimeTrackerEntry ___trackerEntyr___(__crcName__);	
 
 #endif
 
