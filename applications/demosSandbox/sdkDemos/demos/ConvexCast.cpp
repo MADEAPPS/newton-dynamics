@@ -29,7 +29,8 @@ class StupidComplexOfConvexShapes: public DemoEntity
 	{
 		scene->Append(this);
 
-		count = 40;
+		//count = 40;
+		count = 1;
 		const dFloat size = 0.5f;
 
 		DemoMesh* gemetries[32];
@@ -270,8 +271,8 @@ public:
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-			//p0 = dVector (-29.990000, 9.996307, 0.000510, 1.0f);
-			//p1 = dVector (1967.297607, -727.473450, 101.905418, 1.0f);
+			p0 = dVector (-12.625184, 7.175462, -4.710831, 1.0f);
+			p1 = dVector (2062.229248, -846.048157, 196.866821, 1.0f);
 				
 			//dTrace (("%f, %f, %f\n", p0[0], p0[1], p0[2]));
 			//dTrace (("%f, %f, %f\n", p1[0], p1[1], p1[2]));
@@ -286,10 +287,8 @@ public:
 			//int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, ConvexCastCallBack::Filter, &filter, ConvexCastCallBack::Prefilter, &filter.m_contacts[0], 4, 0);
 			NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &param, NULL, Prefilter, NULL, 0, 0);
 
-			//if (!count) {
-				//dTrace(("%f, %f, %f\n", p0[0], p0[1], p0[2]));
-				//dTrace(("%f, %f, %f\n", p1[0], p1[1], p1[2]));
-			//}
+			//dTrace(("%f, %f, %f\n", p0[0], p0[1], p0[2]));
+			//dTrace(("%f, %f, %f\n", p1[0], p1[1], p1[2]));
 
 			if (param < 1.0f) {
 				matrix.m_posit += (p1 - matrix.m_posit).Scale (param);

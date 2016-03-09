@@ -483,7 +483,7 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 	dgInt64 attributeB[DG_CONVEX_CAST_POOLSIZE];
 
 	dgInt32 totalCount = 0;
-	dgFloat32 maxParam = dgFloat32(1.2f);
+	
 
 	dgVector boxP0;
 	dgVector boxP1;
@@ -492,7 +492,8 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 
 	maxContacts = dgMin (maxContacts, DG_CONVEX_CAST_POOLSIZE);
 	dgAssert (!maxContacts || (maxContacts && info));
-	dgFloat32 timeToImpact = dgFloat32 (1.0e0f);
+	dgFloat32 maxParam = *param;
+	dgFloat32 timeToImpact = *param;
 	while (stack) {
 		stack--;
 

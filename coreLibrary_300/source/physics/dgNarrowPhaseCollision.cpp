@@ -1540,7 +1540,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		if (proxy.m_instance0->GetCollisionMode() & proxy.m_instance1->GetCollisionMode()) {
 			contactJoint->m_closestDistance = dgFloat32(1.0e10f);
 
-			dgAssert(proxy.m_timestep____ <= dgFloat32(1.0f));
+			dgAssert(proxy.m_timestep____ <= dgFloat32(2.0f));
 			dgAssert(proxy.m_timestep____ >= dgFloat32(0.0f));
 
 			dgPolygonMeshDesc data(proxy, NULL);
@@ -1782,7 +1782,6 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 	dgVector p(dgFloat32(0.0f));
 	dgVector q(dgFloat32(0.0f));
 
-dgAssert (0);
 	dgFloat32 closestDist = dgFloat32(1.0e10f);
 	dgFloat32 minTimeStep = proxy.m_timestep____;
 	dgFloat32 timeNormalizer = proxy.m_timestep____;
