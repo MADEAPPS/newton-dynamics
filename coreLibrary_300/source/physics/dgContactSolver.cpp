@@ -218,15 +218,15 @@ DG_INLINE dgVector dgContactSolver::ReduceTriangle(dgInt32& indexOut)
 					m_hullSum[0] = tmp0;
 					m_hullSum[1] = tmp1;
 
-					i0 = m_polygonFaceIndex0[i0];
-					i1 = m_polygonFaceIndex0[i1];
-					m_polygonFaceIndex0[0] = i0;
-					m_polygonFaceIndex0[1] = i1;
+					dgInt32 j0 = m_polygonFaceIndex0[i0];
+					dgInt32 j1 = m_polygonFaceIndex0[i1];
+					m_polygonFaceIndex0[0] = j0;
+					m_polygonFaceIndex0[1] = j1;
 
-					i0 = m_polygonFaceIndex1[i0];
-					i1 = m_polygonFaceIndex1[i1];
-					m_polygonFaceIndex1[0] = i0;
-					m_polygonFaceIndex1[1] = i1;
+					j0 = m_polygonFaceIndex1[i0];
+					j1 = m_polygonFaceIndex1[i1];
+					m_polygonFaceIndex1[0] = j0;
+					m_polygonFaceIndex1[1] = j1;
 
 					return m_hullDiff[0] + segment.Scale4(num / den);
 				}
@@ -293,15 +293,15 @@ DG_INLINE dgVector dgContactSolver::ReduceTriangleLarge (dgInt32& indexOut)
 					m_hullSum[0] = tmp0;
 					m_hullSum[1] = tmp1;
 
-					i0 = m_polygonFaceIndex0[i0];
-					i1 = m_polygonFaceIndex0[i1];
-					m_polygonFaceIndex0[0] = i0;
-					m_polygonFaceIndex0[1] = i1;
+					dgInt32 j0 = m_polygonFaceIndex0[i0];
+					dgInt32 j1 = m_polygonFaceIndex0[i1];
+					m_polygonFaceIndex0[0] = j0;
+					m_polygonFaceIndex0[1] = j1;
 
-					i0 = m_polygonFaceIndex1[i0];
-					i1 = m_polygonFaceIndex1[i1];
-					m_polygonFaceIndex1[0] = i0;
-					m_polygonFaceIndex1[1] = i1;
+					j0 = m_polygonFaceIndex1[i0];
+					j1 = m_polygonFaceIndex1[i1];
+					m_polygonFaceIndex1[0] = j0;
+					m_polygonFaceIndex1[1] = j1;
 
 					return dgVector (triangleDiffExtended[0] + segment.Scale3 (num / den));
 				}
@@ -411,19 +411,19 @@ DG_INLINE dgVector dgContactSolver::ReduceTetrahedrum(dgInt32& indexOut)
 		m_hullDiff[1] = tmp[1];
 		m_hullDiff[2] = tmp[2];
 
-		i0 = m_polygonFaceIndex0[i0];
-		i1 = m_polygonFaceIndex0[i1];
-		i2 = m_polygonFaceIndex0[i2];
-		m_polygonFaceIndex0[0] = i0;
-		m_polygonFaceIndex0[1] = i1;
-		m_polygonFaceIndex0[2] = i2;
+		dgInt32 j0 = m_polygonFaceIndex0[i0];
+		dgInt32 j1 = m_polygonFaceIndex0[i1];
+		dgInt32 j2 = m_polygonFaceIndex0[i2];
+		m_polygonFaceIndex0[0] = j0;
+		m_polygonFaceIndex0[1] = j1;
+		m_polygonFaceIndex0[2] = j2;
 
-		i0 = m_polygonFaceIndex1[i0];
-		i1 = m_polygonFaceIndex1[i1];
-		i2 = m_polygonFaceIndex1[i2];
-		m_polygonFaceIndex1[0] = i0;
-		m_polygonFaceIndex1[1] = i1;
-		m_polygonFaceIndex1[2] = i2;
+		j0 = m_polygonFaceIndex1[i0];
+		j1 = m_polygonFaceIndex1[i1];
+		j2 = m_polygonFaceIndex1[i2];
+		m_polygonFaceIndex1[0] = j0;
+		m_polygonFaceIndex1[1] = j1;
+		m_polygonFaceIndex1[2] = j2;
 
 		indexOut = 3;
 		return ReduceTriangle(indexOut);
@@ -511,19 +511,19 @@ DG_INLINE dgVector dgContactSolver::ReduceTetrahedrumLarge (dgInt32& indexOut)
 		m_hullDiff[1] = tmp[1];
 		m_hullDiff[2] = tmp[2];
 
-		i0 = m_polygonFaceIndex0[i0];
-		i1 = m_polygonFaceIndex0[i1];
-		i2 = m_polygonFaceIndex0[i2];
-		m_polygonFaceIndex0[0] = i0;
-		m_polygonFaceIndex0[1] = i1;
-		m_polygonFaceIndex0[2] = i2;
+		dgInt32 j0 = m_polygonFaceIndex0[i0];
+		dgInt32 j1 = m_polygonFaceIndex0[i1];
+		dgInt32 j2 = m_polygonFaceIndex0[i2];
+		m_polygonFaceIndex0[0] = j0;
+		m_polygonFaceIndex0[1] = j1;
+		m_polygonFaceIndex0[2] = j2;
 
-		i0 = m_polygonFaceIndex1[i0];
-		i1 = m_polygonFaceIndex1[i1];
-		i2 = m_polygonFaceIndex1[i2];
-		m_polygonFaceIndex1[0] = i0;
-		m_polygonFaceIndex1[1] = i1;
-		m_polygonFaceIndex1[2] = i2;
+		j0 = m_polygonFaceIndex1[i0];
+		j1 = m_polygonFaceIndex1[i1];
+		j2 = m_polygonFaceIndex1[i2];
+		m_polygonFaceIndex1[0] = j0;
+		m_polygonFaceIndex1[1] = j1;
+		m_polygonFaceIndex1[2] = j2;
 
 		indexOut = 3;
 		return ReduceTriangleLarge (indexOut);
@@ -1964,7 +1964,6 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 		dgFloat32 dt = num / den;
 		if ((tacc + dt) >= timestep) {
 			// object do not collide on this timestep
-			//m_proxy->m_timestep = timestep * dgFloat32 (0.999f);
 			m_proxy->m_timestep = tacc + dt;
 			m_proxy->m_normal = m_normal.Scale4 (dgFloat32 (-1.0f));
 			m_proxy->m_closestPointBody0 = m_closestPoint0;

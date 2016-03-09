@@ -26,27 +26,16 @@ class CustomControllerConvexCastPreFilter
 	public:
 	CustomControllerConvexCastPreFilter ()
 		:m_me(NULL)
-		,m_intersectParam(1.2f)
 	{
 	}
 
 	CustomControllerConvexCastPreFilter (const NewtonBody* const me)
 		:m_me(me)
-		,m_intersectParam(1.2f)
 	{
 	}
-
 
 	~CustomControllerConvexCastPreFilter ()
 	{
-	}
-
-	virtual dFloat Filter(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, dFloat intersectParam)
-	{
-		if (intersectParam < m_intersectParam) {
-			m_intersectParam = intersectParam;
-		}
-		return intersectParam;
 	}
 
 	virtual unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
@@ -58,13 +47,6 @@ class CustomControllerConvexCastPreFilter
 	}
 
 	private:
-	CUSTOM_JOINTS_API static dFloat Filter (const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
-	{
-		CustomControllerConvexCastPreFilter* const filter = (CustomControllerConvexCastPreFilter*)userData;
-		dAssert (body != filter->m_me);
-		return filter->Filter (body, shapeHit, hitContact, hitNormal, collisionID, intersectParam);
-	}
-
 	CUSTOM_JOINTS_API static unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision, void* const userData)
 	{
 		CustomControllerConvexCastPreFilter* const filter = (CustomControllerConvexCastPreFilter*) userData;
@@ -73,7 +55,6 @@ class CustomControllerConvexCastPreFilter
 
 	protected:
 	const NewtonBody* m_me;
-	dFloat m_intersectParam;
 	friend class CustomPlayerController;
 	friend class CustomVehicleControllerManager;
 };

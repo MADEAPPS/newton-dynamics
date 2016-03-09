@@ -309,27 +309,27 @@ dFloat CustomPlayerController::CalculateContactKinematics(const dVector& veloc, 
 
 void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& castMatrix, const dVector& dst, int threadIndex)
 {
-	dAssert (0);
-/*
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
-
+	NewtonWorldConvexCastReturnInfo info;
 	CustomControllerConvexRayFilter filter(m_body);
-	NewtonWorldConvexRayCast (world, &castMatrix[0][0], &dst[0], m_castingShape, CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexCastPreFilter::Prefilter, threadIndex);
+
+	dFloat param = 10.0f;
+	int count = NewtonWorldConvexCast (world, &castMatrix[0][0], &dst[0], m_castingShape, &param, &filter, CustomControllerConvexCastPreFilter::Prefilter, &info, 1, threadIndex);
 
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
-	if (filter.m_hitBody) {
+	if (count) {
+		dAssert (param <= 1.0f);
 		m_isJumping = false;
-		dVector supportPoint (castMatrix.m_posit + (dst - castMatrix.m_posit).Scale (filter.m_intersectParam));
-		m_groundPlane = filter.m_hitNormal;
-		m_groundPlane.m_w = - (supportPoint % filter.m_hitNormal);
-		NewtonBodyGetPointVelocity (filter.m_hitBody, &supportPoint.m_x, &m_groundVelocity[0]);
+		dVector supportPoint (castMatrix.m_posit + (dst - castMatrix.m_posit).Scale (param));
+		m_groundPlane = dVector (info.m_normal[0], info.m_normal[1], info.m_normal[2], 0.0f);
+		m_groundPlane.m_w = - (supportPoint % m_groundPlane);
+		NewtonBodyGetPointVelocity (info.m_hitBody, &supportPoint.m_x, &m_groundVelocity[0]);
 		matrix.m_posit = supportPoint;
 		matrix.m_posit.m_w = 1.0f;
 	}
-*/
 }
 
 
@@ -380,8 +380,6 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	upConstratint.m_normal[2] = m_upVector.m_z;
 	upConstratint.m_normal[3] = m_upVector.m_w;
 
-	dAssert (0);
-/*
 	for (int j = 0; (j < D_PLAYER_MAX_INTERGRATION_STEPS) && (normalizedTimeLeft > 1.0e-5f); j ++ ) {
 		if ((veloc % veloc) < 1.0e-6f) {
 			break;
@@ -510,5 +508,4 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	// set player velocity, position and orientation
 	NewtonBodySetVelocity(m_body, &veloc[0]);
 	NewtonBodySetMatrix (m_body, &matrix[0][0]);
-*/
 }

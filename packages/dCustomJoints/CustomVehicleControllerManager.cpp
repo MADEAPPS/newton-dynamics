@@ -1815,6 +1815,9 @@ void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 
 		dFloat Filter(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, dFloat intersectParam)
 		{
+			dAssert (0);
+			return 0;
+/*
 			if (intersectParam < m_intersectParam) {
 				m_hitCount = 1;
 				m_hitBodies[0] = body;
@@ -1830,6 +1833,7 @@ void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 				}
 			}
 			return intersectParam;
+*/
 		}
 
 		unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
