@@ -715,8 +715,12 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	if (distance < dgFloat32(1.0f)) {
 		dgVector boxSize((hullBoxP1 - hullBoxP0).CompProduct4(dgVector::m_half));
 		dgVector pointInPlane (polygonMatrix.RotateVector(hullBoxP1 + hullBoxP0).CompProduct4(dgVector::m_half));
+		dgFloat32 distToPlane = (m_localPoly[0] - pointInPlane) % m_normal + proxy.m_instance0->GetBoxMaxRadius();
 
-		dgFloat32 distToPlane = (m_localPoly[0] - pointInPlane) % m_normal;
+//dgVector pointInPlane1(polygonMatrix.RotateVector(hullBoxP1 + hullBoxP0).CompProduct4(dgVector::m_half));
+//dgFloat32 distToPlane1 = (m_localPoly[0] - pointInPlane1) % m_normal;
+//dgFloat32 distToPlane2 = ((m_localPoly[0] - pointInPlane1) % m_normal) + proxy.m_instance0->GetBoxMaxRadius();
+
 		dgFloat32 timeToPlane = distToPlane / (relativeVelocity % m_normal);
 		dgVector boxOrigin(pointInPlane + relativeVelocity.Scale4(timeToPlane));
 
@@ -762,10 +766,10 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 				dgAssert(timetoImpact >= dgFloat32(0.0f));
 			}
 
-			if (timetoImpact <= proxy.m_timestep____) {
+			if (timetoImpact <= proxy.m_timestep) {
 				dgVector contactPoints[64];
 				contactJoint->m_closestDistance = penetration;
-				proxy.m_timestep____ = timetoImpact;
+				proxy.m_timestep = timetoImpact;
 
 				if (!proxy.m_intersectionTestOnly) {
 					pointInHull -= normalInHull.Scale4 (DG_ROBUST_PLANE_CLIP);

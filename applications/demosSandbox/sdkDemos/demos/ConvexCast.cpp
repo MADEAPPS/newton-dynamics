@@ -29,8 +29,8 @@ class StupidComplexOfConvexShapes: public DemoEntity
 	{
 		scene->Append(this);
 
-		//count = 40;
-		count = 1;
+		count = 40;
+		//count = 1;
 		const dFloat size = 0.5f;
 
 		DemoMesh* gemetries[32];
@@ -208,7 +208,7 @@ public:
 
 class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 {
-public:
+	public:
 	dConvexCastManager(DemoEntityManager* const scene, StupidComplexOfConvexShapes* const stupidLevel)
 	:CustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
 	,m_helpKey (true)
@@ -271,11 +271,8 @@ public:
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-			p0 = dVector (-12.625184, 7.175462, -4.710831, 1.0f);
-			p1 = dVector (2062.229248, -846.048157, 196.866821, 1.0f);
-				
-			//dTrace (("%f, %f, %f\n", p0[0], p0[1], p0[2]));
-			//dTrace (("%f, %f, %f\n", p1[0], p1[1], p1[2]));
+			//p0 = dVector (-11.531384, 6.897866, -2.453451, 1.0f);
+			//p1 = dVector (1720.189697, -1245.047241, 58.625248, 1.0f);
 
 			// do the convex cast here
 			dMatrix matrix (dGetIdentityMatrix());

@@ -811,34 +811,6 @@ dgFloat32 dgCollisionConvex::RayCast(const dgVector& localP0, const dgVector& lo
 	return rayCaster.RayCast(localP0, localP1, maxT, contactOut);
 }
 
-/*
-dgFloat32 dgCollisionConvex::ConvexRayCast (const dgCollisionInstance* const castingShape, const dgMatrix& shapeMatrix, const dgVector& shapeVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceCollision, void* const userData, dgInt32 threadId) const 
-{
-	dgCollisionID id1 = referenceCollision->GetCollisionPrimityType();
-	dgCollisionID id2 = castingShape->GetCollisionPrimityType();
-	dgAssert ((id1 == m_polygonCollision) || (id1 < m_nullCollision));
-	dgAssert (id2 < m_nullCollision);
-	bool flipShape = (id1 == m_polygonCollision) ? true : m_priorityOrder.m_swapPriority[id1][id2];
-
-	if (flipShape) {
-		dgContactPoint tmpContat;
-		dgAssert (castingShape->IsType(dgCollision::dgCollisionConvexShape_RTTI));
-		dgCollisionConvex* const conicConvexShape = (dgCollisionConvex*)castingShape->GetChildShape();
-		dgFloat32 t = conicConvexShape->ConvexConicConvexRayCast (castingShape, shapeMatrix, referenceCollision, referenceBody->m_matrix, shapeVeloc.Scale4(dgFloat32(-1.0f)), maxT, tmpContat);
-		if (t < maxT) {
-			contactOut.m_normal = tmpContat.m_normal.Scale4 (dgFloat32 (-1.0f));
-			contactOut.m_point = tmpContat.m_point + shapeVeloc.Scale4 (t);
-		}
-		return t;
-
-	} else {
-		dgAssert (referenceCollision->IsType(dgCollision::dgCollisionConvexShape_RTTI));
-		dgCollisionConvex* const conicConvexShape = (dgCollisionConvex*)referenceCollision->GetChildShape();
-		return conicConvexShape->ConvexConicConvexRayCast (referenceCollision, referenceBody->m_matrix, castingShape, shapeMatrix, shapeVeloc, maxT, contactOut);
-	}
-}
-*/
-
 dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
 	dgVector support[4];

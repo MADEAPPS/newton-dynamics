@@ -66,7 +66,6 @@ class dgCollisionParamProxy
 	dgVector m_normal;
 	dgVector m_closestPointBody0;
 	dgVector m_closestPointBody1;
-//	dgUnsigned64 m_shapeFaceID;
 	dgContact* m_contactJoint;
 	dgBody* m_body0;
 	dgBody* m_body1;
@@ -75,7 +74,7 @@ class dgCollisionParamProxy
 	dgContactPoint* m_contacts;
 	dgPolygonMeshDesc* m_polyMeshData;
 	
-	dgFloat32 m_timestep____;
+	dgFloat32 m_timestep;
 	dgFloat32 m_skinThickness;
 	dgInt32 m_threadIndex;
 	dgInt32 m_maxContacts;

@@ -109,7 +109,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 		dgFloat32 angularSpeedBound = maxAngularSpeed * (otherInstance->GetBoxMaxRadius() - minRadius);
 
 		dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt (angularSpeedBound);
-		dgVector upperBoundVeloc (hullVeloc.Scale3 (proxy.m_timestep____ * upperBoundSpeed / baseLinearSpeed));
+		dgVector upperBoundVeloc (hullVeloc.Scale3 (proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
 
 		dgVector boxDistanceTravelInMeshSpace (myMatrix.UnrotateVector(upperBoundVeloc.CompProduct4(otherInstance->m_invScale)));
 

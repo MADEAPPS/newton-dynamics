@@ -1226,18 +1226,6 @@ void NewtonWorldRayCast(const NewtonWorld* const newtonWorld, const dFloat* cons
 	}
 }
 
-/*
-void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const dFloat* const matrix, const dFloat* const target, const NewtonCollision* const shape, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, int threadIndex)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	if (filter) {
-		dgMatrix pp0 (matrix);
-		dgVector pp1 (target[0], target[1], target[2], dgFloat32 (0.0f));
-		Newton* const world = (Newton *) newtonWorld;
-		world->GetBroadPhase()->ConvexRayCast ((dgCollisionInstance*) shape, pp0, pp1, (OnRayCastAction) filter, (OnRayPrecastAction) prefilter, userData, threadIndex);
-	}
-}
-*/
 
 // Name: NewtonWorldConvexCast 
 // cast a simple convex shape along the ray that goes for the matrix position to the destination and get the firsts contacts of collision.

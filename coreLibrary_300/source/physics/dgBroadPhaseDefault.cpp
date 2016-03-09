@@ -92,30 +92,6 @@ void dgBroadPhaseDefault::RayCast(const dgVector& l0, const dgVector& l1, OnRayC
 	}
 }
 
-/*
-void dgBroadPhaseDefault::ConvexRayCast(dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const
-{
-	if (filter && m_rootNode && shape->IsType(dgCollision::dgCollisionConvexShape_RTTI)) {
-		dgVector boxP0;
-		dgVector boxP1;
-		shape->CalcAABB(shape->GetLocalMatrix() * matrix, boxP0, boxP1);
-
-		//dgInt32 stack = 1;
-		dgFloat32 distance[DG_COMPOUND_STACK_DEPTH];
-		const dgBroadPhaseNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
-
-		dgVector velocA((target - matrix.m_posit) & dgVector::m_triplexMask);
-		dgFastRayTest ray(dgVector(dgFloat32(0.0f)), velocA);
-
-		dgVector minBox(m_rootNode->m_minBox - boxP1);
-		dgVector maxBox(m_rootNode->m_maxBox - boxP0);
-		stackPool[0] = m_rootNode;
-		distance[0] = ray.BoxIntersect(minBox, maxBox);
-
-		dgBroadPhase::ConvexRayCast(stackPool, distance, 1, velocA, ray, shape, matrix, target, filter, prefilter, userData, threadId);
-	}
-}
-*/
 
 dgInt32 dgBroadPhaseDefault::ConvexCast(dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
