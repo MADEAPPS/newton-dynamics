@@ -1989,18 +1989,11 @@ dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 	dgInt32 count = 0;
 
 	if (m_proxy->m_intersectionTestOnly) {
-		dgAssert (0);
-		return 0;
-/*
-		if (!minkHull.DisjointTest()) {
-			return -1;
-		}
-		minkHull.m_p = SupportVertexSpecial(minkHull.m_p, minkHull.m_normal);
-		dgFloat32 penetration = minkHull.m_normal % (minkHull.m_q - minkHull.m_p) - proxy.m_skinThickness;
+		CalculateClosestPoints();
+		dgFloat32 penetration = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar() - m_proxy->m_skinThickness;
 		dgInt32 retVal = (penetration <= dgFloat32(0.0f)) ? -1 : 0;
-		proxy.m_contactJoint->m_contactActive = retVal;
+		m_proxy->m_contactJoint->m_contactActive = retVal;
 		return retVal;
-*/
 	} else {
 		if (CalculateClosestPoints()) { 
 			dgFloat32 penetration = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar() - m_proxy->m_skinThickness;
