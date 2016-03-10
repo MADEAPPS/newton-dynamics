@@ -859,11 +859,11 @@ void DemoEntityManager::RenderFrame ()
 	// render all entities
 	if (m_mainWindow->m_hideVisualMeshes) {
 		if (m_sky) {
-			
 			glPushMatrix();	
 			m_sky->Render(timestep, this);
 			glPopMatrix();
 		}
+
 	} else {
 		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
 			DemoEntity* const entity = node->GetInfo();
