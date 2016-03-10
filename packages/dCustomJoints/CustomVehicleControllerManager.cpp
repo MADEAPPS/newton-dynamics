@@ -1707,6 +1707,7 @@ int CustomVehicleControllerManager::OnContactGeneration (const NewtonMaterial* c
 		dAssert (tire->GetBody() == body0);
 		return manager->OnContactGeneration (tire, otherBody, otherCollision, contactBuffer, maxCount, threadIndex);
 	} 
+	dAssert (data1 == manager->m_tireShapeTemplateData);
 	const NewtonBody* const otherBody = body0;
 	const NewtonCollision* const tireCollision = collision1;
 	const NewtonCollision* const otherCollision = collision0;
@@ -1809,31 +1810,7 @@ void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 		TireFilter(const NewtonBody* const tire, const NewtonBody* const vehicle)
 			:CustomControllerConvexCastPreFilter(tire)
 			,m_vehicle(vehicle)
-			,m_hitCount(0)
 		{
-		}
-
-		dFloat Filter(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, dFloat intersectParam)
-		{
-			dAssert (0);
-			return 0;
-/*
-			if (intersectParam < m_intersectParam) {
-				m_hitCount = 1;
-				m_hitBodies[0] = body;
-				m_intersectParam = intersectParam;
-			} else if (dAbs (intersectParam - m_intersectParam) < 1.0e-3f) {
-				bool found = false;
-				for (int i = 0; i < m_hitCount; i ++) {
-					found |= (body == m_hitBodies[i]); 
-				}
-				if (!found) {
-					m_hitBodies[m_hitCount] = body;
-					m_hitCount += m_hitCount < (sizeof (m_hitBodies) / sizeof (m_hitBodies[0])) ? 1 : 0;
-				}
-			}
-			return intersectParam;
-*/
 		}
 
 		unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
@@ -1843,8 +1820,6 @@ void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 		}
 
 		const NewtonBody* m_vehicle;
-		const NewtonBody* m_hitBodies[4];
-		int m_hitCount;
 	};
 
 	dMatrix tireMatrix;
@@ -1874,12 +1849,18 @@ void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 	NewtonCollision* const tireCollision = NewtonBodyGetCollision(tireBody);
 	TireFilter filter(tireBody, vehicleBody);
 
-	dAssert (0);
+//	dAssert (0);
+//	int contactCount = 
 //	NewtonWorldConvexRayCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, CustomControllerConvexCastPreFilter::Filter, &filter, CustomControllerConvexCastPreFilter::Prefilter, 0);
-	for (int i = 0; i < filter.m_hitCount; i ++) {
-		tire->m_collidingBodies[i] = filter.m_hitBodies[i];
+
+	dFloat timetoImpact;
+	NewtonWorldConvexCastReturnInfo info[4];
+	int contactCount = NewtonWorldConvexCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, &timetoImpact, &filter, CustomControllerConvexCastPreFilter::Prefilter, info, sizeof (info) / sizeof (info[0]), 0);
+	for (int i = 0; i < contactCount; i ++) {
+		dAssert (0);
+//		tire->m_collidingBodies[i] = filter.m_hitBodies[i];
 	}
-	tire->m_collidingCount = filter.m_hitCount;
+	tire->m_collidingCount = contactCount;
 }
 
 void CustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
