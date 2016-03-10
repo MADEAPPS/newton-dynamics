@@ -864,13 +864,15 @@ void DemoEntityManager::RenderFrame ()
 	// render all entities
 	if (m_mainWindow->m_hideVisualMeshes) {
 		if (m_sky) {
+			
 			glPushMatrix();	
 			m_sky->Render(timestep, this);
 			glPopMatrix();
 		}
-
 	} else {
+		dTimeTrackerTrackTime(__FUNCTION__);
 		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
+			dTimeTrackerTrackTime(__FUNCTION__);
 			DemoEntity* const entity = node->GetInfo();
 			glPushMatrix();	
 			entity->Render(timestep, this);

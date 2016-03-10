@@ -24,6 +24,15 @@
 class dTimeTracker
 {
 	public:
+	class dTrackRecord
+	{
+		public:
+		long long m_startTime;
+		long long m_endTime;
+		dCRCTYPE m_nameCRC;
+		int m_size;
+	};
+
 	class dTrackerThread;
 	class dTimeTrackerEntry
 	{
@@ -32,22 +41,25 @@ class dTimeTracker
 		~dTimeTrackerEntry();
 
 		private:
-		dCRCTYPE m_nameCRC;
-		long long m_startTime;
-		long long m_endTime;
 		dTrackerThread* m_thread;
-		dTimeTrackerEntry* m_parent;
+		int m_index;
 	};
 
 	class dTrackerThread
 	{
 		public:
 		dTrackerThread (const char* const name);
+		~dTrackerThread ();
+
+		void Realloc();
 
 		private:
 		dList<dTimeTrackerEntry*> m_stack;
 		const char* m_name;
 		long long m_threadId;
+		dTrackRecord* m_buffer;
+		int m_index;
+		int m_size;
 		friend class dTimeTracker;
 	};
 	

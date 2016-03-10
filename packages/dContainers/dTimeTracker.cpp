@@ -13,6 +13,7 @@
 
 #include "dContainersStdAfx.h"
 #include "dTimeTracker.h"
+#include "dContainersAlloc.h"
 
 #ifdef D_TIME_TRACKER
 
@@ -25,20 +26,29 @@ dTimeTracker* dTimeTracker::GetInstance()
 
 dTimeTracker::dTrackerThread::dTrackerThread (const char* const name)
 	:m_name (name)
-//	,m_root (NULL)
-//	,m_current (NULL)
 	,m_threadId (GetCurrentThreadId())
+	,m_buffer ((dTrackRecord*) dContainersAlloc::Alloc (1024 * sizeof (dTrackRecord)))
+	,m_size (1024)
+	,m_index (0)
 {
 }
 
+dTimeTracker::dTrackerThread::~dTrackerThread ()
+{
+	dContainersAlloc::Free (m_buffer);
+}
 
-
+void dTimeTracker::dTrackerThread::Realloc()
+{
+	dTrackRecord* const buffer = ((dTrackRecord*) dContainersAlloc::Alloc (2 * m_size * sizeof (dTrackRecord)));
+	memcpy (m_buffer, buffer, m_size * sizeof (dTrackRecord));
+	m_size = m_size * 2;
+}
 
 dTimeTracker::dTimeTrackerEntry::dTimeTrackerEntry(dCRCTYPE nameCRC)
-	:m_nameCRC (nameCRC)
 {
 	dTimeTracker* const instance = dTimeTracker::GetInstance();
-	m_startTime = instance->GetTimeInMicrosenconds ();
+	long long startTime = instance->GetTimeInMicrosenconds ();
 
 	long long threadId = GetCurrentThreadId();
 	dList<dTimeTracker::dTrackerThread>::dListNode* tracker = instance->m_tracks.GetFirst();
@@ -52,6 +62,17 @@ dTimeTracker::dTimeTrackerEntry::dTimeTrackerEntry(dCRCTYPE nameCRC)
 	dTrackerThread& thread = tracker->GetInfo();
 	m_thread = &thread;
 	thread.m_stack.Append (this);
+
+	if (thread.m_index >= thread.m_size) {
+		thread.Realloc();
+	}
+
+	m_index = thread.m_index;
+	dTrackRecord& record = thread.m_buffer[thread.m_index];
+	record.m_nameCRC = nameCRC;
+	record.m_startTime = startTime;
+	record.m_size = thread.m_index;
+	thread.m_index ++;
 }
 
 dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
@@ -59,7 +80,15 @@ dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
 	dTimeTracker* const instance = dTimeTracker::GetInstance();
 	dAssert (this == m_thread->m_stack.GetLast()->GetInfo());
 	m_thread->m_stack.Remove (m_thread->m_stack.GetLast());
-	m_endTime = instance->GetTimeInMicrosenconds ();
+
+	dTrackRecord& record = m_thread->m_buffer[m_index];
+	record.m_size = m_thread->m_index - record.m_size;
+	record.m_endTime = instance->GetTimeInMicrosenconds ();
+
+	if (!m_thread->m_stack.GetCount()) {
+		// save record ();
+		m_thread->m_index = 0;
+	}
 }
 
 
@@ -84,33 +113,12 @@ dCRCTYPE dTimeTracker::RegisterName (const char* const name)
 
 long long dTimeTracker::GetTimeInMicrosenconds()
 {
-	#ifdef _MSC_VER
-		LARGE_INTEGER count;
-		QueryPerformanceCounter (&count);
-		count.QuadPart -= m_baseCount.QuadPart;
-		LONGLONG ticks = LONGLONG (count.QuadPart * LONGLONG (1000000) / m_frequency.QuadPart);
-		return ticks;
-	#endif
-/*
-	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
-		timespec ts;
-		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
-		//return unsigned64 (ts.tv_nsec / 1000) - baseCount;
-		
-		return unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
-	#endif
-
-
-	#ifdef _MACOSX_VER
-		timeval tp;
-		gettimeofday(&tp, NULL);
-		unsigned64 microsecunds =  unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
-		return microsecunds - baseCount;
-	#endif
-*/
+	LARGE_INTEGER count;
+	QueryPerformanceCounter (&count);
+	count.QuadPart -= m_baseCount.QuadPart;
+	LONGLONG ticks = LONGLONG (count.QuadPart * LONGLONG (1000000) / m_frequency.QuadPart);
+	return ticks;
 }
-
-
 
 
 #endif
