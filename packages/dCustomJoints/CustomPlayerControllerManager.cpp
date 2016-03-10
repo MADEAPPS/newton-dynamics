@@ -320,8 +320,7 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
-	if (count) {
-		dAssert (param <= 1.0f);
+	if (count && (param <= 1.0f)) {
 		m_isJumping = false;
 		dVector supportPoint (castMatrix.m_posit + (dst - castMatrix.m_posit).Scale (param));
 		m_groundPlane = dVector (info.m_normal[0], info.m_normal[1], info.m_normal[2], 0.0f);

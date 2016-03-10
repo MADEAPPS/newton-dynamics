@@ -18,7 +18,23 @@
 #include "dTree.h"
 #include "dCRC.h"
 
-#define D_TIME_TRACKER
+
+#ifdef TIMETRACKER_EXPORTS
+	#ifdef _WIN32
+		#define TIMETRACKER_API __declspec (dllexport)
+	#else
+		#define TIMETRACKER_API __attribute__ ((visibility("default")))
+	#endif
+#else
+	#ifdef _WIN32
+		#define TIMETRACKER_API __declspec (dllimport)
+	#else
+		#define TIMETRACKER_API
+	#endif
+#endif
+
+
+
 
 #ifdef D_TIME_TRACKER
 class dTimeTracker
@@ -63,9 +79,9 @@ class dTimeTracker
 		friend class dTimeTracker;
 	};
 	
-	static dTimeTracker* GetInstance();
-	void CreateThread (const char* const name);
-	dCRCTYPE RegisterName (const char* const name);
+	TIMETRACKER_API static dTimeTracker* GetInstance();
+	TIMETRACKER_API void CreateThread (const char* const name);
+	TIMETRACKER_API dCRCTYPE RegisterName (const char* const name);
 
 	long long GetTimeInMicrosenconds();
 
@@ -79,13 +95,17 @@ class dTimeTracker
 };
 
 
-#define dTimeTrackerCreateThread(name)							\
+#define dTimeTrackerCreateThread(name)												\
 	dTimeTracker::GetInstance()->CreateThread (name);
-
 
 #define dTimeTrackerTrackTime(name)													\
 	static dCRCTYPE __crcName__ = dTimeTracker::GetInstance()->RegisterName (name);	\
-	dTimeTracker::dTimeTrackerEntry ___trackerEntyr___(__crcName__);	
+	dTimeTracker::dTimeTrackerEntry ___trackerEntry___(__crcName__);	
+
+#else 
+
+#define dTimeTrackerCreateThread(name)							
+#define dTimeTrackerTrackTime(name)													
 
 #endif
 

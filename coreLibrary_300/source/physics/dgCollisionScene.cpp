@@ -141,9 +141,6 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 							dgContactPoint* const buffer = proxy.m_contacts;
 							for (dgInt32 i = count; i < pair->m_contactCount; i ++) {
 								dgAssert (buffer[i].m_collision0 == proxy.m_instance0);
-								//if (buffer[i].m_collision1 == proxy.m_floatingCollision) {
-								//	buffer[i].m_collision1 = myInstance;
-								//}
 								if (buffer[i].m_collision1->GetChildShape() == myInstance->GetChildShape()) {
 									buffer[i].m_collision1 = myInstance;
 								}
@@ -166,9 +163,8 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 		}
 
 	} else {
-		dgVector origin;
 		dgVector size;
-
+		dgVector origin;
 
 		otherInstance->CalcObb(origin, size);
 		dgOOBBTestData data (matrix, origin, size);
@@ -199,9 +195,6 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 							dgContactPoint* const buffer = proxy.m_contacts;
 							for (dgInt32 i = count; i < pair->m_contactCount; i ++) {
 								dgAssert (buffer[i].m_collision0 == proxy.m_instance0);
-								//if (buffer[i].m_collision1 == proxy.m_floatingCollision) {
-								//	buffer[i].m_collision1 = myInstance;
-								//}
 								if (buffer[i].m_collision1->GetChildShape() == myInstance->GetChildShape()) {
 									buffer[i].m_collision1 = myInstance;
 								}
