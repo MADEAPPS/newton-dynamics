@@ -17,7 +17,6 @@
 #include "DemoEntity.h"
 #include "DemoCamera.h"
 #include "OpenGlUtil.h"
-#include "dTimeTracker.h"
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
@@ -56,8 +55,6 @@ DemoEntityManager::ButtonKey::ButtonKey (bool state)
 	,m_memory0(false)
 	,m_memory1(false)
 {
-//	dTimeTracker::dTrackerThread name ("xxx");
-	dTimeTrackerCreateThread("mainthread" );
 }
 
 bool DemoEntityManager::ButtonKey::UpdateTriggerButton (const NewtonDemos* const mainWin, int keyCode)
@@ -778,8 +775,6 @@ void DemoEntityManager::RenderFrame ()
 {
 	//Sleep (20);
 
-	dTimeTrackerTrackTime(__FUNCTION__);
-
 	// Make context current
 	if (m_mainWindow->m_suspendVisualUpdates) {
 		return;
@@ -870,9 +865,7 @@ void DemoEntityManager::RenderFrame ()
 			glPopMatrix();
 		}
 	} else {
-		dTimeTrackerTrackTime(__FUNCTION__);
 		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
-			dTimeTrackerTrackTime(__FUNCTION__);
 			DemoEntity* const entity = node->GetInfo();
 			glPushMatrix();	
 			entity->Render(timestep, this);
