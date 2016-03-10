@@ -13,6 +13,8 @@
 #ifndef __DTIME_TRACKER_H__
 #define __DTIME_TRACKER_H__
 
+#if defined (D_TIME_TRACKER) && defined(_MSC_VER)
+
 #include "dContainersAlloc.h"
 #include "dList.h"
 #include "dTree.h"
@@ -34,9 +36,6 @@
 #endif
 
 
-
-
-#ifdef D_TIME_TRACKER
 class dTimeTracker
 {
 	public:
@@ -82,6 +81,7 @@ class dTimeTracker
 	TIMETRACKER_API static dTimeTracker* GetInstance();
 	TIMETRACKER_API void CreateThread (const char* const name);
 	TIMETRACKER_API dCRCTYPE RegisterName (const char* const name);
+	TIMETRACKER_API void SaveData ();
 
 	long long GetTimeInMicrosenconds();
 
@@ -101,6 +101,13 @@ class dTimeTracker
 #define dTimeTrackerTrackTime(name)													\
 	static dCRCTYPE __crcName__ = dTimeTracker::GetInstance()->RegisterName (name);	\
 	dTimeTracker::dTimeTrackerEntry ___trackerEntry___(__crcName__);	
+
+#define dTimeTrackerSync()															\
+{                                                                                   \
+		dTimeTrackerTrackTime("timeTracker")										\
+		dTimeTracker::GetInstance()->SavaData ();									\
+}
+
 
 #else 
 

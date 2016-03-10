@@ -13,7 +13,7 @@
 #include "stdafx.h"
 #include "dTimeTracker.h"
 
-#ifdef D_TIME_TRACKER
+#if defined (D_TIME_TRACKER) && defined(_MSC_VER)
 
 dTimeTracker* dTimeTracker::GetInstance()
 {
@@ -42,6 +42,8 @@ void dTimeTracker::dTrackerThread::Realloc()
 	memcpy (m_buffer, buffer, m_size * sizeof (dTrackRecord));
 	m_size = m_size * 2;
 }
+
+
 
 dTimeTracker::dTimeTrackerEntry::dTimeTrackerEntry(dCRCTYPE nameCRC)
 {
@@ -81,12 +83,13 @@ dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
 
 	dTrackRecord& record = m_thread->m_buffer[m_index];
 	record.m_size = m_thread->m_index - record.m_size;
-	record.m_endTime = instance->GetTimeInMicrosenconds ();
 
 	if (!m_thread->m_stack.GetCount()) {
 		// save record ();
 		m_thread->m_index = 0;
 	}
+
+	record.m_endTime = instance->GetTimeInMicrosenconds ();
 }
 
 
@@ -94,7 +97,6 @@ dTimeTracker::dTimeTracker ()
 {
 	QueryPerformanceFrequency(&m_frequency);
 	QueryPerformanceCounter (&m_baseCount);
-
 }
 
 void dTimeTracker::CreateThread (const char* const name)
@@ -118,5 +120,8 @@ long long dTimeTracker::GetTimeInMicrosenconds()
 	return ticks;
 }
 
+void dTimeTracker::SaveData ()
+{
+}
 
 #endif

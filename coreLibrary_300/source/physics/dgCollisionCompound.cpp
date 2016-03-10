@@ -2443,7 +2443,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 
 	dgInt32 contactCount = 0;
 
-//	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * compoundBody->m_matrix);
 	const dgMatrix myMatrix = compoundInstance->GetGlobalMatrix();
 	dgMatrix matrix (otherBody->m_collision->GetGlobalMatrix() * myMatrix.Inverse());
 
@@ -2581,16 +2580,10 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 	proxy.m_body0 = compoundBody;
 	proxy.m_body1 = otherCompoundBody;
 
-//	dgMatrix myMatrix (compoundInstance->GetLocalMatrix() * compoundBody->m_matrix);
-//	dgMatrix otherMatrix (otherCompoundInstance->GetLocalMatrix() * otherCompoundBody->m_matrix);
-//	dgMatrix matrix (otherCompoundInstance->GetGlobalMatrix() * myMatrix.Inverse());
 	const dgMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
 	const dgMatrix& otherMatrix = otherCompoundInstance->GetGlobalMatrix();
 	dgOOBBTestData data (otherMatrix * myMatrix.Inverse());
 
-//	dgVector boxP0;
-//	dgVector boxP1;
-//	otherCompoundInstance->CalcAABB (data.m_matrix, boxP0, boxP1);
 	dgVector relVeloc (myMatrix.UnrotateVector (otherCompoundBody->GetVelocity() - compoundBody->GetVelocity()));
 	dgFastRayTest myCompoundRay (dgVector (dgFloat32 (0.0f)), relVeloc);
 	dgFastRayTest otherCompoundRay (dgVector (dgFloat32 (0.0f)), data.m_matrix.UnrotateVector(relVeloc));
@@ -2820,22 +2813,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 
 		dgVector p0;
 		dgVector p1;
-/*
-#ifdef _DEBUG
-		treeCollision->GetNodeAABB(other, p0, p1);
-		dgVector size = (p1 - p0).Scale3 (dgFloat32 (0.5f));
-		dgVector origin = (p1 + p0).Scale3 (dgFloat32 (0.5f));
-		dgVector size1 (size.m_y, size.m_z, size.m_x, dgFloat32 (0.0f));
-		dgFloat32 area = size  % size1;
-		dgAssert (dgAbsf(area - stackEntry->m_treeNodeArea) < dgFloat32 (1.0e-1f));
-#endif
 
-		nodeProxi.m_p0 = stackEntry->m_treeNodeP0;
-		nodeProxi.m_p1 = stackEntry->m_treeNodeP1;
-		nodeProxi.m_area = stackEntry->m_treeNodeArea;
-		nodeProxi.m_size = stackEntry->m_treeNodeSize;
-		nodeProxi.m_origin = stackEntry->m_treeNodeOrigin;
-*/
 		treeCollision->GetNodeAABB(other, p0, p1);
 		nodeProxi.m_p0 = p0.CompProduct4(treeScale);
 		nodeProxi.m_p1 = p1.CompProduct4(treeScale);
@@ -2847,7 +2825,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 		nodeProxi.m_area = nodeProxi.m_size.ShiftTripleRight().DotProduct4(nodeProxi.m_size).GetScalar();
 
 		dgFloat32 dist = me->RayBoxDistance (data, myCompoundRay, otherTreedRay, &nodeProxi);
-//		if (me->BoxTest (data, &nodeProxi)) {
 		if (dist <= upperBound) {
 			if ((me->m_type == m_leaf) && treeNodeIsLeaf) {
 				dgCollisionInstance* const subShape = me->GetShape();
@@ -2861,10 +2838,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 						dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
 						proxy.m_instance0 = &childInstance; 
-
-						//dgCollisionInstance otherChildInstance (*otherSubShape, otherSubShape->GetChildShape());
-						//otherChildInstance.m_globalMatrix = otherChildInstance.GetLocalMatrix() * otherMatrix;
-						//proxy.m_floatingCollision = &otherChildInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
 						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;

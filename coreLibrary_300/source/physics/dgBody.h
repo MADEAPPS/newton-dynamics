@@ -552,7 +552,7 @@ DG_INLINE dgVector dgBody::GetApparentMass() const
 DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 {
 	m_matrix = matrix;
-	dgAssert (m_matrix.TestOrthogonal(dgFloat32 (1.0e-5f)));
+	dgAssert (m_matrix.TestOrthogonal(dgFloat32 (1.0e-4f)));
 
 	m_rotation = dgQuaternion (m_matrix);
 	m_globalCentreOfMass = m_matrix.TransformVector (m_localCentreOfMass);

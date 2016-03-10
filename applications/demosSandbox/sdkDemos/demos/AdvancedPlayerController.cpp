@@ -662,14 +662,12 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 			DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
 			dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
-			const dMatrix& meshMatrix = entity->GetMeshMatrix();
-			//const dMatrix& meshMatrix (GetIdentityMatrix());
-			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, &meshMatrix[0][0]);
+			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
 			void* const proxy = NewtonSceneCollisionAddSubCollision (sceneCollision, collision);
 			NewtonDestroyCollision (collision);
 
 			// set the matrix for this sub shape
-			dMatrix matrix (entity->GetNextMatrix());
+			dMatrix matrix (entity->GetMeshMatrix() * entity->GetNextMatrix());
 			NewtonCollision* const bridgeCollision = NewtonSceneCollisionGetCollisionFromNode (sceneCollision, proxy);
 			NewtonSceneCollisionSetSubCollisionMatrix (sceneCollision, proxy, &matrix[0][0]);	
 			NewtonCollisionSetUserData(bridgeCollision, entity);
@@ -809,19 +807,19 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 			DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
 			dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
+			
 			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, NULL);
 			void* const proxy = NewtonSceneCollisionAddSubCollision (sceneCollision, collision);
 			NewtonDestroyCollision (collision);
 
 			// get the location of this tire relative to the car chassis
-			dMatrix matrix (entity->GetNextMatrix());
+			dMatrix matrix (entity->GetMeshMatrix() * entity->GetNextMatrix());
 
 			NewtonCollision* const bridgeCollision = NewtonSceneCollisionGetCollisionFromNode (sceneCollision, proxy);
 			NewtonSceneCollisionSetSubCollisionMatrix (sceneCollision, proxy, &matrix[0][0]);	
 			NewtonCollisionSetUserData(bridgeCollision, entity);
 		}
 	}
-
 
 	// add all the planks that form the bridge
 	dTree<NewtonBody*, dString> planks;
@@ -1000,8 +998,9 @@ static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* 
 
 		// load another ferry bridge
 		bridgeMatrix.m_posit.m_z += 20.0f;
-		LoadFerryBridge(scene, triggerManager, sceneCollision, "platformBridge.ngd", bridgeMatrix, playGroundBody);
+//		LoadFerryBridge(scene, triggerManager, sceneCollision, "platformBridge.ngd", bridgeMatrix, playGroundBody);
 	}
+
 	// finalize adding shapes to this scene collisions 
 	NewtonSceneCollisionEndAddRemove (sceneCollision);
 

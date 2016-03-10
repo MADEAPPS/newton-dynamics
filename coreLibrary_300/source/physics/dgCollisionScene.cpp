@@ -117,6 +117,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 		stackPool[0] = m_root;
 		dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), boxDistanceTravelInMeshSpace);
 
+		dgFloat32 maxParam = proxy.m_timestep;
 		while (stack) {
 			stack--;
 			const dgNodeBase* const me = stackPool[stack];
@@ -136,7 +137,15 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 						childInstance.SetGlobalMatrix(childInstance.GetLocalMatrix() * myMatrix);
 						proxy.m_instance1 = &childInstance;
 						dgInt32 count = pair->m_contactCount;
+
+						proxy.m_timestep = maxParam;
 						m_world->SceneChildContacts (pair, proxy);
+						dgFloat32 param = proxy.m_timestep;
+						dgAssert(param >= dgFloat32(0.0f));
+						if (param < maxParam) {
+							maxParam = param;
+						}
+
 						if (pair->m_contactCount > count) {
 							dgContactPoint* const buffer = proxy.m_contacts;
 							for (dgInt32 i = count; i < pair->m_contactCount; i ++) {
@@ -162,6 +171,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 			}
 		}
 
+		proxy.m_timestep = maxParam;
 	} else {
 		dgVector size;
 		dgVector origin;
@@ -292,12 +302,6 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 						if (pair->m_contactCount > count) {
 							dgContactPoint* const buffer = proxy.m_contacts;
 							for (dgInt32 i = count; i < pair->m_contactCount; i ++) {
-								//if (buffer[i].m_collision0 == proxy.m_floatingCollision) {
-								//	buffer[i].m_collision0 = mySrcInstance;
-								//}
-								//if (buffer[i].m_collision1 == proxy.m_referenceCollision) {
-								//	buffer[i].m_collision1 = otherSrcInstance;
-								//}
 								if (buffer[i].m_collision1->GetChildShape() == otherSrcInstance->GetChildShape()) {
 									dgAssert(buffer[i].m_collision0->GetChildShape() == mySrcInstance->GetChildShape());
 									buffer[i].m_collision0 = mySrcInstance;
@@ -368,7 +372,6 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 	}
 	constraint->m_closestDistance = closestDist;
 }
-
 
 
 void dgCollisionScene::Serialize(dgSerialize callback, void* const userData) const
