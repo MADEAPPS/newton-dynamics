@@ -714,15 +714,18 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	dgInt32 count = 0;
 	if (distance < dgFloat32(1.0f)) {
 		dgVector boxSize((hullBoxP1 - hullBoxP0).CompProduct4(dgVector::m_half));
+		boxSize = (boxSize.DotProduct4(boxSize)).Sqrt();
+
+		dgFloat32 den = dgFloat32 (1.0f) / (relativeVelocity % m_normal);
 		dgVector pointInPlane (polygonMatrix.RotateVector(hullBoxP1 + hullBoxP0).CompProduct4(dgVector::m_half));
-		dgFloat32 distToPlane = (m_localPoly[0] - pointInPlane) % m_normal + proxy.m_instance0->GetBoxMaxRadius();
+		dgFloat32 distToPlane = (m_localPoly[0] - pointInPlane) % m_normal;
 
-//dgVector pointInPlane1(polygonMatrix.RotateVector(hullBoxP1 + hullBoxP0).CompProduct4(dgVector::m_half));
-//dgFloat32 distToPlane1 = (m_localPoly[0] - pointInPlane1) % m_normal;
-//dgFloat32 distToPlane2 = ((m_localPoly[0] - pointInPlane1) % m_normal) + proxy.m_instance0->GetBoxMaxRadius();
+		dgFloat32 timeToPlane0 = (distToPlane + boxSize.GetScalar()) * den;
+		dgVector boxOrigin0 (pointInPlane + relativeVelocity.Scale4(timeToPlane0));
 
-		dgFloat32 timeToPlane = distToPlane / (relativeVelocity % m_normal);
-		dgVector boxOrigin(pointInPlane + relativeVelocity.Scale4(timeToPlane));
+		dgFloat32 timeToPlane1 = (distToPlane - boxSize.GetScalar()) * den;
+		dgVector boxOrigin1 (pointInPlane + relativeVelocity.Scale4(timeToPlane1));
+		dgVector boxOrigin ((boxOrigin0 + boxOrigin1).CompProduct4(dgVector::m_half)); 
 
 		bool inside = true;
 		dgInt32 i0 = m_count - 1;
