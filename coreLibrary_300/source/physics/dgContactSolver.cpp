@@ -988,18 +988,21 @@ DG_INLINE dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 				//}
 				dgVector sum[3];
 				dgVector diff[3];
-//				dgInt32 index[3];
+				dgInt32 index0[3];
+				dgInt32 index1[3];
 				m_normal = faceNode->m_plane & dgVector::m_triplexMask;
 				for (dgInt32 i = 0; i < 3; i++) {
 					dgInt32 j = faceNode->m_vertex[i];
 					sum[i] = m_hullSum[j];
 					diff[i] = m_hullDiff[j];
-//					index[i] = m_polygonFaceIndex[j];
+					index0[i] = m_polygonFaceIndex0[j];
+					index1[i] = m_polygonFaceIndex1[j];
 				}
 				for (dgInt32 i = 0; i < 3; i++) {
 					m_hullSum[i] = sum[i];
 					m_hullDiff[i] = diff[i];
-//					m_polygonFaceIndex[i] = index[i];
+					m_polygonFaceIndex0[i] = index0[i];
+					m_polygonFaceIndex1[i] = index1[i];
 				}
 				return 3;
 			}
