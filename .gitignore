@@ -49,6 +49,7 @@ packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
 *.dll
 *.lib
 *.tlog
+*.json
 *.manifest
 *.log
 *.lastbuildstate

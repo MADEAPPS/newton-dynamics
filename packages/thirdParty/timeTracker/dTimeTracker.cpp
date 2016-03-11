@@ -99,12 +99,17 @@ dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
 
 dTimeTracker::dTimeTracker ()
 	:m_file(NULL)
+	,m_firstRecord(false)
 {
 	StartSection ("xxxx.json");
-	EndSection ();
 
 	QueryPerformanceFrequency(&m_frequency);
 	QueryPerformanceCounter (&m_baseCount);
+}
+
+dTimeTracker::~dTimeTracker ()
+{
+	EndSection ();
 }
 
 
@@ -124,7 +129,7 @@ void dTimeTracker::EndSection ()
 {
 	fprintf (m_file, "\n");
 	fprintf (m_file, "\t],\n");
-	  
+
 	fprintf (m_file, "\t\"displayTimeUnit\": \"ns\",\n");
 	fprintf (m_file, "\t\"systemTraceEvents\": \"SystemTraceData\",\n");
 	fprintf (m_file, "\t\"otherData\": {\n");
@@ -176,6 +181,39 @@ long long dTimeTracker::GetTimeInMicrosenconds()
 void dTimeTracker::WriteTrack (const dTrackerThread* const track, const dTrackRecord& record)
 {
 
+//  {"name": "Asub", "cat": "xxxxx", "ph": "B", "pid": 22630, "tid": 22630, "ts": 829}
+	
+
+	const dTrackRecord* ptr = &record;
+	for (int i = 0; i < record.m_size; i ++) {
+
+		if (!m_firstRecord) {
+			fprintf (m_file, "\n");
+			m_firstRecord = true;
+		} else {
+			fprintf (m_file, ",\n");
+		}
+
+		fprintf (m_file, "\t\t {");
+		fprintf (m_file, "\"name\": \"%s\", ", m_dictionary.Find (ptr->m_nameCRC)->GetInfo());
+		fprintf (m_file, "\"cat\": \"%s\", ", track->m_name);
+		fprintf (m_file, "\"ph\": \"B\", ");
+		fprintf (m_file, "\"pid\": \"%d\", ", track->m_processId);
+		fprintf (m_file, "\"tid\": \"%d\", ", track->m_threadId);
+		fprintf (m_file, "\"ts\": %d", ptr->m_startTime);
+		fprintf (m_file, "},\n");
+
+		fprintf (m_file, "\t\t {");
+		fprintf (m_file, "\"name\": \"%s\", ", m_dictionary.Find (ptr->m_nameCRC)->GetInfo());
+		fprintf (m_file, "\"cat\": \"%s\", ", track->m_name);
+		fprintf (m_file, "\"ph\": \"E\", ");
+		fprintf (m_file, "\"pid\": \"%d\", ", track->m_processId);
+		fprintf (m_file, "\"tid\": \"%d\", ", track->m_threadId);
+		fprintf (m_file, "\"ts\": %d", ptr->m_endTime);
+		fprintf (m_file, "}");
+		
+		ptr ++;
+	}
 }
 
 #endif

@@ -682,8 +682,11 @@ void DemoEntityManager::UpdatePhysics(float timestep)
 		unsigned64 nextTime = currentTime - m_microsecunds;
 		int loops = 0;
 
+		//dTimeTrackerTrackTime("xxxxxxx");
 		while ((nextTime >= timestepMicrosecunds) && (loops < MAX_PHYSICS_LOOPS)) {
 			loops ++;
+
+			dTimeTrackerTrackTime(__FUNCTION__);
 
 			// run the newton update function
 			if (!m_reEntrantUpdate) {
@@ -771,7 +774,7 @@ void DemoEntityManager::OnPaint (wxPaintEvent& WXUNUSED(event))
 
 void DemoEntityManager::RenderFrame ()
 {
-	dTimeTrackerTrackTime(__FUNCTION__);
+//	dTimeTrackerTrackTime(__FUNCTION__);
 
 	// Make context current
 	if (m_mainWindow->m_suspendVisualUpdates) {

@@ -88,6 +88,7 @@ class dTimeTracker
 
 	private:
 	dTimeTracker ();
+	~dTimeTracker ();
 	long long GetTimeInMicrosenconds();
 	void WriteTrack(const dTrackerThread* const track, const dTrackRecord& record);
 
@@ -97,6 +98,7 @@ class dTimeTracker
 	LARGE_INTEGER m_frequency;
 	LARGE_INTEGER m_baseCount;
 	FILE* m_file;
+	bool m_firstRecord;
 };
 
 
