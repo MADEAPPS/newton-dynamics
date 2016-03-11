@@ -95,7 +95,7 @@ class dTimeTracker
 };
 
 
-#define dTimeTrackerCreateThread(name)												\
+#define dTimeTrackerCreateTrack(name)												\
 	dTimeTracker::GetInstance()->CreateThread (name);
 
 #define dTimeTrackerTrackTime(name)													\
@@ -111,7 +111,7 @@ class dTimeTracker
 
 #else 
 
-#define dTimeTrackerCreateThread(name)							
+#define dTimeTrackerCreateTrack(name)							
 #define dTimeTrackerTrackTime(name)													
 
 #endif

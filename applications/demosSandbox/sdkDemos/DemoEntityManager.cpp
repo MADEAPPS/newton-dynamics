@@ -111,8 +111,7 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 
 	m_context = new wxGLContext(this);
 
-	dTimeTrackerCreateThread("main thread");
-
+	dTimeTrackerCreateTrack("main thread");
 }
 
 
@@ -674,10 +673,8 @@ int DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const ch
 
 void DemoEntityManager::UpdatePhysics(float timestep)
 {
-	// read the controls 
 	// update the physics
 	if (m_world) {
-		//Sleep (40);
 
 		dFloat timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
 		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
@@ -702,7 +699,6 @@ void DemoEntityManager::UpdatePhysics(float timestep)
 					} else {
 						NewtonUpdateAsync(m_world, timestepInSecunds);
 					}
-					//m_physThreadTime = NewtonReadPerformanceTicks (m_world, NEWTON_PROFILER_WORLD_UPDATE) * 1.0e-3f;
 				}
 				m_reEntrantUpdate = false;
 			}
@@ -791,7 +787,6 @@ void DemoEntityManager::RenderFrame ()
 	UpdatePhysics(timestep);
 	unsigned64 time1 = dGetTimeInMicrosenconds ();
 	m_mainThreadPhysicsTime = dFloat ((time1 - time0) / 1000.0f);
-
 
 	// Get the interpolated location of each body in the scene
 	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
