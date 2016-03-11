@@ -171,11 +171,8 @@ class NewtonDemos: public wxFrame
 	float m_timestepAcc;
 	float m_fps;
 
-
 	int m_key[512];
 	int m_keyMap[512];
-	wxMenuItem* m_profilerTracksMenu[16];
-
 
 	static int m_solverModes[];
 	static int m_threadsTracks[];

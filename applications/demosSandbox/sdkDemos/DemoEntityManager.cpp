@@ -99,10 +99,9 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,m_cameraManager(NULL)
     ,m_tranparentHeap()
 //	,m_visualDebugger(NULL)
-//	,m_profiler(60, 40)
+
 	,m_mainThreadGraphicsTime(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)
-//	,m_physThreadTime(0.0f)
 {
 	// initialized the physics world for the new scene
 	Cleanup ();
@@ -943,17 +942,6 @@ void DemoEntityManager::RenderFrame ()
 	}
 
 	int lineNumber = 130 + 22;
-	//if (m_mainWindow->m_concurrentProfilerState) {
-	//	lineNumber = m_profiler.RenderConcurrentPerformance(lineNumber);
-	//}
-
-	//if (profileFlags) {
-	//	lineNumber = m_profiler.Render (profileFlags, lineNumber);
-	//}
-
-	//if (m_mainWindow->m_threadProfilerState) {
-	//	m_profiler.RenderThreadPerformance ();
-	//}
 
 	if (m_renderHood) {
 

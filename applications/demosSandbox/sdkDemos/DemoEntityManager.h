@@ -167,7 +167,6 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 
 	dFloat m_mainThreadGraphicsTime;
 	dFloat m_mainThreadPhysicsTime;
-	//dFloat m_physThreadTime;
 
 	static int m_attributes[];
 

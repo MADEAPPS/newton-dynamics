@@ -355,8 +355,6 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_microthreadIndex = 1;
 //m_useParallelSolver = true;
 
-	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));
-
 	// clear the key map
 	memset (m_key, 0, sizeof (m_key));
 	for (int i = 0; i < int (sizeof (m_keyMap)/sizeof (m_keyMap[0])); i ++) {
