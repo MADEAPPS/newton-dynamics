@@ -27,6 +27,7 @@
 #include "CustomPlayerControllerManager.h"
 #include "CustomVehicleControllerManager.h"
 
+
 #ifdef _MACOSX_VER
 	#include "CocoaOpenglGlue.h"
 #endif
@@ -108,8 +109,10 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 
 	ResetTimer();
 
-
 	m_context = new wxGLContext(this);
+
+	dTimeTrackerCreateThread("main thread");
+
 }
 
 
