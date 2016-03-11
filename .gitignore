@@ -45,15 +45,15 @@ bld/
 # third party
 packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
 *.obj
-*.tlog
 *.pdb
+*.dll
+*.lib
+*.tlog
 *.manifest
 *.log
 *.lastbuildstate
-*.dll
 *.exp
 *.ilk
-*.lib
 *.map
 *.exe
 *.unsuccessfulbuild
