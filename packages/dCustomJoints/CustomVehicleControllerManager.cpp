@@ -232,7 +232,6 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 			dVector chassisMatrixPosit (chassisMatrix.m_posit + chassisMatrix.m_up.Scale (param * m_tire->m_data.m_suspesionlenght));
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_tire->m_data.m_springStrength, m_tire->m_data.m_dampingRatio);
-			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrixPosit[0], &chassisMatrix.m_up[0]);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else if (param <= 0.0f) {
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
@@ -1752,6 +1751,7 @@ int CustomVehicleControllerManager::OnContactGeneration (const CustomVehicleCont
 			contactBuffer[count].m_penetration = 0.0f;
 			contactBuffer[count].m_shapeId0 = tireID;
 			contactBuffer[count].m_shapeId1 = tire->m_info[i].m_contactID;
+			count ++;
 		}				  
 	}
 	return count;
@@ -1805,40 +1805,10 @@ void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 	TireFilter filter(tireBody, vehicleBody);
 
 	dFloat timeOfImpact;
-	NewtonWorldConvexCastReturnInfo info[2];
-	int contactCount = NewtonWorldConvexCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, &timeOfImpact, &filter, CustomControllerConvexCastPreFilter::Prefilter, tire->m_info, sizeof (info) / sizeof (info[0]), 0);
-	if (contactCount) {
-//		dMatrix matrixA;
-//		dMatrix matrixB;
-//		dMatrix tireMatrix;
-//		dMatrix chassisMatrix;
-//		const NewtonBody* const tireBody = tire->GetBody();
-//		CustomVehicleController* const controller = tire->GetController();
-//		NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
-//		NewtonBodyGetMatrix(controller->GetBody(), &chassisMatrix[0][0]);
-//		chassisMatrix.m_posit = chassisMatrix.TransformVector(tire->m_data.m_location);
-//		dVector suspensionSpan(chassisMatrix.m_up.Scale(tire->m_data.m_suspesionlenght));
-//		matrixA.m_up = chassisMatrix.m_up;
-//		matrixA.m_right = tireMatrix.m_front * chassisMatrix.m_up;
-//		matrixA.m_right = matrixA.m_right.Scale(1.0f / dSqrt(matrixA.m_right % matrixA.m_right));
-//		matrixA.m_front = matrixA.m_up * matrixA.m_right;
-//		matrixA.m_posit = chassisMatrix.m_posit + suspensionSpan;
-//		dVector velocA(matrixA.m_up.Scale(-tire->m_data.m_suspesionlenght));
-//		dVector zero(0.0f, 0.0f, 0.0f, 0.0f);
-//		const int maxContacts = 4;
-//		dFloat timeOfImpact;
-//		dFloat contacts[maxContacts][3];
-//		dFloat normals[maxContacts][3];
-//		dFloat penetration[maxContacts];
-//		dLong attributeA[maxContacts];
-//		dLong attributeB[maxContacts];
-//		NewtonBodyGetMatrix(otherBody, &matrixB[0][0]);
-//		NewtonCollision* const collisionA = NewtonBodyGetCollision(tireBody);
-//		NewtonCollision* const collisionB = NewtonBodyGetCollision(otherBody);
-//		contactCount = NewtonCollisionCollideContinue(GetWorld(), maxContacts, 1.0f, collisionA, &matrixA[0][0], &velocA[0], &zero[0], collisionB, &matrixB[0][0], &zero[0], &zero[0], &timeOfImpact, &contacts[0][0], &normals[0][0], &penetration[0],	&attributeA[0], &attributeB[0], threadIndex);
-//		if (contactCount) {
+	tire->m_collidingCount = NewtonWorldConvexCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, &timeOfImpact, &filter, CustomControllerConvexCastPreFilter::Prefilter, tire->m_info, sizeof (tire->m_info) / sizeof (tire->m_info[0]), 0);
+	if (tire->m_collidingCount) {
+
 		timeOfImpact = 1.0f - timeOfImpact;
-/*
 		dFloat num = (tireMatrix.m_posit - chassisMatrix.m_posit) % suspensionSpan;
 		dFloat tireParam = num / (tire->m_data.m_suspesionlenght * tire->m_data.m_suspesionlenght);
 
@@ -1846,21 +1816,6 @@ void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 			tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(timeOfImpact * tire->m_data.m_suspesionlenght);
 			NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
 		}
-
-		for (int i = 0; i < contactCount; i++) {
-			contactBuffer[i].m_point[0] = contacts[i][0];
-			contactBuffer[i].m_point[1] = contacts[i][1];
-			contactBuffer[i].m_point[2] = contacts[i][2];
-			contactBuffer[i].m_point[3] = 1.0f;
-			contactBuffer[i].m_normal[0] = normals[i][0];
-			contactBuffer[i].m_normal[1] = normals[i][1];
-			contactBuffer[i].m_normal[2] = normals[i][2];
-			contactBuffer[i].m_normal[3] = 0.0f;
-			contactBuffer[i].m_penetration = 0.0f;
-			contactBuffer[i].m_shapeId0 = attributeA[i];
-			contactBuffer[i].m_shapeId1 = attributeA[i];
-		}
-*/	
 	}
 }
 
