@@ -344,8 +344,8 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_z = 0.0f;
 
 	location.m_posit.m_x = 98.710999f;
-	location.m_posit.m_y =-0.96156919; 
-	location.m_posit.m_z = 27.254711;
+	location.m_posit.m_y =-0.96156919f; 
+	location.m_posit.m_z = 27.254711f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
 	BasicPlayerEntity* const player = new BasicPlayerEntity (scene, playerManager, 0.5f, 1.9f, location);

@@ -195,9 +195,9 @@ class CustomVehicleController: public CustomControllerBase
 		dFloat m_lateralSlip;
 		dFloat m_longitudinalSlip;
 		dFloat m_aligningTorque;
-		const NewtonBody* m_collidingBodies[4];
-		int m_collidingCount;
 		int m_index;
+		int m_collidingCount;
+		NewtonWorldConvexCastReturnInfo m_info[2];
 		friend class WheelJoint;
 		friend class CustomVehicleController;
 		friend class CustomVehicleControllerManager;
