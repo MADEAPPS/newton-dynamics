@@ -200,7 +200,7 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(ProjectName)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(ProjectName)_profile</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">$(ProjectName)</TargetName>

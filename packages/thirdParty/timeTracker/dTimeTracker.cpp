@@ -83,13 +83,12 @@ dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
 
 	dTrackRecord& record = m_thread->m_buffer[m_index];
 	record.m_size = m_thread->m_index - record.m_size;
+	record.m_endTime = instance->GetTimeInMicrosenconds ();
 
 	if (!m_thread->m_stack.GetCount()) {
 		// save record ();
 		m_thread->m_index = 0;
 	}
-
-	record.m_endTime = instance->GetTimeInMicrosenconds ();
 }
 
 
@@ -99,7 +98,7 @@ dTimeTracker::dTimeTracker ()
 	QueryPerformanceCounter (&m_baseCount);
 }
 
-void dTimeTracker::CreateThread (const char* const name)
+void dTimeTracker::CreateTrack (const char* const name)
 {
 	m_tracks.Append (dTrackerThread (name));
 }

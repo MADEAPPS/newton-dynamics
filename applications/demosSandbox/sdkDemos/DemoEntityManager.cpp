@@ -771,7 +771,7 @@ void DemoEntityManager::OnPaint (wxPaintEvent& WXUNUSED(event))
 
 void DemoEntityManager::RenderFrame ()
 {
-	//Sleep (20);
+	dTimeTrackerTrackTime(__FUNCTION__);
 
 	// Make context current
 	if (m_mainWindow->m_suspendVisualUpdates) {

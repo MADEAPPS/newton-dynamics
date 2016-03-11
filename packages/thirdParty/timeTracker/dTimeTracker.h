@@ -52,8 +52,8 @@ class dTimeTracker
 	class dTimeTrackerEntry
 	{
 		public:
-		dTimeTrackerEntry(dCRCTYPE nameCRC);
-		~dTimeTrackerEntry();
+		TIMETRACKER_API dTimeTrackerEntry(dCRCTYPE nameCRC);
+		TIMETRACKER_API ~dTimeTrackerEntry();
 
 		private:
 		dTrackerThread* m_thread;
@@ -79,7 +79,7 @@ class dTimeTracker
 	};
 	
 	TIMETRACKER_API static dTimeTracker* GetInstance();
-	TIMETRACKER_API void CreateThread (const char* const name);
+	TIMETRACKER_API void CreateTrack (const char* const name);
 	TIMETRACKER_API dCRCTYPE RegisterName (const char* const name);
 	TIMETRACKER_API void SaveData ();
 
@@ -96,7 +96,7 @@ class dTimeTracker
 
 
 #define dTimeTrackerCreateTrack(name)												\
-	dTimeTracker::GetInstance()->CreateThread (name);
+	dTimeTracker::GetInstance()->CreateTrack (name);
 
 #define dTimeTrackerTrackTime(name)													\
 	static dCRCTYPE __crcName__ = dTimeTracker::GetInstance()->RegisterName (name);	\
