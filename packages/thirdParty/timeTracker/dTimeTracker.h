@@ -80,6 +80,9 @@ class dTimeTracker
 	};
 	
 	TIMETRACKER_API static dTimeTracker* GetInstance();
+	TIMETRACKER_API void StartSection (const char* const name);
+	TIMETRACKER_API void EndSection ();
+
 	TIMETRACKER_API void CreateTrack (const char* const name);
 	TIMETRACKER_API dCRCTYPE RegisterName (const char* const name);
 
@@ -91,10 +94,17 @@ class dTimeTracker
 
 	dList<dTrackerThread> m_tracks;
 	dTree<const char*, dCRCTYPE> m_dictionary;
-
 	LARGE_INTEGER m_frequency;
 	LARGE_INTEGER m_baseCount;
+	FILE* m_file;
 };
+
+
+#define dTimeTrackerStartSection(fileName)											\
+	dTimeTracker::GetInstance()->StartSection (name);
+
+#define dTimeTrackerEndSection()													\
+	dTimeTracker::GetInstance()->EndSection ();
 
 
 #define dTimeTrackerCreateTrack(name)												\

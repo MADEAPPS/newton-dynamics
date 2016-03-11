@@ -49,55 +49,93 @@ void dTimeTracker::dTrackerThread::Realloc()
 dTimeTracker::dTimeTrackerEntry::dTimeTrackerEntry(dCRCTYPE nameCRC)
 {
 	dTimeTracker* const instance = dTimeTracker::GetInstance();
-	long long startTime = instance->GetTimeInMicrosenconds ();
+	if (instance->m_file) {
+		long long startTime = instance->GetTimeInMicrosenconds ();
 
-	long long threadId = GetCurrentThreadId();
-	dList<dTimeTracker::dTrackerThread>::dListNode* tracker = instance->m_tracks.GetFirst();
-	for (dList<dTimeTracker::dTrackerThread>::dListNode* threadPtr = instance->m_tracks.GetFirst(); threadPtr; threadPtr = threadPtr->GetNext()) {
-		if (threadPtr->GetInfo().m_threadId == threadId) {
-			tracker = threadPtr;
-			break;
+		long long threadId = GetCurrentThreadId();
+		dList<dTimeTracker::dTrackerThread>::dListNode* tracker = instance->m_tracks.GetFirst();
+		for (dList<dTimeTracker::dTrackerThread>::dListNode* threadPtr = instance->m_tracks.GetFirst(); threadPtr; threadPtr = threadPtr->GetNext()) {
+			if (threadPtr->GetInfo().m_threadId == threadId) {
+				tracker = threadPtr;
+				break;
+			}
 		}
-	}
 	
-	dTrackerThread& thread = tracker->GetInfo();
-	m_thread = &thread;
-	thread.m_stack.Append (this);
+		dTrackerThread& thread = tracker->GetInfo();
+		m_thread = &thread;
+		thread.m_stack.Append (this);
 
-	if (thread.m_index >= thread.m_size) {
-		thread.Realloc();
+		if (thread.m_index >= thread.m_size) {
+			thread.Realloc();
+		}
+
+		m_index = thread.m_index;
+		dTrackRecord& record = thread.m_buffer[thread.m_index];
+		record.m_nameCRC = nameCRC;
+		record.m_startTime = startTime;
+		record.m_size = thread.m_index;
+		thread.m_index ++;
 	}
-
-	m_index = thread.m_index;
-	dTrackRecord& record = thread.m_buffer[thread.m_index];
-	record.m_nameCRC = nameCRC;
-	record.m_startTime = startTime;
-	record.m_size = thread.m_index;
-	thread.m_index ++;
 }
 
 dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
 {
 	dTimeTracker* const instance = dTimeTracker::GetInstance();
-	dAssert (this == m_thread->m_stack.GetLast()->GetInfo());
-	m_thread->m_stack.Remove (m_thread->m_stack.GetLast());
+	if (instance->m_file) {
+		dAssert (this == m_thread->m_stack.GetLast()->GetInfo());
+		m_thread->m_stack.Remove (m_thread->m_stack.GetLast());
 
-	dTrackRecord& record = m_thread->m_buffer[m_index];
-	record.m_size = m_thread->m_index - record.m_size;
-	record.m_endTime = instance->GetTimeInMicrosenconds ();
+		dTrackRecord& record = m_thread->m_buffer[m_index];
+		record.m_size = m_thread->m_index - record.m_size;
+		record.m_endTime = instance->GetTimeInMicrosenconds ();
 
-	if (!m_thread->m_stack.GetCount()) {
-		instance->WriteTrack (m_thread, record);
-		m_thread->m_index = 0;
+		if (!m_thread->m_stack.GetCount()) {
+			instance->WriteTrack (m_thread, record);
+			m_thread->m_index = 0;
+		}
 	}
 }
 
 
 dTimeTracker::dTimeTracker ()
+	:m_file(NULL)
 {
+	StartSection ("xxxx.json");
+	EndSection ();
+
 	QueryPerformanceFrequency(&m_frequency);
 	QueryPerformanceCounter (&m_baseCount);
 }
+
+
+void dTimeTracker::StartSection (const char* const fileName)
+{
+	if (m_file) {
+		fclose (m_file);
+	}
+
+	m_file = fopen (fileName, "wb");
+
+	fprintf (m_file, "{\n");
+	fprintf (m_file, "\t\"traceEvents\": [\n");
+}
+
+void dTimeTracker::EndSection ()
+{
+	fprintf (m_file, "\n");
+	fprintf (m_file, "\t],\n");
+	  
+	fprintf (m_file, "\t\"displayTimeUnit\": \"ns\",\n");
+	fprintf (m_file, "\t\"systemTraceEvents\": \"SystemTraceData\",\n");
+	fprintf (m_file, "\t\"otherData\": {\n");
+	fprintf (m_file, "\t\t\"version\": \"My Application v1.0\"\n");
+	fprintf (m_file, "\t}\n");
+	fprintf (m_file, "}\n");
+
+	fclose (m_file);
+	m_file = NULL;
+}
+
 
 void dTimeTracker::CreateTrack (const char* const name)
 {
