@@ -24,10 +24,11 @@ dTimeTracker* dTimeTracker::GetInstance()
 
 dTimeTracker::dTrackerThread::dTrackerThread (const char* const name)
 	:m_name (name)
-	,m_threadId (GetCurrentThreadId())
 	,m_buffer ((dTrackRecord*) dContainersAlloc::Alloc (1024 * sizeof (dTrackRecord)))
-	,m_size (1024)
 	,m_index (0)
+	,m_size (1024)
+	,m_threadId (GetCurrentThreadId())
+	,m_processId (GetCurrentProcessId())
 {
 }
 
@@ -86,7 +87,7 @@ dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
 	record.m_endTime = instance->GetTimeInMicrosenconds ();
 
 	if (!m_thread->m_stack.GetCount()) {
-		// save record ();
+		instance->WriteTrack (m_thread, record);
 		m_thread->m_index = 0;
 	}
 }
@@ -119,8 +120,24 @@ long long dTimeTracker::GetTimeInMicrosenconds()
 	return ticks;
 }
 
-void dTimeTracker::SaveData ()
+/*
 {
+  "traceEvents": [
+    {"name": "Asub", "cat": "xxxxx", "ph": "B", "pid": 22630, "tid": 22630, "ts": 829},
+    {"name": "Asub", "cat": "xxxxx", "ph": "E", "pid": 22630, "tid": 22630, "ts": 833}
+  ],
+
+  "displayTimeUnit": "ns",
+  "systemTraceEvents": "SystemTraceData",
+  "otherData": {
+    "version": "My Application v1.0"
+  }
+}
+*/
+
+void dTimeTracker::WriteTrack (const dTrackerThread* const track, const dTrackRecord& record)
+{
+
 }
 
 #endif

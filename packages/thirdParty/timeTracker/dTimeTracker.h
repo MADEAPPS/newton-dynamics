@@ -71,22 +71,24 @@ class dTimeTracker
 		private:
 		dList<dTimeTrackerEntry*> m_stack;
 		const char* m_name;
-		long long m_threadId;
 		dTrackRecord* m_buffer;
 		int m_index;
 		int m_size;
+		DWORD m_threadId;
+		DWORD m_processId;
 		friend class dTimeTracker;
 	};
 	
 	TIMETRACKER_API static dTimeTracker* GetInstance();
 	TIMETRACKER_API void CreateTrack (const char* const name);
 	TIMETRACKER_API dCRCTYPE RegisterName (const char* const name);
-	TIMETRACKER_API void SaveData ();
-
-	long long GetTimeInMicrosenconds();
 
 	private:
 	dTimeTracker ();
+	long long GetTimeInMicrosenconds();
+	void WriteTrack(const dTrackerThread* const track, const dTrackRecord& record);
+
+
 	dList<dTrackerThread> m_tracks;
 	dTree<const char*, dCRCTYPE> m_dictionary;
 
