@@ -45,11 +45,10 @@ void dTimeTracker::dTrackerThread::Realloc()
 }
 
 
-
 dTimeTracker::dTimeTrackerEntry::dTimeTrackerEntry(dCRCTYPE nameCRC)
 {
 	dTimeTracker* const instance = dTimeTracker::GetInstance();
-	if (instance->m_file) {
+	if (instance->m_file && instance->m_frames) {
 		long long startTime = instance->GetTimeInMicrosenconds ();
 
 		long long threadId = GetCurrentThreadId();
@@ -81,7 +80,7 @@ dTimeTracker::dTimeTrackerEntry::dTimeTrackerEntry(dCRCTYPE nameCRC)
 dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
 {
 	dTimeTracker* const instance = dTimeTracker::GetInstance();
-	if (instance->m_file) {
+	if (instance->m_file && instance->m_frames) {
 		dAssert (this == m_thread->m_stack.GetLast()->GetInfo());
 		m_thread->m_stack.Remove (m_thread->m_stack.GetLast());
 
@@ -92,6 +91,14 @@ dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
 		if (!m_thread->m_stack.GetCount()) {
 			instance->WriteTrack (m_thread, record);
 			m_thread->m_index = 0;
+
+			if (m_thread == &instance->m_tracks.GetFirst()->GetInfo()) {
+				instance->m_frames --;
+			}
+
+			if (!instance->m_frames) {
+				instance->EndSection ();
+			}
 		}
 	}
 }
@@ -99,9 +106,12 @@ dTimeTracker::dTimeTrackerEntry::~dTimeTrackerEntry()
 
 dTimeTracker::dTimeTracker ()
 	:m_file(NULL)
+	,m_frames(0)
 	,m_firstRecord(false)
 {
-	StartSection ("xxxx.json");
+	StartSection ("xxxx.json", 100);
+
+	InitializeCriticalSectionAndSpinCount(&m_criticalSection, 0x1000);
 
 	QueryPerformanceFrequency(&m_frequency);
 	QueryPerformanceCounter (&m_baseCount);
@@ -109,20 +119,24 @@ dTimeTracker::dTimeTracker ()
 
 dTimeTracker::~dTimeTracker ()
 {
-	EndSection ();
+	DeleteCriticalSection(&m_criticalSection);
 }
 
 
-void dTimeTracker::StartSection (const char* const fileName)
+void dTimeTracker::StartSection (const char* const fileName, int frames)
 {
 	if (m_file) {
 		fclose (m_file);
 	}
 
+	m_frames = frames;
 	m_file = fopen (fileName, "wb");
 
 	fprintf (m_file, "{\n");
 	fprintf (m_file, "\t\"traceEvents\": [\n");
+
+	QueryPerformanceFrequency(&m_frequency);
+	QueryPerformanceCounter (&m_baseCount);
 }
 
 void dTimeTracker::EndSection ()
@@ -150,7 +164,13 @@ void dTimeTracker::CreateTrack (const char* const name)
 dCRCTYPE dTimeTracker::RegisterName (const char* const name)
 {
 	dCRCTYPE crc = dCRC64 (name);
-	m_dictionary.Insert (name, crc);
+
+	EnterCriticalSection(&m_criticalSection); 
+	dTree<dLabels, dCRCTYPE>::dTreeNode* const node = m_dictionary.Insert (crc);
+	LeaveCriticalSection(&m_criticalSection);
+	if (node) {
+		strncpy (&node->GetInfo().m_name[0], name, sizeof (node->GetInfo().m_name));  
+	}
 	return crc;
 }
 
@@ -183,7 +203,7 @@ void dTimeTracker::WriteTrack (const dTrackerThread* const track, const dTrackRe
 
 //  {"name": "Asub", "cat": "xxxxx", "ph": "B", "pid": 22630, "tid": 22630, "ts": 829}
 	
-
+	EnterCriticalSection(&m_criticalSection); 
 	const dTrackRecord* ptr = &record;
 	for (int i = 0; i < record.m_size; i ++) {
 
@@ -195,7 +215,7 @@ void dTimeTracker::WriteTrack (const dTrackerThread* const track, const dTrackRe
 		}
 
 		fprintf (m_file, "\t\t {");
-		fprintf (m_file, "\"name\": \"%s\", ", m_dictionary.Find (ptr->m_nameCRC)->GetInfo());
+		fprintf (m_file, "\"name\": \"%s\", ", m_dictionary.Find (ptr->m_nameCRC)->GetInfo().m_name);
 		fprintf (m_file, "\"cat\": \"%s\", ", track->m_name);
 		fprintf (m_file, "\"ph\": \"B\", ");
 		fprintf (m_file, "\"pid\": \"%d\", ", track->m_processId);
@@ -204,7 +224,7 @@ void dTimeTracker::WriteTrack (const dTrackerThread* const track, const dTrackRe
 		fprintf (m_file, "},\n");
 
 		fprintf (m_file, "\t\t {");
-		fprintf (m_file, "\"name\": \"%s\", ", m_dictionary.Find (ptr->m_nameCRC)->GetInfo());
+		fprintf (m_file, "\"name\": \"%s\", ", m_dictionary.Find (ptr->m_nameCRC)->GetInfo().m_name);
 		fprintf (m_file, "\"cat\": \"%s\", ", track->m_name);
 		fprintf (m_file, "\"ph\": \"E\", ");
 		fprintf (m_file, "\"pid\": \"%d\", ", track->m_processId);
@@ -214,6 +234,8 @@ void dTimeTracker::WriteTrack (const dTrackerThread* const track, const dTrackRe
 		
 		ptr ++;
 	}
+	
+    LeaveCriticalSection(&m_criticalSection);
 }
 
 #endif

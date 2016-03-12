@@ -80,33 +80,36 @@ class dTimeTracker
 	};
 	
 	TIMETRACKER_API static dTimeTracker* GetInstance();
-	TIMETRACKER_API void StartSection (const char* const name);
+	TIMETRACKER_API void StartSection (const char* const name, int frames);
 	TIMETRACKER_API void EndSection ();
 
 	TIMETRACKER_API void CreateTrack (const char* const name);
 	TIMETRACKER_API dCRCTYPE RegisterName (const char* const name);
 
 	private:
+	class dLabels
+	{
+		public:
+		char m_name[128];
+	};
 	dTimeTracker ();
 	~dTimeTracker ();
 	long long GetTimeInMicrosenconds();
 	void WriteTrack(const dTrackerThread* const track, const dTrackRecord& record);
 
-
 	dList<dTrackerThread> m_tracks;
-	dTree<const char*, dCRCTYPE> m_dictionary;
+	dTree<dLabels, dCRCTYPE> m_dictionary;
 	LARGE_INTEGER m_frequency;
 	LARGE_INTEGER m_baseCount;
 	FILE* m_file;
+	CRITICAL_SECTION m_criticalSection; 
+	int m_frames;
 	bool m_firstRecord;
 };
 
 
-#define dTimeTrackerStartSection(fileName)											\
-	dTimeTracker::GetInstance()->StartSection (name);
-
-#define dTimeTrackerEndSection()													\
-	dTimeTracker::GetInstance()->EndSection ();
+#define dTimeTrackerStartSection(fileName,frames)									\
+	dTimeTracker::GetInstance()->StartSection (name, frame);
 
 
 #define dTimeTrackerCreateTrack(name)												\
