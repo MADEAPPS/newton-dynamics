@@ -94,7 +94,7 @@ class dTimeTracker
 #define dTimeTrackerUpdate()																\
 	dTimeTracker::GetInstance()->Update ();
 
-#define dTimeTrackerSetTrreadName(name)														\
+#define dTimeTrackerSetThreadName(name)														\
 	dTimeTracker::GetInstance()->RegisterThreadName (name);
 
 #define dTimeTrackerEvent(name)																\
@@ -103,8 +103,10 @@ class dTimeTracker
 
 #else 
 
-#define dTimeTrackerStartSection(fileName,frames)
-#define dTimeTrackerEvent(name)													
+#define dTimeTrackerUpdate()
+#define dTimeTrackerEvent(name)
+#define dTimeTrackerSetThreadName(name)
+#define dTimeTrackerStartSection(frames)
 
 #endif
 

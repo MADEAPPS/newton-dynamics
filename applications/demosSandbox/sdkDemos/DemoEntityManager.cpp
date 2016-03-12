@@ -108,7 +108,7 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 
 	ResetTimer();
 
-	dTimeTrackerSetTrreadName ("mainThread");
+	dTimeTrackerSetThreadName ("mainThread");
 	m_context = new wxGLContext(this);
 }
 
