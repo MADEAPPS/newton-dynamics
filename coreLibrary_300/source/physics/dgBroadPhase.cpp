@@ -260,6 +260,7 @@ bool dgBroadPhase::DoNeedUpdate(dgBodyMasterList::dgListNode* const node) const
 
 void dgBroadPhase::UpdateAggregateEntropy (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseAggregate*>::dgListNode* node, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
 	while (node) {
 		node->GetInfo()->ImproveEntropy();
@@ -272,6 +273,7 @@ void dgBroadPhase::UpdateAggregateEntropy (dgBroadphaseSyncDescriptor* const des
 
 void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
@@ -299,6 +301,7 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 
 void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
@@ -1166,6 +1169,7 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
+//	dTimeTrackerEvent(__FUNCTION__);
 	if (TestOverlaping (body0, body1, timestep)) {
 		dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
 
@@ -1397,6 +1401,7 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 
 void dgBroadPhase::FindCollidingPairs(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	const dgFloat32 timestep = descriptor->m_timestep;
 
 	dgList<dgBroadPhaseNode*>::dgListNode* node = nodePtr;
@@ -1445,6 +1450,7 @@ void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* 
 
 void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	// delete all non used contacts
 	dgInt32 count = 0;
 	dgUnsigned32 lru = m_lru;
@@ -1527,6 +1533,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	if (m_world->m_preListener.GetCount()) {
 		for (dgWorld::dgListenerList::dgListNode* node = m_world->m_preListener.GetFirst(); node; node = node->GetNext()) {
 			dgWorld::dgListener& listener = node->GetInfo();
+			dTimeTrackerEvent(listener.m_name);
 			listener.m_onListenerUpdate(m_world, listener.m_userData, timestep);
 		}
 	}

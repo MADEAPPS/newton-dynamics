@@ -81,6 +81,7 @@ void dTimeTracker::EndSection ()
 
 	fclose (m_file);
 	m_file = NULL;
+	m_firstRecord = 0;
 }
 
 void dTimeTracker::Update ()
@@ -142,7 +143,6 @@ void dTimeTracker::WriteTracks ()
 		} else {
 			fprintf (m_file, ",\n");
 		}
-
 		
 		dTree<dLabels, dCRCTYPE>::dTreeNode* threadNodeName = m_dictionary.Find (event.m_threadId);
 		if (!threadNodeName) {
@@ -193,17 +193,17 @@ dTimeTracker::dTrackEntry::~dTrackEntry()
 	dTimeTracker* const instance = dTimeTracker::GetInstance();
 	m_endTime = instance->GetTimeInMicrosenconds ();
 	if (instance->m_file) {
-		long index = _InterlockedExchangeAdd((long*) &instance->m_bufferIndex, 1);
-		if (index >= instance->m_bufferSize) {
-			EnterCriticalSection(&instance->m_criticalSection); 
-			if (index >= instance->m_bufferSize) {
-				dTrackEntry* const buffer = ((dTrackEntry*) dContainersAlloc::Alloc (2 * instance->m_bufferSize * sizeof (dTrackEntry)));
-				memcpy (instance->m_buffer, buffer, instance->m_bufferIndex * sizeof (dTrackEntry));
-				instance->m_bufferSize = instance->m_bufferSize * 2;
-			}
-			LeaveCriticalSection(&instance->m_criticalSection);
+		EnterCriticalSection(&instance->m_criticalSection); 
+		if (instance->m_bufferIndex >= instance->m_bufferSize) {
+			dTrackEntry* const buffer = ((dTrackEntry*) dContainersAlloc::Alloc (2 * instance->m_bufferSize * sizeof (dTrackEntry)));
+			memcpy (buffer, instance->m_buffer, instance->m_bufferIndex * sizeof (dTrackEntry));
+			dContainersAlloc::Free (instance->m_buffer);
+			instance->m_bufferSize = instance->m_bufferSize * 2;
+			instance->m_buffer = buffer;
 		}
-		instance->m_buffer[index] = *this;
+		instance->m_buffer[instance->m_bufferIndex] = *this;
+		instance->m_bufferIndex ++;
+		LeaveCriticalSection(&instance->m_criticalSection);
 	}
 }
 

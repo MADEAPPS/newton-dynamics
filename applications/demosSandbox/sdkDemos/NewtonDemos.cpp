@@ -902,7 +902,7 @@ void NewtonDemos::OnNew (wxCommandEvent& event)
 
 void NewtonDemos::OnRunProfileSection (wxCommandEvent& event)
 {
-	dTimeTrackerStartSection(500);
+	dTimeTrackerStartSection(200);
 }
 
 void NewtonDemos::OnSerializeWorld (wxCommandEvent& event)

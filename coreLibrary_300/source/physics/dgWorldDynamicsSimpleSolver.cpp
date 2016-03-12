@@ -397,6 +397,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 
 void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep) const 
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgAssert (island->m_bodyCount >= 2);
 
 	dgWorld* const world = (dgWorld*) this;
@@ -759,6 +760,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(dgJointInfo* const jointInfo
 
 void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = island->m_bodyCount;
 	const dgInt32 jointCount = island->m_jointCount;
