@@ -221,6 +221,9 @@ void* dgThread::dgThreadSystemCallback(void* threadData)
 	dgSetPrecisionDouble precision;
 
 	dgThread* const me = (dgThread*) threadData;
+
+	dTimeTrackerSetThreadName(me->m_name);
+
 	dgInterlockedExchange(&me->m_threadRunning, 1);
 	me->Execute(me->m_id);
 	dgInterlockedExchange(&me->m_threadRunning, 0);

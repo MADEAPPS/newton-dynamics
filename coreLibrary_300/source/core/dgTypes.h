@@ -87,6 +87,7 @@
 #include <pthread.h>
 #include <sched.h>
 #include <semaphore.h>
+#include <dTimeTracker.h>
 
 #if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 	#include <io.h> 

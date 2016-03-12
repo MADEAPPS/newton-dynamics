@@ -79,6 +79,7 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 
 void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	dgBodyMasterList& masterList = *world;
 
