@@ -56,8 +56,7 @@ class NewtonDemos: public wxFrame
 		ID_SELECT_MICROTHREADS,
 		ID_SELECT_MICROTHREADS_COUNT = ID_SELECT_MICROTHREADS + 16,
 
-		ID_SHOW_PROFILER,
-		ID_SHOW_CONCURRENCE_PROFILER,
+		ID_RUN_PROFILER_SECTION,
 
 		ID_RUN_DEMO,
 		ID_RUN_DEMO_RANGE = ID_RUN_DEMO + 100,
@@ -124,6 +123,8 @@ class NewtonDemos: public wxFrame
 	void OnNew(wxCommandEvent& event);
 	void OnSerializeWorld(wxCommandEvent& event);
 	void OnDeserializeWorld(wxCommandEvent& event);
+
+	void OnRunProfileSection(wxCommandEvent& event);
 
 	void OnJoystickEvent(wxJoystickEvent& event);
 

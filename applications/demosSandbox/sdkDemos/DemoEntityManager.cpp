@@ -108,9 +108,8 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 
 	ResetTimer();
 
+	dTimeTrackerSetTrreadName ("mainThread");
 	m_context = new wxGLContext(this);
-
-	dTimeTrackerCreateTrack("main thread");
 }
 
 
@@ -682,12 +681,10 @@ void DemoEntityManager::UpdatePhysics(float timestep)
 		unsigned64 nextTime = currentTime - m_microsecunds;
 		int loops = 0;
 
-		//dTimeTrackerTrackTime("xxxxxxx");
 		while ((nextTime >= timestepMicrosecunds) && (loops < MAX_PHYSICS_LOOPS)) {
 			loops ++;
-
-			dTimeTrackerTrackTime(__FUNCTION__);
-
+			
+			dTimeTrackerEvent(__FUNCTION__);
 			// run the newton update function
 			if (!m_reEntrantUpdate) {
 				m_reEntrantUpdate = true;
@@ -763,6 +760,7 @@ void DemoEntityManager::OnIdle(wxIdleEvent& event)
 {
 	wxClientDC dc(this);
 	RenderFrame ();
+	dTimeTrackerUpdate();
 	event.RequestMore(); // render continuously, not only once on idle
 }
 
@@ -774,7 +772,7 @@ void DemoEntityManager::OnPaint (wxPaintEvent& WXUNUSED(event))
 
 void DemoEntityManager::RenderFrame ()
 {
-//	dTimeTrackerTrackTime(__FUNCTION__);
+	dTimeTrackerEvent(__FUNCTION__);
 
 	// Make context current
 	if (m_mainWindow->m_suspendVisualUpdates) {

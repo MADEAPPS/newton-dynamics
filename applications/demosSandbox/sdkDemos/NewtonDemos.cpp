@@ -283,6 +283,8 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_CONCURRENT_PHYSICS_UPDATE, NewtonDemos::OnRunPhysicsConcurrent)
 	EVT_MENU_RANGE(ID_SELECT_MICROTHREADS, ID_SELECT_MICROTHREADS_COUNT, NewtonDemos::OnSelectNumberOfMicroThreads)
 	
+	EVT_MENU(ID_RUN_PROFILER_SECTION, NewtonDemos::OnRunProfileSection)
+
 	EVT_MENU(ID_SERIALIZE, NewtonDemos::OnSerializeWorld)
 	EVT_MENU(ID_DESERIALIZE, NewtonDemos::OnDeserializeWorld)
 
@@ -531,6 +533,8 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		}
 		optionsMenu->AppendSubMenu (microThreadedsSubMenu, wxT("select microThread count"));
 
+		optionsMenu->AppendSeparator();
+		optionsMenu->Append(ID_RUN_PROFILER_SECTION, wxT("&Profile"), wxT("profile app for 500 frames"));
 
 		mainMenu->Append(optionsMenu, wxT("&Options"));
 	}
@@ -895,6 +899,11 @@ void NewtonDemos::OnNew (wxCommandEvent& event)
 	END_MENU_OPTION();
 }
 
+
+void NewtonDemos::OnRunProfileSection (wxCommandEvent& event)
+{
+	dTimeTrackerStartSection(500);
+}
 
 void NewtonDemos::OnSerializeWorld (wxCommandEvent& event)
 {

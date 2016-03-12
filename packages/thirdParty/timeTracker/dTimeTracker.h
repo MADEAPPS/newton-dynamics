@@ -36,55 +36,29 @@
 #endif
 
 
+
 class dTimeTracker
 {
 	public:
-	class dTrackRecord
+	TIMETRACKER_API static dTimeTracker* GetInstance();
+
+	TIMETRACKER_API void Update ();
+	TIMETRACKER_API void StartSection (int numberOfFrames);
+	TIMETRACKER_API dCRCTYPE RegisterName (const char* const name);
+	TIMETRACKER_API void RegisterThreadName (const char* const name);
+
+	class dTrackEntry
 	{
 		public:
+		dTrackEntry(){}
+		TIMETRACKER_API dTrackEntry(dCRCTYPE nameCRC);
+		TIMETRACKER_API ~dTrackEntry();
+
 		long long m_startTime;
 		long long m_endTime;
 		dCRCTYPE m_nameCRC;
-		int m_size;
-	};
-
-	class dTrackerThread;
-	class dTimeTrackerEntry
-	{
-		public:
-		TIMETRACKER_API dTimeTrackerEntry(dCRCTYPE nameCRC);
-		TIMETRACKER_API ~dTimeTrackerEntry();
-
-		private:
-		dTrackerThread* m_thread;
-		int m_index;
-	};
-
-	class dTrackerThread
-	{
-		public:
-		dTrackerThread (const char* const name);
-		~dTrackerThread ();
-
-		void Realloc();
-
-		private:
-		dList<dTimeTrackerEntry*> m_stack;
-		const char* m_name;
-		dTrackRecord* m_buffer;
-		int m_index;
-		int m_size;
 		DWORD m_threadId;
-		DWORD m_processId;
-		friend class dTimeTracker;
 	};
-	
-	TIMETRACKER_API static dTimeTracker* GetInstance();
-	TIMETRACKER_API void StartSection (const char* const name, int frames);
-	TIMETRACKER_API void EndSection ();
-
-	TIMETRACKER_API void CreateTrack (const char* const name);
-	TIMETRACKER_API dCRCTYPE RegisterName (const char* const name);
 
 	private:
 	class dLabels
@@ -92,44 +66,45 @@ class dTimeTracker
 		public:
 		char m_name[128];
 	};
+
 	dTimeTracker ();
 	~dTimeTracker ();
-	long long GetTimeInMicrosenconds();
-	void WriteTrack(const dTrackerThread* const track, const dTrackRecord& record);
 
-	dList<dTrackerThread> m_tracks;
+	void EndSection ();
+	void WriteTracks ();
+	long long GetTimeInMicrosenconds();
+	
 	dTree<dLabels, dCRCTYPE> m_dictionary;
 	LARGE_INTEGER m_frequency;
 	LARGE_INTEGER m_baseCount;
-	FILE* m_file;
 	CRITICAL_SECTION m_criticalSection; 
-	int m_frames;
-	bool m_firstRecord;
+	DWORD m_processId;
+	FILE* m_file;
+	int m_numberOfFrames;
+	int m_firstRecord;
+	long m_bufferIndex;
+	long m_bufferSize;
+	dTrackEntry* m_buffer;
 };
 
 
-#define dTimeTrackerStartSection(fileName,frames)									\
-	dTimeTracker::GetInstance()->StartSection (name, frame);
+#define dTimeTrackerStartSection(frames)													\
+	dTimeTracker::GetInstance()->StartSection (frames);
 
+#define dTimeTrackerUpdate()																\
+	dTimeTracker::GetInstance()->Update ();
 
-#define dTimeTrackerCreateTrack(name)												\
-	dTimeTracker::GetInstance()->CreateTrack (name);
+#define dTimeTrackerSetTrreadName(name)														\
+	dTimeTracker::GetInstance()->RegisterThreadName (name);
 
-#define dTimeTrackerTrackTime(name)													\
-	static dCRCTYPE __crcName__ = dTimeTracker::GetInstance()->RegisterName (name);	\
-	dTimeTracker::dTimeTrackerEntry ___trackerEntry___(__crcName__);	
-
-#define dTimeTrackerSync()															\
-{                                                                                   \
-		dTimeTrackerTrackTime("timeTracker")										\
-		dTimeTracker::GetInstance()->SavaData ();									\
-}
-
+#define dTimeTrackerEvent(name)																\
+	static dCRCTYPE __crcEventName__ = dTimeTracker::GetInstance()->RegisterName (name);	\
+	dTimeTracker::dTrackEntry ___trackerEntry___(__crcEventName__);	
 
 #else 
 
-#define dTimeTrackerCreateTrack(name)							
-#define dTimeTrackerTrackTime(name)													
+#define dTimeTrackerStartSection(fileName,frames)
+#define dTimeTrackerEvent(name)													
 
 #endif
 
