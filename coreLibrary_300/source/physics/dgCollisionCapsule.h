@@ -56,15 +56,9 @@ class dgCollisionCapsule: public dgCollisionConvex
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 
 	static dgInt32 CalculateSignature (dgFloat32 radius, dgFloat32 height);
-
-	// special feature based contact calculation for conics convex (ex spheres, capsules, tapered capsules, and chamfered cylinders)
-	// in newton we only deal with sub set of conic function, that can be expressed by the equation
-	// ((x - x0) / a)^2 + ((y - y0) / b)^2 + ((z - z0) / c)^2  = 1   and possible a linear or circular sweep of the same equation
-	// this preclude parabolic and hyperbolic conics 
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
-	//dgInt32 CalculateSphereConicContacts (dgFloat32 posit, const dgVector& normal, const dgVector& point, dgVector* const contact) const;
-	//virtual dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
+
 
 	void TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* ouput) const;
 

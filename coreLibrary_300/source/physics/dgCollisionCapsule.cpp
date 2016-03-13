@@ -447,13 +447,6 @@ dgVector dgCollisionCapsule::SupportVertexSpecialProjectPoint (const dgVector& p
 	return p;
 }
 
-/*
-dgInt32 dgCollisionCapsule::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
-{
-	dgAssert(0);
-	return 0;
-}
-*/
 
 dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {

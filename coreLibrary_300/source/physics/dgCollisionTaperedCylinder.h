@@ -54,14 +54,8 @@ class dgCollisionTaperedCylinder: public dgCollisionConvex
 
 	static dgInt32 CalculateSignature (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height);
 
-	// special feature based contact calculation for conics convex (ex spheres, capsules, tapered capsules, and chamfered cylinders)
-	// in newton we only deal with sub set of conic function, that can be expressed by the equation
-	// ((x - x0) / a)^2 + ((y - y0) / b)^2 + ((z - z0) / c)^2  = 1   and possible a linear or circular sweep of the same equation
-	// this preclude parabolic and hyperbolic conics 
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
-	//virtual dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
-	
 
 	dgVector m_dirVector;
 	dgFloat32 m_height;

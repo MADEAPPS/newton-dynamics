@@ -290,15 +290,6 @@ dgVector dgCollisionCylinder::SupportVertexSpecialProjectPoint (const dgVector& 
 	return p;
 }
 
-/*
-dgInt32 dgCollisionCylinder::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
-{
-	dgAssert(0);
-	return 0;
-//	dgAssert (dgAbsf (normal % normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-//	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
-}
-*/
 
 dgFloat32 dgCollisionCylinder::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {

@@ -88,18 +88,9 @@ class dgCollisionConvex: public dgCollision
 //	dgPerimenterEdge* ReduceContacts (dgPerimenterEdge* poly, dgInt32 maxCount) const;
 	dgInt32 RectifyConvexSlice (dgInt32 count, const dgVector& normal, dgVector* const contactsOut) const;
 
-	// special feature based contact calculation for conics convex (ex spheres, capsules, tapered capsules, and chamfered cylinders)
-	// in newton we only deal with sub set of conic function, that can be expressed by the equation
-	// ((x - x0) / a)^2 + ((y - y0) / b)^2 + ((z - z0) / c)^2  = 1   and possible a linear or circular sweep of the same equation
-    // this preclude parabolic and hyperbolic conics 
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
-	//virtual dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
 
-//	dgInt32 CalculateContactsGeneric (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
-//	dgInt32 ConvexPolygonsIntersection (const dgVector& nornal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgInt32 maxContacts) const;
-//	dgInt32 ConvexPolygonToLineIntersection (const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgVector* const mem) const;
-//	dgFloat32 ConvexConicConvexRayCast (const dgCollisionInstance* const convexConicShape, const dgMatrix& conicShapeMatrix, const dgCollisionInstance* const convexCastingShape, const dgMatrix& castingMatrix, const dgVector& castingVeloc, dgFloat32 maxT, dgContactPoint& contactOut) const;
 
 	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
 	

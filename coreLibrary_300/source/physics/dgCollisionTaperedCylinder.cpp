@@ -293,47 +293,11 @@ dgVector dgCollisionTaperedCylinder::SupportVertexSpecialProjectPoint (const dgV
 
 }
 
-/*
-dgInt32 dgCollisionTaperedCylinder::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
-{
-	dgAssert(0);
-	return 0;
-}
-*/
 
 dgFloat32 dgCollisionTaperedCylinder::CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const
 {
-	dgFloat32 volume = dgCollisionConvex::CalculateMassProperties (offset, inertia, crossInertia, centerOfMass);
-
-/*
-	centerOfMass = GetLocalMatrix().m_posit;
-	volume = dgFloat32 (3.14159f * 2.0f) * m_radius * m_radius * m_height; 
-
-	inertaxx   = dgFloat32 (0.5f) * m_radius *  m_radius * volume;
-	inertayyzz = (dgFloat32 (0.25f) * m_radius *  m_radius + dgFloat32 (1.0f / 3.0f) * m_height * m_height) * volume;
-
-	dgMatrix inertiaTensor (dgGetIdentityMatrix());
-
-	inertiaTensor[0][0] = inertaxx;
-	inertiaTensor[1][1] = inertayyzz;
-	inertiaTensor[2][2] = inertayyzz;
-
-	inertiaTensor = GetLocalMatrix().Inverse() * inertiaTensor * GetLocalMatrix();
-
-	crossInertia.m_x = inertiaTensor[1][2] - volume * centerOfMass.m_y * centerOfMass.m_z;
-	crossInertia.m_y = inertiaTensor[0][2] - volume * centerOfMass.m_z * centerOfMass.m_x;
-	crossInertia.m_z = inertiaTensor[0][1] - volume * centerOfMass.m_x * centerOfMass.m_y;
-
-	dgVector central (centerOfMass.CompProduct(centerOfMass));
-	inertia.m_x = inertiaTensor[0][0] + volume * (central.m_y + central.m_z);
-	inertia.m_y = inertiaTensor[1][1] + volume * (central.m_z + central.m_x);
-	inertia.m_z = inertiaTensor[2][2] + volume * (central.m_x + central.m_y);
-
-	centerOfMass = centerOfMass.Scale3 (volume);
-*/
-	return volume;
+	return dgCollisionConvex::CalculateMassProperties (offset, inertia, crossInertia, centerOfMass);
 }
-
 
 dgInt32 dgCollisionTaperedCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
