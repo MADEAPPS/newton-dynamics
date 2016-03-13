@@ -702,7 +702,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 		case _TAPERED_CAPSULE_PRIMITIVE:
 		{
 			// create the collision 
-			collision = NewtonCreateTaperedCapsule (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, NULL); 
+			collision = NewtonCreateTaperedCapsule (world, size.m_z * 0.5f, size.m_x * 0.5f, size.m_y, 0, NULL); 
 			break;
 		}
 

@@ -796,6 +796,7 @@ dgVector dgCollisionConvex::SupportVertexSpecialProjectPoint (const dgVector& po
 	return point;
  }
 
+/*
 dgInt32 dgCollisionConvex::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
 {
 	dgAssert (0);
@@ -803,6 +804,7 @@ dgInt32 dgCollisionConvex::CalculateContacts (const dgVector& point, const dgVec
 //	dgAssert (dgAbsf (normal % normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 //	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
 }
+*/
 
 dgFloat32 dgCollisionConvex::RayCast(const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {

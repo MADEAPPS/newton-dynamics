@@ -32,7 +32,7 @@ static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat m
 		for (int j = 0; j < zCount; j ++) {
 
 			dFloat scale = 0.75f + 1.0f * (dFloat (dRand()) / dFloat(dRAND_MAX) - 0.5f);
-//scale = 2.0f;
+//scale = 1.0f;
 			NewtonCollisionSetScale (collision, scale, scale, scale);
 			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
@@ -151,7 +151,7 @@ void UniformScaledCollision(DemoEntityManager* const scene)
 	dMatrix camMatrix(dRollMatrix(-20.0f * 3.1416f / 180.0f) * dYawMatrix(-45.0f * 3.1416f / 180.0f));
 	dQuaternion rot(camMatrix);
 	//	dVector origin (-30.0f, 40.0f, -15.0f, 0.0f);
-	dVector origin(-10.0f, 5.0f, -15.0f, 0.0f);
+	dVector origin(-5.0f, 5.0f, -15.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 	NewtonWorld* const world = scene->GetNewton();
@@ -162,15 +162,15 @@ void UniformScaledCollision(DemoEntityManager* const scene)
 	//dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 
 	dMatrix shapeOffsetMatrix(dRollMatrix(3.141592f / 2.0f));
+//	dMatrix shapeOffsetMatrix(dGetIdentityMatrix);
 	//	shapeOffsetMatrix = GetIdentityMatrix();
 	//	shapeOffsetMatrix.m_posit.m_y = 1.0f;
 
 	int count = 5;
-
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size, count, count, 4.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

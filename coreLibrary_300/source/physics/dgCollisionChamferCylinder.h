@@ -57,8 +57,7 @@ class dgCollisionChamferCylinder: public dgCollisionConvex
 	// this preclude parabolic and hyperbolic conics 
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
-	virtual dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
-
+	//virtual dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
 
 	private:
 	dgFloat32 m_height;

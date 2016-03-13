@@ -24,8 +24,8 @@
 
 #include "dgCollisionConvex.h"
 
-#define DG_CAP_SEGMENTS 4
 #define DG_CAPSULE_SEGMENTS 6
+#define DG_CAPSULE_CAP_SEGMENTS 4
 
 class dgCollisionCapsule: public dgCollisionConvex  
 {
@@ -64,13 +64,13 @@ class dgCollisionCapsule: public dgCollisionConvex
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
 	//dgInt32 CalculateSphereConicContacts (dgFloat32 posit, const dgVector& normal, const dgVector& point, dgVector* const contact) const;
-	virtual dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
+	//virtual dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const;
 
 	void TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* ouput) const;
 
 	dgFloat32 m_radius;
 	dgFloat32 m_height;
-	dgVector m_vertex[2 * DG_CAP_SEGMENTS * DG_CAPSULE_SEGMENTS];
+	dgVector m_vertex[2 * DG_CAPSULE_CAP_SEGMENTS * DG_CAPSULE_SEGMENTS];
 	static dgInt32 m_shapeRefCount;
 	static dgConvexSimplexEdge m_edgeArray[];
 

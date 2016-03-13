@@ -34,7 +34,7 @@
 #define DG_CAPSULE_PERPENDICULAR_NORMAL		dgFloat32 (1.0e-2f)
 
 dgInt32 dgCollisionCapsule::m_shapeRefCount = 0;
-dgCollisionConvex::dgConvexSimplexEdge dgCollisionCapsule::m_edgeArray[DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAP_SEGMENTS - 1))];
+dgCollisionConvex::dgConvexSimplexEdge dgCollisionCapsule::m_edgeArray[DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAPSULE_CAP_SEGMENTS - 1))];
 
 dgCollisionCapsule::dgCollisionCapsule(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radius, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_capsuleCollision)
@@ -65,13 +65,13 @@ void dgCollisionCapsule::Init (dgFloat32 radius, dgFloat32 height)
 	m_rtti |= dgCollisionCapsule_RTTI;
 
 	dgInt32 i0 = 0;
-	dgInt32 i1 = DG_CAPSULE_SEGMENTS * DG_CAP_SEGMENTS * 2;
+	dgInt32 i1 = DG_CAPSULE_SEGMENTS * DG_CAPSULE_CAP_SEGMENTS * 2;
 
 	m_radius = dgAbsf (radius);
 	m_height = dgAbsf (height * dgFloat32 (0.5f));
-	for (dgInt32 j = 0; j < DG_CAP_SEGMENTS; j ++) {
+	for (dgInt32 j = 0; j < DG_CAPSULE_CAP_SEGMENTS; j ++) {
 		dgFloat32 angle = dgFloat32 (0.0f);
-		dgFloat32 x = (DG_CAP_SEGMENTS - j - 1) * m_radius / DG_CAP_SEGMENTS;
+		dgFloat32 x = (DG_CAPSULE_CAP_SEGMENTS - j - 1) * m_radius / DG_CAPSULE_CAP_SEGMENTS;
 		dgFloat32 r = dgSqrt (m_radius * m_radius - x * x);
 		i1 -= DG_CAPSULE_SEGMENTS;
 		for (dgInt32 i = 0; i < DG_CAPSULE_SEGMENTS; i ++) {
@@ -86,8 +86,8 @@ void dgCollisionCapsule::Init (dgFloat32 radius, dgFloat32 height)
 		i1 -= DG_CAPSULE_SEGMENTS;
 	}
 
-	m_vertexCount = DG_CAPSULE_SEGMENTS * DG_CAP_SEGMENTS * 2;
-	m_edgeCount = DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAP_SEGMENTS - 1));
+	m_vertexCount = DG_CAPSULE_SEGMENTS * DG_CAPSULE_CAP_SEGMENTS * 2;
+	m_edgeCount = DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAPSULE_CAP_SEGMENTS - 1));
 	dgCollisionConvex::m_vertex = m_vertex;
 
 
@@ -98,7 +98,7 @@ void dgCollisionCapsule::Init (dgFloat32 radius, dgFloat32 height)
 		i1 = 0;
 		i0 = DG_CAPSULE_SEGMENTS - 1;
 		polyhedra.BeginFace ();
-		for (dgInt32 j = 0; j < DG_CAP_SEGMENTS * 2 - 1; j ++) {
+		for (dgInt32 j = 0; j < DG_CAPSULE_CAP_SEGMENTS * 2 - 1; j ++) {
 			for (dgInt32 i = 0; i < DG_CAPSULE_SEGMENTS; i ++) { 
 				wireframe[0] = i0;
 				wireframe[1] = i1;
@@ -117,7 +117,7 @@ void dgCollisionCapsule::Init (dgFloat32 radius, dgFloat32 height)
 		polyhedra.AddFace (DG_CAPSULE_SEGMENTS, wireframe);
 
 		for (dgInt32 i = 0; i < DG_CAPSULE_SEGMENTS; i ++) { 
-			wireframe[i] = i + DG_CAPSULE_SEGMENTS * (DG_CAP_SEGMENTS * 2 - 1);
+			wireframe[i] = i + DG_CAPSULE_SEGMENTS * (DG_CAPSULE_CAP_SEGMENTS * 2 - 1);
 		}
 		polyhedra.AddFace (DG_CAPSULE_SEGMENTS, wireframe);
 		polyhedra.EndFace ();
@@ -447,19 +447,13 @@ dgVector dgCollisionCapsule::SupportVertexSpecialProjectPoint (const dgVector& p
 	return p;
 }
 
-
+/*
 dgInt32 dgCollisionCapsule::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
 {
 	dgAssert(0);
 	return 0;
-/*
-	if (dgAbsf (normal.m_x) > DG_CAPSULE_PERPENDICULAR_NORMAL) {
-		contactsOut[0] = SupportVertex (normal.Scale3 (dgFloat32 (-1.0f)), NULL);
-		return 1;
-	}
-	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
-*/
 }
+*/
 
 dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {

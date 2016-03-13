@@ -65,7 +65,6 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 	}
 
 
-
 count = 8;
 for (int i = 0; i < 50; i ++){
 //AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

@@ -293,15 +293,13 @@ dgVector dgCollisionTaperedCylinder::SupportVertexSpecialProjectPoint (const dgV
 
 }
 
-
+/*
 dgInt32 dgCollisionTaperedCylinder::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
 {
 	dgAssert(0);
 	return 0;
-//	dgAssert (dgAbsf (normal % normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-//	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
 }
-
+*/
 
 dgFloat32 dgCollisionTaperedCylinder::CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const
 {

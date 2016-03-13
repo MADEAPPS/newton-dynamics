@@ -25,15 +25,12 @@
 #include "dgContact.h"
 #include "dgCollisionTaperedCapsule.h"
 
+#define DG_TAPED_CAPSULE_SEGMENTS		10
+#define DG_TAPED_CAPSULE_CAP_SEGMENTS	12
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
-
-
-dgInt32 dgCollisionTaperedCapsule::m_shapeRefCount = 0;
-dgCollisionConvex::dgConvexSimplexEdge dgCollisionTaperedCapsule::m_edgeArray[DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAP_SEGMENTS - 1))];
-
 dgCollisionTaperedCapsule::dgCollisionTaperedCapsule(dgMemoryAllocator* allocator, dgUnsigned32 signature, dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 	:dgCollisionConvex(allocator, signature, m_taperedCapsuleCollision)
 {
@@ -44,144 +41,163 @@ dgCollisionTaperedCapsule::dgCollisionTaperedCapsule(dgWorld* const world, dgDes
 	:dgCollisionConvex (world, deserialization, userData, revisionNumber)
 {
 	dgVector size;
-	deserialization (userData, &size, sizeof (dgVector));
-	Init (size.m_x, size.m_y, size.m_z);
+	deserialization(userData, &size, sizeof (dgVector));
+	deserialization(userData, &m_p0, sizeof (dgVector));
+	deserialization(userData, &m_p1, sizeof (dgVector));
+	deserialization(userData, &m_transform, sizeof (dgVector));
+	m_radio0 = size.m_x;
+	m_radio1 = size.m_y;
+	m_height = size.m_z;
+
+//	Init (size.m_x, size.m_y, size.m_z);
 }
 
 
 dgCollisionTaperedCapsule::~dgCollisionTaperedCapsule()
 {
-	m_shapeRefCount --;
-	dgAssert (m_shapeRefCount >= 0);
-
-	dgCollisionConvex::m_simplex = NULL;
-	dgCollisionConvex::m_vertex = NULL;
 }
 
 void dgCollisionTaperedCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 {
 	m_rtti |= dgCollisionTaperedCapsule_RTTI;
 
-	m_radio0 = dgAbsf (radio0);
-	m_radio1 = dgAbsf (radio1);
-	m_height = dgAbsf (height * 0.5f);
+	radio0 = dgAbsf(radio0);
+	radio1 = dgAbsf(radio1);
+	height = dgAbsf(height);
 
-	m_clip1 = dgFloat32 (0.0f);
-	m_clip0 = dgFloat32 (0.0f);
-	dgFloat32 angle0 = dgFloat32 (-3.141592f / 2.0f);
-	dgFloat32 angle1 = dgFloat32 ( 3.141592f / 2.0f);
-	do {
-		dgFloat32 angle = (angle1 + angle0) * dgFloat32 (0.5f);
-		dgVector dir (dgSin (angle), dgCos (angle), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_transform = dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
+	if (radio0 > radio1) {
+		m_transform.m_x = dgFloat32 (-1.0f);
+		m_transform.m_y = dgFloat32 (-1.0f);
+		dgSwap(radio0, radio1);
+	}
 
-		dgVector p0(dir.Scale3 (m_radio0));
-		dgVector p1(dir.Scale3 (m_radio1));
-		p0.m_x += m_height;
-		p1.m_x -= m_height;
-		dgFloat32 dir0 = p0 % dir;
-		dgFloat32 dir1 = p1 % dir;
-		if (dir0 > dir1) {
-			angle1 = angle;
-			m_clip0 = p0.m_x - m_height;
+	m_radio0 = radio0;
+	m_radio1 = radio1;
+	m_height = height * dgFloat32 (0.5f);
+
+	m_p0 = dgVector (- m_height, m_radio0, dgFloat32 (0.0f), dgFloat32 (0.0f)); 
+	m_p1 = dgVector (  m_height, m_radio1, dgFloat32 (0.0f), dgFloat32 (0.0f)); 
+	dgVector side (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
+
+	for (int i = 0; i < 16; i ++) {
+		dgVector p1p0 (m_p1 - m_p0);
+		dgVector dir(side * p1p0);
+		dir = dir.Scale4(dgFloat32 (1.0f) / dgSqrt(dir.DotProduct4(dir).GetScalar()));
+		dgVector support0(dir.Scale4(m_radio0));
+		dgVector support1(dir.Scale4(m_radio1));
+		support0.m_x -= m_height;
+		support1.m_x += m_height;
+		dgFloat32 distance0 = support0.DotProduct4(dir).GetScalar();
+		dgFloat32 distance1 = support1.DotProduct4(dir).GetScalar();
+
+		if (distance1 > distance0) {
+			m_p1 = support1;
+		} else if (distance1 < distance0) {
+			m_p0 = support0;
 		} else {
-			angle0 = angle;
-			m_clip1 = p1.m_x + m_height;
+			i = 1000;
 		}
-	} while ((angle1 - angle0) > dgFloat32 (0.001f * 3.141592f/180.0f));
+	}
 
-	dgFloat32 angle = (angle1 + angle0) * dgFloat32 (0.5f);
-	m_sideNormal = dgVector (dgSin (angle), dgCos (angle), dgFloat32 (0.0f), dgFloat32 (0.0f));
-
-	m_clipRadio0 = dgSqrt (m_radio0 * m_radio0 - m_clip0 * m_clip0);
-	m_clipRadio1 = dgSqrt (m_radio1 * m_radio1 - m_clip1 * m_clip1);
-
-	dgInt32 i1 = 0;
-	dgInt32 i0 = DG_CAPSULE_SEGMENTS * DG_CAP_SEGMENTS * 2;
-
-	dgFloat32 dx0 = (m_clip0 - m_radio0) / DG_CAP_SEGMENTS;
-	dgFloat32 x0 =  m_radio0 + dx0;
+	dgVector tempVertex[4 * DG_TAPED_CAPSULE_CAP_SEGMENTS * DG_TAPED_CAPSULE_SEGMENTS + 100];
+	dgInt32 index = 0;
+	dgInt32 dx0 = dgInt32(dgFloor(DG_TAPED_CAPSULE_SEGMENTS * ((m_p0.m_x + m_height + m_radio0) / m_radio0)) + dgFloat32(1.0f));
+	dgFloat32 step = m_radio0 / DG_TAPED_CAPSULE_SEGMENTS;
+	dgFloat32 x0 = m_p0.m_x - step * dx0;
+	for (dgInt32 j = 0; j < dx0; j++) {
+		x0 += step;
+		dgFloat32 x = x0 + m_height;
+		dgFloat32 r0 = dgSqrt (m_radio0 * m_radio0 - x * x);
+		
+		dgFloat32 angle = dgFloat32(0.0f);
+		for (dgInt32 i = 0; i < DG_TAPED_CAPSULE_CAP_SEGMENTS; i++) {
+			dgFloat32 z = dgSin(angle);
+			dgFloat32 y = dgCos(angle);
+			tempVertex[index] = dgVector(x0, y * r0, z * r0, dgFloat32(0.0f));
+			index++;
+			angle += dgPI2 / DG_TAPED_CAPSULE_CAP_SEGMENTS;
+			dgAssert(index < sizeof (tempVertex) / sizeof (tempVertex[0]));
+		}
+	}
 	
-	dgFloat32 dx1 = (m_clip1 + m_radio1) / DG_CAP_SEGMENTS;
-	dgFloat32 x1 =  -m_radio1 + dx1;
-	for (dgInt32 j = 0; j < DG_CAP_SEGMENTS; j ++) {
+	dgFloat32 x1 = m_p1.m_x;
+	dgInt32 dx1 = dgInt32 (dgFloor (DG_TAPED_CAPSULE_SEGMENTS * ((m_height + m_radio1 - m_p1.m_x) / m_radio1)) + dgFloat32 (1.0f));
+	step = m_radio1 / DG_TAPED_CAPSULE_SEGMENTS;
+	for (dgInt32 j = 0; j < dx1; j ++) {
+		dgFloat32 x = x1 - m_height;
+		dgFloat32 r1 = dgSqrt (m_radio1 * m_radio1 - x * x);
 		dgFloat32 angle = dgFloat32 (0.0f);
-		dgFloat32 r0 = dgSqrt (m_radio0 * m_radio0 - x0 * x0);
-		dgFloat32 r1 = dgSqrt (m_radio1 * m_radio1 - x1 * x1);
-
-		i0 -= DG_CAPSULE_SEGMENTS;
-		for (dgInt32 i = 0; i < DG_CAPSULE_SEGMENTS; i ++) {
+		for (dgInt32 i = 0; i < DG_TAPED_CAPSULE_CAP_SEGMENTS; i ++) {
 			dgFloat32 z = dgSin (angle);
 			dgFloat32 y = dgCos (angle);
-			m_vertex[i0] = dgVector ( m_height + x0, y * r0, z * r0, dgFloat32 (0.0f));
-			m_vertex[i1] = dgVector (-m_height + x1, y * r1, z * r1, dgFloat32 (0.0f));
-			i0 ++;
+			tempVertex[index] = dgVector ( x1, y * r1, z * r1, dgFloat32 (0.0f));
+			index ++;
+			angle += dgPI2 / DG_TAPED_CAPSULE_CAP_SEGMENTS;
+			dgAssert (index < sizeof (tempVertex) / sizeof (tempVertex[0]));
+		}
+		x1 += step;
+	}
+
+	m_vertexCount = dgInt16 (index);
+	dgCollisionConvex::m_vertex = (dgVector*) m_allocator->Malloc (dgInt32 (m_vertexCount * sizeof (dgVector)));
+	memcpy (dgCollisionConvex::m_vertex, tempVertex, m_vertexCount * sizeof (dgVector));
+
+	dgPolyhedra polyhedra(m_allocator);
+	polyhedra.BeginFace ();
+
+	dgInt32 wireframe[DG_TAPED_CAPSULE_SEGMENTS + 10];
+
+	dgInt32 i1 = 0;
+	dgInt32 i0 = DG_TAPED_CAPSULE_CAP_SEGMENTS - 1;
+	const dgInt32 n = index / DG_TAPED_CAPSULE_CAP_SEGMENTS - 1;
+	for (dgInt32 j = 0; j < n; j ++) {
+		for (dgInt32 i = 0; i < DG_TAPED_CAPSULE_CAP_SEGMENTS; i ++) { 
+			wireframe[0] = i0;
+			wireframe[1] = i1;
+			wireframe[2] = i1 + DG_TAPED_CAPSULE_CAP_SEGMENTS;
+			wireframe[3] = i0 + DG_TAPED_CAPSULE_CAP_SEGMENTS;
+			i0 = i1;
 			i1 ++;
-			angle += dgPI2 / DG_CAPSULE_SEGMENTS;
+			polyhedra.AddFace (4, wireframe);
 		}
-		x0 += dx0;
-		x1 += dx1;
-		i0 -= DG_CAPSULE_SEGMENTS;
+		i0 = i1 + DG_TAPED_CAPSULE_CAP_SEGMENTS - 1;
 	}
 
-	m_vertexCount = DG_CAPSULE_SEGMENTS * DG_CAP_SEGMENTS * 2;
-	m_edgeCount = DG_CAPSULE_SEGMENTS * (6 + 8 * (DG_CAP_SEGMENTS - 1));
-	dgCollisionConvex::m_vertex = m_vertex;
+	for (dgInt32 i = 0; i < DG_TAPED_CAPSULE_CAP_SEGMENTS; i ++) { 
+		wireframe[i] = DG_TAPED_CAPSULE_CAP_SEGMENTS - i - 1;
+	}
+	polyhedra.AddFace (DG_TAPED_CAPSULE_CAP_SEGMENTS, wireframe);
 
-	if (!m_shapeRefCount) {
-		dgPolyhedra polyhedra(m_allocator);
-		dgInt32 wireframe[DG_CAPSULE_SEGMENTS + 10];
+	for (dgInt32 i = 0; i < DG_TAPED_CAPSULE_CAP_SEGMENTS; i ++) { 
+		wireframe[i] = index - DG_TAPED_CAPSULE_CAP_SEGMENTS + i;
+	}
+	polyhedra.AddFace (DG_TAPED_CAPSULE_CAP_SEGMENTS, wireframe);
+	polyhedra.EndFace ();
 
-		i1 = 0;
-		i0 = DG_CAPSULE_SEGMENTS - 1;
-		polyhedra.BeginFace ();
-		for (dgInt32 j = 0; j < DG_CAP_SEGMENTS * 2 - 1; j ++) {
-			for (dgInt32 i = 0; i < DG_CAPSULE_SEGMENTS; i ++) { 
-				wireframe[0] = i0;
-				wireframe[1] = i1;
-				wireframe[2] = i1 + DG_CAPSULE_SEGMENTS;
-				wireframe[3] = i0 + DG_CAPSULE_SEGMENTS;
-				i0 = i1;
-				i1 ++;
-				polyhedra.AddFace (4, wireframe);
-			}
-			i0 = i1 + DG_CAPSULE_SEGMENTS - 1;
-		}
+	dgAssert (SanityCheck (polyhedra));
 
-		for (dgInt32 i = 0; i < DG_CAPSULE_SEGMENTS; i ++) { 
-			wireframe[i] = DG_CAPSULE_SEGMENTS - 1 - i;
-		}
-		polyhedra.AddFace (DG_CAPSULE_SEGMENTS, wireframe);
+	m_edgeCount = dgInt16 (polyhedra.GetEdgeCount());
+	m_simplex = (dgConvexSimplexEdge*) m_allocator->Malloc (dgInt32 (m_edgeCount * sizeof (dgConvexSimplexEdge)));
 
-		for (dgInt32 i = 0; i < DG_CAPSULE_SEGMENTS; i ++) { 
-			wireframe[i] = i + DG_CAPSULE_SEGMENTS * (DG_CAP_SEGMENTS * 2 - 1);
-		}
-		polyhedra.AddFace (DG_CAPSULE_SEGMENTS, wireframe);
-		polyhedra.EndFace ();
-
-		dgAssert (SanityCheck (polyhedra));
-
-		dgUnsigned64 i = 0;
-		dgPolyhedra::Iterator iter (polyhedra);
-		for (iter.Begin(); iter; iter ++) {
-			dgEdge* const edge = &(*iter);
-			edge->m_userData = i;
-			i ++;
-		}
-
-		for (iter.Begin(); iter; iter ++) {
-			dgEdge* const edge = &(*iter);
-
-			dgConvexSimplexEdge* const ptr = &m_edgeArray[edge->m_userData];
-
-			ptr->m_vertex = edge->m_incidentVertex;
-			ptr->m_next = &m_edgeArray[edge->m_next->m_userData];
-			ptr->m_prev = &m_edgeArray[edge->m_prev->m_userData];
-			ptr->m_twin = &m_edgeArray[edge->m_twin->m_userData];
-		}
+	dgUnsigned64 i = 0;
+	dgPolyhedra::Iterator iter (polyhedra);
+	for (iter.Begin(); iter; iter ++) {
+		dgEdge* const edge = &(*iter);
+		edge->m_userData = i;
+		i ++;
 	}
 
-	m_shapeRefCount ++;
-	dgCollisionConvex::m_simplex = m_edgeArray;
+	for (iter.Begin(); iter; iter ++) {
+		dgEdge* const edge = &(*iter);
+
+		dgConvexSimplexEdge* const ptr = &m_simplex[edge->m_userData];
+
+		ptr->m_vertex = edge->m_incidentVertex;
+		ptr->m_next = &m_simplex[edge->m_next->m_userData];
+		ptr->m_prev = &m_simplex[edge->m_prev->m_userData];
+		ptr->m_twin = &m_simplex[edge->m_twin->m_userData];
+	}
 	SetVolumeAndCG ();
 }
 
@@ -199,144 +215,18 @@ dgInt32 dgCollisionTaperedCapsule::CalculateSignature (dgFloat32 radio0, dgFloat
 
 dgInt32 dgCollisionTaperedCapsule::CalculateSignature () const
 {
-	return CalculateSignature (m_radio0, m_radio1, m_height);
+	dgAssert (0);
+	return 0;
+//	return CalculateSignature (m_radio0, m_radio1, m_height);
 }
-
-void dgCollisionTaperedCapsule::TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* ouput) const
-{
-	if (level) {
-		dgAssert (dgAbsf (p0 % p0 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p1 % p1 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p2 % p2 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgVector p01 (p0 + p1);
-		dgVector p12 (p1 + p2);
-		dgVector p20 (p2 + p0);
-
-		p01 = p01.Scale3 (dgRsqrt(p01 % p01));
-		p12 = p12.Scale3 (dgRsqrt(p12 % p12));
-		p20 = p20.Scale3 (dgRsqrt(p20 % p20));
-
-		dgAssert (dgAbsf (p01 % p01 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p12 % p12 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p20 % p20 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-
-		TesselateTriangle (level - 1, p0,  p01, p20, count, ouput);
-		TesselateTriangle (level - 1, p1,  p12, p01, count, ouput);
-		TesselateTriangle (level - 1, p2,  p20, p12, count, ouput);
-		TesselateTriangle (level - 1, p01, p12, p20, count, ouput);
-
-	} else {
-		ouput[count + 0] = p0.Scale3 (m_radio0);
-		ouput[count + 1] = p1.Scale3 (m_radio0);
-		ouput[count + 2] = p2.Scale3 (m_radio0);
-		count += 3;
-	}
-}
-
-
 
 void dgCollisionTaperedCapsule::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-	#define POWER 2
-	dgVector tmpVectex[1024 * 2];
-
-	dgVector p0 ( dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-	dgVector p1 (-dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-	dgVector p2 ( dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-	dgVector p3 ( dgFloat32 (0.0f),-dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector p4 ( dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
-	dgVector p5 ( dgFloat32 (0.0f), dgFloat32 (0.0f),-dgFloat32 (1.0f), dgFloat32 (0.0f));
-
-	dgInt32 count = 0;
-	TesselateTriangle (POWER, p0, p2, p4, count, tmpVectex);
-	TesselateTriangle (POWER, p0, p4, p3, count, tmpVectex);
-	TesselateTriangle (POWER, p0, p3, p5, count, tmpVectex);
-	TesselateTriangle (POWER, p0, p5, p2, count, tmpVectex);
-
-	TesselateTriangle (POWER, p1, p4, p2, count, tmpVectex);
-	TesselateTriangle (POWER, p1, p3, p4, count, tmpVectex);
-	TesselateTriangle (POWER, p1, p5, p3, count, tmpVectex);
-	TesselateTriangle (POWER, p1, p2, p5, count, tmpVectex);
-
-	dgFloat32 scale = m_radio1 / m_radio0;
-	dgVector edgeP0(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector edgeP1(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-
-	for (dgInt32 i = 0; i < count; i += 3) {
-		dgVector face0[4]; 	
-		dgVector face1[4]; 	
-		dgInt32 n0 = 0;
-		dgInt32 n1 = 0;
-		dgVector p0 (tmpVectex[i + 2]);
-		for (dgInt32 j = 0; j < 3; j ++) {
-			dgVector p1 (tmpVectex[i + j]);
-			if (p1.m_x > m_clip0) {
-				if (p0.m_x < m_clip0) {
-					dgFloat32 t = (m_clip0 - p0.m_x) / (p1.m_x - p0.m_x);
-					edgeP0 = p0 + (p1 - p0).Scale3 (t);
-					edgeP0.m_x = m_clip0;
-
-					face0[n0] = edgeP0;
-					face0[n0].m_x += m_height;
-					n0 ++;
-
-					face1[n1] = edgeP0.Scale3 (scale);
-					face1[n1].m_x -= m_height;
-					n1 ++;
-				}
-				face0[n0] = p1;
-				face0[n0].m_x += m_height;
-				n0 ++;
-			} else {
-				if (p0.m_x > m_clip0) {
-					dgFloat32 t = (m_clip0 - p0.m_x) / (p1.m_x - p0.m_x);
-					edgeP1 = p0 + (p1 - p0).Scale3 (t);
-					edgeP1.m_x = m_clip0;
-
-					face0[n0] = edgeP1;
-					face0[n0].m_x += m_height;
-					n0 ++;
-
-					face1[n1] = edgeP1.Scale3 (scale);
-					face1[n1].m_x -= m_height;
-					n1 ++;
-				}
-				face1[n1] = p1.Scale3 (scale);;
-				face1[n1].m_x -= m_height;
-				
-				n1 ++;
-			}
-			p0 = p1;
-		}
-
-		dgTriplex face[4];
-		if (n0) {
-			matrix.TransformTriplex (&face[0].m_x, sizeof (dgTriplex), &face0[0].m_x, sizeof (dgVector), n0);			
-			callback (userData, n0, &face[0].m_x, 0);
-		}
-		if (n1) {
-			matrix.TransformTriplex (&face[0].m_x, sizeof (dgTriplex), &face1[0].m_x, sizeof (dgVector), n1);
-			callback (userData, n1, &face[0].m_x, 0);
-		}
-		if (n0 && n1) {
-			face0[0] = edgeP0;
-			face0[1] = edgeP1;
-			face0[2] = edgeP1.Scale3 (scale);
-			face0[3] = edgeP0.Scale3 (scale);
-			face0[0].m_x += m_height;
-			face0[1].m_x += m_height;
-			face0[2].m_x -= m_height;
-			face0[3].m_x -= m_height;
-
-			dgPlane plane (face0[0], face0[1], face0[2]);
-			if (plane.m_w >= dgFloat32 (0.0f)) {
-				dgAssert (0);
-			}
-
-			matrix.TransformTriplex (&face[0].m_x, sizeof (dgTriplex), &face0[0].m_x, sizeof (dgVector), 4);
-			callback (userData, 4, &face[0].m_x, 0);
-		}
-	}
+	dgMatrix transform (matrix);
+	transform[0] = transform[0].Scale4(m_transform.m_x);
+	transform[1] = transform[1].Scale4(m_transform.m_y);
+	transform[2] = transform[2].Scale4(m_transform.m_z);
+	dgCollisionConvex::DebugCollision (transform, callback, userData);
 }
 
 
@@ -346,119 +236,55 @@ void dgCollisionTaperedCapsule::SetCollisionBBox (const dgVector& p0__, const dg
 }
 
 
-dgVector dgCollisionTaperedCapsule::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionTaperedCapsule::SupportVertex (const dgVector& direction, dgInt32* const vertexIndex) const
 {
+	dgVector dir (direction.CompProduct4(m_transform));
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
-	dgVector p0(dir.Scale3 (m_radio0));
-	dgVector p1(dir.Scale3 (m_radio1));
-	p0.m_x += m_height;
-	p1.m_x -= m_height;
-	dgFloat32 dir0 = p0 % dir;
-	dgFloat32 dir1 = p1 % dir;
+	dgVector p0(dir.Scale4 (m_radio0));
+	dgVector p1(dir.Scale4 (m_radio1));
+	p0.m_x -= m_height;
+	p1.m_x += m_height;
+	dgFloat32 dir0 = p0.DotProduct4(dir).GetScalar();
+	dgFloat32 dir1 = p1.DotProduct4(dir).GetScalar();
 	if (dir1 > dir0) {
 		p0 = p1;
 	}
-	return p0;
+	return p0.CompProduct4(m_transform);
+}
+
+dgVector dgCollisionTaperedCapsule::SupportVertexSpecial(const dgVector& direction, dgInt32* const vertexIndex) const
+{
+	*vertexIndex = -1;
+	dgVector dir(direction.CompProduct4(m_transform));
+	dgAssert(dgAbsf(dir % dir - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+
+	dgVector p0(dgVector::m_zero);
+	dgVector p1(dir.Scale4(m_radio1 - m_radio0));
+	p0.m_x -= m_height;
+	p1.m_x += m_height;
+	dgFloat32 dir0 = p0.DotProduct4(dir).GetScalar();
+	dgFloat32 dir1 = p1.DotProduct4(dir).GetScalar();
+	if (dir1 > dir0) {
+		p0 = p1;
+	}
+	return p0.CompProduct4(m_transform);
 }
 
 
-
-dgFloat32 dgCollisionTaperedCapsule::RayCast (const dgVector& q0, const dgVector& q1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
+dgVector dgCollisionTaperedCapsule::SupportVertexSpecialProjectPoint (const dgVector& testPoint, const dgVector& direction) const
 {
-	dgVector origin0 ( m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector origin1 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgFloat32 t0 = dgRayCastSphere (q0, q1, origin0, m_radio0);
-	dgFloat32 t1 = dgRayCastSphere (q0, q1, origin1, m_radio1);
-//	if ((t0 < dgFloat32 (1.2f)) && (t1 < dgFloat32 (1.2f))) {
-	if ((t0 < maxT) && (t1 < maxT)) {
-		if (t0 < t1) {
-			dgVector q (q0 + (q1 - q0).Scale4 (t0));
-			dgVector n (q - origin0); 
-			dgAssert (n.m_w == dgFloat32 (0.0f));
-			//contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
-			contactOut.m_normal = n.CompProduct4(n.DotProduct4(n).InvSqrt());
-//			contactOut.m_userId = SetUserDataID();
-			return t0;
-		} else {
-			dgVector q (q0 + (q1 - q0).Scale4 (t1));
-			dgVector n (q - origin1); 
-			dgAssert (n.m_w == dgFloat32 (0.0f));
-			//contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
-			contactOut.m_normal = n.CompProduct4(n.DotProduct4(n).InvSqrt());
-//			contactOut.m_userId = SetUserDataID();
-			return t1;
-		}
-//	} else if (t0 < dgFloat32 (1.2f)) {
-	} else if (t0 < maxT) {
-		dgVector q (q0 + (q1 - q0).Scale4 (t0));
-		if (q.m_x >= (m_height + m_clip0)) {
-			dgVector n (q - origin0); 
-			dgAssert (n.m_w == dgFloat32 (0.0f));
-			//contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
-			contactOut.m_normal = n.CompProduct4(n.DotProduct4(n).InvSqrt());
-//			contactOut.m_userId = SetUserDataID();
-			return t0;
-		}
-
-//	} else if (t1 < dgFloat32 (1.2f)) {
-	} else if (t1 < maxT) {
-		dgVector q (q0 + (q1 - q0).Scale4 (t1));
-		if (q.m_x <= (-m_height + m_clip1)) {
-			dgVector n (q - origin1); 
-			dgAssert (n.m_w == dgFloat32 (0.0f));
-			//contactOut.m_normal = n.Scale3 (dgRsqrt (n % n));
-			contactOut.m_normal = n.CompProduct4(n.DotProduct4(n).InvSqrt());
-//			contactOut.m_userId = SetUserDataID();
-			return t1;
-		}
-	}
-	return dgCollisionConvex::RayCast (q0, q1, maxT, contactOut, body, NULL, NULL);
+	dgVector dir(direction.CompProduct4(m_transform));
+	dgVector point(testPoint.CompProduct4(m_transform));
+	point += dir.Scale4(m_radio0);
+	return m_transform.CompProduct4(point);
 }
 
 
 dgFloat32 dgCollisionTaperedCapsule::CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const
 {
-	dgFloat32 volume = dgCollisionConvex::CalculateMassProperties (offset, inertia, crossInertia, centerOfMass);
-/*
-	centerOfMass = GetLocalMatrix().m_posit;
-	dgFloat32 cylVolume = dgFloat32 (3.14159f * 2.0f) * m_radio0 * m_radio0 * m_height;
-	dgFloat32 sphVolume = dgFloat32 (3.14159f * 4.0f / 3.0f) * m_radio0 * m_radio0 * m_radio0; 
-
-	dgFloat32 cylInertiaxx = (dgFloat32 (0.5f) * m_radio0 * m_radio0) * cylVolume;
-	dgFloat32 sphInertiaxx = (dgFloat32 (2.0f / 5.0f) * m_radio0 * m_radio0) * sphVolume;
-
-	dgFloat32 cylInertiayyzz = (dgFloat32 (0.25f) * m_radio0 *  m_radio0 + dgFloat32 (1.0f / 3.0f) * m_height * m_height) * cylVolume;
-	dgFloat32 sphInertiayyzz = sphInertiaxx + m_height * m_height * sphVolume;
-
-	dgFloat32 volume = cylVolume + sphVolume;
-	dgFloat32 inertiaxx = cylInertiaxx + sphInertiaxx;
-	dgFloat32 inertiayyzz = cylInertiayyzz + sphInertiayyzz;
-
-	dgMatrix inertiaTensor (dgGetIdentityMatrix());
-
-	inertiaTensor[0][0] = inertiaxx;
-	inertiaTensor[1][1] = inertiayyzz;
-	inertiaTensor[2][2] = inertiayyzz;
-
-	inertiaTensor = GetLocalMatrix().Inverse() * inertiaTensor * GetLocalMatrix();
-
-	crossInertia.m_x = inertiaTensor[1][2] - volume * centerOfMass.m_y * centerOfMass.m_z;
-	crossInertia.m_y = inertiaTensor[0][2] - volume * centerOfMass.m_z * centerOfMass.m_x;
-	crossInertia.m_z = inertiaTensor[0][1] - volume * centerOfMass.m_x * centerOfMass.m_y;
-
-	dgVector central (centerOfMass.CompProduct(centerOfMass));
-	inertia.m_x = inertiaTensor[0][0] + volume * (central.m_y + central.m_z);
-	inertia.m_y = inertiaTensor[1][1] + volume * (central.m_z + central.m_x);
-	inertia.m_z = inertiaTensor[2][2] + volume * (central.m_x + central.m_y);
-
-	centerOfMass = centerOfMass.Scale3 (volume);
-*/
-	return volume;
+	return dgCollisionConvex::CalculateMassProperties (offset, inertia, crossInertia, centerOfMass);
 }
-
-
-
 
 void dgCollisionTaperedCapsule::GetCollisionInfo(dgCollisionInfo* const info) const
 {
@@ -467,95 +293,95 @@ void dgCollisionTaperedCapsule::GetCollisionInfo(dgCollisionInfo* const info) co
 	info->m_taperedCapsule.m_radio0 = m_radio0;
 	info->m_taperedCapsule.m_radio1 = m_radio1;
 	info->m_capsule.m_height = dgFloat32 (2.0f) * m_height;
-}
 
+	if (m_transform.m_x < dgFloat32 (0.0f)) {
+		dgSwap(info->m_taperedCapsule.m_radio0, info->m_taperedCapsule.m_radio1);
+	}
+}
 
 void dgCollisionTaperedCapsule::Serialize(dgSerialize callback, void* const userData) const
 {
-	dgVector size (m_radio0, m_radio1, dgFloat32 (2.0f) * m_height, dgFloat32 (0.0f));
-
 	SerializeLow(callback, userData);
+
+	dgVector size(m_radio0, m_radio1, m_height, dgFloat32 (0.0f));
 	callback (userData, &size, sizeof (dgVector));
+	callback (userData, &m_p0, sizeof (dgVector));
+	callback (userData, &m_p1, sizeof (dgVector));
+	callback (userData, &m_transform, sizeof (dgVector));
 }
 
 
-dgVector dgCollisionTaperedCapsule::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+dgInt32 dgCollisionTaperedCapsule::CalculatePlaneIntersection (const dgVector& direction, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
-	*vertexIndex = -1;
-	dgVector p0(dir.Scale3 (m_radio0));
-	dgVector p1(dir.Scale3 (m_radio1));
-	p0.m_x += m_height;
-	p1.m_x -= m_height;
-	dgFloat32 dir0 = p0 % dir;
-	dgFloat32 dir1 = p1 % dir;
-	return dgVector ((dir0 >= dir1) ? m_height : - m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-}
-
-dgVector dgCollisionTaperedCapsule::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
-{
-	dgAssert (dgAbsf (dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
-	dgVector p (SupportVertex(dir, NULL));
-
-	dgVector n (dir.m_x, dgSqrt (dir.m_y * dir.m_y + dir.m_z * dir.m_z), dgFloat32 (0.0), dgFloat32 (0.0f));
-	dgAssert (dgAbsf (n % n - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgVector normal(direction.CompProduct4(m_transform));
+	dgVector origin(point.CompProduct4(m_transform));
 	
-	dgFloat32 project = m_sideNormal % n;
-	if (project > dgFloat32 (0.9998f)) {
-		dgFloat32 t = dgFloat32 (0.5f) * (point.m_x + m_height) / m_height;
-		dgFloat32 r = m_radio1 + (m_radio0 - m_radio1) * t;
-		p = dir.Scale3 (r);
-		p.m_x += point.m_x;
-	}
-	return p;
-}
-
-dgInt32 dgCollisionTaperedCapsule::CalculateSphereConicContacts (dgFloat32 posit, dgFloat32 radius, const dgVector& normal, const dgVector& point, dgVector* const contact) const
-{
-	dgVector r (posit, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgFloat32 t = normal % (r - point);
-	contact[0] = r - normal.Scale3 (t);
-	return 1;
-}
-
-
-dgInt32 dgCollisionTaperedCapsule::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
-{
-	dgAssert (0);
-	return 0;
-/*
-	dgVector n (-normal.m_x, -dgSqrt (normal.m_y * normal.m_y + normal.m_z * normal.m_z), dgFloat32 (0.0), dgFloat32 (0.0f));
-	dgFloat32 project = m_sideNormal % n;
-	if (project > dgFloat32 (0.9998f)) {
-		return CalculateContactsGeneric (point, normal, proxy, contactsOut);
-	} else if (point.m_x > (m_height + m_clip0)){
-		return CalculateSphereConicContacts ( m_height, m_radio0, normal, point, contactsOut);
-	} else if (point.m_x < (-m_height + m_clip1)) {
-		return CalculateSphereConicContacts (-m_height, m_radio1, normal, point, contactsOut);
-	}
-	return CalculateContactsGeneric (point, normal, proxy, contactsOut);
-*/
-}
-
-
-
-dgInt32 dgCollisionTaperedCapsule::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
-{
 	dgInt32 count = 0;
-	dgVector p0 (m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector p0 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector dir0 (p0 - origin);
-	dgFloat32 dist0 = dir0 % normal;
+	dgFloat32 dist0 = dir0.DotProduct4(normal).GetScalar();
 	if ((dist0 * dist0) < (m_radio0 * m_radio0)) {
-		contactsOut[count] = p0 - normal.Scale3 (dist0);
+		contactsOut[count] = m_transform.CompProduct4 (p0 - normal.Scale4 (dist0));
 		count ++;
 	}
 
-	dgVector p1 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector p1 (m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector dir1 (p1 - origin);
-	dgFloat32 dist1 = dir1 % normal;
+	dgFloat32 dist1 = dir1.DotProduct4(normal).GetScalar();
 	if ((dist1 * dist1) < (m_radio1 * m_radio1)) {
-		contactsOut[count] = p1 - normal.Scale3 (dist1);
+		contactsOut[count] = m_transform.CompProduct4(p1 - normal.Scale4 (dist1));
 		count ++;
 	}
 	return count;
 }
+
+dgFloat32 dgCollisionTaperedCapsule::RayCast (const dgVector& r0, const dgVector& r1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
+{
+	dgVector q0(r0.CompProduct4(m_transform));
+	dgVector q1(r1.CompProduct4(m_transform));
+
+	dgVector origin0 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector origin1 ( m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgFloat32 t0 = dgRayCastSphere (q0, q1, origin0, m_radio0);
+	dgFloat32 t1 = dgRayCastSphere (q0, q1, origin1, m_radio1);
+	if ((t0 < maxT) && (t1 < maxT)) {
+		if (t0 < t1) {
+			dgVector q (q0 + (q1 - q0).Scale4 (t0));
+			dgVector n(q - origin0);
+			dgAssert(n.m_w == dgFloat32(0.0f));
+			contactOut.m_normal = m_transform.CompProduct4(n.CompProduct4(n.DotProduct4(n).InvSqrt()));
+			return t0;
+		} else {
+			dgVector q (q0 + (q1 - q0).Scale4 (t1));
+			dgVector n(q - origin1);
+			dgAssert(n.m_w == dgFloat32(0.0f));
+			contactOut.m_normal = m_transform.CompProduct4(n.CompProduct4(n.DotProduct4(n).InvSqrt()));
+			return t1;
+		}
+	} else if (t1 < maxT) {
+		dgVector q (q0 + (q1 - q0).Scale4 (t1));
+		if (q.m_x >= m_p1.m_x) {
+			dgVector n (q - origin1); 
+			dgAssert (n.m_w == dgFloat32 (0.0f));
+			contactOut.m_normal = m_transform.CompProduct4 (n.CompProduct4(n.DotProduct4(n).InvSqrt()));
+			return t1;
+		}
+	} else if (t0 < maxT) {
+		dgVector q (q0 + (q1 - q0).Scale4 (t0));
+		if (q.m_x <= m_p0.m_x) {
+			dgVector n (q - origin0); 
+			dgAssert (n.m_w == dgFloat32 (0.0f));
+			contactOut.m_normal = m_transform.CompProduct4 (n.CompProduct4(n.DotProduct4(n).InvSqrt()));
+			return t0;
+		}
+	}
+
+	dgFloat32 ret = dgCollisionConvex::RayCast (q0, q1, maxT, contactOut, body, NULL, NULL);
+	if (ret <= dgFloat32 (1.0f)) {
+		contactOut.m_normal = m_transform.CompProduct4 (contactOut.m_normal);
+	}
+	return ret;
+}
+
+
 

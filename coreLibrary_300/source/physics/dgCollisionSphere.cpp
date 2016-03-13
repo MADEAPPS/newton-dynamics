@@ -319,6 +319,7 @@ dgVector dgCollisionSphere::SupportVertexSpecialProjectPoint (const dgVector& po
 	return SupportVertex(dir, NULL);
 }
 
+/*
 dgInt32 dgCollisionSphere::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
 {
 	dgAssert (normal.m_w == 0.0f);
@@ -326,4 +327,4 @@ dgInt32 dgCollisionSphere::CalculateContacts (const dgVector& point, const dgVec
 	contactsOut[0] = normal.CompProduct4 (normal.DotProduct4(point));
 	return 1;
 }
-
+*/

@@ -14,7 +14,7 @@
 
 
 #define DEMO_GRAVITY  -10.0f
-//#define DEMO_GRAVITY  10.0f
+//#define DEMO_GRAVITY  -0.1f
 
 enum PrimitiveType
 {

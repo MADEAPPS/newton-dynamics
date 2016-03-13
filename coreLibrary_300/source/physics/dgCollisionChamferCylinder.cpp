@@ -366,31 +366,13 @@ dgVector dgCollisionChamferCylinder::SupportVertexSpecialProjectPoint (const dgV
 	return point + dir.Scale4(m_height);
 }
 
-
+/*
 dgInt32 dgCollisionChamferCylinder::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
 {
 	dgAssert(0);
 	return 0;
-/*
-	dgFloat32 disc2 = point.m_y * point.m_y + point.m_z * point.m_z;
-	if (disc2 < m_radius * m_radius) {
-		dgVector cylinderNormal ((point.m_x >= dgFloat32 (0.0)) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		return CalculateContactsGeneric (point, cylinderNormal, proxy, contactsOut);
-	} else {
-
-		dgVector r (dgFloat32 (0.0f), point.m_y, point.m_z, dgFloat32 (0.0f));
-		dgAssert ((r % r) > dgFloat32 (0.0f));
-//		r = r.Scale3(m_radius * dgRsqrt (r % r));
-		r = r.CompProduct4(r.InvMagSqrt()).Scale4(m_radius);
-		//dgFloat32 t = normal % (r - point);
-		dgVector t (normal.DotProduct4(r - point));
-		//contactsOut[0] = r - normal.Scale3 (t);
-		contactsOut[0] = r - normal.CompProduct4(t);
-		return 1;
-	}
-*/
 }
-
+*/
 
 dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
 {
