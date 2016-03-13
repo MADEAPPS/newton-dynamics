@@ -260,7 +260,7 @@ class dgWorldDynamicUpdate
 	//static void CalculateJointsImpulseVelocParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void UpdateFeedbackForcesParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void UpdateBodyVelocityParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void FindActiveJointAndBodies (void* const context, void* const worldContext, dgInt32 threadID); 
+	static void FindActiveJointAndBodiesKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static dgInt32 SortJointInfoByColor(const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexA, const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexB, void* const context);
 	//void CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;
 

@@ -225,8 +225,9 @@ dgBroadPhaseTreeNode* dgBroadPhase::InsertNode(dgBroadPhaseNode* const root, dgB
 }
 
 
-void dgBroadPhase::UpdateAggregateEntropy(void* const context, void* const node, dgInt32 threadID)
+void dgBroadPhase::UpdateAggregateEntropyKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -235,6 +236,7 @@ void dgBroadPhase::UpdateAggregateEntropy(void* const context, void* const node,
 
 void dgBroadPhase::ForceAndToqueKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -243,6 +245,7 @@ void dgBroadPhase::ForceAndToqueKernel(void* const context, void* const node, dg
 
 void dgBroadPhase::SleepingStateKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -260,7 +263,6 @@ bool dgBroadPhase::DoNeedUpdate(dgBodyMasterList::dgListNode* const node) const
 
 void dgBroadPhase::UpdateAggregateEntropy (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseAggregate*>::dgListNode* node, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
 	while (node) {
 		node->GetInfo()->ImproveEntropy();
@@ -273,7 +275,6 @@ void dgBroadPhase::UpdateAggregateEntropy (dgBroadphaseSyncDescriptor* const des
 
 void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
@@ -301,7 +302,6 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 
 void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
@@ -822,6 +822,7 @@ dgInt32 dgBroadPhase::CompareNodes(const dgBroadPhaseNode* const nodeA, const dg
 
 void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhaseNode** const root)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	if (*root) {
 		dgBroadPhaseNode* const parent = (*root)->m_parent;
 		(*root)->m_parent = NULL;
@@ -1169,7 +1170,7 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
-//	dTimeTrackerEvent(__FUNCTION__);
+	dTimeTrackerEvent(__FUNCTION__);
 	if (TestOverlaping (body0, body1, timestep)) {
 		dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
 
@@ -1401,7 +1402,6 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 
 void dgBroadPhase::FindCollidingPairs(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
 {
-	dTimeTrackerEvent(__FUNCTION__);
 	const dgFloat32 timestep = descriptor->m_timestep;
 
 	dgList<dgBroadPhaseNode*>::dgListNode* node = nodePtr;
@@ -1433,6 +1433,7 @@ void dgBroadPhase::FindCollidingPairs(dgBroadphaseSyncDescriptor* const descript
 
 void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -1442,6 +1443,7 @@ void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, d
 
 void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -1575,7 +1577,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob (UpdateAggregateEntropy, &syncPoints, aggregateNode);
+		m_world->QueueJob (UpdateAggregateEntropyKernel, &syncPoints, aggregateNode);
 		aggregateNode = aggregateNode ? aggregateNode->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();

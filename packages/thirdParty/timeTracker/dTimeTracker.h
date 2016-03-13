@@ -71,8 +71,9 @@ class dTimeTracker
 	~dTimeTracker ();
 
 	void EndSection ();
-	void WriteTracks ();
-	long long GetTimeInMicrosenconds();
+	void FlushQueue ();
+	void QueueEvents ();
+	long long GetTimeInNanosenconds();
 	
 	dTree<dLabels, dCRCTYPE> m_dictionary;
 	LARGE_INTEGER m_frequency;
@@ -85,6 +86,10 @@ class dTimeTracker
 	long m_bufferIndex;
 	long m_bufferSize;
 	dTrackEntry* m_buffer;
+
+	int m_outQueueBufferindex;
+	int m_outQueueBufferSize;
+	dTrackEntry* m_outQueueBuffer;
 };
 
 

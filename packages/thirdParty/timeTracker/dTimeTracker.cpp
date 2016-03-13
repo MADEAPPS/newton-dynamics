@@ -33,14 +33,19 @@ dTimeTracker::dTimeTracker ()
 
 	InitializeCriticalSectionAndSpinCount(&m_criticalSection, 0x1000);
 
-	m_bufferSize = 1024;
 	m_bufferIndex = 0;
-	m_buffer = ((dTrackEntry*) dContainersAlloc::Alloc (1024 * sizeof (dTrackEntry)));
+	m_bufferSize = 1024;
+	m_buffer = ((dTrackEntry*) dContainersAlloc::Alloc (m_bufferSize * sizeof (dTrackEntry)));
+
+	m_outQueueBufferindex = 0;
+	m_outQueueBufferSize = 1024 * 512;
+	m_outQueueBuffer = ((dTrackEntry*) dContainersAlloc::Alloc (m_outQueueBufferSize * sizeof (dTrackEntry)));
 }
 
 dTimeTracker::~dTimeTracker ()
 {
 	dContainersAlloc::Free (m_buffer);
+	dContainersAlloc::Free (m_outQueueBuffer);
 	DeleteCriticalSection(&m_criticalSection);
 }
 
@@ -69,6 +74,9 @@ void dTimeTracker::StartSection (int numberOfFrames)
 
 void dTimeTracker::EndSection ()
 {
+	EnterCriticalSection(&m_criticalSection); 
+	FlushQueue ();
+
 	fprintf (m_file, "\n");
 	fprintf (m_file, "\t],\n");
 
@@ -82,12 +90,13 @@ void dTimeTracker::EndSection ()
 	fclose (m_file);
 	m_file = NULL;
 	m_firstRecord = 0;
+	LeaveCriticalSection(&m_criticalSection);
 }
 
 void dTimeTracker::Update ()
 {
 	if (m_file) {
-		WriteTracks ();
+		QueueEvents ();
 		m_numberOfFrames --;
 		if (m_numberOfFrames == 0) {
 			EndSection ();
@@ -96,12 +105,12 @@ void dTimeTracker::Update ()
 }
 
 
-long long dTimeTracker::GetTimeInMicrosenconds()
+long long dTimeTracker::GetTimeInNanosenconds()
 {
 	LARGE_INTEGER count;
 	QueryPerformanceCounter (&count);
 	count.QuadPart -= m_baseCount.QuadPart;
-	LONGLONG ticks = LONGLONG (count.QuadPart * LONGLONG (1000000) / m_frequency.QuadPart);
+	LONGLONG ticks = LONGLONG (count.QuadPart * LONGLONG (1000000000) / m_frequency.QuadPart);
 	return ticks;
 }
 
@@ -129,14 +138,25 @@ TIMETRACKER_API void dTimeTracker::RegisterThreadName (const char* const threadN
 	}
 }	
 
-
-void dTimeTracker::WriteTracks ()
+void dTimeTracker::QueueEvents ()
 {
-	//  {"name": "Asub", "cat": "xxxxx", "ph": "B", "pid": 22630, "tid": 22630, "ts": 829}
 	EnterCriticalSection(&m_criticalSection); 
-	for (int i = 0; i < m_bufferIndex; i ++) {
+	if ((m_outQueueBufferindex + m_bufferIndex) > m_outQueueBufferSize) {
+		FlushQueue ();
+		m_outQueueBufferindex = 0;
+	}
+	memcpy (&m_outQueueBuffer[m_outQueueBufferindex], m_buffer, m_bufferIndex * sizeof (dTrackEntry));
+	m_outQueueBufferindex += m_bufferIndex;
+	m_bufferIndex = 0;
 
-		const dTrackEntry& event = m_buffer[i];
+	LeaveCriticalSection(&m_criticalSection);
+}
+
+
+void dTimeTracker::FlushQueue ()
+{
+	for (int i = 0; i < m_outQueueBufferindex; i ++) {
+		const dTrackEntry& event = m_outQueueBuffer[i];
 		if (!m_firstRecord) {
 			fprintf (m_file, "\n");
 			m_firstRecord = true;
@@ -156,7 +176,7 @@ void dTimeTracker::WriteTracks ()
 		fprintf (m_file, "\"ph\": \"B\", ");
 		fprintf (m_file, "\"pid\": \"%d\", ", m_processId);
 		fprintf (m_file, "\"tid\": \"%d\", ", event.m_threadId);
-		fprintf (m_file, "\"ts\": %d", event.m_startTime);
+		fprintf (m_file, "\"ts\": %lld", event.m_startTime);
 		fprintf (m_file, "},\n");
 
 		fprintf (m_file, "\t\t {");
@@ -165,12 +185,11 @@ void dTimeTracker::WriteTracks ()
 		fprintf (m_file, "\"ph\": \"E\", ");
 		fprintf (m_file, "\"pid\": \"%d\", ", m_processId);
 		fprintf (m_file, "\"tid\": \"%d\", ", event.m_threadId);
-		fprintf (m_file, "\"ts\": %d", event.m_endTime);
+		fprintf (m_file, "\"ts\": %lld", event.m_endTime);
 		fprintf (m_file, "}");
 	}
 
-	m_bufferIndex = 0;
-	LeaveCriticalSection(&m_criticalSection);
+	m_outQueueBufferindex = 0;
 }
 
 
@@ -179,7 +198,7 @@ dTimeTracker::dTrackEntry::dTrackEntry(dCRCTYPE nameCRC)
 {
 	dTimeTracker* const instance = dTimeTracker::GetInstance();
 	if (instance->m_file) {
-		long long startTime = instance->GetTimeInMicrosenconds ();
+		long long startTime = instance->GetTimeInNanosenconds ();
 		m_nameCRC = nameCRC;
 		m_startTime = startTime;
 		m_endTime = startTime;
@@ -191,7 +210,7 @@ dTimeTracker::dTrackEntry::dTrackEntry(dCRCTYPE nameCRC)
 dTimeTracker::dTrackEntry::~dTrackEntry()
 {
 	dTimeTracker* const instance = dTimeTracker::GetInstance();
-	m_endTime = instance->GetTimeInMicrosenconds ();
+	m_endTime = instance->GetTimeInNanosenconds ();
 	if (instance->m_file) {
 		EnterCriticalSection(&instance->m_criticalSection); 
 		if (instance->m_bufferIndex >= instance->m_bufferSize) {
