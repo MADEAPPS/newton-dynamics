@@ -108,7 +108,8 @@ void dgCollisionTaperedCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloa
 	for (dgInt32 j = 0; j < dx0; j++) {
 		x0 += step;
 		dgFloat32 x = x0 + m_height;
-		dgFloat32 r0 = dgSqrt (m_radio0 * m_radio0 - x * x);
+		dgFloat32 arg = dgMax (m_radio0 * m_radio0 - x * x, dgFloat32 (1.0e-3f));
+		dgFloat32 r0 = dgSqrt (arg);
 		
 		dgFloat32 angle = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < DG_TAPED_CAPSULE_CAP_SEGMENTS; i++) {
@@ -126,7 +127,8 @@ void dgCollisionTaperedCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloa
 	step = m_radio1 / DG_TAPED_CAPSULE_SEGMENTS;
 	for (dgInt32 j = 0; j < dx1; j ++) {
 		dgFloat32 x = x1 - m_height;
-		dgFloat32 r1 = dgSqrt (m_radio1 * m_radio1 - x * x);
+		dgFloat32 arg = dgMax (m_radio1 * m_radio1 - x * x, dgFloat32 (1.0e-3f));
+		dgFloat32 r1 = dgSqrt (arg);
 		dgFloat32 angle = dgFloat32 (0.0f);
 		for (dgInt32 i = 0; i < DG_TAPED_CAPSULE_CAP_SEGMENTS; i ++) {
 			dgFloat32 z = dgSin (angle);

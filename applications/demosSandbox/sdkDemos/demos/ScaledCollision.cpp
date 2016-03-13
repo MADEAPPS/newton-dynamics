@@ -201,8 +201,7 @@ void NonUniformScaledCollision(DemoEntityManager* const scene)
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	dVector location(0.0f, 0.0f, 0.0f, 0.0f);
-	//dVector size (0.5f, 0.5f, 0.75f, 0.0f);
-	dVector size(1.0f, 1.0f, 1.0f, 0.0f);
+	dVector size(0.5f, 0.5f, 1.0f, 0.0f);
 
 	int count = 5;
 	dMatrix shapeOffsetMatrix(dRollMatrix(3.141592f / 2.0f));
