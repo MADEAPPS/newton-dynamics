@@ -25,6 +25,7 @@
 #include "dgContact.h"
 #include "dgCollisionBox.h"
 
+#define D_BOX_SKIN_THINCKNESS	dgFloat32 (1.0f/64.0f)
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -63,9 +64,9 @@ dgCollisionBox::dgCollisionBox(dgWorld* const world, dgDeserialize deserializati
 void dgCollisionBox::Init (dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 {
 	m_rtti |= dgCollisionBox_RTTI;
-	m_size[0].m_x = dgAbsf (size_x) * dgFloat32 (0.5f);
-	m_size[0].m_y = dgAbsf (size_y) * dgFloat32 (0.5f);
-	m_size[0].m_z = dgAbsf (size_z) * dgFloat32 (0.5f);
+	m_size[0].m_x = dgMax (dgAbsf (size_x) * dgFloat32 (0.5f), dgFloat32(2.0f) * D_BOX_SKIN_THINCKNESS);
+	m_size[0].m_y = dgMax (dgAbsf (size_y) * dgFloat32 (0.5f), dgFloat32(2.0f) * D_BOX_SKIN_THINCKNESS);
+	m_size[0].m_z = dgMax (dgAbsf (size_z) * dgFloat32 (0.5f), dgFloat32(2.0f) * D_BOX_SKIN_THINCKNESS);
 	m_size[0].m_w = dgFloat32 (0.0f);
 
 	m_size[1].m_x = - m_size[0].m_x;
@@ -186,6 +187,10 @@ dgInt32 dgCollisionBox::CalculateSignature () const
 	return CalculateSignature(m_size[0].m_x, m_size[0].m_y, m_size[0].m_z);
 }
 
+dgFloat32 dgCollisionBox::GetSkinThickness () const
+{
+	return D_BOX_SKIN_THINCKNESS;
+}
 
 dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
