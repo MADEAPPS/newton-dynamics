@@ -173,12 +173,13 @@ void dTimeTracker::FlushQueue ()
 		fprintf (m_file, "\t\t {");
 		fprintf (m_file, "\"name\": \"%s\", ", m_dictionary.Find (event.m_nameCRC)->GetInfo().m_name);
 		fprintf (m_file, "\"cat\": \"%s\", ", threadNodeName->GetInfo().m_name);
-		fprintf (m_file, "\"ph\": \"B\", ");
+		fprintf (m_file, "\"ph\": \"X\", ");
 		fprintf (m_file, "\"pid\": \"%d\", ", m_processId);
 		fprintf (m_file, "\"tid\": \"%d\", ", event.m_threadId);
 		fprintf (m_file, "\"ts\": %lld", event.m_startTime);
+		fprintf (m_file, "\"dur\": %lld", event.m_endTime - event.m_startTime);
 		fprintf (m_file, "},\n");
-
+/*
 		fprintf (m_file, "\t\t {");
 		fprintf (m_file, "\"name\": \"%s\", ", m_dictionary.Find (event.m_nameCRC)->GetInfo().m_name);
 		fprintf (m_file, "\"cat\": \"%s\", ", threadNodeName->GetInfo().m_name);
@@ -187,6 +188,7 @@ void dTimeTracker::FlushQueue ()
 		fprintf (m_file, "\"tid\": \"%d\", ", event.m_threadId);
 		fprintf (m_file, "\"ts\": %lld", event.m_endTime);
 		fprintf (m_file, "}");
+*/
 	}
 
 	m_outQueueBufferindex = 0;

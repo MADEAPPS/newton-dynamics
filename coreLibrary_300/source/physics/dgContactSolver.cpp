@@ -1625,10 +1625,15 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point, const dgVecto
 	dgInt32 count1 = 0;
 	dgVector* const shape1 = &contactsOut[baseCount];
 
-	dgInt32 dommy;
 	const dgMatrix& matrix1 = m_instance1->m_globalMatrix;
 	dgVector ponintOnInstance1(matrix1.UntransformVector(point));
 	dgVector normalOnInstance1 (matrix1.UnrotateVector(normal));
+	count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, ponintOnInstance1, shape1, dgFloat32(1.0f));
+	if (!count1) {
+		count1 = 1;
+		shape1[0] = ponintOnInstance1;
+	}
+/*
 	dgVector supportOnInstance1 (m_instance1->SupportVertex(normalOnInstance1, &dommy));
 	dgFloat32 dist = normalOnInstance1 % (supportOnInstance1 - ponintOnInstance1);
 	if (dist >= DG_ROBUST_PLANE_CLIP) {
@@ -1645,7 +1650,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point, const dgVecto
 			count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, ponintOnInstance1, shape1, dgFloat32(1.0f));
 		}
 	}
-
+*/
 	if (count1) {
 		for (int i = 0; i < count1; i ++) {
 			shape1[i] = matrix1.TransformVector(shape1[i]);
@@ -1657,6 +1662,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point, const dgVecto
 		const dgMatrix& matrix0 = m_instance0->m_globalMatrix;
 		dgVector pointOnInstance0(matrix0.UntransformVector(point));
 		dgVector normalOnInstance0(matrix0.UnrotateVector(normal.Scale4(dgFloat32(-1.0f))));
+/*
 		dgVector supportOnInstance0(m_instance0->SupportVertex(normalOnInstance0, &dommy));
 		dgFloat32 dist = normalOnInstance0 % (supportOnInstance0 - pointOnInstance0);
 		if (dist >= DG_ROBUST_PLANE_CLIP) {
@@ -1666,13 +1672,18 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point, const dgVecto
 			for (dgInt32 i = 0; i < count0; i++) {
 				shape0[i] -= err;
 			}
-
 		} else {
 			count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0, dgFloat32(1.0f));
 			if (!count0) {
 				pointOnInstance0 -= normalOnInstance0.Scale4(DG_ROBUST_PLANE_CLIP);
 				count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0, dgFloat32(1.0f));
 			}
+		}
+*/
+		count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0, dgFloat32(1.0f));
+		if (!count0) {
+			count0 = 1;
+			shape0[0] = pointOnInstance0;
 		}
 
 		if (count0) {

@@ -38,6 +38,15 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+dgVector dgCollisionConvex::m_unitCircle[] = { dgVector(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.000000f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(0.5f), dgFloat32(0.866025f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.5f), dgFloat32(0.866026f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-1.0f), dgFloat32(0.000000f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.5f), dgFloat32(-0.866025f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(0.5f), dgFloat32(-0.866026f), dgFloat32(0.0f)) };
+
+
+
 dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id)
 	:dgCollision(allocator, signature, id) 
 	,m_userData (NULL)

@@ -85,7 +85,6 @@ class dgCollisionConvex: public dgCollision
 
 	bool SanityCheck(dgInt32 count, const dgVector& normal, dgVector* const contactsOut) const;
 
-//	dgPerimenterEdge* ReduceContacts (dgPerimenterEdge* poly, dgInt32 maxCount) const;
 	dgInt32 RectifyConvexSlice (dgInt32 count, const dgVector& normal, dgVector* const contactsOut) const;
 
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
@@ -106,11 +105,8 @@ class dgCollisionConvex: public dgCollision
 	dgUnsigned16 m_vertexCount;
 	
 	public:	
-//	static dgVector m_hullDirs[14]; 
-//	static dgVector m_dummySum[4];
-//	static dgInt32 m_rayCastSimplex[4][4];
-//	static dgCollisionPriority m_priorityOrder;
-	
+	static dgVector m_unitCircle[6];	
+
 	friend class dgWorld;
 	friend class dgBroadPhase;
 	friend class dgMinkowskiConv;

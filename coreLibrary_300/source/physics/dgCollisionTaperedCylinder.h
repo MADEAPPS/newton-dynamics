@@ -24,7 +24,7 @@
 
 #include "dgCollisionConvex.h"
 
-#define DG_CYLINDER_SEGMENTS 8
+#define DG_TAPED_CYLINDER_SEGMENTS 12
 
 
 class dgCollisionTaperedCylinder: public dgCollisionConvex  
@@ -57,12 +57,12 @@ class dgCollisionTaperedCylinder: public dgCollisionConvex
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
 
-	dgVector m_dirVector;
-	dgFloat32 m_height;
+	dgVector m_profile[4];
+	dgVector m_vertex[DG_TAPED_CYLINDER_SEGMENTS * 2];
 	dgFloat32 m_radio0;
 	dgFloat32 m_radio1;
-	dgFloat32 m_skinthickness;
-	dgVector m_vertex[DG_CYLINDER_SEGMENTS * 2];
+	dgFloat32 m_height;
+
 	static dgInt32 m_shapeRefCount;
 	static dgConvexSimplexEdge m_edgeArray[];
 
