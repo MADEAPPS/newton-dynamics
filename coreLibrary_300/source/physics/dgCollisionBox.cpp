@@ -207,14 +207,27 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vert
 
 dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	return SupportVertex(dir, vertexIndex);
+	dgAssert(dgAbsf(dir % dir - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert(dir.m_w == dgFloat32(0.0f));
+	dgVector mask(dir < dgVector(dgFloat32(0.0f)));
+	if (vertexIndex) {
+		dgVector index(m_indexMark.CompProduct4(mask & dgVector::m_one));
+		index = (index.AddHorizontal()).GetInt();
+		*vertexIndex = index.m_ix;
+	}
+
+	dgVector padd (D_BOX_SKIN_THINCKNESS);
+	padd = padd & dgVector::m_triplexMask;
+	dgVector size0 (m_size[0] - padd);
+	dgVector size1 (m_size[1] + padd);
+	return (size1 & mask) + size0.AndNot(mask);
 }
 
 dgVector dgCollisionBox::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const
 {
-	return point;
+	dgAssert(dgAbsf((dir % dir - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
+	return point + dir.Scale4 (D_BOX_SKIN_THINCKNESS);
 }
-
 
 
 void dgCollisionBox::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
