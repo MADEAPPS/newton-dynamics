@@ -1019,6 +1019,7 @@ void dgBroadPhase::RotateRight (dgBroadPhaseTreeNode* const node, dgBroadPhaseNo
 
 bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	bool mass0 = (body0->m_invMass.m_w != dgFloat32 (0.0f)); 
 	bool mass1 = (body1->m_invMass.m_w != dgFloat32 (0.0f)); 
 	bool isDynamic0 = body0->IsRTTIType (dgBody::m_dynamicBodyRTTI) != 0;
@@ -1042,6 +1043,114 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 		const dgCollisionInstance* const instance0 = body0->GetCollision();
 		const dgCollisionInstance* const instance1 = body1->GetCollision();
 
+		dgVector obb0;
+		dgVector obb1;
+		dgVector origin0;
+		dgVector origin1;
+		instance0->CalcObb (origin0, obb0);
+		instance1->CalcObb (origin1, obb1);
+
+		dgAssert (origin0.m_w == dgFloat32 (0.0f));
+		dgAssert (origin1.m_w == dgFloat32 (0.0f));
+		dgMatrix matrix (instance1->GetGlobalMatrix() * instance0->GetGlobalMatrix().Inverse());
+		matrix.m_posit = matrix.TransformVector (origin1) - origin0;
+
+matrix.m_posit = dgVector (0.0f, 2.0f, 0.0f, 0.0f);
+
+		dgVector dir0 (matrix.m_posit & dgVector::m_triplexMask); 
+		dgFloat32 mag2 = dir0.DotProduct4 (dir0).GetScalar();
+		if (mag2 < dgFloat32 (1.0e-8f)) {
+			dir0 = dgVector(dgFloat32 (0.0f));
+			dir0.m_y = dgFloat32 (1.0f);
+			mag2 = dgFloat32 (1.0f);
+		}
+		dir0 = dir0.Scale4(dgFloat32 (1.0f) / dgSqrt (mag2));
+
+		dgVector simplex[4];
+		dgVector negObb0 (obb0.CompProduct4 (dgVector::m_negOne));
+		dgVector negObb1 (obb1.CompProduct4 (dgVector::m_negOne));
+		
+		dgVector mask0 (dir0 > dgVector::m_zero);
+		dgVector p ((obb0 & mask0) | (negObb0.AndNot (mask0)));
+
+		dgVector dir1 (matrix.UnrotateVector(dir0.CompProduct4 (dgVector::m_negOne)));
+		dgVector mask1 (dir1 > dgVector::m_zero);
+		dgVector q (matrix.TransformVector (dgVector ((obb1 & mask1) | (negObb1.AndNot (mask1)))));
+
+		simplex[0] = p - q;
+		dgVector v (simplex[0]);
+
+		dgInt32 iter = 0;
+		dgInt32 index = 1;
+		dgInt32 cycling = 0;
+		dgFloat32 minDist = dgFloat32(1.0e20f);
+		do {
+			dgFloat32 dist = v % v;
+			if (dist < dgFloat32(1.0e-9f)) {
+		//		ret = true;
+				break;
+			}
+
+			if (dist < minDist) {
+				minDist = dist;
+				cycling = -1;
+			}
+			cycling++;
+			if (cycling > 4) {
+	//			ret = true;
+				break;
+			}
+
+			dgVector dir0(v.Scale4(-dgRsqrt(dist)));
+//			SupportVertex(dir, index);
+
+			dgVector mask0 (dir0 > dgVector::m_zero);
+			dgVector p ((obb0 & mask0) | (negObb0.AndNot (mask0)));
+
+			dgVector dir1 (matrix.UnrotateVector(dir0.CompProduct4 (dgVector::m_negOne)));
+			dgVector mask1 (dir1 > dgVector::m_zero);
+			dgVector q (matrix.TransformVector (dgVector ((obb1 & mask1) | (negObb1.AndNot (mask1)))));
+
+			simplex[index] = p - q;
+			const dgVector& w = simplex[index];
+			dgVector wv(w - v);
+			dgAssert (dir0.m_w  == dgFloat32 (0.0f));
+			dist = dir0.DotProduct4(wv).GetScalar();
+
+			if (dist < dgFloat32(1.0e-3f)) {
+//				m_normal = dir;
+//				ret = false;
+				break;
+			}
+
+			index++;
+			switch (index) 
+			{
+				case 2:
+				{
+					dgAssert (0);
+//					v = ReduceLine(index);
+					break;
+				}
+
+				case 3:
+				{
+					dgAssert (0);
+//					v = ReduceTriangle(index);
+					break;
+				}
+
+				case 4:
+				{
+					dgAssert (0);
+//					v = ReduceTetrahedrum(index);
+					break;
+				}
+			}
+			iter++;
+		} while (iter < 8);
+
+
 		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 			dgVector box0_p0;
 			dgVector box0_p1;
@@ -1060,15 +1169,6 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 			ret = (distance < dgFloat32 (1.0f));
 		} else {
 			ret = dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
-//			if (ret) {
-//				dgVector size0;
-//				dgVector size1;
-//				dgVector origin0;
-//				dgVector origin1;
-//				instance0->CalcObb (origin0, size0);
-//				instance1->CalcObb (origin1, size1);
-//				ret = dgObbTest (origin0, size0, instance0->GetGlobalMatrix(), origin1, size1, instance1->GetGlobalMatrix());
-//			}
 		}
 	}
 	return ret;
