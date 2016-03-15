@@ -534,7 +534,7 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->AppendSubMenu (microThreadedsSubMenu, wxT("select microThread count"));
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->Append(ID_RUN_PROFILER_SECTION, wxT("&Profile"), wxT("profile app for 500 frames"));
+		optionsMenu->Append(ID_RUN_PROFILER_SECTION, wxT("&Profile"), wxT("profile app for 10 frames"));
 
 		mainMenu->Append(optionsMenu, wxT("&Options"));
 	}
