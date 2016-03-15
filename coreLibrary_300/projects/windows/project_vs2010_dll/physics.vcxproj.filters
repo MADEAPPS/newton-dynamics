@@ -111,12 +111,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionSphere.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCapsule.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCylinder.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionUserMesh.cpp">
       <Filter>collision</Filter>
     </ClCompile>
@@ -285,12 +279,6 @@
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionSphere.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCapsule.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCylinder.h">
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionUserMesh.h">

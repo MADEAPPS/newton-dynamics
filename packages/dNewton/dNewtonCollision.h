@@ -247,10 +247,10 @@ class dNewtonCollisionCapsule: public dNewtonCollision
 		SetShape (shape);
 	}
 
-	CNEWTON_API dNewtonCollisionCapsule (dNewton* const world, dFloat radio, dFloat height, dLong collisionMask)
+	CNEWTON_API dNewtonCollisionCapsule (dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, dLong collisionMask)
 		:dNewtonCollision(m_capsule, collisionMask)
 	{
-		SetShape (NewtonCreateCapsule (world->GetNewton(), radio, height, 0, NULL));
+		SetShape (NewtonCreateCapsule (world->GetNewton(), radio0, radio1, height, 0, NULL));
 	}
 
 	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
@@ -260,29 +260,6 @@ class dNewtonCollisionCapsule: public dNewtonCollision
 
 	protected:
 	CNEWTON_API dNewtonCollisionCapsule (const dNewtonCollisionCapsule& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
-};
-
-
-
-class dNewtonCollisionTaperedCapsule: public dNewtonCollision
-{
-	public: 
-	CNEWTON_API dNewtonCollisionTaperedCapsule (dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, dLong collisionMask)
-		:dNewtonCollision(m_taperedCapsule, collisionMask)
-	{
-		SetShape (NewtonCreateTaperedCapsule (world->GetNewton(), radio0, radio1, height, 0, NULL));
-	}
-
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionTaperedCapsule (*this, shape);
-	}
-
-	protected:
-	CNEWTON_API dNewtonCollisionTaperedCapsule (const dNewtonCollisionTaperedCapsule& srcCollision, NewtonCollision* const shape)
 		:dNewtonCollision (srcCollision, shape)
 	{
 	}
@@ -320,10 +297,10 @@ class dNewtonCollisionCylinder: public dNewtonCollision
 		SetShape (shape);
 	}
 
-	CNEWTON_API dNewtonCollisionCylinder (dNewton* const world, dFloat radio, dFloat height, dLong collisionMask)
+	CNEWTON_API dNewtonCollisionCylinder (dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, dLong collisionMask)
 		:dNewtonCollision(m_cylinder, collisionMask)
 	{
-		SetShape (NewtonCreateCylinder (world->GetNewton(), radio, height, 0, NULL));
+		SetShape (NewtonCreateCylinder (world->GetNewton(), radio0, radio1, height, 0, NULL));
 	}
 
 	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
@@ -338,27 +315,6 @@ class dNewtonCollisionCylinder: public dNewtonCollision
 	}
 };
 
-
-class dNewtonCollisionTaperedCylinder: public dNewtonCollision
-{
-	public: 
-	CNEWTON_API dNewtonCollisionTaperedCylinder (dNewton* const world, dFloat radio0, dFloat radio1, dFloat height, dLong collisionMask)
-		:dNewtonCollision(m_taperedCyinder, collisionMask)
-	{
-		SetShape (NewtonCreateTaperedCylinder(world->GetNewton(), radio0, radio1, height, 0, NULL));
-	}
-
-	CNEWTON_API dNewtonCollision* Clone(NewtonCollision* const shape) const 
-	{
-		return new dNewtonCollisionTaperedCylinder (*this, shape);
-	}
-
-	protected:
-	CNEWTON_API dNewtonCollisionTaperedCylinder (const dNewtonCollisionTaperedCylinder& srcCollision, NewtonCollision* const shape)
-		:dNewtonCollision (srcCollision, shape)
-	{
-	}
-};
 
 
 class dNewtonCollisionChamferedCylinder: public dNewtonCollision
