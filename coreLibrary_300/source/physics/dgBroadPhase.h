@@ -384,9 +384,14 @@ class dgBroadPhase
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	bool m_recursiveChunks;
 
+	DG_INLINE dgVector ReduceLine(dgVector* const simplex, dgInt32& indexOut) const;
+	DG_INLINE dgVector ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const;
+	DG_INLINE dgVector ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const;
+
 	static dgVector m_velocTol;
 	static dgVector m_linearContactError2;
 	static dgVector m_angularContactError2;
+	static dgInt32 m_obbTestSimplex[4][4];
 
 	friend class dgBody;
 	friend class dgWorld;

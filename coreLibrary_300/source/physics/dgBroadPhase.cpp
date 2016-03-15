@@ -47,6 +47,15 @@ dgVector dgBroadPhaseNode::m_broadPhaseScale (DG_BROADPHASE_AABB_SCALE, DG_BROAD
 dgVector dgBroadPhaseNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, dgFloat32 (0.0f));
 
 
+dgInt32 dgBroadPhase::m_obbTestSimplex[4][4] =
+{
+	{ 0, 1, 2, 3 },
+	{ 0, 2, 3, 1 },
+	{ 2, 1, 3, 0 },
+	{ 1, 0, 3, 2 },
+};
+
+
 class dgBroadPhase::dgSpliteInfo
 {
 	public:
@@ -1017,6 +1026,166 @@ void dgBroadPhase::RotateRight (dgBroadPhaseTreeNode* const node, dgBroadPhaseNo
 }
 
 
+DG_INLINE dgVector dgBroadPhase::ReduceLine(dgVector* const simplex, dgInt32& indexOut) const
+{
+	const dgVector& p0 = simplex[0];
+	const dgVector& p1 = simplex[1];
+	dgVector dp(p1 - p0);
+	dgVector v;
+
+	dgAssert(dp.m_w == dgFloat32(0.0f));
+	dgFloat32 mag2 = dp.DotProduct4(dp).GetScalar();
+	if (mag2 < dgFloat32(1.0e-24f)) {
+		v = p0;
+		indexOut = 1;
+	} else {
+		dgFloat32 alpha0 = -p0.DotProduct4(dp).GetScalar();
+		if (alpha0 > mag2) {
+			v = p1;
+			indexOut = 1;
+			simplex[0] = simplex[1];
+		} else if (alpha0 < dgFloat32(0.0f)) {
+			v = p0;
+			indexOut = 1;
+		} else {
+			v = p0 + dp.Scale4(alpha0 / mag2);
+		}
+	}
+	return v;
+}
+
+DG_INLINE dgVector dgBroadPhase::ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const
+{
+	dgVector e10(simplex[1] - simplex[0]);
+	dgVector e20(simplex[2] - simplex[0]);
+	dgVector normal(e10 * e20);
+	dgAssert(normal.m_w == dgFloat32(0.0f));
+	if (normal.DotProduct4(normal).GetScalar() > dgFloat32(1.0e-14f)) {
+		dgInt32 i0 = 2;
+		dgInt32 minIndex = -1;
+		for (dgInt32 i1 = 0; i1 < 3; i1++) {
+			const dgVector& p1p0 = simplex[i0];
+			const dgVector& p2p0 = simplex[i1];
+
+			dgFloat32 volume = normal.DotProduct4(p1p0 * p2p0).GetScalar();
+			if (volume < dgFloat32(0.0f)) {
+				dgVector segment(simplex[i1] - simplex[i0]);
+				dgAssert(segment.m_w == dgFloat32(0.0f));
+				dgVector poinP0(simplex[i0].CompProduct4(dgVector::m_negOne));
+				dgFloat32 den = segment.DotProduct4(segment).GetScalar();
+				dgAssert(den > dgFloat32(0.0f));
+				dgFloat32 num = poinP0.DotProduct4(segment).GetScalar();
+				if (num < dgFloat32(0.0f)) {
+					minIndex = i0;
+				} else if (num > den) {
+					minIndex = i1;
+				} else {
+					indexOut = 2;
+					dgVector tmp0(simplex[i0]);
+					dgVector tmp1(simplex[i1]);
+					simplex[0] = tmp0;
+					simplex[1] = tmp1;
+					return simplex[0] + segment.Scale4(num / den);
+				}
+			}
+			i0 = i1;
+		}
+		if (minIndex != -1) {
+			indexOut = 1;
+			simplex[0] = simplex[minIndex];
+			return simplex[0];
+		} else {
+			indexOut = 3;
+			return normal.Scale4(normal.DotProduct4(simplex[0]).GetScalar() / normal.DotProduct4(normal).GetScalar());
+		}
+	} else {
+		indexOut = 2;
+		dgAssert (0);
+//		ReduceDegeneratedTriangle();
+		return ReduceLine(simplex, indexOut);
+	}
+}
+
+
+DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const
+{
+	dgInt32 i0 = m_obbTestSimplex[0][0];
+	dgInt32 i1 = m_obbTestSimplex[0][1];
+	dgInt32 i2 = m_obbTestSimplex[0][2];
+	dgInt32 i3 = m_obbTestSimplex[0][3];
+	const dgVector& p0 = simplex[i0];
+	const dgVector& p1 = simplex[i1];
+	const dgVector& p2 = simplex[i2];
+	const dgVector& p3 = simplex[i3];
+
+	dgVector p10(p1 - p0);
+	dgVector p20(p2 - p0);
+	dgVector p30(p3 - p0);
+	dgVector n(p10 * p20);
+	dgAssert(n.m_w == dgFloat32(0.0f));
+	//dgFloat32 volume = p30 % n;
+	dgFloat32 volume = n.DotProduct4(p30).GetScalar();
+	if (volume < dgFloat32(0.0f)) {
+		volume = -volume;
+		dgSwap(simplex[i2], simplex[i3]);
+	}
+	if (volume < dgFloat32(1.0e-8f)) {
+		dgTrace(("very import to finish this\n"));
+		//		dgAssert (0);
+	}
+
+	dgInt32 faceIndex = -1;
+	dgFloat32 minDist = dgFloat32(dgFloat32(0.0f));
+	const dgVector origin(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	for (dgInt32 i = 0; i < 4; i++) {
+		dgInt32 i0 = m_obbTestSimplex[i][0];
+		dgInt32 i1 = m_obbTestSimplex[i][1];
+		dgInt32 i2 = m_obbTestSimplex[i][2];
+
+		const dgVector& p0 = simplex[i0];
+		const dgVector& p1 = simplex[i1];
+		const dgVector& p2 = simplex[i2];
+
+		dgVector p10(p1 - p0);
+		dgVector p20(p2 - p0);
+		dgVector normal(p10 * p20);
+		dgAssert(normal.m_w == dgFloat32(0.0f));
+
+		dgVector normalDot4(normal.DotProduct4(normal));
+		dgAssert(normalDot4.GetScalar() > dgFloat32(0.0f));
+		if (normalDot4.GetScalar() > dgFloat32(1.0e-24f)) {
+			normal = normal.CompProduct4(normalDot4.InvSqrt());
+			dgFloat32 dist = normal.DotProduct4(origin - p0).GetScalar();
+			if (dist <= minDist) {
+				minDist = dist;
+				faceIndex = i;
+			}
+		}
+	}
+
+	if (faceIndex != -1) {
+		dgVector tmp[3];
+		dgInt32 i0 = m_obbTestSimplex[faceIndex][0];
+		dgInt32 i1 = m_obbTestSimplex[faceIndex][1];
+		dgInt32 i2 = m_obbTestSimplex[faceIndex][2];
+
+		tmp[0] = simplex[i0];
+		tmp[1] = simplex[i1];
+		tmp[2] = simplex[i2];
+		simplex[0] = tmp[0];
+		simplex[1] = tmp[1];
+		simplex[2] = tmp[2];
+
+		indexOut = 3;
+		return ReduceTriangle(simplex, indexOut);
+	}
+
+	indexOut = 4;
+	return origin;
+}
+
+
+
 bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
@@ -1050,12 +1219,14 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 		instance0->CalcObb (origin0, obb0);
 		instance1->CalcObb (origin1, obb1);
 
+		obb0 -= dgCollisionInstance::m_padding;
+		obb1 -= dgCollisionInstance::m_padding;
+
 		dgAssert (origin0.m_w == dgFloat32 (0.0f));
 		dgAssert (origin1.m_w == dgFloat32 (0.0f));
 		dgMatrix matrix (instance1->GetGlobalMatrix() * instance0->GetGlobalMatrix().Inverse());
 		matrix.m_posit = matrix.TransformVector (origin1) - origin0;
-
-matrix.m_posit = dgVector (0.0f, 2.0f, 0.0f, 0.0f);
+//matrix.m_posit = dgVector (0.0f, 2.0f, 0.0f, 0.0f);
 
 		dgVector dir0 (matrix.m_posit & dgVector::m_triplexMask); 
 		dgFloat32 mag2 = dir0.DotProduct4 (dir0).GetScalar();
@@ -1075,41 +1246,33 @@ matrix.m_posit = dgVector (0.0f, 2.0f, 0.0f, 0.0f);
 
 		dgVector dir1 (matrix.UnrotateVector(dir0.CompProduct4 (dgVector::m_negOne)));
 		dgVector mask1 (dir1 > dgVector::m_zero);
-		dgVector q (matrix.TransformVector (dgVector ((obb1 & mask1) | (negObb1.AndNot (mask1)))));
+		dgVector q (matrix.TransformVector (dgVector ((obb1 & mask1) | (negObb1.AndNot (mask1)))) & dgVector::m_triplexMask);
 
 		simplex[0] = p - q;
 		dgVector v (simplex[0]);
 
 		dgInt32 iter = 0;
 		dgInt32 index = 1;
-		dgInt32 cycling = 0;
 		dgFloat32 minDist = dgFloat32(1.0e20f);
 		do {
 			dgFloat32 dist = v % v;
 			if (dist < dgFloat32(1.0e-9f)) {
-		//		ret = true;
+				minDist = dist;
 				break;
 			}
 
 			if (dist < minDist) {
 				minDist = dist;
-				cycling = -1;
-			}
-			cycling++;
-			if (cycling > 4) {
-	//			ret = true;
-				break;
 			}
 
 			dgVector dir0(v.Scale4(-dgRsqrt(dist)));
-//			SupportVertex(dir, index);
 
 			dgVector mask0 (dir0 > dgVector::m_zero);
 			dgVector p ((obb0 & mask0) | (negObb0.AndNot (mask0)));
 
 			dgVector dir1 (matrix.UnrotateVector(dir0.CompProduct4 (dgVector::m_negOne)));
 			dgVector mask1 (dir1 > dgVector::m_zero);
-			dgVector q (matrix.TransformVector (dgVector ((obb1 & mask1) | (negObb1.AndNot (mask1)))));
+			dgVector q (matrix.TransformVector (dgVector ((obb1 & mask1) | (negObb1.AndNot (mask1)))) & dgVector::m_triplexMask);
 
 			simplex[index] = p - q;
 			const dgVector& w = simplex[index];
@@ -1118,8 +1281,7 @@ matrix.m_posit = dgVector (0.0f, 2.0f, 0.0f, 0.0f);
 			dist = dir0.DotProduct4(wv).GetScalar();
 
 			if (dist < dgFloat32(1.0e-3f)) {
-//				m_normal = dir;
-//				ret = false;
+				minDist = dist;
 				break;
 			}
 
@@ -1128,22 +1290,19 @@ matrix.m_posit = dgVector (0.0f, 2.0f, 0.0f, 0.0f);
 			{
 				case 2:
 				{
-					dgAssert (0);
-//					v = ReduceLine(index);
+					v = ReduceLine(simplex, index);
 					break;
 				}
 
 				case 3:
 				{
-					dgAssert (0);
-//					v = ReduceTriangle(index);
+					v = ReduceTriangle(simplex, index);
 					break;
 				}
 
 				case 4:
 				{
-					dgAssert (0);
-//					v = ReduceTetrahedrum(index);
+					v = ReduceTetrahedrum(simplex, index);
 					break;
 				}
 			}
@@ -1168,7 +1327,11 @@ matrix.m_posit = dgVector (0.0f, 2.0f, 0.0f, 0.0f);
 			dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
 			ret = (distance < dgFloat32 (1.0f));
 		} else {
-			ret = dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
+			ret = dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
+//			bool ret1 = dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
+//			bool ret0 = minDist < dgFloat32(1.0e-3f);
+//			dgAssert (ret0 == ret1);
+//			ret = minDist < dgFloat32(1.0e-3f);
 		}
 	}
 	return ret;
