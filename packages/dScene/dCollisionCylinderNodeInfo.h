@@ -32,10 +32,11 @@ class dCollisionCylinderNodeInfo: public dCollisionNodeInfo
 	dCollisionCylinderNodeInfo(NewtonCollision* const cylinder);
 	virtual ~dCollisionCylinderNodeInfo(void);
 
-	virtual void SetRadius (dFloat radius);
+	virtual void SetRadius (dFloat radius0, dFloat radius1);
 	virtual void SetHeight (dFloat height);
 
-	virtual dFloat GetRadius () const;
+	virtual dFloat GetRadius0 () const;
+	virtual dFloat GetRadius1 () const;
 	virtual dFloat GetHeight () const;
 
 
@@ -50,7 +51,8 @@ class dCollisionCylinderNodeInfo: public dCollisionNodeInfo
 	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
 	NewtonCollision* CreateNewtonCollision (NewtonWorld* const world, dScene* const scene, dScene::dTreeNode* const myNode) const;
 
-	dFloat m_radius;
+	dFloat m_radius0;
+	dFloat m_radius1;
 	dFloat m_height;
 };
 

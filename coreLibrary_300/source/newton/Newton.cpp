@@ -2473,15 +2473,15 @@ NewtonCollision* NewtonCreateCapsule(const NewtonWorld* const newtonWorld, dFloa
 // 
 // Return: Pointer to the box
 //
-NewtonCollision* NewtonCreateCylinder(const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix)
+NewtonCollision* NewtonCreateCylinder(const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgMatrix matrix (dgGetIdentityMatrix());
+	dgMatrix matrix(dgGetIdentityMatrix());
 	if (offsetMatrix) {
-		 matrix = dgMatrix (offsetMatrix);
+		matrix = dgMatrix(offsetMatrix);
 	}
-	return (NewtonCollision*) world->CreateCylinder (radius, height, shapeID, matrix);
+	return (NewtonCollision*)world->CreateCylinder(radio0, radio1, height, shapeID, matrix);
 }
 
 
@@ -2520,16 +2520,6 @@ NewtonCollision* NewtonCreateTaperedCapsule(const NewtonWorld* const newtonWorld
 }
 
 
-NewtonCollision* NewtonCreateTaperedCylinder(const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	dgMatrix matrix (dgGetIdentityMatrix());
-	if (offsetMatrix) {
-		matrix = dgMatrix (offsetMatrix);
-	}
-	return (NewtonCollision*) world->CreateTaperedCylinder (radio0, radio1, height, shapeID, matrix);
-}
 
 
 // Name: NewtonCreateConvexHull 

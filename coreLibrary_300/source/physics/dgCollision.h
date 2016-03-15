@@ -47,7 +47,6 @@ enum dgCollisionID
 	m_chamferCylinderCollision,
 	m_taperedCapsuleCollision,
 	m_cylinderCollision,
-	m_taperedCylinderCollision,
 	m_boxCollision,
 	m_coneCollision,
 	m_convexHullCollision,

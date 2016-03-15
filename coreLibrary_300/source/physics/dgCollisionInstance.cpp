@@ -36,7 +36,6 @@
 #include "dgCollisionHeightField.h"
 #include "dgCollisionConvexPolygon.h"
 #include "dgCollisionTaperedCapsule.h"
-#include "dgCollisionTaperedCylinder.h"
 #include "dgCollisionChamferCylinder.h"
 #include "dgCollisionCompoundFractured.h"
 #include "dgCollisionDeformableSolidMesh.h"
@@ -271,14 +270,6 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_chamferCylinderCollision:
 				{
 					collision = new (allocator) dgCollisionChamferCylinder (world, deserialization, userData, revisionNumber);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
-					collision->AddRef();
-					break;
-				}
-
-				case m_taperedCylinderCollision:
-				{
-					collision = new (allocator) dgCollisionTaperedCylinder (world, deserialization, userData, revisionNumber);
 					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;

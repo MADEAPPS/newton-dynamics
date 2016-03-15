@@ -35,7 +35,6 @@
 #include "dgCollisionScene.h"
 #include "dgCollisionSphere.h"
 #include "dgCollisionCapsule.h"
-#include "dgCollisionCylinder.h"
 #include "dgCollisionCompound.h"
 #include "dgCollisionUserMesh.h"
 #include "dgCollisionInstance.h"
@@ -46,7 +45,7 @@
 #include "dgCollisionConvexPolygon.h"
 #include "dgCollisionDeformableMesh.h"
 #include "dgCollisionTaperedCapsule.h"
-#include "dgCollisionTaperedCylinder.h"
+#include "dgCollisionCylinder.h"
 #include "dgCollisionChamferCylinder.h"
 #include "dgCollisionCompoundFractured.h"
 #include "dgCollisionDeformableSolidMesh.h"
@@ -122,17 +121,6 @@ dgCollisionInstance* dgWorld::CreateCapsule (dgFloat32 radius, dgFloat32 height,
 	return CreateInstance (node->GetInfo(), shapeID, offsetMatrix);
 }
 
-dgCollisionInstance* dgWorld::CreateCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
-{
-	dgUnsigned32 crc = dgCollisionCylinder::CalculateSignature(dgAbsf (radius), dgAbsf (height) * dgFloat32 (0.5f));
-	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
-	if (!node) {
-		dgCollision* const collision = new (m_allocator) dgCollisionCylinder (m_allocator, crc, radius, height);
-		node = dgBodyCollisionList::Insert (collision, crc);
-	}
-	return CreateInstance (node->GetInfo(), shapeID, offsetMatrix);
-}
-
 
 dgCollisionInstance* dgWorld::CreateTaperedCapsule (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
@@ -147,13 +135,13 @@ dgCollisionInstance* dgWorld::CreateTaperedCapsule (dgFloat32 radio0, dgFloat32 
 }
 
 
-dgCollisionInstance* dgWorld::CreateTaperedCylinder (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
+dgCollisionInstance* dgWorld::CreateCylinder (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgUnsigned32 crc = dgCollisionTaperedCylinder::CalculateSignature(dgAbsf (radio0), dgAbsf (radio1), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned32 crc = dgCollisionCylinder::CalculateSignature(dgAbsf (radio0), dgAbsf (radio1), dgAbsf (height) * dgFloat32 (0.5f));
 
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
-		dgCollision* collision = new  (m_allocator) dgCollisionTaperedCylinder (m_allocator, crc, radio0, radio1, height);
+		dgCollision* collision = new  (m_allocator) dgCollisionCylinder (m_allocator, crc, radio0, radio1, height);
 		node = dgBodyCollisionList::Insert (collision, crc);
 	}
 	return CreateInstance (node->GetInfo(), shapeID, offsetMatrix);

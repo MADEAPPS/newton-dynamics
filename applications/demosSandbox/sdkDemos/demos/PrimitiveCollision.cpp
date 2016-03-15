@@ -152,7 +152,7 @@ void PrimitiveCollision (DemoEntityManager* const scene)
 	AddSinglePrimitive (scene,  -4.0f, _CYLINDER_PRIMITIVE, materialID);
 	AddSinglePrimitive (scene,  -2.0f, _CONE_PRIMITIVE, materialID);
 	AddSinglePrimitive (scene,  -0.0f, _TAPERED_CAPSULE_PRIMITIVE, materialID);
-	AddSinglePrimitive (scene,   2.0f, _TAPERED_CYLINDER_PRIMITIVE, materialID);
+//	AddSinglePrimitive (scene,   2.0f, _TAPERED_CYLINDER_PRIMITIVE, materialID);
 	AddSinglePrimitive (scene,   4.0f, _CHAMFER_CYLINDER_PRIMITIVE, materialID);
 	AddSinglePrimitive (scene,   6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, materialID);
 	AddSinglePrimitive (scene,   8.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, materialID);

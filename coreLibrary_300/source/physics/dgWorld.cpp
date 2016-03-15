@@ -33,7 +33,6 @@
 #include "dgCollisionSphere.h"
 #include "dgCollisionCapsule.h"
 #include "dgBroadPhaseDefault.h"
-#include "dgCollisionCylinder.h"
 #include "dgCollisionInstance.h"
 #include "dgCollisionCompound.h"
 #include "dgWorldDynamicUpdate.h"

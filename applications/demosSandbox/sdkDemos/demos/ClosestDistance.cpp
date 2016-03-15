@@ -222,7 +222,7 @@ void ClosestDistance (DemoEntityManager* const scene)
 	castManager->AddPrimitives (count, dVector ( 10, 0, 10), _CHAMFER_CYLINDER_PRIMITIVE, materialID, castinShapeType);
 	castManager->AddPrimitives (count, dVector (- 4, 0, -4), _CONE_PRIMITIVE, materialID, castinShapeType);
 	castManager->AddPrimitives (count, dVector (- 6, 0, -6), _TAPERED_CAPSULE_PRIMITIVE, materialID, castinShapeType);
-	castManager->AddPrimitives (count, dVector (- 8, 0, -8), _TAPERED_CYLINDER_PRIMITIVE, materialID, castinShapeType);
+//	castManager->AddPrimitives (count, dVector (- 8, 0, -8), _TAPERED_CYLINDER_PRIMITIVE, materialID, castinShapeType);
 	castManager->AddPrimitives (count, dVector (-10, 0, -10), _REGULAR_CONVEX_HULL_PRIMITIVE, materialID, castinShapeType);
 	castManager->AddPrimitives (count, dVector (-12, 0, -12), _COMPOUND_CONVEX_CRUZ_PRIMITIVE, materialID, castinShapeType);
 

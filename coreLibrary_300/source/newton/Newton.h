@@ -89,19 +89,18 @@ extern "C" {
 	#define SERIALIZE_ID_CHAMFERCYLINDER					2
 	#define SERIALIZE_ID_TAPEREDCAPSULE						3
 	#define SERIALIZE_ID_CYLINDER							4
-	#define SERIALIZE_ID_TAPEREDCYLINDER					5
-	#define SERIALIZE_ID_BOX								6	
-	#define SERIALIZE_ID_CONE								7
-	#define SERIALIZE_ID_CONVEXHULL							8
-	#define SERIALIZE_ID_NULL								9
-	#define SERIALIZE_ID_COMPOUND							10
-	#define SERIALIZE_ID_TREE								11
-	#define SERIALIZE_ID_HEIGHTFIELD						12
-	#define SERIALIZE_ID_CLOTH_PATCH						13
-	#define SERIALIZE_ID_DEFORMABLE_SOLID					14
-	#define SERIALIZE_ID_USERMESH							15
-	#define SERIALIZE_ID_SCENE								16
-	#define SERIALIZE_ID_FRACTURED_COMPOUND					17
+	#define SERIALIZE_ID_BOX								5	
+	#define SERIALIZE_ID_CONE								6
+	#define SERIALIZE_ID_CONVEXHULL							7
+	#define SERIALIZE_ID_NULL								8
+	#define SERIALIZE_ID_COMPOUND							9
+	#define SERIALIZE_ID_TREE								10
+	#define SERIALIZE_ID_HEIGHTFIELD						11
+	#define SERIALIZE_ID_CLOTH_PATCH						12
+	#define SERIALIZE_ID_DEFORMABLE_SOLID					13
+	#define SERIALIZE_ID_USERMESH							14
+	#define SERIALIZE_ID_SCENE								15
+	#define SERIALIZE_ID_FRACTURED_COMPOUND					16
 
 #ifdef __cplusplus
 	class NewtonMesh;
@@ -138,17 +137,19 @@ extern "C" {
 		dFloat m_radio;
 	} NewtonSphereParam;
 
-	typedef struct NewtonCylinderParam
-	{
-		dFloat m_radio;
-		dFloat m_height;
-	} NewtonCylinderParam;
 
 	typedef struct NewtonCapsuleParam
 	{
 		dFloat m_radio;
 		dFloat m_height;
 	} NewtonCapsuleParam;
+
+	typedef struct NewtonCylinderParam
+	{
+		dFloat m_radio0;
+		dFloat m_radio1;
+		dFloat m_height;
+	} NewtonCylinderParam;
 
 	typedef struct NewtonConeParam
 	{
@@ -163,13 +164,6 @@ extern "C" {
 		dFloat m_height;
 	} NewtonTaperedCapsuleParam;
 
-
-	typedef struct NewtonTaperedCylinderParam
-	{
-		dFloat m_radio0;
-		dFloat m_radio1;
-		dFloat m_height;
-	} NewtonTaperedCylinderParam;
 
 	typedef struct NewtonChamferCylinderParam
 	{
@@ -237,7 +231,6 @@ extern "C" {
 			NewtonCapsuleParam m_capsule;
 			NewtonCylinderParam m_cylinder;
 			NewtonTaperedCapsuleParam m_taperedCapsule;
-			NewtonTaperedCylinderParam m_taperedCylinder;
 			NewtonChamferCylinderParam m_chamferCylinder;
 			NewtonConvexHullParam m_convexHull;
 			NewtonDeformableMeshParam m_deformableMesh;
@@ -626,9 +619,8 @@ extern "C" {
 	NEWTON_API NewtonCollision* NewtonCreateBox (const NewtonWorld* const newtonWorld, dFloat dx, dFloat dy, dFloat dz, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateCone (const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateCapsule (const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix);
-	NEWTON_API NewtonCollision* NewtonCreateCylinder (const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix);
+	NEWTON_API NewtonCollision* NewtonCreateCylinder (const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateTaperedCapsule (const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix);
-	NEWTON_API NewtonCollision* NewtonCreateTaperedCylinder (const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateChamferCylinder (const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateConvexHull (const NewtonWorld* const newtonWorld, int count, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateConvexHullFromMesh (const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, dFloat tolerance, int shapeID);

@@ -161,7 +161,7 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 
 			case 2:
 			{
-				collision = NewtonCreateTaperedCylinder(world, 0.25, 0.5, 0.25, 0, &matrix[0][0]) ;
+				collision = NewtonCreateCylinder(world, 0.25, 0.5, 0.25, 0, &matrix[0][0]) ;
 				break; 
 			}
 

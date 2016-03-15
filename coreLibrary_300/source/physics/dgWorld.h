@@ -272,11 +272,11 @@ class dgWorld
 	dgCollisionInstance* CreateSphere (dgFloat32 radiusdg, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateCone (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateCapsule (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
-	dgCollisionInstance* CreateCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
+	dgCollisionInstance* CreateCylinder (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateBox (dgFloat32 dx, dgFloat32 dy, dgFloat32 dz, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateConvexHull (dgInt32 count, const dgFloat32* const points, dgInt32 strideInBytes, dgFloat32 thickness, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateTaperedCapsule (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
-	dgCollisionInstance* CreateTaperedCylinder (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
+	
 	dgCollisionInstance* CreateChamferCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateCompound ();
 	dgCollisionInstance* CreateFracturedCompound (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix,
