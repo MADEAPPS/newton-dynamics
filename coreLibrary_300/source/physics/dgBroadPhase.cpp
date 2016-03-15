@@ -1309,7 +1309,7 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 			iter++;
 		} while (iter < 8);
 
-
+		dgFloat32 dist = v.DotProduct4 (v).GetScalar(); 
 		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 			dgVector box0_p0;
 			dgVector box0_p1;
@@ -1327,11 +1327,11 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 			dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
 			ret = (distance < dgFloat32 (1.0f));
 		} else {
-			ret = dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
+//			ret = dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
 //			bool ret1 = dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
 //			bool ret0 = minDist < dgFloat32(1.0e-3f);
 //			dgAssert (ret0 == ret1);
-//			ret = minDist < dgFloat32(1.0e-3f);
+			ret = dist < dgFloat32(1.0e-3f * 1.0e-3f);
 		}
 	}
 	return ret;
