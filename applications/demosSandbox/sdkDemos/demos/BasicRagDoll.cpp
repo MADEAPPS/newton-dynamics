@@ -167,7 +167,7 @@ class PassiveRagDollManager: public CustomArticulaledTransformManager
 		matrix.m_posit.m_x = definition.m_shape_x;
 		matrix.m_posit.m_y = definition.m_shape_y;
 		matrix.m_posit.m_z = definition.m_shape_z;
-		return NewtonCreateCapsule (GetWorld(), definition.m_radio, definition.m_height, 0, &matrix[0][0]);
+		return NewtonCreateCapsule (GetWorld(), definition.m_radio, definition.m_radio, definition.m_height, 0, &matrix[0][0]);
 	}
 
 	NewtonCollision* MakeBox(DemoEntity* const bodyPart) const

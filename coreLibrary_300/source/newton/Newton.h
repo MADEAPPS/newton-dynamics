@@ -86,21 +86,20 @@ extern "C" {
 
 	#define SERIALIZE_ID_SPHERE								0
 	#define SERIALIZE_ID_CAPSULE							1
-	#define SERIALIZE_ID_CHAMFERCYLINDER					2
-	#define SERIALIZE_ID_TAPEREDCAPSULE						3
-	#define SERIALIZE_ID_CYLINDER							4
-	#define SERIALIZE_ID_BOX								5	
-	#define SERIALIZE_ID_CONE								6
-	#define SERIALIZE_ID_CONVEXHULL							7
-	#define SERIALIZE_ID_NULL								8
-	#define SERIALIZE_ID_COMPOUND							9
-	#define SERIALIZE_ID_TREE								10
-	#define SERIALIZE_ID_HEIGHTFIELD						11
-	#define SERIALIZE_ID_CLOTH_PATCH						12
-	#define SERIALIZE_ID_DEFORMABLE_SOLID					13
-	#define SERIALIZE_ID_USERMESH							14
-	#define SERIALIZE_ID_SCENE								15
-	#define SERIALIZE_ID_FRACTURED_COMPOUND					16
+	#define SERIALIZE_ID_CYLINDER							2
+	#define SERIALIZE_ID_CHAMFERCYLINDER					3
+	#define SERIALIZE_ID_BOX								4	
+	#define SERIALIZE_ID_CONE								5
+	#define SERIALIZE_ID_CONVEXHULL							6
+	#define SERIALIZE_ID_NULL								7
+	#define SERIALIZE_ID_COMPOUND							8
+	#define SERIALIZE_ID_TREE								9
+	#define SERIALIZE_ID_HEIGHTFIELD						10
+	#define SERIALIZE_ID_CLOTH_PATCH						11
+	#define SERIALIZE_ID_DEFORMABLE_SOLID					12
+	#define SERIALIZE_ID_USERMESH							13
+	#define SERIALIZE_ID_SCENE								14
+	#define SERIALIZE_ID_FRACTURED_COMPOUND					15
 
 #ifdef __cplusplus
 	class NewtonMesh;
@@ -140,7 +139,8 @@ extern "C" {
 
 	typedef struct NewtonCapsuleParam
 	{
-		dFloat m_radio;
+		dFloat m_radio0;
+		dFloat m_radio1;
 		dFloat m_height;
 	} NewtonCapsuleParam;
 
@@ -156,14 +156,6 @@ extern "C" {
 		dFloat m_radio;
 		dFloat m_height;
 	} NewtonConeParam;
-
-	typedef struct NewtonTaperedCapsuleParam
-	{
-		dFloat m_radio0;
-		dFloat m_radio1;
-		dFloat m_height;
-	} NewtonTaperedCapsuleParam;
-
 
 	typedef struct NewtonChamferCylinderParam
 	{
@@ -230,7 +222,6 @@ extern "C" {
 			NewtonSphereParam m_sphere;
 			NewtonCapsuleParam m_capsule;
 			NewtonCylinderParam m_cylinder;
-			NewtonTaperedCapsuleParam m_taperedCapsule;
 			NewtonChamferCylinderParam m_chamferCylinder;
 			NewtonConvexHullParam m_convexHull;
 			NewtonDeformableMeshParam m_deformableMesh;
@@ -618,9 +609,8 @@ extern "C" {
 	NEWTON_API NewtonCollision* NewtonCreateSphere (const NewtonWorld* const newtonWorld, dFloat radius, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateBox (const NewtonWorld* const newtonWorld, dFloat dx, dFloat dy, dFloat dz, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateCone (const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix);
-	NEWTON_API NewtonCollision* NewtonCreateCapsule (const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix);
+	NEWTON_API NewtonCollision* NewtonCreateCapsule (const NewtonWorld* const newtonWorld, dFloat radius0, dFloat radius1, dFloat height, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateCylinder (const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix);
-	NEWTON_API NewtonCollision* NewtonCreateTaperedCapsule (const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateChamferCylinder (const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateConvexHull (const NewtonWorld* const newtonWorld, int count, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance, int shapeID, const dFloat* const offsetMatrix);
 	NEWTON_API NewtonCollision* NewtonCreateConvexHullFromMesh (const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, dFloat tolerance, int shapeID);

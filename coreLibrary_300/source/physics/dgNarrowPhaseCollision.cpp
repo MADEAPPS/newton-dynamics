@@ -34,7 +34,6 @@
 #include "dgBodyMasterList.h"
 #include "dgCollisionScene.h"
 #include "dgCollisionSphere.h"
-#include "dgCollisionCapsule.h"
 #include "dgCollisionCompound.h"
 #include "dgCollisionUserMesh.h"
 #include "dgCollisionInstance.h"
@@ -44,7 +43,7 @@
 #include "dgCollisionHeightField.h"
 #include "dgCollisionConvexPolygon.h"
 #include "dgCollisionDeformableMesh.h"
-#include "dgCollisionTaperedCapsule.h"
+#include "dgCollisionCapsule.h"
 #include "dgCollisionCylinder.h"
 #include "dgCollisionChamferCylinder.h"
 #include "dgCollisionCompoundFractured.h"
@@ -97,38 +96,14 @@ dgCollisionInstance* dgWorld::CreateBox(dgFloat32 dx, dgFloat32 dy, dgFloat32 dz
 }
 
 
-dgCollisionInstance* dgWorld::CreateCapsule (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
+
+dgCollisionInstance* dgWorld::CreateCapsule (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	//dgUnsigned32 crc = dgCollisionCapsule::CalculateSignature(dgAbsf (radius), dgMax (dgFloat32(0.01f), dgAbsf (height * dgFloat32 (0.5f)) - dgAbsf (radius)));  
-	//dgUnsigned32 pinNumber = dgCollisionCapsule::CalculateSignature(dgMax (dgFloat32(0.01f), dgAbsf (height * dgFloat32 (0.5f)) - dgAbsf (radius)), dgAbsf (radius));  
-	dgUnsigned32 crc = dgCollisionCapsule::CalculateSignature (dgAbsf (radius), dgAbsf (height * dgFloat32 (0.5f)));  
-
-	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
-
-/*
-	if (node && (node->GetInfo().m_pinNumber != pinNumber)) {
-		// shape was found but it is a CRC collision simple single out this shape as a unique entry in the cache
-		dgTrace (("we have a CRC collision simple single out this shape as a unique entry in the cache\n"));
-		dgCollision* const collision = new  (m_allocator) dgCollisionCapsule (m_allocator, pinNumber, radius, height);
-		node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), pinNumber);
-	}
-*/
-	if (!node) {
-		dgCollision* const collision = new  (m_allocator) dgCollisionCapsule (m_allocator, crc, radius, height);
-		node = dgBodyCollisionList::Insert (collision, crc);
-	}
-
-	return CreateInstance (node->GetInfo(), shapeID, offsetMatrix);
-}
-
-
-dgCollisionInstance* dgWorld::CreateTaperedCapsule (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix)
-{
-	dgUnsigned32 crc = dgCollisionTaperedCapsule::CalculateSignature(dgAbsf (radio0), dgAbsf (radio1), dgAbsf (height) * dgFloat32 (0.5f));
+	dgUnsigned32 crc = dgCollisionCapsule::CalculateSignature(dgAbsf (radio0), dgAbsf (radio1), dgAbsf (height) * dgFloat32 (0.5f));
 
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
 	if (!node) {
-		dgCollision* collision = new  (m_allocator) dgCollisionTaperedCapsule (m_allocator, crc, radio0, radio1, height);
+		dgCollision* collision = new  (m_allocator) dgCollisionCapsule (m_allocator, crc, radio0, radio1, height);
 		node = dgBodyCollisionList::Insert (collision, crc);
 	}
 	return CreateInstance (node->GetInfo(), shapeID, offsetMatrix);

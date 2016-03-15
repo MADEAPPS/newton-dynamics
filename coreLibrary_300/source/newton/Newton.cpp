@@ -2450,15 +2450,15 @@ NewtonCollision* NewtonCreateCone(const NewtonWorld* const newtonWorld, dFloat r
 // 
 // Remark: the capsule height must equal of larger than the sum of the cap radius. If this is not the case the height will be clamped the 2 * radius.
 //
-NewtonCollision* NewtonCreateCapsule(const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix)
+NewtonCollision* NewtonCreateCapsule(const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgMatrix matrix (dgGetIdentityMatrix());
+	dgMatrix matrix(dgGetIdentityMatrix());
 	if (offsetMatrix) {
-		 matrix = dgMatrix (offsetMatrix);
+		matrix = dgMatrix(offsetMatrix);
 	}
-	return (NewtonCollision*) world->CreateCapsule (radius, height, shapeID, matrix);
+	return (NewtonCollision*)world->CreateCapsule(radio0, radio1, height, shapeID, matrix);
 }
 
 
@@ -2506,20 +2506,6 @@ NewtonCollision* NewtonCreateChamferCylinder(const NewtonWorld* const newtonWorl
 	}
 	return (NewtonCollision*) world->CreateChamferCylinder (radius, height, shapeID, matrix);
 }
-
-
-NewtonCollision* NewtonCreateTaperedCapsule(const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	dgMatrix matrix (dgGetIdentityMatrix());
-	if (offsetMatrix) {
-		matrix = dgMatrix (offsetMatrix);
-	}
-	return (NewtonCollision*) world->CreateTaperedCapsule (radio0, radio1, height, shapeID, matrix);
-}
-
-
 
 
 // Name: NewtonCreateConvexHull 

@@ -372,7 +372,6 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 		case SERIALIZE_ID_CONE:
 		case SERIALIZE_ID_CAPSULE:
 		case SERIALIZE_ID_CYLINDER:
-		case SERIALIZE_ID_TAPEREDCAPSULE:
 		case SERIALIZE_ID_CHAMFERCYLINDER:
 		{
 			//NewtonMeshApplySphericalMapping(mesh, LoadTexture(texture0));

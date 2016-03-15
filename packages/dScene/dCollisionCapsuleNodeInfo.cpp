@@ -26,13 +26,13 @@
 D_IMPLEMENT_CLASS_NODE(dCollisionCapsuleNodeInfo);
 
 dCollisionCapsuleNodeInfo::dCollisionCapsuleNodeInfo(dScene* const world) 
-	:dCollisionNodeInfo (), m_radius (0.5f), m_height(1.0f)
+	:dCollisionNodeInfo (), m_radius0 (0.5f), m_radius1 (0.5f), m_height(1.0f)
 {
 	SetName ("capsule collision");
 }
 
 dCollisionCapsuleNodeInfo::dCollisionCapsuleNodeInfo()
-	:dCollisionNodeInfo (), m_radius (0.5f), m_height(1.0f)
+	:dCollisionNodeInfo (), m_radius0 (0.5f), m_radius1 (0.5f), m_height(1.0f)
 {
 	SetName ("capsule collision");
 }
@@ -51,7 +51,8 @@ dCollisionCapsuleNodeInfo::dCollisionCapsuleNodeInfo(NewtonCollision* const cyli
 	dMatrix& offsetMatrix = *((dMatrix*) record.m_offsetMatrix);
 	SetName ("cylinder collision");
 
-	m_radius = record.m_capsule.m_radio;
+	m_radius0 = record.m_capsule.m_radio0;
+	m_radius1 = record.m_capsule.m_radio1;
 	m_height = record.m_capsule.m_height;
 
 	SetTransform (offsetMatrix);
@@ -61,19 +62,26 @@ dCollisionCapsuleNodeInfo::dCollisionCapsuleNodeInfo(NewtonCollision* const cyli
 }
 
 
-void dCollisionCapsuleNodeInfo::SetRadius (dFloat radius)
+void dCollisionCapsuleNodeInfo::SetRadius (dFloat radius0, dFloat radius1)
 {
-	m_radius = radius;
+	m_radius0 = radius0;
+	m_radius1 = radius1;
 }
 void dCollisionCapsuleNodeInfo::SetHeight (dFloat height)
 {
 	m_height = height;
 }
 
-dFloat dCollisionCapsuleNodeInfo::GetRadius () const
+dFloat dCollisionCapsuleNodeInfo::GetRadius0 () const
 {
-	return m_radius;
+	return m_radius0;
 }
+
+dFloat dCollisionCapsuleNodeInfo::GetRadius1() const
+{
+	return m_radius1;
+}
+
 
 dFloat dCollisionCapsuleNodeInfo::GetHeight () const
 {
@@ -90,7 +98,8 @@ void dCollisionCapsuleNodeInfo::BakeTransform (const dMatrix& transform)
 	dMatrix stretchAxis;
 	dMatrix transformMatrix;
 	transform.PolarDecomposition (transformMatrix, scale, stretchAxis);
-	m_radius *= scale.m_y;
+	m_radius0 *= scale.m_y;
+	m_radius1 *= scale.m_y;
 	m_height *= scale.m_x;
 }
 
@@ -98,7 +107,7 @@ void dCollisionCapsuleNodeInfo::BakeTransform (const dMatrix& transform)
 void dCollisionCapsuleNodeInfo::CalculateInertiaGeometry (dScene* const world, dVector& inertia, dVector& centerOfMass) const
 {
 	NewtonWorld* const newton = world->GetNewtonWorld();
-	NewtonCollision* const shape = NewtonCreateCapsule(newton, m_radius, m_height, 0, &m_matrix[0][0]);
+	NewtonCollision* const shape = NewtonCreateCapsule(newton, m_radius0, m_radius1, m_height, 0, &m_matrix[0][0]);
 	CalculateGeometryProperies (shape, inertia, centerOfMass);
 	NewtonDestroyCollision (shape);
 }
@@ -110,7 +119,8 @@ void dCollisionCapsuleNodeInfo::Serialize (TiXmlElement* const rootNode) const
 
 	TiXmlElement* const dataNode = new TiXmlElement ("size");
 	rootNode->LinkEndChild(dataNode);
-	dataNode->SetDoubleAttribute("radius", double (m_radius));
+	dataNode->SetDoubleAttribute("radius0", double (m_radius0));
+	dataNode->SetDoubleAttribute("radius1", double (m_radius1));
 	dataNode->SetDoubleAttribute("height", double (m_height));
 }
 
@@ -119,7 +129,8 @@ bool dCollisionCapsuleNodeInfo::Deserialize (const dScene* const scene, TiXmlEle
 	DeserialiseBase(scene, dCollisionNodeInfo, rootNode);
 
 	TiXmlElement* const dataNode = (TiXmlElement*) rootNode->FirstChild ("size");
-	dStringToFloatArray (dataNode->Attribute("radius"), &m_radius, 1);
+	dStringToFloatArray (dataNode->Attribute("radius0"), &m_radius0, 1);
+	dStringToFloatArray (dataNode->Attribute("radius1"), &m_radius1, 1);
 	dStringToFloatArray (dataNode->Attribute("height"), &m_height, 1);
 	return true;
 }
@@ -134,5 +145,5 @@ NewtonCollision* dCollisionCapsuleNodeInfo::CreateNewtonCollision (NewtonWorld* 
 	const dMatrix& offsetMatrix = GetTransform ();
 	
 	// create a newton collision shape from the node.
-	return NewtonCreateCapsule(world, m_radius, m_height, collisionID, &offsetMatrix[0][0]);
+	return NewtonCreateCapsule(world, m_radius0, m_radius1, m_height, collisionID, &offsetMatrix[0][0]);
 }

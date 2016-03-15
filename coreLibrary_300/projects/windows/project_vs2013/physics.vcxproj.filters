@@ -22,9 +22,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionBVH.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionCapsule.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionChamferCylinder.cpp">
       <Filter>collision</Filter>
     </ClCompile>
@@ -118,9 +115,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionInstance.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCapsule.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect5.cpp">
       <Filter>meshUtil</Filter>
     </ClCompile>
@@ -172,6 +166,9 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionCylinder.cpp">
       <Filter>collision</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCapsule.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h">
@@ -190,9 +187,6 @@
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionBVH.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionCapsule.h">
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionChamferCylinder.h">
@@ -279,9 +273,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionInstance.h">
       <Filter>collision</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCapsule.h">
-      <Filter>collision</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgBody.h">
       <Filter>bodies</Filter>
     </ClInclude>
@@ -325,6 +316,9 @@
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionCylinder.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCapsule.h">
       <Filter>collision</Filter>
     </ClInclude>
   </ItemGroup>

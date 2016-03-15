@@ -44,9 +44,8 @@ enum dgCollisionID
 	// do not change the order of these enum
 	m_sphereCollision = 0,
 	m_capsuleCollision,
-	m_chamferCylinderCollision,
-	m_taperedCapsuleCollision,
 	m_cylinderCollision,
+	m_chamferCylinderCollision,
 	m_boxCollision,
 	m_coneCollision,
 	m_convexHullCollision,

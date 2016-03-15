@@ -29,13 +29,12 @@
 #include "dgCollisionNull.h"
 #include "dgCollisionCone.h"
 #include "dgCollisionSphere.h"
-#include "dgCollisionCapsule.h"
 #include "dgCollisionCylinder.h"
 #include "dgCollisionInstance.h"
 #include "dgCollisionCompound.h"
 #include "dgCollisionHeightField.h"
 #include "dgCollisionConvexPolygon.h"
-#include "dgCollisionTaperedCapsule.h"
+#include "dgCollisionCapsule.h"
 #include "dgCollisionChamferCylinder.h"
 #include "dgCollisionCompoundFractured.h"
 #include "dgCollisionDeformableSolidMesh.h"
@@ -246,14 +245,6 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_capsuleCollision:
 				{
 					collision = new (allocator) dgCollisionCapsule (world, deserialization, userData, revisionNumber);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
-					collision->AddRef();
-					break;
-				}
-
-				case m_taperedCapsuleCollision:
-				{
-					collision = new (allocator) dgCollisionTaperedCapsule (world, deserialization, userData, revisionNumber);
 					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
