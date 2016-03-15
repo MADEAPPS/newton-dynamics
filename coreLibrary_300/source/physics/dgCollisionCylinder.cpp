@@ -119,10 +119,10 @@ void dgCollisionCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 he
 		}
 	}
 
-	m_profile[0] = dgVector( m_height,  m_radio1, 0.0f, 0.0f);
-	m_profile[1] = dgVector(-m_height,  m_radio0, 0.0f, 0.0f);
-	m_profile[2] = dgVector(-m_height, -m_radio0, 0.0f, 0.0f);
-	m_profile[3] = dgVector(m_height,  -m_radio1, 0.0f, 0.0f);
+	m_profile[0] = dgVector( m_height,  m_radio1, dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_profile[1] = dgVector(-m_height,  m_radio0, dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_profile[2] = dgVector(-m_height, -m_radio0, dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_profile[3] = dgVector(m_height,  -m_radio1, dgFloat32 (0.0f), dgFloat32 (0.0f));
 
 	m_shapeRefCount ++;
 	dgCollisionConvex::m_simplex = m_edgeArray;

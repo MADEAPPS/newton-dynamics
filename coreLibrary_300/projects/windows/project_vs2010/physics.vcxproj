@@ -714,8 +714,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionInstance.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCapsule.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCylinder.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgContact.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgContactSolver.cpp" />
@@ -794,8 +792,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionInstance.h" />
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCapsule.h" />
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCylinder.h" />
     <ClInclude Include="..\..\..\source\physics\dgConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgContact.h" />
     <ClInclude Include="..\..\..\source\physics\dgContactSolver.h" />
