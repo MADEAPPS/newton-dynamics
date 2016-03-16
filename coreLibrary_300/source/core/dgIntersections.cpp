@@ -1053,7 +1053,7 @@ dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVecto
 {
 	dgVector p0Origin (p0 - origin);
 
-	if ((p0Origin % p0Origin) < (100.0f * radius * radius)) {
+	if ((p0Origin % p0Origin) < (dgFloat32 (100.0f) * radius * radius)) {
 		dgVector dp (p1 - p0);
 		dgFloat32 a = dp % dp;
 		dgFloat32 b = dgFloat32 (2.0f) * (p0Origin % dp);
