@@ -209,8 +209,8 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	dQuaternion rot;
 	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
 //origin.m_x = -10.0f;
-origin.m_x = 20.0f;
-origin.m_y = 1.0f;
+//origin.m_x = 20.0f;
+//origin.m_y = 1.0f;
 	scene->SetCameraMatrix(rot, origin);
 
 
