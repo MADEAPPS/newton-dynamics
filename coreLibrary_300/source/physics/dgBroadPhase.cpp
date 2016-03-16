@@ -1770,6 +1770,8 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 	dgActiveContacts* const contactList = m_world;
 	dgContact** const deadContacs = dgAlloca (dgContact*, contactList->GetCount() + 256);
 
+	const dgInt32 garbageCollectingCicle = 8;
+
 	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
 		dgContact* const contact = contactNode->GetInfo();
 		if (contact->m_broadphaseLru != lru) {
@@ -1782,7 +1784,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 					deadContacs[count] = contact;
 					count ++;
 				}
-			} else if ((lru -  contact->m_broadphaseLru) > 200) {
+			} else if ((lru -  contact->m_broadphaseLru) > garbageCollectingCicle) {
 				dgVector minBox (body0->m_minAABB - body1->m_maxAABB);
 				dgVector maxBox (body0->m_maxAABB - body1->m_minAABB);
 				dgVector mask ((minBox.CompProduct4(maxBox)) > dgVector (dgFloat32 (0.0f)));
