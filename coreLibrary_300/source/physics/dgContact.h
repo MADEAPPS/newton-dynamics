@@ -194,6 +194,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	const dgContactMaterial* GetMaterial() const;
 
 	protected:
+	dgContact(dgContact* const clone);
 	dgContact(dgWorld* const world, const dgContactMaterial* const material);
 	virtual ~dgContact();
 

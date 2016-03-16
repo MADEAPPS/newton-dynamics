@@ -87,6 +87,29 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	m_constId = m_contactConstraint;
 }
 
+dgContact::dgContact(dgContact* const clone)
+	:dgConstraint(*clone), dgList<dgContactMaterial>(clone->GetAllocator())
+	,m_positAcc(clone->m_positAcc)
+	,m_rotationAcc(clone->m_rotationAcc)
+	,m_separtingVector (clone->m_separtingVector)
+	,m_closestDistance(clone->m_closestDistance)
+	,m_timeOfImpact(clone->m_timeOfImpact)
+	,m_world(clone->m_world)
+	,m_material(clone->m_material)
+	,m_contactNode(clone->m_contactNode)
+	,m_broadphaseLru(clone->m_broadphaseLru)
+	,m_isNewContact(clone->m_isNewContact)
+{
+	dgAssert((((dgUnsigned64) this) & 15) == 0);
+	m_body0 = clone->m_body0;
+	m_body1 = clone->m_body1;
+	m_maxDOF = clone->m_maxDOF;
+	m_constId = m_contactConstraint;
+	m_contactActive = clone->m_contactActive;
+	m_enableCollision = clone->m_enableCollision;
+	Merge (*clone);
+}
+
 dgContact::~dgContact()
 {
 	dgList<dgContactMaterial>::RemoveAll();
