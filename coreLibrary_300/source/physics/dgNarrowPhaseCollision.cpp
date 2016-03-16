@@ -1375,6 +1375,10 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 
 	contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct4(proxy.m_normal).GetScalar();
 
+	instance0.m_userData0 = NULL;
+	instance0.m_userData1 = NULL;
+	instance1.m_userData0 = NULL;
+	instance1.m_userData1 = NULL;
 	proxy.m_instance0 = collision0;
 	proxy.m_instance1 = collision1;
 	return 1;
@@ -1429,13 +1433,13 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 	if (!contactJoint->m_material->m_contactGeneration) {
 		dgCollisionInstance instance0(*collision0, collision0->m_childShape);
 		dgCollisionInstance instance1(*collision1, collision1->m_childShape);
+
 		proxy.m_instance0 = &instance0;
 		proxy.m_instance1 = &instance1;
 
 		dgVector origin(instance0.m_globalMatrix.m_posit & dgVector::m_triplexMask);
 		instance0.m_globalMatrix.m_posit = dgVector::m_wOne;
 		instance1.m_globalMatrix.m_posit -= origin;
-
 
 		if (contactJoint->m_isNewContact) {
 			contactJoint->m_isNewContact = false;
@@ -1468,6 +1472,10 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 			contactOut[i].m_shapeId1 = collision1->GetUserDataID();
 		}
 
+		instance0.m_userData0 = NULL;
+		instance0.m_userData1 = NULL;
+		instance1.m_userData0 = NULL;
+		instance1.m_userData1 = NULL;
 		proxy.m_instance0 = collision0;
 		proxy.m_instance1 = collision1;
 
@@ -1569,6 +1577,10 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 			contactOut[i].m_shapeId1 = collision1->GetUserDataID();
 		}
 
+		instance0.m_userData0 = NULL;
+		instance0.m_userData1 = NULL;
+		instance1.m_userData0 = NULL;
+		instance1.m_userData1 = NULL;
 		proxy.m_instance0 = collision0;
 		proxy.m_instance1 = collision1;
 
@@ -1709,6 +1721,8 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	proxy.m_contacts = contactOut;
 
 	// restore the pointer
+	polyInstance.m_userData0 = NULL;
+	polyInstance.m_userData1 = NULL;
 	proxy.m_instance1 = polySoupInstance;
 	return count;
 }
@@ -1812,6 +1826,9 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 			q = proxy.m_closestPointBody1;
 		}
 	}
+
+	polyInstance.m_userData0 = NULL;
+	polyInstance.m_userData1 = NULL;
 
 	proxy.m_normal = n;
 	proxy.m_closestPointBody0 = p;

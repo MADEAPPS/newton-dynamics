@@ -185,7 +185,7 @@ bool dgCollisionConvex::SanityCheck (dgPolyhedra& hull) const
 				dgVector p1 (m_vertex[neiborg->m_incidentVertex]);
 				dgVector dp (p1 - p0);
 				dgFloat32 project = dp % n0;
-				if (project > dgFloat32 (1.0e-12f)) {
+				if (project > dgFloat32 (1.0e-9f)) {
 					return false;
 				}
 			}

@@ -56,7 +56,7 @@ dgCollisionCapsule::~dgCollisionCapsule()
 
 void dgCollisionCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 {
-	m_rtti |= dgCollisionTaperedCapsule_RTTI;
+	m_rtti |= dgCollisionCapsule_RTTI;
 
 	radio0 = dgAbsf(radio0);
 	radio1 = dgAbsf(radio1);

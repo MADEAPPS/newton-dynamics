@@ -1026,6 +1026,23 @@ void dgBroadPhase::RotateRight (dgBroadPhaseTreeNode* const node, dgBroadPhaseNo
 }
 
 
+DG_INLINE void dgBroadPhase::ReduceDegeneratedTriangle(dgVector* const simplex) const
+{
+	dgVector e10(simplex[1] - simplex[0]);
+	if ((e10 % e10) < dgFloat32(1.0e-12f)) {
+		simplex[1] = simplex[2];
+
+#ifdef _DEBUG
+	}
+	else {
+		dgVector e21(simplex[2] - simplex[1]);
+		dgVector e20(simplex[2] - simplex[0]);
+		dgAssert(((e20 % e20) < dgFloat32(1.0e-8f)) || ((e21 % e21) < dgFloat32(1.0e-8f)));
+#endif
+	}
+}
+
+
 DG_INLINE dgVector dgBroadPhase::ReduceLine(dgVector* const simplex, dgInt32& indexOut) const
 {
 	const dgVector& p0 = simplex[0];
@@ -1100,8 +1117,7 @@ DG_INLINE dgVector dgBroadPhase::ReduceTriangle(dgVector* const simplex, dgInt32
 		}
 	} else {
 		indexOut = 2;
-		dgAssert (0);
-//		ReduceDegeneratedTriangle();
+		ReduceDegeneratedTriangle(simplex);
 		return ReduceLine(simplex, indexOut);
 	}
 }
@@ -1256,7 +1272,7 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 		dgFloat32 minDist = dgFloat32(1.0e20f);
 		do {
 			dgFloat32 dist = v % v;
-			if (dist < dgFloat32(1.0e-9f)) {
+			if (dist < dgFloat32(1.0e-7f)) {
 				minDist = dist;
 				break;
 			}

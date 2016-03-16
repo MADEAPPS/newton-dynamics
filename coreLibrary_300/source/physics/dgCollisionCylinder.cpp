@@ -54,7 +54,7 @@ dgCollisionCylinder::dgCollisionCylinder(dgWorld* const world, dgDeserialize des
 
 void dgCollisionCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 {
-	m_rtti |= dgCollisionTaperedCylinder_RTTI;
+	m_rtti |= dgCollisionCylinder_RTTI;
 	m_radio0 = dgMax (dgAbsf (radio0), dgFloat32 (2.0f) * D_CYLINDER_SKIN_THINCKNESS);
 	m_radio1 = dgMax (dgAbsf (radio1), dgFloat32 (2.0f) * D_CYLINDER_SKIN_THINCKNESS);
 	m_height = dgMax (dgAbsf (height * dgFloat32 (0.5f)), dgFloat32 (2.0f) * D_CYLINDER_SKIN_THINCKNESS);

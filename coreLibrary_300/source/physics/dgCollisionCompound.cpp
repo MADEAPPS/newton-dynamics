@@ -1552,7 +1552,6 @@ dgInt32 dgCollisionCompound::CalculateContacts (dgBroadPhase::dgPair* const pair
 }
 
 
-//dgInt32 dgCollisionCompound::ClosestDistance (dgBody* const compoundBody, dgTriplex& contactA, dgBody* const bodyB, dgTriplex& contactB, dgTriplex& normalAB) const
 dgInt32 dgCollisionCompound::ClosestDistance (dgCollisionParamProxy& proxy) const
 {
 	int count = 0;
@@ -1607,6 +1606,10 @@ dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& pro
 			childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
 			proxy.m_instance0 = &childInstance; 
 			dgInt32 flag = m_world->ClosestPoint (proxy);
+
+			childInstance.m_userData0 = NULL;
+			childInstance.m_userData1 = NULL;
+
 			if (flag) {
 				retFlag = 1;
 				dgFloat32 dist2 = proxy.m_contactJoint->m_closestDistance * proxy.m_contactJoint->m_closestDistance;
@@ -1692,6 +1695,11 @@ dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& p
 			proxy.m_instance1 = &otherChildInstance; 
 
 			dgInt32 flag = m_world->ClosestPoint (proxy);
+
+			myChildInstance.m_userData0 = NULL;
+			myChildInstance.m_userData1 = NULL;
+			otherChildInstance.m_userData0 = NULL;
+			otherChildInstance.m_userData1 = NULL;
 			if (flag) {
 				retFlag = 1;
 				dgFloat32 dist2 = proxy.m_contactJoint->m_closestDistance * proxy.m_contactJoint->m_closestDistance;
@@ -1704,6 +1712,8 @@ dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& p
 				dgAssert (0);
 				break;
 			}
+
+
 		} else if (pair.m_nodeA->m_type == m_leaf) {
 			PushNode (matrix, heap, pair.m_nodeA, pair.m_nodeB->m_left);
 			PushNode (matrix, heap, pair.m_nodeA, pair.m_nodeB->m_right);
@@ -1812,6 +1822,11 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 						}
 						//childInstance.SetUserData(NULL);
 						//otherChildInstance.SetUserData(NULL);
+						childInstance.m_userData0 = NULL;
+						childInstance.m_userData1 = NULL;
+						otherChildInstance.m_userData0 = NULL;
+						otherChildInstance.m_userData1 = NULL;
+
 						proxy.m_instance0 = NULL;
 						proxy.m_instance1 = NULL; 
 					}
@@ -1964,6 +1979,12 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 							break;
 						}
 						//childInstance.SetUserData(NULL);
+
+						childInstance.m_userData0 = NULL;
+						childInstance.m_userData1 = NULL;
+						//otherChildInstance.m_userData0 = NULL;
+						//otherChildInstance.m_userData1 = NULL;
+
 						proxy.m_instance0 = NULL;
 					}
 				}
@@ -2065,6 +2086,9 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase
 							break;
 						}
 						//childInstance.SetUserData(NULL);
+
+						childInstance.m_userData0 = NULL;
+						childInstance.m_userData1 = NULL;
 						proxy.m_instance0 = NULL;
 					}
 				}
@@ -2161,6 +2185,9 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 							break;
 						}
 						//childInstance.SetUserData(NULL);
+
+						childInstance.m_userData0 = NULL;
+						childInstance.m_userData1 = NULL;
 						proxy.m_instance0 = NULL;
 					}
 				}
@@ -2282,6 +2309,9 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 							break;
 						}
 						//childInstance.SetUserData(NULL);
+
+						childInstance.m_userData0 = NULL;
+						childInstance.m_userData1 = NULL;
 						proxy.m_instance0 = NULL; 
 					}
 				}
@@ -2529,6 +2559,9 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 								}
 							}
 						}
+
+						childInstance.m_userData0 = NULL;
+						childInstance.m_userData1 = NULL;
 						proxy.m_instance0 = NULL; 
 					}
 				}
@@ -2678,6 +2711,12 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 								}
 							}
 						}
+
+						childInstance.m_userData0 = NULL;
+						childInstance.m_userData1 = NULL;
+						otherChildInstance.m_userData0 = NULL;
+						otherChildInstance.m_userData1 = NULL;
+
 						proxy.m_instance0 = NULL; 
 						proxy.m_instance1 = NULL; 
 					}
@@ -2884,7 +2923,8 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 								}
 							}
 						}
-						
+						childInstance.m_userData0 = NULL;
+						childInstance.m_userData1 = NULL;
 						proxy.m_instance0 = NULL; 
 					}
 				}
