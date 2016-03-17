@@ -56,7 +56,6 @@ dgInt32 dgBroadPhase::m_obbTestSimplex[4][4] =
 };
 
 
-
 class dgBroadPhase::dgSpliteInfo
 {
 	public:
