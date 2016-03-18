@@ -276,6 +276,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 	dFloat m_brakeTorque;
 };
 
+/*
 class CustomVehicleController::EngineJoint: public CustomJoint
 {
 	public:
@@ -451,7 +452,7 @@ class CustomVehicleController::DifferentialSpiderGearJoint: public CustomJoint
 	dFloat m_clutchTorque;
 	dFloat m_couplingFactor;
 };
-
+*/
 
 void CustomVehicleController::BodyPartChassis::ApplyDownForce ()
 {
@@ -546,7 +547,7 @@ void CustomVehicleController::BodyPartTire::SetBrakeTorque(dFloat torque)
 	tire->m_brakeTorque = dMax (torque, tire->m_brakeTorque);
 }
 
-
+/*
 CustomVehicleController::BodyPartEngine::BodyPartEngine (CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:BodyPart()
 	,m_info(info)
@@ -926,6 +927,7 @@ void CustomVehicleController::BodyPartEngine::SetGear(int gear)
 	omega = matrix.RotateVector(omega);
 	NewtonBodySetOmega(engine, &omega[0]);
 }
+*/
 
 CustomVehicleController::SteeringController::SteeringController (CustomVehicleController* const controller, dFloat maxAngle)
 	:Controller(controller)
@@ -1000,19 +1002,23 @@ void CustomVehicleController::BrakeController::Update(dFloat timestep)
 	}
 }
 
-CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, BodyPartEngine* const engine)
+//CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, BodyPartEngine* const engine)
+CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller)
 	:Controller(controller)
-	,m_engine(engine)
+//	,m_engine(engine)
 	,m_automaticTransmissionMode(true)
 {
 }
 
 void CustomVehicleController::EngineController::Update(dFloat timestep)
 {
+	dAssert (0);
+/*
 	if (m_automaticTransmissionMode) {
 		m_engine->UpdateAutomaticGearBox (timestep);
 	}
 	m_engine->Update (timestep, m_param);
+*/
 }
 
 bool CustomVehicleController::EngineController::GetTransmissionMode() const
@@ -1027,39 +1033,53 @@ void CustomVehicleController::EngineController::SetTransmissionMode(bool mode)
 
 int CustomVehicleController::EngineController::GetGear() const
 {
-	return m_engine->GetGear();
+	dAssert (0);
+	return 0;
+//	return m_engine->GetGear();
 }
 
 void CustomVehicleController::EngineController::SetGear(int gear)
 {
-	return m_engine->SetGear(gear);
+	dAssert (0);
+//	return m_engine->SetGear(gear);
 }
 
 int CustomVehicleController::EngineController::GetNeutralGear() const
 {
-	return m_engine->GetNeutralGear();
+	dAssert (0);
+	return 0;
+//	return m_engine->GetNeutralGear();
 }
 
 int CustomVehicleController::EngineController::GetReverseGear() const
 {
-	return m_engine->GetReverseGear();
+	dAssert (0);
+	return 0;
+//	return m_engine->GetReverseGear();
 }
 
 dFloat CustomVehicleController::EngineController::GetRPM() const
 {
-	return m_engine->GetRPM();
+	dAssert (0);
+	return 0;
+//	return m_engine->GetRPM();
 }
 
 dFloat CustomVehicleController::EngineController::GetRedLineRPM() const
 {
-	return m_engine->GetRedLineRPM();
+	dAssert (0);
+	return 0;
+//	return m_engine->GetRedLineRPM();
 }
 
 dFloat CustomVehicleController::EngineController::GetSpeed() const
 {
-	return m_engine->GetSpeed();
+	dAssert (0);
+	return 0;
+//	return m_engine->GetSpeed();
 }
 
+/*
 CustomVehicleController::ClutchController::ClutchController(CustomVehicleController* const controller, BodyPartEngine* const engine, dFloat maxClutchTorque)
 	:Controller(controller)
 	,m_engine(engine)
@@ -1078,6 +1098,7 @@ void CustomVehicleController::ClutchController::Update(dFloat timestep)
 		m_engine->m_differential1.m_rightGear->SetClutch(torque);
 	}
 }
+*/
 
 void CustomVehicleControllerManager::DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const
 {
@@ -1338,6 +1359,9 @@ void CustomVehicleController::Init(NewtonCollision* const chassisShape, const dM
 
 void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData)
 {
+	dAssert (0);
+/*
+
 	m_body = body;
 	m_finalized = false;
 	m_localFrame = vehicleFrame;
@@ -1382,20 +1406,23 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	file_xxx = fopen("vehiceLog.csv", "wb");
 	fprintf (file_xxx, "eng_rpm, eng_torque, eng_nominalTorque,\n");
 #endif
+*/
 }
 
 void CustomVehicleController::Cleanup()
 {
-	SetClutch(NULL);
+	dAssert (0);
+//	SetClutch(NULL);
 	SetBrakes(NULL);
 	SetEngine(NULL);
 	SetSteering(NULL);
 	SetHandBrakes(NULL);
 	SetContactFilter(NULL);
-
+/*
 	if (m_engine) {
 		delete m_engine;
 	}
+*/
 }
 
 const CustomVehicleController::BodyPart* CustomVehicleController::GetChassis() const
@@ -1426,10 +1453,12 @@ CustomVehicleController::EngineController* CustomVehicleController::GetEngine() 
 	return m_engineControl;
 }
 
+/*
 CustomVehicleController::ClutchController* CustomVehicleController::GetClutch() const
 {
 	return m_cluthControl;
 }
+*/
 
 CustomVehicleController::SteeringController* CustomVehicleController::GetSteering() const
 {
@@ -1454,6 +1483,7 @@ void CustomVehicleController::SetEngine(EngineController* const engineControl)
 	m_engineControl = engineControl;
 }
 
+/*
 void CustomVehicleController::SetClutch(ClutchController* const cluth)
 {
 	if (m_cluthControl) {
@@ -1461,7 +1491,7 @@ void CustomVehicleController::SetClutch(ClutchController* const cluth)
 	}
 	m_cluthControl = cluth;
 }
-
+*/
 
 void CustomVehicleController::SetHandBrakes(BrakeController* const handBrakes)
 {
@@ -1619,6 +1649,7 @@ CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const Bo
 	return &tireNode->GetInfo();
 }
 
+/*
 CustomVehicleController::BodyPartEngine* CustomVehicleController::GetEngineBodyPart() const
 {
 	return m_engine;
@@ -1634,6 +1665,7 @@ void CustomVehicleController::AddEngineBodyPart (BodyPartEngine* const engine)
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());
 	NewtonSkeletonContainerAttachBone(m_skeleton, m_engine->GetBody(), m_chassis.GetBody());
 }
+*/
 
 dVector CustomVehicleController::GetTireNormalForce(const BodyPartTire* const tire) const
 {
@@ -1993,7 +2025,8 @@ NewtonBodySetOmega(tire.GetBody(), &xxx[0]);
 		}
 
 		m_chassis.ApplyDownForce ();
-
+dAssert (0);
+/*
 		if (m_engineControl) {
 			BodyPartEngine* const engine = m_engineControl->m_engine;
 			EngineJoint* const joint = (EngineJoint*) engine->GetJoint();
@@ -2004,7 +2037,7 @@ NewtonBodySetOmega(tire.GetBody(), &xxx[0]);
 		if (m_cluthControl) {
 			m_cluthControl->Update(timestep);
 		}
-
+*/
 		if (m_steeringControl) {
 			m_steeringControl->Update(timestep);
 		}

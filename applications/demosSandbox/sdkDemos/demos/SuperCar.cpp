@@ -361,6 +361,8 @@ class SuperCarEntity: public DemoEntity
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
+		dAssert (0);
+/*
 		// add the engine, differential and transmission 
 		CustomVehicleController::BodyPartEngine::Info engineInfo;
 		engineInfo.m_mass = VIPER_ENGINE_MASS; 
@@ -421,13 +423,15 @@ class SuperCarEntity: public DemoEntity
 		// add clutch controller
 		CustomVehicleController::ClutchController* const clutch = new CustomVehicleController::ClutchController(m_controller, engine, VIPER_TIRE_CLUTCH_TORQUE);
 		m_controller->SetClutch(clutch);
-
+*/
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 	}
 
 	void ApplyPlayerControl ()
 	{
+dAssert (0);
+#if 0
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -489,7 +493,6 @@ class SuperCarEntity: public DemoEntity
 #ifdef  __TEST_VEHICLE_XXX__
 steeringVal *= 0.3f;
 #endif
-
 
 			// check for gear change (note key code for '>' = '.' and key code for '<' == ',')
 			gear += int (m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int (m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
@@ -587,6 +590,7 @@ steeringVal *= 0.3f;
 		if (handBrakes) {
 			handBrakes->SetParam(handBrakePedal);
 		}
+#endif
 	}
 
 	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/
@@ -653,6 +657,8 @@ steeringVal *= 0.3f;
 
 	void ApplyNPCControl (dFloat timestep, DemoEntity* const pathEntity)
 	{
+dAssert (0);
+#if 0
 		//drive the vehicle by trying to follow the spline path as close as possible 
 		//NewtonBody* const body = m_controller->GetBody();
 		//NewtonWorld* const world = NewtonBodyGetWorld(body);
@@ -697,6 +703,7 @@ steeringVal *= 0.3f;
 
 		dFloat steeringParam = CalculateNPCControlSteerinValue (2.0f, 2.0f, pathEntity);
 		steering->SetParam (steeringParam);
+#endif
 	}
 
 

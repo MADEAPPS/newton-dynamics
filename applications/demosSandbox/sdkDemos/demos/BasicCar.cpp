@@ -337,6 +337,8 @@ class BasicCarEntity: public DemoEntity
 		handBrakes->AddTire (rearTires[1]);
 		m_controller->SetHandBrakes (handBrakes);
 
+dAssert (0);
+#if 0
 		CustomVehicleController::BodyPartEngine::DifferentialAxel axel0;
 		CustomVehicleController::BodyPartEngine::DifferentialAxel axel1;
 		switch (parameters.m_differentialType) 
@@ -411,10 +413,14 @@ class BasicCarEntity: public DemoEntity
 			CustomVehicleController::BodyPartTire::Info tireInfo (tire->GetInfo());
 		}
 */		
+#endif
 	}
 
 	void ApplyPlayerControl ()
 	{
+dAssert (0);
+#if 0
+
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -535,6 +541,7 @@ class BasicCarEntity: public DemoEntity
 		if (handBrakes) {
 			handBrakes->SetParam(handBrakePedal);
 		}
+#endif
 	}
 
 	void ApplyNPCControl ()
