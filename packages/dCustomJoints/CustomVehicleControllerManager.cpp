@@ -1014,6 +1014,11 @@ CustomVehicleController::EngineController::Differential::Differential(EngineCont
 //	dAssert (0);
 }
 
+void CustomVehicleController::EngineController::Differential::Update (dFloat timestep)
+{
+	dAssert (0);
+}
+
 CustomVehicleController::EngineController::Differential::~Differential()
 {
 //	dAssert (0);
@@ -1026,6 +1031,11 @@ CustomVehicleController::EngineController::DualDifferential::DualDifferential (E
 }
 
 CustomVehicleController::EngineController::DualDifferential::~DualDifferential()
+{
+	dAssert (0);
+}
+
+void CustomVehicleController::EngineController::DualDifferential::Update (dFloat timestep)
 {
 	dAssert (0);
 }

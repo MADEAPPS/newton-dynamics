@@ -481,6 +481,8 @@ class CustomVehicleController: public CustomControllerBase
 			Differential (EngineController* const controller);
 			Differential(EngineController* const controller, const DifferentialAxel& axel0);
 			virtual ~Differential();
+
+			virtual void Update (dFloat timestep);
 		};
 
 		class DualDifferential: public Differential
@@ -488,6 +490,8 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DualDifferential(EngineController* const controller, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
 			virtual ~DualDifferential();
+
+			virtual void Update (dFloat timestep);
 		};
 
 
