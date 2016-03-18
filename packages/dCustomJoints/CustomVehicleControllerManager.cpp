@@ -1551,7 +1551,7 @@ void CustomVehicleController::SetCenterOfGravity(const dVector& comRelativeToGeo
 void CustomVehicleController::Finalize()
 {
 
-//NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
+NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_finalized = true;
 	NewtonSkeletonContainerFinalize(m_skeleton);

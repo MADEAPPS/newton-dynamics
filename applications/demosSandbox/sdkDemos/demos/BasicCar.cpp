@@ -315,7 +315,6 @@ class BasicCarEntity: public DemoEntity
 		rearTires[1] = AddTire (offset2, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
 		// add a steering Wheel
-		//CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
 		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
 		steering->AddTire (frontTires[0]);
 		steering->AddTire (frontTires[1]);
@@ -419,8 +418,6 @@ class BasicCarEntity: public DemoEntity
 
 	void ApplyPlayerControl ()
 	{
-//dAssert (0);
-#if 0
 
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
@@ -428,12 +425,13 @@ class BasicCarEntity: public DemoEntity
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
 		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
-		CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
+//		CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
 		CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
 
-		int gear = engine ? engine->GetGear() : engine->GetNeutralGear();
+//		int gear = engine ? engine->GetGear() : engine->GetNeutralGear();
+		int gear = 0;
 		dFloat steeringVal = 0.0f;
 		dFloat engineGasPedal = 0.0f;
 		dFloat brakePedal = 0.0f;
@@ -510,8 +508,8 @@ class BasicCarEntity: public DemoEntity
 	#endif
 #endif
 
-
 		if (engine) {
+			dAssert (0);
 /*
 			m_engineOldKeyState = engine->GetKey();
 			engine->SetKey ((m_engineKeySwitchCounter & 1) ? true : false);
@@ -542,7 +540,6 @@ class BasicCarEntity: public DemoEntity
 		if (handBrakes) {
 			handBrakes->SetParam(handBrakePedal);
 		}
-#endif
 	}
 
 	void ApplyNPCControl ()
