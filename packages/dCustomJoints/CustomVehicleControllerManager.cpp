@@ -1002,17 +1002,89 @@ void CustomVehicleController::BrakeController::Update(dFloat timestep)
 	}
 }
 
+
+CustomVehicleController::EngineController::Differential::Differential (EngineController* const controller)
+{
+	dAssert (0);
+}
+	
+
+CustomVehicleController::EngineController::Differential::Differential(EngineController* const controller, const DifferentialAxel& axel0)
+{
+//	dAssert (0);
+}
+
+CustomVehicleController::EngineController::Differential::~Differential()
+{
+//	dAssert (0);
+}
+
+CustomVehicleController::EngineController::DualDifferential::DualDifferential (EngineController* const controller, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
+	:Differential (controller)
+{
+	dAssert (0);
+}
+
+CustomVehicleController::EngineController::DualDifferential::~DualDifferential()
+{
+	dAssert (0);
+}
+
+
 //CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, BodyPartEngine* const engine)
-CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller)
+CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:Controller(controller)
+	,m_info(m_info)
 //	,m_engine(engine)
 	,m_automaticTransmissionMode(true)
 {
+//	m_parent = &controller->m_chassis;
+//	m_controller = controller;
+
+
+	//NewtonWorld* const world = ((CustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
+	//NewtonCollision* const collision = NewtonCreateNull(world);
+	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.5f, 0.5f, 0, NULL);
+	//dMatrix engineMatrix (CalculateEngineMatrix());
+	//m_body = NewtonCreateDynamicBody(world, collision, &engineMatrix[0][0]);
+	//NewtonDestroyCollision(collision);
+	//EngineJoint* const engineJoint = new EngineJoint(m_body, m_parent->GetBody());
+	//m_joint = engineJoint;
+
+	if (axel1.m_leftTire) {
+		dAssert (0);
+		dAssert (axel0.m_leftTire);
+		dAssert (axel0.m_rightTire);
+		dAssert (axel1.m_leftTire);
+		dAssert (axel1.m_rightTire);
+		m_differential = new DualDifferential (this, axel0, axel1);	
+	} else if (axel0.m_leftTire) {
+		dAssert (axel0.m_leftTire);
+		dAssert (axel0.m_rightTire);
+		m_differential = new Differential (this, axel0);
+	}
+
+	//m_differential0.m_leftGear = new DifferentialSpiderGearJoint (engineJoint, (WheelJoint*)m_differential0.m_leftTire->GetJoint());
+	//m_differential0.m_rightGear = new DifferentialSpiderGearJoint (engineJoint, (WheelJoint*)m_differential0.m_rightTire->GetJoint());
+	//if (m_differential1.m_leftTire) {
+		//m_differential1.m_leftGear = new DifferentialSpiderGearJoint (engineJoint, (WheelJoint*)m_differential1.m_leftTire->GetJoint());
+		//m_differential1.m_rightGear = new DifferentialSpiderGearJoint (engineJoint, (WheelJoint*)m_differential1.m_rightTire->GetJoint());
+	//}
+	//NewtonBodySetForceAndTorqueCallback(m_body, m_controller->m_forceAndTorque);
+	//SetInfo (info);
+}
+
+CustomVehicleController::EngineController::~EngineController ()
+{
+	if (m_differential) {
+		delete m_differential;
+	}
 }
 
 void CustomVehicleController::EngineController::Update(dFloat timestep)
 {
-	dAssert (0);
+//	dAssert (0);
 /*
 	if (m_automaticTransmissionMode) {
 		m_engine->UpdateAutomaticGearBox (timestep);
@@ -2009,13 +2081,10 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 
 		m_chassis.ApplyDownForce ();
 		if (m_engineControl) {
-			dAssert (0);
-/*
-			BodyPartEngine* const engine = m_engineControl->m_engine;
-			EngineJoint* const joint = (EngineJoint*) engine->GetJoint();
-			joint->RemoveKinematicError();
+//			BodyPartEngine* const engine = m_engineControl->m_engine;
+//			EngineJoint* const joint = (EngineJoint*) engine->GetJoint();
+//			joint->RemoveKinematicError();
 			m_engineControl->Update(timestep);
-*/
 		}
 
 //		if (m_cluthControl) {

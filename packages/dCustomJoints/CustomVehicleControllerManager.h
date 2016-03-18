@@ -410,8 +410,56 @@ class CustomVehicleController: public CustomControllerBase
 	class EngineController: public Controller
 	{
 		public:
+		class DifferentialAxel
+		{
+			public:
+			DifferentialAxel ()
+				:m_leftTire (NULL)
+				,m_rightTire (NULL)
+			{
+			}
+
+			BodyPartTire* m_leftTire;
+			BodyPartTire* m_rightTire;
+		};
+
+		class Info
+		{
+			public:
+			Info()
+			{
+				memset (this, 0, sizeof (Info));
+			}
+
+			dVector m_location;
+			dFloat m_mass;
+			dFloat m_radio;
+			dFloat m_peakTorque;
+			dFloat m_rpmAtPeakTorque;
+			dFloat m_peakHorsePower;
+			dFloat m_rpmAtPeakHorsePower;
+			dFloat m_redLineTorque;
+			dFloat m_rpmAtReadLineTorque;
+			dFloat m_idleTorque;
+			dFloat m_rpmAtIdleTorque;
+			dFloat m_vehicleTopSpeed;
+			dFloat m_reverseGearRatio;
+			dFloat m_gearRatios[10];
+
+			int m_gearsCount;
+			void* m_userData;
+
+			private:
+			void ConvertToMetricSystem();
+
+			dFloat m_crownGearRatio;
+			dFloat m_peakPowerTorque;
+			//friend class BodyPartEngine;
+		};
+
 //		CUSTOM_JOINTS_API EngineController (CustomVehicleController* const controller, BodyPartEngine* const engine);
-		CUSTOM_JOINTS_API EngineController (CustomVehicleController* const controller);
+		CUSTOM_JOINTS_API EngineController (CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
+		CUSTOM_JOINTS_API ~EngineController ();
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const;
 		CUSTOM_JOINTS_API dFloat GetRedLineRPM() const;
@@ -427,9 +475,27 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API void SetTransmissionMode(bool mode);
 
 		protected:
+		class Differential: public CustomAlloc
+		{
+			public:
+			Differential (EngineController* const controller);
+			Differential(EngineController* const controller, const DifferentialAxel& axel0);
+			virtual ~Differential();
+		};
+
+		class DualDifferential: public Differential
+		{
+			public:
+			DualDifferential(EngineController* const controller, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
+			virtual ~DualDifferential();
+		};
+
+
 		virtual void Update(dFloat timestep);
 
+		Info m_info;
 //		BodyPartEngine* m_engine;
+		Differential* m_differential;
 		bool m_automaticTransmissionMode;
 		friend class CustomVehicleController;
 	};

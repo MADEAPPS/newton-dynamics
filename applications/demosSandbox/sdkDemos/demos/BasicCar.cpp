@@ -336,9 +336,9 @@ class BasicCarEntity: public DemoEntity
 		handBrakes->AddTire (rearTires[1]);
 		m_controller->SetHandBrakes (handBrakes);
 
-#if 0
-		CustomVehicleController::BodyPartEngine::DifferentialAxel axel0;
-		CustomVehicleController::BodyPartEngine::DifferentialAxel axel1;
+
+		CustomVehicleController::EngineController::DifferentialAxel axel0;
+		CustomVehicleController::EngineController::DifferentialAxel axel1;
 		switch (parameters.m_differentialType) 
 		{
 			case BasciCarParameters::m_RWD:
@@ -359,8 +359,7 @@ class BasicCarEntity: public DemoEntity
 		}
 
 
-
-		CustomVehicleController::BodyPartEngine::Info engineInfo;
+		CustomVehicleController::EngineController::Info engineInfo;
 		engineInfo.m_mass = parameters.ENGINE_MASS;
 		engineInfo.m_radio = parameters.ENGINE_ARMATURE_RADIO;
 		engineInfo.m_vehicleTopSpeed = parameters.TOP_SPEED_KMH;
@@ -380,17 +379,16 @@ class BasicCarEntity: public DemoEntity
 		engineInfo.m_gearRatios[2] = parameters.GEAR_3;
 		engineInfo.m_reverseGearRatio = parameters.REVERSE_GEAR;
 
-		CustomVehicleController::BodyPartEngine* const engine = new CustomVehicleController::BodyPartEngine(m_controller, engineInfo, axel0, axel1);
-		m_controller->AddEngineBodyPart(engine);
+//		CustomVehicleController::BodyPartEngine* const engine = new CustomVehicleController::BodyPartEngine(m_controller, engineInfo, axel0, axel1);
+//		m_controller->AddEngineBodyPart(engine);
 
-		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engine);
+		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, axel0, axel1);
+
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
 
 		m_controller->SetEngine(engineControl);
-
-#endif
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
@@ -509,7 +507,6 @@ class BasicCarEntity: public DemoEntity
 #endif
 
 		if (engine) {
-			dAssert (0);
 /*
 			m_engineOldKeyState = engine->GetKey();
 			engine->SetKey ((m_engineKeySwitchCounter & 1) ? true : false);
