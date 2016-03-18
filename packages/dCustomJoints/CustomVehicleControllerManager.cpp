@@ -1359,16 +1359,12 @@ void CustomVehicleController::Init(NewtonCollision* const chassisShape, const dM
 
 void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData)
 {
-	dAssert (0);
-/*
 
 	m_body = body;
 	m_finalized = false;
 	m_localFrame = vehicleFrame;
 	m_localFrame.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 	m_forceAndTorque = forceAndTorque;
-
-	m_engine = NULL;
 	
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = manager->GetWorld();
@@ -1387,11 +1383,12 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	// assume gravity is 10.0f, and a speed of 60 miles/hours
 	SetAerodynamicsDownforceCoefficient(2.0f * 10.0f, 60.0f * 0.447f);
 
-	m_cluthControl = NULL;
+//	m_engine = NULL;
+//	m_cluthControl = NULL;
 	m_brakesControl = NULL;
 	m_engineControl = NULL;
-	m_handBrakesControl = NULL;
 	m_steeringControl = NULL;
+	m_handBrakesControl = NULL;
 	
 	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 	NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
@@ -1406,12 +1403,10 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	file_xxx = fopen("vehiceLog.csv", "wb");
 	fprintf (file_xxx, "eng_rpm, eng_torque, eng_nominalTorque,\n");
 #endif
-*/
 }
 
 void CustomVehicleController::Cleanup()
 {
-	dAssert (0);
 //	SetClutch(NULL);
 	SetBrakes(NULL);
 	SetEngine(NULL);
@@ -1420,6 +1415,7 @@ void CustomVehicleController::Cleanup()
 	SetContactFilter(NULL);
 /*
 	if (m_engine) {
+		dAssert (0);
 		delete m_engine;
 	}
 */
@@ -2002,9 +1998,6 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
-//dTrace (("%d\n", xxx));
-//xxx ++;
-
 	if (m_finalized) {
 		CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager();
 		for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
@@ -2012,32 +2005,23 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 			WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
 			tireJoint->RemoveKinematicError(timestep);
 			manager->Collide (&tire);
-			
-/*
-if (tire.m_index == 3){
-dMatrix tireMatrix;
-NewtonBodyGetMatrix(tire.GetBody(), &tireMatrix[0][0]);
-tireMatrix = tireJoint->GetMatrix0() * tireMatrix;
-dVector xxx (tireMatrix.m_front.Scale(5.0f));
-NewtonBodySetOmega(tire.GetBody(), &xxx[0]);
-}
-*/
 		}
 
 		m_chassis.ApplyDownForce ();
-dAssert (0);
-/*
 		if (m_engineControl) {
+			dAssert (0);
+/*
 			BodyPartEngine* const engine = m_engineControl->m_engine;
 			EngineJoint* const joint = (EngineJoint*) engine->GetJoint();
 			joint->RemoveKinematicError();
 			m_engineControl->Update(timestep);
+*/
 		}
 
-		if (m_cluthControl) {
-			m_cluthControl->Update(timestep);
-		}
-*/
+//		if (m_cluthControl) {
+//			m_cluthControl->Update(timestep);
+//		}
+
 		if (m_steeringControl) {
 			m_steeringControl->Update(timestep);
 		}

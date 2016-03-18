@@ -337,7 +337,6 @@ class BasicCarEntity: public DemoEntity
 		handBrakes->AddTire (rearTires[1]);
 		m_controller->SetHandBrakes (handBrakes);
 
-dAssert (0);
 #if 0
 		CustomVehicleController::BodyPartEngine::DifferentialAxel axel0;
 		CustomVehicleController::BodyPartEngine::DifferentialAxel axel1;
@@ -392,6 +391,8 @@ dAssert (0);
 
 		m_controller->SetEngine(engineControl);
 
+#endif
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 
@@ -413,12 +414,12 @@ dAssert (0);
 			CustomVehicleController::BodyPartTire::Info tireInfo (tire->GetInfo());
 		}
 */		
-#endif
+
 	}
 
 	void ApplyPlayerControl ()
 	{
-dAssert (0);
+//dAssert (0);
 #if 0
 
 		NewtonBody* const body = m_controller->GetBody();
