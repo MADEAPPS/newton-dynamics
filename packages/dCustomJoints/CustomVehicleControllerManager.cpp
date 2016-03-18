@@ -1232,14 +1232,12 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 		// draw vehicle forces
 		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			BodyPartTire* const tire = &node->GetInfo();
-			//dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
 			dMatrix matrix;
 			NewtonBody* const tireBody = tire->GetBody();
 			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
 			matrix.m_up = chassisMatrix.m_up;
 			matrix.m_right = matrix.m_front * matrix.m_up;
 
-			//dTrace (("(%f %f %f) (%f %f %f)\n", p0.m_x, p0.m_y, p0.m_z, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z ));
 			dVector origin(worldToComMatrix.TransformVector(matrix.m_posit));
 
 			dVector lateralForce(chassisMatrix.UnrotateVector(GetTireLateralForce(tire)));
@@ -1926,11 +1924,6 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 				controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, phy_x, phy_z, f_x, f_z, moment);
 
-//if ((tire->m_index == 0) || (tire->m_index == 1)) 
-//{
-//dTrace(("tire: %d  force (%f, %f %f), slip (%f %f)\n", tire->m_index, tireLoad, f_x, f_z, phy_x, phy_z));
-//}
-
 				dVector force (longitudinalContactDir.Scale (f_x) + lateralPin.Scale (f_z));
 				dVector torque (radius * force);
 
@@ -1964,14 +1957,145 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 		fprintf(file_xxx, "%f, %f, %f,\n", engineOmega, engineTorque, m_engine->GetNominalTorque());
 #endif
 	}
-
-//dTrace (("\n"));
 }
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
-//dTrace (("%d\n", xxx));
-//xxx ++;
+/*
+	dMatrix inertia[5];
+	dVector JacobianPair[5][2];
+	int index[5][2] = {{0, 2}, {1, 3}, {2, 4}, {3, 4}, {2, 3}};
+
+	for (int i = 0; i < 5; i ++) {
+		inertia[i] = dGetIdentityMatrix();
+	}
+
+	JacobianPair[0][0] = dVector (-1.0f, 0.0f, 0.0f, 0.0f);
+	JacobianPair[0][1] = dVector ( 1.0f, 0.0f, 0.0f, 0.0f);
+
+	JacobianPair[1][0] = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
+	JacobianPair[1][1] = dVector( 1.0f, 0.0f, 0.0f, 0.0f);
+
+	JacobianPair[2][0] = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
+	JacobianPair[2][1] = dVector( 1.0f, 0.0f, 0.0f, 0.0f);
+
+	JacobianPair[3][0] = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
+	JacobianPair[3][1] = dVector( 1.0f, 0.0f, 0.0f, 0.0f);
+
+	JacobianPair[4][0] = dVector( 1.0f, 0.0f, 0.0f, 0.0f);
+	JacobianPair[4][1] = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
+
+
+	dVector JacobianInvPair[5][2];
+	for (int i = 0; i < 5; i ++) {
+		int j0 = index[i][0];
+		int j1 = index[i][1];
+		JacobianInvPair[i][0][3] = 0.0f;
+		JacobianInvPair[i][1][3] = 0.0f;
+		for (int k = 0; k < 3; k++) {
+			JacobianInvPair[i][0][k] = JacobianPair[i][0][k] * inertia[j0][k][k];
+			JacobianInvPair[i][1][k] = JacobianPair[i][1][k] * inertia[j1][k][k];
+		}
+	}
+
+	dFloat invMass[5][5];
+	for (int i = 0; i < 5; i++) {
+		int i0 = index[i][0];
+		int i1 = index[i][1];
+		invMass[i][i] = JacobianInvPair[i][0] % JacobianPair[i][0] + JacobianInvPair[i][1] % JacobianPair[i][1];
+		for (int j = i + 1; j < 5; j ++) {
+			int j0 = index[j][0];
+			int j1 = index[j][1];
+			dFloat a = 0.0f;
+			if (i0 == j0) {
+				a += JacobianInvPair[i][0] % JacobianPair[j][0];
+			} 
+			if (i0 == j1) {
+				a += JacobianInvPair[i][0] % JacobianPair[j][1];
+			}
+			if (i1 == j1) {
+				a += JacobianInvPair[i][1] % JacobianPair[j][1];
+			}
+			if (i1 == j0) {
+				a += JacobianInvPair[i][1] % JacobianPair[j][0];
+			}
+			invMass[i][j] = a;
+			invMass[j][i] = a;
+		}
+	}
+
+
+	for (int i = 0; i < 5; i ++) {
+		for (int j = 0; j <= i; j++) {
+			dFloat s = 0.0f;
+			for (int k = 0; k < j; k++) {
+				s += invMass[i][k] * invMass[j][k];
+			}
+
+			if (j == i) {
+				dFloat diag = invMass[i][i] - s;
+				if (diag < 0.0f) {
+					dAssert (0);
+				}
+				invMass[i][i] = dSqrt(diag);
+			} else {
+				invMass[i][j] = (1.0f / invMass[j][j]) * (invMass[i][j] - s);
+			}
+		}
+	}
+
+	dFloat w[7];
+
+	w[0] = 0.0f;
+	w[1] = 0.0f;
+
+	w[2] = 0.0f;
+	w[3] = 0.0f;
+
+	w[4] = 1.0f;
+
+	w[5] =  0.0f;
+	w[6] =  0.0f;
+
+int n = 4;
+	for (int m = 0; m < 10; m ++) {
+		dFloat x[5];
+		x[0] = -(w[2] - w[0]);
+		x[1] = -(w[3] - w[1]);
+		x[2] = -(w[4] - w[2]); 
+		x[3] = -(w[4] - w[3]); 
+		x[4] = 0.0f;
+
+		for (int i = 0; i < n; i++) {
+			dFloat acc = 0.0f;
+			for (int j = 0; j < i; j++) {
+				acc = acc + invMass[i][j] * x[j];
+			}
+			x[i] = (x[i] - acc) / invMass[i][i];
+		}
+
+		for (int i = n - 1; i >= 0; i--) {
+			dFloat acc = 0.0f;
+			for (int j = i + 1; j < n; j++) {
+				acc = acc + invMass[j][i] * x[j];
+			}
+			x[i] = (x[i] - acc) / invMass[i][i];
+		}
+
+		w[0] = w[0] - x[0];
+		w[1] = w[1] - x[1];
+
+		w[2] = w[2] + x[0] - x[2];
+		w[3] = w[3] + x[1] - x[3];
+		
+		w[4] = w[4] + x[2] + x[3];
+
+		w[5] = w[5];
+		w[6] = w[5];
+
+		m*=1;
+	}
+*/
 
 	if (m_finalized) {
 		CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager();
@@ -1980,16 +2104,6 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 			WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
 			tireJoint->RemoveKinematicError(timestep);
 			manager->Collide (&tire);
-			
-/*
-if (tire.m_index == 3){
-dMatrix tireMatrix;
-NewtonBodyGetMatrix(tire.GetBody(), &tireMatrix[0][0]);
-tireMatrix = tireJoint->GetMatrix0() * tireMatrix;
-dVector xxx (tireMatrix.m_front.Scale(5.0f));
-NewtonBodySetOmega(tire.GetBody(), &xxx[0]);
-}
-*/
 		}
 
 		m_chassis.ApplyDownForce ();
