@@ -1947,6 +1947,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 }
 
 
+
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
