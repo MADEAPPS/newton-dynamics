@@ -1326,29 +1326,13 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 		} while (iter < 8);
 
 		dgFloat32 dist = v.DotProduct4 (v).GetScalar(); 
+		dgFloat32 testDist = dgFloat32(1.0e-3f * 1.0e-3f);
 		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
-			dgVector box0_p0;
-			dgVector box0_p1;
-			dgVector box1_p0;
-			dgVector box1_p1;
-			
-			instance0->CalcAABB(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
-			instance1->CalcAABB(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
-
-			dgVector boxp0 (box0_p0 - box1_p1);
-			dgVector boxp1 (box0_p1 - box1_p0);
-
 			dgVector velRelative (body1->GetVelocity() - body0->GetVelocity());
-			dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velRelative.Scale4 (timestep * dgFloat32 (4.0f)));
-			dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
-			ret = (distance < dgFloat32 (1.0f));
-		} else {
-//			ret = dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
-//			bool ret1 = dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
-//			bool ret0 = minDist < dgFloat32(1.0e-3f);
-//			dgAssert (ret0 == ret1);
-			ret = dist < dgFloat32(1.0e-3f * 1.0e-3f);
+			dgVector step (velRelative.Scale4 (timestep * dgFloat32 (2.0f)));
+			testDist += (dist < step.DotProduct4(step).GetScalar());
 		}
+		ret = dist < testDist;
 	}
 	return ret;
 }
@@ -1492,14 +1476,14 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 //					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
 					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
 
-#if 0
+#if 1
 						m_world->GlobalLock(false);
-						if (body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-							contact = new (m_world->m_allocator) dgDeformableContact(m_world, material);
-						} else {
-							contact = new (m_world->m_allocator) dgContact(m_world, material);
-						}
-						contact->AppendToActiveList();
+							if (body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
+								contact = new (m_world->m_allocator) dgDeformableContact(m_world, material);
+							} else {
+								contact = new (m_world->m_allocator) dgContact(m_world, material);
+							}
+							contact->AppendToActiveList();
 						m_world->GlobalUnlock();
 						m_world->AttachConstraint(contact, body0, body1);
 
