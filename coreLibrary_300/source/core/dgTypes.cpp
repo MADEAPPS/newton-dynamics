@@ -307,8 +307,6 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 }
 
 
-
-
 static dgInt32 QuickSortVertices (dgFloat64* const vertList, dgInt32 stride, dgInt32 compareCount, dgInt32 vertexCount, dgFloat64 tolerance)
 {
 	dgInt32 count = 0;
@@ -385,7 +383,7 @@ static dgInt32 QuickSortVertices (dgFloat64* const vertList, dgInt32 stride, dgI
 	return count;
 }
 
-#ifndef _NEWTON_USE_DOUBLE
+
 dgInt32 dgVertexListToIndexList (dgFloat64* const vertList, dgInt32 strideInBytes, dgInt32 compareCount, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat64 tolerance)
 {
 	dgSetPrecisionDouble precision;
@@ -439,7 +437,6 @@ dgInt32 dgVertexListToIndexList (dgFloat64* const vertList, dgInt32 strideInByte
 
 	return count;
 }
-#endif
 
 
 dgInt32 dgVertexListToIndexList (dgFloat32* const vertList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes, dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexList, dgFloat32 tolerance)

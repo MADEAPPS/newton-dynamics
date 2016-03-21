@@ -709,12 +709,122 @@ class dgVector
 	public:
 	DG_INLINE dgVector() 
 	{
+		dgAssert (0);
 	}
 
-	DG_INLINE dgVector(const __m128 type)
-		:m_typeLow (type)
-		,m_typeHigh (type)
+	DG_INLINE dgVector (const dgFloat32 a)
+		:m_typeLow(_mm_set1_pd(a)) 
+		,m_typeHigh(_mm_set1_pd(a))
 	{
+		dgAssert (0);
+	}
+
+	DG_INLINE dgVector (const dgFloat32* const ptr)
+//		:m_type(_mm_loadu_ps (ptr))
+	{
+		dgAssert (0);
+//		m_type = _mm_and_ps (m_type, m_triplexMask.m_type);
+	}
+
+
+	DG_INLINE dgVector(const __m128d typeLow, const __m128d typeHigh)
+		:m_typeLow (typeLow)
+		,m_typeHigh (typeHigh)
+	{
+		dgAssert (0);
+	}
+
+	DG_INLINE dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w)
+		:m_typeLow(_mm_set_pd(y, x))
+		,m_typeHigh(_mm_set_pd(w, z))
+	{
+		dgAssert (0);
+	}
+
+	DG_INLINE dgFloat32 GetScalar () const
+	{
+		dgAssert (0);
+		//dgFloat32 scalar;
+		//_mm_store_ss(&scalar, m_type);
+		return m_x;
+	}
+
+	DG_INLINE dgVector operator- (const dgVector& A) const 
+	{
+		return dgVector (_mm_sub_pd (m_typeLow, A.m_typeLow), _mm_sub_pd (m_typeHigh, A.m_typeHigh));	
+	}
+
+	// logical operations
+	DG_INLINE dgVector operator& (const dgVector& data) const
+	{
+		dgAssert (0);
+		return data;
+//		return _mm_and_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator| (const dgVector& data) const
+	{
+		dgAssert (0);
+		return data;
+//		return _mm_or_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator^ (const dgVector& data) const
+	{
+		dgAssert (0);
+		return data;
+//		return _mm_xor_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector AndNot (const dgVector& data) const
+	{
+		dgAssert (0);
+		return data;
+//		return _mm_andnot_ps (data.m_type, m_type);	
+	}
+
+
+	// return cross product
+	DG_INLINE dgVector operator* (const dgVector& B) const
+	{
+		dgAssert (0);
+//		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 1, 0, 2))),
+//						   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 0, 2, 1))));
+		return B;
+	}
+
+	DG_INLINE dgFloat32 operator% (const dgVector& A) const
+	{
+		dgAssert (0);
+/*
+		#ifdef DG_SSE4_INSTRUCTIONS_SET 
+			return dgVector (_mm_dp_ps (m_type, A.m_type, 0x77)).GetScalar(); 
+		#else
+			dgVector tmp (A & m_triplexMask);
+			dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
+			return CompProduct4(tmp).AddHorizontal().GetScalar();
+		#endif
+*/
+		return 0;
+	}
+
+	DG_INLINE dgVector DotProduct4 (const dgVector& A) const
+	{
+		dgAssert (0);
+		return A;
+//		#ifdef DG_SSE4_INSTRUCTIONS_SET 
+//			return _mm_dp_ps (m_type, A.m_type, 0xff); 
+//		#else 
+//			return CompProduct4(A).AddHorizontal();
+//		#endif
+	}
+
+	// component wise multiplication
+	DG_INLINE dgVector CompProduct4 (const dgVector& A) const
+	{
+		dgAssert (0);
+		return A;
+		//return _mm_mul_ps (m_type, A.m_type);
 	}
 
 
@@ -722,13 +832,15 @@ class dgVector
 	
 	union {
 		struct {
-			__m128 m_typeLow;
-			__m128 m_typeHigh;
+			__m128d m_typeLow;
+			__m128d m_typeHigh;
 		};
+/*
 		struct {
-			__m128 m_typeIntLow;
-			__m128 m_typeIntHigh;
+			__m128d m_typeIntLow;
+			__m128d m_typeIntHigh;
 		};
+*/
 		dgFloat32 m_f[4];
 		struct {
 			dgFloat32 m_x;
@@ -737,10 +849,10 @@ class dgVector
 			dgFloat32 m_w;
 		};
 		struct {
-			dgInt32 m_ix;
-			dgInt32 m_iy;
-			dgInt32 m_iz;
-			dgInt32 m_iw;
+			dgInt64 m_ix;
+			dgInt64 m_iy;
+			dgInt64 m_iz;
+			dgInt64 m_iw;
 		};
 	};
 
