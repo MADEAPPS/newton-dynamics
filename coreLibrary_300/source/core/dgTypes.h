@@ -147,7 +147,8 @@
 	#undef DG_SCALAR_VECTOR_CLASS
 #endif
 
-#if defined (_NEWTON_USE_DOUBLE) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
+//#if defined (_NEWTON_USE_DOUBLE) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
+#if defined (__ppc__) || defined (ANDROID) || defined (IOS)
 	#undef DG_SSE4_INSTRUCTIONS_SET
 	#ifndef DG_SCALAR_VECTOR_CLASS
 		#define DG_SCALAR_VECTOR_CLASS

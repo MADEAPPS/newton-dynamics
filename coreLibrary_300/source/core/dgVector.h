@@ -698,6 +698,64 @@ public:
 
 #else
 
+#ifdef _NEWTON_USE_DOUBLE
+DG_MSC_VECTOR_ALIGMENT
+class dgVector
+{
+	public:
+	DG_INLINE dgVector() 
+	{
+	}
+
+	DG_INLINE dgVector(const __m128 type)
+		:m_typeLow (type)
+		,m_typeHigh (type)
+	{
+	}
+
+
+	DG_CLASS_ALLOCATOR(allocator)
+	
+	union {
+		struct {
+			__m128 m_typeLow;
+			__m128 m_typeHigh;
+		};
+		struct {
+			__m128 m_typeIntLow;
+			__m128 m_typeIntHigh;
+		};
+		dgFloat32 m_f[4];
+		struct {
+			dgFloat32 m_x;
+			dgFloat32 m_y;
+			dgFloat32 m_z;
+			dgFloat32 m_w;
+		};
+		struct {
+			dgInt32 m_ix;
+			dgInt32 m_iy;
+			dgInt32 m_iz;
+			dgInt32 m_iw;
+		};
+	};
+
+	static dgVector m_zero;
+	static dgVector m_one;
+	static dgVector m_wOne;
+	static dgVector m_two;
+	static dgVector m_half;
+	static dgVector m_three;
+	static dgVector m_negOne;
+	static dgVector m_xMask;
+	static dgVector m_yMask;
+	static dgVector m_zMask;
+	static dgVector m_wMask;
+	static dgVector m_signMask;
+	static dgVector m_triplexMask;
+};
+
+#else
 DG_MSC_VECTOR_ALIGMENT
 class dgVector
 {
@@ -1113,6 +1171,7 @@ class dgVector
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
 
+#endif
 
 DG_MSC_VECTOR_ALIGMENT
 class dgSpatialVector
@@ -1169,13 +1228,12 @@ class dgSpatialVector
 		dgFloat64 m_v[6];
 	};
 } DG_GCC_VECTOR_ALIGMENT;
-
 #endif
 
 DG_MSC_VECTOR_ALIGMENT
 class dgSpatialMatrix
 {
-public:
+	public:
 	DG_INLINE dgSpatialVector& operator[] (dgInt32 i)
 	{
 		dgAssert(i < 6);
