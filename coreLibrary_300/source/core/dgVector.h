@@ -190,8 +190,6 @@ class dgTemplateVector
 	}
 #endif
 
-	
-
 	T m_x;
 	T m_y;
 	T m_z;
@@ -200,12 +198,18 @@ class dgTemplateVector
 
 class dgVector;
 
+
 // *****************************************************************************************
 //
 // 256 bit double precision vector class declaration
 //
 // *****************************************************************************************
 DG_MSC_VECTOR_ALIGMENT
+
+#ifdef _NEWTON_USE_DOUBLE
+	typedef dgVector dgBigVector;
+#else 
+
 class dgBigVector: public dgTemplateVector<dgFloat64>
 {
 	public:
@@ -252,8 +256,8 @@ class dgBigVector: public dgTemplateVector<dgFloat64>
 	{
 		dgAssert (dgCheckVector ((*this)));
 	}
-
 } DG_GCC_VECTOR_ALIGMENT;
+#endif
 
 
 
@@ -1172,6 +1176,9 @@ class dgVector
 } DG_GCC_VECTOR_ALIGMENT;
 
 #endif
+
+
+
 
 DG_MSC_VECTOR_ALIGMENT
 class dgSpatialVector
