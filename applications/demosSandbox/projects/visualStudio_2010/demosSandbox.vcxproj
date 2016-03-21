@@ -676,6 +676,10 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">
     <ClCompile>
@@ -685,6 +689,9 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp" />
