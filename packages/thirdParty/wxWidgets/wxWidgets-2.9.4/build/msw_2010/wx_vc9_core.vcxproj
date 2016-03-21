@@ -1,6 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug_double|Win32">
+      <Configuration>debug_double</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="debug_double|x64">
+      <Configuration>debug_double</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -64,6 +72,12 @@
     <CharacterSet>NotSet</CharacterSet>
     <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
@@ -88,6 +102,12 @@
     <CharacterSet>NotSet</CharacterSet>
     <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -103,6 +123,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -115,11 +138,16 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
@@ -127,15 +155,59 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>WIN32;_LIB;_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;WXBUILDING;wxUSE_BASE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\lib\vc_lib\mswud;..\..\include;..\..\src\tiff\libtiff;..\..\src\jpeg;..\..\src\png;..\..\src\zlib;..\..\src\regex;..\..\src\expat\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\lib\$(Platform);..\..\include;..\..\src\tiff;..\..\src\jpeg;..\..\src\png;..\..\src\zlib;..\..\src\regex;..\..\src\expat\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_LIB;_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;WXBUILDING;wxUSE_BASE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>wx/wxprec.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;WXBUILDING;wxUSE_BASE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>..\..\include;..\..\src\tiff\libtiff;..\..\src\jpeg;..\..\src\png;..\..\src\zlib;..\..\src\regex;..\..\src\expat\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>..\..\lib\vc_lib\wx_vc9_core.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">
     <Midl>
       <PreprocessorDefinitions>WIN32;_LIB;_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;WXBUILDING;wxUSE_BASE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\lib\vc_lib\mswud;..\..\include;..\..\src\tiff\libtiff;..\..\src\jpeg;..\..\src\png;..\..\src\zlib;..\..\src\regex;..\..\src\expat\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -282,6 +354,45 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>WIN32;_LIB;_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;WXBUILDING;wxUSE_BASE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\lib\vc_lib\mswud;..\..\include;..\..\src\tiff\libtiff;..\..\src\jpeg;..\..\src\png;..\..\src\zlib;..\..\src\regex;..\..\src\expat\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\lib\$(Platform);..\..\include;..\..\src\tiff;..\..\src\jpeg;..\..\src\png;..\..\src\zlib;..\..\src\regex;..\..\src\expat\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_LIB;_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;WXBUILDING;wxUSE_BASE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>wx/wxprec.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;WXBUILDING;wxUSE_BASE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>..\..\include;..\..\src\tiff\libtiff;..\..\src\jpeg;..\..\src\png;..\..\src\zlib;..\..\src\regex;..\..\src\expat\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>..\..\lib\vc_lib\wx_vc9_core.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">
     <Midl>
       <PreprocessorDefinitions>WIN32;_LIB;_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;WXBUILDING;wxUSE_BASE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\lib\vc_lib\mswud;..\..\include;..\..\src\tiff\libtiff;..\..\src\jpeg;..\..\src\png;..\..\src\zlib;..\..\src\regex;..\..\src\expat\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -473,7 +584,9 @@
     <ClCompile Include="..\..\src\common\dseldlg.cpp" />
     <ClCompile Include="..\..\src\common\dummy.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">Create</PrecompiledHeader>
@@ -572,7 +685,9 @@
     <ClCompile Include="..\..\src\common\xpmdecod.cpp" />
     <ClCompile Include="..\..\src\msw\accel.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -582,7 +697,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\ole\access.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -592,7 +709,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\ole\activex.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -602,7 +721,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\anybutton.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -612,7 +733,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\app.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -622,7 +745,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\artmsw.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -632,7 +757,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\ole\automtn.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -642,7 +769,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\bitmap.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -652,7 +781,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\bmpbuttn.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -662,7 +793,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\brush.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -672,7 +805,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\button.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -682,7 +817,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\caret.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -692,7 +829,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\checkbox.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -702,7 +841,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\checklst.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -712,7 +853,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\choice.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -722,7 +865,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\clipbrd.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -732,7 +877,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\colordlg.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -742,7 +889,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\colour.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -752,7 +901,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\combo.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -762,7 +913,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\combobox.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -772,7 +925,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\control.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -782,7 +937,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\cursor.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -792,7 +949,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\data.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -802,7 +961,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\ole\dataobj.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -812,7 +973,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\dc.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -822,7 +985,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\dcclient.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -832,7 +997,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\dcmemory.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -842,7 +1009,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\dcprint.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -852,7 +1021,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\dcscreen.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -862,7 +1033,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\dialog.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -872,7 +1045,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\dialup.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -882,7 +1057,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\dib.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -892,7 +1069,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\dirdlg.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -902,7 +1081,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\display.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -912,7 +1093,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\dragimag.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -922,7 +1105,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\ole\dropsrc.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -932,7 +1117,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\ole\droptgt.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -942,7 +1129,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\enhmeta.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -952,7 +1141,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\evtloop.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -962,7 +1153,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\fdrepdlg.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -972,7 +1165,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\filedlg.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -982,7 +1177,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\font.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -992,7 +1189,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\fontdlg.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1002,7 +1201,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\fontenum.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1012,7 +1213,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\fontutil.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1022,7 +1225,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\frame.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1032,7 +1237,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\gauge.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1042,7 +1249,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\gdiimage.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1052,7 +1261,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\gdiobj.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1062,7 +1273,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\gdiplus.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1072,7 +1285,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\graphics.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1082,7 +1297,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\headerctrl.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1092,7 +1309,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\helpchm.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1102,7 +1321,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\helpwin.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1112,7 +1333,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\icon.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1122,7 +1345,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\imaglist.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1132,7 +1357,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\iniconf.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1142,7 +1369,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\listbox.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1152,7 +1381,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\listctrl.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1162,7 +1393,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\main.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1172,7 +1405,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\mdi.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1182,7 +1417,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\menu.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1192,7 +1429,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\menuitem.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1202,7 +1441,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\metafile.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1212,7 +1453,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\minifram.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1222,7 +1465,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\msgdlg.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1232,7 +1477,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\mslu.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1242,7 +1489,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\nativdlg.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1252,7 +1501,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\nativewin.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1262,7 +1513,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\nonownedwnd.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1272,7 +1525,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\notebook.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1282,7 +1537,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\ole\oleutils.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1292,7 +1549,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\ownerdrw.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1302,7 +1561,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\palette.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1312,7 +1573,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\panel.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1322,7 +1585,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\pen.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1332,7 +1597,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\popupwin.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1342,7 +1609,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\printdlg.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1352,7 +1621,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\printwin.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1362,7 +1633,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\progdlg.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1372,7 +1645,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\radiobox.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1382,7 +1657,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\radiobut.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1392,7 +1669,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\region.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1402,7 +1681,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\renderer.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1412,7 +1693,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\richmsgdlg.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1422,7 +1705,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\scrolbar.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1432,7 +1717,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\settings.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1442,7 +1729,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\slider.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1452,7 +1741,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\spinbutt.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1462,7 +1753,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\spinctrl.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1472,7 +1765,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\statbmp.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1482,7 +1777,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\statbox.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1492,7 +1789,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\statline.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1502,7 +1801,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\stattext.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1512,7 +1813,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\statusbar.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1522,7 +1825,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\textctrl.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1532,7 +1837,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\textentry.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1542,7 +1849,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\tglbtn.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1552,7 +1861,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\toolbar.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1562,7 +1873,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\tooltip.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1572,7 +1885,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\toplevel.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1582,7 +1897,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\treectrl.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1592,7 +1909,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\uiaction.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1602,7 +1921,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\utilsgui.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1612,7 +1933,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\ole\uuid.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1622,7 +1945,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\uxtheme.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1632,7 +1957,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\volume.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1642,7 +1969,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\msw\window.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1652,7 +1981,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\generic\accel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1668,7 +1999,9 @@
     <ClCompile Include="..\..\src\generic\collpaneg.cpp" />
     <ClCompile Include="..\..\src\generic\colrdlgg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1681,7 +2014,9 @@
     <ClCompile Include="..\..\src\generic\dirctrlg.cpp" />
     <ClCompile Include="..\..\src\generic\dirdlgg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1692,7 +2027,9 @@
     <ClCompile Include="..\..\src\generic\dragimgg.cpp" />
     <ClCompile Include="..\..\src\generic\fdrepdlg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1703,7 +2040,9 @@
     <ClCompile Include="..\..\src\generic\filectrlg.cpp" />
     <ClCompile Include="..\..\src\generic\filedlgg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1714,7 +2053,9 @@
     <ClCompile Include="..\..\src\generic\filepickerg.cpp" />
     <ClCompile Include="..\..\src\generic\fontdlgg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1729,7 +2070,9 @@
     <ClCompile Include="..\..\src\generic\listbkg.cpp" />
     <ClCompile Include="..\..\src\generic\listctrl.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1741,7 +2084,9 @@
     <ClCompile Include="..\..\src\generic\markuptext.cpp" />
     <ClCompile Include="..\..\src\generic\mdig.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1765,7 +2110,9 @@
     <ClCompile Include="..\..\src\generic\stattextg.cpp" />
     <ClCompile Include="..\..\src\generic\statusbr.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(IntDir)$(TargetName)\msw\</ObjectFileName>
@@ -1782,7 +2129,9 @@
     <ClCompile Include="..\..\src\generic\vscroll.cpp" />
     <ClCompile Include="..\..\src\univ\bmpbuttn.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1792,7 +2141,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\button.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1802,7 +2153,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\checkbox.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1812,7 +2165,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\checklst.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1822,7 +2177,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\choice.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1832,7 +2189,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\combobox.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1842,7 +2201,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\control.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1852,7 +2213,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\ctrlrend.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1862,7 +2225,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\dialog.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1872,7 +2237,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\framuniv.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1882,7 +2249,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\gauge.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1892,7 +2261,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\themes\gtk.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1902,7 +2273,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\inpcons.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1912,7 +2285,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\inphand.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1922,7 +2297,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\listbox.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1932,7 +2309,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\menu.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1942,7 +2321,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\themes\metal.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1952,7 +2333,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\themes\mono.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1962,7 +2345,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\notebook.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1972,7 +2357,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\radiobox.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1982,7 +2369,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\radiobut.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -1992,7 +2381,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\scrarrow.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2002,7 +2393,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\scrolbar.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2012,7 +2405,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\scrthumb.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2022,7 +2417,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\settingsuniv.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2032,7 +2429,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\slider.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2042,7 +2441,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\spinbutt.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2052,7 +2453,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\statbmp.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2062,7 +2465,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\statbox.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2072,7 +2477,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\statline.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2082,7 +2489,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\stattext.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2092,7 +2501,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\statusbr.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2102,7 +2513,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\stdrend.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2112,7 +2525,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\textctrl.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2122,7 +2537,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\tglbtn.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2132,7 +2549,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\theme.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2142,7 +2561,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\toolbar.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2152,7 +2573,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\topluniv.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2162,7 +2585,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\themes\win32.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2172,7 +2597,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\univ\winuniv.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2184,7 +2611,9 @@
   <ItemGroup>
     <ResourceCompile Include="..\..\src\msw\version.rc">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">true</ExcludedFromBuild>
@@ -2197,13 +2626,21 @@
     <ClInclude Include="..\..\include\wx\univ\setup.h" />
     <CustomBuild Include="..\..\include\wx\msw\setup.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Creating ..\..\lib\$(Platform)\wx\setup.h</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Creating ..\..\lib\$(Platform)\wx\setup.h</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy "%(FullPath)" ..\..\lib\$(Platform)\wx\setup.h
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">copy "%(FullPath)" ..\..\lib\$(Platform)\wx\setup.h
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\lib\$(Platform)\wx\setup.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">..\..\lib\$(Platform)\wx\setup.h;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Creating ..\..\lib\$(Platform)\wx\setup.h</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">Creating ..\..\lib\$(Platform)\wx\setup.h</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy "%(FullPath)" ..\..\lib\$(Platform)\wx\setup.h
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">copy "%(FullPath)" ..\..\lib\$(Platform)\wx\setup.h
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\lib\$(Platform)\wx\setup.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">..\..\lib\$(Platform)\wx\setup.h;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Creating ..\..\lib\$(Platform)\wx\setup.h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Creating ..\..\lib\$(Platform)\wx\setup.h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">Creating ..\..\lib\$(Platform)\wx\setup.h</Message>
@@ -2282,15 +2719,25 @@
     <ClInclude Include="..\..\include\wx\msw\gdiimage.h" />
     <CustomBuild Include="..\..\include\wx\msw\genrcdefs.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Creating ..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Creating ..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cl /EP /nologo "%(FullPath)" &gt; "..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">cl /EP /nologo "%(FullPath)" &gt; "..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h"
+</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\lib\vc_lib\mswud\wx\msw;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">..\..\lib\vc_lib\mswud\wx\msw;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Creating ..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">Creating ..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cl /EP /nologo "%(FullPath)" &gt; "..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h"
 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">cl /EP /nologo "%(FullPath)" &gt; "..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h"
+</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\lib\vc_lib\mswud\wx\msw;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">..\..\lib\vc_lib\mswud\wx\msw;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">..\..\lib\vc_lib\mswud\wx\msw\rcdefs.h;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Creating ..\..\lib\vc_lib\mswu\wx\msw\rcdefs.h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Creating ..\..\lib\vc_lib\mswu\wx\msw\rcdefs.h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">Creating ..\..\lib\vc_lib\mswu\wx\msw\rcdefs.h</Message>
