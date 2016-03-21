@@ -245,9 +245,9 @@
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='profile|x64'">false</EmbedManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">../../$(PlatformName)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">../../$(PlatformName)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -275,7 +275,7 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)NewtonDemos.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -312,7 +312,7 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)NewtonDemos.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -356,6 +356,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -393,6 +394,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -430,6 +432,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -467,6 +470,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
@@ -505,6 +509,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       </DataExecutionPrevention>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -541,6 +546,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       </DataExecutionPrevention>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -577,6 +583,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       </DataExecutionPrevention>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -613,6 +620,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       </DataExecutionPrevention>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
@@ -636,6 +644,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
@@ -659,6 +668,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
@@ -679,6 +689,8 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     <Link>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">
@@ -691,6 +703,8 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
