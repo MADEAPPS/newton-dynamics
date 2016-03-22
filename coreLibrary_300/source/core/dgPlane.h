@@ -109,7 +109,9 @@ DG_INLINE dgFloat32 dgPlane::Evalue (const dgVector& point) const
 }
 
 
-#ifndef _NEWTON_USE_DOUBLE
+#ifdef _NEWTON_USE_DOUBLE
+typedef dgPlane dgBigPlane;
+#else 
 DG_INLINE dgBigPlane::dgBigPlane () 
 	:dgBigVector () 
 {
