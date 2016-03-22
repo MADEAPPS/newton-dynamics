@@ -398,6 +398,7 @@ dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, c
 }
 
 
+#ifndef _NEWTON_USE_DOUBLE
 dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& normal)
 {
 #ifdef _DEBUG
@@ -446,9 +447,9 @@ dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVect
 		return point - normal.Scale3((normal % (point - p0)) / (normal % normal));
 	}
 }
+#endif
 
-
-
+/*
 static dgVector obbTolerance (dgFloat32 (1.0e-5f), dgFloat32 (1.0e-5f), dgFloat32 (1.0e-5f), dgFloat32 (0.0f));	
 bool dgObbTest (const dgVector& origin0__, const dgVector& size0__, const dgMatrix& matrix0, const dgVector& origin1__, const dgVector& size1__, const dgMatrix& matrix1)
 {
@@ -600,6 +601,7 @@ bool dgObbTest (const dgVector& origin0__, const dgVector& size0__, const dgMatr
 	}
 	return true;
 }
+*/
 
 /*
 bool dgApi dgPointToPolygonDistance (const dgVector& p, const dgFloat32* const polygon, dgInt32 strideInBytes,

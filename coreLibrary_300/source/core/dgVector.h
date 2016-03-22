@@ -787,38 +787,6 @@ class dgVector
 		//return (*this = _mm_sub_ps (m_type, A.m_type));
 	}
 
-
-
-	// logical operations
-	DG_INLINE dgVector operator& (const dgVector& data) const
-	{
-		dgAssert (0);
-		return data;
-//		return _mm_and_ps (m_type, data.m_type);	
-	}
-
-	DG_INLINE dgVector operator| (const dgVector& data) const
-	{
-		dgAssert (0);
-		return data;
-//		return _mm_or_ps (m_type, data.m_type);	
-	}
-
-	DG_INLINE dgVector operator^ (const dgVector& data) const
-	{
-		dgAssert (0);
-		return data;
-//		return _mm_xor_ps (m_type, data.m_type);	
-	}
-
-	DG_INLINE dgVector AndNot (const dgVector& data) const
-	{
-		dgAssert (0);
-		return data;
-//		return _mm_andnot_ps (data.m_type, m_type);	
-	}
-
-
 	// return cross product
 	DG_INLINE dgVector operator* (const dgVector& B) const
 	{
@@ -920,6 +888,14 @@ class dgVector
 		//return _mm_and_ps (m_type, m_signMask.m_type);
 	}
 
+	DG_INLINE dgVector Reciproc () const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_div_ps (m_one.m_type, m_type);
+	}
+
+
 	DG_INLINE dgVector Sqrt () const
 	{
 		dgAssert (0);
@@ -961,6 +937,155 @@ class dgVector
 		dgAssert (0);
 		return dgVector (0.0f);
 		//return dgVector(_mm_cvtps_epi32(Floor().m_type));
+	}
+
+	// relational operators
+	DG_INLINE dgVector operator> (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_cmpgt_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator== (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_cmpeq_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator< (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_cmplt_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator>= (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_cmpge_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator<= (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_cmple_ps (m_type, data.m_type);	
+	}
+
+	// logical operations
+	DG_INLINE dgVector operator& (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_and_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator| (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_or_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector operator^ (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_xor_ps (m_type, data.m_type);	
+	}
+
+	DG_INLINE dgVector AndNot (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_andnot_ps (data.m_type, m_type);	
+	}
+
+	DG_INLINE dgVector ShiftTripleRight () const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_shuffle_ps(m_type, m_type, PURMUT_MASK(3, 1, 0, 2));
+	}
+
+	DG_INLINE dgVector MoveLow (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_movelh_ps (m_type, data.m_type);
+	}
+
+	DG_INLINE dgVector MoveHigh (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_movehl_ps (m_type, data.m_type);
+	}
+
+	DG_INLINE dgVector PackLow (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_unpacklo_ps (m_type, data.m_type);
+	}
+
+	DG_INLINE dgVector PackHigh (const dgVector& data) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_unpackhi_ps (m_type, data.m_type);
+	}
+
+	DG_INLINE dgInt32 GetSignMask() const
+	{
+		dgAssert (0);
+		return 0;
+//		return _mm_movemask_ps(m_type);
+	} 
+
+	DG_INLINE dgVector CrossProduct4 (const dgVector& A, const dgVector& B) const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+/*
+		dgFloat32 cofactor[3][3];
+		dgFloat32 array[4][4];
+
+		const dgVector& me = *this;
+		for (dgInt32 i = 0; i < 4; i ++) {
+			array[0][i] = me[i];
+			array[1][i] = A[i];
+			array[2][i] = B[i];
+			array[3][i] = dgFloat32 (1.0f);
+		}
+
+		dgVector normal;
+		dgFloat32  sign = dgFloat32 (-1.0f);
+		for (dgInt32 i = 0; i < 4; i ++)  {
+
+			for (dgInt32 j = 0; j < 3; j ++) {
+				dgInt32 k0 = 0;
+				for (dgInt32 k = 0; k < 4; k ++) {
+					if (k != i) {
+						cofactor[j][k0] = array[j][k];
+						k0 ++;
+					}
+				}
+			}
+			dgFloat32  x = cofactor[0][0] * (cofactor[1][1] * cofactor[2][2] - cofactor[1][2] * cofactor[2][1]);
+			dgFloat32  y = cofactor[0][1] * (cofactor[1][2] * cofactor[2][0] - cofactor[1][0] * cofactor[2][2]);
+			dgFloat32  z = cofactor[0][2] * (cofactor[1][0] * cofactor[2][1] - cofactor[1][1] * cofactor[2][0]);
+			dgFloat32  det = x + y + z;
+
+			normal[i] = sign * det;
+			sign *= dgFloat32 (-1.0f);
+		}
+
+		return normal;
+*/
 	}
 
 
@@ -1368,7 +1493,6 @@ class dgVector
 		return _mm_shuffle_ps(m_type, m_type, PURMUT_MASK(3, 1, 0, 2));
 	}
 
-
 	DG_INLINE dgVector MoveLow (const dgVector& data) const
 	{
 		return _mm_movelh_ps (m_type, data.m_type);
@@ -1388,7 +1512,6 @@ class dgVector
 	{
 		return _mm_unpackhi_ps (m_type, data.m_type);
 	}
-
 
 	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, 
 										const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)

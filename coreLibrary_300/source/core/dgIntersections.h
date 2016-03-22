@@ -167,12 +167,15 @@ bool dgRayBoxClip (dgVector& ray_p0, dgVector& ray_p1, const dgVector& boxP0, co
 dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, const dgVector& ray_p1); 
 void dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, const dgVector& ray_q0, const dgVector& ray_q1, dgVector& p0Out, dgVector& p1Out); 
 dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2, const dgVector& normal);
-dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& normal);
 dgFloat32 dgSweepLineToPolygonTimeOfImpact (const dgVector& p0, const dgVector& p1, dgFloat32 radius, dgInt32 count, const dgVector* const polygon, const dgVector& normal, dgVector& normalOut, dgVector& contactOut);
 dgFloat32 dgRayCastBox (const dgVector& p0, const dgVector& p1, const dgVector& boxP0, const dgVector& boxP1, dgVector& normalOut);
 dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVector& origin, dgFloat32 radius);
 
-bool dgObbTest (const dgVector& origin0, const dgVector& size0, const dgMatrix& matrix0, const dgVector& origin1, const dgVector& size1, const dgMatrix& matrix1);
+#ifndef _NEWTON_USE_DOUBLE
+dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& normal);
+#endif
+
+//bool dgObbTest (const dgVector& origin0, const dgVector& size0, const dgMatrix& matrix0, const dgVector& origin1, const dgVector& size1, const dgMatrix& matrix1);
 
 DG_INLINE dgInt32 dgOverlapTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {
