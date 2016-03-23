@@ -259,24 +259,6 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 }
 
 
-
-dgFloat32 dgBody::ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInstance* const convexShape, const dgVector& shapeMinBox, const dgVector& shapeMaxBox, const dgMatrix& origin, const dgVector& shapeVeloc, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT, dgInt32 threadId) const
-{
-	dgVector minBox (m_minAABB - shapeMaxBox);
-	dgVector maxBox (m_maxAABB - shapeMinBox);
-	if (ray.BoxTest (minBox, maxBox)) {
-		dgContactPoint contactOut;
-		dgFloat32 t = m_collision->ConvexRayCast (convexShape, origin, shapeVeloc, minT, contactOut, preFilter, this, userData, threadId);
-		if (t < minT) {
-			dgAssert (t >= dgFloat32 (0.0f));
-			dgAssert (t <= dgFloat32 (1.1f));
-			minT = filter (this, contactOut.m_collision0, contactOut.m_point, contactOut.m_normal, contactOut.m_shapeId0, userData, t);
-		}
-	} 
-	return minT;
-}
-
-
 void dgBody::UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 {
 	if (m_matrixUpdate) {

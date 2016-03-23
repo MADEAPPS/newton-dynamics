@@ -270,7 +270,7 @@ class dgBroadPhase
     	public:
 		dgContact* m_contact;
 		dgContactPoint* m_contactBuffer;
-		dgFloat32 m_timeOfImpact;
+		dgFloat32 m_timestep;
 		dgInt32 m_contactCount : 16;
 		dgInt32 m_isDeformable : 1;
 		dgInt32 m_cacheIsValid : 1;
@@ -308,8 +308,8 @@ class dgBroadPhase
 	virtual void CheckStaticDynamic(dgBody* const body, dgFloat32 mass) = 0;
 	virtual void ForEachBodyInAABB (const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const = 0;
 	virtual void RayCast (const dgVector& p0, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const = 0;
-	virtual void ConvexRayCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const = 0;
-	virtual dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32& timeToImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
+	virtual dgInt32 Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
+	virtual dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
 
 	void ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints);
 	void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
@@ -338,8 +338,8 @@ class dgBroadPhase
 	void ImproveNodeFitness(dgBroadPhaseTreeNode* const node, dgBroadPhaseNode** const root);
 	void ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhaseNode** const root);
 
+	void CalculatePairContacts (dgPair* const pair, dgInt32 threadID);
 	bool ValidateContactCache(dgContact* const contact, dgFloat32 timestep) const;
-    void CalculatePairContacts (dgPair* const pair, dgFloat32 timestep, dgInt32 threadID);
     void AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex);
 	void AddPair (dgBody* const body0, dgBody* const body1, dgFloat32 timestep, dgInt32 threadID);	
 	bool TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const;
@@ -347,16 +347,15 @@ class dgBroadPhase
 	void ForEachBodyInAABB (const dgBroadPhaseNode** stackPool, dgInt32 stack, const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const;
 	void RayCast (const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& l0, const dgVector& l1, dgFastRayTest& ray, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
 
-	void ConvexRayCast (const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& velocA, dgFastRayTest& ray,  
-					 	dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const;
-
 	dgInt32 ConvexCast (const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& velocA, const dgVector& velocB, dgFastRayTest& ray,  
-						dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32& timeToImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
+						dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
+
+	dgInt32 Collide(const dgBroadPhaseNode** stackPool, dgInt32* const overlap, dgInt32 stack, const dgVector& p0, const dgVector& p1, 
+		            dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
 
 	void SleepingState (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID);
 	void ApplyForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID);
 	
-
 	void UpdateAggregateEntropy (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseAggregate*>::dgListNode* node, dgInt32 threadID);
 
 	dgBroadPhaseNode* BuildTopDown(dgBroadPhaseNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
@@ -370,7 +369,7 @@ class dgBroadPhase
 	static void SleepingStateKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
-	static void UpdateAggregateEntropy(void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void UpdateAggregateEntropyKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	
 	static void AddGeneratedBodiesContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static dgInt32 CompareNodes(const dgBroadPhaseNode* const nodeA, const dgBroadPhaseNode* const nodeB, void* const notUsed);
@@ -385,9 +384,15 @@ class dgBroadPhase
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	bool m_recursiveChunks;
 
+	DG_INLINE dgVector ReduceLine(dgVector* const simplex, dgInt32& indexOut) const;
+	DG_INLINE dgVector ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const;
+	DG_INLINE dgVector ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const;
+	DG_INLINE void ReduceDegeneratedTriangle(dgVector* const simplex) const;
+
 	static dgVector m_velocTol;
 	static dgVector m_linearContactError2;
 	static dgVector m_angularContactError2;
+	static dgInt32 m_obbTestSimplex[4][4];
 
 	friend class dgBody;
 	friend class dgWorld;

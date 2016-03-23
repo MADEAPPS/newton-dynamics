@@ -26,13 +26,13 @@
 D_IMPLEMENT_CLASS_NODE(dCollisionCylinderNodeInfo);
 
 dCollisionCylinderNodeInfo::dCollisionCylinderNodeInfo(dScene* const world) 
-	:dCollisionNodeInfo (), m_radius (0.5f), m_height(1.0f)
+	:dCollisionNodeInfo (), m_radius0 (0.5f), m_radius1 (0.5f), m_height(1.0f)
 {
 	SetName ("cylinder collision");
 }
 
 dCollisionCylinderNodeInfo::dCollisionCylinderNodeInfo()
-	:dCollisionNodeInfo (), m_radius (0.5f), m_height(1.0f)
+	:dCollisionNodeInfo (), m_radius0 (0.5f), m_radius1 (0.5f), m_height(1.0f)
 {
 	SetName ("cylinder collision");
 }
@@ -51,7 +51,8 @@ dCollisionCylinderNodeInfo::dCollisionCylinderNodeInfo(NewtonCollision* const cy
 	dMatrix& offsetMatrix = *((dMatrix*) record.m_offsetMatrix);
 	SetName ("cylinder collision");
 
-	m_radius = record.m_cylinder.m_radio;
+	m_radius0 = record.m_cylinder.m_radio0;
+	m_radius1 = record.m_cylinder.m_radio1;
 	m_height = record.m_cylinder.m_height;
 
 	SetTransform (offsetMatrix);
@@ -61,19 +62,26 @@ dCollisionCylinderNodeInfo::dCollisionCylinderNodeInfo(NewtonCollision* const cy
 }
 
 
-void dCollisionCylinderNodeInfo::SetRadius (dFloat radius)
+void dCollisionCylinderNodeInfo::SetRadius (dFloat radius0, dFloat radius1)
 {
-	m_radius = radius;
+	m_radius0 = radius0;
+	m_radius1 = radius1;
 }
 void dCollisionCylinderNodeInfo::SetHeight (dFloat height)
 {
 	m_height = height;
 }
 
-dFloat dCollisionCylinderNodeInfo::GetRadius () const
+dFloat dCollisionCylinderNodeInfo::GetRadius0 () const
 {
-	return m_radius;
+	return m_radius0;
 }
+
+dFloat dCollisionCylinderNodeInfo::GetRadius1() const
+{
+	return m_radius1;
+}
+
 
 dFloat dCollisionCylinderNodeInfo::GetHeight () const
 {
@@ -90,7 +98,8 @@ void dCollisionCylinderNodeInfo::BakeTransform (const dMatrix& transform)
 	dMatrix stretchAxis;
 	dMatrix transformMatrix;
 	transform.PolarDecomposition (transformMatrix, scale, stretchAxis);
-	m_radius *= scale.m_y;
+	m_radius0 *= scale.m_y;
+	m_radius1 *= scale.m_y;
 	m_height *= scale.m_x;
 }
 
@@ -98,7 +107,7 @@ void dCollisionCylinderNodeInfo::BakeTransform (const dMatrix& transform)
 void dCollisionCylinderNodeInfo::CalculateInertiaGeometry (dScene* const world, dVector& inertia, dVector& centerOfMass) const
 {
 	NewtonWorld* const newton = world->GetNewtonWorld();
-	NewtonCollision* const shape = NewtonCreateCylinder(newton, m_radius, m_height, 0, &m_matrix[0][0]);
+	NewtonCollision* const shape = NewtonCreateCylinder(newton, m_radius0, m_radius1, m_height, 0, &m_matrix[0][0]);
 	CalculateGeometryProperies (shape, inertia, centerOfMass);
 	NewtonDestroyCollision(shape);
 
@@ -111,7 +120,8 @@ void dCollisionCylinderNodeInfo::Serialize (TiXmlElement* const rootNode) const
 
 	TiXmlElement* const dataNode = new TiXmlElement ("size");
 	rootNode->LinkEndChild(dataNode);
-	dataNode->SetDoubleAttribute("radius", double (m_radius));
+	dataNode->SetDoubleAttribute("radius0", double (m_radius0));
+	dataNode->SetDoubleAttribute("radius1", double (m_radius1));
 	dataNode->SetDoubleAttribute("height", double (m_height));
 }
 
@@ -120,7 +130,8 @@ bool dCollisionCylinderNodeInfo::Deserialize (const dScene* const scene, TiXmlEl
 	DeserialiseBase(scene, dCollisionNodeInfo, rootNode);
 
 	TiXmlElement* const dataNode = (TiXmlElement*) rootNode->FirstChild ("size");
-	dStringToFloatArray (dataNode->Attribute("radius"), &m_radius, 1);
+	dStringToFloatArray (dataNode->Attribute("radius0"), &m_radius0, 1);
+	dStringToFloatArray (dataNode->Attribute("radius1"), &m_radius1, 1);
 	dStringToFloatArray (dataNode->Attribute("height"), &m_height, 1);
 	return true;
 }
@@ -135,5 +146,5 @@ NewtonCollision* dCollisionCylinderNodeInfo::CreateNewtonCollision (NewtonWorld*
 	const dMatrix& offsetMatrix = GetTransform ();
 	
 	// create a newton collision shape from the node.
-	return NewtonCreateCylinder(world, m_radius, m_height, collisionID, &offsetMatrix[0][0]);
+	return NewtonCreateCylinder(world, m_radius0, m_radius1, m_height, collisionID, &offsetMatrix[0][0]);
 }

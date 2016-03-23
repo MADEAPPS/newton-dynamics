@@ -44,10 +44,8 @@ enum dgCollisionID
 	// do not change the order of these enum
 	m_sphereCollision = 0,
 	m_capsuleCollision,
-	m_chamferCylinderCollision,
-	m_taperedCapsuleCollision,
 	m_cylinderCollision,
-	m_taperedCylinderCollision,
+	m_chamferCylinderCollision,
 	m_boxCollision,
 	m_coneCollision,
 	m_convexHullCollision,
@@ -219,21 +217,19 @@ class dgCollision
 		dgCollisionCapsule_RTTI						= 1<<4,
 		dgCollisionCylinder_RTTI					= 1<<5,
 		dgCollisionConvexHull_RTTI					= 1<<6,
-		dgCollisionTaperedCapsule_RTTI				= 1<<7,	
-		dgCollisionTaperedCylinder_RTTI 			= 1<<8,	
-		dgCollisionChamferCylinder_RTTI 			= 1<<9,
-		dgCollisionConvexPolygon_RTTI				= 1<<10,
-		dgCollisionConvexShape_RTTI					= 1<<11,
-		dgCollisionCompound_RTTI					= 1<<12,
-		dgCollisionBVH_RTTI							= 1<<13,
-		dgCollisionMesh_RTTI						= 1<<14,
-		dgCollisionDeformableMesh_RTTI				= 1<<15,
-		dgCollisionDeformableSolidMesh_RTTI			= 1<<16,
-		dgCollisionDeformableClothPatch_RTTI		= 1<<17,
-		dgCollisionUserMesh_RTTI					= 1<<18,
-		dgCollisionHeightField_RTTI					= 1<<19,
-		dgCollisionScene_RTTI						= 1<<20,
-		dgCollisionCompoundBreakable_RTTI			= 1<<21,
+		dgCollisionChamferCylinder_RTTI 			= 1<<7,
+		dgCollisionConvexPolygon_RTTI				= 1<<8,
+		dgCollisionConvexShape_RTTI					= 1<<9,
+		dgCollisionCompound_RTTI					= 1<<10,
+		dgCollisionBVH_RTTI							= 1<<11,
+		dgCollisionMesh_RTTI						= 1<<12,
+		dgCollisionDeformableMesh_RTTI				= 1<<13,
+		dgCollisionDeformableSolidMesh_RTTI			= 1<<14,
+		dgCollisionDeformableClothPatch_RTTI		= 1<<15,
+		dgCollisionUserMesh_RTTI					= 1<<16,
+		dgCollisionHeightField_RTTI					= 1<<17,
+		dgCollisionScene_RTTI						= 1<<18,
+		dgCollisionCompoundBreakable_RTTI			= 1<<19,
 	};													 
 	
 	DG_CLASS_ALLOCATOR(allocator)
@@ -244,7 +240,11 @@ class dgCollision
 	dgInt32 IsType (dgRTTI type) const; 
 	dgUnsigned32 GetSignature () const;
 	dgCollisionID GetCollisionPrimityType () const;
+
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const = 0;
+	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const = 0;
+	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const = 0;
+
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const = 0;
 
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1) = 0;
@@ -252,7 +252,6 @@ class dgCollision
 
 	virtual void DebugCollision  (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const = 0;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const = 0;
-	virtual dgFloat32 ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& origin, const dgVector& veloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const = 0;
 
 	virtual dgFloat32 GetVolume () const = 0;
 	

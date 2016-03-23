@@ -27,6 +27,7 @@
 #include "CustomPlayerControllerManager.h"
 #include "CustomVehicleControllerManager.h"
 
+
 #ifdef _MACOSX_VER
 	#include "CocoaOpenglGlue.h"
 #endif
@@ -98,17 +99,16 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,m_cameraManager(NULL)
     ,m_tranparentHeap()
 //	,m_visualDebugger(NULL)
-//	,m_profiler(60, 40)
+
 	,m_mainThreadGraphicsTime(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)
-//	,m_physThreadTime(0.0f)
 {
 	// initialized the physics world for the new scene
 	Cleanup ();
 
 	ResetTimer();
 
-
+	dTimeTrackerSetThreadName ("mainThread");
 	m_context = new wxGLContext(this);
 }
 
@@ -671,10 +671,8 @@ int DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const ch
 
 void DemoEntityManager::UpdatePhysics(float timestep)
 {
-	// read the controls 
 	// update the physics
 	if (m_world) {
-		//Sleep (40);
 
 		dFloat timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
 		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
@@ -685,7 +683,8 @@ void DemoEntityManager::UpdatePhysics(float timestep)
 
 		while ((nextTime >= timestepMicrosecunds) && (loops < MAX_PHYSICS_LOOPS)) {
 			loops ++;
-
+			
+			dTimeTrackerEvent(__FUNCTION__);
 			// run the newton update function
 			if (!m_reEntrantUpdate) {
 				m_reEntrantUpdate = true;
@@ -699,7 +698,6 @@ void DemoEntityManager::UpdatePhysics(float timestep)
 					} else {
 						NewtonUpdateAsync(m_world, timestepInSecunds);
 					}
-					//m_physThreadTime = NewtonReadPerformanceTicks (m_world, NEWTON_PROFILER_WORLD_UPDATE) * 1.0e-3f;
 				}
 				m_reEntrantUpdate = false;
 			}
@@ -762,6 +760,7 @@ void DemoEntityManager::OnIdle(wxIdleEvent& event)
 {
 	wxClientDC dc(this);
 	RenderFrame ();
+	dTimeTrackerUpdate();
 	event.RequestMore(); // render continuously, not only once on idle
 }
 
@@ -773,7 +772,7 @@ void DemoEntityManager::OnPaint (wxPaintEvent& WXUNUSED(event))
 
 void DemoEntityManager::RenderFrame ()
 {
-	//Sleep (20);
+	dTimeTrackerEvent(__FUNCTION__);
 
 	// Make context current
 	if (m_mainWindow->m_suspendVisualUpdates) {
@@ -788,7 +787,6 @@ void DemoEntityManager::RenderFrame ()
 	UpdatePhysics(timestep);
 	unsigned64 time1 = dGetTimeInMicrosenconds ();
 	m_mainThreadPhysicsTime = dFloat ((time1 - time0) / 1000.0f);
-
 
 	// Get the interpolated location of each body in the scene
 	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
@@ -945,17 +943,6 @@ void DemoEntityManager::RenderFrame ()
 	}
 
 	int lineNumber = 130 + 22;
-	//if (m_mainWindow->m_concurrentProfilerState) {
-	//	lineNumber = m_profiler.RenderConcurrentPerformance(lineNumber);
-	//}
-
-	//if (profileFlags) {
-	//	lineNumber = m_profiler.Render (profileFlags, lineNumber);
-	//}
-
-	//if (m_mainWindow->m_threadProfilerState) {
-	//	m_profiler.RenderThreadPerformance ();
-	//}
 
 	if (m_renderHood) {
 

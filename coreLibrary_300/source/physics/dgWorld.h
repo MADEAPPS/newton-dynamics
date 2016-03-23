@@ -125,7 +125,6 @@ class dgWorld
 	,public dgWorldThreadPool
 {
 	public:
-
 	typedef dgUnsigned32 (dgApi *OnIslandUpdate) (const dgWorld* const world, void* island, dgInt32 bodyCount);
 	typedef void (dgApi *OnListenerBodyDestroyCallback) (const dgWorld* const world, void* const listener, dgBody* const body);
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listener, dgFloat32 timestep);
@@ -272,12 +271,10 @@ class dgWorld
 	dgCollisionInstance* CreateNull ();
 	dgCollisionInstance* CreateSphere (dgFloat32 radiusdg, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateCone (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
-	dgCollisionInstance* CreateCapsule (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
-	dgCollisionInstance* CreateCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
+	dgCollisionInstance* CreateCapsule (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
+	dgCollisionInstance* CreateCylinder (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateBox (dgFloat32 dx, dgFloat32 dy, dgFloat32 dz, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateConvexHull (dgInt32 count, const dgFloat32* const points, dgInt32 strideInBytes, dgFloat32 thickness, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
-	dgCollisionInstance* CreateTaperedCapsule (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
-	dgCollisionInstance* CreateTaperedCylinder (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateChamferCylinder (dgFloat32 radius, dgFloat32 height, dgInt32 shapeID, const dgMatrix& offsetMatrix = dgGetIdentityMatrix());
 	dgCollisionInstance* CreateCompound ();
 	dgCollisionInstance* CreateFracturedCompound (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix,
@@ -359,37 +356,19 @@ class dgWorld
 	void Sync ();
 	
 	private:
-	
-	void CalculateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
+	void CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
 	dgInt32 PruneContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;
 	dgInt32 ReduceContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount, dgFloat32 tol, dgInt32 arrayIsSorted = 0) const;
-	
-//	dgInt32 CalculateHullToHullContacts (dgCollisionParamProxy& proxy) const;
-//	void PopulateContacts (dgContact* const contact, dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);	
-//	dgInt32 CalculateConicConvexToHullContacts (dgCollisionParamProxy& proxy) const;
-//	dgInt32 CalculateConvexToConvexContinuesContacts (dgFloat32& timestep, dgBody* body1, dgBody* body2, dgContactPoint contactOut[]) const; 
-//	dgInt32 CalculateConvexToConvexContinuesContacts (dgCollisionParamProxy& proxy) const; 
-//	dgInt32 CalculateConvexToConvexContinuesContacts (dgCollisionParamProxy& proxy) const; 
-//	dgInt32 CalculateConvexToConvexContacts (dgFloat32& timestep, dgBody* conv1, dgBody* conv2, dgFloat32 penetrationPadding, dgContactPoint* const contact) const;
-//	dgInt32 CalculateConvexToNonConvexContacts (dgFloat32& timestep, dgBody* conv, dgBody* nConv, dgContactPoint* const contact, dgInt32 maxContacts) const;
-//	dgInt32 CalculatecConvexConvexCastContacts (dgCollisionParamProxy& proxy, bool& algorithmSuccessful) const;
-//	bool ValidateContactCache (dgContact* const contact, dgFloat32 timestep) const;
-	
 	dgInt32 CalculateConvexPolygonToHullContactsDescrete (dgCollisionParamProxy& proxy) const;
-
 	dgInt32 CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateConvexToNonConvexContactsContinue (dgCollisionParamProxy& proxy) const;
-	
-	dgInt32 CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) const;
-
 	dgInt32 CalculateUserContacts (dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateConvexToNonConvexContacts (dgCollisionParamProxy& proxy) const;
-
-	//dgInt32 FilterPolygonDuplicateContacts (dgInt32 count, dgContactPoint* const contact) const;
+	dgInt32 CalculateConvexToConvexContacts (dgCollisionParamProxy& proxy) const;
 	
-	void PopulateContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);	
-	void ProcessContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);
-	void ProcessDeformableContacts (dgBroadPhase::dgPair* const pair, dgFloat32 timestep, dgInt32 threadIndex);
+	void PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex);	
+	void ProcessContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex);
+	void ProcessDeformableContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex);
 	void ProcessCachedContacts (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex) const;
 
 	void ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;

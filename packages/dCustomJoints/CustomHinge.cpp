@@ -182,12 +182,17 @@ void CustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	// Restrict the movement on the pivot point along all tree orthonormal direction
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
 	// two rows to restrict rotation around around the parent coordinate system
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	CalculateAngle (matrix1.m_up, matrix0.m_up, matrix1.m_front, sinAngle, cosAngle);

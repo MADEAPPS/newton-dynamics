@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timeTracker", "timeTracker.vcxproj", "{57F4521C-2AEC-46DF-AB1A-324A29E9E4B2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dContainers", "..\..\..\..\projects\visualStudio_2012_static_mt\dContainers.vcxproj", "{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{57F4521C-2AEC-46DF-AB1A-324A29E9E4B2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{57F4521C-2AEC-46DF-AB1A-324A29E9E4B2}.Debug|Win32.Build.0 = Debug|Win32
+		{57F4521C-2AEC-46DF-AB1A-324A29E9E4B2}.Debug|x64.ActiveCfg = Debug|Win32
+		{57F4521C-2AEC-46DF-AB1A-324A29E9E4B2}.Release|Win32.ActiveCfg = Release|Win32
+		{57F4521C-2AEC-46DF-AB1A-324A29E9E4B2}.Release|Win32.Build.0 = Release|Win32
+		{57F4521C-2AEC-46DF-AB1A-324A29E9E4B2}.Release|x64.ActiveCfg = Release|Win32
+		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Debug|Win32.Build.0 = Debug|Win32
+		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Debug|x64.ActiveCfg = debug|x64
+		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Debug|x64.Build.0 = debug|x64
+		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Release|Win32.ActiveCfg = release|Win32
+		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Release|Win32.Build.0 = release|Win32
+		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Release|x64.ActiveCfg = release|x64
+		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.Release|x64.Build.0 = release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

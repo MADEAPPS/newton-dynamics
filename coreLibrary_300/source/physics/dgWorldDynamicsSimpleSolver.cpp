@@ -300,11 +300,12 @@ void dgWorldDynamicUpdate::CalculateIslandContacts (dgIsland* const island, dgFl
 					contact->m_broadphaseLru = currLru;
 					pair.m_contact = contact;
 					pair.m_cacheIsValid = false;
+					pair.m_timestep = timestep;
 					pair.m_contactBuffer = contactArray;
-					world->CalculateContacts (&pair, timestep, threadID, false, false);
+					world->CalculateContacts (&pair, threadID, false, false);
 					if (pair.m_contactCount) {
 						dgAssert (pair.m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
-						world->ProcessContacts (&pair, timestep, threadID);
+						world->ProcessContacts (&pair, threadID);
 					}
 				}
 			}
@@ -380,17 +381,13 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 			row->m_maxImpact = dgFloat32(0.0f);
 
 			//force[index] = 0.0f;
-			dgAssert(row->m_diagDamp >= dgFloat32(0.1f));
-			dgAssert(row->m_diagDamp <= dgFloat32(100.0f));
-			dgFloat32 stiffness = DG_PSD_DAMP_TOL * row->m_diagDamp;
-
 			dgAssert (tmpDiag.m_w == dgFloat32 (0.0f));
 			dgFloat32 diag = (tmpDiag.AddHorizontal()).GetScalar();
 			dgAssert(diag > dgFloat32(0.0f));
-			row->m_diagDamp = diag * stiffness;
+			row->m_diagDamp = diag * row->m_stiffness;
 
 			//row->m_JMinvJt = diag;
-			diag *= (dgFloat32(1.0f) + stiffness);
+			diag *= (dgFloat32(1.0f) + row->m_stiffness);
 			row->m_invJMinvJt = dgFloat32(1.0f) / diag;
 			index++;
 		}
@@ -400,6 +397,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 
 void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep) const 
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgAssert (island->m_bodyCount >= 2);
 
 	dgWorld* const world = (dgWorld*) this;
@@ -762,6 +760,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(dgJointInfo* const jointInfo
 
 void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = island->m_bodyCount;
 	const dgInt32 jointCount = island->m_jointCount;
@@ -825,6 +824,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	for (dgInt32 i = 0; i < skeletonCount; i ++) {
 		dgSkeletonContainer* const container = skeletonArray[i];
+		//if (container->m_errorCorrection > dgFloat32 (0.0f)) {
+		//	container->ApplpyKinematicErrorCorrection (constraintArray, matrixRow);
+		//}
 		if (!container->m_skeletonHardMotors) {
 			container->InitMassMatrix (constraintArray, matrixRow);
 		}

@@ -121,12 +121,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionInstance.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCylinder.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCapsule.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect5.cpp">
       <Filter>meshUtil</Filter>
     </ClCompile>
@@ -170,6 +164,9 @@
       <Filter>systems</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgBroadPhaseAggregate.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgContactSolver.cpp">
       <Filter>systems</Filter>
     </ClCompile>
   </ItemGroup>
@@ -282,12 +279,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionInstance.h">
       <Filter>collision</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCylinder.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCapsule.h">
-      <Filter>collision</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgBody.h">
       <Filter>bodies</Filter>
     </ClInclude>
@@ -325,6 +316,9 @@
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgBroadPhaseAggregate.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgContactSolver.h">
       <Filter>systems</Filter>
     </ClInclude>
   </ItemGroup>

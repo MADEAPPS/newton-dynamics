@@ -98,7 +98,7 @@ void dCollisionChamferCylinderNodeInfo::BakeTransform (const dMatrix& transform)
 void dCollisionChamferCylinderNodeInfo::CalculateInertiaGeometry (dScene* const world, dVector& inertia, dVector& centerOfMass) const
 {
 	NewtonWorld* const newton = world->GetNewtonWorld();
-	NewtonCollision* const shape = NewtonCreateCylinder(newton, m_radius, m_height, 0, &m_matrix[0][0]);
+	NewtonCollision* const shape = NewtonCreateChamferCylinder(newton, m_radius, m_height, 0, &m_matrix[0][0]);
 	CalculateGeometryProperies (shape, inertia, centerOfMass);
 	NewtonDestroyCollision (shape);
 }

@@ -55,26 +55,25 @@ class dgFastRayTest
 	DG_INLINE dgFastRayTest(const dgVector& l0, const dgVector& l1)
 		:m_p0 (l0)
 		,m_p1(l1)
-		,m_diff ((l1 - l0) | dgVector::m_wOne)
+		,m_diff ((l1 - l0) & dgVector::m_triplexMask)
 		,m_minT(dgFloat32 (0.0f))  
 		,m_maxT(dgFloat32 (1.0f))
 		,m_zero(dgFloat32 (0.0f)) 
 	{
 		dgAssert (m_p0.m_w == dgFloat32 (0.0f));
 		dgAssert (m_p1.m_w == dgFloat32 (0.0f));
-		dgAssert (m_diff.m_w == dgFloat32 (1.0f));
+		dgAssert (m_diff.m_w == dgFloat32 (0.0f));
 
 		m_isParallel = (m_diff.Abs() < dgVector (1.0e-8f));
 
 		m_dpInv = (((dgVector (dgFloat32 (1.0e-20)) & m_isParallel) | m_diff.AndNot(m_isParallel)).Reciproc ()) & dgVector::m_triplexMask;
 		m_dpBaseInv = m_dpInv;
 
-		dgFloat32 mag = dgSqrt (m_diff % m_diff);
+		dgFloat32 mag = dgSqrt (m_diff.DotProduct4(m_diff).GetScalar());
 		m_dirError = -dgFloat32 (0.0175f) * mag;
 		m_magRayTest = dgMax (mag, dgFloat32 (1.0f));
 	}
 	
-
 	dgFloat32 PolygonIntersect (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
 	dgFloat32 PolygonIntersectFallback (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
 
@@ -168,12 +167,15 @@ bool dgRayBoxClip (dgVector& ray_p0, dgVector& ray_p1, const dgVector& boxP0, co
 dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, const dgVector& ray_p1); 
 void dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, const dgVector& ray_q0, const dgVector& ray_q1, dgVector& p0Out, dgVector& p1Out); 
 dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2, const dgVector& normal);
-dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& normal);
 dgFloat32 dgSweepLineToPolygonTimeOfImpact (const dgVector& p0, const dgVector& p1, dgFloat32 radius, dgInt32 count, const dgVector* const polygon, const dgVector& normal, dgVector& normalOut, dgVector& contactOut);
 dgFloat32 dgRayCastBox (const dgVector& p0, const dgVector& p1, const dgVector& boxP0, const dgVector& boxP1, dgVector& normalOut);
 dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVector& origin, dgFloat32 radius);
 
-bool dgObbTest (const dgVector& origin0, const dgVector& size0, const dgMatrix& matrix0, const dgVector& origin1, const dgVector& size1, const dgMatrix& matrix1);
+#ifndef _NEWTON_USE_DOUBLE
+dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& normal);
+#endif
+
+//bool dgObbTest (const dgVector& origin0, const dgVector& size0, const dgMatrix& matrix0, const dgVector& origin1, const dgVector& size1, const dgMatrix& matrix1);
 
 DG_INLINE dgInt32 dgOverlapTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {

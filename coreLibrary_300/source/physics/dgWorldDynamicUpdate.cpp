@@ -79,6 +79,7 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 
 void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	dgBodyMasterList& masterList = *world;
 
@@ -115,11 +116,14 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_active = false;
 	sentinelBody->m_equilibrium = true;
 	for (dgInt32 i = 0; i < threadCount; i ++) {
-		world->QueueJob (FindActiveJointAndBodies, &descriptor, world);
+		world->QueueJob (FindActiveJointAndBodiesKernel, &descriptor, world);
 	}
 	world->SynchronizationBarrier();
-
-	dgSort (m_islandMemory, m_islands, CompareIslands); 
+	{
+		dTimeTrackerEvent("SortIsland");
+		dgSort (m_islandMemory, m_islands, CompareIslands); 
+	}
+	
 
 	if (!(world->m_amp && (world->m_hardwaredIndex > 0))) {
 		dgInt32 index = 0;
@@ -165,6 +169,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 void dgWorldDynamicUpdate::BuildIslands(dgFloat32 timestep)
 {
+	dTimeTrackerEvent(__FUNCTION__);
+
 	dgWorld* const world = (dgWorld*) this;
 	dgUnsigned32 lru = m_markLru - 1;
 
@@ -668,9 +674,9 @@ dgInt32 dgWorldDynamicUpdate::CompareIslands(const dgIsland* const islandA, cons
 }
 
 
-
-void dgWorldDynamicUpdate::FindActiveJointAndBodies (void* const context, void* const worldContext, dgInt32 threadID)
+void dgWorldDynamicUpdate::FindActiveJointAndBodiesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgWorldDynamicUpdateSyncDescriptor* const descriptor = (dgWorldDynamicUpdateSyncDescriptor*) context;
 
 	dgWorld* const world = (dgWorld*) worldContext;
@@ -684,9 +690,9 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (void* const context, void* 
 }
 
 
-
 void dgWorldDynamicUpdate::CalculateIslandReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgWorldDynamicUpdateSyncDescriptor* const descriptor = (dgWorldDynamicUpdateSyncDescriptor*) context;
 
 	dgFloat32 timestep = descriptor->m_timestep;
@@ -736,12 +742,16 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 			dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);
 			row->m_Jt = constraintParamOut.m_jacobian[i];
 
-			dgAssert(constraintParamOut.m_jointStiffness[i] >= dgFloat32(0.1f));
-			dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(100.0f));
+			//dgAssert(constraintParamOut.m_jointStiffness[i] >= dgFloat32(0.0f));
+			//dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(1.0f));
 
-			row->m_diagDamp = constraintParamOut.m_jointStiffness[i];
+			//row->m_stiffness = constraintParamOut.m_jointStiffness[i];
+			row->m_diagDamp = dgFloat32 (0.0f);
+			row->m_stiffness = DG_PSD_DAMP_TOL * (dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) + dgFloat32 (1.0e-6f);
+			dgAssert(row->m_stiffness >= dgFloat32(0.0f));
 			row->m_coordenateAccel = constraintParamOut.m_jointAccel[i];
-			row->m_accelIsMotor = constraintParamOut.m_isMotor[i];
+			row->m_accelIsMotor = constraintParamOut.m_flags[i].m_isMotor ? true : false;
+			row->m_applyCorrection = constraintParamOut.m_flags[i].m_applyCorrection ? true : false;
 			row->m_restitution = constraintParamOut.m_restitution[i];
 			row->m_penetration = constraintParamOut.m_penetration[i];
 			row->m_penetrationStiffness = constraintParamOut.m_penetrationStiffness[i];

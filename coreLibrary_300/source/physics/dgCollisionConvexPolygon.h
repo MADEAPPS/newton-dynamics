@@ -56,12 +56,14 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	virtual dgFloat32 GetVolume () const;
 	virtual dgFloat32 GetBoxMinRadius () const; 
 	virtual dgFloat32 GetBoxMaxRadius () const;
-
+	
 	void BeamClipping (const dgVector& origin, dgFloat32 size);
 	void SetFeatureHit (dgInt32 featureCount, const dgInt32* const index);
-    dgInt32 CalculateContactToConvexHullDescrete (dgCollisionParamProxy& proxy, const dgVector& polyInstanceScale, const dgVector& polyInstanceInvScale);
-	dgInt32 CalculateContactToConvexHullContinue (dgCollisionParamProxy& proxy, const dgVector& polyInstanceScale, const dgVector& polyInstanceInvScale);
 
+	dgVector CalculateGlobalNormal (const dgCollisionInstance* const parentMesh, const dgVector& localNormal) const;
+	dgInt32 CalculateContactToConvexHullDescrete(const dgWorld* const world, const dgCollisionInstance* const parentMesh, dgCollisionParamProxy& proxy);
+	dgInt32 CalculateContactToConvexHullContinue (const dgWorld* const world, const dgCollisionInstance* const parentMesh, dgCollisionParamProxy& proxy);
+	
 //	dgVector ClosestDistanceToTriangle (const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2, bool& isEdge) const;
 //	bool PointToPolygonDistance (const dgVector& point, dgFloat32 radius, dgVector& out, bool& isEdge);
 //	bool DistanceToOrigen (const dgMatrix& matrix, const dgVector& scale, dgFloat32 radius, dgVector& out, bool& isEdge);

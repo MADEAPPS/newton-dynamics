@@ -147,14 +147,15 @@ void Newton::DestroyBody(dgBody* const body)
 
 NewtonUserJoint::NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo, dgBody* const dyn0, dgBody* const dyn1)
 	:dgUserConstraint (world, dyn0, dyn1, 1)
+	,m_forceArray(m_jointForce)
+	,m_param(NULL)
+	,m_rows(0)
 {
-	m_rows = 0;
 	m_maxDOF = dgUnsigned8(maxDof);
 	m_jacobianFnt = callback;
 	m_getInfoCallback = getInfo;
 
 	dgAssert (world);
-	m_forceArray = m_jointForce;
 	if (m_maxDOF > DG_BILATERAL_CONTRAINT_DOF) {
 		m_forceArray = (dgForceImpactPair*) world->GetAllocator()->Malloc (dgInt32 (m_maxDOF * sizeof (dgForceImpactPair)));
 	}
@@ -166,7 +167,6 @@ NewtonUserJoint::~NewtonUserJoint ()
 	if (m_forceArray != m_jointForce) {
 		m_body0->GetWorld()->GetAllocator()->Free (m_forceArray);
 	}
-
 }
 
 
@@ -195,9 +195,6 @@ void NewtonUserJoint::AddLinearRowJacobian (const dgVector& pivot0, const dgVect
 	dgPointParam pointData;
     InitPointParam (pointData, m_stiffness, pivot0, pivot1);
 
-	m_lastPosit0 = pivot0;
-	m_lastPosit1 = pivot1;
-	m_lastJointAngle = dgFloat32 (0.0f);
 	CalculatePointDerivative (m_rows, *m_param, dir, pointData, &m_forceArray[m_rows]); 
 	m_rows ++;
 	dgAssert (m_rows <= dgInt32 (m_maxDOF));
@@ -205,9 +202,6 @@ void NewtonUserJoint::AddLinearRowJacobian (const dgVector& pivot0, const dgVect
 
 void NewtonUserJoint::AddAngularRowJacobian (const dgVector& dir, dgFloat32 relAngle)
 {
-	m_lastPosit0 = dgVector (dgFloat32 (0.0f));
-	m_lastPosit1 = dgVector (dgFloat32 (0.0f));
-	m_lastJointAngle = relAngle;
 	CalculateAngularDerivative (m_rows, *m_param, dir, m_stiffness, relAngle, &m_forceArray[m_rows]); 
 	m_rows ++;
 	dgAssert (m_rows <= dgInt32 (m_maxDOF));
@@ -215,10 +209,6 @@ void NewtonUserJoint::AddAngularRowJacobian (const dgVector& dir, dgFloat32 relA
 
 void NewtonUserJoint::AddGeneralRowJacobian (const dgFloat32* const jacobian0, const dgFloat32* const jacobian1)
 {
-	m_lastPosit0 = dgVector (dgFloat32 (0.0f));
-	m_lastPosit1 = dgVector (dgFloat32 (0.0f));
-	m_lastJointAngle = 0.0f;
-
 	SetJacobianDerivative (m_rows, *m_param, jacobian0, jacobian1, &m_forceArray[m_rows]);
 	m_rows ++;
 	dgAssert (m_rows <= dgInt32 (m_maxDOF));
@@ -263,12 +253,13 @@ dgFloat32 NewtonUserJoint::CalculateZeroMotorAcceleration() const
 }
 
 
-void NewtonUserJoint::SetSpringDamperAcceleration (dFloat springK, dFloat damperD)
+void NewtonUserJoint::SetSpringDamperAcceleration (dFloat spring, dFloat damper)
 {
 	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
-		dgFloat32 accel = CalculateSpringDamperAcceleration (index, *m_param, m_lastJointAngle, m_lastPosit0, m_lastPosit1, springK, damperD);
-		SetMotorAcceleration (index, accel, *m_param);
+//		dgFloat32 accel = CalculateSpringDamperAcceleration (index, *m_param, springK, damperD);
+//		SetMotorAcceleration (index, accel, *m_param);
+		dgBilateralConstraint::SetSpringDamperAcceleration (index, *m_param, spring, damper);
 	}
 }
 
@@ -318,8 +309,8 @@ void NewtonUserJoint::SetRowStiffness (dgFloat32 stiffness)
 {
 	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
-		stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
-		stiffness = 100.0f - stiffness * 99.0f; 
+		//stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
+		//stiffness = 100.0f - stiffness * 99.0f; 
 		m_param->m_jointStiffness[index] = stiffness;
 	}
 }

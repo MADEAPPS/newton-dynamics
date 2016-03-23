@@ -51,16 +51,16 @@ class dgBilateralConstraint: public dgConstraint
 
 	dgFloat32 CalculateMotorAcceleration (dgInt32 index, dgContraintDescritor& desc) const;
 	void SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc);
+	void SetSpringDamperAcceleration (dgInt32 index, dgContraintDescritor& desc, dgFloat32 spring, dgFloat32 damper);
 	void SetJacobianDerivative (dgInt32 index, dgContraintDescritor& desc, const dgFloat32* const jacobianA, const dgFloat32* const jacobianB, dgForceImpactPair* const jointForce);
 	void CalculatePointDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, const dgPointParam& param, dgForceImpactPair* const jointForce);
 	void CalculateAngularDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& normalGlobal, dgFloat32 stiffness, dgFloat32 jointAngle, dgForceImpactPair* const jointForce);
-	dgFloat32 CalculateSpringDamperAcceleration (dgInt32 index, const dgContraintDescritor& desc, dgFloat32 jointAngle, const dgVector& p0Global, const dgVector& p1Global, dgFloat32 springK, dgFloat32 springD);
-
-	dgFloat32 m_stiffness;
+	
 	dgForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
-	dgInt32	  m_rowIsMotor[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
+	dgInt32	  m_rowIsMotor[DG_BILATERAL_CONTRAINT_DOF];
 	OnConstraintDestroy m_destructor;
+	dgFloat32 m_stiffness;
 
 	friend class dgWorldDynamicUpdate;
 };

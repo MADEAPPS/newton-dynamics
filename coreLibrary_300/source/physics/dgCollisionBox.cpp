@@ -25,14 +25,15 @@
 #include "dgContact.h"
 #include "dgCollisionBox.h"
 
+#define D_BOX_SKIN_THINCKNESS	dgFloat32 (1.0f/64.0f)
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 dgInt32 dgCollisionBox::m_initSimplex = 0;
-dgConvexSimplexEdge dgCollisionBox::m_edgeArray[24];
-dgConvexSimplexEdge* dgCollisionBox::m_edgeEdgeMap[12];
-dgConvexSimplexEdge* dgCollisionBox::m_vertexToEdgeMap[8];
+dgCollisionConvex::dgConvexSimplexEdge dgCollisionBox::m_edgeArray[24];
+dgCollisionConvex::dgConvexSimplexEdge* dgCollisionBox::m_edgeEdgeMap[12];
+dgCollisionConvex::dgConvexSimplexEdge* dgCollisionBox::m_vertexToEdgeMap[8];
 dgInt32 dgCollisionBox::m_faces[][4] =
 {
 	{0, 1, 3, 2},
@@ -63,9 +64,9 @@ dgCollisionBox::dgCollisionBox(dgWorld* const world, dgDeserialize deserializati
 void dgCollisionBox::Init (dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 {
 	m_rtti |= dgCollisionBox_RTTI;
-	m_size[0].m_x = dgAbsf (size_x) * dgFloat32 (0.5f);
-	m_size[0].m_y = dgAbsf (size_y) * dgFloat32 (0.5f);
-	m_size[0].m_z = dgAbsf (size_z) * dgFloat32 (0.5f);
+	m_size[0].m_x = dgMax (dgAbsf (size_x) * dgFloat32 (0.5f), dgFloat32(2.0f) * D_BOX_SKIN_THINCKNESS);
+	m_size[0].m_y = dgMax (dgAbsf (size_y) * dgFloat32 (0.5f), dgFloat32(2.0f) * D_BOX_SKIN_THINCKNESS);
+	m_size[0].m_z = dgMax (dgAbsf (size_z) * dgFloat32 (0.5f), dgFloat32(2.0f) * D_BOX_SKIN_THINCKNESS);
 	m_size[0].m_w = dgFloat32 (0.0f);
 
 	m_size[1].m_x = - m_size[0].m_x;
@@ -186,6 +187,10 @@ dgInt32 dgCollisionBox::CalculateSignature () const
 	return CalculateSignature(m_size[0].m_x, m_size[0].m_y, m_size[0].m_z);
 }
 
+dgFloat32 dgCollisionBox::GetSkinThickness () const
+{
+	return D_BOX_SKIN_THINCKNESS;
+}
 
 dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
@@ -200,6 +205,29 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vert
 	return (m_size[1] & mask) + m_size[0].AndNot(mask);
 }
 
+dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	dgAssert(dgAbsf(dir % dir - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert(dir.m_w == dgFloat32(0.0f));
+	dgVector mask(dir < dgVector(dgFloat32(0.0f)));
+	if (vertexIndex) {
+		dgVector index(m_indexMark.CompProduct4(mask & dgVector::m_one));
+		index = (index.AddHorizontal()).GetInt();
+		*vertexIndex = index.m_ix;
+	}
+
+	dgVector padd (D_BOX_SKIN_THINCKNESS);
+	padd = padd & dgVector::m_triplexMask;
+	dgVector size0 (m_size[0] - padd);
+	dgVector size1 (m_size[1] + padd);
+	return (size1 & mask) + size0.AndNot(mask);
+}
+
+dgVector dgCollisionBox::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const
+{
+	dgAssert(dgAbsf((dir % dir - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
+	return point + dir.Scale4 (D_BOX_SKIN_THINCKNESS);
+}
 
 
 void dgCollisionBox::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
@@ -297,14 +325,14 @@ void dgCollisionBox::Serialize(dgSerialize callback, void* const userData) const
 	callback (userData, &size, sizeof (dgVector));
 }
 
-const dgConvexSimplexEdge** dgCollisionBox::GetVertexToEdgeMapping() const 
+const dgCollisionConvex::dgConvexSimplexEdge** dgCollisionBox::GetVertexToEdgeMapping() const 
 {
 	return (const dgConvexSimplexEdge**)&m_vertexToEdgeMap[0];
 }
 
 
 
-dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
+dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign___) const
 {
 	dgVector support[4];
 	dgInt32 featureCount = 3;
@@ -312,12 +340,13 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 	const dgConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
 	if (vertToEdgeMapping) {
 		dgInt32 edgeIndex;
-		support[0] = SupportVertex (normal.Scale4(normalSign), &edgeIndex);
+		//support[0] = SupportVertex (normal.Scale4(normalSign), &edgeIndex);
+		support[0] = SupportVertex (normal, &edgeIndex);
 
 		dgFloat32 dist = normal.DotProduct4(support[0] - point).GetScalar();
 		if (dist <= DG_IMPULSIVE_CONTACT_PENETRATION) {
 			dgVector normalAlgin (normal.Abs());
-			if (!((normalAlgin.m_x > dgFloat32 (0.9999f)) || (normalAlgin.m_y > dgFloat32 (0.9999f)) || (normalAlgin.m_x > dgFloat32 (0.9999f)))) {
+			if (!((normalAlgin.m_x > dgFloat32 (0.9999f)) || (normalAlgin.m_y > dgFloat32 (0.9999f)) || (normalAlgin.m_z > dgFloat32 (0.9999f)))) {
 				// 0.25 degrees
 				const dgFloat32 tiltAngle = dgFloat32 (0.005f);
 				const dgFloat32 tiltAngle2 = tiltAngle * tiltAngle ;

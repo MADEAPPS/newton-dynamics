@@ -1226,16 +1226,6 @@ void NewtonWorldRayCast(const NewtonWorld* const newtonWorld, const dFloat* cons
 	}
 }
 
-void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const NewtonCollision* const shape, const dFloat* const matrix, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, int threadIndex)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	if (filter) {
-		dgMatrix pp0 (matrix);
-		dgVector pp1 (p1[0], p1[1], p1[2], dgFloat32 (0.0f));
-		Newton* const world = (Newton *) newtonWorld;
-		world->GetBroadPhase()->ConvexRayCast ((dgCollisionInstance*) shape, pp0, pp1, (OnRayCastAction) filter, (OnRayPrecastAction) prefilter, userData, threadIndex);
-	}
-}
 
 // Name: NewtonWorldConvexCast 
 // cast a simple convex shape along the ray that goes for the matrix position to the destination and get the firsts contacts of collision.
@@ -1275,15 +1265,14 @@ void NewtonWorldConvexRayCast (const NewtonWorld* const newtonWorld, const Newto
 // this parameter could be NULL.
 //
 // See also: NewtonWorldRayCast  
-int NewtonWorldConvexCast(const NewtonWorld* const newtonWorld, const dFloat* const matrix, const dFloat* const target, 
-						  const NewtonCollision* const shape, dFloat* const hitParam, void* const userData, 
-						  NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, 
+int NewtonWorldConvexCast(const NewtonWorld* const newtonWorld, const dFloat* const matrix, const dFloat* const target, const NewtonCollision* const shape, 
+						  dFloat* const param, void* const userData, NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, 
 						  int maxContactsCount, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgVector destination (target[0], target[1], target[2], dgFloat32 (0.0f));
 	Newton* const world = (Newton *) newtonWorld;
-	return world->GetBroadPhase()->ConvexCast ((dgCollisionInstance*) shape, dgMatrix (matrix), destination, *hitParam, (OnRayPrecastAction) prefilter, userData, (dgConvexCastReturnInfo*)info, maxContactsCount, threadIndex);
+	return world->GetBroadPhase()->ConvexCast ((dgCollisionInstance*) shape, dgMatrix (matrix), destination, param, (OnRayPrecastAction) prefilter, userData, (dgConvexCastReturnInfo*)info, maxContactsCount, threadIndex);
 }
 
 
@@ -1291,9 +1280,8 @@ int NewtonWorldCollide (const NewtonWorld* const newtonWorld, const dFloat* cons
 					   NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, int maxContactsCount, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	
-	dgAssert (0);
-	return 0;
+	Newton* const world = (Newton *)newtonWorld;
+	return world->GetBroadPhase()->Collide((dgCollisionInstance*)shape, dgMatrix(matrix), (OnRayPrecastAction)prefilter, userData, (dgConvexCastReturnInfo*)info, maxContactsCount, threadIndex);
 }
 
 
@@ -2005,9 +1993,7 @@ void NewtonMaterialGetContactForce(const NewtonMaterial* const materialHandle, c
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 
-	dgVector force (material->m_normal.Scale3(material->m_normal_Force.m_force) +
-					material->m_dir0.Scale3 (material->m_dir0_Force.m_force) +
-					material->m_dir1.Scale3 (material->m_dir1_Force.m_force));
+	dgVector force (material->m_normal.Scale4(material->m_normal_Force.m_force) + material->m_dir0.Scale4 (material->m_dir0_Force.m_force) + material->m_dir1.Scale4 (material->m_dir1_Force.m_force));
 
 	forcePtr[0] = force.m_x;
 	forcePtr[1] = force.m_y;
@@ -2464,15 +2450,15 @@ NewtonCollision* NewtonCreateCone(const NewtonWorld* const newtonWorld, dFloat r
 // 
 // Remark: the capsule height must equal of larger than the sum of the cap radius. If this is not the case the height will be clamped the 2 * radius.
 //
-NewtonCollision* NewtonCreateCapsule(const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix)
+NewtonCollision* NewtonCreateCapsule(const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgMatrix matrix (dgGetIdentityMatrix());
+	dgMatrix matrix(dgGetIdentityMatrix());
 	if (offsetMatrix) {
-		 matrix = dgMatrix (offsetMatrix);
+		matrix = dgMatrix(offsetMatrix);
 	}
-	return (NewtonCollision*) world->CreateCapsule (radius, height, shapeID, matrix);
+	return (NewtonCollision*)world->CreateCapsule(radio0, radio1, height, shapeID, matrix);
 }
 
 
@@ -2487,15 +2473,15 @@ NewtonCollision* NewtonCreateCapsule(const NewtonWorld* const newtonWorld, dFloa
 // 
 // Return: Pointer to the box
 //
-NewtonCollision* NewtonCreateCylinder(const NewtonWorld* const newtonWorld, dFloat radius, dFloat height, int shapeID, const dFloat* const offsetMatrix)
+NewtonCollision* NewtonCreateCylinder(const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgMatrix matrix (dgGetIdentityMatrix());
+	dgMatrix matrix(dgGetIdentityMatrix());
 	if (offsetMatrix) {
-		 matrix = dgMatrix (offsetMatrix);
+		matrix = dgMatrix(offsetMatrix);
 	}
-	return (NewtonCollision*) world->CreateCylinder (radius, height, shapeID, matrix);
+	return (NewtonCollision*)world->CreateCylinder(radio0, radio1, height, shapeID, matrix);
 }
 
 
@@ -2519,30 +2505,6 @@ NewtonCollision* NewtonCreateChamferCylinder(const NewtonWorld* const newtonWorl
 		 matrix = dgMatrix (offsetMatrix);
 	}
 	return (NewtonCollision*) world->CreateChamferCylinder (radius, height, shapeID, matrix);
-}
-
-
-NewtonCollision* NewtonCreateTaperedCapsule(const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	dgMatrix matrix (dgGetIdentityMatrix());
-	if (offsetMatrix) {
-		matrix = dgMatrix (offsetMatrix);
-	}
-	return (NewtonCollision*) world->CreateTaperedCapsule (radio0, radio1, height, shapeID, matrix);
-}
-
-
-NewtonCollision* NewtonCreateTaperedCylinder(const NewtonWorld* const newtonWorld, dFloat radio0, dFloat radio1, dFloat height, int shapeID, const dFloat* const offsetMatrix)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	dgMatrix matrix (dgGetIdentityMatrix());
-	if (offsetMatrix) {
-		matrix = dgMatrix (offsetMatrix);
-	}
-	return (NewtonCollision*) world->CreateTaperedCylinder (radio0, radio1, height, shapeID, matrix);
 }
 
 
@@ -4098,7 +4060,7 @@ NEWTON_API int NewtonCollisionIsStaticShape (const NewtonCollision* const collis
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*)collision;
-	return (instance->IsType(dgCollision::dgCollisionMesh_RTTI) || instance->IsType(dgCollision::dgCollisionMesh_RTTI)) ? 1 : 0;
+	return (instance->IsType(dgCollision::dgCollisionMesh_RTTI) || instance->IsType(dgCollision::dgCollisionScene_RTTI)) ? 1 : 0;
 }
 
 // Name: NewtonCollisionSetUserID 
@@ -6044,6 +6006,16 @@ void NewtonBodySetVelocity(const NewtonBody* const bodyPtr, const dFloat* const 
 	body->SetVelocity (vector);
 }
 
+void NewtonBodySetVelocityNoSleep(const NewtonBody* const bodyPtr, const dFloat* const velocity)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+
+	dgVector vector(velocity[0], velocity[1], velocity[2], dgFloat32(0.0f));
+	body->SetVelocityNoSleep(vector);
+}
+
+
 // Name: NewtonBodyGetVelocity 
 // Get the global linear velocity of the body.
 //
@@ -6081,6 +6053,16 @@ void NewtonBodySetOmega(const NewtonBody* const bodyPtr, const dFloat* const ome
 	dgVector vector (omega[0], omega[1], omega[2], dgFloat32 (0.0f));
 	body->SetOmega (vector);
 }
+
+void NewtonBodySetOmegaNoSleep(const NewtonBody* const bodyPtr, const dFloat* const omega)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+
+	dgVector vector(omega[0], omega[1], omega[2], dgFloat32(0.0f));
+	body->SetOmegaNoSleep(vector);
+}
+
 
 // Name: NewtonBodyGetOmega 
 // Get the global angular velocity of the body.
@@ -7526,11 +7508,11 @@ dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)
 // Remark: for this function to take place the joint stiffness must be set to a values lower than 1.0
 //
 // See also: NewtonUserJointSetRowAcceleration, NewtonUserJointSetRowStiffness  
-void NewtonUserJointSetRowSpringDamperAcceleration(const NewtonJoint* const joint, dFloat springK, dFloat springD)
+void NewtonUserJointSetRowSpringDamperAcceleration(const NewtonJoint* const joint, dFloat spring, dFloat damper)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
-	userJoint->SetSpringDamperAcceleration (springK, springD);
+	userJoint->SetSpringDamperAcceleration (spring, damper);
 }
 
 

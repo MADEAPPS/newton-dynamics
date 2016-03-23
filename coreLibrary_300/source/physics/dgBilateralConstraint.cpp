@@ -31,22 +31,19 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define DG_JOINT_STIFFNESS_RANGE (dgFloat32 (5.0f)) 
-
 #define DG_VEL_DAMP				 (dgFloat32(100.0f))
 #define DG_POS_DAMP				 (dgFloat32(1500.0f))
 
 
 dgBilateralConstraint::dgBilateralConstraint ()
 	:dgConstraint () 
+	,m_destructor(NULL)
 {
 	m_maxDOF = 6;
-	m_contactActive = true;
-	m_destructor = NULL;
 	m_isBilateral = true;
+	m_contactActive = true;
 
-	//SetStiffness (90.0f/99.0f);
-	SetStiffness (dgFloat32 (0.9f));
+	SetStiffness (dgFloat32 (1.0f));
 
 	memset (m_jointForce, 0, sizeof (m_jointForce));
 	memset (m_rowIsMotor, 0, sizeof (m_rowIsMotor));
@@ -63,14 +60,13 @@ dgBilateralConstraint::~dgBilateralConstraint ()
 
 dgFloat32 dgBilateralConstraint::GetStiffness() const
 {
-	return (DG_JOINT_STIFFNESS_RANGE - m_stiffness) / (DG_JOINT_STIFFNESS_RANGE - dgFloat32 (1.0f));
+	return m_stiffness;
 }
 
 
 void dgBilateralConstraint::SetStiffness(dgFloat32 stiffness)
 {
-	stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
-	m_stiffness = DG_JOINT_STIFFNESS_RANGE - stiffness * (DG_JOINT_STIFFNESS_RANGE - dgFloat32 (1.0f)); 
+	m_stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
 }
 
 
@@ -168,7 +164,8 @@ void dgBilateralConstraint::SetMotorAcceleration (dgInt32 index, dgFloat32 accel
 {
 	m_rowIsMotor[index] = -1;
 	m_motorAcceleration[index] = acceleration;
-	desc.m_isMotor[index] = 1;
+	desc.m_flags[index].m_isMotor = 1;
+	desc.m_flags[index].m_applyCorrection = 0;
 	desc.m_jointAccel[index] = acceleration;
 }
 
@@ -200,6 +197,8 @@ void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDes
 	m_rowIsMotor[index] = -1;
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
+	desc.m_flags[index].m_isMotor = 1;
+	desc.m_flags[index].m_applyCorrection = 0;
 	desc.m_restitution[index] = dgFloat32 (0.0f);
 	desc.m_jointAccel[index] = dgFloat32 (0.0f);
 	desc.m_penetration[index] = dgFloat32 (0.0f);
@@ -209,17 +208,10 @@ void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDes
 }
 
 
-dgFloat32 dgBilateralConstraint::CalculateSpringDamperAcceleration (
-	dgInt32 index, 
-	const dgContraintDescritor& desc, 
-	dgFloat32 jointAngle,
-	const dgVector& p0Global, 
-	const dgVector& p1Global,
-	dgFloat32 springK, 
-	dgFloat32 springD)
+void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContraintDescritor& desc, dgFloat32 spring, dgFloat32 damper)
 {
-	dgFloat32 accel = 0.0f;
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
+
 		dgAssert (m_body1);
 		const dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 
 		const dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1; 
@@ -229,19 +221,21 @@ dgFloat32 dgBilateralConstraint::CalculateSpringDamperAcceleration (
 		dgVector veloc1 (m_body1->m_veloc);
 		dgVector omega1 (m_body1->m_omega);
 
-		dgFloat32 relPosit = (p1Global - p0Global) % jacobian0.m_linear + jointAngle;
+		//dgFloat32 relPosit = (p1Global - p0Global) % jacobian0.m_linear + jointAngle;
+		dgFloat32 relPosit = desc.m_penetration[index];
 		dgFloat32 relVeloc = - (veloc0 % jacobian0.m_linear + veloc1 % jacobian1.m_linear +	omega0 % jacobian0.m_angular + omega1 % jacobian1.m_angular);
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		dgFloat32 dt = desc.m_timestep;
-		dgFloat32 ks = springK;
-		dgFloat32 kd = springD;
+		dgFloat32 ks = dgAbsf (spring);
+		dgFloat32 kd = dgAbsf (damper);
 		dgFloat32 ksd = dt * ks;
 		dgFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
-		dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
-		accel = num / den;
+		dgFloat32 den = dt * kd + dt * ksd;
+		float accel = num / (dgFloat32 (1.0f) + den);
+		SetMotorAcceleration (index, accel, desc);
+		desc.m_jointStiffness[index] = - den / DG_PSD_DAMP_TOL ;
 	}
-	return accel;
 }
 
 
@@ -275,7 +269,8 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 	dgFloat32 omegaError = (omega1 - omega0) % dir;
 
 	m_rowIsMotor[index] = 0;
-	desc.m_isMotor[index] = 0;
+	desc.m_flags[index].m_isMotor = 0;
+	desc.m_flags[index].m_applyCorrection = 0;
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
@@ -291,6 +286,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 
 		desc.m_zeroRowAcceleration[index] = (jointAngle + omegaError * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep;
 
+		desc.m_flags[index].m_applyCorrection = 1;
 		desc.m_penetration[index] = jointAngle;
 		desc.m_jointAccel[index] = alphaError;
 		desc.m_restitution[index] = dgFloat32 (0.0f);
@@ -337,7 +333,8 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 	jacobian1.m_angular[3] = dgFloat32 (0.0f);
 
 	m_rowIsMotor[index] = 0;
-	desc.m_isMotor[index] = 0;
+	desc.m_flags[index].m_isMotor = 0;
+	desc.m_flags[index].m_applyCorrection = 0;
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
 	dgVector velocError (param.m_veloc1 - param.m_veloc0);
@@ -349,9 +346,8 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 
 		dgFloat32 relPosit = positError % dir;
 		dgFloat32 relCentr = centrError % dir; 
-		relCentr = dgClamp (relCentr, dgFloat32(-10000.0f), dgFloat32(10000.0f));
+		relCentr = dgClamp (relCentr, dgFloat32(-100000.0f), dgFloat32(100000.0f));
 
-//		desc.m_zeroRowAcceleration[index] = (relPosit + relVeloc * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep + relCentr;
 		desc.m_zeroRowAcceleration[index] = (relPosit + relVeloc * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep;
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
@@ -364,6 +360,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		dgFloat32 accelError = num / den;
 
 		desc.m_penetration[index] = relPosit;
+		desc.m_flags[index].m_applyCorrection = 1;
 		desc.m_penetrationStiffness[index] = dgFloat32 (0.01f/4.0f);
 		desc.m_jointStiffness[index] = param.m_stiffness;
 		desc.m_jointAccel[index] = accelError + relCentr;

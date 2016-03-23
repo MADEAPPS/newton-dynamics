@@ -43,24 +43,24 @@
 //#define DEFAULT_SCENE	14			// compound Collision
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
-//#define DEFAULT_SCENE	17			// non Uniform Scaled Collision
+//#define DEFAULT_SCENE	17			// non uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
-//#define DEFAULT_SCENE	19			// simple convex decomposition
-//#define DEFAULT_SCENE	20			// scene Collision
-//#define DEFAULT_SCENE	21          // simple boolean operators 
-//#define DEFAULT_SCENE	22			// simple convex fracturing 
-//#define DEFAULT_SCENE	23			// structured convex fracturing 
-//#define DEFAULT_SCENE	24			// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	25			// continuous collision
-//#define DEFAULT_SCENE	26			// paper wall continuous collision
-//#define DEFAULT_SCENE	27			// puck slide continuous collision
+//#define DEFAULT_SCENE	19			// continuous collision
+//#define DEFAULT_SCENE	20			// paper wall continuous collision
+//#define DEFAULT_SCENE	21			// puck slide continuous collision
+//#define DEFAULT_SCENE	22			// simple convex decomposition
+//#define DEFAULT_SCENE	23			// scene Collision
+//#define DEFAULT_SCENE	24          // simple boolean operators 
+//#define DEFAULT_SCENE	25			// simple convex fracturing 
+//#define DEFAULT_SCENE	26			// structured convex fracturing 
+//#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
 //#define DEFAULT_SCENE	32			// basic Car
-//#define DEFAULT_SCENE	33			// heavy vehicles
-#define DEFAULT_SCENE	34			// super Car
+#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
 //#define DEFAULT_SCENE	37			// cloth patch			
@@ -130,22 +130,22 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Uniform scaled collision shape"), wxT("demonstrate scaling shape"), UniformScaledCollision},
 	{wxT("Non uniform scaled collision shape"), wxT("demonstrate scaling shape"), NonUniformScaledCollision},
 	{wxT("Scaled mesh collision"), wxT("demonstrate scaling mesh scaling collision"), ScaledMeshCollision},
+	{ wxT("Continuous collision"), wxT("show continuous collision"), ContinuousCollision },
+	{ wxT("Paper wall continuous collision"), wxT("show fast continuous collision"), ContinuousCollision1 },
+	{ wxT("Puck slide"), wxT("show continuous collision"), PuckSlide },
 	{wxT("Simple convex decomposition"), wxT("demonstrate convex decomposition and compound collision"), SimpleConvexApproximation},
 	{wxT("Multi geometry collision"), wxT("show static mesh with the ability of moving internal parts"), SceneCollision},
 	{wxT("Simple boolean operations"), wxT("demonstrate simple boolean operations "), SimpleBooleanOperations},
 	{wxT("Simple convex fracture"), wxT("demonstrate simple fracture destruction using Voronoi partition"), SimpleConvexFracturing},
 	{wxT("Structured convex fracture"), wxT("demonstrate structured fracture destruction using Voronoi partition"), StructuredConvexFracturing},
 	{wxT("Parallel ray cast"), wxT("using the threading Job scheduler"), MultiRayCast},
-	{wxT("Continuous collision"), wxT("show continuous collision"), ContinuousCollision},
-    {wxT("Paper wall continuous collision"), wxT("show fast continuous collision"), ContinuousCollision1},
-	{wxT("Puck slide"), wxT("show continuous collision"), PuckSlide},
     {wxT("Standard Joints"), wxT("show some of the common joints"), StandardJoints},
 	{wxT("Articulated robotic actuators joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
 	{wxT("Pasive rag doll"), wxT("demonstrate parsive rag doll"), PassiveRagDoll},
 	{wxT("Dynamic rag doll"), wxT("demonstrate dynamic rag doll"), DynamicRagDoll},
 	{wxT("Basic Car"), wxT("show how to set up a vehicle controller"), BasicCar},
-	{wxT("Heavy vehicles"), wxT("implement military type heavy Vehicles"), MilitaryTransport},
 	{wxT("Super car"), wxT("implement a hight performance sport car"), SuperCar},
+	{wxT("Heavy vehicles"), wxT("implement military type heavy Vehicles"), MilitaryTransport},
 	{wxT("Basic player controller"), wxT("demonstrate simple player controller"), BasicPlayerController},
 	{wxT("Advanced player controller"), wxT("demonstrate player interacting with other objects"), AdvancedPlayerController},
 	{wxT("Simple cloth Patch"), wxT("show simple cloth patch"), ClothPatch},
@@ -189,7 +189,22 @@ class NewtonDemosApp: public wxApp
 		int version = NewtonWorldGetVersion();
 		wxString title;
 		title.Printf (wxT ("Newton %d.%02d SDK demos"), version / 100, version % 100);
-		NewtonDemos* const frame = new NewtonDemos(title, wxDefaultPosition, wxSize(DEMO_WIDTH, DEMO_HEIGHT));
+
+		//This is the case when there are two monitor, Create Main Display on secund monitor
+	NewtonDemos* frame = NULL;
+	switch (wxDisplay::GetCount()) 
+	{
+		case 1:
+			frame = new NewtonDemos(title, wxDefaultPosition, wxSize(DEMO_WIDTH, DEMO_HEIGHT));
+			break;
+		default:
+			wxDisplay display(1);
+			wxRect rect (display.GetGeometry());
+			wxPoint location (rect.x + 20, rect.y + 20);
+			frame = new NewtonDemos(title, location, wxSize(DEMO_WIDTH, DEMO_HEIGHT));
+	}
+
+	frame->Show(TRUE);
 
 		frame->Show(true);
 		SetTopWindow(frame);
@@ -268,6 +283,8 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_CONCURRENT_PHYSICS_UPDATE, NewtonDemos::OnRunPhysicsConcurrent)
 	EVT_MENU_RANGE(ID_SELECT_MICROTHREADS, ID_SELECT_MICROTHREADS_COUNT, NewtonDemos::OnSelectNumberOfMicroThreads)
 	
+	EVT_MENU(ID_RUN_PROFILER_SECTION, NewtonDemos::OnRunProfileSection)
+
 	EVT_MENU(ID_SERIALIZE, NewtonDemos::OnSerializeWorld)
 	EVT_MENU(ID_DESERIALIZE, NewtonDemos::OnDeserializeWorld)
 
@@ -324,22 +341,21 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_microthreadIndex = 1;
 //m_useParallelSolver = true;
 //m_threadProfilerState = true;
-m_showNormalForces = true;
+//m_showContactPoints = true;
 //m_showCenterOfMass = true;
-m_hideVisualMeshes = true;
+//m_hideVisualMeshes = true;
 //m_physicsUpdateMode = 1;
-m_showContactPoints = true;
 //m_hardwareDevice = 2;
 //m_showStatistics = true;
 //*/
 //m_debugDisplayMode = 2;
-
+//m_showContactPoints = true;
+//SetDebugDisplayMode (m_debugDisplayMode);
+//m_showNormalForces = true;
 
 //m_autoSleepState = false;
 //m_microthreadIndex = 1;
 //m_useParallelSolver = true;
-
-	memset (m_profilerTracksMenu, 0, sizeof (m_profilerTracksMenu));
 
 	// clear the key map
 	memset (m_key, 0, sizeof (m_key));
@@ -517,6 +533,8 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		}
 		optionsMenu->AppendSubMenu (microThreadedsSubMenu, wxT("select microThread count"));
 
+		optionsMenu->AppendSeparator();
+		optionsMenu->Append(ID_RUN_PROFILER_SECTION, wxT("&Profile"), wxT("profile app for 10 frames"));
 
 		mainMenu->Append(optionsMenu, wxT("&Options"));
 	}
@@ -881,6 +899,11 @@ void NewtonDemos::OnNew (wxCommandEvent& event)
 	END_MENU_OPTION();
 }
 
+
+void NewtonDemos::OnRunProfileSection (wxCommandEvent& event)
+{
+	dTimeTrackerStartSection(10);
+}
 
 void NewtonDemos::OnSerializeWorld (wxCommandEvent& event)
 {

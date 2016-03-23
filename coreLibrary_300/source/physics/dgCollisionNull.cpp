@@ -82,6 +82,12 @@ dgVector dgCollisionNull::SupportVertex (const dgVector& dir, dgInt32* const ver
 	return dgVector (dgFloat32 (0.0f));
 }
 
+dgVector dgCollisionNull::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	dgAssert(0);
+	return dgVector(dgFloat32(0.0f));
+}
+
 dgFloat32 dgCollisionNull::GetVolume () const
 {
 	return 0.0f;

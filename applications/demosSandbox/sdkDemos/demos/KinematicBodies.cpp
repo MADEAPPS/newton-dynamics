@@ -283,6 +283,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
             matrix.m_posit += m_castDir.Scale (D_PLACEMENT_PENETRATION);
 			return true;
 		}
+
 		return false;
 	}
 

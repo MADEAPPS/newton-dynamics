@@ -60,7 +60,7 @@ static void ApplyGravity(const NewtonBody* const body, dFloat timestep, int thre
 	NewtonBodySetForce(body, &gravityForce[0]);
 }
 
-// it fires a box when a key is pused.
+// it fires a box when a key is pressed.
 static void FireNewtonCcdBox(NewtonWorld* world, const dVector & postion, const dVector & velocity)
 {
 	NewtonCollision* collision = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
@@ -86,11 +86,18 @@ static void FireNewtonCcdBox(NewtonWorld* world, const dVector & postion, const 
 // we recommend using and input manage to control input for all games
 class CCDInputManager : public CustomInputManager
 {
-public:
+	public:
 	CCDInputManager(DemoEntityManager* const scene)
 		:CustomInputManager(scene->GetNewton())
 		, m_scene(scene)
 	{
+		scene->Set2DDisplayRenderFunction (DrawHelpMenu, this);
+	}
+
+	static void DrawHelpMenu (DemoEntityManager* const scene, void* const context, int lineNumber)
+	{
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "Hit R key to shot  boxes to teh wall");
 	}
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
@@ -107,25 +114,6 @@ public:
         dVector dir = GetLookAtDirction(m_scene);
         dVector pos = GetCamPosition(m_scene);
 
-#if 0
-    #if 0
-        static FILE* file = fopen ("log.bin", "wb");
-        if (file) {
-            fwrite (&key, sizeof (int), 1, file);
-            fwrite (&dir, sizeof (dVector), 1, file);
-            fwrite (&pos, sizeof (dVector), 1, file);
-            fflush(file);
-        }
-    #else 
-        static FILE* file = fopen ("log.bin", "rb");
-        if (file) {		
-            fread (&key, sizeof (int), 1, file);
-            fread (&dir, sizeof (dVector), 1, file);
-            fread (&pos, sizeof (dVector), 1, file);
-        }
-    #endif
-#endif
-		
 		// fire ammo
 		if (key)
 		{
@@ -238,6 +226,7 @@ void ContinuousCollision1(DemoEntityManager* const scene)
 	char fileName[2048];
 	GetWorkingFileName("flatPlane.ngd", fileName);
 	scene->LoadScene(fileName);
+	
 
 	dVector pos;
 
@@ -248,13 +237,10 @@ void ContinuousCollision1(DemoEntityManager* const scene)
 	dQuaternion rot(dVector(1.f,0.f,0.f),(float)M_PI/4.0f);
 	scene->SetCameraMatrix(rot, pos);
 
-
 	CreateBackgroundWallsAndCellingBody(scene->GetNewton());
 	new CCDInputManager(scene);
-
 
 	// compel to change debug display mode. just for convenience.
 	NewtonDemos* const mainWindow = scene->GetRootWindow();
 	mainWindow->m_debugDisplayMode = 2;
-
 }

@@ -147,27 +147,23 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 			case 0:
 			{
 				collision = NewtonCreateSphere(world, 0.5, 0, &matrix[0][0]) ;
-				//collision = NewtonCreateChamferCylinder(world, 0.25, 0.25, 0, &matrix[0][0]) ;
 				break; 
 			}
 
 			case 1:
 			{
-				// note: this expose a bug in the construction of the tapered capsule, save for later 
-				//collision = NewtonCreateTaperedCapsule(world, 0.25, 0.5, 0.25, 0, &matrix[0][0]) ;
-				collision = NewtonCreateTaperedCapsule(world, 0.3f, 0.2f, 0.5f, 0, &matrix[0][0]) ;
+				collision = NewtonCreateCapsule(world, 0.3f, 0.2f, 0.5f, 0, &matrix[0][0]) ;
 				break; 
 			}
 
 			case 2:
 			{
-				collision = NewtonCreateTaperedCylinder(world, 0.25, 0.5, 0.25, 0, &matrix[0][0]) ;
+				collision = NewtonCreateCylinder(world, 0.25, 0.5, 0.25, 0, &matrix[0][0]) ;
 				break; 
 			}
 
 			case 3:
 			{
-				
 				collision = NewtonCreateCone(world, 0.25, 0.25, 0, &matrix[0][0]) ;
 				break; 
 			}

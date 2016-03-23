@@ -270,6 +270,7 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundFractured.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgContact.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgContactSolver.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCorkscrewConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDeformableContact.cpp" />
@@ -335,6 +336,7 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundFractured.h" />
     <ClInclude Include="..\..\..\source\physics\dgConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgContact.h" />
+    <ClInclude Include="..\..\..\source\physics\dgContactSolver.h" />
     <ClInclude Include="..\..\..\source\physics\dgCorkscrewConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h" />
     <ClInclude Include="..\..\..\source\physics\dgDeformableContact.h" />

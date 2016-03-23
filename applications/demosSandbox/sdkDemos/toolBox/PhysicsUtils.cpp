@@ -547,7 +547,7 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
 //mass*= 0.0f;
 
-	dVector force (0.0f, mass * DEMO_GRAVITY, 0.0f, 0.0f);
+	dVector force (dVector (0.0f, 1.0f, 0.0f).Scale (mass * DEMO_GRAVITY));
 	NewtonBodySetForce (body, &force.m_x);
 /*
 // check that angular momentum is conserved
@@ -687,7 +687,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 		case _CYLINDER_PRIMITIVE:
 		{
 			// create the collision 
-			collision = NewtonCreateCylinder (world, size.m_x * 0.5f, size.m_y, 0, NULL); 
+			collision = NewtonCreateCylinder (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, NULL); 
 			break;
 		}
 
@@ -695,17 +695,9 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 		case _CAPSULE_PRIMITIVE:
 		{
 			// create the collision 
-			collision = NewtonCreateCapsule (world, size.m_x * 0.5f, size.m_y, 0, NULL); 
+			collision = NewtonCreateCapsule (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, NULL); 
 			break;
 		}
-
-		case _TAPERED_CAPSULE_PRIMITIVE:
-		{
-			// create the collision 
-			collision = NewtonCreateTaperedCapsule (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, NULL); 
-			break;
-		}
-
 
 		case _CHAMFER_CYLINDER_PRIMITIVE:
 		{
@@ -713,14 +705,6 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 			collision = NewtonCreateChamferCylinder (world, size.m_x * 0.5f, size.m_y, 0, NULL); 
 			break;
 		}
-
-		case _TAPERED_CYLINDER_PRIMITIVE:
-		{
-			// create the collision 
-			collision = NewtonCreateTaperedCylinder (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, NULL); 
-			break;
-		}
-
 
 		case _RANDOM_CONVEX_HULL_PRIMITIVE:
 		{

@@ -21,7 +21,7 @@
 
 class StupidComplexOfConvexShapes: public DemoEntity
 {
-public:
+	public:
 	StupidComplexOfConvexShapes (DemoEntityManager* const scene, int count)
 	:DemoEntity (dGetIdentityMatrix(), NULL)
 	,m_rayP0(0.0f, 0.0f, 0.0f, 0.0f)
@@ -30,6 +30,7 @@ public:
 		scene->Append(this);
 
 		count = 40;
+		//count = 1;
 		const dFloat size = 0.5f;
 
 		DemoMesh* gemetries[32];
@@ -51,8 +52,7 @@ public:
 		// make a large complex of plane by adding lost of these shapes at a random location and oriention;
 		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, materialID);
 		NewtonCompoundCollisionBeginAddRemove(compound);
-
-		//count = 0;
+		
 		for (int i = 0 ; i < count; i ++) {
 			for (int j = 0 ; j < count; j ++) {
 				float pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
@@ -62,14 +62,6 @@ public:
 				float x = size * (j - count / 2) + RandomVariable (size * 0.5f);
 				float y = RandomVariable (size * 2.0f);
 				float z = size * (i - count / 2) + RandomVariable (size * 0.5f);
-				/*
-				 pitch = 0;
-				 yaw = 0;
-				 roll = 0;
-				 x = size * (j - count / 2);
-				 y = 0;
-				 z = size * (i - count / 2);
-				 */
 
 				dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
 				matrix.m_posit = dVector (x, y, z, 1.0f);
@@ -216,7 +208,7 @@ public:
 
 class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 {
-public:
+	public:
 	dConvexCastManager(DemoEntityManager* const scene, StupidComplexOfConvexShapes* const stupidLevel)
 	:CustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
 	,m_helpKey (true)
@@ -246,11 +238,16 @@ public:
 	{
 	};
 
+
+	static unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
+	{
+		return 1;
+	}
+
 	virtual void PreUpdate (dFloat timestep)
 	{
 		(void)timestep;
 
-		//CustomControllerManager<dConvexCastRecord>::PreUpdate (timestep);
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
@@ -274,21 +271,24 @@ public:
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-			//p0 = dVector (-29.900000f, 9.972861f, 0.013483f, 1.0f);
-			//p1 = dVector (1969.768188f, -532.715515f, 269.629333f, 1.0f);
-			//dTrace (("%f, %f, %f\n", p0[0], p0[1], p0[2]));
-			//dTrace (("%f, %f, %f\n", p1[0], p1[1], p1[2]));
+			//p0 = dVector (-11.531384, 6.897866, -2.453451, 1.0f);
+			//p1 = dVector (1720.189697, -1245.047241, 58.625248, 1.0f);
 
 			// do the convex cast here
 			dMatrix matrix (dGetIdentityMatrix());
 			matrix.m_posit = p0;
 
-			dFloat hitParam;
-			NewtonWorldConvexCastReturnInfo info[16];
+			
+			dFloat param = 1.2f;
 			NewtonCollision* const shape = m_stupidLevel->GetCurrentShape();
-			int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &hitParam, NULL, NULL, &info[0], 4, 0);
-			if (count) {
-				matrix.m_posit += (p1 - matrix.m_posit).Scale (hitParam);
+			//int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, ConvexCastCallBack::Filter, &filter, ConvexCastCallBack::Prefilter, &filter.m_contacts[0], 4, 0);
+			NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &param, NULL, Prefilter, NULL, 0, 0);
+
+			//dTrace(("%f, %f, %f\n", p0[0], p0[1], p0[2]));
+			//dTrace(("%f, %f, %f\n", p1[0], p1[1], p1[2]));
+
+			if (param < 1.0f) {
+				matrix.m_posit += (p1 - matrix.m_posit).Scale (param);
 				m_stupidLevel->SetCastEntityMatrix (scene, matrix);
 			}
 			m_stupidLevel->SetCastingLine (p0, p1);

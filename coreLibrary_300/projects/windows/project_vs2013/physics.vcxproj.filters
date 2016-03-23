@@ -22,9 +22,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionBVH.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionCapsule.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionChamferCylinder.cpp">
       <Filter>collision</Filter>
     </ClCompile>
@@ -38,9 +35,6 @@
       <Filter>collision</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionConvexPolygon.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionCylinder.cpp">
       <Filter>collision</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableMesh.cpp">
@@ -121,12 +115,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionInstance.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCylinder.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCapsule.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\meshUtil\dgMeshEffect5.cpp">
       <Filter>meshUtil</Filter>
     </ClCompile>
@@ -172,6 +160,15 @@
     <ClCompile Include="..\..\..\source\physics\dgBroadPhaseAggregate.cpp">
       <Filter>systems</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgContactSolver.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCylinder.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgCollisionCapsule.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h">
@@ -190,9 +187,6 @@
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionBVH.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionCapsule.h">
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionChamferCylinder.h">
@@ -214,9 +208,6 @@
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionConvexPolygon.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionCylinder.h">
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableMesh.h">
@@ -282,12 +273,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionInstance.h">
       <Filter>collision</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCylinder.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCapsule.h">
-      <Filter>collision</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgBody.h">
       <Filter>bodies</Filter>
     </ClInclude>
@@ -326,6 +311,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgBroadPhaseAggregate.h">
       <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgContactSolver.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCylinder.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgCollisionCapsule.h">
+      <Filter>collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

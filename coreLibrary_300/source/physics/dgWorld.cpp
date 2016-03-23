@@ -33,7 +33,6 @@
 #include "dgCollisionSphere.h"
 #include "dgCollisionCapsule.h"
 #include "dgBroadPhaseDefault.h"
-#include "dgCollisionCylinder.h"
 #include "dgCollisionInstance.h"
 #include "dgCollisionCompound.h"
 #include "dgWorldDynamicUpdate.h"
@@ -219,8 +218,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgSkeletonList(allocator)
 	,dgActiveContacts(allocator) 
 	,dgWorldDynamicUpdate()
-	,dgMutexThread("dgMutexThread", DG_MUTEX_THREAD_ID, DG_ENGINE_STACK_SIZE)
-	,dgAsyncThread("dgAsyncThread", DG_ASYNC_THREAD_ID)
+	,dgMutexThread("newtonSyncThread", DG_MUTEX_THREAD_ID, DG_ENGINE_STACK_SIZE)
+	,dgAsyncThread("newtonAsyncThread", DG_ASYNC_THREAD_ID)
 	,dgWorldThreadPool(allocator)
 	,m_broadPhase(NULL)
 	,m_sentinelBody(NULL)
@@ -948,6 +947,7 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 
 	//xxxxx();
 
+	dTimeTrackerEvent(__FUNCTION__);
 	dgAssert (m_inUpdate == 0);
 //SerializeToFile ("xxx.bin");
 

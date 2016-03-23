@@ -101,6 +101,7 @@ typedef long long unsigned64;
 // gui library includes
 #include <wx/wx.h>
 #include <wx/event.h>
+#include <wx/display.h>
 #include <wx/dcclient.h>
 #include <wx/glcanvas.h>
 #include <wx/joystick.h>
@@ -156,21 +157,26 @@ typedef long long unsigned64;
 #include <dRefCounter.h>
 #include <dBaseHierarchy.h>
 
-#include "dSceneStdafx.h"
-#include "dScene.h"
-#include "dRootNodeInfo.h"
-#include "dBoneNodeInfo.h"
-#include "dSceneNodeInfo.h"
-#include "dMeshNodeInfo.h"
-#include "dLineNodeInfo.h"
-#include "dTextureNodeInfo.h"
-#include "dMaterialNodeInfo.h"
-#include "dRigidbodyNodeInfo.h"
-#include "dCollisionNodeInfo.h"
-#include "dCollisionBoxNodeInfo.h"
-#include "dCollisionSphereNodeInfo.h"
-#include "dCollisionConvexHullNodeInfo.h"
-#include "dGeometryNodeSkinModifierInfo.h"
+#include <dSceneStdafx.h>
+#include <dScene.h>
+#include <dRootNodeInfo.h>
+#include <dBoneNodeInfo.h>
+#include <dSceneNodeInfo.h>
+#include <dMeshNodeInfo.h>
+#include <dLineNodeInfo.h>
+#include <dTextureNodeInfo.h>
+#include <dMaterialNodeInfo.h>
+#include <dRigidbodyNodeInfo.h>
+#include <dCollisionNodeInfo.h>
+#include <dCollisionBoxNodeInfo.h>
+#include <dCollisionSphereNodeInfo.h>
+#include <dCollisionConvexHullNodeInfo.h>
+#include <dGeometryNodeSkinModifierInfo.h>
+		 
+
+#include <dTimeTracker.h>
+
+
 
 
 #ifdef __USE_DOUBLE_PRECISION__

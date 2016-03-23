@@ -81,16 +81,17 @@ class dgMatrix
 						   const dgFloat32* const src, dgInt32 srcStrideInBytes, dgInt32 count) const;
 #endif
 
-	bool TestOrthogonal(dgFloat32 tol = dgFloat32 (1.0e-4f)) const;
+	bool TestIdentity() const;
 	bool TestSymetric3x3() const;
+	bool TestOrthogonal(dgFloat32 tol = dgFloat32 (1.0e-4f)) const;
 
 	dgMatrix Multiply3X3 (const dgMatrix &B) const;
 	dgMatrix operator* (const dgMatrix &B) const;
 
 	// these function can only be called when dgMatrix is a PDS matrix
-	void EigenVectors (dgVector &eigenValues, const dgMatrix& initialGuess = dgGetIdentityMatrix());
-	void EigenVectors (const dgMatrix& initialGuess = dgGetIdentityMatrix());
-	void PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix& initialStretchAxis = dgGetIdentityMatrix()) const;
+	void EigenVectors (const dgMatrix* initialGuess = NULL);
+	void EigenVectors (dgVector &eigenValues, const dgMatrix* const initialGuess = NULL);
+	void PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix* initialStretchAxis = NULL) const;
 
 	// constructor for polar composition
 	dgMatrix (const dgMatrix& transformMatrix, const dgVector& scale, const dgMatrix& stretchAxis);
@@ -197,14 +198,14 @@ DG_INLINE dgMatrix dgMatrix::Transpose4X4 () const
 DG_INLINE dgVector dgMatrix::RotateVector (const dgVector &v) const
 {
 //	return dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z));
-	return dgVector (m_front.CompProduct4 (v.BroadcastX()) + m_up.CompProduct4 (v.BroadcastY()) + m_right.CompProduct4 (v.BroadcastZ()));
+	return m_front.CompProduct4 (v.BroadcastX()) + m_up.CompProduct4 (v.BroadcastY()) + m_right.CompProduct4 (v.BroadcastZ());
 }
 
 
 DG_INLINE dgVector dgMatrix::UnrotateVector (const dgVector &v) const
 {
 //	return dgVector (v.DotProduct4(m_front).GetScalar(), v.DotProduct4(m_up).GetScalar(), v.DotProduct4(m_right).GetScalar(), dgFloat32 (0.0f));
-	return dgVector ((v.DotProduct4(m_front) & dgVector::m_xMask) + (v.DotProduct4(m_up) & dgVector::m_yMask) + (v.DotProduct4(m_right) & dgVector::m_zMask));
+	return (v.DotProduct4(m_front) & dgVector::m_xMask) + (v.DotProduct4(m_up) & dgVector::m_yMask) + (v.DotProduct4(m_right) & dgVector::m_zMask);
 }
 
 
@@ -229,7 +230,7 @@ DG_INLINE dgPlane dgMatrix::UntransformPlane (const dgPlane &globalPlane) const
 	return dgPlane (UnrotateVector (globalPlane), globalPlane.Evalue(m_posit));
 }
 
-DG_INLINE void dgMatrix::EigenVectors (const dgMatrix& initialGuess)
+DG_INLINE void dgMatrix::EigenVectors (const dgMatrix* const initialGuess)
 {
 	dgVector eigenValues;
 	EigenVectors (eigenValues, initialGuess);
@@ -244,6 +245,24 @@ DG_INLINE dgMatrix dgMatrix::Inverse () const
 					 dgVector (- (m_posit % m_front), - (m_posit % m_up), - (m_posit % m_right), dgFloat32(1.0f)));
 }
 
+DG_INLINE bool dgMatrix::TestIdentity() const
+{
+	const dgMatrix& me = *this;
+	for (int i = 0; i < 4; i++) {
+		if (me[i][i] != dgFloat32 (1.0f)) {
+			return false;
+		}
+		for (int j = i + 1; j < 4; j++) {
+			if (me[i][j] != dgFloat32 (0.0f)) {
+				return false;
+			}
+			if (me[j][i] != dgFloat32(0.0f)) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
 
 DG_INLINE bool dgMatrix::TestOrthogonal(dgFloat32 tol) const
 {
@@ -253,7 +272,7 @@ DG_INLINE bool dgMatrix::TestOrthogonal(dgFloat32 tol) const
 	dgFloat32 c = m_front % m_front;
 	dgFloat32 d = n % m_right;
 
-#if _DEBUG
+#ifdef _DEBUG
 	const dgMatrix& me = *this;
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -270,29 +289,6 @@ DG_INLINE bool dgMatrix::TestOrthogonal(dgFloat32 tol) const
 		   (dgAbsf(b - dgFloat32 (1.0f)) < tol) &
 		   (dgAbsf(c - dgFloat32 (1.0f)) < tol) &
 		   (dgAbsf(d - dgFloat32 (1.0f)) < tol); 
-
-
-/*
-	for (dgInt32 i = 0; i < 4; i++) {
-		for (dgInt32 j = 0; j < 4; j++) {
-			dgAssert(dgCheckFloat(m_matrix[i][j]));
-		}
-	}
-
-	dgInt32 j0 = 1;
-	dgInt32 j1 = 2;
-	for (dgInt32 i = 0; i < 3; i++) {
-		dgAssert(m_matrix[i][3] == 0.0f);
-		dgFloat32 val = m_matrix[i] % m_matrix[i];
-		dgAssert(dgAbsf(val - 1.0f) < 1.0e-5f);
-		dgVector tmp(m_matrix[j0] * m_matrix[j1]);
-		val = tmp % m_matrix[i];
-		dgAssert(dgAbsf(val - 1.0f) < 1.0e-5f);
-		j0 = j1;
-		j1 = i;
-	}
-	return true;		   
-*/
 }
 
 DG_INLINE bool dgMatrix::TestSymetric3x3() const

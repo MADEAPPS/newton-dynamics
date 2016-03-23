@@ -162,6 +162,9 @@ class dgCollisionCompound: public dgCollision
 	virtual dgFloat32 GetBoxMaxRadius () const;
 	
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
+	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
+	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const {return point;}
+
 	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	
 	static void CalculateInertia (void* userData, int vertexCount, const dgFloat32* const FaceArray, int faceId);
@@ -169,16 +172,10 @@ class dgCollisionCompound: public dgCollision
 	virtual void MassProperties ();
 	dgMatrix CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
 	dgFloat32 CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const;
-
-	
-	
 	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane, const dgCollisionInstance& parentScale) const;
 
 	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
-
-	virtual dgFloat32 ConvexRayCast (const dgCollisionInstance* const instance, const dgMatrix& instanceMatrix, const dgVector& instanceVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const; 
-	
 
 	virtual dgInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
@@ -194,8 +191,6 @@ class dgCollisionCompound: public dgCollision
 	dgInt32 CalculateContactsToCollisionTreeContinue (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsToHeightField (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsUserDefinedCollision (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-
-	dgFloat32 ConvexRayCastSingleConvex (const dgCollisionInstance* const convexInstance, const dgMatrix& instanceMatrix, const dgVector& instanceVeloc, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const referenceBody, const dgCollisionInstance* const referenceInstance, void* const userData, dgInt32 threadId) const; 
 
 	//dgInt32 ClosestDistance (dgBody* const bodyA, dgTriplex& contactA, dgBody* const bodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
 	//dgInt32 ClosestDistanceToCompound (dgBody* const compoundBodyA, dgTriplex& contactA, dgBody* const compoundBodyB, dgTriplex& contactB, dgTriplex& normalAB) const;

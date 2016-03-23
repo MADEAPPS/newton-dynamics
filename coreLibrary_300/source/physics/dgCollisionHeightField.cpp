@@ -711,6 +711,12 @@ dgVector dgCollisionHeightField::SupportVertex (const dgVector& dir, dgInt32* co
 	return support;
 }
 
+dgVector dgCollisionHeightField::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	dgAssert (0);
+	return SupportVertex (dir, vertexIndex);
+}
+
 void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgVector points[4];
@@ -1238,12 +1244,17 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 
 			if (GetDebugCollisionCallback()) { 
 				dgTriplex triplex[3];
-				const dgMatrix& matrix = data->m_polySoupCollision->GetGlobalMatrix();
+				//const dgMatrix& matrix = data->m_polySoupInstance->GetGlobalMatrix();
+				const dgVector scale = data->m_polySoupInstance->GetScale();
+				dgMatrix matrix(data->m_polySoupInstance->GetLocalMatrix() * data->m_polySoupBody->GetMatrix());
+
 				for (dgInt32 i = 0; i < data->m_faceCount; i ++) {
 					dgInt32 base = address[i];
 					for (dgInt32 j = 0; j < 3; j ++) {
 						dgInt32 index = data->m_faceVertexIndex[base + j];
-						dgVector p (matrix.TransformVector(vertex[index]));
+						//dgVector p (matrix.TransformVector(vertex[index]));
+						//p = matrix.TransformVector(scale.CompProduct4(p));
+						dgVector p (matrix.TransformVector(scale.CompProduct4(dgVector(vertex[index])))); 
 						triplex[j].m_x = p.m_x;
 						triplex[j].m_y = p.m_y;
 						triplex[j].m_z = p.m_z;

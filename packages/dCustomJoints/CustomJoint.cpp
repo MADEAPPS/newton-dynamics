@@ -29,6 +29,7 @@ CustomJoint::CustomJoint ()
 	,m_world(NULL)
 	,m_userDestructor(NULL)
 	,m_userConstrationCallback(NULL)
+	,m_stiffness(1.0f)
 	,m_maxDof(0)
 	,m_autoDestroy(0)
 {
@@ -47,12 +48,14 @@ CustomJoint::CustomJoint (NewtonBody* const body0, NewtonBody* const body1, Newt
 	,m_world(NULL)
 	,m_userDestructor(NULL)
 	,m_userConstrationCallback(NULL)
+	,m_stiffness(1.0f)
 	,m_maxDof(0)
 	,m_autoDestroy(0)
 {
 	callback (userData, &m_localMatrix0, sizeof (m_localMatrix0));
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
+	callback (userData, &m_stiffness, sizeof (m_stiffness));
 	Init (m_maxDof, body0, body1);
 }
 
@@ -92,6 +95,7 @@ void CustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const b
 	m_body0 = body0;
 	m_body1 = body1;
 	m_maxDof = maxDOF;
+	m_stiffness = 1.0f;
 	m_world	= body0 ? NewtonBodyGetWorld (body0) : NewtonBodyGetWorld (body1);
 	m_joint = NewtonConstraintCreateUserJoint (m_world, maxDOF, SubmitConstraints, GetInfo, m_body0, m_body1); 
 
@@ -111,7 +115,7 @@ const dMatrix& CustomJoint::GetMatrix0() const
 
 const dMatrix& CustomJoint::GetMatrix1() const
 {
-	return m_localMatrix0;
+	return m_localMatrix1;
 }
 
 
@@ -130,6 +134,16 @@ NewtonJoint* CustomJoint::GetJoint () const
 	return m_joint;
 }
 
+dFloat CustomJoint::GetStiffness() const
+{
+	return m_stiffness;
+}
+
+void CustomJoint::SetStiffness(dFloat stiffness)
+{
+	m_stiffness = dClamp (stiffness, 0.0f, 1.0f);
+}
+
 
 void CustomJoint::Destructor (const NewtonJoint* me)
 {
@@ -143,7 +157,7 @@ void CustomJoint::Destructor (const NewtonJoint* me)
 }
 
 
-void  CustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex)
+void CustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex)
 {
 	// get the pointer to the joint class
 	if (timestep != 0.0f) {
@@ -324,5 +338,6 @@ void CustomJoint::Serialize (NewtonSerializeCallback callback, void* const userD
 	callback (userData, &m_localMatrix0, sizeof (m_localMatrix0));
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
+	callback (userData, &m_stiffness, sizeof (m_stiffness));
 }
 

@@ -577,7 +577,7 @@ dgVector damp (0.3f);
 	dgMatrix tmp;
 	dgMatrix transform;
 	dgVector scale;
-	inertiaMatrix.PolarDecomposition (transform, scale, tmp, matrix);
+	inertiaMatrix.PolarDecomposition (transform, scale, tmp, &matrix);
 	body->GetCollision()->SetGlobalMatrix(transform);
 	body->SetMatrixOriginAndRotation(body->GetCollision()->GetLocalMatrix().Inverse() * transform);
     body->SetVelocity(comVeloc);
@@ -646,7 +646,7 @@ dgVector beta1 (dgVector::m_one - beta0);
 		dgMatrix S (QiPi * QiPi.Transpose4X4());
 		dgVector eigenValues;
 
-		S.EigenVectors (eigenValues, m_clusterRotationInitialGuess[i]);
+		S.EigenVectors (eigenValues, &m_clusterRotationInitialGuess[i]);
 		m_clusterRotationInitialGuess[i] = S;
 
 #ifdef _DEBUG_____ 
