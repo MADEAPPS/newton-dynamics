@@ -292,6 +292,7 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_vehicleTopSpeed;
 			dFloat m_reverseGearRatio;
 			dFloat m_gearRatios[10];
+			dFloat m_clutchFrictionTorque;
 
 			int m_gearsCount;
 			void* m_userData;
@@ -333,6 +334,8 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API bool GetTransmissionMode() const;
 		CUSTOM_JOINTS_API void SetTransmissionMode(bool mode);
 
+		CUSTOM_JOINTS_API void SetClutchParam (dFloat cluthParam);
+
 		CUSTOM_JOINTS_API void UpdateAutomaticGearBox(dFloat timestep);
 
 		protected:
@@ -347,6 +350,7 @@ class CustomVehicleController: public CustomControllerBase
 		DriveTrain* m_driveTrain;
 		dInterpolationCurve m_torqueRPMCurve;
 
+		dFloat m_clutchParam;
 		int m_gearTimer;
 		int m_currentGear;
 		bool m_ignitionKey;

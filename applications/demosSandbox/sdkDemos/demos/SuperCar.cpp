@@ -43,6 +43,8 @@
 #define VIPER_ENGINE_MASS					100.0f
 #define VIPER_MASS							(3380.0f * 0.454f)
 #define VIPER_ENGINE_RADIO					0.125f
+#define VIPER_CLUTCH_FRICTION_TORQUE		1000.0f
+
 
 #define VIPER_IDLE_TORQUE					350.0f
 #define VIPER_IDLE_TORQUE_RPM				500.0f
@@ -74,7 +76,6 @@
 #define VIPER_TIRE_SUSPENSION_DAMPER		10.0f
 #define VIPER_TIRE_SUSPENSION_LENGTH		0.25f
 #define VIPER_TIRE_BRAKE_TORQUE				3000.0f
-#define VIPER_TIRE_CLUTCH_TORQUE			1000000.0f
 #define VIPER_TIRE_PIVOT_OFSSET_TORQUE		-0.05f
 
 #define VIPER_TIRE_GEAR_1					2.66f
@@ -366,6 +367,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_mass = VIPER_ENGINE_MASS; 
 		engineInfo.m_radio = VIPER_ENGINE_RADIO; 
 		engineInfo.m_vehicleTopSpeed = VIPER_TIRE_TOP_SPEED_KMH;
+		engineInfo.m_clutchFrictionTorque = VIPER_CLUTCH_FRICTION_TORQUE;
 	
 		engineInfo.m_peakTorque = VIPER_PEAK_TORQUE;
 		engineInfo.m_rpmAtPeakTorque = VIPER_PEAK_TORQUE_RPM;
@@ -418,14 +420,8 @@ class SuperCarEntity: public DemoEntity
 
 		m_controller->SetEngine(engineControl);
 
-		// add clutch controller
-		//CustomVehicleController::ClutchController* const clutch = new CustomVehicleController::ClutchController(m_controller, engine, VIPER_TIRE_CLUTCH_TORQUE);
-		//m_controller->SetClutch(clutch);
-
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
-
-		
 	}
 
 	void ApplyPlayerControl ()

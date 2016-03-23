@@ -456,6 +456,11 @@ class CustomVehicleController::EngineController::DriveTrain: public CustomAlloc
 		}
 	}
 
+	dFloat GetClutchTorque(EngineController* const controller) const
+	{
+		return controller->m_info.m_clutchFrictionTorque * controller->m_clutchParam;
+	}
+
 	virtual void Integrate(EngineController* const controller, dFloat timestep)
 	{
 		m_omega += m_inertiaInv.CompProduct(m_torque.Scale(timestep));
@@ -592,6 +597,25 @@ class CustomVehicleController::EngineController::DriveTrain: public CustomAlloc
 		}
 	}
 
+	void Solve (int dofSize, int width, const dFloat* const massMatrix, const dFloat* const b, dFloat* const x) const
+	{
+		for (int i = 0; i < dofSize; i++) {
+			dFloat acc = 0.0f;
+			const dFloat* const rowI = &massMatrix[i * width];
+			for (int j = 0; j < i; j++) {
+				acc = acc + rowI[j] * x[j];
+			}
+			x[i] = (b[i] - acc) / rowI[i];
+		}
+		for (int i = dofSize - 1; i >= 0; i--) {
+			dFloat acc = 0.0f;
+			for (int j = i + 1; j < dofSize; j++) {
+				acc = acc + massMatrix[j * width + i] * x[j];
+			}
+			x[i] = (x[i] - acc) / massMatrix[i * width + i];
+		}
+	}
+
 	void Update(EngineController* const controller, dFloat timestep)
 	{
 		const int size = 6;
@@ -608,20 +632,19 @@ class CustomVehicleController::EngineController::DriveTrain: public CustomAlloc
 		}
 
 		dFloat* const massMatrix = GetMassMatrix();
-		for (int i = 0; i < dofSize; i++) {
-			dFloat acc = 0.0f;
-			const dFloat* const rowI = &massMatrix[i * dofSize];
-			for (int j = 0; j < i; j++) {
-				acc = acc + rowI[j] * x[j];
+		Solve (dofSize, dofSize, massMatrix, b, x);
+
+		int cluthIndex = dofSize - 1;
+		dFloat cluthTorque = GetClutchTorque(controller);
+		if (dAbs (x[cluthIndex]) > cluthTorque) {
+			if (x[cluthIndex] < 0.0f) {
+				cluthTorque *= -1.0f;
 			}
-			x[i] = (b[i] - acc) / rowI[i];
-		}
-		for (int i = dofSize - 1; i >= 0; i--) {
-			dFloat acc = 0.0f;
-			for (int j = i + 1; j < dofSize; j++) {
-				acc = acc + massMatrix[j * dofSize + i] * x[j];
+			x[cluthIndex] = cluthTorque;
+			for (int i = 0; i < cluthIndex; i ++) {
+				b[i] -= massMatrix[i * dofSize + cluthIndex] * cluthTorque;
 			}
-			x[i] = (x[i] - acc) / massMatrix[i * dofSize + i];
+			Solve (cluthIndex, dofSize, massMatrix, b, x);
 		}
 
 /*
@@ -895,6 +918,7 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 	,m_info(info)
 	,m_infoCopy(info)
 	,m_driveTrain(NULL)
+	,m_clutchParam(1.0f)
 	,m_gearTimer(0)
 	,m_currentGear(2)
 	,m_ignitionKey(false)
@@ -928,6 +952,9 @@ void CustomVehicleController::EngineController::SetInfo(const Info& info)
 {
 	m_info = info;
 	m_infoCopy = info;
+
+	m_info.m_clutchFrictionTorque = dAbs (m_info.m_clutchFrictionTorque);
+	m_infoCopy.m_clutchFrictionTorque = m_info.m_clutchFrictionTorque;
 
 	dFloat inertiaInv = 1.0f / (2.0f * m_info.m_mass * m_info.m_radio * m_info.m_radio / 5.0f);
 	m_driveTrain->m_inertiaInv = dVector (inertiaInv, inertiaInv, inertiaInv, 0.0f);
@@ -1111,6 +1138,12 @@ void CustomVehicleController::EngineController::SetTransmissionMode(bool mode)
 {
 	m_automaticTransmissionMode = mode;
 }
+
+void CustomVehicleController::EngineController::SetClutchParam (dFloat cluthParam)
+{
+	m_clutchParam = dClamp (cluthParam, 0.0f, 1.0f);
+}
+
 
 int CustomVehicleController::EngineController::GetGear() const
 {
@@ -1574,12 +1607,6 @@ CustomVehicleController::EngineController* CustomVehicleController::GetEngine() 
 	return m_engineControl;
 }
 
-/*
-CustomVehicleController::ClutchController* CustomVehicleController::GetClutch() const
-{
-	return m_cluthControl;
-}
-*/
 
 CustomVehicleController::SteeringController* CustomVehicleController::GetSteering() const
 {
@@ -1604,15 +1631,6 @@ void CustomVehicleController::SetEngine(EngineController* const engineControl)
 	m_engineControl = engineControl;
 }
 
-/*
-void CustomVehicleController::SetClutch(ClutchController* const cluth)
-{
-	if (m_cluthControl) {
-		delete m_cluthControl;
-	}
-	m_cluthControl = cluth;
-}
-*/
 
 void CustomVehicleController::SetHandBrakes(BrakeController* const handBrakes)
 {
@@ -1770,23 +1788,6 @@ CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const Bo
 	return &tireNode->GetInfo();
 }
 
-/*
-CustomVehicleController::BodyPartEngine* CustomVehicleController::GetEngineBodyPart() const
-{
-	return m_engine;
-}
-
-void CustomVehicleController::AddEngineBodyPart (BodyPartEngine* const engine)
-{
-	if (m_engine) {
-		delete m_engine;
-	}
-
-	m_engine = engine;
-	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());
-	NewtonSkeletonContainerAttachBone(m_skeleton, m_engine->GetBody(), m_chassis.GetBody());
-}
-*/
 
 dVector CustomVehicleController::GetTireNormalForce(const BodyPartTire* const tire) const
 {
@@ -2117,142 +2118,6 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
-/*
-	dMatrix inertia[5];
-	dVector JacobianPair[5][2];
-	int index[5][2] = {{0, 2}, {1, 3}, {2, 4}, {3, 4}, {2, 3}};
-
-	for (int i = 0; i < 5; i ++) {
-		inertia[i] = dGetIdentityMatrix();
-	}
-
-	JacobianPair[0][0] = dVector (-1.0f, 0.0f, 0.0f, 0.0f);
-	JacobianPair[0][1] = dVector ( 1.0f, 0.0f, 0.0f, 0.0f);
-
-	JacobianPair[1][0] = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
-	JacobianPair[1][1] = dVector( 1.0f, 0.0f, 0.0f, 0.0f);
-
-	JacobianPair[2][0] = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
-	JacobianPair[2][1] = dVector( 1.0f, 0.0f, 0.0f, 0.0f);
-
-	JacobianPair[3][0] = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
-	JacobianPair[3][1] = dVector( 1.0f, 0.0f, 0.0f, 0.0f);
-
-	JacobianPair[4][0] = dVector( 1.0f, 0.0f, 0.0f, 0.0f);
-	JacobianPair[4][1] = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
-
-
-	dVector JacobianInvPair[5][2];
-	for (int i = 0; i < 5; i ++) {
-		int j0 = index[i][0];
-		int j1 = index[i][1];
-		JacobianInvPair[i][0][3] = 0.0f;
-		JacobianInvPair[i][1][3] = 0.0f;
-		for (int k = 0; k < 3; k++) {
-			JacobianInvPair[i][0][k] = JacobianPair[i][0][k] * inertia[j0][k][k];
-			JacobianInvPair[i][1][k] = JacobianPair[i][1][k] * inertia[j1][k][k];
-		}
-	}
-
-	dFloat invMass[5][5];
-	for (int i = 0; i < 5; i++) {
-		int i0 = index[i][0];
-		int i1 = index[i][1];
-		invMass[i][i] = JacobianInvPair[i][0] % JacobianPair[i][0] + JacobianInvPair[i][1] % JacobianPair[i][1];
-		for (int j = i + 1; j < 5; j ++) {
-			int j0 = index[j][0];
-			int j1 = index[j][1];
-			dFloat a = 0.0f;
-			if (i0 == j0) {
-				a += JacobianInvPair[i][0] % JacobianPair[j][0];
-			} 
-			if (i0 == j1) {
-				a += JacobianInvPair[i][0] % JacobianPair[j][1];
-			}
-			if (i1 == j1) {
-				a += JacobianInvPair[i][1] % JacobianPair[j][1];
-			}
-			if (i1 == j0) {
-				a += JacobianInvPair[i][1] % JacobianPair[j][0];
-			}
-			invMass[i][j] = a;
-			invMass[j][i] = a;
-		}
-	}
-
-
-	for (int i = 0; i < 5; i ++) {
-		for (int j = 0; j <= i; j++) {
-			dFloat s = 0.0f;
-			for (int k = 0; k < j; k++) {
-				s += invMass[i][k] * invMass[j][k];
-			}
-
-			if (j == i) {
-				dFloat diag = invMass[i][i] - s;
-				if (diag < 0.0f) {
-					dAssert (0);
-				}
-				invMass[i][i] = dSqrt(diag);
-			} else {
-				invMass[i][j] = (1.0f / invMass[j][j]) * (invMass[i][j] - s);
-			}
-		}
-	}
-
-	dFloat w[7];
-
-	w[0] = 1.0f;
-	w[1] = 0.0f;
-
-	w[2] = 0.0f;
-	w[3] = 0.0f;
-
-	w[4] = 0.0f;
-
-	w[5] =  0.0f;
-	w[6] =  0.0f;
-
-int n = 4;
-	for (int m = 0; m < 10; m ++) {
-		dFloat x[5];
-		x[0] = -(w[2] - w[0]);
-		x[1] = -(w[3] - w[1]);
-		x[2] = -(w[4] - w[2]); 
-		x[3] = -(w[4] - w[3]); 
-		x[4] = 0.0f;
-
-		for (int i = 0; i < n; i++) {
-			dFloat acc = 0.0f;
-			for (int j = 0; j < i; j++) {
-				acc = acc + invMass[i][j] * w[j];
-			}
-			x[i] = (w[i] - acc) / invMass[i][i];
-		}
-
-		for (int i = n - 1; i >= 0; i--) {
-			dFloat acc = 0.0f;
-			for (int j = i + 1; j < n; j++) {
-				acc = acc + invMass[j][i] * x[j];
-			}
-			x[i] = (x[i] - acc) / invMass[i][i];
-		}
-
-		w[0] = w[0] - x[0];
-		w[1] = w[1] - x[1];
-
-		w[2] = w[2] + x[0] - x[2];
-		w[3] = w[3] + x[1] - x[3];
-		
-		w[4] = w[4] + x[2] + x[3];
-
-		w[5] = w[5];
-		w[6] = w[5];
-
-		m*=1;
-	}
-*/
-
 	if (m_finalized) {
 		CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager();
 		for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {

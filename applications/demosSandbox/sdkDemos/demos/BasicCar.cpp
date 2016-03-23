@@ -34,6 +34,7 @@ struct BasciCarParameters
 	dFloat ENGINE_MASS;
 	dFloat TIRE_MASS;
 	dFloat ENGINE_ARMATURE_RADIO;
+	dFloat CLUTCH_FRICTION_TORQUE;
 	dFloat STEER_ANGLE;
 	dFloat BRAKE_TORQUE;
 	dFloat COM_Y_OFFSET;
@@ -72,7 +73,8 @@ static BasciCarParameters basicCarParameters =
 	 900.0f,	// VEHICLE_MASS
 	  40.0f,	// ENGINE_MASS
 	  40.0f,	// TIRE_MASS
-	  0.5f,		// ENGINE_ARMATURE_RADIO;
+	  0.125f,	// ENGINE_ARMATURE_RADIO
+	  1000.0f,	// CLUTCH_FRICTION_TORQUE
 	  10.0f,	// STEER_ANGLE
 	4000.0f,	// BRAKE_TORQUE
 	  -0.2f,	// COM_Y_OFFSET
