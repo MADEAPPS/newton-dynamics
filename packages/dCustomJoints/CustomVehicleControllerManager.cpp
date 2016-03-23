@@ -618,7 +618,7 @@ class CustomVehicleController::EngineController::DriveTrain: public CustomAlloc
 
 	void Update(EngineController* const controller, dFloat timestep)
 	{
-		const int size = 6;
+		const int size = 16;
 		DriveTrain* nodeArray[size];
 		dFloat b[size];
 		dFloat x[size];
@@ -795,7 +795,48 @@ class CustomVehicleController::EngineController::DriveTrainDifferentialGear: pub
 	{
 		m_child = new DriveTrainTire (axel.m_leftTire, this);
 		m_child->m_sibling = new DriveTrainTire (axel.m_rightTire, this);
+		SetJacobianMarix ();
+	}
 
+	DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel, DriveTrain* const engine, dFloat location)
+		:DriveTrain(invInertia, invMass, engine)
+	{
+		m_child = new DriveTrainTire (axel.m_leftTire, this);
+		m_child->m_sibling = new DriveTrainTire (axel.m_rightTire, this);
+		dAssert (0);
+/*
+		dVector pin (dFloat(dSign(m_tire->m_data.m_location.m_x)), 1.0f, 0.0f, 0.0f);
+		m_J01[0].m_linear = dVector (0.0f, 0.0f, 1.0f, 0.0f);
+		m_J01[0].m_angular = dVector (0.0f, 1.0f, 0.0f, 0.0f) * m_J01[0].m_linear;
+		m_J10[0].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
+		m_J10[0].m_angular = pin * m_J10[0].m_linear;
+		m_J01[1].m_linear = dVector (0.0f, 0.0f, -1.0f, 0.0f);
+		m_J01[1].m_angular = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+		m_J10[1].m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+		m_J10[1].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+
+		m_invMassJt01[0].m_linear = m_J01[0].m_linear.Scale (m_massInv);
+		m_invMassJt01[0].m_angular = m_J01[0].m_angular.CompProduct (m_inertiaInv);
+		m_invMassJt10[0].m_linear = m_J10[0].m_linear.Scale(m_parent->m_massInv);
+		m_invMassJt10[0].m_angular = m_J10[0].m_angular.CompProduct(m_parent->m_inertiaInv);
+		m_invMassJt01[1].m_linear = m_J01[1].m_linear.Scale(m_massInv);
+		m_invMassJt01[1].m_angular = m_J01[1].m_angular.CompProduct(m_inertiaInv);
+		m_invMassJt10[1].m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);;
+		m_invMassJt10[1].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);;
+*/
+	}
+
+
+	DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel0, const DifferentialAxel& axel1, DriveTrain* const engine)
+		:DriveTrain(invInertia, invMass, engine)
+	{
+		m_child = new DriveTrainDifferentialGear (invInertia, invMass, axel0, engine, -1.0f);
+		m_child->m_sibling = new DriveTrainDifferentialGear (invInertia, invMass, axel1, engine, 1.0f);
+		SetJacobianMarix ();
+	}
+
+	void SetJacobianMarix ()
+	{
 		m_J01[0].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
 		m_J01[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 		m_J10[0].m_linear = dVector(0.0f, 0.0f,  0.0f, 0.0f);
@@ -910,6 +951,53 @@ class CustomVehicleController::EngineController::DriveTrainSingleDifferential: p
 	float m_smoothOmega[4];
 };
 
+class CustomVehicleController::EngineController::DriveTrainDualDifferential: public DriveTrain
+{
+	public:
+	DriveTrainDualDifferential (const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
+		:DriveTrain(invInertia, invMass)
+	{
+		dFloat gearInvMass = invMass * 4.0f;
+		dVector gearInvInertia (invInertia.Scale (4.0f));
+		memset (m_smoothOmega, 0, sizeof (m_smoothOmega));
+		m_child = new DriveTrainDifferentialGear (gearInvInertia, gearInvMass, axel0, axel1, this);
+	}
+
+	virtual dFloat* GetMassMatrix()
+	{
+		return &invMassMatrix[0][0];
+	}
+
+	virtual void RebuildEngine ()
+	{
+		m_child->m_massInv = m_massInv * 4.0f;
+		m_child->m_inertiaInv = m_inertiaInv.Scale(4.0f);
+
+		memset(invMassMatrix, 0, sizeof (invMassMatrix));
+		BuildMassMatrix();
+	}
+
+	virtual void Integrate(EngineController* const controller, dFloat timestep)
+	{
+		DriveTrain::Integrate(controller, timestep);
+		m_omega.m_x = dClamp (m_omega.m_x, 0.0f, controller->m_info.m_rpmAtReadLineTorque);
+
+		dFloat average = m_omega.m_x; 
+		for (int i = 1; i < sizeof (m_smoothOmega)/sizeof (m_smoothOmega[0]); i ++) {
+			average += m_smoothOmega[i];
+			m_smoothOmega[i - 1] = m_smoothOmega[i];
+		}
+		m_smoothOmega[3] = m_omega.m_x;
+		m_omega.m_x = average * dFloat (1.0f / (sizeof (m_smoothOmega)/sizeof (m_smoothOmega[0])));
+
+		dTrace (("engine Omega: %f\n", m_omega.m_x));
+	}
+
+	dFloat invMassMatrix[8][8];
+	float m_smoothOmega[4];
+};
+
+
 
 CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:Controller(controller)
@@ -922,13 +1010,16 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 	,m_ignitionKey(false)
 	,m_automaticTransmissionMode(true)
 {
+	dFloat inertiaInv = 1.0f / (2.0f * m_info.m_mass * m_info.m_radio * m_info.m_radio / 5.0f);
 	if (axel1.m_leftTire) {
-		dAssert (0);
+		dAssert (axel0.m_leftTire);
+		dAssert (axel0.m_rightTire);
+		dAssert (axel1.m_leftTire);
+		dAssert (axel1.m_rightTire);
+		m_driveTrain = new DriveTrainDualDifferential (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), 1.0f / m_info.m_mass, axel0, axel1);
 	} else {
 		dAssert (axel0.m_leftTire);
 		dAssert (axel0.m_rightTire);
-
-		dFloat inertiaInv = 1.0f / (2.0f * m_info.m_mass * m_info.m_radio * m_info.m_radio / 5.0f);
 		m_driveTrain = new DriveTrainSingleDifferential (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), 1.0f / m_info.m_mass, axel0);
 	}
 	SetInfo(info);

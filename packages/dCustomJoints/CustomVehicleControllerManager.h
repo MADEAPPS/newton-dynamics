@@ -253,8 +253,8 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		class DriveTrain;
 		class DriveTrainTire;
-		class DualDifferential;
 		class DriveTrainDifferentialGear;
+		class DriveTrainDualDifferential;
 		class DriveTrainSingleDifferential;
 
 		class DifferentialAxel
