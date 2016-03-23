@@ -40,9 +40,9 @@
 
 // vehicle definition for a Muscle car
 #define VIPER_TIRE_MASS						40.0f  
-#define VIPER_ENGINE_MASS					200.0f
+#define VIPER_ENGINE_MASS					100.0f
 #define VIPER_MASS							(3380.0f * 0.454f)
-#define VIPER_ENGINE_RADIO					0.5f
+#define VIPER_ENGINE_RADIO					0.125f
 
 #define VIPER_IDLE_TORQUE					350.0f
 #define VIPER_IDLE_TORQUE_RPM				500.0f
@@ -362,7 +362,7 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetHandBrakes(handBrakes);
 
 		// add the engine, differential and transmission 
-		CustomVehicleController::BodyPartEngine::Info engineInfo;
+		CustomVehicleController::EngineController::Info engineInfo;
 		engineInfo.m_mass = VIPER_ENGINE_MASS; 
 		engineInfo.m_radio = VIPER_ENGINE_RADIO; 
 		engineInfo.m_vehicleTopSpeed = VIPER_TIRE_TOP_SPEED_KMH;
@@ -385,8 +385,8 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_gearRatios[5] = VIPER_TIRE_GEAR_6;
 		engineInfo.m_reverseGearRatio = VIPER_TIRE_REVERSE_GEAR;
 
-		CustomVehicleController::BodyPartEngine::DifferentialAxel axel0; 
-		CustomVehicleController::BodyPartEngine::DifferentialAxel axel1; 
+		CustomVehicleController::EngineController::DifferentialAxel axel0; 
+		CustomVehicleController::EngineController::DifferentialAxel axel1; 
 		switch (differentialType)
 		{
 			case 0:
@@ -408,22 +408,24 @@ class SuperCarEntity: public DemoEntity
 		
 		engineInfo.m_userData = this;
 
-		CustomVehicleController::BodyPartEngine* const engine = new CustomVehicleController::BodyPartEngine(m_controller, engineInfo, axel0, axel1);
-		m_controller->AddEngineBodyPart (engine);
-		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engine);
+		//CustomVehicleController::BodyPartEngine* const engine = new CustomVehicleController::BodyPartEngine(m_controller, engineInfo, axel0, axel1);
+		//m_controller->AddEngineBodyPart (engine);
+		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, axel0, axel1);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
+		engineControl->SetIgnition(true);
 
 		m_controller->SetEngine(engineControl);
 
-
 		// add clutch controller
-		CustomVehicleController::ClutchController* const clutch = new CustomVehicleController::ClutchController(m_controller, engine, VIPER_TIRE_CLUTCH_TORQUE);
-		m_controller->SetClutch(clutch);
+		//CustomVehicleController::ClutchController* const clutch = new CustomVehicleController::ClutchController(m_controller, engine, VIPER_TIRE_CLUTCH_TORQUE);
+		//m_controller->SetClutch(clutch);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
+
+		
 	}
 
 	void ApplyPlayerControl ()
@@ -434,7 +436,7 @@ class SuperCarEntity: public DemoEntity
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
 		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
-		CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
+		//CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
 		CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
@@ -544,15 +546,15 @@ steeringVal *= 0.3f;
 
 //		dTrace (("%d\n", gear));
 		if (engine) {
-/*
 			bool key = (m_engineKeySwitchCounter & 1) ? true : false;
 			if (!m_engineOldKeyState && key) {
-				engine->SetKey (true);
+				engine->SetIgnition (true);
 			} else if (m_engineOldKeyState && !key) {
-				engine->SetKey (false);
+				engine->SetIgnition (false);
 			}
 			m_engineOldKeyState = key;
 
+/*
 			if (toggleTransmission) {
 				engine->SetTransmissionMode (!engine->GetTransmissionMode());
 			}
@@ -572,9 +574,9 @@ steeringVal *= 0.3f;
 			engine->SetParam(engineGasPedal);
 		}
 
-		if (clutch) {
-			clutch->SetParam(cluthVal);
-		}
+		//if (clutch) {
+		//	clutch->SetParam(cluthVal);
+		//}
 
 		
 		if (steering) {
@@ -661,7 +663,7 @@ steeringVal *= 0.3f;
 		 
 		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
-		CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
+		//CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
 		//CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
 		//CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 		
@@ -674,7 +676,7 @@ steeringVal *= 0.3f;
 
 			// AI car are manual gears
 			engine->SetTransmissionMode (1);
-			clutch->SetParam(1.0f);
+			//clutch->SetParam(1.0f);
 
 			// engage first Gear 
 //			engine->SetGear (CustomVehicleControllerComponentEngine::dGearBox::m_firstGear + 3);
@@ -1102,7 +1104,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		}
 
 		//print controllers help 
-//		DrawHelp(scene, lineNumber);
+		DrawHelp(scene, lineNumber);
 
 		// restore color and blend mode
 		glDisable (GL_BLEND);
@@ -1110,6 +1112,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void SetAsPlayer (SuperCarEntity* const player)
 	{
+		CustomVehicleController::EngineController* const engine = player->m_controller->GetEngine();
+		engine->SetIgnition(false);
 		m_player = player;
 	}
 
@@ -1371,7 +1375,7 @@ void SuperCar (DemoEntityManager* const scene)
 	SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
 
 	// set this vehicle as the player
-//	manager->SetAsPlayer(vehicleEntity);
+	manager->SetAsPlayer(vehicleEntity);
 	manager->SetDebugVehicle(vehicleEntity);
 
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
@@ -1379,6 +1383,7 @@ void SuperCar (DemoEntityManager* const scene)
 //	scene->SetCameraMouseLock (true);
 
 	camMatrix.m_posit.m_x -= 5.0f;
+camMatrix = dYawMatrix (0.5f * 3.1416f) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 
@@ -1386,7 +1391,7 @@ void SuperCar (DemoEntityManager* const scene)
 	location.m_posit.m_z += 4.0f;
 	location.m_posit.m_x += 44.0f;
 
-	int count = 5;
+	//int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);

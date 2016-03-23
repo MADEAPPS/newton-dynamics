@@ -337,8 +337,8 @@ class BasicCarEntity: public DemoEntity
 		handBrakes->AddTire (rearTires[1]);
 		m_controller->SetHandBrakes (handBrakes);
 
-		CustomVehicleController::BodyPartEngine::DifferentialAxel axel0;
-		CustomVehicleController::BodyPartEngine::DifferentialAxel axel1;
+		CustomVehicleController::EngineController::DifferentialAxel axel0;
+		CustomVehicleController::EngineController::DifferentialAxel axel1;
 		switch (parameters.m_differentialType) 
 		{
 			case BasciCarParameters::m_RWD:
@@ -359,8 +359,7 @@ class BasicCarEntity: public DemoEntity
 		}
 
 
-
-		CustomVehicleController::BodyPartEngine::Info engineInfo;
+		CustomVehicleController::EngineController::Info engineInfo;
 		engineInfo.m_mass = parameters.ENGINE_MASS;
 		engineInfo.m_radio = parameters.ENGINE_ARMATURE_RADIO;
 		engineInfo.m_vehicleTopSpeed = parameters.TOP_SPEED_KMH;
@@ -380,10 +379,7 @@ class BasicCarEntity: public DemoEntity
 		engineInfo.m_gearRatios[2] = parameters.GEAR_3;
 		engineInfo.m_reverseGearRatio = parameters.REVERSE_GEAR;
 
-		CustomVehicleController::BodyPartEngine* const engine = new CustomVehicleController::BodyPartEngine(m_controller, engineInfo, axel0, axel1);
-		m_controller->AddEngineBodyPart(engine);
-
-		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engine);
+		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, axel0, axel1);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
@@ -421,7 +417,7 @@ class BasicCarEntity: public DemoEntity
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
 		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
-		CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
+		//CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
 		CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
@@ -945,9 +941,9 @@ void BasicCar (DemoEntityManager* const scene)
 	//	location.m_z += 20.0f;
 //	location.m_posit.m_z += 4.0f;
 
-	int count = 1;
+//	int count = 1;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
 	//AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
