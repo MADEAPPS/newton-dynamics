@@ -893,9 +893,7 @@ class CustomVehicleController::EngineController::DriveTrainSingleDifferential: p
 	virtual void Integrate(EngineController* const controller, dFloat timestep)
 	{
 		DriveTrain::Integrate(controller, timestep);
-		if (m_omega.m_x < 0.0f) {
-			m_omega.m_x = 0.0f;
-		}
+		m_omega.m_x = dClamp (m_omega.m_x, 0.0f, controller->m_info.m_rpmAtReadLineTorque);
 
 		dFloat average = m_omega.m_x; 
 		for (int i = 1; i < sizeof (m_smoothOmega)/sizeof (m_smoothOmega[0]); i ++) {
@@ -1108,12 +1106,13 @@ void CustomVehicleController::EngineController::Update(dFloat timestep)
 	}
 
 	dFloat torque = 0.0f;
+	dFloat omega = m_driveTrain->m_omega.m_x;
 	if (m_ignitionKey) {
 		dFloat gasVal = dMax (m_param, D_VEHICLE_REST_GAS_VALVE);
-		dFloat drag = dMin (m_driveTrain->m_omega.m_x * m_driveTrain->m_omega.m_x * m_info.m_idleViscousDrag2, 2.0f * m_info.m_minTorque);
-		torque = m_torqueRPMCurve.GetValue(m_info.m_rpmAtIdleTorque) * gasVal - drag;
+		dFloat drag = dMin (omega * omega * m_info.m_idleViscousDrag2, 2.0f * m_info.m_minTorque);
+		torque = m_torqueRPMCurve.GetValue(omega) * gasVal - drag;
 	} else {
-		 torque = -m_driveTrain->m_omega.m_x * m_info.m_idleViscousDrag1;
+		 torque = - omega * m_info.m_idleViscousDrag1;
 	}
 	ApplyTorque(torque, timestep);
 }
