@@ -822,6 +822,15 @@ class dgVector
 //		#endif
 	}
 
+	DG_INLINE dgVector AddHorizontal () const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		dgVector tmp (_mm_hadd_ps (m_type, m_type));
+//		return _mm_hadd_ps (tmp.m_type, tmp.m_type);
+	}
+
+
 	// component wise multiplication
 	DG_INLINE dgVector CompProduct3 (const dgVector& A) const
 	{
@@ -1046,6 +1055,26 @@ class dgVector
 //		return _mm_movemask_ps(m_type);
 	} 
 
+	DG_INLINE dgVector Floor () const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+
+//		dgVector mask ((dgFloat32 (1.5f) * dgFloat32 (1<<23)));
+//		dgVector ret (_mm_sub_ps(_mm_add_ps(m_type, mask.m_type), mask.m_type));
+//		dgVector adjust (_mm_cmplt_ps (m_type, ret.m_type));
+//		ret = _mm_sub_ps (ret.m_type, _mm_and_ps(_mm_set_ps1(1.0), adjust.m_type));
+/*
+		dgVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
+		dgVector ret (truncated - (dgVector::m_one & (*this < truncated)));
+		dgAssert (ret.m_f[0] == dgFloor(m_f[0]));
+		dgAssert (ret.m_f[1] == dgFloor(m_f[1]));
+		dgAssert (ret.m_f[2] == dgFloor(m_f[2]));
+		dgAssert (ret.m_f[3] == dgFloor(m_f[3]));
+		return ret;
+*/	
+	}
+
 	DG_INLINE dgVector CrossProduct4 (const dgVector& A, const dgVector& B) const
 	{
 		dgAssert (0);
@@ -1088,6 +1117,12 @@ class dgVector
 */
 	}
 
+	DG_INLINE dgVector TestZero() const
+	{
+		dgAssert (0);
+		return dgVector (0.0f);
+//		return _mm_cmpeq_epi32 (m_typeInt, dgVector (dgFloat32 (0.0f)).m_typeInt);
+	}
 
 
 	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, 
