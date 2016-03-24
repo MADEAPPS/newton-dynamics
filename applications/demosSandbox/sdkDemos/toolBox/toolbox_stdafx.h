@@ -178,17 +178,35 @@ typedef long long unsigned64;
 
 
 
-
-#ifdef __USE_DOUBLE_PRECISION__
+/*
+#ifdef _NEWTON_USE_DOUBLE
 	#define glMultMatrix(x) glMultMatrixd(x)
 	#define glLoadMatrix(x) glMultMatrixd(x)
-//	#define glGetFloat(x,y) glGetDoublev(x,(GLdouble *)y) 
+	#define glGetFloat(x,y) glGetDoublev(x,(GLdouble *)y) 
 #else
 	#define glMultMatrix(x) glMultMatrixf(x)
 	#define glLoadMatrix(x) glMultMatrixf(x)
 	#define glGetFloat(x,y) glGetFloatv(x,(dFloat  *)y) 
 #endif
+*/
 
+#ifdef _NEWTON_USE_DOUBLE
+inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
+{
+	GLfloat tmp[4] = {params[0], params[1], params[2], params[0]};
+	glMaterialfv (face, pname, &tmp[0]);
+}
+
+
+#define glMultMatrix(x) glMultMatrixd(x)
+#define glLoadMatrix(x) glMultMatrixd(x)
+#define glGetFloat(x,y) glGetDoublev(x,(GLdouble *)y) 
+#else 
+#define glMaterialParam glMaterialfv
+#define glMultMatrix(x) glMultMatrixf(x)
+#define glLoadMatrix(x) glMultMatrixf(x)
+#define glGetFloat(x,y) glGetFloatv(x, (GLfloat*)y) 
+#endif
 
 
 #ifndef _MSC_VER

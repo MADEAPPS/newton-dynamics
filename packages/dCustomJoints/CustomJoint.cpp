@@ -141,7 +141,7 @@ dFloat CustomJoint::GetStiffness() const
 
 void CustomJoint::SetStiffness(dFloat stiffness)
 {
-	m_stiffness = dClamp (stiffness, 0.0f, 1.0f);
+	m_stiffness = dClamp (stiffness, dFloat(0.0f), dFloat(1.0f));
 }
 
 

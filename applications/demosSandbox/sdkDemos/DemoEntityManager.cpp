@@ -822,8 +822,8 @@ void DemoEntityManager::RenderFrame ()
 	glLoadIdentity();
 
 	dFloat cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
-	glMaterialfv(GL_FRONT, GL_SPECULAR, cubeColor);
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
+	glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
+	glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
 	glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 

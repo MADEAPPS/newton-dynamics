@@ -49,9 +49,9 @@ class ShowCollisionCollide: public DemoEntity::UserData
 		ShowCollisionCollide* const me = (ShowCollisionCollide*)userData;
 		if (me->m_body != otherBody) {
 			const int cMaxContacts = 15;
-			float contacts[cMaxContacts][3];
-			float normals[cMaxContacts][3];
-			float penetrations[cMaxContacts];
+			dFloat contacts[cMaxContacts][3];
+			dFloat normals[cMaxContacts][3];
+			dFloat penetrations[cMaxContacts];
 			dLong attributeA[cMaxContacts];
 			dLong attributeB[cMaxContacts];
 			NewtonWorld* const world = NewtonBodyGetWorld(otherBody);

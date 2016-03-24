@@ -108,13 +108,13 @@ static BasciCarParameters basicCarParameters =
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER		0.125f
 
 
-static float VehicleHullShape0[][3] =  
+static dFloat VehicleHullShape0[][3] =  
 {
 	{-2.3f, 0.0f, -0.9f}, {-2.3f, 0.0f, 0.9f}, {2.3f, 0.0f, -0.9f}, {2.3f, 0.0f, 0.9f},
 	{-2.1f, 0.7f, -0.9f}, {-2.1f, 0.7f, 0.9f}, {2.1f, 0.7f, -0.9f}, {2.1f, 0.7f, 0.9f},
 };
 
-static float VehicleHullShape1[][3] =  
+static dFloat VehicleHullShape1[][3] =  
 {
 	{-1.5f, 0.0f, -0.9f}, {-1.5f, 0.0f, 0.9f}, {1.2f, 0.0f, -0.9f}, {1.2f, 0.0f, 0.9f},
 	{-1.1f, 0.7f, -0.9f}, {-1.1f, 0.7f, 0.9f}, {0.8f, 0.7f, -0.9f}, {0.8f, 0.7f, 0.9f},

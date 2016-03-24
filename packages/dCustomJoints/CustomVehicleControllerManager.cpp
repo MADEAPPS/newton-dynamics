@@ -28,8 +28,8 @@ static FILE* file_xxx;
 #define D_VEHICLE_NEUTRAL_GEAR		0
 #define D_VEHICLE_REVERSE_GEAR		1
 #define D_VEHICLE_FIRST_GEAR		2
-#define D_VEHICLE_REST_GAS_VALVE	(0.1f)
-#define D_VEHICLE_MIN_RPM_FACTOR	(0.5f)
+#define D_VEHICLE_REST_GAS_VALVE	dFloat(0.1f)
+#define D_VEHICLE_MIN_RPM_FACTOR	dFloat(0.5f)
 
 
 /*
@@ -89,7 +89,7 @@ dFloat CustomVehicleController::dInterpolationCurve::GetValue(dFloat param) cons
 {
 	dFloat interplatedValue = 0.0f;
 	if (m_count) {
-		param = dClamp(param, 0.0f, m_nodes[m_count - 1].m_param);
+		param = dClamp(param, dFloat(0.0f), m_nodes[m_count - 1].m_param);
 		interplatedValue = m_nodes[m_count - 1].m_value;
 		for (int i = 1; i < m_count; i++) {
 			if (param < m_nodes[i].m_param) {
@@ -163,7 +163,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right % tireMatrix.m_right));
 		tireMatrix.m_up = tireMatrix.m_right * tireMatrix.m_front;
 
-		dFloat param = dMin (CalcuateTireParametricPosition (tireMatrix, chassisMatrix), 1.0f);
+		dFloat param = dMin (CalcuateTireParametricPosition (tireMatrix, chassisMatrix), dFloat(1.0f));
 		tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale (param * m_tire->m_data.m_suspesionlenght);
 
 		NewtonBody* const tire = m_body0;
@@ -934,7 +934,7 @@ class CustomVehicleController::EngineController::DriveTrainSingleDifferential: p
 	virtual void Integrate(EngineController* const controller, dFloat timestep)
 	{
 		DriveTrain::Integrate(controller, timestep);
-		m_omega.m_x = dClamp (m_omega.m_x, 0.0f, controller->m_info.m_rpmAtReadLineTorque);
+		m_omega.m_x = dClamp (m_omega.m_x, dFloat(0.0f), controller->m_info.m_rpmAtReadLineTorque);
 
 		dFloat average = m_omega.m_x; 
 		for (int i = 1; i < sizeof (m_smoothOmega)/sizeof (m_smoothOmega[0]); i ++) {
@@ -980,7 +980,7 @@ class CustomVehicleController::EngineController::DriveTrainDualDifferential: pub
 	virtual void Integrate(EngineController* const controller, dFloat timestep)
 	{
 		DriveTrain::Integrate(controller, timestep);
-		m_omega.m_x = dClamp (m_omega.m_x, 0.0f, controller->m_info.m_rpmAtReadLineTorque);
+		m_omega.m_x = dClamp (m_omega.m_x, dFloat(0.0f), controller->m_info.m_rpmAtReadLineTorque);
 
 		dFloat average = m_omega.m_x; 
 		for (int i = 1; i < sizeof (m_smoothOmega)/sizeof (m_smoothOmega[0]); i ++) {
@@ -1231,7 +1231,7 @@ void CustomVehicleController::EngineController::SetTransmissionMode(bool mode)
 
 void CustomVehicleController::EngineController::SetClutchParam (dFloat cluthParam)
 {
-	m_clutchParam = dClamp (cluthParam, 0.0f, 1.0f);
+	m_clutchParam = dClamp (cluthParam, dFloat(0.0f), dFloat(1.0f));
 }
 
 

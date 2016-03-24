@@ -89,10 +89,10 @@ void ContinuousCollision (DemoEntityManager* const scene)
 
 	// set continuous collision mode on all dynamics bodies
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		float Ix;
-		float Iy;
-		float Iz;
-		float mass;
+		dFloat Ix;
+		dFloat Iy;
+		dFloat Iz;
+		dFloat mass;
 		NewtonBodyGetMassMatrix(body, &mass, &Ix, &Iy, &Iz);
 		if (mass > 0.0f) {
 			NewtonBodySetContinuousCollisionMode(body, 1);
