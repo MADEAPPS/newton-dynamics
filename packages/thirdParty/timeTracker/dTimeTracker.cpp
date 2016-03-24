@@ -10,10 +10,10 @@
 * freely
 */
 
+#if defined (D_TIME_TRACKER) && defined(_MSC_VER)
+
 #include "stdafx.h"
 #include "dTimeTracker.h"
-
-#if defined (D_TIME_TRACKER) && defined(_MSC_VER)
 
 dTimeTracker* dTimeTracker::GetInstance()
 {
