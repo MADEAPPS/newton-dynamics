@@ -707,14 +707,12 @@ class dgVector
 	public:
 	DG_INLINE dgVector() 
 	{
-		dgAssert (0);
 	}
 
 	DG_INLINE dgVector (const dgFloat32 a)
 		:m_typeLow(_mm_set1_pd(a)) 
 		,m_typeHigh(_mm_set1_pd(a))
 	{
-		dgAssert (0);
 	}
 
 	DG_INLINE dgVector (const dgFloat32* const ptr)
@@ -729,14 +727,22 @@ class dgVector
 		:m_typeLow (typeLow)
 		,m_typeHigh (typeHigh)
 	{
-		dgAssert (0);
 	}
 
 	DG_INLINE dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w)
 		:m_typeLow(_mm_set_pd(y, x))
 		,m_typeHigh(_mm_set_pd(w, z))
 	{
-		dgAssert (0);
+	}
+
+	DG_INLINE dgVector (dgInt32 ix, dgInt32 iy, dgInt32 iz, dgInt32 iw)
+	{
+		dgInt64 x = ix;
+		dgInt64 y = iy;
+		dgInt64 z = iz;
+		dgInt64 w = iw;
+		m_typeLow = _mm_set_pd(*(dgFloat32*)&y, *(dgFloat32*)&x);
+		m_typeHigh = _mm_set_pd(*(dgFloat32*)&w, *(dgFloat32*)&z);
 	}
 
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
@@ -763,13 +769,11 @@ class dgVector
 
 	DG_INLINE dgVector operator+ (const dgVector& A) const
 	{
-		dgAssert (0);
 		return dgVector (_mm_add_pd (m_typeLow, A.m_typeLow), _mm_add_pd (m_typeHigh, A.m_typeHigh));	
 	}
 
 	DG_INLINE dgVector operator- (const dgVector& A) const 
 	{
-		dgAssert (0);
 		return dgVector (_mm_sub_pd (m_typeLow, A.m_typeLow), _mm_sub_pd (m_typeHigh, A.m_typeHigh));	
 	}
 
@@ -798,17 +802,21 @@ class dgVector
 
 	DG_INLINE dgFloat32 operator% (const dgVector& A) const
 	{
-		dgAssert (0);
-/*
+		dgFloat32 ret;
 		#ifdef DG_SSE4_INSTRUCTIONS_SET 
-			return dgVector (_mm_dp_ps (m_type, A.m_type, 0x77)).GetScalar(); 
+			__m128d tmp0 (_mm_mul_pd (m_typeLow, A.m_typeLow));
+			__m128d tmp1 (_mm_and_pd (m_typeHigh, dgVector::m_triplexMask.m_typeHigh));
+			__m128d tmp2 (_mm_mul_pd (m_typeHigh, tmp1));
+			__m128d tmp3 (_mm_add_pd (tmp0, tmp2));
+			__m128d dot (_mm_dp_pd (tmp3, tmp3, 0x77));
+			_mm_store_sd (& ret, dot);
 		#else
-			dgVector tmp (A & m_triplexMask);
-			dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
-			return CompProduct4(tmp).AddHorizontal().GetScalar();
+			dgAssert (0);
+//			dgVector tmp (A & m_triplexMask);
+//			dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
+//			return CompProduct4(tmp).AddHorizontal().GetScalar();
 		#endif
-*/
-		return 0;
+		return ret;
 	}
 
 	DG_INLINE dgVector DotProduct4 (const dgVector& A) const

@@ -57,6 +57,7 @@ packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
 *.ilk
 *.map
 *.exe
+*.ib_tag
 *.unsuccessfulbuild
 *.cache
 *.idb

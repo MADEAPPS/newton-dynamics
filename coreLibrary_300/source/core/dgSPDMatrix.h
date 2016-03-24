@@ -440,12 +440,12 @@ bool dgLCP<T>::SolveDantzig()
 	dgSPDMatrix<T>& me = *this;
 	const dgInt32 size = dgGeneralMatrix<T>::m_rowCount;
 
-//static int xxx;
-//xxx++;
-//dgLCP<T> gauss(*this);
-//gauss.GaussSeidelLCP(100000, T(1.0e-6f));
-//dgTrace(("pgs %d :", xxx));
-//gauss.GetX().Trace();
+	//static int xxx;
+	//xxx++;
+	//dgLCP<T> gauss(*this);
+	//gauss.GaussSeidelLCP(100000, T(1.0e-6f));
+	//dgTrace(("pgs %d :", xxx));
+	//gauss.GetX().Trace();
 
 	T* const r = &m_tmp[0][0];
 	T* const x = &m_tmp[1][0];
@@ -527,15 +527,15 @@ bool dgLCP<T>::SolveDantzig()
 				}
 
 				if (s > T(1.0e-12f)) {
-				for (dgInt32 i = 0; i < size; i++) {
-					dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
-					dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
-					x[i] += s * delta_x[i];
-					r[i] += s * delta_r[i];
-					dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
-					dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
+					for (dgInt32 i = 0; i < size; i++) {
+						dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
+						dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
+						x[i] += s * delta_x[i];
+						r[i] += s * delta_r[i];
+						dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
+						dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
+					}
 				}
-			}
 			}
 
 			if (swapIndex == -1) {
@@ -603,9 +603,9 @@ bool dgLCP<T>::SolveDantzig()
 		r_out[m_permute[i]] = r[i];
 	}
 
-//dgTrace(("lcp %d :", xxx));
-//m_x.Trace();
-//m_x.Copy(gauss.GetX());
+	//dgTrace(("lcp %d :", xxx));
+	//m_x.Trace();
+	//m_x.Copy(gauss.GetX());
 
 	return true;
 }
