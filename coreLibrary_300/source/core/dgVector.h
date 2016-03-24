@@ -803,41 +803,30 @@ class dgVector
 	DG_INLINE dgFloat32 operator% (const dgVector& A) const
 	{
 		dgFloat32 ret;
-		#ifdef DG_SSE4_INSTRUCTIONS_SET 
-			__m128d tmp0 (_mm_mul_pd (m_typeLow, A.m_typeLow));
-			__m128d tmp1 (_mm_and_pd (m_typeHigh, dgVector::m_triplexMask.m_typeHigh));
-			__m128d tmp2 (_mm_mul_pd (m_typeHigh, tmp1));
-			__m128d tmp3 (_mm_add_pd (tmp0, tmp2));
-			__m128d dot (_mm_dp_pd (tmp3, tmp3, 0x77));
-			_mm_store_sd (& ret, dot);
-		#else
-			dgAssert (0);
-//			dgVector tmp (A & m_triplexMask);
-//			dgAssert ((m_w * tmp.m_w) == dgFloat32 (0.0f));
-//			return CompProduct4(tmp).AddHorizontal().GetScalar();
-		#endif
+		__m128d tmp0 (_mm_mul_pd (m_typeLow, A.m_typeLow));
+		__m128d tmp1 (_mm_and_pd (m_typeHigh, dgVector::m_triplexMask.m_typeHigh));
+		__m128d tmp2 (_mm_mul_pd (tmp1, A.m_typeHigh));
+		__m128d tmp3 (_mm_add_pd (tmp0, tmp2));
+		__m128d dot (_mm_hadd_pd (tmp3, tmp3));
+		_mm_store_sd (& ret, dot);
 		return ret;
 	}
 
 	DG_INLINE dgVector DotProduct4 (const dgVector& A) const
 	{
-		dgAssert (0);
-		return A;
-//		#ifdef DG_SSE4_INSTRUCTIONS_SET 
-//			return _mm_dp_ps (m_type, A.m_type, 0xff); 
-//		#else 
-//			return CompProduct4(A).AddHorizontal();
-//		#endif
+		__m128d tmp0 (_mm_mul_pd (m_typeLow, A.m_typeLow));
+		__m128d tmp1 (_mm_mul_pd (m_typeHigh, A.m_typeHigh));
+		__m128d tmp2 (_mm_add_pd (tmp0, tmp1));
+		__m128d dot (_mm_hadd_pd (tmp2, tmp2));
+		return dgVector (dot, dot);
 	}
 
 	DG_INLINE dgVector AddHorizontal () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		dgVector tmp (_mm_hadd_ps (m_type, m_type));
-//		return _mm_hadd_ps (tmp.m_type, tmp.m_type);
+		__m128d tmp0 (_mm_add_pd (m_typeHigh, m_typeLow));
+		__m128d tmp1 (_mm_hadd_pd (tmp0, tmp0));
+		return dgVector (tmp1, tmp1);
 	}
-
 
 	// component wise multiplication
 	DG_INLINE dgVector CompProduct3 (const dgVector& A) const
@@ -847,12 +836,10 @@ class dgVector
 //		return _mm_mul_ps (m_type, A.m_type);
 	}
 
-	// component wise multiplication
+	// component wide multiplication
 	DG_INLINE dgVector CompProduct4 (const dgVector& A) const
 	{
-		dgAssert (0);
-		return A;
-		//return _mm_mul_ps (m_type, A.m_type);
+		return dgVector (_mm_mul_pd (m_typeLow, A.m_typeLow), _mm_mul_pd (m_typeHigh, A.m_typeHigh));
 	}
 
 	DG_INLINE dgVector BroadcastX () const
@@ -893,9 +880,8 @@ class dgVector
 
 	DG_INLINE dgVector Scale4 (dgFloat32 s) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_mul_ps (m_type, _mm_set_ps1(s));
+		__m128d tmp0 (_mm_set1_pd(s));
+		return dgVector (_mm_mul_pd (m_typeLow, tmp0), _mm_mul_pd (m_typeHigh, tmp0));
 	}
 
 	DG_INLINE dgVector Abs () const
@@ -907,32 +893,22 @@ class dgVector
 
 	DG_INLINE dgVector Reciproc () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_div_ps (m_one.m_type, m_type);
+		return dgVector (_mm_div_pd (m_one.m_typeLow, m_typeLow), _mm_div_pd (m_one.m_typeHigh, m_typeHigh));
 	}
-
 
 	DG_INLINE dgVector Sqrt () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//return dgVector (_mm_sqrt_ps(m_type));
+		return dgVector (_mm_sqrt_pd(m_typeLow), _mm_sqrt_pd(m_typeHigh));
 	}
 
 	DG_INLINE dgVector InvSqrt () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//dgVector tmp0 (_mm_rsqrt_ps(m_type));
-		//return m_half.CompProduct4(tmp0).CompProduct4((m_three - CompProduct4(tmp0).CompProduct4(tmp0)));
+		return Sqrt().Reciproc();
 	}
 
 	DG_INLINE dgVector InvMagSqrt () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//return DotProduct4(*this).InvSqrt();
+		return (DotProduct4(*this)).InvSqrt ();
 	}
 
 	dgVector GetMax (const dgVector& data) const
