@@ -562,7 +562,7 @@ class CustomVehicleController::EngineController::DriveTrain: public CustomAlloc
 					for (int jj = 0; jj < nodeBdof; jj ++) {
 						memset (rowJ, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
 						nodeB->GetInvRowT(rowJ, jj);
-//						nodeB->GetRow(rowJ, l);
+//						nodeB->GetRow(rowJ, jj);
 
 						dFloat acc = 0.0f;
 						for (int k = 0; k < nodeCount; k ++) {
@@ -628,7 +628,8 @@ class CustomVehicleController::EngineController::DriveTrain: public CustomAlloc
 		for (int i = 0; i < nodesCount - 1; i ++) {
 			DriveTrain* const node = nodeArray[i];
 			node->CalculateRightSide(controller, timestep, b);
-			dofSize += node->m_dofBase;
+//			dofSize += node->m_dofBase;
+			dofSize += node->GetDegreeOfFredom();
 		}
 
 		dFloat* const massMatrix = GetMassMatrix();
@@ -798,13 +799,14 @@ class CustomVehicleController::EngineController::DriveTrainDifferentialGear: pub
 		SetJacobianMarix ();
 	}
 
+/*
 	DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel, DriveTrain* const engine, dFloat location)
 		:DriveTrain(invInertia, invMass, engine)
 	{
 		m_child = new DriveTrainTire (axel.m_leftTire, this);
 		m_child->m_sibling = new DriveTrainTire (axel.m_rightTire, this);
 		dAssert (0);
-/*
+
 		dVector pin (dFloat(dSign(m_tire->m_data.m_location.m_x)), 1.0f, 0.0f, 0.0f);
 		m_J01[0].m_linear = dVector (0.0f, 0.0f, 1.0f, 0.0f);
 		m_J01[0].m_angular = dVector (0.0f, 1.0f, 0.0f, 0.0f) * m_J01[0].m_linear;
@@ -823,15 +825,14 @@ class CustomVehicleController::EngineController::DriveTrainDifferentialGear: pub
 		m_invMassJt01[1].m_angular = m_J01[1].m_angular.CompProduct(m_inertiaInv);
 		m_invMassJt10[1].m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);;
 		m_invMassJt10[1].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);;
-*/
 	}
-
+*/
 
 	DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel0, const DifferentialAxel& axel1, DriveTrain* const engine)
 		:DriveTrain(invInertia, invMass, engine)
 	{
-		m_child = new DriveTrainDifferentialGear (invInertia, invMass, axel0, engine, -1.0f);
-		m_child->m_sibling = new DriveTrainDifferentialGear (invInertia, invMass, axel1, engine, 1.0f);
+		m_child = new DriveTrainDifferentialGear (invInertia, invMass, axel0, engine);
+		m_child->m_sibling = new DriveTrainDifferentialGear (invInertia, invMass, axel1, engine);
 		SetJacobianMarix ();
 	}
 
@@ -993,7 +994,7 @@ class CustomVehicleController::EngineController::DriveTrainDualDifferential: pub
 		dTrace (("engine Omega: %f\n", m_omega.m_x));
 	}
 
-	dFloat invMassMatrix[8][8];
+	dFloat invMassMatrix[14][14];
 	float m_smoothOmega[4];
 };
 
