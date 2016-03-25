@@ -728,12 +728,10 @@ class dgVector
 	}
 
 	DG_INLINE dgVector (const dgFloat32* const ptr)
-//		:m_type(_mm_loadu_ps (ptr))
+		:m_typeLow(_mm_loadu_pd (ptr))
+		,m_typeHigh(_mm_set_pd(dgFloat32 (0.0f), ptr[2]))
 	{
-		dgAssert (0);
-//		m_type = _mm_and_ps (m_type, m_triplexMask.m_type);
 	}
-
 
 	DG_INLINE dgVector(const __m128d typeLow, const __m128d typeHigh)
 		:m_typeLow (typeLow)
@@ -841,9 +839,7 @@ class dgVector
 	// component wise multiplication
 	DG_INLINE dgVector CompProduct3 (const dgVector& A) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_mul_ps (m_type, A.m_type);
+		return dgVector (_mm_mul_pd (m_typeLow, A.m_typeLow), _mm_and_pd (_mm_mul_pd (m_typeHigh, A.m_typeHigh), m_triplexMask.m_typeHigh));
 	}
 
 	// component wide multiplication
@@ -875,7 +871,7 @@ class dgVector
 	DG_INLINE dgVector Scale3 (dgFloat32 s) const
 	{
 		__m128d tmp0 (_mm_set1_pd(s));
-		__m128d tmp1 (_mm_set_pd(1.0f, s));
+		__m128d tmp1 (_mm_set_pd(dgFloat32 (1.0f), s));
 		return dgVector (_mm_mul_pd (m_typeLow, tmp0), _mm_mul_pd (m_typeHigh, tmp1));
 	}
 
@@ -1076,30 +1072,23 @@ class dgVector
 
 	DG_INLINE dgVector TestZero() const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_cmpeq_epi32 (m_typeInt, dgVector (dgFloat32 (0.0f)).m_typeInt);
+		return dgVector (_mm_castsi128_pd(_mm_cmpeq_epi64 (m_typeIntLow, m_zero.m_typeIntLow)), _mm_castsi128_pd(_mm_cmpeq_epi64 (m_typeIntHigh, m_zero.m_typeIntHigh)));
 	}
 
 
 	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, 
 										const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
 	{
-		dgAssert (0);
-/*
-		dgVector tmp0 (src0.PackLow(src1));
-		dgVector tmp1 (src2.PackLow(src3));
-		dgVector tmp2 (src0.PackHigh(src1));
-		dgVector tmp3 (src2.PackHigh(src3));
+		dgVector tmp0 (src0);
+		dgVector tmp1 (src1);
+		dgVector tmp2 (src2);
+		dgVector tmp3 (src3);
 
-		dst0 = tmp0.MoveLow (tmp1);
-		dst1 = tmp1.MoveHigh (tmp0);
-		dst2 = tmp2.MoveLow (tmp3);
-		dst3 = tmp3.MoveHigh (tmp2);
-*/
+		dst0 = dgVector (tmp0.m_x, tmp1.m_x, tmp2.m_x, tmp3.m_x);
+		dst1 = dgVector (tmp0.m_y, tmp1.m_y, tmp2.m_y, tmp3.m_y);
+		dst2 = dgVector (tmp0.m_z, tmp1.m_z, tmp2.m_z, tmp3.m_z);
+		dst3 = dgVector (tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
 	}
-
-
 
 	DG_CLASS_ALLOCATOR(allocator)
 	
@@ -1391,7 +1380,7 @@ class dgVector
 
 	DG_INLINE dgVector TestZero() const
 	{
-		return _mm_cmpeq_epi32 (m_typeInt, dgVector (dgFloat32 (0.0f)).m_typeInt);
+		return _mm_cmpeq_epi32 (m_typeInt, m_zero.m_typeInt);
 	}
 
 	DG_INLINE dgVector Floor () const
