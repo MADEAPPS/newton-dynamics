@@ -573,6 +573,16 @@ class dgVector
 		return dgVector (m_z, m_x, m_y, m_w); 
 	}
 
+	DG_INLINE dgVector ShiftTripleLeft () const
+	{
+		return dgVector (m_y, m_z, m_x, m_w); 
+	}
+
+	DG_INLINE dgVector ShiftRightLogical (int bits) const
+	{
+		return dgVector (dgUnsigned32 (m_ix) >> bits, dgUnsigned32 (m_iy) >> bits, dgUnsigned32 (m_iz) >> bits, dgUnsigned32 (m_iw) >> bits); 
+	}
+
 
 	DG_INLINE dgVector MoveLow (const dgVector& data) const
 	{
@@ -704,6 +714,8 @@ public:
 DG_MSC_VECTOR_ALIGMENT
 class dgVector
 {
+	#define PURMUT_MASK(y, x)	_MM_SHUFFLE2 (y, x)
+
 	public:
 	DG_INLINE dgVector() 
 	{
@@ -779,25 +791,26 @@ class dgVector
 
 	DG_INLINE dgVector &operator+= (const dgVector& A)
 	{
-		dgAssert (0);
+		m_typeLow = _mm_add_pd (m_typeLow, A.m_typeLow);
+		m_typeHigh = _mm_add_pd (m_typeHigh, A.m_typeHigh);
 		return *this;
-		//return (*this = _mm_add_ps (m_type, A.m_type));
 	}
 
 	DG_INLINE dgVector &operator-= (const dgVector& A)
 	{
-		dgAssert (0);
+		m_typeLow = _mm_sub_pd (m_typeLow, A.m_typeLow);
+		m_typeHigh = _mm_sub_pd (m_typeHigh, A.m_typeHigh);
 		return *this;
-		//return (*this = _mm_sub_ps (m_type, A.m_type));
 	}
 
 	// return cross product
 	DG_INLINE dgVector operator* (const dgVector& B) const
 	{
-		dgAssert (0);
-//		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 1, 0, 2))),
-//						   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 0, 2, 1))));
-		return B;
+		dgVector tmp0 (ShiftTripleLeft ());
+		dgVector tmp1 (B.ShiftTripleRight ());
+		dgVector tmp2 (ShiftTripleRight ());
+		dgVector tmp3 (B.ShiftTripleLeft ());
+		return tmp0.CompProduct4(tmp1) - tmp2.CompProduct4(tmp3);
 	}
 
 	DG_INLINE dgFloat32 operator% (const dgVector& A) const
@@ -844,38 +857,29 @@ class dgVector
 
 	DG_INLINE dgVector BroadcastX () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(0, 0, 0, 0));
+		return dgVector (m_x);
 	}
 
 	DG_INLINE dgVector BroadcastY () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(1, 1, 1, 1));
+		return dgVector (m_y);
 	}
 
 	DG_INLINE dgVector BroadcastZ () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(2, 2, 2, 2));
+		return dgVector (m_z);
 	}
 
 	DG_INLINE dgVector BroadcastW () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 3, 3, 3));
+		return dgVector (m_w);
 	}
 
 	DG_INLINE dgVector Scale3 (dgFloat32 s) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		dgVector tmp (s, s, s, dgFloat32 (1.0f));
-//		return _mm_mul_ps (m_type, tmp.m_type);
+		__m128d tmp0 (_mm_set1_pd(s));
+		__m128d tmp1 (_mm_set_pd(1.0f, s));
+		return dgVector (_mm_mul_pd (m_typeLow, tmp0), _mm_mul_pd (m_typeHigh, tmp1));
 	}
 
 	DG_INLINE dgVector Scale4 (dgFloat32 s) const
@@ -886,9 +890,8 @@ class dgVector
 
 	DG_INLINE dgVector Abs () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//return _mm_and_ps (m_type, m_signMask.m_type);
+//		return _mm_and_ps (m_type, m_signMask.m_type);
+		return dgVector (_mm_and_pd (m_typeLow, m_signMask.m_typeLow), _mm_and_pd (m_typeHigh, m_signMask.m_typeLow));
 	}
 
 	DG_INLINE dgVector Reciproc () const
@@ -935,73 +938,68 @@ class dgVector
 	// relational operators
 	DG_INLINE dgVector operator> (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
 //		return _mm_cmpgt_ps (m_type, data.m_type);	
+		return dgVector (_mm_cmpgt_pd (m_typeLow, data.m_typeLow), _mm_cmpgt_pd (m_typeHigh, data.m_typeHigh));	
 	}
 
 	DG_INLINE dgVector operator== (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
 //		return _mm_cmpeq_ps (m_type, data.m_type);	
+		return dgVector (_mm_cmpeq_pd (m_typeLow, data.m_typeLow), _mm_cmpeq_pd (m_typeHigh, data.m_typeHigh));	
 	}
 
 	DG_INLINE dgVector operator< (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_cmplt_ps (m_type, data.m_type);	
+		return dgVector (_mm_cmplt_pd (m_typeLow, data.m_typeLow), _mm_cmplt_pd (m_typeHigh, data.m_typeHigh));	
 	}
 
 	DG_INLINE dgVector operator>= (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
 //		return _mm_cmpge_ps (m_type, data.m_type);	
+		return dgVector (_mm_cmpge_pd (m_typeLow, data.m_typeLow), _mm_cmpge_pd (m_typeHigh, data.m_typeHigh));	
 	}
 
 	DG_INLINE dgVector operator<= (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
 //		return _mm_cmple_ps (m_type, data.m_type);	
+		return dgVector (_mm_cmple_pd (m_typeLow, data.m_typeLow), _mm_cmple_pd (m_typeHigh, data.m_typeHigh));	
 	}
 
 	// logical operations
 	DG_INLINE dgVector operator& (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_and_ps (m_type, data.m_type);	
+		return dgVector (_mm_and_pd (m_typeLow, data.m_typeLow), _mm_and_pd (m_typeHigh, data.m_typeHigh));	
 	}
 
 	DG_INLINE dgVector operator| (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_or_ps (m_type, data.m_type);	
+		return dgVector (_mm_or_pd (m_typeLow, data.m_typeLow), _mm_or_pd (m_typeHigh, data.m_typeHigh));	
 	}
 
 	DG_INLINE dgVector operator^ (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_xor_ps (m_type, data.m_type);	
+		return dgVector (_mm_xor_pd (m_typeLow, data.m_typeLow), _mm_xor_pd (m_typeHigh, data.m_typeHigh));	
 	}
 
 	DG_INLINE dgVector AndNot (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
 //		return _mm_andnot_ps (data.m_type, m_type);	
+		return dgVector (_mm_andnot_pd (data.m_typeLow, m_typeLow), _mm_or_pd (data.m_typeHigh, m_typeHigh));	
 	}
 
 	DG_INLINE dgVector ShiftTripleRight () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_shuffle_ps(m_type, m_type, PURMUT_MASK(3, 1, 0, 2));
+		return dgVector (_mm_shuffle_pd (m_typeHigh, m_typeLow, PURMUT_MASK(0, 0)), _mm_shuffle_pd (m_typeLow, m_typeHigh, PURMUT_MASK(1, 1)));
+	}
+
+	DG_INLINE dgVector ShiftTripleLeft () const
+	{
+		return dgVector (_mm_shuffle_pd (m_typeLow, m_typeHigh, PURMUT_MASK(0, 1)), _mm_shuffle_pd (m_typeLow, m_typeHigh, PURMUT_MASK(1, 0)));
+	}
+
+	DG_INLINE dgVector ShiftRightLogical (int bits) const
+	{
+		return dgVector (_mm_castsi128_pd(_mm_srli_epi64(m_typeIntLow, bits)), _mm_castsi128_pd(_mm_srli_epi64(m_typeIntHigh, bits))); 
 	}
 
 	DG_INLINE dgVector MoveLow (const dgVector& data) const
@@ -1135,12 +1133,12 @@ class dgVector
 			__m128d m_typeLow;
 			__m128d m_typeHigh;
 		};
-/*
+
 		struct {
-			__m128d m_typeIntLow;
-			__m128d m_typeIntHigh;
+			__m128i m_typeIntLow;
+			__m128i m_typeIntHigh;
 		};
-*/
+
 		dgFloat32 m_f[4];
 		struct {
 			dgFloat32 m_x;
@@ -1510,6 +1508,16 @@ class dgVector
 	DG_INLINE dgVector ShiftTripleRight () const
 	{
 		return _mm_shuffle_ps(m_type, m_type, PURMUT_MASK(3, 1, 0, 2));
+	}
+
+	DG_INLINE dgVector ShiftTripleLeftt () const
+	{
+		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 0, 2, 1));
+	}
+
+	DG_INLINE dgVector ShiftRightLogical (int bits) const
+	{
+		return dgVector (_mm_castsi128_ps(_mm_srli_epi32(m_typeInt, bits))); 
 	}
 
 	DG_INLINE dgVector MoveLow (const dgVector& data) const

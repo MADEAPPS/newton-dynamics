@@ -24,12 +24,13 @@
 #include "dgQuaternion.h"
 
 
-dgVector dgVector::m_xMask (0xffffffff, 0, 0, 0);
-dgVector dgVector::m_yMask (0,          0xffffffff, 0, 0);
-dgVector dgVector::m_zMask (0,          0,          0xffffffff, 0);
-dgVector dgVector::m_wMask (0,          0,          0,          0xffffffff);
-dgVector dgVector::m_triplexMask (0xffffffff, 0xffffffff, 0xffffffff, 0);
-dgVector dgVector::m_signMask (0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff);
+dgVector dgVector::m_xMask (dgInt32 (0xffffffff),		dgInt32 (0),				dgInt32 (0),          dgInt32 (0));
+dgVector dgVector::m_yMask (dgInt32 (0),				dgInt32 (0xffffffff),		dgInt32 (0),          dgInt32 (0));
+dgVector dgVector::m_zMask (dgInt32 (0),				dgInt32 (0),				dgInt32 (0xffffffff), dgInt32 (0));
+dgVector dgVector::m_wMask (dgInt32 (0),				dgInt32 (0),				dgInt32 (0),          dgInt32 (0xffffffff));
+dgVector dgVector::m_triplexMask (dgInt32 (0xffffffff), dgInt32 (0xffffffff),		dgInt32 (0xffffffff), dgInt32 (0));
+dgVector dgVector::m_signMask (dgVector(dgInt32 (0xffffffff), dgInt32 (0xffffffff), dgInt32 (0xffffffff), dgInt32 (0xffffffff)).ShiftRightLogical(1));
+
 
 dgVector dgVector::m_zero (dgFloat32 (0.0f));
 dgVector dgVector::m_one  (dgFloat32 (1.0f));
