@@ -132,6 +132,7 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 			dgVector tmp (m_matrix.UnrotateVector(axis));
 			dgVector d (m_size.DotProduct4(tmp.Abs()) + m_padding);
 			dgVector c (origin.DotProduct4(axis));
+dgAssert (0);
 			extends[index] = ((c - d).PackLow (c + d));
 			m_crossAxisAbs[index] = axis.Abs();
 			index ++;

@@ -990,6 +990,7 @@ class dgVector
 		return dgVector (_mm_castsi128_pd(_mm_srli_epi64(m_typeIntLow, bits)), _mm_castsi128_pd(_mm_srli_epi64(m_typeIntHigh, bits))); 
 	}
 
+/*
 	DG_INLINE dgVector MoveLow (const dgVector& data) const
 	{
 		dgAssert (0);
@@ -1003,20 +1004,21 @@ class dgVector
 		return dgVector (0.0f);
 //		return _mm_movehl_ps (m_type, data.m_type);
 	}
-
+*/
 	DG_INLINE dgVector PackLow (const dgVector& data) const
 	{
 		dgAssert (0);
 		return dgVector (0.0f);
 //		return _mm_unpacklo_ps (m_type, data.m_type);
 	}
-
+/*
 	DG_INLINE dgVector PackHigh (const dgVector& data) const
 	{
 		dgAssert (0);
 		return dgVector (0.0f);
 //		return _mm_unpackhi_ps (m_type, data.m_type);
 	}
+*/
 
 	DG_INLINE dgInt32 GetSignMask() const
 	{
@@ -1030,9 +1032,6 @@ class dgVector
 
 	DG_INLINE dgVector CrossProduct4 (const dgVector& A, const dgVector& B) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-/*
 		dgFloat32 cofactor[3][3];
 		dgFloat32 array[4][4];
 
@@ -1067,7 +1066,6 @@ class dgVector
 		}
 
 		return normal;
-*/
 	}
 
 	DG_INLINE dgVector TestZero() const
