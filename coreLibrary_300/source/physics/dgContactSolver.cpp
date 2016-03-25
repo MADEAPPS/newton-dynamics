@@ -782,7 +782,7 @@ DG_INLINE void dgContactSolver::PushFace(dgMinkFace* const face)
 	}
 }
 
-DG_INLINE dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
+dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 {
 	dgAssert(count >= 1);
 	if (count == 1) {

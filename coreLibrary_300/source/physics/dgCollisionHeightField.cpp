@@ -848,10 +848,10 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& q0, const dgVector& q
 	dgAssert (p1.m_ix == dgFastInt (boxP1.m_x * m_horizontalScaleInv));
 	dgAssert (p1.m_iz == dgFastInt (boxP1.m_z * m_horizontalScaleInv));
 
-	dgInt32 x0 = p0.m_ix;
-	dgInt32 x1 = p1.m_ix;
-	dgInt32 z0 = p0.m_iz;
-	dgInt32 z1 = p1.m_iz;
+	dgInt32 x0 = dgInt32 (p0.m_ix);
+	dgInt32 x1 = dgInt32 (p1.m_ix);
+	dgInt32 z0 = dgInt32 (p0.m_iz);
+	dgInt32 z1 = dgInt32 (p1.m_iz);
 
 	dgFloat32 minHeight = dgFloat32 (1.0e10f);
 	dgFloat32 maxHeight = dgFloat32 (-1.0e10f);
@@ -940,10 +940,10 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 	dgAssert (p1.m_ix == dgFastInt (boxP1.m_x * m_horizontalScaleInv));
 	dgAssert (p1.m_iz == dgFastInt (boxP1.m_z * m_horizontalScaleInv));
 
-	dgInt32 x0 = p0.m_ix;
-	dgInt32 x1 = p1.m_ix;
-	dgInt32 z0 = p0.m_iz;
-	dgInt32 z1 = p1.m_iz;
+	dgInt32 x0 = dgInt32 (p0.m_ix);
+	dgInt32 x1 = dgInt32 (p1.m_ix);
+	dgInt32 z0 = dgInt32 (p0.m_iz);
+	dgInt32 z1 = dgInt32 (p1.m_iz);
 
 	dgFloat32 minHeight = dgFloat32 (1.0e10f);
 	dgFloat32 maxHeight = dgFloat32 (-1.0e10f);

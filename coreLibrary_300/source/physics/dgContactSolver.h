@@ -85,10 +85,9 @@ class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>
 	DG_INLINE void SupportVertex(const dgVector& dir, dgInt32 vertexIndex);
 	
 	DG_INLINE void TranslateSimplex(const dgVector& step);
-	DG_INLINE dgInt32 CalculateIntersectingPlane(dgInt32 count);
+	
 	DG_INLINE void CalculateContactFromFeacture(dgInt32 featureType);
 	DG_INLINE dgPerimenterEdge* ReduceContacts(dgPerimenterEdge* poly, dgInt32 maxCount) const;
-
 	DG_INLINE void ReduceDegeneratedTriangle();
 	DG_INLINE dgVector ReduceLine(dgInt32& indexOut);
 	DG_INLINE dgVector ReduceTriangle(dgInt32& indexOut);
@@ -103,6 +102,7 @@ class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>
 	dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal);
 	dgInt32 CalculateClosestSimplex();
 	dgInt32 CalculateClosestSimplexLarge ();
+	dgInt32 CalculateIntersectingPlane(dgInt32 count);
 
 	dgVector m_normal;
 	dgVector m_closestPoint0;

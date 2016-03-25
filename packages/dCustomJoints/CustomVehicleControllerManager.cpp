@@ -949,7 +949,7 @@ class CustomVehicleController::EngineController::DriveTrainSingleDifferential: p
 	}
 
 	dFloat invMassMatrix[6][6];
-	float m_smoothOmega[4];
+	dFloat m_smoothOmega[4];
 };
 
 class CustomVehicleController::EngineController::DriveTrainDualDifferential: public DriveTrain
@@ -995,7 +995,7 @@ class CustomVehicleController::EngineController::DriveTrainDualDifferential: pub
 	}
 
 	dFloat invMassMatrix[14][14];
-	float m_smoothOmega[4];
+	dFloat m_smoothOmega[4];
 };
 
 
