@@ -10,9 +10,11 @@
 * freely
 */
 
-#if defined (D_TIME_TRACKER) && defined(_MSC_VER)
 
 #include "stdafx.h"
+// need to include stdafx.h first so that visual studio do no issues a precompiled header error 
+#if defined (D_TIME_TRACKER) && defined(_MSC_VER)
+
 #include "dTimeTracker.h"
 
 dTimeTracker* dTimeTracker::GetInstance()
