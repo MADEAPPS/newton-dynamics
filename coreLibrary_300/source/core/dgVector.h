@@ -773,9 +773,6 @@ class dgVector
 
 	DG_INLINE dgFloat32 GetScalar () const
 	{
-		dgAssert (0);
-		//dgFloat32 scalar;
-		//_mm_store_ss(&scalar, m_type);
 		return m_x;
 	}
 
@@ -916,23 +913,18 @@ class dgVector
 
 	dgVector GetMax (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//return _mm_max_ps (m_type, data.m_type);
+		return dgVector (_mm_max_pd (m_typeLow, data.m_typeLow), _mm_max_pd (m_typeHigh, data.m_typeHigh));
 	}
 
 	dgVector GetMin (const dgVector& data) const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//return _mm_min_ps (m_type, data.m_type);
+		return dgVector (_mm_min_pd (m_typeLow, data.m_typeLow), _mm_min_pd (m_typeHigh, data.m_typeHigh));
 	}
 
 	DG_INLINE dgVector GetInt () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-		//return dgVector(_mm_cvtps_epi32(Floor().m_type));
+		dgVector temp (Floor ());
+		return dgVector(_mm_castsi128_pd(_mm_cvttpd_epi32(temp.m_typeLow)), _mm_castsi128_pd(_mm_cvttpd_epi32(temp.m_typeHigh)));
 	}
 
 	// relational operators
@@ -984,7 +976,7 @@ class dgVector
 	DG_INLINE dgVector AndNot (const dgVector& data) const
 	{
 //		return _mm_andnot_ps (data.m_type, m_type);	
-		return dgVector (_mm_andnot_pd (data.m_typeLow, m_typeLow), _mm_or_pd (data.m_typeHigh, m_typeHigh));	
+		return dgVector (_mm_andnot_pd (data.m_typeLow, m_typeLow), _mm_andnot_pd (data.m_typeHigh, m_typeHigh));	
 	}
 
 	DG_INLINE dgVector ShiftTripleRight () const
@@ -1032,29 +1024,12 @@ class dgVector
 
 	DG_INLINE dgInt32 GetSignMask() const
 	{
-		dgAssert (0);
-		return 0;
-//		return _mm_movemask_ps(m_type);
+		return _mm_movemask_pd (m_typeLow) | (_mm_movemask_pd (m_typeHigh) << 2);
 	} 
 
 	DG_INLINE dgVector Floor () const
 	{
-		dgAssert (0);
-		return dgVector (0.0f);
-
-//		dgVector mask ((dgFloat32 (1.5f) * dgFloat32 (1<<23)));
-//		dgVector ret (_mm_sub_ps(_mm_add_ps(m_type, mask.m_type), mask.m_type));
-//		dgVector adjust (_mm_cmplt_ps (m_type, ret.m_type));
-//		ret = _mm_sub_ps (ret.m_type, _mm_and_ps(_mm_set_ps1(1.0), adjust.m_type));
-/*
-		dgVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
-		dgVector ret (truncated - (dgVector::m_one & (*this < truncated)));
-		dgAssert (ret.m_f[0] == dgFloor(m_f[0]));
-		dgAssert (ret.m_f[1] == dgFloor(m_f[1]));
-		dgAssert (ret.m_f[2] == dgFloor(m_f[2]));
-		dgAssert (ret.m_f[3] == dgFloor(m_f[3]));
-		return ret;
-*/	
+		return dgVector (_mm_floor_pd(m_typeLow), _mm_floor_pd(m_typeHigh)); 
 	}
 
 	DG_INLINE dgVector CrossProduct4 (const dgVector& A, const dgVector& B) const
@@ -1411,7 +1386,6 @@ class dgVector
 	//DG_INLINE dgInt32 GetInt () const
 	DG_INLINE dgVector GetInt () const
 	{
-		//return _mm_cvtss_si32(m_type);
 		return dgVector(_mm_cvtps_epi32(Floor().m_type));
 	}
 
@@ -1422,18 +1396,12 @@ class dgVector
 
 	DG_INLINE dgVector Floor () const
 	{
-//		dgVector mask ((dgFloat32 (1.5f) * dgFloat32 (1<<23)));
-//		dgVector ret (_mm_sub_ps(_mm_add_ps(m_type, mask.m_type), mask.m_type));
-//		dgVector adjust (_mm_cmplt_ps (m_type, ret.m_type));
-//		ret = _mm_sub_ps (ret.m_type, _mm_and_ps(_mm_set_ps1(1.0), adjust.m_type));
-
-		dgVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
-		dgVector ret (truncated - (dgVector::m_one & (*this < truncated)));
-		dgAssert (ret.m_f[0] == dgFloor(m_f[0]));
-		dgAssert (ret.m_f[1] == dgFloor(m_f[1]));
-		dgAssert (ret.m_f[2] == dgFloor(m_f[2]));
-		dgAssert (ret.m_f[3] == dgFloor(m_f[3]));
-		return ret;
+		//dgVector ret (_mm_floor_ps(m_type));
+		//dgAssert (ret.m_f[0] == dgFloor(m_f[0])); 
+		//dgAssert (ret.m_f[1] == dgFloor(m_f[1]));
+		//dgAssert (ret.m_f[2] == dgFloor(m_f[2]));
+		//dgAssert (ret.m_f[3] == dgFloor(m_f[3]));
+		return _mm_floor_ps(m_type);
 	}
 
 	DG_INLINE dgVector Sqrt () const
