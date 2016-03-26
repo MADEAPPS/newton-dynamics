@@ -80,6 +80,9 @@
     <ClCompile Include="..\..\dCustomJoints\CustomUserBlank.cpp">
       <Filter>joints</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomDynamicRagDollManager.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h">
       <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomDynamicRagDollManager.h">
+      <Filter>managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

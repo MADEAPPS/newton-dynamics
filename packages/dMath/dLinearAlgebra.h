@@ -45,7 +45,7 @@ class dSymmetricBiconjugateGradientSolve
 	void Sub (int size, dFloat64* const a, const dFloat64* const b, const dFloat64* const c) const;
 };
 
-class dComplemtaritySolver 
+class dComplentaritySolver 
 {
 	public:
 	class dBodyState;
@@ -156,7 +156,7 @@ class dComplemtaritySolver
 		int m_count;
 
 		friend class dBodyState;
-		friend class dComplemtaritySolver;
+		friend class dComplentaritySolver;
 	};
 
 	class dFrictionLessContactJoint: public dBilateralJoint
@@ -244,14 +244,14 @@ class dComplemtaritySolver
 		int m_myIndex;
 
 		friend class dBilateralJoint;
-		friend class dComplemtaritySolver;
+		friend class dComplentaritySolver;
 	};
 
 
 
 	public:
-	dComplemtaritySolver() {};
-	virtual ~dComplemtaritySolver() {};
+	dComplentaritySolver() {};
+	virtual ~dComplentaritySolver() {};
 
 	virtual int GetActiveJoints (dBilateralJoint** const jointArray, int bufferSize)
 	{

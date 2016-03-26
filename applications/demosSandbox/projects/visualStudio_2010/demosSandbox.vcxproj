@@ -9,6 +9,14 @@
       <Configuration>debugDll</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="debug_double|Win32">
+      <Configuration>debug_double</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="debug_double|x64">
+      <Configuration>debug_double</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="debug|Win32">
       <Configuration>debug</Configuration>
       <Platform>Win32</Platform>
@@ -17,12 +25,28 @@
       <Configuration>debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="profile|Win32">
+      <Configuration>profile</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile|x64">
+      <Configuration>profile</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="releaseDll|Win32">
       <Configuration>releaseDll</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="releaseDll|x64">
       <Configuration>releaseDll</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_double|Win32">
+      <Configuration>release_double</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release_double|x64">
+      <Configuration>release_double</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="release|Win32">
@@ -45,11 +69,27 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_double|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -61,11 +101,19 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -80,11 +128,27 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='profile|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_double|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
@@ -96,11 +160,19 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
@@ -118,20 +190,34 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">../../$(PlatformName)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">../../$(PlatformName)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">../../$(PlatformName)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">../../$(PlatformName)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">../../$(PlatformName)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">../../$(PlatformName)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">../../$(PlatformName)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">../../$(PlatformName)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='profile|x64'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">false</LinkIncremental>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">$(ProjectName)_d</TargetName>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">../../$(PlatformName)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">../../$(PlatformName)\</OutDir>
@@ -139,8 +225,30 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(ProjectName)_profile</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='profile|x64'">$(ProjectName)</TargetName>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">false</EmbedManifest>
+    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='profile|x64'">false</EmbedManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">../../$(PlatformName)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">../../$(PlatformName)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -148,7 +256,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -167,7 +275,7 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)NewtonDemos.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -187,7 +295,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -204,7 +312,7 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)NewtonDemos.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -222,7 +330,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -248,6 +356,83 @@
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;D_TIME_TRACKER;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;timeTracker.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>../../../../packages/thirdParty/timeTracker/projects/vs_2010/Win32/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -259,7 +444,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -285,6 +470,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
@@ -298,7 +484,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -323,6 +509,81 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       </DataExecutionPrevention>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -334,7 +595,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -359,6 +620,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       </DataExecutionPrevention>
       <AdditionalOptions>
       </AdditionalOptions>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
@@ -370,7 +632,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -382,6 +644,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
@@ -394,7 +657,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -405,6 +668,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
       <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
@@ -412,6 +676,37 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLi
 xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dContainers/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
 xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R</Command>
     </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp" />
@@ -421,6 +716,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\DynamicRagDoll.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp" />
@@ -452,13 +748,19 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\BasicFriction.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicStacking.cpp" />
@@ -511,24 +813,44 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Performing Custom Build Step</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Performing Custom Build Step</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">Performing Custom Build Step</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">Performing Custom Build Step</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='release|x64'">Performing Custom Build Step</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Performing Custom Build Step</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='profile|x64'">Performing Custom Build Step</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">Performing Custom Build Step</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">
       </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">
       </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='release|x64'">
       </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
+      </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">
       </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='release|Win32'">%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>

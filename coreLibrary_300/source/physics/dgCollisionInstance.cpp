@@ -35,8 +35,6 @@
 #include "dgCollisionCompound.h"
 #include "dgCollisionHeightField.h"
 #include "dgCollisionConvexPolygon.h"
-#include "dgCollisionTaperedCapsule.h"
-#include "dgCollisionTaperedCylinder.h"
 #include "dgCollisionChamferCylinder.h"
 #include "dgCollisionCompoundFractured.h"
 #include "dgCollisionDeformableSolidMesh.h"
@@ -252,14 +250,6 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 					break;
 				}
 
-				case m_taperedCapsuleCollision:
-				{
-					collision = new (allocator) dgCollisionTaperedCapsule (world, deserialization, userData, revisionNumber);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
-					collision->AddRef();
-					break;
-				}
-
 				case m_cylinderCollision:
 				{
 					collision = new (allocator) dgCollisionCylinder (world, deserialization, userData, revisionNumber);
@@ -271,14 +261,6 @@ dgCollisionInstance::dgCollisionInstance(const dgWorld* const constWorld, dgDese
 				case m_chamferCylinderCollision:
 				{
 					collision = new (allocator) dgCollisionChamferCylinder (world, deserialization, userData, revisionNumber);
-					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
-					collision->AddRef();
-					break;
-				}
-
-				case m_taperedCylinderCollision:
-				{
-					collision = new (allocator) dgCollisionTaperedCylinder (world, deserialization, userData, revisionNumber);
 					node = world->dgBodyCollisionList::Insert (collision, collision->GetSignature());
 					collision->AddRef();
 					break;
@@ -671,27 +653,8 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 		}
 	}
 	return dgFloat32 (1.2f);
-
 }
 
-dgFloat32 dgCollisionInstance::ConvexRayCast (const dgCollisionInstance* const convexShape, const dgMatrix& convexShapeMatrix, const dgVector& localVeloc, dgFloat32 minT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const referenceBody, void* const userData, dgInt32 threadId) const
-{
-	dgFloat32 t = dgFloat32 (1.2f);
-	if ((GetCollisionPrimityType() != m_nullCollision) && (!preFilter || preFilter(referenceBody, this, userData))) {
-		t = m_childShape->ConvexRayCast (convexShape, convexShapeMatrix, localVeloc, minT, contactOut, referenceBody, this, userData, threadId);
-		if (t <= minT) {
-			if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-				contactOut.m_shapeId0 = GetUserDataID();
-				//contactOut.m_shapeId1 = GetUserDataID();
-				contactOut.m_shapeId1 = convexShape->GetUserDataID();
-			}
-			contactOut.m_collision0 = this;
-			//contactOut.m_collision1 = this;
-			contactOut.m_collision1 = convexShape;
-		}
-	}
-	return t;
-}
 
 void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix, const dgVector& origin, const dgVector& gravity, const dgVector& fluidPlane, dgFloat32 fluidDensity, dgFloat32 fluidViscosity, dgVector& accel, dgVector& alpha)
 {

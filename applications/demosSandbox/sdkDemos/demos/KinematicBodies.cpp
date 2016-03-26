@@ -86,7 +86,7 @@ class dKinematicPlacement: public CustomControllerBase
 
 
 
-class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlacement>, public dComplemtaritySolver 
+class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlacement>, public dComplentaritySolver 
 {
 	public:
 
@@ -283,6 +283,7 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
             matrix.m_posit += m_castDir.Scale (D_PLACEMENT_PENETRATION);
 			return true;
 		}
+
 		return false;
 	}
 

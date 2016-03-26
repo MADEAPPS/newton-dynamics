@@ -373,29 +373,26 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 	dgBodyMasterListRow& row0 = body0->m_masterNode->GetInfo();
 	dgBodyMasterListRow& row1 = body1->m_masterNode->GetInfo();
 
-    if (constraint->GetId() != dgConstraint::m_contactConstraint) {
-	    if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-		    dgDynamicBody* const dynBody0 = (dgDynamicBody*) body0;
-		    dynBody0->m_prevExternalForce = dgVector (dgFloat32 (0.0f));
-		    dynBody0->m_prevExternalTorque = dgVector (dgFloat32 (0.0f));
-	    }
+	if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+		dgDynamicBody* const dynBody0 = (dgDynamicBody*)body0;
+		dynBody0->m_prevExternalForce = dgVector(dgFloat32(0.0f));
+		dynBody0->m_prevExternalTorque = dgVector(dgFloat32(0.0f));
+	}
 
-	    if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-		    dgDynamicBody* const dynBody1 = (dgDynamicBody*) body1;
-		    dynBody1->m_prevExternalForce = dgVector (dgFloat32 (0.0f));
-		    dynBody1->m_prevExternalTorque = dgVector (dgFloat32 (0.0f));
-	    }
+	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+		dgDynamicBody* const dynBody1 = (dgDynamicBody*)body1;
+		dynBody1->m_prevExternalForce = dgVector(dgFloat32(0.0f));
+		dynBody1->m_prevExternalTorque = dgVector(dgFloat32(0.0f));
+	}
 
-	    if (constraint->m_maxDOF) {
-		    body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
-		    body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
-	    }
-
-		row0.RemoveBilateralJoint (constraint->m_link0);
-		row1.RemoveBilateralJoint (constraint->m_link1);
-    } else {
-		row0.RemoveContactJoint (constraint->m_link0);
-		row1.RemoveContactJoint (constraint->m_link1);
+	body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
+	body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
+	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+		row0.RemoveContactJoint(constraint->m_link0);
+		row1.RemoveContactJoint(constraint->m_link1);
+	} else {
+		row0.RemoveBilateralJoint(constraint->m_link0);
+		row1.RemoveBilateralJoint(constraint->m_link1);
 	}
 }
 

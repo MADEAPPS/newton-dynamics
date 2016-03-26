@@ -47,12 +47,14 @@ class dgSkeletonContainer
 	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
 	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
 	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow) const;
+	void ApplpyKinematicErrorCorrection (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow) const;
 	dgFloat32 CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
 	bool GetSolverMode () const;
 	void SetSolverMode (bool hardJoint);
 	
 	dgSkeletonGraph* GetRoot () const;
 	dgBody* GetBody(dgSkeletonGraph* const node) const;
+	dgBilateralConstraint* GetParentJoint(dgSkeletonGraph* const node) const;
 	dgSkeletonGraph* GetParent (dgSkeletonGraph* const node) const;
 	dgSkeletonGraph* GetFirstChild (dgSkeletonGraph* const parent) const;
 	dgSkeletonGraph* GetNextSiblingChild (dgSkeletonGraph* const sibling) const;
@@ -60,6 +62,8 @@ class dgSkeletonContainer
 	private:
 	DG_INLINE void SolveFoward () const;
 	DG_INLINE void SolveBackward () const;
+	DG_INLINE void UpdatePosition (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow) const;
+	DG_INLINE void InitKinematicMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow) const;
 	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	DG_INLINE void InitMassMatrixLCP (const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
 	DG_INLINE dgFloat32 CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
@@ -68,16 +72,16 @@ class dgSkeletonContainer
 	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
 	
-	
 	static void ResetUniqueId(dgInt32 id);
 
 	dgWorld* m_world;
 	dgSkeletonGraph* m_skeleton;
 	dgSkeletonGraph** m_nodesOrder;
 	dgOnSkeletonContainerDestroyCallback m_destructor;
+	dgFloat32 m_errorCorrection;
 	dgInt32 m_id;
 	dgInt32 m_lru;
-	dgInt8 m_nodeCount;
+	dgInt16 m_nodeCount;
 	dgInt8 m_skeletonHardMotors;
 	static dgInt32 m_uniqueID;
 	static dgInt32 m_lruMarker;

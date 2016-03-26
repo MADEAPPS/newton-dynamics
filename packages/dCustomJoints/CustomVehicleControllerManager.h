@@ -36,9 +36,6 @@ class CustomVehicleController: public CustomControllerBase
 {
 	public:
 	class WheelJoint;
-	class EngineJoint;
-	class dWeightDistibutionSolver;
-	class DifferentialSpiderGearJoint;
 
 	class dInterpolationCurve
 	{
@@ -65,6 +62,54 @@ class CustomVehicleController: public CustomControllerBase
 		dNot m_nodes[6];
 		int m_count;
 	};
+
+	class Controller: public CustomAlloc
+	{
+		public:
+		Controller(CustomVehicleController* const controller)
+			:m_controller(controller)
+			, m_param(0.0f)
+			, m_paramMemory(0.0f)
+			, m_timer(60)
+		{
+		}
+
+		~Controller()
+		{
+		}
+
+		void SetParam(dFloat param)
+		{
+			m_paramMemory = m_param;
+			m_param = param;
+		}
+
+		dFloat GetParam() const
+		{
+			return m_param;
+		}
+
+		bool ParamChanged() const
+		{
+			m_timer--;
+			if (dAbs(m_paramMemory - m_param) > 1.e-3f) {
+				m_timer = 30;
+			}
+			return m_timer > 0;
+		}
+
+
+		virtual void Update(dFloat timestep)
+		{
+		}
+
+		CustomVehicleController* m_controller;
+
+		dFloat m_param;
+		dFloat m_paramMemory;
+		mutable dFloat m_timer;
+	};
+
 	
 	class BodyPart: public CustomAlloc
 	{
@@ -112,6 +157,8 @@ class CustomVehicleController: public CustomControllerBase
 			m_body = controller->GetBody();
 		}
 
+		CUSTOM_JOINTS_API void ApplyDownForce ();
+
 		dFloat m_aerodynamicsDownForceCoefficient;
 	};
 	
@@ -146,36 +193,27 @@ class CustomVehicleController: public CustomControllerBase
 			virtual dFloat GetFrictionCoefficient(const NewtonMaterial* const material, const NewtonBody* const tireBody, const NewtonBody* const otherBody) const
 			{
 				//return 1.5f;
-				return 1.0f;
+				return 1.2f;
 			}
 
+			// Using brush tire model explained on this paper
+			// https://ddl.stanford.edu/sites/default/files/2013_Thesis_Hindiyeh_Dynamics_and_Control_of_Drifting_in_Automobiles.pdf
+			// 
 			virtual void GetForces(const BodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat longitudinalSlip, dFloat lateralSlip, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
 			{
-			//longitudinalSlip = 1.0f;
-			//lateralSlip = 0.0f;
-
-				dFloat phy_y = lateralSlip * tire->m_data.m_lateralStiffness;
+				dFloat phy_z = lateralSlip * tire->m_data.m_lateralStiffness;
 				dFloat phy_x = longitudinalSlip * tire->m_data.m_longitudialStiffness;
+				dFloat gamma = dSqrt(phy_x * phy_x + phy_z * phy_z);
+
 				tireLoad *= GetFrictionCoefficient (material, tire->GetBody(), otherBody);
-
 				dFloat phyMax = 3.0f * tireLoad + 1.0f;
-				dFloat phyMag = dSqrt(phy_x * phy_x + phy_y * phy_y);
-				
-				dFloat ratio = phyMag / phyMax;
-				dFloat F = phyMag * (1.0f - ratio + ratio * ratio * (1.0f / 3.0f));
-				if (ratio > 1.0f) {
-					F = tireLoad;
-				}
 
-				dFloat fraction = F / phyMag;
-				dFloat F_x = phy_x * fraction;
-				dFloat F_y = phy_y * fraction;
+				dFloat F = (gamma <= phyMax) ? (gamma * (1.0f - gamma / phyMax  + gamma * gamma / (3.0f * phyMax * phyMax))) : tireLoad;
 
-				if (tire->m_index == 0) {
-//					dTrace(("%f %f %f\n", tireLoad, F_x, F_y));
-				}
-				lateralForce = F_y;
-				longitudinalForce = F_x;
+				dFloat fraction = F / gamma;
+				lateralForce = - phy_z * fraction;
+				longitudinalForce = - phy_x * fraction;
+
 				aligningTorque = 0.0f;
 			}
 
@@ -192,23 +230,55 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const; 
 
+		// TODO
+		CUSTOM_JOINTS_API Info GetInfo() const {return m_data;}
+		CUSTOM_JOINTS_API void SetInfo(const Info& info) {};
+
+
 		protected:
 		Info m_data;
 		dFloat m_lateralSlip;
 		dFloat m_longitudinalSlip;
 		dFloat m_aligningTorque;
 		int m_index;
+		int m_collidingCount;
+		NewtonWorldConvexCastReturnInfo m_info[2];
 		friend class WheelJoint;
 		friend class CustomVehicleController;
 		friend class CustomVehicleControllerManager;
 	};
 
-	class BodyPartEngine: public BodyPart
+	class EngineController: public Controller
 	{
 		public:
+		class DriveTrain;
+		class DriveTrainTire;
+		class DriveTrainDifferentialGear;
+		class DriveTrainDualDifferential;
+		class DriveTrainSingleDifferential;
+
+		class DifferentialAxel
+		{
+			public:
+			DifferentialAxel()
+				:m_leftTire(NULL)
+				, m_rightTire(NULL)
+			{
+			}
+
+			BodyPartTire* m_leftTire;
+			BodyPartTire* m_rightTire;
+		};
+
 		class Info
 		{
 			public:
+			Info()
+			{
+				memset(this, 0, sizeof (Info));
+			}
+
+			dVector m_location;
 			dFloat m_mass;
 			dFloat m_radio;
 			dFloat m_peakTorque;
@@ -220,107 +290,73 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_idleTorque;
 			dFloat m_rpmAtIdleTorque;
 			dFloat m_vehicleTopSpeed;
+			dFloat m_reverseGearRatio;
+			dFloat m_gearRatios[10];
+			dFloat m_clutchFrictionTorque;
 
 			int m_gearsCount;
-			dFloat m_gearRatios[10];
-			dFloat m_reverseGearRatio;
-
-			BodyPartTire* m_leftTire;
-			BodyPartTire* m_rightTire;
-
 			void* m_userData;
-
+	
 			private:
 			void ConvertToMetricSystem();
+			
 
+			dFloat m_minRPM;
+			dFloat m_minTorque;
 			dFloat m_crownGearRatio;
 			dFloat m_peakPowerTorque;
-			dFloat m_engineIdleDryDrag;
-			dFloat m_engineIdleViscousDrag;
-			friend class BodyPartEngine;
+			dFloat m_idleViscousDrag1;
+			dFloat m_idleViscousDrag2;
+			friend class EngineController;
 		};
 
-		BodyPartEngine ();
-		CUSTOM_JOINTS_API BodyPartEngine(CustomVehicleController* const controller, const Info& info);
-		CUSTOM_JOINTS_API virtual ~BodyPartEngine();
+		CUSTOM_JOINTS_API EngineController(CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
+		CUSTOM_JOINTS_API ~EngineController();
 
-		CUSTOM_JOINTS_API void ApplyTorque(dFloat torque);
-		CUSTOM_JOINTS_API virtual void Update (dFloat timestep, dFloat gasVal);
+		CUSTOM_JOINTS_API void ApplyTorque(dFloat torque, dFloat timestep);
+
+		CUSTOM_JOINTS_API Info GetInfo() const;
+		CUSTOM_JOINTS_API void SetInfo(const Info& info);
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const;
-		CUSTOM_JOINTS_API dFloat GetSpeed() const;
 		CUSTOM_JOINTS_API dFloat GetRedLineRPM() const;
+		CUSTOM_JOINTS_API dFloat GetSpeed() const;
 
 		CUSTOM_JOINTS_API int GetGear() const;
 		CUSTOM_JOINTS_API void SetGear(int gear);
 
-		CUSTOM_JOINTS_API void UpdateAutomaticGearBox(dFloat timestep);
+		CUSTOM_JOINTS_API void SetIgnition(bool key);
+		CUSTOM_JOINTS_API bool GetIgnition() const;
 
-		dFloat GetNominalTorque() const {return m_norminalTorque;}
-		DifferentialSpiderGearJoint* GetLeftSpiderGear () const {return m_leftGear;}
-		DifferentialSpiderGearJoint* GetRightSpiderGear () const {return m_rigntGear;}
+		CUSTOM_JOINTS_API int GetNeutralGear() const;
+		CUSTOM_JOINTS_API int GetReverseGear() const;
+
+		CUSTOM_JOINTS_API bool GetTransmissionMode() const;
+		CUSTOM_JOINTS_API void SetTransmissionMode(bool mode);
+
+		CUSTOM_JOINTS_API void SetClutchParam (dFloat cluthParam);
+
+		CUSTOM_JOINTS_API void UpdateAutomaticGearBox(dFloat timestep);
 
 		protected:
 		dFloat GetTopGear() const;
-		void SetTopSpeed();
 		void InitEngineTorqueCurve();
+		void CalculateCrownGear();
+		dFloat GetGearRatio () const;
+		virtual void Update(dFloat timestep);
 
-		Info m_data;
+		Info m_info;
+		Info m_infoCopy;
+		DriveTrain* m_driveTrain;
 		dInterpolationCurve m_torqueRPMCurve;
-		DifferentialSpiderGearJoint* m_leftGear;
-		DifferentialSpiderGearJoint* m_rigntGear;
-		dFloat m_norminalTorque;
-		int m_currentGear;
+
+		dFloat m_clutchParam;
 		int m_gearTimer;
+		int m_currentGear;
+		bool m_ignitionKey;
+		bool m_automaticTransmissionMode;
+		friend class CustomVehicleController;
 	};
-
-	class Controller: public CustomAlloc
-	{
-		public:
-		Controller (CustomVehicleController* const controller)
-			:m_controller(controller)
-			,m_param(0.0f)
-			,m_paramMemory(0.0f)
-			,m_timer(60)
-		{
-		}
-
-		~Controller()
-		{
-		}
-
-		void SetParam( dFloat param)
-		{
-			m_paramMemory = m_param;
-			m_param = param;
-		}
-
-		dFloat GetParam() const
-		{
-			return m_param;
-		}
-
-		bool ParamChanged() const
-		{
-			m_timer--;
-			if (dAbs(m_paramMemory - m_param) > 1.e-3f) {
-				m_timer = 30;
-			}
-			return m_timer > 0;
-		}
-
-
-		virtual void Update(dFloat timestep)
-		{
-		}
-
-		CustomVehicleController* m_controller;
-		
-		dFloat m_param;
-		dFloat m_paramMemory;
-		mutable dFloat m_timer;
-	};
-
 
 	class SteeringController: public Controller
 	{
@@ -354,46 +390,10 @@ class CustomVehicleController: public CustomControllerBase
 		friend class CustomVehicleController;
 	};
 
-	class ClutchController: public Controller
-	{
-		public:
-		CUSTOM_JOINTS_API ClutchController(CustomVehicleController* const controller, BodyPartEngine* const engine, dFloat maxClutchTorque);
-		
-		protected:
-		virtual void Update(dFloat timestep);
-
-		BodyPartEngine* m_engine;
-		dFloat m_maxTorque;
-		friend class CustomVehicleController;
-	};
-
-	class EngineController: public Controller
-	{
-		public:
-		CUSTOM_JOINTS_API EngineController (CustomVehicleController* const controller, BodyPartEngine* const engine);
-
-		CUSTOM_JOINTS_API dFloat GetRPM() const;
-		CUSTOM_JOINTS_API dFloat GetRedLineRPM() const;
-		CUSTOM_JOINTS_API dFloat GetSpeed() const;
-
-		CUSTOM_JOINTS_API int GetGear() const;
-		CUSTOM_JOINTS_API void SetGear(int gear);
-
-		CUSTOM_JOINTS_API bool GetTransmissionMode() const;
-		CUSTOM_JOINTS_API void SetTransmissionMode(bool mode);
-
-		protected:
-		virtual void Update(dFloat timestep);
-
-		BodyPartEngine* m_engine;
-		bool m_automaticTransmissionMode;
-		friend class CustomVehicleController;
-	};
 
 #if 0
 	CUSTOM_JOINTS_API void SetDryRollingFrictionTorque (dFloat torque);
 	CUSTOM_JOINTS_API dFloat GetDryRollingFrictionTorque () const;
-	
 #endif
 
 	CUSTOM_JOINTS_API void Finalize();
@@ -401,11 +401,11 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 	CUSTOM_JOINTS_API BodyPartTire* AddTire (const BodyPartTire::Info& tireInfo);
 
-	CUSTOM_JOINTS_API BodyPartEngine* GetEngineBodyPart() const;
-	CUSTOM_JOINTS_API void AddEngineBodyPart (BodyPartEngine* const engine);
-
 	const CUSTOM_JOINTS_API BodyPart* GetChassis() const;
 	const CUSTOM_JOINTS_API dMatrix& GetLocalFrame() const;
+
+	CUSTOM_JOINTS_API dMatrix GetTransform() const;
+	CUSTOM_JOINTS_API void SetTransform(const dMatrix& matrix);
 
 	CUSTOM_JOINTS_API dList<BodyPartTire>::dListNode* GetFirstTire() const;
 	CUSTOM_JOINTS_API dList<BodyPartTire>::dListNode* GetNextTire (dList<BodyPartTire>::dListNode* const tireNode) const;
@@ -419,14 +419,12 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API dVector GetTireLateralForce(const BodyPartTire* const tire) const;
 	CUSTOM_JOINTS_API dVector GetTireLongitudinalForce(const BodyPartTire* const tire) const;
 
-	CUSTOM_JOINTS_API ClutchController* GetClutch() const;
 	CUSTOM_JOINTS_API BrakeController* GetBrakes() const;
 	CUSTOM_JOINTS_API EngineController* GetEngine() const;
 	CUSTOM_JOINTS_API BrakeController* GetHandBrakes() const;
 	CUSTOM_JOINTS_API SteeringController* GetSteering() const;
 	
 	CUSTOM_JOINTS_API void SetEngine(EngineController* const engine);
-	CUSTOM_JOINTS_API void SetClutch(ClutchController* const cluth);
 	CUSTOM_JOINTS_API void SetBrakes(BrakeController* const brakes);
 	CUSTOM_JOINTS_API void SetHandBrakes(BrakeController* const brakes);
 	CUSTOM_JOINTS_API void SetSteering(SteeringController* const steering);
@@ -455,8 +453,6 @@ class CustomVehicleController: public CustomControllerBase
 	NewtonSkeletonContainer* m_skeleton;
 	void* m_collisionAggregate;
 	
-	BodyPartEngine* m_engine;
-	ClutchController* m_cluthControl;
 	BrakeController* m_brakesControl;
 	EngineController* m_engineControl;
 	BrakeController* m_handBrakesControl;
@@ -487,9 +483,12 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 	protected:
 	CUSTOM_JOINTS_API void OnTireContactsProcess (const NewtonJoint* const contactJoint, CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody, dFloat timestep);
 	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
+	CUSTOM_JOINTS_API int OnContactGeneration (const CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const;
 
+	void Collide (CustomVehicleController::BodyPartTire* const tire) const;
 	static void OnTireContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex);
 	static int OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
+	static int OnContactGeneration (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex);
 
 	const void* m_tireShapeTemplateData;
 	NewtonCollision* m_tireShapeTemplate;

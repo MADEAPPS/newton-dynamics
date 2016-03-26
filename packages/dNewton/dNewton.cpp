@@ -96,8 +96,9 @@ dNewton::dNewton()
 
 	// use default material to implement traditional "Game style" one side material system
 	int defaultMaterial = NewtonMaterialGetDefaultGroupID (m_world);
+	NewtonMaterialSetCallbackUserData (m_world, defaultMaterial, defaultMaterial, m_world);
 	NewtonMaterialSetCompoundCollisionCallback(m_world, defaultMaterial, defaultMaterial, OnCompoundSubCollisionAABBOverlap);
-	NewtonMaterialSetCollisionCallback (m_world, defaultMaterial, defaultMaterial, m_world, OnBodiesAABBOverlap, OnContactProcess);
+	NewtonMaterialSetCollisionCallback (m_world, defaultMaterial, defaultMaterial, OnBodiesAABBOverlap, OnContactProcess);
 
 	// add a hierarchical transform manage to update local transforms
 	new dNewtonTransformManager (this);

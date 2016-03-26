@@ -88,6 +88,9 @@
     <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp">
       <Filter>joints</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomDynamicRagDollManager.cpp">
+      <Filter>managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\Custom6DOF.h">
@@ -168,6 +171,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h">
       <Filter>joints</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomDynamicRagDollManager.h">
+      <Filter>managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

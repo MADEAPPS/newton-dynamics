@@ -84,15 +84,16 @@ static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 };
 
 
-class RagDollManager: public CustomArticulaledTransformManager
+class PassiveRagDollManager: public CustomArticulaledTransformManager
 {
 	public: 
-	RagDollManager (DemoEntityManager* const scene)
-		:CustomArticulaledTransformManager (scene->GetNewton(), true)
+	PassiveRagDollManager (DemoEntityManager* const scene)
+		:CustomArticulaledTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, this, OnBoneAABBOverlap, NULL);
+		NewtonMaterialSetCallbackUserData (scene->GetNewton(), m_material, m_material, this);
+		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
 	}
 
 	virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
@@ -166,7 +167,7 @@ class RagDollManager: public CustomArticulaledTransformManager
 		matrix.m_posit.m_x = definition.m_shape_x;
 		matrix.m_posit.m_y = definition.m_shape_y;
 		matrix.m_posit.m_z = definition.m_shape_z;
-		return NewtonCreateCapsule (GetWorld(), definition.m_radio, definition.m_height, 0, &matrix[0][0]);
+		return NewtonCreateCapsule (GetWorld(), definition.m_radio, definition.m_radio, definition.m_height, 0, &matrix[0][0]);
 	}
 
 	NewtonCollision* MakeBox(DemoEntity* const bodyPart) const
@@ -280,6 +281,8 @@ class RagDollManager: public CustomArticulaledTransformManager
 		// create a transform controller
 		CustomArticulatedTransformController* const controller = CreateTransformController (ragDollEntity);
 
+		controller->SetCalculateLocalTransforms (true);
+
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
@@ -345,7 +348,7 @@ class RagDollManager: public CustomArticulaledTransformManager
 };
 
 
-void DescreteRagDoll (DemoEntityManager* const scene)
+void PassiveRagDoll (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
@@ -357,7 +360,7 @@ void DescreteRagDoll (DemoEntityManager* const scene)
 	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
 
 	//  create a skeletal transform controller for controlling rag doll
-	RagDollManager* const manager = new RagDollManager (scene);
+	PassiveRagDollManager* const manager = new PassiveRagDollManager (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix matrix (dGetIdentityMatrix());

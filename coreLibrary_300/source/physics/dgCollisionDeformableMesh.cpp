@@ -403,6 +403,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 			}
 		}
 	}
+//	SetVolumeAndCG ();
 }
 
 

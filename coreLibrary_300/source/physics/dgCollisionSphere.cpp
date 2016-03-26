@@ -36,8 +36,7 @@
 
 dgInt32 dgCollisionSphere::m_shapeRefCount = 0;
 dgVector dgCollisionSphere::m_unitSphere[DG_SPHERE_VERTEX_COUNT];
-dgConvexSimplexEdge dgCollisionSphere::m_edgeArray[DG_SPHERE_EDGE_COUNT];
-
+dgCollisionConvex::dgConvexSimplexEdge dgCollisionSphere::m_edgeArray[DG_SPHERE_EDGE_COUNT];
 
 dgCollisionSphere::dgCollisionSphere(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgFloat32 radii)
 	:dgCollisionConvex(allocator, signature, m_sphereCollision) 
@@ -144,15 +143,12 @@ void dgCollisionSphere::Init (dgFloat32 radius, dgMemoryAllocator* allocator)
 	SetVolumeAndCG ();
 }
 
-
 dgVector dgCollisionSphere::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	dgAssert (dir.m_w == 0.0f);
 	return dir.Scale4 (m_radius);
 }
-
-
 
 void dgCollisionSphere::TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* ouput) const
 {
@@ -269,6 +265,10 @@ dgVector dgCollisionPoint::SupportVertex (const dgVector& dir, dgInt32* const ve
 	return dgVector (dgFloat32 (0.0f)); 
 }
 
+dgVector dgCollisionPoint::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	return dgVector (dgFloat32 (0.0f)); 
+}
 
 dgFloat32 dgCollisionSphere::RayCast (const dgVector& p0, const dgVector& p1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
@@ -308,21 +308,14 @@ void dgCollisionSphere::Serialize(dgSerialize callback, void* const userData) co
 }
 
 
-dgVector dgCollisionSphere::ConvexConicSupporVertex (const dgVector& dir) const 
+dgVector dgCollisionSphere::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const 
 {
+	*vertexIndex = -1;
 	return dgVector (dgFloat32 (0.0f));
 }
 
-dgVector dgCollisionSphere::ConvexConicSupporVertex (const dgVector& point, const dgVector& dir) const
+dgVector dgCollisionSphere::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
 	return SupportVertex(dir, NULL);
-}
-
-dgInt32 dgCollisionSphere::CalculateContacts (const dgVector& point, const dgVector& normal, dgCollisionParamProxy& proxy, dgVector* const contactsOut) const
-{
-	dgAssert (normal.m_w == 0.0f);
-	//contactsOut[0] = normal.Scale3(normal % point);
-	contactsOut[0] = normal.CompProduct4 (normal.DotProduct4(point));
-	return 1;
 }
 

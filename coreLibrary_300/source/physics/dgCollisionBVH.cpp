@@ -293,11 +293,12 @@ dgIntersectStatus dgCollisionBVH::GetPolygon (void* const context, const dgFloat
 	if (data.m_me->GetDebugCollisionCallback()) { 
 		dgTriplex triplex[128];
 		dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
-		const dgVector scale = data.m_polySoupCollision->GetScale();
-		const dgMatrix& matrix = data.m_polySoupCollision->GetGlobalMatrix();
+		const dgVector scale = data.m_polySoupInstance->GetScale();
+		dgMatrix matrix (data.m_polySoupInstance->GetLocalMatrix() * data.m_polySoupBody->GetMatrix());
 		for (dgInt32 i = 0; i < indexCount; i ++ ) {
-			dgVector p (&polygon[indexArray[i] * stride]);
-			p = matrix.TransformVector(scale.CompProduct4(p));
+			//dgVector p (&polygon[indexArray[i] * stride]);
+			//p = matrix.TransformVector(scale.CompProduct4(p));
+			dgVector p (matrix.TransformVector(scale.CompProduct4(dgVector(&polygon[indexArray[i] * stride])))); 
 			triplex[i].m_x = p.m_x;
 			triplex[i].m_y = p.m_y;
 			triplex[i].m_z = p.m_z;
@@ -351,6 +352,18 @@ dgVector dgCollisionBVH::SupportVertex (const dgVector& dir) const
 	return ForAllSectorsSupportVectex (dir);
 }
 
+dgVector dgCollisionBVH::SupportVertex(const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	return ForAllSectorsSupportVectex(dir);
+}
+
+dgVector dgCollisionBVH::SupportVertexSpecial(const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	dgAssert(0);
+	return SupportVertex(dir, vertexIndex);
+}
+
+
 
 void dgCollisionBVH::GetLocalAABB (const dgVector& p0, const dgVector& p1, dgVector& boxP0, dgVector& boxP1) const
 {
@@ -383,10 +396,6 @@ dgIntersectStatus dgCollisionBVH::ShowDebugPolygon (void* const context, const d
 	return t_ContinueSearh;
 }
 
-dgVector dgCollisionBVH::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	return ForAllSectorsSupportVectex (dir);
-}
 
 
 void dgCollisionBVH::DebugCollision (const dgMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const

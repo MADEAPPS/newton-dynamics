@@ -42,7 +42,7 @@ enum eSBMaterials
 };
 
 
-static void	NewtonRigidBodySetForceCB(const NewtonBody* const body, float timestep, int threadIndex);
+static void	NewtonRigidBodySetForceCB(const NewtonBody* const body, dFloat timestep, int threadIndex);
 static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoint,dFloat fTimeStep,int ThreadIndex);
 //static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, float length);
 
@@ -147,19 +147,17 @@ class PuckEntity: public DemoEntity
 };
 
 
-
-
-void NewtonRigidBodySetForceCB(const NewtonBody* const body, float timestep, int threadIndex)
+void NewtonRigidBodySetForceCB(const NewtonBody* const body, dFloat timestep, int threadIndex)
 {	
-	float mass;
-	float Ixx;
-	float Iyy;
-	float Izz;
+	dFloat mass;
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
 	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
 	
-	float force[3];
+	dFloat force[3];
 	force[0] = 0.0f;
-	force[1] = mass * (-9.81f * PHYSICS_WORLD_SCALE);
+	force[1] = mass * (DEMO_GRAVITY * PHYSICS_WORLD_SCALE);
 	force[2] = 0.0f;
 	NewtonBodySetForce(body, force);
 }
@@ -170,7 +168,7 @@ static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoin
 	
 	// Get pointer to body
 	NewtonBody* body = NewtonJointGetBody0(pContactJoint);				
-	float mass, Ixx, Iyy, Izz;
+	dFloat mass, Ixx, Iyy, Izz;
 	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
 	if (mass == 0.0f)
 	{
@@ -196,10 +194,6 @@ static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoin
 	}
 }
 
-
-
-
-
 // create physics scene
 void PuckSlide (DemoEntityManager* const scene)
 {
@@ -222,7 +216,7 @@ void PuckSlide (DemoEntityManager* const scene)
 
 
 	// setup callbacks for collisions between two material groups
-	NewtonMaterialSetCollisionCallback(world,materialGroupIDs[SBMaterial_WEIGHT],materialGroupIDs[SBMaterial_SURFACE],NULL,NULL,PhysicsNewton_CollisionPuckSurfaceCB);
+	NewtonMaterialSetCollisionCallback(world,materialGroupIDs[SBMaterial_WEIGHT],materialGroupIDs[SBMaterial_SURFACE],NULL,PhysicsNewton_CollisionPuckSurfaceCB);
 
 	///////
 	// Add table

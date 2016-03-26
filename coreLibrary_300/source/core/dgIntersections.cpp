@@ -241,8 +241,7 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 			sN = dgFloat32 (0.0f);
 			tN = e;
 			tD = c;
-		}
-		else if (sN > sD) {  // sc > 1 => the s=1 edge is visible
+		} else if (sN > sD) {  // sc > 1 => the s=1 edge is visible
 			sN = sD;
 			tN = e + b;
 			tD = c;
@@ -253,23 +252,22 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 	if (tN < dgFloat32 (0.0f)) {           // tc < 0 => the t=0 edge is visible
 		tN = dgFloat32 (0.0f);
 		// recompute sc for this edge
-		if (-d < dgFloat32 (0.0f))
+		if (-d < dgFloat32 (0.0f)) {
 			sN = dgFloat32 (0.0f);
-		else if (-d > a)
+		} else if (-d > a) {
 			sN = sD;
-		else {
+		} else {
 			sN = -d;
 			sD = a;
 		}
-	}
-	else if (tN > tD) {      // tc > 1 => the t=1 edge is visible
+	} else if (tN > tD) {      // tc > 1 => the t=1 edge is visible
 		tN = tD;
 		// recompute sc for this edge
-		if ((-d + b) < dgFloat32 (0.0f))
+		if ((-d + b) < dgFloat32 (0.0f)) {
 			sN = dgFloat32 (0.0f);
-		else if ((-d + b) > a)
+		} else if ((-d + b) > a) {
 			sN = sD;
-		else {
+		} else {
 			sN = (-d + b);
 			sD = a;
 		}
@@ -400,6 +398,7 @@ dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, c
 }
 
 
+#ifndef _NEWTON_USE_DOUBLE
 dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& normal)
 {
 #ifdef _DEBUG
@@ -448,9 +447,9 @@ dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVect
 		return point - normal.Scale3((normal % (point - p0)) / (normal % normal));
 	}
 }
+#endif
 
-
-
+/*
 static dgVector obbTolerance (dgFloat32 (1.0e-5f), dgFloat32 (1.0e-5f), dgFloat32 (1.0e-5f), dgFloat32 (0.0f));	
 bool dgObbTest (const dgVector& origin0__, const dgVector& size0__, const dgMatrix& matrix0, const dgVector& origin1__, const dgVector& size1__, const dgMatrix& matrix1)
 {
@@ -602,6 +601,7 @@ bool dgObbTest (const dgVector& origin0__, const dgVector& size0__, const dgMatr
 	}
 	return true;
 }
+*/
 
 /*
 bool dgApi dgPointToPolygonDistance (const dgVector& p, const dgFloat32* const polygon, dgInt32 strideInBytes,
@@ -1055,7 +1055,7 @@ dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVecto
 {
 	dgVector p0Origin (p0 - origin);
 
-	if ((p0Origin % p0Origin) < (100.0f * radius * radius)) {
+	if ((p0Origin % p0Origin) < (dgFloat32 (100.0f) * radius * radius)) {
 		dgVector dp (p1 - p0);
 		dgFloat32 a = dp % dp;
 		dgFloat32 b = dgFloat32 (2.0f) * (p0Origin % dp);

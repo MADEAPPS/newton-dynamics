@@ -82,7 +82,7 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	m_sphereCastOrigin = capsuleHigh * 0.5f + stairStep;
 	outerShapeMatrix.m_posit = outerShapeMatrix[0].Scale(m_sphereCastOrigin);
 	outerShapeMatrix.m_posit.m_w = 1.0f;
-	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
+	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, 0.25f, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
 	NewtonCollisionSetScale(bodyCapsule, capsuleHigh, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
 
 	// compound collision player controller
@@ -178,7 +178,7 @@ void CustomPlayerController::SetPlayerOrigin (dFloat originHeight)
 	NewtonBodyGetMassMatrix(m_body, &mass, &Ixx, &Iyy, &Izz);
 	NewtonBodySetMassProperties(m_body, mass, playerShape);
 */
-	originHeight = dClamp (originHeight, 0.0f, m_height);
+	originHeight = dClamp (originHeight, dFloat(0.0f), m_height);
 	dVector origin (m_upVector.Scale (originHeight));
 	NewtonBodySetCentreOfMass (m_body, &origin[0]);
 }
@@ -311,19 +311,21 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 {
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
-
+	NewtonWorldConvexCastReturnInfo info;
 	CustomControllerConvexRayFilter filter(m_body);
-	NewtonWorldConvexRayCast (world, m_castingShape, &castMatrix[0][0], &dst[0], CustomControllerConvexRayFilter::Filter, &filter, CustomControllerConvexCastPreFilter::Prefilter, threadIndex);
+
+	dFloat param = 10.0f;
+	int count = NewtonWorldConvexCast (world, &castMatrix[0][0], &dst[0], m_castingShape, &param, &filter, CustomControllerConvexCastPreFilter::Prefilter, &info, 1, threadIndex);
 
 	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
-	if (filter.m_hitBody) {
+	if (count && (param <= 1.0f)) {
 		m_isJumping = false;
-		dVector supportPoint (castMatrix.m_posit + (dst - castMatrix.m_posit).Scale (filter.m_intersectParam));
-		m_groundPlane = filter.m_hitNormal;
-		m_groundPlane.m_w = - (supportPoint % filter.m_hitNormal);
-		NewtonBodyGetPointVelocity (filter.m_hitBody, &supportPoint.m_x, &m_groundVelocity[0]);
+		dVector supportPoint (castMatrix.m_posit + (dst - castMatrix.m_posit).Scale (param));
+		m_groundPlane = dVector (info.m_normal[0], info.m_normal[1], info.m_normal[2], 0.0f);
+		m_groundPlane.m_w = - (supportPoint % m_groundPlane);
+		NewtonBodyGetPointVelocity (info.m_hitBody, &supportPoint.m_x, &m_groundVelocity[0]);
 		matrix.m_posit = supportPoint;
 		matrix.m_posit.m_w = 1.0f;
 	}

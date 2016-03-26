@@ -97,9 +97,9 @@ void DemoSubMesh::SetOpacity(dFloat opacity)
 
 void DemoSubMesh::Render() const
 {
-	glMaterialfv(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
-	glMaterialfv(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
+	glMaterialParam(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
+	glMaterialParam(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
+	glMaterialParam(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
 	glMaterialf(GL_FRONT, GL_SHININESS, m_shiness);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	if (m_textureHandle) {
@@ -114,9 +114,9 @@ void DemoSubMesh::Render() const
 
 void DemoSubMesh::OptimizeForRender(const DemoMesh* const mesh) const
 {
-	glMaterialfv(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
-	glMaterialfv(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
+	glMaterialParam(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
+	glMaterialParam(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
+	glMaterialParam(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
 	glMaterialf(GL_FRONT, GL_SHININESS, m_shiness);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	if (m_textureHandle) {
@@ -372,8 +372,6 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 		case SERIALIZE_ID_CONE:
 		case SERIALIZE_ID_CAPSULE:
 		case SERIALIZE_ID_CYLINDER:
-		case SERIALIZE_ID_TAPEREDCYLINDER:
-		case SERIALIZE_ID_TAPEREDCAPSULE:
 		case SERIALIZE_ID_CHAMFERCYLINDER:
 		{
 			//NewtonMeshApplySphericalMapping(mesh, LoadTexture(texture0));
@@ -434,7 +432,7 @@ DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dF
 	,m_optimizedOpaqueDiplayList(0)		
 	,m_optimizedTransparentDiplayList(0)
 {
-	float* elevationMap[4096];
+	dFloat* elevationMap[4096];
 	dVector* normalMap[4096];
 	dVector* const normals = new dVector [size * size];
 

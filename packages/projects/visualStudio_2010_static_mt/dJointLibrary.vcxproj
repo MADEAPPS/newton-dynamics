@@ -208,6 +208,7 @@
     <ClCompile Include="..\..\dCustomJoints\CustomBallAndSocket.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomCorkScrew.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomDryRollingFriction.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomDynamicRagDollManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomGear.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomHinge.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomHingeActuator.cpp" />
@@ -242,6 +243,7 @@
     <ClInclude Include="..\..\dCustomJoints\CustomBallAndSocket.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomCorkScrew.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomDryRollingFriction.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomDynamicRagDollManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomGear.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomHinge.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomHingeActuator.h" />

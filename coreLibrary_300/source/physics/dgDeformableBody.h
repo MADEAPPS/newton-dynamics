@@ -61,7 +61,7 @@ class dgDeformableBody: public dgBody
 	virtual void SetLinearDamping (dgFloat32 linearDamp) {}
 	virtual void SetAngularDamping (const dgVector& angularDamp) {}
 
-	virtual const dgMatrix& GetInertiaMatrix () const {return dgGetZeroMatrix();}
+	virtual const dgMatrix& GetInvInertiaMatrix () const {return dgGetZeroMatrix();}
 	virtual dgMatrix CalculateInertiaMatrix () const {return dgGetZeroMatrix();}
 	virtual dgMatrix CalculateInvInertiaMatrix () const {return dgGetZeroMatrix();}
 

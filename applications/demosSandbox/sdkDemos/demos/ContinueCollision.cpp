@@ -45,9 +45,8 @@ void ContinuousCollision (DemoEntityManager* const scene)
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 //	CreateLevelMesh (scene, "sponza.ngd", optimization);
 //	CreateLevelMesh (scene, "cattle.ngd", fileName);
-	//	CreateLevelMesh (scene, "playground.ngd", fileName);
-	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE,
-							 1.5f, 0.2f, 200.0f, -50.0f);
+//	CreateLevelMesh (scene, "playground.ngd", fileName);
+	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
@@ -90,10 +89,10 @@ void ContinuousCollision (DemoEntityManager* const scene)
 
 	// set continuous collision mode on all dynamics bodies
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		float Ix;
-		float Iy;
-		float Iz;
-		float mass;
+		dFloat Ix;
+		dFloat Iy;
+		dFloat Iz;
+		dFloat mass;
 		NewtonBodyGetMassMatrix(body, &mass, &Ix, &Iy, &Iz);
 		if (mass > 0.0f) {
 			NewtonBodySetContinuousCollisionMode(body, 1);

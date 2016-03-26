@@ -280,12 +280,12 @@ dVector dMatrix::RotateVector (const dVector &v) const
 {
 	return dVector (v.m_x * m_front.m_x + v.m_y * m_up.m_x + v.m_z * m_right.m_x,
 					v.m_x * m_front.m_y + v.m_y * m_up.m_y + v.m_z * m_right.m_y,
-					v.m_x * m_front.m_z + v.m_y * m_up.m_z + v.m_z * m_right.m_z);
+					v.m_x * m_front.m_z + v.m_y * m_up.m_z + v.m_z * m_right.m_z, 0.0f);
 }
 
 dVector dMatrix::UnrotateVector (const dVector &v) const
 {
-	return dVector (v % m_front, v % m_up, v % m_right);
+	return dVector (v % m_front, v % m_up, v % m_right, 0.0f);
 }
 
 dVector dMatrix::RotateVector4x4 (const dVector &v) const

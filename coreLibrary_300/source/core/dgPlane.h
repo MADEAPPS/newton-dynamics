@@ -41,6 +41,8 @@ class dgPlane: public dgVector
 
 }DG_GCC_VECTOR_ALIGMENT;
 
+
+#ifndef _NEWTON_USE_DOUBLE
 DG_MSC_VECTOR_ALIGMENT
 class dgBigPlane: public dgBigVector
 {
@@ -51,13 +53,12 @@ class dgBigPlane: public dgBigVector
 	dgBigPlane (const dgBigVector &P0, const dgBigVector &P1, const dgBigVector &P2);
 	dgBigPlane Scale (dgFloat64 s) const;
 	dgFloat64 Evalue (const dgFloat32* const point) const;
-#ifndef _NEWTON_USE_DOUBLE
 	dgFloat64 Evalue (const dgFloat64* const point) const;
-#endif
+
 	dgFloat64 Evalue (const dgVector &point) const;
 	dgFloat64 Evalue (const dgBigVector &point) const;
 }DG_GCC_VECTOR_ALIGMENT;
-
+#endif
 
 
 
@@ -98,17 +99,19 @@ DG_INLINE dgPlane dgPlane::Scale (dgFloat32 s)	const
 DG_INLINE dgFloat32 dgPlane::Evalue (const dgFloat32* const point) const
 {
 //	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
-	return DotProduct4 (dgVector (point) | m_wOne).m_x;
+	return DotProduct4 (dgVector (point) | m_wOne).GetScalar();
 }
 
 DG_INLINE dgFloat32 dgPlane::Evalue (const dgVector& point) const
 {
 //	return m_x * point.m_x + m_y * point.m_y + m_z * point.m_z + m_w;
-	return DotProduct4 ((point & m_triplexMask) | m_wOne).m_x;
+	return DotProduct4 ((point & m_triplexMask) | m_wOne).GetScalar();
 }
 
 
-
+#ifdef _NEWTON_USE_DOUBLE
+typedef dgPlane dgBigPlane;
+#else 
 DG_INLINE dgBigPlane::dgBigPlane () 
 	:dgBigVector () 
 {
@@ -142,12 +145,11 @@ DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgFloat32* const point) const
 	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
 }
 
-#ifndef _NEWTON_USE_DOUBLE
 DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgFloat64* const point) const
 {
 	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
 }
-#endif
+
 
 DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgVector &point) const
 {
@@ -158,7 +160,7 @@ DG_INLINE dgFloat64 dgBigPlane::Evalue (const dgBigVector &point) const
 {
 	return m_x * point.m_x + m_y * point.m_y + m_z * point.m_z + m_w;
 }
-
+#endif
 
 #endif
 

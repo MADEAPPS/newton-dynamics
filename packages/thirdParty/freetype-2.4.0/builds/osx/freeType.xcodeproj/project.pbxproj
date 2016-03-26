@@ -340,6 +340,7 @@
 		FF8B5D81175056CD0076BE6C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				EXECUTABLE_PREFIX = lib;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					FT2_BUILD_LIBRARY,
@@ -354,6 +355,7 @@
 		FF8B5D82175056CD0076BE6C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				EXECUTABLE_PREFIX = lib;
 				GCC_PREPROCESSOR_DEFINITIONS = FT2_BUILD_LIBRARY;
 				HEADER_SEARCH_PATHS = ../../include;

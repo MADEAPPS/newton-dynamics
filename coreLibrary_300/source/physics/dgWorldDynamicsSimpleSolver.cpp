@@ -109,7 +109,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 					}
 				}
 			} else {
-				// island is no sleeping but may be resting with small residual velocity for a long time
+				// island is not sleeping but may be resting with small residual velocity for a long time
 				// see if we can force to go to sleep
 				if ((maxAccel > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel) ||
 					(maxAlpha > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha) ||
@@ -300,11 +300,12 @@ void dgWorldDynamicUpdate::CalculateIslandContacts (dgIsland* const island, dgFl
 					contact->m_broadphaseLru = currLru;
 					pair.m_contact = contact;
 					pair.m_cacheIsValid = false;
+					pair.m_timestep = timestep;
 					pair.m_contactBuffer = contactArray;
-					world->CalculateContacts (&pair, timestep, threadID, false, false);
+					world->CalculateContacts (&pair, threadID, false, false);
 					if (pair.m_contactCount) {
 						dgAssert (pair.m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
-						world->ProcessContacts (&pair, timestep, threadID);
+						world->ProcessContacts (&pair, threadID);
 					}
 				}
 			}
@@ -380,17 +381,13 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 			row->m_maxImpact = dgFloat32(0.0f);
 
 			//force[index] = 0.0f;
-			dgAssert(row->m_diagDamp >= dgFloat32(0.1f));
-			dgAssert(row->m_diagDamp <= dgFloat32(100.0f));
-			dgFloat32 stiffness = DG_PSD_DAMP_TOL * row->m_diagDamp;
-
 			dgAssert (tmpDiag.m_w == dgFloat32 (0.0f));
 			dgFloat32 diag = (tmpDiag.AddHorizontal()).GetScalar();
 			dgAssert(diag > dgFloat32(0.0f));
-			row->m_diagDamp = diag * stiffness;
+			row->m_diagDamp = diag * row->m_stiffness;
 
 			//row->m_JMinvJt = diag;
-			diag *= (dgFloat32(1.0f) + stiffness);
+			diag *= (dgFloat32(1.0f) + row->m_stiffness);
 			row->m_invJMinvJt = dgFloat32(1.0f) / diag;
 			index++;
 		}
@@ -400,6 +397,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 
 void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep) const 
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgAssert (island->m_bodyCount >= 2);
 
 	dgWorld* const world = (dgWorld*) this;
@@ -762,6 +760,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(dgJointInfo* const jointInfo
 
 void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = island->m_bodyCount;
 	const dgInt32 jointCount = island->m_jointCount;
@@ -825,6 +824,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	for (dgInt32 i = 0; i < skeletonCount; i ++) {
 		dgSkeletonContainer* const container = skeletonArray[i];
+		//if (container->m_errorCorrection > dgFloat32 (0.0f)) {
+		//	container->ApplpyKinematicErrorCorrection (constraintArray, matrixRow);
+		//}
 		if (!container->m_skeletonHardMotors) {
 			container->InitMassMatrix (constraintArray, matrixRow);
 		}
@@ -955,6 +957,8 @@ void dgWorldDynamicUpdate::ApplyNetVelcAndOmega (dgDynamicBody* const body, cons
 			torque += body->m_alpha;
 		}
 
+#if 1
+		// this method is more accurate numerically 
 		dgVector velocStep((force.Scale4(body->m_invMass.m_w)).CompProduct4(timestep4));
 		dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)).CompProduct4(timestep4));
 		if (!body->m_resting) {
@@ -968,7 +972,29 @@ void dgWorldDynamicUpdate::ApplyNetVelcAndOmega (dgDynamicBody* const body, cons
 				body->m_resting = false;
 			}
 		}
+
+#else
+		// this method is Lagrange-Euler by is more expensive and accumulate more numerical error. 
+		dgVector linearMomentum(force.CompProduct4(timestep4) + body->m_veloc.Scale4 (body->m_mass.m_w));
+		dgVector angularMomentum(torque.CompProduct4(timestep4) + body->m_matrix.RotateVector(body->m_mass.CompProduct4(body->m_matrix.UnrotateVector(body->m_omega))));
+		if (!body->m_resting) {
+			body->m_veloc = linearMomentum.Scale4 (body->m_invMass.m_w);
+			body->m_omega = body->m_invWorldInertiaMatrix.RotateVector(angularMomentum);
+		} else {
+			dgVector velocStep (linearMomentum.Scale4(body->m_invMass.m_w));
+			dgVector omegaStep (body->m_invWorldInertiaMatrix.RotateVector(angularMomentum));
+			dgVector velocStep2(velocStep.DotProduct4(velocStep));
+			dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
+			dgVector test((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2) | forceActiveMask);
+			if (test.GetSignMask()) {
+				body->m_resting = false;
+			}
+		}
+#endif
 	}
+
+	dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
+	dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
 }
 
 void dgWorldDynamicUpdate::ApplyNetTorqueAndForce (dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& maxAccNorm2, const dgVector& forceActiveMask) const

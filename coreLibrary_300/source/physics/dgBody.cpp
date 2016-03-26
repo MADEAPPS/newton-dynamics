@@ -259,24 +259,6 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 }
 
 
-
-dgFloat32 dgBody::ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInstance* const convexShape, const dgVector& shapeMinBox, const dgVector& shapeMaxBox, const dgMatrix& origin, const dgVector& shapeVeloc, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT, dgInt32 threadId) const
-{
-	dgVector minBox (m_minAABB - shapeMaxBox);
-	dgVector maxBox (m_maxAABB - shapeMinBox);
-	if (ray.BoxTest (minBox, maxBox)) {
-		dgContactPoint contactOut;
-		dgFloat32 t = m_collision->ConvexRayCast (convexShape, origin, shapeVeloc, minT, contactOut, preFilter, this, userData, threadId);
-		if (t < minT) {
-			dgAssert (t >= dgFloat32 (0.0f));
-			dgAssert (t <= dgFloat32 (1.1f));
-			minT = filter (this, contactOut.m_collision0, contactOut.m_point, contactOut.m_normal, contactOut.m_shapeId0, userData, t);
-		}
-	} 
-	return minT;
-}
-
-
 void dgBody::UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 {
 	if (m_matrixUpdate) {
@@ -290,14 +272,14 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
 	m_globalCentreOfMass += m_veloc.Scale3 (timestep); 
 	while (((m_omega % m_omega) * timestep * timestep) > m_maxAngulaRotationPerSet2) {
-		m_omega = m_omega.Scale3 (dgFloat32 (0.8f));
+		m_omega = m_omega.Scale4 (dgFloat32 (0.8f));
 	}
 
 	// this is correct
 	dgFloat32 omegaMag2 = m_omega % m_omega;
 	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {
 		dgFloat32 invOmegaMag = dgRsqrt (omegaMag2);
-		dgVector omegaAxis (m_omega.Scale3 (invOmegaMag));
+		dgVector omegaAxis (m_omega.Scale4 (invOmegaMag));
 		dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
 		dgQuaternion rotation (omegaAxis, omegaAngle);
 		m_rotation = m_rotation * rotation;
@@ -306,27 +288,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	}
 
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
-
-#ifdef _DEBUG
-	for (dgInt32 i = 0; i < 4; i ++) {
-		for (dgInt32 j = 0; j < 4; j ++) {
-			dgAssert (dgCheckFloat(m_matrix[i][j]));
-		}
-	}
-
-	dgInt32 j0 = 1;
-	dgInt32 j1 = 2;
-	for (dgInt32 i = 0; i < 3; i ++) {
-		dgAssert (m_matrix[i][3] == 0.0f);
-		dgFloat32 val = m_matrix[i] % m_matrix[i];
-		dgAssert (dgAbsf (val - 1.0f) < 1.0e-5f);
-		dgVector tmp (m_matrix[j0] * m_matrix[j1]);
-		val = tmp % m_matrix[i];
-		dgAssert (dgAbsf (val - 1.0f) < 1.0e-5f);
-		j0 = j1;
-		j1 = i;
-	}
-#endif
+	dgAssert (m_matrix.TestOrthogonal());
 }
 
 

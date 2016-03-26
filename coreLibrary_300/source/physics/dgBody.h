@@ -112,6 +112,9 @@ class dgBody
 	void SetOmega (const dgVector& omega);
 	void SetVelocity (const dgVector& velocity);
 
+	void SetOmegaNoSleep(const dgVector& omega);
+	void SetVelocityNoSleep(const dgVector& velocity);
+
 	dgUnsigned32 GetGroupID () const;
 	virtual void SetGroupID (dgUnsigned32 id);
 	dgInt32 GetUniqueID () const;
@@ -146,7 +149,7 @@ class dgBody
 	dgVector GetMass() const;
 	dgVector GetInvMass() const;
 	void SetInvMass(const dgVector& invMass);
-	const dgMatrix& GetInertiaMatrix () const;
+	const dgMatrix& GetInvInertiaMatrix () const;
 
 	virtual dgMatrix CalculateInertiaMatrix () const;
 	virtual dgMatrix CalculateInvInertiaMatrix () const;
@@ -182,8 +185,8 @@ class dgBody
 	virtual void InvalidateCache();
 	
     virtual void SetMatrix(const dgMatrix& matrix);
-	virtual void SetMatrixNoSleep(const dgMatrix& matrix);
     virtual void SetMatrixResetSleep(const dgMatrix& matrix);
+	virtual void SetMatrixNoSleep(const dgMatrix& matrix);
 	virtual void IntegrateVelocity (dgFloat32 timestep);
 	virtual void AttachCollision (dgCollisionInstance* const collision);
     
@@ -192,8 +195,6 @@ class dgBody
 	virtual void SetExtForceAndTorqueCallback (OnApplyExtForceAndTorque callback) = 0;
 
 	virtual dgFloat32 RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT) const;
-	virtual dgFloat32 ConvexRayCast (const dgFastRayTest& ray, const dgCollisionInstance* const convexShape, const dgVector& shapeMinBox, const dgVector& shapeMaxBox, const dgMatrix& origin, const dgVector& shapeVeloc, OnRayCastAction filter, OnRayPrecastAction preFilter, void* const userData, dgFloat32 minT, dgInt32 threadId) const;
-
 	virtual void Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData);
 	
 	virtual dgConstraint* GetFirstJoint() const;
@@ -302,7 +303,7 @@ class dgBody
 //	 Implementation	
 // 
 // *****************************************************************************
-DG_INLINE const dgMatrix& dgBody::GetInertiaMatrix () const 
+DG_INLINE const dgMatrix& dgBody::GetInvInertiaMatrix () const 
 {
 	return m_invWorldInertiaMatrix;
 }
@@ -386,22 +387,35 @@ DG_INLINE const dgVector& dgBody::GetVelocity() const
 	return m_veloc; 
 }
 
-DG_INLINE void dgBody::SetOmega (const dgVector& omega)
+DG_INLINE void dgBody::SetOmegaNoSleep(const dgVector& omega)
 {
 	m_omega = omega;
+}
+
+
+DG_INLINE void dgBody::SetOmega (const dgVector& omega)
+{
+	SetOmegaNoSleep(omega);
 	m_equilibrium = false;
 }
+
 
 DG_INLINE dgVector dgBody::GetVelocityAtPoint (const dgVector& point) const
 {
 	return m_veloc + m_omega * (point - m_globalCentreOfMass);
 }
 
-DG_INLINE void dgBody::SetVelocity (const dgVector& velocity)
+DG_INLINE void dgBody::SetVelocityNoSleep(const dgVector& velocity)
 {
 	m_veloc = velocity;
+}
+
+DG_INLINE void dgBody::SetVelocity (const dgVector& velocity)
+{
+	SetVelocityNoSleep(velocity);
 	m_equilibrium = false;
 }
+
 
 DG_INLINE const dgMatrix& dgBody::GetMatrix() const
 {
@@ -538,27 +552,7 @@ DG_INLINE dgVector dgBody::GetApparentMass() const
 DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 {
 	m_matrix = matrix;
-
-#ifdef _DEBUG
-	for (int i = 0; i < 4; i ++) {
-		for (int j = 0; j < 4; j ++) {
-			dgAssert (dgCheckFloat(m_matrix[i][j]));
-		}
-	}
-
-	int j0 = 1;
-	int j1 = 2;
-	for (dgInt32 i = 0; i < 3; i ++) {
-		dgAssert (m_matrix[i][3] == 0.0f);
-		dgFloat32 val = m_matrix[i] % m_matrix[i];
-		dgAssert (dgAbsf (val - 1.0f) < 1.0e-4f);
-		dgVector tmp (m_matrix[j0] * m_matrix[j1]);
-		val = tmp % m_matrix[i];
-		dgAssert (dgAbsf (val - 1.0f) < 1.0e-4f);
-		j0 = j1;
-		j1 = i;
-	}
-#endif
+	dgAssert (m_matrix.TestOrthogonal(dgFloat32 (1.0e-4f)));
 
 	m_rotation = dgQuaternion (m_matrix);
 	m_globalCentreOfMass = m_matrix.TransformVector (m_localCentreOfMass);

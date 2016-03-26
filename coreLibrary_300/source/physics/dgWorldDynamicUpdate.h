@@ -131,6 +131,8 @@ class dgParallelSolverSyncData
 	dgInt32 m_jointCount;
 	dgInt32 m_rowCount;
 	dgInt32 m_atomicIndex;
+	dgInt32 m_lock0;
+	dgInt32 m_lock1;
 	dgInt32 m_jacobianMatrixRowAtomicIndex;
 
 	dgInt32* m_bodyLocks;  
@@ -214,10 +216,12 @@ class dgJacobianMatrixElement
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
 
-	dgForceImpactPair* m_jointFeebackForce;
+	dgFloat32 m_stiffness;
 	dgFloat32 m_maxImpact;
+	dgForceImpactPair* m_jointFeebackForce;
 	dgInt32 m_normalForceIndex;
 	bool m_accelIsMotor;
+	bool m_applyCorrection;
 } DG_GCC_VECTOR_ALIGMENT;
 
 class dgJacobianMemory
@@ -256,7 +260,7 @@ class dgWorldDynamicUpdate
 	//static void CalculateJointsImpulseVelocParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void UpdateFeedbackForcesParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void UpdateBodyVelocityParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void FindActiveJointAndBodies (void* const context, void* const worldContext, dgInt32 threadID); 
+	static void FindActiveJointAndBodiesKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static dgInt32 SortJointInfoByColor(const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexA, const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexB, void* const context);
 	//void CreateParallelArrayBatchArrays (dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;
 

@@ -91,6 +91,7 @@
 #include <pthread.h>
 #include <sched.h>
 #include <semaphore.h>
+#include <dTimeTracker.h>
 
 #if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 	#include <io.h> 
@@ -104,6 +105,7 @@
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#define DG_SSE4_INSTRUCTIONS_SET
 	#include <intrin.h>
+	#include <emmintrin.h> 
 #endif
 
 
@@ -150,7 +152,8 @@
 	#undef DG_SCALAR_VECTOR_CLASS
 #endif
 
-#if defined (_NEWTON_USE_DOUBLE) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
+//#if defined (_NEWTON_USE_DOUBLE) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
+#if defined (__ppc__) || defined (ANDROID) || defined (IOS)
 	#undef DG_SSE4_INSTRUCTIONS_SET
 	#ifndef DG_SCALAR_VECTOR_CLASS
 		#define DG_SCALAR_VECTOR_CLASS
@@ -268,7 +271,9 @@ class dgTriplex
 
 
 class dgVector;
+#ifndef _NEWTON_USE_DOUBLE
 class dgBigVector;
+#endif
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#define dgApi __cdecl 	
@@ -668,13 +673,14 @@ union dgDoubleInt
 };
 
 
-
-void GetMinMax (dgVector &Min, dgVector &Max, const dgFloat32* const vArray, dgInt32 vCount, dgInt32 StrideInBytes);
+#ifndef _NEWTON_USE_DOUBLE
 void GetMinMax (dgBigVector &Min, dgBigVector &Max, const dgFloat64* const vArray, dgInt32 vCount, dgInt32 strideInBytes);
+#endif
+void GetMinMax (dgVector &Min, dgVector &Max, const dgFloat32* const vArray, dgInt32 vCount, dgInt32 StrideInBytes);
 
 dgInt32 dgVertexListToIndexList (dgFloat32* const vertexList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes, dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat32 tolerance = dgEPSILON);
-
 dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat64 tolerance = dgEPSILON);
+
 
 
 #define PointerToInt(x) ((size_t)x)

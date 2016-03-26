@@ -48,8 +48,8 @@ class dgBroadPhaseDefault: public dgBroadPhase
 	virtual void CheckStaticDynamic(dgBody* const body, dgFloat32 mass) {}
 
 	void RayCast (const dgVector& p0, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
-	void ConvexRayCast (dgCollisionInstance* const shape, const dgMatrix& matrx, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const;
-	dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& p0, const dgVector& p1, dgFloat32& timetoImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
+	dgInt32 Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
+	dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& p0, const dgVector& p1, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
 	void ForEachBodyInAABB (const dgVector& q0, const dgVector& q1, OnBodiesInAABB callback, void* const userData) const;
 
 	void ResetEntropy ();

@@ -95,7 +95,7 @@ void GetMinMax (dgVector &minOut, dgVector &maxOut, const dgFloat32* const verte
     }
 }
 
-
+#ifndef _NEWTON_USE_DOUBLE
 void GetMinMax (dgBigVector &minOut, dgBigVector &maxOut, const dgFloat64* const vertexArray, dgInt32 vCount, dgInt32 strideInBytes)
 {
     dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
@@ -118,7 +118,7 @@ void GetMinMax (dgBigVector &minOut, dgBigVector &maxOut, const dgFloat64* const
     }
 }
 
-
+#endif
 
 static inline dgInt32 cmp_vertex (const dgFloat64* const v1, const dgFloat64* const v2, dgInt32 firstSortAxis)
 {
@@ -304,8 +304,6 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 }
 
 
-
-
 static dgInt32 QuickSortVertices (dgFloat64* const vertList, dgInt32 stride, dgInt32 compareCount, dgInt32 vertexCount, dgFloat64 tolerance)
 {
     dgInt32 count = 0;
@@ -436,8 +434,6 @@ dgInt32 dgVertexListToIndexList (dgFloat64* const vertList, dgInt32 strideInByte
 
     return count;
 }
-
-
 
 
 dgInt32 dgVertexListToIndexList (dgFloat32* const vertList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes, dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexList, dgFloat32 tolerance)

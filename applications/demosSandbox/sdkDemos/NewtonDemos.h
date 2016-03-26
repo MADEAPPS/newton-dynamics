@@ -56,8 +56,7 @@ class NewtonDemos: public wxFrame
 		ID_SELECT_MICROTHREADS,
 		ID_SELECT_MICROTHREADS_COUNT = ID_SELECT_MICROTHREADS + 16,
 
-		ID_SHOW_PROFILER,
-		ID_SHOW_CONCURRENCE_PROFILER,
+		ID_RUN_PROFILER_SECTION,
 
 		ID_RUN_DEMO,
 		ID_RUN_DEMO_RANGE = ID_RUN_DEMO + 100,
@@ -125,6 +124,8 @@ class NewtonDemos: public wxFrame
 	void OnSerializeWorld(wxCommandEvent& event);
 	void OnDeserializeWorld(wxCommandEvent& event);
 
+	void OnRunProfileSection(wxCommandEvent& event);
+
 	void OnJoystickEvent(wxJoystickEvent& event);
 
 //	long onLoad(FXObject* sender, FXSelector id, void* eventPtr); 
@@ -171,11 +172,8 @@ class NewtonDemos: public wxFrame
 	float m_timestepAcc;
 	float m_fps;
 
-
 	int m_key[512];
 	int m_keyMap[512];
-	wxMenuItem* m_profilerTracksMenu[16];
-
 
 	static int m_solverModes[];
 	static int m_threadsTracks[];

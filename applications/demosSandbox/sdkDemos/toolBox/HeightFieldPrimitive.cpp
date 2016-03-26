@@ -193,9 +193,9 @@ freq *= 0.5f;
 
 	static void ApplySmoothFilter (dFloat* const elevation, int size)
 	{
-		float* map0[4096 + 1];
-		float* map1[4096 + 1];
-		float* const buffer = new dFloat [size * size];
+		dFloat* map0[4096 + 1];
+		dFloat* map1[4096 + 1];
+		dFloat* const buffer = new dFloat [size * size];
 
 		MakeMap (elevation, map0, size);
 		MakeMap (buffer, map1, size);
@@ -233,7 +233,7 @@ freq *= 0.5f;
 
 	static void MakeFractalTerrain (dFloat* const elevation, int sizeInPowerOfTwos, dFloat elevationScale, dFloat roughness, dFloat maxElevation, dFloat minElevation)
 	{
-		float* map[4096 + 1];
+		dFloat* map[4096 + 1];
 		int size = (1 << sizeInPowerOfTwos) + 1;
 		dAssert (size < int (sizeof (map) / sizeof map[0]));
 		MakeMap (elevation, map, size);

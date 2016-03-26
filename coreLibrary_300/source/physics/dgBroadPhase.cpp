@@ -47,6 +47,15 @@ dgVector dgBroadPhaseNode::m_broadPhaseScale (DG_BROADPHASE_AABB_SCALE, DG_BROAD
 dgVector dgBroadPhaseNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, dgFloat32 (0.0f));
 
 
+dgInt32 dgBroadPhase::m_obbTestSimplex[4][4] =
+{
+	{ 0, 1, 2, 3 },
+	{ 0, 2, 3, 1 },
+	{ 2, 1, 3, 0 },
+	{ 1, 0, 3, 2 },
+};
+
+
 class dgBroadPhase::dgSpliteInfo
 {
 	public:
@@ -225,8 +234,9 @@ dgBroadPhaseTreeNode* dgBroadPhase::InsertNode(dgBroadPhaseNode* const root, dgB
 }
 
 
-void dgBroadPhase::UpdateAggregateEntropy(void* const context, void* const node, dgInt32 threadID)
+void dgBroadPhase::UpdateAggregateEntropyKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -235,10 +245,20 @@ void dgBroadPhase::UpdateAggregateEntropy(void* const context, void* const node,
 
 void dgBroadPhase::ForceAndToqueKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
 	broadPhase->ApplyForceAndtorque(descriptor, (dgBodyMasterList::dgListNode*) node, threadID);
+}
+
+void dgBroadPhase::SleepingStateKernel(void* const context, void* const node, dgInt32 threadID)
+{
+	dTimeTrackerEvent(__FUNCTION__);
+	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
+	dgWorld* const world = descriptor->m_world;
+	dgBroadPhase* const broadPhase = world->GetBroadPhase();
+	broadPhase->SleepingState(descriptor, (dgBodyMasterList::dgListNode*) node, threadID);
 }
 
 bool dgBroadPhase::DoNeedUpdate(dgBodyMasterList::dgListNode* const node) const
@@ -267,46 +287,69 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
-	while (node && DoNeedUpdate(node)) {
-		dgBody* const body = node->GetInfo().GetBody();
+	while (node) {
+		if (DoNeedUpdate(node)) {
+			dgBody* const body = node->GetInfo().GetBody();
 
-		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-			dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
-
-			dynamicBody->ApplyExtenalForces(timestep, threadID);
-			if (!dynamicBody->IsInEquilibrium()) {
-				dynamicBody->m_sleeping = false;
-				dynamicBody->m_equilibrium = false;
-				// update collision matrix only
-				dynamicBody->UpdateCollisionMatrix(timestep, threadID);
-			}
-			if (dynamicBody->GetInvMass().m_w == dgFloat32(0.0f) || body->m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
-				dynamicBody->m_sleeping = true;
-				dynamicBody->m_autoSleep = true;
-				dynamicBody->m_equilibrium = true;
-			}
-
-			dynamicBody->m_prevExternalForce = dynamicBody->m_accel;
-			dynamicBody->m_prevExternalTorque = dynamicBody->m_alpha;
-		} else {
-			dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
-
-			if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-				body->ApplyExtenalForces(timestep, threadID);
-			}
-
-			// kinematic bodies are always sleeping (skip collision with kinematic bodies)
-			if (body->IsCollidable()) {
-				body->m_sleeping = false;
-				body->m_autoSleep = false;
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
+				dynamicBody->ApplyExtenalForces(timestep, threadID);
 			} else {
-				body->m_sleeping = true;
-				body->m_autoSleep = true;
+				dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
+				if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
+					body->ApplyExtenalForces(timestep, threadID);
+				}
 			}
-			body->m_equilibrium = true;
+		}
 
-			// update collision matrix by calling the transform callback for all kinematic bodies
-			body->UpdateMatrix(timestep, threadID);
+		for (dgInt32 i = 0; i < threadCount; i++) {
+			node = node ? node->GetPrev() : NULL;
+		}
+	}
+}
+
+
+void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
+{
+	dgFloat32 timestep = descriptor->m_timestep;
+
+	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
+	while (node) {
+		if (DoNeedUpdate(node)) {
+			dgBody* const body = node->GetInfo().GetBody();
+
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
+				if (!dynamicBody->IsInEquilibrium()) {
+					dynamicBody->m_sleeping = false;
+					dynamicBody->m_equilibrium = false;
+					// update collision matrix only
+					dynamicBody->UpdateCollisionMatrix(timestep, threadID);
+				}
+				if (dynamicBody->GetInvMass().m_w == dgFloat32(0.0f) || body->m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
+					dynamicBody->m_sleeping = true;
+					dynamicBody->m_autoSleep = true;
+					dynamicBody->m_equilibrium = true;
+				}
+
+				dynamicBody->m_prevExternalForce = dynamicBody->m_accel;
+				dynamicBody->m_prevExternalTorque = dynamicBody->m_alpha;
+			} else {
+				dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
+
+				// kinematic bodies are always sleeping (skip collision with kinematic bodies)
+				if (body->IsCollidable()) {
+					body->m_sleeping = false;
+					body->m_autoSleep = false;
+				} else {
+					body->m_sleeping = true;
+					body->m_autoSleep = true;
+				}
+				body->m_equilibrium = true;
+
+				// update collision matrix by calling the transform callback for all kinematic bodies
+				body->UpdateMatrix(timestep, threadID);
+			}
 		}
 
 		for (dgInt32 i = 0; i < threadCount; i++) {
@@ -353,95 +396,10 @@ void dgBroadPhase::ForEachBodyInAABB(const dgBroadPhaseNode** stackPool, dgInt32
 	}
 }
 
-void dgBroadPhase::ConvexRayCast(const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& velocA, dgFastRayTest& ray,
-								dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData, dgInt32 threadId) const
-{
-	dgVector boxP0;
-	dgVector boxP1;
-	shape->CalcAABB(shape->GetLocalMatrix() * matrix, boxP0, boxP1);
 
-	dgFloat32 quantizeStep = dgMax(dgFloat32(1.0f) / velocA.DotProduct4(velocA).m_x, dgFloat32(0.001f));
-
-	dgFloat32 maxParam = dgFloat32 (1.02f);
-	while (stack) {
-		stack--;
-		dgFloat32 dist = distance[stack];
-		if (dist > maxParam) {
-			break;
-		} else {
-			const dgBroadPhaseNode* const me = stackPool[stack];
-			dgAssert(me);
-			dgBody* const body = me->GetBody();
-			if (body) {
-				if (!PREFILTER_RAYCAST(prefilter, body, shape, userData)) {
-					dgFloat32 param = body->ConvexRayCast(ray, shape, boxP0, boxP1, matrix, velocA, filter, prefilter, userData, maxParam, threadId);
-					if (param < maxParam) {
-						param = dgMin(param + quantizeStep, dgFloat32(1.0f));
-						maxParam = param;
-					}
-				}
-			} else if (me->IsAggregate()) {
-				dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)me;
-				const dgBroadPhaseNode* const node = aggregate->m_root;
-				if (node) {
-					dgVector minBox(node->m_minBox - boxP1);
-					dgVector maxBox(node->m_maxBox - boxP0);
-					dgFloat32 dist = ray.BoxIntersect(minBox, maxBox);
-					if (dist < maxParam) {
-						dgInt32 j = stack;
-						for (; j && (dist > distance[j - 1]); j--) {
-							stackPool[j] = stackPool[j - 1];
-							distance[j] = distance[j - 1];
-						}
-						stackPool[j] = node;
-						distance[j] = dist;
-						stack++;
-						dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
-					}
-				}
-
-			} else {
-				dgBroadPhaseTreeNode* const node = (dgBroadPhaseTreeNode*)me;
-				const dgBroadPhaseNode* const left = node->m_left;
-				dgAssert(left);
-				dgVector minBox(left->m_minBox - boxP1);
-				dgVector maxBox(left->m_maxBox - boxP0);
-				dgFloat32 dist = ray.BoxIntersect(minBox, maxBox);
-				if (dist < maxParam) {
-					dgInt32 j = stack;
-					for (; j && (dist > distance[j - 1]); j--) {
-						stackPool[j] = stackPool[j - 1];
-						distance[j] = distance[j - 1];
-					}
-					stackPool[j] = left;
-					distance[j] = dist;
-					stack++;
-					dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
-				}
-
-				const dgBroadPhaseNode* const right = node->m_right;
-				dgAssert(right);
-				minBox = right->m_minBox - boxP1;
-				maxBox = right->m_maxBox - boxP0;
-				dist = ray.BoxIntersect(minBox, maxBox);
-				if (dist < maxParam) {
-					dgInt32 j = stack;
-					for (; j && (dist > distance[j - 1]); j--) {
-						stackPool[j] = stackPool[j - 1];
-						distance[j] = distance[j - 1];
-					}
-					stackPool[j] = right;
-					distance[j] = dist;
-					stack++;
-					dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
-				}
-			}
-		}
-	}
-}
 
 dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& velocA, const dgVector& velocB, dgFastRayTest& ray,
-								 dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32& timeToImpact, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
+								 dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
 	dgTriplex points[DG_CONVEX_CAST_POOLSIZE];
 	dgTriplex normals[DG_CONVEX_CAST_POOLSIZE];
@@ -450,14 +408,17 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 	dgInt64 attributeB[DG_CONVEX_CAST_POOLSIZE];
 
 	dgInt32 totalCount = 0;
-	dgFloat32 time = dgFloat32(1.0f);
-	dgFloat32 maxParam = dgFloat32(1.2f);
+	
 
 	dgVector boxP0;
 	dgVector boxP1;
 	dgAssert(matrix.TestOrthogonal());
 	shape->CalcAABB(matrix, boxP0, boxP1);
 
+	maxContacts = dgMin (maxContacts, DG_CONVEX_CAST_POOLSIZE);
+	dgAssert (!maxContacts || (maxContacts && info));
+	dgFloat32 maxParam = *param;
+	dgFloat32 timeToImpact = *param;
 	while (stack) {
 		stack--;
 
@@ -471,36 +432,34 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 			dgBody* const body = me->GetBody();
 			if (body) {
 				if (!PREFILTER_RAYCAST(prefilter, body, shape, userData)) {
-					dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, time, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
+					dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, timeToImpact, points, normals, penetration, attributeA, attributeB, maxContacts, threadIndex);
 
-					if (count) {
-						if (time < maxParam) {
-							if ((time - maxParam) < dgFloat32(-1.0e-3f)) {
-								totalCount = 0;
-							}
-							maxParam = time;
-							if (count >= (maxContacts - totalCount)) {
-								count = maxContacts - totalCount;
-							}
+					if (timeToImpact < maxParam) {
+						if ((timeToImpact - maxParam) < dgFloat32(-1.0e-3f)) {
+							totalCount = 0;
+						}
+						maxParam = timeToImpact;
+						if (count >= (maxContacts - totalCount)) {
+							count = maxContacts - totalCount;
+						}
 
-							for (dgInt32 i = 0; i < count; i++) {
-								info[totalCount].m_point[0] = points[i].m_x;
-								info[totalCount].m_point[1] = points[i].m_y;
-								info[totalCount].m_point[2] = points[i].m_z;
-								info[totalCount].m_point[3] = dgFloat32(0.0f);
-								info[totalCount].m_normal[0] = normals[i].m_x;
-								info[totalCount].m_normal[1] = normals[i].m_y;
-								info[totalCount].m_normal[2] = normals[i].m_z;
-								info[totalCount].m_normal[3] = dgFloat32(0.0f);
-								info[totalCount].m_penetration = penetration[i];
-								info[totalCount].m_contaID = attributeB[i];
-								info[totalCount].m_hitBody = body;
-								totalCount++;
-							}
+						for (dgInt32 i = 0; i < count; i++) {
+							info[totalCount].m_point[0] = points[i].m_x;
+							info[totalCount].m_point[1] = points[i].m_y;
+							info[totalCount].m_point[2] = points[i].m_z;
+							info[totalCount].m_point[3] = dgFloat32(0.0f);
+							info[totalCount].m_normal[0] = normals[i].m_x;
+							info[totalCount].m_normal[1] = normals[i].m_y;
+							info[totalCount].m_normal[2] = normals[i].m_z;
+							info[totalCount].m_normal[3] = dgFloat32(0.0f);
+							info[totalCount].m_penetration = penetration[i];
+							info[totalCount].m_contaID = attributeB[i];
+							info[totalCount].m_hitBody = body;
+							totalCount++;
 						}
-						if (maxParam < 1.0e-8f) {
-							break;
-						}
+					}
+					if (maxParam < 1.0e-8f) {
+						break;
 					}
 				}
 			} else if (me->IsAggregate()) {
@@ -561,10 +520,86 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 			}
 		}
 	}
-	timeToImpact = maxParam;
+	*param = maxParam;
 	return totalCount;
 }
 
+dgInt32 dgBroadPhase::Collide(const dgBroadPhaseNode** stackPool, dgInt32* const ovelapStack, dgInt32 stack, const dgVector& boxP0, const dgVector& boxP1, dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
+{
+	dgTriplex points[DG_CONVEX_CAST_POOLSIZE];
+	dgTriplex normals[DG_CONVEX_CAST_POOLSIZE];
+	dgFloat32 penetration[DG_CONVEX_CAST_POOLSIZE];
+	dgInt64 attributeA[DG_CONVEX_CAST_POOLSIZE];
+	dgInt64 attributeB[DG_CONVEX_CAST_POOLSIZE];
+
+	dgInt32 totalCount = 0;
+	while (stack) {
+		stack--;
+
+		dgInt32 test = ovelapStack[stack];
+		if (test) {
+			const dgBroadPhaseNode* const me = stackPool[stack];
+
+			dgBody* const body = me->GetBody();
+			if (body) {
+				if (!PREFILTER_RAYCAST(prefilter, body, shape, userData)) {
+					dgInt32 count = m_world->Collide(shape, matrix, body->m_collision, body->m_matrix, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
+
+					if (count) {
+						bool teminate = false;
+						if (count >= (maxContacts - totalCount)) {
+							count = maxContacts - totalCount;
+							teminate = true;
+						}
+
+						for (dgInt32 i = 0; i < count; i++) {
+							info[totalCount].m_point[0] = points[i].m_x;
+							info[totalCount].m_point[1] = points[i].m_y;
+							info[totalCount].m_point[2] = points[i].m_z;
+							info[totalCount].m_point[3] = dgFloat32(0.0f);
+							info[totalCount].m_normal[0] = normals[i].m_x;
+							info[totalCount].m_normal[1] = normals[i].m_y;
+							info[totalCount].m_normal[2] = normals[i].m_z;
+							info[totalCount].m_normal[3] = dgFloat32(0.0f);
+							info[totalCount].m_penetration = penetration[i];
+							info[totalCount].m_contaID = attributeB[i];
+							info[totalCount].m_hitBody = body;
+							totalCount++;
+						}
+
+						if (teminate) {
+							break;
+						}
+					}
+				}
+			} else if (me->IsAggregate()) {
+				dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)me;
+				const dgBroadPhaseNode* const node = aggregate->m_root;
+				if (node) {
+					stackPool[stack] = node;
+					ovelapStack[stack] = dgOverlapTest(node->m_minBox, node->m_maxBox, boxP0, boxP1);
+					stack++;
+					dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
+				}
+
+			} else {
+				dgBroadPhaseTreeNode* const node = (dgBroadPhaseTreeNode*)me;
+				const dgBroadPhaseNode* const left = node->m_left;
+				stackPool[stack] = left;
+				ovelapStack[stack] = dgOverlapTest(left->m_minBox, left->m_maxBox, boxP0, boxP1);
+				stack ++;
+				dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
+
+				const dgBroadPhaseNode* const right = node->m_right;
+				stackPool[stack] = right;
+				ovelapStack[stack] = dgOverlapTest(right->m_minBox, right->m_maxBox, boxP0, boxP1);
+				stack++;
+				dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
+			}
+		}
+	}
+	return totalCount;
+}
 
 void dgBroadPhase::RayCast(const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& l0, const dgVector& l1, dgFastRayTest& ray, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const
 {
@@ -796,6 +831,7 @@ dgInt32 dgBroadPhase::CompareNodes(const dgBroadPhaseNode* const nodeA, const dg
 
 void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhaseNode** const root)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	if (*root) {
 		dgBroadPhaseNode* const parent = (*root)->m_parent;
 		(*root)->m_parent = NULL;
@@ -990,8 +1026,185 @@ void dgBroadPhase::RotateRight (dgBroadPhaseTreeNode* const node, dgBroadPhaseNo
 }
 
 
+DG_INLINE void dgBroadPhase::ReduceDegeneratedTriangle(dgVector* const simplex) const
+{
+	dgVector e10(simplex[1] - simplex[0]);
+	if ((e10 % e10) < dgFloat32(1.0e-12f)) {
+		simplex[1] = simplex[2];
+
+#ifdef _DEBUG
+	}
+	else {
+		dgVector e21(simplex[2] - simplex[1]);
+		dgVector e20(simplex[2] - simplex[0]);
+		dgAssert(((e20 % e20) < dgFloat32(1.0e-8f)) || ((e21 % e21) < dgFloat32(1.0e-8f)));
+#endif
+	}
+}
+
+
+DG_INLINE dgVector dgBroadPhase::ReduceLine(dgVector* const simplex, dgInt32& indexOut) const
+{
+	const dgVector& p0 = simplex[0];
+	const dgVector& p1 = simplex[1];
+	dgVector dp(p1 - p0);
+	dgVector v;
+
+	dgAssert(dp.m_w == dgFloat32(0.0f));
+	dgFloat32 mag2 = dp.DotProduct4(dp).GetScalar();
+	if (mag2 < dgFloat32(1.0e-24f)) {
+		v = p0;
+		indexOut = 1;
+	} else {
+		dgFloat32 alpha0 = -p0.DotProduct4(dp).GetScalar();
+		if (alpha0 > mag2) {
+			v = p1;
+			indexOut = 1;
+			simplex[0] = simplex[1];
+		} else if (alpha0 < dgFloat32(0.0f)) {
+			v = p0;
+			indexOut = 1;
+		} else {
+			v = p0 + dp.Scale4(alpha0 / mag2);
+		}
+	}
+	return v;
+}
+
+DG_INLINE dgVector dgBroadPhase::ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const
+{
+	dgVector e10(simplex[1] - simplex[0]);
+	dgVector e20(simplex[2] - simplex[0]);
+	dgVector normal(e10 * e20);
+	dgAssert(normal.m_w == dgFloat32(0.0f));
+	if (normal.DotProduct4(normal).GetScalar() > dgFloat32(1.0e-14f)) {
+		dgInt32 i0 = 2;
+		dgInt32 minIndex = -1;
+		for (dgInt32 i1 = 0; i1 < 3; i1++) {
+			const dgVector& p1p0 = simplex[i0];
+			const dgVector& p2p0 = simplex[i1];
+
+			dgFloat32 volume = normal.DotProduct4(p1p0 * p2p0).GetScalar();
+			if (volume < dgFloat32(0.0f)) {
+				dgVector segment(simplex[i1] - simplex[i0]);
+				dgAssert(segment.m_w == dgFloat32(0.0f));
+				dgVector poinP0(simplex[i0].CompProduct4(dgVector::m_negOne));
+				dgFloat32 den = segment.DotProduct4(segment).GetScalar();
+				dgAssert(den > dgFloat32(0.0f));
+				dgFloat32 num = poinP0.DotProduct4(segment).GetScalar();
+				if (num < dgFloat32(0.0f)) {
+					minIndex = i0;
+				} else if (num > den) {
+					minIndex = i1;
+				} else {
+					indexOut = 2;
+					dgVector tmp0(simplex[i0]);
+					dgVector tmp1(simplex[i1]);
+					simplex[0] = tmp0;
+					simplex[1] = tmp1;
+					return simplex[0] + segment.Scale4(num / den);
+				}
+			}
+			i0 = i1;
+		}
+		if (minIndex != -1) {
+			indexOut = 1;
+			simplex[0] = simplex[minIndex];
+			return simplex[0];
+		} else {
+			indexOut = 3;
+			return normal.Scale4(normal.DotProduct4(simplex[0]).GetScalar() / normal.DotProduct4(normal).GetScalar());
+		}
+	} else {
+		indexOut = 2;
+		ReduceDegeneratedTriangle(simplex);
+		return ReduceLine(simplex, indexOut);
+	}
+}
+
+
+DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const
+{
+	dgInt32 i0 = m_obbTestSimplex[0][0];
+	dgInt32 i1 = m_obbTestSimplex[0][1];
+	dgInt32 i2 = m_obbTestSimplex[0][2];
+	dgInt32 i3 = m_obbTestSimplex[0][3];
+	const dgVector& p0 = simplex[i0];
+	const dgVector& p1 = simplex[i1];
+	const dgVector& p2 = simplex[i2];
+	const dgVector& p3 = simplex[i3];
+
+	dgVector p10(p1 - p0);
+	dgVector p20(p2 - p0);
+	dgVector p30(p3 - p0);
+	dgVector n(p10 * p20);
+	dgAssert(n.m_w == dgFloat32(0.0f));
+	//dgFloat32 volume = p30 % n;
+	dgFloat32 volume = n.DotProduct4(p30).GetScalar();
+	if (volume < dgFloat32(0.0f)) {
+		volume = -volume;
+		dgSwap(simplex[i2], simplex[i3]);
+	}
+	if (volume < dgFloat32(1.0e-8f)) {
+		dgTrace(("very import to finish this\n"));
+		//		dgAssert (0);
+	}
+
+	dgInt32 faceIndex = -1;
+	dgFloat32 minDist = dgFloat32(dgFloat32(0.0f));
+	const dgVector origin(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	for (dgInt32 i = 0; i < 4; i++) {
+		dgInt32 i0 = m_obbTestSimplex[i][0];
+		dgInt32 i1 = m_obbTestSimplex[i][1];
+		dgInt32 i2 = m_obbTestSimplex[i][2];
+
+		const dgVector& p0 = simplex[i0];
+		const dgVector& p1 = simplex[i1];
+		const dgVector& p2 = simplex[i2];
+
+		dgVector p10(p1 - p0);
+		dgVector p20(p2 - p0);
+		dgVector normal(p10 * p20);
+		dgAssert(normal.m_w == dgFloat32(0.0f));
+
+		dgVector normalDot4(normal.DotProduct4(normal));
+		dgAssert(normalDot4.GetScalar() > dgFloat32(0.0f));
+		if (normalDot4.GetScalar() > dgFloat32(1.0e-24f)) {
+			normal = normal.CompProduct4(normalDot4.InvSqrt());
+			dgFloat32 dist = normal.DotProduct4(origin - p0).GetScalar();
+			if (dist <= minDist) {
+				minDist = dist;
+				faceIndex = i;
+			}
+		}
+	}
+
+	if (faceIndex != -1) {
+		dgVector tmp[3];
+		dgInt32 i0 = m_obbTestSimplex[faceIndex][0];
+		dgInt32 i1 = m_obbTestSimplex[faceIndex][1];
+		dgInt32 i2 = m_obbTestSimplex[faceIndex][2];
+
+		tmp[0] = simplex[i0];
+		tmp[1] = simplex[i1];
+		tmp[2] = simplex[i2];
+		simplex[0] = tmp[0];
+		simplex[1] = tmp[1];
+		simplex[2] = tmp[2];
+
+		indexOut = 3;
+		return ReduceTriangle(simplex, indexOut);
+	}
+
+	indexOut = 4;
+	return origin;
+}
+
+
+
 bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	bool mass0 = (body0->m_invMass.m_w != dgFloat32 (0.0f)); 
 	bool mass1 = (body1->m_invMass.m_w != dgFloat32 (0.0f)); 
 	bool isDynamic0 = body0->IsRTTIType (dgBody::m_dynamicBodyRTTI) != 0;
@@ -1015,34 +1228,111 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 		const dgCollisionInstance* const instance0 = body0->GetCollision();
 		const dgCollisionInstance* const instance1 = body1->GetCollision();
 
-		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
-			dgVector box0_p0;
-			dgVector box0_p1;
-			dgVector box1_p0;
-			dgVector box1_p1;
-			
-			instance0->CalcAABB(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
-			instance1->CalcAABB(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
+		dgVector obb0;
+		dgVector obb1;
+		dgVector origin0;
+		dgVector origin1;
+		instance0->CalcObb (origin0, obb0);
+		instance1->CalcObb (origin1, obb1);
 
-			dgVector boxp0 (box0_p0 - box1_p1);
-			dgVector boxp1 (box0_p1 - box1_p0);
+		obb0 -= dgCollisionInstance::m_padding;
+		obb1 -= dgCollisionInstance::m_padding;
 
-			dgVector velRelative (body1->GetVelocity() - body0->GetVelocity());
-			dgFastRayTest ray (dgVector (dgFloat32 (0.0f)), velRelative.Scale4 (timestep * dgFloat32 (4.0f)));
-			dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
-			ret = (distance < dgFloat32 (1.0f));
-		} else {
-			ret = dgOverlapTest (body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
-//			if (ret) {
-//				dgVector size0;
-//				dgVector size1;
-//				dgVector origin0;
-//				dgVector origin1;
-//				instance0->CalcObb (origin0, size0);
-//				instance1->CalcObb (origin1, size1);
-//				ret = dgObbTest (origin0, size0, instance0->GetGlobalMatrix(), origin1, size1, instance1->GetGlobalMatrix());
-//			}
+		dgAssert (origin0.m_w == dgFloat32 (0.0f));
+		dgAssert (origin1.m_w == dgFloat32 (0.0f));
+		dgMatrix matrix (instance1->GetGlobalMatrix() * instance0->GetGlobalMatrix().Inverse());
+		matrix.m_posit = matrix.TransformVector (origin1) - origin0;
+//matrix.m_posit = dgVector (0.0f, 2.0f, 0.0f, 0.0f);
+
+		dgVector dir0 (matrix.m_posit & dgVector::m_triplexMask); 
+		dgFloat32 mag2 = dir0.DotProduct4 (dir0).GetScalar();
+		if (mag2 < dgFloat32 (1.0e-8f)) {
+			dir0 = dgVector(dgFloat32 (0.0f));
+			dir0.m_y = dgFloat32 (1.0f);
+			mag2 = dgFloat32 (1.0f);
 		}
+		dir0 = dir0.Scale4(dgFloat32 (1.0f) / dgSqrt (mag2));
+
+		dgVector simplex[4];
+		dgVector negObb0 (obb0.CompProduct4 (dgVector::m_negOne));
+		dgVector negObb1 (obb1.CompProduct4 (dgVector::m_negOne));
+		
+		dgVector mask0 (dir0 > dgVector::m_zero);
+		dgVector p ((obb0 & mask0) | (negObb0.AndNot (mask0)));
+
+		dgVector dir1 (matrix.UnrotateVector(dir0.CompProduct4 (dgVector::m_negOne)));
+		dgVector mask1 (dir1 > dgVector::m_zero);
+		dgVector q (matrix.TransformVector (dgVector ((obb1 & mask1) | (negObb1.AndNot (mask1)))) & dgVector::m_triplexMask);
+
+		simplex[0] = p - q;
+		dgVector v (simplex[0]);
+
+		dgInt32 iter = 0;
+		dgInt32 index = 1;
+		dgFloat32 minDist = dgFloat32(1.0e20f);
+		do {
+			dgFloat32 dist = v % v;
+			if (dist < dgFloat32(1.0e-7f)) {
+				minDist = dist;
+				break;
+			}
+
+			if (dist < minDist) {
+				minDist = dist;
+			}
+
+			dgVector dir0(v.Scale4(-dgRsqrt(dist)));
+
+			dgVector mask0 (dir0 > dgVector::m_zero);
+			dgVector p ((obb0 & mask0) | (negObb0.AndNot (mask0)));
+
+			dgVector dir1 (matrix.UnrotateVector(dir0.CompProduct4 (dgVector::m_negOne)));
+			dgVector mask1 (dir1 > dgVector::m_zero);
+			dgVector q (matrix.TransformVector (dgVector ((obb1 & mask1) | (negObb1.AndNot (mask1)))) & dgVector::m_triplexMask);
+
+			simplex[index] = p - q;
+			const dgVector& w = simplex[index];
+			dgVector wv(w - v);
+			dgAssert (dir0.m_w  == dgFloat32 (0.0f));
+			dist = dir0.DotProduct4(wv).GetScalar();
+
+			if (dist < dgFloat32(1.0e-3f)) {
+				minDist = dist;
+				break;
+			}
+
+			index++;
+			switch (index) 
+			{
+				case 2:
+				{
+					v = ReduceLine(simplex, index);
+					break;
+				}
+
+				case 3:
+				{
+					v = ReduceTriangle(simplex, index);
+					break;
+				}
+
+				case 4:
+				{
+					v = ReduceTetrahedrum(simplex, index);
+					break;
+				}
+			}
+			iter++;
+		} while (iter < 8);
+
+		dgFloat32 dist = v.DotProduct4 (v).GetScalar(); 
+		dgFloat32 testDist = dgFloat32(1.0e-3f * 1.0e-3f);
+		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
+			dgVector velRelative (body1->GetVelocity() - body0->GetVelocity());
+			dgVector step (velRelative.Scale4 (timestep * dgFloat32 (2.0f)));
+			testDist += (dist < step.DotProduct4(step).GetScalar());
+		}
+		ret = dist < testDist;
 	}
 	return ret;
 }
@@ -1076,20 +1366,20 @@ bool dgBroadPhase::ValidateContactCache(dgContact* const contact, dgFloat32 time
 }
 
 
-void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgFloat32 timestep, dgInt32 threadID)
+void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 {
     dgContactPoint contacts[DG_MAX_CONTATCS];
 
 	pair->m_cacheIsValid = false;
 	pair->m_contactBuffer = contacts;
-	m_world->CalculateContacts(pair, timestep, threadID, false, false);
+	m_world->CalculateContacts(pair, threadID, false, false);
 
 	if (pair->m_contactCount) {
 		dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
 		if (pair->m_isDeformable) {
-			m_world->ProcessDeformableContacts(pair, timestep, threadID);
+			m_world->ProcessDeformableContacts(pair, threadID);
 		} else {
-			m_world->ProcessContacts(pair, timestep, threadID);
+			m_world->ProcessContacts(pair, threadID);
 			KinematicBodyActivation(pair->m_contact);
 		}
 	} else {
@@ -1134,7 +1424,8 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 
 			pair.m_contact = contact;
 			pair.m_isDeformable = 0;
-            CalculatePairContacts (&pair, timestep, threadIndex);
+			pair.m_timestep = timestep;
+            CalculatePairContacts (&pair, threadIndex);
 		}
 	}
 }
@@ -1142,6 +1433,7 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	if (TestOverlaping (body0, body1, timestep)) {
 		dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
 
@@ -1157,10 +1449,9 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 			if (contact) {
 				contact->m_broadphaseLru = m_lru;
 				contact->m_timeOfImpact = dgFloat32(1.0e10f);
-				if (ValidateContactCache (contact, timestep)) {
+				if (!ValidateContactCache (contact, timestep)) {
 					// It does not have to set the value because it should be the same ar previous update.
 					//contact->m_contactActive = (contact->m_closestDistance < dgFloat32 (0.0f)) ? true : false;
-				} else {
 					contact->m_contactActive = 0;
 					contact->m_positAcc = dgVector::m_zero;
 					contact->m_rotationAcc = dgQuaternion();
@@ -1179,24 +1470,54 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 				const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
 
 				if (material->m_flags & dgContactMaterial::m_collisionEnable) {
-					m_world->GlobalLock(false);
-					if (body0->IsRTTIType (dgBody::m_deformableBodyRTTI) || body1->IsRTTIType (dgBody::m_deformableBodyRTTI)) {
-						contact = new (m_world->m_allocator) dgDeformableContact (m_world, material);
-					} else {
-						contact = new (m_world->m_allocator) dgContact (m_world, material);
-					}
-					contact->AppendToActiveList();
-					m_world->GlobalUnlock();
 
-					m_world->AttachConstraint (contact, body0, body1);
 
-					dgAssert (contact);
 					bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
-					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
+//					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
+					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
+
+#if 1
+						m_world->GlobalLock(false);
+							if (body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
+								contact = new (m_world->m_allocator) dgDeformableContact(m_world, material);
+							} else {
+								contact = new (m_world->m_allocator) dgContact(m_world, material);
+							}
+							contact->AppendToActiveList();
+						m_world->GlobalUnlock();
+						m_world->AttachConstraint(contact, body0, body1);
+
+						dgAssert (contact);
 						contact->m_contactActive = 0;
 						contact->m_broadphaseLru = m_lru;
 						contact->m_timeOfImpact = dgFloat32 (1.0e10f);
 						AddPair(contact, timestep, threadID);
+#else
+
+						if (!(body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI))) {
+							dgAssert(body0);
+							dgAssert(body1);
+
+							dgContact tempContact (m_world, material);
+							tempContact.m_body0 = body0;
+							tempContact.m_body1 = body1;
+							tempContact.m_contactActive = 0;
+							tempContact.m_broadphaseLru = m_lru;
+							tempContact.m_timeOfImpact = dgFloat32(1.0e10f);
+							AddPair(&tempContact, timestep, threadID);
+							if (tempContact.GetCount()) {
+								m_world->GlobalLock(false);
+								contact = new (m_world->m_allocator) dgContact(&tempContact);
+								contact->AppendToActiveList();
+								m_world->GlobalUnlock();
+								m_world->AttachConstraint(contact, body0, body1);
+							}
+						} else {
+							dgAssert (0);
+//							contact = new dgDeformableContact(m_world, material);
+						}
+#endif
+
 					}
 				}
 			}
@@ -1405,6 +1726,7 @@ void dgBroadPhase::FindCollidingPairs(dgBroadphaseSyncDescriptor* const descript
 
 void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -1414,6 +1736,7 @@ void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, d
 
 void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -1422,12 +1745,15 @@ void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* 
 
 void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	// delete all non used contacts
 	dgInt32 count = 0;
 	dgUnsigned32 lru = m_lru;
 
 	dgActiveContacts* const contactList = m_world;
 	dgContact** const deadContacs = dgAlloca (dgContact*, contactList->GetCount() + 256);
+
+	const dgInt32 garbageCollectingCicle = 8;
 
 	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
 		dgContact* const contact = contactNode->GetInfo();
@@ -1441,7 +1767,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 					deadContacs[count] = contact;
 					count ++;
 				}
-			} else if ((lru -  contact->m_broadphaseLru) > 200) {
+			} else if ((lru -  contact->m_broadphaseLru) > garbageCollectingCicle) {
 				dgVector minBox (body0->m_minAABB - body1->m_maxAABB);
 				dgVector maxBox (body0->m_maxAABB - body1->m_minAABB);
 				dgVector mask ((minBox.CompProduct4(maxBox)) > dgVector (dgFloat32 (0.0f)));
@@ -1484,6 +1810,7 @@ void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	m_lru = m_lru + 1;
 
 	m_recursiveChunks = true;
@@ -1503,9 +1830,17 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	if (m_world->m_preListener.GetCount()) {
 		for (dgWorld::dgListenerList::dgListNode* node = m_world->m_preListener.GetFirst(); node; node = node->GetNext()) {
 			dgWorld::dgListener& listener = node->GetInfo();
+			dTimeTrackerEvent(listener.m_name);
 			listener.m_onListenerUpdate(m_world, listener.m_userData, timestep);
 		}
 	}
+
+	node = masterList->GetLast();
+	for (dgInt32 i = 0; i < threadsCount; i++) {
+		m_world->QueueJob(SleepingStateKernel, &syncPoints, node);
+		node = node ? node->GetPrev() : NULL;
+	}
+	m_world->SynchronizationBarrier();
 
 
 #if 0
@@ -1537,7 +1872,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 	dgList<dgBroadPhaseAggregate*>::dgListNode* aggregateNode = m_aggregateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob (UpdateAggregateEntropy, &syncPoints, aggregateNode);
+		m_world->QueueJob (UpdateAggregateEntropyKernel, &syncPoints, aggregateNode);
 		aggregateNode = aggregateNode ? aggregateNode->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();

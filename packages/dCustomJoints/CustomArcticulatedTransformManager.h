@@ -102,6 +102,9 @@ class CustomArticulatedTransformController: public CustomControllerBase
 	CUSTOM_JOINTS_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
 
 	CUSTOM_JOINTS_API void MakeNewtonSkeleton () const;
+
+	void SetCalculateLocalTransforms (bool val) {m_calculateLocalTransform = val;}
+	bool GetCalculateLocalTransforms () const {return m_calculateLocalTransform;}
 	
 	protected:
 	CUSTOM_JOINTS_API void Init (void* const userData);
@@ -113,13 +116,14 @@ class CustomArticulatedTransformController: public CustomControllerBase
 	dSkeletonBone m_bones[D_HIERACHICAL_CONTROLLER_MAX_BONES];
 	void* m_collisionAggregate;
 	int m_boneCount;
+	bool m_calculateLocalTransform;
 	friend class CustomArticulaledTransformManager;
 };
 
 class CustomArticulaledTransformManager: public CustomControllerManager<CustomArticulatedTransformController> 
 {
 	public:
-	CUSTOM_JOINTS_API CustomArticulaledTransformManager(NewtonWorld* const world, bool applyLocalTransform);
+	CUSTOM_JOINTS_API CustomArticulaledTransformManager(NewtonWorld* const world, const char* const name = HIERACHICAL_ARTICULATED_PLUGIN_NAME);
 	CUSTOM_JOINTS_API virtual ~CustomArticulaledTransformManager();
 
 	CUSTOM_JOINTS_API virtual void Debug () const {}
@@ -136,8 +140,6 @@ class CustomArticulaledTransformManager: public CustomControllerManager<CustomAr
 	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 
 	private: 
-	bool m_applyLocalTransform;
-
 	static void OnControllerDestroy (const NewtonSkeletonContainer* const me);
 
 	friend class CustomArticulatedTransformController;

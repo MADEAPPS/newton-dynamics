@@ -1,9 +1,9 @@
 # Copyright (c) <2014> <Newton Game Dynamics>
-# 
+#
 # This software is provided 'as-is', without any express or implied
 # warranty. In no event will the authors be held liable for any damages
 # arising from the use of this software.
-# 
+#
 # Permission is granted to anyone to use this software for any purpose,
 # including commercial applications, and to alter it and redistribute it
 # freely.
@@ -40,13 +40,20 @@ target_include_directories(NewtonObj PRIVATE ${NEWTON_SOURCE}/physics)
 target_include_directories(NewtonObj PRIVATE ${NEWTON_SOURCE}/meshUtil)
 target_include_directories(NewtonObj INTERFACE ${NEWTON_SOURCE}/newton)
 
+# add timeTracker include
+get_target_property(TIMETRACKER_INCLUDE timeTracker INTERFACE_INCLUDE_DIRECTORIES)
+target_include_directories(NewtonObj PRIVATE ${TIMETRACKER_INCLUDE})
+
+
 # create static library
 add_library(NewtonStatic STATIC $<TARGET_OBJECTS:NewtonObj>)
 target_include_directories(NewtonStatic INTERFACE ${NEWTON_SOURCE}/newton)
+target_link_libraries(NewtonStatic timeTracker)
 
 # create shared library
 add_library(Newton SHARED $<TARGET_OBJECTS:NewtonObj>)
 target_include_directories(Newton INTERFACE ${NEWTON_SOURCE}/newton)
+target_link_libraries(Newton timeTracker)
 
 if (UNIX)
   set_target_properties(NewtonStatic PROPERTIES OUTPUT_NAME Newton)

@@ -187,7 +187,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 			}
 		}
 		
-		float face[3][12];
+		dFloat face[3][12];
 		memset (face, 0, sizeof (face));
 		face[0][4 + 1] = 1.0f;
 		face[1][4 + 1] = 1.0f;

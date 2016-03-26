@@ -173,8 +173,14 @@ class CustomJoint: public CustomAlloc
 	// note: this is not a extension of a virtual function, DO NOT CALL the base class SubmitConstraints!! 
 	CUSTOM_JOINTS_API void SetUserData (void* userData) {m_userData = userData;}
 	CUSTOM_JOINTS_API void* GetUserData () const {return m_userData;}
+
+	CUSTOM_JOINTS_API dFloat GetStiffness () const;
+	CUSTOM_JOINTS_API void SetStiffness (dFloat stiffness);
+
 	CUSTOM_JOINTS_API void SetUserDestructorCallback (JointUserDestructorCallback callback) {m_userDestructor = callback;}
 	CUSTOM_JOINTS_API void SetUserSubmintConstraintCallback (JointUserSubmitConstraintCallback callback) {m_userConstrationCallback = callback;}
+
+	CUSTOM_JOINTS_API virtual void UserUpdate(dFloat timestep, int threadIndex) { dAssert (0);}
 
 	private:
 	// this are the callback needed to have transparent c++ method interfaces 
@@ -183,7 +189,7 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API static void GetInfo (const NewtonJoint* const me, NewtonJointRecord* const info);
 	CUSTOM_JOINTS_API static void Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API static void Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
-	
+
 	protected:
 	CUSTOM_JOINTS_API void Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
 
@@ -207,8 +213,10 @@ class CustomJoint: public CustomAlloc
 	NewtonWorld* m_world;
 	JointUserDestructorCallback m_userDestructor;
 	JointUserSubmitConstraintCallback m_userConstrationCallback;
+	dFloat m_stiffness;
 	int m_maxDof;
 	int m_autoDestroy;
+	
 	static SerializeMetaData m_metaData;
 };
 

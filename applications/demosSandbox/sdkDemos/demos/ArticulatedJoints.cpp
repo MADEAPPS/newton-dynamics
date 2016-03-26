@@ -303,11 +303,12 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	public:
 
 	ArticulatedVehicleManagerManager (DemoEntityManager* const scene)
-		:CustomArticulaledTransformManager (scene->GetNewton(), true)
+		:CustomArticulaledTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, this, OnBoneAABBOverlap, OnContactsProcess);
+		NewtonMaterialSetCallbackUserData (scene->GetNewton(), material, material, this);
+		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, OnBoneAABBOverlap, OnContactsProcess);
 	}
 
 	virtual void OnPreUpdate (CustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
@@ -484,22 +485,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
 
 			int countCount = 0;
-			//dVector contactPoint (0.0f, 0.0f, 0.0f, 0.0f);
-			//dVector contactNornal (0.0f, 0.0f, 0.0f, 0.0f);
-
 			void* contactList[32];
 			for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 				contactList[countCount] = contact;
 				countCount ++;
-
-				//NewtonMaterial* const material = NewtonContactGetMaterial(contact);
-				//dVector posit;
-				//dVector normal;
-				//NewtonMaterialGetContactPositionAndNormal (material, linkBody, &posit[0], &normal[0]);
-				//posit.m_w = 0.0f;
-				//normal.m_w = 0.0f;
-				//contactPoint += posit;
-				//contactNornal += normal;
 			}
 
 			for (int i = 1; i < countCount; i++) {
@@ -690,6 +679,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		vehicleModel->ResetMatrix (*scene, location);
 
 		CustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel);
+		controller->SetCalculateLocalTransforms (true);
 
 		DemoEntity* const rootEntity = (DemoEntity*) vehicleModel->Find (definition[0].m_boneName);
 		NewtonBody* const rootBody = CreateBodyPart (rootEntity, definition[0]);
@@ -1103,6 +1093,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			NewtonBodyGetMatrix(link1, &matrix[0][0]);
 			dMatrix franmeMatrix (aligment * matrix);
 			CustomHinge* const hinge = new CustomHinge (franmeMatrix, link1, link0);
+			hinge->SetStiffness (0.0f);
 			hinge->SetFriction(linkFriction);
 			hingeArray[i-1] = hinge->GetJoint();
 			link0 = link1;
@@ -1308,6 +1299,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		vehicleModel->ResetMatrix(*scene, matrix);
 
 		CustomArticulatedTransformController* const controller = CreateTransformController(vehicleModel);
+		controller->SetCalculateLocalTransforms (true);
 
 		ARTICULATED_VEHICLE_DEFINITION definition;
 		strcpy (definition.m_boneName, "body");
@@ -1577,8 +1569,8 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 
 	// load a the mesh of the articulate vehicle
-//	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
-//	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift (matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
+	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
+	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift (matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 //	inputManager->AddPlayer (forklift);
 	
 	matrix.m_posit.m_z += 4.0f;

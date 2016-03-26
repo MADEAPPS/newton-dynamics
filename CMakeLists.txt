@@ -1,9 +1,9 @@
 # Copyright (c) <2014> <Newton Game Dynamics>
-# 
+#
 # This software is provided 'as-is', without any express or implied
 # warranty. In no event will the authors be held liable for any damages
 # arising from the use of this software.
-# 
+#
 # Permission is granted to anyone to use this software for any purpose,
 # including commercial applications, and to alter it and redistribute it
 # freely.
@@ -88,8 +88,9 @@ endif ()
 option("NEWTON_DEMOS_SANDBOX" "Build demos sandbox" ON)
 
 
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/coreLibrary_300")
 add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages")
+add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages/thirdParty")
+add_subdirectory("${NewtonSDK_SOURCE_DIR}/coreLibrary_300")
 
 if(NEWTON_DEMOS_SANDBOX)
   add_subdirectory("${NewtonSDK_SOURCE_DIR}/applications/demosSandbox")

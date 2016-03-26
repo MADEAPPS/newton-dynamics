@@ -81,6 +81,7 @@ void dFloatArrayToString (const dFloat* const array, int count, char* const stri
 	}
 }
 
+#ifndef _NEWTON_USE_DOUBLE
 void dFloatArrayToString (const dFloat64* const array, int count, char* const string, int maxSixeInBytes)
 {
 	if (count) {
@@ -94,7 +95,7 @@ void dFloatArrayToString (const dFloat64* const array, int count, char* const st
 		string[ptr - string - 1] = 0;
 	}
 }
-
+#endif
 
 void dStringToIntArray (const char* const string, int* const array, int maxCount)
 {
@@ -136,6 +137,7 @@ void dStringToFloatArray (const char* const string, dFloat* const array, int max
 	}
 }
 
+#ifndef _NEWTON_USE_DOUBLE
 void dStringToFloatArray (const char* const string, dFloat64* const array, int maxCount)
 {
 	const char* ptr = string;
@@ -155,7 +157,7 @@ void dStringToFloatArray (const char* const string, dFloat64* const array, int m
 		array[i] = val;
 	}
 }
-
+#endif
 
 static int SortVertexArray (const void *A, const void *B) 
 {

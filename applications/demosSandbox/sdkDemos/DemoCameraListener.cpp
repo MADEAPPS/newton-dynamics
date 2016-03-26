@@ -107,7 +107,7 @@ void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat times
 		} else if (mouseSpeedY < 0){
 			m_pitch -= m_pitchRate;
 		}
-		m_pitch = dClamp(m_pitch, -80.0f * 3.1416f / 180.0f, 80.0f * 3.1416f / 180.0f);
+		m_pitch = dClamp(m_pitch, dFloat (-80.0f * 3.1416f / 180.0f), dFloat (80.0f * 3.1416f / 180.0f));
 	}
 
 	m_mousePosX = mouseX;

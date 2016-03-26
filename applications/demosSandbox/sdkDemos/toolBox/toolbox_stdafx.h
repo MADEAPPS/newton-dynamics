@@ -101,6 +101,7 @@ typedef long long unsigned64;
 // gui library includes
 #include <wx/wx.h>
 #include <wx/event.h>
+#include <wx/display.h>
 #include <wx/dcclient.h>
 #include <wx/glcanvas.h>
 #include <wx/joystick.h>
@@ -156,33 +157,54 @@ typedef long long unsigned64;
 #include <dRefCounter.h>
 #include <dBaseHierarchy.h>
 
-#include "dSceneStdafx.h"
-#include "dScene.h"
-#include "dRootNodeInfo.h"
-#include "dBoneNodeInfo.h"
-#include "dSceneNodeInfo.h"
-#include "dMeshNodeInfo.h"
-#include "dLineNodeInfo.h"
-#include "dTextureNodeInfo.h"
-#include "dMaterialNodeInfo.h"
-#include "dRigidbodyNodeInfo.h"
-#include "dCollisionNodeInfo.h"
-#include "dCollisionBoxNodeInfo.h"
-#include "dCollisionSphereNodeInfo.h"
-#include "dCollisionConvexHullNodeInfo.h"
-#include "dGeometryNodeSkinModifierInfo.h"
+#include <dSceneStdafx.h>
+#include <dScene.h>
+#include <dRootNodeInfo.h>
+#include <dBoneNodeInfo.h>
+#include <dSceneNodeInfo.h>
+#include <dMeshNodeInfo.h>
+#include <dLineNodeInfo.h>
+#include <dTextureNodeInfo.h>
+#include <dMaterialNodeInfo.h>
+#include <dRigidbodyNodeInfo.h>
+#include <dCollisionNodeInfo.h>
+#include <dCollisionBoxNodeInfo.h>
+#include <dCollisionSphereNodeInfo.h>
+#include <dCollisionConvexHullNodeInfo.h>
+#include <dGeometryNodeSkinModifierInfo.h>
+		 
+
+#include <dTimeTracker.h>
 
 
-#ifdef __USE_DOUBLE_PRECISION__
+
+/*
+#ifdef _NEWTON_USE_DOUBLE
 	#define glMultMatrix(x) glMultMatrixd(x)
 	#define glLoadMatrix(x) glMultMatrixd(x)
-//	#define glGetFloat(x,y) glGetDoublev(x,(GLdouble *)y) 
+	#define glGetFloat(x,y) glGetDoublev(x,(GLdouble *)y) 
 #else
 	#define glMultMatrix(x) glMultMatrixf(x)
 	#define glLoadMatrix(x) glMultMatrixf(x)
 	#define glGetFloat(x,y) glGetFloatv(x,(dFloat  *)y) 
 #endif
+*/
 
+#ifdef _NEWTON_USE_DOUBLE
+inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
+{
+	GLfloat tmp[4] = {params[0], params[1], params[2], params[3]};
+	glMaterialfv (face, pname, &tmp[0]);
+}
+#define glMultMatrix(x) glMultMatrixd(x)
+#define glLoadMatrix(x) glMultMatrixd(x)
+#define glGetFloat(x,y) glGetDoublev(x,(GLdouble *)y) 
+#else 
+#define glMaterialParam glMaterialfv
+#define glMultMatrix(x) glMultMatrixf(x)
+#define glLoadMatrix(x) glMultMatrixf(x)
+#define glGetFloat(x,y) glGetFloatv(x, (GLfloat*)y) 
+#endif
 
 
 #ifndef _MSC_VER

@@ -24,7 +24,7 @@
 
 #include "dgCollisionConvex.h"
 
-#define DG_CONE_SEGMENTS 8
+#define DG_CONE_SEGMENTS 12
 
 
 class dgCollisionCone: public dgCollisionConvex  
@@ -37,6 +37,8 @@ class dgCollisionCone: public dgCollisionConvex
 	private:
 	void Init (dgFloat32 radius, dgFloat32 height);
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
+	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const;
+	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
 
 	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const;
 
@@ -50,17 +52,9 @@ class dgCollisionCone: public dgCollisionConvex
 
 	static dgInt32 CalculateSignature (dgFloat32 radius, dgFloat32 height);
 
+	dgVector m_profile[3];
 	dgFloat32 m_height;
 	dgFloat32 m_radius;
-	dgFloat32 m_sinAngle;
-
-//	dgFloat32 m_delCosTetha;
-//	dgFloat32 m_delSinTetha;
-//	dgFloat32 m_tethaStep;
-//	dgFloat32 m_tethaStepInv;
-
-	dgFloat32 m_amp;
-
 	dgVector m_vertex[DG_CONE_SEGMENTS + 1];
 	static dgInt32 m_shapeRefCount;
 	static dgConvexSimplexEdge m_edgeArray[];

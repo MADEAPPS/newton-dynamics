@@ -139,7 +139,7 @@
 
 
 
-
+/*
 #ifdef _NEWTON_USE_DOUBLE
 	#define glMultMatrix(x) glMultMatrixd(x)
 	#define glLoadMatrix(x) glMultMatrixd(x)
@@ -149,6 +149,7 @@
 	#define glLoadMatrix(x) glMultMatrixf(x)
 	#define glGetFloat(x,y) glGetFloatv(x,(dFloat  *)y) 
 #endif
+*/
 
 
 DSCENE_API void dStringToIntArray (const char* const string, int* const array, int maxCount);

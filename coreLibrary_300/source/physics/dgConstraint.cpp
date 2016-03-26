@@ -60,8 +60,6 @@ void dgConstraint::InitPointParam (dgPointParam& param, dgFloat32 stiffness, con
 }
 
 
-
-
 void dgConstraint::InitInfo (dgConstraintInfo* const info) const
 {
 	info->m_attachBody_0 = GetBody0();

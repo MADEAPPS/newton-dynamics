@@ -175,7 +175,6 @@ class BasicPlayerInputManager: public CustomInputManager
 		//scene->SetCurrent();
 
 		static PrimitiveType proSelection[] = {_SPHERE_PRIMITIVE, _BOX_PRIMITIVE, _CAPSULE_PRIMITIVE, _CYLINDER_PRIMITIVE, _CONE_PRIMITIVE, 
-											    _TAPERED_CAPSULE_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, 
 											   _CHAMFER_CYLINDER_PRIMITIVE, _RANDOM_CONVEX_HULL_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
 
 		PrimitiveType type = PrimitiveType (dRand() % (sizeof (proSelection) / sizeof (proSelection[0])));
@@ -343,6 +342,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_y = 5.0f;
 	location.m_posit.m_z = 0.0f;
 
+	location.m_posit.m_x = 98.710999f;
+	location.m_posit.m_y =-0.96156919f; 
+	location.m_posit.m_z = 27.254711f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
 	BasicPlayerEntity* const player = new BasicPlayerEntity (scene, playerManager, 0.5f, 1.9f, location);

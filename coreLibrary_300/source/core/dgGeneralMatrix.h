@@ -224,8 +224,8 @@ template<class T>
 void dgGeneralMatrix<T>::VectorTimeMatrix(const dgGeneralVector<T> &v, dgGeneralVector<T> &out) const
 {
 	dgAssert(&v != &out);
-	dgAssert(m_rowCount == v.m_colCount);
-	dgAssert(m_colCount == out.m_colCount);
+	dgAssert(dgGeneralMatrix<T>::GetRowCount() == v.m_colCount);
+	dgAssert(dgGeneralMatrix<T>::GetColCount() == out.m_colCount);
 	VectorTimeMatrix(v, out);
 }
 
@@ -250,8 +250,8 @@ template<class T>
 void dgGeneralMatrix<T>::MatrixTimeVector(const dgGeneralVector<T> &v, dgGeneralVector<T> &out) const
 {
      dgAssert(&v != &out);
-     dgAssert(m_rowCount == out.m_colCount);
-     dgAssert(GetColCount() == v.m_colCount);
+     dgAssert(dgGeneralMatrix<T>::GetRowCount() == out.m_colCount);
+     dgAssert(dgGeneralMatrix<T>::GetColCount() == v.m_colCount);
 	 MatrixTimeVector (&v[0], &out[0]);
 }
 
@@ -269,8 +269,8 @@ template<class T>
 void dgGeneralMatrix<T>::MatrixTimeMatrix(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& B)
 {
 	dgAssert(this != &A);
-	dgAssert(m_rowCount == A.m_rowCount);
-	dgAssert(GetColCount() == B.GetColCount());
+	dgAssert(dgGeneralMatrix<T>::GetRowCount() == A.m_rowCount);
+	dgAssert(dgGeneralMatrix<T>::GetColCount() == B.GetColCount());
 	dgAssert(A.GetColCount() == B.m_rowCount);
 
 	const dgInt32 colCount = GetColCount();
@@ -293,7 +293,7 @@ template<class T>
 void dgGeneralMatrix<T>::MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& Bt)
 {
      dgAssert(m_rowCount == A.m_rowCount);
-     dgAssert(GetColCount() == Bt.m_rowCount);
+     dgAssert(dgGeneralMatrix<T>::GetColCount() == Bt.m_rowCount);
      dgAssert(A.GetColCount() == Bt.GetColCount());
 
      dgAssert(this != &A);
@@ -332,8 +332,8 @@ void dgGeneralMatrix<T>::SwapColumns(dgInt32 i, dgInt32 j)
 {
      dgAssert(i >= 0);
      dgAssert(j >= 0);
-     dgAssert(i < GetColCount());
-     dgAssert(j < GetColCount());
+     dgAssert(i < dgGeneralMatrix<T>::GetColCount());
+     dgAssert(j < dgGeneralMatrix<T>::GetColCount());
 	 if (j != i) {
 		 dgGeneralMatrix<T>& me = *this;
 		 for (dgInt32 k = 0; k < m_rowCount; k++) {
@@ -363,9 +363,9 @@ dgSquareMatrix<T>::~dgSquareMatrix()
 template<class T>
 bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVector<T> &b)
 {
-	dgAssert(GetColCount() == GetRowCount());
-	dgAssert(b.GetRowCount() == GetRowCount());
-	dgAssert(x.GetRowCount() == GetRowCount());
+	dgAssert(dgGeneralMatrix<T>::GetColCount() == dgGeneralMatrix<T>::GetRowCount());
+	dgAssert(b.GetRowCount() == dgGeneralMatrix<T>::GetRowCount());
+	dgAssert(x.GetRowCount() == dgGeneralMatrix<T>::GetRowCount());
 
 	x.Copy(b);
 	T* const B = &x[0];
