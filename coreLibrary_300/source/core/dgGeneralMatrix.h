@@ -363,9 +363,9 @@ dgSquareMatrix<T>::~dgSquareMatrix()
 template<class T>
 bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVector<T> &b)
 {
-	dgAssert(GetColCount() == GetRowCount());
-	dgAssert(b.GetRowCount() == GetRowCount());
-	dgAssert(x.GetRowCount() == GetRowCount());
+	dgAssert(dgGeneralMatrix<T>::GetColCount() == dgGeneralMatrix<T>::GetRowCount());
+	dgAssert(b.GetRowCount() == dgGeneralMatrix<T>::GetRowCount());
+	dgAssert(x.GetRowCount() == dgGeneralMatrix<T>::GetRowCount());
 
 	x.Copy(b);
 	T* const B = &x[0];
