@@ -132,8 +132,10 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 			dgVector tmp (m_matrix.UnrotateVector(axis));
 			dgVector d (m_size.DotProduct4(tmp.Abs()) + m_padding);
 			dgVector c (origin.DotProduct4(axis));
-dgAssert (0);
-			extends[index] = ((c - d).PackLow (c + d));
+//			extends[index] = ((c - d).PackLow (c + d));
+			dgVector diff (c - d);
+			dgVector sum (c + d);
+			extends[index] = dgVector (diff.m_x, sum.m_x, diff.m_y, sum.m_y);
 			m_crossAxisAbs[index] = axis.Abs();
 			index ++;
 		}
@@ -142,11 +144,11 @@ dgAssert (0);
 	dgVector tmp;
 	dgVector::Transpose4x4 (m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3], m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3]);
 	dgVector::Transpose4x4 (m_crossAxis[3], m_crossAxis[4], m_crossAxis[5], m_crossAxis[6], m_crossAxis[4], m_crossAxis[5], m_crossAxis[6], m_crossAxis[7]);
-	dgVector::Transpose4x4 (m_crossAxis[6], m_crossAxis[7], m_crossAxis[8], tmp,				m_crossAxis[8], m_crossAxis[8], m_crossAxis[8], m_crossAxis[8]);
+	dgVector::Transpose4x4 (m_crossAxis[6], m_crossAxis[7], m_crossAxis[8], tmp,			m_crossAxis[8], m_crossAxis[8], m_crossAxis[8], m_crossAxis[8]);
 
 	dgVector::Transpose4x4 (m_crossAxisAbs[0], m_crossAxisAbs[1], m_crossAxisAbs[2], m_crossAxisAbs[3], m_crossAxisAbs[0], m_crossAxisAbs[1], m_crossAxisAbs[2], m_crossAxisAbs[3]);
 	dgVector::Transpose4x4 (m_crossAxisAbs[3], m_crossAxisAbs[4], m_crossAxisAbs[5], m_crossAxisAbs[6], m_crossAxisAbs[4], m_crossAxisAbs[5], m_crossAxisAbs[6], m_crossAxisAbs[7]);
-	dgVector::Transpose4x4 (m_crossAxisAbs[6], m_crossAxisAbs[7], m_crossAxisAbs[8], tmp,				    m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8]);
+	dgVector::Transpose4x4 (m_crossAxisAbs[6], m_crossAxisAbs[7], m_crossAxisAbs[8], tmp,				m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8]);
 
 	dgVector::Transpose4x4 (m_extendsMinX[0], m_extendsMaxX[0], tmp, tmp, extends[0], extends[1], extends[2], extends[3]);
 	dgVector::Transpose4x4 (m_extendsMinX[1], m_extendsMaxX[1], tmp, tmp, extends[4], extends[5], extends[6], extends[7]);
