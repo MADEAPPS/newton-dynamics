@@ -88,9 +88,9 @@ endif ()
 option("NEWTON_DEMOS_SANDBOX" "Build demos sandbox" ON)
 
 
+add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages")
 add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages/thirdParty")
 add_subdirectory("${NewtonSDK_SOURCE_DIR}/coreLibrary_300")
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages")
 
 if(NEWTON_DEMOS_SANDBOX)
   add_subdirectory("${NewtonSDK_SOURCE_DIR}/applications/demosSandbox")
