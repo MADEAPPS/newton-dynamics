@@ -997,7 +997,7 @@ static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* 
 
 		// load another ferry bridge
 		bridgeMatrix.m_posit.m_z += 20.0f;
-//		LoadFerryBridge(scene, triggerManager, sceneCollision, "platformBridge.ngd", bridgeMatrix, playGroundBody);
+		LoadFerryBridge(scene, triggerManager, sceneCollision, "platformBridge.ngd", bridgeMatrix, playGroundBody);
 	}
 
 	// finalize adding shapes to this scene collisions 

@@ -40,10 +40,7 @@ class CustomControllerConvexCastPreFilter
 
 	virtual unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
 	{
-		//const NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		//unsigned retValue = NewtonCollisionGetMode(collision);
-		//return retValue;
-		return 1;
+		return NewtonCollisionGetMode(myCollision);
 	}
 
 	private:

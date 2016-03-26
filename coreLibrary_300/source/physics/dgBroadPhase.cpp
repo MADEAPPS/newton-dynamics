@@ -431,7 +431,7 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 
 			dgBody* const body = me->GetBody();
 			if (body) {
-				if (!PREFILTER_RAYCAST(prefilter, body, shape, userData)) {
+				if (!PREFILTER_RAYCAST(prefilter, body, body->m_collision, userData)) {
 					dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, timeToImpact, points, normals, penetration, attributeA, attributeB, maxContacts, threadIndex);
 
 					if (timeToImpact < maxParam) {
@@ -542,7 +542,7 @@ dgInt32 dgBroadPhase::Collide(const dgBroadPhaseNode** stackPool, dgInt32* const
 
 			dgBody* const body = me->GetBody();
 			if (body) {
-				if (!PREFILTER_RAYCAST(prefilter, body, shape, userData)) {
+				if (!PREFILTER_RAYCAST(prefilter, body, body->m_collision, userData)) {
 					dgInt32 count = m_world->Collide(shape, matrix, body->m_collision, body->m_matrix, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
 
 					if (count) {
