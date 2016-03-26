@@ -55,6 +55,7 @@
 		FF084ACE173F1B310059C41D /* SceneCollision.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F6F1556DA2300E7B112 /* SceneCollision.cpp */; };
 		FF084AD0173F1B310059C41D /* SoftBodies.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F711556DA2300E7B112 /* SoftBodies.cpp */; };
 		FF084AD2173F1B310059C41D /* UsingNewtonMeshTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FFF60F771556DA2300E7B112 /* UsingNewtonMeshTool.cpp */; };
+		FF4B5A181CA6F12E004BEC8B /* DynamicRagDoll.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF4B5A171CA6F12E004BEC8B /* DynamicRagDoll.cpp */; };
 		FF50660B173F34B600D01FDF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660A173F34B600D01FDF /* Cocoa.framework */; };
 		FF50660D173F360C00D01FDF /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660C173F360C00D01FDF /* IOKit.framework */; };
 		FF50660F173F36B200D01FDF /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF50660E173F36B200D01FDF /* Carbon.framework */; };
@@ -465,6 +466,8 @@
 		FF3B297417300CF0007E6FEC /* UserPlaneCollision.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UserPlaneCollision.cpp; path = ../../../sdkDemos/toolBox/UserPlaneCollision.cpp; sourceTree = "<group>"; };
 		FF3B297917300D39007E6FEC /* PuckSlide.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PuckSlide.cpp; path = ../../../sdkDemos/demos/PuckSlide.cpp; sourceTree = "<group>"; };
 		FF3B297A17300D39007E6FEC /* SimpleBooleans.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SimpleBooleans.cpp; path = ../../../sdkDemos/demos/SimpleBooleans.cpp; sourceTree = "<group>"; };
+		FF4B5A151CA6F044004BEC8B /* dTimeTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dTimeTracker.h; path = ../../../../../packages/thirdParty/timeTracker/dTimeTracker.h; sourceTree = "<group>"; };
+		FF4B5A171CA6F12E004BEC8B /* DynamicRagDoll.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DynamicRagDoll.cpp; path = ../../../sdkDemos/demos/DynamicRagDoll.cpp; sourceTree = "<group>"; };
 		FF506608173F33DA00D01FDF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = /System/Library/Frameworks/CoreGraphics.framework; sourceTree = "<absolute>"; };
 		FF50660A173F34B600D01FDF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		FF50660C173F360C00D01FDF /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
@@ -1127,6 +1130,7 @@
 				FF7EDAA3188843F000CB1FFA /* ContinueCollision1.cpp */,
 				FFF60F601556DA2300E7B112 /* ConvexApproximation.cpp */,
 				FFF60F611556DA2300E7B112 /* ConvexCast.cpp */,
+				FF4B5A171CA6F12E004BEC8B /* DynamicRagDoll.cpp */,
 				FFF60F621556DA2300E7B112 /* HeavyVehicles.cpp */,
 				FFF60F631556DA2300E7B112 /* HeighFieldCollision.cpp */,
 				FF3B296E17300BD6007E6FEC /* KinematicBodies.cpp */,
@@ -1191,6 +1195,7 @@
 		FFF184B61313103C0077CF7A /* toolBox */ = {
 			isa = PBXGroup;
 			children = (
+				FF4B5A151CA6F044004BEC8B /* dTimeTracker.h */,
 				FF3B297217300CF0007E6FEC /* UserHeightFieldCollision.cpp */,
 				FF3B297417300CF0007E6FEC /* UserPlaneCollision.cpp */,
 				FFF60FA01556DBB400E7B112 /* DebugDisplay.cpp */,
@@ -1659,6 +1664,7 @@
 				FF82375F17C26DE6004C80D4 /* SimpleConvexFracturing.cpp in Sources */,
 				C54AD38E19C319CF00A6C98B /* BasicCar.cpp in Sources */,
 				FF82377617C26F8C004C80D4 /* DirectionalDiffuse.vs in Sources */,
+				FF4B5A181CA6F12E004BEC8B /* DynamicRagDoll.cpp in Sources */,
 				FF82377817C26F8C004C80D4 /* SkinningDirectionalDiffuse.vs in Sources */,
 				FF82377A17C26F8C004C80D4 /* SolidColor.vs in Sources */,
 				FF82377C17C26F8C004C80D4 /* TextureDecal.vs in Sources */,
@@ -1775,6 +1781,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1820,6 +1827,7 @@
 					../../../../../packages/dAnimation,
 					../../../../../packages/dVisualDebuggerServer,
 					../../../../../packages/thirdParty/tinyxml,
+					../../../../../packages/thirdParty/timeTracker,
 					../../../../../packages/thirdParty/glew/include,
 					"../../../../../packages/thirdParty/freetype-2.4.0/include",
 					"../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include",
@@ -1848,6 +1856,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1891,6 +1900,7 @@
 					../../../../../packages/dAnimation,
 					../../../../../packages/dVisualDebuggerServer,
 					../../../../../packages/thirdParty/tinyxml,
+					../../../../../packages/thirdParty/timeTracker,
 					../../../../../packages/thirdParty/glew/include,
 					"../../../../../packages/thirdParty/freetype-2.4.0/include",
 					"../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include",

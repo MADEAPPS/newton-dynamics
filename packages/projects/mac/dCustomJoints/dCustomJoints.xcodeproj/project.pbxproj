@@ -27,6 +27,8 @@
 		FF32E226172E13BF0052D273 /* CustomUpVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1FA172E13BF0052D273 /* CustomUpVector.cpp */; };
 		FF32E228172E13BF0052D273 /* CustomUserBlank.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1FC172E13BF0052D273 /* CustomUserBlank.cpp */; };
 		FF32E22A172E13BF0052D273 /* CustomVehicleControllerManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF32E1FE172E13BF0052D273 /* CustomVehicleControllerManager.cpp */; };
+		FF4B5A1B1CA6F27E004BEC8B /* CustomDynamicRagDollManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF4B5A191CA6F27E004BEC8B /* CustomDynamicRagDollManager.cpp */; };
+		FF4B5A1C1CA6F27E004BEC8B /* CustomDynamicRagDollManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FF4B5A1A1CA6F27E004BEC8B /* CustomDynamicRagDollManager.h */; };
 		FF82375217C269BC004C80D4 /* CustomArcticulatedTransformManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82374A17C269BC004C80D4 /* CustomArcticulatedTransformManager.cpp */; };
 		FF82375317C269BC004C80D4 /* CustomArcticulatedTransformManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FF82374B17C269BC004C80D4 /* CustomArcticulatedTransformManager.h */; };
 		FF82375417C269BC004C80D4 /* CustomHingeActuator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FF82374C17C269BC004C80D4 /* CustomHingeActuator.cpp */; };
@@ -84,6 +86,8 @@
 		FF32E1FA172E13BF0052D273 /* CustomUpVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomUpVector.cpp; path = ../../../dCustomJoints/CustomUpVector.cpp; sourceTree = "<group>"; };
 		FF32E1FC172E13BF0052D273 /* CustomUserBlank.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomUserBlank.cpp; path = ../../../dCustomJoints/CustomUserBlank.cpp; sourceTree = "<group>"; };
 		FF32E1FE172E13BF0052D273 /* CustomVehicleControllerManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomVehicleControllerManager.cpp; path = ../../../dCustomJoints/CustomVehicleControllerManager.cpp; sourceTree = "<group>"; };
+		FF4B5A191CA6F27E004BEC8B /* CustomDynamicRagDollManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomDynamicRagDollManager.cpp; path = ../../../dCustomJoints/CustomDynamicRagDollManager.cpp; sourceTree = "<group>"; };
+		FF4B5A1A1CA6F27E004BEC8B /* CustomDynamicRagDollManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomDynamicRagDollManager.h; path = ../../../dCustomJoints/CustomDynamicRagDollManager.h; sourceTree = "<group>"; };
 		FF82374A17C269BC004C80D4 /* CustomArcticulatedTransformManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomArcticulatedTransformManager.cpp; path = ../../../dCustomJoints/CustomArcticulatedTransformManager.cpp; sourceTree = "<group>"; };
 		FF82374B17C269BC004C80D4 /* CustomArcticulatedTransformManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CustomArcticulatedTransformManager.h; path = ../../../dCustomJoints/CustomArcticulatedTransformManager.h; sourceTree = "<group>"; };
 		FF82374C17C269BC004C80D4 /* CustomHingeActuator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CustomHingeActuator.cpp; path = ../../../dCustomJoints/CustomHingeActuator.cpp; sourceTree = "<group>"; };
@@ -151,6 +155,8 @@
 		FFD2A7A2172E128200114513 /* source */ = {
 			isa = PBXGroup;
 			children = (
+				FF4B5A191CA6F27E004BEC8B /* CustomDynamicRagDollManager.cpp */,
+				FF4B5A1A1CA6F27E004BEC8B /* CustomDynamicRagDollManager.h */,
 				FF32E1D6172E13BF0052D273 /* Custom6DOF.cpp */,
 				FFA78D9B1789A8670056DE1C /* Custom6DOF.h */,
 				FFA78DC71789A8A60056DE1C /* CustomAlloc.cpp */,
@@ -227,6 +233,7 @@
 				FFA78DB81789A8670056DE1C /* CustomJointLibraryStdAfx.h in Headers */,
 				FFA78DB91789A8670056DE1C /* CustomKinematicController.h in Headers */,
 				FFA78DBB1789A8670056DE1C /* CustomPathFollow.h in Headers */,
+				FF4B5A1C1CA6F27E004BEC8B /* CustomDynamicRagDollManager.h in Headers */,
 				FFA78DBC1789A8670056DE1C /* CustomPlayerControllerManager.h in Headers */,
 				FFA78DBD1789A8670056DE1C /* CustomPulley.h in Headers */,
 				FFA78DBE1789A8670056DE1C /* CustomRackAndPinion.h in Headers */,
@@ -305,6 +312,7 @@
 				FF32E20C172E13BF0052D273 /* CustomGear.cpp in Sources */,
 				FF32E20E172E13BF0052D273 /* CustomHinge.cpp in Sources */,
 				FF32E210172E13BF0052D273 /* CustomJoint.cpp in Sources */,
+				FF4B5A1B1CA6F27E004BEC8B /* CustomDynamicRagDollManager.cpp in Sources */,
 				FF32E212172E13BF0052D273 /* CustomJointLibraryStdAfx.cpp in Sources */,
 				FF32E214172E13BF0052D273 /* CustomKinematicController.cpp in Sources */,
 				FF32E216172E13BF0052D273 /* CustomPathFollow.cpp in Sources */,
@@ -384,6 +392,7 @@
 		FFD2A797172E123600114513 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_X86_VECTOR_INSTRUCTIONS = sse4.1;
@@ -405,6 +414,7 @@
 		FFD2A798172E123600114513 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_X86_VECTOR_INSTRUCTIONS = sse4.1;

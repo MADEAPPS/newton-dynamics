@@ -172,6 +172,7 @@
 		FF0A4FF1173160E6005D6C12 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				EXECUTABLE_PREFIX = lib;
@@ -190,6 +191,7 @@
 		FF0A4FF2173160E6005D6C12 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				EXECUTABLE_PREFIX = lib;
