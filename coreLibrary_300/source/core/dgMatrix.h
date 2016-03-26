@@ -169,30 +169,18 @@ DG_INLINE const dgVector& dgMatrix::operator[] (dgInt32  i) const
 
 DG_INLINE dgMatrix dgMatrix::Transpose () const
 {
-#ifdef DG_SCALAR_VECTOR_CLASS
 	return dgMatrix (dgVector (m_front.m_x, m_up.m_x, m_right.m_x, dgFloat32(0.0f)),
 					 dgVector (m_front.m_y, m_up.m_y, m_right.m_y, dgFloat32(0.0f)),
 					 dgVector (m_front.m_z, m_up.m_z, m_right.m_z, dgFloat32(0.0f)),
-					 dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f)));
-#else
-	dgMatrix tmp;
-	dgVector::Transpose4x4 (tmp.m_front, tmp.m_up, tmp.m_right, tmp.m_posit, m_front, m_up, m_right, dgVector::m_wOne); 
-	return tmp;
-#endif
+					 dgVector::m_wOne);
 }
 
 DG_INLINE dgMatrix dgMatrix::Transpose4X4 () const
 {
-#ifdef DG_SCALAR_VECTOR_CLASS
 	return dgMatrix (dgVector (m_front.m_x, m_up.m_x, m_right.m_x, m_posit.m_x),
 					 dgVector (m_front.m_y, m_up.m_y, m_right.m_y, m_posit.m_y),
 					 dgVector (m_front.m_z, m_up.m_z, m_right.m_z, m_posit.m_z),
 					 dgVector (m_front.m_w, m_up.m_w, m_right.m_w, m_posit.m_w));
-#else 
-	dgMatrix tmp;
-	dgVector::Transpose4x4 (tmp.m_front, tmp.m_up, tmp.m_right, tmp.m_posit, m_front, m_up, m_right, m_posit); 
-	return tmp;
-#endif
 }
 
 DG_INLINE dgVector dgMatrix::RotateVector (const dgVector &v) const
