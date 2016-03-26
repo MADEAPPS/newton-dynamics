@@ -1943,7 +1943,7 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 		dgFloat32 num = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar();
 		if ((num <= dgFloat32(1.0e-5f)) && (tacc <= timestep)) {
 			// bodies collide at time tacc, but we do not set it yet
-			dgVector step(relVeloc.Scale4(tacc));
+			//dgVector step(relVeloc.Scale4(tacc));
 			m_proxy->m_timestep = tacc;
 			m_proxy->m_closestPointBody0 = m_closestPoint0;
 			m_proxy->m_closestPointBody1 = m_closestPoint1;
