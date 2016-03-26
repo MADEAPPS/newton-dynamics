@@ -1028,7 +1028,11 @@ class dgVector
 
 	DG_INLINE dgVector Floor () const
 	{
-		return dgVector (_mm_floor_pd(m_typeLow), _mm_floor_pd(m_typeHigh)); 
+		#ifdef DG_SSE4_INSTRUCTIONS_SET
+			return dgVector (_mm_floor_pd(m_typeLow), _mm_floor_pd(m_typeHigh)); 
+		#else 
+			return dgVector (dgFloor (m_x), dgFloor (m_y), dgFloor (m_z), dgFloor (m_w)); 
+		#endif
 	}
 
 	DG_INLINE dgVector CrossProduct4 (const dgVector& A, const dgVector& B) const
@@ -1384,12 +1388,17 @@ class dgVector
 
 	DG_INLINE dgVector Floor () const
 	{
-		//dgVector ret (_mm_floor_ps(m_type));
-		//dgAssert (ret.m_f[0] == dgFloor(m_f[0])); 
-		//dgAssert (ret.m_f[1] == dgFloor(m_f[1]));
-		//dgAssert (ret.m_f[2] == dgFloor(m_f[2]));
-		//dgAssert (ret.m_f[3] == dgFloor(m_f[3]));
-		return _mm_floor_ps(m_type);
+		#ifdef DG_SSE4_INSTRUCTIONS_SET
+			return _mm_floor_ps(m_type);
+		#else
+			dgVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
+			dgVector ret (truncated - (dgVector::m_one & (*this < truncated)));
+			dgAssert (ret.m_f[0] == dgFloor(m_f[0]));
+			dgAssert (ret.m_f[1] == dgFloor(m_f[1]));
+			dgAssert (ret.m_f[2] == dgFloor(m_f[2]));
+			dgAssert (ret.m_f[3] == dgFloor(m_f[3]));
+			return ret;
+		#endif
 	}
 
 	DG_INLINE dgVector Sqrt () const
