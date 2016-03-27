@@ -115,7 +115,6 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	}
 	m_castingShape = NewtonCreateConvexHull(world, steps * 2, &convexPoints[0][0].m_x, sizeof (dVector), 0.0f, 0, NULL); 
 
-
 	m_supportShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 0));
 	m_upperBodyShape = NewtonCompoundCollisionGetCollisionFromNode (shape, NewtonCompoundCollisionGetNodeByIndex (shape, 1));
 

@@ -253,6 +253,7 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		class DriveTrain;
 		class DriveTrainTire;
+		class DriveTrainDualCoupling;
 		class DriveTrainDifferentialGear;
 		class DriveTrainDualDifferential;
 		class DriveTrainSingleDifferential;

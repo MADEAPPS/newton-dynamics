@@ -533,18 +533,20 @@ class CustomVehicleController::EngineController::DriveTrain: public CustomAlloc
 
 	void BuildMassMatrix ()
 	{
-		DriveTrain* nodeList[256];
-		dComplentaritySolver::dJacobian rowI[256];
-		dComplentaritySolver::dJacobian rowJ[256];
+		const int size = 256;
+		DriveTrain* nodeList[size];
+		dComplentaritySolver::dJacobian rowI[size];
+		dComplentaritySolver::dJacobian rowJ[size];
 
-		int dofCount = 0;
+		int dofSize = 0;
 		int nodeCount = GetNodeArray(nodeList);
 
 		for (int i = 0; i < nodeCount; i ++) {
 			nodeList[i]->m_index = i;
-			nodeList[i]->m_dofBase = dofCount;
-			dofCount += nodeList[i]->GetDegreeOfFredom ();
+			nodeList[i]->m_dofBase = dofSize;
+			dofSize += nodeList[i]->GetDegreeOfFredom ();
 		}
+		dAssert (size > dofSize);
 
 		int y = 0;
 		dFloat* const massMatrix = GetMassMatrix();
@@ -555,7 +557,7 @@ class CustomVehicleController::EngineController::DriveTrain: public CustomAlloc
 				int x = 0;
 				memset (rowI, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
 				nodeA->GetRow(rowI, ii);
-				dFloat* const row = &massMatrix[y * dofCount];
+				dFloat* const row = &massMatrix[y * dofSize];
 				for (int j = 0; j < nodeCount - 1; j ++) {
 					DriveTrain* const nodeB = nodeList[j];
 					int nodeBdof = nodeB->GetDegreeOfFredom();
@@ -576,12 +578,12 @@ class CustomVehicleController::EngineController::DriveTrain: public CustomAlloc
 			}
 		}
 
-		for (int i = 0; i < dofCount; i++) {
-			dFloat* const rowI = &massMatrix[i * dofCount];
+		for (int i = 0; i < dofSize; i++) {
+			dFloat* const rowI = &massMatrix[i * dofSize];
 			for (int j = 0; j <= i; j++) {
 
 				dFloat s = 0.0f;
-				const dFloat* const rowJ = &massMatrix[j * dofCount];
+				const dFloat* const rowJ = &massMatrix[j * dofSize];
 				for (int k = 0; k < j; k++) {
 					s += rowI[k] * rowJ[k];
 				}
@@ -628,10 +630,9 @@ class CustomVehicleController::EngineController::DriveTrain: public CustomAlloc
 		for (int i = 0; i < nodesCount - 1; i ++) {
 			DriveTrain* const node = nodeArray[i];
 			node->CalculateRightSide(controller, timestep, b);
-//			dofSize += node->m_dofBase;
 			dofSize += node->GetDegreeOfFredom();
 		}
-
+		dAssert (size > dofSize);
 		dFloat* const massMatrix = GetMassMatrix();
 		Solve (dofSize, dofSize, massMatrix, b, x);
 
@@ -786,6 +787,16 @@ class CustomVehicleController::EngineController::DriveTrainTire: public DriveTra
 	dComplentaritySolver::dJacobian m_invMassJt01[2];
 	dComplentaritySolver::dJacobian m_invMassJt10[2];
 	BodyPartTire* m_tire;
+};
+
+class CustomVehicleController::EngineController::DriveTrainDualCoupling: public DriveTrain
+{
+	public:
+	DriveTrainDualCoupling (const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel0, const DifferentialAxel& axel1, DriveTrain* const engine)
+		:DriveTrain(invInertia, invMass, engine)
+	{
+
+	}
 };
 
 class CustomVehicleController::EngineController::DriveTrainDifferentialGear: public DriveTrain

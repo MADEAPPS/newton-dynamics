@@ -1363,7 +1363,7 @@ void SuperCar (DemoEntityManager* const scene)
 		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
 		location2.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
-		vehicle2->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
+		vehicle2->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
 		u -= 0.01f;
 	}
 
