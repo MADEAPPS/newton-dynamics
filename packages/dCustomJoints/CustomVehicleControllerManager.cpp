@@ -371,8 +371,6 @@ void CustomVehicleController::BodyPartTire::SetBrakeTorque(dFloat torque)
 }
 
 /*
-
-
 void CustomVehicleController::BodyPartEngine::SetGear(int gear)
 {
 	m_gearTimer = 30;
@@ -414,8 +412,6 @@ void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
 
 	m_peakPowerTorque = m_peakHorsePower / m_rpmAtPeakHorsePower;
 
-	//m_idleTorque = m_peakTorque * 0.5f;
-	//m_peakPowerTorque = m_peakTorque * 0.5f;
 	dAssert(m_rpmAtIdleTorque > 0.0f);
 	dAssert(m_rpmAtIdleTorque < m_rpmAtPeakHorsePower);
 	dAssert(m_rpmAtPeakTorque < m_rpmAtPeakHorsePower);
@@ -427,56 +423,6 @@ void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
 	dAssert(m_redLineTorque > 0.0f);
 	dAssert((m_peakTorque * m_rpmAtPeakTorque) < m_peakHorsePower);
 }
-
-
-/*
-class CustomVehicleController::EngineController::DriveTrainSingleDifferential: public DriveTrain
-{
-	public:
-	DriveTrainSingleDifferential (const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel)
-		:DriveTrain(invInertia, invMass)
-	{
-		dFloat gearInvMass = invMass * 4.0f;
-		dVector gearInvInertia (invInertia.Scale (4.0f));
-		memset (m_smoothOmega, 0, sizeof (m_smoothOmega));
-		m_child = new DriveTrainDifferentialGear (gearInvInertia, gearInvMass, axel, this);
-	}
-
-	virtual dFloat* GetMassMatrix()
-	{
-		return &invMassMatrix[0][0];
-	}
-
-	virtual void RebuildEngine ()
-	{
-		m_child->m_massInv = m_massInv * 4.0f;
-		m_child->m_inertiaInv = m_inertiaInv.Scale(4.0f);
-
-		memset(invMassMatrix, 0, sizeof (invMassMatrix));
-		BuildMassMatrix();
-	}
-
-	virtual void Integrate(EngineController* const controller, dFloat timestep)
-	{
-		DriveTrain::Integrate(controller, timestep);
-		m_omega.m_x = dClamp (m_omega.m_x, dFloat(0.0f), controller->m_info.m_rpmAtReadLineTorque);
-
-		dFloat average = m_omega.m_x; 
-		for (int i = 1; i < sizeof (m_smoothOmega)/sizeof (m_smoothOmega[0]); i ++) {
-			average += m_smoothOmega[i];
-			m_smoothOmega[i - 1] = m_smoothOmega[i];
-		}
-		m_smoothOmega[3] = m_omega.m_x;
-		m_omega.m_x = average * dFloat (1.0f / (sizeof (m_smoothOmega)/sizeof (m_smoothOmega[0])));
-
-		dTrace (("engine Omega: %f\n", m_omega.m_x));
-	}
-
-	dFloat invMassMatrix[6][6];
-	dFloat m_smoothOmega[4];
-};
-
-*/
 
 
 CustomVehicleController::EngineController::DriveTrain::DriveTrain(const dVector& invInertia, dFloat invMass, DriveTrain* const parent)
@@ -955,8 +901,6 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTor
 }
 
 
-
-
 CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:Controller(controller)
 	,m_info(info)
@@ -1090,14 +1034,6 @@ void CustomVehicleController::EngineController::InitEngineTorqueCurve()
 	torqueTable[3] = m_info.m_peakPowerTorque;
 	torqueTable[4] = m_info.m_redLineTorque;
 
-//	if (m_info.m_idleTorque * 0.25f > m_info.m_redLineTorque) {
-//		torqueTable[4] = m_info.m_idleTorque * 0.25f;
-//	}
-//	const int count = sizeof (rpsTable) / sizeof (rpsTable[0]);
-//	for (int i = 0; i < count; i++) {
-//		rpsTable[i] /= m_info.m_crownGearRatio;
-//		torqueTable[i] *= m_info.m_crownGearRatio;
-//	}
 	m_torqueRPMCurve.InitalizeCurve(sizeof (rpsTable) / sizeof (rpsTable[0]), rpsTable, torqueTable);
 	m_info.m_minRPM = m_info.m_rpmAtIdleTorque * D_VEHICLE_MIN_RPM_FACTOR;
 
@@ -1578,8 +1514,6 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	m_localFrame = vehicleFrame;
 	m_localFrame.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 	m_forceAndTorque = forceAndTorque;
-
-	
 	
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = manager->GetWorld();
@@ -1598,8 +1532,6 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	// assume gravity is 10.0f, and a speed of 60 miles/hours
 	SetAerodynamicsDownforceCoefficient(2.0f * 10.0f, 60.0f * 0.447f);
 
-//	m_engine = NULL;
-//	m_cluthControl = NULL;
 	m_brakesControl = NULL;
 	m_engineControl = NULL;
 	m_handBrakesControl = NULL;
@@ -1622,16 +1554,11 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 
 void CustomVehicleController::Cleanup()
 {
-//	SetClutch(NULL);
 	SetBrakes(NULL);
 	SetEngine(NULL);
 	SetSteering(NULL);
 	SetHandBrakes(NULL);
 	SetContactFilter(NULL);
-
-//	if (m_engine) {
-//		delete m_engine;
-//	}
 }
 
 const CustomVehicleController::BodyPart* CustomVehicleController::GetChassis() const
