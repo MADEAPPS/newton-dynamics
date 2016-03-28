@@ -675,7 +675,7 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Integrate(Engi
 	m_smoothOmega[3] = m_omega.m_x;
 	m_omega.m_x = average * dFloat(1.0f / (sizeof (m_smoothOmega) / sizeof (m_smoothOmega[0])));
 
-	dTrace(("engine Omega: %f\n", m_omega.m_x));
+//	dTrace(("engine Omega: %f\n", m_omega.m_x));
 }
 
 
