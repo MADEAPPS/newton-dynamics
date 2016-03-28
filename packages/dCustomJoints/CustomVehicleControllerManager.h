@@ -575,6 +575,7 @@ class CustomVehicleController: public CustomControllerBase
 
 class CustomVehicleControllerManager: public CustomControllerManager<CustomVehicleController> 
 {
+	class TireFilter;
 	public:
 	CUSTOM_JOINTS_API CustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const otherMaterials);
 	CUSTOM_JOINTS_API virtual ~CustomVehicleControllerManager();

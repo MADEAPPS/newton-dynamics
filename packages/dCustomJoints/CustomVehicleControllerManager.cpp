@@ -74,6 +74,25 @@ class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconj
 */
 
 
+class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexCastPreFilter
+{
+	public:
+	TireFilter(const NewtonBody* const tire, const NewtonBody* const vehicle)
+		:CustomControllerConvexCastPreFilter(tire)
+		, m_vehicle(vehicle)
+	{
+	}
+
+	unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
+	{
+		dAssert(body != m_me);
+		return (body != m_vehicle) ? 1 : 0;
+	}
+
+	const NewtonBody* m_vehicle;
+};
+
+
 void CustomVehicleController::dInterpolationCurve::InitalizeCurve(int points, const dFloat* const steps, const dFloat* const values)
 {
 	m_count = points;
@@ -979,7 +998,6 @@ void CustomVehicleController::EngineController::CalculateCrownGear()
 {
 	dAssert(m_info.m_vehicleTopSpeed >= 0.0f);
 	dAssert(m_info.m_vehicleTopSpeed < 100.0f);
-
 
 	DriveTrain* nodeArray[256];
 	int nodesCount = m_engine->GetNodeArray(nodeArray);
@@ -1893,26 +1911,11 @@ int CustomVehicleControllerManager::OnContactGeneration (const CustomVehicleCont
 	return count;
 }
 
+
+
+
 void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTire* const tire) const
 {
-	class TireFilter: public CustomControllerConvexCastPreFilter
-	{
-		public:
-		TireFilter(const NewtonBody* const tire, const NewtonBody* const vehicle)
-			:CustomControllerConvexCastPreFilter(tire)
-			,m_vehicle(vehicle)
-		{
-		}
-
-		unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
-		{
-			dAssert(body != m_me);
-			return (body != m_vehicle) ? 1 : 0;
-		}
-
-		const NewtonBody* m_vehicle;
-	};
-
 	dMatrix tireMatrix;
 	dMatrix chassisMatrix;
 
@@ -2111,20 +2114,20 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 
 		m_chassis.ApplyDownForce ();
 
-		if (m_engineControl) {
-			m_engineControl->Update(timestep);
-		}
-
-		if (m_steeringControl) {
-			m_steeringControl->Update(timestep);
-		}
-
 		if (m_brakesControl) {
 			m_brakesControl->Update(timestep);
 		}
 
 		if (m_handBrakesControl) {
 			m_handBrakesControl->Update(timestep);
+		}
+
+		if (m_steeringControl) {
+			m_steeringControl->Update(timestep);
+		}
+
+		if (m_engineControl) {
+			m_engineControl->Update(timestep);
 		}
 
 		if (ControlStateChanged()) {
