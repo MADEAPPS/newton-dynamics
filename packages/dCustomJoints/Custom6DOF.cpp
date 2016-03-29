@@ -250,9 +250,9 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
         } else {
             dMatrix basis (dGrammSchmidt (dVector (quat.m_q1, quat.m_q2, quat.m_q3, 0.0f)));
 
-			dVector p0 (matrix0[3] + basis[1].Scale (MIN_JOINT_PIN_LENGTH));
-			dVector p1 (matrix0[3] + rotation.RotateVector(basis[1].Scale (MIN_JOINT_PIN_LENGTH)));
-			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &basis[2][0]);
+			dVector q0 (matrix0[3] + basis[1].Scale (MIN_JOINT_PIN_LENGTH));
+			dVector q1 (matrix0[3] + rotation.RotateVector(basis[1].Scale (MIN_JOINT_PIN_LENGTH)));
+			NewtonUserJointAddLinearRow (m_joint, &q0[0], &q1[0], &basis[2][0]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 
 			//dVector q0 (matrix0[3] + basis[0].Scale (MIN_JOINT_PIN_LENGTH));

@@ -405,8 +405,8 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 
 			for (int i = 1; i < contactCount; i ++) {
 				dVector n0 (info[i-1].m_normal);
-				for (int j = 0; j < i; j ++) {
-					dVector n1 (info[j].m_normal);
+				for (int k = 0; k < i; k ++) {
+					dVector n1 (info[k].m_normal);
 					if ((n0 % n1) > 0.9999f) {
 						info[i] = info[contactCount - 1];
 						i --;
