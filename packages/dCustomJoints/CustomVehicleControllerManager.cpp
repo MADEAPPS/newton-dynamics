@@ -698,12 +698,17 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Integrate(Engi
 }
 
 
-void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineController* const controller, const dFloat engineTorque, dFloat timestep)
+void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineController* const controller, dFloat engineTorque, dFloat timestep)
 {
-	const int size = 18;
+	const int size = 6;
 	DriveTrain* nodeArray[size];
 	dFloat b[size];
 	dFloat x[size];
+
+static int xxx;
+xxx ++;
+if (xxx > 1000)
+engineTorque = 100.0f;
 
 	int dofSize = 0;
 	int nodesCount = GetNodeArray(nodeArray);
