@@ -710,8 +710,6 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Integrate(Engi
 	}
 	m_smoothOmega[3] = m_omega.m_x;
 	m_omega.m_x = average * dFloat(1.0f / (sizeof (m_smoothOmega) / sizeof (m_smoothOmega[0])));
-
-//	dTrace(("engine Omega: %f\n", m_omega.m_x));
 }
 
 
@@ -744,8 +742,8 @@ const int size = 6;
 	int clutchIndex = dofSize - 1;
 	dFloat clutchTorque = GetClutchTorque(controller);
 	if (dAbs(x[clutchIndex]) > clutchTorque) {
-		dFloat frictionTorque = dClamp (clutchTorque, -clutchTorque, clutchTorque);
-		x[clutchIndex] = clutchTorque;
+		dFloat frictionTorque = dClamp (x[clutchIndex], -clutchTorque, clutchTorque);
+		x[clutchIndex] = frictionTorque;
 		for (int i = 0; i < clutchIndex; i++) {
 			b[i] -= massMatrix[i * dofSize + clutchIndex] * frictionTorque;
 		}
@@ -817,32 +815,12 @@ CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrai
 	SetInvMassJt();
 }
 
-/*
-void CustomVehicleController::EngineController::DriveTrainDifferentialGear::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide)
-{
-//	dFloat gearRatio = controller->GetGearRatio();
-//	dAssert(gearRatio >= 0.0f);
-//	dFloat relativeOmega = m_omega % m_J01[1].m_angular * gearRatio + m_parent->m_omega % m_J10[1].m_angular;
-	dFloat relativeOmega = m_omega % m_J01[1].m_angular + m_parent->m_omega % m_J10[1].m_angular;
-	dFloat torqueAccel = m_torque % m_invMassJt01[1].m_angular + m_parent->m_torque % m_invMassJt10[1].m_angular;
-
-	rightSide[m_dofBase + 0] = 0.0f;
-	rightSide[m_dofBase + 1] = -(torqueAccel + relativeOmega / timestep);
-}
-*/
 
 CustomVehicleController::EngineController::DriveTrainFrictionGear::DriveTrainFrictionGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel)
 	:DriveTrainDifferentialGear(invInertia, invMass, parent, axel)
 {
 }
 
-/*
-void CustomVehicleController::EngineController::DriveTrainFrictionGear::CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide)
-{
-	rightSide[m_dofBase + 0] = 0.0f;
-	rightSide[m_dofBase + 1] = -(m_omega % m_J01[1].m_angular + m_parent->m_omega % m_J10[1].m_angular) / timestep;
-}
-*/
 
 CustomVehicleController::EngineController::DriveTrainFrictionPad::DriveTrainFrictionPad(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel)
 	:DriveTrain(invInertia, invMass, parent)
@@ -862,13 +840,6 @@ CustomVehicleController::EngineController::DriveTrainFrictionPad::DriveTrainFric
 	SetInvMassJt();
 }
 
-/*
-void CustomVehicleController::EngineController::DriveTrainFrictionPad::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide)
-{
-	rightSide[m_dofBase + 0] = 0.0f;
-	rightSide[m_dofBase + 1] = -(m_omega % m_J01[1].m_angular + m_parent->m_omega % m_J10[1].m_angular) / timestep;
-}
-*/
 
 CustomVehicleController::EngineController::DriveTrainTire::DriveTrainTire(BodyPartTire* const tire, DriveTrain* const parent)
 	:DriveTrain(dVector(0.0f, 0.0f, 0.0f, 0.0f), 0.0f, parent)
@@ -901,26 +872,6 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetPartMasses (c
 	NewtonBodyGetInvMass(body, &tireInvMass, &tireInvInertia.m_x, &tireInvInertia.m_y, &tireInvInertia.m_z);
 	DriveTrain::SetPartMasses (tireInvInertia, tireInvMass);
 }
-
-/*
-void CustomVehicleController::EngineController::DriveTrainTire::CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide)
-{
-	dMatrix matrix;
-	dVector omega;
-
-	NewtonBody* const body = m_tire->GetBody();
-	NewtonBodyGetOmega(body, &omega[0]);
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
-
-	omega = matrix.UnrotateVector(omega);
-	dFloat tireAngularSpeed = omega % m_J01[1].m_angular;
-	dFloat diffAngularSpeed = m_parent->m_omega % m_J10[1].m_angular;
-	dFloat ratio = -(tireAngularSpeed + diffAngularSpeed) / timestep;
-
-	rightSide[m_dofBase + 0] = 0.0f;
-	rightSide[m_dofBase + 1] = (dAbs (ratio) < 1.e-12f) ? 0.0f : ratio;
-}
-*/
 
 void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorque(EngineController* const controller)
 {

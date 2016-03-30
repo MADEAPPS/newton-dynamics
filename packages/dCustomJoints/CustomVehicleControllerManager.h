@@ -322,7 +322,6 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void RebuildEngine (const dVector& invInertia, dFloat invMass) {dAssert (0);}
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
 			
-					
 			void SetInvMassJt();
 			void BuildMassMatrix ();
 			void ReconstructInvMassJt ();
@@ -388,21 +387,19 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel);
 			DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
-//			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 		};
 
 		class DriveTrainFrictionGear: public DriveTrainDifferentialGear
 		{
 			public:
 			DriveTrainFrictionGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel);
-//			virtual void CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 		};
 
 		class DriveTrainFrictionPad: public DriveTrain
 		{
 			public:
 			DriveTrainFrictionPad (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel);
-//			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
+
 		};
 
 		class DriveTrainTire: public DriveTrain
@@ -415,8 +412,6 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void SetPartMasses (const dVector& invInertia, dFloat invMass);
 			virtual void Integrate(EngineController* const controller, dFloat timestep) {};
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
-//			virtual void CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide);
-
 			BodyPartTire* m_tire;
 		};
 
