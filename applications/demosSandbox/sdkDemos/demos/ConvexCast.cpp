@@ -117,7 +117,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 
 		dMatrix alignMatrix (dRollMatrix(3.141592f * 90.0f / 180.0f));
 		for (int i = 0; i < m_count; i ++) {
-			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
+			shapeSize = dVector (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
 #if 1
 			m_castingShapeArray[i] = CreateConvexCollision (world, &alignMatrix[0][0], shapeSize, castSelection[i], materialID);
 #else

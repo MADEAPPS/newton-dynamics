@@ -257,8 +257,8 @@ void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* 
 	DEBUG_DRAW_MODE mode = (DEBUG_DRAW_MODE) ((intptr_t)userData);
 	
 	if (mode == m_lines) {
-		int i = vertexCount - 1;
-		dVector p0 (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
+		int index = vertexCount - 1;
+		dVector p0 (faceVertec[index * 3 + 0], faceVertec[index * 3 + 1], faceVertec[index * 3 + 2]);
 		for (int i = 0; i < vertexCount; i ++) {
 			dVector p1 (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
@@ -274,7 +274,7 @@ void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* 
 		normal = normal.Scale (1.0f / dSqrt (normal % normal));
 		glNormal3f(normal.m_x, normal.m_y, normal.m_z);
 		for (int i = 2; i < vertexCount; i ++) {
-			dVector p2 (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
+			p2 = dVector (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
 			glVertex3f (p2.m_x, p2.m_y, p2.m_z);

@@ -289,15 +289,15 @@ class PassiveRagDollManager: public CustomArticulaledTransformManager
 		// for debugging
 		//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
-		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, dGetIdentityMatrix());
+		CustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddBone (rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
-		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBone), bone);
+		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBone), bone0);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
 		CustomArticulatedTransformController::dSkeletonBone* parentBones[32];
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = bone;
+			parentBones[stackIndex] = bone0;
 			childEntities[stackIndex] = child;
 			stackIndex ++;
 		}

@@ -476,20 +476,20 @@ DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dF
 	dFloat* const normal = m_normal;
 	dFloat* const uv = m_uv;
 
-	int index = 0;
+	int index0 = 0;
 	for (int z = 0; z < size; z ++) {
 		for (int x = 0; x < size; x ++) {
-			vertex[index * 3 + 0] = x * cellSize;
-			vertex[index * 3 + 1] = elevationMap[z][x];
-			vertex[index * 3 + 2] = z * cellSize;
+			vertex[index0 * 3 + 0] = x * cellSize;
+			vertex[index0 * 3 + 1] = elevationMap[z][x];
+			vertex[index0 * 3 + 2] = z * cellSize;
 
-			normal[index * 3 + 0] = normalMap[z][x].m_x;
-			normal[index * 3 + 1] = normalMap[z][x].m_y;
-			normal[index * 3 + 2] = normalMap[z][x].m_z;
+			normal[index0 * 3 + 0] = normalMap[z][x].m_x;
+			normal[index0 * 3 + 1] = normalMap[z][x].m_y;
+			normal[index0 * 3 + 2] = normalMap[z][x].m_z;
 
-			uv[index * 2 + 0] = x * texelsDensity;
-			uv[index * 2 + 1] = z * texelsDensity;
-			index ++;
+			uv[index0 * 2 + 0] = x * texelsDensity;
+			uv[index0 * 2 + 1] = z * texelsDensity;
+			index0 ++;
 		}
 	}
 
@@ -507,28 +507,26 @@ DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dF
 			tile->m_textureName = "grassanddirt.tga";
 			tile->m_textureHandle = LoadTexture(tile->m_textureName.GetStr());
 
-			int index = 0;
+			int index1 = 0;
 			int x1 = x + tileSize;
 			int z1 = z + tileSize;
-			for (int z0 = z; z0 < z1; z0 ++) {
-				for (int x0 = x; x0 < x1; x0 ++) {
-					int i0 = x0 + 0 + (z0 + 0) * size;
-					int i1 = x0 + 1 + (z0 + 0) * size;
-					int i2 = x0 + 1 + (z0 + 1) * size;
-					int i3 = x0 + 0 + (z0 + 1) * size;
+			for (int z2 = z; z2 < z1; z2 ++) {
+				for (int x2 = x; x2 < x1; x2 ++) {
+					int i0 = x2 + 0 + (z2 + 0) * size;
+					int i1 = x2 + 1 + (z2 + 0) * size;
+					int i2 = x2 + 1 + (z2 + 1) * size;
+					int i3 = x2 + 0 + (z2 + 1) * size;
 
-					indexes[index + 0] = i0;
-					indexes[index + 1] = i2;
-					indexes[index + 2] = i1;
+					indexes[index1 + 0] = i0;
+					indexes[index1 + 1] = i2;
+					indexes[index1 + 2] = i1;
 
-					indexes[index + 3] = i0;
-					indexes[index + 4] = i3;
-					indexes[index + 5] = i2;
-					index += 6;
+					indexes[index1 + 3] = i0;
+					indexes[index1 + 4] = i3;
+					indexes[index1 + 5] = i2;
+					index1 += 6;
 				}
 			}
-
-			index*=1;
 		}
 	}
 	delete[] normals; 

@@ -245,7 +245,7 @@ freq *= 0.5f;
 		map[size-1][size-1] = Guassian(f);
 		for (int frequency = size - 1; frequency > 1; frequency = frequency / 2 ) {
 			//dFloat f = pow (dFloat (frequency) * elevationScale, 1.0f + roughness);
-			dFloat f = GetElevation (frequency, elevationScale, maxElevation, minElevation, roughness);
+			dFloat h = GetElevation (frequency, elevationScale, maxElevation, minElevation, roughness);
 
 			for(int y0 = 0; y0 < (size - frequency); y0 += frequency) {
 				int y1 = y0 + frequency / 2;
@@ -255,20 +255,20 @@ freq *= 0.5f;
 					int x1 = x0 + frequency / 2;
 					int x2 = x0 + frequency;
 
-					map[y1][x1] = (map[y0][x0] + map[y0][x2] + map[y2][x0] + map[y2][x2]) * 0.25f + Guassian(f);
+					map[y1][x1] = (map[y0][x0] + map[y0][x2] + map[y2][x0] + map[y2][x2]) * 0.25f + Guassian(h);
 
-					map[y0][x1] = (map[y0][x0] + map[y0][x2]) * 0.5f + Guassian(f);
-					map[y2][x1] = (map[y2][x0] + map[y2][x2]) * 0.5f + Guassian(f);
+					map[y0][x1] = (map[y0][x0] + map[y0][x2]) * 0.5f + Guassian(h);
+					map[y2][x1] = (map[y2][x0] + map[y2][x2]) * 0.5f + Guassian(h);
 
-					map[y1][x0] = (map[y0][x0] + map[y2][x0]) * 0.5f + Guassian(f);
-					map[y1][x2] = (map[y0][x2] + map[y2][x2]) * 0.5f + Guassian(f);
+					map[y1][x0] = (map[y0][x0] + map[y2][x0]) * 0.5f + Guassian(h);
+					map[y1][x2] = (map[y0][x2] + map[y2][x2]) * 0.5f + Guassian(h);
 
 					// this trick eliminate the creases 
 					#ifdef RE_SAMPLE_CORNER
-						map[y0][x0] = (map[y0][x1] + map[y1][x0]) * 0.5f + Guassian(f);
-						map[y0][x2] = (map[y0][x1] + map[y1][x2]) * 0.5f + Guassian(f);
-						map[y2][x0] = (map[y1][x0] + map[y2][x1]) * 0.5f + Guassian(f);
-						map[y2][x2] = (map[y2][x1] + map[y1][x2]) * 0.5f + Guassian(f);
+						map[y0][x0] = (map[y0][x1] + map[y1][x0]) * 0.5f + Guassian(h);
+						map[y0][x2] = (map[y0][x1] + map[y1][x2]) * 0.5f + Guassian(h);
+						map[y2][x0] = (map[y1][x0] + map[y2][x1]) * 0.5f + Guassian(h);
+						map[y2][x2] = (map[y2][x1] + map[y1][x2]) * 0.5f + Guassian(h);
 
 //						map[y0][x1] = (map[y0][x0] + map[y0][x2]) * 0.5f + Guassian(f);
 //						map[y2][x1] = (map[y2][x0] + map[y2][x2]) * 0.5f + Guassian(f);

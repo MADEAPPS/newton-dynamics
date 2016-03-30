@@ -82,9 +82,9 @@ class FractureEffect: public dList<FractureAtom>
 		textureMatrix[1][1] = 1.0f / size.m_y;
 
 		// Get the volume of the original mesh
-		NewtonCollision* const collision = NewtonCreateConvexHullFromMesh (m_world, mesh, 0.0f, 0);
-		dFloat volume = NewtonConvexCollisionCalculateVolume (collision);
-		NewtonDestroyCollision(collision);
+		NewtonCollision* const collision1 = NewtonCreateConvexHullFromMesh (m_world, mesh, 0.0f, 0);
+		dFloat volume = NewtonConvexCollisionCalculateVolume (collision1);
+		NewtonDestroyCollision(collision1);
 
 		// now we call create we decompose the mesh into several convex pieces 
 		NewtonMesh* const debriMeshPieces = NewtonMeshCreateVoronoiConvexDecomposition (m_world, count, &points[0].m_x, sizeof (dVector), interiorMaterial, &textureMatrix[0][0]);

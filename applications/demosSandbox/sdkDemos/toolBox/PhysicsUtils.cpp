@@ -1168,14 +1168,14 @@ NewtonMesh* LoadNewtonMesh (NewtonWorld* const world, const char* const name)
 	NewtonMesh* mesh = NULL;
 	FILE* const file = fopen (fileName, "rb");
 	if (file) {
-		char name[2048];
-		fread (name, strlen(D_MESH_HEADER), 1, file);
-		if (!strncmp (name, D_MESH_HEADER, strlen(D_MESH_HEADER))) {
+		char skipName[2048];
+		fread (skipName, strlen(D_MESH_HEADER), 1, file);
+		if (!strncmp (skipName, D_MESH_HEADER, strlen(D_MESH_HEADER))) {
 			int size;
 			fread (&size, sizeof (int), 1, file);
 			dAssert (size < int (sizeof (name)));
-			fread (name, size, 1, file);
-			name[size] = 0;
+			fread (skipName, size, 1, file);
+			skipName[size] = 0;
 
 			mesh = NewtonMeshCreateFromSerialization (world, DemoEntityManager::DeserializeFile, file);
 		}

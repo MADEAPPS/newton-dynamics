@@ -315,11 +315,11 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
             m_hitParam = 1.2f;
             NewtonWorldRayCast(world, &p0[0], &p1[0], RayCastFilter, this, RayPrefilterCallback, 0);
             if (m_hitParam < 1.0f) {
-				dMatrix matrix (dPitchMatrix(m_pitch) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
-				matrix.m_posit = p0 + (p1 - p0).Scale (m_hitParam);
-				matrix.m_posit.m_w = 1.0f;
-				if (CalculateTranslationMatrix (matrix)) {
-					NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix[0][0]);
+				dMatrix matrix1 (dPitchMatrix(m_pitch) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
+				matrix1.m_posit = p0 + (p1 - p0).Scale (m_hitParam);
+				matrix1.m_posit.m_w = 1.0f;
+				if (CalculateTranslationMatrix (matrix1)) {
+					NewtonBodySetMatrix(m_phantomEntity->m_phantom, &matrix1[0][0]);
 					if (!TestForCollision ()) {
                         CalculateRotationMatrix (1000.0f);
                         m_phantomEntity->SetPhantomMesh (false);
