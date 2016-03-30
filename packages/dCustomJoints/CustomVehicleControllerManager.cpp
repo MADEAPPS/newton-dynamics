@@ -545,6 +545,9 @@ void CustomVehicleController::EngineController::DriveTrain::CalculateRightSide(E
 	dFloat relativeOmega = m_omega % m_J01[1].m_angular + m_parent->m_omega % m_J10[1].m_angular;
 	dFloat torqueAccel = m_torque % m_invMassJt01[1].m_angular + m_parent->m_torque % m_invMassJt10[1].m_angular;
 
+	torqueAccel = (dAbs (torqueAccel) < 1.0e-8f) ? 0.0f : torqueAccel;
+	relativeOmega = (dAbs (relativeOmega) < 1.0e-8f) ? 0.0f : relativeOmega;
+
 	rightSide[m_dofBase + 0] = 0.0f;
 	rightSide[m_dofBase + 1] = -(torqueAccel + relativeOmega / timestep);
 }
@@ -713,13 +716,18 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Integrate(Engi
 }
 
 
-void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineController* const controller, const dFloat engineTorque, dFloat timestep)
+void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineController* const controller, dFloat engineTorque, dFloat timestep)
 {
 //	const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
 const int size = 6;
 	DriveTrain* nodeArray[size];
 	dFloat b[size];
 	dFloat x[size];
+
+static int xxx;
+xxx ++;
+if (xxx > 100)
+engineTorque = 100;
 
 	m_engineTorque = engineTorque;
 	const int nodesCount = GetNodeArray(nodeArray);
