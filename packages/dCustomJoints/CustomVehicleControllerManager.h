@@ -320,14 +320,15 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void SetExternalTorque(EngineController* const controller);
 			virtual void Integrate(EngineController* const controller, dFloat timestep);
 			virtual void RebuildEngine (const dVector& invInertia, dFloat invMass) {dAssert (0);}
-			virtual void ApplyInternalTorque(EngineController* const controller, dFloat* const lambda);
-			virtual void CalculateRightSideAlpha (EngineController* const controller, dFloat* const rightSide) ; 
+			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
+			
 					
 			void SetInvMassJt();
 			void BuildMassMatrix ();
 			void ReconstructInvMassJt ();
 			void GetRow(dComplentaritySolver::dJacobian* const row, int dof) const;
 			void GetInvRowT(dComplentaritySolver::dJacobian* const row, int dof) const;
+			void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 			
 			int GetNodeArray(DriveTrain** const array);
 			int GetNodeArray(DriveTrain** const array, int& index);
@@ -353,15 +354,15 @@ class CustomVehicleController: public CustomControllerBase
 			DriveTrainEngine (const dVector& invInertia, dFloat invMass);
 
 			int GetDegreeOfFredom() const;
+			void SetExternalTorque(EngineController* const controller);
 			void RebuildEngine (const dVector& invInertia, dFloat invMass);
 			dFloat GetClutchTorque(EngineController* const controller) const;
 			void Integrate(EngineController* const controller, dFloat timestep);
 			void Update(EngineController* const controller, dFloat engineTorque, dFloat timestep);
 			void Solve (int dofSize, int width, const dFloat* const massMatrix, const dFloat* const b, dFloat* const x) const;
 
-			void SolveForTorque(EngineController* const controller, dFloat engineTorque, dFloat timestep);
-//			void SolveTorque (int dofSize, int width, const dFloat* const massMatrix, const dFloat* const b, dFloat* const x) const;
-//			dFloat m_smoothOmega[4];
+			dFloat m_engineTorque;
+			dFloat m_smoothOmega[4];
 		};
 
 		class DriveTrainEngine2W: public DriveTrainEngine
@@ -387,21 +388,21 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel);
 			DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
-//			virtual void CalculateRightSideAlpha (EngineController* const controller, dFloat* const rightSide);
+//			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 		};
 
 		class DriveTrainFrictionGear: public DriveTrainDifferentialGear
 		{
 			public:
 			DriveTrainFrictionGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel);
-//			virtual void CalculateRightSideAlpha(EngineController* const controller, dFloat* const rightSide);
+//			virtual void CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 		};
 
 		class DriveTrainFrictionPad: public DriveTrain
 		{
 			public:
 			DriveTrainFrictionPad (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel);
-//			virtual void CalculateRightSideAlpha (EngineController* const controller, dFloat* const rightSide);
+//			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 		};
 
 		class DriveTrainTire: public DriveTrain
@@ -412,13 +413,11 @@ class CustomVehicleController: public CustomControllerBase
 			virtual DriveTrainTire* CastAsTire() {return this;}
 			virtual void SetExternalTorque(EngineController* const controller);
 			virtual void SetPartMasses (const dVector& invInertia, dFloat invMass);
-			//virtual void Integrate(EngineController* const controller, dFloat timestep) {};
-			//virtual void ApplyInternalTorque(EngineController* const controller, dFloat* const lambda);
-			virtual void CalculateRightSideAlpha(EngineController* const controller, dFloat* const rightSide);
+			virtual void Integrate(EngineController* const controller, dFloat timestep) {};
+			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
+//			virtual void CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 
-			dVector m_savedOmega;
 			BodyPartTire* m_tire;
-			
 		};
 
 		public:
