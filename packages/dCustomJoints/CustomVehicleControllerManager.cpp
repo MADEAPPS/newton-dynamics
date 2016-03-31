@@ -641,11 +641,15 @@ void CustomVehicleController::EngineController::DriveTrain::Integrate(EngineCont
 
 void CustomVehicleController::EngineController::DriveTrain::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
 {
-	dVector torque(m_J01[0].m_angular.Scale(lambda[m_dofBase]) + m_J01[1].m_angular.Scale(lambda[m_dofBase + 1]));
-	dVector parentTorque(m_J10[0].m_angular.Scale(lambda[m_dofBase]) + m_J10[1].m_angular.Scale(lambda[m_dofBase + 1]));
-
-	m_torque += torque;
-	m_parent->m_torque += parentTorque;
+	const int dof = GetDegreeOfFredom();
+	for (int i = 0; i < dof; i++) {
+		m_torque += m_J01[i].m_angular.Scale(lambda[m_dofBase + i]);
+		m_parent->m_torque += m_J10[i].m_angular.Scale(lambda[m_dofBase + i]);
+	}
+//	dVector torque(m_J01[0].m_angular.Scale(lambda[m_dofBase]) + m_J01[1].m_angular.Scale(lambda[m_dofBase + 1]));
+//	dVector parentTorque(m_J10[0].m_angular.Scale(lambda[m_dofBase]) + m_J10[1].m_angular.Scale(lambda[m_dofBase + 1]));
+//	m_torque += torque;
+//	m_parent->m_torque += parentTorque;
 }
 
 
@@ -720,7 +724,6 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Integrate(Engi
 void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (dFloat gearRatio)
 {
 	if (m_lastGear != gearRatio) {
-gearRatio = 1;
 		m_lastGear = gearRatio;
 		m_child->SetGearRatioJacobians(gearRatio);
 
@@ -782,7 +785,9 @@ xxx ++;
 if (xxx > 0)
 engineTorque = 100;
 
-	SetGearRatio (controller->GetGearRatio());
+	dFloat gearRatio = controller->GetGearRatio();
+//gearRatio = 0;
+	SetGearRatio (gearRatio);
 
 	m_engineTorque = engineTorque;
 	const int nodesCount = GetNodeArray(nodeArray);
@@ -800,16 +805,21 @@ engineTorque = 100;
 
 	dAssert(size >= dofSize);
 	const dFloat* const massMatrix = GetMassMatrix();
-	Solve(dofSize, dofSize, massMatrix, b, x);
 
 	int clutchIndex = dofSize - 1;
-	dFloat clutchTorque = GetClutchTorque(controller);
-	if (dAbs(x[clutchIndex]) > clutchTorque) {
-		dFloat frictionTorque = dClamp (x[clutchIndex], -clutchTorque, clutchTorque);
-		x[clutchIndex] = frictionTorque;
-		for (int i = 0; i < clutchIndex; i++) {
-			b[i] -= massMatrix[i * dofSize + clutchIndex] * frictionTorque;
+	if (gearRatio != 0.0f) {
+		Solve(dofSize, dofSize, massMatrix, b, x);
+		dFloat clutchTorque = GetClutchTorque(controller);
+		if (dAbs(x[clutchIndex]) > clutchTorque) {
+			dFloat frictionTorque = dClamp (x[clutchIndex], -clutchTorque, clutchTorque);
+			x[clutchIndex] = frictionTorque;
+			for (int i = 0; i < clutchIndex; i++) {
+				b[i] -= massMatrix[i * dofSize + clutchIndex] * frictionTorque;
+			}
+			Solve(clutchIndex, dofSize, massMatrix, b, x);
 		}
+	} else {
+		x[clutchIndex] = 0.0f;
 		Solve(clutchIndex, dofSize, massMatrix, b, x);
 	}
 
