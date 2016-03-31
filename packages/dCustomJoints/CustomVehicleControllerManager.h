@@ -321,6 +321,7 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void Integrate(EngineController* const controller, dFloat timestep);
 			virtual void SetGearRatioJacobians(dFloat gearRatio) {};
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
+			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 			
 			void SetInvMassJt();
 			void BuildMassMatrix ();
@@ -328,7 +329,7 @@ class CustomVehicleController: public CustomControllerBase
 			void FactorRow (int row, int size, dFloat* const matrix);
 			void GetRow(dComplentaritySolver::dJacobian* const row, int dof) const;
 			void GetInvRowT(dComplentaritySolver::dJacobian* const row, int dof) const;
-			void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
+			
 			
 			int GetNodeArray(DriveTrain** const array);
 			int GetNodeArray(DriveTrain** const array, int& index);
@@ -393,6 +394,7 @@ class CustomVehicleController: public CustomControllerBase
 
 			int GetDegreeOfFredom() const {return m_dof;}
 			void SetGearRatioJacobians(dFloat gearRatio);
+			void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 			dFloat m_gearSign;
 			int m_dof;
 		};

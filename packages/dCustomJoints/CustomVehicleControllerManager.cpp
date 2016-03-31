@@ -720,6 +720,7 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Integrate(Engi
 void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (dFloat gearRatio)
 {
 	if (m_lastGear != gearRatio) {
+gearRatio = 1;
 		m_lastGear = gearRatio;
 		m_child->SetGearRatioJacobians(gearRatio);
 
@@ -903,6 +904,22 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetG
 	SetInvMassJt();
 }
 
+void CustomVehicleController::EngineController::DriveTrainDifferentialGear::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide)
+{
+	if (m_dof != 3) {
+		DriveTrain::CalculateRightSide (controller, timestep, rightSide);
+	} else {
+		dFloat relativeOmega = m_omega % m_J01[2].m_angular + m_parent->m_omega % m_J10[2].m_angular;
+		dFloat torqueAccel = m_torque % m_invMassJt01[2].m_angular + m_parent->m_torque % m_invMassJt10[2].m_angular;
+
+		torqueAccel = (dAbs (torqueAccel) < 1.0e-8f) ? 0.0f : torqueAccel;
+		relativeOmega = (dAbs (relativeOmega) < 1.0e-8f) ? 0.0f : relativeOmega;
+
+		rightSide[m_dofBase + 0] = 0.0f;
+		rightSide[m_dofBase + 1] = 0.0f;
+		rightSide[m_dofBase + 2] = -(torqueAccel + relativeOmega / timestep);
+	}
+}
 
 CustomVehicleController::EngineController::DriveTrainFrictionGear::DriveTrainFrictionGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel)
 	:DriveTrainDifferentialGear(invInertia, invMass, parent, axel)
