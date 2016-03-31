@@ -511,8 +511,6 @@ void CustomVehicleController::EngineController::DriveTrain::GetRow(dComplentarit
 
 void CustomVehicleController::EngineController::DriveTrain::GetInvRowT(dComplentaritySolver::dJacobian* const row, int dof) const
 {
-GetRow(row, dof);
-return;
 	dAssert(dof < GetDegreeOfFredom());
 	row[m_index].m_linear = m_invMassJt01[dof].m_linear;
 	row[m_index].m_angular = m_invMassJt01[dof].m_angular;
@@ -607,8 +605,7 @@ void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
 				int nodeBdof = nodeB->GetDegreeOfFredom();
 				for (int jj = 0; jj < nodeBdof; jj++) {
 					memset(rowJ, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
-					//nodeB->GetInvRowT(rowJ, jj);
-					nodeB->GetRow(rowJ, jj);
+					nodeB->GetInvRowT(rowJ, jj);
 
 					dFloat acc = 0.0f;
 					for (int k = 0; k < nodeCount; k++) {
@@ -723,10 +720,8 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Integrate(Engi
 void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (dFloat gearRatio)
 {
 	if (m_lastGear != gearRatio) {
-gearRatio = 1;
 		m_lastGear = gearRatio;
 		m_child->SetGearRatioJacobians(gearRatio);
-
 
 		const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
 		DriveTrain* nodeList[size];
@@ -740,49 +735,37 @@ gearRatio = 1;
 		}
 		dAssert(size > dofSize);
 
-		int y = 0;
 		dFloat* const massMatrix = GetMassMatrix();
 		dAssert(massMatrix);
-		memset(massMatrix, 0, dofSize * dofSize * sizeof (dFloat));
-		for (int i = 0; i < nodeCount - 1; i++) {
-			DriveTrain* const nodeA = nodeList[i];
-			int nodeAdof = nodeA->GetDegreeOfFredom();
-			for (int ii = 0; ii < nodeAdof; ii++) {
-				int x = 0;
-				memset(rowI, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
-				nodeA->GetRow(rowI, ii);
-				dFloat* const row = &massMatrix[y * dofSize];
-				for (int j = 0; j < nodeCount - 1; j++) {
-					DriveTrain* const nodeB = nodeList[j];
-					int nodeBdof = nodeB->GetDegreeOfFredom();
-					for (int jj = 0; jj < nodeBdof; jj++) {
-						memset(rowJ, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
-						//nodeB->GetInvRowT(rowJ, jj);
-						nodeB->GetRow(rowJ, jj);
 
-						dFloat acc = 0.0f;
-						for (int k = 0; k < nodeCount; k++) {
-							acc += rowI[k].m_linear % rowJ[k].m_linear + rowI[k].m_angular % rowJ[k].m_angular;
-						}
-						row[x] = acc;
-						x++;
-					}
+		int x = 0;
+		DriveTrain* const nodeA = nodeList[nodeCount - 2];
+		int nodeAdof = nodeA->GetDegreeOfFredom();
+		int ii = nodeAdof - 1;
+		memset(rowI, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
+		nodeA->GetRow(rowI, ii);
+		int y = dofSize - 1;
+		dFloat* const row = &massMatrix[y * dofSize];
+		for (int j = 0; j < nodeCount - 1; j++) {
+			DriveTrain* const nodeB = nodeList[j];
+			int nodeBdof = nodeB->GetDegreeOfFredom();
+			for (int jj = 0; jj < nodeBdof; jj++) {
+				memset(rowJ, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
+				nodeB->GetInvRowT(rowJ, jj);
+
+				dFloat acc = 0.0f;
+				for (int k = 0; k < nodeCount; k++) {
+					acc += rowI[k].m_linear % rowJ[k].m_linear + rowI[k].m_angular % rowJ[k].m_angular;
 				}
-				y++;
+				row[x] = acc;
+				massMatrix[y] = acc;
+				x++;
+				y += dofSize;
 			}
 		}
-
-		for (int i = 0; i < dofSize; i++) {
-			massMatrix[i * dofSize + i] *= D_VEHICLE_REGULARIZER;
-		}
-/*
-		for (int i = 0; i < dofSize; i++) {
-			FactorRow(i, dofSize, massMatrix);
-		}
-*/
-
+		massMatrix[(dofSize - 1) * dofSize + dofSize - 1] *= D_VEHICLE_REGULARIZER;
+		FactorRow(dofSize - 1, dofSize, massMatrix);
 	}
-
 }
 
 void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineController* const controller, dFloat engineTorque, dFloat timestep)
