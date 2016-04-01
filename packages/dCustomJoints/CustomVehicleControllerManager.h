@@ -529,8 +529,6 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetFirstBodyPart() const;
 	CUSTOM_JOINTS_API dList<BodyPart*>::dListNode* GetNextBodyPart(dList<BodyPart*>::dListNode* const partNode) const;
 
-	CUSTOM_JOINTS_API void LinksTiresKinematically (int count, BodyPartTire** const tires);
-
 	CUSTOM_JOINTS_API dVector GetTireNormalForce(const BodyPartTire* const tire) const;
 	CUSTOM_JOINTS_API dVector GetTireLateralForce(const BodyPartTire* const tire) const;
 	CUSTOM_JOINTS_API dVector GetTireLongitudinalForce(const BodyPartTire* const tire) const;

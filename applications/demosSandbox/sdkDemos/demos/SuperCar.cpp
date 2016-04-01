@@ -177,6 +177,15 @@ class SuperCarEntity: public DemoEntity
 		((CustomVehicleControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
+	void SetGearMap(CustomVehicleController::EngineController* const engine)
+	{
+		for (int i = 0; i < int((sizeof (m_gearMap) / sizeof (m_gearMap[0]))); i++) {
+			m_gearMap[i] = i;
+		}
+		m_gearMap[0] = engine->GetNeutralGear();
+		m_gearMap[1] = engine->GetReverseGear();
+	}
+
 	NewtonCollision* CreateChassisCollision (NewtonWorld* const world) const
 	{
 		DemoEntity* const chassis = dHierarchy<DemoEntity>::Find("car_body");
@@ -420,6 +429,9 @@ class SuperCarEntity: public DemoEntity
 
 		m_controller->SetEngine(engineControl);
 
+		// set the gear look up table
+		SetGearMap(engineControl);
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 	}
@@ -432,7 +444,6 @@ class SuperCarEntity: public DemoEntity
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
 		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
-		//CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
 		CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
@@ -502,21 +513,21 @@ steeringVal *= 0.3f;
 		}
 
 
-//		int reverseGear = m_reverseGear.UpdateTriggerButton (mainWindow, 'R') ? 1 : 0;
+		int reverseGear = m_reverseGear.UpdateTriggerButton (mainWindow, 'R') ? 1 : 0;
 
 		// count the engine key switch
 		m_engineKeySwitchCounter += m_engineKeySwitch.UpdateTriggerButton(mainWindow, 'Y');
 
 		// check transmission type
-//		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
+		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 1
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
-			//fwrite (&toggleTransmission, sizeof (int), 1, file);
-			//fwrite (&reverseGear, sizeof (int), 1, file);
+			fwrite (&toggleTransmission, sizeof (int), 1, file);
+			fwrite (&reverseGear, sizeof (int), 1, file);
 			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
 			fwrite (&engineGasPedal, sizeof (dFloat), 1, file);
@@ -528,8 +539,8 @@ steeringVal *= 0.3f;
 		static FILE* file = fopen ("log.bin", "rb");
 		if (file) {		
 			fread (&m_engineKeySwitchCounter, sizeof (int), 1, file);
-			//fread (&toggleTransmission, sizeof (int), 1, file);
-			//fread (&reverseGear, sizeof (int), 1, file);
+			fread (&toggleTransmission, sizeof (int), 1, file);
+			fread (&reverseGear, sizeof (int), 1, file);
 			fread (&gear, sizeof (int), 1, file);
 			fread (&steeringVal, sizeof (dFloat), 1, file);
 			fread (&engineGasPedal, sizeof (dFloat), 1, file);
@@ -550,7 +561,7 @@ steeringVal *= 0.3f;
 			}
 			m_engineOldKeyState = key;
 
-/*
+
 			if (toggleTransmission) {
 				engine->SetTransmissionMode (!engine->GetTransmissionMode());
 			}
@@ -559,22 +570,20 @@ steeringVal *= 0.3f;
 			}
 			
 			if (reverseGear) {
-				if (engine->GetGear() == CustomVehicleControllerComponentEngine::dGearBox::m_reverseGear) {
-					engine->SetGear(CustomVehicleControllerComponentEngine::dGearBox::m_newtralGear);
+				if (engine->GetGear() == engine->GetNeutralGear()) {
+					engine->SetGear(engine->GetNeutralGear());
 				} else {
-					engine->SetGear(CustomVehicleControllerComponentEngine::dGearBox::m_reverseGear);
+					engine->SetGear(engine->GetReverseGear());
 				}
 			}
-*/
-//			engine->SetGear(gear);
+
 			engine->SetParam(engineGasPedal);
 		}
 
-		//if (clutch) {
-		//	clutch->SetParam(cluthVal);
-		//}
-
-		
+		if (cluthVal) {
+			engine->SetClutchParam(cluthVal);
+		}
+				
 		if (steering) {
 			steering->SetParam(steeringVal);
 		}

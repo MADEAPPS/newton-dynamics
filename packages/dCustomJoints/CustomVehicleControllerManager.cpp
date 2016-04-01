@@ -98,7 +98,7 @@ class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexC
 void CustomVehicleController::dInterpolationCurve::InitalizeCurve(int points, const dFloat* const steps, const dFloat* const values)
 {
 	m_count = points;
-	dAssert(points < int(sizeof(m_nodes) / sizeof (m_nodes[0])));
+	dAssert(points <= int(sizeof(m_nodes) / sizeof (m_nodes[0])));
 	memset(m_nodes, 0, sizeof (m_nodes));
 	for (int i = 0; i < m_count; i++) {
 		m_nodes[i].m_param = steps[i];
@@ -646,10 +646,6 @@ void CustomVehicleController::EngineController::DriveTrain::ApplyInternalTorque(
 		m_torque += m_J01[i].m_angular.Scale(lambda[m_dofBase + i]);
 		m_parent->m_torque += m_J10[i].m_angular.Scale(lambda[m_dofBase + i]);
 	}
-//	dVector torque(m_J01[0].m_angular.Scale(lambda[m_dofBase]) + m_J01[1].m_angular.Scale(lambda[m_dofBase + 1]));
-//	dVector parentTorque(m_J10[0].m_angular.Scale(lambda[m_dofBase]) + m_J10[1].m_angular.Scale(lambda[m_dofBase + 1]));
-//	m_torque += torque;
-//	m_parent->m_torque += parentTorque;
 }
 
 
@@ -710,15 +706,16 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Solve(int dofS
 void CustomVehicleController::EngineController::DriveTrainEngine::Integrate(EngineController* const controller, dFloat timestep)
 {
 	DriveTrain::Integrate(controller, timestep);
-	m_omega.m_x = dClamp(m_omega.m_x, dFloat(0.0f), controller->m_info.m_rpmAtReadLineTorque);
+//	m_omega.m_x = dClamp(m_omega.m_x, dFloat(0.0f), controller->m_info.m_rpmAtReadLineTorque);
 
+	const int size = sizeof (m_smoothOmega) / sizeof (m_smoothOmega[0]);
 	dFloat average = m_omega.m_x;
-	for (int i = 1; i < sizeof (m_smoothOmega) / sizeof (m_smoothOmega[0]); i++) {
+	for (int i = 1; i < size; i++) {
 		average += m_smoothOmega[i];
 		m_smoothOmega[i - 1] = m_smoothOmega[i];
 	}
-	m_smoothOmega[3] = m_omega.m_x;
-	m_omega.m_x = average * dFloat(1.0f / (sizeof (m_smoothOmega) / sizeof (m_smoothOmega[0])));
+	m_smoothOmega[size - 1] = m_omega.m_x;
+	m_omega.m_x = average * (1.0f / size);
 }
 
 void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (dFloat gearRatio)
@@ -774,16 +771,16 @@ void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (
 
 void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineController* const controller, dFloat engineTorque, dFloat timestep)
 {
-//	const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
-const int size = 7;
+	const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
+//const int size = 7;
 	DriveTrain* nodeArray[size];
 	dFloat b[size];
 	dFloat x[size];
 
-static int xxx;
-xxx ++;
-if (xxx > 0)
-engineTorque = 100;
+//static int xxx;
+//xxx ++;
+//if (xxx > 0)
+//engineTorque = 100;
 
 	dFloat gearRatio = controller->GetGearRatio();
 //gearRatio = 0;
@@ -856,7 +853,7 @@ CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4
 
 CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel)
 	:DriveTrain(invInertia, invMass, parent)
-	,m_gearSign(-1.0f)
+	,m_gearSign(1.0f)
 	,m_dof(2)
 {
 	m_child = new DriveTrainTire(axel.m_leftTire, this);
@@ -876,7 +873,7 @@ CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrai
 
 CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:DriveTrain(invInertia, invMass, parent)
-	,m_gearSign(1.0f)
+	,m_gearSign(-1.0f)
 	,m_dof(2)
 {
 	m_child = new DriveTrainFrictionPad(invInertia, invMass, this, axel0);
@@ -891,6 +888,7 @@ CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrai
 	m_J10[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_J10[1].m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);
 	m_J10[1].m_angular = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+
 	SetInvMassJt();
 }
 
@@ -1026,7 +1024,7 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 	,m_engine(NULL)
 	,m_clutchParam(1.0f)
 	,m_gearTimer(0)
-	,m_currentGear(2)
+	,m_currentGear(D_VEHICLE_NEUTRAL_GEAR)
 	,m_ignitionKey(false)
 	,m_automaticTransmissionMode(true)
 {
@@ -1136,27 +1134,30 @@ void CustomVehicleController::EngineController::InitEngineTorqueCurve()
 
 	CalculateCrownGear();
 
-	dFloat rpsTable[5];
-	dFloat torqueTable[5];
+	dFloat rpsTable[6];
+	dFloat torqueTable[6];
 
 	rpsTable[0] = 0.0f;
 	rpsTable[1] = m_info.m_rpmAtIdleTorque;
 	rpsTable[2] = m_info.m_rpmAtPeakTorque;
 	rpsTable[3] = m_info.m_rpmAtPeakHorsePower;
 	rpsTable[4] = m_info.m_rpmAtReadLineTorque;
+	rpsTable[5] = m_info.m_rpmAtReadLineTorque * 1.1f;
 
 	torqueTable[0] = m_info.m_idleTorque;
 	torqueTable[1] = m_info.m_idleTorque;
 	torqueTable[2] = m_info.m_peakTorque;
 	torqueTable[3] = m_info.m_peakPowerTorque;
 	torqueTable[4] = m_info.m_redLineTorque;
+	torqueTable[5] = 0.0f;
 
 	m_torqueRPMCurve.InitalizeCurve(sizeof (rpsTable) / sizeof (rpsTable[0]), rpsTable, torqueTable);
 	m_info.m_minRPM = m_info.m_rpmAtIdleTorque * D_VEHICLE_MIN_RPM_FACTOR;
 
-	m_info.m_minTorque = m_torqueRPMCurve.GetValue(m_info.m_rpmAtIdleTorque) * D_VEHICLE_REST_GAS_VALVE;
-	m_info.m_idleViscousDrag1 = 4.0f * m_info.m_minTorque / m_info.m_rpmAtIdleTorque;
-	m_info.m_idleViscousDrag2 = 2.0f * m_info.m_minTorque / (m_info.m_rpmAtIdleTorque * m_info.m_rpmAtIdleTorque);
+	dFloat minTorque = m_torqueRPMCurve.GetValue(m_info.m_rpmAtIdleTorque) * D_VEHICLE_REST_GAS_VALVE;
+	m_info.m_idleViscousDrag1 = 4.0f * minTorque / m_info.m_rpmAtIdleTorque;
+	m_info.m_idleViscousDrag2 = 2.0f * minTorque / (m_info.m_rpmAtIdleTorque * m_info.m_rpmAtIdleTorque);
+	m_info.m_minTorque = dMax (minTorque, m_info.m_redLineTorque * 0.9f);
 }
 
 dFloat CustomVehicleController::EngineController::GetGearRatio () const
@@ -1166,9 +1167,8 @@ dFloat CustomVehicleController::EngineController::GetGearRatio () const
 
 void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat timestep)
 {
-//m_info.m_gearsCount = 4;
-m_currentGear = 2;
-return;
+//m_currentGear = 2;
+//return;
 
 	m_gearTimer--;
 	if (m_gearTimer < 0) {
@@ -1177,13 +1177,13 @@ return;
 		{
 			case D_VEHICLE_NEUTRAL_GEAR:
 			{
-			   dAssert(0);
+			   SetGear(D_VEHICLE_NEUTRAL_GEAR);
 			   break;
 			}
 
 			case D_VEHICLE_REVERSE_GEAR:
 			{
-				dAssert(0);
+				SetGear(D_VEHICLE_REVERSE_GEAR);
 				break;
 			}
 
@@ -1218,7 +1218,7 @@ void CustomVehicleController::EngineController::Update(dFloat timestep)
 	dFloat omega = m_engine->m_omega.m_x;
 	if (m_ignitionKey) {
 		dFloat gasVal = dMax (m_param, D_VEHICLE_REST_GAS_VALVE);
-		dFloat drag = dMin (omega * omega * m_info.m_idleViscousDrag2, 2.0f * m_info.m_minTorque);
+		dFloat drag = dMin (omega * omega * m_info.m_idleViscousDrag2, m_info.m_minTorque);
 		torque = m_torqueRPMCurve.GetValue(omega) * gasVal - drag;
 	} else {
 		 torque = - omega * m_info.m_idleViscousDrag1;
@@ -1261,6 +1261,7 @@ int CustomVehicleController::EngineController::GetGear() const
 void CustomVehicleController::EngineController::SetGear(int gear)
 {
 	m_currentGear = dClamp(gear, 0, m_info.m_gearsCount);
+	m_gearTimer = 30;
 }
 
 int CustomVehicleController::EngineController::GetNeutralGear() const
@@ -1412,17 +1413,6 @@ CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody
 }
 #endif
 
-
-void CustomVehicleController::LinksTiresKinematically (int count, BodyPartTire** const tires)
-{
-//	dFloat radio0 = tires[0]->m_data.m_radio;
-	for (int i = 1; i < count; i ++) {
-//		CustomVehicleControllerEngineDifferencialJoint* const link = &m_tankTireLinks.Append()->GetInfo();
-//		link->Init(this, tires[0], tires[i]);
-//		link->m_radio0 = radio0;
-//		link->m_radio1 = tires[i]->m_radio;
-	}
-}
 
 void CustomVehicleController::DrawSchematic(dFloat scale) const
 {
@@ -1792,8 +1782,7 @@ void CustomVehicleController::SetCenterOfGravity(const dVector& comRelativeToGeo
 
 void CustomVehicleController::Finalize()
 {
-
-NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
+//NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 
 	m_finalized = true;
 	NewtonSkeletonContainerFinalize(m_skeleton);
