@@ -23,7 +23,8 @@ class TemplateVector
 {
 	public:
 	TemplateVector ();
-	TemplateVector (const T *ptr);
+	TemplateVector (const T val);
+	TemplateVector (const T* const ptr);
 	TemplateVector (T m_x, T m_y, T m_z, T m_w); 
 	TemplateVector Scale (T s) const;
 
@@ -55,17 +56,28 @@ class dVector: public TemplateVector<dFloat>
 {
 	public:
 	dVector();
+	dVector(dFloat val);
 	dVector (const TemplateVector<dFloat>& v);
-	dVector (const dFloat *ptr);
+	dVector (const dFloat* const ptr);
 	dVector (dFloat x, dFloat y, dFloat z, dFloat w = 1.0f); 
 };
 
 
-class dBigVector: public TemplateVector<double>
+class dBigVector: public TemplateVector<dFloat64>
 {
 	public: 
 	dBigVector(){};
-	dBigVector (const TemplateVector<dFloat>& v)
+	dBigVector(dFloat64 val)
+		:TemplateVector<dFloat64> (val)
+	{
+	}
+
+	dBigVector (const dFloat64* const ptr)
+		:TemplateVector<dFloat64> (ptr)
+	{
+	}
+
+	dBigVector (const TemplateVector<dFloat64>& v)
 		:TemplateVector<dFloat64> (v.m_x, v.m_y, v.m_z, v.m_w)
 	{
 	}
@@ -78,7 +90,7 @@ class dBigVector: public TemplateVector<double>
 #endif
 
 	//	dBigVector (const dFloat *ptr);
-	dBigVector (dFloat x, dFloat y, dFloat z, dFloat w = dFloat(1.0f))
+	dBigVector (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w = dFloat(1.0f))
 		:TemplateVector<dFloat64> (x, y, z, w)
 	{
 	}
@@ -96,6 +108,12 @@ class dBigVector: public TemplateVector<double>
 
 template<class T>
 TemplateVector<T>::TemplateVector() {}
+
+template<class T>
+TemplateVector<T>::TemplateVector(const T val)
+	:m_x (val), m_y(val), m_z(val), m_w(val)
+{
+}
 
 template<class T>
 TemplateVector<T>::TemplateVector(const T *ptr)
@@ -190,12 +208,18 @@ inline dVector::dVector()
 {
 }
 
+inline dVector::dVector(dFloat val)
+	:TemplateVector<dFloat>(val)
+{
+}
+
+
 inline dVector::dVector (const TemplateVector<dFloat>& v)
 	:TemplateVector<dFloat>(v)
 {
 }
 
-inline dVector::dVector (const dFloat *ptr)
+inline dVector::dVector (const dFloat* const ptr)
 	:TemplateVector<dFloat>(ptr)
 {
 }

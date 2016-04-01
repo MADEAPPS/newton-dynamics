@@ -209,11 +209,11 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 	{
 		dMatrix tireMatrix;
 		dMatrix chassisMatrix;
-		dVector tireOmega;
-		dVector chassisOmega;
-		dVector tireVeloc;
-		dVector chassisCom;
-		dVector chassisVeloc;
+		dVector tireOmega(0.0f);
+		dVector chassisOmega(0.0f);
+		dVector tireVeloc(0.0f);
+		dVector chassisCom(0.0f);
+		dVector chassisVeloc(0.0f);
 
 		NewtonBody* const tire = m_body0;
 		NewtonBody* const chassis = m_body1;
