@@ -80,11 +80,12 @@ class ArticulatedEntityModel: public DemoEntity
 			NewtonBody* const tire = GetBody0();
 			NewtonBody* const chassis = GetBody1();
 
-			dVector chassisCom;
-			dVector tireVeloc;
-			dVector chassisVeloc;
 			dMatrix tireMatrix;
 			dMatrix chassisMatrix;
+
+			dVector chassisCom(0.0f);
+			dVector tireVeloc(0.0f);
+			dVector chassisVeloc(0.0f);
 
 			NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
 			NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
@@ -572,22 +573,22 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
 	{
-		dVector points[1024 * 16];
+//		dVector points[1024 * 16];
+		dFloat points[1024 * 16][3];
 
 		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
 		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
-		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < int (sizeof (points)/ sizeof (points[0]))));
+		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < int (sizeof (points) / (3 * sizeof (dFloat)))));
 
 		// go over the vertex array and find and collect all vertices's weighted by this bone.
-		dFloat* const array = mesh->m_vertex;
+		const dFloat* const array = mesh->m_vertex;
 		for (int i = 0; i < mesh->m_vertexCount; i ++) {
-			points[i].m_x = array[i * 3 + 0];
-			points[i].m_y = array[i * 3 + 1];
-			points[i].m_z = array[i * 3 + 2];
+			points[i][0] = array[i * 3 + 0];
+			points[i][1] = array[i * 3 + 1];
+			points[i][2] = array[i * 3 + 2];
 		}
-		bodyPart->GetMeshMatrix().TransformTriplex(&points[0].m_x, sizeof (dVector), &points[0].m_x, sizeof (dVector), mesh->m_vertexCount) ;
-
-		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0].m_x, sizeof (dVector), 1.0e-3f, 0, NULL);
+		bodyPart->GetMeshMatrix().TransformTriplex(&points[0][0], 3 * sizeof (dFloat), &points[0][0], 3 * sizeof (dFloat), mesh->m_vertexCount) ;
+		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0][0], 3 * sizeof (dFloat), 1.0e-3f, 0, NULL);
 	}
 
 	NewtonCollision* MakeConvexHullAggregate(DemoEntity* const bodyPart) const

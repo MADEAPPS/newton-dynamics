@@ -158,10 +158,10 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 	{
 		dMatrix tireMatrix;
 		dMatrix chassisMatrix;
-		dVector tireVeloc;
-		dVector tireOmega;
-		dVector chassisVeloc;
-		dVector chassisOmega;
+		dVector tireVeloc(0.0f);
+		dVector tireOmega(0.0f);
+		dVector chassisVeloc(0.0f);
+		dVector chassisOmega(0.0f);
 
 		CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 
@@ -302,7 +302,7 @@ void CustomVehicleController::BodyPartChassis::ApplyDownForce ()
 {
 	// add aerodynamics forces
 	dMatrix matrix;
-	dVector veloc;
+	dVector veloc(0.0f);
 
 	NewtonBody* const body = GetBody();
 	NewtonBodyGetVelocity(body, &veloc[0]);
@@ -989,7 +989,7 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetPartMasses (c
 void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorque(EngineController* const controller)
 {
 	dMatrix matrix;
-	dVector omega;
+	dVector omega(0.0f);
 
 	NewtonBody* const body = m_tire->GetBody();
 	NewtonBodyGetOmega(body, &omega[0]);
@@ -1287,7 +1287,7 @@ dFloat CustomVehicleController::EngineController::GetRedLineRPM() const
 dFloat CustomVehicleController::EngineController::GetSpeed() const
 {
 	dMatrix matrix;
-	dVector veloc;
+	dVector veloc(0.0f);
 	NewtonBody* const chassis = m_controller->GetBody();
 
 	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
@@ -2081,8 +2081,8 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 	dAssert((tire->GetBody() == NewtonJointGetBody0(contactJoint)) || (tire->GetBody() == NewtonJointGetBody1(contactJoint)));
 
 	dMatrix tireMatrix;
-	dVector tireOmega;
-	dVector tireVeloc;
+	dVector tireOmega(0.0f);
+	dVector tireVeloc(0.0f);
 
 	NewtonBody* const tireBody = tire->GetBody();
 	const CustomVehicleController* const controller = tire->GetController();
@@ -2100,8 +2100,8 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 	tire->m_longitudinalSlip = 0.0f;
 
 	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
-		dVector contactPoint;
-		dVector contactNormal;
+		dVector contactPoint(0.0f);
+		dVector contactNormal(0.0f);
 		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
 		NewtonMaterialGetContactPositionAndNormal(material, tireBody, &contactPoint[0], &contactNormal[0]);
 
@@ -2115,8 +2115,8 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			dVector dp(contactPatch - tireMatrix.m_posit);
 			dVector radius(dp.Scale(tire->m_data.m_radio / dSqrt(dp % dp)));
 
-			dVector lateralContactDir;
-			dVector longitudinalContactDir;
+			dVector lateralContactDir(0.0f);
+			dVector longitudinalContactDir(0.0f);
 			NewtonMaterialContactRotateTangentDirections(material, &lateralPin[0]);
 			NewtonMaterialGetContactTangentDirections(material, tireBody, &lateralContactDir[0], &longitudinalContactDir[0]);
 
@@ -2147,7 +2147,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				dFloat f_z;
 				dFloat moment;
 
-				dVector tireLoadForce;
+				dVector tireLoadForce(0.0f);
 				NewtonMaterialGetContactForce(material, tireBody, &tireLoadForce.m_x);
 				dFloat tireLoad = (tireLoadForce % contactNormal);
 

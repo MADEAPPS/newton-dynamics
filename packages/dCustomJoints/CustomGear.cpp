@@ -66,10 +66,10 @@ void CustomGear::Serialize (NewtonSerializeCallback callback, void* const userDa
 
 void CustomGear::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-	dVector omega0;
-	dVector omega1;
 	dMatrix matrix0;
 	dMatrix matrix1;
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
 	dFloat jacobian0[6];
 	dFloat jacobian1[6];
 
@@ -197,8 +197,8 @@ void CustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
-	dVector omega0;
-	dVector veloc1;
+	dVector omega0(0.0f);
+	dVector veloc1(0.0f);
 	dFloat jacobian0[6];
 	dFloat jacobian1[6];
 

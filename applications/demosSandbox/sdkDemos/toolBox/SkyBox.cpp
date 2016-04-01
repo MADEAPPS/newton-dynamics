@@ -26,6 +26,7 @@
 
 SkyBox::SkyBox()
 	:DemoEntity (dGetIdentityMatrix(), NULL)
+	,m_size(0.0f)
 {
 	dFloat boxsize;
 

@@ -81,9 +81,11 @@ class dMatrix
 	dVector m_posit;
 };
 
-
-
 inline dMatrix::dMatrix ()
+	:m_front(0.0f)
+	,m_up(0.0f)
+	,m_right(0.0f)
+	,m_posit(0.0f)
 {
 }
 
@@ -97,6 +99,10 @@ inline dMatrix::dMatrix (
 }
 
 inline dMatrix::dMatrix (const dFloat* const array)
+	:m_front(0.0f)
+	,m_up(0.0f)
+	,m_right(0.0f)
+	,m_posit(0.0f)
 {
 	memcpy (&(*this)[0][0], array, sizeof (dMatrix));
 }

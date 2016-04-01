@@ -99,8 +99,11 @@ dMatrix dRollMatrix(dFloat ang)
 
 
 dMatrix::dMatrix (const dQuaternion &rotation, const dVector &position)
+	:m_front(0.0f)
+	,m_up(0.0f)
+	,m_right(0.0f)
+	,m_posit(0.0f)
 {
-
 	dFloat x2 = dFloat (2.0f) * rotation.m_q1 * rotation.m_q1;
 	dFloat y2 = dFloat (2.0f) * rotation.m_q2 * rotation.m_q2;
 	dFloat z2 = dFloat (2.0f) * rotation.m_q3 * rotation.m_q3;
@@ -722,6 +725,10 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 }
 
 dMatrix::dMatrix (const dMatrix& transformMatrix, const dVector& scale, const dMatrix& stretchAxis)
+	:m_front(0.0f)
+	,m_up(0.0f)
+	,m_right(0.0f)
+	,m_posit(0.0f)
 {
 	dMatrix scaledAxis;
 	scaledAxis[0] = stretchAxis[0].Scale (scale[0]);
@@ -731,9 +738,3 @@ dMatrix::dMatrix (const dMatrix& transformMatrix, const dVector& scale, const dM
 
 	*this = stretchAxis.Transpose() * scaledAxis * transformMatrix;
 }
-
-
-
-
-
-

@@ -84,7 +84,7 @@ void dSceneNodeInfo::SetTransform (const dMatrix& matrix)
 	matrix.PolarDecomposition(transform, m_scale, m_eigenScaleAxis);
 	m_position = matrix.m_posit;
 	//m_euler = transform.GetEulerAngles ();
-    dVector tmp;
+    dVector tmp(0.0f);
     transform.GetEulerAngles (m_euler, tmp);
 }
 

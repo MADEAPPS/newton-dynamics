@@ -1204,13 +1204,13 @@ void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
 
 void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalSpace, dFloat timestep)
 {
-	dVector com; 
 	dMatrix matrix; 
-	dVector omega0;
-	dVector veloc0;
-	dVector omega1;
-	dVector veloc1;
-	dVector pointVeloc;
+	dVector com(0.0f); 
+	dVector omega0(0.0f);
+	dVector veloc0(0.0f);
+	dVector omega1(0.0f);
+	dVector veloc1(0.0f);
+	dVector pointVeloc(0.0f);
 
 	const dFloat stiffness = 0.3f;
 	const dFloat angularDamp = 0.95f;
@@ -1229,7 +1229,7 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 	dVector deltaVeloc (targetPositionInGlobalSpace - pointOnBodyInGlobalSpace);
 	deltaVeloc = deltaVeloc.Scale (stiffness * invTimeStep) - pointVeloc;
 	for (int i = 0; i < 3; i ++) {
-		dVector veloc (0.0f, 0.0f, 0.0f, 0.0f);
+		dVector veloc (0.0f);
 		veloc[i] = deltaVeloc[i];
 		NewtonBodyAddImpulse (body, &veloc[0], &pointOnBodyInGlobalSpace[0]);
 	}

@@ -726,9 +726,9 @@ void dScene::FreezeScale ()
 		dAssert (sceneNodeInfo->IsType(dSceneNodeInfo::GetRttiType()));
 		dMatrix transform (sceneNodeInfo->GetTransform() * parentMatrix);
 
-		dVector scale;
 		dMatrix matrix;
 		dMatrix stretchAxis;
+		dVector scale(0.0f);
 		transform.PolarDecomposition (matrix, scale, stretchAxis);
 		sceneNodeInfo->SetTransform (matrix);
 

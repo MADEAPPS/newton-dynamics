@@ -20,6 +20,43 @@
 #include <string.h>
 #include <assert.h>
 
+#ifdef _MSC_VER
+	#include <windows.h>
+	#ifdef _DEBUG
+		#include <stdarg.h>
+		inline void dExpandTraceMessage (const char* const fmt, ...)
+		{
+			va_list v_args;
+			char text[4096];
+
+			text[0] = 0;
+			va_start (v_args, fmt);     
+			vsprintf(text, fmt, v_args);
+			va_end (v_args);            
+
+			OutputDebugStringA (text);
+		}
+
+		#define dTrace(x)										\
+		{														\
+			dExpandTraceMessage x;								\
+		}																	
+	#else
+		#define dTrace(x)
+	#endif
+#else
+	#define dTrace(x)
+#endif
+
+#if ( defined (_MSC_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER) )
+	#include <crtdbg.h>
+	#define dAssert(x) _ASSERTE(x)
+#else 
+	#define dAssert(x) assert(x)
+#endif
+
+
+
 #ifndef dFloat
 	#ifdef _NEWTON_USE_DOUBLE
 		typedef double dFloat;
@@ -56,16 +93,6 @@ enum dEulerAngleOrder
 	m_pitchYawRoll = (0 << 8) + (1 << 4) + (2 << 0),
 	m_rollYawpitch = (2 << 8) + (1 << 4) + (0 << 0),
 };
-
-
-
-
-#if ( defined (_MSC_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER) )
-	#define dAssert(x) _ASSERTE(x)
-#else 
-	#define dAssert(x) assert(x)
-#endif
-
 
 
 
@@ -169,37 +196,6 @@ void dSort (T* const array, int elements, int (*compare) (const T* const  A, con
 	}
 #endif
 }
-
-
-
-#ifdef _MSC_VER
-	#ifdef _DEBUG
-		#include <windows.h>
-		#include <stdarg.h>
-		inline void dExpandTraceMessage (const char* const fmt, ...)
-		{
-			va_list v_args;
-			char text[4096];
-
-			text[0] = 0;
-			va_start (v_args, fmt);     
-			vsprintf(text, fmt, v_args);
-			va_end (v_args);            
-
-			OutputDebugStringA (text);
-		}
-
-		#define dTrace(x)										\
-		{														\
-			dExpandTraceMessage x;								\
-		}																	
-	#else
-		#define dTrace(x)
-	#endif
-#else
-	#define dTrace(x)
-#endif
-
 
 #endif
 

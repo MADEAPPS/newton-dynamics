@@ -55,11 +55,30 @@ D_MSC_VECTOR_ALIGMENT
 class dVector: public TemplateVector<dFloat>
 {
 	public:
-	dVector();
-	dVector(dFloat val);
-	dVector (const TemplateVector<dFloat>& v);
-	dVector (const dFloat* const ptr);
-	dVector (dFloat x, dFloat y, dFloat z, dFloat w = 1.0f); 
+	dVector()
+		:TemplateVector<dFloat>()
+	{
+	}
+
+	dVector(dFloat val)
+		:TemplateVector<dFloat>(val)
+	{
+	}
+
+	dVector (const TemplateVector<dFloat>& v)
+		:TemplateVector<dFloat>(v)
+	{
+	}
+
+	dVector (const dFloat* const ptr)
+		:TemplateVector<dFloat>(ptr)
+	{
+	}
+
+	dVector (dFloat x, dFloat y, dFloat z, dFloat w = 1.0f) 
+		:TemplateVector<dFloat>(x, y, z, w)
+	{
+	}
 };
 
 
@@ -104,10 +123,15 @@ class dBigVector: public TemplateVector<dFloat64>
 };
 
 
-
-
 template<class T>
-TemplateVector<T>::TemplateVector() {}
+TemplateVector<T>::TemplateVector() 
+{
+static int xxxx;
+xxxx ++;
+if (xxxx > 1024 * 10)
+dAssert (0);
+
+}
 
 template<class T>
 TemplateVector<T>::TemplateVector(const T val)
@@ -127,7 +151,6 @@ TemplateVector<T>::TemplateVector(T x, T y, T z, T w)
 {
 }
 
-
 template<class T>
 T& TemplateVector<T>::operator[] (int i)
 {
@@ -145,7 +168,6 @@ TemplateVector<T> TemplateVector<T>::Scale (T scale) const
 {
 	return TemplateVector<T> (m_x * scale, m_y * scale, m_z * scale, m_w);
 }
-
 
 template<class T>
 TemplateVector<T> TemplateVector<T>::operator+ (const TemplateVector<T>& B) const
@@ -177,13 +199,11 @@ TemplateVector<T>& TemplateVector<T>::operator-= (const TemplateVector<T>& A)
 	return *this;
 }
 
-
 template<class T>
 T TemplateVector<T>::operator% (const TemplateVector<T>& A) const
 {
 	return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 }
-
 
 template<class T>
 TemplateVector<T> TemplateVector<T>::operator* (const TemplateVector<T>& B) const
@@ -193,41 +213,12 @@ TemplateVector<T> TemplateVector<T>::operator* (const TemplateVector<T>& B) cons
 								m_x * B.m_y - m_y * B.m_x, m_w);
 }
 
-
-
 template<class T>
 TemplateVector<T> TemplateVector<T>::CompProduct (const TemplateVector<T>& A) const
 {
 	return TemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 }
 
-
-
-inline dVector::dVector()
-	:TemplateVector<dFloat>()
-{
-}
-
-inline dVector::dVector(dFloat val)
-	:TemplateVector<dFloat>(val)
-{
-}
-
-
-inline dVector::dVector (const TemplateVector<dFloat>& v)
-	:TemplateVector<dFloat>(v)
-{
-}
-
-inline dVector::dVector (const dFloat* const ptr)
-	:TemplateVector<dFloat>(ptr)
-{
-}
-
-inline dVector::dVector (dFloat x, dFloat y, dFloat z, dFloat w) 
-	:TemplateVector<dFloat>(x, y, z, w)
-{
-}
 
 #endif
 
