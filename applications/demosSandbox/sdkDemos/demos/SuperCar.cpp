@@ -168,8 +168,6 @@ class SuperCarEntity: public DemoEntity
 		for (int i = 0; i < int ((sizeof (m_gearMap) / sizeof (m_gearMap[0]))); i ++) {
 			m_gearMap[i] = i;
 		}
-		m_gearMap[0] = 1;
-		m_gearMap[1] = 0;
 	}
 
 	~SuperCarEntity ()
@@ -179,8 +177,10 @@ class SuperCarEntity: public DemoEntity
 
 	void SetGearMap(CustomVehicleController::EngineController* const engine)
 	{
-		for (int i = 0; i < int((sizeof (m_gearMap) / sizeof (m_gearMap[0]))); i++) {
-			m_gearMap[i] = i;
+		int start = engine->GetFirstGear();
+		int count = engine->GetLastGear() - start;
+		for (int i = 0; i < count; i++) {
+			m_gearMap[i + 2] = start + i;
 		}
 		m_gearMap[0] = engine->GetNeutralGear();
 		m_gearMap[1] = engine->GetReverseGear();
@@ -521,7 +521,7 @@ steeringVal *= 0.3f;
 		// check transmission type
 		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 1
+#if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {

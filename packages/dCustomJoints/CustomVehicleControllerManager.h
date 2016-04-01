@@ -444,6 +444,8 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API void SetIgnition(bool key);
 		CUSTOM_JOINTS_API bool GetIgnition() const;
 
+		CUSTOM_JOINTS_API int GetFirstGear() const;
+		CUSTOM_JOINTS_API int GetLastGear() const;
 		CUSTOM_JOINTS_API int GetNeutralGear() const;
 		CUSTOM_JOINTS_API int GetReverseGear() const;
 

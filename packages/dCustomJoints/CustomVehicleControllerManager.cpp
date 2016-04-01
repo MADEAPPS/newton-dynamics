@@ -1274,6 +1274,17 @@ int CustomVehicleController::EngineController::GetReverseGear() const
 	return D_VEHICLE_REVERSE_GEAR;
 }
 
+int CustomVehicleController::EngineController::GetFirstGear() const
+{
+	return D_VEHICLE_FIRST_GEAR;
+}
+
+int CustomVehicleController::EngineController::GetLastGear() const
+{
+	return m_info.m_gearsCount - 1;
+}
+
+
 dFloat CustomVehicleController::EngineController::GetRPM() const
 {
 	return m_engine->m_omega.m_x * 9.55f;
