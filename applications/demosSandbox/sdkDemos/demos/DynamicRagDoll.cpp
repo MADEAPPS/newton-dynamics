@@ -149,8 +149,8 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 
 	NewtonCollision* MakeSphere(DemoEntity* const bodyPart, const RAGDOLL_BONE_DEFINITION& definition) const
 	{
-		dVector size;
-		dVector origin;
+		dVector size(0.0f);
+		dVector origin(0.0f);
 		dMatrix matrix (dGetIdentityMatrix());
 
 		matrix.m_posit.m_x = definition.m_shape_x;
@@ -162,8 +162,8 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 
 	NewtonCollision* MakeCapsule(DemoEntity* const bodyPart, const RAGDOLL_BONE_DEFINITION& definition) const
 	{
-		dVector size;
-		dVector origin;
+		dVector size(0.0f);
+		dVector origin(0.0f);
 		dMatrix matrix (dPitchMatrix(definition.m_shapePitch * 3.141592f / 180.0f) * dYawMatrix(definition.m_shapeYaw * 3.141592f / 180.0f) * dRollMatrix(definition.m_shapeRoll * 3.141592f / 180.0f));
 
 		matrix.m_posit.m_x = definition.m_shape_x;
@@ -175,8 +175,8 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 	NewtonCollision* MakeBox(DemoEntity* const bodyPart) const
 	{
 		dAssert (0);
-//		dVector size;
-//		dVector origin;
+//		dVector size(0.0f);
+//		dVector origin(0.0f);
 //		dMatrix matrix (GetIdentityMatrix());
 //		GetDimentions(bone, matrix.m_posit, size);
 //		return NewtonCreateBox (nWorld, 2.0f * size.m_x, 2.0f * size.m_y, 2.0f * size.m_z, 0, &matrix[0][0]);
@@ -197,21 +197,20 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
 	{
-		dVector points[1024 * 16];
+		dFloat points[1024 * 16][3];
 
 		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
-		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
-		dAssert (mesh->m_vertexCount && (mesh->m_vertexCount < int (sizeof (points)/ sizeof (points[0]))));
+		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		dAssert(mesh->m_vertexCount && (mesh->m_vertexCount < int(sizeof (points) / sizeof (points[0]))));
 
 		// go over the vertex array and find and collect all vertices's weighted by this bone.
 		dFloat* const array = mesh->m_vertex;
-		for (int i = 0; i < mesh->m_vertexCount; i ++) {
-			points[i].m_x = array[i * 3 + 0];
-			points[i].m_y = array[i * 3 + 1];
-			points[i].m_z = array[i * 3 + 2];
+		for (int i = 0; i < mesh->m_vertexCount; i++) {
+			points[i][0] = array[i * 3 + 0];
+			points[i][1] = array[i * 3 + 1];
+			points[i][2] = array[i * 3 + 2];
 		}
-
-		return NewtonCreateConvexHull (GetWorld(), mesh->m_vertexCount, &points[0].m_x, sizeof (dVector), 1.0e-3f, 0, NULL);
+		return NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &points[0][0], 3 * sizeof (dFloat), 1.0e-3f, 0, NULL);
 	}
 
 
