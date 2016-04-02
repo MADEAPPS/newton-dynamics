@@ -738,7 +738,8 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 			#define STEPS_HULL 6
 			//#define STEPS_HULL 3
 
-			dVector cloud [STEPS_HULL * 4 + 256];
+			//dVector cloud [STEPS_HULL * 4 + 256];
+			dFloat cloud [STEPS_HULL * 4 + 256][3];
 			int count = 0;
 			dFloat radius = size.m_y;
 			dFloat height = size.m_x * 0.999f;
@@ -750,13 +751,16 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 				x += 0.3333f * height;
 				dMatrix acc (dGetIdentityMatrix());
 				for (int j = 0; j < STEPS_HULL; j ++) {
-					cloud[count] = acc.RotateVector(p);
+					dVector tmp (acc.RotateVector(p)); 
+					cloud[count][0] = tmp.m_x;
+					cloud[count][1] = tmp.m_y;
+					cloud[count][2] = tmp.m_z;
 					acc = acc * rotation;
 					count ++;
 				}
 			}
 
-			collision = NewtonCreateConvexHull (world, count, &cloud[0].m_x, sizeof (dVector), 0.02f, 0, NULL); 
+			collision = NewtonCreateConvexHull (world, count, &cloud[0][0], 3 * sizeof (dFloat), 0.02f, 0, NULL); 
 			break;
 		}
 

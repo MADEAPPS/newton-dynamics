@@ -434,7 +434,9 @@ DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dF
 {
 	dFloat* elevationMap[4096];
 	dVector* normalMap[4096];
-	dVector* const normals = new dVector [size * size];
+	dFloat* const normalsPtr = new dFloat [size * size * 4];
+//	dVector* const normals = new dVector [size * size];
+	dVector* const normals = (dVector*)normalsPtr;
 
 	for (int i = 0; i < size; i ++) {
 		elevationMap[i] = &elevation[i * size];
@@ -529,7 +531,7 @@ DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dF
 			}
 		}
 	}
-	delete[] normals; 
+	delete[] normalsPtr; 
 	OptimizeForRender();
 }
 

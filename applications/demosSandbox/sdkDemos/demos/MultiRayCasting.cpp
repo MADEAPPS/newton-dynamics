@@ -26,10 +26,15 @@
 class dRayCastRecord: public CustomControllerBase
 {
 	public:
-	void PreUpdate(dFloat timestep, int threadIndex)
+	dRayCastRecord()
+		:m_p0(0.0f)
+		,m_p1(0.0f)
 	{
 	}
 
+	void PreUpdate(dFloat timestep, int threadIndex)
+	{
+	}
 
 	static dFloat RayCast (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
 	{
@@ -45,7 +50,7 @@ class dRayCastRecord: public CustomControllerBase
 		DemoEntity* const targetEnt = (DemoEntity*) NewtonBodyGetUserData (m_target);
 		const dMatrix& matrix = targetEnt->GetRenderMatrix(); 
 
-		float parameter = 1.1f;
+		dFloat parameter = 1.1f;
 		NewtonWorld* const world = NewtonBodyGetWorld (m_target);
 		NewtonWorldRayCast(world, &m_p0[0], &matrix.m_posit[0], RayCast, &parameter, NULL, threadIndex);
 
