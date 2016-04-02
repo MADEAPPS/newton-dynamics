@@ -25,7 +25,7 @@ class TemplateVector
 	TemplateVector ();
 	TemplateVector (const T val);
 	TemplateVector (const T* const ptr);
-	TemplateVector (T m_x, T m_y, T m_z, T m_w); 
+	TemplateVector (T m_x, T m_y, T m_z, T m_w = T(1.0f)); 
 	TemplateVector Scale (T s) const;
 
 	T& operator[] (int i);
@@ -101,25 +101,15 @@ class dBigVector: public TemplateVector<dFloat64>
 	{
 	}
 
-#ifndef _NEWTON_USE_DOUBLE
-	dBigVector (const TemplateVector<dFloat64>& v)
-		:TemplateVector<dFloat64> (v.m_x, v.m_y, v.m_z, v.m_w)
+	dBigVector(const dVector& v)
+		:TemplateVector<dFloat64>(v.m_x, v.m_y, v.m_z, v.m_w)
 	{
 	}
-#endif
 
-	//	dBigVector (const dFloat *ptr);
 	dBigVector (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w = dFloat(1.0f))
 		:TemplateVector<dFloat64> (x, y, z, w)
 	{
 	}
-
-#ifndef _NEWTON_USE_DOUBLE
-	dBigVector (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w = dFloat64(1.0f))
-		:TemplateVector<dFloat64> (x, y, z, w)
-	{
-	}
-#endif
 };
 
 

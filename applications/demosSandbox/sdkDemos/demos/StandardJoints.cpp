@@ -384,7 +384,8 @@ class JoesRagdollJoint: public CustomBallAndSocket
 			basis = dMatrix(qt0, dVector(0.0f, 0.0f, 0.0f, 1.0f));
 		}
 
-		dVector angVel0, angVel1;
+		dVector angVel0(0.0f);
+		dVector angVel1(0.0f);
 		NewtonBodyGetOmega(m_body0, (dFloat*)&angVel0);
 		NewtonBodyGetOmega(m_body1, (dFloat*)&angVel1);
 
@@ -959,7 +960,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	dBigVector point0;
 	
 	dVector positions[count + 1];
-	dFloat64 knot = spline.FindClosestKnot(point0, origin + dVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 0.0f), 4);
+	dFloat64 knot = spline.FindClosestKnot(point0, dBigVector (origin + dVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 0.0f)), 4);
 	positions[0] = dVector (point0.m_x, point0.m_y, point0.m_z, 0.0);
 	dFloat average = 0.0f;
 	for (int i = 0; i < count; i ++) {
@@ -1042,9 +1043,9 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f, 0.0f, 0.0f, 0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
+//AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 
-/*
+
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -1058,12 +1059,11 @@ AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
-	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
-
+//	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 1.5f); // animated
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -5.0f));
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
-*/
+
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);

@@ -39,8 +39,8 @@ dMatrix dGetZeroMatrix ()
 
 dMatrix dGrammSchmidt(const dVector& dir)
 {
-	dVector up;
-	dVector right;
+	dVector up(0.0f);
+	dVector right(0.0f);
 	dVector front (dir); 
 
 	front = front.Scale(1.0f / dSqrt (front % front));

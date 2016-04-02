@@ -103,9 +103,9 @@ void Custom6DOF::GetAngularLimits (dVector& minAngularLimits, dVector& maxAngula
 
 void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 {
-	dFloat dist;
 	dMatrix matrix0;
 	dMatrix matrix1;
+	dFloat dist;
 
 	strcpy (info->m_descriptionType, GetTypeName());
 
@@ -204,8 +204,8 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	}
 
-	dVector euler0;
-	dVector euler1;
+	dVector euler0(0.0f);
+	dVector euler1(0.0f);
 	dMatrix localMatrix (matrix0 * matrix1.Inverse());
 	localMatrix.GetEulerAngles(euler0, euler1);
 
