@@ -55,6 +55,12 @@ class dComplentaritySolver
 	class dContact
 	{
 		public:
+		dContact()
+			:m_point(0.0f)
+			,m_normal(0.0f)
+		{
+		}
+
 		dVector m_point;
 		dVector m_normal;
 	};
@@ -62,6 +68,12 @@ class dComplentaritySolver
 	class dJacobian
 	{
 		public:
+		dJacobian ()
+			:m_linear(0.0f)
+			,m_angular(0.0f)
+		{
+		}
+
 		dVector m_linear;
 		dVector m_angular;
 	};
@@ -100,6 +112,18 @@ class dComplentaritySolver
 	class dPointDerivativeParam
 	{
 		public:
+		dPointDerivativeParam()
+			:m_r0(0.0f)
+			,m_posit0(0.0f)
+			,m_veloc0(0.0f)
+			,m_centripetal0(0.0f)
+			,m_r1(0.0f)
+			,m_posit1(0.0f)
+			,m_veloc1(0.0f)
+			,m_centripetal1(0.0f)
+		{
+		}
+
 		dVector m_r0;
 		dVector m_posit0;
 		dVector m_veloc0;
