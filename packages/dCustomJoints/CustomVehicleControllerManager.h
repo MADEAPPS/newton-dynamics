@@ -285,6 +285,7 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_clutchFrictionTorque;
 
 			int m_gearsCount;
+			int m_slipDifferentialOn;
 			void* m_userData;
 	
 			private:
@@ -379,25 +380,20 @@ class CustomVehicleController: public CustomControllerBase
 			DriveTrainEngine4W (const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
 			virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
 
-			dFloat matrix[21][21];
+			dFloat matrix[15][15];
 		};
 
 		class DriveTrainDifferentialGear: public DriveTrain
 		{
 			public:
 			DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel);
+			DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel, dFloat side);
 			DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
 
 			void SetGearRatioJacobians(dFloat gearRatio);
 			void SetExternalTorque(EngineController* const controller);
 			dFloat m_gearSign;
 			dFloat m_slipDifferentialFrition;
-		};
-
-		class DriveTrainFrictionPad: public DriveTrain
-		{
-			public:
-			DriveTrainFrictionPad (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel);
 		};
 
 		class DriveTrainTire: public DriveTrain
@@ -441,10 +437,11 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API bool GetTransmissionMode() const;
 		CUSTOM_JOINTS_API void SetTransmissionMode(bool mode);
 
+		CUSTOM_JOINTS_API bool GetSlipDifferential () const;
+		CUSTOM_JOINTS_API void SetSlipDifferential (bool mode);
 		CUSTOM_JOINTS_API void SetClutchParam (dFloat cluthParam);
 
 		CUSTOM_JOINTS_API void PlotEngineCurve () const;
-		
 
 		protected:
 		dFloat GetTopGear() const;

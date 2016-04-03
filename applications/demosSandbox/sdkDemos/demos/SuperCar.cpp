@@ -420,7 +420,7 @@ class SuperCarEntity: public DemoEntity
 				axel1.m_rightTire = rightFrontTire;
 		}
 
-		
+		engineInfo.m_slipDifferentialOn = 1;
 		engineInfo.m_userData = this;
 
 		//CustomVehicleController::BodyPartEngine* const engine = new CustomVehicleController::BodyPartEngine(m_controller, engineInfo, axel0, axel1);

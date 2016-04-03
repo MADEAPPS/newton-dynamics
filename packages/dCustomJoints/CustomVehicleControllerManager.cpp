@@ -740,8 +740,8 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 	dFloat gearRatio = controller->GetGearRatio();
 	SetGearRatio (gearRatio);
 
-static int xxx;
-xxx++;
+//static int xxx;
+//xxx++;
 
 	m_engineTorque = engineTorque;
 	const int nodesCount = GetNodeArray(nodeArray);
@@ -805,27 +805,50 @@ CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4
 	m_child = new DriveTrainDifferentialGear(gearInvInertia, gearInvMass, this, axel0, axel1);
 }
 
+
 CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel)
 	:DriveTrain(invInertia, invMass, parent)
 	,m_gearSign(1.0f)
+	,m_slipDifferentialFrition(D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS)
 {
 	m_dof = 3;
 	m_child = new DriveTrainTire(axel.m_leftTire, this);
 	m_child->m_sibling = new DriveTrainTire(axel.m_rightTire, this);
-
-	m_slipDifferentialFrition = D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS;
 	SetGearRatioJacobians(1.0f);
 }
+
+
+CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel, dFloat side)
+	:DriveTrain(invInertia, invMass, parent)
+	,m_gearSign(1.0f)
+	,m_slipDifferentialFrition(D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS)
+{
+	m_child = new DriveTrainTire(axel.m_leftTire, this);
+	m_child->m_sibling = new DriveTrainTire(axel.m_rightTire, this);
+	m_slipDifferentialFrition = D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS;
+
+	dVector pin(dFloat(dSign(side)), 1.0f, 0.0f, 0.0f);
+	m_J01[0].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
+	m_J01[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+	m_J01[1].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
+	m_J01[1].m_angular = dVector(0.0f, 1.0f, 0.0f, 0.0f) * m_J01[1].m_linear;
+
+	m_J10[0].m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+	m_J10[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+	m_J10[1].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
+	m_J10[1].m_angular = pin * m_J10[1].m_linear;
+	SetInvMassJt();
+}
+
 
 CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:DriveTrain(invInertia, invMass, parent)
 	,m_gearSign(1.0f)
+	,m_slipDifferentialFrition(D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS)
 {
 	m_dof = 3;
-	m_child = new DriveTrainFrictionPad(invInertia, invMass, this, axel0);
-	m_child->m_sibling = new DriveTrainFrictionPad(invInertia, invMass, this, axel1);
-
-	m_slipDifferentialFrition = D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS;
+	m_child = new DriveTrainDifferentialGear(invInertia, invMass, this, axel0, -1.0f);
+	m_child->m_sibling = new DriveTrainDifferentialGear(invInertia, invMass, this, axel1, 1.0f);
 	SetGearRatioJacobians(1.0f);
 	m_gearSign = -1.0f;
 }
@@ -853,7 +876,7 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetG
 void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetExternalTorque(EngineController* const controller)
 {
 	DriveTrain::SetExternalTorque(controller);
-	if (dAbs (m_omega.m_x) > 10.0f) {
+	if ((dAbs (m_omega.m_x) > 10.0f) && controller->GetSlipDifferential()) {
 		// apply viscous slip differential friction torque
 		dFloat omegay = 0.0f;
 		if (m_omega.m_y > D_VEHICLE_SLIP_DIFF_RPS) {
@@ -865,25 +888,6 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetE
 	}
 //	dTrace (("%f %f %f\n", m_omega.m_x, m_omega.m_y, m_torque.m_y));
 }
-
-CustomVehicleController::EngineController::DriveTrainFrictionPad::DriveTrainFrictionPad(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel)
-	:DriveTrain(invInertia, invMass, parent)
-{
-	m_child = new DriveTrainDifferentialGear (invInertia, invMass, this, axel);
-
-	dVector pin(dFloat(dSign(axel.m_leftTire->m_data.m_location.m_x)), 1.0f, 0.0f, 0.0f);
-	m_J01[0].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J01[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J01[1].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J01[1].m_angular = dVector(0.0f, 1.0f, 0.0f, 0.0f) * m_J01[1].m_linear;
-
-	m_J10[0].m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J10[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J10[1].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J10[1].m_angular = pin * m_J10[1].m_linear;
-	SetInvMassJt();
-}
-
 
 CustomVehicleController::EngineController::DriveTrainTire::DriveTrainTire(BodyPartTire* const tire, DriveTrain* const parent)
 	:DriveTrain(dVector(0.0f, 0.0f, 0.0f, 0.0f), 0.0f, parent)
@@ -1013,6 +1017,17 @@ void CustomVehicleController::EngineController::SetInfo(const Info& info)
 		dFloat angle = (1.0f / 30.0f) * (0.277778f) * info.m_vehicleTopSpeed / tire.m_data.m_radio;
 		NewtonBodySetMaxRotationPerStep(tire.GetBody(), angle);
 	}
+}
+
+
+bool CustomVehicleController::EngineController::GetSlipDifferential() const
+{
+	return m_info.m_slipDifferentialOn ? true : false;
+}
+
+void CustomVehicleController::EngineController::SetSlipDifferential(bool mode)
+{
+	m_info.m_slipDifferentialOn ? 1 : 0;
 }
 
 
