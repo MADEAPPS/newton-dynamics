@@ -1143,9 +1143,8 @@ dFloat CustomVehicleController::EngineController::GetGearRatio () const
 
 void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat timestep)
 {
-//m_currentGear = 2;
-//return;
-m_info.m_gearsCount = 3;
+//xxxx
+m_info.m_gearsCount = 4;
 
 	m_gearTimer--;
 	if (m_gearTimer < 0) {
