@@ -60,10 +60,6 @@
 #define VIPER_REDLINE_TORQUE_RPM			6000.0f
 
 
-
-
-
-
 //#define VIPER_TIRE_TOP_SPEED				164 mile / hours
 #define VIPER_TIRE_TOP_SPEED_KMH			264.0f
 
@@ -555,7 +551,7 @@ class SuperCarEntity: public DemoEntity
 #endif
 
 
-forwardGasPedal *= 0.75f;	
+//forwardGasPedal *= 0.75f;	
 		steering->SetParam(steeringVal);
 		switch (m_drivingState)
 		{
@@ -576,6 +572,7 @@ forwardGasPedal *= 0.75f;
 
 			case m_engineIdle:
 			{
+				brakes->SetParam(0.0f);
 				handBrakes->SetParam(handBrakePedal);
 				if (!engineIgnitionKey) {
 					m_drivingState = m_engineOff;
@@ -1435,7 +1432,7 @@ void SuperCar (DemoEntityManager* const scene)
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
-		vehicle1->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
+		vehicle1->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
 		u -= 0.005f;
 /*
 		dMatrix location2 (manager->CalculateSplineMatrix (u));

@@ -32,7 +32,7 @@ static FILE* file_xxx;
 #define D_VEHICLE_MIN_RPM_FACTOR		dFloat(0.5f)
 #define D_VEHICLE_MAX_DRIVETRAIN_DOF	64
 #define D_VEHICLE_REGULARIZER			1.0001f
-
+#define D_VEHICLE_SLIP_DIFF_RPS			5.0f
 
 /*
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
@@ -876,7 +876,11 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetG
 void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetExternalTorque(EngineController* const controller)
 {
 	DriveTrain::SetExternalTorque(controller);
-	dTrace (("%f %f %f\n", m_omega.m_x, m_omega.m_y, m_omega.m_z));
+	if (dAbs (m_omega.m_x) > 10.0f) {
+		// apply limited slip differential 
+		m_omega.m_y = dClamp (m_omega.m_y, -D_VEHICLE_SLIP_DIFF_RPS, D_VEHICLE_SLIP_DIFF_RPS);
+	}
+//	dTrace (("%f %f %f\n", m_omega.m_x, m_omega.m_y, m_omega.m_z));
 }
 
 CustomVehicleController::EngineController::DriveTrainFrictionGear::DriveTrainFrictionGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel)
