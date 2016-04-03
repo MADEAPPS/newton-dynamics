@@ -38,18 +38,17 @@ static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, float
 	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body); joint; joint = NewtonBodyGetNextContactJoint(body, joint)) {
 		if (NewtonJointIsActive (joint)) {
 			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
-				dVector point;
-				dVector normal;	
+				dVector point(0.0f);
+				dVector normal(0.0f);	
 				NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 				NewtonMaterialGetContactPositionAndNormal (material, body, &point.m_x, &normal.m_x);
 
-				dVector tangnetDir0;
-				dVector tangnetDir1;
-				NewtonMaterialGetContactTangentDirections(material, body, &tangnetDir0[0], &tangnetDir1[0]);
+				dVector tangentDir0(0.0f);
+				dVector tangentDir1(0.0f);
+				NewtonMaterialGetContactTangentDirections(material, body, &tangentDir0[0], &tangentDir1[0]);
 
 				// if we are display debug info we need to block other threads from writing the data at the same time
 				dVector p1 (point + normal.Scale (length));
-				//dVector p0 (point - normal.Scale (length));
 				dVector p0 (point);
 				glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 				glVertex3f (p1.m_x, p1.m_y, p1.m_z);
@@ -73,11 +72,11 @@ static void RenderBodyContactsForces (NewtonBody* const body, float scale)
 		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body); joint; joint = NewtonBodyGetNextContactJoint(body, joint)) {
 			if (NewtonJointIsActive (joint)) {
 				for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
-					dVector point;
-					dVector normal;	
-					dVector tangnetDir0;
-					dVector tangnetDir1;
-					dVector contactForce;	
+					dVector point(0.0f);
+					dVector normal(0.0f);	
+					dVector tangnetDir0(0.0f);
+					dVector tangnetDir1(0.0f);
+					dVector contactForce(0.0f);	
 					NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 
 					NewtonMaterialGetContactForce(material, body, &contactForce.m_x);
@@ -120,9 +119,10 @@ void RenderAABB (NewtonWorld* const world)
 //glVertex3f (-19.6875000f, 3.54257250f, 35.2211456f);
 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		dVector p0; 
-		dVector p1; 
 		dMatrix matrix;
+		dVector p0(0.0f); 
+		dVector p1(0.0f); 
+		
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		NewtonBodyGetMatrix (body, &matrix[0][0]);
 		NewtonCollisionCalculateAABB (collision, &matrix[0][0], &p0[0], &p1[0]);
@@ -178,9 +178,9 @@ void RenderCenterOfMass (NewtonWorld* const world)
 
 	glBegin(GL_LINES);
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		dVector com; 
 		dMatrix matrix;
-
+		dVector com(0.0f); 
+		
 		NewtonBodyGetCentreOfMass (body, &com[0]);
 		NewtonBodyGetMatrix (body, &matrix[0][0]);
 
@@ -218,8 +218,8 @@ void RenderContactPoints (NewtonWorld* const world)
 		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body); joint; joint = NewtonBodyGetNextContactJoint(body, joint)) {
 			if (NewtonJointIsActive (joint)) {
 				for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
-					dVector point;
-					dVector normal;	
+					dVector point(0.0f);
+					dVector normal(0.0f);	
 					NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 					NewtonMaterialGetContactPositionAndNormal (material, body, &point.m_x, &normal.m_x);
 

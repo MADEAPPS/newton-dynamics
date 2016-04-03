@@ -1411,7 +1411,7 @@ CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody
 
 void CustomVehicleController::DrawSchematic(dFloat scale) const
 {
-	dVector array[32];
+	
 	dMatrix projectionMatrix(dGetIdentityMatrix());
 	projectionMatrix[0][0] = scale;
 	projectionMatrix[1][1] = 0.0f;
@@ -1419,12 +1419,14 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 	projectionMatrix[2][2] = 0.0f;
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 
+	dMatrix matrix;
+	dVector com(0.0f);
+	dFloat arrayPtr[32][4];
+	dVector* const array = (dVector*)arrayPtr;
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
-	dVector com;
-	dMatrix matrix;
 	NewtonBody* const chassisBody = m_chassis.GetBody();
 
 	float velocityScale = 0.125f;
@@ -1441,7 +1443,6 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 		dVector p0(D_CUSTOM_LARGE_VALUE, D_CUSTOM_LARGE_VALUE, D_CUSTOM_LARGE_VALUE, 0.0f);
 		dVector p1(-D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, 0.0f);
 
-		//for (dList<CustomVehicleControllerBodyStateTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			BodyPartTire* const tire = &node->GetInfo();
 			NewtonBody* const tireBody = tire->GetBody();
@@ -1482,8 +1483,8 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 
 	{
 		// draw vehicle velocity
-		dVector veloc;
-		dVector omega;
+		dVector veloc(0.0f);
+		dVector omega(0.0f);
 
 		NewtonBodyGetOmega(chassisBody, &omega[0]);
 		NewtonBodyGetVelocity(chassisBody, &veloc[0]);
@@ -1531,7 +1532,7 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 			array[1] = origin + longitudinalForce;
 			manager->DrawSchematicCallback(this, "longitudinalForce", 0, 2, array);
 
-			dVector veloc;
+			dVector veloc(0.0f);
 			NewtonBodyGetVelocity(tireBody, &veloc[0]);
 			veloc = chassisMatrix.UnrotateVector(veloc);
 			veloc.m_y = 0.0f;
@@ -1781,6 +1782,28 @@ void CustomVehicleController::Finalize()
 
 	m_finalized = true;
 	NewtonSkeletonContainerFinalize(m_skeleton);
+
+
+	if (m_tireList.GetCount() == 4) {
+		dMatrix matrix;
+		dMatrix tireMatrix;
+		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+		matrix = matrix.Inverse();
+		dVector origin(0.0f);
+		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			BodyPartTire* const tire = &node->GetInfo();
+			NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
+			tireMatrix = tireMatrix * matrix;
+			origin += tireMatrix.m_posit;
+		}
+		origin = origin.Scale (1.0f / 4.0f);
+
+		dVector vehCom (0.0f);
+		NewtonBodyGetCentreOfMass(m_body, &vehCom[0]);
+		vehCom.m_x = origin.m_x;
+		vehCom.m_z = origin.m_z;
+		NewtonBodySetCentreOfMass(m_body, &vehCom[0]);
+	}
 
 /*
 	dWeightDistibutionSolver solver;

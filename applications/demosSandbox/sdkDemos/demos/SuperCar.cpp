@@ -666,7 +666,7 @@ class SuperCarEntity: public DemoEntity
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
 
 		dMatrix matrix;
-		dVector veloc;
+		dVector veloc(0.0f);
 		NewtonBody* const body = chassis.GetBody();
 		NewtonBodyGetVelocity(body, &veloc[0]);
 		NewtonBodyGetMatrix(body, &matrix[0][0]);
@@ -770,16 +770,16 @@ class SuperCarEntity: public DemoEntity
 
 	void Debug (DemoEntity* const m_aiPath) const 
 	{
-		const CustomVehicleController::BodyPart* const chassis = m_controller->GetChassis ();
-		NewtonBody* const chassisBody = chassis->GetBody();
-
+		dMatrix matrix;
+		dVector com(0.0f);
 		dFloat Ixx;
 		dFloat Iyy;
 		dFloat Izz;
 		dFloat mass;
+
+		const CustomVehicleController::BodyPart* const chassis = m_controller->GetChassis ();
+		NewtonBody* const chassisBody = chassis->GetBody();
 		
-		dVector com;
-		dMatrix matrix;
 		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
 		NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
@@ -809,7 +809,7 @@ class SuperCarEntity: public DemoEntity
 		glVertex3f (r1.m_x, r1.m_y, r1.m_z);
 
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
-		dVector veloc;
+		dVector veloc(0.0f);
 		NewtonBodyGetVelocity(chassisBody, &veloc[0]);
 		dVector q0 (p0 + matrix[1].Scale (1.0f));
 		dVector q1 (q0 + veloc.Scale (0.25f));
