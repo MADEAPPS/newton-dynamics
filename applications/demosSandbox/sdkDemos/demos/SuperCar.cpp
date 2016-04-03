@@ -486,6 +486,9 @@ class SuperCarEntity: public DemoEntity
 		} else {
 
 			engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
+			automaticTransmission = m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d);
+			steeringVal = (dFloat(mainWindow->GetKeyState('A')) - dFloat(mainWindow->GetKeyState('D')));
+			gear += int(m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int(m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
 
 			if (mainWindow->GetKeyState ('W')) {
 				forwardGasPedal = 1.0f;
@@ -499,39 +502,21 @@ class SuperCarEntity: public DemoEntity
 				handBrakePedal = 1.0f;
 			}
 
-			steeringVal = (dFloat (mainWindow->GetKeyState ('A')) - dFloat (mainWindow->GetKeyState ('D')));
-
-			gear += int (m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int (m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
-
 
 			if (mainWindow->GetKeyState ('K')) {
  				cluthPedal = 0.0f;
 			}
-		
-			automaticTransmission = m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d) ? 1 : 0;
-
-
-/*
-			// check for gear change (note key code for '>' = '.' and key code for '<' == ',')
-			
-			// do driving heuristic for automatic transmission
-			if (!engine->GetTransmissionMode()) {
-				dFloat speed = engine->GetSpeed();
-				// check if vehicle is parked
-				if ((dAbs (speed) < 1.0f) && !engineGasPedal && !brakePedal && !handBrakePedal) {
-					handBrakePedal = 0.5f;
-				}
-			}
-*/			
 		}
 
 #if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
+			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
 			fwrite (&automaticTransmission, sizeof (int), 1, file);
 			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
+			fwrite (&cluthPedal, sizeof (dFloat), 1, file);
 			fwrite (&forwardGasPedal, sizeof (dFloat), 1, file);
 			fwrite (&reverseGasPedal, sizeof (dFloat), 1, file);
 			fwrite (&handBrakePedal, sizeof (dFloat), 1, file);
@@ -540,9 +525,11 @@ class SuperCarEntity: public DemoEntity
 	#else 
 		static FILE* file = fopen ("log.bin", "rb");
 		if (file) {		
+			fread (&engineIgnitionKey, sizeof (int), 1, file);
 		 	fread (&automaticTransmission, sizeof (int), 1, file);
 			fread (&gear, sizeof (int), 1, file);
 			fread (&steeringVal, sizeof (dFloat), 1, file);
+			fread (&cluthPedal, sizeof (dFloat), 1, file);
 			fread (&forwardGasPedal, sizeof (dFloat), 1, file);
 			fread (&reverseGasPedal, sizeof (dFloat), 1, file);
 			fread (&handBrakePedal, sizeof (dFloat), 1, file);
@@ -1468,7 +1455,7 @@ void SuperCar (DemoEntityManager* const scene)
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
