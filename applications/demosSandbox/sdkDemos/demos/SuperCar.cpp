@@ -204,9 +204,9 @@ class SuperCarEntity: public DemoEntity
 		//dAssert (chassis->GetMeshMatrix().TestIdentity());
 		const dMatrix& meshMatrix = chassis->GetMeshMatrix();
 
-		dVector* const temp = new dVector[mesh->m_vertexCount];
-		meshMatrix.TransformTriplex (&temp[0].m_x, sizeof (dVector), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
-		NewtonCollision* const shape = NewtonCreateConvexHull (world, mesh->m_vertexCount, &temp[0].m_x, sizeof (dVector), 0.001f, 0, NULL);
+		dFloat* const temp = new dFloat[mesh->m_vertexCount * 3];
+		meshMatrix.TransformTriplex (&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
+		NewtonCollision* const shape = NewtonCreateConvexHull (world, mesh->m_vertexCount, &temp[0], 3 * sizeof (dFloat), 0.001f, 0, NULL);
 		delete[] temp;
 		return shape;
 	}
@@ -622,6 +622,11 @@ class SuperCarEntity: public DemoEntity
 				} else {
 					brakes->SetParam(0.0f);
 				}
+
+				if (!engineIgnitionKey) {
+					m_drivingState = m_engineStop;
+				}
+
 				break;
 			}
 
@@ -651,6 +656,10 @@ class SuperCarEntity: public DemoEntity
 					}
 				} else {
 					brakes->SetParam(0.0f);
+				}
+
+				if (!engineIgnitionKey) {
+					m_drivingState = m_engineStop;
 				}
 				break;
 			}
@@ -1417,14 +1426,14 @@ void SuperCar (DemoEntityManager* const scene)
 		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
 		vehicle0->BuildWheelCar(1, -0.35f);
 		u -= 0.005f;
-
+*/
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
 		vehicle1->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
 		u -= 0.005f;
-*/
+/*
 		dMatrix location2 (manager->CalculateSplineMatrix (u));
 		location2.m_posit += location2.m_right.Scale ( 3.0f);
 		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
@@ -1432,6 +1441,7 @@ void SuperCar (DemoEntityManager* const scene)
 		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
 		vehicle2->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
 		u -= 0.01f;
+*/
 	}
 
 	CustomVehicleController* const controller = &manager->GetLast()->GetInfo();
@@ -1454,13 +1464,13 @@ camMatrix = dYawMatrix (0.5f * 3.1416f) * camMatrix;
 	location.m_posit.m_z += 4.0f;
 	location.m_posit.m_x += 44.0f;
 
-	//int count = 5;
+	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
-//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CAPSULE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CYLINDER_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
