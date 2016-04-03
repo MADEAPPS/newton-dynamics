@@ -391,6 +391,7 @@ class CustomVehicleController: public CustomControllerBase
 			void SetGearRatioJacobians(dFloat gearRatio);
 			void SetExternalTorque(EngineController* const controller);
 			dFloat m_gearSign;
+			dFloat m_slipDifferentialFrition;
 		};
 
 		class DriveTrainFrictionPad: public DriveTrain

@@ -33,6 +33,7 @@ static FILE* file_xxx;
 #define D_VEHICLE_MAX_DRIVETRAIN_DOF	64
 #define D_VEHICLE_REGULARIZER			1.0001f
 #define D_VEHICLE_SLIP_DIFF_RPS			5.0f
+#define D_VEHICLE_SLIP_DIFF_FRICTION	50.0f
 
 /*
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
@@ -811,6 +812,8 @@ CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrai
 	m_dof = 3;
 	m_child = new DriveTrainTire(axel.m_leftTire, this);
 	m_child->m_sibling = new DriveTrainTire(axel.m_rightTire, this);
+
+	m_slipDifferentialFrition = D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS;
 	SetGearRatioJacobians(1.0f);
 }
 
@@ -821,6 +824,8 @@ CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrai
 	m_dof = 3;
 	m_child = new DriveTrainFrictionPad(invInertia, invMass, this, axel0);
 	m_child->m_sibling = new DriveTrainFrictionPad(invInertia, invMass, this, axel1);
+
+	m_slipDifferentialFrition = D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS;
 	SetGearRatioJacobians(1.0f);
 	m_gearSign = -1.0f;
 }
@@ -849,10 +854,16 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetE
 {
 	DriveTrain::SetExternalTorque(controller);
 	if (dAbs (m_omega.m_x) > 10.0f) {
-		// apply limited slip differential 
-		m_omega.m_y = dClamp (m_omega.m_y, -D_VEHICLE_SLIP_DIFF_RPS, D_VEHICLE_SLIP_DIFF_RPS);
+		// apply viscous slip differential friction torque
+		dFloat omegay = 0.0f;
+		if (m_omega.m_y > D_VEHICLE_SLIP_DIFF_RPS) {
+			omegay = m_omega.m_y - D_VEHICLE_SLIP_DIFF_RPS;
+		} else if (m_omega.m_y < -D_VEHICLE_SLIP_DIFF_RPS) {
+			omegay = m_omega.m_y + D_VEHICLE_SLIP_DIFF_RPS;
+		}
+		m_torque.m_y = dClamp (-m_slipDifferentialFrition * omegay, - 2.0f * D_VEHICLE_SLIP_DIFF_FRICTION, 2.0f * D_VEHICLE_SLIP_DIFF_FRICTION);
 	}
-//	dTrace (("%f %f %f\n", m_omega.m_x, m_omega.m_y, m_omega.m_z));
+//	dTrace (("%f %f %f\n", m_omega.m_x, m_omega.m_y, m_torque.m_y));
 }
 
 CustomVehicleController::EngineController::DriveTrainFrictionPad::DriveTrainFrictionPad(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel)
