@@ -47,13 +47,13 @@
 
 #define VIPER_CLUTCH_FRICTION_TORQUE		2000.0f
 #define VIPER_IDLE_TORQUE					350.0f
-#define VIPER_IDLE_TORQUE_RPM				500.0f
+#define VIPER_IDLE_TORQUE_RPM				800.0f
 
 // torque in pound per foot
-#define VIPER_PEAK_TORQUE					450.0f
-#define VIPER_PEAK_TORQUE_RPM				3700.0f
+#define VIPER_PEAK_TORQUE					500.0f
+#define VIPER_PEAK_TORQUE_RPM				3000.0f
 
-#define VIPER_PEAK_HP						450.0f
+#define VIPER_PEAK_HP						400.0f
 #define VIPER_PEAK_HP_RPM					5200.0f
 
 #define VIPER_REDLINE_TORQUE				100.0f
@@ -437,6 +437,9 @@ class SuperCarEntity: public DemoEntity
 
 		m_controller->SetEngine(engineControl);
 
+		// trace the engine curve
+		engineControl->PlotEngineCurve ();
+
 		// set the gear look up table
 		SetGearMap(engineControl);
 
@@ -551,7 +554,8 @@ class SuperCarEntity: public DemoEntity
 	#endif
 #endif
 
-	
+
+forwardGasPedal *= 0.75f;	
 		steering->SetParam(steeringVal);
 		switch (m_drivingState)
 		{
@@ -1456,7 +1460,7 @@ void SuperCar (DemoEntityManager* const scene)
 //	scene->SetCameraMouseLock (true);
 
 	camMatrix.m_posit.m_x -= 5.0f;
-camMatrix = dYawMatrix (0.5f * 3.1416f) * camMatrix;
+//camMatrix = dYawMatrix (0.5f * 3.1416f) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 
@@ -1467,10 +1471,10 @@ camMatrix = dYawMatrix (0.5f * 3.1416f) * camMatrix;
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
-	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CAPSULE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CYLINDER_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);

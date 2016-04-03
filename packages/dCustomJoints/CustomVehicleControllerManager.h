@@ -317,7 +317,6 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void Integrate(EngineController* const controller, dFloat timestep);
 			virtual void SetGearRatioJacobians(dFloat gearRatio) {};
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
-			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 			
 			void SetInvMassJt();
 			void BuildMassMatrix ();
@@ -325,7 +324,7 @@ class CustomVehicleController: public CustomControllerBase
 			void FactorRow (int row, int size, dFloat* const matrix);
 			void GetRow(dComplentaritySolver::dJacobian* const row, int dof) const;
 			void GetInvRowT(dComplentaritySolver::dJacobian* const row, int dof) const;
-			
+			void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 			
 			int GetNodeArray(DriveTrain** const array);
 			int GetNodeArray(DriveTrain** const array, int& index);
@@ -355,7 +354,6 @@ class CustomVehicleController: public CustomControllerBase
 			void SetExternalTorque(EngineController* const controller);
 			void RebuildEngine (const dVector& invInertia, dFloat invMass);
 			dFloat GetClutchTorque(EngineController* const controller) const;
-			//void Integrate(EngineController* const controller, dFloat timestep);
 			void Update(EngineController* const controller, dFloat engineTorque, dFloat timestep);
 			void Solve (int dofSize, int width, const dFloat* const massMatrix, const dFloat* const b, dFloat* const x) const;
 
@@ -389,7 +387,7 @@ class CustomVehicleController: public CustomControllerBase
 
 			int GetDegreeOfFredom() const {return m_dof;}
 			void SetGearRatioJacobians(dFloat gearRatio);
-			void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
+			void SetExternalTorque(EngineController* const controller);
 			dFloat m_gearSign;
 			int m_dof;
 		};
@@ -450,7 +448,8 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API void SetClutchParam (dFloat cluthParam);
 
-		CUSTOM_JOINTS_API void UpdateAutomaticGearBox(dFloat timestep);
+		CUSTOM_JOINTS_API void PlotEngineCurve () const;
+		
 
 		protected:
 		dFloat GetTopGear() const;
@@ -458,6 +457,7 @@ class CustomVehicleController: public CustomControllerBase
 		void CalculateCrownGear();
 		dFloat GetGearRatio () const;
 		virtual void Update(dFloat timestep);
+		void UpdateAutomaticGearBox(dFloat timestep);
 
 		Info m_info;
 		Info m_infoCopy;
