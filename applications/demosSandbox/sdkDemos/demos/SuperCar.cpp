@@ -434,7 +434,7 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetEngine(engineControl);
 
 		// trace the engine curve
-		engineControl->PlotEngineCurve ();
+		//engineControl->PlotEngineCurve ();
 
 		// set the gear look up table
 		SetGearMap(engineControl);
@@ -1432,7 +1432,7 @@ void SuperCar (DemoEntityManager* const scene)
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
-		vehicle1->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
+		vehicle1->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
 		u -= 0.005f;
 /*
 		dMatrix location2 (manager->CalculateSplineMatrix (u));
