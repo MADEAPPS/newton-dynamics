@@ -391,26 +391,6 @@ void CustomVehicleController::BodyPartTire::SetBrakeTorque(dFloat torque)
 	tire->m_brakeTorque = dMax (torque, tire->m_brakeTorque);
 }
 
-/*
-void CustomVehicleController::BodyPartEngine::SetGear(int gear)
-{
-	m_gearTimer = 30;
-	dFloat oldGain = m_info.m_gearRatios[m_currentGear];
-	m_currentGear = dClamp(gear, 0, m_info.m_gearsCount);
-
-	dVector omega;
-	dMatrix matrix;
-
-	EngineJoint* const joint = (EngineJoint*)GetJoint();
-	NewtonBody* const engine = joint->GetBody0();
-	NewtonBodyGetOmega(engine, &omega[0]);
-	NewtonBodyGetMatrix(engine, &matrix[0][0]);
-	omega = matrix.UnrotateVector(omega);
-	omega.m_x *= m_info.m_gearRatios[m_currentGear] / oldGain;
-	omega = matrix.RotateVector(omega);
-	NewtonBodySetOmega(engine, &omega[0]);
-}
-*/
 
 void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
 {
@@ -654,7 +634,6 @@ CustomVehicleController::EngineController::DriveTrainEngine::DriveTrainEngine(co
 	,m_lastGear(-1000.0f)
 	,m_engineTorque(0.0f)
 {
-	memset(m_smoothOmega, 0, sizeof (m_smoothOmega));
 }
 
 int CustomVehicleController::EngineController::DriveTrainEngine::GetDegreeOfFredom() const
@@ -703,11 +682,10 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Solve(int dofS
 	}
 }
 
+/*
 void CustomVehicleController::EngineController::DriveTrainEngine::Integrate(EngineController* const controller, dFloat timestep)
 {
 	DriveTrain::Integrate(controller, timestep);
-//	m_omega.m_x = dClamp(m_omega.m_x, dFloat(0.0f), controller->m_info.m_rpmAtReadLineTorque);
-
 	const int size = sizeof (m_smoothOmega) / sizeof (m_smoothOmega[0]);
 	dFloat average = m_omega.m_x;
 	for (int i = 1; i < size; i++) {
@@ -717,6 +695,7 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Integrate(Engi
 	m_smoothOmega[size - 1] = m_omega.m_x;
 	m_omega.m_x = average * (1.0f / size);
 }
+*/
 
 void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (dFloat gearRatio)
 {
@@ -1290,6 +1269,11 @@ dFloat CustomVehicleController::EngineController::GetRPM() const
 	return m_engine->m_omega.m_x * 9.55f;
 }
 
+dFloat CustomVehicleController::EngineController::GetIdleRPM() const
+{
+	return m_info.m_rpmAtIdleTorque * 9.55f;
+}
+
 dFloat CustomVehicleController::EngineController::GetRedLineRPM() const
 {
 	return m_info.m_rpmAtReadLineTorque * 9.55f;
@@ -1305,7 +1289,7 @@ dFloat CustomVehicleController::EngineController::GetSpeed() const
 	NewtonBodyGetVelocity(chassis, &veloc[0]);
 
 	dVector pin (matrix.RotateVector (m_controller->m_localFrame.m_front));
-	return dAbs(pin % veloc);
+	return pin % veloc;
 }
 
 CustomVehicleController::SteeringController::SteeringController (CustomVehicleController* const controller, dFloat maxAngle)

@@ -24,12 +24,8 @@
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
 
 
-//#define __TEST_VEHICLE_XXX__
-
 
 class CustomVehicleController;
-
-
 
 class CustomJoint;
 class CustomVehicleController: public CustomControllerBase
@@ -359,13 +355,12 @@ class CustomVehicleController: public CustomControllerBase
 			void SetExternalTorque(EngineController* const controller);
 			void RebuildEngine (const dVector& invInertia, dFloat invMass);
 			dFloat GetClutchTorque(EngineController* const controller) const;
-			void Integrate(EngineController* const controller, dFloat timestep);
+			//void Integrate(EngineController* const controller, dFloat timestep);
 			void Update(EngineController* const controller, dFloat engineTorque, dFloat timestep);
 			void Solve (int dofSize, int width, const dFloat* const massMatrix, const dFloat* const b, dFloat* const x) const;
 
 			dFloat m_lastGear;
 			dFloat m_engineTorque;
-			dFloat m_smoothOmega[4];
 		};
 
 		class DriveTrainEngine2W: public DriveTrainEngine
@@ -435,6 +430,7 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API void SetInfo(const Info& info);
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const;
+		CUSTOM_JOINTS_API dFloat GetIdleRPM() const;
 		CUSTOM_JOINTS_API dFloat GetRedLineRPM() const;
 		CUSTOM_JOINTS_API dFloat GetSpeed() const;
 

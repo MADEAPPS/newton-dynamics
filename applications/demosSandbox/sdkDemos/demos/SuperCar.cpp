@@ -43,9 +43,9 @@
 #define VIPER_ENGINE_MASS					100.0f
 #define VIPER_MASS							(3380.0f * 0.454f)
 #define VIPER_ENGINE_RADIO					0.125f
-#define VIPER_CLUTCH_FRICTION_TORQUE		1000.0f
+#define VIPER_TIRE_STEER_ANGLE				15.0f
 
-
+#define VIPER_CLUTCH_FRICTION_TORQUE		2000.0f
 #define VIPER_IDLE_TORQUE					350.0f
 #define VIPER_IDLE_TORQUE_RPM				500.0f
 
@@ -60,7 +60,6 @@
 #define VIPER_REDLINE_TORQUE_RPM			6000.0f
 
 
-#define VIPER_TIRE_STEER_ANGLE				10.0f
 
 
 
@@ -96,6 +95,17 @@
 class SuperCarEntity: public DemoEntity
 {
 	public: 
+	enum DrivingState
+	{
+		m_engineOff,
+		m_engineIdle,
+		m_engineStop,
+		m_driveForward,
+		m_preDriveForward,
+		m_driveReverse,
+		m_preDriveReverse,
+	};
+
 	class TireAligmentTransform: public UserData
 	{
 		public: 
@@ -117,13 +127,11 @@ class SuperCarEntity: public DemoEntity
 		,m_controller(NULL)
 		,m_gearUpKey (false)
 		,m_gearDownKey (false)
-		,m_reverseGear (false)
 		,m_engineKeySwitch(false)
 		,m_automaticTransmission(true)
-		,m_engineKeySwitchCounter(0)
-		,m_engineOldKeyState(false)
 		,m_engineRPMOn(false)
 		,m_distanceToPath(distanceToPath)
+		,m_drivingState(m_engineOff)
 	{
 		// add this entity to the scene for rendering
 		scene->Append(this);
@@ -454,14 +462,17 @@ class SuperCarEntity: public DemoEntity
 		int joyButtons;
 
 		int gear = engine->GetGear();
-		dFloat cluthVal = 0.0f;
+		int engineIgnitionKey = 0;
+		int automaticTransmission = engine->GetTransmissionMode();
+		dFloat cluthPedal = 1.0f;
 		dFloat steeringVal = 0.0f;
-		dFloat brakePedal = 0.0f;
-		dFloat engineGasPedal = 0.0f;
+		dFloat reverseGasPedal = 0.0f;
+		dFloat forwardGasPedal = 0.0f;
 		dFloat handBrakePedal = 0.0f;
 		
 		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
 		if (hasJopytick) {
+/*
 			// apply a cubic attenuation to the joystick inputs
 			joyPosX = joyPosX * joyPosX * joyPosX;
 			joyPosY = joyPosY * joyPosY * joyPosY;
@@ -472,36 +483,38 @@ class SuperCarEntity: public DemoEntity
 
 			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
 			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
-
+*/
 		} else {
-	
-			// get keyboard controls
+
+			engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
+
 			if (mainWindow->GetKeyState ('W')) {
-				engineGasPedal = 1.0f;
+				forwardGasPedal = 1.0f;
 			}
 
-			// see if HandBrake is on
-			if (mainWindow->GetKeyState ('S')) {
-				brakePedal = 1.0f;
+			if (mainWindow->GetKeyState('S')) {
+				reverseGasPedal = 1.0f;
 			}
 
-			// see if HandBreale is on
-			if (mainWindow->GetKeyState (' ')) {
+			if (mainWindow->GetKeyState(' ')) {
 				handBrakePedal = 1.0f;
 			}
 
-			cluthVal = mainWindow->GetKeyState (0x0d) ? 0.0f : 1.0f;
-
-			// get the steering input
 			steeringVal = (dFloat (mainWindow->GetKeyState ('A')) - dFloat (mainWindow->GetKeyState ('D')));
 
-#ifdef  __TEST_VEHICLE_XXX__
-steeringVal *= 0.3f;
-#endif
-
-
-			// check for gear change (note key code for '>' = '.' and key code for '<' == ',')
 			gear += int (m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int (m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
+
+
+			if (mainWindow->GetKeyState ('K')) {
+ 				cluthPedal = 0.0f;
+			}
+		
+			automaticTransmission = m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d) ? 1 : 0;
+
+
+/*
+			// check for gear change (note key code for '>' = '.' and key code for '<' == ',')
+			
 			// do driving heuristic for automatic transmission
 			if (!engine->GetTransmissionMode()) {
 				dFloat speed = engine->GetSpeed();
@@ -510,89 +523,137 @@ steeringVal *= 0.3f;
 					handBrakePedal = 0.5f;
 				}
 			}
+*/			
 		}
-
-
-		int reverseGear = m_reverseGear.UpdateTriggerButton (mainWindow, 'R') ? 1 : 0;
-
-		// count the engine key switch
-		m_engineKeySwitchCounter += m_engineKeySwitch.UpdateTriggerButton(mainWindow, 'Y');
-
-		// check transmission type
-		int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
-			fwrite (&m_engineKeySwitchCounter, sizeof (int), 1, file);
-			fwrite (&toggleTransmission, sizeof (int), 1, file);
-			fwrite (&reverseGear, sizeof (int), 1, file);
+			fwrite (&automaticTransmission, sizeof (int), 1, file);
 			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
-			fwrite (&engineGasPedal, sizeof (dFloat), 1, file);
+			fwrite (&forwardGasPedal, sizeof (dFloat), 1, file);
+			fwrite (&reverseGasPedal, sizeof (dFloat), 1, file);
 			fwrite (&handBrakePedal, sizeof (dFloat), 1, file);
-			fwrite (&brakePedal, sizeof (dFloat), 1, file);
 			fflush(file);
 		}
 	#else 
 		static FILE* file = fopen ("log.bin", "rb");
 		if (file) {		
-			fread (&m_engineKeySwitchCounter, sizeof (int), 1, file);
-			fread (&toggleTransmission, sizeof (int), 1, file);
-			fread (&reverseGear, sizeof (int), 1, file);
+		 	fread (&automaticTransmission, sizeof (int), 1, file);
 			fread (&gear, sizeof (int), 1, file);
 			fread (&steeringVal, sizeof (dFloat), 1, file);
-			fread (&engineGasPedal, sizeof (dFloat), 1, file);
+			fread (&forwardGasPedal, sizeof (dFloat), 1, file);
+			fread (&reverseGasPedal, sizeof (dFloat), 1, file);
 			fread (&handBrakePedal, sizeof (dFloat), 1, file);
-			fread (&brakePedal, sizeof (dFloat), 1, file);
-//steeringVal *= -1;
 		}
 	#endif
 #endif
 
-//		dTrace (("%d\n", gear));
-		if (engine) {
-			bool key = (m_engineKeySwitchCounter & 1) ? true : false;
-			if (!m_engineOldKeyState && key) {
-				engine->SetIgnition (true);
-			} else if (m_engineOldKeyState && !key) {
-				engine->SetIgnition (false);
+	
+		steering->SetParam(steeringVal);
+		switch (m_drivingState)
+		{
+			case m_engineOff:
+			{
+				if (engineIgnitionKey) {
+					m_drivingState = m_engineIdle;
+					engine->SetIgnition (true);
+					handBrakes->SetParam(0.0f);
+					engine->SetGear (engine->GetNeutralGear());
+				} else {
+					engine->SetIgnition (false);
+					engine->SetGear(engine->GetFirstGear());
+					handBrakes->SetParam(1.0f);
+				}
+				break;
 			}
-			m_engineOldKeyState = key;
 
+			case m_engineIdle:
+			{
+				handBrakes->SetParam(handBrakePedal);
+				if (!engineIgnitionKey) {
+					m_drivingState = m_engineOff;
+				} else {
+					if (forwardGasPedal) {
+						m_drivingState = m_preDriveForward;
+					} else if (reverseGasPedal) {
+						m_drivingState = m_preDriveReverse;
+					}
+				}
+				break;
+			}
 
-			if (toggleTransmission) {
-				engine->SetTransmissionMode (!engine->GetTransmissionMode());
+			case m_engineStop:
+			{
+				if (forwardGasPedal || reverseGasPedal) {
+					brakes->SetParam(1.0f);
+				} else {
+					m_drivingState = m_engineIdle;
+				}
+				break;
 			}
-			if (!engine->GetTransmissionMode()) {
-				engine->SetGear(gear);
-			}
-			
-			if (reverseGear) {
-				if (engine->GetGear() == engine->GetNeutralGear()) {
+
+			case m_preDriveForward:
+			{
+				if (engine->GetSpeed() < -5.0f) {
+					brakes->SetParam(0.5f);
+					engine->SetClutchParam(0.0f);
 					engine->SetGear(engine->GetNeutralGear());
 				} else {
-					engine->SetGear(engine->GetReverseGear());
+					m_drivingState = m_driveForward;
+					engine->SetGear(engine->GetFirstGear());
 				}
+				break;
+			}	
+
+			case m_driveForward:
+			{
+				engine->SetParam(forwardGasPedal);
+				engine->SetClutchParam(cluthPedal);
+				handBrakes->SetParam(handBrakePedal);
+				if (reverseGasPedal) {
+					brakes->SetParam(reverseGasPedal);
+					if (engine->GetSpeed() < 5.0f) {
+						engine->SetGear(engine->GetNeutralGear());
+						m_drivingState = m_engineStop;
+					}
+				} else {
+					brakes->SetParam(0.0f);
+				}
+				break;
 			}
 
-			engine->SetParam(engineGasPedal);
-		}
+			case m_preDriveReverse:
+			{
+				if (engine->GetSpeed() > 5.0f) {
+					brakes->SetParam(0.5f);
+					engine->SetClutchParam(0.0f);
+					engine->SetGear(engine->GetNeutralGear());
+				} else {
+					m_drivingState = m_driveReverse;
+					engine->SetGear(engine->GetReverseGear());
+				}
+				break;
+			}
 
-		if (cluthVal) {
-			engine->SetClutchParam(cluthVal);
-		}
-				
-		if (steering) {
-			steering->SetParam(steeringVal);
-		}
-
-		if (brakes) {
-			brakes->SetParam(brakePedal);
-		}
-		if (handBrakes) {
-			handBrakes->SetParam(handBrakePedal);
+			case m_driveReverse:
+			{
+				engine->SetParam(reverseGasPedal);
+				engine->SetClutchParam(cluthPedal);
+				handBrakes->SetParam(handBrakePedal);
+				if (forwardGasPedal) {
+					brakes->SetParam(forwardGasPedal);
+					if (engine->GetSpeed() > -5.0f) {
+						engine->SetGear(engine->GetNeutralGear());
+						m_drivingState = m_engineStop;
+					}
+				} else {
+					brakes->SetParam(0.0f);
+				}
+				break;
+			}
 		}
 	}
 
@@ -823,16 +884,13 @@ steeringVal *= 0.3f;
 	CustomVehicleController* m_controller;
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;
-	DemoEntityManager::ButtonKey m_reverseGear;
 	DemoEntityManager::ButtonKey m_engineKeySwitch;
 	DemoEntityManager::ButtonKey m_automaticTransmission;
 	int m_gearMap[10];
-	int m_engineKeySwitchCounter;
-	bool m_engineOldKeyState;
 	bool m_engineRPMOn;
 	dFloat m_distanceToPath;
-
 	dVector m_debugTargetHeading; 
+	DrivingState m_drivingState;
 };
 
 
@@ -947,14 +1005,14 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engine switch       : 'Y'           start engine");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "engine switch       : 'I'           start engine");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'           stick forward");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'           stick back");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left           : 'A'           stick left");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'S'           stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Reverse Gear : 'R'           toggle reverse Gear");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage clutch       : 'K'           button 5");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up             : '>'           button 2");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           : '<'           button 4");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           : '<'           button 3");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission : enter         button 4");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : space         button 1");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
