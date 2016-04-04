@@ -1415,8 +1415,6 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 #endif
 void MilitaryTransport (DemoEntityManager* const scene)
 {
-	dAssert(0);
-/*
 
 	// load the sky box
 	scene->CreateSkyBox();
@@ -1432,6 +1430,8 @@ location.m_posit.m_x = 126.0f;
 location.m_posit.m_y = 50.0f;
 location.m_posit.m_z = 50.0f;
 
+
+/*
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 2.0f;
 
