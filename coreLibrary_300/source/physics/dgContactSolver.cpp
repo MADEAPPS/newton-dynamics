@@ -86,10 +86,8 @@ DG_INLINE void dgContactSolver::SupportVertex(const dgVector& dir0, dgInt32 vert
 
 	const dgMatrix& matrix0 = m_instance0->m_globalMatrix;
 	const dgMatrix& matrix1 = m_instance1->m_globalMatrix;
-	dgVector p(matrix0.TransformVector(m_instance0->SupportVertexSpecial(matrix0.UnrotateVector (dir0), &m_polygonFaceIndex0[vertexIndex])));
-	dgVector q(matrix1.TransformVector(m_instance1->SupportVertexSpecial(matrix1.UnrotateVector (dir1), &m_polygonFaceIndex1[vertexIndex])));
-	p.m_w = dgFloat32(0.0f);
-	q.m_w = dgFloat32(0.0f);
+	dgVector p(matrix0.TransformVector(m_instance0->SupportVertexSpecial(matrix0.UnrotateVector (dir0), &m_polygonFaceIndex0[vertexIndex])) & dgVector::m_triplexMask);
+	dgVector q(matrix1.TransformVector(m_instance1->SupportVertexSpecial(matrix1.UnrotateVector (dir1), &m_polygonFaceIndex1[vertexIndex])) & dgVector::m_triplexMask);
 	m_hullDiff[vertexIndex] = p - q;
 	m_hullSum[vertexIndex] = p + q;
 }
@@ -1943,10 +1941,10 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 		dgFloat32 num = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar();
 		if ((num <= dgFloat32(1.0e-5f)) && (tacc <= timestep)) {
 			// bodies collide at time tacc, but we do not set it yet
-			//dgVector step(relVeloc.Scale4(tacc));
+			dgVector step(relVeloc.Scale4(tacc));
 			m_proxy->m_timestep = tacc;
-			m_proxy->m_closestPointBody0 = m_closestPoint0;
-			m_proxy->m_closestPointBody1 = m_closestPoint1;
+			m_proxy->m_closestPointBody0 = m_closestPoint0 + step;
+			m_proxy->m_closestPointBody1 = m_closestPoint1 + step;
 			m_proxy->m_normal = m_normal.Scale4 (dgFloat32 (-1.0f));
 			m_proxy->m_contactJoint->m_closestDistance = m_proxy->m_normal.DotProduct4(m_closestPoint0 - m_closestPoint1).GetScalar();
 			dgFloat32 penetration = dgMax(num * dgFloat32(-1.0f) - DG_RESTING_CONTACT_PENETRATION, dgFloat32(0.0f));
@@ -1964,7 +1962,7 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 						dgContactPoint* const contactOut = m_proxy->m_contacts;
 
 						for (int i = 0; i < count; i++) {
-							contactOut[i].m_point = m_hullDiff[i];
+							contactOut[i].m_point = m_hullDiff[i] + step;
 							contactOut[i].m_normal = m_normal;
 							contactOut[i].m_penetration = penetration;
 						}

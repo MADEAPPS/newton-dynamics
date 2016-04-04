@@ -155,7 +155,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		return num / den;
 	}
 
-	void ApplyBumberLimitImpact(const dVector& dir, dFloat param)
+	void ApplyBumperImpactLimit(const dVector& dir, dFloat param)
 	{
 		dComplentaritySolver::dJacobian tireJacobian;
 		dComplentaritySolver::dJacobian chassisJacobian;
@@ -260,10 +260,10 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		dFloat param = CalculateTireParametricPosition (tireMatrix, chassisMatrix);
 		if (param > 1.0f) {
 			param = 1.0f;
-			ApplyBumberLimitImpact(chassisMatrix.m_up, param);
+			ApplyBumperImpactLimit(chassisMatrix.m_up, param);
 		} else if (param < 0.0f){
 			param = 0.0f;
-			ApplyBumberLimitImpact(chassisMatrix.m_up, param);
+			ApplyBumperImpactLimit(chassisMatrix.m_up, param);
 		}
 		
 		tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale (param * m_tire->m_data.m_suspesionlenght);
@@ -708,14 +708,12 @@ void CustomVehicleController::EngineController::DriveTrain::ApplyInternalTorque(
 	}
 }
 
-
 CustomVehicleController::EngineController::DriveTrainEngine::DriveTrainEngine(const dVector& invInertia, dFloat invMass)
 	:DriveTrain(invInertia, invMass)
 	,m_lastGear(-1000.0f)
 	,m_engineTorque(0.0f)
 {
 }
-
 
 void CustomVehicleController::EngineController::DriveTrainEngine::SetExternalTorque(EngineController* const controller)
 {
@@ -868,7 +866,6 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 	}
 }
 
-
 CustomVehicleController::EngineController::DriveTrainEngine2W::DriveTrainEngine2W(const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel)
 	:DriveTrainEngine(invInertia, invMass)
 {
@@ -885,7 +882,6 @@ CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4
 	m_child = new DriveTrainDifferentialGear(gearInvInertia, gearInvMass, this, axel0, axel1);
 }
 
-
 CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel)
 	:DriveTrain(invInertia, invMass, parent)
 	,m_gearSign(1.0f)
@@ -896,7 +892,6 @@ CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrai
 	m_child->m_sibling = new DriveTrainTire(axel.m_rightTire, this);
 	SetGearRatioJacobians(1.0f);
 }
-
 
 CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel, dFloat side)
 	:DriveTrain(invInertia, invMass, parent)
@@ -919,7 +914,6 @@ CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrai
 	m_J10[1].m_angular = pin * m_J10[1].m_linear;
 	SetInvMassJt();
 }
-
 
 CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:DriveTrain(invInertia, invMass, parent)
@@ -951,7 +945,6 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetG
 
 	SetInvMassJt();
 }
-
 
 void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetExternalTorque(EngineController* const controller)
 {
@@ -1027,10 +1020,10 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTor
 	torque = matrix.RotateVector(torque);
 	NewtonBodyAddTorque(body, &torque[0]);
 
+//xxxxxxxxxxxxxxxxxxxxxxx
 	dVector parentTorque(m_J10[0].m_angular.Scale(lambda[m_dofBase]) + m_J10[1].m_angular.Scale(lambda[m_dofBase + 1]));
 	m_parent->m_torque += parentTorque;
 }
-
 
 CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:Controller(controller)
