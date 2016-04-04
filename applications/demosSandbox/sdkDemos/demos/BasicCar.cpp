@@ -71,7 +71,7 @@ struct BasciCarParameters
 static BasciCarParameters basicCarParameters = 
 {
 	 900.0f,	// VEHICLE_MASS
-	  40.0f,	// ENGINE_MASS
+	  80.0f,	// ENGINE_MASS
 	  40.0f,	// TIRE_MASS
 	  0.125f,	// ENGINE_ARMATURE_RADIO
 	  1000.0f,	// CLUTCH_FRICTION_TORQUE
@@ -390,6 +390,7 @@ class BasicCarEntity: public DemoEntity
 		engineInfo.m_mass = parameters.ENGINE_MASS;
 		engineInfo.m_radio = parameters.ENGINE_ARMATURE_RADIO;
 		engineInfo.m_vehicleTopSpeed = parameters.TOP_SPEED_KMH;
+		engineInfo.m_clutchFrictionTorque = parameters.CLUTCH_FRICTION_TORQUE;
 		
 		engineInfo.m_peakTorque = parameters.PEAK_TORQUE;
 		engineInfo.m_rpmAtPeakTorque = parameters.PEAK_TORQUE_RPM;
@@ -492,7 +493,7 @@ class BasicCarEntity: public DemoEntity
  			cluthPedal = 0.0f;
 		}
 
-#if 0
+#if 1
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
