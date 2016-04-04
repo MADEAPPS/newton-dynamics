@@ -1429,6 +1429,8 @@ void CustomVehicleController::BrakeController::Update(dFloat timestep)
 	}
 }
 
+
+
 void CustomVehicleControllerManager::DrawSchematic (const CustomVehicleController* const controller, dFloat scale) const
 {
 	controller->DrawSchematic(scale);
@@ -1475,7 +1477,6 @@ CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody
 
 void CustomVehicleController::DrawSchematic(dFloat scale) const
 {
-	
 	dMatrix projectionMatrix(dGetIdentityMatrix());
 	projectionMatrix[0][0] = scale;
 	projectionMatrix[1][1] = 0.0f;
@@ -1678,6 +1679,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 {
 	m_body = body;
 	m_finalized = false;
+	m_weightDistribution = 0.5f;
 	m_localFrame = vehicleFrame;
 	m_localFrame.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 	m_forceAndTorque = forceAndTorque;
@@ -1839,34 +1841,40 @@ void CustomVehicleController::SetCenterOfGravity(const dVector& comRelativeToGeo
 	NewtonBodySetCentreOfMass(m_body, &comRelativeToGeomtriCenter[0]);
 }
 
-
-void CustomVehicleController::Finalize()
+dFloat CustomVehicleController::GetWeightDistribution() const
 {
-//NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
+	return m_weightDistribution;
+}
 
-	m_finalized = true;
-	NewtonSkeletonContainerFinalize(m_skeleton);
+void CustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
+{
+	m_weightDistribution = dClamp (weightDistribution, dFloat(0.0f), dFloat(1.0f));
+	if (m_finalized) {
+		dFloat factor = m_weightDistribution - 0.5f;
+		if (m_tireList.GetCount() == 4) {
+			dMatrix matrix;
+			dMatrix tireMatrix;
+			NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+			matrix = matrix.Inverse();
+			dVector origin(0.0f);
+			dFloat xMin = 1.0e10f;
+			dFloat xMax = -1.0e10f;
+			for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+				BodyPartTire* const tire = &node->GetInfo();
+				NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
+				tireMatrix = tireMatrix * matrix;
+				origin += tireMatrix.m_posit;
+				xMin = dMin (xMin, tireMatrix.m_posit.m_x); 
+				xMax = dMax (xMax, tireMatrix.m_posit.m_x); 
+			}
+			origin = origin.Scale (1.0f / 4.0f);
 
-
-	if (m_tireList.GetCount() == 4) {
-		dMatrix matrix;
-		dMatrix tireMatrix;
-		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
-		matrix = matrix.Inverse();
-		dVector origin(0.0f);
-		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-			BodyPartTire* const tire = &node->GetInfo();
-			NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
-			tireMatrix = tireMatrix * matrix;
-			origin += tireMatrix.m_posit;
+			dVector vehCom (0.0f);
+			NewtonBodyGetCentreOfMass(m_body, &vehCom[0]);
+			vehCom.m_x = origin.m_x + (xMax - xMin) * factor;
+			vehCom.m_z = origin.m_z;
+			NewtonBodySetCentreOfMass(m_body, &vehCom[0]);
 		}
-		origin = origin.Scale (1.0f / 4.0f);
-
-		dVector vehCom (0.0f);
-		NewtonBodyGetCentreOfMass(m_body, &vehCom[0]);
-		vehCom.m_x = origin.m_x;
-		vehCom.m_z = origin.m_z;
-		NewtonBodySetCentreOfMass(m_body, &vehCom[0]);
 	}
 
 /*
@@ -1926,6 +1934,15 @@ void CustomVehicleController::Finalize()
 		index ++;
 	}
 */
+}
+
+
+void CustomVehicleController::Finalize()
+{
+//NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
+	m_finalized = true;
+	NewtonSkeletonContainerFinalize(m_skeleton);
+	SetWeightDistribution (m_weightDistribution);
 }
 
 bool CustomVehicleController::ControlStateChanged() const

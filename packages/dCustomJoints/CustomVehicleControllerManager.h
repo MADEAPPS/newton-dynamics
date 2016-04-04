@@ -537,6 +537,9 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API dFloat GetAerodynamicsDowforceCoeficient() const;
 	CUSTOM_JOINTS_API void SetAerodynamicsDownforceCoefficient(dFloat maxDownforceInGravities, dFloat topSpeed);
 
+	CUSTOM_JOINTS_API dFloat GetWeightDistribution() const;
+	CUSTOM_JOINTS_API void SetWeightDistribution(dFloat weightDistribution);
+
 	CUSTOM_JOINTS_API void DrawSchematic (dFloat scale) const;	
 
 	protected:
@@ -563,6 +566,7 @@ class CustomVehicleController: public CustomControllerBase
 	SteeringController* m_steeringControl; 
 	BodyPartTire::FrictionModel* m_contactFilter;
 	NewtonApplyForceAndTorque m_forceAndTorque;
+	dFloat m_weightDistribution;
 	bool m_finalized;
 
 	friend class CustomVehicleControllerManager;

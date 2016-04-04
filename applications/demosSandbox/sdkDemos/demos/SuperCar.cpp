@@ -44,6 +44,7 @@
 #define VIPER_MASS							(3380.0f * 0.454f)
 #define VIPER_ENGINE_RADIO					0.125f
 #define VIPER_TIRE_STEER_ANGLE				15.0f
+#define VEHICLE_WEIGHT_DISTRIBUTION			0.55f
 
 #define VIPER_CLUTCH_FRICTION_TORQUE		2000.0f
 #define VIPER_IDLE_TORQUE					350.0f
@@ -87,6 +88,8 @@
 //#define VEHICLE_THIRD_PERSON_VIEW_HIGHT		10.0f
 //#define VEHICLE_THIRD_PERSON_VIEW_DIST		35.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
+
+
 
 class SuperCarEntity: public DemoEntity
 {
@@ -438,6 +441,9 @@ class SuperCarEntity: public DemoEntity
 
 		// set the gear look up table
 		SetGearMap(engineControl);
+
+		// set teh vehicle weigh doistibution 
+		m_controller->SetWeightDistribution (VEHICLE_WEIGHT_DISTRIBUTION);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
