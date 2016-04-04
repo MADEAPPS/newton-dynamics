@@ -1015,12 +1015,14 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTor
 {
 	dMatrix matrix;
 	dVector torque(m_J01[0].m_angular.Scale(lambda[m_dofBase]) + m_J01[1].m_angular.Scale(lambda[m_dofBase + 1]));
-	NewtonBody* const body = m_tire->GetBody();
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
+	NewtonBody* const tireBody = m_tire->GetBody();
+	NewtonBody* const chassisBody = m_tire->GetParent()->GetBody();
+	NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
 	torque = matrix.RotateVector(torque);
-	NewtonBodyAddTorque(body, &torque[0]);
-
-//xxxxxxxxxxxxxxxxxxxxxxx
+	NewtonBodyAddTorque(tireBody, &torque[0]);
+	torque = torque.Scale (-1.0f);
+	NewtonBodyAddTorque(chassisBody, &torque[0]);
+	
 	dVector parentTorque(m_J10[0].m_angular.Scale(lambda[m_dofBase]) + m_J10[1].m_angular.Scale(lambda[m_dofBase + 1]));
 	m_parent->m_torque += parentTorque;
 }
