@@ -508,8 +508,8 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 
-#if 0
-	#if 0
+#if 1
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);

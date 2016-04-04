@@ -144,7 +144,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 	}
 
-	dFloat CalcuateTireParametricPosition(const dMatrix& tireMatrix, const dMatrix& chassisMatrix) const 
+	dFloat CalculateTireParametricPosition(const dMatrix& tireMatrix, const dMatrix& chassisMatrix) const 
 	{
 		const dVector& chassisP0 = chassisMatrix.m_posit;
 		dVector chassisP1(chassisMatrix.m_posit + chassisMatrix.m_up.Scale(m_tire->m_data.m_suspesionlenght));
@@ -153,6 +153,77 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		dFloat num = q1p0 % p1p0;
 		dFloat den = p1p0 % p1p0;
 		return num / den;
+	}
+
+	void ApplyBumberLimitImpact(const dVector& dir, dFloat param)
+	{
+		dComplentaritySolver::dJacobian tireJacobian;
+		dComplentaritySolver::dJacobian chassisJacobian;
+
+		dMatrix tireMatrix;
+		dMatrix tireInvInertia;
+		dMatrix chassisMatrix;
+		dMatrix chassisInvInertia;
+		dVector com(0.0f);
+		dVector tireVeloc(0.0f);
+		dVector tireOmega(0.0f);
+		dVector chassisVeloc(0.0f);
+		dVector chassisOmega(0.0f);
+
+		dFloat tireInvMass;
+		dFloat chassisInvMass;
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+
+		NewtonBody* const tire = m_body0;
+		NewtonBody* const chassis = m_body1;
+		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
+		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
+		NewtonBodyGetCentreOfMass(chassis, &com[0]);
+
+		NewtonBodyGetOmega(tire, &tireOmega[0]);
+		NewtonBodyGetVelocity(tire, &tireVeloc[0]);
+		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
+		NewtonBodyGetVelocity(chassis, &chassisVeloc[0]);
+
+
+		dVector r (tireMatrix.m_posit - chassisMatrix.TransformVector(com));
+		tireJacobian.m_linear = dir;
+		tireJacobian.m_angular = dVector (0.0f);
+		chassisJacobian.m_linear = dir.Scale (-1.0f);
+		chassisJacobian.m_angular = r * chassisJacobian.m_linear;
+
+		dFloat relativeVeloc = tireVeloc % tireJacobian.m_linear + tireOmega % tireJacobian.m_angular + chassisVeloc % chassisJacobian.m_linear + chassisOmega % chassisJacobian.m_angular;
+		if (relativeVeloc > 0.0f) {
+			dComplentaritySolver::dJacobian tireInvMassJacobianTrans;
+			dComplentaritySolver::dJacobian chassisInvMassJacobianTrans;
+
+			NewtonBodyGetInvMass(tire, &tireInvMass, &Ixx, &Ixx, &Ixx);
+			NewtonBodyGetInvMass(chassis, &chassisInvMass, &Ixx, &Iyy, &Izz);
+			NewtonBodyGetInvInertiaMatrix(tire, &tireInvInertia[0][0]);
+			NewtonBodyGetInvInertiaMatrix(chassis, &chassisInvInertia[0][0]);
+
+			tireInvMassJacobianTrans.m_linear = tireJacobian.m_linear.Scale (tireInvMass);
+			tireInvMassJacobianTrans.m_angular = tireInvInertia.RotateVector(tireJacobian.m_angular);
+
+			chassisInvMassJacobianTrans.m_linear = chassisJacobian.m_linear.Scale(tireInvMass);
+			chassisInvMassJacobianTrans.m_angular = chassisInvInertia.RotateVector (chassisJacobian.m_angular);
+
+			dFloat den = tireJacobian.m_linear % tireInvMassJacobianTrans.m_linear + tireJacobian.m_angular % tireInvMassJacobianTrans.m_angular + 
+						 chassisJacobian.m_linear % chassisInvMassJacobianTrans.m_linear + chassisJacobian.m_angular % chassisInvMassJacobianTrans.m_angular;
+
+			dFloat impulse = - relativeVeloc / den;
+			tireVeloc += tireInvMassJacobianTrans.m_linear.Scale (impulse);
+			tireOmega += tireInvMassJacobianTrans.m_angular.Scale (impulse);
+			chassisVeloc += chassisInvMassJacobianTrans.m_linear.Scale (impulse);
+			chassisOmega += chassisInvMassJacobianTrans.m_angular.Scale (impulse);
+
+			NewtonBodySetOmega(tire, &tireOmega[0]);
+			NewtonBodySetVelocity(tire, &tireVeloc[0]);
+			NewtonBodySetOmega(chassis, &chassisOmega[0]);
+			NewtonBodySetVelocity(chassis, &chassisVeloc[0]);
+		}
 	}
 
 	void RemoveKinematicError(dFloat timestep)
@@ -185,7 +256,16 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right % tireMatrix.m_right));
 		tireMatrix.m_up = tireMatrix.m_right * tireMatrix.m_front;
 
-		dFloat param = dMin (CalcuateTireParametricPosition (tireMatrix, chassisMatrix), dFloat(1.0f));
+//		dFloat param = dMin (CalculateTireParametricPosition (tireMatrix, chassisMatrix), dFloat(1.0f));
+		dFloat param = CalculateTireParametricPosition (tireMatrix, chassisMatrix);
+		if (param > 1.0f) {
+			param = 1.0f;
+			ApplyBumberLimitImpact(chassisMatrix.m_up, param);
+		} else if (param < 0.0f){
+			param = 0.0f;
+			ApplyBumberLimitImpact(chassisMatrix.m_up, param);
+		}
+		
 		tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale (param * m_tire->m_data.m_suspesionlenght);
 
 		NewtonBody* const tire = m_body0;
@@ -250,7 +330,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		NewtonUserJointAddAngularRow(m_joint, -angle, &chassisMatrix.m_up[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, alphaError);
 
-		dFloat param = CalcuateTireParametricPosition(tireMatrix, chassisMatrix);
+		dFloat param = CalculateTireParametricPosition(tireMatrix, chassisMatrix);
 		if (param >= 1.0f) {
 			dVector chassisMatrixPosit (chassisMatrix.m_posit + chassisMatrix.m_up.Scale (param * m_tire->m_data.m_suspesionlenght));
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
