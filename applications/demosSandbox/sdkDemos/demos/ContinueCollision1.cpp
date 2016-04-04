@@ -32,11 +32,11 @@ static dVector GetLookAtDirction(DemoEntityManager* const scene)
 	dMatrix m = scene->GetCamera()->GetCurrentMatrix();
 	dVector f = m.m_front;
 
-	float x2 = f.m_x * f.m_x;
-	float y2 = f.m_y * f.m_y;
-	float z2 = f.m_z * f.m_z;
+	dFloat x2 = f.m_x * f.m_x;
+	dFloat y2 = f.m_y * f.m_y;
+	dFloat z2 = f.m_z * f.m_z;
 
-	float u = sqrt(x2 + y2 + z2);
+	dFloat u = sqrt(x2 + y2 + z2);
 
 	return dVector(f.m_x / u, f.m_y / u, f.m_z / u);
 }
@@ -118,7 +118,7 @@ class CCDInputManager : public CustomInputManager
 		if (key)
 		{
 
-			float ammo_vel = 1000.0f;
+			dFloat ammo_vel = 1000.0f;
 			dVector vel(dir.m_x*ammo_vel, dir.m_y*ammo_vel, dir.m_z*ammo_vel);
 
 			FireNewtonCcdBox(m_scene->GetNewton(), pos, vel);
@@ -234,7 +234,7 @@ void ContinuousCollision1(DemoEntityManager* const scene)
 	pos.m_y = 50.0f;
 	pos.m_z = 0.0f;
 
-	dQuaternion rot(dVector(1.f,0.f,0.f),(float)M_PI/4.0f);
+	dQuaternion rot(dVector(1.f,0.f,0.f),(dFloat)M_PI/4.0f);
 	scene->SetCameraMatrix(rot, pos);
 
 	CreateBackgroundWallsAndCellingBody(scene->GetNewton());

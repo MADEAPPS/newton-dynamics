@@ -80,7 +80,7 @@ class NewtonDemos: public wxFrame
 	wxMenuBar* CreateMainMenu();
 	void LoadDemo (int index);
 
-	void CalculateFPS(float timestep);
+	void CalculateFPS(dFloat timestep);
 
 	void BEGIN_MENU_OPTION();
 	void END_MENU_OPTION();
@@ -169,8 +169,8 @@ class NewtonDemos: public wxFrame
 	int m_microthreadIndex;
 	int m_hardwareDevice;
 	
-	float m_timestepAcc;
-	float m_fps;
+	dFloat m_timestepAcc;
+	dFloat m_fps;
 
 	int m_key[512];
 	int m_keyMap[512];

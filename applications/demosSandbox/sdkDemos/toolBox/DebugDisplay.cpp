@@ -33,7 +33,7 @@ void SetDebugDisplayMode(int state)
 	static dVector debugDisplayCallback[1024 * 4];
 #endif
 
-static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, float length)
+static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, dFloat length)
 {
 	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body); joint; joint = NewtonBodyGetNextContactJoint(body, joint)) {
 		if (NewtonJointIsActive (joint)) {
@@ -57,7 +57,7 @@ static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, float
 	}
 }
 
-static void RenderBodyContactsForces (NewtonBody* const body, float scale)
+static void RenderBodyContactsForces (NewtonBody* const body, dFloat scale)
 {
 	dFloat mass;
 	dFloat Ixx;
@@ -242,7 +242,7 @@ void RenderNormalForces (NewtonWorld* const world)
 	glColor3f(0.0f, 0.5f, 1.0f);
 	glBegin(GL_LINES);
 
-	float length = 0.25f;
+	dFloat length = 0.125f;
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		RenderBodyContactsForces (body, length);
 	}

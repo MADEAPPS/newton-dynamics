@@ -102,8 +102,8 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	dFloat stepz = maxP.m_z - minP.m_z + 0.01f;
 	dFloat stepy = maxP.m_y - minP.m_y;
 
-	float y0 = matrix.m_posit.m_y + stepy / 2.0f;
-	float z0 = matrix.m_posit.m_z - stepz * count / 2;
+	dFloat y0 = matrix.m_posit.m_y + stepy / 2.0f;
+	dFloat z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 	matrix.m_posit.m_y = y0;
 	for (int j = 0; j < count; j ++) {

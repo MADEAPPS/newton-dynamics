@@ -695,7 +695,7 @@ bool NewtonDemos::GetMouseKeyState (int button) const
 	return false;
 }
 
-void NewtonDemos::CalculateFPS(float timestep)
+void NewtonDemos::CalculateFPS(dFloat timestep)
 {
 	m_framesCount ++;
 	m_timestepAcc += timestep;
@@ -708,7 +708,7 @@ void NewtonDemos::CalculateFPS(float timestep)
 
 	//update fps every quarter of a second
 	if (m_timestepAcc >= 0.25f) {
-		m_fps = float (m_framesCount) / m_timestepAcc;
+		m_fps = dFloat (m_framesCount) / m_timestepAcc;
 		m_timestepAcc -= 0.25f;
 		m_framesCount = 0.0f;
 

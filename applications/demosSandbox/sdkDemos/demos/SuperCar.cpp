@@ -954,8 +954,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		dFloat angle = minAngle + (maxAngle - minAngle) * param;
 		dMatrix needleMatrix (dRollMatrix (angle));
 
-		float x = size * 0.7f;
-		float y = size * 0.7f;
+		dFloat x = size * 0.7f;
+		dFloat y = size * 0.7f;
 
 		glPushMatrix();
 		glMultMatrix (&needleMatrix[0][0]);
@@ -980,8 +980,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		glMultMatrix (&origin[0][0]);
 
 		dFloat uwith = 0.1f;
-		float u0 = uwith * gear;
-		float u1 = u0 + uwith;
+		dFloat u0 = uwith * gear;
+		dFloat u1 = u0 + uwith;
 
 		dFloat x1 = 10.0f;
 		dFloat y1 = 10.0f;

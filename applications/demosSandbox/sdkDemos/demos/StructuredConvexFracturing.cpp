@@ -334,7 +334,7 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
     dVector inertia;
     NewtonConvexCollisionCalculateInertialMatrix (structuredFracturedCollision, &inertia[0], &com[0]);	
 
-    //float mass = 10.0f;
+    //dFloat mass = 10.0f;
     //int materialId = 0;
     //create the rigid body
 	dMatrix matrix (dGetIdentityMatrix());

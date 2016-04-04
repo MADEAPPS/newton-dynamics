@@ -13,7 +13,7 @@
 #include "OpenGlUtil.h"
 #include "dHighResolutionTimer.h"
 
-#define LOCKED_FPS		float (100.0f)
+#define LOCKED_FPS		dFloat (100.0f)
 #define LOCKED_TIMESTEP int ((1000000.0f/LOCKED_FPS))
 
 const dFloat TICKS2SEC = 1.0e-6f;

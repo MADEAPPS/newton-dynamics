@@ -43,7 +43,7 @@ static void UserContactRestitution (const NewtonJoint* contactJoint, dFloat time
 
 	NewtonCollision* const collision = NewtonBodyGetCollision(body);
 	void* userData = NewtonCollisionGetUserData (collision);
-	dFloat restitution = *((float*)&userData);
+	dFloat restitution = *((dFloat*)&userData);
 	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 		NewtonMaterialSetContactElasticity (material, restitution);
@@ -88,7 +88,7 @@ void Restitution (DemoEntityManager* const scene)
 
 	// create a simple scene
 	for (int i = 0; i < zCount; i ++) {
-		float restitution = i * 0.1f + 0.083f;
+		dFloat restitution = i * 0.1f + 0.083f;
 		NewtonBody* body;
 		NewtonCollision* collision;
 

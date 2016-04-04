@@ -69,7 +69,7 @@ void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat times
 	mainWin->GetMousePosition (mouseX, mouseY);
 
 	// slow down the Camera if we have a Body
-	float slowDownFactor = mainWin->IsShiftKeyDown() ? 0.5f/10.0f : 0.5f;
+	dFloat slowDownFactor = mainWin->IsShiftKeyDown() ? 0.5f/10.0f : 0.5f;
 
 	// do camera translation
 	if (mainWin->GetKeyState ('W')) {
@@ -191,7 +191,7 @@ void DemoCameraListener::OnPickedBodyDestroyedNotify (const NewtonBody* body)
 }
 */
 
-void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float timestep) 
+void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat timestep) 
 {
 	NewtonDemos* const mainWin = scene->GetRootWindow();
 
@@ -203,8 +203,8 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 			dVector posit;
 			dVector normal;
 
-			float x = dFloat (m_mousePosX);
-			float y = dFloat (m_mousePosY);
+			dFloat x = dFloat (m_mousePosX);
+			dFloat y = dFloat (m_mousePosY);
 			dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 			NewtonBody* const body = MousePickByForce (scene->GetNewton(), p0, p1, param, posit, normal);
@@ -228,8 +228,8 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, float ti
 
 	} else {
 		if (mainWin->GetMouseKeyState(0)) {
-			float x = dFloat (m_mousePosX);
-			float y = dFloat (m_mousePosY);
+			dFloat x = dFloat (m_mousePosX);
+			dFloat y = dFloat (m_mousePosY);
 			dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);

@@ -607,7 +607,7 @@ void DemoEntityManager::LoadScene (const char* const fileName)
 }
 
 
-float DemoEntityManager::GetPhysicsTime()
+dFloat DemoEntityManager::GetPhysicsTime()
 {
 	return m_physicsTime;
 }
@@ -669,7 +669,7 @@ int DemoEntityManager::Print (const dVector& color, dFloat x, dFloat y, const ch
 }
 
 
-void DemoEntityManager::UpdatePhysics(float timestep)
+void DemoEntityManager::UpdatePhysics(dFloat timestep)
 {
 	// update the physics
 	if (m_world) {

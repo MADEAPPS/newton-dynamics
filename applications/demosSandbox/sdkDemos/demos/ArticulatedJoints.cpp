@@ -976,7 +976,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return dMod(u0 + du * (t - h0) / dh, 1.0f);
 	}
 
-	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, float offset, CustomArticulatedTransformController::dSkeletonBone* const rootNode)
+	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, dFloat offset, CustomArticulatedTransformController::dSkeletonBone* const rootNode)
 	{
 		dFloat linkLength = 0.33f;
 
@@ -1085,7 +1085,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dMatrix aligment (dYawMatrix(90.0f * 3.1416f / 180.0f));
 		NewtonBody* link0 = linkArray[0];
 
-		float linkFriction = 15.0f;
+		dFloat linkFriction = 15.0f;
 		NewtonJoint* hingeArray[1024];
 		for (int i = 1; i < bodyCount; i++) {
 			NewtonBody* const link1 = linkArray[i];
@@ -1534,7 +1534,7 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 			NewtonCollision* const shape = node->GetInfo();
 			dMatrix matrix (child->GetMeshMatrix() * child->CalculateGlobalMatrix());
 			matrix.m_posit += location;
-			float mass = density * NewtonConvexCollisionCalculateVolume(shape);
+			dFloat mass = density * NewtonConvexCollisionCalculateVolume(shape);
 			CreateSimpleSolid (scene, mesh, mass, matrix, shape, defaultMaterialID);
 		}
 	}

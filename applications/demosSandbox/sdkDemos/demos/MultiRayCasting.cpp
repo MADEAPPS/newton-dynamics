@@ -121,9 +121,9 @@ class dRayCasterManager: public CustomControllerManager<dRayCastRecord>
 		// make 16 casting center
 		dVector location[16];
 		for (int i = 0; i < 4; i ++) {
-			float x = (i - 2) * 4.0f;
+			dFloat x = (i - 2) * 4.0f;
 			for (int j = 0; j < 4; j ++) {
-				float z = (j - 2) * 4.0f;
+				dFloat z = (j - 2) * 4.0f;
 				location [i * 4 + j] = dVector (x, 30.0f, z, 0.0f);
 			}
 		}
@@ -191,7 +191,7 @@ void MultiRayCast (DemoEntityManager* const scene)
 
 	// populate the world with few objects
 	int count = 8;
-	float separation = 4.0f;
+	dFloat separation = 4.0f;
 	AddPrimitiveArray(scene, 10.0f, location0, size, count, count, separation, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location1, size, count, count, separation, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location2, size, count, count, separation, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

@@ -277,7 +277,7 @@ static void AddFracturedEntity (DemoEntityManager* const scene, DemoMesh* const 
 	dVector inertia;
 	NewtonConvexCollisionCalculateInertialMatrix (collision, &inertia[0], &origin[0]);	
 
-	float mass = 10.0f;
+	dFloat mass = 10.0f;
 	int materialId = 0;
 
 	//create the rigid body

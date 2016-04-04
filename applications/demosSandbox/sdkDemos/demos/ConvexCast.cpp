@@ -55,13 +55,13 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		
 		for (int i = 0 ; i < count; i ++) {
 			for (int j = 0 ; j < count; j ++) {
-				float pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
-				float yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
-				float roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
+				dFloat pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
+				dFloat yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
+				dFloat roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
 
-				float x = size * (j - count / 2) + RandomVariable (size * 0.5f);
-				float y = RandomVariable (size * 2.0f);
-				float z = size * (i - count / 2) + RandomVariable (size * 0.5f);
+				dFloat x = size * (j - count / 2) + RandomVariable (size * 0.5f);
+				dFloat y = RandomVariable (size * 2.0f);
+				dFloat z = size * (i - count / 2) + RandomVariable (size * 0.5f);
 
 				dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
 				matrix.m_posit = dVector (x, y, z, 1.0f);
@@ -266,8 +266,8 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			buttonState = false;
 			mainWindow->GetMousePosition (mouseX, mouseY);
 
-			float x = dFloat (mouseX);
-			float y = dFloat (mouseY);
+			dFloat x = dFloat (mouseX);
+			dFloat y = dFloat (mouseY);
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 

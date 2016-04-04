@@ -44,7 +44,7 @@ enum eSBMaterials
 
 static void	NewtonRigidBodySetForceCB(const NewtonBody* const body, dFloat timestep, int threadIndex);
 static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoint,dFloat fTimeStep,int ThreadIndex);
-//static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, float length);
+//static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, dFloat length);
 
 
 class PuckEntity: public DemoEntity
@@ -81,9 +81,9 @@ class PuckEntity: public DemoEntity
 		// Set moment of inertia
 		// correction: this is deprecated, NewtonBodySetMassProperties produce the exact result
 		//dVector I;
-		//float Mass = WEIGHT_MASS;
-		//float Radius = WEIGHT_RADIUS;
-		//float Height = WEIGHT_HEIGHT;
+		//dFloat Mass = WEIGHT_MASS;
+		//dFloat Radius = WEIGHT_RADIUS;
+		//dFloat Height = WEIGHT_HEIGHT;
 		//I.m_x = I.m_z = Mass*(3.0f*Radius*Radius+Height*Height)/12.0f;
 		//I.m_y = Mass*Radius*Radius/2.0f;
 		//NewtonBodySetMassMatrix(gPuckBody,Mass, I.m_x, I.m_y, I.m_z);	

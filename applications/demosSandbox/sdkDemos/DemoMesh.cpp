@@ -317,9 +317,9 @@ DemoMesh::DemoMesh(const DemoMesh& mesh)
 	,m_optimizedTransparentDiplayList(0)
 {
 	AllocVertexData(mesh.m_vertexCount);
-	memcpy (m_vertex, mesh.m_vertex, 3 * m_vertexCount * sizeof (float));
-	memcpy (m_normal, mesh.m_normal, 3 * m_vertexCount * sizeof (float));
-	memcpy (m_uv, mesh.m_uv, 2 * m_vertexCount * sizeof (float));
+	memcpy (m_vertex, mesh.m_vertex, 3 * m_vertexCount * sizeof (dFloat));
+	memcpy (m_normal, mesh.m_normal, 3 * m_vertexCount * sizeof (dFloat));
+	memcpy (m_uv, mesh.m_uv, 2 * m_vertexCount * sizeof (dFloat));
 
 	for (dListNode* nodes = mesh.GetFirst(); nodes; nodes = nodes->GetNext()) {
 		DemoSubMesh* const segment = AddSubMesh();
@@ -832,7 +832,7 @@ void DemoMesh::RenderNormals ()
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 
-	float length = 0.1f;
+	dFloat length = 0.1f;
 	glBegin(GL_LINES);
 
 	for (int i = 0; i < m_vertexCount; i ++) {

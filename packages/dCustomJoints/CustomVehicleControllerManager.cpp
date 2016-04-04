@@ -1189,7 +1189,7 @@ void CustomVehicleController::EngineController::PlotEngineCurve() const
 	dFloat omegaStep = (rpm1 - rpm0) / steps;
 	dTrace(("rpm\ttorque\tpower\n"));
 	for (int i = 0; i < steps; i++) {
-		float r = rpm0 + omegaStep * i;
+		dFloat r = rpm0 + omegaStep * i;
 
 		dFloat torque = m_torqueRPMCurve.GetValue(r);
 		dFloat power = r * torque;
@@ -1493,7 +1493,7 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 	dFloat mass;
 	NewtonBody* const chassisBody = m_chassis.GetBody();
 
-	float velocityScale = 0.125f;
+	dFloat velocityScale = 0.125f;
 
 	NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);

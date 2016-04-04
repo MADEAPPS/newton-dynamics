@@ -22,8 +22,8 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 	// load the skybox
 	scene->CreateSkyBox();
 
-//float xxx[] = {2.3257, -3.6253, -2.7155, 2.7075, -3.6253, -2.7155, 2.7075, -3.6253, -2.3337, 2.3257, -3.6253, -2.3337};
-//NewtonCollision* aaa = NewtonCreateConvexHull(scene->GetNewton(), sizeof (xxx) /(3 * sizeof (float)), xxx, 3 * sizeof (float), 0, 0, 0);
+//dFloat xxx[] = {2.3257, -3.6253, -2.7155, 2.7075, -3.6253, -2.7155, 2.7075, -3.6253, -2.3337, 2.3257, -3.6253, -2.3337};
+//NewtonCollision* aaa = NewtonCreateConvexHull(scene->GetNewton(), sizeof (xxx) /(3 * sizeof (dFloat)), xxx, 3 * sizeof (dFloat), 0, 0, 0);
 
 
 	// load the scene from a ngd file format

@@ -1215,7 +1215,7 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 		glBegin(GL_LINES);
 		dBigVector p0 (spline.CurvePoint(0.0f)) ;
 		for (int i = 1; i <= segments; i ++) {
-			dBigVector p1 (spline.CurvePoint(float (i) / segments)) ;
+			dBigVector p1 (spline.CurvePoint(dFloat (i) / segments)) ;
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
 			p0 = p1;
@@ -1249,7 +1249,7 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 		glBegin(GL_LINES);
 		p0 = spline1.CurvePoint(0.0f);
 		for (int i = 1; i <= segments; i ++) {
-			dFloat64 u = float (i) / segments;
+			dFloat64 u = dFloat (i) / segments;
 			dBigVector p1 (spline1.CurvePoint(u));
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
 			glVertex3f (p1.m_x, p1.m_y, p1.m_z);

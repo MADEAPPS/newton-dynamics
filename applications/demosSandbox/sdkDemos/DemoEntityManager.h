@@ -90,9 +90,9 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 
 	void ResetTimer();
 	void RenderFrame ();
-	void UpdatePhysics(float timestep);
+	void UpdatePhysics(dFloat timestep);
 
-	float GetPhysicsTime();
+	dFloat GetPhysicsTime();
 
 	int GetWidth() const;
 	int GetHeight() const;

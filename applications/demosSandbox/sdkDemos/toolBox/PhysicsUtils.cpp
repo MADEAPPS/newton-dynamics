@@ -320,7 +320,7 @@ void GetForceOnStaticBody (NewtonBody* body, NewtonBody* staticBody)
 
 			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
 
-				float forceMag;
+				dFloat forceMag;
 				dVector point;
 				dVector normal;	
 				NewtonMaterial* material;
@@ -343,8 +343,8 @@ void GetForceOnStaticBody (NewtonBody* body, NewtonBody* staticBody)
 
 static void ExtrudeFaces (void* userData, int vertexCount, const dFloat* faceVertec, int id)
 {
-	float OFFSET = 0.1f;
-	float face[32][10];
+	dFloat OFFSET = 0.1f;
+	dFloat face[32][10];
 
 	NewtonMesh* mesh = (NewtonMesh*) userData;
 
@@ -385,7 +385,7 @@ static void ExtrudeFaces (void* userData, int vertexCount, const dFloat* faceVer
 	}
 	
 	// add the face
-	NewtonMeshAddFace (mesh, vertexCount, &face[0][0], 10 * sizeof (float), id);
+	NewtonMeshAddFace (mesh, vertexCount, &face[0][0], 10 * sizeof (dFloat), id);
 
 
 	// now add on face walk the perimeter and add a rivet face
@@ -449,7 +449,7 @@ static void ExtrudeFaces (void* userData, int vertexCount, const dFloat* faceVer
 		q0 = q1;
 
 		// add this face to the mesh
-		NewtonMeshAddFace (mesh, 4, &face[0][0], 10 * sizeof (float), id);
+		NewtonMeshAddFace (mesh, 4, &face[0][0], 10 * sizeof (dFloat), id);
 	}
 }
 

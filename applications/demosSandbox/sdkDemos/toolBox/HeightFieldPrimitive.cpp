@@ -88,7 +88,7 @@ freq *= 0.5f;
 	{
 		dVector* const normals = new dVector [size * size];
 
-		float* elevationMap[4096];
+		dFloat* elevationMap[4096];
 		dVector* normalMap[4096];
 
 		MakeMap (elevation, elevationMap, size);

@@ -307,8 +307,8 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 			//buttonState = false;
 			mainWindow->GetMousePosition (mouseX, mouseY);
 
-			float x = dFloat (mouseX);
-			float y = dFloat (mouseY);
+			dFloat x = dFloat (mouseX);
+			dFloat y = dFloat (mouseY);
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
@@ -485,7 +485,7 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 /*
 dMatrix matrix (dGetIdentityMatrix());
-float pts[] = { 0,0,0, 0,0,0.01, 0.01,0,0.01,  0.01,0,0, 0,0.03,0, 0,0.03,0.01, 0.01, 0.03,0, 0.01,0.03,0.01 };
+dFloat pts[] = { 0,0,0, 0,0,0.01, 0.01,0,0.01,  0.01,0,0, 0,0.03,0, 0,0.03,0.01, 0.01, 0.03,0, 0.01,0.03,0.01 };
 NewtonCollision* col = NewtonCreateConvexHull(scene->GetNewton(), 8, pts, 12, 0.0, 0, NULL);
 NewtonBody* body = NewtonCreateDynamicBody(scene->GetNewton(), col, &matrix[0][0]);
 NewtonBodySetMassProperties(body, 1.0, col);

@@ -46,7 +46,7 @@ static void UserContactFriction (const NewtonJoint* contactJoint, dFloat timeste
 	//now core 300 can have per collision user data 		
 	NewtonCollision* const collision = NewtonBodyGetCollision(body);
 	void* userData = NewtonCollisionGetUserData (collision);
-	dFloat frictionValue = *((float*)&userData);
+	dFloat frictionValue = *((dFloat*)&userData);
 	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 		NewtonMaterialSetContactFrictionCoef (material, frictionValue + 0.1f, frictionValue, 0);
@@ -88,7 +88,7 @@ void Friction (DemoEntityManager* const scene)
 			NewtonCollision* const collision = NewtonBodyGetCollision(body);
 
 			// use the collision user data to save the coefficient of friction 
-			float coefficientOfFriction = dFloat (index) * 0.03f; 
+			dFloat coefficientOfFriction = dFloat (index) * 0.03f; 
 			NewtonCollisionSetUserData (collision, *((void**)&coefficientOfFriction));
 
 //			DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData (body);

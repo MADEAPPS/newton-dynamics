@@ -307,15 +307,14 @@ class JoesRagdollJoint: public CustomBallAndSocket
 	public:
 	dQuaternion m_target; // relative target rotation to reach at next timestep
 
-	float m_reduceError;
-	float m_pin_length;
-	float m_angularFriction;
-	float m_stiffness;
+	dFloat m_reduceError;
+	dFloat m_pin_length;
+	dFloat m_angularFriction;
+	dFloat m_stiffness;
 
-	float m_anim_speed;
-	float m_anim_offset;
-	float m_anim_time;
-
+	dFloat m_anim_speed;
+	dFloat m_anim_offset;
+	dFloat m_anim_time;
 	
 	JoesRagdollJoint(NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world)
 		:CustomBallAndSocket(localMatrix0, localMatrix1, child, parent)
@@ -347,7 +346,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
-		float invTimestep = 1.0f / timestep;
+		dFloat invTimestep = 1.0f / timestep;
 
 		dMatrix matrix0;
 		dMatrix matrix1;
@@ -357,8 +356,8 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		if (m_anim_speed != 0.0f) // some animation to illustrate purpose
 		{
 			m_anim_time += timestep * m_anim_speed;
-			float a0 = sin(m_anim_time);
-			float a1 = m_anim_offset * 3.14f;
+			dFloat a0 = sin(m_anim_time);
+			dFloat a1 = m_anim_offset * 3.14f;
 			dVector axis(sin(a1), 0.0f, cos(a1));
 			//dVector axis (1,0,0);
 			m_target = dQuaternion(axis, a0 * 0.5f);
@@ -370,7 +369,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		dQuaternion qt0 = m_target * q1;
 		dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f)	? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
 
-		float errorAngle = 2.0f * acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
+		dFloat errorAngle = 2.0f * acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
 		dVector errorAngVel(0, 0, 0);
 
 		dMatrix basis;
@@ -395,7 +394,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		for (int n = 0; n < 3; n++) {
 			// calculate the desired acceleration
 			dVector &axis = basis[n];
-			float relAccel = angAcc % axis;
+			dFloat relAccel = angAcc % axis;
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
@@ -407,10 +406,10 @@ class JoesRagdollJoint: public CustomBallAndSocket
 };
 
 
-void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const float animSpeed = 0.0f, const int numSegments = 4)
+void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed = 0.0f, const int numSegments = 4)
 {
-    float height = 1.0f;
-    float width = 4.0f;
+    dFloat height = 1.0f;
+    dFloat width = 4.0f;
 
     dVector size (width, height, width);
     NewtonBody* parent = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
@@ -422,17 +421,17 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 
     for (int i=0; i<numSegments; i++)
     {
-        float height = 1.0f;
-        float width = 0.5f;
+        dFloat height = 1.0f;
+        dFloat width = 0.5f;
 
         dVector size (width, height, width);
-        NewtonBody* child = CreateBox (scene, origin + dVector (0.0f,  0.5f + height * float(i+1), 0.0f, 0.0f), size);
+        NewtonBody* child = CreateBox (scene, origin + dVector (0.0f,  0.5f + height * dFloat(i+1), 0.0f, 0.0f), size);
         
         dMatrix matrix0 = dGetIdentityMatrix(); matrix0.m_posit = dVector (0.0f, height*-0.5f, 0.0f, 1.0f);
         dMatrix matrix1 = dGetIdentityMatrix(); matrix1.m_posit = dVector (0.0f, height*0.5f, 0.0f, 1.0f);
         JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
 
-		if (animSpeed != 0.0f) joint->m_anim_speed = animSpeed, joint->m_anim_offset = float(i) / float(numSegments); // animated      
+		if (animSpeed != 0.0f) joint->m_anim_speed = animSpeed, joint->m_anim_offset = dFloat(i) / dFloat(numSegments); // animated      
 
 #ifdef _USE_HARD_JOINTS
         NewtonSkeletonContainerAttachBone (skeleton, child, parent);

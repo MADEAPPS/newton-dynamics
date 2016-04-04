@@ -122,17 +122,17 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 	NewtonCompoundCollisionBeginAddRemove(compound);	
 
 	// add a bunch of convex collision at random position and orientation over the surface of a big sphere
-	float radio = 5.0f;
+	dFloat radio = 5.0f;
 	for (int i = 0 ; i < 300; i ++) {
 		NewtonCollision* collision = NULL;
 
-		float pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
-		float yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
-		float roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
+		dFloat pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
+		dFloat yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
+		dFloat roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
 
-		float x = RandomVariable (0.5f);
-		float y = RandomVariable (0.5f);
-		float z = RandomVariable (0.5f);
+		dFloat x = RandomVariable (0.5f);
+		dFloat y = RandomVariable (0.5f);
+		dFloat z = RandomVariable (0.5f);
 		if ((x == 0.0f) && (y == 0.0f) && (z == 0.0f)){
 			x = 0.1f;
 		}
