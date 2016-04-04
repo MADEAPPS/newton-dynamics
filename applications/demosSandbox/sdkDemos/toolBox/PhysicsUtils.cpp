@@ -1015,22 +1015,17 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* world, DemoEntity* const enti
 			DemoSubMesh& segment = nodes->GetInfo();
 			int matID = segment.m_textureHandle;
 			for (int i = 0; i < segment.m_indexCount; i += 3) {
-				int index;	
-				dVector face[3];
-
-				index = segment.m_indexes[i + 0] * 3;
-				face[0] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
-
-				index = segment.m_indexes[i + 1] * 3;
-				face[1] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
-
-				index = segment.m_indexes[i + 2] * 3;
-				face[2] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
-
-				matrix.TransformTriplex (&face[0].m_x, sizeof (dVector), &face[0].m_x, sizeof (dVector), 3);
+				dFloat face[3][3];
+				for (int j = 0; j < 3; j ++) {
+					int index = segment.m_indexes[i + j] * 3;
+					face[j][0] = vertex[index + 0];
+					face[j][1] = vertex[index + 1];
+					face[j][2] = vertex[index + 2];
+				}
+				matrix.TransformTriplex (&face[0][0], 3 * sizeof (dFloat), &face[0][0], 3 * sizeof (dFloat), 3);
 
 				// use material ids as physics materials 
-				NewtonTreeCollisionAddFace(collision, 3, &face[0].m_x, sizeof (dVector), matID);
+				NewtonTreeCollisionAddFace(collision, 3, &face[0][0], 3 * sizeof (dFloat), matID);
 			}
 		}
 	}
