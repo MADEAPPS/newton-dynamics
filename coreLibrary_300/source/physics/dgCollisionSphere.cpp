@@ -150,7 +150,7 @@ dgVector dgCollisionSphere::SupportVertex (const dgVector& dir, dgInt32* const v
 	return dir.Scale4 (m_radius);
 }
 
-void dgCollisionSphere::TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* ouput) const
+void dgCollisionSphere::TesselateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* const ouput) const
 {
 	if (level) {
 		dgAssert (dgAbsf (p0 % p0 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));

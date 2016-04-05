@@ -110,6 +110,65 @@ static int OnSubShapeAABBOverlapTest (const NewtonMaterial* const material, cons
 }
 
 
+static void TesselateTriangle (int level, const dVector& p0, const dVector& p1, const dVector& p2, int& count, dFloat* const ouput)
+{
+	if (level) {
+		dAssert (dAbs (p0 % p0 - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dAssert (dAbs (p1 % p1 - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dAssert (dAbs (p2 % p2 - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dVector p01 ((p0 + p1).Scale (0.5f));
+		dVector p12 ((p1 + p2).Scale (0.5f));
+		dVector p20 ((p2 + p0).Scale (0.5f));
+
+		p01 = p01.Scale (1.0f / dSqrt (p01 % p01));
+		p12 = p12.Scale (1.0f / dSqrt (p12 % p12));
+		p20 = p20.Scale (1.0f / dSqrt (p20 % p20));
+
+		dAssert (dAbs (p01 % p01 - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dAssert (dAbs (p12 % p12 - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dAssert (dAbs (p20 % p20 - dFloat (1.0f)) < dFloat (1.0e-4f));
+
+		TesselateTriangle (level - 1, p0,  p01, p20, count, ouput);
+		TesselateTriangle (level - 1, p1,  p12, p01, count, ouput);
+		TesselateTriangle (level - 1, p2,  p20, p12, count, ouput);
+		TesselateTriangle (level - 1, p01, p12, p20, count, ouput);
+	} else {
+		dVector p ((p0 + p1 + p2).Scale (1.0f / 3.0f));
+		p = p.Scale (1.0f / dSqrt (p % p));
+		ouput[count * 3 + 0] = p.m_x;
+		ouput[count * 3 + 1] = p.m_y;
+		ouput[count * 3 + 2] = p.m_z;
+		count ++;
+		dAssert (count < 700);
+	}
+}
+
+static int BuildPointArray (dFloat* const points)
+{
+//	dgTriplex pool[1024 * 2];
+//	dVector points[1024 * 2];
+
+	dVector p0 ( dFloat (1.0f), dFloat (0.0f), dFloat (0.0f), dFloat (0.0f)); 
+	dVector p1 (-dFloat (1.0f), dFloat (0.0f), dFloat (0.0f), dFloat (0.0f)); 
+	dVector p2 ( dFloat (0.0f), dFloat (1.0f), dFloat (0.0f), dFloat (0.0f)); 
+	dVector p3 ( dFloat (0.0f),-dFloat (1.0f), dFloat (0.0f), dFloat (0.0f));
+	dVector p4 ( dFloat (0.0f), dFloat (0.0f), dFloat (1.0f), dFloat (0.0f));
+	dVector p5 ( dFloat (0.0f), dFloat (0.0f),-dFloat (1.0f), dFloat (0.0f));
+
+	int level = 3;
+	int count = 0;
+	TesselateTriangle (level, p4, p0, p2, count, points);
+	TesselateTriangle (level, p4, p2, p1, count, points);
+	TesselateTriangle (level, p4, p1, p3, count, points);
+	TesselateTriangle (level, p4, p3, p0, count, points);
+	TesselateTriangle (level, p5, p2, p0, count, points);
+	TesselateTriangle (level, p5, p1, p2, count, points);
+	TesselateTriangle (level, p5, p3, p1, count, points);
+	TesselateTriangle (level, p5, p0, p3, count, points);
+	return count;
+}
+
+
 static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& origin)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -117,31 +176,28 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 	// create an empty compound collision
 	NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
 	
-	
-#if 1
+	dFloat points[1000][3];
+	int pointsCount = BuildPointArray (&points[0][0]);
+
 	NewtonCompoundCollisionBeginAddRemove(compound);	
 
 	// add a bunch of convex collision at random position and orientation over the surface of a big sphere
 	dFloat radio = 5.0f;
-	for (int i = 0 ; i < 300; i ++) {
+	for (int i = 0 ; i < pointsCount; i ++) {
 		NewtonCollision* collision = NULL;
 
 		dFloat pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
 		dFloat yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
 		dFloat roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
 
-		dFloat x = RandomVariable (0.5f);
-		dFloat y = RandomVariable (0.5f);
-		dFloat z = RandomVariable (0.5f);
-		if ((x == 0.0f) && (y == 0.0f) && (z == 0.0f)){
-			x = 0.1f;
-		}
-		dVector p (x, y, z, 1.0f) ;
-		p = p.Scale (radio / dSqrt (p % p));
+		dFloat x = points[i][0] * radio;
+		dFloat y = points[i][1] * radio;
+		dFloat z = points[i][2] * radio;
 
 		dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
-		matrix.m_posit = p;
-		int r = dRand();	
+		matrix.m_posit = dVector (x, y, z, 1.0f);
+//		int r = dRand();	
+		int r = 0;
 		switch ((r >>2) & 3) 
 		{
 			case 0:
@@ -227,42 +283,10 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 
 //	NewtonCollisionSetScale(compound, 0.5f, 0.25f, 0.125f);
 
-#else 
-
-	//test Yeside compound shape shape
-	//	- Rotation="1.5708 -0 0" Translation="0 0 0.024399" Size="0.021 0.096" Pos="0 0 0.115947"
-	//	- Rotation="1.5708 -0 0" Translation="0 0 0.056366" Size="0.195 0.024" Pos="0 0 0.147914"
-	//	- Rotation="1.5708 -0 0" Translation="0 0 -0.056366" Size="0.0065 0.07 Pos="0 0 0.035182"
-
-	NewtonCompoundCollisionBeginAddRemove(compound);	
-
-	NewtonCollision* collision;
-	dMatrix offsetMatrix (dPitchMatrix(1.5708f));
-	offsetMatrix.m_posit.m_z = 0.115947f;
-	collision = NewtonCreateCylinder (world, 0.021f, 0.096f, 0, &offsetMatrix[0][0]) ;
-	NewtonCompoundCollisionAddSubCollision (compound, collision);
-	NewtonDestroyCollision(collision);
-
-	offsetMatrix.m_posit.m_z = 0.035182f;
-	collision = NewtonCreateCylinder (world, 0.0065f, 0.07f, 0, &offsetMatrix[0][0]) ;
-	NewtonCompoundCollisionAddSubCollision (compound, collision);
-	NewtonDestroyCollision(collision);
-
-	offsetMatrix.m_posit.m_z = 0.147914f;
-	collision = NewtonCreateCylinder (world, 0.195f, 0.024f, 0, &offsetMatrix[0][0]) ;
-	NewtonCompoundCollisionAddSubCollision (compound, collision);
-	NewtonDestroyCollision(collision);
-
-	NewtonCompoundCollisionEndAddRemove(compound);	
-
-#endif
-
-
-
 	// for now we will simple make simple Box,  make a visual Mesh
 	DemoMesh* const visualMesh = new DemoMesh ("big ball", compound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 
-	int instaceCount = 2;
+	int instaceCount = 1;
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	for (int ix = 0; ix < instaceCount; ix ++) {
@@ -288,11 +312,10 @@ void CompoundCollision (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-//	CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	CreateLevelMesh (scene, "playground.ngd", true);
 	//	CreateLevelMesh (scene, "sponza.ngd", true);
-	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE,
-							 1.5f, 0.2f, 200.0f, -50.0f);
+//	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
@@ -317,11 +340,11 @@ void CompoundCollision (DemoEntityManager* const scene)
 	int count = 5;
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 
 	// place camera into position
