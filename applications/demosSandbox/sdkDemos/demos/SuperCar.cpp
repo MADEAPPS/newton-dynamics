@@ -608,7 +608,7 @@ class SuperCarEntity: public DemoEntity
 				engine->SetClutchParam(cluthPedal);
 				handBrakes->SetParam(handBrakePedal);
 				if (reverseGasPedal) {
-					brakes->SetParam(reverseGasPedal);
+					brakes->SetParam(reverseGasPedal * 0.25f);
 					if (engine->GetSpeed() < 5.0f) {
 						engine->SetGear(engine->GetNeutralGear());
 						m_drivingState = m_engineStop;
@@ -643,7 +643,7 @@ class SuperCarEntity: public DemoEntity
 				engine->SetClutchParam(cluthPedal);
 				handBrakes->SetParam(handBrakePedal);
 				if (forwardGasPedal) {
-					brakes->SetParam(forwardGasPedal);
+					brakes->SetParam(forwardGasPedal * 0.25f);
 					if (engine->GetSpeed() > -5.0f) {
 						engine->SetGear(engine->GetNeutralGear());
 						m_drivingState = m_engineStop;
