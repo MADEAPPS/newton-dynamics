@@ -497,11 +497,6 @@ class CustomVehicleController: public CustomControllerBase
 	};
 
 
-#if 0
-	CUSTOM_JOINTS_API void SetDryRollingFrictionTorque (dFloat torque);
-	CUSTOM_JOINTS_API dFloat GetDryRollingFrictionTorque () const;
-#endif
-
 	CUSTOM_JOINTS_API void Finalize();
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);

@@ -1020,7 +1020,8 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTor
 	NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
 	torque = matrix.RotateVector(torque);
 	NewtonBodyAddTorque(tireBody, &torque[0]);
-	torque = torque.Scale (-1.0f);
+
+	torque = torque.Scale (-0.25f);
 	NewtonBodyAddTorque(chassisBody, &torque[0]);
 	
 	dVector parentTorque(m_J10[0].m_angular.Scale(lambda[m_dofBase]) + m_J10[1].m_angular.Scale(lambda[m_dofBase + 1]));
@@ -1439,40 +1440,6 @@ void CustomVehicleControllerManager::DrawSchematic (const CustomVehicleControlle
 void CustomVehicleControllerManager::DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
 {
 }
-
-#if 0
-void CustomVehicleController::SetDryRollingFrictionTorque (dFloat dryRollingFrictionTorque)
-{
-	m_chassisState.SetDryRollingFrictionTorque (dryRollingFrictionTorque);
-}
-
-dFloat CustomVehicleController::GetDryRollingFrictionTorque () const
-{
-	return m_chassisState.GetDryRollingFrictionTorque();
-}
-
-CustomVehicleControllerBodyStateContact* CustomVehicleController::GetContactBody (const NewtonBody* const body)
-{
-	for (int i = 0; i < m_externalContactStatesCount; i ++) {
-		if (m_externalContactStates[i]->m_newtonBody == body) {
-			return m_externalContactStates[i];
-		}
-	}
-
-	dAssert (m_externalContactStatesPool.GetCount() < 32);
-	if (!m_freeContactList) {
-		m_freeContactList = m_externalContactStatesPool.Append();
-	}
-	CustomVehicleControllerBodyStateContact* const externalBody = &m_freeContactList->GetInfo();
-	m_freeContactList = m_freeContactList->GetNext(); 
-	externalBody->Init (this, body);
-	m_externalContactStates[m_externalContactStatesCount] = externalBody;
-	m_externalContactStatesCount ++;
-	dAssert (m_externalContactStatesCount < int (sizeof (m_externalContactStates) / sizeof (m_externalContactStates[0])));
-
-	return externalBody;
-}
-#endif
 
 
 void CustomVehicleController::DrawSchematic(dFloat scale) const
