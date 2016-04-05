@@ -61,9 +61,9 @@ static void GetCollisionSubShape(const NewtonJoint* const contactJoint, NewtonBo
 				// you can also get the forces here, however when tho function is call form a contact material
 				// we can only get resting forces, impulsive forces can not be read here since they has no being calculated yet.
 				// whoever if this function function is call after the NetwonUpdate they the application can read the contact force, that was applied to each contact point
-				dVector force;
-				dVector posit;
-				dVector normal;
+				dVector force(0.0f);
+				dVector posit(0.0f);
+				dVector normal(0.0f);
 				NewtonMaterialGetContactForce (material, body, &force[0]);
 				NewtonMaterialGetContactPositionAndNormal (material, body, &posit[0], &normal[0]);
 				// the torque on this contact is
