@@ -327,6 +327,7 @@ void CompoundCollision (DemoEntityManager* const scene)
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
 	// set a material callback to get the colliding shape
+	NewtonMaterialSetDefaultElasticity(scene->GetNewton(), defaultMaterialID, defaultMaterialID, 0.1f);
 	NewtonMaterialSetCollisionCallback (scene->GetNewton(), defaultMaterialID, defaultMaterialID, NULL, OnGettingTheCollisionSubShapeFromMaterialCallback);
 	NewtonMaterialSetCompoundCollisionCallback(scene->GetNewton(), defaultMaterialID, defaultMaterialID, OnSubShapeAABBOverlapTest);
 
@@ -357,6 +358,8 @@ void CompoundCollision (DemoEntityManager* const scene)
 	// place camera into position
 //	dQuaternion rot;
 //	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
+origin.m_x += 20.0f;	
+origin.m_z += 20.0f;	
 	scene->SetCameraMatrix(rot, origin);
 	//ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
 

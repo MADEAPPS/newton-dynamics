@@ -1422,7 +1422,7 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 	dgAssert(collision0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
 	dgAssert(collision1->IsType(dgCollision::dgCollisionConvexShape_RTTI));
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
-	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount())) {
+	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount() && proxy.m_instance0->GetCollisionMode() && proxy.m_instance1->GetCollisionMode())) {
 		return count;
 	}
 
@@ -1506,7 +1506,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 	dgAssert(collision1->IsType(dgCollision::dgCollisionMesh_RTTI));
 	dgAssert(collision0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
-	if (!collision0->GetConvexVertexCount()) {
+	if (!(collision0->GetConvexVertexCount() && proxy.m_instance0->GetCollisionMode() && proxy.m_instance1->GetCollisionMode())) {
 		return count;
 	}
 
@@ -1520,7 +1520,6 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		instance0.m_globalMatrix.m_posit = dgVector::m_wOne;
 		instance1.m_globalMatrix.m_posit -= origin;
 
-		if (proxy.m_instance0->GetCollisionMode() & proxy.m_instance1->GetCollisionMode()) {
 			contactJoint->m_closestDistance = dgFloat32(1.0e10f);
 
 			dgAssert(proxy.m_timestep <= dgFloat32(2.0f));
@@ -1562,7 +1561,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 					count = PruneContacts(count, proxy.m_contacts);
 				}
 			}
-		}
+
 
 		proxy.m_closestPointBody0 += origin;
 		proxy.m_closestPointBody1 += origin;
@@ -1583,7 +1582,6 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		instance1.m_userData1 = NULL;
 		proxy.m_instance0 = collision0;
 		proxy.m_instance1 = collision1;
-
 	} else {
 		count = CalculateUserContacts(proxy);
 
