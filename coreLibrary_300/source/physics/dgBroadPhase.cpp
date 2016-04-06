@@ -1828,9 +1828,9 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 	// update pre-listeners after the force and true are applied
 	if (m_world->m_preListener.GetCount()) {
+		dTimeTrackerEvent("preListeners");
 		for (dgWorld::dgListenerList::dgListNode* node = m_world->m_preListener.GetFirst(); node; node = node->GetNext()) {
 			dgWorld::dgListener& listener = node->GetInfo();
-			dTimeTrackerEvent(listener.m_name);
 			listener.m_onListenerUpdate(m_world, listener.m_userData, timestep);
 		}
 	}

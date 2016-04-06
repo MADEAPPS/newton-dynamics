@@ -958,6 +958,7 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	UpdateDynamics (timestep);
 
 	if (m_postListener.GetCount()) {
+		dTimeTrackerEvent("postListeners");
 		for (dgListenerList::dgListNode* node = m_postListener.GetFirst(); node; node = node->GetNext()) {
 			dgListener& listener = node->GetInfo();
 			listener.m_onListenerUpdate (this, listener.m_userData, timestep);
