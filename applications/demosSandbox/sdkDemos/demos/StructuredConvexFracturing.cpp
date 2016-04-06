@@ -26,7 +26,7 @@
 
 static int MakeRandomGuassianPointCloud (NewtonMesh* const mesh, dVector* const points, int count)
 {
-	dVector size;
+	dVector size(0.0f);
 	dMatrix matrix(dGetIdentityMatrix()); 
 	NewtonMeshCalculateOOBB(mesh, &matrix[0][0], &size.m_x, &size.m_y, &size.m_z);
 
@@ -56,7 +56,7 @@ static int MakeRandomGuassianPointCloud (NewtonMesh* const mesh, dVector* const 
 
 static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const points)
 {
-	dVector size;
+	dVector size(0.0f);
 	dMatrix matrix(dGetIdentityMatrix()); 
 	NewtonMeshCalculateOOBB(mesh, &matrix[0][0], &size.m_x, &size.m_y, &size.m_z);
 
@@ -330,8 +330,8 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 
 
 
-    dVector com;
-    dVector inertia;
+    dVector com(0.0f);
+    dVector inertia(0.0f);
     NewtonConvexCollisionCalculateInertialMatrix (structuredFracturedCollision, &inertia[0], &com[0]);	
 
     //dFloat mass = 10.0f;

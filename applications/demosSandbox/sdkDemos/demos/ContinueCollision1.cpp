@@ -228,7 +228,7 @@ void ContinuousCollision1(DemoEntityManager* const scene)
 	scene->LoadScene(fileName);
 	
 
-	dVector pos;
+	dVector pos(0.0f);
 
 	pos.m_x = 0.0f;
 	pos.m_y = 50.0f;

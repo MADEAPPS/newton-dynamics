@@ -654,7 +654,7 @@ class BasicCarEntity: public DemoEntity
 		dFloat Izz;
 		dFloat mass;
 
-		dVector com;
+		dVector com(0.0f);
 		dMatrix matrix;
 		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
 		NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
@@ -685,7 +685,7 @@ class BasicCarEntity: public DemoEntity
 		glVertex3f(r1.m_x, r1.m_y, r1.m_z);
 
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
-		dVector veloc;
+		dVector veloc(0.0f);
 		NewtonBodyGetVelocity(chassisBody, &veloc[0]);
 		dVector q0(p0 + matrix[1].Scale(2.0f));
 		dVector q1(q0 + veloc.Scale(0.25f));

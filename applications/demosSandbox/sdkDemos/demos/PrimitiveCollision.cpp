@@ -33,8 +33,8 @@ class ShowCollisionCollide: public DemoEntity::UserData
 
 	virtual void OnRender (dFloat timestep) const
 	{
-		dVector p0;
-		dVector p1;
+		dVector p0(0.0f);
+		dVector p1(0.0f);
 		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(m_body);
 		const dMatrix& matrix = entity->GetRenderMatrix();
 		NewtonCollision* const collision = NewtonBodyGetCollision(m_body);

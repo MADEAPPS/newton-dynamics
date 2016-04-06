@@ -578,7 +578,7 @@ class HeavyVehicleEntity: public DemoEntity
 		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(entity));
 
 		// find the support points that can be used to define the with and high of the tire collision mesh
-		dVector extremePoint;
+		dVector extremePoint(0.0f);
 		dVector upDir (tireMatrix.UnrotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f)));
 		NewtonCollisionSupportVertex (collision, &upDir[0], &extremePoint[0]);
 		radius = dAbs (upDir % extremePoint);
@@ -1383,7 +1383,7 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 			dMatrix playerMatrix (m_player->GetNextMatrix());
 
 			dVector frontDir (camMatrix[0]);
-			dVector camOrigin; 
+			dVector camOrigin(0.0f); 
 			if (m_externalView) {
 				camOrigin = playerMatrix.m_posit + dVector(0.0f, HEAVY_VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f);
 				camOrigin -= frontDir.Scale (HEAVY_VEHICLE_THIRD_PERSON_VIEW_DIST);

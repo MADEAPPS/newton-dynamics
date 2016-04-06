@@ -91,7 +91,7 @@ static void AddNonUniformScaledPrimitives (DemoEntityManager* const scene, dFloa
 
 			//NewtonBodySetCollisionScale (body, scalex, scaley, scalez);
 
-			dVector omega (0, 0, 0);
+			dVector omega (0.0f);
 			NewtonBodySetOmega(body, &omega[0]);
 
 			// release the mesh

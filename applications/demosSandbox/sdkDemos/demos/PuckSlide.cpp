@@ -164,7 +164,7 @@ void NewtonRigidBodySetForceCB(const NewtonBody* const body, dFloat timestep, in
 
 static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoint,dFloat fTimeStep,int ThreadIndex)
 {
-	dVector Position;
+	dVector Position(0.0f);
 	
 	// Get pointer to body
 	NewtonBody* body = NewtonJointGetBody0(pContactJoint);				

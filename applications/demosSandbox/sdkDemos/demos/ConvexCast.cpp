@@ -24,8 +24,8 @@ class StupidComplexOfConvexShapes: public DemoEntity
 	public:
 	StupidComplexOfConvexShapes (DemoEntityManager* const scene, int count)
 	:DemoEntity (dGetIdentityMatrix(), NULL)
-	,m_rayP0(0.0f, 0.0f, 0.0f, 0.0f)
-	,m_rayP1(0.0f, 0.0f, 0.0f, 0.0f)
+	,m_rayP0(0.0f)
+	,m_rayP1(0.0f)
 	{
 		scene->Append(this);
 

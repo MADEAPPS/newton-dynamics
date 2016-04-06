@@ -686,7 +686,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBody* const rootBody = CreateBodyPart (rootEntity, definition[0]);
 
 		// move the center of mass a lithe to the back, and lower
-		dVector com;
+		dVector com(0.0f);
 		NewtonBodyGetCentreOfMass(rootBody, &com[0]);
 		//com.m_x -= 0.25f;
 		com.m_y -= 0.25f;
@@ -1438,7 +1438,7 @@ class AriculatedJointInputManager: public CustomInputManager
 
 		dVector frontDir (camMatrix[0]);
 
-		dVector camOrigin; 
+		dVector camOrigin(0.0f); 
 		m_cameraMode.UpdatePushButton(m_scene->GetRootWindow(), 'C');
 		if (m_cameraMode.GetPushButtonState()) {
 			camOrigin = playerMatrix.TransformVector( dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));

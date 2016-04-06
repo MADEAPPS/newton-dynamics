@@ -36,7 +36,7 @@ static void GetCollisionSubShape(const NewtonJoint* const contactJoint, NewtonBo
 	if (collisionInfo.m_collisionType == SERIALIZE_ID_COMPOUND) {
 
 		// to get the torque we need the center of gravity in global space
-		dVector origin;
+		dVector origin(0.0f);
 		dMatrix bodyMatrix;
 		NewtonBodyGetMatrix(body, &bodyMatrix[0][0]);
 		NewtonBodyGetCentreOfMass(body, &origin[0]);

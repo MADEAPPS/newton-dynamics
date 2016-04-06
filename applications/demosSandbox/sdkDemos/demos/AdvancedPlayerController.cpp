@@ -339,7 +339,7 @@ class AdvancedPlayerInputManager: public CustomInputManager
 		    dFloat height = controller->GetHigh();
 		    dVector upDir (controller->GetUpDir());
 
-		    dVector camOrigin; 
+		    dVector camOrigin(0.0f); 
 
 		    if (m_player->m_inputs.m_cameraMode) {
 			    // set third person view camera
@@ -415,6 +415,7 @@ class PlaformEntityEntity: public DemoEntity
 
 		FerryDriver (NewtonBody* const body, const dVector& pivot, NewtonBody* const triggerPort0, NewtonBody* const triggerPort1)
 			:CustomKinematicController (body, pivot)
+			,m_target(0.0f)
 			,m_triggerPort0(triggerPort0)
 			,m_triggerPort1(triggerPort1)
 			,m_state(m_driving)
@@ -442,7 +443,7 @@ class PlaformEntityEntity: public DemoEntity
 		virtual void SubmitConstraints (dFloat timestep, int threadIndex)
 		{
 			dMatrix matrix;
-			dVector com;
+			dVector com(0.0f);
 			const dFloat speed = 3.0f;
 			NewtonBody* const body = GetBody0();
 
@@ -524,17 +525,17 @@ class PlaformEntityEntity: public DemoEntity
 		NewtonWorld* const world = scene->GetNewton();
 
 		// note: because the mesh matrix can have scale, for simplicity just apply the local mesh matrix to the vertex cloud
-		dVector pool[128];
+		dFloat pool[128][3];
 		const dMatrix& meshMatrix = GetMeshMatrix();
-		meshMatrix.TransformTriplex(&pool[0].m_x, sizeof (dVector), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
-		NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, &pool[0].m_x, sizeof (dVector), 0, 0, NULL);
+		meshMatrix.TransformTriplex(&pool[0][0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
+		NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, &pool[0][0], 3 * sizeof (dFloat), 0, 0, NULL);
 
 		NewtonBody* body = CreateSimpleBody (world, this, 100, matrix, collision, 0);
 		NewtonDestroyCollision(collision);
 
 
 		// attach a kinematic joint controller joint to move this body 
-		dVector pivot;
+		dVector pivot(0.0f);
 		NewtonBodyGetCentreOfMass (body, &pivot[0]);
 		pivot = matrix.TransformVector(pivot);
 		m_driver = new FerryDriver (body, pivot, triggerPort0, triggerPort1);
@@ -611,19 +612,22 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 		int trianglesCount = subMesh->m_indexCount;
 		for (int i = 0; i < trianglesCount; i += 3) {
 
-			dVector face[3];
-			int index = indices[i + 0] * 3;
-			face[0] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
+			dFloat face[3][3];
+			for (int j = 0; j < 3; j ++) {
+				int index = indices[i + j] * 3;
+				face[j][0] = vertex[index + 0];
+				face[j][1] = vertex[index + 1];
+				face[j][2] = vertex[index + 2];
+			}
+//			index = indices[i + 1] * 3;
+//			face[1] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
 
-			index = indices[i + 1] * 3;
-			face[1] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
-
-			index = indices[i + 2] * 3;
-			face[2] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
+//			index = indices[i + 2] * 3;
+//			face[2] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
 
 			int matID = 0;
 			//matID = matID == 2 ? 1 : 2 ;
-			NewtonTreeCollisionAddFace(tree, 3, &face[0].m_x, sizeof (dVector), matID);
+			NewtonTreeCollisionAddFace(tree, 3, &face[0][0], 3 * sizeof (dFloat), matID);
 		}
 	}
 	NewtonTreeCollisionEndBuild (tree, 1);
@@ -860,8 +864,8 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		dVector dir (matrix0.UnrotateVector(planksideDir));
 		NewtonCollision* const shape = NewtonBodyGetCollision(body0);
 
-		dVector p0;
-		dVector p1;
+		dVector p0(0.0f);
+		dVector p1(0.0f);
 		NewtonCollisionSupportVertex(shape, &dir[0], &p0[0]);
 		dVector dir1 (dir.Scale (-1.0f));
 		NewtonCollisionSupportVertex(shape, &dir1[0], &p1[0]);

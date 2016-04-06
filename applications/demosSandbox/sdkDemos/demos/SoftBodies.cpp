@@ -39,8 +39,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonWorld* const world = scene->GetNewton();
 		// calculate the moment of inertia and the relative center of mass of the solid
 
-		dVector origin;
-		dVector inertia;
+		dVector origin(0.0f);
+		dVector inertia(0.0f);
 		NewtonConvexCollisionCalculateInertialMatrix (softCollision, &inertia[0], &origin[0]);	
 
 		dFloat mass = 8.0f;
@@ -297,7 +297,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		dVector p2 (-1.0e10f, 1.0e10f, -1.0e10f, 0.0f);
 		dVector p3 (-1.0e10f, 1.0e10f,  1.0e10f, 0.0f);
 		for (int i = 0; i < particlesCount; i++ ) {
-			dVector p;
+			dVector p(0.0f);
 			NewtonDeformableMeshGetParticlePosition (softCollisionMesh, i, &p.m_x);
 			if ((p.m_x < p0.m_x) || (p.m_z < p0.m_z)) {
 				index0 = i;

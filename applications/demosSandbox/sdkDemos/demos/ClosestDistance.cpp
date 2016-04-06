@@ -27,6 +27,9 @@ class dClosestDistanceRecord: public CustomControllerBase
 		public:
 		ClosestDistanceEntity (DemoEntityManager* const scene, dMatrix& matrix, int materialID, PrimitiveType castingShapeType)
 			:DemoEntity (matrix, NULL)
+			,m_normal(0.0f)
+			,m_contact0(0.0f)
+			,m_contact1(0.0f)
 			,m_contactsCount(0)
 		{
 			NewtonWorld* const world = scene->GetNewton();

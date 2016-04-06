@@ -27,6 +27,12 @@
 class FractureAtom
 {
 	public:
+	FractureAtom()
+		:m_centerOfMass(0.0f)
+		,m_momentOfInirtia(0.0f)
+	{
+	}
+
 	dVector m_centerOfMass;
 	dVector m_momentOfInirtia;
 	DemoMesh* m_mesh;
@@ -45,7 +51,7 @@ class FractureEffect: public dList<FractureAtom>
 		// the subdivision are local to the point placement, by placing these points visual ally with a 3d tool
 		// and have precise control of how the debris are created.
 		// the number of pieces is equal to the number of point inside the Mesh plus the number of point on the mesh 
-		dVector size;
+		dVector size(0.0f);
 		dMatrix matrix(dGetIdentityMatrix()); 
 		NewtonMeshCalculateOOBB(mesh, &matrix[0][0], &size.m_x, &size.m_y, &size.m_z);
 
@@ -178,15 +184,14 @@ class SimpleFracturedEffectEntity: public DemoEntity
 		if (breakImpact > BREAK_IMPACT_IN_METERS_PER_SECONDS) {
 			NewtonWorld* const world = NewtonBodyGetWorld(m_myBody);
 
-			dFloat Ixx; 
-			dFloat Iyy; 
-			dFloat Izz; 
-			dFloat mass; 
-
-			dVector com;
-			dVector veloc;
-			dVector omega;
 			dMatrix bodyMatrix;
+			dVector com(0.0f);
+			dVector veloc(0.0f);
+			dVector omega(0.0f);
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
 
 			NewtonBodyGetVelocity(m_myBody, &veloc[0]);
 			NewtonBodyGetOmega(m_myBody, &omega[0]);
@@ -273,8 +278,8 @@ static void AddFracturedEntity (DemoEntityManager* const scene, DemoMesh* const 
 	entity->InterpolateMatrix (*scene, 1.0f);
 	scene->Append(entity);
 
-	dVector origin;
-	dVector inertia;
+	dVector origin(0.0f);
+	dVector inertia(0.0f);
 	NewtonConvexCollisionCalculateInertialMatrix (collision, &inertia[0], &origin[0]);	
 
 	dFloat mass = 10.0f;

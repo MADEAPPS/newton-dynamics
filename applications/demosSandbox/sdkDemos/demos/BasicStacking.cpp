@@ -94,8 +94,8 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f; 
 
 	// get the dimension from shape itself
-	dVector minP;
-	dVector maxP;
+	dVector minP(0.0f);
+	dVector maxP(0.0f);
 	CalculateAABB (collision, dGetIdentityMatrix(), minP, maxP);
 
 	//dFloat stepz = size.m_z + 0.01f;

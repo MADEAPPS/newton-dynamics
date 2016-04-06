@@ -17,11 +17,11 @@
 
 #if 0
 static dFloat pickedParam;
-static dVector pickedForce;
-static dVector rayLocalNormal;
-static dVector rayWorldNormal;
-static dVector rayWorldOrigin;
-static dVector attachmentPoint;
+static dVector pickedForce(0.0f);
+static dVector rayLocalNormal(0.0f);
+static dVector rayWorldNormal(0.0f);
+static dVector rayWorldOrigin(0.0f);
+static dVector attachmentPoint(0.0f);
 
 static bool isPickedBodyDynamics;
 static NewtonBody* pickedBody;
@@ -46,9 +46,9 @@ static void PhysicsApplyPickForce (const NewtonBody* body, dFloat timestep, int 
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
-	dVector com;
-	dVector veloc;
-	dVector omega;
+	dVector com(0.0f);
+	dVector veloc(0.0f);
+	dVector omega(0.0f);
 	dMatrix matrix;
 
 	// apply the thew body forces
@@ -267,7 +267,8 @@ class dMousePickClass
 {
 	public:
 	dMousePickClass ()
-		:m_param (1.0f)
+		:m_normal(0.0f)
+		,m_param (1.0f)
 		,m_body(NULL)
 	{
 	}

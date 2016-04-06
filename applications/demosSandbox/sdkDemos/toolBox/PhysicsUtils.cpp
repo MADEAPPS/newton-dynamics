@@ -27,9 +27,9 @@ dVector ForceBetweenBody (NewtonBody* const body0, NewtonBody* const body1)
 	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body0); joint; joint = NewtonBodyGetNextContactJoint(body0, joint)) {
 		if ((NewtonJointGetBody0(joint) == body0) || (NewtonJointGetBody0(joint) == body1)) {
 			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
-				dVector point;
-				dVector normal;	
-				dVector contactForce;
+				dVector point(0.0f);
+				dVector normal(0.0f);	
+				dVector contactForce(0.0f);
 				NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 				NewtonMaterialGetContactPositionAndNormal (material, body0, &point.m_x, &normal.m_x);
 				NewtonMaterialGetContactForce(material, body0, &contactForce[0]);
@@ -319,10 +319,10 @@ void GetForceOnStaticBody (NewtonBody* body, NewtonBody* staticBody)
 		if ((body0 == staticBody) || (body1 == staticBody)) {
 
 			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
-
+	
+				dVector point(0.0f);
+				dVector normal(0.0f);	
 				dFloat forceMag;
-				dVector point;
-				dVector normal;	
 				NewtonMaterial* material;
 
 				material = NewtonContactGetMaterial (contact);
@@ -349,7 +349,7 @@ static void ExtrudeFaces (void* userData, int vertexCount, const dFloat* faceVer
 	NewtonMesh* mesh = (NewtonMesh*) userData;
 
 	// calculate the face normal
-	dVector normal (0, 0, 0);
+	dVector normal (0.0f);
 	dVector p0 (faceVertec[0 * 3 + 0], faceVertec[0 * 3 + 1], faceVertec[0 * 3 + 2]);
 	dVector p1 (faceVertec[1 * 3 + 0], faceVertec[1 * 3 + 1], faceVertec[1 * 3 + 2]);
 
@@ -491,8 +491,8 @@ void HandlecollisionPoints (NewtonJoint* const contactjoint)
 
 		// do whatever you want here
 		//dFloat forceMag;
-		dVector point;
-		dVector normal;	
+		dVector point(0.0f);
+		dVector normal(0.0f);	
 		//NewtonMaterialGetContactForce (material, &forceMag);
 		NewtonMaterialGetContactPositionAndNormal (material, body0, &point.m_x, &normal.m_x);
 		NewtonMaterialGetContactPositionAndNormal (material, body1, &point.m_x, &normal.m_x);
@@ -511,8 +511,8 @@ void GetContactOnBody (NewtonBody* const body)
 			NewtonMaterial* material = NewtonContactGetMaterial (contact);
 
 			//dFloat forceMag;
-			dVector point;
-			dVector normal;	
+			dVector point(0.0f);
+			dVector normal(0.0f);	
 			//NewtonMaterialGetContactForce (material, &forceMag);
 			NewtonMaterialGetContactPositionAndNormal (material, body1, &point.m_x, &normal.m_x);
 			NewtonMaterialGetContactPositionAndNormal (material, body0, &point.m_x, &normal.m_x);
@@ -552,7 +552,7 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 /*
 // check that angular momentum is conserved
 dMatrix I;
-dVector omega;
+dVector omega(0.0f);
 NewtonBodyGetInertiaMatrix(body, &I[0][0]);
 NewtonBodyGetOmega(body, &omega[0]);
 dVector L (I.RotateVector(omega));
@@ -625,11 +625,11 @@ void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, in
 
 	NewtonBody* const body = NewtonJointGetBody0(contactJoint);
 	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
-		dVector point;
-		dVector normal;	
-		dVector dir0;	
-		dVector dir1;	
-		dVector force;
+		dVector point(0.0f);
+		dVector normal(0.0f);	
+		dVector dir0(0.0f);	
+		dVector dir1(0.0f);	
+		dVector force(0.0f);
 
 		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 
@@ -912,8 +912,8 @@ void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matri
 {
 	dFloat skinThickness = NewtonCollisionGetSkinThickness (collision) * 0.125f;
 	for (int i = 0; i < 3; i ++) {
-		dVector support;
-		dVector dir (0.0f, 0.0f, 0.0f, 0.0f);
+		dVector support(0.0f);
+		dVector dir (0.0f);
 		dir[i] = 1.0f;
 
 		dVector localDir (matrix.UnrotateVector (dir));

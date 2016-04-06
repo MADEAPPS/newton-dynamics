@@ -215,8 +215,8 @@ dAssert (0);
 #endif
 
 
-	dVector boxP0; 
-	dVector boxP1; 
+	dVector boxP0(0.0f); 
+	dVector boxP1(0.0f); 
 	// get the position of the aabb of this geometry
 
 	dMatrix matrix (GetMatrix());
@@ -548,7 +548,7 @@ dFloat  UserHeightFieldCollision::UserMeshCollisionRayHitCallback (NewtonUserMes
 	
 	dFloat stepX;
 	dFloat stepZ;
-	dVector normalOut;
+	dVector normalOut(0.0f);
 	UserHeightFieldCollision *map;
 
 
@@ -565,8 +565,8 @@ dFloat  UserHeightFieldCollision::UserMeshCollisionRayHitCallback (NewtonUserMes
 
 //if (q1.m_y < 0.0f) return q0.m_y / (q0.m_y - q1.m_y);
 
-	dVector boxP0;
-	dVector boxP1;
+	dVector boxP0(0.0f);
+	dVector boxP1(0.0f);
 
 	// calculate the ray bounding box
 	map->CalculateMinExtend2d (q0, q1, boxP0, boxP1);
@@ -672,8 +672,8 @@ void  UserHeightFieldCollision::MeshCollisionCollideCallback (NewtonUserMeshColl
 	dInt32 vertexIndex;
 	dInt32 threadNumber;
 	UserHeightFieldCollision *map;
-	dVector boxP0;
-	dVector boxP1;
+	dVector boxP0(0.0f);
+	dVector boxP1(0.0f);
 
 	// the user data is the pointer to the collision geometry
 	map = (UserHeightFieldCollision*) collideDesc->m_userData;

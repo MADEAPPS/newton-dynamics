@@ -334,10 +334,12 @@ class JoesRagdollJoint: public CustomBallAndSocket
 
 	dVector BodyGetPointVelocity(const NewtonBody* const body, const dVector &point)
 	{
-		dVector v, w, c;
+		dMatrix matrix;
+		dVector v(0.0f);
+		dVector w(0.0f);
+		dVector c(0.0f);
 		NewtonBodyGetVelocity(body, &v[0]);
 		NewtonBodyGetOmega(body, &w[0]);
-		dMatrix matrix;
 		NewtonBodyGetMatrix(body, &matrix[0][0]);
 		c = matrix.m_posit; // TODO: Does not handle COM offset !!!
 		return v + w * (point - c);
@@ -877,12 +879,12 @@ class CustomDistanceRope: public CustomPointToPoint
 		dMatrix matrix(dGrammSchmidt(dir));
 		dFloat x = dSqrt(mag2) - m_distance;
 
-		dVector com0;
-		dVector com1;
-		dVector veloc0;
-		dVector veloc1;
 		dMatrix body0Matrix;
 		dMatrix body1Matrix;
+		dVector com0(0.0f);
+		dVector com1(0.0f);
+		dVector veloc0(0.0f);
+		dVector veloc1(0.0f);
 
 		NewtonBody* const body0 = GetBody0();
 		NewtonBody* const body1 = GetBody1();

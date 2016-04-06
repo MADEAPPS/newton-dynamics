@@ -147,7 +147,7 @@ dAssert (0);
 
 	return dVector (dFloat(winX), dFloat (winY), dFloat(winZ), 0.0f);
 */
-	return dVector (0,0,0,0);
+	return dVector (0.0f);
 }
 
 

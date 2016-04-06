@@ -172,7 +172,7 @@ class ComplexScene: public DemoEntity
 		NewtonTreeCollisionSetUserRayCastCallback (collisionTree, AllRayHitCallback);
 		dVector p0 (0,  100, 0, 0);
 		dVector p1 (0, -100, 0, 0);
-		dVector normal;
+		dVector normal(0.0f);
 		dLong id;
 		dFloat parameter;
 		parameter = NewtonCollisionRayCast (collisionTree, &p0[0], &p1[0], &normal[0], &id);

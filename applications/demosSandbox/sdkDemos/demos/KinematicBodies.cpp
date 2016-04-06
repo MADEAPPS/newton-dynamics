@@ -250,9 +250,10 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 
     bool TestForCollision ()
     {
-	    dVector minP;
-	    dVector maxP;
 		dMatrix matrix;
+	    dVector minP(0.0f);
+	    dVector maxP(0.0f);
+		
 		//NewtonBodyGetAABB (m_phantomEntity->m_phantom, &minP.m_x, &maxP.m_x);
 
 		NewtonBodyGetMatrix (m_phantomEntity->m_phantom, &matrix[0][0]);
@@ -359,8 +360,8 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 		bool isUnstable = true;
 //int xxx = 0;
 		for (int i = 0; (i < 16) && isUnstable; i ++) {
-            dVector minP;
-            dVector maxP;
+            dVector minP(0.0f);
+            dVector maxP(0.0f);
 //xxx ++;
 			isUnstable = false;
 			if (CalculateTranslationMatrix (matrix)) {
@@ -377,8 +378,8 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 				    m_body.SetMatrix(matrix);
 				    m_body.SetLocalMatrix(localMatrix);
 
-				    dVector com;
-				    dVector inertia;
+				    dVector com(0.0f);
+				    dVector inertia(0.0f);
 				    NewtonConvexCollisionCalculateInertialMatrix (collision, &inertia[0], &com[0]);	
 
 				    dFloat mass = 1.0f;

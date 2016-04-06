@@ -257,7 +257,7 @@ class BasicPlayerInputManager: public CustomInputManager
 		dFloat height = controller->GetHigh();
 		dVector upDir (controller->GetUpDir());
 
-		dVector camOrigin; 
+		dVector camOrigin(0.0f); 
 		
 		if (m_player->m_inputs.m_cameraMode) {
 			// set third person view camera

@@ -52,8 +52,6 @@ class UserHeightFieldCollision : public RenderPrimitive
 	void CalculateMinExtend3d (const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1);
 	bool ClipRay2d (dVector& p0, dVector& p1, const dVector& boxP0, const dVector& boxP1); 
 
-	
-
 	NewtonBody* m_level;
 	dVector m_minBox;
 	dVector m_maxBox;
