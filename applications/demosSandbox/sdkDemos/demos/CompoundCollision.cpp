@@ -152,7 +152,7 @@ static int BuildPointArray (dFloat* const points)
 	dVector p4 ( dFloat (0.0f), dFloat (0.0f), dFloat (1.0f), dFloat (0.0f));
 	dVector p5 ( dFloat (0.0f), dFloat (0.0f),-dFloat (1.0f), dFloat (0.0f));
 
-	int level = 2;
+	int level = 3;
 	int count = 0;
 	TesselateTriangle (level, p4, p0, p2, count, points);
 	TesselateTriangle (level, p4, p2, p1, count, points);
@@ -193,8 +193,8 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 
 		dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
 		matrix.m_posit = dVector (x, y, z, 1.0f);
-//		int r = dRand();	
-		int r = 0;
+		int r = dRand();	
+//		int r = 0;
 		switch ((r >>2) & 3) 
 		{
 			case 0:
