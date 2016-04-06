@@ -1160,11 +1160,11 @@ void CustomVehicleController::EngineController::InitEngineTorqueCurve()
 	dFloat torqueTable[6];
 
 	rpsTable[0] = 0.0f;
-	rpsTable[1] = m_info.m_rpmAtIdleTorque;
-	rpsTable[2] = m_info.m_rpmAtPeakTorque;
-	rpsTable[3] = m_info.m_rpmAtPeakHorsePower;
-	rpsTable[4] = m_info.m_rpmAtReadLineTorque;
-	rpsTable[5] = m_info.m_rpmAtReadLineTorque * 1.1f;
+	rpsTable[1] = m_info.m_rpmAtIdleTorque * 0.92f;
+	rpsTable[2] = m_info.m_rpmAtPeakTorque * 0.92f;
+	rpsTable[3] = m_info.m_rpmAtPeakHorsePower * 0.92f;
+	rpsTable[4] = m_info.m_rpmAtReadLineTorque * 0.92f;
+	rpsTable[5] = m_info.m_rpmAtReadLineTorque;
 
 	torqueTable[0] = m_info.m_idleTorque;
 	torqueTable[1] = m_info.m_idleTorque;
@@ -2066,8 +2066,6 @@ int CustomVehicleControllerManager::OnContactGeneration (const CustomVehicleCont
 }
 
 
-
-
 void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTire* const tire) const
 {
 	dMatrix tireMatrix;
@@ -2246,6 +2244,17 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
+		if (!NewtonBodyGetSleepState(m_body)) {
+			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager();
+			for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
+				BodyPartTire& tire = tireNode->GetInfo();
+				WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
+				tireJoint->RemoveKinematicError(timestep);
+				manager->Collide(&tire);
+			}
+		}
+
+
 #ifdef D_PLOT_ENGINE_CURVE 
 		dFloat engineOmega = m_engine->GetRPM();
 		dFloat tireTorque = m_engine->GetLeftSpiderGear()->m_tireTorque + m_engine->GetRightSpiderGear()->m_tireTorque;
@@ -2258,14 +2267,6 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	if (m_finalized) {
-		CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager();
-		for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
-			BodyPartTire& tire = tireNode->GetInfo();
-			WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
-			tireJoint->RemoveKinematicError(timestep);
-			manager->Collide (&tire);
-		}
-
 		m_chassis.ApplyDownForce ();
 
 		if (m_brakesControl) {

@@ -145,9 +145,6 @@ static void TesselateTriangle (int level, const dVector& p0, const dVector& p1, 
 
 static int BuildPointArray (dFloat* const points)
 {
-//	dgTriplex pool[1024 * 2];
-//	dVector points[1024 * 2];
-
 	dVector p0 ( dFloat (1.0f), dFloat (0.0f), dFloat (0.0f), dFloat (0.0f)); 
 	dVector p1 (-dFloat (1.0f), dFloat (0.0f), dFloat (0.0f), dFloat (0.0f)); 
 	dVector p2 ( dFloat (0.0f), dFloat (1.0f), dFloat (0.0f), dFloat (0.0f)); 
@@ -155,7 +152,7 @@ static int BuildPointArray (dFloat* const points)
 	dVector p4 ( dFloat (0.0f), dFloat (0.0f), dFloat (1.0f), dFloat (0.0f));
 	dVector p5 ( dFloat (0.0f), dFloat (0.0f),-dFloat (1.0f), dFloat (0.0f));
 
-	int level = 3;
+	int level = 2;
 	int count = 0;
 	TesselateTriangle (level, p4, p0, p2, count, points);
 	TesselateTriangle (level, p4, p2, p1, count, points);
@@ -237,6 +234,8 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 	// finish adding shapes
 	NewtonCompoundCollisionEndAddRemove(compound);	
 
+#if 0
+// test the inteface
 	{
 		// remove the first 10 shapes
 		// test remove shape form a compound
@@ -250,8 +249,8 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 		}
 		// finish remove 
 
-		void* handle1 = NewtonCompoundCollisionGetNodeByIndex (compound, 30);
-		void* handle2 = NewtonCompoundCollisionGetNodeByIndex (compound, 100);
+		void* handle1 = NewtonCompoundCollisionGetNodeByIndex (compound, pointsCount / 3);
+		void* handle2 = NewtonCompoundCollisionGetNodeByIndex (compound, pointsCount * 2 / 3);
 		NewtonCollision* const shape1 = NewtonCompoundCollisionGetCollisionFromNode (compound, handle1);
 		NewtonCollision* const shape2 = NewtonCompoundCollisionGetCollisionFromNode (compound, handle2);
 
@@ -259,8 +258,14 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 		NewtonCollision* const copyShape2 = NewtonCollisionCreateInstance (shape2);
 
 		// you can also remove shape by their index
-		NewtonCompoundCollisionRemoveSubCollisionByIndex (compound, 30);	
-		NewtonCompoundCollisionRemoveSubCollisionByIndex (compound, 100);	
+		void* handle3 = NewtonCompoundCollisionGetNodeByIndex (compound, pointsCount / 4);
+		if (handle3) {
+			NewtonCompoundCollisionRemoveSubCollisionByIndex (compound, pointsCount / 4);	
+		}
+		void* handle4 = NewtonCompoundCollisionGetNodeByIndex (compound, pointsCount * 3 / 4);	
+		if (handle4) {
+			NewtonCompoundCollisionRemoveSubCollisionByIndex (compound, pointsCount * 3 / 4);	
+		}
 
 		handle1 = NewtonCompoundCollisionAddSubCollision (compound, copyShape1);
 		handle2 = NewtonCompoundCollisionAddSubCollision (compound, copyShape2);
@@ -280,7 +285,9 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 		}
 		NewtonCompoundCollisionEndAddRemove(compound);	
 	}
+#endif
 
+// test general scaling
 //	NewtonCollisionSetScale(compound, 0.5f, 0.25f, 0.125f);
 
 	// for now we will simple make simple Box,  make a visual Mesh
