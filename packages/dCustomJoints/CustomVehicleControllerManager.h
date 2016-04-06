@@ -32,6 +32,7 @@ class CustomVehicleController: public CustomControllerBase
 {
 	public:
 	class WheelJoint;
+//	class dWeightDistibutionSolver;
 
 	class dInterpolationCurve
 	{

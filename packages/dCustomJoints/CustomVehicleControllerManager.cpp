@@ -76,7 +76,6 @@ class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconj
 };
 */
 
-
 class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexCastPreFilter
 {
 	public:
@@ -1818,89 +1817,104 @@ void CustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 	m_weightDistribution = dClamp (weightDistribution, dFloat(0.0f), dFloat(1.0f));
 	if (m_finalized) {
 		dFloat factor = m_weightDistribution - 0.5f;
-		if (m_tireList.GetCount() == 4) {
-			dMatrix matrix;
-			dMatrix tireMatrix;
-			NewtonBodyGetMatrix(m_body, &matrix[0][0]);
-			matrix = matrix.Inverse();
-			dVector origin(0.0f);
-			dFloat xMin = 1.0e10f;
-			dFloat xMax = -1.0e10f;
-			for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-				BodyPartTire* const tire = &node->GetInfo();
-				NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
-				tireMatrix = tireMatrix * matrix;
-				origin += tireMatrix.m_posit;
-				xMin = dMin (xMin, tireMatrix.m_posit.m_x); 
-				xMax = dMax (xMax, tireMatrix.m_posit.m_x); 
-			}
-			origin = origin.Scale (1.0f / 4.0f);
 
-			dVector vehCom (0.0f);
-			NewtonBodyGetCentreOfMass(m_body, &vehCom[0]);
-			vehCom.m_x = origin.m_x + (xMax - xMin) * factor;
-			vehCom.m_z = origin.m_z;
-			NewtonBodySetCentreOfMass(m_body, &vehCom[0]);
+		dMatrix matrix;
+		dMatrix tireMatrix;
+		dVector origin(0.0f);
+		dVector totalMassOrigin (0.0f);
+		dFloat xMin = 1.0e10f;
+		dFloat xMax = -1.0e10f;
+		dFloat totalMass;
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+
+		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+		NewtonBodyGetCentreOfMass(m_body, &origin[0]);
+		NewtonBodyGetMassMatrix (m_body, &totalMass, &Ixx, &Iyy, &Izz);
+		totalMassOrigin = origin.Scale (totalMass);
+
+		matrix = matrix.Inverse();
+		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			dFloat mass;
+			BodyPartTire* const tire = &node->GetInfo();
+			NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
+			NewtonBodyGetMassMatrix (tire->GetBody(), &mass, &Ixx, &Iyy, &Izz);
+			tireMatrix = tireMatrix * matrix;
+			totalMassOrigin += tireMatrix.m_posit.Scale (mass);
+			totalMass += mass;
+			xMin = dMin (xMin, tireMatrix.m_posit.m_x); 
+			xMax = dMax (xMax, tireMatrix.m_posit.m_x); 
 		}
-	}
+		origin = totalMassOrigin.Scale (1.0f / totalMass);
+
+		dVector vehCom (0.0f);
+		NewtonBodyGetCentreOfMass(m_body, &vehCom[0]);
+		vehCom.m_x = origin.m_x + (xMax - xMin) * factor;
+		vehCom.m_z = origin.m_z;
+		NewtonBodySetCentreOfMass(m_body, &vehCom[0]);
+
 
 /*
-	dWeightDistibutionSolver solver;
-	dFloat64 unitAccel[256];
-	dFloat64 sprungMass[256];
+		dWeightDistibutionSolver solver;
+		dFloat64 unitAccel[256];
+		dFloat64 sprungMass[256];
 
-	int count = 0;
-	dVector dir (0.0f, 1.0f, 0.0f, 0.0f);
-	
-	dMatrix matrix;
-	dVector com;
-	dVector invInertia;
-	dFloat invMass;
-	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
-	NewtonBodyGetCentreOfMass(m_body, &com[0]);
-	NewtonBodyGetInvMass(m_body, &invMass, &invInertia[0], &invInertia[1], &invInertia[2]);
-	matrix = matrix.Inverse();
+		int count = 0;
+		dVector dir(0.0f, 1.0f, 0.0f, 0.0f);
 
-	for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		BodyPartTire* const tire = &node->GetInfo();
-		
-		dMatrix tireMatrix;
-		NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
-		tireMatrix = tireMatrix * matrix;
+		dMatrix matrix;
+		dVector com;
+		dVector invInertia;
+		dFloat invMass;
+		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+		NewtonBodyGetCentreOfMass(m_body, &com[0]);
+		NewtonBodyGetInvMass(m_body, &invMass, &invInertia[0], &invInertia[1], &invInertia[2]);
+		matrix = matrix.Inverse();
 
-		dVector posit  (tireMatrix.m_posit - com);  
+		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			BodyPartTire* const tire = &node->GetInfo();
 
-		dComplentaritySolver::dJacobian &jacobian0 = solver.m_jacobians[count];
-		dComplentaritySolver::dJacobian &invMassJacobian0 = solver.m_invMassJacobians[count];
-		jacobian0.m_linear = dir;
-		jacobian0.m_angular = posit * dir;
-		jacobian0.m_angular.m_w = 0.0f;
+			dMatrix tireMatrix;
+			NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
+			tireMatrix = tireMatrix * matrix;
 
-		invMassJacobian0.m_linear = jacobian0.m_linear.Scale(invMass);
-		invMassJacobian0.m_angular = jacobian0.m_angular.CompProduct(invInertia);
+			dVector posit(tireMatrix.m_posit - com);
 
-		dFloat diagnal = jacobian0.m_linear % invMassJacobian0.m_linear + jacobian0.m_angular % invMassJacobian0.m_angular;
-		solver.m_diagRegularizer[count] = diagnal * 0.005f;
-		solver.m_invDiag[count] = 1.0f / (diagnal + solver.m_diagRegularizer[count]);
+			dComplentaritySolver::dJacobian &jacobian0 = solver.m_jacobians[count];
+			dComplentaritySolver::dJacobian &invMassJacobian0 = solver.m_invMassJacobians[count];
+			jacobian0.m_linear = dir;
+			jacobian0.m_angular = posit * dir;
+			jacobian0.m_angular.m_w = 0.0f;
 
-		unitAccel[count] = 1.0f;
-		sprungMass[count] = 0.0f;
-		count ++;
-	}
+			invMassJacobian0.m_linear = jacobian0.m_linear.Scale(invMass);
+			invMassJacobian0.m_angular = jacobian0.m_angular.CompProduct(invInertia);
 
-	if (count) {
-		solver.m_count = count;
-		solver.Solve (count, 1.0e-6f, sprungMass, unitAccel);
-	}
+			dFloat diagonal = jacobian0.m_linear % invMassJacobian0.m_linear + jacobian0.m_angular % invMassJacobian0.m_angular;
+			solver.m_diagRegularizer[count] = diagonal * 0.005f;
+			solver.m_invDiag[count] = 1.0f / (diagonal + solver.m_diagRegularizer[count]);
 
-	int index = 0;
-	for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		BodyPartTire* const tire = &node->GetInfo();
-		WheelJoint* const tireJoint = (WheelJoint*) tire->GetJoint();
-		tireJoint->m_restSprunMass = dFloat (5.0f * dFloor (sprungMass[index] / 5.0f + 0.5f));
-		index ++;
-	}
+			unitAccel[count] = 1.0f;
+			sprungMass[count] = 0.0f;
+			count++;
+		}
+
+		if (count) {
+			solver.m_count = count;
+			solver.Solve(count, 1.0e-6f, sprungMass, unitAccel);
+		}
+
+
+		int index = 0;
+		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			BodyPartTire* const tire = &node->GetInfo();
+			WheelJoint* const tireJoint = (WheelJoint*)tire->GetJoint();
+			tireJoint->m_restSprunMass = dFloat(5.0f * dFloor(sprungMass[index] / 5.0f + 0.5f));
+			index++;
+		}
 */
+	}
+
 }
 
 
