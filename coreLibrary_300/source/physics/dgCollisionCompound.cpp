@@ -624,13 +624,10 @@ void dgCollisionCompound::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 	}
 }
 
-
-
-dgInt32 dgCollisionCompound::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
+dgInt32 dgCollisionCompound::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
 {
 	return 0;
 }
-
 
 void dgCollisionCompound::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
@@ -640,7 +637,6 @@ void dgCollisionCompound::DebugCollision (const dgMatrix& matrix, dgCollision::O
 		collision->DebugCollision (matrix, callback, userData);
 	}
 }
-
 
 dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
@@ -2253,7 +2249,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 
 	const dgContactMaterial* const material = constraint->GetMaterial();
 	const dgVector& treeScale = treeCollisionInstance->GetScale();
-	
+
 	dgAssert (contacts);
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	while (stack) {

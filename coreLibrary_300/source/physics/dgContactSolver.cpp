@@ -1626,7 +1626,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point, const dgVecto
 	const dgMatrix& matrix1 = m_instance1->m_globalMatrix;
 	dgVector ponintOnInstance1(matrix1.UntransformVector(point));
 	dgVector normalOnInstance1 (matrix1.UnrotateVector(normal));
-	count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, ponintOnInstance1, shape1, dgFloat32(1.0f));
+	count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, ponintOnInstance1, shape1);
 	if (!count1) {
 		count1 = 1;
 		shape1[0] = ponintOnInstance1;
@@ -1678,7 +1678,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point, const dgVecto
 			}
 		}
 */
-		count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0, dgFloat32(1.0f));
+		count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0);
 		if (!count0) {
 			count0 = 1;
 			shape0[0] = pointOnInstance0;

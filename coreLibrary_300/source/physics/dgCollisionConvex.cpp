@@ -822,7 +822,7 @@ dgFloat32 dgCollisionConvex::RayCast(const dgVector& localP0, const dgVector& lo
 	return rayCaster.RayCast(localP0, localP1, maxT, contactOut);
 }
 
-dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
+dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
 {
 	dgVector support[4];
 	dgInt32 featureCount = 3;
@@ -831,7 +831,7 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 	if (vertToEdgeMapping) {
 		dgInt32 edgeIndex;
 		featureCount = 1;
-		support[0] = SupportVertex (normal.Scale4(normalSign), &edgeIndex);
+		support[0] = SupportVertex (normal, &edgeIndex);
 		edge = vertToEdgeMapping[edgeIndex];
 
 		// 5 degrees

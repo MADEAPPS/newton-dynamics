@@ -415,7 +415,7 @@ void dgCollisionCapsule::Serialize(dgSerialize callback, void* const userData) c
 }
 
 
-dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& direction, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
+dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& direction, const dgVector& point, dgVector* const contactsOut) const
 {
 	dgVector normal(direction.CompProduct4(m_transform));
 	dgVector origin(point.CompProduct4(m_transform));

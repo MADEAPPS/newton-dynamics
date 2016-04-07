@@ -234,8 +234,8 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 	// finish adding shapes
 	NewtonCompoundCollisionEndAddRemove(compound);	
 
-#if 0
-// test the inteface
+#if 1
+// test the interface
 	{
 		// remove the first 10 shapes
 		// test remove shape form a compound
@@ -287,13 +287,10 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 	}
 #endif
 
-// test general scaling
-//	NewtonCollisionSetScale(compound, 0.5f, 0.25f, 0.125f);
-
 	// for now we will simple make simple Box,  make a visual Mesh
 	DemoMesh* const visualMesh = new DemoMesh ("big ball", compound, "metal_30.tga", "metal_30.tga", "metal_30.tga");
 
-	int instaceCount = 1;
+	int instaceCount = 2;
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	for (int ix = 0; ix < instaceCount; ix ++) {
@@ -303,7 +300,16 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 			dFloat z = origin.m_z + (iz - instaceCount/2) * 15.0f;
 			matrix.m_posit = FindFloor (world, dVector (x, y + 10.0f, z, 0.0f), 20.0f); ;
 			matrix.m_posit.m_y += 15.0f;
-			CreateSimpleSolid (scene, visualMesh, 10.0f, matrix, compound, 0);
+			NewtonBody* const body =  CreateSimpleSolid (scene, visualMesh, 10.0f, matrix, compound, 0);
+			if ((ix == 0) && (iz == 0)) {
+				// test general scaling
+				NewtonCollision* const shape = NewtonBodyGetCollision(body);
+				NewtonCollisionSetScale(shape, 1.5f, 0.75f, 1.0f);
+				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
+				DemoMesh* const mesh = new DemoMesh ("big ball", shape, "metal_30.tga", "metal_30.tga", "metal_30.tga");
+				entity->SetMesh(mesh, entity->GetMeshMatrix());
+				mesh->Release();
+			}
 		}
 	}
 	visualMesh->Release();
@@ -319,10 +325,10 @@ void CompoundCollision (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-	CreateLevelMesh (scene, "flatPlane.ngd", true);
+//	CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	CreateLevelMesh (scene, "playground.ngd", true);
-	//	CreateLevelMesh (scene, "sponza.ngd", true);
-//	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
+//	CreateLevelMesh (scene, "sponza.ngd", true);
+	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
@@ -342,27 +348,26 @@ void CompoundCollision (DemoEntityManager* const scene)
 	location.m_x += 40.0f;
 	location.m_z += 40.0f;
 
-	// this crash temporarily (I need to make the compound use shape Instance)
-	MakeFunnyCompound (scene, location);
 
 	int count = 5;
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
+	// this crash temporarily (I need to make the compound use shape Instance)
+	MakeFunnyCompound(scene, location);
 
 	// place camera into position
 //	dQuaternion rot;
 //	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
-origin.m_x += 20.0f;	
-origin.m_z += 20.0f;	
+//origin.m_x += 20.0f;	
+//origin.m_z += 20.0f;	
 	scene->SetCameraMatrix(rot, origin);
 	//ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
-
 }
 
 

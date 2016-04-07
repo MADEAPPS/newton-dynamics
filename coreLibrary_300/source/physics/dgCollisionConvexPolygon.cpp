@@ -337,7 +337,7 @@ void dgCollisionConvexPolygon::SetFeatureHit (dgInt32 featureCount, const dgInt3
 	}
 }
 
-dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& normalIn, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
+dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& normalIn, const dgVector& origin, dgVector* const contactsOut) const
 {
 	dgVector normal(normalIn);
 	dgInt32 count = 0;
@@ -603,7 +603,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		dgAssert(penetration >= 0.0f);
 		dgVector point(pointInHull + normalInHull.Scale4(penetration + DG_ROBUST_PLANE_CLIP));
 
-		count = hull->CalculatePlaneIntersection(normalInHull.Scale4(dgFloat32(-1.0f)), point, contactPoints, 1.0f);
+		count = hull->CalculatePlaneIntersection(normalInHull.Scale4(dgFloat32(-1.0f)), point, contactPoints);
 		dgVector step(normalInHull.Scale4((proxy.m_skinThickness - penetration) * dgFloat32(0.5f)));
 
 		dgContactPoint* const contactsOut = proxy.m_contacts;
@@ -779,7 +779,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 
 				if (!proxy.m_intersectionTestOnly) {
 					pointInHull -= normalInHull.Scale4 (DG_ROBUST_PLANE_CLIP);
-					count = proxy.m_instance0->CalculatePlaneIntersection(normalInHull, pointInHull, contactPoints, 1.0f);
+					count = proxy.m_instance0->CalculatePlaneIntersection(normalInHull, pointInHull, contactPoints);
 
 					dgVector step(relativeVelocity.Scale4(timetoImpact));
 					penetration = dgMax(penetration, dgFloat32(0.0f));

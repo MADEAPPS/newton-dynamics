@@ -370,7 +370,7 @@ dgVector dgCollisionChamferCylinder::SupportVertexSpecialProjectPoint (const dgV
 }
 
 
-dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
+dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
 {
 	dgInt32 count = 0;
 	if (normal.m_x < dgFloat32 (-0.997f)) {

@@ -285,7 +285,7 @@ dgFloat32 dgCollisionCylinder::CalculateMassProperties (const dgMatrix& offset, 
 	return dgCollisionConvex::CalculateMassProperties (offset, inertia, crossInertia, centerOfMass);
 }
 
-dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut, dgFloat32 normalSign) const
+dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
 {
 	dgInt32 count = 0;
 	if (normal.m_x < dgFloat32 (-0.995f)) {
@@ -307,7 +307,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 			dgVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dgFloat32(0.0f), dgFloat32(0.0f));
 			dgVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng,	origin.m_z * cosAng - origin.m_y * sinAng, dgFloat32(0.0f));
 
-			count = dgCollisionConvex::CalculatePlaneIntersection(normal1, origin1, contactsOut, normalSign);
+			count = dgCollisionConvex::CalculatePlaneIntersection(normal1, origin1, contactsOut);
 			if (count > 6) {
 				dgInt32 dy = 2 * 6;
 				dgInt32 dx = 2 * count;
@@ -350,7 +350,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 			dgVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dgFloat32(0.0f), dgFloat32(0.0f));
 			dgVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dgFloat32(0.0f));
 
-			count = dgCollisionConvex::CalculatePlaneIntersection(normal1, origin1, contactsOut, normalSign);
+			count = dgCollisionConvex::CalculatePlaneIntersection(normal1, origin1, contactsOut);
 			if (count > 6) {
 				dgInt32 dy = 2 * 6;
 				dgInt32 dx = 2 * count;

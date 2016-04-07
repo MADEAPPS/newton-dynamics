@@ -332,7 +332,7 @@ const dgCollisionConvex::dgConvexSimplexEdge** dgCollisionBox::GetVertexToEdgeMa
 
 
 
-dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign___) const
+dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
 {
 	dgVector support[4];
 	dgInt32 featureCount = 3;

@@ -41,7 +41,7 @@ class dgCollisionBox: public dgCollisionConvex
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecial(const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const;
-	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const;
+	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const;
 	
 	virtual dgInt32 CalculateSignature () const;

@@ -41,16 +41,13 @@ class dgCollisionConvex: public dgCollision
 		dgInt32 m_vertex;
 	};
 	
-	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
-	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
-	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
-	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const;
 	virtual dgInt32 GetConvexVertexCount() const { return m_vertexCount;}
+	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
+	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
+	virtual dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
+	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 
 	bool IntesectionTest (dgCollisionParamProxy& proxy) const;
-
-	//dgInt32 CalculateConvexToConvexContact (dgCollisionParamProxy& proxy) const;
-	//dgInt32 ConvexCastContacts (const dgMatrix& matrix, const dgMatrix& invMatrix, const dgVector& veloc, dgFloat32& timeStep, const dgCollisionConvex* const convexShape, dgContactPoint* const contact) const;
 
 	protected:
 	dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id);

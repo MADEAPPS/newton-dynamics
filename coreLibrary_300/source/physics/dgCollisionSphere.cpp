@@ -207,17 +207,13 @@ void dgCollisionSphere::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector
 	p1 = (matrix[3] + size) & dgVector::m_triplexMask;
 }
 
-
-dgInt32 dgCollisionSphere::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut, dgFloat32 normalSign) const
+dgInt32 dgCollisionSphere::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
 {
 	dgAssert (normal.m_w == 0.0f);
 	dgAssert ((normal % normal) > dgFloat32 (0.999f));
-	//contactsOut[0] = normal.Scale3 (normal % point);
 	contactsOut[0] = normal.CompProduct4 (normal.DotProduct4(point));
 	return 1;
 }
-
-
 
 void dgCollisionSphere::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
