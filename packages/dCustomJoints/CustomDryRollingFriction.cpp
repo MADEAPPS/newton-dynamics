@@ -52,7 +52,7 @@ CustomDryRollingFriction::~CustomDryRollingFriction()
 // of rotation of the ball. and with a magnitude of the stopping angular acceleration.
 void CustomDryRollingFriction::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-	dVector omega;
+	dVector omega(0.0f);
 
 	// get the omega vector
 	NewtonBodyGetOmega(m_body0, &omega[0]);

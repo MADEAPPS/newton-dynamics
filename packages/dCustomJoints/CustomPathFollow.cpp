@@ -97,8 +97,8 @@ void CustomPathFollow::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
-	dVector pathPosit;
-	dVector pathTangent;
+	dVector pathPosit(0.0f);
+	dVector pathTangent(0.0f);
 		
 	// Get the global matrices of each rigid body.
 	CalculateGlobalMatrix (matrix0, matrix1);

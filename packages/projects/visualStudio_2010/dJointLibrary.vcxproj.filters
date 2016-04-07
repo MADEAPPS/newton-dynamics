@@ -14,9 +14,6 @@
     <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp">
       <Filter>managers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dCustomJoints\CustomKinematicController.cpp">
-      <Filter>managers</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomInputManager.cpp">
       <Filter>managers</Filter>
     </ClCompile>
@@ -83,6 +80,9 @@
     <ClCompile Include="..\..\dCustomJoints\CustomDynamicRagDollManager.cpp">
       <Filter>managers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\CustomKinematicController.cpp">
+      <Filter>joints</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
@@ -96,9 +96,6 @@
       <Filter>managers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h">
-      <Filter>managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h">
       <Filter>managers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomInputManager.h">
@@ -166,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dCustomJoints\CustomDynamicRagDollManager.h">
       <Filter>managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h">
+      <Filter>joints</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -90,10 +90,10 @@ void CustomPointToPoint::SubmitConstraints(dFloat timestep, int threadIndex)
 		dMatrix matrix (dGrammSchmidt (dir));
 		dFloat x = dSqrt (mag2) - m_distance;
 
-		dVector com0;
-		dVector com1;
-		dVector veloc0;
-		dVector veloc1;
+		dVector com0(0.0f);
+		dVector com1(0.0f);
+		dVector veloc0(0.0f);
+		dVector veloc1(0.0f);
 		dMatrix body0Matrix;
 		dMatrix body1Matrix;
 
@@ -219,8 +219,8 @@ CustomBallAndSocketWithFriction::CustomBallAndSocketWithFriction(const dMatrix& 
 void CustomBallAndSocketWithFriction::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
-	dVector omega0(0.0f, 0.0f, 0.0f, 0.0f);
-	dVector omega1(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
 
 	// get the omega vector
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
@@ -540,8 +540,8 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
 
 #if 0
-	dVector euler0;
-	dVector euler1;
+	dVector euler0(0.0f);
+	dVector euler1(0.0f);
 	dMatrix localMatrix (matrix0 * matrix1.Inverse());
 	localMatrix.GetEulerAngles(euler0, euler1);
 
@@ -615,8 +615,8 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 	if (quat.m_q0 > dFloat(0.99995f)) {
 //		dAssert (0);
 /*
-		dVector euler0;
-		dVector euler1;
+		dVector euler0(0.0f);
+		dVector euler1(0.0f);
 		rotation.GetEulerAngles(euler0, euler1);
 		NewtonUserJointAddAngularRow(m_joint, euler0[0], &rotation[0][0]);
 		NewtonUserJointAddAngularRow(m_joint, euler0[1], &rotation[1][0]);

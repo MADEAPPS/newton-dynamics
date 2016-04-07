@@ -146,10 +146,10 @@ void CustomKinematicController::SubmitConstraints (dFloat timestep, int threadIn
 	// check if this is an impulsive time step
 	
 	if (timestep > 0.0f) {
-		dVector v;
-		dVector w;
-		dVector cg;
 		dMatrix matrix0;
+		dVector v(0.0f);
+		dVector w(0.0f);
+		dVector cg(0.0f);
 
 		dFloat invTimestep = 1.0f / timestep;
 

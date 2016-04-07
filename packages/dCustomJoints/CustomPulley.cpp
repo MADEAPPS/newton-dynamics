@@ -62,8 +62,8 @@ void CustomPulley::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
-	dVector veloc0;
-	dVector veloc1;
+	dVector veloc0(0.0f);
+	dVector veloc1(0.0f);
 	dFloat jacobian0[6];
 	dFloat jacobian1[6];
 

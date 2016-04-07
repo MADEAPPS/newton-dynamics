@@ -159,8 +159,8 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateAngle(matrix1_1.m_front, matrix1.m_front, matrix1.m_up, sinAngle, cosAngle);
 	m_curJointAngle.Update(cosAngle, sinAngle);
 
-	dVector veloc0(0.0f, 0.0f, 0.0f, 0.0f);
-	dVector veloc1(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector veloc0(0.0f);
+	dVector veloc1(0.0f);
 	dAssert(m_body0);
 	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
 	if (m_body1) {

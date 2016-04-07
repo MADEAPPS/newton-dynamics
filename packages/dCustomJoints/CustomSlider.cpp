@@ -157,8 +157,8 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle (matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 
 	// calculate position and speed	
-	dVector veloc0(0.0f, 0.0f, 0.0f, 0.0f); 
-	dVector veloc1(0.0f, 0.0f, 0.0f, 0.0f);  
+	dVector veloc0(0.0f); 
+	dVector veloc1(0.0f);  
 	dAssert (m_body0);
 	NewtonBodyGetPointVelocity(m_body0, &matrix0.m_posit[0], &veloc0[0]);
 	if (m_body1) {
@@ -201,9 +201,9 @@ void CustomSlider::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matr
 			// take any point on body0 (origin)
 			const dVector& p0 = matrix0.m_posit;
 
-			dVector veloc0; 
-			dVector veloc1; 
-			dVector omega1; 
+			dVector veloc0(0.0f); 
+			dVector veloc1(0.0f); 
+			dVector omega1(0.0f); 
 
 			NewtonBodyGetVelocity(m_body0, &veloc0[0]);
 			NewtonBodyGetVelocity(m_body1, &veloc1[0]);

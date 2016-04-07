@@ -48,8 +48,8 @@ class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconj
 	virtual void MatrixTimeVector(dFloat64* const out, const dFloat64* const v) const
 	{
 		dComplentaritySolver::dJacobian invMassJacobians;
-		invMassJacobians.m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-		invMassJacobians.m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+		invMassJacobians.m_linear = dVector(0.0f);
+		invMassJacobians.m_angular = dVector(0.0f);
 		for (int i = 0; i < m_count; i++) {
 			invMassJacobians.m_linear += m_invMassJacobians[i].m_linear.Scale(dFloat(v[i]));
 			invMassJacobians.m_angular += m_invMassJacobians[i].m_angular.Scale(dFloat(v[i]));
@@ -452,7 +452,7 @@ void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, co
 
 dFloat CustomVehicleController::BodyPartTire::GetRPM() const
 {
-	dVector omega; 
+	dVector omega(0.0f); 
 	WheelJoint* const joint = (WheelJoint*) m_joint;
 	NewtonBodyGetOmega(m_body, &omega[0]);
 	return (joint->m_lateralDir % omega) * 9.55f;
@@ -1864,8 +1864,8 @@ void CustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 		dVector dir(0.0f, 1.0f, 0.0f, 0.0f);
 
 		dMatrix matrix;
-		dVector com;
-		dVector invInertia;
+		dVector com(0.0f);
+		dVector invInertia(0.0f);
 		dFloat invMass;
 		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 		NewtonBodyGetCentreOfMass(m_body, &com[0]);

@@ -216,8 +216,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	
 
 	// override the normal right side  because the joint is too week due to centripetal accelerations
-	dVector omega0(0.0f, 0.0f, 0.0f, 0.0f);
-	dVector omega1(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	if (m_body1) {
 		NewtonBodyGetOmega(m_body1, &omega1[0]);

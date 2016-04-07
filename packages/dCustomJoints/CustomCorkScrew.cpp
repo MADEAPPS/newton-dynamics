@@ -199,8 +199,8 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 
 	if (m_angularmotorOn) {
-		dVector omega0 (0.0f, 0.0f, 0.0f);
-		dVector omega1 (0.0f, 0.0f, 0.0f);
+		dVector omega0 (0.0f);
+		dVector omega1 (0.0f);
 
 		// get relative angular velocity
 		NewtonBodyGetOmega(m_body0, &omega0[0]);

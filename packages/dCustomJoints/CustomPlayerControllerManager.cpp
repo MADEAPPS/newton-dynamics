@@ -238,12 +238,12 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 	dVector frontDir (matrix.RotateVector(m_frontVector));
 	dVector rightDir (frontDir * updir);
 
-	dVector veloc (0.0f, 0.0f, 0.0f, 0.0f);
+	dVector veloc (0.0f);
 	if ((verticalSpeed <= 0.0f) && (m_groundPlane % m_groundPlane) > 0.0f) {
 		// plane is supported by a ground plane, apply the player input velocity
 		if ((m_groundPlane % updir) >= m_maxSlope) {
 			// player is in a legal slope, he is in full control of his movement
-			dVector bodyVeloc;
+			dVector bodyVeloc(0.0f);
 			NewtonBodyGetVelocity(m_body, &bodyVeloc[0]);
 			veloc = updir.Scale(bodyVeloc % updir) + gravity.Scale (timestep) + frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(verticalSpeed);
 			veloc += (m_groundVelocity - updir.Scale (updir % m_groundVelocity));
@@ -316,8 +316,8 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 	dFloat param = 10.0f;
 	int count = NewtonWorldConvexCast (world, &castMatrix[0][0], &dst[0], m_castingShape, &param, &filter, CustomControllerConvexCastPreFilter::Prefilter, &info, 1, threadIndex);
 
-	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_groundPlane = dVector (0.0f);
+	m_groundVelocity = dVector (0.0f);
 
 	if (count && (param <= 1.0f)) {
 		m_isJumping = false;
@@ -335,8 +335,8 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix; 
 	dQuaternion bodyRotation;
-	dVector veloc(0.0f, 0.0f, 0.0f, 0.0f); 
-	dVector omega(0.0f, 0.0f, 0.0f, 0.0f);  
+	dVector veloc(0.0f); 
+	dVector omega(0.0f);  
 
 	CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*) GetManager();
 	NewtonWorld* const world = manager->GetWorld();
@@ -364,7 +364,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 
 	dVector updir (matrix.RotateVector(m_upVector));
 
-	dVector scale;
+	dVector scale(0.0f);
 	NewtonCollisionGetScale (m_upperBodyShape, &scale.m_x, &scale.m_y, &scale.m_z);
 	//const dFloat radio = m_outerRadio * 4.0f;
 	const dFloat radio = (m_outerRadio + m_restrainingDistance) * 4.0f;
@@ -465,7 +465,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 				}
 			}
 
-			dVector velocStep (0.0f, 0.0f, 0.0f, 0.0f);
+			dVector velocStep (0.0f);
 			for (int i = 0; i < count; i ++) {
 				dVector normal (bounceNormal[i]);
 				velocStep += normal.Scale (speed[i]);

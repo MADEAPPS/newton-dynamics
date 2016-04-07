@@ -61,10 +61,10 @@ void CustomRackAndPinion::Serialize (NewtonSerializeCallback callback, void* con
 
 void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-	dVector omega0;
-	dVector veloc1;
 	dMatrix matrix0;
 	dMatrix matrix1;
+	dVector omega0(0.0f);
+	dVector veloc1(0.0f);
 	dFloat jacobian0[6];
 	dFloat jacobian1[6];
 
