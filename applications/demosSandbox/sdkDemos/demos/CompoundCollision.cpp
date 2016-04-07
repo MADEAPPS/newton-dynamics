@@ -195,11 +195,11 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 		matrix.m_posit = dVector (x, y, z, 1.0f);
 		int r = dRand();	
 //		int r = 0;
-		switch ((r >>2) & 3) 
+		switch (r % 4) 
 		{
 			case 0:
 			{
-				collision = NewtonCreateSphere(world, 0.5, 0, &matrix[0][0]) ;
+				collision = NewtonCreateSphere(world, 0.5f, 0, &matrix[0][0]) ;
 				break; 
 			}
 
@@ -211,15 +211,20 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 
 			case 2:
 			{
-				collision = NewtonCreateCylinder(world, 0.25, 0.5, 0.25, 0, &matrix[0][0]) ;
+				collision = NewtonCreateCylinder(world, 0.25f, 0.5f, 0.25f, 0, &matrix[0][0]) ;
 				break; 
 			}
 
 			case 3:
 			{
-				collision = NewtonCreateCone(world, 0.25, 0.25, 0, &matrix[0][0]) ;
+				collision = NewtonCreateCone(world, 0.25f, 0.25f, 0, &matrix[0][0]) ;
 				break; 
 			}
+
+			default:
+				collision = NewtonCreateBox(world, 0.5f, 0.5f, 0.5f, 0, &matrix[0][0]) ;
+				break; 
+
 		}
 
 		dAssert (collision);
