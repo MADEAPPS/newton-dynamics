@@ -138,5 +138,5 @@ void HeightFieldCollision (DemoEntityManager* const scene)
    scene->SetCameraMatrix(dQuaternion(locationTransform), locationTransform.m_posit + dVector(0, 5, 0));
    
    NewtonDemos* const mainWindow = scene->GetRootWindow();
-   mainWindow->m_debugDisplayMode = 2;
+   mainWindow->m_debugDisplayMode = 1;
 }
