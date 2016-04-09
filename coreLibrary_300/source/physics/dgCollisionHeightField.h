@@ -122,45 +122,5 @@ class dgCollisionHeightField: public dgCollisionMesh
 };
 
 
-DG_INLINE void dgCollisionHeightField::CalculateMinExtend2d (const dgVector& p0, const dgVector& p1, dgVector& boxP0, dgVector& boxP1) const
-{
-	dgVector q0 (p0.GetMin(p1) - m_padding);
-	dgVector q1 (p0.GetMax(p1) + m_padding);
-
-	boxP0 = ((q0.Scale4(m_horizontalScaleInv).Floor().Scale4(m_horizontalScale) & m_yMask) + dgVector(dgFloat32 (-1.0e10f)).AndNot(m_yMask)) & dgVector::m_triplexMask;
-	boxP1 = (((q1.Scale4(m_horizontalScaleInv).Floor().Scale4(m_horizontalScale) + dgVector(m_horizontalScale)) & m_yMask) + dgVector(dgFloat32 (1.0e10f)).AndNot(m_yMask)) & dgVector::m_triplexMask;
-
-	dgVector minBox ((m_minBox & m_yMask) + boxP0.AndNot(m_yMask));
-	dgVector maxBox ((m_maxBox & m_yMask) + boxP1.AndNot(m_yMask));
-	boxP0 = boxP0.GetMax (minBox);
-	boxP1 = boxP1.GetMin (maxBox);
-}
-
-
-DG_INLINE void dgCollisionHeightField::CalculateMinExtend3d (const dgVector& p0, const dgVector& p1, dgVector& boxP0, dgVector& boxP1) const
-{
-	dgAssert (p0.m_x <= p1.m_x);
-	dgAssert (p0.m_y <= p1.m_y);
-	dgAssert (p0.m_z <= p1.m_z);
-	dgAssert (p0.m_w == dgFloat32 (0.0f));
-	dgAssert (p1.m_w == dgFloat32 (0.0f));
-
-	dgVector q0 (p0 - m_padding);
-	dgVector q1 (p1 + m_padding);
-
-	boxP0 = (q0.Scale4(m_horizontalScaleInv).Floor().Scale4(m_horizontalScale) & m_yMask) + q0.AndNot(m_yMask);
-	boxP1 = ((q1.Scale4(m_horizontalScaleInv).Floor().Scale4(m_horizontalScale) + dgVector(m_horizontalScale)) & m_yMask) + q1.AndNot(m_yMask);
-
-	if (m_horizontalDisplacement) {
-		boxP0 -= dgVector (m_horizontalScale, dgFloat32 (0.0f), m_horizontalScale, dgFloat32 (0.0f)); 
-		boxP1 += dgVector (m_horizontalScale, dgFloat32 (0.0f), m_horizontalScale, dgFloat32 (0.0f)); 
-	}
-
-	dgVector minBox ((m_minBox & m_yMask) + boxP0.AndNot(m_yMask));
-	dgVector maxBox ((m_maxBox & m_yMask) + boxP1.AndNot(m_yMask));
-	boxP0 = boxP0.GetMax (minBox);
-	boxP1 = boxP1.GetMin (maxBox);
-}
-
 
 #endif

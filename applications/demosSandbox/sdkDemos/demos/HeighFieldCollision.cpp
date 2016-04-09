@@ -66,77 +66,78 @@ void LoadHeights(dFloat* elevation, int width, int height)
    }
 }
 
-void HeightFieldCollision (DemoEntityManager* const scene)
+void HeightFieldCollision(DemoEntityManager* const scene)
 {
-   // load the sky box
-   scene->CreateSkyBox();
-   int size = 64;
-   
-   dFloat* elevation = new dFloat [size * size];
+	// load the sky box
+	scene->CreateSkyBox();
+	int size = 64;
 
-   LoadHeights(elevation, size, size);
+	dFloat* elevation = new dFloat[size * size];
 
-   dFloat extent = 128.0f; // world size
-   dFloat horizontal_scale = 128.0f / (size - 1);
+	LoadHeights(elevation, size, size);
 
-   // create the attribute map
-   char* const attibutes = new char [size * size];
-   memset (attibutes, 0, size * size * sizeof (char));
-   NewtonCollision* height_field= NewtonCreateHeightFieldCollision (scene->GetNewton(), size, size, 0, 0, elevation, attibutes, 1.0f, horizontal_scale, 0);
+	dFloat extent = 128.0f; // world size
+	dFloat horizontal_scale = 128.0f / (size - 1);
 
-   float offset = -extent * 0.5f;
+	// create the attribute map
+	char* const attibutes = new char[size * size];
+	memset(attibutes, 0, size * size * sizeof (char));
+	NewtonCollision* height_field = NewtonCreateHeightFieldCollision(scene->GetNewton(), size, size, 0, 0, elevation, attibutes, 1.0f, horizontal_scale, 0);
+	NewtonStaticCollisionSetDebugCallback(height_field, ShowMeshCollidingFaces);
 
-   dMatrix mLocal(dGetIdentityMatrix());
-   mLocal.m_posit = dVector(offset,0, offset);
-   NewtonCollisionSetMatrix(height_field, &mLocal[0][0]);
 
-   dMatrix matrix(dGetIdentityMatrix());
-   NewtonBody* terrain_body = NewtonCreateDynamicBody(scene->GetNewton(), height_field, &matrix[0][0]);
-   NewtonBodySetMassProperties(terrain_body, 0.0, NewtonBodyGetCollision(terrain_body));
-   NewtonDestroyCollision(height_field);
+	float offset = -extent * 0.5f;
 
-   NewtonCollision* collision_pool[3] = {
-      NewtonCreateBox(scene->GetNewton(), 1,1,1, 0, nullptr),
-      NewtonCreateSphere(scene->GetNewton(), 0.5, 0, nullptr),
-      NewtonCreateCapsule(scene->GetNewton(), 0.5, 0.5, 1.0, 0, nullptr),
-   };
+	dMatrix mLocal(dGetIdentityMatrix());
+	mLocal.m_posit = dVector(offset, 0, offset);
+	NewtonCollisionSetMatrix(height_field, &mLocal[0][0]);
 
-   const int num_bodies_x = 10;
-   const int num_bodies_z = 10;
+	dMatrix matrix(dGetIdentityMatrix());
+	NewtonBody* terrain_body = NewtonCreateDynamicBody(scene->GetNewton(), height_field, &matrix[0][0]);
+	NewtonBodySetMassProperties(terrain_body, 0.0, NewtonBodyGetCollision(terrain_body));
+	NewtonDestroyCollision(height_field);
 
-   dFloat usable = extent;
+	NewtonCollision* collision_pool[3] = {
+		NewtonCreateBox(scene->GetNewton(), 1, 1, 1, 0, nullptr),
+		NewtonCreateSphere(scene->GetNewton(), 0.5, 0, nullptr),
+		NewtonCreateCapsule(scene->GetNewton(), 0.5, 0.5, 1.0, 0, nullptr),
+	};
 
-   dFloat spacing_x = usable / (num_bodies_x + 1);      
-   dFloat spacing_z = usable / (num_bodies_z + 1);
-   dFloat start = -usable * 0.5f;
+	const int num_bodies_x = 10;
+	const int num_bodies_z = 10;
 
-   dVector center(start,10,start);
-   for (int i = 0; i < num_bodies_z; ++i)
-   {
-      for (int j = 0; j < num_bodies_x; ++j)
-      {
-         dFloat offset_x = spacing_x * (j+1);
-         dFloat offset_z = spacing_z * (i+1);
-         matrix.m_posit = center + dVector(offset_x, 0, offset_z);
-         NewtonCollision* col = collision_pool[0];
-         NewtonBody* body = NewtonCreateDynamicBody(scene->GetNewton(),col,&matrix[0][0]);
-         NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-         NewtonBodySetMassProperties(body, 1.0, NewtonBodyGetCollision(body));
-      }
-   }
+	dFloat usable = extent;
 
-   for (int i = 0; i < 3; ++i)
-   {
-      NewtonDestroyCollision(collision_pool[i]);
-   }
-   delete [] attibutes;
-   delete [] elevation;
+	dFloat spacing_x = usable / (num_bodies_x + 1);
+	dFloat spacing_z = usable / (num_bodies_z + 1);
+	dFloat start = -usable * 0.5f;
 
-   dMatrix locationTransform (dGetIdentityMatrix());   
-   locationTransform.m_posit.m_y = 2.0f;
+	dVector center(start, 10, start);
+	for (int i = 0; i < num_bodies_z; ++i)
+	{
+		for (int j = 0; j < num_bodies_x; ++j)
+		{
+			dFloat offset_x = spacing_x * (j + 1);
+			dFloat offset_z = spacing_z * (i + 1);
+			matrix.m_posit = center + dVector(offset_x, 0, offset_z);
+			NewtonCollision* col = collision_pool[0];
+			NewtonBody* body = NewtonCreateDynamicBody(scene->GetNewton(), col, &matrix[0][0]);
+			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+			NewtonBodySetMassProperties(body, 1.0, NewtonBodyGetCollision(body));
+		}
+	}
 
-   scene->SetCameraMatrix(dQuaternion(locationTransform), locationTransform.m_posit + dVector(0, 5, 0));
-   
-   NewtonDemos* const mainWindow = scene->GetRootWindow();
-   mainWindow->m_debugDisplayMode = 1;
+	for (int i = 0; i < 3; ++i) {
+		NewtonDestroyCollision(collision_pool[i]);
+	}
+	delete[] attibutes;
+	delete[] elevation;
+
+	dMatrix locationTransform(dGetIdentityMatrix());
+	locationTransform.m_posit.m_y = 2.0f;
+
+	scene->SetCameraMatrix(dQuaternion(locationTransform), locationTransform.m_posit + dVector(0, 5, 0));
+
+	NewtonDemos* const mainWindow = scene->GetRootWindow();
+	mainWindow->m_debugDisplayMode = 1;
 }

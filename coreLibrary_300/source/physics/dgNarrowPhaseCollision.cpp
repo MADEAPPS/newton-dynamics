@@ -1520,48 +1520,47 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		instance0.m_globalMatrix.m_posit = dgVector::m_wOne;
 		instance1.m_globalMatrix.m_posit -= origin;
 
-			contactJoint->m_closestDistance = dgFloat32(1.0e10f);
+		contactJoint->m_closestDistance = dgFloat32(1.0e10f);
 
-			dgAssert(proxy.m_timestep <= dgFloat32(2.0f));
-			dgAssert(proxy.m_timestep >= dgFloat32(0.0f));
+		dgAssert(proxy.m_timestep <= dgFloat32(2.0f));
+		dgAssert(proxy.m_timestep >= dgFloat32(0.0f));
 
-			dgPolygonMeshDesc data(proxy, NULL);
+		dgPolygonMeshDesc data(proxy, NULL);
+		if (proxy.m_continueCollision) {
+			data.m_doContinuesCollisionTest = true;
+
+			const dgVector& hullVeloc = data.m_objBody->m_veloc;
+			const dgVector& hullOmega = data.m_objBody->m_omega;
+
+			dgFloat32 baseLinearSpeed = dgSqrt(hullVeloc % hullVeloc);
+			if (baseLinearSpeed > dgFloat32(1.0e-6f)) {
+				dgFloat32 minRadius = instance0.GetBoxMinRadius();
+				dgFloat32 maxAngularSpeed = dgSqrt(hullOmega % hullOmega);
+				dgFloat32 angularSpeedBound = maxAngularSpeed * (instance0.GetBoxMaxRadius() - minRadius);
+
+				dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
+				dgVector upperBoundVeloc(hullVeloc.Scale4(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
+				data.SetDistanceTravel(upperBoundVeloc);
+			}
+		}
+
+		dgCollisionMesh* const polysoup = (dgCollisionMesh *)data.m_polySoupInstance->GetChildShape();
+		polysoup->GetCollidingFaces(&data);
+
+		if (data.m_faceCount) {
+			proxy.m_polyMeshData = &data;
+
 			if (proxy.m_continueCollision) {
-				data.m_doContinuesCollisionTest = true;
-
-				const dgVector& hullVeloc = data.m_objBody->m_veloc;
-				const dgVector& hullOmega = data.m_objBody->m_omega;
-
-				dgFloat32 baseLinearSpeed = dgSqrt(hullVeloc % hullVeloc);
-				if (baseLinearSpeed > dgFloat32(1.0e-6f)) {
-					dgFloat32 minRadius = instance0.GetBoxMinRadius();
-					dgFloat32 maxAngularSpeed = dgSqrt(hullOmega % hullOmega);
-					dgFloat32 angularSpeedBound = maxAngularSpeed * (instance0.GetBoxMaxRadius() - minRadius);
-
-					dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
-					dgVector upperBoundVeloc(hullVeloc.Scale4(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
-					data.SetDistanceTravel(upperBoundVeloc);
-				}
+				count = CalculateConvexToNonConvexContactsContinue(proxy);
+			} else {
+				count = CalculatePolySoupToHullContactsDescrete(proxy);
 			}
 
-			dgCollisionMesh* const polysoup = (dgCollisionMesh *)data.m_polySoupInstance->GetChildShape();
-			polysoup->GetCollidingFaces(&data);
-
-			if (data.m_faceCount) {
-				proxy.m_polyMeshData = &data;
-
-				if (proxy.m_continueCollision) {
-					count = CalculateConvexToNonConvexContactsContinue(proxy);
-				} else {
-					count = CalculatePolySoupToHullContactsDescrete(proxy);
-				}
-
-				if (count > 0) {
-					proxy.m_contactJoint->m_contactActive = 1;
-					count = PruneContacts(count, proxy.m_contacts);
-				}
+			if (count > 0) {
+				proxy.m_contactJoint->m_contactActive = 1;
+				count = PruneContacts(count, proxy.m_contacts);
 			}
-
+		}
 
 		proxy.m_closestPointBody0 += origin;
 		proxy.m_closestPointBody1 += origin;
@@ -1635,7 +1634,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 
 	dgAssert (proxy.m_contactJoint);
 	dgVector separatingVector (proxy.m_instance0->m_globalMatrix.m_up);
-	
+
 	const dgInt32 stride = polygon.m_stride;
 	const dgFloat32* const vertex = polygon.m_vertex;
 	dgAssert (polyInstance.m_scaleType == dgCollisionInstance::m_unit);
