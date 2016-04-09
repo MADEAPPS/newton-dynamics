@@ -36,7 +36,6 @@ class dgCollisionChamferCylinder: public dgCollisionConvex
 	dgCollisionChamferCylinder(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionChamferCylinder();
 
-
 	protected:
 	void Init (dgFloat32 radius, dgFloat32 height);
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;

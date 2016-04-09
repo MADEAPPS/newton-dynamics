@@ -117,6 +117,11 @@ class dgHugeVector: public dgTemplateVector<dgGoogol>
 	{
 	}
 
+	dgHugeVector(const dgGoogol& x, const dgGoogol& y, const dgGoogol& z, const dgGoogol& w)
+		:dgTemplateVector<dgGoogol>(x, y, z, w)
+	{
+	}
+
 	dgGoogol EvaluePlane (const dgHugeVector& point) const 
 	{
 		return (point % (*this)) + m_w;
