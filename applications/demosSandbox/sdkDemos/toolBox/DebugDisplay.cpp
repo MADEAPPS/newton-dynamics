@@ -16,21 +16,21 @@
 #include "DebugDisplay.h"
 #include "PhysicsUtils.h"
 
-static int debugMode = 0;
+static int g_debugMode = 0;
 
 int DebugDisplayOn()
 {
-	return debugMode;
+	return g_debugMode;
 }
 
 void SetDebugDisplayMode(int state)
 {
-	debugMode = state;
+	g_debugMode = state;
 }
 
 #ifdef USE_STATIC_MESHES_DEBUG_COLLISION
-	static int debugDisplayCount;
-	static dVector debugDisplayCallback[1024 * 4];
+	static int g_debugDisplayCount;
+	static dVector g_debugDisplayCallback[1024 * 4];
 #endif
 
 static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, dFloat length)
@@ -371,9 +371,9 @@ void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE 
 	glDisable (GL_LIGHTING);
 	glBegin(GL_LINES);
 	glColor3f(1.0f, 1.0f, 0.0f);
-	for (int i = 0; i < debugDisplayCount; i += 2) {
-		glVertex3f (debugDisplayCallback[i].m_x, debugDisplayCallback[i].m_y, debugDisplayCallback[i].m_z);
-		glVertex3f (debugDisplayCallback[i+1].m_x, debugDisplayCallback[i+1].m_y, debugDisplayCallback[i+1].m_z);
+	for (int i = 0; i < g_debugDisplayCount; i += 2) {
+		glVertex3f (g_debugDisplayCallback[i].m_x, g_debugDisplayCallback[i].m_y, g_debugDisplayCallback[i].m_z);
+		glVertex3f (g_debugDisplayCallback[i+1].m_x, g_debugDisplayCallback[i+1].m_y, g_debugDisplayCallback[i+1].m_z);
 	}
 	glEnd();
 }
@@ -405,14 +405,14 @@ void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& 
 
 void ClearDebugDisplay( NewtonWorld* const world )
 {
-	debugDisplayCount = 0;
+	g_debugDisplayCount = 0;
 }
 
 void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat* const vertex, int vertexstrideInBytes)
 {
 #ifdef USE_STATIC_MESHES_DEBUG_COLLISION
-	if (debugMode) {
-		if ((debugDisplayCount + vertexCount * 2) < int (sizeof (debugDisplayCallback) / sizeof(debugDisplayCallback[0]))) {
+	if (g_debugMode) {
+		if ((g_debugDisplayCount + vertexCount * 2) < int (sizeof (g_debugDisplayCallback) / sizeof(g_debugDisplayCallback[0]))) {
 			// we are coping data to and array of memory, another call back may be doing the same thing
 			// here fore we need to avoid race conditions
 			NewtonWorldCriticalSectionLock (NewtonBodyGetWorld (staticCollisionBody), 0);
@@ -421,9 +421,9 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 			dVector l0 (vertex[(vertexCount-1) * stride + 0], vertex[(vertexCount-1) * stride + 1], vertex[(vertexCount-1) * stride + 2], 0.0f);
 			for (int j = 0; j < vertexCount; j ++) {
 				dVector l1 (vertex[j * stride + 0], vertex[j * stride + 1] , vertex[j * stride + 2], 0.0f);
-				debugDisplayCallback[debugDisplayCount + 0] = l0;
-				debugDisplayCallback[debugDisplayCount + 1] = l1;
-				debugDisplayCount  += 2;
+				g_debugDisplayCallback[g_debugDisplayCount + 0] = l0;
+				g_debugDisplayCallback[g_debugDisplayCount + 1] = l1;
+				g_debugDisplayCount  += 2;
 				l0 = l1;
 			}
 			// unlock the critical section
