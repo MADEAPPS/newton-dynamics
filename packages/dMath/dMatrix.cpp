@@ -293,12 +293,10 @@ dVector dMatrix::UnrotateVector (const dVector &v) const
 
 dVector dMatrix::RotateVector4x4 (const dVector &v) const
 {
-	dVector tmp;
-	const dMatrix& me = *this;
-	for (int i = 0; i < 4; i ++) {
-		tmp[i] = v[0] * me[0][i] + v[1] * me[1][i] +  v[2] * me[2][i] +  v[3] * me[3][i];
-	}
-	return tmp;
+	return dVector (v.m_x * m_front.m_x + v.m_y * m_up.m_x + v.m_z * m_right.m_x + v.m_w * m_posit.m_x,
+					v.m_x * m_front.m_y + v.m_y * m_up.m_y + v.m_z * m_right.m_y + v.m_w * m_posit.m_y,
+					v.m_x * m_front.m_z + v.m_y * m_up.m_z + v.m_z * m_right.m_z + v.m_w * m_posit.m_z,
+					v.m_x * m_front.m_w + v.m_y * m_up.m_w + v.m_z * m_right.m_w + v.m_w * m_posit.m_w);
 }
 
 

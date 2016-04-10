@@ -65,15 +65,44 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	class dgPairKey
 	{
 		public:
-		dgPairKey ();
-		dgPairKey (dgInt64 val);
-		dgPairKey (dgInt32 v0, dgInt32 v1);
-		dgInt64 GetVal () const; 
-		dgInt32 GetLowKey () const;
-		dgInt32 GetHighKey () const;
+		dgPairKey()
+		{
+		}
+
+		dgPairKey(dgInt64 key)
+			:m_key(dgUnsigned64(key))
+		{
+		}
+
+		dgPairKey(dgInt32 keyHigh, dgInt32 keyLow)
+			:m_keyLow(keyLow)
+			,m_keyHigh(keyHigh)
+		{
+		}
+
+		dgInt64 GetVal() const
+		{
+			return dgInt64(m_key);
+		}
+
+		dgInt32 GetLowKey() const
+		{
+			return m_keyLow;
+		}
+
+		dgInt32 GetHighKey() const
+		{
+			return m_keyHigh;
+		}
 
 		private:
-		dgUnsigned64 m_key;
+		union {
+			dgUnsigned64 m_key;
+			struct {
+				dgUnsigned32 m_keyLow;
+				dgUnsigned32 m_keyHigh;
+			};
+		};
 	};
 
 	dgPolyhedra (dgMemoryAllocator* const allocator);
@@ -119,7 +148,8 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	void Triangulate (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut);
 	void ConvexPartition (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut);
 	dgEdge* CollapseEdge(dgEdge* const edge);
-	void PolygonizeFace (dgEdge* face, const dgFloat64* const pool, dgInt32 stride);
+	bool PolygonizeFace (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride);
+	bool TriangulateFace (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride);
 
 	private:
 	void RefineTriangulation (const dgFloat64* const vertex, dgInt32 stride);
@@ -128,8 +158,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	void MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* const face, const dgFloat64* const pool, dgInt32 strideInBytes);
 	dgEdge* FindEarTip (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride, dgDownHeap<dgEdge*, dgFloat64>& heap, const dgBigVector &normal) const;
 	dgEdge* TriangulateFace (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride, dgDownHeap<dgEdge*, dgFloat64>& heap, dgBigVector* const faceNormalOut);
-	
-
+		
 	void RemoveHalfEdge (dgEdge* const edge);
 	dgEdge* OptimizeCollapseEdge (dgEdge* const edge);
 	bool IsOkToCollapse (const dgBigVector* const pool, dgEdge* const edge) const;
@@ -137,16 +166,13 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	dgBigPlane EdgePlane (dgInt32 i0, dgInt32 i1, dgInt32 i2, const dgBigVector* const pool) const;
 	void CalculateAllMetrics (dgVertexCollapseVertexMetric* const table, const dgBigVector* const pool) const;
 	void CalculateVertexMetrics (dgVertexCollapseVertexMetric* const table, const dgBigVector* const pool, dgEdge* const edge) const;
+	dgEdge* BestEdgePolygonizeFace(const dgBigVector& normal, dgEdge* const edge, const dgFloat64* const pool, dgInt32 stride, const dgBigVector& point) const;
 	
-
 	mutable dgInt32 m_baseMark;
 	mutable dgInt32 m_edgeMark;
 	mutable dgInt32 m_faceSecuence;
-
 	friend class dgPolyhedraDescriptor;
-	
 };
-
 
 
 DG_INLINE dgEdge::dgEdge ()
@@ -168,34 +194,7 @@ DG_INLINE dgEdge::~dgEdge ()
 {
 }
 
-DG_INLINE dgPolyhedra::dgPairKey::dgPairKey ()
-{
-}
 
-DG_INLINE dgPolyhedra::dgPairKey::dgPairKey (dgInt64 val)
-	:m_key(dgUnsigned64 (val))
-{
-}
-
-DG_INLINE dgPolyhedra::dgPairKey::dgPairKey (dgInt32 v0, dgInt32 v1)
-	:m_key (dgUnsigned64 ((dgInt64 (v0) << 32) | v1))
-{
-}
-
-DG_INLINE dgInt64 dgPolyhedra::dgPairKey::GetVal () const 
-{
-	return dgInt64 (m_key);
-}
-
-DG_INLINE dgInt32 dgPolyhedra::dgPairKey::GetLowKey () const 
-{
-	return dgInt32 (m_key>>32);
-}
-
-DG_INLINE dgInt32 dgPolyhedra::dgPairKey::GetHighKey () const 
-{
-	return dgInt32 (m_key & 0xffffffff);
-}
 
 DG_INLINE void dgPolyhedra::BeginFace ()
 {
