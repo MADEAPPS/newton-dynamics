@@ -443,7 +443,6 @@ dgMeshEffect* dgMeshEffect::Difference (const dgMatrix& matrix, const dgMeshEffe
 
 class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 {
-
 	class dgNodeKey
 	{
 		public:
@@ -484,11 +483,18 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 		const dgEdge* m_edgeKey;
 	};
 
-	class dgPoint
+	class dgVertex 
+	{
+		public:
+		dgBigVector m_posit;
+	};
+
+	class dgPoint: public dgVertex
 	{
 		public:
 		dgPoint()
-			:m_links(NULL)
+			:dgVertex()
+			,m_links(NULL)
 		{
 			dgAssert (0);
 		}
@@ -508,7 +514,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 //			m_posit = p0 + (p1 - p0).Scale3 (param);
 		}
 
-		dgBigVector m_posit;
+		
 		dgList<dgTree<dgPoint, dgNodeKey>::dgTreeNode*> m_links;
 //		dgEdge* m_edge;
 //		dgEdge* m_face;
@@ -903,14 +909,170 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 	{
 	}
 
+/*
+	dgFloat64 IntersetionSegment(const dgMeshEffect* const meshEdge, dgEdge* const edge, const dgMeshEffect* const meshFace, dgEdge* const face, const dgHugeVector& plane)
+	{
+		dgHugeVector p0 (meshEdge->GetVertex(edge->m_incidentVertex));
+		dgHugeVector p1 (meshEdge->GetVertex(edge->m_twin->m_incidentVertex));
+			
+		dgGoogol test0 (plane.EvaluePlane(p0));
+		dgGoogol test1 (plane.EvaluePlane(p1));
+
+		if ((test0 * test1) > dgGoogol::m_zero) {
+			// both point are in one side
+			return -1.0f;
+		}
+
+		if ((test0 * test1) < dgGoogol::m_zero) {
+			//point on different size, clip the line
+			dgHugeVector p1p0 (p1 - p0);
+			dgGoogol param = dgGoogol::m_zero - plane.EvaluePlane(p0) / (plane % p1p0);
+			dgHugeVector p (p0 + p1p0.Scale3 (param));
+			if (IsPointInFace (p, meshFace, face, plane)) {
+				return param;
+			}
+			return -1.0f;
+		} else {
+			dgAssert (0);
+			//special cases;
+		}
+			
+		return -1.0f;
+	}
+*/
+
+	static dgHugeVector CalculateFaceNormal (const dgMeshEffect* const mesh, dgEdge* const face)
+	{
+		dgHugeVector plane(dgGoogol::m_zero, dgGoogol::m_zero, dgGoogol::m_zero, dgGoogol::m_zero);
+		dgEdge* edge = face;
+		dgHugeVector p0(mesh->GetVertex(edge->m_incidentVertex));
+		edge = edge->m_next;
+		dgHugeVector p1(mesh->GetVertex(edge->m_incidentVertex));
+		dgHugeVector p1p0(p1 - p0);
+		edge = edge->m_next;
+		do {
+			dgHugeVector p2(mesh->GetVertex(edge->m_incidentVertex));
+			dgHugeVector p2p0(p2 - p0);
+			plane += p2p0 * p1p0;
+			p1p0 = p2p0;
+			edge = edge->m_next;
+		} while (edge != face);
+
+		plane.m_w = dgGoogol::m_zero - (plane % p0);
+		return plane;
+	}
+
+	static bool IsPointInFace (const dgHugeVector& point, const dgMeshEffect* const mesh, dgEdge* const face, const dgHugeVector& normal)
+	{
+		dgEdge* edge = face;
+
+//		dgTrace (("%f %f %f\n", dgFloat64 (point.m_x), dgFloat64 (point.m_y), dgFloat64 (point.m_z)));
+//		do {
+//			dgBigVector p1(mesh->GetVertex(edge->m_incidentVertex));
+//			dgTrace (("%f %f %f\n", dgFloat64 (p1.m_x), dgFloat64 (p1.m_y), dgFloat64 (p1.m_z)));
+//			edge = edge->m_next;
+//		} while (edge != face);
+
+		dgHugeVector p0(mesh->GetVertex(face->m_incidentVertex));
+		do {
+			dgHugeVector p1(mesh->GetVertex(edge->m_twin->m_incidentVertex));
+			dgHugeVector p1p0(p1 - p0);
+			dgHugeVector q1p0(point - p0);
+			dgGoogol side (q1p0 % (normal * p1p0));
+			if (side >= dgGoogol::m_zero) {
+				return false;
+			}
+			p0 = p1;
+			edge = edge->m_next;
+		} while (edge != face);
+
+		return true;
+	}
+
+	static dgFloat64 ClipEdgeFace(const dgMeshEffect* const meshEdge, dgEdge* const edge, const dgMeshEffect* const meshFace, dgEdge* const face, const dgHugeVector& plane)
+	{
+		dgHugeVector p0 (meshEdge->GetVertex(edge->m_incidentVertex));
+		dgHugeVector p1 (meshEdge->GetVertex(edge->m_twin->m_incidentVertex));
+			
+		dgGoogol test0 (plane.EvaluePlane(p0));
+		dgGoogol test1 (plane.EvaluePlane(p1));
+
+		if ((test0 * test1) > dgGoogol::m_zero) {
+			// both point are in one side
+			return -1.0f;
+		}
+
+		if ((test0 * test1) < dgGoogol::m_zero) {
+			//point on different size, clip the line
+			dgHugeVector p1p0 (p1 - p0);
+			dgGoogol param = dgGoogol::m_zero - plane.EvaluePlane(p0) / (plane % p1p0);
+			dgHugeVector p (p0 + p1p0.Scale3 (param));
+			if (IsPointInFace (p, meshFace, face, plane)) {
+				return param;
+			}
+			return -1.0f;
+		} else {
+			dgAssert (0);
+			//special cases;
+		}
+			
+		return -1.0f;
+	}
+
+	static void CalculateIntersection (dgMeshEffect* const edgeOwnerMesh, dgEdge* const edgeStart, dgMeshEffect* const faceOwnerMesh, dgEdge* const face, const dgHugeVector& plane, dgVertex* const data, dgInt32& index)
+	{
+		dgEdge* edge = edgeStart;
+		do {
+			dgFloat64 param = ClipEdgeFace(edgeOwnerMesh, edge, faceOwnerMesh, face, plane);
+			if (param > 0.0f) {
+				dgAssert(0);
+/*
+				dgPoint point(edgeOwnerMesh, edge, param, faceOwnerMesh, face);
+				dgTreeNode* node = Find(dgNodeKey(edge, param));
+				if (!node) {
+					node = Insert(point, dgNodeKey(edge, param));
+				}
+				nodes[index] = node;
+*/
+				index ++;
+			}
+
+			edge = edge->m_next;
+		} while (edge != edgeStart);
+	}
+
+
+	static dgInt32 ClipMeshesFaces(dgMeshEffect* const meshA, dgEdge* const faceA, dgMeshEffect* const meshB, dgEdge* const faceB, dgVertex* const data)
+	{
+		dgAssert (meshA->FindEdge(faceA->m_incidentVertex, faceA->m_twin->m_incidentVertex) == faceA);
+		dgAssert (meshB->FindEdge(faceB->m_incidentVertex, faceB->m_twin->m_incidentVertex) == faceB);
+
+		dgHugeVector planeA (CalculateFaceNormal (meshA, faceA));
+		dgHugeVector planeB (CalculateFaceNormal (meshB, faceB));
+
+		dgInt32 index = 0;
+		CalculateIntersection (meshA, faceA, meshB, faceB, planeB, data, index);
+		CalculateIntersection (meshB, faceB, meshA, faceA, planeA, data, index);
+		dgAssert ((index == 0) || (index == 2));
+		if (index == 2) {
+			dgAssert (0);
+/*
+			dgPoint& pointA = nodes[0]->GetInfo();
+			dgPoint& pointB = nodes[1]->GetInfo();
+			pointA.m_links.Append(nodes[1]);
+			pointB.m_links.Append(nodes[0]);
+*/
+		}
+		return index;
+	}
+
 	static void ClipMeshesAndColorize(dgMeshEffect* const meshA, dgMeshEffect* const meshB)
 	{
 		dgBooleanMeshClipper BVHmeshA(meshA);
 		dgBooleanMeshClipper BVHmeshB(meshB);
 
-//		dgCurvesNetwork network(&BVHmeshA, &BVHmeshB);
-
 		int stack = 1;
+		dgVertex data[32];
 		dgMeshBVHNode* stackPool[2 * DG_MESH_EFFECT_BVH_STACK_DEPTH][2];
 
 		stackPool[0][0] = BVHmeshA.m_rootNode;
@@ -921,8 +1083,12 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			dgMeshBVHNode* const nodeB = stackPool[stack][1];
 			if (dgOverlapTest (nodeA->m_p0, nodeA->m_p1, nodeB->m_p0, nodeB->m_p1)) {
 				if (nodeA->m_face && nodeB->m_face) {
-					BVHmeshA.m_clippedFaces.ClipMeshesFaces(meshA, nodeA->m_face, meshB, nodeB->m_face);
-					BVHmeshB.m_clippedFaces.ClipMeshesFaces(meshB, nodeB->m_face, meshA, nodeA->m_face);
+					dgInt32 clipCount = ClipMeshesFaces(meshA, nodeA->m_face, meshB, nodeB->m_face, data);
+					if (clipCount) {
+						dgAssert(0);
+						BVHmeshA.m_clippedFaces.ClipMeshesFaces(meshA, nodeA->m_face, meshB, nodeB->m_face);
+						BVHmeshB.m_clippedFaces.ClipMeshesFaces(meshB, nodeB->m_face, meshA, nodeA->m_face);
+					}
 				} else if (nodeA->m_face) {
 					stackPool[stack][0] = nodeA;
 					stackPool[stack][1] = nodeB->m_left;
