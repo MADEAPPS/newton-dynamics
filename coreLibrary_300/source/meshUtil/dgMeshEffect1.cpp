@@ -82,6 +82,7 @@ dgMeshEffect::dgMeshBVH::dgMeshBVHNode::dgMeshBVHNode (const dgMeshEffect* const
 dgMeshEffect::dgMeshBVH::dgMeshBVHNode::dgMeshBVHNode (dgMeshBVHNode* const left, dgMeshBVHNode* const right)
 	:m_area(dgFloat32 (0.0f))
 	,m_face (NULL)
+	,m_userData(NULL)
 	,m_left (left)
 	,m_right(right)
 	,m_parent(NULL)
@@ -2306,12 +2307,18 @@ void* dgMeshEffect::GetNextEdge (const void* const edge) const
 	return NULL; 
 }
 
+
 void dgMeshEffect::GetEdgeIndex (const void* const edge, dgInt32& v0, dgInt32& v1) const
 {
 	dgTreeNode* node = (dgTreeNode*) edge;
 	v0 = node->GetInfo().m_incidentVertex;
 	v1 = node->GetInfo().m_twin->m_incidentVertex;
 }
+
+//void* dgMeshEffect::FindEdge (dgInt32 v0, dgInt32 v1) const
+//{
+//	return FindEdgeNode(v0, v1);
+//}
 
 //void dgMeshEffect::GetEdgeAttributeIndex (const void* edge, dgInt32& v0, dgInt32& v1) const
 //{

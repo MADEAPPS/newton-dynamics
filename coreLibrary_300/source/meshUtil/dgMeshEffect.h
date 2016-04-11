@@ -131,8 +131,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		friend class dgMeshEffect;
 	};
 
-
-
 	dgMeshEffect(dgMemoryAllocator* const allocator);
 	dgMeshEffect(dgCollisionInstance* const collision);
 	dgMeshEffect(const dgMeshEffect& source);
@@ -271,6 +269,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	void* GetFirstEdge () const;
 	void* GetNextEdge (const void* const edge) const;
+//	void* FindEdge (dgInt32 v0, dgInt32 v1) const;
 	void GetEdgeIndex (const void* const edge, dgInt32& v0, dgInt32& v1) const;
 //	void GetEdgeAttributeIndex (const void* edge, dgInt32& v0, dgInt32& v1) const;
 
