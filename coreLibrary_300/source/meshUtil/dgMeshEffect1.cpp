@@ -797,7 +797,11 @@ dgMeshEffect::dgMeshBVH::dgMeshBVHNode* dgMeshEffect::dgMeshBVH::FaceRayCast (co
 }
 
 
-
+dgMeshEffect::dgMeshEffect ()
+	:dgPolyhedra(NULL)
+{
+	dgAssert (0);
+}
 
 dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator)
 	:dgPolyhedra(allocator)
@@ -1533,6 +1537,8 @@ void dgMeshEffect::RemoveUnusedVertices(dgInt32* const vertexMapResult)
 			dgInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
 			dgInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
 
+
+			void AddPolygon (dgInt32 count, const dgFloat32* const vertexList, dgInt32 stride, dgInt32 material);
 			dgEdge* ptr = face;
 			dgInt32 indexCount = 0;
 			do {

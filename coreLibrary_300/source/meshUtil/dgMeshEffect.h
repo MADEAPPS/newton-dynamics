@@ -131,6 +131,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		friend class dgMeshEffect;
 	};
 
+	dgMeshEffect ();
 	dgMeshEffect(dgMemoryAllocator* const allocator);
 	dgMeshEffect(dgCollisionInstance* const collision);
 	dgMeshEffect(const dgMeshEffect& source);
@@ -180,9 +181,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void RemoveUnusedVertices(dgInt32* const vertexRemapTable);
 	
 	void BeginPolygon ();
-	void AddPolygon (dgInt32 count, const dgFloat32* const vertexList, dgInt32 stride, dgInt32 material);
+	void AddPolygon (dgInt32 count, const dgFloat32* const vertexList, dgInt32 strideInBytes, dgInt32 material);
 #ifndef _NEWTON_USE_DOUBLE
-	void AddPolygon (dgInt32 count, const dgFloat64* const vertexList, dgInt32 stride, dgInt32 material);
+	void AddPolygon (dgInt32 count, const dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 material);
 #endif
 	void EndPolygon (dgFloat64 tol, bool fixTjoint = true);
 

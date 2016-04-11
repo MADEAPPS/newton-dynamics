@@ -443,6 +443,7 @@ dgMeshEffect* dgMeshEffect::Difference (const dgMatrix& matrix, const dgMeshEffe
 
 class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 {
+/*
 	class dgNodeKey
 	{
 		public:
@@ -647,23 +648,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 				pointB.m_links.Append(nodes[0]);
 			}
 		}
-/*
-		void AddVertex()
-		{
-			Iterator iter (*this);
-			dgInt32 indexA = m_meshA->GetVertexCount();
-			dgInt32 indexB = m_meshB->GetVertexCount();
-			for (iter.Begin(); iter; iter ++) {
-				dgPoint& point = iter.GetNode()->GetInfo();
-				m_meshA->AddVertex(point.m_posit);
-				m_meshB->AddVertex(point.m_posit);
-				point.m_indexA = indexA;
-				point.m_indexB = indexB;
-				indexA ++;
-				indexB ++;
-			}
-		}
-*/
+
 		void GetCurve (dgList<dgTreeNode*>& curve, dgTreeNode* const node)
 		{
 			dgInt32 stack = 1;
@@ -761,9 +746,6 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 
 		void EmbedCurveToMulipleFaces (dgList<dgTreeNode*>& curve, dgMeshEffect* const mesh)
 		{
-//			dgInt32 indexBase = mesh->GetVertexCount();
-//			dgInt32 indexAttribBase = mesh->GetPropertiesCount();
-
 			for (dgList<dgTreeNode*>::dgListNode* node = curve.GetFirst(); node; node = node->GetNext()) {
 				dgPoint& point = node->GetInfo()->GetInfo();
 				if (point.m_edgeOwnerMesh == mesh) {
@@ -818,946 +800,82 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			m_meshB->SaveOFF("xxxB0.off");
 		}
 
-
 		dgMeshEffect* m_meshA;
 		dgMeshEffect* m_meshB;
 		dgInt32 m_pointBaseA;
 		dgInt32 m_pointBaseB;
 		dgInt32 m_lru;
 	};
-
-
-	public:
-#if 0
-	class dgClusterFace: public dgList<dgMeshBVHNode*>
-	{
-		public:
-		dgClusterFace(dgMeshEffect* const mesh, dgEdge* const face)
-			:dgList<dgMeshBVHNode*>(mesh->GetAllocator())
-			,m_plane (mesh->FaceNormal (face, mesh->GetVertexPool(), sizeof (dgBigVector)), dgFloat32(0.0))
-		{
-			const dgBigVector* const vertex = (dgBigVector*) mesh->GetVertexPool();
-			m_plane = m_plane.Scale(1.0 / sqrt(m_plane % m_plane));
-			m_plane.m_w = - (m_plane % vertex[face->m_incidentVertex]);
-		}
-
-		bool AddFace (const dgMeshEffect* const mesh, dgMeshBVHNode* const faceNode, const dgMeshEffect* const myMesh, dgMeshBVHNode* const myFaceNode) 
-		{
-			dgAssert (!Find(faceNode));
-
-			bool added = false;
-			dgInt32 posCount = 0;
-			dgInt32 negCount = 0;
-			const dgBigVector* const vertex = (dgBigVector*) mesh->GetVertexPool();
-			dgEdge* ptr = faceNode->m_face;
-			do {
-				dgFloat64 test = m_plane.Evalue(vertex[ptr->m_incidentVertex]);
-				posCount += (test > -1.0e-3);
-				negCount += (test <  1.0e-3);
-				ptr = ptr->m_next;
-			} while (ptr != faceNode->m_face);
-
-			if (posCount * negCount) {
-				dgBigPlane plane (mesh->FaceNormal (faceNode->m_face, &vertex[0].m_x, sizeof (dgBigVector)), dgFloat32 (0.0f));
-				plane = plane.Scale(1.0 / sqrt(plane % plane));
-				plane.m_w = - (plane % vertex[faceNode->m_face->m_incidentVertex]);
-
-				dgInt32 posCount = 0;
-				dgInt32 negCount = 0;
-				const dgBigVector* const myVertex = (dgBigVector*) myMesh->GetVertexPool();
-				dgEdge* ptr = myFaceNode->m_face;
-				do {
-					dgFloat64 test = plane.Evalue (myVertex[ptr->m_incidentVertex]);
-					posCount += (test > -1.0e-3);
-					negCount += (test <  1.0e-3);
-					ptr = ptr->m_next;
-				} while (ptr != myFaceNode->m_face);
-
-				if (posCount * negCount) {
-					Append(faceNode);
-					added = true;
-				}
-			}
-
-			return added;
-		}
-
-		dgEdge* FindFirstClipperEdge (const dgHugeVector& normal, const dgHugeVector& origin, const dgBooleanMeshClipper* const clipperMeshBVH, dgInt32 clipperMark) const
-		{
-/*
-			dgEdge* vertexClipperEdge = NULL;
-//normal.Trace();
-//origin.Trace();
-
-			for (dgListNode* clipperNode = GetFirst(); clipperNode; clipperNode = clipperNode->GetNext()) {
-				dgMeshBVHNode* const clipperFaceNode = clipperNode ->GetInfo();
-
-				dgEdge* ptr = clipperFaceNode->m_face;
-//clipperMeshBVH->m_vertexAlias[ptr->m_incidentVertex].Trace();
-				dgGoogol test0 (normal % (clipperMeshBVH->m_vertexAlias[ptr->m_incidentVertex] - origin));
-				do {
-					dgGoogol test1 (normal % (clipperMeshBVH->m_vertexAlias[ptr->m_next->m_incidentVertex] - origin));
-//test0.Trace();
-//test1.Trace();
-					if (ptr->m_mark != clipperMark) {
-						if ((test0 <= dgGoogol (m_negTol)) && (test1 >= dgGoogol (m_posTol))) {
-							return ptr;
-						} else if ((test0.Abs() < dgGoogol (m_posTol)) && (test1 >= dgGoogol (m_posTol))) {
-							dgAssert (0);
-							vertexClipperEdge = ptr;
-						}
-					}
-
-					test0 = test1;
-					ptr = ptr->m_next;
-				} while (ptr != clipperFaceNode->m_face);
-			}
-			return vertexClipperEdge;
-		}
-
-		dgEdge* EmitPointOnPlaneAndGetNextCrossingEdge (const dgHugeVector& normal, const dgHugeVector& origin, const dgBooleanMeshClipper* const clipperMeshBVH, dgEdge* const clipperEdge, dgInt32 clipperMark, dgList<dgHugeVector>& curve) const
-		{
-			dgHugeVector& point = curve.Addtop()->GetInfo();
-			point = clipperMeshBVH->m_vertexAlias[clipperEdge->m_twin->m_incidentVertex];
-
-			dgEdge* ptr = clipperEdge;
-			do {
-				ptr->m_mark = clipperMark;
-				ptr->m_twin->m_mark = clipperMark;
-				ptr = ptr->m_next;
-			} while (ptr != clipperEdge);
-
-			dgEdge* nexEdge = NULL;
-			ptr = clipperEdge->m_next->m_twin->m_next;
-			do {
-				ptr->m_mark = clipperMark;
-				ptr->m_twin->m_mark = clipperMark;
-
-				if (!nexEdge) {
-					dgEdge* ptr1 = ptr->m_next;
-					dgAssert (ptr1);
-					dgGoogol test0 (normal % (clipperMeshBVH->m_vertexAlias[ptr1->m_incidentVertex] - origin));
-					do {
-						dgAssert (ptr1->m_next);
-						dgGoogol test1 (normal % (clipperMeshBVH->m_vertexAlias[ptr1->m_next->m_incidentVertex] - origin));
-						if (test0 >= m_posTol) {
-							if (test1.Abs() < m_posTol) {
-								nexEdge = EmitPointOnPlaneAndGetNextCrossingEdge (normal, origin, clipperMeshBVH, ptr1, clipperMark, curve);
-							} else if (test1 <= m_negTol) {
-								nexEdge = ptr1;
-							}
-						}
-
-						test1 = test0;
-						ptr1 = ptr1->m_next;
-					} while (ptr1 != ptr->m_prev);
-				}
-
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != clipperEdge->m_next);
-
-			dgAssert (nexEdge);
-			return nexEdge;
-		}
-
-
-		bool Get2DCurve (const dgHugeVector& normal, const dgHugeVector& origin, const dgBooleanMeshClipper* const clipperMeshBVH, dgEdge* const clipperEdge, dgInt32 clipperMark, dgList<dgHugeVector>& curve) const
-		{
-			bool isClosedLoop = false;
-
-static int xxx;
-xxx ++;
-if (xxx == 3){
-clipperMeshBVH->m_mesh->Trace();
-}
-
-			dgInt32 clusterColor = clipperMark -1;	
-
-			dgEdge* firstClipperEdge = clipperEdge;
-			dgAssert (firstClipperEdge->m_mark >= clusterColor);
-
-			for (bool state = true; state; ) {
-				state = false;
-
-				dgHugeVector p1p0 (clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_next->m_incidentVertex] - clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_incidentVertex]);
-				dgGoogol num (normal % (clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_incidentVertex] - origin));
-				dgGoogol den (normal % p1p0);
-				dgHugeVector& point = curve.Addtop()->GetInfo();
-				point = clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_incidentVertex] - p1p0.Scale3(num / den);
-
-				if (firstClipperEdge->m_mark >= clusterColor) {
-					firstClipperEdge->m_mark = clipperMark;
-					firstClipperEdge->m_twin->m_mark = clipperMark;
-
-					dgEdge* ptr = firstClipperEdge->m_next;
-					dgGoogol test0 (normal % (clipperMeshBVH->m_vertexAlias[ptr->m_incidentVertex] - origin));
-					do {
-						dgGoogol test1 (normal % (clipperMeshBVH->m_vertexAlias[ptr->m_next->m_incidentVertex] - origin));
-						dgAssert (ptr->m_mark >= clusterColor);
-						if (test1.Abs() < m_posTol) {
-							dgAssert (test0 >= m_posTol);
-							state = true;
-							firstClipperEdge = EmitPointOnPlaneAndGetNextCrossingEdge (normal, origin, clipperMeshBVH, ptr, clipperMark, curve);
-							firstClipperEdge = firstClipperEdge->m_twin;
-							break;
-
-						} else if ((test0 >= m_posTol) && (test1 <= m_negTol)) {
-							if (ptr->m_mark != clipperMark) {
-								state = true;
-								firstClipperEdge = ptr->m_twin;
-							} else {
-								isClosedLoop = true;
-							}
-							break;
-						}
-
-						test0 = test1;
-						ptr = ptr->m_next;
-					} while (ptr != firstClipperEdge);
-				}
-			}
-
-			if (!isClosedLoop) {
-				dgEdge* firstClipperEdge = clipperEdge->m_twin->m_next;
-				for (bool state = true; state; ) {
-					state = false;
-					if (firstClipperEdge->m_mark >= clusterColor) {
-						dgAssert (0);
-/*
-						firstClipperEdge->m_mark = clipperMark;
-						firstClipperEdge->m_twin->m_mark = clipperMark;
-
-						dgEdge* ptr = firstClipperEdge->m_next;
-						dgGoogol test0 (normal % (clipperMeshBVH->m_vertexAlias[ptr->m_incidentVertex] - origin));
-						do {
-							dgGoogol test1 (normal % (clipperMeshBVH->m_vertexAlias[ptr->m_next->m_incidentVertex] - origin));
-							dgAssert (ptr->m_mark >= clusterColor);
-							if ((test0 >= dgGoogol (m_posTol)) && (test1 <= dgGoogol (m_negTol))) {
-								if (ptr->m_mark != clipperMark) {
-									state = true;
-									firstClipperEdge = ptr->m_twin;
-								} else {
-									isClosedLoop = true;
-								}
-								break;
-							}
-
-							test0 = test1;
-							ptr = ptr->m_next;
-						} while (ptr != firstClipperEdge);
-
-//						dgHugeVector p1p0 (clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_next->m_incidentVertex] - clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_incidentVertex]);
-//						dgGoogol num (normal % (clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_incidentVertex] - origin  ));
-//						dgGoogol den (normal % p1p0);
-//						dgHugeVector& point = curve.Addtop()->GetInfo();
-//						point = clipperMeshBVH->m_vertexAlias[firstClipperEdge->m_incidentVertex] - p1p0.Scale(num / den);
 */
-					}
-				}
-			}
-			return isClosedLoop;
-		}
 
-		bool TestPlanar (const dgHugeVector& normal, const dgList<dgHugeVector>& curve) const
-		{
-			dgHugeVector n (0.0, 0.0, 0.0, 0.0);
-			const dgHugeVector& p0 = curve.GetFirst()->GetInfo();
-			const dgHugeVector& p1 = curve.GetFirst()->GetNext()->GetInfo();
-
-//			p0.Trace();
-//			p1.Trace();
-			dgHugeVector e10 (p1 - p0);
-			for (dgList<dgHugeVector>::dgListNode* node = curve.GetFirst()->GetNext()->GetNext(); node; node = node->GetNext()) {
-				const dgHugeVector& p2 = node->GetInfo();
-//				p2.Trace();
-				dgHugeVector e20 (p2 - p0);
-				n += e10 * e20;
-				e10 = e20;
-			}
-
-			dgGoogol dir (n % normal);
-			return dir > dgGoogol::m_zero;
-		}
-
-
-		void RayRayIntersect (const dgHugeVector& ray_p0, const dgHugeVector& ray_p1, dgGoogol& paramP, const dgHugeVector& ray_q0, const dgHugeVector& ray_q1, dgGoogol& paramQ) const
-		{
-			dgHugeVector p1p0 (ray_p1 - ray_p0);
-			dgHugeVector q1q0 (ray_q1 - ray_q0);
-			dgHugeVector p0q0 (ray_p0 - ray_q0);
-
-			dgGoogol a = p1p0 % p1p0;        // always >= 0
-			dgGoogol c = q1q0 % q1q0;        // always >= 0
-			dgGoogol b = p1p0 % q1q0;
-
-			dgGoogol d = (p1p0 % p0q0);
-			dgGoogol e = (q1q0 % p0q0);
-			dgGoogol den = a * c - b * b;   // always >= 0
-
-			// compute the line parameters of the two closest points
-			dgAssert (den > m_tol3);
-
-			// get the closest points on the infinite lines
-			paramP = (b * e - c * d) / den;
-			paramQ = (a * e - b * d) / den;
-			paramP = dgClamp (paramP, dgGoogol::m_zero, dgGoogol::m_one);
-			paramQ = dgClamp (paramQ, dgGoogol::m_zero, dgGoogol::m_one);
-		}
-
-		void InsertOpenCurve (dgBooleanMeshClipper* const meshBVH, dgList<dgEdge*>& facePerimeter, const dgHugeVector& normal, const dgHugeVector& origin, dgList<dgHugeVector>& curve) const
-		{
-			dgInt32 edgeConnectCount = 0;
-			dgEdge* edgeConnect[4];
-			const dgHugeVector* const vertex = &meshBVH->m_vertexAlias[0];
-			for (dgList<dgEdge*>::dgListNode* node = facePerimeter.GetFirst(); node; node = node->GetNext()) {
-				dgEdge* const edge = node->GetInfo();
-
-				dgInt32 index0 = edge->m_incidentVertex;
-				dgInt32 index1 = edge->m_next->m_incidentVertex;
-				const dgHugeVector& q0 (vertex[index0]);
-				const dgHugeVector& q1 (vertex[index1]);
-
-				for (dgList<dgHugeVector>::dgListNode* curveNode = curve.GetFirst(); curveNode != curve.GetLast(); curveNode = curveNode->GetNext()) {
-					const dgHugeVector& p0 = curveNode->GetInfo();
-					const dgHugeVector& p1 = curveNode->GetNext()->GetInfo();
-
-					dgHugeVector q0p0 (q0 - p0);
-					dgHugeVector q1p0 (q1 - p0);
-					dgGoogol alpha0 ((normal * q0p0) % q1p0);
-
-					dgHugeVector q0p1 (q0 - p1);
-					dgHugeVector q1p1 (q1 - p1);
-					dgGoogol alpha1 ((normal * q0p1) % q1p1);
-
-					bool test0 = (alpha0 <= m_tol2);
-					bool test1 = (alpha1 <= m_tol2);
-					if (test0 ^ test1) {
-						dgGoogol paramP;
-						dgGoogol paramQ;
-						RayRayIntersect (q0, q1, paramQ, p0, p1, paramP);
-
-						bool test0ParamP = paramP >= m_posTol;
-						bool test1ParamP = paramP <= m_oneMinusTol;
-						bool test0ParamQ = paramQ >= m_posTol;
-						bool test1ParamQ = paramQ <= m_oneMinusTol;
-
-						if (test0ParamP & test1ParamP & test0ParamQ & test1ParamQ) {
-							dgEdge* edge0;
-							dgEdge* edge1;
-
-							meshBVH->SpliteEdge(edge, paramQ, &edge0, &edge1);
-							edgeConnect[edgeConnectCount] = edge1;
-							edgeConnectCount ++; 
-
-							node->GetInfo() = edge0;
-							facePerimeter.InsertAfter(node, facePerimeter.Append(edge1));
-							curve.InsertAfter (curveNode, curve.Append(meshBVH->m_vertexAlias[meshBVH->m_mesh->GetVertexCount()-1]));
-
-						} else if (!((test0ParamP ^ test1ParamP) & (test0ParamQ ^ test1ParamQ))) {
-							dgHugeVector p (p0 + (p1 - p0).Scale3 (paramP));
-							dgHugeVector q (q0 + (q1 - q0).Scale3 (paramQ));
-							dgHugeVector pq = (p - q);
-							dgGoogol dist2 (pq % pq);
-							if (dist2 < m_tol2) {
-								if (test0ParamQ ^ test1ParamQ) {
-									dgAssert (test0ParamP & test1ParamP);
-									if (!test0ParamQ) {
-										dgAssert (test1ParamQ);
-										edgeConnect[edgeConnectCount] = edge;
-										edgeConnectCount ++; 
-										curve.InsertAfter (curveNode, curve.Append(meshBVH->m_vertexAlias[edge->m_next->m_incidentVertex]));
-									} else {
-										dgAssert (!test1ParamQ);
-										edgeConnect[edgeConnectCount] = edge->m_next;
-										edgeConnectCount ++; 
-										curve.InsertAfter (curveNode, curve.Append(meshBVH->m_vertexAlias[edge->m_next->m_incidentVertex]));
-									}
-								} else {
-									dgAssert (0);
-									dgAssert (test0ParamP ^ test1ParamP);
-									dgAssert (test0ParamQ & test1ParamQ);
-								}
-							}
-						}
-
-						break;
-					}
-				}
-			}
-
-			dgList<dgHugeVector>::dgListNode* nextNode;
-			for (dgList<dgHugeVector>::dgListNode* node = curve.GetFirst(); node; node = nextNode) {
-				nextNode = node->GetNext();
-				const dgHugeVector& p0 = node->GetInfo();
-
-				for (dgList<dgEdge*>::dgListNode* faceNode = facePerimeter.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
-					dgEdge* const edge = faceNode->GetInfo();
-
-					dgInt32 index0 = edge->m_incidentVertex;
-					dgInt32 index1 = edge->m_next->m_incidentVertex;
-					const dgHugeVector& q0 (vertex[index0]);
-					const dgHugeVector& q1 (vertex[index1]);
-					dgHugeVector q0p0 (q0 - p0);
-					dgHugeVector q1p0 (q1 - p0);
-					dgGoogol alpha0 ((normal * q1p0) % q0p0);
-					if (alpha0 >= m_tol2) {
-						curve.Remove(node);
-						break;
-					}
-				}
-			}
-
-
-			dgAssert (edgeConnectCount == 2);
-			if (curve.GetCount() == 2) {
-				meshBVH->m_mesh->ConnectVertex(edgeConnect[0], edgeConnect[1]);
-			} else {
-				dgAssert (0);
-			}
-		}
-
-
-		void InsertClosedCurve (dgBooleanMeshClipper* const meshBVH, dgList<dgEdge*>& facePerimeter, const dgHugeVector& normal, const dgHugeVector& origin, const dgList<dgHugeVector>& clipperCurve) const
-		{
-			dgAssert (TestPlanar (normal, clipperCurve));
-
-			bool isInside = true;
-			const dgHugeVector* const vertex = &meshBVH->m_vertexAlias[0];
-			for (dgList<dgEdge*>::dgListNode* node = facePerimeter.GetFirst(); isInside && node; node = node->GetNext()) {
-				dgEdge* const edge = node->GetInfo();
-				dgInt32 index0 = edge->m_incidentVertex;
-				dgInt32 index1 = edge->m_next->m_incidentVertex;
-
-				const dgHugeVector& q0 (vertex[index0]);
-				const dgHugeVector& q1 (vertex[index1]);
-				for (dgList<dgHugeVector>::dgListNode* clipperNode = clipperCurve.GetFirst(); clipperNode; clipperNode = clipperNode->GetNext()) {
-					const dgHugeVector& p0 = clipperNode->GetInfo();
-					dgHugeVector q0p0 (q0 - p0);
-					dgHugeVector q1p0 (q1 - p0);
-					dgGoogol alpha ((normal * q0p0) % q1p0);
-					if (alpha <= m_tol2) {
-						isInside = false;
-						break;
-					}
-				}
-			} 
-
-			if (isInside) {
-				dgInt32 face[1024];
-				dgInt64 attrb[1024];
-
-				dgInt32 indexCount = 0;
-				dgEdge* const exteriorFace = facePerimeter.GetFirst()->GetInfo();
-				for (dgList<dgHugeVector>::dgListNode* clipperNode = clipperCurve.GetFirst(); clipperNode; clipperNode = clipperNode->GetNext()) {
-					meshBVH->InsertFaceVertex (exteriorFace, clipperNode->GetInfo());
-					face[indexCount] = meshBVH->m_mesh->GetVertexCount() - 1;
-					attrb[indexCount] = meshBVH->m_mesh->GetPropertiesCount() - 1;
-					indexCount ++;
-				}
-				dgEdge* const interiorFace = meshBVH->m_mesh->AddFace(indexCount, face, attrb);
-				dgEdge* ptr = interiorFace;
-				do {
-					ptr->m_twin = meshBVH->m_mesh->AddHalfEdge(ptr->m_next->m_incidentVertex, ptr->m_incidentVertex);
-					dgAssert (ptr->m_twin);
-					ptr->m_twin->m_twin = ptr;
-					ptr = ptr->m_next;
-				} while (ptr != interiorFace);
-
-				ptr = interiorFace;
-				do {
-					ptr->m_twin->m_incidentFace = ptr->m_incidentFace;
-					ptr->m_twin->m_userData = ptr->m_next->m_userData;
-
-					ptr->m_twin->m_prev = ptr->m_next->m_twin;
-					ptr->m_next->m_twin->m_next = ptr->m_twin;
-
-					ptr = ptr->m_next;
-				} while (ptr != interiorFace);
-
-				dgGoogol error2 (1.0e20);
-				dgEdge* closestEdge = NULL;
-				const dgHugeVector* const vertex = &meshBVH->m_vertexAlias[0];
-				const dgHugeVector& p0 = vertex[exteriorFace->m_incidentVertex];
-				ptr = interiorFace;
-				do {
-					const dgHugeVector& q0 = vertex[ptr->m_incidentVertex];
-					dgHugeVector dist (q0 - p0);
-					dgGoogol mag2 (dist % dist);
-
-					if (mag2 < error2) {
-						error2 = mag2;
-						closestEdge = ptr;
-					}
-
-					ptr->m_twin->m_incidentFace = interiorFace->m_incidentFace;
-					ptr = ptr->m_next;
-				} while (ptr != interiorFace);
-
-				dgAssert (closestEdge);
-				closestEdge = closestEdge->m_twin->m_next;
-				closestEdge = meshBVH->m_mesh->ConnectVertex (exteriorFace, closestEdge);
-				dgAssert (closestEdge);
-
-				meshBVH->m_mesh->TriangulateFace(interiorFace, meshBVH->m_mesh->GetVertexPool(), sizeof (dgBigVector));
-				meshBVH->m_mesh->TriangulateFace(closestEdge, meshBVH->m_mesh->GetVertexPool(), sizeof (dgBigVector));
-
-			} else {
-				dgAssert (0);
-			}
-		}
-
-
-
-		bool ClipFace (dgMeshBVHNode* const faceNode, dgBooleanMeshClipper* const meshBVH, const dgBooleanMeshClipper* const clipperMeshBVH)
-		{
-			dgHugeVector normal (meshBVH->FaceNormal (faceNode->m_face));
-			dgGoogol mag2 (normal % normal);
-			normal = normal.Scale3 (mag2.InvSqrt());
-			const dgHugeVector& origin (meshBVH->m_vertexAlias[faceNode->m_face->m_incidentVertex]);
-
-			dgClusterFace::dgListNode* nextNode;
-			dgInt32 clusterColor = clipperMeshBVH->m_mesh->IncLRU();
-			for (dgClusterFace::dgListNode* node = GetFirst(); node; node = nextNode) {
-				dgMeshBVHNode* const clipperFaceNode = node->GetInfo();
-				nextNode = node->GetNext();
-
-				dgInt32 posCount = 0;
-				dgInt32 negCount = 0;
-				dgInt32 onPlaneCount = 0;
-				dgEdge* ptr = clipperFaceNode->m_face;
-				do {
-					ptr->m_mark = clusterColor;
-					dgGoogol test (normal % (clipperMeshBVH->m_vertexAlias[ptr->m_incidentVertex] - origin));
-					bool pos = (test > dgBooleanMeshClipper::m_posTol);
-					bool neg = (test < dgBooleanMeshClipper::m_negTol);
-					posCount += pos;
-					negCount += neg;
-					onPlaneCount += !(pos || neg);
-					ptr = ptr->m_next;
-				} while (ptr != clipperFaceNode->m_face);
-
-
-				if (!((posCount && negCount) || (posCount && onPlaneCount) || (negCount && onPlaneCount))) {
-					dgAssert (0);
-					Remove(node);
-				}
-			}
-
-
-			if (GetCount()) {
-				dgList<dgEdge*> facePerimeter (clipperMeshBVH->m_mesh->GetAllocator());
-				dgEdge* perimterEdge = faceNode->m_face;
-				do {
-					facePerimeter.Append(perimterEdge);
-					perimterEdge = perimterEdge->m_next;
-				} while (perimterEdge != faceNode->m_face);
-
-				dgPolyhedra::dgPairKey key (faceNode->m_face->m_incidentVertex, faceNode->m_face->m_twin->m_incidentVertex);
-
-				dgInt32 clipperMark = clipperMeshBVH->m_mesh->IncLRU();
-				for (bool found = true; found;) {
-					found = false;
-					dgList<dgHugeVector> clipperCurve (clipperMeshBVH->m_mesh->GetAllocator());
-
-					dgEdge* const firstClipperEdge = FindFirstClipperEdge (normal, origin, clipperMeshBVH, clipperMark);
-					if (firstClipperEdge) {
-						dgAssert (firstClipperEdge->m_mark == clusterColor);
-						found = true;
-						bool isClosedLoop = Get2DCurve (normal, origin, clipperMeshBVH, firstClipperEdge, clipperMark, clipperCurve);
-						if (clipperCurve.GetCount() >= 2) {
-							if (isClosedLoop) {
-								InsertClosedCurve (meshBVH, facePerimeter, normal, origin, clipperCurve);
-							} else {
-								InsertOpenCurve (meshBVH, facePerimeter, normal, origin, clipperCurve);
-							}
-						}
-					}
-				}
-
-				meshBVH->m_nodeEdgeMap.Remove(key.GetVal());
-				meshBVH->RemoveNode(faceNode);
-
-				dgInt32 stack = 0;
-				dgEdge* stackPool[512];
-				dgInt32 mark = meshBVH->m_mesh->IncLRU();
-				for (dgList<dgEdge*>::dgListNode* node = facePerimeter.GetFirst(); node; node = node->GetNext()) {
-					dgEdge* const edge = node->GetInfo();
-					edge->m_twin->m_mark = mark;
-					stackPool[stack] = edge;
-					stack ++;
-				}
-
-				while (stack) {
-					stack --;
-					dgEdge* const face = stackPool[stack];
-					if (face->m_mark != mark) {
-						dgMeshBVHNode* const newNode = meshBVH->AddFaceNode (face, NULL);
-						dgPolyhedra::dgPairKey key(newNode->m_face->m_incidentVertex, newNode->m_face->m_twin->m_incidentVertex);
-						meshBVH->m_nodeEdgeMap.Insert(newNode, key.GetVal());
-					}
-
-					dgEdge* ptr = face;
-					do {
-						ptr->m_mark = mark;
-						if (ptr->m_twin->m_mark != mark) {
-							stackPool[stack] = ptr->m_twin;
-							stack ++;
-						}
-						ptr = ptr->m_next;
-					} while (ptr != face);
-				}
-			}
-
-			return false;
-		}
-
-
-		dgBigPlane m_plane;
-	};
-
-	class dgBooleanFaceCluster: public dgTree<dgClusterFace, dgMeshBVHNode*>
+	class dgClippedFace: public dgMeshEffect
 	{
 		public:
-		dgBooleanFaceCluster (dgMemoryAllocator* const allocator)
-			:dgTree<dgClusterFace, dgMeshBVHNode*>(allocator)
+		dgClippedFace ()
+			:dgMeshEffect()
+		{
+			dgAssert (0);
+		}
+
+		dgClippedFace (dgMemoryAllocator* const allocator)
+			:dgMeshEffect(allocator)
 		{
 		}
 
-		bool ClipCluster (dgTreeNode* const clusterNode, dgBooleanMeshClipper* const meshBVH, const dgBooleanMeshClipper* const clipperMeshBVH)
+		dgClippedFace (const dgClippedFace& copy)
+			:dgMeshEffect(copy)
 		{
-			dgClusterFace& cluster = clusterNode->GetInfo();
-			dgMeshBVHNode* const faceNode = clusterNode->GetKey();
-			bool ret = cluster.ClipFace(faceNode, meshBVH, clipperMeshBVH);
-			Remove (clusterNode);
-			return ret;
 		}
-	};
 
-
-	void Cleanup ()
-	{
-		dgMeshBVH::Cleanup();
-	}
-
-
-	bool SanityCheck() const
-	{
-		#ifdef _DEBUG
-			dgAssert (dgMeshBVH::SanityCheck()); 
-			dgMeshBVHNode* stackPool[DG_MESH_EFFECT_BVH_STACK_DEPTH];
-			dgInt32 stack = 1;
-			stackPool[0] = m_rootNode;
-			dgVector l0(dgFloat32 (-1.0e15f), dgFloat32 (-1.0e15f), dgFloat32 (-1.0e15f), dgFloat32 (0.0f)); 
-			dgVector l1(dgFloat32 (1.0e15f), dgFloat32 ( 1.0e15f), dgFloat32 ( 1.0e15f), dgFloat32 (0.0f)); 
-
-			while (stack) {
-				stack --;
-				dgMeshBVHNode* const me = stackPool[stack];
-				if (me && dgOverlapTest (me->m_p0, me->m_p1, l0, l1)) {
-					if (!me->m_left) {
-						dgAssert (!me->m_right);
-						dgPolyhedra::dgPairKey key (me->m_face->m_incidentVertex, me->m_face->m_twin->m_incidentVertex);
-						dgTree<dgMeshBVHNode*, dgUnsigned64>::dgTreeNode* const node = m_nodeEdgeMap.Find(key.GetVal());
-						dgAssert (node);
-						dgAssert (node->GetInfo() == me);
-					} else {
-						dgAssert (me->m_left);
-						dgAssert (me->m_right);
-						stackPool[stack] = me->m_left;
-						stack++;
-						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgMeshBVHNode*)));
-
-						stackPool[stack] = me->m_right;
-						stack++;
-						dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgMeshBVHNode*)));
-					}
-				}
-			}
-		#endif
-		return true;
-	}
-
-
-	dgHugeVector FaceNormal (const dgEdge* const face) const
-	{
-		const dgEdge* edge = face;
-		const dgHugeVector& p0 = m_vertexAlias[edge->m_incidentVertex];
-
-		edge = edge->m_next;
-		const dgHugeVector& p1 = m_vertexAlias[edge->m_incidentVertex];
-		dgHugeVector e1 (p1 - p0);
-
-		dgHugeVector normal (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-		for (edge = edge->m_next; edge != face; edge = edge->m_next) {
-			const dgHugeVector& p2 = m_vertexAlias[edge->m_incidentVertex]; 
-			dgHugeVector e2 (p2 - p0);
-			normal += e1 * e2;
-			e1 = e2;
-		} 
-		return normal;
-	}
-
-	void InsertFaceVertex (dgEdge* const face, const dgHugeVector& point)
-	{
-		dgMeshEffect::dgVertexAtribute attribute;
-		memset (&attribute, 0, sizeof (attribute));
-
-		dgGoogol tol(m_posTol);
-		const dgMeshEffect::dgVertexAtribute* const attrib = (dgMeshEffect::dgVertexAtribute*)m_mesh->GetAttributePool(); 
-		for (dgInt32 i = 0; i < 4; i ++) {
-
-			dgGoogol posTol (tol + dgGoogol::m_one);
-			dgGoogol negTol (dgGoogol::m_zero - m_posTol);
-
+		void InitFace(dgMeshEffect* const mesh, dgEdge* const face)
+		{
+			dgInt32 indexCount = 0;
+			dgInt32 faceIndex[256];
+			dgInt64 faceDataIndex[256];
+			BeginFace ();
 			dgEdge* ptr = face;
-			dgEdge* const edge0 = ptr;
-			dgHugeVector q0 (m_vertexAlias[ptr->m_incidentVertex]);
-
-			ptr = ptr->m_next;
-			const dgEdge* edge1 = ptr;
-			dgHugeVector q1 (m_vertexAlias[ptr->m_incidentVertex]);
-
-			ptr = ptr->m_next;
-			const dgEdge* edge2 = ptr;
 			do {
-				const dgHugeVector& q2 = m_vertexAlias[ptr->m_incidentVertex];
-
-				dgHugeVector p10 (q1 - q0);
-				dgHugeVector p20 (q2 - q0);
-
-				dgGoogol dot = p20 % p10;
-				dgGoogol mag1 = p10 % p10;
-				dgGoogol mag2 = p20 % p20;
-				dgGoogol collinear = dot * dot - mag2 * mag1;
-				if (collinear.Abs() > m_posTol) {
-					dgHugeVector p_p0 (point - q0);
-					dgHugeVector p_p1 (point - q1);
-					dgHugeVector p_p2 (point - q2);
-
-					dgGoogol alpha1 = p10 % p_p0;
-					dgGoogol alpha2 = p20 % p_p0;
-					dgGoogol alpha3 = p10 % p_p1;
-					dgGoogol alpha4 = p20 % p_p1;
-					dgGoogol alpha5 = p10 % p_p2;
-					dgGoogol alpha6 = p20 % p_p2;
-
-					dgGoogol vc = alpha1 * alpha4 - alpha3 * alpha2;
-					dgGoogol vb = alpha5 * alpha2 - alpha1 * alpha6;
-					dgGoogol va = alpha3 * alpha6 - alpha5 * alpha4;
-					dgGoogol den = va + vb + vc;
-					dgGoogol minError = den * negTol;
-					dgGoogol maxError = den * posTol;
-
-					if ((va > minError) && (vb > minError) && (vc > minError) && (va < maxError) && (vb < maxError) && (vc < maxError)) {
-
-						edge2 = ptr;
-
-						dgGoogol alpha0 = va / den;
-						dgGoogol alpha1 = vb / den;
-						dgGoogol alpha2 = vc / den;
-
-						dgFloat64 falpha0 = alpha0;
-						dgFloat64 falpha1 = alpha1;
-						dgFloat64 falpha2 = alpha2;
-
-						const dgMeshEffect::dgVertexAtribute& attr0 = attrib[edge0->m_userData];
-						const dgMeshEffect::dgVertexAtribute& attr1 = attrib[edge1->m_userData];
-						const dgMeshEffect::dgVertexAtribute& attr2 = attrib[edge2->m_userData];
-						dgBigVector normal (attr0.m_normal_x * falpha0 + attr1.m_normal_x * falpha1 + attr2.m_normal_x * falpha2,
-											attr0.m_normal_y * falpha0 + attr1.m_normal_y * falpha1 + attr2.m_normal_y * falpha2,
-											attr0.m_normal_z * falpha0 + attr1.m_normal_z * falpha1 + attr2.m_normal_z * falpha2, dgFloat32 (0.0f));
-						normal = normal.Scale3 (dgFloat64 (1.0f) / sqrt (normal % normal));
-
-
-						attribute.m_vertex.m_x = point.m_x;
-						attribute.m_vertex.m_y = point.m_y;
-						attribute.m_vertex.m_z = point.m_z;
-						attribute.m_vertex.m_w = point.m_w;
-						attribute.m_normal_x = normal.m_x;
-						attribute.m_normal_y = normal.m_y;
-						attribute.m_normal_z = normal.m_z;
-						attribute.m_u0 = attr0.m_u0 * falpha0 +  attr1.m_u0 * falpha1 + attr2.m_u0 * falpha2;
-						attribute.m_v0 = attr0.m_v0 * falpha0 +  attr1.m_v0 * falpha1 + attr2.m_v0 * falpha2;
-						attribute.m_u1 = attr0.m_u1 * falpha0 +  attr1.m_u1 * falpha1 + attr2.m_u1 * falpha2;
-						attribute.m_v1 = attr0.m_v1 * falpha0 +  attr1.m_v1 * falpha1 + attr2.m_v1 * falpha2;
-
-						attribute.m_material = attr0.m_material;
-						dgAssert (attr0.m_material == attr1.m_material);
-						dgAssert (attr0.m_material == attr2.m_material);
-
-						m_mesh->AddPoint(&attribute.m_vertex.m_x, dgInt32 (attribute.m_material)); 
-						m_vertexAlias[m_mesh->GetVertexCount()-1] = point;
-						return;
-					}
-				}
-
-				q1 = q2;
-				edge1 = ptr;
-
+				const dgMeshEffect::dgVertexAtribute& point =  mesh->GetAttribute(dgInt32 (ptr->m_userData));
+				AddPoint (&point.m_vertex.m_x, dgInt32 (point.m_material));
+				faceIndex[indexCount] = indexCount;
+				faceDataIndex[indexCount] = indexCount;
+				indexCount ++;
 				ptr = ptr->m_next;
 			} while (ptr != face);
-			dgAssert (0);
-			tol = tol * dgGoogol::m_two;
+			AddFace (indexCount, faceIndex[0], faceDataIndex[0]);
+			EndFace ();
 		}
-		// this should never happens
-		dgAssert (0);
-	}
+	};
 
-	void SpliteEdge(dgEdge* const edge, dgGoogol param, dgEdge** edge0, dgEdge** edge1)
+	class dgClipppedFaces: public dgTree<dgClippedFace, dgEdge*>
 	{
-		dgInt32 v0 = edge->m_incidentVertex;
-		dgInt32 v1 = edge->m_twin->m_incidentVertex;
-		dgPolyhedra::dgPairKey edgeKey (v0, v1);
-		dgPolyhedra::dgPairKey twinKey (v1, v0);
-
-		dgEdge* const newEdge = m_mesh->InsertEdgeVertex (edge, param);
-		dgGoogol t0(dgGoogol::m_one - param);
-		dgGoogol t1(param);
-		dgInt32 v01 = newEdge->m_twin->m_incidentVertex;
-		m_vertexAlias[v01] = m_vertexAlias[v0].Scale3 (t0) + m_vertexAlias[v1].Scale3 (t1);
-
-		dgTree<dgMeshBVHNode*, dgUnsigned64>::dgTreeNode* const mapNode = m_nodeEdgeMap.Find(edgeKey.GetVal());
-		if (mapNode) {
-			dgMeshBVHNode* const node = mapNode->GetInfo();
-			node->m_face = newEdge;
-			m_nodeEdgeMap.Remove(mapNode);
-			dgPolyhedra::dgPairKey key (newEdge->m_incidentVertex, newEdge->m_twin->m_incidentVertex);
-			m_nodeEdgeMap.Insert(node, key.GetVal());
+		public:
+		dgClipppedFaces(dgMeshEffect* const mesh)
+			:dgTree<dgClippedFace, dgEdge*>(mesh->GetAllocator())
+			,m_parentMesh (mesh)
+		{
 		}
 
-		dgTree<dgMeshBVHNode*, dgUnsigned64>::dgTreeNode* const twinMapNode = m_nodeEdgeMap.Find(twinKey.GetVal());
-		if (twinMapNode) {
-			dgMeshBVHNode* const node = twinMapNode->GetInfo();
-			node->m_face = newEdge->m_twin;
-			m_nodeEdgeMap.Remove(twinMapNode);
-			dgPolyhedra::dgPairKey key (newEdge->m_twin->m_incidentVertex, newEdge->m_incidentVertex);
-			m_nodeEdgeMap.Insert(node, key.GetVal());
-		}
-
-		*edge0 = newEdge;
-		*edge1 = newEdge->m_next;
-
-		dgAssert (SanityCheck());
-	}
-
-	bool ClippMesh (const dgBooleanMeshClipper& otherMeshBVH)
-	{
-		dgMeshBVHNode* stackPool[4 * DG_MESH_EFFECT_BVH_STACK_DEPTH][2];
-	
-
-		dgInt32 stack = 1;
-		stackPool[0][0] = m_rootNode;
-		stackPool[0][1] = otherMeshBVH.m_rootNode;
-
-		dgBooleanFaceCluster bundaryClusters (m_mesh->GetAllocator());
-		while (stack) {
-			stack --;
-			dgMeshBVHNode* const me = stackPool[stack][0];
-			dgMeshBVHNode* const other = stackPool[stack][1];
-
-			dgAssert (me && other);
-			if (dgOverlapTest (me->m_p0, me->m_p1, other->m_p0, other->m_p1)) {
-
-				if (!me->m_left && !other->m_left) {
-					dgAssert (!me->m_right);
-					dgAssert (!other->m_right);
-
-					dgBooleanFaceCluster::dgTreeNode* node = bundaryClusters.Find(me);
-					if (!node) {
-						dgClusterFace tmp (m_mesh, me->m_face);
-						node = bundaryClusters.Insert(tmp, me);
-					}
-					if (!node->GetInfo().AddFace (otherMeshBVH.m_mesh, other, m_mesh, me)) {
-						if (!node->GetInfo().GetCount()) {
-							bundaryClusters.Remove(node);
-						}
-					}
-
-				} else if (!me->m_left) {
-					dgAssert (other->m_left);
-					dgAssert (other->m_right);
-
-					stackPool[stack][0] = me;
-					stackPool[stack][1] = other->m_left;
-					stack++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgMeshBVHNode*)));
-
-					stackPool[stack][0] = me;
-					stackPool[stack][1] = other->m_right;
-					stack++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgMeshBVHNode*)));
-
-				} else if (!other->m_right) {
-					dgAssert (me->m_left);
-					dgAssert (me->m_right);
-
-					stackPool[stack][0] = me->m_left;
-					stackPool[stack][1] = other;
-					stack++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgMeshBVHNode*)));
-
-					stackPool[stack][0] = me->m_right;
-					stackPool[stack][1] = other;
-					stack++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgMeshBVHNode*)));
-				} else {
-					dgAssert (me->m_left && me->m_right);
-					dgAssert (other->m_left && other->m_right);
-
-					stackPool[stack][0] = me->m_left;
-					stackPool[stack][1] = other->m_left;
-					stack++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgMeshBVHNode*)));
-
-					stackPool[stack][0] = me->m_left;
-					stackPool[stack][1] = other->m_right;
-					stack++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgMeshBVHNode*)));
-
-					stackPool[stack][0] = me->m_right;
-					stackPool[stack][1] = other->m_left;
-					stack++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgMeshBVHNode*)));
-
-					stackPool[stack][0] = me->m_right;
-					stackPool[stack][1] = other->m_right;
-					stack++;
-					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (dgMeshBVHNode*)));
-				}
+		void ClipMeshesFaces(dgMeshEffect* const meshA, dgEdge* const faceA, dgMeshEffect* const meshB, dgEdge* const faceB)
+		{
+			dgAssert (meshA == m_parentMesh);
+			dgTreeNode* node = Find (faceA);
+			if (!node) {
+				dgClippedFace tmp (m_parentMesh->GetAllocator());
+				node = Insert (tmp, faceA);
+				dgClippedFace& faceHead = node->GetInfo();
+				faceHead.InitFace (m_parentMesh, faceA);
 			}
 		}
 
-		bool intersectionFound = false;
-		while (bundaryClusters.GetCount()) {
-			intersectionFound |= bundaryClusters.ClipCluster (bundaryClusters.GetRoot(), this, &otherMeshBVH);
-		}
-		ImproveNodeFitness();
-		return intersectionFound;
-	}
+		dgMeshEffect* m_parentMesh;
+	};
+	
 
-	static void ClipMeshesAndColorize (dgMeshEffect* const meshA, dgMeshEffect* const meshB)
-	{
-		dgBooleanMeshClipper BVHmeshA (meshA);
-		dgBooleanMeshClipper BVHmeshB (meshB);
-
-
-		BVHmeshA.ClippMesh (BVHmeshB);
-BVHmeshA.m_mesh->SaveOFF("xxxA0.off");
-		BVHmeshB.ClippMesh (BVHmeshA);
-BVHmeshB.m_mesh->SaveOFF("xxxB0.off");
-		BVHmeshA.ClippMesh (BVHmeshB);
-		dgAssert (!BVHmeshB.ClippMesh (BVHmeshA));
-		dgAssert (!BVHmeshA.ClippMesh (BVHmeshB));
-		
-	}
-#endif
-
-
+	public:
 	dgBooleanMeshClipper(dgMeshEffect* const mesh)
 		:dgMeshBVH(mesh)
-//		,m_vertexBase(mesh->GetVertexCount())
-//		,m_vertexAlias(mesh->GetVertexCount() + 512, mesh->GetAllocator())
-//		,m_nodeEdgeMap(mesh->GetAllocator())
+		,m_clippedFaces(mesh)
 	{
 		dgMeshBVH::Build();
 	}
@@ -1766,13 +884,12 @@ BVHmeshB.m_mesh->SaveOFF("xxxB0.off");
 	{
 	}
 
-
 	static void ClipMeshesAndColorize(dgMeshEffect* const meshA, dgMeshEffect* const meshB)
 	{
 		dgBooleanMeshClipper BVHmeshA(meshA);
 		dgBooleanMeshClipper BVHmeshB(meshB);
 
-		dgCurvesNetwork network(&BVHmeshA, &BVHmeshB);
+//		dgCurvesNetwork network(&BVHmeshA, &BVHmeshB);
 
 		int stack = 1;
 		dgMeshBVHNode* stackPool[2 * DG_MESH_EFFECT_BVH_STACK_DEPTH][2];
@@ -1785,7 +902,8 @@ BVHmeshB.m_mesh->SaveOFF("xxxB0.off");
 			dgMeshBVHNode* const nodeB = stackPool[stack][1];
 			if (dgOverlapTest (nodeA->m_p0, nodeA->m_p1, nodeB->m_p0, nodeB->m_p1)) {
 				if (nodeA->m_face && nodeB->m_face) {
-					network.ClipMeshesFaces(nodeA->m_face, nodeB->m_face);
+					BVHmeshA.m_clippedFaces.ClipMeshesFaces(meshA, nodeA->m_face, meshB, nodeB->m_face);
+					BVHmeshB.m_clippedFaces.ClipMeshesFaces(meshB, nodeB->m_face, meshA, nodeA->m_face);
 				} else if (nodeA->m_face) {
 					stackPool[stack][0] = nodeA;
 					stackPool[stack][1] = nodeB->m_left;
@@ -1832,8 +950,10 @@ BVHmeshB.m_mesh->SaveOFF("xxxB0.off");
 			}
 		}
 
-		network.Colorize();
-		
+		dgAssert (0);
+//		network.Colorize();
+	
+
 /*
 		dgInt32 baseAttibuteCountB = BVHmeshB.m_mesh->GetPropertiesCount();
 
@@ -1868,26 +988,9 @@ BVHmeshB.m_mesh->SaveOFF("xxxB0.off");
 */		
 	}
 
-
-
-//	dgInt32 m_vertexBase;
-//	dgArray<dgHugeVector> m_vertexAlias;
-//	dgArray<dgBigVector> m_vertexAlias;
-//	dgTree<dgInt32,dgInt32> m_vertexMap;
-//	dgTree<dgMeshBVHNode*, dgUnsigned64> m_nodeEdgeMap;
-
-//	static dgBigVector m_posTol;
-//	static dgBigVector m_negTol;
-//	static dgBigVector m_tol2;
-//	static dgBigVector m_tol3;
-//	static dgBigVector m_oneMinusTol;
+	dgClipppedFaces m_clippedFaces;
 };
 
-//dgBigVector dgBooleanMeshClipper::m_posTol ( DG_BOOLEAN_ZERO_TOLERANCE);
-//dgBigVector dgBooleanMeshClipper::m_negTol (-DG_BOOLEAN_ZERO_TOLERANCE);
-//dgBigVector dgBooleanMeshClipper::m_tol2 (m_posTol * m_posTol);
-//dgBigVector dgBooleanMeshClipper::m_tol3 (m_posTol * m_tol2);
-//dgBigVector dgBooleanMeshClipper::m_oneMinusTol (dgGoogol(1.0) - m_posTol);
 
 
 dgMeshEffect* dgMeshEffect::Intersection (const dgMatrix& matrix, const dgMeshEffect* const clipperMesh) const
