@@ -443,7 +443,7 @@ dgMeshEffect* dgMeshEffect::Difference (const dgMatrix& matrix, const dgMeshEffe
 
 class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 {
-/*
+
 	class dgNodeKey
 	{
 		public:
@@ -489,47 +489,60 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 		public:
 		dgPoint()
 			:m_links(NULL)
-		{}
+		{
+			dgAssert (0);
+		}
 
 		dgPoint(dgMeshEffect* const edgeOwnerMesh, dgEdge* const edge, dgFloat64 param, dgMeshEffect* const faceOwnerMesh, dgEdge* const face)
-			:m_edge(edge)
-			,m_face(face)
-			,m_edgeOwnerMesh(edgeOwnerMesh)
-			,m_faceOwnerMesh(faceOwnerMesh)
-			,m_links(edgeOwnerMesh->GetAllocator())
-			,m_indexA(0)
-			,m_indexB(0)
-			,m_lru(0)
+			:m_links(edgeOwnerMesh->GetAllocator())
+//			:m_edge(edge)
+//			,m_face(face)
+//			,m_edgeOwnerMesh(edgeOwnerMesh)
+//			,m_faceOwnerMesh(faceOwnerMesh)
+//			,m_indexA(0)
+//			,m_indexB(0)
+//			,m_lru(0)
 		{
-			dgBigVector p0(m_edgeOwnerMesh->GetVertex(m_edge->m_incidentVertex));
-			dgBigVector p1(m_edgeOwnerMesh->GetVertex(m_edge->m_twin->m_incidentVertex));
-			m_posit = p0 + (p1 - p0).Scale3 (param);
+//			dgBigVector p0(m_edgeOwnerMesh->GetVertex(m_edge->m_incidentVertex));
+//			dgBigVector p1(m_edgeOwnerMesh->GetVertex(m_edge->m_twin->m_incidentVertex));
+//			m_posit = p0 + (p1 - p0).Scale3 (param);
 		}
 
 		dgBigVector m_posit;
-		dgEdge* m_edge;
-		dgEdge* m_face;
-		dgMeshEffect* m_edgeOwnerMesh;
-		dgMeshEffect* m_faceOwnerMesh;
 		dgList<dgTree<dgPoint, dgNodeKey>::dgTreeNode*> m_links;
-		dgInt32 m_indexA;
-		dgInt32 m_indexB;
-		dgInt32 m_lru;
+//		dgEdge* m_edge;
+//		dgEdge* m_face;
+//		dgMeshEffect* m_edgeOwnerMesh;
+//		dgMeshEffect* m_faceOwnerMesh;
+//		dgInt32 m_indexA;
+//		dgInt32 m_indexB;
+//		dgInt32 m_lru;
 	};
 
 	class dgCurvesNetwork: public dgTree<dgPoint, dgNodeKey>
 	{
 		public:
-		dgCurvesNetwork(dgBooleanMeshClipper* const BVHmeshA, dgBooleanMeshClipper* const BVHmeshB)
-			:dgTree<dgPoint, dgNodeKey>(BVHmeshA->m_mesh->GetAllocator())
-			,m_meshA(BVHmeshA->m_mesh)
-			,m_meshB(BVHmeshB->m_mesh)
-			,m_pointBaseA(m_meshA->GetVertexCount()) 
-			,m_pointBaseB(m_meshB->GetVertexCount()) 
-			,m_lru(0)
+		dgCurvesNetwork ()
+			:dgTree<dgPoint, dgNodeKey>(NULL)
+		{
+			dgAssert (0);
+		}
+
+		dgCurvesNetwork (dgMemoryAllocator* const allocator)
+			:dgTree<dgPoint, dgNodeKey>(allocator)
 		{
 		}
 
+		dgCurvesNetwork(dgBooleanMeshClipper* const BVHmeshA, dgBooleanMeshClipper* const BVHmeshB)
+			:dgTree<dgPoint, dgNodeKey>(BVHmeshA->m_mesh->GetAllocator())
+//			,m_meshA(BVHmeshA->m_mesh)
+//			,m_meshB(BVHmeshB->m_mesh)
+//			,m_pointBaseA(m_meshA->GetVertexCount()) 
+//			,m_pointBaseB(m_meshB->GetVertexCount()) 
+//			,m_lru(0)
+		{
+		}
+/*
 		dgHugeVector CalculateFaceNormal (const dgMeshEffect* const mesh, dgEdge* const face)
 		{
 			dgHugeVector plane(dgGoogol::m_zero, dgGoogol::m_zero, dgGoogol::m_zero, dgGoogol::m_zero);
@@ -805,25 +818,29 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 		dgInt32 m_pointBaseA;
 		dgInt32 m_pointBaseB;
 		dgInt32 m_lru;
-	};
 */
+	};
+
 
 	class dgClippedFace: public dgMeshEffect
 	{
 		public:
 		dgClippedFace ()
 			:dgMeshEffect()
+			,m_curveNetwork()
 		{
 			dgAssert (0);
 		}
 
 		dgClippedFace (dgMemoryAllocator* const allocator)
 			:dgMeshEffect(allocator)
+			,m_curveNetwork(allocator)
 		{
 		}
 
 		dgClippedFace (const dgClippedFace& copy)
 			:dgMeshEffect(copy)
+			,m_curveNetwork(copy.m_curveNetwork)
 		{
 		}
 
@@ -842,9 +859,11 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 				indexCount ++;
 				ptr = ptr->m_next;
 			} while (ptr != face);
-			AddFace (indexCount, faceIndex[0], faceDataIndex[0]);
+			AddFace (indexCount, faceIndex, faceDataIndex);
 			EndFace ();
 		}
+
+		dgCurvesNetwork m_curveNetwork;
 	};
 
 	class dgClipppedFaces: public dgTree<dgClippedFace, dgEdge*>
