@@ -88,19 +88,19 @@ void dSceneRender::DrawTriangle(const dVector& p0, const dVector& p1, const dVec
 
 void dSceneRender::DrawCylinder(int segments, dFloat radius, dFloat heigh)
 {
-	dVector p0 ( heigh / 2.0f, radius, 0.0f, 0.0f);
-	dVector p1 (-heigh / 2.0f, radius, 0.0f, 0.0f);
+	dVector q0 ( heigh / 2.0f, radius, 0.0f, 0.0f);
+	dVector q1 (-heigh / 2.0f, radius, 0.0f, 0.0f);
 	dMatrix rotation (dPitchMatrix(2.0f * 3.1614f/segments));
 	dVector cap0[1024];
 	dVector cap1[1024];
 	dAssert (segments < sizeof (cap0)/sizeof (cap0[0]));
-	cap0[segments] = p0;
-	cap1[segments] = p1;
+	cap0[segments] = q0;
+	cap1[segments] = q1;
 	for (int i = 0; i < segments; i ++) {
-		cap0[i] = p0;
-		cap1[i] = p1;
-		p0 = rotation.RotateVector(p0);
-		p1 = rotation.RotateVector(p1);
+		cap0[i] = q0;
+		cap1[i] = q1;
+		q0 = rotation.RotateVector(q0);
+		q1 = rotation.RotateVector(q1);
 	}
 	dVector normal0 ( 1.0f, 0.0f, 0.0f, 0.0f);
 	dVector normal1 (-1.0f, 0.0f, 0.0f, 0.0f);
@@ -136,14 +136,14 @@ void dSceneRender::DrawCylinder(int segments, dFloat radius, dFloat heigh)
 
 void dSceneRender::DrawCone(int segments, dFloat radius, dFloat heigh)
 {
-	dVector p1 (-heigh / 2.0f, radius, 0.0f, 0.0f);
+	dVector q1 (-heigh / 2.0f, radius, 0.0f, 0.0f);
 	dMatrix rotation (dPitchMatrix(2.0f * 3.1614f/segments));
 	dVector cap[1024];
 	dAssert (segments < sizeof (cap)/sizeof (cap[0]));
-	cap[segments] = p1;
+	cap[segments] = q1;
 	for (int i = 0; i < segments; i ++) {
-		cap[i] = p1;
-		p1 = rotation.RotateVector(p1);
+		cap[i] = q1;
+		q1 = rotation.RotateVector(q1);
 	}
 	dVector normal1 (-1.0f, 0.0f, 0.0f, 0.0f);
 

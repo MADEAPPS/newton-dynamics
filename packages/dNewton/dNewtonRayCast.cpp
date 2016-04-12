@@ -27,8 +27,8 @@
 
 
 dNewtonRayCast::dNewtonRayCast(dNewton* const dWorld, dLong mask)
-	:dNewtonAlloc()
-	,dNewtonMaterial(mask)  
+//	:dNewtonAlloc()
+	:dNewtonMaterial(mask)  
 	,m_world(dWorld)
 {
 }

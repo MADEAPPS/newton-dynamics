@@ -1450,7 +1450,7 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 	projectionMatrix[2][2] = 0.0f;
 	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 
-	dMatrix matrix;
+	dMatrix matrix0;
 	dVector com(0.0f);
 	dFloat arrayPtr[32][4];
 	dVector* const array = (dVector*)arrayPtr;
@@ -1463,11 +1463,11 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 	dFloat velocityScale = 0.125f;
 
 	NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
-	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
-	matrix.m_posit = matrix.TransformVector(com);
+	NewtonBodyGetMatrix(chassisBody, &matrix0[0][0]);
+	matrix0.m_posit = matrix0.TransformVector(com);
 
 	NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
-	dMatrix chassisMatrix(GetLocalFrame() * matrix);
+	dMatrix chassisMatrix(GetLocalFrame() * matrix0);
 	dMatrix worldToComMatrix(chassisMatrix.Inverse() * projectionMatrix);
 	{
 		// draw vehicle chassis
@@ -1475,9 +1475,10 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 		dVector p1(-D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, 0.0f);
 
 		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			dMatrix matrix;
 			BodyPartTire* const tire = &node->GetInfo();
 			NewtonBody* const tireBody = tire->GetBody();
-			dMatrix matrix;
+			
 			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
 			//dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
 			dVector p(worldToComMatrix.TransformVector(matrix.m_posit));
@@ -1495,10 +1496,10 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 	{
 		// draw vehicle tires
 		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			dMatrix matrix;
 			BodyPartTire* const tire = &node->GetInfo();
 			dFloat width = tire->m_data.m_width * 0.5f;
 			dFloat radio = tire->m_data.m_radio;
-
 			NewtonBody* const tireBody = tire->GetBody();
 			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
 			matrix.m_up = chassisMatrix.m_up;

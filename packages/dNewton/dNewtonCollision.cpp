@@ -26,8 +26,8 @@
 
 
 dNewtonCollision::dNewtonCollision(dCollsionType type, dLong collisionMask)
-	:dNewtonAlloc()
-	,dNewtonMaterial(collisionMask)
+//	:dNewtonAlloc()
+	:dNewtonMaterial(collisionMask)
 	,m_shape (NULL)
 	,m_userData(NULL)
 	,m_type (type)
@@ -36,8 +36,8 @@ dNewtonCollision::dNewtonCollision(dCollsionType type, dLong collisionMask)
 
 
 dNewtonCollision::dNewtonCollision(const dNewtonCollision& srcCollision, NewtonCollision* const shape)
-	:dNewtonAlloc()
-	,dNewtonMaterial(srcCollision)
+//	:dNewtonAlloc()
+	:dNewtonMaterial(srcCollision)
 	,m_shape (shape)
 	,m_userData(srcCollision.m_userData)
 	,m_type (srcCollision.m_type)

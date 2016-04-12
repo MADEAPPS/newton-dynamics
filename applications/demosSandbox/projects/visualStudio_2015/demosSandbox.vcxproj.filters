@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\sdkDemos\demos\BasicFriction.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\BasicStacking.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ClosestDistance.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\CompoundCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ConvexApproximation.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\DebugDisplay.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoCamera.cpp">
+      <Filter>mainLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoEntity.cpp">
+      <Filter>mainLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoEntityManager.cpp">
+      <Filter>mainLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoMesh.cpp">
+      <Filter>mainLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\MousePick.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\MultiRayCasting.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\NewtonDemos.cpp">
+      <Filter>mainLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\OpenGlUtil.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\SkyBox.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\SoftBodies.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\TargaToOpenGl.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\toolbox_stdafx.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\UsingNewtonMeshTool.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\MeshCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\HeighFieldCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\HeavyVehicles.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ConvexCast.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\PrimitiveCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\PrecessingTops.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\BasicRestitution.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\PhysicsUtils.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\SimpleBooleans.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\UserHeightFieldCollision.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\UserPlaneCollision.cpp">
+      <Filter>tooBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\UserStaticCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp">
+      <Filter>mainLogic\listeners</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoVisualDebugerListener.cpp">
+      <Filter>mainLogic\listeners</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoListenerBase.cpp">
+      <Filter>mainLogic\listeners</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\PuckSlide.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp">
+      <Filter>mainLogic\listeners</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexFracturing.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\StructuredConvexFracturing.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision1.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\StandardJoints.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\DynamicRagDoll.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\DemoCamera.h">
+      <Filter>mainLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\DemoEntity.h">
+      <Filter>mainLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\DemoEntityManager.h">
+      <Filter>mainLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\DemoMesh.h">
+      <Filter>mainLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\MousePick.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\OpenGlUtil.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\SkyBox.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\TargaToOpenGl.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\toolbox_stdafx.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\PhysicsUtils.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\UserHeightFieldCollision.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\UserPlaneCollision.h">
+      <Filter>tooBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h">
+      <Filter>mainLogic\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\DemoVisualDebugerListener.h">
+      <Filter>mainLogic\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\DemoListenerBase.h">
+      <Filter>mainLogic\listeners</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h">
+      <Filter>mainLogic\listeners</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="demos">
+      <UniqueIdentifier>{793be47a-8291-4e25-b17e-ac84b4ef2fde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tooBox">
+      <UniqueIdentifier>{718f5b08-6963-49af-8fa4-3ba24e9013a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mainLogic">
+      <UniqueIdentifier>{c23f6d15-858a-4b77-b7d9-71402b1e6b7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mainLogic\listeners">
+      <UniqueIdentifier>{018b799f-0d42-482a-9dca-52fcf73f1f4b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\sdkDemos\NewtonDemos.h">
+      <Filter>mainLogic</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
