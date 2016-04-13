@@ -50,7 +50,6 @@ CustomGear::~CustomGear()
 {
 }
 
-
 CustomGear::CustomGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomJoint(child, parent, callback, userData)
 {
@@ -75,58 +74,38 @@ void CustomGear::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
-	
+
 	// calculate the angular velocity for both bodies
+	const dVector& dir0 = matrix0.m_right;
+	const dVector& dir1 = matrix1.m_right;
+
+	dVector dir0Cross (matrix0.m_up * dir0.Scale (m_gearRatio));
+	dVector dir1Cross(matrix1.m_up * dir1);
+	jacobian0[0] = dir0.m_x;
+	jacobian0[1] = dir0.m_y;
+	jacobian0[2] = dir0.m_z;
+	jacobian0[3] = dir0Cross.m_x;
+	jacobian0[4] = dir0Cross.m_y;
+	jacobian0[5] = dir0Cross.m_z;
+
+	jacobian1[0] = dir1.m_x;
+	jacobian1[1] = dir1.m_y;
+	jacobian1[2] = dir1.m_z;
+	jacobian1[3] = dir1Cross.m_x;
+	jacobian1[4] = dir1Cross.m_y;
+	jacobian1[5] = dir1Cross.m_z;
+
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
 
-	// get angular velocity relative to the pin vector
-	dFloat w0 = omega0 % matrix0.m_front;
-	dFloat w1 = omega1 % matrix1.m_front;
-
-	// establish the gear equation.
-	dFloat relOmega = w0 + m_gearRatio * w1;
-	if (m_gearRatio > dFloat(1.0f)) {
-		relOmega = w0 / m_gearRatio  + w1;
-	}
-	
-
-	// calculate the relative angular acceleration by dividing by the time step
-	// ideally relative acceleration should be zero, but is practice there will always 
-	// be a small difference in velocity that need to be compensated. 
-	// using the full acceleration will make the to over show a oscillate 
-	// so use only fraction of the acceleration
-	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep: 1.0f;
-	dFloat relAccel = - 0.3f * relOmega * invTimestep;
-
-
-	// set the linear part of Jacobian 0 to zero	
-	jacobian0[0] = 	0.0f;
-	jacobian0[1] = 	0.0f;
-	jacobian0[2] = 	0.0f;
-
-	// set the angular part of Jacobian 0 pin vector		
-	jacobian0[3] = 	matrix0.m_front[0];
-	jacobian0[4] = 	matrix0.m_front[1];
-	jacobian0[5] = 	matrix0.m_front[2];
-
-	// set the linear part of Jacobian 1 to zero
-	jacobian1[0] = 	0.0f;
-	jacobian1[1] = 	0.0f;
-	jacobian1[2] = 	0.0f;
-
-	// set the angular part of Jacobian 1 pin vector	
-	jacobian1[3] = 	matrix1.m_front[0];
-	jacobian1[4] = 	matrix1.m_front[1];
-	jacobian1[5] = 	matrix1.m_front[2];
-
-	// add a angular constraint
-	NewtonUserJointAddGeneralRow (m_joint, jacobian0, jacobian1);
-
-	// set the desired angular acceleration between the two bodies
-	NewtonUserJointSetRowAcceleration (m_joint, relAccel);
+	dFloat w0 = omega0 % dir0Cross;
+	dFloat w1 = omega1 % dir1Cross;
+	dFloat relOmega = w0 + w1;
+	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
+	dFloat relAccel = -0.5f * relOmega * invTimestep;
+	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 }
-
 
 void CustomGear::GetInfo (NewtonJointRecord* const info) const
 {
@@ -164,6 +143,7 @@ CustomGearAndSlide::CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, con
 	:CustomGear(2, child, parent)
 	,m_slideRatio (slideRatio)
 {
+	dAssert (0);
 	m_gearRatio = gearRatio;
 
 	dMatrix dommyMatrix;
@@ -249,7 +229,6 @@ void CustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 	jacobian1[3] = 	0.0f;
 	jacobian1[4] = 	0.0f;
 	jacobian1[5] = 	0.0f;
-
 
 	// add a angular constraint
 	NewtonUserJointAddGeneralRow (m_joint, jacobian0, jacobian1);

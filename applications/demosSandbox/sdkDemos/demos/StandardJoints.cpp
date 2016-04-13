@@ -804,8 +804,8 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
     dVector pin1 (matrix1.RotateVector(dVector( 1.0f, 0.0f, 0.0f)));
     dVector pin2 (matrix2.RotateVector(dVector( 1.0f, 0.0f, 0.0f)));
 
-    new CustomGear (1.0f, pin0, pin2, body0, body2);
-    new CustomRackAndPinion (1.0f, pin1, pin2, body1, body2);
+    new CustomGear (0.3f, pin0, pin2, body0, body2);
+    new CustomRackAndPinion (0.25f, pin1, pin2, body1, body2);
 
 #ifdef _USE_HARD_JOINTS
 	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), reel0, NULL);
@@ -1041,10 +1041,8 @@ void StandardJoints (DemoEntityManager* const scene)
     CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "flatPlane1.ngd", 1);
 
-    dVector location (0.0f, 0.0f, 0.0f, 0.0f);
+    dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
-
-//AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 
 
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));

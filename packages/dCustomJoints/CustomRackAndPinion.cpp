@@ -25,7 +25,7 @@
 IMPLEMENT_CUSTON_JOINT(CustomRackAndPinion);
 
 CustomRackAndPinion::CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody)
-	:CustomJoint(1, rotationalBody, linearBody)
+	:CustomJoint(2, rotationalBody, linearBody)
 {
 	m_gearRatio = gearRatio;
 
@@ -58,7 +58,6 @@ void CustomRackAndPinion::Serialize (NewtonSerializeCallback callback, void* con
 }
 
 
-
 void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -74,52 +73,29 @@ void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 	// calculate the angular velocity for both bodies
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+	const dVector& dir0 = matrix0.m_right;
+	const dVector& dir1 = matrix1.m_front;
+	dVector dir0Cross(matrix0.m_up * dir0.Scale(m_gearRatio));
+	jacobian0[0] = dir0.m_x;
+	jacobian0[1] = dir0.m_y;
+	jacobian0[2] = dir0.m_z;
+	jacobian0[3] = dir0Cross.m_x;
+	jacobian0[4] = dir0Cross.m_y;
+	jacobian0[5] = dir0Cross.m_z;
 
-	// get angular velocity relative to the pin vector
-	dFloat w0 = omega0 % matrix0.m_front;
-	dFloat w1 = veloc1 % matrix1.m_front;
+	jacobian1[0] = dir1.m_x;
+	jacobian1[1] = dir1.m_y;
+	jacobian1[2] = dir1.m_z;
+	jacobian1[3] = dFloat(0.0f);
+	jacobian1[4] = dFloat(0.0f);
+	jacobian1[5] = dFloat(0.0f);
 
-	// establish the gear equation.
-	dFloat relVeloc = w0 + m_gearRatio * w1;
-	if (m_gearRatio > dFloat (1.0f)) {
-		relVeloc = w0 / m_gearRatio +  w1;
-	}
-
-	// calculate the relative angular acceleration by dividing by the time step
-
-	// ideally relative acceleration should be zero, but is practice there will always 
-	// be a small difference in velocity that need to be compensated. 
-	// using the full acceleration will make the to over show a oscillate 
-	// so use only fraction of the acceleration
-
-	// check if this is an impulsive time step
-	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep: 1.0f;
-	dFloat relAccel = - 0.3f * relVeloc * invTimestep;
-
-	// set the linear part of Jacobian 0 to zero	
-	jacobian0[0] = 0.0f;
-	jacobian0[1] = 0.0f;	 
-	jacobian0[2] = 0.0f;
-
-	// set the angular part of Jacobian 0 pin vector		
-	jacobian0[3] = matrix0.m_front[0];
-	jacobian0[4] = matrix0.m_front[1];
-	jacobian0[5] = matrix0.m_front[2];
-
-	// set the linear part of Jacobian 1 to translational pin vector	
-	jacobian1[0] = matrix1.m_front[0];
-	jacobian1[1] = matrix1.m_front[1];
-	jacobian1[2] = matrix1.m_front[2];
-
-	// set the rotational part of Jacobian 1 to zero
-	jacobian1[3] = 	0.0f;
-	jacobian1[4] = 	0.0f;
-	jacobian1[5] = 	0.0f;
-
-	// add a angular constraint
+	dFloat w0 = omega0 % dir0Cross;
+	dFloat w1 = veloc1 % dir1;
+	dFloat relOmega = w0 + w1;
+	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
+	dFloat relAccel = -0.5f * relOmega * invTimestep;
 	NewtonUserJointAddGeneralRow (m_joint, jacobian0, jacobian1);
-
-	// set the desired angular acceleration between the two bodies
 	NewtonUserJointSetRowAcceleration (m_joint, relAccel);
 }
 

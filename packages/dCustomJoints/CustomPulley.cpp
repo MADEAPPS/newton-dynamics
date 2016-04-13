@@ -69,48 +69,35 @@ void CustomPulley::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
+
+	// set the linear part of Jacobian 0 to translational pin vector	
+	dVector dir0 (matrix0.m_front.Scale (1.0f/m_gearRatio));
+	const dVector& dir1 = matrix1.m_front;
+	jacobian0[0] = dir0.m_x;
+	jacobian0[1] = dir0.m_y;	
+	jacobian0[2] = dir0.m_z;
+	jacobian0[3] = 0.0f;
+	jacobian0[4] = 0.0f;
+	jacobian0[5] = 0.0f;
 	
+	jacobian1[0] = dir1.m_x;
+	jacobian1[1] = dir1.m_y;	
+	jacobian1[2] = dir1.m_z;	
+	jacobian1[3] = 0.0f;
+	jacobian1[4] = 0.0f;
+	jacobian1[5] = 0.0f;
+
 	// calculate the angular velocity for both bodies
 	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
 	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
 
 	// get angular velocity relative to the pin vector
-	dFloat w0 = veloc0 % matrix0.m_front;
-	dFloat w1 = veloc1 % matrix1.m_front;
+	dFloat w0 = veloc0 % dir0;
+	dFloat w1 = veloc1 % dir1;
+	dFloat relVeloc = w0 + w1;
 
-	// establish the gear equation.
-	dFloat relVeloc = w0 + m_gearRatio * w1;
-	if (m_gearRatio > dFloat(1.0f)) {
-		relVeloc = w0 / m_gearRatio + w1;
-	}
-
-	// calculate the relative angular acceleration by dividing by the time step
-	// ideally relative acceleration should be zero, but is practice there will always 
-	// be a small difference in velocity that need to be compensated. 
-	// using the full acceleration will make the to over show a oscillate 
-	// so use only fraction of the acceleration
-	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep: 1.0f;
-	dFloat relAccel = - 0.3f * relVeloc * invTimestep;
-
-	// set the linear part of Jacobian 0 to translational pin vector	
-	jacobian0[0] = 	matrix0.m_front[0];
-	jacobian0[1] = 	matrix0.m_front[1];
-	jacobian0[2] = 	matrix0.m_front[2];
-
-	// set the rotational part of Jacobian 0 to zero
-	jacobian0[3] = 	0.0f;
-	jacobian0[4] = 	0.0f;
-	jacobian0[5] = 	0.0f;
-
-	// set the linear part of Jacobian 1 to translational pin vector	
-	jacobian1[0] = 	matrix1.m_front[0];
-	jacobian1[1] = 	matrix1.m_front[1];
-	jacobian1[2] = 	matrix1.m_front[2];
-
-	// set the rotational part of Jacobian 1 to zero
-	jacobian1[3] = 	0.0f;
-	jacobian1[4] = 	0.0f;
-	jacobian1[5] = 	0.0f;
+	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
+	dFloat relAccel = -0.5f * relVeloc * invTimestep;
 
 	// add a angular constraint
 	NewtonUserJointAddGeneralRow (m_joint, jacobian0, jacobian1);
