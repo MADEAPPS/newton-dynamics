@@ -513,7 +513,7 @@ joint0->SetPitchAngle (90.0f * 3.141592f / 180.0f);
 
 void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 {
-    dVector size (1.5f, 0.125f, 0.125f);
+    dVector size (1.5f, 1.5f, 0.125f);
 	NewtonBody* parent = CreateBox(scene, origin + dVector (-0.8f, 4.0f, 0.0f, 0.0f), dVector (0.2f, 0.125f, 0.125f));
 	NewtonBodySetMassMatrix(parent, 0.0f, 0.0f, 0.0f, 0.0f);
     //the joint pin is the first row of the matrix, to make a upright pin we
@@ -529,7 +529,7 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), parent, NULL);
 #endif
 
-	int count = 1;
+	int count = 4;
 	for (int i = 0; i < count; i ++) {
 		child = CreateBox (scene, position, size);
 		NewtonBodyGetMatrix(child, &matrix[0][0]);
