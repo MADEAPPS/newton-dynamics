@@ -107,7 +107,6 @@ class CustomVehicleController: public CustomControllerBase
 		mutable dFloat m_timer;
 	};
 
-	
 	class BodyPart: public CustomAlloc
 	{
 		public:
@@ -159,7 +158,6 @@ class CustomVehicleController: public CustomControllerBase
 		dFloat m_aerodynamicsDownForceCoefficient;
 	};
 	
-
 	class BodyPartTire: public BodyPart
 	{
 		public:
@@ -546,6 +544,7 @@ class CustomVehicleController: public CustomControllerBase
 	void Init (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	
+	void ApplyLateralStabilityForces(dFloat timestep);
 	void Cleanup();
 	
 	dMatrix m_localFrame;

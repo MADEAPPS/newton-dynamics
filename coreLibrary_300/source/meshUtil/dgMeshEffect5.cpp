@@ -869,6 +869,28 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			EndFace ();
 		}
 
+		void AddSegment (const dgBigVector& plane, const dgVertex* const segment)
+		{
+/*
+			dgTreeNode* node = Find(dgNodeKey(edge, param));
+			if (!node) {
+				node = Insert(point, dgNodeKey(edge, param));
+			}
+			nodes[index] = node;
+*/
+//			dgPoint& pointA = nodes[0]->GetInfo();
+//			dgPoint& pointB = nodes[1]->GetInfo();
+//			pointA.m_links.Append(nodes[1]);
+//			pointB.m_links.Append(nodes[0]);
+
+/*
+			dgPoint& pointA = nodes[0]->GetInfo();
+			dgPoint& pointB = nodes[1]->GetInfo();
+			pointA.m_links.Append(nodes[1]);
+			pointB.m_links.Append(nodes[0]);
+*/
+		}
+
 		dgCurvesNetwork m_curveNetwork;
 	};
 
@@ -890,24 +912,9 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 				dgClippedFace& faceHead = node->GetInfo();
 				faceHead.InitFace (m_parentMesh, faceA);
 			}
-
 			dgAssert (node);
-
-/*
-			dgPoint point(edgeOwnerMesh, edge, param, faceOwnerMesh, face);
-			dgTreeNode* node = Find(dgNodeKey(edge, param));
-			if (!node) {
-				node = Insert(point, dgNodeKey(edge, param));
-			}
-			nodes[index] = node;
-*/
-
-/*
-			dgPoint& pointA = nodes[0]->GetInfo();
-			dgPoint& pointB = nodes[1]->GetInfo();
-			pointA.m_links.Append(nodes[1]);
-			pointB.m_links.Append(nodes[0]);
-*/
+			dgClippedFace& faceHead = node->GetInfo();
+			faceHead.AddSegment(planeB, segment);
 		}
 
 		dgMeshEffect* m_parentMesh;
@@ -1042,6 +1049,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 		do {
 			dgFloat64 param = ClipEdgeFace(edgeOwnerMesh, edge, faceOwnerMesh, face, plane);
 			if (param > 0.0f) {
+				dgAssert (0);
 				index ++;
 			}
 
@@ -1071,6 +1079,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 
 			bvhMeshA.m_clippedFaces.ClipMeshesFaces(faceA, meshB, faceB, facePlaneB, points);
 			bvhMeshB.m_clippedFaces.ClipMeshesFaces(faceB, meshA, faceA, facePlaneA, points);
+
 		}
 	}
 

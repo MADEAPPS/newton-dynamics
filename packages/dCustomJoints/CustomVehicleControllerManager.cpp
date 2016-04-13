@@ -2280,11 +2280,16 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 	}
 }
 
+void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
+{
+}
+
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		m_chassis.ApplyDownForce ();
+		ApplyLateralStabilityForces(timestep);
 
 		if (m_brakesControl) {
 			m_brakesControl->Update(timestep);
