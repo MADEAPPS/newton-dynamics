@@ -2282,6 +2282,150 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 {
+	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
+
+	dMatrix matrix0;
+	
+	dVector veloc(0.0f);
+	dVector com(0.0f);
+//	dFloat arrayPtr[32][4];
+//	dVector* const array = (dVector*)arrayPtr;
+//	dFloat Ixx;
+//	dFloat Iyy;
+//	dFloat Izz;
+//	dFloat mass;
+	NewtonBody* const chassisBody = m_chassis.GetBody();
+	NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
+	NewtonBodyGetMatrix(chassisBody, &matrix0[0][0]);
+	matrix0.m_posit = matrix0.TransformVector(com);
+
+	dMatrix chassisMatrix(GetLocalFrame() * matrix0);
+	NewtonBodyGetVelocity(chassisBody, &veloc[0]);
+
+	veloc = chassisMatrix.UnrotateVector(veloc);
+	dVector sideSlipDir (veloc - chassisMatrix.m_up.Scale (veloc % chassisMatrix.m_up));
+	veloc.m_y = 0.0f;
+	dFloat mag2 = veloc % veloc;
+	if (mag2 > 1.0f) {
+		sideSlipDir = veloc.Scale (1.0f / dSqrt (veloc % veloc));
+		dFloat speed = sideSlipDir % veloc;
+
+		dVector omega(0.0f);
+		NewtonBodyGetOmega(chassisBody, &omega[0]);	
+		omega = chassisMatrix.UnrotateVector(omega);
+		dFloat yawRate = omega.m_y;
+
+//		dTrace (("%f %f\n", speed, yawRate));
+	}
+/*
+	NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+	dMatrix worldToComMatrix(chassisMatrix.Inverse() * projectionMatrix);
+	{
+		// draw vehicle chassis
+		dVector p0(D_CUSTOM_LARGE_VALUE, D_CUSTOM_LARGE_VALUE, D_CUSTOM_LARGE_VALUE, 0.0f);
+		dVector p1(-D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, -D_CUSTOM_LARGE_VALUE, 0.0f);
+
+		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			dMatrix matrix;
+			BodyPartTire* const tire = &node->GetInfo();
+			NewtonBody* const tireBody = tire->GetBody();
+			
+			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
+			//dMatrix matrix (tire->CalculateSteeringMatrix() * m_chassisState.GetMatrix());
+			dVector p(worldToComMatrix.TransformVector(matrix.m_posit));
+			p0 = dVector(dMin(p.m_x, p0.m_x), dMin(p.m_y, p0.m_y), dMin(p.m_z, p0.m_z), 1.0f);
+			p1 = dVector(dMax(p.m_x, p1.m_x), dMax(p.m_y, p1.m_y), dMax(p.m_z, p1.m_z), 1.0f);
+		}
+
+		array[0] = dVector(p0.m_x, p0.m_y, p0.m_z, 1.0f);
+		array[1] = dVector(p1.m_x, p0.m_y, p0.m_z, 1.0f);
+		array[2] = dVector(p1.m_x, p1.m_y, p0.m_z, 1.0f);
+		array[3] = dVector(p0.m_x, p1.m_y, p0.m_z, 1.0f);
+		manager->DrawSchematicCallback(this, "chassis", 0, 4, array);
+	}
+
+	{
+		// draw vehicle tires
+		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			dMatrix matrix;
+			BodyPartTire* const tire = &node->GetInfo();
+			dFloat width = tire->m_data.m_width * 0.5f;
+			dFloat radio = tire->m_data.m_radio;
+			NewtonBody* const tireBody = tire->GetBody();
+			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
+			matrix.m_up = chassisMatrix.m_up;
+			matrix.m_right = matrix.m_front * matrix.m_up;
+
+			array[0] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector(width, 0.0f, radio, 0.0f)));
+			array[1] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector(width, 0.0f, -radio, 0.0f)));
+			array[2] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector(-width, 0.0f, -radio, 0.0f)));
+			array[3] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector(-width, 0.0f, radio, 0.0f)));
+			manager->DrawSchematicCallback(this, "tire", 0, 4, array);
+		}
+	}
+
+	{
+		// draw vehicle velocity
+		dVector veloc(0.0f);
+		dVector omega(0.0f);
+
+		NewtonBodyGetOmega(chassisBody, &omega[0]);
+		NewtonBodyGetVelocity(chassisBody, &veloc[0]);
+
+		dVector localVelocity(chassisMatrix.UnrotateVector(veloc));
+		localVelocity.m_y = 0.0f;
+
+		localVelocity = projectionMatrix.RotateVector(localVelocity);
+		array[0] = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+		array[1] = localVelocity.Scale(velocityScale);
+		manager->DrawSchematicCallback(this, "velocity", 0, 2, array);
+
+		dVector localOmega(chassisMatrix.UnrotateVector(omega));
+		array[0] = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+		array[1] = dVector(0.0f, localOmega.m_y * 10.0f, 0.0f, 0.0f);
+		manager->DrawSchematicCallback(this, "omega", 0, 2, array);
+	}
+
+	{
+		dFloat scale(2.0f / (mass * 10.0f));
+		// draw vehicle forces
+		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			BodyPartTire* const tire = &node->GetInfo();
+			dMatrix matrix;
+			NewtonBody* const tireBody = tire->GetBody();
+			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
+			matrix.m_up = chassisMatrix.m_up;
+			matrix.m_right = matrix.m_front * matrix.m_up;
+
+			dVector origin(worldToComMatrix.TransformVector(matrix.m_posit));
+
+			dVector lateralForce(chassisMatrix.UnrotateVector(GetTireLateralForce(tire)));
+			lateralForce = lateralForce.Scale(-scale);
+			lateralForce = projectionMatrix.RotateVector(lateralForce);
+
+			array[0] = origin;
+			array[1] = origin + lateralForce;
+			manager->DrawSchematicCallback(this, "lateralForce", 0, 2, array);
+
+			dVector longitudinalForce(chassisMatrix.UnrotateVector(GetTireLongitudinalForce(tire)));
+			longitudinalForce = longitudinalForce.Scale(-scale);
+			longitudinalForce = projectionMatrix.RotateVector(longitudinalForce);
+
+			array[0] = origin;
+			array[1] = origin + longitudinalForce;
+			manager->DrawSchematicCallback(this, "longitudinalForce", 0, 2, array);
+
+			dVector veloc(0.0f);
+			NewtonBodyGetVelocity(tireBody, &veloc[0]);
+			veloc = chassisMatrix.UnrotateVector(veloc);
+			veloc.m_y = 0.0f;
+			veloc = projectionMatrix.RotateVector(veloc);
+			array[0] = origin;
+			array[1] = origin + veloc.Scale(velocityScale);
+			manager->DrawSchematicCallback(this, "tireVelocity", 0, 2, array);
+		}
+	}
+*/
 }
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
