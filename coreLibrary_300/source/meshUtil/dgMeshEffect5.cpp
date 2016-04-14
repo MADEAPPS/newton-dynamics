@@ -1079,7 +1079,6 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 
 			bvhMeshA.m_clippedFaces.ClipMeshesFaces(faceA, meshB, faceB, facePlaneB, points);
 			bvhMeshB.m_clippedFaces.ClipMeshesFaces(faceB, meshA, faceA, facePlaneA, points);
-
 		}
 	}
 

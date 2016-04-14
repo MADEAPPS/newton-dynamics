@@ -1573,7 +1573,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
 	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift (matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
-	inputManager->AddPlayer (forklift);
+//	inputManager->AddPlayer (forklift);
 	
 	matrix.m_posit.m_z += 4.0f;
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
