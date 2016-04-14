@@ -95,6 +95,7 @@ class ArticulatedEntityModel: public DemoEntity
 
 			dFloat speed = GetSpeed();
 			dFloat posit = GetPosition();
+			// remember later change this to a spring damper joint
 			dFloat springForce = -50.0f * NewtonCalculateSpringDamperAcceleration (timestep, 200.0f, posit, 30.0f, speed);
 
 			CalculateGlobalMatrix(tireMatrix, chassisMatrix);
@@ -879,7 +880,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		dMatrix pinMatrix;
 		NewtonBodyGetMatrix(root->m_body, &pinMatrix[0][0]);
-		new CustomGear(masterRadio / slaveRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
+		new CustomGear(slaveRadio / masterRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
 	}
 	
 
@@ -1572,7 +1573,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
 	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift (matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
-//	inputManager->AddPlayer (forklift);
+	inputManager->AddPlayer (forklift);
 	
 	matrix.m_posit.m_z += 4.0f;
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
@@ -1593,7 +1594,6 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
 	scene->SetCameraMatrix(rot, origin);
-
 }
 
 
