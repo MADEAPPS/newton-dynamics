@@ -744,11 +744,12 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 
 			//dgAssert(constraintParamOut.m_jointStiffness[i] >= dgFloat32(0.0f));
 			//dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(1.0f));
-
 			//row->m_stiffness = constraintParamOut.m_jointStiffness[i];
+			
 			row->m_diagDamp = dgFloat32 (0.0f);
 			row->m_stiffness = DG_PSD_DAMP_TOL * (dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) + dgFloat32 (1.0e-6f);
 			dgAssert(row->m_stiffness >= dgFloat32(0.0f));
+			dgAssert ((dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) >= dgFloat32 (0.0f));
 			row->m_coordenateAccel = constraintParamOut.m_jointAccel[i];
 			row->m_accelIsMotor = constraintParamOut.m_flags[i].m_isMotor ? true : false;
 			row->m_applyCorrection = constraintParamOut.m_flags[i].m_applyCorrection ? true : false;

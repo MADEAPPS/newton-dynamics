@@ -77,39 +77,17 @@ class ArticulatedEntityModel: public DemoEntity
 
 		void SubmitConstraints (dFloat timestep, int threadIndex)
 		{
-			NewtonBody* const tire = GetBody0();
-			NewtonBody* const chassis = GetBody1();
+			CustomSlidingContact::SubmitConstraints(timestep, threadIndex);
+
+			//NewtonBody* const tire = GetBody0();
+			//NewtonBody* const chassis = GetBody1();
 
 			dMatrix tireMatrix;
 			dMatrix chassisMatrix;
-
-			dVector chassisCom(0.0f);
-			dVector tireVeloc(0.0f);
-			dVector chassisVeloc(0.0f);
-
-			NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-			NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
-			NewtonBodyGetCentreOfMass(chassis, &chassisCom[0]);
-			dVector chassisPosit (chassisMatrix.TransformVector(chassisCom));
-			dVector tireDistance (tireMatrix.m_posit - chassisPosit);
-
-			dFloat speed = GetSpeed();
-			dFloat posit = GetPosition();
-			// remember later change this to a spring damper joint
-			dFloat springForce = -50.0f * NewtonCalculateSpringDamperAcceleration (timestep, 200.0f, posit, 30.0f, speed);
-
 			CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-
-			dVector force (chassisMatrix.m_front.Scale (springForce));
-			dVector torque (tireDistance * force);
-
-			NewtonBodyAddForce(chassis, &force[0]);
-			NewtonBodyAddTorque(chassis, &torque[0]);
-
-			force = force.Scale (-1.0f);
-			NewtonBodyAddForce(tire, &force[0]);
-
-			CustomSlidingContact::SubmitConstraints(timestep, threadIndex);
+			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_front[0]);
+			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 150.0f, 10.0f);
+			NewtonUserJointSetRowStiffness (m_joint, 0.7f);
 		}
 	};
 
@@ -1095,7 +1073,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			NewtonBodyGetMatrix(link1, &matrix[0][0]);
 			dMatrix franmeMatrix (aligment * matrix);
 			CustomHinge* const hinge = new CustomHinge (franmeMatrix, link1, link0);
-			hinge->SetStiffness (0.0f);
+			hinge->SetStiffness (0.99f);
 			hinge->SetFriction(linkFriction);
 			hingeArray[i-1] = hinge->GetJoint();
 			link0 = link1;
@@ -1363,8 +1341,10 @@ class AriculatedJointInputManager: public CustomInputManager
 	AriculatedJointInputManager (DemoEntityManager* const scene)
 		:CustomInputManager(scene->GetNewton())
 		,m_scene(scene)
-		,m_player(NULL)
 		,m_cameraMode(true)
+		,m_changeVehicle(true)
+		,m_playersCount(0)
+		,m_currentPlayer(0)
 	{
 		// plug a callback for 2d help display
 		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
@@ -1375,7 +1355,7 @@ class AriculatedJointInputManager: public CustomInputManager
 		ArticulatedEntityModel::InputRecord inputs;
 
 		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
-		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player->GetUserData();
+		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
 		inputs.m_wristAxis0 = int(mainWindow->GetKeyState('Y')) - int(mainWindow->GetKeyState('U'));
 		inputs.m_wristAxis1 = int(mainWindow->GetKeyState('I')) - int(mainWindow->GetKeyState('O'));
@@ -1405,7 +1385,7 @@ class AriculatedJointInputManager: public CustomInputManager
 			mainWindow->GetKeyState ('Z') ||
 			mainWindow->GetKeyState ('X')) 
 		{
-			NewtonBody* const body = m_player->GetBoneBody(0);
+			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetBoneBody(0);
 			NewtonBodySetSleepState(body, false);
 		}
 
@@ -1432,13 +1412,16 @@ class AriculatedJointInputManager: public CustomInputManager
 	void OnEndUpdate (dFloat timestepInSecunds)
 	{
 		DemoCamera* const camera = m_scene->GetCamera();
-		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player->GetUserData();
+		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
+
+		if (m_changeVehicle.UpdateTriggerButton(m_scene->GetRootWindow(), 'P')) {
+			m_currentPlayer ++;
+		}
 		
 		dMatrix camMatrix(camera->GetNextMatrix());
 		dMatrix playerMatrix (vehicleModel->GetNextMatrix());
 
 		dVector frontDir (camMatrix[0]);
-
 		dVector camOrigin(0.0f); 
 		m_cameraMode.UpdatePushButton(m_scene->GetRootWindow(), 'C');
 		if (m_cameraMode.GetPushButtonState()) {
@@ -1454,9 +1437,9 @@ class AriculatedJointInputManager: public CustomInputManager
 
 	void AddPlayer(CustomArticulatedTransformController* const player)
 	{
-		m_player = player;
+		m_player[m_playersCount] = player;
+		m_playersCount ++;
 	}
-
 
 	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
 	{
@@ -1476,6 +1459,7 @@ class AriculatedJointInputManager: public CustomInputManager
 		lineNumber = scene->Print(color, 10,  lineNumber + 20, "turn base left:          R");
 		lineNumber = scene->Print(color, 10,  lineNumber + 20, "turn base right:         T");
 		lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle camera mode:      C");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "switch vehicle:          P");
 	}
 
 
@@ -1487,8 +1471,11 @@ class AriculatedJointInputManager: public CustomInputManager
 
 
 	DemoEntityManager* m_scene;
-	CustomArticulatedTransformController* m_player;
+	CustomArticulatedTransformController* m_player[2];
 	DemoEntityManager::ButtonKey m_cameraMode;
+	DemoEntityManager::ButtonKey m_changeVehicle;
+	int m_playersCount;
+	int m_currentPlayer;
 };
 
 
@@ -1570,15 +1557,15 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 1.5f;
 
-	// load a the mesh of the articulate vehicle
-	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
-	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift (matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
-//	inputManager->AddPlayer (forklift);
-	
-	matrix.m_posit.m_z += 4.0f;
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
 	CustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
 	inputManager->AddPlayer (robot);
+
+	matrix.m_posit.m_z += 4.0f;
+	// load a the mesh of the articulate vehicle
+	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
+	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
+	inputManager->AddPlayer(forklift);
 
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);
