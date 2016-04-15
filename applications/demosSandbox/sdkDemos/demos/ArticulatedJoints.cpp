@@ -24,8 +24,8 @@
 
 #define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
-//#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			7.0f
-#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			15.0f
+//#define ARTICULATED_VEHICLE_CAMERA_DISTANCE		7.0f
+#define ARTICULATED_VEHICLE_CAMERA_DISTANCE			10.0f
 
 struct ARTICULATED_VEHICLE_DEFINITION
 {
@@ -56,11 +56,9 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"lift_2",		"convexHull",			 40.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_4",		"convexHull",			 20.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-	{"left_teeth",  "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-	{"right_teeth", "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"left_teeth",  "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"right_teeth", "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
-
-
 
 class ArticulatedEntityModel: public DemoEntity
 {
@@ -136,6 +134,8 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_angularActuatorsCount1(0)
 		,m_liftActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
+		,m_maxEngineTorque(0.0f)
+		,m_omegaResistance(0.0f)
 	{
 		// load the vehicle model
 		LoadNGD_mesh (name, scene->GetNewton());
@@ -150,6 +150,8 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_liftActuatorsCount(0)
 		,m_universalActuatorsCount(0)
 		,m_paletteActuatorsCount(0)
+		,m_maxEngineTorque(0.0f)
+		,m_omegaResistance(0.0f)
 		,m_maxEngineSpeed(6.0f)
 		,m_maxTurnSpeed(2.0f)
 		,m_turnAngle(0.0f)
@@ -254,6 +256,8 @@ class ArticulatedEntityModel: public DemoEntity
 	int m_liftActuatorsCount;
 	int m_universalActuatorsCount;
 	int m_paletteActuatorsCount;
+	dFloat m_maxEngineTorque;
+	dFloat m_omegaResistance;
 	dFloat m_maxEngineSpeed;
 	dFloat m_maxTurnSpeed;
 	dFloat m_turnAngle;
@@ -295,7 +299,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	{
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
 
-		// apply engine torque
+		// IMPORTANT NOTE!!!  remember unify the engine for both models
+		// apply robot engine torque 
 		if (vehicleModel->m_engineLeftTire && vehicleModel->m_engineRightTire) {
 
 			dFloat speed = 0.0f; 
@@ -310,16 +315,52 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			if (vehicleModel->m_inputs.m_steerValue > 0) {
 				vehicleModel->m_engineLeftTire->m_velocity += vehicleModel->m_maxTurnSpeed;
 				vehicleModel->m_engineRightTire->m_velocity -= vehicleModel->m_maxTurnSpeed;
-			}
-			else if (vehicleModel->m_inputs.m_steerValue < 0) {
+			} else if (vehicleModel->m_inputs.m_steerValue < 0) {
 				vehicleModel->m_engineLeftTire->m_velocity -= vehicleModel->m_maxTurnSpeed;
 				vehicleModel->m_engineRightTire->m_velocity += vehicleModel->m_maxTurnSpeed;
 			}
+		} else {
+			// apply forklift engine torque 
+			if (vehicleModel->m_frontTiresCount) {
+				dFloat brakeTorque = 0.0f;
+				dFloat engineTorque = 0.0f;
+				if (vehicleModel->m_inputs.m_throttleValue > 0) {
+					engineTorque = -vehicleModel->m_maxEngineTorque; 
+				} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
+					engineTorque = vehicleModel->m_maxEngineTorque; 
+				} else {
+					brakeTorque = 1000.0f;
+				}
+				for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
+					vehicleModel->m_frontTireJoints[i]->SetFriction(brakeTorque);
+				}
+
+				dMatrix matrix;
+				NewtonBody* const rootBody = controller->GetBoneBody(0);
+				NewtonBodyGetMatrix(rootBody, &matrix[0][0]);
+			
+				dVector tirePing (matrix.RotateVector(dVector (0.0, 0.0, 1.0, 0.0)));
+				if (engineTorque != 0.0f) {
+					dVector torque (tirePing.Scale(engineTorque));
+					for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
+						NewtonBodyAddTorque (vehicleModel->m_fronTires[i], &torque[0]);
+					}
+				}
+
+				for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
+					dVector omega(0.0f);
+					NewtonBodyGetOmega(vehicleModel->m_fronTires[i], &omega[0]);
+					dFloat omegaMag = omega % tirePing;
+					dFloat sign = (omegaMag >= 0.0f) ? 1.0 : -1.0f;
+					omega -= tirePing.Scale(sign * omegaMag * omegaMag * vehicleModel->m_omegaResistance);
+					NewtonBodySetOmega(vehicleModel->m_fronTires[i], &omega[0]);
+				}
+			}
 		}
+
 
 		// update steering wheels
 		if (vehicleModel->m_rearTiresCount) {
-/*
 			dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetActuatorAngle1();
 			if (vehicleModel->m_inputs.m_steerValue > 0) {
 				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
@@ -329,7 +370,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			for (int i = 0; i < vehicleModel->m_rearTiresCount; i ++) {
 				vehicleModel->m_rearTireJoints[i]->SetTargetAngle1(steeringAngle);
 			}
-*/			
 		}
 
 
@@ -645,6 +685,30 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		}
 	}
 
+	void CalculateEngine (ArticulatedEntityModel* const vehicleModel, NewtonBody* const chassiBody, NewtonBody* const tireBody)
+	{
+		// calculate the maximum torque that the engine will produce
+		NewtonCollision* const tireShape = NewtonBodyGetCollision(tireBody);
+		dAssert (NewtonCollisionGetType(tireShape) == SERIALIZE_ID_CHAMFERCYLINDER);
+
+		dVector p0;
+		dVector p1;
+		CalculateAABB (tireShape, dGetIdentityMatrix(), p0, p1);
+
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+		NewtonBodyGetMassMatrix(chassiBody, &mass, &Ixx, &Iyy, &Izz);
+		dFloat radius = (p1.m_y - p0.m_y) * 0.5f;
+
+		// calculate a torque the will produce a 0.5f of the force of gravity
+		vehicleModel->m_maxEngineTorque = 0.25f * mass * radius * dAbs(DEMO_GRAVITY);
+
+		// calculate the coefficient of drag for top speed of 20 m/s
+		dFloat maxOmega = 100.0f / radius;
+		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
+	}
 
 	CustomArticulatedTransformController* CreateForklift (const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, ARTICULATED_VEHICLE_DEFINITION* const definition)
 	{
@@ -719,9 +783,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		}
 
 		// calculate the engine parameters
-//		if (vehicleModel->m_frontTiresCount) {
-//			CalculateEngine (vehicleModel, rootBody, vehicleModel->m_fronTires[0]);
-//		}
+		if (vehicleModel->m_frontTiresCount) {
+			CalculateEngine (vehicleModel, rootBody, vehicleModel->m_fronTires[0]);
+		}
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
@@ -914,8 +978,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		ArticulatedEntityModel::EngineTire* const engineJoint = (ArticulatedEntityModel::EngineTire*)NewtonJointGetUserData(NewtonBodyGetFirstJoint(rightTire_0->m_body));
 		dAssert(dString(engineJoint->GetTypeName()) == dString("CustomHinge"));
 		model->m_engineRightTire = engineJoint;
-
-
 	}
 		
 	class ConstantSpeedKnotInterpolant
@@ -1566,7 +1628,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
 	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 	inputManager->AddPlayer(forklift);
-
+/*
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);
 	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
@@ -1576,7 +1638,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 20.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 20.0f, 0.0f));
-
+*/
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
