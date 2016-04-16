@@ -52,12 +52,12 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"fl_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "frontTire"},
 	{"rr_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "rearTire"},
 	{"rl_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "rearTire"},
-	{"lift_1",		"convexHull",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
-	{"lift_2",		"convexHull",			 40.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-	{"lift_4",		"convexHull",			 20.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-	{"left_teeth",  "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-	{"right_teeth", "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"lift_1",		"convexHull",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
+//	{"lift_2",		"convexHull",			 40.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+//	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+//	{"lift_4",		"convexHull",			 20.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+//	{"left_teeth",  "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+//	{"right_teeth", "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 class ArticulatedEntityModel: public DemoEntity
@@ -136,6 +136,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_paletteActuatorsCount(0)
 		,m_maxEngineTorque(0.0f)
 		,m_omegaResistance(0.0f)
+		,m_engineBody(NULL)
 	{
 		// load the vehicle model
 		LoadNGD_mesh (name, scene->GetNewton());
@@ -163,6 +164,7 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_wristAxis1(0.0f)
 		,m_engineLeftTire(NULL)
 		,m_engineRightTire(NULL)
+		,m_engineBody(NULL)
 	{
 	}
 
@@ -188,6 +190,8 @@ class ArticulatedEntityModel: public DemoEntity
 
 		chassisMatrix = dYawMatrix(90.0f * 3.141592f / 180.0f) * chassisMatrix;
 		chassisMatrix.m_posit = tireMatrix.m_posit;
+
+		new CustomGear(10.0f, chassisMatrix.m_front, chassisMatrix.m_front, tire, m_engineBody);
 
 		m_frontTireJoints[m_frontTiresCount] = new CustomHinge (&chassisMatrix[0][0], tire, chassis);
 		m_fronTires[m_frontTiresCount] = tire;
@@ -278,6 +282,7 @@ class ArticulatedEntityModel: public DemoEntity
 	CustomUniversalActuator* m_universalActuator[4];
 	EngineTire* m_engineLeftTire;
 	EngineTire* m_engineRightTire;
+	NewtonBody* m_engineBody;
 
 	InputRecord m_inputs;
 };
@@ -657,13 +662,36 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// save the user data with the bone body (usually the visual geometry)
 		NewtonBodySetUserData(body, bodyPart);
 
-		// assigne a body part id
+		// assign a body part id
 		NewtonCollisionSetUserID(collision, definition.m_bodyPartID____);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback (body, PhysicsApplyGravityForce);
 		return body;
 	}
+
+	NewtonBody* CreateEngineBodyPart(const dMatrix& matrix)
+	{
+		NewtonWorld* const world = GetWorld();
+		NewtonCollision* shape = NewtonCreateSphere (world, 1.0f, 0, NULL);
+
+		// create the rigid body that will make this bone
+		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(body, 50.0f, collision);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+		return body;
+	}
+
 
 	void ConnectBodyPart (ArticulatedEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation)
 	{
@@ -734,6 +762,15 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		//com.m_x -= 0.25f;
 		com.m_y -= 0.25f;
 		NewtonBodySetCentreOfMass(rootBody, &com[0]);
+
+		dMatrix matrix;
+		NewtonBodyGetMatrix (rootBody, &matrix[0][0]);
+		matrix = dYawMatrix(0.5f * 3.1416f) * matrix;
+		matrix.m_posit.m_y += 3.0f;
+		vehicleModel->m_engineBody = CreateEngineBodyPart(matrix);
+
+		// connect engine to chassis wit a hinge
+		new CustomHinge (matrix, rootBody, vehicleModel->m_engineBody);
 
 		// for debugging joints
 		//NewtonBodySetMassMatrix(rootBody, 0,0,0,0);
