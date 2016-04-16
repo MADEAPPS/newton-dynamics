@@ -40,7 +40,7 @@ struct ARTICULATED_VEHICLE_DEFINITION
 	char m_boneName[32];
 	char m_shapeTypeName[32];
 	dFloat m_mass;
-	int m_bodyPartID____;
+	int m_bodyPartID;
 	char m_articulationName[32];
 };
 
@@ -52,12 +52,12 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"fl_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "frontTire"},
 	{"rr_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "rearTire"},
 	{"rl_tire",		"tireShape",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_tireID, "rearTire"},
-//	{"lift_1",		"convexHull",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
-//	{"lift_2",		"convexHull",			 40.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"lift_4",		"convexHull",			 20.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"left_teeth",  "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-//	{"right_teeth", "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"lift_1",		"convexHull",			 50.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "hingeActuator"},
+	{"lift_2",		"convexHull",			 40.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+	{"lift_4",		"convexHull",			 20.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
+	{"left_teeth",  "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"right_teeth", "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 class ArticulatedEntityModel: public DemoEntity
@@ -191,7 +191,7 @@ class ArticulatedEntityModel: public DemoEntity
 		chassisMatrix = dYawMatrix(90.0f * 3.141592f / 180.0f) * chassisMatrix;
 		chassisMatrix.m_posit = tireMatrix.m_posit;
 
-		new CustomGear(10.0f, chassisMatrix.m_front, chassisMatrix.m_front, tire, m_engineBody);
+		new CustomGear(5.0f, chassisMatrix.m_front, chassisMatrix.m_front, tire, m_engineBody);
 
 		m_frontTireJoints[m_frontTiresCount] = new CustomHinge (&chassisMatrix[0][0], tire, chassis);
 		m_fronTires[m_frontTiresCount] = tire;
@@ -307,7 +307,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// IMPORTANT NOTE!!!  remember unify the engine for both models
 		// apply robot engine torque 
 		if (vehicleModel->m_engineLeftTire && vehicleModel->m_engineRightTire) {
-
+			dAssert (0);
 			dFloat speed = 0.0f; 
 			if (vehicleModel->m_inputs.m_throttleValue > 0) {
 				speed = vehicleModel->m_maxEngineSpeed;
@@ -327,6 +327,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		} else {
 			// apply forklift engine torque 
 			if (vehicleModel->m_frontTiresCount) {
+
 				dFloat brakeTorque = 0.0f;
 				dFloat engineTorque = 0.0f;
 				if (vehicleModel->m_inputs.m_throttleValue > 0) {
@@ -334,31 +335,21 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 				} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
 					engineTorque = vehicleModel->m_maxEngineTorque; 
 				} else {
-					brakeTorque = 1000.0f;
+					brakeTorque = 2000.0f;
 				}
+				// apply DC engine torque
+				dMatrix matrix;
+				dVector omega(0.0f);
+				NewtonBodyGetOmega(vehicleModel->m_engineBody, &omega[0]);
+				NewtonBodyGetMatrix(vehicleModel->m_engineBody, &matrix[0][0]);
+				engineTorque -= omega % matrix.m_front;
+
+				dVector torque (matrix.m_front.Scale(engineTorque));
+				NewtonBodyAddTorque (vehicleModel->m_engineBody, &torque[0]);
+
+				// apply breaks
 				for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
 					vehicleModel->m_frontTireJoints[i]->SetFriction(brakeTorque);
-				}
-
-				dMatrix matrix;
-				NewtonBody* const rootBody = controller->GetBoneBody(0);
-				NewtonBodyGetMatrix(rootBody, &matrix[0][0]);
-			
-				dVector tirePing (matrix.RotateVector(dVector (0.0, 0.0, 1.0, 0.0)));
-				if (engineTorque != 0.0f) {
-					dVector torque (tirePing.Scale(engineTorque));
-					for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
-						NewtonBodyAddTorque (vehicleModel->m_fronTires[i], &torque[0]);
-					}
-				}
-
-				for (int i = 0; i < vehicleModel->m_frontTiresCount; i ++) {
-					dVector omega(0.0f);
-					NewtonBodyGetOmega(vehicleModel->m_fronTires[i], &omega[0]);
-					dFloat omegaMag = omega % tirePing;
-					dFloat sign = (omegaMag >= 0.0f) ? 1.0 : -1.0f;
-					omega -= tirePing.Scale(sign * omegaMag * omegaMag * vehicleModel->m_omegaResistance);
-					NewtonBodySetOmega(vehicleModel->m_fronTires[i], &omega[0]);
 				}
 			}
 		}
@@ -663,19 +654,24 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBodySetUserData(body, bodyPart);
 
 		// assign a body part id
-		NewtonCollisionSetUserID(collision, definition.m_bodyPartID____);
+		NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback (body, PhysicsApplyGravityForce);
 		return body;
 	}
 
-	NewtonBody* CreateEngineBodyPart(const dMatrix& matrix)
+	NewtonBody* CreateEngineBodyPart(NewtonBody* const chassis)
 	{
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* shape = NewtonCreateSphere (world, 1.0f, 0, NULL);
 
 		// create the rigid body that will make this bone
+		dMatrix matrix;
+		NewtonBodyGetMatrix(chassis, &matrix[0][0]);
+		matrix = dYawMatrix(0.5f * 3.1416f) * matrix;
+		matrix.m_posit.m_y += 3.0f;
+		matrix.m_posit.m_x -= 1.0f;
 		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
 
 		// destroy the collision helper shape 
@@ -689,6 +685,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+
+		// connect engine to chassis with a hinge
+		new CustomHinge(matrix, chassis, body);
+
 		return body;
 	}
 
@@ -713,30 +713,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		}
 	}
 
-	void CalculateEngine (ArticulatedEntityModel* const vehicleModel, NewtonBody* const chassiBody, NewtonBody* const tireBody)
-	{
-		// calculate the maximum torque that the engine will produce
-		NewtonCollision* const tireShape = NewtonBodyGetCollision(tireBody);
-		dAssert (NewtonCollisionGetType(tireShape) == SERIALIZE_ID_CHAMFERCYLINDER);
-
-		dVector p0;
-		dVector p1;
-		CalculateAABB (tireShape, dGetIdentityMatrix(), p0, p1);
-
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-		dFloat mass;
-		NewtonBodyGetMassMatrix(chassiBody, &mass, &Ixx, &Iyy, &Izz);
-		dFloat radius = (p1.m_y - p0.m_y) * 0.5f;
-
-		// calculate a torque the will produce a 0.5f of the force of gravity
-		vehicleModel->m_maxEngineTorque = 0.25f * mass * radius * dAbs(DEMO_GRAVITY);
-
-		// calculate the coefficient of drag for top speed of 20 m/s
-		dFloat maxOmega = 100.0f / radius;
-		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
-	}
 
 	CustomArticulatedTransformController* CreateForklift (const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, ARTICULATED_VEHICLE_DEFINITION* const definition)
 	{
@@ -763,14 +739,12 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		com.m_y -= 0.25f;
 		NewtonBodySetCentreOfMass(rootBody, &com[0]);
 
-		dMatrix matrix;
-		NewtonBodyGetMatrix (rootBody, &matrix[0][0]);
-		matrix = dYawMatrix(0.5f * 3.1416f) * matrix;
-		matrix.m_posit.m_y += 3.0f;
-		vehicleModel->m_engineBody = CreateEngineBodyPart(matrix);
+		// add engine
+		vehicleModel->m_engineBody = CreateEngineBodyPart(rootBody);
 
-		// connect engine to chassis wit a hinge
-		new CustomHinge (matrix, rootBody, vehicleModel->m_engineBody);
+		dFloat maxOmega = 20.0f;
+		vehicleModel->m_maxEngineTorque = 200.0f;
+		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
 
 		// for debugging joints
 		//NewtonBodySetMassMatrix(rootBody, 0,0,0,0);
@@ -819,11 +793,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			}
 		}
 
-		// calculate the engine parameters
-		if (vehicleModel->m_frontTiresCount) {
-			CalculateEngine (vehicleModel, rootBody, vehicleModel->m_fronTires[0]);
-		}
-
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
 
@@ -864,7 +833,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_shapeTypeName, "tireShape");
 		strcpy(definition.m_articulationName, tireName);
 		definition.m_mass = 30.0f;
-		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_tireID;
+		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_tireID;
 
 		NewtonBody* const parentBody = parentBone->m_body;
 		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
@@ -893,7 +862,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBodySetUserData(tireBody, tireModel);
 
 		//NewtonBodySetMaterialGroupID (body, m_material);
-		NewtonCollisionSetUserID(collision, definition.m_bodyPartID____);
+		NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback(tireBody, PhysicsApplyGravityForce);
@@ -1225,7 +1194,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, name);
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 10.0f;
-		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, name);
 		NewtonBody* const boomBody = CreateBodyPart(boom, definition);
 
@@ -1255,7 +1224,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, name);
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 10.0f;
-		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, name);
 		NewtonBody* const paletteBody = CreateBodyPart(palette, definition);
 
@@ -1284,7 +1253,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, "effector");
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 10.0f;
-		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, "effector");
 		NewtonBody* const wristBody = CreateBodyPart(wrist, definition);
 
@@ -1315,7 +1284,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, "Boom1");
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 10.0f;
-		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, "Boom1");
 		NewtonBody* const boomBody = CreateBodyPart(boom, definition);
 
@@ -1345,7 +1314,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, "base");
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 30.0f;
-		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, "base");
 		NewtonBody* const baseBody = CreateBodyPart(base, definition);
 
@@ -1384,7 +1353,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy (definition.m_boneName, "body");
 		strcpy (definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 800.0f;
-		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy (definition.m_articulationName, "mainBody");
 		NewtonBody* const chassis = CreateBodyPart (vehicleModel, definition);
 
@@ -1665,7 +1634,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
 	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 	inputManager->AddPlayer(forklift);
-/*
+
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);
 	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
@@ -1675,7 +1644,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 20.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 20.0f, 0.0f));
-*/
+
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
