@@ -19,7 +19,8 @@
 
 //dInitRtti(CustomGear);
 IMPLEMENT_CUSTON_JOINT(CustomGear);
-IMPLEMENT_CUSTON_JOINT(CustomGearAndSlide);
+//IMPLEMENT_CUSTON_JOINT(CustomGearAndSlide);
+IMPLEMENT_CUSTON_JOINT(CustomSatelliteGear);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -139,6 +140,108 @@ void CustomGear::GetInfo (NewtonJointRecord* const info) const
 }
 
 
+CustomSatelliteGear::CustomSatelliteGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const referenceBody, dFloat salleliteSide)
+	:CustomGear(gearRatio, childPin, parentPin, child, parent)
+	,m_referenceBody(referenceBody)
+	,m_salleliteSide((salleliteSide > 0.0f) ? 1.0f : -1.0f)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	dMatrix referenceMatrix (dGetIdentityMatrix());
+	if (m_referenceBody) {
+		NewtonBodyGetMatrix (m_referenceBody, &referenceMatrix[0][0]);
+	}
+	m_referenceLocalMatrix = matrix1 * referenceMatrix.Inverse();
+}
+
+CustomSatelliteGear::CustomSatelliteGear(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomGear(child, parent, callback, userData)
+{
+	dAssert (0);
+	//remember load refrence body;
+	callback (userData, &m_salleliteSide, sizeof (dFloat));
+}
+
+void CustomSatelliteGear::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomGear::Serialize(callback, userData);
+	callback(userData, &m_salleliteSide, sizeof (dFloat));
+	dAssert(0);
+	//remember save refrence body;
+}
+
+void CustomSatelliteGear::GetInfo(NewtonJointRecord* const info) const
+{
+	CustomGear::GetInfo (info);
+	strcpy(info->m_descriptionType, GetTypeName());
+	info->m_extraParameters[0] = m_gearRatio;
+	info->m_extraParameters[1] = m_salleliteSide;
+}
+
+void CustomSatelliteGear::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
+	dFloat jacobian0[6];
+	dFloat jacobian1[6];
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	matrix1 = m_referenceLocalMatrix;
+	if (m_referenceBody) {
+		dMatrix tmpMatrix;
+		NewtonBodyGetMatrix(m_referenceBody, &tmpMatrix[0][0]);
+		matrix1 = m_referenceLocalMatrix * tmpMatrix;
+	}
+
+	// calculate the angular velocity for both bodies
+	const dVector& dir0 = matrix0.m_right;
+	const dVector& dir1 = matrix1.m_right;
+
+	dVector dir0Cross(matrix0.m_up * dir0.Scale(m_gearRatio));
+//	dVector dir1Cross(matrix1.m_up * dir1);
+//	dVector dir1Cross(matrix1.m_up * dir1 + matrix1.m_front.Scale (m_salleliteSide) * dir1);
+	dVector dir1Cross(matrix1.m_front.Scale (m_salleliteSide) * dir1);
+	jacobian0[0] = dir0.m_x;
+	jacobian0[1] = dir0.m_y;
+	jacobian0[2] = dir0.m_z;
+	jacobian0[3] = dir0Cross.m_x;
+	jacobian0[4] = dir0Cross.m_y;
+	jacobian0[5] = dir0Cross.m_z;
+
+	jacobian1[0] = dir1.m_x;
+	jacobian1[1] = dir1.m_y;
+	jacobian1[2] = dir1.m_z;
+	jacobian1[3] = dir1Cross.m_x;
+	jacobian1[4] = dir1Cross.m_y;
+	jacobian1[5] = dir1Cross.m_z;
+
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+	dFloat w0 = omega0 % dir0Cross;
+	dFloat w1 = omega1 % dir1Cross;
+
+if (m_salleliteSide != 0.0) {
+//dTrace(("%f %f (%f %f %f %f %f %f)\n", omega1.m_y, w1, jacobian1[0], jacobian1[1], jacobian1[2], jacobian1[3], jacobian1[4], jacobian1[5]));
+dTrace(("(%f %f %f %f %f %f) (%f %f %f %f %f %f)\n", jacobian0[0], jacobian0[1], jacobian0[2], jacobian0[3], jacobian0[4], jacobian0[5], 
+													 jacobian1[0], jacobian1[1], jacobian1[2], jacobian1[3], jacobian1[4], jacobian1[5]));
+}
+
+	dFloat relOmega = w0 + w1;
+	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
+	dFloat relAccel = -0.5f * relOmega * invTimestep;
+	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+}
+
+
+/*
 CustomGearAndSlide::CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent)
 	:CustomGear(2, child, parent)
 	,m_slideRatio (slideRatio)
@@ -244,3 +347,4 @@ void CustomGearAndSlide::GetInfo (NewtonJointRecord* const info) const
 {
 	dAssert(0);
 }
+*/

@@ -43,6 +43,26 @@ class CustomGear: public CustomJoint
 	DECLARE_CUSTON_JOINT(CustomGear, CustomJoint)
 };
 
+class CustomSatelliteGear: public CustomGear
+{
+	public:
+	CUSTOM_JOINTS_API CustomSatelliteGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent, NewtonBody* const referenceBody, dFloat salleliteSide);
+
+	protected:
+	CUSTOM_JOINTS_API CustomSatelliteGear(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+
+	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
+
+	dMatrix m_referenceLocalMatrix;
+	NewtonBody* m_referenceBody;
+	dFloat m_salleliteSide;
+	DECLARE_CUSTON_JOINT(CustomSatelliteGear, CustomGear)
+};
+
+
+/*
 class CustomGearAndSlide: public CustomGear
 {
 	public:
@@ -59,7 +79,7 @@ class CustomGearAndSlide: public CustomGear
 	dFloat m_slideRatio;
 	DECLARE_CUSTON_JOINT(CustomGearAndSlide, CustomGear)
 };
-
+*/
 
 #endif 
 
