@@ -40,7 +40,7 @@ struct ARTICULATED_VEHICLE_DEFINITION
 	char m_boneName[32];
 	char m_shapeTypeName[32];
 	dFloat m_mass;
-	int m_bodyPartID;
+	int m_bodyPartID____;
 	char m_articulationName[32];
 };
 
@@ -56,8 +56,8 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 	{"lift_2",		"convexHull",			 40.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_3",		"convexHull",			 30.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
 	{"lift_4",		"convexHull",			 20.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "liftActuator"},
-//	{"left_teeth",  "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
-//	{"right_teeth", "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"left_teeth",  "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
+	{"right_teeth", "convexHullAggregate",	 10.0f, ARTICULATED_VEHICLE_DEFINITION::m_bodyPart, "paletteActuator"},
 };
 
 class ArticulatedEntityModel: public DemoEntity
@@ -657,8 +657,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// save the user data with the bone body (usually the visual geometry)
 		NewtonBodySetUserData(body, bodyPart);
 
-		//NewtonBodySetMaterialGroupID (body, m_material);
-		NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
+		// assigne a body part id
+		NewtonCollisionSetUserID(collision, definition.m_bodyPartID____);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback (body, PhysicsApplyGravityForce);
@@ -827,7 +827,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_shapeTypeName, "tireShape");
 		strcpy(definition.m_articulationName, tireName);
 		definition.m_mass = 30.0f;
-		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_tireID;
+		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_tireID;
 
 		NewtonBody* const parentBody = parentBone->m_body;
 		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
@@ -856,7 +856,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBodySetUserData(tireBody, tireModel);
 
 		//NewtonBodySetMaterialGroupID (body, m_material);
-		NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
+		NewtonCollisionSetUserID(collision, definition.m_bodyPartID____);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback(tireBody, PhysicsApplyGravityForce);
@@ -1188,7 +1188,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, name);
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 10.0f;
-		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, name);
 		NewtonBody* const boomBody = CreateBodyPart(boom, definition);
 
@@ -1218,7 +1218,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, name);
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 10.0f;
-		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, name);
 		NewtonBody* const paletteBody = CreateBodyPart(palette, definition);
 
@@ -1247,7 +1247,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, "effector");
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 10.0f;
-		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, "effector");
 		NewtonBody* const wristBody = CreateBodyPart(wrist, definition);
 
@@ -1278,7 +1278,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, "Boom1");
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 10.0f;
-		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, "Boom1");
 		NewtonBody* const boomBody = CreateBodyPart(boom, definition);
 
@@ -1308,7 +1308,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy(definition.m_boneName, "base");
 		strcpy(definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 30.0f;
-		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy(definition.m_articulationName, "base");
 		NewtonBody* const baseBody = CreateBodyPart(base, definition);
 
@@ -1347,7 +1347,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy (definition.m_boneName, "body");
 		strcpy (definition.m_shapeTypeName, "convexHull");
 		definition.m_mass = 800.0f;
-		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		definition.m_bodyPartID____ = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy (definition.m_articulationName, "mainBody");
 		NewtonBody* const chassis = CreateBodyPart (vehicleModel, definition);
 
@@ -1620,8 +1620,8 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
-	CustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
-	inputManager->AddPlayer (robot);
+//	CustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
+//	inputManager->AddPlayer (robot);
 
 	matrix.m_posit.m_z += 4.0f;
 	// load a the mesh of the articulate vehicle

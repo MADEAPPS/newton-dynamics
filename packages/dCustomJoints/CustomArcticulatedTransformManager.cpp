@@ -175,6 +175,7 @@ void CustomArticulatedTransformController::SetDefaultSelfCollisionMask ()
 
 void CustomArticulatedTransformController::DisableAllSelfCollision ()
 {
+	NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
 	for (int i = 0; i < m_boneCount; i ++) {
 		for (int j = i + 1; j < m_boneCount; j ++) {
 			SetSelfCollisionMask (&m_bones[i], &m_bones[j], false);
