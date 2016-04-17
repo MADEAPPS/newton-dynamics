@@ -113,6 +113,7 @@ typedef long long unsigned64;
 	#pragma warning (disable: 4505) //unreferenced local function has been removed
 	#pragma warning (disable: 4201) //nonstandard extension used : nameless struct/union
 	#pragma warning (disable: 4127) //conditional expression is constant
+	#pragma warning (disable: 4456) //declaration of 'bone' hides previous local declaration
 
 	#if (_MSC_VER >= 1400)
 		#pragma warning (disable: 4996) // for 2005 users declared deprecated
