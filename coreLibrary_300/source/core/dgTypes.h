@@ -22,6 +22,10 @@
 #ifndef __DGTYPES_H__
 #define __DGTYPES_H__
 
+#if (defined(__APPLE__) && !defined(_MACOSX_VER))
+    #define _MACOSX_VER
+#endif
+
 #ifdef _MSC_VER 
 	#ifdef _M_X64
 		#ifndef _WIN_64_VER
