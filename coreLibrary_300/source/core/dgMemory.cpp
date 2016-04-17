@@ -26,7 +26,7 @@
 
 
 #ifdef _DEBUG
-dgInt32 m_threadSanityCheck = 0;
+static dgInt32 m_threadSanityCheck = 0;
 #define DG_MEMORY_THREAD_SANITY_CHECK_LOCK()		\
 	dgAssert (!m_threadSanityCheck);				\
 	dgAtomicExchangeAndAdd(&m_threadSanityCheck, 1);
@@ -506,8 +506,6 @@ void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator)
 
 	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 	return ptr;
-
-	
 }
 
 

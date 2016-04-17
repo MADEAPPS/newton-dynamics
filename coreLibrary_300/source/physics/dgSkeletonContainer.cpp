@@ -216,6 +216,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 
 	DG_INLINE void InitKinematicMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 correctionFactor)
 	{
+		dgAssert (0);
 		dgAssert((dgUnsigned64(&m_bodyMass) & 0x0f) == 0);
 		m_bodyMass.SetZero();
 		m_bodyForce.SetZero();
@@ -235,7 +236,8 @@ class dgSkeletonContainer::dgSkeletonGraph
 			const dgInt32 first = jointInfo->m_pairStart;
 			for (dgInt32 i = 0; i < count; i++) {
 				const dgJacobianMatrixElement* const row = &matrixRow[i + first];
-				if (row->m_applyCorrection) {
+				//if (row->m_applyCorrection) 
+				{
 					m_jointForce[m_dof] = -dgClamp(row->m_penetration * correctionFactor, dgFloat32(-0.25f), dgFloat32(0.25f));
 					m_sourceJacobianIndex[m_dof] = dgInt8(i);
 					m_dof++;

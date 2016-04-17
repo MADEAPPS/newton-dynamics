@@ -42,6 +42,12 @@ class CustomUniversal: public CustomJoint
 	CUSTOM_JOINTS_API void EnableMotor_0(bool state);
 	CUSTOM_JOINTS_API void EnableMotor_1(bool state);
 
+	CUSTOM_JOINTS_API void SetAccel_0(dFloat accel);
+	CUSTOM_JOINTS_API void SetDamp_0(dFloat damp);
+
+	CUSTOM_JOINTS_API void SetAccel_1(dFloat accel);
+	CUSTOM_JOINTS_API void SetDamp_1(dFloat damp);
+
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;

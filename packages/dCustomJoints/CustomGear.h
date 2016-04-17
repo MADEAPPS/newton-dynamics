@@ -29,7 +29,6 @@ class CustomGear: public CustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API CustomGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent);
-	CUSTOM_JOINTS_API CustomGear(int dof, NewtonBody* const child, NewtonBody* const parent);
 	CUSTOM_JOINTS_API virtual ~CustomGear();
 
 	protected:
@@ -46,40 +45,21 @@ class CustomGear: public CustomJoint
 class CustomSatelliteGear: public CustomGear
 {
 	public:
-	CUSTOM_JOINTS_API CustomSatelliteGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent, NewtonBody* const referenceBody, dFloat salleliteSide);
+	CUSTOM_JOINTS_API CustomSatelliteGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference);
 
 	protected:
-	CUSTOM_JOINTS_API CustomSatelliteGear(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
-
-	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
-
-	dMatrix m_referenceLocalMatrix;
-	NewtonBody* m_referenceBody;
-	dFloat m_salleliteSide;
-	DECLARE_CUSTON_JOINT(CustomSatelliteGear, CustomGear)
-};
-
-
-/*
-class CustomGearAndSlide: public CustomGear
-{
-	public:
-	CUSTOM_JOINTS_API CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
-	CUSTOM_JOINTS_API virtual ~CustomGearAndSlide();
-
-	protected:
-	CUSTOM_JOINTS_API CustomGearAndSlide (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API CustomSatelliteGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
+	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
-	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
+	DECLARE_CUSTON_JOINT(CustomSatelliteGear, CustomGear)
 
-	dFloat m_slideRatio;
-	DECLARE_CUSTON_JOINT(CustomGearAndSlide, CustomGear)
+	dVector m_pintOnReference;
+	NewtonBody* m_parentReference;
 };
-*/
+
+
+
 
 #endif 
 

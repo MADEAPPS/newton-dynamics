@@ -143,8 +143,6 @@ class ArticulatedEntityModel: public DemoEntity
 		,m_steeringTorque(0.0f)
 		,m_wristAxis0(0.0f)
 		,m_wristAxis1(0.0f)
-//		,m_engineLeftTire(NULL)
-//		,m_engineRightTire(NULL)
 		,m_engineJoint(NULL)
 	{
 	}
@@ -243,6 +241,8 @@ class ArticulatedEntityModel: public DemoEntity
 	int m_paletteActuatorsCount;
 	dFloat m_maxEngineTorque;
 	dFloat m_omegaResistance;
+	dFloat m_maxTurmDamp;
+	dFloat m_maxTurmAccel;
 	dFloat m_maxEngineSpeed;
 	dFloat m_maxTurnSpeed;
 	dFloat m_turnAngle;
@@ -261,7 +261,7 @@ class ArticulatedEntityModel: public DemoEntity
 	CustomHingeActuator* m_angularActuator1[4];
 	CustomUniversalActuator* m_rearTireJoints[4];
 	CustomUniversalActuator* m_universalActuator[4];
-	CustomJoint* m_engineJoint;
+	CustomUniversal* m_engineJoint;
 
 	InputRecord m_inputs;
 };
@@ -281,77 +281,50 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 	virtual void OnPreUpdate (CustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
+//xxxxxxxx
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
 
-static int xxxx;
-		// IMPORTANT NOTE!!!  remember unify the engine for both models
-		// apply robot engine torque 
-//		if (vehicleModel->m_engineLeftTire && vehicleModel->m_engineRightTire) 
-		{
-/*
-			dAssert (0);
-			dFloat speed = 0.0f; 
+		if (vehicleModel->m_engineJoint) {
+			dFloat brakeTorque = 2000.0f;
+			dFloat engineTorque = 0.0f;
 			if (vehicleModel->m_inputs.m_throttleValue > 0) {
-				speed = vehicleModel->m_maxEngineSpeed;
+				brakeTorque = 0.0f;
+				engineTorque = -vehicleModel->m_maxEngineTorque; 
 			} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
-				speed = -vehicleModel->m_maxEngineSpeed;
+				brakeTorque = 0.0f;
+				engineTorque = vehicleModel->m_maxEngineTorque; 
 			}
-			vehicleModel->m_engineLeftTire->m_velocity = speed; 
-			vehicleModel->m_engineRightTire->m_velocity = speed; 
 
-			if (vehicleModel->m_inputs.m_steerValue > 0) {
-				vehicleModel->m_engineLeftTire->m_velocity += vehicleModel->m_maxTurnSpeed;
-				vehicleModel->m_engineRightTire->m_velocity -= vehicleModel->m_maxTurnSpeed;
-			} else if (vehicleModel->m_inputs.m_steerValue < 0) {
-				vehicleModel->m_engineLeftTire->m_velocity -= vehicleModel->m_maxTurnSpeed;
-				vehicleModel->m_engineRightTire->m_velocity += vehicleModel->m_maxTurnSpeed;
-			}
-		} else {
-*/
-			// apply forklift engine torque 
-//			if (vehicleModel->m_frontTiresCount) {
-			if (vehicleModel->m_engineJoint) {
-
-				dFloat brakeTorque = 0.0f;
-				dFloat engineTorque = 0.0f;
-				if (vehicleModel->m_inputs.m_throttleValue > 0) {
-					engineTorque = -vehicleModel->m_maxEngineTorque; 
-				} else if (vehicleModel->m_inputs.m_throttleValue < 0) {
-					engineTorque = vehicleModel->m_maxEngineTorque; 
+			// apply DC engine torque
+			dMatrix chassisMatrix;
+			dVector engineOmega(0.0f);
+			NewtonBody* const engineBody = vehicleModel->m_engineJoint->GetBody0();
+			NewtonBody* const chassisBody = vehicleModel->m_engineJoint->GetBody1();
+			NewtonBodyGetOmega(engineBody, &engineOmega[0]);
+			NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+			chassisMatrix = vehicleModel->m_engineJoint->GetMatrix1() * chassisMatrix;
+			engineTorque -= (engineOmega % chassisMatrix.m_up) * vehicleModel->m_omegaResistance;
+			dVector torque (chassisMatrix.m_up.Scale(engineTorque));
+			NewtonBodyAddTorque (engineBody, &torque[0]);
+			
+			if (!vehicleModel->m_rearTiresCount) {
+				// apply DC rate turn Motor 
+				if (vehicleModel->m_inputs.m_steerValue > 0) {
+					brakeTorque = 0.0f;
+					vehicleModel->m_engineJoint->EnableMotor_0(true);
+					vehicleModel->m_engineJoint->SetAccel_0(vehicleModel->m_maxTurmAccel);
+				} else if (vehicleModel->m_inputs.m_steerValue < 0){
+					brakeTorque = 0.0f;
+					vehicleModel->m_engineJoint->EnableMotor_0(true);
+					vehicleModel->m_engineJoint->SetAccel_0(-vehicleModel->m_maxTurmAccel);
 				} else {
-					brakeTorque = 2000.0f;
+					vehicleModel->m_engineJoint->EnableMotor_0(false);
 				}
+			}
 
-if (xxxx> 400)
-engineTorque = vehicleModel->m_maxEngineTorque; 
-xxxx ++;
-
-				// apply DC engine torque
-				dMatrix matrix;
-				dVector omega(0.0f);
-				NewtonBody* const engineBody = vehicleModel->m_engineJoint->GetBody0();
-				NewtonBodyGetOmega(engineBody, &omega[0]);
-				NewtonBodyGetMatrix(engineBody, &matrix[0][0]);
-				matrix = vehicleModel->m_engineJoint->GetMatrix0() * matrix;
-				engineTorque -= omega % matrix.m_front;
-				dVector torque (matrix.m_front.Scale(engineTorque));
-//				NewtonBodyAddTorque (engineBody, &torque[0]);
-
-NewtonBody* const chassis = vehicleModel->m_engineJoint->GetBody1();
-NewtonBodyGetMatrix(chassis, &matrix[0][0]);
-matrix = vehicleModel->m_engineJoint->GetMatrix1() * matrix;
-dVector torque1 (matrix.m_up.Scale(engineTorque * 2.0f));
-omega = matrix.m_up.Scale (10.0f); 
-NewtonBodyAddTorque (engineBody, &torque1[0]);
-NewtonBodySetOmega (engineBody, &omega[0]);
-//NewtonBodyAddTorque (engineBody, &torque1[0]);
-NewtonBodySetSleepState(engineBody, false);
-NewtonBodySetSleepState(chassis, false);
-
-				// apply breaks
-				for (int i = 0; i < vehicleModel->m_tractionTiresCount; i ++) {
-//					vehicleModel->m_tractionTiresJoints[i]->SetFriction(brakeTorque);
-				}
+			// apply breaks
+			for (int i = 0; i < vehicleModel->m_tractionTiresCount; i ++) {
+				vehicleModel->m_tractionTiresJoints[i]->SetFriction(brakeTorque);
 			}
 		}
 
@@ -367,7 +340,6 @@ NewtonBodySetSleepState(chassis, false);
 				vehicleModel->m_rearTireJoints[i]->SetTargetAngle1(steeringAngle);
 			}
 		}
-
 
 		// set the base turn angle
 		if (vehicleModel->m_angularActuatorsCount1) {
@@ -386,7 +358,6 @@ NewtonBodySetSleepState(chassis, false);
 			}
 		}
 
-
 		// set the tilt angle
 		if (vehicleModel->m_angularActuatorsCount0) {
 			dFloat tiltAngle = vehicleModel->m_tiltAngle;
@@ -402,7 +373,6 @@ NewtonBodySetSleepState(chassis, false);
 				vehicleModel->m_angularActuator0[i]->SetTargetAngle (tiltAngle);
 			}
 		}
-
 
 		// set the lift position
 		if (vehicleModel->m_liftActuatorsCount) {
@@ -511,7 +481,6 @@ NewtonBodySetSleepState(chassis, false);
 				NewtonContactJointRemoveContact(contactJoint, contactList[i]);
 			}
 
-
 			dMatrix tireMatrix;
 			dMatrix chassisMatrix;
 			NewtonBodyGetMatrix(linkBody, &tireMatrix[0][0]);
@@ -554,7 +523,6 @@ NewtonBodySetSleepState(chassis, false);
 		}
 	}
 	
-
 	virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
@@ -661,37 +629,49 @@ NewtonBodySetSleepState(chassis, false);
 		return body;
 	}
 
-	CustomJoint* CreateEngineBodyPart(NewtonBody* const chassis)
+	CustomUniversal* CreateEngineBodyPart(NewtonBody* const chassis)
 	{
 		NewtonWorld* const world = GetWorld();
+//		NewtonCollision* shape = NewtonCreateSphere (world, 0.5f, 0, NULL);
 		NewtonCollision* shape = NewtonCreateCylinder (world, 0.5f, 0.5f, 2.0f, 0, NULL);
 
 		// create the rigid body that will make this bone
-		dMatrix matrix;
-		NewtonBodyGetMatrix(chassis, &matrix[0][0]);
-		matrix = dPitchMatrix(-0.5f * 3.1416f) * dYawMatrix(0.5f * 3.1416f) * matrix;
-		matrix.m_posit.m_y += 3.0f;
-		matrix.m_posit.m_x -= 1.0f;
-		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+		dMatrix engineMatrix;
+		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
+		engineMatrix = dRollMatrix(0.5f * 3.1416f) * engineMatrix;
+engineMatrix.m_posit.m_y += 3.0f;
+engineMatrix.m_posit.m_x -= 1.0f;
+
+		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
 
 		// destroy the collision helper shape 
 		NewtonDestroyCollision(shape);
 
 		// get the collision from body
 		NewtonCollision* const collision = NewtonBodyGetCollision(engineBody);
+		NewtonCollisionSetMode (collision, 0);
 
 		// calculate the moment of inertia and the relative center of mass of the solid
-		NewtonBodySetMassProperties(engineBody, 50.0f, collision);
+		//NewtonBodySetMassProperties(engineBody, 50.0f, collision);
+		dFloat mass = 50.0f;
+		dFloat radius = 1.0f;
+		dFloat Inertia = 2.0f * mass * radius * radius / 5.0f;
+		NewtonBodySetMassMatrix (engineBody, mass, Inertia, Inertia, Inertia);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback(engineBody, PhysicsApplyGravityForce);
 
 		// connect engine to chassis with a hinge
-//		new CustomHinge(matrix, chassis, body);
-		CustomUniversal* const attachement = new CustomUniversal(matrix, engineBody, chassis);
-		attachement->EnableLimit_0(false);
-		attachement->EnableLimit_1(false);
-		return attachement;
+		dMatrix engineAxis;
+		engineAxis.m_front = engineMatrix.m_front;
+		engineAxis.m_up = engineMatrix.m_right;
+		engineAxis.m_right = engineAxis.m_front * engineAxis.m_up;
+		engineAxis.m_posit = engineMatrix.m_posit;
+
+		CustomUniversal* const engineJoint = new CustomUniversal(engineAxis, engineBody, chassis);
+		engineJoint->EnableLimit_0(false);
+		engineJoint->EnableLimit_1(false);
+		return engineJoint;
 	}
 
 
@@ -748,6 +728,9 @@ NewtonBodySetSleepState(chassis, false);
 		dFloat maxOmega = 20.0f;
 		vehicleModel->m_maxEngineTorque = 200.0f;
 		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
+
+		vehicleModel->m_maxTurmDamp = 0.0f;
+		vehicleModel->m_maxTurmAccel = 0.0f;
 
 		// for debugging joints
 		//NewtonBodySetMassMatrix(rootBody, 0,0,0,0);
@@ -901,36 +884,35 @@ NewtonBodySetSleepState(chassis, false);
 		return bone;
 	}
 
-
 	CustomArticulatedTransformController::dSkeletonBone* MakeTractionTire(const char* const entName, const char* const tireName, CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const parentBone)
 	{
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
 		CustomArticulatedTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone);
-//xxxxxxxxxx
+
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
-		dMatrix hingeFrame(dRollMatrix(90.0f * 3.141592f / 180.0f) * matrix);
+		dMatrix tireHingeMatrix(dRollMatrix(90.0f * 3.141592f / 180.0f) * matrix);
 
 		// save tractions tires 
 		vehicleModel->m_tractionTires[vehicleModel->m_tractionTiresCount] = bone->m_body;
-		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount] = new CustomHinge(hingeFrame, bone->m_body, parentBone->m_body);
+		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount] = new CustomHinge(tireHingeMatrix, bone->m_body, parentBone->m_body);
 		vehicleModel->m_tractionTiresCount ++;
-
 
 		// link traction tire to the engine using a differential gear
 		dMatrix tireMatrix;
 		dMatrix chassisMatrix;
-		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		NewtonBody* const tire = bone->m_body;
+		NewtonBody* const engine = vehicleModel->m_engineJoint->GetBody0();
+		NewtonBody* const chassis = vehicleModel->m_engineJoint->GetBody1();
 		NewtonBodyGetMatrix(bone->m_body, &tireMatrix[0][0]);
-		NewtonBodyGetMatrix(chassisBone->m_body, &chassisMatrix[0][0]);
+		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
+		chassisMatrix = vehicleModel->m_engineJoint->GetMatrix1() * chassisMatrix;
 
-		dVector tireLocalPosit (chassisMatrix.UntransformVector(tireMatrix.m_posit));
-		dFloat side = (tireLocalPosit.m_z > 0.0f) ? 1.0f : -1.0f;
+		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit) % chassisMatrix.m_up;
+		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
+		new CustomSatelliteGear(5.0f, tireHingeMatrix.m_front, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
 
-		chassisMatrix = dYawMatrix(90.0f * 3.141592f / 180.0f) * chassisMatrix;
-		chassisMatrix.m_posit = tireMatrix.m_posit;
-		new CustomSatelliteGear(5.0f, chassisMatrix.m_front, chassisMatrix.m_front, bone->m_body, vehicleModel->m_engineJoint->GetBody0(), vehicleModel->m_engineJoint->GetBody1(), side);
 		return bone;
 	}
 
@@ -970,7 +952,6 @@ NewtonBodySetSleepState(chassis, false);
 			sprintf(name, "leftTire_%d", i);
 			CustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
 			LinkTires (leftTire_0, childBone, chassisBone);
-break;
 		}
 	}
 
@@ -990,7 +971,6 @@ break;
 			sprintf(name, "rightTire_%d", i);
 			CustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
 			LinkTires(rightTire_0, childBone, chassisBone);
-break;
 		}
 	}
 		
@@ -1186,7 +1166,6 @@ break;
 		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
 	}
 	
-
 	CustomArticulatedTransformController::dSkeletonBone* AddCraneBoom(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone, const char* name)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
@@ -1215,7 +1194,6 @@ break;
 		return boomBone;
 	}
 
-
 	void AddCranekPaletteActuator(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone, const char* const name)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
@@ -1243,7 +1221,6 @@ break;
 		vehicleModel->m_paletteActuatorsCount++;
 		controller->AddBone(paletteBody, dGetIdentityMatrix(), baseBone);
 	}
-
 
 	void AddCraneWrist(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone)
 	{
@@ -1274,7 +1251,6 @@ break;
 		AddCranekPaletteActuator (controller, wristBone, "leftHand");
 		AddCranekPaletteActuator (controller, wristBone, "rightHand");
 	}
-
 
 	void AddCraneLift(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone)
 	{
@@ -1364,9 +1340,12 @@ break;
 		vehicleModel->m_engineJoint = CreateEngineBodyPart(chassis);
 
 		// set power parameter for a simple DC engine
-		dFloat maxOmega = 40.0f;
-		vehicleModel->m_maxEngineTorque = 400.0f;
-		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
+		dFloat maxOmega = 80.0f;
+		vehicleModel->m_maxEngineTorque = 350.0f;
+		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
+
+		vehicleModel->m_maxTurmAccel = 10.0f;
+		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
 
 		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
 		NewtonCompoundCollisionBeginAddRemove(compound);
@@ -1468,10 +1447,6 @@ class AriculatedJointInputManager: public CustomInputManager
 			NewtonBodySetSleepState(body, false);
 		}
 
-//NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetBoneBody(0);
-//NewtonBodySetSleepState(body, false);
-
-
 #if 0
 	#if 0
 			static FILE* file = fopen ("log.bin", "wb");
@@ -1558,8 +1533,6 @@ class AriculatedJointInputManager: public CustomInputManager
 	int m_currentPlayer;
 };
 
-
-
 static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity& entity, const dVector& location)
 {
 	dTree<NewtonCollision*, DemoMesh*> filter;
@@ -1614,8 +1587,6 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 		filter.Remove(filter.GetRoot());
 	}
 }
-
-
 
 void ArticulatedJoints (DemoEntityManager* const scene)
 {

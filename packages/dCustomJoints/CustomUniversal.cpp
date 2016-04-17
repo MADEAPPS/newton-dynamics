@@ -137,6 +137,28 @@ void CustomUniversal::EnableMotor_1(bool state)
 	m_angularMotor_1_On = state;
 }
 
+void CustomUniversal::SetAccel_0(dFloat accel)
+{
+	m_angularAccel_0 = accel;
+}
+
+void CustomUniversal::SetDamp_0(dFloat damp)
+{
+	m_angularDamp_0 = damp;
+}
+
+
+void CustomUniversal::SetAccel_1(dFloat accel)
+{
+	m_angularAccel_1 = accel;
+}
+
+void CustomUniversal::SetDamp_1(dFloat damp)
+{
+	m_angularDamp_1 = damp;
+}
+
+
 
 void CustomUniversal::SetLimis_0(dFloat minAngle, dFloat maxAngle)
 {
