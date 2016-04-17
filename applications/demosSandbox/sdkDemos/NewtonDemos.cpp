@@ -349,7 +349,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_showStatistics = true;
 //*/
 //m_hideVisualMeshes = true;
-m_debugDisplayMode = 2;
+//m_debugDisplayMode = 2;
 //m_showContactPoints = true;
 //SetDebugDisplayMode (m_debugDisplayMode);
 //m_showNormalForces = true;

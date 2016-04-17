@@ -632,15 +632,15 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	CustomUniversal* CreateEngineBodyPart(NewtonBody* const chassis)
 	{
 		NewtonWorld* const world = GetWorld();
-//		NewtonCollision* shape = NewtonCreateSphere (world, 0.5f, 0, NULL);
-		NewtonCollision* shape = NewtonCreateCylinder (world, 0.5f, 0.5f, 2.0f, 0, NULL);
+		NewtonCollision* shape = NewtonCreateSphere (world, 0.5f, 0, NULL);
+//		NewtonCollision* shape = NewtonCreateCylinder (world, 0.5f, 0.5f, 2.0f, 0, NULL);
 
 		// create the rigid body that will make this bone
 		dMatrix engineMatrix;
 		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
 		engineMatrix = dRollMatrix(0.5f * 3.1416f) * engineMatrix;
-engineMatrix.m_posit.m_y += 3.0f;
-engineMatrix.m_posit.m_x -= 1.0f;
+//engineMatrix.m_posit.m_y += 3.0f;
+//engineMatrix.m_posit.m_x -= 1.0f;
 
 		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
 
@@ -725,8 +725,8 @@ engineMatrix.m_posit.m_x -= 1.0f;
 		vehicleModel->m_engineJoint = CreateEngineBodyPart(rootBody);
 
 		// set power parameter for a simple DC engine
-		dFloat maxOmega = 20.0f;
-		vehicleModel->m_maxEngineTorque = 200.0f;
+		dFloat maxOmega = 40.0f;
+		vehicleModel->m_maxEngineTorque = -400.0f;
 		vehicleModel->m_omegaResistance = 1.0f / maxOmega;
 
 		vehicleModel->m_maxTurmDamp = 0.0f;
@@ -1340,8 +1340,8 @@ engineMatrix.m_posit.m_x -= 1.0f;
 		vehicleModel->m_engineJoint = CreateEngineBodyPart(chassis);
 
 		// set power parameter for a simple DC engine
-		dFloat maxOmega = 80.0f;
-		vehicleModel->m_maxEngineTorque = 350.0f;
+		dFloat maxOmega = 100.0f;
+		vehicleModel->m_maxEngineTorque = 1250.0f;
 		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
 
 		vehicleModel->m_maxTurmAccel = 10.0f;
@@ -1371,9 +1371,9 @@ engineMatrix.m_posit.m_x -= 1.0f;
 
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
-//		MakeLeftThread(controller);
-//		MakeRightThread(controller);
-//		AddCraneBase (controller);
+		MakeLeftThread(controller);
+		MakeRightThread(controller);
+		AddCraneBase (controller);
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
@@ -1615,9 +1615,9 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_z += 4.0f;
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
-//	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
-//	inputManager->AddPlayer(forklift);
-/*
+	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
+	inputManager->AddPlayer(forklift);
+
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);
 	entity.LoadNGD_mesh ("lumber.ngd", scene->GetNewton());
@@ -1627,7 +1627,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 20.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 20.0f, 0.0f));
-*/
+
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
