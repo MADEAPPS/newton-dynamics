@@ -347,8 +347,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			if (vehicleModel->m_inputs.m_turnValue > 0) {
 				turnAngle = vehicleModel->m_angularActuator1[0]->GetMinAngularLimit();
 				vehicleModel->m_turnAngle = vehicleModel->m_angularActuator1[0]->GetActuatorAngle();
-			}
-			else if (vehicleModel->m_inputs.m_turnValue < 0) {
+			} else if (vehicleModel->m_inputs.m_turnValue < 0) {
 				turnAngle = vehicleModel->m_angularActuator1[0]->GetMaxAngularLimit();
 				vehicleModel->m_turnAngle = vehicleModel->m_angularActuator1[0]->GetActuatorAngle();
 			}
