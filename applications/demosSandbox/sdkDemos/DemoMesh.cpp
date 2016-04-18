@@ -191,14 +191,17 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 	matrix = (matrix.Inverse4x4()).Transpose();
 	matrix.TransformTriplex(m_normal, 3 * sizeof (dFloat), m_normal, 3 * sizeof (dFloat), m_vertexCount);
 
+	bool hasModifiers = false;
 	dTree<dScene::dTreeNode*, dCRCTYPE> materialMap;
 	for (void* ptr = scene->GetFirstChildLink(meshNode); ptr; ptr = scene->GetNextChildLink (meshNode, ptr)) {
-		dScene::dTreeNode* node = scene->GetNodeFromLink(ptr);
-		dNodeInfo* info = scene->GetInfoFromNode(node);
+		dScene::dTreeNode* const node = scene->GetNodeFromLink(ptr);
+		dNodeInfo* const info = scene->GetInfoFromNode(node);
 		if (info->GetTypeId() == dMaterialNodeInfo::GetRttiType()) {
 			dMaterialNodeInfo* const material = (dMaterialNodeInfo*)info;
 			dCRCTYPE id = material->GetId();
 			materialMap.Insert(node, id);
+		} else if (info->IsType(dGeometryNodeModifierInfo::GetRttiType())) {
+			hasModifiers = true;
 		}
 	}
 
@@ -239,8 +242,10 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 	}
 	NewtonMeshEndHandle (mesh, meshCookie); 
 
-	// see if this mesh can be optimized
-	OptimizeForRender ();
+	if (!hasModifiers) {
+		// see if this mesh can be optimized
+		OptimizeForRender ();
+	}
 }
 
 DemoMesh::DemoMesh(NewtonMesh* const mesh)
