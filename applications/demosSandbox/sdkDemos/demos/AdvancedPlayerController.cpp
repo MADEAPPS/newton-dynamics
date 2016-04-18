@@ -225,7 +225,29 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 
 	virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
 	{
-		count = CustomPlayerControllerManager::ProcessContacts (controller, contacts, count); 
+		// here you need to process the contact and reject the one you do not need.
+		//there are different ways to do this:
+		// 1-by assigning a collision ID to the colliding shape in the contact
+		// 2-by using the material system 
+		// 3-by getting the user data from the shape or from the body and using any labeling system of the client application 
+		// 4- by using any king of heuristic
+		// if a contact is rejected then the [alway body will client with the object in the background and the collision system will take place 
+		// for simplicity I will use the heuristic that I will let the  
+
+		int newCount = count;
+		for (int i = count - 1; i >= 0; i --) {
+			const NewtonBody* const hitBody = contacts[i].m_hitBody;
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+			NewtonBodyGetMassMatrix(hitBody, &mass, &Ixx, &Iyy, &Izz);
+			if (mass > 0.0f) {
+				contacts[i] = contacts[newCount - 1];
+				newCount --;
+			}
+		}
+		count = CustomPlayerControllerManager::ProcessContacts (controller, contacts, newCount); 
 		return count;
 	}
 };
@@ -260,7 +282,8 @@ class AdvancedPlayerInputManager: public CustomInputManager
 
 		PrimitiveType type = PrimitiveType (dRand() % (sizeof (proSelection) / sizeof (proSelection[0])));
 
-		dVector size (0.35f, 0.25f, 0.25f, 0.0f);
+		//dVector size (0.35f, 0.25f, 0.25f, 0.0f);
+		dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, type, 0);
 		DemoMesh* const geometry = new DemoMesh("prop", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
@@ -1067,10 +1090,6 @@ void AdvancedPlayerController (DemoEntityManager* const scene)
 	dQuaternion rot;
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
-
-
-	// configure Game Logic AI agent
-//	new AIAgentGameLogic (scene, playerAgent);
 
 //	AddBoxes(system, 10.0f, location, size, 3, 3, 10.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddBoxes(system, 10.0f, location, size, 3, 3, 10.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
