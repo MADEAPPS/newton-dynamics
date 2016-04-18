@@ -73,15 +73,15 @@ void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 	// calculate the angular velocity for both bodies
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
-	const dVector& dir0 = matrix0.m_right;
+	dVector dir0 (matrix0.m_front.Scale (m_gearRatio));
 	const dVector& dir1 = matrix1.m_front;
-	dVector dir0Cross(matrix0.m_up * dir0.Scale(m_gearRatio));
-	jacobian0[0] = dir0.m_x;
-	jacobian0[1] = dir0.m_y;
-	jacobian0[2] = dir0.m_z;
-	jacobian0[3] = dir0Cross.m_x;
-	jacobian0[4] = dir0Cross.m_y;
-	jacobian0[5] = dir0Cross.m_z;
+
+	jacobian0[0] = dFloat(0.0f);
+	jacobian0[1] = dFloat(0.0f);
+	jacobian0[2] = dFloat(0.0f);
+	jacobian0[3] = dir0.m_x;
+	jacobian0[4] = dir0.m_y;
+	jacobian0[5] = dir0.m_z;
 
 	jacobian1[0] = dir1.m_x;
 	jacobian1[1] = dir1.m_y;
@@ -90,7 +90,7 @@ void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 	jacobian1[4] = dFloat(0.0f);
 	jacobian1[5] = dFloat(0.0f);
 
-	dFloat w0 = omega0 % dir0Cross;
+	dFloat w0 = omega0 % dir0;
 	dFloat w1 = veloc1 % dir1;
 	dFloat relOmega = w0 + w1;
 	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
