@@ -189,19 +189,20 @@ void dGeometryNodeSkinModifierInfo::Serialize (TiXmlElement* const rootNode) con
 	rootNode->LinkEndChild(vertexCount);
 	vertexCount->SetAttribute("count", m_vertexCount);
 
+	int size0 = sizeof (dMatrix) * m_boneCount / sizeof (dFloat);
+	int size1 = sizeof (dVector) * m_vertexCount / sizeof (dFloat);
+	int bufferSizeInBytes = dMax (size0, size1) * 10;
+	char* const buffer = new char[bufferSizeInBytes];
+
 	TiXmlElement* const matrix = new TiXmlElement ("bindingMatrix");
 	rootNode->LinkEndChild(matrix);
-	char matrixText[1024];
-	dFloatArrayToString (&m_shapeBindMatrix[0][0], 16, matrixText, sizeof (matrixText));
-	matrix->SetAttribute("float16", matrixText);
-
-	int bufferSize = (m_boneCount * sizeof (dFloat) * 16 + m_vertexCount * sizeof (dFloat) * 4) * 7;
-	char* const buffer = new char[(m_boneCount * sizeof (dFloat) * 16 + m_vertexCount * sizeof (dFloat) * 4) * 7];
+	dFloatArrayToString (&m_shapeBindMatrix[0][0], 16, buffer, bufferSizeInBytes);
+	matrix->SetAttribute("float16", buffer);
 
 	TiXmlElement* const bindMatrices = new TiXmlElement ("bonesBindMatrices");
 	rootNode->LinkEndChild(bindMatrices);
 
-	dFloatArrayToString (&m_shapeBindMatrix[0][0], m_boneCount * 16, buffer, bufferSize);
+	dFloatArrayToString (&m_boneBindingMatrix[0][0][0], size0, buffer, bufferSizeInBytes);
 	bindMatrices->SetAttribute("count", m_boneCount);
 	bindMatrices->SetAttribute("float16", buffer);
 
@@ -236,17 +237,17 @@ void dGeometryNodeSkinModifierInfo::Serialize (TiXmlElement* const rootNode) con
 
 	TiXmlElement* const vIndices = new TiXmlElement ("vertexIndices");
 	vertexWeight->LinkEndChild(vIndices);
-	dIntArrayToString (vertexIndex, weightCount, buffer, bufferSize);
+	dIntArrayToString (vertexIndex, weightCount, buffer, bufferSizeInBytes);
 	vIndices->SetAttribute("indices", buffer);
 
 	TiXmlElement* const bIndices = new TiXmlElement ("boneIndices");
 	vertexWeight->LinkEndChild(bIndices);
-	dIntArrayToString (boneIndex, weightCount, buffer, bufferSize);
+	dIntArrayToString (boneIndex, weightCount, buffer, bufferSizeInBytes);
 	bIndices->SetAttribute("indices", buffer);
 
 	TiXmlElement* const vWeights = new TiXmlElement ("weights");
 	vertexWeight->LinkEndChild(vWeights);
-	dFloatArrayToString (weights, weightCount, buffer, bufferSize);
+	dFloatArrayToString (weights, weightCount, buffer, bufferSizeInBytes);
 	vWeights->SetAttribute("floats", buffer);
 
 	delete[] boneIndex;
