@@ -80,8 +80,8 @@ dGeometryNodeSkinModifierInfo::~dGeometryNodeSkinModifierInfo(void)
 void dGeometryNodeSkinModifierInfo::RemoveUnusedVertices(const int* const vertexMap)
 {
 	int vertexCount = 0;
-	dVector* vertexWeights = new dVector[m_vertexCount];
-	dBoneWeightIndex* boneWeightIndex = new dBoneWeightIndex[m_vertexCount];
+	dVector* const vertexWeights = new dVector[m_vertexCount];
+	dBoneWeightIndex* const boneWeightIndex = new dBoneWeightIndex[m_vertexCount];
 	memcpy (vertexWeights, m_vertexWeights, m_vertexCount * sizeof(dVector));
 	memcpy (boneWeightIndex, m_boneWeightIndex, m_vertexCount * sizeof(dBoneWeightIndex));
 	for (int i = 0; i < m_vertexCount; i ++) {
@@ -106,7 +106,7 @@ void dGeometryNodeSkinModifierInfo::RemoveUnusedVertices(const int* const vertex
 
 
 
-void dGeometryNodeSkinModifierInfo::SkinMesh(dScene::dTreeNode* skinNode, dScene* scene, dBoneVertexWeightData* skinData, int skinDataCount)  
+void dGeometryNodeSkinModifierInfo::SkinMesh(dScene::dTreeNode* const skinNode, dScene* const scene, dBoneVertexWeightData* const skinData, int skinDataCount)  
 {
 	dAssert (scene->GetInfoFromNode(skinNode) == this);
 
@@ -122,16 +122,16 @@ void dGeometryNodeSkinModifierInfo::SkinMesh(dScene::dTreeNode* skinNode, dScene
 	}
 
 	while (scene->GetFirstChildLink(skinNode)) {
-		dScene::dTreeNode* bone = scene->GetNodeFromLink(scene->GetFirstChildLink(skinNode));
+		dScene::dTreeNode* const bone = scene->GetNodeFromLink(scene->GetFirstChildLink(skinNode));
 		dAssert (bone);
 		scene->RemoveReference (skinNode, bone);
 	}
 
-	dScene::dTreeNode* meshNode = scene->FindParentByType(skinNode, dMeshNodeInfo::GetRttiType());
+	dScene::dTreeNode* const meshNode = scene->FindParentByType(skinNode, dMeshNodeInfo::GetRttiType());
 	dAssert (meshNode);
 
-	dMeshNodeInfo* meshInfo = (dMeshNodeInfo*) scene->GetInfoFromNode (meshNode);
-	NewtonMesh* mesh = meshInfo->GetMesh();
+	dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) scene->GetInfoFromNode (meshNode);
+	NewtonMesh* const mesh = meshInfo->GetMesh();
 
 //	int vertexCount = NewtonMeshGetVertexCount(mesh);
 	m_vertexCount = NewtonMeshGetVertexCount(mesh);
@@ -167,14 +167,14 @@ void dGeometryNodeSkinModifierInfo::SkinMesh(dScene::dTreeNode* skinNode, dScene
 	m_boneCount = skinBoneCount;
 	m_boneBindingMatrix = new dMatrix [skinBoneCount];
 
-	dScene::dTreeNode* parentBone = scene->FindParentByType(meshNode, dSceneNodeInfo::GetRttiType());
+	dScene::dTreeNode* const parentBone = scene->FindParentByType(meshNode, dSceneNodeInfo::GetRttiType());
 	dAssert (parentBone);
-	dSceneNodeInfo* sceneNode = (dSceneNodeInfo*) scene->GetInfoFromNode(parentBone);
+	dSceneNodeInfo* const sceneNode = (dSceneNodeInfo*) scene->GetInfoFromNode(parentBone);
 	m_shapeBindMatrix = meshInfo->m_matrix * sceneNode->GetTransform();
 	int index = 0;
 	for (void* boneLink = scene->GetFirstChildLink(skinNode); boneLink; boneLink = scene->GetNextChildLink(skinNode, boneLink)) {
-		dScene::dTreeNode* boneNode = scene->GetNodeFromLink(boneLink);
-		dSceneNodeInfo* sceneInfo = (dSceneNodeInfo*) scene->GetInfoFromNode(boneNode);
+		dScene::dTreeNode* const boneNode = scene->GetNodeFromLink(boneLink);
+		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*) scene->GetInfoFromNode(boneNode);
 		dMatrix matrix (sceneInfo->GetTransform());
 		m_boneBindingMatrix[index] = matrix.Inverse4x4();
 		index ++;
@@ -189,16 +189,16 @@ void dGeometryNodeSkinModifierInfo::Serialize (TiXmlElement* const rootNode) con
 	rootNode->LinkEndChild(vertexCount);
 	vertexCount->SetAttribute("count", m_vertexCount);
 
-	TiXmlElement* matrix = new TiXmlElement ("bindingMatrix");
+	TiXmlElement* const matrix = new TiXmlElement ("bindingMatrix");
 	rootNode->LinkEndChild(matrix);
 	char matrixText[1024];
 	dFloatArrayToString (&m_shapeBindMatrix[0][0], 16, matrixText, sizeof (matrixText));
 	matrix->SetAttribute("float16", matrixText);
 
 	int bufferSize = (m_boneCount * sizeof (dFloat) * 16 + m_vertexCount * sizeof (dFloat) * 4) * 7;
-	char* buffer = new char[(m_boneCount * sizeof (dFloat) * 16 + m_vertexCount * sizeof (dFloat) * 4) * 7];
+	char* const buffer = new char[(m_boneCount * sizeof (dFloat) * 16 + m_vertexCount * sizeof (dFloat) * 4) * 7];
 
-	TiXmlElement* bindMatrices = new TiXmlElement ("bonesBindMatrices");
+	TiXmlElement* const bindMatrices = new TiXmlElement ("bonesBindMatrices");
 	rootNode->LinkEndChild(bindMatrices);
 
 	dFloatArrayToString (&m_shapeBindMatrix[0][0], m_boneCount * 16, buffer, bufferSize);
@@ -213,9 +213,9 @@ void dGeometryNodeSkinModifierInfo::Serialize (TiXmlElement* const rootNode) con
 	}
 
 	int count = 0;
-	dFloat* weights = new dFloat[weightCount];
-	int* vertexIndex = new int[weightCount];
-	int* boneIndex = new int[weightCount];
+	dFloat* const weights = new dFloat[weightCount];
+	int* const vertexIndex = new int[weightCount];
+	int* const boneIndex = new int[weightCount];
 	for (int i = 0; i < m_vertexCount; i ++) {
 		for (int j = 0; j < 4; j ++) {
 			if (m_vertexWeights[i][j] > 0.0f) {
@@ -229,22 +229,22 @@ void dGeometryNodeSkinModifierInfo::Serialize (TiXmlElement* const rootNode) con
 
 	dAssert (count == weightCount);
 
-	TiXmlElement* vertexWeight = new TiXmlElement ("vertexWeights");
+	TiXmlElement* const vertexWeight = new TiXmlElement ("vertexWeights");
 	rootNode->LinkEndChild(vertexWeight);
 	
 	vertexWeight->SetAttribute("count", weightCount);
 
-	TiXmlElement* vIndices = new TiXmlElement ("vertexIndices");
+	TiXmlElement* const vIndices = new TiXmlElement ("vertexIndices");
 	vertexWeight->LinkEndChild(vIndices);
 	dIntArrayToString (vertexIndex, weightCount, buffer, bufferSize);
 	vIndices->SetAttribute("indices", buffer);
 
-	TiXmlElement* bIndices = new TiXmlElement ("boneIndices");
+	TiXmlElement* const bIndices = new TiXmlElement ("boneIndices");
 	vertexWeight->LinkEndChild(bIndices);
 	dIntArrayToString (boneIndex, weightCount, buffer, bufferSize);
 	bIndices->SetAttribute("indices", buffer);
 
-	TiXmlElement* vWeights = new TiXmlElement ("weights");
+	TiXmlElement* const vWeights = new TiXmlElement ("weights");
 	vertexWeight->LinkEndChild(vWeights);
 	dFloatArrayToString (weights, weightCount, buffer, bufferSize);
 	vWeights->SetAttribute("floats", buffer);

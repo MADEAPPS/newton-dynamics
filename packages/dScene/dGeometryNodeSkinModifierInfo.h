@@ -50,7 +50,7 @@ class dGeometryNodeSkinModifierInfo: public dGeometryNodeModifierInfo
 //	virtual dFloat RayCast (const dVector& p0, const dVector& p1) const {return 1.0f;}
 
 	virtual void RemoveUnusedVertices(const int* const verteMap);
-	virtual void SkinMesh(dScene::dTreeNode* myNode, dScene* const world, dBoneVertexWeightData* skinData, int skinDataCount);  
+	virtual void SkinMesh(dScene::dTreeNode* const myNode, dScene* const world, dBoneVertexWeightData* const skinData, int skinDataCount);  
 
 	virtual void BakeTransform (const dMatrix& matrix);
 
