@@ -26,19 +26,19 @@ class dGeometryNodeModifierInfo: public dNodeInfo
 	public:
 	D_DEFINE_CLASS_NODE(dGeometryNodeModifierInfo,dNodeInfo,DSCENE_API)
 
-	dGeometryNodeModifierInfo();
-	dGeometryNodeModifierInfo(dScene* const world);
-	dGeometryNodeModifierInfo(const dGeometryNodeModifierInfo& me);
-	virtual ~dGeometryNodeModifierInfo(void);
+	DSCENE_API dGeometryNodeModifierInfo();
+	DSCENE_API dGeometryNodeModifierInfo(dScene* const world);
+	DSCENE_API dGeometryNodeModifierInfo(const dGeometryNodeModifierInfo& me);
+	DSCENE_API virtual ~dGeometryNodeModifierInfo(void);
 
-	virtual void RemoveUnusedVertices(const int* const verteMap);
+	DSCENE_API virtual void RemoveUnusedVertices(const int* const verteMap);
 
 //	virtual const dMatrix& GetPivotMatrix () const;
 //	virtual void SetPivotMatrix (const dMatrix& matrix);
 //	virtual void BakeTransform (const dMatrix& matrix);
 //	virtual dFloat RayCast (const dVector& p0, const dVector& p1) const {return 1.0f;}
-	virtual void Serialize (TiXmlElement* const rootNode) const;
-	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
+	DSCENE_API virtual void Serialize (TiXmlElement* const rootNode) const;
+	DSCENE_API virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
 
 //	dMatrix m_matrix;
 };

@@ -40,22 +40,22 @@ class dGeometryNodeSkinModifierInfo: public dGeometryNodeModifierInfo
 
 	D_DEFINE_CLASS_NODE(dGeometryNodeSkinModifierInfo,dGeometryNodeModifierInfo,DSCENE_API)
 
-	dGeometryNodeSkinModifierInfo();
-	dGeometryNodeSkinModifierInfo(dScene* const world);
-	dGeometryNodeSkinModifierInfo(const dGeometryNodeSkinModifierInfo& me);
-	virtual ~dGeometryNodeSkinModifierInfo(void);
+	DSCENE_API dGeometryNodeSkinModifierInfo();
+	DSCENE_API dGeometryNodeSkinModifierInfo(dScene* const world);
+	DSCENE_API dGeometryNodeSkinModifierInfo(const dGeometryNodeSkinModifierInfo& me);
+	DSCENE_API virtual ~dGeometryNodeSkinModifierInfo(void);
 
 //	virtual const dMatrix& GetPivotMatrix () const;
 //	virtual void SetPivotMatrix (const dMatrix& matrix);
 //	virtual dFloat RayCast (const dVector& p0, const dVector& p1) const {return 1.0f;}
 
-	virtual void RemoveUnusedVertices(const int* const verteMap);
-	virtual void SkinMesh(dScene::dTreeNode* const myNode, dScene* const world, dBoneVertexWeightData* const skinData, int skinDataCount);  
+	DSCENE_API virtual void RemoveUnusedVertices(const int* const verteMap);
+	DSCENE_API virtual void SkinMesh(dScene::dTreeNode* const myNode, dScene* const world, dBoneVertexWeightData* const skinData, int skinDataCount);  
 
-	virtual void BakeTransform (const dMatrix& matrix);
+	DSCENE_API virtual void BakeTransform (const dMatrix& matrix);
 
-	virtual void Serialize (TiXmlElement* const rootNode) const;
-	virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
+	DSCENE_API virtual void Serialize (TiXmlElement* const rootNode) const;
+	DSCENE_API virtual bool Deserialize (const dScene* const scene, TiXmlElement* const rootNode);
 
 	int m_boneCount;
 	int m_vertexCount;

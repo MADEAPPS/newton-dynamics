@@ -18,6 +18,7 @@
 
 #include "dSceneStdafx.h"
 #include "dScene.h"
+#include "dLineNodeInfo.h"
 #include "dRootNodeInfo.h"
 #include "dBoneNodeInfo.h"
 #include "dMeshNodeInfo.h"
@@ -37,6 +38,7 @@
 #include "dCollisionConvexHullNodeInfo.h"
 #include "dGeometryNodeSkinModifierInfo.h"
 #include "dCollisionChamferCylinderNodeInfo.h"
+
 
 
 // revision 101:  change SceneNodeMatrix Matrix from global to local
@@ -203,6 +205,29 @@ dScene::dScene(const dScene& me)
 	,m_revision(m_revision)
 	,m_newton (me.m_newton)
 {
+	dBoneNodeInfo::GetRttiType();
+	dMeshNodeInfo::GetRttiType();
+	dLineNodeInfo::GetRttiType();
+	dRootNodeInfo::GetRttiType();
+	dSceneNodeInfo::GetRttiType();
+	dSceneCacheInfo::GetRttiType();
+	dSceneModelInfo::GetRttiType();
+	dTextureNodeInfo::GetRttiType();
+	dMaterialNodeInfo::GetRttiType();
+	dGeometryNodeInfo::GetRttiType();
+	dCollisionNodeInfo::GetRttiType();
+	dRigidbodyNodeInfo::GetRttiType();
+	dCollisionBoxNodeInfo::GetRttiType();
+	dCollisionConeNodeInfo::GetRttiType();
+	dCollisionTreeNodeInfo::GetRttiType();
+	dCollisionSphereNodeInfo::GetRttiType();
+	dGeometryNodeModifierInfo::GetRttiType();
+	dCollisionCapsuleNodeInfo::GetRttiType();
+	dCollisionCompoundNodeInfo::GetRttiType();
+	dCollisionCylinderNodeInfo::GetRttiType();
+	dCollisionConvexHullNodeInfo::GetRttiType();
+	dGeometryNodeSkinModifierInfo::GetRttiType();
+	dCollisionChamferCylinderNodeInfo::GetRttiType();
 }
 
 dScene::~dScene(void)

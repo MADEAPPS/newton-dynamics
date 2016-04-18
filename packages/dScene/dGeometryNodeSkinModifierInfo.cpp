@@ -26,39 +26,40 @@
 
 D_IMPLEMENT_CLASS_NODE(dGeometryNodeSkinModifierInfo);
 
+
 dGeometryNodeSkinModifierInfo::dGeometryNodeSkinModifierInfo()
-	:dGeometryNodeModifierInfo (), 
-	 m_boneCount(0),
-	 m_vertexCount(0),
-	 m_shapeBindMatrix(dGetIdentityMatrix()), 
-	 m_vertexWeights(NULL),
-	 m_boneBindingMatrix(NULL),
-	 m_boneWeightIndex(NULL)
+	:dGeometryNodeModifierInfo () 
+	,m_boneCount(0)
+	,m_vertexCount(0)
+	,m_shapeBindMatrix(dGetIdentityMatrix()) 
+	,m_vertexWeights(NULL)
+	,m_boneBindingMatrix(NULL)
+	,m_boneWeightIndex(NULL)
 {
 	SetName ("Skin Modifier");
 }
 
 dGeometryNodeSkinModifierInfo::dGeometryNodeSkinModifierInfo(dScene* const world)
-	:dGeometryNodeModifierInfo (),
-	 m_boneCount(0),
-	 m_vertexCount(0),
-	 m_shapeBindMatrix(dGetIdentityMatrix()), 
-	 m_vertexWeights(NULL),
-	 m_boneBindingMatrix(NULL),
-	 m_boneWeightIndex(NULL)
+	:dGeometryNodeModifierInfo ()
+	,m_boneCount(0)
+	,m_vertexCount(0)
+	,m_shapeBindMatrix(dGetIdentityMatrix()) 
+	,m_vertexWeights(NULL)
+	,m_boneBindingMatrix(NULL)
+	,m_boneWeightIndex(NULL)
 {
 	SetName ("Skin Modifier");
 }
 
 
 dGeometryNodeSkinModifierInfo::dGeometryNodeSkinModifierInfo(const dGeometryNodeSkinModifierInfo& me)
-	:dGeometryNodeModifierInfo (me),
-	 m_boneCount(0),
-	 m_vertexCount(0),
-	 m_shapeBindMatrix(dGetIdentityMatrix()), 
-	 m_vertexWeights(NULL),
-	 m_boneBindingMatrix(NULL),
-	 m_boneWeightIndex(NULL)
+	:dGeometryNodeModifierInfo (me)
+	,m_boneCount(0)
+	,m_vertexCount(0)
+	,m_shapeBindMatrix(dGetIdentityMatrix()) 
+	,m_vertexWeights(NULL)
+	,m_boneBindingMatrix(NULL)
+	,m_boneWeightIndex(NULL)
 {
 	dAssert (0);
 	SetName ("Skin Modifier");
@@ -258,7 +259,7 @@ void dGeometryNodeSkinModifierInfo::Serialize (TiXmlElement* const rootNode) con
 
 bool dGeometryNodeSkinModifierInfo::Deserialize (const dScene* const scene, TiXmlElement* const rootNode) 
 {
-	DeserialiseBase(scene, dNodeInfo, rootNode);
+	DeserialiseBase(scene, dGeometryNodeModifierInfo, rootNode);
 
 	TiXmlElement* const vertexCount = (TiXmlElement*) rootNode->FirstChild ("vertexCount");
 	vertexCount->Attribute("count", &m_vertexCount);
