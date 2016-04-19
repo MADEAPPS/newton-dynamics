@@ -1129,10 +1129,8 @@ void CustomVehicleController::EngineController::PlotEngineCurve() const
 	dTrace(("rpm\ttorque\tpower\n"));
 	for (int i = 0; i < steps; i++) {
 		dFloat r = rpm0 + omegaStep * i;
-
 		dFloat torque = m_torqueRPMCurve.GetValue(r);
 		dFloat power = r * torque;
-
 		//const dFloat horsePowerToWatts = 735.5f;
 		//const dFloat rpmToRadiansPerSecunds = 0.105f;
 		//const dFloat poundFootToNewtonMeters = 1.356f;
