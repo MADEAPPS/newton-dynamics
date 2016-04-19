@@ -83,6 +83,15 @@
 #define VIPER_TIRE_REVERSE_GEAR				2.90f
 #define VIPER_COM_Y_OFFSET					0.0f
 
+// downforce at 80 kmh
+#define VIPER_DOWNFORCE_WEIGHT_FACTOR_0		2.0f
+// downforce at top Speed
+#define VIPER_DOWNFORCE_WEIGHT_FACTOR_1		4.0f
+#define VIPER_DOWNFORCE_WEIGHT_FACTOR_SPEED	80.0f 
+
+
+
+
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
 //#define VEHICLE_THIRD_PERSON_VIEW_HIGHT		10.0f
@@ -442,8 +451,14 @@ class SuperCarEntity: public DemoEntity
 		// set the gear look up table
 		SetGearMap(engineControl);
 
-		// set teh vehicle weigh doistibution 
+		// set the vehicle weigh doistibution 
 		m_controller->SetWeightDistribution (VEHICLE_WEIGHT_DISTRIBUTION);
+
+		// set teh vehicle aerodynamics
+		dFloat weightRatio0 = VIPER_DOWNFORCE_WEIGHT_FACTOR_0;
+		dFloat weightRatio1 = VIPER_DOWNFORCE_WEIGHT_FACTOR_1;
+		dFloat speedFactor = VIPER_DOWNFORCE_WEIGHT_FACTOR_SPEED / VIPER_TIRE_TOP_SPEED_KMH;
+		m_controller->SetAerodynamicsDownforceCoefficient(DEMO_GRAVITY, weightRatio0, speedFactor, weightRatio1);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
@@ -1162,7 +1177,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 				// draw the odometer
 				x += gageSize;
-				dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
+				//dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
+				dFloat speed = dAbs(engine->GetSpeed())  / engine->GetTopSpeed();
 				int gear = engine->GetGear();
 				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
 				DrawGear(speed, x, y, m_debugVehicle->m_gearMap[gear], gageSize);
@@ -1425,7 +1441,7 @@ void SuperCar (DemoEntityManager* const scene)
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
 		location1.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
-		vehicle1->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
+		vehicle1->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
 		u -= 0.005f;
 /*
 		dMatrix location2 (manager->CalculateSplineMatrix (u));

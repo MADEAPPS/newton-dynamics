@@ -386,12 +386,18 @@ void CustomVehicleController::BodyPartChassis::ApplyDownForce ()
 	NewtonBody* const body = GetBody();
 	NewtonBodyGetVelocity(body, &veloc[0]);
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
-
 	matrix = GetController()->m_localFrame * matrix;
 
 	veloc -= matrix.m_up.Scale (veloc % matrix.m_up);
-	//dVector downforce (matrix.m_up.Scale(-m_aerodynamicsDownForceCoefficient * (veloc % veloc)));
-	dVector downforce(matrix.m_up.Scale(-10.0f * (veloc % veloc)));
+	dFloat downForceMag = m_aerodynamicsDownForceCoefficient * (veloc % veloc);
+	if (downForceMag > m_aerodynamicsDownForce0) {
+		dFloat speed = dSqrt (veloc % veloc);
+		dFloat topSpeed = GetController()->GetEngine() ? GetController()->GetEngine()->GetTopGear() : 30.0f;
+		dFloat speedRatio = (speed - m_aerodynamicsDownSpeedCutOff) / (topSpeed - speed); 
+		downForceMag = m_aerodynamicsDownForce0 + (m_aerodynamicsDownForce1 - m_aerodynamicsDownForce0) * speedRatio; 
+	}
+
+	dVector downforce(matrix.m_up.Scale (-downForceMag));
 	NewtonBodyAddForce(body, &downforce[0]);
 }
 
@@ -1289,6 +1295,11 @@ dFloat CustomVehicleController::EngineController::GetSpeed() const
 	return pin % veloc;
 }
 
+dFloat CustomVehicleController::EngineController::GetTopSpeed() const
+{
+	return m_info.m_vehicleTopSpeed;
+}
+
 CustomVehicleController::SteeringController::SteeringController (CustomVehicleController* const controller, dFloat maxAngle)
 	:Controller(controller)
 	,m_maxAngle(dAbs (maxAngle))
@@ -1598,9 +1609,6 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	m_contactFilter = new BodyPartTire::FrictionModel(this);
 
 //	SetDryRollingFrictionTorque(100.0f / 4.0f);
-	// assume gravity is 10.0f, and a speed of 60 miles/hours
-	SetAerodynamicsDownforceCoefficient(2.0f * 10.0f, 60.0f * 0.447f);
-
 	m_brakesControl = NULL;
 	m_engineControl = NULL;
 	m_handBrakesControl = NULL;
@@ -1915,15 +1923,24 @@ dFloat CustomVehicleController::GetAerodynamicsDowforceCoeficient() const
 	return m_chassis.m_aerodynamicsDownForceCoefficient;
 }
 
-void CustomVehicleController::SetAerodynamicsDownforceCoefficient(dFloat maxDownforceInGravity, dFloat topSpeed)
+void CustomVehicleController::SetAerodynamicsDownforceCoefficient(dFloat maxDownforceInGravity, dFloat downWeightRatioAtSpeedFactor, dFloat speedFactor, dFloat maxWeightAtTopSpeed)
 {
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
+
+	dAssert (speedFactor >= 0.0f);
+	dAssert (speedFactor <= 1.0f);
+	dAssert (downWeightRatioAtSpeedFactor >= 0.0f);
+	dAssert (downWeightRatioAtSpeedFactor < maxWeightAtTopSpeed);
 	NewtonBody* const body = GetBody();
 	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
-	m_chassis.m_aerodynamicsDownForceCoefficient = mass * maxDownforceInGravity / (topSpeed * topSpeed);
+	dFloat topSpeed = m_engineControl ? m_engineControl->GetTopSpeed() : 25.0f;
+	m_chassis.m_aerodynamicsDownSpeedCutOff = topSpeed * speedFactor;
+	m_chassis.m_aerodynamicsDownForce0 = mass * downWeightRatioAtSpeedFactor * dAbs (maxDownforceInGravity);
+	m_chassis.m_aerodynamicsDownForce1 = mass * maxWeightAtTopSpeed * dAbs (maxDownforceInGravity);
+	m_chassis.m_aerodynamicsDownForceCoefficient = m_chassis.m_aerodynamicsDownForce0 / (m_chassis.m_aerodynamicsDownSpeedCutOff * m_chassis.m_aerodynamicsDownSpeedCutOff);
 }
 
 int CustomVehicleControllerManager::OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)

@@ -141,7 +141,10 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		BodyPartChassis ()
 			:BodyPart()
-			,m_aerodynamicsDownForceCoefficient(1.e-4f)
+			,m_aerodynamicsDownForce0(0.0f)
+			,m_aerodynamicsDownForce1(0.0f)
+			,m_aerodynamicsDownSpeedCutOff(0.0f)
+			,m_aerodynamicsDownForceCoefficient(0.0f)
 		{
 		}
 
@@ -155,6 +158,9 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API void ApplyDownForce ();
 
+		dFloat m_aerodynamicsDownForce0;
+		dFloat m_aerodynamicsDownForce1;
+		dFloat m_aerodynamicsDownSpeedCutOff;
 		dFloat m_aerodynamicsDownForceCoefficient;
 	};
 	
@@ -299,7 +305,6 @@ class CustomVehicleController: public CustomControllerBase
 			friend class EngineController;
 		};
 
-
 		private:
 		class DriveTrainTire;
 
@@ -415,6 +420,7 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API dFloat GetIdleRPM() const;
 		CUSTOM_JOINTS_API dFloat GetRedLineRPM() const;
 		CUSTOM_JOINTS_API dFloat GetSpeed() const;
+		CUSTOM_JOINTS_API dFloat GetTopSpeed() const;
 
 		CUSTOM_JOINTS_API int GetGear() const;
 		CUSTOM_JOINTS_API void SetGear(int gear);
@@ -523,7 +529,7 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void SetContactFilter(BodyPartTire::FrictionModel* const filter);
 
 	CUSTOM_JOINTS_API dFloat GetAerodynamicsDowforceCoeficient() const;
-	CUSTOM_JOINTS_API void SetAerodynamicsDownforceCoefficient(dFloat maxDownforceInGravities, dFloat topSpeed);
+	CUSTOM_JOINTS_API void SetAerodynamicsDownforceCoefficient(dFloat maxDownforceInGravity, dFloat downWeightRatioAtSpeedFactor, dFloat speedFactor, dFloat maxWeightAtTopSpeed);
 
 	CUSTOM_JOINTS_API dFloat GetWeightDistribution() const;
 	CUSTOM_JOINTS_API void SetWeightDistribution(dFloat weightDistribution);
