@@ -306,56 +306,52 @@ class CustomVehicleController: public CustomControllerBase
 		class DriveTrain: public CustomAlloc
 		{
 			public:
-			DriveTrain(const dVector& invInertia, dFloat invMass, DriveTrain* const parent = NULL);
+			DriveTrain(const dVector& invInertia, DriveTrain* const parent = NULL);
 			virtual ~DriveTrain();
 
 			virtual DriveTrainTire* CastAsTire() {return NULL;}
 			
-			virtual int GetDegreeOfFredom() const {return m_dof;}
-			virtual void SetPartMasses (const dVector& invInertia, dFloat invMass);
+			virtual void SetPartMasses (const dVector& invInertia);
 			virtual dFloat* GetMassMatrix() {return NULL;}
 			virtual void SetExternalTorque(EngineController* const controller);
 			virtual void Integrate(EngineController* const controller, dFloat timestep);
 			virtual void SetGearRatioJacobians(dFloat gearRatio) {};
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
+			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 			
 			void SetInvMassJt();
 			void BuildMassMatrix ();
 			void ReconstructInvMassJt ();
-			
+
+			void GetRow(dVector* const row) const;
+			void GetInvRowT(dVector* const row) const;
 			void FactorRow (int row, int size, dFloat* const matrix);
-			void GetRow(dComplentaritySolver::dJacobian* const row, int dof) const;
-			void GetInvRowT(dComplentaritySolver::dJacobian* const row, int dof) const;
-			void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
+			
 			
 			int GetNodeArray(DriveTrain** const array);
 			int GetNodeArray(DriveTrain** const array, int& index);
 
-			dComplentaritySolver::dJacobian m_J01[3];
-			dComplentaritySolver::dJacobian m_J10[3];
-			dComplentaritySolver::dJacobian m_invMassJt01[3];
-			dComplentaritySolver::dJacobian m_invMassJt10[3];
+			dVector m_J01;
+			dVector m_J10;
+			dVector m_invMassJt01;
+			dVector m_invMassJt10;
 			dVector m_omega;
 			dVector m_torque;
 			dVector m_inertiaInv;
 			DriveTrain* m_parent;
 			DriveTrain* m_child;
 			DriveTrain* m_sibling;
-			dFloat m_massInv;
-			int m_dof;
 			int m_index;
-			int m_dofBase;
 		};
 
 		class DriveTrainEngine: public DriveTrain
 		{
 			public:
-			DriveTrainEngine (const dVector& invInertia, dFloat invMass);
+			DriveTrainEngine (const dVector& invInertia);
 
 			void SetGearRatio (dFloat gearRatio);
-			int GetDegreeOfFredom() const {return 0;}
 			void SetExternalTorque(EngineController* const controller);
-			void RebuildEngine (const dVector& invInertia, dFloat invMass);
+			void RebuildEngine (const dVector& invInertia);
 			dFloat GetClutchTorque(EngineController* const controller) const;
 			void Update(EngineController* const controller, dFloat engineTorque, dFloat timestep);
 			void Solve (int dofSize, int width, const dFloat* const massMatrix, const dFloat* const b, dFloat* const x) const;
@@ -367,32 +363,30 @@ class CustomVehicleController: public CustomControllerBase
 		class DriveTrainEngine2W: public DriveTrainEngine
 		{
 			public:
-			DriveTrainEngine2W (const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel);
+			DriveTrainEngine2W (const dVector& invInertia, const DifferentialAxel& axel);
 			virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
-
-			dFloat matrix[7][7];
+			dFloat matrix[3][3];
 		};
 
 		class DriveTrainEngine4W: public DriveTrainEngine
 		{
 			public:
-			DriveTrainEngine4W (const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
+			DriveTrainEngine4W (const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
 			virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
 
-			dFloat matrix[15][15];
+			dFloat matrix[7][7];
 		};
 
 		class DriveTrainDifferentialGear: public DriveTrain
 		{
 			public:
-			DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel);
-			DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel, dFloat side);
-			DriveTrainDifferentialGear (const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
+			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel);
+			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel, dFloat side);
+			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
 
 			void SetGearRatioJacobians(dFloat gearRatio);
-			void SetExternalTorque(EngineController* const controller);
-			dFloat m_gearSign;
-			dFloat m_slipDifferentialFrition;
+			//void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
+			dFloat m_slipDifferentialViscuosFriction;
 		};
 
 		class DriveTrainTire: public DriveTrain
@@ -402,7 +396,7 @@ class CustomVehicleController: public CustomControllerBase
 
 			virtual DriveTrainTire* CastAsTire() {return this;}
 			virtual void SetExternalTorque(EngineController* const controller);
-			virtual void SetPartMasses (const dVector& invInertia, dFloat invMass);
+			virtual void SetPartMasses (const dVector& invInertia);
 			virtual void Integrate(EngineController* const controller, dFloat timestep) {};
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
 			BodyPartTire* m_tire;

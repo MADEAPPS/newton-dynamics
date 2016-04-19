@@ -30,10 +30,9 @@ static FILE* file_xxx;
 #define D_VEHICLE_FIRST_GEAR			2
 #define D_VEHICLE_REST_GAS_VALVE		dFloat(0.1f)
 #define D_VEHICLE_MIN_RPM_FACTOR		dFloat(0.5f)
-#define D_VEHICLE_MAX_DRIVETRAIN_DOF	64
+#define D_VEHICLE_MAX_DRIVETRAIN_DOF	32
 #define D_VEHICLE_REGULARIZER			1.0001f
 #define D_VEHICLE_SLIP_DIFF_RPS			10.0f
-#define D_VEHICLE_SLIP_DIFF_FRICTION	150.0f
 
 /*
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
@@ -506,20 +505,20 @@ void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
 }
 
 
-CustomVehicleController::EngineController::DriveTrain::DriveTrain(const dVector& invInertia, dFloat invMass, DriveTrain* const parent)
+CustomVehicleController::EngineController::DriveTrain::DriveTrain(const dVector& invInertia, DriveTrain* const parent)
 	:CustomAlloc()
-	,m_omega(0.0f, 0.0f, 0.0f, 0.0f)
-	,m_torque(0.0f, 0.0f, 0.0f, 0.0f)
+	,m_J01(0.0f)
+	,m_J10(0.0f)
+	,m_invMassJt01(0.0f)
+	,m_invMassJt10(0.0f)
+	,m_omega(0.0f)
+	,m_torque(0.0f)
 	,m_inertiaInv(invInertia)
 	,m_parent(parent)
 	,m_child(NULL)
 	,m_sibling(NULL)
-	,m_massInv(invMass)
-	,m_dof(2)
 	,m_index(0)
-	,m_dofBase(0)
 {
-	m_inertiaInv.m_w = 0.0f;
 }
 
 CustomVehicleController::EngineController::DriveTrain::~DriveTrain()
@@ -533,21 +532,15 @@ CustomVehicleController::EngineController::DriveTrain::~DriveTrain()
 
 void CustomVehicleController::EngineController::DriveTrain::SetInvMassJt()
 {
-	int dof = GetDegreeOfFredom();
-	for (int i = 0; i < dof; i ++) {
-		m_invMassJt01[i].m_linear = m_J01[i].m_linear.Scale(m_massInv);
-		m_invMassJt01[i].m_angular = m_J01[i].m_angular.CompProduct(m_inertiaInv);
-		m_invMassJt10[i].m_linear = m_J10[i].m_linear.Scale(m_parent->m_massInv);
-		m_invMassJt10[i].m_angular = m_J10[i].m_angular.CompProduct(m_parent->m_inertiaInv);
-	}
+	m_invMassJt01 = m_J01.CompProduct(m_inertiaInv);
+	m_invMassJt10 = m_J10.CompProduct(m_parent->m_inertiaInv);
 }
 
-void CustomVehicleController::EngineController::DriveTrain::SetPartMasses (const dVector& invInertia, dFloat invMass)
+void CustomVehicleController::EngineController::DriveTrain::SetPartMasses (const dVector& invInertia)
 {
-	m_massInv = invMass;
 	m_inertiaInv = invInertia;
 	for (DriveTrain* ptr = m_child; ptr; ptr = ptr->m_sibling) {
-		ptr->SetPartMasses (invInertia, invMass);
+		ptr->SetPartMasses (invInertia);
 	}
 }
 
@@ -561,22 +554,16 @@ void CustomVehicleController::EngineController::DriveTrain::ReconstructInvMassJt
 	}
 }
 
-void CustomVehicleController::EngineController::DriveTrain::GetRow(dComplentaritySolver::dJacobian* const row, int dof) const
+void CustomVehicleController::EngineController::DriveTrain::GetRow(dVector* const row) const
 {
-	dAssert(dof < GetDegreeOfFredom());
-	row[m_index].m_linear = m_J01[dof].m_linear;
-	row[m_index].m_angular = m_J01[dof].m_angular;
-	row[m_parent->m_index].m_linear = m_J10[dof].m_linear;
-	row[m_parent->m_index].m_angular = m_J10[dof].m_angular;
+	row[m_index] = m_J01;
+	row[m_parent->m_index] = m_J10;
 }
 
-void CustomVehicleController::EngineController::DriveTrain::GetInvRowT(dComplentaritySolver::dJacobian* const row, int dof) const
+void CustomVehicleController::EngineController::DriveTrain::GetInvRowT(dVector* const row) const
 {
-	dAssert(dof < GetDegreeOfFredom());
-	row[m_index].m_linear = m_invMassJt01[dof].m_linear;
-	row[m_index].m_angular = m_invMassJt01[dof].m_angular;
-	row[m_parent->m_index].m_linear = m_invMassJt10[dof].m_linear;
-	row[m_parent->m_index].m_angular = m_invMassJt10[dof].m_angular;
+	row[m_index] = m_invMassJt01;
+	row[m_parent->m_index] = m_invMassJt10;
 }
 
 int CustomVehicleController::EngineController::DriveTrain::GetNodeArray(DriveTrain** const array, int& index)
@@ -598,16 +585,13 @@ int CustomVehicleController::EngineController::DriveTrain::GetNodeArray(DriveTra
 
 void CustomVehicleController::EngineController::DriveTrain::CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide)
 {
-	const int dof = GetDegreeOfFredom();
-	const dFloat k = 1.0f / (4.0f * timestep);
-	for (int i = 0; i < dof; i ++) {
-		dFloat relativeOmega = m_omega % m_J01[i].m_angular + m_parent->m_omega % m_J10[i].m_angular;
-		dFloat torqueAccel = m_torque % m_invMassJt01[i].m_angular + m_parent->m_torque % m_invMassJt10[i].m_angular;
+	const dFloat k = 0.5f / timestep;
+	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
+	dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
 
-		torqueAccel = (dAbs(torqueAccel) < 1.0e-8f) ? 0.0f : torqueAccel;
-		relativeOmega = (dAbs(relativeOmega) < 1.0e-8f) ? 0.0f : relativeOmega;
-		rightSide[m_dofBase + i] = -(torqueAccel + k * relativeOmega);
-	}
+	torqueAccel = (dAbs(torqueAccel) < 1.0e-8f) ? 0.0f : torqueAccel;
+	relativeOmega = (dAbs(relativeOmega) < 1.0e-8f) ? 0.0f : relativeOmega;
+	rightSide[m_index] = -(torqueAccel + k * relativeOmega);
 }
 
 void CustomVehicleController::EngineController::DriveTrain::FactorRow (int row, int dofSize, dFloat* const massMatrix)
@@ -634,17 +618,14 @@ void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
 {
 	const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
 	DriveTrain* nodeList[size];
-	dComplentaritySolver::dJacobian rowI[size];
-	dComplentaritySolver::dJacobian rowJ[size];
+	dVector rowI[size];
+	dVector rowJ[size];
 
-	int dofSize = 0;
 	int nodeCount = GetNodeArray(nodeList);
-
 	for (int i = 0; i < nodeCount; i++) {
 		nodeList[i]->m_index = i;
-		nodeList[i]->m_dofBase = dofSize;
-		dofSize += nodeList[i]->GetDegreeOfFredom();
 	}
+	int dofSize = nodeCount - 1;
 	dAssert(size > dofSize);
 
 	int y = 0;
@@ -653,29 +634,23 @@ void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
 	memset(massMatrix, 0, dofSize * dofSize * sizeof (dFloat));
 	for (int i = 0; i < nodeCount - 1; i++) {
 		DriveTrain* const nodeA = nodeList[i];
-		int nodeAdof = nodeA->GetDegreeOfFredom();
-		for (int ii = 0; ii < nodeAdof; ii++) {
-			int x = 0;
-			memset(rowI, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
-			nodeA->GetRow(rowI, ii);
-			dFloat* const row = &massMatrix[y * dofSize];
-			for (int j = 0; j < nodeCount - 1; j++) {
-				DriveTrain* const nodeB = nodeList[j];
-				int nodeBdof = nodeB->GetDegreeOfFredom();
-				for (int jj = 0; jj < nodeBdof; jj++) {
-					memset(rowJ, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
-					nodeB->GetInvRowT(rowJ, jj);
+		int x = 0;
+		memset(rowI, 0, nodeCount * sizeof (dVector));
+		nodeA->GetRow(rowI);
+		dFloat* const row = &massMatrix[y * dofSize];
+		for (int j = 0; j < nodeCount - 1; j++) {
+			DriveTrain* const nodeB = nodeList[j];
+			memset(rowJ, 0, nodeCount * sizeof (dVector));
+			nodeB->GetInvRowT(rowJ);
 
-					dFloat acc = 0.0f;
-					for (int k = 0; k < nodeCount; k++) {
-						acc += rowI[k].m_linear % rowJ[k].m_linear + rowI[k].m_angular % rowJ[k].m_angular;
-					}
-					row[x] = acc;
-					x++;
-				}
+			dFloat acc = 0.0f;
+			for (int k = 0; k < nodeCount; k++) {
+				acc += rowI[k] % rowJ[k];
 			}
-			y++;
+			row[x] = acc;
+			x++;
 		}
+		y++;
 	}
 
 	for (int i = 0; i < dofSize; i++) {
@@ -689,7 +664,7 @@ void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
 
 void CustomVehicleController::EngineController::DriveTrain::SetExternalTorque(EngineController* const controller)
 {
-	m_torque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_torque = dVector (0.0f);
 }
 
 void CustomVehicleController::EngineController::DriveTrain::Integrate(EngineController* const controller, dFloat timestep)
@@ -700,15 +675,12 @@ void CustomVehicleController::EngineController::DriveTrain::Integrate(EngineCont
 
 void CustomVehicleController::EngineController::DriveTrain::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
 {
-	const int dof = GetDegreeOfFredom();
-	for (int i = 0; i < dof; i++) {
-		m_torque += m_J01[i].m_angular.Scale(lambda[m_dofBase + i]);
-		m_parent->m_torque += m_J10[i].m_angular.Scale(lambda[m_dofBase + i]);
-	}
+	m_torque += m_J01.Scale(lambda[m_index]);
+	m_parent->m_torque += m_J10.Scale(lambda[m_index]);
 }
 
-CustomVehicleController::EngineController::DriveTrainEngine::DriveTrainEngine(const dVector& invInertia, dFloat invMass)
-	:DriveTrain(invInertia, invMass)
+CustomVehicleController::EngineController::DriveTrainEngine::DriveTrainEngine(const dVector& invInertia)
+	:DriveTrain(invInertia)
 	,m_lastGear(-1000.0f)
 	,m_engineTorque(0.0f)
 {
@@ -724,12 +696,10 @@ dFloat CustomVehicleController::EngineController::DriveTrainEngine::GetClutchTor
 	return controller->m_info.m_clutchFrictionTorque * controller->m_clutchParam;
 }
 
-void CustomVehicleController::EngineController::DriveTrainEngine::RebuildEngine(const dVector& invInertia, dFloat invMass)
+void CustomVehicleController::EngineController::DriveTrainEngine::RebuildEngine(const dVector& invInertia)
 {
-	dFloat gearInvMass = invMass * 4.0f;
 	dVector gearInvInertia(invInertia.Scale(4.0f));
-	SetPartMasses(gearInvInertia, gearInvMass);
-	m_massInv = invMass;
+	SetPartMasses(gearInvInertia);
 	m_inertiaInv = invInertia;
 	ReconstructInvMassJt ();
 	BuildMassMatrix();
@@ -764,14 +734,11 @@ void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (
 
 		const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
 		DriveTrain* nodeList[size];
-		dComplentaritySolver::dJacobian rowI[size];
-		dComplentaritySolver::dJacobian rowJ[size];
+		dVector rowI[size];
+		dVector rowJ[size];
 
-		int dofSize = 0;
 		int nodeCount = GetNodeArray(nodeList);
-		for (int i = 0; i < nodeCount; i++) {
-			dofSize += nodeList[i]->GetDegreeOfFredom();
-		}
+		int dofSize = nodeCount - 1;
 		dAssert(size > dofSize);
 
 		dFloat* const massMatrix = GetMassMatrix();
@@ -779,28 +746,23 @@ void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (
 
 		int x = 0;
 		DriveTrain* const nodeA = nodeList[nodeCount - 2];
-		int nodeAdof = nodeA->GetDegreeOfFredom();
-		int ii = nodeAdof - 1;
-		memset(rowI, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
-		nodeA->GetRow(rowI, ii);
+		memset(rowI, 0, nodeCount * sizeof (dVector));
+		nodeA->GetRow(rowI);
 		int y = dofSize - 1;
 		dFloat* const row = &massMatrix[y * dofSize];
 		for (int j = 0; j < nodeCount - 1; j++) {
 			DriveTrain* const nodeB = nodeList[j];
-			int nodeBdof = nodeB->GetDegreeOfFredom();
-			for (int jj = 0; jj < nodeBdof; jj++) {
-				memset(rowJ, 0, nodeCount * sizeof (dComplentaritySolver::dJacobian));
-				nodeB->GetInvRowT(rowJ, jj);
+			memset(rowJ, 0, nodeCount * sizeof (dVector));
+			nodeB->GetInvRowT(rowJ);
 
-				dFloat acc = 0.0f;
-				for (int k = 0; k < nodeCount; k++) {
-					acc += rowI[k].m_linear % rowJ[k].m_linear + rowI[k].m_angular % rowJ[k].m_angular;
-				}
-				row[x] = acc;
-				massMatrix[y] = acc;
-				x++;
-				y += dofSize;
+			dFloat acc = 0.0f;
+			for (int k = 0; k < nodeCount; k++) {
+				acc += rowI[k] % rowJ[k];
 			}
+			row[x] = acc;
+			massMatrix[y] = acc;
+			x++;
+			y += dofSize;
 		}
 		massMatrix[(dofSize - 1) * dofSize + dofSize - 1] *= D_VEHICLE_REGULARIZER;
 		FactorRow(dofSize - 1, dofSize, massMatrix);
@@ -810,15 +772,12 @@ void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (
 void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineController* const controller, dFloat engineTorque, dFloat timestep)
 {
 	const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
-	DriveTrain* nodeArray[size];
+	DriveTrain* nodeArray[size + 1];
 	dFloat b[size];
 	dFloat x[size];
 
 	dFloat gearRatio = controller->GetGearRatio();
 	SetGearRatio (gearRatio);
-
-//static int xxx;
-//xxx++;
 
 	m_engineTorque = engineTorque;
 	const int nodesCount = GetNodeArray(nodeArray);
@@ -827,13 +786,11 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 		node->SetExternalTorque(controller);
 	}
 
-	int dofSize = 0;
 	for (int i = 0; i < nodesCount - 1; i++) {
 		DriveTrain* const node = nodeArray[i];
 		node->CalculateRightSide(controller, timestep, b);
-		dofSize += node->GetDegreeOfFredom();
 	}
-
+	int dofSize = nodesCount - 1;
 	dAssert(size >= dofSize);
 	const dFloat* const massMatrix = GetMassMatrix();
 
@@ -865,132 +822,108 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 	}
 }
 
-CustomVehicleController::EngineController::DriveTrainEngine2W::DriveTrainEngine2W(const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel)
-	:DriveTrainEngine(invInertia, invMass)
+CustomVehicleController::EngineController::DriveTrainEngine2W::DriveTrainEngine2W(const dVector& invInertia, const DifferentialAxel& axel)
+	:DriveTrainEngine(invInertia)
 {
-	dFloat gearInvMass = invMass * 4.0f;
 	dVector gearInvInertia(invInertia.Scale(4.0f));
-	m_child = new DriveTrainDifferentialGear(gearInvInertia, gearInvMass, this, axel);
+	m_child = new DriveTrainDifferentialGear(gearInvInertia, this, axel);
 }
 
-CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4W(const dVector& invInertia, dFloat invMass, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
-	:DriveTrainEngine(invInertia, invMass)
+CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
+	:DriveTrainEngine(invInertia)
 {
-	dFloat gearInvMass = invMass * 4.0f;
 	dVector gearInvInertia(invInertia.Scale(4.0f));
-	m_child = new DriveTrainDifferentialGear(gearInvInertia, gearInvMass, this, axel0, axel1);
+	m_child = new DriveTrainDifferentialGear(gearInvInertia, this, axel0, axel1);
 }
 
-CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel)
-	:DriveTrain(invInertia, invMass, parent)
-	,m_gearSign(1.0f)
-	,m_slipDifferentialFrition(D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS)
+CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel)
+	:DriveTrain(invInertia, parent)
+	,m_slipDifferentialViscuosFriction(0.1f)
 {
-	m_dof = 3;
 	m_child = new DriveTrainTire(axel.m_leftTire, this);
 	m_child->m_sibling = new DriveTrainTire(axel.m_rightTire, this);
 	SetGearRatioJacobians(1.0f);
 }
 
-CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel, dFloat side)
-	:DriveTrain(invInertia, invMass, parent)
-	,m_gearSign(1.0f)
-	,m_slipDifferentialFrition(D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS)
+CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel, dFloat side)
+	:DriveTrain(invInertia, parent)
+	,m_slipDifferentialViscuosFriction(0.1f)
 {
 	m_child = new DriveTrainTire(axel.m_leftTire, this);
 	m_child->m_sibling = new DriveTrainTire(axel.m_rightTire, this);
-	m_slipDifferentialFrition = D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS;
 
-	dVector pin(dFloat(dSign(side)), 1.0f, 0.0f, 0.0f);
-	m_J01[0].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J01[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J01[1].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J01[1].m_angular = dVector(0.0f, 1.0f, 0.0f, 0.0f) * m_J01[1].m_linear;
-
-	m_J10[0].m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J10[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J10[1].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J10[1].m_angular = pin * m_J10[1].m_linear;
+	m_J01 = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
+	m_J10 = dVector(1.0f, dSign(side), 0.0f, 0.0f);
 	SetInvMassJt();
 }
 
-CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, dFloat invMass, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
-	:DriveTrain(invInertia, invMass, parent)
-	,m_gearSign(1.0f)
-	,m_slipDifferentialFrition(D_VEHICLE_SLIP_DIFF_FRICTION / D_VEHICLE_SLIP_DIFF_RPS)
+CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
+	:DriveTrain(invInertia, parent)
+	,m_slipDifferentialViscuosFriction(0.1f)
 {
-	m_dof = 3;
-	m_child = new DriveTrainDifferentialGear(invInertia, invMass, this, axel0, -1.0f);
-	m_child->m_sibling = new DriveTrainDifferentialGear(invInertia, invMass, this, axel1, 1.0f);
+	m_child = new DriveTrainDifferentialGear(invInertia, this, axel0, -1.0f);
+	m_child->m_sibling = new DriveTrainDifferentialGear(invInertia, this, axel1, 1.0f);
 	SetGearRatioJacobians(1.0f);
-	m_gearSign = -1.0f;
 }
 
 void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetGearRatioJacobians(dFloat gearRatio)
 {
-	m_J01[0].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J01[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J01[1].m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J01[1].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J01[2].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J01[2].m_angular = dVector(0.0f, m_gearSign * gearRatio, 0.0f, 0.0f) * m_J01[2].m_linear;
-
-	m_J10[0].m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J10[0].m_angular = dVector(0.f, 0.0f, 0.0f, 0.0f);
-	m_J10[1].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J10[1].m_angular = dVector(0.f, 0.0f, 0.0f, 0.0f);
-	m_J10[2].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J10[2].m_angular = m_J10[2].m_linear * dVector(0.0f, 1.0f, 0.0f, 0.0f);
-
+	m_J01 = dVector(dAbs (gearRatio), 0.0f, 0.0f, 0.0f);
+	m_J10 = dVector(-dSign(gearRatio), 0.0f, 0.0f, 0.0f);
 	SetInvMassJt();
 }
 
-void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetExternalTorque(EngineController* const controller)
+#if 0
+void CustomVehicleController::EngineController::DriveTrainDifferentialGear::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide)
 {
-	DriveTrain::SetExternalTorque(controller);
-	if ((dAbs (m_omega.m_x) > 10.0f) && controller->GetSlipDifferential()) {
+/*
+	dVector omega (m_omega);
+	if ((dAbs(m_omega.m_x) > 10.0f) && controller->GetSlipDifferential()) {
 		// apply viscous slip differential friction torque
 		dFloat omegay = 0.0f;
 		if (m_omega.m_y > D_VEHICLE_SLIP_DIFF_RPS) {
 			omegay = m_omega.m_y - D_VEHICLE_SLIP_DIFF_RPS;
-		} else if (m_omega.m_y < -D_VEHICLE_SLIP_DIFF_RPS) {
+		}
+		else if (m_omega.m_y < -D_VEHICLE_SLIP_DIFF_RPS) {
 			omegay = m_omega.m_y + D_VEHICLE_SLIP_DIFF_RPS;
 		}
-		m_torque.m_y = dClamp (-m_slipDifferentialFrition * omegay, - dFloat (62.0f * D_VEHICLE_SLIP_DIFF_FRICTION), dFloat (2.0f * D_VEHICLE_SLIP_DIFF_FRICTION));
+		//		m_torque.m_y = dClamp (-m_slipDifferentialViscuosFriction * omegay, - dFloat (62.0f * D_VEHICLE_SLIP_DIFF_FRICTION), dFloat (2.0f * D_VEHICLE_SLIP_DIFF_FRICTION));
 	}
-//	dTrace (("%f %f %f\n", m_omega.m_x, m_omega.m_y, m_torque.m_y));
+*/
+
+	const dFloat k = 0.5f / timestep;
+	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
+	dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
+
+	torqueAccel = (dAbs(torqueAccel) < 1.0e-8f) ? 0.0f : torqueAccel;
+	relativeOmega = (dAbs(relativeOmega) < 1.0e-8f) ? 0.0f : relativeOmega;
+	rightSide[m_index] = -(torqueAccel + k * relativeOmega);
+	//	dTrace (("%f %f %f\n", m_omega.m_x, m_omega.m_y, m_torque.m_y));
 }
+#endif
 
 CustomVehicleController::EngineController::DriveTrainTire::DriveTrainTire(BodyPartTire* const tire, DriveTrain* const parent)
-	:DriveTrain(dVector(0.0f, 0.0f, 0.0f, 0.0f), 0.0f, parent)
+	:DriveTrain(dVector(0.0f), parent)
 	,m_tire(tire)
 {
+	dFloat massInv;
 	NewtonBody* const body = m_tire->GetBody();
-	NewtonBodyGetInvMass(body, &m_massInv, &m_inertiaInv.m_x, &m_inertiaInv.m_y, &m_inertiaInv.m_z);
+	NewtonBodyGetInvMass(body, &massInv, &m_inertiaInv.m_x, &m_inertiaInv.m_y, &m_inertiaInv.m_z);
 	dAssert(m_tire->GetJoint()->GetBody0() == body);
-	dVector pin(dFloat(dSign(m_tire->m_data.m_location.m_z)), 1.0f, 0.0f, 0.0f);
 
-	m_J01[0].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J01[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J01[1].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J01[1].m_angular = dVector(0.0f, 1.0f, 0.0f, 0.0f) * m_J01[1].m_linear;
-
-	m_J10[0].m_linear = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J10[0].m_angular = dVector(0.0f, 0.0f, 0.0f, 0.0f);
-	m_J10[1].m_linear = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	m_J10[1].m_angular = pin * m_J10[1].m_linear;
-
+	m_J01 = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	m_J10 = dVector (1.0f, dFloat(dSign(m_tire->m_data.m_location.m_z)), 0.0f, 0.0f);
 	SetInvMassJt();
 }
 
-void CustomVehicleController::EngineController::DriveTrainTire::SetPartMasses (const dVector& invInertia, dFloat invMass)
+void CustomVehicleController::EngineController::DriveTrainTire::SetPartMasses (const dVector& invInertia)
 {
 	dVector tireInvInertia;
 	dFloat tireInvMass;
 
 	NewtonBody* const body = m_tire->GetBody();
 	NewtonBodyGetInvMass(body, &tireInvMass, &tireInvInertia.m_x, &tireInvInertia.m_y, &tireInvInertia.m_z);
-	DriveTrain::SetPartMasses (tireInvInertia, tireInvMass);
+	DriveTrain::SetPartMasses (tireInvInertia);
 }
 
 void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorque(EngineController* const controller)
@@ -1007,13 +940,13 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorqu
 //	dFloat diffAngularSpeed = m_parent->m_omega % m_J10[1].m_angular;
 //	dFloat ratio = -(tireAngularSpeed + diffAngularSpeed) / timestep;
 
-	m_torque = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_torque = dVector (0.0f);
 }
 
 void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
 {
 	dMatrix matrix;
-	dVector torque(m_J01[0].m_angular.Scale(lambda[m_dofBase]) + m_J01[1].m_angular.Scale(lambda[m_dofBase + 1]));
+	dVector torque(m_J01.Scale(lambda[m_index]));
 	NewtonBody* const tireBody = m_tire->GetBody();
 	NewtonBody* const chassisBody = m_tire->GetParent()->GetBody();
 	NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
@@ -1023,7 +956,7 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTor
 	torque = torque.Scale (-0.25f);
 	NewtonBodyAddTorque(chassisBody, &torque[0]);
 	
-	dVector parentTorque(m_J10[0].m_angular.Scale(lambda[m_dofBase]) + m_J10[1].m_angular.Scale(lambda[m_dofBase + 1]));
+	dVector parentTorque(m_J10.Scale(lambda[m_index]));
 	m_parent->m_torque += parentTorque;
 }
 
@@ -1044,11 +977,11 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 		dAssert (axel0.m_rightTire);
 		dAssert (axel1.m_leftTire);
 		dAssert (axel1.m_rightTire);
-		m_engine = new DriveTrainEngine4W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), 1.0f / m_info.m_mass, axel0, axel1);
+		m_engine = new DriveTrainEngine4W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), axel0, axel1);
 	} else {
 		dAssert (axel0.m_leftTire);
 		dAssert (axel0.m_rightTire);
-		m_engine = new DriveTrainEngine2W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), 1.0f / m_info.m_mass, axel0);
+		m_engine = new DriveTrainEngine2W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), axel0);
 	}
 	SetInfo(info);
 }
@@ -1074,7 +1007,7 @@ void CustomVehicleController::EngineController::SetInfo(const Info& info)
 	m_infoCopy.m_clutchFrictionTorque = m_info.m_clutchFrictionTorque;
 
 	dFloat inertiaInv = 1.0f / (2.0f * m_info.m_mass * m_info.m_radio * m_info.m_radio / 5.0f);
-	m_engine->RebuildEngine (dVector (inertiaInv, inertiaInv, inertiaInv, 0.0f), 1.0f / m_info.m_mass);
+	m_engine->RebuildEngine (dVector (inertiaInv, inertiaInv, inertiaInv, 0.0f));
 
 	InitEngineTorqueCurve();
 
@@ -2282,7 +2215,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 {
-	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
+//	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 
 	dMatrix matrix0;
 	
@@ -2308,12 +2241,12 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 	dFloat mag2 = veloc % veloc;
 	if (mag2 > 1.0f) {
 		sideSlipDir = veloc.Scale (1.0f / dSqrt (veloc % veloc));
-		dFloat speed = sideSlipDir % veloc;
+//		dFloat speed = sideSlipDir % veloc;
 
 		dVector omega(0.0f);
 		NewtonBodyGetOmega(chassisBody, &omega[0]);	
 		omega = chassisMatrix.UnrotateVector(omega);
-		dFloat yawRate = omega.m_y;
+//		dFloat yawRate = omega.m_y;
 
 //		dTrace (("%f %f\n", speed, yawRate));
 	}
