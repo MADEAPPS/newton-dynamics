@@ -853,7 +853,7 @@ CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrai
 	m_child->m_sibling = new DriveTrainTire(axel.m_rightTire, this);
 
 	m_J01 = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
-	m_J10 = dVector(1.0f, dSign(side), 0.0f, 0.0f);
+	m_J10 = dVector(1.0f, 2.0f * dSign(side), 0.0f, 0.0f);
 	SetInvMassJt();
 }
 
@@ -912,7 +912,7 @@ CustomVehicleController::EngineController::DriveTrainTire::DriveTrainTire(BodyPa
 	dAssert(m_tire->GetJoint()->GetBody0() == body);
 
 	m_J01 = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-	m_J10 = dVector (1.0f, dFloat(dSign(m_tire->m_data.m_location.m_z)), 0.0f, 0.0f);
+	m_J10 = dVector (1.0f, 2.0f * dSign(m_tire->m_data.m_location.m_z), 0.0f, 0.0f);
 	SetInvMassJt();
 }
 
