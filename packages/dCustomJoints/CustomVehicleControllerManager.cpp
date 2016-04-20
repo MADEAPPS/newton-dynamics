@@ -340,7 +340,9 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else if (param <= 0.0f) {
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			if (!m_tire->GetController()->m_isAirborned) {
+				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			}
 		} else {
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_tire->m_data.m_springStrength, m_tire->m_data.m_dampingRatio);
