@@ -26,6 +26,8 @@ m_collidingCount
 static FILE* file_xxx;
 #endif
 
+static int xxx;
+
 
 #define D_VEHICLE_NEUTRAL_GEAR			0
 #define D_VEHICLE_REVERSE_GEAR			1
@@ -2217,7 +2219,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
-static int xxx;
+
 xxx++;
 
 

@@ -1464,7 +1464,7 @@ void SuperCar (DemoEntityManager* const scene)
 //	scene->SetCameraMouseLock (true);
 
 	camMatrix.m_posit.m_x -= 5.0f;
-//camMatrix = dYawMatrix (0.5f * 3.1416f) * camMatrix;
+camMatrix = dYawMatrix (-0.75f * 3.1416f) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 
