@@ -2213,20 +2213,16 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
-static int xxx;
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
-//		if (!NewtonBodyGetSleepState(m_body)) 
-		{
-xxx ++;
-			dTrace (("%d %f %f %f\n", xxx, m_lastAngularMomentum[0], m_lastAngularMomentum[1], m_lastAngularMomentum[2]));
+		if (!NewtonBodyGetSleepState(m_body)) {
 			if (m_isAirborned) {
 				dMatrix invInertia;
 				NewtonBodyGetInvInertiaMatrix(m_body, &invInertia[0][0]);
 				dVector omega (invInertia.RotateVector(m_lastAngularMomentum));
 				NewtonBodySetOmega(m_body, &omega[0]);
 				// attenuate the angular momentum by applying a pseudo angular deficiently of drag
-				m_lastAngularMomentum = m_lastAngularMomentum.Scale (0.995f);
+				m_lastAngularMomentum = m_lastAngularMomentum.Scale (0.999f);
 			}
 
 			bool hasContacts = false;
