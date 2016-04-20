@@ -1974,7 +1974,7 @@ int CustomVehicleControllerManager::OnTireAABBOverlap(const NewtonMaterial* cons
 int CustomVehicleControllerManager::OnTireAABBOverlap(const NewtonMaterial* const material, const CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody) const
 {
 	for (int i = 0; i < tire->m_collidingCount; i ++) {
-		if (otherBody == tire->m_info[i].m_hitBody) {
+		if (otherBody == tire->m_contactInfo[i].m_hitBody) {
 			return true;
 		}
 	}
@@ -2020,18 +2020,18 @@ int CustomVehicleControllerManager::OnContactGeneration (const CustomVehicleCont
 	NewtonCollision* const collisionA = NewtonBodyGetCollision(tire->GetBody());
 	dLong tireID = NewtonCollisionGetUserID(collisionA);
 	for (int i = 0; i < tire->m_collidingCount; i ++) {
-		if (otherBody == tire->m_info[i].m_hitBody) {
-			contactBuffer[count].m_point[0] = tire->m_info[i].m_point[0];
-			contactBuffer[count].m_point[1] = tire->m_info[i].m_point[1];
-			contactBuffer[count].m_point[2] = tire->m_info[i].m_point[2];
+		if (otherBody == tire->m_contactInfo[i].m_hitBody) {
+			contactBuffer[count].m_point[0] = tire->m_contactInfo[i].m_point[0];
+			contactBuffer[count].m_point[1] = tire->m_contactInfo[i].m_point[1];
+			contactBuffer[count].m_point[2] = tire->m_contactInfo[i].m_point[2];
 			contactBuffer[count].m_point[3] = 1.0f;
-			contactBuffer[count].m_normal[0] = tire->m_info[i].m_normal[0];
-			contactBuffer[count].m_normal[1] = tire->m_info[i].m_normal[1];
-			contactBuffer[count].m_normal[2] = tire->m_info[i].m_normal[2];
+			contactBuffer[count].m_normal[0] = tire->m_contactInfo[i].m_normal[0];
+			contactBuffer[count].m_normal[1] = tire->m_contactInfo[i].m_normal[1];
+			contactBuffer[count].m_normal[2] = tire->m_contactInfo[i].m_normal[2];
 			contactBuffer[count].m_normal[3] = 0.0f;
 			contactBuffer[count].m_penetration = 0.0f;
 			contactBuffer[count].m_shapeId0 = tireID;
-			contactBuffer[count].m_shapeId1 = tire->m_info[i].m_contactID;
+			contactBuffer[count].m_shapeId1 = tire->m_contactInfo[i].m_contactID;
 			count ++;
 		}				  
 	}
@@ -2069,7 +2069,7 @@ bool CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 	TireFilter filter(tireBody, vehicleBody);
 
 	dFloat timeOfImpact;
-	tire->m_collidingCount = NewtonWorldConvexCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, &timeOfImpact, &filter, CustomControllerConvexCastPreFilter::Prefilter, tire->m_info, sizeof (tire->m_info) / sizeof (tire->m_info[0]), 0);
+	tire->m_collidingCount = NewtonWorldConvexCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, &timeOfImpact, &filter, CustomControllerConvexCastPreFilter::Prefilter, tire->m_contactInfo, sizeof (tire->m_contactInfo) / sizeof (tire->m_contactInfo[0]), 0);
 	if (tire->m_collidingCount) {
 
 		timeOfImpact = 1.0f - timeOfImpact;
@@ -2217,6 +2217,10 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
+static int xxx;
+xxx++;
+
+
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		if (!NewtonBodyGetSleepState(m_body)) {
