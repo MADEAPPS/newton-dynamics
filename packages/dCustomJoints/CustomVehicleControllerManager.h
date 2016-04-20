@@ -547,7 +547,9 @@ class CustomVehicleController: public CustomControllerBase
 	void ApplyLateralStabilityForces(dFloat timestep);
 	void Cleanup();
 	
+	
 	dMatrix m_localFrame;
+	dVector m_lastAngularMomentum;
 	BodyPartChassis m_chassis;
 	dList<BodyPartTire> m_tireList;
 	dList<BodyPart*> m_bodyPartsList;
@@ -563,6 +565,7 @@ class CustomVehicleController: public CustomControllerBase
 	NewtonApplyForceAndTorque m_forceAndTorque;
 	dFloat m_weightDistribution;
 	bool m_finalized;
+	bool m_isAirborned;
 
 	friend class CustomVehicleControllerManager;
 };
@@ -589,7 +592,7 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
 	CUSTOM_JOINTS_API int OnContactGeneration (const CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const;
 
-	void Collide (CustomVehicleController::BodyPartTire* const tire) const;
+	bool Collide (CustomVehicleController::BodyPartTire* const tire) const;
 	static void OnTireContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex);
 	static int OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
 	static int OnContactGeneration (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex);

@@ -1,3 +1,5 @@
+m_collidingCount
+m_collidingCount
 /* Copyright (c) <2009> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
@@ -254,14 +256,16 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right % tireMatrix.m_right));
 		tireMatrix.m_up = tireMatrix.m_right * tireMatrix.m_front;
 
-//		dFloat param = dMin (CalculateTireParametricPosition (tireMatrix, chassisMatrix), dFloat(1.0f));
-		dFloat param = CalculateTireParametricPosition (tireMatrix, chassisMatrix);
-		if (param > 1.0f) {
-			param = 1.0f;
-			ApplyBumperImpactLimit(chassisMatrix.m_up, param);
-		} else if (param < 0.0f){
-			param = 0.0f;
-			ApplyBumperImpactLimit(chassisMatrix.m_up, param);
+		dFloat param = 0.0f;
+		if (!m_tire->GetController()->m_isAirborned) {
+			param = CalculateTireParametricPosition (tireMatrix, chassisMatrix);
+			if (param > 1.0f) {
+				param = 1.0f;
+				ApplyBumperImpactLimit(chassisMatrix.m_up, param);
+			} else if (param < 0.0f){
+				param = 0.0f;
+				ApplyBumperImpactLimit(chassisMatrix.m_up, param);
+			}
 		}
 		
 		tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale (param * m_tire->m_data.m_suspesionlenght);
@@ -1574,6 +1578,8 @@ void CustomVehicleController::Init(NewtonCollision* const chassisShape, const dM
 	NewtonWorld* const world = manager->GetWorld();
 
 	// create a body and an call the low level init function
+	m_isAirborned = false;
+	m_lastAngularMomentum = dVector (0.0f);
 	dMatrix locationMatrix(dGetIdentityMatrix());
 	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
 
@@ -2029,7 +2035,7 @@ int CustomVehicleControllerManager::OnContactGeneration (const CustomVehicleCont
 }
 
 
-void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTire* const tire) const
+bool CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTire* const tire) const
 {
 	dMatrix tireMatrix;
 	dMatrix chassisMatrix;
@@ -2071,6 +2077,7 @@ void CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 			NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
 		}
 	}
+	return tire->m_collidingCount ? true : false;
 }
 
 void CustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
@@ -2206,15 +2213,43 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
+static int xxx;
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
-		if (!NewtonBodyGetSleepState(m_body)) {
+//		if (!NewtonBodyGetSleepState(m_body)) 
+		{
+xxx ++;
+			dTrace (("%d %f %f %f\n", xxx, m_lastAngularMomentum[0], m_lastAngularMomentum[1], m_lastAngularMomentum[2]));
+			if (m_isAirborned) {
+				dMatrix invInertia;
+				NewtonBodyGetInvInertiaMatrix(m_body, &invInertia[0][0]);
+				dVector omega (invInertia.RotateVector(m_lastAngularMomentum));
+				NewtonBodySetOmega(m_body, &omega[0]);
+				// attenuate the angular momentum by applying a pseudo angular deficiently of drag
+				m_lastAngularMomentum = m_lastAngularMomentum.Scale (0.995f);
+			}
+
+			bool hasContacts = false;
 			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*) GetManager();
 			for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
 				BodyPartTire& tire = tireNode->GetInfo();
 				WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
 				tireJoint->RemoveKinematicError(timestep);
-				manager->Collide(&tire);
+				hasContacts |= manager->Collide(&tire);
+			}
+			if (!hasContacts) {
+				for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(m_body); joint; joint = NewtonBodyGetNextContactJoint(m_body, joint)) {
+					hasContacts |= NewtonJointIsActive(joint) ? true : false;
+				}
+			}
+
+			m_isAirborned = !hasContacts;
+			if (hasContacts) {
+				dMatrix inertia;				
+				dVector omega;
+				NewtonBodyGetOmega(m_body, &omega[0]);
+				NewtonBodyGetInertiaMatrix(m_body, &inertia[0][0]);
+				m_lastAngularMomentum = inertia.RotateVector(omega);
 			}
 		}
 

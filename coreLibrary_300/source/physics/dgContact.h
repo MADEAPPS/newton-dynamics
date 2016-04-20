@@ -55,7 +55,7 @@ class dgCollisionParamProxy
 	public:
 	dgCollisionParamProxy(dgContact* const contact, dgContactPoint* const contactBuffer, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly)
 		:m_contactJoint(contact)
-		,m_contacts____(contactBuffer)
+		,m_contacts(contactBuffer)
 		,m_polyMeshData(NULL)		
 		,m_threadIndex(threadIndex)
 		,m_continueCollision(ccdMode)
@@ -71,7 +71,7 @@ class dgCollisionParamProxy
 	dgBody* m_body1;
 	dgCollisionInstance* m_instance0;
 	dgCollisionInstance* m_instance1;
-	dgContactPoint* m_contacts____;
+	dgContactPoint* m_contacts;
 	dgPolygonMeshDesc* m_polyMeshData;
 	
 	dgFloat32 m_timestep;

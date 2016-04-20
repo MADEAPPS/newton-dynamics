@@ -527,7 +527,7 @@ class SuperCarEntity: public DemoEntity
 		}
 
 #if 0
-	#if 0
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
@@ -1426,16 +1426,17 @@ void SuperCar (DemoEntityManager* const scene)
 
 	dFloat u = 1.0f;
 	for (int i = 0; i < 1; i ++) {
+		dVector offset (0.0f, 50.0f, 0.0f, 0.0f);
 /*
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
+		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0 + offset, "lambDiablo.ngd", 3.0f);
 		vehicle0->BuildWheelCar(1, -0.35f);
 		u -= 0.005f;
 */
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
-		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + dVector (0.0f, 50.0f, 0.0f, 0.0f), 100.0f);
+		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + offset, 100.0f);
 		location1.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
 		vehicle1->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
@@ -1443,7 +1444,7 @@ void SuperCar (DemoEntityManager* const scene)
 /*
 		dMatrix location2 (manager->CalculateSplineMatrix (u));
 		location2.m_posit += location2.m_right.Scale ( 3.0f);
-		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit, 100.0f);
+		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit + offset, 100.0f);
 		location2.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
 		vehicle2->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
@@ -1474,7 +1475,7 @@ void SuperCar (DemoEntityManager* const scene)
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);

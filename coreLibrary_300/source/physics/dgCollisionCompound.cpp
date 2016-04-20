@@ -1614,8 +1614,8 @@ dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& pro
 				dgFloat32 dist2 = proxy.m_contactJoint->m_closestDistance * proxy.m_contactJoint->m_closestDistance;
 				if (dist2 < minDist2) {
 					minDist2 = dist2;
-					contact0 = proxy.m_contacts____[0];
-					contact1 = proxy.m_contacts____[1];
+					contact0 = proxy.m_contacts[0];
+					contact1 = proxy.m_contacts[1];
 				}
 			} else {
 				dgAssert (0);
@@ -1637,8 +1637,8 @@ dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& pro
 	}
 
 	if (retFlag) {
-		proxy.m_contacts____[0] = contact0;
-		proxy.m_contacts____[1] = contact1;
+		proxy.m_contacts[0] = contact0;
+		proxy.m_contacts[1] = contact1;
 		proxy.m_contactJoint->m_closestDistance = dgSqrt (minDist2);
 	}
 	return retFlag;
@@ -1704,8 +1704,8 @@ dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& p
 				dgFloat32 dist2 = proxy.m_contactJoint->m_closestDistance * proxy.m_contactJoint->m_closestDistance;
 				if (dist2 < minDist2) {
 					minDist2 = dist2;
-					contact0 = proxy.m_contacts____[0];
-					contact1 = proxy.m_contacts____[1];
+					contact0 = proxy.m_contacts[0];
+					contact1 = proxy.m_contacts[1];
 				}
 			} else {
 				dgAssert (0);
@@ -1730,8 +1730,8 @@ dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& p
 	}
 
 	if (retFlag) {
-		proxy.m_contacts____[0] = contact0;
-		proxy.m_contacts____[1] = contact1;
+		proxy.m_contacts[0] = contact0;
+		proxy.m_contacts[1] = contact1;
 		proxy.m_contactJoint->m_closestDistance = dgSqrt (minDist2);
 	}
 	return retFlag;
@@ -1741,7 +1741,7 @@ dgInt32 dgCollisionCompound::ClosestDistanceToCompound (dgCollisionParamProxy& p
 
 dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
-	dgContactPoint* const contacts = proxy.m_contacts____;
+	dgContactPoint* const contacts = proxy.m_contacts;
 	const dgNodeBase* stackPool[4 * DG_COMPOUND_STACK_DEPTH][2];
 
 	dgInt32 contactCount = 0;
@@ -1799,7 +1799,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 						proxy.m_instance1 = &otherChildInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts____ = contacts ? &contacts[contactCount] : contacts;
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
@@ -1886,7 +1886,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 	}
 
 	constraint->m_closestDistance = closestDist;
-	proxy.m_contacts____ = contacts;
+	proxy.m_contacts = contacts;
 	return contactCount;
 }
 
@@ -1895,7 +1895,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 
 dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
-	dgContactPoint* const contacts = proxy.m_contacts____;
+	dgContactPoint* const contacts = proxy.m_contacts;
 
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 
@@ -1957,7 +1957,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts____ = contacts ? &contacts[contactCount] : contacts;
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = 0;
 						count += m_world->CalculateConvexToNonConvexContacts (proxy);
@@ -2000,14 +2000,14 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 	}
 
 	constraint->m_closestDistance = closestDist;
-	proxy.m_contacts____ = contacts;	
+	proxy.m_contacts = contacts;	
 	return contactCount;
 }
 
 
 dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
-	dgContactPoint* const contacts = proxy.m_contacts____;
+	dgContactPoint* const contacts = proxy.m_contacts;
 
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 
@@ -2064,7 +2064,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase
 						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts____ = contacts ? &contacts[contactCount] : contacts;
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = 0;
 						count += m_world->CalculateConvexToNonConvexContacts (proxy);
@@ -2104,14 +2104,14 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase
 	}
 
 	constraint->m_closestDistance = closestDist;
-	proxy.m_contacts____ = contacts;	
+	proxy.m_contacts = contacts;	
 	return contactCount;
 }
 
 
 dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
-	dgContactPoint* const contacts = proxy.m_contacts____;
+	dgContactPoint* const contacts = proxy.m_contacts;
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 
 	dgContact* const constraint = pair->m_contact;
@@ -2166,7 +2166,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts____ = contacts ? &contacts[contactCount] : contacts;
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
@@ -2205,7 +2205,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 	}
 
 	constraint->m_closestDistance = closestDist;
-	proxy.m_contacts____ = contacts;
+	proxy.m_contacts = contacts;
 	return contactCount;
 }
 
@@ -2213,7 +2213,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 
 dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
-	dgContactPoint* const contacts = proxy.m_contacts____;
+	dgContactPoint* const contacts = proxy.m_contacts;
 
 	dgNodePairs stackPool[4 * DG_COMPOUND_STACK_DEPTH];
 
@@ -2289,7 +2289,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts____ = contacts ? &contacts[contactCount] : contacts;
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = m_world->CalculateConvexToNonConvexContacts (proxy);
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
@@ -2441,7 +2441,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 	}
 
 	constraint->m_closestDistance = closestDist;
-	proxy.m_contacts____ = contacts;	
+	proxy.m_contacts = contacts;	
 	return contactCount;
 }
 
@@ -2452,7 +2452,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 	if (proxy.m_timestep < dgFloat32 (1.0e-4f)) {
 		return 0;
 	}
-	dgContactPoint* const contacts = proxy.m_contacts____;
+	dgContactPoint* const contacts = proxy.m_contacts;
 	const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
 	dgContact* const constraint = pair->m_contact;
 
@@ -2515,7 +2515,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts____ = contacts ? &contacts[contactCount] : contacts;
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
 
@@ -2582,7 +2582,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 	proxy.m_closestPointBody1 = q;
 	proxy.m_timestep = maxParam;
 	constraint->m_closestDistance = closestDist;
-	proxy.m_contacts____ = contacts;
+	proxy.m_contacts = contacts;
 	return contactCount;
 }
 
@@ -2594,7 +2594,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 	}
 
 	dgInt32 contactCount = 0;
-	dgContactPoint* const contacts = proxy.m_contacts____;
+	dgContactPoint* const contacts = proxy.m_contacts;
 	const dgNodeBase* stackPool[4 * DG_COMPOUND_STACK_DEPTH][2];
 	dgContact* const constraint = pair->m_contact;
 
@@ -2665,7 +2665,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 						proxy.m_instance1 = &otherChildInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts____ = contacts ? &contacts[contactCount] : contacts;
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = m_world->CalculateConvexToConvexContacts (proxy);
 
@@ -2777,7 +2777,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 	proxy.m_timestep = maxParam;
 
 	constraint->m_closestDistance = closestDist;
-	proxy.m_contacts____ = contacts;
+	proxy.m_contacts = contacts;
 	return contactCount;
 }
 
@@ -2787,7 +2787,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 		return 0;
 	}
 
-	dgContactPoint* const contacts = proxy.m_contacts____;
+	dgContactPoint* const contacts = proxy.m_contacts;
 
 	dgNodePairs stackPool[4 * DG_COMPOUND_STACK_DEPTH];
 
@@ -2878,7 +2878,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 						proxy.m_instance0 = &childInstance; 
 
 						proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
-						proxy.m_contacts____ = contacts ? &contacts[contactCount] : contacts;
+						proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
 
 						dgInt32 count = m_world->CalculateConvexToNonConvexContacts (proxy);
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
@@ -3060,6 +3060,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 	proxy.m_timestep = maxParam;
 
 	constraint->m_closestDistance = closestDist;
-	proxy.m_contacts____ = contacts;	
+	proxy.m_contacts = contacts;	
 	return contactCount;
 }
