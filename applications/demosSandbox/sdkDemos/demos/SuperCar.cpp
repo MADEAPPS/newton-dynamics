@@ -1399,10 +1399,10 @@ void SuperCar (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	//CreateLevelMesh (scene, "flatPlane1.ngd", 0);
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	//CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);
-	//CreateLevelMesh (scene, "raceTrack1.ngd", 0);
+	CreateLevelMesh (scene, "raceTrack1.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 1);
 	//CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	//CreatePlaneCollision (scene, dVector (0.0f, 1.0f, 0.0f, 0.0f));
@@ -1435,7 +1435,7 @@ void SuperCar (DemoEntityManager* const scene)
 		u -= 0.005f;
 */
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
-		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit, 100.0f);
+		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + dVector (0.0f, 50.0f, 0.0f, 0.0f), 100.0f);
 		location1.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
 		vehicle1->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
