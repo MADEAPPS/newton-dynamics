@@ -994,6 +994,8 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 		m_engine = new DriveTrainEngine2W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), axel0);
 	}
 	SetInfo(info);
+
+	m_controller->SetAerodynamicsDownforceCoefficient(10.0f, 0.5f, 0.4f, 1.0f);
 }
 
 CustomVehicleController::EngineController::~EngineController()

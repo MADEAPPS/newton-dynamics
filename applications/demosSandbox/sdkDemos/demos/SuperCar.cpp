@@ -83,10 +83,10 @@
 #define VIPER_TIRE_REVERSE_GEAR				2.90f
 #define VIPER_COM_Y_OFFSET					0.0f
 
-// downforce at 80 kmh
-#define VIPER_DOWNFORCE_WEIGHT_FACTOR_0		2.0f
-// downforce at top Speed
-#define VIPER_DOWNFORCE_WEIGHT_FACTOR_1		4.0f
+// down force at 80 kmh
+#define VIPER_DOWNFORCE_WEIGHT_FACTOR_0		1.0f
+// down force at top Speed
+#define VIPER_DOWNFORCE_WEIGHT_FACTOR_1		2.0f
 #define VIPER_DOWNFORCE_WEIGHT_FACTOR_SPEED	80.0f 
 
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
