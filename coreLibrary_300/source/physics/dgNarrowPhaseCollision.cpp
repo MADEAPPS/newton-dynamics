@@ -1763,6 +1763,9 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 	const dgInt32 stride = polygon.m_stride;
 	const dgFloat32* const vertex = polygon.m_vertex;
 	dgAssert(polyInstance.m_scaleType == dgCollisionInstance::m_unit);
+
+dgAssert (0);
+//huge bug here !!!!!;
 	dgContactPoint* const contactOut = proxy.m_contacts;
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
