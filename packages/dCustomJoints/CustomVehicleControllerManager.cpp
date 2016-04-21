@@ -1,7 +1,3 @@
-m_index
-m_index
-m_collidingCount
-m_collidingCount
 /* Copyright (c) <2009> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
