@@ -193,8 +193,8 @@ class CustomVehicleController: public CustomControllerBase
 
 			virtual dFloat GetFrictionCoefficient(const NewtonMaterial* const material, const NewtonBody* const tireBody, const NewtonBody* const otherBody) const
 			{
-				//return 1.5f;
-				return 1.2f;
+				// the vehicle model is realistic, please do not use fake larger than one fiction coefficient, or you vehicle will simply role over
+				return 1.0f;
 			}
 
 			// Using brush tire model explained on this paper
@@ -202,17 +202,18 @@ class CustomVehicleController: public CustomControllerBase
 			// 
 			virtual void GetForces(const BodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat longitudinalSlip, dFloat lateralSlip, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
 			{
-				dFloat phy_z = lateralSlip * tire->m_data.m_lateralStiffness;
+				dFloat phy_y = lateralSlip * tire->m_data.m_lateralStiffness;
 				dFloat phy_x = longitudinalSlip * tire->m_data.m_longitudialStiffness;
-				dFloat gamma = dSqrt(phy_x * phy_x + phy_z * phy_z);
+				dFloat gamma = dSqrt(phy_x * phy_x + phy_y * phy_y);
 
-				tireLoad *= GetFrictionCoefficient (material, tire->GetBody(), otherBody);
+				dFloat fritionCoeficicent = dClamp (GetFrictionCoefficient (material, tire->GetBody(), otherBody), dFloat (0.0f), dFloat (1.0f));
+				tireLoad *= fritionCoeficicent;
 				dFloat phyMax = 3.0f * tireLoad + 1.0f;
 
 				dFloat F = (gamma <= phyMax) ? (gamma * (1.0f - gamma / phyMax  + gamma * gamma / (3.0f * phyMax * phyMax))) : tireLoad;
 
 				dFloat fraction = F / gamma;
-				lateralForce = - phy_z * fraction;
+				lateralForce = - phy_y * fraction;
 				longitudinalForce = - phy_x * fraction;
 
 				aligningTorque = 0.0f;

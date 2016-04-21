@@ -1,3 +1,5 @@
+m_index
+m_index
 m_collidingCount
 m_collidingCount
 /* Copyright (c) <2009> <Newton Game Dynamics>
@@ -2160,11 +2162,12 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			NewtonMaterialContactRotateTangentDirections(material, &lateralPin[0]);
 			NewtonMaterialGetContactTangentDirections(material, tireBody, &lateralContactDir[0], &longitudinalContactDir[0]);
 
-			dFloat vy = tireVeloc % lateralPin;
-			dFloat vx = tireVeloc % longitudinalContactDir;
-			dFloat vw = -((tireOmega * radius) % longitudinalContactDir);
+			//dFloat tireOriginLateralSpeed = tireVeloc % lateralPin;
+			dFloat tireOriginLateralSpeed = tireVeloc % longitudinalContactDir;
+			dFloat tireOriginLongitudinalSpeed = tireVeloc % longitudinalContactDir;
+			dFloat tireContactLongitudinalSpeed = -((tireOmega * radius) % longitudinalContactDir);
 
-			if ((dAbs(vx) < (1.0f)) || (dAbs(vw) < 0.1f)) {
+			if ((dAbs(tireOriginLongitudinalSpeed) < (1.0f)) || (dAbs(tireContactLongitudinalSpeed) < 0.1f)) {
 				// vehicle  moving at speed for which tire physics is undefined, simple do a kinematic motion
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
@@ -2177,33 +2180,38 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				//dFloat phy_z0 = alphaTangent / (1.0f + k);
 
 				// reduces to this, which may have a divide by zero locked, so I am cl;amping to some small value
-				if (dAbs(vw) < 0.01f) {
-					vw = 0.01f * dSign(vw);
+				if (dAbs(tireContactLongitudinalSpeed) < 0.01f) {
+					tireContactLongitudinalSpeed = 0.01f * dSign(tireContactLongitudinalSpeed);
 				}
-				dFloat phy_x = (vw - vx) / vw;
-				dFloat phy_z = vy / dAbs (vw);
 
-				dFloat f_x;
-				dFloat f_z;
-				dFloat moment;
+				dFloat lateralSideSlip = tireOriginLateralSpeed / dAbs (tireContactLongitudinalSpeed);
+				dFloat longitudinalSlipRatio = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireContactLongitudinalSpeed;
+
+
+				dFloat aligningMoment;
+				dFloat lateralForce;
+				dFloat longitudinalForce;
 
 				dVector tireLoadForce(0.0f);
 				NewtonMaterialGetContactForce(material, tireBody, &tireLoadForce.m_x);
 				dFloat tireLoad = (tireLoadForce % contactNormal);
 
-				controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, phy_x, phy_z, f_x, f_z, moment);
+				controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, longitudinalSlipRatio, lateralSideSlip, longitudinalForce, lateralForce, aligningMoment);
 
-				dVector force (longitudinalContactDir.Scale (f_x) + lateralPin.Scale (f_z));
-				dVector torque (radius * force);
+				//dVector force (longitudinalContactDir.Scale (f_x) + lateralPin.Scale (f_z));
+				//dVector force (longitudinalContactDir.Scale (f_x) + lateralContactDir.Scale (f_z));
+				//dVector torque (radius * force);
 
 				//NewtonBodyAddForce(tireBody, &force[0]);
 				//NewtonBodyAddForce(tireBody, &torque[0]);
 
 				NewtonMaterialSetContactTangentAcceleration (material, 0.0f, 0);
-				NewtonMaterialSetContactTangentFriction(material, dAbs (f_z), 0);
+				NewtonMaterialSetContactTangentFriction(material, dAbs (lateralForce), 0);
 
 				NewtonMaterialSetContactTangentAcceleration (material, 0.0f, 1);
-				NewtonMaterialSetContactTangentFriction(material, dAbs (f_x), 1);
+				NewtonMaterialSetContactTangentFriction(material, dAbs (longitudinalForce), 1);
+
+//dTrace (("%d (%f %f %f)\n", tire->m_index, tireLoad, longitudinalForce, lateralForce));
 			}
 
 		} else {

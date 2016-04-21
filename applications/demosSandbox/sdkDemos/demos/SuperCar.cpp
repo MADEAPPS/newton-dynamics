@@ -1405,6 +1405,7 @@ void SuperCar (DemoEntityManager* const scene)
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 1);
 	CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
+	//CreateHeightFieldTerrain (scene, 10, 8.0f, 0.0f, 0.0f, 200.0f, -50.0f);
 	//CreatePlaneCollision (scene, dVector (0.0f, 1.0f, 0.0f, 0.0f));
 
 	NewtonWorld* const world = scene->GetNewton();
@@ -1464,7 +1465,7 @@ void SuperCar (DemoEntityManager* const scene)
 //	scene->SetCameraMouseLock (true);
 
 	camMatrix.m_posit.m_x -= 5.0f;
-camMatrix = dYawMatrix (-0.75f * 3.1416f) * camMatrix;
+camMatrix = dYawMatrix (-0.0f * 3.1416f) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 
