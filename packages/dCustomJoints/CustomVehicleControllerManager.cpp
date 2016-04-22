@@ -24,7 +24,7 @@
 static FILE* file_xxx;
 #endif
 
-static int xxx;
+//static int xxx;
 
 
 #define D_VEHICLE_NEUTRAL_GEAR			0
@@ -412,6 +412,7 @@ CustomVehicleController::BodyPartTire::BodyPartTire()
 	,m_lateralSlip(0.0f)
 	,m_longitudinalSlip(0.0f)
 	,m_aligningTorque(0.0f)
+	,m_driveTorque(0.0f)
 	,m_index(0)
 	,m_collidingCount(0)
 {
@@ -948,11 +949,8 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorqu
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 
 	m_omega = matrix.UnrotateVector(omega);
-//	dFloat tireAngularSpeed = omega % m_J01[1].m_angular;
-//	dFloat diffAngularSpeed = m_parent->m_omega % m_J10[1].m_angular;
-//	dFloat ratio = -(tireAngularSpeed + diffAngularSpeed) / timestep;
-
 	m_torque = dVector (0.0f);
+//	m_torque = dVector (m_tire->m_powerTorque, 0.0f, 0.0f, 0.0f);
 }
 
 void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
@@ -2151,6 +2149,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 	tire->m_lateralSlip = 0.0f;
 	tire->m_aligningTorque = 0.0f;
 	tire->m_longitudinalSlip = 0.0f;
+	tire->m_driveTorque = 0.0f;
 
 	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 		dVector contactPoint(0.0f);
@@ -2185,19 +2184,17 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			} else {
 				// calculating Brush tire model with longitudinal and lateral coupling 
 				// for friction coupling according to Motor Vehicle dynamics by: Giancarlo Genta 
+				// reduces to this, which may have a divide by zero locked, so I am cl;amping to some small value
 				// dFloat alphaTangent = vy / dAbs(vx);
 				//dFloat k = (vw - vx) / vx;
 				//dFloat phy_x0 = k / (1.0f + k);
-				//dFloat phy_z0 = alphaTangent / (1.0f + k);
-
-				// reduces to this, which may have a divide by zero locked, so I am cl;amping to some small value
+				//dFloat phy_y0 = alphaTangent / (1.0f + k);
 				if (dAbs(tireContactLongitudinalSpeed) < 0.01f) {
 					tireContactLongitudinalSpeed = 0.01f * dSign(tireContactLongitudinalSpeed);
 				}
 
 				dFloat lateralSideSlip = tireOriginLateralSpeed / dAbs (tireContactLongitudinalSpeed);
 				dFloat longitudinalSlipRatio = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireContactLongitudinalSpeed;
-
 
 				dFloat aligningMoment;
 				dFloat lateralForce;
@@ -2215,14 +2212,16 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 				//NewtonBodyAddForce(tireBody, &force[0]);
 				//NewtonBodyAddForce(tireBody, &torque[0]);
-
+				dFloat sign = dSign (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed);
+				tire->m_driveTorque += longitudinalForce * sign * tire->m_data.m_radio;
+				
 				NewtonMaterialSetContactTangentAcceleration (material, 0.0f, 0);
 				NewtonMaterialSetContactTangentFriction(material, dAbs (lateralForce), 0);
 
 				NewtonMaterialSetContactTangentAcceleration (material, 0.0f, 1);
 				NewtonMaterialSetContactTangentFriction(material, dAbs (longitudinalForce), 1);
 
-//dTrace (("%d (%f %f %f)\n", tire->m_index, tireLoad, longitudinalForce, lateralForce));
+//dTrace (("(%d %f) ", tire->m_index, tire->m_powerTorque));
 			}
 
 		} else {
@@ -2238,9 +2237,8 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
-
-xxx++;
-
+//xxx++;
+//dTrace (("\n"));
 
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {

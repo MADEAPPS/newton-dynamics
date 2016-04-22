@@ -236,12 +236,12 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API Info GetInfo() const {return m_data;}
 		CUSTOM_JOINTS_API void SetInfo(const Info& info) {};
 
-
 		protected:
 		Info m_data;
 		dFloat m_lateralSlip;
 		dFloat m_longitudinalSlip;
 		dFloat m_aligningTorque;
+		dFloat m_driveTorque;
 		int m_index;
 		int m_collidingCount;
 		NewtonWorldConvexCastReturnInfo m_contactInfo[2];
