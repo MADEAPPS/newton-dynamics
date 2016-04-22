@@ -307,7 +307,9 @@ dVector dMatrix::TransformVector (const dVector &v) const
 
 dVector dMatrix::UntransformVector (const dVector &v) const
 {
-	return UnrotateVector(v - m_posit);
+	dVector rot (UnrotateVector(v - m_posit));
+	rot.m_w = 1.0f;
+	return rot;
 }
 
 

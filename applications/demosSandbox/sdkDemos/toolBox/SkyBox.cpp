@@ -50,8 +50,7 @@ void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
 	glGetFloat (GL_MODELVIEW_MATRIX, &matrix[0][0]);
 
 	dMatrix skyMatrix (dGetIdentityMatrix());
-	skyMatrix.m_posit = matrix.UnrotateVector (matrix.m_posit.Scale (-1.0f));
-	skyMatrix.m_posit.m_y += 25.0f; 
+	skyMatrix.m_posit = matrix.UntransformVector (dVector (0.0f, 0.25f, 0.0f, 1.0f));
 
 	glPushMatrix();
 	glMultMatrix(&skyMatrix[0][0]);
