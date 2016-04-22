@@ -244,7 +244,7 @@ class CustomVehicleController: public CustomControllerBase
 		dFloat m_aligningTorque;
 		int m_index;
 		int m_collidingCount;
-		NewtonWorldConvexCastReturnInfo m_contactInfo[1];
+		NewtonWorldConvexCastReturnInfo m_contactInfo[2];
 		friend class WheelJoint;
 		friend class CustomVehicleController;
 		friend class CustomVehicleControllerManager;
