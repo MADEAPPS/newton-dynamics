@@ -863,13 +863,14 @@ NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dF
 
 NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId)
 {
-	dAssert (mesh);
 	dAssert (collision);
 
 	// add an new entity to the world
 	DemoEntity* const entity = new DemoEntity(matrix, NULL);
 	scene->Append (entity);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
+	if (mesh) {
+		entity->SetMesh(mesh, dGetIdentityMatrix());
+	}
 	return CreateSimpleBody (scene->GetNewton(), entity, mass, matrix, collision, materialId);
 }
 

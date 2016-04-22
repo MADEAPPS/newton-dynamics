@@ -55,53 +55,53 @@ static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat m
 }
 
 
-static void AddNonUniformScaledPrimitives (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
+static void AddNonUniformScaledPrimitives(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
 {
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
-//	NewtonCollision* const collision = CreateConvexCollision (world, &shapeOffsetMatrix[0][0], size, type, materialID);
-	NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, type, materialID);
+	//     NewtonCollision* const collision = CreateConvexCollision (world, &shapeOffsetMatrix[0][0], size, type, materialID);
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, type, materialID);
 
 	dFloat startElevation = 1000.0f;
-	dMatrix matrix (dGetIdentityMatrix());
-//matrix = dPitchMatrix(-45.0f * 3.141592f/180.0f);
-	for (int i = 0; i < xCount; i ++) {
+	dMatrix matrix(dGetIdentityMatrix());
+	//matrix = dPitchMatrix(-45.0f * 3.141592f/180.0f);
+	for (int i = 0; i < xCount; i++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
-		for (int j = 0; j < zCount; j ++) {
+		for (int j = 0; j < zCount; j++) {
 
-			dFloat scalex = 0.75f + 1.0f * (dFloat (dRand()) / dFloat(dRAND_MAX) - 0.5f);
-			dFloat scaley = 0.75f + 1.0f * (dFloat (dRand()) / dFloat(dRAND_MAX) - 0.5f);
-			dFloat scalez = 0.75f + 1.0f * (dFloat (dRand()) / dFloat(dRAND_MAX) - 0.5f);
-
-//			scalex = 1.0f;
-//			scaley = 1.0f;
-//			scalez = 1.0f;
-
-			NewtonCollisionSetScale(collision, scalex, scaley, scalez);
-			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+			dFloat scalex = 1.0f + 1.5f * (dFloat(dRand()) / dFloat(dRAND_MAX) - 0.5f);
+			dFloat scaley = 1.0f + 1.5f * (dFloat(dRand()) / dFloat(dRAND_MAX) - 0.5f);
+			dFloat scalez = 1.0f + 1.5f * (dFloat(dRand()) / dFloat(dRAND_MAX) - 0.5f);
 
 			dFloat z = origin.m_z + (j - zCount / 2) * spacing;
 			matrix.m_posit.m_x = x;
 			matrix.m_posit.m_z = z;
-			dVector floor (FindFloor (world, dVector (matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+			dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 			matrix.m_posit.m_y = floor.m_y + 8.0f;
 
 			// create a solid
-			NewtonBody* const body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
+			//NewtonBody* const body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
+			NewtonBody* const body = CreateSimpleSolid(scene, NULL, mass, matrix, collision, materialID);
 
-			//NewtonBodySetCollisionScale (body, scalex, scaley, scalez);
+			DemoEntity* entity = (DemoEntity*)NewtonBodyGetUserData(body);
+			NewtonCollisionSetScale(collision, scalex, scaley, scalez);
+			DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+			entity->SetMesh(geometry, dGetIdentityMatrix());
+			NewtonBodySetCollisionScale(body, scalex, scaley, scalez);
 
-			dVector omega (0.0f);
+			dVector omega(0.0f);
 			NewtonBodySetOmega(body, &omega[0]);
 
 			// release the mesh
-			geometry->Release(); 
+			geometry->Release();
 		}
 	}
 
 	// do not forget to delete the collision
-	NewtonDestroyCollision (collision);
+	NewtonDestroyCollision(collision);
 }
+
+
 
 static void CreateScaleStaticMesh (DemoEntity* const entity, NewtonCollision* const collision, DemoEntityManager* const scene, const dMatrix& location, const dVector& scale)
 {
