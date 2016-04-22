@@ -1931,7 +1931,7 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 		if (den <= dgFloat32(1.0e-6f)) {
 			// bodies are residing from each other, even if they are touching they are not considered to be colliding because the motion will move them apart 
 			// get the closet point and the normal at contact point
-			m_proxy->m_timestep = dgFloat32 (1.2f);
+			m_proxy->m_timestep = dgFloat32 (1.0e10f);
 			m_proxy->m_normal = m_normal.Scale4(-1.0f);
 			m_proxy->m_closestPointBody0 = m_closestPoint0;
 			m_proxy->m_closestPointBody1 = m_closestPoint1;
@@ -1976,7 +1976,7 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 		dgFloat32 dt = num / den;
 		if ((tacc + dt) >= timestep) {
 			// object do not collide on this timestep
-			m_proxy->m_timestep = tacc + dt;
+			//m_proxy->m_timestep = tacc + dt;
 			m_proxy->m_normal = m_normal.Scale4 (dgFloat32 (-1.0f));
 			m_proxy->m_closestPointBody0 = m_closestPoint0;
 			m_proxy->m_closestPointBody1 = m_closestPoint1;

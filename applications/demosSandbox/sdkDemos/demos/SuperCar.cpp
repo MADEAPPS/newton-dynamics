@@ -72,7 +72,7 @@
 #define VIPER_TIRE_SUSPENSION_DAMPER		10.0f
 #define VIPER_TIRE_SUSPENSION_LENGTH		0.25f
 #define VIPER_TIRE_BRAKE_TORQUE				3000.0f
-#define VIPER_TIRE_PIVOT_OFSSET_TORQUE		-0.05f
+#define VIPER_TIRE_PIVOT_OFFSET_Y			-0.0f
 
 #define VIPER_TIRE_GEAR_1					2.66f
 #define VIPER_TIRE_GEAR_2					1.78f
@@ -353,14 +353,14 @@ class SuperCarEntity: public DemoEntity
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
 		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
-		CustomVehicleController::BodyPartTire* const leftFrontTire = AddTire ("fl_tire", VIPER_TIRE_PIVOT_OFSSET_TORQUE, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, 1.0f);
-		CustomVehicleController::BodyPartTire* const rightFrontTire = AddTire ("fr_tire", VIPER_TIRE_PIVOT_OFSSET_TORQUE, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, -1.0f);
+		CustomVehicleController::BodyPartTire* const leftFrontTire = AddTire ("fl_tire", VIPER_TIRE_PIVOT_OFFSET_Y, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, 1.0f);
+		CustomVehicleController::BodyPartTire* const rightFrontTire = AddTire ("fr_tire", VIPER_TIRE_PIVOT_OFFSET_Y, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, -1.0f);
 
 		// add rear axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", VIPER_TIRE_PIVOT_OFSSET_TORQUE, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, 1.0f);
-		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", VIPER_TIRE_PIVOT_OFSSET_TORQUE, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, -1.0f);
+		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", VIPER_TIRE_PIVOT_OFFSET_Y, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, 1.0f);
+		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", VIPER_TIRE_PIVOT_OFFSET_Y, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, -1.0f);
 
 		//calculate the Ackerman parameters
 		// add a steering Wheel component
@@ -526,8 +526,8 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 
-#if 0
-	#if 0
+#if 1
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
@@ -1465,7 +1465,7 @@ void SuperCar (DemoEntityManager* const scene)
 //	scene->SetCameraMouseLock (true);
 
 	camMatrix.m_posit.m_x -= 5.0f;
-camMatrix = dYawMatrix (-0.0f * 3.1416f) * camMatrix;
+//camMatrix = dYawMatrix (-0.75f * 3.1416f) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 
@@ -1476,7 +1476,7 @@ camMatrix = dYawMatrix (-0.0f * 3.1416f) * camMatrix;
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);

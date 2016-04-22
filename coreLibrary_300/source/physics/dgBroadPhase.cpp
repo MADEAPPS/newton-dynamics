@@ -401,17 +401,15 @@ void dgBroadPhase::ForEachBodyInAABB(const dgBroadPhaseNode** stackPool, dgInt32
 dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& velocA, const dgVector& velocB, dgFastRayTest& ray,
 								 dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
+	dgVector boxP0;
+	dgVector boxP1;
 	dgTriplex points[DG_CONVEX_CAST_POOLSIZE];
 	dgTriplex normals[DG_CONVEX_CAST_POOLSIZE];
 	dgFloat32 penetration[DG_CONVEX_CAST_POOLSIZE];
 	dgInt64 attributeA[DG_CONVEX_CAST_POOLSIZE];
 	dgInt64 attributeB[DG_CONVEX_CAST_POOLSIZE];
-
 	dgInt32 totalCount = 0;
-	
 
-	dgVector boxP0;
-	dgVector boxP1;
 	dgAssert(matrix.TestOrthogonal());
 	shape->CalcAABB(matrix, boxP0, boxP1);
 

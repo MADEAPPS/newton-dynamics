@@ -2068,19 +2068,34 @@ bool CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 	NewtonCollision* const tireCollision = NewtonBodyGetCollision(tireBody);
 	TireFilter filter(tireBody, vehicleBody);
 
+//if (tire->m_index == 1) {
+//dTrace(("%d ", xxx));
+//dTrace (("%d (%f %f %f)\n", xxxx, ));
+//}
+
 	dFloat timeOfImpact;
 	tire->m_collidingCount = NewtonWorldConvexCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, &timeOfImpact, &filter, CustomControllerConvexCastPreFilter::Prefilter, tire->m_contactInfo, sizeof (tire->m_contactInfo) / sizeof (tire->m_contactInfo[0]), 0);
 	if (tire->m_collidingCount) {
 
 		timeOfImpact = 1.0f - timeOfImpact;
-		dFloat num = (tireMatrix.m_posit - chassisMatrix.m_posit) % suspensionSpan;
+		//dFloat num = (tireMatrix.m_posit - chassisMatrix.m_posit) % suspensionSpan;
+		dFloat num = (tireMatrix.m_posit - chassisMatrix.m_up.Scale (0.25f * tire->m_data.m_suspesionlenght) - chassisMatrix.m_posit) % suspensionSpan;
 		dFloat tireParam = num / (tire->m_data.m_suspesionlenght * tire->m_data.m_suspesionlenght);
 
 		if (tireParam <= timeOfImpact) {
 			tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(timeOfImpact * tire->m_data.m_suspesionlenght);
 			NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
+		} else {
+			tire->m_collidingCount = 0;
 		}
 	}
+
+//if (tire->m_index == 1) {
+//dTrace(("%d\n", tire->m_collidingCount));
+//dTrace (("%d (%f %f %f)\n", xxxx, ));
+//}
+
+
 	return tire->m_collidingCount ? true : false;
 }
 
