@@ -45,7 +45,7 @@ class Custom6DOF: public CustomJoint
 	AngularIntegration m_pitch;
 	AngularIntegration m_yaw;
 	AngularIntegration m_roll;
-	DECLARE_CUSTON_JOINT(Custom6DOF, CustomJoint)
+	DECLARE_CUSTOM_JOINT(Custom6DOF, CustomJoint)
 };
 
 #endif // !defined(AFX_Custom6DOF_H__B631F556_B7D7_F85ECF3E9ADE_H)

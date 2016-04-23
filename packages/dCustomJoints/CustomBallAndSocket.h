@@ -34,7 +34,7 @@ class CustomPointToPoint: public CustomJoint
 	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
 
 	dFloat m_distance;
-	DECLARE_CUSTON_JOINT(CustomPointToPoint, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomPointToPoint, CustomJoint)
 };
 
 
@@ -52,7 +52,7 @@ class CustomBallAndSocket: public CustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	DECLARE_CUSTON_JOINT(CustomBallAndSocket, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomBallAndSocket, CustomJoint)
 };
 
 
@@ -86,7 +86,7 @@ class CustomLimitBallAndSocket: public CustomBallAndSocket
 	dFloat m_coneAngleSin;
 	dFloat m_coneAngleHalfCos;
 	dFloat m_coneAngleHalfSin;	
-	DECLARE_CUSTON_JOINT(CustomLimitBallAndSocket, CustomBallAndSocket)
+	DECLARE_CUSTOM_JOINT(CustomLimitBallAndSocket, CustomBallAndSocket)
 };
 
 
@@ -131,7 +131,7 @@ class CustomControlledBallAndSocket: public CustomBallAndSocket
 	AngularIntegration m_yaw;
 	AngularIntegration m_roll;
 	dFloat m_angulaSpeed;
-	DECLARE_CUSTON_JOINT(CustomControlledBallAndSocket, CustomBallAndSocket)
+	DECLARE_CUSTOM_JOINT(CustomControlledBallAndSocket, CustomBallAndSocket)
 };
 
 #endif 

@@ -49,7 +49,7 @@ class DynamicRagDollJoint: public CustomBallAndSocket
 	dFloat m_coneAngleSin;
 	dFloat m_coneAngleHalfCos;
 	dFloat m_coneAngleHalfSin;
-	DECLARE_CUSTON_JOINT(DynamicRagDollJoint, CustomBallAndSocket)
+	DECLARE_CUSTOM_JOINT(DynamicRagDollJoint, CustomBallAndSocket)
 };
 
 class CustomDynamicRagDollManager: public CustomArticulaledTransformManager

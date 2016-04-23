@@ -31,7 +31,7 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 
 #define D_CUSTOM_LARGE_VALUE		dFloat (1.0e20f)
 
-#define DECLARE_CUSTON_JOINT(className,baseClass)																			\
+#define DECLARE_CUSTOM_JOINT(className,baseClass)																			\
 	public:																													\
 	virtual dCRCTYPE GetSerializeKey() const { return dCRC64(#className); }													\
 	virtual const char* GetTypeName() const { return #className; }															\

@@ -48,7 +48,7 @@ class CustomCorkScrew: public CustomJoint
 	bool m_limitsAngularOn;
 	bool m_angularmotorOn;
 
-	DECLARE_CUSTON_JOINT(CustomCorkScrew, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomCorkScrew, CustomJoint)
 };
 
 #endif // !defined(AFX_CUSTOMCORKSCREW_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)

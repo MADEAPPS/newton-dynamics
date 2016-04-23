@@ -53,7 +53,7 @@ class CustomHinge: public CustomJoint
 	dFloat m_jointOmega;
 	bool m_limitsOn;
 	bool m_lastRowWasUsed;
-	DECLARE_CUSTON_JOINT(CustomHinge, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomHinge, CustomJoint)
 };
 
 #endif 

@@ -39,7 +39,7 @@ class CustomGear: public CustomJoint
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_gearRatio;
-	DECLARE_CUSTON_JOINT(CustomGear, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomGear, CustomJoint)
 };
 
 class CustomSatelliteGear: public CustomGear
@@ -52,7 +52,7 @@ class CustomSatelliteGear: public CustomGear
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
-	DECLARE_CUSTON_JOINT(CustomSatelliteGear, CustomGear)
+	DECLARE_CUSTOM_JOINT(CustomSatelliteGear, CustomGear)
 
 	dVector m_pintOnReference;
 	NewtonBody* m_parentReference;
