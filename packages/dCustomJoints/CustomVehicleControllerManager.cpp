@@ -595,7 +595,6 @@ int CustomVehicleController::EngineController::DriveTrain::GetNodeArray(DriveTra
 	return GetNodeArray(array, index) + 1;
 }
 
-
 void CustomVehicleController::EngineController::DriveTrain::CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide)
 {
 	const dFloat k = 0.5f / timestep;
@@ -949,8 +948,7 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorqu
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 
 	m_omega = matrix.UnrotateVector(omega);
-	m_torque = dVector (0.0f);
-//	m_torque = dVector (m_tire->m_powerTorque, 0.0f, 0.0f, 0.0f);
+	m_torque = dVector (m_tire->m_driveTorque, 0.0f, 0.0f, 0.0f);
 }
 
 void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
@@ -1153,7 +1151,7 @@ dFloat CustomVehicleController::EngineController::GetGearRatio () const
 
 void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat timestep)
 {
-//xxxx
+//xxx
 m_info.m_gearsCount = 4;
 
 	m_gearTimer--;
@@ -2066,11 +2064,6 @@ bool CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 	NewtonCollision* const tireCollision = NewtonBodyGetCollision(tireBody);
 	TireFilter filter(tireBody, vehicleBody);
 
-//if (tire->m_index == 1) {
-//dTrace(("%d ", xxx));
-//dTrace (("%d (%f %f %f)\n", xxxx, ));
-//}
-
 	dFloat timeOfImpact;
 	tire->m_collidingCount = NewtonWorldConvexCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, &timeOfImpact, &filter, CustomControllerConvexCastPreFilter::Prefilter, tire->m_contactInfo, sizeof (tire->m_contactInfo) / sizeof (tire->m_contactInfo[0]), 0);
 	if (tire->m_collidingCount) {
@@ -2087,12 +2080,6 @@ bool CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 			tire->m_collidingCount = 0;
 		}
 	}
-
-//if (tire->m_index == 1) {
-//dTrace(("%d\n", tire->m_collidingCount));
-//dTrace (("%d (%f %f %f)\n", xxxx, ));
-//}
-
 
 	return tire->m_collidingCount ? true : false;
 }
@@ -2213,7 +2200,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				//NewtonBodyAddForce(tireBody, &force[0]);
 				//NewtonBodyAddForce(tireBody, &torque[0]);
 				dFloat sign = dSign (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed);
-				tire->m_driveTorque += longitudinalForce * sign * tire->m_data.m_radio;
+				tire->m_driveTorque -= longitudinalForce * sign * tire->m_data.m_radio;
 				
 				NewtonMaterialSetContactTangentAcceleration (material, 0.0f, 0);
 				NewtonMaterialSetContactTangentFriction(material, dAbs (lateralForce), 0);
@@ -2237,9 +2224,6 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
-//xxx++;
-//dTrace (("\n"));
-
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		if (!NewtonBodyGetSleepState(m_body)) {
