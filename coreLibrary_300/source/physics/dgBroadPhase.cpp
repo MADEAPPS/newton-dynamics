@@ -1449,7 +1449,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 				contact->m_timeOfImpact = dgFloat32(1.0e10f);
 				if (!ValidateContactCache (contact, timestep)) {
 					// It does not have to set the value because it should be the same ar previous update.
-					//contact->m_contactActive = (contact->m_closestDistance < dgFloat32 (0.0f)) ? true : false;
 					contact->m_contactActive = 0;
 					contact->m_positAcc = dgVector::m_zero;
 					contact->m_rotationAcc = dgQuaternion();
@@ -1760,7 +1759,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 			const dgBody* const body1 = contact->m_body1;
 			if (! ((body0->m_sleeping | body0->m_equilibrium) & (body1->m_sleeping | body1->m_equilibrium)) ) {
 				if (contact->m_contactActive) {
-					contact->m_contactActive = false;
+					contact->m_contactActive = 0;
 				} else {
 					deadContacs[count] = contact;
 					count ++;
@@ -1776,7 +1775,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 					contact->m_broadphaseLru = lru - 1;
 				} else {
 					if (contact->m_contactActive) {
-						contact->m_contactActive = false;
+						contact->m_contactActive = 0;
 					} else {
 						deadContacs[count] = contact;
 						count ++;

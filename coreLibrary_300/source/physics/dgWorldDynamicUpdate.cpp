@@ -268,7 +268,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 				dgAssert ((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
 				dgAssert ((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
 				const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
-				if (linkBody->IsCollidable() && (!contact || contact->m_maxDOF || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode))) { 
+				if (linkBody->IsCollidable() && (!contact || (contact->m_contactActive && contact->m_maxDOF) || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode))) { 
 					dgDynamicBody* const body = (dgDynamicBody*)linkBody;
 
 					isInEquilibrium &= srcBody->m_equilibrium;
@@ -470,7 +470,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 				dgAssert ((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
 				const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
 				dgInt32 ccdMode = contact ? (body->m_continueCollisionMode | linkBody->m_continueCollisionMode) : 0;
-				if (linkBody->IsCollidable() && (!contact || contact->m_maxDOF || ccdMode)) { 
+				if (linkBody->IsCollidable() && (!contact || (contact->m_contactActive && contact->m_maxDOF) || ccdMode)) { 
 					dgDynamicBody* const body = (dgDynamicBody*)linkBody;
 
 					if (constraint->m_dynamicsLru != lruMark) {
