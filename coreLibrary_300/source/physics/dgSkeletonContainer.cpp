@@ -236,12 +236,9 @@ class dgSkeletonContainer::dgSkeletonGraph
 			const dgInt32 first = jointInfo->m_pairStart;
 			for (dgInt32 i = 0; i < count; i++) {
 				const dgJacobianMatrixElement* const row = &matrixRow[i + first];
-				//if (row->m_applyCorrection) 
-				{
-					m_jointForce[m_dof] = -dgClamp(row->m_penetration * correctionFactor, dgFloat32(-0.25f), dgFloat32(0.25f));
-					m_sourceJacobianIndex[m_dof] = dgInt8(i);
-					m_dof++;
-				}
+				m_jointForce[m_dof] = -dgClamp(row->m_penetration * correctionFactor, dgFloat32(-0.25f), dgFloat32(0.25f));
+				m_sourceJacobianIndex[m_dof] = dgInt8(i);
+				m_dof++;
 			}
 			GetJacobians(jointInfo, matrixRow);
 		}

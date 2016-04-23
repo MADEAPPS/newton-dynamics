@@ -162,10 +162,11 @@ dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (dgMatrix& globalM
 
 void dgBilateralConstraint::SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc)
 {
-	m_rowIsMotor[index] = -1;
+	m_rowIsMotor[index] = 1;
 	m_motorAcceleration[index] = acceleration;
-	desc.m_flags[index].m_isMotor = -1;
-	desc.m_flags[index].m_applyCorrection = 0;
+	desc.m_isMotor[index] = 1;
+//	desc.m_flags[index].m_isMotor = -1;
+//	desc.m_flags[index].m_applyCorrection = 0;
 	desc.m_jointAccel[index] = acceleration;
 }
 
@@ -194,11 +195,12 @@ void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDes
 	jacobian1.m_angular[2] = jacobianB[5];
 	jacobian1.m_angular[3] = dgFloat32 (0.0f);
 
-	m_rowIsMotor[index] = -1;
+	m_rowIsMotor[index] = 1;
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
-	desc.m_flags[index].m_isMotor = -1;
-	desc.m_flags[index].m_applyCorrection = 0;
+	//desc.m_flags[index].m_isMotor = -1;
+	//desc.m_flags[index].m_applyCorrection = 0;
+ 	desc.m_isMotor[index] = 1;
 	desc.m_restitution[index] = dgFloat32 (0.0f);
 	desc.m_jointAccel[index] = dgFloat32 (0.0f);
 	desc.m_penetration[index] = dgFloat32 (0.0f);
@@ -270,8 +272,9 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 	dgFloat32 omegaError = (omega1 - omega0) % dir;
 
 	m_rowIsMotor[index] = 0;
-	desc.m_flags[index].m_isMotor = 0;
-	desc.m_flags[index].m_applyCorrection = 0;
+	desc.m_isMotor[index] = 0;
+//	desc.m_flags[index].m_isMotor = 0;
+//	desc.m_flags[index].m_applyCorrection = 0;
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
@@ -287,7 +290,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 
 		desc.m_zeroRowAcceleration[index] = (jointAngle + omegaError * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep;
 
-		desc.m_flags[index].m_applyCorrection = -1;
+		//desc.m_flags[index].m_applyCorrection = -1;
 		desc.m_penetration[index] = jointAngle;
 		desc.m_jointAccel[index] = alphaError;
 		desc.m_restitution[index] = dgFloat32 (0.0f);
@@ -334,8 +337,9 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 	jacobian1.m_angular[3] = dgFloat32 (0.0f);
 
 	m_rowIsMotor[index] = 0;
-	desc.m_flags[index].m_isMotor = 0;
-	desc.m_flags[index].m_applyCorrection = 0;
+//	desc.m_flags[index].m_isMotor = 0;
+//	desc.m_flags[index].m_applyCorrection = 0;
+	desc.m_isMotor[index] = 0;
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
 	dgVector velocError (param.m_veloc1 - param.m_veloc0);
@@ -361,7 +365,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		dgFloat32 accelError = num / den;
 
 		desc.m_penetration[index] = relPosit;
-		desc.m_flags[index].m_applyCorrection = -1;
+//		desc.m_flags[index].m_applyCorrection = -1;
 		desc.m_penetrationStiffness[index] = dgFloat32 (0.01f/4.0f);
 		desc.m_jointStiffness[index] = param.m_stiffness;
 		desc.m_jointAccel[index] = accelError + relCentr;
