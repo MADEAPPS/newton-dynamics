@@ -34,7 +34,8 @@ static FILE* file_xxx;
 #define D_VEHICLE_MIN_RPM_FACTOR		dFloat(0.5f)
 #define D_VEHICLE_MAX_DRIVETRAIN_DOF	32
 #define D_VEHICLE_REGULARIZER			1.0001f
-#define D_VEHICLE_SLIP_DIFF_RPS			10.0f
+#define D_VEHICLE_SLIP_DIFF_ENGAGE_RPS	4.0f
+#define D_VEHICLE_SLIP_DIFF_TORQUE		4000.0f
 
 /*
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
@@ -885,34 +886,22 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetG
 	SetInvMassJt();
 }
 
-#if 0
-void CustomVehicleController::EngineController::DriveTrainDifferentialGear::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide)
+
+void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetExternalTorque(EngineController* const controller)
 {
-/*
-	dVector omega (m_omega);
-	if ((dAbs(m_omega.m_x) > 10.0f) && controller->GetSlipDifferential()) {
-		// apply viscous slip differential friction torque
-		dFloat omegay = 0.0f;
-		if (m_omega.m_y > D_VEHICLE_SLIP_DIFF_RPS) {
-			omegay = m_omega.m_y - D_VEHICLE_SLIP_DIFF_RPS;
+	DriveTrain::SetExternalTorque(controller);
+	if (controller->GetSlipDifferential()) {
+		dVector omega (m_omega);
+		if (m_omega.m_y > D_VEHICLE_SLIP_DIFF_ENGAGE_RPS) {
+			dFloat omegay = m_omega.m_y - D_VEHICLE_SLIP_DIFF_ENGAGE_RPS;
+			m_torque.m_y = -omegay * omegay * D_VEHICLE_SLIP_DIFF_TORQUE / (D_VEHICLE_SLIP_DIFF_ENGAGE_RPS * D_VEHICLE_SLIP_DIFF_ENGAGE_RPS);
+		} else if (m_omega.m_y < -D_VEHICLE_SLIP_DIFF_ENGAGE_RPS) {
+			dFloat omegay = m_omega.m_y + D_VEHICLE_SLIP_DIFF_ENGAGE_RPS;
+			m_torque.m_y = omegay * omegay * D_VEHICLE_SLIP_DIFF_TORQUE / (D_VEHICLE_SLIP_DIFF_ENGAGE_RPS * D_VEHICLE_SLIP_DIFF_ENGAGE_RPS);
 		}
-		else if (m_omega.m_y < -D_VEHICLE_SLIP_DIFF_RPS) {
-			omegay = m_omega.m_y + D_VEHICLE_SLIP_DIFF_RPS;
-		}
-		//		m_torque.m_y = dClamp (-m_slipDifferentialViscuosFriction * omegay, - dFloat (62.0f * D_VEHICLE_SLIP_DIFF_FRICTION), dFloat (2.0f * D_VEHICLE_SLIP_DIFF_FRICTION));
 	}
-*/
-
-	const dFloat k = 0.5f / timestep;
-	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
-	dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
-
-	torqueAccel = (dAbs(torqueAccel) < 1.0e-8f) ? 0.0f : torqueAccel;
-	relativeOmega = (dAbs(relativeOmega) < 1.0e-8f) ? 0.0f : relativeOmega;
-	rightSide[m_index] = -(torqueAccel + k * relativeOmega);
-	//	dTrace (("%f %f %f\n", m_omega.m_x, m_omega.m_y, m_torque.m_y));
 }
-#endif
+
 
 CustomVehicleController::EngineController::DriveTrainTire::DriveTrainTire(BodyPartTire* const tire, DriveTrain* const parent)
 	:DriveTrain(dVector(0.0f), parent)

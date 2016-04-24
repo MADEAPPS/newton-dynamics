@@ -333,7 +333,6 @@ class CustomVehicleController: public CustomControllerBase
 			void GetInvRowT(dVector* const row) const;
 			void FactorRow (int row, int size, dFloat* const matrix);
 			
-			
 			int GetNodeArray(DriveTrain** const array);
 			int GetNodeArray(DriveTrain** const array, int& index);
 
@@ -391,6 +390,7 @@ class CustomVehicleController: public CustomControllerBase
 			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
 
 			void SetGearRatioJacobians(dFloat gearRatio);
+			virtual void SetExternalTorque(EngineController* const controller);
 			//void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 			dFloat m_slipDifferentialViscuosFriction;
 		};
