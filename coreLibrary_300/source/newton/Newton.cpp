@@ -4554,6 +4554,7 @@ void NewtonDestroyBody (const NewtonBody* const bodyPtr)
 	world->DestroyBody(body);
 }
 
+/*
 void NewtonBodyEnableSimulation(const NewtonBody* const bodyPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -4569,6 +4570,7 @@ void NewtonBodyDisableSimulation(const NewtonBody* const bodyPtr)
 	dgWorld* const world = body->GetWorld();
 	world->BodyDisableSimulation (body);
 }
+*/
 
 // Name: NewtonBodyGetSimulationState
 // Gets the current simulation state of the specified body.

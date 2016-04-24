@@ -51,7 +51,6 @@ class TemplateVector
 	T m_w;
 };
 
-D_MSC_VECTOR_ALIGMENT
 class dVector: public TemplateVector<dFloat>
 {
 	public:
