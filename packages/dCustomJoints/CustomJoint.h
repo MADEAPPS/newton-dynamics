@@ -53,10 +53,10 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 		}																													\
 	};																														\
 	friend class SerializeMetaData;																							\
-	CUSTOM_JOINTS_API static SerializeMetaData m_metaData;
+	CUSTOM_JOINTS_API static SerializeMetaData m_metaData_##className;
 
 #define IMPLEMENT_CUSTON_JOINT(className)																					\
-	className::SerializeMetaData className::m_metaData(#className);															\
+	className::SerializeMetaData className::m_metaData_##className(#className);												\
 
 // this is the base class to implement custom joints, it is not a joint it just provide functionality
 // for the user to implement it own joints
