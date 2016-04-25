@@ -146,7 +146,6 @@ class SuperCarEntity: public DemoEntity
 
 		// place entity in the world
 		ResetMatrix (*scene, location);
-
 		NewtonWorld* const world = scene->GetNewton();
 
 		// create the car rigid body
@@ -747,7 +746,9 @@ class SuperCarEntity: public DemoEntity
 		//CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
 		//CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
 		//CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
-		
+		if (!engine) {
+			return;
+		}
 		
 //		if (!engine->GetKey()) 
 		{
@@ -1428,24 +1429,27 @@ void SuperCar (DemoEntityManager* const scene)
 	dFloat u = 1.0f;
 	for (int i = 0; i < 1; i ++) {
 		dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
-/*
+
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
-		location0.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0 + offset, "lambDiablo.ngd", 3.0f);
-		vehicle0->BuildWheelCar(1, -0.35f);
+		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
+		location0.m_posit.m_y += 5.0f;
+//		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
+		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "monsterTruck.ngd", 3.0f);
+		vehicle0->BuildWheelCar(2, -0.35f);
 		u -= 0.005f;
-*/
+/*
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + offset, 200.0f);
 		location1.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
-		vehicle1->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
+		vehicle1->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
 		u -= 0.005f;
+*/
 /*
 		dMatrix location2 (manager->CalculateSplineMatrix (u));
 		location2.m_posit += location2.m_right.Scale ( 3.0f);
-		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit + offset, 100.0f);
+		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit + offset, 200.0f);
 		location2.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
 		vehicle2->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
