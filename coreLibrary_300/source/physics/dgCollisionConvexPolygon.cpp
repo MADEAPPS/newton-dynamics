@@ -681,6 +681,12 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	if (m_normal.DotProduct4(relativeVelocity).GetScalar() >= 0.0f) {
 		return 0;
 	}
+	dgFloat32 den = dgFloat32 (1.0f) / (relativeVelocity % m_normal);
+	if (den > dgFloat32 (1.0e-5f)) {
+		// this can actually happens
+		dgAssert(0);
+		return 0;
+	}
 
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
@@ -713,11 +719,11 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 
 	dgInt32 count = 0;
 	if (distance < dgFloat32(1.0f)) {
+
 		dgVector boxSize((hullBoxP1 - hullBoxP0).CompProduct4(dgVector::m_half));
 		dgVector sphereMag2 (boxSize.DotProduct4(boxSize));
 		boxSize = sphereMag2.Sqrt();
 
-		dgFloat32 den = dgFloat32 (1.0f) / (relativeVelocity % m_normal);
 		dgVector pointInPlane (polygonMatrix.RotateVector(hullBoxP1 + hullBoxP0).CompProduct4(dgVector::m_half));
 		dgFloat32 distToPlane = (m_localPoly[0] - pointInPlane) % m_normal;
 
