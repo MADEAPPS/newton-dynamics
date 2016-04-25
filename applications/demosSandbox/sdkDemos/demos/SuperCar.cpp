@@ -1448,9 +1448,8 @@ void SuperCar (DemoEntityManager* const scene)
 	manager->AddCones (scene);
 
 	dFloat u = 1.0f;
-	for (int i = 0; i < 10; i ++) {
-		dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
-
+	dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
+	for (int i = 0; i < 1; i ++) {
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
@@ -1458,29 +1457,30 @@ void SuperCar (DemoEntityManager* const scene)
 		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "monsterTruck.ngd", 3.0f);
 		vehicle0->BuildWheelCar(2, -0.35f);
 		u -= 0.005f;
+/*
+		dMatrix location1 (manager->CalculateSplineMatrix (u));
+		location1.m_posit += location1.m_right.Scale ( 3.0f);
+		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + offset, 200.0f);
+		location1.m_posit.m_y += 1.0f;
+		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "f1.ngd", 0.0f);
+		vehicle1->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
+		u -= 0.005f;
 
-		dMatrix location2 (manager->CalculateSplineMatrix (u));
-		location2.m_posit += location2.m_right.Scale ( 3.0f);
-		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit + offset, 200.0f);
+		dMatrix location2(manager->CalculateSplineMatrix(u));
+		location2.m_posit += location0.m_right.Scale(3.0f);
+		location2.m_posit = FindFloor(scene->GetNewton(), location2.m_posit + offset, 200.0f);
 		location2.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
-		vehicle2->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
+		SuperCarEntity* const vehicle2 = new SuperCarEntity(scene, manager, location2, "lambDiablo.ngd", 3.0f);
+		vehicle2->BuildWheelCar(1, -0.35f);
 		u -= 0.005f;
 
 		dMatrix location3(manager->CalculateSplineMatrix(u));
-		location3.m_posit += location0.m_right.Scale(3.0f);
 		location3.m_posit = FindFloor(scene->GetNewton(), location3.m_posit + offset, 200.0f);
 		location3.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "lambDiablo.ngd", 3.0f);
-		vehicle3->BuildWheelCar(1, -0.35f);
+		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "viper.ngd", -3.0f);
+		vehicle3->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
 		u -= 0.005f;
-
-		dMatrix location1(manager->CalculateSplineMatrix(u));
-		location1.m_posit = FindFloor(scene->GetNewton(), location1.m_posit + offset, 200.0f);
-		location1.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle1 = new SuperCarEntity(scene, manager, location1, "viper.ngd", -3.0f);
-		vehicle1->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
-		u -= 0.005f;
+*/
 	}
 
 	CustomVehicleController* const controller = &manager->GetLast()->GetInfo();
