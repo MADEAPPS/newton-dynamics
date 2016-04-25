@@ -778,7 +778,7 @@ class SuperCarEntity: public DemoEntity
 			engine->SetIgnition(true);
 			brakes->SetParam(0.0f);
 			handBrakes->SetParam(0.0f);
-			engine->SetGear(engine->GetFirstGear());
+			engine->SetGear(engine->GetFirstGear() + 2);
 			return;
 		}
 
@@ -924,6 +924,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		,m_debugVehicle (NULL) 
 		,m_drawShematic(false)
 		,m_helpKey (true)
+		,m_nexVehicle (true)
 	{
 		// hook a callback for 2d help display
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -1019,7 +1020,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		glPopMatrix();
 	}
 
-	void DrawHelp(DemoEntityManager* const scene, int lineNumber) const
+	void DrawHelp(DemoEntityManager* const scene, int lineNumber)
 	{
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
@@ -1034,7 +1035,13 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           : '<'           button 3");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission : enter         button 4");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : space         button 1");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "next vehicle        : 'V'");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
+		}
+
+		bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene->GetRootWindow(), 'V');
+		if (engineIgnitionKey) {
+			SetNextPlayer();
 		}
 	}
 
@@ -1151,7 +1158,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		}
 	}
 
-	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
+	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber)
 	{
 		// draw the player physics model
 		if (m_drawShematic) {
@@ -1198,6 +1205,16 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		CustomVehicleController::EngineController* const engine = player->m_controller->GetEngine();
 		engine->SetIgnition(false);
 		m_player = player;
+	}
+
+	void SetNextPlayer() 
+	{
+		dListNode* const playerNode = GetNodeFromInfo (*m_player->m_controller);
+		dListNode* const nextPlayerNode = playerNode->GetNext() ? playerNode->GetNext() : GetFirst();
+
+		NewtonBody* const vehicleBody = nextPlayerNode->GetInfo().GetBody();
+		SuperCarEntity* const player = (SuperCarEntity*) NewtonBodyGetUserData(vehicleBody);
+		SetAsPlayer (player);
 	}
 
 	void SetDebugVehicle (SuperCarEntity* const player)
@@ -1387,6 +1404,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	int m_soundsCount;
 	mutable bool m_drawShematic;
 	DemoEntityManager::ButtonKey m_helpKey;
+	DemoEntityManager::ButtonKey m_nexVehicle;
 	void* m_engineSounds[16];
 };
 
@@ -1425,39 +1443,44 @@ void SuperCar (DemoEntityManager* const scene)
 //	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 //	NewtonMaterialSetDefaultFriction(scene->GetNewton(), defaulMaterial, defaulMaterial, 0.9f, 0.9f);
 
-	// create a Bezier Spline path for AI car to drive                     e
+	// create a Bezier Spline path for AI car to drive 
 	manager->CreatedrivingTestCourt (scene);
 	manager->AddCones (scene);
 
 	dFloat u = 1.0f;
-	for (int i = 0; i < 5; i ++) {
+	for (int i = 0; i < 10; i ++) {
 		dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
 
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
 		location0.m_posit.m_y += 1.0f;
-//		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "lambDiablo.ngd", 3.0f);
 		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "monsterTruck.ngd", 3.0f);
 		vehicle0->BuildWheelCar(2, -0.35f);
 		u -= 0.005f;
-
-		dMatrix location1 (manager->CalculateSplineMatrix (u));
-		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + offset, 200.0f);
-		location1.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "viper.ngd", -3.0f);
-		vehicle1->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
-		u -= 0.005f;
-
 
 		dMatrix location2 (manager->CalculateSplineMatrix (u));
 		location2.m_posit += location2.m_right.Scale ( 3.0f);
 		location2.m_posit = FindFloor (scene->GetNewton(), location2.m_posit + offset, 200.0f);
 		location2.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle2 = new SuperCarEntity (scene, manager, location2, "f1.ngd", 0.0f);
-		vehicle2->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
-		u -= 0.01f;
+		vehicle2->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
+		u -= 0.005f;
 
+		dMatrix location3(manager->CalculateSplineMatrix(u));
+		location3.m_posit += location0.m_right.Scale(3.0f);
+		location3.m_posit = FindFloor(scene->GetNewton(), location3.m_posit + offset, 200.0f);
+		location3.m_posit.m_y += 1.0f;
+		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "lambDiablo.ngd", 3.0f);
+		vehicle3->BuildWheelCar(1, -0.35f);
+		u -= 0.005f;
+
+		dMatrix location1(manager->CalculateSplineMatrix(u));
+		location1.m_posit = FindFloor(scene->GetNewton(), location1.m_posit + offset, 200.0f);
+		location1.m_posit.m_y += 1.0f;
+		SuperCarEntity* const vehicle1 = new SuperCarEntity(scene, manager, location1, "viper.ngd", -3.0f);
+		vehicle1->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
+		u -= 0.005f;
 	}
 
 	CustomVehicleController* const controller = &manager->GetLast()->GetInfo();
@@ -1474,8 +1497,7 @@ void SuperCar (DemoEntityManager* const scene)
 	camMatrix.m_posit.m_x -= 5.0f;
 //camMatrix = dYawMatrix (-0.75f * 3.1416f) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
-
-
+/*
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
 	location.m_posit.m_x += 44.0f;
@@ -1496,6 +1518,6 @@ void SuperCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-
+*/
 }
 
