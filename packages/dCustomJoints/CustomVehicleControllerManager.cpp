@@ -892,6 +892,7 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetE
 	DriveTrain::SetExternalTorque(controller);
 	if (controller->GetSlipDifferential()) {
 		dVector omega (m_omega);
+		m_omega.m_y = dClamp(m_omega.m_y, -15.0f, 15.0f);
 		if (m_omega.m_y > D_VEHICLE_SLIP_DIFF_ENGAGE_RPS) {
 			dFloat omegay = m_omega.m_y - D_VEHICLE_SLIP_DIFF_ENGAGE_RPS;
 			m_torque.m_y = -omegay * omegay * D_VEHICLE_SLIP_DIFF_TORQUE / (D_VEHICLE_SLIP_DIFF_ENGAGE_RPS * D_VEHICLE_SLIP_DIFF_ENGAGE_RPS);
@@ -899,6 +900,7 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetE
 			dFloat omegay = m_omega.m_y + D_VEHICLE_SLIP_DIFF_ENGAGE_RPS;
 			m_torque.m_y = omegay * omegay * D_VEHICLE_SLIP_DIFF_TORQUE / (D_VEHICLE_SLIP_DIFF_ENGAGE_RPS * D_VEHICLE_SLIP_DIFF_ENGAGE_RPS);
 		}
+		dAssert (dAbs(m_torque.m_y) < 50000.0f);
 	}
 }
 
