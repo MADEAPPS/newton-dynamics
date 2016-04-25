@@ -1445,7 +1445,7 @@ void SuperCar (DemoEntityManager* const scene)
 
 	// create a Bezier Spline path for AI car to drive 
 	manager->CreatedrivingTestCourt (scene);
-	manager->AddCones (scene);
+//	manager->AddCones (scene);
 
 	dFloat u = 1.0f;
 	dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
