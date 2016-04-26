@@ -1580,6 +1580,7 @@ void CustomVehicleController::Init(NewtonCollision* const chassisShape, const dM
 
 	// create a body and an call the low level init function
 	m_isAirborned = false;
+	m_hasNewContact = false;
 	m_lastAngularMomentum = dVector (0.0f);
 	dMatrix locationMatrix(dGetIdentityMatrix());
 	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
@@ -1879,6 +1880,7 @@ bool CustomVehicleController::ControlStateChanged() const
 	inputChanged = inputChanged || (m_engineControl && m_engineControl ->ParamChanged());
 	inputChanged = inputChanged || (m_brakesControl && m_brakesControl->ParamChanged());
 	inputChanged = inputChanged || (m_handBrakesControl && m_handBrakesControl->ParamChanged());
+	inputChanged = inputChanged || m_hasNewContact;
 	return inputChanged;
 }
 
@@ -1972,10 +1974,11 @@ int CustomVehicleControllerManager::OnTireAABBOverlap(const NewtonMaterial* cons
 {
 	for (int i = 0; i < tire->m_collidingCount; i ++) {
 		if (otherBody == tire->m_contactInfo[i].m_hitBody) {
-			return true;
+			return 1;
 		}
 	}
-	return false;
+	tire->GetController()->m_hasNewContact |= tire->m_data.m_hasFender ? false : true;
+	return tire->m_data.m_hasFender ? 0 : 1;
 }
 
 int CustomVehicleControllerManager::OnContactGeneration (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
@@ -2060,13 +2063,15 @@ bool CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 	}
 
 	tire->m_collidingCount = count;
-	count = NewtonWorldCollide (world, &tireMatrix[0][0], tireCollision, &filter, CustomControllerConvexCastPreFilter::Prefilter, &tire->m_contactInfo[count], maxContactCount, threadIndex);
-	for (int i = 0; i < count; i++) {
-		if (tire->m_contactInfo[tire->m_collidingCount + i].m_penetration == 0.0f) {
-			tire->m_contactInfo[tire->m_collidingCount + i].m_penetration = 1.0e-5f;
+	if (!tire->m_data.m_hasFender) {
+		count = NewtonWorldCollide (world, &tireMatrix[0][0], tireCollision, &filter, CustomControllerConvexCastPreFilter::Prefilter, &tire->m_contactInfo[count], maxContactCount, threadIndex);
+		for (int i = 0; i < count; i++) {
+			if (tire->m_contactInfo[tire->m_collidingCount + i].m_penetration == 0.0f) {
+				tire->m_contactInfo[tire->m_collidingCount + i].m_penetration = 1.0e-5f;
+			}
 		}
+		tire->m_collidingCount += count;
 	}
-	tire->m_collidingCount += count;
 
 	return tire->m_collidingCount ? true : false;
 }
@@ -2393,6 +2398,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		if (!NewtonBodyGetSleepState(m_body)) {
+			m_hasNewContact = false;
 			if (m_isAirborned) {
 				dMatrix invInertia;
 				NewtonBodyGetInvInertiaMatrix(m_body, &invInertia[0][0]);

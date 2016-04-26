@@ -168,6 +168,11 @@ class CustomVehicleController: public CustomControllerBase
 		class Info
 		{
 			public:
+			Info ()
+			{
+				memset (this, 0, sizeof (Info));
+			}
+
 			dVector m_location;
 			dFloat m_mass;
 			dFloat m_radio;
@@ -178,6 +183,7 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_lateralStiffness;
 			dFloat m_longitudialStiffness;
 			dFloat m_aligningMomentTrail;
+			int m_hasFender;
 			void* m_userData;
 		};
 
@@ -243,7 +249,6 @@ class CustomVehicleController: public CustomControllerBase
 		int m_index;
 		int m_collidingCount;
 		NewtonWorldConvexCastReturnInfo m_contactInfo[4];
-//		char m_contactWasCasted[4];
 		friend class WheelJoint;
 		friend class CustomVehicleController;
 		friend class CustomVehicleControllerManager;
@@ -566,6 +571,7 @@ class CustomVehicleController: public CustomControllerBase
 	dFloat m_weightDistribution;
 	bool m_finalized;
 	bool m_isAirborned;
+	bool m_hasNewContact;
 
 	friend class CustomVehicleControllerManager;
 };
