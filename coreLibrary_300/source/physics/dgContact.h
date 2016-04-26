@@ -39,6 +39,7 @@ class dgCollisionInstance;
 //#define DG_IMPULSIVE_CONTACT_PENETRATION	dgFloat32 (1.0f / 256.0f)
 #define DG_IMPULSIVE_CONTACT_PENETRATION	dgFloat32 (1.0f / 256.0f + DG_RESTING_CONTACT_PENETRATION)
 
+
 class dgActiveContacts: public dgList<dgContact*>
 {
 	public:
@@ -91,7 +92,6 @@ class dgClothPatchMaterial
 	dgFloat32 m_stiffness;
 };
 
-
 DG_MSC_VECTOR_ALIGMENT
 class dgContactPoint
 {
@@ -112,7 +112,6 @@ DG_MSC_VECTOR_ALIGMENT
 class dgContactMaterial: public dgContactPoint
 {
 	public:
-
 	enum {
 		m_collisionEnable = 1<<0,
 		m_friction0Enable = 1<<1,
@@ -134,8 +133,8 @@ class dgContactMaterial: public dgContactPoint
 		dgUnsigned64 m_shapeId1;
 		dgFloat32 m_penetration;
 		dgUnsigned32 m_unused[3];
-		
-	}DG_GCC_VECTOR_ALIGMENT;
+	} DG_GCC_VECTOR_ALIGMENT;
+
 
 	typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dgFloat32 timestep, dgInt32 threadIndex);
 	typedef bool (dgApi *OnAABBOverlap) (const dgContactMaterial& material, const dgBody& body0, const dgBody& body1, dgInt32 threadIndex);
@@ -148,7 +147,6 @@ class dgContactMaterial: public dgContactPoint
 	void SetCollisionGenerationCallback (OnContactGeneration contactGeneration); 
 	void SetCollisionCallback (OnAABBOverlap abbOvelap, OnContactCallback callback); 
 	void SetCompoundCollisionCallback (OnCompoundCollisionPrefilter abbCompounndOvelap); 
-	
 
 	dgVector m_dir0;
 	dgVector m_dir1;
@@ -225,7 +223,6 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgUnsigned32 m_broadphaseLru;
 	dgUnsigned32 m_isNewContact				: 1;
 
-
     friend class dgBody;
 	friend class dgWorld;
 	friend class dgBroadPhase;
@@ -300,6 +297,7 @@ inline void dgContact::ResetMaxDOF()
 {
 	m_maxDOF = 0;
 }
+
 
 #endif 
 

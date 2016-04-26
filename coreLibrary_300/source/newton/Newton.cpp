@@ -1444,6 +1444,7 @@ void NewtonMaterialSetDefaultCollidable(const NewtonWorld* const newtonWorld, in
 }
 
 
+
 // Name: NewtonMaterialSetContinuousCollisionMode 
 // Set the material interaction between two physics materials to enable or disable continuous collision.
 // continuous collision is on by defaults.
@@ -2045,17 +2046,22 @@ void NewtonMaterialGetContactTangentDirections(const NewtonMaterial* const mater
 	}
 }
 
+dFloat NewtonMaterialGetContactPenetration (const NewtonMaterial* const materialHandle)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
+	return material->m_penetration;
+}
 
-
-NewtonCollision* NewtonMaterialGetBodyCollidingShape(const NewtonMaterial* const material, const NewtonBody* const body)
+NewtonCollision* NewtonMaterialGetBodyCollidingShape(const NewtonMaterial* const materialHandle, const NewtonBody* const body)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const bodyPtr = (dgBody*) body;
-	dgContactMaterial* const materialPtr = (dgContactMaterial*) material;
+	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 
-	const dgCollisionInstance* collision = materialPtr->m_collision0; 
-	if (bodyPtr == materialPtr->m_body1) {
-		collision = materialPtr->m_collision1; 
+	const dgCollisionInstance* collision = material->m_collision0; 
+	if (bodyPtr == material->m_body1) {
+		collision = material->m_collision1; 
 	}
 	return (NewtonCollision*) collision;
 }
@@ -2079,6 +2085,7 @@ void NewtonMaterialSetContactSoftness(const NewtonMaterial* const materialHandle
 	material->m_softness = dgClamp (softness, dFloat(0.01f), dFloat(0.7f));
 }
 
+
 // Name: NewtonMaterialSetContactElasticity 
 // Override the default elasticity (coefficient of restitution) value for the contact.
 //
@@ -2097,9 +2104,6 @@ void NewtonMaterialSetContactElasticity(const NewtonMaterial* const materialHand
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 	material->m_restitution = dgClamp (restitution, dFloat(0.01f), dFloat(2.0f));
 }
-
-
-
 
 
 // Name: NewtonMaterialSetContactFrictionState 
@@ -2191,14 +2195,11 @@ void NewtonMaterialSetContactFrictionCoef(const NewtonMaterial* const materialHa
 // See also: NewtonMaterialSetCollisionCallback
 void NewtonMaterialSetContactNormalAcceleration(const NewtonMaterial* const materialHandle, dFloat accel)
 {
-
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 
-//	if (accel > dFloat (0.0f)) {
-		material->m_normal_Force.m_force = accel;
-		material->m_flags |= dgContactMaterial::m_overrideNormalAccel;
-//	}
+	material->m_normal_Force.m_force = accel;
+	material->m_flags |= dgContactMaterial::m_overrideNormalAccel;
 }
 
 // Name: NewtonMaterialSetContactTangentAcceleration

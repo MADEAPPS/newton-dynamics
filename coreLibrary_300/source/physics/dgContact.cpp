@@ -67,8 +67,6 @@ dgContactMaterial::dgContactMaterial()
 	m_flags = m_collisionEnable | m_friction0Enable | m_friction1Enable;
 }
 
-
-
 dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const material)
 	:dgConstraint(), dgList<dgContactMaterial>(world->GetAllocator())
 	,m_positAcc (dgFloat32(0.0f))
@@ -219,8 +217,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_forceBounds[normalIndex].m_jointForce = (dgForceImpactPair*) &contact.m_normal_Force;
 	params.m_jointStiffness[normalIndex] = dgFloat32 (0.5f);
 	params.m_isMotor[normalIndex] = 0;
-//	params.m_flags[normalIndex].m_isMotor = 0;
-//	params.m_flags[normalIndex].m_applyCorrection = 0;
 
 //	params.m_jointAccel[normalIndex] = GetMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * params.m_invTimestep;
 	params.m_jointAccel[normalIndex] = dgMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * impulseOrForceScale;
