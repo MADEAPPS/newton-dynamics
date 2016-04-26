@@ -38,56 +38,59 @@
 // 6th Gear 0.50:1 
 // Reverse 2.90:1 
 
+/*
 // vehicle definition for a Muscle car
-#define VIPER_TIRE_MASS						40.0f  
-#define VIPER_ENGINE_MASS					100.0f
-#define VIPER_MASS							(3380.0f * 0.454f)
-#define VIPER_ENGINE_RADIO					0.125f
-#define VIPER_TIRE_STEER_ANGLE				15.0f
+#define TIRE_MASS						40.0f  
+#define ENGINE_MASS					100.0f
+#define MASS							(3380.0f * 0.454f)
+#define ENGINE_RADIO					0.125f
+#define TIRE_STEER_ANGLE				15.0f
 #define VEHICLE_WEIGHT_DISTRIBUTION			0.55f
 
-#define VIPER_CLUTCH_FRICTION_TORQUE		2000.0f
-#define VIPER_IDLE_TORQUE					350.0f
-#define VIPER_IDLE_TORQUE_RPM				800.0f
+#define CLUTCH_FRICTION_TORQUE		2000.0f
+#define IDLE_TORQUE					350.0f
+#define IDLE_TORQUE_RPM				800.0f
 
 // torque in pound per foot
-#define VIPER_PEAK_TORQUE					500.0f
-#define VIPER_PEAK_TORQUE_RPM				3000.0f
+#define PEAK_TORQUE					500.0f
+#define PEAK_TORQUE_RPM				3000.0f
 
-#define VIPER_PEAK_HP						400.0f
-#define VIPER_PEAK_HP_RPM					5200.0f
+#define PEAK_HP						400.0f
+#define PEAK_HP_RPM					5200.0f
 
-#define VIPER_REDLINE_TORQUE				100.0f
-#define VIPER_REDLINE_TORQUE_RPM			6000.0f
+#define REDLINE_TORQUE				100.0f
+#define REDLINE_TORQUE_RPM			6000.0f
 
 
-//#define VIPER_TIRE_TOP_SPEED				164 mile / hours
-#define VIPER_TIRE_TOP_SPEED_KMH			264.0f
+//#define TIRE_TOP_SPEED				164 mile / hours
+#define TIRE_TOP_SPEED_KMH			264.0f
 
-#define VIPER_TIRE_LATERAL_STIFFNESS		(VIPER_MASS * DEMO_GRAVITY * 10.0f)
-#define VIPER_TIRE_LONGITUDINAL_STIFFNESS	(VIPER_MASS * DEMO_GRAVITY *  2.0f)
+#define TIRE_LATERAL_STIFFNESS		(MASS * DEMO_GRAVITY * 10.0f)
+#define TIRE_LONGITUDINAL_STIFFNESS	(MASS * DEMO_GRAVITY *  2.0f)
 
-#define VIPER_TIRE_ALIGNING_MOMENT_TRAIL	0.5f
-#define VIPER_TIRE_SUSPENSION_SPRING		150.0f
-#define VIPER_TIRE_SUSPENSION_DAMPER		10.0f
-#define VIPER_TIRE_SUSPENSION_LENGTH		0.25f
-#define VIPER_TIRE_BRAKE_TORQUE				3000.0f
-#define VIPER_TIRE_PIVOT_OFFSET_Y			-0.0f
+#define TIRE_ALIGNING_MOMENT_TRAIL	0.5f
+#define TIRE_SUSPENSION_SPRING		150.0f
+#define TIRE_SUSPENSION_DAMPER		10.0f
+#define TIRE_SUSPENSION_LENGTH		0.25f
+#define TIRE_BRAKE_TORQUE				3000.0f
+#define TIRE_PIVOT_OFFSET_Y			-0.0f
 
-#define VIPER_TIRE_GEAR_1					2.66f
-#define VIPER_TIRE_GEAR_2					1.78f
-#define VIPER_TIRE_GEAR_3 					1.30f
-#define VIPER_TIRE_GEAR_4 					1.00f
-#define VIPER_TIRE_GEAR_5 					0.74f
-#define VIPER_TIRE_GEAR_6 					0.50f
-#define VIPER_TIRE_REVERSE_GEAR				2.90f
-#define VIPER_COM_Y_OFFSET					0.0f
+#define TIRE_GEAR_1					2.66f
+#define TIRE_GEAR_2					1.78f
+#define TIRE_GEAR_3 					1.30f
+#define TIRE_GEAR_4 					1.00f
+#define TIRE_GEAR_5 					0.74f
+#define TIRE_GEAR_6 					0.50f
+#define TIRE_REVERSE_GEAR				2.90f
+#define COM_Y_OFFSET					0.0f
 
 // down force at 80 kmh
-#define VIPER_DOWNFORCE_WEIGHT_FACTOR_0		1.0f
+#define DOWNFORCE_WEIGHT_FACTOR_0		1.0f
 // down force at top Speed
-#define VIPER_DOWNFORCE_WEIGHT_FACTOR_1		2.0f
-#define VIPER_DOWNFORCE_WEIGHT_FACTOR_SPEED	80.0f 
+#define DOWNFORCE_WEIGHT_FACTOR_1		2.0f
+#define DOWNFORCE_WEIGHT_FACTOR_SPEED	80.0f 
+
+*/
 
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
@@ -95,6 +98,129 @@
 //#define VEHICLE_THIRD_PERSON_VIEW_DIST		35.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
+struct CarDefinition 
+{
+	dFloat TIRE_MASS;
+	dFloat ENGINE_MASS;
+	dFloat MASS;
+	dFloat ENGINE_RADIO;
+	dFloat TIRE_STEER_ANGLE;
+	dFloat VEHICLE_WEIGHT_DISTRIBUTION;
+	dFloat CLUTCH_FRICTION_TORQUE;
+	dFloat IDLE_TORQUE;
+	dFloat IDLE_TORQUE_RPM;
+	dFloat PEAK_TORQUE;
+	dFloat PEAK_TORQUE_RPM;
+	dFloat PEAK_HP;
+	dFloat PEAK_HP_RPM;
+	dFloat REDLINE_TORQUE;
+	dFloat REDLINE_TORQUE_RPM;
+	dFloat TIRE_TOP_SPEED_KMH;
+	dFloat TIRE_LATERAL_STIFFNESS;
+	dFloat TIRE_LONGITUDINAL_STIFFNESS;
+	dFloat TIRE_ALIGNING_MOMENT_TRAIL;
+	dFloat TIRE_SUSPENSION_SPRING;
+	dFloat TIRE_SUSPENSION_DAMPER;
+	dFloat TIRE_SUSPENSION_LENGTH;
+	dFloat TIRE_BRAKE_TORQUE;
+	dFloat TIRE_PIVOT_OFFSET_Y;
+	dFloat TIRE_GEAR_1;
+	dFloat TIRE_GEAR_2;
+	dFloat TIRE_GEAR_3;
+	dFloat TIRE_GEAR_4;
+	dFloat TIRE_GEAR_5;
+	dFloat TIRE_GEAR_6;
+	dFloat TIRE_REVERSE_GEAR;
+	dFloat COM_Y_OFFSET;
+	dFloat DOWNFORCE_WEIGHT_FACTOR_0;
+	dFloat DOWNFORCE_WEIGHT_FACTOR_1;
+	dFloat DOWNFORCE_WEIGHT_FACTOR_SPEED;
+	int WHEEL_HAS_FENDER;
+	int DIFFERENTIAL_TYPE;
+};
+
+static CarDefinition monsterTruck = 
+{
+	40.0f,  
+	100.0f,
+	(3380.0f * 0.454f),
+	0.125f,
+	15.0f,
+	0.55f,
+	2000.0f,
+	350.0f,
+	800.0f,
+	500.0f,
+	3000.0f,
+	400.0f,
+	5200.0f,
+	100.0f,
+	6000.0f,
+	264.0f,
+	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),
+	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),
+	0.5f,
+	150.0f,
+	10.0f,
+	0.25f,
+	3000.0f,
+	-0.0f,
+	2.66f,
+	1.78f,
+	1.30f,
+	1.00f,
+	0.74f,
+	0.50f,
+	2.90f,
+	-0.35f,
+	1.0f,
+	2.0f,
+	80.0f, 
+	1,
+	2,
+};
+
+
+static CarDefinition viper = 
+{
+	40.0f,  
+	100.0f,
+	(3380.0f * 0.454f),
+	0.125f,
+	15.0f,
+	0.55f,
+	2000.0f,
+	350.0f,
+	800.0f,
+	500.0f,
+	3000.0f,
+	400.0f,
+	5200.0f,
+	100.0f,
+	6000.0f,
+	264.0f,
+	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),
+	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),
+	0.5f,
+	150.0f,
+	10.0f,
+	0.25f,
+	3000.0f,
+	-0.0f,
+	2.66f,
+	1.78f,
+	1.30f,
+	1.00f,
+	0.74f,
+	0.50f,
+	2.90f,
+	0.0f,
+	1.0f,
+	2.0f,
+	80.0f, 
+	0,
+	2,
+};
 
 
 class SuperCarEntity: public DemoEntity
@@ -127,7 +253,7 @@ class SuperCarEntity: public DemoEntity
 	};
 
 
-	SuperCarEntity (DemoEntityManager* const scene, CustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename, dFloat distanceToPath)
+	SuperCarEntity (DemoEntityManager* const scene, CustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename, dFloat distanceToPath, const CarDefinition& definition)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_controller(NULL)
 		,m_gearUpKey (false)
@@ -160,7 +286,7 @@ class SuperCarEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle 
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, VIPER_MASS, PhysicsApplyGravityForce, this);
+		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.MASS, PhysicsApplyGravityForce, this);
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();
@@ -276,7 +402,7 @@ class SuperCarEntity: public DemoEntity
 	}
 
 
-	CustomVehicleController::BodyPartTire* AddTire (const char* const tireName, dFloat offset, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMOmentTrail, dFloat pinDir) 
+	CustomVehicleController::BodyPartTire* AddTire (const char* const tireName, dFloat offset, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, dFloat pinDir, int hasFender) 
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
@@ -305,7 +431,8 @@ class SuperCarEntity: public DemoEntity
 		tireInfo.m_suspesionlenght = suspensionLength;
 		tireInfo.m_lateralStiffness = dAbs (lateralStiffness);
 		tireInfo.m_longitudialStiffness = dAbs (longitudinalStiffness);
-		tireInfo.m_aligningMomentTrail =  aligningMOmentTrail;
+		tireInfo.m_aligningMomentTrail =  aligningMomentTrail;
+		tireInfo.m_hasFender = hasFender;
 		tireInfo.m_userData = tirePart;
 
 		return m_controller->AddTire (tireInfo);
@@ -339,38 +466,38 @@ class SuperCarEntity: public DemoEntity
 	}
 
 	// this function is an example of how to make a high performance super car
-	void BuildWheelCar (int differentialType, dFloat comHigh)
+	void BuildWheelCar (const CarDefinition& definition)
 	{
 		// step one: find the location of each tire, in the visual mesh and add them one by one to the vehicle controller 
 		dFloat width;
 		dFloat radius;
 
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (0.0f, comHigh, 0.0f, 0.0f)); 
+		m_controller->SetCenterOfGravity (dVector (0.0f, definition.COM_Y_OFFSET, 0.0f, 0.0f)); 
 
 		// add front axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
 		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
-		CustomVehicleController::BodyPartTire* const leftFrontTire = AddTire ("fl_tire", VIPER_TIRE_PIVOT_OFFSET_Y, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, 1.0f);
-		CustomVehicleController::BodyPartTire* const rightFrontTire = AddTire ("fr_tire", VIPER_TIRE_PIVOT_OFFSET_Y, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, -1.0f);
+		CustomVehicleController::BodyPartTire* const leftFrontTire = AddTire ("fl_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, 1.0f, definition.WHEEL_HAS_FENDER);
+		CustomVehicleController::BodyPartTire* const rightFrontTire = AddTire ("fr_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, -1.0f, definition.WHEEL_HAS_FENDER);
 
 		// add rear axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", VIPER_TIRE_PIVOT_OFFSET_Y, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, 1.0f);
-		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", VIPER_TIRE_PIVOT_OFFSET_Y, width, radius, VIPER_TIRE_MASS, VIPER_TIRE_SUSPENSION_LENGTH, VIPER_TIRE_SUSPENSION_SPRING, VIPER_TIRE_SUSPENSION_DAMPER, VIPER_TIRE_LATERAL_STIFFNESS, VIPER_TIRE_LONGITUDINAL_STIFFNESS, VIPER_TIRE_ALIGNING_MOMENT_TRAIL, -1.0f);
+		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, 1.0f, definition.WHEEL_HAS_FENDER);
+		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, -1.0f, definition.WHEEL_HAS_FENDER);
 
 		//calculate the Ackerman parameters
 		// add a steering Wheel component
-		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller, VIPER_TIRE_STEER_ANGLE * 3.141592f / 180.0f);
+		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller, definition.TIRE_STEER_ANGLE * 3.141592f / 180.0f);
 		steering->AddTire(leftFrontTire);
 		steering->AddTire(rightFrontTire);
 		steering->CalculateAkermanParameters (leftRearTire, rightRearTire, leftFrontTire, rightFrontTire);
 		m_controller->SetSteering(steering);
 		
 		// add vehicle brakes
-		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController (m_controller, VIPER_TIRE_BRAKE_TORQUE);
+		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController (m_controller, definition.TIRE_BRAKE_TORQUE);
 		brakes->AddTire (leftFrontTire);
 		brakes->AddTire (rightFrontTire);
 		brakes->AddTire (leftRearTire);
@@ -378,39 +505,39 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetBrakes(brakes);
 
 		// add vehicle hand brakes
-		CustomVehicleController::BrakeController* const handBrakes = new CustomVehicleController::BrakeController (m_controller, VIPER_TIRE_BRAKE_TORQUE);
+		CustomVehicleController::BrakeController* const handBrakes = new CustomVehicleController::BrakeController (m_controller, definition.TIRE_BRAKE_TORQUE);
 		handBrakes->AddTire (leftRearTire);
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
 		// add the engine, differential and transmission 
 		CustomVehicleController::EngineController::Info engineInfo;
-		engineInfo.m_mass = VIPER_ENGINE_MASS; 
-		engineInfo.m_radio = VIPER_ENGINE_RADIO; 
-		engineInfo.m_vehicleTopSpeed = VIPER_TIRE_TOP_SPEED_KMH;
-		engineInfo.m_clutchFrictionTorque = VIPER_CLUTCH_FRICTION_TORQUE;
+		engineInfo.m_mass = definition.ENGINE_MASS; 
+		engineInfo.m_radio = definition.ENGINE_RADIO; 
+		engineInfo.m_vehicleTopSpeed = definition.TIRE_TOP_SPEED_KMH;
+		engineInfo.m_clutchFrictionTorque = definition.CLUTCH_FRICTION_TORQUE;
 	
-		engineInfo.m_peakTorque = VIPER_PEAK_TORQUE;
-		engineInfo.m_rpmAtPeakTorque = VIPER_PEAK_TORQUE_RPM;
-		engineInfo.m_peakHorsePower = VIPER_PEAK_HP;
-		engineInfo.m_rpmAtPeakHorsePower = VIPER_PEAK_HP_RPM;
-		engineInfo.m_redLineTorque = VIPER_REDLINE_TORQUE;
-		engineInfo.m_rpmAtReadLineTorque = VIPER_REDLINE_TORQUE_RPM;
-		engineInfo.m_idleTorque = VIPER_IDLE_TORQUE;
-		engineInfo.m_rpmAtIdleTorque = VIPER_IDLE_TORQUE_RPM;
+		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
+		engineInfo.m_rpmAtPeakTorque = definition.PEAK_TORQUE_RPM;
+		engineInfo.m_peakHorsePower = definition.PEAK_HP;
+		engineInfo.m_rpmAtPeakHorsePower = definition.PEAK_HP_RPM;
+		engineInfo.m_redLineTorque = definition.REDLINE_TORQUE;
+		engineInfo.m_rpmAtReadLineTorque = definition.REDLINE_TORQUE_RPM;
+		engineInfo.m_idleTorque = definition.IDLE_TORQUE;
+		engineInfo.m_rpmAtIdleTorque = definition.IDLE_TORQUE_RPM;
 
 		engineInfo.m_gearsCount = 6;
-		engineInfo.m_gearRatios[0] = VIPER_TIRE_GEAR_1;
-		engineInfo.m_gearRatios[1] = VIPER_TIRE_GEAR_2;
-		engineInfo.m_gearRatios[2] = VIPER_TIRE_GEAR_3;
-		engineInfo.m_gearRatios[3] = VIPER_TIRE_GEAR_4;
-		engineInfo.m_gearRatios[4] = VIPER_TIRE_GEAR_5;
-		engineInfo.m_gearRatios[5] = VIPER_TIRE_GEAR_6;
-		engineInfo.m_reverseGearRatio = VIPER_TIRE_REVERSE_GEAR;
+		engineInfo.m_gearRatios[0] = definition.TIRE_GEAR_1;
+		engineInfo.m_gearRatios[1] = definition.TIRE_GEAR_2;
+		engineInfo.m_gearRatios[2] = definition.TIRE_GEAR_3;
+		engineInfo.m_gearRatios[3] = definition.TIRE_GEAR_4;
+		engineInfo.m_gearRatios[4] = definition.TIRE_GEAR_5;
+		engineInfo.m_gearRatios[5] = definition.TIRE_GEAR_6;
+		engineInfo.m_reverseGearRatio = definition.TIRE_REVERSE_GEAR;
 
 		CustomVehicleController::EngineController::DifferentialAxel axel0; 
 		CustomVehicleController::EngineController::DifferentialAxel axel1; 
-		switch (differentialType)
+		switch (definition.DIFFERENTIAL_TYPE)
 		{
 			case 0:
 				axel0.m_leftTire = leftRearTire;
@@ -448,12 +575,12 @@ class SuperCarEntity: public DemoEntity
 		SetGearMap(engineControl);
 
 		// set the vehicle weigh doistibution 
-		m_controller->SetWeightDistribution (VEHICLE_WEIGHT_DISTRIBUTION);
+		m_controller->SetWeightDistribution (definition.VEHICLE_WEIGHT_DISTRIBUTION);
 
 		// set teh vehicle aerodynamics
-		dFloat weightRatio0 = VIPER_DOWNFORCE_WEIGHT_FACTOR_0;
-		dFloat weightRatio1 = VIPER_DOWNFORCE_WEIGHT_FACTOR_1;
-		dFloat speedFactor = VIPER_DOWNFORCE_WEIGHT_FACTOR_SPEED / VIPER_TIRE_TOP_SPEED_KMH;
+		dFloat weightRatio0 = definition.DOWNFORCE_WEIGHT_FACTOR_0;
+		dFloat weightRatio1 = definition.DOWNFORCE_WEIGHT_FACTOR_1;
+		dFloat speedFactor = definition.DOWNFORCE_WEIGHT_FACTOR_SPEED / definition.TIRE_TOP_SPEED_KMH;
 		m_controller->SetAerodynamicsDownforceCoefficient(DEMO_GRAVITY, weightRatio0, speedFactor, weightRatio1);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
@@ -1454,31 +1581,33 @@ void SuperCar (DemoEntityManager* const scene)
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
 		location0.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "monsterTruck.ngd", 3.0f);
-		vehicle0->BuildWheelCar(2, -0.35f);
+		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "monsterTruck.ngd", 3.0f, monsterTruck);
+		vehicle0->BuildWheelCar(monsterTruck);
 		u -= 0.005f;
+
 /*
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit += location1.m_right.Scale ( 3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + offset, 200.0f);
 		location1.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "f1.ngd", 0.0f);
-		vehicle1->BuildWheelCar(0, VIPER_COM_Y_OFFSET);
+		SuperCarEntity* const vehicle1 = new SuperCarEntity (scene, manager, location1, "f1.ngd", 0.0f, viper);
+		vehicle1->BuildWheelCar(viper);
 		u -= 0.005f;
 
 		dMatrix location2(manager->CalculateSplineMatrix(u));
 		location2.m_posit += location0.m_right.Scale(3.0f);
 		location2.m_posit = FindFloor(scene->GetNewton(), location2.m_posit + offset, 200.0f);
 		location2.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle2 = new SuperCarEntity(scene, manager, location2, "lambDiablo.ngd", 3.0f);
-		vehicle2->BuildWheelCar(1, -0.35f);
+		SuperCarEntity* const vehicle2 = new SuperCarEntity(scene, manager, location2, "lambDiablo.ngd", 3.0f, viper);
+//		vehicle2->BuildWheelCar(1, -0.35f, viper);
+		vehicle2->BuildWheelCar(viper);
 		u -= 0.005f;
 
 		dMatrix location3(manager->CalculateSplineMatrix(u));
 		location3.m_posit = FindFloor(scene->GetNewton(), location3.m_posit + offset, 200.0f);
 		location3.m_posit.m_y += 1.0f;
-		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "viper.ngd", -3.0f);
-		vehicle3->BuildWheelCar(2, VIPER_COM_Y_OFFSET);
+		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "viper.ngd", -3.0f, viper);
+		vehicle3->BuildWheelCar(viper);
 		u -= 0.005f;
 */
 	}
