@@ -35,10 +35,10 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 	public:																													\
 	virtual dCRCTYPE GetSerializeKey() const { return dCRC64(#className); }													\
 	virtual const char* GetTypeName() const { return #className; }															\
-	class SerializeMetaData: public baseClass::SerializeMetaData															\
+	class SerializeMetaData_##className: public baseClass::SerializeMetaData												\
 	{																														\
 		public:																												\
-		SerializeMetaData(const char* const name)																			\
+		SerializeMetaData_##className(const char* const name)																\
 			:baseClass::SerializeMetaData(name)																				\
 		{																													\
 		}																													\
@@ -52,11 +52,11 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 			return new className (body0, body1, callback, userData);														\
 		}																													\
 	};																														\
-	friend class SerializeMetaData;																							\
-	CUSTOM_JOINTS_API static SerializeMetaData m_metaData_##className;
+	friend class SerializeMetaData_##className;																				\
+	CUSTOM_JOINTS_API static SerializeMetaData_##className m_metaData_##className;
 
 #define IMPLEMENT_CUSTON_JOINT(className)																					\
-	className::SerializeMetaData className::m_metaData_##className(#className);												\
+	className::SerializeMetaData_##className className::m_metaData_##className(#className);									\
 
 // this is the base class to implement custom joints, it is not a joint it just provide functionality
 // for the user to implement it own joints
@@ -216,8 +216,7 @@ class CustomJoint: public CustomAlloc
 	dFloat m_stiffness;
 	int m_maxDof;
 	int m_autoDestroy;
-	
-	static SerializeMetaData m_metaData;
+	CUSTOM_JOINTS_API static SerializeMetaData m_metaData_CustomJoint;
 };
 
 

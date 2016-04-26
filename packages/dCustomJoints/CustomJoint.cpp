@@ -16,7 +16,8 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomJoint.h"
 
-CustomJoint::SerializeMetaData m_metaData("CustomJoint");
+
+CustomJoint::SerializeMetaData m_metaData_CustomJoint("CustomJoint");
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
