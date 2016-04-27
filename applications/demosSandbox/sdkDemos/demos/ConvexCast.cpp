@@ -76,11 +76,11 @@ class StupidComplexOfConvexShapes: public DemoEntity
 			}
 		}
 		NewtonCompoundCollisionEndAddRemove(compound);
-
 		CreateSimpleBody (world, NULL, 0.0f, dGetIdentityMatrix(), compound, 0);
 
 		// destroy all collision shapes after they are used
 		NewtonDestroyCollision(compound);
+
 		for (int i = 0; i < int (sizeof (collisionArray) / sizeof (collisionArray[0])); i ++) {
 			gemetries[i]->Release();
 			NewtonDestroyCollision(collisionArray[i]);
@@ -271,8 +271,8 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-			p0 = dVector (-12.044177f, 8.068434f, -7.558466f, 1.0f);
-			p1 = dVector (1751.264038f, -845.520630f, 633.307312f, 1.0f);
+			//p0 = dVector (-12.044177f, 8.068434f, -7.558466f, 1.0f);
+			//p1 = dVector (1751.264038f, -845.520630f, 633.307312f, 1.0f);
 
 			// do the convex cast here
 			dMatrix matrix (dGetIdentityMatrix());

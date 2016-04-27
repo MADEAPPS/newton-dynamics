@@ -719,6 +719,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 
 	dgInt32 count = 0;
 	if (distance < dgFloat32(1.0f)) {
+		bool inside = false;
 
 		dgVector boxSize((hullBoxP1 - hullBoxP0).CompProduct4(dgVector::m_half));
 		dgVector sphereMag2 (boxSize.DotProduct4(boxSize));
@@ -733,48 +734,42 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 		dgVector boxOrigin0 (pointInPlane + relativeVelocity.Scale4(timeToPlane0));
 		dgVector boxOrigin1 (pointInPlane + relativeVelocity.Scale4(timeToPlane1));
 		dgVector boxOrigin ((boxOrigin0 + boxOrigin1).CompProduct4(dgVector::m_half)); 
+		dgVector boxProjectSize (((boxOrigin0 - boxOrigin1).CompProduct4(dgVector::m_half))); 
+		sphereMag2 = boxProjectSize.DotProduct4(boxProjectSize);
+		boxSize = sphereMag2.Sqrt();
+
 		dgAssert (boxOrigin.m_w == 0.0f);
 		boxOrigin = boxOrigin | dgVector::m_wOne;
+		
+		if (!proxy.m_intersectionTestOnly) {
+			inside = true;
+			dgInt32 i0 = m_count - 1;
 
-		bool inside = true;
-		dgInt32 i0 = m_count - 1;
+			for (dgInt32 i = 0; i < m_count; i++) {
+				dgVector e(m_localPoly[i] - m_localPoly[i0]);
+				dgVector n(m_normal * e & dgVector::m_triplexMask);
+				dgFloat32 param = dgSqrt (sphereMag2.GetScalar() / (n.DotProduct4(n)).GetScalar());
+				dgPlane plane(n, -(m_localPoly[i0] % n));
 
-		for (dgInt32 i = 0; i < m_count; i++) {
-			dgVector e(m_localPoly[i] - m_localPoly[i0]);
-			dgVector n(m_normal * e & dgVector::m_triplexMask);
-			dgFloat32 param = dgSqrt (sphereMag2.GetScalar() / (n.DotProduct4(n)).GetScalar());
-			dgPlane plane(n, -(m_localPoly[i0] % n));
+				dgVector p0 (boxOrigin + n.Scale4 (param));
+				dgVector p1 (boxOrigin - n.Scale4 (param));
 
-			dgVector p0 (boxOrigin + n.Scale4 (param));
-			dgVector p1 (boxOrigin - n.Scale4 (param));
+				dgFloat32 size0 = (plane.DotProduct4 (p0)).GetScalar();
+				dgFloat32 size1 = (plane.DotProduct4 (p1)).GetScalar();
 
-			dgFloat32 size0 = (plane.DotProduct4 (p0)).GetScalar();
-			dgFloat32 size1 = (plane.DotProduct4 (p1)).GetScalar();
+				if ((size0 < 0.0f) && (size1 < 0.0f)) {
+					return 0;
+				}
 
-			if ((size0 < 0.0f) && (size1 < 0.0f)) {
-				return 0;
+				if ((size0 * size1) < 0.0f) {
+					inside = false;
+					break;
+				}
+				i0 = i;
 			}
-
-			if ((size0 * size1) < 0.0f) {
-				inside = false;
-				break;
-			}
-/*
-			dgVector supportDist(plane.Abs().DotProduct4(boxSize));
-			dgFloat32 centerDist = plane.Evalue(boxOrigin);
-			if ((centerDist + supportDist.m_x) < dgFloat32(0.0f)) {
-				return 0;
-			}
-
-			if ((centerDist - supportDist.m_x) < dgFloat32(0.0f)) {
-				inside = false;
-				break;
-			}
-*/
-			i0 = i;
 		}
 
-		dgFloat32 convexSphapeUmbra = proxy.m_instance0->GetUmbraClipSize();
+		dgFloat32 convexSphapeUmbra = dgMax (proxy.m_instance0->GetUmbraClipSize(), boxSize.GetScalar());
 		if (m_faceClipSize > convexSphapeUmbra) {
 			BeamClipping(boxOrigin, convexSphapeUmbra);
 			m_faceClipSize = proxy.m_instance0->m_childShape->GetBoxMaxRadius();
