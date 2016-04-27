@@ -20,7 +20,7 @@
 #include "HeightFieldPrimitive.h"
 #include "DebugDisplay.h"
 
-#if 0
+
 struct VehicleParameters
 {
 	dFloat MASS;
@@ -187,7 +187,7 @@ class HeavyVehicleEntity: public DemoEntity
 			}
 		}
 
-
+/*
 		dFloat GetTireRadius (DemoEntity* const tire) const
 		{
 			for (CustomVehicleControllerBodyStateTire* tireNode = m_vehicle->m_controller->GetFirstTire (); tireNode; tireNode = m_vehicle->m_controller->GetNextTire(tireNode)) {
@@ -198,9 +198,12 @@ class HeavyVehicleEntity: public DemoEntity
 			dAssert (0);
 			return 0.0f;
 		}
+*/
 
 		void CalculaterBinding()
 		{
+		dAssert (0);
+/*
 			m_controlPointCount = m_bezierMesh->m_curve.GetControlPointCount();
 			m_controlPointsOffset = new dVector[m_controlPointCount];
 			m_controlPointBindIndex = new int[m_controlPointCount];
@@ -246,6 +249,7 @@ class HeavyVehicleEntity: public DemoEntity
 					m_controlPointsOffset[i] -= tireMatrix[index].m_posit;
 				}
 			}
+*/
 		}
 
 		void CalculaterUniformSpaceSamples()
@@ -307,6 +311,7 @@ class HeavyVehicleEntity: public DemoEntity
 			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
 		}
 
+/*
 		void Init (HeavyVehicleEntity* const me, const char* const name, CustomVehicleControllerBodyStateTire* const tire)
 		{
 			m_vehicle = me;
@@ -327,6 +332,7 @@ class HeavyVehicleEntity: public DemoEntity
 			AnimateThread (*((DemoEntityManager*)NewtonWorldGetUserData(world)), 0.0f);
 			AnimateThread (*((DemoEntityManager*)NewtonWorldGetUserData(world)), 0.0f);
 		}
+*/
 
 		dFloat CalculateKnotParam (dFloat t) const
 		{
@@ -367,6 +373,8 @@ class HeavyVehicleEntity: public DemoEntity
 
 		void AnimateThread (DemoEntityManager& world, dFloat timestep) 
 		{
+		dAssert (0);
+/*
 			dVector matrixPalette[8];
 			for (int i = 0; i < 8; i ++) {
 				matrixPalette[i] = (m_bindingTires[i]->GetMeshMatrix() * m_bindingTires[i]->GetCurrentMatrix()).m_posit;
@@ -415,6 +423,7 @@ class HeavyVehicleEntity: public DemoEntity
 				q0 = q1;
 				u0 = u1;
 			}
+*/
 		}
 
 		dMatrix m_shapeMatrix;
@@ -423,7 +432,7 @@ class HeavyVehicleEntity: public DemoEntity
 		HeavyVehicleEntity* m_vehicle;
 		DemoEntity* m_bezierEntity;
 		DemoBezierCurve* m_bezierMesh;
-		CustomVehicleControllerBodyStateTire* m_tire;
+//		CustomVehicleControllerBodyStateTire* m_tire;
 		ConstantSpeedKnotInterpolant* m_intepolants;
 		DemoEntity* m_bindingTires[8];
 		DemoEntity** m_linksEntity;
@@ -466,6 +475,8 @@ class HeavyVehicleEntity: public DemoEntity
 		,m_engineOldKeyState(false)
 		,m_engineRPMOn(false)
 	{
+		dAssert (0);
+/*
 		// add this entity to the scene for rendering
 		scene->Append(this);
 
@@ -514,6 +525,7 @@ class HeavyVehicleEntity: public DemoEntity
 		}
 		m_gearMap[0] = 1;
 		m_gearMap[1] = 0;
+*/
 	}
 
 	~HeavyVehicleEntity ()
@@ -541,6 +553,8 @@ class HeavyVehicleEntity: public DemoEntity
 	// interpolate all skeleton transform 
 	virtual void InterpolateMatrix (DemoEntityManager& world, dFloat param)
 	{
+		dAssert (0);
+/*
 		DemoEntity::InterpolateMatrix (world, param);
 		if (m_controller){
 			for (CustomVehicleControllerBodyStateTire* tire = m_controller->GetFirstTire(); tire; tire = m_controller->GetNextTire(tire)) {
@@ -553,6 +567,7 @@ class HeavyVehicleEntity: public DemoEntity
 			m_leftTrack.InterpolateMatrix (world, param);
 			m_rightTrack.InterpolateMatrix  (world, param);
 		}
+*/	
 	}
 
 	void CalculateTireDimensions (const char* const tireName, dFloat& width, dFloat& radius) const
@@ -595,7 +610,7 @@ class HeavyVehicleEntity: public DemoEntity
 		NewtonDestroyCollision (collision);	
 	}
 
-
+/*
 	CustomVehicleControllerBodyStateTire* AddTire (const char* const tireName, const dVector& offset, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, const dMatrix& tireAligmentMatrix) 
 	{
 		NewtonBody* const body = m_controller->GetBody();
@@ -636,9 +651,11 @@ class HeavyVehicleEntity: public DemoEntity
 
 		return m_controller->AddTire (tireInfo);
 	}
-
+*/
 	void UpdateTireTransforms(dFloat timestep)
 	{
+		dAssert (0);
+/*
 		NewtonBody* const body = m_controller->GetBody();
 		//NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
@@ -669,11 +686,14 @@ class HeavyVehicleEntity: public DemoEntity
 			m_leftTrack.AnimateThread (*scene, timestep);
 			m_rightTrack.AnimateThread (*scene, timestep);
 		}
+*/
 	}
 
 	// this function is an example of how to make a high performance super car
 	void BuildAllWheelDriveVehicle (const VehicleParameters& parameters)
 	{
+		dAssert (0);
+/*
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
 
@@ -753,10 +773,13 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
+*/
 	}
 
 	void BuildLightTruckVehicle (const VehicleParameters& parameters)
 	{
+		dAssert (0);
+/*
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
 		
@@ -828,16 +851,21 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
+*/
 	}
 
+/*
 	void SetTracks (CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire)
 	{
 		m_leftTrack.Init(this, "leftTrackPath", leftTire);
 		m_rightTrack.Init(this, "rightTrackPath", rightTire);
 	}
+*/
 
 	void BuildTrackedVehicle (const VehicleParameters& parameters)
 	{
+		dAssert (0);
+/*
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
 
@@ -909,12 +937,14 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
+*/
 	}
-
 
 
 	void ApplyPlayerControl ()
 	{
+		dAssert (0);
+#if 0
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -1058,20 +1088,25 @@ class HeavyVehicleEntity: public DemoEntity
 		if (handBrakes) {
 			handBrakes->SetParam(handBrakePedal);
 		}
-		
+#endif		
 	}
 
 	void ApplyNPCControl ()
 	{
+		dAssert (0);
+/*
 		// simple park NPC vehicle 
 		CustomVehicleControllerComponentBrake* const brakes = m_controller->GetBrakes();
 		if (brakes) {
 			brakes->SetParam (0.5f);
 		}
+*/	
 	}
 	
 	void Debug () const 
 	{
+		dAssert (0);
+/*
 		NewtonBody* const body = m_controller->GetBody();
 		const CustomVehicleControllerBodyStateChassis& chassis = m_controller->GetChassisState ();
 
@@ -1138,7 +1173,7 @@ class HeavyVehicleEntity: public DemoEntity
 		glEnd();
 
 		glLineWidth(1.0f);
-
+*/
 	}
 
 	TrackSystem m_leftTrack;
@@ -1156,11 +1191,12 @@ class HeavyVehicleEntity: public DemoEntity
 	bool m_engineRPMOn;
 };
 
+
 class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 {
 	public:
-	HeavyVehicleControllerManager (NewtonWorld* const world)
-		:CustomVehicleControllerManager (world)
+	HeavyVehicleControllerManager (NewtonWorld* const world, int materialCount, int* const otherMaterials)
+		:CustomVehicleControllerManager (world, materialCount, otherMaterials)
 		,m_externalView(true)
 		,m_changeVehicle(false)
 		,m_player (NULL) 
@@ -1412,7 +1448,8 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 	HeavyVehicleEntity* m_player;
 };
 
-#endif
+
+
 void MilitaryTransport (DemoEntityManager* const scene)
 {
 
@@ -1420,8 +1457,7 @@ void MilitaryTransport (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE,
-							  5.0f, 0.2f, 200.0f, -50.0f);
+	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 5.0f, 0.2f, 200.0f, -50.0f);
 
 //	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dMatrix location (dGetIdentityMatrix());
@@ -1431,15 +1467,19 @@ location.m_posit.m_y = 50.0f;
 location.m_posit.m_z = 50.0f;
 
 
-/*
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 2.0f;
 
 	NewtonWorld* const world = scene->GetNewton();
 
+	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	NewtonMaterialSetDefaultFriction(world, defaulMaterial, defaulMaterial, 0.6f, 0.5f);
+
 	// create a vehicle controller manager
-	HeavyVehicleControllerManager* const manager = new HeavyVehicleControllerManager (world);
-	
+	int materialList[] = {defaulMaterial };
+	HeavyVehicleControllerManager* const manager = new HeavyVehicleControllerManager (world, 1, materialList);
+
+/*
 	HeavyVehicleEntity* const heavyVehicle = new HeavyVehicleEntity (scene, manager, location, "lav-25.ngd", heavyTruck);
 	heavyVehicle->BuildAllWheelDriveVehicle (heavyTruck);
 
