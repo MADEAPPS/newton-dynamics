@@ -176,7 +176,7 @@ static CarDefinition monsterTruck =
 	1.0f,
 	2.0f,
 	80.0f, 
-	1,
+	0,
 	2,
 };
 
@@ -218,7 +218,7 @@ static CarDefinition viper =
 	1.0f,
 	2.0f,
 	80.0f, 
-	0,
+	1,
 	2,
 };
 

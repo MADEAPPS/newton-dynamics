@@ -2055,8 +2055,19 @@ bool CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 		dFloat tireParam = num / (tire->m_data.m_suspesionlenght * tire->m_data.m_suspesionlenght);
 
 		if (tireParam <= timeOfImpact) {
-			tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(timeOfImpact * tire->m_data.m_suspesionlenght);
-			NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
+			tireSweeptMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(timeOfImpact * tire->m_data.m_suspesionlenght);
+			for (int i = count - 1; i >= 0; i --) {
+				dVector p (tireSweeptMatrix.UntransformVector (dVector (tire->m_contactInfo[i].m_point[0], tire->m_contactInfo[i].m_point[1], tire->m_contactInfo[i].m_point[2], 1.0f)));
+				dFloat tangAngle = dAbs (p.m_x / p.m_y) ;
+				if (tangAngle > 0.4f) {
+					tire->m_contactInfo[i] = tire->m_contactInfo[count - 1];
+					count --;
+				}
+			}
+			if (count) {
+				tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(timeOfImpact * tire->m_data.m_suspesionlenght);
+				NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
+			}
 		} else {
 			count = 0;
 		}
