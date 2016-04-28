@@ -540,6 +540,7 @@ CustomVehicleController::EngineController::DriveTrain::DriveTrain(const dVector&
 	,m_child(NULL)
 	,m_sibling(NULL)
 	,m_index(0)
+	,m_dofBase(0)
 {
 }
 
@@ -642,11 +643,14 @@ void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
 	dVector rowI[size];
 	dVector rowJ[size];
 
+	int dofSize = 0;
 	int nodeCount = GetNodeArray(nodeList);
 	for (int i = 0; i < nodeCount; i++) {
 		nodeList[i]->m_index = i;
+		nodeList[i]->m_dofBase = dofSize;
+		dofSize += nodeList[i]->GetDOF();
 	}
-	int dofSize = nodeCount - 1;
+//	int dofSize = nodeCount - 1;
 	dAssert(size > dofSize);
 
 	int y = 0;
