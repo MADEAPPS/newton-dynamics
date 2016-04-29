@@ -330,16 +330,12 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		dVector relOmega(tireOmega - chassisOmega);
 
 		dFloat angle = -CalculateAngle(tireMatrix.m_front, chassisMatrix.m_front, chassisMatrix.m_right);
-		dFloat omega = relOmega % chassisMatrix.m_right;
-		dFloat alphaError = -(angle + omega * timestep) / (timestep * timestep);
 		NewtonUserJointAddAngularRow(m_joint, -angle, &chassisMatrix.m_right[0]);
-		NewtonUserJointSetRowAcceleration(m_joint, alphaError);
+		NewtonUserJointSetRowAcceleration(m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
 
-		angle = CalculateAngle(tireMatrix.m_front, chassisMatrix.m_front, chassisMatrix.m_up);
-		omega = relOmega % chassisMatrix.m_up;
-		alphaError = -(angle + omega * timestep) / (timestep * timestep);
+		angle = -CalculateAngle(tireMatrix.m_front, chassisMatrix.m_front, chassisMatrix.m_up);
 		NewtonUserJointAddAngularRow(m_joint, -angle, &chassisMatrix.m_up[0]);
-		NewtonUserJointSetRowAcceleration(m_joint, alphaError);
+		NewtonUserJointSetRowAcceleration(m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
 
 		dFloat param = CalculateTireParametricPosition(tireMatrix, chassisMatrix);
 		if (param >= 1.0f) {
@@ -1903,7 +1899,7 @@ void CustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 
 void CustomVehicleController::Finalize()
 {
-//NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
+NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 	m_finalized = true;
 	NewtonSkeletonContainerFinalize(m_skeleton);
 	SetWeightDistribution (m_weightDistribution);
@@ -2449,7 +2445,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 				NewtonBodyGetInvInertiaMatrix(m_body, &invInertia[0][0]);
 				dVector omega(invInertia.RotateVector(m_lastAngularMomentum));
 				NewtonBodySetOmega(m_body, &omega[0]);
-				// attenuate the angular momentum by applying a pseudo angular deficiently of drag
+				// attenuate angular momentum by applying a pesudo angular drag coefficient 
 				m_lastAngularMomentum = m_lastAngularMomentum.Scale(0.999f);
 			}
 
