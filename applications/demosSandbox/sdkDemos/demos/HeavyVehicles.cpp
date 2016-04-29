@@ -939,7 +939,7 @@ class HeavyVehicleEntity: public DemoEntity
 		//m_engineKeySwitchCounter += m_engineKeySwitch.UpdateTriggerButton(mainWindow, 'Y');
 		//int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 0
+#if 1
 	#if 1
 			static FILE* file = fopen ("log.bin", "wb");                                         
 			if (file) {
