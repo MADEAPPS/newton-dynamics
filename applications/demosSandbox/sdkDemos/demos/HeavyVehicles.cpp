@@ -940,7 +940,7 @@ class HeavyVehicleEntity: public DemoEntity
 		//int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 0
-	#if 0
+	#if 1
 			static FILE* file = fopen ("log.bin", "wb");                                         
 			if (file) {
 				fwrite (&engineIgnitionKey, sizeof (int), 1, file);

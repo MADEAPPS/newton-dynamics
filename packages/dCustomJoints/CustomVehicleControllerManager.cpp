@@ -341,8 +341,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		if (param >= 1.0f) {
 			dVector chassisMatrixPosit (chassisMatrix.m_posit + chassisMatrix.m_up.Scale (param * m_tire->m_data.m_suspesionlenght));
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
-dTrace (("julio Fix this bug please!!\n"));
-			//NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_tire->m_data.m_springStrength, m_tire->m_data.m_dampingRatio);
+			NewtonUserJointSetRowAcceleration(m_joint, -2.0f / timestep);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else if (param <= 0.0f) {
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
@@ -1900,7 +1899,7 @@ void CustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 
 void CustomVehicleController::Finalize()
 {
-NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
+//NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 	m_finalized = true;
 	NewtonSkeletonContainerFinalize(m_skeleton);
 	SetWeightDistribution (m_weightDistribution);
