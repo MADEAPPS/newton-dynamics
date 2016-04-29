@@ -262,13 +262,62 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DifferentialAxel()
 				:m_leftTire(NULL)
-				, m_rightTire(NULL)
+				,m_rightTire(NULL)
 			{
 			}
 
 			BodyPartTire* m_leftTire;
 			BodyPartTire* m_rightTire;
 		};
+
+		class Differential
+		{
+			public:
+			enum type
+			{
+				m_2wd,
+				m_4wd,
+				m_8wd,
+			};
+
+			Differential()
+				:m_axel()
+				,m_type(m_2wd)
+			{
+			}
+
+			DifferentialAxel m_axel;
+			int m_type;
+		};
+
+		class Differential4wd: public Differential
+		{
+			public:
+			Differential4wd()
+				:Differential()
+				,m_secundAxel()
+			{
+				m_type = m_4wd;
+			}
+
+			Differential m_secundAxel;
+		};
+
+
+		class Differential8wd: public Differential4wd
+		{
+			public:
+			Differential8wd()
+				:Differential4wd()
+				,m_secund4Wd()
+			{
+				m_type = m_4wd;
+			}
+
+			Differential4wd m_secund4Wd;
+		};
+
+
 
 		class Info
 		{
@@ -326,13 +375,14 @@ class CustomVehicleController: public CustomControllerBase
 			virtual dFloat* GetMassMatrix() {return NULL;}
 			virtual void SetExternalTorque(EngineController* const controller);
 			virtual void Integrate(EngineController* const controller, dFloat timestep);
-			virtual void SetGearRatioJacobians(dFloat gearRatio) {};
+			virtual void SetGearRatioJacobian(dFloat gearRatio) {};
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
 			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 			
 			void SetInvMassJt();
 			void BuildMassMatrix ();
 			void ReconstructInvMassJt ();
+			void SetDifferentialJacobian (dFloat gearGain);
 
 			void GetRow(dVector* const row) const;
 			void GetInvRowT(dVector* const row) const;
@@ -362,6 +412,7 @@ class CustomVehicleController: public CustomControllerBase
 
 			int GetDOF() const {return 0;}
 			void SetGearRatio (dFloat gearRatio);
+			void SetGearRatioJacobian(dFloat gearRatio);
 			void SetExternalTorque(EngineController* const controller);
 			void RebuildEngine (const dVector& invInertia);
 			dFloat GetClutchTorque(EngineController* const controller) const;
@@ -369,6 +420,7 @@ class CustomVehicleController: public CustomControllerBase
 			void Solve (int dofSize, int width, const dFloat* const massMatrix, const dFloat* const b, dFloat* const x) const;
 
 			dFloat m_lastGear;
+			dFloat m_gearSign;
 			dFloat m_engineTorque;
 		};
 
@@ -389,14 +441,25 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat matrix[7][7];
 		};
 
+		class DriveTrainEngine8W: public DriveTrainEngine
+		{
+			public:
+			DriveTrainEngine8W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1, const DifferentialAxel& axel2, const DifferentialAxel& axel3);
+			virtual dFloat* GetMassMatrix() { return &matrix[0][0]; }
+
+			dFloat matrix[15][15];
+		};
+
+
 		class DriveTrainDifferentialGear: public DriveTrain
 		{
 			public:
-			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel);
 			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel, dFloat side);
-			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
+			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1, dFloat side);
+			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1, const DifferentialAxel& axel2, const DifferentialAxel& axel3, dFloat side);
 
-			void SetGearRatioJacobians(dFloat gearRatio);
+			
+			virtual void SetGearRatioJacobian(dFloat gearGain);
 			virtual void SetExternalTorque(EngineController* const controller);
 			//void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
 			dFloat m_slipDifferentialViscuosFriction;
@@ -416,7 +479,7 @@ class CustomVehicleController: public CustomControllerBase
 		};
 
 		public:
-		CUSTOM_JOINTS_API EngineController(CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
+		CUSTOM_JOINTS_API EngineController(CustomVehicleController* const controller, const Info& info, const Differential& differential);
 		CUSTOM_JOINTS_API ~EngineController();
 
 		CUSTOM_JOINTS_API void ApplyTorque(dFloat torque, dFloat timestep);

@@ -364,27 +364,28 @@ class BasicCarEntity: public DemoEntity
 		handBrakes->AddTire (rearTires[1]);
 		m_controller->SetHandBrakes (handBrakes);
 
-		CustomVehicleController::EngineController::DifferentialAxel axel0;
-		CustomVehicleController::EngineController::DifferentialAxel axel1;
+		CustomVehicleController::EngineController::Differential8wd differential;
 		switch (parameters.m_differentialType) 
 		{
 			case BasciCarParameters::m_RWD:
-				axel0.m_leftTire = rearTires[0];
-				axel0.m_rightTire = rearTires[1];
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
+				differential.m_axel.m_leftTire = rearTires[0];
+				differential.m_axel.m_rightTire = rearTires[1];
 				break;
 			case BasciCarParameters::m_FWD:
-				axel0.m_leftTire = frontTires[0];
-				axel0.m_rightTire = frontTires[1];
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
+				differential.m_axel.m_leftTire = frontTires[0];
+				differential.m_axel.m_rightTire = frontTires[1];
 				break;
 
 			case BasciCarParameters::m_4WD:
 			default:
-				axel0.m_leftTire = rearTires[0];
-				axel0.m_rightTire = rearTires[1];
-				axel1.m_leftTire = frontTires[0];
-				axel1.m_rightTire = frontTires[1];
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_4wd;
+				differential.m_axel.m_leftTire = rearTires[0];
+				differential.m_axel.m_rightTire = rearTires[1];
+				differential.m_secundAxel.m_axel.m_leftTire = frontTires[0];
+				differential.m_secundAxel.m_axel.m_rightTire = frontTires[1];
 		}
-
 
 		CustomVehicleController::EngineController::Info engineInfo;
 		engineInfo.m_mass = parameters.ENGINE_MASS;
@@ -407,7 +408,7 @@ class BasicCarEntity: public DemoEntity
 		engineInfo.m_gearRatios[2] = parameters.GEAR_3;
 		engineInfo.m_reverseGearRatio = parameters.REVERSE_GEAR;
 
-		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, axel0, axel1);
+		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, differential);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());

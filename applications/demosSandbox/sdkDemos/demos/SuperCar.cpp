@@ -534,7 +534,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_gearRatios[4] = definition.TIRE_GEAR_5;
 		engineInfo.m_gearRatios[5] = definition.TIRE_GEAR_6;
 		engineInfo.m_reverseGearRatio = definition.TIRE_REVERSE_GEAR;
-
+/*
 		CustomVehicleController::EngineController::DifferentialAxel axel0; 
 		CustomVehicleController::EngineController::DifferentialAxel axel1; 
 		switch (definition.DIFFERENTIAL_TYPE)
@@ -554,13 +554,34 @@ class SuperCarEntity: public DemoEntity
 				axel1.m_leftTire = leftFrontTire;
 				axel1.m_rightTire = rightFrontTire;
 		}
+*/
+
+		CustomVehicleController::EngineController::Differential4wd differential;
+		switch (definition.DIFFERENTIAL_TYPE) 
+		{
+			case 0:
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
+				differential.m_axel.m_leftTire = leftRearTire;
+				differential.m_axel.m_rightTire = rightRearTire;
+				break;
+			case 1:
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
+				differential.m_axel.m_leftTire = leftFrontTire;
+				differential.m_axel.m_rightTire = rightFrontTire;
+				break;
+
+			default:
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_4wd;
+				differential.m_axel.m_leftTire = leftRearTire;
+				differential.m_axel.m_rightTire = rightRearTire;
+				differential.m_secundAxel.m_axel.m_leftTire = leftFrontTire;
+				differential.m_secundAxel.m_axel.m_rightTire = rightFrontTire;
+		}
+
 
 		engineInfo.m_slipDifferentialOn = 1;
 		engineInfo.m_userData = this;
-
-		//CustomVehicleController::BodyPartEngine* const engine = new CustomVehicleController::BodyPartEngine(m_controller, engineInfo, axel0, axel1);
-		//m_controller->AddEngineBodyPart (engine);
-		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, axel0, axel1);
+		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, differential);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
@@ -574,7 +595,7 @@ class SuperCarEntity: public DemoEntity
 		// set the gear look up table
 		SetGearMap(engineControl);
 
-		// set the vehicle weigh doistibution 
+		// set the vehicle weigh distribution 
 		m_controller->SetWeightDistribution (definition.VEHICLE_WEIGHT_DISTRIBUTION);
 
 		// set the vehicle aerodynamics
@@ -1548,12 +1569,12 @@ void SuperCar (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	//CreateLevelMesh (scene, "flatPlane1.ngd", 0);
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	//CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 1);
-	//CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
+	CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	//CreateHeightFieldTerrain (scene, 10, 8.0f, 0.0f, 0.0f, 200.0f, -50.0f);
 	//CreatePlaneCollision (scene, dVector (0.0f, 1.0f, 0.0f, 0.0f));
 

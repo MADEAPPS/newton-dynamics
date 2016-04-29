@@ -559,6 +559,14 @@ void CustomVehicleController::EngineController::DriveTrain::SetInvMassJt()
 	m_invMassJt10 = m_J10.CompProduct(m_parent->m_inertiaInv);
 }
 
+void CustomVehicleController::EngineController::DriveTrain::SetDifferentialJacobian(dFloat gearGain)
+{
+	m_J01 = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	m_J10 = dVector(1.0f, gearGain, 0.0f, 0.0f);
+	SetInvMassJt();
+}
+
+
 void CustomVehicleController::EngineController::DriveTrain::SetPartMasses (const dVector& invInertia)
 {
 	m_inertiaInv = invInertia;
@@ -650,7 +658,6 @@ void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
 		nodeList[i]->m_dofBase = dofSize;
 		dofSize += nodeList[i]->GetDOF();
 	}
-//	int dofSize = nodeCount - 1;
 	dAssert(size > dofSize);
 
 	int y = 0;
@@ -706,6 +713,7 @@ void CustomVehicleController::EngineController::DriveTrain::ApplyInternalTorque(
 
 CustomVehicleController::EngineController::DriveTrainEngine::DriveTrainEngine(const dVector& invInertia)
 	:DriveTrain(invInertia)
+	,m_gearSign(1.0f)
 	,m_lastGear(-1000.0f)
 	,m_engineTorque(0.0f)
 {
@@ -750,12 +758,16 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Solve(int dofS
 	}
 }
 
+void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatioJacobian(dFloat gearRatio)
+{
+	m_child->SetGearRatioJacobian(gearRatio * m_gearSign);
+}
 
 void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (dFloat gearRatio)
 {
 	if (m_lastGear != gearRatio) {
 		m_lastGear = gearRatio;
-		m_child->SetGearRatioJacobians(gearRatio);
+		SetGearRatioJacobian(gearRatio);
 
 		const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
 		DriveTrain* nodeList[size];
@@ -763,7 +775,10 @@ void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatio (
 		dVector rowJ[size];
 
 		int nodeCount = GetNodeArray(nodeList);
-		int dofSize = nodeCount - 1;
+		int dofSize = 0;
+		for (int i = 0; i < nodeCount; i++) {
+			dofSize += nodeList[i]->GetDOF();
+		}
 		dAssert(size > dofSize);
 
 		dFloat* const massMatrix = GetMassMatrix();
@@ -851,23 +866,25 @@ CustomVehicleController::EngineController::DriveTrainEngine2W::DriveTrainEngine2
 	:DriveTrainEngine(invInertia)
 {
 	dVector gearInvInertia(invInertia.Scale(4.0f));
-	m_child = new DriveTrainDifferentialGear(gearInvInertia, this, axel);
+	m_child = new DriveTrainDifferentialGear(gearInvInertia, this, axel, 1.0f);
+	SetGearRatioJacobian(1.0f);
 }
 
 CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:DriveTrainEngine(invInertia)
 {
 	dVector gearInvInertia(invInertia.Scale(4.0f));
-	m_child = new DriveTrainDifferentialGear(gearInvInertia, this, axel0, axel1);
+	m_child = new DriveTrainDifferentialGear(gearInvInertia, this, axel0, axel1, 1.0f);
+	m_gearSign = -1.0f;
+	SetGearRatioJacobian(1.0f);
 }
 
-CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel)
-	:DriveTrain(invInertia, parent)
-	,m_slipDifferentialViscuosFriction(0.1f)
+CustomVehicleController::EngineController::DriveTrainEngine8W::DriveTrainEngine8W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1, const DifferentialAxel& axel2, const DifferentialAxel& axel3)
+	:DriveTrainEngine(invInertia)
 {
-	m_child = new DriveTrainTire(axel.m_leftTire, this);
-	m_child->m_sibling = new DriveTrainTire(axel.m_rightTire, this);
-	SetGearRatioJacobians(1.0f);
+	dVector gearInvInertia(invInertia.Scale(4.0f));
+	m_child = new DriveTrainDifferentialGear(gearInvInertia, this, axel0, axel1, axel2, axel3, 1.0f);
+	SetGearRatioJacobian(1.0f);
 }
 
 CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel, dFloat side)
@@ -876,28 +893,33 @@ CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrai
 {
 	m_child = new DriveTrainTire(axel.m_leftTire, this);
 	m_child->m_sibling = new DriveTrainTire(axel.m_rightTire, this);
-
-	m_J01 = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
-	m_J10 = dVector(1.0f, 2.0f * dSign(side), 0.0f, 0.0f);
-	SetInvMassJt();
+	SetDifferentialJacobian(side);
 }
 
-CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
+CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1, dFloat side)
 	:DriveTrain(invInertia, parent)
 	,m_slipDifferentialViscuosFriction(0.1f)
 {
 	m_child = new DriveTrainDifferentialGear(invInertia, this, axel0, -1.0f);
 	m_child->m_sibling = new DriveTrainDifferentialGear(invInertia, this, axel1, 1.0f);
-	SetGearRatioJacobians(1.0f);
+	SetDifferentialJacobian(side);
 }
 
-void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetGearRatioJacobians(dFloat gearRatio)
+CustomVehicleController::EngineController::DriveTrainDifferentialGear::DriveTrainDifferentialGear(const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1, const DifferentialAxel& axel2, const DifferentialAxel& axel3, dFloat side)
+	:DriveTrain(invInertia, parent)
+	,m_slipDifferentialViscuosFriction(0.1f)
 {
-	m_J01 = dVector(dAbs (gearRatio), 0.0f, 0.0f, 0.0f);
-	m_J10 = dVector(-dSign(gearRatio), 0.0f, 0.0f, 0.0f);
+	m_child = new DriveTrainDifferentialGear(invInertia, this, axel0, axel1, -1.0f);
+	m_child->m_sibling = new DriveTrainDifferentialGear(invInertia, this, axel2, axel3, 1.0f);
+	SetDifferentialJacobian(side);
+}
+
+void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetGearRatioJacobian(dFloat gearGain)
+{
+	m_J01 = dVector(dAbs (gearGain), 0.0f, 0.0f, 0.0f);
+	m_J10 = dVector(-dSign(gearGain), 0.0f, 0.0f, 0.0f);
 	SetInvMassJt();
 }
-
 
 void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetExternalTorque(EngineController* const controller)
 {
@@ -925,10 +947,7 @@ CustomVehicleController::EngineController::DriveTrainTire::DriveTrainTire(BodyPa
 	NewtonBody* const body = m_tire->GetBody();
 	NewtonBodyGetInvMass(body, &massInv, &m_inertiaInv.m_x, &m_inertiaInv.m_y, &m_inertiaInv.m_z);
 	dAssert(m_tire->GetJoint()->GetBody0() == body);
-
-	m_J01 = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-	m_J10 = dVector (1.0f, 2.0f * dSign(m_tire->m_data.m_location.m_z), 0.0f, 0.0f);
-	SetInvMassJt();
+	SetDifferentialJacobian(dSign(m_tire->m_data.m_location.m_z));
 }
 
 void CustomVehicleController::EngineController::DriveTrainTire::SetPartMasses (const dVector& invInertia)
@@ -971,7 +990,7 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTor
 	m_parent->m_torque += parentTorque;
 }
 
-CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, const Info& info, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
+CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, const Info& info, const Differential& differential)
 	:Controller(controller)
 	,m_info(info)
 	,m_infoCopy(info)
@@ -983,16 +1002,28 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 	,m_automaticTransmissionMode(true)
 {
 	dFloat inertiaInv = 1.0f / (2.0f * m_info.m_mass * m_info.m_radio * m_info.m_radio / 5.0f);
-	if (axel1.m_leftTire) {
-		dAssert (axel0.m_leftTire);
-		dAssert (axel0.m_rightTire);
-		dAssert (axel1.m_leftTire);
-		dAssert (axel1.m_rightTire);
-		m_engine = new DriveTrainEngine4W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), axel0, axel1);
-	} else {
-		dAssert (axel0.m_leftTire);
-		dAssert (axel0.m_rightTire);
-		m_engine = new DriveTrainEngine2W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), axel0);
+
+	switch (differential.m_type)
+	{
+		case Differential::m_2wd:
+		{
+			m_engine = new DriveTrainEngine2W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), differential.m_axel);
+			break;
+		}
+
+		case Differential::m_4wd:
+		{
+			const Differential4wd& diff = (Differential4wd&) differential;
+			m_engine = new DriveTrainEngine4W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), diff.m_axel, diff.m_secundAxel.m_axel);
+			break;
+		}
+
+		case Differential::m_8wd:
+		{
+			const Differential8wd& diff = (Differential8wd&) differential;
+			m_engine = new DriveTrainEngine8W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), diff.m_axel, diff.m_secundAxel.m_axel, diff.m_secund4Wd.m_axel, diff.m_secund4Wd.m_secundAxel.m_axel);
+			break;
+		}
 	}
 	SetInfo(info);
 
