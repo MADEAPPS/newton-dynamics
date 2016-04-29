@@ -678,15 +678,13 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	dgAssert (proxy.m_instance1->GetGlobalMatrix().TestIdentity());
 
 	dgVector relativeVelocity (body0->m_veloc - body1->m_veloc);
-	if (m_normal.DotProduct4(relativeVelocity).GetScalar() >= 0.0f) {
+
+	dgFloat32 den = m_normal.DotProduct4(relativeVelocity).GetScalar();
+//	if (m_normal.DotProduct4(relativeVelocity).GetScalar() >= 0.0f) {
+	if (den > dgFloat32 (-1.0e-10f)) {
 		return 0;
 	}
-	dgFloat32 den = dgFloat32 (1.0f) / (relativeVelocity % m_normal);
-	if (den > dgFloat32 (1.0e-5f)) {
-		// this can actually happens
-		dgAssert(0);
-		return 0;
-	}
+	den = dgFloat32 (1.0f) / den;
 
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);

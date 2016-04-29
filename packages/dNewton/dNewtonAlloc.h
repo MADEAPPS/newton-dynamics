@@ -25,8 +25,8 @@
 #include "dStdAfxNewton.h"
 
 
-typedef void* (*CNewtonAllocMemory) (int sizeInBytes);
-typedef void (*CNewtonFreeMemory) (void* const ptr, int sizeInBytes);
+//typedef void* (*CNewtonAllocMemory) (int sizeInBytes);
+//typedef void (*CNewtonFreeMemory) (void* const ptr, int sizeInBytes);
 
 
 class dNewtonAlloc  
@@ -44,7 +44,7 @@ class dNewtonAlloc
 	}
 
 	// default memory allocation functions if not other is provided 
-	CNEWTON_API static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
+	//CNEWTON_API static void SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free);
 };
 
 #endif

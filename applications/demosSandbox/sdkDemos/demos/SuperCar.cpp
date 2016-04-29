@@ -62,8 +62,8 @@
 #define REDLINE_TORQUE_RPM			6000.0f
 
 
-//#define TIRE_TOP_SPEED				164 mile / hours
-#define TIRE_TOP_SPEED_KMH			264.0f
+//#define VEHICLE_TOP_SPEED_KMH			164 mile / hours
+#define VEHICLE_TOP_SPEED_KMH			264.0f
 
 #define TIRE_LATERAL_STIFFNESS		(MASS * DEMO_GRAVITY * 10.0f)
 #define TIRE_LONGITUDINAL_STIFFNESS	(MASS * DEMO_GRAVITY *  2.0f)
@@ -115,7 +115,7 @@ struct CarDefinition
 	dFloat PEAK_HP_RPM;
 	dFloat REDLINE_TORQUE;
 	dFloat REDLINE_TORQUE_RPM;
-	dFloat TIRE_TOP_SPEED_KMH;
+	dFloat VEHICLE_TOP_SPEED_KMH;
 	dFloat TIRE_LATERAL_STIFFNESS;
 	dFloat TIRE_LONGITUDINAL_STIFFNESS;
 	dFloat TIRE_ALIGNING_MOMENT_TRAIL;
@@ -514,7 +514,7 @@ class SuperCarEntity: public DemoEntity
 		CustomVehicleController::EngineController::Info engineInfo;
 		engineInfo.m_mass = definition.ENGINE_MASS; 
 		engineInfo.m_radio = definition.ENGINE_RADIO; 
-		engineInfo.m_vehicleTopSpeed = definition.TIRE_TOP_SPEED_KMH;
+		engineInfo.m_vehicleTopSpeed = definition.VEHICLE_TOP_SPEED_KMH;
 		engineInfo.m_clutchFrictionTorque = definition.CLUTCH_FRICTION_TORQUE;
 	
 		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
@@ -577,10 +577,10 @@ class SuperCarEntity: public DemoEntity
 		// set the vehicle weigh doistibution 
 		m_controller->SetWeightDistribution (definition.VEHICLE_WEIGHT_DISTRIBUTION);
 
-		// set teh vehicle aerodynamics
+		// set the vehicle aerodynamics
 		dFloat weightRatio0 = definition.DOWNFORCE_WEIGHT_FACTOR_0;
 		dFloat weightRatio1 = definition.DOWNFORCE_WEIGHT_FACTOR_1;
-		dFloat speedFactor = definition.DOWNFORCE_WEIGHT_FACTOR_SPEED / definition.TIRE_TOP_SPEED_KMH;
+		dFloat speedFactor = definition.DOWNFORCE_WEIGHT_FACTOR_SPEED / definition.VEHICLE_TOP_SPEED_KMH;
 		m_controller->SetAerodynamicsDownforceCoefficient(DEMO_GRAVITY, weightRatio0, speedFactor, weightRatio1);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
@@ -1548,12 +1548,12 @@ void SuperCar (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	//CreateLevelMesh (scene, "flatPlane1.ngd", 0);
-	//CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 1);
-	CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
+	//CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	//CreateHeightFieldTerrain (scene, 10, 8.0f, 0.0f, 0.0f, 200.0f, -50.0f);
 	//CreatePlaneCollision (scene, dVector (0.0f, 1.0f, 0.0f, 0.0f));
 
@@ -1580,7 +1580,7 @@ void SuperCar (DemoEntityManager* const scene)
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
-		location0.m_posit.m_y += 1.0f;
+		location0.m_posit.m_y += 2.0f;
 		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "monsterTruck.ngd", 3.0f, monsterTruck);
 		vehicle0->BuildWheelCar(monsterTruck);
 		u -= 0.005f;

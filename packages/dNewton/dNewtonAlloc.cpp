@@ -33,8 +33,9 @@ void dNewtonAlloc::operator delete (void* ptr)
 	NewtonFree(ptr);
 }
 
-
+/*
 void dNewtonAlloc::SetAllocationDrivers (CNewtonAllocMemory alloc, CNewtonFreeMemory free)
 {
 	NewtonSetMemorySystem (alloc, free);
 }
+*/
