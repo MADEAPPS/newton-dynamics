@@ -21,6 +21,11 @@
 #include "DebugDisplay.h"
 
 
+#define HEAVY_VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
+#define HEAVY_VEHICLE_THIRD_PERSON_VIEW_DIST		12.0f
+#define HEAVY_VEHICLE_THIRD_PERSON_VIEW_FILTER		0.125f
+
+
 struct VehicleParameters
 {
 	dFloat MASS;
@@ -87,7 +92,7 @@ static VehicleParameters heavyTruck =
 		2.0f,							// GEAR_2
 		1.5f,							// GEAR_3
 		2.9f,							// REVERSE_GEAR
-	   1.2f,							// SUSPENSION_LENGTH
+	   0.7f,							// SUSPENSION_LENGTH
 	 150.0f,							// SUSPENSION_SPRING
 	  10.0f,							// SUSPENSION_DAMPER
   (5000.0f * DEMO_GRAVITY * 10.0f),		// LATERAL_STIFFNESS
@@ -165,11 +170,6 @@ static VehicleParameters m1a1Param =
 	0,										// WHEEL_HAS_FENDER	
 	0,										// DIFFERENTIAL_TYPE
 };
-
-
-#define HEAVY_VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
-#define HEAVY_VEHICLE_THIRD_PERSON_VIEW_DIST		10.0f
-#define HEAVY_VEHICLE_THIRD_PERSON_VIEW_FILTER		0.125f
 
 
 class HeavyVehicleEntity: public DemoEntity
@@ -611,7 +611,7 @@ class HeavyVehicleEntity: public DemoEntity
 	}
 
 
-	CustomVehicleController::BodyPartTire* AddTire(const char* const tireName, const dVector& offset, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, const dMatrix& tireAligmentMatrix, int hasFender)
+	CustomVehicleController::BodyPartTire* AddTire(const char* const tireName, const dVector& offset, dFloat width, dFloat radius, dFloat mass, dFloat steerAngle, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, const dMatrix& tireAligmentMatrix, int hasFender)
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
@@ -641,6 +641,7 @@ class HeavyVehicleEntity: public DemoEntity
 		tireInfo.m_mass = mass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
+		tireInfo.m_maxSteeringAngle = steerAngle * 3.1416 / 180.0f;
 		tireInfo.m_dampingRatio = suspensionDamper;
 		tireInfo.m_springStrength = suspensionSpring;
 		tireInfo.m_suspesionlenght = suspensionLength;
@@ -939,7 +940,7 @@ class HeavyVehicleEntity: public DemoEntity
 		//m_engineKeySwitchCounter += m_engineKeySwitch.UpdateTriggerButton(mainWindow, 'Y');
 		//int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
-#if 1
+#if 0
 	#if 1
 			static FILE* file = fopen ("log.bin", "wb");                                         
 			if (file) {
@@ -1098,20 +1099,20 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// add left tires
 		CustomVehicleController::BodyPartTire* leftTire[4];
-		leftTire[0] = AddTire("ltire_0", offset, width, radius, definition.TIRE_MASS, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		leftTire[1] = AddTire("ltire_1", offset, width, radius, definition.TIRE_MASS, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		leftTire[2] = AddTire("ltire_2", offset, width, radius, definition.TIRE_MASS, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		leftTire[3] = AddTire("ltire_3", offset, width, radius, definition.TIRE_MASS, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		leftTire[0] = AddTire("ltire_0", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		leftTire[1] = AddTire("ltire_1", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		leftTire[2] = AddTire("ltire_2", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		leftTire[3] = AddTire("ltire_3", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
 
 		// add right tires
 		CustomVehicleController::BodyPartTire* rightTire[4];
-		rightTire[0] = AddTire("rtire_0", offset, width, radius, definition.TIRE_MASS, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		rightTire[1] = AddTire("rtire_1", offset, width, radius, definition.TIRE_MASS, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		rightTire[2] = AddTire("rtire_2", offset, width, radius, definition.TIRE_MASS, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		rightTire[3] = AddTire("rtire_3", offset, width, radius, definition.TIRE_MASS, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		rightTire[0] = AddTire("rtire_0", offset, width, radius, definition.TIRE_MASS, 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		rightTire[1] = AddTire("rtire_1", offset, width, radius, definition.TIRE_MASS, 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		rightTire[2] = AddTire("rtire_2", offset, width, radius, definition.TIRE_MASS, 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		rightTire[3] = AddTire("rtire_3", offset, width, radius, definition.TIRE_MASS, 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
 
 		// add a steering Wheel
-		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController(m_controller, definition.STEER_ANGLE * 3.141592f / 180.0f);
+		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController(m_controller);
 		for (int i = 0; i < 2; i++) {
 			steering->AddTire(leftTire[i]);
 			steering->AddTire(rightTire[i]);
@@ -1573,17 +1574,17 @@ void MilitaryTransport (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-//	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 5.0f, 0.2f, 200.0f, -50.0f);
+//	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 5.0f, 0.2f, 200.0f, -50.0f);
 
 //	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (1000.0f, 100.0f, 1000.0f, 1.0f);
-//location.m_posit.m_x = 126.0f;
-//location.m_posit.m_y = 50.0f;
-//location.m_posit.m_z = 50.0f;
-location.m_posit.m_x = 0.0f;
-location.m_posit.m_z = 0.0f;
+location.m_posit.m_x = 126.0f;
+location.m_posit.m_y = 50.0f;
+location.m_posit.m_z = 50.0f;
+//location.m_posit.m_x = 0.0f;
+//location.m_posit.m_z = 0.0f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 200.0f);
 	location.m_posit.m_y += 2.0f;
@@ -1635,21 +1636,22 @@ for (int i = 0; i < 5; i ++){
 	//scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
+	location.m_posit.m_x += 20.0f;
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-	//	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
 }
 

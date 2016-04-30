@@ -256,7 +256,7 @@ class BasicCarEntity: public DemoEntity
 		}
 	}
 
-	CustomVehicleController::BodyPartTire* AddTire (const dVector& offset, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, const dMatrix& tireAligmentMatrix) 
+	CustomVehicleController::BodyPartTire* AddTire (const dVector& offset, dFloat width, dFloat radius, dFloat mass, dFloat steeringAngle, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, const dMatrix& tireAligmentMatrix) 
 	{
 		NewtonBody* const body = m_controller->GetBody();
 
@@ -280,6 +280,7 @@ class BasicCarEntity: public DemoEntity
 		tireInfo.m_mass = mass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
+		tireInfo.m_maxSteeringAngle = steeringAngle * 3.1416f / 180.0f;
 		tireInfo.m_dampingRatio = suspensionDamper;
 		tireInfo.m_springStrength = suspensionSpring;
 		tireInfo.m_suspesionlenght = suspensionLength;
@@ -330,20 +331,20 @@ class BasicCarEntity: public DemoEntity
 		// add front tires
 		CustomVehicleController::BodyPartTire* frontTires[2]; 
 		dVector offset1 (1.5f, 0.0f, -1.0f, 1.0f);
-		frontTires[0] = AddTire (offset1, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		frontTires[0] = AddTire (offset1, width, radius, parameters.TIRE_MASS, parameters.STEER_ANGLE, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 		offset1 = dVector (1.5f, 0.0f, 1.0f, 1.0f);		
-		frontTires[1] = AddTire (offset1, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		frontTires[1] = AddTire (offset1, width, radius, parameters.TIRE_MASS, parameters.STEER_ANGLE, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
 		// add rear tires
 		CustomVehicleController::BodyPartTire* rearTires[2];
 		dVector offset2 (-1.7f, 0.0f, -1.0f, 1.0f);
-		rearTires[0] = AddTire (offset2, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		rearTires[0] = AddTire (offset2, width, radius, parameters.TIRE_MASS, 0.0f, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 		offset2 = dVector (-1.7f, 0.0f, 1.0f, 1.0f);
-		rearTires[1] = AddTire (offset2, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		rearTires[1] = AddTire (offset2, width, radius, parameters.TIRE_MASS, 0.0f, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
 		// add a steering Wheel
 		//CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
-		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
+		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller);
 		steering->AddTire (frontTires[0]);
 		steering->AddTire (frontTires[1]);
 		m_controller->SetSteering(steering);

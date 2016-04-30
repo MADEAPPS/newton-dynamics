@@ -38,59 +38,6 @@
 // 6th Gear 0.50:1 
 // Reverse 2.90:1 
 
-/*
-// vehicle definition for a Muscle car
-#define TIRE_MASS						40.0f  
-#define ENGINE_MASS					100.0f
-#define MASS							(3380.0f * 0.454f)
-#define ENGINE_RADIO					0.125f
-#define TIRE_STEER_ANGLE				15.0f
-#define VEHICLE_WEIGHT_DISTRIBUTION			0.55f
-
-#define CLUTCH_FRICTION_TORQUE		2000.0f
-#define IDLE_TORQUE					350.0f
-#define IDLE_TORQUE_RPM				800.0f
-
-// torque in pound per foot
-#define PEAK_TORQUE					500.0f
-#define PEAK_TORQUE_RPM				3000.0f
-
-#define PEAK_HP						400.0f
-#define PEAK_HP_RPM					5200.0f
-
-#define REDLINE_TORQUE				100.0f
-#define REDLINE_TORQUE_RPM			6000.0f
-
-
-//#define VEHICLE_TOP_SPEED_KMH			164 mile / hours
-#define VEHICLE_TOP_SPEED_KMH			264.0f
-
-#define TIRE_LATERAL_STIFFNESS		(MASS * DEMO_GRAVITY * 10.0f)
-#define TIRE_LONGITUDINAL_STIFFNESS	(MASS * DEMO_GRAVITY *  2.0f)
-
-#define TIRE_ALIGNING_MOMENT_TRAIL	0.5f
-#define TIRE_SUSPENSION_SPRING		150.0f
-#define TIRE_SUSPENSION_DAMPER		10.0f
-#define TIRE_SUSPENSION_LENGTH		0.25f
-#define TIRE_BRAKE_TORQUE				3000.0f
-#define TIRE_PIVOT_OFFSET_Y			-0.0f
-
-#define TIRE_GEAR_1					2.66f
-#define TIRE_GEAR_2					1.78f
-#define TIRE_GEAR_3 					1.30f
-#define TIRE_GEAR_4 					1.00f
-#define TIRE_GEAR_5 					0.74f
-#define TIRE_GEAR_6 					0.50f
-#define TIRE_REVERSE_GEAR				2.90f
-#define COM_Y_OFFSET					0.0f
-
-// down force at 80 kmh
-#define DOWNFORCE_WEIGHT_FACTOR_0		1.0f
-// down force at top Speed
-#define DOWNFORCE_WEIGHT_FACTOR_1		2.0f
-#define DOWNFORCE_WEIGHT_FACTOR_SPEED	80.0f 
-
-*/
 
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
@@ -104,7 +51,8 @@ struct CarDefinition
 	dFloat ENGINE_MASS;
 	dFloat MASS;
 	dFloat ENGINE_RADIO;
-	dFloat TIRE_STEER_ANGLE;
+	dFloat FRONT_AXEL_STEER_ANGLE;
+	dFloat REAR_AXEL_STEER_ANGLE;
 	dFloat VEHICLE_WEIGHT_DISTRIBUTION;
 	dFloat CLUTCH_FRICTION_TORQUE;
 	dFloat IDLE_TORQUE;
@@ -141,85 +89,86 @@ struct CarDefinition
 
 static CarDefinition monsterTruck = 
 {
-	40.0f,  
-	100.0f,
-	(3380.0f * 0.454f),
-	0.125f,
-	15.0f,
-	0.55f,
-	2000.0f,
-	350.0f,
-	800.0f,
-	500.0f,
-	3000.0f,
-	400.0f,
-	5200.0f,
-	100.0f,
-	6000.0f,
-	264.0f,
-	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),
-	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),
-	0.5f,
-	150.0f,
-	10.0f,
-	0.25f,
-	3000.0f,
-	-0.0f,
-	2.66f,
-	1.78f,
-	1.30f,
-	1.00f,
-	0.74f,
-	0.50f,
-	2.90f,
-	-0.35f,
-	1.0f,
-	2.0f,
-	80.0f, 
-	0,
-	2,
+	40.0f,										// TIRE_MASS	
+	100.0f,										// ENGINE_MASS
+	(3380.0f * 0.454f),							// MASS
+	0.125f,										// ENGINE_RADIO
+	15.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
+	-5.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
+	0.55f,										// VEHICLE_WEIGHT_DISTRIBUTION
+	2000.0f,									// CLUTCH_FRICTION_TORQUE
+	350.0f,										// IDLE_TORQUE
+	800.0f,										// IDLE_TORQUE_RPM
+	500.0f,										// PEAK_TORQUE
+	3000.0f,									// PEAK_TORQUE_RPM
+	400.0f,										// PEAK_HP
+	5200.0f,									// PEAK_HP_RPM
+	100.0f,										// REDLINE_TORQUE
+	6000.0f,									// REDLINE_TORQUE_RPM
+	264.0f,										// VEHICLE_TOP_SPEED_KMH
+	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),	// TIRE_LATERAL_STIFFNESS
+	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),	// TIRE_LONGITUDINAL_STIFFNESS
+	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
+	150.0f,										// TIRE_SUSPENSION_SPRING
+	10.0f,										// TIRE_SUSPENSION_DAMPER
+	0.25f,										// TIRE_SUSPENSION_LENGTH
+	3000.0f,									// TIRE_BRAKE_TORQUE
+	-0.0f,										// TIRE_PIVOT_OFFSET_Y
+	2.66f,										// TIRE_GEAR_1
+	1.78f,										// TIRE_GEAR_2
+	1.30f,										// TIRE_GEAR_3
+	1.00f,										// TIRE_GEAR_4
+	0.74f,										// TIRE_GEAR_5
+	0.50f,										// TIRE_GEAR_6
+	2.90f,										// TIRE_REVERSE_GEAR
+	-0.35f,										// COM_Y_OFFSET
+	1.0f,										// DOWNFORCE_WEIGHT_FACTOR_0
+	2.0f,										// DOWNFORCE_WEIGHT_FACTOR_1
+	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
+	0,											// WHEEL_HAS_FENDER
+	2,											// DIFFERENTIAL_TYPE
 };
-
 
 static CarDefinition viper = 
 {
-	40.0f,  
-	100.0f,
-	(3380.0f * 0.454f),
-	0.125f,
-	15.0f,
-	0.55f,
-	2000.0f,
-	350.0f,
-	800.0f,
-	500.0f,
-	3000.0f,
-	400.0f,
-	5200.0f,
-	100.0f,
-	6000.0f,
-	264.0f,
-	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),
-	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),
-	0.5f,
-	150.0f,
-	10.0f,
-	0.25f,
-	3000.0f,
-	-0.0f,
-	2.66f,
-	1.78f,
-	1.30f,
-	1.00f,
-	0.74f,
-	0.50f,
-	2.90f,
-	0.0f,
-	1.0f,
-	2.0f,
-	80.0f, 
-	1,
-	2,
+	40.0f,										// TIRE_MASS	
+	100.0f,										// ENGINE_MASS
+	(3380.0f * 0.454f),							// MASS
+	0.125f,										// ENGINE_RADIO
+	15.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
+	 0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
+	0.55f,										// VEHICLE_WEIGHT_DISTRIBUTION
+	2000.0f,									// CLUTCH_FRICTION_TORQUE
+	350.0f,										// IDLE_TORQUE
+	800.0f,										// IDLE_TORQUE_RPM
+	500.0f,										// PEAK_TORQUE
+	3000.0f,									// PEAK_TORQUE_RPM
+	400.0f,										// PEAK_HP
+	5200.0f,									// PEAK_HP_RPM
+	100.0f,										// REDLINE_TORQUE
+	6000.0f,									// REDLINE_TORQUE_RPM
+	264.0f,										// VEHICLE_TOP_SPEED_KMH
+	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),  // TIRE_LATERAL_STIFFNESS
+	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),	// TIRE_LONGITUDINAL_STIFFNESS
+	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
+	150.0f,										// TIRE_SUSPENSION_SPRING
+	10.0f,										// TIRE_SUSPENSION_DAMPER
+	0.25f,										// TIRE_SUSPENSION_LENGTH
+	3000.0f,									// TIRE_BRAKE_TORQUE
+	-0.0f,										// TIRE_PIVOT_OFFSET_Y
+	2.66f,										// TIRE_GEAR_1
+	1.78f,										// TIRE_GEAR_2
+	1.30f,										// TIRE_GEAR_3
+	1.00f,										// TIRE_GEAR_4
+	0.74f,										// TIRE_GEAR_5
+	0.50f,										// TIRE_GEAR_6
+	2.90f,										// TIRE_REVERSE_GEAR
+	0.0f,										// COM_Y_OFFSET
+	1.0f,										// DOWNFORCE_WEIGHT_FACTOR_0
+	2.0f,										// DOWNFORCE_WEIGHT_FACTOR_1
+	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
+	1,											// WHEEL_HAS_FENDER
+	2,											// DIFFERENTIAL_TYPE
 };
 
 
@@ -402,7 +351,7 @@ class SuperCarEntity: public DemoEntity
 	}
 
 
-	CustomVehicleController::BodyPartTire* AddTire (const char* const tireName, dFloat offset, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, dFloat pinDir, int hasFender) 
+	CustomVehicleController::BodyPartTire* AddTire (const char* const tireName, dFloat offset, dFloat width, dFloat radius, dFloat mass, dFloat maxSteerAngle, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, dFloat pinDir, int hasFender) 
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
@@ -426,6 +375,7 @@ class SuperCarEntity: public DemoEntity
 		tireInfo.m_mass = mass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
+		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416f / 180.0f; 
 		tireInfo.m_dampingRatio = suspensionDamper;
 		tireInfo.m_springStrength = suspensionSpring;
 		tireInfo.m_suspesionlenght = suspensionLength;
@@ -479,20 +429,23 @@ class SuperCarEntity: public DemoEntity
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
 		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
-		CustomVehicleController::BodyPartTire* const leftFrontTire = AddTire ("fl_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, 1.0f, definition.WHEEL_HAS_FENDER);
-		CustomVehicleController::BodyPartTire* const rightFrontTire = AddTire ("fr_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, -1.0f, definition.WHEEL_HAS_FENDER);
+		CustomVehicleController::BodyPartTire* const leftFrontTire = AddTire ("fl_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.FRONT_AXEL_STEER_ANGLE, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, 1.0f, definition.WHEEL_HAS_FENDER);
+		CustomVehicleController::BodyPartTire* const rightFrontTire = AddTire ("fr_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.FRONT_AXEL_STEER_ANGLE, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, -1.0f, definition.WHEEL_HAS_FENDER);
 
 		// add rear axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, 1.0f, definition.WHEEL_HAS_FENDER);
-		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, -1.0f, definition.WHEEL_HAS_FENDER);
+		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.REAR_AXEL_STEER_ANGLE, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, 1.0f, definition.WHEEL_HAS_FENDER);
+		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", definition.TIRE_PIVOT_OFFSET_Y, width, radius, definition.TIRE_MASS, definition.REAR_AXEL_STEER_ANGLE, definition.TIRE_SUSPENSION_LENGTH, definition.TIRE_SUSPENSION_SPRING, definition.TIRE_SUSPENSION_DAMPER, definition.TIRE_LATERAL_STIFFNESS, definition.TIRE_LONGITUDINAL_STIFFNESS, definition.TIRE_ALIGNING_MOMENT_TRAIL, -1.0f, definition.WHEEL_HAS_FENDER);
 
 		//calculate the Ackerman parameters
 		// add a steering Wheel component
-		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller, definition.TIRE_STEER_ANGLE * 3.141592f / 180.0f);
+		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller);
 		steering->AddTire(leftFrontTire);
 		steering->AddTire(rightFrontTire);
+		steering->AddTire(leftRearTire);
+		steering->AddTire(rightRearTire);
+
 		steering->CalculateAkermanParameters (leftRearTire, rightRearTire, leftFrontTire, rightFrontTire);
 		m_controller->SetSteering(steering);
 		
@@ -1390,7 +1343,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 				vehicleEntity->ApplyPlayerControl ();
 			} else {
 				// do no player control
-				vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath);
+				//vehicleEntity->ApplyNPCControl (timestep, m_raceTrackPath);
 			}
 		}
 
@@ -1436,8 +1389,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
 		} else {
 			dAssert (0);
-			//            camMatrix = camMatrix * playerMatrix;
-			//            camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+			//           camMatrix = camMatrix * playerMatrix;
+			//           camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
 		}
 
 		camera->SetNextMatrix (*scene, camMatrix, camOrigin);
@@ -1560,7 +1513,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 // *************************************************************************************************
 // 
-//  create a simple racing game with a simple controlled by a Newton AI engine and newton physics
+// create a simple racing game with a simple controlled by a Newton AI engine and newton physics
 //
 // *************************************************************************************************
 void SuperCar (DemoEntityManager* const scene)
@@ -1569,12 +1522,12 @@ void SuperCar (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	//CreateLevelMesh (scene, "flatPlane1.ngd", 0);
-	//CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 1);
-	CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
+//	CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	//CreateHeightFieldTerrain (scene, 10, 8.0f, 0.0f, 0.0f, 200.0f, -50.0f);
 	//CreatePlaneCollision (scene, dVector (0.0f, 1.0f, 0.0f, 0.0f));
 
@@ -1598,6 +1551,7 @@ void SuperCar (DemoEntityManager* const scene)
 	dFloat u = 1.0f;
 	dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
 	for (int i = 0; i < 1; i ++) {
+
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
@@ -1606,7 +1560,6 @@ void SuperCar (DemoEntityManager* const scene)
 		vehicle0->BuildWheelCar(monsterTruck);
 		u -= 0.005f;
 
-/*
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit += location1.m_right.Scale ( 3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + offset, 200.0f);
@@ -1620,7 +1573,6 @@ void SuperCar (DemoEntityManager* const scene)
 		location2.m_posit = FindFloor(scene->GetNewton(), location2.m_posit + offset, 200.0f);
 		location2.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle2 = new SuperCarEntity(scene, manager, location2, "lambDiablo.ngd", 3.0f, viper);
-//		vehicle2->BuildWheelCar(1, -0.35f, viper);
 		vehicle2->BuildWheelCar(viper);
 		u -= 0.005f;
 
@@ -1630,7 +1582,6 @@ void SuperCar (DemoEntityManager* const scene)
 		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "viper.ngd", -3.0f, viper);
 		vehicle3->BuildWheelCar(viper);
 		u -= 0.005f;
-*/
 	}
 
 	CustomVehicleController* const controller = &manager->GetLast()->GetInfo();

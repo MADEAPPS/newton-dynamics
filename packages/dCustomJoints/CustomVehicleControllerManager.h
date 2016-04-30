@@ -177,6 +177,7 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_mass;
 			dFloat m_radio;
 			dFloat m_width;
+			dFloat m_maxSteeringAngle;
 			dFloat m_dampingRatio;
 			dFloat m_springStrength;
 			dFloat m_suspesionlenght;
@@ -231,7 +232,7 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API void Init (BodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const Info& info);
 
-		CUSTOM_JOINTS_API void SetSteerAngle (dFloat angle);
+		CUSTOM_JOINTS_API void SetSteerAngle (dFloat angleParam);
 		CUSTOM_JOINTS_API void SetBrakeTorque (dFloat torque);
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const; 
@@ -537,7 +538,7 @@ class CustomVehicleController: public CustomControllerBase
 	class SteeringController: public Controller
 	{
 		public:
-		CUSTOM_JOINTS_API SteeringController (CustomVehicleController* const controller, dFloat maxAngle);
+		CUSTOM_JOINTS_API SteeringController (CustomVehicleController* const controller);
 		CUSTOM_JOINTS_API void AddTire (BodyPartTire* const tire);
 		CUSTOM_JOINTS_API void CalculateAkermanParameters(const BodyPartTire* const rearLeftTire, const BodyPartTire* const rearRightTire,
 														  const BodyPartTire* const frontLeftTire, const BodyPartTire* const frontRightTire);
@@ -546,7 +547,6 @@ class CustomVehicleController: public CustomControllerBase
 		virtual void Update(dFloat timestep);
 
 		dList<BodyPartTire*> m_tires;
-		dFloat m_maxAngle;
 		dFloat m_akermanWheelBaseWidth;
 		dFloat m_akermanAxelSeparation;
 		friend class CustomVehicleController;

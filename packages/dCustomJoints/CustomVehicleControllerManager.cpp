@@ -24,7 +24,7 @@
 static FILE* file_xxx;
 #endif
 
-//static int xxx;
+static int xxx;
 
 
 #define D_VEHICLE_NEUTRAL_GEAR			0
@@ -476,10 +476,10 @@ dFloat CustomVehicleController::BodyPartTire::GetRPM() const
 }
 
 
-void CustomVehicleController::BodyPartTire::SetSteerAngle (dFloat angle)
+void CustomVehicleController::BodyPartTire::SetSteerAngle (dFloat angleParam)
 {
 	WheelJoint* const tire = (WheelJoint*)m_joint;
-	tire->m_steerAngle1 = angle;
+	tire->m_steerAngle1 = angleParam * m_data.m_maxSteeringAngle;
 }
 
 void CustomVehicleController::BodyPartTire::SetBrakeTorque(dFloat torque)
@@ -1334,9 +1334,8 @@ dFloat CustomVehicleController::EngineController::GetTopSpeed() const
 	return m_info.m_vehicleTopSpeed;
 }
 
-CustomVehicleController::SteeringController::SteeringController (CustomVehicleController* const controller, dFloat maxAngle)
+CustomVehicleController::SteeringController::SteeringController (CustomVehicleController* const controller)
 	:Controller(controller)
-	,m_maxAngle(dAbs (maxAngle))
 	,m_akermanWheelBaseWidth(0.0f)
 	,m_akermanAxelSeparation(0.0f)
 {
@@ -1360,7 +1359,7 @@ void CustomVehicleController::SteeringController::CalculateAkermanParameters(
 
 void CustomVehicleController::SteeringController::Update(dFloat timestep)
 {
-	dFloat angle = m_maxAngle * m_param;
+	dFloat angle = m_param;
 	if ((m_akermanWheelBaseWidth == 0.0f) || (dAbs(angle) < (2.0f * 3.141592f / 180.0f))) {
 		for (dList<BodyPartTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
 			BodyPartTire& tire = *node->GetInfo();
@@ -2089,14 +2088,27 @@ bool CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTi
 			tireSweeptMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(timeOfImpact * tire->m_data.m_suspesionlenght);
 			for (int i = count - 1; i >= 0; i --) {
 				dVector p (tireSweeptMatrix.UntransformVector (dVector (tire->m_contactInfo[i].m_point[0], tire->m_contactInfo[i].m_point[1], tire->m_contactInfo[i].m_point[2], 1.0f)));
-				if ((p.m_y >= -0.01f) || (dAbs (p.m_x / p.m_y) > 0.4f)) {
+				if ((p.m_y >= -(tire->m_data.m_radio * 0.5f)) || (dAbs (p.m_x / p.m_y) > 0.4f)) {
 					tire->m_contactInfo[i] = tire->m_contactInfo[count - 1];
 					count --;
 				}
 			}
 			if (count) {
-				tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(timeOfImpact * tire->m_data.m_suspesionlenght);
-				NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
+				dFloat x1 = timeOfImpact * tire->m_data.m_suspesionlenght;
+				dFloat x0 = (tireMatrix.m_posit - chassisMatrix.m_posit) % chassisMatrix.m_up;
+				dFloat x10 = x1 - x0;
+				if (x10 > 0.125f) {
+					dFloat param = 1.0e10f;
+					x1 = x0 + 0.125f;
+					dMatrix origin (chassisMatrix);
+					origin.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(x1);
+					NewtonWorldConvexCast (world, &chassisMatrix[0][0], &tireSweeptMatrix.m_posit[0], tireCollision, &param, &filter, CustomControllerConvexCastPreFilter::Prefilter, NULL, 0, threadIndex);
+					count = (param < 1.0f) ? 0 : count;
+				}
+				if (count) {
+					tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(x1);
+					NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
+				}
 			}
 		} else {
 			count = 0;
@@ -2269,8 +2281,6 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 					NewtonMaterialSetContactTangentAcceleration (material, 0.0f, 1);
 					NewtonMaterialSetContactTangentFriction(material, dAbs (longitudinalForce), 1);
-
-	//dTrace (("(%d %f) ", tire->m_index, tire->m_powerTorque));
 				}
 
 			} else {
@@ -2320,7 +2330,6 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 		NewtonBodyGetOmega(chassisBody, &omega[0]);	
 		omega = chassisMatrix.UnrotateVector(omega);
 //		dFloat yawRate = omega.m_y;
-
 //		dTrace (("%f %f\n", speed, yawRate));
 	}
 /*
@@ -2436,6 +2445,9 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
+xxx ++;
+//dTrace (("%d\n", xxx));
+
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		if (!NewtonBodyGetSleepState(m_body)) {
@@ -2445,7 +2457,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 				NewtonBodyGetInvInertiaMatrix(m_body, &invInertia[0][0]);
 				dVector omega(invInertia.RotateVector(m_lastAngularMomentum));
 				NewtonBodySetOmega(m_body, &omega[0]);
-				// attenuate angular momentum by applying a pesudo angular drag coefficient 
+				// attenuate the angular momentum by applying a pseudo angular deficiently of drag
 				m_lastAngularMomentum = m_lastAngularMomentum.Scale(0.999f);
 			}
 
