@@ -34,8 +34,8 @@ static int xxx;
 #define D_VEHICLE_MIN_RPM_FACTOR		dFloat(0.5f)
 #define D_VEHICLE_MAX_DRIVETRAIN_DOF	32
 #define D_VEHICLE_REGULARIZER			1.0001f
-#define D_VEHICLE_SLIP_DIFF_ENGAGE_RPS	4.0f
-#define D_VEHICLE_SLIP_DIFF_TORQUE		4000.0f
+#define D_VEHICLE_SLIP_DIFF_ENGAGE_RPS	15.0f
+
 
 /*
 class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
@@ -196,7 +196,6 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
 		NewtonBodyGetVelocity(chassis, &chassisVeloc[0]);
 
-
 		dVector r (tireMatrix.m_posit - chassisMatrix.TransformVector(com));
 		tireJacobian.m_linear = dir;
 		tireJacobian.m_angular = dVector (0.0f);
@@ -264,6 +263,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		tireMatrix.m_right = tireMatrix.m_front * tireMatrix.m_up;
 		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right % tireMatrix.m_right));
 		tireMatrix.m_up = tireMatrix.m_right * tireMatrix.m_front;
+//		dFloat param = dClamp (CalculateTireParametricPosition (tireMatrix, chassisMatrix), dFloat (0.0f), dFloat (1.0f));
 
 		dFloat param = 0.0f;
 		if (!m_tire->GetController()->m_isAirborned) {
@@ -301,11 +301,6 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 	{
 		dMatrix tireMatrix;
 		dMatrix chassisMatrix;
-		dVector tireOmega(0.0f);
-		dVector chassisOmega(0.0f);
-		dVector tireVeloc(0.0f);
-		dVector chassisCom(0.0f);
-		dVector chassisVeloc(0.0f);
 
 		NewtonBody* const tire = m_body0;
 		NewtonBody* const chassis = m_body1;
@@ -324,10 +319,6 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 
 		NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &m_longitudinalDir[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
-		
-		NewtonBodyGetOmega(tire, &tireOmega[0]);
-		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
-		dVector relOmega(tireOmega - chassisOmega);
 
 		dFloat angle = -CalculateAngle(tireMatrix.m_front, chassisMatrix.m_front, chassisMatrix.m_right);
 		NewtonUserJointAddAngularRow(m_joint, -angle, &chassisMatrix.m_right[0]);
@@ -339,12 +330,24 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 
 		dFloat param = CalculateTireParametricPosition(tireMatrix, chassisMatrix);
 		if (param >= 1.0f) {
+			dVector tireVeloc(0.0f);
+			dVector chassisPivotVeloc(0.0f);
 			dVector chassisMatrixPosit (chassisMatrix.m_posit + chassisMatrix.m_up.Scale (param * m_tire->m_data.m_suspesionlenght));
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, -2.0f / timestep);
+
+			NewtonBodyGetVelocity(tire, &tireVeloc[0]);
+			NewtonBodyGetPointVelocity(chassis, &tireMatrix.m_posit[0], &chassisPivotVeloc[0]);
+			dFloat accel = ((chassisPivotVeloc - tireVeloc) % chassisMatrix.m_up - 2.0f) / timestep;
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else if (param <= 0.0f) {
+			dVector tireVeloc(0.0f);
+			dVector chassisPivotVeloc(0.0f);
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
+			NewtonBodyGetVelocity(tire, &tireVeloc[0]);
+			NewtonBodyGetPointVelocity(chassis, &tireMatrix.m_posit[0], &chassisPivotVeloc[0]);
+			dFloat accel = ((chassisPivotVeloc - tireVeloc) % chassisMatrix.m_up) / timestep;
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			if (!m_tire->GetController()->m_isAirborned) {
 				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 			}
@@ -354,6 +357,12 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		}
 
 		if (m_brakeTorque > 1.0e-3f) {
+			dVector tireOmega(0.0f);
+			dVector chassisOmega(0.0f);
+			NewtonBodyGetOmega(tire, &tireOmega[0]);
+			NewtonBodyGetOmega(chassis, &chassisOmega[0]);
+			dVector relOmega(tireOmega - chassisOmega);
+
 			dFloat speed = relOmega % m_lateralDir;
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &m_lateralDir[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, -speed / timestep);
@@ -920,18 +929,15 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetG
 void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetExternalTorque(EngineController* const controller)
 {
 	DriveTrain::SetExternalTorque(controller);
+/*
 	if (controller->GetSlipDifferential()) {
-		dVector omega (m_omega);
-		m_omega.m_y = dClamp(m_omega.m_y, -15.0f, 15.0f);
-		if (m_omega.m_y > D_VEHICLE_SLIP_DIFF_ENGAGE_RPS) {
-			dFloat omegay = m_omega.m_y - D_VEHICLE_SLIP_DIFF_ENGAGE_RPS;
-			m_torque.m_y = -omegay * omegay * D_VEHICLE_SLIP_DIFF_TORQUE / (D_VEHICLE_SLIP_DIFF_ENGAGE_RPS * D_VEHICLE_SLIP_DIFF_ENGAGE_RPS);
-		} else if (m_omega.m_y < -D_VEHICLE_SLIP_DIFF_ENGAGE_RPS) {
-			dFloat omegay = m_omega.m_y + D_VEHICLE_SLIP_DIFF_ENGAGE_RPS;
-			m_torque.m_y = omegay * omegay * D_VEHICLE_SLIP_DIFF_TORQUE / (D_VEHICLE_SLIP_DIFF_ENGAGE_RPS * D_VEHICLE_SLIP_DIFF_ENGAGE_RPS);
+		dFloat speed = dAbs (m_omega.m_y) ;
+		if (speed > D_VEHICLE_SLIP_DIFF_ENGAGE_RPS) {
+			dFloat sign = dSign (m_omega.m_y);
+			m_omega.m_y = sign * (D_VEHICLE_SLIP_DIFF_ENGAGE_RPS + (speed - D_VEHICLE_SLIP_DIFF_ENGAGE_RPS) * 0.3f);
 		}
-		dAssert (dAbs(m_torque.m_y) < 50000.0f);
 	}
+*/
 }
 
 
@@ -1221,6 +1227,7 @@ m_info.m_gearsCount = 4;
 
 void CustomVehicleController::EngineController::ApplyTorque(dFloat torque, dFloat timestep)
 {
+	m_engine->m_omega.m_x = dClamp(m_engine->m_omega.m_x, dFloat (0.0f), m_info.m_rpmAtReadLineTorque);
 	m_engine->Update(this, torque, timestep);
 }
 

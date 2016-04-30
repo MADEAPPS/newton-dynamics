@@ -71,7 +71,7 @@ struct VehicleParameters
 
 static VehicleParameters heavyTruck = 
 {
-	2500.0f,							// MASS
+	2000.0f,							// MASS
 	100.0f,								// TIRE_MASS
 	0.125f,								// ENGINE_RADIO
 	 100.0f,							// TIRE_MASS
@@ -81,10 +81,10 @@ static VehicleParameters heavyTruck =
 	 60.0f,								// VEHICLE_TOP_SPEED_KMH
 	10000.0f,							// CLUTCH_FRICTION_TORQUE
 	3500.0f,							// IDLE_TORQUE
-	500.0f,								// IDLE_TORQUE_RPM
-	1200.0f,							// PEAK_TORQUE
+	 700.0f,							// IDLE_TORQUE_RPM
+	1800.0f,							// PEAK_TORQUE
 	3000.0f,							// PEAK_TORQUE_RPM
-	 800.0f,							// PEAK_HP
+	1000.0f,							// PEAK_HP
 	4000.0f,							// PEAK_HP_RPM
 	 300.0f,							// REDLINE_TORQUE
 	4500.0f,							// REDLINE_TORQUE_RPM
@@ -1101,15 +1101,15 @@ class HeavyVehicleEntity: public DemoEntity
 		CustomVehicleController::BodyPartTire* leftTire[4];
 		leftTire[0] = AddTire("ltire_0", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
 		leftTire[1] = AddTire("ltire_1", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		leftTire[2] = AddTire("ltire_2", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		leftTire[3] = AddTire("ltire_3", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		leftTire[2] = AddTire("ltire_2", offset, width, radius, definition.TIRE_MASS,					0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		leftTire[3] = AddTire("ltire_3", offset, width, radius, definition.TIRE_MASS,					0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
 
 		// add right tires
 		CustomVehicleController::BodyPartTire* rightTire[4];
-		rightTire[0] = AddTire("rtire_0", offset, width, radius, definition.TIRE_MASS, 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		rightTire[1] = AddTire("rtire_1", offset, width, radius, definition.TIRE_MASS, 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		rightTire[2] = AddTire("rtire_2", offset, width, radius, definition.TIRE_MASS, 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		rightTire[3] = AddTire("rtire_3", offset, width, radius, definition.TIRE_MASS, 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		rightTire[0] = AddTire("rtire_0", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		rightTire[1] = AddTire("rtire_1", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		rightTire[2] = AddTire("rtire_2", offset, width, radius, definition.TIRE_MASS,					 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		rightTire[3] = AddTire("rtire_3", offset, width, radius, definition.TIRE_MASS,					 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
 
 		// add a steering Wheel
 		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController(m_controller);
@@ -1575,7 +1575,7 @@ void MilitaryTransport (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 5.0f, 0.2f, 200.0f, -50.0f);
+	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.2f, 200.0f, -50.0f);
 
 //	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dMatrix location (dGetIdentityMatrix());
