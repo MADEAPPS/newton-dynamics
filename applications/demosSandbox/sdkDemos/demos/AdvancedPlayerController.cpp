@@ -613,6 +613,70 @@ static DemoEntityManager::dListNode* LoadScene(DemoEntityManager* const scene, c
 	return lastEnt->GetNext(); 
 }
 
+
+#define SPEK_CRASH_TEST
+#ifdef SPEK_CRASH_TEST
+
+// Make a 2-triangle flat test floor
+NewtonCollision* testCreateFlatFloor(DemoEntityManager* const scene)
+{
+   NewtonCollision* tree = NewtonCreateTreeCollision(scene->GetNewton(), 0);
+   NewtonTreeCollisionBeginBuild(tree);
+
+   dFloat face[3][3];
+   face[0][0] = +50; face[0][1] = 0; face[0][2] = -50;
+   face[1][0] = -50; face[1][1] = 0; face[1][2] = -50;
+   face[2][0] = -50; face[2][1] = 0; face[2][2] = +50;
+// the stride in byte is the size of the vertex not the side of the array
+   NewtonTreeCollisionAddFace(tree, 3, &face[0][0], 3 * sizeof (dFloat), 0);
+
+   face[0][0] = +50; face[0][1] = 0; face[0][2] = -50;
+   face[1][0] = -50; face[1][1] = 0; face[1][2] = +50;
+   face[2][0] = +50; face[2][1] = 0; face[2][2] = +50;
+   NewtonTreeCollisionAddFace(tree, 3, &face[0][0], 3 * sizeof (dFloat), 0);
+
+   NewtonTreeCollisionEndBuild( tree, 0);
+
+   return tree;
+} // testCreateFlatFloor
+
+
+static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sceneCollision)
+{
+   NewtonWorld* const world = scene->GetNewton();
+
+   // add a flat plane
+   dMatrix matrix(dGetIdentityMatrix());
+   DemoEntityManager::dListNode* const floorNode = LoadScene(scene, "flatPlane.ngd", matrix);
+
+   DemoEntity* const entity = floorNode->GetInfo();
+   DemoMesh* const mesh = (DemoMesh*)entity->GetMesh();
+   dAssert (mesh->IsType(DemoMesh::GetRttiType()));
+
+   // Replace original code with testFloor
+   NewtonCollision* const tree = testCreateFlatFloor(scene);
+
+   // add the collision tree to the collision scene
+   void* const proxy = NewtonSceneCollisionAddSubCollision (sceneCollision, tree);
+
+   // destroy the original tree collision
+   NewtonDestroyCollision (tree);
+
+
+   // set the parameter on the added collision share
+   matrix = entity->GetCurrentMatrix();
+   NewtonCollision* const collisionTree = NewtonSceneCollisionGetCollisionFromNode (sceneCollision, proxy);
+
+   NewtonSceneCollisionSetSubCollisionMatrix (sceneCollision, proxy, &matrix[0][0]);   
+   NewtonCollisionSetUserData(collisionTree, entity);
+
+   // set the application level callback, for debug display
+   #ifdef USE_STATIC_MESHES_DEBUG_COLLISION
+   NewtonStaticCollisionSetDebugCallback (collisionTree, ShowMeshCollidingFaces);
+   #endif   
+}
+#else 
+
 static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sceneCollision)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -674,6 +738,10 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 	NewtonStaticCollisionSetDebugCallback (collisionTree, ShowMeshCollidingFaces);
 	#endif
 }
+#endif
+
+
+
 
 static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* const triggerManager, NewtonCollision* const sceneCollision, const char* const name, const dMatrix& location, NewtonBody* const playGroundBody)
 {
@@ -1010,6 +1078,7 @@ static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* 
 		// load a flat floor
 		LoadFloor(scene, sceneCollision);
 
+#ifndef SPEK_CRASH_TEST
 		// load a slide platform
 		dMatrix slideMatrix(dGetIdentityMatrix());
 		slideMatrix.m_posit.m_x += 80.0f;
@@ -1025,6 +1094,7 @@ static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* 
 		// load another ferry bridge
 		bridgeMatrix.m_posit.m_z += 20.0f;
 		LoadFerryBridge(scene, triggerManager, sceneCollision, "platformBridge.ngd", bridgeMatrix, playGroundBody);
+#endif	
 	}
 
 	// finalize adding shapes to this scene collisions 
