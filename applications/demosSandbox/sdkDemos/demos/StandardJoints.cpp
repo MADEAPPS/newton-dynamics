@@ -393,15 +393,21 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);
 
 		// motor
-		for (int n = 0; n < 3; n++) {
+//		for (int n = 0; n < 3; n++) {
+		for (int n = 2; n >=0 ; n--) {
 			// calculate the desired acceleration
 			dVector &axis = basis[n];
 			dFloat relAccel = angAcc % axis;
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+if (n == 0) {
+NewtonUserJointSetRowMinimumFriction(m_joint, -10.0f);
+NewtonUserJointSetRowMaximumFriction(m_joint, 10.0f);
+}
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
 	}
@@ -1044,7 +1050,8 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
+//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 1);
 /*
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
