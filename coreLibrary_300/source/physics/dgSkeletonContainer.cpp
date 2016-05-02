@@ -701,13 +701,18 @@ dgFloat32 dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfo
 {
 	dgFloat32 retAccel = dgFloat32 (0.0f);
 	if (m_nodesOrder) {
-		if (m_skeletonHardMotors) {
+		if (!m_skeletonHardMotors) {
+			retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
+			SolveFoward();
+			SolveBackward();
+			UpdateForces(jointInfoArray, internalForces, matrixRow);
+		} else {
 			InitMassMatrixLCP (jointInfoArray, internalForces, matrixRow);
+			retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
+			SolveFoward();
+			SolveBackward();
+			UpdateForces(jointInfoArray, internalForces, matrixRow);
 		}
-		retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
-		SolveFoward();
-		SolveBackward();
-		UpdateForces(jointInfoArray, internalForces, matrixRow);
 	}
 
 	return retAccel;
