@@ -1044,6 +1044,8 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
+/*
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -1061,7 +1063,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 1.5f); // animated
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -5.0f));
 	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
-
+*/
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
