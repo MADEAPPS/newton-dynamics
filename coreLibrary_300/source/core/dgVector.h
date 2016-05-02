@@ -1572,8 +1572,8 @@ class dgSpatialVector
 {
 	public:
 	DG_INLINE dgSpatialVector()
-		:m_l(dgFloat32 (0.0f))
-		,m_h(dgFloat32 (0.0f))
+		:m_l(dgVector::m_zero)
+		,m_h(dgVector::m_zero)
 	{
 	}
 
@@ -1593,46 +1593,40 @@ class dgSpatialVector
 
 	DG_INLINE void SetZero()
 	{
-dgAssert (0);
-/*
-		m_type[0] = _mm_xor_pd(m_type[0], m_type[0]);
-		m_type[1] = m_type[0];
-		m_type[2] = m_type[0];
-*/
+		m_l = dgVector::m_zero;
+		m_h = dgVector::m_zero;
 	}
 
 	DG_INLINE dgFloat32 DotProduct(const dgSpatialVector& v) const
 	{
-dgAssert (0);
-/*
-		dgFloat64 ret;
-		__m128d tmp (_mm_add_pd(_mm_mul_pd(m_type[0], v.m_type[0]), _mm_add_pd (_mm_mul_pd(m_type[1], v.m_type[1]), _mm_mul_pd(m_type[2], v.m_type[2]))));
-		_mm_store_sd(&ret, _mm_hadd_pd(tmp, tmp));
-		return ret;
-*/
-		return 0;
+//		dgFloat64 ret;
+//		__m128d tmp (_mm_add_pd(_mm_mul_pd(m_type[0], v.m_type[0]), _mm_add_pd (_mm_mul_pd(m_type[1], v.m_type[1]), _mm_mul_pd(m_type[2], v.m_type[2]))));
+//		_mm_store_sd(&ret, _mm_hadd_pd(tmp, tmp));
+//		return ret;
+		dgAssert (v.m_h[2] == dgFloat32 (0.0f));
+		dgAssert (v.m_h[3] == dgFloat32 (0.0f));
+		dgVector p (m_l.CompProduct4(v.m_l) + m_h.CompProduct4(v.m_h));
+		return (p.AddHorizontal()).GetScalar(); 
 	}
 	
 	DG_INLINE void Scale(dgFloat32 s, dgSpatialVector& dst) const
 	{
-		dgAssert (0);
-/*
-		__m128d tmp = _mm_set1_pd(s);
-		dst.m_type[0] = _mm_mul_pd(m_type[0], tmp);
-		dst.m_type[1] = _mm_mul_pd(m_type[1], tmp);
-		dst.m_type[2] = _mm_mul_pd(m_type[2], tmp);
-*/	
+		//__m128d tmp = _mm_set1_pd(s);
+		//dst.m_type[0] = _mm_mul_pd(m_type[0], tmp);
+		//dst.m_type[1] = _mm_mul_pd(m_type[1], tmp);
+		//dst.m_type[2] = _mm_mul_pd(m_type[2], tmp);
+		dst.m_l = m_l.Scale4 (s);
+		dst.m_h = m_h.Scale4 (s);
 	}
 
 	DG_INLINE void ScaleAdd(dgFloat32 s, const dgSpatialVector& b, dgSpatialVector& dst) const
 	{
-		dgAssert (0);
-/*
-		__m128d tmp = _mm_set1_pd(s);
-		dst.m_type[0] = _mm_add_pd(b.m_type[0], _mm_mul_pd(m_type[0], tmp));
-		dst.m_type[1] = _mm_add_pd(b.m_type[1], _mm_mul_pd(m_type[1], tmp));
-		dst.m_type[2] = _mm_add_pd(b.m_type[2], _mm_mul_pd(m_type[2], tmp));
-*/	
+		//__m128d tmp = _mm_set1_pd(s);
+		//dst.m_type[0] = _mm_add_pd(b.m_type[0], _mm_mul_pd(m_type[0], tmp));
+		//dst.m_type[1] = _mm_add_pd(b.m_type[1], _mm_mul_pd(m_type[1], tmp));
+		//dst.m_type[2] = _mm_add_pd(b.m_type[2], _mm_mul_pd(m_type[2], tmp));
+		dst.m_l = b.m_l + m_l.Scale4 (s);
+		dst.m_h = b.m_h + m_h.Scale4 (s);
 	}
 
 	dgVector m_l;
