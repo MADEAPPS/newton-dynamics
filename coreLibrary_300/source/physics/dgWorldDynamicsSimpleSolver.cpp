@@ -824,9 +824,6 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	for (dgInt32 i = 0; i < skeletonCount; i ++) {
 		dgSkeletonContainer* const container = skeletonArray[i];
-		//if (container->m_errorCorrection > dgFloat32 (0.0f)) {
-		//	container->ApplpyKinematicErrorCorrection (constraintArray, matrixRow);
-		//}
 		if (!container->m_skeletonHardMotors) {
 			container->InitMassMatrix (constraintArray, matrixRow);
 		}
