@@ -1563,9 +1563,7 @@ class dgVector
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
-
 #endif
-
 
 
 
@@ -1573,56 +1571,73 @@ DG_MSC_VECTOR_ALIGMENT
 class dgSpatialVector
 {
 	public:
-	DG_INLINE dgFloat64& operator[] (dgInt32 i)
+	DG_INLINE dgSpatialVector()
+		:m_l(dgFloat32 (0.0f))
+		,m_h(dgFloat32 (0.0f))
 	{
-		dgAssert(i < 6);
-		dgAssert(i >= 0);
-		return m_v[i];
 	}
 
-	DG_INLINE const dgFloat64& operator[] (dgInt32 i) const
+	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
 		dgAssert(i < 6);
 		dgAssert(i >= 0);
-		return m_v[i];
+		return (&m_l.m_x)[i];
+	}
+
+	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return (&m_l.m_x)[i];
 	}
 
 	DG_INLINE void SetZero()
 	{
+dgAssert (0);
+/*
 		m_type[0] = _mm_xor_pd(m_type[0], m_type[0]);
 		m_type[1] = m_type[0];
 		m_type[2] = m_type[0];
+*/
 	}
 
-	DG_INLINE dgFloat64 DotProduct(const dgSpatialVector& v) const
+	DG_INLINE dgFloat32 DotProduct(const dgSpatialVector& v) const
 	{
+dgAssert (0);
+/*
 		dgFloat64 ret;
 		__m128d tmp (_mm_add_pd(_mm_mul_pd(m_type[0], v.m_type[0]), _mm_add_pd (_mm_mul_pd(m_type[1], v.m_type[1]), _mm_mul_pd(m_type[2], v.m_type[2]))));
 		_mm_store_sd(&ret, _mm_hadd_pd(tmp, tmp));
 		return ret;
+*/
+		return 0;
 	}
 	
-	DG_INLINE void Scale(dgFloat64 s, dgSpatialVector& dst) const
+	DG_INLINE void Scale(dgFloat32 s, dgSpatialVector& dst) const
 	{
+		dgAssert (0);
+/*
 		__m128d tmp = _mm_set1_pd(s);
 		dst.m_type[0] = _mm_mul_pd(m_type[0], tmp);
 		dst.m_type[1] = _mm_mul_pd(m_type[1], tmp);
 		dst.m_type[2] = _mm_mul_pd(m_type[2], tmp);
+*/	
 	}
 
-	DG_INLINE void ScaleAdd(dgFloat64 s, const dgSpatialVector& b, dgSpatialVector& dst) const
+	DG_INLINE void ScaleAdd(dgFloat32 s, const dgSpatialVector& b, dgSpatialVector& dst) const
 	{
+		dgAssert (0);
+/*
 		__m128d tmp = _mm_set1_pd(s);
 		dst.m_type[0] = _mm_add_pd(b.m_type[0], _mm_mul_pd(m_type[0], tmp));
 		dst.m_type[1] = _mm_add_pd(b.m_type[1], _mm_mul_pd(m_type[1], tmp));
 		dst.m_type[2] = _mm_add_pd(b.m_type[2], _mm_mul_pd(m_type[2], tmp));
+*/	
 	}
 
-	union
-	{
-		__m128d m_type[3];
-		dgFloat64 m_v[6];
-	};
+	dgVector m_l;
+	dgVector m_h;
+
 } DG_GCC_VECTOR_ALIGMENT;
 #endif
 
@@ -1671,17 +1686,17 @@ class dgSpatialMatrix
 		}
 
 		for (dgInt32 i = 0; i < rows; i++) {
-			dgFloat64 val = copy.m_rows[i][i];
-			dgAssert(fabs(val) > dgFloat64(1.0e-12f));
-			dgFloat64 den = dgFloat64(1.0f) / val;
+			dgFloat32 val = copy.m_rows[i][i];
+			dgAssert(fabs(val) > dgFloat32(1.0e-12f));
+			dgFloat32 den = dgFloat32(1.0f) / val;
 
 			dst[i].Scale(den, dst[i]);
 			copy[i].Scale(den, copy[i]);
-			copy[i][i] = dgFloat64(1.0f);
+			copy[i][i] = dgFloat32(1.0f);
 
 			for (dgInt32 j = 0; j < rows; j++) {
 				if (j != i) {
-					dgFloat64 pivot = -copy[j][i];
+					dgFloat32 pivot = -copy[j][i];
 					dst[i].ScaleAdd(pivot, dst[j], dst[j]);
 					copy[i].ScaleAdd(pivot, copy[j], copy[j]);
 				}

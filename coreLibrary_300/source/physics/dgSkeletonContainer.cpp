@@ -225,8 +225,8 @@ class dgSkeletonContainer::dgSkeletonGraph
 		for (dgInt32 i = 0; i < dof ; i++) {
 			const dgSpatialVector& jacobian = jacobianMatrix[i];
 			for (dgInt32 j = 0; j < dof ; j++) {
-				dgAssert(dgAreEqual (childDiagonal[i][j], childDiagonal[j][i], dgFloat64(1.0e-5f)));
-				dgFloat64 val = childDiagonal[i][j];
+				dgAssert(dgAreEqual (childDiagonal[i][j], childDiagonal[j][i], dgFloat32(1.0e-5f)));
+				dgFloat32 val = childDiagonal[i][j];
 				jacobian.ScaleAdd(val, copy[j], copy[j]);
 			}
 		}
@@ -235,7 +235,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 			const dgSpatialVector& Jacobian = copy[i];
 			const dgSpatialVector& JacobianTranspose = jacobianMatrix[i];
 			for (dgInt32 j = 0; j < 6; j++) {
-				dgFloat64 val = -Jacobian[j];
+				dgFloat32 val = -Jacobian[j];
 				JacobianTranspose.ScaleAdd(val, m_bodyMass[j], m_bodyMass[j]);
 			}
 		}
@@ -249,7 +249,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 		}
 
 		for (dgInt32 i = 0; i < m_dof; i++) {
-			dgFloat64 a = m_bodyJt[i].DotProduct(tmp[i]);
+			dgFloat32 a = m_bodyJt[i].DotProduct(tmp[i]);
 			m_jointMass[i][i] -= a;
 			for (dgInt32 j = i + 1; j < m_dof; j++) {
 				a = - m_bodyJt[i].DotProduct(tmp[j]);
@@ -273,7 +273,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 			const dgSpatialVector& jacobian = copy[i];
 			const dgSpatialVector& invDiagonalRow = m_jointInvMass[i];
 			for (dgInt32 j = 0; j < m_dof; j++) {
-				dgFloat64 val = invDiagonalRow[j];
+				dgFloat32 val = invDiagonalRow[j];
 				jacobian.ScaleAdd(val, m_jointJ[j], m_jointJ[j]);
 			}
 		}
