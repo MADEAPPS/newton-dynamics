@@ -619,9 +619,10 @@ DG_INLINE void dgSkeletonContainer::SolveBackward () const
 }
 
 
-DG_INLINE dgFloat32 dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const
+//DG_INLINE dgFloat32 dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const
+DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const
 {
-	dgVector accNorm (dgFloat32(0.0f));
+//	dgVector accNorm (dgFloat32(0.0f));
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		dgSkeletonGraph* const node = m_nodesOrder[i];
 		dgAssert(node->m_body);
@@ -646,15 +647,13 @@ DG_INLINE dgFloat32 dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const 
 						 row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
 			acc = dgVector(row->m_coordenateAccel) - acc.AddHorizontal();
 			accel[j] = -acc.GetScalar();
-			accNorm = accNorm.GetMax(acc.Abs());
-//dgTrace (("%f ", accel[j]));
+			//accNorm = accNorm.GetMax(acc.Abs());
 		}
 	}
 	m_nodesOrder[m_nodeCount - 1]->m_bodyForce.SetZero();
 	m_nodesOrder[m_nodeCount - 1]->m_jointForce.SetZero();
-//dgTrace (("\n"));
 
-	return accNorm.GetScalar();
+//	return accNorm.GetScalar();
 }
 
 
@@ -697,23 +696,25 @@ DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 }
 
 
-dgFloat32 dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
+//dgFloat32 dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
+void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 {
-	dgFloat32 retAccel = dgFloat32 (0.0f);
+//	dgFloat32 retAccel = dgFloat32 (0.0f);
 	if (m_nodesOrder) {
 		if (!m_skeletonHardMotors) {
-			retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
+			//retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
+			CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
 			SolveFoward();
 			SolveBackward();
 			UpdateForces(jointInfoArray, internalForces, matrixRow);
 		} else {
 			InitMassMatrixLCP (jointInfoArray, internalForces, matrixRow);
-			retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
+			//retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
+			CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
 			SolveFoward();
 			SolveBackward();
 			UpdateForces(jointInfoArray, internalForces, matrixRow);
 		}
 	}
-
-	return retAccel;
+//	return retAccel;
 }

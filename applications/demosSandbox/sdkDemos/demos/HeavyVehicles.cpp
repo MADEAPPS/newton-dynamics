@@ -84,7 +84,7 @@ static VehicleParameters heavyTruck =
 	 700.0f,							// IDLE_TORQUE_RPM
 	1800.0f,							// PEAK_TORQUE
 	3000.0f,							// PEAK_TORQUE_RPM
-	1000.0f,							// PEAK_HP
+	1200.0f,							// PEAK_HP
 	4000.0f,							// PEAK_HP_RPM
 	 300.0f,							// REDLINE_TORQUE
 	4500.0f,							// REDLINE_TORQUE_RPM
@@ -1575,7 +1575,7 @@ void MilitaryTransport (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.2f, 200.0f, -50.0f);
+	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.1f, 200.0f, -30.0f);
 
 //	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dMatrix location (dGetIdentityMatrix());

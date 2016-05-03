@@ -216,7 +216,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_forceBounds[normalIndex].m_normalIndex = DG_NORMAL_CONSTRAINT;
 	params.m_forceBounds[normalIndex].m_jointForce = (dgForceImpactPair*) &contact.m_normal_Force;
 	params.m_jointStiffness[normalIndex] = dgFloat32 (0.5f);
-	params.m_isMotor[normalIndex] = 0;
 
 //	params.m_jointAccel[normalIndex] = GetMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * params.m_invTimestep;
 	params.m_jointAccel[normalIndex] = dgMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * impulseOrForceScale;
@@ -233,7 +232,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_BILATERAL_FRICTION_CONSTRAINT : normalIndex;
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.5f);
 
-		params.m_isMotor[jacobIndex] = 0;
 		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
@@ -260,11 +258,10 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_BILATERAL_FRICTION_CONSTRAINT : normalIndex;
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.5f);
 
-		params.m_isMotor[jacobIndex] = 0;
 		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
-		dgAssert (params.m_isMotor[jacobIndex] == 0);
+
 		if (contact.m_flags & dgContactMaterial::m_override1Accel) {
 			params.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 		} else {
@@ -277,7 +274,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 			params.m_forceBounds[jacobIndex].m_low = - contact.m_staticFriction1;
 			params.m_forceBounds[jacobIndex].m_upper = contact.m_staticFriction1;
 		}
-		//params.m_flags[jacobIndex].m_applyCorrection = 0;
 		params.m_forceBounds[jacobIndex].m_jointForce = (dgForceImpactPair*)&contact.m_dir1_Force;
 	}
 }
@@ -301,7 +297,8 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 	}
 
 	for (dgInt32 k = 0; k < count; k ++) {
-		if (!rowMatrix[k].m_accelIsMotor) {
+//		if (!rowMatrix[k].m_accelIsMotor) 
+//		{
 			dgJacobianMatrixElement* const row = &rowMatrix[k];
 
 			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear.CompProduct4(bodyVeloc0) + row->m_Jt.m_jacobianM0.m_angular.CompProduct4(bodyOmega0) + row->m_Jt.m_jacobianM1.m_linear.CompProduct4(bodyVeloc1) + row->m_Jt.m_jacobianM1.m_angular.CompProduct4(bodyOmega1));
@@ -330,7 +327,7 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 				vRel = dgMin (dgFloat32 (4.0f), vRel + penetrationVeloc);
 			}
 			row->m_coordenateAccel = (aRel - vRel * invTimestep);
-		}
+//		}
 	}
 }
 

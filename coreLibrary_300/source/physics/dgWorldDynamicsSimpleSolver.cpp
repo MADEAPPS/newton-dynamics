@@ -872,8 +872,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 			for (dgInt32 i = 0; i < skeletonCount; i++) {
 				dgSkeletonContainer* const container = skeletonArray[i];
-				dgFloat32 accel = container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
-				accNorm = (accel > accNorm) ? accel : accNorm;
+				//dgFloat32 accel = container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
+				//accNorm = (accel > accNorm) ? accel : accNorm;
+				container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow); 
 			}
 		}
 

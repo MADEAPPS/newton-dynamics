@@ -62,7 +62,7 @@
 //#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
-#define DEFAULT_SCENE	36			// advanced player controller
+//#define DEFAULT_SCENE	36			// advanced player controller
 //#define DEFAULT_SCENE	37			// cloth patch			
 //#define DEFAULT_SCENE	38			// soft bodies			
 
@@ -352,7 +352,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_debugDisplayMode = 2;
 //m_showContactPoints = true;
 //SetDebugDisplayMode (m_debugDisplayMode);
-m_showNormalForces = true;
+//m_showNormalForces = true;
 
 //m_autoSleepState = false;
 //m_microthreadIndex = 1;

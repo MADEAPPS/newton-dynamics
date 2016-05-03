@@ -615,7 +615,9 @@ class CustomVehicleController: public CustomControllerBase
 	void Init (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	
+
 	void ApplyLateralStabilityForces(dFloat timestep);
+	void GetLastLateralForce(BodyPartTire* const tire) const;
 	void Cleanup();
 	
 	
@@ -635,6 +637,7 @@ class CustomVehicleController: public CustomControllerBase
 	BodyPartTire::FrictionModel* m_contactFilter;
 	NewtonApplyForceAndTorque m_forceAndTorque;
 	dFloat m_weightDistribution;
+	int m_tiresInContacts;
 	bool m_finalized;
 	bool m_isAirborned;
 	bool m_hasNewContact;
@@ -664,7 +667,7 @@ class CustomVehicleControllerManager: public CustomControllerManager<CustomVehic
 	CUSTOM_JOINTS_API virtual void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const;
 	CUSTOM_JOINTS_API int OnContactGeneration (const CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonCollision* const othercollision, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex) const;
 
-	bool Collide (CustomVehicleController::BodyPartTire* const tire, int threadIndex) const;
+	int Collide (CustomVehicleController::BodyPartTire* const tire, int threadIndex) const;
 	static void OnTireContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex);
 	static int OnTireAABBOverlap(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
 	static int OnContactGeneration (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex);
