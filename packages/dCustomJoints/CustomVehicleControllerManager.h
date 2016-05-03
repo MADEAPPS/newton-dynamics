@@ -170,9 +170,9 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			enum SuspensionType
 			{
-				m_mediumSuspension,
-				m_softSuspension,
-				m_raceSuspension,
+				m_offroad,
+				m_confort,
+				m_race,
 			};
 
 			Info ()

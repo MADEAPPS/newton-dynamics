@@ -355,13 +355,13 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_tire->m_data.m_springStrength, m_tire->m_data.m_dampingRatio);
 			switch(m_tire->m_data.m_suspentionType) 
 			{
-				case BodyPartTire::Info::m_softSuspension:
+				case BodyPartTire::Info::m_offroad:
 					NewtonUserJointSetRowStiffness (m_joint, 0.8f);
 					break;
-				case BodyPartTire::Info::m_mediumSuspension:
-					NewtonUserJointSetRowStiffness (m_joint, 0.94f);
+				case BodyPartTire::Info::m_confort:
+					NewtonUserJointSetRowStiffness (m_joint, 0.9f);
 					break;
-				case BodyPartTire::Info::m_raceSuspension:
+				case BodyPartTire::Info::m_race:
 					NewtonUserJointSetRowStiffness (m_joint, 0.94f);
 					break;
 

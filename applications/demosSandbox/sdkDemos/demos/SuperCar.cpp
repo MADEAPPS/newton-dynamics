@@ -113,7 +113,7 @@ static CarDefinition monsterTruck =
 	200.0f,										// TIRE_SUSPENSION_SPRING
 	10.0f,										// TIRE_SUSPENSION_DAMPER
 	0.5f,										// TIRE_SUSPENSION_LENGTH
-	CustomVehicleController::BodyPartTire::Info::m_softSuspension, //TIRE_SUSPENSION_TYPE
+	CustomVehicleController::BodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
 	3000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
@@ -156,7 +156,7 @@ static CarDefinition viper =
 	300.0f,										// TIRE_SUSPENSION_SPRING
 	10.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	CustomVehicleController::BodyPartTire::Info::m_raceSuspension, //TIRE_SUSPENSION_TYPE
+	CustomVehicleController::BodyPartTire::Info::m_confort, //TIRE_SUSPENSION_TYPE
 	3000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
