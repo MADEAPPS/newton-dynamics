@@ -176,6 +176,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 		dgAssert((dgUnsigned64(&m_bodyMass) & 0x0f) == 0);
 
 		m_bodyMass.SetZero();
+		m_bodyForce.SetZero();
 		if (m_body->GetInvMass().m_w != dgFloat32(0.0f)) {
 			GetInertia();
 		}
@@ -191,16 +192,19 @@ class dgSkeletonContainer::dgSkeletonGraph
 			const dgInt32 m1 = jointInfo->m_m1;
 			const dgJacobian& y0 = internalForces[m0];
 			const dgJacobian& y1 = internalForces[m1];
+			dgSpatialVector& accel = m_jointForce;
 
 			m_dof = 0;
 			const dgInt32 count = jointInfo->m_pairCount;
 			const dgInt32 first = jointInfo->m_pairStart;
+			
 			for (dgInt32 i = 0; i < count; i++) {
 				const dgJacobianMatrixElement* const row = &matrixRow[i + first];
 				dgVector residual(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
 								  row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
 				residual = dgVector(row->m_coordenateAccel) - residual.AddHorizontal();
 
+				accel[i] = -residual.GetScalar();
 				dgFloat32 force = row->m_force + row->m_invJMinvJt * residual.GetScalar();
 				if ((force > row->m_lowerBoundFrictionCoefficent) && (force < row->m_upperBoundFrictionCoefficent)) {
 					m_sourceJacobianIndex[m_dof] = dgInt8(i);
@@ -699,26 +703,22 @@ DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 //dgFloat32 dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 {
-//	dgFloat32 retAccel = dgFloat32 (0.0f);
 	if (m_nodesOrder) {
 		if (!m_skeletonHardMotors) {
-			//retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
 			CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
 			SolveFoward();
 			SolveBackward();
 			UpdateForces(jointInfoArray, internalForces, matrixRow);
 		} else {
-//			XXXX();
+			XXXX();
 
 			InitMassMatrixLCP (jointInfoArray, internalForces, matrixRow);
-			//retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
 			CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
 			SolveFoward();
 			SolveBackward();
 			UpdateForces(jointInfoArray, internalForces, matrixRow);
 		}
 	}
-//	return retAccel;
 }
 
 void dgSkeletonContainer::XXXX()
@@ -736,7 +736,7 @@ void dgSkeletonContainer::XXXX()
 	xxx[1][0] = 1.0f;
 	B[0] = 10.0f;
 	B[1] = 10.0f;
-	X[0] = 0.0f;
+	X[0] = 20.0f;
 	X[1] = 0.0f;
 	Low[0] = -1.0f;
 	Low[1] = -10.0f;
