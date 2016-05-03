@@ -81,9 +81,10 @@ class dgLCP: public dgSPDMatrix<T>
 
 	dgGeneralVector<T>& GetB() { return m_b; }
 	dgGeneralVector<T>& GetX() { return m_x; }
-	dgGeneralVector<T>& GetR() { return m_r; }
 	dgGeneralVector<T>& GetLowLimit() { return m_low; }
 	dgGeneralVector<T>& GetHightLimit() { return m_high; }
+
+	const dgGeneralVector<T>& GetR() { return m_r; }	
 
 	// Using George B. Dantzig algorithm.  
 	// Inspired from David Baraff interpretation of George B. Dantzig algorithm in his paper. 

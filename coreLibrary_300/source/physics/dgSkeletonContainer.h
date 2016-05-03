@@ -70,6 +70,8 @@ class dgSkeletonContainer
 	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
 	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
+
+void XXXX();
 	
 	static void ResetUniqueId(dgInt32 id);
 

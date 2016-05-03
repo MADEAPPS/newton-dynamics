@@ -364,9 +364,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 				case BodyPartTire::Info::m_race:
 					NewtonUserJointSetRowStiffness (m_joint, 0.94f);
 					break;
-
 			}
-			
 		}
 
 		if (m_brakeTorque > 1.0e-3f) {

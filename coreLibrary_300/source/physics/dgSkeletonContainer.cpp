@@ -708,6 +708,8 @@ void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray
 			SolveBackward();
 			UpdateForces(jointInfoArray, internalForces, matrixRow);
 		} else {
+//			XXXX();
+
 			InitMassMatrixLCP (jointInfoArray, internalForces, matrixRow);
 			//retAccel = CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
 			CalculateJointAccel(jointInfoArray, internalForces, matrixRow);
@@ -717,4 +719,31 @@ void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray
 		}
 	}
 //	return retAccel;
+}
+
+void dgSkeletonContainer::XXXX()
+{
+	dgLCP<dgFloat32> xxx(m_world->GetAllocator(), 2);
+
+	dgGeneralVector<dgFloat32>& B = xxx.GetB();
+	dgGeneralVector<dgFloat32>& X = xxx.GetX();
+	dgGeneralVector<dgFloat32>& Low = xxx.GetLowLimit();
+	dgGeneralVector<dgFloat32>& High = xxx.GetHightLimit();
+
+	xxx[0][0] = 2.0f;
+	xxx[0][1] = 1.0f;
+	xxx[1][1] = 2.0f;
+	xxx[1][0] = 1.0f;
+	B[0] = 10.0f;
+	B[1] = 10.0f;
+	X[0] = 0.0f;
+	X[1] = 0.0f;
+	Low[0] = -1.0f;
+	Low[1] = -10.0f;
+	High[0] = 1.0f;
+	High[1] = 10.0f;
+	xxx.SolveDantzig();
+
+	const dgGeneralVector<dgFloat32>& R = xxx.GetR();
+	const dgGeneralVector<dgFloat32>& X1 = xxx.GetX();
 }
