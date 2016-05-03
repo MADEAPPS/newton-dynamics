@@ -614,7 +614,7 @@ static DemoEntityManager::dListNode* LoadScene(DemoEntityManager* const scene, c
 }
 
 
-#define SPEK_CRASH_TEST
+//#define SPEK_CRASH_TEST
 #ifdef SPEK_CRASH_TEST
 
 // Make a 2-triangle flat test floor

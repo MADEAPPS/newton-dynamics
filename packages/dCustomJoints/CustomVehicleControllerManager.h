@@ -168,6 +168,13 @@ class CustomVehicleController: public CustomControllerBase
 		class Info
 		{
 			public:
+			enum SuspensionType
+			{
+				m_mediumSuspension,
+				m_softSuspension,
+				m_raceSuspension,
+			};
+
 			Info ()
 			{
 				memset (this, 0, sizeof (Info));
@@ -185,6 +192,7 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_longitudialStiffness;
 			dFloat m_aligningMomentTrail;
 			int m_hasFender;
+			SuspensionType m_suspentionType;
 			void* m_userData;
 		};
 

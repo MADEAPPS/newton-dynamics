@@ -263,7 +263,6 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		tireMatrix.m_right = tireMatrix.m_front * tireMatrix.m_up;
 		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right % tireMatrix.m_right));
 		tireMatrix.m_up = tireMatrix.m_right * tireMatrix.m_front;
-//		dFloat param = dClamp (CalculateTireParametricPosition (tireMatrix, chassisMatrix), dFloat (0.0f), dFloat (1.0f));
 
 		dFloat param = 0.0f;
 		if (!m_tire->GetController()->m_isAirborned) {
@@ -354,6 +353,20 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		} else {
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_tire->m_data.m_springStrength, m_tire->m_data.m_dampingRatio);
+			switch(m_tire->m_data.m_suspentionType) 
+			{
+				case BodyPartTire::Info::m_softSuspension:
+					NewtonUserJointSetRowStiffness (m_joint, 0.8f);
+					break;
+				case BodyPartTire::Info::m_mediumSuspension:
+					NewtonUserJointSetRowStiffness (m_joint, 0.94f);
+					break;
+				case BodyPartTire::Info::m_raceSuspension:
+					NewtonUserJointSetRowStiffness (m_joint, 0.94f);
+					break;
+
+			}
+			
 		}
 
 		if (m_brakeTorque > 1.0e-3f) {
