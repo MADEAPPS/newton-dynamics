@@ -33,6 +33,15 @@ typedef void (dgApi *dgOnSkeletonContainerDestroyCallback) (dgSkeletonContainer*
 class dgSkeletonContainer
 {
 	public:
+	DG_MSC_VECTOR_ALIGMENT
+	class dgForcePair
+	{
+		public:
+		dgSpatialVector m_jointForce;
+		dgSpatialVector m_bodyForce;
+	} DG_GCC_VECTOR_ALIGMENT;
+
+
 	class dgSkeletonGraph;
 
 	DG_CLASS_ALLOCATOR(allocator)
@@ -60,12 +69,16 @@ class dgSkeletonContainer
 	dgSkeletonGraph* GetNextSiblingChild (dgSkeletonGraph* const sibling) const;
 
 	private:
-	DG_INLINE void SolveFoward () const;
-	DG_INLINE void SolveBackward () const;
-	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	DG_INLINE void SolveFoward (dgForcePair* const forces) const;
+	DG_INLINE void SolveBackward (dgForcePair* const forces) const;
 	DG_INLINE void InitMassMatrixLCP (const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	//DG_INLINE dgFloat32 CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const forces) const;
+	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const forces) const;
+
+	DG_INLINE void EnumerateRowsAndInitForces (const dgJointInfo* const jointInfoArray) const;
+	void SoveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
+	void SoveNormal (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const forces);
+	
 
 	dgSkeletonGraph* FindNode (dgDynamicBody* const node) const;
 	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);

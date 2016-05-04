@@ -405,8 +405,8 @@ class JoesRagdollJoint: public CustomBallAndSocket
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 if (n == 0) {
-NewtonUserJointSetRowMinimumFriction(m_joint, -10.0f);
-NewtonUserJointSetRowMaximumFriction(m_joint, 10.0f);
+//NewtonUserJointSetRowMinimumFriction(m_joint, -10.0f);
+//NewtonUserJointSetRowMaximumFriction(m_joint, 10.0f);
 }
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
@@ -427,7 +427,7 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 	NewtonSkeletonSetSolverMode(skeleton, 1);
 #endif
 
-    for (int i=0; i<numSegments; i++)
+    for (int i=0; i < numSegments; i++)
     {
         dFloat height = 1.0f;
         dFloat width = 0.5f;
@@ -1051,7 +1051,10 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 //	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
-	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 1);
+//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
+
+AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
+
 /*
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));

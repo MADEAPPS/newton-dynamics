@@ -2117,9 +2117,9 @@ int CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTir
 				dFloat x1 = timeOfImpact * tire->m_data.m_suspesionlenght;
 				dFloat x0 = (tireMatrix.m_posit - chassisMatrix.m_posit) % chassisMatrix.m_up;
 				dFloat x10 = x1 - x0;
-				if (x10 > 0.125f) {
+				if (x10 > (1.0f / 32.0f)) {
 					dFloat param = 1.0e10f;
-					x1 = x0 + 0.125f;
+					x1 = x0 + (1.0f / 32.0f);
 					dMatrix origin (chassisMatrix);
 					origin.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(x1);
 					NewtonWorldConvexCast (world, &chassisMatrix[0][0], &tireSweeptMatrix.m_posit[0], tireCollision, &param, &filter, CustomControllerConvexCastPreFilter::Prefilter, NULL, 0, threadIndex);
