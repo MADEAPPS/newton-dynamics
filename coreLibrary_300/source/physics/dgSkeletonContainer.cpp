@@ -174,8 +174,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 	{
 		dgAssert((dgUnsigned64(&m_bodyMass) & 0x0f) == 0);
 
-		//m_bodyMass.SetZero();
-		//m_bodyForce.SetZero();
+		m_bodyMass.SetZero();
 		if (m_body->GetInvMass().m_w != dgFloat32(0.0f)) {
 			GetInertia();
 		}
@@ -204,8 +203,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 				residual = dgVector(row->m_coordenateAccel) - residual.AddHorizontal();
 				
 				dgFloat32 force = row->m_force + row->m_invJMinvJt * residual.GetScalar();
-				//if ((force > row->m_lowerBoundFrictionCoefficent) && (force < row->m_upperBoundFrictionCoefficent)) {
-				if (((row->m_lowerBoundFrictionCoefficent < dgFloat32 (-1.0e9f)) && row->m_upperBoundFrictionCoefficent > dgFloat32 (1.0e9f))) {
+				if ((force > row->m_lowerBoundFrictionCoefficent) && (force < row->m_upperBoundFrictionCoefficent)) {
 					m_sourceJacobianIndex[m_dof] = dgInt8(i);
 					accel[m_dof] = -residual.GetScalar();
 					m_dof++;
@@ -793,19 +791,9 @@ void dgSkeletonContainer::XXXX()
 void dgSkeletonContainer::SoveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const forces)
 {
 //	XXXX();
-static int xxx;
-xxx ++;
 
 	EnumerateRowsAndInitForces(jointInfoArray, forces); 
-
-#if 0
-	// there is  afucking bug here that I can not find 
 	InitMassMatrixLCP(jointInfoArray, internalForces, matrixRow, forces);
-#else
-InitMassMatrix(jointInfoArray, matrixRow);
-CalculateJointAccel(jointInfoArray, internalForces, matrixRow, forces);
-#endif
-
 	SolveFoward(forces);
 	SolveBackward(forces);
 	UpdateForces(jointInfoArray, internalForces, matrixRow, forces);
