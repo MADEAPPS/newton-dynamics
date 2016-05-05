@@ -401,11 +401,10 @@ void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const dgGeneralVector<T
 template<class T, dgInt32 Rows, dgInt32 Columns>
 void dgGeneralMatrix<T, Rows, Columns>::SwapRows(dgInt32 i, dgInt32 j)
 {
-	dgAssert (0);
 	dgAssert(i >= 0);
 	dgAssert(j >= 0);
-	dgAssert(i < GetColCount());
-	dgAssert(j < GetColCount());
+	dgAssert(i < GetRowCount());
+	dgAssert(j < GetRowCount());
 	if (j != i) {
 		//dgGeneralMatrix<T>& me = *this;
 		dgGeneralVector<T, Columns>& A = m_rows[i];
@@ -419,7 +418,6 @@ void dgGeneralMatrix<T, Rows, Columns>::SwapRows(dgInt32 i, dgInt32 j)
 template<class T, dgInt32 Rows, dgInt32 Columns>
 void dgGeneralMatrix<T, Rows, Columns>::SwapColumns(dgInt32 i, dgInt32 j)
 {
-	dgAssert (0);
 	dgAssert(i >= 0);
 	dgAssert(j >= 0);
 	dgAssert(i < GetColCount());

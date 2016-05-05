@@ -551,15 +551,25 @@ DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 	if (i != j) {
 		dgGeneralMatrix<T, Size, Size>::SwapRows(i, j);
 		dgGeneralMatrix<T, Size, Size>::SwapColumns(i, j);
-/*
-		dgSwap(m_b[i], m_b[j]);
-		dgSwap(m_low[i], m_low[j]);
-		dgSwap(m_high[i], m_high[j]);
-		dgSwap(m_permute[i], m_permute[j]);
-		for (dgInt32 k = 0; k < 5; k++) {
-			dgSwap(m_tmp[k][i], m_tmp[k][j]);
-		}
-*/
+
+		dgSwap(b[i], b[j]);
+		dgSwap(low[i], low[j]);
+		dgSwap(high[i], high[j]);
+		dgSwap(permute[i], permute[j]);
+		//T* const r = &m_tmp[0][0];
+		//T* const x = &m_tmp[1][0];
+		//T* const delta_r = &m_tmp[2][0];
+		//T* const delta_x = &m_tmp[3][0];
+		//T* const diagonal = &m_tmp[4][0];
+		//T* const tmp = &m_tmp[5][0];
+		//for (dgInt32 k = 0; k < 5; k++) {
+		//	dgSwap(tmp[k][i], tmp[k][j]);
+		//}
+		dgSwap(r[i], r[j]);
+		dgSwap(x[i], x[j]);
+		dgSwap(delta_r[i], delta_r[j]);
+		dgSwap(delta_x[i], delta_x[j]);
+		dgSwap(diagonal[i], diagonal[j]);
 	}
 }
 
@@ -567,15 +577,14 @@ DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 template<class T, dgInt32 Size>
 DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(dgInt32 n)
 {
-dgAssert (0);
-return false;
-/*
-	dgAssert(n <= dgGeneralMatrix<T, Size>::m_rowCount);
-	dgGeneralMatrix<T, Size>& me = *this;
-	T* const rowI = &me[n][0];
+	//dgAssert(n <= dgGeneralMatrix<T, Size>::m_rowCount);
+	//dgGeneralMatrix<T, Size>& me = *this;
+	//T* const rowI = &me[n][0];
+	dgGeneralVector<T, Size>& rowI = m_rows[n];
 	for (dgInt32 j = 0; j <= n; j++) {
 		T s(0.0f);
-		T* const rowJ = &me[j][0];
+		//T* const rowJ = &me[j][0];
+		const dgGeneralVector<T, Size>& rowJ = m_rows[n];
 		for (dgInt32 k = 0; k < j; k++) {
 			s += rowI[k] * rowJ[k];
 		}
@@ -591,7 +600,6 @@ return false;
 		}
 	}
 	return true;
-*/
 }
 
 
