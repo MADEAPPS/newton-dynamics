@@ -53,11 +53,13 @@ class dgSPDMatrix: public dgSquareMatrix<T, Size>
 //	dgSPDMatrix(const dgSPDMatrix<T, Size>& src);
 
 	~dgSPDMatrix() {}
+
+	void CholeskySolve(dgGeneralVector<T, Size> &x, const dgGeneralVector<T, Size> &b, dgInt32 n) const;
 /*
 	bool TestPSD() const;
 	bool LDLtDecomposition();
 	bool CholeskyFactorization();
-	void CholeskySolve(dgGeneralVector<T, Size> &x, const dgGeneralVector<T, Size> &b) const;
+	
 
 	protected:
 	DG_INLINE bool CholeskyFactorization(dgInt32 n);
@@ -109,13 +111,17 @@ class dgLCP: public dgSPDMatrix<T, Size>
 
 	private:
 	DG_INLINE void PermuteRows(dgInt32 i, dgInt32 j);
-	DG_INLINE void CalculateDelta_x(T* const data_x, T* const tmp, T dir, dgInt32 n) const;
-	DG_INLINE void CalculateDelta_r(T* const delta_r, const T* const delta_x, dgInt32 n) const;
+	
+	
 	DG_INLINE void CholeskyRestore(T* const diagonal, dgInt32 i, dgInt32 size);
 	DG_INLINE T PartialDotProduct(const T* const a, const T* const b, dgInt32 size) const;
 	DG_INLINE void PartialMatrixTimeVector(const T* const v, T* const out, dgInt32 size) const;
 	DG_INLINE void PartialScaleAdd(T* const a, const T* const b, T scale, const T* const c, dgInt32 size) const;
 */
+	DG_INLINE void CalculateDelta_r (dgInt32 n);
+	DG_INLINE void CalculateDelta_x(T dir, dgInt32 n);
+	
+
 //	dgGeneralVector<T, Size> m_b;
 //	dgGeneralVector<T, Size> m_x;
 //	dgGeneralVector<T, Size> m_r;
@@ -201,11 +207,6 @@ bool dgSPDMatrix<T, Size>::CholeskyFactorization()
 	return CholeskyFactorization(dgGeneralMatrix<T, Size>::m_rowCount);
 }
 
-template<class T, dgInt32 Size>
-void dgSPDMatrix<T, Size>::CholeskySolve(dgGeneralVector<T, Size> &x, const dgGeneralVector<T, Size> &b) const
-{
-	CholeskySolve(&x[0], &b[0], dgGeneralMatrix<T, Size>::m_rowCount);
-}
 
 
 template<class T, dgInt32 Size>
@@ -328,35 +329,8 @@ DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 }
 
 
-// calculate delta_x = int (Acc) * unitStep 
-// unitStep  in vector [-a[c][0] * dir, -a[c][1] * dir, -a[c][2] * dir, ....-a[c][n-1] * dir]
-// on exit delta_x[n] = dir,  delta_x[n.. size] = 0.0f
-template<class T, dgInt32 Size>
-DG_INLINE void dgLCP<T, Size>::CalculateDelta_x(T* const delta_x, T* const tmp, T dir, dgInt32 n) const
-{
-	const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
-	const dgSPDMatrix<T, Size>& me = *this;
-	for (dgInt32 i = 0; i < n; i++) {
-		tmp[i] = -me[n][i] * dir;
-	}
-	CholeskySolve(delta_x, tmp, n);
-	delta_x[n] = dir;
-	for (dgInt32 i = n + 1; i < size; i++) {
-		delta_x[i] = T(0.0f);
-	}
-}
 
 
-// calculate delta_r = A * delta_x
-template<class T, dgInt32 Size>
-DG_INLINE void dgLCP<T, Size>::CalculateDelta_r(T* const delta_r, const T* const delta_x, dgInt32 n) const
-{
-	const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
-	const dgSPDMatrix<T, Size>& me = *this;
-	for (dgInt32 i = n; i < size; i++) {
-		delta_r[i] = me[i].DotProduct(delta_x);
-	}
-}
 
 
 template<class T, dgInt32 Size>
@@ -630,11 +604,69 @@ m_x.Copy(gauss.GetX());
 
 #endif
 
+template<class T, dgInt32 Size>
+void dgSPDMatrix<T, Size>::CholeskySolve(dgGeneralVector<T, Size>& x, const dgGeneralVector<T, Size> &b, dgInt32 n) const
+{
+//	CholeskySolve(&x[0], &b[0], dgGeneralMatrix<T, Size>::m_rowCount);
+//	const dgGeneralMatrix<T, Size>& me = *this;
+	for (dgInt32 i = 0; i < n; i++) {
+		T acc = 0.0f;
+		const T* const row = &m_rows[i][0];
+		for (dgInt32 j = 0; j < i; j++) {
+			acc = acc + row[j] * x[j];
+		}
+		x[i] = (b[i] - acc) / row[i];
+	}
+
+	for (dgInt32 i = n - 1; i >= 0; i--) {
+		T acc = 0.0f;
+		for (dgInt32 j = i + 1; j < n; j++) {
+			acc = acc + m_rows[j][i] * x[j];
+		}
+		x[i] = (x[i] - acc) / m_rows[i][i];
+	}
+}
+
+
+
+// calculate delta_r = A * delta_x
+template<class T, dgInt32 Size>
+DG_INLINE void dgLCP<T, Size>::CalculateDelta_r(dgInt32 n)
+{
+//	const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
+//	const dgSPDMatrix<T, Size>& me = *this;
+	for (dgInt32 i = n; i < Size; i++) {
+		delta_r[i] = m_rows[i].DotProduct(delta_x);
+	}
+}
+
+
+// calculate delta_x = int (Acc) * unitStep 
+// unitStep  in vector [-a[c][0] * dir, -a[c][1] * dir, -a[c][2] * dir, ....-a[c][n-1] * dir]
+// on exit delta_x[n] = dir,  delta_x[n.. size] = 0.0f
+template<class T, dgInt32 Size>
+//DG_INLINE void dgLCP<T, Size>::CalculateDelta_x(T* const delta_x, T* const tmp, T dir, dgInt32 n) const
+DG_INLINE void dgLCP<T, Size>::CalculateDelta_x(T dir, dgInt32 n)
+{
+//	const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
+//	const dgSPDMatrix<T, Size>& me = *this;
+	const dgGeneralVector<T, Size>& row = m_rows[n];
+	for (dgInt32 i = 0; i < n; i++) {
+		//tmp[i] = -me[n][i] * dir;
+		tmp[i] = -row[i] * dir;
+	}
+	CholeskySolve(delta_x, tmp, n);
+	delta_x[n] = dir;
+	for (dgInt32 i = n + 1; i < Size; i++) {
+		delta_x[i] = T(0.0f);
+	}
+}
+
 
 template<class T, dgInt32 Size>
 bool dgLCP<T, Size>::SolveDantzig()
 {
-	dgSPDMatrix<T, Size>& me = *this;
+	//dgSPDMatrix<T, Size>& me = *this;
 	//const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
 
 	//static int xxx;
@@ -660,7 +692,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 	for (dgInt32 i = 0; i < Size; i++) {
 		x[i] = dgClamp(x_out[i], low[i], high[i]);
 		permute[i] = dgInt16(i);
-		diagonal[i] = me[i][i];
+		diagonal[i] = m_rows[i][i];
 	}
 
 	MatrixTimeVector(x, r);
@@ -682,21 +714,21 @@ bool dgLCP<T, Size>::SolveDantzig()
 			T clamp_x(0.0f);
 			dgInt32 swapIndex = -1;
 
-dgAssert (0);
-/*
 			if (T(fabs(r[index]) > T(1.0e-12f))) {
 				if (calculateDelta_x) {
 					dir = (r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
-					CalculateDelta_x(delta_x, tmp, dir, index);
+					CalculateDelta_x(dir, index);
 				}
 				calculateDelta_x = true;
-				CalculateDelta_r(delta_r, delta_x, index);
-
+				CalculateDelta_r(index);
 				dgAssert(delta_r[index] != T(0.0f));
 				dgAssert(T(fabs(delta_x[index])) == T(1.0f));
 
 				T s = -r[index] / delta_r[index];
 				dgAssert(s >= T(0.0f));
+
+dgAssert (0);
+/*
 				for (dgInt32 i = 0; i <= index; i++) {
 					T x1 = x[i] + s * delta_x[i];
 					if (x1 > high[i]) {
@@ -735,8 +767,11 @@ dgAssert (0);
 						dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
 					}
 				}
+*/			
 			}
 
+dgAssert (0);
+/*
 			if (swapIndex == -1) {
 				r[index] = T(0.0f);
 				delta_r[index] = T(0.0f);
