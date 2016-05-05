@@ -47,10 +47,13 @@ class dgGeneralMatrix
 	dgGeneralVector<T, Columns>& operator[] (dgInt32 i);
 	const dgGeneralVector<T, Columns>& operator[] (dgInt32 i) const;
 
-/*
-	dgInt32 GetRowCount() const;
-	dgInt32 GetColCount() const;
+	// calculate out = A * v;
+	void MatrixTimeVector(const dgGeneralVector<T, Columns> &v, dgGeneralVector<T, Columns> &out) const;
 
+	dgInt32 GetRowCount() const {return Rows;}
+	dgInt32 GetColCount() const {return Columns;}
+
+/*
 	void Clear(T val);
 	void Identity();
 
@@ -60,8 +63,6 @@ class dgGeneralMatrix
 	// calculate out = v * A;
 	void VectorTimeMatrix(const dgGeneralVector<T, Rows> &v, dgGeneralVector<T, Rows> &out) const;
 
-	// calculate out = A * v;
-	void MatrixTimeVector(const dgGeneralVector<T, Columns> &v, dgGeneralVector<T, Columns> &out) const;
 
 	// calculate M = A * B;
 	void MatrixTimeMatrix(const dgGeneralMatrix<T, Rows, Columns>& A, const dgGeneralMatrix<T, Rows, Columns>& B);
@@ -162,18 +163,6 @@ void dgGeneralMatrix<T, Rows, Columns>::operator delete (void* const ptr)
 }
 */
 
-template<class T, dgInt32 Rows, dgInt32 Columns>
-dgInt32 dgGeneralMatrix<T, Rows, Columns>::GetRowCount() const
-{
-     return Rows;
-}
-
-template<class T, dgInt32 Rows, dgInt32 Columns>
-dgInt32 dgGeneralMatrix<T, Rows, Columns>::GetColCount() const
-{
-     return Columns;
-}
-
 
 template<class T, dgInt32 Rows, dgInt32 Columns>
 void dgGeneralMatrix<T, Rows, Columns>::Trace() const
@@ -228,15 +217,6 @@ void dgGeneralMatrix<T, Rows, Columns>::VectorTimeMatrix(const T* const v, T* co
 }
 
 
-template<class T, dgInt32 Rows, dgInt32 Columns>
-void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const dgGeneralVector<T, Columns> &v, dgGeneralVector<T, Columns> &out) const
-{
-	dgAssert (0);
-    dgAssert(&v != &out);
-    dgAssert(GetRowCount() == out.GetRowCount());
-    dgAssert(GetColCount() == v.GetRowCount());
-	MatrixTimeVector (&v[0], &out[0]);
-}
 
 template<class T, dgInt32 Rows, dgInt32 Columns>
 DG_INLINE void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const T* const v, T* const out) const
@@ -430,6 +410,17 @@ const dgGeneralVector<T, Columns>& dgGeneralMatrix<T, Rows, Columns>::operator[]
      dgAssert(i < Rows);
      dgAssert(i >= 0);
      return m_rows[i];
+}
+
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const dgGeneralVector<T, Columns> &v, dgGeneralVector<T, Columns> &out) const
+{
+    dgAssert(&v != &out);
+	dgAssert(GetRowCount() == v.GetRowCount());
+	dgAssert(GetColCount() == out.GetRowCount());
+	for (dgInt32 i = 0; i < Rows; i++) {
+		out[i] = m_rows[i].DotProduct(v);
+	}
 }
 
 

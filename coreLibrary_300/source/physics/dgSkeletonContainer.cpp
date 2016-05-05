@@ -863,9 +863,9 @@ void dgSkeletonContainer::XXXX()
 	High[1] = 10.0f;
 
 //	dgAssert (0);
-/*
-	xxx.SolveDantzig();
 
+//	xxx.SolveDantzig();
+/*
 	const dgGeneralVector<dgFloat32>& R = xxx.GetR();
 	const dgGeneralVector<dgFloat32>& X1 = xxx.GetX();
 */

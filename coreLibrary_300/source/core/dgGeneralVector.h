@@ -48,11 +48,13 @@ class dgGeneralVector
 	T& operator[] (dgInt32 i);
 	const T& operator[] (dgInt32 i) const;
 
+	T DotProduct(const dgGeneralVector &b) const;
+	dgInt32 GetRowCount() const {return Size;}
 /*
 	void operator += (const dgGeneralVector &a);
 	void operator -= (const dgGeneralVector &a);
 
-	dgInt32 GetRowCount() const;
+	
 
 	T Norm() const;
 	T Norm2() const;
@@ -60,7 +62,7 @@ class dgGeneralVector
 	void Clear(T val);
 	void Scale(T scale);
 	void Copy(const dgGeneralVector &src);
-	T DotProduct(const dgGeneralVector &b) const;
+	
 	void LinearCombine(T scale, const dgGeneralVector &a, const dgGeneralVector &b);
 
 	void Trace() const;
@@ -131,20 +133,8 @@ void dgGeneralVector<T, Size>::Trace() const
 }
 
 
-template<class T, dgInt32 Size>
-dgInt32 dgGeneralVector<T, Size>::GetRowCount() const
-{
-	return m_colCount;
-}
 
 
-// return dot product
-template<class T, dgInt32 Size>
-T dgGeneralVector<T, Size>::DotProduct(const dgGeneralVector<T, Size> &A) const
-{
-	dgAssert(m_colCount == A.m_colCount);
-	return DotProduct(&A[0]);
-}
 
 template<class T, dgInt32 Size>
 DG_INLINE T dgGeneralVector<T, Size>::DotProduct (const T* const A) const
@@ -286,6 +276,17 @@ const T& dgGeneralVector<T, Size>::operator[] (dgInt32 i) const
 	return m_columns[i];
 }
 
+// return dot product
+template<class T, dgInt32 Size>
+T dgGeneralVector<T, Size>::DotProduct(const dgGeneralVector<T, Size> &b) const
+{
+	T val(0.0f);
+	dgAssert (Size == b.GetRowCount());
+	for (dgInt32 i = 0; i < Size; i++) {
+		val = val + m_columns[i] * b.m_columns[i];
+	}
+	return val;
+}
 
 
 
