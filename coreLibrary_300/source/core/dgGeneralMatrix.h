@@ -38,12 +38,6 @@ class dgGeneralMatrix
 
 	~dgGeneralMatrix() {}
 
-
-//	void* operator new (size_t size);
-//	void operator delete (void* const ptr);
-//	void* operator new (size_t size, dgMemoryAllocator* const allocator);
-//	void operator delete (void* const ptr, dgMemoryAllocator* const allocator);
-
 	dgGeneralVector<T, Columns>& operator[] (dgInt32 i);
 	const dgGeneralVector<T, Columns>& operator[] (dgInt32 i) const;
 
@@ -59,11 +53,9 @@ class dgGeneralMatrix
 /*
 	void Clear(T val);
 	void Identity();
-
 	
 	// calculate out = v * A;
 	void VectorTimeMatrix(const dgGeneralVector<T, Rows> &v, dgGeneralVector<T, Rows> &out) const;
-
 
 	// calculate M = A * B;
 	void MatrixTimeMatrix(const dgGeneralMatrix<T, Rows, Columns>& A, const dgGeneralMatrix<T, Rows, Columns>& B);
@@ -110,21 +102,6 @@ class dgSquareMatrix: public dgGeneralMatrix<T, Size, Size>
 //   LinearSystem
 //
 // ***********************************************************************************************
-/*
-template<class T, dgInt32 Size>
-dgGeneralMatrix<T, Rows, Columns>::dgGeneralMatrix(dgMemoryAllocator* const allocator, dgInt32 row, dgInt32 column)
-	:m_rows ((dgGeneralVector<T>**) allocator->MallocLow(row * sizeof (dgGeneralVector<T>*)))
-	,m_allocator(allocator)
-	,m_rowCount(row)
-{
-     dgAssert(row > 0);
-     dgAssert(column > 0);
-     for (dgInt32 i = 0; i < row; i++) {
-           m_rows[i] = new (m_allocator) dgGeneralVector<T>(allocator, column);
-     }
-}
-*/
-
 template<class T, dgInt32 Rows, dgInt32 Columns>
 dgGeneralMatrix<T, Rows, Columns>::dgGeneralMatrix(const dgGeneralMatrix<T, Rows, Columns>& src)
 {
@@ -292,13 +269,6 @@ dgSquareMatrix<T, Size>::dgSquareMatrix(const dgGeneralMatrix<T, Size, Size>& sr
 {
 }
 
-/*
-template<class T, dgInt32 Size>
-dgSquareMatrix<T, dgInt32 Size>::dgSquareMatrix(dgMemoryAllocator* const allocator, dgInt32 size)
-	:dgGeneralMatrix<T>(allocator, size, size)
-{
-}
-*/
 
 template<class T, dgInt32 Size>
 dgSquareMatrix<T, Size>::~dgSquareMatrix()

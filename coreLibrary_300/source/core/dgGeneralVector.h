@@ -40,11 +40,6 @@ class dgGeneralVector
 
 	~dgGeneralVector() {}
 
-//	void* operator new (size_t size); 
-//	void operator delete (void* const ptr); 
-//	void* operator new (size_t size, dgMemoryAllocator* const allocator); 
-//	void operator delete (void* const ptr, dgMemoryAllocator* const allocator); 
-
 	T& operator[] (dgInt32 i);
 	const T& operator[] (dgInt32 i) const;
 
@@ -53,8 +48,6 @@ class dgGeneralVector
 /*
 	void operator += (const dgGeneralVector &a);
 	void operator -= (const dgGeneralVector &a);
-
-	
 
 	T Norm() const;
 	T Norm2() const;
@@ -122,7 +115,6 @@ dgGeneralVector<T, Size>::dgGeneralVector(const dgGeneralVector<T, Size> &src)
 	Copy(src);
 }
 
-
 template<class T, dgInt32 Size>
 void dgGeneralVector<T, Size>::Trace() const
 {
@@ -131,10 +123,6 @@ void dgGeneralVector<T, Size>::Trace() const
 	}
 	dgTrace(("\n"));
 }
-
-
-
-
 
 template<class T, dgInt32 Size>
 DG_INLINE T dgGeneralVector<T, Size>::DotProduct (const T* const A) const
@@ -185,7 +173,6 @@ T dgGeneralVector<T, Size>::Norm() const
 	return T(sqrt(Norm2()));
 }
 
-
 template<class T, dgInt32 Size>
 void dgGeneralVector<T, Size>::LinearCombine(T scale, const dgGeneralVector<T, Size> &A, const dgGeneralVector<T, Size> &B)
 {
@@ -195,7 +182,6 @@ void dgGeneralVector<T, Size>::LinearCombine(T scale, const dgGeneralVector<T, S
 		m_columns[i] = A.m_columns[i] * scale + B.m_columns[i];
 	}
 }
-
 
 template<class T, dgInt32 Size>
 void dgGeneralVector<T, Size>::operator+= (const dgGeneralVector<T, Size> &A)
@@ -287,8 +273,6 @@ T dgGeneralVector<T, Size>::DotProduct(const dgGeneralVector<T, Size> &b) const
 	}
 	return val;
 }
-
-
 
 #endif
 

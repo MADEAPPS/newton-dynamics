@@ -209,10 +209,6 @@ bool dgSPDMatrix<T, Size>::CholeskyFactorization()
 	return CholeskyFactorization(dgGeneralMatrix<T, Size>::m_rowCount);
 }
 
-
-
-
-
 // calculate Cholesky factorization of the n first rows
 template<class T, dgInt32 Size>
 DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorization(dgInt32 n)
@@ -248,8 +244,6 @@ DG_INLINE void dgSPDMatrix<T, Size>::CholeskySolve(T* const x, const T* const b,
 	}
 }
 
-
-
 template<class T, dgInt32 Size>
 dgLCP<T, Size>::dgLCP(const dgLCP& src)
 	:dgSPDMatrix<T, Size>(src)
@@ -268,9 +262,6 @@ dgLCP<T, Size>::dgLCP(const dgLCP& src)
 //	}
 }
 
-
-
-
 template<class T, dgInt32 Size>
 dgLCP<T, Size>::~dgLCP()
 {
@@ -283,9 +274,6 @@ dgLCP<T, Size>::~dgLCP()
 	dgGeneralMatrix<T, Size>::m_allocator->FreeLow(m_permute);
 */
 }
-
-
-
 
 template<class T, dgInt32 Size>
 DG_INLINE T dgLCP<T, Size>::PartialDotProduct(const T* const a, const T* const b, dgInt32 size) const
@@ -313,8 +301,6 @@ DG_INLINE void dgLCP<T, Size>::PartialMatrixTimeVector(const T* const v, T* cons
 		out[i] = PartialDotProduct(&me[i][0], v, size);
 	}
 }
-
-
 
 template<class T, dgInt32 Size>
 bool dgLCP<T, Size>::GaussSeidelLCP(dgInt32 maxIterCount, T tol)
@@ -577,13 +563,9 @@ DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 template<class T, dgInt32 Size>
 DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(dgInt32 n)
 {
-	//dgAssert(n <= dgGeneralMatrix<T, Size>::m_rowCount);
-	//dgGeneralMatrix<T, Size>& me = *this;
-	//T* const rowI = &me[n][0];
 	dgGeneralVector<T, Size>& rowI = m_rows[n];
 	for (dgInt32 j = 0; j <= n; j++) {
 		T s(0.0f);
-		//T* const rowJ = &me[j][0];
 		const dgGeneralVector<T, Size>& rowJ = m_rows[n];
 		for (dgInt32 k = 0; k < j; k++) {
 			s += rowI[k] * rowJ[k];
@@ -601,7 +583,6 @@ DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(dgInt32 n)
 	}
 	return true;
 }
-
 
 template<class T, dgInt32 Size>
 DG_INLINE void dgLCP<T, Size>::CholeskyRestore(dgInt32 n, dgInt32 size)
@@ -622,11 +603,8 @@ DG_INLINE void dgLCP<T, Size>::CholeskyRestore(dgInt32 n, dgInt32 size)
 template<class T, dgInt32 Size>
 void dgSPDMatrix<T, Size>::CholeskySolve(dgGeneralVector<T, Size>& x, const dgGeneralVector<T, Size> &b, dgInt32 n) const
 {
-//	CholeskySolve(&x[0], &b[0], dgGeneralMatrix<T, Size>::m_rowCount);
-//	const dgGeneralMatrix<T, Size>& me = *this;
 	for (dgInt32 i = 0; i < n; i++) {
-		T acc = 0.0f;
-		//const T* const row = &m_rows[i][0];
+		T acc (0.0f);
 		const dgGeneralVector<T, Size>& row = m_rows[i];
 		for (dgInt32 j = 0; j < i; j++) {
 			acc = acc + row[j] * x[j];
@@ -644,13 +622,10 @@ void dgSPDMatrix<T, Size>::CholeskySolve(dgGeneralVector<T, Size>& x, const dgGe
 }
 
 
-
 // calculate delta_r = A * delta_x
 template<class T, dgInt32 Size>
 DG_INLINE void dgLCP<T, Size>::CalculateDelta_r(dgInt32 n)
 {
-//	const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
-//	const dgSPDMatrix<T, Size>& me = *this;
 	for (dgInt32 i = n; i < Size; i++) {
 		delta_r[i] = m_rows[i].DotProduct(delta_x);
 	}
@@ -661,14 +636,10 @@ DG_INLINE void dgLCP<T, Size>::CalculateDelta_r(dgInt32 n)
 // unitStep  in vector [-a[c][0] * dir, -a[c][1] * dir, -a[c][2] * dir, ....-a[c][n-1] * dir]
 // on exit delta_x[n] = dir,  delta_x[n.. size] = 0.0f
 template<class T, dgInt32 Size>
-//DG_INLINE void dgLCP<T, Size>::CalculateDelta_x(T* const delta_x, T* const tmp, T dir, dgInt32 n) const
 DG_INLINE void dgLCP<T, Size>::CalculateDelta_x(T dir, dgInt32 n)
 {
-//	const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
-//	const dgSPDMatrix<T, Size>& me = *this;
 	const dgGeneralVector<T, Size>& row = m_rows[n];
 	for (dgInt32 i = 0; i < n; i++) {
-		//tmp[i] = -me[n][i] * dir;
 		tmp[i] = -row[i] * dir;
 	}
 	CholeskySolve(delta_x, tmp, n);
@@ -856,7 +827,5 @@ bool dgLCP<T, Size>::SolveDantzig()
 
 	return true;
 }
-
-
 
 #endif
