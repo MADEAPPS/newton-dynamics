@@ -590,9 +590,9 @@ DG_INLINE void dgLCP<T, Size>::CholeskyRestore(dgInt32 n, dgInt32 size)
 //	dgGeneralMatrix<T, Size>& me = *this;
 	dgAssert (0);
 	for (dgInt32 i = n; i < size; i++) {
-		m_rows[i][i] = diagonal[i];
 		//T* const row = &me[i][0];
 		dgGeneralVector<T, Size>& row = m_rows[i];
+		row[i] = diagonal[i];
 		for (dgInt32 j = 0; j < i; j++) {
 			row[j] = m_rows[j][i];
 		}
