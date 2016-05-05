@@ -834,22 +834,25 @@ void dgSkeletonContainer::SoveNormal (dgJointInfo* const jointInfoArray, const d
 	SolveFoward(force);
 	SolveBackward(force);
 	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
+
+XXXX();
 }
 
 
 void dgSkeletonContainer::XXXX()
 {
-	dgLCP<dgFloat32> xxx(m_world->GetAllocator(), 2);
+	dgLCP<dgFloat32, 2> xxx;
 
-	dgGeneralVector<dgFloat32>& B = xxx.GetB();
-	dgGeneralVector<dgFloat32>& X = xxx.GetX();
-	dgGeneralVector<dgFloat32>& Low = xxx.GetLowLimit();
-	dgGeneralVector<dgFloat32>& High = xxx.GetHightLimit();
+	dgGeneralVector<dgFloat32, 2>& B = xxx.GetB();
+	dgGeneralVector<dgFloat32, 2>& X = xxx.GetX();
+	dgGeneralVector<dgFloat32, 2>& Low = xxx.GetLowLimit();
+	dgGeneralVector<dgFloat32, 2>& High = xxx.GetHightLimit();
 
 	xxx[0][0] = 2.0f;
 	xxx[0][1] = 1.0f;
 	xxx[1][1] = 2.0f;
 	xxx[1][0] = 1.0f;
+
 	B[0] = 10.0f;
 	B[1] = 10.0f;
 	X[0] = 20.0f;
@@ -858,10 +861,14 @@ void dgSkeletonContainer::XXXX()
 	Low[1] = -10.0f;
 	High[0] = 1.0f;
 	High[1] = 10.0f;
+
+//	dgAssert (0);
+/*
 	xxx.SolveDantzig();
 
 	const dgGeneralVector<dgFloat32>& R = xxx.GetR();
 	const dgGeneralVector<dgFloat32>& X1 = xxx.GetX();
+*/
 }
 
 
@@ -902,7 +909,7 @@ void dgSkeletonContainer::FindFirstVariablesSet(dgJointInfo* const jointInfoArra
 
 void dgSkeletonContainer::SoveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const forces)
 {
-//	XXXX();
+	XXXX();
 
 	EnumerateRowsAndInitForces(jointInfoArray, forces); 
 

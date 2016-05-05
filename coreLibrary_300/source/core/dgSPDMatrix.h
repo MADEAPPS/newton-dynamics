@@ -45,23 +45,25 @@ class dgSymmetricBiconjugateGradientSolve
 };
 
 
-template<class T>
-class dgSPDMatrix: public dgSquareMatrix<T>
+template<class T, dgInt32 Size>
+class dgSPDMatrix: public dgSquareMatrix<T, Size>
 {
 	public:
-	dgSPDMatrix(const dgSPDMatrix<T>& src);
-	dgSPDMatrix(dgMemoryAllocator* const allocator, dgInt32 size);
-	~dgSPDMatrix();
+	dgSPDMatrix() {}
+//	dgSPDMatrix(const dgSPDMatrix<T, Size>& src);
 
+	~dgSPDMatrix() {}
+/*
 	bool TestPSD() const;
 	bool LDLtDecomposition();
 	bool CholeskyFactorization();
-	void CholeskySolve(dgGeneralVector<T> &x, const dgGeneralVector<T> &b) const;
+	void CholeskySolve(dgGeneralVector<T, Size> &x, const dgGeneralVector<T, Size> &b) const;
 
 	protected:
 	DG_INLINE bool CholeskyFactorization(dgInt32 n);
 	DG_INLINE bool CholeskyFactorizationAddRow(dgInt32 n);
 	DG_INLINE void CholeskySolve(T* const x, const T* const b, dgInt32 n) const;
+*/
 };
 
 
@@ -71,21 +73,21 @@ class dgSPDMatrix: public dgSquareMatrix<T>
 // x(i) = low(i),  if r(i) >= 0  
 // x(i) = high(i), if r(i) <= 0  
 // low(i) <= x(i) <= high(i),  if r(i) == 0  
-template<class T>
-class dgLCP: public dgSPDMatrix<T>
+template<class T, dgInt32 Size>
+class dgLCP: public dgSPDMatrix<T, Size>
 {
 	public:
-	dgLCP(const dgLCP& src);
-	dgLCP(dgMemoryAllocator* const allocator, dgInt32 size);
-	~dgLCP();
+	dgLCP() {}
+//	dgLCP(const dgLCP& src);
 
-	dgGeneralVector<T>& GetB() { return m_b; }
-	dgGeneralVector<T>& GetX() { return m_x; }
-	dgGeneralVector<T>& GetLowLimit() { return m_low; }
-	dgGeneralVector<T>& GetHightLimit() { return m_high; }
+	~dgLCP() {}
 
-	const dgGeneralVector<T>& GetR() { return m_r; }	
-
+	dgGeneralVector<T, Size>& GetB() { return m_b;}
+	dgGeneralVector<T, Size>& GetX() { return m_x;}
+	dgGeneralVector<T, Size>& GetLowLimit() { return m_low;}
+	dgGeneralVector<T, Size>& GetHightLimit() { return m_high;}
+	const dgGeneralVector<T, Size>& GetR() { return m_r;}	
+/*
 	// Using George B. Dantzig algorithm.  
 	// Inspired from David Baraff interpretation of George B. Dantzig algorithm in his paper. 
 	// Fast Contact Force Computation for non penetrating Rigid Bodies, http://www.cs.cmu.edu/~baraff/papers/sig94.pdf
@@ -102,7 +104,7 @@ class dgLCP: public dgSPDMatrix<T>
 
 	static dgInt32 CalculateMemorySize(dgInt32 size)
 	{
-		return dgSPDMatrix<T>::CalculateMemorySize(size) + 5 * dgGeneralVector<T>::CalculateMemorySize(size) + 6 * (size * sizeof (T)+sizeof (dgVector));
+		return dgSPDMatrix<T, Size>::CalculateMemorySize(size) + 5 * dgGeneralVector<T, Size>::CalculateMemorySize(size) + 6 * (size * sizeof (T)+sizeof (dgVector));
 	}
 
 	private:
@@ -113,57 +115,55 @@ class dgLCP: public dgSPDMatrix<T>
 	DG_INLINE T PartialDotProduct(const T* const a, const T* const b, dgInt32 size) const;
 	DG_INLINE void PartialMatrixTimeVector(const T* const v, T* const out, dgInt32 size) const;
 	DG_INLINE void PartialScaleAdd(T* const a, const T* const b, T scale, const T* const c, dgInt32 size) const;
-
-	dgGeneralVector<T> m_b;
-	dgGeneralVector<T> m_x;
-	dgGeneralVector<T> m_r;
-	dgGeneralVector<T> m_low;
-	dgGeneralVector<T> m_high;
-	T* m_tmp[6];
-	dgInt16* m_permute;
+*/
+	dgGeneralVector<T, Size> m_b;
+	dgGeneralVector<T, Size> m_x;
+	dgGeneralVector<T, Size> m_r;
+	dgGeneralVector<T, Size> m_low;
+	dgGeneralVector<T, Size> m_high;
+//	T* m_tmp[6];
+//	dgInt16 m_permute[Size];
 };
 
 
+#if 0
 // ***********************************************************************************************
 //
 //   LinearSystem
 //
 // ***********************************************************************************************
-template<class T>
-dgSPDMatrix<T>::dgSPDMatrix(dgMemoryAllocator* const allocator, dgInt32 size)
-	:dgSquareMatrix<T>(allocator, size)
+/*
+template<class T, dgInt32 Size>
+dgSPDMatrix<T, Size>::dgSPDMatrix(dgMemoryAllocator* const allocator, dgInt32 size)
+	:dgSquareMatrix<T, Size>(allocator, size)
+{
+}
+*/
+
+
+
+template<class T, dgInt32 Size>
+dgSPDMatrix<T, Size>::~dgSPDMatrix()
 {
 }
 
-template<class T>
-dgSPDMatrix<T>::dgSPDMatrix(const dgSPDMatrix<T>& src)
-	:dgSquareMatrix<T>(src)
+template<class T, dgInt32 Size>
+bool dgSPDMatrix<T, Size>::TestPSD() const
 {
-}
-
-
-template<class T>
-dgSPDMatrix<T>::~dgSPDMatrix()
-{
-}
-
-template<class T>
-bool dgSPDMatrix<T>::TestPSD() const
-{
-	dgSPDMatrix<T> tmp(*this);
+	dgSPDMatrix<T, Size> tmp(*this);
 	return tmp.CholeskyDecomposition();
 }
 
 
-template<class T>
-bool dgSPDMatrix<T>::LDLtDecomposition()
+template<class T, dgInt32 Size>
+bool dgSPDMatrix<T, Size>::LDLtDecomposition()
 {
-	for (dgInt32 j = 0; j < dgGeneralMatrix<T>::m_rowCount; j++) {
-		T* const rowJ = &dgGeneralMatrix<T>::m_rows[j].m_columns[0];
+	for (dgInt32 j = 0; j < dgGeneralMatrix<T, Size>::m_rowCount; j++) {
+		T* const rowJ = &dgGeneralMatrix<T, Size>::m_rows[j].m_columns[0];
 		for (dgInt32 k = 0; k < j; k++) {
-			T* const rowK = &dgGeneralMatrix<T>::m_rows[k].m_columns[0];
+			T* const rowK = &dgGeneralMatrix<T, Size>::m_rows[k].m_columns[0];
 			T factor = rowK[j];
-			for (dgInt32 i = j; i < dgGeneralMatrix<T>::m_rowCount; i++) {
+			for (dgInt32 i = j; i < dgGeneralMatrix<T, Size>::m_rowCount; i++) {
 				rowJ[i] -= rowK[i] * factor;
 			}
 		}
@@ -175,7 +175,7 @@ bool dgSPDMatrix<T>::LDLtDecomposition()
 
 		rowJ[j] = T(sqrt(factor));
 		factor = T(1.0f / rowJ[j]);
-		for (dgInt32 k = j + 1; k < dgGeneralMatrix<T>::m_rowCount; k++) {
+		for (dgInt32 k = j + 1; k < dgGeneralMatrix<T, Size>::m_rowCount; k++) {
 			rowJ[k] *= factor;
 		}
 	}
@@ -183,24 +183,27 @@ bool dgSPDMatrix<T>::LDLtDecomposition()
 }
 
 
-template<class T>
-bool dgSPDMatrix<T>::CholeskyFactorization()
+template<class T, dgInt32 Size>
+bool dgSPDMatrix<T, Size>::CholeskyFactorization()
 {
-	return CholeskyFactorization(dgGeneralMatrix<T>::m_rowCount);
+	return CholeskyFactorization(dgGeneralMatrix<T, Size>::m_rowCount);
 }
 
-template<class T>
-void dgSPDMatrix<T>::CholeskySolve(dgGeneralVector<T> &x, const dgGeneralVector<T> &b) const
+template<class T, dgInt32 Size>
+void dgSPDMatrix<T, Size>::CholeskySolve(dgGeneralVector<T, Size> &x, const dgGeneralVector<T, Size> &b) const
 {
-	CholeskySolve(&x[0], &b[0], dgGeneralMatrix<T>::m_rowCount);
+	CholeskySolve(&x[0], &b[0], dgGeneralMatrix<T, Size>::m_rowCount);
 }
 
 
-template<class T>
-DG_INLINE bool dgSPDMatrix<T>::CholeskyFactorizationAddRow(dgInt32 n)
+template<class T, dgInt32 Size>
+DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(dgInt32 n)
 {
-	dgAssert(n <= dgGeneralMatrix<T>::m_rowCount);
-	dgGeneralMatrix<T>& me = *this;
+dgAssert (0);
+return false;
+/*
+	dgAssert(n <= dgGeneralMatrix<T, Size>::m_rowCount);
+	dgGeneralMatrix<T, Size>& me = *this;
 	T* const rowI = &me[n][0];
 	for (dgInt32 j = 0; j <= n; j++) {
 		T s(0.0f);
@@ -220,12 +223,13 @@ DG_INLINE bool dgSPDMatrix<T>::CholeskyFactorizationAddRow(dgInt32 n)
 		}
 	}
 	return true;
+*/
 }
 
 
 // calculate Cholesky factorization of the n first rows
-template<class T>
-DG_INLINE bool dgSPDMatrix<T>::CholeskyFactorization(dgInt32 n)
+template<class T, dgInt32 Size>
+DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorization(dgInt32 n)
 {
 	bool passed = true;
 	for (dgInt32 i = 0; passed && (i < n); i++) {
@@ -236,10 +240,10 @@ DG_INLINE bool dgSPDMatrix<T>::CholeskyFactorization(dgInt32 n)
 
 
 // calculate x = inv (A) * b 
-template<class T>
-DG_INLINE void dgSPDMatrix<T>::CholeskySolve(T* const x, const T* const b, dgInt32 n) const
+template<class T, dgInt32 Size>
+DG_INLINE void dgSPDMatrix<T, Size>::CholeskySolve(T* const x, const T* const b, dgInt32 n) const
 {
-	const dgGeneralMatrix<T>& me = *this;
+	const dgGeneralMatrix<T, Size>& me = *this;
 	for (dgInt32 i = 0; i < n; i++) {
 		T acc = 0.0f;
 		const T* const row = &me[i][0];
@@ -260,55 +264,47 @@ DG_INLINE void dgSPDMatrix<T>::CholeskySolve(T* const x, const T* const b, dgInt
 
 
 
-template<class T>
-dgLCP<T>::dgLCP(const dgLCP& src)
-	:dgSPDMatrix<T>(src)
+template<class T, dgInt32 Size>
+dgLCP<T, Size>::dgLCP(const dgLCP& src)
+	:dgSPDMatrix<T, Size>(src)
 	,m_b(src.m_b)
 	,m_x(src.m_x)
 	,m_r(src.m_r)
 	,m_low(src.m_low)
 	,m_high(src.m_high)
-	,m_permute((dgInt16*)dgGeneralMatrix<T>::m_allocator->MallocLow(src.m_rowCount * sizeof (dgInt16)))
+//	,m_permute((dgInt16*)dgGeneralMatrix<T, Size>::m_allocator->MallocLow(src.m_rowCount * sizeof (dgInt16)))
 {
-	dgInt32 n = dgInt32(sizeof(m_tmp) / sizeof (m_tmp[0]));
-	for (dgInt32 i = 0; i < n; i++) {
-		m_tmp[i] = (T*)dgGeneralMatrix<T>::m_allocator->MallocLow(src.m_rowCount * sizeof (T));
-	}
+	dgAssert (0);
+	memcpy (m_permute, src.m_permute, sizeof (m_permute)); 
+//	dgInt32 n = dgInt32(sizeof(m_tmp) / sizeof (m_tmp[0]));
+//	for (dgInt32 i = 0; i < n; i++) {
+//		m_tmp[i] = (T*)dgGeneralMatrix<T, Size>::m_allocator->MallocLow(src.m_rowCount * sizeof (T));
+//	}
 }
 
-template<class T>
-dgLCP<T>::dgLCP(dgMemoryAllocator* const allocator, dgInt32 size)
-	:dgSPDMatrix<T>(allocator, size)
-	,m_b(allocator, size)
-	,m_x(allocator, size)
-	,m_r(allocator, size)
-	,m_low(allocator, size)
-	,m_high(allocator, size)
-	,m_permute((dgInt16*)dgGeneralMatrix<T>::m_allocator->MallocLow(size * sizeof (dgInt16)))
-{
-	dgInt32 n = dgInt32(sizeof(m_tmp) / sizeof (m_tmp[0]));
-	for (dgInt32 i = 0; i < n; i++) {
-		m_tmp[i] = (T*)dgGeneralMatrix<T>::m_allocator->MallocLow(size * sizeof (T));
-	}
-}
 
-template<class T>
-dgLCP<T>::~dgLCP()
+
+
+template<class T, dgInt32 Size>
+dgLCP<T, Size>::~dgLCP()
 {
+	dgAsser (0);
+/*
 	dgInt32 n = dgInt32(sizeof(m_tmp) / sizeof (m_tmp[0]));
 	for (dgInt32 i = n - 1; i >= 0; i--) {
-		dgGeneralMatrix<T>::m_allocator->FreeLow(m_tmp[i]);
+		dgGeneralMatrix<T, Size>::m_allocator->FreeLow(m_tmp[i]);
 	}
-	dgGeneralMatrix<T>::m_allocator->FreeLow(m_permute);
+	dgGeneralMatrix<T, Size>::m_allocator->FreeLow(m_permute);
+*/
 }
 
 
-template<class T>
-DG_INLINE void dgLCP<T>::PermuteRows(dgInt32 i, dgInt32 j)
+template<class T, dgInt32 Size>
+DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 {
 	if (i != j) {
-		dgGeneralMatrix<T>::SwapRows(i, j);
-		dgGeneralMatrix<T>::SwapColumns(i, j);
+		dgGeneralMatrix<T, Size>::SwapRows(i, j);
+		dgGeneralMatrix<T, Size>::SwapColumns(i, j);
 		dgSwap(m_b[i], m_b[j]);
 		dgSwap(m_low[i], m_low[j]);
 		dgSwap(m_high[i], m_high[j]);
@@ -323,11 +319,11 @@ DG_INLINE void dgLCP<T>::PermuteRows(dgInt32 i, dgInt32 j)
 // calculate delta_x = int (Acc) * unitStep 
 // unitStep  in vector [-a[c][0] * dir, -a[c][1] * dir, -a[c][2] * dir, ....-a[c][n-1] * dir]
 // on exit delta_x[n] = dir,  delta_x[n.. size] = 0.0f
-template<class T>
-DG_INLINE void dgLCP<T>::CalculateDelta_x(T* const delta_x, T* const tmp, T dir, dgInt32 n) const
+template<class T, dgInt32 Size>
+DG_INLINE void dgLCP<T, Size>::CalculateDelta_x(T* const delta_x, T* const tmp, T dir, dgInt32 n) const
 {
-	const dgInt32 size = dgGeneralMatrix<T>::m_rowCount;
-	const dgSPDMatrix<T>& me = *this;
+	const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
+	const dgSPDMatrix<T, Size>& me = *this;
 	for (dgInt32 i = 0; i < n; i++) {
 		tmp[i] = -me[n][i] * dir;
 	}
@@ -340,21 +336,21 @@ DG_INLINE void dgLCP<T>::CalculateDelta_x(T* const delta_x, T* const tmp, T dir,
 
 
 // calculate delta_r = A * delta_x
-template<class T>
-DG_INLINE void dgLCP<T>::CalculateDelta_r(T* const delta_r, const T* const delta_x, dgInt32 n) const
+template<class T, dgInt32 Size>
+DG_INLINE void dgLCP<T, Size>::CalculateDelta_r(T* const delta_r, const T* const delta_x, dgInt32 n) const
 {
-	const dgInt32 size = dgGeneralMatrix<T>::m_rowCount;
-	const dgSPDMatrix<T>& me = *this;
+	const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
+	const dgSPDMatrix<T, Size>& me = *this;
 	for (dgInt32 i = n; i < size; i++) {
 		delta_r[i] = me[i].DotProduct(delta_x);
 	}
 }
 
 
-template<class T>
-DG_INLINE void dgLCP<T>::CholeskyRestore(T* const diagonal, dgInt32 n, dgInt32 size)
+template<class T, dgInt32 Size>
+DG_INLINE void dgLCP<T, Size>::CholeskyRestore(T* const diagonal, dgInt32 n, dgInt32 size)
 {
-	dgGeneralMatrix<T>& me = *this;
+	dgGeneralMatrix<T, Size>& me = *this;
 	for (dgInt32 i = n; i < size; i++) {
 		me[i][i] = diagonal[i];
 		T* const row = &me[i][0];
@@ -365,8 +361,8 @@ DG_INLINE void dgLCP<T>::CholeskyRestore(T* const diagonal, dgInt32 n, dgInt32 s
 }
 
 
-template<class T>
-DG_INLINE T dgLCP<T>::PartialDotProduct(const T* const a, const T* const b, dgInt32 size) const
+template<class T, dgInt32 Size>
+DG_INLINE T dgLCP<T, Size>::PartialDotProduct(const T* const a, const T* const b, dgInt32 size) const
 {
 	T acc(0.0f);
 	for (dgInt32 i = 0; i < size; i++) {
@@ -375,18 +371,18 @@ DG_INLINE T dgLCP<T>::PartialDotProduct(const T* const a, const T* const b, dgIn
 	return acc;
 }
 
-template<class T>
-DG_INLINE void dgLCP<T>::PartialScaleAdd(T* const a, const T* const b, T scale, const T* const c, dgInt32 size) const
+template<class T, dgInt32 Size>
+DG_INLINE void dgLCP<T, Size>::PartialScaleAdd(T* const a, const T* const b, T scale, const T* const c, dgInt32 size) const
 {
 	for (dgInt32 i = 0; i < size; i++) {
 		a[i] = b[i] + scale * c[i];
 	}
 }
 
-template<class T>
-DG_INLINE void dgLCP<T>::PartialMatrixTimeVector(const T* const v, T* const out, dgInt32 size) const
+template<class T, dgInt32 Size>
+DG_INLINE void dgLCP<T, Size>::PartialMatrixTimeVector(const T* const v, T* const out, dgInt32 size) const
 {
-	const dgGeneralMatrix<T>& me = *this;
+	const dgGeneralMatrix<T, Size>& me = *this;
 	for (dgInt32 i = 0; i < size; i++) {
 		out[i] = PartialDotProduct(&me[i][0], v, size);
 	}
@@ -394,11 +390,11 @@ DG_INLINE void dgLCP<T>::PartialMatrixTimeVector(const T* const v, T* const out,
 
 
 
-template<class T>
-bool dgLCP<T>::GaussSeidelLCP(dgInt32 maxIterCount, T tol)
+template<class T, dgInt32 Size>
+bool dgLCP<T, Size>::GaussSeidelLCP(dgInt32 maxIterCount, T tol)
 {
-	const dgInt32 count = dgGeneralMatrix<T>::GetRowCount();
-	const dgSPDMatrix<T>& me = *this;
+	const dgInt32 count = dgGeneralMatrix<T, Size>::GetRowCount();
+	const dgSPDMatrix<T, Size>& me = *this;
 
 	T* const x = &m_x[0];
 	T* const invDiag1 = &m_tmp[2][0];
@@ -418,7 +414,7 @@ bool dgLCP<T>::GaussSeidelLCP(dgInt32 maxIterCount, T tol)
 	for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
 		tolerance = T(0.0f);
 		for (dgInt32 j = 0; j < count; j++) {
-			const dgGeneralVector<T>& row = me[j];
+			const dgGeneralVector<T, Size>& row = me[j];
 			T a = b[j] - row.DotProduct(x);
 			T x1 = (a + row[j] * x[j]) * invDiag[j];
 			if (x1 > high[j]) {
@@ -435,15 +431,18 @@ bool dgLCP<T>::GaussSeidelLCP(dgInt32 maxIterCount, T tol)
 }
 
 
-template<class T>
-bool dgLCP<T>::SolveDantzig()
+template<class T, dgInt32 Size>
+bool dgLCP<T, Size>::SolveDantzig()
 {
-	dgSPDMatrix<T>& me = *this;
-	const dgInt32 size = dgGeneralMatrix<T>::m_rowCount;
+dgAssert (0);
+return false;
+/*
+	dgSPDMatrix<T, Size>& me = *this;
+	const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
 
 	//static int xxx;
 	//xxx++;
-	//dgLCP<T> gauss(*this);
+	//dgLCP<T, Size> gauss(*this);
 	//gauss.GaussSeidelLCP(100000, T(1.0e-6f));
 	//dgTrace(("pgs %d :", xxx));
 	//gauss.GetX().Trace();
@@ -542,7 +541,7 @@ bool dgLCP<T>::SolveDantzig()
 			if (swapIndex == -1) {
 				r[index] = T(0.0f);
 				delta_r[index] = T(0.0f);
-				if (!dgSPDMatrix<T>::CholeskyFactorizationAddRow(index)) {
+				if (!dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(index)) {
 					return false;
 				}
 				index++;
@@ -589,9 +588,9 @@ bool dgLCP<T>::SolveDantzig()
 				index--;
 				for (dgInt32 i = swapIndex; i < index; i++) {
 #ifdef _DEBUG
-					dgAssert(dgSPDMatrix<T>::CholeskyFactorizationAddRow(i));
+					dgAssert(dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(i));
 #else
-					dgSPDMatrix<T>::CholeskyFactorizationAddRow(i);
+					dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(i);
 #endif
 				}
 				loop = true;
@@ -609,17 +608,18 @@ bool dgLCP<T>::SolveDantzig()
 	//m_x.Copy(gauss.GetX());
 
 	return true;
+*/
 }
 
-template<class T>
-bool dgLCP<T>::SolveConjugateGradient(T tol)
+template<class T, dgInt32 Size>
+bool dgLCP<T, Size>::SolveConjugateGradient(T tol)
 {
-     dgSPDMatrix<T>& me = *this;
-     const dgInt32 size = dgGeneralMatrix<T>::m_rowCount;
+     dgSPDMatrix<T, Size>& me = *this;
+     const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
 
 static int xxx;
 xxx ++;
-dgLCP<T> gauss(*this);
+dgLCP<T, Size> gauss(*this);
 //gauss.GaussSeidelLCP(100000, T(1.0e-6f));
 gauss.SolveDantzig();
 dgTrace(("dtz %d :", xxx));
@@ -721,8 +721,8 @@ gauss.GetX().Trace();
                 iter = index;
                 x[swapIndex] = clamp_x;
                 if (swapIndex != index) {
-                     dgGeneralMatrix<T>::SwapRows(swapIndex, index);
-                     dgGeneralMatrix<T>::SwapColumns(swapIndex, index);
+                     dgGeneralMatrix<T, Size>::SwapRows(swapIndex, index);
+                     dgGeneralMatrix<T, Size>::SwapColumns(swapIndex, index);
                      dgSwap(x[swapIndex], x[index]);
                      dgSwap(low[swapIndex], low[index]);
                      dgSwap(high[swapIndex], high[index]);
@@ -794,6 +794,9 @@ m_x.Copy(gauss.GetX());
 
      return num < tol2;
 }
+
+#endif
+
 
 
 

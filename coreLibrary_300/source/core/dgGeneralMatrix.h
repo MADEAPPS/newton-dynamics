@@ -29,22 +29,25 @@
 #include "dgGeneralVector.h"
 
 
-template<class T>
+template<class T, dgInt32 Rows, dgInt32 Columns>
 class dgGeneralMatrix
 {
 	public:
-	dgGeneralMatrix(const dgGeneralMatrix<T>& src);
-	dgGeneralMatrix(dgMemoryAllocator* const allocator, dgInt32 row, dgInt32 column);
-	~dgGeneralMatrix();
+	dgGeneralMatrix() {};
+//	dgGeneralMatrix(const dgGeneralMatrix<T, Rows, Columns>& src);
 
-	void* operator new (size_t size);
-	void operator delete (void* const ptr);
-	void* operator new (size_t size, dgMemoryAllocator* const allocator);
-	void operator delete (void* const ptr, dgMemoryAllocator* const allocator);
+	~dgGeneralMatrix() {}
 
-	dgGeneralVector<T>& operator[] (dgInt32 i);
-	const dgGeneralVector<T>& operator[] (dgInt32 i) const;
 
+//	void* operator new (size_t size);
+//	void operator delete (void* const ptr);
+//	void* operator new (size_t size, dgMemoryAllocator* const allocator);
+//	void operator delete (void* const ptr, dgMemoryAllocator* const allocator);
+
+	dgGeneralVector<T, Columns>& operator[] (dgInt32 i);
+	const dgGeneralVector<T, Columns>& operator[] (dgInt32 i) const;
+
+/*
 	dgInt32 GetRowCount() const;
 	dgInt32 GetColCount() const;
 
@@ -55,16 +58,16 @@ class dgGeneralMatrix
 	void SwapColumns(dgInt32 i, dgInt32 j);
 	
 	// calculate out = v * A;
-	void VectorTimeMatrix(const dgGeneralVector<T> &v, dgGeneralVector<T> &out) const;
+	void VectorTimeMatrix(const dgGeneralVector<T, Rows> &v, dgGeneralVector<T, Rows> &out) const;
 
 	// calculate out = A * v;
-	void MatrixTimeVector(const dgGeneralVector<T> &v, dgGeneralVector<T> &out) const;
+	void MatrixTimeVector(const dgGeneralVector<T, Columns> &v, dgGeneralVector<T, Columns> &out) const;
 
 	// calculate M = A * B;
-	void MatrixTimeMatrix(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& B);
+	void MatrixTimeMatrix(const dgGeneralMatrix<T, Rows, Columns>& A, const dgGeneralMatrix<T, Rows, Columns>& B);
 
 	// calculate M = A * transpose (B);
-	void MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& Bt);
+	void MatrixTimeMatrixTranspose(const dgGeneralMatrix<T, Rows, Columns>& A, const dgGeneralMatrix<T, Rows, Columns>& Bt);
 
 	void Trace() const;
 
@@ -76,36 +79,38 @@ class dgGeneralMatrix
 	protected:
 	DG_INLINE void VectorTimeMatrix(const T* const v, T* const out) const;
 	DG_INLINE void MatrixTimeVector(const T* const v, T* const out) const;
-
-	dgGeneralVector<T>** m_rows;
-	dgMemoryAllocator* m_allocator;
-	dgInt32 m_rowCount;
+*/
+	dgGeneralVector<T, Rows> m_rows[Columns];
 };
 
-template<class T>
-class dgSquareMatrix: public dgGeneralMatrix<T>
+
+template<class T, dgInt32 Size>
+class dgSquareMatrix: public dgGeneralMatrix<T, Size, Size>
 {
 	public:
-	dgSquareMatrix(const dgGeneralMatrix<T>& src);
-	dgSquareMatrix(dgMemoryAllocator* const allocator, dgInt32 size);
-	~dgSquareMatrix();
-
+	dgSquareMatrix() {}
+//	dgSquareMatrix(const dgGeneralMatrix<T, Size, Size>& src);
+	~dgSquareMatrix() {}
+/*
 	static dgInt32 CalculateMemorySize(dgInt32 row)
 	{
-		return dgGeneralMatrix<T>::CalculateMemorySize(row, row);
+		return dgGeneralMatrix<T, Rows, Columns>::CalculateMemorySize(row, row);
 	}
 
-
-	bool SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVector<T> &b);
+	bool SolveGaussian(dgGeneralVector<T, Size> &x, const dgGeneralVector<T, Size> &b);
+*/
 };
 
+
+#if 0
 // ***********************************************************************************************
 //
 //   LinearSystem
 //
 // ***********************************************************************************************
-template<class T>
-dgGeneralMatrix<T>::dgGeneralMatrix(dgMemoryAllocator* const allocator, dgInt32 row, dgInt32 column)
+/*
+template<class T, dgInt32 Size>
+dgGeneralMatrix<T, Rows, Columns>::dgGeneralMatrix(dgMemoryAllocator* const allocator, dgInt32 row, dgInt32 column)
 	:m_rows ((dgGeneralVector<T>**) allocator->MallocLow(row * sizeof (dgGeneralVector<T>*)))
 	,m_allocator(allocator)
 	,m_rowCount(row)
@@ -116,103 +121,79 @@ dgGeneralMatrix<T>::dgGeneralMatrix(dgMemoryAllocator* const allocator, dgInt32 
            m_rows[i] = new (m_allocator) dgGeneralVector<T>(allocator, column);
      }
 }
+*/
 
-
-template<class T>
-dgGeneralMatrix<T>::dgGeneralMatrix(const dgGeneralMatrix<T>& src)
-	:m_rows((dgGeneralVector<T>**) src.m_allocator->MallocLow(src.m_rowCount * sizeof (dgGeneralVector<T>*)))
-	,m_allocator(src.m_allocator)
-	,m_rowCount(src.m_rowCount)
+template<class T, dgInt32 Rows, dgInt32 Columns>
+dgGeneralMatrix<T, Rows, Columns>::dgGeneralMatrix(const dgGeneralMatrix<T, Rows, Columns>& src)
 {
-	for (dgInt32 i = 0; i < m_rowCount; i++) {
-		m_rows[i] = new (m_allocator) dgGeneralVector<T>(src[i]);
-	}
 }
 
 
-template<class T>
-dgGeneralMatrix<T>::~dgGeneralMatrix()
+template<class T, dgInt32 Rows, dgInt32 Columns>
+dgGeneralMatrix<T, Rows, Columns>::~dgGeneralMatrix()
 {
-	for (dgInt32 i = 0; i < m_rowCount; i++) {
-		delete m_rows[i]; 
-	}
-    m_allocator->FreeLow(m_rows);
 }
 
-template<class T>
-void* dgGeneralMatrix<T>::operator new (size_t size)
+/*
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void* dgGeneralMatrix<T, Rows, Columns>::operator new (size_t size)
 {
 	dgAssert(0);
 	return NULL;
 }
 
-template<class T>
-void* dgGeneralMatrix<T>::operator new (size_t size, dgMemoryAllocator* const allocator)
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void* dgGeneralMatrix<T, Rows, Columns>::operator new (size_t size, dgMemoryAllocator* const allocator)
 {
 	return allocator->MallocLow(size);
 }
 
 template<class T>
-void dgGeneralMatrix<T>::operator delete (void* const ptr, dgMemoryAllocator* const allocator)
+void dgGeneralMatrix<T, Rows, Columns>::operator delete (void* const ptr, dgMemoryAllocator* const allocator)
 {
 	dgAssert(0);
 	//dgFree(ptr); 
 }
 
 template<class T>
-void dgGeneralMatrix<T>::operator delete (void* const ptr)
+void dgGeneralMatrix<T, Rows, Columns>::operator delete (void* const ptr)
 {
 	dgAssert(0);
 }
+*/
 
-
-template<class T>
-dgInt32 dgGeneralMatrix<T>::GetRowCount() const
+template<class T, dgInt32 Rows, dgInt32 Columns>
+dgInt32 dgGeneralMatrix<T, Rows, Columns>::GetRowCount() const
 {
-     return m_rowCount;
+     return Rows;
 }
 
-template<class T>
-dgInt32 dgGeneralMatrix<T>::GetColCount() const
+template<class T, dgInt32 Rows, dgInt32 Columns>
+dgInt32 dgGeneralMatrix<T, Rows, Columns>::GetColCount() const
 {
-     return m_rows[0]->GetRowCount();
+     return Columns;
 }
 
 
-template<class T>
-void dgGeneralMatrix<T>::Trace() const
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::Trace() const
 {
-     for (dgInt32 i = 0; i < m_rowCount; i++) {
+     for (dgInt32 i = 0; i < Rows; i++) {
            m_rows[i]->Trace();
      }
 }
 
-template<class T>
-dgGeneralVector<T>& dgGeneralMatrix<T>::operator[] (dgInt32 i)
-{
-     dgAssert(i < m_rowCount);
-     dgAssert(i >= 0);
-     return *m_rows[i];
-}
 
-template<class T>
-const dgGeneralVector<T>& dgGeneralMatrix<T>::operator[] (dgInt32 i) const
-{
-     dgAssert(i < m_rowCount);
-     dgAssert(i >= 0);
-     return *m_rows[i];
-}
-
-template<class T>
-void dgGeneralMatrix<T>::Clear(T val)
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::Clear(T val)
 {
      for (dgInt32 i = 0; i < m_rowCount; i++) {
            m_rows[i].Clear(val);
      }
 }
 
-template<class T>
-void dgGeneralMatrix<T>::Identity()
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::Identity()
 {
      for (dgInt32 i = 0; i < m_rowCount; i++) {
            m_rows[i].Clear(T(0.0f));
@@ -220,19 +201,21 @@ void dgGeneralMatrix<T>::Identity()
      }
 }
 
-template<class T>
-void dgGeneralMatrix<T>::VectorTimeMatrix(const dgGeneralVector<T> &v, dgGeneralVector<T> &out) const
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::VectorTimeMatrix(const dgGeneralVector<T, Rows> &v, dgGeneralVector<T, Rows> &out) const
 {
+	dgAssert (0);
 	dgAssert(&v != &out);
-	dgAssert(dgGeneralMatrix<T>::GetRowCount() == v.m_colCount);
-	dgAssert(dgGeneralMatrix<T>::GetColCount() == out.m_colCount);
+	dgAssert(GetRowCount() == v.GetRowCount());
+	dgAssert(GetColCount() == out.GetRowCount());
 	VectorTimeMatrix(v, out);
 }
 
 
-template<class T>
-void dgGeneralMatrix<T>::VectorTimeMatrix(const T* const v, T* const out) const
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::VectorTimeMatrix(const T* const v, T* const out) const
 {
+	dgAssert (0);
 	const dgGeneralMatrix<T>& me = *this;
 	const dgInt32 colCount = GetColCount();
 	for (dgInt32 i = 0; i < colCount; i++) {
@@ -245,18 +228,18 @@ void dgGeneralMatrix<T>::VectorTimeMatrix(const T* const v, T* const out) const
 }
 
 
-
-template<class T>
-void dgGeneralMatrix<T>::MatrixTimeVector(const dgGeneralVector<T> &v, dgGeneralVector<T> &out) const
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const dgGeneralVector<T, Columns> &v, dgGeneralVector<T, Columns> &out) const
 {
-     dgAssert(&v != &out);
-     dgAssert(dgGeneralMatrix<T>::GetRowCount() == out.m_colCount);
-     dgAssert(dgGeneralMatrix<T>::GetColCount() == v.m_colCount);
-	 MatrixTimeVector (&v[0], &out[0]);
+	dgAssert (0);
+    dgAssert(&v != &out);
+    dgAssert(GetRowCount() == out.GetRowCount());
+    dgAssert(GetColCount() == v.GetRowCount());
+	MatrixTimeVector (&v[0], &out[0]);
 }
 
-template<class T>
-DG_INLINE void dgGeneralMatrix<T>::MatrixTimeVector(const T* const v, T* const out) const
+template<class T, dgInt32 Rows, dgInt32 Columns>
+DG_INLINE void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const T* const v, T* const out) const
 {
 	const dgGeneralMatrix<T>& me = *this;
 	for (dgInt32 i = 0; i < m_rowCount; i++) {
@@ -265,12 +248,14 @@ DG_INLINE void dgGeneralMatrix<T>::MatrixTimeVector(const T* const v, T* const o
 }
 
 
-template<class T>
-void dgGeneralMatrix<T>::MatrixTimeMatrix(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& B)
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeMatrix(const dgGeneralMatrix<T, Rows, Columns>& A, const dgGeneralMatrix<T, Rows, Columns>& B)
 {
+	dgAssert (0);
+/*
 	dgAssert(this != &A);
-	dgAssert(dgGeneralMatrix<T>::GetRowCount() == A.m_rowCount);
-	dgAssert(dgGeneralMatrix<T>::GetColCount() == B.GetColCount());
+	dgAssert(dgGeneralMatrix<T, Rows, Columns>::GetRowCount() == A.m_rowCount);
+	dgAssert(dgGeneralMatrix<T, Rows, Columns>::GetColCount() == B.GetColCount());
 	dgAssert(A.GetColCount() == B.m_rowCount);
 
 	const dgInt32 colCount = GetColCount();
@@ -286,14 +271,17 @@ void dgGeneralMatrix<T>::MatrixTimeMatrix(const dgGeneralMatrix<T>& A, const dgG
 			out[j] = acc;
 		}
 	}
+*/
 }
 
 
-template<class T>
-void dgGeneralMatrix<T>::MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, const dgGeneralMatrix<T>& Bt)
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeMatrixTranspose(const dgGeneralMatrix<T, Rows, Columns>& A, const dgGeneralMatrix<T, Rows, Columns>& Bt)
 {
+	dgAssert (0);
+/*
      dgAssert(m_rowCount == A.m_rowCount);
-     dgAssert(dgGeneralMatrix<T>::GetColCount() == Bt.m_rowCount);
+     dgAssert(dgGeneralMatrix<T, Rows, Columns>::GetColCount() == Bt.m_rowCount);
      dgAssert(A.GetColCount() == Bt.GetColCount());
 
      dgAssert(this != &A);
@@ -313,10 +301,11 @@ void dgGeneralMatrix<T>::MatrixTimeMatrixTranspose(const dgGeneralMatrix<T>& A, 
                 out[j] = acc;
            }
      }
-}
+*/
+ }
 
-template<class T>
-void dgGeneralMatrix<T>::SwapRows(dgInt32 i, dgInt32 j)
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::SwapRows(dgInt32 i, dgInt32 j)
 {
      dgAssert(i >= 0);
      dgAssert(j >= 0);
@@ -327,13 +316,14 @@ void dgGeneralMatrix<T>::SwapRows(dgInt32 i, dgInt32 j)
 	 }
 }
 
-template<class T>
-void dgGeneralMatrix<T>::SwapColumns(dgInt32 i, dgInt32 j)
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::SwapColumns(dgInt32 i, dgInt32 j)
 {
+	dgAssert (0);
      dgAssert(i >= 0);
      dgAssert(j >= 0);
-     dgAssert(i < dgGeneralMatrix<T>::GetColCount());
-     dgAssert(j < dgGeneralMatrix<T>::GetColCount());
+     dgAssert(i < GetColCount());
+     dgAssert(j < GetColCount());
 	 if (j != i) {
 		 dgGeneralMatrix<T>& me = *this;
 		 for (dgInt32 k = 0; k < m_rowCount; k++) {
@@ -342,41 +332,46 @@ void dgGeneralMatrix<T>::SwapColumns(dgInt32 i, dgInt32 j)
 	 }
 }
 
-template<class T>
-dgSquareMatrix<T>::dgSquareMatrix(const dgGeneralMatrix<T>& src)
-	:dgGeneralMatrix<T>(src)
+template<class T, dgInt32 Size>
+dgSquareMatrix<T, Size>::dgSquareMatrix(const dgGeneralMatrix<T, Size, Size>& src)
+	:dgGeneralMatrix<T, Size, Size>(src)
 {
 }
 
-template<class T>
-dgSquareMatrix<T>::dgSquareMatrix(dgMemoryAllocator* const allocator, dgInt32 size)
+/*
+template<class T, dgInt32 Size>
+dgSquareMatrix<T, dgInt32 Size>::dgSquareMatrix(dgMemoryAllocator* const allocator, dgInt32 size)
 	:dgGeneralMatrix<T>(allocator, size, size)
 {
 }
+*/
 
-template<class T>
-dgSquareMatrix<T>::~dgSquareMatrix()
+template<class T, dgInt32 Size>
+dgSquareMatrix<T, Size>::~dgSquareMatrix()
 {
 }
 
 
-template<class T>
-bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVector<T> &b)
+template<class T, dgInt32 Size>
+bool dgSquareMatrix<T, Size>::SolveGaussian(dgGeneralVector<T, Size> &x, const dgGeneralVector<T, Size> &b)
 {
-	dgAssert(dgGeneralMatrix<T>::GetColCount() == dgGeneralMatrix<T>::GetRowCount());
-	dgAssert(b.GetRowCount() == dgGeneralMatrix<T>::GetRowCount());
-	dgAssert(x.GetRowCount() == dgGeneralMatrix<T>::GetRowCount());
+	dgAssert (0);
+	return false;
+/*
+	dgAssert(dgGeneralMatrix<T, Rows, Columns>::GetColCount() == dgGeneralMatrix<T, Rows, Columns>::GetRowCount());
+	dgAssert(b.GetRowCount() == dgGeneralMatrix<T, Rows, Columns>::GetRowCount());
+	dgAssert(x.GetRowCount() == dgGeneralMatrix<T, Rows, Columns>::GetRowCount());
 
 	x.Copy(b);
 	T* const B = &x[0];
 
 	// convert to upper triangular matrix by applying gauss partial pivoting
 	dgGeneralMatrix<T>& me = *this;
-	for (dgInt32 i = 0; i < dgGeneralMatrix<T>::m_rowCount - 1; i++) {
+	for (dgInt32 i = 0; i < dgGeneralMatrix<T, Rows, Columns>::m_rowCount - 1; i++) {
 
 		dgInt32 k = i;
 		T maxVal (fabs(me[i][i]));
-		for (dgInt32 j = i + 1; j < dgGeneralMatrix<T>::m_rowCount - 1; j++) {
+		for (dgInt32 j = i + 1; j < dgGeneralMatrix<T, Rows, Columns>::m_rowCount - 1; j++) {
 			T val (fabs(me[j][i]));
 			if (val > maxVal) {
 				k = j;
@@ -389,16 +384,16 @@ bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVect
 		}
 
 		if (k != i) {
-			dgGeneralMatrix<T>::SwapRows(i, k);
+			dgGeneralMatrix<T, Rows, Columns>::SwapRows(i, k);
 			dgSwap(B[i], B[k]);
 		}
 
 		T* const rowI = &me[i][0];
 		T den = T(1.0f) / rowI[i];
-		for (dgInt32 k = i + 1; k < dgGeneralMatrix<T>::m_rowCount; k++) {
+		for (dgInt32 k = i + 1; k < dgGeneralMatrix<T, Rows, Columns>::m_rowCount; k++) {
 			T* const rowK = &me[k][0];
 			T factor(-rowK[i] * den);
-			for (dgInt32 j = i + 1; j < dgGeneralMatrix<T>::m_rowCount; j++) {
+			for (dgInt32 j = i + 1; j < dgGeneralMatrix<T, Rows, Columns>::m_rowCount; j++) {
 				rowK[j] += rowI[j] * factor;
 			}
 			rowK[i] = T(0.0f);
@@ -406,10 +401,10 @@ bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVect
 		}
 	}
 
-	for (dgInt32 i = dgGeneralMatrix<T>::m_rowCount - 1; i >= 0; i--) {
+	for (dgInt32 i = dgGeneralMatrix<T, Rows, Columns>::m_rowCount - 1; i >= 0; i--) {
 		T acc(0);
 		T* const rowI = &me[i][0];
-		for (dgInt32 j = i + 1; j < dgGeneralMatrix<T>::m_rowCount; j++) {
+		for (dgInt32 j = i + 1; j < dgGeneralMatrix<T, Rows, Columns>::m_rowCount; j++) {
 			acc = acc + rowI[j] * B[j];
 		}
 		B[i] = (B[i] - acc) / rowI[i];
@@ -417,6 +412,25 @@ bool dgSquareMatrix<T>::SolveGaussian(dgGeneralVector<T> &x, const dgGeneralVect
 	//   Trace();
 	//   x.Trace();
 	return true;
+*/
 }
+#endif
+
+template<class T, dgInt32 Rows, dgInt32 Columns>
+dgGeneralVector<T, Columns>& dgGeneralMatrix<T, Rows, Columns>::operator[] (dgInt32 i)
+{
+     dgAssert(i < Rows);
+     dgAssert(i >= 0);
+     return m_rows[i];
+}
+
+template<class T, dgInt32 Rows, dgInt32 Columns>
+const dgGeneralVector<T, Columns>& dgGeneralMatrix<T, Rows, Columns>::operator[] (dgInt32 i) const
+{
+     dgAssert(i < Rows);
+     dgAssert(i >= 0);
+     return m_rows[i];
+}
+
 
 #endif
