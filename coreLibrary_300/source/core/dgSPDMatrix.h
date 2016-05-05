@@ -54,7 +54,8 @@ class dgSPDMatrix: public dgSquareMatrix<T, Size>
 
 	~dgSPDMatrix() {}
 
-	void CholeskySolve(dgGeneralVector<T, Size> &x, const dgGeneralVector<T, Size> &b, dgInt32 n) const;
+	DG_INLINE bool CholeskyFactorizationAddRow(dgInt32 n);
+	DG_INLINE void CholeskySolve(dgGeneralVector<T, Size> &x, const dgGeneralVector<T, Size> &b, dgInt32 n) const;
 /*
 	bool TestPSD() const;
 	bool LDLtDecomposition();
@@ -63,7 +64,7 @@ class dgSPDMatrix: public dgSquareMatrix<T, Size>
 
 	protected:
 	DG_INLINE bool CholeskyFactorization(dgInt32 n);
-	DG_INLINE bool CholeskyFactorizationAddRow(dgInt32 n);
+	
 	DG_INLINE void CholeskySolve(T* const x, const T* const b, dgInt32 n) const;
 */
 };
@@ -110,17 +111,18 @@ class dgLCP: public dgSPDMatrix<T, Size>
 	}
 
 	private:
-	DG_INLINE void PermuteRows(dgInt32 i, dgInt32 j);
 	
 	
-	DG_INLINE void CholeskyRestore(T* const diagonal, dgInt32 i, dgInt32 size);
+	
+	
 	DG_INLINE T PartialDotProduct(const T* const a, const T* const b, dgInt32 size) const;
 	DG_INLINE void PartialMatrixTimeVector(const T* const v, T* const out, dgInt32 size) const;
 	DG_INLINE void PartialScaleAdd(T* const a, const T* const b, T scale, const T* const c, dgInt32 size) const;
 */
 	DG_INLINE void CalculateDelta_r (dgInt32 n);
 	DG_INLINE void CalculateDelta_x(T dir, dgInt32 n);
-	
+	DG_INLINE void PermuteRows(dgInt32 i, dgInt32 j);
+	DG_INLINE void CholeskyRestore(dgInt32 i, dgInt32 size);
 
 //	dgGeneralVector<T, Size> m_b;
 //	dgGeneralVector<T, Size> m_x;
@@ -209,35 +211,6 @@ bool dgSPDMatrix<T, Size>::CholeskyFactorization()
 
 
 
-template<class T, dgInt32 Size>
-DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(dgInt32 n)
-{
-dgAssert (0);
-return false;
-/*
-	dgAssert(n <= dgGeneralMatrix<T, Size>::m_rowCount);
-	dgGeneralMatrix<T, Size>& me = *this;
-	T* const rowI = &me[n][0];
-	for (dgInt32 j = 0; j <= n; j++) {
-		T s(0.0f);
-		T* const rowJ = &me[j][0];
-		for (dgInt32 k = 0; k < j; k++) {
-			s += rowI[k] * rowJ[k];
-		}
-
-		if (n == j) {
-			T diag = rowI[n] - s;
-			if (diag < T(0.0f)) {
-				return false;
-			}
-			rowI[n] = T(sqrt(diag));
-		} else {
-			rowI[j] = (T(1.0f) / rowJ[j] * (rowI[j] - s));
-		}
-	}
-	return true;
-*/
-}
 
 
 // calculate Cholesky factorization of the n first rows
@@ -312,39 +285,6 @@ dgLCP<T, Size>::~dgLCP()
 }
 
 
-template<class T, dgInt32 Size>
-DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
-{
-	if (i != j) {
-		dgGeneralMatrix<T, Size>::SwapRows(i, j);
-		dgGeneralMatrix<T, Size>::SwapColumns(i, j);
-		dgSwap(m_b[i], m_b[j]);
-		dgSwap(m_low[i], m_low[j]);
-		dgSwap(m_high[i], m_high[j]);
-		dgSwap(m_permute[i], m_permute[j]);
-		for (dgInt32 k = 0; k < 5; k++) {
-			dgSwap(m_tmp[k][i], m_tmp[k][j]);
-		}
-	}
-}
-
-
-
-
-
-
-template<class T, dgInt32 Size>
-DG_INLINE void dgLCP<T, Size>::CholeskyRestore(T* const diagonal, dgInt32 n, dgInt32 size)
-{
-	dgGeneralMatrix<T, Size>& me = *this;
-	for (dgInt32 i = n; i < size; i++) {
-		me[i][i] = diagonal[i];
-		T* const row = &me[i][0];
-		for (dgInt32 j = 0; j < i; j++) {
-			row[j] = me[j][i];
-		}
-	}
-}
 
 
 template<class T, dgInt32 Size>
@@ -604,6 +544,73 @@ m_x.Copy(gauss.GetX());
 
 #endif
 
+
+template<class T, dgInt32 Size>
+DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
+{
+	if (i != j) {
+		dgGeneralMatrix<T, Size, Size>::SwapRows(i, j);
+		dgGeneralMatrix<T, Size, Size>::SwapColumns(i, j);
+/*
+		dgSwap(m_b[i], m_b[j]);
+		dgSwap(m_low[i], m_low[j]);
+		dgSwap(m_high[i], m_high[j]);
+		dgSwap(m_permute[i], m_permute[j]);
+		for (dgInt32 k = 0; k < 5; k++) {
+			dgSwap(m_tmp[k][i], m_tmp[k][j]);
+		}
+*/
+	}
+}
+
+
+template<class T, dgInt32 Size>
+DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(dgInt32 n)
+{
+dgAssert (0);
+return false;
+/*
+	dgAssert(n <= dgGeneralMatrix<T, Size>::m_rowCount);
+	dgGeneralMatrix<T, Size>& me = *this;
+	T* const rowI = &me[n][0];
+	for (dgInt32 j = 0; j <= n; j++) {
+		T s(0.0f);
+		T* const rowJ = &me[j][0];
+		for (dgInt32 k = 0; k < j; k++) {
+			s += rowI[k] * rowJ[k];
+		}
+
+		if (n == j) {
+			T diag = rowI[n] - s;
+			if (diag < T(0.0f)) {
+				return false;
+			}
+			rowI[n] = T(sqrt(diag));
+		} else {
+			rowI[j] = (T(1.0f) / rowJ[j] * (rowI[j] - s));
+		}
+	}
+	return true;
+*/
+}
+
+
+template<class T, dgInt32 Size>
+DG_INLINE void dgLCP<T, Size>::CholeskyRestore(dgInt32 n, dgInt32 size)
+{
+//	dgGeneralMatrix<T, Size>& me = *this;
+	dgAssert (0);
+	for (dgInt32 i = n; i < size; i++) {
+		m_rows[i][i] = diagonal[i];
+		//T* const row = &me[i][0];
+		dgGeneralVector<T, Size>& row = m_rows[i];
+		for (dgInt32 j = 0; j < i; j++) {
+			row[j] = m_rows[j][i];
+		}
+	}
+}
+
+
 template<class T, dgInt32 Size>
 void dgSPDMatrix<T, Size>::CholeskySolve(dgGeneralVector<T, Size>& x, const dgGeneralVector<T, Size> &b, dgInt32 n) const
 {
@@ -611,7 +618,8 @@ void dgSPDMatrix<T, Size>::CholeskySolve(dgGeneralVector<T, Size>& x, const dgGe
 //	const dgGeneralMatrix<T, Size>& me = *this;
 	for (dgInt32 i = 0; i < n; i++) {
 		T acc = 0.0f;
-		const T* const row = &m_rows[i][0];
+		//const T* const row = &m_rows[i][0];
+		const dgGeneralVector<T, Size>& row = m_rows[i];
 		for (dgInt32 j = 0; j < i; j++) {
 			acc = acc + row[j] * x[j];
 		}
@@ -727,8 +735,6 @@ bool dgLCP<T, Size>::SolveDantzig()
 				T s = -r[index] / delta_r[index];
 				dgAssert(s >= T(0.0f));
 
-dgAssert (0);
-/*
 				for (dgInt32 i = 0; i <= index; i++) {
 					T x1 = x[i] + s * delta_x[i];
 					if (x1 > high[i]) {
@@ -744,7 +750,7 @@ dgAssert (0);
 				dgAssert(s >= T(0.0f));
 				dgAssert(s <= -r[index] / delta_r[index]);
 
-				for (dgInt32 i = clampedIndex; (i < size) && (s > T(1.0e-12f)); i++) {
+				for (dgInt32 i = clampedIndex; (i < Size) && (s > T(1.0e-12f)); i++) {
 					T r1 = r[i] + s * delta_r[i];
 					if ((r1 * r[i]) < T(0.0f)) {
 						dgAssert(T(fabs(delta_r[i]) > T(0.0f)));
@@ -758,7 +764,7 @@ dgAssert (0);
 				}
 
 				if (s > T(1.0e-12f)) {
-					for (dgInt32 i = 0; i < size; i++) {
+					for (dgInt32 i = 0; i < Size; i++) {
 						dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
 						dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
 						x[i] += s * delta_x[i];
@@ -767,11 +773,8 @@ dgAssert (0);
 						dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
 					}
 				}
-*/			
 			}
 
-dgAssert (0);
-/*
 			if (swapIndex == -1) {
 				r[index] = T(0.0f);
 				delta_r[index] = T(0.0f);
@@ -791,8 +794,8 @@ dgAssert (0);
 			} else if (swapIndex > index) {
 				loop = true;
 				r[swapIndex] = T(0.0f);
-				dgAssert(swapIndex < size);
-				dgAssert(clampedIndex <= size);
+				dgAssert(swapIndex < Size);
+				dgAssert(clampedIndex <= Size);
 				if (swapIndex < clampedIndex) {
 					count--;
 					clampedIndex--;
@@ -800,17 +803,17 @@ dgAssert (0);
 					dgAssert(clampedIndex >= index);
 				} else {
 					count++;
-					dgAssert(clampedIndex < size);
+					dgAssert(clampedIndex < Size);
 					PermuteRows(clampedIndex, swapIndex);
 					clampedIndex++;
-					dgAssert(clampedIndex <= size);
+					dgAssert(clampedIndex <= Size);
 					dgAssert(clampedIndex >= index);
 				}
 				calculateDelta_x = false;
 
 			} else {
 				x[swapIndex] = clamp_x;
-				CholeskyRestore(diagonal, swapIndex, index);
+				CholeskyRestore(swapIndex, index);
 
 				dgAssert(index > 0);
 				PermuteRows(swapIndex, index - 1);
@@ -822,14 +825,14 @@ dgAssert (0);
 				index--;
 				for (dgInt32 i = swapIndex; i < index; i++) {
 #ifdef _DEBUG
-					dgAssert(dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(i));
+					dgAssert(CholeskyFactorizationAddRow(i));
 #else
-					dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(i);
+					CholeskyFactorizationAddRow(i);
 #endif
 				}
 				loop = true;
 			}
-*/
+
 		}
 	}
 

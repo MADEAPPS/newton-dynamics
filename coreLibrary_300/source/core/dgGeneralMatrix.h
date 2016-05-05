@@ -53,12 +53,13 @@ class dgGeneralMatrix
 	dgInt32 GetRowCount() const {return Rows;}
 	dgInt32 GetColCount() const {return Columns;}
 
+	void SwapRows(dgInt32 i, dgInt32 j);
+	void SwapColumns(dgInt32 i, dgInt32 j);
+
 /*
 	void Clear(T val);
 	void Identity();
 
-	void SwapRows(dgInt32 i, dgInt32 j);
-	void SwapColumns(dgInt32 i, dgInt32 j);
 	
 	// calculate out = v * A;
 	void VectorTimeMatrix(const dgGeneralVector<T, Rows> &v, dgGeneralVector<T, Rows> &out) const;
@@ -284,33 +285,6 @@ void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeMatrixTranspose(const dgGenera
 */
  }
 
-template<class T, dgInt32 Rows, dgInt32 Columns>
-void dgGeneralMatrix<T, Rows, Columns>::SwapRows(dgInt32 i, dgInt32 j)
-{
-     dgAssert(i >= 0);
-     dgAssert(j >= 0);
-     dgAssert(i < m_rowCount);
-     dgAssert(j < m_rowCount);
-	 if (j != i) {
-		dgSwap(m_rows[i]->m_columns, m_rows[j]->m_columns);
-	 }
-}
-
-template<class T, dgInt32 Rows, dgInt32 Columns>
-void dgGeneralMatrix<T, Rows, Columns>::SwapColumns(dgInt32 i, dgInt32 j)
-{
-	dgAssert (0);
-     dgAssert(i >= 0);
-     dgAssert(j >= 0);
-     dgAssert(i < GetColCount());
-     dgAssert(j < GetColCount());
-	 if (j != i) {
-		 dgGeneralMatrix<T>& me = *this;
-		 for (dgInt32 k = 0; k < m_rowCount; k++) {
-			dgSwap(me[k][i], me[k][j]);
-		 }
-	 }
-}
 
 template<class T, dgInt32 Size>
 dgSquareMatrix<T, Size>::dgSquareMatrix(const dgGeneralMatrix<T, Size, Size>& src)
@@ -420,6 +394,41 @@ void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const dgGeneralVector<T
 	dgAssert(GetColCount() == out.GetRowCount());
 	for (dgInt32 i = 0; i < Rows; i++) {
 		out[i] = m_rows[i].DotProduct(v);
+	}
+}
+
+
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::SwapRows(dgInt32 i, dgInt32 j)
+{
+	dgAssert (0);
+	dgAssert(i >= 0);
+	dgAssert(j >= 0);
+	dgAssert(i < GetColCount());
+	dgAssert(j < GetColCount());
+	if (j != i) {
+		//dgGeneralMatrix<T>& me = *this;
+		dgGeneralVector<T, Columns>& A = m_rows[i];
+		dgGeneralVector<T, Columns>& B = m_rows[j];
+		for (dgInt32 k = 0; k < Columns; k++) {
+			dgSwap(A[k], B[k]);
+		}
+	}
+}
+
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::SwapColumns(dgInt32 i, dgInt32 j)
+{
+	dgAssert (0);
+	dgAssert(i >= 0);
+	dgAssert(j >= 0);
+	dgAssert(i < GetColCount());
+	dgAssert(j < GetColCount());
+	if (j != i) {
+		//dgGeneralMatrix<T>& me = *this;
+		for (dgInt32 k = 0; k < Rows; k++) {
+			dgSwap(m_rows[k][i], m_rows[k][j]);
+		}
 	}
 }
 
