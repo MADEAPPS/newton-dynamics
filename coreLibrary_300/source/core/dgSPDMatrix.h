@@ -85,11 +85,11 @@ class dgLCP: public dgSPDMatrix<T, Size>
 
 	~dgLCP() {}
 
-	dgGeneralVector<T, Size>& GetB() { return b;}
-	dgGeneralVector<T, Size>& GetX() { return x_out;}
-	dgGeneralVector<T, Size>& GetLowLimit() { return low;}
-	dgGeneralVector<T, Size>& GetHightLimit() { return high;}
-	const dgGeneralVector<T, Size>& GetR() { return r_out;}	
+	dgGeneralVector<T, Size>& GetB() { return m_b;}
+	dgGeneralVector<T, Size>& GetX() { return m_x_out;}
+	dgGeneralVector<T, Size>& GetLowLimit() { return m_low;}
+	dgGeneralVector<T, Size>& GetHightLimit() { return m_high;}
+	const dgGeneralVector<T, Size>& GetR() { return m_r_out;}	
 
 	// Using George B. Dantzig algorithm.  
 	// Inspired from David Baraff interpretation of George B. Dantzig algorithm in his paper. 
@@ -131,17 +131,17 @@ class dgLCP: public dgSPDMatrix<T, Size>
 //	dgGeneralVector<T, Size> m_high;
 
 	private:
-	dgGeneralVector<T, Size> b;
-	dgGeneralVector<T, Size> x_out;
-	dgGeneralVector<T, Size> r_out;
-	dgGeneralVector<T, Size> low;
-	dgGeneralVector<T, Size> high;
-	dgGeneralVector<T, Size> r;
-	dgGeneralVector<T, Size> x;
-	dgGeneralVector<T, Size> delta_r;
-	dgGeneralVector<T, Size> delta_x;
-	dgGeneralVector<T, Size> diagonal;
-	dgGeneralVector<T, Size> tmp;
+	dgGeneralVector<T, Size> m_b;
+	dgGeneralVector<T, Size> m_x_out;
+	dgGeneralVector<T, Size> m_r_out;
+	dgGeneralVector<T, Size> m_low;
+	dgGeneralVector<T, Size> m_high;
+	dgGeneralVector<T, Size> m_r;
+	dgGeneralVector<T, Size> m_x;
+	dgGeneralVector<T, Size> m_delta_r;
+	dgGeneralVector<T, Size> m_delta_x;
+	dgGeneralVector<T, Size> m_diagonal;
+	dgGeneralVector<T, Size> m_tmp;
 	dgInt16 permute[Size];
 };
 
@@ -538,9 +538,9 @@ DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 		dgGeneralMatrix<T, Size, Size>::SwapRows(i, j);
 		dgGeneralMatrix<T, Size, Size>::SwapColumns(i, j);
 
-		dgSwap(b[i], b[j]);
-		dgSwap(low[i], low[j]);
-		dgSwap(high[i], high[j]);
+		dgSwap(m_b[i], m_b[j]);
+		dgSwap(m_low[i], m_low[j]);
+		dgSwap(m_high[i], m_high[j]);
 		dgSwap(permute[i], permute[j]);
 		//T* const r = &m_tmp[0][0];
 		//T* const x = &m_tmp[1][0];
@@ -551,11 +551,11 @@ DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 		//for (dgInt32 k = 0; k < 5; k++) {
 		//	dgSwap(tmp[k][i], tmp[k][j]);
 		//}
-		dgSwap(r[i], r[j]);
-		dgSwap(x[i], x[j]);
-		dgSwap(delta_r[i], delta_r[j]);
-		dgSwap(delta_x[i], delta_x[j]);
-		dgSwap(diagonal[i], diagonal[j]);
+		dgSwap(m_r[i], m_r[j]);
+		dgSwap(m_x[i], m_x[j]);
+		dgSwap(m_delta_r[i], m_delta_r[j]);
+		dgSwap(m_delta_x[i], m_delta_x[j]);
+		dgSwap(m_diagonal[i], m_diagonal[j]);
 	}
 }
 
@@ -592,7 +592,7 @@ DG_INLINE void dgLCP<T, Size>::CholeskyRestore(dgInt32 n, dgInt32 size)
 	for (dgInt32 i = n; i < size; i++) {
 		//T* const row = &me[i][0];
 		dgGeneralVector<T, Size>& row = dgGeneralMatrix<T, Size, Size>::m_rows[i];
-		row[i] = diagonal[i];
+		row[i] = m_diagonal[i];
 		for (dgInt32 j = 0; j < i; j++) {
 			row[j] = dgGeneralMatrix<T, Size, Size>::m_rows[j][i];
 		}
@@ -627,7 +627,7 @@ template<class T, dgInt32 Size>
 DG_INLINE void dgLCP<T, Size>::CalculateDelta_r(dgInt32 n)
 {
 	for (dgInt32 i = n; i < Size; i++) {
-		delta_r[i] = dgGeneralMatrix<T, Size, Size>::m_rows[i].DotProduct(delta_x);
+		m_delta_r[i] = dgGeneralMatrix<T, Size, Size>::m_rows[i].DotProduct(m_delta_x);
 	}
 }
 
@@ -640,12 +640,12 @@ DG_INLINE void dgLCP<T, Size>::CalculateDelta_x(T dir, dgInt32 n)
 {
 	const dgGeneralVector<T, Size>& row = dgGeneralMatrix<T, Size, Size>::m_rows[n];
 	for (dgInt32 i = 0; i < n; i++) {
-		tmp[i] = -row[i] * dir;
+		m_tmp[i] = -row[i] * dir;
 	}
-	CholeskySolve(delta_x, tmp, n);
-	delta_x[n] = dir;
+	CholeskySolve(m_delta_x, m_tmp, n);
+	m_delta_x[n] = dir;
 	for (dgInt32 i = n + 1; i < Size; i++) {
-		delta_x[i] = T(0.0f);
+		m_delta_x[i] = T(0.0f);
 	}
 }
 
@@ -677,14 +677,14 @@ bool dgLCP<T, Size>::SolveDantzig()
 	//dgInt16* const permute = m_permute;
 
 	for (dgInt32 i = 0; i < Size; i++) {
-		x[i] = dgClamp(x_out[i], low[i], high[i]);
+		m_x[i] = dgClamp(m_x_out[i], m_low[i], m_high[i]);
 		permute[i] = dgInt16(i);
-		diagonal[i] = dgGeneralMatrix<T, Size, Size>::m_rows[i][i];
+		m_diagonal[i] = dgGeneralMatrix<T, Size, Size>::m_rows[i][i];
 	}
 
-	MatrixTimeVector(x, r);
+	MatrixTimeVector(m_x, m_r);
 	for (dgInt32 i = 0; i < Size; i++) {
-		r[i] -= b[i];
+		m_r[i] -= m_b[i];
 	}
 
 	dgInt32 index = 0;
@@ -701,39 +701,39 @@ bool dgLCP<T, Size>::SolveDantzig()
 			T clamp_x(0.0f);
 			dgInt32 swapIndex = -1;
 
-			if (T(fabs(r[index]) > T(1.0e-12f))) {
+			if (T(fabs(m_r[index]) > T(1.0e-12f))) {
 				if (calculateDelta_x) {
-					dir = (r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
+					dir = (m_r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
 					CalculateDelta_x(dir, index);
 				}
 				calculateDelta_x = true;
 				CalculateDelta_r(index);
-				dgAssert(delta_r[index] != T(0.0f));
-				dgAssert(T(fabs(delta_x[index])) == T(1.0f));
+				dgAssert(m_delta_r[index] != T(0.0f));
+				dgAssert(T(fabs(m_delta_x[index])) == T(1.0f));
 
-				T s = -r[index] / delta_r[index];
+				T s = -m_r[index] / m_delta_r[index];
 				dgAssert(s >= T(0.0f));
 
 				for (dgInt32 i = 0; i <= index; i++) {
-					T x1 = x[i] + s * delta_x[i];
-					if (x1 > high[i]) {
+					T x1 = m_x[i] + s * m_delta_x[i];
+					if (x1 > m_high[i]) {
 						swapIndex = i;
-						clamp_x = high[i];
-						s = (high[i] - x[i]) / delta_x[i];
-					} else if (x1 < low[i]) {
+						clamp_x = m_high[i];
+						s = (m_high[i] - m_x[i]) / m_delta_x[i];
+					} else if (x1 < m_low[i]) {
 						swapIndex = i;
-						clamp_x = low[i];
-						s = (low[i] - x[i]) / delta_x[i];
+						clamp_x = m_low[i];
+						s = (m_low[i] - m_x[i]) / m_delta_x[i];
 					}
 				}
 				dgAssert(s >= T(0.0f));
-				dgAssert(s <= -r[index] / delta_r[index]);
+				dgAssert(s <= -m_r[index] / m_delta_r[index]);
 
 				for (dgInt32 i = clampedIndex; (i < Size) && (s > T(1.0e-12f)); i++) {
-					T r1 = r[i] + s * delta_r[i];
-					if ((r1 * r[i]) < T(0.0f)) {
-						dgAssert(T(fabs(delta_r[i]) > T(0.0f)));
-						T s1 = -r[i] / delta_r[i];
+					T r1 = m_r[i] + s * m_delta_r[i];
+					if ((r1 * m_r[i]) < T(0.0f)) {
+						dgAssert(T(fabs(m_delta_r[i]) > T(0.0f)));
+						T s1 = -m_r[i] / m_delta_r[i];
 						dgAssert(s1 >= T(0.0f));
 						if (s1 < s) {
 							s = s1;
@@ -744,19 +744,19 @@ bool dgLCP<T, Size>::SolveDantzig()
 
 				if (s > T(1.0e-12f)) {
 					for (dgInt32 i = 0; i < Size; i++) {
-						dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
-						dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
-						x[i] += s * delta_x[i];
-						r[i] += s * delta_r[i];
-						dgAssert((x[i] + T(1.0e-4f)) >= low[i]);
-						dgAssert((x[i] - T(1.0e-4f)) <= high[i]);
+						dgAssert((m_x[i] + T(1.0e-4f)) >= m_low[i]);
+						dgAssert((m_x[i] - T(1.0e-4f)) <= m_high[i]);
+						m_x[i] += s * m_delta_x[i];
+						m_r[i] += s * m_delta_r[i];
+						dgAssert((m_x[i] + T(1.0e-4f)) >= m_low[i]);
+						dgAssert((m_x[i] - T(1.0e-4f)) <= m_high[i]);
 					}
 				}
 			}
 
 			if (swapIndex == -1) {
-				r[index] = T(0.0f);
-				delta_r[index] = T(0.0f);
+				m_r[index] = T(0.0f);
+				m_delta_r[index] = T(0.0f);
 				if (!dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(index)) {
 					return false;
 				}
@@ -766,13 +766,13 @@ bool dgLCP<T, Size>::SolveDantzig()
 			} else if (swapIndex == index) {
 				count--;
 				clampedIndex--;
-				x[index] = clamp_x;
-				delta_x[index] = T(0.0f);
+				m_x[index] = clamp_x;
+				m_delta_x[index] = T(0.0f);
 				PermuteRows(index, clampedIndex);
 				loop = count ? true : false;
 			} else if (swapIndex > index) {
 				loop = true;
-				r[swapIndex] = T(0.0f);
+				m_r[swapIndex] = T(0.0f);
 				dgAssert(swapIndex < Size);
 				dgAssert(clampedIndex <= Size);
 				if (swapIndex < clampedIndex) {
@@ -791,7 +791,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 				calculateDelta_x = false;
 
 			} else {
-				x[swapIndex] = clamp_x;
+				m_x[swapIndex] = clamp_x;
 				CholeskyRestore(swapIndex, index);
 
 				dgAssert(index > 0);
@@ -813,8 +813,8 @@ bool dgLCP<T, Size>::SolveDantzig()
 
 	for (dgInt32 i = 0; i < Size; i++) {
 		dgInt32 j = permute[i];
-		x_out[j] = x[i];
-		r_out[j] = r[i];
+		m_x_out[j] = m_x[i];
+		m_r_out[j] = m_r[i];
 	}
 
 	//dgTrace(("lcp %d :", xxx));
