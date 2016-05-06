@@ -378,7 +378,6 @@ class CustomVehicleController: public CustomControllerBase
 			virtual ~DriveTrain();
 
 			virtual DriveTrainTire* CastAsTire() {return NULL;}
-			virtual int GetDOF() const {return 1;}
 			
 			virtual void SetPartMasses (const dVector& invInertia);
 			virtual dFloat* GetMassMatrix() {return NULL;}
@@ -411,7 +410,6 @@ class CustomVehicleController: public CustomControllerBase
 			DriveTrain* m_child;
 			DriveTrain* m_sibling;
 			int m_index;
-			int m_dofBase;
 		};
 
 		class DriveTrainEngine: public DriveTrain
@@ -419,7 +417,6 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DriveTrainEngine (const dVector& invInertia);
 
-			int GetDOF() const {return 0;}
 			void SetGearRatio (dFloat gearRatio);
 			void SetGearRatioJacobian(dFloat gearRatio);
 			void SetExternalTorque(EngineController* const controller);
