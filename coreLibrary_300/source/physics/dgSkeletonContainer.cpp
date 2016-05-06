@@ -850,7 +850,7 @@ void dgSkeletonContainer::XXXX()
 	dgGeneralVector<dgFloat32, size>& High = xxx.GetHightLimit();
 
 	for (int i = 0; i < size; i ++) {
-		B[i] = 10.0f + i;
+		B[i] = 100.0f + 10*i;
 		X[i] = 0.0f;
 		Low[i] = -LCP_MAX_VALUE;	
 		High[i] = LCP_MAX_VALUE;
@@ -861,11 +861,15 @@ void dgSkeletonContainer::XXXX()
 		}
 	}
 //	dgAssert (0);
+Low[0] = -1.0f;	
+High[0] = 1.0f;
+Low[2] = -1.0f;	
+High[2] = 1.0f;
 
-Low[7] = -1.0f;	
-High[7] = 1.0f;
+//Low[7] = -1.0f;	
+//High[7] = 1.0f;
 
-
+/*
 	dgSPDMatrix<dgFloat32, size>xxx1 (xxx);
 	xxx.SolveDantzig();
 
@@ -873,6 +877,7 @@ High[7] = 1.0f;
 	xxx1.MatrixTimeVector(X, mm);
 	const dgGeneralVector<dgFloat32, size>& R = xxx.GetR();
 	const dgGeneralVector<dgFloat32, size>& X1 = xxx.GetX();
+*/
 }
 
 

@@ -585,10 +585,7 @@ DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(dgInt32 n)
 template<class T, dgInt32 Size>
 DG_INLINE void dgLCP<T, Size>::CholeskyRestore(dgInt32 n, dgInt32 size)
 {
-//	dgGeneralMatrix<T, Size>& me = *this;
-	dgAssert (0);
 	for (dgInt32 i = n; i < size; i++) {
-		//T* const row = &me[i][0];
 		dgGeneralVector<T, Size>& row = dgGeneralMatrix<T, Size, Size>::m_rows[i];
 		row[i] = m_diagonal[i];
 		for (dgInt32 j = 0; j < i; j++) {
@@ -689,7 +686,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 		}
 		CalculateDelta_r(index);
 		for (dgInt32 i = index; i < Size; i++) {
-			m_r[i] += m_delta_r[i];
+			m_r[i] -= m_delta_r[i];
 		}
 		count = Size - index;
 	}
