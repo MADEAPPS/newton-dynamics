@@ -26,6 +26,8 @@
 #include "dgDebug.h"
 #include "dgGeneralMatrix.h"
 
+#define LCP_MAX_VALUE dgFloat32 (1.0e12f)
+
 class dgSymmetricBiconjugateGradientSolve
 {
 	public:
@@ -76,7 +78,7 @@ template<class T, dgInt32 Size>
 class dgLCP: public dgSPDMatrix<T, Size>
 {
 	public:
-	#define LCP_MAX_VALUE dgFloat32 (1.0e12f);
+	
 	dgLCP() {}
 	~dgLCP() {}
 
@@ -667,8 +669,33 @@ bool dgLCP<T, Size>::SolveDantzig()
 
 	dgInt32 index = 0;
 	dgInt32 count = Size;
-	dgInt32 clampedIndex = Size;
+#if 1
+	for (dgInt32 i = 0; i < count; i++) {
+		if ((m_low[i] <= LCP_MAX_VALUE) && (m_high[i] >= LCP_MAX_VALUE)) {
+			CholeskyFactorizationAddRow (index);
+			index ++;
+		} else {
+			PermuteRows(i, count - 1);
+			i --;
+			count --;
+		}
+	}
 
+	if (index > 0) {
+		dgSPDMatrix<T, Size>::CholeskySolve(m_delta_x, m_r, index);
+		for (dgInt32 i = 0; i < index; i++) {
+			m_x[i] += m_delta_x[i];
+			m_r[i] = T (0.0f);
+		}
+		CalculateDelta_r(index);
+		for (dgInt32 i = index; i < Size; i++) {
+			m_r[i] += m_delta_r[i];
+		}
+		count = Size - index;
+	}
+#endif
+
+	dgInt32 clampedIndex = Size;
 	while (count) {
 		bool loop = true;
 		bool calculateDelta_x = true;
@@ -785,7 +812,6 @@ bool dgLCP<T, Size>::SolveDantzig()
 				}
 				loop = true;
 			}
-
 		}
 	}
 
