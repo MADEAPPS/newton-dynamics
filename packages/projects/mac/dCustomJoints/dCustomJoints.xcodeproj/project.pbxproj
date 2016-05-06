@@ -405,6 +405,7 @@
 					../../../dContainers,
 					../../../thirdParty/tinyxml,
 					"../../../thirdParty/enet-1.2/include",
+					../../../thirdParty/timeTracker,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -428,6 +429,7 @@
 					../../../dContainers,
 					../../../thirdParty/tinyxml,
 					"../../../thirdParty/enet-1.2/include",
+					../../../thirdParty/timeTracker,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
