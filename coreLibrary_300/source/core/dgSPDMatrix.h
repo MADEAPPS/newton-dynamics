@@ -50,8 +50,6 @@ class dgSPDMatrix: public dgSquareMatrix<T, Size>
 {
 	public:
 	dgSPDMatrix() {}
-//	dgSPDMatrix(const dgSPDMatrix<T, Size>& src);
-
 	~dgSPDMatrix() {}
 
 	DG_INLINE bool CholeskyFactorizationAddRow(dgInt32 n);
@@ -60,11 +58,9 @@ class dgSPDMatrix: public dgSquareMatrix<T, Size>
 	bool TestPSD() const;
 	bool LDLtDecomposition();
 	bool CholeskyFactorization();
-	
 
 	protected:
 	DG_INLINE bool CholeskyFactorization(dgInt32 n);
-	
 	DG_INLINE void CholeskySolve(T* const x, const T* const b, dgInt32 n) const;
 */
 };
@@ -81,8 +77,6 @@ class dgLCP: public dgSPDMatrix<T, Size>
 {
 	public:
 	dgLCP() {}
-//	dgLCP(const dgLCP& src);
-
 	~dgLCP() {}
 
 	dgGeneralVector<T, Size>& GetB() { return m_b;}
@@ -563,22 +557,23 @@ DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 template<class T, dgInt32 Size>
 DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(dgInt32 n)
 {
-	dgGeneralVector<T, Size>& rowI = dgGeneralMatrix<T, Size, Size>::m_rows[n];
+	dgGeneralVector<T, Size>& rowN = dgGeneralMatrix<T, Size, Size>::m_rows[n];
 	for (dgInt32 j = 0; j <= n; j++) {
 		T s(0.0f);
-		const dgGeneralVector<T, Size>& rowJ = dgGeneralMatrix<T, Size, Size>::m_rows[n];
+		const dgGeneralVector<T, Size>& rowJ = dgGeneralMatrix<T, Size, Size>::m_rows[j];
 		for (dgInt32 k = 0; k < j; k++) {
-			s += rowI[k] * rowJ[k];
+			s += rowN[k] * rowJ[k];
 		}
 
 		if (n == j) {
-			T diag = rowI[n] - s;
+			T diag = rowN[n] - s;
 			if (diag < T(0.0f)) {
+				dgAssert (0);
 				return false;
 			}
-			rowI[n] = T(sqrt(diag));
+			rowN[n] = T(sqrt(diag));
 		} else {
-			rowI[j] = (T(1.0f) / rowJ[j] * (rowI[j] - s));
+			rowN[j] = (T(1.0f) / rowJ[j] * (rowN[j] - s));
 		}
 	}
 	return true;
@@ -653,28 +648,10 @@ DG_INLINE void dgLCP<T, Size>::CalculateDelta_x(T dir, dgInt32 n)
 template<class T, dgInt32 Size>
 bool dgLCP<T, Size>::SolveDantzig()
 {
-	//dgSPDMatrix<T, Size>& me = *this;
-	//const dgInt32 size = dgGeneralMatrix<T, Size>::m_rowCount;
-
-	//static int xxx;
-	//xxx++;
 	//dgLCP<T, Size> gauss(*this);
 	//gauss.GaussSeidelLCP(100000, T(1.0e-6f));
 	//dgTrace(("pgs %d :", xxx));
 	//gauss.GetX().Trace();
-
-	//T* const r = &m_tmp[0][0];
-	//T* const x = &m_tmp[1][0];
-	//T* const delta_r = &m_tmp[2][0];
-	//T* const delta_x = &m_tmp[3][0];
-	//T* const diagonal = &m_tmp[4][0];
-	//T* const tmp = &m_tmp[5][0];
-	//T* const b = &m_b[0];
-	//T* const x_out = &m_x[0];
-	//T* const r_out = &m_r[0];
-	//T* const low = &m_low[0];
-	//T* const high = &m_high[0];
-	//dgInt16* const permute = m_permute;
 
 	for (dgInt32 i = 0; i < Size; i++) {
 		m_x[i] = dgClamp(m_x_out[i], m_low[i], m_high[i]);
@@ -727,7 +704,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 					}
 				}
 				dgAssert(s >= T(0.0f));
-				dgAssert(s <= -m_r[index] / m_delta_r[index]);
+				//dgAssert(s <= -m_r[index] / m_delta_r[index]);
 
 				for (dgInt32 i = clampedIndex; (i < Size) && (s > T(1.0e-12f)); i++) {
 					T r1 = m_r[i] + s * m_delta_r[i];

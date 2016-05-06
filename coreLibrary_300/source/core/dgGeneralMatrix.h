@@ -34,8 +34,6 @@ class dgGeneralMatrix
 {
 	public:
 	dgGeneralMatrix() {};
-//	dgGeneralMatrix(const dgGeneralMatrix<T, Rows, Columns>& src);
-
 	~dgGeneralMatrix() {}
 
 	dgGeneralVector<T, Columns>& operator[] (dgInt32 i);
@@ -50,6 +48,7 @@ class dgGeneralMatrix
 	void SwapRows(dgInt32 i, dgInt32 j);
 	void SwapColumns(dgInt32 i, dgInt32 j);
 
+
 /*
 	void Clear(T val);
 	void Identity();
@@ -57,8 +56,6 @@ class dgGeneralMatrix
 	// calculate out = v * A;
 	void VectorTimeMatrix(const dgGeneralVector<T, Rows> &v, dgGeneralVector<T, Rows> &out) const;
 
-	// calculate M = A * B;
-	void MatrixTimeMatrix(const dgGeneralMatrix<T, Rows, Columns>& A, const dgGeneralMatrix<T, Rows, Columns>& B);
 
 	// calculate M = A * transpose (B);
 	void MatrixTimeMatrixTranspose(const dgGeneralMatrix<T, Rows, Columns>& A, const dgGeneralMatrix<T, Rows, Columns>& Bt);
@@ -72,7 +69,6 @@ class dgGeneralMatrix
 
 	protected:
 	DG_INLINE void VectorTimeMatrix(const T* const v, T* const out) const;
-	DG_INLINE void MatrixTimeVector(const T* const v, T* const out) const;
 */
 	dgGeneralVector<T, Rows> m_rows[Columns];
 };
@@ -83,7 +79,6 @@ class dgSquareMatrix: public dgGeneralMatrix<T, Size, Size>
 {
 	public:
 	dgSquareMatrix() {}
-//	dgSquareMatrix(const dgGeneralMatrix<T, Size, Size>& src);
 	~dgSquareMatrix() {}
 /*
 	static dgInt32 CalculateMemorySize(dgInt32 row)
@@ -196,14 +191,6 @@ void dgGeneralMatrix<T, Rows, Columns>::VectorTimeMatrix(const T* const v, T* co
 
 
 
-template<class T, dgInt32 Rows, dgInt32 Columns>
-DG_INLINE void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const T* const v, T* const out) const
-{
-	const dgGeneralMatrix<T>& me = *this;
-	for (dgInt32 i = 0; i < m_rowCount; i++) {
-		out[i] = me[i].DotProduct(v);
-	}
-}
 
 
 template<class T, dgInt32 Rows, dgInt32 Columns>
@@ -356,16 +343,6 @@ const dgGeneralVector<T, Columns>& dgGeneralMatrix<T, Rows, Columns>::operator[]
      return m_rows[i];
 }
 
-template<class T, dgInt32 Rows, dgInt32 Columns>
-void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const dgGeneralVector<T, Columns> &v, dgGeneralVector<T, Columns> &out) const
-{
-    dgAssert(&v != &out);
-	dgAssert(GetRowCount() == v.GetRowCount());
-	dgAssert(GetColCount() == out.GetRowCount());
-	for (dgInt32 i = 0; i < Rows; i++) {
-		out[i] = m_rows[i].DotProduct(v);
-	}
-}
 
 
 template<class T, dgInt32 Rows, dgInt32 Columns>
@@ -397,6 +374,18 @@ void dgGeneralMatrix<T, Rows, Columns>::SwapColumns(dgInt32 i, dgInt32 j)
 		for (dgInt32 k = 0; k < Rows; k++) {
 			dgSwap(m_rows[k][i], m_rows[k][j]);
 		}
+	}
+}
+
+
+template<class T, dgInt32 Rows, dgInt32 Columns>
+void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const dgGeneralVector<T, Columns> &v, dgGeneralVector<T, Columns> &out) const
+{
+    dgAssert(&v != &out);
+	dgAssert(GetRowCount() == v.GetRowCount());
+	dgAssert(GetColCount() == out.GetRowCount());
+	for (dgInt32 i = 0; i < Rows; i++) {
+		out[i] = m_rows[i].DotProduct(v);
 	}
 }
 

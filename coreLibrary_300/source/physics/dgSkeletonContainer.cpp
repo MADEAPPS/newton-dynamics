@@ -841,33 +841,34 @@ XXXX();
 
 void dgSkeletonContainer::XXXX()
 {
-	dgLCP<dgFloat32, 2> xxx;
+	int const size = 10;
+	dgLCP<dgFloat32, size> xxx;
 
-	dgGeneralVector<dgFloat32, 2>& B = xxx.GetB();
-	dgGeneralVector<dgFloat32, 2>& X = xxx.GetX();
-	dgGeneralVector<dgFloat32, 2>& Low = xxx.GetLowLimit();
-	dgGeneralVector<dgFloat32, 2>& High = xxx.GetHightLimit();
+	dgGeneralVector<dgFloat32, size>& B = xxx.GetB();
+	dgGeneralVector<dgFloat32, size>& X = xxx.GetX();
+	dgGeneralVector<dgFloat32, size>& Low = xxx.GetLowLimit();
+	dgGeneralVector<dgFloat32, size>& High = xxx.GetHightLimit();
 
-	xxx[0][0] = 2.0f;
-	xxx[0][1] = 1.0f;
-	xxx[1][1] = 2.0f;
-	xxx[1][0] = 1.0f;
-
-	B[0] = 10.0f;
-	B[1] = 10.0f;
-	X[0] = 20.0f;
-	X[1] = 0.0f;
-	Low[0] = -1.0f;
-	Low[1] = -10.0f;
-	High[0] = 1.0f;
-	High[1] = 10.0f;
-
+	for (int i = 0; i < size; i ++) {
+		B[i] = 1.0f + i;
+		X[i] = 0.0f;
+		Low[i] = -1000.0f;	
+		High[i] = 1000.0f;
+		xxx[i][i] = 2.0f;
+		for (int j = i + 1; j < size; j ++) {
+			xxx[i][j] = 1.0f;
+			xxx[j][i] = 1.0f;
+		}
+	}
 //	dgAssert (0);
-
-//	xxx.SolveDantzig();
 /*
-	const dgGeneralVector<dgFloat32>& R = xxx.GetR();
-	const dgGeneralVector<dgFloat32>& X1 = xxx.GetX();
+	dgSPDMatrix<dgFloat32, size>xxx1 (xxx);
+	xxx.SolveDantzig();
+
+	dgGeneralVector<dgFloat32, size> mm;
+	xxx1.MatrixTimeVector(X, mm);
+	const dgGeneralVector<dgFloat32, size>& R = xxx.GetR();
+	const dgGeneralVector<dgFloat32, size>& X1 = xxx.GetX();
 */
 }
 

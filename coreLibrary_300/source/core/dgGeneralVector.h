@@ -36,8 +36,6 @@ class dgGeneralVector
 {
 	public:
 	dgGeneralVector() {}
-//	dgGeneralVector(const dgGeneralVector<T, Size> &src);
-
 	~dgGeneralVector() {}
 
 	T& operator[] (dgInt32 i);
