@@ -803,11 +803,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 
 				index--;
 				for (dgInt32 i = swapIndex; i < index; i++) {
-#ifdef _DEBUG
-					dgAssert(dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(i));
-#else
 					dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(i);
-#endif
 				}
 				loop = true;
 			}
