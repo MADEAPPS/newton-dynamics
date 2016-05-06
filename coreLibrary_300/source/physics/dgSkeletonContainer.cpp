@@ -852,8 +852,8 @@ void dgSkeletonContainer::XXXX()
 	for (int i = 0; i < size; i ++) {
 		B[i] = 1.0f + i;
 		X[i] = 0.0f;
-		Low[i] = -1000.0f;	
-		High[i] = 1000.0f;
+		Low[i] = -LCP_MAX_VALUE;	
+		High[i] = LCP_MAX_VALUE;
 		xxx[i][i] = 2.0f;
 		for (int j = i + 1; j < size; j ++) {
 			xxx[i][j] = 1.0f;

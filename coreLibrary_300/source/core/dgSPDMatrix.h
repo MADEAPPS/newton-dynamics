@@ -76,6 +76,7 @@ template<class T, dgInt32 Size>
 class dgLCP: public dgSPDMatrix<T, Size>
 {
 	public:
+	#define LCP_MAX_VALUE dgFloat32 (1.0e12f);
 	dgLCP() {}
 	~dgLCP() {}
 
