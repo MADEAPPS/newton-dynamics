@@ -563,10 +563,10 @@ DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 template<class T, dgInt32 Size>
 DG_INLINE bool dgSPDMatrix<T, Size>::CholeskyFactorizationAddRow(dgInt32 n)
 {
-	dgGeneralVector<T, Size>& rowI = m_rows[n];
+	dgGeneralVector<T, Size>& rowI = dgGeneralMatrix<T, Size, Size>::m_rows[n];
 	for (dgInt32 j = 0; j <= n; j++) {
 		T s(0.0f);
-		const dgGeneralVector<T, Size>& rowJ = m_rows[n];
+		const dgGeneralVector<T, Size>& rowJ = dgGeneralMatrix<T, Size, Size>::m_rows[n];
 		for (dgInt32 k = 0; k < j; k++) {
 			s += rowI[k] * rowJ[k];
 		}
@@ -591,10 +591,10 @@ DG_INLINE void dgLCP<T, Size>::CholeskyRestore(dgInt32 n, dgInt32 size)
 	dgAssert (0);
 	for (dgInt32 i = n; i < size; i++) {
 		//T* const row = &me[i][0];
-		dgGeneralVector<T, Size>& row = m_rows[i];
-		row[i] = diagonal[i];
+		//dgGeneralVector<T, Size>& row = dgGeneralMatrix<T, Size, Size>::m_rows[i];
+		dgGeneralMatrix<T, Size, Size>::m_rows[i][i] = diagonal[i];
 		for (dgInt32 j = 0; j < i; j++) {
-			row[j] = m_rows[j][i];
+			row[j] = dgGeneralMatrix<T, Size, Size>::m_rows[j][i];
 		}
 	}
 }
@@ -605,7 +605,7 @@ void dgSPDMatrix<T, Size>::CholeskySolve(dgGeneralVector<T, Size>& x, const dgGe
 {
 	for (dgInt32 i = 0; i < n; i++) {
 		T acc (0.0f);
-		const dgGeneralVector<T, Size>& row = m_rows[i];
+		const dgGeneralVector<T, Size>& row = dgGeneralMatrix<T, Size, Size>::m_rows[i];
 		for (dgInt32 j = 0; j < i; j++) {
 			acc = acc + row[j] * x[j];
 		}
@@ -615,9 +615,9 @@ void dgSPDMatrix<T, Size>::CholeskySolve(dgGeneralVector<T, Size>& x, const dgGe
 	for (dgInt32 i = n - 1; i >= 0; i--) {
 		T acc = 0.0f;
 		for (dgInt32 j = i + 1; j < n; j++) {
-			acc = acc + m_rows[j][i] * x[j];
+			acc = acc + dgGeneralMatrix<T, Size, Size>::m_rows[j][i] * x[j];
 		}
-		x[i] = (x[i] - acc) / m_rows[i][i];
+		x[i] = (x[i] - acc) / dgGeneralMatrix<T, Size, Size>::m_rows[i][i];
 	}
 }
 
@@ -627,7 +627,7 @@ template<class T, dgInt32 Size>
 DG_INLINE void dgLCP<T, Size>::CalculateDelta_r(dgInt32 n)
 {
 	for (dgInt32 i = n; i < Size; i++) {
-		delta_r[i] = m_rows[i].DotProduct(delta_x);
+		delta_r[i] = dgGeneralMatrix<T, Size, Size>::m_rows[i].DotProduct(delta_x);
 	}
 }
 
@@ -638,7 +638,7 @@ DG_INLINE void dgLCP<T, Size>::CalculateDelta_r(dgInt32 n)
 template<class T, dgInt32 Size>
 DG_INLINE void dgLCP<T, Size>::CalculateDelta_x(T dir, dgInt32 n)
 {
-	const dgGeneralVector<T, Size>& row = m_rows[n];
+	const dgGeneralVector<T, Size>& row = dgGeneralMatrix<T, Size, Size>::m_rows[n];
 	for (dgInt32 i = 0; i < n; i++) {
 		tmp[i] = -row[i] * dir;
 	}
@@ -679,7 +679,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 	for (dgInt32 i = 0; i < Size; i++) {
 		x[i] = dgClamp(x_out[i], low[i], high[i]);
 		permute[i] = dgInt16(i);
-		diagonal[i] = m_rows[i][i];
+		diagonal[i] = dgGeneralMatrix<T, Size, Size>::m_rows[i][i];
 	}
 
 	MatrixTimeVector(x, r);
