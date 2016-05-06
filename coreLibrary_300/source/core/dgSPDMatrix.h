@@ -684,7 +684,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 	if (index > 0) {
 		dgSPDMatrix<T, Size>::CholeskySolve(m_delta_x, m_r, index);
 		for (dgInt32 i = 0; i < index; i++) {
-			m_x[i] += m_delta_x[i];
+			m_x[i] -= m_delta_x[i];
 			m_r[i] = T (0.0f);
 		}
 		CalculateDelta_r(index);
