@@ -835,7 +835,7 @@ void dgSkeletonContainer::SoveNormal (dgJointInfo* const jointInfoArray, const d
 	SolveBackward(force);
 	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
 
-XXXX();
+//XXXX();
 }
 
 
@@ -860,19 +860,20 @@ void dgSkeletonContainer::XXXX()
 			xxx[j][i] = 1.0f;
 		}
 	}
-//	dgAssert (0);
+
 Low[0] = -1.0f;	
 High[0] = 1.0f;
 Low[2] = -1.0f;	
 High[2] = 1.0f;
 
-//Low[7] = -1.0f;	
-//High[7] = 1.0f;
+Low[7] = -1.0f;	
+High[7] = 1.0f;
 
-/*
+
 	dgSPDMatrix<dgFloat32, size>xxx1 (xxx);
 	xxx.SolveDantzig();
 
+/*
 	dgGeneralVector<dgFloat32, size> mm;
 	xxx1.MatrixTimeVector(X, mm);
 	const dgGeneralVector<dgFloat32, size>& R = xxx.GetR();
@@ -918,7 +919,7 @@ void dgSkeletonContainer::FindFirstVariablesSet(dgJointInfo* const jointInfoArra
 
 void dgSkeletonContainer::SoveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const forces)
 {
-	XXXX();
+//	XXXX();
 
 	EnumerateRowsAndInitForces(jointInfoArray, forces); 
 

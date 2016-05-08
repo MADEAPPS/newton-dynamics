@@ -211,6 +211,7 @@ class SuperCarEntity: public DemoEntity
 		,m_gearUpKey (false)
 		,m_gearDownKey (false)
 		,m_engineKeySwitch(false)
+		,m_engineDifferentialLock(false)
 		,m_automaticTransmission(true)
 		,m_engineRPMOn(false)
 		,m_distanceToPath(distanceToPath)
@@ -541,7 +542,7 @@ class SuperCarEntity: public DemoEntity
 		}
 
 
-		engineInfo.m_slipDifferentialOn = 1;
+		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
 		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, differential);
 
@@ -589,6 +590,7 @@ class SuperCarEntity: public DemoEntity
 
 		int gear = engine->GetGear();
 		int engineIgnitionKey = 0;
+		int engineDifferentialLock = 0;
 		int automaticTransmission = engine->GetTransmissionMode();
 		dFloat cluthPedal = 1.0f;
 		dFloat steeringVal = 0.0f;
@@ -613,6 +615,7 @@ class SuperCarEntity: public DemoEntity
 		} else {
 
 			engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
+			engineDifferentialLock = m_engineDifferentialLock.UpdatePushButton(mainWindow, 'L');
 			automaticTransmission = m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d);
 			steeringVal = (dFloat(mainWindow->GetKeyState('A')) - dFloat(mainWindow->GetKeyState('D')));
 			gear += int(m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int(m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
@@ -629,7 +632,6 @@ class SuperCarEntity: public DemoEntity
 				handBrakePedal = 1.0f;
 			}
 
-
 			if (mainWindow->GetKeyState ('K')) {
  				cluthPedal = 0.0f;
 			}
@@ -640,6 +642,7 @@ class SuperCarEntity: public DemoEntity
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
+			fwrite (&engineSlipDifferential, sizeof (int), 1, file);
 			fwrite (&automaticTransmission, sizeof (int), 1, file);
 			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
@@ -653,6 +656,7 @@ class SuperCarEntity: public DemoEntity
 		static FILE* file = fopen ("log.bin", "rb");
 		if (file) {		
 			fread (&engineIgnitionKey, sizeof (int), 1, file);
+			fread (&engineDifferentialLock, sizeof (int), 1, file);
 		 	fread (&automaticTransmission, sizeof (int), 1, file);
 			fread (&gear, sizeof (int), 1, file);
 			fread (&steeringVal, sizeof (dFloat), 1, file);
@@ -664,9 +668,9 @@ class SuperCarEntity: public DemoEntity
 	#endif
 #endif
 
-
-//forwardGasPedal *= 0.75f;	
 		steering->SetParam(steeringVal);
+		engine->SetDifferentialLock (engineDifferentialLock ? true : false);
+	
 		switch (m_drivingState)
 		{
 			case m_engineOff:
@@ -1014,6 +1018,7 @@ class SuperCarEntity: public DemoEntity
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;
 	DemoEntityManager::ButtonKey m_engineKeySwitch;
+	DemoEntityManager::ButtonKey m_engineDifferentialLock;
 	DemoEntityManager::ButtonKey m_automaticTransmission;
 	int m_gearMap[10];
 	bool m_engineRPMOn;
@@ -1135,18 +1140,19 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engine switch       : 'I'           start engine");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'           stick forward");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'           stick back");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left           : 'A'           stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage clutch       : 'K'           button 5");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up             : '>'           button 2");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           : '<'           button 3");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission : enter         button 4");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : space         button 1");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "next vehicle        : 'V'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "engine switch             : 'I'           start engine");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator               : 'W'           stick forward");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes                    : 'S'           stick back");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left                 : 'A'           stick left");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right                : 'D'           stick right");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage clutch             : 'K'           button 5");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage differential lock  : 'L'           button 5");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up                   : '>'           button 2");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down                 : '<'           button 3");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission       : enter         button 4");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes               : space         button 1");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "next vehicle              : 'V'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help                 : 'H'");
 		}
 
 		bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene->GetRootWindow(), 'V');

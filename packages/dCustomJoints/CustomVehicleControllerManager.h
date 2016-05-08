@@ -326,8 +326,6 @@ class CustomVehicleController: public CustomControllerBase
 			Differential4wd m_secund4Wd;
 		};
 
-
-
 		class Info
 		{
 			public:
@@ -353,7 +351,7 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_clutchFrictionTorque;
 
 			int m_gearsCount;
-			int m_slipDifferentialOn;
+			int m_differentialLock;
 			void* m_userData;
 	
 			private:
@@ -370,6 +368,8 @@ class CustomVehicleController: public CustomControllerBase
 
 		private:
 		class DriveTrainTire;
+		class DriveTrainEngine;
+		class DriveTrainSlipDifferential;
 
 		class DriveTrain: public CustomAlloc
 		{
@@ -378,6 +378,8 @@ class CustomVehicleController: public CustomControllerBase
 			virtual ~DriveTrain();
 
 			virtual DriveTrainTire* CastAsTire() {return NULL;}
+			virtual DriveTrainEngine* CastAsEngine() {return NULL;}
+			virtual DriveTrainSlipDifferential* CastAsSlipDifferential() {return NULL;}
 			
 			virtual void SetPartMasses (const dVector& invInertia);
 			virtual dFloat* GetMassMatrix() {return NULL;}
@@ -385,7 +387,7 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void Integrate(EngineController* const controller, dFloat timestep);
 			virtual void SetGearRatioJacobian(dFloat gearRatio) {};
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
-			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
+			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
 			
 			void SetInvMassJt();
 			void BuildMassMatrix ();
@@ -394,11 +396,11 @@ class CustomVehicleController: public CustomControllerBase
 
 			void GetRow(dVector* const row) const;
 			void GetInvRowT(dVector* const row) const;
-			void FactorRow (int row, int size, dFloat* const matrix);
 			
 			int GetNodeArray(DriveTrain** const array);
 			int GetNodeArray(DriveTrain** const array, int& index);
 
+			
 			dVector m_J01;
 			dVector m_J10;
 			dVector m_invMassJt01;
@@ -410,6 +412,7 @@ class CustomVehicleController: public CustomControllerBase
 			DriveTrain* m_child;
 			DriveTrain* m_sibling;
 			int m_index;
+			int m_sortKey;
 		};
 
 		class DriveTrainEngine: public DriveTrain
@@ -417,15 +420,15 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DriveTrainEngine (const dVector& invInertia);
 
+			virtual DriveTrainEngine* CastAsEngine() {return this;}
 			void SetGearRatio (dFloat gearRatio);
 			void SetGearRatioJacobian(dFloat gearRatio);
 			void SetExternalTorque(EngineController* const controller);
 			void RebuildEngine (const dVector& invInertia);
 			dFloat GetClutchTorque(EngineController* const controller) const;
 			void Update(EngineController* const controller, dFloat engineTorque, dFloat timestep);
-			void Solve (int dofSize, int width, const dFloat* const massMatrix, const dFloat* const b, dFloat* const x) const;
+			//void Solve (int dofSize, int width, const dFloat* const massMatrix, const dFloat* const b, dFloat* const x) const;
 
-			dFloat m_lastGear;
 			dFloat m_gearSign;
 			dFloat m_engineTorque;
 		};
@@ -435,7 +438,7 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DriveTrainEngine2W (const dVector& invInertia, const DifferentialAxel& axel);
 			virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
-			dFloat matrix[3][3];
+			dFloat matrix[4][4];
 		};
 
 		class DriveTrainEngine4W: public DriveTrainEngine
@@ -443,8 +446,7 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DriveTrainEngine4W (const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
 			virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
-
-			dFloat matrix[7][7];
+			dFloat matrix[10][10];
 		};
 
 		class DriveTrainEngine8W: public DriveTrainEngine
@@ -452,10 +454,8 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DriveTrainEngine8W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1, const DifferentialAxel& axel2, const DifferentialAxel& axel3);
 			virtual dFloat* GetMassMatrix() { return &matrix[0][0]; }
-
-			dFloat matrix[15][15];
+			dFloat matrix[22][22];
 		};
-
 
 		class DriveTrainDifferentialGear: public DriveTrain
 		{
@@ -463,12 +463,19 @@ class CustomVehicleController: public CustomControllerBase
 			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel, dFloat side);
 			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1, dFloat side);
 			DriveTrainDifferentialGear (const dVector& invInertia, DriveTrain* const parent, const DifferentialAxel& axel0, const DifferentialAxel& axel1, const DifferentialAxel& axel2, const DifferentialAxel& axel3, dFloat side);
-
 			
 			virtual void SetGearRatioJacobian(dFloat gearGain);
-			virtual void SetExternalTorque(EngineController* const controller);
-			//void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide);
-			dFloat m_slipDifferentialViscuosFriction;
+			void Integrate(EngineController* const controller, dFloat timestep);
+		};
+
+		class DriveTrainSlipDifferential: public DriveTrain
+		{
+			public:
+			DriveTrainSlipDifferential (DriveTrain* const parent);
+
+			DriveTrainSlipDifferential* CastAsSlipDifferential() {return this;}
+			virtual void SetPartMasses (const dVector& invInertia);
+			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
 		};
 
 		class DriveTrainTire: public DriveTrain
@@ -513,8 +520,8 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API bool GetTransmissionMode() const;
 		CUSTOM_JOINTS_API void SetTransmissionMode(bool mode);
 
-		CUSTOM_JOINTS_API bool GetSlipDifferential () const;
-		CUSTOM_JOINTS_API void SetSlipDifferential (bool mode);
+		CUSTOM_JOINTS_API bool GetDifferentialLock () const;
+		CUSTOM_JOINTS_API void SetDifferentialLock (bool mode);
 		CUSTOM_JOINTS_API void SetClutchParam (dFloat cluthParam);
 
 		CUSTOM_JOINTS_API void PlotEngineCurve () const;

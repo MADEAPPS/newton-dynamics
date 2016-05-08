@@ -1197,8 +1197,7 @@ class HeavyVehicleEntity: public DemoEntity
 		differential.m_secund4Wd.m_secundAxel.m_axel.m_leftTire = leftTire[3];
 		differential.m_secund4Wd.m_secundAxel.m_axel.m_rightTire = rightTire[3];
 	
-
-		engineInfo.m_slipDifferentialOn = 1;
+		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
 		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController(m_controller, engineInfo, differential);
 

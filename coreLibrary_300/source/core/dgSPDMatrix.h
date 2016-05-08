@@ -139,7 +139,7 @@ class dgLCP: public dgSPDMatrix<T, Size>
 	dgGeneralVector<T, Size> m_delta_x;
 	dgGeneralVector<T, Size> m_diagonal;
 	dgGeneralVector<T, Size> m_tmp;
-	dgInt16 permute[Size];
+	dgInt16 m_permute[Size];
 };
 
 
@@ -538,7 +538,7 @@ DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 		dgSwap(m_b[i], m_b[j]);
 		dgSwap(m_low[i], m_low[j]);
 		dgSwap(m_high[i], m_high[j]);
-		dgSwap(permute[i], permute[j]);
+		dgSwap(m_permute[i], m_permute[j]);
 		//T* const r = &m_tmp[0][0];
 		//T* const x = &m_tmp[1][0];
 		//T* const delta_r = &m_tmp[2][0];
@@ -655,7 +655,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 
 	for (dgInt32 i = 0; i < Size; i++) {
 		m_x[i] = dgClamp(m_x_out[i], m_low[i], m_high[i]);
-		permute[i] = dgInt16(i);
+		m_permute[i] = dgInt16(i);
 		m_diagonal[i] = dgGeneralMatrix<T, Size, Size>::m_rows[i][i];
 	}
 
@@ -666,9 +666,10 @@ bool dgLCP<T, Size>::SolveDantzig()
 
 	dgInt32 index = 0;
 	dgInt32 count = Size;
+
 #if 1
 	for (dgInt32 i = 0; i < count; i++) {
-		if ((m_low[i] <= LCP_MAX_VALUE) && (m_high[i] >= LCP_MAX_VALUE)) {
+		if ((m_low[i] <= T(-LCP_MAX_VALUE)) && (m_high[i] >= T(LCP_MAX_VALUE))) {
 			CholeskyFactorizationAddRow (index);
 			index ++;
 		} else {
@@ -684,6 +685,10 @@ bool dgLCP<T, Size>::SolveDantzig()
 			m_x[i] -= m_delta_x[i];
 			m_r[i] = T (0.0f);
 		}
+		for (int i = index; i < Size; i++) {
+			m_delta_x[i] = T(0.0f);
+		}
+
 		CalculateDelta_r(index);
 		for (dgInt32 i = index; i < Size; i++) {
 			m_r[i] -= m_delta_r[i];
@@ -696,7 +701,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 	while (count) {
 		bool loop = true;
 		bool calculateDelta_x = true;
-		T dir = 0.0f;
+		T dir (0.0f);
 
 		while (loop) {
 			loop = false;
@@ -813,7 +818,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 	}
 
 	for (dgInt32 i = 0; i < Size; i++) {
-		dgInt32 j = permute[i];
+		dgInt32 j = m_permute[i];
 		m_x_out[j] = m_x[i];
 		m_r_out[j] = m_r[i];
 	}
