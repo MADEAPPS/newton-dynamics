@@ -260,9 +260,9 @@ bool CholeskyFactorizationAddRow(int size, int n, T* const matrix)
 template<class T>
 void CholeskyRestore(int size, T* const matrix, const T* const diagonal, int n, int subSize)
 {
-	int stride = subSize * n;
+	int stride = n * size;
 	for (int i = n; i < subSize; i++) {
-		T* const row = &matrix[i];
+		T* const row = &matrix[stride];
 		row[i] = diagonal[i];
 		for (int j = 0; j < i; j++) {
 			row[j] = matrix[size * j + i];
@@ -300,6 +300,9 @@ template<class T>
 void CalculateDelta_r(int size, int n, const T* const matrix, const T* const m_delta_x, T* const m_delta_r)
 {
 	int stride = n * size;
+	for (int i = 0; i < n; i ++) {
+		m_delta_r[i] = T(0.0f);
+	}
 	for (int i = n; i < size; i++) {
 		m_delta_r[i] = DotProduct(size, &matrix[stride], m_delta_x);
 		stride += size;
@@ -322,7 +325,7 @@ void CalculateDelta_x(int size, T dir, int n, const T* const matrix, T* const m_
 
 
 template<class T>
-void PermuteRows(int size, int i, int j, T* const matrix, T* const m_x, T* const m_b, T* const m_low, T* const m_high, T* const m_r, T* const m_delta_x, T* const m_delta_r, T* const m_diagonal, short* const m_permute)
+void PermuteRows(int size, int i, int j, T* const matrix, T* const m_x, T* const m_r, T* const m_low, T* const m_high, T* const m_diagonal, short* const m_permute)
 {
 	if (i != j) {
 		T* const A = &matrix[size * i];
@@ -339,11 +342,8 @@ void PermuteRows(int size, int i, int j, T* const matrix, T* const m_x, T* const
 
 		dSwap(m_x[i], m_x[j]);
 		dSwap(m_r[i], m_r[j]);
-		dSwap(m_b[i], m_b[j]);
 		dSwap(m_low[i], m_low[j]);
 		dSwap(m_high[i], m_high[j]);
-		dSwap(m_delta_r[i], m_delta_r[j]);
-		dSwap(m_delta_x[i], m_delta_x[j]);
 		dSwap(m_diagonal[i], m_diagonal[j]);
 		dSwap(m_permute[i], m_permute[j]);
 	}
@@ -386,7 +386,7 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 			CholeskyFactorizationAddRow(size, index, matrix);
 			index++;
 		} else {
-			PermuteRows(size, i, count - 1, matrix, m_x, b, low, high, m_r, m_delta_x, m_delta_r, diagonal, permute);
+			PermuteRows(size, i, count - 1, matrix, m_x, m_r, low, high, diagonal, permute);
 			i--;
 			count--;
 		}
@@ -409,6 +409,7 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 		count = size - index;
 	}
 
+	const int start = index;
 	int clampedIndex = size;
 	while (count) {
 		bool loop = true;
@@ -435,7 +436,7 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 				T s = -m_r[index] / m_delta_r[index];
 				dAssert(s >= T(0.0f));
 
-				for (int i = 0; i <= index; i++) {
+				for (int i = start; i <= index; i++) {
 					T x1 = m_x[i] + s * m_delta_x[i];
 					if (x1 > high[i]) {
 						swapIndex = i;
@@ -489,7 +490,7 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 				clampedIndex--;
 				m_x[index] = clamp_x;
 				m_delta_x[index] = T(0.0f);
-				PermuteRows(size, index, clampedIndex, matrix, m_x, b, low, high, m_r, m_delta_x, m_delta_r, diagonal, permute);
+				PermuteRows(size, index, clampedIndex, matrix, m_x, m_r, low, high, diagonal, permute);
 				loop = count ? true : false;
 			} else if (swapIndex > index) {
 				loop = true;
@@ -499,12 +500,12 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 				if (swapIndex < clampedIndex) {
 					count--;
 					clampedIndex--;
-					PermuteRows(size, clampedIndex, swapIndex, matrix, m_x, b, low, high, m_r, m_delta_x, m_delta_r, diagonal, permute);
+					PermuteRows(size, clampedIndex, swapIndex, matrix, m_x, m_r, low, high, diagonal, permute);
 					dAssert(clampedIndex >= index);
 				} else {
 					count++;
 					dAssert(clampedIndex < size);
-					PermuteRows(size, clampedIndex, swapIndex, matrix, m_x, b, low, high, m_r, m_delta_x, m_delta_r, diagonal, permute);
+					PermuteRows(size, clampedIndex, swapIndex, matrix, m_x, m_r, low, high, diagonal, permute);
 					clampedIndex++;
 					dAssert(clampedIndex <= size);
 					dAssert(clampedIndex >= index);
@@ -517,10 +518,10 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 				CholeskyRestore(size, matrix, diagonal, swapIndex, index);
 
 				dAssert(index > 0);
-				PermuteRows(size, swapIndex, index - 1, matrix, m_x, b, low, high, m_r, m_delta_x, m_delta_r, diagonal, permute);
-				PermuteRows(size, index - 1, index, matrix, m_x, b, low, high, m_r, m_delta_x, m_delta_r, diagonal, permute);
+				PermuteRows(size, swapIndex, index - 1, matrix, m_x, m_r, low, high, diagonal, permute);
+				PermuteRows(size, index - 1, index, matrix, m_x, m_r, low, high, diagonal, permute);
 				clampedIndex--;
-				PermuteRows(size, clampedIndex, index, matrix, m_x, b, low, high, m_r, m_delta_x, m_delta_r, diagonal, permute);
+				PermuteRows(size, clampedIndex, index, matrix, m_x, m_r, low, high, diagonal, permute);
 
 				index--;
 				for (int i = swapIndex; i < index; i++) {

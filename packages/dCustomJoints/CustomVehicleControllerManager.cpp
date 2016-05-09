@@ -697,8 +697,9 @@ Low[7] = -1.0f;
 High[7] = 1.0f;
 	SolveDantzigLCP(size, &xxx[0][0], X, B, Low, High);
 }
+*/
 
-void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
+void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix(dFloat* const massMatrix)
 {
 	const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
 	DriveTrain* nodeList[size];
@@ -710,8 +711,6 @@ void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
 	dAssert(size > dofSize);
 	
 	int y = 0;
-	dFloat* const massMatrix = GetMassMatrix();
-	dAssert (massMatrix);
 	memset(massMatrix, 0, dofSize * dofSize * sizeof (dFloat));
 	for (int i = 0; i < nodeCount - 1; i++) {
 		DriveTrain* const nodeA = nodeList[i];
@@ -738,12 +737,8 @@ void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
 	for (int i = 0; i < dofSize; i++) {
 		massMatrix[i * dofSize + i] *= D_VEHICLE_REGULARIZER;
 	}
-
-	for (int i = 0; i < dofSize; i++) {
-//		FactorRow (i, dofSize, massMatrix);
-	}
 }
-*/
+
 
 void CustomVehicleController::EngineController::DriveTrain::SetExternalTorque(EngineController* const controller)
 {
@@ -836,6 +831,9 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 	
 	dAssert(massMatrix);
 
+static int xxx;
+xxx ++;
+
 	int stride = 0;
 	memset(massMatrix, 0, dofSize * dofSize * sizeof (dFloat));
 	for (int i = 0; i < dofSize; i++) {
@@ -861,7 +859,19 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 
 		stride += dofSize;
 	}
-	
+/*
+dFloat xxxx1[10][10];
+dFloat xxxx2[10][10];
+memcpy (xxxx1, massMatrix, sizeof (xxxx1));
+BuildMassMatrix(massMatrix);	
+memcpy (xxxx2, massMatrix, sizeof (xxxx2));
+for (int i = 0; i < 10; i ++)
+for (int j = 0; j < 10; j ++)
+{
+dAssert (dAbs (xxxx1[i][j] - xxxx2[i][j]) < 1.0e-5f);
+}
+*/
+
 	SolveDantzigLCP(dofSize, massMatrix, x, b, low, high);
 
 	for (int i = 0; i < nodesCount - 1; i++) {

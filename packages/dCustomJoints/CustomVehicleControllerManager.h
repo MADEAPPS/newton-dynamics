@@ -391,7 +391,7 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
 			
 			void SetInvMassJt();
-			//void BuildMassMatrix ();
+			void BuildMassMatrix (dFloat* const massMatrix);
 			void ReconstructInvMassJt ();
 			void SetDifferentialJacobian (dFloat gearGain);
 
