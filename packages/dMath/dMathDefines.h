@@ -406,8 +406,8 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 		for (int i = index; i < size; i++) {
 			m_r[i] -= m_delta_r[i];
 		}
-		count = size - index;
 	}
+	count = size - index;
 
 	const int start = index;
 	int clampedIndex = size;
