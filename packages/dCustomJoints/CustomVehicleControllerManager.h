@@ -53,6 +53,7 @@ class CustomVehicleController: public CustomControllerBase
 
 		void InitalizeCurve(int points, const dFloat* const steps, const dFloat* const values);
 		dFloat GetValue(dFloat param) const;
+		const dNot& GetValue(int entry) const {return m_nodes[entry];}
 
 		dNot m_nodes[6];
 		int m_count;
@@ -382,7 +383,7 @@ class CustomVehicleController: public CustomControllerBase
 			virtual DriveTrainSlipDifferential* CastAsSlipDifferential() {return NULL;}
 			
 			virtual void SetPartMasses (const dVector& invInertia);
-			virtual dFloat* GetMassMatrix() {return NULL;}
+			//virtual dFloat* GetMassMatrix() {return NULL;}
 			virtual void SetExternalTorque(EngineController* const controller);
 			virtual void Integrate(EngineController* const controller, dFloat timestep);
 			virtual void SetGearRatioJacobian(dFloat gearRatio) {};
@@ -390,7 +391,7 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
 			
 			void SetInvMassJt();
-			void BuildMassMatrix ();
+			//void BuildMassMatrix ();
 			void ReconstructInvMassJt ();
 			void SetDifferentialJacobian (dFloat gearGain);
 
@@ -437,24 +438,24 @@ class CustomVehicleController: public CustomControllerBase
 		{
 			public:
 			DriveTrainEngine2W (const dVector& invInertia, const DifferentialAxel& axel);
-			virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
-			dFloat matrix[4][4];
+			//virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
+			//dFloat matrix[4][4];
 		};
 
 		class DriveTrainEngine4W: public DriveTrainEngine
 		{
 			public:
 			DriveTrainEngine4W (const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
-			virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
-			dFloat matrix[10][10];
+			//virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
+			//dFloat matrix[10][10];
 		};
 
 		class DriveTrainEngine8W: public DriveTrainEngine
 		{
 			public:
 			DriveTrainEngine8W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1, const DifferentialAxel& axel2, const DifferentialAxel& axel3);
-			virtual dFloat* GetMassMatrix() { return &matrix[0][0]; }
-			dFloat matrix[22][22];
+			//virtual dFloat* GetMassMatrix() { return &matrix[0][0]; }
+			//dFloat matrix[22][22];
 		};
 
 		class DriveTrainDifferentialGear: public DriveTrain

@@ -653,8 +653,15 @@ void CustomVehicleController::EngineController::DriveTrain::CalculateRightSide(E
 	relativeOmega = (dAbs(relativeOmega) < 1.0e-8f) ? 0.0f : relativeOmega;
 	rightSide[m_index] = -(torqueAccel + k * relativeOmega);
 
-	low[m_index] = -D_LCP_MAX_VALUE;
-	high[m_index] = D_LCP_MAX_VALUE;
+	const DriveTrainEngine* const engine = m_parent->CastAsEngine();
+	if (engine) {
+		dFloat clutch = engine->GetClutchTorque(controller);
+		low[m_index] = -clutch;
+		high[m_index] = clutch;
+	} else {
+		low[m_index] = -D_LCP_MAX_VALUE;
+		high[m_index] = D_LCP_MAX_VALUE;
+	}
 }
 
 
@@ -690,8 +697,6 @@ Low[7] = -1.0f;
 High[7] = 1.0f;
 	SolveDantzigLCP(size, &xxx[0][0], X, B, Low, High);
 }
-*/
-
 
 void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
 {
@@ -738,7 +743,7 @@ void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix()
 //		FactorRow (i, dofSize, massMatrix);
 	}
 }
-
+*/
 
 void CustomVehicleController::EngineController::DriveTrain::SetExternalTorque(EngineController* const controller)
 {
@@ -787,8 +792,6 @@ void CustomVehicleController::EngineController::DriveTrainEngine::RebuildEngine(
 	for (int i = 0; i < nodeCount; i++) {
 		nodeArray[i]->m_index = i;
 	}
-
-//	BuildMassMatrix();
 }
 
 
@@ -806,14 +809,12 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 {
 	const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
 
-	dVector rowI[size];
-	dVector rowJ[size];
 	DriveTrain* nodeArray[size + 1];
 	dFloat b[size];
 	dFloat x[size];
 	dFloat low[size];
 	dFloat high[size];
-
+	dFloat massMatrix[size * size];
 
 	dFloat gearRatio = controller->GetGearRatio();
 	SetGearRatio (gearRatio);
@@ -832,64 +833,36 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 	}
 	int dofSize = nodesCount - 1;
 	dAssert(size >= dofSize);
-	dFloat* const massMatrix = GetMassMatrix();
+	
 	dAssert(massMatrix);
 
-//BuildMassMatrix();
-
-	int ii = 0;
-//	memset(massMatrix, 0, dofSize * dofSize * sizeof (dFloat));
+	int stride = 0;
+	memset(massMatrix, 0, dofSize * dofSize * sizeof (dFloat));
 	for (int i = 0; i < dofSize; i++) {
+		dFloat* const row = &massMatrix[stride];
 		DriveTrain* const nodeA = nodeArray[i];
-		memset(rowI, 0, nodesCount * sizeof (dVector));
-		nodeA->GetRow(rowI);
-		dFloat* const row = &massMatrix[ii * dofSize];
+		dFloat acc = (nodeA->m_J01 % nodeA->m_invMassJt01 + nodeA->m_J10 % nodeA->m_invMassJt10) * D_VEHICLE_REGULARIZER;
+		dAssert (nodeA->m_index == i);
+		row[nodeA->m_index] = acc;
 
-		int jj = 0;
-		for (int j = 0; j < dofSize; j++) {
-			DriveTrain* const nodeB = nodeArray[j];
-			memset(rowJ, 0, nodesCount * sizeof (dVector));
-			//nodeB->GetRow(rowJ);
-			nodeB->GetInvRowT(rowJ);
-
-			dFloat acc = 0.0f;
-			for (int k = 0; k < nodesCount; k++) {
-				acc += rowI[k] % rowJ[k];
+		acc = nodeA->m_J10 % nodeA->m_parent->m_invMassJt01;
+		row[nodeA->m_parent->m_index] = acc;
+		for (DriveTrain* nodeB = nodeA->m_parent->m_child; nodeB; nodeB = nodeB->m_sibling) {
+			if (nodeB != nodeA) {
+				acc = nodeA->m_J10 % nodeB->m_invMassJt10;
+				row[nodeB->m_index] = acc;
 			}
-			row[jj] = acc;
-			dAssert (jj == j);
-			jj++;
 		}
-		dAssert (ii == i);
-		ii++;
-	}
 
-	for (int i = 0; i < dofSize; i++) {
-		massMatrix[i * dofSize + i] *= D_VEHICLE_REGULARIZER;
+		for (DriveTrain* nodeB = nodeA->m_child; nodeB; nodeB = nodeB->m_sibling) {
+			acc = nodeA->m_J01 % nodeB->m_invMassJt10;
+			row[nodeB->m_index] = acc;
+		}
+
+		stride += dofSize;
 	}
 	
 	SolveDantzigLCP(dofSize, massMatrix, x, b, low, high);
-
-
-/*
-	int clutchIndex = dofSize - 1;
-	if (gearRatio != 0.0f) {
-		Solve(dofSize, dofSize, massMatrix, b, x);
-		dFloat clutchTorque = GetClutchTorque(controller);
-		if (dAbs(x[clutchIndex]) > clutchTorque) {
-			dFloat frictionTorque = dClamp (x[clutchIndex], -clutchTorque, clutchTorque);
-			x[clutchIndex] = frictionTorque;
-			for (int i = 0; i < clutchIndex; i++) {
-				b[i] -= massMatrix[i * dofSize + clutchIndex] * frictionTorque;
-			}
-			Solve(clutchIndex, dofSize, massMatrix, b, x);
-		}
-	} else {
-		x[clutchIndex] = 0.0f;
-		Solve(clutchIndex, dofSize, massMatrix, b, x);
-	}
-*/
-
 
 	for (int i = 0; i < nodesCount - 1; i++) {
 		DriveTrain* const node = nodeArray[i];
@@ -1281,11 +1254,13 @@ m_info.m_gearsCount = 4;
 
 			default:
 			{
-				if (omega > m_info.m_rpmAtPeakHorsePower) {
+				//if (omega > m_info.m_rpmAtPeakHorsePower) {
+			   if (omega > m_torqueRPMCurve.GetValue(3).m_param) {
 					if (m_currentGear < (m_info.m_gearsCount - 1)) {
 						SetGear(m_currentGear + 1);
 					}
-				} else if (omega < m_info.m_rpmAtPeakTorque) {
+				//} else if (omega < m_info.m_rpmAtPeakTorque) {
+				} else if (omega < m_torqueRPMCurve.GetValue(2).m_param) {
 					if (m_currentGear > D_VEHICLE_FIRST_GEAR) {
 						SetGear(m_currentGear - 1);
 					}

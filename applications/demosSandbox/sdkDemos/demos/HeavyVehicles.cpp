@@ -82,9 +82,9 @@ static VehicleParameters heavyTruck =
 	10000.0f,							// CLUTCH_FRICTION_TORQUE
 	3500.0f,							// IDLE_TORQUE
 	 700.0f,							// IDLE_TORQUE_RPM
-	1800.0f,							// PEAK_TORQUE
+	2800.0f,							// PEAK_TORQUE
 	3000.0f,							// PEAK_TORQUE_RPM
-	1200.0f,							// PEAK_HP
+	2000.0f,							// PEAK_HP
 	4000.0f,							// PEAK_HP_RPM
 	 300.0f,							// REDLINE_TORQUE
 	4500.0f,							// REDLINE_TORQUE_RPM
@@ -93,7 +93,7 @@ static VehicleParameters heavyTruck =
 		1.5f,							// GEAR_3
 		2.9f,							// REVERSE_GEAR
 	   0.7f,							// SUSPENSION_LENGTH
-	 150.0f,							// SUSPENSION_SPRING
+	 100.0f,							// SUSPENSION_SPRING
 	  10.0f,							// SUSPENSION_DAMPER
   (5000.0f * DEMO_GRAVITY * 10.0f),		// LATERAL_STIFFNESS
   (5000.0f * DEMO_GRAVITY *  2.0f),		// LONGITUDINAL_STIFFNESS
@@ -491,9 +491,8 @@ class HeavyVehicleEntity: public DemoEntity
 		,m_gearDownKey (false)
 		,m_reverseGear (false)
 		,m_engineKeySwitch(false)
+		,m_engineDifferentialLock(false)
 		,m_automaticTransmission(true)
-		,m_engineKeySwitchCounter(0)
-		,m_engineOldKeyState(false)
 		,m_engineRPMOn(false)
 		,m_drivingState(m_engineOff)
 	{
@@ -908,7 +907,9 @@ class HeavyVehicleEntity: public DemoEntity
 
 		//int gear = engine->GetGear();
 		int engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
+		int engineDifferentialLock = m_engineDifferentialLock.UpdatePushButton(mainWindow, 'L');
 		//int automaticTransmission = engine->GetTransmissionMode();
+
 		dFloat brakePedal = 0.0f;
 		dFloat handBrakePedal = 0.0f;
 		dFloat cluthPedal = 1.0f;
@@ -933,12 +934,6 @@ class HeavyVehicleEntity: public DemoEntity
 		if (mainWindow->GetKeyState ('S')) {
 			brakePedal = 1.0f;
 		}
-
-
-		// set the help key
-		//int reverseGear = m_reverseGear.UpdateTriggerButton (mainWindow, 'R') ? 1 : 0;
-		//m_engineKeySwitchCounter += m_engineKeySwitch.UpdateTriggerButton(mainWindow, 'Y');
-		//int toggleTransmission = m_automaticTransmission.UpdateTriggerButton (mainWindow, 0x0d) ? 1 : 0;
 
 #if 0
 	#if 1
@@ -969,6 +964,7 @@ class HeavyVehicleEntity: public DemoEntity
 	#endif
 #endif
 
+		engine->SetDifferentialLock (engineDifferentialLock ? true : false);
 		steering->SetParam(steeringVal);
 		switch (m_drivingState) 
 		{
@@ -1095,7 +1091,7 @@ class HeavyVehicleEntity: public DemoEntity
 		dFloat radius;
 		CalculateTireDimensions("ltire_0", width, radius);
 
-		dVector offset(0.0f, 0.35f, 0.0f, 0.0f);
+		dVector offset(0.0f, 0.15f, 0.0f, 0.0f);
 
 		// add left tires
 		CustomVehicleController::BodyPartTire* leftTire[4];
@@ -1270,10 +1266,9 @@ class HeavyVehicleEntity: public DemoEntity
 	DemoEntityManager::ButtonKey m_gearDownKey;
 	DemoEntityManager::ButtonKey m_reverseGear;
 	DemoEntityManager::ButtonKey m_engineKeySwitch;
+	DemoEntityManager::ButtonKey m_engineDifferentialLock;
 	DemoEntityManager::ButtonKey m_automaticTransmission;
 	int m_gearMap[10];
-	int m_engineKeySwitchCounter;
-	bool m_engineOldKeyState;
 	bool m_engineRPMOn;
 	DrivingState m_drivingState;
 };
@@ -1342,18 +1337,19 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engine switch       : 'I'           start engine");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'           stick forward");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'           stick back");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left           : 'A'           stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage clutch       : 'K'           button 5");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up             : '>'           button 2");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           : '<'           button 3");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission : enter         button 4");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : space         button 1");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "next vehicle        : 'V'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "engine switch					: 'I'           start engine");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         			: 'W'           stick forward");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              			: 'S'           stick back");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left           			: 'A'           stick left");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          			: 'D'           stick right");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage clutch       			: 'K'           button 5");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage differential lock        : 'L'           button 5");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up             			: '>'           button 2");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           			: '<'           button 3");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission 			: enter         button 4");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         			: space         button 1");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "next vehicle        			: 'V'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           			: 'H'");
 		}
 
 //		bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene->GetRootWindow(), 'V');

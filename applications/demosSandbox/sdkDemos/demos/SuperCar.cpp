@@ -354,8 +354,6 @@ class SuperCarEntity: public DemoEntity
 		NewtonDestroyCollision (collision);	
 	}
 
-
-//	CustomVehicleController::BodyPartTire* AddTire (const char* const tireName, dFloat offset, dFloat width, dFloat radius, dFloat mass, dFloat maxSteerAngle, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, dFloat pinDir, int hasFender) 
 	CustomVehicleController::BodyPartTire* AddTire (const char* const tireName, dFloat width, dFloat radius, dFloat maxSteerAngle, const CarDefinition& definition) 
 	{
 		NewtonBody* const body = m_controller->GetBody();
@@ -378,8 +376,6 @@ class SuperCarEntity: public DemoEntity
 		// add the tire to the vehicle
 		CustomVehicleController::BodyPartTire::Info tireInfo;
 
-//dFloat offset, dFloat width, dFloat radius, dFloat mass, dFloat maxSteerAngle, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, dFloat pinDir, int hasFender
-//(, definition.TIRE_ALIGNING_MOMENT_TRAIL, 1.0f, definition.WHEEL_HAS_FENDER);
 		tireInfo.m_location = tireMatrix.m_posit;
 		tireInfo.m_mass = definition.TIRE_MASS;
 		tireInfo.m_radio = radius;
@@ -642,7 +638,7 @@ class SuperCarEntity: public DemoEntity
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
-			fwrite (&engineSlipDifferential, sizeof (int), 1, file);
+			fwrite (&engineDifferentialLock, sizeof (int), 1, file);
 			fwrite (&automaticTransmission, sizeof (int), 1, file);
 			fwrite (&gear, sizeof (int), 1, file);
 			fwrite (&steeringVal, sizeof (dFloat), 1, file);
@@ -1036,7 +1032,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		:CustomVehicleControllerManager (world, materialsCount, materialList)
 		,m_externalView(true)
 		,m_player (NULL) 
-		,m_debugVehicle (NULL) 
+		//,m_debugVehicle (NULL) 
 		,m_drawShematic(false)
 		,m_helpKey (true)
 		,m_nexVehicle (true)
@@ -1164,7 +1160,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void RenderVehicleSchematic (DemoEntityManager* const scene) const
 	{
-		if (m_debugVehicle) {
+		if (m_player) {
 			glDisable(GL_LIGHTING);
 			glDisable(GL_TEXTURE_2D);
 			glDisable(GL_DEPTH_TEST);
@@ -1179,7 +1175,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 			glPushMatrix();
 			glMultMatrix (&origin[0][0]);
-			DrawSchematic (m_debugVehicle->m_controller, scale);
+			DrawSchematic (m_player->m_controller, scale);
 			glPopMatrix();
 
 			glLineWidth(1.0f);
@@ -1286,8 +1282,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		if (m_debugVehicle) {
-			CustomVehicleController::EngineController* const engine = m_debugVehicle->m_controller->GetEngine();
+		if (m_player) {
+			CustomVehicleController::EngineController* const engine = m_player->m_controller->GetEngine();
 			if (engine) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				dFloat gageSize = 200.0f;
@@ -1305,7 +1301,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 				dFloat speed = dAbs(engine->GetSpeed())  / engine->GetTopSpeed();
 				int gear = engine->GetGear();
 				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize);
-				DrawGear(speed, x, y, m_debugVehicle->m_gearMap[gear], gageSize);
+				DrawGear(speed, x, y, m_player->m_gearMap[gear], gageSize);
 			}
 		}
 
@@ -1332,11 +1328,12 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		SuperCarEntity* const player = (SuperCarEntity*) NewtonBodyGetUserData(vehicleBody);
 		SetAsPlayer (player);
 	}
-
+/*
 	void SetDebugVehicle (SuperCarEntity* const player)
 	{
 		m_debugVehicle = player;
 	}
+*/
 
 	virtual void PreUpdate (dFloat timestep)
 	{
@@ -1508,7 +1505,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	bool m_externalView;
 	SuperCarEntity* m_player;
-	SuperCarEntity* m_debugVehicle;
+	//SuperCarEntity* m_debugVehicle;
 	DemoEntity* m_raceTrackPath;
 
 	GLuint m_gears;
@@ -1604,7 +1601,7 @@ void SuperCar (DemoEntityManager* const scene)
 
 	// set this vehicle as the player
 	manager->SetAsPlayer(vehicleEntity);
-	manager->SetDebugVehicle(vehicleEntity);
+	//manager->SetDebugVehicle(vehicleEntity);
 
 	// set the camera matrix, we only care the initial direction since it will be following the player vehicle
 	dMatrix camMatrix (vehicleEntity->GetNextMatrix());
