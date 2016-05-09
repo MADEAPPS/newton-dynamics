@@ -273,7 +273,7 @@ void CholeskyRestore(int size, T* const matrix, const T* const diagonal, int n, 
 
 
 template<class T>
-void CholeskySolve(int size, const T* const matrix, const T* const b, T* const x, int n)
+void CholeskySolve(int size, const T* const matrix, T* const x, int n)
 {
 	int stride = 0;
 	for (int i = 0; i < n; i++) {
@@ -282,7 +282,7 @@ void CholeskySolve(int size, const T* const matrix, const T* const b, T* const x
 		for (int j = 0; j < i; j++) {
 			acc = acc + row[j] * x[j];
 		}
-		x[i] = (b[i] - acc) / row[i];
+		x[i] = (x[i] - acc) / row[i];
 		stride += size;
 	}
 
@@ -310,13 +310,13 @@ void CalculateDelta_r(int size, int n, const T* const matrix, const T* const m_d
 }
 
 template<class T>
-void CalculateDelta_x(int size, T dir, int n, const T* const matrix, T* const m_delta_x, T* const m_tmp)
+void CalculateDelta_x(int size, T dir, int n, const T* const matrix, T* const m_delta_x)
 {
 	const T* const row = &matrix[size * n];
 	for (int i = 0; i < n; i++) {
-		m_tmp[i] = -row[i] * dir;
+		m_delta_x[i] = -row[i] * dir;
 	}
-	CholeskySolve(size, matrix, m_tmp, m_delta_x, n);
+	CholeskySolve(size, matrix, m_delta_x, n);
 	m_delta_x[n] = dir;
 	for (int i = n + 1; i < size; i++) {
 		m_delta_x[i] = T(0.0f);
@@ -358,7 +358,6 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 	T* const m_delta_x = dAlloca(T, size);
 	T* const m_delta_r = dAlloca(T, size);
 	T* const diagonal = dAlloca(T, size);
-	T* const m_tmp = dAlloca(T, size);
 	short* const permute = dAlloca(short, size);
 
 //static int xxx;
@@ -393,9 +392,9 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 	}
 
 	if (index > 0) {
-		CholeskySolve(size, matrix, m_r, m_delta_x, index);
+		CholeskySolve(size, matrix, m_r, index);
 		for (int i = 0; i < index; i++) {
-			m_x[i] -= m_delta_x[i];
+			m_x[i] -= m_r[i];
 			m_r[i] = T(0.0f);
 		}
 		for (int i = index; i < size; i++) {
@@ -425,7 +424,7 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 
 				if (calculateDelta_x) {
 					dir = (m_r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
-					CalculateDelta_x(size, dir, index, matrix, m_delta_x, m_tmp);
+					CalculateDelta_x(size, dir, index, matrix, m_delta_x);
 				}
 
 				calculateDelta_x = true;
