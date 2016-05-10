@@ -535,24 +535,16 @@ DG_INLINE void dgLCP<T, Size>::PermuteRows(dgInt32 i, dgInt32 j)
 		dgGeneralMatrix<T, Size, Size>::SwapRows(i, j);
 		dgGeneralMatrix<T, Size, Size>::SwapColumns(i, j);
 
-		dgSwap(m_b[i], m_b[j]);
-		dgSwap(m_low[i], m_low[j]);
-		dgSwap(m_high[i], m_high[j]);
-		dgSwap(m_permute[i], m_permute[j]);
-		//T* const r = &m_tmp[0][0];
-		//T* const x = &m_tmp[1][0];
-		//T* const delta_r = &m_tmp[2][0];
-		//T* const delta_x = &m_tmp[3][0];
-		//T* const diagonal = &m_tmp[4][0];
-		//T* const tmp = &m_tmp[5][0];
-		//for (dgInt32 k = 0; k < 5; k++) {
-		//	dgSwap(tmp[k][i], tmp[k][j]);
-		//}
 		dgSwap(m_r[i], m_r[j]);
 		dgSwap(m_x[i], m_x[j]);
-		dgSwap(m_delta_r[i], m_delta_r[j]);
-		dgSwap(m_delta_x[i], m_delta_x[j]);
+		dgSwap(m_low[i], m_low[j]);
+		dgSwap(m_high[i], m_high[j]);
 		dgSwap(m_diagonal[i], m_diagonal[j]);
+		dgSwap(m_permute[i], m_permute[j]);
+
+		//dgSwap(m_b[i], m_b[j]);
+		//dgSwap(m_delta_r[i], m_delta_r[j]);
+		//dgSwap(m_delta_x[i], m_delta_x[j]);
 	}
 }
 
@@ -667,7 +659,6 @@ bool dgLCP<T, Size>::SolveDantzig()
 	dgInt32 index = 0;
 	dgInt32 count = Size;
 
-#if 1
 	for (dgInt32 i = 0; i < count; i++) {
 		if ((m_low[i] <= T(-LCP_MAX_VALUE)) && (m_high[i] >= T(LCP_MAX_VALUE))) {
 			CholeskyFactorizationAddRow (index);
@@ -693,10 +684,10 @@ bool dgLCP<T, Size>::SolveDantzig()
 		for (dgInt32 i = index; i < Size; i++) {
 			m_r[i] -= m_delta_r[i];
 		}
-		count = Size - index;
 	}
-#endif
+	count = Size - index;
 
+	const int start = index;
 	dgInt32 clampedIndex = Size;
 	while (count) {
 		bool loop = true;
@@ -721,7 +712,7 @@ bool dgLCP<T, Size>::SolveDantzig()
 				T s = -m_r[index] / m_delta_r[index];
 				dgAssert(s >= T(0.0f));
 
-				for (dgInt32 i = 0; i <= index; i++) {
+				for (dgInt32 i = start; i <= index; i++) {
 					T x1 = m_x[i] + s * m_delta_x[i];
 					if (x1 > m_high[i]) {
 						swapIndex = i;
@@ -799,14 +790,13 @@ bool dgLCP<T, Size>::SolveDantzig()
 
 			} else {
 				m_x[swapIndex] = clamp_x;
-				CholeskyRestore(swapIndex, index);
-
 				dgAssert(index > 0);
+
+				CholeskyRestore(swapIndex, index);
 				PermuteRows(swapIndex, index - 1);
 				PermuteRows(index - 1, index);
-
+				PermuteRows(clampedIndex - 1, index);
 				clampedIndex--;
-				PermuteRows(clampedIndex, index);
 
 				index--;
 				for (dgInt32 i = swapIndex; i < index; i++) {

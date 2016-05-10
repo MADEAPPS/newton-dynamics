@@ -859,18 +859,6 @@ xxx ++;
 
 		stride += dofSize;
 	}
-/*
-dFloat xxxx1[10][10];
-dFloat xxxx2[10][10];
-memcpy (xxxx1, massMatrix, sizeof (xxxx1));
-BuildMassMatrix(massMatrix);	
-memcpy (xxxx2, massMatrix, sizeof (xxxx2));
-for (int i = 0; i < 10; i ++)
-for (int j = 0; j < 10; j ++)
-{
-dAssert (dAbs (xxxx1[i][j] - xxxx2[i][j]) < 1.0e-5f);
-}
-*/
 
 	SolveDantzigLCP(dofSize, massMatrix, x, b, low, high);
 

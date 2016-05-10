@@ -351,21 +351,24 @@ void PermuteRows(int size, int i, int j, T* const matrix, T* const m_x, T* const
 
 
 template <class T> 
-bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
+bool SolveDantzigLCP(int size, T* const matrix, T* const x_out, T* const b_out, T* const low, T* const high)
 {
 	T* const m_x = dAlloca(T, size);
 	T* const m_r = dAlloca(T, size);
-	T* const m_delta_x = dAlloca(T, size);
-	T* const m_delta_r = dAlloca(T, size);
-	T* const diagonal = dAlloca(T, size);
+	T* const delta_r = dAlloca(T, size);
+	//T* const delta_x = dAlloca(T, size);
+	//T* const diagonal = dAlloca(T, size);
 	short* const permute = dAlloca(short, size);
+
+	T* const delta_x = b_out;
+	T* const diagonal = x_out;
 
 //static int xxx;
 //xxx ++;
 
 	int stride = 0;
 	for (int i = 0; i < size; i++) {
-		m_x[i] = dClamp(x[i], low[i], high[i]);
+		m_x[i] = dClamp(x_out[i], low[i], high[i]);
 		permute[i] = short(i);
 		diagonal[i] = matrix[stride + i];
 		stride += size;
@@ -373,9 +376,8 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 
 	MatrixTimeVector(size, matrix, m_x, m_r);
 	for (int i = 0; i < size; i++) {
-		m_r[i] -= b[i];
+		m_r[i] -= b_out[i];
 	}
-
 
 	int index = 0;
 	int count = size;
@@ -398,12 +400,12 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 			m_r[i] = T(0.0f);
 		}
 		for (int i = index; i < size; i++) {
-			m_delta_x[i] = T(0.0f);
+			delta_x[i] = T(0.0f);
 		}
 
-		CalculateDelta_r(size, index, matrix, m_delta_x, m_delta_r);
+		CalculateDelta_r(size, index, matrix, delta_x, delta_r);
 		for (int i = index; i < size; i++) {
-			m_r[i] -= m_delta_r[i];
+			m_r[i] -= delta_r[i];
 		}
 	}
 	count = size - index;
@@ -424,37 +426,37 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 
 				if (calculateDelta_x) {
 					dir = (m_r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
-					CalculateDelta_x(size, dir, index, matrix, m_delta_x);
+					CalculateDelta_x(size, dir, index, matrix, delta_x);
 				}
 
 				calculateDelta_x = true;
-				CalculateDelta_r(size, index, matrix, m_delta_x, m_delta_r);
-				dAssert(m_delta_r[index] != T(0.0f));
-				dAssert(T(fabs(m_delta_x[index])) == T(1.0f));
+				CalculateDelta_r(size, index, matrix, delta_x, delta_r);
+				dAssert(delta_r[index] != T(0.0f));
+				dAssert(T(fabs(delta_x[index])) == T(1.0f));
 
-				T s = -m_r[index] / m_delta_r[index];
+				T s = -m_r[index] / delta_r[index];
 				dAssert(s >= T(0.0f));
 
 				for (int i = start; i <= index; i++) {
-					T x1 = m_x[i] + s * m_delta_x[i];
+					T x1 = m_x[i] + s * delta_x[i];
 					if (x1 > high[i]) {
 						swapIndex = i;
 						clamp_x = high[i];
-						s = (high[i] - m_x[i]) / m_delta_x[i];
+						s = (high[i] - m_x[i]) / delta_x[i];
 					} else if (x1 < low[i]) {
 						swapIndex = i;
 						clamp_x = low[i];
-						s = (low[i] - m_x[i]) / m_delta_x[i];
+						s = (low[i] - m_x[i]) / delta_x[i];
 					}
 				}
 				dAssert(s >= T(0.0f));
 				//dgAssert(s <= -m_r[index] / m_delta_r[index]);
 
 				for (int i = clampedIndex; (i < size) && (s > T(1.0e-12f)); i++) {
-					T r1 = m_r[i] + s * m_delta_r[i];
+					T r1 = m_r[i] + s * delta_r[i];
 					if ((r1 * m_r[i]) < T(0.0f)) {
-						dAssert(T(fabs(m_delta_r[i]) > T(0.0f)));
-						T s1 = -m_r[i] / m_delta_r[i];
+						dAssert(T(fabs(delta_r[i]) > T(0.0f)));
+						T s1 = -m_r[i] / delta_r[i];
 						dAssert(s1 >= T(0.0f));
 						if (s1 < s) {
 							s = s1;
@@ -467,8 +469,8 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 					for (int i = 0; i < size; i++) {
 						dAssert((m_x[i] + T(1.0e-4f)) >= low[i]);
 						dAssert((m_x[i] - T(1.0e-4f)) <= high[i]);
-						m_x[i] += s * m_delta_x[i];
-						m_r[i] += s * m_delta_r[i];
+						m_x[i] += s * delta_x[i];
+						m_r[i] += s * delta_r[i];
 						dAssert((m_x[i] + T(1.0e-4f)) >= low[i]);
 						dAssert((m_x[i] - T(1.0e-4f)) <= high[i]);
 					}
@@ -477,7 +479,7 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 
 			if (swapIndex == -1) {
 				m_r[index] = T(0.0f);
-				m_delta_r[index] = T(0.0f);
+				delta_r[index] = T(0.0f);
 				if (!CholeskyFactorizationAddRow(size, index, matrix)) {
 					return false;
 				}
@@ -488,7 +490,7 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 				count--;
 				clampedIndex--;
 				m_x[index] = clamp_x;
-				m_delta_x[index] = T(0.0f);
+				delta_x[index] = T(0.0f);
 				PermuteRows(size, index, clampedIndex, matrix, m_x, m_r, low, high, diagonal, permute);
 				loop = count ? true : false;
 			} else if (swapIndex > index) {
@@ -533,8 +535,8 @@ bool SolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const
 
 	for (int i = 0; i < size; i++) {
 		int j = permute[i];
-		x[j] = m_x[i];
-		b[j] = m_r[i];
+		x_out[j] = m_x[i];
+		b_out[j] = m_r[i];
 	}
 
 	return true;

@@ -438,24 +438,18 @@ class CustomVehicleController: public CustomControllerBase
 		{
 			public:
 			DriveTrainEngine2W (const dVector& invInertia, const DifferentialAxel& axel);
-			//virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
-			//dFloat matrix[4][4];
 		};
 
 		class DriveTrainEngine4W: public DriveTrainEngine
 		{
 			public:
 			DriveTrainEngine4W (const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1);
-			//virtual dFloat* GetMassMatrix() {return &matrix[0][0];}
-			//dFloat matrix[10][10];
 		};
 
 		class DriveTrainEngine8W: public DriveTrainEngine
 		{
 			public:
 			DriveTrainEngine8W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1, const DifferentialAxel& axel2, const DifferentialAxel& axel3);
-			//virtual dFloat* GetMassMatrix() { return &matrix[0][0]; }
-			//dFloat matrix[22][22];
 		};
 
 		class DriveTrainDifferentialGear: public DriveTrain

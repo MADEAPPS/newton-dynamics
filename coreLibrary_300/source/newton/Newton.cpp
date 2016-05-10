@@ -4608,8 +4608,7 @@ void NewtonBodySetSimulationState(const NewtonBody* const bodyPtr, const int sta
 
 	if (state) {
 		world->BodyEnableSimulation(body);
-	}
-	else {
+	} else {
 		world->BodyDisableSimulation(body);
 	}
 }
