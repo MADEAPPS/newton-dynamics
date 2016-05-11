@@ -29,7 +29,8 @@
 #include "dgBilateralConstraint.h"
 
 
-#define DG_SKELETON_STACK_SIZE		512
+
+#define DG_SKELETON_MAX_NODES		1024
 
 
 //////////////////////////////////////////////////////////////////////
@@ -536,7 +537,7 @@ void dgSkeletonContainer::SortGraph(dgSkeletonGraph* const root, dgSkeletonGraph
 dgSkeletonContainer::dgSkeletonGraph* dgSkeletonContainer::FindNode(dgDynamicBody* const body) const
 {
 	dgInt32 stack = 1;
-	dgSkeletonGraph* stackPool[DG_SKELETON_STACK_SIZE];
+	dgSkeletonGraph* stackPool[DG_SKELETON_MAX_NODES];
 
 	stackPool[0] = m_skeleton;
 	while (stack) {
@@ -803,27 +804,30 @@ DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 }
 
 
-void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
-{
-	if (m_nodesOrder) {
-		dgForcePair* const force = dgAlloca (dgForcePair, m_nodeCount);
-		if (m_skeletonHardMotors) {
-			dgForcePair* const accel = dgAlloca (dgForcePair, m_nodeCount);
-			SoveLCP (jointInfoArray, bodyArray, internalForces, matrixRow, force, accel);
-		} else {
-			SoveNormal (jointInfoArray, bodyArray, internalForces, matrixRow, force);
-		}
-	}
-}
-
-void dgSkeletonContainer::SoveNormal (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force)
+void dgSkeletonContainer::SoveNormal (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 {
 	dTimeTrackerEvent(__FUNCTION__);
+	dgForcePair force[DG_SKELETON_MAX_NODES];
+
 	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, force);
 	SolveFoward(force, force);
 	SolveBackward(force);
 	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
 }
+
+
+void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
+{
+	if (m_nodesOrder) {
+		dgAssert (m_nodeCount < DG_SKELETON_MAX_NODES);
+		if (m_skeletonHardMotors) {
+			SoveLCP (jointInfoArray, bodyArray, internalForces, matrixRow);
+		} else {
+			SoveNormal (jointInfoArray, bodyArray, internalForces, matrixRow);
+		}
+	}
+}
+
 
 
 void dgSkeletonContainer::XXXX()
@@ -900,8 +904,7 @@ DG_INLINE void dgSkeletonContainer::FindFirstFeasibleForcesLCP(dgJointInfo* cons
 
 int dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgForcePair* const accel)
 {
-	dgJacobian  forceAcc[1024];
-	dgAssert (m_nodeCount < sizeof (forceAcc) / sizeof (forceAcc[0]));
+	dgJacobian  forceAcc[DG_SKELETON_MAX_NODES];
 	memset (forceAcc, 0, m_nodeCount * sizeof (dgJacobian));
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		dgSkeletonGraph* const node = m_nodesOrder[i];
@@ -979,12 +982,15 @@ int dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArray
 }
 
 
-void dgSkeletonContainer::SoveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, 
-								   dgForcePair* const force, dgForcePair* const accel)
+void dgSkeletonContainer::SoveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 								   
 {
 //	XXXX();
 	dTimeTrackerEvent(__FUNCTION__);
+	dgForcePair force[DG_SKELETON_MAX_NODES];
+	dgForcePair accel[DG_SKELETON_MAX_NODES];
+
+	
 	EnumerateRowsAndInitForcesLCP(jointInfoArray, accel); 
 	FindFirstFeasibleForcesLCP (jointInfoArray, internalForces, matrixRow, force, accel);
 	dgInt32 count = CalculateResidualLCP (jointInfoArray, matrixRow, force, accel);

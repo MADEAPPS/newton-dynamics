@@ -1572,8 +1572,8 @@ class dgSpatialVector
 {
 	public:
 	DG_INLINE dgSpatialVector()
-		:m_l(dgVector::m_zero)
-		,m_h(dgVector::m_zero)
+//		:m_l(dgVector::m_zero)
+//		,m_h(dgVector::m_zero)
 	{
 	}
 
@@ -1593,16 +1593,13 @@ class dgSpatialVector
 
 	DG_INLINE void SetZero()
 	{
-		m_l = dgVector::m_zero;
-		m_h = dgVector::m_zero;
+		dgVector zero (dgVector::m_zero);
+		m_l = zero;
+		m_h = zero;
 	}
 
 	DG_INLINE dgFloat32 DotProduct(const dgSpatialVector& v) const
 	{
-//		dgFloat64 ret;
-//		__m128d tmp (_mm_add_pd(_mm_mul_pd(m_type[0], v.m_type[0]), _mm_add_pd (_mm_mul_pd(m_type[1], v.m_type[1]), _mm_mul_pd(m_type[2], v.m_type[2]))));
-//		_mm_store_sd(&ret, _mm_hadd_pd(tmp, tmp));
-//		return ret;
 		dgAssert (v.m_h[2] == dgFloat32 (0.0f));
 		dgAssert (v.m_h[3] == dgFloat32 (0.0f));
 		dgVector p (m_l.CompProduct4(v.m_l) + m_h.CompProduct4(v.m_h));
@@ -1611,20 +1608,12 @@ class dgSpatialVector
 	
 	DG_INLINE void Scale(dgFloat32 s, dgSpatialVector& dst) const
 	{
-		//__m128d tmp = _mm_set1_pd(s);
-		//dst.m_type[0] = _mm_mul_pd(m_type[0], tmp);
-		//dst.m_type[1] = _mm_mul_pd(m_type[1], tmp);
-		//dst.m_type[2] = _mm_mul_pd(m_type[2], tmp);
 		dst.m_l = m_l.Scale4 (s);
 		dst.m_h = m_h.Scale4 (s);
 	}
 
 	DG_INLINE void ScaleAdd(dgFloat32 s, const dgSpatialVector& b, dgSpatialVector& dst) const
 	{
-		//__m128d tmp = _mm_set1_pd(s);
-		//dst.m_type[0] = _mm_add_pd(b.m_type[0], _mm_mul_pd(m_type[0], tmp));
-		//dst.m_type[1] = _mm_add_pd(b.m_type[1], _mm_mul_pd(m_type[1], tmp));
-		//dst.m_type[2] = _mm_add_pd(b.m_type[2], _mm_mul_pd(m_type[2], tmp));
 		dst.m_l = b.m_l + m_l.Scale4 (s);
 		dst.m_h = b.m_h + m_h.Scale4 (s);
 	}
@@ -1639,6 +1628,10 @@ DG_MSC_VECTOR_ALIGMENT
 class dgSpatialMatrix
 {
 	public:
+	DG_INLINE dgSpatialMatrix()
+	{
+	}
+
 	DG_INLINE dgSpatialVector& operator[] (dgInt32 i)
 	{
 		dgAssert(i < 6);
@@ -1655,8 +1648,10 @@ class dgSpatialMatrix
 
 	DG_INLINE void SetZero()
 	{
+		dgVector zero (dgVector::m_zero);
 		for (dgInt32 i = 0; i < 6; i++) {
-			m_rows[i].SetZero();
+			m_rows[i].m_l = zero;
+			m_rows[i].m_h = zero;
 		}
 	}
 
