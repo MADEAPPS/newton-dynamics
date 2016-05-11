@@ -829,18 +829,18 @@ void dgSkeletonContainer::SoveNormal (dgJointInfo* const jointInfoArray, const d
 void dgSkeletonContainer::XXXX()
 {
 	int const size = 10;
-	dgLCP<dgFloat32, size> xxx;
+	dgSPDMatrix<dgFloat32, size> xxx;
 
-	dgGeneralVector<dgFloat32, size>& B = xxx.GetB();
-	dgGeneralVector<dgFloat32, size>& X = xxx.GetX();
-	dgGeneralVector<dgFloat32, size>& Low = xxx.GetLowLimit();
-	dgGeneralVector<dgFloat32, size>& High = xxx.GetHightLimit();
+	dgGeneralVector<dgFloat32, size> B;
+	dgGeneralVector<dgFloat32, size> X;
+	dgGeneralVector<dgFloat32, size> Low;
+	dgGeneralVector<dgFloat32, size> High;
 
 	for (int i = 0; i < size; i ++) {
 		B[i] = 100.0f + 10*i;
 		X[i] = 0.0f;
-		Low[i] = -LCP_MAX_VALUE;	
-		High[i] = LCP_MAX_VALUE;
+		Low[i] = -DG_LCP_MAX_VALUE;	
+		High[i] = DG_LCP_MAX_VALUE;
 		xxx[i][i] = 2.0f;
 		for (int j = i + 1; j < size; j ++) {
 			xxx[i][j] = 1.0f;
@@ -858,7 +858,7 @@ High[7] = 1.0f;
 
 
 	dgSPDMatrix<dgFloat32, size>xxx1 (xxx);
-	xxx.SolveDantzig();
+	dgSolveDantzigLCP(size, &xxx[0][0], &X[0], &B[0], &Low[0], &High[0]);
 
 /*
 	dgGeneralVector<dgFloat32, size> mm;
@@ -942,7 +942,7 @@ void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArra
 void dgSkeletonContainer::SoveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, 
 								   dgForcePair* const force, dgForcePair* const accel)
 {
-//	XXXX();
+	XXXX();
 	dTimeTrackerEvent(__FUNCTION__);
 	EnumerateRowsAndInitForcesLCP(jointInfoArray, accel); 
 	FindFirstFeasibleForcesLCP (jointInfoArray, internalForces, matrixRow, force, accel);

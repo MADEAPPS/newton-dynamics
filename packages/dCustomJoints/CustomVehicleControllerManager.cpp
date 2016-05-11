@@ -860,7 +860,7 @@ xxx ++;
 		stride += dofSize;
 	}
 
-	SolveDantzigLCP(dofSize, massMatrix, x, b, low, high);
+	dSolveDantzigLCP(dofSize, massMatrix, x, b, low, high);
 
 	for (int i = 0; i < nodesCount - 1; i++) {
 		DriveTrain* const node = nodeArray[i];
