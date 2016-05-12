@@ -114,9 +114,9 @@ void dgSPDMatrix<T, Size>::CholeskySolve(dgGeneralVector<T, Size>& x, const dgGe
 		x[i] = (b[i] - acc) / row[i];
 	}
 
-	for (dgInt32 i = n - 1; i >= 0; i--) {
+	for (dgInt32 i = Size - 1; i >= 0; i--) {
 		T acc = 0.0f;
-		for (dgInt32 j = i + 1; j < n; j++) {
+		for (dgInt32 j = i + 1; j < Size; j++) {
 			acc = acc + dgGeneralMatrix<T, Size, Size>::m_rows[j][i] * x[j];
 		}
 		x[i] = (x[i] - acc) / dgGeneralMatrix<T, Size, Size>::m_rows[i][i];
