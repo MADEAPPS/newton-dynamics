@@ -814,16 +814,6 @@ DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 }
 
 
-void dgSkeletonContainer::SoveNormal (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
-{
-	dTimeTrackerEvent(__FUNCTION__);
-	dgForcePair force[DG_SKELETON_MAX_NODES];
-
-	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, force);
-	SolveFoward(force, force);
-	SolveBackward(force);
-	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
-}
 
 
 void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
@@ -831,9 +821,9 @@ void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray
 	if (m_nodesOrder) {
 		dgAssert (m_nodeCount < DG_SKELETON_MAX_NODES);
 		if (m_skeletonHardMotors) {
-			SoveLCP (jointInfoArray, bodyArray, internalForces, matrixRow);
+			SolveLCP (jointInfoArray, bodyArray, internalForces, matrixRow);
 		} else {
-			SoveNormal (jointInfoArray, bodyArray, internalForces, matrixRow);
+			SolveNormal (jointInfoArray, bodyArray, internalForces, matrixRow);
 		}
 	}
 }
@@ -992,8 +982,19 @@ int dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArray
 }
 
 
-void dgSkeletonContainer::SoveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
-								   
+void dgSkeletonContainer::SolveNormal (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
+{
+	dTimeTrackerEvent(__FUNCTION__);
+	dgForcePair force[DG_SKELETON_MAX_NODES];
+
+	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, force);
+	SolveFoward(force, force);
+	SolveBackward(force);
+	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
+}
+
+
+void dgSkeletonContainer::SolveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 {
 //	XXXX();
 	dTimeTrackerEvent(__FUNCTION__);
