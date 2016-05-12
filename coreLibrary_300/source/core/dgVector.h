@@ -1572,8 +1572,6 @@ class dgSpatialVector
 {
 	public:
 	DG_INLINE dgSpatialVector()
-//		:m_l(dgVector::m_zero)
-//		,m_h(dgVector::m_zero)
 	{
 	}
 
@@ -1655,6 +1653,16 @@ class dgSpatialMatrix
 		}
 	}
 
+	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out) const
+	{
+		dgSpatialVector tmp;
+		m_rows[0].Scale(jacobian[0], tmp);
+		for (dgInt32 i = 1; i < 6; i++) {
+			m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
+		}
+		out = tmp;
+	}
+
 	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out, dgInt32 dof) const
 	{
 		dgSpatialVector tmp;
@@ -1662,8 +1670,14 @@ class dgSpatialMatrix
 		for (dgInt32 i = 1; i < dof; i++) {
 			m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
 		}
-		out = tmp;
+		for (dgInt32 i = 0; i < dof; i++) {
+			out[i] = tmp[i];
+		}
+		for (dgInt32 i = dof; i < 6; i++) {
+			out[i] = 0.0f;
+		}
 	}
+
 
 	DG_INLINE void Inverse(dgSpatialMatrix& dst, dgInt32 rows) const
 	{
