@@ -405,8 +405,8 @@ class JoesRagdollJoint: public CustomBallAndSocket
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 if (n == 0){
-NewtonUserJointSetRowMinimumFriction(m_joint, -1.0f);
-NewtonUserJointSetRowMaximumFriction(m_joint, 1.0f);
+//NewtonUserJointSetRowMinimumFriction(m_joint, -1.0f);
+//NewtonUserJointSetRowMaximumFriction(m_joint, 1.0f);
 }
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
@@ -435,8 +435,8 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
         dVector size (width, height, width);
         NewtonBody* child = CreateBox (scene, origin + dVector (0.0f,  0.5f + height * dFloat(i+1), 0.0f, 0.0f), size);
 
-dVector xxxxx (0.5f, 0.0f, 0.0f, 0.0f);
-NewtonBodySetOmega(child, &xxxxx[0]);
+//dVector xxxxx (0.5f, 0.0f, 0.0f, 0.0f);
+//NewtonBodySetOmega(child, &xxxxx[0]);
         
         dMatrix matrix0 = dGetIdentityMatrix(); matrix0.m_posit = dVector (0.0f, height*-0.5f, 0.0f, 1.0f);
         dMatrix matrix1 = dGetIdentityMatrix(); matrix1.m_posit = dVector (0.0f, height*0.5f, 0.0f, 1.0f);
@@ -1054,7 +1054,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 //	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
-	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 1);
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
 
 //AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 

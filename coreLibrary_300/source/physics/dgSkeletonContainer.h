@@ -78,7 +78,7 @@ class dgSkeletonContainer
 
 	DG_INLINE void EnumerateRowsAndInitForcesLCP(const dgJointInfo* const jointInfoArray, dgForcePair* const accel) const;
 	DG_INLINE bool ValidateForcesLCP(dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force);
-	DG_INLINE void UpdateMassMatrixLCP(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force) const;
+	DG_INLINE void UpdateMassMatrixLCP(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force, dgForcePair* const accel) const;
 	DG_INLINE void InitMassMatrixLCP(const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force) const;
 	DG_INLINE void FindFirstFeasibleForcesLCP(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force, dgForcePair* const accel);
 	DG_INLINE int CalculateResidualLCP (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgForcePair* const accel);

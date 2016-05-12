@@ -268,7 +268,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 		return valid;
 	}
 
-	DG_INLINE void UpdateFactorizeLCP(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair& force)
+	DG_INLINE void UpdateFactorizeLCP(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair& force, dgForcePair& accel)
 	{
 		dgAssert((dgUnsigned64(&m_bodyMass) & 0x0f) == 0);
 
@@ -294,6 +294,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 				dgFloat32 f = force.m_joint[i] + row->m_force;
 				if (f < row->m_lowerBoundFrictionCoefficent) {
 					force.m_joint[i] = row->m_lowerBoundFrictionCoefficent - row->m_force;
+					dgSwap(accel.m_joint[i], accel.m_joint[clampedValue]);
 					dgSwap(force.m_joint[i], force.m_joint[clampedValue]);
 					dgSwap(m_sourceJacobianIndex[i], m_sourceJacobianIndex[clampedValue]);
 					i--;
@@ -301,6 +302,7 @@ class dgSkeletonContainer::dgSkeletonGraph
 					clampedValue--;
 				} else if (f > row->m_upperBoundFrictionCoefficent) {
 					force.m_joint[i] = row->m_upperBoundFrictionCoefficent - row->m_force;
+					dgSwap(accel.m_joint[i], accel.m_joint[clampedValue]);
 					dgSwap(force.m_joint[i], force.m_joint[clampedValue]);
 					dgSwap(m_sourceJacobianIndex[i], m_sourceJacobianIndex[clampedValue]);
 					i--;
@@ -687,11 +689,11 @@ DG_INLINE void dgSkeletonContainer::InitMassMatrixLCP(const dgJointInfo* const j
 	}
 }
 
-DG_INLINE void dgSkeletonContainer::UpdateMassMatrixLCP(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force) const
+DG_INLINE void dgSkeletonContainer::UpdateMassMatrixLCP(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force, dgForcePair* const accel) const
 {
 	for (dgInt32 i = 0; i < m_nodeCount; i++) {
 		dgAssert(m_nodesOrder[i]->m_index == i);
-		m_nodesOrder[i]->UpdateFactorizeLCP(jointInfoArray, matrixRow, force[i]);
+		m_nodesOrder[i]->UpdateFactorizeLCP(jointInfoArray, matrixRow, force[i], accel[i]);
 	}
 }
 
@@ -896,7 +898,7 @@ DG_INLINE void dgSkeletonContainer::FindFirstFeasibleForcesLCP(dgJointInfo* cons
 	SolveBackward(force);
 
 	while (!ValidateForcesLCP(jointInfoArray, matrixRow, force)) {
-		UpdateMassMatrixLCP(jointInfoArray, matrixRow, force);
+		UpdateMassMatrixLCP(jointInfoArray, matrixRow, force, accel);
 		SolveFoward(force, accel);
 		SolveBackward(force);
 	} 
