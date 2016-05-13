@@ -316,6 +316,8 @@ class JoesRagdollJoint: public CustomBallAndSocket
 	dFloat m_anim_offset;
 	dFloat m_anim_time;
 	
+	int xxx;
+	
 	JoesRagdollJoint(NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world)
 		:CustomBallAndSocket(localMatrix0, localMatrix1, child, parent)
 	{
@@ -330,6 +332,10 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		m_anim_speed = 0.0f;
 		m_anim_offset = 0.0f;
 		m_anim_time = 0.0f;
+
+		static int xxxxx;
+		xxx = xxxxx;
+		xxxxx++;
 	}
 
 	dVector BodyGetPointVelocity(const NewtonBody* const body, const dVector &point)
@@ -404,9 +410,9 @@ class JoesRagdollJoint: public CustomBallAndSocket
 
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-if (n == 0){
-//NewtonUserJointSetRowMinimumFriction(m_joint, -1.0f);
-//NewtonUserJointSetRowMaximumFriction(m_joint, 1.0f);
+if ((xxx== 10) && (n == 0)){
+NewtonUserJointSetRowMinimumFriction(m_joint, -1.0f);
+NewtonUserJointSetRowMaximumFriction(m_joint, 1.0f);
 }
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}

@@ -924,8 +924,18 @@ DG_INLINE dgSkeletonContainer::dgClipppedNodes dgSkeletonContainer::FindFirstFea
 	return clipped;
 }
 
-void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgForcePair* const accel)
+DG_INLINE dgJacobian dgSkeletonContainer::ToJacobian(const dgSpatialVector& v) const
 {
+	dgJacobian j;
+	j.m_linear = v.m_l & dgVector::m_triplexMask;
+	j.m_angular = dgVector(v.m_l[3], v.m_h[0], v.m_h[1], dgFloat32(0.0f));
+	return j;
+}
+
+
+void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgForcePair* const accel, dgInt32 nodesCount, dgSkeletonGraph** const clippedNodes)
+{
+/*
 	dgJacobian forceAcc[DG_SKELETON_MAX_NODES];
 	memset (forceAcc, 0, m_nodeCount * sizeof (dgJacobian));
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
@@ -949,7 +959,7 @@ void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArra
 		y1.m_angular = dgVector::m_zero;
 
 		const dgSpatialVector& f = force[i].m_joint;
-		for (dgInt32 j = node->m_dof; j < count; j++) {
+		for (dgInt32 j = 0; j < node->m_dof; j++) {
 			const dgInt32 k = node->m_sourceJacobianIndex[j];
 			dgJacobianMatrixElement* const row = &matrixRow[first + k];
 
@@ -998,6 +1008,41 @@ void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArra
 			a[j] = acc.GetScalar() + row->m_diagDamp * f[j];
 		}
 	}
+*/
+
+	for (dgInt32 i = 0; i < nodesCount; i++) {
+		const dgSkeletonGraph* const node = clippedNodes[i];
+		dgAssert(node->m_body);
+		dgAssert(node->m_joint);
+		dgAssert (node->m_parent);
+
+		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
+		const dgInt32 first = jointInfo->m_pairStart;
+		const dgInt32 count = jointInfo->m_pairCount;
+
+		dgAssert(jointInfo->m_joint == node->m_joint);
+		dgAssert (jointInfo->m_pairCount != node->m_dof);
+		dgAssert (node->m_body == jointInfo->m_joint->m_body0);
+		dgAssert (node->m_parent->m_body == jointInfo->m_joint->m_body1);
+		
+		dgSpatialVector& a = accel[node->m_index].m_joint;
+		const dgSpatialVector& f = force[node->m_index].m_joint;
+		const dgSpatialVector& f0 = force[node->m_index].m_body;
+		const dgSpatialVector& f1 = force[node->m_parent->m_index].m_body;
+
+		dgJacobian y0 (ToJacobian(f0));
+		dgJacobian y1 (ToJacobian(f1));
+		for (dgInt32 j = node->m_dof; j < count; j++) {
+			const dgInt32 k = node->m_sourceJacobianIndex[j];
+			dgJacobianMatrixElement* const row = &matrixRow[first + k];
+
+			dgVector acc(row->m_Jt.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_Jt.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
+						 row->m_Jt.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_Jt.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
+			acc = acc.AddHorizontal();
+dgFloat32 xxx = acc.GetScalar() + row->m_diagDamp * f[j];
+			a[j] = acc.GetScalar() + row->m_diagDamp * f[j];
+		}
+	}
 }
 
 
@@ -1015,7 +1060,7 @@ void dgSkeletonContainer::SolveNormal (dgJointInfo* const jointInfoArray, const 
 
 void dgSkeletonContainer::SolveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 {
-//	XXXX();
+XXXX();
 	dTimeTrackerEvent(__FUNCTION__);
 	dgForcePair force[DG_SKELETON_MAX_NODES];
 	dgForcePair accel[DG_SKELETON_MAX_NODES];
@@ -1024,7 +1069,7 @@ void dgSkeletonContainer::SolveLCP (dgJointInfo* const jointInfoArray, const dgB
 	EnumerateRowsAndInitForcesLCP(jointInfoArray, accel); 
 	dgClipppedNodes clipped (FindFirstFeasibleForcesLCP (jointInfoArray, internalForces, matrixRow, force, accel, clippedNodes));
 	if (clipped.m_variableCount) {
-		CalculateResidualLCP (jointInfoArray, matrixRow, force, accel);
+		CalculateResidualLCP (jointInfoArray, matrixRow, force, accel, clipped.m_nodeCount, clippedNodes);
 	}
 
 	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
