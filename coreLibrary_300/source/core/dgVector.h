@@ -1673,11 +1673,7 @@ class dgSpatialMatrix
 		for (dgInt32 i = 0; i < dof; i++) {
 			out[i] = tmp[i];
 		}
-		for (dgInt32 i = dof; i < 6; i++) {
-			out[i] = 0.0f;
-		}
 	}
-
 
 	DG_INLINE void Inverse(dgSpatialMatrix& dst, dgInt32 rows) const
 	{
