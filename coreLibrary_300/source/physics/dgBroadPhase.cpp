@@ -1328,7 +1328,7 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 			dgVector velRelative (body1->GetVelocity() - body0->GetVelocity());
 			dgVector step (velRelative.Scale4 (timestep * dgFloat32 (2.0f)));
-			testDist += (dist < step.DotProduct4(step).GetScalar());
+			testDist += step.DotProduct4(step).GetScalar();
 		}
 		ret = dist < testDist;
 	}
