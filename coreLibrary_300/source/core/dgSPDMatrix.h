@@ -953,8 +953,6 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x_out, T* const b
 	T* const m_x = dgAlloca(T, size);
 	T* const m_r = dgAlloca(T, size);
 	T* const delta_r = dgAlloca(T, size);
-	//T* const delta_x = dgAlloca(T, size);
-	//T* const diagonal = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
 
 	T* const delta_x = b_out;
