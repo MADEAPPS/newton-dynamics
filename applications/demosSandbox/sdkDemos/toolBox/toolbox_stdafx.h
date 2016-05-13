@@ -129,7 +129,6 @@ typedef long long unsigned64;
 #include <dQuaternion.h>
 #include <dMathDefines.h>
 #include <dBezierSpline.h>
-#include <NewtonDebuggerServer.h>
 
 #include <CustomJoint.h>
 #include <CustomGear.h>

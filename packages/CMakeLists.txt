@@ -47,18 +47,6 @@ target_include_directories(dScene PUBLIC dScene/)
 target_link_libraries(dScene dAnimation dMath dContainers NewtonStatic)
 
 
-# dVisualDebuggerServer
-file(GLOB dVisualDebuggerServer_srcs dVisualDebuggerServer/*.cpp)
-add_library(dVisualDebuggerServer ${dVisualDebuggerServer_srcs})
-
-target_include_directories(dVisualDebuggerServer PUBLIC dVisualDebuggerServer)
-target_link_libraries(dVisualDebuggerServer dContainers dMath NewtonStatic)
-
-find_package(ENet)
-include_directories(${ENet_INCLUDE_DIRS})
-target_link_libraries(dVisualDebuggerServer ${ENet_LIBRARY})
-
-
 if (UNIX)
   add_definitions(-D_POSIX_VER)
 endif(UNIX)
