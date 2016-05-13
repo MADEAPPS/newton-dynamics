@@ -33,17 +33,13 @@ typedef void (dgApi *dgOnSkeletonContainerDestroyCallback) (dgSkeletonContainer*
 class dgSkeletonContainer
 {
 	public:
-	class dgClipppedNodes
+	class dgSkeletonGraph;
+
+	class dgClippedNodes
 	{
 		public:
-		dgClipppedNodes ()
-			:m_nodeCount(0)
-			,m_variableCount(0)
-		{
-		}
-
-		dgInt32 m_nodeCount;
-		dgInt32 m_variableCount;
+		dgSkeletonGraph* m_node;
+		dgInt32 m_relIndex;
 	};
 
 	DG_MSC_VECTOR_ALIGMENT
@@ -53,9 +49,6 @@ class dgSkeletonContainer
 		dgSpatialVector m_joint;
 		dgSpatialVector m_body;
 	} DG_GCC_VECTOR_ALIGMENT;
-
-
-	class dgSkeletonGraph;
 
 	DG_CLASS_ALLOCATOR(allocator)
 	dgSkeletonContainer(dgWorld* const world, dgDynamicBody* const rootBody);
@@ -93,8 +86,8 @@ class dgSkeletonContainer
 	DG_INLINE bool ValidateForcesLCP(dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force);
 	DG_INLINE void UpdateMassMatrixLCP(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force, dgForcePair* const accel) const;
 	DG_INLINE void InitMassMatrixLCP(const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force) const;
-	DG_INLINE void CalculateResidualLCP (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgForcePair* const accel, dgInt32 nodesCount, dgSkeletonGraph** const clippedNodes);
-	DG_INLINE dgClipppedNodes FindFirstFeasibleForcesLCP(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force, dgForcePair* const accel, dgSkeletonGraph** const clippedNodes);
+	DG_INLINE void CalculateResidualLCP (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgForcePair* const accel, dgInt32 nodesCount, const dgClippedNodes* const clippedNodes);
+	DG_INLINE dgInt32 FindFirstFeasibleForcesLCP(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force, dgForcePair* const accel, dgClippedNodes* const clippedNodes);
 	void SolveLCP(dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
 
 

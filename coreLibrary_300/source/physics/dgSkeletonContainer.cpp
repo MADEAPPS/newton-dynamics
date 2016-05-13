@@ -894,7 +894,7 @@ DG_INLINE bool dgSkeletonContainer::ValidateForcesLCP(dgJointInfo* const jointIn
 	return valid;
 }
 
-DG_INLINE dgSkeletonContainer::dgClipppedNodes dgSkeletonContainer::FindFirstFeasibleForcesLCP(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force, dgForcePair* const accel, dgSkeletonGraph** const clippedNodes)
+DG_INLINE dgInt32 dgSkeletonContainer::FindFirstFeasibleForcesLCP(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force, dgForcePair* const accel, dgClippedNodes* const clippedNodes)
 {
 	InitMassMatrixLCP(jointInfoArray, internalForces, matrixRow, accel);
 	SolveFoward(force, accel);
@@ -906,22 +906,21 @@ DG_INLINE dgSkeletonContainer::dgClipppedNodes dgSkeletonContainer::FindFirstFea
 		SolveBackward(force);
 	} 
 
-	dgClipppedNodes clipped;
+	dgInt32 clippedCount = 0;
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		dgSkeletonGraph* const node = m_nodesOrder[i];
 		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
 		dgAssert(jointInfo->m_joint == node->m_joint);
 		const dgInt32 count = jointInfo->m_pairCount;
 
-		dgInt32 variables = count - node->m_dof; 
-		if (variables) {
-			clipped.m_variableCount += variables;
-			clippedNodes[clipped.m_nodeCount] = node;
-			clipped.m_nodeCount ++;
+		for (dgInt32 j = node->m_dof; j < count; j ++) {
+			clippedNodes[clippedCount].m_node = node;
+			clippedNodes[clippedCount].m_relIndex = j;
+			clippedCount ++;
 		}
 	}
 
-	return clipped;
+	return clippedCount;
 }
 
 DG_INLINE dgJacobian dgSkeletonContainer::ToJacobian(const dgSpatialVector& v) const
@@ -933,7 +932,7 @@ DG_INLINE dgJacobian dgSkeletonContainer::ToJacobian(const dgSpatialVector& v) c
 }
 
 
-void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgForcePair* const accel, dgInt32 nodesCount, dgSkeletonGraph** const clippedNodes)
+void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgForcePair* const accel, dgInt32 nodesCount, const dgClippedNodes* const clippedNodes)
 {
 /*
 	dgJacobian forceAcc[DG_SKELETON_MAX_NODES];
@@ -949,7 +948,6 @@ void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArra
 		dgAssert(jointInfo->m_joint == node->m_joint);
 
 		const dgInt32 first = jointInfo->m_pairStart;
-		const dgInt32 count = jointInfo->m_pairCount;
 
 		dgJacobian y0;
 		dgJacobian y1;
@@ -1011,37 +1009,36 @@ void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArra
 */
 
 	for (dgInt32 i = 0; i < nodesCount; i++) {
-		const dgSkeletonGraph* const node = clippedNodes[i];
+		const dgSkeletonGraph* const node = clippedNodes[i].m_node;
 		dgAssert(node->m_body);
 		dgAssert(node->m_joint);
 		dgAssert (node->m_parent);
 
 		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
 		const dgInt32 first = jointInfo->m_pairStart;
-		const dgInt32 count = jointInfo->m_pairCount;
 
 		dgAssert(jointInfo->m_joint == node->m_joint);
 		dgAssert (jointInfo->m_pairCount != node->m_dof);
 		dgAssert (node->m_body == jointInfo->m_joint->m_body0);
 		dgAssert (node->m_parent->m_body == jointInfo->m_joint->m_body1);
 		
-		dgSpatialVector& a = accel[node->m_index].m_joint;
-		const dgSpatialVector& f = force[node->m_index].m_joint;
-		const dgSpatialVector& f0 = force[node->m_index].m_body;
-		const dgSpatialVector& f1 = force[node->m_parent->m_index].m_body;
+		const dgInt32 index = node->m_index;
+		//dgSpatialVector& a = accel[node->m_index].m_joint;
+		//const dgSpatialVector& f = force[node->m_index].m_joint;
+		//const dgSpatialVector& f0 = force[node->m_index].m_body;
+		//const dgSpatialVector& f1 = force[node->m_parent->m_index].m_body;
+		dgJacobian y0 (ToJacobian(force[index].m_body));
+		dgJacobian y1 (ToJacobian(force[node->m_parent->m_index].m_body));
 
-		dgJacobian y0 (ToJacobian(f0));
-		dgJacobian y1 (ToJacobian(f1));
-		for (dgInt32 j = node->m_dof; j < count; j++) {
-			const dgInt32 k = node->m_sourceJacobianIndex[j];
-			dgJacobianMatrixElement* const row = &matrixRow[first + k];
+		const dgInt32 j = clippedNodes[i].m_relIndex;
+		const dgInt32 k = node->m_sourceJacobianIndex[j];
+		dgJacobianMatrixElement* const row = &matrixRow[first + k];
 
-			dgVector acc(row->m_Jt.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_Jt.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
-						 row->m_Jt.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_Jt.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
-			acc = acc.AddHorizontal();
-dgFloat32 xxx = acc.GetScalar() + row->m_diagDamp * f[j];
-			a[j] = acc.GetScalar() + row->m_diagDamp * f[j];
-		}
+		dgVector acc(row->m_Jt.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_Jt.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
+					 row->m_Jt.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_Jt.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
+		acc = acc.AddHorizontal();
+//dgFloat32 xxx = acc.GetScalar() + row->m_diagDamp * force[index].m_joint[j];
+		accel[index].m_joint[j] = acc.GetScalar() + row->m_diagDamp * force[index].m_joint[j];
 	}
 }
 
@@ -1064,12 +1061,33 @@ XXXX();
 	dTimeTrackerEvent(__FUNCTION__);
 	dgForcePair force[DG_SKELETON_MAX_NODES];
 	dgForcePair accel[DG_SKELETON_MAX_NODES];
-	dgSkeletonGraph* clippedNodes[DG_SKELETON_MAX_NODES];
+	dgClippedNodes clippedNodes[DG_SKELETON_MAX_NODES];
 	
 	EnumerateRowsAndInitForcesLCP(jointInfoArray, accel); 
-	dgClipppedNodes clipped (FindFirstFeasibleForcesLCP (jointInfoArray, internalForces, matrixRow, force, accel, clippedNodes));
-	if (clipped.m_variableCount) {
-		CalculateResidualLCP (jointInfoArray, matrixRow, force, accel, clipped.m_nodeCount, clippedNodes);
+	dgInt32 clippedCount = FindFirstFeasibleForcesLCP (jointInfoArray, internalForces, matrixRow, force, accel, clippedNodes);
+	if (clippedCount) {
+		CalculateResidualLCP (jointInfoArray, matrixRow, force, accel, clippedCount, clippedNodes);
+
+		dgInt32 nodeIndex = 0;
+		while (clippedCount) {
+			bool loop = true;
+			bool calculateDelta_x = true;
+
+			while (loop) {
+				loop = false;
+				dgFloat32 clamp_x(0.0f);
+
+				const dgSkeletonGraph* const node = clippedNodes[nodeIndex].m_node;
+				dgFloat32 r = accel[node->m_index].m_joint[clippedNodes[nodeIndex].m_relIndex];
+				dgInt32 swapIndex = -1;
+				if (dgAbsf(r) > dgFloat32(1.0e-12f)) {
+
+				}
+
+			}
+
+			clippedCount--;
+		}
 	}
 
 	UpdateForces(jointInfoArray, internalForces, matrixRow, force);

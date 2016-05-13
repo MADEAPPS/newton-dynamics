@@ -1007,7 +1007,6 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x_out, T* const b
 	while (count) {
 		bool loop = true;
 		bool calculateDelta_x = true;
-		T dir(0.0f);
 
 		while (loop) {
 			loop = false;
@@ -1017,7 +1016,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x_out, T* const b
 			if (T(fabs(m_r[index]) > T(1.0e-12f))) {
 
 				if (calculateDelta_x) {
-					dir = (m_r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
+					//T dir__ = (m_r[index] <= T(0.0f)) ? T(1.0f) : T(-1.0f);
+					T dir = dgSign(-m_r[index]);
 					dgCalculateDelta_x(size, dir, index, matrix, delta_x);
 				}
 
