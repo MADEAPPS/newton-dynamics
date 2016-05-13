@@ -25,7 +25,7 @@ list(REMOVE_ITEM sandbox_srcs "sdkDemos/toolBox/ShaderPrograms.cpp")
 
 add_executable(demosSandbox ${sandbox_srcs})
 
-target_link_libraries(demosSandbox dMath dScene dCustomJoints dContainers dVisualDebuggerServer dAnimation)
+target_link_libraries(demosSandbox dMath dScene dCustomJoints dContainers dAnimation)
 
 
 # 3rd party dependencies

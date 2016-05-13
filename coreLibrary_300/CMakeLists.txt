@@ -70,29 +70,17 @@ endif (UNIX)
 install(TARGETS Newton DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES ${NEWTON_SOURCE}/newton/Newton.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-
-#if (${UNIX})
-#  if (BUILD_64)
-#    add_definitions(-D_POSIX_VER_64)
-#  else (BUILD_64)
-#    add_definitions(-D_POSIX_VER)
-#  endif (BUILD_64)
-#endif(${UNIX})
-
-
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   add_definitions(-D_MACOSX_VER)
-else(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    if (${UNIX})
-      if (BUILD_64)
-        add_definitions(-D_POSIX_VER_64)
-      else (BUILD_64)
-        add_definitions(-D_POSIX_VER)
-      endif (BUILD_64)
-    endif(${UNIX})
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-
+if (${UNIX})
+  if (BUILD_64)
+    add_definitions(-D_POSIX_VER_64)
+  else (BUILD_64)
+    add_definitions(-D_POSIX_VER)
+  endif (BUILD_64)
+endif(${UNIX})
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_definitions(-fpic -msse -msse3 -msse4 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant)
