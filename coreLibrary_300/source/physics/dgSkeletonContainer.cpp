@@ -293,7 +293,6 @@ class dgSkeletonContainer::dgSkeletonGraph
 				
 				dgFloat32 f = force.m_joint[i] + row->m_force;
 				if (f < row->m_lowerBoundFrictionCoefficent) {
-					//force.m_joint[i] = row->m_lowerBoundFrictionCoefficent - row->m_force;
 					force.m_joint[i] = dgFloat32 (0.0f);
 					dgSwap(accel.m_joint[i], accel.m_joint[clampedValue]);
 					dgSwap(force.m_joint[i], force.m_joint[clampedValue]);
@@ -302,7 +301,6 @@ class dgSkeletonContainer::dgSkeletonGraph
 					m_dof--;
 					clampedValue--;
 				} else if (f > row->m_upperBoundFrictionCoefficent) {
-					//force.m_joint[i] = dgFloat32 (0.0f)row->m_upperBoundFrictionCoefficent - row->m_force;
 					force.m_joint[i] = dgFloat32 (0.0f);
 					dgSwap(accel.m_joint[i], accel.m_joint[clampedValue]);
 					dgSwap(force.m_joint[i], force.m_joint[clampedValue]);

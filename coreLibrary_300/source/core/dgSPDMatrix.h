@@ -573,10 +573,10 @@ DG_INLINE void dgCalculateDelta_x(dgInt32 size, T dir, dgInt32 n, const T* const
 {
 	const T* const row = &matrix[size * n];
 	for (dgInt32 i = 0; i < n; i++) {
-		delta_x[i] = -row[i] * dir;
+		delta_x[i] = row[i] * dir;
 	}
 	dgCholeskySolve(size, matrix, delta_x, n);
-	delta_x[n] = dir;
+	delta_x[n] = -dir;
 }
 
 
@@ -691,7 +691,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 			if (dgAbsf(r0[index]) > T(1.0e-12f)) {
 
 				if (calculateDelta_x) {
-					T dir = dgSign(-r0[index]);
+					T dir = dgSign(r0[index]);
 					dgCalculateDelta_x(size, dir, index, matrix, delta_x);
 				}
 

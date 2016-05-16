@@ -311,14 +311,14 @@ void dCalculateDelta_r(int size, int n, const T* const matrix, const T* const de
 }
 
 template<class T>
-void dgCalculateDelta_x(int size, T dir, int n, const T* const matrix, T* const delta_x)
+void dCalculateDelta_x(int size, T dir, int n, const T* const matrix, T* const delta_x)
 {
 	const T* const row = &matrix[size * n];
 	for (int i = 0; i < n; i++) {
-		delta_x[i] = -row[i] * dir;
+		delta_x[i] = row[i] * dir;
 	}
 	dCholeskySolve(size, matrix, delta_x, n);
-	delta_x[n] = dir;
+	delta_x[n] = -dir;
 }
 
 
@@ -433,8 +433,8 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 			if (dAbs(r0[index]) > T(1.0e-12f)) {
 
 				if (calculateDelta_x) {
-					T dir = dSign(-r0[index]);
-					dgCalculateDelta_x(size, dir, index, matrix, delta_x);
+					T dir = dSign(r0[index]);
+					dCalculateDelta_x(size, dir, index, matrix, delta_x);
 				}
 
 				calculateDelta_x = true;
