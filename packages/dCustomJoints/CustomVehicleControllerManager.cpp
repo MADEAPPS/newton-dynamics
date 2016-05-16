@@ -1240,7 +1240,7 @@ dFloat CustomVehicleController::EngineController::GetGearRatio () const
 void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat timestep)
 {
 m_info.m_gearsCount = 4;
-m_currentGear = D_VEHICLE_NEUTRAL_GEAR;
+//m_currentGear = D_VEHICLE_NEUTRAL_GEAR;
 
 	m_gearTimer--;
 	if (m_gearTimer < 0) {
@@ -2312,7 +2312,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				} else {
 					// calculating Brush tire model with longitudinal and lateral coupling 
 					// for friction coupling according to Motor Vehicle dynamics by: Giancarlo Genta 
-					// reduces to this, which may have a divide by zero locked, so I am cl;amping to some small value
+					// reduces to this, which may have a divide by zero locked, so I am clamping to some small value
 					// dFloat alphaTangent = vy / dAbs(vx);
 					//dFloat k = (vw - vx) / vx;
 					//dFloat phy_x0 = k / (1.0f + k);
@@ -2321,8 +2321,13 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 						tireContactLongitudinalSpeed = 0.01f * dSign(tireContactLongitudinalSpeed);
 					}
 
-					dFloat lateralSideSlip = tireOriginLateralSpeed / dAbs (tireContactLongitudinalSpeed);
-					dFloat longitudinalSlipRatio = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireContactLongitudinalSpeed;
+					dFloat longitudinalSlipRatio = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
+					dFloat lateralSideSlip = tireOriginLateralSpeed / dAbs(tireContactLongitudinalSpeed);
+
+if (tire->m_index == 2)
+{
+//	dTrace (("w=%f  v=%f\n", tireContactLongitudinalSpeed, tireOriginLongitudinalSpeed));
+}
 
 					dFloat aligningMoment;
 					dFloat lateralForce;
