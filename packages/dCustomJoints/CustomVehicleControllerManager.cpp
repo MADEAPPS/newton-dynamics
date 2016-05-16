@@ -2327,7 +2327,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 if (tire->m_index == 2)
 {
-	dTrace (("w=%f  v=%f\n", tireContactLongitudinalSpeed, tireOriginLongitudinalSpeed));
+	dTrace (("phi=%f w=%f  v=%f\n",  longitudinalSlipRatio, tireContactLongitudinalSpeed, tireOriginLongitudinalSpeed));
 }
 
 					dFloat aligningMoment;
