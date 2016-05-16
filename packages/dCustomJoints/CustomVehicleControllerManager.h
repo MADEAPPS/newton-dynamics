@@ -345,7 +345,6 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_peakHorsePower;
 			dFloat m_peakHorsePowerRpm;
 			dFloat m_readLineRpm;
-			dFloat m_normalizedAngularAcceleration;
 
 			dFloat m_vehicleTopSpeed;
 			dFloat m_reverseGearRatio;

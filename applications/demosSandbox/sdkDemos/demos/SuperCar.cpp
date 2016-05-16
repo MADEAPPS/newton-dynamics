@@ -62,7 +62,6 @@ struct CarDefinition
 	dFloat PEAK_HP;
 	dFloat PEAK_HP_RPM;
 	dFloat REDLINE_RPM;
-	dFloat NORMALIZED_ANGULAR_ACCELERATION;
 	dFloat VEHICLE_TOP_SPEED_KMH;
 	dFloat TIRE_LATERAL_STIFFNESS;
 	dFloat TIRE_LONGITUDINAL_STIFFNESS;
@@ -105,7 +104,6 @@ static CarDefinition monsterTruck =
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
-	1.0f,										// NORMALIZED_ANGULAR_ACCELERATION
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),	// TIRE_LATERAL_STIFFNESS
 	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),	// TIRE_LONGITUDINAL_STIFFNESS
@@ -148,7 +146,6 @@ static CarDefinition viper =
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
-	1.0f,										// NORMALIZED_ANGULAR_ACCELERATION
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),  // TIRE_LATERAL_STIFFNESS
 	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),	// TIRE_LONGITUDINAL_STIFFNESS
@@ -483,7 +480,6 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_peakHorsePower = definition.PEAK_HP;
 		engineInfo.m_peakHorsePowerRpm = definition.PEAK_HP_RPM;
 		engineInfo.m_readLineRpm = definition.REDLINE_RPM;
-		engineInfo.m_normalizedAngularAcceleration = definition.NORMALIZED_ANGULAR_ACCELERATION;
 
 		engineInfo.m_gearsCount = 6;
 		engineInfo.m_gearRatios[0] = definition.TIRE_GEAR_1;
@@ -612,8 +608,8 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 
-#if 1
-	#if 1
+#if 0
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);

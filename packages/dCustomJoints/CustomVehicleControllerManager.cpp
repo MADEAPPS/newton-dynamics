@@ -1207,7 +1207,6 @@ void CustomVehicleController::EngineController::InitEngineTorqueCurve()
 	m_info.m_driveViscousDrag2 = torque / (speed * speed);
 
 	m_torqueRPMCurve.InitalizeCurve(sizeof (rpsTable) / sizeof (rpsTable[0]), rpsTable, torqueTable);
-	m_info.m_normalizedAngularAcceleration = dClamp(m_info.m_normalizedAngularAcceleration, dFloat(0.1f), dFloat(1.0f));
 }
 
 void CustomVehicleController::EngineController::PlotEngineCurve() const
@@ -2301,7 +2300,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				NewtonMaterialGetContactTangentDirections(material, tireBody, &lateralContactDir[0], &longitudinalContactDir[0]);
 
 				//dFloat tireOriginLateralSpeed = tireVeloc % lateralPin;
-				dFloat tireOriginLateralSpeed = tireVeloc % longitudinalContactDir;
+				dFloat tireOriginLateralSpeed = tireVeloc % lateralContactDir;
 				dFloat tireOriginLongitudinalSpeed = tireVeloc % longitudinalContactDir;
 				dFloat tireContactLongitudinalSpeed = -((tireOmega * radius) % longitudinalContactDir);
 
@@ -2322,11 +2321,13 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 					}
 
 					dFloat longitudinalSlipRatio = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
+					//dFloat lateralSideSlip = tireOriginLateralSpeed / dAbs(tireOriginLongitudinalSpeed);
+					//lateralSideSlip *= (tireOriginLongitudinalSpeed / tireContactLongitudinalSpeed);
 					dFloat lateralSideSlip = tireOriginLateralSpeed / dAbs(tireContactLongitudinalSpeed);
 
 if (tire->m_index == 2)
 {
-//	dTrace (("w=%f  v=%f\n", tireContactLongitudinalSpeed, tireOriginLongitudinalSpeed));
+	dTrace (("w=%f  v=%f\n", tireContactLongitudinalSpeed, tireOriginLongitudinalSpeed));
 }
 
 					dFloat aligningMoment;

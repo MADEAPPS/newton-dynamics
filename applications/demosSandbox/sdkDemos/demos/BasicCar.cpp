@@ -50,7 +50,6 @@ struct BasciCarParameters
 	dFloat PEAK_HP_RPM;
 
 	dFloat REDLINE_RPM;
-	dFloat NORMALIZED_ANGULAR_ACCELERATION;
 
 	dFloat GEAR_1;
 	dFloat GEAR_2;
@@ -86,7 +85,6 @@ static BasciCarParameters basicCarParameters =
 	 190.0f,	// PEAK_HP
 	4000.0f,	// PEAK_HP_RPM
 	4500.0f,	// REDLINE_RPM
-		0.5f,	// NORMALIZED_ANGULAR_ACCELERATION
 		2.5f,	// GEAR_1
 		2.0f,	// GEAR_2
 		1.5f,	// GEAR_3
@@ -404,8 +402,6 @@ class BasicCarEntity: public DemoEntity
 		engineInfo.m_peakHorsePowerRpm = parameters.PEAK_HP_RPM;
 
 		engineInfo.m_readLineRpm = parameters.REDLINE_RPM;
-		engineInfo.m_normalizedAngularAcceleration = parameters.NORMALIZED_ANGULAR_ACCELERATION;
-
 
 		engineInfo.m_gearsCount = 3;
 		engineInfo.m_gearRatios[0] = parameters.GEAR_1;
