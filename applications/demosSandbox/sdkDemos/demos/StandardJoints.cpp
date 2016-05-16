@@ -398,7 +398,6 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);
 
 		CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
-
 		// motors
 		for (int n = 0; n < 3; n++) {
 			// calculate the desired acceleration

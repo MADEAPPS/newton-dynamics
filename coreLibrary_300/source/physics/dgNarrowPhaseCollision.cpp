@@ -1818,7 +1818,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 		}
 
 		closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
-		if (proxy.m_timestep < minTimeStep) {
+		if (proxy.m_timestep <= minTimeStep) {
 			minTimeStep = proxy.m_timestep;
 			n = proxy.m_normal;
 			p = proxy.m_closestPointBody0;

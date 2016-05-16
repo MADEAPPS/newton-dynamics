@@ -199,7 +199,16 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 						}
 					}
 				} else {
-					
+					if (timeToImpact > dgFloat32 (0.0f)) {
+						for (dgInt32 j = 1; j < bodyCount; j++) {
+							dgDynamicBody* const body = (dgDynamicBody*)bodyArray[j].m_body;
+							if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+								body->IntegrateVelocity(timeToImpact);
+								body->UpdateWorlCollisionMatrix();
+							}
+						}
+					}
+
 					CalculateIslandContacts (island, timeRemaining, lru, threadID);
 					BuildJacobianMatrix (island, threadID, 0.0f);
 					CalculateReactionsForces (island, threadID, 0.0f, DG_SOLVER_MAX_ERROR);

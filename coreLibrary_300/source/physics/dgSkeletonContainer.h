@@ -95,7 +95,7 @@ class dgSkeletonContainer
 	dgSkeletonGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgSkeletonGraph* const root, dgSkeletonGraph* const parent, dgInt32& index);
 
-void XXXX();
+void XXXX(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force);
 	
 	static void ResetUniqueId(dgInt32 id);
 

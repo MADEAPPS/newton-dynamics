@@ -345,13 +345,15 @@ DG_INLINE void dgSwap(T& A, T& B)
 }	
 
 template <class T>
+DG_INLINE T dgAbsf(T A)
+{
+	// according to Intel this is better because is does not read after write
+	return (A >= T(0.0f)) ? A : -A;
+}
+
+template <class T>
 DG_INLINE T dgSign(T A)
 {
-//	T sign (1.0f);
-//	if (A < T (0.0f)) {
-//		sign = T (-1.0f);
-//	}
-//	return sign;
 	return (A >= T(0)) ? T(1) : T(-1);
 }
 
@@ -371,7 +373,7 @@ DG_INLINE bool dgAreEqual(T A, T B, T tol)
 	if (exp0 != exp1) {
 		return false;
 	}
-	return fabs(mantissa0 - mantissa1) < fabs (tol);
+	return dgAbsf(mantissa0 - mantissa1) < dgAbsf (tol);
 }
 
 template <class T> 
@@ -688,19 +690,6 @@ dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBy
 #endif
 
 
-DG_INLINE dgFloat32 dgAbsf(dgFloat32 x)
-{
-#if 0
-	dgDoubleInt val;
-	val.m_float = x;
-	val.m_intH &= ~(dgUnsigned64 (1)<<31);
-	dgAssert (val.m_float == fabs (x));
-	return dgFloat32 (val.m_float);
-#else
-	// according to Intel this is better because is doe not read after write
-	return (x >= dgFloat32 (0.0f)) ? x : -x;
-#endif
-}
 
 #ifndef _NEWTON_USE_DOUBLE
 DG_INLINE dgInt32 dgFastInt (dgFloat64 x)
