@@ -61,8 +61,8 @@ struct CarDefinition
 	dFloat PEAK_TORQUE_RPM;
 	dFloat PEAK_HP;
 	dFloat PEAK_HP_RPM;
-	dFloat REDLINE_TORQUE;
-	dFloat REDLINE_TORQUE_RPM;
+	dFloat REDLINE_RPM;
+	dFloat NORMALIZED_ANGULAR_ACCELERATION;
 	dFloat VEHICLE_TOP_SPEED_KMH;
 	dFloat TIRE_LATERAL_STIFFNESS;
 	dFloat TIRE_LONGITUDINAL_STIFFNESS;
@@ -104,8 +104,8 @@ static CarDefinition monsterTruck =
 	3000.0f,									// PEAK_TORQUE_RPM
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
-	100.0f,										// REDLINE_TORQUE
 	6000.0f,									// REDLINE_TORQUE_RPM
+	1.0f,										// NORMALIZED_ANGULAR_ACCELERATION
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),	// TIRE_LATERAL_STIFFNESS
 	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),	// TIRE_LONGITUDINAL_STIFFNESS
@@ -147,8 +147,8 @@ static CarDefinition viper =
 	3000.0f,									// PEAK_TORQUE_RPM
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
-	100.0f,										// REDLINE_TORQUE
 	6000.0f,									// REDLINE_TORQUE_RPM
+	1.0f,										// NORMALIZED_ANGULAR_ACCELERATION
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),  // TIRE_LATERAL_STIFFNESS
 	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),	// TIRE_LONGITUDINAL_STIFFNESS
@@ -475,15 +475,15 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_radio = definition.ENGINE_RADIO; 
 		engineInfo.m_vehicleTopSpeed = definition.VEHICLE_TOP_SPEED_KMH;
 		engineInfo.m_clutchFrictionTorque = definition.CLUTCH_FRICTION_TORQUE;
-	
-		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
-		engineInfo.m_rpmAtPeakTorque = definition.PEAK_TORQUE_RPM;
-		engineInfo.m_peakHorsePower = definition.PEAK_HP;
-		engineInfo.m_rpmAtPeakHorsePower = definition.PEAK_HP_RPM;
-		engineInfo.m_redLineTorque = definition.REDLINE_TORQUE;
-		engineInfo.m_rpmAtReadLineTorque = definition.REDLINE_TORQUE_RPM;
+
 		engineInfo.m_idleTorque = definition.IDLE_TORQUE;
-		engineInfo.m_rpmAtIdleTorque = definition.IDLE_TORQUE_RPM;
+		engineInfo.m_idleTorqueRpm = definition.IDLE_TORQUE_RPM;
+		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
+		engineInfo.m_peakTorqueRpm = definition.PEAK_TORQUE_RPM;
+		engineInfo.m_peakHorsePower = definition.PEAK_HP;
+		engineInfo.m_peakHorsePowerRpm = definition.PEAK_HP_RPM;
+		engineInfo.m_readLineRpm = definition.REDLINE_RPM;
+		engineInfo.m_normalizedAngularAcceleration = definition.NORMALIZED_ANGULAR_ACCELERATION;
 
 		engineInfo.m_gearsCount = 6;
 		engineInfo.m_gearRatios[0] = definition.TIRE_GEAR_1;
@@ -493,27 +493,6 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_gearRatios[4] = definition.TIRE_GEAR_5;
 		engineInfo.m_gearRatios[5] = definition.TIRE_GEAR_6;
 		engineInfo.m_reverseGearRatio = definition.TIRE_REVERSE_GEAR;
-/*
-		CustomVehicleController::EngineController::DifferentialAxel axel0; 
-		CustomVehicleController::EngineController::DifferentialAxel axel1; 
-		switch (definition.DIFFERENTIAL_TYPE)
-		{
-			case 0:
-				axel0.m_leftTire = leftRearTire;
-				axel0.m_rightTire = rightRearTire;
-				break;
-			case 1:
-				axel0.m_leftTire = leftFrontTire;
-				axel0.m_rightTire = rightFrontTire;
-				break;
-
-			default:
-				axel0.m_leftTire = leftRearTire;
-				axel0.m_rightTire = rightRearTire;
-				axel1.m_leftTire = leftFrontTire;
-				axel1.m_rightTire = rightFrontTire;
-		}
-*/
 
 		CustomVehicleController::EngineController::Differential4wd differential;
 		switch (definition.DIFFERENTIAL_TYPE) 
@@ -633,8 +612,8 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 
-#if 0
-	#if 0
+#if 1
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
@@ -1608,7 +1587,7 @@ void SuperCar (DemoEntityManager* const scene)
 //	scene->SetCameraMouseLock (true);
 
 	camMatrix.m_posit.m_x -= 5.0f;
-//camMatrix = dYawMatrix (-0.75f * 3.1416f) * camMatrix;
+camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 	dMatrix location (camMatrix);

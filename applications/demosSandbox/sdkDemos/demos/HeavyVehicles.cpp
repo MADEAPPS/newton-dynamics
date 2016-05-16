@@ -49,8 +49,8 @@ struct VehicleParameters
 	dFloat PEAK_HP;
 	dFloat PEAK_HP_RPM;
 
-	dFloat REDLINE_TORQUE;
-	dFloat REDLINE_TORQUE_RPM;
+	dFloat REDLINE_RPM;
+	dFloat NORMALIZED_ANGULAR_ACCELERATION;
 
 	dFloat GEAR_1;
 	dFloat GEAR_2;
@@ -86,8 +86,8 @@ static VehicleParameters heavyTruck =
 	3000.0f,							// PEAK_TORQUE_RPM
 	2000.0f,							// PEAK_HP
 	4000.0f,							// PEAK_HP_RPM
-	 300.0f,							// REDLINE_TORQUE
-	4500.0f,							// REDLINE_TORQUE_RPM
+	4500.0f,							// REDLINE_RPM
+	   1.0f,							// NORMALIZED_ANGULAR_ACCELERATION
 		2.5f,							// GEAR_1
 		2.0f,							// GEAR_2
 		1.5f,							// GEAR_3
@@ -120,8 +120,8 @@ static VehicleParameters lightTruck =
 	3000.0f,								// PEAK_TORQUE_RPM
 	 300.0f,								// PEAK_HP
 	4000.0f,								// PEAK_HP_RPM
-	  60.0f,								// REDLINE_TORQUE
-	4500.0f,								// REDLINE_TORQUE_RPM
+	4500.0f,								// REDLINE_RPM
+	   1.0f,								// NORMALIZED_ANGULAR_ACCELERATION
 	2.5f,									// GEAR_1
 	2.0f,									// GEAR_2
 	1.5f,									// GEAR_3
@@ -154,8 +154,8 @@ static VehicleParameters m1a1Param =
 	3000.0f,								// PEAK_TORQUE_RPM
 	800.0f,									// PEAK_HP
 	4000.0f,								// PEAK_HP_RPM
-	300.0f,									// REDLINE_TORQUE
-	4500.0f,								// REDLINE_TORQUE_RPM
+	4500.0f,								// REDLINE_RPM
+	   1.0f,								// NORMALIZED_ANGULAR_ACCELERATION
 	2.5f,									// GEAR_1
 	2.0f,									// GEAR_2
 	1.5f,									// GEAR_3
@@ -720,7 +720,7 @@ class HeavyVehicleEntity: public DemoEntity
 		dFloat viperPeakHorsePowerRPM = parameters.PEAK_HP_RPM;
 		dFloat viperPeakHorsePower = parameters.PEAK_HP;
 
-		dFloat viperRedLineRPM = parameters.REDLINE_TORQUE_RPM;
+		dFloat viperRedLineRPM = parameters.REDLINE_RPM;
 		dFloat viperRedLineTorquePoundPerFoot = parameters.REDLINE_TORQUE;
 
 		dFloat vehicleTopSpeedKPH = parameters.VEHICLE_TOP_SPEED_KMH;
@@ -798,7 +798,7 @@ class HeavyVehicleEntity: public DemoEntity
 		dFloat viperPeakHorsePowerRPM = parameters.PEAK_HP_RPM;
 		dFloat viperPeakHorsePower = parameters.PEAK_HP;
 
-		dFloat viperRedLineRPM = parameters.REDLINE_TORQUE_RPM;
+		dFloat viperRedLineRPM = parameters.REDLINE_RPM;
 		dFloat viperRedLineTorquePoundPerFoot = parameters.REDLINE_TORQUE;
 
 		dFloat vehicleTopSpeedKPH = parameters.VEHICLE_TOP_SPEED_KMH;
@@ -1153,7 +1153,7 @@ class HeavyVehicleEntity: public DemoEntity
 		dFloat viperPeakHorsePowerRPM = parameters.PEAK_HP_RPM;
 		dFloat viperPeakHorsePower = parameters.PEAK_HP;
 
-		dFloat viperRedLineRPM = parameters.REDLINE_TORQUE_RPM;
+		dFloat viperRedLineRPM = parameters.REDLINE_RPM;
 		dFloat viperRedLineTorquePoundPerFoot = parameters.REDLINE_TORQUE;
 
 		dFloat vehicleTopSpeedKPH = parameters.VEHICLE_TOP_SPEED_KMH;
@@ -1167,14 +1167,17 @@ class HeavyVehicleEntity: public DemoEntity
 		engineInfo.m_vehicleTopSpeed = definition.VEHICLE_TOP_SPEED_KMH;
 		engineInfo.m_clutchFrictionTorque = definition.CLUTCH_FRICTION_TORQUE;
 
-		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
-		engineInfo.m_rpmAtPeakTorque = definition.PEAK_TORQUE_RPM;
-		engineInfo.m_peakHorsePower = definition.PEAK_HP;
-		engineInfo.m_rpmAtPeakHorsePower = definition.PEAK_HP_RPM;
-		engineInfo.m_redLineTorque = definition.REDLINE_TORQUE;
-		engineInfo.m_rpmAtReadLineTorque = definition.REDLINE_TORQUE_RPM;
 		engineInfo.m_idleTorque = definition.IDLE_TORQUE;
-		engineInfo.m_rpmAtIdleTorque = definition.IDLE_TORQUE_RPM;
+		engineInfo.m_idleTorqueRpm = definition.IDLE_TORQUE_RPM;
+
+		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
+		engineInfo.m_peakTorqueRpm = definition.PEAK_TORQUE_RPM;
+
+		engineInfo.m_peakHorsePower = definition.PEAK_HP;
+		engineInfo.m_peakHorsePowerRpm = definition.PEAK_HP_RPM;
+
+		engineInfo.m_readLineRpm = definition.REDLINE_RPM;
+		engineInfo.m_normalizedAngularAcceleration = definition.NORMALIZED_ANGULAR_ACCELERATION;
 
 		engineInfo.m_gearsCount = 3;
 		engineInfo.m_gearRatios[0] = definition.GEAR_1;

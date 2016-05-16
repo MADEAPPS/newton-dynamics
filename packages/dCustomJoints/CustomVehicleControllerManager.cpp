@@ -24,18 +24,17 @@
 static FILE* file_xxx;
 #endif
 
-static int xxx;
 
+#define D_VEHICLE_NEUTRAL_GEAR						0
+#define D_VEHICLE_REVERSE_GEAR						1
+#define D_VEHICLE_FIRST_GEAR						2
+#define D_VEHICLE_MAX_DRIVETRAIN_DOF				32
+#define D_VEHICLE_REGULARIZER						dFloat(1.0001f)
+#define D_VEHICLE_DIFFERENTIAL_LOCK_RPS				dFloat(4.0f)
+#define D_VEHICLE_DIFFERENTIAL_NORMAL_RPS			dFloat(20.0f)
 
-#define D_VEHICLE_NEUTRAL_GEAR				0
-#define D_VEHICLE_REVERSE_GEAR				1
-#define D_VEHICLE_FIRST_GEAR				2
-#define D_VEHICLE_REST_GAS_VALVE			dFloat(0.1f)
-#define D_VEHICLE_MIN_RPM_FACTOR			dFloat(0.5f)
-#define D_VEHICLE_MAX_DRIVETRAIN_DOF		32
-#define D_VEHICLE_REGULARIZER				1.0001f
-#define D_VEHICLE_DIFFERENTIAL_LOCK_RPS		4.0f
-#define D_VEHICLE_DIFFERENTIAL_NORMAL_RPS	20.0f
+#define D_VEHICLE_ENGINE_IDLE_GAS_VALVE				dFloat(0.1f)
+#define D_VEHICLE_ENGINE_IDLE_FRICTION_COEFFICIENT	dFloat(0.25f)
 
 
 /*
@@ -519,28 +518,27 @@ void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
 
 	m_idleTorque *= poundFootToNewtonMeters;
 	m_peakTorque *= poundFootToNewtonMeters;
-	m_redLineTorque *= poundFootToNewtonMeters;
 
-	m_rpmAtPeakTorque *= rpmToRadiansPerSecunds;
-	m_rpmAtPeakHorsePower *= rpmToRadiansPerSecunds;
-	m_rpmAtReadLineTorque *= rpmToRadiansPerSecunds;
-	m_rpmAtIdleTorque *= rpmToRadiansPerSecunds;
+	m_peakTorqueRpm *= rpmToRadiansPerSecunds;
+	m_peakHorsePowerRpm *= rpmToRadiansPerSecunds;
+	m_readLineRpm *= rpmToRadiansPerSecunds;
+	m_idleTorqueRpm *= rpmToRadiansPerSecunds;
 
 	m_peakHorsePower *= horsePowerToWatts;
 	m_vehicleTopSpeed *= kmhToMetersPerSecunds;
 
-	m_peakPowerTorque = m_peakHorsePower / m_rpmAtPeakHorsePower;
+	m_peakPowerTorque = m_peakHorsePower / m_peakHorsePowerRpm;
 
-	dAssert(m_rpmAtIdleTorque > 0.0f);
-	dAssert(m_rpmAtIdleTorque < m_rpmAtPeakHorsePower);
-	dAssert(m_rpmAtPeakTorque < m_rpmAtPeakHorsePower);
-	dAssert(m_rpmAtPeakHorsePower < m_rpmAtReadLineTorque);
+	dAssert(m_idleTorqueRpm > 0.0f);
+	dAssert(m_idleTorqueRpm < m_peakHorsePowerRpm);
+	dAssert(m_peakTorqueRpm < m_peakHorsePowerRpm);
+	dAssert(m_peakHorsePowerRpm < m_readLineRpm);
 
 	dAssert(m_idleTorque > 0.0f);
 	dAssert(m_peakTorque > m_peakPowerTorque);
-	dAssert(m_peakPowerTorque > m_redLineTorque);
-	dAssert(m_redLineTorque > 0.0f);
-	dAssert((m_peakTorque * m_rpmAtPeakTorque) < m_peakHorsePower);
+	//dAssert(m_peakPowerTorque > m_redLineTorque);
+	//dAssert(m_redLineTorque > 0.0f);
+	dAssert((m_peakTorque * m_peakTorqueRpm) < m_peakHorsePower);
 }
 
 
@@ -665,40 +663,6 @@ void CustomVehicleController::EngineController::DriveTrain::CalculateRightSide(E
 }
 
 
-/*
-void TestSolver()
-{
-	int const size = 10;
-	dFloat xxx[size][size];
-
-	dFloat X[size];
-	dFloat B[size];
-	dFloat Low[size];
-	dFloat High[size];
-
-	for (int i = 0; i < size; i ++) {
-		B[i] = 100.0f + 10*i;
-		//B[i] = 100.0f;
-		X[i] = 0.0f;
-		Low[i] = -D_LCP_MAX_VALUE;	
-		High[i] = D_LCP_MAX_VALUE;
-		xxx[i][i] = 2.0f;
-		for (int j = i + 1; j < size; j ++) {
-			xxx[i][j] = 1.0f;
-			xxx[j][i] = 1.0f;
-		}
-	}
-
-Low[0] = -1.0f;	
-High[0] = 1.0f;
-Low[2] = -1.0f;	
-High[2] = 1.0f;
-Low[7] = -1.0f;	
-High[7] = 1.0f;
-	SolveDantzigLCP(size, &xxx[0][0], X, B, Low, High);
-}
-*/
-
 void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix(dFloat* const massMatrix)
 {
 	const int size = D_VEHICLE_MAX_DRIVETRAIN_DOF;
@@ -760,9 +724,15 @@ void CustomVehicleController::EngineController::DriveTrain::ApplyInternalTorque(
 CustomVehicleController::EngineController::DriveTrainEngine::DriveTrainEngine(const dVector& invInertia)
 	:DriveTrain(invInertia)
 	,m_gearSign(1.0f)
-	,m_engineTorque(0.0f)
 {
 	m_sortKey = 1000;
+	m_internalFiction = new DriveTrainEngineFriction(this);
+	m_child = m_internalFiction;
+}
+
+void CustomVehicleController::EngineController::DriveTrainEngine::SetFriction(dFloat friction)
+{
+	m_internalFiction->m_friction = dMax (friction, 10.0f);
 }
 
 void CustomVehicleController::EngineController::DriveTrainEngine::SetExternalTorque(EngineController* const controller)
@@ -772,7 +742,8 @@ void CustomVehicleController::EngineController::DriveTrainEngine::SetExternalTor
 
 dFloat CustomVehicleController::EngineController::DriveTrainEngine::GetClutchTorque(EngineController* const controller) const
 {
-	return controller->m_info.m_clutchFrictionTorque * controller->m_clutchParam;
+	dFloat param = (controller->GetGear() == D_VEHICLE_NEUTRAL_GEAR) ? 0.0f : controller->m_clutchParam;
+	return dClamp (param * controller->m_info.m_clutchFrictionTorque, 1.0f, controller->m_info.m_clutchFrictionTorque);
 }
 
 void CustomVehicleController::EngineController::DriveTrainEngine::RebuildEngine(const dVector& invInertia)
@@ -788,7 +759,6 @@ void CustomVehicleController::EngineController::DriveTrainEngine::RebuildEngine(
 		nodeArray[i]->m_index = i;
 	}
 }
-
 
 void CustomVehicleController::EngineController::DriveTrainEngine::SetGearRatioJacobian(dFloat gearRatio)
 {
@@ -813,8 +783,8 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 
 	dFloat gearRatio = controller->GetGearRatio();
 	SetGearRatio (gearRatio);
-
 	m_engineTorque = engineTorque;
+
 	const int nodesCount = GetNodeArray(nodeArray);
 	for (int i = 0; i < nodesCount; i++) {
 		DriveTrain* const node = nodeArray[i];
@@ -831,8 +801,6 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 	
 	dAssert(massMatrix);
 
-static int xxx;
-xxx ++;
 
 	int stride = 0;
 	memset(massMatrix, 0, dofSize * dofSize * sizeof (dFloat));
@@ -877,7 +845,12 @@ CustomVehicleController::EngineController::DriveTrainEngine2W::DriveTrainEngine2
 	:DriveTrainEngine(invInertia)
 {
 	dVector gearInvInertia(invInertia.Scale(4.0f));
-	m_child = new DriveTrainDifferentialGear(gearInvInertia, this, axel, 1.0f);
+	DriveTrain* const node = new DriveTrainDifferentialGear(gearInvInertia, this, axel, 1.0f);
+
+	dAssert(!node->m_sibling);
+	node->m_sibling = m_child;
+	m_child = node;
+
 	SetGearRatioJacobian(1.0f);
 }
 
@@ -885,7 +858,11 @@ CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4
 	:DriveTrainEngine(invInertia)
 {
 	dVector gearInvInertia(invInertia.Scale(4.0f));
-	m_child = new DriveTrainDifferentialGear(gearInvInertia, this, axel0, axel1, 1.0f);
+	DriveTrain* const node = new DriveTrainDifferentialGear(gearInvInertia, this, axel0, axel1, 1.0f);
+	dAssert (!node->m_sibling);
+	node->m_sibling = m_child;
+	m_child = node;
+
 	m_gearSign = -1.0f;
 	SetGearRatioJacobian(1.0f);
 }
@@ -894,7 +871,12 @@ CustomVehicleController::EngineController::DriveTrainEngine8W::DriveTrainEngine8
 	:DriveTrainEngine(invInertia)
 {
 	dVector gearInvInertia(invInertia.Scale(4.0f));
-	m_child = new DriveTrainDifferentialGear(gearInvInertia, this, axel0, axel1, axel2, axel3, 1.0f);
+	DriveTrain* const node = new DriveTrainDifferentialGear(gearInvInertia, this, axel0, axel1, axel2, axel3, 1.0f);
+
+	dAssert(!node->m_sibling);
+	node->m_sibling = m_child;
+	m_child = node;
+
 	SetGearRatioJacobian(1.0f);
 }
 
@@ -938,14 +920,38 @@ void CustomVehicleController::EngineController::DriveTrainDifferentialGear::SetG
 void CustomVehicleController::EngineController::DriveTrainDifferentialGear::Integrate(EngineController* const controller, dFloat timestep)
 {
 	m_omega += m_inertiaInv.CompProduct(m_torque.Scale(timestep));
-//	dTrace (("%f %f %f\n", m_omega.m_x, m_omega.m_y, m_omega.m_z));
+}
+
+
+CustomVehicleController::EngineController::DriveTrainEngineFriction::DriveTrainEngineFriction(DriveTrain* const parent)
+	:DriveTrain(dVector(0.0f), parent)
+	,m_friction(100.0f)
+{
+	m_sortKey = 2;
+	m_J01 = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	m_J10 = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	SetInvMassJt();
+}
+
+void CustomVehicleController::EngineController::DriveTrainEngineFriction::SetPartMasses(const dVector& invInertia)
+{
+	DriveTrain::SetPartMasses(invInertia);
+	m_inertiaInv = dVector(0.0f);
+}
+
+void CustomVehicleController::EngineController::DriveTrainEngineFriction::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high)
+{
+	DriveTrain::CalculateRightSide (controller, timestep, rightSide, low, high);
+
+	low[m_index] = -m_friction;
+	high[m_index] = m_friction;
 }
 
 
 CustomVehicleController::EngineController::DriveTrainSlipDifferential::DriveTrainSlipDifferential (DriveTrain* const parent)
 	:DriveTrain(dVector(0.0f), parent)
 {
-	m_sortKey = 2;
+	m_sortKey = 3;
 	m_J01 = dVector(0.0f, 1.0f, 0.0f, 0.0f);
 	m_J10 = dVector(0.0f, 1.0f, 0.0f, 0.0f);
 	SetInvMassJt();
@@ -1090,7 +1096,7 @@ void CustomVehicleController::EngineController::SetInfo(const Info& info)
 	m_info = info;
 	m_infoCopy = info;
 
-	m_info.m_clutchFrictionTorque = dAbs (m_info.m_clutchFrictionTorque);
+	m_info.m_clutchFrictionTorque = dMax (10.0f, dAbs (m_info.m_clutchFrictionTorque));
 	m_infoCopy.m_clutchFrictionTorque = m_info.m_clutchFrictionTorque;
 
 	dFloat inertiaInv = 1.0f / (2.0f * m_info.m_mass * m_info.m_radio * m_info.m_radio / 5.0f);
@@ -1114,7 +1120,6 @@ void CustomVehicleController::EngineController::SetInfo(const Info& info)
 	}
 }
 
-
 bool CustomVehicleController::EngineController::GetDifferentialLock() const
 {
 	return m_info.m_differentialLock ? true : false;
@@ -1125,12 +1130,10 @@ void CustomVehicleController::EngineController::SetDifferentialLock(bool lock)
 	m_info.m_differentialLock = lock ? 1 : 0;
 }
 
-
 dFloat CustomVehicleController::EngineController::GetTopGear() const
 {
 	return m_info.m_gearRatios[m_info.m_gearsCount - 1];
 }
-
 
 void CustomVehicleController::EngineController::CalculateCrownGear()
 {
@@ -1165,7 +1168,7 @@ void CustomVehicleController::EngineController::CalculateCrownGear()
 	
 	dFloat topGearRatio = GetTopGear();
 	dFloat tireRadio = tire->GetInfo().m_radio;
-	m_info.m_crownGearRatio = tireRadio * m_info.m_rpmAtPeakHorsePower / (m_info.m_vehicleTopSpeed * topGearRatio);
+	m_info.m_crownGearRatio = tireRadio * m_info.m_peakHorsePowerRpm / (m_info.m_vehicleTopSpeed * topGearRatio);
 }
 
 
@@ -1175,30 +1178,36 @@ void CustomVehicleController::EngineController::InitEngineTorqueCurve()
 
 	CalculateCrownGear();
 
-	dFloat rpsTable[6];
-	dFloat torqueTable[6];
+	dFloat rpsTable[5];
+	dFloat torqueTable[5];
 
 	rpsTable[0] = 0.0f;
-	rpsTable[1] = m_info.m_rpmAtIdleTorque * 0.92f;
-	rpsTable[2] = m_info.m_rpmAtPeakTorque * 0.92f;
-	rpsTable[3] = m_info.m_rpmAtPeakHorsePower * 0.92f;
-	rpsTable[4] = m_info.m_rpmAtReadLineTorque * 0.92f;
-	rpsTable[5] = m_info.m_rpmAtReadLineTorque;
+	rpsTable[1] = m_info.m_idleTorqueRpm;
+	rpsTable[2] = m_info.m_peakTorqueRpm;
+	rpsTable[3] = m_info.m_peakHorsePowerRpm;
+	rpsTable[4] = m_info.m_readLineRpm;
+
+	m_info.m_readLineTorque = m_info.m_peakPowerTorque * 0.75f;
 
 	torqueTable[0] = m_info.m_idleTorque;
 	torqueTable[1] = m_info.m_idleTorque;
 	torqueTable[2] = m_info.m_peakTorque;
 	torqueTable[3] = m_info.m_peakPowerTorque;
-	torqueTable[4] = m_info.m_redLineTorque;
-	torqueTable[5] = 0.0f;
+	torqueTable[4] = m_info.m_readLineTorque;
+
+
+	m_info.m_idleFriction = dMin (m_info.m_idleTorque, m_info.m_readLineTorque) * D_VEHICLE_ENGINE_IDLE_FRICTION_COEFFICIENT;
+
+	dFloat speed = m_info.m_idleTorqueRpm;
+	dFloat torque = m_info.m_idleTorque - m_info.m_idleFriction;
+	m_info.m_idleViscousDrag2 = torque / (speed * speed);
+
+	speed = m_info.m_readLineRpm * 1.1f;
+	torque = m_info.m_readLineTorque - m_info.m_idleFriction;
+	m_info.m_driveViscousDrag2 = torque / (speed * speed);
 
 	m_torqueRPMCurve.InitalizeCurve(sizeof (rpsTable) / sizeof (rpsTable[0]), rpsTable, torqueTable);
-	m_info.m_minRPM = m_info.m_rpmAtIdleTorque * D_VEHICLE_MIN_RPM_FACTOR;
-
-	dFloat minTorque = m_torqueRPMCurve.GetValue(m_info.m_rpmAtIdleTorque) * D_VEHICLE_REST_GAS_VALVE;
-	m_info.m_idleViscousDrag1 = 4.0f * minTorque / m_info.m_rpmAtIdleTorque;
-	m_info.m_idleViscousDrag2 = 2.0f * minTorque / (m_info.m_rpmAtIdleTorque * m_info.m_rpmAtIdleTorque);
-	m_info.m_minTorque = dMax (minTorque, m_info.m_redLineTorque * 0.9f);
+	m_info.m_normalizedAngularAcceleration = dClamp(m_info.m_normalizedAngularAcceleration, dFloat(0.1f), dFloat(1.0f));
 }
 
 void CustomVehicleController::EngineController::PlotEngineCurve() const
@@ -1230,8 +1239,8 @@ dFloat CustomVehicleController::EngineController::GetGearRatio () const
 
 void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat timestep)
 {
-//xxx
 m_info.m_gearsCount = 4;
+m_currentGear = D_VEHICLE_NEUTRAL_GEAR;
 
 	m_gearTimer--;
 	if (m_gearTimer < 0) {
@@ -1270,7 +1279,7 @@ m_info.m_gearsCount = 4;
 
 void CustomVehicleController::EngineController::ApplyTorque(dFloat torque, dFloat timestep)
 {
-	m_engine->m_omega.m_x = dClamp(m_engine->m_omega.m_x, dFloat (0.0f), m_info.m_rpmAtReadLineTorque);
+	m_engine->m_omega.m_x = dClamp(m_engine->m_omega.m_x, dFloat (0.0f), m_info.m_readLineRpm);
 	m_engine->Update(this, torque, timestep);
 }
 
@@ -1281,14 +1290,21 @@ void CustomVehicleController::EngineController::Update(dFloat timestep)
 	}
 
 	dFloat torque = 0.0f;
-	dFloat omega = m_engine->m_omega.m_x;
 	if (m_ignitionKey) {
-		dFloat gasVal = dMax (m_param, D_VEHICLE_REST_GAS_VALVE);
-		dFloat drag = dMin (omega * omega * m_info.m_idleViscousDrag2, m_info.m_minTorque);
-		torque = m_torqueRPMCurve.GetValue(omega) * gasVal - drag;
+		dFloat omega = m_engine->m_omega.m_x;
+		if (m_param < D_VEHICLE_ENGINE_IDLE_GAS_VALVE) {
+			m_engine->SetFriction(m_info.m_idleFriction);
+			dFloat viscuosFriction0 = dClamp (m_info.m_idleViscousDrag2 * omega * omega, dFloat (0.0), m_info.m_idleFriction);
+			dFloat viscuosFriction1 = m_info.m_driveViscousDrag2 * omega * omega;
+			torque = m_info.m_idleFriction + (m_torqueRPMCurve.GetValue(omega) - m_info.m_idleFriction) * D_VEHICLE_ENGINE_IDLE_GAS_VALVE - viscuosFriction0 - viscuosFriction1;
+		} else {
+			m_engine->SetFriction(m_info.m_idleFriction);
+			torque = (m_torqueRPMCurve.GetValue(omega) - m_info.m_idleFriction) * m_param - m_info.m_driveViscousDrag2 * omega * omega;
+		}
 	} else {
-		 torque = - omega * m_info.m_idleViscousDrag1;
+		m_engine->SetFriction(m_info.m_idleFriction);
 	}
+
 	ApplyTorque(torque, timestep);
 }
 
@@ -1358,12 +1374,12 @@ dFloat CustomVehicleController::EngineController::GetRPM() const
 
 dFloat CustomVehicleController::EngineController::GetIdleRPM() const
 {
-	return m_info.m_rpmAtIdleTorque * 9.55f;
+	return m_info.m_idleTorqueRpm * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineController::GetRedLineRPM() const
 {
-	return m_info.m_rpmAtReadLineTorque * 9.55f;
+	return m_info.m_readLineRpm * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineController::GetSpeed() const
@@ -1696,7 +1712,6 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 
 	m_contactFilter = new BodyPartTire::FrictionModel(this);
 
-//	SetDryRollingFrictionTorque(100.0f / 4.0f);
 	m_brakesControl = NULL;
 	m_engineControl = NULL;
 	m_handBrakesControl = NULL;
@@ -2569,9 +2584,6 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
-xxx ++;
-//dTrace (("%d\n", xxx));
-
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		if (!NewtonBodyGetSleepState(m_body)) {

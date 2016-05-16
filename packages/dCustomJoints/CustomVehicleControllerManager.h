@@ -338,14 +338,15 @@ class CustomVehicleController: public CustomControllerBase
 			dVector m_location;
 			dFloat m_mass;
 			dFloat m_radio;
-			dFloat m_peakTorque;
-			dFloat m_rpmAtPeakTorque;
-			dFloat m_peakHorsePower;
-			dFloat m_rpmAtPeakHorsePower;
-			dFloat m_redLineTorque;
-			dFloat m_rpmAtReadLineTorque;
 			dFloat m_idleTorque;
-			dFloat m_rpmAtIdleTorque;
+			dFloat m_idleTorqueRpm;
+			dFloat m_peakTorque;
+			dFloat m_peakTorqueRpm;
+			dFloat m_peakHorsePower;
+			dFloat m_peakHorsePowerRpm;
+			dFloat m_readLineRpm;
+			dFloat m_normalizedAngularAcceleration;
+
 			dFloat m_vehicleTopSpeed;
 			dFloat m_reverseGearRatio;
 			dFloat m_gearRatios[10];
@@ -358,12 +359,13 @@ class CustomVehicleController: public CustomControllerBase
 			private:
 			void ConvertToMetricSystem();
 
-			dFloat m_minRPM;
-			dFloat m_minTorque;
 			dFloat m_crownGearRatio;
+			dFloat m_idleFriction;
 			dFloat m_peakPowerTorque;
-			dFloat m_idleViscousDrag1;
+			dFloat m_readLineTorque;
 			dFloat m_idleViscousDrag2;
+			dFloat m_driveViscousDrag2;
+
 			friend class EngineController;
 		};
 
@@ -383,7 +385,6 @@ class CustomVehicleController: public CustomControllerBase
 			virtual DriveTrainSlipDifferential* CastAsSlipDifferential() {return NULL;}
 			
 			virtual void SetPartMasses (const dVector& invInertia);
-			//virtual dFloat* GetMassMatrix() {return NULL;}
 			virtual void SetExternalTorque(EngineController* const controller);
 			virtual void Integrate(EngineController* const controller, dFloat timestep);
 			virtual void SetGearRatioJacobian(dFloat gearRatio) {};
@@ -400,7 +401,6 @@ class CustomVehicleController: public CustomControllerBase
 			
 			int GetNodeArray(DriveTrain** const array);
 			int GetNodeArray(DriveTrain** const array, int& index);
-
 			
 			dVector m_J01;
 			dVector m_J10;
@@ -416,6 +416,17 @@ class CustomVehicleController: public CustomControllerBase
 			int m_sortKey;
 		};
 
+		class DriveTrainEngineFriction: public DriveTrain
+		{
+			public:
+			DriveTrainEngineFriction(DriveTrain* const parent);
+
+			virtual void SetPartMasses (const dVector& invInertia);
+			virtual void CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
+
+			dFloat m_friction;
+		};
+
 		class DriveTrainEngine: public DriveTrain
 		{
 			public:
@@ -428,10 +439,12 @@ class CustomVehicleController: public CustomControllerBase
 			void RebuildEngine (const dVector& invInertia);
 			dFloat GetClutchTorque(EngineController* const controller) const;
 			void Update(EngineController* const controller, dFloat engineTorque, dFloat timestep);
-			//void Solve (int dofSize, int width, const dFloat* const massMatrix, const dFloat* const b, dFloat* const x) const;
+
+			void SetFriction(dFloat friction);
 
 			dFloat m_gearSign;
 			dFloat m_engineTorque;
+			DriveTrainEngineFriction* m_internalFiction;
 		};
 
 		class DriveTrainEngine2W: public DriveTrainEngine

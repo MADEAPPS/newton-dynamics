@@ -121,9 +121,6 @@ class CCDInputManager : public CustomInputManager
 			dFloat ammo_vel = 1000.0f;
 			dVector vel(dir.m_x*ammo_vel, dir.m_y*ammo_vel, dir.m_z*ammo_vel);
 
-			pos = dVector (9.010377f, 52.781680f, -22.977158f, 1.0f);
-			vel = dVector(628.279440f, -59.964005f, -775.673426f, 0.0f);
-
 			FireNewtonCcdBox(m_scene->GetNewton(), pos, vel);
 		}
 	}
@@ -202,16 +199,15 @@ static NewtonBody* CreateBackgroundWallsAndCellingBody(NewtonWorld* world)
 	NewtonTreeCollisionBeginBuild(collision);
 
 	// add the face one at a time
-	//NewtonTreeCollisionAddFace(collision, 4, &floor[0][0], 3 * sizeof (dFloat), 0);
-	//NewtonTreeCollisionAddFace(collision, 4, &wall_N[0][0], 3 * sizeof (dFloat), 0);
-	//NewtonTreeCollisionAddFace(collision, 4, &wall_W[0][0], 3 * sizeof (dFloat), 0);
+	NewtonTreeCollisionAddFace(collision, 4, &floor[0][0], 3 * sizeof (dFloat), 0);
+	NewtonTreeCollisionAddFace(collision, 4, &wall_N[0][0], 3 * sizeof (dFloat), 0);
+	NewtonTreeCollisionAddFace(collision, 4, &wall_W[0][0], 3 * sizeof (dFloat), 0);
 	NewtonTreeCollisionAddFace(collision, 4, &wall_S[0][0], 3 * sizeof (dFloat), 0);
-	//NewtonTreeCollisionAddFace(collision, 4, &wall_E[0][0], 3 * sizeof (dFloat), 0);
-	//NewtonTreeCollisionAddFace(collision, 4, &celling[0][0], 3 * sizeof (dFloat), 0);
+	NewtonTreeCollisionAddFace(collision, 4, &wall_E[0][0], 3 * sizeof (dFloat), 0);
+	NewtonTreeCollisionAddFace(collision, 4, &celling[0][0], 3 * sizeof (dFloat), 0);
 
 	// finish building the collision
 	NewtonTreeCollisionEndBuild(collision, 1);
-
 
 	// create a body with a collision and locate at the identity matrix position 
 	dMatrix matrix(dGetIdentityMatrix());
