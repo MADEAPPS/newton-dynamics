@@ -732,7 +732,7 @@ CustomVehicleController::EngineController::DriveTrainEngine::DriveTrainEngine(co
 
 void CustomVehicleController::EngineController::DriveTrainEngine::SetFriction(dFloat friction)
 {
-	m_internalFiction->m_friction = dMax (friction, 10.0f);
+	m_internalFiction->m_friction = dMax (friction, dFloat(10.0f));
 }
 
 void CustomVehicleController::EngineController::DriveTrainEngine::SetExternalTorque(EngineController* const controller)
@@ -743,7 +743,7 @@ void CustomVehicleController::EngineController::DriveTrainEngine::SetExternalTor
 dFloat CustomVehicleController::EngineController::DriveTrainEngine::GetClutchTorque(EngineController* const controller) const
 {
 	dFloat param = (controller->GetGear() == D_VEHICLE_NEUTRAL_GEAR) ? 0.0f : controller->m_clutchParam;
-	return dClamp (param * controller->m_info.m_clutchFrictionTorque, 1.0f, controller->m_info.m_clutchFrictionTorque);
+	return dClamp (param * controller->m_info.m_clutchFrictionTorque, dFloat(1.0f), controller->m_info.m_clutchFrictionTorque);
 }
 
 void CustomVehicleController::EngineController::DriveTrainEngine::RebuildEngine(const dVector& invInertia)
@@ -1096,7 +1096,7 @@ void CustomVehicleController::EngineController::SetInfo(const Info& info)
 	m_info = info;
 	m_infoCopy = info;
 
-	m_info.m_clutchFrictionTorque = dMax (10.0f, dAbs (m_info.m_clutchFrictionTorque));
+	m_info.m_clutchFrictionTorque = dMax (dFloat(10.0f), dAbs (m_info.m_clutchFrictionTorque));
 	m_infoCopy.m_clutchFrictionTorque = m_info.m_clutchFrictionTorque;
 
 	dFloat inertiaInv = 1.0f / (2.0f * m_info.m_mass * m_info.m_radio * m_info.m_radio / 5.0f);
@@ -2327,7 +2327,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 if (tire->m_index == 2)
 {
-	dTrace (("phi=%f w=%f  v=%f\n",  longitudinalSlipRatio, tireContactLongitudinalSpeed, tireOriginLongitudinalSpeed));
+//	dTrace (("phi=%f w=%f  v=%f\n",  longitudinalSlipRatio, tireContactLongitudinalSpeed, tireOriginLongitudinalSpeed));
 }
 
 					dFloat aligningMoment;

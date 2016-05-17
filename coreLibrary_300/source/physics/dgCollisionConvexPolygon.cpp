@@ -552,7 +552,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	dgVector p0(hullMatrix.TransformVector(pointInHull));
 
 	dgFloat32 penetration = (m_localPoly[0] - p0) % m_normal + proxy.m_skinThickness;
-	if (penetration < dgFloat32(0.0f)) {
+	if (penetration < dgFloat32(-1.0e-5f)) {
 		return 0;
 	}
 
@@ -597,10 +597,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 
 	const dgInt32 hullId = hull->GetUserDataID();
 	if (inside & !proxy.m_intersectionTestOnly) {
+		penetration = dgMax (dgFloat32 (0.0f), penetration);
 		dgAssert(penetration >= dgFloat32(0.0f));
 		dgVector contactPoints[64];
-
-		dgAssert(penetration >= 0.0f);
 		dgVector point(pointInHull + normalInHull.Scale4(penetration + DG_ROBUST_PLANE_CLIP));
 
 		count = hull->CalculatePlaneIntersection(normalInHull.Scale4(dgFloat32(-1.0f)), point, contactPoints);
