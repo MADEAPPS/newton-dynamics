@@ -168,7 +168,7 @@ static CarDefinition viper =
 	2.0f,										// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	1,											// WHEEL_HAS_FENDER
-	2,											// DIFFERENTIAL_TYPE
+	0,											// DIFFERENTIAL_TYPE
 };
 
 
@@ -608,7 +608,7 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 
-#if 0
+#if 1
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {

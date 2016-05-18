@@ -24,6 +24,7 @@
 static FILE* file_xxx;
 #endif
 
+static int xxx;
 
 #define D_VEHICLE_NEUTRAL_GEAR						0
 #define D_VEHICLE_REVERSE_GEAR						1
@@ -1025,6 +1026,7 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorqu
 void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
 {
 	dMatrix matrix;
+dTrace (("f= %f ", lambda[m_index]));
 	dVector torque(m_J01.Scale(lambda[m_index]));
 	NewtonBody* const tireBody = m_tire->GetBody();
 	NewtonBody* const chassisBody = m_tire->GetParent()->GetBody();
@@ -1034,7 +1036,6 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTor
 
 	torque = torque.Scale (-0.25f);
 	NewtonBodyAddTorque(chassisBody, &torque[0]);
-	
 	dVector parentTorque(m_J10.Scale(lambda[m_index]));
 	m_parent->m_torque += parentTorque;
 }
@@ -2590,6 +2591,8 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
+xxx ++;
+dTrace (("\n"));
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		if (!NewtonBodyGetSleepState(m_body)) {
