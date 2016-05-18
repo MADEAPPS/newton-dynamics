@@ -2009,7 +2009,7 @@ dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 		if (CalculateClosestPoints()) { 
 			dgFloat32 penetration = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar() - m_proxy->m_skinThickness;
 
-			if (penetration <= dgFloat32(0.0f)) {
+			if (penetration <= dgFloat32(1.0e-5f)) {
 				m_proxy->m_contactJoint->m_contactActive = 1;
 				if (m_instance0->GetCollisionMode() & m_instance1->GetCollisionMode()) {
 					dgVector contactPoint((m_closestPoint0 + m_closestPoint1).Scale4(dgFloat32(0.5f)));

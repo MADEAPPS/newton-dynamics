@@ -199,7 +199,7 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 						}
 					}
 				} else {
-					if (timeToImpact > dgFloat32 (0.0f)) {
+					if (timeToImpact >= dgFloat32 (-1.0e-5f)) {
 						for (dgInt32 j = 1; j < bodyCount; j++) {
 							dgDynamicBody* const body = (dgDynamicBody*)bodyArray[j].m_body;
 							if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
