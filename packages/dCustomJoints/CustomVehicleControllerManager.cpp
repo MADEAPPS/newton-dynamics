@@ -1692,6 +1692,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	m_isAirborned = false;
 	m_hasNewContact = false;
 	m_tiresInContacts = 0;
+	m_sideSlipAngle = 0.0f;
 	m_weightDistribution = 0.5f;
 	
 	m_localFrame = vehicleFrame;
@@ -2409,10 +2410,8 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 		return;
 	}
 
-	dFloat yawRate = omega.m_y;
-	dFloat speed = dSqrt(mag2);
 	dFloat sideSlipAngle = dAtan2(veloc.m_z, veloc.m_x);
-	
+/*
 	dFloat rearForce = 0.0f;
 	dFloat frontForce = 0.0f;
 	for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
@@ -2425,25 +2424,36 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 			rearForce += force.m_z;
 		}
 	}
+*/
+//	dVector force (0.0f);
+//	dFloat Ixx;
+//	dFloat Iyy;
+//	dFloat Izz;
+//	dFloat mass;
+//	NewtonBodyGetForce (chassisBody, &force[0]);
+//	NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+//	force = chassisMatrix.UnrotateVector(force);
+//	force.m_y = 0.0f;
+//	dFloat accel = dSqrt (force % force) / mass;
+//	dFloat sideSlipRate = (frontForce + rearForce) / (mass * speed) - sideSlipAngle * accel / speed - yawRate;
 
-	dVector force (0.0f);
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
+//	dFloat yawRate = -omega.m_y;
+//	dFloat speed = dSqrt(mag2);
 
-	NewtonBodyGetForce (chassisBody, &force[0]);
-	NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+	dFloat sideSlipRate = (sideSlipAngle - m_sideSlipAngle) / timestep;
+	m_sideSlipAngle = sideSlipAngle;
 
+//dTrace (("Ff=%f Fr=%f speed=%f slipRate=%f  sideSlip_xx=%f sideSlip=%f, yawRate=%f ", 
+//			frontForce, rearForce, speed, xxx1 * 180.0f / 3.1416f, sideSlipAngle * 180.0f / 3.1416f, betaRate * 180.0f / 3.1416f, yawRate));
+			
+dTrace (("slipAngle=%f slipRate=%f ", sideSlipAngle * 180.0f / 3.1416f, sideSlipRate * 180.0f / 3.1416f));
 
-static dFloat xxx = 0.0f;
-dFloat xxx1 = (sideSlipAngle - xxx) / timestep;
-xxx = sideSlipAngle;
-dTrace (("Ff=%f Fr=%f speed=%f, slipRate=%f  sideSlip=%f, yawRate=%f ", 
-			frontForce, rearForce, speed, xxx1 * 180.0f / 3.1416f, sideSlipAngle * 180.0f / 3.1416f, yawRate));
-
-if ((dAbs (sideSlipAngle * 180.0f / 3.1416f) > 30.0f) || (dAbs (xxx1 * 180.0f / 3.1416f) > 10.0f))
+if (dAbs (sideSlipAngle * 180.0f / 3.1416f) > 30.0f)
 sideSlipAngle*=1;
+
+if (dAbs(sideSlipRate * 180.0f / 3.1416f) > 30.0f)
+sideSlipAngle *= 1;
+
 /*
 //	dFloat speed = sideSlipDir % veloc;
 		dVector omega(0.0f);
