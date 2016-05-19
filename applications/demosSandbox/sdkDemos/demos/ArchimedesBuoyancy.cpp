@@ -58,7 +58,7 @@ class MyTriggerManager: public CustomTriggerManager
 			dFloat Izz;
 			dFloat mass;
 			
-			NewtonBodyGetMassMatrix(visitor, &mass, &Ixx, &Iyy, &Izz);
+			NewtonBodyGetMass(visitor, &mass, &Ixx, &Iyy, &Izz);
 			if (mass > 0.0f) {
 				dMatrix matrix;
 				dVector cog(0.0f);

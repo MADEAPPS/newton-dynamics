@@ -1026,7 +1026,7 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorqu
 void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
 {
 	dMatrix matrix;
-dTrace (("f= %f ", lambda[m_index]));
+//dTrace (("f=%f ", lambda[m_index]));
 	dVector torque(m_J01.Scale(lambda[m_index]));
 	NewtonBody* const tireBody = m_tire->GetBody();
 	NewtonBody* const chassisBody = m_tire->GetParent()->GetBody();
@@ -1509,7 +1509,7 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 	NewtonBodyGetMatrix(chassisBody, &matrix0[0][0]);
 	matrix0.m_posit = matrix0.TransformVector(com);
 
-	NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 	dMatrix chassisMatrix(GetLocalFrame() * matrix0);
 	dMatrix worldToComMatrix(chassisMatrix.Inverse() * projectionMatrix);
 	{
@@ -1876,7 +1876,7 @@ void CustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 
 		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 		NewtonBodyGetCentreOfMass(m_body, &origin[0]);
-		NewtonBodyGetMassMatrix (m_body, &totalMass, &Ixx, &Iyy, &Izz);
+		NewtonBodyGetMass (m_body, &totalMass, &Ixx, &Iyy, &Izz);
 		totalMassOrigin = origin.Scale (totalMass);
 
 		matrix = matrix.Inverse();
@@ -1884,7 +1884,7 @@ void CustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 			dFloat mass;
 			BodyPartTire* const tire = &node->GetInfo();
 			NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
-			NewtonBodyGetMassMatrix (tire->GetBody(), &mass, &Ixx, &Iyy, &Izz);
+			NewtonBodyGetMass (tire->GetBody(), &mass, &Ixx, &Iyy, &Izz);
 			tireMatrix = tireMatrix * matrix;
 			totalMassOrigin += tireMatrix.m_posit.Scale (mass);
 			totalMass += mass;
@@ -2039,7 +2039,7 @@ void CustomVehicleController::SetAerodynamicsDownforceCoefficient(dFloat maxDown
 	dAssert (downWeightRatioAtSpeedFactor >= 0.0f);
 	dAssert (downWeightRatioAtSpeedFactor < maxWeightAtTopSpeed);
 	NewtonBody* const body = GetBody();
-	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 	dFloat topSpeed = m_engineControl ? m_engineControl->GetTopSpeed() : 25.0f;
 	m_chassis.m_aerodynamicsDownSpeedCutOff = topSpeed * speedFactor;
 	m_chassis.m_aerodynamicsDownForce0 = mass * downWeightRatioAtSpeedFactor * dAbs (maxDownforceInGravity);
@@ -2322,14 +2322,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 					}
 
 					dFloat longitudinalSlipRatio = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
-					//dFloat lateralSideSlip = tireOriginLateralSpeed / dAbs(tireOriginLongitudinalSpeed);
-					//lateralSideSlip *= (tireOriginLongitudinalSpeed / tireContactLongitudinalSpeed);
 					dFloat lateralSideSlip = tireOriginLateralSpeed / dAbs(tireContactLongitudinalSpeed);
-
-if (tire->m_index == 2)
-{
-//	dTrace (("phi=%f w=%f  v=%f\n",  longitudinalSlipRatio, tireContactLongitudinalSpeed, tireOriginLongitudinalSpeed));
-}
 
 					dFloat aligningMoment;
 					dFloat lateralForce;
@@ -2341,12 +2334,11 @@ if (tire->m_index == 2)
 
 					controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, longitudinalSlipRatio, lateralSideSlip, longitudinalForce, lateralForce, aligningMoment);
 
-					//dVector force (longitudinalContactDir.Scale (f_x) + lateralPin.Scale (f_z));
-					//dVector force (longitudinalContactDir.Scale (f_x) + lateralContactDir.Scale (f_z));
-					//dVector torque (radius * force);
+if (tire->m_index >= 2) {
+//dTrace (("(phi=%f w=%f v=%f) \n",  longitudinalSlipRatio, tireContactLongitudinalSpeed, tireOriginLongitudinalSpeed));
+//dTrace (("(tire=%d lonForce=%f latForce=%f) ", tire->m_index, longitudinalForce, lateralForce));
+}
 
-					//NewtonBodyAddForce(tireBody, &force[0]);
-					//NewtonBodyAddForce(tireBody, &torque[0]);
 					dFloat sign = dSign (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed);
 					tire->m_driveTorque -= longitudinalForce * sign * tire->m_data.m_radio;
 				
@@ -2368,59 +2360,20 @@ if (tire->m_index == 2)
 }
 
 
-void CustomVehicleController::GetLastLateralForce(BodyPartTire* const tire) const
+dVector CustomVehicleController::GetLastLateralForce(BodyPartTire* const tire) const
 {
-	dMatrix chassisMatrix;
-	NewtonBody* const tireBody = tire->GetBody();
-	WheelJoint* const joint = (WheelJoint*)tire->GetJoint();
-	dAssert (tireBody == joint->GetBody0());
-	NewtonBody* const chassisBody = joint->GetBody1();
-
-
-	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
-	dVector tireForce (GetTireLateralForce(tire) + GetTireLongitudinalForce(tire));
-	dVector localForce (chassisMatrix.UnrotateVector(tireForce.Scale (-1.0f)));
-
-dVector force1 (GetTireLateralForce(tire));
-	const dMatrix& localMatrix = joint->GetMatrix1();
-
-/*
-	matrix.m_up = chassisMatrix.m_up;
-	matrix.m_right = matrix.m_front * matrix.m_up;
-
-	dVector origin(worldToComMatrix.TransformVector(matrix.m_posit));
-
-	dVector lateralForce(chassisMatrix.UnrotateVector(GetTireLateralForce(tire)));
-	lateralForce = lateralForce.Scale(-scale);
-	lateralForce = projectionMatrix.RotateVector(lateralForce);
-
-	array[0] = origin;
-	array[1] = origin + lateralForce;
-	manager->DrawSchematicCallback(this, "lateralForce", 0, 2, array);
-
-	dVector longitudinalForce(chassisMatrix.UnrotateVector(GetTireLongitudinalForce(tire)));
-	longitudinalForce = longitudinalForce.Scale(-scale);
-	longitudinalForce = projectionMatrix.RotateVector(longitudinalForce);
-
-	array[0] = origin;
-	array[1] = origin + longitudinalForce;
-	manager->DrawSchematicCallback(this, "longitudinalForce", 0, 2, array);
-
-	dVector veloc(0.0f);
-	NewtonBodyGetVelocity(tireBody, &veloc[0]);
-	veloc = chassisMatrix.UnrotateVector(veloc);
-	veloc.m_y = 0.0f;
-	veloc = projectionMatrix.RotateVector(veloc);
-	array[0] = origin;
-	array[1] = origin + veloc.Scale(velocityScale);
-	manager->DrawSchematicCallback(this, "tireVelocity", 0, 2, array);
-*/
-
+	//dMatrix chassisMatrix;
+	//NewtonBody* const tireBody = tire->GetBody();
+	//WheelJoint* const joint = (WheelJoint*)tire->GetJoint();
+	//dAssert (tireBody == joint->GetBody0());
+	//NewtonBody* const chassisBody = joint->GetBody1();
+	//dVector tireForce (GetTireLateralForce(tire) + GetTireLongitudinalForce(tire));
+	//return chassisMatrix.UnrotateVector(tireForce.Scale (-1.0f));
+	return (GetTireLateralForce(tire) + GetTireLongitudinalForce(tire)).Scale (-1.0f);
 }
 
 void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 {
-//	CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 	if (m_tiresInContacts != 4) {
 		return;
 	}
@@ -2434,12 +2387,6 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 	dVector veloc(0.0f);
 	dVector omega(0.0f);
 	dVector com(0.0f);
-//	dFloat arrayPtr[32][4];
-//	dVector* const array = (dVector*)arrayPtr;
-//	dFloat Ixx;
-//	dFloat Iyy;
-//	dFloat Izz;
-//	dFloat mass;
 	NewtonBody* const chassisBody = m_chassis.GetBody();
 	NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix0[0][0]);
@@ -2447,29 +2394,56 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 
 	dMatrix chassisMatrix(GetLocalFrame() * matrix0);
 	NewtonBodyGetVelocity(chassisBody, &veloc[0]);
-	NewtonBodyGetOmega(chassisBody, &omega[0]);	
 
-	omega = chassisMatrix.UnrotateVector(omega);
 	veloc = chassisMatrix.UnrotateVector(veloc);
-	dVector sideSlipDir (veloc - chassisMatrix.m_up.Scale (veloc % chassisMatrix.m_up));
+	if (veloc.m_x < 0.0f) {
+		return ;
+	}
+
+	NewtonBodyGetOmega(chassisBody, &omega[0]);	
+	omega = chassisMatrix.UnrotateVector(omega);
+
 	veloc.m_y = 0.0f;
 	dFloat mag2 = veloc % veloc;
 	if (mag2 < 5.0f) {
 		return;
 	}
 
+	dFloat yawRate = omega.m_y;
+	dFloat speed = dSqrt(mag2);
+	dFloat sideSlipAngle = dAtan2(veloc.m_z, veloc.m_x);
 	
-	dFloat yawRate = chassisMatrix.m_up % omega;
-	dFloat speed = dSqrt (veloc % veloc);
-	sideSlipDir = veloc.Scale (1.0f / speed);
-	dFloat sideSlipAngle = dAtan2 (sideSlipDir.m_z, sideSlipDir.m_x);
-
+	dFloat rearForce = 0.0f;
+	dFloat frontForce = 0.0f;
 	for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-		GetLastLateralForce(&node->GetInfo());
+		BodyPartTire* const tire = &node->GetInfo();
+		dVector force (chassisMatrix.UnrotateVector(GetLastLateralForce(tire)));
+		force.m_y = 0.0f;
+		if (tire->m_data.m_location.m_x > 0.0f) {
+			frontForce += force.m_z;
+		} else {
+			rearForce += force.m_z;
+		}
 	}
 
+	dVector force (0.0f);
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
 
-//dTrace (("speed = %f, sideSlep = %f, yawRate = %f\n", speed, sideSlipAngle * 180.0f / 3.1416f, yawRate));
+	NewtonBodyGetForce (chassisBody, &force[0]);
+	NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+
+
+static dFloat xxx = 0.0f;
+dFloat xxx1 = (sideSlipAngle - xxx) / timestep;
+xxx = sideSlipAngle;
+dTrace (("Ff=%f Fr=%f speed=%f, slipRate=%f  sideSlip=%f, yawRate=%f ", 
+			frontForce, rearForce, speed, xxx1 * 180.0f / 3.1416f, sideSlipAngle * 180.0f / 3.1416f, yawRate));
+
+if ((dAbs (sideSlipAngle * 180.0f / 3.1416f) > 30.0f) || (dAbs (xxx1 * 180.0f / 3.1416f) > 10.0f))
+sideSlipAngle*=1;
 /*
 //	dFloat speed = sideSlipDir % veloc;
 		dVector omega(0.0f);
@@ -2479,7 +2453,7 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 //		dTrace (("%f %f\n", speed, yawRate));
 
 
-	NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 	dMatrix worldToComMatrix(chassisMatrix.Inverse() * projectionMatrix);
 	{
 		// draw vehicle chassis
@@ -2647,6 +2621,7 @@ dTrace (("\n"));
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
+xxx ++;
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		m_chassis.ApplyDownForce ();

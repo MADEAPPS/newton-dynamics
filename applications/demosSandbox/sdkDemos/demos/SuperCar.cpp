@@ -885,7 +885,7 @@ class SuperCarEntity: public DemoEntity
 		NewtonBody* const chassisBody = chassis->GetBody();
 		
 		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
-		NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 		matrix.m_posit = matrix.TransformVector(com);
 		matrix = m_controller->GetLocalFrame() * matrix;

@@ -544,7 +544,7 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 	dFloat Izz;
 	dFloat mass;
 
-	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
 //mass*= 0.0f;
 
 	dVector force (dVector (0.0f, 1.0f, 0.0f).Scale (mass * DEMO_GRAVITY));
@@ -1248,7 +1248,7 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
-	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
 
 	dVector angularMomentum (Ixx, Iyy, Izz);
 	angularMomentum = matrix.RotateVector (angularMomentum.CompProduct(matrix.UnrotateVector(omega1 - omega0)));

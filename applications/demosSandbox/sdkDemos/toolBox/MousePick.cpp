@@ -61,7 +61,7 @@ static void PhysicsApplyPickForce (const NewtonBody* body, dFloat timestep, int 
 
 	NewtonBodyGetOmega(body, &omega[0]);
 	NewtonBodyGetVelocity(body, &veloc[0]);
-	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
 
 	dVector force (pickedForce.Scale (mass * MOUSE_PICK_STIFFNESS));
 	dVector dampForce (veloc.Scale (MOUSE_PICK_DAMP * mass));
@@ -207,7 +207,7 @@ bool MousePick (NewtonWorld* nWorld, const dMOUSE_POINT& mouse1, dInt32 mouseLef
 				rayLocalNormal = matrix.UnrotateVector(rayLocalNormal);
 
 				// Create PickBody Joint
-				NewtonBodyGetMassMatrix (pickedBody, &mass, &Ixx, &Iyy, &Izz);
+				NewtonBodyGetMass (pickedBody, &mass, &Ixx, &Iyy, &Izz);
 				if (mass) {
 //					bodyPickController = new CustomPickBody (pickedBody, p);
 //					bodyPickController->SetMaxLinearFriction (MAX_PICK_ACCEL);
@@ -303,7 +303,7 @@ class dMousePickClass
 		}
 
 		dMousePickClass* const data = (dMousePickClass*) userData;
-		NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
 		if ((mass > 0.0f) || (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY)) {
 			data->m_body = body;
 		}

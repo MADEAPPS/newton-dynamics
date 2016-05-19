@@ -63,7 +63,7 @@ static void RenderBodyContactsForces (NewtonBody* const body, dFloat scale)
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
-	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);	
+	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);	
 
 	//draw normal forces in term of acceleration.
 	//this  mean that two bodies with same shape but different mass will display the same force

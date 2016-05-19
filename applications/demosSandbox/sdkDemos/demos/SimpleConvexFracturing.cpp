@@ -197,7 +197,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 			NewtonBodyGetOmega(m_myBody, &omega[0]);
 			NewtonBodyGetCentreOfMass(m_myBody, &com[0]);
 			NewtonBodyGetMatrix(m_myBody, &bodyMatrix[0][0]);
-			NewtonBodyGetMassMatrix(m_myBody, &mass, &Ixx, &Iyy, &Izz);
+			NewtonBodyGetMass(m_myBody, &mass, &Ixx, &Iyy, &Izz);
 
 			com = bodyMatrix.TransformVector (com);
 			dMatrix matrix (GetCurrentMatrix());

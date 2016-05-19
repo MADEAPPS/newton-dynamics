@@ -3113,7 +3113,7 @@ dFloat NewtonConvexCollisionCalculateVolume(const NewtonCollision* const convexC
 // 
 // Remarks: This function calculate a general inertial matrix for arbitrary convex collision including compound collisions.
 //
-// See also: NewtonBodySetMassMatrix, NewtonBodyGetMassMatrix, NewtonBodySetCentreOfMass, NewtonBodyGetCentreOfMass
+// See also: NewtonBodySetMassMatrix, NewtonBodyGetMass, NewtonBodySetCentreOfMass, NewtonBodyGetCentreOfMass
 void NewtonConvexCollisionCalculateInertialMatrix(const NewtonCollision* convexCollision, dFloat* const inertia, dFloat* const origin)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -4858,7 +4858,7 @@ NewtonBodyDestructor NewtonBodyGetDestructorCallback (const NewtonBody* const bo
 // The application should specify the inertial values, keeping in mind that realistic inertia values are necessary for
 // realistic physics behavior.
 //
-// See also: NewtonConvexCollisionCalculateInertialMatrix, NewtonBodyGetMassMatrix, NewtonBodyGetInvMass
+// See also: NewtonConvexCollisionCalculateInertialMatrix, NewtonBodyGetMass, NewtonBodyGetInvMass
 void NewtonBodySetFullMassMatrix(const NewtonBody* const bodyPtr, dFloat mass, const dFloat* const inertiaMatrix)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -4889,7 +4889,7 @@ void  NewtonBodySetMassProperties (const NewtonBody* const bodyPtr, dFloat mass,
 
 
 
-// Name: NewtonBodyGetMassMatrix 
+// Name: NewtonBodyGetMass 
 // Get the mass matrix of a rigid body.
 //
 // Parameters:
@@ -4902,7 +4902,7 @@ void  NewtonBodySetMassProperties (const NewtonBody* const bodyPtr, dFloat mass,
 // Return: Nothing.
 //
 // See also: NewtonBodySetMassMatrix, NewtonBodyGetInvMass
-void  NewtonBodyGetMassMatrix(const NewtonBody* const bodyPtr, dFloat* const mass, dFloat* const Ixx, dFloat* const Iyy, dFloat* const Izz)
+void  NewtonBodyGetMass(const NewtonBody* const bodyPtr, dFloat* const mass, dFloat* const Ixx, dFloat* const Iyy, dFloat* const Izz)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
@@ -4933,7 +4933,7 @@ void  NewtonBodyGetMassMatrix(const NewtonBody* const bodyPtr, dFloat* const mas
 //
 // Return: Nothing.
 //
-// See also: NewtonBodySetMassMatrix, NewtonBodyGetMassMatrix
+// See also: NewtonBodySetMassMatrix, NewtonBodyGetMass
 void NewtonBodyGetInvMass(const NewtonBody* const bodyPtr, dFloat* const invMass, dFloat* const invIxx, dFloat* const invIyy, dFloat* const invIzz)
 {
 	TRACE_FUNCTION(__FUNCTION__);

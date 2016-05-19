@@ -246,7 +246,6 @@ class CustomVehicleController: public CustomControllerBase
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const; 
 
-		// TODO
 		CUSTOM_JOINTS_API Info GetInfo() const {return m_data;}
 		CUSTOM_JOINTS_API void SetInfo(const Info& info) {};
 
@@ -636,7 +635,7 @@ class CustomVehicleController: public CustomControllerBase
 	
 
 	void ApplyLateralStabilityForces(dFloat timestep);
-	void GetLastLateralForce(BodyPartTire* const tire) const;
+	dVector GetLastLateralForce(BodyPartTire* const tire) const;
 	void Cleanup();
 	
 	

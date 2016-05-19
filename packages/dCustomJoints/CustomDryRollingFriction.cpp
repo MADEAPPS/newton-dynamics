@@ -30,7 +30,7 @@ CustomDryRollingFriction::CustomDryRollingFriction(NewtonBody* child, dFloat rad
 	dFloat Iyy;
 	dFloat Izz;
 
-	NewtonBodyGetMassMatrix (child, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass (child, &mass, &Ixx, &Iyy, &Izz);
 
 	m_frictionCoef = coefficient;
 	m_frictionTorque = Ixx * radius;

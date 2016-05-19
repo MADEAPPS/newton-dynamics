@@ -153,7 +153,7 @@ void NewtonRigidBodySetForceCB(const NewtonBody* const body, dFloat timestep, in
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
-	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 	
 	dFloat force[3];
 	force[0] = 0.0f;
@@ -169,7 +169,7 @@ static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoin
 	// Get pointer to body
 	NewtonBody* body = NewtonJointGetBody0(pContactJoint);				
 	dFloat mass, Ixx, Iyy, Izz;
-	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 	if (mass == 0.0f)
 	{
 		body = NewtonJointGetBody1(pContactJoint);

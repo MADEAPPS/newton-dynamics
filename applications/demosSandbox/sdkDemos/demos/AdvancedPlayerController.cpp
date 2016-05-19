@@ -241,7 +241,7 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 			dFloat Iyy;
 			dFloat Izz;
 			dFloat mass;
-			NewtonBodyGetMassMatrix(hitBody, &mass, &Ixx, &Iyy, &Izz);
+			NewtonBodyGetMass(hitBody, &mass, &Ixx, &Iyy, &Izz);
 			if (mass > 0.0f) {
 				contacts[i] = contacts[newCount - 1];
 				newCount --;

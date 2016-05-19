@@ -55,7 +55,7 @@ static void ApplyGravity(const NewtonBody* const body, dFloat timestep, int thre
 	dFloat Iyy;
 	dFloat Izz;
 
-	NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 	dVector gravityForce(0.0f, -9.8f * mass, 0.0f, 0.0f);
 	NewtonBodySetForce(body, &gravityForce[0]);
 }
