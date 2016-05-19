@@ -2419,20 +2419,28 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 		
 dTrace (("slipAngle=%f slipRate=%f ", sideSlipAngle * 180.0f / 3.1416f, sideSlipRate * 180.0f / 3.1416f));
 	if ((dAbs (sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) || (dAbs(sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE)) {
-		/*
+		
 			dFloat rearForce = 0.0f;
+			dFloat rearTorque = 0.0f;
 			dFloat frontForce = 0.0f;
+			dFloat frontTorque = 0.0f;
+			dFloat frontPivot = 0.0f;
+			dFloat rearPivot = 0.0f;
 			for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 				BodyPartTire* const tire = &node->GetInfo();
 				dVector force (chassisMatrix.UnrotateVector(GetLastLateralForce(tire)));
 				force.m_y = 0.0f;
 				if (tire->m_data.m_location.m_x > 0.0f) {
 					frontForce += force.m_z;
+					frontTorque += tire->m_data.m_location.m_x * force.m_z;
+					frontPivot = dMax (tire->m_data.m_location.m_x, frontPivot);
 				} else {
 					rearForce += force.m_z;
+					rearTorque += tire->m_data.m_location.m_x * force.m_z;
+					rearPivot = dMax (tire->m_data.m_location.m_x, rearPivot);
 				}
 			}
-		*/
+		
 		//	dVector force (0.0f);
 		//	dFloat Ixx;
 		//	dFloat Iyy;
