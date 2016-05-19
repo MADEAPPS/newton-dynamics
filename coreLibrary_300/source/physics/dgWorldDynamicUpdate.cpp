@@ -268,7 +268,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 				dgAssert ((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
 				dgAssert ((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
 				const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
-				if (linkBody->IsCollidable() && (!contact || contact->m_maxDOF || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode))) { 
+				if (linkBody->IsCollidable() && (!contact || (contact->m_contactActive && contact->m_maxDOF) || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode))) { 
 					dgDynamicBody* const body = (dgDynamicBody*)linkBody;
 
 					isInEquilibrium &= srcBody->m_equilibrium;
@@ -470,7 +470,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 				dgAssert ((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
 				const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
 				dgInt32 ccdMode = contact ? (body->m_continueCollisionMode | linkBody->m_continueCollisionMode) : 0;
-				if (linkBody->IsCollidable() && (!contact || contact->m_maxDOF || ccdMode)) { 
+				if (linkBody->IsCollidable() && (!contact || (contact->m_contactActive && contact->m_maxDOF) || ccdMode)) { 
 					dgDynamicBody* const body = (dgDynamicBody*)linkBody;
 
 					if (constraint->m_dynamicsLru != lruMark) {
@@ -751,8 +751,6 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 			dgAssert(row->m_stiffness >= dgFloat32(0.0f));
 			dgAssert ((dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) >= dgFloat32 (0.0f));
 			row->m_coordenateAccel = constraintParamOut.m_jointAccel[i];
-			row->m_accelIsMotor = constraintParamOut.m_flags[i].m_isMotor ? true : false;
-			row->m_applyCorrection = constraintParamOut.m_flags[i].m_applyCorrection ? true : false;
 			row->m_restitution = constraintParamOut.m_restitution[i];
 			row->m_penetration = constraintParamOut.m_penetration[i];
 			row->m_penetrationStiffness = constraintParamOut.m_penetrationStiffness[i];

@@ -40,7 +40,7 @@ class CustomPulley: public CustomJoint
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_gearRatio;
-	DECLARE_CUSTON_JOINT(CustomPulley, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomPulley, CustomJoint)
 };
 
 /*

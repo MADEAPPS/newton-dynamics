@@ -199,7 +199,16 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 						}
 					}
 				} else {
-					
+					if (timeToImpact >= dgFloat32 (-1.0e-5f)) {
+						for (dgInt32 j = 1; j < bodyCount; j++) {
+							dgDynamicBody* const body = (dgDynamicBody*)bodyArray[j].m_body;
+							if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+								body->IntegrateVelocity(timeToImpact);
+								body->UpdateWorlCollisionMatrix();
+							}
+						}
+					}
+
 					CalculateIslandContacts (island, timeRemaining, lru, threadID);
 					BuildJacobianMatrix (island, threadID, 0.0f);
 					CalculateReactionsForces (island, threadID, 0.0f, DG_SOLVER_MAX_ERROR);
@@ -824,9 +833,6 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 
 	for (dgInt32 i = 0; i < skeletonCount; i ++) {
 		dgSkeletonContainer* const container = skeletonArray[i];
-		//if (container->m_errorCorrection > dgFloat32 (0.0f)) {
-		//	container->ApplpyKinematicErrorCorrection (constraintArray, matrixRow);
-		//}
 		if (!container->m_skeletonHardMotors) {
 			container->InitMassMatrix (constraintArray, matrixRow);
 		}
@@ -868,15 +874,12 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 i = 0; i < jointCount; i ++) {
 				dgJointInfo* const jointInfo = &constraintArray[i];
-				//const dgConstraint* const constraint = jointInfo->m_joint;
 				dgFloat32 accel = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 
 			for (dgInt32 i = 0; i < skeletonCount; i++) {
-				dgSkeletonContainer* const container = skeletonArray[i];
-				dgFloat32 accel = container->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow);
-				accNorm = (accel > accNorm) ? accel : accNorm;
+				skeletonArray[i]->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow); 
 			}
 		}
 

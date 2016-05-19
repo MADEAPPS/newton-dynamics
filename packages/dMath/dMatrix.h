@@ -24,7 +24,6 @@ class dQuaternion;
 dMatrix dGetZeroMatrix ();
 dMatrix dGetIdentityMatrix();
 
-D_MSC_VECTOR_ALIGMENT
 class dMatrix
 {
 	public:

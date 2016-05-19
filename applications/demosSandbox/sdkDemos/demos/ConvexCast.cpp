@@ -39,7 +39,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		int materialID = NewtonMaterialGetDefaultGroupID(world);
 
 		// create a pool of predefined convex mesh
-		//		PrimitiveType selection[] = {_SPHERE_PRIMITIVE,	_BOX_PRIMITIVE,	_CAPSULE_PRIMITIVE, _CYLINDER_PRIMITIVE, _CONE_PRIMITIVE, _TAPERED_CAPSULE_PRIMITIVE, _TAPERED_CYLINDER_PRIMITIVE, _CHAMFER_CYLINDER_PRIMITIVE, _RANDOM_CONVEX_HULL_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
+		//		PrimitiveType selection[] = {_SPHERE_PRIMITIVE,	_BOX_PRIMITIVE,	_CAPSULE_PRIMITIVE, _CYLINDER_PRIMITIVE, _CONE_PRIMITIVE, _CHAMFER_CYLINDER_PRIMITIVE, _RANDOM_CONVEX_HULL_PRIMITIVE, _REGULAR_CONVEX_HULL_PRIMITIVE};
 		PrimitiveType selection[] = {_SPHERE_PRIMITIVE};
 		for (int i = 0; i < int (sizeof (collisionArray) / sizeof (collisionArray[0])); i ++) {
 			int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
@@ -76,11 +76,11 @@ class StupidComplexOfConvexShapes: public DemoEntity
 			}
 		}
 		NewtonCompoundCollisionEndAddRemove(compound);
-
 		CreateSimpleBody (world, NULL, 0.0f, dGetIdentityMatrix(), compound, 0);
 
 		// destroy all collision shapes after they are used
 		NewtonDestroyCollision(compound);
+
 		for (int i = 0; i < int (sizeof (collisionArray) / sizeof (collisionArray[0])); i ++) {
 			gemetries[i]->Release();
 			NewtonDestroyCollision(collisionArray[i]);
@@ -271,8 +271,8 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			dVector p0 (camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
 			dVector p1 (camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 
-			//p0 = dVector (-11.531384, 6.897866, -2.453451, 1.0f);
-			//p1 = dVector (1720.189697, -1245.047241, 58.625248, 1.0f);
+			//p0 = dVector (-12.044177f, 8.068434f, -7.558466f, 1.0f);
+			//p1 = dVector (1751.264038f, -845.520630f, 633.307312f, 1.0f);
 
 			// do the convex cast here
 			dMatrix matrix (dGetIdentityMatrix());
@@ -284,8 +284,8 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 			//int count = NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, ConvexCastCallBack::Filter, &filter, ConvexCastCallBack::Prefilter, &filter.m_contacts[0], 4, 0);
 			NewtonWorldConvexCast (world, &matrix[0][0], &p1[0], shape, &param, NULL, Prefilter, NULL, 0, 0);
 
-			//dTrace(("%f, %f, %f\n", p0[0], p0[1], p0[2]));
-			//dTrace(("%f, %f, %f\n", p1[0], p1[1], p1[2]));
+			//dTrace(("%ff, %ff, %ff\n", p0[0], p0[1], p0[2]));
+			//dTrace(("%ff, %ff, %ff\n", p1[0], p1[1], p1[2]));
 
 			if (param < 1.0f) {
 				matrix.m_posit += (p1 - matrix.m_posit).Scale (param);

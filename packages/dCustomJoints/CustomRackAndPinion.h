@@ -39,7 +39,7 @@ class CustomRackAndPinion: public CustomJoint
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_gearRatio;
-	DECLARE_CUSTON_JOINT(CustomRackAndPinion, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomRackAndPinion, CustomJoint)
 };
 
 #endif // !defined(AFX_CustomWormGear_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)

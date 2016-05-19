@@ -49,8 +49,7 @@ struct BasciCarParameters
 	dFloat PEAK_HP;
 	dFloat PEAK_HP_RPM;
 
-	dFloat REDLINE_TORQUE;
-	dFloat REDLINE_TORQUE_RPM;
+	dFloat REDLINE_RPM;
 
 	dFloat GEAR_1;
 	dFloat GEAR_2;
@@ -85,15 +84,14 @@ static BasciCarParameters basicCarParameters =
 	3000.0f,	// PEAK_TORQUE_RPM
 	 190.0f,	// PEAK_HP
 	4000.0f,	// PEAK_HP_RPM
-	 30.0f,		// REDLINE_TORQUE
-	4500.0f,	// REDLINE_TORQUE_RPM
+	4500.0f,	// REDLINE_RPM
 		2.5f,	// GEAR_1
 		2.0f,	// GEAR_2
 		1.5f,	// GEAR_3
 		2.9f,	// REVERSE_GEAR
 	   0.40f,	// SUSPENSION_LENGTH
-	  50.0f,	// SUSPENSION_SPRING
-	   5.0f,	// SUSPENSION_DAMPER
+	  100.0f,	// SUSPENSION_SPRING
+	   10.0f,	// SUSPENSION_DAMPER
 	  900.0f * DEMO_GRAVITY *  5.0f,		// LATERAL_STIFFNESS proportional to the vehicle weight
 	  900.0f * DEMO_GRAVITY *  2.0f,		// LONGITUDINAL_STIFFNESS proportional to the vehicle weight
 	   1.5f,	// ALIGNING_MOMENT_TRAIL
@@ -256,7 +254,7 @@ class BasicCarEntity: public DemoEntity
 		}
 	}
 
-	CustomVehicleController::BodyPartTire* AddTire (const dVector& offset, dFloat width, dFloat radius, dFloat mass, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, const dMatrix& tireAligmentMatrix) 
+	CustomVehicleController::BodyPartTire* AddTire (const dVector& offset, dFloat width, dFloat radius, dFloat mass, dFloat steeringAngle, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, const dMatrix& tireAligmentMatrix) 
 	{
 		NewtonBody* const body = m_controller->GetBody();
 
@@ -280,6 +278,7 @@ class BasicCarEntity: public DemoEntity
 		tireInfo.m_mass = mass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
+		tireInfo.m_maxSteeringAngle = steeringAngle * 3.1416f / 180.0f;
 		tireInfo.m_dampingRatio = suspensionDamper;
 		tireInfo.m_springStrength = suspensionSpring;
 		tireInfo.m_suspesionlenght = suspensionLength;
@@ -330,20 +329,20 @@ class BasicCarEntity: public DemoEntity
 		// add front tires
 		CustomVehicleController::BodyPartTire* frontTires[2]; 
 		dVector offset1 (1.5f, 0.0f, -1.0f, 1.0f);
-		frontTires[0] = AddTire (offset1, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		frontTires[0] = AddTire (offset1, width, radius, parameters.TIRE_MASS, parameters.STEER_ANGLE, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 		offset1 = dVector (1.5f, 0.0f, 1.0f, 1.0f);		
-		frontTires[1] = AddTire (offset1, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		frontTires[1] = AddTire (offset1, width, radius, parameters.TIRE_MASS, parameters.STEER_ANGLE, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
 		// add rear tires
 		CustomVehicleController::BodyPartTire* rearTires[2];
 		dVector offset2 (-1.7f, 0.0f, -1.0f, 1.0f);
-		rearTires[0] = AddTire (offset2, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		rearTires[0] = AddTire (offset2, width, radius, parameters.TIRE_MASS, 0.0f, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 		offset2 = dVector (-1.7f, 0.0f, 1.0f, 1.0f);
-		rearTires[1] = AddTire (offset2, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
+		rearTires[1] = AddTire (offset2, width, radius, parameters.TIRE_MASS, 0.0f, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
 		// add a steering Wheel
 		//CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
-		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
+		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller);
 		steering->AddTire (frontTires[0]);
 		steering->AddTire (frontTires[1]);
 		m_controller->SetSteering(steering);
@@ -364,27 +363,28 @@ class BasicCarEntity: public DemoEntity
 		handBrakes->AddTire (rearTires[1]);
 		m_controller->SetHandBrakes (handBrakes);
 
-		CustomVehicleController::EngineController::DifferentialAxel axel0;
-		CustomVehicleController::EngineController::DifferentialAxel axel1;
+		CustomVehicleController::EngineController::Differential8wd differential;
 		switch (parameters.m_differentialType) 
 		{
 			case BasciCarParameters::m_RWD:
-				axel0.m_leftTire = rearTires[0];
-				axel0.m_rightTire = rearTires[1];
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
+				differential.m_axel.m_leftTire = rearTires[0];
+				differential.m_axel.m_rightTire = rearTires[1];
 				break;
 			case BasciCarParameters::m_FWD:
-				axel0.m_leftTire = frontTires[0];
-				axel0.m_rightTire = frontTires[1];
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
+				differential.m_axel.m_leftTire = frontTires[0];
+				differential.m_axel.m_rightTire = frontTires[1];
 				break;
 
 			case BasciCarParameters::m_4WD:
 			default:
-				axel0.m_leftTire = rearTires[0];
-				axel0.m_rightTire = rearTires[1];
-				axel1.m_leftTire = frontTires[0];
-				axel1.m_rightTire = frontTires[1];
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_4wd;
+				differential.m_axel.m_leftTire = rearTires[0];
+				differential.m_axel.m_rightTire = rearTires[1];
+				differential.m_secundAxel.m_axel.m_leftTire = frontTires[0];
+				differential.m_secundAxel.m_axel.m_rightTire = frontTires[1];
 		}
-
 
 		CustomVehicleController::EngineController::Info engineInfo;
 		engineInfo.m_mass = parameters.ENGINE_MASS;
@@ -392,14 +392,16 @@ class BasicCarEntity: public DemoEntity
 		engineInfo.m_vehicleTopSpeed = parameters.TOP_SPEED_KMH;
 		engineInfo.m_clutchFrictionTorque = parameters.CLUTCH_FRICTION_TORQUE;
 		
-		engineInfo.m_peakTorque = parameters.PEAK_TORQUE;
-		engineInfo.m_rpmAtPeakTorque = parameters.PEAK_TORQUE_RPM;
-		engineInfo.m_peakHorsePower = parameters.PEAK_HP;
-		engineInfo.m_rpmAtPeakHorsePower = parameters.PEAK_HP_RPM;
-		engineInfo.m_redLineTorque = parameters.REDLINE_TORQUE;
-		engineInfo.m_rpmAtReadLineTorque = parameters.REDLINE_TORQUE_RPM;
 		engineInfo.m_idleTorque = parameters.IDLE_TORQUE;
-		engineInfo.m_rpmAtIdleTorque = parameters.IDLE_TORQUE_RPM;
+		engineInfo.m_idleTorqueRpm = parameters.IDLE_TORQUE_RPM;
+
+		engineInfo.m_peakTorque = parameters.PEAK_TORQUE;
+		engineInfo.m_peakTorqueRpm = parameters.PEAK_TORQUE_RPM;
+
+		engineInfo.m_peakHorsePower = parameters.PEAK_HP;
+		engineInfo.m_peakHorsePowerRpm = parameters.PEAK_HP_RPM;
+
+		engineInfo.m_readLineRpm = parameters.REDLINE_RPM;
 
 		engineInfo.m_gearsCount = 3;
 		engineInfo.m_gearRatios[0] = parameters.GEAR_1;
@@ -407,7 +409,7 @@ class BasicCarEntity: public DemoEntity
 		engineInfo.m_gearRatios[2] = parameters.GEAR_3;
 		engineInfo.m_reverseGearRatio = parameters.REVERSE_GEAR;
 
-		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, axel0, axel1);
+		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, differential);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
@@ -657,7 +659,7 @@ class BasicCarEntity: public DemoEntity
 		dVector com(0.0f);
 		dMatrix matrix;
 		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
-		NewtonBodyGetMassMatrix(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 		matrix.m_posit = matrix.TransformVector(com);
 		matrix = m_controller->GetLocalFrame() * matrix;
@@ -1060,8 +1062,6 @@ void BasicCar (DemoEntityManager* const scene)
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _TAPERED_CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _TAPERED_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

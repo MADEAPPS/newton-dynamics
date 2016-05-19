@@ -60,7 +60,7 @@ void CustomKinematicController::SetMaxLinearFriction(dFloat accel)
 	dFloat Izz;
 	dFloat mass;
 
-	NewtonBodyGetMassMatrix (m_body0, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass (m_body0, &mass, &Ixx, &Iyy, &Izz);
 	m_maxLinearFriction = dAbs (accel) * mass;
 }
 
@@ -71,7 +71,7 @@ void CustomKinematicController::SetMaxAngularFriction(dFloat alpha)
 	dFloat Izz;
 	dFloat mass;
 
-	NewtonBodyGetMassMatrix (m_body0, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass (m_body0, &mass, &Ixx, &Iyy, &Izz);
 //	if (Iyy > Ixx) {
 //		Ixx = Iyy;
 //	}

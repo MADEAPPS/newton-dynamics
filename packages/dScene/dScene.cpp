@@ -1506,7 +1506,7 @@ void dScene::NewtonWorldToScene (const NewtonWorld* const world, dSceneExportCal
 		bodyInfo->SetCenterOfMass(com);
 
 		dVector massMatrix;
-		NewtonBodyGetMassMatrix(body, &massMatrix.m_w, &massMatrix.m_x, &massMatrix.m_y, &massMatrix.m_z);
+		NewtonBodyGetMass(body, &massMatrix.m_w, &massMatrix.m_x, &massMatrix.m_y, &massMatrix.m_z);
 		bodyInfo->SetMassMatrix(massMatrix);
 
 		dVector veloc;

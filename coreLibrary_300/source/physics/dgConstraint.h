@@ -118,15 +118,6 @@ DG_MSC_VECTOR_ALIGMENT
 class dgContraintDescritor
 {
 	public:
-	class dgFlags
-	{
-		public:
-		dgInt8 m_flags;
-		union {
-			dgInt32 m_isMotor			: 1;
-			dgInt32 m_applyCorrection	: 1;
-		};
-	};
 	dgJacobianPair m_jacobian[DG_CONSTRAINT_MAX_ROWS];
 	dgBilateralBounds m_forceBounds[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_jointAccel[DG_CONSTRAINT_MAX_ROWS];
@@ -135,7 +126,6 @@ class dgContraintDescritor
 	dgFloat32 m_penetration[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_penetrationStiffness[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_zeroRowAcceleration[DG_CONSTRAINT_MAX_ROWS];
-	dgFlags m_flags[DG_CONSTRAINT_MAX_ROWS];
 	dgWorld* m_world;
 	dgInt32 m_threadIndex;
 	dgFloat32 m_timestep;

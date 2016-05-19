@@ -401,17 +401,15 @@ void dgBroadPhase::ForEachBodyInAABB(const dgBroadPhaseNode** stackPool, dgInt32
 dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& velocA, const dgVector& velocB, dgFastRayTest& ray,
 								 dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
+	dgVector boxP0;
+	dgVector boxP1;
 	dgTriplex points[DG_CONVEX_CAST_POOLSIZE];
 	dgTriplex normals[DG_CONVEX_CAST_POOLSIZE];
 	dgFloat32 penetration[DG_CONVEX_CAST_POOLSIZE];
 	dgInt64 attributeA[DG_CONVEX_CAST_POOLSIZE];
 	dgInt64 attributeB[DG_CONVEX_CAST_POOLSIZE];
-
 	dgInt32 totalCount = 0;
-	
 
-	dgVector boxP0;
-	dgVector boxP1;
 	dgAssert(matrix.TestOrthogonal());
 	shape->CalcAABB(matrix, boxP0, boxP1);
 
@@ -1330,7 +1328,7 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 			dgVector velRelative (body1->GetVelocity() - body0->GetVelocity());
 			dgVector step (velRelative.Scale4 (timestep * dgFloat32 (2.0f)));
-			testDist += (dist < step.DotProduct4(step).GetScalar());
+			testDist += step.DotProduct4(step).GetScalar();
 		}
 		ret = dist < testDist;
 	}
@@ -1451,7 +1449,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 				contact->m_timeOfImpact = dgFloat32(1.0e10f);
 				if (!ValidateContactCache (contact, timestep)) {
 					// It does not have to set the value because it should be the same ar previous update.
-					//contact->m_contactActive = (contact->m_closestDistance < dgFloat32 (0.0f)) ? true : false;
 					contact->m_contactActive = 0;
 					contact->m_positAcc = dgVector::m_zero;
 					contact->m_rotationAcc = dgQuaternion();
@@ -1470,8 +1467,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 				const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
 
 				if (material->m_flags & dgContactMaterial::m_collisionEnable) {
-
-
 					bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
 //					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
 					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
@@ -1762,7 +1757,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 			const dgBody* const body1 = contact->m_body1;
 			if (! ((body0->m_sleeping | body0->m_equilibrium) & (body1->m_sleeping | body1->m_equilibrium)) ) {
 				if (contact->m_contactActive) {
-					contact->m_contactActive = false;
+					contact->m_contactActive = 0;
 				} else {
 					deadContacs[count] = contact;
 					count ++;
@@ -1778,7 +1773,7 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 					contact->m_broadphaseLru = lru - 1;
 				} else {
 					if (contact->m_contactActive) {
-						contact->m_contactActive = false;
+						contact->m_contactActive = 0;
 					} else {
 						deadContacs[count] = contact;
 						count ++;

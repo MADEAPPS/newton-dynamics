@@ -38,7 +38,7 @@ static void UserContactFriction (const NewtonJoint* contactJoint, dFloat timeste
 	const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
 	const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
 	const NewtonBody* body = body0;
-	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
 	if (mass == 0.0f) {
 		body = body1;
 	}
@@ -82,7 +82,7 @@ void Friction (DemoEntityManager* const scene)
 		dFloat Iyy;
 		dFloat Izz;
 		dFloat mass;
-		NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
 		if (mass > 0.0f) {
 			// use the new instance feature to ass per shape information
 			NewtonCollision* const collision = NewtonBodyGetCollision(body);

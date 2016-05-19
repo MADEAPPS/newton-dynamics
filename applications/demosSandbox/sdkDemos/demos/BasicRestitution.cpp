@@ -36,7 +36,7 @@ static void UserContactRestitution (const NewtonJoint* contactJoint, dFloat time
 	body1 = NewtonJointGetBody1(contactJoint);
 
 	body = body0;
-	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
 	if (mass == 0.0f) {
 		body = body1;
 	}

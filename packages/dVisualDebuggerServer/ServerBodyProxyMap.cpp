@@ -119,7 +119,7 @@ void ServerBodyProxyMap::AddNewBodies (NewtonWorld* const world)
 			dFloat Ixx; 
 			dFloat Iyy; 
 			dFloat Izz; 
-			NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 			state = (mass == 0.0f); 
 		}
 
@@ -189,7 +189,7 @@ int DebuggerServer::ServerBodyProxyMap::GetBodies(NewtonWorld* const world)
 			dFloat Ixx; 
 			dFloat Iyy; 
 			dFloat Izz; 
-			NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 			state = (mass == 0.0f); 
 		}
 
@@ -446,7 +446,7 @@ void ServerBodyProxyMap::AddNewBodies ()
 				dFloat Ixx; 
 				dFloat Iyy; 
 				dFloat Izz; 
-				NewtonBodyGetMassMatrix(body, &mass, &Ixx, &Iyy, &Izz);
+				NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 				state = (mass == 0.0f); 
 			}
 

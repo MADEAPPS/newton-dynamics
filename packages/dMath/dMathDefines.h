@@ -70,8 +70,9 @@
 #endif 
 
 
+#define D_LCP_MAX_VALUE (1.0e12f)
+
 // transcendental functions
-#define	dAbs(x)		dFloat (fabs (dFloat(x))) 
 #define	dSqrt(x)	dFloat (sqrt (dFloat(x))) 
 #define	dFloor(x)	dFloat (floor (dFloat(x))) 
 #define	dCiel(x)	dFloat (ceil (dFloat(x))) 
@@ -94,7 +95,14 @@ enum dEulerAngleOrder
 	m_rollYawpitch = (2 << 8) + (1 << 4) + (0 << 0),
 };
 
+#define dAlloca(type, size) (type*) alloca ((size) * sizeof (type))
 
+template <class T>
+T dAbs(T A)
+{
+	// according to Intel this is better because is does not read after write
+	return (A >= T(0.0f)) ? A : -A;
+}
 
 template <class T>
 T dSign (T A)
@@ -196,6 +204,350 @@ void dSort (T* const array, int elements, int (*compare) (const T* const  A, con
 	}
 #endif
 }
+
+
+// return dot product
+template<class T>
+T dgDotProduct(int size, const T* const A, const T* const B)
+{
+	T val(0.0f);
+	for (int i = 0; i < size; i++) {
+		val = val + A[i] * B[i];
+	}
+	return val;
+}
+
+
+template<class T>
+void dMatrixTimeVector(int size, const T* const matrix, const T* const v, T* const out)
+{
+	int stride = 0;
+	for (int i = 0; i < size; i++) {
+		out[i] = dgDotProduct(size, &matrix[stride], v);
+		stride += size;
+	}
+}
+
+
+template<class T>
+bool dCholeskyFactorizationAddRow(int size, int n, T* const matrix)
+{
+	T* const rowN = &matrix[size * n];
+
+	int stride = 0;
+	for (int j = 0; j <= n; j++) {
+		T s(0.0f);
+		T* const rowJ = &matrix[stride];
+		for (int k = 0; k < j; k++) {
+			s += rowN[k] * rowJ[k];
+		}
+
+		if (n == j) {
+			T diag = rowN[n] - s;
+			if (diag < T(0.0f)) {
+				dAssert(0);
+				return false;
+			}
+			rowN[n] = T(sqrt(diag));
+		}
+		else {
+			rowN[j] = (T(1.0f) / rowJ[j] * (rowN[j] - s));
+		}
+
+		stride += size;
+	}
+
+	return true;
+}
+
+
+template<class T>
+void dCholeskyRestore(int size, T* const matrix, const T* const diagonal, int n, int subSize)
+{
+	int stride = n * size;
+	for (int i = n; i < subSize; i++) {
+		T* const row = &matrix[stride];
+		row[i] = diagonal[i];
+		for (int j = 0; j < i; j++) {
+			row[j] = matrix[size * j + i];
+		}
+		stride += size;
+	}
+}
+
+
+template<class T>
+void dCholeskySolve(int size, const T* const matrix, T* const x, int n)
+{
+	int stride = 0;
+	for (int i = 0; i < n; i++) {
+		T acc(0.0f);
+		const T* const row = &matrix[stride];
+		for (int j = 0; j < i; j++) {
+			acc = acc + row[j] * x[j];
+		}
+		x[i] = (x[i] - acc) / row[i];
+		stride += size;
+	}
+
+	for (int i = n - 1; i >= 0; i--) {
+		T acc = 0.0f;
+		for (int j = i + 1; j < n; j++) {
+			acc = acc + matrix[size * j + i] * x[j];
+		}
+		x[i] = (x[i] - acc) / matrix[size * i + i];
+	}
+}
+
+// calculate delta_r = A * delta_x
+template<class T>
+void dCalculateDelta_r(int size, int n, const T* const matrix, const T* const delta_x, T* const delta_r)
+{
+	int stride = n * size;
+	for (int i = n; i < size; i++) {
+		delta_r[i] = dgDotProduct(size, &matrix[stride], delta_x);
+		stride += size;
+	}
+}
+
+template<class T>
+void dCalculateDelta_x(int size, T dir, int n, const T* const matrix, T* const delta_x)
+{
+	const T* const row = &matrix[size * n];
+	for (int i = 0; i < n; i++) {
+		delta_x[i] = row[i] * dir;
+	}
+	dCholeskySolve(size, matrix, delta_x, n);
+	delta_x[n] = -dir;
+}
+
+
+template<class T>
+void dPermuteRows(int size, int i, int j, T* const matrix, T* const x, T* const r, T* const low, T* const high, T* const diagonal, short* const permute)
+{
+	if (i != j) {
+		T* const A = &matrix[size * i];
+		T* const B = &matrix[size * j];
+		for (int k = 0; k < size; k++) {
+			dSwap(A[k], B[k]);
+		}
+
+		int stride = 0;
+		for (int k = 0; k < size; k++) {
+			dSwap(matrix[stride + i], matrix[stride + j]);
+			stride += size;
+		}
+
+		dSwap(x[i], x[j]);
+		dSwap(r[i], r[j]);
+		dSwap(low[i], low[j]);
+		dSwap(high[i], high[j]);
+		dSwap(diagonal[i], diagonal[j]);
+		dSwap(permute[i], permute[j]);
+	}
+}
+
+
+// solve a general Linear complementary program (LCP)
+// A * x = b + r
+// subjected to constraints
+// x(i) = low(i),  if r(i) >= 0  
+// x(i) = high(i), if r(i) <= 0  
+// low(i) <= x(i) <= high(i),  if r(i) == 0  
+//
+// return true is the system has a solution.
+// in return 
+// x is the solution,
+// r is return in vector b
+// note: although the system is called LCP, the solve is far more general than a strict LCP
+// to solve a strict LCP set the following
+// low(i) = 0
+// high(i) = infinity.
+// this the same as enforcing the constrain: x(i) * r(i) = 0
+template <class T>
+bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
+{
+	T* const x0 = dAlloca(T, size);
+	T* const r0 = dAlloca(T, size);
+	T* const delta_r = dAlloca(T, size);
+	short* const permute = dAlloca(short, size);
+
+	T* const delta_x = b;
+	T* const diagonal = x;
+
+	int stride = 0;
+	for (int i = 0; i < size; i++) {
+		x0[i] = dClamp(x[i], low[i], high[i]);
+		permute[i] = short(i);
+		diagonal[i] = matrix[stride + i];
+		stride += size;
+	}
+
+	dMatrixTimeVector(size, matrix, x0, r0);
+	for (int i = 0; i < size; i++) {
+		r0[i] -= b[i];
+	}
+
+	int index = 0;
+	int count = size;
+
+	for (int i = 0; i < count; i++) {
+		if ((low[i] <= T(-D_LCP_MAX_VALUE)) && (high[i] >= T(D_LCP_MAX_VALUE))) {
+			dCholeskyFactorizationAddRow(size, index, matrix);
+			index++;
+		} else {
+			dPermuteRows(size, i, count - 1, matrix, x0, r0, low, high, diagonal, permute);
+			i--;
+			count--;
+		}
+	}
+
+	if (index > 0) {
+		dCholeskySolve(size, matrix, r0, index);
+		for (int i = 0; i < index; i++) {
+			x0[i] -= r0[i];
+			r0[i] = T(0.0f);
+		}
+		dCalculateDelta_r(size, index, matrix, x0, delta_r);
+		for (int i = index; i < size; i++) {
+			r0[i] += delta_r[i];
+		}
+	}
+	count = size - index;
+	for (int i = 0; i < size; i++) {
+		delta_x[i] = T(0.0f);
+		delta_r[i] = T(0.0f);
+	}
+
+	const int start = index;
+	int clampedIndex = size;
+	while (count) {
+		bool loop = true;
+		bool calculateDelta_x = true;
+
+		while (loop) {
+			loop = false;
+			T clamp_x(0.0f);
+			int swapIndex = -1;
+
+			if (dAbs(r0[index]) > T(1.0e-12f)) {
+
+				if (calculateDelta_x) {
+					T dir = dSign(r0[index]);
+					dCalculateDelta_x(size, dir, index, matrix, delta_x);
+				}
+
+				calculateDelta_x = true;
+				dCalculateDelta_r(size, index, matrix, delta_x, delta_r);
+				dAssert(delta_r[index] != T(0.0f));
+				dAssert(dAbs(delta_x[index]) == T(1.0f));
+
+				T s = -r0[index] / delta_r[index];
+				dAssert(s >= T(0.0f));
+
+				for (int i = start; i <= index; i++) {
+					T x1 = x0[i] + s * delta_x[i];
+					if (x1 > high[i]) {
+						swapIndex = i;
+						clamp_x = high[i];
+						s = (high[i] - x0[i]) / delta_x[i];
+					} else if (x1 < low[i]) {
+						swapIndex = i;
+						clamp_x = low[i];
+						s = (low[i] - x0[i]) / delta_x[i];
+					}
+				}
+				dAssert(s >= T(0.0f));
+
+				for (int i = clampedIndex; (i < size) && (s > T(1.0e-12f)); i++) {
+					T r1 = r0[i] + s * delta_r[i];
+					if ((r1 * r0[i]) < T(0.0f)) {
+						dAssert(dAbs(delta_r[i]) > T(0.0f));
+						T s1 = -r0[i] / delta_r[i];
+						dAssert(s1 >= T(0.0f));
+						if (s1 < s) {
+							s = s1;
+							swapIndex = i;
+						}
+					}
+				}
+
+				if (s > T(1.0e-12f)) {
+					for (int i = 0; i < size; i++) {
+						dAssert((x0[i] + T(1.0e-4f)) >= low[i]);
+						dAssert((x0[i] - T(1.0e-4f)) <= high[i]);
+						x0[i] += s * delta_x[i];
+						r0[i] += s * delta_r[i];
+						dAssert((x0[i] + T(1.0e-4f)) >= low[i]);
+						dAssert((x0[i] - T(1.0e-4f)) <= high[i]);
+					}
+				}
+			}
+
+			if (swapIndex == -1) {
+				r0[index] = T(0.0f);
+				delta_r[index] = T(0.0f);
+				if (!dCholeskyFactorizationAddRow(size, index, matrix)) {
+					return false;
+				}
+				index++;
+				count--;
+				loop = false;
+			} else if (swapIndex == index) {
+				count--;
+				clampedIndex--;
+				x0[index] = clamp_x;
+				dPermuteRows(size, index, clampedIndex, matrix, x0, r0, low, high, diagonal, permute);
+				loop = count ? true : false;
+			} else if (swapIndex > index) {
+				loop = true;
+				r0[swapIndex] = T(0.0f);
+				dAssert(swapIndex < size);
+				dAssert(clampedIndex <= size);
+				if (swapIndex < clampedIndex) {
+					count--;
+					clampedIndex--;
+					dPermuteRows(size, clampedIndex, swapIndex, matrix, x0, r0, low, high, diagonal, permute);
+					dAssert(clampedIndex >= index);
+				} else {
+					count++;
+					dAssert(clampedIndex < size);
+					dPermuteRows(size, clampedIndex, swapIndex, matrix, x0, r0, low, high, diagonal, permute);
+					clampedIndex++;
+					dAssert(clampedIndex <= size);
+					dAssert(clampedIndex >= index);
+				}
+				calculateDelta_x = false;
+			} else {
+				dAssert(index > 0);
+				x0[swapIndex] = clamp_x;
+				delta_x[index] = T(0.0f);
+
+				dCholeskyRestore(size, matrix, diagonal, swapIndex, index);
+				dPermuteRows(size, swapIndex, index - 1, matrix, x0, r0, low, high, diagonal, permute);
+				dPermuteRows(size, index - 1, index, matrix, x0, r0, low, high, diagonal, permute);
+				dPermuteRows(size, clampedIndex - 1, index, matrix, x0, r0, low, high, diagonal, permute);
+
+				clampedIndex--;
+				index--;
+				for (int i = swapIndex; i < index; i++) {
+					dCholeskyFactorizationAddRow(size, i, matrix);
+				}
+				loop = true;
+			}
+		}
+	}
+
+	for (int i = 0; i < size; i++) {
+		int j = permute[i];
+		x[j] = x0[i];
+		b[j] = r0[i];
+	}
+
+	return true;
+}
+
+
 
 #endif
 

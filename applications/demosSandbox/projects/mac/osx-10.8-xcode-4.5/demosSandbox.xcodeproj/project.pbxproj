@@ -259,6 +259,9 @@
 		FF93FC2F19C760A500F4094D /* carPath.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FC2E19C760A500F4094D /* carPath.ngd */; };
 		FF93FC3E19C93C0C00F4094D /* streetCone.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF93FC3D19C93C0C00F4094D /* streetCone.ngd */; };
 		FF94FCDF1B91689B0073550E /* robot.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF94FCDE1B91689B0073550E /* robot.ngd */; };
+		FF9984A61CDC6F4500422228 /* flatPlane1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9984A31CDC6F4500422228 /* flatPlane1.ngd */; };
+		FF9984A71CDC6F4500422228 /* gymnast.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9984A41CDC6F4500422228 /* gymnast.ngd */; };
+		FF9984A81CDC6F4500422228 /* wheel1.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9984A51CDC6F4500422228 /* wheel1.ngd */; };
 		FF9AEB9119B8015A007C1C5C /* colum.ngd in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8C19B8015A007C1C5C /* colum.ngd */; };
 		FF9AEB9219B8015A007C1C5C /* concreteBrick.tga in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8D19B8015A007C1C5C /* concreteBrick.tga */; };
 		FF9AEB9319B8015A007C1C5C /* softBox.nme in Resources */ = {isa = PBXBuildFile; fileRef = FF9AEB8E19B8015A007C1C5C /* softBox.nme */; };
@@ -679,6 +682,9 @@
 		FF93FC2E19C760A500F4094D /* carPath.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = carPath.ngd; path = ../../../../media/carPath.ngd; sourceTree = "<group>"; };
 		FF93FC3D19C93C0C00F4094D /* streetCone.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = streetCone.ngd; path = ../../../../media/streetCone.ngd; sourceTree = "<group>"; };
 		FF94FCDE1B91689B0073550E /* robot.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = robot.ngd; path = ../../../../media/robot.ngd; sourceTree = "<group>"; };
+		FF9984A31CDC6F4500422228 /* flatPlane1.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = flatPlane1.ngd; path = ../../../../media/flatPlane1.ngd; sourceTree = "<group>"; };
+		FF9984A41CDC6F4500422228 /* gymnast.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = gymnast.ngd; path = ../../../../media/gymnast.ngd; sourceTree = "<group>"; };
+		FF9984A51CDC6F4500422228 /* wheel1.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = wheel1.ngd; path = ../../../../media/wheel1.ngd; sourceTree = "<group>"; };
 		FF9AEB8C19B8015A007C1C5C /* colum.ngd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = colum.ngd; path = ../../../../media/colum.ngd; sourceTree = "<group>"; };
 		FF9AEB8D19B8015A007C1C5C /* concreteBrick.tga */ = {isa = PBXFileReference; lastKnownFileType = file; name = concreteBrick.tga; path = ../../../../media/concreteBrick.tga; sourceTree = "<group>"; };
 		FF9AEB8E19B8015A007C1C5C /* softBox.nme */ = {isa = PBXFileReference; lastKnownFileType = file; name = softBox.nme; path = ../../../../media/softBox.nme; sourceTree = "<group>"; };
@@ -798,6 +804,9 @@
 		FF506721173F3DDC00D01FDF /* assets */ = {
 			isa = PBXGroup;
 			children = (
+				FF9984A31CDC6F4500422228 /* flatPlane1.ngd */,
+				FF9984A41CDC6F4500422228 /* gymnast.ngd */,
+				FF9984A51CDC6F4500422228 /* wheel1.ngd */,
 				FF94FCDE1B91689B0073550E /* robot.ngd */,
 				FF506673173F3D8700D01FDF /* 00_skap.tga */,
 				FF506674173F3D8700D01FDF /* 01_S_ba.tga */,
@@ -1457,6 +1466,7 @@
 				FF9AEB9319B8015A007C1C5C /* softBox.nme in Resources */,
 				FF50676F173F3EAC00D01FDF /* yellow_p.tga in Resources */,
 				FF506770173F3EAC00D01FDF /* metalblu.tga in Resources */,
+				FF9984A71CDC6F4500422228 /* gymnast.ngd in Resources */,
 				FF506771173F3EAC00D01FDF /* MonsterTruckBody.tga in Resources */,
 				FF506772173F3EAC00D01FDF /* MonsterTruckTire.tga in Resources */,
 				FF506773173F3EAC00D01FDF /* needle_green.tga in Resources */,
@@ -1467,6 +1477,7 @@
 				FF506777173F3EAC00D01FDF /* NewtonSky0003.tga in Resources */,
 				FF506778173F3EAC00D01FDF /* NewtonSky0004.tga in Resources */,
 				FF506779173F3EAC00D01FDF /* NewtonSky0005.tga in Resources */,
+				FF9984A81CDC6F4500422228 /* wheel1.ngd in Resources */,
 				FF50677A173F3EAC00D01FDF /* NewtonSky0006.tga in Resources */,
 				FF50677B173F3EAC00D01FDF /* oldmetal.tga in Resources */,
 				FF50677C173F3EAC00D01FDF /* ornament1_.tga in Resources */,
@@ -1508,6 +1519,7 @@
 				FF5067AA173F3EAD00D01FDF /* gears_font.tga in Resources */,
 				FF5067AB173F3EAD00D01FDF /* GRASS.TGA in Resources */,
 				FF5067AC173F3EAD00D01FDF /* grassanddirt.tga in Resources */,
+				FF9984A61CDC6F4500422228 /* flatPlane1.ngd in Resources */,
 				FF5067AD173F3EAD00D01FDF /* grids.tga in Resources */,
 				FF5067AE173F3EAD00D01FDF /* gymnast.tga in Resources */,
 				FF5067AF173F3EAD00D01FDF /* h2.raw in Resources */,

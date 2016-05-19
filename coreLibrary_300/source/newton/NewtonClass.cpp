@@ -257,8 +257,6 @@ void NewtonUserJoint::SetSpringDamperAcceleration (dFloat spring, dFloat damper)
 {
 	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
-//		dgFloat32 accel = CalculateSpringDamperAcceleration (index, *m_param, springK, damperD);
-//		SetMotorAcceleration (index, accel, *m_param);
 		dgBilateralConstraint::SetSpringDamperAcceleration (index, *m_param, spring, damper);
 	}
 }

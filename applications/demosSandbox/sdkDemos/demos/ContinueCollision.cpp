@@ -93,7 +93,7 @@ void ContinuousCollision (DemoEntityManager* const scene)
 		dFloat Iy;
 		dFloat Iz;
 		dFloat mass;
-		NewtonBodyGetMassMatrix(body, &mass, &Ix, &Iy, &Iz);
+		NewtonBodyGetMass(body, &mass, &Ix, &Iy, &Iz);
 		if (mass > 0.0f) {
 			NewtonBodySetContinuousCollisionMode(body, 1);
 		}

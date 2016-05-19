@@ -31,14 +31,14 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 
 #define D_CUSTOM_LARGE_VALUE		dFloat (1.0e20f)
 
-#define DECLARE_CUSTON_JOINT(className,baseClass)																			\
+#define DECLARE_CUSTOM_JOINT(className,baseClass)																			\
 	public:																													\
 	virtual dCRCTYPE GetSerializeKey() const { return dCRC64(#className); }													\
 	virtual const char* GetTypeName() const { return #className; }															\
-	class SerializeMetaData: public baseClass::SerializeMetaData															\
+	class SerializeMetaData_##className: public baseClass::SerializeMetaData												\
 	{																														\
 		public:																												\
-		SerializeMetaData(const char* const name)																			\
+		SerializeMetaData_##className(const char* const name)																\
 			:baseClass::SerializeMetaData(name)																				\
 		{																													\
 		}																													\
@@ -52,11 +52,11 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 			return new className (body0, body1, callback, userData);														\
 		}																													\
 	};																														\
-	friend class SerializeMetaData;																							\
-	static SerializeMetaData m_metaData;
+	friend class SerializeMetaData_##className;																				\
+	CUSTOM_JOINTS_API static SerializeMetaData_##className m_metaData_##className;
 
 #define IMPLEMENT_CUSTON_JOINT(className)																					\
-	className::SerializeMetaData className::m_metaData(#className);															\
+	className::SerializeMetaData_##className className::m_metaData_##className(#className);									\
 
 // this is the base class to implement custom joints, it is not a joint it just provide functionality
 // for the user to implement it own joints
@@ -216,8 +216,7 @@ class CustomJoint: public CustomAlloc
 	dFloat m_stiffness;
 	int m_maxDof;
 	int m_autoDestroy;
-	
-	static SerializeMetaData m_metaData;
+	CUSTOM_JOINTS_API static SerializeMetaData m_metaData_CustomJoint;
 };
 
 

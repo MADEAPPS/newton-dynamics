@@ -46,7 +46,7 @@ class CustomSlider: public CustomJoint
 	dFloat m_maxDist;
 	bool m_limitsOn;
 	bool m_lastRowWasUsed;
-	DECLARE_CUSTON_JOINT(CustomSlider, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomSlider, CustomJoint)
 };
 
 #endif
