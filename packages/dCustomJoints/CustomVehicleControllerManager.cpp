@@ -2427,9 +2427,9 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 			dFloat rearPivot = 0.0f;
 			for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 				BodyPartTire* const tire = &node->GetInfo();
-				dVector force (chassisMatrix.UnrotateVector(GetLastLateralForce(tire)));
-				force += force.m_z;
-				torque += tire->m_data.m_location.m_x * force.m_z;
+				dVector tireForce (chassisMatrix.UnrotateVector(GetLastLateralForce(tire)));
+				force += tireForce.m_z;
+				torque += tire->m_data.m_location.m_x * tireForce.m_z;
 				if (tire->m_data.m_location.m_x > 0.0f) {
 					frontPivot = dMax (tire->m_data.m_location.m_x, frontPivot);
 				} else {
