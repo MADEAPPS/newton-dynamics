@@ -2408,8 +2408,8 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 	omega = chassisMatrix.UnrotateVector(omega);
 
 	veloc.m_y = 0.0f;
-	dFloat mag2 = veloc % veloc;
-	if (mag2 < 5.0f) {
+	dFloat velocMag2 = veloc % veloc;
+	if (velocMag2 < 5.0f) {
 		return;
 	}
 
@@ -2417,9 +2417,10 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 	dFloat sideSlipRate = (sideSlipAngle - m_sideSlipAngle) / timestep;
 	m_sideSlipAngle = sideSlipAngle;
 		
-dTrace (("slipAngle=%f slipRate=%f ", sideSlipAngle * 180.0f / 3.1416f, sideSlipRate * 180.0f / 3.1416f));
-	if ((dAbs (sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) || (dAbs(sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE)) {
-		
+//dTrace (("slipAngle=%f slipRate=%f ", sideSlipAngle * 180.0f / 3.1416f, sideSlipRate * 180.0f / 3.1416f));
+//	if ((dAbs (sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) || (dAbs(sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE)) {
+	if (1) {
+	
 			dFloat force = 0.0f;
 			dFloat torque = 0.0f;
 			dFloat frontPivot = 0.0f;
@@ -2427,8 +2428,6 @@ dTrace (("slipAngle=%f slipRate=%f ", sideSlipAngle * 180.0f / 3.1416f, sideSlip
 			for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 				BodyPartTire* const tire = &node->GetInfo();
 				dVector force (chassisMatrix.UnrotateVector(GetLastLateralForce(tire)));
-				force.m_y = 0.0f;
-
 				force += force.m_z;
 				torque += tire->m_data.m_location.m_x * force.m_z;
 				if (tire->m_data.m_location.m_x > 0.0f) {
@@ -2438,21 +2437,28 @@ dTrace (("slipAngle=%f slipRate=%f ", sideSlipAngle * 180.0f / 3.1416f, sideSlip
 				}
 			}
 		
-		//	dVector force (0.0f);
-		//	dFloat Ixx;
-		//	dFloat Iyy;
-		//	dFloat Izz;
-		//	dFloat mass;
-		//	NewtonBodyGetForce (chassisBody, &force[0]);
-		//	NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
-		//	force = chassisMatrix.UnrotateVector(force);
-		//	force.m_y = 0.0f;
-		//	dFloat accel = dSqrt (force % force) / mass;
-		//	dFloat sideSlipRate = (frontForce + rearForce) / (mass * speed) - sideSlipAngle * accel / speed - yawRate;
+			dVector bodyNetForce (0.0f);
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
 
-		//	dFloat yawRate = -omega.m_y;
-		//	dFloat speed = dSqrt(mag2);
+			dFloat yawRate = -omega.m_y;
+			dFloat speed = dSqrt(velocMag2);
 
+			NewtonBodyGetForce (chassisBody, &bodyNetForce[0]);
+			NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+
+			bodyNetForce = chassisMatrix.UnrotateVector(bodyNetForce);
+			bodyNetForce.m_y = 0.0f;
+
+			dFloat bodyNetForceMag = dSqrt (bodyNetForce % bodyNetForce);
+			dFloat invMassSpeed = 1.0f / (mass * speed);
+
+			dFloat sideSlipRate1 = invMassSpeed * (force - sideSlipAngle * bodyNetForceMag) - yawRate;
+		
+dTrace (("slipAngle=%f slipRate=%f  slipRate__=%f ", sideSlipAngle * 180.0f / 3.1416f, sideSlipRate * 180.0f / 3.1416f, sideSlipRate1 * 180.0f / 3.1416f));
+/*
 		if (dAbs (sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) {
 			if (dAbs(sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE) {
 				sideSlipAngle *= 1;
@@ -2461,6 +2467,7 @@ dTrace (("slipAngle=%f slipRate=%f ", sideSlipAngle * 180.0f / 3.1416f, sideSlip
 		} else {
 			dAssert (dAbs(sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE);
 		}
+*/
 	}
 }
 
