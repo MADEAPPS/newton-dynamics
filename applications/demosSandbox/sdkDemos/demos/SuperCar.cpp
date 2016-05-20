@@ -448,8 +448,6 @@ class SuperCarEntity: public DemoEntity
 		steering->AddTire(rightFrontTire);
 		steering->AddTire(leftRearTire);
 		steering->AddTire(rightRearTire);
-
-		steering->CalculateAkermanParameters (leftRearTire, rightRearTire, leftFrontTire, rightFrontTire);
 		m_controller->SetSteering(steering);
 		
 		// add vehicle brakes
