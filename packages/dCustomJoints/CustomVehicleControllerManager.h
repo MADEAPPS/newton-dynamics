@@ -558,15 +558,11 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		CUSTOM_JOINTS_API SteeringController (CustomVehicleController* const controller);
 		CUSTOM_JOINTS_API void AddTire (BodyPartTire* const tire);
-		CUSTOM_JOINTS_API void CalculateAkermanParameters(const BodyPartTire* const rearLeftTire, const BodyPartTire* const rearRightTire,
-														  const BodyPartTire* const frontLeftTire, const BodyPartTire* const frontRightTire);
-
+		
 		protected:
 		virtual void Update(dFloat timestep);
 
 		dList<BodyPartTire*> m_tires;
-		dFloat m_akermanWheelBaseWidth;
-		dFloat m_akermanAxelSeparation;
 		friend class CustomVehicleController;
 	};
 

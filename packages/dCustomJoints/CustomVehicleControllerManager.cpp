@@ -1405,48 +1405,15 @@ dFloat CustomVehicleController::EngineController::GetTopSpeed() const
 
 CustomVehicleController::SteeringController::SteeringController (CustomVehicleController* const controller)
 	:Controller(controller)
-	,m_akermanWheelBaseWidth(0.0f)
-	,m_akermanAxelSeparation(0.0f)
 {
 }
 
-void CustomVehicleController::SteeringController::CalculateAkermanParameters(
-	const BodyPartTire* const rearLeftTire, const BodyPartTire* const rearRightTire,
-	const BodyPartTire* const frontLeftTire, const BodyPartTire* const frontRightTire)
-{
-/*
-	const dMatrix& leftRearMatrix = rearLeftTire->GetLocalMatrix();
-	const dMatrix& rightRearMatrix = rearRightTire->GetLocalMatrix();
-	dVector rearDist(rightRearMatrix.m_posit - leftRearMatrix.m_posit);
-	m_akermanWheelBaseWidth = (rearDist % leftRearMatrix.m_front) * 0.5f;
-
-	const dMatrix& frontLeftTireMatrix = frontLeftTire->GetLocalMatrix();
-	dVector akermanAxelSeparation(frontLeftTireMatrix.m_posit - leftRearMatrix.m_posit);
-	m_akermanAxelSeparation = dAbs(akermanAxelSeparation % frontLeftTireMatrix.m_right);
-*/
-}
 
 void CustomVehicleController::SteeringController::Update(dFloat timestep)
 {
-	dFloat angle = m_param;
-	if ((m_akermanWheelBaseWidth == 0.0f) || (dAbs(angle) < (2.0f * 3.141592f / 180.0f))) {
-		for (dList<BodyPartTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
-			BodyPartTire& tire = *node->GetInfo();
-			tire.SetSteerAngle(angle);
-		}
-	} else {
-		dAssert (0);
-/*
-		dAssert(dAbs(angle) >= (2.0f * 3.141592f / 180.0f));
-		dFloat posit = m_akermanAxelSeparation / dTan(dAbs(angle));
-		dFloat sign = dSign(angle);
-		dFloat leftAngle = sign * dAtan2(m_akermanAxelSeparation, posit + m_akermanWheelBaseWidth);
-		dFloat righAngle = sign * dAtan2(m_akermanAxelSeparation, posit - m_akermanWheelBaseWidth);
-		for (dList<BodyPartTire*>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext()) {
-			BodyPartTire& tire = *node->GetInfo();
-			tire.SetSteerAngle ((sign * tire.m_data.m_l > 0.0f) ? leftAngle : righAngle);
-		}
-*/	
+	for (dList<BodyPartTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
+		BodyPartTire& tire = *node->GetInfo();
+		tire.SetSteerAngle(m_param);
 	}
 }
 
