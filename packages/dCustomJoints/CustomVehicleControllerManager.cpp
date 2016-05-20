@@ -24,7 +24,7 @@
 static FILE* file_xxx;
 #endif
 
-static int xxx;
+//static int xxx;
 
 #define D_VEHICLE_NEUTRAL_GEAR						0
 #define D_VEHICLE_REVERSE_GEAR						1
@@ -389,7 +389,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 
 	dFloat GetTireLoad () const
 	{
-		return m_tireLoad;
+		return NewtonUserJointGetRowForce(m_joint, 4);
 	}
 
 	dVector GetLongitudinalForce() const
@@ -2366,13 +2366,6 @@ if (tire->m_index >= 2) {
 
 dVector CustomVehicleController::GetLastLateralForce(BodyPartTire* const tire) const
 {
-	//dMatrix chassisMatrix;
-	//NewtonBody* const tireBody = tire->GetBody();
-	//WheelJoint* const joint = (WheelJoint*)tire->GetJoint();
-	//dAssert (tireBody == joint->GetBody0());
-	//NewtonBody* const chassisBody = joint->GetBody1();
-	//dVector tireForce (GetTireLateralForce(tire) + GetTireLongitudinalForce(tire));
-	//return chassisMatrix.UnrotateVector(tireForce.Scale (-1.0f));
 	return (GetTireLateralForce(tire) + GetTireLongitudinalForce(tire)).Scale (-1.0f);
 }
 
@@ -2416,65 +2409,87 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 	dFloat sideSlipAngle = dAtan2(veloc.m_z, veloc.m_x);
 	dFloat sideSlipRate = (sideSlipAngle - m_sideSlipAngle) / timestep;
 	m_sideSlipAngle = sideSlipAngle;
-		
-//dTrace (("slipAngle=%f slipRate=%f ", sideSlipAngle * 180.0f / 3.1416f, sideSlipRate * 180.0f / 3.1416f));
-//	if ((dAbs (sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) || (dAbs(sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE)) {
-	if (1) {
-	
-			dFloat force = 0.0f;
-			dFloat torque = 0.0f;
-			dFloat frontPivot = 0.0f;
-			dFloat rearPivot = 0.0f;
-			for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-				BodyPartTire* const tire = &node->GetInfo();
-				dVector tireForce (chassisMatrix.UnrotateVector(GetLastLateralForce(tire)));
-				force += tireForce.m_z;
-				torque += tire->m_data.m_location.m_x * tireForce.m_z;
-				if (tire->m_data.m_location.m_x > 0.0f) {
-					frontPivot = dMax (tire->m_data.m_location.m_x, frontPivot);
-				} else {
-					rearPivot = dMax (tire->m_data.m_location.m_x, rearPivot);
-				}
+
+//dTrace (("frame=%d slipAngle=%f slipRate=%f ", xxx, sideSlipAngle * 180.0f / 3.1416f, sideSlipRate * 180.0f / 3.1416f));
+	if ((dAbs (sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) || (dAbs(sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE)) {
+		dFloat force = 0.0f;
+		dFloat torque = 0.0f;
+		dFloat maxLoad = 0.0f; 
+		dFloat frontPivot = 0.0f;
+		dFloat rearPivot = 0.0f;
+		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+			BodyPartTire* const tire = &node->GetInfo();
+			dVector tireForce (chassisMatrix.UnrotateVector(GetLastLateralForce(tire)));
+			force += tireForce.m_z;
+			torque += tire->m_data.m_location.m_x * tireForce.m_z;
+
+			WheelJoint* const joint = (WheelJoint*)tire->GetJoint();
+			maxLoad += dAbs(joint->GetTireLoad());
+
+			if (tire->m_data.m_location.m_x > 0.0f) {
+				frontPivot = dMax (tire->m_data.m_location.m_x, frontPivot);
+			} else {
+				rearPivot = dMin (tire->m_data.m_location.m_x, rearPivot);
 			}
+		}
 		
+		dVector bodyNetTorque (0.0f);
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+
+		//dFloat yawRate = -omega.m_y;
+		dFloat speed = dSqrt(velocMag2);
+
+		NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodyGetTorque (chassisBody, &bodyNetTorque[0]);
+		bodyNetTorque = chassisMatrix.UnrotateVector(bodyNetTorque);
+
+		dFloat b1 = -bodyNetTorque.m_y;
+		dFloat b0 = -sideSlipRate * mass * speed;
+		if (dAbs (sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) {
 			dVector bodyNetForce (0.0f);
-			dFloat Ixx;
-			dFloat Iyy;
-			dFloat Izz;
-			dFloat mass;
-
-			dFloat yawRate = -omega.m_y;
-			dFloat speed = dSqrt(velocMag2);
-
 			NewtonBodyGetForce (chassisBody, &bodyNetForce[0]);
-			NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
-
 			bodyNetForce = chassisMatrix.UnrotateVector(bodyNetForce);
 			bodyNetForce.m_y = 0.0f;
-
 			dFloat bodyNetForceMag = dSqrt (bodyNetForce % bodyNetForce);
-			dFloat invMassSpeed = 1.0f / (mass * speed);
-
-			dFloat sideSlipRate1 = invMassSpeed * (force - sideSlipAngle * bodyNetForceMag) - yawRate;
-		
-dTrace (("slipAngle=%f slipRate=%f  slipRate__=%f ", sideSlipAngle * 180.0f / 3.1416f, sideSlipRate * 180.0f / 3.1416f, sideSlipRate1 * 180.0f / 3.1416f));
-/*
-		if (dAbs (sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) {
-			if (dAbs(sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE) {
-				sideSlipAngle *= 1;
-			}
-
-		} else {
-			dAssert (dAbs(sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE);
+			b0 -= sideSlipAngle * bodyNetForceMag;
 		}
-*/
+
+		dFloat b[2];
+		dFloat x[2];
+		dFloat A[2][2];
+		dFloat low[2];
+		dFloat high[2];
+
+		b[0] =  b0 + b1 * frontPivot;
+		b[1] =  b0 + b1 * rearPivot;
+			
+		A[0][0] = 1.0f + frontPivot * frontPivot;
+		A[1][1] = 1.0f + rearPivot * rearPivot;
+		A[0][1] = 1.0f + frontPivot * rearPivot;
+		A[1][0] = 1.0f + frontPivot * rearPivot;
+
+		low[0] = -maxLoad * 4.0f - 100.0f;
+		low[1] = -maxLoad * 4.0f - 100.0f;
+		high[0] = maxLoad * 4.0f + 100.0f;
+		high[1] = maxLoad * 4.0f + 100.0f;
+
+		dSolveDantzigLCP(2, &A[0][0], x, b, low, high);
+		
+		dVector sizeForce(chassisMatrix.RotateVector(dVector(0.0f, 0.0f, x[0] + x[1], 0.0f)));
+		dVector sizeTorque(chassisMatrix.RotateVector(dVector(0.0f, frontPivot * x[0] + rearPivot * x[0], 0.0f, 0.0f)));
+
+		NewtonBodyAddForce(chassisBody, &sizeForce[0]);
+		NewtonBodyAddTorque(chassisBody, &sizeTorque[0]);
 	}
 }
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
-xxx ++;
-dTrace (("\n"));
+//xxx ++;
+//dTrace (("\n"));
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		if (!NewtonBodyGetSleepState(m_body)) {
@@ -2484,9 +2499,11 @@ dTrace (("\n"));
 				dMatrix invInertia;
 				NewtonBodyGetInvInertiaMatrix(m_body, &invInertia[0][0]);
 				dVector omega(invInertia.RotateVector(m_lastAngularMomentum));
-				NewtonBodySetOmega(m_body, &omega[0]);
-				// attenuate the angular momentum by applying a pseudo angular deficiently of drag
-				m_lastAngularMomentum = m_lastAngularMomentum.Scale(0.999f);
+				if ((omega % omega) > 5.0f) {
+					NewtonBodySetOmega(m_body, &omega[0]);
+					// attenuate the angular momentum by applying a pseudo angular deficiently of drag
+					m_lastAngularMomentum = m_lastAngularMomentum.Scale(0.999f);
+				}
 			}
 
 			bool hasContacts = false;
@@ -2529,7 +2546,6 @@ dTrace (("\n"));
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
-xxx ++;
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		m_chassis.ApplyDownForce ();
