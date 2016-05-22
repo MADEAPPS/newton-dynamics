@@ -208,7 +208,7 @@ void dNewtonBody::SetMassAndInertia (dFloat mass, dFloat Ixx, dFloat Iyy, dFloat
 
 void dNewtonBody::GetMassAndInertia (dFloat& mass, dFloat& Ixx, dFloat& Iyy, dFloat& Izz) const
 {
-	NewtonBodyGetMassMatrix(m_body, &mass, &Ixx, &Iyy, &Izz);
+	NewtonBodyGetMass(m_body, &mass, &Ixx, &Iyy, &Izz);
 }
 
 dNewton* dNewtonBody::GetNewton () const
