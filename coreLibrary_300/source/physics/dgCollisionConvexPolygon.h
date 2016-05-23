@@ -83,8 +83,6 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	const dgFloat32* m_vertex;
 	const dgInt32* m_vertexIndex;
 	const dgInt32* m_adjacentFaceEdgeNormalIndex;
-	static dgVector m_boxPadding;
-
 } DG_GCC_VECTOR_ALIGMENT;
 
 #endif
