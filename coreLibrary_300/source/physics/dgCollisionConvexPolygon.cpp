@@ -31,6 +31,9 @@
 
 #define DG_CONVEX_POLYGON_CRC 0x12341234
 
+#define DG_POLY_PADDING (dgFloat32 (2.0f))
+dgVector dgCollisionConvexPolygon::m_boxPadding (DG_POLY_PADDING, DG_POLY_PADDING, DG_POLY_PADDING, dgFloat32 (0.0f));
+
 dgCollisionConvexPolygon::dgCollisionConvexPolygon (dgMemoryAllocator* const allocator)
 	:dgCollisionConvex (allocator, DG_CONVEX_POLYGON_CRC, m_polygonCollision)
 	,m_count(0)
@@ -563,7 +566,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		return 0;
 	}
 
-	dgVector boxSize (hull->GetBoxSize() & dgVector::m_triplexMask);
+	dgVector boxSize ((hull->GetBoxSize() + m_boxPadding) & dgVector::m_triplexMask);
 	dgVector boxOrigin ((hull->GetBoxOrigin() & dgVector::m_triplexMask) + dgVector::m_wOne);
 
 	bool inside = true;
@@ -679,7 +682,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	dgVector relativeVelocity (body0->m_veloc - body1->m_veloc);
 
 	dgFloat32 den = m_normal.DotProduct4(relativeVelocity).GetScalar();
-//	if (m_normal.DotProduct4(relativeVelocity).GetScalar() >= 0.0f) {
 	if (den > dgFloat32 (-1.0e-10f)) {
 		return 0;
 	}
