@@ -606,7 +606,7 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 
-#if 1
+#if 0
 	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
