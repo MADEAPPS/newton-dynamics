@@ -913,8 +913,7 @@ class HeavyVehicleEntity: public DemoEntity
 		dFloat forwardGasPedal = 0.0f;
 
 		// get the steering input
-		dFloat steeringVal = (dFloat(mainWindow->GetKeyState('A')) - dFloat(mainWindow->GetKeyState('D')));
-
+		dFloat steeringVal = (dFloat(mainWindow->GetKeyState('D')) - dFloat(mainWindow->GetKeyState('A')));
 	
 		// get keyboard controls
 		if (mainWindow->GetKeyState('W')) {

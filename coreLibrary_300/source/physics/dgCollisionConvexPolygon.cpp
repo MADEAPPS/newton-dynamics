@@ -729,8 +729,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		return 0;
 	}
 
-//	dgVector boxSize (hull->GetBoxSize() & dgVector::m_triplexMask);
-//	dgVector boxOrigin ((hull->GetBoxOrigin() & dgVector::m_triplexMask) + dgVector::m_wOne);
 	dgVector boxSize;
 	dgVector boxOrigin;
 	hull->CalcObb(boxOrigin, boxSize);
@@ -742,7 +740,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		dgVector e(m_localPoly[i] - m_localPoly[i0]);
 		dgVector edgeBoundaryNormal(m_normal * e);
 		dgPlane plane(edgeBoundaryNormal, - m_localPoly[i0].DotProduct4 (edgeBoundaryNormal).GetScalar());
-		//plane = hullMatrix.TransformPlane(plane);
 		plane = hullMatrix.UntransformPlane(plane);
 
 		dgFloat32 supportDist = boxSize.DotProduct4 (plane.Abs()).GetScalar();

@@ -563,6 +563,7 @@ class CustomVehicleController: public CustomControllerBase
 		virtual void Update(dFloat timestep);
 
 		dList<BodyPartTire*> m_tires;
+		bool m_isSleeping;
 		friend class CustomVehicleController;
 	};
 

@@ -476,7 +476,7 @@ class BasicCarEntity: public DemoEntity
 		
 		engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
 		automaticTransmission = m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d);
-		steeringVal = (dFloat(mainWindow->GetKeyState('A')) - dFloat(mainWindow->GetKeyState('D')));
+		steeringVal = (dFloat(mainWindow->GetKeyState('D')) - dFloat(mainWindow->GetKeyState('A')));
 		gear += int(m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int(m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
 
 		if (mainWindow->GetKeyState ('W')) {
