@@ -208,7 +208,7 @@ void dSort (T* const array, int elements, int (*compare) (const T* const  A, con
 
 // return dot product
 template<class T>
-T dgDotProduct(int size, const T* const A, const T* const B)
+T dDotProduct(int size, const T* const A, const T* const B)
 {
 	T val(0.0f);
 	for (int i = 0; i < size; i++) {
@@ -223,7 +223,7 @@ void dMatrixTimeVector(int size, const T* const matrix, const T* const v, T* con
 {
 	int stride = 0;
 	for (int i = 0; i < size; i++) {
-		out[i] = dgDotProduct(size, &matrix[stride], v);
+		out[i] = dDotProduct(size, &matrix[stride], v);
 		stride += size;
 	}
 }
@@ -305,7 +305,7 @@ void dCalculateDelta_r(int size, int n, const T* const matrix, const T* const de
 {
 	int stride = n * size;
 	for (int i = n; i < size; i++) {
-		delta_r[i] = dgDotProduct(size, &matrix[stride], delta_x);
+		delta_r[i] = dDotProduct(size, &matrix[stride], delta_x);
 		stride += size;
 	}
 }

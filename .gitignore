@@ -44,6 +44,9 @@ bld/
 
 # third party
 packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
+packages/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
+packages/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
+
 *.obj
 *.pdb
 *.dll
@@ -66,12 +69,9 @@ packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/
 *.ncb
 *.htm
 *.dep
-packages/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
-packages/dCompilerKit/dVirtualAssembler/dAssemblerParser.cpp.txt
-*.pch
 *.pch
 *.rsp
 *.bsc
 *.sbr
 *.res
-*.pdb
+
