@@ -474,12 +474,12 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 
 				if (s > T(1.0e-12f)) {
 					for (int i = 0; i < size; i++) {
-						dAssert((x0[i] + T(1.0e-4f)) >= low[i]);
-						dAssert((x0[i] - T(1.0e-4f)) <= high[i]);
+						dAssert((x0[i] + T(1.0e-2f)) >= low[i]);
+						dAssert((x0[i] - T(1.0e-2f)) <= high[i]);
 						x0[i] += s * delta_x[i];
 						r0[i] += s * delta_r[i];
-						dAssert((x0[i] + T(1.0e-4f)) >= low[i]);
-						dAssert((x0[i] - T(1.0e-4f)) <= high[i]);
+						dAssert((x0[i] + T(1.0e-2f)) >= low[i]);
+						dAssert((x0[i] - T(1.0e-2f)) <= high[i]);
 					}
 				}
 			}

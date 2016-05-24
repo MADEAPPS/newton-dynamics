@@ -2424,7 +2424,7 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 			b0 -= sideSlipAngle * dSqrt (bodyNetForce % bodyNetForce);
 		}
 
-		maxLoad = maxLoad * 1.0f + 100.0f;
+		maxLoad = maxLoad * 0.5f + 100.0f;
 
 		b[0] =  b0 + b1 * frontPivot;
 		b[1] =  b0 + b1 * rearPivot;
