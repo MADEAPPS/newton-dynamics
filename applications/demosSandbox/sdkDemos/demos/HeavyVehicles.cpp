@@ -227,7 +227,6 @@ class HeavyVehicleEntity: public DemoEntity
 
 		dFloat GetTireRadius (DemoEntity* const tire) const
 		{
-			//for (dList<BodyPartTire>::dListNode* tireNode = m_vehicle->m_controller->GetFirstTire (); tireNode; tireNode = m_vehicle->m_controller->GetNextTire(tireNode)) {
 			for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_vehicle->m_controller->GetFirstTire(); node; node = m_vehicle->m_controller->GetNextTire(node)) {
 				const CustomVehicleController::BodyPartTire* const part = &node->GetInfo();
 				if (part->GetUserData() == tire) {
@@ -1159,7 +1158,8 @@ class HeavyVehicleEntity: public DemoEntity
 		engineInfo.m_gearRatios[2] = definition.GEAR_3;
 		engineInfo.m_reverseGearRatio = definition.REVERSE_GEAR;
 
-		CustomVehicleController::EngineController::DifferentialTracked differential (8, leftTire, rightTire);
+		//CustomVehicleController::EngineController::DifferentialTracked differential (8, leftTire, rightTire);
+		CustomVehicleController::EngineController::DifferentialTracked differential (2, leftTire, rightTire);
 
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;

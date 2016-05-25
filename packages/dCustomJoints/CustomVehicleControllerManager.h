@@ -526,8 +526,10 @@ class CustomVehicleController: public CustomControllerBase
 
 		class DriveTrainSlaveTire: public DriveTrainTire
 		{
+			public:
 			DriveTrainSlaveTire (BodyPartTire* const tire, DriveTrainTire* const parent);
 
+			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
 			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
 		};
 

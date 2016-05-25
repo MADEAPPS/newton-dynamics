@@ -861,8 +861,24 @@ CustomVehicleController::EngineController::DriveTrainEngine2W::DriveTrainEngine2
 CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEngineTracked (const dVector& invInertia, const DifferentialTracked& axel)
 	:DriveTrainEngine2W(invInertia, axel.m_axel)
 {
-
-
+	DriveTrainTire* const tire0 = m_child->m_child->CastAsTire();
+	dAssert (tire0);
+	dAssert (tire0->m_tire == axel.m_leftTrack[0]);
+	for (int i = 1; i < axel.m_count; i ++) {
+		DriveTrain* const node = new DriveTrainSlaveTire(axel.m_leftTrack[i], tire0);
+		node->m_sibling = tire0->m_child;
+		tire0->m_child = node;
+	}
+/*
+	DriveTrainTire* const tire1 = m_child->m_child->m_sibling->CastAsTire();
+	dAssert (tire1);
+	dAssert (tire1->m_tire == axel.m_rightTrack[0]);
+	for (int i = 1; i < axel.m_count; i ++) {
+		DriveTrain* const node = new DriveTrainSlaveTire(axel.m_rightTrack[i], tire1);
+		node->m_sibling = tire1->m_child;
+		tire1->m_child = node;
+	}
+*/
 }
 
 CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
@@ -1053,12 +1069,29 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTor
 CustomVehicleController::EngineController::DriveTrainSlaveTire::DriveTrainSlaveTire (BodyPartTire* const tire, DriveTrainTire* const parent)
 	:DriveTrainTire(tire, parent)
 {
-	SetDifferentialJacobian(0.0f);
+	m_J01 = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	m_J10 = dVector(-parent->m_tire->m_data.m_radio / tire->m_data.m_radio, 0.0f, 0.0f, 0.0f);
+	SetInvMassJt();
 }
 
 void CustomVehicleController::EngineController::DriveTrainSlaveTire::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high)
 {
-	dAssert (0);
+	const dFloat k = 0.5f / timestep;
+	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
+	dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
+
+	torqueAccel = (dAbs(torqueAccel) < 1.0e-8f) ? 0.0f : torqueAccel;
+	relativeOmega = (dAbs(relativeOmega) < 1.0e-8f) ? 0.0f : relativeOmega;
+	rightSide[m_index] = -(torqueAccel + k * relativeOmega);
+
+	low[m_index] = -D_LCP_MAX_VALUE;
+	high[m_index] = D_LCP_MAX_VALUE;
+}
+
+void CustomVehicleController::EngineController::DriveTrainSlaveTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
+{
+	dTrace (("here I am xxxxxxxxx"));
+	DriveTrainTire::ApplyInternalTorque(controller, timestep, lambda);
 }
 
 CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, const Info& info, const Differential& differential)
