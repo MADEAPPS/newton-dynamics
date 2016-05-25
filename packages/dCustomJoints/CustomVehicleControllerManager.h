@@ -408,6 +408,7 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void SetGearRatioJacobian(dFloat gearRatio) {};
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
 			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
+			virtual void ApplyTireTorque(EngineController* const controller) {}
 			
 			void SetInvMassJt();
 			void BuildMassMatrix (dFloat* const massMatrix);
@@ -520,7 +521,10 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void SetExternalTorque(EngineController* const controller);
 			virtual void SetPartMasses (const dVector& invInertia);
 			virtual void Integrate(EngineController* const controller, dFloat timestep) {};
+			virtual void ApplyTireTorque(EngineController* const controller);
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
+			
+			dVector m_reactionTorque;
 			BodyPartTire* m_tire;
 		};
 
@@ -528,7 +532,6 @@ class CustomVehicleController: public CustomControllerBase
 		{
 			public:
 			DriveTrainSlaveTire (BodyPartTire* const tire, DriveTrainTire* const parent);
-
 			virtual void ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda);
 			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
 		};

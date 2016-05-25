@@ -842,6 +842,7 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 	for (int i = 0; i < nodesCount; i++) {
 		DriveTrain* const node = nodeArray[i];
 		node->Integrate(controller, timestep);
+		node->ApplyTireTorque(controller);
 	}
 }
 
@@ -1047,10 +1048,13 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorqu
 
 	m_omega = matrix.UnrotateVector(omega);
 	m_torque = dVector (m_tire->m_driveTorque, 0.0f, 0.0f, 0.0f);
+	m_reactionTorque = dVector (0.0f);
 }
+
 
 void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
 {
+/*
 	dMatrix matrix;
 //dTrace (("f=%f ", lambda[m_index]));
 	dVector torque(m_J01.Scale(lambda[m_index]));
@@ -1064,6 +1068,26 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTor
 	NewtonBodyAddTorque(chassisBody, &torque[0]);
 	dVector parentTorque(m_J10.Scale(lambda[m_index]));
 	m_parent->m_torque += parentTorque;
+	DriveTrain::ApplyInternalTorque(controller, timestep, lambda);
+*/
+
+	DriveTrain::ApplyInternalTorque(controller, timestep, lambda);
+	m_reactionTorque += m_J01.Scale(lambda[m_index]);
+}
+
+
+void CustomVehicleController::EngineController::DriveTrainTire::ApplyTireTorque(EngineController* const controller)
+{	
+	dMatrix matrix;
+	NewtonBody* const tireBody = m_tire->GetBody();
+	NewtonBody* const chassisBody = controller->m_controller->GetBody();
+
+	NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
+	dVector torque (matrix.RotateVector(m_reactionTorque));
+	NewtonBodyAddTorque(tireBody, &torque[0]);
+
+	torque = torque.Scale (-0.25f);
+	NewtonBodyAddTorque(chassisBody, &torque[0]);
 }
 
 CustomVehicleController::EngineController::DriveTrainSlaveTire::DriveTrainSlaveTire (BodyPartTire* const tire, DriveTrainTire* const parent)
@@ -1073,6 +1097,14 @@ CustomVehicleController::EngineController::DriveTrainSlaveTire::DriveTrainSlaveT
 	m_J10 = dVector(-parent->m_tire->m_data.m_radio / tire->m_data.m_radio, 0.0f, 0.0f, 0.0f);
 	SetInvMassJt();
 }
+
+void CustomVehicleController::EngineController::DriveTrainSlaveTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
+{
+	dAssert (m_parent->CastAsTire());
+	DriveTrainTire::ApplyInternalTorque(controller, timestep, lambda);
+	m_parent->CastAsTire()->m_reactionTorque += m_J10.Scale(lambda[m_index]);
+}
+
 
 void CustomVehicleController::EngineController::DriveTrainSlaveTire::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high)
 {
@@ -1088,11 +1120,6 @@ void CustomVehicleController::EngineController::DriveTrainSlaveTire::CalculateRi
 	high[m_index] = D_LCP_MAX_VALUE;
 }
 
-void CustomVehicleController::EngineController::DriveTrainSlaveTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
-{
-	dTrace (("here I am xxxxxxxxx"));
-	DriveTrainTire::ApplyInternalTorque(controller, timestep, lambda);
-}
 
 CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, const Info& info, const Differential& differential)
 	:Controller(controller)
