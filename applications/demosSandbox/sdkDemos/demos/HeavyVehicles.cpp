@@ -166,7 +166,7 @@ static VehicleParameters m1a1Param =
 	1.2f,									// SUSPENSION_LENGTH
 	350.0f,									// SUSPENSION_SPRING
 	20.0f,									// SUSPENSION_DAMPER
-	0.15f,									// TIRE_PIVOT_OFFSET_Y
+	0.10f,									// TIRE_PIVOT_OFFSET_Y
 	CustomVehicleController::BodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
 	(5000.0f * DEMO_GRAVITY * 10.0f),		// LATERAL_STIFFNESS
 	(5000.0f * DEMO_GRAVITY *  2.0f),		// LONGITUDINAL_STIFFNESS
