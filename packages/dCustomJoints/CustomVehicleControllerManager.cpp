@@ -1046,6 +1046,7 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorqu
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 
 	m_omega = matrix.UnrotateVector(omega);
+	m_omega = dVector (m_omega.m_x, 0.0f, 0.0f, 0.0f);
 	m_torque = dVector (m_tire->m_driveTorque, 0.0f, 0.0f, 0.0f);
 	m_reactionTorque = dVector (0.0f);
 }
@@ -1053,27 +1054,9 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorqu
 
 void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
 {
-/*
-	dMatrix matrix;
-//dTrace (("f=%f ", lambda[m_index]));
-	dVector torque(m_J01.Scale(lambda[m_index]));
-	NewtonBody* const tireBody = m_tire->GetBody();
-	NewtonBody* const chassisBody = m_tire->GetParent()->GetBody();
-	NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
-	torque = matrix.RotateVector(torque);
-	NewtonBodyAddTorque(tireBody, &torque[0]);
-
-	torque = torque.Scale (-0.25f);
-	NewtonBodyAddTorque(chassisBody, &torque[0]);
-	dVector parentTorque(m_J10.Scale(lambda[m_index]));
-	m_parent->m_torque += parentTorque;
-	DriveTrain::ApplyInternalTorque(controller, timestep, lambda);
-*/
-
 	DriveTrain::ApplyInternalTorque(controller, timestep, lambda);
 	m_reactionTorque += m_J01.Scale(lambda[m_index]);
 }
-
 
 void CustomVehicleController::EngineController::DriveTrainTire::ApplyTireTorque(EngineController* const controller)
 {	
