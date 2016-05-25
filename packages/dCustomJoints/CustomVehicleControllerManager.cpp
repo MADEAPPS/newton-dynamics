@@ -1736,7 +1736,7 @@ void CustomVehicleController::Init(NewtonCollision* const chassisShape, const dM
 	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
 
 	// set vehicle mass, inertia and center of mass
-mass = 0;
+//mass = 0;
 	NewtonBodySetMassProperties(body, mass, chassisShape);
 
 	// initialize 
