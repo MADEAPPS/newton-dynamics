@@ -2320,7 +2320,10 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 	tire->m_driveTorque = 0.0f;
 
 	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+		const dVector& lateralPin = tireMatrix.m_front;
 		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+		NewtonMaterialContactRotateTangentDirections(material, &lateralPin[0]);
+
 		if (NewtonMaterialGetContactPenetration (material) > 0.0f) {
 			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
@@ -2328,7 +2331,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			dVector contactPoint(0.0f);
 			dVector contactNormal(0.0f);
 			NewtonMaterialGetContactPositionAndNormal(material, tireBody, &contactPoint[0], &contactNormal[0]);
-			const dVector& lateralPin = tireMatrix.m_front;
+			
 			dVector tireAnglePin(contactNormal * lateralPin);
 			dFloat pinMag2 = tireAnglePin % tireAnglePin;
 			if (pinMag2 > 0.25f) {
@@ -2340,7 +2343,6 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 				dVector lateralContactDir(0.0f);
 				dVector longitudinalContactDir(0.0f);
-				NewtonMaterialContactRotateTangentDirections(material, &lateralPin[0]);
 				NewtonMaterialGetContactTangentDirections(material, tireBody, &lateralContactDir[0], &longitudinalContactDir[0]);
 
 				//dFloat tireOriginLateralSpeed = tireVeloc % lateralPin;
