@@ -250,7 +250,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	
 	m_defualtBodyGroupID = CreateBodyGroupID();
 	m_genericLRUMark = 0;
-	m_saveSubsteps = 1;
 
 	m_useParallelSolver = 0;
 
@@ -937,7 +936,7 @@ void dgWorld::FlushCache()
 }
 
 
-void dgWorld::StepDynamics (dgFloat32 timestep, dgInt32 substeps)
+void dgWorld::StepDynamics (dgFloat32 timestep)
 {
 
 //static int xxx ;
@@ -949,27 +948,23 @@ void dgWorld::StepDynamics (dgFloat32 timestep, dgInt32 substeps)
 	//xxxxx();
 	//SerializeToFile ("xxx.bin");
 
+	dTimeTrackerEvent(__FUNCTION__);
 	dgAssert (m_inUpdate == 0);
+	dgAssert (GetThreadCount() >= 1);
+
 	m_inUpdate ++;
-	substeps = dgClamp (substeps, 1, 8);
-	timestep /= substeps;
 
-	for(dgInt32 i = 0; i < substeps; i ++) {
-		dTimeTrackerEvent(__FUNCTION__);
+	m_broadPhase->UpdateContacts (timestep);
+	UpdateDynamics (timestep);
 
-		dgAssert (GetThreadCount() >= 1);
-
-		m_broadPhase->UpdateContacts (timestep);
-		UpdateDynamics (timestep);
-
-		if (m_postListener.GetCount()) {
-			dTimeTrackerEvent("postListeners");
-			for (dgListenerList::dgListNode* node = m_postListener.GetFirst(); node; node = node->GetNext()) {
-				dgListener& listener = node->GetInfo();
-				listener.m_onListenerUpdate (this, listener.m_userData, timestep);
-			}
+	if (m_postListener.GetCount()) {
+		dTimeTrackerEvent("postListeners");
+		for (dgListenerList::dgListNode* node = m_postListener.GetFirst(); node; node = node->GetNext()) {
+			dgListener& listener = node->GetInfo();
+			listener.m_onListenerUpdate (this, listener.m_userData, timestep);
 		}
 	}
+
 	m_inUpdate --;
 }
 
@@ -999,9 +994,9 @@ void dgWorld::Execute (dgInt32 threadID)
 void dgWorld::TickCallback (dgInt32 threadID)
 {
 	if (threadID == DG_MUTEX_THREAD_ID) {
-		StepDynamics (m_savetimestep, m_saveSubsteps);
+		StepDynamics (m_savetimestep);
 	} else {
-		Update (m_savetimestep, m_saveSubsteps);
+		Update (m_savetimestep);
 	}
 }
 
@@ -1014,17 +1009,16 @@ void dgWorld::Sync ()
 }
 
 
-void dgWorld::Update (dgFloat32 timestep, dgInt32 substeps)
+void dgWorld::Update (dgFloat32 timestep)
 {
 	m_savetimestep = timestep;
-	m_saveSubsteps = substeps;
 
 	#ifdef DG_USE_THREAD_EMULATION
 		dgFloatExceptions exception;
 		dgSetPrecisionDouble precision;
 
 		// run update in same thread as the calling application as if it was a separate thread  
-		StepDynamics (m_savetimestep, m_saveSubsteps);
+		StepDynamics (m_savetimestep);
 	#else 
 		// runs the update in a separate thread and wait until the update is completed before it returns.
 		// this will run well on single core systems, since the two thread are mutually exclusive 
@@ -1033,13 +1027,12 @@ void dgWorld::Update (dgFloat32 timestep, dgInt32 substeps)
 }
 
 
-void dgWorld::UpdateAsync (dgFloat32 timestep, dgInt32 substeps)
+void dgWorld::UpdateAsync (dgFloat32 timestep)
 {
 	m_savetimestep = timestep;
-	m_saveSubsteps = substeps;
 
 	#ifdef DG_USE_THREAD_EMULATION
-		StepDynamics (m_savetimestep, m_saveSubsteps);
+		StepDynamics (m_savetimestep);
 	#else 
 		// execute one update, but do not wait for the update to finish, instead return immediately to the caller
 		dgAsyncThread::Tick();

@@ -64,8 +64,8 @@ class Newton:
 	void DestroyBody(dgBody* const body);
 	void DestroyJoint(dgConstraint* const joint);
 
-	void UpdatePhysics (dgFloat32 timestep, dgInt32 substeps);
-	void UpdatePhysicsAsync (dgFloat32 timestep, dgInt32 substeps);
+	void UpdatePhysics (dgFloat32 timestep);
+	void UpdatePhysicsAsync (dgFloat32 timestep);
 	static void* DefaultAllocMemory (dgInt32 size);
 	static void DefaultFreeMemory (void* const ptr, dgInt32 size);
 

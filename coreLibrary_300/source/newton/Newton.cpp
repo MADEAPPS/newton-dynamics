@@ -688,7 +688,7 @@ unsigned NewtonReadThreadPerformanceTicks (const NewtonWorld* newtonWorld, unsig
 // Return: This function call NewtonCollisionUpdate at the lower level to get the colliding contacts.
 //
 // See also: NewtonInvalidateCache, NewtonCollisionUpdate
-void NewtonUpdate(const NewtonWorld* const newtonWorld, dFloat timestep, int substeps)
+void NewtonUpdate(const NewtonWorld* const newtonWorld, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
@@ -699,11 +699,11 @@ void NewtonUpdate(const NewtonWorld* const newtonWorld, dFloat timestep, int sub
 	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
 
 //NewtonSerializeToFile (newtonWorld, "xxx.bin", NULL, NULL);
-	world->UpdatePhysics (timestep, substeps);
+	world->UpdatePhysics (timestep);
 }
 
 
-void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep, int substeps)
+void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
@@ -712,7 +712,7 @@ void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep, i
 	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
 
 	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
-	world->UpdatePhysicsAsync(timestep, substeps);
+	world->UpdatePhysicsAsync(timestep);
 }
 
 

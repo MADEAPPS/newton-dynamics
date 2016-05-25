@@ -32,8 +32,7 @@
 	#include "CocoaOpenglGlue.h"
 #endif
 
-#define MAX_PHYSICS_FPS				60.0f
-#define MAX_SUB_STEPS				2
+#define MAX_PHYSICS_FPS				120.0f
 
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
@@ -697,9 +696,9 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 
 					// update the physics world
 					if (!m_mainWindow->m_physicsUpdateMode) {
-						NewtonUpdate (m_world, timestepInSecunds, MAX_SUB_STEPS);
+						NewtonUpdate (m_world, timestepInSecunds);
 					} else {
-						NewtonUpdateAsync(m_world, timestepInSecunds, MAX_SUB_STEPS);
+						NewtonUpdateAsync(m_world, timestepInSecunds);
 					}
 				}
 				m_reEntrantUpdate = false;
