@@ -858,6 +858,13 @@ CustomVehicleController::EngineController::DriveTrainEngine2W::DriveTrainEngine2
 	SetGearRatioJacobian(1.0f);
 }
 
+CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEngineTracked (const dVector& invInertia, const DifferentialTracked& axel)
+	:DriveTrainEngine2W(invInertia, axel.m_axel)
+{
+
+
+}
+
 CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:DriveTrainEngine(invInertia)
 {
@@ -1079,7 +1086,8 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 		}
 
 		case Differential::m_track:
-			m_engine = new DriveTrainEngine2W(dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), differential.m_axel);
+			const DifferentialTracked& diff = (DifferentialTracked&) differential;
+			m_engine = new DriveTrainEngineTracked(dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), diff);
 			break;
 
 	}

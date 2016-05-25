@@ -327,6 +327,25 @@ class CustomVehicleController: public CustomControllerBase
 			Differential4wd m_secund4Wd;
 		};
 
+		class DifferentialTracked: public Differential
+		{
+			public:
+			DifferentialTracked(int tiresCount, BodyPartTire** const leftTrack, BodyPartTire** const rightTrack)
+				:Differential()
+				,m_leftTrack(leftTrack)
+				,m_rightTrack(rightTrack)
+				,m_count (tiresCount)
+			{
+				m_type = m_track;
+				m_axel.m_leftTire = leftTrack[0];
+				m_axel.m_rightTire = rightTrack[0];
+			}
+
+			BodyPartTire** m_leftTrack;
+			BodyPartTire** m_rightTrack;
+			int m_count;
+		};
+
 		class Info
 		{
 			public:
@@ -463,6 +482,13 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DriveTrainEngine8W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1, const DifferentialAxel& axel2, const DifferentialAxel& axel3);
 		};
+
+		class DriveTrainEngineTracked: public DriveTrainEngine2W
+		{
+			public:
+			DriveTrainEngineTracked (const dVector& invInertia, const DifferentialTracked& axel);
+		};
+
 
 		class DriveTrainDifferentialGear: public DriveTrain
 		{

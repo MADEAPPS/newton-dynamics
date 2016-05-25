@@ -1124,9 +1124,6 @@ class HeavyVehicleEntity: public DemoEntity
 			rightTire[i] = AddTire(name, width, radius, definition.STEER_ANGLE, definition);	
 		}
 
-//		m_controller->LinksTiresKinematically(8, leftTire);
-//		m_controller->LinksTiresKinematically(8, rightTire);
-
 		// add vehicle brakes
 		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController(m_controller, definition.BRAKE_TORQUE);
 		brakes->AddTire(leftTire[0]);
@@ -1138,40 +1135,6 @@ class HeavyVehicleEntity: public DemoEntity
 		brakes->AddTire(leftTire[0]);
 		brakes->AddTire(rightTire[0]);
 		m_controller->SetSteering(steering);
-/*
-		// add an engine
-		// make the differential
-		CustomVehicleControllerComponentEngine::dTracksSkidDifferential* const differencial = new CustomVehicleControllerComponentEngine::dTracksSkidDifferential(m_controller, leftTire[0], rightTire[0]);
-
-		// make the gear Box
-		dFloat fowardSpeedGearsBoxRatios[] = { parameters.GEAR_1, parameters.GEAR_1, parameters.GEAR_3 };
-		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, parameters.REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios);
-		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine(m_controller, gearBox, differencial);
-
-		// the the default transmission type
-		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
-
-		m_controller->SetEngine(engine);
-
-
-		dFloat viperIdleRPM = parameters.IDLE_TORQUE_RPM;
-		dFloat viperIdleTorquePoundPerFoot = parameters.IDLE_TORQUE;
-
-		dFloat viperPeakTorqueRPM = parameters.PEAK_TORQUE_RPM;
-		dFloat viperPeakTorquePoundPerFoot = parameters.PEAK_TORQUE;
-
-		dFloat viperPeakHorsePowerRPM = parameters.PEAK_HP_RPM;
-		dFloat viperPeakHorsePower = parameters.PEAK_HP;
-
-		dFloat viperRedLineRPM = parameters.REDLINE_RPM;
-		dFloat viperRedLineTorquePoundPerFoot = parameters.REDLINE_TORQUE;
-
-		dFloat vehicleTopSpeedKPH = parameters.VEHICLE_TOP_SPEED_KMH;
-		engine->InitEngineTorqueCurve(vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
-
-		// set up the tank Track
-		SetTracks(leftTire[0], rightTire[0]);
-*/
 
 		CustomVehicleController::EngineController::Info engineInfo;
 		engineInfo.m_mass = definition.ENGINE_MASS;
@@ -1196,16 +1159,7 @@ class HeavyVehicleEntity: public DemoEntity
 		engineInfo.m_gearRatios[2] = definition.GEAR_3;
 		engineInfo.m_reverseGearRatio = definition.REVERSE_GEAR;
 
-		CustomVehicleController::EngineController::Differential8wd differential;
-		differential.m_type = CustomVehicleController::EngineController::Differential::m_track;
-		differential.m_axel.m_leftTire = leftTire[0];
-		differential.m_axel.m_rightTire = rightTire[0];
-		differential.m_secundAxel.m_axel.m_leftTire = leftTire[1];
-		differential.m_secundAxel.m_axel.m_rightTire = rightTire[1];
-		differential.m_secund4Wd.m_axel.m_leftTire = leftTire[2];
-		differential.m_secund4Wd.m_axel.m_rightTire = rightTire[2];
-		differential.m_secund4Wd.m_secundAxel.m_axel.m_leftTire = leftTire[3];
-		differential.m_secund4Wd.m_secundAxel.m_axel.m_rightTire = rightTire[3];
+		CustomVehicleController::EngineController::DifferentialTracked differential (8, leftTire, rightTire);
 
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
