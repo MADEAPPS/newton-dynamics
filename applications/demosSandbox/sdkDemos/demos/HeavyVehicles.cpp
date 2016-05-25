@@ -1158,8 +1158,8 @@ class HeavyVehicleEntity: public DemoEntity
 		engineInfo.m_gearRatios[2] = definition.GEAR_3;
 		engineInfo.m_reverseGearRatio = definition.REVERSE_GEAR;
 
-		//CustomVehicleController::EngineController::DifferentialTracked differential (8, leftTire, rightTire);
-		CustomVehicleController::EngineController::DifferentialTracked differential (2, leftTire, rightTire);
+		CustomVehicleController::EngineController::DifferentialTracked differential (8, leftTire, rightTire);
+		//CustomVehicleController::EngineController::DifferentialTracked differential (2, leftTire, rightTire);
 
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
@@ -1607,6 +1607,7 @@ for (int i = 0; i < 5; i ++){
 */
 	
 	dMatrix camMatrix (manager->m_player->GetNextMatrix());
+	camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
 	//scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 

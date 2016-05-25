@@ -870,7 +870,7 @@ CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEn
 		node->m_sibling = tire0->m_child;
 		tire0->m_child = node;
 	}
-/*
+
 	DriveTrainTire* const tire1 = m_child->m_child->m_sibling->CastAsTire();
 	dAssert (tire1);
 	dAssert (tire1->m_tire == axel.m_rightTrack[0]);
@@ -879,7 +879,6 @@ CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEn
 		node->m_sibling = tire1->m_child;
 		tire1->m_child = node;
 	}
-*/
 }
 
 CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
@@ -1108,7 +1107,7 @@ void CustomVehicleController::EngineController::DriveTrainSlaveTire::ApplyIntern
 
 void CustomVehicleController::EngineController::DriveTrainSlaveTire::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high)
 {
-	const dFloat k = 0.5f / timestep;
+	const dFloat k = 1.0f / timestep;
 	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
 	dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
 
@@ -1737,6 +1736,7 @@ void CustomVehicleController::Init(NewtonCollision* const chassisShape, const dM
 	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
 
 	// set vehicle mass, inertia and center of mass
+mass = 0;
 	NewtonBodySetMassProperties(body, mass, chassisShape);
 
 	// initialize 
