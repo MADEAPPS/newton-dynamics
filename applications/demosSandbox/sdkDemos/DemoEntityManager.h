@@ -152,7 +152,6 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	
 	DemoEntity* m_sky;
 	unsigned64 m_microsecunds;
-	dFloat m_physicsTime;
 	dFloat m_currentListenerTimestep;
 	bool m_physicsUpdate;
 	bool m_reEntrantUpdate;

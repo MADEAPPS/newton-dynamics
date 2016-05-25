@@ -88,7 +88,6 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,m_world(NULL)
 	,m_sky(NULL)
 	,m_microsecunds(0)
-	,m_physicsTime(0.0f)
 	,m_currentListenerTimestep(0.0f)
 	,m_physicsUpdate(true) 
 	,m_reEntrantUpdate (false)
@@ -99,7 +98,6 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,m_cameraManager(NULL)
     ,m_tranparentHeap()
 //	,m_visualDebugger(NULL)
-
 	,m_mainThreadGraphicsTime(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)
 {
@@ -609,7 +607,7 @@ void DemoEntityManager::LoadScene (const char* const fileName)
 
 dFloat DemoEntityManager::GetPhysicsTime()
 {
-	return m_physicsTime;
+	return m_mainThreadPhysicsTime;
 }
 
 
@@ -684,8 +682,11 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 			nextTime = currentTime - m_microsecunds;
 		}
 
-		while (nextTime >= timestepMicrosecunds) {
-			
+		//while (nextTime >= timestepMicrosecunds) 
+		if (nextTime >= timestepMicrosecunds) 
+		{
+			unsigned64 time0 = dGetTimeInMicrosenconds ();
+
 			dTimeTrackerEvent(__FUNCTION__);
 			// run the newton update function
 			if (!m_reEntrantUpdate) {
@@ -703,9 +704,11 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 				}
 				m_reEntrantUpdate = false;
 			}
-
 			nextTime -= timestepMicrosecunds;
 			m_microsecunds += timestepMicrosecunds;
+
+			unsigned64 time1 = dGetTimeInMicrosenconds ();
+			m_mainThreadPhysicsTime = dFloat ((time1 - time0) / 1000000.0f);
 		}
 	}
 }
@@ -777,10 +780,7 @@ void DemoEntityManager::RenderFrame ()
 	m_mainWindow->CalculateFPS(timestep);
 
 	// update the the state of all bodies in the scene
-	unsigned64 time0 = dGetTimeInMicrosenconds ();
 	UpdatePhysics(timestep);
-	unsigned64 time1 = dGetTimeInMicrosenconds ();
-	m_mainThreadPhysicsTime = dFloat ((time1 - time0) / 1000.0f);
 
 	// Get the interpolated location of each body in the scene
 	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
