@@ -192,7 +192,7 @@ class HeavyVehicleEntity: public DemoEntity
 		m_preDriveReverse,
 	};
 
-/*
+
 	class TrackSystem
 	{
 		public:
@@ -227,9 +227,11 @@ class HeavyVehicleEntity: public DemoEntity
 
 		dFloat GetTireRadius (DemoEntity* const tire) const
 		{
-			for (CustomVehicleControllerBodyStateTire* tireNode = m_vehicle->m_controller->GetFirstTire (); tireNode; tireNode = m_vehicle->m_controller->GetNextTire(tireNode)) {
-				if (tireNode->GetUserData() == tire) {
-					return tireNode->GetTireRadio();
+			//for (dList<BodyPartTire>::dListNode* tireNode = m_vehicle->m_controller->GetFirstTire (); tireNode; tireNode = m_vehicle->m_controller->GetNextTire(tireNode)) {
+			for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_vehicle->m_controller->GetFirstTire(); node; node = m_vehicle->m_controller->GetNextTire(node)) {
+				const CustomVehicleController::BodyPartTire* const part = &node->GetInfo();
+				if (part->GetUserData() == tire) {
+					return part->GetInfo().m_radio;
 				}
 			}
 			dAssert (0);
@@ -344,7 +346,7 @@ class HeavyVehicleEntity: public DemoEntity
 			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
 		}
 
-		void Init (HeavyVehicleEntity* const me, const char* const name, CustomVehicleControllerBodyStateTire* const tire)
+		void Init (HeavyVehicleEntity* const me, const char* const name, CustomVehicleController::BodyPartTire* const tire)
 		{
 			m_vehicle = me;
 			m_tire = tire;
@@ -417,8 +419,8 @@ class HeavyVehicleEntity: public DemoEntity
 				}
 			}
 
-			dFloat radio = m_tire->GetTireRadio();
-			dFloat omega = m_tire->GetTireRotationSpeed();
+			dFloat radio = m_tire->GetInfo().m_radio;
+			dFloat omega = m_tire->GetRPM() / 9.55f;
 
 			dFloat step = omega * radio * timestep;
 
@@ -442,6 +444,7 @@ class HeavyVehicleEntity: public DemoEntity
 				dVector q1 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
 				dVector dir (q1 - q0);
 
+				dir.m_x = 0.0f;
 				dir = dir.Scale (1.0f / dSqrt (dir % dir));
 				matrix.m_front = dVector (dir.m_z, -dir.m_y, 0.0f, 0.0f);
 				matrix.m_up = dVector (dir.m_y, dir.m_z, 0.0f, 0.0f);
@@ -460,7 +463,7 @@ class HeavyVehicleEntity: public DemoEntity
 		HeavyVehicleEntity* m_vehicle;
 		DemoEntity* m_bezierEntity;
 		DemoBezierCurve* m_bezierMesh;
-		CustomVehicleControllerBodyStateTire* m_tire;
+		CustomVehicleController::BodyPartTire* m_tire;
 		ConstantSpeedKnotInterpolant* m_intepolants;
 		DemoEntity* m_bindingTires[8];
 		DemoEntity** m_linksEntity;
@@ -473,7 +476,7 @@ class HeavyVehicleEntity: public DemoEntity
 		int m_controlPointCount;
 		int m_interpolantsCount;
 	};
-*/
+
 	class TireAligmentTransform: public UserData
 	{
 		public: 
@@ -687,7 +690,6 @@ class HeavyVehicleEntity: public DemoEntity
 		CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
 		steering->AddSteeringTire (leftTire[0]);
 		steering->AddSteeringTire (rightTire[0]);
-		//steering->CalculateAkermanParameters (leftRearTire, rightRearTire, leftFrontTire, rightFrontTire);
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
@@ -736,11 +738,6 @@ class HeavyVehicleEntity: public DemoEntity
 		m_controller->Finalize();
 	}
 
-	void SetTracks (CustomVehicleControllerBodyStateTire* const leftTire, CustomVehicleControllerBodyStateTire* const rightTire)
-	{
-		m_leftTrack.Init(this, "leftTrackPath", leftTire);
-		m_rightTrack.Init(this, "rightTrackPath", rightTire);
-	}
 
 
 	void ApplyNPCControl ()
@@ -836,10 +833,6 @@ class HeavyVehicleEntity: public DemoEntity
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
 		//CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 
-		if (!engine) {
-			return;
-		}
-
 		//int gear = engine->GetGear();
 		int engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
 		int engineDifferentialLock = m_engineDifferentialLock.UpdatePushButton(mainWindow, 'L');
@@ -898,10 +891,12 @@ class HeavyVehicleEntity: public DemoEntity
 	#endif
 #endif
 
-		engine->SetDifferentialLock (engineDifferentialLock ? true : false);
-		if (steering) {
-			steering->SetParam(steeringVal);
+		if (!(steering && engine)) {
+			return;
 		}
+
+		engine->SetDifferentialLock (engineDifferentialLock ? true : false);
+		steering->SetParam(steeringVal);
 		switch (m_drivingState) 
 		{
 			case m_engineOff:
@@ -1047,7 +1042,6 @@ class HeavyVehicleEntity: public DemoEntity
 			steering->AddTire(leftTire[i]);
 			steering->AddTire(rightTire[i]);
 		}
-		//steering->CalculateAkermanParameters (leftRearTire, rightRearTire, leftFrontTire, rightFrontTire);
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
@@ -1138,13 +1132,13 @@ class HeavyVehicleEntity: public DemoEntity
 		brakes->AddTire(leftTire[0]);
 		brakes->AddTire(rightTire[0]);
 		m_controller->SetBrakes(brakes);
-/*
-		// add a tank skid steering engine
-		CustomVehicleControllerComponentTrackSkidSteering* const steering = new CustomVehicleControllerComponentTrackSkidSteering(m_controller, 1.0f, 10.0f * parameters.IDLE_TORQUE);
-		steering->AddSteeringTire(leftTire[0]);
-		steering->AddSteeringTire(rightTire[0]);
-		m_controller->SetSteering(steering);
 
+		// add a tank skid steering engine
+		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController(m_controller);
+		brakes->AddTire(leftTire[0]);
+		brakes->AddTire(rightTire[0]);
+		m_controller->SetSteering(steering);
+/*
 		// add an engine
 		// make the differential
 		CustomVehicleControllerComponentEngine::dTracksSkidDifferential* const differencial = new CustomVehicleControllerComponentEngine::dTracksSkidDifferential(m_controller, leftTire[0], rightTire[0]);
@@ -1203,7 +1197,7 @@ class HeavyVehicleEntity: public DemoEntity
 		engineInfo.m_reverseGearRatio = definition.REVERSE_GEAR;
 
 		CustomVehicleController::EngineController::Differential8wd differential;
-		differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
+		differential.m_type = CustomVehicleController::EngineController::Differential::m_track;
 		differential.m_axel.m_leftTire = leftTire[0];
 		differential.m_axel.m_rightTire = rightTire[0];
 		differential.m_secundAxel.m_axel.m_leftTire = leftTire[1];
@@ -1223,10 +1217,18 @@ class HeavyVehicleEntity: public DemoEntity
 
 		m_controller->SetEngine(engineControl);
 
+		// set up the tank Track
+		SetTracks(leftTire[0], rightTire[0]);
 
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
+	}
+
+	void SetTracks(CustomVehicleController::BodyPartTire* const leftTire, CustomVehicleController::BodyPartTire* const rightTire)
+	{
+		m_leftTrack.Init(this, "leftTrackPath", leftTire);
+		m_rightTrack.Init(this, "rightTrackPath", rightTire);
 	}
 
 
@@ -1242,14 +1244,14 @@ class HeavyVehicleEntity: public DemoEntity
 			}
 		}
 
-//		if (m_leftTrack.m_bezierEntity) {
-//			m_leftTrack.InterpolateMatrix(world, param);
-//			m_rightTrack.InterpolateMatrix(world, param);
-//		}
+		if (m_leftTrack.m_bezierEntity) {
+			m_leftTrack.InterpolateMatrix(world, param);
+			m_rightTrack.InterpolateMatrix(world, param);
+		}
 	}
 
 
-	void UpdateTireTransforms()
+	void UpdateTireTransforms(dFloat timestep)
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
@@ -1275,14 +1277,14 @@ class HeavyVehicleEntity: public DemoEntity
 		}
 
 		// update the thread location
-//		if (m_leftTrack.m_bezierEntity) {
-//			m_leftTrack.AnimateThread(*scene, timestep);
-//			m_rightTrack.AnimateThread(*scene, timestep);
-//		}
+		if (m_leftTrack.m_bezierEntity) {
+			m_leftTrack.AnimateThread(*scene, timestep);
+			m_rightTrack.AnimateThread(*scene, timestep);
+		}
 	}
 
-//	TrackSystem m_leftTrack;
-//	TrackSystem m_rightTrack;
+	TrackSystem m_leftTrack;
+	TrackSystem m_rightTrack;
 	CustomVehicleController* m_controller;
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;
@@ -1573,7 +1575,7 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 			CustomVehicleController* const controller = &node->GetInfo();
 			HeavyVehicleEntity* const vehicleEntity = (HeavyVehicleEntity*)NewtonBodyGetUserData(controller->GetBody());
-			vehicleEntity->UpdateTireTransforms();
+			vehicleEntity->UpdateTireTransforms(timestep);
 		}
 
 		UpdateCamera(timestep);

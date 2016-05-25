@@ -1077,6 +1077,11 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			m_engine = new DriveTrainEngine8W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), diff.m_axel, diff.m_secundAxel.m_axel, diff.m_secund4Wd.m_axel, diff.m_secund4Wd.m_secundAxel.m_axel);
 			break;
 		}
+
+		case Differential::m_track:
+			m_engine = new DriveTrainEngine2W(dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), differential.m_axel);
+			break;
+
 	}
 	SetInfo(info);
 

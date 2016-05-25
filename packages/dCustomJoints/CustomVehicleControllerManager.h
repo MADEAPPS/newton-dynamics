@@ -287,6 +287,7 @@ class CustomVehicleController: public CustomControllerBase
 				m_2wd,
 				m_4wd,
 				m_8wd,
+				m_track,
 			};
 
 			Differential()
