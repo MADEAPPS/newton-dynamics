@@ -296,13 +296,13 @@ void dNewton::SetNumberOfThreads(int threadCount)
 }
 
 
-void dNewton::UpdateOffLine (dFloat timestepInSecunds)
+void dNewton::UpdateOffLine (dFloat timestepInSecunds, int subSteps)
 {
-	NewtonUpdate (m_world, timestepInSecunds);
+	NewtonUpdate (m_world, timestepInSecunds, subSteps);
 	m_microseconds += GetTimeInMicrosenconds ();
 }
 
-void dNewton::Update (dFloat timestepInSecunds)
+void dNewton::Update (dFloat timestepInSecunds, int subSteps)
 {
 	dLong timestepMicrosecunds = (dLong) (double (timestepInSecunds) * 1000000.0f);
 	dLong currentTime = GetTimeInMicrosenconds ();
@@ -311,13 +311,13 @@ void dNewton::Update (dFloat timestepInSecunds)
 	int loops = 0;
 	while ((nextTime >= timestepMicrosecunds) && (loops < m_maxUpdatePerIterations)) {
 		loops ++;
-		NewtonUpdate (m_world, timestepInSecunds);
+		NewtonUpdate (m_world, timestepInSecunds, subSteps);
 		nextTime -= timestepMicrosecunds;
 		m_microseconds += timestepMicrosecunds;
 	}
 }
 
-void dNewton::UpdateAsync (dFloat timestepInSecunds)
+void dNewton::UpdateAsync (dFloat timestepInSecunds, int subSteps)
 {
 	dLong timestepMicrosecunds = (dLong) (double (timestepInSecunds) * 1000000.0f);
 	dLong currentTime = GetTimeInMicrosenconds ();
@@ -326,7 +326,7 @@ void dNewton::UpdateAsync (dFloat timestepInSecunds)
 	int loops = 0;
 	while ((nextTime >= timestepMicrosecunds) && (loops < m_maxUpdatePerIterations)) {
 		loops ++;
-		NewtonUpdateAsync (m_world, timestepInSecunds);
+		NewtonUpdateAsync (m_world, timestepInSecunds, subSteps);
 		nextTime -= timestepMicrosecunds;
 		m_microseconds += timestepMicrosecunds;
 	}

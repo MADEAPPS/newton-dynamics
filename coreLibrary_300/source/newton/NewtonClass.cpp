@@ -97,9 +97,9 @@ Newton::~Newton ()
 	}
 }
 
-void Newton::UpdatePhysics (dgFloat32 timestep)
+void Newton::UpdatePhysics (dgFloat32 timestep, dgInt32 substeps)
 {
-	Update (timestep);
+	Update (timestep, substeps);
 
 	NewtonDeadBodies& bodyList = *this;
 	NewtonDeadJoints& jointList = *this;
@@ -108,9 +108,9 @@ void Newton::UpdatePhysics (dgFloat32 timestep)
 	bodyList.DestroyBodies (*this);
 }
 
-void Newton::UpdatePhysicsAsync (dgFloat32 timestep)
+void Newton::UpdatePhysicsAsync (dgFloat32 timestep, dgInt32 substeps)
 {
-	UpdateAsync (timestep);
+	UpdateAsync (timestep, substeps);
 
 	if (!IsBusy()) {		
 		NewtonDeadBodies& bodyList = *this;

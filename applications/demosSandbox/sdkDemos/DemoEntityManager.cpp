@@ -32,9 +32,10 @@
 	#include "CocoaOpenglGlue.h"
 #endif
 
-#define MAX_PHYSICS_LOOPS			1
-#define MAX_PHYSICS_FPS				120.0f
-//#define MAX_PHYSICS_FPS			60.0f
+#define MAX_PHYSICS_FPS				60.0f
+#define MAX_SUB_STEPS				2
+
+
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 BEGIN_EVENT_TABLE (DemoEntityManager, wxGLCanvas)
@@ -679,10 +680,12 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 
 		unsigned64 currentTime = dGetTimeInMicrosenconds ();
 		unsigned64 nextTime = currentTime - m_microsecunds;
-		int loops = 0;
+		if (nextTime > timestepMicrosecunds * 2) {
+			m_microsecunds = currentTime - timestepMicrosecunds * 2;
+			nextTime = currentTime - m_microsecunds;
+		}
 
-		while ((nextTime >= timestepMicrosecunds) && (loops < MAX_PHYSICS_LOOPS)) {
-			loops ++;
+		while (nextTime >= timestepMicrosecunds) {
 			
 			dTimeTrackerEvent(__FUNCTION__);
 			// run the newton update function
@@ -694,9 +697,9 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 
 					// update the physics world
 					if (!m_mainWindow->m_physicsUpdateMode) {
-						NewtonUpdate (m_world, timestepInSecunds);
+						NewtonUpdate (m_world, timestepInSecunds, MAX_SUB_STEPS);
 					} else {
-						NewtonUpdateAsync(m_world, timestepInSecunds);
+						NewtonUpdateAsync(m_world, timestepInSecunds, MAX_SUB_STEPS);
 					}
 				}
 				m_reEntrantUpdate = false;
@@ -704,14 +707,6 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 
 			nextTime -= timestepMicrosecunds;
 			m_microsecunds += timestepMicrosecunds;
-		}
-
-		if (loops) {
-			m_physicsTime = dFloat (dGetTimeInMicrosenconds () - currentTime) / 1000000.0f;
-
-			if (m_physicsTime >= MAX_PHYSICS_LOOPS * (1.0f / MAX_PHYSICS_FPS)) {
-				m_microsecunds = currentTime;
-			}
 		}
 	}
 }

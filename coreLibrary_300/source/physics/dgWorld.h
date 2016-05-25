@@ -207,10 +207,10 @@ class dgWorld
 	void* GetUserData() const;
 	void SetUserData (void* const userData);
 
-	void Update (dgFloat32 timestep);
-	void UpdateAsync (dgFloat32 timestep);
+	void Update (dgFloat32 timestep, dgInt32 substeps);
+	void UpdateAsync (dgFloat32 timestep, dgInt32 substeps);
 	
-	void StepDynamics (dgFloat32 timestep);
+	void StepDynamics (dgFloat32 timestep, dgInt32 substeps);
 	
 	dgInt32 Collide (const dgCollisionInstance* const collisionA, const dgMatrix& matrixA, 
 					 const dgCollisionInstance* const collisionB, const dgMatrix& matrixB, 
@@ -411,6 +411,7 @@ class dgWorld
 	dgUnsigned32 m_bodiesUniqueID;
 	dgUnsigned32 m_useParallelSolver;
 	dgUnsigned32 m_genericLRUMark;
+	dgUnsigned32 m_saveSubsteps;
 
 	dgFloat32 m_freezeAccel2;
 	dgFloat32 m_freezeAlpha2;
