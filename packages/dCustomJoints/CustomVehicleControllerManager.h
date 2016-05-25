@@ -524,6 +524,13 @@ class CustomVehicleController: public CustomControllerBase
 			BodyPartTire* m_tire;
 		};
 
+		class DriveTrainSlaveTire: public DriveTrainTire
+		{
+			DriveTrainSlaveTire (BodyPartTire* const tire, DriveTrainTire* const parent);
+
+			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
+		};
+
 		public:
 		CUSTOM_JOINTS_API EngineController(CustomVehicleController* const controller, const Info& info, const Differential& differential);
 		CUSTOM_JOINTS_API ~EngineController();

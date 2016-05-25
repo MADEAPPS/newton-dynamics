@@ -1050,6 +1050,17 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyInternalTor
 	m_parent->m_torque += parentTorque;
 }
 
+CustomVehicleController::EngineController::DriveTrainSlaveTire::DriveTrainSlaveTire (BodyPartTire* const tire, DriveTrainTire* const parent)
+	:DriveTrainTire(tire, parent)
+{
+	SetDifferentialJacobian(0.0f);
+}
+
+void CustomVehicleController::EngineController::DriveTrainSlaveTire::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high)
+{
+	dAssert (0);
+}
+
 CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, const Info& info, const Differential& differential)
 	:Controller(controller)
 	,m_info(info)
