@@ -59,6 +59,9 @@ struct VehicleParameters
 	dFloat SUSPENSION_LENGTH;
 	dFloat SUSPENSION_SPRING;
 	dFloat SUSPENSION_DAMPER;
+	dFloat TIRE_PIVOT_OFFSET_Y;
+	CustomVehicleController::BodyPartTire::Info::SuspensionType TIRE_SUSPENSION_TYPE;
+
 	dFloat LATERAL_STIFFNESS;
 	dFloat LONGITUDINAL_STIFFNESS;
 	dFloat ALIGNING_MOMENT_TRAIL;
@@ -93,6 +96,8 @@ static VehicleParameters heavyTruck =
 	   0.7f,							// SUSPENSION_LENGTH
 	 100.0f,							// SUSPENSION_SPRING
 	  10.0f,							// SUSPENSION_DAMPER
+		0.15f,							// TIRE_PIVOT_OFFSET_Y
+	  CustomVehicleController::BodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
   (5000.0f * DEMO_GRAVITY * 10.0f),		// LATERAL_STIFFNESS
   (5000.0f * DEMO_GRAVITY *  2.0f),		// LONGITUDINAL_STIFFNESS
 	   1.5f,							// ALIGNING_MOMENT_TRAIL
@@ -126,6 +131,8 @@ static VehicleParameters lightTruck =
 	0.6f,									// SUSPENSION_LENGTH
 	2000.0f,								// SUSPENSION_SPRING
 	100.0f,									// SUSPENSION_DAMPER
+	0.0,										// TIRE_PIVOT_OFFSET_Y
+	CustomVehicleController::BodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
 	20.0f,									// LATERAL_STIFFNESS
 	20000.0f,								// LONGITUDINAL_STIFFNESS
 	1.5f,									// ALIGNING_MOMENT_TRAIL
@@ -140,7 +147,7 @@ static VehicleParameters m1a1Param =
 	100.0f,									// TIRE_MASS
 	0.125f,									// ENGINE_RADIO
 	100.0f,									// TIRE_MASS
-	25.0f,									// STEER_ANGLE
+	 0.0f,									// STEER_ANGLE
 	20000.0f,								// BRAKE_TORQUE
 	-0.6f,									// COM_Y_OFFSET
 	60.0f,									// VEHICLE_TOP_SPEED_KMH
@@ -159,8 +166,10 @@ static VehicleParameters m1a1Param =
 	1.2f,									// SUSPENSION_LENGTH
 	350.0f,									// SUSPENSION_SPRING
 	20.0f,									// SUSPENSION_DAMPER
-	60.0f,									// LATERAL_STIFFNESS
-	10000.0f,								// LONGITUDINAL_STIFFNESS
+	0.15f,									// TIRE_PIVOT_OFFSET_Y
+	CustomVehicleController::BodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+	(5000.0f * DEMO_GRAVITY * 10.0f),		// LATERAL_STIFFNESS
+	(5000.0f * DEMO_GRAVITY *  2.0f),		// LONGITUDINAL_STIFFNESS
 	1.5f,									// ALIGNING_MOMENT_TRAIL
 	dRollMatrix(3.141592f * 90.0f / 180.0f),
 	0,										// WHEEL_HAS_FENDER	
@@ -606,7 +615,7 @@ class HeavyVehicleEntity: public DemoEntity
 	}
 
 
-	CustomVehicleController::BodyPartTire* AddTire(const char* const tireName, const dVector& offset, dFloat width, dFloat radius, dFloat mass, dFloat steerAngle, dFloat suspensionLength, dFloat suspensionSpring, dFloat suspensionDamper, dFloat lateralStiffness, dFloat longitudinalStiffness, dFloat aligningMomentTrail, const dMatrix& tireAligmentMatrix, int hasFender)
+	CustomVehicleController::BodyPartTire* AddTire(const char* const tireName, dFloat width, dFloat radius, dFloat maxSteerAngle, const VehicleParameters& definition) 
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
@@ -616,10 +625,9 @@ class HeavyVehicleEntity: public DemoEntity
 		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(entity));
 
 		// add the offset location
-		tireMatrix.m_posit += offset;
-
+		tireMatrix.m_posit += definition.TIRE_PIVOT_OFFSET_Y;
 		//lower the tire base position by some distance
-		tireMatrix.m_posit.m_y -= suspensionLength * 0.25f;
+		//tireMatrix.m_posit.m_y -= suspensionLength * 0.25f;
 
 		// add and alignment matrix,to match visual mesh to physics collision shape
 		dMatrix aligmentMatrix (dGetIdentityMatrix());
@@ -627,24 +635,26 @@ class HeavyVehicleEntity: public DemoEntity
 			aligmentMatrix = dYawMatrix(3.141592f);
 		}
 
-		TireAligmentTransform* const aligmentTransform = new TireAligmentTransform (tireAligmentMatrix * aligmentMatrix);
+		TireAligmentTransform* const aligmentTransform = new TireAligmentTransform (definition.m_tireAligment * aligmentMatrix);
 		tirePart->SetUserData(aligmentTransform);
 
 		// add the tire to the vehicle
 		CustomVehicleController::BodyPartTire::Info  tireInfo;
+
+		tireInfo.m_userData = tirePart;
 		tireInfo.m_location = tireMatrix.m_posit;
-		tireInfo.m_mass = mass;
+		tireInfo.m_mass = definition.TIRE_MASS;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
-		tireInfo.m_maxSteeringAngle = steerAngle * 3.1416 / 180.0f;
-		tireInfo.m_dampingRatio = suspensionDamper;
-		tireInfo.m_springStrength = suspensionSpring;
-		tireInfo.m_suspesionlenght = suspensionLength;
-		tireInfo.m_lateralStiffness = lateralStiffness;
-		tireInfo.m_longitudialStiffness = longitudinalStiffness;
-		tireInfo.m_aligningMomentTrail =  aligningMomentTrail;
-		tireInfo.m_userData = tirePart;
-		tireInfo.m_hasFender = hasFender;
+		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416 / 180.0f;
+		tireInfo.m_dampingRatio = definition.SUSPENSION_DAMPER;
+		tireInfo.m_springStrength = definition.SUSPENSION_SPRING;
+		tireInfo.m_suspesionlenght = definition.SUSPENSION_LENGTH;
+		tireInfo.m_lateralStiffness = definition.LATERAL_STIFFNESS;
+		tireInfo.m_longitudialStiffness = definition.LONGITUDINAL_STIFFNESS;
+		tireInfo.m_aligningMomentTrail = definition.ALIGNING_MOMENT_TRAIL;
+		tireInfo.m_suspentionType = definition.TIRE_SUSPENSION_TYPE;
+		tireInfo.m_hasFender = definition.WHEEL_HAS_FENDER;
 
 		return m_controller->AddTire (tireInfo);
 	}
@@ -730,81 +740,6 @@ class HeavyVehicleEntity: public DemoEntity
 	{
 		m_leftTrack.Init(this, "leftTrackPath", leftTire);
 		m_rightTrack.Init(this, "rightTrackPath", rightTire);
-	}
-
-	void BuildTrackedVehicle (const VehicleParameters& parameters)
-	{
-		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (0.0f, parameters.COM_Y_OFFSET, 0.0f, 0.0f)); 
-
-		// add all the tank tires
-		dVector offset (0.0f, 0.15f, 0.0f, 0.0f);
-		CustomVehicleControllerBodyStateTire* leftTire[8]; 
-		CustomVehicleControllerBodyStateTire* rightTire[8]; 
-		for (int i = 0; i < 8; i ++) {
-			char name[32];
-			dFloat width;
-			dFloat radius;
-			sprintf (name, "l_tire%d", i);
-			CalculateTireDimensions (name, width, radius);
-			// add the tire thread thickness
-			radius += 0.1f;
-
-			leftTire[i] = AddTire (name, offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
-			sprintf (name, "r_tire%d", i);
-			rightTire[i] = AddTire (name, offset, width, radius, parameters.TIRE_MASS, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireAligment);
-		}
-
-		m_controller->LinksTiresKinematically (8, leftTire);
-		m_controller->LinksTiresKinematically (8, rightTire);
-
-		// add vehicle brakes
-		CustomVehicleControllerComponentBrake* const brakes = new CustomVehicleControllerComponentBrake (m_controller, parameters.BRAKE_TORQUE);
-		brakes->AddBrakeTire (leftTire[0]);
-		brakes->AddBrakeTire (rightTire[0]);
-		m_controller->SetBrakes(brakes);
-
-		// add a tank skid steering engine
-		CustomVehicleControllerComponentTrackSkidSteering* const steering = new CustomVehicleControllerComponentTrackSkidSteering (m_controller, 1.0f, 10.0f * parameters.IDLE_TORQUE);
-		steering->AddSteeringTire (leftTire[0]);
-		steering->AddSteeringTire (rightTire[0]);
-		m_controller->SetSteering(steering);
-
-		// add an engine
-		// make the differential
-		CustomVehicleControllerComponentEngine::dTracksSkidDifferential* const differencial = new CustomVehicleControllerComponentEngine::dTracksSkidDifferential (m_controller, leftTire[0], rightTire[0]);
-
-		// make the gear Box
-		dFloat fowardSpeedGearsBoxRatios[] = {parameters.GEAR_1, parameters.GEAR_1, parameters.GEAR_3};
-		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, parameters.REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios); 
-		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine (m_controller, gearBox, differencial);
-
-		// the the default transmission type
-		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
-
-		m_controller->SetEngine(engine);
-
-
-		dFloat viperIdleRPM = parameters.IDLE_TORQUE_RPM;
-		dFloat viperIdleTorquePoundPerFoot = parameters.IDLE_TORQUE;
-
-		dFloat viperPeakTorqueRPM = parameters.PEAK_TORQUE_RPM;
-		dFloat viperPeakTorquePoundPerFoot = parameters.PEAK_TORQUE;
-
-		dFloat viperPeakHorsePowerRPM = parameters.PEAK_HP_RPM;
-		dFloat viperPeakHorsePower = parameters.PEAK_HP;
-
-		dFloat viperRedLineRPM = parameters.REDLINE_RPM;
-		dFloat viperRedLineTorquePoundPerFoot = parameters.REDLINE_TORQUE;
-
-		dFloat vehicleTopSpeedKPH = parameters.VEHICLE_TOP_SPEED_KMH;
-		engine->InitEngineTorqueCurve (vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
-
-		// set up the tank Track
-		SetTracks (leftTire[0], rightTire[0]);
-
-		// do not forget to call finalize after all components are added or after any change is made to the vehicle
-		m_controller->Finalize();
 	}
 
 
@@ -901,6 +836,10 @@ class HeavyVehicleEntity: public DemoEntity
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
 		//CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 
+		if (!engine) {
+			return;
+		}
+
 		//int gear = engine->GetGear();
 		int engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
 		int engineDifferentialLock = m_engineDifferentialLock.UpdatePushButton(mainWindow, 'L');
@@ -960,7 +899,9 @@ class HeavyVehicleEntity: public DemoEntity
 #endif
 
 		engine->SetDifferentialLock (engineDifferentialLock ? true : false);
-		steering->SetParam(steeringVal);
+		if (steering) {
+			steering->SetParam(steeringVal);
+		}
 		switch (m_drivingState) 
 		{
 			case m_engineOff:
@@ -1086,21 +1027,19 @@ class HeavyVehicleEntity: public DemoEntity
 		dFloat radius;
 		CalculateTireDimensions("ltire_0", width, radius);
 
-		dVector offset(0.0f, 0.15f, 0.0f, 0.0f);
-
 		// add left tires
 		CustomVehicleController::BodyPartTire* leftTire[4];
-		leftTire[0] = AddTire("ltire_0", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		leftTire[1] = AddTire("ltire_1", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		leftTire[2] = AddTire("ltire_2", offset, width, radius, definition.TIRE_MASS,					0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		leftTire[3] = AddTire("ltire_3", offset, width, radius, definition.TIRE_MASS,					0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		leftTire[0] = AddTire("ltire_0", width, radius, definition.STEER_ANGLE, definition);
+		leftTire[1] = AddTire("ltire_1", width, radius, definition.STEER_ANGLE, definition);
+		leftTire[2] = AddTire("ltire_2", width, radius, 				  0.0f, definition);
+		leftTire[3] = AddTire("ltire_3", width, radius, 				  0.0f, definition);
 
 		// add right tires
 		CustomVehicleController::BodyPartTire* rightTire[4];
-		rightTire[0] = AddTire("rtire_0", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		rightTire[1] = AddTire("rtire_1", offset, width, radius, definition.TIRE_MASS, definition.STEER_ANGLE, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		rightTire[2] = AddTire("rtire_2", offset, width, radius, definition.TIRE_MASS,					 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
-		rightTire[3] = AddTire("rtire_3", offset, width, radius, definition.TIRE_MASS,					 0.0f, definition.SUSPENSION_LENGTH, definition.SUSPENSION_SPRING, definition.SUSPENSION_DAMPER, definition.LATERAL_STIFFNESS, definition.LONGITUDINAL_STIFFNESS, definition.ALIGNING_MOMENT_TRAIL, definition.m_tireAligment, definition.WHEEL_HAS_FENDER);
+		rightTire[0] = AddTire("rtire_0", width, radius, definition.STEER_ANGLE, definition);
+		rightTire[1] = AddTire("rtire_1", width, radius, definition.STEER_ANGLE, definition);
+		rightTire[2] = AddTire("rtire_2", width, radius, 				   0.0f, definition);
+		rightTire[3] = AddTire("rtire_3", width, radius, 				   0.0f, definition);
 
 		// add a steering Wheel
 		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController(m_controller);
@@ -1118,42 +1057,6 @@ class HeavyVehicleEntity: public DemoEntity
 			brakes->AddTire(rightTire[i]);
 		}
 		m_controller->SetBrakes(brakes);
-
-/*
-		// add an engine
-		// make the differential
-		CustomVehicleControllerComponentEngine::dSingleAxelDifferential* axels[4];
-		for (int i = 0; i < 4; i++) {
-			axels[i] = new CustomVehicleControllerComponentEngine::dSingleAxelDifferential(m_controller, leftTire[i], rightTire[i]);
-		}
-		CustomVehicleControllerComponentEngine::dMultiAxelDifferential* const differencial = new CustomVehicleControllerComponentEngine::dMultiAxelDifferential(m_controller, 4, axels);
-
-		// make the gear Box
-		dFloat fowardSpeedGearsBoxRatios[] = { parameters.GEAR_1, parameters.GEAR_1, parameters.GEAR_3 };
-		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, parameters.REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios);
-		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine(m_controller, gearBox, differencial);
-
-		// the the default transmission type
-		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
-
-		m_controller->SetEngine(engine);
-
-
-		dFloat viperIdleRPM = parameters.IDLE_TORQUE_RPM;
-		dFloat viperIdleTorquePoundPerFoot = parameters.IDLE_TORQUE;
-
-		dFloat viperPeakTorqueRPM = parameters.PEAK_TORQUE_RPM;
-		dFloat viperPeakTorquePoundPerFoot = parameters.PEAK_TORQUE;
-
-		dFloat viperPeakHorsePowerRPM = parameters.PEAK_HP_RPM;
-		dFloat viperPeakHorsePower = parameters.PEAK_HP;
-
-		dFloat viperRedLineRPM = parameters.REDLINE_RPM;
-		dFloat viperRedLineTorquePoundPerFoot = parameters.REDLINE_TORQUE;
-
-		dFloat vehicleTopSpeedKPH = parameters.VEHICLE_TOP_SPEED_KMH;
-		engine->InitEngineTorqueCurve(vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
-*/
 
 		// add the engine, differential and transmission 
 		CustomVehicleController::EngineController::Info engineInfo;
@@ -1199,6 +1102,128 @@ class HeavyVehicleEntity: public DemoEntity
 		engineControl->SetIgnition(true);
 
 		m_controller->SetEngine(engineControl);
+
+		// do not forget to call finalize after all components are added or after any change is made to the vehicle
+		m_controller->Finalize();
+	}
+
+
+	void BuildTrackedVehicle(const VehicleParameters& definition)
+	{
+		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
+		m_controller->SetCenterOfGravity(dVector(0.0f, definition.COM_Y_OFFSET, 0.0f, 0.0f));
+
+		// add all the tank tires
+		CustomVehicleController::BodyPartTire* leftTire[8];
+		CustomVehicleController::BodyPartTire* rightTire[8];
+		for (int i = 0; i < 8; i++) {
+			char name[32];
+			dFloat width;
+			dFloat radius;
+			sprintf(name, "l_tire%d", i);
+			CalculateTireDimensions(name, width, radius);
+			// add the tire thread thickness
+			radius += 0.1f;
+			
+			leftTire[i] = AddTire(name, width, radius, definition.STEER_ANGLE, definition);	
+			sprintf(name, "r_tire%d", i);
+			rightTire[i] = AddTire(name, width, radius, definition.STEER_ANGLE, definition);	
+		}
+
+//		m_controller->LinksTiresKinematically(8, leftTire);
+//		m_controller->LinksTiresKinematically(8, rightTire);
+
+		// add vehicle brakes
+		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController(m_controller, definition.BRAKE_TORQUE);
+		brakes->AddTire(leftTire[0]);
+		brakes->AddTire(rightTire[0]);
+		m_controller->SetBrakes(brakes);
+/*
+		// add a tank skid steering engine
+		CustomVehicleControllerComponentTrackSkidSteering* const steering = new CustomVehicleControllerComponentTrackSkidSteering(m_controller, 1.0f, 10.0f * parameters.IDLE_TORQUE);
+		steering->AddSteeringTire(leftTire[0]);
+		steering->AddSteeringTire(rightTire[0]);
+		m_controller->SetSteering(steering);
+
+		// add an engine
+		// make the differential
+		CustomVehicleControllerComponentEngine::dTracksSkidDifferential* const differencial = new CustomVehicleControllerComponentEngine::dTracksSkidDifferential(m_controller, leftTire[0], rightTire[0]);
+
+		// make the gear Box
+		dFloat fowardSpeedGearsBoxRatios[] = { parameters.GEAR_1, parameters.GEAR_1, parameters.GEAR_3 };
+		CustomVehicleControllerComponentEngine::dGearBox* const gearBox = new CustomVehicleControllerComponentEngine::dGearBox(m_controller, parameters.REVERSE_GEAR, sizeof (fowardSpeedGearsBoxRatios) / sizeof (fowardSpeedGearsBoxRatios[0]), fowardSpeedGearsBoxRatios);
+		CustomVehicleControllerComponentEngine* const engine = new CustomVehicleControllerComponentEngine(m_controller, gearBox, differencial);
+
+		// the the default transmission type
+		engine->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
+
+		m_controller->SetEngine(engine);
+
+
+		dFloat viperIdleRPM = parameters.IDLE_TORQUE_RPM;
+		dFloat viperIdleTorquePoundPerFoot = parameters.IDLE_TORQUE;
+
+		dFloat viperPeakTorqueRPM = parameters.PEAK_TORQUE_RPM;
+		dFloat viperPeakTorquePoundPerFoot = parameters.PEAK_TORQUE;
+
+		dFloat viperPeakHorsePowerRPM = parameters.PEAK_HP_RPM;
+		dFloat viperPeakHorsePower = parameters.PEAK_HP;
+
+		dFloat viperRedLineRPM = parameters.REDLINE_RPM;
+		dFloat viperRedLineTorquePoundPerFoot = parameters.REDLINE_TORQUE;
+
+		dFloat vehicleTopSpeedKPH = parameters.VEHICLE_TOP_SPEED_KMH;
+		engine->InitEngineTorqueCurve(vehicleTopSpeedKPH, viperIdleTorquePoundPerFoot, viperIdleRPM, viperPeakTorquePoundPerFoot, viperPeakTorqueRPM, viperPeakHorsePower, viperPeakHorsePowerRPM, viperRedLineTorquePoundPerFoot, viperRedLineRPM);
+
+		// set up the tank Track
+		SetTracks(leftTire[0], rightTire[0]);
+*/
+
+		CustomVehicleController::EngineController::Info engineInfo;
+		engineInfo.m_mass = definition.ENGINE_MASS;
+		engineInfo.m_radio = definition.ENGINE_RADIO;
+		engineInfo.m_vehicleTopSpeed = definition.VEHICLE_TOP_SPEED_KMH;
+		engineInfo.m_clutchFrictionTorque = definition.CLUTCH_FRICTION_TORQUE;
+
+		engineInfo.m_idleTorque = definition.IDLE_TORQUE;
+		engineInfo.m_idleTorqueRpm = definition.IDLE_TORQUE_RPM;
+
+		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
+		engineInfo.m_peakTorqueRpm = definition.PEAK_TORQUE_RPM;
+
+		engineInfo.m_peakHorsePower = definition.PEAK_HP;
+		engineInfo.m_peakHorsePowerRpm = definition.PEAK_HP_RPM;
+
+		engineInfo.m_readLineRpm = definition.REDLINE_RPM;
+
+		engineInfo.m_gearsCount = 3;
+		engineInfo.m_gearRatios[0] = definition.GEAR_1;
+		engineInfo.m_gearRatios[1] = definition.GEAR_2;
+		engineInfo.m_gearRatios[2] = definition.GEAR_3;
+		engineInfo.m_reverseGearRatio = definition.REVERSE_GEAR;
+
+		CustomVehicleController::EngineController::Differential8wd differential;
+		differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
+		differential.m_axel.m_leftTire = leftTire[0];
+		differential.m_axel.m_rightTire = rightTire[0];
+		differential.m_secundAxel.m_axel.m_leftTire = leftTire[1];
+		differential.m_secundAxel.m_axel.m_rightTire = rightTire[1];
+		differential.m_secund4Wd.m_axel.m_leftTire = leftTire[2];
+		differential.m_secund4Wd.m_axel.m_rightTire = rightTire[2];
+		differential.m_secund4Wd.m_secundAxel.m_axel.m_leftTire = leftTire[3];
+		differential.m_secund4Wd.m_secundAxel.m_axel.m_rightTire = rightTire[3];
+
+		engineInfo.m_differentialLock = 0;
+		engineInfo.m_userData = this;
+		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController(m_controller, engineInfo, differential);
+
+		// the the default transmission type
+		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
+		engineControl->SetIgnition(true);
+
+		m_controller->SetEngine(engineControl);
+
+
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
@@ -1588,9 +1613,10 @@ location.m_posit.m_z = 50.0f;
 	NewtonMaterialSetDefaultFriction(world, defaulMaterial, defaulMaterial, 0.6f, 0.5f);
 	int materialList[] = { defaulMaterial };
 	HeavyVehicleControllerManager* const manager = new HeavyVehicleControllerManager (world, 1, materialList);
-	
+/*	
 	HeavyVehicleEntity* const heavyVehicle = new HeavyVehicleEntity (scene, manager, location, "lav-25.ngd", heavyTruck);
 	heavyVehicle->BuildAllWheelDriveVehicle (heavyTruck);
+*/
 /*
 	// add a second Vehicle
 	location.m_posit.m_z += 4.0f;
@@ -1598,16 +1624,16 @@ location.m_posit.m_z = 50.0f;
 	location.m_posit.m_y += 2.0f;
 	HeavyVehicleEntity* const lightVehicle = new HeavyVehicleEntity (scene, manager, location, "buggy_.ngd", lightTruck);
 	lightVehicle->BuildLightTruckVehicle (lightTruck);
-
+*/
 	location.m_posit.m_z -= 12.0f;
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 3.0f;
 	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1_.ngd", m1a1Param);
 	m1a1Tank->BuildTrackedVehicle (m1a1Param);
-*/
+
 	// set this vehicle as the player
-//	manager->SetAsPlayer(m1a1Tank);
-	manager->SetAsPlayer(heavyVehicle);
+	manager->SetAsPlayer(m1a1Tank);
+//	manager->SetAsPlayer(heavyVehicle);
 
 //NewtonDestroyBody (m1a1Tank->m_controller->GetBody());
 //manager->DestroyController(m1a1Tank->m_controller);
@@ -1628,6 +1654,7 @@ for (int i = 0; i < 5; i ++){
 	//scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
+/*
 	location.m_posit.m_x += 20.0f;
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	int count = 5;
@@ -1645,5 +1672,6 @@ for (int i = 0; i < 5; i ++){
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
+*/
 }
 
