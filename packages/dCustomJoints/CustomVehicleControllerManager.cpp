@@ -85,10 +85,11 @@ class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconj
 class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexCastPreFilter
 {
 	public:
-	TireFilter(const CustomVehicleController::BodyPartTire* const tire, const NewtonBody* const vehicle)
+	TireFilter(const CustomVehicleController::BodyPartTire* const tire, const CustomVehicleController* const controller)
 		:CustomControllerConvexCastPreFilter(tire->GetBody())
 		,m_tire (tire)
-		,m_vehicle(vehicle)
+		//,m_vehicle(vehicle)
+		,m_controller(controller)
 	{
 	}
 
@@ -101,10 +102,17 @@ class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexC
 			}
 		}
 
-		return (body != m_vehicle) ? 1 : 0;
+		for (dList<CustomVehicleController::BodyPart*>::dListNode* node = m_controller->m_bodyPartsList.GetFirst(); node; node = node->GetNext()) {
+			if (node->GetInfo()->GetBody() == body) {
+				return 0;
+			}
+		}
+
+		return (body != m_controller->GetBody()) ? 1 : 0;
 	}
 
-	const NewtonBody* m_vehicle;
+//	const NewtonBody* m_vehicle;
+	const CustomVehicleController* m_controller;
 	const CustomVehicleController::BodyPartTire* m_tire;
 };
 
@@ -2182,7 +2190,7 @@ int CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTir
 	tireSweeptMatrix.m_posit = chassisMatrix.m_posit + suspensionSpan;
 
 	NewtonCollision* const tireCollision = NewtonBodyGetCollision(tireBody);
-	TireFilter filter(tire, vehicleBody);
+	TireFilter filter(tire, controller);
 
 	dFloat timeOfImpact;
 	tire->m_collidingCount = 0;
