@@ -15,7 +15,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomJoint.h"
-#include "CustomHinge.h"
+//#include "CustomHinge.h"
+#include "CustomGear.h"
 #include "CustomVehicleControllerManager.h"
 
 //#define D_PLOT_ENGINE_CURVE
@@ -873,19 +874,25 @@ CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEn
 	DriveTrainTire* const tire0 = m_child->m_child->CastAsTire();
 	dAssert (tire0);
 	dAssert (tire0->m_tire == axel.m_leftTrack[0]);
+	dMatrix pinMatrix;
+	NewtonBodyGetMatrix(tire0->m_tire->GetBody(), &pinMatrix[0][0]);
+	dVector pin0 (pinMatrix[0]);
+	dVector pin1 (pinMatrix[0].Scale (-1.0f));
 	for (int i = 1; i < axel.m_count; i ++) {
-		DriveTrain* const node = new DriveTrainSlaveTire(axel.m_leftTrack[i], tire0);
-		node->m_sibling = tire0->m_child;
-		tire0->m_child = node;
+		dFloat gain = tire0->m_tire->m_data.m_radio / axel.m_leftTrack[i]->m_data.m_radio;
+		new CustomGear (gain, pin0, pin1, tire0->m_tire->GetBody(), axel.m_leftTrack[i]->GetBody());
 	}
 
+
 	DriveTrainTire* const tire1 = m_child->m_child->m_sibling->CastAsTire();
-	dAssert (tire1);
-	dAssert (tire1->m_tire == axel.m_rightTrack[0]);
-	for (int i = 1; i < axel.m_count; i ++) {
-		DriveTrain* const node = new DriveTrainSlaveTire(axel.m_rightTrack[i], tire1);
-		node->m_sibling = tire1->m_child;
-		tire1->m_child = node;
+	dAssert(tire1);
+	dAssert(tire1->m_tire == axel.m_rightTrack[0]);
+	NewtonBodyGetMatrix(tire1->m_tire->GetBody(), &pinMatrix[0][0]);
+	pin0 = pinMatrix[0];
+	pin1 = pinMatrix[0].Scale(-1.0f);
+	for (int i = 1; i < axel.m_count; i++) {
+		dFloat gain = tire1->m_tire->m_data.m_radio / axel.m_rightTrack[i]->m_data.m_radio;
+		new CustomGear(gain, pin0, pin1, tire1->m_tire->GetBody(), axel.m_rightTrack[i]->GetBody());
 	}
 }
 
@@ -1080,36 +1087,6 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyTireTorque(
 	NewtonBodyAddTorque(chassisBody, &torque[0]);
 }
 
-CustomVehicleController::EngineController::DriveTrainSlaveTire::DriveTrainSlaveTire (BodyPartTire* const tire, DriveTrainTire* const parent)
-	:DriveTrainTire(tire, parent)
-{
-	m_J01 = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-	m_J10 = dVector(-parent->m_tire->m_data.m_radio / tire->m_data.m_radio, 0.0f, 0.0f, 0.0f);
-	SetInvMassJt();
-}
-
-void CustomVehicleController::EngineController::DriveTrainSlaveTire::ApplyInternalTorque(EngineController* const controller, dFloat timestep, dFloat* const lambda)
-{
-	dAssert (m_parent->CastAsTire());
-	DriveTrainTire::ApplyInternalTorque(controller, timestep, lambda);
-	m_parent->CastAsTire()->m_reactionTorque += m_J10.Scale(lambda[m_index]);
-}
-
-
-void CustomVehicleController::EngineController::DriveTrainSlaveTire::CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high)
-{
-	const dFloat k = 1.0f / timestep;
-	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
-	dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
-
-	torqueAccel = (dAbs(torqueAccel) < 1.0e-8f) ? 0.0f : torqueAccel;
-	relativeOmega = (dAbs(relativeOmega) < 1.0e-8f) ? 0.0f : relativeOmega;
-	rightSide[m_index] = -(torqueAccel + k * relativeOmega);
-
-	low[m_index] = -D_LCP_MAX_VALUE;
-	high[m_index] = D_LCP_MAX_VALUE;
-}
-
 
 CustomVehicleController::EngineController::EngineController (CustomVehicleController* const controller, const Info& info, const Differential& differential)
 	:Controller(controller)
@@ -1147,10 +1124,11 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 		}
 
 		case Differential::m_track:
+		{
 			const DifferentialTracked& diff = (DifferentialTracked&) differential;
 			m_engine = new DriveTrainEngineTracked(dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), diff);
 			break;
-
+		}
 	}
 	SetInfo(info);
 
