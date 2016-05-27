@@ -512,6 +512,14 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
 		};
 
+		class DriveTrainTracksSteeringDifferential: public DriveTrainSlipDifferential
+		{
+			public:
+			DriveTrainTracksSteeringDifferential(DriveTrain* const parent);
+			virtual void CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
+		};
+
+
 		class DriveTrainTire: public DriveTrain
 		{
 			public:

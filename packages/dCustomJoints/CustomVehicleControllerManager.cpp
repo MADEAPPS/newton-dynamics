@@ -883,8 +883,7 @@ CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEn
 		new CustomGear (gain, pin0, pin1, tire0->m_tire->GetBody(), axel.m_leftTrack[i]->GetBody());
 	}
 
-
-	DriveTrainTire* const tire1 = m_child->m_child->m_sibling->CastAsTire();
+	DriveTrainTire* const tire1 = tire0->m_sibling->CastAsTire();
 	dAssert(tire1);
 	dAssert(tire1->m_tire == axel.m_rightTrack[0]);
 	NewtonBodyGetMatrix(tire1->m_tire->GetBody(), &pinMatrix[0][0]);
@@ -894,6 +893,13 @@ CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEn
 		dFloat gain = tire1->m_tire->m_data.m_radio / axel.m_rightTrack[i]->m_data.m_radio;
 		new CustomGear(gain, pin0, pin1, tire1->m_tire->GetBody(), axel.m_rightTrack[i]->GetBody());
 	}
+
+	DriveTrainSlipDifferential* const diff = tire1->m_sibling->CastAsSlipDifferential();
+	dAssert (diff);
+	tire1->m_sibling = new DriveTrainTracksSteeringDifferential (diff->m_parent);
+
+	diff->m_parent = NULL;
+	delete diff;
 }
 
 CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
@@ -1029,6 +1035,26 @@ void CustomVehicleController::EngineController::DriveTrainSlipDifferential::Calc
 	}
 }
 
+CustomVehicleController::EngineController::DriveTrainTracksSteeringDifferential::DriveTrainTracksSteeringDifferential (DriveTrain* const parent)
+	:DriveTrainSlipDifferential (parent)
+{
+}
+
+void CustomVehicleController::EngineController::DriveTrainTracksSteeringDifferential::CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high)
+{
+//	DriveTrainSlipDifferential::CalculateRightSide(controller, timestep, rightSide, low, high);
+
+	low[m_index] = -D_LCP_MAX_VALUE;
+	high[m_index] = D_LCP_MAX_VALUE;
+	const dFloat k = 0.5f / timestep;
+	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
+	dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
+
+	relativeOmega += 25.0f;
+//dFloat differentialSpeed = controller->GetDifferentialLock() ? D_VEHICLE_DIFFERENTIAL_LOCK_RPS : D_VEHICLE_DIFFERENTIAL_NORMAL_RPS;
+	rightSide[m_index] = -(torqueAccel + k * relativeOmega);
+
+}
 
 CustomVehicleController::EngineController::DriveTrainTire::DriveTrainTire(BodyPartTire* const tire, DriveTrain* const parent)
 	:DriveTrain(dVector(0.0f), parent)
