@@ -254,7 +254,7 @@ class CustomVehicleController: public CustomControllerBase
 		dFloat m_lateralSlip;
 		dFloat m_longitudinalSlip;
 		dFloat m_aligningTorque;
-		dFloat m_driveTorque;
+		//dFloat m_driveTorque____;
 		int m_index;
 		int m_collidingCount;
 		NewtonWorldConvexCastReturnInfo m_contactInfo[4];

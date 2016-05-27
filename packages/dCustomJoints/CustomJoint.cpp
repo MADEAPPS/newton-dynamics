@@ -16,7 +16,7 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomJoint.h"
 
-
+dCRCTYPE CustomJoint::m_key = dCRC64 ("CustomJoint");
 CustomJoint::SerializeMetaData m_metaData_CustomJoint("CustomJoint");
 
 //////////////////////////////////////////////////////////////////////
@@ -299,14 +299,20 @@ void CustomJoint::SubmitConstraints (dFloat timestep, int threadIndex)
 }
 
 
+
 const char* CustomJoint::GetTypeName() const
 {
 	return "CustomJoint";
 }
 
+bool CustomJoint::IsType (dCRCTYPE type) const
+{
+	return false;
+}
+
 dCRCTYPE CustomJoint::GetSerializeKey() const
 {
-	return dCRC64(CustomJoint::GetTypeName());
+	return m_key;
 }
 
 

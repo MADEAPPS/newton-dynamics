@@ -450,7 +450,7 @@ CustomVehicleController::BodyPartTire::BodyPartTire()
 	,m_lateralSlip(0.0f)
 	,m_longitudinalSlip(0.0f)
 	,m_aligningTorque(0.0f)
-	,m_driveTorque(0.0f)
+//	,m_driveTorque____(0.0f)
 	,m_index(0)
 	,m_collidingCount(0)
 {
@@ -1042,15 +1042,13 @@ CustomVehicleController::EngineController::DriveTrainTracksSteeringDifferential:
 
 void CustomVehicleController::EngineController::DriveTrainTracksSteeringDifferential::CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high)
 {
-//	DriveTrainSlipDifferential::CalculateRightSide(controller, timestep, rightSide, low, high);
-
 	low[m_index] = -D_LCP_MAX_VALUE;
 	high[m_index] = D_LCP_MAX_VALUE;
 	const dFloat k = 0.5f / timestep;
 	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
 	dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
 
-	relativeOmega += 25.0f;
+	relativeOmega += 10.0f;
 //dFloat differentialSpeed = controller->GetDifferentialLock() ? D_VEHICLE_DIFFERENTIAL_LOCK_RPS : D_VEHICLE_DIFFERENTIAL_NORMAL_RPS;
 	rightSide[m_index] = -(torqueAccel + k * relativeOmega);
 
@@ -1082,13 +1080,23 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorqu
 	dMatrix matrix;
 	dVector omega(0.0f);
 
-	NewtonBody* const body = m_tire->GetBody();
-	NewtonBodyGetOmega(body, &omega[0]);
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
+	NewtonBody* const tireBody = m_tire->GetBody();
+	NewtonBodyGetOmega(tireBody, &omega[0]);
+	NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
 
 	m_omega = matrix.UnrotateVector(omega);
 	m_omega = dVector (m_omega.m_x, 0.0f, 0.0f, 0.0f);
-	m_torque = dVector (m_tire->m_driveTorque, 0.0f, 0.0f, 0.0f);
+//	m_torque = dVector (m_tire->m_driveTorque____, 0.0f, 0.0f, 0.0f);
+
+	for (NewtonJoint* joint = NewtonBodyGetFirstJoint (tireBody); joint; joint = NewtonBodyGetNextJoint(tireBody, joint)) {
+		CustomJoint* const cJoint = (CustomJoint*) NewtonJointGetUserData(joint);
+		if (cJoint->IsType (CustomGear::GetKeyType())) {
+			NewtonBody* const body0 = cJoint->GetBody0();
+			NewtonBody* const body1 = cJoint->GetBody1();
+//			NewtonBody* const otherBody = (body0 == body) ? body1 : body0;
+		}
+	}
+
 	m_reactionTorque = dVector (0.0f);
 }
 
@@ -2329,7 +2337,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 	tire->m_lateralSlip = 0.0f;
 	tire->m_aligningTorque = 0.0f;
 	tire->m_longitudinalSlip = 0.0f;
-	tire->m_driveTorque = 0.0f;
+//	tire->m_driveTorque____ = 0.0f;
 
 	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
 		const dVector& lateralPin = tireMatrix.m_front;
@@ -2390,8 +2398,8 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 					dFloat tireLoad = (tireLoadForce % contactNormal);
 
 					controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, longitudinalSlipRatio, lateralSideSlip, longitudinalForce, lateralForce, aligningMoment);
-					dFloat sign = dSign (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed);
-					tire->m_driveTorque -= longitudinalForce * sign * tire->m_data.m_radio;
+					//dFloat sign = dSign (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed);
+					//tire->m_driveTorque____ -= longitudinalForce * sign * tire->m_data.m_radio;
 				
 					NewtonMaterialSetContactTangentAcceleration (material, 0.0f, 0);
 					NewtonMaterialSetContactTangentFriction(material, dAbs (lateralForce), 0);

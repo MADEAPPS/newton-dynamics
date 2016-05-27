@@ -33,13 +33,16 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 
 #define DECLARE_CUSTOM_JOINT(className,baseClass)																			\
 	public:																													\
-	virtual dCRCTYPE GetSerializeKey() const { return dCRC64(#className); }													\
+	virtual bool IsType (dCRCTYPE type) const {return m_metaData_##className.IsType(type);}									\
+	virtual dCRCTYPE GetSerializeKey() const { return m_metaData_##className.m_key_##className;}							\
+	static dCRCTYPE GetKeyType () { return m_metaData_##className.m_key_##className; }										\
 	virtual const char* GetTypeName() const { return #className; }															\
 	class SerializeMetaData_##className: public baseClass::SerializeMetaData												\
 	{																														\
 		public:																												\
 		SerializeMetaData_##className(const char* const name)																\
 			:baseClass::SerializeMetaData(name)																				\
+			,m_key_##className (dCRC64(#className))																			\
 		{																													\
 		}																													\
 		virtual void SerializeJoint (CustomJoint* const joint, NewtonSerializeCallback callback, void* const userData)		\
@@ -51,6 +54,14 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 		{																													\
 			return new className (body0, body1, callback, userData);														\
 		}																													\
+		virtual bool IsType (dCRCTYPE type) const																			\
+		{																													\
+			if (type == m_key_##className) {																				\
+				return true;																								\
+			}																												\
+			return baseClass::SerializeMetaData::IsType(type);																\
+		}																													\
+		dCRCTYPE m_key_##className;																							\
 	};																														\
 	friend class SerializeMetaData_##className;																				\
 	CUSTOM_JOINTS_API static SerializeMetaData_##className m_metaData_##className;
@@ -69,6 +80,7 @@ class CustomJoint: public CustomAlloc
 		CUSTOM_JOINTS_API SerializeMetaData(const char* const name);
 		CUSTOM_JOINTS_API virtual void SerializeJoint (CustomJoint* const joint, NewtonSerializeCallback callback, void* const userData);
 		CUSTOM_JOINTS_API virtual CustomJoint* DeserializeJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
+		CUSTOM_JOINTS_API virtual bool IsType (dCRCTYPE type) const {return false;}
 	};
 
 	class SerializeMetaDataDictionary: public dTree<SerializeMetaData*, dCRCTYPE>
@@ -164,6 +176,7 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API const dMatrix& GetMatrix1 () const;
 
 	// the application needs to implement this function for serialization
+	CUSTOM_JOINTS_API virtual bool IsType (dCRCTYPE type) const;
 	CUSTOM_JOINTS_API virtual const char* GetTypeName() const;
 	CUSTOM_JOINTS_API virtual dCRCTYPE GetSerializeKey() const;
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
@@ -216,6 +229,7 @@ class CustomJoint: public CustomAlloc
 	dFloat m_stiffness;
 	int m_maxDof;
 	int m_autoDestroy;
+	CUSTOM_JOINTS_API static dCRCTYPE m_key;
 	CUSTOM_JOINTS_API static SerializeMetaData m_metaData_CustomJoint;
 };
 
