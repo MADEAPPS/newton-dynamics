@@ -538,7 +538,6 @@ DG_INLINE void dgCollisionInstance::CalcObb (dgVector& origin, dgVector& size) c
 		}
 		case m_global:
 		{
-			dgAssert (0);
 //			dgMatrix matrix1 (matrix);
 //			matrix1[0] = matrix1[0].Scale4(m_scale.m_x);
 //			matrix1[1] = matrix1[1].Scale4(m_scale.m_y);
@@ -546,6 +545,12 @@ DG_INLINE void dgCollisionInstance::CalcObb (dgVector& origin, dgVector& size) c
 //			m_childShape->CalcAABB (m_aligmentMatrix * matrix1, p0, p1);
 //			p0 -= m_padding;
 //			p1 += m_padding;
+
+			dgVector p0;
+			dgVector p1;
+			m_childShape->CalcAABB(m_aligmentMatrix, p0, p1);
+			size = ((p1 - p0).CompProduct4(dgVector::m_half).CompProduct4(m_scale) + m_padding) & dgVector::m_triplexMask;
+			origin = ((p1 + p0).CompProduct4(dgVector::m_half).CompProduct4(m_scale)) & dgVector::m_triplexMask;;
 			break;
 		}
 	}

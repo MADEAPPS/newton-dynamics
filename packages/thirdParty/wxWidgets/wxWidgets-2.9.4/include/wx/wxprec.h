@@ -46,6 +46,15 @@
     #include "wx/msw/wrapcdlg.h"
     #include "wx/msw/private.h"
     #include "wx/msw/missing.h"
+
+	#pragma warning (disable: 4302) // 'type cast' : truncation from 'wxStreamOutData *' to 'DWORD'
+	#pragma warning (disable: 4310) //  cast truncates constant value
+	#pragma warning (disable: 4311) // 'type cast' : pointer truncation from 'wxStreamOutData *' to 'DWORD'
+	#pragma warning (disable: 4091) // 'typedef ' : ignored on left of '' when no variable is declared
+	#pragma warning (disable: 4996) //'GetVersionExA' : was declared deprecated
+	#pragma warning (disable: 4458) // declaration of 'argc' hides class member
+	#pragma warning (disable: 4456) // declaration of 'key' hides previous local declaration
+	#pragma warning (disable: 4457) // declaration of 'body' hides function parameter
 #endif
 
 // include <os2.h>

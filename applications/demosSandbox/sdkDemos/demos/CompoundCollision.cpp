@@ -230,7 +230,7 @@ static void MakeFunnyCompound (DemoEntityManager* const scene, const dVector& or
 		dAssert (collision);
 		// we can set a collision id, and use data per sub collision 
 		NewtonCollisionSetUserID(collision, i);
-		NewtonCollisionSetUserData(collision, (void*) i);
+		//NewtonCollisionSetUserData(collision, (void*) i);
 
 		// add this new collision 
 		NewtonCompoundCollisionAddSubCollision (compound, collision);

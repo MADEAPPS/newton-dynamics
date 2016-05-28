@@ -1635,7 +1635,7 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 	}
 
 	{
-		dFloat scale(2.0f / (mass * 10.0f));
+		dFloat scale1(2.0f / (mass * 10.0f));
 		// draw vehicle forces
 		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			BodyPartTire* const tire = &node->GetInfo();
@@ -1648,7 +1648,7 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 			dVector origin(worldToComMatrix.TransformVector(matrix.m_posit));
 
 			dVector lateralForce(chassisMatrix.UnrotateVector(GetTireLateralForce(tire)));
-			lateralForce = lateralForce.Scale(-scale);
+			lateralForce = lateralForce.Scale(-scale1);
 			lateralForce = projectionMatrix.RotateVector(lateralForce);
 
 			array[0] = origin;
@@ -1656,7 +1656,7 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 			manager->DrawSchematicCallback(this, "lateralForce", 0, 2, array);
 
 			dVector longitudinalForce(chassisMatrix.UnrotateVector(GetTireLongitudinalForce(tire)));
-			longitudinalForce = longitudinalForce.Scale(-scale);
+			longitudinalForce = longitudinalForce.Scale(-scale1);
 			longitudinalForce = projectionMatrix.RotateVector(longitudinalForce);
 
 			array[0] = origin;
@@ -2276,10 +2276,10 @@ void CustomVehicleControllerManager::OnTireContactsProcess (const NewtonJoint* c
 		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 		const void* const data1 = NewtonCollisionDataPointer(collision1);
 		if (data1 == manager->m_tireShapeTemplateData) {
-			const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-			dAssert(NewtonCollisionDataPointer(collision1) == manager->m_tireShapeTemplateData);
+			const NewtonCollision* const collision2 = NewtonBodyGetCollision(body1);
+			dAssert(NewtonCollisionDataPointer(collision2) == manager->m_tireShapeTemplateData);
 			const NewtonBody* const otherBody = body0;
-			CustomVehicleController::BodyPartTire* const tire = (CustomVehicleController::BodyPartTire*) NewtonCollisionGetUserData1(collision1);
+			CustomVehicleController::BodyPartTire* const tire = (CustomVehicleController::BodyPartTire*) NewtonCollisionGetUserData1(collision2);
 			dAssert(tire->GetParent()->GetBody() != otherBody);
 			manager->OnTireContactsProcess(contactJoint, tire, otherBody, timestep);
 		}
