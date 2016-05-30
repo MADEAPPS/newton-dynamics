@@ -201,7 +201,7 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 					ptr = newEdge;
 				}
 			} else {
-				if (test1 > tol) {
+				if ((test1 > tol) && (test0 * test1) < dgFloat32 (0.0f)) {
 					newFirst = ptr->m_next;
 
 					const dgVector& p0 = points[ptr->m_incidentVertex];
@@ -233,7 +233,6 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 					ptr = newEdge;
 				}
 			}
-
 
 			test0 = test1;
 			ptr = ptr->m_next;

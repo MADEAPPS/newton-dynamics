@@ -30,6 +30,8 @@ class CustomVehicleController: public CustomControllerBase
 {
 	public:
 	class WheelJoint;
+	class SteeringController;
+	class TrackedSteeringJoint;
 //	class dWeightDistibutionSolver;
 
 	class dInterpolationCurve
@@ -262,6 +264,13 @@ class CustomVehicleController: public CustomControllerBase
 		friend class CustomVehicleControllerManager;
 	};
 
+	class BodyPartDifferentialSteering: public BodyPart
+	{
+		public:
+		BodyPartDifferentialSteering (CustomVehicleController* const controller, BodyPartTire* const leftTire, BodyPartTire* const rightTire);
+		~BodyPartDifferentialSteering ();
+	};
+
 	class EngineController: public Controller
 	{
 		public:
@@ -457,6 +466,7 @@ class CustomVehicleController: public CustomControllerBase
 			void RebuildEngine (const dVector& invInertia);
 			dFloat GetClutchTorque(EngineController* const controller) const;
 			void Update(EngineController* const controller, dFloat engineTorque, dFloat timestep);
+			virtual void ApplySteering(SteeringController* const steering, dFloat timestep) {}
 
 			void SetFriction(dFloat friction);
 
@@ -486,7 +496,10 @@ class CustomVehicleController: public CustomControllerBase
 		class DriveTrainEngineTracked: public DriveTrainEngine2W
 		{
 			public:
-			DriveTrainEngineTracked (const dVector& invInertia, const DifferentialTracked& axel);
+			DriveTrainEngineTracked (const dVector& invInertia, const DifferentialTracked& axel, CustomVehicleController* const controller);
+			virtual void ApplySteering(SteeringController* const steering, dFloat timestep);
+
+			BodyPartDifferentialSteering m_differentialPart;
 		};
 
 
@@ -510,14 +523,6 @@ class CustomVehicleController: public CustomControllerBase
 			virtual void SetPartMasses (const dVector& invInertia);
 			virtual void CalculateRightSide (EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
 		};
-
-		class DriveTrainTracksSteeringDifferential: public DriveTrainSlipDifferential
-		{
-			public:
-			DriveTrainTracksSteeringDifferential(DriveTrain* const parent);
-			virtual void CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high);
-		};
-
 
 		class DriveTrainTire: public DriveTrain
 		{

@@ -1607,11 +1607,11 @@ for (int i = 0; i < 5; i ++){
 */
 	
 	dMatrix camMatrix (manager->m_player->GetNextMatrix());
-	camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
+//	camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
 	//scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
-/*
+
 	location.m_posit.m_x += 20.0f;
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	int count = 5;
@@ -1629,6 +1629,6 @@ for (int i = 0; i < 5; i ++){
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-*/
+
 }
 

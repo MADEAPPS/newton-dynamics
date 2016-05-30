@@ -10,12 +10,10 @@
 */
 
 
-// NewtonCustomJoint.cpp: implementation of the NewtonCustomJoint class.
-//
-//////////////////////////////////////////////////////////////////////
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomJoint.h"
 #include "CustomGear.h"
+#include "CustomUniversal.h"
 #include "CustomVehicleControllerManager.h"
 
 //#define D_PLOT_ENGINE_CURVE
@@ -420,6 +418,70 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 	dFloat m_brakeTorque;
 };
 
+class CustomVehicleController::TrackedSteeringJoint: public CustomUniversal
+{
+	public:
+	TrackedSteeringJoint (const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
+		:CustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
+		,m_turRateAccel(3.0f)
+		,m_turnRate(0.0f)
+		,m_turnRateTarget(0.0f)
+	{
+		EnableLimit_0(false);
+		EnableLimit_1(false);
+	}
+
+	void ApplySteering(SteeringController* const steering, dFloat timestep)
+	{
+		m_turnRateTarget = steering->m_param * 10.0f;
+
+		if (m_turnRate < m_turnRateTarget) {
+			m_turnRate += m_turRateAccel * timestep;
+			if (m_turnRate > m_turnRateTarget) {
+				m_turnRate = m_turnRateTarget;
+			}
+		} else if (m_turnRate > m_turnRateTarget) {
+			m_turnRate -= m_turRateAccel * timestep;
+			if (m_turnRate < m_turnRateTarget) {
+				m_turnRate = m_turnRateTarget;
+			}
+		}
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		CustomUniversal::SubmitConstraints(timestep, threadIndex);
+
+		dMatrix chassisMatrix;
+		dMatrix differentialMatrix;
+		dVector chassisOmega;
+		dVector differentialOmega;
+		
+		NewtonBody* const chassisBody = m_body1;
+		NewtonBody* const diffentialBody = m_body0;
+
+		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+		CalculateGlobalMatrix(differentialMatrix, chassisMatrix);
+
+		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
+		NewtonBodyGetOmega(diffentialBody, &differentialOmega[0]);
+
+		
+		const dVector& pin = differentialMatrix.m_front;
+
+		dVector relOmega(chassisOmega - differentialOmega);
+		dFloat accel = 0.5f * (relOmega % pin + m_turnRate) / timestep;
+//dTrace (("%f\n", m_turnRate));
+
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+	}
+
+	dFloat m_turRateAccel;
+	dFloat m_turnRate;
+	dFloat m_turnRateTarget;
+};
+
 void CustomVehicleController::BodyPartChassis::ApplyDownForce ()
 {
 	// add aerodynamics forces
@@ -520,38 +582,51 @@ void CustomVehicleController::BodyPartTire::SetBrakeTorque(dFloat torque)
 }
 
 
-void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
+CustomVehicleController::BodyPartDifferentialSteering::BodyPartDifferentialSteering(CustomVehicleController* const controller, BodyPartTire* const leftTire, BodyPartTire* const rightTire)
+	:BodyPart()
 {
-	const dFloat horsePowerToWatts = 735.5f;
-	const dFloat kmhToMetersPerSecunds = 0.278f;
-	const dFloat rpmToRadiansPerSecunds = 0.105f;
-	const dFloat poundFootToNewtonMeters = 1.356f;
+	m_parent = &controller->m_chassis;
+	m_controller = controller;
 
-	m_idleTorque *= poundFootToNewtonMeters;
-	m_peakTorque *= poundFootToNewtonMeters;
+	NewtonBody* const chassisBody = m_controller->GetBody();
+	NewtonWorld* const world = ((CustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
 
-	m_peakTorqueRpm *= rpmToRadiansPerSecunds;
-	m_peakHorsePowerRpm *= rpmToRadiansPerSecunds;
-	m_readLineRpm *= rpmToRadiansPerSecunds;
-	m_idleTorqueRpm *= rpmToRadiansPerSecunds;
+	//NewtonCollision* const collision = NewtonCreateNull(world);
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.5f, 0.5f, 0.5f, 0, NULL);
+	
+	dMatrix offset(dYawMatrix(-0.5f * 3.14159213f) * m_controller->m_localFrame);
+	//offset.m_posit.m_y += 4.0f;
 
-	m_peakHorsePower *= horsePowerToWatts;
-	m_vehicleTopSpeed *= kmhToMetersPerSecunds;
+	dMatrix matrix;
+	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
+	matrix = offset * matrix;
 
-	m_peakPowerTorque = m_peakHorsePower / m_peakHorsePowerRpm;
+	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+	NewtonDestroyCollision(collision);
 
-	dAssert(m_idleTorqueRpm > 0.0f);
-	dAssert(m_idleTorqueRpm < m_peakHorsePowerRpm);
-	dAssert(m_peakTorqueRpm < m_peakHorsePowerRpm);
-	dAssert(m_peakHorsePowerRpm < m_readLineRpm);
+	dFloat mass = leftTire->m_data.m_mass + rightTire->m_data.m_mass;
+	dFloat inertia = 2.0f * mass * leftTire->m_data.m_radio * leftTire->m_data.m_radio / 5.0f;
+	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
 
-	dAssert(m_idleTorque > 0.0f);
-	dAssert(m_peakTorque > m_peakPowerTorque);
-	//dAssert(m_peakPowerTorque > m_redLineTorque);
-	//dAssert(m_redLineTorque > 0.0f);
-	dAssert((m_peakTorque * m_peakTorqueRpm) < m_peakHorsePower);
+	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
+	NewtonBodySetLinearDamping(m_body, 0);
+	NewtonBodySetAngularDamping(m_body, &drag[0]);
+	NewtonBodySetMaxRotationPerStep(m_body, 3.141692f);
+	NewtonBodySetForceAndTorqueCallback(m_body, m_controller->m_forceAndTorque);
+
+	// attach with a joint;
+	m_joint = new TrackedSteeringJoint(matrix, m_body, controller->GetChassis()->GetBody());
+	NewtonCollisionAggregateAddBody(controller->m_collisionAggregate, m_body);
+	NewtonSkeletonContainerAttachBone(controller->m_skeleton, m_body, chassisBody);
+
+	new CustomSatelliteGear (1.0f, matrix[0], matrix[0].Scale ( 1.0f), matrix[1].Scale ( 1.0f), leftTire->GetBody(), m_body, controller->GetChassis()->GetBody());
+	new CustomSatelliteGear (1.0f, matrix[0], matrix[0].Scale (-1.0f), matrix[1].Scale ( 1.0f), rightTire->GetBody(), m_body, controller->GetChassis()->GetBody());
 }
 
+CustomVehicleController::BodyPartDifferentialSteering::~BodyPartDifferentialSteering()
+{
+}
 
 CustomVehicleController::EngineController::DriveTrain::DriveTrain(const dVector& invInertia, DriveTrain* const parent)
 	:CustomAlloc()
@@ -866,8 +941,9 @@ CustomVehicleController::EngineController::DriveTrainEngine2W::DriveTrainEngine2
 	SetGearRatioJacobian(1.0f);
 }
 
-CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEngineTracked (const dVector& invInertia, const DifferentialTracked& axel)
+CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEngineTracked (const dVector& invInertia, const DifferentialTracked& axel, CustomVehicleController* const controller)
 	:DriveTrainEngine2W(invInertia, axel.m_axel)
+	,m_differentialPart(controller, axel.m_axel.m_leftTire, axel.m_axel.m_rightTire)
 {
 	DriveTrainTire* const tire0 = m_child->m_child->CastAsTire();
 	dAssert (tire0);
@@ -891,13 +967,12 @@ CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEn
 		dFloat gain = tire1->m_tire->m_data.m_radio / axel.m_rightTrack[i]->m_data.m_radio;
 		new CustomGear(gain, pin0, pin1, tire1->m_tire->GetBody(), axel.m_rightTrack[i]->GetBody());
 	}
+}
 
-	DriveTrainSlipDifferential* const diff = tire1->m_sibling->CastAsSlipDifferential();
-	dAssert (diff);
-	tire1->m_sibling = new DriveTrainTracksSteeringDifferential (diff->m_parent);
-
-	diff->m_parent = NULL;
-	delete diff;
+void CustomVehicleController::EngineController::DriveTrainEngineTracked::ApplySteering(SteeringController* const steering, dFloat timestep)
+{
+	TrackedSteeringJoint* const steeringJoint = (TrackedSteeringJoint*)m_differentialPart.GetJoint();
+	steeringJoint->ApplySteering(steering, timestep);
 }
 
 CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
@@ -1033,24 +1108,7 @@ void CustomVehicleController::EngineController::DriveTrainSlipDifferential::Calc
 	}
 }
 
-CustomVehicleController::EngineController::DriveTrainTracksSteeringDifferential::DriveTrainTracksSteeringDifferential (DriveTrain* const parent)
-	:DriveTrainSlipDifferential (parent)
-{
-}
 
-void CustomVehicleController::EngineController::DriveTrainTracksSteeringDifferential::CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high)
-{
-	low[m_index] = -D_LCP_MAX_VALUE;
-	high[m_index] = D_LCP_MAX_VALUE;
-	const dFloat k = 0.5f / timestep;
-	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
-	dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
-
-	relativeOmega += 2.0f;
-//dFloat differentialSpeed = controller->GetDifferentialLock() ? D_VEHICLE_DIFFERENTIAL_LOCK_RPS : D_VEHICLE_DIFFERENTIAL_NORMAL_RPS;
-	rightSide[m_index] = -(torqueAccel + k * relativeOmega);
-
-}
 
 CustomVehicleController::EngineController::DriveTrainTire::DriveTrainTire(BodyPartTire* const tire, DriveTrain* const parent)
 	:DriveTrain(dVector(0.0f), parent)
@@ -1084,15 +1142,7 @@ void CustomVehicleController::EngineController::DriveTrainTire::SetExternalTorqu
 
 	m_omega = matrix.UnrotateVector(omega);
 	m_omega = dVector (m_omega.m_x, 0.0f, 0.0f, 0.0f);
-
-	dFloat torque = 0.0f;
-	for (NewtonJoint* joint = NewtonBodyGetFirstJoint (tireBody); joint; joint = NewtonBodyGetNextJoint(tireBody, joint)) {
-		CustomJoint* const cJoint = (CustomJoint*) NewtonJointGetUserData(joint);
-		if (cJoint->IsType (CustomGear::GetKeyType())) {
-			torque += NewtonUserJointGetRowForce (joint, 0);
-		}
-	}
-	m_torque = dVector (torque, 0.0f, 0.0f, 0.0f);
+	m_torque = dVector (0.0f);
 	m_reactionTorque = dVector (0.0f);
 }
 
@@ -1115,6 +1165,47 @@ void CustomVehicleController::EngineController::DriveTrainTire::ApplyTireTorque(
 
 	torque = torque.Scale (-0.25f);
 	NewtonBodyAddTorque(chassisBody, &torque[0]);
+
+/*
+dVector omega(0.0f);
+NewtonBodyGetOmega(tireBody, &omega[0]);
+NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
+omega = matrix.UnrotateVector(omega);
+dTrace (("(%f %f)\n", omega.m_x, m_reactionTorque.m_x));
+*/
+}
+
+
+void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
+{
+	const dFloat horsePowerToWatts = 735.5f;
+	const dFloat kmhToMetersPerSecunds = 0.278f;
+	const dFloat rpmToRadiansPerSecunds = 0.105f;
+	const dFloat poundFootToNewtonMeters = 1.356f;
+
+	m_idleTorque *= poundFootToNewtonMeters;
+	m_peakTorque *= poundFootToNewtonMeters;
+
+	m_peakTorqueRpm *= rpmToRadiansPerSecunds;
+	m_peakHorsePowerRpm *= rpmToRadiansPerSecunds;
+	m_readLineRpm *= rpmToRadiansPerSecunds;
+	m_idleTorqueRpm *= rpmToRadiansPerSecunds;
+
+	m_peakHorsePower *= horsePowerToWatts;
+	m_vehicleTopSpeed *= kmhToMetersPerSecunds;
+
+	m_peakPowerTorque = m_peakHorsePower / m_peakHorsePowerRpm;
+
+	dAssert(m_idleTorqueRpm > 0.0f);
+	dAssert(m_idleTorqueRpm < m_peakHorsePowerRpm);
+	dAssert(m_peakTorqueRpm < m_peakHorsePowerRpm);
+	dAssert(m_peakHorsePowerRpm < m_readLineRpm);
+
+	dAssert(m_idleTorque > 0.0f);
+	dAssert(m_peakTorque > m_peakPowerTorque);
+	//dAssert(m_peakPowerTorque > m_redLineTorque);
+	//dAssert(m_redLineTorque > 0.0f);
+	dAssert((m_peakTorque * m_peakTorqueRpm) < m_peakHorsePower);
 }
 
 
@@ -1131,32 +1222,33 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 {
 	dFloat inertiaInv = 1.0f / (2.0f * m_info.m_mass * m_info.m_radio * m_info.m_radio / 5.0f);
 
+	dVector invInertia (inertiaInv, inertiaInv, inertiaInv, 0.0f);
 	switch (differential.m_type)
 	{
 		case Differential::m_2wd:
 		{
-			m_engine = new DriveTrainEngine2W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), differential.m_axel);
+			m_engine = new DriveTrainEngine2W (invInertia, differential.m_axel);
 			break;
 		}
 
 		case Differential::m_4wd:
 		{
 			const Differential4wd& diff = (Differential4wd&) differential;
-			m_engine = new DriveTrainEngine4W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), diff.m_axel, diff.m_secundAxel.m_axel);
+			m_engine = new DriveTrainEngine4W (invInertia, diff.m_axel, diff.m_secundAxel.m_axel);
 			break;
 		}
 
 		case Differential::m_8wd:
 		{
 			const Differential8wd& diff = (Differential8wd&) differential;
-			m_engine = new DriveTrainEngine8W (dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), diff.m_axel, diff.m_secundAxel.m_axel, diff.m_secund4Wd.m_axel, diff.m_secund4Wd.m_secundAxel.m_axel);
+			m_engine = new DriveTrainEngine8W (invInertia, diff.m_axel, diff.m_secundAxel.m_axel, diff.m_secund4Wd.m_axel, diff.m_secund4Wd.m_secundAxel.m_axel);
 			break;
 		}
 
 		case Differential::m_track:
 		{
 			const DifferentialTracked& diff = (DifferentialTracked&) differential;
-			m_engine = new DriveTrainEngineTracked(dVector(inertiaInv, inertiaInv, inertiaInv, 0.0f), diff);
+			m_engine = new DriveTrainEngineTracked(invInertia, diff, controller);
 			break;
 		}
 	}
@@ -1500,6 +1592,10 @@ void CustomVehicleController::SteeringController::Update(dFloat timestep)
 		WheelJoint* const joint = (WheelJoint*)tire.m_joint;
 		tire.SetSteerAngle(m_param);
 		m_isSleeping &= dAbs (joint->m_steerAngle1 - joint->m_steerAngle0) < 1.0e-4f;
+	}
+
+	if (m_controller->m_engineControl) {
+		m_controller->m_engineControl->m_engine->ApplySteering(this, timestep);
 	}
 }
 
