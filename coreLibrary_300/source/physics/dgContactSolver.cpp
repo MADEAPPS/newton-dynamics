@@ -785,10 +785,10 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 	dgAssert(count >= 1);
 	if (count == 1) {
 		SupportVertex(m_proxy->m_contactJoint->m_separtingVector.Scale4(dgFloat32(-1.0f)), 1);
-#ifdef _DEBUG
 		dgVector err(m_hullDiff[1] - m_hullDiff[0]);
-		dgAssert((err % err) > dgFloat32(0.0f));
-#endif
+		if ((err % err) < dgFloat32(1.0e-8f)) {
+			return -1;
+		}
 		count = 2;
 	}
 	
