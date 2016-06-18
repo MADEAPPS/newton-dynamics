@@ -2459,7 +2459,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				//dFloat tireOriginLateralSpeed = tireVeloc % lateralPin;
 				dFloat tireOriginLateralSpeed = tireVeloc.DotProduct3(lateralContactDir);
 				dFloat tireOriginLongitudinalSpeed = tireVeloc.DotProduct3(longitudinalContactDir);
-				dFloat tireContactLongitudinalSpeed = -(tireOmega.CrossProduct(radius)).DotProduct3(longitudinalContactDir);
+				dFloat tireContactLongitudinalSpeed = -longitudinalContactDir.DotProduct3 (tireOmega.CrossProduct(radius));
 
 				if ((dAbs(tireOriginLongitudinalSpeed) < (1.0f)) || (dAbs(tireContactLongitudinalSpeed) < 0.1f)) {
 					// vehicle  moving at speed for which tire physics is undefined, simple do a kinematic motion

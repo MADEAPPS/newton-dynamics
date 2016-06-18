@@ -80,7 +80,8 @@ void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
 		dFloat sinAngle;
 		dFloat cosAngle;
 
-		sinAngle = (matrix0.m_front.CrossProduct(matrix1.m_front)).DotProduct3(matrix1.m_up);
+		//sinAngle = (matrix0.m_front.CrossProduct(matrix1.m_front)).DotProduct3(matrix1.m_up);
+		sinAngle = matrix1.m_up.DotProduct3(matrix0.m_front.CrossProduct(matrix1.m_front));
 		cosAngle = matrix0.m_front.DotProduct3(matrix1.m_front);
 		angle = dAtan2 (sinAngle, cosAngle);
 
@@ -99,7 +100,8 @@ void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
 		dFloat sinAngle;
 		dFloat cosAngle;
 
-		sinAngle = (matrix0.m_up.CrossProduct(matrix1.m_up)).DotProduct3(matrix0.m_front);
+//		sinAngle = (matrix0.m_up.CrossProduct(matrix1.m_up)).DotProduct3(matrix0.m_front);
+		sinAngle = matrix0.m_front.DotProduct3 (matrix0.m_up.CrossProduct(matrix1.m_up));
 		cosAngle = matrix0.m_up.DotProduct3(matrix1.m_up);
 		angle = dAtan2 (sinAngle, cosAngle);
 

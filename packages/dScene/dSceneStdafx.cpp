@@ -348,7 +348,8 @@ dFloat dPolygonRayCast (const dVector& l0, const dVector& l1, int indexCount, co
 		index = indices[i] * stride;
 		dBigVector v1 (vertex[index], vertex[index + 1], vertex[index + 2], dFloat64(0.0));
 		dBigVector p0v1 (v1 - line0);
-		double alpha = sign * ((p0v1.CrossProduct(p0v0)).DotProduct3(segment));
+		//double alpha = sign * ((p0v1.CrossProduct(p0v0)).DotProduct3(segment));
+		double alpha = sign * segment.DotProduct3(p0v1.CrossProduct(p0v0));
 		if (alpha < 1.0e-15f) {
 			return 1.2f;
 		}

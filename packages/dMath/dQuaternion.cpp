@@ -28,7 +28,7 @@ dQuaternion::dQuaternion (const dMatrix &matrix)
 	static QUAT_INDEX QIndex [] = {Y_INDEX, Z_INDEX, X_INDEX};
 
 	dFloat trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
-	dAssert (((matrix[0].CrossProduct(matrix[1])).DotProduct3(matrix[2])) > 0.0f);
+	dAssert (matrix[2].DotProduct3(matrix[0].CrossProduct(matrix[1])) > 0.0f);
 
 	if (trace > dFloat(0.0f)) {
 		trace = dSqrt (trace + dFloat(1.0f));

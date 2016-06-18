@@ -682,8 +682,10 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 
 	const dMatrix& me = *this;
 //	dFloat sign = ((((*this)[0] * (*this)[1]).DotProduct((*this)[2])) > 0.0f) ? 1.0f : -1.0f;
-	dFloat sign = (me[0].CrossProduct(me[1])).DotProduct3(me[2]) > 0.0f ? 1.0f : -1.0f;
-	dFloat det = (pureRotation[0].CrossProduct(pureRotation[1])).DotProduct3(pureRotation[2]);
+//	dFloat sign1 = (me[0].CrossProduct(me[1])).DotProduct3(me[2]) > 0.0f ? 1.0f : -1.0f;
+	dFloat sign = me[2].DotProduct3 (me[0].CrossProduct(me[1])) > 0.0f ? 1.0f : -1.0f;
+//	dFloat det = (pureRotation[0].CrossProduct(pureRotation[1])).DotProduct3(pureRotation[2]);
+	dFloat det = pureRotation[2].DotProduct3 (pureRotation[0].CrossProduct(pureRotation[1]));
 	if (dAbs (det - 1.0f) < 1.e-5f){
 		// this is a pure scale * rotation * translation
 		det = sign * dSqrt (det2);
