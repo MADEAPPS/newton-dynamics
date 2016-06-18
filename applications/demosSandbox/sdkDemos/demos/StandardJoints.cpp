@@ -382,7 +382,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		dMatrix basis;
 		if (errorAngle > 1.0e-10f) {
 			dVector errorAxis(qErr.m_q1, qErr.m_q2, qErr.m_q3, 0.0f);
-			errorAxis = errorAxis.Scale(1.0f / dSqrt(errorAxis % errorAxis));
+			errorAxis = errorAxis.Scale(1.0f / dSqrt(errorAxis.DotProduct(errorAxis)));
 			errorAngVel = errorAxis.Scale(errorAngle * invTimestep);
 
 			basis = dGrammSchmidt(errorAxis);
@@ -402,7 +402,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		for (int n = 0; n < 3; n++) {
 			// calculate the desired acceleration
 			dVector &axis = basis[n];
-			dFloat relAccel = angAcc % axis;
+			dFloat relAccel = angAcc.DotProduct(axis);
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
@@ -860,7 +860,7 @@ class MyPathFollow: public CustomPathFollow
 		dBigVector point;
 		dFloat64 knot = spline.FindClosestKnot (point, location, 4);
 		dBigVector tangent (spline.CurveDerivative (knot));
-		tangent = tangent.Scale (1.0 / sqrt (tangent % tangent));
+		tangent = tangent.Scale (1.0 / sqrt (tangent.DotProduct(tangent)));
 
 		positOut = dVector (point.m_x, point.m_y, point.m_z);
 		tangentOut = dVector (tangent.m_x, tangent.m_y, tangent.m_z);
@@ -890,7 +890,7 @@ class CustomDistanceRope: public CustomPointToPoint
 		dVector p1(matrix1.m_posit);
 
 		dVector dir(p1 - p0);
-		dFloat mag2 = dir % dir;
+		dFloat mag2 = dir.DotProduct(dir);
 		dir = dir.Scale(1.0f / dSqrt(mag2));
 		dMatrix matrix(dGrammSchmidt(dir));
 		dFloat x = dSqrt(mag2) - m_distance;
@@ -913,7 +913,7 @@ class CustomDistanceRope: public CustomPointToPoint
 		NewtonBodyGetMatrix(body1, &body1Matrix[0][0]);
 		NewtonBodyGetPointVelocity(body1, &p1[0], &veloc1[0]);
 
-		dFloat v((veloc0 - veloc1) % dir);
+		dFloat v((veloc0 - veloc1).DotProduct(dir));
 		dFloat a = (x - v * timestep) / (timestep * timestep);
 
 		dVector r0((p0 - body0Matrix.TransformVector(com0)) * matrix.m_front);
@@ -984,7 +984,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		dBigVector point1;
 		average += positions[i].m_y;
 		dBigVector tangent(spline.CurveDerivative(knot));
-		tangent = tangent.Scale (1.0 / sqrt (tangent % tangent));
+		tangent = tangent.Scale (1.0 / sqrt (tangent.DotProduct(tangent)));
 		knot = spline.FindClosestKnot(point1, dBigVector (point0 + tangent.Scale (2.0f)), 4);
 		point0 = point1;
 		positions[i + 1] = dVector (point0.m_x, point0.m_y, point0.m_z, 0.0);
@@ -1006,7 +1006,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 
 		dVector location1 (positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, 0.0);
 		dVector dir (location1 - location0);
-		matrix.m_front = dir.Scale (1.0f / dSqrt (dir % dir));
+		matrix.m_front = dir.Scale (1.0f / dSqrt (dir.DotProduct(dir)));
 		matrix.m_right = matrix.m_front * matrix.m_up;
 		dMatrix matrix1 (dYawMatrix(0.5f * 3.141692f) * matrix);
 		NewtonBodySetMatrix(box, &matrix1[0][0]);

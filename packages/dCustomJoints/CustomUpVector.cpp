@@ -58,7 +58,7 @@ void CustomUpVector::SubmitConstraints (dFloat timestep, int threadIndex)
   
 	// if the body ha rotated by some amount, the there will be a plane of rotation
 	dVector lateralDir (matrix0.m_front * matrix1.m_front);
-	dFloat mag = lateralDir % lateralDir;
+	dFloat mag = lateralDir.DotProduct(lateralDir);
 	if (mag > 1.0e-6f) {
 		// if the side vector is not zero, it means the body has rotated
 		mag = dSqrt (mag);

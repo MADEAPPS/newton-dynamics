@@ -57,7 +57,7 @@ void CustomDryRollingFriction::SubmitConstraints (dFloat timestep, int threadInd
 	// get the omega vector
 	NewtonBodyGetOmega(m_body0, &omega[0]);
 
-	dFloat omegaMag = dSqrt (omega % omega);
+	dFloat omegaMag = dSqrt (omega.DotProduct(omega));
 	if (omegaMag > 0.1f) {
 		// tell newton to used this the friction of the omega vector to apply the rolling friction
 		dVector pin (omega.Scale (1.0f / omegaMag));

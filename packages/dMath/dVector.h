@@ -36,8 +36,9 @@ class TemplateVector
 	TemplateVector &operator+= (const TemplateVector &A);
 	TemplateVector &operator-= (const TemplateVector &A); 
 
+	T DotProduct (const TemplateVector &A) const; 
 	// return dot product
-	T operator% (const TemplateVector &A) const; 
+	T operator% (const TemplateVector &A) const {return A.DotProduct(*this);} 
 
 	// return cross product
 	TemplateVector operator* (const TemplateVector &B) const; 
@@ -192,7 +193,8 @@ TemplateVector<T>& TemplateVector<T>::operator-= (const TemplateVector<T>& A)
 }
 
 template<class T>
-T TemplateVector<T>::operator% (const TemplateVector<T>& A) const
+//T TemplateVector<T>::operator% (const TemplateVector<T>& A) const
+T TemplateVector<T>::DotProduct (const TemplateVector<T>& A) const
 {
 	return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 }
@@ -200,9 +202,7 @@ T TemplateVector<T>::operator% (const TemplateVector<T>& A) const
 template<class T>
 TemplateVector<T> TemplateVector<T>::operator* (const TemplateVector<T>& B) const
 {
-	return TemplateVector<T> (m_y * B.m_z - m_z * B.m_y,
- 							    m_z * B.m_x - m_x * B.m_z,
-								m_x * B.m_y - m_y * B.m_x, m_w);
+	return TemplateVector<T> (m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
 }
 
 template<class T>

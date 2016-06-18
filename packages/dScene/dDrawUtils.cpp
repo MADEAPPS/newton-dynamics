@@ -30,7 +30,7 @@ int CreateCone (dVector* const points, dVector* const normals, int segments, dFl
 	dVector q1 (height, 0.0f, 0.0f, 0.0f);
 
 	dVector n (radius, height, 0.0f, 0.0f);
-	n = n.Scale (1.0f / dSqrt (n % n));
+	n = n.Scale (1.0f / dSqrt (n.DotProduct(n)));
 
 	int count = 0;
 	for (int i = 0; (i < segments) && (count < maxPoints); i ++) {

@@ -256,12 +256,12 @@ void dComplentaritySolver::dBodyState::IntegrateVelocity (dFloat timestep)
 	const dFloat D_ANGULAR_TOL = dFloat (0.0125f * 3.141592f / 180.0f);
 
 	m_globalCentreOfMass += m_veloc.Scale (timestep); 
-	while (((m_omega % m_omega) * timestep * timestep) > (D_MAX_ANGLE_STEP * D_MAX_ANGLE_STEP)) {
+	while ((m_omega.DotProduct(m_omega) * timestep * timestep) > (D_MAX_ANGLE_STEP * D_MAX_ANGLE_STEP)) {
 		m_omega = m_omega.Scale (dFloat (0.8f));
 	}
 
 	// this is correct
-	dFloat omegaMag2 = m_omega % m_omega;
+	dFloat omegaMag2 = m_omega.DotProduct(m_omega);
 	if (omegaMag2 > (D_ANGULAR_TOL * D_ANGULAR_TOL)) {
 		dFloat invOmegaMag = 1.0f / dSqrt (omegaMag2);
 		dVector omegaAxis (m_omega.Scale (invOmegaMag));
@@ -280,10 +280,10 @@ void dComplentaritySolver::dBodyState::IntegrateVelocity (dFloat timestep)
 	int j1 = 2;
 	for (int i = 0; i < 3; i ++) {
 		dAssert (m_matrix[i][3] == 0.0f);
-		dFloat val = m_matrix[i] % m_matrix[i];
+		dFloat val = m_matrix[i].DotProduct(m_matrix[i]);
 		dAssert (dAbs (val - 1.0f) < 1.0e-5f);
 		dVector tmp (m_matrix[j0] * m_matrix[j1]);
-		val = tmp % m_matrix[i];
+		val = tmp.DotProduct(m_matrix[i]);
 		dAssert (dAbs (val - 1.0f) < 1.0e-5f);
 		j0 = j1;
 		j1 = i;
@@ -366,9 +366,9 @@ void dComplentaritySolver::dBilateralJoint::CalculatePointDerivative (dParamInfo
 	dVector positError (param.m_posit1 - param.m_posit0);
 	dVector centrError (param.m_centripetal1 - param.m_centripetal0);
 
-	dFloat relPosit = positError % dir;
-	dFloat relVeloc = velocError % dir;
-	dFloat relCentr = centrError % dir; 
+	dFloat relPosit = positError.DotProduct(dir);
+	dFloat relVeloc = velocError.DotProduct(dir);
+	dFloat relCentr = centrError.DotProduct(dir); 
 
 	dFloat dt = constraintParams->m_timestep;
 	dFloat ks = COMPLEMENTARITY_POS_DAMP;
@@ -413,7 +413,7 @@ void dComplentaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* c
 
 	const dVector& omega0 = m_state0->m_omega;
 	const dVector& omega1 = m_state1->m_omega;
-	dFloat omegaError = (omega1 - omega0) % dir;
+	dFloat omegaError = (omega1 - omega0).DotProduct(dir);
 
 
 	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
@@ -542,7 +542,7 @@ int dComplentaritySolver::dFrictionLessContactJoint::ReduceContacts (int count, 
 			for (int j = i + 1; (j < count) && (contacts[j].m_point[index] < val) ; j ++) {
 				if (!mask[j]) {
 					dVector dp (contacts[j].m_point - contacts[i].m_point);
-					dFloat dist2 = dp % dp;
+					dFloat dist2 = dp.DotProduct(dp);
 					if (dist2 < window2) {
 						mask[j] = 1;
 						packContacts = 1;
@@ -590,7 +590,7 @@ void dComplentaritySolver::dFrictionLessContactJoint::JacobianDerivative (dParam
 		dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
 
 		//dFloat restitution = 0.05f;
-		dFloat relVelocErr = velocError % m_contacts[i].m_normal;
+		dFloat relVelocErr = velocError.DotProduct(m_contacts[i].m_normal);
 		dFloat penetration = 0.0f;
 		dFloat penetrationStiffness = 0.0f;
 		dFloat penetrationVeloc = penetration * penetrationStiffness;

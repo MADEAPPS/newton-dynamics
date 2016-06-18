@@ -90,8 +90,8 @@ void CustomRackAndPinion::SubmitConstraints (dFloat timestep, int threadIndex)
 	jacobian1[4] = dFloat(0.0f);
 	jacobian1[5] = dFloat(0.0f);
 
-	dFloat w0 = omega0 % dir0;
-	dFloat w1 = veloc1 % dir1;
+	dFloat w0 = omega0.DotProduct(dir0);
+	dFloat w1 = veloc1.DotProduct(dir1);
 	dFloat relOmega = w0 + w1;
 	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
 	dFloat relAccel = -0.5f * relOmega * invTimestep;

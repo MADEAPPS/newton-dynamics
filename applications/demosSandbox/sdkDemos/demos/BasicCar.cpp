@@ -461,9 +461,9 @@ class BasicCarEntity: public DemoEntity
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
 
 		// get the throttler input
-		dFloat joyPosX;
-		dFloat joyPosY;
-		int joyButtons;
+		//dFloat joyPosX;
+		//dFloat joyPosY;
+		//int joyButtons;
 
 		int gear = engine->GetGear();
 		int engineIgnitionKey = 0;
@@ -711,7 +711,7 @@ class BasicCarEntity: public DemoEntity
 			dMatrix tireMatrix;
 			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
 
-			dFloat sign = dSign((tireMatrix.m_posit - matrix.m_posit) % matrix.m_right);
+			dFloat sign = dSign((tireMatrix.m_posit - matrix.m_posit).DotProduct(matrix.m_right));
 			tireMatrix.m_posit += matrix.m_right.Scale(sign * 0.25f);
 
 			// draw the tire load 

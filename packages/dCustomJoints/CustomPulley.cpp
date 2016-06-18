@@ -92,8 +92,8 @@ void CustomPulley::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
 
 	// get angular velocity relative to the pin vector
-	dFloat w0 = veloc0 % dir0;
-	dFloat w1 = veloc1 % dir1;
+	dFloat w0 = veloc0.DotProduct(dir0);
+	dFloat w1 = veloc1.DotProduct(dir1);
 	dFloat relVeloc = w0 + w1;
 
 	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;

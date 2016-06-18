@@ -80,8 +80,8 @@ void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
 		dFloat sinAngle;
 		dFloat cosAngle;
 
-		sinAngle = (matrix0.m_front * matrix1.m_front) % matrix1.m_up;
-		cosAngle = matrix0.m_front % matrix1.m_front;
+		sinAngle = (matrix0.m_front * matrix1.m_front).DotProduct(matrix1.m_up);
+		cosAngle = matrix0.m_front.DotProduct(matrix1.m_front);
 		angle = dAtan2 (sinAngle, cosAngle);
 
 		info->m_minAngularDof[0] = (m_minAngle_0 - angle) * 180.0f / 3.141592f ;
@@ -99,8 +99,8 @@ void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
 		dFloat sinAngle;
 		dFloat cosAngle;
 
-		sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-		cosAngle = matrix0.m_up % matrix1.m_up;
+		sinAngle = (matrix0.m_up * matrix1.m_up).DotProduct(matrix0.m_front);
+		cosAngle = matrix0.m_up.DotProduct(matrix1.m_up);
 		angle = dAtan2 (sinAngle, cosAngle);
 
 		info->m_minAngularDof[1] = (m_minAngle_1 - angle) * 180.0f / 3.141592f ;
@@ -233,7 +233,7 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1_1;
 	matrix1_1.m_up = matrix1.m_up;
 	matrix1_1.m_right = matrix0.m_front * matrix1.m_up;
-	matrix1_1.m_right = matrix1_1.m_right.Scale (1.0f / dSqrt (matrix1_1.m_right % matrix1_1.m_right));
+	matrix1_1.m_right = matrix1_1.m_right.Scale (1.0f / dSqrt (matrix1_1.m_right.DotProduct(matrix1_1.m_right)));
 	matrix1_1.m_front = matrix1_1.m_up * matrix1_1.m_right;
 	
 
@@ -251,7 +251,7 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 //xxx ++;
 
 	dFloat angle = -CalculateAngle(matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right);
-	dFloat omega = (relOmega % matrix1_1.m_right);
+	dFloat omega = (relOmega.DotProduct(matrix1_1.m_right));
 	dFloat alphaError = -(angle + omega * timestep) / (timestep * timestep);
 	//dTrace(("%f  ", alphaError));
 	
@@ -272,8 +272,8 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// calculate the desired acceleration
 	
-	m_jointOmega_0 = relOmega % matrix0.m_front;
-	m_jointOmega_1 = relOmega % matrix1.m_up;
+	m_jointOmega_0 = relOmega.DotProduct(matrix0.m_front);
+	m_jointOmega_1 = relOmega.DotProduct(matrix1.m_up);
 	
 	// check is the joint limit are enable
 	if (m_limit_0_On) {

@@ -37,14 +37,14 @@ static int MakeRandomGuassianPointCloud (NewtonMesh* const mesh, dVector* const 
 	dVector origin = (maxBox + minBox).Scale (0.5f);
 
 	dFloat biasExp = 10.0f;
-	dFloat r = dSqrt (size % size);
+	dFloat r = dSqrt (size.DotProduct(size));
 	r = powf(r, 1.0f/biasExp);
 	for (int i = 0; i < count; i++) {
 		dVector& p = points[i];
 		bool test;
 		do {
 			p = dVector (2.0f * RandomVariable(r), 2.0f * RandomVariable(r), 2.0f * RandomVariable(r), 0.0f);
-			dFloat len = dSqrt (p % p);
+			dFloat len = dSqrt (p.DotProduct(p));
 			dFloat scale = powf(len, biasExp) / len;
 			p = p.Scale (scale) + origin;
 			test = (p.m_x > minBox.m_x) && (p.m_x < maxBox.m_x) && (p.m_y > minBox.m_y) && (p.m_y < maxBox.m_y) && (p.m_z > minBox.m_z) && (p.m_z < maxBox.m_z);

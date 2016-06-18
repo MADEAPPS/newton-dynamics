@@ -1371,7 +1371,7 @@ dFloat dScene::RayCast (const dVector& globalP0, const dVector& globalP1, dList<
 	dTreeNode* trace[128];
 	traceToRoot.RemoveAll();
 	dVector globalP1p0 (globalP1 - globalP0);
-	dFloat	den = 1.0f / (globalP1p0 % globalP1p0);
+	dFloat	den = 1.0f / globalP1p0.DotProduct(globalP1p0);
 	while (rootNodes.GetCount()) {
 		dTreeNode* const node = rootNodes.GetLast()->GetInfo();
 		dMatrix parentMatrix (rootMatrix.GetLast()->GetInfo());
@@ -1399,7 +1399,7 @@ dFloat dScene::RayCast (const dVector& globalP0, const dVector& globalP1, dList<
 				if (t1 < 1.0f) {
 					dVector p1p0 (p2 - p0);
 					p2 = p0 + p1p0.Scale (t1);
-					t = den * (p1p0 % globalP1p0);
+					t = den * p1p0.DotProduct(globalP1p0);
 					p2.m_w = 1.0f;
 					traceToRoot.RemoveAll();
 					for (int i = 0; i < index; i ++) {

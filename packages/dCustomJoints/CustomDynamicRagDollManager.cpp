@@ -147,10 +147,10 @@ void DynamicRagDollJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 		const dVector& coneDir0 = matrix0.m_front;
 		const dVector& coneDir1 = matrix1.m_front;
-		dFloat cosAngle = coneDir0 % coneDir1;
+		dFloat cosAngle = coneDir0.DotProduct(coneDir1);
 		if (cosAngle <= m_coneAngleCos) {
 			dVector lateralDir(coneDir0 * coneDir1);
-			dFloat mag2 = lateralDir % lateralDir;
+			dFloat mag2 = lateralDir.DotProduct(lateralDir);
 			dAssert(mag2 > 1.0e-4f);
 			lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
 

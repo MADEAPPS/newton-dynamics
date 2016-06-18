@@ -126,7 +126,7 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
 	dVector p0(matrix0.m_posit);
-	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit) % matrix1.m_front));
+	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit).DotProduct(matrix1.m_front)));
 	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 	
@@ -148,7 +148,7 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// if limit are enable ...
 	if (m_limitsLinearOn) {
-		dFloat dist = (matrix0.m_posit - matrix1.m_posit) % matrix0.m_front;
+		dFloat dist = (matrix0.m_posit - matrix1.m_posit).DotProduct(matrix0.m_front);
 		if (dist < m_minLinearDist) {
 			// get a point along the up vector and set a constraint  
 			NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix0.m_front[0]);
@@ -209,7 +209,7 @@ void CustomCorkScrew::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 
 		// calculate the desired acceleration
-		dFloat relOmega = (omega0 - omega1) % matrix0.m_front;
+		dFloat relOmega = (omega0 - omega1).DotProduct(matrix0.m_front);
 		dFloat relAccel = m_angularAccel - m_angularDamp * relOmega;
 
 		// if the motor capability is on, then set angular acceleration with zero angular correction 
@@ -236,7 +236,7 @@ void CustomCorkScrew::GetInfo (NewtonJointRecord* const info) const
 
 	if (m_limitsLinearOn) {
 		dFloat dist;
-		dist = (matrix0.m_posit - matrix1.m_posit) % matrix0.m_front;
+		dist = (matrix0.m_posit - matrix1.m_posit).DotProduct(matrix0.m_front);
 		info->m_minLinearDof[0] = m_minLinearDist - dist;
 		info->m_maxLinearDof[0] = m_maxLinearDist - dist;
 	} else {
@@ -257,8 +257,8 @@ void CustomCorkScrew::GetInfo (NewtonJointRecord* const info) const
 		dFloat sinAngle;
 		dFloat cosAngle;
 
-		sinAngle = (matrix0.m_up * matrix1.m_up) % matrix0.m_front;
-		cosAngle = matrix0.m_up % matrix1.m_up;
+		sinAngle = (matrix0.m_up * matrix1.m_up).DotProduct(matrix0.m_front);
+		cosAngle = matrix0.m_up.DotProduct(matrix1.m_up);
 		angle = dAtan2 (sinAngle, cosAngle);
 		info->m_minAngularDof[0] = (m_minAngularDist - angle) * 180.0f / 3.141592f ;
 		info->m_maxAngularDof[0] = (m_maxAngularDist - angle) * 180.0f / 3.141592f ;

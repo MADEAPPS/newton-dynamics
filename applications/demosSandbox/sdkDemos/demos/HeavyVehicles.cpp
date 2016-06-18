@@ -271,7 +271,7 @@ class HeavyVehicleEntity: public DemoEntity
 				const dVector& p0 = m_controlPointsOffset[i];
 				for (int j = 0; j < 8; j ++) {
 					dVector dist (p0 - tireMatrix[j].m_posit);
-					dFloat mag2 = dist % dist;
+					dFloat mag2 = dist.DotProduct(dist);
 					if (mag2 < dist2) {
 						dist2 = mag2;
 						index = j;
@@ -323,7 +323,7 @@ class HeavyVehicleEntity: public DemoEntity
 				dBigVector q (m_bezierMesh->m_curve.CurvePoint(dMod (u, 1.0f)));
 				dVector p1 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
 				dVector err (p1 - p0);
-				dFloat errMag = dSqrt (err % err);
+				dFloat errMag = dSqrt (err.DotProduct(err));
 				distAcc += errMag;
 				if (distAcc > stepAcc) {
 					stepAcc += threadSize;
@@ -444,7 +444,7 @@ class HeavyVehicleEntity: public DemoEntity
 				dVector dir (q1 - q0);
 
 				dir.m_x = 0.0f;
-				dir = dir.Scale (1.0f / dSqrt (dir % dir));
+				dir = dir.Scale (1.0f / dSqrt (dir.DotProduct(dir)));
 				matrix.m_front = dVector (dir.m_z, -dir.m_y, 0.0f, 0.0f);
 				matrix.m_up = dVector (dir.m_y, dir.m_z, 0.0f, 0.0f);
 				matrix.m_right = dVector (0.0f, 0.0f, 1.0f, 0.0f);
@@ -602,15 +602,15 @@ class HeavyVehicleEntity: public DemoEntity
 		dVector extremePoint(0.0f);
 		dVector upDir (tireMatrix.UnrotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f)));
 		NewtonCollisionSupportVertex (collision, &upDir[0], &extremePoint[0]);
-		radius = dAbs (upDir % extremePoint);
+		radius = dAbs (upDir.DotProduct(extremePoint));
 
 		dVector widthDir (tireMatrix.UnrotateVector(dVector (0.0f, 0.0f, 1.0f, 0.0f)));
 		NewtonCollisionSupportVertex (collision, &widthDir[0], &extremePoint[0]);
-		width = widthDir % extremePoint;
+		width = widthDir.DotProduct(extremePoint);
 
 		widthDir = widthDir.Scale (-1.0f);
 		NewtonCollisionSupportVertex (collision, &widthDir[0], &extremePoint[0]);
-		width += widthDir % extremePoint;
+		width += widthDir.DotProduct(extremePoint);
 
 		// destroy the auxiliary collision
 		NewtonDestroyCollision (collision);	

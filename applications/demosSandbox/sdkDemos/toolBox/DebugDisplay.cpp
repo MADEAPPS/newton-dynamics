@@ -81,7 +81,7 @@ static void RenderBodyContactsForces (NewtonBody* const body, dFloat scale)
 
 					NewtonMaterialGetContactForce(material, body, &contactForce.m_x);
 					NewtonMaterialGetContactPositionAndNormal (material, body, &point.m_x, &normal.m_x);
-					dVector normalforce (normal.Scale (contactForce % normal));
+					dVector normalforce (normal.Scale (contactForce.DotProduct(normal)));
 					dVector p0 (point);
 					dVector p1 (point + normalforce.Scale (scale));
 					glVertex3f (p0.m_x, p0.m_y, p0.m_z);
@@ -89,8 +89,8 @@ static void RenderBodyContactsForces (NewtonBody* const body, dFloat scale)
 
 					// these are the components of the tangents forces at the contact point, the can be display at the contact position point.
 					NewtonMaterialGetContactTangentDirections(material, body, &tangnetDir0[0], &tangnetDir1[0]);
-					dVector tangentForce1 (tangnetDir0.Scale ((contactForce % tangnetDir0) * scale));
-					dVector tangentForce2 (tangnetDir1.Scale ((contactForce % tangnetDir1) * scale));
+					dVector tangentForce1 (tangnetDir0.Scale ((contactForce.DotProduct(tangnetDir0)) * scale));
+					dVector tangentForce2 (tangnetDir1.Scale ((contactForce.DotProduct(tangnetDir1)) * scale));
 
 					p1 = point + tangentForce1.Scale (scale);
 					glVertex3f(p0.m_x, p0.m_y, p0.m_z);
@@ -271,7 +271,7 @@ void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* 
 		dVector p2 (faceVertec[2 * 3 + 0], faceVertec[2 * 3 + 1], faceVertec[2 * 3 + 2]);
 
 		dVector normal ((p1 - p0) * (p2 - p0));
-		normal = normal.Scale (1.0f / dSqrt (normal % normal));
+		normal = normal.Scale (1.0f / dSqrt (normal.DotProduct(normal)));
 		glNormal3f(normal.m_x, normal.m_y, normal.m_z);
 		for (int i = 2; i < vertexCount; i ++) {
 			p2 = dVector (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);

@@ -169,8 +169,8 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		dVector chassisP1(chassisMatrix.m_posit + chassisMatrix.m_up.Scale(m_tire->m_data.m_suspesionlenght));
 		dVector p1p0(chassisP1 - chassisP0);
 		dVector q1p0(tireMatrix.m_posit - chassisP0);
-		dFloat num = q1p0 % p1p0;
-		dFloat den = p1p0 % p1p0;
+		dFloat num = q1p0.DotProduct(p1p0);
+		dFloat den = p1p0.DotProduct(p1p0);
 		return num / den;
 	}
 
@@ -212,7 +212,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		chassisJacobian.m_linear = dir.Scale (-1.0f);
 		chassisJacobian.m_angular = r * chassisJacobian.m_linear;
 
-		dFloat relativeVeloc = tireVeloc % tireJacobian.m_linear + tireOmega % tireJacobian.m_angular + chassisVeloc % chassisJacobian.m_linear + chassisOmega % chassisJacobian.m_angular;
+		dFloat relativeVeloc = tireVeloc.DotProduct(tireJacobian.m_linear) + tireOmega.DotProduct(tireJacobian.m_angular) + chassisVeloc.DotProduct(chassisJacobian.m_linear) + chassisOmega.DotProduct(chassisJacobian.m_angular);
 		if (relativeVeloc > 0.0f) {
 			dComplentaritySolver::dJacobian tireInvMassJacobianTrans;
 			dComplentaritySolver::dJacobian chassisInvMassJacobianTrans;
@@ -228,8 +228,8 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 			chassisInvMassJacobianTrans.m_linear = chassisJacobian.m_linear.Scale(tireInvMass);
 			chassisInvMassJacobianTrans.m_angular = chassisInvInertia.RotateVector (chassisJacobian.m_angular);
 
-			dFloat den = tireJacobian.m_linear % tireInvMassJacobianTrans.m_linear + tireJacobian.m_angular % tireInvMassJacobianTrans.m_angular + 
-						 chassisJacobian.m_linear % chassisInvMassJacobianTrans.m_linear + chassisJacobian.m_angular % chassisInvMassJacobianTrans.m_angular;
+			dFloat den = tireJacobian.m_linear.DotProduct(tireInvMassJacobianTrans.m_linear) + tireJacobian.m_angular.DotProduct(tireInvMassJacobianTrans.m_angular) + 
+						 chassisJacobian.m_linear.DotProduct(chassisInvMassJacobianTrans.m_linear) + chassisJacobian.m_angular.DotProduct(chassisInvMassJacobianTrans.m_angular);
 
 			dFloat impulse = - relativeVeloc / den;
 			tireVeloc += tireInvMassJacobianTrans.m_linear.Scale (impulse);
@@ -271,7 +271,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 
 		tireMatrix.m_front = chassisMatrix.m_front;
 		tireMatrix.m_right = tireMatrix.m_front * tireMatrix.m_up;
-		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right % tireMatrix.m_right));
+		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right.DotProduct(tireMatrix.m_right)));
 		tireMatrix.m_up = tireMatrix.m_right * tireMatrix.m_front;
 
 		dFloat param = 0.0f;
@@ -294,12 +294,12 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		tireMatrix = GetMatrix0().Inverse() * tireMatrix;
 		NewtonBodyGetVelocity(tire, &tireVeloc[0]);
 		NewtonBodyGetPointVelocity(chassis, &tireMatrix.m_posit[0], &chassisVeloc[0]);
-		chassisVeloc -= chassisMatrix.m_up.Scale (chassisVeloc % chassisMatrix.m_up);
-		tireVeloc = chassisVeloc + chassisMatrix.m_up.Scale (tireVeloc % chassisMatrix.m_up);
+		chassisVeloc -= chassisMatrix.m_up.Scale (chassisVeloc.DotProduct(chassisMatrix.m_up));
+		tireVeloc = chassisVeloc + chassisMatrix.m_up.Scale (tireVeloc.DotProduct(chassisMatrix.m_up));
 		
 		NewtonBodyGetOmega(tire, &tireOmega[0]);
 		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
-		tireOmega = chassisOmega + tireMatrix.m_front.Scale (tireOmega % tireMatrix.m_front);
+		tireOmega = chassisOmega + tireMatrix.m_front.Scale (tireOmega.DotProduct(tireMatrix.m_front));
 
 		NewtonBodySetMatrixNoSleep(tire, &tireMatrix[0][0]);
 		NewtonBodySetVelocityNoSleep(tire, &tireVeloc[0]);
@@ -346,7 +346,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 
 			NewtonBodyGetVelocity(tire, &tireVeloc[0]);
 			NewtonBodyGetPointVelocity(chassis, &tireMatrix.m_posit[0], &chassisPivotVeloc[0]);
-			dFloat accel = ((chassisPivotVeloc - tireVeloc) % chassisMatrix.m_up - 2.0f) / timestep;
+			dFloat accel = ((chassisPivotVeloc - tireVeloc).DotProduct(chassisMatrix.m_up) - 2.0f) / timestep;
 			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else if (param <= 0.0f) {
@@ -355,7 +355,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 			NewtonBodyGetVelocity(tire, &tireVeloc[0]);
 			NewtonBodyGetPointVelocity(chassis, &tireMatrix.m_posit[0], &chassisPivotVeloc[0]);
-			dFloat accel = ((chassisPivotVeloc - tireVeloc) % chassisMatrix.m_up) / timestep;
+			dFloat accel = ((chassisPivotVeloc - tireVeloc).DotProduct(chassisMatrix.m_up)) / timestep;
 			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			if (!m_tire->GetController()->m_isAirborned) {
 				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
@@ -384,7 +384,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 			NewtonBodyGetOmega(chassis, &chassisOmega[0]);
 			dVector relOmega(tireOmega - chassisOmega);
 
-			dFloat speed = relOmega % m_lateralDir;
+			dFloat speed = relOmega.DotProduct(m_lateralDir);
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &m_lateralDir[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, -speed / timestep);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_brakeTorque);
@@ -470,7 +470,7 @@ class CustomVehicleController::TrackedSteeringJoint: public CustomUniversal
 		const dVector& pin = differentialMatrix.m_front;
 
 		dVector relOmega(chassisOmega - differentialOmega);
-		dFloat accel = 0.5f * (relOmega % pin + m_turnRate) / timestep;
+		dFloat accel = 0.5f * (relOmega.DotProduct(pin) + m_turnRate) / timestep;
 //dTrace (("%f\n", m_turnRate));
 
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
@@ -493,10 +493,10 @@ void CustomVehicleController::BodyPartChassis::ApplyDownForce ()
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 	matrix = GetController()->m_localFrame * matrix;
 
-	veloc -= matrix.m_up.Scale (veloc % matrix.m_up);
-	dFloat downForceMag = m_aerodynamicsDownForceCoefficient * (veloc % veloc);
+	veloc -= matrix.m_up.Scale (veloc.DotProduct(matrix.m_up));
+	dFloat downForceMag = m_aerodynamicsDownForceCoefficient * veloc.DotProduct(veloc);
 	if (downForceMag > m_aerodynamicsDownForce0) {
-		dFloat speed = dSqrt (veloc % veloc);
+		dFloat speed = dSqrt (veloc.DotProduct(veloc));
 		dFloat topSpeed = GetController()->GetEngine() ? GetController()->GetEngine()->GetTopGear() : 30.0f;
 		dFloat speedRatio = (speed - m_aerodynamicsDownSpeedCutOff) / (topSpeed - speed); 
 		downForceMag = m_aerodynamicsDownForce0 + (m_aerodynamicsDownForce1 - m_aerodynamicsDownForce0) * speedRatio; 
@@ -565,7 +565,7 @@ dFloat CustomVehicleController::BodyPartTire::GetRPM() const
 	dVector omega(0.0f); 
 	WheelJoint* const joint = (WheelJoint*) m_joint;
 	NewtonBodyGetOmega(m_body, &omega[0]);
-	return (joint->m_lateralDir % omega) * 9.55f;
+	return joint->m_lateralDir.DotProduct(omega) * 9.55f;
 }
 
 
@@ -730,8 +730,8 @@ int CustomVehicleController::EngineController::DriveTrain::GetNodeArray(DriveTra
 void CustomVehicleController::EngineController::DriveTrain::CalculateRightSide(EngineController* const controller, dFloat timestep, dFloat* const rightSide, dFloat* const low, dFloat* const high)
 {
 	const dFloat k = 0.5f / timestep;
-	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
-	dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
+	dFloat relativeOmega = m_omega.DotProduct(m_J01) + m_parent->m_omega.DotProduct(m_J10);
+	dFloat torqueAccel = m_torque.DotProduct(m_invMassJt01) + m_parent->m_torque.DotProduct(m_invMassJt10);
 
 	torqueAccel = (dAbs(torqueAccel) < 1.0e-8f) ? 0.0f : torqueAccel;
 	relativeOmega = (dAbs(relativeOmega) < 1.0e-8f) ? 0.0f : relativeOmega;
@@ -776,7 +776,7 @@ void CustomVehicleController::EngineController::DriveTrain::BuildMassMatrix(dFlo
 
 			dFloat acc = 0.0f;
 			for (int k = 0; k < nodeCount; k++) {
-				acc += rowI[k] % rowJ[k];
+				acc += rowI[k].DotProduct(rowJ[k]);
 			}
 			row[x] = acc;
 			x++;
@@ -893,21 +893,21 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 	for (int i = 0; i < dofSize; i++) {
 		dFloat* const row = &massMatrix[stride];
 		DriveTrain* const nodeA = nodeArray[i];
-		dFloat acc = (nodeA->m_J01 % nodeA->m_invMassJt01 + nodeA->m_J10 % nodeA->m_invMassJt10) * D_VEHICLE_REGULARIZER;
+		dFloat acc = (nodeA->m_J01.DotProduct(nodeA->m_invMassJt01) + nodeA->m_J10.DotProduct(nodeA->m_invMassJt10)) * D_VEHICLE_REGULARIZER;
 		dAssert (nodeA->m_index == i);
 		row[nodeA->m_index] = acc;
 
-		acc = nodeA->m_J10 % nodeA->m_parent->m_invMassJt01;
+		acc = nodeA->m_J10.DotProduct(nodeA->m_parent->m_invMassJt01);
 		row[nodeA->m_parent->m_index] = acc;
 		for (DriveTrain* nodeB = nodeA->m_parent->m_child; nodeB; nodeB = nodeB->m_sibling) {
 			if (nodeB != nodeA) {
-				acc = nodeA->m_J10 % nodeB->m_invMassJt10;
+				acc = nodeA->m_J10.DotProduct(nodeB->m_invMassJt10);
 				row[nodeB->m_index] = acc;
 			}
 		}
 
 		for (DriveTrain* nodeB = nodeA->m_child; nodeB; nodeB = nodeB->m_sibling) {
-			acc = nodeA->m_J01 % nodeB->m_invMassJt10;
+			acc = nodeA->m_J01.DotProduct(nodeB->m_invMassJt10);
 			row[nodeB->m_index] = acc;
 		}
 
@@ -1089,7 +1089,7 @@ void CustomVehicleController::EngineController::DriveTrainSlipDifferential::Calc
 {
 	low[m_index] = -0.1f;
 	high[m_index] = 0.1f;
-	dFloat relativeOmega = m_omega % m_J01 + m_parent->m_omega % m_J10;
+	dFloat relativeOmega = m_omega.DotProduct(m_J01) + m_parent->m_omega.DotProduct(m_J10);
 
 	dFloat differentialSpeed = controller->GetDifferentialLock() ?  D_VEHICLE_DIFFERENTIAL_LOCK_RPS : D_VEHICLE_DIFFERENTIAL_NORMAL_RPS;
 	if (dAbs (relativeOmega) > differentialSpeed) {
@@ -1101,7 +1101,7 @@ void CustomVehicleController::EngineController::DriveTrainSlipDifferential::Calc
 			high[m_index] = D_LCP_MAX_VALUE;
 		}
 		const dFloat k = 0.5f / timestep;
-		dFloat torqueAccel = m_torque % m_invMassJt01 + m_parent->m_torque % m_invMassJt10;
+		dFloat torqueAccel = m_torque.DotProduct(m_invMassJt01) + m_parent->m_torque.DotProduct(m_invMassJt10);
 		rightSide[m_index] = -(torqueAccel + k * relativeOmega);
 	} else {
 		rightSide[m_index] = 0.0f;
@@ -1569,7 +1569,7 @@ dFloat CustomVehicleController::EngineController::GetSpeed() const
 	NewtonBodyGetVelocity(chassis, &veloc[0]);
 
 	dVector pin (matrix.RotateVector (m_controller->m_localFrame.m_front));
-	return pin % veloc;
+	return pin.DotProduct(veloc);
 }
 
 dFloat CustomVehicleController::EngineController::GetTopSpeed() const
@@ -2289,7 +2289,7 @@ int CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTir
 	dMatrix tireSweeptMatrix;
 	tireSweeptMatrix.m_up = chassisMatrix.m_up;
 	tireSweeptMatrix.m_right = tireMatrix.m_front * chassisMatrix.m_up;
-	tireSweeptMatrix.m_right = tireSweeptMatrix.m_right.Scale(1.0f / dSqrt(tireSweeptMatrix.m_right % tireSweeptMatrix.m_right));
+	tireSweeptMatrix.m_right = tireSweeptMatrix.m_right.Scale(1.0f / dSqrt(tireSweeptMatrix.m_right.DotProduct(tireSweeptMatrix.m_right)));
 	tireSweeptMatrix.m_front = tireSweeptMatrix.m_up * tireSweeptMatrix.m_right;
 	tireSweeptMatrix.m_posit = chassisMatrix.m_posit + suspensionSpan;
 
@@ -2303,7 +2303,7 @@ int CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTir
 	int count = NewtonWorldConvexCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, &timeOfImpact, &filter, CustomControllerConvexCastPreFilter::Prefilter, tire->m_contactInfo, maxContactCount, threadIndex);
 	if (count) {
 		timeOfImpact = 1.0f - timeOfImpact;
-		dFloat num = (tireMatrix.m_posit - chassisMatrix.m_up.Scale (0.25f * tire->m_data.m_suspesionlenght) - chassisMatrix.m_posit) % suspensionSpan;
+		dFloat num = (tireMatrix.m_posit - chassisMatrix.m_up.Scale (0.25f * tire->m_data.m_suspesionlenght) - chassisMatrix.m_posit).DotProduct(suspensionSpan);
 		dFloat tireParam = dMax (num / (tire->m_data.m_suspesionlenght * tire->m_data.m_suspesionlenght), dFloat(0.0f));
 
 		if (tireParam <= timeOfImpact) {
@@ -2317,7 +2317,7 @@ int CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTir
 			}
 			if (count) {
 				dFloat x1 = timeOfImpact * tire->m_data.m_suspesionlenght;
-				dFloat x0 = (tireMatrix.m_posit - chassisMatrix.m_posit) % chassisMatrix.m_up;
+				dFloat x0 = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct(chassisMatrix.m_up);
 				dFloat x10 = x1 - x0;
 				if (x10 > (1.0f / 32.0f)) {
 					dFloat param = 1.0e10f;
@@ -2444,22 +2444,22 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			NewtonMaterialGetContactPositionAndNormal(material, tireBody, &contactPoint[0], &contactNormal[0]);
 			
 			dVector tireAnglePin(contactNormal * lateralPin);
-			dFloat pinMag2 = tireAnglePin % tireAnglePin;
+			dFloat pinMag2 = tireAnglePin.DotProduct(tireAnglePin);
 			if (pinMag2 > 0.25f) {
 				// brush rubber tire friction model
 				// project the contact point to the surface of the collision shape
-				dVector contactPatch(contactPoint - lateralPin.Scale((contactPoint - tireMatrix.m_posit) % lateralPin));
+				dVector contactPatch(contactPoint - lateralPin.Scale((contactPoint - tireMatrix.m_posit).DotProduct(lateralPin)));
 				dVector dp(contactPatch - tireMatrix.m_posit);
-				dVector radius(dp.Scale(tire->m_data.m_radio / dSqrt(dp % dp)));
+				dVector radius(dp.Scale(tire->m_data.m_radio / dSqrt(dp.DotProduct(dp))));
 
 				dVector lateralContactDir(0.0f);
 				dVector longitudinalContactDir(0.0f);
 				NewtonMaterialGetContactTangentDirections(material, tireBody, &lateralContactDir[0], &longitudinalContactDir[0]);
 
 				//dFloat tireOriginLateralSpeed = tireVeloc % lateralPin;
-				dFloat tireOriginLateralSpeed = tireVeloc % lateralContactDir;
-				dFloat tireOriginLongitudinalSpeed = tireVeloc % longitudinalContactDir;
-				dFloat tireContactLongitudinalSpeed = -((tireOmega * radius) % longitudinalContactDir);
+				dFloat tireOriginLateralSpeed = tireVeloc.DotProduct(lateralContactDir);
+				dFloat tireOriginLongitudinalSpeed = tireVeloc.DotProduct(longitudinalContactDir);
+				dFloat tireContactLongitudinalSpeed = -(tireOmega * radius).DotProduct(longitudinalContactDir);
 
 				if ((dAbs(tireOriginLongitudinalSpeed) < (1.0f)) || (dAbs(tireContactLongitudinalSpeed) < 0.1f)) {
 					// vehicle  moving at speed for which tire physics is undefined, simple do a kinematic motion
@@ -2486,7 +2486,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 					dVector tireLoadForce(0.0f);
 					NewtonMaterialGetContactForce(material, tireBody, &tireLoadForce.m_x);
-					dFloat tireLoad = (tireLoadForce % contactNormal);
+					dFloat tireLoad = tireLoadForce.DotProduct(contactNormal);
 
 					controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, longitudinalSlipRatio, lateralSideSlip, longitudinalForce, lateralForce, aligningMoment);
 				
@@ -2545,7 +2545,7 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 	omega = chassisMatrix.UnrotateVector(omega);
 
 	veloc.m_y = 0.0f;
-	dFloat velocMag2 = veloc % veloc;
+	dFloat velocMag2 = veloc.DotProduct(veloc);
 	if (velocMag2 < 5.0f) {
 		return;
 	}
@@ -2599,7 +2599,7 @@ void CustomVehicleController::ApplyLateralStabilityForces(dFloat timestep)
 			NewtonBodyGetForce (chassisBody, &bodyNetForce[0]);
 			bodyNetForce = chassisMatrix.UnrotateVector(bodyNetForce);
 			bodyNetForce.m_y = 0.0f;
-			b0 -= sideSlipAngle * dSqrt (bodyNetForce % bodyNetForce);
+			b0 -= sideSlipAngle * dSqrt (bodyNetForce.DotProduct(bodyNetForce));
 		}
 
 		maxLoad = maxLoad * 0.5f + 100.0f;
@@ -2641,7 +2641,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 				dMatrix invInertia;
 				NewtonBodyGetInvInertiaMatrix(m_body, &invInertia[0][0]);
 				dVector omega(invInertia.RotateVector(m_lastAngularMomentum));
-				if ((omega % omega) > 5.0f) {
+				if (omega.DotProduct(omega) > 5.0f) {
 					NewtonBodySetOmega(m_body, &omega[0]);
 					// attenuate the angular momentum by applying a pseudo angular deficiently of drag
 					m_lastAngularMomentum = m_lastAngularMomentum.Scale(0.999f);

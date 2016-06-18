@@ -337,15 +337,15 @@ class SuperCarEntity: public DemoEntity
 		dVector extremePoint(0.0f);
 		dVector upDir (tireMatrix.UnrotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f)));
 		NewtonCollisionSupportVertex (collision, &upDir[0], &extremePoint[0]);
-		radius = dAbs (upDir % extremePoint);
+		radius = dAbs (upDir.DotProduct(extremePoint));
 
 		dVector widthDir (tireMatrix.UnrotateVector(dVector (0.0f, 0.0f, 1.0f, 0.0f)));
 		NewtonCollisionSupportVertex (collision, &widthDir[0], &extremePoint[0]);
-		width = widthDir % extremePoint;
+		width = widthDir.DotProduct(extremePoint);
 
 		widthDir = widthDir.Scale (-1.0f);
 		NewtonCollisionSupportVertex (collision, &widthDir[0], &extremePoint[0]);
-		width += widthDir % extremePoint;
+		width += widthDir.DotProduct(extremePoint);
 
 		// destroy the auxiliary collision
 		NewtonDestroyCollision (collision);	
@@ -767,7 +767,7 @@ class SuperCarEntity: public DemoEntity
 		NewtonBody* const body = chassis.GetBody();
 		NewtonBodyGetVelocity(body, &veloc[0]);
 		NewtonBodyGetMatrix(body, &matrix[0][0]);
-		dVector lookAheadPoint (veloc.Scale (distanceAhead / dSqrt (veloc % veloc)));
+		dVector lookAheadPoint (veloc.Scale (distanceAhead / dSqrt (veloc.DotProduct(veloc))));
 
 		// find the closet point to the past on the spline
 		dMatrix vehicleMatrix (m_controller->GetLocalFrame() * matrix);
@@ -785,16 +785,16 @@ class SuperCarEntity: public DemoEntity
 		dFloat angle = 0.0f;
 //		dFloat maxAngle = steering->GetMaxSteeringAngle ();
 		dFloat maxAngle = 20.0f * 3.1314f / 180.0f;
-		if ((dist % dist) < (pathWidth * pathWidth)) {
+		if (dist.DotProduct(dist) < (pathWidth * pathWidth)) {
 			dBigVector averageTangent (0.0f, 0.0f, 0.0f, 0.0f);
 			for(int i = 0; i < 4; i ++) {
 				dBigVector tangent (path->m_curve.CurveDerivative (u));
-				tangent = tangent.Scale (1.0f / dSqrt (tangent % tangent));
+				tangent = tangent.Scale (1.0f / dSqrt (tangent.DotProduct(tangent)));
 				averageTangent += tangent;
 				q += tangent.Scale (5.0f);
 				u = path->m_curve.FindClosestKnot (q, q, 4);
 			}
-			averageTangent = averageTangent.Scale (1.0f / dSqrt (averageTangent % averageTangent));
+			averageTangent = averageTangent.Scale (1.0f / dSqrt (averageTangent.DotProduct(averageTangent)));
 			dVector heading (pathMatrix.RotateVector(dVector (averageTangent.m_x, averageTangent.m_y, averageTangent.m_z, averageTangent.m_w)));
 			heading.m_y = 0.0;
 			heading = vehicleMatrix.UnrotateVector(heading);
@@ -804,7 +804,7 @@ class SuperCarEntity: public DemoEntity
 			// find a point in the past at some distance ahead
 			for(int i = 0; i < 5; i ++) {
 				dBigVector tangent (path->m_curve.CurveDerivative (u));
-				q += tangent.Scale (5.0f / dSqrt (tangent % tangent));
+				q += tangent.Scale (5.0f / dSqrt (tangent.DotProduct(tangent)));
 				path->m_curve.FindClosestKnot (q, q, 4);
 			}
 
@@ -927,7 +927,7 @@ class SuperCarEntity: public DemoEntity
 			dMatrix tireMatrix;
 			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
 
-			dFloat sign = dSign ((tireMatrix.m_posit - matrix.m_posit) % matrix.m_right);
+			dFloat sign = dSign ((tireMatrix.m_posit - matrix.m_posit).DotProduct(matrix.m_right));
 			tireMatrix.m_posit += matrix.m_right.Scale (sign * 0.25f);
 
 			// draw the tire load 
@@ -1388,14 +1388,14 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 		dBigVector origin (path->m_curve.CurvePoint(param)); 
 		dBigVector tangent (path->m_curve.CurveDerivative(param, 1)); 
-		tangent = tangent.Scale (1.0 / sqrt (tangent % tangent));
+		tangent = tangent.Scale (1.0 / sqrt (tangent.DotProduct(tangent)));
 		dBigVector p1 (origin + tangent);
 
 		dBigVector dir; 
 		path->m_curve.FindClosestKnot (dir, p1, 4);
 
 		dir -= origin;
-		dir = dir.Scale (1.0 / sqrt (dir % dir));
+		dir = dir.Scale (1.0 / sqrt (dir.DotProduct(dir)));
 		dMatrix matrix (dGetIdentityMatrix());
 
 		dMatrix pathMatrix (m_raceTrackPath->GetMeshMatrix() * m_raceTrackPath->GetCurrentMatrix());
@@ -1435,7 +1435,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			dFloat64 t = dFloat64 (i) / 1000.0f;
 			dBigVector p1 (path->m_curve.CurvePoint(t));
 			dBigVector dp (p1 - p0);
-			dist += sqrt (dp % dp);
+			dist += sqrt (dp.DotProduct(dp));
 			if (dist > acc) {
 				acc += step;
 				dMatrix matrix (CalculateSplineMatrix  (dFloat64 (i-1) / 1000.0f));

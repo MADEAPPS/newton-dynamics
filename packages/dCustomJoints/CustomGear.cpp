@@ -92,8 +92,8 @@ void CustomGear::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
 
-	dFloat w0 = omega0 % dir0;
-	dFloat w1 = omega1 % dir1;
+	dFloat w0 = omega0.DotProduct(dir0);
+	dFloat w1 = omega1.DotProduct(dir1);
 	dFloat relOmega = w0 + w1;
 	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
 	dFloat relAccel = -0.5f * relOmega * invTimestep;
@@ -194,8 +194,8 @@ void CustomSatelliteGear::SubmitConstraints(dFloat timestep, int threadIndex)
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
 
-	dFloat w0 = omega0 % dir0;
-	dFloat w1 = omega1 % dir1;
+	dFloat w0 = omega0.DotProduct(dir0);
+	dFloat w1 = omega1.DotProduct(dir1);
 
 	dFloat relOmega = w0 + w1;
 	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;

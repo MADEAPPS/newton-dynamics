@@ -32,7 +32,7 @@ CustomPointToPoint::CustomPointToPoint(const dVector& pivotInChildInGlobalSpace,
 	:CustomJoint(6, child, parent)
 {
 	dVector dist(pivotInChildInGlobalSpace - pivotInParentInGlobalSpace);
-	m_distance = dSqrt(dist % dist);
+	m_distance = dSqrt(dist.DotProduct(dist));
 
 	dMatrix childMatrix(dGetIdentityMatrix());
 	dMatrix parentMatrix(dGetIdentityMatrix());
@@ -80,7 +80,7 @@ void CustomPointToPoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	dVector p1(matrix1.m_posit);
 
 	dVector dir(p1 - p0);
-	dFloat mag2 = dir % dir;
+	dFloat mag2 = dir.DotProduct(dir);
 	if (mag2 < 1.0e-3f) {
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
@@ -108,7 +108,7 @@ void CustomPointToPoint::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonBodyGetMatrix(body1, &body1Matrix[0][0]);
 		NewtonBodyGetPointVelocity (body1, &p1[0], &veloc1[0]);
 
-		dFloat v((veloc0 - veloc1) % dir);
+		dFloat v((veloc0 - veloc1).DotProduct(dir));
 		dFloat a = (x - v * timestep) / (timestep * timestep);
 
 		dVector r0 ((p0 - body0Matrix.TransformVector(com0)) * matrix.m_front);
@@ -229,7 +229,7 @@ void CustomBallAndSocketWithFriction::SubmitConstraints(dFloat timestep, int thr
 	}
 
 	dVector relOmega(omega0 - omega1);
-	dFloat omegaMag = dSqrt(relOmega % relOmega);
+	dFloat omegaMag = dSqrt(relOmega.DotProduct(relOmega));
 	if (omegaMag > 0.1f) {
 		// tell newton to used this the friction of the omega vector to apply the rolling friction
 		dMatrix basis(dGrammSchmidt(relOmega));
@@ -403,10 +403,10 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 
 		const dVector& coneDir0 = matrix0.m_front;
 		const dVector& coneDir1 = matrix1.m_front;
-		dFloat cosAngle = coneDir0 % coneDir1;
+		dFloat cosAngle = coneDir0.DotProduct(coneDir1);
 		if (cosAngle <= m_coneAngleCos) {
 			dVector lateralDir(coneDir0 * coneDir1);
-			dFloat mag2 = lateralDir % lateralDir;
+			dFloat mag2 = lateralDir.DotProduct(lateralDir);
 			dAssert(mag2 > 1.0e-4f);
 			lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
 
@@ -599,7 +599,7 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 	dFloat angleStep = m_angulaSpeed * timestep;
 	if (angleStep < angle) {
 		dVector axis(dVector(localRotation.m_q1, localRotation.m_q2, localRotation.m_q3, 0.0f));
-		axis = axis.Scale(1.0f / dSqrt(axis % axis));
+		axis = axis.Scale(1.0f / dSqrt(axis.DotProduct(axis)));
 //		localRotation = dQuaternion(axis, angleStep);
 	}
 
