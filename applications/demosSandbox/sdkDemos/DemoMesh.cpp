@@ -458,14 +458,14 @@ DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dF
 
 			dVector e10 (p1 - p0);
 			dVector e20 (p2 - p0);
-			dVector n0 (e20 * e10);
+			dVector n0 (e20.CrossProduct(e10));
 			n0 = n0.Scale ( 1.0f / dSqrt (n0.DotProduct(n0)));
 			normalMap [z + 0][x + 0] += n0;
 			normalMap [z + 0][x + 1] += n0;
 			normalMap [z + 1][x + 1] += n0;
 
 			dVector e30 (p3 - p0);
-			dVector n1 (e30 * e20);
+			dVector n1 (e30.CrossProduct(e20));
 			n1 = n1.Scale ( 1.0f / dSqrt (n1.DotProduct(n1)));
 			normalMap [z + 0][x + 0] += n1;
 			normalMap [z + 1][x + 0] += n1;

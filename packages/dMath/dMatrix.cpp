@@ -45,12 +45,12 @@ dMatrix dGrammSchmidt(const dVector& dir)
 
 	front = front.Scale(1.0f / dSqrt (front.DotProduct(front)));
 	if (dAbs (front.m_z) > 0.577f) {
-		right = front * dVector (-front.m_y, front.m_z, 0.0f);
+		right = front.CrossProduct(dVector (-front.m_y, front.m_z, 0.0f));
 	} else {
-		right = front * dVector (-front.m_y, front.m_x, 0.0f);
+		right = front.CrossProduct(dVector (-front.m_y, front.m_x, 0.0f));
 	}
 	right = right.Scale (1.0f / dSqrt (right.DotProduct(right)));
-	up = right * front;
+	up = right.CrossProduct(front);
 
 	front.m_w = 0.0f;
 	up.m_w = 0.0f;
@@ -156,7 +156,7 @@ bool dMatrix::TestIdentity() const
 
 bool dMatrix::TestOrthogonal() const
 {
-	dVector n (m_front * m_up);
+	dVector n (m_front.CrossProduct(m_up));
 	dFloat a = m_right.DotProduct(m_right);
 	dFloat b = m_up.DotProduct(m_up);
 	dFloat c = m_front.DotProduct(m_front);
@@ -384,7 +384,7 @@ dVector dMatrix::UntransformPlane (const dVector &globalPlane) const
 
 bool dMatrix::SanityCheck() const
 {
-	dVector right (m_front * m_up);
+	dVector right (m_front.CrossProduct(m_up));
 	if (dAbs (right.DotProduct(m_right)) < 0.9999f) {
 		return false;
 	}
@@ -680,9 +680,10 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 	pureRotation[1] = pureRotation[1].Scale (invdet2);
 	pureRotation[2] = pureRotation[2].Scale (invdet2);
 
-	//dFloat soureSign = ((*this)[0] * (*this)[1]) % (*this)[2];
-	dFloat sign = ((((*this)[0] * (*this)[1]).DotProduct((*this)[2])) > 0.0f) ? 1.0f : -1.0f;
-	dFloat det = (pureRotation[0] * pureRotation[1]).DotProduct(pureRotation[2]);
+	const dMatrix& me = *this;
+//	dFloat sign = ((((*this)[0] * (*this)[1]).DotProduct((*this)[2])) > 0.0f) ? 1.0f : -1.0f;
+	dFloat sign = (me[0].CrossProduct(me[1])).DotProduct(me[2]) > 0.0f ? 1.0f : -1.0f;
+	dFloat det = (pureRotation[0].CrossProduct(pureRotation[1])).DotProduct(pureRotation[2]);
 	if (dAbs (det - 1.0f) < 1.e-5f){
 		// this is a pure scale * rotation * translation
 		det = sign * dSqrt (det2);

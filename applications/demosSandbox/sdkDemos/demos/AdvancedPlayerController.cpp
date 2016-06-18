@@ -113,7 +113,7 @@ class AdvancePlayerEntity: public DemoEntity
 		dMatrix playerAxis; 
 		playerAxis[0] = dVector (0.0f, 1.0f, 0.0f, 0.0f); // the y axis is the character up vector
 		playerAxis[1] = dVector (1.0f, 0.0f, 0.0f, 0.0f); // the x axis is the character front direction
-		playerAxis[2] = playerAxis[0] * playerAxis[1];
+		playerAxis[2] = playerAxis[0].CrossProduct(playerAxis[1]);
 		playerAxis[3] = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// make the player controller, this function makes a kinematic body
@@ -983,9 +983,9 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 
 		// calculate the hinge parameter form the matrix location of each plank
 		dMatrix pinMatrix0 (dGetIdentityMatrix());
-		pinMatrix0[0] = pinMatrix0[1] * planksideDir;
+		pinMatrix0[0] = pinMatrix0[1].CrossProduct(planksideDir);
 		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0].DotProduct(pinMatrix0[0])));
-		pinMatrix0[2] = pinMatrix0[0] * pinMatrix0[1];
+		pinMatrix0[2] = pinMatrix0[0].CrossProduct(pinMatrix0[1]);
 		pinMatrix0[0][3] = 0.0f;
 		pinMatrix0[1][3] = 0.0f;
 		pinMatrix0[2][3] = 0.0f;
@@ -1023,9 +1023,9 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		NewtonBodyGetMatrix(body0, &matrix0[0][0]);
 
 		dMatrix pinMatrix0 (dGetIdentityMatrix());
-		pinMatrix0[0] = pinMatrix0[1] * planksideDir;
+		pinMatrix0[0] = pinMatrix0[1].CrossProduct(planksideDir);
 		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0].DotProduct(pinMatrix0[0])));
-		pinMatrix0[2] = pinMatrix0[0] * pinMatrix0[1];
+		pinMatrix0[2] = pinMatrix0[0].CrossProduct(pinMatrix0[1]);
 		pinMatrix0[0][3] = 0.0f;
 		pinMatrix0[1][3] = 0.0f;
 		pinMatrix0[2][3] = 0.0f;
@@ -1040,9 +1040,9 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		NewtonBodyGetMatrix(body0, &matrix0[0][0]);
 
 		dMatrix pinMatrix0 (dGetIdentityMatrix());
-		pinMatrix0[0] = pinMatrix0[1] * planksideDir;
+		pinMatrix0[0] = pinMatrix0[1].CrossProduct(planksideDir);
 		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0].DotProduct(pinMatrix0[0])));
-		pinMatrix0[2] = pinMatrix0[0] * pinMatrix0[1];
+		pinMatrix0[2] = pinMatrix0[0].CrossProduct(pinMatrix0[1]);
 		pinMatrix0[0][3] = 0.0f;
 		pinMatrix0[1][3] = 0.0f;
 		pinMatrix0[2][3] = 0.0f;

@@ -53,7 +53,7 @@ class BasicPlayerEntity: public DemoEntity
 		dMatrix playerAxis; 
 		playerAxis[0] = dVector (0.0f, 1.0f, 0.0f, 0.0f); // the y axis is the character up vector
 		playerAxis[1] = dVector (1.0f, 0.0f, 0.0f, 0.0f); // the x axis is the character front direction
-		playerAxis[2] = playerAxis[0] * playerAxis[1];
+		playerAxis[2] = playerAxis[0].CrossProduct(playerAxis[1]);
 		playerAxis[3] = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// make the player controller, this function makes a kinematic body

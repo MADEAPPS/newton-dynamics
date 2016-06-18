@@ -222,7 +222,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 
 				// calculate debris initial velocity
 				dVector center (matrix.TransformVector(atom.m_centerOfMass));
-				dVector v (veloc + omega * (center - com));
+				dVector v (veloc + omega.CrossProduct(center - com));
 
 				// set initial velocity
 				NewtonBodySetVelocity(rigidBody, &v[0]);

@@ -161,7 +161,7 @@ void CustomKinematicController::SubmitConstraints (dFloat timestep, int threadIn
 
 		dVector p0 (matrix0.TransformVector (m_localHandle));
 
-		dVector pointVeloc (v + w * matrix0.RotateVector (m_localHandle - cg));
+		dVector pointVeloc (v + w.CrossProduct(matrix0.RotateVector (m_localHandle - cg)));
 		dVector relPosit (m_targetPosit - p0);
 		dVector relVeloc (relPosit.Scale (invTimestep) - pointVeloc);
 		dVector relAccel (relVeloc.Scale (invTimestep * 0.3f)); 

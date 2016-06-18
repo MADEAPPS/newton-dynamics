@@ -57,7 +57,7 @@ void CustomUpVector::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateGlobalMatrix (matrix0, matrix1);
   
 	// if the body ha rotated by some amount, the there will be a plane of rotation
-	dVector lateralDir (matrix0.m_front * matrix1.m_front);
+	dVector lateralDir (matrix0.m_front.CrossProduct(matrix1.m_front));
 	dFloat mag = lateralDir.DotProduct(lateralDir);
 	if (mag > 1.0e-6f) {
 		// if the side vector is not zero, it means the body has rotated
@@ -70,7 +70,7 @@ void CustomUpVector::SubmitConstraints (dFloat timestep, int threadIndex)
 
 		// in theory only one correction is needed, but this produces instability as the body may move sideway.
 		// a lateral correction prevent this from happening.
-		dVector frontDir (lateralDir * matrix1.m_front);
+		dVector frontDir (lateralDir.CrossProduct(matrix1.m_front));
 		NewtonUserJointAddAngularRow (m_joint, 0.0f, &frontDir[0]);
  	} else {
 		// if the angle error is very small then two angular correction along the plane axis do the trick

@@ -111,8 +111,8 @@ void CustomPointToPoint::SubmitConstraints(dFloat timestep, int threadIndex)
 		dFloat v((veloc0 - veloc1).DotProduct(dir));
 		dFloat a = (x - v * timestep) / (timestep * timestep);
 
-		dVector r0 ((p0 - body0Matrix.TransformVector(com0)) * matrix.m_front);
-		dVector r1 ((p1 - body1Matrix.TransformVector(com1)) * matrix.m_front);
+		dVector r0 ((p0 - body0Matrix.TransformVector(com0)).CrossProduct(matrix.m_front));
+		dVector r1 ((p1 - body1Matrix.TransformVector(com1)).CrossProduct(matrix.m_front));
 		dFloat jacobian0[6];
 		dFloat jacobian1[6];
 
@@ -405,14 +405,14 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 		const dVector& coneDir1 = matrix1.m_front;
 		dFloat cosAngle = coneDir0.DotProduct(coneDir1);
 		if (cosAngle <= m_coneAngleCos) {
-			dVector lateralDir(coneDir0 * coneDir1);
+			dVector lateralDir(coneDir0.CrossProduct(coneDir1));
 			dFloat mag2 = lateralDir.DotProduct(lateralDir);
 			dAssert(mag2 > 1.0e-4f);
 			lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
 
 			dQuaternion rot(m_coneAngleHalfCos, lateralDir.m_x * m_coneAngleHalfSin, lateralDir.m_y * m_coneAngleHalfSin, lateralDir.m_z * m_coneAngleHalfSin);
 			dVector frontDir(rot.UnrotateVector(coneDir1));
-			dVector upDir(lateralDir * frontDir);
+			dVector upDir(lateralDir.CrossProduct(frontDir));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
 			NewtonUserJointAddAngularRow(m_joint, CalculateAngle(coneDir0, frontDir, lateralDir), &lateralDir[0]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
@@ -603,8 +603,8 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 //		localRotation = dQuaternion(axis, angleStep);
 	}
 
-	dVector axis (matrix1.m_front * matrix1.m_front);
-	dVector axis1 (matrix1.m_front * matrix1.m_front);
+	dVector axis (matrix1.m_front.CrossProduct(matrix1.m_front));
+	dVector axis1 (matrix1.m_front.CrossProduct(matrix1.m_front));
 //dFloat sinAngle;
 //dFloat cosAngle;
 //CalculatePitchAngle (matrix0, matrix1, sinAngle, cosAngle);

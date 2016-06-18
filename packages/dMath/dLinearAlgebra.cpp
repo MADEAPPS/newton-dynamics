@@ -282,7 +282,7 @@ void dComplentaritySolver::dBodyState::IntegrateVelocity (dFloat timestep)
 		dAssert (m_matrix[i][3] == 0.0f);
 		dFloat val = m_matrix[i].DotProduct(m_matrix[i]);
 		dAssert (dAbs (val - 1.0f) < 1.0e-5f);
-		dVector tmp (m_matrix[j0] * m_matrix[j1]);
+		dVector tmp (m_matrix[j0].CrossProduct(m_matrix[j1]));
 		val = tmp.DotProduct(m_matrix[i]);
 		dAssert (dAbs (val - 1.0f) < 1.0e-5f);
 		j0 = j1;
@@ -324,14 +324,14 @@ void dComplentaritySolver::dBilateralJoint::InitPointParam (dPointDerivativePara
 
 	param.m_posit0 = pivot;
 	param.m_r0 = pivot - m_state0->m_globalCentreOfMass;
-	param.m_veloc0 = m_state0->m_omega * param.m_r0;
-	param.m_centripetal0 = m_state0->m_omega * param.m_veloc0;
+	param.m_veloc0 = m_state0->m_omega.CrossProduct(param.m_r0);
+	param.m_centripetal0 = m_state0->m_omega.CrossProduct(param.m_veloc0);
 	param.m_veloc0 += m_state0->m_veloc;
 
 	param.m_posit1 = pivot;
 	param.m_r1 = pivot - m_state1->m_globalCentreOfMass;
-	param.m_veloc1 = m_state1->m_omega * param.m_r1;
-	param.m_centripetal1 = m_state1->m_omega * param.m_veloc1;
+	param.m_veloc1 = m_state1->m_omega.CrossProduct(param.m_r1);
+	param.m_centripetal1 = m_state1->m_omega.CrossProduct(param.m_veloc1);
 	param.m_veloc1 += m_state1->m_veloc;
 }
 
@@ -341,7 +341,7 @@ void dComplentaritySolver::dBilateralJoint::CalculatePointDerivative (dParamInfo
 	int index = constraintParams->m_count;
 
 	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_IM0; 
-	dVector r0CrossDir (param.m_r0 * dir);
+	dVector r0CrossDir (param.m_r0.CrossProduct(dir));
 	jacobian0.m_linear[0] = dir.m_x;
 	jacobian0.m_linear[1] = dir.m_y;
 	jacobian0.m_linear[2] = dir.m_z;
@@ -352,7 +352,7 @@ void dComplentaritySolver::dBilateralJoint::CalculatePointDerivative (dParamInfo
 	jacobian0.m_angular[3] = 0.0f;
 
 	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_IM1; 
-	dVector r1CrossDir (dir * param.m_r1);
+	dVector r1CrossDir (dir.CrossProduct(param.m_r1));
 	jacobian1.m_linear[0] = -dir.m_x;
 	jacobian1.m_linear[1] = -dir.m_y;
 	jacobian1.m_linear[2] = -dir.m_z;

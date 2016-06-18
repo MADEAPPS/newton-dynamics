@@ -270,7 +270,7 @@ void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* 
 		dVector p1 (faceVertec[1 * 3 + 0], faceVertec[1 * 3 + 1], faceVertec[1 * 3 + 2]);
 		dVector p2 (faceVertec[2 * 3 + 0], faceVertec[2 * 3 + 1], faceVertec[2 * 3 + 2]);
 
-		dVector normal ((p1 - p0) * (p2 - p0));
+		dVector normal ((p1 - p0).CrossProduct(p2 - p0));
 		normal = normal.Scale (1.0f / dSqrt (normal.DotProduct(normal)));
 		glNormal3f(normal.m_x, normal.m_y, normal.m_z);
 		for (int i = 2; i < vertexCount; i ++) {

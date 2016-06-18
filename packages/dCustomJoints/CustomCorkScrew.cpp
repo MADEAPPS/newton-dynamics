@@ -257,7 +257,7 @@ void CustomCorkScrew::GetInfo (NewtonJointRecord* const info) const
 		dFloat sinAngle;
 		dFloat cosAngle;
 
-		sinAngle = (matrix0.m_up * matrix1.m_up).DotProduct(matrix0.m_front);
+		sinAngle = (matrix0.m_up.CrossProduct(matrix1.m_up)).DotProduct(matrix0.m_front);
 		cosAngle = matrix0.m_up.DotProduct(matrix1.m_up);
 		angle = dAtan2 (sinAngle, cosAngle);
 		info->m_minAngularDof[0] = (m_minAngularDist - angle) * 180.0f / 3.141592f ;

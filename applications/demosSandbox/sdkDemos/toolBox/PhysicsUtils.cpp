@@ -802,9 +802,9 @@ NewtonCollision* const collisionC = NewtonCreateBox (world, size.m_x * 0.25f, si
 
 	dMatrix matrix (srcMatrix);
 	matrix.m_front = matrix.m_front.Scale (1.0f / dSqrt (matrix.m_front.DotProduct(matrix.m_front)));
-	matrix.m_right = matrix.m_front * matrix.m_up;
+	matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
 	matrix.m_right = matrix.m_right.Scale (1.0f / dSqrt (matrix.m_right.DotProduct(matrix.m_right)));
-	matrix.m_up = matrix.m_right * matrix.m_front;
+	matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
 	NewtonCollisionSetMatrix(collision, &matrix[0][0]);
 
 	return collision;

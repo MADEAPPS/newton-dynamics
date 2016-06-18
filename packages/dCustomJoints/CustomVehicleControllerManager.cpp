@@ -210,7 +210,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		tireJacobian.m_linear = dir;
 		tireJacobian.m_angular = dVector (0.0f);
 		chassisJacobian.m_linear = dir.Scale (-1.0f);
-		chassisJacobian.m_angular = r * chassisJacobian.m_linear;
+		chassisJacobian.m_angular = r.CrossProduct(chassisJacobian.m_linear);
 
 		dFloat relativeVeloc = tireVeloc.DotProduct(tireJacobian.m_linear) + tireOmega.DotProduct(tireJacobian.m_angular) + chassisVeloc.DotProduct(chassisJacobian.m_linear) + chassisOmega.DotProduct(chassisJacobian.m_angular);
 		if (relativeVeloc > 0.0f) {
@@ -270,9 +270,9 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		chassisMatrix = dYawMatrix(m_steerAngle0) * chassisMatrix;
 
 		tireMatrix.m_front = chassisMatrix.m_front;
-		tireMatrix.m_right = tireMatrix.m_front * tireMatrix.m_up;
+		tireMatrix.m_right = tireMatrix.m_front.CrossProduct(tireMatrix.m_up);
 		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right.DotProduct(tireMatrix.m_right)));
-		tireMatrix.m_up = tireMatrix.m_right * tireMatrix.m_front;
+		tireMatrix.m_up = tireMatrix.m_right.CrossProduct(tireMatrix.m_front);
 
 		dFloat param = 0.0f;
 		if (!m_tire->GetController()->m_isAirborned) {
@@ -1698,7 +1698,7 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 			NewtonBody* const tireBody = tire->GetBody();
 			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
 			matrix.m_up = chassisMatrix.m_up;
-			matrix.m_right = matrix.m_front * matrix.m_up;
+			matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
 
 			array[0] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector(width, 0.0f, radio, 0.0f)));
 			array[1] = worldToComMatrix.TransformVector(matrix.TransformVector(dVector(width, 0.0f, -radio, 0.0f)));
@@ -1739,7 +1739,7 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 			NewtonBody* const tireBody = tire->GetBody();
 			NewtonBodyGetMatrix(tireBody, &matrix[0][0]);
 			matrix.m_up = chassisMatrix.m_up;
-			matrix.m_right = matrix.m_front * matrix.m_up;
+			matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
 
 			dVector origin(worldToComMatrix.TransformVector(matrix.m_posit));
 
@@ -2288,9 +2288,9 @@ int CustomVehicleControllerManager::Collide(CustomVehicleController::BodyPartTir
 
 	dMatrix tireSweeptMatrix;
 	tireSweeptMatrix.m_up = chassisMatrix.m_up;
-	tireSweeptMatrix.m_right = tireMatrix.m_front * chassisMatrix.m_up;
+	tireSweeptMatrix.m_right = tireMatrix.m_front.CrossProduct(chassisMatrix.m_up);
 	tireSweeptMatrix.m_right = tireSweeptMatrix.m_right.Scale(1.0f / dSqrt(tireSweeptMatrix.m_right.DotProduct(tireSweeptMatrix.m_right)));
-	tireSweeptMatrix.m_front = tireSweeptMatrix.m_up * tireSweeptMatrix.m_right;
+	tireSweeptMatrix.m_front = tireSweeptMatrix.m_up.CrossProduct(tireSweeptMatrix.m_right);
 	tireSweeptMatrix.m_posit = chassisMatrix.m_posit + suspensionSpan;
 
 	NewtonCollision* const tireCollision = NewtonBodyGetCollision(tireBody);
@@ -2443,7 +2443,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			dVector contactNormal(0.0f);
 			NewtonMaterialGetContactPositionAndNormal(material, tireBody, &contactPoint[0], &contactNormal[0]);
 			
-			dVector tireAnglePin(contactNormal * lateralPin);
+			dVector tireAnglePin(contactNormal.CrossProduct(lateralPin));
 			dFloat pinMag2 = tireAnglePin.DotProduct(tireAnglePin);
 			if (pinMag2 > 0.25f) {
 				// brush rubber tire friction model
@@ -2459,7 +2459,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				//dFloat tireOriginLateralSpeed = tireVeloc % lateralPin;
 				dFloat tireOriginLateralSpeed = tireVeloc.DotProduct(lateralContactDir);
 				dFloat tireOriginLongitudinalSpeed = tireVeloc.DotProduct(longitudinalContactDir);
-				dFloat tireContactLongitudinalSpeed = -(tireOmega * radius).DotProduct(longitudinalContactDir);
+				dFloat tireContactLongitudinalSpeed = -(tireOmega.CrossProduct(radius)).DotProduct(longitudinalContactDir);
 
 				if ((dAbs(tireOriginLongitudinalSpeed) < (1.0f)) || (dAbs(tireContactLongitudinalSpeed) < 0.1f)) {
 					// vehicle  moving at speed for which tire physics is undefined, simple do a kinematic motion

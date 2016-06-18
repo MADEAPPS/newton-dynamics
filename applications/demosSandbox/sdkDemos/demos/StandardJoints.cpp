@@ -348,7 +348,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		NewtonBodyGetOmega(body, &w[0]);
 		NewtonBodyGetMatrix(body, &matrix[0][0]);
 		c = matrix.m_posit; // TODO: Does not handle COM offset !!!
-		return v + w * (point - c);
+		return v + w.CrossProduct(point - c);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -916,8 +916,8 @@ class CustomDistanceRope: public CustomPointToPoint
 		dFloat v((veloc0 - veloc1).DotProduct(dir));
 		dFloat a = (x - v * timestep) / (timestep * timestep);
 
-		dVector r0((p0 - body0Matrix.TransformVector(com0)) * matrix.m_front);
-		dVector r1((p1 - body1Matrix.TransformVector(com1)) * matrix.m_front);
+		dVector r0((p0 - body0Matrix.TransformVector(com0)).CrossProduct(matrix.m_front));
+		dVector r1((p1 - body1Matrix.TransformVector(com1)).CrossProduct(matrix.m_front));
 		dFloat jacobian0[6];
 		dFloat jacobian1[6];
 
@@ -1007,7 +1007,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		dVector location1 (positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, 0.0);
 		dVector dir (location1 - location0);
 		matrix.m_front = dir.Scale (1.0f / dSqrt (dir.DotProduct(dir)));
-		matrix.m_right = matrix.m_front * matrix.m_up;
+		matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
 		dMatrix matrix1 (dYawMatrix(0.5f * 3.141692f) * matrix);
 		NewtonBodySetMatrix(box, &matrix1[0][0]);
 		matrix.m_posit.m_y += attachmentOffset;		

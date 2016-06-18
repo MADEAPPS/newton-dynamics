@@ -236,7 +236,7 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 	NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 	dVector updir (matrix.RotateVector(m_upVector));
 	dVector frontDir (matrix.RotateVector(m_frontVector));
-	dVector rightDir (frontDir * updir);
+	dVector rightDir (frontDir.CrossProduct(updir));
 
 	dVector veloc (0.0f);
 	if ((verticalSpeed <= 0.0f) && (m_groundPlane.DotProduct(m_groundPlane)) > 0.0f) {

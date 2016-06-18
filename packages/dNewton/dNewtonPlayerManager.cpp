@@ -70,7 +70,7 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 	dMatrix playerAxis; 
 	playerAxis[0] = dVector (upDir); // the y axis is the character up vector
 	playerAxis[1] = dVector (frontDir); // the x axis is the character front direction
-	playerAxis[2] = playerAxis[0] * playerAxis[1];
+	playerAxis[2] = playerAxis[0].CrossProduct(playerAxis[1]);
 	playerAxis[3] = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 	m_controller = manager->CreatePlayer(mass, outerRadius, innerRadius, height, stairStep, playerAxis);

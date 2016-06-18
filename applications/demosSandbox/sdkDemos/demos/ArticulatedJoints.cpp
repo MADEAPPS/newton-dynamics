@@ -486,7 +486,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			NewtonBodyGetMatrix(chassiBody, &chassisMatrix[0][0]);
 			dVector upDir(chassisMatrix.RotateVector(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
 			dVector tireAxis(tireMatrix.RotateVector(dVector(1.0f, 0.0f, 0.0f, 0.0f)));
-			dVector contactDirection(upDir * tireAxis);
+			dVector contactDirection(upDir.CrossProduct(tireAxis));
 
 			NewtonMaterial* const material = NewtonContactGetMaterial(contactList[0]);
 			NewtonMaterialContactRotateTangentDirections(material, &contactDirection[0]);
@@ -512,7 +512,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			dVector upDir (chassisMatrix.RotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f)));
 			dVector tireAxis (tireMatrix.RotateVector(dVector (1.0f, 0.0f, 0.0f, 0.0f)));
 
-			dVector contactDirection (upDir * tireAxis);
+			dVector contactDirection (upDir.CrossProduct(tireAxis));
 			for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
 				NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 				NewtonMaterialContactRotateTangentDirections (material, &contactDirection[0]);
@@ -664,7 +664,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dMatrix engineAxis;
 		engineAxis.m_front = engineMatrix.m_front;
 		engineAxis.m_up = engineMatrix.m_right;
-		engineAxis.m_right = engineAxis.m_front * engineAxis.m_up;
+		engineAxis.m_right = engineAxis.m_front.CrossProduct(engineAxis.m_up);
 		engineAxis.m_posit = engineMatrix.m_posit;
 
 		CustomUniversal* const engineJoint = new CustomUniversal(engineAxis, engineBody, chassis);

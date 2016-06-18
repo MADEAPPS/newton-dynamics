@@ -149,14 +149,14 @@ void DynamicRagDollJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 		const dVector& coneDir1 = matrix1.m_front;
 		dFloat cosAngle = coneDir0.DotProduct(coneDir1);
 		if (cosAngle <= m_coneAngleCos) {
-			dVector lateralDir(coneDir0 * coneDir1);
+			dVector lateralDir(coneDir0.CrossProduct(coneDir1));
 			dFloat mag2 = lateralDir.DotProduct(lateralDir);
 			dAssert(mag2 > 1.0e-4f);
 			lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
 
 			dQuaternion rot(m_coneAngleHalfCos, lateralDir.m_x * m_coneAngleHalfSin, lateralDir.m_y * m_coneAngleHalfSin, lateralDir.m_z * m_coneAngleHalfSin);
 			dVector frontDir(rot.UnrotateVector(coneDir1));
-			dVector upDir(lateralDir * frontDir);
+			dVector upDir(lateralDir.CrossProduct(frontDir));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
 			NewtonUserJointAddAngularRow(m_joint, CalculateAngle(coneDir0, frontDir, lateralDir), &lateralDir[0]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);

@@ -67,7 +67,7 @@ static void GetCollisionSubShape(const NewtonJoint* const contactJoint, NewtonBo
 				NewtonMaterialGetContactForce (material, body, &force[0]);
 				NewtonMaterialGetContactPositionAndNormal (material, body, &posit[0], &normal[0]);
 				// the torque on this contact is
-				dVector torque ((origin - posit) * force);
+				dVector torque ((origin - posit).CrossProduct(force));
 
 				// do what ever you want wit this  
 

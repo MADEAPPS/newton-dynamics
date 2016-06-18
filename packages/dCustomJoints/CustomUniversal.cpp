@@ -80,7 +80,7 @@ void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
 		dFloat sinAngle;
 		dFloat cosAngle;
 
-		sinAngle = (matrix0.m_front * matrix1.m_front).DotProduct(matrix1.m_up);
+		sinAngle = (matrix0.m_front.CrossProduct(matrix1.m_front)).DotProduct(matrix1.m_up);
 		cosAngle = matrix0.m_front.DotProduct(matrix1.m_front);
 		angle = dAtan2 (sinAngle, cosAngle);
 
@@ -99,7 +99,7 @@ void CustomUniversal::GetInfo (NewtonJointRecord* const info) const
 		dFloat sinAngle;
 		dFloat cosAngle;
 
-		sinAngle = (matrix0.m_up * matrix1.m_up).DotProduct(matrix0.m_front);
+		sinAngle = (matrix0.m_up.CrossProduct(matrix1.m_up)).DotProduct(matrix0.m_front);
 		cosAngle = matrix0.m_up.DotProduct(matrix1.m_up);
 		angle = dAtan2 (sinAngle, cosAngle);
 
@@ -232,9 +232,9 @@ void CustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	// construct an orthogonal coordinate system with these two vectors
 	dMatrix matrix1_1;
 	matrix1_1.m_up = matrix1.m_up;
-	matrix1_1.m_right = matrix0.m_front * matrix1.m_up;
+	matrix1_1.m_right = matrix0.m_front.CrossProduct(matrix1.m_up);
 	matrix1_1.m_right = matrix1_1.m_right.Scale (1.0f / dSqrt (matrix1_1.m_right.DotProduct(matrix1_1.m_right)));
-	matrix1_1.m_front = matrix1_1.m_up * matrix1_1.m_right;
+	matrix1_1.m_front = matrix1_1.m_up.CrossProduct(matrix1_1.m_right);
 	
 
 	// override the normal right side  because the joint is too week due to centripetal accelerations
