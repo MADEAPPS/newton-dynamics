@@ -104,7 +104,7 @@ void CustomPathFollow::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateGlobalMatrix (matrix0, matrix1);
 
 	GetPointAndTangentAtLocation(matrix0.m_posit, pathPosit, pathTangent);
-	if (pathTangent.DotProduct(matrix0.m_front) < 0.0f) {
+	if (pathTangent.DotProduct3(matrix0.m_front) < 0.0f) {
 		pathTangent = pathTangent.Scale (-1.0f);
 	}
 	matrix1 = dGrammSchmidt(pathTangent);

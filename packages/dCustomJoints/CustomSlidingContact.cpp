@@ -78,7 +78,7 @@ void CustomSlidingContact::GetInfo (NewtonJointRecord* const info) const
 
 	if (m_limitsLinearOn) {
 		dFloat dist;
-		dist = (matrix0.m_posit - matrix1.m_posit).DotProduct(matrix0.m_front);
+		dist = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix0.m_front);
 		info->m_minLinearDof[0] = m_minLinearDist - dist;
 		info->m_maxLinearDof[0] = m_maxLinearDist - dist;
 	} else {
@@ -99,8 +99,8 @@ void CustomSlidingContact::GetInfo (NewtonJointRecord* const info) const
 		dFloat sinAngle;
 		dFloat cosAngle;
 
-		sinAngle = (matrix0.m_up.CrossProduct(matrix1.m_up)).DotProduct(matrix0.m_front);
-		cosAngle = matrix0.m_up.DotProduct(matrix1.m_up);
+		sinAngle = (matrix0.m_up.CrossProduct(matrix1.m_up)).DotProduct3(matrix0.m_front);
+		cosAngle = matrix0.m_up.DotProduct3(matrix1.m_up);
 		angle = dAtan2 (sinAngle, cosAngle);
 		info->m_minAngularDof[0] = (m_minAngularDist - angle) * 180.0f / 3.141592f ;
 		info->m_maxAngularDof[0] = (m_maxAngularDist - angle) * 180.0f / 3.141592f ;
@@ -142,7 +142,7 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
 	dVector p0(matrix0.m_posit);
-	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit).DotProduct(matrix1.m_front)));
+	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit).DotProduct3(matrix1.m_front)));
 	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 
@@ -150,7 +150,7 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1_1;
 	matrix1_1.m_up = matrix1.m_up;
 	matrix1_1.m_right = matrix0.m_front.CrossProduct(matrix1.m_up);
-	matrix1_1.m_right = matrix1_1.m_right.Scale(1.0f / dSqrt(matrix1_1.m_right.DotProduct(matrix1_1.m_right)));
+	matrix1_1.m_right = matrix1_1.m_right.Scale(1.0f / dSqrt(matrix1_1.m_right.DotProduct3(matrix1_1.m_right)));
 	matrix1_1.m_front = matrix1_1.m_up.CrossProduct(matrix1_1.m_right);
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_up, matrix1_1.m_up, matrix1_1.m_front), &matrix1_1.m_front[0]);
 	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_up, matrix1_1.m_up, matrix1_1.m_right), &matrix1_1.m_right[0]);
@@ -166,8 +166,8 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 	if (m_body1) {
 		NewtonBodyGetPointVelocity(m_body1, &matrix1.m_posit[0], &veloc1[0]);
 	}
-	m_posit = (matrix0.m_posit - matrix1.m_posit).DotProduct(matrix1.m_front);
-	m_speed = (veloc0 - veloc1).DotProduct(matrix1.m_front);
+	m_posit = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix1.m_front);
+	m_speed = (veloc0 - veloc1).DotProduct3(matrix1.m_front);
 	
 	// if limit are enable ...
 	if (m_limitsLinearOn) {

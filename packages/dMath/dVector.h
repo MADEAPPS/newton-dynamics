@@ -36,14 +36,14 @@ class TemplateVector
 	TemplateVector &operator+= (const TemplateVector &A);
 	TemplateVector &operator-= (const TemplateVector &A); 
 
-	T DotProduct (const TemplateVector &A) const; 
+	T DotProduct3 (const TemplateVector &A) const; 
 	TemplateVector CrossProduct (const TemplateVector &B) const; 
 
 	// component wise multiplication
 	TemplateVector CompProduct(const TemplateVector &A) const;
 
 	// legacy return dot product
-	T operator% (const TemplateVector &A) const {return A.DotProduct(*this);} 
+	T operator% (const TemplateVector &A) const {return A.DotProduct3(*this);} 
 
 	// legacy return cross product
 	TemplateVector operator* (const TemplateVector &B) const {return (*this).CrossProduct(A);}
@@ -196,7 +196,7 @@ TemplateVector<T>& TemplateVector<T>::operator-= (const TemplateVector<T>& A)
 
 template<class T>
 //T TemplateVector<T>::operator% (const TemplateVector<T>& A) const
-T TemplateVector<T>::DotProduct (const TemplateVector<T>& A) const
+T TemplateVector<T>::DotProduct3 (const TemplateVector<T>& A) const
 {
 	return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 }

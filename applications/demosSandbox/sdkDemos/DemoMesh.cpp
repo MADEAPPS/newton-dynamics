@@ -459,14 +459,14 @@ DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dF
 			dVector e10 (p1 - p0);
 			dVector e20 (p2 - p0);
 			dVector n0 (e20.CrossProduct(e10));
-			n0 = n0.Scale ( 1.0f / dSqrt (n0.DotProduct(n0)));
+			n0 = n0.Scale ( 1.0f / dSqrt (n0.DotProduct3(n0)));
 			normalMap [z + 0][x + 0] += n0;
 			normalMap [z + 0][x + 1] += n0;
 			normalMap [z + 1][x + 1] += n0;
 
 			dVector e30 (p3 - p0);
 			dVector n1 (e30.CrossProduct(e20));
-			n1 = n1.Scale ( 1.0f / dSqrt (n1.DotProduct(n1)));
+			n1 = n1.Scale ( 1.0f / dSqrt (n1.DotProduct3(n1)));
 			normalMap [z + 0][x + 0] += n1;
 			normalMap [z + 1][x + 0] += n1;
 			normalMap [z + 1][x + 1] += n1;
@@ -474,7 +474,7 @@ DemoMesh::DemoMesh(const char* const name, dFloat* const elevation, int size, dF
 	}
 
 	for (int i = 0; i < size * size; i ++) {
-		normals[i] = normals[i].Scale (1.0f / sqrtf (normals[i].DotProduct(normals[i])));
+		normals[i] = normals[i].Scale (1.0f / dSqrt (normals[i].DotProduct3(normals[i])));
 	}
 	
 	AllocVertexData (size * size);
@@ -576,8 +576,8 @@ NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& 
 
 				//dgVector (m_normal[index * 3 + 0], m_normal[index * 3 + 1], m_normal[index * 3 + 2], dgFloat32 (0.0f));
 				dVector n (rotation.RotateVector(dVector (m_normal[index * 3 + 0], m_normal[index * 3 + 1], m_normal[index * 3 + 2], 0.0f)));
-				dAssert ((n.DotProduct(n)) > 0.0f);
-				n = n.Scale (1.0f / dSqrt (n.DotProduct(n)));
+				dAssert ((n.DotProduct3(n)) > 0.0f);
+				n = n.Scale (1.0f / dSqrt (n.DotProduct3(n)));
 
 				point[j][4] = n.m_x;
 				point[j][5] = n.m_y;

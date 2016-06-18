@@ -405,8 +405,8 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
 				    BuildJacobianMatrix (1, jointArray, timeStep, jacobianPairArray, jacobianColumn, sizeof (jacobianPairArray)/ sizeof (jacobianPairArray[0]));
 				    CalculateReactionsForces (2, bodyArray, 1, jointArray, timeStep, jacobianPairArray, jacobianColumn);
 
-				    dFloat vMag2 = m_body.GetVelocity().DotProduct(m_body.GetVelocity());
-				    dFloat wMag2 = m_body.GetOmega().DotProduct(m_body.GetOmega());
+				    dFloat vMag2 = m_body.GetVelocity().DotProduct3(m_body.GetVelocity());
+				    dFloat wMag2 = m_body.GetOmega().DotProduct3(m_body.GetOmega());
 				    if ((vMag2 > 1.0e-6f) || (wMag2 > 1.0e-6f)) {
 					    isUnstable = true;
 					    m_body.IntegrateVelocity (timeStep);

@@ -711,7 +711,7 @@ class BasicCarEntity: public DemoEntity
 			dMatrix tireMatrix;
 			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
 
-			dFloat sign = dSign((tireMatrix.m_posit - matrix.m_posit).DotProduct(matrix.m_right));
+			dFloat sign = dSign((tireMatrix.m_posit - matrix.m_posit).DotProduct3(matrix.m_right));
 			tireMatrix.m_posit += matrix.m_right.Scale(sign * 0.25f);
 
 			// draw the tire load 

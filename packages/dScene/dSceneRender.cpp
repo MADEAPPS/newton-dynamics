@@ -121,7 +121,7 @@ void dSceneRender::DrawCylinder(int segments, dFloat radius, dFloat heigh)
 		dVector p3 (cap1[i]);
 
 		dVector normal ((p1 - p0).CrossProduct(p2 - p0));
-		normal = normal.Scale (1.0f / dSqrt(normal.DotProduct(normal)));
+		normal = normal.Scale (1.0f / dSqrt(normal.DotProduct3(normal)));
 
 		SubmitNormal(normal);
 		DrawTriangle(p0, p2, p1);
@@ -159,7 +159,7 @@ void dSceneRender::DrawCone(int segments, dFloat radius, dFloat heigh)
 		dVector p2 (cap[i + 1]);
 
 		dVector normal ((p1 - p0).CrossProduct(p2 - p0));
-		normal = normal.Scale (1.0f / dSqrt(normal.DotProduct(normal)));
+		normal = normal.Scale (1.0f / dSqrt(normal.DotProduct3(normal)));
 
 		SubmitNormal(normal);
 		DrawTriangle(p0, p1, p2);

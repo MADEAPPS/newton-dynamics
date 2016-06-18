@@ -244,8 +244,8 @@ void CustomJoint::CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) con
 
 dFloat CustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const
 {
-	cosAngle = dir.DotProduct(cosDir);
-	sinAngle = (dir.CrossProduct(cosDir)).DotProduct(sinDir);
+	cosAngle = dir.DotProduct3(cosDir);
+	sinAngle = (dir.CrossProduct(cosDir)).DotProduct3(sinDir);
 	return dAtan2(sinAngle, cosAngle);
 }
 

@@ -28,7 +28,7 @@ dQuaternion::dQuaternion (const dMatrix &matrix)
 	static QUAT_INDEX QIndex [] = {Y_INDEX, Z_INDEX, X_INDEX};
 
 	dFloat trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
-	dAssert (((matrix[0].CrossProduct(matrix[1])).DotProduct(matrix[2])) > 0.0f);
+	dAssert (((matrix[0].CrossProduct(matrix[1])).DotProduct3(matrix[2])) > 0.0f);
 
 	if (trace > dFloat(0.0f)) {
 		trace = dSqrt (trace + dFloat(1.0f));
@@ -84,7 +84,7 @@ dQuaternion::dQuaternion (const dVector &unitAxis, dFloat angle)
 
 #ifdef _DEBUG
 	if (dAbs (angle) > dFloat(1.0e-6f)) {
-		dAssert (dAbs (dFloat(1.0f) - unitAxis.DotProduct(unitAxis)) < dFloat(1.0e-3f));
+		dAssert (dAbs (dFloat(1.0f) - unitAxis.DotProduct3(unitAxis)) < dFloat(1.0e-3f));
 	} 
 #endif
 	m_q1 = unitAxis.m_x * sinAng;
@@ -102,7 +102,7 @@ dVector dQuaternion::CalcAverageOmega (const dQuaternion &q1, dFloat invdt) cons
 	dQuaternion dq (q0.Inverse() * q1);
 	dVector omegaDir (dq.m_q1, dq.m_q2, dq.m_q3);
 
-	dFloat dirMag2 = omegaDir.DotProduct(omegaDir);
+	dFloat dirMag2 = omegaDir.DotProduct3(omegaDir);
 	if (dirMag2	< dFloat(dFloat (1.0e-5f) * dFloat (1.0e-5f))) {
 		return dVector (dFloat(0.0f), dFloat(0.0f), dFloat(0.0f), dFloat(0.0f));
 	}
@@ -197,7 +197,7 @@ dQuaternion dQuaternion::IntegrateOmega (const dVector& omega, dFloat timestep) 
 {
 	// this is correct
 	dQuaternion rotation (*this);
-	dFloat omegaMag2 = omega.DotProduct(omega);
+	dFloat omegaMag2 = omega.DotProduct3(omega);
 	const dFloat errAngle = 0.0125f * 3.141592f / 180.0f;
 	const dFloat errAngle2 = errAngle * errAngle;
 	if (omegaMag2 > errAngle2) {

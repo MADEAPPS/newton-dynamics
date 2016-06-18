@@ -303,7 +303,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			NewtonBodyGetOmega(engineBody, &engineOmega[0]);
 			NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 			chassisMatrix = vehicleModel->m_engineJoint->GetMatrix1() * chassisMatrix;
-			engineTorque -= (engineOmega.DotProduct(chassisMatrix.m_up)) * vehicleModel->m_omegaResistance;
+			engineTorque -= (engineOmega.DotProduct3(chassisMatrix.m_up)) * vehicleModel->m_omegaResistance;
 			dVector torque (chassisMatrix.m_up.Scale(engineTorque));
 			NewtonBodyAddTorque (engineBody, &torque[0]);
 			
@@ -908,7 +908,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
 		chassisMatrix = vehicleModel->m_engineJoint->GetMatrix1() * chassisMatrix;
 
-		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct(chassisMatrix.m_up);
+		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
 		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
 		new CustomSatelliteGear(5.0f, tireHingeMatrix.m_front, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
 
@@ -1041,7 +1041,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			dBigVector q(bezierPath->m_curve.CurvePoint(dMod(u, 1.0f)));
 			dVector p1(dVector(q.m_x, q.m_y, q.m_z, q.m_w));
 			dVector err(p1 - p0);
-			dFloat errMag = dSqrt(err.DotProduct(err));
+			dFloat errMag = dSqrt(err.DotProduct3(err));
 			distAcc += errMag;
 			if (distAcc >= stepAcc) {
 				stepAcc += linkLength;
@@ -1091,7 +1091,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			dVector r1(dVector(r.m_x, r.m_y, r.m_z, 1.0f));
 			dVector dir(r1 - r0);
 
-			dir = dir.Scale(1.0f / dSqrt(dir.DotProduct(dir)));
+			dir = dir.Scale(1.0f / dSqrt(dir.DotProduct3(dir)));
 			matrix.m_front = dVector(dir.m_z, -dir.m_y, 0.0f, 0.0f);
 			matrix.m_up = dVector(dir.m_y, dir.m_z, 0.0f, 0.0f);
 			matrix.m_right = dVector(0.0f, 0.0f, 1.0f, 0.0f);

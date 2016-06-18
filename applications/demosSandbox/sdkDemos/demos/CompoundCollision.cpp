@@ -113,20 +113,20 @@ static int OnSubShapeAABBOverlapTest (const NewtonMaterial* const material, cons
 static void TesselateTriangle (int level, const dVector& p0, const dVector& p1, const dVector& p2, int& count, dFloat* const ouput)
 {
 	if (level) {
-		dAssert (dAbs (p0.DotProduct(p0) - dFloat (1.0f)) < dFloat (1.0e-4f));
-		dAssert (dAbs (p1.DotProduct(p1) - dFloat (1.0f)) < dFloat (1.0e-4f));
-		dAssert (dAbs (p2.DotProduct(p2) - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dAssert (dAbs (p0.DotProduct3(p0) - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dAssert (dAbs (p1.DotProduct3(p1) - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dAssert (dAbs (p2.DotProduct3(p2) - dFloat (1.0f)) < dFloat (1.0e-4f));
 		dVector p01 ((p0 + p1).Scale (0.5f));
 		dVector p12 ((p1 + p2).Scale (0.5f));
 		dVector p20 ((p2 + p0).Scale (0.5f));
 
-		p01 = p01.Scale (1.0f / dSqrt (p01.DotProduct(p01)));
-		p12 = p12.Scale (1.0f / dSqrt (p12.DotProduct(p12)));
-		p20 = p20.Scale (1.0f / dSqrt (p20.DotProduct(p20)));
+		p01 = p01.Scale (1.0f / dSqrt (p01.DotProduct3(p01)));
+		p12 = p12.Scale (1.0f / dSqrt (p12.DotProduct3(p12)));
+		p20 = p20.Scale (1.0f / dSqrt (p20.DotProduct3(p20)));
 
-		dAssert (dAbs (p01.DotProduct(p01) - dFloat (1.0f)) < dFloat (1.0e-4f));
-		dAssert (dAbs (p12.DotProduct(p12) - dFloat (1.0f)) < dFloat (1.0e-4f));
-		dAssert (dAbs (p20.DotProduct(p20) - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dAssert (dAbs (p01.DotProduct3(p01) - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dAssert (dAbs (p12.DotProduct3(p12) - dFloat (1.0f)) < dFloat (1.0e-4f));
+		dAssert (dAbs (p20.DotProduct3(p20) - dFloat (1.0f)) < dFloat (1.0e-4f));
 
 		TesselateTriangle (level - 1, p0,  p01, p20, count, ouput);
 		TesselateTriangle (level - 1, p1,  p12, p01, count, ouput);
@@ -134,7 +134,7 @@ static void TesselateTriangle (int level, const dVector& p0, const dVector& p1, 
 		TesselateTriangle (level - 1, p01, p12, p20, count, ouput);
 	} else {
 		dVector p ((p0 + p1 + p2).Scale (1.0f / 3.0f));
-		p = p.Scale (1.0f / dSqrt (p.DotProduct(p)));
+		p = p.Scale (1.0f / dSqrt (p.DotProduct3(p)));
 		ouput[count * 3 + 0] = p.m_x;
 		ouput[count * 3 + 1] = p.m_y;
 		ouput[count * 3 + 2] = p.m_z;

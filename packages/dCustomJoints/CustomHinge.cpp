@@ -205,7 +205,7 @@ void CustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	if (m_body1) {
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
-	m_jointOmega = (omega0 - omega1).DotProduct(matrix1.m_front);
+	m_jointOmega = (omega0 - omega1).DotProduct3(matrix1.m_front);
 
 //dTrace (("%f %f\n", GetJointAngle(), GetJointOmega()));
 

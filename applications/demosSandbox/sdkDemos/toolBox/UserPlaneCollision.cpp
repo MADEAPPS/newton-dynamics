@@ -153,13 +153,13 @@ class dInfinitePlane
 		const dInfinitePlane* const me = (dInfinitePlane*) userData;
 
 		dVector minBox (box0[0], box0[1], box0[2], 0.0f);
-		dFloat test = me->m_plane.DotProduct(minBox) +  me->m_plane.m_w;
+		dFloat test = me->m_plane.DotProduct3(minBox) +  me->m_plane.m_w;
 		if (test > 0.0f) {
 			return 0;
 		}
 
 		dVector maxBox (box1[0], box1[1], box1[2], 0.0f);
-		test = me->m_plane.DotProduct(maxBox) +  me->m_plane.m_w;
+		test = me->m_plane.DotProduct3(maxBox) +  me->m_plane.m_w;
 		if (test < 0.0f) {
 			return 0;
 		}
@@ -192,7 +192,7 @@ class dInfinitePlane
 
 		// calculate intersection between point lien a plane and return intersection parameter
 		dInfinitePlane* const me = (dInfinitePlane*) rayDesc->m_userData;
-		dFloat t = -(me->m_plane.DotProduct(q0) + me->m_plane.m_w) / (me->m_plane.DotProduct(dq));
+		dFloat t = -(me->m_plane.DotProduct3(q0) + me->m_plane.m_w) / (me->m_plane.DotProduct3(dq));
 		if ((t > 0.0f) && (t < 1.0f)) {
 			rayDesc->m_normalOut[0] = me->m_plane[0];
 			rayDesc->m_normalOut[1] = me->m_plane[1];
@@ -215,7 +215,7 @@ class dInfinitePlane
 			dVector centre ((p1 + p0).Scale (0.5f));
 
 			//find the projection of center point over the plane
-			dFloat t = - (me->m_plane.DotProduct(centre) + me->m_plane.m_w);
+			dFloat t = - (me->m_plane.DotProduct3(centre) + me->m_plane.m_w);
 			centre += me->m_plane.Scale (t);
 
 			//know calculate the scale factor
@@ -268,13 +268,13 @@ class dInfinitePlane
 		dVector p1 (collideDesc->m_boxP1[0], collideDesc->m_boxP1[1], collideDesc->m_boxP1[2], 0.0f);
 		dVector suportVertex ((me->m_plane.m_x > 0.0f) ? p0.m_x : p1.m_x, (me->m_plane.m_y > 0.0f) ? p0.m_y : p1.m_y, (me->m_plane.m_z > 0.0f) ? p0.m_z : p1.m_z);
 
-		dFloat dist = me->m_plane.DotProduct(suportVertex) + me->m_plane.m_w;
+		dFloat dist = me->m_plane.DotProduct3(suportVertex) + me->m_plane.m_w;
 		if (dist < 0.25f) {
 			// calculate the aabb center
 			dVector centre ((p1 + p0).Scale (0.5f));
 
 			//find the projection of center point over the plane
-			dFloat t = - (me->m_plane.DotProduct(centre) + me->m_plane.m_w);
+			dFloat t = - (me->m_plane.DotProduct3(centre) + me->m_plane.m_w);
 			centre += me->m_plane.Scale (t);
 
 			//know calculate the scale factor

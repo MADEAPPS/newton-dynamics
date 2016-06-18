@@ -239,22 +239,22 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 	dVector rightDir (frontDir.CrossProduct(updir));
 
 	dVector veloc (0.0f);
-	if ((verticalSpeed <= 0.0f) && (m_groundPlane.DotProduct(m_groundPlane)) > 0.0f) {
+	if ((verticalSpeed <= 0.0f) && (m_groundPlane.DotProduct3(m_groundPlane)) > 0.0f) {
 		// plane is supported by a ground plane, apply the player input velocity
-		if (m_groundPlane.DotProduct(updir) >= m_maxSlope) {
+		if (m_groundPlane.DotProduct3(updir) >= m_maxSlope) {
 			// player is in a legal slope, he is in full control of his movement
 			dVector bodyVeloc(0.0f);
 			NewtonBodyGetVelocity(m_body, &bodyVeloc[0]);
-			veloc = updir.Scale(bodyVeloc.DotProduct(updir)) + gravity.Scale (timestep) + frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(verticalSpeed);
-			veloc += (m_groundVelocity - updir.Scale (updir.DotProduct(m_groundVelocity)));
+			veloc = updir.Scale(bodyVeloc.DotProduct3(updir)) + gravity.Scale (timestep) + frontDir.Scale (forwardSpeed) + rightDir.Scale (lateralSpeed) + updir.Scale(verticalSpeed);
+			veloc += (m_groundVelocity - updir.Scale (updir.DotProduct3(m_groundVelocity)));
 
-			dFloat speedLimitMag2 = forwardSpeed * forwardSpeed + lateralSpeed * lateralSpeed + verticalSpeed * verticalSpeed + m_groundVelocity.DotProduct(m_groundVelocity) + 0.1f;
-			dFloat speedMag2 = veloc.DotProduct(veloc);
+			dFloat speedLimitMag2 = forwardSpeed * forwardSpeed + lateralSpeed * lateralSpeed + verticalSpeed * verticalSpeed + m_groundVelocity.DotProduct3(m_groundVelocity) + 0.1f;
+			dFloat speedMag2 = veloc.DotProduct3(veloc);
 			if (speedMag2 > speedLimitMag2) {
 				veloc = veloc.Scale (dSqrt (speedLimitMag2 / speedMag2));
 			}
 
-			dFloat normalVeloc = m_groundPlane.DotProduct(veloc - m_groundVelocity);
+			dFloat normalVeloc = m_groundPlane.DotProduct3(veloc - m_groundVelocity);
 			if (normalVeloc < 0.0f) {
 				veloc -= m_groundPlane.Scale (normalVeloc);
 			}
@@ -263,7 +263,7 @@ dVector CustomPlayerController::CalculateDesiredVelocity (dFloat forwardSpeed, d
 			NewtonBodyGetVelocity(m_body, &veloc[0]);
 			veloc += updir.Scale(verticalSpeed);
 			veloc += gravity.Scale (timestep);
-			dFloat normalVeloc = m_groundPlane.DotProduct(veloc - m_groundVelocity);
+			dFloat normalVeloc = m_groundPlane.DotProduct3(veloc - m_groundVelocity);
 			if (normalVeloc < 0.0f) {
 				veloc -= m_groundPlane.Scale (normalVeloc);
 			}
@@ -301,7 +301,7 @@ dFloat CustomPlayerController::CalculateContactKinematics(const dVector& veloc, 
 
 	const dFloat restitution = 0.0f;
 	dVector normal (contactInfo->m_normal);
-	dFloat reboundVelocMag = - (veloc - contactVeloc).DotProduct(normal) * (1.0f + restitution);
+	dFloat reboundVelocMag = - (veloc - contactVeloc).DotProduct3(normal) * (1.0f + restitution);
 	return (reboundVelocMag > 0.0f) ? reboundVelocMag : 0.0f; 
 }
 
@@ -323,7 +323,7 @@ void CustomPlayerController::UpdateGroundPlane (dMatrix& matrix, const dMatrix& 
 		m_isJumping = false;
 		dVector supportPoint (castMatrix.m_posit + (dst - castMatrix.m_posit).Scale (param));
 		m_groundPlane = dVector (info.m_normal[0], info.m_normal[1], info.m_normal[2], 0.0f);
-		m_groundPlane.m_w = - supportPoint.DotProduct(m_groundPlane);
+		m_groundPlane.m_w = - supportPoint.DotProduct3(m_groundPlane);
 		NewtonBodyGetPointVelocity (info.m_hitBody, &supportPoint.m_x, &m_groundVelocity[0]);
 		matrix.m_posit = supportPoint;
 		matrix.m_posit.m_w = 1.0f;
@@ -356,7 +356,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 
 	// integrate linear velocity
 	dFloat normalizedTimeLeft = 1.0f; 
-	dFloat step = timestep * dSqrt (veloc.DotProduct(veloc)) ;
+	dFloat step = timestep * dSqrt (veloc.DotProduct3(veloc)) ;
 	dFloat descreteTimeStep = timestep * (1.0f / D_DESCRETE_MOTION_STEPS);
 	int prevContactCount = 0;
 	CustomControllerConvexCastPreFilter castFilterData (m_body);
@@ -379,7 +379,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	upConstratint.m_normal[3] = m_upVector.m_w;
 
 	for (int j = 0; (j < D_PLAYER_MAX_INTERGRATION_STEPS) && (normalizedTimeLeft > 1.0e-5f); j ++ ) {
-		if (veloc.DotProduct(veloc) < 1.0e-6f) {
+		if (veloc.DotProduct3(veloc) < 1.0e-6f) {
 			break;
 		}
 
@@ -394,7 +394,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 		if (contactCount) {
 			matrix.m_posit += veloc.Scale (timetoImpact * timestep);
 			if (timetoImpact > 0.0f) {
-				matrix.m_posit -= veloc.Scale (D_PLAYER_CONTACT_SKIN_THICKNESS / dSqrt (veloc.DotProduct(veloc))) ; 
+				matrix.m_posit -= veloc.Scale (D_PLAYER_CONTACT_SKIN_THICKNESS / dSqrt (veloc.DotProduct3(veloc))) ; 
 			}
 
 			normalizedTimeLeft -= timetoImpact;
@@ -407,7 +407,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 				dVector n0 (info[i-1].m_normal);
 				for (int k = 0; k < i; k ++) {
 					dVector n1 (info[k].m_normal);
-					if (n0.DotProduct(n1) > 0.9999f) {
+					if (n0.DotProduct3(n1) > 0.9999f) {
 						info[i] = info[contactCount - 1];
 						i --;
 						contactCount --;
@@ -449,7 +449,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 				residual = 0.0f;
 				for (int k = 0; k < count; k ++) {
 					dVector normal (bounceNormal[k]);
-					dFloat v = bounceSpeed[k] - normal.DotProduct(auxBounceVeloc);
+					dFloat v = bounceSpeed[k] - normal.DotProduct3(auxBounceVeloc);
 					dFloat x = speed[k] + v;
 					if (x < 0.0f) {
 						v = 0.0f;
@@ -472,7 +472,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 			}
 			veloc += velocStep;
 
-			dFloat velocMag2 = velocStep.DotProduct(velocStep);
+			dFloat velocMag2 = velocStep.DotProduct3(velocStep);
 			if (velocMag2 < 1.0e-6f) {
 				dFloat advanceTime = dMin (descreteTimeStep, normalizedTimeLeft * timestep);
 				matrix.m_posit += veloc.Scale (advanceTime);
@@ -497,8 +497,8 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 		dVector dst (matrix.m_posit);
 		UpdateGroundPlane (matrix, supportMatrix, dst, threadIndex);
 	} else {
-		step = dAbs (updir.DotProduct(veloc.Scale (timestep)));
-		dFloat castDist = (m_groundPlane.DotProduct(m_groundPlane) > 0.0f) ? m_stairStep : step;
+		step = dAbs (updir.DotProduct3(veloc.Scale (timestep)));
+		dFloat castDist = (m_groundPlane.DotProduct3(m_groundPlane) > 0.0f) ? m_stairStep : step;
 		dVector dst (matrix.m_posit - updir.Scale (castDist * 2.0f));
 		UpdateGroundPlane (matrix, supportMatrix, dst, threadIndex);
 	}

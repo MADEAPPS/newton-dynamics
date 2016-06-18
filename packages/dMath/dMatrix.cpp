@@ -43,13 +43,13 @@ dMatrix dGrammSchmidt(const dVector& dir)
 	dVector right(0.0f);
 	dVector front (dir); 
 
-	front = front.Scale(1.0f / dSqrt (front.DotProduct(front)));
+	front = front.Scale(1.0f / dSqrt (front.DotProduct3(front)));
 	if (dAbs (front.m_z) > 0.577f) {
 		right = front.CrossProduct(dVector (-front.m_y, front.m_z, 0.0f));
 	} else {
 		right = front.CrossProduct(dVector (-front.m_y, front.m_x, 0.0f));
 	}
-	right = right.Scale (1.0f / dSqrt (right.DotProduct(right)));
+	right = right.Scale (1.0f / dSqrt (right.DotProduct3(right)));
 	up = right.CrossProduct(front);
 
 	front.m_w = 0.0f;
@@ -157,10 +157,10 @@ bool dMatrix::TestIdentity() const
 bool dMatrix::TestOrthogonal() const
 {
 	dVector n (m_front.CrossProduct(m_up));
-	dFloat a = m_right.DotProduct(m_right);
-	dFloat b = m_up.DotProduct(m_up);
-	dFloat c = m_front.DotProduct(m_front);
-	dFloat d = n.DotProduct(m_right);
+	dFloat a = m_right.DotProduct3(m_right);
+	dFloat b = m_up.DotProduct3(m_up);
+	dFloat c = m_front.DotProduct3(m_front);
+	dFloat d = n.DotProduct3(m_right);
 
 	return (m_front[3] == dFloat (0.0f)) & 
 		(m_up[3] == dFloat (0.0f)) & 
@@ -259,7 +259,7 @@ dMatrix dMatrix::Inverse () const
 	return dMatrix (dVector (m_front.m_x, m_up.m_x, m_right.m_x, 0.0f),
 					dVector (m_front.m_y, m_up.m_y, m_right.m_y, 0.0f),
 		            dVector (m_front.m_z, m_up.m_z, m_right.m_z, 0.0f),
-		            dVector (- m_posit.DotProduct(m_front), - m_posit.DotProduct(m_up), - m_posit.DotProduct(m_right), 1.0f));
+		            dVector (- m_posit.DotProduct3(m_front), - m_posit.DotProduct3(m_up), - m_posit.DotProduct3(m_right), 1.0f));
 }
 
 dMatrix dMatrix::Transpose () const
@@ -288,7 +288,7 @@ dVector dMatrix::RotateVector (const dVector &v) const
 
 dVector dMatrix::UnrotateVector (const dVector &v) const
 {
-	return dVector (v.DotProduct(m_front), v.DotProduct(m_up), v.DotProduct(m_right), 0.0f);
+	return dVector (v.DotProduct3(m_front), v.DotProduct3(m_up), v.DotProduct3(m_right), 0.0f);
 }
 
 dVector dMatrix::RotateVector4x4 (const dVector &v) const
@@ -371,21 +371,21 @@ dMatrix dMatrix::operator* (const dMatrix &B) const
 dVector dMatrix::TransformPlane (const dVector &localPlane) const
 {
 	dVector tmp (RotateVector (localPlane));  
-	tmp.m_w = localPlane.m_w - (localPlane.DotProduct(UnrotateVector (m_posit)));  
+	tmp.m_w = localPlane.m_w - (localPlane.DotProduct3(UnrotateVector (m_posit)));  
 	return tmp;  
 }
 
 dVector dMatrix::UntransformPlane (const dVector &globalPlane) const
 {
 	dVector tmp (UnrotateVector (globalPlane));
-	tmp.m_w = globalPlane.DotProduct(m_posit) + globalPlane.m_w;
+	tmp.m_w = globalPlane.DotProduct3(m_posit) + globalPlane.m_w;
 	return tmp;
 }
 
 bool dMatrix::SanityCheck() const
 {
 	dVector right (m_front.CrossProduct(m_up));
-	if (dAbs (right.DotProduct(m_right)) < 0.9999f) {
+	if (dAbs (right.DotProduct3(m_right)) < 0.9999f) {
 		return false;
 	}
 	if (dAbs (m_right.m_w) > 0.0f) {
@@ -535,9 +535,9 @@ dMatrix dMatrix::JacobiDiagonalization (dVector &eigenValues, const dMatrix& ini
 		dFloat sm = dAbs(mat[0][1]) + dAbs(mat[0][2]) + dAbs(mat[1][2]);
 
 		if (sm < EPSILON * 1e-5) {
-			dAssert (dAbs((eigenVectors.m_front.DotProduct(eigenVectors.m_front)) - 1.0f) <EPSILON);
-			dAssert (dAbs((eigenVectors.m_up.DotProduct(eigenVectors.m_up)) - 1.0f) < EPSILON);
-			dAssert (dAbs((eigenVectors.m_right.DotProduct(eigenVectors.m_right)) - 1.0f) < EPSILON);
+			dAssert (dAbs((eigenVectors.m_front.DotProduct3(eigenVectors.m_front)) - 1.0f) <EPSILON);
+			dAssert (dAbs((eigenVectors.m_up.DotProduct3(eigenVectors.m_up)) - 1.0f) < EPSILON);
+			dAssert (dAbs((eigenVectors.m_right.DotProduct3(eigenVectors.m_right)) - 1.0f) < EPSILON);
 			eigenValues = dVector (d[0], d[1], d[2], dFloat (0.0f));
 			return eigenVectors.Inverse();
 		}
@@ -682,8 +682,8 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 
 	const dMatrix& me = *this;
 //	dFloat sign = ((((*this)[0] * (*this)[1]).DotProduct((*this)[2])) > 0.0f) ? 1.0f : -1.0f;
-	dFloat sign = (me[0].CrossProduct(me[1])).DotProduct(me[2]) > 0.0f ? 1.0f : -1.0f;
-	dFloat det = (pureRotation[0].CrossProduct(pureRotation[1])).DotProduct(pureRotation[2]);
+	dFloat sign = (me[0].CrossProduct(me[1])).DotProduct3(me[2]) > 0.0f ? 1.0f : -1.0f;
+	dFloat det = (pureRotation[0].CrossProduct(pureRotation[1])).DotProduct3(pureRotation[2]);
 	if (dAbs (det - 1.0f) < 1.e-5f){
 		// this is a pure scale * rotation * translation
 		det = sign * dSqrt (det2);

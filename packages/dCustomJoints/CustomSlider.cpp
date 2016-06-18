@@ -106,7 +106,7 @@ void CustomSlider::GetInfo(NewtonJointRecord* const info) const
 
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(matrix0, matrix1);
-		dist = (matrix0.m_posit - matrix1.m_posit).DotProduct(matrix0.m_front);
+		dist = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix0.m_front);
 
 		info->m_minLinearDof[0] = m_minDist - dist;
 		info->m_maxLinearDof[0] = m_maxDist - dist;
@@ -147,7 +147,7 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
 	dVector p0(matrix0.m_posit);
-	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit).DotProduct(matrix1.m_front)));
+	dVector p1(matrix1.m_posit + matrix1.m_front.Scale((p0 - matrix1.m_posit).DotProduct3(matrix1.m_front)));
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
 	NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
 
@@ -164,8 +164,8 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 	if (m_body1) {
 		NewtonBodyGetPointVelocity(m_body1, &matrix1.m_posit[0], &veloc1[0]);
 	}
-	m_posit = (matrix0.m_posit - matrix1.m_posit).DotProduct(matrix1.m_front);
-	m_speed = (veloc0 - veloc1).DotProduct(matrix1.m_front);
+	m_posit = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix1.m_front);
+	m_speed = (veloc0 - veloc1).DotProduct3(matrix1.m_front);
 
 	m_lastRowWasUsed = false;
 	SubmitConstraintsFreeDof (timestep, matrix0, matrix1);

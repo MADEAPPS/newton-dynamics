@@ -333,7 +333,7 @@ void dBezierSpline::CreateCubicKnotVector(int count, const dBigVector* const poi
 	u[0] = 0.0f;
 	for (int i = 1; i < count; i ++) {
 		dBigVector step (points[i] - points[i - 1]);
-		dFloat64 len = dSqrt (step.DotProduct(step));
+		dFloat64 len = dSqrt (step.DotProduct3(step));
 //		u[i] = len; 
 		u[i] = dSqrt (len); 
 		d += u[i];
@@ -453,10 +453,10 @@ dFloat64 dBezierSpline::CalculateLength (dFloat64 tol) const
 			dBigVector q01 (CurvePoint (t01));
 			dBigVector err (q01 - p01);
 
-			dFloat64 err2 = err.DotProduct(err);
+			dFloat64 err2 = err.DotProduct3(err);
 			if (err2 < tol2) {
 				dBigVector step (q1 - q0);
-				length += dSqrt (step.DotProduct(step));
+				length += dSqrt (step.DotProduct3(step));
 			} else {
 				stackPool[stack][0] = q01;
 				stackPool[stack][1] = q1;
@@ -492,7 +492,7 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 			param += scale;
 			dBigVector p (CurvePoint (u, span));
 			dBigVector dp (p - point);
-			dFloat64 dist2 = dp.DotProduct(dp);
+			dFloat64 dist2 = dp.DotProduct3(dp);
 			if (dist2 < distance2) {
 				bestU = u;
 				startSpan = span;
@@ -510,8 +510,8 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 		CurveAllDerivatives (u0, derivatives);
 
 		dBigVector dist (closestControlPoint - point);
-		dFloat64 num = derivatives[1].DotProduct(dist);
-		dFloat64 den = derivatives[2].DotProduct(dist) + derivatives[1].DotProduct(derivatives[1]);
+		dFloat64 num = derivatives[1].DotProduct3(dist);
+		dFloat64 den = derivatives[2].DotProduct3(dist) + derivatives[1].DotProduct3(derivatives[1]);
 //		if (dAbs (den) < 1.0e-6f)
 //			__debugbreak();
 		
@@ -532,7 +532,7 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 		//dFloat64 xxx2 = derivatives[1] % derivatives[1];
 		//dFloat64 xxx3 = xxx1 * xxx2 * 1.0e-10;
 
-		stop |= (dAbs (u1 - u0) < 1.0e-10) || (num * num < ((dist.DotProduct(dist)) * (derivatives[1].DotProduct(derivatives[1])) * 1.0e-10));
+		stop |= (dAbs (u1 - u0) < 1.0e-10) || (num * num < ((dist.DotProduct3(dist)) * (derivatives[1].DotProduct3(derivatives[1])) * 1.0e-10));
 		u0 = u1;
 	}
 
@@ -642,12 +642,12 @@ bool dBezierSpline::RemoveKnot (dFloat64 u, dFloat64 tol)
 		}
 		if ((j - i) < t) {
 			dBigVector diff (temp[ii - 1] - temp[jj + 1]);
-			removableFlag = diff.DotProduct(diff) < (tol * tol);
+			removableFlag = diff.DotProduct3(diff) < (tol * tol);
 		} else {
 			dFloat64 alpha_i = (u - m_knotVector[i]) / (m_knotVector[i + ord + t] - m_knotVector[i]);
 			dBigVector p (temp[ii + t + 1].Scale (alpha_i) + temp[ii - 1].Scale (dFloat64 (1.0f) - alpha_i));
 			dBigVector diff (m_controlPoints[i] - p);
-			removableFlag = diff.DotProduct(diff) < (tol * tol);
+			removableFlag = diff.DotProduct3(diff) < (tol * tol);
 		}
 		if (!removableFlag) {
 			break;

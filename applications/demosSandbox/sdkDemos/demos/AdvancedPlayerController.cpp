@@ -453,7 +453,7 @@ class PlaformEntityEntity: public DemoEntity
 			dVector dist1 (matrix1.m_posit - pivot);
 			//dist0.m_y = 0.0f;
 			//dist1.m_y = 0.0f;
-			if ((dist0.DotProduct(dist0)) < (dist1.DotProduct(dist1))) {
+			if ((dist0.DotProduct3(dist0)) < (dist1.DotProduct3(dist1))) {
 				m_target = matrix0.m_posit;
 				m_currentPort = m_triggerPort0;
 			} else {
@@ -485,7 +485,7 @@ class PlaformEntityEntity: public DemoEntity
 				case m_driving:
 				{
 					dVector veloc (m_target - com);
-					veloc = veloc.Scale (speed / dSqrt (veloc.DotProduct(veloc))); 
+					veloc = veloc.Scale (speed / dSqrt (veloc.DotProduct3(veloc))); 
 					dVector target = com + veloc.Scale(timestep);
 					SetTargetPosit (target);
 					break;
@@ -950,7 +950,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		NewtonBodyGetMatrix(body1, &matrix1[0][0]);
 
 		planksideDir = matrix1.m_posit - matrix0.m_posit;
-		planksideDir = planksideDir.Scale (1.0f / dSqrt (planksideDir.DotProduct(planksideDir)));
+		planksideDir = planksideDir.Scale (1.0f / dSqrt (planksideDir.DotProduct3(planksideDir)));
 
 		dVector dir (matrix0.UnrotateVector(planksideDir));
 		NewtonCollision* const shape = NewtonBodyGetCollision(body0);
@@ -960,7 +960,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		NewtonCollisionSupportVertex(shape, &dir[0], &p0[0]);
 		dVector dir1 (dir.Scale (-1.0f));
 		NewtonCollisionSupportVertex(shape, &dir1[0], &p1[0]);
-		plankwidth = dAbs (0.5f * ((p1 - p0).DotProduct(dir)));
+		plankwidth = dAbs (0.5f * ((p1 - p0).DotProduct3(dir)));
 	}
 
 
@@ -984,7 +984,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		// calculate the hinge parameter form the matrix location of each plank
 		dMatrix pinMatrix0 (dGetIdentityMatrix());
 		pinMatrix0[0] = pinMatrix0[1].CrossProduct(planksideDir);
-		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0].DotProduct(pinMatrix0[0])));
+		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0].DotProduct3(pinMatrix0[0])));
 		pinMatrix0[2] = pinMatrix0[0].CrossProduct(pinMatrix0[1]);
 		pinMatrix0[0][3] = 0.0f;
 		pinMatrix0[1][3] = 0.0f;
@@ -1024,7 +1024,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 
 		dMatrix pinMatrix0 (dGetIdentityMatrix());
 		pinMatrix0[0] = pinMatrix0[1].CrossProduct(planksideDir);
-		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0].DotProduct(pinMatrix0[0])));
+		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0].DotProduct3(pinMatrix0[0])));
 		pinMatrix0[2] = pinMatrix0[0].CrossProduct(pinMatrix0[1]);
 		pinMatrix0[0][3] = 0.0f;
 		pinMatrix0[1][3] = 0.0f;
@@ -1041,7 +1041,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 
 		dMatrix pinMatrix0 (dGetIdentityMatrix());
 		pinMatrix0[0] = pinMatrix0[1].CrossProduct(planksideDir);
-		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0].DotProduct(pinMatrix0[0])));
+		pinMatrix0[0] = pinMatrix0[0].Scale (1.0f / dSqrt (pinMatrix0[0].DotProduct3(pinMatrix0[0])));
 		pinMatrix0[2] = pinMatrix0[0].CrossProduct(pinMatrix0[1]);
 		pinMatrix0[0][3] = 0.0f;
 		pinMatrix0[1][3] = 0.0f;

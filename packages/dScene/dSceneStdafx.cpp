@@ -334,7 +334,7 @@ dFloat dPolygonRayCast (const dVector& l0, const dVector& l1, int indexCount, co
 	dBigVector line1(l1);
 	dBigVector segment (line1 - line0);
 	dBigVector normal (dPolygonNormal (indexCount, vertex, strideInBytes, indices));
-	double den = normal.DotProduct(segment);
+	double den = normal.DotProduct3(segment);
 	if (dAbs(den) < 1.0e-15) {
 		return 1.2f;
 	}
@@ -348,14 +348,14 @@ dFloat dPolygonRayCast (const dVector& l0, const dVector& l1, int indexCount, co
 		index = indices[i] * stride;
 		dBigVector v1 (vertex[index], vertex[index + 1], vertex[index + 2], dFloat64(0.0));
 		dBigVector p0v1 (v1 - line0);
-		double alpha = sign * ((p0v1.CrossProduct(p0v0)).DotProduct(segment));
+		double alpha = sign * ((p0v1.CrossProduct(p0v0)).DotProduct3(segment));
 		if (alpha < 1.0e-15f) {
 			return 1.2f;
 		}
 		p0v0 = p0v1;
 	}
 
-	double t = - ((line0 - v0).DotProduct(normal)) / den;
+	double t = - ((line0 - v0).DotProduct3(normal)) / den;
 	if ((t < 0.0f) || (t > 1.0f)) {
 		return 1.2f;
 	}
@@ -368,11 +368,11 @@ void dRayToRayCast (const dVector& ray_p0, const dVector& ray_p1, const dVector&
 	dVector v (ray_q1 - ray_q0);
 	dVector w (ray_p0 - ray_q0);
 
-	dFloat a = u.DotProduct(u);        // always >= 0
-	dFloat b = u.DotProduct(v);
-	dFloat c = v.DotProduct(v);        // always >= 0
-	dFloat d = u.DotProduct(w);
-	dFloat e = v.DotProduct(w);
+	dFloat a = u.DotProduct3(u);        // always >= 0
+	dFloat b = u.DotProduct3(v);
+	dFloat c = v.DotProduct3(v);        // always >= 0
+	dFloat d = u.DotProduct3(w);
+	dFloat e = v.DotProduct3(w);
 	dFloat D = a*c - b*b;   // always >= 0
 	dFloat sD = D;			// sc = sN / sD, default sD = D >= 0
 	dFloat tD = D;			// tc = tN / tD, default tD = D >= 0

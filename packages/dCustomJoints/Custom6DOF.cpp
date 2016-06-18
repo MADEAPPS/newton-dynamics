@@ -120,7 +120,7 @@ void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 	dVector dp (p0 - p1);
 	for (int i = 0; i < 3; i ++) {
 		if (!((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f))) {
-			p1 += matrix1[i].Scale (dp.DotProduct(matrix1[i]));
+			p1 += matrix1[i].Scale (dp.DotProduct3(matrix1[i]));
 		}
 	}
 
@@ -129,7 +129,7 @@ void Custom6DOF::GetInfo (NewtonJointRecord* const info) const
 			info->m_minLinearDof[i] = 0.0f;
 			info->m_maxLinearDof[i] = 0.0f;
 		} else {
-			dist = dp.DotProduct(matrix1[i]);
+			dist = dp.DotProduct3(matrix1[i]);
 			info->m_maxLinearDof[i] = m_maxLinearLimits[i] - dist;
 			info->m_minLinearDof[i] = m_minLinearLimits[i] - dist;
 		}
@@ -172,12 +172,12 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 		} else {
 			// it is a limited linear dof, check if it pass the limits
-			dFloat dist = dp.DotProduct(matrix1[i]);
+			dFloat dist = dp.DotProduct3(matrix1[i]);
 			if (dist > m_maxLinearLimits[i]) {
 				dVector q1 (p1 + matrix1[i].Scale (m_maxLinearLimits[i]));
 
 				// clamp the error, so the not too much energy is added when constraint violation occurs
-				dFloat maxDist = (p0 - q1).DotProduct(matrix1[i]);
+				dFloat maxDist = (p0 - q1).DotProduct3(matrix1[i]);
 				if (maxDist > D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION) {
 					q1 = p0 - matrix1[i].Scale(D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION);
 				}
@@ -191,7 +191,7 @@ void Custom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 				dVector q1 (p1 + matrix1[i].Scale (m_minLinearLimits[i]));
 
 				// clamp the error, so the not too much energy is added when constraint violation occurs
-				dFloat maxDist = (p0 - q1).DotProduct(matrix1[i]);
+				dFloat maxDist = (p0 - q1).DotProduct3(matrix1[i]);
 				if (maxDist < -D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION) {
 					q1 = p0 - matrix1[i].Scale(-D_6DOF_ANGULAR_MAX_LINEAR_CORRECTION);
 				}
