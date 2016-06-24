@@ -127,14 +127,15 @@ class dgGlobalAllocator: public dgMemoryAllocator, public dgList<dgMemoryAllocat
 		return mem;
 	}
 
-	static dgGlobalAllocator m_globalAllocator;
+	//static dgGlobalAllocator m_globalAllocator;
+	static dgGlobalAllocator& GetGlobalAllocator()
+	{
+		static dgGlobalAllocator m_globalAllocator;
+		return m_globalAllocator;
+	}
 };
 
-
-
-dgGlobalAllocator dgGlobalAllocator::m_globalAllocator;
-
-
+//dgGlobalAllocator dgGlobalAllocator::m_globalAllocator;
 
 dgMemoryAllocator::dgMemoryAllocator ()
 	:m_emumerator(0)
@@ -143,9 +144,9 @@ dgMemoryAllocator::dgMemoryAllocator ()
 	,m_free(NULL)
 	,m_malloc(NULL)
 {
-	SetAllocatorsCallback (dgGlobalAllocator::m_globalAllocator.m_malloc, dgGlobalAllocator::m_globalAllocator.m_free);
+	SetAllocatorsCallback (dgGlobalAllocator::GetGlobalAllocator().m_malloc, dgGlobalAllocator::GetGlobalAllocator().m_free);
 	memset (m_memoryDirectory, 0, sizeof (m_memoryDirectory));
-	dgGlobalAllocator::m_globalAllocator.Append(this);
+	dgGlobalAllocator::GetGlobalAllocator().Append(this);
 }
 
 dgMemoryAllocator::dgMemoryAllocator (dgMemAlloc memAlloc, dgMemFree memFree)
@@ -163,7 +164,7 @@ dgMemoryAllocator::dgMemoryAllocator (dgMemAlloc memAlloc, dgMemFree memFree)
 dgMemoryAllocator::~dgMemoryAllocator  ()
 {
 	if (m_isInList) {
-		dgGlobalAllocator::m_globalAllocator.Remove(this);
+		dgGlobalAllocator::GetGlobalAllocator().Remove(this);
 	}
 	dgAssert (m_memoryUsed == 0);
 }
@@ -448,16 +449,15 @@ void dgMemoryAllocator::dgMemoryLeaksTracker::RemoveBlock (void* const ptr)
 #endif
 
 
-
 // Set the pointer of memory allocation functions
 void dgMemoryAllocator::SetGlobalAllocators (dgMemAlloc malloc, dgMemFree free)
 {
-	dgGlobalAllocator::m_globalAllocator.SetAllocatorsCallback (malloc, free);
+	dgGlobalAllocator::GetGlobalAllocator().SetAllocatorsCallback (malloc, free);
 }
 
 dgInt32 dgMemoryAllocator::GetGlobalMemoryUsed ()
 {
-	return dgGlobalAllocator::m_globalAllocator.GetMemoryUsed();
+	return dgGlobalAllocator::GetGlobalAllocator().GetMemoryUsed();
 }
 
 // this can be used by function that allocates large memory pools memory locally on the stack
@@ -467,7 +467,7 @@ dgInt32 dgMemoryAllocator::GetGlobalMemoryUsed ()
 void* dgApi dgMallocStack (size_t size)
 {
 	DG_MEMORY_THREAD_SANITY_CHECK_LOCK();
-	void * const ptr = dgGlobalAllocator::m_globalAllocator.MallocLow (dgInt32 (size));
+	void * const ptr = dgGlobalAllocator::GetGlobalAllocator().MallocLow (dgInt32 (size));
 	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 	return ptr;
 }
@@ -475,7 +475,7 @@ void* dgApi dgMallocStack (size_t size)
 void* dgApi dgMallocAligned (size_t size, dgInt32 align)
 {
 	DG_MEMORY_THREAD_SANITY_CHECK_LOCK();
-	void * const ptr = dgGlobalAllocator::m_globalAllocator.MallocLow (dgInt32 (size), align);
+	void * const ptr = dgGlobalAllocator::GetGlobalAllocator().MallocLow (dgInt32 (size), align);
 	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 	return ptr;
 	
@@ -488,7 +488,7 @@ void* dgApi dgMallocAligned (size_t size, dgInt32 align)
 void  dgApi dgFreeStack (void* const ptr)
 {
 	DG_MEMORY_THREAD_SANITY_CHECK_LOCK();
-	dgGlobalAllocator::m_globalAllocator.FreeLow (ptr);
+	dgGlobalAllocator::GetGlobalAllocator().FreeLow (ptr);
 	DG_MEMORY_THREAD_SANITY_CHECK_UNLOCK();
 }
 
