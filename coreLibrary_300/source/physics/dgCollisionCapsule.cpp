@@ -79,7 +79,7 @@ void dgCollisionCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 hei
 
 	for (int i = 0; i < 16; i ++) {
 		dgVector p1p0 (m_p1 - m_p0);
-		dgVector dir(side * p1p0);
+		dgVector dir(side.CrossProduct3(p1p0));
 		dir = dir.Scale4(dgFloat32 (1.0f) / dgSqrt(dir.DotProduct4(dir).GetScalar()));
 		dgVector support0(dir.Scale4(m_radio0));
 		dgVector support1(dir.Scale4(m_radio1));

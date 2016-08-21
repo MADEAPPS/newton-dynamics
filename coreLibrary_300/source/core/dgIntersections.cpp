@@ -53,7 +53,7 @@ dgFloat32 dgFastRayTest::PolygonIntersectFallback (const dgVector& normal, dgFlo
 				dgBigVector p0v1_ (v1 - m_p0_);
 				// calculate the volume formed by the line and the edge of the polygon
 				//dgFloat64 alpha = (diff_ * p0v1_) % p0v0_;
-				dgFloat64 alpha = p0v0_.DotProduct3 (diff_ * p0v1_);
+				dgFloat64 alpha = p0v0_.DotProduct3 (diff_.CrossProduct3(p0v1_));
 				// if a least one volume is negative it mean the line cross the polygon outside this edge and do not hit the face
 				if (alpha < DG_RAY_TOL_ERROR) {
 					return 1.2f;
@@ -96,7 +96,7 @@ dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& normal, dgFloat32 max
 				dgBigVector p0v1_ (v1 - m_p0_);
 				// calculate the volume formed by the line and the edge of the polygon
 				//dgFloat64 alpha = (diff_ * p0v1_) % p0v0_;
-				dgFloat64 alpha = p0v0_.DotProduct3 (diff_ * p0v1_);
+				dgFloat64 alpha = p0v0_.DotProduct3 (diff_.CrossProduct3(p0v1_));
 				// if a least one volume is negative it mean the line cross the polygon outside this edge and do not hit the face
 				if (alpha < DG_RAY_TOL_ERROR) {
 					return 1.2f;
@@ -355,7 +355,7 @@ dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, c
 //	return  dgPointToTriangleDistance____ (point, p0, p1, p2);
 
 #ifdef _DEBUG
-	dgVector faceNormal ((p1 - p0) * (p2 - p0));
+	dgVector faceNormal ((p1 - p0).CrossProduct3(p2 - p0));
 	dgFloat64 faceNormal2 = faceNormal.DotProduct3(faceNormal);
 	dgFloat64 normal2 = normal.DotProduct3(normal);
 	dgFloat64 faceNormalNormal = faceNormal.DotProduct3(normal);
@@ -376,7 +376,7 @@ dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, c
 		dgVector p2p0 (array[i1] - point);
 
 		//dgFloat32 volume = (p1p0 * p2p0) % normal;
-		dgFloat32 volume = normal.DotProduct3(p1p0 * p2p0);
+		dgFloat32 volume = normal.DotProduct3(p1p0.CrossProduct3(p2p0));
 
 		if (volume < dgFloat32 (0.0f)) {
 			dgVector segment (array[i1] - array[i0]);
@@ -408,7 +408,7 @@ dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, c
 dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& normal)
 {
 #ifdef _DEBUG
-	dgBigVector faceNormal ((p1 - p0) * (p2 - p0));
+	dgBigVector faceNormal ((p1 - p0).CrossProduct3(p2 - p0));
 	dgFloat64 faceNormal2 = faceNormal.DotProduct3(faceNormal);
 	dgFloat64 normal2 = normal.DotProduct3(normal);
 	dgFloat64 faceNormalNormal = faceNormal.DotProduct3(normal);
@@ -429,7 +429,7 @@ dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVect
 		dgBigVector p2p0 (array[i1] - point);
 
 		//dgFloat64 volume = (p1p0 * p2p0) % normal;
-		dgFloat64 volume = normal.DotProduct3(p1p0 * p2p0);
+		dgFloat64 volume = normal.DotProduct3(p1p0.CrossProduct3(p2p0));
 		
 		if (volume < dgFloat32 (0.0f)) {
 			dgBigVector segment (array[i1] - array[i0]);
@@ -786,7 +786,7 @@ class dgSweepSphereToPolygon
 
 			// calculate the volume formed by the line and the edge of the polygon
 			//dgFloat64 alpha = (diff * p0v1) % p0v0;
-			dgFloat64 alpha = p0v0.DotProduct3(diff * p0v1);
+			dgFloat64 alpha = p0v0.DotProduct3(diff.CrossProduct3(p0v1));
 			
 			if (alpha < dgFloat32 (0.0f)) {
 
@@ -862,7 +862,7 @@ class dgSweepSphereToPolygon
 				for (dgInt32 i = 0; i < m_count; i ++) {
 					dgBigVector v1 (m_polygon[i]);
 					dgBigVector edge (v1 - v0);
-					dgBigVector wallNormal (edge * m_normal);
+					dgBigVector wallNormal (edge.CrossProduct3(m_normal));
 					wallNormal = wallNormal.Scale3 (sqrt (dgFloat64(1.0f) / wallNormal.DotProduct3(wallNormal)));
 					planes[i] =  dgBigPlane (wallNormal, - wallNormal.DotProduct3(v1));
 					adjacentRegion[i] = m_edgeVoronoi[m_prevVertex[i]];
@@ -882,7 +882,7 @@ class dgSweepSphereToPolygon
 			dgBigVector q0 (m_polygon[i0]);
 			dgBigVector q1 (m_polygon[i1]);
 			dgBigVector dir (q0 - q1);
-			dir = dir * m_normal;
+			dir = dir.CrossProduct3(m_normal);
 			dir = dir.Scale3 (sqrt (dgFloat64(1.0f) / dir.DotProduct3(dir)));
 			planes[0] =  dgBigPlane (dir, - dir.DotProduct3(q0));
 			adjacentRegion[0] = 0;

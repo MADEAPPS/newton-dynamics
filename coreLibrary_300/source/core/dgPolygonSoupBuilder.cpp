@@ -237,7 +237,7 @@ void dgPolygonSoupDatabaseBuilder::AddMesh (const dgFloat32* const vertex, dgInt
 			if (convexFaces) {
 				dgBigVector edge0 (m_vertexPoints[pool[2]] - m_vertexPoints[pool[0]]);
 				dgBigVector edge1 (m_vertexPoints[pool[1]] - m_vertexPoints[pool[0]]);
-				dgBigVector normal (edge0 * edge1);
+				dgBigVector normal (edge0.CrossProduct3(edge1));
 				dgFloat64 mag2 = normal.DotProduct3(normal);
 				if (mag2 < dgFloat32 (1.0e-8f)) {
 					convexFaces = 0;
@@ -494,7 +494,7 @@ void dgPolygonSoupDatabaseBuilder::End(bool optimize)
 		for (dgInt32 j = 2; j < faceIndexCount - 1; j ++) {
 			dgBigVector v2 (&m_vertexPoints[ptr[j]].m_x);
 			dgBigVector e1 (v2 - v0);
-			normal += e0 * e1;
+			normal += e0.CrossProduct3(e1);
 			e0 = e1;
 		}
 		normal = normal.Scale3 (dgFloat64 (1.0f) / sqrt (normal.DotProduct3(normal)));
@@ -700,7 +700,7 @@ dgInt32 dgPolygonSoupDatabaseBuilder::FilterFace (dgInt32 count, dgInt32* const 
 		if (count == 3) {
 			dgBigVector edge0 (m_vertexPoints[pool[2]] - m_vertexPoints[pool[0]]);
 			dgBigVector edge1 (m_vertexPoints[pool[1]] - m_vertexPoints[pool[0]]);
-			dgBigVector normal (edge0 * edge1);
+			dgBigVector normal (edge0.CrossProduct3(edge1));
 			dgFloat64 mag2 = normal.DotProduct3(normal);
 			if (mag2 < dgFloat32 (1.0e-8f)) {
 				count = 0;
@@ -778,7 +778,7 @@ dgInt32 dgPolygonSoupDatabaseBuilder::FilterFace (dgInt32 count, dgInt32* const 
 							break;
 						}
 
-						dgBigVector n (e0 * e1);
+						dgBigVector n (e0.CrossProduct3(e1));
 						mag2 = n.DotProduct3(normal);
 						if (mag2 < dgFloat32 (1.0e-5f)) {
 							count --;
@@ -845,7 +845,7 @@ dgInt32 dgPolygonSoupDatabaseBuilder::FilterFace (dgInt32 count, dgInt32* const 
 				dgBigVector e0 ((p0 - p1));
 				dgBigVector e1 ((p2 - p1));
 
-				dgBigVector n (e1 * e0);
+				dgBigVector n (e1.CrossProduct3(e0));
 				dgAssert (n.DotProduct3(normal) > dgFloat32 (0.0f));
 				j0 = j1;
 				j1 = j2;
@@ -955,7 +955,7 @@ dgInt32 dgPolygonSoupDatabaseBuilder::AddConvexFace (dgInt32 count, dgInt32* con
 
 				e1 = e1.Scale3 (dgFloat64 (1.0f) / sqrt (e1.DotProduct3(e1) + dgFloat32(1.0e-24f)));
 
-				dgBigVector n (e0 * e1);
+				dgBigVector n (e0.CrossProduct3(e1));
 				dgFloat64 mag2 = n.DotProduct3(normal);
 				if (mag2 < dgFloat32 (1.0e-5f)) {
 					isconvex = 0;

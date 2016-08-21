@@ -1663,7 +1663,7 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
                 dgVertexAtribute& attrib2 = attribArray[dgInt32 (ptr->m_userData)];
                 dgBigVector p2 (attrib2.m_u0, attrib2.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
                 dgBigVector e1 (p2 - p0);
-                normal += e1 * e0;
+                normal += e1.CrossProduct3(e0);
                 ptr = ptr->m_next;
             } while (ptr != edge);
 
@@ -1749,7 +1749,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
                 dgVertexAtribute& attrib2 = attribArray[dgInt32 (ptr->m_userData)];
                 dgBigVector p2 (attrib2.m_u0, attrib2.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
                 dgBigVector e1 (p2 - p0);
-                normal += e0 * e1;
+                normal += e0.CrossProduct3(e1);
                 ptr = ptr->m_next;
             } while (ptr != edge);
 
@@ -1784,7 +1784,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
 
             dgVector e0 (p1 - p0);
             dgVector e1 (p2 - p0);
-            dgVector n (e0 * e1);
+            dgVector n (e0.CrossProduct3(e1));
             if ((n.m_x * n.m_x) > (dgFloat32 (0.99f) * n.DotProduct3(n))) {
                 dgEdge* ptr = edge;
                 do {
@@ -1845,7 +1845,7 @@ void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
 
             dgBigVector e0 (p1 - p0);
             dgBigVector e1 (p2 - p0);
-            dgBigVector n (e0 * e1);
+            dgBigVector n (e0.CrossProduct3(e1));
 
             dgInt32 index = 0;
             dgFloat64 maxProjection = dgFloat32 (0.0f);

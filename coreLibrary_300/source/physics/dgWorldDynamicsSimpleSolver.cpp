@@ -248,8 +248,8 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 									
 									for (dgList<dgContactMaterial>::dgListNode* node = contact->GetFirst(); node; node = node->GetNext()) {
 										const dgContactMaterial* const contactMaterial = &node->GetInfo();
-										dgVector vel0 (veloc0 + omega0 * (contactMaterial->m_point - com0));
-										dgVector vel1 (veloc1 + omega1 * (contactMaterial->m_point - com1));
+										dgVector vel0 (veloc0 + omega0.CrossProduct3(contactMaterial->m_point - com0));
+										dgVector vel1 (veloc1 + omega1.CrossProduct3(contactMaterial->m_point - com1));
 										dgVector vRel (vel0 - vel1);
 										dgAssert (contactMaterial->m_normal.m_w == dgFloat32 (0.0f));
 										dgFloat32 speed = vRel.DotProduct4(contactMaterial->m_normal).m_w;
@@ -571,7 +571,7 @@ void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* co
 			body->m_netTorque = body->m_alpha;
 
 			body->m_veloc += accel.CompProduct4(timeStepVect);
-			dgVector correction (alpha * body->m_omega);
+			dgVector correction (alpha.CrossProduct3(body->m_omega));
 			body->m_omega += alpha.CompProduct4(timeStepVect.CompProduct4 (dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4 (m_eulerTaylorCorrection)));
 		}
 

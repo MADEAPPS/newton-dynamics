@@ -432,7 +432,7 @@ void dgCollisionInstance::SetLocalMatrix (const dgMatrix& matrix)
 	m_localMatrix[3][3] = dgFloat32 (1.0f);
 
 #ifdef _DEBUG
-	dgFloat32 det = m_localMatrix.m_right.DotProduct3(m_localMatrix.m_front * m_localMatrix.m_up);
+	dgFloat32 det = m_localMatrix.m_right.DotProduct3(m_localMatrix.m_front.CrossProduct3(m_localMatrix.m_up));
 	dgAssert (det > dgFloat32 (0.999f));
 	dgAssert (det < dgFloat32 (1.001f));
 #endif
@@ -653,7 +653,7 @@ void dgCollisionInstance::CalculateBuoyancyAcceleration (const dgMatrix& matrix,
 		dgVector buoyanceCenter (volumeIntegral - origin);
 
 		dgVector force (gravity.Scale3 (-fluidDensity * volumeIntegral.m_w));
-		dgVector torque (buoyanceCenter * force);
+		dgVector torque (buoyanceCenter.CrossProduct3(force));
 
 		accel += force;
 		alpha += torque;

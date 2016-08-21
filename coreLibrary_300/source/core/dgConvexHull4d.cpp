@@ -713,7 +713,7 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 		e3 = points[index] - convexPoints[0];
 		e3.m_w = dgFloat64 (0.0f);
 		//dgFloat64 volume = (e1 * e2) % e3;		
-		dgFloat64 volume = e3.DotProduct3(e1 * e2);
+		dgFloat64 volume = e3.DotProduct3(e1.CrossProduct3(e2));
 		if (fabs (volume) > (dgFloat64 (1.0e-4f) * m_diag * m_diag * m_diag)) {
 			convexPoints[3] = points[index];
 			points[index].m_mark = 1;

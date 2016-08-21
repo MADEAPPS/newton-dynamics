@@ -1072,7 +1072,7 @@ DG_INLINE dgVector dgBroadPhase::ReduceTriangle(dgVector* const simplex, dgInt32
 {
 	dgVector e10(simplex[1] - simplex[0]);
 	dgVector e20(simplex[2] - simplex[0]);
-	dgVector normal(e10 * e20);
+	dgVector normal(e10.CrossProduct3(e20));
 	dgAssert(normal.m_w == dgFloat32(0.0f));
 	if (normal.DotProduct4(normal).GetScalar() > dgFloat32(1.0e-14f)) {
 		dgInt32 i0 = 2;
@@ -1081,7 +1081,7 @@ DG_INLINE dgVector dgBroadPhase::ReduceTriangle(dgVector* const simplex, dgInt32
 			const dgVector& p1p0 = simplex[i0];
 			const dgVector& p2p0 = simplex[i1];
 
-			dgFloat32 volume = normal.DotProduct4(p1p0 * p2p0).GetScalar();
+			dgFloat32 volume = (normal.DotProduct4(p1p0.CrossProduct3(p2p0))).GetScalar();
 			if (volume < dgFloat32(0.0f)) {
 				dgVector segment(simplex[i1] - simplex[i0]);
 				dgAssert(segment.m_w == dgFloat32(0.0f));
@@ -1134,7 +1134,7 @@ DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgIn
 	dgVector p10(p1 - p0);
 	dgVector p20(p2 - p0);
 	dgVector p30(p3 - p0);
-	dgVector n(p10 * p20);
+	dgVector n(p10.CrossProduct3(p20));
 	dgAssert(n.m_w == dgFloat32(0.0f));
 	//dgFloat32 volume = p30 % n;
 	dgFloat32 volume = n.DotProduct4(p30).GetScalar();
@@ -1161,7 +1161,7 @@ DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgIn
 
 		dgVector p10(p1 - p0);
 		dgVector p20(p2 - p0);
-		dgVector normal(p10 * p20);
+		dgVector normal(p10.CrossProduct3(p20));
 		dgAssert(normal.m_w == dgFloat32(0.0f));
 
 		dgVector normalDot4(normal.DotProduct4(normal));

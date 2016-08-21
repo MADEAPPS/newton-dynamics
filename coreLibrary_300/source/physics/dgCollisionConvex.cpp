@@ -174,7 +174,7 @@ bool dgCollisionConvex::SanityCheck (dgPolyhedra& hull) const
 		for (ptr = ptr->m_next; ptr != edge; ptr = ptr->m_next) {
 			dgVector p2 (m_vertex[ptr->m_incidentVertex]);
 			dgVector e2 (p2 - p0);
-			n0 += e1 * e2;
+			n0 += e1.CrossProduct3(e2);
 			e1 = e2;
 		} 
 
@@ -606,7 +606,7 @@ bool dgCollisionConvex::SanityCheck(dgInt32 count, const dgVector& normal, dgVec
 			dgVector e0 (contactsOut[1] - contactsOut[0]);
 			for (dgInt32 i = 2; i < count; i ++) {
 				dgVector e1 (contactsOut[i] - contactsOut[0]);
-				n += e0 * e1;
+				n += e0.CrossProduct3(e1);
 				e0 = e1;
 			} 
 			dgAssert (n.DotProduct3(n) > dgFloat32 (0.0f));
@@ -622,7 +622,7 @@ bool dgCollisionConvex::SanityCheck(dgInt32 count, const dgVector& normal, dgVec
 			j = count - 1;
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgVector e1 (contactsOut[i] - contactsOut[j]);
-				dgVector n (e0 * e1);
+				dgVector n (e0.CrossProduct3(e1));
 				dgFloat32 error = n.DotProduct3(normal);
 				dgAssert (error >= dgFloat32 (-1.0e-4f));
 				if (error < dgFloat32 (-1.0e-4f)) {
@@ -655,7 +655,7 @@ dgInt32 dgCollisionConvex::SimplifyClipPolygon (dgInt32 count, const dgVector& n
 
 			dgVector e0 = polygon[i1] - polygon[i0];
 			dgVector e1 = polygon[i2] - polygon[i0];
-			dgFloat32 area = dgAbsf (normal.DotProduct3(e0 * e1));
+			dgFloat32 area = dgAbsf (normal.DotProduct3(e0.CrossProduct3(e1)));
 
 			sortHeap.Push(i1, area);
 
@@ -750,7 +750,7 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 			dgInt32 i2 = ptr->m_next->m_next->m_vertex;
 			dgVector e0 (contactsOut[i2] - contactsOut[i1]);
 			dgVector e1 (contactsOut[i0] - contactsOut[i1]);
-			dgVector n (e0 * e1);
+			dgVector n (e0.CrossProduct3(e1));
 			dgFloat32 area = normal.DotProduct3(n);
 			if (area <= dgFloat32 (1.0e-5f)) {
 				if (ptr->m_next == poly) {

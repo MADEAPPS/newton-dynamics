@@ -273,7 +273,8 @@ void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 {
 	const dgMatrix& matrix = *this;
 	//dgAssert (dgAbsf (((matrix[0] * matrix[1]) % matrix[2]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-	dgAssert (dgAbsf (matrix[2].DotProduct3(matrix[0] * matrix[1]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+	dgAssert (matrix[2].DotProduct3(matrix[0].CrossProduct3(matrix[1])) > 0.0f);
+	dgAssert (dgAbsf (matrix[2].DotProduct3(matrix[0].CrossProduct3(matrix[1])) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > dgFloat32 (0.99995f)) {
@@ -417,8 +418,7 @@ dgMatrix xxxxx4(xxxxx2.Inverse() * xxxxx1 * xxxxx2);
 	const dgMatrix& me = *this;
 	//dgFloat32 sign = ((((*this)[0] * (*this)[1]) % (*this)[2]) > 0.0f) ? 1.0f : -1.0f;
 	//dgFloat32 sign = dgSign(((*this)[0] * (*this)[1]) % (*this)[2]);
-	//dgFloat32 sign = dgSign(((*this)[0] * (*this)[1]) % (*this)[2]);
-	dgFloat32 sign = dgSign (me[2].DotProduct3 (me[0] * me[1]));
+	dgFloat32 sign = dgSign (me[2].DotProduct3 (me[0].CrossProduct3(me[1])));
 	//stretchAxis = (*this) * Transpose();
 	stretchAxis = me * Transpose();
 	stretchAxis.EigenVectors (scale);
@@ -523,7 +523,7 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initia
 
 		if (sm < dgFloat32 (1.0e-12f)) {
 			// order the eigenvalue vectors	
-			dgVector tmp (eigenVectors.m_front * eigenVectors.m_up);
+			dgVector tmp (eigenVectors.m_front.CrossProduct3(eigenVectors.m_up));
 			if (tmp.DotProduct3(eigenVectors.m_right) < dgFloat32(0.0f)) {
 				dgAssert (0.0f);
 				eigenVectors.m_right = eigenVectors.m_right.Scale3 (-dgFloat32(1.0f));

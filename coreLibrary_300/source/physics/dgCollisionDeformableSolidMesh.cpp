@@ -552,7 +552,7 @@ invMass = 1.0f / invMass;
 		dgVector r (m_posit[i] - com);
 		dgVector mr (r.CompProduct4(mass));
 		dgVector relVeloc (veloc[i] - comVeloc);
-		comAngularMomentum += mr * relVeloc;
+		comAngularMomentum += mr.CrossProduct3(relVeloc);
 
 		dgMatrix inertia (mr, r);
 		dgVector diagInertia (mr.DotProduct4(r));
@@ -568,7 +568,7 @@ dgVector damp (0.3f);
 	dgVector omega (invInertia.RotateVector(comAngularMomentum));
 	for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 		dgVector r (m_posit[i] - com);
-		dgVector deltaVeloc (comVeloc + omega * r - veloc[i]);
+		dgVector deltaVeloc (comVeloc + omega.CrossProduct3(r) - veloc[i]);
 		veloc[i] += deltaVeloc.CompProduct4(damp);
 	}
 

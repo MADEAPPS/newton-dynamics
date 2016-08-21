@@ -704,7 +704,7 @@ dgFloat64 dgMeshEffect::dgMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const 
 			dgInt32 index1 = ptr->m_next->m_incidentVertex;
 			dgBigVector p0v0 (points[index0] - p0);
 			dgBigVector p0v1 (points[index1] - p0);
-			dgFloat64 alpha = p0v0.DotProduct3(diff * p0v1);
+			dgFloat64 alpha = p0v0.DotProduct3(diff.CrossProduct3(p0v1));
 			if (alpha <= 0.0f) {
 				return 1.2f;
 			}
@@ -725,7 +725,7 @@ dgFloat64 dgMeshEffect::dgMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const 
 			dgInt32 index1 = ptr->m_prev->m_incidentVertex;
 			dgBigVector p0v0 (points[index0] - p0);
 			dgBigVector p0v1 (points[index1] - p0);
-			dgFloat64 alpha = p0v0.DotProduct3(diff * p0v1);
+			dgFloat64 alpha = p0v0.DotProduct3(diff.CrossProduct3(p0v1));
 			if (alpha <= 0.0f) {
 				return 1.2f;
 			}
@@ -1773,7 +1773,7 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat64* const vertexList,
 					const dgBigVector& p2 = m_points[m_pointCount - 1];
 					dgBigVector e1 (p1 - p0);
 					dgBigVector e2 (p2 - p0);
-					dgBigVector n (e1 * e2);
+					dgBigVector n (e1.CrossProduct3(e2));
 					dgFloat64 mag3 = n.DotProduct3(n);
 					dgAssert (mag3 > dgFloat64 (DG_MESH_EFFECT_PRECISION_SCALE_INV * DG_MESH_EFFECT_PRECISION_SCALE_INV));
 				#endif
@@ -1791,7 +1791,7 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat64* const vertexList,
 		const dgBigVector& p2 = m_points[m_pointCount - 1];
 		dgBigVector e1 (p1 - p0);
 		dgBigVector e2 (p2 - p0);
-		dgBigVector n (e1 * e2);
+		dgBigVector n (e1.CrossProduct3(e2));
 		dgFloat64 mag3 = n.DotProduct3(n);
 		if (mag3 < dgFloat64 (DG_MESH_EFFECT_PRECISION_SCALE_INV * DG_MESH_EFFECT_PRECISION_SCALE_INV)) {
 			m_pointCount -= 3;
@@ -1855,7 +1855,7 @@ void dgMeshEffect::EndPolygon (dgFloat64 tol, bool fixTjoint)
 		dgBigVector p2 (m_points[i + 2]);
 		dgBigVector e1 (p1 - p0);
 		dgBigVector e2 (p2 - p0);
-		dgBigVector n (e1 * e2);
+		dgBigVector n (e1.CrossProduct3(e2));
 		dgFloat64 mag2 = n.DotProduct3(n);
 		dgAssert (mag2 > dgFloat32 (0.0f));
 	}
@@ -1877,7 +1877,7 @@ void dgMeshEffect::EndPolygon (dgFloat64 tol, bool fixTjoint)
 		dgBigVector e1 (m_points[index[1]] - m_points[index[0]]);
 		dgBigVector e2 (m_points[index[2]] - m_points[index[0]]);
 
-		dgBigVector n (e1 * e2);
+		dgBigVector n (e1.CrossProduct3(e2));
 		dgFloat64 mag2 = n.DotProduct3(n);
 		if (mag2 > dgFloat64 (1.0e-12f)) {
 			userdata[0] = attrIndexMap[i * 3 + 0];
@@ -1922,7 +1922,7 @@ void dgMeshEffect::EndPolygon (dgFloat64 tol, bool fixTjoint)
 			dgBigVector p2 (m_points[face->m_next->m_next->m_incidentVertex]);
 			dgBigVector e1 (p1 - p0);
 			dgBigVector e2 (p2 - p0);
-			dgBigVector n (e1 * e2);
+			dgBigVector n (e1.CrossProduct3(e2));
 			dgFloat64 mag2 = n.DotProduct3(n);
 			dgAssert (mag2 >= dgFloat32 (0.0f));
 		}

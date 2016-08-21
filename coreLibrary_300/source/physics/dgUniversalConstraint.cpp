@@ -217,9 +217,9 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 
 	const dgVector& dir0 = matrix0.m_front;
 	const dgVector& dir1 = matrix1.m_up;
-	dgVector dir2 (dir0 * dir1);
+	dgVector dir2 (dir0.CrossProduct3(dir1));
 
-	dgVector dir3 (dir2 * dir0);
+	dgVector dir3 (dir2.CrossProduct3(dir0));
 	dir3 = dir3.Scale3 (dgRsqrt (dir3.DotProduct3(dir3)));
 
 	const dgVector& p0 = matrix0.m_posit;
@@ -246,7 +246,7 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 //		m_angle0 = (m_angle0 >= dgFloat32 (0.0f)) ? dgPI - m_angle0 : dgPI + m_angle0;
 //	}
 
-	sinAngle = matrix0.m_front.DotProduct3(matrix1.m_up * matrix0.m_up);
+	sinAngle = matrix0.m_front.DotProduct3(matrix1.m_up.CrossProduct3(matrix0.m_up));
 	cosAngle = matrix0.m_up.DotProduct3(matrix1.m_up);
 //	dgAssert (dgAbsf (m_angle0 - dgAtan2 (sinAngle, cosAngle)) < 1.0e-1f);
 	m_angle0 = dgAtan2 (sinAngle, cosAngle);
@@ -257,7 +257,7 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 //		m_angle1 = (m_angle1 >= dgFloat32 (0.0f)) ? dgPI - m_angle1 : dgPI + m_angle1;
 //	}
 
-	sinAngle = matrix1.m_up.DotProduct3(matrix0.m_front * matrix1.m_front);
+	sinAngle = matrix1.m_up.DotProduct3(matrix0.m_front.CrossProduct3(matrix1.m_front));
 	cosAngle = matrix0.m_front.DotProduct3(matrix1.m_front);
 //	dgAssert (dgAbsf (m_angle1 - dgAtan2 (sinAngle, cosAngle)) < 1.0e-1f);
 	m_angle1 = dgAtan2 (sinAngle, cosAngle);

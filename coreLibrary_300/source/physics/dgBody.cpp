@@ -623,7 +623,7 @@ void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointP
 
 
 	dgVector dv (changeOfMomentum.Scale3 (m_invMass.m_w));
-	dgVector dw (invInertia.RotateVector (globalContact * changeOfMomentum));
+	dgVector dw (invInertia.RotateVector (globalContact.CrossProduct3(changeOfMomentum)));
 
 	m_veloc += dv;
 	m_omega += dw;
@@ -663,7 +663,7 @@ void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const d
 		dgInt32 index = i * stride;
 		dgVector r (pointArray[index], pointArray[index + 1], pointArray[index + 2], dgFloat32 (0.0f));
 		dgVector L (impulseArray[index], impulseArray[index + 1], impulseArray[index + 2], dgFloat32 (0.0f));
-		dgVector Q ((r - com) * L);
+		dgVector Q ((r - com).CrossProduct3(L));
 
 		impulse += L;
 		angularImpulse += Q;

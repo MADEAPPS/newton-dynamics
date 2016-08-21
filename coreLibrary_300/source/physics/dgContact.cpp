@@ -145,7 +145,7 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 	dgAssert (m_body0);
 	dgAssert (m_body1);
 
-	dgVector r0CrossDir (param.m_r0 * dir);
+	dgVector r0CrossDir (param.m_r0.CrossProduct3(dir));
 	dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 
 	jacobian0.m_linear[0] = dir.m_x;
 	jacobian0.m_linear[1] = dir.m_y;
@@ -157,7 +157,7 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 	jacobian0.m_angular[3] = dgFloat32 (0.0f);
 
 
-	dgVector r1CrossDir (dir * param.m_r1);
+	dgVector r1CrossDir (dir.CrossProduct3(param.m_r1));
 	dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1; 
 	jacobian1.m_linear[0] = -dir.m_x;
 	jacobian1.m_linear[1] = -dir.m_y;

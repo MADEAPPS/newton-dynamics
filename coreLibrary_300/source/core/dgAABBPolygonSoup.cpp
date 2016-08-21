@@ -471,7 +471,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 					dgVector p1 (&vertexArray[face[j]].m_x);
 					if (face[j0] == -1) {
 						dgVector e (p1 - p0);
-						dgVector n (e * normal);
+						dgVector n (e.CrossProduct3(normal));
 						n = n.Scale4(dgFloat32 (1.0f) / dgSqrt (n.DotProduct3(n)));
 						dgAssert (dgAbsf (n.DotProduct3(n) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
 						pool[normalCount].m_x = n.m_x;
@@ -501,7 +501,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 					dgVector p1 (&vertexArray[face[j]].m_x);
 					if (face[j0] == -1) {
 						dgVector e (p1 - p0);
-						dgVector n (e * normal);
+						dgVector n (e.CrossProduct3(normal));
 						n = n.Scale4(dgFloat32 (1.0f) / dgSqrt (n.DotProduct3(n)));
 						dgAssert (dgAbsf (n.DotProduct3(n) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
 						pool[normalCount].m_x = n.m_x;
@@ -683,8 +683,8 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 										dgBigVector n1 (&polygon[adjacentFaces.m_index[j0 + adjacentCount + 2] * stride]);
 										dgBigVector n2 (&polygon[indexArray[indexCount + 1] * stride]);
 
-										dgBigVector tilt0 (n0 * n1); 
-										dgBigVector tilt1 (n0 * n2); 
+										dgBigVector tilt0 (n0.CrossProduct3(n1)); 
+										dgBigVector tilt1 (n0.CrossProduct3(n2)); 
 										dgFloat64 dist0 (q1q0.DotProduct3 (tilt0));
 										dgFloat64 dist1 (q1q0.DotProduct3 (tilt1));
 										if (dist0 < dist1) {

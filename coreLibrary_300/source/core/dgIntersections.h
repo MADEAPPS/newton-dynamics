@@ -365,7 +365,7 @@ class dgFastAABBInfo: public dgObb
 		faceMatrix[0] = faceNormal;
 		faceMatrix[1] = dgVector (&vertexArray[indexArray[1] * stride]) - origin;
 		faceMatrix[1] = faceMatrix[1].CompProduct4 (faceMatrix[1].DotProduct4(faceMatrix[1]).InvSqrt());
-		faceMatrix[2] = faceMatrix[0] * faceMatrix[1];
+		faceMatrix[2] = faceMatrix[0].CrossProduct3(faceMatrix[1]);
 		faceMatrix[3] = origin | dgVector::m_wOne; 
 		return faceMatrix.Inverse();
 	}

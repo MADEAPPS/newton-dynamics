@@ -1879,8 +1879,8 @@ dFloat NewtonMaterialGetContactNormalSpeed(const NewtonMaterial* const materialH
 	dgVector p0 (material->m_point - body0->GetPosition());
 	dgVector p1 (material->m_point - body1->GetPosition());
 
-	dgVector v0 (body0->GetVelocity() + body0->GetOmega() * p0);
-	dgVector v1 (body1->GetVelocity() + body1->GetOmega() * p1);
+	dgVector v0 (body0->GetVelocity() + body0->GetOmega().CrossProduct3(p0));
+	dgVector v1 (body1->GetVelocity() + body1->GetOmega().CrossProduct3(p1));
 
 	dgVector dv (v1 - v0);
 
@@ -1911,8 +1911,8 @@ dFloat NewtonMaterialGetContactTangentSpeed(const NewtonMaterial* const material
 	dgVector p0 (material->m_point - body0->GetPosition());
 	dgVector p1 (material->m_point - body1->GetPosition());
 
-	dgVector v0 (body0->GetVelocity() + body0->GetOmega() * p0);
-	dgVector v1 (body1->GetVelocity() + body1->GetOmega() * p1);
+	dgVector v0 (body0->GetVelocity() + body0->GetOmega().CrossProduct3(p0));
+	dgVector v1 (body1->GetVelocity() + body1->GetOmega().CrossProduct3(p1));
 
 	dgVector dv (v1 - v0);
 	dgVector dir (index ? material->m_dir1 : material->m_dir0);
@@ -2319,11 +2319,11 @@ void NewtonMaterialContactRotateTangentDirections(const NewtonMaterial* const ma
 
 	const dgVector dir0 (alignVector[0], alignVector[1], alignVector[2], dgFloat32 (0.0f));
     	
-	dgVector dir1 (material->m_normal * dir0);
+	dgVector dir1 (material->m_normal.CrossProduct3(dir0));
 	dFloat mag2 = dir1.DotProduct3(dir1);
 	if (mag2 > 1.0e-6f) {
 		material->m_dir1 = dir1.Scale3 (dgRsqrt (mag2));
-		material->m_dir0 = material->m_dir1 * material->m_normal;
+		material->m_dir0 = material->m_dir1.CrossProduct3(material->m_normal);
 	}
 }
 
@@ -6340,7 +6340,7 @@ void NewtonBallSetConeLimits(const NewtonJoint* const ball, const dFloat* pin, d
 			dgAssert (dgAbsf (tmp.DotProduct3(coneAxis)) < dgFloat32 (0.999f));
 		}
 	}
-	dgVector lateral (tmp * coneAxis); 
+	dgVector lateral (tmp.CrossProduct3(coneAxis)); 
 	lateral = lateral.Scale3 (dgRsqrt (lateral.DotProduct3(lateral)));
 	coneAxis = coneAxis.Scale3 (dgRsqrt (coneAxis.DotProduct3(coneAxis)));
 

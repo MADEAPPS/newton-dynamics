@@ -73,7 +73,7 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix)
 		dgVector dir(dgFloat32 (0.0f));
 		dir[i] = dgFloat32 (1.0f);
 		for (dgInt32 j = 0; j < 3; j ++) {
-			dgVector axis (dir * m_matrix[j]);
+			dgVector axis (dir.CrossProduct3(m_matrix[j]));
 			m_crossAxis[index] = axis;
 			m_crossAxisAbs[index] = axis.Abs();
 			m_crossAxisDotAbs[index] = matrix.UnrotateVector (axis).Abs();
@@ -113,7 +113,7 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 		dgVector dir(dgFloat32 (0.0f));
 		dir[i] = dgFloat32 (1.0f);
 		for (dgInt32 j = 0; j < 3; j ++) {
-			m_crossAxis[index] = dir * m_matrix[j];
+			m_crossAxis[index] = dir.CrossProduct3(m_matrix[j]);
 			index ++;
 		}
 	}

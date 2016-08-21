@@ -547,7 +547,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 
 		dgVector e10 (points[2] - points[1]);
 		dgVector e20 (points[3] - points[1]);
-		dgVector normal (e10 * e20);
+		dgVector normal (e10.CrossProduct3(e20));
 		normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
 		t = ray.PolygonIntersect (normal, maxT, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < maxT){
@@ -560,7 +560,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		triangle[2] = 2;
 
 		dgVector e30 (points[0] - points[1]);
-		normal = e30 * e10;
+		normal = e30.CrossProduct3(e10);
 		normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
 		t = ray.PolygonIntersect (normal, maxT, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < maxT){
@@ -575,7 +575,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 
 		dgVector e10 (points[2] - points[0]);
 		dgVector e20 (points[3] - points[0]);
-		dgVector normal (e10 * e20);
+		dgVector normal (e10.CrossProduct3(e20));
 		normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
 		t = ray.PolygonIntersect (normal, maxT, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < maxT){
@@ -588,7 +588,7 @@ dgFloat32 dgCollisionHeightField::RayCastCell (const dgFastRayTest& ray, dgInt32
 		triangle[2] = 1;
 
 		dgVector e30 (points[1] - points[0]);
-		normal = e20 * e30;
+		normal = e20.CrossProduct3(e30);
 		normal = normal.CompProduct4(normal.DotProduct4(normal).InvSqrt());
 		t = ray.PolygonIntersect (normal, maxT, &points[0].m_x, sizeof (dgVector), triangle, 3);
 		if (t < maxT){
@@ -1109,8 +1109,8 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				const dgVector e0 (vertex[i0] - vertex[i1]);
 				const dgVector e1 (vertex[i2] - vertex[i1]);
 				const dgVector e2 (vertex[i3] - vertex[i1]);
-				dgVector n0 (e0 *  e1);
-				dgVector n1 (e1 *  e2);
+				dgVector n0 (e0.CrossProduct3(e1));
+				dgVector n1 (e1.CrossProduct3(e2));
 
 				//normalBase 
 				const dgInt32 normalIndex0 = normalBase;
@@ -1317,13 +1317,13 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				dgVector p1 (vertex[data->m_faceVertexIndex[base + 1]]);
 				dgVector p2 (vertex[data->m_faceVertexIndex[base + 2]]);
 
-				dgVector n1 ((p1 - p0) * (p2 - p0));
+				dgVector n1 ((p1 - p0).CrossProduct3(p2 - p0));
 				n1 = n1.CompProduct4(n1.InvMagSqrt());
 
 				dgMatrix polygonMatrix;
 				polygonMatrix[0] = p1 - p0;
 				polygonMatrix[0] = polygonMatrix[0].CompProduct4 (polygonMatrix[0].DotProduct4(polygonMatrix[0]).InvSqrt());
-				polygonMatrix[1] = n * polygonMatrix[0];
+				polygonMatrix[1] = n.CrossProduct3(polygonMatrix[0]);
 				polygonMatrix[2] = n;
 				polygonMatrix[3] = dgVector::m_wOne;
 				dgAssert (polygonMatrix.TestOrthogonal());

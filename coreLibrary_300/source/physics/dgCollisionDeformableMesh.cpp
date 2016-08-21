@@ -776,7 +776,7 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 		dgInt32 i2 = m_indexList[i * 3 + 2];
 		dgVector e0 (m_particles.m_posit[i1] - m_particles.m_posit[i0]);
 		dgVector e1 (m_particles.m_posit[i2] - m_particles.m_posit[i0]);
-		dgVector n = e0 * e1;
+		dgVector n = e0.CrossProduct3(e1);
 		n = n.Scale3(dgRsqrt (n.DotProduct3(n)));
 		m_faceNormals[i] = n;
 	} 
