@@ -66,10 +66,10 @@ void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island
 			if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 				dgAssert (body->m_invMass.m_w);
 
-				const dgFloat32 accel2 = body->m_accel % body->m_accel;
-				const dgFloat32 alpha2 = body->m_alpha % body->m_alpha;
-				const dgFloat32 speed2 = body->m_veloc % body->m_veloc;
-				const dgFloat32 omega2 = body->m_omega % body->m_omega;
+				const dgFloat32 accel2 = body->m_accel.DotProduct3(body->m_accel);
+				const dgFloat32 alpha2 = body->m_alpha.DotProduct3(body->m_alpha);
+				const dgFloat32 speed2 = body->m_veloc.DotProduct3(body->m_veloc);
+				const dgFloat32 omega2 = body->m_omega.DotProduct3(body->m_omega);
 
 				maxAccel = dgMax (maxAccel, accel2);
 				maxAlpha = dgMax (maxAlpha, alpha2);
@@ -418,8 +418,8 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
 
 	dgAssert (((dgDynamicBody*) bodyArray[0].m_body)->IsRTTIType (dgBody::m_dynamicBodyRTTI));
-	dgAssert ((((dgDynamicBody*)bodyArray[0].m_body)->m_accel % ((dgDynamicBody*)bodyArray[0].m_body)->m_accel) == dgFloat32 (0.0f));
-	dgAssert ((((dgDynamicBody*)bodyArray[0].m_body)->m_alpha % ((dgDynamicBody*)bodyArray[0].m_body)->m_alpha) == dgFloat32 (0.0f));
+	dgAssert ((((dgDynamicBody*)bodyArray[0].m_body)->m_accel.DotProduct3(((dgDynamicBody*)bodyArray[0].m_body)->m_accel)) == dgFloat32 (0.0f));
+	dgAssert ((((dgDynamicBody*)bodyArray[0].m_body)->m_alpha.DotProduct3(((dgDynamicBody*)bodyArray[0].m_body)->m_alpha)) == dgFloat32 (0.0f));
 
 	dgAssert(bodyArray[0].m_body->m_resting);
 	internalForces[0].m_linear = dgVector::m_zero;
@@ -554,14 +554,14 @@ void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* co
 			}
 
 			dgVector accel (body->m_accel.Scale3 (body->m_invMass.m_w));
-			dgFloat32 error = accel % accel;
+			dgFloat32 error = accel.DotProduct3(accel);
 			if (error < accelTol2) {
 				accel = dgVector::m_zero;
 				body->m_accel = dgVector::m_zero;
 			}
 
 			dgVector alpha (body->m_invWorldInertiaMatrix.RotateVector (body->m_alpha));
-			error = alpha % alpha;
+			error = alpha.DotProduct3(alpha);
 			if (error < accelTol2) {
 				alpha = dgVector::m_zero;
 				body->m_alpha = dgVector::m_zero;
@@ -832,10 +832,11 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	}
 
 	for (dgInt32 i = 0; i < skeletonCount; i ++) {
-		dgSkeletonContainer* const container = skeletonArray[i];
-		if (!container->m_skeletonHardMotors) {
-			container->InitMassMatrix (constraintArray, matrixRow);
-		}
+		//dgSkeletonContainer* const container = skeletonArray[i];
+		//if (!container->m_skeletonHardMotors) {
+			//container->InitMassMatrix (constraintArray, matrixRow);
+		//}
+		skeletonArray[i]->InitMassMatrix (constraintArray, matrixRow);
 	}
 
 	const dgInt32 passes = world->m_solverMode;

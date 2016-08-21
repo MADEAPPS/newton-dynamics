@@ -124,7 +124,8 @@ class dgHugeVector: public dgTemplateVector<dgGoogol>
 
 	dgGoogol EvaluePlane (const dgHugeVector& point) const 
 	{
-		return (point % (*this)) + m_w;
+		//return (point % (*this)) + m_w;
+		return DotProduct3(point) + m_w;
 	}
 
 #ifdef _DEBUG

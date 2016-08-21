@@ -672,7 +672,7 @@ dgFloat32 dgCollisionHeightField::RayCast (const dgVector& q0, const dgVector& q
 			dgFloat32 t = RayCastCell (ray, xIndex0, zIndex0, normalOut, maxT);
 			if (t < maxT) {
 				// bail out at the first intersection and copy the data into the descriptor
-				contactOut.m_normal = normalOut.Scale3 (dgRsqrt (normalOut % normalOut));
+				contactOut.m_normal = normalOut.Scale3 (dgRsqrt (normalOut.DotProduct3(normalOut)));
 				contactOut.m_shapeId0 = m_atributeMap[zIndex0 * m_width + xIndex0];
 				contactOut.m_shapeId1 = m_atributeMap[zIndex0 * m_width + xIndex0];
 
@@ -1115,11 +1115,11 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				//normalBase 
 				const dgInt32 normalIndex0 = normalBase;
 				vertex[normalIndex0] = n0.CompProduct4(n0.InvMagSqrt());
-				dgAssert  (dgAbsf(vertex[normalIndex0] % vertex[normalIndex0] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
+				dgAssert  (dgAbsf(vertex[normalIndex0].DotProduct3(vertex[normalIndex0]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
 
 				const dgInt32 normalIndex1 = normalBase + 1;
 				vertex[normalIndex1] = n1.CompProduct4(n1.InvMagSqrt());
-				dgAssert  (dgAbsf(vertex[normalIndex1] % vertex[normalIndex1] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
+				dgAssert  (dgAbsf(vertex[normalIndex1].DotProduct3(vertex[normalIndex1]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
 
 				faceIndexCount[faceCount] = 3;
 				indices[index + 0 + 0] = i2;
@@ -1143,7 +1143,7 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				indices[index + 9 + 7] = normalIndex1;
 				indices[index + 9 + 8] = faceSize;
 
-				dgFloat32 dist (vertex[normalIndex0] % (vertex[i3] - vertex[i1]));
+				dgFloat32 dist (vertex[normalIndex0].DotProduct3(vertex[i3] - vertex[i1]));
 				if (dist < -dgFloat32 (1.0e-3f)) {
 					indices[index + 0 + 5] = normalIndex1;
 					indices[index + 9 + 5] = normalIndex0;
@@ -1186,7 +1186,7 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 					const dgVector& origin = vertex[i0];
 					const dgVector& testPoint = vertex[i1];
 					const dgVector& normal = vertex[i2];
-					dgFloat32 dist (normal % (testPoint - origin));
+					dgFloat32 dist (normal.DotProduct3(testPoint - origin));
 
 					if (dist < -dgFloat32 (1.0e-3f)) {
 						const dgInt32 i3 = edgeMap[3];
@@ -1220,7 +1220,7 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 					const dgVector& origin = vertex[i0];
 					const dgVector& testPoint = vertex[i1];
 					const dgVector& normal = vertex[i2];
-					dgFloat32 dist (normal % (testPoint - origin));
+					dgFloat32 dist (normal.DotProduct3(testPoint - origin));
 
 					if (dist < -dgFloat32 (1.0e-3f)) {
 						const dgInt32 i3 = edgeMap[3];

@@ -94,7 +94,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 	dgMatrix matrix (otherMatrix * myMatrix.Inverse());
 
 	const dgVector& hullVeloc = otherBody->m_veloc;
-	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc % hullVeloc);
+	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc.DotProduct3(hullVeloc));
 
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	if (proxy.m_continueCollision && (baseLinearSpeed > dgFloat32 (1.0e-6f))) {
@@ -105,7 +105,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 		const dgVector& hullOmega = otherBody->m_omega;
 
 		dgFloat32 minRadius = otherInstance->GetBoxMinRadius();
-		dgFloat32 maxAngularSpeed = dgSqrt (hullOmega % hullOmega);
+		dgFloat32 maxAngularSpeed = dgSqrt (hullOmega.DotProduct3(hullOmega));
 		dgFloat32 angularSpeedBound = maxAngularSpeed * (otherInstance->GetBoxMaxRadius() - minRadius);
 
 		dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt (angularSpeedBound);
@@ -261,7 +261,7 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 	stackPool[0][1] = otherCompound->m_root;
 
 	const dgVector& hullVeloc = otherBody->m_veloc;
-	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc % hullVeloc);
+	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc.DotProduct3(hullVeloc));
 
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	if (proxy.m_continueCollision && (baseLinearSpeed > dgFloat32 (1.0e-6f))) {

@@ -32,7 +32,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 	dgAssert (convexFace->m_incidentFace > 0);
 
 	dgBigVector normal (convexMesh.FaceNormal(convexFace, &convexMesh.m_points[0].m_x, sizeof(dgBigVector)));
-	dgFloat64 mag2 = normal % normal;
+	dgFloat64 mag2 = normal.DotProduct3(normal);
 	if (mag2 < dgFloat64 (1.0e-30)) {
 		dgAssert (0);
 		return true;
@@ -40,7 +40,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 
 	normal = normal.Scale3(dgFloat64 (1.0f) / sqrt (mag2));
 	dgBigVector origin (convexMesh.m_points[convexFace->m_incidentVertex]);
-	dgBigPlane plane (normal, - (origin % normal));
+	dgBigPlane plane (normal, - origin.DotProduct3(normal));
 
 	dgAssert (!HasOpenEdges());
 
@@ -76,9 +76,9 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 		dgBigVector p1 (convexMesh.m_points[e1->m_incidentVertex]);
 
 		dgBigVector xDir (p1 - origin);
-		dgAssert ((xDir % xDir) > dgFloat32 (0.0f));
+		dgAssert (xDir.DotProduct3(xDir) > dgFloat32 (0.0f));
 		matrix[2] = dgVector (normal);
-		matrix[0] = dgVector(xDir.Scale3(dgFloat64 (1.0f) / sqrt (xDir% xDir)));
+		matrix[0] = dgVector(xDir.Scale3(dgFloat64 (1.0f) / sqrt (xDir.DotProduct3(xDir))));
 		matrix[1] = matrix[2] * matrix[0];
 		matrix[3] = dgVector (origin);
 		matrix[3][3] = dgFloat32 (1.0f);
@@ -90,7 +90,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 		dgVector p10 (q1 - q0);
 		dgVector p20 (q2 - q0);
 		dgVector faceNormal (matrix.UnrotateVector (dgVector(normal)));
-		dgFloat32 areaInv = (p10 * p20) % faceNormal;
+		dgFloat32 areaInv = faceNormal.DotProduct3(p10 * p20);
 		if (e2->m_next != e0) {
 			const dgEdge* edge = e2;
 			dgVector r1 (q2);
@@ -98,7 +98,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 			do {
 				dgVector r2 (matrix.UntransformVector(dgVector(convexMesh.m_points[edge->m_next->m_incidentVertex])));
 				dgVector p20 (r2 - q0);
-				dgFloat32 areaInv1 = (p10 * p20) % faceNormal;
+				dgFloat32 areaInv1 = faceNormal.DotProduct3(p10 * p20);
 				if (areaInv1 > areaInv) {
 					e1 = edge;
 					e2 = edge->m_next;
@@ -131,7 +131,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 
 			if ((side0 < dgFloat32 (0.0f)) && (side1 > dgFloat64 (0.0f))) {
 				dgBigVector dp (m_points[edge->m_incidentVertex] - m_points[edge->m_prev->m_incidentVertex]);
-				dgFloat64 param = - side0 / (plane % dp);
+				dgFloat64 param = - side0 / plane.DotProduct3(dp);
 
 				dgEdge* const splitEdge = InsertEdgeVertex (edge->m_prev, param);
 				test[splitEdge->m_next->m_incidentVertex] = dgFloat64 (0.0f);
@@ -257,9 +257,9 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 				//alpha1 = dgFloat32 (vb * den);
 				//alpha2 = dgFloat32 (vc * den);
 
-				dgFloat32 alpha0 = ((p_p1 * p_p2) % faceNormal) * areaInv;
-				dgFloat32 alpha1 = ((p_p2 * p_p0) % faceNormal) * areaInv;
-				dgFloat32 alpha2 = ((p_p0 * p_p1) % faceNormal) * areaInv;
+				dgFloat32 alpha0 = faceNormal.DotProduct3(p_p1 * p_p2) * areaInv;
+				dgFloat32 alpha1 = faceNormal.DotProduct3(p_p2 * p_p0) * areaInv;
+				dgFloat32 alpha2 = faceNormal.DotProduct3(p_p0 * p_p1) * areaInv;
 
 				attibute.m_u0 = uv0_0.m_x * alpha0 + uv0_1.m_x * alpha1 + uv0_2.m_x * alpha2; 
 				attibute.m_v0 = uv0_0.m_y * alpha0 + uv0_1.m_y * alpha1 + uv0_2.m_y * alpha2; 
@@ -924,7 +924,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			edge = edge->m_next;
 		} while (edge != face);
 
-		plane.m_w = dgGoogol::m_zero - (plane % p0);
+		plane.m_w = dgGoogol::m_zero - plane.DotProduct3(p0);
 		return plane;
 	}
 
@@ -944,7 +944,7 @@ do {
 			dgHugeVector p1(mesh->GetVertex(edge->m_twin->m_incidentVertex));
 			dgHugeVector p1p0(p1 - p0);
 			dgHugeVector q1p0(point - p0);
-			dgGoogol side (q1p0 % (p1p0 * normal));
+			dgGoogol side (q1p0.DotProduct3(p1p0 * normal));
 			if (side >= dgGoogol::m_zero) {
 				return false;
 			}
@@ -972,7 +972,7 @@ do {
 		if ((test0 * test1) < dgGoogol::m_zero) {
 			//point on different size, clip the line
 			dgHugeVector p1p0 (p1 - p0);
-			dgGoogol param = dgGoogol::m_zero - plane.EvaluePlane(p0) / (plane % p1p0);
+			dgGoogol param = dgGoogol::m_zero - plane.EvaluePlane(p0) / plane.DotProduct3(p1p0);
 			dgHugeVector p (p0 + p1p0.Scale3 (param));
 			if (IsPointInFace (p, meshFace, face, plane)) {
 				point = dgBigVector(p.m_x, p.m_y, p.m_z, p.m_w);

@@ -93,7 +93,7 @@ dgFloat32 dgHingeConstraint::GetJointOmega () const
 	dgVector dir (m_body0->GetMatrix().RotateVector (m_localMatrix0[0]));
 	const dgVector& omega0 = m_body0->GetOmega();
 	const dgVector& omega1 = m_body1->GetOmega();
-	return (omega0 - omega1) % dir;
+	return dir.DotProduct3(omega0 - omega1);
 }
 
 
@@ -146,9 +146,9 @@ dgUnsigned32 dgHingeConstraint::JacobianDerivative (dgContraintDescritor& params
 
 	m_angle = -angle.m_x;
 
-	dgAssert (dgAbsf (1.0f - (matrix0.m_front % matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbsf (1.0f - (matrix0.m_up % matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbsf (1.0f - (matrix0.m_right % matrix0.m_right)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbsf (1.0f - matrix0.m_front.DotProduct3(matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbsf (1.0f - matrix0.m_up.DotProduct3(matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbsf (1.0f - matrix0.m_right.DotProduct3(matrix0.m_right)) < dgFloat32 (1.0e-5f)); 
 
 	const dgVector& dir0 = matrix0.m_front;
 	const dgVector& dir1 = matrix0.m_up;

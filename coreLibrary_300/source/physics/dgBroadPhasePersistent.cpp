@@ -388,7 +388,7 @@ void dgBroadPhasePersistent::RayCast(const dgVector& l0, const dgVector& l1, OnR
 	dgBroadPhasePesistanceRootNode* const root = (dgBroadPhasePesistanceRootNode*)m_rootNode;
 	if (filter && (root->m_left || root->m_right)) {
 		dgVector segment(l1 - l0);
-		dgFloat32 dist2 = segment % segment;
+		dgFloat32 dist2 = segment.DotProduct3(segment);
 		if (dist2 > dgFloat32(1.0e-8f)) {
 
 			dgFloat32 distance[DG_BROADPHASE_MAX_STACK_DEPTH];

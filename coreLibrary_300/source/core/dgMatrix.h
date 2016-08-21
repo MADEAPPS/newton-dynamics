@@ -137,7 +137,7 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector& front)
 	} else {
 	  	m_right = front * dgVector (-front.m_y, front.m_x, dgFloat32(0.0f), dgFloat32(0.0f));
 	}
-  	m_right = m_right.Scale3 (dgRsqrt (m_right % m_right));
+  	m_right = m_right.Scale3 (dgRsqrt (m_right.DotProduct3(m_right)));
   	m_up = m_right * m_front;
 
 	m_front.m_w = dgFloat32(0.0f);
@@ -145,10 +145,10 @@ DG_INLINE dgMatrix::dgMatrix (const dgVector& front)
 	m_right.m_w = dgFloat32(0.0f);
 	m_posit = dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f));
 
-	dgAssert ((dgAbsf (m_front % m_front) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
-	dgAssert ((dgAbsf (m_up % m_up) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
-	dgAssert ((dgAbsf (m_right % m_right) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
-	dgAssert ((dgAbsf (m_right % (m_front * m_up)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
+	dgAssert ((dgAbsf (m_front.DotProduct3(m_front)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
+	dgAssert ((dgAbsf (m_up.DotProduct3(m_up)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
+	dgAssert ((dgAbsf (m_right.DotProduct3(m_right)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
+	dgAssert ((dgAbsf (m_right.DotProduct3(m_front * m_up)) - dgFloat32(1.0f)) < dgFloat32(1.0e-5f)); 
 }
 
 
@@ -210,7 +210,7 @@ DG_INLINE dgVector dgMatrix::UntransformVector (const dgVector &v) const
 
 DG_INLINE dgPlane dgMatrix::TransformPlane (const dgPlane &localPlane) const
 {
-	return dgPlane (RotateVector (localPlane), localPlane.m_w - (localPlane % UnrotateVector (m_posit)));  
+	return dgPlane (RotateVector (localPlane), localPlane.m_w - (localPlane.DotProduct3(UnrotateVector (m_posit))));  
 }
 
 DG_INLINE dgPlane dgMatrix::UntransformPlane (const dgPlane &globalPlane) const
@@ -230,7 +230,7 @@ DG_INLINE dgMatrix dgMatrix::Inverse () const
 	return dgMatrix (dgVector (m_front.m_x, m_up.m_x, m_right.m_x, dgFloat32(0.0f)),
 					 dgVector (m_front.m_y, m_up.m_y, m_right.m_y, dgFloat32(0.0f)),
 					 dgVector (m_front.m_z, m_up.m_z, m_right.m_z, dgFloat32(0.0f)),
-					 dgVector (- (m_posit % m_front), - (m_posit % m_up), - (m_posit % m_right), dgFloat32(1.0f)));
+					 dgVector (- m_posit.DotProduct3(m_front), - m_posit.DotProduct3(m_up), - m_posit.DotProduct3(m_right), dgFloat32(1.0f)));
 }
 
 DG_INLINE bool dgMatrix::TestIdentity() const
@@ -255,10 +255,10 @@ DG_INLINE bool dgMatrix::TestIdentity() const
 DG_INLINE bool dgMatrix::TestOrthogonal(dgFloat32 tol) const
 {
 	dgVector n (m_front * m_up);
-	dgFloat32 a = m_right % m_right;
-	dgFloat32 b = m_up % m_up;
-	dgFloat32 c = m_front % m_front;
-	dgFloat32 d = n % m_right;
+	dgFloat32 a = m_right.DotProduct3(m_right);
+	dgFloat32 b = m_up.DotProduct3(m_up);
+	dgFloat32 c = m_front.DotProduct3(m_front);
+	dgFloat32 d = n.DotProduct3(m_right);
 
 #ifdef _DEBUG
 	const dgMatrix& me = *this;

@@ -413,7 +413,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 
 	bool ArePlaneCoplanar (dgMeshEffect* const meshA, void* faceA, const dgBigVector& planeA, dgMeshEffect* const meshB, void* faceB, const dgBigVector& planeB) const
 	{
-		if (((planeA % planeB) < dgFloat64 (-1.0 + 1.0e-6f)) && ((fabs(planeA.m_w + planeB.m_w) < dgFloat64(1.0e-6f)))) {
+		if ((planeA.DotProduct3(planeB) < dgFloat64 (-1.0 + 1.0e-6f)) && ((fabs(planeA.m_w + planeB.m_w) < dgFloat64(1.0e-6f)))) {
 			const dgBigVector* const pointsA = (dgBigVector*) meshA->GetVertexPool();
 			const dgBigVector* const pointsB = (dgBigVector*) meshB->GetVertexPool();
 
@@ -459,7 +459,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
                 const dgBigVector& q0 = pointsA[indexA[i0]];
                 const dgBigVector& q1 = pointsA[indexA[i1]];
 				dgBigVector n (planeA * (q1 - q0));
-				dgBigPlane plane (n, - (n % q0));
+				dgBigPlane plane (n, - n.DotProduct3(q0));
 				i0 = i1;
 //dgTrace (("%f %f %f\n", q0.m_x, q0.m_y, q0.m_z));
 
@@ -476,7 +476,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 							const dgBigVector& p1 = *tmp->m_next->m_vertex;
 
 							dgBigVector dp (p1 - p0); 
-							dgFloat64 den = plane % dp;
+							dgFloat64 den = plane.DotProduct3(dp);
 							if (fabs(den) < dgFloat32 (1.0e-24f)) {
 								den = (den >= dgFloat32 (0.0f)) ?  dgFloat32 (1.0e-24f) :  dgFloat32 (-1.0e-24f);
 							}
@@ -496,7 +496,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 						const dgBigVector& p1 = *tmp->m_next->m_vertex;
 						isInside |= 1;
 						dgBigVector dp (p1 - p0); 
-						dgFloat64 den = plane % dp;
+						dgFloat64 den = plane.DotProduct3(dp);
 						if (fabs(den) < dgFloat32 (1.0e-24f)) {
 							den = (den >= dgFloat32 (0.0f)) ?  dgFloat32 (1.0e-24f) :  dgFloat32 (-1.0e-24f);
 						}
@@ -548,7 +548,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
                 r1r0 = r2r0;
                 polyPtr = polyPtr->m_next;
             } while (polyPtr != poly);
-            return fabs (area % planeA) > dgFloat32 (1.0e-5f);
+            return fabs (area.DotProduct3(planeA)) > dgFloat32 (1.0e-5f);
 		}
 
 		return false;
@@ -570,7 +570,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
             if (!meshB->IsFaceOpen (faceB)) {
 				dgInt32 vertexIndexB = meshB->GetVertexIndex (faceB);
 				dgBigVector planeB (meshB->CalculateFaceNormal (faceB));
-				planeB.m_w = -(planeB % pointsB[vertexIndexB]);
+				planeB.m_w = -planeB.DotProduct3(pointsB[vertexIndexB]);
 				planeB_array[planeB_Count] = planeB;
 				planeB_Count ++;
 				dgAssert (planeB_Count < sizeof (planeB_array) / sizeof (planeB_array[0]));
@@ -581,7 +581,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
             if (!meshA->IsFaceOpen (faceA)) {
 				dgInt32 vertexIndexA = meshA->GetVertexIndex (faceA);
 				dgBigVector planeA (meshA->CalculateFaceNormal (faceA));
-				planeA.m_w = -(planeA % pointsA[vertexIndexA]);
+				planeA.m_w = - planeA.DotProduct3(pointsA[vertexIndexA]);
 
 				dgInt32 indexB = 0;
 				for (void* faceB = meshB->GetFirstFace(); faceB; faceB = meshB->GetNextFace(faceB)) {

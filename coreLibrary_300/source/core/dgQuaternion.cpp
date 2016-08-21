@@ -88,7 +88,7 @@ dgQuaternion::dgQuaternion (const dgVector &unitAxis, dgFloat32 angle)
 
 #ifdef _DEBUG
 	if (dgAbsf (angle) > dgFloat32(dgEPSILON / 10.0f)) {
-		dgAssert (dgAbsf (dgFloat32(1.0f) - unitAxis % unitAxis) < dgFloat32(dgEPSILON * 10.0f));
+		dgAssert (dgAbsf (dgFloat32(1.0f) - unitAxis.DotProduct3(unitAxis)) < dgFloat32(dgEPSILON * 10.0f));
 	} 
 #endif
 	m_q1 = unitAxis.m_x * sinAng;
@@ -107,7 +107,7 @@ dgVector dgQuaternion::CalcAverageOmega (const dgQuaternion &q1, dgFloat32 invdt
 	dgQuaternion dq (q0.Inverse() * q1);
 	dgVector omegaDir (dq.m_q1, dq.m_q2, dq.m_q3, dgFloat32 (0.0f));
 
-	dgFloat32 dirMag2 = omegaDir % omegaDir;
+	dgFloat32 dirMag2 = omegaDir.DotProduct3(omegaDir);
 	if (dirMag2	< dgFloat32(dgFloat32 (1.0e-5f) * dgFloat32 (1.0e-5f))) {
 		return dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 	}

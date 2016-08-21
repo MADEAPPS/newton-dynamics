@@ -240,12 +240,12 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 		dgVector localP0 (globalMatrix.UntransformVector (l0));
 		dgVector localP1 (globalMatrix.UntransformVector (l1));
 		dgVector p1p0 (localP1 - localP0);
-		if ((p1p0 % p1p0) > dgFloat32 (1.0e-12f)) {
+		if (p1p0.DotProduct3(p1p0) > dgFloat32 (1.0e-12f)) {
 			dgFloat32 t = m_collision->RayCast (localP0, localP1, dgFloat32 (1.0f), contactOut, preFilter, this, userData);
 			if (t < dgFloat32 (1.0f)) {
 				dgVector p (globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale3(t)));
 				dgVector l1l0 (line.m_l1 - line.m_l0);
-				t = ((p - line.m_l0) % l1l0) / (l1l0 % l1l0);
+				t = l1l0.DotProduct3(p - line.m_l0) / l1l0.DotProduct3(l1l0);
 				if (t < maxT) {
 					dgAssert (t >= dgFloat32 (0.0f));
 					dgAssert (t <= dgFloat32 (1.0f));
@@ -271,12 +271,12 @@ void dgBody::UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
 	m_globalCentreOfMass += m_veloc.Scale3 (timestep); 
-	while (((m_omega % m_omega) * timestep * timestep) > m_maxAngulaRotationPerSet2) {
+	while ((m_omega.DotProduct3(m_omega) * timestep * timestep) > m_maxAngulaRotationPerSet2) {
 		m_omega = m_omega.Scale4 (dgFloat32 (0.8f));
 	}
 
 	// this is correct
-	dgFloat32 omegaMag2 = m_omega % m_omega;
+	dgFloat32 omegaMag2 = m_omega.DotProduct3(m_omega);
 	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {
 		dgFloat32 invOmegaMag = dgRsqrt (omegaMag2);
 		dgVector omegaAxis (m_omega.Scale4 (invOmegaMag));
@@ -524,7 +524,7 @@ void dgBody::SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const
 	dgMatrix inertia (collision->CalculateInertia());
 
 	dgVector origin (inertia.m_posit);
-	dgFloat32 mag = origin % origin;
+	dgFloat32 mag = origin.DotProduct3(origin);
 	for (dgInt32 i = 0; i < 3; i ++) {
 		inertia[i][i] = (inertia[i][i] - (mag - origin[i] * origin[i])) * mass;
 		for (dgInt32 j = i + 1; j < 3; j ++) {

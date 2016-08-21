@@ -430,7 +430,7 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 #ifdef _USE_HARD_JOINTS
     NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), parent, NULL);
 	if (useHardMortor) {
-		NewtonSkeletonSetSolverMode(skeleton, 1);
+//		NewtonSkeletonSetSolverMode(skeleton, 1);
 	}
 #endif
 

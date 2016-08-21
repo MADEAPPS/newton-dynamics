@@ -289,20 +289,20 @@ dgFloat64 dgConvexHull4d::RoundToFloat (dgFloat64 val) const
 void dgConvexHull4d::TessellateTriangle (dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgBigVector* const ouput, dgInt32& start) const
 {
 	if (level) {
-		dgAssert (dgAbsf (p0 % p0 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p1 % p1 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p2 % p2 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbsf (p0.DotProduct3(p0) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbsf (p1.DotProduct3(p1) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbsf (p2.DotProduct3(p2) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 		dgVector p01 (p0 + p1);
 		dgVector p12 (p1 + p2);
 		dgVector p20 (p2 + p0);
 
-		p01 = p01.Scale3 (dgRsqrt(p01 % p01));
-		p12 = p12.Scale3 (dgRsqrt(p12 % p12));
-		p20 = p20.Scale3 (dgRsqrt(p20 % p20));
+		p01 = p01.Scale3 (dgRsqrt(p01.DotProduct3(p01)));
+		p12 = p12.Scale3 (dgRsqrt(p12.DotProduct3(p12)));
+		p20 = p20.Scale3 (dgRsqrt(p20.DotProduct3(p20)));
 
-		dgAssert (dgAbsf (p01 % p01 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p12 % p12 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
-		dgAssert (dgAbsf (p20 % p20 - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbsf (p01.DotProduct3(p01) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbsf (p12.DotProduct3(p12) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbsf (p20.DotProduct3(p20) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 
 		TessellateTriangle  (level - 1, p0,  p01, p20, count, ouput, start);
 		TessellateTriangle  (level - 1, p1,  p12, p01, count, ouput, start);
@@ -311,7 +311,7 @@ void dgConvexHull4d::TessellateTriangle (dgInt32 level, const dgVector& p0, cons
 
 	} else {
 		dgBigPlane n (p0, p1, p2);
-		n = n.Scale (dgFloat64(1.0f) / sqrt (n % n));
+		n = n.Scale (dgFloat64(1.0f) / sqrt (n.DotProduct3(n)));
 		n.m_w = dgFloat64(0.0f);
 		ouput[start] = n;
 		start += 8;
@@ -712,7 +712,8 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgHullVector* const points, const dgBigV
 
 		e3 = points[index] - convexPoints[0];
 		e3.m_w = dgFloat64 (0.0f);
-		dgFloat64 volume = (e1 * e2) % e3;		
+		//dgFloat64 volume = (e1 * e2) % e3;		
+		dgFloat64 volume = e3.DotProduct3(e1 * e2);
 		if (fabs (volume) > (dgFloat64 (1.0e-4f) * m_diag * m_diag * m_diag)) {
 			convexPoints[3] = points[index];
 			points[index].m_mark = 1;

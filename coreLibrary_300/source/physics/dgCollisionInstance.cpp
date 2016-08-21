@@ -376,7 +376,7 @@ void dgCollisionInstance::SetGlobalScale (const dgVector& scale)
 
 	// extract the original local matrix
 	dgMatrix transpose (matrix.Transpose());
-	dgVector globalScale (dgSqrt (transpose[0] % transpose[0]), dgSqrt (transpose[1] % transpose[1]), dgSqrt (transpose[2] % transpose[2]), dgFloat32 (1.0f));
+	dgVector globalScale (dgSqrt (transpose[0].DotProduct3(transpose[0])), dgSqrt (transpose[1].DotProduct3(transpose[1])), dgSqrt (transpose[2].DotProduct3(transpose[2])), dgFloat32 (1.0f));
 	dgVector invGlobalScale (dgFloat32 (1.0f) / globalScale.m_x, dgFloat32 (1.0f) / globalScale.m_y, dgFloat32 (1.0f) / globalScale.m_z, dgFloat32 (1.0f));
 	dgMatrix localMatrix (m_aligmentMatrix.Transpose() * m_localMatrix);
 	localMatrix.m_posit = matrix.m_posit.CompProduct4(invGlobalScale) | dgVector::m_wOne;
@@ -432,7 +432,7 @@ void dgCollisionInstance::SetLocalMatrix (const dgMatrix& matrix)
 	m_localMatrix[3][3] = dgFloat32 (1.0f);
 
 #ifdef _DEBUG
-	dgFloat32 det = (m_localMatrix.m_front * m_localMatrix.m_up) % m_localMatrix.m_right;
+	dgFloat32 det = m_localMatrix.m_right.DotProduct3(m_localMatrix.m_front * m_localMatrix.m_up);
 	dgAssert (det > dgFloat32 (0.999f));
 	dgAssert (det < dgFloat32 (1.001f));
 #endif

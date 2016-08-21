@@ -194,7 +194,7 @@ dgFloat32 dgCollisionBox::GetSkinThickness () const
 
 dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgVector mask (dir < dgVector (dgFloat32 (0.0f)));
 	if (vertexIndex) {
@@ -207,7 +207,7 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vert
 
 dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert(dgAbsf(dir % dir - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 	dgAssert(dir.m_w == dgFloat32(0.0f));
 	dgVector mask(dir < dgVector(dgFloat32(0.0f)));
 	if (vertexIndex) {
@@ -225,7 +225,7 @@ dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir, dgInt32* cons
 
 dgVector dgCollisionBox::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const
 {
-	dgAssert(dgAbsf((dir % dir - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbsf((dir.DotProduct3(dir) - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
 	return point + dir.Scale4 (D_BOX_SKIN_THINCKNESS);
 }
 

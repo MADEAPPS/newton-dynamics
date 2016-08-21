@@ -278,7 +278,7 @@ dgFloat32 dgCollisionChamferCylinder::RayCast(const dgVector& q0, const dgVector
 	dgVector dq((q1 - q0) & dgVector::m_triplexMask);
 
 	// avoid NaN as a result of a division by zero
-	if ((dq % dq) <= 0.0f) {
+	if (dq.DotProduct3(dq) <= 0.0f) {
 		return dgFloat32(1.2f);
 	}
 
@@ -335,7 +335,7 @@ dgFloat32 dgCollisionChamferCylinder::RayCast(const dgVector& q0, const dgVector
 
 dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgFloat32 x = dir.GetScalar();
 	if (dgAbsf (x) > dgFloat32 (0.9999f)) {
@@ -351,7 +351,7 @@ dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32
 dgVector dgCollisionChamferCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	*vertexIndex = -1;
-	dgAssert (dgAbsf(dir % dir - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgFloat32 x = dir.GetScalar();
 	if (dgAbsf (x) > dgFloat32 (0.99995f)) {
@@ -359,7 +359,7 @@ dgVector dgCollisionChamferCylinder::SupportVertexSpecial (const dgVector& dir, 
 	}
 
 	dgVector sideDir (m_yzMask & dir);
-	dgAssert ((sideDir % sideDir) > dgFloat32 (0.0f));
+	dgAssert (sideDir.DotProduct3(sideDir) > dgFloat32 (0.0f));
 	return sideDir.CompProduct4(sideDir.InvMagSqrt()).Scale4(m_radius);
 }
 

@@ -116,7 +116,7 @@ void dgMeshEffect::dgMeshBVH::dgMeshBVHNode::SetBox (const dgVector& p0, const d
 
 	dgVector size ((m_p1 - m_p0).Scale3 (dgFloat32 (0.5f)));
 	dgVector size1(size.m_y, size.m_z, size.m_x, dgFloat32 (0.0f));
-	m_area = size % size1;
+	m_area = size.DotProduct3(size1);
 }
 
 
@@ -211,7 +211,7 @@ dgFloat32 dgMeshEffect::dgMeshBVH::CalculateSurfaceArea (dgMeshBVHNode* const no
 	maxBox = dgVector (dgMax (node0->m_p1.m_x, node1->m_p1.m_x), dgMax (node0->m_p1.m_y, node1->m_p1.m_y), dgMax (node0->m_p1.m_z, node1->m_p1.m_z), dgFloat32 (0.0f));		
 	dgVector side0 ((maxBox - minBox).Scale3 (dgFloat32 (0.5f)));
 	dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-	return side0 % side1;
+	return side0.DotProduct3(side1);
 }
 
 
@@ -696,7 +696,7 @@ dgFloat64 dgMeshEffect::dgMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const 
 
 	dgFloat64 tOut = 2.0f;
 	const dgBigVector* const points = (dgBigVector*) m_mesh->GetVertexPool();
-	dgFloat64 dir = normal % diff;
+	dgFloat64 dir = normal.DotProduct3(diff);
 	if (dir < 0.0f) {
 		dgEdge* ptr = faceNode->m_face;
 		do {
@@ -704,7 +704,7 @@ dgFloat64 dgMeshEffect::dgMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const 
 			dgInt32 index1 = ptr->m_next->m_incidentVertex;
 			dgBigVector p0v0 (points[index0] - p0);
 			dgBigVector p0v1 (points[index1] - p0);
-			dgFloat64 alpha = (diff * p0v1) % p0v0;
+			dgFloat64 alpha = p0v0.DotProduct3(diff * p0v1);
 			if (alpha <= 0.0f) {
 				return 1.2f;
 			}
@@ -714,8 +714,8 @@ dgFloat64 dgMeshEffect::dgMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const 
 
 		dgInt32 index0 = ptr->m_incidentVertex;
 		dgBigVector p0v0 (points[index0] - p0);
-		tOut = normal % p0v0;
-		dgFloat64 dist = normal % diff;
+		tOut = normal.DotProduct3(p0v0);
+		dgFloat64 dist = normal.DotProduct3(diff);
 		tOut = tOut / dist;
 
 	} else if (doubleSidedFaces && (dir > 0.0f)) {
@@ -725,7 +725,7 @@ dgFloat64 dgMeshEffect::dgMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const 
 			dgInt32 index1 = ptr->m_prev->m_incidentVertex;
 			dgBigVector p0v0 (points[index0] - p0);
 			dgBigVector p0v1 (points[index1] - p0);
-			dgFloat64 alpha = (diff * p0v1) % p0v0;
+			dgFloat64 alpha = p0v0.DotProduct3(diff * p0v1);
 			if (alpha <= 0.0f) {
 				return 1.2f;
 			}
@@ -735,8 +735,8 @@ dgFloat64 dgMeshEffect::dgMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const 
 
 		dgInt32 index0 = ptr->m_incidentVertex;
 		dgBigVector p0v0 (points[index0] - p0);
-		tOut = normal % p0v0;
-		dgFloat64 dist = normal % diff;
+		tOut = normal.DotProduct3(p0v0);
+		dgFloat64 dist = normal.DotProduct3(diff);
 		tOut = tOut / dist;
 	}
 
@@ -1569,8 +1569,8 @@ void dgMeshEffect::ApplyTransform (const dgMatrix& matrix)
 	for (dgInt32 i = 0; i < m_atribCount; i ++) {
 		dgVector n (dgFloat32 (m_attrib[i].m_normal_x), dgFloat32 (m_attrib[i].m_normal_y), dgFloat32 (m_attrib[i].m_normal_z), dgFloat32 (0.0f));
 		n = rotation.RotateVector(n);
-		dgAssert ((n % n) > dgFloat32 (0.0f));
-		n = n.Scale3 (dgRsqrt (n % n));
+		dgAssert (n.DotProduct3(n) > dgFloat32 (0.0f));
+		n = n.Scale3 (dgRsqrt (n.DotProduct3(n)));
 		m_attrib[i].m_normal_x = n.m_x;
 		m_attrib[i].m_normal_y = n.m_y;
 		m_attrib[i].m_normal_z = n.m_z;
@@ -1645,7 +1645,7 @@ void dgMeshEffect::AddAtribute (const dgVertexAtribute& attib)
 	m_attrib[m_atribCount] = attib;
 
 	dgBigVector n (attib.m_normal_x, attib.m_normal_y, attib.m_normal_z, dgFloat64 (0.0f));
-	dgFloat64 mag2 = n % n ; 
+	dgFloat64 mag2 = n.DotProduct3(n); 
 	if (mag2 < dgFloat64 (1.0e-16f)) {
 		n.m_x = dgFloat64 (0.0f);
 		n.m_y = dgFloat64 (1.0f);
@@ -1774,7 +1774,7 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat64* const vertexList,
 					dgBigVector e1 (p1 - p0);
 					dgBigVector e2 (p2 - p0);
 					dgBigVector n (e1 * e2);
-					dgFloat64 mag3 = n % n;
+					dgFloat64 mag3 = n.DotProduct3(n);
 					dgAssert (mag3 > dgFloat64 (DG_MESH_EFFECT_PRECISION_SCALE_INV * DG_MESH_EFFECT_PRECISION_SCALE_INV));
 				#endif
 			}
@@ -1792,7 +1792,7 @@ void dgMeshEffect::AddPolygon (dgInt32 count, const dgFloat64* const vertexList,
 		dgBigVector e1 (p1 - p0);
 		dgBigVector e2 (p2 - p0);
 		dgBigVector n (e1 * e2);
-		dgFloat64 mag3 = n % n;
+		dgFloat64 mag3 = n.DotProduct3(n);
 		if (mag3 < dgFloat64 (DG_MESH_EFFECT_PRECISION_SCALE_INV * DG_MESH_EFFECT_PRECISION_SCALE_INV)) {
 			m_pointCount -= 3;
 			m_atribCount -= 3;
@@ -1856,7 +1856,7 @@ void dgMeshEffect::EndPolygon (dgFloat64 tol, bool fixTjoint)
 		dgBigVector e1 (p1 - p0);
 		dgBigVector e2 (p2 - p0);
 		dgBigVector n (e1 * e2);
-		dgFloat64 mag2 = n % n;
+		dgFloat64 mag2 = n.DotProduct3(n);
 		dgAssert (mag2 > dgFloat32 (0.0f));
 	}
 #endif
@@ -1878,7 +1878,7 @@ void dgMeshEffect::EndPolygon (dgFloat64 tol, bool fixTjoint)
 		dgBigVector e2 (m_points[index[2]] - m_points[index[0]]);
 
 		dgBigVector n (e1 * e2);
-		dgFloat64 mag2 = n % n;
+		dgFloat64 mag2 = n.DotProduct3(n);
 		if (mag2 > dgFloat64 (1.0e-12f)) {
 			userdata[0] = attrIndexMap[i * 3 + 0];
 			userdata[1] = attrIndexMap[i * 3 + 1];
@@ -1923,7 +1923,7 @@ void dgMeshEffect::EndPolygon (dgFloat64 tol, bool fixTjoint)
 			dgBigVector e1 (p1 - p0);
 			dgBigVector e2 (p2 - p0);
 			dgBigVector n (e1 * e2);
-			dgFloat64 mag2 = n % n;
+			dgFloat64 mag2 = n.DotProduct3(n);
 			dgAssert (mag2 >= dgFloat32 (0.0f));
 		}
 	}
@@ -2452,7 +2452,7 @@ dgBigVector dgMeshEffect::CalculateFaceNormal (const void* const face) const
 	dgTreeNode* const node = (dgTreeNode*) face;
 	dgEdge* const faceEdge = &node->GetInfo();
 	dgBigVector normal (FaceNormal (faceEdge, &m_points[0].m_x, sizeof (m_points[0])));
-	normal = normal.Scale3 (1.0f / sqrt (normal % normal));
+	normal = normal.Scale3 (1.0f / sqrt (normal.DotProduct3(normal)));
 	return normal;
 }
 
@@ -2833,7 +2833,7 @@ bool dgMeshEffect::Sanity () const
 				dgBigVector p0 (m_points[edge->m_incidentVertex]);
 				dgBigVector p1 (m_attrib[edge->m_userData].m_vertex);
 				dgBigVector p1p0 (p1 - p0);
-				dgFloat64 mag2 (p1p0 % p1p0);
+				dgFloat64 mag2 (p1p0.DotProduct3(p1p0));
 				dgAssert (mag2 < 1.0e-16f);
 			}
 		}
@@ -2906,21 +2906,21 @@ dgMeshEffect::dgVertexAtribute dgMeshEffect::InterpolateVertex (const dgBigVecto
 			dgBigVector p10 (q1 - q0);
 			dgBigVector p20 (q2 - q0);
 
-			dgFloat64 dot = p20 % p10;
-			dgFloat64 mag1 = p10 % p10;
-			dgFloat64 mag2 = p20 % p20;
+			dgFloat64 dot = p20.DotProduct3(p10);
+			dgFloat64 mag1 = p10.DotProduct3(p10);
+			dgFloat64 mag2 = p20.DotProduct3(p20);
 			dgFloat64 collinear = dot * dot - mag2 * mag1;
 			if (fabs (collinear) > dgFloat64 (1.0e-8f)) {
 				dgBigVector p_p0 (point - q0);
 				dgBigVector p_p1 (point - q1);
 				dgBigVector p_p2 (point - q2);
 
-				dgFloat64 alpha1 = p10 % p_p0;
-				dgFloat64 alpha2 = p20 % p_p0;
-				dgFloat64 alpha3 = p10 % p_p1;
-				dgFloat64 alpha4 = p20 % p_p1;
-				dgFloat64 alpha5 = p10 % p_p2;
-				dgFloat64 alpha6 = p20 % p_p2;
+				dgFloat64 alpha1 = p10.DotProduct3(p_p0);
+				dgFloat64 alpha2 = p20.DotProduct3(p_p0);
+				dgFloat64 alpha3 = p10.DotProduct3(p_p1);
+				dgFloat64 alpha4 = p20.DotProduct3(p_p1);
+				dgFloat64 alpha5 = p10.DotProduct3(p_p2);
+				dgFloat64 alpha6 = p20.DotProduct3(p_p2);
 
 				dgFloat64 vc = alpha1 * alpha4 - alpha3 * alpha2;
 				dgFloat64 vb = alpha5 * alpha2 - alpha1 * alpha6;
@@ -2943,7 +2943,7 @@ dgMeshEffect::dgVertexAtribute dgMeshEffect::InterpolateVertex (const dgBigVecto
 					dgBigVector normal (attr0.m_normal_x * alpha0 + attr1.m_normal_x * alpha1 + attr2.m_normal_x * alpha2,
 										attr0.m_normal_y * alpha0 + attr1.m_normal_y * alpha1 + attr2.m_normal_y * alpha2,
 										attr0.m_normal_z * alpha0 + attr1.m_normal_z * alpha1 + attr2.m_normal_z * alpha2, dgFloat32 (0.0f));
-					normal = normal.Scale3 (dgFloat64 (1.0f) / sqrt (normal % normal));
+					normal = normal.Scale3 (dgFloat64 (1.0f) / sqrt (normal.DotProduct3(normal)));
 
 		#ifdef _DEBUG
 					dgBigVector testPoint (attr0.m_vertex.m_x * alpha0 + attr1.m_vertex.m_x * alpha1 + attr2.m_vertex.m_x * alpha2,
@@ -3164,7 +3164,7 @@ void dgMeshEffect::RepairTJoints ()
 			const dgBigVector& p0 = m_points[edge->m_incidentVertex];
 			const dgBigVector& p1 = m_points[edge->m_twin->m_incidentVertex];
 			dgBigVector dist (p1 - p0);
-			dgFloat64 mag2 = dist % dist;
+			dgFloat64 mag2 = dist.DotProduct3(dist);
 			if (mag2 < tol2) {
 				bool move = true;
 				while (move) {
@@ -3245,10 +3245,10 @@ void dgMeshEffect::RepairTJoints ()
 
 			dgBigVector A (p1 - p0);
 			dgBigVector B (p2 - p1);
-			dgFloat64 ab = A % B;
+			dgFloat64 ab = A.DotProduct3(B);
 			if (ab >= 0.0f) {
-				dgFloat64 aa = A % A;
-				dgFloat64 bb = B % B;
+				dgFloat64 aa = A.DotProduct3(A);
+				dgFloat64 bb = B.DotProduct3(B);
 
 				dgFloat64 magab2 = ab * ab;
 				dgFloat64 magaabb = aa * bb * tol2;
@@ -3315,8 +3315,8 @@ void dgMeshEffect::RepairTJoints ()
 								openEdge->m_userData = deletedEdge->m_twin->m_userData;
 
 								dgBigVector p2p0 (p2 - p0);
-								dgFloat64 den = p2p0 % p2p0;
-								dgFloat64 param1 = ((p1 - p0) % p2p0) / den;
+								dgFloat64 den = p2p0.DotProduct3(p2p0);
+								dgFloat64 param1 = p2p0.DotProduct3(p1 - p0) / den;
 								dgVertexAtribute attib1 = InterpolateEdge (deletedEdge->m_twin, param1);
 								AddAtribute(attib1);
 								openEdge->m_next->m_userData = m_atribCount  - 1;
@@ -3355,8 +3355,8 @@ void dgMeshEffect::RepairTJoints ()
 
 							openEdge->m_userData = deletedEdge->m_twin->m_userData;
 							dgBigVector p2p0 (p2 - p0);
-							dgFloat64 den = p2p0 % p2p0;
-							dgFloat64 param1 = ((p1 - p0) % p2p0) / den;
+							dgFloat64 den = p2p0.DotProduct3(p2p0);
+							dgFloat64 param1 = p2p0.DotProduct3(p1 - p0) / den;
 							dgVertexAtribute attib1 = InterpolateEdge (deletedEdge->m_twin, param1);
 							attib1.m_vertex = m_points[openEdge->m_next->m_incidentVertex];
 							AddAtribute(attib1);
@@ -3385,10 +3385,10 @@ void dgMeshEffect::RepairTJoints ()
 
 						dgBigVector A (p3 - p2);
 						dgBigVector B (p2 - p1);
-						dgFloat64 ab (A % B);
+						dgFloat64 ab = A.DotProduct3(B);
 						if (ab >= 0.0) {
-							dgFloat64 aa (A % A);
-							dgFloat64 bb (B % B);
+							dgFloat64 aa = A.DotProduct3(A);
+							dgFloat64 bb = B.DotProduct3(B);
 
 							dgFloat64 magab2 = ab * ab;
 							dgFloat64 magaabb = aa * bb * tol2;
@@ -3397,7 +3397,7 @@ void dgMeshEffect::RepairTJoints ()
 									const dgBigVector& p4 = m_points[openEdge->m_prev->m_incidentVertex];
 									dgBigVector A (p1 - p0);
 									dgBigVector B (p1 - p4);
-									dgFloat64 ab (A % B);
+									dgFloat64 ab = A.DotProduct3(B);
 									if (ab < 0.0f) {
 										dgFloat64 magab2 = ab * ab;
 										dgFloat64 magaabb = aa * bb * tol2;
@@ -3423,14 +3423,14 @@ void dgMeshEffect::RepairTJoints ()
 									openEdge->m_userData = deletedEdge->m_twin->m_userData;
 
 									dgBigVector p3p0 (p3 - p0);
-									dgFloat64 den = p3p0 % p3p0;
-									dgFloat64 param1 = ((p1 - p0) % p3p0) / den;
+									dgFloat64 den = p3p0.DotProduct3(p3p0);
+									dgFloat64 param1 = p3p0.DotProduct3(p1 - p0) / den;
 									dgVertexAtribute attib1 = InterpolateEdge (deletedEdge->m_twin, param1);
 									attib1.m_vertex = m_points[openEdge->m_next->m_incidentVertex];
 									AddAtribute(attib1);
 									openEdge->m_next->m_userData = m_atribCount  - 1;
 
-									dgFloat64 param2 = ((p2 - p0) % p3p0) / den;
+									dgFloat64 param2 = p3p0.DotProduct3(p2 - p0) / den;
 									dgVertexAtribute attib2 = InterpolateEdge (deletedEdge->m_twin, param2);
 									attib2.m_vertex = m_points[openEdge->m_next->m_next->m_incidentVertex];
 									AddAtribute(attib2);

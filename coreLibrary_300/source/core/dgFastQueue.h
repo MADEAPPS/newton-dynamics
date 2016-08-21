@@ -47,8 +47,8 @@ class dgFastQueue
 	private:
 	T* m_pool;
     dgMemoryAllocator* m_allocator;
-    dgInt32 m_head;
-    dgInt32 m_tail;
+	dgInt32 m_head;
+	dgInt32 m_tail;
 };
 
 
@@ -59,7 +59,7 @@ dgFastQueue<T, sizeInPowerOfTwo>::dgFastQueue (dgMemoryAllocator* const allocato
 	,m_head(0)
 	,m_tail(0)
 {
-    dgAssert (((sizeInPowerOfTwo -1) & (-sizeInPowerOfTwo)) == 0);
+	dgAssert (((sizeInPowerOfTwo -1) & (-sizeInPowerOfTwo)) == 0);
     m_pool = (T*) m_allocator->MallocLow(sizeInPowerOfTwo * sizeof (T));
 }
 

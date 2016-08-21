@@ -43,8 +43,8 @@ dgFloat32 dgFastRayTest::PolygonIntersectFallback (const dgVector& normal, dgFlo
 	dgBigVector p0v0_ (v0 - m_p0_);
 	dgBigVector normal_ (normal);
 	dgBigVector diff_ (m_diff);
-	dgFloat64 tOut = normal_ % p0v0_;
-	dgFloat64 dist = normal_ % diff_;
+	dgFloat64 tOut = normal_.DotProduct3 (p0v0_);
+	dgFloat64 dist = normal_.DotProduct3 (diff_);
 	if (tOut >= dist * maxT) {
 		if ((tOut < dgFloat64 (0.0f)) && (tOut > dist)) {
 			for (dgInt32 i = 0; i < indexCount; i ++) {
@@ -52,7 +52,8 @@ dgFloat32 dgFastRayTest::PolygonIntersectFallback (const dgVector& normal, dgFlo
 				dgBigVector v1 (&polygon[i2]);
 				dgBigVector p0v1_ (v1 - m_p0_);
 				// calculate the volume formed by the line and the edge of the polygon
-				dgFloat64 alpha = (diff_ * p0v1_) % p0v0_;
+				//dgFloat64 alpha = (diff_ * p0v1_) % p0v0_;
+				dgFloat64 alpha = p0v0_.DotProduct3 (diff_ * p0v1_);
 				// if a least one volume is negative it mean the line cross the polygon outside this edge and do not hit the face
 				if (alpha < DG_RAY_TOL_ERROR) {
 					return 1.2f;
@@ -85,8 +86,8 @@ dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& normal, dgFloat32 max
 	dgBigVector p0v0_ (v0 - m_p0_);
 	dgBigVector normal_ (normal);
 	dgBigVector diff_ (m_diff);
-	dgFloat64 tOut = normal_ % p0v0_;
-	dgFloat64 dist = normal_ % diff_;
+	dgFloat64 tOut = normal_.DotProduct3 (p0v0_);
+	dgFloat64 dist = normal_ .DotProduct3 (diff_);
 	if (tOut >= dist * maxT) {
 		if ((tOut < dgFloat64 (0.0f)) && (tOut > dist)) {
 			for (dgInt32 i = 0; i < indexCount; i ++) {
@@ -94,7 +95,8 @@ dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& normal, dgFloat32 max
 				dgBigVector v1 (&polygon[i2]);
 				dgBigVector p0v1_ (v1 - m_p0_);
 				// calculate the volume formed by the line and the edge of the polygon
-				dgFloat64 alpha = (diff_ * p0v1_) % p0v0_;
+				//dgFloat64 alpha = (diff_ * p0v1_) % p0v0_;
+				dgFloat64 alpha = p0v0_.DotProduct3 (diff_ * p0v1_);
 				// if a least one volume is negative it mean the line cross the polygon outside this edge and do not hit the face
 				if (alpha < DG_RAY_TOL_ERROR) {
 					return 1.2f;
@@ -206,7 +208,9 @@ dgVector dgApi dgPointToRayDistance (const dgVector& point, const dgVector& ray_
 {
 	dgFloat32 t;
 	dgVector dp (ray_p1 - ray_p0);
-	t = dgClamp (((point - ray_p0) % dp) / (dp % dp), dgFloat32(dgFloat32 (0.0f)), dgFloat32 (1.0f));
+	//t = dgClamp (((point - ray_p0) % dp) / (dp % dp), dgFloat32(dgFloat32 (0.0f)), dgFloat32 (1.0f));
+	t = dgClamp (dp.DotProduct3 (point - ray_p0) / dp.DotProduct3 (dp), dgFloat32(dgFloat32 (0.0f)), dgFloat32 (1.0f));
+	
 	return ray_p0 + dp.Scale3 (t);
 }
 
@@ -219,11 +223,11 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 	dgVector v (ray_q1 - ray_q0);
 	dgVector w (ray_p0 - ray_q0);
 
-	dgFloat32 a = u % u;        // always >= 0
-	dgFloat32 b = u % v;
-	dgFloat32 c = v % v;        // always >= 0
-	dgFloat32 d = u % w;
-	dgFloat32 e = v % w;
+	dgFloat32 a = u.DotProduct3(u);        // always >= 0
+	dgFloat32 b = u.DotProduct3(v);
+	dgFloat32 c = v.DotProduct3(v);        // always >= 0
+	dgFloat32 d = u.DotProduct3(w);
+	dgFloat32 e = v.DotProduct3(w);
 	dgFloat32 D = a*c - b*b;   // always >= 0
 	dgFloat32 sD = D;			// sc = sN / sD, default sD = D >= 0
 	dgFloat32 tD = D;			// tc = tN / tD, default tD = D >= 0
@@ -352,9 +356,9 @@ dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, c
 
 #ifdef _DEBUG
 	dgVector faceNormal ((p1 - p0) * (p2 - p0));
-	dgFloat64 faceNormal2 = faceNormal % faceNormal;
-	dgFloat64 normal2 = normal % normal;
-	dgFloat64 faceNormalNormal = faceNormal % normal;
+	dgFloat64 faceNormal2 = faceNormal.DotProduct3(faceNormal);
+	dgFloat64 normal2 = normal.DotProduct3(normal);
+	dgFloat64 faceNormalNormal = faceNormal.DotProduct3(normal);
 	dgFloat64 error = (faceNormalNormal * faceNormalNormal - faceNormal2 * normal2) / (faceNormalNormal * faceNormalNormal);
 	dgAssert (fabsf (error < dgFloat32 (1.0e-5f)));
 	dgAssert (faceNormalNormal > dgFloat32 (0.0f));
@@ -371,13 +375,15 @@ dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, c
 	for (dgInt32 i1 = 0; i1 < 3; i1 ++) {
 		dgVector p2p0 (array[i1] - point);
 
-		dgFloat32 volume = (p1p0 * p2p0) % normal;
+		//dgFloat32 volume = (p1p0 * p2p0) % normal;
+		dgFloat32 volume = normal.DotProduct3(p1p0 * p2p0);
+
 		if (volume < dgFloat32 (0.0f)) {
 			dgVector segment (array[i1] - array[i0]);
 			dgVector poinP0 (point - array[i0]);
-			dgFloat32 den = segment % segment;
+			dgFloat32 den = segment.DotProduct3(segment);
 			dgAssert (den > dgFloat32 (0.0f));
-			dgFloat32 num = poinP0 % segment;
+			dgFloat32 num = poinP0.DotProduct3(segment);
 			if (num < dgFloat32 (0.0f)) {
 				closestIndex = i0;
 			} else if (num > den) {
@@ -393,7 +399,7 @@ dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, c
 	if (closestIndex >= 0) {
 		return array[closestIndex];
 	} else {
-		return point - normal.Scale3((normal % (point - p0)) / (normal % normal));
+		return point - normal.Scale3(normal.DotProduct3(point - p0) / normal.DotProduct3(normal));
 	}
 }
 
@@ -403,9 +409,9 @@ dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVect
 {
 #ifdef _DEBUG
 	dgBigVector faceNormal ((p1 - p0) * (p2 - p0));
-	dgFloat64 faceNormal2 = faceNormal % faceNormal;
-	dgFloat64 normal2 = normal % normal;
-	dgFloat64 faceNormalNormal = faceNormal % normal;
+	dgFloat64 faceNormal2 = faceNormal.DotProduct3(faceNormal);
+	dgFloat64 normal2 = normal.DotProduct3(normal);
+	dgFloat64 faceNormalNormal = faceNormal.DotProduct3(normal);
 	dgFloat64 error = (faceNormalNormal * faceNormalNormal - faceNormal2 * normal2) / (faceNormalNormal * faceNormalNormal);
 	dgAssert (fabsf (error < dgFloat32 (1.0e-5f)));
 	dgAssert (faceNormalNormal > dgFloat32 (0.0f));
@@ -422,13 +428,15 @@ dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVect
 	for (dgInt32 i1 = 0; i1 < 3; i1 ++) {
 		dgBigVector p2p0 (array[i1] - point);
 
-		dgFloat64 volume = (p1p0 * p2p0) % normal;
+		//dgFloat64 volume = (p1p0 * p2p0) % normal;
+		dgFloat64 volume = normal.DotProduct3(p1p0 * p2p0);
+		
 		if (volume < dgFloat32 (0.0f)) {
 			dgBigVector segment (array[i1] - array[i0]);
 			dgBigVector poinP0 (point - array[i0]);
-			dgFloat64 den = segment % segment;
+			dgFloat64 den = segment.DotProduct3(segment);
 			dgAssert (den > dgFloat32 (0.0f));
-			dgFloat64 num = poinP0 % segment;
+			dgFloat64 num = poinP0.DotProduct3(segment);
 			if (num < dgFloat32 (0.0f)) {
 				closestIndex = i0;
 			} else if (num > den) {
@@ -444,7 +452,7 @@ dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVect
 	if (closestIndex >= 0) {
 		return array[closestIndex];
 	} else {
-		return point - normal.Scale3((normal % (point - p0)) / (normal % normal));
+		return point - normal.Scale3(normal.DotProduct3(point - p0) / normal.DotProduct3(normal));
 	}
 }
 #endif
@@ -726,7 +734,9 @@ class dgSweepSphereToPolygon
 			dgFloat64 param = CalculateInterstionParam(startRegion, r0, r1, radius, normalOut, contactOut);
 			if (param >= dgFloat32 (0.0f)) {
 				dgBigVector q2 (r0 + (r1 - r0).Scale3 (param));
-				return dgFloat32 (((q2 - q0) % diff) / (diff % diff));
+				//return dgFloat32 (((q2 - q0) % diff) / (diff % diff));
+				return dgFloat32 (diff.DotProduct3(q2 - q0) / diff.DotProduct3(diff));
+				
 			}
 			if (startRegion == exitRegion) {
 				break;
@@ -747,14 +757,14 @@ class dgSweepSphereToPolygon
 		dgInt32 j = m_nextVertex[vertexIndex];
 		dgBigVector v1 (m_polygon[j]);
 		dgBigVector dir0 (v1 - v0);
-		dir0 = dir0.Scale3 (sqrt (dgFloat64(1.0f) / (dir0 % dir0)));
-		planeA = dgBigPlane (dir0, -(dir0 % v0));
+		dir0 = dir0.Scale3 (sqrt (dgFloat64(1.0f) / dir0.DotProduct3 (dir0)));
+		planeA = dgBigPlane (dir0, -dir0.DotProduct3 (v0));
 
 		j = m_prevVertex[vertexIndex];
 		dgBigVector v2 (m_polygon[j]);
 		dgBigVector dir2 (v2 - v0);
-		dir2 = dir2.Scale3 (sqrt (dgFloat64(1.0f) / (dir2 % dir2)));
-		planeB = dgBigPlane (dir2, -(dir2 % v0));
+		dir2 = dir2.Scale3 (sqrt (dgFloat64(1.0f) / dir2.DotProduct3 (dir2)));
+		planeB = dgBigPlane (dir2, -dir2.DotProduct3 (v0));
 	}
 
 
@@ -762,7 +772,8 @@ class dgSweepSphereToPolygon
 	{
 		dgInt32 voronoiRegion = 0;
 		dgBigVector v0 (m_polygon[m_count-1]);
-		dgVector pointInPlane (point - m_normal.Scale3 ((point - v0) % m_normal));
+		//dgVector pointInPlane (point - m_normal.Scale3 ((point - v0) % m_normal));
+		dgVector pointInPlane (point - m_normal.Scale3 (m_normal.DotProduct3(point - v0)));
 
 		dgBigVector p0 (point);
 		dgBigVector p1 (pointInPlane);
@@ -774,7 +785,9 @@ class dgSweepSphereToPolygon
 			dgBigVector p0v1 (v1 - p0);
 
 			// calculate the volume formed by the line and the edge of the polygon
-			dgFloat64 alpha = (diff * p0v1) % p0v0;
+			//dgFloat64 alpha = (diff * p0v1) % p0v0;
+			dgFloat64 alpha = p0v0.DotProduct3(diff * p0v1);
+			
 			if (alpha < dgFloat32 (0.0f)) {
 
 				// calculate the voronoi regions for the edge
@@ -811,7 +824,7 @@ class dgSweepSphereToPolygon
 		dgFloat64 minT = dgFloat64 (1.0f);
 		dgBigVector p1p0 (p1 - p0);
 		for (dgInt32 i = 0; i < planesCount; i ++) {
-			dgFloat64 den = planes[i] % p1p0;
+			dgFloat64 den = planes[i].DotProduct3(p1p0);
 			if (fabs (den) > dgFloat64 (1.0e-20f)) {
 				dgFloat64 t = -planes[i].Evalue(p0) / den;
 				if (t > dgFloat32 (1.0e-10f)) {
@@ -842,16 +855,16 @@ class dgSweepSphereToPolygon
 
 			dgBigVector diff (p1 - p0);
 			// deal we special case that the line is parallel to the normal
-			dgFloat64 diff2 = diff % diff;
-			dgFloat64 parallelTest = (diff % m_normal);
+			dgFloat64 diff2 = diff.DotProduct3(diff);
+			dgFloat64 parallelTest = diff.DotProduct3(m_normal);
 			if ((parallelTest * parallelTest) < (diff2 * dgFloat32 (0.9999f))) {
 				dgBigVector v0 (m_polygon[m_count-1]);
 				for (dgInt32 i = 0; i < m_count; i ++) {
 					dgBigVector v1 (m_polygon[i]);
 					dgBigVector edge (v1 - v0);
 					dgBigVector wallNormal (edge * m_normal);
-					wallNormal = wallNormal.Scale3 (sqrt (dgFloat64(1.0f) / (wallNormal % wallNormal)));
-					planes[i] =  dgBigPlane (wallNormal, - (wallNormal % v1));
+					wallNormal = wallNormal.Scale3 (sqrt (dgFloat64(1.0f) / wallNormal.DotProduct3(wallNormal)));
+					planes[i] =  dgBigPlane (wallNormal, - wallNormal.DotProduct3(v1));
 					adjacentRegion[i] = m_edgeVoronoi[m_prevVertex[i]];
 					v0 = v1;
 				}
@@ -870,8 +883,8 @@ class dgSweepSphereToPolygon
 			dgBigVector q1 (m_polygon[i1]);
 			dgBigVector dir (q0 - q1);
 			dir = dir * m_normal;
-			dir = dir.Scale3 (sqrt (dgFloat64(1.0f) / (dir % dir)));
-			planes[0] =  dgBigPlane (dir, - (dir % q0));
+			dir = dir.Scale3 (sqrt (dgFloat64(1.0f) / dir.DotProduct3(dir)));
+			planes[0] =  dgBigPlane (dir, - dir.DotProduct3(q0));
 			adjacentRegion[0] = 0;
 
 			dgBigPlane plane0;
@@ -917,13 +930,13 @@ class dgSweepSphereToPolygon
 			// inside the plane
 			dgBigVector diff (p1 - p0);
 			dgBigVector dist (p0 - dgBigVector(m_polygon[0]));
-			dgFloat64 num = radius - m_normal % dist;
-			dgFloat64 den = m_normal % diff;
+			dgFloat64 num = radius - m_normal.DotProduct3(dist);
+			dgFloat64 den = m_normal.DotProduct3(diff);
 			dgFloat64 t = num / den;
 
 			if (t < dgFloat32 (0.0f)) {
 				dgBigVector r (diff.Scale3 (t));
-				if ((r % r) < radius * radius) {
+				if (r.DotProduct3(r) < radius * radius) {
 					t = dgFloat64 (0.0f);
 				}
 			}
@@ -933,7 +946,7 @@ class dgSweepSphereToPolygon
 				t = dgFloat32 (-1.0f);
 			} else {
 				dgBigVector p (p0 + diff.Scale3 (t));
-				contactOut = dgVector (p - m_normal.Scale3 (m_normal % (p - dgBigVector(m_polygon[0]))));
+				contactOut = dgVector (p - m_normal.Scale3 (m_normal.DotProduct3(p - dgBigVector(m_polygon[0]))));
 				normalOut = m_normal;
 			}
 			return t;
@@ -949,17 +962,17 @@ class dgSweepSphereToPolygon
 			dgBigVector q1q0 (q1 - q0);
 			dgBigVector p0q0 (p0 - q0);
 			dgBigVector p1p0 (p1 - p0);
-			dgFloat64 den = dgFloat64 (1.0f) / (q1q0 % q1q0);
+			dgFloat64 den = dgFloat64 (1.0f) / q1q0.DotProduct3(q1q0);
 
-			dgBigVector B (q1q0.Scale3 ((p0q0 % q1q0) * den));
-			dgBigVector C (q1q0.Scale3 ((p1p0 % q1q0) * den));
+			dgBigVector B (q1q0.Scale3 (p0q0.DotProduct3(q1q0) * den));
+			dgBigVector C (q1q0.Scale3 (p1p0.DotProduct3(q1q0) * den));
 			
 			dgBigVector r0 (p0q0 - B);
 			dgBigVector r1 (p1p0 - C);
 
-			dgFloat64 a = r1 % r1;
-			dgFloat64 b = dgFloat64 (2.0f) * (r0 % r1);
-			dgFloat64 c = r0 % r0 - radius * radius;
+			dgFloat64 a = r1.DotProduct3(r1);
+			dgFloat64 b = dgFloat64 (2.0f) * r0.DotProduct3(r1);
+			dgFloat64 c = r0.DotProduct3(r0) - radius * radius;
 
 			dgFloat64 t0 = dgFloat64 (-1.0f);
 			dgFloat64 t1;
@@ -967,7 +980,7 @@ class dgSweepSphereToPolygon
 				t0 = dgMin(t0, t1);
 				if (t0 < dgFloat32 (0.0f)) {
 					dgBigVector r ((p1 - p0).Scale3 (t0));
-					if ((r % r) < radius * radius) {
+					if (r.DotProduct3(r) < radius * radius) {
 						t0 = dgFloat64 (0.0f);
 					}
 				}
@@ -980,7 +993,7 @@ class dgSweepSphereToPolygon
 					
 					contactOut = q;
 					normalOut = dgVector (p - q);
-					normalOut = normalOut.Scale3 (dgRsqrt(normalOut % normalOut));
+					normalOut = normalOut.Scale3 (dgRsqrt(normalOut.DotProduct3(normalOut)));
 				}
 			}
 			return t0;
@@ -993,9 +1006,9 @@ class dgSweepSphereToPolygon
 
 			dgBigVector p1p0 (p1 - p0);
 			dgBigVector p0q (p0 - q);
-			dgFloat64 a = p1p0 % p1p0;
-			dgFloat64 b = dgFloat64 (2.0f) * (p1p0 % p0q);
-			dgFloat64 c = p0q % p0q - radius * radius;
+			dgFloat64 a = p1p0.DotProduct3(p1p0);
+			dgFloat64 b = dgFloat64 (2.0f) * p1p0.DotProduct3(p0q);
+			dgFloat64 c = p0q.DotProduct3(p0q) - radius * radius;
 			dgFloat64 t0 = dgFloat64 (-1.0f);
 			dgFloat64 t1;
 			if (dgQuadraticRoots (a, b, c, t0, t1)) {
@@ -1003,7 +1016,7 @@ class dgSweepSphereToPolygon
 
 				if (t0 < dgFloat32 (0.0f)) {
 					dgBigVector r ((p1 - p0).Scale3 (t0));
-					if ((r % r) < radius * radius) {
+					if (r.DotProduct3(r) < radius * radius) {
 						t0 = dgFloat64 (0.0f);
 					}
 				}
@@ -1013,7 +1026,7 @@ class dgSweepSphereToPolygon
 				} else {
 					contactOut = q;
 					normalOut = dgVector (p0 + p1p0.Scale3 (t0) - q);
-					normalOut = normalOut.Scale3 (dgRsqrt (normalOut % normalOut));
+					normalOut = normalOut.Scale3 (dgRsqrt (normalOut.DotProduct3(normalOut)));
 				}
 			}
 			return t0;
@@ -1036,12 +1049,14 @@ class dgSweepSphereToPolygon
 dgFloat32 dgSweepLineToPolygonTimeOfImpact (const dgVector& p0, const dgVector& p1, dgFloat32 radius, dgInt32 count, const dgVector* const polygon, const dgVector& normal, dgVector& normalOut, dgVector& contactOut)
 {
 	dgVector diff (p1 - p0);
-	dgFloat32 projectVeloc = normal % diff;
+	dgFloat32 projectVeloc = normal.DotProduct3(diff);
 	if (projectVeloc >= dgFloat32 (0.0f)) {
 		return dgFloat32 (-1.0f);
 	}
 
-	dgFloat32 planeSide = (p0 - polygon[0]) % normal;
+	//dgFloat32 planeSide = (p0 - polygon[0]) % normal;
+	dgFloat32 planeSide = normal.DotProduct3(p0 - polygon[0]);
+	
 	if ((planeSide) <= dgFloat32 (0.0f)) {
 		return dgFloat32 (-1.0f);
 	}
@@ -1055,11 +1070,11 @@ dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVecto
 {
 	dgVector p0Origin (p0 - origin);
 
-	if ((p0Origin % p0Origin) < (dgFloat32 (100.0f) * radius * radius)) {
+	if (p0Origin.DotProduct3(p0Origin) < (dgFloat32 (100.0f) * radius * radius)) {
 		dgVector dp (p1 - p0);
-		dgFloat32 a = dp % dp;
-		dgFloat32 b = dgFloat32 (2.0f) * (p0Origin % dp);
-		dgFloat32 c = p0Origin % p0Origin - radius * radius;
+		dgFloat32 a = dp.DotProduct3(dp);
+		dgFloat32 b = dgFloat32 (2.0f) * p0Origin.DotProduct3(dp);
+		dgFloat32 c = p0Origin.DotProduct3(p0Origin) - radius * radius;
 		dgFloat32 desc = b * b - dgFloat32 (4.0f) * a * c;
 		if (desc >= 0.0f) {
 			desc = dgSqrt (desc);
@@ -1084,9 +1099,9 @@ dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVecto
 	} else {
 		dgBigVector p0Origin1 (p0Origin);
 		dgBigVector dp (p1 - p0);
-		dgFloat64 a = dp % dp;
-		dgFloat64 b = dgFloat32 (2.0f) * (p0Origin1 % dp);
-		dgFloat64 c = p0Origin1 % p0Origin1 - dgFloat64(radius) * radius;
+		dgFloat64 a = dp.DotProduct3(dp);
+		dgFloat64 b = dgFloat32 (2.0f) * p0Origin1.DotProduct3(dp);
+		dgFloat64 c = p0Origin1.DotProduct3(p0Origin1) - dgFloat64(radius) * radius;
 		dgFloat64 desc = b * b - dgFloat32 (4.0f) * a * c;
 		if (desc >= 0.0f) {
 			desc = sqrt (desc);

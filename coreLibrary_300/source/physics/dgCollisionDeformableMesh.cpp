@@ -140,7 +140,7 @@ class dgCollisionDeformableMesh::dgDeformableNode
 
 		dgVector side0 (m_maxBox - m_minBox);
 		dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-		m_surfaceArea = side0 % side1;
+		m_surfaceArea = side0.DotProduct3(side1);
 	}
 
 	dgInt32 UpdateBox (const dgVector* const position, const dgInt32* const faceIndices)
@@ -163,7 +163,7 @@ class dgCollisionDeformableMesh::dgDeformableNode
 			m_maxBox = maxP;
 			dgVector side0 (m_maxBox - m_minBox);
 			dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-			m_surfaceArea = side0 % side1;
+			m_surfaceArea = side0.DotProduct3(side1);
 		}
 		return state;
 	}
@@ -449,7 +449,7 @@ dgFloat32 dgCollisionDeformableMesh::CalculateSurfaceArea (const dgDeformableNod
 	maxBox = dgVector (dgMax (node0->m_maxBox.m_x, node1->m_maxBox.m_x), dgMax (node0->m_maxBox.m_y, node1->m_maxBox.m_y), dgMax (node0->m_maxBox.m_z, node1->m_maxBox.m_z), dgFloat32 (0.0f));		
 	dgVector side0 (maxBox - minBox);
 	dgVector side1 (side0.m_y, side0.m_z, side0.m_x, dgFloat32 (0.0f));
-	return side0 % side1;
+	return side0.DotProduct3(side1);
 }
 
 
@@ -777,7 +777,7 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 		dgVector e0 (m_particles.m_posit[i1] - m_particles.m_posit[i0]);
 		dgVector e1 (m_particles.m_posit[i2] - m_particles.m_posit[i0]);
 		dgVector n = e0 * e1;
-		n = n.Scale3(dgRsqrt (n % n));
+		n = n.Scale3(dgRsqrt (n.DotProduct3(n)));
 		m_faceNormals[i] = n;
 	} 
 
@@ -802,7 +802,7 @@ void dgCollisionDeformableMesh::UpdateVisualNormals()
 
 	for (dgInt32 i = 0; i < m_visualVertexCount; i ++)	{
 		dgVector n (m_visualVertexData[i].m_normals[0], m_visualVertexData[i].m_normals[1], m_visualVertexData[i].m_normals[2],  dgFloat32 (0.0f));
-		n = n.Scale3(dgRsqrt (n % n));
+		n = n.Scale3(dgRsqrt (n.DotProduct3(n)));
 		m_visualVertexData[i].m_normals[0] = n.m_x;
 		m_visualVertexData[i].m_normals[1] = n.m_y;
 		m_visualVertexData[i].m_normals[2] = n.m_z;

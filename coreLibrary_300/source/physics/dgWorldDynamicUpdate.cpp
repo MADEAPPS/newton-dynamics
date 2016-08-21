@@ -834,10 +834,10 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 			dgAssert (body->m_invMass.m_w);
 			body->IntegrateVelocity(timestep);
 
-			dgFloat32 accel2 = body->m_accel % body->m_accel;
-			dgFloat32 alpha2 = body->m_alpha % body->m_alpha;
-			dgFloat32 speed2 = body->m_veloc % body->m_veloc;
-			dgFloat32 omega2 = body->m_omega % body->m_omega;
+			dgFloat32 accel2 = body->m_accel.DotProduct3(body->m_accel);
+			dgFloat32 alpha2 = body->m_alpha.DotProduct3(body->m_alpha);
+			dgFloat32 speed2 = body->m_veloc.DotProduct3(body->m_veloc);
+			dgFloat32 omega2 = body->m_omega.DotProduct3(body->m_omega);
 
 			maxAccel = dgMax (maxAccel, accel2);
 			maxAlpha = dgMax (maxAlpha, alpha2);

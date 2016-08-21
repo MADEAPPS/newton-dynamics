@@ -26,7 +26,7 @@
 #include "dgDebug.h"
 #include "dgGeneralMatrix.h"
 
-#define DG_LCP_MAX_VALUE dgFloat32 (1.0e12f)
+#define DG_LCP_MAX_VALUE dgFloat32 (1.0e10f)
 
 class dgSymmetricBiconjugateGradientSolve
 {

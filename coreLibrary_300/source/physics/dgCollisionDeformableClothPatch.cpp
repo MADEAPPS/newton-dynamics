@@ -202,7 +202,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 			twin->m_mark = mark;
 
 			dgVector dist (posit[edge->m_incidentVertex] - posit[twin->m_incidentVertex]);
-			dgFloat32 dist2 = dist % dist;
+			dgFloat32 dist2 = dist.DotProduct3(dist);
 			if (dist2 > 1.0e-6f) {
 				dgClothLink* const link = &m_links[index];
 				link->m_restLengh = dgSqrt (dist2);
@@ -430,7 +430,7 @@ void dgCollisionDeformableClothPatch::ResolvePositionsConstraints (dgFloat32 tim
 		dgInt32 index0 = link->m_particle_0;
 		dgInt32 index1 = link->m_particle_1;
 		dgVector relPosit (posit[index0] - posit[index1]);
-		dgFloat32 x2 = relPosit % relPosit; 
+		dgFloat32 x2 = relPosit.DotProduct3(relPosit); 
 #if 1
 		dgFloat32 x = dgSqrt(x2);
 #else 

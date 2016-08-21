@@ -86,7 +86,8 @@ DG_INLINE dgPlane::dgPlane (const dgVector &normal, dgFloat32 distance)
 DG_INLINE dgPlane::dgPlane (const dgVector &P0, const dgVector &P1, const dgVector &P2)
 	:dgVector ((P1 - P0) * (P2 - P0)) 
 {
-	m_w = - (*this % P0);
+//	m_w = - (*this % P0);
+	m_w = - DotProduct3(P0);
 }
 
 DG_INLINE dgPlane dgPlane::Scale (dgFloat32 s)	const
@@ -132,7 +133,8 @@ DG_INLINE dgBigPlane::dgBigPlane (const dgBigVector &normal, dgFloat64 distance)
 DG_INLINE dgBigPlane::dgBigPlane (const dgBigVector &P0, const dgBigVector &P1, const dgBigVector &P2)
 	:dgBigVector ((P1 - P0) * (P2 - P0)) 
 {
-	m_w = - (*this % P0);
+//	m_w = - (*this % P0);
+	m_w = - DotProduct3(P0);
 }
 
 DG_INLINE dgBigPlane dgBigPlane::Scale (dgFloat64 s) const

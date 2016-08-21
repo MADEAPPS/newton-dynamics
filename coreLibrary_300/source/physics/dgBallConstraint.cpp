@@ -113,7 +113,7 @@ dgVector dgBallConstraint::GetJointOmega () const
 //	}
 
 	dgVector relOmega (omega0 - omega1);
-	return dgVector (relOmega % dir0, relOmega % dir1, relOmega % dir2, dgFloat32 (0.0f));
+	return dgVector (relOmega.DotProduct3(dir0), relOmega.DotProduct3(dir1), relOmega.DotProduct3(dir2), dgFloat32 (0.0f));
 
 }
 
@@ -163,7 +163,7 @@ void dgBallConstraint::SetPivotPoint(const dgVector &pivot)
 	const dgMatrix& matrix = m_body0->GetMatrix();
 
 	dgVector pin (pivot - matrix.m_posit); 
-	if ((pin % pin) < dgFloat32 (1.0e-3f)) {
+	if (pin.DotProduct3(pin) < dgFloat32 (1.0e-3f)) {
 		pin = matrix.m_front;
 	}
 
@@ -193,7 +193,7 @@ void dgBallConstraint::SetLimits (
 	const dgMatrix& body0_Matrix = m_body0->GetMatrix();
 
 	dgVector lateralDir (bilateralDir * coneDir);
-	if ((lateralDir % lateralDir) < dgFloat32 (1.0e-3f)) {
+	if (lateralDir.DotProduct3(lateralDir) < dgFloat32 (1.0e-3f)) {
 		dgMatrix tmp (coneDir);
 		lateralDir = tmp.m_up;
 	}
@@ -203,8 +203,8 @@ void dgBallConstraint::SetLimits (
 	m_localMatrix0.m_up = body0_Matrix.UnrotateVector (lateralDir);
 	m_localMatrix0.m_posit = body0_Matrix.UntransformVector (matrix1.m_posit);
 
-	m_localMatrix0.m_front = m_localMatrix0.m_front.Scale3 (dgRsqrt (m_localMatrix0.m_front % m_localMatrix0.m_front));
-	m_localMatrix0.m_up = m_localMatrix0.m_up.Scale3 (dgRsqrt (m_localMatrix0.m_up % m_localMatrix0.m_up));
+	m_localMatrix0.m_front = m_localMatrix0.m_front.Scale3 (dgRsqrt (m_localMatrix0.m_front.DotProduct3(m_localMatrix0.m_front)));
+	m_localMatrix0.m_up = m_localMatrix0.m_up.Scale3 (dgRsqrt (m_localMatrix0.m_up.DotProduct3(m_localMatrix0.m_up)));
 	m_localMatrix0.m_right = m_localMatrix0.m_front * m_localMatrix0.m_up;
 
 	m_localMatrix0.m_front.m_w = dgFloat32 (0.0f);
@@ -267,7 +267,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 			CalculatePointDerivative (ret, params, dir, pointData, &m_jointForce[ret]); 
 
 			dgVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
-			relVelocErr = velocError % dir;
+			relVelocErr = velocError.DotProduct3(dir);
 			if (relVelocErr > dgFloat32 (1.0e-3f)) {
 				relVelocErr *= dgFloat32 (1.1f);
 			}
@@ -287,7 +287,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 			CalculatePointDerivative (ret, params, dir, pointData, &m_jointForce[ret]); 
 
 			dgVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
-			relVelocErr = velocError % dir;
+			relVelocErr = velocError.DotProduct3(dir);
 			if (relVelocErr > dgFloat32 (1.0e-3f)) {
 				relVelocErr *= dgFloat32 (1.1f);
 			}
@@ -307,13 +307,13 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 	if (m_coneLimit) {
 
 		dgFloat32 coneCos;
-		coneCos = matrix0.m_front % matrix1.m_front;
+		coneCos = matrix0.m_front.DotProduct3(matrix1.m_front);
 		if (coneCos < m_coneAngleCos) {
 			dgVector p0 (matrix0.m_posit + matrix0.m_front.Scale3(MIN_JOINT_PIN_LENGTH));
 			InitPointParam (pointData, m_stiffness, p0, p0);
 
 			dgVector tangentDir (matrix0.m_front * matrix1.m_front);
-			tangentDir = tangentDir.Scale3 (dgRsqrt ((tangentDir % tangentDir) + 1.0e-8f));
+			tangentDir = tangentDir.Scale3 (dgRsqrt (tangentDir.DotProduct3(tangentDir) + dgFloat32(1.0e-8f)));
 			CalculatePointDerivative (ret, params, tangentDir, pointData, &m_jointForce[ret]); 
 			ret ++;
 
@@ -321,7 +321,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 
 			dgVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
 			//restitution = contact.m_restitution;
-			relVelocErr = velocError % normalDir;
+			relVelocErr = velocError.DotProduct3(normalDir);
 			if (relVelocErr > dgFloat32 (1.0e-3f)) {
 				relVelocErr *= dgFloat32 (1.1f);
 			}

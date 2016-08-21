@@ -104,10 +104,15 @@ class dgTemplateVector
 	}
 
 	// return dot product
-	DG_INLINE T operator% (const dgTemplateVector<T>& A) const
+	DG_INLINE T DotProduct3 (const dgTemplateVector<T>& A) const
 	{
 		return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 	}
+
+//	DG_INLINE T operator% (const dgTemplateVector<T>& A) const
+//	{
+//		return DotProduct3(A);
+//	}
 
 	// return cross product
 	DG_INLINE dgTemplateVector<T> operator* (const dgTemplateVector<T>& B) const
@@ -407,10 +412,15 @@ class dgVector
 
 
 	// return dot product
-	DG_INLINE dgFloat32 operator% (const dgVector& A) const
+	DG_INLINE dgFloat32 DotProduct3 (const dgVector& A) const
 	{
 		return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 	}
+
+//	DG_INLINE dgFloat32 operator% (const dgVector& A) const
+//	{
+//		return DotProduct3 (const dgVector& A) const
+//	}
 
 	// return cross product
 	DG_INLINE dgVector operator* (const dgVector& B) const
@@ -808,7 +818,7 @@ class dgVector
 		return tmp0.CompProduct4(tmp1) - tmp2.CompProduct4(tmp3);
 	}
 
-	DG_INLINE dgFloat32 operator% (const dgVector& A) const
+	DG_INLINE dgFloat32 DotProduct3 (const dgVector& A) const
 	{
 		dgFloat32 ret;
 		__m128d tmp0 (_mm_mul_pd (m_typeLow, A.m_typeLow));
@@ -819,6 +829,11 @@ class dgVector
 		_mm_store_sd (& ret, dot);
 		return ret;
 	}
+
+//	DG_INLINE dgFloat32 operator% (const dgVector& A) const
+//	{
+//		return DotProduct3 (A);
+//	}
 
 	DG_INLINE dgVector DotProduct4 (const dgVector& A) const
 	{
@@ -1269,7 +1284,7 @@ class dgVector
 	}
 
 	// return dot product
-	DG_INLINE dgFloat32 operator% (const dgVector& A) const
+	DG_INLINE dgFloat32 DotProduct3 (const dgVector& A) const
 	{
 		#ifdef DG_SSE4_INSTRUCTIONS_SET 
 			return dgVector (_mm_dp_ps (m_type, A.m_type, 0x77)).GetScalar(); 
@@ -1279,6 +1294,11 @@ class dgVector
 			return CompProduct4(tmp).AddHorizontal().GetScalar();
 		#endif
 	}
+
+//	DG_INLINE dgFloat32 operator% (const dgVector& A) const
+//	{
+//		return DotProduct3 (A);
+//	}
 
 	DG_INLINE dgVector DotProduct4 (const dgVector& A) const
 	{

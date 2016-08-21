@@ -193,7 +193,7 @@ void dgCollisionCone::SetCollisionBBox (const dgVector& p0__, const dgVector& p1
 
 dgVector dgCollisionCone::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert(dgAbsf((dir % dir - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
 	if (dir.m_x < dgFloat32(-0.9999f)) {
 		return dgVector(-m_height, dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
@@ -224,7 +224,7 @@ dgVector dgCollisionCone::SupportVertex (const dgVector& dir, dgInt32* const ver
 
 dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	dgAssert(dgAbsf((dir % dir - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
 	if (dir.m_x < dgFloat32(-0.9999f)) {
 		return dgVector(-(m_height - D_CONE_SKIN_THINCKNESS), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
@@ -255,7 +255,7 @@ dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgInt32* con
 
 dgVector dgCollisionCone::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const
 {
-	dgAssert(dgAbsf((dir % dir - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
+	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 	return point + dir.Scale4(D_CONE_SKIN_THINCKNESS);
 }
 

@@ -107,7 +107,7 @@ dgInt32 dgDelaunayTetrahedralization::AddVertex (const dgBigVector& vertex)
 	dgSetPrecisionDouble precision;
 
 	dgBigVector p (vertex);
-	p.m_w = p % p;
+	p.m_w = p.DotProduct3(p);
 	dgInt32 index = dgConvexHull4d::AddVertex(p);
 
 	return index;

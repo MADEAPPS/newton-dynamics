@@ -97,7 +97,7 @@ dgFloat32 dgSlidingConstraint::GetJointVeloc () const
 //	if (m_body1) {
 //		veloc1 = m_body1->GetVelocity();
 //	}
-	return (veloc0 - veloc1) % dir;
+	return dir.DotProduct3(veloc0 - veloc1);
 }
 
 
@@ -150,18 +150,18 @@ dgUnsigned32 dgSlidingConstraint::JacobianDerivative (dgContraintDescritor& para
 
 	//dgVector angle (CalculateGlobalMatrixAndAngle (matrix0, matrix1));
 	CalculateGlobalMatrixAndAngle (matrix0, matrix1);
-	m_posit = (matrix0.m_posit - matrix1.m_posit) % matrix0.m_front;
+	m_posit = matrix0.m_front.DotProduct3(matrix0.m_posit - matrix1.m_posit);
 	matrix1.m_posit += matrix1.m_front.Scale3 (m_posit);
 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - (matrix0.m_front % matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - (matrix0.m_up % matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
-	dgAssert (dgAbsf (dgFloat32 (1.0f) - (matrix0.m_right % matrix0.m_right)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbsf (dgFloat32 (1.0f) - matrix0.m_front.DotProduct3(matrix0.m_front)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbsf (dgFloat32 (1.0f) - matrix0.m_up.DotProduct3(matrix0.m_up)) < dgFloat32 (1.0e-5f)); 
+	dgAssert (dgAbsf (dgFloat32 (1.0f) - matrix0.m_right.DotProduct3(matrix0.m_right)) < dgFloat32 (1.0e-5f)); 
 
 	const dgVector& dir1 = matrix0.m_up;
 	const dgVector& dir2 = matrix0.m_right;
 
 	dgVector p0 (matrix0.m_posit);
-	dgVector p1 (matrix1.m_posit + matrix1.m_front.Scale3 ((p0 - matrix1.m_posit) % matrix1.m_front));
+	dgVector p1 (matrix1.m_posit + matrix1.m_front.Scale3 (matrix1.m_front.DotProduct3(p0 - matrix1.m_posit))); 
 
 	dgVector q0 (p0 + matrix0.m_front.Scale3(MIN_JOINT_PIN_LENGTH));
 	dgVector q1 (p1 + matrix1.m_front.Scale3(MIN_JOINT_PIN_LENGTH));

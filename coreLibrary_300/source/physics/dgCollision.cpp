@@ -116,7 +116,7 @@ void dgCollision::MassProperties ()
 	inertia[2][1] = m_crossInertia[0];
 
 	dgVector origin (m_centerOfMass);
-	dgFloat32 mag = origin % origin;
+	dgFloat32 mag = origin.DotProduct3(origin);
 
 	dgFloat32 unitMass = dgFloat32 (1.0f);
 	for (dgInt32 i = 0; i < 3; i ++) {

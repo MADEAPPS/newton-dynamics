@@ -1884,7 +1884,7 @@ dFloat NewtonMaterialGetContactNormalSpeed(const NewtonMaterial* const materialH
 
 	dgVector dv (v1 - v0);
 
-	dFloat speed = dv % material->m_normal;
+	dFloat speed = dv.DotProduct3(material->m_normal);
 	return speed;
 }
 
@@ -1916,7 +1916,7 @@ dFloat NewtonMaterialGetContactTangentSpeed(const NewtonMaterial* const material
 
 	dgVector dv (v1 - v0);
 	dgVector dir (index ? material->m_dir1 : material->m_dir0);
-	dFloat speed = dv % dir;
+	dFloat speed = dv.DotProduct3(dir);
 	return - speed;
 }
 
@@ -2276,8 +2276,8 @@ void NewtonMaterialSetContactNormalDirection(const NewtonMaterial* const materia
 	dgVector normal (direction[0], direction[1], direction[2], dgFloat32 (0.0f));
 
 
-	dgAssert ((dgAbsf (normal % material->m_normal) - dgFloat32(1.0f)) <dgFloat32 (0.01f));
-	if ((normal % material->m_normal) < dgFloat32 (0.0f)) {
+	dgAssert (dgAbsf (normal.DotProduct3(material->m_normal) - dgFloat32(1.0f)) <dgFloat32 (0.01f));
+	if (normal.DotProduct3(material->m_normal) < dgFloat32 (0.0f)) {
 		normal = normal.Scale3 (-dgFloat32(1.0f));
 	}
 	material->m_normal = normal;
@@ -2320,7 +2320,7 @@ void NewtonMaterialContactRotateTangentDirections(const NewtonMaterial* const ma
 	const dgVector dir0 (alignVector[0], alignVector[1], alignVector[2], dgFloat32 (0.0f));
     	
 	dgVector dir1 (material->m_normal * dir0);
-	dFloat mag2 = dir1 % dir1;
+	dFloat mag2 = dir1.DotProduct3(dir1);
 	if (mag2 > 1.0e-6f) {
 		material->m_dir1 = dir1.Scale3 (dgRsqrt (mag2));
 		material->m_dir0 = material->m_dir1 * material->m_normal;
@@ -3928,7 +3928,7 @@ void NewtonCollisionSupportVertex(const NewtonCollision* const collisionPtr, con
 
 	const dgMatrix& matrix = collision->GetLocalMatrix ();
 	dgVector searchDir (matrix.UnrotateVector(dgVector (dir[0], dir[1], dir[2], dgFloat32 (0.0f)))); 
-	searchDir = searchDir.Scale3 (dgRsqrt (searchDir % searchDir));
+	searchDir = searchDir.Scale3 (dgRsqrt (searchDir.DotProduct3(searchDir)));
 
 	dgInt32 index; 
 	dgVector vertexOut (matrix.TransformVector(collision->SupportVertex(searchDir, &index)));
@@ -6329,20 +6329,20 @@ void NewtonBallSetConeLimits(const NewtonJoint* const ball, const dFloat* pin, d
 
 	dgVector coneAxis (pin[0], pin[1], pin[2], dgFloat32 (0.0f)); 
 
-	if ((coneAxis % coneAxis) < 1.0e-3f) {
+	if (coneAxis.DotProduct3(coneAxis) < 1.0e-3f) {
 		coneAxis.m_x = dgFloat32(1.0f);
 	}
 	dgVector tmp (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-	if (dgAbsf (tmp % coneAxis) > dgFloat32 (0.999f)) {
+	if (dgAbsf (tmp.DotProduct3(coneAxis)) > dgFloat32 (0.999f)) {
 		tmp = dgVector (dgFloat32 (0.0f), dgFloat32(1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-		if (dgAbsf (tmp % coneAxis) > dgFloat32 (0.999f)) {
+		if (dgAbsf (tmp.DotProduct3(coneAxis)) > dgFloat32 (0.999f)) {
 			tmp = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32(1.0f), dgFloat32 (0.0f)); 
-			dgAssert (dgAbsf (tmp % coneAxis) < dgFloat32 (0.999f));
+			dgAssert (dgAbsf (tmp.DotProduct3(coneAxis)) < dgFloat32 (0.999f));
 		}
 	}
 	dgVector lateral (tmp * coneAxis); 
-	lateral = lateral.Scale3 (dgRsqrt (lateral % lateral));
-	coneAxis = coneAxis.Scale3 (dgRsqrt (coneAxis % coneAxis));
+	lateral = lateral.Scale3 (dgRsqrt (lateral.DotProduct3(lateral)));
+	coneAxis = coneAxis.Scale3 (dgRsqrt (coneAxis.DotProduct3(coneAxis)));
 
 	maxConeAngle = dgAbsf (maxConeAngle);
 	maxTwistAngle = dgAbsf (maxTwistAngle);
@@ -7349,8 +7349,8 @@ void NewtonUserJointAddLinearRow(const NewtonJoint* const joint, const dFloat* c
 
 	TRACE_FUNCTION(__FUNCTION__);
 	dgVector direction (dir[0], dir[1], dir[2], dgFloat32 (0.0f)); 
-	direction = direction.Scale3 (dgRsqrt (direction % direction));
-	dgAssert (dgAbsf (direction % direction - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
+	direction = direction.Scale3 (dgRsqrt (direction.DotProduct3(direction)));
+	dgAssert (dgAbsf (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
 	dgVector pivotPoint0 (pivot0[0], pivot0[1], pivot0[2], dgFloat32 (0.0f)); 
 	dgVector pivotPoint1 (pivot1[0], pivot1[1], pivot1[2], dgFloat32 (0.0f)); 
 	
@@ -7384,8 +7384,8 @@ void NewtonUserJointAddAngularRow(const NewtonJoint* const joint, dFloat relativ
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
 	dgVector direction (pin[0], pin[1], pin[2], dgFloat32 (0.0f));
-	direction = direction.Scale3 (dgRsqrt (direction % direction));
-	dgAssert (dgAbsf (direction % direction - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	direction = direction.Scale3 (dgRsqrt (direction.DotProduct3(direction)));
+	dgAssert (dgAbsf (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	userJoint->AddAngularRowJacobian (direction, relativeAngleError);
 }
@@ -8816,6 +8816,7 @@ NewtonJoint* NewtonSkeletonContainerGetParentJointFromNode (const NewtonSkeleton
 	return (NewtonJoint*)(skeleton->GetParentJoint((dgSkeletonContainer::dgSkeletonGraph*) node));
 }
 
+/*
 int NewtonSkeletonGetSolverMode(const NewtonSkeletonContainer* const skeletonPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8829,7 +8830,7 @@ void NewtonSkeletonSetSolverMode(NewtonSkeletonContainer* const skeletonPtr, int
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
 	skeleton->SetSolverMode(hardJointMotors ? true : false);
 }
-
+*/
 
 void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray)
 {

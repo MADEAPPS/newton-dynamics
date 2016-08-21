@@ -254,10 +254,10 @@ dgCollisionInstance* dgWorld::CreateHeightField(
 
 dgCollisionInstance* dgWorld::CreateInstance (const dgCollision* const child, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
-	dgAssert (dgAbsf (offsetMatrix[0] % offsetMatrix[0] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
-	dgAssert (dgAbsf (offsetMatrix[1] % offsetMatrix[1] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
-	dgAssert (dgAbsf (offsetMatrix[2] % offsetMatrix[2] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
-	dgAssert (dgAbsf ((offsetMatrix[0] * offsetMatrix[1]) % offsetMatrix[2] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbsf (offsetMatrix[0].DotProduct3(offsetMatrix[0]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbsf (offsetMatrix[1].DotProduct3(offsetMatrix[1]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbsf (offsetMatrix[2].DotProduct3(offsetMatrix[2]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
+	dgAssert (dgAbsf (offsetMatrix[2].DotProduct3(offsetMatrix[0] * offsetMatrix[1]) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f));
 
 	dgAssert (offsetMatrix[0][3] == dgFloat32 (0.0f));
 	dgAssert (offsetMatrix[1][3] == dgFloat32 (0.0f));
@@ -529,7 +529,7 @@ dgInt32 dgWorld::ReduceContacts (dgInt32 count, dgContactPoint* const contact,  
 					for (dgInt32 j = i + 1; (j < count) && countOver && (contact[j].m_point[index] < val) ; j ++) {
 						if (!mask[j]) {
 							dgVector dp (contact[j].m_point - contact[i].m_point);
-							dgFloat32 dist2 = dp % dp;
+							dgFloat32 dist2 = dp.DotProduct3(dp);
 							if (dist2 < window2) {
 								mask[j] = 1;
 								countOver --;
@@ -576,7 +576,7 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contact, dg
 				for (dgInt32 j = i + 1; (j < count) && (contact[j].m_point[index] < val) ; j ++) {
 					if (!mask[j]) {
 						dgVector dp (contact[j].m_point - contact[i].m_point);
-						dgFloat32 dist2 = dp % dp;
+						dgFloat32 dist2 = dp.DotProduct3(dp);
 						if (dist2 < window2) {
 							if (contact[i].m_penetration < contact[j].m_penetration ) {
 								contact[i].m_point = contact[j].m_point;
@@ -705,8 +705,8 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	dgVector vel0 (v0 + w0 * (contactArray[0].m_point - com0));
 	dgVector vel1 (v1 + w1 * (contactArray[0].m_point - com1));
 	dgVector vRel (vel1 - vel0);
-	dgVector tangDir (vRel - controlNormal.Scale3 (vRel % controlNormal));
-	dgFloat32 diff = tangDir % tangDir;
+	dgVector tangDir (vRel - controlNormal.Scale3 (vRel.DotProduct3(controlNormal)));
+	dgFloat32 diff = tangDir.DotProduct3(tangDir);
 
 	dgInt32 staticMotion = 0;
 	if (diff <= dgFloat32 (1.0e-2f)) {
@@ -717,10 +717,10 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 			tangDir = dgVector (-controlNormal.m_y, controlNormal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
 		}
 		controlDir0 = controlNormal * tangDir;
-		dgAssert (controlDir0 % controlDir0 > dgFloat32 (1.0e-8f));
-		controlDir0 = controlDir0.Scale3 (dgRsqrt (controlDir0 % controlDir0));
+		dgAssert (controlDir0.DotProduct3(controlDir0) > dgFloat32 (1.0e-8f));
+		controlDir0 = controlDir0.Scale3 (dgRsqrt (controlDir0.DotProduct3(controlDir0)));
 		controlDir1 = controlNormal * controlDir0;
-		dgAssert (dgAbsf((controlDir0 * controlDir1) % controlNormal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+		dgAssert (dgAbsf(controlNormal.DotProduct3(controlDir0 * controlDir1) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	}
 
 	dgFloat32 maxImpulse = dgFloat32 (-1.0f);
@@ -733,7 +733,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		dgInt32 index = -1;
 		for (dgInt32 j = 0; j < count; j ++) {
 			dgVector v (cachePosition[j] - contactArray[i].m_point);
-			diff = v % v;
+			diff = v.DotProduct3(v);
 			if (diff < min) {
 				min = diff;
 				index = j;
@@ -780,7 +780,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		contactMaterial->m_dynamicFriction0 = material->m_dynamicFriction0;
 		contactMaterial->m_dynamicFriction1 = material->m_dynamicFriction1;
 
-		dgAssert ((dgAbsf(contactMaterial->m_normal % contactMaterial->m_normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+		dgAssert (dgAbsf(contactMaterial->m_normal.DotProduct3(contactMaterial->m_normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 
 		//contactMaterial.m_collisionEnable = true;
 		//contactMaterial.m_friction0Enable = material->m_friction0Enable;
@@ -792,7 +792,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		contactMaterial->m_userData = material->m_userData;
 
 		if (staticMotion) {
-			if ((contactMaterial->m_normal % controlNormal) > dgFloat32 (0.9995f)) {
+			if (contactMaterial->m_normal.DotProduct3(controlNormal) > dgFloat32 (0.9995f)) {
 				contactMaterial->m_dir0 = controlDir0;
 				contactMaterial->m_dir1 = controlDir1;
 			} else {
@@ -802,10 +802,10 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 					tangDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
 				contactMaterial->m_dir0 = contactMaterial->m_normal * tangDir;
-				dgAssert (contactMaterial->m_dir0 % contactMaterial->m_dir0 > dgFloat32 (1.0e-8f));
-				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale3 (dgRsqrt (contactMaterial->m_dir0 % contactMaterial->m_dir0));
+				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
+				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale3 (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
 				contactMaterial->m_dir1 = contactMaterial->m_normal * contactMaterial->m_dir0;
-				dgAssert (dgAbsf((contactMaterial->m_dir0 * contactMaterial->m_dir1) % contactMaterial->m_normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+				dgAssert (dgAbsf(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0 * contactMaterial->m_dir1) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 			}
 		} else {
 
@@ -815,7 +815,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 			dgVector vel1 (v1 + w1 * (contactMaterial->m_point - com1));
 			dgVector vRel (vel1 - vel0);
 
-			dgFloat32 impulse = vRel % contactMaterial->m_normal;
+			dgFloat32 impulse = vRel.DotProduct3(contactMaterial->m_normal);
 			if (dgAbsf (impulse) > maxImpulse) {
 				maxImpulse = dgAbsf (impulse); 
 //				breakImpulse0 = contactMaterial->m_collision0->GetBreakImpulse();
@@ -823,7 +823,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 			}
 
 			dgVector tangDir (vRel - contactMaterial->m_normal.Scale3 (impulse));
-			diff = tangDir % tangDir;
+			diff = tangDir.DotProduct3(tangDir);
 
 			if (diff > dgFloat32 (1.0e-2f)) {
 				contactMaterial->m_dir0 = tangDir.Scale3 (dgRsqrt (diff));
@@ -834,11 +834,11 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 					tangDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
 				contactMaterial->m_dir0 = contactMaterial->m_normal * tangDir;
-				dgAssert (contactMaterial->m_dir0 % contactMaterial->m_dir0 > dgFloat32 (1.0e-8f));
-				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale3 (dgRsqrt (contactMaterial->m_dir0 % contactMaterial->m_dir0));
+				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
+				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale3 (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
 			}
 			contactMaterial->m_dir1 = contactMaterial->m_normal * contactMaterial->m_dir0;
-			dgAssert (dgAbsf((contactMaterial->m_dir0 * contactMaterial->m_dir1) % contactMaterial->m_normal - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+			dgAssert (dgAbsf(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0 * contactMaterial->m_dir1) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 		}
 		contactMaterial->m_normal.m_w = dgFloat32 (0.0f);
 		contactMaterial->m_dir0.m_w = dgFloat32 (0.0f); 
@@ -1395,7 +1395,7 @@ dgInt32 dgWorld::CalculateUserContacts(dgCollisionParamProxy& proxy) const
 		proxy.m_contactJoint->m_contactActive = 1;
 		dgContactPoint* const contactOut = proxy.m_contacts;
 		for (dgInt32 i = 0; i < count; i++) {
-			dgAssert((dgAbsf(buffer[i].m_normal % buffer[i].m_normal) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+			dgAssert(dgAbsf(buffer[i].m_normal.DotProduct3(buffer[i].m_normal) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 			contactOut[i].m_point = buffer[i].m_point;
 			contactOut[i].m_normal = buffer[i].m_normal;
 			contactOut[i].m_penetration = buffer[i].m_penetration;
@@ -1532,10 +1532,10 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 			const dgVector& hullVeloc = data.m_objBody->m_veloc;
 			const dgVector& hullOmega = data.m_objBody->m_omega;
 
-			dgFloat32 baseLinearSpeed = dgSqrt(hullVeloc % hullVeloc);
+			dgFloat32 baseLinearSpeed = dgSqrt(hullVeloc.DotProduct3(hullVeloc));
 			if (baseLinearSpeed > dgFloat32(1.0e-6f)) {
 				dgFloat32 minRadius = instance0.GetBoxMinRadius();
-				dgFloat32 maxAngularSpeed = dgSqrt(hullOmega % hullOmega);
+				dgFloat32 maxAngularSpeed = dgSqrt(hullOmega.DotProduct3(hullOmega));
 				dgFloat32 angularSpeedBound = maxAngularSpeed * (instance0.GetBoxMaxRadius() - minRadius);
 
 				dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
@@ -1689,14 +1689,14 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	for (dgInt32 i = 0; i < count; i ++) {
 		const dgVector& normal = contactOut[i].m_normal;
 		dgVector minPenetration (contactOut[i].m_point - matrix.TransformVector(convexInstance->SupportVertex (matrix.UnrotateVector(normal.Scale3 (dgFloat32 (-1.0f))), NULL)));
-		penetrations[i] = minPenetration % normal;
+		penetrations[i] = minPenetration.DotProduct3(normal);
 	}
 
 	for (dgInt32 i = 0; i < count; i ++) {
 		const dgVector& n0 = contactOut[i].m_normal;
 		for (dgInt32 j = i + 1; j < count; j ++) {
 			const dgVector& n1 = contactOut[j].m_normal;
-			dgFloat32 dir = n0 % n1;
+			dgFloat32 dir = n0.DotProduct3(n1);
 			if (dir < dgFloat32 (-0.995f)) {
 				dgFloat32 dist0 = penetrations[i];
 				dgFloat32 dist1 = penetrations[j];

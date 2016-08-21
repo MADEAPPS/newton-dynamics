@@ -83,7 +83,7 @@ void dgBilateralConstraint::CalculateMatrixOffset (const dgVector& pivot, const 
 
 	const dgMatrix& body0_Matrix = m_body0->GetMatrix();
 
-	length = dir % dir;
+	length = dir.DotProduct3(dir);
 	length = dgSqrt (length);
 	dgAssert (length > dgFloat32 (0.0f));
 	matrix0 = dgMatrix (body0_Matrix.UnrotateVector (dir.Scale3 (dgFloat32 (1.0f) / length)));
@@ -219,7 +219,7 @@ void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContra
 
 		//dgFloat32 relPosit = (p1Global - p0Global) % jacobian0.m_linear + jointAngle;
 		dgFloat32 relPosit = desc.m_penetration[index];
-		dgFloat32 relVeloc = - (veloc0 % jacobian0.m_linear + veloc1 % jacobian1.m_linear +	omega0 % jacobian0.m_angular + omega1 % jacobian1.m_angular);
+		dgFloat32 relVeloc = - (veloc0.DotProduct3(jacobian0.m_linear) + veloc1.DotProduct3(jacobian1.m_linear) + omega0.DotProduct3(jacobian0.m_angular) + omega1.DotProduct3(jacobian1.m_angular));
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		dgFloat32 dt = desc.m_timestep;
@@ -263,7 +263,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 
 	const dgVector& omega0 = m_body0->GetOmega();
 	const dgVector& omega1 = m_body1->GetOmega();
-	dgFloat32 omegaError = (omega1 - omega0) % dir;
+	dgFloat32 omegaError = dir.DotProduct3(omega1 - omega0);
 
 	m_rowIsMotor[index] = 0;
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
@@ -330,14 +330,14 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
 	dgVector velocError (param.m_veloc1 - param.m_veloc0);
-	dgFloat32 relVeloc = velocError % dir;
+	dgFloat32 relVeloc = velocError.DotProduct3(dir);
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
 
 		dgVector positError (param.m_posit1 - param.m_posit0);
 		dgVector centrError (param.m_centripetal1 - param.m_centripetal0);
 
-		dgFloat32 relPosit = positError % dir;
-		dgFloat32 relCentr = centrError % dir; 
+		dgFloat32 relPosit = positError.DotProduct3(dir);
+		dgFloat32 relCentr = centrError.DotProduct3(dir); 
 		relCentr = dgClamp (relCentr, dgFloat32(-100000.0f), dgFloat32(100000.0f));
 
 		desc.m_zeroRowAcceleration[index] = (relPosit + relVeloc * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep;
