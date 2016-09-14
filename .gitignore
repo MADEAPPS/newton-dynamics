@@ -75,3 +75,8 @@ packages/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 *.sbr
 *.res
 
+#
+# Ignore auxiliary output from Doxygen and Sphinx
+#
+doc/xml
+doc/html
