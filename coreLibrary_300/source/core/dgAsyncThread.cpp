@@ -40,7 +40,7 @@ dgAsyncThread::~dgAsyncThread(void)
 
 void dgAsyncThread::Terminate()
 {
-	if (StillBusy()) {
+	if (IsThreadActive()) {
 		dgInterlockedExchange(&m_terminate, 1);
 		m_myMutex.Release();
 		Close();

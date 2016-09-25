@@ -81,8 +81,8 @@ void Newton::DefaultFreeMemory (void* const ptr, dgInt32 size)
 }
 
 
-Newton::Newton (dgFloat32 scale, dgMemoryAllocator* const allocator)
-	:dgWorld(allocator) 
+Newton::Newton (dgFloat32 scale, dgMemoryAllocator* const allocator, dgInt32 stackSize)
+	:dgWorld(allocator, stackSize) 
 	,NewtonDeadBodies(allocator)
 	,NewtonDeadJoints(allocator)
 	,m_maxTimeStep(DG_TIMESTEP)

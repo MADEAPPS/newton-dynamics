@@ -70,7 +70,7 @@ class dgThread
 
 	virtual void Execute (dgInt32 threadId) = 0;
 	
-	bool StillBusy() const;
+	bool IsThreadActive() const;
 	void SuspendExecution (dgSemaphore& mutex);
 	void SuspendExecution (dgInt32 count, dgSemaphore* const mutexes);
 

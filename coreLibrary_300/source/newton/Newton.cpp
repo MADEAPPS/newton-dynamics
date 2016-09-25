@@ -176,6 +176,15 @@ NewtonWorld* NewtonCreate()
 	return world;
 }
 
+NewtonWorld* NewtonCreateEx (int stackSizeInMegabytes)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMemoryAllocator* const allocator = new dgMemoryAllocator();
+
+	NewtonWorld* const world = (NewtonWorld*) new (allocator)Newton(dgFloat32(1.0f), allocator, stackSizeInMegabytes<<20);
+	return world;
+}
+
 // Name: NewtonDestroy 
 // Destroy an instance of the Newton world.
 //

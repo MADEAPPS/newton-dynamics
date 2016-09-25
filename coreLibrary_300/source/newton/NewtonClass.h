@@ -58,7 +58,7 @@ class Newton:
 	public:
 	DG_CLASS_ALLOCATOR(allocator)
 
-	Newton (dgFloat32 scale, dgMemoryAllocator* const allocator);
+	Newton (dgFloat32 scale, dgMemoryAllocator* const allocator, dgInt32 stackSize = DG_ENGINE_STACK_SIZE);
 	~Newton ();
 
 	void DestroyBody(dgBody* const body);

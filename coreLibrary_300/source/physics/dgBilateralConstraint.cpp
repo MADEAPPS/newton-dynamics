@@ -212,10 +212,10 @@ void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContra
 		const dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 
 		const dgJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1; 
 
-		dgVector veloc0 (m_body0->m_veloc);
-		dgVector omega0 (m_body0->m_omega);
-		dgVector veloc1 (m_body1->m_veloc);
-		dgVector omega1 (m_body1->m_omega);
+		const dgVector& veloc0 = m_body0->m_veloc;
+		const dgVector& omega0 = m_body0->m_omega;
+		const dgVector& veloc1 = m_body1->m_veloc;
+		const dgVector& omega1 = m_body1->m_omega;
 
 		//dgFloat32 relPosit = (p1Global - p0Global) % jacobian0.m_linear + jointAngle;
 		dgFloat32 relPosit = desc.m_penetration[index];
