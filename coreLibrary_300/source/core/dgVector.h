@@ -1003,7 +1003,8 @@ class dgVector
 
 	DG_INLINE dgVector ShiftRightLogical (int bits) const
 	{
-		return dgVector (_mm_castsi128_pd(_mm_srli_epi64(m_typeIntLow, bits)), _mm_castsi128_pd(_mm_srli_epi64(m_typeIntHigh, bits))); 
+		//return dgVector (_mm_castsi128_pd(_mm_srli_epi64(m_typeIntLow, bits)), _mm_castsi128_pd(_mm_srli_epi64(m_typeIntHigh, bits))); 
+		return dgVector (_mm_srli_epi64(m_typeIntLow, bits), _mm_srli_epi64(m_typeIntHigh, bits)); 
 	}
 
 
@@ -1061,13 +1062,8 @@ class dgVector
 
 	DG_INLINE dgVector TestZero() const
 	{
-		__m128i typeIntLow (_mm_cmpeq_epi64 (m_typeIntLow, m_zero.m_typeIntLow));
-		__m128i typeIntHigh (_mm_cmpeq_epi64 (m_typeIntHigh, m_zero.m_typeIntHigh));
-		dgVector a(typeIntLow, typeIntHigh);
-		//__m128d a (_mm_castsi128_pd(typeIntLow));
-		//__m128d b (_mm_castsi128_pd(typeIntHigh));
-		return dgVector (_mm_castsi128_pd(_mm_cmpeq_epi64 (m_typeIntLow, m_zero.m_typeIntLow)), _mm_castsi128_pd(_mm_cmpeq_epi64 (m_typeIntHigh, m_zero.m_typeIntHigh)));
-
+//		return dgVector (_mm_castsi128_pd(_mm_cmpeq_epi64 (m_typeIntLow, m_zero.m_typeIntLow)), _mm_castsi128_pd(_mm_cmpeq_epi64 (m_typeIntHigh, m_zero.m_typeIntHigh)));
+		return dgVector (_mm_cmpeq_epi64 (m_typeIntLow, m_zero.m_typeIntLow), _mm_cmpeq_epi64 (m_typeIntHigh, m_zero.m_typeIntHigh)) & m_negOne;
 	}
 
 
@@ -1482,7 +1478,8 @@ class dgVector
 
 	DG_INLINE dgVector ShiftRightLogical (int bits) const
 	{
-		return dgVector (_mm_castsi128_ps(_mm_srli_epi32(m_typeInt, bits))); 
+//		return dgVector (_mm_castsi128_ps(_mm_srli_epi32(m_typeInt, bits))); 
+		return dgVector (_mm_srli_epi32(m_typeInt, bits)); 
 	}
 
 	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
