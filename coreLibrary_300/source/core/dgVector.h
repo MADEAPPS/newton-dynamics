@@ -603,28 +603,6 @@ class dgVector
 		return dgVector (dgUnsigned32 (m_ix) >> bits, dgUnsigned32 (m_iy) >> bits, dgUnsigned32 (m_iz) >> bits, dgUnsigned32 (m_iw) >> bits); 
 	}
 
-/*
-	DG_INLINE dgVector MoveLow (const dgVector& data) const
-	{
-		return dgVector (m_x, m_y, data.m_x, data.m_y); 
-	}
-
-	DG_INLINE dgVector MoveHigh (const dgVector& data) const
-	{
-		return dgVector (data.m_z, data.m_w, m_z, m_w); 
-	}
-
-	DG_INLINE dgVector PackLow (const dgVector& data) const
-	{
-		return dgVector (m_x, data.m_x, m_y, data.m_y); 
-	}
-
-	DG_INLINE dgVector PackHigh (const dgVector& data) const
-	{
-		return dgVector (m_z, data.m_z, m_w, data.m_w); 
-	}
-*/
-
 	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
 	{
 		dgVector tmp0 (src0);
@@ -762,6 +740,12 @@ class dgVector
 	DG_INLINE dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w)
 		:m_typeLow(_mm_set_pd(y, x))
 		,m_typeHigh(_mm_set_pd(w, z))
+	{
+	}
+
+	DG_INLINE dgVector(const __m128i typeLow, const __m128i typeHigh)
+		:m_typeIntLow (typeLow)
+		,m_typeIntHigh (typeHigh)
 	{
 	}
 
@@ -1022,35 +1006,6 @@ class dgVector
 		return dgVector (_mm_castsi128_pd(_mm_srli_epi64(m_typeIntLow, bits)), _mm_castsi128_pd(_mm_srli_epi64(m_typeIntHigh, bits))); 
 	}
 
-/*
-	DG_INLINE dgVector MoveLow (const dgVector& data) const
-	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_movelh_ps (m_type, data.m_type);
-	}
-
-	DG_INLINE dgVector MoveHigh (const dgVector& data) const
-	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_movehl_ps (m_type, data.m_type);
-	}
-
-	DG_INLINE dgVector PackLow (const dgVector& data) const
-	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_unpacklo_ps (m_type, data.m_type);
-	}
-
-	DG_INLINE dgVector PackHigh (const dgVector& data) const
-	{
-		dgAssert (0);
-		return dgVector (0.0f);
-//		return _mm_unpackhi_ps (m_type, data.m_type);
-	}
-*/
 
 	DG_INLINE dgInt32 GetSignMask() const
 	{
@@ -1106,8 +1061,9 @@ class dgVector
 
 	DG_INLINE dgVector TestZero() const
 	{
-		//__m128i typeIntLow (_mm_cmpeq_epi64 (m_typeIntLow, m_zero.m_typeIntLow));
-		//__m128i typeIntHigh (_mm_cmpeq_epi64 (m_typeIntHigh, m_zero.m_typeIntHigh));
+		__m128i typeIntLow (_mm_cmpeq_epi64 (m_typeIntLow, m_zero.m_typeIntLow));
+		__m128i typeIntHigh (_mm_cmpeq_epi64 (m_typeIntHigh, m_zero.m_typeIntHigh));
+		dgVector a(typeIntLow, typeIntHigh);
 		//__m128d a (_mm_castsi128_pd(typeIntLow));
 		//__m128d b (_mm_castsi128_pd(typeIntHigh));
 		return dgVector (_mm_castsi128_pd(_mm_cmpeq_epi64 (m_typeIntLow, m_zero.m_typeIntLow)), _mm_castsi128_pd(_mm_cmpeq_epi64 (m_typeIntHigh, m_zero.m_typeIntHigh)));
@@ -1529,47 +1485,16 @@ class dgVector
 		return dgVector (_mm_castsi128_ps(_mm_srli_epi32(m_typeInt, bits))); 
 	}
 
-/*
-	DG_INLINE dgVector MoveLow (const dgVector& data) const
-	{
-		return _mm_movelh_ps (m_type, data.m_type);
-	}
-
-	DG_INLINE dgVector MoveHigh (const dgVector& data) const
-	{
-		return _mm_movehl_ps (m_type, data.m_type);
-	}
-
-
-	DG_INLINE dgVector PackLow (const dgVector& data) const
-	{
-		return _mm_unpacklo_ps (m_type, data.m_type);
-	}
-
-	DG_INLINE dgVector PackHigh (const dgVector& data) const
-	{
-		return _mm_unpackhi_ps (m_type, data.m_type);
-	}
-*/
-
 	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
 	{
-//		dgVector tmp0 (src0.PackLow(src1));
 		__m128 tmp0 (_mm_unpacklo_ps (src0.m_type, src1.m_type));
-//		dgVector tmp1 (src2.PackLow(src3));
 		__m128 tmp1 (_mm_unpacklo_ps (src2.m_type, src3.m_type));
-//		dgVector tmp2 (src0.PackHigh(src1));
 		__m128 tmp2 (_mm_unpackhi_ps (src0.m_type, src1.m_type));
-//		dgVector tmp3 (src2.PackHigh(src3));
 		__m128 tmp3 (_mm_unpackhi_ps (src2.m_type, src3.m_type));
 
-//		dst0 = tmp0.MoveLow (tmp1);
 		dst0 = dgVector (_mm_movelh_ps (tmp0, tmp1));
-//		dst1 = tmp1.MoveHigh (tmp0);
 		dst1 = dgVector (_mm_movehl_ps (tmp1, tmp0));
-//		dst2 = tmp2.MoveLow (tmp3);
 		dst2 = dgVector (_mm_movelh_ps (tmp2, tmp3));
-//		dst3 = tmp3.MoveHigh (tmp2);
 		dst3 = dgVector (_mm_movehl_ps (tmp3, tmp2));
 	}
 
