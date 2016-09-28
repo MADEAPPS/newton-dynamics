@@ -40,7 +40,7 @@ dgMutexThread::~dgMutexThread(void)
 
 void dgMutexThread::Terminate()
 {
-	if (StillBusy()) {
+	if (IsThreadActive()) {
 		dgInterlockedExchange(&m_terminate, 1);
 		m_callerMutex.Release();
 		m_myMutex.Release();

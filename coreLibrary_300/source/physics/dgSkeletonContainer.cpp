@@ -1135,7 +1135,7 @@ void dgSkeletonContainer::SolveLCP (dgJointInfo* const jointInfoArray, const dgB
 	dTimeTrackerEvent(__FUNCTION__);
 	dgForcePair force[DG_SKELETON_MAX_NODES];
 	dgForcePair accel[DG_SKELETON_MAX_NODES];
-	dgClippedNodes clippedNodes[DG_SKELETON_MAX_NODES];
+//	dgClippedNodes clippedNodes[DG_SKELETON_MAX_NODES];
 
 //dgForcePair force1[DG_SKELETON_MAX_NODES];
 //dgForcePair accel1[DG_SKELETON_MAX_NODES];

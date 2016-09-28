@@ -49,7 +49,7 @@ void dgThread::Init (const char* const name, dgInt32 id, int stackSize)
 }
 
 
-bool dgThread::StillBusy() const
+bool dgThread::IsThreadActive() const
 {
 	return m_threadRunning ? true : false;
 }

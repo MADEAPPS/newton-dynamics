@@ -59,7 +59,7 @@
 #define DG_INITIAL_BODIES_SIZE		(1024 * 4)
 #define DG_INITIAL_JOINTS_SIZE		(1024 * 4)
 #define DG_INITIAL_JACOBIAN_SIZE	(1024 * 16)
-#define DG_ENGINE_STACK_SIZE        (1024 * 1024)
+
 
 
 /*
@@ -210,7 +210,7 @@ void dgWorld::dgAsyncUpdate::Update ()
 #define DG_MUTEX_THREAD_ID	0
 #define DG_ASYNC_THREAD_ID	1
 
-dgWorld::dgWorld(dgMemoryAllocator* const allocator)
+dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	:dgBodyMasterList(allocator)
 	,dgBodyMaterialList(allocator)
 	,dgBodyCollisionList(allocator)
@@ -218,7 +218,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgSkeletonList(allocator)
 	,dgActiveContacts(allocator) 
 	,dgWorldDynamicUpdate()
-	,dgMutexThread("newtonSyncThread", DG_MUTEX_THREAD_ID, DG_ENGINE_STACK_SIZE)
+	,dgMutexThread("newtonSyncThread", DG_MUTEX_THREAD_ID, stackSize)
 	,dgAsyncThread("newtonAsyncThread", DG_ASYNC_THREAD_ID)
 	,dgWorldThreadPool(allocator)
 	,m_broadPhase(NULL)
