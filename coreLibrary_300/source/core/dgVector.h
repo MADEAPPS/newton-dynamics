@@ -1106,6 +1106,10 @@ class dgVector
 
 	DG_INLINE dgVector TestZero() const
 	{
+		//__m128i typeIntLow (_mm_cmpeq_epi64 (m_typeIntLow, m_zero.m_typeIntLow));
+		//__m128i typeIntHigh (_mm_cmpeq_epi64 (m_typeIntHigh, m_zero.m_typeIntHigh));
+		//__m128d a (_mm_castsi128_pd(typeIntLow));
+		//__m128d b (_mm_castsi128_pd(typeIntHigh));
 		return dgVector (_mm_castsi128_pd(_mm_cmpeq_epi64 (m_typeIntLow, m_zero.m_typeIntLow)), _mm_castsi128_pd(_mm_cmpeq_epi64 (m_typeIntHigh, m_zero.m_typeIntHigh)));
 
 	}
