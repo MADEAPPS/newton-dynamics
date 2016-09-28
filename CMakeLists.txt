@@ -84,14 +84,17 @@ else ()
   set(BUILD_64 FALSE)
 endif ()
 
-
+option("DOUBLE_PRECISION" "Use Double Precision" OFF)
 option("NEWTON_DEMOS_SANDBOX" "Build demos sandbox" ON)
 
-
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages")
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages/thirdParty")
-add_subdirectory("${NewtonSDK_SOURCE_DIR}/coreLibrary_300")
+if(DOUBLE_PRECISION)
+ add_definitions(-D_NEWTON_USE_DOUBLE)
+endif()
 
 if(NEWTON_DEMOS_SANDBOX)
   add_subdirectory("${NewtonSDK_SOURCE_DIR}/applications/demosSandbox")
 endif()
+
+add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages")
+add_subdirectory("${NewtonSDK_SOURCE_DIR}/packages/thirdParty")
+add_subdirectory("${NewtonSDK_SOURCE_DIR}/coreLibrary_300")
