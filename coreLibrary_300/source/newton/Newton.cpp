@@ -484,29 +484,6 @@ int NewtonGetMaxThreadsCount(const NewtonWorld* const newtonWorld)
 }
 
 
-
-/*
-// fixme: delete NewtonGetThreadNumber ?
-// Get the current thread the Engine is running
-//
-// @param *newtonWorld is the pointer to the Newton world
-// 
-// @return the index to the current workir thread runnin the call back. -1 if the function is called ourxoed of a call back
-//
-// This function let application to read the current thread running in a callback
-//
-// the function will always return 1 on the none multi core version of the library..
-//
-// See also: ::NewtonGetThreadsCount, ::NewtonSetThreadsCount, ::NewtonSetMultiThreadSolverOnSingleIsland
-int NewtonGetThreadNumber(const NewtonWorld* const newtonWorld)
-{
-	Newton* const world;
-	Newton* const world = (Newton *)newtonWorld;
-	TRACE_FUNCTION(__FUNCTION__);
-	return world->GetThreadNumber();
-}
-*/
-
 /*!
   Enable or disable solver to resolve constraint forces in multi threaded mode when large island configurations. Mode is disabled by default.
 
