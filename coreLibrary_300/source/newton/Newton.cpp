@@ -242,7 +242,7 @@ void NewtonSetContactMergeTolerance (const NewtonWorld* const newtonWorld, dFloa
 /*!
   Reset all internal states of the engine.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
 
   When an application wants to reset the state of all the objects in the world to a predefined initial condition,
   just setting the initial position and velocity is not sufficient to reproduce equal runs since the engine maintain
@@ -342,7 +342,7 @@ void NewtonGetDeviceString (const NewtonWorld* const newtonWorld, int deviceInde
 /*!
   this function block all other threads from executing the same subsequent code simultaneously.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param threadIndex thread index from whe thsi function is called, zero if call form outsize a newton update
 
   this function should use to present racing conditions when when a call back ins executed form a mutithreaded loop.
@@ -395,7 +395,7 @@ void NewtonYield ()
 /*!
   this function block all other threads from executing the same subsequent code simultaneously.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
 
 
   this function should use to present racing conditions when when a call back ins executed form a mutithreaded loop.
@@ -787,7 +787,7 @@ void NewtonSetIslandUpdateEvent(const NewtonWorld* const newtonWorld, NewtonIsla
 /*!
   get th first body in the body in the world body list.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
 
   @return nothing
 
@@ -819,7 +819,7 @@ NewtonBody* NewtonWorldGetFirstBody(const NewtonWorld* const newtonWorld)
 /*!
   get the fixt body in the general body.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param curBody fixme
 
   @return nothing
@@ -848,7 +848,7 @@ NewtonBody* NewtonWorldGetNextBody(const NewtonWorld* const newtonWorld, const N
 /*!
   Iterate thought every joint in the world calling the function callback.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param callback application define callback
   @param *userData pointer to the user defined user data value.
 
@@ -887,7 +887,7 @@ void NewtonWorldForEachJointDo(const NewtonWorld* const newtonWorld, NewtonJoint
 /*!
   Iterate thought every body in the world that intersect the AABB calling the function callback.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param  *p0 - pointer to an array of at least three floats to hold minimum value for the AABB.
   @param  *p1 - pointer to an array of at least three floats to hold maximum value for the AABB.
   @param callback application defined callback
@@ -967,7 +967,7 @@ void NewtonWorldSetUserData(const NewtonWorld* const newtonWorld, void* const us
 /*!
   Retrieve a user previously stored user define value with the world.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
 
   @return user data value.
 
@@ -986,7 +986,7 @@ void* NewtonWorldGetUserData(const NewtonWorld* const newtonWorld)
 /*!
   set a function pointer as destructor call back.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param destructor function poiter callback
 
   The application can store a user defined destructor call back function to be called at the  time the world is to be destroyed
@@ -1004,7 +1004,7 @@ void NewtonWorldSetDestructorCallback(const NewtonWorld* const newtonWorld, Newt
 /*!
   Return the function call back Pointer.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
 
   The application can store a user defined destructor call back function to be called at the  time the world is to be destroyed
 
@@ -1525,7 +1525,7 @@ void NewtonMaterialSetCallbackUserData (const NewtonWorld* const newtonWorld, in
 /*!
   Set userData and the functions event handlers for the material interaction between two physics materials .
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param  id0 - group id0.
   @param  id1 - group id1.
   @param *aabbOverlap address of the event function called when the AABB of tow bodyes overlap. This parameter can be NULL.
@@ -1572,7 +1572,7 @@ void NewtonMaterialSetContactGenerationCallback (const NewtonWorld* const newton
 /*!
   Set userData and the functions event handlers for the material interaction between two physics materials .
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param  id0 - group id0.
   @param  id1 - group id1.
   @param  *compoundAabbOverlap: fixme (can this be NULL?)
@@ -1610,7 +1610,7 @@ void NewtonMaterialSetCompoundCollisionCallback(const NewtonWorld* const newtonW
 /*!
   Get userData associated with this material.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param  id0 - group id0.
   @param  id1 - group id1.
 
@@ -1629,7 +1629,7 @@ void* NewtonMaterialGetUserData (const NewtonWorld* const newtonWorld, int id0, 
 /*!
   Get the first Material pair from the material array.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
 
   @return the first material.
 
@@ -1645,7 +1645,7 @@ NewtonMaterial* NewtonWorldGetFirstMaterial(const NewtonWorld* const newtonWorld
 /*!
   Get the next Material pair from the material array.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *material corrent material
 
   @return next material in material array or NULL if material is the last material in the list.
@@ -2196,7 +2196,7 @@ Convex collision primitives interface
 /*!
   Create a transparent collision primitive.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
 
   @return Pointer to the collision object.
 
@@ -2217,7 +2217,7 @@ NewtonCollision* NewtonCreateNull(const NewtonWorld* const newtonWorld)
 /*!
   Create a box primitive for collision.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param dx box side one x dimension.
   @param dy box side one y dimension.
   @param dz box side one z dimension.
@@ -2241,7 +2241,7 @@ NewtonCollision* NewtonCreateBox(const NewtonWorld* const newtonWorld, dFloat dx
 /*!
   Create a generalized ellipsoid primitive..
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param radius sphere radius
   @param shapeID fixme
   @param *offsetMatrix pointer to an array of 16 floats containing the offset matrix of the sphere relative to the body. If this parameter is NULL then the sphere is centered at the origin of the body.
@@ -2277,7 +2277,7 @@ NewtonCollision* NewtonCreateSphere(const NewtonWorld* const newtonWorld, dFloat
 /*!
   Create a cone primitive for collision.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param radius cone radius at the base.
   @param height cone height along the x local axis from base to tip.
   @param shapeID fixme
@@ -2301,7 +2301,7 @@ NewtonCollision* NewtonCreateCone(const NewtonWorld* const newtonWorld, dFloat r
 /*!
   Create a capsule primitive for collision.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param  radio0 - fixme
   @param  radio1 - fixme
   @param height capsule height along the x local axis from tip to tip.
@@ -2328,7 +2328,7 @@ NewtonCollision* NewtonCreateCapsule(const NewtonWorld* const newtonWorld, dFloa
 /*!
   Create a cylinder primitive for collision.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param  radio0 - fixme
   @param  radio1 - fixme
   @param height cylinder height along the x local axis.
@@ -2353,7 +2353,7 @@ NewtonCollision* NewtonCreateCylinder(const NewtonWorld* const newtonWorld, dFlo
 /*!
   Create a ChamferCylinder primitive for collision.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param radius ChamferCylinder radius at the base.
   @param height ChamferCylinder height along the x local axis.
   @param shapeID fixme
@@ -2377,7 +2377,7 @@ NewtonCollision* NewtonCreateChamferCylinder(const NewtonWorld* const newtonWorl
 /*!
   Create a ConvexHull primitive from collision from a cloud of points.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param count number of consecutive point to follow must be at least 4.
   @param *vertexCloud pointer to and array of point.
   @param strideInBytes vertex size in bytes, must be at least 12.
@@ -2427,7 +2427,7 @@ NewtonCollision* NewtonCreateConvexHull(const NewtonWorld* const newtonWorld, in
 /*!
   Create a ConvexHull primitive from a special effect mesh.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *mesh special effect mesh
   @param tolerance tolerance value for the hull generation.
   @param shapeID fixme
@@ -2451,7 +2451,7 @@ NewtonCollision* NewtonCreateConvexHullFromMesh(const NewtonWorld* const newtonW
 /*!
   Create a container to hold an array of convex collision primitives.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param  shapeID: fixme
 
   @return Pointer to the compound collision.
@@ -2600,7 +2600,7 @@ NewtonCollision* NewtonCompoundCollisionGetCollisionFromNode (NewtonCollision* c
 /*!
   Create a compound collision from a concave mesh by an approximate convex partition
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *convexAproximation fixme
   @param hullTolerance fixme
   @param shapeID fixme
@@ -3064,7 +3064,7 @@ Complex collision primitives interface
 /*!
   Create a complex collision geometry to be controlled by the application.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *minBox pointer to an array of at least three floats to hold minimum value for the box relative to the collision.
   @param *maxBox pointer to an array of at least three floats to hold maximum value for the box relative to the collision.
   @param *userData pointer to user data to be used as context for event callback.
@@ -3149,7 +3149,7 @@ int NewtonUserMeshCollisionContinuousOverlapTest (const NewtonUserMeshCollisionC
 /*!
   Create an empty complex collision geometry tree.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param shapeID fixme
 
   @return Pointer to the collision tree.
@@ -3450,7 +3450,7 @@ int NewtonTreeCollisionGetVertexListTriangleListInAABB(const NewtonCollision* co
 /*!
   Create a height field collision geometry.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param width fixme
   @param height fixme
   @param gridsDiagonals fixme
@@ -3483,7 +3483,7 @@ int NewtonTreeCollisionGetVertexListTriangleListInAABB(const NewtonCollision* co
 /*!
   Create a height field collision geometry.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param shapeID fixme
 
   @return Pointer to the collision.
@@ -3607,7 +3607,7 @@ Generic collision library functions
 /*!
   Calculate the closest point between a point and convex collision primitive.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *point pointer to and array of a least 3 floats representing the origin.
   @param *collision pointer to collision primitive.
   @param *matrix pointer to an array of 16 floats containing the offset matrix of collision primitiveA.
@@ -3643,7 +3643,7 @@ int NewtonCollisionPointDistance(const NewtonWorld* const newtonWorld, const dFl
 /*!
   Calculate the closest points between two disjoint convex collision primitive.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *collisionA pointer to collision primitive A.
   @param *matrixA pointer to an array of 16 floats containing the offset matrix of collision primitiveA.
   @param *collisionB pointer to collision primitive B.
@@ -3694,7 +3694,7 @@ int NewtonCollisionIntersectionTest (const NewtonWorld* const newtonWorld, const
 /*!
   Calculate contact points between two collision primitive.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param maxSize size of maximum number of elements in contacts, normals, and penetration.
   @param *collisionA pointer to collision primitive A.
   @param *matrixA pointer to an array of 16 floats containing the offset matrix of collision primitiveA.
@@ -3737,7 +3737,7 @@ int NewtonCollisionCollide (const NewtonWorld* const newtonWorld, int maxSize,
 /*!
   Calculate time of impact of impact and contact points between two collision primitive.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param maxSize size of maximum number of elements in contacts, normals, and penetration.
   @param timestep maximum time interval considered for the continuous collision calculation.
   @param *collisionA pointer to collision primitive A.
@@ -4098,7 +4098,7 @@ NewtonCollision* NewtonCollisionCreateInstance (const NewtonCollision* const col
 /*!
   Serialize a general collision shape.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *collision is the pointer to the collision tree shape.
   @param serializeFunction pointer to the event function that will do the serialization.
   @param  *serializeHandle	- user data that will be passed to the _NewtonSerialize_ callback.
@@ -4122,7 +4122,7 @@ void NewtonCollisionSerialize(const NewtonWorld* const newtonWorld, const Newton
 /*!
   Create a collision shape via a serialization function.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param deserializeFunction pointer to the event function that will do the deserialization.
   @param *serializeHandle user data that will be passed to the _NewtonSerialize_ callback.
 
@@ -4287,7 +4287,7 @@ Rigid Body Interface
 /*!
   Create a rigid body.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *collisionPtr pointer to the collision object.
   @param *matrixPtr fixme
 
@@ -6120,7 +6120,7 @@ Ball and Socket joint interface
 /*!
   Create a ball an socket joint.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *pivotPoint is origin of ball and socket in global space.
   @param *childBody is the pointer to the attached rigid body, this body can not be NULL or it can not have an infinity (zero) mass.
   @param *parentBody is the pointer to the parent rigid body, this body can be NULL or any kind of rigid body.
@@ -6298,7 +6298,7 @@ Slider joint interface
 /*!
   Create a slider joint.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *pivotPoint is origin of the slider in global space.
   @param *pinDir is the line of action of the slider in global space.
   @param *childBody is the pointer to the attached rigid body, this body can not be NULL or it can not have an infinity (zero) mass.
@@ -6446,7 +6446,7 @@ Corkscrew joint interface
 /*!
   Create a corkscrew joint.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *pivotPoint is origin of the corkscrew in global space.
   @param *pinDir is the line of action of the corkscrew in global space.
   @param *childBody is the pointer to the attached rigid body, this body can not be NULL or it can not have an infinity (zero) mass.
@@ -6661,7 +6661,7 @@ Universal joint interface
 /*!
   Create a universal joint.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *pivotPoint is origin of the universal joint in global space.
   @param  *pinDir0 - first axis of rotation fixed on childBody body and perpendicular to pinDir1.
   @param  *pinDir1 - second axis of rotation fixed on parentBody body and perpendicular to pinDir0.
@@ -6890,7 +6890,7 @@ UpVector joint Interface
 /*!
   Create a UpVector joint.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *pinDir is the aligning vector.
   @param *body is the pointer to the attached rigid body, this body can not be NULL or it can not have an infinity (zero) mass.
 
@@ -6976,7 +6976,7 @@ User defined joint interface
 /*!
   Create a user define bilateral joint.
 
-  @param *newtonWorld is the pointer to the Newton world.
+  @param *newtonWorld Pointer to the Newton world.
   @param maxDOF is the maximum number of degree of freedom controlled by this joint.
   @param submitConstraints pointer to the joint constraint definition function call back.
   @param getInfo pointer to callback for collecting joint information.
