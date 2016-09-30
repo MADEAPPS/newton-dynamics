@@ -432,19 +432,16 @@ void NewtonWorldCriticalSectionUnlock(const NewtonWorld* const newtonWorld)
 
 
 /*!
-  Set the maximum number of thread the engine is allowed to use by the application.
+  Set the maximum number of threads the engine can use.
 
-  @param *newtonWorld is the pointer to the Newton world
-  @param threads max number of threaded allowed
+  @param *newtonWorld Pointer to the Newton world.
+  @param threads Maximum number of allowed threads.
 
   @return Nothing
 
-  The maximum number of threaded is set on initialization to the maximum number of CPU in the system.
-
-  The engine will only allow a maximum number of thread equal are lower to the maximum number of cores visible in the system.
-  if *threads* is set to a value larger that then number of logical CPUs in the system, the *threads* will be clamped to the number of logical CPUs.
-
-  the function is only only have effect on the multi core version of the engine.
+  The maximum number of threaded is set on initialization to the maximum number
+  of CPU in the system.
+  fixme: this appears to be wrong. It is set to 1.
 
   See also: ::NewtonGetThreadsCount
 */
@@ -458,15 +455,11 @@ void NewtonSetThreadsCount(const NewtonWorld* const newtonWorld, int threads)
 
 
 /*!
-  Get the total number of thread running in the engine.
+  Return the number of threads currently used by the engine.
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld Pointer to the Newton world.
 
-  @return number threads
-
-  The maximum number of threaded is set on initialization to the maximum number of CPU in the system.
-
-  the function will always return 1 on the none multi core version of the library..
+  @return Number threads
 
   See also: ::NewtonSetThreadsCount, ::NewtonSetMultiThreadSolverOnSingleIsland
 */
@@ -480,15 +473,14 @@ int NewtonGetThreadsCount(const NewtonWorld* const newtonWorld)
 
 
 /*!
-  Get the maximu number of thread abialble.
+  Return the maximum number of threads supported on this platform.
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld Pointer to the Newton world.
 
-  @return number threads
+  @return Number threads.
 
-  The maximum number of threaded is set on initialization to the maximum number of CPU in the system.
-
-  the function will always return 1 on the none multi core version of the library..
+  This function will return 1 on single core version of the library.
+  // fixme; what is a single core version?
 
   See also: ::NewtonSetThreadsCount, ::NewtonSetMultiThreadSolverOnSingleIsland
 */
@@ -502,24 +494,29 @@ int NewtonGetMaxThreadsCount(const NewtonWorld* const newtonWorld)
 
 
 /*!
-  Enable or disable solver to resolve constraint forces in multi threaded mode when large island configurations. Mode is disabled by default.
+  Enable/disable multi-threaded constraint resolution for large islands
+  (disabled by default).
 
-  @param *newtonWorld is the pointer to the Newton world
-  @param mode solver mode 1 enable parallel mode 0 disable parallel mode, default
+  @param *newtonWorld Pointer to the Newton world.
+  @param mode 1: enabled  0: disabled (default)
 
   @return Nothing
 
-  When running in multi threaded mode it is not always faster to calculate constraint forces in parallel.
-  there reasons for this are:
-  1 - there is a significant software cost for setting threads both in memory and instructions overhead.
-  2 - different systems have different cost for running separate threads in a share memory environment
-  3 - numerical algorithms have decreased converge rate when implemented in parallel, typical lost of converge can be as high as half
-  of the of the sequential version, for this reason the parallel version require higher number of interaction to achieve similar convergence.
+  Multi threaded mode is not always faster. Among the reasons are
 
-  It is recommended this option is enabled on system with more than two cores, since the performance gain in a dual core system are marginally better.
-  at the very list the application must test the option to verify the performance gains.
+  1 - Significant software cost to set up threads, as well as instruction overhead.
+  2 - Different systems have different cost for running separate threads in a shared memory environment.
+  3 - Parallel algorithms often have decreased converge rate. This can be as
+      high as half of the of the sequential version. Consequently, the parallel
+      solver requires a higher number of interactions to achieve similar convergence.
 
-  disabling or enabling this option have not impact on the execution of the any of the other subsystems of the engine.
+  It is recommended this option is enabled on system with more than two cores,
+  since the performance gain in a dual core system are marginally better. Your
+  mileage may vary.
+
+  At the very least the application must test the option to verify the performance gains.
+
+  This option has no impact on other subsystems of the engine.
 
   See also: ::NewtonGetThreadsCount, ::NewtonSetThreadsCount
 */
@@ -638,17 +635,18 @@ void NewtonSetFrictionModel(const NewtonWorld* const newtonWorld, int model)
 
 
 /*!
-  Advance the simulation by an amount of time.
+  Advance the simulation by a user defined amount of time.
 
   @param *newtonWorld is the pointer to the Newton world
-  @param timestep time step in seconds
+  @param timestep time step in seconds.
 
   @return Nothing
 
-  This function will advance the simulation by the amount of time specified by
-  *timestep*. The Newton Engine does not perform sub-steps, and does not need
-  tuning parameters. It is the responsibility of the application to ensure that
-  *timestep* is small enough to guarantee physics stability.
+  This function will advance the simulation by the specified amount of time.
+
+  The Newton Engine does not perform sub-steps, nor  does it need
+  tuning parameters. As a consequence, the application is responsible for
+  requesting sane time steps.
 
   @return This function call NewtonCollisionUpdate at the lower level
   to get the colliding contacts. fixme: is this true? there is no
@@ -1223,7 +1221,7 @@ int NewtonWorldCollide (const NewtonWorld* const newtonWorld, const dFloat* cons
 /*!
   Retrieve body by index from island.
 
-  @param Pointer to simulation island.
+  @param island Pointer to simulation island.
   @param bodyIndex Index of body on current island.
 
   @return requested body. fixme: does it return NULL on error?
@@ -1243,7 +1241,7 @@ NewtonBody* NewtonIslandGetBody(const void* const island, int bodyIndex)
 /*!
   Return the AABB of the body on this island
 
-  @param Pointer to simulation island.
+  @param island Pointer to simulation island.
   @param bodyIndex index to the body in current island.
   @param p0 - fixme
   @param p1 - fixme
