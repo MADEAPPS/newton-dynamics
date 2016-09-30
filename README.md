@@ -1,7 +1,7 @@
 ![emscripten logo](https://raw.githubusercontent.com/MADEAPPS/newton-dynamics/master/applications/newtonLogo/newtonLogo.png)
 
-Newton dynamics is a realistic, cross-platform physics simulation library. It can easily be integrated into games and game engines and provides top of it's class performance and simulation stability.
-Ongoing developement and a permissive license makes Newton Dynamics a top choice for all kinds of projects from scientific projects to game engines.
+Newton dynamics is a realistic, cross-platform physics simulation library. It can easily be integrated into games and game engines and provides top of its class performance and simulation stability.
+Ongoing development and a permissive license makes Newton Dynamics a top choice for all kinds of projects from scientific projects to game engines.
 
 * Links to **demos**, **tutorial**, **FAQ**, etc: <https://github.com/MADEAPPS/newton-dynamics/wiki>
 * Main project page: <http://newtondynamics.com>
@@ -18,11 +18,11 @@ Project files for Visual Studio and XCode are provided, mainly
 * demo sandbox: [applications/demosSandbox/projects/](applications/demosSandbox/projects/)
 
 ## Linux
-There are Unix makefiles in the project folders mentioned above, but it is *highly* recommended to use CMake indstead.
+There are Unix makefiles in the project folders mentioned above, but it is *highly* recommended to use CMake instead.
 
 Newton Core does not have any third party dependencies.
 
-For building the demo sandbox the following packages need to be installed:
+To build the demo sandbox the following packages need to be installed:
 * wxWidgets 2.8 or 2.9
 * Freetype
 * OpenGL
