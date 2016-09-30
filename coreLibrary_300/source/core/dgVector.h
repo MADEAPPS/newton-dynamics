@@ -449,10 +449,10 @@ class dgVector
 	DG_INLINE dgVector TestZero() const
 	{
 		const dgInt32* const a = (dgInt32*)&m_x;
-		return dgVector ((a[0] == 0) ? dgInt32 (0xffffffff) : dgInt32 (0),
-						 (a[1] == 0) ? dgInt32 (0xffffffff) : dgInt32 (0),
-						 (a[2] == 0) ? dgInt32 (0xffffffff) : dgInt32 (0),
-					     (a[3] == 0) ? dgInt32 (0xffffffff) : dgInt32 (0));
+		return dgVector ((a[0] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
+						 (a[1] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
+						 (a[2] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
+					     (a[3] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f));
 	}
 
 
@@ -1379,7 +1379,7 @@ class dgVector
 
 	DG_INLINE dgVector TestZero() const
 	{
-		return _mm_cmpeq_epi32 (m_typeInt, m_zero.m_typeInt);
+		return dgVector (_mm_cmpeq_epi32 (m_typeInt, m_zero.m_typeInt)) & m_negOne;
 	}
 
 	DG_INLINE dgVector Floor () const
