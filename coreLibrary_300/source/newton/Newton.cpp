@@ -636,33 +636,6 @@ void NewtonSetFrictionModel(const NewtonWorld* const newtonWorld, int model)
 	world->SetFrictionMode (model);
 }
 
-/*
-void NewtonSetPerformanceClock(const NewtonWorld* const newtonWorld, NewtonGetTicksCountCallback callback)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-	//Newton* const world = (Newton *)newtonWorld;
-	//world->SetPerfomanceCounter ((OnGetPerformanceCountCallback) callback);
-}
-
-unsigned NewtonReadPerformanceTicks(const NewtonWorld* const newtonWorld, unsigned performanceEntry)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert (0);
-	return 0;
-//	Newton* const world = (Newton *)newtonWorld;
-//	return world->GetPerfomanceTicks (performanceEntry);
-}
-
-unsigned NewtonReadThreadPerformanceTicks (const NewtonWorld* newtonWorld, unsigned threadIndex)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert(0);
-	return 0;
-	//Newton* const world = (Newton *)newtonWorld;
-	//return world->GetThreadPerfomanceTicks (threadIndex);
-}
-*/
 
 /*!
   Advance the simulation by an amount of time.
@@ -672,9 +645,10 @@ unsigned NewtonReadThreadPerformanceTicks (const NewtonWorld* newtonWorld, unsig
 
   @return Nothing
 
-  This function will advance the simulation by the amount of time specified by *timestep*. The Newton Engine does
-  not perform sub-steps, and does not need tuning parameters. It is the responsibility of the application to
-  ensure that *timestep* is small enough to guarantee physics stability.
+  This function will advance the simulation by the amount of time specified by
+  *timestep*. The Newton Engine does not perform sub-steps, and does not need
+  tuning parameters. It is the responsibility of the application to ensure that
+  *timestep* is small enough to guarantee physics stability.
 
   @return This function call NewtonCollisionUpdate at the lower level
   to get the colliding contacts. fixme: is this true? there is no
@@ -692,7 +666,6 @@ void NewtonUpdate(const NewtonWorld* const newtonWorld, dFloat timestep)
 
 	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
 
-//NewtonSerializeToFile (newtonWorld, "xxx.bin", NULL, NULL);
 	world->UpdatePhysics (timestep);
 }
 
