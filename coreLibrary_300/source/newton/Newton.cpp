@@ -741,20 +741,7 @@ void NewtonDestroyAllBodies(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
-  // fixme: cleanup
-//	dFloat p0[4];
-//	dFloat p1[4];
-//	p0[0] = -100.0f;
-//	p0[1] = -100.0f;
-//	p0[2] = -100.0f;
-//	p1[0] = 100.0f;
-//	p1[1] = 100.0f;
-//	p1[2] = 100.0f;
-//	NewtonSetWorldSize (newtonWorld, p0, p1);
-
 	Newton* const world = (Newton *) newtonWorld;
-
-//	world->RagDollList::DestroyAll();
 	world->DestroyAllBodies ();
 }
 
