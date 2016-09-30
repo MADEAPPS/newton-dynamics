@@ -90,12 +90,12 @@ void SaveCollision (const NewtonCollision* const collisionPtr)
 
 
 /*!
-  Return the exact amount of memory use by the engine and any given time time.
-
+  Return the exact amount of memory (in Bytes) use by the engine at any given time.
 
   @return total memory use by the engine.
 
-  this function is useful for application to determine if the memory use by the engine is balanced at all time.
+  Applications can use this function to ascertain that the memory use by the
+  engine is balanced at all times.
 
   See also: ::NewtonCreate
 */
@@ -149,10 +149,9 @@ World interface
 /*!
   Create an instance of the Newton world.
 
-  @return a pointer to an instance of the Newton world.
+  @return Pointer to new Newton world.
 
-  this function must be called before any of the other API functions.
-
+  This function must be called before any of the other API functions.
 
   See also: ::NewtonDestroy, ::NewtonDestroyAllBodies
 */
@@ -165,6 +164,19 @@ NewtonWorld* NewtonCreate()
 	return world;
 }
 
+/*!
+  Create an instance of the Newton world.
+
+  @param stackSizeInMegabytes Assign this much memory to each thread.
+  @return Pointer to new Newton world.
+
+  This function does the same as ::NewtonCreate, except that it accepts an extra
+  argument to specify the stack size for each thread. This is only useful for
+  simulation with very many (ie thousands or more objects). If in doubt, use
+  ::NewtonCreate as it uses reasonable defaults.
+
+  See also: ::NewtonDestroy, ::NewtonDestroyAllBodies
+*/
 NewtonWorld* NewtonCreateEx (int stackSizeInMegabytes)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -178,8 +190,7 @@ NewtonWorld* NewtonCreateEx (int stackSizeInMegabytes)
 /*!
   Destroy an instance of the Newton world.
 
-  @param *newtonWorld pointer to the Newton world.
-
+  @param *newtonWorld Pointer to the Newton world.
   @return Nothing.
 
   This function will destroy the entire Newton world.
@@ -189,7 +200,7 @@ NewtonWorld* NewtonCreateEx (int stackSizeInMegabytes)
 void NewtonDestroy(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	
+
 	Newton* const world = (Newton *) newtonWorld;
 	dgMemoryAllocator* const allocator = world->dgWorld::GetAllocator();
 
@@ -218,7 +229,7 @@ dFloat NewtonGetContactMergeTolerance (const NewtonWorld* const newtonWorld)
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
 	return world->GetContactMergeTolerance();
-}	
+}
 
 void NewtonSetContactMergeTolerance (const NewtonWorld* const newtonWorld, dFloat tolerance)
 {
