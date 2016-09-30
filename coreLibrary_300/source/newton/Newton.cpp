@@ -1697,27 +1697,6 @@ dgAssert (0);
 return 0;
 }
 
-/*
-// fixme: delete NewtonMaterialGetCurrentTimestep?
-// Get the current time step.
-//
-// @param materialHandle pointer to a material pair
-// 
-// @return the current time step.
-//
-// This function can only be called from a material callback event handler. The function can be useful for the implementation of powered contacts.
-// 
-// See also: ::NewtonMaterialSetCollisionCallback
-dFloat NewtonMaterialGetCurrentTimestep(const NewtonMaterial* const materialHandle)
-{
-	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
-//	return material->m_currTimestep;
-
-	dgAssert (material->m_body0);
-	return material->m_body0->GetWorld()->GetTimeStep();
-}
-*/
-
 
 /*!
   Calculate the speed of this contact along the normal vector of the contact.
