@@ -17,7 +17,6 @@ API functions by group.
    TransUtil <api/TransUtil>
    RigidBodyInterface <api/RigidBodyInterface>
    ConstraintBall <api/ConstraintBall>
-   JointHinge <api/JointHinge>
    JointSlider <api/JointSlider>
    JointCorkscrew <api/JointCorkscrew>
    JointUniversal <api/JointUniversal>
