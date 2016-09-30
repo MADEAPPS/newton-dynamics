@@ -7302,56 +7302,6 @@ void* NewtonJointGetUserData(const NewtonJoint* const joint)
 	return contraint->GetUserData();
 }
 
-/*
-// fixme: delete NewtonJointGetBody0/
-// Retrieve the first rigid body controlled by this joint.
-//
-// @param *joint pointer to the joint.
-//
-// @return pointer the first body
-// 
-// See also: ::NewtonJointGetBody1
-NewtonBody* NewtonJointGetBody0(const NewtonJoint* const joint)
-{
-	dgBody* const body;
-	dgWorld* const world;
-	dgConstraint* const contraint;
-	dgConstraint* const contraint = (dgConstraint*) joint;
-
-	body = contraint->GetBody0();
-	world = body->GetWorld();
-	if (body == world->GetSentinelBody()) {
-		body = NULL;
-	}
-	return (NewtonBody*) body;
-}
-
-
-// fixme: delete NewtonJointGetBody1?
-// Retrieve the second rigid body controlled by this joint.
-//
-// @param *joint pointer to the joint.
-//
-// @return pointer the second body.
-// 
-// See also: ::NewtonJointGetBody0
-NewtonBody* NewtonJointGetBody1(const NewtonJoint* const joint)
-{
-	dgBody* const body;
-	dgWorld* const world;
-	dgConstraint* const contraint;
-	dgConstraint* const contraint = (dgConstraint*) joint;
-
-	body = contraint->GetBody1();
-	world = body->GetWorld();
-	if (body == world->GetSentinelBody()) {
-		body = NULL;
-	}
-	return (NewtonBody*) body;
-}
-*/
-
-
 /*!
   Get creation parameters for this joint.
 
