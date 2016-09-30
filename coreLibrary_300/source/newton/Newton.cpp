@@ -89,23 +89,6 @@ void SaveCollision (const NewtonCollision* const collisionPtr)
 #endif
 
 
-
-/*
-fixme: where does this belong?
-
-// globalScale - global scale factor that will scale all internal tolerance.
-// the physics system in theory should be dimensionless, however in practice the engine have to be implemented with
-// limited precision floating numbers and is also built for real-time simulation, it is inevitable that tolerances have to be used in order to increase performance, and 
-// reduce instabilities. These tolerances make the engine dimension dependent, for example let say a rigid body is considered at rest when 
-// its velocity is less than 0.01 units per second for some frames. For a program using meters as unit this translate to 0.01 meters per second, 
-// however for a program using centimeter this translate to 0.0001 meter per second, since the precession of speed is independent of the unit system, 
-// this means that in the second system the engine has to work much harder to bring the body to rest. A solution for this is to scale all tolerances 
-// to match the unit system. The argument *globalScale* must be a constant to convert the unit system in the game to meters, for example if in your game you are using 39 units is a meter, 
-// the *globaScale* must be 39. The exact conversion factor does not have to be exact, but the closer it is to reality the better performance the application will get.
-// Applications that are already using meters as the unit system must pass 1.0 as *globalSscale*.
-*/
-
-
 /*!
   Return the exact amount of memory use by the engine and any given time time.
 
