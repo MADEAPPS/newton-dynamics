@@ -1,0 +1,2 @@
+-e git+https://github.com/olitheolix/breathe.git@9633d61345f30dd1c2947b3c88b7c1b702a76470#egg=breathe
+-e git+https://github.com/olitheolix/guzzle_sphinx_theme.git@bc7a87bc8accddbbf5954ed2825072cb47f166a0#egg=guzzle_sphinx_theme
