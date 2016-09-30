@@ -4132,53 +4132,6 @@ NewtonCollision* NewtonCreateCollisionFromSerialization(const NewtonWorld* const
 	return  (NewtonCollision*) world->CreateCollisionFromSerialization ((dgDeserialize) deserializeFunction, serializeHandle);
 }
 
-/*
-// fixme: delete NewtonCreateTreeCollisionFromSerialization?
-// Create a tree collision and load the polygon mesh via a serialization function.
-//
-// @param *newtonWorld is the pointer to the Newton world.
-// @param *userCallback pointer to an event function to call before Newton is begins collecting polygons that are colliding with a body. This parameter can be NULL.
-// @param callback pointer to the callback function that will handle the serialization.
-// @param  *userData	- user data that will be passed as the argument to *NewtonSerialize* callback.
-//
-// @return Nothing.
-//
-// if this function is call on a non tree collision, the results are unpredictable.
-//
-// Small and medium size *TreeCollision* objects (under 50000 polygons) can be constructed at application startup without significant processing overhead.
-// However, for very large polygons sets (over 50000 polygons) it is recommended that the application use *NewtonCreateTreeCollision* 
-// in an off-line tool. Then the application can call this function to store the *TreeCollision* to a file or 
-// any file packer system the application is using. At run time the application can use the function *NewtonCreateTreeCollisionFromSerialization* 
-// to create and load a pre-made *TreeCollision*
-//
-// See also: ::NewtonCollisionSerialize, ::NewtonCollisionGetInfo
-NewtonCollision* NewtonCreateTreeCollisionFromSerialization(const NewtonWorld* const newtonWorld, NewtonTreeCollisionCallback userCallback, NewtonDeserialize deserializeFunction, void* const serializeHandle)
-{
-	Newton* const world;
-	dgCollisionInstance* const collision;
-	NewtonCollisionTree *dataBase;
-
-	Newton* const world = (Newton *)newtonWorld;
-
-	dataBase = new NewtonCollisionTree (world, userCallback);
-	dataBase->Deserialize (deserializeFunction, serializeHandle);
-
-	dgVector p0; 
-	dgVector p1; 
-
-	dataBase->GetAABB (p0, p1);
-
-	Newton* const world = (Newton *)newtonWorld;
-
-	collision = world->CreatePolygonSoup (dataBase,
-		NewtonCollisionTree::GetIntersectingPolygons, 
-		NewtonCollisionTree::RayHit, 
-		NewtonCollisionTree::Destroy, NULL, NULL);
-
-	collision->SetCollisionBBox(p0, p1);
-	return (NewtonCollision*)collision;
-}
-*/
 
 /*!
   Get creation parameters for this collision objects.
