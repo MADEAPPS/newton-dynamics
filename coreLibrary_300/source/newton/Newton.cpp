@@ -725,23 +725,6 @@ void NewtonSetMinimumFrameRate(const NewtonWorld* const newtonWorld, dFloat fram
 	world->m_maxTimeStep = dgFloat32(1.0f) / frameRate;
 }
 
-/*
-// fixme: delete NewtonGetTimeStep?
-// Return the correct time step for this simulation update.
-//
-// @param *newtonWorld is the pointer to the Newton world.
-//
-// This application can used this function to get the current simulation time step. 
-// 
-// @return correct update timestep.
-dFloat NewtonGetTimeStep(const NewtonWorld* const newtonWorld)
-{
-	Newton* const world;
-	Newton* const world = (Newton *)newtonWorld;
-	return world->GetTimeStep();
-}
-*/
-
 /*!
   Remove all bodies and joints from the newton world.
 
@@ -758,6 +741,7 @@ void NewtonDestroyAllBodies(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 
+  // fixme: cleanup
 //	dFloat p0[4];
 //	dFloat p1[4];
 //	p0[0] = -100.0f;
