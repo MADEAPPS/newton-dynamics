@@ -240,17 +240,21 @@ void NewtonSetContactMergeTolerance (const NewtonWorld* const newtonWorld, dFloa
 
 
 /*!
-  Reset all internal states of the engine.
+  Reset all internal engine states.
 
   @param *newtonWorld Pointer to the Newton world.
 
-  When an application wants to reset the state of all the objects in the world to a predefined initial condition,
-  just setting the initial position and velocity is not sufficient to reproduce equal runs since the engine maintain
-  there are internal states that in order to take advantage of frame to frame coherence.
-  In this cases this function will reset all of the internal states.
+  Call this function whenever you want to create a reproducible simulation from
+  a pre-defined initial condition.
 
-  This function must be call outside of a Newton Update. this function should only be used for special case of synchronization,
-  using it as part of the simulation loop will severally affect the engine performance.
+  It does *not* suffice to merely reset the position and velocity of
+  objects. This is because Newton takes advantage of frame-to-frame coherence for
+  performance reasons.
+
+  This function must be called outside of a Newton Update.
+
+  Note: this kind of synchronization incurs a heavy performance penalty if
+  called during each update.
 
   See also: ::NewtonUpdate
 */
@@ -289,6 +293,8 @@ void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char
 	Newton* const world = (Newton *) newtonWorld;
 	world->DeserializeFromFile (filename, dgWorld::OnBodyDeserialize (bodyCallback), bodyUserData);
 }
+
+// fixme: why are these functions commented?
 
 /*
 void NewtonSerializeBodyArray (const NewtonWorld* const newtonWorld, NewtonBody** const bodyArray, int bodyCount, NewtonOnBodySerializationCallback serializeBody, NewtonSerializeCallback serializeFunction, void* const serializeHandle)
@@ -713,18 +719,17 @@ void NewtonWaitForUpdateToFinish (const NewtonWorld* const newtonWorld)
 
 
 
-
-
 /*!
   Set the minimum frame rate at which the simulation can run.
 
-  @param *newtonWorld is the pointer to the Newton world
-  @param frameRate minimum frame rate of the simulation in frame per second. This value is clamped between 60fps and 1000fps
+  @param *newtonWorld Pointer to the Newton world.
+  @param frameRate Minimum FPS. This value is clamped between 60fps and 1000fps
 
   @return nothing
 
-  the default minimum frame rate of the simulation is 60 frame per second. When the simulation falls below the specified minimum frame, Newton will
-  perform sub steps in order to meet the desired minimum FPS.
+  The default minimum frame rate of the simulation is 60 frame per second.
+  Newton will perform sub steps to meet the desired minimum FPS, should the
+  frame rate drop below the specified minimum.
 */
 void NewtonSetMinimumFrameRate(const NewtonWorld* const newtonWorld, dFloat frameRate)
 {
@@ -737,14 +742,17 @@ void NewtonSetMinimumFrameRate(const NewtonWorld* const newtonWorld, dFloat fram
 }
 
 /*!
-  Remove all bodies and joints from the newton world.
+  Remove all bodies and joints from the Newton world.
 
-  @param *newtonWorld is a pointer to the Newton world
+  @param *newtonWorld Pointer to the Newton world.
 
   @return Nothing
 
-  This function will destroy all bodies and all joints in the Newton world, but it will retain group IDs.
-  Use this function for when you want to clear the world but preserve all the group IDs and material pairs.
+  This function will destroy all bodies and all joints in the Newton world, but
+  will retain group IDs.
+
+  Use this function for when you want to clear the world but preserve all the
+  group IDs and material pairs.
 
   See also: ::NewtonMaterialDestroyAllGroupID
 */
@@ -759,19 +767,30 @@ void NewtonDestroyAllBodies(const NewtonWorld* const newtonWorld)
 /*!
   Set a function callback to be call on each island update.
 
-  @param *newtonWorld is the pointer to the Newton world
-  @param islandUpdate application defined callback
+  @param *newtonWorld Pointer to the Newton world.
+  @param islandUpdate callback function.
 
   @return Nothing.
 
-  The application can set a function callback to be called just after the array of all bodies making an island of articulated and colliding bodies are collected for resolution.
-  This function will be called just before the array is accepted for solution and integration.
-  The function callback may return one to validate the array or zero to skip the resolution of this array of bodies on this frame only.
-  This functionality can be used by the application to implement in game physics LOD. For example the application can determine the AABB of the
-  island and check against the view frustum, if the entire island AABB is invisible then the application can suspend simulation even if they are not in equilibrium.
-  another functionality is the implementation of visual debuggers, and also the implementation of auto frozen bodies under arbitrary condition set by the logic of the application.
+  The application can set a function callback to be called just after the array
+  of all bodies making an island of connected bodies are collected. This
+  function will be called just before the array is accepted for contact
+  resolution and integration.
 
-  The application should not modify the position, velocity, or it create or destroy any body or joint during this function call. Doing so will result in unpredictable malfunctions.
+  The callback function must return an integer 0 or 1 to either skip or process
+  the bodies in that particular island.
+
+  Applications can leverage this function to implement an game physics LOD. For
+  example the application can determine the AABB of the island and check it
+  against the view frustum. If the entire island AABB is invisible, then the
+  application can suspend its simulation, even if it is not in equilibrium.
+
+  Other possible applications are to implement of a visual debugger, or freeze
+  entire islands for application specific reasons.
+
+  The application must not create, modify, or destroy bodies inside the callback
+  or risk putting the engine into an undefined state (ie it will crash, if you
+  are lucky).
 
   See also: ::NewtonIslandGetBody
 */
@@ -785,7 +804,7 @@ void NewtonSetIslandUpdateEvent(const NewtonWorld* const newtonWorld, NewtonIsla
 
 
 /*!
-  get th first body in the body in the world body list.
+  Get the first body in the body in the world body list.
 
   @param *newtonWorld Pointer to the Newton world.
 
@@ -817,16 +836,17 @@ NewtonBody* NewtonWorldGetFirstBody(const NewtonWorld* const newtonWorld)
 
 
 /*!
-  get the fixt body in the general body.
+  Get the first body in the general body.
 
   @param *newtonWorld Pointer to the Newton world.
   @param curBody fixme
 
   @return nothing
 
-  The application can call this function to iterate thought every body in the world.
+  The application can call this function to iterate through every body in the world.
 
   The application call this function for debugging purpose
+
   See also: ::NewtonWorldGetFirstBody, ::NewtonWorldForEachBodyInAABBDo, ::NewtonWorldForEachJointDo
 */
 NewtonBody* NewtonWorldGetNextBody(const NewtonWorld* const newtonWorld, const NewtonBody* const curBody)
@@ -846,19 +866,19 @@ NewtonBody* NewtonWorldGetNextBody(const NewtonWorld* const newtonWorld, const N
 
 
 /*!
-  Iterate thought every joint in the world calling the function callback.
+  Trigger callback function for each joint in the world.
 
   @param *newtonWorld Pointer to the Newton world.
-  @param callback application define callback
-  @param *userData pointer to the user defined user data value.
+  @param callback The callback function to invoke for each joint.
+  @param *userData User data to pass into the callback.
 
   @return nothing
 
-  The application can call this function to iterate thought every joint in the world.
-  the application should provide the function *NewtonJointIterator callback* to be called by Newton for every joint in the world
+  The application should provide the function *NewtonJointIterator callback* to
+  be called by Newton for every joint in the world.
 
-  this function affect severally the performance of Newton. The application should call this function only for debugging
-  or for serialization purposes.
+  Note that this function is primarily for debugging. The performance penalty
+  for calling it is high.
 
   See also: ::NewtonWorldForEachBodyInAABBDo, ::NewtonWorldGetFirstBody
 */
@@ -885,22 +905,23 @@ void NewtonWorldForEachJointDo(const NewtonWorld* const newtonWorld, NewtonJoint
 
 
 /*!
-  Iterate thought every body in the world that intersect the AABB calling the function callback.
+  Trigger a callback for every body that intersects the specified AABB.
 
   @param *newtonWorld Pointer to the Newton world.
-  @param  *p0 - pointer to an array of at least three floats to hold minimum value for the AABB.
-  @param  *p1 - pointer to an array of at least three floats to hold maximum value for the AABB.
+  @param *p0 - pointer to an array of at least three floats to hold minimum value for the AABB.
+  @param *p1 - pointer to an array of at least three floats to hold maximum value for the AABB.
   @param callback application defined callback
   @param *userData pointer to the user defined user data value.
 
   @return nothing
 
-  The application can call this function to iterate thought every body in the world.
-  the application should provide the function *NewtonBodyIterator callback* to be called by Newton for every body in the world
+  The application should provide the function *NewtonBodyIterator callback* to
+  be called by Newton for every body in the world.
 
-  For relatively small AABB volumes this function is much more inefficients
-  that NewtonWorldGetFirstBody, however in case where the AABB contain must of the objects in the scene,
-  the overhead of scanning the internal Broad face collision plus the AABB test make this function more expensive.
+  For small AABB volumes this function is much more inefficients (fixme: more or
+  less efficient?) than NewtonWorldGetFirstBody. However, if the AABB contains
+  the majority of objects in the scene, the overhead of scanning the internal
+  Broadphase collision plus the AABB test make this function more expensive.
 
   See also: ::NewtonWorldGetFirstBody
 */
@@ -919,11 +940,13 @@ void NewtonWorldForEachBodyInAABBDo(const NewtonWorld* const newtonWorld, const 
 /*!
   Return the current library version number.
 
+  @return version number as an integer, eg 314.
 
-  @return release decimal three digit value x.xx
-  the first digit:  is mayor version number (interface changes among other things)
-  the second digit: is mayor patch number (new features, and bug fixes)
-  third digit: is minor bug fixed patch.
+  The version number is a three-digit integer.
+
+  First digit:  major version (interface changes among other things)
+  Second digit: major patch number (new features, and bug fixes)
+  Third Digit:  minor bug fixed patch.
 */
 int NewtonWorldGetVersion()
 {
@@ -931,11 +954,11 @@ int NewtonWorldGetVersion()
 	return NEWTON_MAJOR_VERSION * 100 + NEWTON_MINOR_VERSION;
 }
 
+
 /*!
-  Return the current sizeof of float value in bytes.
+  Return the size of a Newton dFloat in bytes.
 
-
-  @return sizeof of float value in bytes
+  @return sizeof(dFloat)
 */
 int NewtonWorldFloatSize ()
 {
@@ -952,10 +975,13 @@ int NewtonWorldFloatSize ()
 
   @return Nothing.
 
-  The application can store a user defined value with the Newton world. The user data is useful for application developing
-  object oriented classes based on the Newton API.
+  The application can attach custom data to the Newton world. Newton will never
+  look at this data.
 
-  See also: ::NewtonWorldGetUserData
+  The user data is useful for application developing object oriented classes
+  based on the Newton API.
+
+  See also: ::NewtonBodyGetUserData, ::NewtonWorldSetUserData, ::NewtonWorldGetUserData
 */
 void NewtonWorldSetUserData(const NewtonWorld* const newtonWorld, void* const userData)
 {
@@ -965,17 +991,14 @@ void NewtonWorldSetUserData(const NewtonWorld* const newtonWorld, void* const us
 }
 
 /*!
-  Retrieve a user previously stored user define value with the world.
+  Retrieve the user data attached to the world.
 
   @param *newtonWorld Pointer to the Newton world.
 
-  @return user data value.
+  @return Pointer to user data.
 
-  The application can store a user defined value with the Newton world. The user data is useful for application developing
-  object oriented classes based on the Newton API.
-
-  See also: ::NewtonWorldSetDestructorCallback, ::NewtonWorldGetUserData
-*/
+  See also: ::NewtonBodySetUserData, ::NewtonWorldSetUserData, ::NewtonWorldGetUserData
+  */
 void* NewtonWorldGetUserData(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -984,14 +1007,14 @@ void* NewtonWorldGetUserData(const NewtonWorld* const newtonWorld)
 }
 
 /*!
-  set a function pointer as destructor call back.
+  Specify a custom destructor callback for destroying the world.
 
   @param *newtonWorld Pointer to the Newton world.
   @param destructor function poiter callback
 
-  The application can store a user defined destructor call back function to be called at the  time the world is to be destroyed
+  The application may specify its own world destructor.
 
-  See also: ::NewtonWorldGetUserData
+  See also: ::NewtonWorldSetDestructorCallback, ::NewtonWorldGetUserData
 */
 void NewtonWorldSetDestructorCallback(const NewtonWorld* const newtonWorld, NewtonWorldDestructorCallback destructor)
 {
@@ -1002,11 +1025,9 @@ void NewtonWorldSetDestructorCallback(const NewtonWorld* const newtonWorld, Newt
 
 
 /*!
-  Return the function call back Pointer.
+  Return pointer to destructor call back function.
 
   @param *newtonWorld Pointer to the Newton world.
-
-  The application can store a user defined destructor call back function to be called at the  time the world is to be destroyed
 
   See also: ::NewtonWorldGetUserData, ::NewtonWorldSetDestructorCallback
 */
@@ -1077,15 +1098,12 @@ void* NewtonWorldGetPostListener (const NewtonWorld* const newtonWorld, const ch
 }
 
 
-
-
-
 /*!
-  return the total number of rigid bodies in the world.
+  Return the total number of rigid bodies in the world.
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld Pointer to the Newton world.
 
-  @return number of rigid bodies in this world.
+  @return Number of rigid bodies in the world.
 
 */
 int NewtonWorldGetBodyCount(const NewtonWorld* const newtonWorld)
@@ -1096,13 +1114,11 @@ int NewtonWorldGetBodyCount(const NewtonWorld* const newtonWorld)
 }
 
 /*!
-  return the total number of constraints in the world.
+  Return the total number of constraints in the world.
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld pointer to the Newton world.
 
-  this function will return the total number of joint including contacts
-
-  @return number of rigid bodies in this world.
+  @return number of constraints.
 
 */
 int NewtonWorldGetConstraintCount(const NewtonWorld* const newtonWorld)
@@ -1114,39 +1130,50 @@ int NewtonWorldGetConstraintCount(const NewtonWorld* const newtonWorld)
 
 
 /*!
-  Shoot a ray from p0 to p1 and call the application callback with each ray intersection.
+  Shoot ray from point p0 to p1 and trigger callback for each body on that line.
 
-  @param *newtonWorld is the pointer to the world.
-  @param  *p0 - pointer to an array of at least three floats containing the beginning of the ray in global space.
-  @param  *p1 - pointer to an array of at least three floats containing the end of the ray in global space.
-  @param filter user define function to be called for each body hit during the ray scan.
-  @param *userData user data to be passed to the filter callback.
-  @param prefilter user define function to be called for each body before intersection.
-  @param threadIndex thread index from whe thsi function is called, zero if call form outsize a newton update
+  @param *newtonWorld Pointer to the Newton world.
+  @param *p0 - pointer to an array of at least three floats containing the beginning of the ray in global space.
+  @param *p1 - pointer to an array of at least three floats containing the end of the ray in global space.
+  @param filter Callback function for each hit during the ray scan.
+  @param *userData user data to pass along to the filter callback.
+  @param prefilter user defined function to be called for each body before intersection.
+  @param threadIndex Index of thread that called this function (zero if called form outsize a newton update).
 
   @return nothing
 
-  The ray cast function will call the application with each body intersecting the line segment.
-  By writing the callback filter function in different ways the application can implement different flavors of ray casting.
-  For example an all body ray cast can be easily implemented by having the filter function always returning 1.0, and copying each
-  rigid body into an array of pointers; a closest hit ray cast can be implemented by saving the body with the smaller intersection
-  parameter and returning the parameter t; and a report the first body hit can be implemented by having the filter function returning
-  zero after the first call and saving the pointer to the rigid body.
+  The ray cast function will trigger the callback for every intersection between
+  the line segment (from p0 to p1) and a body in the world.
 
-  The most common use for the ray cast function is the closest body hit, In this case it is important, for performance reasons,
-  that the filter function returns the intersection parameter. If the filter function returns a value of zero the ray cast will terminate
-  immediately.
+  By writing the callback filter function in different ways the application can
+  implement different flavors of ray casting. For example an all body ray cast
+  can be easily implemented by having the filter function always returning 1.0,
+  and copying each rigid body into an array of pointers; a closest hit ray cast
+  can be implemented by saving the body with the smaller intersection parameter
+  and returning the parameter t; and a report the first body hit can be
+  implemented by having the filter function returning zero after the first call
+  and saving the pointer to the rigid body.
 
-  if prefilter is not NULL, Newton will call the application right before executing the intersections between the ray and the primitive.
-  if the function returns zero the Newton will not ray cast the primitive. passing a NULL pointer will ray cast the.
-  The application can use this implement faster or smarter filters when implementing complex logic, otherwise for normal all ray cast
-  this parameter could be NULL.
+  The most common use for the ray cast function is the closest body hit, In this
+  case it is important, for performance reasons, that the filter function
+  returns the intersection parameter. If the filter function returns a value of
+  zero the ray cast will terminate immediately.
 
-  The ray cast function is provided as an utility function, this means that even thought the function is very high performance
-  by function standards, it can not by batched and therefore it can not be an incremental function. For example the cost of calling 1000
-  ray cast is 1000 times the cost of calling one ray cast. This is much different than the collision system where the cost of calculating
-  collision for 1000 pairs in much, much less that the 1000 times the cost of one pair. Therefore this function must be used with care,
-  as excessive use of it can degrade performance.
+  if prefilter is not NULL, Newton will call the application right before
+  executing the intersections between the ray and the primitive. if the function
+  returns zero the Newton will not ray cast the primitive. passing a NULL
+  pointer will ray cast the. The application can use this implement faster or
+  smarter filters when implementing complex logic, otherwise for normal all ray
+  cast this parameter could be NULL.
+
+  The ray cast function is provided as an utility function, this means that even
+  thought the function is very high performance by function standards, it can
+  not by batched and therefore it can not be an incremental function. For
+  example the cost of calling 1000 ray cast is 1000 times the cost of calling
+  one ray cast. This is much different than the collision system where the cost
+  of calculating collision for 1000 pairs in much, much less that the 1000 times
+  the cost of one pair. Therefore this function must be used with care, as
+  excessive use of it can degrade performance.
 
   See also: ::NewtonWorldConvexCast
 */
@@ -1165,7 +1192,7 @@ void NewtonWorldRayCast(const NewtonWorld* const newtonWorld, const dFloat* cons
 /*!
   cast a simple convex shape along the ray that goes for the matrix position to the destination and get the firsts contacts of collision.
 
-  @param *newtonWorld is the pointer to the world.
+  @param *newtonWorld Pointer to the Newton world.
   @param *matrix pointer to an array of at least three floats containing the beginning and orienetaion of the shape in global space.
   @param *target pointer to an array of at least three floats containing the end of the ray in global space.
   @param shape collision shap[e use to cat the ray.
@@ -1220,25 +1247,15 @@ int NewtonWorldCollide (const NewtonWorld* const newtonWorld, const dFloat* cons
 }
 
 
-
 /*!
-  Get the body indexed by bodyIndex form and island.
+  Retrieve body by index from island.
 
-  @param *island is the pointer to current island
-  @param bodyIndex index to the body in current island
+  @param Pointer to simulation island.
+  @param bodyIndex Index of body on current island.
 
-  @return body at location bodtIndex.
+  @return requested body. fixme: does it return NULL on error?
 
   This function can only be called from an island update callback.
-
-  The application can set a function callback to be called just after the array of all bodies making an island of connected bodies are collected.
-  This function will be called just before the array is accepted for solution and integration.
-  The function callback may return one to validate the array of zero to freeze it.
-  This functionality can be used by the application to implement in game physics LOD. For example the application can determine the AABB of the
-  island and check against the view frustum, if the entire island AABB is invisible then the application can suspend simulation even if they are not in equilibrium.
-  another functionality is the implementation of visual debuggers, and also the implementation of auto frozen bodies under arbitrary condition set by the logic of the application.
-
-  The application should not modify any parameter of the origin body when the callback is called, nor it should create or destroy any body or joint. Do so will result in unpredictable malfunction.
 
   See also: ::NewtonSetIslandUpdateEvent
 */
@@ -1253,31 +1270,12 @@ NewtonBody* NewtonIslandGetBody(const void* const island, int bodyIndex)
 /*!
   Return the AABB of the body on this island
 
-  @param island is the pointer to current island
-  @param bodyIndex index to the body in current island
-  @param    p0 - fixme
-  @param    p1 - fixme
+  @param Pointer to simulation island.
+  @param bodyIndex index to the body in current island.
+  @param p0 - fixme
+  @param p1 - fixme
 
   This function can only be called from an island update callback.
-
-  The application can set a function callback to be called
-  just after the array of all bodies making an island of connected
-  bodies are collected. This function will be called just before the
-  array is accepted for solution and integration. The function
-  callback may return one to validate the array of zero to freeze it.
-  This functionality can be used by the application to implement in
-  game physics LOD. For example the application can determine the AABB
-  of the island and check against the view frustum, if the entire
-  island AABB is invisible then the application can suspend simulation
-  even if they are not in equilibrium. another functionality is the
-  implementation of visual debuggers, and also the implementation of
-  auto frozen bodies under arbitrary condition set by the logic of the
-  application.
-
-  The application should not modify any parameter of the
-  origin body when the callback is called, nor it should create or
-  destroy any body or joint. Do so will result in unpredictable
-  malfunction.
 
   See also: ::NewtonSetIslandUpdateEvent
 */
@@ -1301,7 +1299,7 @@ GroupID interface
 /*!
   Get the value of the default MaterialGroupID.
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld pointer to the Newton world.
 
   @return The ID number for the default Group ID.
 
@@ -1320,7 +1318,7 @@ int NewtonMaterialGetDefaultGroupID(const NewtonWorld* const newtonWorld)
 /*!
   Create a new MaterialGroupID.
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld pointer to the Newton world.
 
   @return The ID of a new GroupID.
 
@@ -1342,7 +1340,7 @@ int NewtonMaterialCreateGroupID(const NewtonWorld* const newtonWorld)
 /*!
   Remove all groups ID from the Newton world.
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld pointer to the Newton world.
 
   @return Nothing.
 
@@ -1370,7 +1368,7 @@ Material setup interface
 /*!
   Set the material interaction between two physics materials  to be collidable or non-collidable by default.
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld pointer to the Newton world.
   @param  id0 - group id0
   @param  id1 - group id1
   @param state state for this material: 1 = collidable; 0 = non collidable
@@ -1395,7 +1393,7 @@ void NewtonMaterialSetDefaultCollidable(const NewtonWorld* const newtonWorld, in
   Set an imaginary thickness between the collision geometry of two colliding bodies whose physics
   properties are defined by this material pair
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld pointer to the Newton world.
   @param  id0 - group id0
   @param  id1 - group id1
   @param thickness material thickness a value form 0.0 to 0.125; the default surface value is 0.0
@@ -1426,7 +1424,7 @@ void NewtonMaterialSetSurfaceThickness(const NewtonWorld* const newtonWorld, int
 /*!
   Set the default coefficients of friction for the material interaction between two physics materials .
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld pointer to the Newton world.
   @param  id0 - group id0
   @param  id1 - group id1
   @param staticFriction static friction coefficients
@@ -1469,7 +1467,7 @@ void NewtonMaterialSetDefaultFriction(const NewtonWorld* const newtonWorld, int 
 /*!
   Set the default coefficients of restitution (elasticity) for the material interaction between two physics materials .
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld pointer to the Newton world.
   @param  id0 - group id0
   @param  id1 - group id1
   @param elasticCoef static friction coefficients
@@ -1493,7 +1491,7 @@ void NewtonMaterialSetDefaultElasticity(const NewtonWorld* const newtonWorld, in
 /*!
   Set the default softness coefficients for the material interaction between two physics materials .
 
-  @param *newtonWorld is the pointer to the Newton world
+  @param *newtonWorld pointer to the Newton world.
   @param  id0 - group id0
   @param  id1 - group id1
   @param softnessCoef softness coefficient
@@ -4496,7 +4494,7 @@ int NewtonBodyGetID (const NewtonBody* const bodyPtr)
   The application can store a user defined value with the Body. This value can be the pointer to a structure containing some application data for special effect.
   if the application allocate some resource to store the user data, the application can register a joint destructor to get rid of the allocated resource when the body is destroyed
 
-  See also: ::NewtonBodyGetUserData, ::NewtonBodySetDestructorCallback
+  See also: ::NewtonBodyGetUserData
 */
 void  NewtonBodySetUserData(const NewtonBody* const bodyPtr, void* const userDataPtr)
 {
@@ -4515,7 +4513,7 @@ void  NewtonBodySetUserData(const NewtonBody* const bodyPtr, void* const userDat
   The application can store a user defined value with a rigid body. This value can be the pointer
   to a structure which is the graphical representation of the rigid body.
 
-  See also: ::NewtonBodySetUserData
+  See also: ::NewtonBodySetUserData, 
 */
 void* NewtonBodyGetUserData(const NewtonBody* const bodyPtr)
 {
@@ -4526,16 +4524,14 @@ void* NewtonBodyGetUserData(const NewtonBody* const bodyPtr)
 
 
 /*!
-  Retrieve get the pointer to the world from the body.
+  Return pointer to the Newton world of the specified body.
 
-  @param *bodyPtr pointer to the body.
+  @param *bodyPtr Pointer to the body.
 
-  @return the world that own this body.
+  @return World that owns this body.
 
-  The application can use this function to determine what world own this body. If the application
-  have to get the world from a joint, it can do so by getting one of the bodies attached to the joint and getting the world from
-  that body.
-
+  The application can also determine the world from a joint, if it queries one
+  of the bodies attached to that joint.
 */
 NewtonWorld* NewtonBodyGetWorld(const NewtonBody* const bodyPtr)
 {
@@ -4559,7 +4555,7 @@ NewtonWorld* NewtonBodyGetWorld(const NewtonBody* const bodyPtr)
 
   The matrix should be organized in row-major order (this is the way directX and OpenGL stores matrices).
 
-  See also: ::NewtonBodyGetUserData, ::NewtonBodyGetUserData
+  See also: NewtonBodyGetTransformCallback
 */
 void  NewtonBodySetTransformCallback(const NewtonBody* const bodyPtr, NewtonSetTransform callback)
 {
@@ -4582,7 +4578,7 @@ void  NewtonBodySetTransformCallback(const NewtonBody* const bodyPtr, NewtonSetT
 
   The matrix should be organized in row-major order (this is the way directX and OpenGL stores matrices).
 
-  See also: ::NewtonBodyGetUserData, ::NewtonBodyGetUserData
+  See also: ::NewtonBodySetTransformCallback
 */
 NewtonSetTransform NewtonBodyGetTransformCallback (const NewtonBody* const bodyPtr)
 {
