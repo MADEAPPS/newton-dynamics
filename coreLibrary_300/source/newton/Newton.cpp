@@ -294,25 +294,6 @@ void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char
 	world->DeserializeFromFile (filename, dgWorld::OnBodyDeserialize (bodyCallback), bodyUserData);
 }
 
-// fixme: why are these functions commented?
-
-/*
-void NewtonSerializeBodyArray (const NewtonWorld* const newtonWorld, NewtonBody** const bodyArray, int bodyCount, NewtonOnBodySerializationCallback serializeBody, NewtonSerializeCallback serializeFunction, void* const serializeHandle)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	world->SerializeBodyArray ((dgBody**)bodyArray, bodyCount, dgWorld::OnBodySerialize (serializeBody), (dgSerialize) serializeFunction, serializeHandle);
-}
-
-void NewtonDeserializeBodyArray (const NewtonWorld* const newtonWorld, NewtonOnBodyDeserializationCallback deserializeBody, NewtonDeserializeCallback serializeFunction, void* const serializeHandle)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	world->DeserializeBodyArray (dgWorld::OnBodyDeserialize (deserializeBody), (dgDeserialize) serializeFunction, serializeHandle);
-}
-*/
-
-
 int NewtonGetCurrentDevice (const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
