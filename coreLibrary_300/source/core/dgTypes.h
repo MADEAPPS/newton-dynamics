@@ -772,62 +772,23 @@ dgUnsigned64 dgGetTimeInMicrosenconds();
 class dgFloatExceptions
 {
 	public:
+	#define DG_FLOAT_EXECTIONS_MASK	(_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE)
+	//#define DG_FLOAT_EXECTIONS_MASK (_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW)
 	//#define DG_FLOAT_EXECTIONS_MASK (_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW| _EM_INEXACT)
-	//#define DG_FLOAT_EXECTIONS_MASK (_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE)
-	//#define DG_FLOAT_EXECTIONS_MASK (_EM_DENORMAL | _EM_ZERODIVIDE)
-	
-	enum dgFloatExceptionMask
-	{
-		#if (defined (_MSC_VER) && defined (_DEBUG))
-			m_InvalidDenormalAndivideByZero = _EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE,
-			m_allExepctions = _EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW,
-		#else
-			m_InvalidDenormalAndivideByZero,
-			m_allExepctions,
-		#endif			
-	};
 
-	dgFloatExceptions(dgFloatExceptionMask mask = m_InvalidDenormalAndivideByZero)
-		:m_mask (0)
-	{
-		#if (defined (_MSC_VER) && defined (_DEBUG))
-			dgClearFP();
-			m_mask = dgControlFP(0, 0);
-			dgControlFP (m_mask & dgUnsigned32 (~mask), _MCW_EM);
-		#endif
-	}
+	dgFloatExceptions(dgUnsigned32 mask = DG_FLOAT_EXECTIONS_MASK);
+	~dgFloatExceptions();
 
-	~dgFloatExceptions()
-	{
-		#if (defined (_MSC_VER) && defined (_DEBUG))
-			dgClearFP();
-			dgControlFP(m_mask, _MCW_EM);
-		#endif
-	}
-
-	dgInt32 m_mask;
+	private:
+	dgUnsigned32 m_mask;
 };
 
 
 class dgSetPrecisionDouble 
 {
 	public:
-	dgSetPrecisionDouble()
-	{
-		#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-			dgClearFP();
-			m_mask = dgControlFP(0, 0);
-			dgControlFP (_PC_53, _MCW_PC);
-		#endif
-	}
-
-	~dgSetPrecisionDouble()
-	{
-		#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-			dgClearFP();
-			dgControlFP (m_mask, _MCW_PC);
-		#endif
-	}
+	dgSetPrecisionDouble();
+	~dgSetPrecisionDouble();
 	dgInt32 m_mask; 
 };
 
