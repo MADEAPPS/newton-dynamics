@@ -1657,23 +1657,6 @@ Contact behavior control interface
 @{
 */
 
-// fixme: delete NewtonMaterialDisableContact?
-// Disable processing for the contact. 
-//
-// @param materialHandle pointer to a material pair
-// 
-// @return Nothing.
-//
-// This function can only be called from a material callback event handler.
-// 
-// See also: ::NewtonMaterialSetCollisionCallback
-// void NewtonMaterialDisableContact(const NewtonMaterial* const materialHandle)
-// {
-// 	material = (dgContactMaterial*) materialHandle;
-// 	dgContactMaterial* const material->m_collisionEnable = false;
-// }
-
-
 /*!
   Get the userData set by the application when it created this material pair.
 
