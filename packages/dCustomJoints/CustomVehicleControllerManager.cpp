@@ -581,6 +581,16 @@ void CustomVehicleController::BodyPartTire::SetBrakeTorque(dFloat torque)
 	tire->m_brakeTorque = dMax (torque, tire->m_brakeTorque);
 }
 
+dFloat CustomVehicleController::BodyPartTire::GetLateralSlip () const
+{
+	return m_lateralSlip;
+}
+
+dFloat CustomVehicleController::BodyPartTire::GetLongitudinalSlip () const
+{
+	return m_longitudinalSlip;
+}
+
 
 CustomVehicleController::BodyPartDifferentialSteering::BodyPartDifferentialSteering(CustomVehicleController* const controller, BodyPartTire* const leftTire, BodyPartTire* const rightTire)
 	:BodyPart()

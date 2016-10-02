@@ -247,6 +247,8 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API void SetBrakeTorque (dFloat torque);
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const; 
+		CUSTOM_JOINTS_API dFloat GetLateralSlip () const;
+		CUSTOM_JOINTS_API dFloat GetLongitudinalSlip () const;
 
 		CUSTOM_JOINTS_API Info GetInfo() const {return m_data;}
 		CUSTOM_JOINTS_API void SetInfo(const Info& info) {};
