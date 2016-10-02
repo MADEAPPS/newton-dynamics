@@ -2487,8 +2487,13 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 						tireContactLongitudinalSpeed = 0.01f * dSign(tireContactLongitudinalSpeed);
 					}
 
-					dFloat longitudinalSlipRatio = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
-					dFloat lateralSideSlip = tireOriginLateralSpeed / dAbs(tireContactLongitudinalSpeed);
+					//dFloat longitudinalSlipRatio = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
+					//dFloat lateralSideSlip = tireOriginLateralSpeed / dAbs(tireContactLongitudinalSpeed);
+					//tire->m_lateralSlip = lateralSideSlip;
+					//tire->m_longitudinalSlip = longitudinalSlipRatio;
+
+					tire->m_longitudinalSlip = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
+					tire->m_lateralSlip = tireOriginLateralSpeed / dAbs(tireContactLongitudinalSpeed);
 
 					dFloat aligningMoment;
 					dFloat lateralForce;
@@ -2498,7 +2503,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 					NewtonMaterialGetContactForce(material, tireBody, &tireLoadForce.m_x);
 					dFloat tireLoad = tireLoadForce.DotProduct3(contactNormal);
 
-					controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, longitudinalSlipRatio, lateralSideSlip, longitudinalForce, lateralForce, aligningMoment);
+					controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, longitudinalForce, lateralForce, aligningMoment);
 				
 					NewtonMaterialSetContactTangentAcceleration (material, 0.0f, 0);
 					NewtonMaterialSetContactTangentFriction(material, dAbs (lateralForce), 0);
