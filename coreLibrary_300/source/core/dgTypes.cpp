@@ -572,14 +572,16 @@ dgFloatExceptions::dgFloatExceptions(dgUnsigned32 mask)
 		dgControlFP (m_mask & ~mask, _MCW_EM);
 	#endif
 
-	//#ifdef _MSC_VER
+	#ifdef _MACOSX_VER
+		fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
+	#else 
 		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-	//#endif
+	#endif
 
-//	dgVector a (1.0f);
-//	dgVector b (0.1f);
-//	while (a.m_x != 0.0f)
-//		a = a.CompProduct4(b);
+//	float a (1.0f);
+//	float b (0.1f);
+//	while (a != 0.0f)
+//		a = a * b;
 }
 
 dgFloatExceptions::~dgFloatExceptions()

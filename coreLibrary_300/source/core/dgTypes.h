@@ -133,9 +133,11 @@
 	#include <sys/sysctl.h>
     #include <assert.h> 
     #if (defined __i386__ || defined __x86_64__)
+		#include <fenv.h>
 		#include <pmmintrin.h> 
 		#include <emmintrin.h>  //sse3
         #include <mmintrin.h> 
+		
 		#ifdef __SSE4_1__
 			#define DG_SSE4_INSTRUCTIONS_SET
 			#include <smmintrin.h>
@@ -772,9 +774,9 @@ dgUnsigned64 dgGetTimeInMicrosenconds();
 class dgFloatExceptions
 {
 	public:
-	#define DG_FLOAT_EXECTIONS_MASK	(_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE)
-	//#define DG_FLOAT_EXECTIONS_MASK (_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW)
-	//#define DG_FLOAT_EXECTIONS_MASK (_EM_INVALID | _EM_DENORMAL | _EM_ZERODIVIDE | _EM_OVERFLOW | _EM_UNDERFLOW| _EM_INEXACT)
+	#define DG_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
+	//#define DG_FLOAT_EXECTIONS_MASK (EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE | EM_OVERFLOW | EM_UNDERFLOW)
+	//#define DG_FLOAT_EXECTIONS_MASK (EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE | EM_OVERFLOW | EM_UNDERFLOW| EM_INEXACT)
 
 	dgFloatExceptions(dgUnsigned32 mask = DG_FLOAT_EXECTIONS_MASK);
 	~dgFloatExceptions();
