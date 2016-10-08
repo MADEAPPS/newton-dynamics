@@ -70,7 +70,7 @@
 #endif 
 
 
-#define D_LCP_MAX_VALUE (1.0e12f)
+
 
 // transcendental functions
 #define	dSqrt(x)	dFloat (sqrt (dFloat(x))) 
@@ -244,7 +244,7 @@ bool dCholeskyFactorizationAddRow(int size, int n, T* const matrix)
 
 		if (n == j) {
 			T diag = rowN[n] - s;
-			if (diag < T(0.0f)) {
+			if (diag <= T(1.0e-6f)) {
 				dAssert(0);
 				return false;
 			}
@@ -348,6 +348,7 @@ void dPermuteRows(int size, int i, int j, T* const matrix, T* const x, T* const 
 }
 
 
+#define D_LCP_MAX_VALUE (1.0e12f)
 // solve a general Linear complementary program (LCP)
 // A * x = b + r
 // subjected to constraints
@@ -393,7 +394,9 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 
 	for (int i = 0; i < count; i++) {
 		if ((low[i] <= T(-D_LCP_MAX_VALUE)) && (high[i] >= T(D_LCP_MAX_VALUE))) {
-			dCholeskyFactorizationAddRow(size, index, matrix);
+			if (!dCholeskyFactorizationAddRow(size, index, matrix)) {
+				return false;
+			}
 			index++;
 		} else {
 			dPermuteRows(size, i, count - 1, matrix, x0, r0, low, high, diagonal, permute);
@@ -433,7 +436,8 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 			if (dAbs(r0[index]) > T(1.0e-12f)) {
 
 				if (calculateDelta_x) {
-					T dir = dSign(r0[index]);
+					//T dir = dSign(r0[index]);
+					T dir = 1.0f;
 					dCalculateDelta_x(size, dir, index, matrix, delta_x);
 				}
 
@@ -442,8 +446,8 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 				dAssert(delta_r[index] != T(0.0f));
 				dAssert(dAbs(delta_x[index]) == T(1.0f));
 
-				T s = -r0[index] / delta_r[index];
-				dAssert(s >= T(0.0f));
+				T s = - r0[index] / delta_r[index];
+				dAssert(dAbs (s) >= T(0.0f));
 
 				for (int i = start; i <= index; i++) {
 					T x1 = x0[i] + s * delta_x[i];
@@ -457,31 +461,35 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 						s = (low[i] - x0[i]) / delta_x[i];
 					}
 				}
-				dAssert(s >= T(0.0f));
+				dAssert(dAbs (s) >= T(0.0f));
 
-				for (int i = clampedIndex; (i < size) && (s > T(1.0e-12f)); i++) {
+				for (int i = clampedIndex; (i < size) && (dAbs(s) > T(1.0e-12f)); i++) {
 					T r1 = r0[i] + s * delta_r[i];
 					if ((r1 * r0[i]) < T(0.0f)) {
 						dAssert(dAbs(delta_r[i]) > T(0.0f));
-						T s1 = -r0[i] / delta_r[i];
-						dAssert(s1 >= T(0.0f));
-						if (s1 < s) {
+						T s1 = - r0[i] / delta_r[i];
+						dAssert(dAbs(s1) >= T(0.0f));
+						dAssert(dAbs(s1) <= dAbs(s));
+						if (dAbs(s1) < dAbs(s)) {
 							s = s1;
 							swapIndex = i;
 						}
 					}
 				}
 
-				if (s > T(1.0e-12f)) {
-					for (int i = 0; i < size; i++) {
-						dAssert((x0[i] + T(1.0e-2f)) >= low[i]);
-						dAssert((x0[i] - T(1.0e-2f)) <= high[i]);
-						x0[i] += s * delta_x[i];
-						r0[i] += s * delta_r[i];
-						dAssert((x0[i] + T(1.0e-2f)) >= low[i]);
-						dAssert((x0[i] - T(1.0e-2f)) <= high[i]);
-					}
+				dAssert(dAbs (s) >= T(0.0f));
+//				if (s > T(1.0e-12f)) {
+				for (int i = 0; i < size; i++) {
+					dAssert((x0[i] + dAbs(x0[i]) * T(1.0e-4f)) >= low[i]);
+					dAssert((x0[i] - dAbs(x0[i]) * T(1.0e-4f)) <= high[i]);
+
+					x0[i] += s * delta_x[i];
+					r0[i] += s * delta_r[i];
+
+					dAssert((x0[i] + dAbs(x0[i]) * T(1.0e-4f)) >= low[i]);
+					dAssert((x0[i] - dAbs(x0[i]) * T(1.0e-4f)) <= high[i]);
 				}
+//				}
 			}
 
 			if (swapIndex == -1) {

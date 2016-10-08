@@ -936,6 +936,82 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 		node->Integrate(controller, timestep);
 		node->ApplyTireTorque(controller);
 	}
+
+/*
+{
+	float b_[3];
+	float x_[3];
+	float low_[3];
+	float high_[3];
+	float A[3][3];
+
+	A[0][0] = 2.0f;
+	A[1][1] = 2.0f;
+	A[2][2] = 2.0f;
+	A[0][1] = 1.0f;
+	A[1][0] = 1.0f;
+	A[0][2] = 1.0f;
+	A[2][0] = 1.0f;
+	A[1][2] = 1.0f;
+	A[2][1] = 1.0f;
+
+	low_[0] = -D_LCP_MAX_VALUE * 2.0f;
+	low_[1] = -D_LCP_MAX_VALUE * 2.0f;
+	low_[2] = -D_LCP_MAX_VALUE * 2.0f;
+	high_[0] = D_LCP_MAX_VALUE * 2.0f;
+	high_[1] = D_LCP_MAX_VALUE * 2.0f;
+	high_[2] = D_LCP_MAX_VALUE * 2.0f;
+
+	x_[0] = 0.0f;
+	x_[1] = 0.0f;
+	x_[2] = 0.0f;
+
+	b_[0] = 10.0f;
+	b_[1] = 10.0f;
+	b_[2] = 10.0f;
+	//low_[2] = -10.0f;
+	//high_[2] = 10.0f;
+	dSolveDantzigLCP(3, &A[0][0], x_, b_, low_, high_);
+	dTrace(("%f %f %f\n", x_[0], x_[1], x_[2]));
+}
+
+{
+float b_[3];
+float x_[3];
+float low_[3];
+float high_[3];
+float A[3][3];
+
+A[0][0] = 2.0f;
+A[1][1] = 2.0f;
+A[2][2] = 2.0f;
+A[0][1] = 1.0f;
+A[1][0] = 1.0f;
+A[0][2] = 1.0f;
+A[2][0] = 1.0f;
+A[1][2] = 1.0f;
+A[2][1] = 1.0f;
+
+low_[0] = -D_LCP_MAX_VALUE * 2.0f;
+low_[1] = -D_LCP_MAX_VALUE * 2.0f;
+low_[2] = -D_LCP_MAX_VALUE * 2.0f;
+high_[0] = D_LCP_MAX_VALUE * 2.0f;
+high_[1] = D_LCP_MAX_VALUE * 2.0f;
+high_[2] = D_LCP_MAX_VALUE * 2.0f;
+
+x_[0] = 0.0f;
+x_[1] = 0.0f;
+x_[2] = 0.0f;
+
+b_[0] = 10.0f;
+b_[1] = 10.0f;
+b_[2] = 10.0f;
+//low_[2] = -10.0f;
+//high_[2] = 10.0f;
+dSolveDantzigLCP(3, &A[0][0], x_, b_, low_, high_);
+dTrace (("%f %f %f\n", x_[0], x_[1], x_[2]));
+}
+*/
 }
 
 CustomVehicleController::EngineController::DriveTrainEngine2W::DriveTrainEngine2W(const dVector& invInertia, const DifferentialAxel& axel)
