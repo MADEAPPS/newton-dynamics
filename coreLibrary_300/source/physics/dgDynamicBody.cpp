@@ -43,6 +43,8 @@ dgDynamicBody::dgDynamicBody()
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
 	,m_applyExtForces(NULL)
+	,m_linearDampOn(true)
+	,m_angularDampOn(true)
 {
 #ifdef DG_USEFULL_INERTIA_MATRIX
 	m_principalAxis = dgGetIdentityMatrix();
@@ -64,7 +66,10 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
 	,m_applyExtForces(NULL)
+	,m_linearDampOn(true)
+	,m_angularDampOn(true)
 {
+	dgInt32 val;
 	m_type = m_dynamicBody;
 	m_rtti |= m_dynamicBodyRTTI;
 
@@ -73,6 +78,9 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
 	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
+	serializeCallback(userData, &val, sizeof (dgInt32));
+	m_linearDampOn = (val & 1) ? true : false;
+	m_angularDampOn = (val & 2) ? true : false;
 
 #ifdef DG_USEFULL_INERTIA_MATRIX
 	serializeCallback(userData, &m_principalAxis, sizeof (m_principalAxis));
@@ -92,10 +100,12 @@ void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collis
 {
 	dgBody::Serialize (collisionRemapId, serializeCallback, userData);
 
+	dgInt32 val = (m_linearDampOn ? 1 : 0) & (m_angularDampOn ? 2 : 0) ;
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
 	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
+	serializeCallback (userData, &val, sizeof (dgInt32));
 
 #ifdef DG_USEFULL_INERTIA_MATRIX
 	serializeCallback(userData, &m_principalAxis, sizeof (m_principalAxis));
