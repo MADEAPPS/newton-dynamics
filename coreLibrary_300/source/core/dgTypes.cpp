@@ -566,7 +566,8 @@ dgSetPrecisionDouble::~dgSetPrecisionDouble()
 dgFloatExceptions::dgFloatExceptions(dgUnsigned32 mask)
 	:m_mask (0)
 {
-	#if (defined (_MSC_VER) && defined (_MSC_VER))
+//	#if (defined (_MSC_VER) && defined (_MSC_VER))
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
 		dgClearFP();
 		m_mask = dgControlFP(0, 0);
 		dgControlFP (m_mask & ~mask, _MCW_EM);
