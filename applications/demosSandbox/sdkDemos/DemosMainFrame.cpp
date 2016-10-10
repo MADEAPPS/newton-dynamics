@@ -44,6 +44,9 @@ DemosMainFrame::DemosMainFrame ()
 	m_mainFrame = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", NULL, NULL);
 	glfwMakeContextCurrent(m_mainFrame);
 
+	// attach myself to the main frame
+	glfwSetWindowUserPointer(m_mainFrame, this);
+
 	// Setup ImGui binding
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -80,7 +83,7 @@ DemosMainFrame::DemosMainFrame ()
 #endif
 
 	glfwSetKeyCallback(m_mainFrame, KeyCallback);
-	//glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
+	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
 	//glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
 	//glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 
@@ -100,6 +103,9 @@ DemosMainFrame::DemosMainFrame ()
     bool show_another_window = false;
 */
 
+	m_mousePressed[0] = false;
+	m_mousePressed[1] = false;
+	m_mousePressed[2] = false;
 }
 
 DemosMainFrame::~DemosMainFrame ()
@@ -145,13 +151,11 @@ void DemosMainFrame::ShowMainMenuBar()
 {
 	if (ImGui::BeginMainMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
-		{
+		if (ImGui::BeginMenu("File")) {
 //			ShowExampleMenuFile();
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("Edit"))
-		{
+		if (ImGui::BeginMenu("Demos")) {
 			if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
 			if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
 			ImGui::Separator();
@@ -160,6 +164,15 @@ void DemosMainFrame::ShowMainMenuBar()
 			if (ImGui::MenuItem("Paste", "CTRL+V")) {}
 			ImGui::EndMenu();
 		}
+
+		if (ImGui::BeginMenu("Options")) {
+
+		}
+
+		if (ImGui::BeginMenu("Help")) {
+
+		}
+
 		ImGui::EndMainMenuBar();
 	}
 }
@@ -170,6 +183,15 @@ void DemosMainFrame::ErrorCallback(int error, const char* description)
 	dAssert (0);
 	dTrace (("Error %d: %s\n", error, description));
 	fprintf(stderr, "Error %d: %s\n", error, description);
+}
+
+
+void DemosMainFrame::MouseButtonCallback(GLFWwindow* const window, int button, int action, int /*mods*/)
+{
+	if (action == GLFW_PRESS && button >= 0 && button < 3) {
+		DemosMainFrame* const me = (DemosMainFrame*) glfwGetWindowUserPointer(window);
+		me->m_mousePressed[button] = true;
+	}
 }
 
 
@@ -280,9 +302,6 @@ void DemosMainFrame::BeginFrame()
 {
 	glfwPollEvents();
 
-//	if (!g_FontTexture)
-//		ImGui_ImplGlfw_CreateDeviceObjects();
-
 	ImGuiIO& io = ImGui::GetIO();
 
 	// Setup display size (every frame to accommodate for window resizing)
@@ -310,13 +329,14 @@ void DemosMainFrame::BeginFrame()
 	{
 		io.MousePos = ImVec2(-1,-1);
 	}
-
+*/
 	for (int i = 0; i < 3; i++)
 	{
-		io.MouseDown[i] = g_MousePressed[i] || glfwGetMouseButton(g_Window, i) != 0;    // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
-		g_MousePressed[i] = false;
+		// If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
+		io.MouseDown[i] = m_mousePressed[i] || glfwGetMouseButton(m_mainFrame, i) != 0;    
+		m_mousePressed[i] = false;
 	}
-
+/*
 	io.MouseWheel = g_MouseWheel;
 	g_MouseWheel = 0.0f;
 
