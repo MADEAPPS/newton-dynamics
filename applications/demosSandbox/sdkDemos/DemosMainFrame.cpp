@@ -148,7 +148,7 @@ void DemosMainFrame::error_callback(int error, const char* description)
 {
 	dAssert (0);
 	dTrace (("Error %d: %s\n", error, description));
-//	fprintf(stderr, "Error %d: %s\n", error, description);
+	fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
 
