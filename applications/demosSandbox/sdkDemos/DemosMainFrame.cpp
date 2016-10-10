@@ -37,7 +37,7 @@ DemosMainFrame::DemosMainFrame ()
 {
 
 	// Setup window
-	glfwSetErrorCallback(error_callback);
+	glfwSetErrorCallback(ErrorCallback);
 
 	glfwInit();
 
@@ -79,12 +79,10 @@ DemosMainFrame::DemosMainFrame ()
 	dAssert (0);
 #endif
 
+	glfwSetKeyCallback(m_mainFrame, KeyCallback);
 	//glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
 	//glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
-	//glfwSetKeyCallback(window, ImGui_ImplGlFw_KeyCallback);
 	//glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
-
-
 
 	LoadDefaultFont();
 /*
@@ -144,11 +142,31 @@ void DemosMainFrame::LoadDefaultFont()
 }
 
 
-void DemosMainFrame::error_callback(int error, const char* description)
+void DemosMainFrame::ErrorCallback(int error, const char* description)
 {
 	dAssert (0);
 	dTrace (("Error %d: %s\n", error, description));
 	fprintf(stderr, "Error %d: %s\n", error, description);
+}
+
+
+void DemosMainFrame::KeyCallback(GLFWwindow* const window, int key, int, int action, int mods)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	if (action == GLFW_PRESS)
+		io.KeysDown[key] = true;
+	if (action == GLFW_RELEASE)
+		io.KeysDown[key] = false;
+
+	(void)mods; // Modifiers are not reliable across systems
+	io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+	io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+
+	if (key == GLFW_KEY_ESCAPE) {
+		glfwSetWindowShouldClose (window, 1);
+	}
 }
 
 

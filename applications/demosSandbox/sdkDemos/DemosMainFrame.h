@@ -27,7 +27,8 @@ class DemosMainFrame
 	void EndFrame();
 	void LoadDefaultFont();
 
-	static void error_callback(int error, const char* const description);
+	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
+	static void ErrorCallback(int error, const char* const description);
 	GLFWwindow* m_mainFrame;
 	int     m_defaultFont;
 
