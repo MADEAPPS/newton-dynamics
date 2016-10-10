@@ -83,7 +83,9 @@ DemosMainFrame::DemosMainFrame ()
 #endif
 
 	glfwSetKeyCallback(m_mainFrame, KeyCallback);
+	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
 	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
+	
 	//glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
 	//glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 
@@ -166,11 +168,11 @@ void DemosMainFrame::ShowMainMenuBar()
 		}
 
 		if (ImGui::BeginMenu("Options")) {
-
+			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Help")) {
-
+			ImGui::EndMenu();
 		}
 
 		ImGui::EndMainMenuBar();
@@ -186,14 +188,24 @@ void DemosMainFrame::ErrorCallback(int error, const char* description)
 }
 
 
-void DemosMainFrame::MouseButtonCallback(GLFWwindow* const window, int button, int action, int /*mods*/)
+void DemosMainFrame::MouseButtonCallback(GLFWwindow*, int button, int action, int)
 {
-	if (action == GLFW_PRESS && button >= 0 && button < 3) {
-		DemosMainFrame* const me = (DemosMainFrame*) glfwGetWindowUserPointer(window);
-		me->m_mousePressed[button] = true;
+	if (button >= 0 && button < 3) {
+		ImGuiIO& io = ImGui::GetIO();
+		if (action == GLFW_PRESS) {
+			io.MouseDown[button] = true;    
+		} else if (action == GLFW_RELEASE) {
+			io.MouseDown[button] = false;    
+		}
 	}
 }
 
+
+void DemosMainFrame::CursorposCallback  (GLFWwindow* , double x, double y)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.MousePos = ImVec2((float)x, (float)y);
+}
 
 // This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
 // If text or lines are blurry when integrating ImGui in your engine:
@@ -316,26 +328,8 @@ void DemosMainFrame::BeginFrame()
 	double current_time =  glfwGetTime();
 	io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
 	g_Time = current_time;
-
-	// Setup inputs
-	// (we already got mouse wheel, keyboard keys & characters from glfw callbacks polled in glfwPollEvents())
-	if (glfwGetWindowAttrib(g_Window, GLFW_FOCUSED))
-	{
-		double mouse_x, mouse_y;
-		glfwGetCursorPos(g_Window, &mouse_x, &mouse_y);
-		io.MousePos = ImVec2((float)mouse_x, (float)mouse_y);   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
-	}
-	else
-	{
-		io.MousePos = ImVec2(-1,-1);
-	}
 */
-	for (int i = 0; i < 3; i++)
-	{
-		// If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
-		io.MouseDown[i] = m_mousePressed[i] || glfwGetMouseButton(m_mainFrame, i) != 0;    
-		m_mousePressed[i] = false;
-	}
+
 /*
 	io.MouseWheel = g_MouseWheel;
 	g_MouseWheel = 0.0f;

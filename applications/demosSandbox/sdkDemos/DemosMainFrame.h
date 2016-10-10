@@ -29,8 +29,11 @@ class DemosMainFrame
 	void LoadDefaultFont();
 	void ShowMainMenuBar();
 
+	
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
 	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
+
+	static void CursorposCallback  (GLFWwindow* const window, double x, double y);
 	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
 	static void ErrorCallback(int error, const char* const description);
 	GLFWwindow* m_mainFrame;
