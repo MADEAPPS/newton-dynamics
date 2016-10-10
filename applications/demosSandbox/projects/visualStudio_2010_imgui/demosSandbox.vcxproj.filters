@@ -2,5 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\sdkDemos\main.cpp" />
+    <ClCompile Include="..\..\sdkDemos\DemosMainFrame.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\sdkDemos\DemosMainFrame.h" />
   </ItemGroup>
 </Project>

@@ -8,16 +8,29 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
+#ifndef __DEMO_MAIN_FRAME_H__
+#define __DEMO_MAIN_FRAME_H__
 
-#include "DemosMainFrame.h"
 
+struct GLFWwindow;
 
-int main(int, char**)
+class DemosMainFrame
 {
-	DemosMainFrame demos;
+	public:
+	DemosMainFrame ();
+	~DemosMainFrame ();
 
-	demos.Run();
+	void Run();
 
-    return 0;
-}
+	private:
+	void BeginFrame();
+	void EndFrame();
+	void LoadDefaultFont();
 
+	static void error_callback(int error, const char* const description);
+	GLFWwindow* m_mainFrame;
+	int     m_defaultFont;
+
+};
+
+#endif
