@@ -13,6 +13,7 @@
 
 
 struct GLFWwindow;
+struct ImDrawData;
 
 class DemosMainFrame
 {
@@ -26,7 +27,9 @@ class DemosMainFrame
 	void BeginFrame();
 	void EndFrame();
 	void LoadDefaultFont();
+	void ShowMainMenuBar();
 
+	static void RenderDrawListsCallback(ImDrawData* const draw_data);
 	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
 	static void ErrorCallback(int error, const char* const description);
 	GLFWwindow* m_mainFrame;
