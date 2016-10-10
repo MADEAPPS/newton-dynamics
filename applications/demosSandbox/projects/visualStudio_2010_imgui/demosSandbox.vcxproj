@@ -22,6 +22,9 @@
     <ClCompile Include="..\..\sdkDemos\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\glfw\vs2010\glfw.vcxproj">
+      <Project>{71de04d1-e371-4a45-9694-2aa647d65451}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\imgui\vs2010\imgui.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
@@ -100,8 +103,9 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty/timeTracker;../../../../packages/thirdParty/glew/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -114,8 +118,9 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty/timeTracker;../../../../packages/thirdParty/glew/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,7 +135,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty/timeTracker;../../../../packages/thirdParty/glew/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -148,7 +153,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty/timeTracker;../../../../packages/thirdParty/glew/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>

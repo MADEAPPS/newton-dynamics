@@ -2,29 +2,33 @@
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 
 #include <imgui.h>
+#include <glfw3.h>
 #include <stdio.h>
 
 /*
 #include <GLFW/glfw3.h>
 #include "imgui_impl_glfw.h"
+*/
+
 static void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error %d: %s\n", error, description);
 }
-*/
+
 
 int main(int, char**)
 {
 
     // Setup window
-    //glfwSetErrorCallback(error_callback);
+    glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
         return 1;
-/*
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "ImGui OpenGL2 example", NULL, NULL);
+
+    GLFWwindow* const window = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", NULL, NULL);
     glfwMakeContextCurrent(window);
 
+/*
     // Setup ImGui binding
     ImGui_ImplGlfw_Init(window, true);
 
@@ -41,10 +45,11 @@ int main(int, char**)
     bool show_test_window = true;
     bool show_another_window = false;
     ImVec4 clear_color = ImColor(114, 144, 154);
-
+*/
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
+/*
         glfwPollEvents();
         ImGui_ImplGlfw_NewFrame();
 
@@ -84,11 +89,13 @@ int main(int, char**)
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui::Render();
         glfwSwapBuffers(window);
+*/
     }
 
+
     // Cleanup
-    ImGui_ImplGlfw_Shutdown();
+    //ImGui_ImplGlfw_Shutdown();
     glfwTerminate();
-*/
+
     return 0;
 }
