@@ -53,6 +53,7 @@ packages/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 *.lib
 *.tlog
 *.json
+*.db
 *.manifest
 *.log
 *.lastbuildstate
