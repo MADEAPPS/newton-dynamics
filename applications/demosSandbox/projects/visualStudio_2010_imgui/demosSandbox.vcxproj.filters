@@ -3,8 +3,10 @@
   <ItemGroup>
     <ClCompile Include="..\..\sdkDemos\main.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemosMainFrame.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\toolbox_stdafx__.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos\DemosMainFrame.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\toolbox_stdafx__.h" />
   </ItemGroup>
 </Project>

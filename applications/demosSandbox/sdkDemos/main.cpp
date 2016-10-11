@@ -9,8 +9,8 @@
 * freely
 */
 
+#include "toolbox_stdafx__.h"
 #include "DemosMainFrame.h"
-
 
 int main(int, char**)
 {

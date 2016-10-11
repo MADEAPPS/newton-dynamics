@@ -9,33 +9,15 @@
 * freely
 */
 
+
+#include <toolbox_stdafx__.h>
 #include "DemosMainFrame.h"
-
-#include <imgui.h>
-#include <glfw3.h>
-#include <stdio.h>
-
-#ifdef _MSC_VER 
-#undef APIENTRY
-#define GLFW_EXPOSE_NATIVE_WIN32
-#define GLFW_EXPOSE_NATIVE_WGL
-#include <glfw3native.h>
-#endif
-
-#include <dVector.h>
-#include <dMatrix.h>
-#include <dQuaternion.h>
-#include <dMathDefines.h>
-#include <dBezierSpline.h>
 
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
-
-
 DemosMainFrame::DemosMainFrame ()
 {
-
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
 
@@ -90,20 +72,6 @@ DemosMainFrame::DemosMainFrame ()
 	//glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 
 	LoadDefaultFont();
-/*
-    // Load Fonts
-    // (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
-    //ImGuiIO& io = ImGui::GetIO();
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("../../extra_fonts/Cousine-Regular.ttf", 15.0f);
-    //io.Fonts->AddFontFromFileTTF("../../extra_fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyClean.ttf", 13.0f);
-    //io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf", 10.0f);
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-
-    bool show_test_window = true;
-    bool show_another_window = false;
-*/
 
 	m_mousePressed[0] = false;
 	m_mousePressed[1] = false;
@@ -125,10 +93,25 @@ void DemosMainFrame::LoadDefaultFont()
 {
 	// Build texture atlas
 	ImGuiIO& io = ImGui::GetIO();
+
+    // Load Fonts
+    // (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
+    //io.Fonts->AddFontDefault();
+
+	float pixedSize = 20;
+	char pathName[2048];
+	char* const name = "Cousine-Regular.ttf";
+	//char* const name = "calibri.ttf";
+	//char* const name = "courbd.ttf";
+
+	GetWorkingFileName (name, pathName);
+    io.Fonts->AddFontFromFileTTF(pathName, pixedSize);
+    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+
+	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. 
+	// If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
 	unsigned char* pixels;
 	int width, height;
-
-	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
 	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   
 
 	// Upload texture to graphics system
@@ -154,7 +137,36 @@ void DemosMainFrame::ShowMainMenuBar()
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File")) {
-//			ShowExampleMenuFile();
+			if (ImGui::MenuItem("About", "")) {
+				dAssert (0);
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Preferences", "")) {
+				dAssert (0);
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("New", "")) {
+				dAssert (0);
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Open", "")) {
+				dAssert (0);
+			}
+			if (ImGui::MenuItem("Save", "")) {
+				dAssert (0);
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Serialize", "")) {
+				dAssert (0);
+			}
+			if (ImGui::MenuItem("Deserialize", "")) {
+				dAssert (0);
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Exit", "")) {
+				glfwSetWindowShouldClose (m_mainFrame, 1);
+			}
+
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Demos")) {
@@ -339,7 +351,6 @@ void DemosMainFrame::BeginFrame()
 */
 	// Start the frame
 	ImGui::NewFrame();
-
 
 	ShowMainMenuBar();
 }
