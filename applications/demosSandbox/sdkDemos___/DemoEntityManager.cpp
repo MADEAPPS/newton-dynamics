@@ -12,6 +12,7 @@
 
 #include <toolbox_stdafx.h>
 #include "DemoEntityManager.h"
+#include "SkyBox.h"
 
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
@@ -19,6 +20,7 @@
 DemoEntityManager::DemoEntityManager ()
 	:m_mainFrame(NULL)
 	,m_defaultFont(0)
+	,m_sky(NULL)
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -377,6 +379,24 @@ void DemoEntityManager::EndFrame()
 	glClear(GL_COLOR_BUFFER_BIT);
 	ImGui::Render();
 	glfwSwapBuffers(m_mainFrame);
+}
+
+
+void DemoEntityManager::CreateSkyBox()
+{
+	if (!m_sky) {
+		m_sky = new SkyBox();
+		Append(m_sky);
+	}
+}
+
+
+void DemoEntityManager::PushTransparentMesh (const DemoMeshInterface* const mesh)
+{
+	dMatrix matrix;
+	glGetFloat (GL_MODELVIEW_MATRIX, &matrix[0][0]);
+	TransparentMesh entry (matrix, (DemoMesh*) mesh);
+	m_tranparentHeap.Push (entry, matrix.m_posit.m_z);
 }
 
 

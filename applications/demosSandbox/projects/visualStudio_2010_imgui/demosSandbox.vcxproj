@@ -54,8 +54,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\sdkDemos___\DemoEntity.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoEntityManager.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\DemoMesh.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\UsingNewtonMeshTool.cpp" />
     <ClCompile Include="..\..\sdkDemos___\main.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\toolBox\SkyBox.cpp" />
     <ClCompile Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -64,7 +68,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\sdkDemos___\DemoEntity.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoEntityManager.h" />
+    <ClInclude Include="..\..\sdkDemos___\DemoMesh.h" />
+    <ClInclude Include="..\..\sdkDemos___\toolBox\SkyBox.h" />
     <ClInclude Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

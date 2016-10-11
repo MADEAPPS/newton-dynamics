@@ -11,7 +11,8 @@
 
 
 
-#include <toolbox_stdafx__.h>
+#include <toolbox_stdafx.h>
+#include "DemoEntityManager.h"
 /*
 #include "SkyBox.h"
 #include "TargaToOpenGl.h"
@@ -165,6 +166,9 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
+dAssert (0);
+/*
+
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	CreateLevelMesh (scene, "playground.ngd", true);
@@ -192,6 +196,7 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 
 //	NewtonSerializeToFile(scene->GetNewton(), "xxxx.bin");
+*/
 }
 
 

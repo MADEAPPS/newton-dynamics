@@ -15,13 +15,55 @@
 struct GLFWwindow;
 struct ImDrawData;
 
-class DemoEntityManager
+class DemoMesh;
+class DemoEntity;
+class DemoMeshInterface;
+
+class DemoEntityManager: public dList <DemoEntity*>
 {
 	public:
+	class EntityDictionary: public dTree<DemoEntity*, dScene::dTreeNode*>
+	{
+	};
+
+	class TransparentMesh
+	{
+		public: 
+		TransparentMesh()
+			:m_matrix(dGetIdentityMatrix())
+			,m_mesh(NULL)
+		{
+		}
+
+		TransparentMesh(const dMatrix& matrix, const DemoMesh* const mesh)
+			:m_matrix(matrix)
+			,m_mesh(mesh)
+		{
+		}
+
+		dMatrix m_matrix;
+		const DemoMesh* m_mesh;
+	};
+
+	class TransparentHeap: public dUpHeap <TransparentMesh, dFloat>
+	{
+		public:
+		TransparentHeap()
+			:dUpHeap <TransparentMesh, dFloat>(256)
+		{
+		}
+	};
+
 	DemoEntityManager ();
 	~DemoEntityManager ();
 
 	void Run();
+
+	void Lock(unsigned& atomicLock);
+	void Unlock(unsigned& atomicLock);
+
+	void CreateSkyBox();
+	void PushTransparentMesh (const DemoMeshInterface* const mesh); 
 
 	private:
 	void BeginFrame();
@@ -39,6 +81,25 @@ class DemoEntityManager
 	GLFWwindow* m_mainFrame;
 	int	m_defaultFont;
 	bool m_mousePressed[3];
+
+	DemoEntity* m_sky;
+	TransparentHeap m_tranparentHeap;
 };
+
+
+// for simplicity we are not going to run the demo in a separate thread at this time
+// this confuses many user int thinking it is more complex than it really is  
+inline void DemoEntityManager::Lock(unsigned& atomicLock)
+{
+	while (NewtonAtomicSwap((int*)&atomicLock, 1)) {
+		NewtonYield();
+	}
+}
+
+inline void DemoEntityManager::Unlock(unsigned& atomicLock)
+{
+	NewtonAtomicSwap((int*)&atomicLock, 0);
+}
+
 
 #endif
