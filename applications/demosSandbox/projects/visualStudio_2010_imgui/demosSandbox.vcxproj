@@ -32,8 +32,29 @@
     <ClCompile Include="..\..\sdkDemos\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\sdkDemos\DemosMainFrame.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010\core.vcxproj">
+      <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010\newton.vcxproj">
+      <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010\physics.vcxproj">
+      <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dContainers.vcxproj">
+      <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dJointLibrary.vcxproj">
+      <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dMath.vcxproj">
       <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dScene.vcxproj">
+      <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\glfw\vs2010\glfw.vcxproj">
       <Project>{71de04d1-e371-4a45-9694-2aa647d65451}</Project>
@@ -41,9 +62,9 @@
     <ProjectReference Include="..\..\..\..\packages\thirdParty\imgui\vs2010\imgui.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\sdkDemos\DemosMainFrame.h" />
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2010\tinyxml.vcxproj">
+      <Project>{0540dbfa-e42e-4538-879a-37004cdfe261}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7830075E-785B-4AE5-BDF2-3468D5B41615}</ProjectGuid>

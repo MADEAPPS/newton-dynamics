@@ -59,7 +59,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{18E509CF-46D2-4749-B3BB-160937CF2481}</ProjectGuid>
+    <ProjectGuid>{0540DBFA-E42E-4538-879A-37004CDFE261}</ProjectGuid>
     <RootNamespace>tinyxml</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
