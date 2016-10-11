@@ -17,6 +17,8 @@
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 DemosMainFrame::DemosMainFrame ()
+	:m_mainFrame(NULL)
+	,m_defaultFont(0)
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -65,8 +67,10 @@ DemosMainFrame::DemosMainFrame ()
 #endif
 
 	glfwSetKeyCallback(m_mainFrame, KeyCallback);
+	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
 	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
 	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
+	
 	
 	//glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
 	//glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
@@ -212,6 +216,12 @@ void DemosMainFrame::MouseButtonCallback(GLFWwindow*, int button, int action, in
 	}
 }
 
+void DemosMainFrame::MouseScrollCallback(GLFWwindow* const window, double x, double y)
+{
+	ImGuiIO& io = ImGui::GetIO();
+//	DemosMainFrame* me = (DemosMainFrame*) glfwGetWindowUserPointer(window);
+	io.MouseWheel += float (y);
+}
 
 void DemosMainFrame::CursorposCallback  (GLFWwindow* , double x, double y)
 {
