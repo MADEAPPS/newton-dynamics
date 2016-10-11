@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\sdkDemos\main.cpp" />
-    <ClCompile Include="..\..\sdkDemos\DemosMainFrame.cpp" />
-    <ClCompile Include="..\..\sdkDemos\toolBox\toolbox_stdafx__.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\DemoEntityManager.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\main.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\sdkDemos\DemosMainFrame.h" />
-    <ClInclude Include="..\..\sdkDemos\toolBox\toolbox_stdafx__.h" />
+    <ClInclude Include="..\..\sdkDemos___\DemoEntityManager.h" />
+    <ClInclude Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.h" />
   </ItemGroup>
 </Project>

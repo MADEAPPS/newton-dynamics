@@ -19,33 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\sdkDemos\DemosMainFrame.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">toolbox_stdafx__.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">toolbox_stdafx__.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">toolbox_stdafx__.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">toolbox_stdafx__.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\main.cpp" />
-    <ClCompile Include="..\..\sdkDemos\toolBox\toolbox_stdafx__.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">toolbox_stdafx__.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">toolbox_stdafx__.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">toolbox_stdafx__.h</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">toolbox_stdafx__.h</PrecompiledHeaderFile>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\sdkDemos\DemosMainFrame.h" />
-    <ClInclude Include="..\..\sdkDemos\toolBox\toolbox_stdafx__.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010\core.vcxproj">
       <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
     </ProjectReference>
@@ -76,6 +49,20 @@
     <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2010\tinyxml.vcxproj">
       <Project>{0540dbfa-e42e-4538-879a-37004cdfe261}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\sdkDemos___\DemoEntityManager.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\main.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\sdkDemos___\DemoEntityManager.h" />
+    <ClInclude Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7830075E-785B-4AE5-BDF2-3468D5B41615}</ProjectGuid>
@@ -151,10 +138,10 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeaderFile>toolbox_stdafx__.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -168,10 +155,10 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeaderFile>toolbox_stdafx__.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -187,9 +174,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <PrecompiledHeaderFile>toolbox_stdafx__.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -208,9 +195,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../sdkDemos___;../../sdkDemos___/toolBox;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/thirdParty/imgui;../../../../packages/thirdParty/glfw/src;../../../../packages/thirdParty/tinyxml;../../../../packages/thirdParty/timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/glfw/include/GLFW</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <PrecompiledHeaderFile>toolbox_stdafx__.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
