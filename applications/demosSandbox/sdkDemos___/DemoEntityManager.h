@@ -29,7 +29,6 @@ class DemoEntityManager
 	void LoadDefaultFont();
 	void ShowMainMenuBar();
 
-	
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
 	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
 

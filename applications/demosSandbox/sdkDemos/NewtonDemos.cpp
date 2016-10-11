@@ -190,7 +190,7 @@ class NewtonDemosApp: public wxApp
 		wxString title;
 		title.Printf (wxT ("Newton %d.%02d SDK demos"), version / 100, version % 100);
 
-		//This is the case when there are two monitor, Create Main Display on secund monitor
+		//This is the case when there are two monitor, Create Main Display on second monitor
 	NewtonDemos* frame = NULL;
 	switch (wxDisplay::GetCount()) 
 	{
