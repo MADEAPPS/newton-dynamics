@@ -132,8 +132,10 @@ class DemoEntityManager: public dList <DemoEntity*>
 	dFloat m_fps;
 	dFloat m_timestepAcc;
 	dFloat m_currentListenerTimestep;
-	static SDKDemos m_demosSelection[];
+	bool m_showStats;
 
+
+	static SDKDemos m_demosSelection[];
 	friend class DemoEntityListener;
 	friend class DemoListenerManager;
 };

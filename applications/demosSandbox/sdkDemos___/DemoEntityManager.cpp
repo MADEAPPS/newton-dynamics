@@ -85,6 +85,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_framesCount(0)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
+	,m_showStats(true)
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -132,6 +133,7 @@ DemoEntityManager::DemoEntityManager ()
 	dAssert (0);
 #endif
 
+	glfwSwapInterval(0);
 	glfwSetKeyCallback(m_mainFrame, KeyCallback);
 	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
 	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
@@ -276,7 +278,7 @@ void DemoEntityManager::LoadFont()
     // (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
     //io.Fonts->AddFontDefault();
 
-	float pixedSize = 20;
+	float pixedSize = 18;
 	char pathName[2048];
 	char* const name = "Cousine-Regular.ttf";
 	//char* const name = "calibri.ttf";
@@ -367,6 +369,11 @@ void DemoEntityManager::ShowMainMenuBar()
 		}
 
 		if (ImGui::BeginMenu("Options")) {
+			
+			if (ImGui::Checkbox("Show stats", &m_showStats)) {
+//				m_showStats = ! m_showStats;
+			}
+
 			ImGui::EndMenu();
 		}
 
@@ -518,8 +525,8 @@ void DemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, int 
 void DemoEntityManager::BeginFrame()
 {
 	dTimeTrackerEvent(__FUNCTION__);
-	glfwPollEvents();
 
+	glfwPollEvents();
 	ImGuiIO& io = ImGui::GetIO();
 
 	// Setup display size (every frame to accommodate for window resizing)
@@ -529,28 +536,41 @@ void DemoEntityManager::BeginFrame()
 	glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
 	io.DisplaySize = ImVec2((float)w, (float)h);
 	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
-/*
+
 	// Setup time step
-	double current_time =  glfwGetTime();
-	io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
-	g_Time = current_time;
+	//double current_time =  glfwGetTime();
+	//io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
+	//g_Time = current_time;
 
 	// Hide OS mouse cursor if ImGui is drawing it
-	glfwSetInputMode(g_Window, GLFW_CURSOR, io.MouseDrawCursor ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
-*/
+	//glfwSetInputMode(g_Window, GLFW_CURSOR, io.MouseDrawCursor ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
+
 	// Start the frame
 	ImGui::NewFrame();
 
-	dFloat timestep = dGetElapsedSeconds();	
-	CalculateFPS(timestep);
-
-	ShowMainMenuBar();
 }
 
 void DemoEntityManager::EndFrame()
 {
 	dTimeTrackerEvent(__FUNCTION__);
     ImVec4 clear_color = ImColor(114, 144, 154);
+
+	dFloat timestep = dGetElapsedSeconds();	
+	CalculateFPS(timestep);
+
+
+
+
+
+	if (m_showStats) {
+		bool dommy;
+		char text[256];
+		sprintf (text, "fps: %5.2f", m_fps);
+		ImGui::Begin("statistics", &dommy);
+		ImGui::Text(text);
+		ImGui::End();
+	}
+	ShowMainMenuBar();
 
 	// Rendering
 	int display_w, display_h;
@@ -609,13 +629,7 @@ void DemoEntityManager::CalculateFPS(dFloat timestep)
 		m_statusbar->SetStatusText (statusText, 6);
 */
 	}
-
-	bool xxx;
-	ImGui::Begin("Another Window", &xxx);
-	ImGui::Text("Hello");
-	ImGui::End();
 }
-
 
 
 void DemoEntityManager::CreateSkyBox()
