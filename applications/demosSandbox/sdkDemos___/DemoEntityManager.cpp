@@ -580,41 +580,35 @@ void DemoEntityManager::EndFrame()
 		char text[1024];
 
 		if (ImGui::Begin("statistics", &dommy)){
-			sprintf (text, "fps         : %6.3f", m_fps);
+			sprintf (text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text);
 
 			sprintf (text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
 			ImGui::Text(text);
 
+			sprintf (text, "memory used:  %6.3f kbytes", NewtonGetMemoryUsed() / 1024);
+			ImGui::Text(text);
+
+			sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
+			ImGui::Text(text);
+
+			sprintf (text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
+			ImGui::Text(text);
+
+			//sprintf (text, "auto sleep: %s"), m_autoSleepState ? wxT("on") : wxT("off"));
+			//m_statusbar->SetStatusText (statusText, 5);
+
 /*
-		wxString statusText;
-		NewtonWorld* const world = m_scene->GetNewton();
-		char platform[256];
-		NewtonGetDeviceString(world, NewtonGetCurrentDevice(world), platform, sizeof (platform));
-		int memoryUsed = NewtonGetMemoryUsed() / (1024) ;
+			wxString statusText;
+			NewtonWorld* const world = m_scene->GetNewton();
+			char platform[256];
+			NewtonGetDeviceString(world, NewtonGetCurrentDevice(world), platform, sizeof (platform));
 
-		statusText.Printf (wxT ("render fps: %7.2f"), m_fps);
-		m_statusbar->SetStatusText (statusText, 0);
-
-
-		statusText.Printf (wxT ("memory: %d kbytes"), memoryUsed);
-		m_statusbar->SetStatusText (statusText, 2);
-
-		statusText.Printf (wxT ("bodies: %d"), NewtonWorldGetBodyCount(world));
-		m_statusbar->SetStatusText (statusText, 3);
-
-		statusText.Printf (wxT ("threads: %d"), NewtonGetThreadsCount(world));
-		m_statusbar->SetStatusText (statusText, 4);
-
-		statusText.Printf (wxT ("auto sleep: %s"), m_autoSleepState ? wxT("on") : wxT("off"));
-		m_statusbar->SetStatusText (statusText, 5);
-
-		char floatMode[128];
-		NewtonGetDeviceString (world, m_hardwareDevice, floatMode, sizeof (floatMode));
-		statusText.Printf (wxT ("instructions: %s"),  wxString::FromAscii(floatMode).wc_str());
-		m_statusbar->SetStatusText (statusText, 6);
+			char floatMode[128];
+			NewtonGetDeviceString (world, m_hardwareDevice, floatMode, sizeof (floatMode));
+			statusText.Printf (wxT ("instructions: %s"),  wxString::FromAscii(floatMode).wc_str());
+			m_statusbar->SetStatusText (statusText, 6);
 */
-
 
 			ImGui::End();
 		}
@@ -872,8 +866,6 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 //dTrace (("%f\n", m_mainThreadPhysicsTime));
 	}
 }
-
-
 
 void DemoEntityManager::Run()
 {
