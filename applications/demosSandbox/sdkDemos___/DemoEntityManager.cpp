@@ -17,6 +17,8 @@
 #include "DebugDisplay.h"
 #include "DemoEntityManager.h"
 #include "DemoCameraListener.h"
+#include "DemoEntityListener.h"
+#include "dHighResolutionTimer.h"
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -76,6 +78,11 @@ DemoEntityManager::DemoEntityManager ()
 	,m_sky(NULL)
 	,m_world(NULL)
 	,m_cameraManager(NULL)
+	,m_renderHoodContext(NULL)
+	,m_renderHood(NULL)
+	,m_microsecunds(0)
+	,m_tranparentHeap()
+	,m_currentListenerTimestep(0.0f)
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -135,16 +142,126 @@ DemoEntityManager::DemoEntityManager ()
 	m_mousePressed[0] = false;
 	m_mousePressed[1] = false;
 	m_mousePressed[2] = false;
+
+	// initialized the physics world for the new scene
+	Cleanup ();
+	ResetTimer();
+
+	dTimeTrackerSetThreadName ("mainThread");
 }
 
 DemoEntityManager::~DemoEntityManager ()
 {
+	// is we are run asynchronous we need make sure no update in on flight.
+	if (m_world) {
+		NewtonWaitForUpdateToFinish (m_world);
+	}
+
+	Cleanup ();
+
+	// destroy the empty world
+	if (m_world) {
+		NewtonDestroy (m_world);
+		m_world = NULL;
+	}
+
 	// Cleanup
 	GLuint font_texture (m_defaultFont);
 	glDeleteTextures(1, &font_texture);
 	ImGui::GetIO().Fonts->TexID = 0;
 
 	ImGui::Shutdown();
+
+	dAssert (NewtonGetMemoryUsed () == 0);
+}
+
+
+void DemoEntityManager::ResetTimer()
+{
+	dResetTimer();
+	m_microsecunds = dGetTimeInMicrosenconds ();
+}
+
+void DemoEntityManager::RemoveEntity (dListNode* const entNode)
+{
+	DemoEntity* const entity = entNode->GetInfo();
+	entity->Release();
+	Remove(entNode);
+}
+
+void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
+{
+	for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
+		if (node->GetInfo() == ent) {
+			RemoveEntity (node);
+			break;
+		}
+	}
+}
+
+
+void DemoEntityManager::Cleanup ()
+{
+	// is we are run asynchronous we need make sure no update in on flight.
+	if (m_world) {
+		NewtonWaitForUpdateToFinish (m_world);
+	}
+
+	// destroy all remaining visual objects
+	while (dList<DemoEntity*>::GetFirst()) {
+		RemoveEntity (dList<DemoEntity*>::GetFirst());
+	}
+
+	m_sky = NULL;
+
+	// destroy the Newton world
+	if (m_world) {
+		// get serialization call back before destroying the world
+		NewtonDestroy (m_world);
+		m_world = NULL;
+	}
+
+	//	memset (&demo, 0, sizeof (demo));
+	// check that there are no memory leak on exit
+	dAssert (NewtonGetMemoryUsed () == 0);
+
+	// create the newton world
+	m_world = NewtonCreate();
+
+	// link the work with this user data
+	NewtonWorldSetUserData(m_world, this);
+
+	// set joint serialization call back
+	CustomJoint::Initalize(m_world);
+
+	// add all physics pre and post listeners
+	//	m_preListenerManager.Append(new DemoVisualDebugerListener("visualDebuger", m_world));
+	new DemoEntityListener (this);
+	m_cameraManager = new DemoCameraListener(this);
+	//	m_postListenerManager.Append (new DemoAIListener("aiManager"));
+
+
+	// set the default parameters for the newton world
+	// set the simplified solver mode (faster but less accurate)
+	NewtonSetSolverModel (m_world, 4);
+
+	// newton 300 does not have world size, this is better controlled by the client application
+	//dVector minSize (-500.0f, -500.0f, -500.0f);
+	//dVector maxSize ( 500.0f,  500.0f,  500.0f);
+	//NewtonSetWorldSize (m_world, &minSize[0], &maxSize[0]); 
+
+	// set the performance track function
+	//NewtonSetPerformanceClock (m_world, dRuntimeProfiler::GetTimeInMicrosenconds);
+
+	// clean up all caches the engine have saved
+	NewtonInvalidateCache (m_world);
+
+	// Set the Newton world user data
+	NewtonWorldSetUserData(m_world, this);
+
+	// we start without 2d render
+	m_renderHood = NULL;
+	m_renderHoodContext = NULL;
 }
 
 

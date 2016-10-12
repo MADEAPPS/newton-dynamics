@@ -23,6 +23,10 @@ class DemoCameraListener;
 class DemoEntityManager: public dList <DemoEntity*>
 {
 	public:
+	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
+	typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* const context, int lineNumber);
+
+
 	class EntityDictionary: public dTree<DemoEntity*, dScene::dTreeNode*>
 	{
 	};
@@ -55,10 +59,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 		}
 	};
 
-	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
 	class SDKDemos
 	{
-	public:
+		public:
 		const char *m_name;
 		const char *m_description;
 		LaunchSDKDemoCallback m_launchDemoCallback;
@@ -76,7 +79,10 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	NewtonWorld* GetNewton() const;
 	void CreateSkyBox();
+
+	void ResetTimer();
 	void LoadScene (const char* const name);
+	void RemoveEntity (DemoEntity* const ent);
 
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
@@ -92,8 +98,13 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void BeginFrame();
 	void EndFrame();
 	void LoadFont();
+	void Cleanup();
+	void RemoveEntity (dListNode* const entNode);
+
 	void ShowMainMenuBar();
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
+
+	
 
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
 	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
@@ -109,9 +120,17 @@ class DemoEntityManager: public dList <DemoEntity*>
 	DemoEntity* m_sky;
 	NewtonWorld* m_world;
 	DemoCameraListener* m_cameraManager;
+	void* m_renderHoodContext;
+	RenderHoodCallback m_renderHood;
+
+	unsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;
 
+	dFloat m_currentListenerTimestep;
 	static SDKDemos m_demosSelection[];
+
+	friend class DemoEntityListener;
+	friend class DemoListenerManager;
 };
 
 

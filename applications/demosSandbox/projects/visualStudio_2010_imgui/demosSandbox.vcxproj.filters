@@ -38,6 +38,7 @@
     <ClCompile Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.cpp">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\DemoEntityListener.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos___\DemoEntityManager.h" />
@@ -70,6 +71,7 @@
     <ClInclude Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.h">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\sdkDemos___\DemoEntityListener.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="demos">

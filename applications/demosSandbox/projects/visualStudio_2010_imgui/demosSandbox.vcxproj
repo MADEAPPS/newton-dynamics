@@ -57,6 +57,7 @@
     <ClCompile Include="..\..\sdkDemos___\DemoCamera.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoCameraListener.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoEntity.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\DemoEntityListener.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoEntityManager.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoListenerBase.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoMesh.cpp" />
@@ -81,6 +82,7 @@
     <ClInclude Include="..\..\sdkDemos___\DemoCamera.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoCameraListener.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoEntity.h" />
+    <ClInclude Include="..\..\sdkDemos___\DemoEntityListener.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoEntityManager.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoListenerBase.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoMesh.h" />
@@ -153,7 +155,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>../../$(PlatformName)\</OutDir>
     <IntDir>$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <TargetName>$(ProjectName)</TargetName>
+    <TargetName>$(ProjectName)___</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
