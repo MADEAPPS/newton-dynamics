@@ -3,36 +3,80 @@
   <ItemGroup>
     <ClCompile Include="..\..\sdkDemos___\DemoEntityManager.cpp" />
     <ClCompile Include="..\..\sdkDemos___\main.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\UsingNewtonMeshTool.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\SkyBox.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoEntity.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoMesh.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\TargaToOpenGl.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\demos\BasicFriction.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\PhysicsUtils.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\dHighResolutionTimer.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\DebugDisplay.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoCameraListener.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoListenerBase.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoCamera.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\MousePick.cpp" />
-    <ClCompile Include="..\..\sdkDemos___\toolBox\OpenGlUtil.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicFriction.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\UsingNewtonMeshTool.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\DebugDisplay.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\dHighResolutionTimer.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\MousePick.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\OpenGlUtil.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\PhysicsUtils.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\SkyBox.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\TargaToOpenGl.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos___\DemoEntityManager.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\SkyBox.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoEntity.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoMesh.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\TargaToOpenGl.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\PhysicsUtils.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\dHighResolutionTimer.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\DebugDisplay.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoCameraListener.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoListenerBase.h" />
     <ClInclude Include="..\..\sdkDemos___\DemoCamera.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\MousePick.h" />
-    <ClInclude Include="..\..\sdkDemos___\toolBox\OpenGlUtil.h" />
+    <ClInclude Include="..\..\sdkDemos___\toolBox\DebugDisplay.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos___\toolBox\dHighResolutionTimer.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos___\toolBox\MousePick.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos___\toolBox\OpenGlUtil.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos___\toolBox\PhysicsUtils.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos___\toolBox\SkyBox.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos___\toolBox\TargaToOpenGl.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="demos">
+      <UniqueIdentifier>{e8946d62-01ab-4ef7-bb81-aa59ae28411e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{63ca4215-63cf-4c8f-840e-fddc3c418c1d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
