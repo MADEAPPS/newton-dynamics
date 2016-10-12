@@ -99,7 +99,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void EndFrame();
 	void LoadFont();
 	void Cleanup();
+	void CalculateFPS(dFloat timestep);
 	void RemoveEntity (dListNode* const entNode);
+	
 
 	void ShowMainMenuBar();
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
@@ -126,6 +128,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 	unsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;
 
+	int m_framesCount;
+	dFloat m_fps;
+	dFloat m_timestepAcc;
 	dFloat m_currentListenerTimestep;
 	static SDKDemos m_demosSelection[];
 

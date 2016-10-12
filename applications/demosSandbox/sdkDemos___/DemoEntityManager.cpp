@@ -82,6 +82,8 @@ DemoEntityManager::DemoEntityManager ()
 	,m_renderHood(NULL)
 	,m_microsecunds(0)
 	,m_tranparentHeap()
+	,m_framesCount(0)
+	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
 {
 	// Setup window
@@ -515,6 +517,7 @@ void DemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, int 
 
 void DemoEntityManager::BeginFrame()
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	glfwPollEvents();
 
 	ImGuiIO& io = ImGui::GetIO();
@@ -531,11 +534,6 @@ void DemoEntityManager::BeginFrame()
 	double current_time =  glfwGetTime();
 	io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
 	g_Time = current_time;
-*/
-
-/*
-	io.MouseWheel = g_MouseWheel;
-	g_MouseWheel = 0.0f;
 
 	// Hide OS mouse cursor if ImGui is drawing it
 	glfwSetInputMode(g_Window, GLFW_CURSOR, io.MouseDrawCursor ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
@@ -543,11 +541,15 @@ void DemoEntityManager::BeginFrame()
 	// Start the frame
 	ImGui::NewFrame();
 
+	dFloat timestep = dGetElapsedSeconds();	
+	CalculateFPS(timestep);
+
 	ShowMainMenuBar();
 }
 
 void DemoEntityManager::EndFrame()
 {
+	dTimeTrackerEvent(__FUNCTION__);
     ImVec4 clear_color = ImColor(114, 144, 154);
 
 	// Rendering
@@ -559,6 +561,61 @@ void DemoEntityManager::EndFrame()
 	ImGui::Render();
 	glfwSwapBuffers(m_mainFrame);
 }
+
+void DemoEntityManager::CalculateFPS(dFloat timestep)
+{
+	m_framesCount ++;
+	m_timestepAcc += timestep;
+
+	// this probably happing on loading of and a pause, just rest counters
+	if ((m_timestepAcc <= 0.0f) || (m_timestepAcc > 2.0f)){
+		m_timestepAcc = 0;
+		m_framesCount = 0;
+	}
+
+	//update fps every quarter of a second
+	if (m_timestepAcc >= 0.25f) {
+		m_fps = dFloat (m_framesCount) / m_timestepAcc;
+		m_timestepAcc -= 0.25f;
+		m_framesCount = 0;
+/*
+		wxString statusText;
+		NewtonWorld* const world = m_scene->GetNewton();
+		char platform[256];
+		NewtonGetDeviceString(world, NewtonGetCurrentDevice(world), platform, sizeof (platform));
+		int memoryUsed = NewtonGetMemoryUsed() / (1024) ;
+
+		statusText.Printf (wxT ("render fps: %7.2f"), m_fps);
+		m_statusbar->SetStatusText (statusText, 0);
+
+		statusText.Printf (wxT ("physics time: %4.2f ms"), m_scene->GetPhysicsTime() * 1000.0f);
+		m_statusbar->SetStatusText (statusText, 1);
+
+		statusText.Printf (wxT ("memory: %d kbytes"), memoryUsed);
+		m_statusbar->SetStatusText (statusText, 2);
+
+		statusText.Printf (wxT ("bodies: %d"), NewtonWorldGetBodyCount(world));
+		m_statusbar->SetStatusText (statusText, 3);
+
+		statusText.Printf (wxT ("threads: %d"), NewtonGetThreadsCount(world));
+		m_statusbar->SetStatusText (statusText, 4);
+
+		statusText.Printf (wxT ("auto sleep: %s"), m_autoSleepState ? wxT("on") : wxT("off"));
+		m_statusbar->SetStatusText (statusText, 5);
+
+		char floatMode[128];
+		NewtonGetDeviceString (world, m_hardwareDevice, floatMode, sizeof (floatMode));
+		statusText.Printf (wxT ("instructions: %s"),  wxString::FromAscii(floatMode).wc_str());
+		m_statusbar->SetStatusText (statusText, 6);
+*/
+	}
+
+	bool xxx;
+	ImGui::Begin("Another Window", &xxx);
+	ImGui::Text("Hello");
+	ImGui::End();
+}
+
 
 
 void DemoEntityManager::CreateSkyBox()
@@ -746,6 +803,7 @@ void DemoEntityManager::Run()
     // Main loop
     while (!glfwWindowShouldClose(m_mainFrame))
     {
+		dTimeTrackerEvent(__FUNCTION__);
         BeginFrame();
 /*
         // 1. Show a simple window
