@@ -19,7 +19,8 @@
 
 #include <toolbox_stdafx.h>
 #include "DemoEntity.h"
-
+#include "DemoCamera.h"
+#include "DemoListenerBase.h"
 
 class DemoCameraListener: public DemoListenerBase
 {

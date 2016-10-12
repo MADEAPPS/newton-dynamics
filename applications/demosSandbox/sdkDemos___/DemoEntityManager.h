@@ -18,6 +18,7 @@ struct ImDrawData;
 class DemoMesh;
 class DemoEntity;
 class DemoMeshInterface;
+class DemoCameraListener;
 
 class DemoEntityManager: public dList <DemoEntity*>
 {
@@ -54,6 +55,16 @@ class DemoEntityManager: public dList <DemoEntity*>
 		}
 	};
 
+	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
+	class SDKDemos
+	{
+	public:
+		const char *m_name;
+		const char *m_description;
+		LaunchSDKDemoCallback m_launchDemoCallback;
+	};
+
+
 	DemoEntityManager ();
 	~DemoEntityManager ();
 
@@ -62,14 +73,27 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void Lock(unsigned& atomicLock);
 	void Unlock(unsigned& atomicLock);
 
+
+	NewtonWorld* GetNewton() const;
 	void CreateSkyBox();
+	void LoadScene (const char* const name);
+
+	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
+
 	void PushTransparentMesh (const DemoMeshInterface* const mesh); 
+
+
+	static void SerializeFile (void* const serializeHandle, const void* const buffer, int size);
+	static void DeserializeFile (void* const serializeHandle, void* const buffer, int size);
+	static void BodySerialization (NewtonBody* const body, void* const userData, NewtonSerializeCallback serializecallback, void* const serializeHandle);
+	static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
 
 	private:
 	void BeginFrame();
 	void EndFrame();
-	void LoadDefaultFont();
+	void LoadFont();
 	void ShowMainMenuBar();
+	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
 
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
 	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
@@ -83,8 +107,18 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_mousePressed[3];
 
 	DemoEntity* m_sky;
+	NewtonWorld* m_world;
+	DemoCameraListener* m_cameraManager;
 	TransparentHeap m_tranparentHeap;
+
+	static SDKDemos m_demosSelection[];
 };
+
+
+inline NewtonWorld* DemoEntityManager::GetNewton() const
+{
+	return m_world;
+}
 
 
 // for simplicity we are not going to run the demo in a separate thread at this time

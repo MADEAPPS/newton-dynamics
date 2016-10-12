@@ -211,18 +211,22 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 	GLint iWidth = width;
 	GLint iHeight = hight;
 
+	//GL_COLOR_INDEX, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, GL_RGB, GL_RGBA, GL_BGR_EXT, GL_BGRA_EXT, GL_LUMINANCE, or GL_LUMINANCE_ALPHA.
+
 	GLenum eFormat = GL_RGBA;
 	GLint iComponents = 4;
 	switch(format)
 	{
 		case m_rgb:     
 			// Most likely case
-			eFormat = GL_BGR;
+			//eFormat = GL_BGR;
+			eFormat = GL_RGB;
 			iComponents = 4;
 			break;
-
+			
 		case m_rgba:
-			eFormat = GL_BGRA;
+			//eFormat = GL_BGRA;
+			eFormat = GL_RGBA;
 			iComponents = 4;
 			break;
 

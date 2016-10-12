@@ -12,10 +12,11 @@
 #include <toolbox_stdafx.h>
 #include "DemoMesh.h"
 #include "DemoEntity.h"
-#include "PhysicsUtils.h"
-#include "DemoEntityManager.h"
 #include "OpenGlUtil.h"
 #include "DebugDisplay.h"
+#include "PhysicsUtils.h"
+#include "DemoEntityManager.h"
+#include "dHighResolutionTimer.h"
 
 
 //const D_MESH_HEADER	"Newton Mesh"

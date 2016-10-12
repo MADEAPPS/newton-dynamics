@@ -16,8 +16,8 @@
 //////////////////////////////////////////////////////////////////////
 #include <toolbox_stdafx.h>
 #include "DemoCamera.h"
-#include "MousePick.h"
-#include "NewtonDemos.h"
+//#include "MousePick.h"
+#include "OpenGlUtil.h"
 #include "PhysicsUtils.h"
 #include "DemoCameraListener.h"
 
@@ -57,6 +57,8 @@ DemoCameraListener::~DemoCameraListener()
 
 void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat timestep)
 {
+	dAssert (0);
+/*
 	// update the camera;
 	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
@@ -121,6 +123,7 @@ void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat times
 	m_camera->SetMatrix (*scene, rot, targetMatrix.m_posit);
 
 	UpdatePickBody(scene, timestep);
+*/
 }
 
 void DemoCameraListener::PostUpdate (const NewtonWorld* const world, dFloat timestep)
@@ -193,6 +196,9 @@ void DemoCameraListener::OnPickedBodyDestroyedNotify (const NewtonBody* body)
 
 void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat timestep) 
 {
+dAssert (0);
+/*
+
 	NewtonDemos* const mainWin = scene->GetRootWindow();
 
 	// handle pick body from the screen
@@ -251,6 +257,7 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 	}
 
 	m_prevMouseState = mousePickState;
+*/
 }
 
 

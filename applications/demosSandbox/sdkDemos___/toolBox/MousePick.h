@@ -11,8 +11,6 @@
 
 
 #include <toolbox_stdafx.h>
-#include "OpenGlUtil.h"
-
 
 NewtonBody* MousePickByForce (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat& paramter, dVector& positionOut, dVector& normalOut);
 

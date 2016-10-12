@@ -11,8 +11,61 @@
 
 
 #include <toolbox_stdafx.h>
-#include "DemoEntityManager.h"
 #include "SkyBox.h"
+#include "DemoMesh.h"
+#include "PhysicsUtils.h"
+#include "DebugDisplay.h"
+#include "DemoEntityManager.h"
+#include "DemoCameraListener.h"
+
+/// demos forward declaration 
+void Friction (DemoEntityManager* const scene);
+void Restitution (DemoEntityManager* const scene);
+void PrecessingTops (DemoEntityManager* const scene);
+void ClosestDistance (DemoEntityManager* const scene);
+void ConvexCast (DemoEntityManager* const scene);
+void PrimitiveCollision (DemoEntityManager* const scene);
+void KinematicPlacement (DemoEntityManager* const scene);
+void ClothPatch(DemoEntityManager* const scene);
+void SoftBodies (DemoEntityManager* const scene);
+void BasicBoxStacks (DemoEntityManager* const scene);
+void SimpleMeshLevelCollision (DemoEntityManager* const scene);
+void OptimizedMeshLevelCollision (DemoEntityManager* const scene);
+void UniformScaledCollision (DemoEntityManager* const scene);
+void NonUniformScaledCollision (DemoEntityManager* const scene);
+void ScaledMeshCollision (DemoEntityManager* const scene);
+void ContinuousCollision (DemoEntityManager* const scene);
+void ContinuousCollision1 (DemoEntityManager* const scene);
+void PuckSlide (DemoEntityManager* const scene);
+void SceneCollision (DemoEntityManager* const scene);
+void CompoundCollision(DemoEntityManager* const scene);
+void AlchimedesBuoyancy(DemoEntityManager* const scene);
+void SimpleConvexApproximation(DemoEntityManager* const scene);
+void SimpleBooleanOperations(DemoEntityManager* const scene);
+void SimpleConvexFracturing (DemoEntityManager* const scene);
+void StructuredConvexFracturing (DemoEntityManager* const scene);
+void UsingNewtonMeshTool (DemoEntityManager* const scene);
+void MultiRayCast (DemoEntityManager* const scene);
+void BasicCar (DemoEntityManager* const scene);
+void SuperCar (DemoEntityManager* const scene);
+void MilitaryTransport (DemoEntityManager* const scene);
+void BasicPlayerController (DemoEntityManager* const scene);
+void AdvancedPlayerController (DemoEntityManager* const scene);
+void HeightFieldCollision (DemoEntityManager* const scene);
+void UserPlaneCollision (DemoEntityManager* const scene);
+void UserHeightFieldCollision (DemoEntityManager* const scene);
+void PassiveRagDoll (DemoEntityManager* const scene);
+void DynamicRagDoll (DemoEntityManager* const scene);
+void ArticulatedJoints (DemoEntityManager* const scene);
+void StandardJoints (DemoEntityManager* const scene);
+
+
+DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] = 
+{
+	{"Using the newton mesh tool", "demonstrate how to use the newton mesh toll for mesh manipulation", UsingNewtonMeshTool},
+	{"Coefficients of friction", "demonstrate the effect of various coefficient of friction", Friction},
+};
+
 
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
@@ -21,6 +74,8 @@ DemoEntityManager::DemoEntityManager ()
 	:m_mainFrame(NULL)
 	,m_defaultFont(0)
 	,m_sky(NULL)
+	,m_world(NULL)
+	,m_cameraManager(NULL)
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -72,12 +127,10 @@ DemoEntityManager::DemoEntityManager ()
 	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
 	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
 	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
-	
-	
 	//glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
 	//glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 
-	LoadDefaultFont();
+	LoadFont();
 
 	m_mousePressed[0] = false;
 	m_mousePressed[1] = false;
@@ -95,7 +148,7 @@ DemoEntityManager::~DemoEntityManager ()
 }
 
 
-void DemoEntityManager::LoadDefaultFont()
+void DemoEntityManager::LoadFont()
 {
 	// Build texture atlas
 	ImGuiIO& io = ImGui::GetIO();
@@ -176,12 +229,21 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Demos")) {
-			if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-			if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-			ImGui::Separator();
-			if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-			if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-			if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+			//if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+			//if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+			//ImGui::Separator();
+			//if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+			//if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+			//if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+
+			//wxMenu* const sdkDemos = new wxMenu;
+			int demosCount = int (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
+			for (int i = 0; i < demosCount; i ++) {
+				if (ImGui::RadioButton(m_demosSelection[i].m_name, false)) {
+					dAssert(0);
+				}
+			}
+
 			ImGui::EndMenu();
 		}
 
@@ -398,6 +460,168 @@ void DemoEntityManager::PushTransparentMesh (const DemoMeshInterface* const mesh
 	TransparentMesh entry (matrix, (DemoMesh*) mesh);
 	m_tranparentHeap.Push (entry, matrix.m_posit.m_z);
 }
+
+
+void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& dictionary)
+{
+	// load all meshes into a Mesh cache for reuse
+	dTree<DemoMeshInterface*, dScene::dTreeNode*> meshDictionary;
+	for (dScene::dTreeNode* node = scene->GetFirstNode (); node; node = scene->GetNextNode (node)) {
+		dNodeInfo* info = scene->GetInfoFromNode(node);
+		if (info->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
+			DemoMeshInterface* const mesh = new DemoMesh(scene, node);
+			meshDictionary.Insert(mesh, node);
+		}
+	}
+
+	// create an entity for every root node in the mesh
+	// a root node or scene entity is a dSceneNodeInfo with a direct link to the root of the dScene node.
+	dScene::dTreeNode* const root = scene->GetRootNode();
+	for (void* child = scene->GetFirstChildLink(root); child; child = scene->GetNextChildLink (root, child)) {
+		dScene::dTreeNode* node = scene->GetNodeFromLink(child);
+		dNodeInfo* info = scene->GetInfoFromNode(node);
+		if (info->GetTypeId() == dSceneNodeInfo::GetRttiType()) {
+			// we found a root dSceneNodeInfo, convert it to a Scene entity and load all it children 
+			DemoEntity* const entityRoot = new DemoEntity (*this, scene, node, meshDictionary, dictionary);
+			Append(entityRoot);
+		}
+	}
+
+	// release all meshes before exiting
+	dTree<DemoMeshInterface*, dScene::dTreeNode*>::Iterator iter (meshDictionary);
+	for (iter.Begin(); iter; iter++) {
+		DemoMeshInterface* const mesh = iter.GetNode()->GetInfo();
+		mesh->Release();
+	}
+}
+
+
+void DemoEntityManager::LoadScene (const char* const fileName)
+{
+	dScene database (GetNewton());
+
+	database.Deserialize(fileName);
+
+	// this will apply all global the scale to the mesh
+	database.FreezeScale();
+	// this will apply all local scale and transform to the mesh
+	//database.FreezePivot();
+
+	// Load the Visual Scene
+	EntityDictionary entDictionary;
+	LoadVisualScene(&database, entDictionary);
+
+	//Load the physics world
+	dList<NewtonBody*> bodyList;
+	database.SceneToNewtonWorld(m_world, bodyList);
+
+	// bind every rigidBody loaded to the scene entity
+	for (dList<NewtonBody*>::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext()) {
+		// find the user data and set to the visual entity in the scene
+		NewtonBody* const body = bodyNode->GetInfo();
+		dScene::dTreeNode* const sceneNode = (dScene::dTreeNode*)NewtonBodyGetUserData(body);
+		DemoEntity* const entity = entDictionary.Find(sceneNode)->GetInfo();
+		NewtonBodySetUserData(body, entity);
+
+		// see if this body have some special setups
+		dScene::dTreeNode* const node = database.FindChildByType(sceneNode, dRigidbodyNodeInfo::GetRttiType());
+		dAssert (node);
+		dRigidbodyNodeInfo* const bodyData = (dRigidbodyNodeInfo*) database.GetInfoFromNode(node);
+		dVariable* bodyType = bodyData->FindVariable("rigidBodyType");
+
+		// set the default call backs
+		if (!bodyType || !strcmp (bodyType->GetString(), "default gravity")) {
+			NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+			NewtonBodySetDestructorCallback (body, PhysicsBodyDestructor);
+		}
+	}
+
+	// clean up all caches the engine have saved
+	NewtonInvalidateCache (m_world);
+}
+
+
+void DemoEntityManager::SerializeFile (void* const serializeHandle, const void* const buffer, int size)
+{
+	// check that each chunk is a multiple of 4 bytes, this is useful for easy little to big Indian conversion
+	dAssert ((size & 0x03) == 0);
+	fwrite (buffer, size, 1, (FILE*) serializeHandle);
+}
+
+void DemoEntityManager::DeserializeFile (void* const serializeHandle, void* const buffer, int size)
+{
+	// check that each chunk is a multiple of 4 bytes, this is useful for easy little to big Indian conversion
+	dAssert ((size & 0x03) == 0);
+	fread (buffer, size, 1, (FILE*) serializeHandle);
+}
+
+
+void DemoEntityManager::BodySerialization (NewtonBody* const body, void* const bodyUserData, NewtonSerializeCallback serializeCallback, void* const serializeHandle)
+{
+	// here the use can save information of this body, ex:
+	// a string naming the body,  
+	// serialize the visual mesh, or save a link to the visual mesh
+	// save labels for looking up the body call backs
+
+	// for the demos I will simple write three stream to identify what body it is, the application can do anything
+	const char* const bodyIndentification = "gravityBody\0\0\0\0";
+	int size = (strlen (bodyIndentification) + 3) & -4;
+	serializeCallback (serializeHandle, &size, sizeof (size));
+	serializeCallback (serializeHandle, bodyIndentification, size);
+}
+
+
+void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const bodyUserData, NewtonDeserializeCallback deserializecallback, void* const serializeHandle)
+{
+	int size;
+	char bodyIndentification[256];
+
+	deserializecallback (serializeHandle, &size, sizeof (size));
+	deserializecallback (serializeHandle, bodyIndentification, size);
+
+	// get the world and the scene form the world user data
+	NewtonWorld* const world = NewtonBodyGetWorld(body);
+	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+	// here we attach a visual object to the entity, 
+	dMatrix matrix;
+	NewtonBodyGetMatrix(body, &matrix[0][0]);
+	DemoEntity* const entity = new DemoEntity(matrix, NULL);
+	scene->Append (entity);
+
+	NewtonBodySetUserData (body, entity);
+	NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+	NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+	NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
+	if (NewtonCollisionGetType(collision) == SERIALIZE_ID_TREE) {
+		NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
+	}
+#endif
+
+	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
+	dTree <DemoMeshInterface*, const void*>* const cache = (dTree <DemoMeshInterface*, const void*>*)bodyUserData;
+	dTree <DemoMeshInterface*, const void*>::dTreeNode* node = cache->Find(NewtonCollisionDataPointer (collision));
+	if (!node) {
+		DemoMeshInterface* mesh = new DemoMesh(bodyIndentification, collision, NULL, NULL, NULL);
+		node = cache->Insert(mesh, NewtonCollisionDataPointer (collision));
+	} else {
+		node->GetInfo()->AddRef();
+	}
+
+	DemoMeshInterface* const mesh = node->GetInfo();
+	entity->SetMesh(mesh, dGetIdentityMatrix());
+	mesh->Release();
+}
+
+void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
+{
+	dAssert (0);
+	m_cameraManager->SetCameraMatrix(this, rotation, position);
+}
+
 
 
 void DemoEntityManager::Run()

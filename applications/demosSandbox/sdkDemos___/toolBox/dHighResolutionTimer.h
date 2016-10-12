@@ -15,13 +15,8 @@
 
 #include <toolbox_stdafx.h>
 
-
-
 void dResetTimer();
 dFloat dGetElapsedSeconds();
 unsigned64 dGetTimeInMicrosenconds();
-
-
-
 #endif 
 

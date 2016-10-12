@@ -64,6 +64,9 @@ typedef long long unsigned64;
 	#include <time.h>
 	#include <tchar.h>
 	#include <crtdbg.h>
+
+	#include <GL/glu.h>
+	#include <GL/gl.h>
 	#include <imgui.h>
 	#include <glfw3.h>
 	#include <glfw3native.h>

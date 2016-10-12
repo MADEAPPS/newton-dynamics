@@ -12,15 +12,15 @@
 
 
 #include <toolbox_stdafx.h>
-#include "DemoEntityManager.h"
-/*
-#include "SkyBox.h"
-#include "TargaToOpenGl.h"
 #include "DemoMesh.h"
-#include "DemoEntityManager.h"
-#include "DemoCamera.h"
 #include "PhysicsUtils.h"
+#include "DemoEntityManager.h"
 
+//#include "SkyBox.h"
+//#include "TargaToOpenGl.h"
+//#include "DemoMesh.h"
+//#include "DemoEntityManager.h"
+//#include "DemoCamera.h"
 
 
 static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, const dVector& origin, const dVector& scale, dFloat mass)
@@ -159,15 +159,12 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 	return body;
 }
 
-*/
 
 void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
 
-dAssert (0);
-/*
 
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
@@ -181,12 +178,14 @@ dAssert (0);
 //	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	// using my own interpretation
 
+
 	NewtonSetContactMergeTolerance (scene->GetNewton(), 1.0e-3f);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (0.7f, 0.25f, 0.7f, 0.0f), 0.0f);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.015f, 0.0f), dVector (0.0125f, 0.0063f, 0.0063f, 0.0f), 1.0f);
 	//CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 0.0f, 0.0f), dVector (2.0f, 0.5f, 1.0f, 0.0f), 0.0f);
 
 	CreateSimpleNewtonMeshBox (scene, dVector (0.0f, 2.0f, 0.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+
 
 	// place camera into position
 	dQuaternion rot;
@@ -196,7 +195,7 @@ dAssert (0);
 	scene->SetCameraMatrix(rot, origin);
 
 //	NewtonSerializeToFile(scene->GetNewton(), "xxxx.bin");
-*/
+
 }
 
 

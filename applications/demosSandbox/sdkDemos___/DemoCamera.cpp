@@ -17,8 +17,7 @@
 #include <toolbox_stdafx.h>
 #include "DemoCamera.h"
 #include "MousePick.h"
-#include "NewtonDemos.h"
-#include "NewtonDemos.h"
+
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
