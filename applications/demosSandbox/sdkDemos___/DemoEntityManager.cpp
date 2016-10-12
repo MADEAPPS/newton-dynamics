@@ -372,7 +372,29 @@ void DemoEntityManager::ShowMainMenuBar()
 			int demosCount = int (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
 			for (int i = 0; i < demosCount; i ++) {
 				if (ImGui::RadioButton(m_demosSelection[i].m_name, false)) {
-					dAssert(0);
+
+					//BEGIN_MENU_OPTION();
+					//NewtonWaitForUpdateToFinish (m_world);
+
+					Cleanup();
+
+					m_demosSelection[i].m_launchDemoCallback (this);
+					//m_scene->SwapBuffers(); 
+
+					//RestoreSettings ();
+					ResetTimer();
+
+					// clean up all caches the engine have saved
+					NewtonInvalidateCache(m_world);
+
+					dAssert (0);
+					//END_MENU_OPTION();
+					//NewtonWaitForUpdateToFinish (m_world);
+					//SetAutoSleepMode (m_world, !m_autoSleepState);
+					//NewtonSetSolverModel (m_world, m_solverModes[m_solverModeIndex]);
+					//NewtonSetSolverConvergenceQuality (m_world, m_solverModeQuality ? 1 : 0);
+					//NewtonSetMultiThreadSolverOnSingleIsland (m_world, m_useParallelSolver ? 1 : 0);	
+					//NewtonSelectBroadphaseAlgorithm (m_world, m_broadPhaseType);
 				}
 			}
 
@@ -586,7 +608,8 @@ void DemoEntityManager::EndFrame()
 			sprintf (text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
 			ImGui::Text(text);
 
-			sprintf (text, "memory used:  %6.3f kbytes", NewtonGetMemoryUsed() / 1024);
+			int xxx = NewtonGetMemoryUsed();
+			sprintf (text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
 			ImGui::Text(text);
 
 			sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
@@ -600,7 +623,7 @@ void DemoEntityManager::EndFrame()
 
 /*
 			wxString statusText;
-			NewtonWorld* const world = m_scene->GetNewton();
+			NewtonWorld* const world = m_world;
 			char platform[256];
 			NewtonGetDeviceString(world, NewtonGetCurrentDevice(world), platform, sizeof (platform));
 
