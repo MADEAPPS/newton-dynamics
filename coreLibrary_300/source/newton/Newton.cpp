@@ -651,6 +651,14 @@ void NewtonSetFrictionModel(const NewtonWorld* const newtonWorld, int model)
 	world->SetFrictionMode (model);
 }
 
+void NewtonSetPerformanceClock(const NewtonWorld* const newtonWorld, NewtonGetTimeInMicrosencondsCallback callback)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	world->SetGetTimeInMicrosenconds ((dgWorld::OnGetTimeInMicrosenconds) callback);
+}
+
+
 /*
 void NewtonSetPerformanceClock(const NewtonWorld* const newtonWorld, NewtonGetTicksCountCallback callback)
 {
@@ -702,10 +710,9 @@ void NewtonUpdate(const NewtonWorld* const newtonWorld, dFloat timestep)
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 
-	dgFloat32 minstep = dgFloat32 (DG_MIN_TIMESTEP);
-	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
-
-	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
+//	dgFloat32 minstep = dgFloat32 (DG_MIN_TIMESTEP);
+//	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
+//	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
 
 //NewtonSerializeToFile (newtonWorld, "xxx.bin", NULL, NULL);
 	world->UpdatePhysics (timestep);
@@ -717,10 +724,10 @@ void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep)
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 
-	dgFloat32 minstep = dgFloat32 (DG_MIN_TIMESTEP);
-	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
+//	dgFloat32 minstep = dgFloat32 (DG_MIN_TIMESTEP);
+//	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
+//	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
 
-	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
 	world->UpdatePhysicsAsync(timestep);
 }
 
@@ -732,10 +739,15 @@ void NewtonWaitForUpdateToFinish (const NewtonWorld* const newtonWorld)
 	world->Sync ();
 }
 
+dFloat NewtonGetLastUpdateTime (const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->GetUpdateTime();
+}
 
 
-
-
+/*
 // Name: NewtonSetMinimumFrameRate 
 // Set the minimum frame rate at which the simulation can run.
 //
@@ -756,24 +768,23 @@ void NewtonSetMinimumFrameRate(const NewtonWorld* const newtonWorld, dFloat fram
 	frameRate = dgClamp (frameRate, dgFloat32(1.0f) / dgFloat32 (DG_MAX_TIMESTEP), dgFloat32(1.0f) / dgFloat32 (DG_MIN_TIMESTEP));  
 	world->m_maxTimeStep = dgFloat32(1.0f) / frameRate;
 }
-
-/*
-// Name: NewtonGetTimeStep 
-// Return the correct time step for this simulation update.
-//
-// Parameters:
-// *const NewtonWorld* *newtonWorld - is the pointer to the Newton world.
-//
-// Remark: This application can used this function to get the current simulation time step. 
-// 
-// Return: correct update timestep.
-dFloat NewtonGetTimeStep(const NewtonWorld* const newtonWorld)
-{
-	Newton* const world;
-	Newton* const world = (Newton *)newtonWorld;
-	return world->GetTimeStep();
-}
 */
+
+
+void NewtonSetNumberOfSubsteps (const NewtonWorld* const newtonWorld, int subSteps)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	world->SetSubsteps (subSteps);
+}
+
+int NewtonGetNumberOfSubsteps (const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *) newtonWorld;
+	return world->GetSubsteps ();
+}
+
 
 // Name: NewtonDestroyAllBodies 
 // Remove all bodies and joints from the newton world.

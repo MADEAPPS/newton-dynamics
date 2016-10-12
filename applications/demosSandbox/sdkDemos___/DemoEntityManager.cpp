@@ -20,6 +20,9 @@
 #include "DemoEntityListener.h"
 #include "dHighResolutionTimer.h"
 
+#define MAX_PHYSICS_FPS				60.0f
+#define MAX_PHYSICS_SUB_STEPS		2
+
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
 void Restitution (DemoEntityManager* const scene);
@@ -83,9 +86,12 @@ DemoEntityManager::DemoEntityManager ()
 	,m_microsecunds(0)
 	,m_tranparentHeap()
 	,m_framesCount(0)
+	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
+	,m_mainThreadPhysicsTime(0.0f)
 	,m_showStats(true)
+	,m_synchronousPhysicsUpdateMode(true)
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -244,6 +250,8 @@ void DemoEntityManager::Cleanup ()
 	m_cameraManager = new DemoCameraListener(this);
 	//	m_postListenerManager.Append (new DemoAIListener("aiManager"));
 
+	// set number of internal sub steps
+	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
 
 	// set the default parameters for the newton world
 	// set the simplified solver mode (faster but less accurate)
@@ -262,6 +270,9 @@ void DemoEntityManager::Cleanup ()
 
 	// Set the Newton world user data
 	NewtonWorldSetUserData(m_world, this);
+
+	// for debugging time spend on phys update
+	NewtonSetPerformanceClock (m_world, dGetTimeInMicrosenconds);
 
 	// we start without 2d render
 	m_renderHood = NULL;
@@ -419,6 +430,15 @@ void DemoEntityManager::CursorposCallback  (GLFWwindow* , double x, double y)
 	io.MousePos = ImVec2((float)x, (float)y);
 }
 
+bool DemoEntityManager::GetMousePosition (int& posX, int& posY) const
+{
+	ImGuiIO& io = ImGui::GetIO();
+	posX = int (io.MousePos.x);
+	posY = int (io.MousePos.y);
+	return true;
+}
+
+
 // This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
 // If text or lines are blurry when integrating ImGui in your engine:
 // - in your Render function, try translating your projection matrix by (0.5f,0.5f) or (0.375f,0.375f)
@@ -555,20 +575,49 @@ void DemoEntityManager::EndFrame()
 	dTimeTrackerEvent(__FUNCTION__);
     ImVec4 clear_color = ImColor(114, 144, 154);
 
-	dFloat timestep = dGetElapsedSeconds();	
-	CalculateFPS(timestep);
-
-
-
-
-
 	if (m_showStats) {
 		bool dommy;
-		char text[256];
-		sprintf (text, "fps: %5.2f", m_fps);
-		ImGui::Begin("statistics", &dommy);
-		ImGui::Text(text);
-		ImGui::End();
+		char text[1024];
+
+		if (ImGui::Begin("statistics", &dommy)){
+			sprintf (text, "fps         : %6.3f", m_fps);
+			ImGui::Text(text);
+
+			sprintf (text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
+			ImGui::Text(text);
+
+/*
+		wxString statusText;
+		NewtonWorld* const world = m_scene->GetNewton();
+		char platform[256];
+		NewtonGetDeviceString(world, NewtonGetCurrentDevice(world), platform, sizeof (platform));
+		int memoryUsed = NewtonGetMemoryUsed() / (1024) ;
+
+		statusText.Printf (wxT ("render fps: %7.2f"), m_fps);
+		m_statusbar->SetStatusText (statusText, 0);
+
+
+		statusText.Printf (wxT ("memory: %d kbytes"), memoryUsed);
+		m_statusbar->SetStatusText (statusText, 2);
+
+		statusText.Printf (wxT ("bodies: %d"), NewtonWorldGetBodyCount(world));
+		m_statusbar->SetStatusText (statusText, 3);
+
+		statusText.Printf (wxT ("threads: %d"), NewtonGetThreadsCount(world));
+		m_statusbar->SetStatusText (statusText, 4);
+
+		statusText.Printf (wxT ("auto sleep: %s"), m_autoSleepState ? wxT("on") : wxT("off"));
+		m_statusbar->SetStatusText (statusText, 5);
+
+		char floatMode[128];
+		NewtonGetDeviceString (world, m_hardwareDevice, floatMode, sizeof (floatMode));
+		statusText.Printf (wxT ("instructions: %s"),  wxString::FromAscii(floatMode).wc_str());
+		m_statusbar->SetStatusText (statusText, 6);
+*/
+
+
+			ImGui::End();
+		}
 	}
 	ShowMainMenuBar();
 
@@ -598,36 +647,6 @@ void DemoEntityManager::CalculateFPS(dFloat timestep)
 		m_fps = dFloat (m_framesCount) / m_timestepAcc;
 		m_timestepAcc -= 0.25f;
 		m_framesCount = 0;
-/*
-		wxString statusText;
-		NewtonWorld* const world = m_scene->GetNewton();
-		char platform[256];
-		NewtonGetDeviceString(world, NewtonGetCurrentDevice(world), platform, sizeof (platform));
-		int memoryUsed = NewtonGetMemoryUsed() / (1024) ;
-
-		statusText.Printf (wxT ("render fps: %7.2f"), m_fps);
-		m_statusbar->SetStatusText (statusText, 0);
-
-		statusText.Printf (wxT ("physics time: %4.2f ms"), m_scene->GetPhysicsTime() * 1000.0f);
-		m_statusbar->SetStatusText (statusText, 1);
-
-		statusText.Printf (wxT ("memory: %d kbytes"), memoryUsed);
-		m_statusbar->SetStatusText (statusText, 2);
-
-		statusText.Printf (wxT ("bodies: %d"), NewtonWorldGetBodyCount(world));
-		m_statusbar->SetStatusText (statusText, 3);
-
-		statusText.Printf (wxT ("threads: %d"), NewtonGetThreadsCount(world));
-		m_statusbar->SetStatusText (statusText, 4);
-
-		statusText.Printf (wxT ("auto sleep: %s"), m_autoSleepState ? wxT("on") : wxT("off"));
-		m_statusbar->SetStatusText (statusText, 5);
-
-		char floatMode[128];
-		NewtonGetDeviceString (world, m_hardwareDevice, floatMode, sizeof (floatMode));
-		statusText.Printf (wxT ("instructions: %s"),  wxString::FromAscii(floatMode).wc_str());
-		m_statusbar->SetStatusText (statusText, 6);
-*/
 	}
 }
 
@@ -811,6 +830,50 @@ void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVec
 }
 
 
+void DemoEntityManager::UpdatePhysics(dFloat timestep)
+{
+	// update the physics
+	if (m_world) {
+
+		dFloat timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
+		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
+
+		unsigned64 currentTime = dGetTimeInMicrosenconds ();
+		unsigned64 nextTime = currentTime - m_microsecunds;
+		if (nextTime > timestepMicrosecunds * 2) {
+			m_microsecunds = currentTime - timestepMicrosecunds * 2;
+			nextTime = currentTime - m_microsecunds;
+		}
+
+		bool newUpdate = false;
+		dFloat physicsTime = 0.0f;
+		//while (nextTime >= timestepMicrosecunds) 
+		if (nextTime >= timestepMicrosecunds) 
+		{
+			dTimeTrackerEvent(__FUNCTION__);
+			newUpdate = true;
+			ClearDebugDisplay(m_world);
+
+			if (m_synchronousPhysicsUpdateMode) {
+				NewtonUpdate (m_world, timestepInSecunds);
+			} else {
+				NewtonUpdateAsync(m_world, timestepInSecunds);
+			}
+			physicsTime += NewtonGetLastUpdateTime(m_world);
+			
+			nextTime -= timestepMicrosecunds;
+			m_microsecunds += timestepMicrosecunds;
+		}
+
+		if (newUpdate) {
+			m_mainThreadPhysicsTime = physicsTime;
+		}
+		
+//dTrace (("%f\n", m_mainThreadPhysicsTime));
+	}
+}
+
+
 
 void DemoEntityManager::Run()
 {
@@ -818,6 +881,11 @@ void DemoEntityManager::Run()
     while (!glfwWindowShouldClose(m_mainFrame))
     {
 		dTimeTrackerEvent(__FUNCTION__);
+
+		dFloat timestep = dGetElapsedSeconds();	
+		CalculateFPS(timestep);
+		UpdatePhysics(timestep);
+
         BeginFrame();
 /*
         // 1. Show a simple window

@@ -85,7 +85,7 @@ Newton::Newton (dgFloat32 scale, dgMemoryAllocator* const allocator, dgInt32 sta
 	:dgWorld(allocator, stackSize) 
 	,NewtonDeadBodies(allocator)
 	,NewtonDeadJoints(allocator)
-	,m_maxTimeStep(DG_TIMESTEP)
+//	,m_maxTimeStep(DG_TIMESTEP)
 	,m_destructor(NULL)
 {
 }
@@ -104,6 +104,8 @@ void Newton::UpdatePhysics (dgFloat32 timestep)
 	NewtonDeadBodies& bodyList = *this;
 	NewtonDeadJoints& jointList = *this;
 
+	dgAssert (bodyList.GetCount() == 1);
+	dgAssert (jointList.GetCount() == 1);
 	jointList.DestroyJoints (*this);
 	bodyList.DestroyBodies (*this);
 }
@@ -115,6 +117,9 @@ void Newton::UpdatePhysicsAsync (dgFloat32 timestep)
 	if (!IsBusy()) {		
 		NewtonDeadBodies& bodyList = *this;
 		NewtonDeadJoints& jointList = *this;
+
+		dgAssert (bodyList.GetCount() == 1);
+		dgAssert (jointList.GetCount() == 1);
 
 		jointList.DestroyJoints (*this);
 		bodyList.DestroyBodies (*this);

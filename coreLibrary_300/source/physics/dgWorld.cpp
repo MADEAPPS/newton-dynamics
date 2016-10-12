@@ -238,6 +238,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 
 	m_allocator = allocator;
 	m_islandUpdate = NULL;
+	m_getDebugTime = NULL;
 
 	m_onCollisionInstanceDestruction = NULL;
 	m_onCollisionInstanceCopyConstrutor = NULL;
@@ -257,6 +258,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	m_solverMode = DG_DEFAULT_SOLVER_ITERATION_COUNT;
 	m_frictionMode = 0;
 	m_dynamicsLru = 0;
+	m_numberOfSubsteps = 1;
 		
 	m_bodiesUniqueID = 0;
 	m_frictiomTheshold = dgFloat32 (0.25f);
@@ -994,7 +996,12 @@ void dgWorld::Execute (dgInt32 threadID)
 void dgWorld::TickCallback (dgInt32 threadID)
 {
 	if (threadID == DG_MUTEX_THREAD_ID) {
-		StepDynamics (m_savetimestep);
+		dgUnsigned64 timeAcc = m_getDebugTime ? m_getDebugTime() : 0;
+		dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
+		for (dgUnsigned32 i = 0; i < m_numberOfSubsteps; i ++) {
+			StepDynamics (step);
+		}
+		m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
 	} else {
 		Update (m_savetimestep);
 	}
@@ -1018,7 +1025,12 @@ void dgWorld::Update (dgFloat32 timestep)
 		dgSetPrecisionDouble precision;
 
 		// run update in same thread as the calling application as if it was a separate thread  
-		StepDynamics (m_savetimestep);
+		dgUnsigned64 timeAcc = m_getDebugTime ? m_getDebugTime() : 0;
+		dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
+		for (dgInt32 i = 0; i < m_numberOfSubsteps; i ++) {
+			StepDynamics (m_savetimestep);
+		}
+		m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
 	#else 
 		// runs the update in a separate thread and wait until the update is completed before it returns.
 		// this will run well on single core systems, since the two thread are mutually exclusive 
@@ -1032,7 +1044,12 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 	m_savetimestep = timestep;
 
 	#ifdef DG_USE_THREAD_EMULATION
-		StepDynamics (m_savetimestep);
+		dgUnsigned64 timeAcc = m_getDebugTime ? m_getDebugTime() : 0;
+		dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
+		for (dgInt32 i = 0; i < m_numberOfSubsteps; i ++) {
+			StepDynamics (m_savetimestep);
+		}
+		m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
 	#else 
 		// execute one update, but do not wait for the update to finish, instead return immediately to the caller
 		dgAsyncThread::Tick();
@@ -1100,6 +1117,11 @@ void dgWorld::OnBodyDeserializeFromFile (dgBody& body, void* const userData, dgD
 
 }
 
+
+void dgWorld::SetGetTimeInMicrosenconds (OnGetTimeInMicrosenconds callback)
+{
+	m_getDebugTime = callback;
+}
 
 void dgWorld::SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor)
 {

@@ -57,19 +57,16 @@ DemoCameraListener::~DemoCameraListener()
 
 void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat timestep)
 {
-	dAssert (0);
-/*
 	// update the camera;
 	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-
-	NewtonDemos* const mainWin = scene->GetRootWindow();
+//	NewtonDemos* const mainWin = scene->GetRootWindow();
 
 	dMatrix targetMatrix (m_camera->GetNextMatrix());
 
 	int mouseX;
 	int mouseY;
-	mainWin->GetMousePosition (mouseX, mouseY);
-
+	scene->GetMousePosition (mouseX, mouseY);
+/*
 	// slow down the Camera if we have a Body
 	dFloat slowDownFactor = mainWin->IsShiftKeyDown() ? 0.5f/10.0f : 0.5f;
 

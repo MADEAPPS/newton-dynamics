@@ -126,6 +126,7 @@ class dgWorld
 	,public dgWorldThreadPool
 {
 	public:
+	typedef dgUnsigned64 (dgApi *OnGetTimeInMicrosenconds) ();
 	typedef dgUnsigned32 (dgApi *OnIslandUpdate) (const dgWorld* const world, void* island, dgInt32 bodyCount);
 	typedef void (dgApi *OnListenerBodyDestroyCallback) (const dgWorld* const world, void* const listener, dgBody* const body);
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listener, dgFloat32 timestep);
@@ -189,6 +190,8 @@ class dgWorld
 	dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize);
 	~dgWorld();
 
+
+	dgFloat32 GetUpdateTime() const;
 	dgBroadPhase* GetBroadPhase() const;
 
 	void SetSolverMode (dgInt32 mode);
@@ -289,6 +292,7 @@ class dgWorld
 	dgBroadPhaseAggregate* CreateAggreGate() const; 
 	void DestroyAggregate(dgBroadPhaseAggregate* const aggregate) const; 
 
+	void SetGetTimeInMicrosenconds (OnGetTimeInMicrosenconds callback);
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 
 	static void OnSerializeToFile (void* const userData, const void* const buffer, size_t size);
@@ -354,6 +358,9 @@ class dgWorld
 	void SetContactMergeTolerance(dgFloat32 tolerenace);
 
 	void Sync ();
+
+	void SetSubsteps (dgInt32 subSteps);
+	dgInt32 GetSubsteps () const;
 	
 	private:
 	void CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
@@ -401,7 +408,7 @@ class dgWorld
 	};
 	static dgInt32 SortFaces (const dgAdressDistPair* const A, const dgAdressDistPair* const B, void* const context);
 
-
+	dgUnsigned32 m_numberOfSubsteps;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_inUpdate;
 	dgUnsigned32 m_solverMode;
@@ -420,6 +427,7 @@ class dgWorld
 	dgFloat32 m_savetimestep;
 	dgFloat32 m_contactTolerance;
 	dgFloat32 m_solverConvergeQuality;
+	dgFloat32 m_lastExecutionTime;
 
 	dgSolverSleepTherfesholds m_sleepTable[DG_SLEEP_ENTRIES];
 	
@@ -432,6 +440,7 @@ class dgWorld
 	dgMemoryAllocator* m_allocator;
 	dgInt32 m_hardwaredIndex;
 	OnIslandUpdate m_islandUpdate;
+	OnGetTimeInMicrosenconds m_getDebugTime;
 	OnCollisionInstanceDestroy	m_onCollisionInstanceDestruction;
 	OnCollisionInstanceDuplicate m_onCollisionInstanceCopyConstrutor;
 	OnJointSerializationCallback m_serializedJointCallback;	
@@ -489,6 +498,21 @@ inline dgMemoryAllocator* dgWorld::GetAllocator() const
 inline dgBroadPhase* dgWorld::GetBroadPhase() const
 {
 	return m_broadPhase;
+}
+
+inline void dgWorld::SetSubsteps (dgInt32 subSteps)
+{
+	m_numberOfSubsteps = dgClamp(subSteps, 1, 8);
+}
+
+inline dgInt32 dgWorld::GetSubsteps () const
+{
+	return m_numberOfSubsteps;
+}
+
+inline dgFloat32 dgWorld::GetUpdateTime() const
+{
+	return m_lastExecutionTime;
 }
 
 #endif

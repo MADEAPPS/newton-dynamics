@@ -84,6 +84,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void LoadScene (const char* const name);
 	void RemoveEntity (DemoEntity* const ent);
 
+
+	bool GetMousePosition (int& posX, int& posY) const;
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
 	void PushTransparentMesh (const DemoMeshInterface* const mesh); 
@@ -99,14 +101,13 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void EndFrame();
 	void LoadFont();
 	void Cleanup();
+	void UpdatePhysics(dFloat timestep);
+
 	void CalculateFPS(dFloat timestep);
 	void RemoveEntity (dListNode* const entNode);
 	
-
 	void ShowMainMenuBar();
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
-
-	
 
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
 	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
@@ -132,7 +133,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 	dFloat m_fps;
 	dFloat m_timestepAcc;
 	dFloat m_currentListenerTimestep;
+	dFloat m_mainThreadPhysicsTime;
 	bool m_showStats;
+	bool m_synchronousPhysicsUpdateMode;
 
 
 	static SDKDemos m_demosSelection[];

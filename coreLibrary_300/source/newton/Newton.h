@@ -326,14 +326,15 @@ extern "C" {
 	typedef void* (*NewtonAllocMemory) (int sizeInBytes);
 	typedef void (*NewtonFreeMemory) (void* const ptr, int sizeInBytes);
 
-
+	
 	typedef void (*NewtonWorldDestructorCallback) (const NewtonWorld* const world);
 
 	typedef void (*NewtonWorldListenerBodyDestroyCallback) (const NewtonWorld* const world, void* const listenerUserData, NewtonBody* const body);
 	typedef void (*NewtonWorldUpdateListenerCallback) (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
 	typedef void (*NewtonWorldDestroyListenerCallback) (const NewtonWorld* const world, void* const listenerUserData);
 
-	typedef unsigned (*NewtonGetTicksCountCallback) ();
+	//typedef unsigned (*NewtonGetTicksCountCallback) ();
+	typedef dLong (*NewtonGetTimeInMicrosencondsCallback) ();
 
 	typedef void (*NewtonSerializeCallback) (void* const serializeHandle, const void* const buffer, int size);
 	typedef void (*NewtonDeserializeCallback) (void* const serializeHandle, void* const buffer, int size);
@@ -448,7 +449,7 @@ extern "C" {
 	NEWTON_API void NewtonSetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld, int mode);
 	NEWTON_API int NewtonGetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld);
 
-	//NEWTON_API void NewtonSetPerformanceClock (const NewtonWorld* const newtonWorld, NewtonGetTicksCountCallback callback);
+	NEWTON_API void NewtonSetPerformanceClock (const NewtonWorld* const newtonWorld, NewtonGetTimeInMicrosencondsCallback callback);
 	//NEWTON_API unsigned NewtonReadPerformanceTicks (const NewtonWorld* const newtonWorld, unsigned performanceEntry);
 	//NEWTON_API unsigned NewtonReadThreadPerformanceTicks (const NewtonWorld* newtonWorld, unsigned threadIndex);
 
@@ -458,6 +459,12 @@ extern "C" {
 	NEWTON_API void NewtonUpdate (const NewtonWorld* const newtonWorld, dFloat timestep);
 	NEWTON_API void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep);
 	NEWTON_API void NewtonWaitForUpdateToFinish (const NewtonWorld* const newtonWorld);
+
+
+//	NEWTON_API void NewtonSetMinimumFrameRate (const NewtonWorld* const newtonWorld, dFloat frameRate);
+	NEWTON_API int NewtonGetNumberOfSubsteps (const NewtonWorld* const newtonWorld);
+	NEWTON_API void NewtonSetNumberOfSubsteps (const NewtonWorld* const newtonWorld, int subSteps);
+	NEWTON_API dFloat NewtonGetLastUpdateTime (const NewtonWorld* const newtonWorld);
 
 	NEWTON_API void NewtonSerializeToFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodySerializationCallback bodyCallback, void* const bodyUserData);
 	NEWTON_API void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodyDeserializationCallback bodyCallback, void* const bodyUserData);
@@ -483,7 +490,7 @@ extern "C" {
 	
 
 	NEWTON_API void NewtonSetFrictionModel (const NewtonWorld* const newtonWorld, int model);
-	NEWTON_API void NewtonSetMinimumFrameRate (const NewtonWorld* const newtonWorld, dFloat frameRate);
+
 	NEWTON_API void NewtonSetIslandUpdateEvent (const NewtonWorld* const newtonWorld, NewtonIslandUpdate islandUpdate); 
 //	NEWTON_API void NewtonSetDestroyBodyByExeciveForce (const NewtonWorld* const newtonWorld, NewtonDestroyBodyByExeciveForce callback); 
 //	NEWTON_API void NewtonWorldForEachBodyDo (const NewtonWorld* const newtonWorld, NewtonBodyIterator callback);
