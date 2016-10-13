@@ -361,14 +361,6 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Demos")) {
-			//if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-			//if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-			//ImGui::Separator();
-			//if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-			//if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-			//if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-
-			//wxMenu* const sdkDemos = new wxMenu;
 			int demosCount = int (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
 			for (int i = 0; i < demosCount; i ++) {
 				if (ImGui::RadioButton(m_demosSelection[i].m_name, false)) {
@@ -379,7 +371,6 @@ void DemoEntityManager::ShowMainMenuBar()
 					Cleanup();
 
 					m_demosSelection[i].m_launchDemoCallback (this);
-					//m_scene->SwapBuffers(); 
 
 					//RestoreSettings ();
 					ResetTimer();
@@ -387,7 +378,7 @@ void DemoEntityManager::ShowMainMenuBar()
 					// clean up all caches the engine have saved
 					NewtonInvalidateCache(m_world);
 
-					dAssert (0);
+					//dAssert (0);
 					//END_MENU_OPTION();
 					//NewtonWaitForUpdateToFinish (m_world);
 					//SetAutoSleepMode (m_world, !m_autoSleepState);
@@ -592,15 +583,17 @@ void DemoEntityManager::BeginFrame()
 
 }
 
-void DemoEntityManager::EndFrame()
+void DemoEntityManager::RenderUI()
 {
 	dTimeTrackerEvent(__FUNCTION__);
-    ImVec4 clear_color = ImColor(114, 144, 154);
 
 	if (m_showStats) {
 		bool dommy;
 		char text[1024];
 
+		glEnable (GL_BLEND);
+		glDisable (GL_LIGHTING);
+		
 		if (ImGui::Begin("statistics", &dommy)){
 			sprintf (text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text);
@@ -636,15 +629,6 @@ void DemoEntityManager::EndFrame()
 		}
 	}
 	ShowMainMenuBar();
-
-	// Rendering
-	int display_w, display_h;
-	glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
-	glViewport(0, 0, display_w, display_h);
-	glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-	glClear(GL_COLOR_BUFFER_BIT);
-	ImGui::Render();
-	glfwSwapBuffers(m_mainFrame);
 }
 
 void DemoEntityManager::CalculateFPS(dFloat timestep)
@@ -841,7 +825,6 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 
 void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {
-	dAssert (0);
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
 }
 
@@ -889,6 +872,17 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 	}
 }
 
+dFloat DemoEntityManager::CalculateInteplationParam () const
+{
+	unsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
+	dFloat param = (dFloat (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
+	dAssert (param >= 0.0f);
+	if (param > 1.0f) {
+		param = 1.0f;
+	}
+	return param;
+}
+
 void DemoEntityManager::Run()
 {
     // Main loop
@@ -896,42 +890,81 @@ void DemoEntityManager::Run()
     {
 		dTimeTrackerEvent(__FUNCTION__);
 
+		BeginFrame();
+
 		dFloat timestep = dGetElapsedSeconds();	
 		CalculateFPS(timestep);
 		UpdatePhysics(timestep);
 
-        BeginFrame();
-/*
-        // 1. Show a simple window
-        // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
-        {
-            static float f = 0.0f;
-            ImGui::Text("Hello, world!");
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit3("clear color", (float*)&clear_color);
-            if (ImGui::Button("Test Window")) show_test_window ^= 1;
-            if (ImGui::Button("Another Window")) show_another_window ^= 1;
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        }
+		// Get the interpolated location of each body in the scene
+		m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
 
-        // 2. Show another simple window, this time using an explicit Begin/End pair
-        if (show_another_window)
-        {
-            ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("Another Window", &show_another_window);
-            ImGui::Text("Hello");
-            ImGui::End();
-        }
+		int display_w, display_h;
+		glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
+		glViewport(0, 0, display_w, display_h);
+		
+		// Rendering
+		// Our shading model--Goraud (smooth). 
+		glShadeModel (GL_SMOOTH);
 
-        // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-        if (show_test_window)
-        {
-            ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-            ImGui::ShowTestWindow(&show_test_window);
-        }
-*/
+		// Culling. 
+		glCullFace (GL_BACK);
+		glFrontFace (GL_CCW);
+		glEnable (GL_CULL_FACE);
 
-		EndFrame();
+		//	glEnable(GL_DITHER);
+
+		// z buffer test
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc (GL_LEQUAL);
+
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+		glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
+
+		ImVec4 clearColor = ImColor(114, 144, 154);
+		glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// set default lightning
+		glEnable (GL_LIGHTING);
+
+		// make sure the model view matrix is set to identity before setting world space light sources
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+
+		dFloat cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
+		glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
+		glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
+		glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+		// one light form the Camera eye point
+		GLfloat lightDiffuse0[] = { 0.5f, 0.5f, 0.5f, 0.0 };
+		GLfloat lightAmbient0[] = { 0.0f, 0.0f, 0.0f, 0.0 };
+		dVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);
+		GLfloat lightPosition0[] = {camPosition.m_x, camPosition.m_y, camPosition.m_z};
+
+		glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
+		glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse0);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, lightDiffuse0);
+		glEnable(GL_LIGHT0);
+
+
+		// set just one directional light
+		GLfloat lightDiffuse1[] = { 0.7f, 0.7f, 0.7f, 0.0 };
+		GLfloat lightAmbient1[] = { 0.2f, 0.2f, 0.2f, 0.0 };
+		GLfloat lightPosition1[] = { -500.0f, 200.0f, 500.0f, 0.0 };
+
+		glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
+		glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
+		glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
+		glLightfv(GL_LIGHT1, GL_SPECULAR, lightDiffuse1);
+		glEnable(GL_LIGHT1);
+
+
+		RenderUI();
+		ImGui::Render();
+		glfwSwapBuffers(m_mainFrame);
     }
-
 }

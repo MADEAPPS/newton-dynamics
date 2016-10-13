@@ -98,10 +98,11 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	private:
 	void BeginFrame();
-	void EndFrame();
+	void RenderUI();
 	void LoadFont();
 	void Cleanup();
 	void UpdatePhysics(dFloat timestep);
+	dFloat CalculateInteplationParam () const;
 
 	void CalculateFPS(dFloat timestep);
 	void RemoveEntity (dListNode* const entNode);
