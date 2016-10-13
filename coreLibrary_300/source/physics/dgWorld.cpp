@@ -1047,6 +1047,7 @@ void dgWorld::Update (dgFloat32 timestep)
 
 void dgWorld::UpdateAsync (dgFloat32 timestep)
 {
+	Sync ();
 	m_savetimestep = timestep;
 	#ifdef DG_USE_THREAD_EMULATION
 		dgFloatExceptions exception;
