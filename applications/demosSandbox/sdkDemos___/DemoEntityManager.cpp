@@ -608,7 +608,6 @@ void DemoEntityManager::EndFrame()
 			sprintf (text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
 			ImGui::Text(text);
 
-			int xxx = NewtonGetMemoryUsed();
 			sprintf (text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
 			ImGui::Text(text);
 
