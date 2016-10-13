@@ -41,7 +41,6 @@ class dgMutexThread: public dgThread
 
 	private:
 	dgInt32 m_isBusy;
-//	dgInt32 m_terminate;
 	dgSemaphore m_myMutex;
 	dgSemaphore m_callerMutex;
 };

@@ -23,52 +23,6 @@
 #include "NewtonClass.h"
 
 
-
-
-
-NewtonDeadBodies::NewtonDeadBodies(dgMemoryAllocator* const allocator)
-	:dgTree<dgBody*, void*>(allocator)
-{
-	Insert((dgBody*)NULL, 0);
-}
-
-void NewtonDeadBodies::DestroyBodies(Newton& world)
-{
-	Iterator iter (*this);
-	for (iter.Begin(); iter; ) {
-		dgTreeNode* const node = iter.GetNode();
-		iter ++;
-		dgBody* const body = node->GetInfo();
-		if (body) {
-			Remove (node);
-			world.DestroyBody(body);
-		}
-	}
-}
-
-
-NewtonDeadJoints::NewtonDeadJoints(dgMemoryAllocator* const allocator)
-	:dgTree<dgConstraint*, void*>(allocator)
-{
-	Insert((dgConstraint*)NULL, 0);
-}
-
-
-void NewtonDeadJoints::DestroyJoints(Newton& world)
-{
-	Iterator iter (*this);
-	for (iter.Begin(); iter; ) {
-		dgTreeNode* const node = iter.GetNode();
-		iter ++;
-		dgConstraint* const joint = node->GetInfo();
-		if (joint) {
-			Remove (node);
-			world.DestroyConstraint (joint);
-		}
-	}
-}
-
-
 void* Newton::DefaultAllocMemory (dgInt32 size)
 {
 	return malloc (size_t (size));
@@ -83,9 +37,6 @@ void Newton::DefaultFreeMemory (void* const ptr, dgInt32 size)
 
 Newton::Newton (dgFloat32 scale, dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	:dgWorld(allocator, stackSize) 
-	,NewtonDeadBodies(allocator)
-	,NewtonDeadJoints(allocator)
-//	,m_maxTimeStep(DG_TIMESTEP)
 	,m_destructor(NULL)
 {
 }
@@ -100,33 +51,14 @@ Newton::~Newton ()
 void Newton::UpdatePhysics (dgFloat32 timestep)
 {
 	Update (timestep);
-
-	NewtonDeadBodies& bodyList = *this;
-	NewtonDeadJoints& jointList = *this;
-
-	dgAssert (bodyList.GetCount() == 1);
-	dgAssert (jointList.GetCount() == 1);
-	jointList.DestroyJoints (*this);
-	bodyList.DestroyBodies (*this);
 }
 
 void Newton::UpdatePhysicsAsync (dgFloat32 timestep)
 {
 	UpdateAsync (timestep);
-
-	if (!IsBusy()) {		
-		NewtonDeadBodies& bodyList = *this;
-		NewtonDeadJoints& jointList = *this;
-
-		dgAssert (bodyList.GetCount() == 1);
-		dgAssert (jointList.GetCount() == 1);
-
-		jointList.DestroyJoints (*this);
-		bodyList.DestroyBodies (*this);
-	} 
 }
 
-
+/*
 void Newton::DestroyJoint(dgConstraint* const joint)
 {
 	if (IsBusy()) {		
@@ -148,7 +80,7 @@ void Newton::DestroyBody(dgBody* const body)
 		dgWorld::DestroyBody(body);
 	}
 }
-
+*/
 
 NewtonUserJoint::NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo, dgBody* const dyn0, dgBody* const dyn1)
 	:dgUserConstraint (world, dyn0, dyn1, 1)

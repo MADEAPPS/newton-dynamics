@@ -39,7 +39,6 @@ class dgAsyncThread: public dgThread
 	virtual void TickCallback (dgInt32 threadID) = 0;
 
 	private:
-//	dgInt32 m_terminate;
 	dgSemaphore m_myMutex;
 	dgSemaphore m_callerMutex;
 };

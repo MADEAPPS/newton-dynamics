@@ -55,13 +55,13 @@ void dgMutexThread::Execute (dgInt32 threadID)
 	dgAssert (threadID == m_id);
 	while (!m_terminate) {
 		// wait for the main thread to signal an update
-		dgInterlockedExchange(&m_isBusy, 0);
 		SuspendExecution(m_myMutex);
-		dgInterlockedExchange(&m_isBusy, 1);
 		if (!m_terminate) {
+			dgInterlockedExchange(&m_isBusy, 1);			
 			TickCallback(threadID);
 			// let main thread resume execution
 			m_callerMutex.Release();
+			dgInterlockedExchange(&m_isBusy, 0);
 		}
 	}
 	dgInterlockedExchange(&m_isBusy, 0);

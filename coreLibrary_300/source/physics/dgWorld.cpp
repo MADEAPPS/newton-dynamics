@@ -221,6 +221,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	,dgMutexThread("newtonSyncThread", DG_MUTEX_THREAD_ID, stackSize)
 	,dgAsyncThread("newtonAsyncThread", DG_ASYNC_THREAD_ID)
 	,dgWorldThreadPool(allocator)
+	,dgDeadBodies(allocator)
+	,dgDeadJoints(allocator)
 	,m_broadPhase(NULL)
 	,m_sentinelBody(NULL)
 	,m_pointCollision(NULL)
@@ -236,6 +238,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	dgMutexThread* const mutexThread = this;
 	SetMatertThread (mutexThread);
 
+	m_savetimestep = dgFloat32 (0.0f);
 	m_allocator = allocator;
 	m_islandUpdate = NULL;
 	m_getDebugTime = NULL;
@@ -981,8 +984,6 @@ void dgWorldThreadPool::OnEndWorkerThread (dgInt32 threadId)
 
 }
 
-
-
 void dgWorld::Execute (dgInt32 threadID)
 {
 	if (threadID == DG_MUTEX_THREAD_ID) {
@@ -992,22 +993,6 @@ void dgWorld::Execute (dgInt32 threadID)
 	}
 }
 
-
-void dgWorld::TickCallback (dgInt32 threadID)
-{
-	if (threadID == DG_MUTEX_THREAD_ID) {
-		dgUnsigned64 timeAcc = m_getDebugTime ? m_getDebugTime() : 0;
-		dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
-		for (dgUnsigned32 i = 0; i < m_numberOfSubsteps; i ++) {
-			StepDynamics (step);
-		}
-		m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
-	} else {
-		Update (m_savetimestep);
-	}
-}
-
-
 void dgWorld::Sync ()
 {
 	while (dgMutexThread::IsBusy()) {
@@ -1016,21 +1001,39 @@ void dgWorld::Sync ()
 }
 
 
+void dgWorld::RunStep ()
+{
+	dgUnsigned64 timeAcc = m_getDebugTime ? m_getDebugTime() : 0;
+	dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
+	for (dgUnsigned32 i = 0; i < m_numberOfSubsteps; i ++) {
+		StepDynamics (step);
+
+		dgDeadBodies& bodyList = *this;
+		dgDeadJoints& jointList = *this;
+
+		jointList.DestroyJoints (*this);
+		bodyList.DestroyBodies (*this);
+	}
+	m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
+}
+
+void dgWorld::TickCallback (dgInt32 threadID)
+{
+	if (threadID == DG_MUTEX_THREAD_ID) {
+		RunStep ();
+	} else {
+		Update (m_savetimestep);
+	}
+}
+
+
 void dgWorld::Update (dgFloat32 timestep)
 {
 	m_savetimestep = timestep;
-
 	#ifdef DG_USE_THREAD_EMULATION
 		dgFloatExceptions exception;
 		dgSetPrecisionDouble precision;
-
-		// run update in same thread as the calling application as if it was a separate thread  
-		dgUnsigned64 timeAcc = m_getDebugTime ? m_getDebugTime() : 0;
-		dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
-		for (dgInt32 i = 0; i < m_numberOfSubsteps; i ++) {
-			StepDynamics (m_savetimestep);
-		}
-		m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
+		RunStep ();
 	#else 
 		// runs the update in a separate thread and wait until the update is completed before it returns.
 		// this will run well on single core systems, since the two thread are mutually exclusive 
@@ -1042,14 +1045,10 @@ void dgWorld::Update (dgFloat32 timestep)
 void dgWorld::UpdateAsync (dgFloat32 timestep)
 {
 	m_savetimestep = timestep;
-
 	#ifdef DG_USE_THREAD_EMULATION
-		dgUnsigned64 timeAcc = m_getDebugTime ? m_getDebugTime() : 0;
-		dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
-		for (dgInt32 i = 0; i < m_numberOfSubsteps; i ++) {
-			StepDynamics (m_savetimestep);
-		}
-		m_lastExecutionTime = m_getDebugTime ? dgFloat32 (m_getDebugTime() - timeAcc) * dgFloat32 (1.0e-6f): 0;
+		dgFloatExceptions exception;
+		dgSetPrecisionDouble precision;
+		RunStep ();
 	#else 
 		// execute one update, but do not wait for the update to finish, instead return immediately to the caller
 		dgAsyncThread::Tick();
@@ -1423,4 +1422,73 @@ dgBroadPhaseAggregate* dgWorld::CreateAggreGate() const
 void dgWorld::DestroyAggregate(dgBroadPhaseAggregate* const aggregate) const
 {
 	m_broadPhase->DestroyAggregate((dgBroadPhaseAggregate*) aggregate);
+}
+
+
+void dgDeadJoints::DestroyJoint(dgConstraint* const joint)
+{
+	dgAssert (0);
+	dgSpinLock (&m_lock, true);
+	
+/*
+	if (IsBusy()) {		
+		// the engine is busy in the previous update, deferred the deletion
+		NewtonDeadJoints& jointList = *this;
+		jointList.Insert (joint, joint);
+	} else {
+		dgWorld::DestroyConstraint (joint);
+	}
+*/
+	dgSpinUnlock(&m_lock);
+}
+
+
+void dgDeadJoints::DestroyJoints(dgWorld& world)
+{
+	dgSpinLock (&m_lock, true);
+	Iterator iter (*this);
+	for (iter.Begin(); iter; ) {
+		dgTreeNode* const node = iter.GetNode();
+		iter ++;
+		dgConstraint* const joint = node->GetInfo();
+		if (joint) {
+			Remove (node);
+			world.DestroyConstraint (joint);
+		}
+	}
+	dgSpinUnlock(&m_lock);
+}
+
+
+void dgDeadBodies::DestroyBody(dgBody* const body)
+{
+	dgAssert (0);
+	dgSpinLock (&m_lock, true);
+/*
+	if (IsBusy()) {		
+		// the engine is busy in the previous update, deferred the deletion
+		NewtonDeadBodies& bodyList = *this;
+		bodyList.Insert (body, body);
+	} else {
+		dgWorld::DestroyBody(body);
+	}
+*/
+	dgSpinUnlock(&m_lock);
+}
+
+
+void dgDeadBodies::DestroyBodies(dgWorld& world)
+{
+	dgSpinLock (&m_lock, true);
+	Iterator iter (*this);
+	for (iter.Begin(); iter; ) {
+		dgTreeNode* const node = iter.GetNode();
+		iter ++;
+		dgBody* const body = node->GetInfo();
+		if (body) {
+			Remove (node);
+			world.DestroyBody(body);
+		}
+	}
+	dgSpinUnlock(&m_lock);
 }

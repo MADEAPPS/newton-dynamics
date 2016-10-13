@@ -661,10 +661,6 @@ void NewtonUpdate(const NewtonWorld* const newtonWorld, dFloat timestep)
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 
-//	dgFloat32 minstep = dgFloat32 (DG_MIN_TIMESTEP);
-//	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
-//	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
-
 //NewtonSerializeToFile (newtonWorld, "xxx.bin", NULL, NULL);
 	world->UpdatePhysics (timestep);
 }
@@ -674,10 +670,6 @@ void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-
-//	dgFloat32 minstep = dgFloat32 (DG_MIN_TIMESTEP);
-//	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
-//	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
 
 	world->UpdatePhysicsAsync(timestep);
 }
