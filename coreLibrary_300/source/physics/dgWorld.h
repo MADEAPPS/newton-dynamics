@@ -433,7 +433,6 @@ class dgWorld
 	virtual void Execute (dgInt32 threadID);
 	virtual void TickCallback (dgInt32 threadID);
 
-
 	class dgAdressDistPair
 	{
 		public:
@@ -452,6 +451,7 @@ class dgWorld
 	dgUnsigned32 m_bodiesUniqueID;
 	dgUnsigned32 m_useParallelSolver;
 	dgUnsigned32 m_genericLRUMark;
+	dgInt32 m_delayDelateLock;
 
 	dgFloat32 m_freezeAccel2;
 	dgFloat32 m_freezeAlpha2;
@@ -490,6 +490,8 @@ class dgWorld
 	
 	friend class dgBody;
 	friend class dgBroadPhase;
+	friend class dgDeadBodies;
+	friend class dgDeadJoints;
 	friend class dgAmpInstance;
 	friend class dgDeformableBody;
 	friend class dgActiveContacts;
@@ -519,6 +521,7 @@ class dgWorld
 	friend class dgParallelSolverInitFeedbackUpdate;
 	friend class dgParallelSolverInitInternalForces;
 	friend class dgParallelSolverBuildJacobianMatrix;
+
 	friend class dgBroadPhaseMaterialCallbackWorkerThread;
 	friend class dgBroadPhaseCalculateContactsWorkerThread;
 } DG_GCC_VECTOR_ALIGMENT ;

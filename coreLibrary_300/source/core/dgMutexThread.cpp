@@ -57,7 +57,7 @@ void dgMutexThread::Execute (dgInt32 threadID)
 		// wait for the main thread to signal an update
 		SuspendExecution(m_myMutex);
 		if (!m_terminate) {
-			dgInterlockedExchange(&m_isBusy, 1);			
+			dgInterlockedExchange(&m_isBusy, 1);
 			TickCallback(threadID);
 			// let main thread resume execution
 			m_callerMutex.Release();

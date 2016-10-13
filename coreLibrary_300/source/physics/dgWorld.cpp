@@ -254,6 +254,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	
 	m_defualtBodyGroupID = CreateBodyGroupID();
 	m_genericLRUMark = 0;
+	m_delayDelateLock = 0;
 
 	m_useParallelSolver = 0;
 
@@ -1006,7 +1007,9 @@ void dgWorld::RunStep ()
 	dgUnsigned64 timeAcc = m_getDebugTime ? m_getDebugTime() : 0;
 	dgFloat32 step = m_savetimestep / m_numberOfSubsteps;
 	for (dgUnsigned32 i = 0; i < m_numberOfSubsteps; i ++) {
+		dgInterlockedExchange(&m_delayDelateLock, 1);
 		StepDynamics (step);
+		dgInterlockedExchange(&m_delayDelateLock, 0);
 
 		dgDeadBodies& bodyList = *this;
 		dgDeadJoints& jointList = *this;
@@ -1429,16 +1432,15 @@ void dgDeadJoints::DestroyJoint(dgConstraint* const joint)
 {
 	dgAssert (0);
 	dgSpinLock (&m_lock, true);
-	
-/*
-	if (IsBusy()) {		
+
+	dgWorld& me = *((dgWorld*)this);
+	if (me.m_delayDelateLock) {
 		// the engine is busy in the previous update, deferred the deletion
-		NewtonDeadJoints& jointList = *this;
-		jointList.Insert (joint, joint);
+		Insert (joint, joint);
 	} else {
-		dgWorld::DestroyConstraint (joint);
+		me.DestroyConstraint (joint);
 	}
-*/
+
 	dgSpinUnlock(&m_lock);
 }
 
@@ -1447,15 +1449,12 @@ void dgDeadJoints::DestroyJoints(dgWorld& world)
 {
 	dgSpinLock (&m_lock, true);
 	Iterator iter (*this);
-	for (iter.Begin(); iter; ) {
+	for (iter.Begin(); iter; iter++) {
 		dgTreeNode* const node = iter.GetNode();
-		iter ++;
 		dgConstraint* const joint = node->GetInfo();
-		if (joint) {
-			Remove (node);
-			world.DestroyConstraint (joint);
-		}
+		world.DestroyConstraint (joint);
 	}
+	RemoveAll ();
 	dgSpinUnlock(&m_lock);
 }
 
@@ -1464,15 +1463,14 @@ void dgDeadBodies::DestroyBody(dgBody* const body)
 {
 	dgAssert (0);
 	dgSpinLock (&m_lock, true);
-/*
-	if (IsBusy()) {		
+
+	dgWorld& me = *((dgWorld*)this);
+	if (me.m_delayDelateLock) {
 		// the engine is busy in the previous update, deferred the deletion
-		NewtonDeadBodies& bodyList = *this;
-		bodyList.Insert (body, body);
+		Insert (body, body);
 	} else {
-		dgWorld::DestroyBody(body);
+		me.DestroyBody(body);
 	}
-*/
 	dgSpinUnlock(&m_lock);
 }
 
@@ -1480,15 +1478,13 @@ void dgDeadBodies::DestroyBody(dgBody* const body)
 void dgDeadBodies::DestroyBodies(dgWorld& world)
 {
 	dgSpinLock (&m_lock, true);
+
 	Iterator iter (*this);
-	for (iter.Begin(); iter; ) {
+	for (iter.Begin(); iter; iter++) {
 		dgTreeNode* const node = iter.GetNode();
-		iter ++;
 		dgBody* const body = node->GetInfo();
-		if (body) {
-			Remove (node);
-			world.DestroyBody(body);
-		}
+		world.DestroyBody(body);
 	}
+	RemoveAll ();
 	dgSpinUnlock(&m_lock);
 }
