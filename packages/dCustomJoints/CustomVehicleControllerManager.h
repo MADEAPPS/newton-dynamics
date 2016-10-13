@@ -216,10 +216,10 @@ class CustomVehicleController: public CustomControllerBase
 			// Using brush tire model explained on this paper
 			// https://ddl.stanford.edu/sites/default/files/2013_Thesis_Hindiyeh_Dynamics_and_Control_of_Drifting_in_Automobiles.pdf
 			// 
-			virtual void GetForces(const BodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat longitudinalSlip, dFloat lateralSlip, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
+			virtual void GetForces(const BodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
 			{
-				dFloat phy_y = lateralSlip * tire->m_data.m_lateralStiffness;
-				dFloat phy_x = longitudinalSlip * tire->m_data.m_longitudialStiffness;
+				dFloat phy_y = tire->m_lateralSlip * tire->m_data.m_lateralStiffness;
+				dFloat phy_x = tire->m_longitudinalSlip * tire->m_data.m_longitudialStiffness;
 				dFloat gamma = dSqrt(phy_x * phy_x + phy_y * phy_y);
 
 				dFloat fritionCoeficicent = dClamp (GetFrictionCoefficient (material, tire->GetBody(), otherBody), dFloat (0.0f), dFloat (1.0f));
@@ -247,6 +247,8 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API void SetBrakeTorque (dFloat torque);
 
 		CUSTOM_JOINTS_API dFloat GetRPM() const; 
+		CUSTOM_JOINTS_API dFloat GetLateralSlip () const;
+		CUSTOM_JOINTS_API dFloat GetLongitudinalSlip () const;
 
 		CUSTOM_JOINTS_API Info GetInfo() const {return m_data;}
 		CUSTOM_JOINTS_API void SetInfo(const Info& info) {};

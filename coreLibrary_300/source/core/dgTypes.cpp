@@ -542,3 +542,51 @@ dgInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userDat
 	serializeCallback (userData, &revision, sizeof (revision));
 	return revision;
 }
+
+dgSetPrecisionDouble::dgSetPrecisionDouble()
+{
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+		dgClearFP();
+		m_mask = dgControlFP(0, 0);
+		dgControlFP (_PC_53, _MCW_PC);
+	#endif
+}
+
+dgSetPrecisionDouble::~dgSetPrecisionDouble()
+{
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+		dgClearFP();
+		dgControlFP (m_mask, _MCW_PC);
+	#endif
+}
+
+
+dgFloatExceptions::dgFloatExceptions(dgUnsigned32 mask)
+	:m_mask (0)
+{
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+		dgClearFP();
+		m_mask = dgControlFP(0, 0);
+		dgControlFP (m_mask & ~mask, _MCW_EM);
+	#endif
+
+	#ifdef _MACOSX_VER
+		fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
+	#else 
+		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	#endif
+
+//	float a (1.0f);
+//	float b (0.1f);
+//	while (a != 0.0f)
+//		a = a * b;
+}
+
+dgFloatExceptions::~dgFloatExceptions()
+{
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+		dgClearFP();
+		dgControlFP(m_mask, _MCW_EM);
+	#endif
+}
+

@@ -27,9 +27,9 @@
 
 
 
-#define DG_TIMESTEP (1.0f / 60.0f)	
-#define DG_MAX_TIMESTEP (1.0f / 30.0f)	
-#define DG_MIN_TIMESTEP (1.0f / 1000.0f)	
+//#define DG_TIMESTEP (1.0f / 60.0f)	
+//#define DG_MAX_TIMESTEP (1.0f / 30.0f)	
+//#define DG_MIN_TIMESTEP (1.0f / 1000.0f)	
 
 class Newton; 
 
@@ -69,7 +69,7 @@ class Newton:
 	static void* DefaultAllocMemory (dgInt32 size);
 	static void DefaultFreeMemory (void* const ptr, dgInt32 size);
 
-	dgFloat32 m_maxTimeStep;
+//	dgFloat32 m_maxTimeStep;
 
 	NewtonWorldDestructorCallback m_destructor;
 };
