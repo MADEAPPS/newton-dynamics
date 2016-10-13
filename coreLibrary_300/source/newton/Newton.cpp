@@ -23,7 +23,6 @@
 #include "Newton.h"
 #include "NewtonClass.h"
 
-
 #ifdef _NEWTON_BUILD_DLL
 	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 		int main(int argc, char* argv[])
