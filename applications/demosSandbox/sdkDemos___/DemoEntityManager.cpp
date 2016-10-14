@@ -974,14 +974,6 @@ void DemoEntityManager::RenderScene()
 	// update Camera
 	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
 
-// test render
-//glBindTexture(GL_TEXTURE_2D, 0);
-//glBegin(GL_LINES);
-//glVertex3f (100.0f, 100.0f, 0.0f);
-//glVertex3f (200.0f, 200.0f, 0.0f);
-//glEnd();
-
-
 	// render all entities
 	if (m_hideVisualMeshes) {
 		if (m_sky) {
