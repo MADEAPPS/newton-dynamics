@@ -205,6 +205,10 @@ GLuint LoadTexture(const char* const filename)
 	return texture;
 } 
 
+#define GL_BGR 0x80E0
+#define GL_BGRA 0x80E1
+
+
 GLuint LoadImage(const char* const cacheName, const char* const buffer, int width, int hight, TextureImageFormat format)
 {
 	// Get width, height, and depth of texture
@@ -219,14 +223,14 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 	{
 		case m_rgb:     
 			// Most likely case
-			//eFormat = GL_BGR;
-			eFormat = GL_RGB;
+			eFormat = GL_BGR;
+			//eFormat = GL_RGB;
 			iComponents = 4;
 			break;
 			
 		case m_rgba:
-			//eFormat = GL_BGRA;
-			eFormat = GL_RGBA;
+			eFormat = GL_BGRA;
+			//eFormat = GL_RGBA;
 			iComponents = 4;
 			break;
 
