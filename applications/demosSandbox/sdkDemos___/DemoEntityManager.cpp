@@ -1010,7 +1010,6 @@ void DemoEntityManager::RenderScene()
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
-
 }
 
 

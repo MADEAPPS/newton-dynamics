@@ -205,9 +205,10 @@ GLuint LoadTexture(const char* const filename)
 	return texture;
 } 
 
+#ifndef GL_BGR
 #define GL_BGR 0x80E0
 #define GL_BGRA 0x80E1
-
+#endif
 
 GLuint LoadImage(const char* const cacheName, const char* const buffer, int width, int hight, TextureImageFormat format)
 {
