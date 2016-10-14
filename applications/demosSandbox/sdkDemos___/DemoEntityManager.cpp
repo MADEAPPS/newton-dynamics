@@ -506,8 +506,6 @@ void DemoEntityManager::BeginFrame()
 void DemoEntityManager::RenderUI()
 {
 	dTimeTrackerEvent(__FUNCTION__);
-	glEnable (GL_BLEND);
-	glDisable (GL_LIGHTING);
 
 	if (m_showStats) {
 		bool dommy;
@@ -830,10 +828,8 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
+	glDisable (GL_LIGHTING);
 	glEnable(GL_SCISSOR_TEST);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
 	glEnable(GL_TEXTURE_2D);
 	//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
 
@@ -846,6 +842,10 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
 
 	// Render command lists
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
@@ -881,6 +881,7 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
+
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
@@ -905,48 +906,8 @@ void DemoEntityManager::RenderScene()
 	int display_h = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 	glViewport(0, 0, display_w, display_h);
 	glScissor(0, 0, display_w, display_h);
+	glEnable(GL_SCISSOR_TEST);	
 
-
-
-
-glEnable(GL_BLEND);
-glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-glDisable(GL_CULL_FACE);
-glDisable(GL_DEPTH_TEST);
-glEnable(GL_SCISSOR_TEST);
-glEnableClientState(GL_VERTEX_ARRAY);
-glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-glEnableClientState(GL_COLOR_ARRAY);
-glEnable(GL_TEXTURE_2D);
-//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
-
-// Setup viewport, orthographic projection matrix
-glMatrixMode(GL_PROJECTION);
-glPushMatrix();
-glLoadIdentity();
-glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
-glMatrixMode(GL_MODELVIEW);
-glPushMatrix();
-glLoadIdentity();
-
-// test render
-glBindTexture(GL_TEXTURE_2D, 0);
-glBegin(GL_LINES);
-glVertex3f (100.0f, 100.0f, 0.0f);
-glVertex3f (200.0f, 200.0f, 0.0f);
-glEnd();
-
-glMatrixMode(GL_MODELVIEW);
-glPopMatrix();
-glMatrixMode(GL_PROJECTION);
-glPopMatrix();
-
-
-
-
-
-
-/*
 	// Rendering
 	// Our shading model--Goraud (smooth). 
 	glShadeModel (GL_SMOOTH);
@@ -957,7 +918,6 @@ glPopMatrix();
 	glEnable (GL_CULL_FACE);
 
 	//	glEnable(GL_DITHER);
-
 	// z buffer test
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc (GL_LEQUAL);
@@ -967,10 +927,6 @@ glPopMatrix();
 
 	// set default lightning
 	glEnable (GL_LIGHTING);
-
-	// make sure the model view matrix is set to identity before setting world space light sources
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 
 	dFloat cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
 	glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
@@ -1001,8 +957,30 @@ glPopMatrix();
 	glLightfv(GL_LIGHT1, GL_SPECULAR, lightDiffuse1);
 	glEnable(GL_LIGHT1);
 
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
+
+	// Setup matrix
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	//glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// make sure the model view matrix is set to identity before setting world space light sources
 	// update Camera
 	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
+
+// test render
+//glBindTexture(GL_TEXTURE_2D, 0);
+//glBegin(GL_LINES);
+//glVertex3f (100.0f, 100.0f, 0.0f);
+//glVertex3f (200.0f, 200.0f, 0.0f);
+//glEnd();
+
 
 	// render all entities
 	if (m_hideVisualMeshes) {
@@ -1022,8 +1000,9 @@ glPopMatrix();
 	}
 
 	if (m_tranparentHeap.GetCount()) {
-		dMatrix modelView;
-		glGetFloat (GL_MODELVIEW_MATRIX, &modelView[0][0]);
+		//dMatrix modelView;
+		//glGetFloat (GL_MODELVIEW_MATRIX, &modelView[0][0]);
+		glPushMatrix();	
 		while (m_tranparentHeap.GetCount()) {
 			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
 			glLoadIdentity();
@@ -1031,9 +1010,14 @@ glPopMatrix();
 			transparentMesh.m_mesh->RenderTransparency();
 			m_tranparentHeap.Pop();
 		}
-		glLoadMatrix(&modelView[0][0]);
+		glPopMatrix();
+		//glLoadMatrix(&modelView[0][0]);
 	}
-*/
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
 
 }
 
