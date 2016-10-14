@@ -586,13 +586,13 @@ void DemoEntityManager::BeginFrame()
 void DemoEntityManager::RenderUI()
 {
 	dTimeTrackerEvent(__FUNCTION__);
+	glEnable (GL_BLEND);
+	glDisable (GL_LIGHTING);
 
 	if (m_showStats) {
 		bool dommy;
 		char text[1024];
 
-		glEnable (GL_BLEND);
-		glDisable (GL_LIGHTING);
 		
 		if (ImGui::Begin("statistics", &dommy)){
 			sprintf (text, "fps:           %6.3f", m_fps);
