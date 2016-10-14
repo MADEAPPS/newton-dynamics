@@ -108,9 +108,8 @@ void StandardJoints (DemoEntityManager* const scene);
 
 DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] = 
 {
-	{"Using the newton mesh tool", "demonstrate how to use the newton mesh toll for mesh manipulation", UsingNewtonMeshTool},
+	{"Using the newton mesh tool", "demonstrate how to use the newton mesh tool for mesh manipulation", UsingNewtonMeshTool},
 	{"Coefficients of friction", "demonstrate the effect of various coefficient of friction", Friction},
-/*
 	{"Coefficients of restitution", "demonstrate the effect of various coefficient of restitution", Restitution},
 	{"Precessing tops", "show natural precession", PrecessingTops},
 	{"Closest distance", "demonstrate closest distance to a convex shape", ClosestDistance},
@@ -118,6 +117,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Kinematic bodies", "demonstrate separate collision of primitives", KinematicPlacement},
 	{"Primitive convex cast", "demonstrate separate primitive convex cast", ConvexCast},
 	{"Simple box Stacks", "show simple stack of Boxes", BasicBoxStacks},
+/*
 	{"Unoptimized mesh collision", "show simple level mesh", SimpleMeshLevelCollision},
 	{"Optimized mesh collision", "show optimized level mesh", OptimizedMeshLevelCollision},
 	{"Height field collision mesh", "show high file collision mesh", HeightFieldCollision},
@@ -128,9 +128,9 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Uniform scaled collision shape", "demonstrate scaling shape", UniformScaledCollision},
 	{"Non uniform scaled collision shape", "demonstrate scaling shape", NonUniformScaledCollision},
 	{"Scaled mesh collision", "demonstrate scaling mesh scaling collision", ScaledMeshCollision},
-	{ "Continuous collision", "show continuous collision", ContinuousCollision },
-	{ "Paper wall continuous collision", "show fast continuous collision", ContinuousCollision1 },
-	{ "Puck slide", "show continuous collision", PuckSlide },
+	{"Continuous collision", "show continuous collision", ContinuousCollision },
+	{"Paper wall continuous collision", "show fast continuous collision", ContinuousCollision1 },
+	{"Puck slide", "show continuous collision", PuckSlide },
 	{"Simple convex decomposition", "demonstrate convex decomposition and compound collision", SimpleConvexApproximation},
 	{"Multi geometry collision", "show static mesh with the ability of moving internal parts", SceneCollision},
 	{"Simple boolean operations", "demonstrate simple boolean operations ", SimpleBooleanOperations},
@@ -167,14 +167,17 @@ DemoEntityManager::DemoEntityManager ()
 	,m_tranparentHeap()
 	,m_currentScene(DEFAULT_SCENE)
 	,m_framesCount(0)
+	,m_physicsFramesCount(0)
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)
+	,m_mainThreadPhysicsTimeAcc(0.0f)
 	,m_showStats(true)
 	,m_synchronousPhysicsUpdateMode(true)
 	,m_hideVisualMeshes(false)
 {
+m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
 
@@ -872,7 +875,14 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 		}
 
 		if (newUpdate) {
-			m_mainThreadPhysicsTime = physicsTime;
+			m_physicsFramesCount ++;
+			m_mainThreadPhysicsTimeAcc += physicsTime;
+			if (m_physicsFramesCount >= 16) {
+				m_mainThreadPhysicsTime = m_mainThreadPhysicsTimeAcc / m_physicsFramesCount;
+				m_physicsFramesCount = 0;
+				m_mainThreadPhysicsTimeAcc = 0.0f;
+			}
+
 		}
 		
 //dTrace (("%f\n", m_mainThreadPhysicsTime));

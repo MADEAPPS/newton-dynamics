@@ -12,11 +12,10 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "DemoEntityManager.h"
+#include "DemoMesh.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "DemoMesh.h"
-#include "OpenGlUtil.h"
+#include "DemoEntityManager.h"
 
 
 void PrecessingTops (DemoEntityManager* const scene)

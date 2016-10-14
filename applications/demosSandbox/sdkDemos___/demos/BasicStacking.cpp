@@ -12,10 +12,11 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "DemoEntityManager.h"
-#include "DemoCamera.h"
 #include "DemoMesh.h"
+#include "DemoCamera.h"
+#include "OpenGlUtil.h"
 #include "PhysicsUtils.h"
+#include "DemoEntityManager.h"
 
 static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
 {

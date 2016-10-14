@@ -62,6 +62,13 @@
     <ClCompile Include="..\..\sdkDemos___\DemoListenerBase.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoMesh.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\BasicFriction.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicRestitution.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicStacking.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\ClosestDistance.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\ConvexCast.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\KinematicBodies.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\PrecessingTops.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\PrimitiveCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\UsingNewtonMeshTool.cpp" />
     <ClCompile Include="..\..\sdkDemos___\main.cpp" />
     <ClCompile Include="..\..\sdkDemos___\toolBox\DebugDisplay.cpp" />
@@ -77,6 +84,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\UserPlaneCollision.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos___\DemoCamera.h" />
@@ -94,6 +102,7 @@
     <ClInclude Include="..\..\sdkDemos___\toolBox\SkyBox.h" />
     <ClInclude Include="..\..\sdkDemos___\toolBox\TargaToOpenGl.h" />
     <ClInclude Include="..\..\sdkDemos___\toolBox\toolbox_stdafx.h" />
+    <ClInclude Include="..\..\sdkDemos___\toolBox\UserPlaneCollision.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7830075E-785B-4AE5-BDF2-3468D5B41615}</ProjectGuid>

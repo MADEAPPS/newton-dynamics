@@ -134,10 +134,12 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	int m_currentScene;
 	int m_framesCount;
+	int m_physicsFramesCount;
 	dFloat m_fps;
 	dFloat m_timestepAcc;
 	dFloat m_currentListenerTimestep;
 	dFloat m_mainThreadPhysicsTime;
+	dFloat m_mainThreadPhysicsTimeAcc;
 	bool m_showStats;
 	bool m_synchronousPhysicsUpdateMode;
 	bool m_hideVisualMeshes;

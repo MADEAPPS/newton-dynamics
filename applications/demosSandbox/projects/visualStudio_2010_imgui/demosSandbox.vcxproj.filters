@@ -39,6 +39,30 @@
       <Filter>utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos___\DemoEntityListener.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicRestitution.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\PrecessingTops.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\ClosestDistance.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\PrimitiveCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\KinematicBodies.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\ConvexCast.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\UserPlaneCollision.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicStacking.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos___\DemoEntityManager.h" />
@@ -72,6 +96,9 @@
       <Filter>utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos___\DemoEntityListener.h" />
+    <ClInclude Include="..\..\sdkDemos___\toolBox\UserPlaneCollision.h">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="demos">

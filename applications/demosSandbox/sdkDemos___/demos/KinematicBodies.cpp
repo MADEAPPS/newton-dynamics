@@ -11,12 +11,13 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "DemoEntityManager.h"
-#include "DemoCamera.h"
 #include "DemoMesh.h"
-#include "NewtonDemos.h"
+#include "DemoCamera.h"
+#include "OpenGlUtil.h"
 #include "PhysicsUtils.h"
+#include "DemoEntityManager.h"
 
+/*
 #define D_PLACEMENT_PENETRATION   0.005f
 
 class PhantomPlacement: public DemoEntity
@@ -463,10 +464,12 @@ static NewtonBody* AddStaticMesh(DemoEntityManager* const scene)
 
 	return body;
 }
-
+*/
 
 void KinematicPlacement (DemoEntityManager* const scene)
 {
+dAssert (0);
+/*
 	// load the skybox
 	scene->CreateSkyBox();
 
@@ -484,13 +487,13 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	location.m_x += 0.0f;
 	location.m_z += 0.0f;
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
-/*
-dMatrix matrix (dGetIdentityMatrix());
-dFloat pts[] = { 0,0,0, 0,0,0.01, 0.01,0,0.01,  0.01,0,0, 0,0.03,0, 0,0.03,0.01, 0.01, 0.03,0, 0.01,0.03,0.01 };
-NewtonCollision* col = NewtonCreateConvexHull(scene->GetNewton(), 8, pts, 12, 0.0, 0, NULL);
-NewtonBody* body = NewtonCreateDynamicBody(scene->GetNewton(), col, &matrix[0][0]);
-NewtonBodySetMassProperties(body, 1.0, col);
-*/
+
+//dMatrix matrix (dGetIdentityMatrix());
+//dFloat pts[] = { 0,0,0, 0,0,0.01, 0.01,0,0.01,  0.01,0,0, 0,0.03,0, 0,0.03,0.01, 0.01, 0.03,0, 0.01,0.03,0.01 };
+//NewtonCollision* col = NewtonCreateConvexHull(scene->GetNewton(), 8, pts, 12, 0.0, 0, NULL);
+//NewtonBody* body = NewtonCreateDynamicBody(scene->GetNewton(), col, &matrix[0][0]);
+//NewtonBodySetMassProperties(body, 1.0, col);
+
 //	int count = 1;
 //	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -508,10 +511,7 @@ NewtonBodySetMassProperties(body, 1.0, col);
 	dQuaternion rot;
 	dVector origin (-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
-
-
-
 //	ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
-
+*/
 }
 

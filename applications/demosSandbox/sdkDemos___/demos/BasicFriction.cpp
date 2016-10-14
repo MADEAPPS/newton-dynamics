@@ -11,12 +11,12 @@
 
 
 #include <toolbox_stdafx.h>
-#include "DemoEntityManager.h"
-
-
 #include "SkyBox.h"
+#include "DemoMesh.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
+#include "DemoEntityManager.h"
+
 
 #define FRICTION_VAR_NAME "friction"
 static dCRCTYPE frictionCRC (dCRC64 (FRICTION_VAR_NAME));

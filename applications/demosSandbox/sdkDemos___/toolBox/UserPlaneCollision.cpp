@@ -11,13 +11,16 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "TargaToOpenGl.h"
 #include "DemoMesh.h"
-#include "DemoEntityManager.h"
 #include "DemoCamera.h"
+#include "OpenGlUtil.h"
 #include "PhysicsUtils.h"
-#include "DebugDisplay.h"
+#include "TargaToOpenGl.h"
+#include "DemoEntityManager.h"
 #include "UserPlaneCollision.h"
+
+//#include "DebugDisplay.h"
+//#include "UserPlaneCollision.h"
 
 #define PASS_A_QUAD
 #define MAX_THREAD_FACES	32
@@ -123,7 +126,8 @@ class dInfinitePlane
 													 UserCollisionSerializationCallback, 0);
 
 		// set a debug display call back
-		NewtonStaticCollisionSetDebugCallback (m_collision, ShowMeshCollidingFaces);
+dAssert (0);
+//		NewtonStaticCollisionSetDebugCallback (m_collision, ShowMeshCollidingFaces);
 
 		// set the collisoin offset Matrix;
 		NewtonCollisionSetMatrix(m_collision, &m_rotation[0][0]);
@@ -242,7 +246,9 @@ class dInfinitePlane
 			polygon[4] =  me->m_plane;
 
 			// show debug display info
-			if (DebugDisplayOn()) {
+dAssert (0);
+//			if (DebugDisplayOn()) 
+			{
 				dMatrix matrix;
 				dVector face[64];
 
@@ -301,7 +307,9 @@ class dInfinitePlane
 			polygon[4] =  me->m_plane;
 
 			// show debug display info
-			if (DebugDisplayOn()) {
+dAssert (0);
+//			if (DebugDisplayOn()) 
+			{
 				dMatrix matrix;
 				dVector face[64];
 
