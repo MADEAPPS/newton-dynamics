@@ -92,6 +92,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_mainThreadPhysicsTime(0.0f)
 	,m_showStats(true)
 	,m_synchronousPhysicsUpdateMode(true)
+	,m_hideVisualMeshes(false)
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -106,6 +107,7 @@ DemoEntityManager::DemoEntityManager ()
 
 	// Setup ImGui binding
 	ImGuiIO& io = ImGui::GetIO();
+	io.UserData = this;
 
 	// Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
 	io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;                     
@@ -452,6 +454,7 @@ bool DemoEntityManager::GetMousePosition (int& posX, int& posY) const
 }
 
 
+
 // This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
 // If text or lines are blurry when integrating ImGui in your engine:
 // - in your Render function, try translating your projection matrix by (0.5f,0.5f) or (0.375f,0.375f)
@@ -459,12 +462,21 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 {
 	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
 	ImGuiIO& io = ImGui::GetIO();
+
 	int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 	int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 	if (fb_width == 0 || fb_height == 0)
 		return;
-	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 
+	DemoEntityManager* const window = (DemoEntityManager*)io.UserData;
+
+	ImVec4 clearColor = ImColor(114, 144, 154);
+	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	window->RenderScene();
+
+	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 	// We are using the OpenGL fixed pipeline to make the example code simpler to read!
 	// Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers.
 	GLint last_texture; glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
@@ -492,8 +504,14 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPushMatrix();
 	glLoadIdentity();
 
+// test render
+glBegin(GL_LINES);
+glVertex3f (100.0f, 100.0f, 0.0f);
+glVertex3f (200.0f, 200.0f, 0.0f);
+glEnd();
+
 	// Render command lists
-#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
+	#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
 	for (int n = 0; n < draw_data->CmdListsCount; n++)
 	{
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];
@@ -519,7 +537,7 @@ void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 			idx_buffer += pcmd->ElemCount;
 		}
 	}
-#undef OFFSETOF
+	#undef OFFSETOF
 
 	// Restore modified state
 	glDisableClientState(GL_COLOR_ARRAY);
@@ -580,7 +598,6 @@ void DemoEntityManager::BeginFrame()
 
 	// Start the frame
 	ImGui::NewFrame();
-
 }
 
 void DemoEntityManager::RenderUI()
@@ -802,11 +819,11 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 	NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 	NewtonCollision* const collision = NewtonBodyGetCollision(body);
 
-#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
+	#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
 	if (NewtonCollisionGetType(collision) == SERIALIZE_ID_TREE) {
 		NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
 	}
-#endif
+	#endif
 
 	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
 	dTree <DemoMeshInterface*, const void*>* const cache = (dTree <DemoMeshInterface*, const void*>*)bodyUserData;
@@ -883,6 +900,115 @@ dFloat DemoEntityManager::CalculateInteplationParam () const
 	return param;
 }
 
+
+void DemoEntityManager::RenderScene()
+{
+	dTimeTrackerEvent(__FUNCTION__);
+
+	dFloat timestep = dGetElapsedSeconds();	
+	CalculateFPS(timestep);
+	UpdatePhysics(timestep);
+
+	// Get the interpolated location of each body in the scene
+	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
+
+	ImGuiIO& io = ImGui::GetIO();
+	int display_w = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	int display_h = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	glViewport(0, 0, display_w, display_h);
+
+/*
+	// Rendering
+	// Our shading model--Goraud (smooth). 
+	glShadeModel (GL_SMOOTH);
+
+	// Culling. 
+	glCullFace (GL_BACK);
+	glFrontFace (GL_CCW);
+	glEnable (GL_CULL_FACE);
+
+	//	glEnable(GL_DITHER);
+
+	// z buffer test
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc (GL_LEQUAL);
+
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
+
+	// set default lightning
+	glEnable (GL_LIGHTING);
+
+	// make sure the model view matrix is set to identity before setting world space light sources
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	dFloat cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
+	glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
+	glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
+	glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	// one light form the Camera eye point
+	GLfloat lightDiffuse0[] = { 0.5f, 0.5f, 0.5f, 0.0 };
+	GLfloat lightAmbient0[] = { 0.0f, 0.0f, 0.0f, 0.0 };
+	dVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);
+	GLfloat lightPosition0[] = {camPosition.m_x, camPosition.m_y, camPosition.m_z};
+
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse0);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, lightDiffuse0);
+	glEnable(GL_LIGHT0);
+
+	// set just one directional light
+	GLfloat lightDiffuse1[] = { 0.7f, 0.7f, 0.7f, 0.0 };
+	GLfloat lightAmbient1[] = { 0.2f, 0.2f, 0.2f, 0.0 };
+	GLfloat lightPosition1[] = { -500.0f, 200.0f, 500.0f, 0.0 };
+
+	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, lightDiffuse1);
+	glEnable(GL_LIGHT1);
+
+	// update Camera
+	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
+
+	// render all entities
+	if (m_hideVisualMeshes) {
+		if (m_sky) {
+			glPushMatrix();	
+			m_sky->Render(timestep, this);
+			glPopMatrix();
+		}
+
+	} else {
+		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
+			DemoEntity* const entity = node->GetInfo();
+			glPushMatrix();	
+			entity->Render(timestep, this);
+			glPopMatrix();
+		}
+	}
+
+	if (m_tranparentHeap.GetCount()) {
+		dMatrix modelView;
+		glGetFloat (GL_MODELVIEW_MATRIX, &modelView[0][0]);
+		while (m_tranparentHeap.GetCount()) {
+			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
+			glLoadIdentity();
+			glLoadMatrix(&transparentMesh.m_matrix[0][0]);
+			transparentMesh.m_mesh->RenderTransparency();
+			m_tranparentHeap.Pop();
+		}
+		glLoadMatrix(&modelView[0][0]);
+	}
+*/
+
+}
+
+
 void DemoEntityManager::Run()
 {
     // Main loop
@@ -892,78 +1018,8 @@ void DemoEntityManager::Run()
 
 		BeginFrame();
 
-		dFloat timestep = dGetElapsedSeconds();	
-		CalculateFPS(timestep);
-		UpdatePhysics(timestep);
-
-		// Get the interpolated location of each body in the scene
-		m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
-
-		int display_w, display_h;
-		glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
-		glViewport(0, 0, display_w, display_h);
-		
-		// Rendering
-		// Our shading model--Goraud (smooth). 
-		glShadeModel (GL_SMOOTH);
-
-		// Culling. 
-		glCullFace (GL_BACK);
-		glFrontFace (GL_CCW);
-		glEnable (GL_CULL_FACE);
-
-		//	glEnable(GL_DITHER);
-
-		// z buffer test
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc (GL_LEQUAL);
-
-		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-		glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
-
-		ImVec4 clearColor = ImColor(114, 144, 154);
-		glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		// set default lightning
-		glEnable (GL_LIGHTING);
-
-		// make sure the model view matrix is set to identity before setting world space light sources
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-
-		dFloat cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
-		glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
-		glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
-		glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-		// one light form the Camera eye point
-		GLfloat lightDiffuse0[] = { 0.5f, 0.5f, 0.5f, 0.0 };
-		GLfloat lightAmbient0[] = { 0.0f, 0.0f, 0.0f, 0.0 };
-		dVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);
-		GLfloat lightPosition0[] = {camPosition.m_x, camPosition.m_y, camPosition.m_z};
-
-		glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
-		glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse0);
-		glLightfv(GL_LIGHT0, GL_SPECULAR, lightDiffuse0);
-		glEnable(GL_LIGHT0);
-
-
-		// set just one directional light
-		GLfloat lightDiffuse1[] = { 0.7f, 0.7f, 0.7f, 0.0 };
-		GLfloat lightAmbient1[] = { 0.2f, 0.2f, 0.2f, 0.0 };
-		GLfloat lightPosition1[] = { -500.0f, 200.0f, 500.0f, 0.0 };
-
-		glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
-		glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
-		glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
-		glLightfv(GL_LIGHT1, GL_SPECULAR, lightDiffuse1);
-		glEnable(GL_LIGHT1);
-
-
 		RenderUI();
+
 		ImGui::Render();
 		glfwSwapBuffers(m_mainFrame);
     }

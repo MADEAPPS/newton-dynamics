@@ -101,6 +101,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void RenderUI();
 	void LoadFont();
 	void Cleanup();
+
+	void RenderScene();
 	void UpdatePhysics(dFloat timestep);
 	dFloat CalculateInteplationParam () const;
 
@@ -137,6 +139,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	dFloat m_mainThreadPhysicsTime;
 	bool m_showStats;
 	bool m_synchronousPhysicsUpdateMode;
+	bool m_hideVisualMeshes;
 
 
 	static SDKDemos m_demosSelection[];
