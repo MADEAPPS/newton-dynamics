@@ -23,6 +23,47 @@
 #define MAX_PHYSICS_FPS				60.0f
 #define MAX_PHYSICS_SUB_STEPS		2
 
+#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+//#define DEFAULT_SCENE	1			// Coefficients of friction
+//#define DEFAULT_SCENE	2			// Coefficients of restitution
+//#define DEFAULT_SCENE	3			// Precessing tops
+//#define DEFAULT_SCENE	4			// closest distance
+//#define DEFAULT_SCENE	5			// primitive collision
+//#define DEFAULT_SCENE	6 			// Kinematic bodies
+//#define DEFAULT_SCENE	7			// primitive convex cast 
+//#define DEFAULT_SCENE	8			// Box stacks
+//#define DEFAULT_SCENE	9			// simple level mesh collision
+//#define DEFAULT_SCENE	10			// optimized level mesh collision
+//#define DEFAULT_SCENE	11			// height field Collision
+//#define DEFAULT_SCENE	12			// infinite user plane collision
+//#define DEFAULT_SCENE	13			// user height field Collision
+//#define DEFAULT_SCENE	14			// compound Collision
+//#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	16			// uniform Scaled Collision
+//#define DEFAULT_SCENE	17			// non uniform Scaled Collision
+//#define DEFAULT_SCENE	18			// scaled mesh collision
+//#define DEFAULT_SCENE	19			// continuous collision
+//#define DEFAULT_SCENE	20			// paper wall continuous collision
+//#define DEFAULT_SCENE	21			// puck slide continuous collision
+//#define DEFAULT_SCENE	22			// simple convex decomposition
+//#define DEFAULT_SCENE	23			// scene Collision
+//#define DEFAULT_SCENE	24          // simple boolean operators 
+//#define DEFAULT_SCENE	25			// simple convex fracturing 
+//#define DEFAULT_SCENE	26			// structured convex fracturing 
+//#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
+//#define DEFAULT_SCENE	28          // standard joints
+//#define DEFAULT_SCENE	29			// articulated joints
+//#define DEFAULT_SCENE	30			// basic rag doll
+//#define DEFAULT_SCENE	31			// dynamics rag doll
+//#define DEFAULT_SCENE	32			// basic Car
+//#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	34			// heavy vehicles
+//#define DEFAULT_SCENE	35			// basic player controller
+//#define DEFAULT_SCENE	36			// advanced player controller
+//#define DEFAULT_SCENE	37			// cloth patch			
+//#define DEFAULT_SCENE	38			// soft bodies			
+
+
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
 void Restitution (DemoEntityManager* const scene);
@@ -69,6 +110,45 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 {
 	{"Using the newton mesh tool", "demonstrate how to use the newton mesh toll for mesh manipulation", UsingNewtonMeshTool},
 	{"Coefficients of friction", "demonstrate the effect of various coefficient of friction", Friction},
+/*
+	{"Coefficients of restitution", "demonstrate the effect of various coefficient of restitution", Restitution},
+	{"Precessing tops", "show natural precession", PrecessingTops},
+	{"Closest distance", "demonstrate closest distance to a convex shape", ClosestDistance},
+	{"Primitive Collision", "demonstrate separate collision of primitives", PrimitiveCollision},
+	{"Kinematic bodies", "demonstrate separate collision of primitives", KinematicPlacement},
+	{"Primitive convex cast", "demonstrate separate primitive convex cast", ConvexCast},
+	{"Simple box Stacks", "show simple stack of Boxes", BasicBoxStacks},
+	{"Unoptimized mesh collision", "show simple level mesh", SimpleMeshLevelCollision},
+	{"Optimized mesh collision", "show optimized level mesh", OptimizedMeshLevelCollision},
+	{"Height field collision mesh", "show high file collision mesh", HeightFieldCollision},
+	{"User infinite Plane collision mesh", "show high file collision mesh", UserPlaneCollision},
+	{"User Height field collision mesh", "show high file collision mesh", UserHeightFieldCollision},
+	{"Compound collision shape", "demonstrate compound collision", CompoundCollision},
+	{"Archimedes Buoyancy", "show Archimedes Buoyancy using the trigger volume manager", AlchimedesBuoyancy},
+	{"Uniform scaled collision shape", "demonstrate scaling shape", UniformScaledCollision},
+	{"Non uniform scaled collision shape", "demonstrate scaling shape", NonUniformScaledCollision},
+	{"Scaled mesh collision", "demonstrate scaling mesh scaling collision", ScaledMeshCollision},
+	{ "Continuous collision", "show continuous collision", ContinuousCollision },
+	{ "Paper wall continuous collision", "show fast continuous collision", ContinuousCollision1 },
+	{ "Puck slide", "show continuous collision", PuckSlide },
+	{"Simple convex decomposition", "demonstrate convex decomposition and compound collision", SimpleConvexApproximation},
+	{"Multi geometry collision", "show static mesh with the ability of moving internal parts", SceneCollision},
+	{"Simple boolean operations", "demonstrate simple boolean operations ", SimpleBooleanOperations},
+	{"Simple convex fracture", "demonstrate simple fracture destruction using Voronoi partition", SimpleConvexFracturing},
+	{"Structured convex fracture", "demonstrate structured fracture destruction using Voronoi partition", StructuredConvexFracturing},
+	{"Parallel ray cast", "using the threading Job scheduler", MultiRayCast},
+	{"Standard Joints", "show some of the common joints", StandardJoints},
+	{"Articulated robotic actuators joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
+	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagDoll},
+	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
+	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
+	{"Super car", "implement a hight performance sport car", SuperCar},
+	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
+	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
+	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
+	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
+	{"Simple soft Body", "show simple soft body", SoftBodies},
+*/
 };
 
 
@@ -85,6 +165,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_renderHood(NULL)
 	,m_microsecunds(0)
 	,m_tranparentHeap()
+	,m_currentScene(DEFAULT_SCENE)
 	,m_framesCount(0)
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
@@ -365,29 +446,8 @@ void DemoEntityManager::ShowMainMenuBar()
 		if (ImGui::BeginMenu("Demos")) {
 			int demosCount = int (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
 			for (int i = 0; i < demosCount; i ++) {
-				if (ImGui::RadioButton(m_demosSelection[i].m_name, false)) {
-
-					//BEGIN_MENU_OPTION();
-					//NewtonWaitForUpdateToFinish (m_world);
-
-					Cleanup();
-
-					m_demosSelection[i].m_launchDemoCallback (this);
-
-					//RestoreSettings ();
-					ResetTimer();
-
-					// clean up all caches the engine have saved
-					NewtonInvalidateCache(m_world);
-
-					//dAssert (0);
-					//END_MENU_OPTION();
-					//NewtonWaitForUpdateToFinish (m_world);
-					//SetAutoSleepMode (m_world, !m_autoSleepState);
-					//NewtonSetSolverModel (m_world, m_solverModes[m_solverModeIndex]);
-					//NewtonSetSolverConvergenceQuality (m_world, m_solverModeQuality ? 1 : 0);
-					//NewtonSetMultiThreadSolverOnSingleIsland (m_world, m_useParallelSolver ? 1 : 0);	
-					//NewtonSelectBroadphaseAlgorithm (m_world, m_broadPhaseType);
+				if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) {
+					m_currentScene = i;
 				}
 			}
 
@@ -408,6 +468,32 @@ void DemoEntityManager::ShowMainMenuBar()
 		}
 
 		ImGui::EndMainMenuBar();
+	}
+
+	if (m_currentScene != -1) {
+		//BEGIN_MENU_OPTION();
+		//NewtonWaitForUpdateToFinish (m_world);
+
+		Cleanup();
+
+		m_demosSelection[m_currentScene].m_launchDemoCallback (this);
+
+		//RestoreSettings ();
+		ResetTimer();
+
+		// clean up all caches the engine have saved
+		NewtonInvalidateCache(m_world);
+
+		//dAssert (0);
+		//END_MENU_OPTION();
+		//NewtonWaitForUpdateToFinish (m_world);
+		//SetAutoSleepMode (m_world, !m_autoSleepState);
+		//NewtonSetSolverModel (m_world, m_solverModes[m_solverModeIndex]);
+		//NewtonSetSolverConvergenceQuality (m_world, m_solverModeQuality ? 1 : 0);
+		//NewtonSetMultiThreadSolverOnSingleIsland (m_world, m_useParallelSolver ? 1 : 0);	
+		//NewtonSelectBroadphaseAlgorithm (m_world, m_broadPhaseType);
+
+		m_currentScene = -1;
 	}
 }
 
@@ -510,8 +596,11 @@ void DemoEntityManager::RenderUI()
 	if (m_showStats) {
 		bool dommy;
 		char text[1024];
-
 		
+		//ImVec2 size ( 100, 400);
+		//int flags = ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoResize;
+		//bool ImGui::Begin(const char* name, bool* p_open, const ImVec2& size_on_first_use, float bg_alpha, ImGuiWindowFlags flags)
+		//if (ImGui::Begin("statistics", &dommy, size, -1.0f, flags)){
 		if (ImGui::Begin("statistics", &dommy)){
 			sprintf (text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text);
@@ -528,7 +617,7 @@ void DemoEntityManager::RenderUI()
 			sprintf (text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
 			ImGui::Text(text);
 
-			//sprintf (text, "auto sleep: %s"), m_autoSleepState ? wxT("on") : wxT("off"));
+			//sprintf (text, "auto sleep: %s", m_autoSleepState ? "on") : "off"));
 			//m_statusbar->SetStatusText (statusText, 5);
 
 /*
@@ -539,7 +628,7 @@ void DemoEntityManager::RenderUI()
 
 			char floatMode[128];
 			NewtonGetDeviceString (world, m_hardwareDevice, floatMode, sizeof (floatMode));
-			statusText.Printf (wxT ("instructions: %s"),  wxString::FromAscii(floatMode).wc_str());
+			statusText.Printf (wxT ("instructions: %s",  wxString::FromAscii(floatMode).wc_str());
 			m_statusbar->SetStatusText (statusText, 6);
 */
 

@@ -132,6 +132,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	unsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;
 
+	int m_currentScene;
 	int m_framesCount;
 	dFloat m_fps;
 	dFloat m_timestepAcc;
