@@ -37,5 +37,5 @@ class CustomPathFollow: public CustomJoint
 //	dVector m_pointOnPath;
 };
 
-#endif // !defined(AFX_CUSTOM_PATH_FOLLOW_H_H)
+#endif
 

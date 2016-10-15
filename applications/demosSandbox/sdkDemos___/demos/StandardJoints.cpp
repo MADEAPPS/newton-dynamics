@@ -11,11 +11,13 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "DemoEntityManager.h"
+#include "DemoMesh.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "DemoMesh.h"
-#include "OpenGlUtil.h"
+#include "DebugDisplay.h"
+#include "TargaToOpenGl.h"
+#include "DemoEntityManager.h"
+
 #include <CustomGear.h>
 #include <Custom6DOF.h>
 #include <CustomHinge.h>
@@ -114,8 +116,8 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size (1.0f, 1.0f, 1.0f);
 	NewtonBody* const box0 = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
-	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box2 = CreateCapule (scene, origin + dVector (0.0f,  5.0 - size.m_y * 4.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f, 5.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box2 = CreateCapule (scene, origin + dVector (0.0f, 5.0f - size.m_y * 4.0f, 0.0f, 0.0f), size);
 
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
 	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
@@ -150,8 +152,8 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	dVector size(1.0f, 1.0f, 1.0f);
 	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
 	NewtonBody* const box0 = CreateCapule(scene, origin + dVector(0.0f, 5.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 5.0 - size.m_y * 2.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box2 = CreateCapule(scene, origin + dVector(0.0f, 5.0 - size.m_y * 4.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 5.0f - size.m_y * 2.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box2 = CreateCapule(scene, origin + dVector(0.0f, 5.0f - size.m_y * 4.0f, 0.0f, 0.0f), size);
 
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix pinMatrix(dGrammSchmidt(dVector(0.0f, -1.0f, 0.0f, 0.0f)));
@@ -196,7 +198,7 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 	dVector size (1.0f, 1.0f, 1.0f);
 	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
 	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0 - size.m_y * 2.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0f - size.m_y * 2.0f, 0.0f, 0.0f), size);
 
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
@@ -224,9 +226,9 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size (1.0f, 1.0f, 1.0f);
-	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
-	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0 - size.m_y * 2.0f, 0.0f, 0.0f), size);
+	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f, 5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
+	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f, 5.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f, 5.0f - size.m_y * 2.0f, 0.0f, 0.0f), size);
 
 	const dFloat angle = 60.0f * 3.1415592f / 180.0f;
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
@@ -862,8 +864,8 @@ class MyPathFollow: public CustomPathFollow
 		dBigVector tangent (spline.CurveDerivative (knot));
 		tangent = tangent.Scale (1.0 / sqrt (tangent.DotProduct3(tangent)));
 
-		positOut = dVector (point.m_x, point.m_y, point.m_z);
-		tangentOut = dVector (tangent.m_x, tangent.m_y, tangent.m_z);
+		positOut = dVector (dFloat(point.m_x), dFloat(point.m_y), dFloat(point.m_z));
+		tangentOut = dVector (dFloat(tangent.m_x), dFloat(tangent.m_y), dFloat(tangent.m_z));
 	}
 
 	DemoEntity* const m_rollerCosterPath;
@@ -978,7 +980,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	
 	dVector positions[count + 1];
 	dFloat64 knot = spline.FindClosestKnot(point0, dBigVector (origin + dVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 0.0f)), 4);
-	positions[0] = dVector (point0.m_x, point0.m_y, point0.m_z, 0.0);
+	positions[0] = dVector (dFloat(point0.m_x), dFloat(point0.m_y), dFloat(point0.m_z), 0.0f);
 	dFloat average = 0.0f;
 	for (int i = 0; i < count; i ++) {
 		dBigVector point1;
@@ -987,7 +989,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		tangent = tangent.Scale (1.0 / sqrt (tangent.DotProduct3(tangent)));
 		knot = spline.FindClosestKnot(point1, dBigVector (point0 + tangent.Scale (2.0f)), 4);
 		point0 = point1;
-		positions[i + 1] = dVector (point0.m_x, point0.m_y, point0.m_z, 0.0);
+		positions[i + 1] = dVector (dFloat(point0.m_x), dFloat(point0.m_y), dFloat(point0.m_z), 0.0f);
 	}
 
 	average /= count;

@@ -18,13 +18,10 @@
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
 #include "DemoMesh.h"
-#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "HeightFieldPrimitive.h"
-#include "CustomInputManager.h"
-#include "NewtonDemos.h"
-#include "DebugDisplay.h"
+#include "DemoEntityManager.h"
+#include "dHighResolutionTimer.h"
 
 
 static dVector GetLookAtDirction(DemoEntityManager* const scene)
@@ -91,25 +88,26 @@ class CCDInputManager : public CustomInputManager
 		:CustomInputManager(scene->GetNewton())
 		, m_scene(scene)
 	{
-		scene->Set2DDisplayRenderFunction (DrawHelpMenu, this);
+		dAssert (0);
+//		scene->Set2DDisplayRenderFunction (DrawHelpMenu, this);
 	}
 
 	static void DrawHelpMenu (DemoEntityManager* const scene, void* const context, int lineNumber)
 	{
+		dAssert (0);
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "Hit R key to shot  boxes to teh wall");
+//		lineNumber = scene->Print (color, 10, lineNumber + 20, "Hit R key to shot  boxes to teh wall");
 	}
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
-
-		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
-
+dAssert (0);
+/*
         int key = 0;
         static dLong timer = dGetTimeInMicrosenconds() + 100000;
         if (dGetTimeInMicrosenconds() > timer) {
             timer = dGetTimeInMicrosenconds() + 100000;
-            key = mainWindow->GetKeyState('R');
+            key = m_scene->GetKeyState('R');
         }
         dVector dir = GetLookAtDirction(m_scene);
         dVector pos = GetCamPosition(m_scene);
@@ -123,6 +121,7 @@ class CCDInputManager : public CustomInputManager
 
 			FireNewtonCcdBox(m_scene->GetNewton(), pos, vel);
 		}
+*/	
 	}
 
 	void OnEndUpdate(dFloat timestepInSecunds)
@@ -234,13 +233,14 @@ void ContinuousCollision1(DemoEntityManager* const scene)
 	pos.m_y = 50.0f;
 	pos.m_z = 0.0f;
 
-	dQuaternion rot(dVector(1.f,0.f,0.f),(dFloat)M_PI/4.0f);
+	dQuaternion rot(dVector(1.f,0.f,0.f), 3.14159f/4.0f);
 	scene->SetCameraMatrix(rot, pos);
 
 	CreateBackgroundWallsAndCellingBody(scene->GetNewton());
 	new CCDInputManager(scene);
 
 	// compel to change debug display mode. just for convenience.
-	NewtonDemos* const mainWindow = scene->GetRootWindow();
-	mainWindow->m_debugDisplayMode = 2;
+	dAssert (0);
+//	NewtonDemos* const mainWindow = scene->GetRootWindow();
+//	scene->m_debugDisplayMode = 2;
 }

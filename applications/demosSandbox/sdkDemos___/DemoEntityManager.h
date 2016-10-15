@@ -17,6 +17,7 @@ struct ImDrawData;
 
 class DemoMesh;
 class DemoEntity;
+class DemoCamera;
 class DemoMeshInterface;
 class DemoCameraListener;
 
@@ -83,8 +84,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void ResetTimer();
 	void LoadScene (const char* const name);
 	void RemoveEntity (DemoEntity* const ent);
+	void RemoveEntity (dListNode* const entNode);
 
-
+	DemoCamera* GetCamera() const;
 	bool GetMousePosition (int& posX, int& posY) const;
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
@@ -107,7 +109,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	dFloat CalculateInteplationParam () const;
 
 	void CalculateFPS(dFloat timestep);
-	void RemoveEntity (dListNode* const entNode);
+
 	
 	void ShowMainMenuBar();
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);

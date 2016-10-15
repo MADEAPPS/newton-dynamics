@@ -117,7 +117,6 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Kinematic bodies", "demonstrate separate collision of primitives", KinematicPlacement},
 	{"Primitive convex cast", "demonstrate separate primitive convex cast", ConvexCast},
 	{"Simple box Stacks", "show simple stack of Boxes", BasicBoxStacks},
-/*
 	{"Unoptimized mesh collision", "show simple level mesh", SimpleMeshLevelCollision},
 	{"Optimized mesh collision", "show optimized level mesh", OptimizedMeshLevelCollision},
 	{"Height field collision mesh", "show high file collision mesh", HeightFieldCollision},
@@ -141,17 +140,14 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Articulated robotic actuators joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagDoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
-	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
-	{"Super car", "implement a hight performance sport car", SuperCar},
-	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
-	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
-	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
+//	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
+//	{"Super car", "implement a hight performance sport car", SuperCar},
+//	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
+//	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
+//	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
 	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
 	{"Simple soft Body", "show simple soft body", SoftBodies},
-*/
 };
-
-
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
@@ -269,6 +265,12 @@ DemoEntityManager::~DemoEntityManager ()
 	ImGui::Shutdown();
 
 	dAssert (NewtonGetMemoryUsed () == 0);
+}
+
+
+DemoCamera* DemoEntityManager::GetCamera() const
+{
+	return m_cameraManager->GetCamera();
 }
 
 

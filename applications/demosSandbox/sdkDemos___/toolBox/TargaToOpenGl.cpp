@@ -14,8 +14,6 @@
 #include "TargaToOpenGl.h"
 
 
-
-
 struct TextureEntry: public dRefCounter
 {
 	GLuint m_textureID;

@@ -10,13 +10,14 @@
 */
 
 #include <toolbox_stdafx.h>
-#include "TargaToOpenGl.h"
+#include "SkyBox.h"
 #include "DemoMesh.h"
-#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
+#include "DemoEntityManager.h"
 #include "HeightFieldPrimitive.h"
+
 
 #define GAUSSIAN_BELL 2
 //#define GAUSSIAN_BELL	1
