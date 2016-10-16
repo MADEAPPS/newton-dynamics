@@ -1090,7 +1090,7 @@ void DemoEntityManager::RenderScene()
 	GLfloat lightDiffuse0[] = { 0.5f, 0.5f, 0.5f, 0.0 };
 	GLfloat lightAmbient0[] = { 0.0f, 0.0f, 0.0f, 0.0 };
 	dVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);
-	GLfloat lightPosition0[] = {camPosition.m_x, camPosition.m_y, camPosition.m_z};
+	GLfloat lightPosition0[] = {GLfloat(camPosition.m_x), GLfloat(camPosition.m_y), GLfloat(camPosition.m_z)};
 
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
