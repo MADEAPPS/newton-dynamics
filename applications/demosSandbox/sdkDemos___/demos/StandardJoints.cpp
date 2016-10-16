@@ -868,7 +868,7 @@ class MyPathFollow: public CustomPathFollow
 		tangentOut = dVector (dFloat(tangent.m_x), dFloat(tangent.m_y), dFloat(tangent.m_z));
 	}
 
-	DemoEntity* const m_rollerCosterPath;
+	DemoEntity* m_rollerCosterPath;
 };
 
 

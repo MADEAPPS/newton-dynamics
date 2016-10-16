@@ -9,17 +9,17 @@
 * freely
 */
 
+
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "NewtonDemos.h"
-#include "PhysicsUtils.h"
-#include "TargaToOpenGl.h"
-#include "HeightFieldPrimitive.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
-#include "DemoEntityManager.h"
+#include "PhysicsUtils.h"
 #include "DebugDisplay.h"
+#include "TargaToOpenGl.h"
+#include "DemoEntityManager.h"
 #include "UserPlaneCollision.h"
+
 
 // some figures form the 2000 SRT Viper data sheet: http://www.vipercentral.com/specifications/
 // the 2000 Vipers’ 8.4-liter engine generates
@@ -544,8 +544,8 @@ class SuperCarEntity: public DemoEntity
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		NewtonDemos* const mainWindow = scene->GetRootWindow();
+		DemoEntityManager* const mainWindow = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		//NewtonDemos* const mainWindow = scene->GetRootWindow();
 
 		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
@@ -779,7 +779,7 @@ class SuperCarEntity: public DemoEntity
 		dBigVector q; 
 		DemoBezierCurve* const path = (DemoBezierCurve*) pathEntity->GetMesh();
 		dFloat64 u = path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
-		dVector p1 (pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w)));
+		dVector p1 (pathMatrix.TransformVector(dVector (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w))));
 		p1.m_y = 0.0f;
 		dVector dist (p1 - p0);
 		dFloat angle = 0.0f;
@@ -795,7 +795,7 @@ class SuperCarEntity: public DemoEntity
 				u = path->m_curve.FindClosestKnot (q, q, 4);
 			}
 			averageTangent = averageTangent.Scale (1.0f / dSqrt (averageTangent.DotProduct3(averageTangent)));
-			dVector heading (pathMatrix.RotateVector(dVector (averageTangent.m_x, averageTangent.m_y, averageTangent.m_z, averageTangent.m_w)));
+			dVector heading (pathMatrix.RotateVector(dVector (dFloat(averageTangent.m_x), dFloat(averageTangent.m_y), dFloat(averageTangent.m_z), dFloat(averageTangent.m_w))));
 			heading.m_y = 0.0;
 			heading = vehicleMatrix.UnrotateVector(heading);
 			angle = dClamp (dAtan2 (heading.m_z, heading.m_x), -maxAngle, maxAngle);
@@ -808,7 +808,7 @@ class SuperCarEntity: public DemoEntity
 				path->m_curve.FindClosestKnot (q, q, 4);
 			}
 
-			m_debugTargetHeading = pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+			m_debugTargetHeading = pathMatrix.TransformVector(dVector (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w)));
 			dVector localDir (vehicleMatrix.UntransformVector(m_debugTargetHeading));
 			angle = dClamp (dAtan2 (localDir.m_z, localDir.m_x), -maxAngle, maxAngle);
 		}
@@ -1011,8 +1011,9 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		,m_nexVehicle (true)
 	{
 		// hook a callback for 2d help display
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
+		dAssert (0);
+		//DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		//scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
 
 		// load 2d display assets
 		m_gears = LoadTexture ("gears_font.tga");
@@ -1106,6 +1107,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void DrawHelp(DemoEntityManager* const scene, int lineNumber)
 	{
+		dAssert (0);
+/*
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
@@ -1128,11 +1131,14 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		if (engineIgnitionKey) {
 			SetNextPlayer();
 		}
+*/
 	}
 
 
 	void RenderVehicleSchematic (DemoEntityManager* const scene) const
 	{
+		dAssert (0);
+/*
 		if (m_player) {
 			glDisable(GL_LIGHTING);
 			glDisable(GL_TEXTURE_2D);
@@ -1154,6 +1160,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glLineWidth(1.0f);
 			glEnable(GL_TEXTURE_2D);
 		}
+*/
 	}
 
 
@@ -1315,7 +1322,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
 		// set the help key
-		m_helpKey.UpdatePushButton (scene->GetRootWindow(), 'H');
+		m_helpKey.UpdatePushButton (scene, 'H');
 		
 		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
 			CustomVehicleController* const controller = &ptr->GetInfo();
@@ -1399,10 +1406,10 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		dMatrix matrix (dGetIdentityMatrix());
 
 		dMatrix pathMatrix (m_raceTrackPath->GetMeshMatrix() * m_raceTrackPath->GetCurrentMatrix());
-		matrix.m_front = pathMatrix.RotateVector (dVector (dir.m_x, dir.m_y, dir.m_z, 0.0f));
+		matrix.m_front = pathMatrix.RotateVector (dVector (dFloat(dir.m_x), dFloat(dir.m_y), dFloat(dir.m_z), 0.0f));
 		matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
 		matrix.m_right.m_w = 0.0f;
-		matrix.m_posit = pathMatrix.TransformVector(dVector (origin.m_x, origin.m_y, origin.m_z, 1.0f));
+		matrix.m_posit = pathMatrix.TransformVector(dVector (dFloat(origin.m_x), dFloat(origin.m_y), dFloat(origin.m_z), 1.0f));
 		return matrix;
 	}
 
@@ -1422,7 +1429,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 1.0e-3f, 0, &offsetMatrix[0][0]);
 
 		dFloat64 slineLength = path->m_curve.CalculateLength(0.01f);
-		int segmentCount = slineLength / 5.0f;
+		int segmentCount = int (slineLength / 5.0f);
 
 		dFloat64 step = slineLength / segmentCount;
 

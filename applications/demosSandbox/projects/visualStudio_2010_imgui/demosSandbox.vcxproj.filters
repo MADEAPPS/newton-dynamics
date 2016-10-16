@@ -126,6 +126,21 @@
     <ClCompile Include="..\..\sdkDemos___\demos\SoftBodies.cpp">
       <Filter>demos</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicCar.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\SuperCar.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\HeavyVehicles.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicPlayerController.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\AdvancedPlayerController.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos___\DemoEntityManager.h" />

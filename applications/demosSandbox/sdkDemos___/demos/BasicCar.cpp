@@ -11,14 +11,12 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "NewtonDemos.h"
-#include "TargaToOpenGl.h"
 #include "DemoMesh.h"
-#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "HeightFieldPrimitive.h"
 #include "DebugDisplay.h"
+#include "TargaToOpenGl.h"
+#include "DemoEntityManager.h"
 
 
 struct BasciCarParameters
@@ -452,8 +450,8 @@ class BasicCarEntity: public DemoEntity
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		NewtonDemos* const mainWindow = scene->GetRootWindow();
+		DemoEntityManager* const mainWindow = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		//NewtonDemos* const mainWindow = scene->GetRootWindow();
 
 		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
@@ -767,8 +765,9 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 		,m_player (NULL) 
 	{
 		// hook a callback for 2d help display
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
+		dAssert (0);
+//		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+//		scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
 	}
 
 	~BasicCarControllerManager ()
@@ -784,6 +783,8 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 
 	void DrawHelp(DemoEntityManager* const scene, int lineNumber) const
 	{
+		dAssert (0);
+/*
 		if (m_player->m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control");
@@ -796,11 +797,14 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         : 'space'");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
 		}
+*/	
 	}
 
 
 	void RenderVehicleHud (DemoEntityManager* const scene, int lineNumber) const
 	{
+		dAssert (0);
+/*
 		if (m_player) {
 			// set to transparent color
 			glEnable (GL_BLEND);
@@ -835,6 +839,7 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 			glEnable(GL_LIGHTING);
 			glDisable(GL_BLEND);
 		}
+*/
 	}
 
 

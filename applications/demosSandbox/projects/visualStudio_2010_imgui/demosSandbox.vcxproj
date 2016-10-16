@@ -61,9 +61,12 @@
     <ClCompile Include="..\..\sdkDemos___\DemoEntityManager.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoListenerBase.cpp" />
     <ClCompile Include="..\..\sdkDemos___\DemoMesh.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\AdvancedPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\ArchimedesBuoyancy.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\ArticulatedJoints.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicCar.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\BasicFriction.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\BasicRagDoll.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\BasicRestitution.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\BasicStacking.cpp" />
@@ -74,6 +77,7 @@
     <ClCompile Include="..\..\sdkDemos___\demos\ConvexApproximation.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\ConvexCast.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\DynamicRagDoll.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\HeavyVehicles.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\HeighFieldCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\KinematicBodies.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\MeshCollision.cpp" />
@@ -88,6 +92,7 @@
     <ClCompile Include="..\..\sdkDemos___\demos\SoftBodies.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\StandardJoints.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\StructuredConvexFracturing.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\SuperCar.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\UserStaticCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos___\demos\UsingNewtonMeshTool.cpp" />
     <ClCompile Include="..\..\sdkDemos___\main.cpp" />

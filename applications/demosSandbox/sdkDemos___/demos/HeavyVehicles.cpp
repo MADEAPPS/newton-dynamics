@@ -11,14 +11,14 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "NewtonDemos.h"
-#include "TargaToOpenGl.h"
 #include "DemoMesh.h"
-#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "HeightFieldPrimitive.h"
 #include "DebugDisplay.h"
+#include "TargaToOpenGl.h"
+#include "DemoEntityManager.h"
+#include "UserPlaneCollision.h"
+#include "HeightFieldPrimitive.h"
 
 
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
@@ -261,7 +261,7 @@ class HeavyVehicleEntity: public DemoEntity
 			for (int i = 0; i < m_controlPointCount; i ++) {
 				m_controlPointBindIndex[i] = -1;
 				dBigVector q (m_bezierMesh->m_curve.GetControlPoint(i));
-				m_controlPointsOffset[i] = m_shapeMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+				m_controlPointsOffset[i] = m_shapeMatrix.TransformVector(dVector (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w)));
 			}
 
 			for (int i = 0; i < m_controlPointCount; i ++) {
@@ -317,11 +317,11 @@ class HeavyVehicleEntity: public DemoEntity
 			threadSize *= 0.25f;
 			dFloat stepAcc = threadSize;
 			dBigVector q (m_bezierMesh->m_curve.CurvePoint(0.0f));
-			dVector p0 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+			dVector p0 (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w));
 			for (int i = 1; i < samplingRate + 15; i ++) {
 				dFloat u = dFloat (i) / samplingRate;
 				dBigVector q (m_bezierMesh->m_curve.CurvePoint(dMod (u, 1.0f)));
-				dVector p1 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+				dVector p1 (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w));
 				dVector err (p1 - p0);
 				dFloat errMag = dSqrt (err.DotProduct3(err));
 				distAcc += errMag;
@@ -355,7 +355,7 @@ class HeavyVehicleEntity: public DemoEntity
 			m_bezierMesh = (DemoBezierCurve*) m_bezierEntity->GetMesh();
 			dAssert (m_bezierMesh->IsType(DemoBezierCurve::GetRttiType()));
 
-			m_length = m_bezierMesh->m_curve.CalculateLength (0.01f);
+			m_length = dFloat(m_bezierMesh->m_curve.CalculateLength (0.01f));
 
 			m_bezierEntity = me->Find (name);
 			CalculaterUniformSpaceSamples();
@@ -434,13 +434,13 @@ class HeavyVehicleEntity: public DemoEntity
 			dFloat size = m_length / m_linksCount;
 			dFloat u0 = CalculateKnotParam (dMod (m_parameter + (m_linksCount - 1) * size, m_length));
 			dBigVector q (m_bezierMesh->m_curve.CurvePoint(u0));
-			dVector q0 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+			dVector q0 (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w));
 			for (int i = 0; i < m_linksCount; i ++) {
 				DemoEntity* const threadPart = m_linksEntity[i];
 				dFloat s = dMod (m_parameter + i * size, m_length);
 				dFloat u1 = CalculateKnotParam (s);
 				dBigVector q (m_bezierMesh->m_curve.CurvePoint(u1));
-				dVector q1 (dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+				dVector q1 (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w));
 				dVector dir (q1 - q0);
 
 				dir.m_x = 0.0f;
@@ -648,7 +648,7 @@ class HeavyVehicleEntity: public DemoEntity
 		tireInfo.m_mass = definition.TIRE_MASS;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
-		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416 / 180.0f;
+		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416f / 180.0f;
 		tireInfo.m_dampingRatio = definition.SUSPENSION_DAMPER;
 		tireInfo.m_springStrength = definition.SUSPENSION_SPRING;
 		tireInfo.m_suspesionlenght = definition.SUSPENSION_LENGTH;
@@ -824,8 +824,7 @@ class HeavyVehicleEntity: public DemoEntity
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		NewtonDemos* const mainWindow = scene->GetRootWindow();
+		DemoEntityManager* const mainWindow = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
 		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
 		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
@@ -1263,8 +1262,9 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 		,m_helpKey (true)
 	{
 		// hook a callback for 2d help display
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
+		dAssert (0);
+		//DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		//scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
 	}
 
 	~HeavyVehicleControllerManager ()
@@ -1293,25 +1293,10 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 		}
 		//TestSpline();
 	}
-/*
-	void DrawHelp(DemoEntityManager* const scene, int lineNumber) const
-	{
-		if (m_player->m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "key switch          : 'Y'           start engine");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'           stick forward");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'           stick back");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'S'           stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Reverse Gear : 'R'           toggle reverse Gear");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Vehicle      : 'V'           change vehicle");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
-		}
-	}
-*/
+
 	void DrawHelp(DemoEntityManager* const scene, int lineNumber)
 	{
+/*
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
@@ -1329,6 +1314,7 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "next vehicle        			: 'V'");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           			: 'H'");
 		}
+*/
 
 //		bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene->GetRootWindow(), 'V');
 //		if (engineIgnitionKey) {
@@ -1477,8 +1463,7 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 	{
 		// apply the vehicle controls, and all simulation time effect
 		NewtonWorld* const world = GetWorld();
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-		NewtonDemos* const mainWindow = scene->GetRootWindow();
+		DemoEntityManager* const mainWindow = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		m_helpKey.UpdatePushButton (mainWindow, 'H');
 

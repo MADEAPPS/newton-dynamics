@@ -140,14 +140,45 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Articulated robotic actuators joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagDoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
-//	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
-//	{"Super car", "implement a hight performance sport car", SuperCar},
-//	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
-//	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
-//	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
+	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
+	{"Super car", "implement a hight performance sport car", SuperCar},
+	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
+	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
+	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
 	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
 	{"Simple soft Body", "show simple soft body", SoftBodies},
 };
+
+
+DemoEntityManager::ButtonKey::ButtonKey (bool state)
+	:m_state(state)
+	,m_memory0(false)
+	,m_memory1(false)
+{
+}
+
+bool DemoEntityManager::ButtonKey::UpdateTriggerButton (const DemoEntityManager* const mainWin, int keyCode)
+{
+	m_memory0 = m_memory1;
+	m_memory1 = mainWin->GetKeyState (keyCode);
+	return !m_memory0 & m_memory1;
+}
+
+bool DemoEntityManager::ButtonKey::UpdateTriggerJoystick (const DemoEntityManager* const mainWin, int buttonMask)
+{
+	m_memory0 = m_memory1;
+	m_memory1 = buttonMask ? true : false;
+	return !m_memory0 & m_memory1;
+}
+
+bool DemoEntityManager::ButtonKey::UpdatePushButton (const DemoEntityManager* const mainWin, int keyCode)
+{
+	if (UpdateTriggerButton (mainWin, keyCode)) {
+		m_state = ! m_state;
+	}
+	return m_state;
+}
+
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
@@ -272,6 +303,26 @@ DemoCamera* DemoEntityManager::GetCamera() const
 {
 	return m_cameraManager->GetCamera();
 }
+
+
+bool DemoEntityManager::GetKeyState(int key) const
+{
+//	return wxGetKeyState(wxKeyCode(key & 0xff));
+	//	return m_key[m_keyMap[key & 0xff]] ? true : false;
+	dAssert (0);
+	return false;
+}
+
+bool DemoEntityManager::GetJoytickPosition (dFloat& posX, dFloat& posY, int& buttonsMask) const
+{
+	dAssert (0);
+	return false;
+//	buttonsMask = m_joytickButtonMask;
+//	posX = dFloat (m_joytickX - 32767) / 32768.0f;
+//	posY = -dFloat (m_joytickY - 32767) / 32768.0f;
+//	return m_hasJoysticController;
+}
+
 
 
 void DemoEntityManager::ResetTimer()
