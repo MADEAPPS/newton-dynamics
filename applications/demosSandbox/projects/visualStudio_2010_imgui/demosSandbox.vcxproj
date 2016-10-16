@@ -466,6 +466,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dContainers/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_md|Win32'">
     <ClCompile>
@@ -534,6 +540,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dContainers/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_md|x64'">
     <ClCompile>
@@ -610,6 +622,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>Glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dContainers/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_md|Win32'">
     <ClCompile>
@@ -694,6 +712,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>Glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dContainers/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
+xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_md|x64'">
     <ClCompile>
