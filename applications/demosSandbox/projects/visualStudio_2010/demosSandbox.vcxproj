@@ -631,7 +631,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
@@ -656,7 +656,7 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
