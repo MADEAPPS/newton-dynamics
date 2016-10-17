@@ -716,7 +716,6 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 						s = (low[i] - x0[i]) / delta_x[i];
 					}
 				}
-				//dgAssert(s >= T(dgFloat32 (0.0f)));
 				dgAssert(dgAbsf (s) >= T(dgFloat32 (0.0f)));
 
 				for (dgInt32 i = clampedIndex; (i < size) && (s > T(1.0e-12f)); i++) {
@@ -733,21 +732,15 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 					}
 				}
 
-				//if (s > T(1.0e-12f)) 
-				{
-					for (dgInt32 i = 0; i < size; i++) {
-						dgAssert((x0[i] + dgAbsf(x0[i]) * T(dgFloat32 (1.0e-4f))) >= low[i]);
-						dgAssert((x0[i] - dgAbsf(x0[i]) * T(dgFloat32 (1.0e-4f))) <= high[i]);
+				for (dgInt32 i = 0; i < size; i++) {
+					dgAssert((x0[i] + dgAbsf(x0[i]) * T(dgFloat32 (1.0e-4f))) >= low[i]);
+					dgAssert((x0[i] - dgAbsf(x0[i]) * T(dgFloat32 (1.0e-4f))) <= high[i]);
 
-						x0[i] += s * delta_x[i];
-						r0[i] += s * delta_r[i];
-						dgAssert((x0[i] + T(1.0e-4f)) >= low[i]);
-						dgAssert((x0[i] - T(1.0e-4f)) <= high[i]);
+					x0[i] += s * delta_x[i];
+					r0[i] += s * delta_r[i];
 
-						dgAssert((x0[i] + dgAbsf(x0[i]) * T(dgFloat32 (1.0e-4f))) >= low[i]);
-						dgAssert((x0[i] - dgAbsf(x0[i]) * T(dgFloat32 (1.0e-4f))) <= high[i]);
-
-					}
+					dgAssert((x0[i] + dgAbsf(x0[i]) * T(dgFloat32 (1.0e-4f))) >= low[i]);
+					dgAssert((x0[i] - dgAbsf(x0[i]) * T(dgFloat32 (1.0e-4f))) <= high[i]);
 				}
 			}
 
