@@ -61,8 +61,6 @@ class dgSkeletonContainer::dgSkeletonGraph
 		m_jointInvMass.SetZero();
 		m_jointJ.SetZero();
 		m_bodyJt.SetZero();
-//		m_bodyForce.SetZero();
-//		m_jointForce.SetZero();
 
 		if (m_parent) {
 			if (m_parent->m_child) {
@@ -448,6 +446,8 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_nodeCount(1)
 	,m_skeletonHardMotors(0)
 {
+SetSolverMode(true);
+
 	rootBody->SetSkeleton(this);
 	m_uniqueID++;
 }

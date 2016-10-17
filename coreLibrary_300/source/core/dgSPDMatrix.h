@@ -702,7 +702,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 				dgAssert(dgAbsf(delta_x[index]) == T(1.0f));
 
 				T s = -r0[index] / delta_r[index];
-				dgAssert(s >= T(dgFloat32 (0.0f)));
+				dgAssert(dgAbsf (s) >= T(dgFloat32 (0.0f)));
 
 				for (dgInt32 i = start; i <= index; i++) {
 					T x1 = x0[i] + s * delta_x[i];
@@ -716,7 +716,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 						s = (low[i] - x0[i]) / delta_x[i];
 					}
 				}
-				dgAssert(s >= T(dgFloat32 (0.0f)));
+				//dgAssert(s >= T(dgFloat32 (0.0f)));
+				dgAssert(dgAbsf (s) >= T(dgFloat32 (0.0f)));
 
 				for (dgInt32 i = clampedIndex; (i < size) && (s > T(1.0e-12f)); i++) {
 					T r1 = r0[i] + s * delta_r[i];

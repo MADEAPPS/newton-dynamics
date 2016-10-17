@@ -449,7 +449,9 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
         dMatrix matrix1 = dGetIdentityMatrix(); matrix1.m_posit = dVector (0.0f, height*0.5f, 0.0f, 1.0f);
         JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
 
-		if (animSpeed != 0.0f) joint->m_anim_speed = animSpeed, joint->m_anim_offset = dFloat(i) / dFloat(numSegments); // animated      
+		if (animSpeed != 0.0f) {
+			joint->m_anim_speed = animSpeed, joint->m_anim_offset = dFloat(i) / dFloat(numSegments); // animated      
+		}
 
 #ifdef _USE_HARD_JOINTS
         NewtonSkeletonContainerAttachBone (skeleton, child, parent);
