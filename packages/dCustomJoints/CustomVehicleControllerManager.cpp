@@ -969,12 +969,14 @@ void CustomVehicleController::EngineController::DriveTrainEngine::Update(EngineC
 	b_[0] = 10.0f;
 	b_[1] = 10.0f;
 	b_[2] = 10.0f;
-	//low_[2] = -10.0f;
-	//high_[2] = 10.0f;
+	low_[2] = -100.0f;
+	high_[2] = 100.0f;
 	dSolveDantzigLCP(3, &A[0][0], x_, b_, low_, high_);
 	dTrace(("%f %f %f\n", x_[0], x_[1], x_[2]));
 }
+*/
 
+/*
 {
 float b_[3];
 float x_[3];

@@ -244,7 +244,7 @@ bool dCholeskyFactorizationAddRow(int size, int n, T* const matrix)
 
 		if (n == j) {
 			T diag = rowN[n] - s;
-			if (diag <= T(1.0e-6f)) {
+			if (diag <= T(1.0e-10f)) {
 				dAssert(0);
 				return false;
 			}
@@ -315,10 +315,10 @@ void dCalculateDelta_x(int size, T dir, int n, const T* const matrix, T* const d
 {
 	const T* const row = &matrix[size * n];
 	for (int i = 0; i < n; i++) {
-		delta_x[i] = row[i] * dir;
+		delta_x[i] = -row[i] * dir;
 	}
 	dCholeskySolve(size, matrix, delta_x, n);
-	delta_x[n] = -dir;
+	delta_x[n] = dir;
 }
 
 
