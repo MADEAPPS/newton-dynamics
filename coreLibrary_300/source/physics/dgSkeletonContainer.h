@@ -34,13 +34,7 @@ class dgSkeletonContainer
 {
 	public:
 	class dgSkeletonGraph;
-
-	class dgClippedNodes
-	{
-		public:
-		dgSkeletonGraph* m_node;
-		dgInt32 m_relIndex;
-	};
+	class dgClippedNodes;
 
 	DG_MSC_VECTOR_ALIGMENT
 	class dgForcePair
