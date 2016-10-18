@@ -831,13 +831,13 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 		}
 	}
 
-	for (dgInt32 i = 0; i < skeletonCount; i ++) {
+	//for (dgInt32 i = 0; i < skeletonCount; i ++) {
 		//dgSkeletonContainer* const container = skeletonArray[i];
 		//if (!container->m_skeletonHardMotors) {
 			//container->InitMassMatrix (constraintArray, matrixRow);
 		//}
-		skeletonArray[i]->InitMassMatrix (constraintArray, matrixRow);
-	}
+		//skeletonArray[i]->InitMassMatrix (constraintArray, matrixRow);
+	//}
 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < maxPasses; step ++) {

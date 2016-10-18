@@ -8393,7 +8393,7 @@ void* NewtonSkeletonContainerGetParent(const NewtonSkeletonContainer* const skel
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetParent((dgSkeletonContainer::dgSkeletonGraph*) node);
+	return skeleton->GetParent((dgSkeletonContainer::dgGraph*) node);
 }
 
 
@@ -8401,28 +8401,28 @@ void* NewtonSkeletonContainerFirstChild(const NewtonSkeletonContainer* const ske
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetFirstChild((dgSkeletonContainer::dgSkeletonGraph*) parentNode);
+	return skeleton->GetFirstChild((dgSkeletonContainer::dgGraph*) parentNode);
 }
 
 void* NewtonSkeletonContainerNextSibling(const NewtonSkeletonContainer* const skeletonPtr, void* const siblingNode)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetNextSiblingChild((dgSkeletonContainer::dgSkeletonGraph*) siblingNode);
+	return skeleton->GetNextSiblingChild((dgSkeletonContainer::dgGraph*) siblingNode);
 }
 
 NewtonBody* NewtonSkeletonContainerGetBodyFromNode (const NewtonSkeletonContainer* const skeletonPtr, void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return (NewtonBody*) (skeleton->GetBody((dgSkeletonContainer::dgSkeletonGraph*) node));
+	return (NewtonBody*) (skeleton->GetBody((dgSkeletonContainer::dgGraph*) node));
 }
 
 NewtonJoint* NewtonSkeletonContainerGetParentJointFromNode (const NewtonSkeletonContainer* const skeletonPtr, void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return (NewtonJoint*)(skeleton->GetParentJoint((dgSkeletonContainer::dgSkeletonGraph*) node));
+	return (NewtonJoint*)(skeleton->GetParentJoint((dgSkeletonContainer::dgGraph*) node));
 }
 
 /*
