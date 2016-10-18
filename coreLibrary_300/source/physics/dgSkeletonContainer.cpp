@@ -30,9 +30,6 @@
 
 
 
-#define DG_SKELETON_MAX_NODES		1024
-
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -91,7 +88,7 @@ class dgSkeletonContainer::dgGraph
 		}
 	}
 
-	DG_INLINE void Factorize(dgSkeletonContainer::dgBodyJointMatrixDataPair* const data)
+	DG_INLINE void Factorize(dgBodyJointMatrixDataPair* const data)
 	{
 		const dgSpatialMatrix& bodyMass = data[m_index].m_body.m_mass;
 		dgSpatialMatrix& bodyInvMass = data[m_index].m_body.m_invMass;
@@ -116,7 +113,7 @@ class dgSkeletonContainer::dgGraph
 		}
 	}
 
-	DG_INLINE void CalculateInertiaMatrix(dgSkeletonContainer::dgBodyJointMatrixDataPair* const data)
+	DG_INLINE void CalculateInertiaMatrix(dgBodyJointMatrixDataPair* const data)
 	{
 		dgSpatialMatrix& bodyMass = data[m_index].m_body.m_mass;
 
@@ -131,7 +128,7 @@ class dgSkeletonContainer::dgGraph
 		}
 	}
 
-	DG_INLINE void GetJacobians(const dgJointInfo* const jointInfo, const dgJacobianMatrixElement* const matrixRow, dgSkeletonContainer::dgBodyJointMatrixDataPair* const data)
+	DG_INLINE void GetJacobians(const dgJointInfo* const jointInfo, const dgJacobianMatrixElement* const matrixRow, dgBodyJointMatrixDataPair* const data)
 	{
 		dgAssert(m_parent);
 		dgAssert(jointInfo->m_joint == m_joint);
@@ -172,7 +169,7 @@ class dgSkeletonContainer::dgGraph
 		}
 	}
 
-	DG_INLINE void Factorize(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgSkeletonContainer::dgBodyJointMatrixDataPair* const data)
+	DG_INLINE void Factorize(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgBodyJointMatrixDataPair* const data)
 	{
 		dgAssert((dgUnsigned64(data) & 0x0f) == 0);
 
@@ -345,7 +342,7 @@ dgAssert (0);
 	}
 
 
-	DG_INLINE void CalculateBodyDiagonal(dgSkeletonContainer::dgBodyJointMatrixDataPair* const data, dgGraph* const child)
+	DG_INLINE void CalculateBodyDiagonal(dgBodyJointMatrixDataPair* const data, dgGraph* const child)
 	{
 		dgAssert(child->m_joint);
 		
@@ -376,7 +373,7 @@ dgAssert (0);
 		}
 	}
 
-	DG_INLINE void CalculateJointDiagonal (dgSkeletonContainer::dgBodyJointMatrixDataPair* const data)
+	DG_INLINE void CalculateJointDiagonal (dgBodyJointMatrixDataPair* const data)
 	{
 		const dgSpatialMatrix& bodyMass = data[m_index].m_body.m_mass;
 		const dgSpatialMatrix& bodyJt = data[m_index].m_body.m_jt;
@@ -400,7 +397,7 @@ dgAssert (0);
 		jointMass.Inverse(jointInvMass, m_dof);
 	}
 
-	DG_INLINE void CalculateJacobianBlock(dgSkeletonContainer::dgBodyJointMatrixDataPair* const data)
+	DG_INLINE void CalculateJacobianBlock(dgBodyJointMatrixDataPair* const data)
 	{
 		dgSpatialMatrix& jointJ = data[m_index].m_joint.m_jt;
 
@@ -421,57 +418,50 @@ dgAssert (0);
 		}
 	}
 
-	DG_INLINE void JointJacobianTimeMassForward (dgForcePair& force)
+	DG_INLINE void JointJacobianTimeMassForward (const dgBodyJointMatrixDataPair* const data, dgForcePair& force)
 	{
-dgAssert (0);
-/*
+		const dgSpatialMatrix& bodyJt = data[m_index].m_body.m_jt;
 		for (dgInt32 i = 0; i < m_dof; i++) {
-			force.m_joint[i] -= m_bodyJt[i].DotProduct(force.m_body);
+			force.m_joint[i] -= bodyJt[i].DotProduct(force.m_body);
 		}
-*/	
 	}
 
-	DG_INLINE void BodyJacobianTimeMassForward(const dgForcePair& force, dgForcePair& parentForce) const 
+	DG_INLINE void BodyJacobianTimeMassForward(const dgBodyJointMatrixDataPair* const data, const dgForcePair& force, dgForcePair& parentForce) const 
 	{
-dgAssert (0);
-/*
+		const dgSpatialMatrix& jointJ = data[m_index].m_joint.m_jt;
 		for (dgInt32 i = 0; i < m_dof; i++) {
-			m_jointJ[i].ScaleAdd(-force.m_joint[i], parentForce.m_body, parentForce.m_body);
+			jointJ[i].ScaleAdd(-force.m_joint[i], parentForce.m_body, parentForce.m_body);
 		}
-*/	
 	}
 
-	DG_INLINE void JointJacobianTimeSolutionBackward(dgForcePair& force, const dgForcePair& parentForce)
+	DG_INLINE void JointJacobianTimeSolutionBackward(const dgBodyJointMatrixDataPair* const data, dgForcePair& force, const dgForcePair& parentForce)
 	{
-dgAssert (0);
-/*
+		const dgSpatialMatrix& jointJ = data[m_index].m_joint.m_jt;
 		const dgSpatialVector& f = parentForce.m_body;
 		for (dgInt32 i = 0; i < m_dof; i++) {
-			force.m_joint[i] -= f.DotProduct(m_jointJ[i]);
+			force.m_joint[i] -= f.DotProduct(jointJ[i]);
 		}
-*/	
 	}
 
-	DG_INLINE void BodyJacobianTimeSolutionBackward(dgForcePair& force)
+	DG_INLINE void BodyJacobianTimeSolutionBackward(const dgBodyJointMatrixDataPair* const data, dgForcePair& force)
 	{
-dgAssert (0);
-/*
-/		for (dgInt32 i = 0; i < m_dof; i++) {
-			m_bodyJt[i].ScaleAdd(-force.m_joint[i], force.m_body, force.m_body);
+		const dgSpatialMatrix& bodyJt = data[m_index].m_body.m_jt;
+		for (dgInt32 i = 0; i < m_dof; i++) {
+			bodyJt[i].ScaleAdd(-force.m_joint[i], force.m_body, force.m_body);
 		}
-*/	
+
 	}
 
-	DG_INLINE void BodyDiagInvTimeSolution(dgForcePair& force)
+	DG_INLINE void BodyDiagInvTimeSolution(const dgBodyJointMatrixDataPair* const data, dgForcePair& force)
 	{
-dgAssert (0);
-//		m_bodyInvMass.MultiplyNxNMatrixTimeVector(force.m_body, force.m_body);
+		const dgSpatialMatrix& bodyInvMass = data[m_index].m_body.m_invMass;
+		bodyInvMass.MultiplyNxNMatrixTimeVector(force.m_body, force.m_body);
 	}
 
-	DG_INLINE void JointDiagInvTimeSolution(dgForcePair& force)
+	DG_INLINE void JointDiagInvTimeSolution(const dgBodyJointMatrixDataPair* const data, dgForcePair& force)
 	{
-dgAssert (0);
-//		m_jointInvMass.MultiplyNxNMatrixTimeVector (force.m_joint, force.m_joint, m_dof);
+		const dgSpatialMatrix& jointInvMass = data[m_index].m_joint.m_invMass;
+		jointInvMass.MultiplyNxNMatrixTimeVector (force.m_joint, force.m_joint, m_dof);
 	}
 
 //	dgSpatialMatrix m_bodyJt;
@@ -603,7 +593,7 @@ void dgSkeletonContainer::SortGraph(dgGraph* const root, dgGraph* const parent, 
 dgSkeletonContainer::dgGraph* dgSkeletonContainer::FindNode(dgDynamicBody* const body) const
 {
 	dgInt32 stack = 1;
-	dgGraph* stackPool[DG_SKELETON_MAX_NODES];
+	dgGraph* stackPool[1024];
 
 	stackPool[0] = m_skeleton;
 	while (stack) {
@@ -757,7 +747,7 @@ DG_INLINE void dgSkeletonContainer::UpdateMassMatrixLCP(const dgJointInfo* const
 }
 
 
-DG_INLINE void dgSkeletonContainer::SolveFoward (dgForcePair* const force, const dgForcePair* const accel) const
+DG_INLINE void dgSkeletonContainer::SolveFoward (dgForcePair* const force, const dgForcePair* const accel, const dgBodyJointMatrixDataPair* const data) const
 {
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		dgGraph* const node = m_nodesOrder[i];
@@ -772,28 +762,28 @@ DG_INLINE void dgSkeletonContainer::SolveFoward (dgForcePair* const force, const
 		for (dgGraph* child = node->m_child; child; child = child->m_sibling) {
 			dgAssert(child->m_joint);
 			dgAssert(child->m_parent->m_index == i);
-			child->BodyJacobianTimeMassForward(force[child->m_index], f);
+			child->BodyJacobianTimeMassForward(data, force[child->m_index], f);
 		}
-		node->JointJacobianTimeMassForward(f);
+		node->JointJacobianTimeMassForward(data, f);
 	}
 
 	force[m_nodeCount - 1] = accel[m_nodeCount - 1];
 	for (dgGraph* child = m_nodesOrder[m_nodeCount - 1]->m_child; child; child = child->m_sibling) {
-		child->BodyJacobianTimeMassForward(force[child->m_index], force[child->m_parent->m_index]);
+		child->BodyJacobianTimeMassForward(data, force[child->m_index], force[child->m_parent->m_index]);
 	}
 }
 
-DG_INLINE void dgSkeletonContainer::SolveBackward (dgForcePair* const force) const
+DG_INLINE void dgSkeletonContainer::SolveBackward (dgForcePair* const force, const dgBodyJointMatrixDataPair* const data) const
 {
-	m_nodesOrder[m_nodeCount - 1]->BodyDiagInvTimeSolution(force[m_nodeCount - 1]);
+	m_nodesOrder[m_nodeCount - 1]->BodyDiagInvTimeSolution(data, force[m_nodeCount - 1]);
 	for (dgInt32 i = m_nodeCount - 2; i >= 0; i--) {
 		dgGraph* const node = m_nodesOrder[i];
 		dgAssert (node->m_index == i);
 		dgForcePair& f = force[i];
-		node->JointDiagInvTimeSolution(f);
-		node->JointJacobianTimeSolutionBackward(f, force[node->m_parent->m_index]);
-		node->BodyDiagInvTimeSolution(f);
-		node->BodyJacobianTimeSolutionBackward(f);
+		node->JointDiagInvTimeSolution(data, f);
+		node->JointJacobianTimeSolutionBackward(data, f, force[node->m_parent->m_index]);
+		node->BodyDiagInvTimeSolution(data, f);
+		node->BodyJacobianTimeSolutionBackward(data, f);
 	}
 }
 
@@ -879,7 +869,7 @@ DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 {
 	if (m_nodesOrder) {
-		dgAssert (m_nodeCount < DG_SKELETON_MAX_NODES);
+//		dgAssert (m_nodeCount < DG_SKELETON_MAX_NODES);
 		if (m_skeletonHardMotors) {
 			dgAssert (0);
 			SolveLCP (jointInfoArray, bodyArray, internalForces, matrixRow);
@@ -888,9 +878,6 @@ void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray
 		}
 	}
 }
-
-
-
 
 
 DG_INLINE void dgSkeletonContainer::EnumerateRowsAndInitForcesLCP(const dgJointInfo* const jointInfoArray, dgForcePair* const accel) const
@@ -915,6 +902,9 @@ DG_INLINE bool dgSkeletonContainer::ValidateForcesLCP(dgJointInfo* const jointIn
 
 DG_INLINE dgInt32 dgSkeletonContainer::FindFirstFeasibleForcesLCP(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force, dgForcePair* const accel, dgClippedNodes* const clippedNodes)
 {
+	dgAssert (0);
+	return 0;
+/*
 	InitMassMatrixLCP(jointInfoArray, internalForces, matrixRow, accel);
 	SolveFoward(force, accel);
 	SolveBackward(force);
@@ -940,6 +930,7 @@ DG_INLINE dgInt32 dgSkeletonContainer::FindFirstFeasibleForcesLCP(dgJointInfo* c
 	}
 
 	return clippedCount;
+*/
 }
 
 DG_INLINE dgJacobian dgSkeletonContainer::ToJacobian(const dgSpatialVector& v) const
@@ -1072,8 +1063,8 @@ InitMassMatrix (jointInfoArray, matrixRow, data);
 
 
 	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, force);
-	SolveFoward(force, force);
-	SolveBackward(force);
+	SolveFoward(force, force, data);
+	SolveBackward(force, data);
 	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
 }
 
@@ -1197,14 +1188,16 @@ void dgSkeletonContainer::XXXX(dgJointInfo* const jointInfoArray, const dgJacobi
 void dgSkeletonContainer::SolveLCP (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 {
 	dTimeTrackerEvent(__FUNCTION__);
-	dgForcePair force[DG_SKELETON_MAX_NODES];
-	dgForcePair accel[DG_SKELETON_MAX_NODES];
+	dgAssert (0);
+//	dgForcePair force[DG_SKELETON_MAX_NODES];
+//	dgForcePair accel[DG_SKELETON_MAX_NODES];
 //	dgClippedNodes clippedNodes[DG_SKELETON_MAX_NODES];
 
 //dgForcePair force1[DG_SKELETON_MAX_NODES];
 //dgForcePair accel1[DG_SKELETON_MAX_NODES];
-EnumerateRowsAndInitForcesLCP(jointInfoArray, accel); 
-XXXX(jointInfoArray, internalForces, matrixRow, force);
+
+//EnumerateRowsAndInitForcesLCP(jointInfoArray, accel); 
+//XXXX(jointInfoArray, internalForces, matrixRow, force);
 /*	
 	EnumerateRowsAndInitForcesLCP(jointInfoArray, accel); 
 	dgInt32 clippedCount = FindFirstFeasibleForcesLCP (jointInfoArray, internalForces, matrixRow, force, accel, clippedNodes);
@@ -1257,7 +1250,7 @@ for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 dgTrace(("\n"));
 */
 
-	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
+//	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
 }
 
 
