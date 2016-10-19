@@ -809,4 +809,61 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 }
 
 
+template <class T>
+bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
+{
+	T* const g = dgAlloca(T, size);
+	T* const r = dgAlloca(T, size);
+	dgInt16* const permute = dgAlloca(short, size);
+
+	for (dgInt32 i = 0; i < size; i++) {
+		x[i] = b[i];
+		g[i] = dgFloat32 (0.0f);
+		permute[i] = short(i);
+//		diagonal[i] = matrix[stride + i];
+//		stride += size;
+	}
+
+	dgInt32 count = size;
+	for (dgInt32 i = 0; i < count; i++) {
+		if ((low[i] <= T(-DG_LCP_MAX_VALUE)) && (high[i] >= T(DG_LCP_MAX_VALUE))) {
+			dgCholeskyFactorizationAddRow(size, i, matrix);
+		} else {
+//			dgPermuteRows(size, i, count - 1, matrix, x, b, low, high, g, permute);
+			i--;
+			count--;
+		}
+	}
+
+	const dgInt32 blockSize = size - count;
+
+	if (count > 0) {
+		dgCholeskySolve(size, matrix, x, count);
+//		for (dgInt32 i = 0; i < index; i++) {
+//			x0[i] -= r0[i];
+//			r0[i] = T(dgFloat32 (0.0f));
+//		}
+		dgInt32 base = blockSize * size;
+		for (dgInt32 i = blockSize; i < size; i++) {
+			const T* const row = &matrix[base];
+			T acc (dgFloat32 (0.0f));
+			for (dgInt32 j = 0; j < blockSize; j++) {
+				acc += row[j] * x[j];
+			}
+			b[i] = acc - b[i];
+			x[i] = T(dgFloat32 (0.0f));
+			base += size;
+		}
+
+		for (dgInt32 i = 0; i < blockSize; i++) {
+			b[i] = T(dgFloat32 (0.0f));
+		}
+	}
+
+
+
+	return true;
+}
+
+
 #endif

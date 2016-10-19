@@ -1062,6 +1062,70 @@ void dgSkeletonContainer::SolveNormal (dgJointInfo* const jointInfoArray, const 
 {
 	dTimeTrackerEvent(__FUNCTION__);
 
+
+{
+	const int xxx = 4;
+
+	dgFloat32 x[xxx];
+	dgFloat32 b[xxx];
+	dgFloat32 low[xxx];
+	dgFloat32 high[xxx];
+	dgFloat32 a[xxx][xxx];
+
+	memset (a, 0, sizeof (a));
+	for (int i = 0; i < xxx; i ++) {
+		b[i] = 18.0f;
+		x[i] = 0.0f;
+		low[i] = -DG_LCP_MAX_VALUE;
+		high[i] = DG_LCP_MAX_VALUE;
+		a[i][i] = 3.0f;
+		for (int j = i + 1; j < xxx; j ++) {
+			a[i][j] = 2.0f;
+			a[j][i] = 2.0f;
+		}
+	}
+	low[2] = -10.0f;
+	low[3] = -10.0f;
+
+	//dgSolveDantzigLCP(xxx, &a[0][0], x, b, low, high);
+	dgSolveBlockDantzigLCP(xxx, &a[0][0], x, b, low, high);
+	low[4] = -10.0f;
+	
+}
+
+
+{
+const int xxx = 6;
+
+dgFloat32 x[xxx];
+dgFloat32 b[xxx];
+dgFloat32 low[xxx];
+dgFloat32 high[xxx];
+dgFloat32 a[xxx][xxx];
+
+memset (a, 0, sizeof (a));
+for (int i = 0; i < xxx; i ++) {
+	b[i] = 0.0f;
+	x[i] = 0.0f;
+	low[i] = -DG_LCP_MAX_VALUE;
+	high[i] = DG_LCP_MAX_VALUE;
+	a[i][i] = 2.0f;
+}
+for (int i = 0; i < xxx - 1; i ++) {
+	a[i][i + 1] = -1.0f;
+	a[i + 1][i] = -1.0f;
+}
+b[xxx - 1] = 14.0f;
+low[3] = -10.0f;
+low[4] = -10.0f;
+low[5] = -10.0f;
+
+//dgSolveDantzigLCP(xxx, &a[0][0], x, b, low, high);
+dgSolveBlockDantzigLCP(xxx, &a[0][0], x, b, low, high);
+}
+
+
+
 	dgForcePair* const force = dgAlloca (dgForcePair, m_nodeCount);
 	dgBodyJointMatrixDataPair* const data = dgAlloca (dgBodyJointMatrixDataPair, m_nodeCount);
 
