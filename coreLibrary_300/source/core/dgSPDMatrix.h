@@ -854,6 +854,8 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 		for (dgInt32 i = 0; i < blockSize; i++) {
 			b[i] = T(dgFloat32 (0.0f));
 		}
+	} else {
+		dgAssert (0);
 	}
 
 
