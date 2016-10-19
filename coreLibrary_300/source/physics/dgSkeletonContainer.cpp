@@ -169,7 +169,7 @@ class dgSkeletonContainer::dgGraph
 		}
 	}
 
-	DG_INLINE void Factorize(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgBodyJointMatrixDataPair* const data)
+	DG_INLINE dgInt32 Factorize(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgBodyJointMatrixDataPair* const data)
 	{
 		dgAssert((dgUnsigned64(data) & 0x0f) == 0);
 
@@ -184,6 +184,7 @@ class dgSkeletonContainer::dgGraph
 			m_sourceJacobianIndex[i] = dgInt8 (i);
 		}
 
+		dgInt32 boundedDof = 0;
 		if (m_joint) {
 			dgAssert (m_parent);
 			const dgJointInfo* const jointInfo = &jointInfoArray[m_joint->m_index];
@@ -204,9 +205,11 @@ class dgSkeletonContainer::dgGraph
 					count--;
 				}
 			}
+			boundedDof += jointInfo->m_pairCount - count;
 			GetJacobians(jointInfo, matrixRow, data);
 		}
 		Factorize(data);
+		return boundedDof;
 	}
 
 	DG_INLINE void FactorizeLCP(const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair& accel)
@@ -721,13 +724,15 @@ void dgSkeletonContainer::Finalize()
 }
 
 
-void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgBodyJointMatrixDataPair* const data) const
+dgInt32 dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgBodyJointMatrixDataPair* const data) const
 {
+	dgInt32 boundedDofCount = 0;
 	if (m_nodesOrder) {
 		for (dgInt32 i = 0; i < m_nodeCount; i++) {
-			m_nodesOrder[i]->Factorize(jointInfoArray, matrixRow, data);
+			boundedDofCount += m_nodesOrder[i]->Factorize(jointInfoArray, matrixRow, data);
 		}
 	}
+	return boundedDofCount;
 }
 
 DG_INLINE void dgSkeletonContainer::InitMassMatrixLCP(const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const
@@ -1060,10 +1065,13 @@ void dgSkeletonContainer::SolveNormal (dgJointInfo* const jointInfoArray, const 
 	dgForcePair* const force = dgAlloca (dgForcePair, m_nodeCount);
 	dgBodyJointMatrixDataPair* const data = dgAlloca (dgBodyJointMatrixDataPair, m_nodeCount);
 
-	InitMassMatrix (jointInfoArray, matrixRow, data);
+	dgInt32 boundedDofCount = InitMassMatrix (jointInfoArray, matrixRow, data);
 	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, force);
 	SolveFoward(force, force, data);
 	SolveBackward(force, data);
+	if (boundedDofCount) {
+		//dgAssert (0);
+	}
 	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
 }
 
