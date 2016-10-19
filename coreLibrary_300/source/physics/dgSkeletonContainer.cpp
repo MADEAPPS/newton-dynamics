@@ -788,16 +788,16 @@ DG_INLINE void dgSkeletonContainer::SolveBackward (dgForcePair* const force, con
 }
 
 
-DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force) const
+DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const
 {
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		dgGraph* const node = m_nodesOrder[i];
 		dgAssert (i == node->m_index);
 
-		dgForcePair& f = force[i];
+		dgForcePair& a = accel[i];
 		dgAssert(node->m_body);
-		f.m_body.SetZero();
-		f.m_joint.SetZero();
+		a.m_body.SetZero();
+		a.m_joint.SetZero();
 
 		dgAssert(node->m_joint);
 		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
@@ -816,12 +816,12 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 			dgVector acc(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
 						 row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
 			acc = dgVector(row->m_coordenateAccel) - acc.AddHorizontal();
-			f.m_joint[j] = -acc.GetScalar();
+			a.m_joint[j] = -acc.GetScalar();
 		}
 	}
 	dgAssert ((m_nodeCount - 1) == m_nodesOrder[m_nodeCount - 1]->m_index);
-	force[m_nodeCount - 1].m_body.SetZero();	
-	force[m_nodeCount - 1].m_joint.SetZero();	
+	accel[m_nodeCount - 1].m_body.SetZero();	
+	accel[m_nodeCount - 1].m_joint.SetZero();	
 }
 
 
@@ -1056,12 +1056,11 @@ void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArra
 void dgSkeletonContainer::SolveNormal (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 {
 	dTimeTrackerEvent(__FUNCTION__);
-//	dgForcePair force[DG_SKELETON_MAX_NODES];
+
 	dgForcePair* const force = dgAlloca (dgForcePair, m_nodeCount);
-dgBodyJointMatrixDataPair* const data = dgAlloca (dgBodyJointMatrixDataPair, m_nodeCount);
-InitMassMatrix (jointInfoArray, matrixRow, data);
+	dgBodyJointMatrixDataPair* const data = dgAlloca (dgBodyJointMatrixDataPair, m_nodeCount);
 
-
+	InitMassMatrix (jointInfoArray, matrixRow, data);
 	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, force);
 	SolveFoward(force, force, data);
 	SolveBackward(force, data);
