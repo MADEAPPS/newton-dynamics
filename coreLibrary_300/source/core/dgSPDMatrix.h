@@ -839,10 +839,6 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 
 	if (count > 0) {
 		dgCholeskySolve(size, matrix, x, count);
-//		for (dgInt32 i = 0; i < index; i++) {
-//			x0[i] -= r0[i];
-//			r0[i] = T(dgFloat32 (0.0f));
-//		}
 		dgInt32 base = blockSize * size;
 		for (dgInt32 i = blockSize; i < size; i++) {
 			const T* const row = &matrix[base];
