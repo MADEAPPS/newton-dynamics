@@ -1090,7 +1090,6 @@ void dgSkeletonContainer::SolveNormal (dgJointInfo* const jointInfoArray, const 
 	//dgSolveDantzigLCP(xxx, &a[0][0], x, b, low, high);
 	dgSolveBlockDantzigLCP(xxx, &a[0][0], x, b, low, high);
 	low[4] = -10.0f;
-	
 }
 
 

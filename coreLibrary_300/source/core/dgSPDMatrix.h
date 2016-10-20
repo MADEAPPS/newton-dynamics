@@ -812,15 +812,12 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 template <class T>
 bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
 {
-	T* const g = dgAlloca(T, size);
+//	T* const g = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
 
 	for (dgInt32 i = 0; i < size; i++) {
 		x[i] = b[i];
-		g[i] = dgFloat32 (0.0f);
 		permute[i] = short(i);
-//		diagonal[i] = matrix[stride + i];
-//		stride += size;
 	}
 
 	dgInt32 unboundedSize = size;
@@ -854,40 +851,44 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 		}
 
 		const dgInt32 boundedSize = size - unboundedSize;
-		T* const r = dgAlloca(T, unboundedSize);
 		T* const l = dgAlloca(T, boundedSize);
 		T* const h = dgAlloca(T, boundedSize);
 		T* const c = dgAlloca(T, boundedSize);
+		T* const u = dgAlloca(T, boundedSize);
 		T* const a = dgAlloca(T, boundedSize * boundedSize);
+		T* const r = dgAlloca(T, boundedSize * unboundedSize);
 		
 		for (dgInt32 i = 0; i < boundedSize; i++) {
+			T* const g = &r[i * unboundedSize];
 			const T* const row = &matrix[(unboundedSize + i) * size];
 			for (dgInt32 j = 0; j < unboundedSize; j++) {
-				r[j] = -row[j];
+				g[j] = -row[j];
 			}
-			dgCholeskySolve(size, matrix, r, unboundedSize);
+			dgCholeskySolve(size, matrix, g, unboundedSize);
 
 			T* const arow = &a[i * boundedSize];
 			for (dgInt32 j = 0; j < boundedSize; j++) {
 				T* const row = &matrix[(unboundedSize + j) * size];
 				T acc = row[unboundedSize + i];
-				for (dgInt32 k = 0; k < boundedSize; k++) {
-					acc += row[k] * r[k];
+				for (dgInt32 k = 0; k < unboundedSize; k++) {
+					acc += row[k] * g[k];
 				}
 				arow[j] = acc;
 			}
-			g[i] = T(dgFloat32(0.0f));
+			u[i] = T(dgFloat32(0.0f));
 			c[i] = -b[i + unboundedSize];
 			l[i] = low[i + unboundedSize];
 			h[i] = high[i + unboundedSize];
 		}
-		if (dgSolveDantzigLCP(boundedSize, a, g, c, l, h)) {
-			for (dgInt32 i = 0; i < unboundedSize; i ++) {
-				x[boundedSize + i] = g[i];
-			}
+
+		if (dgSolveDantzigLCP(boundedSize, a, u, c, l, h)) {
 			for (dgInt32 i = 0; i < boundedSize; i ++) {
-				for (dgInt32 j = 0; j < unboundedSize; i ++) {
-					x[i] += g[j] * 
+				const T s = u[i];
+				x[unboundedSize + i] = s;
+				const T* const g = &r[i * unboundedSize];
+				for (dgInt32 j = 0; j < unboundedSize; j ++) {
+					x[j] += g[j] * s;
+				}
 			}
 			ret = true;
 		}
