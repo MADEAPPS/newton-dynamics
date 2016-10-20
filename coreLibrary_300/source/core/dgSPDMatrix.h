@@ -617,11 +617,11 @@ DG_INLINE void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, T* const matrix
 // in return 
 // x is the solution,
 // r is return in vector b
-// note: although the system is called LCP, the solve is far more general than a strict LCP
-// to solve a strict LCP set the following
+// note: although the system is called LCP, the solver is far more general than a strict LCP
+// to solve a strict LCP, set the following
 // low(i) = 0
 // high(i) = infinity.
-// this the same as enforcing the constrain: x(i) * r(i) = 0
+// this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
 bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
 {
@@ -809,10 +809,24 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 }
 
 
+// solve a general Linear complementary program (LCP)
+// A * x = b + r
+// subjected to constraints
+// x(i) = low(i),  if r(i) >= 0  
+// x(i) = high(i), if r(i) <= 0  
+// low(i) <= x(i) <= high(i),  if r(i) == 0  
+//
+// return true is the system has a solution.
+// in return 
+// x is the solution,
+// note: although the system is called LCP, the solver is far more general than a strict LCP
+// to solve a strict LCP, set the following
+// low(i) = 0
+// high(i) = infinity.
+// this is the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
 bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
 {
-//	T* const g = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
 
 	for (dgInt32 i = 0; i < size; i++) {
@@ -825,7 +839,26 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 		if ((low[i] <= T(-DG_LCP_MAX_VALUE)) && (high[i] >= T(DG_LCP_MAX_VALUE))) {
 			dgCholeskyFactorizationAddRow(size, i, matrix);
 		} else {
-//			dgPermuteRows(size, i, count - 1, matrix, x, b, low, high, g, permute);
+			dgInt32 j = unboundedSize - 1;
+			if (i != j) {
+				T* const A = &matrix[size * i];
+				T* const B = &matrix[size * j];
+				for (dgInt32 k = 0; k < size; k++) {
+					dgSwap(A[k], B[k]);
+				}
+
+				dgInt32 stride = 0;
+				for (dgInt32 k = 0; k < size; k++) {
+					dgSwap(matrix[stride + i], matrix[stride + j]);
+					stride += size;
+				}
+				dgSwap(x[i], x[j]);
+				dgSwap(b[i], b[j]);
+				dgSwap(low[i], low[j]);
+				dgSwap(high[i], high[j]);
+				dgSwap(permute[i], permute[j]);
+			}
+
 			i--;
 			unboundedSize--;
 		}
@@ -898,8 +931,13 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 //		ret = false;
 	}
 
-
-
+	for (dgInt32 i = 0; i < size; i++) {
+		b[i] = x[i];
+	}
+	for (dgInt32 i = 0; i < size; i++) {
+		dgInt32 j = permute[i];
+		x[j] = b[i];
+	}
 	return ret;
 }
 
