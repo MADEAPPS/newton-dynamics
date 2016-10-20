@@ -628,14 +628,17 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 	T* const x0 = dgAlloca(T, size);
 	T* const r0 = dgAlloca(T, size);
 	T* const delta_r = dgAlloca(T, size);
+	T* const diagonal = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
-
 	T* const delta_x = b;
-	T* const diagonal = x;
 
 	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < size; i++) {
 		x0[i] = dgClamp(x[i], low[i], high[i]);
+		if ((low[i] > T(-DG_LCP_MAX_VALUE)) || (high[i] < T(DG_LCP_MAX_VALUE))) {
+			low[i] -= x0[i];
+			high[i] -= x0[i];
+		}
 		permute[i] = short(i);
 		diagonal[i] = matrix[stride + i];
 		stride += size;
@@ -644,6 +647,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 	dgMatrixTimeVector(size, matrix, x0, r0);
 	for (dgInt32 i = 0; i < size; i++) {
 		r0[i] -= b[i];
+		x0[i] = T(0.0f);
 	}
 
 	dgInt32 index = 0;
@@ -801,7 +805,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 
 	for (dgInt32 i = 0; i < size; i++) {
 		dgInt32 j = permute[i];
-		x[j] = x0[i];
+		x[j] += x0[i];
 		b[j] = r0[i];
 	}
 
@@ -827,9 +831,20 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 template <class T>
 bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
 {
+	T* const f = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
 
 	for (dgInt32 i = 0; i < size; i++) {
+		f[i] = dgClamp(x[i], low[i], high[i]);
+		if ((low[i] > T(-DG_LCP_MAX_VALUE)) || (high[i] < T(DG_LCP_MAX_VALUE))) {
+			low[i] -= f[i];
+			high[i] -= f[i];
+		}
+	}
+
+	dgMatrixTimeVector(size, matrix, f, x);
+	for (dgInt32 i = 0; i < size; i++) {
+		b[i] -= x[i];
 		x[i] = b[i];
 		permute[i] = short(i);
 	}
@@ -936,7 +951,7 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 	}
 	for (dgInt32 i = 0; i < size; i++) {
 		dgInt32 j = permute[i];
-		x[j] = b[i];
+		x[j] = f[j] + b[i];
 	}
 	return ret;
 }

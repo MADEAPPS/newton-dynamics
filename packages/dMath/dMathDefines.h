@@ -379,6 +379,11 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 	int stride = 0;
 	for (int i = 0; i < size; i++) {
 		x0[i] = dClamp(x[i], low[i], high[i]);
+		if ((low[i] > T(-D_LCP_MAX_VALUE)) || (high[i] < T(D_LCP_MAX_VALUE))) {
+			dAssert (0);
+			low[i] -= x0[i];
+			high[i] -= x0[i];
+		}
 		permute[i] = short(i);
 		diagonal[i] = matrix[stride + i];
 		stride += size;
@@ -478,7 +483,6 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 				}
 
 				dAssert(dAbs (s) >= T(0.0f));
-//				if (s > T(1.0e-12f)) {
 				for (int i = 0; i < size; i++) {
 					dAssert((x0[i] + dAbs(x0[i]) * T(1.0e-4f)) >= low[i]);
 					dAssert((x0[i] - dAbs(x0[i]) * T(1.0e-4f)) <= high[i]);
@@ -489,7 +493,6 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 					dAssert((x0[i] + dAbs(x0[i]) * T(1.0e-4f)) >= low[i]);
 					dAssert((x0[i] - dAbs(x0[i]) * T(1.0e-4f)) <= high[i]);
 				}
-//				}
 			}
 
 			if (swapIndex == -1) {
