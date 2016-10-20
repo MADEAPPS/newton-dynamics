@@ -894,10 +894,6 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 			base += size;
 		}
 
-		//for (dgInt32 i = 0; i < unboundedSize; i++) {
-			//b[i] = T(dgFloat32 (0.0f));
-		//}
-
 		const dgInt32 boundedSize = size - unboundedSize;
 		T* const l = dgAlloca(T, boundedSize);
 		T* const h = dgAlloca(T, boundedSize);

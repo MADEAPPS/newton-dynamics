@@ -1075,7 +1075,7 @@ void dgSkeletonContainer::SolveNormal (dgJointInfo* const jointInfoArray, const 
 	memset (a, 0, sizeof (a));
 	for (int i = 0; i < xxx; i ++) {
 		b[i] = 18.0f;
-		x[i] = 1.0f;
+		x[i] = 1.8f;
 		low[i] = -DG_LCP_MAX_VALUE;
 		high[i] = DG_LCP_MAX_VALUE;
 		a[i][i] = 3.0f;
@@ -1084,8 +1084,8 @@ void dgSkeletonContainer::SolveNormal (dgJointInfo* const jointInfoArray, const 
 			a[j][i] = 2.0f;
 		}
 	}
-	high[2] = 1.5f;
-	high[3] = 1.2f;
+	high[2] = 10.5f;
+	high[3] = 10.2f;
 
 //	dgSolveDantzigLCP(xxx, &a[0][0], x, b, low, high);
 	dgSolveBlockDantzigLCP(xxx, &a[0][0], x, b, low, high);
