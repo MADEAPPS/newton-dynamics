@@ -407,9 +407,10 @@ class JoesRagdollJoint: public CustomBallAndSocket
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-if ((xxx== 0) && (n == 0)){
+//			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+//			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+//if ((n == 0) && (xxx== 0)){
+if (n == 2){
 NewtonUserJointSetRowMinimumFriction(m_joint, -1.0f);
 NewtonUserJointSetRowMaximumFriction(m_joint, 1.0f);
 }
@@ -419,7 +420,7 @@ NewtonUserJointSetRowMaximumFriction(m_joint, 1.0f);
 };
 
 
-void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments, bool useHardMortor)
+void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments)
 {
     dFloat height = 1.0f;
     dFloat width = 4.0f;
@@ -429,9 +430,6 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 
 #ifdef _USE_HARD_JOINTS
     NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), parent, NULL);
-	if (useHardMortor) {
-//		NewtonSkeletonSetSolverMode(skeleton, 1);
-	}
 #endif
 
     for (int i=0; i < numSegments; i++)
@@ -1063,7 +1061,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 //	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
-	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 1, true);
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 1);
 //	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 0.0f, 20, false);
 
 //AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));

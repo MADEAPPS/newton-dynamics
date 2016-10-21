@@ -1541,6 +1541,15 @@ class dgSpatialVector
 	{
 	}
 
+	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
+		:m_l(low)
+		,m_h(dgVector::m_zero)
+	{
+		m_l[3] = high[0];
+		m_h[0] = high[1];
+		m_h[1] = high[2];
+	}
+
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
 		dgAssert(i < 6);

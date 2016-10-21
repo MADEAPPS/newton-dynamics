@@ -94,6 +94,7 @@ class dgJointInfo
 	dgInt32 m_m1;
 	dgInt32 m_pairStart;
 	dgInt16 m_pairCount;
+//	remember to remove m_pairActiveCount variable after replace exact solver
 	dgInt16 m_pairActiveCount;
 };
 

@@ -8425,22 +8425,6 @@ NewtonJoint* NewtonSkeletonContainerGetParentJointFromNode (const NewtonSkeleton
 	return (NewtonJoint*)(skeleton->GetParentJoint((dgSkeletonContainer::dgGraph*) node));
 }
 
-/*
-int NewtonSkeletonGetSolverMode(const NewtonSkeletonContainer* const skeletonPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetSolverMode();
-}
-
-void NewtonSkeletonSetSolverMode(NewtonSkeletonContainer* const skeletonPtr, int hardJointMotors)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	skeleton->SetSolverMode(hardJointMotors ? true : false);
-}
-*/
-
 void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray)
 {
 	TRACE_FUNCTION(__FUNCTION__);
