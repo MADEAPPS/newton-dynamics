@@ -938,8 +938,10 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 		}
 
 	} else {
-		dgAssert (0);
-//		ret = false;
+		for (dgInt32 i = 0; i < size; i++) {
+			x[i] = T(dgFloat32 (0.0f));
+		}
+		ret = dgSolveDantzigLCP(size, matrix, x, b, low, high);
 	}
 
 	for (dgInt32 i = 0; i < size; i++) {
