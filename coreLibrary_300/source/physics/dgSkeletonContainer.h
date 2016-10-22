@@ -71,10 +71,8 @@ class dgSkeletonContainer
 	dgGraph* AddChild (dgBody* const child, dgBody* const parent);
 	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
 	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
-	dgInt32 InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgBodyJointMatrixDataPair* const data) const;
+	
 	void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
-	bool GetSolverMode () const;
-	void SetSolverMode (bool hardJoint);
 	
 	dgGraph* GetRoot () const;
 	dgBody* GetBody(dgGraph* const node) const;
@@ -87,9 +85,9 @@ class dgSkeletonContainer
 	DG_INLINE void SolveBackward (dgForcePair* const force, const dgBodyJointMatrixDataPair* const data) const;
 	DG_INLINE void SolveFoward (dgForcePair* const force, const dgForcePair* const accel, const dgBodyJointMatrixDataPair* const data) const;
 	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
+	DG_INLINE void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgBodyJointMatrixDataPair* const data);
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force) const;
-	void SolveNormal (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
-
+	DG_INLINE void BuildAuxiliaryMassMatrix(dgFloat32* const massMatrix11, dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow) const;
 
 	DG_INLINE dgJacobian ToJacobian(const dgSpatialVector& v) const;
 	DG_INLINE void EnumerateRowsAndInitForcesLCP(const dgJointInfo* const jointInfoArray, dgForcePair* const accel) const;
