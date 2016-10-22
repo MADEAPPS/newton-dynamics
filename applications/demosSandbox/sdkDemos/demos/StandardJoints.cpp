@@ -410,7 +410,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 //if ((n == 0) && (xxx== 0)){
-if (n == 0){
+if (n == 2){
 NewtonUserJointSetRowMinimumFriction(m_joint, -1.0f);
 NewtonUserJointSetRowMaximumFriction(m_joint, 1.0f);
 }
@@ -1061,7 +1061,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 //	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
-	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 1);
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 3);
 //	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 0.0f, 20, false);
 
 //AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));

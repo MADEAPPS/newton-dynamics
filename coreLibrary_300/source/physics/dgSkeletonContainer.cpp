@@ -787,43 +787,8 @@ DG_INLINE void dgSkeletonContainer::SolveBackward (dgForcePair* const force, con
 	}
 }
 
-/*
-DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const
-{
-	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
-		dgGraph* const node = m_nodesOrder[i];
-		dgAssert (i == node->m_index);
-
-		dgForcePair& a = accel[i];
-		dgAssert(node->m_body);
-		a.m_body.SetZero();
-		a.m_joint.SetZero();
-
-		dgAssert(node->m_joint);
-		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
-		dgAssert(jointInfo->m_joint == node->m_joint);
 		
-		const dgInt32 first = jointInfo->m_pairStart;
-		const dgInt32 dof = node->m_dof;
-		const dgInt32 m0 = jointInfo->m_m0;
-		const dgInt32 m1 = jointInfo->m_m1;
-		const dgJacobian& y0 = internalForces[m0];
-		const dgJacobian& y1 = internalForces[m1];
 
-		for (dgInt32 j = 0; j < dof; j++) {
-			const dgInt32 k = node->m_sourceJacobianIndex[j];
-			dgJacobianMatrixElement* const row = &matrixRow[first + k];
-			dgVector acc(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
-						 row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
-			acc = dgVector(row->m_coordenateAccel) - acc.AddHorizontal();
-			a.m_joint[j] = -acc.GetScalar();
-		}
-	}
-	dgAssert ((m_nodeCount - 1) == m_nodesOrder[m_nodeCount - 1]->m_index);
-	accel[m_nodeCount - 1].m_body.SetZero();	
-	accel[m_nodeCount - 1].m_joint.SetZero();	
-}
-*/
 
 DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const
 {
@@ -1262,6 +1227,137 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 	dgAssert((m_nodeCount - 1) == m_nodesOrder[m_nodeCount - 1]->m_index);
 	accel[m_nodeCount - 1].m_body.SetZero();
 	accel[m_nodeCount - 1].m_joint.SetZero();
+}
+
+
+DG_INLINE void dgSkeletonContainer::BuildAuxiliaryMassMatrix(dgFloat32* const massMatrix11, dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow) const
+{
+/*
+	dgInt32 size = 0;
+	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
+		dgGraph* const node = m_nodesOrder[i];
+		dgAssert(i == node->m_index);
+		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
+		size += jointInfo->m_pairCount;
+	}
+
+	dgFloat32* const damp = dgAlloca(dgFloat32, size);
+	dgFloat32* const b = dgAlloca(dgFloat32, size);
+	dgFloat32* const x = dgAlloca(dgFloat32, size);
+	dgFloat32* const low = dgAlloca(dgFloat32, size);
+	dgFloat32* const high = dgAlloca(dgFloat32, size);
+
+	dgFloat32* const matrix = dgAlloca(dgFloat32, size * size);
+	dgJacobian* const Jt = dgAlloca(dgJacobian, size * m_nodeCount);
+	dgJacobian* const JinvM = dgAlloca(dgJacobian, size * m_nodeCount);
+
+	memset(matrix, 0, size * size * sizeof (dgFloat32));
+	memset(Jt, 0, size * m_nodeCount * sizeof (dgJacobian));
+	memset(JinvM, 0, size * m_nodeCount * sizeof (dgJacobian));
+
+	dgJacobian* jtPtr = Jt;
+	dgJacobian* JinvMPtr = JinvM;
+
+	dgInt32 index = 0;
+	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
+		const dgGraph* const node = m_nodesOrder[i];
+		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
+		const dgInt32 dofBase = node->m_dof;
+		dgInt32 count = jointInfo->m_pairCount - dofBase;
+		if (count) {
+			const dgInt32 first = jointInfo->m_pairStart;
+			const dgInt32 count = jointInfo->m_pairCount;
+
+			const dgInt32 m0 = jointInfo->m_m0;
+			const dgInt32 m1 = jointInfo->m_m1;
+			const dgJacobian& y0 = internalForces[m0];
+			const dgJacobian& y1 = internalForces[m1];
+
+			for (dgInt32 j = 0; j < count; j++) {
+				const dgInt32 k = node->m_sourceJacobianIndex[j + dofBase];
+				const dgJacobianMatrixElement* const row = &matrixRow[first + k];
+
+				dgFloat32 force = row->m_force;
+				dgVector residual(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
+								  row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
+				residual = dgVector(row->m_coordenateAccel) - residual.AddHorizontal();
+				b[index] = residual.GetScalar();
+				x[index] = dgFloat32(0.0f);
+				damp[index] = row->m_diagDamp;
+				low[index] = -DG_LCP_MAX_VALUE;
+				high[index] = DG_LCP_MAX_VALUE;
+				if (row->m_lowerBoundFrictionCoefficent > dgFloat32(-1.0e9f)) {
+					low[index] = row->m_lowerBoundFrictionCoefficent - force;
+				}
+				if (row->m_upperBoundFrictionCoefficent < dgFloat32(1.0e9f)) {
+					high[index] = row->m_upperBoundFrictionCoefficent - force;
+				}
+
+				JinvMPtr[node->m_index] = row->m_JMinv.m_jacobianM0;
+				JinvMPtr[node->m_parent->m_index] = row->m_JMinv.m_jacobianM1;
+
+				jtPtr[node->m_index] = row->m_Jt.m_jacobianM0;
+				jtPtr[node->m_parent->m_index] = row->m_Jt.m_jacobianM1;
+
+
+				index++;
+				jtPtr += m_nodeCount;
+				JinvMPtr += m_nodeCount;
+			}
+		}
+	}
+*/
+
+/*
+	JinvMPtr = JinvM;
+	for (dgInt32 i = 0; i < size; i++) {
+		jtPtr = Jt + m_nodeCount * i;
+		dgVector acc(dgVector::m_zero);
+		for (dgInt32 k = 0; k < m_nodeCount; k++) {
+			acc = acc + JinvMPtr[k].m_linear.CompProduct4(jtPtr[k].m_linear) + JinvMPtr[k].m_angular.CompProduct4(jtPtr[k].m_angular);
+		}
+		acc = acc.AddHorizontal();
+		dgFloat32 val = acc.GetScalar() + damp[i];
+		matrix[i * size + i] = val;
+
+		jtPtr += m_nodeCount;
+		for (dgInt32 j = i + 1; j < size; j++) {
+			acc = dgVector::m_zero;
+			for (dgInt32 k = 0; k < m_nodeCount; k++) {
+				acc = acc + JinvMPtr[k].m_linear.CompProduct4(jtPtr[k].m_linear) + JinvMPtr[k].m_angular.CompProduct4(jtPtr[k].m_angular);
+			}
+			acc = acc.AddHorizontal();
+			val = acc.GetScalar();
+			matrix[i * size + j] = val;
+			matrix[j * size + i] = val;
+			jtPtr += m_nodeCount;
+		}
+		JinvMPtr += m_nodeCount;
+	}
+*/
+	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
+		const dgGraph* const node = m_nodesOrder[i];
+		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
+
+	}
+
+/*
+	//dgSPDMatrix<dgFloat32, 4> xxx___;
+	//memcpy (&xxx___[0][0], matrix, size * size * sizeof (dgFloat32));
+	dgSolveDantzigLCP(size, matrix, x, b, low, high);
+
+	index = 0;
+	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
+		dgGraph* const node = m_nodesOrder[i];
+		const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
+		const dgInt32 count = jointInfo->m_pairCount;
+		dgSpatialVector& f = force[i].m_joint;
+		for (dgInt32 j = 0; j < count; j++) {
+			f[j] = x[index];
+			index++;
+		}
+	}
+*/
 }
 
 void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
