@@ -175,10 +175,7 @@ class dgSkeletonContainer::dgGraph
 			CalculateInertiaMatrix(data);
 		}
 
-		for (dgInt32 i = 0; i < sizeof (m_sourceJacobianIndex) / sizeof (m_sourceJacobianIndex[0]); i ++) {
-			m_sourceJacobianIndex[i] = dgInt8 (i);
-		}
-
+		m_ordinals = m_ordinalInit;
 		dgInt32 boundedDof = 0;
 		if (m_joint) {
 			dgAssert (m_parent);
@@ -482,9 +479,15 @@ dgAssert (0);
 	dgInt16 m_index;
 	dgInt16 m_dof;
 	dgInt16 m_rowStart;
-	dgInt8 m_sourceJacobianIndex[6];
+	union {
+		dgInt8 m_sourceJacobianIndex[8];
+		dgInt64 m_ordinals;
+	};
+
+	static dgInt64 m_ordinalInit;
 };
 
+dgInt64 dgSkeletonContainer::dgGraph::m_ordinalInit = 0x050403020100ll;
 
 dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* const rootBody)
 	:m_world(world)
