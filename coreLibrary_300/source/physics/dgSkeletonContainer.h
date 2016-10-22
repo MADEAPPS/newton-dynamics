@@ -116,7 +116,8 @@ void XXXX(dgJointInfo* const jointInfoArray, const dgJacobian* const internalFor
 	dgInt32 m_id;
 	dgInt32 m_lru;
 	dgInt16 m_nodeCount;
-	dgInt8 m_skeletonHardMotors;
+	dgInt16 m_rowCount;
+	dgInt16 m_auxiliaryRowCount;
 	static dgInt32 m_uniqueID;
 	static dgInt32 m_lruMarker;
 

@@ -147,7 +147,7 @@ class dgSkeletonContainer::dgGraph
 		}
 	}
 
-	DG_INLINE void EnumerateRows(const dgJointInfo* const jointInfoArray)
+	DG_INLINE void EnumerateRowsLCP(const dgJointInfo* const jointInfoArray)
 	{
 		dgAssert (0);
 		if (m_joint) {
@@ -492,7 +492,8 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_id(m_uniqueID)
 	,m_lru(0)
 	,m_nodeCount(1)
-	,m_skeletonHardMotors(0)
+	,m_rowCount(0)
+	,m_auxiliaryRowCount(0)
 {
 //SetSolverMode(true);
 
@@ -853,26 +854,11 @@ DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 	}
 }
 
-
-void dgSkeletonContainer::CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
-{
-	if (m_nodesOrder) {
-//		dgAssert (m_nodeCount < DG_SKELETON_MAX_NODES);
-		if (m_skeletonHardMotors) {
-			dgAssert (0);
-			SolveLCP (jointInfoArray, bodyArray, internalForces, matrixRow);
-		} else {
-			SolveNormal (jointInfoArray, bodyArray, internalForces, matrixRow);
-		}
-	}
-}
-
-
 DG_INLINE void dgSkeletonContainer::EnumerateRowsAndInitForcesLCP(const dgJointInfo* const jointInfoArray, dgForcePair* const accel) const
 {
 	for (dgInt32 i = 0; i < m_nodeCount; i++) {
 		accel[i].m_body.SetZero();
-		m_nodesOrder[i]->EnumerateRows(jointInfoArray);
+		m_nodesOrder[i]->EnumerateRowsLCP(jointInfoArray);
 	}
 	accel[m_nodeCount - 1].m_joint.SetZero();
 }
@@ -1041,86 +1027,6 @@ void dgSkeletonContainer::CalculateResidualLCP (dgJointInfo* const jointInfoArra
 }
 
 
-void dgSkeletonContainer::SolveNormal (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
-{
-	dTimeTrackerEvent(__FUNCTION__);
-
-
-{
-	const int xxx = 4;
-
-	dgFloat32 x[xxx];
-	dgFloat32 b[xxx];
-	dgFloat32 low[xxx];
-	dgFloat32 high[xxx];
-	dgFloat32 a[xxx][xxx];
-
-	memset (a, 0, sizeof (a));
-	for (int i = 0; i < xxx; i ++) {
-		b[i] = 18.0f;
-		x[i] = 1.8f;
-		low[i] = -DG_LCP_MAX_VALUE;
-		high[i] = DG_LCP_MAX_VALUE;
-		a[i][i] = 3.0f;
-		for (int j = i + 1; j < xxx; j ++) {
-			a[i][j] = 2.0f;
-			a[j][i] = 2.0f;
-		}
-	}
-	high[2] = 10.5f;
-	high[3] = 10.2f;
-
-//	dgSolveDantzigLCP(xxx, &a[0][0], x, b, low, high);
-	dgSolveBlockDantzigLCP(xxx, &a[0][0], x, b, low, high);
-	low[4] = -10.0f;
-}
-
-
-{
-const int xxx = 6;
-
-dgFloat32 x[xxx];
-dgFloat32 b[xxx];
-dgFloat32 low[xxx];
-dgFloat32 high[xxx];
-dgFloat32 a[xxx][xxx];
-
-memset (a, 0, sizeof (a));
-for (int i = 0; i < xxx; i ++) {
-	b[i] = 0.0f;
-	x[i] = 0.0f;
-	low[i] = -DG_LCP_MAX_VALUE;
-	high[i] = DG_LCP_MAX_VALUE;
-	a[i][i] = 2.0f;
-}
-for (int i = 0; i < xxx - 1; i ++) {
-	a[i][i + 1] = -1.0f;
-	a[i + 1][i] = -1.0f;
-}
-b[xxx - 1] = 14.0f;
-low[3] = -10.0f;
-low[4] = -10.0f;
-low[5] = -10.0f;
-
-//dgSolveDantzigLCP(xxx, &a[0][0], x, b, low, high);
-dgSolveBlockDantzigLCP(xxx, &a[0][0], x, b, low, high);
-low[4] = -10.0f;
-}
-
-
-
-	dgForcePair* const force = dgAlloca (dgForcePair, m_nodeCount);
-	dgBodyJointMatrixDataPair* const data = dgAlloca (dgBodyJointMatrixDataPair, m_nodeCount);
-
-	dgInt32 boundedDofCount = InitMassMatrix (jointInfoArray, matrixRow, data);
-	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, force);
-	SolveFoward(force, force, data);
-	SolveBackward(force, data);
-	if (boundedDofCount) {
-		//dgAssert (0);
-	}
-	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
-}
 
 
 void dgSkeletonContainer::XXXX(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force)
@@ -1306,5 +1212,89 @@ dgTrace(("\n"));
 
 //	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
 }
+
+
+void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
+{
+	dTimeTrackerEvent(__FUNCTION__);
+
+{
+	const int xxx = 4;
+
+	dgFloat32 x[xxx];
+	dgFloat32 b[xxx];
+	dgFloat32 low[xxx];
+	dgFloat32 high[xxx];
+	dgFloat32 a[xxx][xxx];
+
+	memset(a, 0, sizeof (a));
+	for (int i = 0; i < xxx; i++) {
+		b[i] = 18.0f;
+		x[i] = 1.8f;
+		low[i] = -DG_LCP_MAX_VALUE;
+		high[i] = DG_LCP_MAX_VALUE;
+		a[i][i] = 3.0f;
+		for (int j = i + 1; j < xxx; j++) {
+			a[i][j] = 2.0f;
+			a[j][i] = 2.0f;
+		}
+	}
+	high[2] = 10.5f;
+	high[3] = 10.2f;
+
+	//	dgSolveDantzigLCP(xxx, &a[0][0], x, b, low, high);
+	//	dgSolveBlockDantzigLCP(xxx, &a[0][0], x, b, low, high);
+	low[4] = -10.0f;
+}
+
+
+{
+	const int xxx = 6;
+
+	dgFloat32 x[xxx];
+	dgFloat32 b[xxx];
+	dgFloat32 low[xxx];
+	dgFloat32 high[xxx];
+	dgFloat32 a[xxx][xxx];
+
+	memset(a, 0, sizeof (a));
+	for (int i = 0; i < xxx; i++) {
+		b[i] = 0.0f;
+		x[i] = 0.0f;
+		low[i] = -DG_LCP_MAX_VALUE;
+		high[i] = DG_LCP_MAX_VALUE;
+		a[i][i] = 2.0f;
+	}
+	for (int i = 0; i < xxx - 1; i++) {
+		a[i][i + 1] = -1.0f;
+		a[i + 1][i] = -1.0f;
+	}
+	b[xxx - 1] = 14.0f;
+	low[3] = -10.0f;
+	low[4] = -10.0f;
+	low[5] = -10.0f;
+
+	//dgSolveDantzigLCP(xxx, &a[0][0], x, b, low, high);
+	dgSolveBlockDantzigLCP(xxx, &a[0][0], x, b, low, high);
+	low[4] = -10.0f;
+}
+
+
+	dgForcePair* const force = dgAlloca(dgForcePair, m_nodeCount);
+	dgBodyJointMatrixDataPair* const data = dgAlloca(dgBodyJointMatrixDataPair, m_nodeCount);
+
+	InitMassMatrix(jointInfoArray, matrixRow, data);
+	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, force);
+	SolveFoward(force, force, data);
+	SolveBackward(force, data);
+	if (m_auxiliaryRowCount) {
+		dgFloat32* const massMatrix11 = dgAlloca (dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
+//		dgFloat32* const massMatrix01 = dgAlloca (dgFloat32, (m_rowCount - m_auxiliaryRowCount) * m_auxiliaryRowCount);
+//		BuildAuxiliaryMassMatrix(massMatrix11, jointInfoArray, internalForces, matrixRow);
+
+	}
+	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
+}
+
 
 
