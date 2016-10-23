@@ -33,9 +33,14 @@ typedef void (dgApi *dgOnSkeletonContainerDestroyCallback) (dgSkeletonContainer*
 class dgSkeletonContainer
 {
 	public:
-	class dgClippedNodes;
-
 	class dgGraph;
+
+	class dgNodePair
+	{
+		public:
+		dgInt32 m_m0;
+		dgInt32 m_m1;
+	};
 
 	DG_MSC_VECTOR_ALIGMENT
 	class dgForcePair
@@ -92,8 +97,6 @@ class dgSkeletonContainer
 	dgGraph* FindNode (dgDynamicBody* const node) const;
 	dgGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgGraph* const root, dgGraph* const parent, dgInt32& index);
-
-void XXXX(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force);
 	
 	static void ResetUniqueId(dgInt32 id);
 
