@@ -603,8 +603,6 @@ DG_INLINE void dgSkeletonContainer::SolveBackward (dgForcePair* const force, con
 	}
 }
 
-		
-
 
 DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const
 {
@@ -725,17 +723,10 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 		dgJacobian JMinvM0(row_i->m_JMinv.m_jacobianM0);
 		dgJacobian JMinvM1(row_i->m_JMinv.m_jacobianM1);
 		dgVector acc(JMinvM0.m_linear.CompProduct4(row_i->m_Jt.m_jacobianM0.m_linear) + JMinvM0.m_angular.CompProduct4(row_i->m_Jt.m_jacobianM0.m_angular) +
-			JMinvM1.m_linear.CompProduct4(row_i->m_Jt.m_jacobianM1.m_linear) + JMinvM1.m_angular.CompProduct4(row_i->m_Jt.m_jacobianM1.m_angular));
+					 JMinvM1.m_linear.CompProduct4(row_i->m_Jt.m_jacobianM1.m_linear) + JMinvM1.m_angular.CompProduct4(row_i->m_Jt.m_jacobianM1.m_angular));
 		acc = acc.AddHorizontal();
 		dgFloat32 val = acc.GetScalar() + row_i->m_diagDamp;
 		matrixRow[i] = val;
-
-		//const dgJacobian& y0 = internalForces[m0];
-		//const dgJacobian& y1 = internalForces[m1];
-		//acc = row_i->m_JMinv.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row_i->m_JMinv.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
-		//	  row_i->m_JMinv.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row_i->m_JMinv.m_jacobianM1.m_angular.CompProduct4(y1.m_angular);
-		//acc = acc.AddHorizontal() - dgVector(row_i->m_coordenateAccel);
-		//b[i] = acc.GetScalar();
 
 		f[i] = row_i->m_force;
 		b[i] = row_i->m_coordenateAccel;
