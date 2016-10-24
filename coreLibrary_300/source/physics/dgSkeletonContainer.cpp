@@ -683,12 +683,12 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 }
 
 
-void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const
+void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
 
 	dgNodePair* const pairs = dgAlloca(dgNodePair, 6 * (m_nodeCount - 1));
-	const dgJacobianMatrixElement** const rowArray = dgAlloca(const dgJacobianMatrixElement*, 6 * (m_nodeCount - 1));
+	dgJacobianMatrixElement** const rowArray = dgAlloca(dgJacobianMatrixElement*, 6 * (m_nodeCount - 1));
 
 	dgInt32 count = 0;
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
@@ -755,9 +755,20 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 		}
 	}
 
-	dgSolveBlockDantzigLCP(count, massMatrix, f, b, low, high);
+	dgSolveDantzigLCP (count, massMatrix, f, b, low, high);
 
-	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
+	for (dgInt32 i = 0; i < count ; i ++) {
+		dgJacobianMatrixElement* const row = rowArray[i];
+		const dgInt32 m0 = pairs[i].m_m0;
+		const dgInt32 m1 = pairs[i].m_m1;
+
+		dgFloat32 df = f[i] - row->m_force;
+		row->m_force = f[i];
+
+		internalForces[m0].m_linear += row->m_Jt.m_jacobianM0.m_linear.CompProduct4(df);
+		internalForces[m0].m_angular += row->m_Jt.m_jacobianM0.m_angular.CompProduct4(df);
+		internalForces[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear.CompProduct4(df);
+		internalForces[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(df);
 	}
 }
 
@@ -831,8 +842,8 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 	dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
 	dgBodyJointMatrixDataPair* const data = dgAlloca(dgBodyJointMatrixDataPair, m_nodeCount);
 
-//	BruteForceSolve (jointInfoArray, internalForces, matrixRow, data, accel, force);
-
+	BruteForceSolve (jointInfoArray, internalForces, matrixRow, data, accel, force);
+/*
 	InitMassMatrix(jointInfoArray, matrixRow, data);
 	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, accel);
 	SolveFoward(force, accel, data);
@@ -841,6 +852,7 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 		BuildAuxiliaryMassMatrix (jointInfoArray, internalForces, matrixRow, data, accel, force);
 	}
 	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
+*/
 }
 
 
@@ -1033,6 +1045,7 @@ DG_INLINE void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* 
 
  	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i ++) {
 	}
+
 }
 
 

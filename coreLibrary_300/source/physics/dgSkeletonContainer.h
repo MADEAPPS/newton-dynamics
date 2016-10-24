@@ -93,7 +93,7 @@ class dgSkeletonContainer
 	DG_INLINE void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgBodyJointMatrixDataPair* const data);
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force) const;
 	void BuildAuxiliaryMassMatrix (const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const;
-	void BruteForceSolve (const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const;
+	void BruteForceSolve (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const;
 
 	dgGraph* FindNode (dgDynamicBody* const node) const;
 	dgGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);

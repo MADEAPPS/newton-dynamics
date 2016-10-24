@@ -354,12 +354,12 @@ class JoesRagdollJoint: public CustomBallAndSocket
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dFloat invTimestep = 1.0f / timestep;
-if (xxx == 0) {
-NewtonBody* const body0 = GetBody0();
-dVector xxx(10.0f, 10.0f, 10.0f, 0.0f);
-NewtonBodyAddForce (body0, &xxx.m_x);
-NewtonBodyAddTorque (body0, &xxx.m_x);
-}
+//if (xxx == 0) {
+//NewtonBody* const body0 = GetBody0();
+//dVector xxx(10.0f, 10.0f, 10.0f, 0.0f);
+//NewtonBodyAddForce (body0, &xxx.m_x);
+//NewtonBodyAddTorque (body0, &xxx.m_x);
+//}
 
 		dMatrix matrix0;
 		dMatrix matrix1;
@@ -413,13 +413,13 @@ NewtonBodyAddTorque (body0, &xxx.m_x);
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 
-			//NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-			//NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 //if ((n == 0) && (xxx== 0)){
-if (n <= 1){
-NewtonUserJointSetRowMinimumFriction(m_joint, -1.0f);
-NewtonUserJointSetRowMaximumFriction(m_joint, 1.0f);
-}
+//if (n <= 1){
+//NewtonUserJointSetRowMinimumFriction(m_joint, -100.0f);
+//NewtonUserJointSetRowMaximumFriction(m_joint, 100.0f);
+//}
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
 	}
@@ -433,6 +433,7 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 
     dVector size (width, height, width);
     NewtonBody* parent = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
+//NewtonBodySetMassMatrix (parent, 0.0f, 0.0f, 0.0f, 0.0f);
 
 #ifdef _USE_HARD_JOINTS
     NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), parent, NULL);
@@ -1066,9 +1067,9 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
-	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 1);
-//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 0.0f, 20, false);
+//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 1.0f, -25.0f), 0.0f, 20);
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 1.0f, -25.0f), 0.0f, 1);
+//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 1.0f, -15.0f), 0.0f, 20, false);
 
 //AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 

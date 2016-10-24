@@ -1838,16 +1838,19 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 
 #if 0
+	static dgInt32 xxx;
+	xxx ++;
 	for (dgBodyMasterList::dgListNode* node = masterList->GetLast(); node; node = node->GetPrev()) {
 		dgDynamicBody* const body = (dgDynamicBody*)node->GetInfo().GetBody();
 		if ((body->GetType() == dgBody::m_dynamicBody) && (body->GetInvMass().m_w > dgFloat32 (0.0f))) {
-			#if 1
+			#if 0
 				static FILE* file = fopen("replay.bin", "wb");
 				if (file) {
 					fwrite(&body->m_accel, sizeof (dgVector), 1, file);
 					fwrite(&body->m_alpha, sizeof (dgVector), 1, file);
 					fwrite(&body->m_veloc, sizeof (dgVector), 1, file);
 					fwrite(&body->m_omega, sizeof (dgVector), 1, file);
+					dgTrace (("%d f(%f %f %f) v(%f %f %f) \n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z));
 					fflush(file);
 				}
 			#else 
@@ -1857,6 +1860,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 					fread(&body->m_alpha, sizeof (dgVector), 1, file);
 					fread(&body->m_veloc, sizeof (dgVector), 1, file);
 					fread(&body->m_omega, sizeof (dgVector), 1, file);
+					dgTrace (("%d f(%f %f %f) v(%f %f %f) \n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z));
 				}
 			#endif
 		}
