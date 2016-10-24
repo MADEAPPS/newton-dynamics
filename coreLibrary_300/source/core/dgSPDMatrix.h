@@ -913,11 +913,11 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 			T* const arow = &a[i * boundedSize];
 			for (dgInt32 j = 0; j < boundedSize; j++) {
 				T* const row = &matrix[(unboundedSize + j) * size];
-				T acc = row[unboundedSize + i];
+				T acc = dgFloat32 (0.0f);
 				for (dgInt32 k = 0; k < unboundedSize; k++) {
 					acc += row[k] * g[k];
 				}
-				arow[j] = acc;
+				arow[j] = acc + row[unboundedSize + i];
 			}
 			u[i] = T(dgFloat32(0.0f));
 			c[i] = -b[i + unboundedSize];
