@@ -842,7 +842,7 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 	dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
 	dgBodyJointMatrixDataPair* const data = dgAlloca(dgBodyJointMatrixDataPair, m_nodeCount);
 
-#if 1
+#if 0
 	BruteForceSolve (jointInfoArray, internalForces, matrixRow, data, accel, force);
 #else 
 	InitMassMatrix(jointInfoArray, matrixRow, data);

@@ -354,12 +354,11 @@ class JoesRagdollJoint: public CustomBallAndSocket
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dFloat invTimestep = 1.0f / timestep;
-//if (xxx == 0) {
-//NewtonBody* const body0 = GetBody0();
-//dVector xxx(10.0f, 10.0f, 10.0f, 0.0f);
-//NewtonBodyAddForce (body0, &xxx.m_x);
-//NewtonBodyAddTorque (body0, &xxx.m_x);
-//}
+if (xxx == 0) {
+NewtonBody* const body0 = GetBody0();
+dVector xxx(0.0f, -500.0f, 0.0f, 0.0f);
+NewtonBodyAddForce (body0, &xxx.m_x);
+}
 
 		dMatrix matrix0;
 		dMatrix matrix1;
@@ -1067,9 +1066,9 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 1.0f, -25.0f), 0.0f, 20);
-	AddJoesPoweredRagDoll (scene, dVector (0.0f, 1.0f, -25.0f), 0.0f, 1);
-//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 1.0f, -15.0f), 0.0f, 20, false);
+//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 1);
+//	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 0.0f, 20, false);
 
 //AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 
