@@ -842,17 +842,19 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 	dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
 	dgBodyJointMatrixDataPair* const data = dgAlloca(dgBodyJointMatrixDataPair, m_nodeCount);
 
+#if 1
 	BruteForceSolve (jointInfoArray, internalForces, matrixRow, data, accel, force);
-/*
+#else 
 	InitMassMatrix(jointInfoArray, matrixRow, data);
 	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, accel);
 	SolveFoward(force, accel, data);
 	SolveBackward(force, data);
 	if (m_auxiliaryRowCount) {
-		BuildAuxiliaryMassMatrix (jointInfoArray, internalForces, matrixRow, data, accel, force);
+//		BuildAuxiliaryMassMatrix (jointInfoArray, internalForces, matrixRow, data, accel, force);
 	}
 	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
-*/
+#endif
+
 }
 
 
