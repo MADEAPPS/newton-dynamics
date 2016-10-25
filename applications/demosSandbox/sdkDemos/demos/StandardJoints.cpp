@@ -416,8 +416,8 @@ NewtonBodyAddForce (body0, &xxx.m_x);
 //			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 
 if (n <= 1){
-NewtonUserJointSetRowMinimumFriction(m_joint, -100.0f);
-NewtonUserJointSetRowMaximumFriction(m_joint, 100.0f);
+//NewtonUserJointSetRowMinimumFriction(m_joint, -100.0f);
+//NewtonUserJointSetRowMaximumFriction(m_joint, 100.0f);
 }
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
