@@ -355,9 +355,9 @@ class JoesRagdollJoint: public CustomBallAndSocket
 	{
 		dFloat invTimestep = 1.0f / timestep;
 if (xxx == 0) {
-NewtonBody* const body0 = GetBody0();
-dVector xxx(100.0f, 500.0f, 200.0f, 0.0f);
-NewtonBodyAddForce (body0, &xxx.m_x);
+//NewtonBody* const body0 = GetBody0();
+//dVector xxx(100.0f, 500.0f, 200.0f, 0.0f);
+//NewtonBodyAddForce (body0, &xxx.m_x);
 }
 
 		dMatrix matrix0;
@@ -412,12 +412,12 @@ NewtonBodyAddForce (body0, &xxx.m_x);
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 
-//			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-//			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 
 if (n <= 1){
-NewtonUserJointSetRowMinimumFriction(m_joint, -10.0f);
-NewtonUserJointSetRowMaximumFriction(m_joint, 10.0f);
+//NewtonUserJointSetRowMinimumFriction(m_joint, -10.0f);
+//NewtonUserJointSetRowMaximumFriction(m_joint, 10.0f);
 }
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
@@ -1067,7 +1067,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 //	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
-	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 1);
+	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -25.0f), 0.0f, 20);
 //	AddJoesPoweredRagDoll (scene, dVector (0.0f, 0.0f, -15.0f), 0.0f, 20, false);
 
 //AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));

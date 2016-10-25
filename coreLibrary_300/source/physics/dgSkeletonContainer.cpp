@@ -804,13 +804,11 @@ DG_INLINE void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* 
 
 		const dgInt32 m0 = jointInfo->m_m0;
 		const dgInt32 m1 = jointInfo->m_m1;
-		const dgInt32 primaryCount = node->m_dof;
-		//const dgInt32 primaryRowStart = node->m_index;
-		//const dgInt32 parentPrimaryRowStart = node->m_parent->m_index;
+		const dgInt32 primaryDof = node->m_dof;
 		const dgSpatialVector& accelSpatial = accel[i].m_joint;
 		const dgSpatialVector& forceSpatial = force[i].m_joint;
 
-		for (dgInt32 j = 0; j < primaryCount; j++) {
+		for (dgInt32 j = 0; j < primaryDof; j++) {
 			const dgInt32 index = node->m_sourceJacobianIndex[j];
 			rowArray[primaryIndex] = &matrixRow[first + index];
 			pairs[primaryIndex].m_m0 = m0;
@@ -819,17 +817,15 @@ DG_INLINE void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* 
 			primaryIndex++;
 		}
 
-		const dgInt32 auxiliaryCount = jointInfo->m_pairCount - primaryCount;
-		//const dgInt32 auxiliaryRowStart = node->m_index;
-		//const dgInt32 parentAuxiliaryRowStart = node->m_parent->m_index;
-		for (dgInt32 j = 0; j < auxiliaryCount; j++) {
-			const dgInt32 index = node->m_sourceJacobianIndex[primaryCount + j];
+		const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof;
+		for (dgInt32 j = 0; j < auxiliaryDof; j++) {
+			const dgInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
 			const dgJacobianMatrixElement* const row = &matrixRow[first + index];
 			rowArray[auxiliaryIndex + primaryCount] = row;
 			pairs[auxiliaryIndex + primaryCount].m_m0 = m0;
 			pairs[auxiliaryIndex + primaryCount].m_m1 = m1;
-			f[auxiliaryIndex + primaryCount] = forceSpatial[primaryCount + j];
-			b[auxiliaryIndex] = -accelSpatial[primaryCount + j];
+			f[auxiliaryIndex + primaryCount] = forceSpatial[primaryDof + j];
+			b[auxiliaryIndex] = -accelSpatial[primaryDof + j];
 			low[auxiliaryIndex] = row->m_lowerBoundFrictionCoefficent - row->m_force;
 			high[auxiliaryIndex] = row->m_upperBoundFrictionCoefficent - row->m_force;
 			auxiliaryIndex++;
@@ -850,8 +846,6 @@ DG_INLINE void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* 
 		dgFloat32 val = element.GetScalar() + row_i->m_diagDamp;
 		matrixRow11[i] = val;
 
-		//const dgInt32 m0 = pairs[i].m_m0;
-		//const dgInt32 m1 = pairs[i].m_m1;
 		const dgInt32 m0 = pairs[auxiliaryStart + i].m_m0;
 		const dgInt32 m1 = pairs[auxiliaryStart + i].m_m1;
 		for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
@@ -1050,7 +1044,7 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 	dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
 	dgBodyJointMatrixDataPair* const data = dgAlloca(dgBodyJointMatrixDataPair, m_nodeCount);
 
-#if 0
+#if 1
 	BruteForceSolve (jointInfoArray, internalForces, matrixRow, data, accel, force);
 #else 
 	InitMassMatrix(jointInfoArray, matrixRow, data);
