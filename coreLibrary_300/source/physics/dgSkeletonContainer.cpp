@@ -786,7 +786,6 @@ DG_INLINE void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* 
 	const dgJacobianMatrixElement** const rowArray = dgAlloca(const dgJacobianMatrixElement*, m_rowCount);
 
 	dgFloat32* const f = dgAlloca(dgFloat32, m_rowCount);
-
 	dgFloat32* const b = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const low = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const high = dgAlloca(dgFloat32, m_auxiliaryRowCount);
@@ -814,7 +813,6 @@ DG_INLINE void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* 
 			rowArray[primaryIndex] = &matrixRow[first + index];
 			pairs[primaryIndex].m_m0 = primaryRowStart;
 			pairs[primaryIndex].m_m1 = parentPrimaryRowStart;
-			//b[primaryIndex] = -accelSpatial[j];
 			f[primaryIndex] = forceSpatial[j];
 			primaryIndex++;
 		}
@@ -1038,7 +1036,7 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 	dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
 	dgBodyJointMatrixDataPair* const data = dgAlloca(dgBodyJointMatrixDataPair, m_nodeCount);
 
-#if 1
+#if 0
 	BruteForceSolve (jointInfoArray, internalForces, matrixRow, data, accel, force);
 #else 
 	InitMassMatrix(jointInfoArray, matrixRow, data);
@@ -1046,7 +1044,7 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 	SolveFoward(force, accel, data);
 	SolveBackward(force, data);
 	if (m_auxiliaryRowCount) {
-//		BuildAuxiliaryMassMatrix (jointInfoArray, internalForces, matrixRow, data, accel, force);
+		BuildAuxiliaryMassMatrix (jointInfoArray, internalForces, matrixRow, data, accel, force);
 	}
 	UpdateForces(jointInfoArray, internalForces, matrixRow, force);
 #endif

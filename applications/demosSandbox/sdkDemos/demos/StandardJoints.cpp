@@ -404,7 +404,7 @@ NewtonBodyAddForce (body0, &xxx.m_x);
 
 		CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
 		// motors
-		for (int n = 0; n < 0; n++) {
+		for (int n = 0; n < 3; n++) {
 			// calculate the desired acceleration
 			dVector &axis = basis[n];
 			dFloat relAccel = angAcc.DotProduct3(axis);
@@ -412,13 +412,13 @@ NewtonBodyAddForce (body0, &xxx.m_x);
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-//if ((n == 0) && (xxx== 0)){
-//if (n <= 1){
-//NewtonUserJointSetRowMinimumFriction(m_joint, -100.0f);
-//NewtonUserJointSetRowMaximumFriction(m_joint, 100.0f);
-//}
+//			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+//			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+
+if (n <= 1){
+NewtonUserJointSetRowMinimumFriction(m_joint, -100.0f);
+NewtonUserJointSetRowMaximumFriction(m_joint, 100.0f);
+}
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
 	}
