@@ -404,7 +404,7 @@ NewtonBodyAddForce (body0, &xxx.m_x);
 
 		CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
 		// motors
-		for (int n = 0; n < 3; n++) {
+		for (int n = 0; n < 0; n++) {
 			// calculate the desired acceleration
 			dVector &axis = basis[n];
 			dFloat relAccel = angAcc.DotProduct3(axis);
