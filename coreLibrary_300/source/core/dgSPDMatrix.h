@@ -606,17 +606,12 @@ DG_INLINE void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, T* const matrix
 }
 
 
-
-
-
 // solve a general Linear complementary program (LCP)
 // A * x = b + r
 // subjected to constraints
 // x(i) = low(i),  if r(i) >= 0  
 // x(i) = high(i), if r(i) <= 0  
 // low(i) <= x(i) <= high(i),  if r(i) == 0  
-//
-// on initialization X[i] is assume to be the initial solution. 
 //
 // return true is the system has a solution.
 // in return 
@@ -628,18 +623,39 @@ DG_INLINE void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, T* const matrix
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-bool dgSolveDantzigLCP_Low(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high, T* const x0, T* const r0)
+bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
 {
+	T* const x0 = dgAlloca(T, size);
+	T* const r0 = dgAlloca(T, size);
 	T* const delta_r = dgAlloca(T, size);
 	T* const diagonal = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
 	T* const delta_x = b;
 
 	dgInt32 stride = 0;
+	bool applyInitialGuess = false;
 	for (dgInt32 i = 0; i < size; i++) {
+		x0[i] = dgClamp(x[i], low[i], high[i]);
+		if ((low[i] > T(-DG_LCP_MAX_VALUE)) || (high[i] < T(DG_LCP_MAX_VALUE))) {
+			low[i] -= x0[i];
+			high[i] -= x0[i];
+		}
+		applyInitialGuess |= (x0[i] != dgFloat32 (0.0f));
 		permute[i] = short(i);
 		diagonal[i] = matrix[stride + i];
 		stride += size;
+	}
+
+	if (applyInitialGuess) {
+		dgMatrixTimeVector(size, matrix, x0, r0);
+		for (dgInt32 i = 0; i < size; i++) {
+			r0[i] -= b[i];
+			x0[i] = T(0.0f);
+		}
+	} else {
+		for (dgInt32 i = 0; i < size; i++) {
+			r0[i] = - b[i];
+		}
 	}
 
 	dgInt32 index = 0;
@@ -805,45 +821,6 @@ bool dgSolveDantzigLCP_Low(dgInt32 size, T* const matrix, T* const x, T* const b
 }
 
 
-// solve a canonical Linear complementary program (LCP)
-// A * x = b + r
-// subjected to constraints
-// x(i) = low(i),  if r(i) >= 0  
-// x(i) = high(i), if r(i) <= 0  
-// low(i) <= x(i) <= high(i),  if r(i) == 0  
-//
-// the term Canonical means the fallowing
-// x[i] is not is set to zero on initialization, 
-// low[i] must be lest of equal zero and 
-// high[i] must be larger or equal zero
-// 
-// return true is the system has a solution.
-// in return 
-// x is the solution,
-// r is return in vector b
-// note: although the system is called LCP, the solver is far more general than a strict LCP
-// to solve a strict LCP, set the following
-// low(i) = 0
-// high(i) = infinity.
-// this the same as enforcing the constraint: x(i) * r(i) = 0
-template <class T>
-bool dgSolveCanonicalDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
-{
-	T* const x0 = dgAlloca(T, size);
-	T* const r0 = dgAlloca(T, size);
-
-	for (dgInt32 i = 0; i < size; i++) {
-		dgAssert(low[i] <= dgFloat32(0.0f));
-		dgAssert(high[i] >= dgFloat32(0.0f));
-		dgAssert(low[i] < high[i]);
-
-		r0[i] = -b[i];
-		x0[i] = T(0.0f);
-	}
-	return dgSolveDantzigLCP_Low(size, matrix, x, b, low, high, x0, r0);
-}
-
-
 // solve a general Linear complementary program (LCP)
 // A * x = b + r
 // subjected to constraints
@@ -851,62 +828,42 @@ bool dgSolveCanonicalDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* co
 // x(i) = high(i), if r(i) <= 0  
 // low(i) <= x(i) <= high(i),  if r(i) == 0  
 //
-// on initialization X[i] is assume to be the initial solution. 
-//
 // return true is the system has a solution.
 // in return 
 // x is the solution,
-// r is return in vector b
 // note: although the system is called LCP, the solver is far more general than a strict LCP
 // to solve a strict LCP, set the following
 // low(i) = 0
 // high(i) = infinity.
-// this the same as enforcing the constraint: x(i) * r(i) = 0
-template <class T>
-bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
-{
-	T* const x0 = dgAlloca(T, size);
-	T* const r0 = dgAlloca(T, size);
-
-	for (dgInt32 i = 0; i < size; i++) {
-		x0[i] = dgClamp(x[i], low[i], high[i]);
-		if ((low[i] > T(-DG_LCP_MAX_VALUE)) || (high[i] < T(DG_LCP_MAX_VALUE))) {
-			low[i] -= x0[i];
-			high[i] -= x0[i];
-		}
-	}
-
-	dgMatrixTimeVector(size, matrix, x0, r0);
-	for (dgInt32 i = 0; i < size; i++) {
-		r0[i] -= b[i];
-		x0[i] = T(0.0f);
-	}
-	return dgSolveDantzigLCP_Low(size, matrix, x, b, low, high, x0, r0);
-}
-
-
-
+// this is the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
 bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
 {
 	T* const f = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
 
+	bool applyInitialGuess = false;
 	for (dgInt32 i = 0; i < size; i++) {
+		permute[i] = short(i);
 		f[i] = dgClamp(x[i], low[i], high[i]);
 		if ((low[i] > T(-DG_LCP_MAX_VALUE)) || (high[i] < T(DG_LCP_MAX_VALUE))) {
 			low[i] -= f[i];
 			high[i] -= f[i];
 		}
+		applyInitialGuess |= (f[i] != dgFloat32 (0.0f));
 	}
 
-	dgMatrixTimeVector(size, matrix, f, x);
-	for (dgInt32 i = 0; i < size; i++) {
-		b[i] -= x[i];
-		x[i] = b[i];
-		permute[i] = short(i);
+	if (applyInitialGuess) {
+		dgMatrixTimeVector(size, matrix, f, x);
+		for (dgInt32 i = 0; i < size; i++) {
+			b[i] -= x[i];
+			x[i] = b[i];
+		}
+	} else {
+		for (dgInt32 i = 0; i < size; i++) {
+			x[i] = b[i];
+		}
 	}
-
 
 	dgInt32 unboundedSize = size;
 	for (dgInt32 i = 0; i < unboundedSize; i++) {
@@ -984,7 +941,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* co
 			h[i] = high[i + unboundedSize];
 		}
 
-		if (dgSolveCanonicalDantzigLCP(boundedSize, a, u, c, l, h)) {
+		if (dgSolveDantzigLCP(boundedSize, a, u, c, l, h)) {
 			for (dgInt32 i = 0; i < boundedSize; i ++) {
 				const T s = u[i];
 				x[unboundedSize + i] = s;
@@ -1012,88 +969,6 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* co
 	}
 	return ret;
 }
-
-
-// solve a general partition Linear complementary program (LCP)
-// A * x = b + r
-// subjected to constraints
-// x(i) = low(i),  if r(i) >= 0  
-// x(i) = high(i), if r(i) <= 0  
-// low(i) <= x(i) <= high(i),  if r(i) == 0  
-//
-// return true is the system has a solution.
-// in return 
-// x is the solution,
-// note: although the system is called LCP, the solver is far more general than a strict LCP
-// to solve a strict LCP, set the following
-// low(i) = 0
-// high(i) = infinity.
-// this is the same as enforcing the constraint: x(i) * r(i) = 0
-/*
-template <class T>
-bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
-{
-	T* const f = dgAlloca(T, size);
-//	dgInt16* const permute = dgAlloca(short, size);
-//	for (dgInt32 i = 0; i < size; i++) {
-//		f[i] = dgClamp(x[i], low[i], high[i]);
-//		if ((low[i] > T(-DG_LCP_MAX_VALUE)) || (high[i] < T(DG_LCP_MAX_VALUE))) {
-//			low[i] -= f[i];
-//			high[i] -= f[i];
-//		}
-//	}
-
-//	dgMatrixTimeVector(size, matrix, f, x);
-	for (dgInt32 i = 0; i < size; i++) {
-		dgAssert(low[i] <= dgFloat32(0.0f));
-		dgAssert(high[i] >= dgFloat32(0.0f));
-		dgAssert(low[i] < high[i]);
-
-//		b[i] -= x[i];
-//		x[i] = b[i];
-//		permute[i] = short(i);
-	}
-}
-*/
-
-
-// solve a general partition Linear complementary program (LCP)
-// A * x = b + r
-// subjected to constraints
-// x(i) = low(i),  if r(i) >= 0  
-// x(i) = high(i), if r(i) <= 0  
-// low(i) <= x(i) <= high(i),  if r(i) == 0  
-//
-// return true is the system has a solution.
-// in return 
-// x is the solution,
-// note: although the system is called LCP, the solver is far more general than a strict LCP
-// to solve a strict LCP, set the following
-// low(i) = 0
-// high(i) = infinity.
-// this is the same as enforcing the constraint: x(i) * r(i) = 0
-/*
-template <class T>
-bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
-{
-//	dgInt16* const permute = dgAlloca(short, size);
-	for (dgInt32 i = 0; i < size; i++) {
-		x[i] = dgClamp(x[i], low[i], high[i]);
-		if ((low[i] > T(-DG_LCP_MAX_VALUE)) || (high[i] < T(DG_LCP_MAX_VALUE))) {
-			low[i] -= f[i];
-			high[i] -= f[i];
-		}
-	}
-
-	T* const temp = dgAlloca(T, size);
-	dgMatrixTimeVector(size, matrix, x, temp);
-	for (dgInt32 i = 0; i < size; i++) {
-		b[i] -= temp[i];
-//		x[i] = b[i];
-//		permute[i] = short(i);
-	}
-}
-*/
 
 
 #endif

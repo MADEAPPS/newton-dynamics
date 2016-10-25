@@ -971,7 +971,7 @@ DG_INLINE void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* 
 void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow)
 {
 	dTimeTrackerEvent(__FUNCTION__);
-
+/*
 {
 	const int xxx = 4;
 
@@ -1001,7 +1001,7 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 	low[4] = -10.0f;
 }
 
-/*
+
 {
 	const int xxx = 6;
 
