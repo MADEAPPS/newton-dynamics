@@ -778,13 +778,12 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 }
 
 
-
-void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const
+void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
 
 	dgNodePair* const pairs = dgAlloca(dgNodePair, m_rowCount);
-	const dgJacobianMatrixElement** const rowArray = dgAlloca(const dgJacobianMatrixElement*, m_rowCount);
+	dgJacobianMatrixElement** const rowArray = dgAlloca(dgJacobianMatrixElement*, m_rowCount);
 
 	dgFloat32* const f = dgAlloca(dgFloat32, m_rowCount);
 	dgFloat32* const b = dgAlloca(dgFloat32, m_auxiliaryRowCount);
@@ -820,7 +819,7 @@ void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* const join
 		const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof;
 		for (dgInt32 j = 0; j < auxiliaryDof; j++) {
 			const dgInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
-			const dgJacobianMatrixElement* const row = &matrixRow[first + index];
+			dgJacobianMatrixElement* const row = &matrixRow[first + index];
 			rowArray[auxiliaryIndex + primaryCount] = row;
 			pairs[auxiliaryIndex + primaryCount].m_m0 = m0;
 			pairs[auxiliaryIndex + primaryCount].m_m1 = m1;
@@ -968,6 +967,18 @@ void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* const join
 		}
 	}
 
+	for (dgInt32 i = 0; i < primaryCount; i++) {
+		dgJacobianMatrixElement* const row = rowArray[i];
+		const dgInt32 m0 = pairs[i].m_m0;
+		const dgInt32 m1 = pairs[i].m_m1;
+
+		row->m_force += f[i];
+		dgVector jointForce(f[i]);
+		internalForces[m0].m_linear += row->m_Jt.m_jacobianM0.m_linear.CompProduct4(jointForce);
+		internalForces[m0].m_angular += row->m_Jt.m_jacobianM0.m_angular.CompProduct4(jointForce);
+		internalForces[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear.CompProduct4(jointForce);
+		internalForces[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(jointForce);
+	}
 }
 
 
