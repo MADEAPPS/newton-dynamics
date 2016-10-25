@@ -873,10 +873,9 @@ xxx ++;
 				dgFloat32 accel = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
-
-			for (dgInt32 i = 0; i < skeletonCount; i++) {
-				skeletonArray[i]->CalculateJointForce (constraintArray, bodyArray, internalForces, matrixRow); 
-			}
+		}
+		for (dgInt32 i = 0; i < skeletonCount; i++) {
+			skeletonArray[i]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
 		}
 
 		if (timestepRK != dgFloat32 (0.0f)) {
