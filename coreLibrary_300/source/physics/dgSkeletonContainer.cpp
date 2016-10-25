@@ -128,7 +128,8 @@ class dgSkeletonContainer::dgGraph
 			const dgInt32 k = m_sourceJacobianIndex[i];
 			const dgJacobianMatrixElement* const row = &matrixRow[start + k];
 			jointMass[i].SetZero();
-			jointMass[i][i] = -row->m_stiffness;
+			//jointMass[i][i] = -row->m_stiffness;
+			jointMass[i][i] = -row->m_diagDamp;
 			bodyJt[i] = dgSpatialVector (row->m_Jt.m_jacobianM0.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM0.m_angular.CompProduct4(dgVector::m_negOne));
 			jointJ[i] = dgSpatialVector (row->m_Jt.m_jacobianM1.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM1.m_angular.CompProduct4(dgVector::m_negOne));
 		}
