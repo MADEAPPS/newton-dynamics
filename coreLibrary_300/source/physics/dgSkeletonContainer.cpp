@@ -967,7 +967,7 @@ void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* const join
 		}
 	}
 
-	for (dgInt32 i = 0; i < primaryCount; i++) {
+	for (dgInt32 i = 0; i < m_rowCount; i++) {
 		dgJacobianMatrixElement* const row = rowArray[i];
 		const dgInt32 m0 = pairs[i].m_m0;
 		const dgInt32 m1 = pairs[i].m_m1;
