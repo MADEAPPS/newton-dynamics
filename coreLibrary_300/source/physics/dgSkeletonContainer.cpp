@@ -760,7 +760,7 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 		}
 	}
 
-	dgSolveDantzigLCP (count, massMatrix, f, b, low, high);
+	dgSolveCanonicalDantzigLCP (count, massMatrix, f, b, low, high);
 
 	for (dgInt32 i = 0; i < count ; i ++) {
 		dgJacobianMatrixElement* const row = rowArray[i];
