@@ -778,7 +778,7 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 }
 
 
-void dgSkeletonContainer::BuildAuxiliaryMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const
+void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
 
@@ -998,7 +998,7 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 	SolveFoward(force, accel, data);
 	SolveBackward(force, data);
 	if (m_auxiliaryRowCount) {
-		BuildAuxiliaryMassMatrix (jointInfoArray, internalForces, matrixRow, data, accel, force);
+		SolveAuxiliary (jointInfoArray, internalForces, matrixRow, data, accel, force);
 	} else {
 		UpdateForces(jointInfoArray, internalForces, matrixRow, force);
 	}
