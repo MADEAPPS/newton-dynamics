@@ -886,23 +886,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 
 
 
-// solve a general Linear complementary program (LCP)
-// A * x = b + r
-// subjected to constraints
-// x(i) = low(i),  if r(i) >= 0  
-// x(i) = high(i), if r(i) <= 0  
-// low(i) <= x(i) <= high(i),  if r(i) == 0  
-//
-// return true is the system has a solution.
-// in return 
-// x is the solution,
-// note: although the system is called LCP, the solver is far more general than a strict LCP
-// to solve a strict LCP, set the following
-// low(i) = 0
-// high(i) = infinity.
-// this is the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
+bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
 {
 	T* const f = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
@@ -921,6 +906,7 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 		x[i] = b[i];
 		permute[i] = short(i);
 	}
+
 
 	dgInt32 unboundedSize = size;
 	for (dgInt32 i = 0; i < unboundedSize; i++) {
@@ -1026,6 +1012,88 @@ bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const 
 	}
 	return ret;
 }
+
+
+// solve a general partition Linear complementary program (LCP)
+// A * x = b + r
+// subjected to constraints
+// x(i) = low(i),  if r(i) >= 0  
+// x(i) = high(i), if r(i) <= 0  
+// low(i) <= x(i) <= high(i),  if r(i) == 0  
+//
+// return true is the system has a solution.
+// in return 
+// x is the solution,
+// note: although the system is called LCP, the solver is far more general than a strict LCP
+// to solve a strict LCP, set the following
+// low(i) = 0
+// high(i) = infinity.
+// this is the same as enforcing the constraint: x(i) * r(i) = 0
+/*
+template <class T>
+bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
+{
+	T* const f = dgAlloca(T, size);
+//	dgInt16* const permute = dgAlloca(short, size);
+//	for (dgInt32 i = 0; i < size; i++) {
+//		f[i] = dgClamp(x[i], low[i], high[i]);
+//		if ((low[i] > T(-DG_LCP_MAX_VALUE)) || (high[i] < T(DG_LCP_MAX_VALUE))) {
+//			low[i] -= f[i];
+//			high[i] -= f[i];
+//		}
+//	}
+
+//	dgMatrixTimeVector(size, matrix, f, x);
+	for (dgInt32 i = 0; i < size; i++) {
+		dgAssert(low[i] <= dgFloat32(0.0f));
+		dgAssert(high[i] >= dgFloat32(0.0f));
+		dgAssert(low[i] < high[i]);
+
+//		b[i] -= x[i];
+//		x[i] = b[i];
+//		permute[i] = short(i);
+	}
+}
+*/
+
+
+// solve a general partition Linear complementary program (LCP)
+// A * x = b + r
+// subjected to constraints
+// x(i) = low(i),  if r(i) >= 0  
+// x(i) = high(i), if r(i) <= 0  
+// low(i) <= x(i) <= high(i),  if r(i) == 0  
+//
+// return true is the system has a solution.
+// in return 
+// x is the solution,
+// note: although the system is called LCP, the solver is far more general than a strict LCP
+// to solve a strict LCP, set the following
+// low(i) = 0
+// high(i) = infinity.
+// this is the same as enforcing the constraint: x(i) * r(i) = 0
+/*
+template <class T>
+bool dgSolveBlockDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
+{
+//	dgInt16* const permute = dgAlloca(short, size);
+	for (dgInt32 i = 0; i < size; i++) {
+		x[i] = dgClamp(x[i], low[i], high[i]);
+		if ((low[i] > T(-DG_LCP_MAX_VALUE)) || (high[i] < T(DG_LCP_MAX_VALUE))) {
+			low[i] -= f[i];
+			high[i] -= f[i];
+		}
+	}
+
+	T* const temp = dgAlloca(T, size);
+	dgMatrixTimeVector(size, matrix, x, temp);
+	for (dgInt32 i = 0; i < size; i++) {
+		b[i] -= temp[i];
+//		x[i] = b[i];
+//		permute[i] = short(i);
+	}
+}
+*/
 
 
 #endif
