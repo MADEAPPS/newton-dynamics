@@ -356,7 +356,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		dFloat invTimestep = 1.0f / timestep;
 if (xxx == 0) {
 NewtonBody* const body0 = GetBody0();
-dVector xxx(0.0f, -500.0f, 0.0f, 0.0f);
+dVector xxx(100.0f, 500.0f, 200.0f, 0.0f);
 NewtonBodyAddForce (body0, &xxx.m_x);
 }
 
@@ -416,8 +416,8 @@ NewtonBodyAddForce (body0, &xxx.m_x);
 //			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 
 if (n <= 1){
-//NewtonUserJointSetRowMinimumFriction(m_joint, -100.0f);
-//NewtonUserJointSetRowMaximumFriction(m_joint, 100.0f);
+NewtonUserJointSetRowMinimumFriction(m_joint, -10.0f);
+NewtonUserJointSetRowMaximumFriction(m_joint, 10.0f);
 }
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		}
