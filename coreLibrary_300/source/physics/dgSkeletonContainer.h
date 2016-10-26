@@ -34,36 +34,10 @@ class dgSkeletonContainer
 {
 	public:
 	class dgGraph;
-
-	class dgNodePair
-	{
-		public:
-		dgInt32 m_m0;
-		dgInt32 m_m1;
-	};
-
-	DG_MSC_VECTOR_ALIGMENT
-	class dgForcePair
-	{
-		public:
-		dgSpatialVector m_joint;
-		dgSpatialVector m_body;
-	} DG_GCC_VECTOR_ALIGMENT;
-
-	DG_MSC_VECTOR_ALIGMENT class dgMatriData
-	{
-		public:
-		dgSpatialMatrix m_jt;
-		dgSpatialMatrix m_mass;
-		dgSpatialMatrix m_invMass;
-	} DG_GCC_VECTOR_ALIGMENT;
-
-	DG_MSC_VECTOR_ALIGMENT class dgBodyJointMatrixDataPair
-	{
-		public:
-		dgMatriData m_body;
-		dgMatriData m_joint;
-	} DG_GCC_VECTOR_ALIGMENT;
+	class dgNodePair;
+	class dgForcePair;
+	class dgMatriData;
+	class dgBodyJointMatrixDataPair;
 
 	DG_CLASS_ALLOCATOR(allocator)
 	dgSkeletonContainer(dgWorld* const world, dgDynamicBody* const rootBody);
@@ -77,8 +51,6 @@ class dgSkeletonContainer
 	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
 	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
 	
-	void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
-	
 	dgGraph* GetRoot () const;
 	dgBody* GetBody(dgGraph* const node) const;
 	dgBilateralConstraint* GetParentJoint(dgGraph* const node) const;
@@ -87,13 +59,18 @@ class dgSkeletonContainer
 	dgGraph* GetNextSiblingChild (dgGraph* const sibling) const;
 
 	private:
-	DG_INLINE void SolveBackward (dgForcePair* const force, const dgBodyJointMatrixDataPair* const data) const;
-	DG_INLINE void SolveFoward (dgForcePair* const force, const dgForcePair* const accel, const dgBodyJointMatrixDataPair* const data) const;
+	DG_INLINE void SolveBackward (dgForcePair* const force) const;
+	DG_INLINE void SolveFoward (dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
-	DG_INLINE void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgBodyJointMatrixDataPair* const data);
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force) const;
-	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const;
-	void BruteForceSolve (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgBodyJointMatrixDataPair* const data, const dgForcePair* const accel, dgForcePair* const force) const;
+
+	
+	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
+	dgInt32 CalculateMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
+	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
+	void BruteForceSolve (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
+	void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
+	
 
 	dgGraph* FindNode (dgDynamicBody* const node) const;
 	dgGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
@@ -104,6 +81,11 @@ class dgSkeletonContainer
 	dgWorld* m_world;
 	dgGraph* m_skeleton;
 	dgGraph** m_nodesOrder;
+	dgNodePair* m_pairs;
+	dgFloat32* m_massMatrix11;
+	dgFloat32* m_massMatrix10;
+	dgJacobianMatrixElement** m_rowArray;
+	dgBodyJointMatrixDataPair* m_localMatrices;
 	dgOnSkeletonContainerDestroyCallback m_destructor;
 	dgInt32 m_id;
 	dgInt32 m_lru;
