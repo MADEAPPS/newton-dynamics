@@ -94,8 +94,6 @@ class dgJointInfo
 	dgInt32 m_m1;
 	dgInt32 m_pairStart;
 	dgInt16 m_pairCount;
-//	remember to remove m_pairActiveCount variable after replace exact solver
-	dgInt16 m_pairActiveCount;
 };
 
 
@@ -203,22 +201,20 @@ class dgJacobianMatrixElement
 	dgJacobianPair m_JMinv;
 
 	dgFloat32 m_force;
-	dgFloat32 m_accel;
 	dgFloat32 m_deltaAccel;
-	dgFloat32 m_deltaForce;
-
 	dgFloat32 m_diagDamp;
 	dgFloat32 m_invJMinvJt;
+
 	dgFloat32 m_restitution;
 	dgFloat32 m_penetration;
-
 	dgFloat32 m_coordenateAccel;
 	dgFloat32 m_penetrationStiffness;
+
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
-
 	dgFloat32 m_stiffness;
 	dgFloat32 m_maxImpact;
+
 	dgForceImpactPair* m_jointFeebackForce;
 	dgInt32 m_normalForceIndex;
 } DG_GCC_VECTOR_ALIGMENT;
@@ -275,7 +271,6 @@ class dgWorldDynamicUpdate
 	void ApplyNetTorqueAndForce (dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& accNorm, const dgVector& mask) const;
 	void ApplyNetVelcAndOmega (dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2, const dgVector& mask) const;
 	
-	void CalculateForcesSimulationMode (const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
 	void BuildJacobianMatrix (dgIsland* const island, dgInt32 threadID, dgFloat32 timestep) const;
 	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, const dgJointInfo* const jointInfo, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const;
@@ -285,8 +280,6 @@ class dgWorldDynamicUpdate
 	void ApplyExternalForcesAndAcceleration(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 
 	dgFloat32 CalculateJointForce(dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	dgFloat32 CalculateJointForces(const dgIsland* const island, dgInt32 rowStart, dgInt32 joint, dgFloat32* const forceStep, dgFloat32 maxAccNorm, const dgJacobianPair* const JMinv) const;
-    
 	void IntegrateArray (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 
 	void CalculateIslandContacts (dgIsland* const island, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const;

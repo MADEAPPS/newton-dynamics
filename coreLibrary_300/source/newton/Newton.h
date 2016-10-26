@@ -487,9 +487,6 @@ extern "C" {
 	NEWTON_API int NewtonAtomicAdd (int* const ptr, int value);
 	NEWTON_API int NewtonAtomicSwap (int* const ptr, int value);
 	NEWTON_API void NewtonYield ();
-	
-
-	NEWTON_API void NewtonSetFrictionModel (const NewtonWorld* const newtonWorld, int model);
 
 	NEWTON_API void NewtonSetIslandUpdateEvent (const NewtonWorld* const newtonWorld, NewtonIslandUpdate islandUpdate); 
 //	NEWTON_API void NewtonSetDestroyBodyByExeciveForce (const NewtonWorld* const newtonWorld, NewtonDestroyBodyByExeciveForce callback); 

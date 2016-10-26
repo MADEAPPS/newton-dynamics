@@ -260,7 +260,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 
 	//m_solverMode = 0;
 	m_solverMode = DG_DEFAULT_SOLVER_ITERATION_COUNT;
-	m_frictionMode = 0;
 	m_dynamicsLru = 0;
 	m_numberOfSubsteps = 1;
 		
@@ -375,13 +374,9 @@ dgBody* dgWorld::GetSentinelBody() const
 
 void dgWorld::SetSolverMode (dgInt32 mode)
 {
-	m_solverMode = dgUnsigned32 (dgMax (0, mode));
+	m_solverMode = dgUnsigned32 (dgMax (1, mode));
 }
 
-void dgWorld::SetFrictionMode (dgInt32 mode)
-{
-	m_frictionMode = dgUnsigned32 (mode);
-}
 
 void dgWorld::SetSolverConvergenceQuality (dgInt32 mode)
 {

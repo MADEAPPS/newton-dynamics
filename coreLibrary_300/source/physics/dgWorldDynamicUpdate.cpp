@@ -735,7 +735,6 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 
 		jointInfo->m_pairStart = rowCount;
 		jointInfo->m_pairCount = dgInt16 (dof);
-		jointInfo->m_pairActiveCount = dgInt16 (dof);
 
 		for (dgInt32 i = 0; i < dof; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[rowCount];

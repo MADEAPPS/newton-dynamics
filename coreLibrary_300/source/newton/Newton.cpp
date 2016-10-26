@@ -571,8 +571,6 @@ int NewtonGetMultiThreadSolverOnSingleIsland(const NewtonWorld* const newtonWorl
   the adaptive friction model combined with the linear model make for the fastest possible configuration
   of the Newton solver. This setup is best for games.
   If you need the best realistic behavior, we recommend the use of the exact solver and exact friction model which are the defaults.
-
-  See also: ::NewtonSetFrictionModel
 */
 void NewtonSetSolverModel(const NewtonWorld* const newtonWorld, int model)
 {
@@ -595,39 +593,6 @@ void NewtonSetSolverConvergenceQuality (const NewtonWorld* const newtonWorld, in
 	world->SetSolverConvergenceQuality(lowOrHigh);
 }
 
-/*!
-  Set coulomb model of friction.
-
-  @param *newtonWorld is the pointer to the Newton world
-  @param model friction model;  0 = exact coulomb, 1 = adaptive coulomb, The default is exact.
-
-  @return Nothing.
-
-  This function allows the application to chose between and exact or an adaptive coulomb friction model
-
-  0: Is the exact model. Friction forces are calculated in each frame.
-  This model is good for applications where precision is more important than speed, ex: realistic simulation.
-
-  1: Is the adaptive model. Here values from previous frames are used to determine the maximum friction values of the current frame.
-  This is about 10% faster than the exact model however it may introduce strange friction behaviors. For example a
-  bouncing object tumbling down a ramp will act as a friction less object because the contacts do not have continuity.
-  In general each time a new contact is generated the friction value is zero, only if the contact persist a non zero
-  friction values is used. The second effect is that if a normal force is very strong, and if the contact is suddenly
-  destroyed, a very strong friction force will be generated at the contact point making the object react in a non-familiar way.
-
-  the adaptive friction model combined with the linear model make for the fastest possible configuration
-  of the Newton solver. This setup is best for games.
-  If you need the best realistic behavior, we recommend the use of the exact solver and exact friction model which are the defaults.
-
-  See also: ::NewtonSetSolverModel
-*/
-void NewtonSetFrictionModel(const NewtonWorld* const newtonWorld, int model)
-{
-	Newton* const world = (Newton *)newtonWorld;
-
-	TRACE_FUNCTION(__FUNCTION__);
-	world->SetFrictionMode (model);
-}
 
 void NewtonSetPerformanceClock(const NewtonWorld* const newtonWorld, NewtonGetTimeInMicrosencondsCallback callback)
 {

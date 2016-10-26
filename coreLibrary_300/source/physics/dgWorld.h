@@ -228,7 +228,6 @@ class dgWorld
 	dgBroadPhase* GetBroadPhase() const;
 
 	void SetSolverMode (dgInt32 mode);
-	void SetFrictionMode (dgInt32 mode);
 	void SetSolverConvergenceQuality (dgInt32 mode);
 
 	dgInt32 EnumerateHardwareModes() const;
@@ -445,7 +444,7 @@ class dgWorld
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_inUpdate;
 	dgUnsigned32 m_solverMode;
-	dgUnsigned32 m_frictionMode;
+//	dgUnsigned32 m_frictionMode;
 	dgUnsigned32 m_bodyGroupID;
 	dgUnsigned32 m_defualtBodyGroupID;
 	dgUnsigned32 m_bodiesUniqueID;
