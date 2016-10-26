@@ -82,6 +82,7 @@ class dgSkeletonContainer
 	dgGraph* m_skeleton;
 	dgGraph** m_nodesOrder;
 	dgNodePair* m_pairs;
+	dgFloat32* m_deltaForce;
 	dgFloat32* m_massMatrix11;
 	dgFloat32* m_massMatrix10;
 	dgJacobianMatrixElement** m_rowArray;

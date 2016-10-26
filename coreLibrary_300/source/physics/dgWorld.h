@@ -444,7 +444,6 @@ class dgWorld
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_inUpdate;
 	dgUnsigned32 m_solverMode;
-//	dgUnsigned32 m_frictionMode;
 	dgUnsigned32 m_bodyGroupID;
 	dgUnsigned32 m_defualtBodyGroupID;
 	dgUnsigned32 m_bodiesUniqueID;

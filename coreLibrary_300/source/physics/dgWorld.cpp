@@ -258,7 +258,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 
 	m_useParallelSolver = 0;
 
-	//m_solverMode = 0;
 	m_solverMode = DG_DEFAULT_SOLVER_ITERATION_COUNT;
 	m_dynamicsLru = 0;
 	m_numberOfSubsteps = 1;

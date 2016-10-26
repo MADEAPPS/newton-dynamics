@@ -400,7 +400,6 @@ class JoesRagdollJoint: public CustomBallAndSocket
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
