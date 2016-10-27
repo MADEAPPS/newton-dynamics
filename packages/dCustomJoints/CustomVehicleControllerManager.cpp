@@ -22,7 +22,6 @@
 static FILE* file_xxx;
 #endif
 
-//static int xxx;
 
 #define D_VEHICLE_NEUTRAL_GEAR						0
 #define D_VEHICLE_REVERSE_GEAR						1
@@ -35,50 +34,10 @@ static FILE* file_xxx;
 #define D_VEHICLE_ENGINE_IDLE_GAS_VALVE				dFloat(0.1f)
 #define D_VEHICLE_ENGINE_IDLE_FRICTION_COEFFICIENT	dFloat(0.25f)
 
-
 #define D_VEHICLE_MAX_SIDESLIP_ANGLE				dFloat(30.0f * 3.1416f / 180.0f)
 #define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(20.0f * 3.1416f / 180.0f)
 
-/*
-class CustomVehicleController::dWeightDistibutionSolver: public dSymmetricBiconjugateGradientSolve
-{
-	public:
-	dWeightDistibutionSolver()
-		:dSymmetricBiconjugateGradientSolve()
-		,m_count(0)
-	{
-	}
 
-	virtual void MatrixTimeVector(dFloat64* const out, const dFloat64* const v) const
-	{
-		dComplentaritySolver::dJacobian invMassJacobians;
-		invMassJacobians.m_linear = dVector(0.0f);
-		invMassJacobians.m_angular = dVector(0.0f);
-		for (int i = 0; i < m_count; i++) {
-			invMassJacobians.m_linear += m_invMassJacobians[i].m_linear.Scale(dFloat(v[i]));
-			invMassJacobians.m_angular += m_invMassJacobians[i].m_angular.Scale(dFloat(v[i]));
-		}
-
-		for (int i = 0; i < m_count; i++) {
-			out[i] = m_diagRegularizer[i] * v[i] + invMassJacobians.m_linear % m_jacobians[i].m_linear + invMassJacobians.m_angular % m_jacobians[i].m_angular;
-		}
-	}
-
-	virtual bool InversePrecoditionerTimeVector(dFloat64* const out, const dFloat64* const v) const
-	{
-		for (int i = 0; i < m_count; i++) {
-			out[i] = v[i] * m_invDiag[i];
-		}
-		return true;
-	}
-
-	dComplentaritySolver::dJacobian m_jacobians[256];
-	dComplentaritySolver::dJacobian m_invMassJacobians[256];
-	dFloat m_invDiag[256];
-	dFloat m_diagRegularizer[256];
-	int m_count;
-};
-*/
 
 class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexCastPreFilter
 {
@@ -86,7 +45,6 @@ class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexC
 	TireFilter(const CustomVehicleController::BodyPartTire* const tire, const CustomVehicleController* const controller)
 		:CustomControllerConvexCastPreFilter(tire->GetBody())
 		,m_tire (tire)
-		//,m_vehicle(vehicle)
 		,m_controller(controller)
 	{
 	}
@@ -109,7 +67,6 @@ class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexC
 		return (body != m_controller->GetBody()) ? 1 : 0;
 	}
 
-//	const NewtonBody* m_vehicle;
 	const CustomVehicleController* m_controller;
 	const CustomVehicleController::BodyPartTire* m_tire;
 };
@@ -471,7 +428,6 @@ class CustomVehicleController::TrackedSteeringJoint: public CustomUniversal
 
 		dVector relOmega(chassisOmega - differentialOmega);
 		dFloat accel = 0.5f * (relOmega.DotProduct3(pin) + m_turnRate) / timestep;
-//dTrace (("%f\n", m_turnRate));
 
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
