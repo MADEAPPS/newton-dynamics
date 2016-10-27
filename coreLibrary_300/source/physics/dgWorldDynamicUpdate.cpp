@@ -740,10 +740,6 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 			dgJacobianMatrixElement* const row = &matrixRow[rowCount];
 			dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);
 			row->m_Jt = constraintParamOut.m_jacobian[i];
-
-			//dgAssert(constraintParamOut.m_jointStiffness[i] >= dgFloat32(0.0f));
-			//dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(1.0f));
-			//row->m_stiffness = constraintParamOut.m_jointStiffness[i];
 			
 			row->m_diagDamp = dgFloat32 (0.0f);
 			row->m_stiffness = DG_PSD_DAMP_TOL * (dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) + dgFloat32 (1.0e-6f);

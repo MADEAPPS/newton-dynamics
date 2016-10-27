@@ -377,7 +377,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 							  row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(accel1) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(alpha1));
 
 			dgAssert(tmpAccel.m_w == dgFloat32(0.0f));
-			//dgFloat32 extenalAcceleration = -(tmpAccel.m_x + tmpAccel.m_y + tmpAccel.m_z);
 			dgFloat32 extenalAcceleration = -(tmpAccel.AddHorizontal()).GetScalar();
 			row->m_deltaAccel = extenalAcceleration * forceImpulseScale;
 			row->m_coordenateAccel += extenalAcceleration * forceImpulseScale;

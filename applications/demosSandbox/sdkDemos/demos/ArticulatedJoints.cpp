@@ -75,19 +75,59 @@ class ArticulatedEntityModel: public DemoEntity
 
 		void SubmitConstraints (dFloat timestep, int threadIndex)
 		{
-			CustomSlidingContact::SubmitConstraints(timestep, threadIndex);
-
-			//NewtonBody* const tire = GetBody0();
-			//NewtonBody* const chassis = GetBody1();
-
 			dMatrix tireMatrix;
 			dMatrix chassisMatrix;
+			CustomSlidingContact::SubmitConstraints(timestep, threadIndex);
 			CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_front[0]);
 			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 150.0f, 10.0f);
 			NewtonUserJointSetRowStiffness (m_joint, 0.7f);
 		}
 	};
+
+	class TreadLink: public CustomHinge
+	{
+		//#define USE_DRY_FRICTION
+
+		public:
+		TreadLink(const dMatrix& pinAndPivotFrame, NewtonBody* const link0, NewtonBody* const link1)
+			:CustomHinge(pinAndPivotFrame, link0, link1)
+		{
+			SetParameters ();
+		}
+
+		TreadLink(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const link0, NewtonBody* const link1)
+			:CustomHinge(pinAndPivotFrame0, pinAndPivotFrame1, link0, link1)
+		{
+			SetParameters ();
+		}
+
+		void SetParameters ()
+		{
+			SetStiffness(0.99f);
+			#ifdef USE_DRY_FRICTION
+				// much more expensive since each link add a limited row
+				SetFriction(15.0f);
+			#endif
+		}
+
+		void SubmitConstraints(dFloat timestep, int threadIndex)
+		{
+			CustomHinge::SubmitConstraints(timestep, threadIndex);
+
+			#ifndef USE_DRY_FRICTION
+				// this is about twice as fast since the friction row in unbounded and does not require LCP solution
+				dMatrix matrix0;
+				dMatrix matrix1;
+				CalculateGlobalMatrix(matrix0, matrix1);
+			
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+				NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.0f, 7.0f);
+				NewtonUserJointSetRowStiffness(m_joint, 0.7f);
+			#endif
+		}
+	};
+
 
 	class InputRecord
 	{
@@ -281,7 +321,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 	virtual void OnPreUpdate (CustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
-//xxxxxxxx
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
 
 		if (vehicleModel->m_engineJoint) {
@@ -1118,7 +1157,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dMatrix aligment (dYawMatrix(90.0f * 3.1416f / 180.0f));
 		NewtonBody* link0 = linkArray[0];
 
-		dFloat linkFriction = 15.0f;
+
 		NewtonJoint* hingeArray[1024];
 		for (int i = 1; i < bodyCount; i++) {
 			NewtonBody* const link1 = linkArray[i];
@@ -1126,9 +1165,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			dMatrix matrix;
 			NewtonBodyGetMatrix(link1, &matrix[0][0]);
 			dMatrix franmeMatrix (aligment * matrix);
-			CustomHinge* const hinge = new CustomHinge (franmeMatrix, link1, link0);
-			hinge->SetStiffness (0.99f);
-			hinge->SetFriction(linkFriction);
+			CustomHinge* const hinge = new ArticulatedEntityModel::TreadLink (franmeMatrix, link1, link0);
 			hingeArray[i-1] = hinge->GetJoint();
 			link0 = link1;
 		}
@@ -1142,12 +1179,13 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		
 		dVector dist (matrix2.m_posit - matrix0.m_posit);
 		matrix1.m_posit += dist;
-		CustomHinge* const hinge = new CustomHinge (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
-		hinge->SetFriction(linkFriction);
+		CustomHinge* const hinge = new ArticulatedEntityModel::TreadLink (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
 
 		NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (world, link0, NULL);
 		NewtonSkeletonContainerAttachJointArray (skeleton, bodyCount - 1, hingeArray);
 		NewtonSkeletonContainerFinalize (skeleton);
+
+		NewtonSkeletonContainerAttachCyclingJoint(skeleton, hinge->GetJoint());
 	}
 
 	void MakeLeftThread(CustomArticulatedTransformController* const controller)
@@ -1372,8 +1410,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		MakeLeftTrack (controller, m_cycleLinks);
 		MakeRightTrack (controller, m_cycleLinks);
-//		MakeLeftThread(controller);
-//		MakeRightThread(controller);
+		MakeLeftThread(controller);
+		MakeRightThread(controller);
 		AddCraneBase (controller);
 
 		// disable self collision between all body parts
@@ -1616,7 +1654,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
 	CustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
 	inputManager->AddPlayer (robot);
-/*
+
 	matrix.m_posit.m_z += 4.0f;
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
@@ -1632,7 +1670,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 20.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 20.0f, 0.0f));
-*/
+
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
