@@ -883,7 +883,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return bone;
 	}
 
-	CustomArticulatedTransformController::dSkeletonBone* MakeTractionTire(const char* const entName, const char* const tireName, CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const parentBone)
+	CustomArticulatedTransformController::dSkeletonBone* MakeTractionTire(const char* const entName, const char* const tireName, CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const parentBone, dList<CustomJoint*>& cycleLinks)
 	{
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
 		CustomArticulatedTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone);
@@ -910,7 +910,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
 		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
-		new CustomSatelliteGear(5.0f, tireHingeMatrix.m_front, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
+		CustomSatelliteGear* const axel = new CustomSatelliteGear(5.0f, tireHingeMatrix.m_front, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
+		cycleLinks.Append (axel);
 
 		return bone;
 	}
@@ -939,7 +940,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		
-		CustomArticulatedTransformController::dSkeletonBone* const leftTire_0 = MakeTractionTire ("leftTire_0", "tractionLeftTire", controller, chassisBone);
+		CustomArticulatedTransformController::dSkeletonBone* const leftTire_0 = MakeTractionTire ("leftTire_0", "tractionLeftTire", controller, chassisBone, cycleLinks);
 		CustomArticulatedTransformController::dSkeletonBone* const leftTire_7 = MakeTire ("leftTire_7", "tire", controller, chassisBone);
 		cycleLinks.Append(LinkTires (leftTire_0, leftTire_7, chassisBone));
 
@@ -958,7 +959,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 
-		CustomArticulatedTransformController::dSkeletonBone* const rightTire_0 = MakeTractionTire("rightTire_0", "tractionrightTire", controller, chassisBone);
+		CustomArticulatedTransformController::dSkeletonBone* const rightTire_0 = MakeTractionTire("rightTire_0", "tractionrightTire", controller, chassisBone, cycleLinks);
 		CustomArticulatedTransformController::dSkeletonBone* const rightTire_7 = MakeTire("rightTire_7", "tire", controller, chassisBone);
 		cycleLinks.Append(LinkTires (rightTire_0, rightTire_7, chassisBone));
 
@@ -1373,7 +1374,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		MakeRightTrack (controller, m_cycleLinks);
 //		MakeLeftThread(controller);
 //		MakeRightThread(controller);
-//		AddCraneBase (controller);
+		AddCraneBase (controller);
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
