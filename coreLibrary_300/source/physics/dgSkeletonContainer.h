@@ -58,23 +58,19 @@ class dgSkeletonContainer
 	dgGraph* GetParent (dgGraph* const node) const;
 	dgGraph* GetFirstChild (dgGraph* const parent) const;
 	dgGraph* GetNextSiblingChild (dgGraph* const sibling) const;
-
 	
-
 	private:
 	DG_INLINE void SolveBackward (dgForcePair* const force) const;
 	DG_INLINE void SolveFoward (dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force) const;
-
-	
+		
 	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
 	dgInt32 CalculateMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
 	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void BruteForceSolve (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
 	
-
 	dgGraph* FindNode (dgDynamicBody* const node) const;
 	dgGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgGraph* const root, dgGraph* const parent, dgInt32& index);
@@ -91,6 +87,7 @@ class dgSkeletonContainer
 	dgJacobianMatrixElement** m_rowArray;
 	dgBodyJointMatrixDataPair* m_localMatrices;
 	dgOnSkeletonContainerDestroyCallback m_destructor;
+	dgList<dgConstraint*> m_cyclingJoints;
 	dgInt32 m_id;
 	dgInt32 m_lru;
 	dgInt16 m_nodeCount;
