@@ -890,8 +890,6 @@ static void LoadSlide (DemoEntityManager* const scene, TriggerManager* const tri
 
 class HangingBridgeFrictionJoint : public CustomHinge
 {
-	//#define USE_DRY_FRICTION
-
 	public:
 	HangingBridgeFrictionJoint(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const link0, NewtonBody* const link1)
 		:CustomHinge(pinAndPivotFrame0, pinAndPivotFrame1, link0, link1)
@@ -1029,9 +1027,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		pinMatrix1[3][3] = 1.0f;
 
 		// connect these two plank by a hinge, there a wiggle space between eh hinge that give therefore use the alternate hinge constructor
-//		CustomHinge* const joint = new CustomHinge (pinMatrix0, pinMatrix1, body0, body1);
 		CustomHinge* const joint = new HangingBridgeFrictionJoint(pinMatrix0, pinMatrix1, body0, body1);
-//		joint->SetFriction(1000.0f);
 
 		// save the joint for later used
 		jointArray[jointCount] = joint->GetJoint();
