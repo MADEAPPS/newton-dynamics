@@ -58,29 +58,6 @@ void Newton::UpdatePhysicsAsync (dgFloat32 timestep)
 	UpdateAsync (timestep);
 }
 
-/*
-void Newton::DestroyJoint(dgConstraint* const joint)
-{
-	if (IsBusy()) {		
-		// the engine is busy in the previous update, deferred the deletion
-		NewtonDeadJoints& jointList = *this;
-		jointList.Insert (joint, joint);
-	} else {
-		dgWorld::DestroyConstraint (joint);
-	}
-}
-
-void Newton::DestroyBody(dgBody* const body)
-{
-	if (IsBusy()) {		
-		// the engine is busy in the previous update, deferred the deletion
-		NewtonDeadBodies& bodyList = *this;
-		bodyList.Insert (body, body);
-	} else {
-		dgWorld::DestroyBody(body);
-	}
-}
-*/
 
 NewtonUserJoint::NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo, dgBody* const dyn0, dgBody* const dyn1)
 	:dgUserConstraint (world, dyn0, dyn1, 1)

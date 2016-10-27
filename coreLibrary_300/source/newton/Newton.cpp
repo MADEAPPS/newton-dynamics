@@ -8405,6 +8405,15 @@ int NewtonSkeletonContainerAttachCyclingJoint (NewtonSkeletonContainer* const sk
 	return skeleton->AttachCyclingJoint(joint) ? 1 : 0;
 }
 
+void NewtonSkeletonContainerRemoveCyclingJoint(NewtonSkeletonContainer* const skeletonPtr, NewtonJoint* const jointPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
+	dgBilateralConstraint* const joint = (dgBilateralConstraint*)jointPtr;
+	return skeleton->RemoveCyclingJoint(joint);
+}
+
+
 void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray)
 {
 	TRACE_FUNCTION(__FUNCTION__);

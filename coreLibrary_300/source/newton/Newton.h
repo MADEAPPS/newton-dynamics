@@ -1151,6 +1151,7 @@ extern "C" {
 	NEWTON_API void NewtonSkeletonContainerFinalize (NewtonSkeletonContainer* const skeleton);
 
 	NEWTON_API int NewtonSkeletonContainerAttachCyclingJoint (NewtonSkeletonContainer* const skeleton, NewtonJoint* const joint);
+	NEWTON_API void NewtonSkeletonContainerRemoveCyclingJoint (NewtonSkeletonContainer* const skeleton, NewtonJoint* const joint);
 
 	NEWTON_API void* NewtonSkeletonContainerGetRoot (const NewtonSkeletonContainer* const skeleton);
 	NEWTON_API void* NewtonSkeletonContainerGetParent (const NewtonSkeletonContainer* const skeleton, void* const node);

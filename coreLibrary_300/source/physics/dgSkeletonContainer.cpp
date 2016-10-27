@@ -558,6 +558,16 @@ bool dgSkeletonContainer::AttachCyclingJoint(dgBilateralConstraint* const joint)
 	return ret;
 }
 
+void dgSkeletonContainer::RemoveCyclingJoint(dgBilateralConstraint* const joint)
+{
+	for (dgList<dgConstraint*>::dgListNode* ptr = m_cyclingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		if (ptr->GetInfo() == joint) {
+			m_cyclingJoints.Remove(ptr);
+			break;
+		}
+	}
+}
+
 void dgSkeletonContainer::AddJointList (dgInt32 count, dgBilateralConstraint** const array)
 {
 	dgTree<dgBody*, dgBody*> filter(m_world->GetAllocator());

@@ -25,7 +25,7 @@
 #include "dgConstraint.h"
 #include "dgDynamicBody.h"
 #include "dgBodyMasterList.h"
-
+#include "dgSkeletonContainer.h"
 
 dgInt32 dgBodyMasterListRow::m_contactCountReversal[] = {1, 0, 2};
 
@@ -377,12 +377,19 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 		dgDynamicBody* const dynBody0 = (dgDynamicBody*)body0;
 		dynBody0->m_prevExternalForce = dgVector(dgFloat32(0.0f));
 		dynBody0->m_prevExternalTorque = dgVector(dgFloat32(0.0f));
+		if ((constraint->GetId() == dgConstraint::m_contactConstraint) && dynBody0->GetSkeleton()) {
+			dynBody0->GetSkeleton()->RemoveCyclingJoint((dgBilateralConstraint*)constraint);
+		}
 	}
 
 	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 		dgDynamicBody* const dynBody1 = (dgDynamicBody*)body1;
 		dynBody1->m_prevExternalForce = dgVector(dgFloat32(0.0f));
 		dynBody1->m_prevExternalTorque = dgVector(dgFloat32(0.0f));
+
+		if ((constraint->GetId() == dgConstraint::m_contactConstraint) && dynBody1->GetSkeleton()) {
+			dynBody1->GetSkeleton()->RemoveCyclingJoint((dgBilateralConstraint*)constraint);
+		}
 	}
 
 	body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;

@@ -51,6 +51,7 @@ class dgSkeletonContainer
 	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
 	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
 	bool AttachCyclingJoint(dgBilateralConstraint* const jointPtr); 
+	void RemoveCyclingJoint(dgBilateralConstraint* const jointPtr);  
 	
 	dgGraph* GetRoot () const;
 	dgBody* GetBody(dgGraph* const node) const;
