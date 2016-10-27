@@ -888,6 +888,36 @@ static void LoadSlide (DemoEntityManager* const scene, TriggerManager* const tri
 }
 */
 
+class HangingBridgeFrictionJoint : public CustomHinge
+{
+	//#define USE_DRY_FRICTION
+
+	public:
+	HangingBridgeFrictionJoint(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const link0, NewtonBody* const link1)
+		:CustomHinge(pinAndPivotFrame0, pinAndPivotFrame1, link0, link1)
+	{
+		SetParameters();
+	}
+
+	void SetParameters()
+	{
+		SetStiffness(0.99f);
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		CustomHinge::SubmitConstraints(timestep, threadIndex);
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+		NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.0f, 5.0f);
+		NewtonUserJointSetRowStiffness(m_joint, 0.7f);
+	}
+};
+
+
 static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* const triggerManager, NewtonCollision* const sceneCollision, const char* const name, const dMatrix& location, NewtonBody* const playGroundBody)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -999,8 +1029,9 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		pinMatrix1[3][3] = 1.0f;
 
 		// connect these two plank by a hinge, there a wiggle space between eh hinge that give therefore use the alternate hinge constructor
-		CustomHinge* const joint = new CustomHinge (pinMatrix0, pinMatrix1, body0, body1);
-		joint->SetFriction(1000.0f);
+//		CustomHinge* const joint = new CustomHinge (pinMatrix0, pinMatrix1, body0, body1);
+		CustomHinge* const joint = new HangingBridgeFrictionJoint(pinMatrix0, pinMatrix1, body0, body1);
+//		joint->SetFriction(1000.0f);
 
 		// save the joint for later used
 		jointArray[jointCount] = joint->GetJoint();
