@@ -71,8 +71,9 @@ CustomArticulatedTransformController::CustomArticulatedTransformController()
 
 CustomArticulatedTransformController::~CustomArticulatedTransformController()
 {
-//	CustomArticulaledTransformManager* const manager = (CustomArticulaledTransformManager*) GetManager();
-	NewtonCollisionAggregateDestroy(m_collisionAggregate);
+	if (m_collisionAggregate) {
+		NewtonCollisionAggregateDestroy(m_collisionAggregate);
+	}
 }
 
 
@@ -216,7 +217,7 @@ bool CustomArticulatedTransformController::SelfCollisionTest (const dSkeletonBon
 }
 
 
-void CustomArticulatedTransformController::MakeNewtonSkeleton() const
+void CustomArticulatedTransformController::MakeNewtonSkeleton()
 {
 	NewtonBody* bonePool[32];
 	NewtonBody* boneParent[32];

@@ -8390,6 +8390,21 @@ NewtonJoint* NewtonSkeletonContainerGetParentJointFromNode (const NewtonSkeleton
 	return (NewtonJoint*)(skeleton->GetParentJoint((dgSkeletonContainer::dgGraph*) node));
 }
 
+NewtonSkeletonContainer* NewtonSkeletonGetSkeletonFromBody (NewtonBody* const body)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const newtonBody = (dgBody*) body;
+	return (NewtonSkeletonContainer*)newtonBody->GetSkeleton();
+}
+
+int NewtonSkeletonContainerAttachCyclingJoint (NewtonSkeletonContainer* const skeletonPtr, NewtonJoint* const jointPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
+	dgBilateralConstraint* const joint = (dgBilateralConstraint*)jointPtr;
+	return skeleton->AttachCyclingJoint(joint) ? 1 : 0;
+}
+
 void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray)
 {
 	TRACE_FUNCTION(__FUNCTION__);

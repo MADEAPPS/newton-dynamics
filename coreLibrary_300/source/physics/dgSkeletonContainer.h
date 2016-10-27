@@ -50,6 +50,7 @@ class dgSkeletonContainer
 	dgGraph* AddChild (dgBody* const child, dgBody* const parent);
 	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
 	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
+	bool AttachCyclingJoint(dgBilateralConstraint* const jointPtr); 
 	
 	dgGraph* GetRoot () const;
 	dgBody* GetBody(dgGraph* const node) const;
@@ -57,6 +58,8 @@ class dgSkeletonContainer
 	dgGraph* GetParent (dgGraph* const node) const;
 	dgGraph* GetFirstChild (dgGraph* const parent) const;
 	dgGraph* GetNextSiblingChild (dgGraph* const sibling) const;
+
+	
 
 	private:
 	DG_INLINE void SolveBackward (dgForcePair* const force) const;

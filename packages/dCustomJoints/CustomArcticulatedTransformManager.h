@@ -101,7 +101,8 @@ class CustomArticulatedTransformController: public CustomControllerBase
 
 	CUSTOM_JOINTS_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
 
-	CUSTOM_JOINTS_API void MakeNewtonSkeleton () const;
+	CUSTOM_JOINTS_API void LinkCycleBones(CustomJoint* ) const;
+	CUSTOM_JOINTS_API void MakeNewtonSkeleton ();
 
 	void SetCalculateLocalTransforms (bool val) {m_calculateLocalTransform = val;}
 	bool GetCalculateLocalTransforms () const {return m_calculateLocalTransform;}

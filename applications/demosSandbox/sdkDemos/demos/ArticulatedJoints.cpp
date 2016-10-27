@@ -915,7 +915,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return bone;
 	}
 
-	void LinkTires(CustomArticulatedTransformController::dSkeletonBone* const master, CustomArticulatedTransformController::dSkeletonBone* const slave, CustomArticulatedTransformController::dSkeletonBone* const root)
+	CustomJoint* LinkTires(CustomArticulatedTransformController::dSkeletonBone* const master, CustomArticulatedTransformController::dSkeletonBone* const slave, CustomArticulatedTransformController::dSkeletonBone* const root)
 	{
 		NewtonCollisionInfoRecord masterTire;
 		NewtonCollisionInfoRecord slaveTire;
@@ -931,17 +931,17 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		dMatrix pinMatrix;
 		NewtonBodyGetMatrix(root->m_body, &pinMatrix[0][0]);
-		new CustomGear(slaveRadio / masterRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
+		return new CustomGear(slaveRadio / masterRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
 	}
 	
 
-	void MakeLeftTrack(CustomArticulatedTransformController* const controller)
+	void MakeLeftTrack(CustomArticulatedTransformController* const controller, dList<CustomJoint*>& cycleLinks)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		
 		CustomArticulatedTransformController::dSkeletonBone* const leftTire_0 = MakeTractionTire ("leftTire_0", "tractionLeftTire", controller, chassisBone);
 		CustomArticulatedTransformController::dSkeletonBone* const leftTire_7 = MakeTire ("leftTire_7", "tire", controller, chassisBone);
-		LinkTires (leftTire_0, leftTire_7, chassisBone);
+		cycleLinks.Append(LinkTires (leftTire_0, leftTire_7, chassisBone));
 
 		MakeTire ("leftTireSuport_0", "suportTire", controller, chassisBone);
 		MakeTire ("leftTireSuport_1", "suportTire", controller, chassisBone);
@@ -950,17 +950,17 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			char name[64];
 			sprintf(name, "leftTire_%d", i);
 			CustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
-			LinkTires (leftTire_0, childBone, chassisBone);
+			cycleLinks.Append(LinkTires (leftTire_0, childBone, chassisBone));
 		}
 	}
 
-	void MakeRightTrack(CustomArticulatedTransformController* const controller)
+	void MakeRightTrack(CustomArticulatedTransformController* const controller, dList<CustomJoint*>& cycleLinks)
 	{
 		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 
 		CustomArticulatedTransformController::dSkeletonBone* const rightTire_0 = MakeTractionTire("rightTire_0", "tractionrightTire", controller, chassisBone);
 		CustomArticulatedTransformController::dSkeletonBone* const rightTire_7 = MakeTire("rightTire_7", "tire", controller, chassisBone);
-		LinkTires (rightTire_0, rightTire_7, chassisBone);
+		cycleLinks.Append(LinkTires (rightTire_0, rightTire_7, chassisBone));
 
 		MakeTire("rightTireSuport_0", "suportTire", controller, chassisBone);
 		MakeTire("rightTireSuport_1", "suportTire", controller, chassisBone);
@@ -969,7 +969,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			char name[64];
 			sprintf(name, "rightTire_%d", i);
 			CustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
-			LinkTires(rightTire_0, childBone, chassisBone);
+			cycleLinks.Append(LinkTires(rightTire_0, childBone, chassisBone));
 		}
 	}
 		
@@ -1324,6 +1324,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		matrix.m_posit = location.m_posit;
 		vehicleModel->ResetMatrix(*scene, matrix);
 
+		dList<CustomJoint*> m_cycleLinks;
 		CustomArticulatedTransformController* const controller = CreateTransformController(vehicleModel);
 		controller->SetCalculateLocalTransforms (true);
 
@@ -1334,7 +1335,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy (definition.m_articulationName, "mainBody");
 		NewtonBody* const chassis = CreateBodyPart (vehicleModel, definition);
-
+		
 		// add engine
 		vehicleModel->m_engineJoint = CreateEngineBodyPart(chassis);
 
@@ -1368,11 +1369,11 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(chassis, dGetIdentityMatrix());
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(chassis), bone);
 
-		MakeLeftTrack (controller);
-		MakeRightTrack (controller);
-		MakeLeftThread(controller);
-		MakeRightThread(controller);
-		AddCraneBase (controller);
+		MakeLeftTrack (controller, m_cycleLinks);
+		MakeRightTrack (controller, m_cycleLinks);
+//		MakeLeftThread(controller);
+//		MakeRightThread(controller);
+//		AddCraneBase (controller);
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
@@ -1386,6 +1387,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			NewtonCollisionSetUserData (NewtonBodyGetCollision(bone->m_body), bone);
 		}
 
+		NewtonSkeletonContainer* const skeleton = NewtonSkeletonGetSkeletonFromBody (controller->GetBone(0)->m_body);
+		for (dList<CustomJoint*>::dListNode* ptr = m_cycleLinks.GetFirst(); ptr; ptr = ptr->GetNext()) {
+			NewtonSkeletonContainerAttachCyclingJoint (skeleton, ptr->GetInfo()->GetJoint());
+		}
 		return controller;
 	}
 };
@@ -1610,7 +1615,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
 	CustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
 	inputManager->AddPlayer (robot);
-
+/*
 	matrix.m_posit.m_z += 4.0f;
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
@@ -1626,7 +1631,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 10.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(10.0f, 0.0f, 20.0f, 0.0f));
 	LoadLumberYardMesh (scene, entity, dVector(20.0f, 0.0f, 20.0f, 0.0f));
-
+*/
 	origin.m_x -= 5.0f;
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  

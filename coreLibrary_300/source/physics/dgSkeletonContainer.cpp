@@ -539,6 +539,10 @@ dgSkeletonContainer::dgGraph* dgSkeletonContainer::AddChild(dgDynamicBody* const
 	return node;
 }
 
+bool dgSkeletonContainer::AttachCyclingJoint(dgBilateralConstraint* const jointPtr)
+{
+	return false;
+}
 
 void dgSkeletonContainer::AddJointList (dgInt32 count, dgBilateralConstraint** const array)
 {
