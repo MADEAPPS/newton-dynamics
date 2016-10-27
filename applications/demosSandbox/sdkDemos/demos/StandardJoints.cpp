@@ -890,7 +890,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	mesh->SetRenderResolution(500);
 	mesh->Release();
 	
-	const int count = 32;
+	const int count = 2;
 	NewtonBody* bodies[count];
 
 	dBigVector point0;
@@ -944,7 +944,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 //		dVector veloc (dir.Scale (20.0f));
 //		NewtonBodySetVelocity(box, &veloc[0]);
 	}
-/*	
+	
 	for (int i = 1; i < count; i ++) {
 		NewtonBody* const box0 = bodies[i - 1];
 		NewtonBody* const box1 = bodies[i];
@@ -953,12 +953,17 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		dMatrix matrix1;
 		NewtonBodyGetMatrix(box0, &matrix0[0][0]);
 		NewtonBodyGetMatrix(box1, &matrix1[0][0]);
-		matrix0.m_posit.m_y += attachmentOffset;
-		matrix1.m_posit.m_y += attachmentOffset;
+
+		//dVector pivot((matrix0.m_posit + matrix1.m_posit).Scale(0.5f));
+		dVector dir(matrix1.m_posit - matrix0.m_posit);
+		dir = dir.Scale(1.0f / dir.DotProduct3(dir));
+		matrix0.m_posit += dir.Scale(attachmentOffset);
+		matrix1.m_posit -= dir.Scale(attachmentOffset);
+
 		//new CustomDistanceRope (matrix1.m_posit, matrix0.m_posit, box1, box0);
 		new CustomPointToPoint (matrix1.m_posit, matrix0.m_posit, box1, box0);
 	}
-	
+
 	void* const aggregate = NewtonCollisionAggregateCreate (scene->GetNewton());
 	for (int i = 0; i < count; i ++) {
 		NewtonCollisionAggregateAddBody(aggregate, bodies[i]);
@@ -975,7 +980,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 
 //	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), pathBody, NULL);
 #endif
-*/
+
 }
 
 void StandardJoints (DemoEntityManager* const scene)
@@ -992,7 +997,7 @@ void StandardJoints (DemoEntityManager* const scene)
 
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
-
+/*
 	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, -25.0f), 0.0f, 20);
 	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, 5.0f), 1.5f, 4);
 	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, 15.0f), 0.0f, 4);
@@ -1011,8 +1016,8 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
-
-//	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+*/
+	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
