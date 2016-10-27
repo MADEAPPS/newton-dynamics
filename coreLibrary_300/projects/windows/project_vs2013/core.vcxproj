@@ -417,6 +417,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\core\dgAsyncThread.h" />
+    <ClInclude Include="..\..\..\source\core\dgFastQueue.h" />
     <ClInclude Include="..\..\..\source\core\dgMutexThread.h" />
     <ClInclude Include="..\..\..\source\core\dgNode.h" />
     <ClInclude Include="..\..\..\source\core\dgObb.h" />
