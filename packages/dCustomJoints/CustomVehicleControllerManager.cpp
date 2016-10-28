@@ -2456,6 +2456,8 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 	CustomVehicleController::WheelJoint* const tireJoint = (CustomVehicleController::WheelJoint*) tire->GetJoint();
 
 	dAssert(tireJoint->GetBody0() == tireBody);
+
+
 	NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
 	tireMatrix = tireJoint->GetMatrix0() * tireMatrix;
 
@@ -2492,7 +2494,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				dVector longitudinalContactDir(0.0f);
 				NewtonMaterialGetContactTangentDirections(material, tireBody, &lateralContactDir[0], &longitudinalContactDir[0]);
 
-				dFloat tireOriginLateralSpeed = tireVeloc.DotProduct3(lateralContactDir);
+				//dFloat tireOriginLateralSpeed = tireVeloc.DotProduct3(lateralContactDir);
 				dFloat tireOriginLongitudinalSpeed = tireVeloc.DotProduct3(longitudinalContactDir);
 				dFloat tireContactLongitudinalSpeed = -longitudinalContactDir.DotProduct3 (tireOmega.CrossProduct(radius));
 
@@ -2513,7 +2515,23 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 					}
 
 					tire->m_longitudinalSlip = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
-					tire->m_lateralSlip = tireOriginLateralSpeed / dAbs(tireContactLongitudinalSpeed);
+					//tire->m_lateralSlip = tireOriginLateralSpeed / dAbs(tireContactLongitudinalSpeed);
+
+					NewtonBody* const chassisBody = tireJoint->GetBody1();
+					dMatrix chassisMatrix;
+					dVector chassisCom(0.0f);
+					dVector chassisVeloc(0.0f);
+					dVector chassisOmega(0.0f);
+
+					NewtonBodyGetCentreOfMass(chassisBody, &chassisCom[0]);
+					NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+					chassisMatrix.m_posit = chassisMatrix.TransformVector(chassisCom);
+					chassisMatrix = controller->GetLocalFrame() * chassisMatrix;
+					NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
+					NewtonBodyGetVelocity(chassisBody, &chassisVeloc[0]);
+
+					dFloat tireSizeSpeed = chassisMatrix.m_right.DotProduct3(chassisOmega.CrossProduct(tireMatrix.m_posit - chassisMatrix.m_posit));
+					tire->m_lateralSlip = controller->m_sideSlipAngle + tireSizeSpeed / controller->m_speed + tireJoint->m_steerAngle0;
 
 					dFloat lateralForce;
 					dFloat aligningMoment;
@@ -2561,99 +2579,21 @@ void CustomVehicleController::CalculateSideState(dFloat timestep)
 	NewtonBodyGetMatrix(chassisBody, &matrix0[0][0]);
 	matrix0.m_posit = matrix0.TransformVector(com);
 
-	dMatrix chassisMatrix(GetLocalFrame() * matrix0);
+	matrix0 = GetLocalFrame() * matrix0;
 	NewtonBodyGetVelocity(chassisBody, &veloc[0]);
 
-	veloc = chassisMatrix.UnrotateVector(veloc);
+	veloc = matrix0.UnrotateVector(veloc);
 	veloc.m_y = 0.0f;
 	dFloat velocMag2 = veloc.DotProduct3(veloc);
 	if (velocMag2 < 0.25f) {
 		m_sideSlipRate = 0.0f;
 		m_sideSlipAngle = 0.0f;
 	} else {
-		NewtonBodyGetOmega(chassisBody, &omega[0]);
-		omega = chassisMatrix.UnrotateVector(omega);
-
 		m_speed = dSqrt (velocMag2);
 		dFloat sideSlipAngle = dAtan2(veloc.m_z, veloc.m_x);
 		m_sideSlipRate = (sideSlipAngle - m_sideSlipAngle) / timestep;
 		m_sideSlipAngle = sideSlipAngle;
 
-		dTrace (("V=%f Beta=%f BetaRate=%f\n", m_speed, m_sideSlipAngle, m_sideSlipRate));
-/*
-	if ((dAbs(sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) || (dAbs(sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE)) {
-		dVector bodyNetTorque(0.0f);
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-		dFloat mass;
-		dFloat force = 0.0f;
-		dFloat torque = 0.0f;
-		dFloat maxLoad = 0.0f;
-		dFloat rearPivot = 0.0f;
-		dFloat frontPivot = 0.0f;
-
-		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-			BodyPartTire* const tire = &node->GetInfo();
-			WheelJoint* const joint = (WheelJoint*)tire->GetJoint();
-
-			dVector tireForce(chassisMatrix.UnrotateVector(GetLastLateralForce(tire)));
-			force += tireForce.m_z;
-			torque += tire->m_data.m_location.m_x * tireForce.m_z;
-			maxLoad = dMax(dAbs(joint->GetTireLoad()), maxLoad);
-
-			if (tire->m_data.m_location.m_x > 0.0f) {
-				frontPivot = dMax(tire->m_data.m_location.m_x, frontPivot);
-			} else {
-				rearPivot = dMin(tire->m_data.m_location.m_x, rearPivot);
-			}
-		}
-
-		NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
-		NewtonBodyGetTorque(chassisBody, &bodyNetTorque[0]);
-		bodyNetTorque = chassisMatrix.UnrotateVector(bodyNetTorque);
-
-		dFloat b[2];
-		dFloat x[2];
-		dFloat A[2][2];
-		dFloat low[2];
-		dFloat high[2];
-
-		dFloat speed = dSqrt(velocMag2);
-		dFloat b0 = -sideSlipRate * mass * speed;
-		dFloat b1 = -bodyNetTorque.m_y;
-
-		if (dAbs(sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) {
-			dVector bodyNetForce(0.0f);
-			NewtonBodyGetForce(chassisBody, &bodyNetForce[0]);
-			bodyNetForce = chassisMatrix.UnrotateVector(bodyNetForce);
-			bodyNetForce.m_y = 0.0f;
-			b0 -= sideSlipAngle * dSqrt(bodyNetForce.DotProduct3(bodyNetForce));
-		}
-
-		maxLoad = maxLoad * 0.5f + 100.0f;
-
-		b[0] = b0 + b1 * frontPivot;
-		b[1] = b0 + b1 * rearPivot;
-
-		A[0][0] = 1.0f + frontPivot * frontPivot;
-		A[1][1] = 1.0f + rearPivot * rearPivot;
-		A[0][1] = 1.0f + frontPivot * rearPivot;
-		A[1][0] = 1.0f + frontPivot * rearPivot;
-
-		low[0] = -maxLoad;
-		low[1] = -maxLoad;
-		high[0] = maxLoad;
-		high[1] = maxLoad;
-
-		dSolveDantzigLCP(2, &A[0][0], x, b, low, high);
-
-		dVector sideForce(chassisMatrix.RotateVector(dVector(0.0f, 0.0f, x[0] + x[1], 0.0f)));
-		dVector sideTorque(chassisMatrix.RotateVector(dVector(0.0f, frontPivot * x[0] + rearPivot * x[1], 0.0f, 0.0f)));
-
-		NewtonBodyAddForce(chassisBody, &sideForce[0]);
-		NewtonBodyAddTorque(chassisBody, &sideTorque[0]);
-*/
 	}
 }
 
@@ -2693,7 +2633,7 @@ void CustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 			dAssert(chassisBody == joint->GetBody1());
 
 			dMatrix tireMatrix;
-			dMatrix chassisMatrix;
+			//dMatrix chassisMatrix;
 			dVector tireVeloc(0.0f);
 			dVector chassisPivotVeloc(0.0f);
 
