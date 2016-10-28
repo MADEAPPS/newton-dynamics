@@ -69,8 +69,6 @@ static NewtonBody* CreateCapule (DemoEntityManager* const scene, const dVector& 
 	return body;
 }
 
-
-
 static NewtonBody* CreateWheel (DemoEntityManager* const scene, const dVector& location, dFloat radius, dFloat height)
 {
     NewtonWorld* const world = scene->GetNewton();
@@ -108,7 +106,6 @@ static NewtonBody* CreateCylinder (DemoEntityManager* const scene, const dVector
     NewtonDestroyCollision(collision);
     return body;
 }
-
 
 static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 {
@@ -323,9 +320,9 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		m_localMatrix1 = localMatrix1;
 
 		m_target = dQuaternion(dVector(1.0f, 0, 0), 0.0f);
-		m_reduceError = 0.2f; // amount of error to reduce per timestep (more -> oszillation)
+		m_reduceError = 0.95f; // amount of error to reduce per timestep (more -> oszillation)
+		m_stiffness = 0.98f;
 		m_angularFriction = 300.0f;
-		m_stiffness = 0.9f;
 
 		m_anim_speed = 0.0f;
 		m_anim_offset = 0.0f;
