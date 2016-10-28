@@ -112,7 +112,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		,m_longitudinalDir(0.0f, 0.0f, 0.0f, 0.0f)
 		,m_tire (tireData)
 		,m_tireLoad(0.0f)
-		,m_steerRate (0.25f * 3.1416f)
+		,m_steerRate (0.5f * 3.1416f)
 		,m_steerAngle0(0.0f)
 		,m_steerAngle1(0.0f)
 		,m_brakeTorque(0.0f)
@@ -213,19 +213,6 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		dVector chassisOmega(0.0f);
 
 		CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-
-		if (m_steerAngle0 < m_steerAngle1) {
-			m_steerAngle0 += m_steerRate * timestep;
-			if (m_steerAngle0 > m_steerAngle1) {
-				m_steerAngle0 = m_steerAngle1;
-			}
-		} else if (m_steerAngle0 > m_steerAngle1) {
-			m_steerAngle0 -= m_steerRate * timestep;
-			if (m_steerAngle0 < m_steerAngle1) {
-				m_steerAngle0 = m_steerAngle1;
-			}
-		}
-
 		chassisMatrix = dYawMatrix(m_steerAngle0) * chassisMatrix;
 
 		tireMatrix.m_front = chassisMatrix.m_front;
@@ -366,6 +353,7 @@ class CustomVehicleController::TrackedSteeringJoint: public CustomUniversal
 
 	void ApplySteering(SteeringController* const steering, dFloat timestep)
 	{
+		dAssert(0);
 		m_turnRateTarget = steering->m_param * 10.0f;
 
 		if (m_turnRate < m_turnRateTarget) {
