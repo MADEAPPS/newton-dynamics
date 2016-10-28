@@ -524,7 +524,7 @@ dFloat CustomVehicleController::BodyPartTire::GetLongitudinalSlip () const
 	return m_longitudinalSlip;
 }
 
-
+/*
 CustomVehicleController::BodyPartDifferentialSteering::BodyPartDifferentialSteering(CustomVehicleController* const controller, BodyPartTire* const leftTire, BodyPartTire* const rightTire)
 	:BodyPart()
 {
@@ -570,6 +570,7 @@ CustomVehicleController::BodyPartDifferentialSteering::BodyPartDifferentialSteer
 CustomVehicleController::BodyPartDifferentialSteering::~BodyPartDifferentialSteering()
 {
 }
+*/
 
 CustomVehicleController::EngineController::DriveTrain::DriveTrain(const dVector& invInertia, DriveTrain* const parent)
 	:CustomAlloc()
@@ -962,6 +963,7 @@ CustomVehicleController::EngineController::DriveTrainEngine2W::DriveTrainEngine2
 	SetGearRatioJacobian(1.0f);
 }
 
+/*
 CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEngineTracked (const dVector& invInertia, const DifferentialTracked& axel, CustomVehicleController* const controller)
 	:DriveTrainEngine2W(invInertia, axel.m_axel)
 	,m_differentialPart(controller, axel.m_axel.m_leftTire, axel.m_axel.m_rightTire)
@@ -990,11 +992,13 @@ CustomVehicleController::EngineController::DriveTrainEngineTracked::DriveTrainEn
 	}
 }
 
+
 void CustomVehicleController::EngineController::DriveTrainEngineTracked::ApplySteering(SteeringController* const steering, dFloat timestep)
 {
 	TrackedSteeringJoint* const steeringJoint = (TrackedSteeringJoint*)m_differentialPart.GetJoint();
 	steeringJoint->ApplySteering(steering, timestep);
 }
+*/
 
 CustomVehicleController::EngineController::DriveTrainEngine4W::DriveTrainEngine4W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1)
 	:DriveTrainEngine(invInertia)
@@ -1251,7 +1255,7 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			m_engine = new DriveTrainEngine2W (invInertia, differential.m_axel);
 			break;
 		}
-
+/*
 		case Differential::m_4wd:
 		{
 			const Differential4wd& diff = (Differential4wd&) differential;
@@ -1272,6 +1276,9 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			m_engine = new DriveTrainEngineTracked(invInertia, diff, controller);
 			break;
 		}
+*/		
+		default:
+			dAssert(0);
 	}
 	SetInfo(info);
 
@@ -2076,68 +2083,7 @@ void CustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 		vehCom.m_x = origin.m_x + (xMax - xMin) * factor;
 		vehCom.m_z = origin.m_z;
 		NewtonBodySetCentreOfMass(m_body, &vehCom[0]);
-
-
-/*
-		dWeightDistibutionSolver solver;
-		dFloat64 unitAccel[256];
-		dFloat64 sprungMass[256];
-
-		int count = 0;
-		dVector dir(0.0f, 1.0f, 0.0f, 0.0f);
-
-		dMatrix matrix;
-		dVector com(0.0f);
-		dVector invInertia(0.0f);
-		dFloat invMass;
-		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
-		NewtonBodyGetCentreOfMass(m_body, &com[0]);
-		NewtonBodyGetInvMass(m_body, &invMass, &invInertia[0], &invInertia[1], &invInertia[2]);
-		matrix = matrix.Inverse();
-
-		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-			BodyPartTire* const tire = &node->GetInfo();
-
-			dMatrix tireMatrix;
-			NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
-			tireMatrix = tireMatrix * matrix;
-
-			dVector posit(tireMatrix.m_posit - com);
-
-			dComplentaritySolver::dJacobian &jacobian0 = solver.m_jacobians[count];
-			dComplentaritySolver::dJacobian &invMassJacobian0 = solver.m_invMassJacobians[count];
-			jacobian0.m_linear = dir;
-			jacobian0.m_angular = posit * dir;
-			jacobian0.m_angular.m_w = 0.0f;
-
-			invMassJacobian0.m_linear = jacobian0.m_linear.Scale(invMass);
-			invMassJacobian0.m_angular = jacobian0.m_angular.CompProduct(invInertia);
-
-			dFloat diagonal = jacobian0.m_linear % invMassJacobian0.m_linear + jacobian0.m_angular % invMassJacobian0.m_angular;
-			solver.m_diagRegularizer[count] = diagonal * 0.005f;
-			solver.m_invDiag[count] = 1.0f / (diagonal + solver.m_diagRegularizer[count]);
-
-			unitAccel[count] = 1.0f;
-			sprungMass[count] = 0.0f;
-			count++;
-		}
-
-		if (count) {
-			solver.m_count = count;
-			solver.Solve(count, 1.0e-6f, sprungMass, unitAccel);
-		}
-
-
-		int index = 0;
-		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
-			BodyPartTire* const tire = &node->GetInfo();
-			WheelJoint* const tireJoint = (WheelJoint*)tire->GetJoint();
-			tireJoint->m_restSprunMass = dFloat(5.0f * dFloor(sprungMass[index] / 5.0f + 0.5f));
-			index++;
-		}
-*/
 	}
-
 }
 
 

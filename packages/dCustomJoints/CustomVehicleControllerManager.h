@@ -267,12 +267,14 @@ class CustomVehicleController: public CustomControllerBase
 		friend class CustomVehicleControllerManager;
 	};
 
+/*
 	class BodyPartDifferentialSteering: public BodyPart
 	{
 		public:
 		BodyPartDifferentialSteering (CustomVehicleController* const controller, BodyPartTire* const leftTire, BodyPartTire* const rightTire);
 		~BodyPartDifferentialSteering ();
 	};
+*/
 
 	class EngineController: public Controller
 	{
@@ -495,7 +497,7 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			DriveTrainEngine8W(const dVector& invInertia, const DifferentialAxel& axel0, const DifferentialAxel& axel1, const DifferentialAxel& axel2, const DifferentialAxel& axel3);
 		};
-
+/*
 		class DriveTrainEngineTracked: public DriveTrainEngine2W
 		{
 			public:
@@ -504,7 +506,7 @@ class CustomVehicleController: public CustomControllerBase
 
 			BodyPartDifferentialSteering m_differentialPart;
 		};
-
+*/
 
 		class DriveTrainDifferentialGear: public DriveTrain
 		{

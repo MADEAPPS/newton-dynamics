@@ -144,9 +144,6 @@ class BasicCarEntity: public DemoEntity
 		,m_reverseGear (false)
 		,m_engineKeySwitch(false)
 		,m_automaticTransmission(true)
-//		,m_engineKeySwitchCounter(0)
-//		,m_engineOldKeyState(false)
-//		,m_engineRPMOn(false)
 		,m_drivingState(m_engineOff)
 	{
 		// add this entity to the scene for rendering
@@ -173,7 +170,6 @@ class BasicCarEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle controller
-		//m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.MASS, dVector (0.0f, DEMO_GRAVITY, 0.0f, 0.0f));
 		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.VEHICLE_MASS, PhysicsApplyGravityForce, this);
 
 		// get body the vehicle rigid body and set the Newton rigid body physics properties
@@ -360,7 +356,6 @@ class BasicCarEntity: public DemoEntity
 		handBrakes->AddTire (rearTires[1]);
 		m_controller->SetHandBrakes (handBrakes);
 
-/*
 		CustomVehicleController::EngineController::Differential8wd differential;
 		switch (parameters.m_differentialType) 
 		{
@@ -370,6 +365,7 @@ class BasicCarEntity: public DemoEntity
 				differential.m_axel.m_rightTire = rearTires[1];
 				break;
 			case BasciCarParameters::m_FWD:
+				dAssert(0);
 				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
 				differential.m_axel.m_leftTire = frontTires[0];
 				differential.m_axel.m_rightTire = frontTires[1];
@@ -377,6 +373,7 @@ class BasicCarEntity: public DemoEntity
 
 			case BasciCarParameters::m_4WD:
 			default:
+				dAssert(0);
 				differential.m_type = CustomVehicleController::EngineController::Differential::m_4wd;
 				differential.m_axel.m_leftTire = rearTires[0];
 				differential.m_axel.m_rightTire = rearTires[1];
@@ -407,8 +404,9 @@ class BasicCarEntity: public DemoEntity
 		engineInfo.m_gearRatios[2] = parameters.GEAR_3;
 		engineInfo.m_reverseGearRatio = parameters.REVERSE_GEAR;
 
-		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, differential);
+//		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, differential);
 
+	/*
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
 
@@ -419,10 +417,9 @@ class BasicCarEntity: public DemoEntity
 
 		// set the gear look up table
 		SetGearMap(engineControl);
-
+*/
 		// set the vehicle weigh distribution 
 		m_controller->SetWeightDistribution (0.5f);
-*/
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
