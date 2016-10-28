@@ -1425,7 +1425,6 @@ void dgWorld::DestroyAggregate(dgBroadPhaseAggregate* const aggregate) const
 
 void dgDeadJoints::DestroyJoint(dgConstraint* const joint)
 {
-	dgAssert (0);
 	dgSpinLock (&m_lock, true);
 
 	dgWorld& me = *((dgWorld*)this);
