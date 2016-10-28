@@ -398,12 +398,12 @@ void dgCollisionCapsule::GetCollisionInfo(dgCollisionInfo* const info) const
 {
 	dgCollisionConvex::GetCollisionInfo(info);
 
-	info->m_taperedCapsule.m_radio0 = m_radio0;
-	info->m_taperedCapsule.m_radio1 = m_radio1;
+	info->m_capsule.m_radio0 = m_radio0;
+	info->m_capsule.m_radio1 = m_radio1;
 	info->m_capsule.m_height = dgFloat32 (2.0f) * m_height;
 
 	if (m_transform.m_x < dgFloat32 (0.0f)) {
-		dgSwap(info->m_taperedCapsule.m_radio0, info->m_taperedCapsule.m_radio1);
+		dgSwap(info->m_capsule.m_radio0, info->m_capsule.m_radio1);
 	}
 }
 

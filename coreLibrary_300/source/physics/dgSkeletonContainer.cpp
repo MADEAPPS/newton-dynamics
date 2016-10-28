@@ -28,13 +28,6 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
 
-
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-
 class dgSkeletonContainer::dgNodePair
 {
 	public:
@@ -66,8 +59,6 @@ class dgSkeletonContainer::dgBodyJointMatrixDataPair
 	dgMatriData m_body;
 	dgMatriData m_joint;
 } DG_GCC_VECTOR_ALIGMENT;
-
-
 
 dgInt32 dgSkeletonContainer::m_lruMarker = 1;
 dgInt32 dgSkeletonContainer::m_uniqueID = DG_SKELETON_BASEW_UNIQUE_ID;
@@ -163,7 +154,6 @@ class dgSkeletonContainer::dgGraph
 			const dgInt32 k = m_sourceJacobianIndex[i];
 			const dgJacobianMatrixElement* const row = &matrixRow[start + k];
 			jointMass[i].SetZero();
-			//jointMass[i][i] = -row->m_stiffness;
 			jointMass[i][i] = -row->m_diagDamp;
 			bodyJt[i] = dgSpatialVector (row->m_Jt.m_jacobianM0.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM0.m_angular.CompProduct4(dgVector::m_negOne));
 			jointJ[i] = dgSpatialVector (row->m_Jt.m_jacobianM1.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM1.m_angular.CompProduct4(dgVector::m_negOne));
@@ -210,7 +200,6 @@ class dgSkeletonContainer::dgGraph
 		Factorize(data);
 		return boundedDof;
 	}
-
 
 	DG_INLINE void CalculateBodyDiagonal(dgBodyJointMatrixDataPair* const data, dgGraph* const child)
 	{
@@ -352,7 +341,6 @@ class dgSkeletonContainer::dgGraph
 		}
 		return rowCount;
 	}
-
 	
 	dgDynamicBody* m_body;
 	dgBilateralConstraint* m_joint;
@@ -430,7 +418,6 @@ dgBilateralConstraint* dgSkeletonContainer::GetParentJoint(dgSkeletonContainer::
 	return node->m_joint;
 }
 
-
 dgSkeletonContainer::dgGraph* dgSkeletonContainer::GetFirstChild(dgSkeletonContainer::dgGraph* const parent) const
 {
 	return parent->m_child;
@@ -440,7 +427,6 @@ dgSkeletonContainer::dgGraph* dgSkeletonContainer::GetNextSiblingChild(dgSkeleto
 {
 	return sibling->m_sibling;
 }
-
 
 dgWorld* dgSkeletonContainer::GetWorld() const
 {
@@ -839,7 +825,6 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 	}
 }
 
-
 DG_INLINE void dgSkeletonContainer::SolveFoward (dgForcePair* const force, const dgForcePair* const accel) const
 {
 	const dgBodyJointMatrixDataPair* const data = m_localMatrices;
@@ -923,7 +908,6 @@ DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 	}
 }
 
-
 DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const
 {
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
@@ -960,7 +944,6 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 	accel[m_nodeCount - 1].m_body.SetZero();
 	accel[m_nodeCount - 1].m_joint.SetZero();
 }
-
 
 void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const
 {
@@ -1053,7 +1036,6 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 		internalForces[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(jointForce);
 	}
 }
-
 
 void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const
 {

@@ -75,7 +75,7 @@ static NewtonBody* CreateWheel (DemoEntityManager* const scene, const dVector& l
 {
     NewtonWorld* const world = scene->GetNewton();
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
-    dVector size (radius, height, 0.0f, 0.0f);
+    dVector size (radius, height, radius, 0.0f);
     NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _CHAMFER_CYLINDER_PRIMITIVE, 0);
     DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
@@ -94,7 +94,7 @@ static NewtonBody* CreateCylinder (DemoEntityManager* const scene, const dVector
 {
     NewtonWorld* const world = scene->GetNewton();
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
-    dVector size (radius, height, 0.0f, 0.0f);
+    dVector size (radius, height, radius, 0.0f);
     NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
     DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 

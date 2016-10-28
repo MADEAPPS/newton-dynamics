@@ -85,20 +85,6 @@ class dgCollisionInfo
 
 	struct dgCylinderData
 	{
-		dgFloat32 m_radius;
-		dgFloat32 m_height;
-	};
-
-	struct dgTaperedCapsuleData
-	{
-		dgFloat32 m_radio0;
-		dgFloat32 m_radio1;
-		dgFloat32 m_height;
-	};
-
-
-	struct dgTaperedCylinderData
-	{
 		dgFloat32 m_radio0;
 		dgFloat32 m_radio1;
 		dgFloat32 m_height;
@@ -106,7 +92,8 @@ class dgCollisionInfo
 
 	struct dgCapsuleData
 	{
-		dgFloat32 m_radio;
+		dgFloat32 m_radio0;
+		dgFloat32 m_radio1;
 		dgFloat32 m_height;
 	};
 
@@ -186,8 +173,6 @@ class dgCollisionInfo
 		dgSphereData m_sphere;
 		dgCapsuleData m_capsule;
 		dgCylinderData m_cylinder;
-		dgTaperedCapsuleData m_taperedCapsule;
-		dgTaperedCylinderData m_taperedCylinder;
 		dgChamferCylinderData m_chamferCylinder;
 		dgConvexHullData m_convexHull;
 		dgDeformableMeshData m_deformableMesh;

@@ -672,14 +672,11 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	{
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* shape = NewtonCreateSphere (world, 0.5f, 0, NULL);
-//		NewtonCollision* shape = NewtonCreateCylinder (world, 0.5f, 0.5f, 2.0f, 0, NULL);
 
 		// create the rigid body that will make this bone
 		dMatrix engineMatrix;
 		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
 		engineMatrix = dRollMatrix(0.5f * 3.1416f) * engineMatrix;
-//engineMatrix.m_posit.m_y += 3.0f;
-//engineMatrix.m_posit.m_x -= 1.0f;
 
 		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
 

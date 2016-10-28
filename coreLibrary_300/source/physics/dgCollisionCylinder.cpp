@@ -413,8 +413,8 @@ void dgCollisionCylinder::GetCollisionInfo(dgCollisionInfo* const info) const
 {
 	dgCollisionConvex::GetCollisionInfo(info);
 
-	info->m_taperedCylinder.m_radio0 = m_radio0;
-	info->m_taperedCylinder.m_radio1 = m_radio1;
+	info->m_cylinder.m_radio0 = m_radio0;
+	info->m_cylinder.m_radio1 = m_radio1;
 	info->m_cylinder.m_height = m_height * dgFloat32 (2.0f);
 }
 

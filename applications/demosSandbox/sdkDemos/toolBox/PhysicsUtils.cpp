@@ -688,6 +688,10 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 		{
 			// create the collision 
 			collision = NewtonCreateCylinder (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, NULL); 
+
+			NewtonCollisionInfoRecord collisionInfo;
+			NewtonCollisionGetInfo(collision, &collisionInfo);
+
 			break;
 		}
 
