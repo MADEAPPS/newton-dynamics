@@ -21,6 +21,7 @@
 #include "DebugDisplay.h"
 #include "UserPlaneCollision.h"
 
+#if 0
 // some figures form the 2000 SRT Viper data sheet: http://www.vipercentral.com/specifications/
 // the 2000 Vipers’ 8.4-liter engine generates
 // max speed: 164 miles per hours					= 73.0f meter per seconds		
@@ -1494,7 +1495,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	void* m_engineSounds[16];
 };
 
-
+#endif
 
 // *************************************************************************************************
 // 
@@ -1506,6 +1507,7 @@ void SuperCar (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
+#if 0
 	//CreateLevelMesh (scene, "flatPlane1.ngd", 0);
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
@@ -1607,6 +1609,6 @@ void SuperCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-
+#endif
 }
 

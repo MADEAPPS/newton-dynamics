@@ -174,6 +174,7 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API NewtonJoint* GetJoint () const;
 	CUSTOM_JOINTS_API const dMatrix& GetMatrix0 () const;
 	CUSTOM_JOINTS_API const dMatrix& GetMatrix1 () const;
+	CUSTOM_JOINTS_API void CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) const;
 
 	// the application needs to implement this function for serialization
 	CUSTOM_JOINTS_API virtual bool IsType (dCRCTYPE type) const;
@@ -209,7 +210,7 @@ class CustomJoint: public CustomAlloc
 	// the application needs to implement this function for each derived joint. See examples for more detail
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-	CUSTOM_JOINTS_API void CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) const;
+
 	CUSTOM_JOINTS_API void CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 
 	CUSTOM_JOINTS_API static SerializeMetaDataDictionary& GetDictionary();

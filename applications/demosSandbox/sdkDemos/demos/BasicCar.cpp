@@ -89,9 +89,9 @@ static BasciCarParameters basicCarParameters =
 		2.0f,	// GEAR_2
 		1.5f,	// GEAR_3
 		2.9f,	// REVERSE_GEAR
-	   0.40f,	// SUSPENSION_LENGTH
-	  100.0f,	// SUSPENSION_SPRING
-	   10.0f,	// SUSPENSION_DAMPER
+	   0.30f,	// SUSPENSION_LENGTH
+	  700.0f,	// SUSPENSION_SPRING
+	   30.0f,	// SUSPENSION_DAMPER
 	  900.0f * DEMO_GRAVITY *  5.0f,		// LATERAL_STIFFNESS proportional to the vehicle weight
 	  900.0f * DEMO_GRAVITY *  2.0f,		// LONGITUDINAL_STIFFNESS proportional to the vehicle weight
 	   1.5f,	// ALIGNING_MOMENT_TRAIL
@@ -328,27 +328,25 @@ class BasicCarEntity: public DemoEntity
 
 		// add front tires
 		CustomVehicleController::BodyPartTire* frontTires[2]; 
-		dVector offset1 (1.5f, 0.0f, -1.0f, 1.0f);
+		dVector offset1 (1.5f, -0.1f, -1.0f, 1.0f);
 		frontTires[0] = AddTire (offset1, width, radius, parameters.TIRE_MASS, parameters.STEER_ANGLE, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		offset1 = dVector (1.5f, 0.0f, 1.0f, 1.0f);		
+		offset1 = dVector (1.5f, -0.1f, 1.0f, 1.0f);		
 		frontTires[1] = AddTire (offset1, width, radius, parameters.TIRE_MASS, parameters.STEER_ANGLE, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
 		// add rear tires
 		CustomVehicleController::BodyPartTire* rearTires[2];
-		dVector offset2 (-1.7f, 0.0f, -1.0f, 1.0f);
+		dVector offset2 (-1.7f, -0.1f, -1.0f, 1.0f);
 		rearTires[0] = AddTire (offset2, width, radius, parameters.TIRE_MASS, 0.0f, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
-		offset2 = dVector (-1.7f, 0.0f, 1.0f, 1.0f);
+		offset2 = dVector (-1.7f, -0.1f, 1.0f, 1.0f);
 		rearTires[1] = AddTire (offset2, width, radius, parameters.TIRE_MASS, 0.0f, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
-		// add a steering Wheel
-		//CustomVehicleControllerComponentSteering* const steering = new CustomVehicleControllerComponentSteering (m_controller, parameters.STEER_ANGLE * 3.141592f / 180.0f);
+		// add a steering Wheel component
 		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller);
 		steering->AddTire (frontTires[0]);
 		steering->AddTire (frontTires[1]);
 		m_controller->SetSteering(steering);
 
-
-		// add all wheels brakes
+		// add all wheels brakes component
 		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController (m_controller, parameters.BRAKE_TORQUE);
 		for (int i = 0; i < 2; i ++) {
 			brakes->AddTire (frontTires[i]);
@@ -356,13 +354,13 @@ class BasicCarEntity: public DemoEntity
 		}
 		m_controller->SetBrakes(brakes);
 
-
-		// add hand brakes
+		// add hand brakes component
 		CustomVehicleController::BrakeController* const handBrakes = new CustomVehicleController::BrakeController (m_controller, parameters.BRAKE_TORQUE);
 		handBrakes->AddTire (rearTires[0]);
 		handBrakes->AddTire (rearTires[1]);
 		m_controller->SetHandBrakes (handBrakes);
 
+/*
 		CustomVehicleController::EngineController::Differential8wd differential;
 		switch (parameters.m_differentialType) 
 		{
@@ -422,11 +420,14 @@ class BasicCarEntity: public DemoEntity
 		// set the gear look up table
 		SetGearMap(engineControl);
 
-		// set teh vehicle weigh doistibution 
+		// set the vehicle weigh distribution 
 		m_controller->SetWeightDistribution (0.5f);
+*/
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
+
+
 
 /*
 		// test tire update interface
@@ -465,34 +466,42 @@ class BasicCarEntity: public DemoEntity
 		//dFloat joyPosY;
 		//int joyButtons;
 
-		int gear = engine->GetGear();
 		int engineIgnitionKey = 0;
-		int automaticTransmission = engine->GetTransmissionMode();
 		dFloat cluthPedal = 1.0f;
 		dFloat steeringVal = 0.0f;
 		dFloat reverseGasPedal = 0.0f;
 		dFloat forwardGasPedal = 0.0f;
 		dFloat handBrakePedal = 0.0f;
-		
-		engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
-		automaticTransmission = m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d);
-		steeringVal = (dFloat(mainWindow->GetKeyState('D')) - dFloat(mainWindow->GetKeyState('A')));
-		gear += int(m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int(m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
 
-		if (mainWindow->GetKeyState ('W')) {
-			forwardGasPedal = 1.0f;
+		if (steering) {
+			steeringVal = (dFloat(mainWindow->GetKeyState('D')) - dFloat(mainWindow->GetKeyState('A')));
 		}
 
-		if (mainWindow->GetKeyState('S')) {
-			reverseGasPedal = 1.0f;
+		if (handBrakes) {
+			if (mainWindow->GetKeyState(' ')) {
+				handBrakePedal = 1.0f;
+			}
 		}
 
-		if (mainWindow->GetKeyState(' ')) {
-			handBrakePedal = 1.0f;
-		}
+		if (engine) {
+			int gear = engine->GetGear();
+			int automaticTransmission = engine ? engine->GetTransmissionMode() : 0;
+			
+			engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
+			automaticTransmission = m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d);
+			gear += int(m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int(m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
 
-		if (mainWindow->GetKeyState ('K')) {
- 			cluthPedal = 0.0f;
+			if (mainWindow->GetKeyState ('W')) {
+				forwardGasPedal = 1.0f;
+			}
+
+			if (mainWindow->GetKeyState('S')) {
+				reverseGasPedal = 1.0f;
+			}
+
+			if (mainWindow->GetKeyState ('K')) {
+ 				cluthPedal = 0.0f;
+			}
 		}
 
 #if 0
@@ -523,120 +532,152 @@ class BasicCarEntity: public DemoEntity
 		}
 	#endif
 #endif
+		if (steering) {
+			steering->SetParam(steeringVal);
+		}
 
-
-//forwardGasPedal *= 0.75f;	
-		steering->SetParam(steeringVal);
-		switch (m_drivingState)
-		{
-			case m_engineOff:
+		if (engine) {
+			switch (m_drivingState)
 			{
-				if (engineIgnitionKey) {
-					m_drivingState = m_engineIdle;
-					engine->SetIgnition (true);
-					handBrakes->SetParam(0.0f);
-					engine->SetGear (engine->GetNeutralGear());
-				} else {
-					engine->SetIgnition (false);
-					engine->SetGear(engine->GetFirstGear());
-					handBrakes->SetParam(1.0f);
+				case m_engineOff:
+				{
+					if (engineIgnitionKey) {
+						m_drivingState = m_engineIdle;
+						engine->SetIgnition (true);
+						if (handBrakes) {
+							handBrakes->SetParam(0.0f);
+						}
+						engine->SetGear (engine->GetNeutralGear());
+					} else {
+						engine->SetIgnition (false);
+						engine->SetGear(engine->GetFirstGear());
+						if (handBrakes) {
+							handBrakes->SetParam(1.0f);
+						}
+					}
+					break;
 				}
-				break;
-			}
 
-			case m_engineIdle:
-			{
-				brakes->SetParam(0.0f);
-				handBrakes->SetParam(handBrakePedal);
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineOff;
-				} else {
+				case m_engineIdle:
+				{
+					if (brakes) {
+						brakes->SetParam(0.0f);
+					}
+					if (handBrakes) {
+						handBrakes->SetParam(handBrakePedal);
+					}
+					if (!engineIgnitionKey) {
+						m_drivingState = m_engineOff;
+					} else {
+						if (forwardGasPedal) {
+							m_drivingState = m_preDriveForward;
+						} else if (reverseGasPedal) {
+							m_drivingState = m_preDriveReverse;
+						}
+					}
+					break;
+				}
+
+				case m_engineStop:
+				{
+					if (forwardGasPedal || reverseGasPedal) {
+						if (brakes) {
+							brakes->SetParam(1.0f);
+						}
+					} else {
+						m_drivingState = m_engineIdle;
+					}
+					break;
+				}
+
+				case m_preDriveForward:
+				{
+					if (engine->GetSpeed() < -5.0f) {
+						if (brakes) {
+							brakes->SetParam(0.5f);
+						}
+						engine->SetClutchParam(0.0f);
+						engine->SetGear(engine->GetNeutralGear());
+					} else {
+						m_drivingState = m_driveForward;
+						engine->SetGear(engine->GetFirstGear());
+					}
+					break;
+				}	
+
+				case m_driveForward:
+				{
+					engine->SetParam(forwardGasPedal);
+					engine->SetClutchParam(cluthPedal);
+					if (handBrakes) {
+						handBrakes->SetParam(handBrakePedal);
+					}
+					if (reverseGasPedal) {
+						if (brakes) {
+							brakes->SetParam(reverseGasPedal);
+						}
+						if (engine->GetSpeed() < 5.0f) {
+							engine->SetGear(engine->GetNeutralGear());
+							m_drivingState = m_engineStop;
+						}
+					} else {
+						if (brakes) {
+							brakes->SetParam(0.0f);
+						}
+					}
+
+					if (!engineIgnitionKey) {
+						m_drivingState = m_engineStop;
+					}
+
+					break;
+				}
+
+				case m_preDriveReverse:
+				{
+					if (engine->GetSpeed() > 5.0f) {
+						if (brakes) {
+							brakes->SetParam(0.5f);
+						}
+						engine->SetClutchParam(0.0f);
+						engine->SetGear(engine->GetNeutralGear());
+					} else {
+						m_drivingState = m_driveReverse;
+						engine->SetGear(engine->GetReverseGear());
+					}
+					break;
+				}
+
+				case m_driveReverse:
+				{
+					engine->SetParam(reverseGasPedal);
+					engine->SetClutchParam(cluthPedal);
+					if (handBrakes) {
+						handBrakes->SetParam(handBrakePedal);
+					}
 					if (forwardGasPedal) {
-						m_drivingState = m_preDriveForward;
-					} else if (reverseGasPedal) {
-						m_drivingState = m_preDriveReverse;
+						if (brakes) {
+							brakes->SetParam(forwardGasPedal);
+						}
+						if (engine->GetSpeed() > -5.0f) {
+							engine->SetGear(engine->GetNeutralGear());
+							m_drivingState = m_engineStop;
+						}
+					} else {
+						if (brakes) {
+							brakes->SetParam(0.0f);
+						}
 					}
-				}
-				break;
-			}
 
-			case m_engineStop:
-			{
-				if (forwardGasPedal || reverseGasPedal) {
-					brakes->SetParam(1.0f);
-				} else {
-					m_drivingState = m_engineIdle;
-				}
-				break;
-			}
-
-			case m_preDriveForward:
-			{
-				if (engine->GetSpeed() < -5.0f) {
-					brakes->SetParam(0.5f);
-					engine->SetClutchParam(0.0f);
-					engine->SetGear(engine->GetNeutralGear());
-				} else {
-					m_drivingState = m_driveForward;
-					engine->SetGear(engine->GetFirstGear());
-				}
-				break;
-			}	
-
-			case m_driveForward:
-			{
-				engine->SetParam(forwardGasPedal);
-				engine->SetClutchParam(cluthPedal);
-				handBrakes->SetParam(handBrakePedal);
-				if (reverseGasPedal) {
-					brakes->SetParam(reverseGasPedal);
-					if (engine->GetSpeed() < 5.0f) {
-						engine->SetGear(engine->GetNeutralGear());
+					if (!engineIgnitionKey) {
 						m_drivingState = m_engineStop;
 					}
-				} else {
-					brakes->SetParam(0.0f);
+					break;
 				}
-
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineStop;
-				}
-
-				break;
 			}
-
-			case m_preDriveReverse:
-			{
-				if (engine->GetSpeed() > 5.0f) {
-					brakes->SetParam(0.5f);
-					engine->SetClutchParam(0.0f);
-					engine->SetGear(engine->GetNeutralGear());
-				} else {
-					m_drivingState = m_driveReverse;
-					engine->SetGear(engine->GetReverseGear());
-				}
-				break;
-			}
-
-			case m_driveReverse:
-			{
-				engine->SetParam(reverseGasPedal);
-				engine->SetClutchParam(cluthPedal);
+		} else {
+			if (handBrakes) {
 				handBrakes->SetParam(handBrakePedal);
-				if (forwardGasPedal) {
-					brakes->SetParam(forwardGasPedal);
-					if (engine->GetSpeed() > -5.0f) {
-						engine->SetGear(engine->GetNeutralGear());
-						m_drivingState = m_engineStop;
-					}
-				} else {
-					brakes->SetParam(0.0f);
-				}
-
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineStop;
-				}
-				break;
 			}
 		}
 	}
@@ -1010,7 +1051,6 @@ class BasicCarControllerManager: public CustomVehicleControllerManager
 
 void BasicCar (DemoEntityManager* const scene)
 {
-
 	// load the sky box
 	scene->CreateSkyBox();
 

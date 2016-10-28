@@ -157,6 +157,7 @@ class CustomVehicleController: public CustomControllerBase
 		}
 
 		CUSTOM_JOINTS_API void ApplyDownForce ();
+		
 
 		dFloat m_aerodynamicsDownForce0;
 		dFloat m_aerodynamicsDownForce1;
@@ -175,6 +176,7 @@ class CustomVehicleController: public CustomControllerBase
 				m_offroad,
 				m_confort,
 				m_race,
+				m_roller,
 			};
 
 			Info ()
@@ -219,7 +221,7 @@ class CustomVehicleController: public CustomControllerBase
 			{
 				dFloat phy_y = tire->m_lateralSlip * tire->m_data.m_lateralStiffness;
 				dFloat phy_x = tire->m_longitudinalSlip * tire->m_data.m_longitudialStiffness;
-				dFloat gamma = dSqrt(phy_x * phy_x + phy_y * phy_y);
+				dFloat gamma = dMax (dSqrt(phy_x * phy_x + phy_y * phy_y), 0.1f);
 
 				dFloat fritionCoeficicent = dClamp (GetFrictionCoefficient (material, tire->GetBody(), otherBody), dFloat (0.0f), dFloat (1.0f));
 				tireLoad *= fritionCoeficicent;
@@ -240,11 +242,6 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API BodyPartTire();
 		CUSTOM_JOINTS_API ~BodyPartTire();
 
-		CUSTOM_JOINTS_API void Init (BodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const Info& info);
-
-		CUSTOM_JOINTS_API void SetSteerAngle (dFloat angleParam);
-		CUSTOM_JOINTS_API void SetBrakeTorque (dFloat torque);
-
 		CUSTOM_JOINTS_API dFloat GetRPM() const; 
 		CUSTOM_JOINTS_API dFloat GetLateralSlip () const;
 		CUSTOM_JOINTS_API dFloat GetLongitudinalSlip () const;
@@ -253,6 +250,11 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API void SetInfo(const Info& info) {};
 
 		protected:
+		void Init(BodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const Info& info);
+
+		void SetBrakeTorque(dFloat torque);
+		void SetSteerAngle(dFloat angleParam, dFloat timestep);
+
 		Info m_data;
 		dFloat m_lateralSlip;
 		dFloat m_longitudinalSlip;
@@ -674,13 +676,13 @@ class CustomVehicleController: public CustomControllerBase
 	void Init (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	
-
+	void ApplySuspensionForces (dFloat timestep) const;
 	void ApplyLateralStabilityForces(dFloat timestep);
 	dVector GetLastLateralForce(BodyPartTire* const tire) const;
 	void Cleanup();
 	
 	dMatrix m_localFrame;
-	dVector m_lastAngularMomentum;
+//	dVector m_lastAngularMomentum;
 	BodyPartChassis m_chassis;
 	dList<BodyPartTire> m_tireList;
 	dList<BodyPart*> m_bodyPartsList;
@@ -698,8 +700,8 @@ class CustomVehicleController: public CustomControllerBase
 	dFloat m_weightDistribution;
 	int m_tiresInContacts;
 	bool m_finalized;
-	bool m_isAirborned;
-	bool m_hasNewContact;
+//	bool m_isAirborned;
+//	bool m_hasNewContact;
 
 	friend class CustomVehicleControllerManager;
 };

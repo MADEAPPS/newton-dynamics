@@ -260,6 +260,14 @@ bool dCholeskyFactorizationAddRow(int size, int n, T* const matrix)
 	return true;
 }
 
+template<class T>
+void dCholeskyFactorization(int size, T* const matrix)
+{
+	for (int i = 0; i < size; i++) {
+		dCholeskyFactorizationAddRow(size, i, matrix);
+	}
+}
+
 
 template<class T>
 void dCholeskyRestore(int size, T* const matrix, const T* const diagonal, int n, int subSize)
