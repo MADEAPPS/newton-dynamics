@@ -684,7 +684,6 @@ class CustomVehicleController: public CustomControllerBase
 	void Cleanup();
 	
 	dMatrix m_localFrame;
-//	dVector m_lastAngularMomentum;
 	BodyPartChassis m_chassis;
 	dList<BodyPartTire> m_tireList;
 	dList<BodyPart*> m_bodyPartsList;

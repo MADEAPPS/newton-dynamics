@@ -1871,17 +1871,13 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 {
 	m_body = body;
 	m_finalized = false;
-//	m_isAirborned = false;
-//	m_hasNewContact = false;
 	m_speed = 0.0f;
 	m_sideSlipRate = 0.0f;
 	m_sideSlipAngle = 0.0f;
-//	m_tiresInContacts = 0;
 	m_sideSlipAngle = 0.0f;
 	m_weightDistribution = 0.5f;
 	
 	m_localFrame = vehicleFrame;
-//	m_lastAngularMomentum = dVector(0.0f);
 	m_localFrame.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 	m_forceAndTorque = forceAndTorque;
 	
@@ -2647,48 +2643,13 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		if (!NewtonBodyGetSleepState(m_body)) {
-/*
-			m_hasNewContact = false;
-			m_tiresInContacts = 0;
-			if (m_isAirborned) {
-				dMatrix invInertia;
-				NewtonBodyGetInvInertiaMatrix(m_body, &invInertia[0][0]);
-				dVector omega(invInertia.RotateVector(m_lastAngularMomentum));
-				if (omega.DotProduct3(omega) > 5.0f) {
-					NewtonBodySetOmega(m_body, &omega[0]);
-					// attenuate the angular momentum by applying a pseudo angular deficiently of drag
-					m_lastAngularMomentum = m_lastAngularMomentum.Scale(0.999f);
-				}
-			}
-*/
-
-			bool hasContacts = false;
 			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 			for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
 				BodyPartTire& tire = tireNode->GetInfo();
 				//WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
 				//tireJoint->RemoveKinematicError(timestep);
 				int collided = manager->Collide(&tire, threadIndex);
-				//m_tiresInContacts += collided;
-				hasContacts |= collided ? true : false;
 			}
-
-			if (!hasContacts) {
-				for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(m_body); joint; joint = NewtonBodyGetNextContactJoint(m_body, joint)) {
-					hasContacts |= NewtonJointIsActive(joint) ? true : false;
-				}
-			}
-
-/*
-			m_isAirborned = !hasContacts;
-			if (hasContacts) {
-				dMatrix inertia;
-				dVector omega;
-				NewtonBodyGetOmega(m_body, &omega[0]);
-				NewtonBodyGetInertiaMatrix(m_body, &inertia[0][0]);
-				m_lastAngularMomentum = inertia.RotateVector(omega);
-			}
-*/
 		}
 
 //dTrace (("\n"));
