@@ -91,7 +91,7 @@ static BasciCarParameters basicCarParameters =
 		2.9f,	// REVERSE_GEAR
 	   0.30f,	// SUSPENSION_LENGTH
 	  700.0f,	// SUSPENSION_SPRING
-	   30.0f,	// SUSPENSION_DAMPER
+	   50.0f,	// SUSPENSION_DAMPER
 	  900.0f * DEMO_GRAVITY *  5.0f,		// LATERAL_STIFFNESS proportional to the vehicle weight
 	  900.0f * DEMO_GRAVITY *  2.0f,		// LONGITUDINAL_STIFFNESS proportional to the vehicle weight
 	   1.5f,	// ALIGNING_MOMENT_TRAIL
@@ -421,6 +421,12 @@ class BasicCarEntity: public DemoEntity
 		// set the vehicle weigh distribution 
 		m_controller->SetWeightDistribution (0.5f);
 
+		dFloat weightRatio0 = 1.0f;
+		dFloat weightRatio1 = 2.0f;
+		dFloat speedFactor = 80.0f / engineInfo.m_vehicleTopSpeed;
+		m_controller->SetAerodynamicsDownforceCoefficient(DEMO_GRAVITY, weightRatio0, speedFactor, weightRatio1);
+
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 
@@ -480,9 +486,11 @@ class BasicCarEntity: public DemoEntity
 			}
 		}
 
+		int gear = 0;
+		int automaticTransmission = 0;
 		if (engine) {
-			int gear = engine->GetGear();
-			int automaticTransmission = engine ? engine->GetTransmissionMode() : 0;
+			gear = engine->GetGear();
+			automaticTransmission = engine ? engine->GetTransmissionMode() : 0;
 			
 			engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
 			automaticTransmission = m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d);

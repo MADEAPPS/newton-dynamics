@@ -18,6 +18,7 @@
 
 //#define D_PLOT_ENGINE_CURVE
 
+
 #ifdef D_PLOT_ENGINE_CURVE 
 static FILE* file_xxx;
 #endif
@@ -2093,6 +2094,9 @@ void CustomVehicleController::Finalize()
 	m_finalized = true;
 	NewtonSkeletonContainerFinalize(m_skeleton);
 	SetWeightDistribution (m_weightDistribution);
+
+dVector xxxx (20.0f, 0.0f, 0.0f, 0.0f);
+NewtonBodySetVelocity(m_chassis.GetBody(), &xxxx[0]);
 }
 
 bool CustomVehicleController::ControlStateChanged() const
@@ -2451,21 +2455,10 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 					tire->m_longitudinalSlip = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
 					//tire->m_lateralSlip = tireOriginLateralSpeed / dAbs(tireContactLongitudinalSpeed);
 
-					NewtonBody* const chassisBody = tireJoint->GetBody1();
-					dMatrix chassisMatrix;
-					dVector chassisCom(0.0f);
-					dVector chassisVeloc(0.0f);
-					dVector chassisOmega(0.0f);
 
-					NewtonBodyGetCentreOfMass(chassisBody, &chassisCom[0]);
-					NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
-					chassisMatrix.m_posit = chassisMatrix.TransformVector(chassisCom);
-					chassisMatrix = controller->GetLocalFrame() * chassisMatrix;
-					NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
-					NewtonBodyGetVelocity(chassisBody, &chassisVeloc[0]);
-
-					dFloat tireSizeSpeed = chassisMatrix.m_right.DotProduct3(chassisOmega.CrossProduct(tireMatrix.m_posit - chassisMatrix.m_posit));
-					tire->m_lateralSlip = controller->m_sideSlipAngle + tireSizeSpeed / controller->m_speed + tireJoint->m_steerAngle0;
+					dVector tireLocalPosit (controller->m_vehicleGlabalMatrix.UntransformVector(tireMatrix.m_posit));
+					dVector tireSizeVeloc (controller->m_localOmega.CrossProduct(tireLocalPosit));
+					tire->m_lateralSlip = dAtan2(controller->m_localVeloc.m_z + tireSizeVeloc.m_z, controller->m_localVeloc.m_x + tireSizeVeloc.m_x) - tireJoint->m_steerAngle0;
 
 					dFloat lateralForce;
 					dFloat aligningMoment;
@@ -2501,33 +2494,33 @@ dVector CustomVehicleController::GetLastLateralForce(BodyPartTire* const tire) c
 }
 
 
-void CustomVehicleController::CalculateSideState(dFloat timestep)
+void CustomVehicleController::CalculateLateralDynamicsState(dFloat timestep)
 {
-	dMatrix matrix0;
 	dVector com(0.0f);
-	dVector veloc(0.0f);
-	dVector omega(0.0f);
 	
 	NewtonBody* const chassisBody = m_chassis.GetBody();
 	NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
-	NewtonBodyGetMatrix(chassisBody, &matrix0[0][0]);
-	matrix0.m_posit = matrix0.TransformVector(com);
+	NewtonBodyGetMatrix(chassisBody, &m_vehicleGlabalMatrix[0][0]);
+	m_vehicleGlabalMatrix = GetLocalFrame() * m_vehicleGlabalMatrix;
+	m_vehicleGlabalMatrix.m_posit = m_vehicleGlabalMatrix.TransformVector(com);
+	
+	NewtonBodyGetOmega(chassisBody, &m_localOmega[0]);
+	NewtonBodyGetVelocity(chassisBody, &m_localVeloc[0]);
 
-	matrix0 = GetLocalFrame() * matrix0;
-	NewtonBodyGetVelocity(chassisBody, &veloc[0]);
-
-	veloc = matrix0.UnrotateVector(veloc);
-	veloc.m_y = 0.0f;
-	dFloat velocMag2 = veloc.DotProduct3(veloc);
+	m_localVeloc = m_vehicleGlabalMatrix.UnrotateVector(m_localVeloc);
+	m_localOmega = m_vehicleGlabalMatrix.UnrotateVector(m_localOmega);
+	m_localOmega.m_x = 0.0f;
+	m_localOmega.m_z = 0.0f;
+	m_localVeloc.m_y = 0.0f;
+	dFloat velocMag2 = m_localVeloc.DotProduct3(m_localVeloc);
 	if (velocMag2 < 0.25f) {
 		m_sideSlipRate = 0.0f;
 		m_sideSlipAngle = 0.0f;
 	} else {
 		m_speed = dSqrt (velocMag2);
-		dFloat sideSlipAngle = dAtan2(veloc.m_z, veloc.m_x);
+		dFloat sideSlipAngle = dAtan2(m_localVeloc.m_z, m_localVeloc.m_x);
 		m_sideSlipRate = (sideSlipAngle - m_sideSlipAngle) / timestep;
 		m_sideSlipAngle = sideSlipAngle;
-
 	}
 }
 
@@ -2698,6 +2691,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 */
 		}
 
+//dTrace (("\n"));
 
 #ifdef D_PLOT_ENGINE_CURVE 
 		dFloat engineOmega = m_engine->GetRPM();
@@ -2714,7 +2708,7 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		m_chassis.ApplyDownForce ();
-		CalculateSideState(timestep);
+		CalculateLateralDynamicsState(timestep);
 		ApplySuspensionForces (timestep);
 
 		if (m_brakesControl) {

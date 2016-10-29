@@ -678,7 +678,7 @@ class CustomVehicleController: public CustomControllerBase
 	void Init (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData);
 	
-	void CalculateSideState(dFloat timestep);
+	void CalculateLateralDynamicsState(dFloat timestep);
 	void ApplySuspensionForces (dFloat timestep) const;
 	dVector GetLastLateralForce(BodyPartTire* const tire) const;
 	void Cleanup();
@@ -699,6 +699,9 @@ class CustomVehicleController: public CustomControllerBase
 	BodyPartTire::FrictionModel* m_contactFilter;
 	NewtonApplyForceAndTorque m_forceAndTorque;
 
+	dMatrix m_vehicleGlabalMatrix;
+	dVector m_localOmega;
+	dVector m_localVeloc;
 	dFloat m_speed;
 	dFloat m_sideSlipRate;
 	dFloat m_sideSlipAngle;
