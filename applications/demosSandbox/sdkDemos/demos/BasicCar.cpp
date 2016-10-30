@@ -80,7 +80,7 @@ static BasciCarParameters basicCarParameters =
 	  1000.0f,			// CLUTCH_FRICTION_TORQUE
 	  15.0f,			// STEER_ANGLE
 	4000.0f,			// BRAKE_TORQUE
-	  -0.7f,			// COM_Y_OFFSET
+	  -0.2f,			// COM_Y_OFFSET
 	120.0f,				// TIRE_TOP_SPEED_KMH
 	 400.0f,			// IDLE_TORQUE
 	500.0f,				// IDLE_TORQUE_RPM

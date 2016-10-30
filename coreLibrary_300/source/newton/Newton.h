@@ -610,7 +610,6 @@ extern "C" {
 
 	NEWTON_API int NewtonCollisionGetMode(const NewtonCollision* const convexCollision);
 	NEWTON_API void NewtonCollisionSetMode (const NewtonCollision* const convexCollision, int mode);
-
 	
 
 //	NEWTON_API void NewtonCollisionSetMaxBreakImpactImpulse(const NewtonCollision* const convexHullCollision, dFloat maxImpactImpulse);

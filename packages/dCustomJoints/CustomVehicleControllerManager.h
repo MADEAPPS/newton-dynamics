@@ -689,7 +689,7 @@ class CustomVehicleController: public CustomControllerBase
 	dVector GetLastLateralForce(BodyPartTire* const tire) const;
 	void Cleanup();
 	
-	dMatrix m_localFrame;
+//	dMatrix m_localFrame;
 	BodyPartChassis m_chassis;
 	dList<BodyPartTire> m_tireList;
 	dList<BodyPart*> m_bodyPartsList;
@@ -705,11 +705,13 @@ class CustomVehicleController: public CustomControllerBase
 	BodyPartTire::FrictionModel* m_contactFilter;
 	NewtonApplyForceAndTorque m_forceAndTorque;
 
-	dMatrix m_vehicleGlabalMatrix;
+	dMatrix m_vehicleGlobalMatrix;
 	dVector m_localOmega;
 	dVector m_localVeloc;
 	dFloat m_sideSlipRate;
 	dFloat m_sideSlipAngle;
+//	dFloat m_speedAtSideSlip;
+//	dFloat m_omegaAtSideSlip;
 	dFloat m_gravityMag;
 	dFloat m_weightDistribution;
 
