@@ -37,6 +37,7 @@ static FILE* file_xxx;
 #define D_VEHICLE_ENGINE_IDLE_FRICTION_COEFFICIENT	dFloat(0.25f)
 
 #define D_VEHICLE_MAX_SIDESLIP_ANGLE				dFloat(35.0f * 3.1416f / 180.0f)
+#define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(15.0f * 3.1416f / 180.0f)
 
 
 
@@ -2191,6 +2192,7 @@ void CustomVehicleController::CalculateLateralDynamicState(dFloat timestep)
 		if (dAbs (m_sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) {
 //			dAssert (0);
 			xxx *=1;
+		} else if (dAbs (m_sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE) {
 			xxx *=1;
 		}
 
