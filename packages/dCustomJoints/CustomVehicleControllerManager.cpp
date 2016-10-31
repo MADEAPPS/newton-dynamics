@@ -41,7 +41,6 @@ static FILE* file_xxx;
 
 
 
-
 class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexCastPreFilter
 {
 	public:
@@ -535,6 +534,30 @@ CustomVehicleController::BodyPartTire::BodyPartTire()
 CustomVehicleController::BodyPartTire::~BodyPartTire()
 {
 }
+
+// Using brush tire model explained on this paper
+// https://ddl.stanford.edu/sites/default/files/2013_Thesis_Hindiyeh_Dynamics_and_Control_of_Drifting_in_Automobiles.pdf
+void CustomVehicleController::BodyPartTire::FrictionModel::GetForces(const BodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
+{
+	const CustomVehicleController* const controller = tire->GetController();
+	const dFloat gravityMag = controller->m_gravityMag;
+	dFloat phy_y = tire->m_lateralSlip * tire->m_data.m_lateralStiffness * gravityMag;
+	dFloat phy_x = tire->m_longitudinalSlip * tire->m_data.m_longitudialStiffness * gravityMag;
+	dFloat gamma = dMax(dSqrt(phy_x * phy_x + phy_y * phy_y), 0.1f);
+
+	dFloat fritionCoeficicent = dClamp(GetFrictionCoefficient(material, tire->GetBody(), otherBody), dFloat(0.0f), dFloat(1.0f));
+	tireLoad *= fritionCoeficicent;
+	dFloat phyMax = 3.0f * tireLoad + 1.0f;
+
+	dFloat F = (gamma <= phyMax) ? (gamma * (1.0f - gamma / phyMax + gamma * gamma / (3.0f * phyMax * phyMax))) : tireLoad;
+
+	dFloat fraction = F / gamma;
+	lateralForce = -phy_y * fraction;
+	longitudinalForce = -phy_x * fraction;
+
+	aligningTorque = 0.0f;
+}
+
 
 void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const Info& info)
 {
@@ -1385,6 +1408,9 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 {
 	m_body = body;
 	m_finalized = false;
+	m_speed = 0.0f;
+	m_speedRate = 0.0f;
+	m_totalMass = 0.0f;
 	m_sideSlipRate = 0.0f;
 	m_sideSlipAngle = 0.0f;
 //	m_speedAtSideSlip = 0.0f;
@@ -1584,18 +1610,30 @@ void CustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 
 		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 		NewtonBodyGetCentreOfMass(m_body, &origin[0]);
+		matrix.m_posit = matrix.TransformVector(origin);
 		NewtonBodyGetMass (m_body, &totalMass, &Ixx, &Iyy, &Izz);
 		totalMassOrigin = origin.Scale (totalMass);
 
 		matrix = matrix.Inverse();
+		if (m_engine) {
+			dMatrix engineMatrixMatrix;
+			dFloat mass;
+			NewtonBodyGetMass (m_engine->GetBody(), &mass, &Ixx, &Iyy, &Izz);
+			NewtonBodyGetMatrix(m_engine->GetBody(), &engineMatrixMatrix[0][0]);
+			totalMass += mass;
+			engineMatrixMatrix = engineMatrixMatrix * matrix;
+			totalMassOrigin += engineMatrixMatrix.m_posit.Scale (mass);
+		}
+
 		for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
 			dFloat mass;
 			BodyPartTire* const tire = &node->GetInfo();
 			NewtonBodyGetMatrix(tire->GetBody(), &tireMatrix[0][0]);
 			NewtonBodyGetMass (tire->GetBody(), &mass, &Ixx, &Iyy, &Izz);
+
+			totalMass += mass;
 			tireMatrix = tireMatrix * matrix;
 			totalMassOrigin += tireMatrix.m_posit.Scale (mass);
-			totalMass += mass;
 			xMin = dMin (xMin, tireMatrix.m_posit.m_x); 
 			xMax = dMax (xMax, tireMatrix.m_posit.m_x); 
 		}
@@ -1615,10 +1653,28 @@ void CustomVehicleController::Finalize()
 //NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 	m_finalized = true;
 	NewtonSkeletonContainerFinalize(m_skeleton);
-	SetWeightDistribution (m_weightDistribution);
 
-//dVector xxxx (20.0f, 0.0f, 0.0f, 0.0f);
-//NewtonBodySetVelocity(m_chassis.GetBody(), &xxxx[0]);
+	dFloat totalMass;
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+
+	NewtonBodyGetMass(m_body, &totalMass, &Ixx, &Iyy, &Izz);
+	if (m_engine) {
+		dFloat mass;
+		NewtonBodyGetMass(m_engine->GetBody(), &mass, &Ixx, &Iyy, &Izz);
+		totalMass += mass;
+	}
+
+	for (dList<BodyPartTire>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext()) {
+		dFloat mass;
+		BodyPartTire* const tire = &node->GetInfo();
+		NewtonBodyGetMass(tire->GetBody(), &mass, &Ixx, &Iyy, &Izz);
+		totalMass += mass;
+	}
+
+	m_totalMass = totalMass;
+	SetWeightDistribution (m_weightDistribution);
 }
 
 bool CustomVehicleController::ControlStateChanged() const
@@ -1991,8 +2047,12 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 
 					dFloat lateralAccel = 0.0f;
 					dFloat longitudinalAccel = 0.0f;
-					if (dAbs(controller->m_sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) {
+//dFloat lateralSpeed = lateralAccel * timestep;
+//tire->m_lateralSlip = dAtan2(lateralSpeed, controller->m_localVeloc.m_x + tireSizeVeloc.m_x) - tireJoint->m_steerAngle0;
+
 /*
+					if (dAbs(controller->m_sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) {
+
 						dFloat tanBeta = dTan (D_VEHICLE_MAX_SIDESLIP_ANGLE * dSign (controller->m_sideSlipAngle) + tireJoint->m_steerAngle0);
 						dFloat den = tanBeta * tireLocalPosit.m_z + tireLocalPosit.m_x;
 						dFloat w = (controller->m_localVeloc.m_x - tanBeta * controller->m_localVeloc.m_z) / den;
@@ -2001,9 +2061,9 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 						dFloat dvz = -w * tireLocalPosit.m_x - tireSizeVeloc.m_z;
 						lateralAccel = -dvz / timestep;
 						longitudinalAccel = -dvx / timestep;
-*/
 					}
 dTrace (("beta (%d %f) ", tire->m_index, tire->m_lateralSlip * 180.0f/ 3.141416f));
+*/
 
 					dFloat lateralForce;
 					dFloat aligningMoment;
@@ -2183,9 +2243,14 @@ void CustomVehicleController::CalculateLateralDynamicState(dFloat timestep)
 
 	dFloat velocMag2 = m_localVeloc.DotProduct3(m_localVeloc);
 	if (velocMag2 < 0.25f) {
+		m_speed = 0.0f;
+		m_speedRate = 0.0f;
 		m_sideSlipAngle = 0.0f;
 		m_sideSlipRate = 0.0f;
 	} else {
+		dFloat speed = dSqrt (velocMag2);
+		m_speedRate = (speed - m_speed) / timestep;
+		m_speed = speed;
 		dFloat sideSlipAngle = dAtan2(m_localVeloc.m_z, m_localVeloc.m_x);
 		m_sideSlipRate = (sideSlipAngle - m_sideSlipAngle) / timestep;
 		m_sideSlipAngle = sideSlipAngle;
@@ -2193,11 +2258,16 @@ void CustomVehicleController::CalculateLateralDynamicState(dFloat timestep)
 //			dAssert (0);
 			xxx *=1;
 		} else if (dAbs (m_sideSlipRate) > D_VEHICLE_MAX_SIDESLIP_RATE) {
-			xxx *=1;
-		}
 
+			dFloat beta0 = dSign (m_sideSlipRate) * D_VEHICLE_MAX_SIDESLIP_RATE;
+			dFloat fx = m_totalMass * (m_speedRate + speed * m_sideSlipRate * m_localOmega.m_y);
+			dFloat fz = m_totalMass * (m_speedRate * m_sideSlipAngle + speed * (beta0 - m_localOmega.m_y));
+
+			fz *= 1;
+		}
 	}
-	dTrace(("\n%d sideSlipRate (%f) sideSlip(%f) tires: ", xxx, m_sideSlipRate * 180.0f / 3.141416f, m_sideSlipAngle * 180.0f / 3.141416f));
+
+	dTrace(("\n%d omega(%f)  sideSlipRate (%f) sideSlip(%f) tires: ", xxx, m_localOmega.m_y * 180.0f / 3.141416f, m_sideSlipRate * 180.0f / 3.141416f, m_sideSlipAngle * 180.0f / 3.141416f));
 }
 
 

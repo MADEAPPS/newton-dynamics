@@ -100,8 +100,8 @@ static BasciCarParameters basicCarParameters =
 	  900.0f * 2.0f,	// LONGITUDINAL_STIFFNESS proportional to the vehicle mass
 
 	   1.5f,			// ALIGNING_MOMENT_TRAIL
-	   0.7f,			// DOWNFORCE_WEIGHT_FACTOR_0
-	   1.3f,			// DOWNFORCE_WEIGHT_FACTOR_1;
+	   0.5f,			// DOWNFORCE_WEIGHT_FACTOR_0
+	   1.0f,			// DOWNFORCE_WEIGHT_FACTOR_1;
 	   0.8f,			// DOWNFORCE_WEIGHT_FACTOR_SPEED
 
 	   BasciCarParameters::m_4WD,

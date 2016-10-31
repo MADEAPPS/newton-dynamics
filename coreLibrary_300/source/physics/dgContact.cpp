@@ -232,12 +232,14 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_forceBounds[jacobIndex].m_normalIndex = (contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_BILATERAL_FRICTION_CONSTRAINT : normalIndex;
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.5f);
 
-		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
+		
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
 		if (contact.m_flags & dgContactMaterial::m_override0Accel) {
+			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
 			params.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
 		} else {
+			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 			params.m_jointAccel[jacobIndex] = relVelocErr * impulseOrForceScale;
 		}
 		if (dgAbsf (relVelocErr) > MAX_DYNAMIC_FRICTION_SPEED) {
@@ -263,8 +265,10 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_penetrationStiffness[jacobIndex] = dgFloat32 (0.0f);
 
 		if (contact.m_flags & dgContactMaterial::m_override1Accel) {
+			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
 			params.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 		} else {
+			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 			params.m_jointAccel[jacobIndex] = relVelocErr * impulseOrForceScale;
 		}
 		if (dgAbsf (relVelocErr) > MAX_DYNAMIC_FRICTION_SPEED) {
@@ -297,37 +301,36 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 	}
 
 	for (dgInt32 k = 0; k < count; k ++) {
-//		if (!rowMatrix[k].m_accelIsMotor) 
-//		{
-		dgJacobianMatrixElement* const row = &rowMatrix[k];
+		if (rowMatrix[k].m_restitution >= dgFloat32 (0.0f)) {
+			dgJacobianMatrixElement* const row = &rowMatrix[k];
 
-		dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear.CompProduct4(bodyVeloc0) + row->m_Jt.m_jacobianM0.m_angular.CompProduct4(bodyOmega0) + row->m_Jt.m_jacobianM1.m_linear.CompProduct4(bodyVeloc1) + row->m_Jt.m_jacobianM1.m_angular.CompProduct4(bodyOmega1));
-		dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-		dgFloat32 aRel = row->m_deltaAccel;
+			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear.CompProduct4(bodyVeloc0) + row->m_Jt.m_jacobianM0.m_angular.CompProduct4(bodyOmega0) + row->m_Jt.m_jacobianM1.m_linear.CompProduct4(bodyVeloc1) + row->m_Jt.m_jacobianM1.m_angular.CompProduct4(bodyOmega1));
+			dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+			dgFloat32 aRel = row->m_deltaAccel;
 
-		if (row->m_normalForceIndex < 0) {
-			dgFloat32 restitution = (vRel <= dgFloat32 (0.0f)) ? (dgFloat32 (1.0f) + row->m_restitution) : dgFloat32 (1.0f);
+			if (row->m_normalForceIndex < 0) {
+				dgFloat32 restitution = (vRel <= dgFloat32 (0.0f)) ? (dgFloat32 (1.0f) + row->m_restitution) : dgFloat32 (1.0f);
 
-			dgFloat32 penetrationVeloc = dgFloat32 (0.0f);
-			if (row->m_penetration > DG_RESTING_CONTACT_PENETRATION * dgFloat32 (0.125f)) {
-				if (vRel > dgFloat32 (0.0f)) {
-					dgFloat32 penetrationCorrection = vRel * timestep;
-					dgAssert (penetrationCorrection >= dgFloat32 (0.0f));
-					row->m_penetration = dgMax (dgFloat32 (0.0f), row->m_penetration - penetrationCorrection);
-				} else {
-					dgFloat32 penetrationCorrection = -vRel * timestep * row->m_restitution * dgFloat32 (8.0f);
-					if (penetrationCorrection > row->m_penetration) {
-						row->m_penetration = dgFloat32 (0.001f);
+				dgFloat32 penetrationVeloc = dgFloat32 (0.0f);
+				if (row->m_penetration > DG_RESTING_CONTACT_PENETRATION * dgFloat32 (0.125f)) {
+					if (vRel > dgFloat32 (0.0f)) {
+						dgFloat32 penetrationCorrection = vRel * timestep;
+						dgAssert (penetrationCorrection >= dgFloat32 (0.0f));
+						row->m_penetration = dgMax (dgFloat32 (0.0f), row->m_penetration - penetrationCorrection);
+					} else {
+						dgFloat32 penetrationCorrection = -vRel * timestep * row->m_restitution * dgFloat32 (8.0f);
+						if (penetrationCorrection > row->m_penetration) {
+							row->m_penetration = dgFloat32 (0.001f);
+						}
 					}
+					penetrationVeloc = -(row->m_penetration * row->m_penetrationStiffness);
 				}
-				penetrationVeloc = -(row->m_penetration * row->m_penetrationStiffness);
-			}
 
-			vRel *= restitution;
-			vRel = dgMin (dgFloat32 (4.0f), vRel + penetrationVeloc);
+				vRel *= restitution;
+				vRel = dgMin (dgFloat32 (4.0f), vRel + penetrationVeloc);
+			}
+			row->m_coordenateAccel = (aRel - vRel * invTimestep);
 		}
-		row->m_coordenateAccel = (aRel - vRel * invTimestep);
-//		}
 	}
 }
 
