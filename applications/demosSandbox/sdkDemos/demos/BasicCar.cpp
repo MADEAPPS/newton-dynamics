@@ -524,7 +524,7 @@ class BasicCarEntity: public DemoEntity
 			}
 		}
 
-#if 1
+#if 0
 	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
