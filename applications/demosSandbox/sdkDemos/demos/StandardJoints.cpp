@@ -366,6 +366,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		dQuaternion q1(matrix1);
 		dQuaternion qt0 = m_target * q1;
 		dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f)	? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
+		qErr.Normalize();
 
 		dFloat errorAngle = 2.0f * acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
 		dVector errorAngVel(0, 0, 0);
@@ -404,7 +405,7 @@ class JoesRagdollJoint: public CustomBallAndSocket
 	}
 };
 
-
+/*
 void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments)
 {
     dFloat height = 1.0f;
@@ -442,6 +443,107 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 #ifdef _USE_HARD_JOINTS
     NewtonSkeletonContainerFinalize(skeleton);
 #endif
+}*/
+
+inline float randF (unsigned int time)
+{
+	time *= 1664525;
+	time ^= (time << 16);
+	time *= 16807;
+	return float(time) / float(0xFFFFFFFFu);
+}
+
+void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments,
+	const int numArms = 1,
+	const dFloat torsoHeight = 1.0f, 
+	const dFloat torsoWidth = 4.0f, 
+	const dFloat randomness = 0.0f, 
+	const dFloat armHeight = 1.0f, 
+	const dFloat armWidth = 0.5f,
+	const int pickMe = -1)
+{
+    dFloat height = torsoHeight;
+    dFloat width = torsoWidth;
+
+    dVector size (width, height, width);
+    NewtonBody* torso = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
+	dMatrix torsoMatrix; NewtonBodyGetMatrix (torso, (dFloat*) &torsoMatrix);
+
+#ifdef _USE_HARD_JOINTS
+    NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (scene->GetNewton(), torso, NULL);
+#endif
+
+	int bodyIndex = 0;
+	NewtonBody* pickBody = 0;
+    for (int j=0; j < numArms; j++)
+	{
+		dFloat angle = dFloat(j) / dFloat(numArms) * M_PI*2.0f;
+		dMatrix armRotation = dPitchMatrix(angle);
+		dMatrix armTransform = armRotation * torsoMatrix;
+		
+		NewtonBody* parent = torso;
+
+		int numBodies = numSegments;
+		if (randomness > 0.0f) numBodies += int (randF(j) * dFloat(numSegments) + 0.5f);
+		for (int i=0; i < numBodies; i++)
+		{
+			dFloat height = armHeight;
+			dFloat width = armWidth;
+
+			dVector size (width, height, width);
+			dVector pos (0.0f,  height * dFloat(i + (numArms>1 ? 2 : 1)), 0.0f, 0.0f);
+			NewtonBody* child = CreateBox (scene, pos, size);
+			
+			dMatrix bodyMatrix; NewtonBodyGetMatrix (child, (dFloat*) &bodyMatrix);
+			bodyMatrix = bodyMatrix * armTransform;
+			NewtonBodySetMatrix (child, (dFloat*) &bodyMatrix);
+
+			dMatrix matrix0 = dGetIdentityMatrix(); matrix0.m_posit = dVector (0.0f, height*-0.5f, 0.0f, 1.0f);
+			dMatrix matrix1 = dGetIdentityMatrix(); matrix1.m_posit = dVector (0.0f, height*0.5f, 0.0f, 1.0f);
+			if (parent == torso) 
+			{
+				matrix1.m_posit.m_y += height;
+				matrix1 = matrix1 * armRotation;
+			}
+			if (randomness > 0.0f)
+			{
+				dMatrix rotation =  dPitchMatrix(randF(bodyIndex*3+0) * M_PI * 0.25f * randomness);
+				rotation = rotation * dYawMatrix(randF(bodyIndex*3+1) * M_PI * 0.25f * randomness);
+				rotation = rotation * dYawMatrix(randF(bodyIndex*3+2) * M_PI * 0.25f * randomness);
+				matrix0 = matrix0 * rotation;
+			}
+			JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
+
+			if (animSpeed != 0.0f) {
+				joint->m_anim_speed = animSpeed, joint->m_anim_offset = dFloat(i) / dFloat(numBodies); // animated      
+			}
+
+	#ifdef _USE_HARD_JOINTS
+			NewtonSkeletonContainerAttachBone (skeleton, child, parent);
+	#endif
+			parent = child;
+			if (bodyIndex == pickMe) {
+				pickBody = child;
+			}
+			bodyIndex++;
+		}
+	}
+
+#ifdef _USE_HARD_JOINTS
+    NewtonSkeletonContainerFinalize(skeleton);
+#endif
+
+	if (pickBody)
+	{
+		dMatrix matrix;
+		NewtonBodyGetMatrix(pickBody, &matrix[0][0]);
+		
+		CustomBallAndSocket* const joint = new CustomBallAndSocket(matrix, pickBody);
+		
+#ifdef _USE_HARD_JOINTS
+		NewtonSkeletonContainerAttachCyclingJoint (skeleton, joint->GetJoint());
+#endif
+	}
 }
 
 
@@ -984,10 +1086,16 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, -25.0f), 0.0f, 20);
-	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, 5.0f), 1.5f, 4);
-	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, 15.0f), 0.0f, 4);
+//	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, -25.0f), 0.0f, 20);
+//	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, 5.0f), 1.5f, 4);
+//	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, 15.0f), 0.0f, 4);
 
+	AddJoesPoweredRagDoll(scene, dVector( 5.0f, 20.0f, 0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 20.0f, 0.0f), 0.0f, 7, 2, 0.4f, 0.4f, 1.3f);
+//	AddJoesPoweredRagDoll(scene, dVector(80.0f, 20.0f, 0.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
+//	AddJoesPoweredRagDoll(scene, dVector( 5.0f, 20.0f, 0.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
+
+/*
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -1003,13 +1111,12 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
-
+*/
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
     dVector origin (-50.0f, 5.0f, 0.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
-
 
 
