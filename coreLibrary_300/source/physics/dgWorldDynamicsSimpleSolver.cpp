@@ -326,10 +326,10 @@ void dgWorldDynamicUpdate::CalculateIslandContacts (dgIsland* const island, dgFl
 void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfoArray, const dgJointInfo* const jointInfo, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const 
 {
 	if (jointInfo->m_joint->m_solverActive) {
-		dgInt32 index = jointInfo->m_pairStart;
-		dgInt32 count = jointInfo->m_pairCount;
-		dgInt32 m0 = jointInfo->m_m0;
-		dgInt32 m1 = jointInfo->m_m1;
+		const dgInt32 index = jointInfo->m_pairStart;
+		const dgInt32 count = jointInfo->m_pairCount;
+		const dgInt32 m0 = jointInfo->m_m0;
+		const dgInt32 m1 = jointInfo->m_m1;
 
 	//	dgAssert(m0 >= 0);
 	//	dgAssert(m0 < bodyCount);
@@ -358,8 +358,14 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 			alpha1 = ((dgDynamicBody*)body1)->m_alpha;
 		}
 
+		const dgInt32 vectorStride = dgInt32(sizeof(dgVector) / sizeof(dgFloat32));
+		dgWorld* const world = body0->GetWorld();
+		//const dgInt32 blockStride = ((count - 1) / sizeof(dgVector) + 1) * 4;
+		const dgInt32 blockStride = (count + vectorStride - 1) & (-vectorStride);
+		dgFloat32 * const blokMatrix = (dgFloat32*) &world->m_solverBlockJacobianMemory[jointInfo->m_blockMatrixStart];
 		for (dgInt32 i = 0; i < count; i++) {
-			dgJacobianMatrixElement* const row = &matrixRow[index];
+			dgFloat32 * const blokMatrixPtr = &blokMatrix[i * blockStride];
+			dgJacobianMatrixElement* const row = &matrixRow[index + i];
 			dgAssert(row->m_Jt.m_jacobianM0.m_linear.m_w == dgFloat32(0.0f));
 			dgAssert(row->m_Jt.m_jacobianM0.m_angular.m_w == dgFloat32(0.0f));
 			dgAssert(row->m_Jt.m_jacobianM1.m_linear.m_w == dgFloat32(0.0f));
@@ -390,11 +396,11 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 			dgFloat32 diag = (tmpDiag.AddHorizontal()).GetScalar();
 			dgAssert(diag > dgFloat32(0.0f));
 			row->m_diagDamp = diag * row->m_stiffness;
-
-			//row->m_JMinvJt = diag;
 			diag *= (dgFloat32(1.0f) + row->m_stiffness);
+
+			blokMatrixPtr[i] = diag;
 			row->m_invJMinvJt = dgFloat32(1.0f) / diag;
-			index++;
+			
 		}
 	}
 }

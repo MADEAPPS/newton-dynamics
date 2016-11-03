@@ -229,7 +229,7 @@ class dgJacobianMemory
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes);
 
 	dgJacobian* m_internalForcesBuffer;
-	dgVector* m_solverBlockJacobianMemory;
+//	dgVector* m_solverBlockJacobianMemory;
 	dgJacobianMatrixElement* m_jacobianBuffer;
 };
 

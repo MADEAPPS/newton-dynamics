@@ -786,11 +786,15 @@ void dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island,
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
 	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_jacobianBuffer[island->m_rowsStart];
+
 	dgInt32 jointCount = island->m_jointCount;
+	dgInt32 blockStart = island->m_blockMatrixStart;
 	for (dgInt32 j = 0; j < jointCount; j ++) {
 		dgJointInfo* const jointInfo = &constraintArray[j];
 		dgConstraint* const constraint = jointInfo->m_joint;
 
+		jointInfo->m_blockMatrixStart = blockStart;
+		blockStart += jointInfo->m_blockMatrixSize;
 		dgAssert(jointInfo->m_m0 < island->m_bodyCount);
 		dgAssert(jointInfo->m_m1 < island->m_bodyCount);
 		//dgAssert (constraint->m_index == dgUnsigned32(j));
@@ -943,11 +947,11 @@ void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bod
 	dgAssert(bodyCount <= (((world->m_solverForceAccumulatorMemory.GetBytesCapacity() - 16) / dgInt32(sizeof (dgJacobian))) & (-8)));
 
 	world->m_solverBlockJacobianMemory.ExpandCapacityIfNeessesary(blockMatrixSizeInBytes, 1);
-	m_solverBlockJacobianMemory = (dgVector*) &world->m_solverBlockJacobianMemory[0];
+//	m_solverBlockJacobianMemory = (dgVector*) &world->m_solverBlockJacobianMemory[0];
 	
 	dgAssert((dgUnsigned64(m_jacobianBuffer) & 0x01f) == 0);
 	dgAssert((dgUnsigned64(m_internalForcesBuffer) & 0x01f) == 0);
-	dgAssert((dgUnsigned64(m_solverBlockJacobianMemory) & 0x01f) == 0);
+	dgAssert((dgUnsigned64(&world->m_solverBlockJacobianMemory[0]) & 0x01f) == 0);
 }
 
 
