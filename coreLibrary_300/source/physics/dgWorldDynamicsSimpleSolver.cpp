@@ -400,7 +400,18 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 
 			blokMatrixPtr[i] = diag;
 			row->m_invJMinvJt = dgFloat32(1.0f) / diag;
-			
+
+			for (dgInt32 j = i + 1; j < count;  j++) {
+				dgJacobianMatrixElement* const row_j = &matrixRow[index + j];
+				dgVector tmpDiag(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM0.m_linear) + row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM0.m_angular) +
+								 row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM1.m_linear) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM1.m_angular));
+				dgFloat32 diag = (tmpDiag.AddHorizontal()).GetScalar();
+				blokMatrixPtr[j] = diag;
+				blokMatrix[j * blockStride + i] = diag;
+			}
+			for (dgInt32 j = count; j < blockStride; j++) {
+				blokMatrixPtr[j] = dgFloat32 (0.0f);
+			}
 		}
 	}
 }
