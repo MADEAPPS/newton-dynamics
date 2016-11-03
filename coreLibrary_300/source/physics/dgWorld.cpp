@@ -473,12 +473,10 @@ void dgWorld::DestroyAllBodies ()
 
 	Sync ();
 
-	dgTree<int, dgBody*>::Iterator iter (m_disableBodies);
-	for (iter.Begin(); iter; iter ++) {
-		dgBody* body = iter.GetKey();
-		DestroyBody (body);
+	while (m_disableBodies.GetRoot()) {
+		dgBody* const body = m_disableBodies.GetRoot()->GetKey();
+		BodyEnableSimulation(body);
 	}
-	dgAssert(!m_disableBodies.GetCount());
 
 	dgAssert (dgBodyMasterList::GetFirst()->GetInfo().GetBody() == m_sentinelBody);
 	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; ) {

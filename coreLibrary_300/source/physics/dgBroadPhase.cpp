@@ -699,12 +699,11 @@ void dgBroadPhase::CollisionChange (dgBody* const body, dgCollisionInstance* con
 
 void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 {
-	if (m_rootNode && !m_rootNode->IsLeafNode()) {
+	dgBroadPhaseBodyNode* const node = body->GetBroadPhase();
+	if (m_rootNode && !m_rootNode->IsLeafNode() && node->m_updateNode) {
+		dgAssert(!node->GetLeft());
+		dgAssert(!node->GetRight());
 		dgAssert (!body->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI));
-
-		dgBroadPhaseNode* const node = body->GetBroadPhase();
-		dgAssert (!node->GetLeft());
-		dgAssert (!node->GetRight());
 
 		const dgBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
 

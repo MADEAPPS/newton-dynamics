@@ -327,7 +327,7 @@ void dgBroadPhasePersistent::UnlinkAggregate (dgBroadPhaseAggregate* const aggre
 void dgBroadPhasePersistent::Remove(dgBody* const body)
 {
 	if (body->GetBroadPhase()) {
-		dgBroadPhaseBodyNode* const node = (dgBroadPhaseBodyNode*)body->GetBroadPhase();
+		dgBroadPhaseBodyNode* const node = body->GetBroadPhase();
 		if (node->m_updateNode) {
 			m_updateList.Remove(node->m_updateNode);
 		}
