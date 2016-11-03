@@ -106,7 +106,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		maxRowCount += island.m_rowsCount;
 		blockMatrixSize += island.m_blockMatrixSize;
 	}
-	m_solverMemory.Init (world, maxRowCount, m_bodies);
+	m_solverMemory.Init (world, maxRowCount, m_bodies, blockMatrixSize);
 
 	dgInt32 threadCount = world->GetThreadCount();	
 
@@ -933,7 +933,7 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 	}
 }
 
-void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount)
+void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes)
 {
 	world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(rowsCount, sizeof (dgJacobianMatrixElement));
 	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobiansMemory[0];
@@ -942,8 +942,12 @@ void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bod
 	m_internalForcesBuffer = (dgJacobian*)&world->m_solverForceAccumulatorMemory[0];
 	dgAssert(bodyCount <= (((world->m_solverForceAccumulatorMemory.GetBytesCapacity() - 16) / dgInt32(sizeof (dgJacobian))) & (-8)));
 
+	world->m_solverBlockJacobianMemory.ExpandCapacityIfNeessesary(blockMatrixSizeInBytes, 1);
+	m_solverBlockJacobianMemory = (dgVector*) &world->m_solverBlockJacobianMemory[0];
+	
 	dgAssert((dgUnsigned64(m_jacobianBuffer) & 0x01f) == 0);
 	dgAssert((dgUnsigned64(m_internalForcesBuffer) & 0x01f) == 0);
+	dgAssert((dgUnsigned64(m_solverBlockJacobianMemory) & 0x01f) == 0);
 }
 
 

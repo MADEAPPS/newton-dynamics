@@ -226,7 +226,7 @@ class dgJacobianMatrixElement
 class dgJacobianMemory
 {
 	public:
-	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount);
+	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes);
 
 	dgJacobian* m_internalForcesBuffer;
 	dgVector* m_solverBlockJacobianMemory;
