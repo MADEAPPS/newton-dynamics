@@ -543,7 +543,7 @@ void CustomVehicleController::BodyPartTire::FrictionModel::GetForces(const BodyP
 	const dFloat gravityMag = controller->m_gravityMag;
 	dFloat phy_y = tire->m_lateralSlip * tire->m_data.m_lateralStiffness * gravityMag;
 	dFloat phy_x = tire->m_longitudinalSlip * tire->m_data.m_longitudialStiffness * gravityMag;
-	dFloat gamma = dMax(dSqrt(phy_x * phy_x + phy_y * phy_y), 0.1f);
+	dFloat gamma = dMax(dSqrt(phy_x * phy_x + phy_y * phy_y), dFloat(0.1f));
 
 	dFloat fritionCoeficicent = dClamp(GetFrictionCoefficient(material, tire->GetBody(), otherBody), dFloat(0.0f), dFloat(1.0f));
 	tireLoad *= fritionCoeficicent;
@@ -1477,12 +1477,14 @@ const CustomVehicleController::BodyPart* CustomVehicleController::GetChassis() c
 	return &m_chassis;
 }
 
+/*
 const dMatrix& CustomVehicleController::GetLocalFrame() const
 {
 	dAssert (0);
 //	return m_localFrame;
 	return dGetIdentityMatrix();
 }
+*/
 
 dMatrix CustomVehicleController::GetTransform() const
 {
