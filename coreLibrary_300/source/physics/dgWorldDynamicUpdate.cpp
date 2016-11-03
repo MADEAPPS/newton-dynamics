@@ -633,7 +633,6 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 		for (dgInt32 i = 1; i < bodyCount; i ++) {
 			dgBody* const body = bodyArray[i].m_body;
 			body->m_active = true;
-			//body->m_resting = body->m_equilibrium;
 			body->m_resting = false;
 		}
 
@@ -641,7 +640,6 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 		dgAssert (island->m_bodyCount == 2);
 		dgBody* const body = bodyArray[1].m_body;
 		body->m_active = true;
-		//body->m_resting = body->m_equilibrium;
 		body->m_resting = false;
 	}
 }
@@ -848,6 +846,10 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 				body->m_veloc = (dgVector (veloc.DotProduct4(veloc)) > m_velocTol) & veloc;
 				body->m_omega = (dgVector (omega.DotProduct4(omega)) > m_velocTol) & omega;
 			}
+
+//dgTrace (("%d: %d v(%f %f %f) w(%f %f %f) a(%f %f %f) b(%f %f %f)\n", body->m_uniqueID, int(equilibrium), 
+//																  	  body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z, body->m_omega.m_x, body->m_omega.m_y, body->m_omega.m_z,
+//																	  body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_alpha.m_x, body->m_alpha.m_y, body->m_alpha.m_z));
 
 			body->m_equilibrium = dgUnsigned32 (equilibrium);
 			stackSleeping &= equilibrium;

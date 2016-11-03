@@ -285,8 +285,8 @@ class dgWorldDynamicUpdate
 	void CalculateIslandContacts (dgIsland* const island, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const;
 	void GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, dgInt32 rowCount, dgFloat32 timestep) const;	
 	dgInt32 GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgInt32 rowCount) const;
-
-	dgFloat32 ControllerChek(dgFloat32* const forces, const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow) const;
+	
+	void ControllerCheck(dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgJointInfo* const jointInfo, const dgJacobian* const internalForces, const dgJacobianMatrixElement* const matrixRow) const;
 	
 	dgInt32 m_bodies;
 	dgInt32 m_joints;

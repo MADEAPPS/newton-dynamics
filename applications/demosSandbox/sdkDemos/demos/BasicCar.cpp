@@ -725,7 +725,7 @@ class BasicCarEntity: public DemoEntity
 		NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 		matrix.m_posit = matrix.TransformVector(com);
-		matrix = m_controller->GetLocalFrame() * matrix;
+//		matrix = m_controller->GetLocalFrame() * matrix;
 
 		dFloat scale = -4.0f / (mass * DEMO_GRAVITY);
 		dVector p0(matrix.m_posit);
