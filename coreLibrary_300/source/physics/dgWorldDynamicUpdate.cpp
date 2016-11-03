@@ -98,9 +98,13 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	BuildIslands(timestep);
 
 	dgInt32 maxRowCount = 0;
+	dgInt32 blockMatrixSize = 0;
 	for (dgInt32 i = 0; i < m_islands; i ++) {
-		m_islandMemory[i].m_rowsStart = maxRowCount;
-		maxRowCount += m_islandMemory[i].m_rowsCount;
+		dgIsland& island = m_islandMemory[i];
+		island.m_rowsStart = maxRowCount;
+		island.m_blockMatrixStart = blockMatrixSize;
+		maxRowCount += island.m_rowsCount;
+		blockMatrixSize += island.m_blockMatrixSize;
 	}
 	m_solverMemory.Init (world, maxRowCount, m_bodies);
 
@@ -403,6 +407,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 				dgConstraint* const constraint = constraintArray[m_joints + i].m_joint;
 				constraint->m_dynamicsLru = m_markLru;
 				dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
+				constraintArray[m_joints + i].m_blockMatrixSize = constraint->m_maxDOF * rows;
 				constraintArray[m_joints + i].m_pairCount = dgInt16 (rows);
 			}
 		} else {
@@ -482,6 +487,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 						dgJointInfo* const constraintArray = (dgJointInfo*) &world->m_jointsMemory[0];
 						constraintArray[jointIndex].m_joint = constraint;
 						dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
+						constraintArray[jointIndex].m_blockMatrixSize = constraint->m_maxDOF * rows;
  						constraintArray[jointIndex].m_pairCount = dgInt16 (rows);
 						jointCount ++;
 
@@ -507,22 +513,27 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 	}
 
 	if (bodyCount > 1) {
-		m_islandMemory[m_islands].m_bodyStart = m_bodies;
-		m_islandMemory[m_islands].m_jointStart = m_joints;
-		m_islandMemory[m_islands].m_bodyCount = bodyCount;
-		m_islandMemory[m_islands].m_jointCount = jointCount;
+		dgIsland& island = m_islandMemory[m_islands];
+		island.m_bodyStart = m_bodies;
+		island.m_jointStart = m_joints;
+		island.m_bodyCount = bodyCount;
+		island.m_jointCount = jointCount;
 		
-		m_islandMemory[m_islands].m_rowsStart = 0;
-		m_islandMemory[m_islands].m_isContinueCollision = false;
+		island.m_rowsStart = 0;
+		island.m_blockMatrixStart = 0;
+		island.m_isContinueCollision = false;
 
 		dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 		dgJointInfo* const constraintArray = &constraintArrayPtr[m_joints];
 
 		dgInt32 rowsCount = 0;
+		dgInt32 matrixSize = 0;
 		dgInt32 isContinueCollisionIsland = 0;
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgConstraint* const joint = constraintArray[i].m_joint;
+
 			rowsCount += constraintArray[i].m_pairCount;
+			matrixSize += constraintArray[i].m_blockMatrixSize;
 			if (joint->GetId() == dgConstraint::m_contactConstraint) {
 				const dgBody* const body0 = joint->m_body0;
 				const dgBody* const body1 = joint->m_body1;
@@ -575,8 +586,9 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 		if (isContinueCollisionIsland) {
 			rowsCount = dgMax(rowsCount, 64);
 		}
-		m_islandMemory[m_islands].m_rowsCount = rowsCount;
-		m_islandMemory[m_islands].m_isContinueCollision = isContinueCollisionIsland;
+		island.m_rowsCount = rowsCount;
+		island.m_blockMatrixSize = matrixSize;
+		island.m_isContinueCollision = isContinueCollisionIsland;
 
 		m_islands ++;
 		m_bodies += bodyCount;
@@ -773,7 +785,7 @@ void dgWorldDynamicUpdate::GetJacobianDerivatives (const dgIsland* const island,
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
-	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[island->m_rowsStart];
+	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_jacobianBuffer[island->m_rowsStart];
 	dgInt32 jointCount = island->m_jointCount;
 	for (dgInt32 j = 0; j < jointCount; j ++) {
 		dgJointInfo* const jointInfo = &constraintArray[j];
@@ -923,15 +935,15 @@ void dgWorldDynamicUpdate::IntegrateArray (const dgIsland* const island, dgFloat
 
 void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount)
 {
-	world->m_solverMatrixMemory.ExpandCapacityIfNeessesary(rowsCount, sizeof (dgJacobianMatrixElement));
-	m_memory = (dgJacobianMatrixElement*)&world->m_solverMatrixMemory[0];
+	world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(rowsCount, sizeof (dgJacobianMatrixElement));
+	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobiansMemory[0];
 
-	world->m_solverRightSideMemory.ExpandCapacityIfNeessesary(bodyCount + 8, sizeof (dgJacobian));
-	m_internalForces = (dgJacobian*)&world->m_solverRightSideMemory[0];
-	dgAssert(bodyCount <= (((world->m_solverRightSideMemory.GetBytesCapacity() - 16) / dgInt32(sizeof (dgJacobian))) & (-8)));
+	world->m_solverForceAccumulatorMemory.ExpandCapacityIfNeessesary(bodyCount + 8, sizeof (dgJacobian));
+	m_internalForcesBuffer = (dgJacobian*)&world->m_solverForceAccumulatorMemory[0];
+	dgAssert(bodyCount <= (((world->m_solverForceAccumulatorMemory.GetBytesCapacity() - 16) / dgInt32(sizeof (dgJacobian))) & (-8)));
 
-	dgAssert((dgUnsigned64(m_memory) & 0x01f) == 0);
-	dgAssert((dgUnsigned64(m_internalForces) & 0x01f) == 0);
+	dgAssert((dgUnsigned64(m_jacobianBuffer) & 0x01f) == 0);
+	dgAssert((dgUnsigned64(m_internalForcesBuffer) & 0x01f) == 0);
 }
 
 

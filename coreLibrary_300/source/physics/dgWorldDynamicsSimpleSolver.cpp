@@ -411,7 +411,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
-	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
+	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[island->m_bodyStart];
 
 	dgAssert (((dgDynamicBody*) bodyArray[0].m_body)->IsRTTIType (dgBody::m_dynamicBodyRTTI));
 	dgAssert ((((dgDynamicBody*)bodyArray[0].m_body)->m_accel.DotProduct3(((dgDynamicBody*)bodyArray[0].m_body)->m_accel)) == dgFloat32 (0.0f));
@@ -467,7 +467,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 
 		dgFloat32 forceOrImpulseScale = (timestep > dgFloat32 (0.0f)) ? dgFloat32 (1.0f) : dgFloat32 (0.0f);
 
-		dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[island->m_rowsStart];
+		dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_jacobianBuffer[island->m_rowsStart];
 		for (dgInt32 k = 0; k < jointCount; k ++) {
 			const dgJointInfo* const jointInfo = &constraintArray[k];
 
@@ -482,7 +482,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 
 void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
-	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
+	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[island->m_bodyStart];
 
 	dgInt32 bodyCount = island->m_bodyCount;
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
@@ -496,7 +496,7 @@ void dgWorldDynamicUpdate::ApplyExternalForcesAndAcceleration(const dgIsland* co
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
-	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[island->m_rowsStart];
+	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_jacobianBuffer[island->m_rowsStart];
 	for (dgInt32 i = 0; i < jointCount; i ++) {
 		dgInt32 first = constraintArray[i].m_pairStart;
 		dgInt32 count = constraintArray[i].m_pairCount;
@@ -939,13 +939,13 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode (const dgIsland* const island
 	const dgInt32 bodyCount = island->m_bodyCount;
 	const dgInt32 jointCount = island->m_jointCount;
 
-	dgJacobian* const internalForces = &m_solverMemory.m_internalForces[island->m_bodyStart];
+	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[island->m_bodyStart];
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
-	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_memory[island->m_rowsStart];
+	dgJacobianMatrixElement* const matrixRow = &m_solverMemory.m_jacobianBuffer[island->m_rowsStart];
 
 	for (dgInt32 i = 0; i < jointCount; i ++) {
 		dgJointInfo* const jointInfo = &constraintArray[i];

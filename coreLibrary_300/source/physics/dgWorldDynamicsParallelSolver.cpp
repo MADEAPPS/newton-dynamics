@@ -48,7 +48,7 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 
 	LinearizeJointParallelArray (&syncData, constraintArray, island);
 	
-	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
+	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
 	internalForces[0].m_linear = dgVector::m_zero;
 	internalForces[0].m_angular = dgVector::m_zero;
 
@@ -170,7 +170,7 @@ void dgWorldDynamicUpdate::InitilizeBodyArrayParallel (dgParallelSolverSyncData*
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 threadCounts = world->GetThreadCount();	
 
-	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
+	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
 	internalForces[0].m_linear = dgVector(dgFloat32(0.0f));
 	internalForces[0].m_angular = dgVector(dgFloat32(0.0f));
 
@@ -190,7 +190,7 @@ void dgWorldDynamicUpdate::InitializeBodyArrayParallelKernel (void* const contex
 	const dgIsland* const island = syncData->m_island;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
-	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
+	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
 
 	if (syncData->m_timestep != dgFloat32 (0.0f)) {
 		for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
@@ -259,7 +259,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrixParallelKernel (void* const contex
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
-	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
+	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 	dgAssert (syncData->m_jointCount);
 
 	dgContraintDescritor constraintParams;
@@ -305,8 +305,8 @@ void dgWorldDynamicUpdate::SolverInitInternalForcesParallelKernel (void* const c
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	const dgIsland* const island = syncData->m_island;
-	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
-	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
+	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
+	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex; 
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
@@ -347,7 +347,7 @@ void dgWorldDynamicUpdate::CalculateJointsAccelParallelKernel (void* const conte
 	const dgIsland* const island = syncData->m_island;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
-	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
+	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 
 	dgJointAccelerationDecriptor joindDesc;
 	joindDesc.m_timeStep = syncData->m_timestepRK;
@@ -398,7 +398,7 @@ void dgWorldDynamicUpdate::CalculateJointsVelocParallelKernel (void* const conte
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 
-	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
+	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
 
 	dgVector speedFreeze2 (world->m_freezeSpeed2 * dgFloat32 (0.1f));
 	dgVector freezeOmega2 (world->m_freezeOmega2 * dgFloat32 (0.1f));
@@ -466,7 +466,7 @@ void dgWorldDynamicUpdate::UpdateFeedbackForcesParallelKernel (void* const conte
 	const dgIsland* const island = syncData->m_island;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
-	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
+	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 
 	dgInt32 hasJointFeeback = 0;
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
@@ -658,12 +658,12 @@ void dgWorldDynamicUpdate::CalculateJointsForceParallelKernel (void* const conte
 	dgWorld* const world = (dgWorld*) worldContext;
 
 	const dgIsland* const island = syncData->m_island;
-	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_memory[0];
+	dgJacobianMatrixElement* const matrixRow = &world->m_solverMemory.m_jacobianBuffer[0];
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	const dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
-	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForces[0];
+	dgJacobian* const internalForces = &world->m_solverMemory.m_internalForcesBuffer[0];
 //	const int jointCount = syncData->m_bachIndex;
 	const int jointCount = syncData->m_jointCount;
 

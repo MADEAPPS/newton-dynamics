@@ -483,8 +483,10 @@ class dgWorld
 	dgTree<void*, unsigned> m_perInstanceData;
 	dgArray<dgUnsigned8> m_bodiesMemory; 
 	dgArray<dgUnsigned8> m_jointsMemory; 
-	dgArray<dgUnsigned8> m_solverMatrixMemory;  
-	dgArray<dgUnsigned8> m_solverRightSideMemory;
+	dgArray<dgUnsigned8> m_solverJacobiansMemory;  
+	dgArray<dgUnsigned8> m_solverBlockJacobianMemory;
+	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;
+	
 	
 	friend class dgBody;
 	friend class dgBroadPhase;

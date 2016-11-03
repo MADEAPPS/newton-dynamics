@@ -589,8 +589,8 @@ void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 time
 	dgAssert (m_myBody);
 
 	dgInt32 strideInBytes = sizeof (dgVector) * m_clustersCount + sizeof (dgMatrix) * m_clustersCount + sizeof (dgMatrix) * m_particles.m_count;
-	m_world->m_solverMatrixMemory.ExpandCapacityIfNeessesary (1, strideInBytes);
-	dgVector* const regionCom = (dgVector*)&m_world->m_solverMatrixMemory[0];
+	m_world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary (1, strideInBytes);
+	dgVector* const regionCom = (dgVector*)&m_world->m_solverJacobiansMemory[0];
 	dgMatrix* const sumQiPi = (dgMatrix*) &regionCom[m_clustersCount];
 	dgMatrix* const covarianceMatrix = (dgMatrix*) &sumQiPi[m_clustersCount];
 

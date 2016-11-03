@@ -81,8 +81,10 @@ class dgIsland
 	dgInt32 m_jointStart;	
 	dgInt32 m_jointCount;
 	dgInt32 m_rowsStart;
-	dgInt32 m_rowsCount					: 31;
-	dgUnsigned32 m_isContinueCollision	:  1;
+	dgInt32 m_rowsCount;
+	dgInt32 m_blockMatrixStart;
+	dgInt32 m_blockMatrixSize;
+	dgInt32 m_isContinueCollision;
 };
 
 
@@ -93,6 +95,8 @@ class dgJointInfo
 	dgInt32 m_m0;
 	dgInt32 m_m1;
 	dgInt32 m_pairStart;
+	dgInt32 m_blockMatrixSize;
+	dgInt32 m_blockMatrixStart;
 	dgInt16 m_pairCount;
 };
 
@@ -224,8 +228,9 @@ class dgJacobianMemory
 	public:
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount);
 
-	dgJacobian* m_internalForces;
-	dgJacobianMatrixElement* m_memory;
+	dgJacobian* m_internalForcesBuffer;
+	dgVector* m_solverBlockJacobianMemory;
+	dgJacobianMatrixElement* m_jacobianBuffer;
 };
 
 class dgWorldDynamicUpdate
