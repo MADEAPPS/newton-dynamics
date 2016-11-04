@@ -638,8 +638,7 @@ void dgWorldDynamicUpdate::ControllerCheck(dgFloat32* const x, const dgFloat32* 
 	dgVector angularM1 (dgVector::m_zero);
 
 	const dgInt32 index = jointInfo->m_pairStart;
-	//const dgInt32 rowsCount = jointInfo->m_pairCount;
-const dgInt32 rowsCount = 4;
+	const dgInt32 rowsCount = jointInfo->m_pairCount;
 
 	dgVector l[DG_CONSTRAINT_MAX_ROWS];
 	dgVector h[DG_CONSTRAINT_MAX_ROWS];
