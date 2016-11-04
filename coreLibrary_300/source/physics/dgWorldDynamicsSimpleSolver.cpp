@@ -987,14 +987,14 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(dgJointInfo* const jointInfo
 					accNorm = accNorm.GetMax(dgVector(b[i]).Abs());
 				}
 
-				if (accNorm.GetScalar() > dgFloat32(1.0e-01f)) {
+				if (accNorm.GetScalar() > dgFloat32(5.0e-2f)) {
 					const dgInt32 mask = blockStride - rowsCount;
 					const dgInt32 lastVectorElement = simdBlockStride - 1;
 					x[lastVectorElement] = x[lastVectorElement] & m_vectorMarks[mask];
 
 					dgVector maxAccel(dgFloat32(1.0e10f));
 					dgFloat32 prevError = dgFloat32(1.0e20f);
-					for (dgInt32 k = 0; (k < 4) && (maxAccel.GetScalar() > m_solverConvergeQuality) && (prevError - maxAccel.GetScalar()) > dgFloat32(1.0e-01f); k++) {
+					for (dgInt32 k = 0; (k < 4) && (maxAccel.GetScalar() > m_solverConvergeQuality) && (prevError - maxAccel.GetScalar()) > dgFloat32(5.0e-2f); k++) {
 						prevError = maxAccel.GetScalar();
 						maxAccel = dgVector::m_zero;
 						for (dgInt32 i = 0; i < rowsCount; i++) {
@@ -1025,6 +1025,8 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(dgJointInfo* const jointInfo
 					internalForces[m0].m_angular = angularM0;
 					internalForces[m1].m_linear = linearM1;
 					internalForces[m1].m_angular = angularM1;
+				} else {
+					dgAssert(0);
 				}
 #endif
 			}
