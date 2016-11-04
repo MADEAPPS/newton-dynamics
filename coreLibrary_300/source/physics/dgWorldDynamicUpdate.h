@@ -229,7 +229,7 @@ class dgJacobianMemory
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes);
 
 	dgJacobian* m_internalForcesBuffer;
-//	dgVector* m_solverBlockJacobianMemory;
+	dgFloat32* m_solverBlockJacobianMemory;
 	dgJacobianMatrixElement* m_jacobianBuffer;
 };
 
@@ -303,6 +303,7 @@ class dgWorldDynamicUpdate
 	dgFloat32 m_solverConvergeQuality;
 	static dgVector m_velocTol;
 	static dgVector m_eulerTaylorCorrection;
+	static dgMatrix m_vectorMarks;
 
 	friend class dgWorld;
 	friend class dgAmpInstance;
