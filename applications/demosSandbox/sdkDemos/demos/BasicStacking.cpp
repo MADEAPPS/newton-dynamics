@@ -195,7 +195,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 		}
 	}
 
-	high = 2;
+	high = 20;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
 			SphereStack(scene, 5.0f, dVector(5.0f + j * 8, 0.0f, -10.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0), high);
