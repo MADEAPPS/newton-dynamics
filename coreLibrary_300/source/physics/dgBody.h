@@ -239,6 +239,7 @@ class dgBody
 	dgVector m_globalCentreOfMass;	
 	dgVector m_aparentMass;
 	
+	dgVector m_massSqrt;
 	dgFloat32 m_maxAngulaRotationPerSet2;
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	union 

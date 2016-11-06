@@ -345,7 +345,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_showStatistics = true;
 //*/
 
-  m_showCenterOfMass = true;
+//m_showCenterOfMass = true;
 //m_physicsUpdateMode = 1;
 //m_hideVisualMeshes = true;
 //m_showContactPoints = true;
@@ -353,7 +353,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //SetDebugDisplayMode (m_debugDisplayMode);
 //m_showNormalForces = true;
 
-m_autoSleepState = false;
+//m_autoSleepState = false;
 //m_microthreadIndex = 1;
 //m_useParallelSolver = true;
 

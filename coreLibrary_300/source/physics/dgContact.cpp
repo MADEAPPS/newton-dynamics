@@ -50,6 +50,7 @@ dgContactMaterial::dgContactMaterial()
 	m_point = dgVector (dgFloat32 (0.0f));
 	m_softness = dgFloat32 (0.1f);
 	m_restitution = dgFloat32 (0.4f);
+//m_restitution = dgFloat32 (0.0f);
 
 	m_staticFriction0 = dgFloat32 (0.9f);
 	m_staticFriction1 = dgFloat32 (0.9f);
@@ -223,6 +224,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 
+return;
 	// first dir friction force
 	if (contact.m_flags & dgContactMaterial::m_friction0Enable) {
 		dgInt32 jacobIndex = frictionIndex;
@@ -291,7 +293,7 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 	const dgVector& bodyVeloc1 = m_body1->m_veloc;
 	const dgVector& bodyOmega1 = m_body1->m_omega;
 
-	dgInt32 count = params->m_rowsCount;
+	const dgInt32 count = params->m_rowsCount;
 
 	dgFloat32 timestep = dgFloat32 (1.0f);
 	dgFloat32 invTimestep = dgFloat32 (1.0f);
@@ -305,7 +307,7 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 			dgJacobianMatrixElement* const row = &rowMatrix[k];
 
 			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear.CompProduct4(bodyVeloc0) + row->m_Jt.m_jacobianM0.m_angular.CompProduct4(bodyOmega0) + row->m_Jt.m_jacobianM1.m_linear.CompProduct4(bodyVeloc1) + row->m_Jt.m_jacobianM1.m_angular.CompProduct4(bodyOmega1));
-			dgFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+			dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
 			dgFloat32 aRel = row->m_deltaAccel;
 
 			if (row->m_normalForceIndex < 0) {

@@ -486,6 +486,7 @@ class dgWorld
 	dgArray<dgUnsigned8> m_solverJacobiansMemory;  
 	dgArray<dgUnsigned8> m_solverBlockJacobianMemory;
 	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;
+	dgArray<dgUnsigned8> m_islandMemory;
 	
 	
 	friend class dgBody;

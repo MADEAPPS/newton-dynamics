@@ -837,7 +837,8 @@ void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy,
 
 		if ((entropy > oldEntropy * dgFloat32(2.0f)) || (entropy < oldEntropy * dgFloat32(0.5f))) {
 			if (fitness.GetFirst()) {
-				dgBroadPhaseNode** const leafArray = dgAlloca (dgBroadPhaseNode*, fitness.GetCount() * 2 + 12);
+				m_world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(fitness.GetCount() * 2 + 12, sizeof (dgBroadPhaseNode*));
+				dgBroadPhaseNode** const leafArray = (dgBroadPhaseNode**)&m_world->m_solverJacobiansMemory[0];
 
 				dgInt32 leafNodesCount = 0;
 				for (dgFitnessList::dgListNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
@@ -1745,7 +1746,8 @@ void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
 	dgUnsigned32 lru = m_lru;
 
 	dgActiveContacts* const contactList = m_world;
-	dgContact** const deadContacs = dgAlloca (dgContact*, contactList->GetCount() + 256);
+	m_world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(contactList->GetCount() + 256, sizeof (dgContact*));
+	dgContact** const deadContacs = (dgContact**)&m_world->m_solverJacobiansMemory[0];
 
 	const dgInt32 garbageCollectingCicle = 8;
 

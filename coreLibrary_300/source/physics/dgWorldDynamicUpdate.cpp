@@ -94,7 +94,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_index = 0; 
 	sentinelBody->m_dynamicsLru = m_markLru;
 
-	m_islandMemory = dgAlloca (dgIsland, masterList.GetCount() + 256);
+	world->m_islandMemory.ExpandCapacityIfNeessesary (masterList.GetCount() + 256, sizeof (dgIsland));
+	m_islandMemory = (dgIsland*)&world->m_islandMemory[0];
 	BuildIslands(timestep);
 
 	dgInt32 maxRowCount = 0;
@@ -181,7 +182,8 @@ void dgWorldDynamicUpdate::BuildIslands(dgFloat32 timestep)
 	dgBodyMasterList& masterList = *world;
 
 	dgAssert (masterList.GetFirst()->GetInfo().GetBody() == world->m_sentinelBody);
-	dgDynamicBody** const stackPoolBuffer = dgAlloca (dgDynamicBody*, 2 * (masterList.m_constraintCount + 1024));
+	world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(2 * (masterList.m_constraintCount + 1024), sizeof (dgDynamicBody*));
+	dgDynamicBody** const stackPoolBuffer = (dgDynamicBody**)&world->m_solverJacobiansMemory[0];
 
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
 		const dgBodyMasterListRow& graphNode = node->GetInfo();
@@ -225,7 +227,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	dgBodyMasterList& masterList = *world;
 
 	dgQueue<dgDynamicBody*> queue (queueBuffer, masterList.m_constraintCount + 1024); 
-	
 	dgDynamicBody** const staticPool = &queue.m_pool[queue.m_mod];
 
 	body->m_dynamicsLru = lruMark;
@@ -360,7 +361,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	}
 
 	if (!jointCount) {
-		//dgAssert (bodyCount == 1);
 		if (bodyCount == 1) {
 			isInEquilibrium &= body->m_equilibrium;
 			isInEquilibrium &= body->m_autoSleep;
@@ -731,13 +731,14 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		dgAssert(constraint->m_body0);
 		dgAssert(constraint->m_body1);
 
-		constraint->m_body0->m_inCallback = true;
-		constraint->m_body1->m_inCallback = true;
+		dgBody* const body0 = constraint->m_body0;
+		dgBody* const body1 = constraint->m_body1;
 
+		body0->m_inCallback = true;
+		body1->m_inCallback = true;
 		dof = dgInt32(constraint->JacobianDerivative(constraintParamOut));
-
-		constraint->m_body0->m_inCallback = false;
-		constraint->m_body1->m_inCallback = false;
+		body0->m_inCallback = false;
+		body1->m_inCallback = false;
 
 		//dgAssert(jointInfo->m_m0 < island->m_bodyCount);
 		//dgAssert(jointInfo->m_m1 < island->m_bodyCount);
@@ -746,10 +747,17 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		jointInfo->m_pairStart = rowCount;
 		jointInfo->m_pairCount = dgInt16 (dof);
 
+		dgVector scale0(body0->m_massSqrt);
+		dgVector scale1(body1->m_massSqrt);
+
 		for (dgInt32 i = 0; i < dof; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[rowCount];
 			dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);
-			row->m_Jt = constraintParamOut.m_jacobian[i];
+			row->m_Jt.m_jacobianM0.m_linear = constraintParamOut.m_jacobian[i].m_jacobianM0.m_linear.CompProduct4(scale0);
+			row->m_Jt.m_jacobianM0.m_angular = constraintParamOut.m_jacobian[i].m_jacobianM0.m_angular.CompProduct4(scale0);
+			row->m_Jt.m_jacobianM1.m_linear = constraintParamOut.m_jacobian[i].m_jacobianM1.m_linear.CompProduct4(scale1);
+			row->m_Jt.m_jacobianM1.m_angular = constraintParamOut.m_jacobian[i].m_jacobianM1.m_angular.CompProduct4(scale1);
+
 			
 			row->m_diagDamp = dgFloat32 (0.0f);
 			row->m_stiffness = DG_PSD_DAMP_TOL * (dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) + dgFloat32 (1.0e-6f);
