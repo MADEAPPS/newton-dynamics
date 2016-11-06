@@ -245,7 +245,6 @@ class dgWorldDynamicUpdate
 	void BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat32 timestep, dgInt32 jountCount);
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
-
 	static dgInt32 CompareIslands (const dgIsland* const islandA, const dgIsland* const islandB, void* notUsed);
 	static void CalculateIslandReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 

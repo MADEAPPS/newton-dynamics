@@ -224,7 +224,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 
-return;
 	// first dir friction force
 	if (contact.m_flags & dgContactMaterial::m_friction0Enable) {
 		dgInt32 jacobIndex = frictionIndex;
