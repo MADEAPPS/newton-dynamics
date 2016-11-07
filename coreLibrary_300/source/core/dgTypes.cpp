@@ -571,8 +571,10 @@ dgFloatExceptions::dgFloatExceptions(dgUnsigned32 mask)
 	#endif
 
 	#ifdef _MACOSX_VER
-		fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
-	#else 
+		#ifndef IOS
+			fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
+		#endif
+	#else
 		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	#endif
 

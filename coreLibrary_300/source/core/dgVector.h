@@ -600,7 +600,7 @@ class dgVector
 
 	DG_INLINE dgVector ShiftRightLogical (int bits) const
 	{
-		return dgVector (dgUnsigned32 (m_ix) >> bits, dgUnsigned32 (m_iy) >> bits, dgUnsigned32 (m_iz) >> bits, dgUnsigned32 (m_iw) >> bits); 
+		return dgVector ((dgInt32) (dgUnsigned32 (m_ix) >> bits), dgUnsigned32 (m_iy) >> bits, dgUnsigned32 (m_iz) >> bits, dgUnsigned32 (m_iw) >> bits);
 	}
 
 	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
@@ -653,6 +653,21 @@ class dgVector
 class dgSpatialVector
 {
 public:
+
+	DG_INLINE dgSpatialVector()
+	{
+		SetZero();
+	}
+
+	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
+	{
+		m_v[0] = low[0];
+		m_v[1] = low[1];
+		m_v[2] = low[2];
+		m_v[3] = high[0];
+		m_v[4] = high[1];
+		m_v[5] = high[2];
+	}
 
 	DG_INLINE dgFloat64& operator[] (dgInt32 i)
 	{
@@ -1621,10 +1636,8 @@ class dgSpatialMatrix
 
 	DG_INLINE void SetZero()
 	{
-		dgVector zero (dgVector::m_zero);
 		for (dgInt32 i = 0; i < 6; i++) {
-			m_rows[i].m_l = zero;
-			m_rows[i].m_h = zero;
+			m_rows[i].SetZero();
 		}
 	}
 
