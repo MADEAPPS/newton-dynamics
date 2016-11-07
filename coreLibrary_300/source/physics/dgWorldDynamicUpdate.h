@@ -250,7 +250,8 @@ class dgWorldDynamicUpdate
 
 	private:
 	void BuildIslands(dgFloat32 timestep);
-	void BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat32 timestep, dgInt32 jountCount);
+	//void BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat32 timestep, dgInt32 jountCount);
+	void SortIsland(dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
 	static dgInt32 CompareIslands (const dgIsland* const islandA, const dgIsland* const islandB, void* notUsed);
@@ -298,9 +299,9 @@ class dgWorldDynamicUpdate
 	void GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, dgInt32 rowCount, dgFloat32 timestep) const;	
 	dgInt32 GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgInt32 rowCount) const;
 	
-	dgFloat32 CalculateAcceleration (const dgJointInfo* const jointInfo, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-	void UpdateNextStep (dgInt32 passes, dgInt32 jointCount, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgJointInfo** const jointOrderOut, dgFloat32 maxAccNorm) const;
-	void UpdateFirstStep (dgInt32 passes, dgInt32 jointCount, dgJointInfo* const infoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgJointInfo** const jointOrderOut, dgFloat32 maxAccNorm, dgInt32 lru) const;
+	//dgFloat32 CalculateAcceleration (const dgJointInfo* const jointInfo, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
+	//void UpdateNextStep (dgInt32 passes, dgInt32 jointCount, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgJointInfo** const jointOrderOut, dgFloat32 maxAccNorm) const;
+	//void UpdateFirstStep (dgInt32 passes, dgInt32 jointCount, dgJointInfo* const infoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgJointInfo** const jointOrderOut, dgFloat32 maxAccNorm, dgInt32 lru) const;
 	
 
 	

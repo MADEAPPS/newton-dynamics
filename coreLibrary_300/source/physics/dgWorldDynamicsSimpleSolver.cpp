@@ -40,12 +40,14 @@ dgMatrix dgWorldDynamicUpdate::m_vectorMasks (dgVector (dgInt32 (0xffffffff), dg
 
 void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const
 {
+	SortIsland (island, timestep, threadID);
+
 	if (!(island->m_isContinueCollision && island->m_jointCount)) {
 		BuildJacobianMatrix (island, threadID, timestep);
 		CalculateReactionsForces (island, threadID, timestep, DG_SOLVER_MAX_ERROR);
 		IntegrateArray (island, DG_SOLVER_MAX_ERROR, timestep, threadID); 
 	} else {
-		// calculate reaction force sand new velocities
+		// calculate reaction forces and new velocities
 		BuildJacobianMatrix (island, threadID, timestep);
 		CalculateReactionsForces (island, threadID, timestep, DG_SOLVER_MAX_ERROR);
 
@@ -1149,7 +1151,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 				dgVector scale(dgFloat32 (1.125f));
 				dgFloat32 prevError = dgFloat32(1.0e20f);
 				for (dgInt32 k = 0; (k < 3) && (maxAccel.GetScalar() > m_solverConvergeQuality) && (dgAbsf(prevError - maxAccel.GetScalar()) > dgFloat32(5.0e-2f)); k++) {
-					//for (dgInt32 k = 0; (k < 1000) && (maxAccel.GetScalar() > dgFloat32(5.0e-4f)) && (dgAbsf(prevError - maxAccel.GetScalar()) > dgFloat32(5.0e-6f)); k++) {
+				//for (dgInt32 k = 0; (k < 1000) && (maxAccel.GetScalar() > dgFloat32(5.0e-4f)) && (dgAbsf(prevError - maxAccel.GetScalar()) > dgFloat32(5.0e-6f)); k++) {
 					prevError = maxAccel.GetScalar();
 					maxAccel = dgVector::m_zero;
 					for (dgInt32 i = 0; i < rowsCount; i++) {
@@ -1189,7 +1191,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 	return accNorm.GetScalar();
 }
 
-
+/*
 void dgWorldDynamicUpdate::UpdateNextStep(dgInt32 passes, dgInt32 jointCount, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgJointInfo** const jointOrderOut, dgFloat32 maxAccNorm) const
 {
 	dgFloat32 accNorm(maxAccNorm * dgFloat32(2.0f));
@@ -1308,6 +1310,7 @@ void dgWorldDynamicUpdate::UpdateFirstStep(dgInt32 passes, dgInt32 jointCount, d
 
 	UpdateNextStep(passes - 1, jointCount, bodyArray, internalForces, matrixRow, jointOrderOut, maxAccNorm);
 }
+*/
 
 void dgWorldDynamicUpdate::CalculateForcesGameMode(const dgIsland* const island, dgInt32 threadIndex, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
@@ -1387,10 +1390,9 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode(const dgIsland* const island,
 		skeletonMemorySizeInBytes += memorySizes[i];
 	}
 
-	bool firstStep = true;
+//	bool firstStep = true;
 	const dgInt32 passes = world->m_solverMode;
-
-	dgJointInfo** const jointOrder = dgAlloca(dgJointInfo*, jointCount);
+//	dgJointInfo** const jointOrder = dgAlloca(dgJointInfo*, jointCount);
 
 	for (dgInt32 step = 0; step < maxPasses; step++) {
 		if (joindDesc.m_firstPassCoefFlag == dgFloat32(0.0f)) {
@@ -1421,7 +1423,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode(const dgIsland* const island,
 				}
 			}
 		}
-#if 1
+#if 0
 		if (firstStep) {
 			firstStep = false;
 			UpdateFirstStep(passes, jointCount, constraintArray, bodyArray, internalForces, matrixRow, jointOrder, maxAccNorm, island->m_islandLRU);
