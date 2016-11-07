@@ -238,8 +238,7 @@ class dgBody
 	dgVector m_localCentreOfMass;	
 	dgVector m_globalCentreOfMass;	
 	dgVector m_aparentMass;
-	
-	dgVector m_massSqrt;
+
 	dgFloat32 m_maxAngulaRotationPerSet2;
 	dgThread::dgCriticalSection m_criticalSectionLock;
 	union 
@@ -529,7 +528,8 @@ DG_INLINE bool dgBody::GetAutoSleep () const
 
 DG_INLINE bool dgBody::GetSleepState () const
 {
-	return m_sleeping;
+	return m_resting;
+//	return m_sleeping;
 }
 
 DG_INLINE void dgBody::SetSleepState (bool state)

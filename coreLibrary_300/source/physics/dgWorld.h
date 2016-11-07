@@ -450,6 +450,7 @@ class dgWorld
 	dgUnsigned32 m_useParallelSolver;
 	dgUnsigned32 m_genericLRUMark;
 	dgInt32 m_delayDelateLock;
+	dgInt32 m_islandLRU;
 
 	dgFloat32 m_freezeAccel2;
 	dgFloat32 m_freezeAlpha2;

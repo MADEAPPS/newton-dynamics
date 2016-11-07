@@ -81,7 +81,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
-	dgBodyMasterList& masterList = *world;
+	
 
 	m_bodies = 0;
 	m_joints = 0;
@@ -94,6 +94,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_index = 0; 
 	sentinelBody->m_dynamicsLru = m_markLru;
 
+	dgBodyMasterList& masterList = *world;
 	world->m_islandMemory.ExpandCapacityIfNeessesary (masterList.GetCount() + 256, sizeof (dgIsland));
 	m_islandMemory = (dgIsland*)&world->m_islandMemory[0];
 	BuildIslands(timestep);
@@ -211,6 +212,214 @@ void dgWorldDynamicUpdate::BuildIslands(dgFloat32 timestep)
 	}
 }
 
+#if 1
+void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep)
+{
+	dgWorld* const world = (dgWorld*) this;
+
+	dgInt32 stack = 1;
+	dgInt32 bodyCount = 1;
+	dgInt32 jointCount = 0;
+	dgInt32 isInEquilibrium = 1;
+	const dgInt32 islandLRU = world->m_islandLRU;
+	const dgUnsigned32 lruMark = m_markLru - 1;
+
+	world->m_islandLRU ++;
+
+	queueBuffer[0] = body;
+	world->m_bodiesMemory.ExpandCapacityIfNeessesary(m_bodies, sizeof (dgBodyInfo));
+	dgBodyInfo* const bodyArray0 = (dgBodyInfo*)&world->m_bodiesMemory[0];
+
+	bodyArray0[m_bodies].m_body = world->m_sentinelBody;
+	dgAssert(world->m_sentinelBody->m_index == 0);
+	dgAssert(dgInt32(world->m_sentinelBody->m_dynamicsLru) == m_markLru);
+	const dgInt32 vectorStride = dgInt32 (sizeof (dgVector) / sizeof (dgFloat32));
+
+	while (stack) {
+		stack --;
+		dgDynamicBody* const srcBody = queueBuffer[stack];
+
+		if (srcBody->m_dynamicsLru < lruMark) {
+			dgAssert(srcBody->GetInvMass().m_w > dgFloat32(0.0f));
+			dgAssert(srcBody->m_masterNode);
+
+			dgInt32 bodyIndex = m_bodies + bodyCount;
+			world->m_bodiesMemory.ExpandCapacityIfNeessesary(bodyIndex, sizeof (dgBodyInfo));
+			dgBodyInfo* const bodyArray1 = (dgBodyInfo*)&world->m_bodiesMemory[0];
+			bodyArray1[bodyIndex].m_body = srcBody;
+			isInEquilibrium &= body->m_autoSleep;
+			isInEquilibrium &= body->m_equilibrium;
+			
+			srcBody->m_index = bodyCount;
+			srcBody->m_dynamicsLru = lruMark;
+
+			srcBody->m_active = false;
+			srcBody->m_resting = true;
+			srcBody->m_sleeping = false;
+
+			bodyCount++;
+			for (dgBodyMasterListRow::dgListNode* jointNode = srcBody->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+
+				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+				dgConstraint* const constraint = cell->m_joint;
+				dgAssert(constraint);
+				dgBody* const linkBody = cell->m_bodyNode;
+				dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
+				dgAssert((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
+				const dgContact* const contact = (constraint->GetId() == dgConstraint::m_contactConstraint) ? (dgContact*)constraint : NULL;
+
+				if (linkBody->IsCollidable() && (!contact || (contact->m_contactActive && contact->m_maxDOF) || (srcBody->m_continueCollisionMode | linkBody->m_continueCollisionMode))) {
+					if (constraint->m_dynamicsLru != lruMark) {
+						dgInt32 jointIndex = m_joints + jointCount;
+						world->m_jointsMemory.ExpandCapacityIfNeessesary(jointIndex, sizeof (dgJointInfo));
+
+						constraint->m_islandLRU = islandLRU;
+						constraint->m_dynamicsLru = lruMark;
+						dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
+						constraintArray[jointIndex].m_joint = constraint;
+						dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
+						constraintArray[jointIndex].m_blockMatrixSize = constraint->m_maxDOF * rows;
+						constraintArray[jointIndex].m_pairCount = dgInt16(rows);
+						jointCount++;
+
+						dgAssert(constraint->m_body0);
+						dgAssert(constraint->m_body1);
+					}
+
+					dgDynamicBody* const adjacentBody = (dgDynamicBody*)linkBody;
+/*
+					if (adjacentBody->GetSkeleton()) {
+						for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+							dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+							dgDynamicBody* const otherBody = (dgDynamicBody*)cell->m_bodyNode;
+							if ((otherBody->GetSkeleton() == body->GetSkeleton()) && (otherBody->m_dynamicsLru < lruMark)) {
+								queue.Insert(otherBody);
+								otherBody->m_dynamicsLru = lruMark;
+							}
+						}
+					}
+*/
+
+					if ((adjacentBody->m_dynamicsLru != lruMark) && (adjacentBody->GetInvMass().m_w > dgFloat32(0.0f))) {
+						queueBuffer[stack] = adjacentBody;
+						stack ++;
+					}
+				}
+			}
+		}
+	}
+
+	dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
+	if (isInEquilibrium) {
+		for (dgInt32 i = 0; i < bodyCount; i++) {
+			dgBody* const body = bodyArray[m_bodies + i].m_body;
+			body->m_dynamicsLru = m_markLru;
+			body->m_sleeping = true;
+		}
+	} else {
+		if (world->m_islandUpdate) {
+			dgIslandCallbackStruct record;
+			record.m_world = world;
+			record.m_count = bodyCount;
+			record.m_strideInByte = sizeof (dgBodyInfo);
+			record.m_bodyArray = &bodyArray[m_bodies].m_body;
+			if (!world->m_islandUpdate(world, &record, bodyCount)) {
+				for (dgInt32 i = 0; i < bodyCount; i++) {
+					dgBody* const body = bodyArray[m_bodies + i].m_body;
+					body->m_dynamicsLru = m_markLru;
+				}
+				return;
+			}
+		}
+
+		world->m_islandMemory.ExpandCapacityIfNeessesary (m_islands + 1, sizeof (dgIsland));
+		m_islandMemory = (dgIsland*) &world->m_islandMemory[0];
+		dgIsland& island = m_islandMemory[m_islands];
+
+		island.m_bodyStart = m_bodies;
+		island.m_jointStart = m_joints;
+		island.m_bodyCount = bodyCount;
+		island.m_jointCount = jointCount;
+		island.m_islandLRU = islandLRU;
+
+		island.m_rowsStart = 0;
+		island.m_blockMatrixStart = 0;
+		island.m_isContinueCollision = false;
+
+		dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
+		dgJointInfo* const constraintArray = &constraintArrayPtr[m_joints];
+
+		dgInt32 rowsCount = 0;
+		dgInt32 matrixSize = 0;
+		dgInt32 isContinueCollisionIsland = 0;
+		for (dgInt32 i = 0; i < jointCount; i++) {
+			dgConstraint* const joint = constraintArray[i].m_joint;
+
+			rowsCount += constraintArray[i].m_pairCount;
+			matrixSize += constraintArray[i].m_blockMatrixSize;
+			if (joint->GetId() == dgConstraint::m_contactConstraint) {
+				const dgBody* const body0 = joint->m_body0;
+				const dgBody* const body1 = joint->m_body1;
+				if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
+					dgInt32 ccdJoint = false;
+					const dgVector& veloc0 = body0->m_veloc;
+					const dgVector& veloc1 = body1->m_veloc;
+
+					const dgVector& omega0 = body0->m_omega;
+					const dgVector& omega1 = body1->m_omega;
+
+					const dgVector& com0 = body0->m_globalCentreOfMass;
+					const dgVector& com1 = body1->m_globalCentreOfMass;
+
+					const dgCollisionInstance* const collision0 = body0->m_collision;
+					const dgCollisionInstance* const collision1 = body1->m_collision;
+					dgFloat32 dist = dgMax(body0->m_collision->GetBoxMinRadius(), body1->m_collision->GetBoxMinRadius()) * dgFloat32(0.25f);
+
+					dgVector relVeloc(veloc1 - veloc0);
+					dgVector relOmega(omega1 - omega0);
+					dgVector relVelocMag2(relVeloc.DotProduct4(relVeloc));
+					dgVector relOmegaMag2(relOmega.DotProduct4(relOmega));
+
+					if ((relOmegaMag2.m_w > dgFloat32(1.0f)) || ((relVelocMag2.m_w * timestep * timestep) > (dist * dist))) {
+						dgTriplex normals[16];
+						dgTriplex points[16];
+						dgInt64 attrib0[16];
+						dgInt64 attrib1[16];
+						dgFloat32 penetrations[16];
+						dgFloat32 timeToImpact = timestep;
+						const dgInt32 ccdContactCount = world->CollideContinue(collision0, body0->m_matrix, veloc0, omega0, collision1, body1->m_matrix, veloc1, omega1,
+							timeToImpact, points, normals, penetrations, attrib0, attrib1, 6, 0);
+
+						for (dgInt32 j = 0; j < ccdContactCount; j++) {
+							dgVector point(&points[j].m_x);
+							dgVector normal(&normals[j].m_x);
+							dgVector vel0(veloc0 + omega0.CrossProduct3(point - com0));
+							dgVector vel1(veloc1 + omega1.CrossProduct3(point - com1));
+							dgVector vRel(vel1 - vel0);
+							dgFloat32 contactDistTravel = vRel.DotProduct4(normal).m_w * timestep;
+							ccdJoint |= (contactDistTravel > dist);
+						}
+					}
+					//ccdJoint = body0->m_continueCollisionMode | body1->m_continueCollisionMode;
+					isContinueCollisionIsland |= ccdJoint;
+					rowsCount += DG_CCD_EXTRA_CONTACT_COUNT;
+				}
+			}
+		}
+		if (isContinueCollisionIsland) {
+			rowsCount = dgMax(rowsCount, 64);
+		}
+		island.m_rowsCount = rowsCount;
+		island.m_blockMatrixSize = matrixSize;
+		island.m_isContinueCollision = isContinueCollisionIsland;
+
+		m_islands++;
+		m_bodies += bodyCount;
+		m_joints += jointCount;
+	}
+}
+
+#else
 
 void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep)
 {
@@ -595,7 +804,7 @@ void dgWorldDynamicUpdate::BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat3
 		m_joints += jointCount;
 	}
 }
-
+#endif
 
 void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 {
@@ -747,18 +956,35 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		jointInfo->m_pairStart = rowCount;
 		jointInfo->m_pairCount = dgInt16 (dof);
 
-		dgVector scale0(body0->m_massSqrt);
-		dgVector scale1(body1->m_massSqrt);
+		dgVector scale0(dgVector::m_one);
+		dgVector scale1(dgVector::m_one);
+		const dgFloat32 invMass0 = body0->GetInvMass().m_w;
+		const dgFloat32 invMass1 = body1->GetInvMass().m_w;
+		if ((invMass0 > dgFloat32(0.0f)) && (invMass1 > dgFloat32(0.0f))) {
+			const dgFloat32 mass0 = body0->GetMass().m_w;
+			const dgFloat32 mass1 = body1->GetMass().m_w;
+			const dgFloat32 scaleFactor = dgFloat32 (100.0f);
+			
+			if (mass0 > scaleFactor * mass1) {
+				scale0 = dgVector(dgSqrt (invMass1 * mass0 / scaleFactor));
+			} else if (mass1 > scaleFactor * mass0) {
+				scale1 = dgVector(dgSqrt (invMass0 * mass1 / scaleFactor));
+			}
+
+			float xxx0 = scale0.GetScalar() * invMass0 * scale0.GetScalar() + scale1.GetScalar() * invMass1 * scale1.GetScalar();
+			float xxx1 = invMass0 + invMass1;
+			float xxx2 = invMass0 + invMass1;
+		}
 
 		for (dgInt32 i = 0; i < dof; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[rowCount];
 			dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);
+
 			row->m_Jt.m_jacobianM0.m_linear = constraintParamOut.m_jacobian[i].m_jacobianM0.m_linear.CompProduct4(scale0);
 			row->m_Jt.m_jacobianM0.m_angular = constraintParamOut.m_jacobian[i].m_jacobianM0.m_angular.CompProduct4(scale0);
 			row->m_Jt.m_jacobianM1.m_linear = constraintParamOut.m_jacobian[i].m_jacobianM1.m_linear.CompProduct4(scale1);
 			row->m_Jt.m_jacobianM1.m_angular = constraintParamOut.m_jacobian[i].m_jacobianM1.m_angular.CompProduct4(scale1);
 
-			
 			row->m_diagDamp = dgFloat32 (0.0f);
 			row->m_stiffness = DG_PSD_DAMP_TOL * (dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) + dgFloat32 (1.0e-6f);
 			dgAssert(row->m_stiffness >= dgFloat32(0.0f));

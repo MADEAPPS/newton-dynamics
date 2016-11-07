@@ -53,7 +53,6 @@ dgBody::dgBody()
 	,m_localCentreOfMass(dgFloat32 (0.0f))	
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_aparentMass(dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS))
-	,m_massSqrt(dgFloat32 (1.0f))
 	,m_maxAngulaRotationPerSet2(DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP )
 	,m_criticalSectionLock()
 	,m_flags(0)
@@ -94,7 +93,6 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_netTorque(dgFloat32 (0.0f))
 	,m_localCentreOfMass(dgFloat32 (0.0f))	
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
-	,m_massSqrt(dgFloat32(1.0f))
 	,m_aparentMass(dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS))
 	,m_maxAngulaRotationPerSet2(DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP )
 	,m_criticalSectionLock()
@@ -126,7 +124,6 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	serializeCallback (userData, &m_omega, sizeof (m_omega));
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
 	serializeCallback (userData, &m_mass, sizeof (m_aparentMass));
-	serializeCallback (userData, &m_massSqrt, sizeof (m_aparentMass));
 	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
@@ -170,7 +167,6 @@ void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRema
 	serializeCallback (userData, &m_omega, sizeof (m_omega));
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
 	serializeCallback(userData, &m_mass, sizeof (m_aparentMass));
-	serializeCallback(userData, &m_massSqrt, sizeof (m_aparentMass));
 	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
@@ -505,8 +501,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 		}
 		SetAparentMassMatrix (dgVector (Ixx, Iyy, Izz, mass));
 	}
-
-//	m_massSqrt = dgVector ((m_invMass.m_w == dgFloat32 (0.0f)) ? dgFloat32 (1.0f) : dgSqrt (m_mass.m_w));
 
 #ifdef _DEBUG
 	dgBodyMasterList& me = *m_world;

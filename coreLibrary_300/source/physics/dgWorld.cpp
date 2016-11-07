@@ -257,6 +257,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	m_defualtBodyGroupID = CreateBodyGroupID();
 	m_genericLRUMark = 0;
 	m_delayDelateLock = 0;
+	m_islandLRU = 0;
 
 	m_useParallelSolver = 0;
 
