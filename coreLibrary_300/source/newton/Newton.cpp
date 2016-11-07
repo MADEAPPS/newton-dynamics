@@ -4231,7 +4231,10 @@ NewtonBody* NewtonCreateDynamicBody(const NewtonWorld* const newtonWorld, const 
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgCollisionInstance* const collision = (dgCollisionInstance*) collisionPtr;
+	dgCollisionInstance* collision = (dgCollisionInstance*)collisionPtr;
+	if (!collisionPtr) {
+		collision = (dgCollisionInstance*) NewtonCreateNull(newtonWorld);
+	}
 
 	#ifdef SAVE_COLLISION
 	SaveCollision (collisionPtr);
@@ -4250,14 +4253,21 @@ NewtonBody* NewtonCreateDynamicBody(const NewtonWorld* const newtonWorld, const 
 	matrix.m_right.m_w = dgFloat32 (0.0f);
 	matrix.m_posit.m_w = dgFloat32 (1.0f);
 
-	return (NewtonBody*) world->CreateDynamicBody (collision, matrix);
+	NewtonBody* const body = (NewtonBody*)world->CreateDynamicBody (collision, matrix);
+	if (!collisionPtr) {
+		NewtonDestroyCollision((NewtonCollision*)collision);
+	}
+	return body;
 }
 
 NewtonBody* NewtonCreateKinematicBody(const NewtonWorld* const newtonWorld, const NewtonCollision* const collisionPtr, const dFloat* const matrixPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgCollisionInstance* const collision = (dgCollisionInstance*) collisionPtr;
+	dgCollisionInstance* collision = (dgCollisionInstance*)collisionPtr;
+	if (!collisionPtr) {
+		collision = (dgCollisionInstance*)NewtonCreateNull(newtonWorld);
+	}
 
 #ifdef SAVE_COLLISION
 	SaveCollision (collisionPtr);
@@ -4276,7 +4286,11 @@ NewtonBody* NewtonCreateKinematicBody(const NewtonWorld* const newtonWorld, cons
 	matrix.m_right.m_w = dgFloat32 (0.0f);
 	matrix.m_posit.m_w = dgFloat32 (1.0f);
 
-	return (NewtonBody*) world->CreateKinematicBody(collision, matrix);
+	NewtonBody* const body = (NewtonBody*) world->CreateKinematicBody(collision, matrix);
+	if (!collisionPtr) {
+		NewtonDestroyCollision((NewtonCollision*)collision);
+	}
+	return body;
 }
 
 NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const deformableMesh, const dFloat* const matrixPtr)
