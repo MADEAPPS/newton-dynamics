@@ -437,9 +437,9 @@ void dgWorldDynamicUpdate::SortIsland(dgIsland* const island, dgFloat32 timestep
 		const dgInt32 m0 = jointInfo.m_m0;
 		const dgInt32 m1 = jointInfo.m_m1;
 		if (m0 == 0) {
-			queue.Insert(&jointInfo);
+			queue.Insert(&tmpInfoList[i]);
 		} else if (m1 == 0) {
-			queue.Insert(&jointInfo);
+			queue.Insert(&tmpInfoList[i]);
 		}
 	}
 
@@ -494,11 +494,11 @@ void dgWorldDynamicUpdate::SortIsland(dgIsland* const island, dgFloat32 timestep
 							}
 						}
 					}
-					index++;
-					if (index >= queue.m_mod) {
-						dgAssert(0);
-						index = 0;
-					}
+				}
+				index++;
+				if (index >= queue.m_mod) {
+					dgAssert(0);
+					index = 0;
 				}
 			}
 		}
