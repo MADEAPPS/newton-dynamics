@@ -155,7 +155,7 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 	}
 
 //baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 4.0f);
-NewtonBody* xxx = CreateSimpleSolid(scene, geometry, mass * 100.0f, baseMatrix, collision, defaultMaterialID);
+NewtonBody* xxx = CreateSimpleSolid(scene, geometry, mass * 1000.0f, baseMatrix, collision, defaultMaterialID);
 //dVector xxxxx(0.0f, -10.0f, 0.0f, 0.0f);
 //NewtonBodySetVelocity(xxx, &xxxxx[0]);
 

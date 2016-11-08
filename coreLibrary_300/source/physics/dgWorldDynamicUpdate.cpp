@@ -832,41 +832,33 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		//dgAssert(constraint->m_index == dgUnsigned32(j));
 
 		jointInfo->m_pairStart = rowCount;
-		jointInfo->m_pairCount = dgInt16 (dof);
+		jointInfo->m_pairCount = dof;
 
-#if 0
-		dgVector scale0(dgVector::m_one);
-		dgVector scale1(dgVector::m_one);
+		jointInfo->m_scale0 = dgFloat32(1.0f);
+		jointInfo->m_scale1 = dgFloat32(1.0f);
 		const dgFloat32 invMass0 = body0->GetInvMass().m_w;
 		const dgFloat32 invMass1 = body1->GetInvMass().m_w;
 		if ((invMass0 > dgFloat32(0.0f)) && (invMass1 > dgFloat32(0.0f))) {
 			const dgFloat32 mass0 = body0->GetMass().m_w;
 			const dgFloat32 mass1 = body1->GetMass().m_w;
-			const dgFloat32 scaleFactor = dgFloat32 (100.0f);
+			const dgFloat32 scaleFactor = dgFloat32 (20.0f);
 			
 			if (mass0 > scaleFactor * mass1) {
-				scale0 = dgVector(dgSqrt (invMass1 * mass0 / scaleFactor));
+				jointInfo->m_scale0 = invMass1 * mass0 / scaleFactor;
 			} else if (mass1 > scaleFactor * mass0) {
-				scale1 = dgVector(dgSqrt (invMass0 * mass1 / scaleFactor));
+				jointInfo->m_scale1 = invMass0 * mass1 / scaleFactor;
 			}
 
-			float xxx0 = scale0.GetScalar() * invMass0 * scale0.GetScalar() + scale1.GetScalar() * invMass1 * scale1.GetScalar();
+			float xxx0 = jointInfo->m_scale0 * invMass0 + jointInfo->m_scale1 * invMass1;
 			float xxx1 = invMass0 + invMass1;
 			float xxx2 = invMass0 + invMass1;
 		}
-#endif
+
 
 		for (dgInt32 i = 0; i < dof; i++) {
 			dgJacobianMatrixElement* const row = &matrixRow[rowCount];
 			dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);
-#if 0
-			row->m_Jt.m_jacobianM0.m_linear = constraintParamOut.m_jacobian[i].m_jacobianM0.m_linear.CompProduct4(scale0);
-			row->m_Jt.m_jacobianM0.m_angular = constraintParamOut.m_jacobian[i].m_jacobianM0.m_angular.CompProduct4(scale0);
-			row->m_Jt.m_jacobianM1.m_linear = constraintParamOut.m_jacobian[i].m_jacobianM1.m_linear.CompProduct4(scale1);
-			row->m_Jt.m_jacobianM1.m_angular = constraintParamOut.m_jacobian[i].m_jacobianM1.m_angular.CompProduct4(scale1);
-#else 
 			row->m_Jt = constraintParamOut.m_jacobian[i];
-#endif
 
 			row->m_diagDamp = dgFloat32 (0.0f);
 			row->m_stiffness = DG_PSD_DAMP_TOL * (dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) + dgFloat32 (1.0e-6f);

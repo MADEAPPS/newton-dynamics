@@ -93,12 +93,14 @@ class dgJointInfo
 {
 	public:
 	dgConstraint* m_joint;
+	dgFloat32 m_scale0;
+	dgFloat32 m_scale1;
 	dgInt32 m_m0;
 	dgInt32 m_m1;
 	dgInt32 m_pairStart;
+	dgInt32 m_pairCount;
 	dgInt32 m_blockMatrixSize;
 	dgInt32 m_blockMatrixStart;
-	dgInt16 m_pairCount;
 };
 
 
