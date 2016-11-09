@@ -40,6 +40,8 @@
 
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
 #define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(256)
+#define DG_MASS_SCALE_FACTOR				(25.0f)
+//#define DG_MASS_SCALE_FACTOR				(100.0f)
 
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-18f));
@@ -844,7 +846,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		if ((invMass0 > dgFloat32(0.0f)) && (invMass1 > dgFloat32(0.0f))) {
 			const dgFloat32 mass0 = body0->GetMass().m_w;
 			const dgFloat32 mass1 = body1->GetMass().m_w;
-			const dgFloat32 scaleFactor = dgFloat32 (20.0f);
+			const dgFloat32 scaleFactor = dgFloat32 (DG_MASS_SCALE_FACTOR);
 			
 			if (mass0 > scaleFactor * mass1) {
 				jointInfo->m_scale0 = invMass1 * mass0 / scaleFactor;

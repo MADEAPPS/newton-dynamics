@@ -30,7 +30,7 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
 
-#define DG_OLD_SOLVER
+//#define DG_OLD_SOLVER
 
 dgMatrix dgWorldDynamicUpdate::m_vectorMasks (dgVector (dgInt32 (0xffffffff), dgInt32 (0xffffffff), dgInt32 (0xffffffff), dgInt32 (0xffffffff)),
 											  dgVector (dgInt32 (0xffffffff), dgInt32 (0xffffffff), dgInt32 (0xffffffff),		   dgInt32 (0)),
