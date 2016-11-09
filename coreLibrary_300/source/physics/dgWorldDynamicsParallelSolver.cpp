@@ -538,7 +538,7 @@ void dgWorldDynamicUpdate::IntegrateIslandParallel(dgParallelSolverSyncData* con
 {
 	dgWorld* const world = (dgWorld*) this;
 //	dgWorldDynamicUpdate::IntegrateIslandParallelKernel (syncData, world, 0);
-	world->IntegrateArray (syncData->m_island, DG_SOLVER_MAX_ERROR, syncData->m_timestep, 0); 
+	world->IntegrateVelocity (syncData->m_island, DG_SOLVER_MAX_ERROR, syncData->m_timestep, 0); 
 }
 
 

@@ -646,13 +646,13 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 	m_rowCount = dgInt16 (rowCount);
 	m_auxiliaryRowCount = dgInt16 (auxiliaryStart);
 
-	dgInt16 extraAuxiliaryRows = 0;
+	dgInt32 extraAuxiliaryRows = 0;
 	for (dgList<dgConstraint*>::dgListNode* ptr = m_cyclingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		const dgConstraint* const joint = ptr->GetInfo();
 		extraAuxiliaryRows += jointInfoArray[joint->m_index].m_pairCount;
 	}
-	m_rowCount += extraAuxiliaryRows;
-	m_auxiliaryRowCount += extraAuxiliaryRows;
+	m_rowCount += dgInt16 (extraAuxiliaryRows);
+	m_auxiliaryRowCount += dgInt16 (extraAuxiliaryRows);
 
 	if (m_auxiliaryRowCount) {
 		const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
