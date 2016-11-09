@@ -154,11 +154,9 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
 	}
 
-//baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 4.0f);
-DemoMesh* const geometry1 = new DemoMesh("sphere", collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
-NewtonBody* xxx = CreateSimpleSolid(scene, geometry1, mass * 1000.0f, baseMatrix, collision, defaultMaterialID);
-//dVector xxxxx(0.0f, -10.0f, 0.0f, 0.0f);
-//NewtonBodySetVelocity(xxx, &xxxxx[0]);
+	//baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 4.0f);
+	DemoMesh* const geometry1 = new DemoMesh("sphere", collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
+	CreateSimpleSolid(scene, geometry1, mass * 1000.0f, baseMatrix, collision, defaultMaterialID);
 
 	// do not forget to release the assets	
 	geometry1->Release();

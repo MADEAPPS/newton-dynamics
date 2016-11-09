@@ -528,8 +528,8 @@ DG_INLINE bool dgBody::GetAutoSleep () const
 
 DG_INLINE bool dgBody::GetSleepState () const
 {
-	return m_resting;
-//	return m_sleeping;
+//	return m_resting;
+	return m_sleeping;
 }
 
 DG_INLINE void dgBody::SetSleepState (bool state)
