@@ -624,7 +624,8 @@ void dgSkeletonContainer::Finalize()
 void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer)
 {
 	dTimeTrackerEvent(__FUNCTION__);
-
+dgAssert (0);
+/*
 	dgInt32 rowCount = 0;
 	dgInt32 primaryStart = 0;
 	dgInt32 auxiliaryStart = 0;
@@ -827,6 +828,7 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 			}
 		}
 	}
+*/
 }
 
 DG_INLINE void dgSkeletonContainer::SolveFoward (dgForcePair* const force, const dgForcePair* const accel) const
@@ -914,6 +916,8 @@ DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 
 DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const
 {
+dgAssert (0);
+/*
 	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
 		dgGraph* const node = m_nodesOrder[i];
 		dgAssert(i == node->m_index);
@@ -947,10 +951,13 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 	dgAssert((m_nodeCount - 1) == m_nodesOrder[m_nodeCount - 1]->m_index);
 	accel[m_nodeCount - 1].m_body.SetZero();
 	accel[m_nodeCount - 1].m_joint.SetZero();
+*/
 }
 
 void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const
 {
+	dgAssert (0);
+/*
 	dTimeTrackerEvent(__FUNCTION__);
 	dgNodePair* const pairs = dgAlloca(dgNodePair, 6 * (m_nodeCount - 1));
 	dgJacobianMatrixElement** const rowArray = dgAlloca(dgJacobianMatrixElement*, 6 * (m_nodeCount - 1));
@@ -1039,12 +1046,14 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 		internalForces[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear.CompProduct4(jointForce);
 		internalForces[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(jointForce);
 	}
+*/
 }
 
 void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
-	
+dgAssert (0);
+/*	
 	dgFloat32* const f = dgAlloca(dgFloat32, m_rowCount);
 	dgFloat32* const u = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const b = dgAlloca(dgFloat32, m_auxiliaryRowCount);
@@ -1140,6 +1149,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		internalForces[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear.CompProduct4(jointForce);
 		internalForces[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular.CompProduct4(jointForce);
 	}
+*/
 }
 
 dgInt32 dgSkeletonContainer::CalculateMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const

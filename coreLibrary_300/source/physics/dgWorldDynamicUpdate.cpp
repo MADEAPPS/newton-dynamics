@@ -468,6 +468,9 @@ void dgWorldDynamicUpdate::SortIsland(dgIsland* const island, dgFloat32 timestep
 					constraint->m_islandLRU--;
 					infoIndex++;
 					dgAssert(infoIndex <= island->m_jointCount);
+					if (infoIndex == island->m_jointCount) {
+						return;
+					}
 
 					const dgInt32 m0 = jointInfo->m_m0;
 					const dgBody* const body0 = bodyArray[m0].m_body;
@@ -849,9 +852,9 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 				jointInfo->m_scale1 = invMass0 * mass1 / scaleFactor;
 			}
 
-			float xxx0 = jointInfo->m_scale0 * invMass0 + jointInfo->m_scale1 * invMass1;
-			float xxx1 = invMass0 + invMass1;
-			float xxx2 = invMass0 + invMass1;
+			//float xxx0 = jointInfo->m_scale0 * invMass0 + jointInfo->m_scale1 * invMass1;
+			//float xxx1 = invMass0 + invMass1;
+			//float xxx2 = invMass0 + invMass1;
 		}
 
 
