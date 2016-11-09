@@ -205,7 +205,7 @@ class dgJacobianMatrixElement
 {
 	public:
 	dgJacobianPair m_Jt;
-	dgJacobianPair m_JMinv____;
+	dgJacobianPair m_JMinv;
 
 	dgFloat32 m_force;
 	dgFloat32 m_deltaAccel;

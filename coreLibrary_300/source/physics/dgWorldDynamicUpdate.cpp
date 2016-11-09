@@ -843,7 +843,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		jointInfo->m_scale1 = dgFloat32(1.0f);
 		const dgFloat32 invMass0 = body0->GetInvMass().m_w;
 		const dgFloat32 invMass1 = body1->GetInvMass().m_w;
-		if ((invMass0 > dgFloat32(0.0f)) && (invMass1 > dgFloat32(0.0f))) {
+		if ((invMass0 > dgFloat32(0.0f)) && (invMass1 > dgFloat32(0.0f)) && !body0->GetSkeleton() && !body1->GetSkeleton()) {
 			const dgFloat32 mass0 = body0->GetMass().m_w;
 			const dgFloat32 mass1 = body1->GetMass().m_w;
 			const dgFloat32 scaleFactor = dgFloat32 (DG_MASS_SCALE_FACTOR);
