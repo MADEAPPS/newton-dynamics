@@ -1435,6 +1435,70 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
 	dTimeTrackerEvent(__FUNCTION__);
+#if 0
+	dgContact* const contact = m_world->FindContactJoint(body0, body1);
+	if (contact) {
+		if (ValidateContactCache(contact, timestep)) {
+			contact->m_broadphaseLru = m_lru;
+			contact->m_timeOfImpact = dgFloat32(1.0e10f);
+		} else {
+			contact->m_contactActive = 0;
+			contact->m_positAcc = dgVector::m_zero;
+			contact->m_rotationAcc = dgQuaternion();
+			const dgInt32 oldLru = contact->m_broadphaseLru;
+			contact->m_broadphaseLru = m_lru;
+			AddPair(contact, timestep, threadID);
+			if (contact->m_maxDOF) {
+				contact->m_broadphaseLru = m_lru;
+				contact->m_timeOfImpact = dgFloat32(1.0e10f);
+			} else {
+				contact->m_broadphaseLru = oldLru;
+			}
+		}
+	} else if (TestOverlaping(body0, body1, timestep)) {
+		dgAssert((body0->GetInvMass().m_w != dgFloat32(0.0f)) || (body1->GetInvMass().m_w != dgFloat32(0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
+
+		// add all pairs 
+		const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint(body0, body1);
+		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
+
+		if (isCollidable) {
+			dgUnsigned32 group0_ID = dgUnsigned32(body0->m_bodyGroupId);
+			dgUnsigned32 group1_ID = dgUnsigned32(body1->m_bodyGroupId);
+			if (group1_ID < group0_ID) {
+				dgSwap(group0_ID, group1_ID);
+			}
+
+			dgUnsigned32 key = (group1_ID << 16) + group0_ID;
+			const dgBodyMaterialList* const materialList = m_world;
+			const dgContactMaterial* const material = &materialList->Find(key)->GetInfo();
+
+			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
+				bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
+				if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
+					dgContact* contact;
+					m_world->GlobalLock(false);
+					if (body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
+						contact = new (m_world->m_allocator) dgDeformableContact(m_world, material);
+					}
+					else {
+						contact = new (m_world->m_allocator) dgContact(m_world, material);
+					}
+					contact->AppendToActiveList();
+					m_world->GlobalUnlock();
+					m_world->AttachConstraint(contact, body0, body1);
+
+					dgAssert(contact);
+					contact->m_contactActive = 0;
+					contact->m_broadphaseLru = m_lru;
+					contact->m_timeOfImpact = dgFloat32(1.0e10f);
+					AddPair(contact, timestep, threadID);
+				}
+			}
+		}
+	}
+
+#else 
 	if (TestOverlaping (body0, body1, timestep)) {
 		dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
 
@@ -1471,10 +1535,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 
 				if (material->m_flags & dgContactMaterial::m_collisionEnable) {
 					bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
-//					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
 					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
-
-#if 1
 						m_world->GlobalLock(false);
 							if (body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
 								contact = new (m_world->m_allocator) dgDeformableContact(m_world, material);
@@ -1490,37 +1551,12 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 						contact->m_broadphaseLru = m_lru;
 						contact->m_timeOfImpact = dgFloat32 (1.0e10f);
 						AddPair(contact, timestep, threadID);
-#else
-
-						if (!(body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI))) {
-							dgAssert(body0);
-							dgAssert(body1);
-
-							dgContact tempContact (m_world, material);
-							tempContact.m_body0 = body0;
-							tempContact.m_body1 = body1;
-							tempContact.m_contactActive = 0;
-							tempContact.m_broadphaseLru = m_lru;
-							tempContact.m_timeOfImpact = dgFloat32(1.0e10f);
-							AddPair(&tempContact, timestep, threadID);
-							if (tempContact.GetCount()) {
-								m_world->GlobalLock(false);
-								contact = new (m_world->m_allocator) dgContact(&tempContact);
-								contact->AppendToActiveList();
-								m_world->GlobalUnlock();
-								m_world->AttachConstraint(contact, body0, body1);
-							}
-						} else {
-							dgAssert (0);
-//							contact = new dgDeformableContact(m_world, material);
-						}
-#endif
-
 					}
 				}
 			}
 		}
 	}
+#endif
 }
 
 
