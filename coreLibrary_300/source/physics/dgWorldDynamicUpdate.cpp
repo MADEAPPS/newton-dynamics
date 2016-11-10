@@ -432,82 +432,97 @@ void dgWorldDynamicUpdate::SortIsland(dgIsland* const island, dgFloat32 timestep
 	dgJointInfo** queueBuffer = dgAlloca(dgJointInfo*, island->m_jointCount * 2 + 1024);
 	dgJointInfo* const tmpInfoList = dgAlloca(dgJointInfo, island->m_jointCount);
 	dgQueue<dgJointInfo*> queue(queueBuffer, island->m_jointCount * 2 + 1024);
+	dgFloat32 heaviestMass = dgFloat32(0.0f);
+	dgJointInfo* heaviestBody = NULL;
 	for (dgInt32 i = 0; i < island->m_jointCount; i++) {
 		dgJointInfo& jointInfo = constraintArray[i];
 		tmpInfoList[i] = jointInfo;
 		const dgInt32 m0 = jointInfo.m_m0;
 		const dgInt32 m1 = jointInfo.m_m1;
-		if (m0 == 0) {
+		if ((m0 == 0) || (m1 == 0)){
 			queue.Insert(&tmpInfoList[i]);
-		} else if (m1 == 0) {
-			queue.Insert(&tmpInfoList[i]);
+		} else {
+			if (m0 && (heaviestMass < jointInfo.m_joint->m_body0->m_mass.m_w)) {
+				heaviestMass = jointInfo.m_joint->m_body0->m_mass.m_w;
+				heaviestBody = &tmpInfoList[i];
+			}
+			if (m1 && (heaviestMass < jointInfo.m_joint->m_body1->m_mass.m_w)) {
+				heaviestMass = jointInfo.m_joint->m_body1->m_mass.m_w;
+				heaviestBody = &tmpInfoList[i];
+			}
 		}
 	}
 
-	if (!queue.IsEmpty()) {
-		dgInt32 infoIndex = 0;
-		const dgInt32 lru = island->m_islandLRU;
-		dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-		dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
+	if (queue.IsEmpty()) {
+		dgAssert(heaviestBody);
+		queue.Insert(heaviestBody);
+	}
 
-		while (!queue.IsEmpty()) {
-			dgInt32 count = queue.m_firstIndex - queue.m_lastIndex;
-			if (count < 0) {
+//	if (!queue.IsEmpty()) 
+//	{
+	dgInt32 infoIndex = 0;
+	const dgInt32 lru = island->m_islandLRU;
+	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
+	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
+
+	while (!queue.IsEmpty()) {
+		dgInt32 count = queue.m_firstIndex - queue.m_lastIndex;
+		if (count < 0) {
+			dgAssert(0);
+			count += queue.m_mod;
+		}
+
+		dgInt32 index = queue.m_lastIndex;
+		queue.Reset();
+
+		for (dgInt32 j = 0; j < count; j++) {
+			dgJointInfo* const jointInfo = queue.m_pool[index];
+			dgConstraint* const constraint = jointInfo->m_joint;
+			if (constraint->m_islandLRU == lru) {
+				constraint->m_index = infoIndex;
+				constraintArray[infoIndex] = *jointInfo;
+				constraint->m_islandLRU--;
+				infoIndex++;
+				dgAssert(infoIndex <= island->m_jointCount);
+				if (infoIndex == island->m_jointCount) {
+					return;
+				}
+
+				const dgInt32 m0 = jointInfo->m_m0;
+				const dgBody* const body0 = bodyArray[m0].m_body;
+				if (body0->GetInvMass().m_w > dgFloat32(0.0f)) {
+					for (dgBodyMasterListRow::dgListNode* jointNode = body0->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+						dgConstraint* const constraint = cell->m_joint;
+						if (constraint->m_islandLRU == lru) {
+							dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
+							queue.Insert(nextInfo);
+						}
+					}
+				}
+
+				const dgInt32 m1 = jointInfo->m_m1;
+				const dgBody* const body1 = bodyArray[m1].m_body;
+				if (body1->GetInvMass().m_w > dgFloat32(0.0f)) {
+					for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+						dgConstraint* const constraint = cell->m_joint;
+						if (constraint->m_islandLRU == lru) {
+							dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
+							queue.Insert(nextInfo);
+						}
+					}
+				}
+			}
+			index++;
+			if (index >= queue.m_mod) {
 				dgAssert(0);
-				count += queue.m_mod;
-			}
-
-			dgInt32 index = queue.m_lastIndex;
-			queue.Reset();
-
-			for (dgInt32 j = 0; j < count; j++) {
-				dgJointInfo* const jointInfo = queue.m_pool[index];
-				dgConstraint* const constraint = jointInfo->m_joint;
-				if (constraint->m_islandLRU == lru) {
-					constraint->m_index = infoIndex;
-					constraintArray[infoIndex] = *jointInfo;
-					constraint->m_islandLRU--;
-					infoIndex++;
-					dgAssert(infoIndex <= island->m_jointCount);
-					if (infoIndex == island->m_jointCount) {
-						return;
-					}
-
-					const dgInt32 m0 = jointInfo->m_m0;
-					const dgBody* const body0 = bodyArray[m0].m_body;
-					if (body0->GetInvMass().m_w > dgFloat32(0.0f)) {
-						for (dgBodyMasterListRow::dgListNode* jointNode = body0->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-							dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-							dgConstraint* const constraint = cell->m_joint;
-							if (constraint->m_islandLRU == lru) {
-								dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
-								queue.Insert(nextInfo);
-							}
-						}
-					}
-
-					const dgInt32 m1 = jointInfo->m_m1;
-					const dgBody* const body1 = bodyArray[m1].m_body;
-					if (body1->GetInvMass().m_w > dgFloat32(0.0f)) {
-						for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-							dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-							dgConstraint* const constraint = cell->m_joint;
-							if (constraint->m_islandLRU == lru) {
-								dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
-								queue.Insert(nextInfo);
-							}
-						}
-					}
-				}
-				index++;
-				if (index >= queue.m_mod) {
-					dgAssert(0);
-					index = 0;
-				}
+				index = 0;
 			}
 		}
-		dgAssert(infoIndex == island->m_jointCount);
 	}
+	dgAssert(infoIndex == island->m_jointCount);
+//}
 }
 
 

@@ -40,7 +40,9 @@ dgMatrix dgWorldDynamicUpdate::m_vectorMasks (dgVector (dgInt32 (0xffffffff), dg
 
 void dgWorldDynamicUpdate::CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const
 {
-	SortIsland (island, timestep, threadID);
+	if (island->m_jointCount) {
+		SortIsland(island, timestep, threadID);
+	}
 
 	if (!island->m_isContinueCollision) {
 		if (island->m_jointCount) {
