@@ -389,10 +389,12 @@ class dgBroadPhase
 	DG_INLINE dgVector ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const;
 	DG_INLINE void ReduceDegeneratedTriangle(dgVector* const simplex) const;
 
+	static dgVector m_padding;
 	static dgVector m_velocTol;
 	static dgVector m_linearContactError2;
 	static dgVector m_angularContactError2;
 	static dgInt32 m_obbTestSimplex[4][4];
+	
 
 	friend class dgBody;
 	friend class dgWorld;

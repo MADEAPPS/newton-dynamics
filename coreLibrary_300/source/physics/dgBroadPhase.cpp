@@ -36,12 +36,16 @@
 #define DG_CONVEX_CAST_POOLSIZE			32
 #define DG_BROADPHASE_AABB_SCALE		dgFloat32 (8.0f)
 #define DG_BROADPHASE_AABB_INV_SCALE	(dgFloat32 (1.0f) / DG_BROADPHASE_AABB_SCALE)
-#define DG_CONTACT_TRANSLATION_ERROR (dgFloat32 (1.0e-3f))
-#define DG_CONTACT_ANGULAR_ERROR (dgFloat32 (0.25f * 3.141592f / 180.0f))
- 
+#define DG_CONTACT_TRANSLATION_ERROR	(dgFloat32 (1.0e-3f))
+#define DG_CONTACT_ANGULAR_ERROR		(dgFloat32 (0.25f * 3.141592f / 180.0f))
+#define DG_OBB_OVERLAP_PADDING			dgFloat32 (0.125f)
+#define DG_OBB_OVERLAP_PADDING_BOUND	dgFloat32 (2.0f * (DG_OBB_OVERLAP_PADDING + dgFloat32 (1.0e-3f)))
+
+
 dgVector dgBroadPhase::m_velocTol(dgFloat32(1.0e-18f)); 
 dgVector dgBroadPhase::m_angularContactError2(DG_CONTACT_ANGULAR_ERROR * DG_CONTACT_ANGULAR_ERROR);
 dgVector dgBroadPhase::m_linearContactError2(DG_CONTACT_TRANSLATION_ERROR * DG_CONTACT_TRANSLATION_ERROR);
+dgVector dgBroadPhase::m_padding(DG_OBB_OVERLAP_PADDING, DG_OBB_OVERLAP_PADDING, DG_OBB_OVERLAP_PADDING, dgFloat32(0.0f));
  
 dgVector dgBroadPhaseNode::m_broadPhaseScale (DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, DG_BROADPHASE_AABB_SCALE, dgFloat32 (0.0f));
 dgVector dgBroadPhaseNode::m_broadInvPhaseScale (DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, DG_BROADPHASE_AABB_INV_SCALE, dgFloat32 (0.0f));
@@ -1150,7 +1154,7 @@ DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgIn
 
 	dgInt32 faceIndex = -1;
 	dgFloat32 minDist = dgFloat32(dgFloat32(0.0f));
-	const dgVector origin(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	const dgVector origin(dgVector::m_zero);
 	for (dgInt32 i = 0; i < 4; i++) {
 		dgInt32 i0 = m_obbTestSimplex[i][0];
 		dgInt32 i1 = m_obbTestSimplex[i][1];
@@ -1233,14 +1237,13 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 		instance0->CalcObb (origin0, obb0);
 		instance1->CalcObb (origin1, obb1);
 
-		obb0 -= dgCollisionInstance::m_padding;
-		obb1 -= dgCollisionInstance::m_padding;
-
 		dgAssert (origin0.m_w == dgFloat32 (0.0f));
 		dgAssert (origin1.m_w == dgFloat32 (0.0f));
 		dgMatrix matrix (instance1->GetGlobalMatrix() * instance0->GetGlobalMatrix().Inverse());
 		matrix.m_posit = matrix.TransformVector (origin1) - origin0;
-//matrix.m_posit = dgVector (0.0f, 2.0f, 0.0f, 0.0f);
+
+		obb0 = dgVector::m_zero.GetMax(obb0 - m_padding - dgCollisionInstance::m_padding);
+		obb1 = dgVector::m_zero.GetMax(obb1 - m_padding - dgCollisionInstance::m_padding);
 
 		dgVector dir0 (matrix.m_posit & dgVector::m_triplexMask); 
 		dgFloat32 mag2 = dir0.DotProduct4 (dir0).GetScalar();
@@ -1323,8 +1326,8 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 			iter++;
 		} while (iter < 8);
 
-		dgFloat32 dist = v.DotProduct4 (v).GetScalar(); 
-		dgFloat32 testDist = dgFloat32(1.0e-3f * 1.0e-3f);
+		dgFloat32 dist = v.DotProduct4 (v).GetScalar() ; 
+		dgFloat32 testDist = DG_OBB_OVERLAP_PADDING_BOUND * DG_OBB_OVERLAP_PADDING_BOUND;
 		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 			dgVector velRelative (body1->GetVelocity() - body0->GetVelocity());
 			dgVector step (velRelative.Scale4 (timestep * dgFloat32 (2.0f)));
