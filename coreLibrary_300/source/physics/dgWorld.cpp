@@ -235,7 +235,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	,m_solverJacobiansMemory (DG_INITIAL_JACOBIAN_SIZE, allocator, 64)
 	,m_solverBlockJacobianMemory(DG_INITIAL_BODIES_SIZE, allocator, 64)
 	,m_solverForceAccumulatorMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
-	,m_islandMemory (DG_INITIAL_BODIES_SIZE, allocator, 32)
+	,m_islandMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
 {
 	dgMutexThread* const mutexThread = this;
 	SetMatertThread (mutexThread);
