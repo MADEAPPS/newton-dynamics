@@ -535,9 +535,7 @@ void dgWorldDynamicUpdate::FindActiveJointAndBodies (dgIsland* const island)
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
-
-	dgInt32 jointCount = island->m_jointCount;
-//	if (jointCount > 100000000) {
+	const dgInt32 jointCount = island->m_jointCount;
 	if (jointCount > DG_SMALL_ISLAND_COUNT) {
 		for (dgInt32 i = 0; i < jointCount; i ++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
