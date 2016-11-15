@@ -424,7 +424,7 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& directio
 	dgVector p0 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector dir0 (p0 - origin);
 	dgFloat32 dist0 = dir0.DotProduct4(normal).GetScalar();
-	if ((dist0 * dist0) < (m_radio0 * m_radio0)) {
+	if ((dist0 * dist0 - dgFloat32 (5.0e-5f)) < (m_radio0 * m_radio0)) {
 		contactsOut[count] = m_transform.CompProduct4 (p0 - normal.Scale4 (dist0));
 		count ++;
 	}
@@ -432,7 +432,7 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& directio
 	dgVector p1 (m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector dir1 (p1 - origin);
 	dgFloat32 dist1 = dir1.DotProduct4(normal).GetScalar();
-	if ((dist1 * dist1) < (m_radio1 * m_radio1)) {
+	if ((dist1 * dist1 - dgFloat32 (5.0e-5f)) < (m_radio1 * m_radio1)) {
 		contactsOut[count] = m_transform.CompProduct4(p1 - normal.Scale4 (dist1));
 		count ++;
 	}
