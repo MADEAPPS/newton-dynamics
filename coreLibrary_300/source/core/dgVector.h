@@ -600,7 +600,7 @@ class dgVector
 
 	DG_INLINE dgVector ShiftRightLogical (int bits) const
 	{
-		return dgVector ((dgInt32) (dgUnsigned32 (m_ix) >> bits), dgUnsigned32 (m_iy) >> bits, dgUnsigned32 (m_iz) >> bits, dgUnsigned32 (m_iw) >> bits);
+		return dgVector (dgUnsigned32 (m_ix) >> bits, dgUnsigned32 (m_iy) >> bits, dgUnsigned32 (m_iz) >> bits, dgUnsigned32 (m_iw) >> bits); 
 	}
 
 	DG_INLINE static void Transpose4x4 (dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
@@ -649,7 +649,7 @@ class dgVector
 }DG_GCC_VECTOR_ALIGMENT;
 
 
-
+DG_MSC_VECTOR_ALIGMENT
 class dgSpatialVector
 {
 public:
@@ -719,7 +719,7 @@ public:
 	}
 
 	dgFloat64 m_v[6];
-};
+}DG_GCC_VECTOR_ALIGMENT;
 
 #else
 
@@ -1137,7 +1137,7 @@ class dgVector
 	static dgVector m_wMask;
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
-};
+}DG_GCC_VECTOR_ALIGMENT;
 
 #else
 DG_MSC_VECTOR_ALIGMENT

@@ -167,15 +167,15 @@ void dgBroadPhaseAggregate::ImproveEntropy()
 void dgBroadPhaseAggregate::SummitPairs(dgBroadPhaseAggregate* const aggregate, dgFloat32 timestep, dgInt32 threadID) const
 {
 	if (m_root && aggregate->m_root && !(m_isInEquilibrium & aggregate->m_isInEquilibrium)) {
-		SummitSeltPairs(m_root, aggregate->m_root, timestep, threadID);
+		SubmitSeltPairs(m_root, aggregate->m_root, timestep, threadID);
 	}
 }
 
-void dgBroadPhaseAggregate::SummitSeltPairs(dgFloat32 timestep, dgInt32 threadID) const
+void dgBroadPhaseAggregate::SubmitSeltPairs(dgFloat32 timestep, dgInt32 threadID) const
 {
 	if (m_root && !m_root->IsLeafNode()) {
 		if (!m_isInEquilibrium & m_isSelfCollidable) {
-			SummitSeltPairs(m_root->GetLeft(), m_root->GetRight(), timestep, threadID);
+			SubmitSeltPairs(m_root->GetLeft(), m_root->GetRight(), timestep, threadID);
 		}
 	}
 }
@@ -222,7 +222,7 @@ void dgBroadPhaseAggregate::SummitPairs(dgBody* const body, dgFloat32 timestep, 
 	}
 }
 
-void dgBroadPhaseAggregate::SummitSeltPairs(dgBroadPhaseNode* const node0, dgBroadPhaseNode* const node1, dgFloat32 timestep, dgInt32 threadID) const
+void dgBroadPhaseAggregate::SubmitSeltPairs(dgBroadPhaseNode* const node0, dgBroadPhaseNode* const node1, dgFloat32 timestep, dgInt32 threadID) const
 {
 	dgInt32 stack = 1;
 	dgBroadPhaseNode* pool[DG_BROADPHASE_MAX_STACK_DEPTH][2];

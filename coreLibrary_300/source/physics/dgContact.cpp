@@ -23,13 +23,15 @@
 #include "dgBody.h"
 #include "dgWorld.h"
 #include "dgContact.h"
+#include "dgContactSolver.h"
 #include "dgCollisionInstance.h"
 #include "dgWorldDynamicUpdate.h"
 
 #define REST_RELATIVE_VELOCITY			dgFloat32 (1.0e-3f)
 #define MAX_DYNAMIC_FRICTION_SPEED		dgFloat32 (0.3f)
 #define MAX_PENETRATION_STIFFNESS		dgFloat32 (50.0f)
-
+//#define DG_RESTING_CONTACT_PENETRATION	dgFloat32 (1.0f / 256.0f)
+#define DG_RESTING_CONTACT_PENETRATION	(DG_PENETRATION_TOL * dgFloat32 (4.0f))
 
 
 //////////////////////////////////////////////////////////////////////
@@ -50,7 +52,6 @@ dgContactMaterial::dgContactMaterial()
 	m_point = dgVector (dgFloat32 (0.0f));
 	m_softness = dgFloat32 (0.1f);
 	m_restitution = dgFloat32 (0.4f);
-//m_restitution = dgFloat32 (0.0f);
 
 	m_staticFriction0 = dgFloat32 (0.9f);
 	m_staticFriction1 = dgFloat32 (0.9f);
@@ -73,6 +74,7 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	,m_positAcc (dgFloat32(0.0f))
 	,m_rotationAcc (dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f))
 	,m_closestDistance (dgFloat32 (0.0f))
+	,m_separationDistance(dgFloat32 (0.0f))
 	,m_timeOfImpact(dgFloat32 (0.0f))
 	,m_world(world)
 	,m_material(material)
@@ -92,6 +94,7 @@ dgContact::dgContact(dgContact* const clone)
 	,m_rotationAcc(clone->m_rotationAcc)
 	,m_separtingVector (clone->m_separtingVector)
 	,m_closestDistance(clone->m_closestDistance)
+	,m_separationDistance(clone->m_separationDistance)
 	,m_timeOfImpact(clone->m_timeOfImpact)
 	,m_world(clone->m_world)
 	,m_material(clone->m_material)
@@ -223,6 +226,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	if (contact.m_flags & dgContactMaterial::m_overrideNormalAccel) {
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
+
 
 	// first dir friction force
 	if (contact.m_flags & dgContactMaterial::m_friction0Enable) {

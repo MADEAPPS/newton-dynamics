@@ -22,8 +22,9 @@
 #include "dgPhysicsStdafx.h"
 #include "dgBody.h"
 #include "dgWorld.h"
-#include "dgContact.h"
+//#include "dgContact.h"
 #include "dgCollisionBox.h"
+#include "dgContactSolver.h"
 
 #define D_BOX_SKIN_THINCKNESS	dgFloat32 (1.0f/64.0f)
 
@@ -340,11 +341,11 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 	const dgConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
 	if (vertToEdgeMapping) {
 		dgInt32 edgeIndex;
-		//support[0] = SupportVertex (normal.Scale4(normalSign), &edgeIndex);
 		support[0] = SupportVertex (normal, &edgeIndex);
 
 		dgFloat32 dist = normal.DotProduct4(support[0] - point).GetScalar();
-		if (dist <= DG_IMPULSIVE_CONTACT_PENETRATION) {
+//		if (dist <= DG_IMPULSIVE_CONTACT_PENETRATION) {
+		if (dist <= DG_PENETRATION_TOL) {
 			dgVector normalAlgin (normal.Abs());
 			if (!((normalAlgin.m_x > dgFloat32 (0.9999f)) || (normalAlgin.m_y > dgFloat32 (0.9999f)) || (normalAlgin.m_z > dgFloat32 (0.9999f)))) {
 				// 0.25 degrees

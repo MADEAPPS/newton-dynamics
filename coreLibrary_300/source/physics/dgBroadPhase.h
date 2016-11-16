@@ -82,6 +82,15 @@ class dgBroadPhaseNode
 		return false;
 	}
 
+	virtual dgUnsigned32 GetAsDirtyLru() const 
+	{
+		return 0;
+	}
+
+	virtual void SetAsDirty()
+	{
+	}
+
 	void SetAABB(const dgVector& minBox, const dgVector& maxBox)
 	{
 		dgAssert(minBox.m_x <= maxBox.m_x);
@@ -133,6 +142,7 @@ class dgBroadPhaseBodyNode: public dgBroadPhaseNode
 		:dgBroadPhaseNode(NULL)
 		,m_body(body)
 		,m_updateNode(NULL)
+		,m_nodeIsDirtyLru(0)
 	{
 		SetAABB(body->m_minAABB, body->m_maxAABB);
 		m_body->SetBroadPhase(this);
@@ -148,8 +158,19 @@ class dgBroadPhaseBodyNode: public dgBroadPhaseNode
 		return m_body;
 	}
 
+	virtual dgUnsigned32 GetAsDirtyLru() const
+	{
+		return m_nodeIsDirtyLru;
+	}
+
+	virtual void SetAsDirty(dgInt32 lru)
+	{
+		m_nodeIsDirtyLru = lru;
+	}
+
 	dgBody* m_body;
 	dgList<dgBroadPhaseNode*>::dgListNode* m_updateNode;
+	dgUnsigned32 m_nodeIsDirtyLru;
 };
 
 class dgBroadPhaseTreeNode: public dgBroadPhaseNode
@@ -312,14 +333,15 @@ class dgBroadPhase
 	virtual dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
 
 	void ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints);
-	void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
+	void FindCollidingPairsForward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
+	void FindCollidingPairsForwardAndBackward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
 
 	void UpdateBody(dgBody* const body, dgInt32 threadIndex);
 	void AddInternallyGeneratedBody(dgBody* const body)
 	{
 		m_generatedBodies.Append(body);
 	}
-	
+
 	void UpdateContacts(dgFloat32 timestep);
 	void CollisionChange (dgBody* const body, dgCollisionInstance* const collisionSrc);
 
@@ -341,8 +363,8 @@ class dgBroadPhase
 	void CalculatePairContacts (dgPair* const pair, dgInt32 threadID);
 	bool ValidateContactCache(dgContact* const contact, dgFloat32 timestep) const;
     void AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex);
-	void AddPair (dgBody* const body0, dgBody* const body1, dgFloat32 timestep, dgInt32 threadID);	
-	bool TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const;
+	dgContact* AddPair (dgBody* const body0, dgBody* const body1, dgFloat32 timestep, dgInt32 threadID);	
+	//bool TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const;
 
 	void ForEachBodyInAABB (const dgBroadPhaseNode** stackPool, dgInt32 stack, const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const;
 	void RayCast (const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& l0, const dgVector& l1, dgFastRayTest& ray, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
@@ -361,17 +383,19 @@ class dgBroadPhase
 	dgBroadPhaseNode* BuildTopDown(dgBroadPhaseNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 	dgBroadPhaseNode* BuildTopDownBig(dgBroadPhaseNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 
-	void UpdateContactsBroadPhaseEnd ();
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
-	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threadID);
+	
+	void PruneDeadContacts ();
 	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
+	void UpdateContacts (dgBroadphaseSyncDescriptor* const descriptor, dgActiveContacts::dgListNode* const node, dgFloat32 timeStep, dgInt32 threadID);
+	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threaCount, dgInt32 threadID);
 		
 	static void SleepingStateKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void UpdateAggregateEntropyKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
-	
 	static void AddGeneratedBodiesContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void UpdateContactKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static dgInt32 CompareNodes(const dgBroadPhaseNode* const nodeA, const dgBroadPhaseNode* const nodeB, void* const notUsed);
 
 	dgWorld* m_world;
@@ -382,19 +406,20 @@ class dgBroadPhase
 	dgUnsigned32 m_lru;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
+	dgInt32 m_dirtyNodesCount;
+	bool m_scanTwoWays;
 	bool m_recursiveChunks;
+	
 
 	DG_INLINE dgVector ReduceLine(dgVector* const simplex, dgInt32& indexOut) const;
 	DG_INLINE dgVector ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const;
 	DG_INLINE dgVector ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const;
 	DG_INLINE void ReduceDegeneratedTriangle(dgVector* const simplex) const;
 
-	static dgVector m_padding;
 	static dgVector m_velocTol;
 	static dgVector m_linearContactError2;
 	static dgVector m_angularContactError2;
 	static dgInt32 m_obbTestSimplex[4][4];
-	
 
 	friend class dgBody;
 	friend class dgWorld;

@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////////
 
 //dInitRtti(CustomSlider);
-IMPLEMENT_CUSTON_JOINT(CustomSlider);
+IMPLEMENT_CUSTOM_JOINT(CustomSlider);
 
 CustomSlider::CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)

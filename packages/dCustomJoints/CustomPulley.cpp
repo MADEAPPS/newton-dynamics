@@ -18,7 +18,7 @@
 #include "CustomPulley.h"
 
 //dInitRtti(CustomPulley);
-IMPLEMENT_CUSTON_JOINT(CustomPulley);
+IMPLEMENT_CUSTOM_JOINT(CustomPulley);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

@@ -22,10 +22,10 @@
 //////////////////////////////////////////////////////////////////////
 
 
-IMPLEMENT_CUSTON_JOINT(CustomPointToPoint);
-IMPLEMENT_CUSTON_JOINT(CustomBallAndSocket);
-IMPLEMENT_CUSTON_JOINT(CustomLimitBallAndSocket);
-IMPLEMENT_CUSTON_JOINT(CustomControlledBallAndSocket);
+IMPLEMENT_CUSTOM_JOINT(CustomPointToPoint);
+IMPLEMENT_CUSTOM_JOINT(CustomBallAndSocket);
+IMPLEMENT_CUSTOM_JOINT(CustomLimitBallAndSocket);
+IMPLEMENT_CUSTOM_JOINT(CustomControlledBallAndSocket);
 
 
 CustomPointToPoint::CustomPointToPoint(const dVector& pivotInChildInGlobalSpace, const dVector& pivotInParentInGlobalSpace, NewtonBody* const child, NewtonBody* const parent)

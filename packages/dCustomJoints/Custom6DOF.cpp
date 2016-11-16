@@ -18,7 +18,7 @@
 
 //dInitRtti(Custom6DOF);
 
-IMPLEMENT_CUSTON_JOINT(Custom6DOF);
+IMPLEMENT_CUSTOM_JOINT(Custom6DOF);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

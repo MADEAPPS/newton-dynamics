@@ -55,10 +55,10 @@ class dgBroadPhaseAggregate: public dgBroadPhaseNode
 	void RemoveBody (dgBody* const body);
 
 	void ImproveEntropy ();
-	void SummitSeltPairs(dgFloat32 timestep, dgInt32 threadID) const;
+	void SubmitSeltPairs(dgFloat32 timestep, dgInt32 threadID) const;
 	void SummitPairs(dgBody* const body, dgFloat32 timestep, dgInt32 threadID) const;
 	void SummitPairs(dgBroadPhaseAggregate* const aggregate, dgFloat32 timestep, dgInt32 threadID) const;
-	void SummitSeltPairs(dgBroadPhaseNode* const node0, dgBroadPhaseNode* const node1, dgFloat32 timestep, dgInt32 threadID) const;
+	void SubmitSeltPairs(dgBroadPhaseNode* const node0, dgBroadPhaseNode* const node1, dgFloat32 timestep, dgInt32 threadID) const;
 
 	dgBroadPhaseNode* m_root;
 	dgBroadPhase* m_broadPhase;

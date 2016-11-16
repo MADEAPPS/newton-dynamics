@@ -13,7 +13,7 @@
 #include <CustomJointLibraryStdAfx.h>
 #include <CustomDynamicRagDollManager.h>
 
-IMPLEMENT_CUSTON_JOINT(DynamicRagDollJoint);
+IMPLEMENT_CUSTOM_JOINT(DynamicRagDollJoint);
 
 
 DynamicRagDollJoint::DynamicRagDollJoint(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent)

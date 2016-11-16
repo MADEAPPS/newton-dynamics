@@ -18,7 +18,7 @@
 
 
 //dInitRtti(CustomCorkScrew);
-IMPLEMENT_CUSTON_JOINT(CustomCorkScrew);
+IMPLEMENT_CUSTOM_JOINT(CustomCorkScrew);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////////
 
 //dInitRtti(CustomRackAndPinion);
-IMPLEMENT_CUSTON_JOINT(CustomRackAndPinion);
+IMPLEMENT_CUSTOM_JOINT(CustomRackAndPinion);
 
 CustomRackAndPinion::CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody)
 	:CustomJoint(2, rotationalBody, linearBody)

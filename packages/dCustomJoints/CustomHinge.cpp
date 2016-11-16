@@ -21,7 +21,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_CUSTON_JOINT(CustomHinge);
+IMPLEMENT_CUSTOM_JOINT(CustomHinge);
 
 CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)

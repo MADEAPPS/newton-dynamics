@@ -82,8 +82,6 @@ class dgIsland
 	dgInt32 m_jointCount;
 	dgInt32 m_rowsStart;
 	dgInt32 m_rowsCount;
-	dgInt32 m_blockMatrixStart;
-	dgInt32 m_blockMatrixSize;
 	dgInt32 m_islandLRU;
 	dgInt32 m_isContinueCollision;
 };
@@ -99,8 +97,6 @@ class dgJointInfo
 	dgInt32 m_m1;
 	dgInt32 m_pairStart;
 	dgInt32 m_pairCount;
-	dgInt32 m_blockMatrixSize;
-	dgInt32 m_blockMatrixStart;
 };
 
 
@@ -208,10 +204,11 @@ class dgJacobianMatrixElement
 	dgJacobianPair m_JMinv;
 
 	dgFloat32 m_force;
-	dgFloat32 m_deltaAccel;
 	dgFloat32 m_diagDamp;
+	dgFloat32 m_jMinvJt;
 	dgFloat32 m_invJMinvJt;
 
+	dgFloat32 m_deltaAccel;
 	dgFloat32 m_restitution;
 	dgFloat32 m_penetration;
 	dgFloat32 m_coordenateAccel;
@@ -232,19 +229,11 @@ class dgJacobianMemory
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes);
 
 	dgJacobian* m_internalForcesBuffer;
-	dgFloat32* m_solverBlockJacobianMemory;
 	dgJacobianMatrixElement* m_jacobianBuffer;
 };
 
 class dgWorldDynamicUpdate
 {
-	class dgJointMapTable
-	{
-		public:
-		const dgJointInfo* m_info;
-		dgInt32 index;
-	};
-
 	public:
 	dgWorldDynamicUpdate();
 	void UpdateDynamics (dgFloat32 timestep);
@@ -252,7 +241,6 @@ class dgWorldDynamicUpdate
 
 	private:
 	void BuildIslands(dgFloat32 timestep);
-	//void BuildIsland (dgQueue<dgDynamicBody*>& queue, dgFloat32 timestep, dgInt32 jountCount);
 	void SortIsland(dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
@@ -287,14 +275,12 @@ class dgWorldDynamicUpdate
 	void CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
 	void BuildJacobianMatrix (dgIsland* const island, dgInt32 threadID, dgFloat32 timestep) const;
 	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, const dgJointInfo* const jointInfo, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const;
+	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const;
 	void InitJointForce (dgJointInfo* const jointInfo, dgJacobianMatrixElement* const matrixRow, dgJacobian& force0, dgJacobian& force1) const;
 	void CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateReactionsForces(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
-	
 
-	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow) const;
-
-	void IntegrateForce(const dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
+	void IntegrateExternalForce(const dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
 	void IntegrateVelocity (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 
 	void CalculateIslandContacts (dgIsland* const island, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const;
@@ -312,7 +298,6 @@ class dgWorldDynamicUpdate
 	dgFloat32 m_solverConvergeQuality;
 	static dgVector m_velocTol;
 	static dgVector m_eulerTaylorCorrection;
-	static dgMatrix m_vectorMasks;
 
 	friend class dgWorld;
 	friend class dgAmpInstance;

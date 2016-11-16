@@ -998,6 +998,7 @@ void dgWorld::CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionPar
 		// prune close contacts
 		pair->m_contactCount = PruneContacts (pair->m_contactCount, proxy.m_contacts);
 	}
+	proxy.m_contactJoint->m_separationDistance = dgFloat32 (0.0f);
 }
 
 
@@ -1347,6 +1348,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	dgAssert(contactJoint);
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
+	contactJoint->m_separationDistance = dgFloat32(0.0f);
 
 	dgCollisionInstance instance0(*collision0, collision0->m_childShape);
 	dgCollisionInstance instance1(*collision1, collision1->m_childShape);
@@ -1374,6 +1376,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 	contactOut[1].m_point = proxy.m_closestPointBody1;
 
 	contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct4(proxy.m_normal).GetScalar();
+	contactJoint->m_separationDistance = dgFloat32(0.0f);
 
 	instance0.m_userData0 = NULL;
 	instance0.m_userData1 = NULL;
@@ -1422,6 +1425,8 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 	dgAssert(collision0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
 	dgAssert(collision1->IsType(dgCollision::dgCollisionConvexShape_RTTI));
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
+	contactJoint->m_separationDistance = dgFloat32(0.0f);
+
 	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount() && proxy.m_instance0->GetCollisionMode() && proxy.m_instance1->GetCollisionMode())) {
 		return count;
 	}
@@ -1470,6 +1475,9 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 			contactOut[i].m_collision1 = collision1;
 			contactOut[i].m_shapeId0 = collision0->GetUserDataID();
 			contactOut[i].m_shapeId1 = collision1->GetUserDataID();
+//dgTrace (("%d %d %f ", proxy.m_body0->m_uniqueID, proxy.m_body1->m_uniqueID, contactOut[i].m_penetration));
+//dgTrace (("p(%f %f %f) ", contactOut[i].m_point[0], contactOut[i].m_point[1], contactOut[i].m_point[2]));
+//dgTrace (("n(%f %f %f)\n", contactOut[i].m_normal[0], contactOut[i].m_normal[1], contactOut[i].m_normal[2]));
 		}
 
 		instance0.m_userData0 = NULL;
@@ -1520,8 +1528,6 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		instance0.m_globalMatrix.m_posit = dgVector::m_wOne;
 		instance1.m_globalMatrix.m_posit -= origin;
 
-		contactJoint->m_closestDistance = dgFloat32(1.0e10f);
-
 		dgAssert(proxy.m_timestep <= dgFloat32(2.0f));
 		dgAssert(proxy.m_timestep >= dgFloat32(0.0f));
 
@@ -1534,9 +1540,10 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 
 			dgFloat32 baseLinearSpeed = dgSqrt(hullVeloc.DotProduct3(hullVeloc));
 			if (baseLinearSpeed > dgFloat32(1.0e-6f)) {
-				dgFloat32 minRadius = instance0.GetBoxMinRadius();
+				const dgFloat32 minRadius = instance0.GetBoxMinRadius();
+				const dgFloat32 maxRadius = instance0.GetBoxMaxRadius();
 				dgFloat32 maxAngularSpeed = dgSqrt(hullOmega.DotProduct3(hullOmega));
-				dgFloat32 angularSpeedBound = maxAngularSpeed * (instance0.GetBoxMaxRadius() - minRadius);
+				dgFloat32 angularSpeedBound = maxAngularSpeed * (maxRadius - minRadius);
 
 				dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
 				dgVector upperBoundVeloc(hullVeloc.Scale4(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
@@ -1595,6 +1602,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		}
 	}
 
+	contactJoint->m_separationDistance = dgFloat32(0.0f);
 	return count;
 }
 

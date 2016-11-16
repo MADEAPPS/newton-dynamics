@@ -229,6 +229,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 		}
 	}
 	constraint->m_closestDistance = closestDist;
+	constraint->m_separationDistance = closestDist;
 }
 
 
@@ -371,6 +372,7 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 		}
 	}
 	constraint->m_closestDistance = closestDist;
+	constraint->m_separationDistance = dgFloat32 (0.0f);
 }
 
 
