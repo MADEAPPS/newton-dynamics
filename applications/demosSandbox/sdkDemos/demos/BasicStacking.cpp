@@ -96,8 +96,8 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	CalculateAABB (collision, dGetIdentityMatrix(), minP, maxP);
 
 	//dFloat stepz = size.m_z + 0.01f;
-	dFloat stepz = maxP.m_z - minP.m_z + 0.01f;
-	dFloat stepy = maxP.m_y - minP.m_y;
+	dFloat stepz = maxP.m_z - minP.m_z;
+	dFloat stepy = (maxP.m_y - minP.m_y) - NewtonWorldGetCollisionMargin(world);
 
 	dFloat y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	dFloat z0 = matrix.m_posit.m_z - stepz * count / 2;
