@@ -214,20 +214,9 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	AddFloorBox(scene, dVector (0.0f, -0.05f, 0.0f, 0.0f), dVector(100.0f, 0.1f, 100.0f, 0.0f));
 
-	// load the scene from a ngd file format
-#if 0
-	char fileName[2048];
-	//GetWorkingFileName ("boxStacks_1.ngd", fileName);
-	//GetWorkingFileName ("boxStacks_3.ngd", fileName);
-	//GetWorkingFileName ("boxStacks.ngd", fileName);
-	//GetWorkingFileName ("pyramid20x20.ngd", fileName);
-	GetWorkingFileName ("pyramid40x40.ngd", fileName);
-	scene->LoadScene (fileName);
-#else
-	
 	int high = 60;
 	for (int i = 0; i < 1; i ++) {
-		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
+//		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
 //		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 //		BuildPyramid (scene, 10.0f, dVector( 20.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 //		BuildPyramid (scene, 10.0f, dVector( 30.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
@@ -249,8 +238,14 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 		}
 	}
 
-#endif
-
+	dVector boxSize(0.5f, 0.5f, 0.5f, 0.0f);
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = dVector(0.0f, 150.0f, 0.0f, 1.0f);
+	NewtonCollision* const boxCollision = CreateConvexCollision(scene->GetNewton(), matrix, boxSize, _BOX_PRIMITIVE, 0);
+	DemoMesh* const boxMesh = new DemoMesh("box", boxCollision, "smilli.tga", "smilli.tga", "smilli.tga");
+	CreateSimpleSolid(scene, boxMesh, 1.0f, matrix, boxCollision, 0);
+	boxMesh->Release();
+	NewtonDestroyCollision(boxCollision);
 
 	// place camera into position
 	dQuaternion rot;
