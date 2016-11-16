@@ -99,7 +99,7 @@ class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>
 	bool SanityCheck() const;
 	dgInt32 ConvexPolygonsIntersection(const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgInt32 maxContacts) const;
 	dgInt32 ConvexPolygonToLineIntersection(const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgVector* const mem) const;
-	dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal);
+	dgInt32 CalculateContacts (const dgVector& point0, const dgVector& point1, const dgVector& normal);
 	dgInt32 CalculateClosestSimplex();
 	dgInt32 CalculateClosestSimplexLarge ();
 	dgInt32 CalculateIntersectingPlane(dgInt32 count);
