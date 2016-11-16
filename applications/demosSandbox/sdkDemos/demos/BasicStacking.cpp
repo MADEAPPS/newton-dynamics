@@ -206,13 +206,13 @@ static void BoxStack(DemoEntityManager* const scene, dFloat mass, const dVector&
 }
 
 
-
 void BasicBoxStacks (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
 
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+//	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	AddFloorBox(scene, dVector (0.0f, -0.05f, 0.0f, 0.0f), dVector(100.0f, 0.1f, 100.0f, 0.0f));
 
 	// load the scene from a ngd file format
 #if 0

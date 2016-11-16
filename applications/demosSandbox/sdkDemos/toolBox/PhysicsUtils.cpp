@@ -1103,6 +1103,28 @@ NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent
 }
 
 
+NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, const dVector& size)
+{
+	// create the shape and visual mesh as a common data to be re used
+	NewtonWorld* const world = scene->GetNewton();
+	const int materialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, materialID);
+
+	// test collision mode
+	//NewtonCollisionSetCollisonMode(collision, 0);
+
+	DemoMesh* const geometry = new DemoMesh("primitive", collision, "wood_3.tga", "wood_3.tga", "wood_3.tga");
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+	NewtonBody* const body = CreateSimpleSolid(scene, geometry, 0.0f, matrix, collision, materialID);
+	// do not forget to release the assets	
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	return body;
+}
+
 
 
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const name, bool optimized)
