@@ -121,8 +121,6 @@ class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>
 	dgMinkFace* m_coneFaceList[DG_CONVEX_MINK_STACK_SIZE];
 	dgMinkFace* m_deletedFaceList[DG_CONVEX_MINK_STACK_SIZE];
 	dgMinkFace m_facePool[DG_CONVEX_MINK_MAX_FACES];
-	dgInt32 m_polygonFaceIndex0[DG_CONVEX_MINK_MAX_POINTS];
-	dgInt32 m_polygonFaceIndex1[DG_CONVEX_MINK_MAX_POINTS];
 	dgInt8 m_heapBuffer[DG_CONVEX_MINK_MAX_FACES * (sizeof (dgFloat32) + sizeof (dgMinkFace *))];
 
 	static dgVector m_hullDirs[14]; 

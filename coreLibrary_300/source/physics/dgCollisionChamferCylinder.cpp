@@ -350,7 +350,7 @@ dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32
 
 dgVector dgCollisionChamferCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
-	*vertexIndex = -1;
+//	*vertexIndex = -1;
 	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	dgFloat32 x = dir.GetScalar();

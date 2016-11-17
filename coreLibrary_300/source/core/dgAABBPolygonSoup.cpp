@@ -573,7 +573,7 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateAllFaceEdgeNormals (void* const co
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
 
-	AdjacentdFaces adjacentFaces;
+	AdjacentdFace adjacentFaces;
 	adjacentFaces.m_count = indexCount;
 	adjacentFaces.m_index = (dgInt32*) indexArray;
 
@@ -591,12 +591,6 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateAllFaceEdgeNormals (void* const co
 		dgInt32 i1 = indexArray[i];
 		dgInt32 index = i1 * stride;
 		dgVector p (&polygon[index]);
-//		p0.m_x = dgMin (p.m_x, p0.m_x); 
-//		p0.m_y = dgMin (p.m_y, p0.m_y); 
-//		p0.m_z = dgMin (p.m_z, p0.m_z); 
-//		p1.m_x = dgMax (p.m_x, p1.m_x); 
-//		p1.m_y = dgMax (p.m_y, p1.m_y); 
-//		p1.m_z = dgMax (p.m_z, p1.m_z); 
 		p0 = p0.GetMin(p);
 		p1 = p1.GetMax(p);
 		adjacentFaces.m_edgeMap[edgeIndex] = (dgInt64 (i1) << 32) + i0;
@@ -624,16 +618,16 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 	#define DG_WELDING_TOL (1.0e-2f)
 	#define DG_WELDING_TOL2 (DG_WELDING_TOL * DG_WELDING_TOL)
 
-	AdjacentdFaces& adjacentFaces = *((AdjacentdFaces*)context);
+	const AdjacentdFace& adjacentFace = *((AdjacentdFace*)context);
 
-	if (adjacentFaces.m_index != indexArray) {	
-		dgInt32 adjacentCount = adjacentFaces.m_count;
+	if (adjacentFace.m_index != indexArray) {	
+		dgInt32 adjacentCount = adjacentFace.m_count;
 		dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
 
 		dgInt32 j0 = adjacentCount - 1;
-		dgInt32 indexJ0 = adjacentFaces.m_index[adjacentCount - 1];
+		dgInt32 indexJ0 = adjacentFace.m_index[adjacentCount - 1];
 		for (dgInt32 j = 0; j < adjacentCount; j ++) {
-			dgInt32 indexJ1 = adjacentFaces.m_index[j];
+			dgInt32 indexJ1 = adjacentFace.m_index[j];
 			dgBigVector q0 (&polygon[indexJ1 * stride]);
 			dgBigVector q1 (&polygon[indexJ0 * stride]);
 			dgBigVector q1q0 (q1 - q0);
@@ -665,22 +659,22 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 								dgFloat32 maxDist = dgFloat32 (0.0f);
 								for (dgInt32 k = 0; k < indexCount; k ++) {
 									dgVector r (&polygon[indexArray[k] * stride]);
-									dgFloat32 dist = adjacentFaces.m_normal.Evalue(r);
+									dgFloat32 dist = adjacentFace.m_normal.Evalue(r);
 									if (dgAbsf (dist) > dgAbsf (maxDist)) {
 										maxDist = dist;
 									}
 								}
 
-								if (adjacentFaces.m_index[j0 + adjacentCount + 2] == -1) {
+								if (adjacentFace.m_index[j0 + adjacentCount + 2] == -1) {
 									if (maxDist < -dgFloat32 (1.0e-3f)) {
-										adjacentFaces.m_index[j0 + adjacentCount + 2] = indexArray[indexCount + 1];
+										adjacentFace.m_index[j0 + adjacentCount + 2] = indexArray[indexCount + 1];
 									} else {
-										adjacentFaces.m_index[j0 + adjacentCount + 2] = adjacentFaces.m_index[adjacentCount + 1];
+										adjacentFace.m_index[j0 + adjacentCount + 2] = adjacentFace.m_index[adjacentCount + 1];
 									}
 								} else {
 									if (maxDist < -dgFloat32 (1.0e-3f)) {
-										dgBigVector n0 (adjacentFaces.m_normal[0], adjacentFaces.m_normal[1], adjacentFaces.m_normal[2], dgFloat64(0.0f));
-										dgBigVector n1 (&polygon[adjacentFaces.m_index[j0 + adjacentCount + 2] * stride]);
+										dgBigVector n0 (adjacentFace.m_normal[0], adjacentFace.m_normal[1], adjacentFace.m_normal[2], dgFloat64(0.0f));
+										dgBigVector n1 (&polygon[adjacentFace.m_index[j0 + adjacentCount + 2] * stride]);
 										dgBigVector n2 (&polygon[indexArray[indexCount + 1] * stride]);
 
 										dgBigVector tilt0 (n0.CrossProduct3(n1)); 
@@ -688,10 +682,10 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 										dgFloat64 dist0 (q1q0.DotProduct3 (tilt0));
 										dgFloat64 dist1 (q1q0.DotProduct3 (tilt1));
 										if (dist0 < dist1) {
-											adjacentFaces.m_index[j0 + adjacentCount + 2] = indexArray[indexCount + 1];
+											adjacentFace.m_index[j0 + adjacentCount + 2] = indexArray[indexCount + 1];
 										}
 									} else {
-										adjacentFaces.m_index[j0 + adjacentCount + 2] = adjacentFaces.m_index[adjacentCount + 1];
+										adjacentFace.m_index[j0 + adjacentCount + 2] = adjacentFace.m_index[adjacentCount + 1];
 									}
 								}
 								break;

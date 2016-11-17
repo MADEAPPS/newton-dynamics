@@ -86,8 +86,8 @@ DG_INLINE void dgContactSolver::SupportVertex(const dgVector& dir0, dgInt32 vert
 
 	const dgMatrix& matrix0 = m_instance0->m_globalMatrix;
 	const dgMatrix& matrix1 = m_instance1->m_globalMatrix;
-	dgVector p(matrix0.TransformVector(m_instance0->SupportVertexSpecial(matrix0.UnrotateVector (dir0), &m_polygonFaceIndex0[vertexIndex])) & dgVector::m_triplexMask);
-	dgVector q(matrix1.TransformVector(m_instance1->SupportVertexSpecial(matrix1.UnrotateVector (dir1), &m_polygonFaceIndex1[vertexIndex])) & dgVector::m_triplexMask);
+	dgVector p(matrix0.TransformVector(m_instance0->SupportVertexSpecial(matrix0.UnrotateVector (dir0), NULL)) & dgVector::m_triplexMask);
+	dgVector q(matrix1.TransformVector(m_instance1->SupportVertexSpecial(matrix1.UnrotateVector (dir1), NULL)) & dgVector::m_triplexMask);
 	m_hullDiff[vertexIndex] = p - q;
 	m_hullSum[vertexIndex] = p + q;
 }
@@ -113,8 +113,6 @@ DG_INLINE dgVector dgContactSolver::ReduceLine(dgInt32& indexOut)
 			indexOut = 1;
 			m_hullSum[0] = m_hullSum[1];
 			m_hullDiff[0] = m_hullDiff[1];
-			m_polygonFaceIndex0[0] = m_polygonFaceIndex0[1];
-			m_polygonFaceIndex1[0] = m_polygonFaceIndex1[1];
 		} else if (alpha0 < dgFloat32(0.0f)) {
 			v = p0;
 			indexOut = 1;
@@ -145,8 +143,6 @@ DG_INLINE dgVector dgContactSolver::ReduceLineLarge(dgInt32& indexOut)
 			indexOut = 1;
 			m_hullSum[0] = m_hullSum[1];
 			m_hullDiff[0] = m_hullDiff[1];
-			m_polygonFaceIndex0[0] = m_polygonFaceIndex0[1];
-			m_polygonFaceIndex1[0] = m_polygonFaceIndex1[1];
 		} else if (alpha0 < dgFloat32(0.0f)) {
 			v = p0;
 			indexOut = 1;
@@ -164,8 +160,6 @@ DG_INLINE void dgContactSolver::ReduceDegeneratedTriangle()
 	if (e10.DotProduct3(e10) < dgFloat32(1.0e-12f)) {
 		m_hullSum[1] = m_hullSum[2];
 		m_hullDiff[1] = m_hullDiff[2];
-		m_polygonFaceIndex0[1] = m_polygonFaceIndex0[2];
-		m_polygonFaceIndex1[1] = m_polygonFaceIndex1[2];
 
 #ifdef _DEBUG
 	} else {
@@ -216,16 +210,6 @@ DG_INLINE dgVector dgContactSolver::ReduceTriangle(dgInt32& indexOut)
 					m_hullSum[0] = tmp0;
 					m_hullSum[1] = tmp1;
 
-					dgInt32 j0 = m_polygonFaceIndex0[i0];
-					dgInt32 j1 = m_polygonFaceIndex0[i1];
-					m_polygonFaceIndex0[0] = j0;
-					m_polygonFaceIndex0[1] = j1;
-
-					j0 = m_polygonFaceIndex1[i0];
-					j1 = m_polygonFaceIndex1[i1];
-					m_polygonFaceIndex1[0] = j0;
-					m_polygonFaceIndex1[1] = j1;
-
 					return m_hullDiff[0] + segment.Scale4(num / den);
 				}
 			}
@@ -233,8 +217,6 @@ DG_INLINE dgVector dgContactSolver::ReduceTriangle(dgInt32& indexOut)
 		}
 		if (minIndex != -1) {
 			indexOut = 1;
-			m_polygonFaceIndex0[0] = m_polygonFaceIndex0[minIndex];
-			m_polygonFaceIndex1[0] = m_polygonFaceIndex1[minIndex];
 			m_hullSum[0] = m_hullSum[minIndex];
 			m_hullDiff[0] = m_hullDiff[minIndex];
 			return m_hullDiff[0];
@@ -291,16 +273,6 @@ DG_INLINE dgVector dgContactSolver::ReduceTriangleLarge (dgInt32& indexOut)
 					m_hullSum[0] = tmp0;
 					m_hullSum[1] = tmp1;
 
-					dgInt32 j0 = m_polygonFaceIndex0[i0];
-					dgInt32 j1 = m_polygonFaceIndex0[i1];
-					m_polygonFaceIndex0[0] = j0;
-					m_polygonFaceIndex0[1] = j1;
-
-					j0 = m_polygonFaceIndex1[i0];
-					j1 = m_polygonFaceIndex1[i1];
-					m_polygonFaceIndex1[0] = j0;
-					m_polygonFaceIndex1[1] = j1;
-
 					return dgVector (triangleDiffExtended[0] + segment.Scale3 (num / den));
 				}
 			}
@@ -309,8 +281,6 @@ DG_INLINE dgVector dgContactSolver::ReduceTriangleLarge (dgInt32& indexOut)
 
 		if (minIndex != -1) {
 			indexOut = 1;
-			m_polygonFaceIndex0[0] = m_polygonFaceIndex0[minIndex];
-			m_polygonFaceIndex1[0] = m_polygonFaceIndex1[minIndex];
 			m_hullSum[0] = m_hullSum[minIndex];
 			m_hullDiff[0] = dgVector (m_hullDiff[minIndex]);
 			//triangleDiffExtended[0] = triangleDiffExtended[minIndex];
@@ -348,8 +318,6 @@ DG_INLINE dgVector dgContactSolver::ReduceTetrahedrum(dgInt32& indexOut)
 		volume = -volume;
 		dgSwap(m_hullSum[i2], m_hullSum[i3]);
 		dgSwap(m_hullDiff[i2], m_hullDiff[i3]);
-		dgSwap(m_polygonFaceIndex0[i2], m_polygonFaceIndex0[i3]);
-		dgSwap(m_polygonFaceIndex1[i2], m_polygonFaceIndex1[i3]);
 	}
 	if (volume < dgFloat32(1.0e-8f)) {
 		dgTrace(("very import to finish this\n"));
@@ -409,20 +377,6 @@ DG_INLINE dgVector dgContactSolver::ReduceTetrahedrum(dgInt32& indexOut)
 		m_hullDiff[1] = tmp[1];
 		m_hullDiff[2] = tmp[2];
 
-		dgInt32 j0 = m_polygonFaceIndex0[i0];
-		dgInt32 j1 = m_polygonFaceIndex0[i1];
-		dgInt32 j2 = m_polygonFaceIndex0[i2];
-		m_polygonFaceIndex0[0] = j0;
-		m_polygonFaceIndex0[1] = j1;
-		m_polygonFaceIndex0[2] = j2;
-
-		j0 = m_polygonFaceIndex1[i0];
-		j1 = m_polygonFaceIndex1[i1];
-		j2 = m_polygonFaceIndex1[i2];
-		m_polygonFaceIndex1[0] = j0;
-		m_polygonFaceIndex1[1] = j1;
-		m_polygonFaceIndex1[2] = j2;
-
 		indexOut = 3;
 		return ReduceTriangle(indexOut);
 	}
@@ -456,8 +410,6 @@ DG_INLINE dgVector dgContactSolver::ReduceTetrahedrumLarge (dgInt32& indexOut)
 		volume = -volume;
 		dgSwap (m_hullSum[i2], m_hullSum[i3]);
 		dgSwap (m_hullDiff[i2], m_hullDiff[i3]);
-		dgSwap (m_polygonFaceIndex0[i2], m_polygonFaceIndex0[i3]);
-		dgSwap (m_polygonFaceIndex1[i2], m_polygonFaceIndex1[i3]);
 		dgSwap (tetraDiffExtended[i2], tetraDiffExtended[i3]);
 	}
 	if (volume < dgFloat32 (1.0e-8f)) {
@@ -508,20 +460,6 @@ DG_INLINE dgVector dgContactSolver::ReduceTetrahedrumLarge (dgInt32& indexOut)
 		m_hullDiff[0] = tmp[0];
 		m_hullDiff[1] = tmp[1];
 		m_hullDiff[2] = tmp[2];
-
-		dgInt32 j0 = m_polygonFaceIndex0[i0];
-		dgInt32 j1 = m_polygonFaceIndex0[i1];
-		dgInt32 j2 = m_polygonFaceIndex0[i2];
-		m_polygonFaceIndex0[0] = j0;
-		m_polygonFaceIndex0[1] = j1;
-		m_polygonFaceIndex0[2] = j2;
-
-		j0 = m_polygonFaceIndex1[i0];
-		j1 = m_polygonFaceIndex1[i1];
-		j2 = m_polygonFaceIndex1[i2];
-		m_polygonFaceIndex1[0] = j0;
-		m_polygonFaceIndex1[1] = j1;
-		m_polygonFaceIndex1[2] = j2;
 
 		indexOut = 3;
 		return ReduceTriangleLarge (indexOut);
@@ -806,8 +744,6 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 			if (area2 > maxArea) {
 				m_hullSum[2] = m_hullSum[3];
 				m_hullDiff[2] = m_hullDiff[3];
-				m_polygonFaceIndex0[2] = m_polygonFaceIndex0[3];
-				m_polygonFaceIndex1[2] = m_polygonFaceIndex1[3];
 				maxArea = area2;
 			}
 			matrix = rotation * matrix;
@@ -851,8 +787,6 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 	if (volume > dgFloat32(0.0f)) {
 		dgSwap(m_hullSum[1], m_hullSum[0]);
 		dgSwap(m_hullDiff[1], m_hullDiff[0]);
-		dgSwap(m_polygonFaceIndex0[1], m_polygonFaceIndex0[0]);
-		dgSwap(m_polygonFaceIndex1[1], m_polygonFaceIndex1[0]);
 	}
 
 	if (dgAbsf(volume) < dgFloat32(1e-15f)) {
@@ -907,8 +841,6 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		if (error2 > dgFloat32(0.0f)) {
 			dgSwap(m_hullSum[1], m_hullSum[2]);
 			dgSwap(m_hullDiff[1], m_hullDiff[2]);
-			dgSwap(m_polygonFaceIndex0[1], m_polygonFaceIndex0[2]);
-			dgSwap(m_polygonFaceIndex1[1], m_polygonFaceIndex1[2]);
 		}
 
 #ifdef _DEBUG
@@ -986,21 +918,15 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 				//}
 				dgVector sum[3];
 				dgVector diff[3];
-				dgInt32 index0[3];
-				dgInt32 index1[3];
 				m_normal = faceNode->m_plane & dgVector::m_triplexMask;
 				for (dgInt32 i = 0; i < 3; i++) {
 					dgInt32 j = faceNode->m_vertex[i];
 					sum[i] = m_hullSum[j];
 					diff[i] = m_hullDiff[j];
-					index0[i] = m_polygonFaceIndex0[j];
-					index1[i] = m_polygonFaceIndex1[j];
 				}
 				for (dgInt32 i = 0; i < 3; i++) {
 					m_hullSum[i] = sum[i];
 					m_hullDiff[i] = diff[i];
-					m_polygonFaceIndex0[i] = index0[i];
-					m_polygonFaceIndex1[i] = index1[i];
 				}
 				return 3;
 			}
@@ -1268,17 +1194,6 @@ bool dgContactSolver::CalculateClosestPoints()
 	}
 	if (simplexPointCount > 0) {
 		dgAssert((simplexPointCount > 0) && (simplexPointCount <= 3));
-
-		if (m_instance1->GetCollisionPrimityType() == m_polygonCollision) {
-			dgCollisionConvexPolygon* const polygonShape = (dgCollisionConvexPolygon*)m_instance1->GetChildShape();
-			polygonShape->SetFeatureHit(simplexPointCount, m_polygonFaceIndex1);
-		} else if (m_instance0->GetCollisionPrimityType() == m_polygonCollision) {
-			dgAssert (0);
-			// this should never happens
-			dgCollisionConvexPolygon* const polygonShape = (dgCollisionConvexPolygon*)m_instance0->GetChildShape();
-			polygonShape->SetFeatureHit(simplexPointCount, m_polygonFaceIndex0);
-		}
-
 		CalculateContactFromFeacture(simplexPointCount);
 
 		const dgMatrix& matrix0 = m_instance0->m_globalMatrix;

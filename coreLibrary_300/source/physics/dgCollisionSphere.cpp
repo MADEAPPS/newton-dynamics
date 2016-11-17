@@ -306,7 +306,7 @@ void dgCollisionSphere::Serialize(dgSerialize callback, void* const userData) co
 
 dgVector dgCollisionSphere::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const 
 {
-	*vertexIndex = -1;
+//	*vertexIndex = -1;
 	return dgVector (dgFloat32 (0.0f));
 }
 

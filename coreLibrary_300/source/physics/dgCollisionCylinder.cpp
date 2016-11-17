@@ -246,7 +246,7 @@ dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32
 {
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
-	*vertexIndex = -1;
+//	*vertexIndex = -1;
 	if (dir.m_x < dgFloat32 (-0.9999f)) {
 		return dgVector (-(m_height - D_CYLINDER_SKIN_THINCKNESS), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
 	} else if (dir.m_x > dgFloat32 (0.9999f)) {

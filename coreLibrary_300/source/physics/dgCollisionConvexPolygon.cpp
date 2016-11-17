@@ -38,7 +38,7 @@ dgCollisionConvexPolygon::dgCollisionConvexPolygon (dgMemoryAllocator* const all
 	,m_paddedCount(0)
 	,m_stride(0)
 	,m_faceNormalIndex(0)
-	,m_closestFeatureType(-1)
+//	,m_closestFeatureType(-1)
 	,m_faceClipSize(0) 
 	,m_vertex(NULL)
 	,m_vertexIndex(NULL)
@@ -107,8 +107,9 @@ dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* 
 		}
 	}
 
-	dgAssert (vertexIndex);
-	*vertexIndex = index;
+	dgAssert (vertexIndex == NULL);
+//	dgAssert (vertexIndex);
+//	*vertexIndex = index;
 	return m_localPoly[index];
 }
 
@@ -285,57 +286,6 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 }
 
 
-void dgCollisionConvexPolygon::SetFeatureHit (dgInt32 featureCount, const dgInt32* const index)
-{
-	dgInt32 copy[3];
-	copy[0] = index[0];
-	copy[1] = index[1];
-	copy[2] = index[2];
-	switch (featureCount)
-	{
-		case 3:
-		{
-			if ((copy[0] != copy[1]) && (copy[0] != copy[2]) && (copy[1] != copy[2])) {
-				m_closestFeatureType = 3;
-				m_closestFeatureStartIndex = 0;
-				break;
-			} else {
-				if (copy[0] == copy[1]) {
-					copy[0] = copy[2];
-				}
-			}
-			featureCount = 2;
-		}
-
-		case 2:
-		{
-			if (copy[0] != copy[1]) {
-				dgInt32 n1 = (copy[0] + 1) % m_count;
-				if (n1 == copy[1]) {
-					m_closestFeatureType = 2;
-					m_closestFeatureStartIndex = copy[0];
-				} else {
-					n1 = (copy[1] + 1) % m_count;
-					if (n1 == copy[0]) {
-						m_closestFeatureType = 2;
-						m_closestFeatureStartIndex = copy[1];
-					} else {
-						m_closestFeatureType = 3;
-					}
-				}
-
-				break;
-			} 
-		}
-
-		case 1:
-		{
-			m_closestFeatureType = 1;
-			m_closestFeatureStartIndex = copy[0];
-			break;
-		}
-	}
-}
 
 dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& normalIn, const dgVector& origin, dgVector* const contactsOut) const
 {
@@ -791,17 +741,20 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 
 		if (count >= 1) {
 			dgContactPoint* const contactsOut = proxy.m_contacts;
+/*
 			if (m_closestFeatureType == 3) {
 				for (dgInt32 i = 0; i < count; i++) {
 					//contactsOut[i].m_userId = m_faceId;
 					contactsOut[i].m_shapeId0 = hullId;
 					contactsOut[i].m_shapeId1 = m_faceId;
 				}
-			} else {
+			} else 
+*/
+			{
 				dgVector normal (contactsOut[0].m_normal);
-
 				if (normal.DotProduct4(m_normal).GetScalar() < dgFloat32(0.9995f)) {
-					dgInt32 index = m_adjacentFaceEdgeNormalIndex[m_closestFeatureStartIndex];
+//					dgInt32 index = m_adjacentFaceEdgeNormalIndex[m_closestFeatureStartIndex];
+					dgInt32 index = 0;
 					dgVector adjacentNormal (CalculateGlobalNormal (parentMesh, dgVector(&m_vertex[index * m_stride])));
 					if ((m_normal.DotProduct4(adjacentNormal).GetScalar() > dgFloat32(0.9995f))) {
 						normal = adjacentNormal;

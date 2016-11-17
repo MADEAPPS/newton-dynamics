@@ -34,7 +34,7 @@
 #include "dgIntersections.h"
 
 
-class AdjacentdFaces
+class AdjacentdFace
 {
 	public:
 	dgInt32 m_count;

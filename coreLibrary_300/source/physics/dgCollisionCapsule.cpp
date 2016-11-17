@@ -363,7 +363,7 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& direction, dgInt32* 
 
 dgVector dgCollisionCapsule::SupportVertexSpecial(const dgVector& direction, dgInt32* const vertexIndex) const
 {
-	*vertexIndex = -1;
+//	*vertexIndex = -1;
 	dgVector dir(direction.CompProduct4(m_transform));
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
