@@ -1540,37 +1540,61 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVect
 	dgInt32 count1 = 0;
 	dgVector* const shape1 = &contactsOut[baseCount];
 
+	dgVector origin((point0 + point1).Scale4(dgFloat32(0.5f)));
+
 	const dgMatrix& matrix1 = m_instance1->m_globalMatrix;
-	dgVector ponintOnInstance1(matrix1.UntransformVector(point1));
+	dgVector ponintOnInstance1(matrix1.UntransformVector(origin));
 	dgVector normalOnInstance1 (matrix1.UnrotateVector(normal));
 	count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, ponintOnInstance1, shape1);
 	if (!count1) {
-		count1 = 1;
-		shape1[0] = ponintOnInstance1;
+		dgVector step(normal.Scale4(DG_PENETRATION_TOL * dgFloat32(2.0f)));
+		dgVector alternatePoint(point1);
+		for (dgInt32 i = 0; (i < 3) && !count1; i++) {
+			alternatePoint -= step;
+			dgVector alternatePointOnInstance1(matrix1.UntransformVector(alternatePoint));
+			count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, alternatePointOnInstance1, shape1);
+		}
+		dgAssert(count1);
+		step = matrix1.UnrotateVector(normal.CompProduct4 ((alternatePoint - origin).DotProduct4(normal)));
+		for (dgInt32 i = 0; i < count1; i++) {
+			shape1[i] -= step;
+		}
+		//count1 = 1;
+		//shape1[0] = ponintOnInstance1;
 	}
 
 	if (count1) {
-		dgVector step(normal.CompProduct4((point0 - point1).DotProduct4(normal.CompProduct4(dgVector::m_half))));
 		for (int i = 0; i < count1; i ++) {
-			shape1[i] = matrix1.TransformVector(shape1[i]) + step;
+			shape1[i] = matrix1.TransformVector(shape1[i]);
 		}
 
 		dgInt32 count0 = 0;
 		dgVector* const shape0 = &contactsOut[baseCount + count1];
 
 		const dgMatrix& matrix0 = m_instance0->m_globalMatrix;
-		dgVector pointOnInstance0(matrix0.UntransformVector(point0));
+		dgVector pointOnInstance0(matrix0.UntransformVector(origin));
 		dgVector normalOnInstance0(matrix0.UnrotateVector(normal.Scale4(dgFloat32(-1.0f))));
-
 		count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0);
 		if (!count0) {
-			count0 = 1;
-			shape0[0] = pointOnInstance0;
+			dgVector step(normal.Scale4(DG_PENETRATION_TOL * dgFloat32(2.0f)));
+			dgVector alternatePoint(point0);
+			for (dgInt32 i = 0; (i < 3) && !count0; i++) {
+				alternatePoint += step;
+				dgVector alternatePointOnInstance0(matrix0.UntransformVector(alternatePoint));
+				count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, alternatePointOnInstance0, shape0);
+			}
+			dgAssert(count0);
+			step = matrix0.UnrotateVector(normal.CompProduct4((alternatePoint - origin).DotProduct4(normal)));
+			for (dgInt32 i = 0; i < count1; i++) {
+				shape0[i] += step;
+			}
+			//count0 = 1;
+			//shape0[0] = pointOnInstance0;
 		}
 
 		if (count0) {
 			for (dgInt32 i = 0; i < count0; i++) {
-				shape0[i] = matrix0.TransformVector(shape0[i]) - step;
+				shape0[i] = matrix0.TransformVector(shape0[i]);
 			}
 
 			if (count1 == 1) {
@@ -1627,7 +1651,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVect
 
 	if (!count && m_proxy->m_continueCollision) {
 		count = 1;
-		contactsOut[0] = (point0 + point1).Scale4 (dgFloat32 (0.5f));
+		contactsOut[0] = origin;
 	}
 
 	return count;
@@ -1894,16 +1918,11 @@ dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 	} else {
 		bool colliding = CalculateClosestPoints();
 		if (colliding) { 
-			//dgFloat32 penetration__ = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar() - m_proxy->m_skinThickness;
 			dgFloat32 penetration = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar() - m_proxy->m_skinThickness + DG_PENETRATION_TOL;
 			if (penetration <= dgFloat32(1.0e-5f)) {
 				m_proxy->m_contactJoint->m_contactActive = 1;
 				if (m_instance0->GetCollisionMode() & m_instance1->GetCollisionMode()) {
-					dgVector step = m_normal.Scale4(DG_PENETRATION_TOL);
-					//dgVector contactPoint((m_closestPoint0 + m_closestPoint1).Scale4(dgFloat32(0.5f)));
-					dgVector p0(m_closestPoint0 - step);
-					dgVector p1(m_closestPoint1 + step);
-					count = CalculateContacts(p0, p1, m_normal.Scale4(-1.0f));
+					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_normal.Scale4(-1.0f));
 				}
 			}
 
