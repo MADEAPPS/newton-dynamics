@@ -741,24 +741,24 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 
 		if (count >= 1) {
 			dgContactPoint* const contactsOut = proxy.m_contacts;
-/*
-			if (m_closestFeatureType == 3) {
-				for (dgInt32 i = 0; i < count; i++) {
-					//contactsOut[i].m_userId = m_faceId;
-					contactsOut[i].m_shapeId0 = hullId;
-					contactsOut[i].m_shapeId1 = m_faceId;
-				}
-			} else 
-*/
-			{
-				dgVector normal (contactsOut[0].m_normal);
-				if (normal.DotProduct4(m_normal).GetScalar() < dgFloat32(0.9995f)) {
-//					dgInt32 index = m_adjacentFaceEdgeNormalIndex[m_closestFeatureStartIndex];
-					dgInt32 index = 0;
-					dgVector adjacentNormal (CalculateGlobalNormal (parentMesh, dgVector(&m_vertex[index * m_stride])));
-					if ((m_normal.DotProduct4(adjacentNormal).GetScalar() > dgFloat32(0.9995f))) {
-						normal = adjacentNormal;
-					} else {
+
+			dgVector normal (contactsOut[0].m_normal);
+			if (normal.DotProduct4(m_normal).GetScalar() < dgFloat32(0.9995f)) {
+//				dgInt32 index = m_adjacentFaceEdgeNormalIndex[m_closestFeatureStartIndex];
+//				dgInt32 index = 0;
+//				dgVector adjacentNormal (CalculateGlobalNormal (parentMesh, dgVector(&m_vertex[index * m_stride])));
+//				if ((m_normal.DotProduct4(adjacentNormal).GetScalar() > dgFloat32(0.9995f))) {
+//					normal = adjacentNormal;
+//				} else {
+				dgInt32 i0 = m_vertexCount - 1;
+				for (dgInt32 i1 = 0; i1 < m_vertexCount; i1++) {
+					dgVector sideDir(m_localPoly[i1] - m_localPoly[i0]);
+					const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
+					dgVector adjacentNormal(CalculateGlobalNormal(parentMesh, dgVector(&m_vertex[adjacentNormalIndex * m_stride])));
+					dgFloat32 val0 = sideDir.DotProduct4(normal.CrossProduct3(m_normal)).GetScalar();
+					dgFloat32 val1 = sideDir.DotProduct4(normal.CrossProduct3(adjacentNormal)).GetScalar();
+					if ((val0 * val1) > dgFloat32(0.0f)) {
+						dgAssert(0);
 						dgVector dir0(adjacentNormal.CrossProduct3(m_normal));
 						dgVector dir1(adjacentNormal.CrossProduct3(normal));
 						dgFloat32 projection = dir0.DotProduct4(dir1).GetScalar();
@@ -766,20 +766,21 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 							normal = adjacentNormal;
 						}
 					}
-					normal = polygonInstance->m_globalMatrix.RotateVector(normal);
-
-					for (dgInt32 i = 0; i < count; i++) {
-						contactsOut[i].m_normal = normal;
-						contactsOut[i].m_shapeId0 = hullId;
-						contactsOut[i].m_shapeId1 = m_faceId;
-					}
-				} else {
-					for (dgInt32 i = 0; i < count; i++) {
-						contactsOut[i].m_shapeId0 = hullId;
-						contactsOut[i].m_shapeId1 = m_faceId;
-					}
+					i0 = i1;
+				}
+				normal = polygonInstance->m_globalMatrix.RotateVector(normal);
+				for (dgInt32 i = 0; i < count; i++) {
+					contactsOut[i].m_normal = normal;
+					contactsOut[i].m_shapeId0 = hullId;
+					contactsOut[i].m_shapeId1 = m_faceId;
+				}
+			} else {
+				for (dgInt32 i = 0; i < count; i++) {
+					contactsOut[i].m_shapeId0 = hullId;
+					contactsOut[i].m_shapeId1 = m_faceId;
 				}
 			}
+		
 		}
 	}
 	return count;
