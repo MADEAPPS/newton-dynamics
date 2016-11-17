@@ -1437,48 +1437,51 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 }
 
 
-dgContact* dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
+void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 
 	dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
-	const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint (body0, body1);
-	const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
+	dgThreadHiveScopeLock lock(m_world, &m_contacJointLock, true);
+	dgContact* contact = m_world->FindContactJoint(body0, body1);
+	if (!contact) {
+		const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint (body0, body1);
+		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 
-	dgContact* contact = NULL;
-	if (isCollidable) {
-		dgUnsigned32 group0_ID = dgUnsigned32 (body0->m_bodyGroupId);
-		dgUnsigned32 group1_ID = dgUnsigned32 (body1->m_bodyGroupId);
-		if (group1_ID < group0_ID) {
-			dgSwap (group0_ID, group1_ID);
-		}
+		if (isCollidable) {
+			dgUnsigned32 group0_ID = dgUnsigned32 (body0->m_bodyGroupId);
+			dgUnsigned32 group1_ID = dgUnsigned32 (body1->m_bodyGroupId);
+			if (group1_ID < group0_ID) {
+				dgSwap (group0_ID, group1_ID);
+			}
 
-		dgUnsigned32 key = (group1_ID << 16) + group0_ID;
-		const dgBodyMaterialList* const materialList = m_world;  
-		const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
+			dgUnsigned32 key = (group1_ID << 16) + group0_ID;
+			const dgBodyMaterialList* const materialList = m_world;  
+			const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
 
-		if (material->m_flags & dgContactMaterial::m_collisionEnable) {
-			bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
-			if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
-	
-				m_world->GlobalLock(false);
+			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
+				bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
+				if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
 					if (body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
 						contact = new (m_world->m_allocator) dgDeformableContact(m_world, material);
 					} else {
 						contact = new (m_world->m_allocator) dgContact(m_world, material);
 					}
 					contact->AppendToActiveList();
-				m_world->GlobalUnlock();
-				m_world->AttachConstraint(contact, body0, body1);
+					m_world->AttachConstraint(contact, body0, body1);
 
-				dgAssert (contact);
-				contact->m_contactActive = 0;
-				contact->m_positAcc = dgVector (dgFloat32 (10.0f));
-				contact->m_timeOfImpact = dgFloat32 (1.0e10f);
+					dgAssert (contact);
+					contact->m_contactActive = 0;
+					contact->m_positAcc = dgVector (dgFloat32 (10.0f));
+					contact->m_timeOfImpact = dgFloat32 (1.0e10f);
+				}
 			}
 		}
 	}
-	return contact;
+
+	if (contact) {
+		contact->m_broadphaseLru = m_lru;
+	}
 }
 
 
@@ -1550,23 +1553,7 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 				dgBody* const body1 = rootNode->GetBody();
 				if (body0) {
 					if (body1) {
-						dgContact* contact = NULL;
-						if (threadCount > 1) {
-							m_world->GlobalLock(false);
-							contact = m_world->FindContactJoint(body0, body1);
-							if (!contact) {
-								contact = AddPair(body0, body1, timestep, threadID);
-							}
-							m_world->GlobalUnlock();
-						} else {
-							contact = m_world->FindContactJoint (body0, body1);
-							if (!contact) {
-								contact = AddPair(body0, body1, timestep, threadID);
-							}
-						}
-						if (contact) {
-							contact->m_broadphaseLru = m_lru;
-						}
+						AddPair(body0, body1, timestep, threadID);
 					} else {
 						dgAssert (rootNode->IsAggregate());
 						dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*) rootNode;
