@@ -47,6 +47,8 @@ class dgMinkFace
 #define DG_MINK_VERTEX_ERR2				(DG_MINK_VERTEX_ERR * DG_MINK_VERTEX_ERR)
 
 
+class dgCollisionParamProxy;
+
 DG_MSC_VECTOR_ALIGMENT
 class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>  
 {

@@ -1177,7 +1177,9 @@ int NewtonWorldCollide (const NewtonWorld* const newtonWorld, const dFloat* cons
 
 dFloat NewtonWorldGetCollisionMargin(const NewtonWorld* const newtonWorld)
 {
-	return DG_PENETRATION_TOL * dgFloat32 (2.0f);
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->GetCollisionMargin();
 }
 
 

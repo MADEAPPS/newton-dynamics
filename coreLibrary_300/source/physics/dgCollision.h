@@ -24,12 +24,14 @@
 
 
 class dgBody;
+class dgWorld;
 class dgCollision;
 class dgMeshEffect;
 class dgContactPoint;
 class dgPolygonSoupDesc;
 class dgCollisionConvex;
 class dgPolygonMeshDesc;
+class dgCollisionInstance;
 class dgCollisionConvexHull;
 class dgPolygonSoupRayHitDesc;
 
@@ -38,6 +40,11 @@ class dgPolygonSoupRayHitDesc;
 #endif
 
 #define PREFILTER_RAYCAST(filter,body,collision,userData) (filter && !filter(body,collision,userData)) 
+
+typedef dgInt32(dgApi *OnBodiesInAABB) (dgBody* body, void* const userData);
+typedef dgUnsigned32(dgApi *OnRayPrecastAction) (const dgBody* const body, const dgCollisionInstance* const collision, void* const userData);
+typedef dgFloat32(dgApi *OnRayCastAction) (const dgBody* const body, const dgCollisionInstance* const collision, const dgVector& contact, const dgVector& normal, dgInt64 collisionID, void* const userData, dgFloat32 intersetParam);
+
 
 enum dgCollisionID
 {

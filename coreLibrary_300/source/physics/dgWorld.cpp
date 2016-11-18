@@ -823,6 +823,11 @@ dgInt32 dgWorld::GetConstraintsCount() const
 	return dgInt32 (list.m_constraintCount);
 }
 
+dgFloat32 dgWorld::GetCollisionMargin() const
+{
+	return DG_RESTING_CONTACT_PENETRATION;
+}
+
 
 void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 {

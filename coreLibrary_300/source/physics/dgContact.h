@@ -22,8 +22,8 @@
 #ifndef __DGCONTACT_H__
 #define __DGCONTACT_H__
 
-
 #include "dgConstraint.h"
+#include "dgContactSolver.h"
 
 class dgBody;
 class dgWorld;
@@ -34,8 +34,8 @@ class dgPolygonMeshDesc;
 class dgCollisionInstance;
 
 
-#define DG_MAX_CONTATCS						128
-
+#define DG_MAX_CONTATCS					128
+#define DG_RESTING_CONTACT_PENETRATION	(DG_PENETRATION_TOL * dgFloat32 (4.0f))
 
 class dgActiveContacts: public dgList<dgContact*>
 {

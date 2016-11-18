@@ -23,6 +23,7 @@
 #define _DG_BODY_H_
 
 #include "dgPhysicsStdafx.h"
+#include "dgCollision.h"
 #include "dgBodyMasterList.h"
 
 class dgLink;
@@ -43,9 +44,6 @@ class dgBroadPhaseAggregate;
 
 #define OverlapTest(body0,body1) dgOverlapTest ((body0)->m_minAABB, (body0)->m_maxAABB, (body1)->m_minAABB, (body1)->m_maxAABB)
 
-typedef dgInt32(dgApi *OnBodiesInAABB) (dgBody* body, void* const userData);
-typedef dgUnsigned32(dgApi *OnRayPrecastAction) (const dgBody* const body, const dgCollisionInstance* const collision, void* const userData);
-typedef dgFloat32(dgApi *OnRayCastAction) (const dgBody* const body, const dgCollisionInstance* const collision, const dgVector& contact, const dgVector& normal, dgInt64 collisionID, void* const userData, dgFloat32 intersetParam);
 
 
 DG_MSC_VECTOR_ALIGMENT

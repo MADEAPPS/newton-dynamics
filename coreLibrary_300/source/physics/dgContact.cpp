@@ -23,15 +23,12 @@
 #include "dgBody.h"
 #include "dgWorld.h"
 #include "dgContact.h"
-#include "dgContactSolver.h"
 #include "dgCollisionInstance.h"
 #include "dgWorldDynamicUpdate.h"
 
 #define REST_RELATIVE_VELOCITY			dgFloat32 (1.0e-3f)
 #define MAX_DYNAMIC_FRICTION_SPEED		dgFloat32 (0.3f)
 #define MAX_PENETRATION_STIFFNESS		dgFloat32 (50.0f)
-//#define DG_RESTING_CONTACT_PENETRATION	dgFloat32 (1.0f / 256.0f)
-#define DG_RESTING_CONTACT_PENETRATION	(DG_PENETRATION_TOL * dgFloat32 (4.0f))
 
 
 //////////////////////////////////////////////////////////////////////
