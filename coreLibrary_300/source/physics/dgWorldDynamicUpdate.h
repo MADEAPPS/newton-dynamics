@@ -228,7 +228,7 @@ class dgJacobianMemory
 	public:
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes);
 
-	dgJacobian* m_internalForcesBuffer;
+//	dgJacobian* m_internalForcesBuffer;
 	dgJacobianMatrixElement* m_jacobianBuffer;
 };
 
@@ -270,12 +270,12 @@ class dgWorldDynamicUpdate
 	void CalculateReactionForcesParallel (const dgIsland* const island, dgFloat32 timestep) const;
 	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;
 	void ApplyNetTorqueAndForce (dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& accNorm, const dgVector& mask) const;
-	void ApplyNetVelcAndOmega (dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2, const dgVector& mask) const;
+	void ApplyNetVelcAndOmega (dgDynamicBody* const body, const dgVector& timestep4, const dgVector& speedFreeze2, const dgVector& mask) const;
 	
 	void CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
 	void BuildJacobianMatrix (dgIsland* const island, dgInt32 threadID, dgFloat32 timestep) const;
 	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, const dgJointInfo* const jointInfo, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const;
-	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 solverExtrapolator, dgFloat32 restAcceleration) const;
+	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 solverExtrapolator, dgFloat32 restAcceleration) const;
 	void InitJointForce (dgJointInfo* const jointInfo, dgJacobianMatrixElement* const matrixRow, dgJacobian& force0, dgJacobian& force1) const;
 	void CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateReactionsForces(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;

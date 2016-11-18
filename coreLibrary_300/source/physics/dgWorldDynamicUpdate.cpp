@@ -92,7 +92,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	world->m_dynamicsLru = world->m_dynamicsLru + DG_BODY_LRU_STEP;
 	m_markLru = world->m_dynamicsLru;
 
-	dgBody* const sentinelBody = world->m_sentinelBody;
+	dgDynamicBody* const sentinelBody = world->m_sentinelBody;
 	sentinelBody->m_index = 0; 
 	sentinelBody->m_dynamicsLru = m_markLru;
 
@@ -119,6 +119,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_resting = true;
 	sentinelBody->m_active = false;
 	sentinelBody->m_equilibrium = true;
+	sentinelBody->m_intenalForce = dgVector::m_zero;
+	sentinelBody->m_intenalTorque = dgVector::m_zero;
 	for (dgInt32 i = 0; i < threadCount; i ++) {
 		world->QueueJob (FindActiveJointAndBodiesKernel, &descriptor, world);
 	}
@@ -870,12 +872,12 @@ void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bod
 	world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(rowsCount, sizeof (dgJacobianMatrixElement));
 	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobiansMemory[0];
 
-	world->m_solverForceAccumulatorMemory.ExpandCapacityIfNeessesary(bodyCount + 8, sizeof (dgJacobian));
-	m_internalForcesBuffer = (dgJacobian*)&world->m_solverForceAccumulatorMemory[0];
-	dgAssert(bodyCount <= (((world->m_solverForceAccumulatorMemory.GetBytesCapacity() - 16) / dgInt32(sizeof (dgJacobian))) & (-8)));
+	//world->m_solverForceAccumulatorMemory.ExpandCapacityIfNeessesary(bodyCount + 8, sizeof (dgJacobian));
+	//m_internalForcesBuffer = (dgJacobian*)&world->m_solverForceAccumulatorMemory[0];
+	//dgAssert(bodyCount <= (((world->m_solverForceAccumulatorMemory.GetBytesCapacity() - 16) / dgInt32(sizeof (dgJacobian))) & (-8)));
 
 	dgAssert((dgUnsigned64(m_jacobianBuffer) & 0x01f) == 0);
-	dgAssert((dgUnsigned64(m_internalForcesBuffer) & 0x01f) == 0);
+	//dgAssert((dgUnsigned64(m_internalForcesBuffer) & 0x01f) == 0);
 }
 
 
