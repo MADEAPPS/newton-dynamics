@@ -30,8 +30,8 @@
 #define DG_FREEZE_MAG		dgFloat32(0.1f)
 #define DG_FREEZE_MAG2		dgFloat32(DG_FREEZE_MAG * DG_FREEZE_MAG)
 
-#define DG_ErrTolerance		(1.0e-2f)
-#define DG_ErrTolerance2	(DG_ErrTolerance * DG_ErrTolerance)
+#define DG_ERR_TOLERANCE	dgFloat32(1.0e-2f)
+#define DG_ERR_TOLERANCE2	(DG_ERR_TOLERANCE * DG_ERR_TOLERANCE)
 
 class dgSkeletonContainer;
 
@@ -89,6 +89,9 @@ class dgDynamicBody : public dgBody
 
 	dgVector m_accel;
 	dgVector m_alpha;
+	dgVector m_intenalForce;
+	dgVector m_intenalTorque;
+
 	dgVector m_prevExternalForce;
 	dgVector m_prevExternalTorque;
 	dgVector m_dampCoef;

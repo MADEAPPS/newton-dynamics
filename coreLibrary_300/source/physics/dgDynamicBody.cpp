@@ -28,17 +28,19 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dgVector dgDynamicBody::m_equilibriumError2 (DG_ErrTolerance2);
+dgVector dgDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
 
 
 dgDynamicBody::dgDynamicBody()
 	:dgBody()
-	,m_accel(dgFloat32 (0.0))
-	,m_alpha(dgFloat32 (0.0))
-	,m_prevExternalForce(dgFloat32 (0.0))
-	,m_prevExternalTorque(dgFloat32 (0.0))
-	,m_dampCoef(dgFloat32 (0.0))
-	,m_aparentMass(dgFloat32 (0.0))
+	,m_accel(dgFloat32 (0.0f))
+	,m_alpha(dgFloat32 (0.0f))
+	,m_intenalForce(dgFloat32(0.0))
+	,m_intenalTorque(dgFloat32(0.0))
+	,m_prevExternalForce(dgFloat32 (0.0f))
+	,m_prevExternalTorque(dgFloat32 (0.0f))
+	,m_dampCoef(dgFloat32 (0.0f))
+	,m_aparentMass(dgFloat32 (0.0f))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
@@ -56,12 +58,14 @@ dgDynamicBody::dgDynamicBody()
 
 dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
 	:dgBody(world, collisionCashe, serializeCallback, userData, revisionNumber)
-	,m_accel(dgFloat32 (0.0))
-	,m_alpha(dgFloat32 (0.0))
-	,m_prevExternalForce(dgFloat32 (0.0))
-	,m_prevExternalTorque(dgFloat32 (0.0))
-	,m_dampCoef(dgFloat32 (0.0))
-	,m_aparentMass(dgFloat32 (0.0))
+	,m_accel(dgFloat32 (0.0f))
+	,m_alpha(dgFloat32 (0.0f))
+	,m_intenalForce(dgFloat32(0.0))
+	,m_intenalTorque(dgFloat32(0.0))
+	,m_prevExternalForce(dgFloat32 (0.0f))
+	,m_prevExternalTorque(dgFloat32 (0.0f))
+	,m_dampCoef(dgFloat32 (0.0f))
+	,m_aparentMass(dgFloat32 (0.0f))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
@@ -144,27 +148,27 @@ bool dgDynamicBody::IsInEquilibrium() const
 		dgVector deltaAccel((m_accel - m_prevExternalForce).Scale4(m_invMass.m_w));
 		dgAssert(deltaAccel.m_w == 0.0f);
 		dgFloat32 deltaAccel2 = deltaAccel.DotProduct4(deltaAccel).GetScalar();
-		if (deltaAccel2 > DG_ErrTolerance2) {
+		if (deltaAccel2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
 		dgVector netAccel(m_netForce.Scale4(m_invMass.m_w));
 		dgAssert(netAccel.m_w == 0.0f);
 		dgFloat32 netAccel2 = deltaAccel.DotProduct4(deltaAccel).GetScalar();
-		if (netAccel2 > DG_ErrTolerance2) {
+		if (netAccel2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
 
 		dgVector deltaAlpha(m_matrix.UnrotateVector(m_alpha - m_prevExternalTorque).CompProduct4(m_invMass));
 		dgAssert(deltaAlpha.m_w == 0.0f);
 		dgFloat32 deltaAlpha2 = deltaAlpha.DotProduct4(deltaAlpha).GetScalar();
-		if (deltaAlpha2 > DG_ErrTolerance2) {
+		if (deltaAlpha2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
 
 		dgVector netAlpha(m_matrix.UnrotateVector(m_alpha - m_prevExternalTorque).CompProduct4(m_invMass));
 		dgAssert(netAlpha.m_w == 0.0f);
 		dgFloat32 netAlpha2 = netAlpha.DotProduct4(netAlpha).GetScalar();
-		if (netAlpha2 > DG_ErrTolerance2) {
+		if (netAlpha2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
 		return true;
