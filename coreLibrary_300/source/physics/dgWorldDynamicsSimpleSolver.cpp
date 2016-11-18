@@ -635,7 +635,7 @@ void dgWorldDynamicUpdate::CalculateReactionsForces(const dgIsland* const island
 }
 
 
-dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const
+dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 solverExtrapolator, dgFloat32 restAcceleration) const
 {
 	dgVector accNorm(dgVector::m_zero);
 
@@ -656,7 +656,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 
 			const dgInt32 index = jointInfo->m_pairStart;
 			const dgInt32 rowsCount = jointInfo->m_pairCount;
-			const dgFloat32 extrapolationFactor = dgFloat32(1.25f);
 
 			dgFloat32 cacheForce[DG_CONSTRAINT_MAX_ROWS + 4];
 			cacheForce[0] = dgFloat32(1.0f);
@@ -682,7 +681,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 					dgVector diag(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(linearM0) + row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(angularM0) +
 								  row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(linearM1) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(angularM1));
 
-					dgVector accel(extrapolationFactor * (row->m_coordenateAccel - row->m_force * row->m_diagDamp - (diag.AddHorizontal()).GetScalar()));
+					dgVector accel(solverExtrapolator * (row->m_coordenateAccel - row->m_force * row->m_diagDamp - (diag.AddHorizontal()).GetScalar()));
 					dgVector force(row->m_force + row->m_invJMinvJt * accel.GetScalar());
 
 					const dgInt32 frictionIndex = row->m_normalForceIndex;
@@ -809,7 +808,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode(const dgIsland* const island,
 		skeletonMemorySizeInBytes += memorySizes[i];
 	}
 
-
+	const dgFloat32 solverExtrapolator = (jointCount < 8) ? dgFloat32 (1.0f) : ((jointCount < 16) ? dgFloat32 (1.125f) : dgFloat32 (1.25f)); 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < maxPasses; step++) {
 		if (joindDesc.m_firstPassCoefFlag == dgFloat32(0.0f)) {
@@ -842,12 +841,12 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode(const dgIsland* const island,
 		}
 
 		dgFloat32 accNorm(maxAccNorm * dgFloat32(2.0f));
-		dgFloat32 equelibrium = maxAccNorm * dgFloat32(0.5f);
+		dgFloat32 equilibrium = maxAccNorm * dgFloat32(0.5f);
 		for (dgInt32 k = 0; (k < passes) && (accNorm > maxAccNorm); k++) {
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 i = 0; i < jointCount; i++) {
 				dgJointInfo* const jointInfo = &constraintArray[i];
-				dgFloat32 accel = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, equelibrium);
+				dgFloat32 accel = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, solverExtrapolator, equilibrium);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 		}

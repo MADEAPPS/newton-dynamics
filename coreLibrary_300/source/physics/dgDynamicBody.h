@@ -180,7 +180,7 @@ DG_INLINE void dgDynamicBody::SetTorque (const dgVector& torque)
 
 DG_INLINE void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
 {
-	const dgFloat32 tau = dgFloat32 (1.0f) / (dgFloat32(120.0f) * timestep);
+	const dgFloat32 tau = dgFloat32 (1.0f) / (dgFloat32(60.0f) * timestep);
 	if (m_linearDampOn) {
 		dgFloat32 velocDamp = dgPow(dgFloat32(1.0f) - m_dampCoef.m_w, tau);
 		m_veloc = m_veloc.Scale4(velocDamp);
