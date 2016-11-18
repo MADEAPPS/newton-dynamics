@@ -437,7 +437,8 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 
 	if (timestep != dgFloat32 (0.0f)) {
 		for (dgInt32 i = 1; i < bodyCount; i ++) {
-			dgBody* const body = bodyArray[i].m_body;
+			dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
+			dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 			if (!body->m_equilibrium) {
 				dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
 				body->AddDampingAcceleration(timestep);
@@ -448,6 +449,9 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (dgIsland* const island, dgInt32 
 				// re use these variables for temp storage 
 				body->m_netForce = body->m_veloc;
 				body->m_netTorque = body->m_omega;
+
+				body->m_intenalForce = dgVector::m_zero;
+				body->m_intenalTorque = dgVector::m_zero;
 
 				internalForces[i].m_linear = dgVector::m_zero;
 				internalForces[i].m_angular = dgVector::m_zero;
@@ -556,8 +560,6 @@ void dgWorldDynamicUpdate::ApplyNetVelcAndOmega(dgDynamicBody* const body, const
 			torque += body->m_alpha;
 		}
 
-#if 1
-		// this method is more accurate numerically 
 		dgVector velocStep((force.Scale4(body->m_invMass.m_w)).CompProduct4(timestep4));
 		dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)).CompProduct4(timestep4));
 		if (!body->m_resting) {
@@ -571,26 +573,6 @@ void dgWorldDynamicUpdate::ApplyNetVelcAndOmega(dgDynamicBody* const body, const
 				body->m_resting = false;
 			}
 		}
-
-#else
-		// this method is Lagrange-Euler by is more expensive and accumulate more numerical error. 
-		dgVector linearMomentum(force.CompProduct4(timestep4) + body->m_veloc.Scale4(body->m_mass.m_w));
-		dgVector angularMomentum(torque.CompProduct4(timestep4) + body->m_matrix.RotateVector(body->m_mass.CompProduct4(body->m_matrix.UnrotateVector(body->m_omega))));
-		if (!body->m_resting) {
-			body->m_veloc = linearMomentum.Scale4(body->m_invMass.m_w);
-			body->m_omega = body->m_invWorldInertiaMatrix.RotateVector(angularMomentum);
-		}
-		else {
-			dgVector velocStep(linearMomentum.Scale4(body->m_invMass.m_w));
-			dgVector omegaStep(body->m_invWorldInertiaMatrix.RotateVector(angularMomentum));
-			dgVector velocStep2(velocStep.DotProduct4(velocStep));
-			dgVector omegaStep2(omegaStep.DotProduct4(omegaStep));
-			dgVector test((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2) | forceActiveMask);
-			if (test.GetSignMask()) {
-				body->m_resting = false;
-			}
-		}
-#endif
 	}
 
 	dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
@@ -643,14 +625,22 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 	if (constraint->m_solverActive) {
 		const dgInt32 m0 = jointInfo->m_m0;
 		const dgInt32 m1 = jointInfo->m_m1;
-		const dgBody* const body0 = bodyArray[m0].m_body;
-		const dgBody* const body1 = bodyArray[m1].m_body;
+
+		dgDynamicBody* const body0 = (dgDynamicBody*)bodyArray[m0].m_body;
+		dgDynamicBody* const body1 = (dgDynamicBody*)bodyArray[m1].m_body;
+		dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+		dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 
 		if (!(body0->m_resting & body1->m_resting)) {
-			dgVector linearM0(internalForces[m0].m_linear);
-			dgVector angularM0(internalForces[m0].m_angular);
-			dgVector linearM1(internalForces[m1].m_linear);
-			dgVector angularM1(internalForces[m1].m_angular);
+			//dgVector linearM0(internalForces[m0].m_linear);
+			//dgVector angularM0(internalForces[m0].m_angular);
+			//dgVector linearM1(internalForces[m1].m_linear);
+			//dgVector angularM1(internalForces[m1].m_angular);
+			dgVector linearM0(body0->m_intenalForce);
+			dgVector angularM0(body0->m_intenalTorque);
+			dgVector linearM1(body1->m_intenalForce);
+			dgVector angularM1(body1->m_intenalTorque);
+
 			const dgVector scale0(jointInfo->m_scale0);
 			const dgVector scale1(jointInfo->m_scale1);
 
@@ -720,6 +710,12 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			if (accNorm.GetScalar() <= restAcceleration) {
 				restAcceleration *=1;
 			}
+
+			body0->m_intenalForce = linearM0;
+			body0->m_intenalTorque = angularM0;
+			body1->m_intenalForce = linearM1;
+			body1->m_intenalTorque = angularM1;
+
 			internalForces[m0].m_linear = linearM0;
 			internalForces[m0].m_angular = angularM0;
 			internalForces[m1].m_linear = linearM1;
@@ -756,6 +752,15 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode(const dgIsland* const island,
 			const dgInt32 m0 = jointInfo->m_m0;
 			const dgInt32 m1 = jointInfo->m_m1;
 			dgAssert(m0 != m1);
+			dgDynamicBody* const body0 = (dgDynamicBody*)bodyArray[m0].m_body;
+			dgDynamicBody* const body1 = (dgDynamicBody*)bodyArray[m1].m_body;
+			dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+			dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+			body0->m_intenalForce += y0.m_linear;
+			body0->m_intenalTorque += y0.m_angular;
+			body1->m_intenalForce += y1.m_linear;
+			body1->m_intenalTorque += y1.m_angular;
+
 			internalForces[m0].m_linear += y0.m_linear;
 			internalForces[m0].m_angular += y0.m_angular;
 			internalForces[m1].m_linear += y1.m_linear;

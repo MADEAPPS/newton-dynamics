@@ -825,7 +825,7 @@ dgInt32 dgWorld::GetConstraintsCount() const
 
 dgFloat32 dgWorld::GetCollisionMargin() const
 {
-	return DG_RESTING_CONTACT_PENETRATION;
+	return DG_RESTING_CONTACT_PENETRATION * dgFloat32 (0.5f);
 }
 
 
