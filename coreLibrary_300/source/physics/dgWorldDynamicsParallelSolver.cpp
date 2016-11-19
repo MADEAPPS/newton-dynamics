@@ -33,6 +33,8 @@
 
 void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* const island, dgFloat32 timestep) const
 {
+	dgAssert(0);
+	/*
 	dgParallelSolverSyncData syncData;
 
 	dgWorld* const world = (dgWorld*) this;
@@ -71,6 +73,7 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* cons
 	SolverInitInternalForcesParallel (&syncData);
 	CalculateForcesGameModeParallel (&syncData);
 	IntegrateIslandParallel(&syncData); 
+*/
 }
 
 
@@ -167,6 +170,8 @@ void dgWorldDynamicUpdate::LinearizeJointParallelArray(dgParallelSolverSyncData*
 
 void dgWorldDynamicUpdate::InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData) const
 {
+	dgAssert (0);
+	/*
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 threadCounts = world->GetThreadCount();	
 
@@ -179,6 +184,7 @@ void dgWorldDynamicUpdate::InitilizeBodyArrayParallel (dgParallelSolverSyncData*
 		world->QueueJob (InitializeBodyArrayParallelKernel, syncData, world);
 	}
 	world->SynchronizationBarrier();
+*/
 }
 
 void dgWorldDynamicUpdate::InitializeBodyArrayParallelKernel (void* const context, void* const worldContext, dgInt32 threadID)
