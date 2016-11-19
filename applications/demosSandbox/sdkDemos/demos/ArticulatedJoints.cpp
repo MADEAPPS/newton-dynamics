@@ -565,10 +565,12 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
+		if (ent) {
+			DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
 
-		dQuaternion rot (localMatrix);
-		ent->SetMatrix (*scene, rot, localMatrix.m_posit);
+			dQuaternion rot (localMatrix);
+			ent->SetMatrix (*scene, rot, localMatrix.m_posit);
+		}
 	}
 
 	NewtonCollision* MakeForkLiftTireShape (DemoEntity* const bodyPart) const
@@ -668,10 +670,12 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return body;
 	}
 
-	CustomUniversal* CreateEngineBodyPart(NewtonBody* const chassis)
+	CustomUniversal* CreateEngineBodyPart(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const chassisBone)
 	{
 		NewtonWorld* const world = GetWorld();
-		NewtonCollision* shape = NewtonCreateSphere (world, 0.5f, 0, NULL);
+		NewtonCollision* const shape = NewtonCreateSphere (world, 0.5f, 0, NULL);
+
+		NewtonBody* const chassis = chassisBone->m_body;
 
 		// create the rigid body that will make this bone
 		dMatrix engineMatrix;
@@ -707,6 +711,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		CustomUniversal* const engineJoint = new CustomUniversal(engineAxis, engineBody, chassis);
 		engineJoint->EnableLimit_0(false);
 		engineJoint->EnableLimit_1(false);
+
+		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
+		NewtonCollisionSetUserData(NewtonBodyGetCollision(engineBody), bone);
+
 		return engineJoint;
 	}
 
@@ -757,8 +765,14 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		com.m_y -= 0.25f;
 		NewtonBodySetCentreOfMass(rootBody, &com[0]);
 
+		// add the root bone to the articulation manager
+		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddBone (rootBody, dGetIdentityMatrix());
+		// save the bone as the shape use data for self collision test
+		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBody), chassisBone);
+
+
 		// add engine
-		vehicleModel->m_engineJoint = CreateEngineBodyPart(rootBody);
+		vehicleModel->m_engineJoint = CreateEngineBodyPart(controller, chassisBone);
 
 		// set power parameter for a simple DC engine
 		dFloat maxOmega = 40.0f;
@@ -768,17 +782,14 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		vehicleModel->m_maxTurmDamp = 0.0f;
 		vehicleModel->m_maxTurmAccel = 0.0f;
 
-		// add the root bone to the articulation manager
-		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBody, dGetIdentityMatrix());
-		// save the bone as the shape use data for self collision test
-		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBody), bone);
+
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
 		CustomArticulatedTransformController::dSkeletonBone* parentBones[32];
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = bone;
+			parentBones[stackIndex] = chassisBone;
 			childEntities[stackIndex] = child;
 			stackIndex ++;
 		}
@@ -1376,17 +1387,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		strcpy (definition.m_articulationName, "mainBody");
 		NewtonBody* const chassis = CreateBodyPart (vehicleModel, definition);
 		
-		// add engine
-		vehicleModel->m_engineJoint = CreateEngineBodyPart(chassis);
-
-		// set power parameter for a simple DC engine
-		dFloat maxOmega = 100.0f;
-		vehicleModel->m_maxEngineTorque = 1250.0f;
-		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
-
-		vehicleModel->m_maxTurmAccel = 10.0f;
-		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
-
 		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
 		NewtonCompoundCollisionBeginAddRemove(compound);
 		NewtonCompoundCollisionAddSubCollision (compound, NewtonBodyGetCollision(chassis));
@@ -1406,14 +1406,25 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBodySetCollision(chassis, compound);
 		NewtonDestroyCollision(compound);
 
-		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(chassis, dGetIdentityMatrix());
-		NewtonCollisionSetUserData(NewtonBodyGetCollision(chassis), bone);
+		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddBone(chassis, dGetIdentityMatrix());
+		NewtonCollisionSetUserData(NewtonBodyGetCollision(chassis), chassisBone);
 
+		// add engine
+		vehicleModel->m_engineJoint = CreateEngineBodyPart(controller, chassisBone);
+
+		// set power parameter for a simple DC engine
+		dFloat maxOmega = 100.0f;
+		vehicleModel->m_maxEngineTorque = 1250.0f;
+		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
+
+		vehicleModel->m_maxTurmAccel = 10.0f;
+		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
+
+		AddCraneBase (controller);
 		MakeLeftTrack (controller, cycleLinks);
 		MakeRightTrack (controller, cycleLinks);
 		MakeLeftThread(controller);
 		MakeRightThread(controller);
-		AddCraneBase (controller);
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();

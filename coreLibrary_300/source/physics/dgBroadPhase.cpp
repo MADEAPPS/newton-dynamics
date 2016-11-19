@@ -717,6 +717,7 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 		if (body->GetBroadPhaseAggregate()) {
 			dgBroadPhaseAggregate* const aggregate = body->GetBroadPhaseAggregate();
 			aggregate->m_isInEquilibrium = body->m_equilibrium;
+			aggregate->SetAsDirty(m_lru + 1);
 		}
 
 		m_dirtyNodesCount += (node->m_nodeIsDirtyLru != (m_lru + 1)) ? 1 : 0;
@@ -1687,7 +1688,6 @@ void dgBroadPhase::FindCollidingPairsForwardAndBackward(dgBroadphaseSyncDescript
 {
 	const dgFloat32 timestep = descriptor->m_timestep;
 
-//	dgBroadPhase* const broadPhase = descriptor->m_world->GetBroadPhase();
 	dgList<dgBroadPhaseNode*>::dgListNode* node = nodePtr;
 	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
 	const dgUnsigned32 lru = m_lru + 1;
@@ -1696,11 +1696,11 @@ void dgBroadPhase::FindCollidingPairsForwardAndBackward(dgBroadphaseSyncDescript
 		dgAssert(broadPhaseNode->IsLeafNode());
 		dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
 
+		if (lru == broadPhaseNode->GetDirtyLru()) {
 		if (broadPhaseNode->IsAggregate()) {
 			((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSeltPairs(timestep, threadID);
 		}
 
-		if (lru == broadPhaseNode->GetAsDirtyLru()) {
 			for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
 				dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
 				dgAssert(!parent->IsLeafNode());
@@ -1746,14 +1746,30 @@ void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* 
 }
 
 
-void dgBroadPhase::PruneDeadContacts ()
+void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 {
+	dgInt32 threadsCount = m_world->GetThreadCount();
+	dgList<dgBroadPhaseNode*>::dgListNode* node = m_updateList.GetFirst();
+	for (dgInt32 i = 0; i < threadsCount; i++) {
+		m_world->QueueJob(CollidingPairsKernel, &syncPoints, node);
+		node = node ? node->GetNext() : NULL;
+	}
+	m_world->SynchronizationBarrier();
+
+
 	dTimeTrackerEvent(__FUNCTION__);
 	const dgUnsigned32 lru = m_lru;
 	dgActiveContacts* const contactList = m_world;
 		for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode;) {
 			dgContact* const contact = contactNode->GetInfo();
 			contactNode = contactNode->GetNext();
+		const dgBody* const body0 = contact->GetBody0();
+		const dgBody* const body1 = contact->GetBody1();
+		const dgInt32 equilbriun0 = body0->m_equilibrium;
+		const dgInt32 equilbriun1 = body1->m_equilibrium;
+		if (equilbriun0 & equilbriun1) {
+			contact->m_broadphaseLru = lru;
+		}
 			if (contact->m_broadphaseLru != lru) {
 				m_world->DestroyConstraint(contact);
 			}
@@ -1776,33 +1792,7 @@ xxx1 += bodyNode->m_nodeIsDirtyLru == (m_lru + 1) ? 1 : 0;
 	}
 dgTrace (("%d %d %d\n", xxx, xxx0, xxx1));
 #endif
-}
 
-
-void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
-{
-	dgInt32 threadsCount = m_world->GetThreadCount();
-	dgList<dgBroadPhaseNode*>::dgListNode* node = m_updateList.GetFirst();
-	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(CollidingPairsKernel, &syncPoints, node);
-		node = node ? node->GetNext() : NULL;
-	}
-	m_world->SynchronizationBarrier();
-
-	if (m_scanTwoWays) {
-		const dgUnsigned32 lru = m_lru;
-		dgActiveContacts* const contactList = m_world;
-		for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
-			dgContact* const contact = contactNode->GetInfo();
-			const dgBody* const body0 = contact->GetBody0();
-			const dgBody* const body1 = contact->GetBody1();
-			const dgInt32 equilbriun0 = body0->m_equilibrium;
-			const dgInt32 equilbriun1 = body1->m_equilibrium;
-			if (equilbriun0 & equilbriun1) {
-				contact->m_broadphaseLru = lru;
-			}
-		}
-	}
 }
 
 
@@ -1946,7 +1936,6 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 	m_scanTwoWays = (lastDirtyCount * 100) < (40 * m_updateList.GetCount());
 	ScanForContactJoints (syncPoints);
-	PruneDeadContacts();
 
 	dgActiveContacts* const contactList = m_world;
 	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();

@@ -119,7 +119,9 @@ CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTransformC
 	m_bones[m_boneCount].m_parent = parentBone;
 	m_bones[m_boneCount].m_bindMatrix = bindMatrix;
 
+	if (m_collisionAggregate) {
 	NewtonCollisionAggregateAddBody (m_collisionAggregate, bone);
+	}
 
 	m_boneCount ++;
 	dAssert (m_boneCount < D_HIERACHICAL_CONTROLLER_MAX_BONES);
@@ -176,7 +178,9 @@ void CustomArticulatedTransformController::SetDefaultSelfCollisionMask ()
 
 void CustomArticulatedTransformController::DisableAllSelfCollision ()
 {
-	NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
+	if (m_collisionAggregate) {
+		NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
+	}
 	for (int i = 0; i < m_boneCount; i ++) {
 		for (int j = i + 1; j < m_boneCount; j ++) {
 			SetSelfCollisionMask (&m_bones[i], &m_bones[j], false);

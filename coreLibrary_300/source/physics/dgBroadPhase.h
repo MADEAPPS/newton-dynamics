@@ -60,6 +60,7 @@ class dgBroadPhaseNode
 		,m_maxBox(dgFloat32(1.0e15f))
 		,m_parent(parent)
 		,m_surfaceArea(dgFloat32(1.0e20f))
+		,m_nodeIsDirtyLru(0)
 	{
 	}
 
@@ -82,13 +83,14 @@ class dgBroadPhaseNode
 		return false;
 	}
 
-	virtual dgUnsigned32 GetAsDirtyLru() const 
+	dgUnsigned32 GetDirtyLru() const
 	{
-		return 0;
+		return m_nodeIsDirtyLru;
 	}
 
-	virtual void SetAsDirty()
+	void SetAsDirty(dgInt32 lru)
 	{
+		m_nodeIsDirtyLru = lru;
 	}
 
 	void SetAABB(const dgVector& minBox, const dgVector& maxBox)
@@ -129,6 +131,7 @@ class dgBroadPhaseNode
 	dgVector m_maxBox;
 	dgBroadPhaseNode* m_parent;
 	dgFloat32 m_surfaceArea;
+	dgUnsigned32 m_nodeIsDirtyLru;
 
 	static dgVector m_broadPhaseScale;
 	static dgVector m_broadInvPhaseScale;
@@ -142,7 +145,6 @@ class dgBroadPhaseBodyNode: public dgBroadPhaseNode
 		:dgBroadPhaseNode(NULL)
 		,m_body(body)
 		,m_updateNode(NULL)
-		,m_nodeIsDirtyLru(0)
 	{
 		SetAABB(body->m_minAABB, body->m_maxAABB);
 		m_body->SetBroadPhase(this);
@@ -158,19 +160,8 @@ class dgBroadPhaseBodyNode: public dgBroadPhaseNode
 		return m_body;
 	}
 
-	virtual dgUnsigned32 GetAsDirtyLru() const
-	{
-		return m_nodeIsDirtyLru;
-	}
-
-	virtual void SetAsDirty(dgInt32 lru)
-	{
-		m_nodeIsDirtyLru = lru;
-	}
-
 	dgBody* m_body;
 	dgList<dgBroadPhaseNode*>::dgListNode* m_updateNode;
-	dgUnsigned32 m_nodeIsDirtyLru;
 };
 
 class dgBroadPhaseTreeNode: public dgBroadPhaseNode
@@ -384,7 +375,6 @@ class dgBroadPhase
 
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
 	
-	void PruneDeadContacts ();
 	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	void UpdateContacts (dgBroadphaseSyncDescriptor* const descriptor, dgActiveContacts::dgListNode* const node, dgFloat32 timeStep, dgInt32 threadID);
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threaCount, dgInt32 threadID);

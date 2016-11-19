@@ -96,15 +96,15 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	CalculateAABB (collision, dGetIdentityMatrix(), minP, maxP);
 
 	//dFloat stepz = size.m_z + 0.01f;
-	dFloat stepz = maxP.m_z - minP.m_z;
+	dFloat stepz = maxP.m_z - minP.m_z + 0.1f;
 	dFloat stepy = (maxP.m_y - minP.m_y) - NewtonWorldGetCollisionMargin(world);
 
 	dFloat y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	dFloat z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 	matrix.m_posit.m_y = y0;
-	for (int j = 0; j < count; j ++) {
-//	for (int j = 0; j < 10; j ++) {
+//	for (int j = 0; j < count; j ++) {
+	for (int j = 0; j < 10; j ++) {
 		matrix.m_posit.m_z = z0;
 		for (int i = 0; i < (count - j) ; i ++) {
 			CreateSimpleSolid (scene, geometry, mass, matrix, collision, defaultMaterialID);
@@ -213,7 +213,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 
 	int high = 20;
 	for (int i = 0; i < 1; i ++) {
-//		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
+		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
 //		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 //		BuildPyramid (scene, 10.0f, dVector( 20.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 //		BuildPyramid (scene, 10.0f, dVector( 30.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
@@ -227,13 +227,14 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 		}
 	}
 
-	high = 10;
+	high = 20;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
 //			SphereStack(scene, 1.0f, dVector(5.0f + j * 8, 0.0f, -10.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0), high);
-			BoxStack(scene, 5.0f, dVector(5.0f + j * 8, 0.0f, 15.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0), high);
+//			BoxStack(scene, 5.0f, dVector(5.0f + j * 8, 0.0f, 15.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0), high);
 		}
 	}
+
 /*
 	dVector boxSize(0.5f, 0.5f, 0.5f, 0.0f);
 	dMatrix matrix(dGetIdentityMatrix());
@@ -244,10 +245,11 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	boxMesh->Release();
 	NewtonDestroyCollision(boxCollision);
 */
+
 	// place camera into position
 	dQuaternion rot;
-	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
-//	dVector origin (-15.0f, 10.0f, 0.0f, 0.0f);
+//	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
+	dVector origin (-20.0f, 4.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 
