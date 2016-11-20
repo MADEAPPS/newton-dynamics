@@ -83,8 +83,11 @@ void CustomPointToPoint::SubmitConstraints(dFloat timestep, int threadIndex)
 	dFloat mag2 = dir.DotProduct3(dir);
 	if (mag2 < 1.0e-3f) {
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	} else {
 		dir = dir.Scale(1.0f / dSqrt(mag2));
 		dMatrix matrix (dGrammSchmidt (dir));
@@ -206,8 +209,11 @@ void CustomBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// Restrict the movement on the pivot point along all three orthonormal directions
 	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_front[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_up[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0.m_right[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }
 
 CustomBallAndSocketWithFriction::CustomBallAndSocketWithFriction(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent, dFloat dryFriction)
@@ -218,7 +224,6 @@ CustomBallAndSocketWithFriction::CustomBallAndSocketWithFriction(const dMatrix& 
 
 void CustomBallAndSocketWithFriction::SubmitConstraints(dFloat timestep, int threadIndex)
 {
-	CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
 
@@ -227,6 +232,8 @@ void CustomBallAndSocketWithFriction::SubmitConstraints(dFloat timestep, int thr
 	if (m_body1) {
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
+
+	CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
 
 	dVector relOmega(omega0 - omega1);
 	dFloat omegaMag = dSqrt(relOmega.DotProduct3(relOmega));
@@ -258,9 +265,6 @@ void CustomBallAndSocketWithFriction::SubmitConstraints(dFloat timestep, int thr
 		}
 	}
 }
-
-
-
 
 
 CustomLimitBallAndSocket::CustomLimitBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
@@ -367,16 +371,9 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
-
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-
-	// Restrict the movement on the pivot point along all tree orthonormal direction
-	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
-	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_up[0]);
-	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_right[0]);
-
 	matrix1 = m_rotationOffset * matrix1;
+
+	CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
 
 	// handle special case of the joint being a hinge
 	if (m_coneAngleCos > 0.9999f) {
@@ -530,14 +527,9 @@ void CustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thre
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
-
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
-	// Restrict the movement on the pivot point along all tree orthonormal direction
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_up[0]);
-	NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_right[0]);
+	CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
 
 #if 0
 	dVector euler0(0.0f);

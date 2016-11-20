@@ -83,6 +83,7 @@ class dgIsland
 	dgInt32 m_rowsStart;
 	dgInt32 m_rowsCount;
 	dgInt32 m_islandLRU;
+	dgInt32 m_activeJointCount;
 	dgInt32 m_isContinueCollision;
 };
 
@@ -97,6 +98,7 @@ class dgJointInfo
 	dgInt32 m_m1;
 	dgInt32 m_pairStart;
 	dgInt32 m_pairCount;
+	dgInt32 m_isFrontier;
 };
 
 
@@ -228,7 +230,7 @@ class dgJacobianMemory
 	public:
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes);
 
-//	dgJacobian* m_internalForcesBuffer;
+	dgJacobian* m_internalForcesBuffer;
 	dgJacobianMatrixElement* m_jacobianBuffer;
 };
 
@@ -241,7 +243,7 @@ class dgWorldDynamicUpdate
 
 	private:
 	void BuildIslands(dgFloat32 timestep);
-	void SortIsland(dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
+	void SortIsland(const dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
 	static dgInt32 CompareIslands (const dgIsland* const islandA, const dgIsland* const islandB, void* notUsed);
@@ -259,7 +261,7 @@ class dgWorldDynamicUpdate
 	static void UpdateBodyVelocityParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static dgInt32 SortJointInfoByColor(const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexA, const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexB, void* const context);
 
-	void FindActiveJointAndBodies (dgIsland* const island); 
+//	void FindActiveJointAndBodies (dgIsland* const island); 
 	void IntegrateIslandParallel(dgParallelSolverSyncData* const syncData) const; 
 	void InitilizeBodyArrayParallel (dgParallelSolverSyncData* const syncData) const; 
 	void BuildJacobianMatrixParallel (dgParallelSolverSyncData* const syncData) const; 
@@ -269,13 +271,12 @@ class dgWorldDynamicUpdate
 	void CalculateReactionForcesParallel (const dgIsland* const island, dgFloat32 timestep) const;
 	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;
 	void ApplyNetTorqueAndForce (dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& accNorm, const dgVector& mask) const;
-	void ApplyNetVelcAndOmega (dgDynamicBody* const body, const dgVector& timestep4, const dgVector& speedFreeze2, const dgVector& mask) const;
+	void ApplyNetVelcAndOmega(dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2, const dgVector& forceActiveMask) const;
 	
 	void CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
 	void BuildJacobianMatrix (dgIsland* const island, dgInt32 threadID, dgFloat32 timestep) const;
-	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, const dgJointInfo* const jointInfo, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const;
-	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 solverExtrapolator, dgFloat32 restAcceleration) const;
-	void InitJointForce (dgJointInfo* const jointInfo, dgJacobianMatrixElement* const matrixRow, dgJacobian& force0, dgJacobian& force1) const;
+	void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, const dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 forceImpulseScale) const;
+	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 extrapolationFactor, dgFloat32 restAcceleration) const;
 	void CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateReactionsForces(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 
@@ -284,9 +285,7 @@ class dgWorldDynamicUpdate
 	void IntegrateVelocity (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 
 	void CalculateIslandContacts (dgIsland* const island, dgFloat32 timestep, dgInt32 currLru, dgInt32 threadID) const;
-	void GetJacobianDerivatives (const dgIsland* const island, dgInt32 threadID, dgInt32 rowCount, dgFloat32 timestep) const;	
 	dgInt32 GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgInt32 rowCount) const;
-
 	
 	dgInt32 m_bodies;
 	dgInt32 m_joints;

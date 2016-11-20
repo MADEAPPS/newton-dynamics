@@ -244,8 +244,6 @@ class dgBody
 		dgUnsigned32 m_flags;
 		struct {
 			dgUnsigned32 m_freeze					: 1;
-			dgUnsigned32 m_active					: 1;
-			dgUnsigned32 m_resting					: 1;
 			dgUnsigned32 m_sleeping					: 1;
 			dgUnsigned32 m_autoSleep				: 1;
 			dgUnsigned32 m_inCallback				: 1;
@@ -526,7 +524,7 @@ DG_INLINE bool dgBody::GetAutoSleep () const
 
 DG_INLINE bool dgBody::GetSleepState () const
 {
-//	return m_resting;
+//	return m_equilibrium;
 	return m_sleeping;
 }
 

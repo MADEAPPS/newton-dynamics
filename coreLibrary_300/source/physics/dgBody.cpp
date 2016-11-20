@@ -72,7 +72,6 @@ dgBody::dgBody()
 	,m_dynamicsLru(0)
 	,m_genericLRUMark(0)
 {
-	m_resting = true;
 	m_autoSleep = true;
 	m_collidable = true;
 	m_collideWithLinkedBodies = true;

@@ -89,9 +89,6 @@ class dgDynamicBody : public dgBody
 
 	dgVector m_accel;
 	dgVector m_alpha;
-	dgVector m_intenalForce;
-	dgVector m_intenalTorque;
-
 	dgVector m_prevExternalForce;
 	dgVector m_prevExternalTorque;
 	dgVector m_dampCoef;

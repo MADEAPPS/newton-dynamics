@@ -666,7 +666,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	dgAssert (body1);
 	dgAssert (contact->m_body0 == body0);
 	dgAssert (contact->m_body1 == body1);
-	dgAssert (contact->m_broadphaseLru == GetBroadPhase()->m_lru);
+	//dgAssert (contact->m_broadphaseLru == GetBroadPhase()->m_lru);
 
 	const dgContactMaterial* const material = contact->m_material;
 	const dgContactPoint* const contactArray = pair->m_contactBuffer;
@@ -881,7 +881,7 @@ void dgWorld::ProcessContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadI
 	dgAssert (pair->m_contact->m_body0);
 	dgAssert (pair->m_contact->m_body1);
 	dgAssert (pair->m_contact->m_body0 != pair->m_contact->m_body1);
-	dgAssert (pair->m_contact->m_broadphaseLru == GetBroadPhase()->m_lru);
+	//dgAssert (pair->m_contact->m_broadphaseLru == GetBroadPhase()->m_lru);
 
 	pair->m_contact->m_positAcc = dgVector (dgFloat32 (0.0f));
 	pair->m_contact->m_rotationAcc = dgVector (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
