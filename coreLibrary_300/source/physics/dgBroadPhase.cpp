@@ -39,6 +39,7 @@
 #define DG_CONTACT_TRANSLATION_ERROR	dgFloat32 (1.0e-3f)
 #define DG_CONTACT_ANGULAR_ERROR		(dgFloat32 (0.25f * 3.141592f / 180.0f))
 #define DG_NARROW_PHASE_DIST			dgFloat32 (0.2f)
+#define DG_CONTACT_DELAY_FRAMES			2
 
 
 dgVector dgBroadPhase::m_velocTol(dgFloat32(1.0e-18f)); 
@@ -157,7 +158,7 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_generatedBodies(world->GetAllocator())
 	,m_updateList(world->GetAllocator())
 	,m_aggregateList(world->GetAllocator())
-	,m_lru(0)
+	,m_lru(DG_CONTACT_DELAY_FRAMES)
 	,m_contacJointLock()
 	,m_criticalSectionLock()
 	,m_dirtyNodesCount(0)
@@ -1748,6 +1749,7 @@ void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* 
 
 void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgInt32 threadsCount = m_world->GetThreadCount();
 	dgList<dgBroadPhaseNode*>::dgListNode* node = m_updateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1756,13 +1758,11 @@ void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 	}
 	m_world->SynchronizationBarrier();
 
-
-	dTimeTrackerEvent(__FUNCTION__);
-	const dgUnsigned32 lru = m_lru;
+	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
 	dgActiveContacts* const contactList = m_world;
-		for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode;) {
-			dgContact* const contact = contactNode->GetInfo();
-			contactNode = contactNode->GetNext();
+	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode;) {
+		dgContact* const contact = contactNode->GetInfo();
+		contactNode = contactNode->GetNext();
 		const dgBody* const body0 = contact->GetBody0();
 		const dgBody* const body1 = contact->GetBody1();
 		const dgInt32 equilbriun0 = body0->m_equilibrium;
@@ -1770,10 +1770,10 @@ void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 		if (equilbriun0 & equilbriun1) {
 			contact->m_broadphaseLru = lru;
 		}
-			if (contact->m_broadphaseLru != lru) {
-				m_world->DestroyConstraint(contact);
-			}
+		if (contact->m_broadphaseLru < lru) {
+			m_world->DestroyConstraint(contact);
 		}
+	}
 
 
 #if 0
@@ -1814,39 +1814,40 @@ void dgBroadPhase::UpdateContacts(dgBroadphaseSyncDescriptor* const descriptor, 
 	while (node) {
 		dgContact* const contact = node->GetInfo();
 
-		dgAssert (contact->m_broadphaseLru == m_lru);
-		if (ValidateContactCache(contact, timestep)) {
-			contact->m_timeOfImpact = dgFloat32(1.0e10f);
-		} else {
-			contact->m_contactActive = 0;
-			contact->m_positAcc = dgVector::m_zero;
-			contact->m_rotationAcc = dgQuaternion();
+		const dgBody* const body0 = contact->GetBody0();
+		const dgBody* const body1 = contact->GetBody1();
+		if (!(body0->m_equilibrium & body1->m_equilibrium)) {
+			if (ValidateContactCache(contact, timestep)) {
+				contact->m_timeOfImpact = dgFloat32(1.0e10f);
+			} else {
+				contact->m_contactActive = 0;
+				contact->m_positAcc = dgVector::m_zero;
+				contact->m_rotationAcc = dgQuaternion();
 
-			dgFloat32 distance = contact->m_separationDistance;
-			if (distance >= DG_NARROW_PHASE_DIST) {
-				const dgBody* const body0 = contact->GetBody0();
-				const dgBody* const body1 = contact->GetBody1();
-				const dgVector veloc0 (body0->GetVelocity());
-				const dgVector veloc1 (body1->GetVelocity());
-				const dgVector omega0 (body0->GetOmega());
-				const dgVector omega1 (body1->GetOmega());
-				const dgCollisionInstance* const collision0 = body0->GetCollision();
-				const dgCollisionInstance* const collision1 = body1->GetCollision();
-				const dgFloat32 maxDiameter0 = dgFloat32 (3.5f) * collision0->GetBoxMaxRadius(); 
-				const dgFloat32 maxDiameter1 = dgFloat32 (3.5f) * collision1->GetBoxMaxRadius(); 
+				dgFloat32 distance = contact->m_separationDistance;
+				if (distance >= DG_NARROW_PHASE_DIST) {
+					const dgVector veloc0(body0->GetVelocity());
+					const dgVector veloc1(body1->GetVelocity());
+					const dgVector omega0(body0->GetOmega());
+					const dgVector omega1(body1->GetOmega());
+					const dgCollisionInstance* const collision0 = body0->GetCollision();
+					const dgCollisionInstance* const collision1 = body1->GetCollision();
+					const dgFloat32 maxDiameter0 = dgFloat32(3.5f) * collision0->GetBoxMaxRadius();
+					const dgFloat32 maxDiameter1 = dgFloat32(3.5f) * collision1->GetBoxMaxRadius();
 
-				const dgVector velocLinear (veloc1 - veloc0);
-				const dgFloat32 velocAngular0 = dgSqrt((omega0.DotProduct4(omega0)).GetScalar()) * maxDiameter0;
-				const dgFloat32 velocAngular1 = dgSqrt((omega1.DotProduct4(omega1)).GetScalar()) * maxDiameter1;
-				const dgFloat32 speed = dgSqrt ((velocLinear.DotProduct4(velocLinear)).GetScalar()) + velocAngular1 + velocAngular0 + dgFloat32 (0.5f);
-				distance -= speed * timestep;
-				contact->m_separationDistance = distance;
-			}
-			//distance = 0.0f;
-			if (distance < DG_NARROW_PHASE_DIST) {
-				AddPair(contact, timestep, threadID);
-				if (contact->m_maxDOF) {
-					contact->m_timeOfImpact = dgFloat32(1.0e10f);
+					const dgVector velocLinear(veloc1 - veloc0);
+					const dgFloat32 velocAngular0 = dgSqrt((omega0.DotProduct4(omega0)).GetScalar()) * maxDiameter0;
+					const dgFloat32 velocAngular1 = dgSqrt((omega1.DotProduct4(omega1)).GetScalar()) * maxDiameter1;
+					const dgFloat32 speed = dgSqrt((velocLinear.DotProduct4(velocLinear)).GetScalar()) + velocAngular1 + velocAngular0 + dgFloat32(0.5f);
+					distance -= speed * timestep;
+					contact->m_separationDistance = distance;
+				}
+				//distance = 0.0f;
+				if (distance < DG_NARROW_PHASE_DIST) {
+					AddPair(contact, timestep, threadID);
+					if (contact->m_maxDOF) {
+						contact->m_timeOfImpact = dgFloat32(1.0e10f);
+					}
 				}
 			}
 		}

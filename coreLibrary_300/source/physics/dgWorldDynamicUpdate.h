@@ -257,7 +257,6 @@ class dgWorldDynamicUpdate
 	static void KinematicCallbackUpdateParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void UpdateFeedbackForcesParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static void UpdateBodyVelocityParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
-	static void FindActiveJointAndBodiesKernel (void* const context, void* const worldContext, dgInt32 threadID); 
 	static dgInt32 SortJointInfoByColor(const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexA, const dgParallelSolverSyncData::dgParallelJointMap* const indirectIndexB, void* const context);
 
 	void FindActiveJointAndBodies (dgIsland* const island); 
@@ -280,6 +279,7 @@ class dgWorldDynamicUpdate
 	void CalculateForcesGameMode (const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 	void CalculateReactionsForces(const dgIsland* const island, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const;
 
+	void SortIslandByCount ();
 	void IntegrateExternalForce(const dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
 	void IntegrateVelocity (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 
