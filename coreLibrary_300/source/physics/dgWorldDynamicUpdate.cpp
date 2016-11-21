@@ -74,7 +74,7 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 {
 }
 
-
+static int xxx;
 void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
 	dTimeTrackerEvent(__FUNCTION__);
@@ -90,6 +90,11 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	dgDynamicBody* const sentinelBody = world->m_sentinelBody;
 	sentinelBody->m_index = 0; 
 	sentinelBody->m_dynamicsLru = m_markLru;
+
+xxx ++;
+if (xxx > 1000)
+xxx *=1;
+
 
 	BuildIslands(timestep);
 	SortIslandByCount();
@@ -110,8 +115,8 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	descriptor.m_firstIsland = 0;
 	descriptor.m_islandCount = m_islands;
 	descriptor.m_atomicCounter = 0;
-
 	sentinelBody->m_equilibrium = true;
+	sentinelBody->m_sleeping = true;
 
 	if (!(world->m_amp && (world->m_hardwaredIndex > 0))) {
 		dgInt32 index = 0;
@@ -236,8 +241,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			world->m_bodiesMemory.ExpandCapacityIfNeessesary(bodyIndex, sizeof (dgBodyInfo));
 			dgBodyInfo* const bodyArray1 = (dgBodyInfo*)&world->m_bodiesMemory[0];
 			bodyArray1[bodyIndex].m_body = srcBody;
-			isInEquilibrium &= body->m_autoSleep;
-			isInEquilibrium &= body->m_equilibrium;
+			isInEquilibrium &= srcBody->m_autoSleep;
+			isInEquilibrium &= srcBody->m_equilibrium;
 			
 			srcBody->m_index = bodyCount;
 			srcBody->m_dynamicsLru = lruMark;
@@ -654,7 +659,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity (const dgIsland* const island, dgFl
 
 	dgWorld* const world = (dgWorld*) this;
 
-	dgFloat32 forceDamp = DG_FREEZZING_VELOCITY_DRAG;
+	dgFloat32 velocityDragCoeff = DG_FREEZZING_VELOCITY_DRAG;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart + 1]; 
 	dgInt32 count = island->m_bodyCount - 1;
@@ -664,7 +669,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity (const dgIsland* const island, dgFl
 			autosleep &= bodyArray[1].m_body->m_autoSleep;
 		}
 		if (!autosleep) {
-			forceDamp = dgFloat32 (0.9999f);
+			velocityDragCoeff = dgFloat32 (0.999f);
 		}
 	}
 
@@ -675,14 +680,14 @@ void dgWorldDynamicUpdate::IntegrateVelocity (const dgIsland* const island, dgFl
 
 	dgFloat32 speedFreeze = world->m_freezeSpeed2;
 	dgFloat32 accelFreeze = world->m_freezeAccel2 * ((island->m_jointCount <= DG_SMALL_ISLAND_COUNT) ? dgFloat32 (0.05f) : dgFloat32 (1.0f));
-	dgVector forceDampVect (forceDamp, forceDamp, forceDamp, dgFloat32 (0.0f));
+	dgVector velocDragVect (velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 
 		dgVector isMovingMask (body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
 		dgAssert (dgCheckVector(isMovingMask));
-		if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI) && (!body->m_equilibrium || ((isMovingMask.TestZero().GetSignMask() & 7) != 7))) {
+		if (!body->m_equilibrium || ((isMovingMask.TestZero().GetSignMask() & 7) != 7)) {
 			dgAssert (body->m_invMass.m_w);
 			body->IntegrateVelocity(timestep);
 
@@ -703,8 +708,8 @@ void dgWorldDynamicUpdate::IntegrateVelocity (const dgIsland* const island, dgFl
 			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
 
 			if (equilibrium) {
-				dgVector veloc (body->m_veloc.CompProduct4(forceDampVect));
-				dgVector omega = body->m_omega.CompProduct4 (forceDampVect);
+				dgVector veloc (body->m_veloc.CompProduct4(velocDragVect));
+				dgVector omega = body->m_omega.CompProduct4 (velocDragVect);
 				body->m_veloc = (dgVector (veloc.DotProduct4(veloc)) > m_velocTol) & veloc;
 				body->m_omega = (dgVector (omega.DotProduct4(omega)) > m_velocTol) & omega;
 			}

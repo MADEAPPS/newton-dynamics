@@ -460,8 +460,8 @@ class dgWorld
 	dgFloat32 m_frictiomTheshold;
 	dgFloat32 m_savetimestep;
 	dgFloat32 m_contactTolerance;
-	dgFloat32 m_solverConvergeQuality;
 	dgFloat32 m_lastExecutionTime;
+	dgInt32 m_solverConvergeQuality;
 
 	dgSolverSleepTherfesholds m_sleepTable[DG_SLEEP_ENTRIES];
 	

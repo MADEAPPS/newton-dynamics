@@ -39,7 +39,7 @@
 #define DG_CONTACT_TRANSLATION_ERROR	dgFloat32 (1.0e-3f)
 #define DG_CONTACT_ANGULAR_ERROR		(dgFloat32 (0.25f * 3.141592f / 180.0f))
 #define DG_NARROW_PHASE_DIST			dgFloat32 (0.2f)
-#define DG_CONTACT_DELAY_FRAMES			2
+#define DG_CONTACT_DELAY_FRAMES			4
 
 
 dgVector dgBroadPhase::m_velocTol(dgFloat32(1.0e-18f)); 
@@ -1778,9 +1778,6 @@ void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 
 #if 0
 static dgInt32 xxx;
-xxx ++;
-if (xxx >= 500)
-xxx *=1;
 dgInt32 xxx0 = 0;
 dgInt32 xxx1 = 0;
 	for (dgList<dgBroadPhaseNode*>::dgListNode* nodePtr = m_updateList.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
@@ -1791,6 +1788,7 @@ xxx0 ++;
 xxx1 += bodyNode->m_nodeIsDirtyLru == (m_lru + 1) ? 1 : 0;
 	}
 dgTrace (("%d %d %d\n", xxx, xxx0, xxx1));
+xxx ++;
 #endif
 
 }

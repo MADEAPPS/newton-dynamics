@@ -54,6 +54,7 @@
 #include "dgAmpInstance.h"
 #endif
 
+#define DG_SOLVER_CONVERGENCE_COUNT			4
 #define DG_DEFAULT_SOLVER_ITERATION_COUNT	4
 
 #define DG_INITIAL_BODIES_SIZE		(1024 * 4)
@@ -276,7 +277,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	m_freezeOmega2 = DG_FREEZE_MAG2 * dgFloat32 (0.1f);
 
 	m_contactTolerance = DG_PRUNE_CONTACT_TOLERANCE;
-	m_solverConvergeQuality = dgFloat32 (1.0f);
+	m_solverConvergeQuality = DG_SOLVER_CONVERGENCE_COUNT;
 
 	dgInt32 steps = 1;
 	dgFloat32 freezeAccel2 = m_freezeAccel2;
@@ -381,7 +382,7 @@ void dgWorld::SetSolverMode (dgInt32 mode)
 
 void dgWorld::SetSolverConvergenceQuality (dgInt32 mode)
 {
-	m_solverConvergeQuality = mode ? dgFloat32 (0.1f) : dgFloat32 (1.0f);
+	m_solverConvergeQuality = mode ? DG_SOLVER_CONVERGENCE_COUNT : 2 * DG_SOLVER_CONVERGENCE_COUNT;
 }
 
 dgInt32 dgWorld::EnumerateHardwareModes() const

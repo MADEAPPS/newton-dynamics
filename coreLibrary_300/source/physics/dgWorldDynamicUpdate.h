@@ -290,11 +290,12 @@ class dgWorldDynamicUpdate
 	dgInt32 m_bodies;
 	dgInt32 m_joints;
 	dgInt32 m_islands;
-	dgUnsigned32 m_markLru;
+	dgInt32 m_markLru;
+	dgInt32 m_solverConvergeQuality;
 	dgJacobianMemory m_solverMemory;
 	dgThread::dgCriticalSection m_softBodyCriticalSectionLock;
 	dgIsland* m_islandMemory;
-	dgFloat32 m_solverConvergeQuality;
+	
 	static dgVector m_velocTol;
 	static dgVector m_eulerTaylorCorrection;
 
