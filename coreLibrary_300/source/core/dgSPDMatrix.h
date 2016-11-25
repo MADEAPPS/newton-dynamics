@@ -970,5 +970,264 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* co
 	return ret;
 }
 
+template <class T>
+DG_INLINE T dgSQRH(const T num, const T den)
+{
+	T r (num / den);
+	return T (sqrt (T(1.0f) + r * r));
+}
+
+
+template <class T>
+DG_INLINE T dgPythag(const T a, const T b)
+{
+	T absa (abs(a));
+	T absb (abs(b));
+	return (absa > absb) ? (absa * dgSQRH (absb, absa)) : ((absb == T(0.0f) ? T(0.0f) : (absb * dgSQRH (absa, absb))));
+}
+
+
+template <class T>
+DG_INLINE T dgSign(const T a, const T b)
+{ 
+	return (b >= T (0.0f)) ? (a >= T(0.0f) ? a : -a) : (a >= T(0.0f) ? -a : a); 
+}
+
+/*
+template <class T>
+DG_INLINE void dgHouseHolderReduction(const dgInt32 size, T* const matrix, T* const eigenValues, T* const offDiag)
+{
+	for (dgInt32 i = size - 1; i >= 1; i--) {
+		const dgInt32 l = i - 1;
+		T h(0.0f);
+		T* const rowI = &matrix[i * size];
+
+		if (l > 0) {
+			T scale(0.0f);
+			for (dgInt32 k = 0; k <= l; k++) {
+				scale += T(abs(rowI[k]));
+			}
+
+			if (scale == T(0.0f)) {
+				offDiag[i] = rowI[l];
+			} else {
+				for (dgInt32 k = 0; k <= l; k++) {
+					rowI[k] /= scale;
+					h += rowI[k] * rowI[k];
+				}
+
+				T f(rowI[l]);
+				T g((f >= T(0.0f) ? -T(sqrt(h)) : T(sqrt(h))));
+				offDiag[i] = scale * g;
+				h -= f * g;
+				rowI[l] = f - g;
+				f = T(0.0f);
+
+				for (dgInt32 j = 0; j <= l; j++) {
+					g = T(0.0f);
+					const T* const rowJ = &matrix[j * size];
+					for (dgInt32 k = 0; k <= j; k++) {
+						g += rowJ[k] * rowI[k];
+					}
+					for (dgInt32 k = j + 1; k <= l; k++) {
+						g += matrix[k * size + j] * rowI[k];
+					}
+					offDiag[j] = g / h;
+					f += offDiag[j] * rowI[j];
+				}
+
+				T hh(f / (h + h));
+				for (dgInt32 j = 0; j <= l; j++) {
+					T f(rowI[j]);
+					T g(offDiag[j] - hh * f);
+					offDiag[j] = g;
+					T* const rowJ = &matrix[j * size];
+					for (dgInt32 k = 0; k <= j; k++) {
+						rowJ[k] -= (f * offDiag[k] + g * rowI[k]);
+					}
+				}
+			}
+		} else {
+			offDiag[i] = rowI[l];
+		}
+		eigenValues[i] = h;
+	}
+
+	dgInt32 index = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		eigenValues[i] = matrix[index + i];
+		index += size;
+	}
+}
+
+template <class T>
+DG_INLINE void dgGivensReduction(dgInt32 size, T* const matrix)
+{
+	dgInt32 indexI = 0;
+	for (dgInt32 i = 1; i < size - 1; i++) {
+		T* const rowI = &matrix[i * size];
+		for (dgInt32 j = i + 1; j < size; j++) {
+			T* const rowJ = &matrix[j * size];
+			if (T(abs(rowJ[i - 1])) > T(1.0e-12f)) {
+				T c = rowJ[i - 1];
+				T s = rowI[i - 1];
+				dgAssert((c * c + s * s) > T(0.0f));
+				const T scale = T(1.0f) / T(sqrt(c * c + s * s));
+				c *= scale;
+				s *= scale;
+				for (dgInt32 k = i - 1; k < size; k++) {
+					const T a(rowI[k] * c - rowJ[k] * s);
+					const T b(rowJ[k] * c + rowI[k] * s);
+					rowI[k] = b;
+					rowJ[k] = a;
+				}
+			}
+		}
+		
+		for (dgInt32 j = i + 1; j < size; j++) {
+			if (T(abs(matrix[indexI + j])) > T(1.0e-12f)) {
+				T s = matrix[indexI + j];
+				T c = matrix[indexI + i];
+				dgAssert((c * c + s * s) > T(0.0f));
+				const T scale = T(1.0f) / T(sqrt(c * c + s * s));
+				c *= scale;
+				s *= scale;
+				dgInt32 indexK = (i - 1) * size;
+				for (dgInt32 k = i - 1; k < size; k++) {
+					const T a(matrix[i + indexK] * c + matrix[j + indexK] * s);
+					const T b(matrix[j + indexK] * c - matrix[i + indexK] * s);
+					matrix[i + indexK] = a;
+					matrix[j + indexK] = b;
+					indexK += size;
+				}
+			}
+		}
+		indexI += size;
+	}
+}
+*/
+
+template <class T>
+void dgEigenValues(const dgInt32 size, T* const matrix, T* const eigenValues)
+{
+	T* const offDiag = dgAlloca(T, size);
+	for (dgInt32 i = size - 1; i > 0; i--) {
+		T h(0.0f);
+		T* const rowI = &matrix[i * size];
+
+		if (i > 1) {
+			T scale(0.0f);
+			for (dgInt32 k = 0; k < i; k++) {
+				scale += T(abs(rowI[k]));
+			}
+
+			if (scale == T(0.0f)) {
+				offDiag[i] = rowI[i - 1];
+			} else {
+				for (dgInt32 k = 0; k < i; k++) {
+					rowI[k] /= scale;
+					h += rowI[k] * rowI[k];
+				}
+
+				T f(rowI[i - 1]);
+				T g((f >= T(0.0f) ? -T(sqrt(h)) : T(sqrt(h))));
+				offDiag[i] = scale * g;
+				h -= f * g;
+				rowI[i - 1] = f - g;
+				f = T(0.0f);
+
+				for (dgInt32 j = 0; j < i; j++) {
+					g = T(0.0f);
+					const T* const rowJ = &matrix[j * size];
+					for (dgInt32 k = 0; k <= j; k++) {
+						g += rowJ[k] * rowI[k];
+					}
+					for (dgInt32 k = j + 1; k < i; k++) {
+						g += matrix[k * size + j] * rowI[k];
+					}
+					offDiag[j] = g / h;
+					f += offDiag[j] * rowI[j];
+				}
+
+				T hh(f / (h + h));
+				for (dgInt32 j = 0; j < i; j++) {
+					T f(rowI[j]);
+					T g(offDiag[j] - hh * f);
+					offDiag[j] = g;
+					T* const rowJ = &matrix[j * size];
+					for (dgInt32 k = 0; k <= j; k++) {
+						rowJ[k] -= (f * offDiag[k] + g * rowI[k]);
+					}
+				}
+			}
+		} else {
+			offDiag[i] = rowI[i - 1];
+		}
+		eigenValues[i] = h;
+	}
+
+	dgInt32 index = size;
+	eigenValues[0] = matrix[0];
+	for (dgInt32 i = 1; i < size; i++) {
+		eigenValues[i] = matrix[index + i];
+		offDiag[i - 1] = offDiag[i];
+		index += size;
+	}
+
+	for (dgInt32 i = 0; i < size; i++) {
+		dgInt32 j;
+		dgInt32 iter = 0;
+		do {
+			for (j = i; j < size - 1; j++) {
+				T dd(abs(eigenValues[j]) + abs(eigenValues[j + 1]));
+				if (abs(offDiag[j]) <= (T(1.e-6f) * dd)) {
+					break;
+				}
+			}
+
+			if (j != i) {
+				iter++;
+				if (iter == 10) {
+					dgAssert(0);
+					return;
+				}
+
+				T g((eigenValues[i + 1] - eigenValues[i]) / (T(2.0f) * offDiag[i]));
+				T r(dgPythag(g, T(1.0f)));
+				g = eigenValues[j] - eigenValues[i] + offDiag[i] / (g + dgSign(r, g));
+				T s(1.0f);
+				T c(1.0f);
+				T p(0.0f);
+
+				dgInt32 k;
+				for (k = j - 1; k >= i; k--) {
+					T f(s * offDiag[k]);
+					T b(c * offDiag[k]);
+					T r(dgPythag(f, g));
+					offDiag[k + 1] = r;
+					if (r == T(0.0f)) {
+						eigenValues[k + 1] -= p;
+						offDiag[j] = T(0.0f);
+						break;
+					}
+					s = f / r;
+					c = g / r;
+					g = eigenValues[k + 1] - p;
+					r = (eigenValues[k] - g) * s + T(2.0f) * c * b;
+					p = s * r;
+					eigenValues[k + 1] = g + p;
+					g = c * r - b;
+				}
+
+				if (r == T(0.0f) && k >= i) {
+					continue;
+				}
+				eigenValues[i] -= p;
+				offDiag[i] = g;
+				offDiag[j] = T(0.0f);
+			}
+		} while (j != i);
+	}
+}
 
 #endif

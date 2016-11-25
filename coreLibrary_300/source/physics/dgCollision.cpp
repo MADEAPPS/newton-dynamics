@@ -136,10 +136,6 @@ void dgCollision::MassProperties ()
 	m_crossInertia[2] = inertia[1][0];
 }
 
-dgFloat32 dgCollision::GetSkinThickness () const
-{
-	return dgFloat32 (0.0f);
-}
 
 void dgCollision::GetCollisionInfo(dgCollisionInfo* const info) const
 {

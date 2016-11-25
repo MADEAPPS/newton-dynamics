@@ -104,8 +104,6 @@ class dgBody
 
 	const dgVector& GetOmega() const;
 	const dgVector& GetVelocity() const;
-	const dgVector& GetNetForce() const;
-	const dgVector& GetNetTorque() const;
 
 	dgVector GetVelocityAtPoint (const dgVector& point) const;
 
@@ -219,8 +217,6 @@ class dgBody
 	// member variables:
 	protected:
 	void CalcInvInertiaMatrix ();
-	dgVector GetApparentMass() const;
-	void SetAparentMassMatrix (const dgVector& massMatrix);
 
 	dgMatrix m_invWorldInertiaMatrix;
 	dgMatrix m_matrix;
@@ -231,11 +227,8 @@ class dgBody
 	dgVector m_omega;
 	dgVector m_minAABB;
 	dgVector m_maxAABB;
-	dgVector m_netForce;
-	dgVector m_netTorque;
 	dgVector m_localCentreOfMass;	
 	dgVector m_globalCentreOfMass;	
-	dgVector m_aparentMass;
 
 	dgFloat32 m_maxAngulaRotationPerSet2;
 	dgThread::dgCriticalSection m_criticalSectionLock;
@@ -540,11 +533,6 @@ DG_INLINE bool dgBody::IsCollidable() const
 	return m_collidable;
 }
 
-DG_INLINE dgVector dgBody::GetApparentMass() const
-{
-	return m_aparentMass;
-}
-
 
 DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 {
@@ -555,15 +543,6 @@ DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 	m_globalCentreOfMass = m_matrix.TransformVector (m_localCentreOfMass);
 }
 
-DG_INLINE const dgVector& dgBody::GetNetForce() const
-{
-	return m_netForce; 
-}
-
-DG_INLINE const dgVector& dgBody::GetNetTorque() const
-{
-	return m_netTorque;
-}
 
 DG_INLINE void dgBody::SetBroadPhase(dgBroadPhaseBodyNode* const node)
 {

@@ -510,7 +510,6 @@ extern "C" {
 	NEWTON_API void NewtonWorldRayCast (const NewtonWorld* const newtonWorld, const dFloat* const p0, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, int threadIndex);
 	NEWTON_API int NewtonWorldConvexCast (const NewtonWorld* const newtonWorld, const dFloat* const matrix, const dFloat* const target, const NewtonCollision* const shape, dFloat* const param, void* const userData, NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, int maxContactsCount, int threadIndex);
 	NEWTON_API int NewtonWorldCollide (const NewtonWorld* const newtonWorld, const dFloat* const matrix, const NewtonCollision* const shape, void* const userData, NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, int maxContactsCount, int threadIndex);
-	NEWTON_API dFloat NewtonWorldGetCollisionMargin(const NewtonWorld* const newtonWorld);
 	
 	// world utility functions
 	NEWTON_API int NewtonWorldGetBodyCount(const NewtonWorld* const newtonWorld);
@@ -776,7 +775,7 @@ extern "C" {
 	NEWTON_API void NewtonCollisionGetScale (const NewtonCollision* const collision, dFloat* const scaleX, dFloat* const scaleY, dFloat* const scaleZ);
 	NEWTON_API void NewtonDestroyCollision (const NewtonCollision* const collision);
 
-	NEWTON_API dFloat NewtonCollisionGetSkinThickness (const NewtonCollision* const collision);
+	//NEWTON_API dFloat NewtonCollisionGetSkinThickness (const NewtonCollision* const collision);
 
 	NEWTON_API int NewtonCollisionIntersectionTest (const NewtonWorld* const newtonWorld, 
 		const NewtonCollision* const collisionA, const dFloat* const matrixA, 
@@ -923,8 +922,8 @@ extern "C" {
 	NEWTON_API void  NewtonBodyGetVelocity(const NewtonBody* const body, dFloat* const vector);
 	NEWTON_API void  NewtonBodyGetForce(const NewtonBody* const body, dFloat* const vector);
 	NEWTON_API void  NewtonBodyGetTorque(const NewtonBody* const body, dFloat* const vector);
-	NEWTON_API void  NewtonBodyGetForceAcc(const NewtonBody* const body, dFloat* const vector);
-	NEWTON_API void  NewtonBodyGetTorqueAcc(const NewtonBody* const body, dFloat* const vector);
+//	NEWTON_API void  NewtonBodyGetForceAcc(const NewtonBody* const body, dFloat* const vector);
+//	NEWTON_API void  NewtonBodyGetTorqueAcc(const NewtonBody* const body, dFloat* const vector);
 	NEWTON_API void  NewtonBodyGetCentreOfMass (const NewtonBody* const body, dFloat* const com);
 	
 	NEWTON_API void NewtonBodyGetPointVelocity (const NewtonBody* const body, const dFloat* const point, dFloat* const velocOut);

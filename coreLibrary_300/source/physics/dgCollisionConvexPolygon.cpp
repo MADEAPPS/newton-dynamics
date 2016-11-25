@@ -615,7 +615,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 				if (!proxy.m_intersectionTestOnly) {
 					dgAssert (0);
 					//pointInHull -= normalInHull.Scale4 (DG_ROBUST_PLANE_CLIP);
-					pointInHull -= normalInHull.Scale4 (DG_PENETRATION_TOL);
+					pointInHull -= normalInHull.Scale4 (-DG_PENETRATION_TOL);
 					count = proxy.m_instance0->CalculatePlaneIntersection(normalInHull, pointInHull, contactPoints);
 
 					dgVector step(relativeVelocity.Scale4(timetoImpact));
@@ -716,11 +716,10 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 
 	const dgInt32 hullId = hull->GetUserDataID();
 	if (inside & !proxy.m_intersectionTestOnly) {
-		penetration = dgMax (dgFloat32 (0.0f), penetration);
+		penetration = dgMax(dgFloat32(0.0f), penetration);
 		dgAssert(penetration >= dgFloat32(0.0f));
 		dgVector contactPoints[64];
-		//dgVector point(pointInHull + normalInHull.Scale4(penetration + DG_ROBUST_PLANE_CLIP));
-		dgVector point(pointInHull + normalInHull.Scale4(penetration + DG_PENETRATION_TOL));
+		dgVector point(pointInHull + normalInHull.Scale4(penetration - DG_PENETRATION_TOL));
 
 		count = hull->CalculatePlaneIntersection(normalInHull.Scale4(dgFloat32(-1.0f)), point, contactPoints);
 		dgVector step(normalInHull.Scale4((proxy.m_skinThickness - penetration) * dgFloat32(0.5f)));
@@ -735,13 +734,13 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 			contactsOut[i].m_penetration = penetration;
 		}
 	} else {
-		m_vertexCount = dgUnsigned16 (m_count);
+		m_vertexCount = dgUnsigned16(m_count);
 		count = world->CalculateConvexToConvexContacts(proxy);
 		dgAssert(proxy.m_intersectionTestOnly || (count >= 0));
 
 		if (count >= 1) {
 			dgContactPoint* const contactsOut = proxy.m_contacts;
-			dgVector normal (contactsOut[0].m_normal);
+			dgVector normal(contactsOut[0].m_normal);
 			if (normal.DotProduct4(m_normal).GetScalar() < dgFloat32(0.9995f)) {
 				dgInt32 i0 = m_vertexCount - 1;
 				for (dgInt32 i1 = 0; i1 < m_vertexCount; i1++) {

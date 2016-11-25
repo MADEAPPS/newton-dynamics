@@ -915,7 +915,6 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 
 void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP)
 {
-	dFloat skinThickness = NewtonCollisionGetSkinThickness (collision) * 0.125f;
 	for (int i = 0; i < 3; i ++) {
 		dVector support(0.0f);
 		dVector dir (0.0f);
@@ -924,12 +923,12 @@ void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matri
 		dVector localDir (matrix.UnrotateVector (dir));
 		NewtonCollisionSupportVertex (collision, &localDir[0], &support[0]);
 		support = matrix.TransformVector (support);
-		maxP[i] = support[i] - skinThickness;  
+		maxP[i] = support[i];  
 
 		localDir = localDir.Scale (-1.0f);
 		NewtonCollisionSupportVertex (collision, &localDir[0], &support[0]);
 		support = matrix.TransformVector (support);
-		minP[i] = support[i] + skinThickness;  
+		minP[i] = support[i];  
 	}
 }
 

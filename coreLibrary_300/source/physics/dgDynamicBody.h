@@ -89,10 +89,11 @@ class dgDynamicBody : public dgBody
 
 	dgVector m_accel;
 	dgVector m_alpha;
-	dgVector m_prevExternalForce;
-	dgVector m_prevExternalTorque;
+	dgVector m_externalForce;
+	dgVector m_externalTorque;
+	dgVector m_savedExternalForce;
+	dgVector m_savedExternalTorque;
 	dgVector m_dampCoef;
-	dgVector m_aparentMass;
 	dgInt32 m_sleepingCounter;
 	dgUnsigned32 m_isInDestructionArrayLRU;
 	dgSkeletonContainer* m_skeleton;
@@ -112,12 +113,12 @@ class dgDynamicBody : public dgBody
 
 DG_INLINE const dgVector& dgDynamicBody::GetForce() const
 {
-	return m_accel; 
+	return m_externalForce; 
 }
 
 DG_INLINE const dgVector& dgDynamicBody::GetTorque() const
 {
-	return m_alpha;
+	return m_externalTorque;
 }
 
 
@@ -159,23 +160,23 @@ DG_INLINE void dgDynamicBody::SetAngularDamping (const dgVector& angularDamp)
 
 DG_INLINE void dgDynamicBody::AddForce (const dgVector& force)
 {
-	SetForce (m_accel + force);
+	SetForce (m_externalForce + force);
 }
 
 DG_INLINE void dgDynamicBody::AddTorque (const dgVector& torque)
 {
-	SetTorque (torque + m_alpha);
+	SetTorque (torque + m_externalTorque);
 }
 
 
 DG_INLINE void dgDynamicBody::SetForce (const dgVector& force)
 {
-	m_accel = force;
+	m_externalForce = force;
 }
 
 DG_INLINE void dgDynamicBody::SetTorque (const dgVector& torque)
 {
-	m_alpha = torque;
+	m_externalTorque = torque;
 }
 
 DG_INLINE void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
@@ -197,12 +198,12 @@ DG_INLINE void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
 
 DG_INLINE dgVector dgDynamicBody::PredictLinearVelocity(dgFloat32 timestep) const
 {
-	return 	m_veloc + m_accel.Scale3 (timestep * m_invMass.m_w);
+	return 	m_veloc + m_externalForce.Scale3 (timestep * m_invMass.m_w);
 }
 
 DG_INLINE dgVector dgDynamicBody::PredictAngularVelocity(dgFloat32 timestep) const
 {
-	return m_omega + m_invWorldInertiaMatrix.RotateVector(m_alpha).Scale3 (timestep);
+	return m_omega + m_invWorldInertiaMatrix.RotateVector(m_externalTorque).Scale3 (timestep);
 }
 
 

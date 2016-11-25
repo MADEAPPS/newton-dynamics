@@ -1175,13 +1175,6 @@ int NewtonWorldCollide (const NewtonWorld* const newtonWorld, const dFloat* cons
 	return world->GetBroadPhase()->Collide((dgCollisionInstance*)shape, dgMatrix(matrix), (OnRayPrecastAction)prefilter, userData, (dgConvexCastReturnInfo*)info, maxContactsCount, threadIndex);
 }
 
-dFloat NewtonWorldGetCollisionMargin(const NewtonWorld* const newtonWorld)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	return world->GetCollisionMargin();
-}
-
 
 /*!
   Retrieve body by index from island.
@@ -3524,12 +3517,6 @@ void* NewtonSceneCollisionGetNextNode (NewtonCollision* const sceneCollision, co
 }
 
 
-dFloat NewtonCollisionGetSkinThickness (const NewtonCollision* const collision)
-{
-	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
-	return instance->GetChildShape()->GetSkinThickness();
-}
-
 /*! @} */ // end of CshapesConvexComples
 
 
@@ -4928,27 +4915,6 @@ void  NewtonBodyAddForce(const NewtonBody* const bodyPtr, const dFloat* const ve
 }
 
 
-/*!
-  Get the force applied on the last call to apply force and torque callback.
-
-  @param *bodyPtr pointer to the body.
-  @param *vectorPtr pointer to an array of 3 floats to hold the net force of the body.
-
-  this function can be useful to modify force from joint callback
-
-  @return Nothing.
-
-  See also: ::NewtonBodyAddForce, ::NewtonBodyGetForce, ::NewtonBodyGetForce
-*/
-void NewtonBodyGetForceAcc(const NewtonBody* const bodyPtr, dFloat* const vectorPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)bodyPtr;
-	dgVector vector (body->GetForce());
-	vectorPtr[0] = vector.m_x;
-	vectorPtr[1] = vector.m_y;
-	vectorPtr[2] = vector.m_z;
-}
 
 
 /*!
@@ -4965,7 +4931,7 @@ void NewtonBodyGetForce(const NewtonBody* const bodyPtr, dFloat* const vectorPtr
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	dgVector vector (body->GetNetForce());
+	dgVector vector (body->GetForce());
 	vectorPtr[0] = vector.m_x;
 	vectorPtr[1] = vector.m_y;
 	vectorPtr[2] = vector.m_z;
@@ -5057,29 +5023,6 @@ void  NewtonBodyAddTorque(const NewtonBody* const bodyPtr, const dFloat* const v
 void NewtonBodyGetTorque(const NewtonBody* const bodyPtr, dFloat* const vectorPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)bodyPtr;
-	dgVector vector (body->GetNetTorque());
-	vectorPtr[0] = vector.m_x;
-	vectorPtr[1] = vector.m_y;
-	vectorPtr[2] = vector.m_z;
-}
-
-/*!
-  Get the torque applied on the last call to apply force and torque callback.
-
-  @param *bodyPtr pointer to the body.
-  @param *vectorPtr pointer to an array of 3 floats to hold the net force of the body.
-
-  this function can be useful to modify torque form joint callback
-
-  @return Nothing.
-
-  See also: ::NewtonBodyAddTorque, ::NewtonBodyGetTorque, ::NewtonBodyGetTorque
-*/
-void NewtonBodyGetTorqueAcc(const NewtonBody* const bodyPtr, dFloat* const vectorPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-
 	dgBody* const body = (dgBody *)bodyPtr;
 	dgVector vector (body->GetTorque());
 	vectorPtr[0] = vector.m_x;

@@ -97,7 +97,7 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 
 	//dFloat stepz = size.m_z + 0.01f;
 	dFloat stepz = maxP.m_z - minP.m_z + 0.03125f;
-	dFloat stepy = (maxP.m_y - minP.m_y) - NewtonWorldGetCollisionMargin(world);
+	dFloat stepy = (maxP.m_y - minP.m_y);
 
 	dFloat y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	dFloat z0 = matrix.m_posit.m_z - stepz * count / 2;
@@ -242,9 +242,6 @@ static void BoxStack(DemoEntityManager* const scene, dFloat mass, const dVector&
 	dFloat startElevation = 100.0f;
 	dVector floor(FindFloor(world, dVector(baseMatrix.m_posit.m_x, startElevation, baseMatrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
-
-//baseMatrix = dPitchMatrix (10.0f * 3.1416f/180.0f) * dRollMatrix (10.0f * 3.1416f/180.0f) * baseMatrix;
-//baseMatrix.m_posit.m_y += 5.0f;
 
 	// create a material to control collision with this objects
 	int defaultMaterialID;

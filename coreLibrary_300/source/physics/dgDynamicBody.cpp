@@ -35,10 +35,11 @@ dgDynamicBody::dgDynamicBody()
 	:dgBody()
 	,m_accel(dgFloat32 (0.0f))
 	,m_alpha(dgFloat32 (0.0f))
-	,m_prevExternalForce(dgFloat32 (0.0f))
-	,m_prevExternalTorque(dgFloat32 (0.0f))
+	,m_externalForce(dgFloat32 (0.0f))
+	,m_externalTorque(dgFloat32 (0.0f))
+	,m_savedExternalForce(dgFloat32 (0.0f))
+	,m_savedExternalTorque(dgFloat32 (0.0f))
 	,m_dampCoef(dgFloat32 (0.0f))
-	,m_aparentMass(dgFloat32 (0.0f))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
@@ -58,10 +59,11 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	:dgBody(world, collisionCashe, serializeCallback, userData, revisionNumber)
 	,m_accel(dgFloat32 (0.0f))
 	,m_alpha(dgFloat32 (0.0f))
-	,m_prevExternalForce(dgFloat32 (0.0f))
-	,m_prevExternalTorque(dgFloat32 (0.0f))
+	,m_externalForce(dgFloat32 (0.0f))
+	,m_externalTorque(dgFloat32 (0.0f))
+	,m_savedExternalForce(dgFloat32 (0.0f))
+	,m_savedExternalTorque(dgFloat32 (0.0f))
 	,m_dampCoef(dgFloat32 (0.0f))
-	,m_aparentMass(dgFloat32 (0.0f))
 	,m_sleepingCounter(0)
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
@@ -77,7 +79,6 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
-	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
 	serializeCallback(userData, &val, sizeof (dgInt32));
 	m_linearDampOn = (val & 1) ? true : false;
 	m_angularDampOn = (val & 2) ? true : false;
@@ -104,7 +105,6 @@ void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collis
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
-	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
 	serializeCallback (userData, &val, sizeof (dgInt32));
 
 #ifdef DG_USEFULL_INERTIA_MATRIX
@@ -116,8 +116,8 @@ void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collis
 void dgDynamicBody::SetMatrixResetSleep(const dgMatrix& matrix)
 {
 	dgBody::SetMatrixResetSleep(matrix);
-	m_prevExternalForce = dgVector (dgFloat32 (0.0f));
-	m_prevExternalTorque = dgVector (dgFloat32 (0.0f));
+	m_savedExternalForce = dgVector (dgFloat32 (0.0f));
+	m_savedExternalTorque = dgVector (dgFloat32 (0.0f));
 	CalcInvInertiaMatrix();
 }
 
@@ -141,12 +141,20 @@ void dgDynamicBody::AttachCollision (dgCollisionInstance* const collision)
 bool dgDynamicBody::IsInEquilibrium() const
 {
 	if (m_equilibrium) {
-		dgVector deltaAccel((m_accel - m_prevExternalForce).Scale4(m_invMass.m_w));
+		dgVector deltaAccel((m_externalForce - m_savedExternalForce).Scale4(m_invMass.m_w));
 		dgAssert(deltaAccel.m_w == 0.0f);
 		dgFloat32 deltaAccel2 = deltaAccel.DotProduct4(deltaAccel).GetScalar();
 		if (deltaAccel2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
+		dgVector deltaAlpha(m_matrix.UnrotateVector(m_externalTorque - m_savedExternalTorque).CompProduct4(m_invMass));
+		dgAssert(deltaAlpha.m_w == 0.0f);
+		dgFloat32 deltaAlpha2 = deltaAlpha.DotProduct4(deltaAlpha).GetScalar();
+		if (deltaAlpha2 > DG_ERR_TOLERANCE2) {
+			return false;
+		}
+
+/*
 		dgVector netAccel(m_netForce.Scale4(m_invMass.m_w));
 		dgAssert(netAccel.m_w == 0.0f);
 		dgFloat32 netAccel2 = deltaAccel.DotProduct4(deltaAccel).GetScalar();
@@ -154,19 +162,13 @@ bool dgDynamicBody::IsInEquilibrium() const
 			return false;
 		}
 
-		dgVector deltaAlpha(m_matrix.UnrotateVector(m_alpha - m_prevExternalTorque).CompProduct4(m_invMass));
-		dgAssert(deltaAlpha.m_w == 0.0f);
-		dgFloat32 deltaAlpha2 = deltaAlpha.DotProduct4(deltaAlpha).GetScalar();
-		if (deltaAlpha2 > DG_ERR_TOLERANCE2) {
-			return false;
-		}
-
-		dgVector netAlpha(m_matrix.UnrotateVector(m_alpha - m_prevExternalTorque).CompProduct4(m_invMass));
+		dgVector netAlpha(m_matrix.UnrotateVector(m_netTorque).CompProduct4(m_invMass));
 		dgAssert(netAlpha.m_w == 0.0f);
 		dgFloat32 netAlpha2 = netAlpha.DotProduct4(netAlpha).GetScalar();
 		if (netAlpha2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
+*/
 		return true;
 	}
 	return false;
@@ -175,8 +177,8 @@ bool dgDynamicBody::IsInEquilibrium() const
 
 void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 {
-	m_accel = dgVector (dgFloat32 (0.0f));
-	m_alpha = dgVector (dgFloat32 (0.0f));
+	m_externalForce = dgVector (dgFloat32 (0.0f));
+	m_externalTorque = dgVector (dgFloat32 (0.0f));
 	if (m_applyExtForces) {
 		m_applyExtForces(*this, timestep, threadIndex);
 	}
@@ -187,8 +189,8 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 void dgDynamicBody::InvalidateCache ()
 {
 	m_sleepingCounter = 0;
-	m_prevExternalForce = dgVector (dgFloat32 (0.0f));
-	m_prevExternalTorque = dgVector (dgFloat32 (0.0f));
+	m_savedExternalForce = dgVector (dgFloat32 (0.0f));
+	m_savedExternalTorque = dgVector (dgFloat32 (0.0f));
 	dgBody::InvalidateCache ();
 }
 

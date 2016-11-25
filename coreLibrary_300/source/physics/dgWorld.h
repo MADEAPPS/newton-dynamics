@@ -300,7 +300,6 @@ class dgWorld
 	
 	dgInt32 GetBodiesCount() const;
 	dgInt32 GetConstraintsCount() const;
-	dgFloat32 GetCollisionMargin() const;
 
     dgCollisionInstance* CreateInstance (const dgCollision* const child, dgInt32 shapeID, const dgMatrix& offsetMatrix);
 

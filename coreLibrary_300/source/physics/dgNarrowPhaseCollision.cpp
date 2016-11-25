@@ -1475,10 +1475,15 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 			contactOut[i].m_collision1 = collision1;
 			contactOut[i].m_shapeId0 = collision0->GetUserDataID();
 			contactOut[i].m_shapeId1 = collision1->GetUserDataID();
-//dgTrace (("%d %d %f ", proxy.m_body0->m_uniqueID, proxy.m_body1->m_uniqueID, contactOut[i].m_penetration));
-//dgTrace (("p(%f %f %f) ", contactOut[i].m_point[0], contactOut[i].m_point[1], contactOut[i].m_point[2]));
-//dgTrace (("n(%f %f %f)\n", contactOut[i].m_normal[0], contactOut[i].m_normal[1], contactOut[i].m_normal[2]));
+#if 0
+dgVector xxxx0 (instance0.m_globalMatrix.UntransformVector(contactOut[i].m_point));
+dgVector xxxx1 (instance0.m_globalMatrix.UnrotateVector(contactOut[i].m_normal));
+dgTrace (("%d %d %f ", proxy.m_body0->m_uniqueID, proxy.m_body1->m_uniqueID, contactOut[i].m_penetration));
+dgTrace (("p(%f %f %f) ", xxxx0[0], xxxx0[1], xxxx0[2]));
+dgTrace (("n(%f %f %f)\n", xxxx1[0], xxxx1[1], xxxx1[2]));
+#endif
 		}
+
 
 		instance0.m_userData0 = NULL;
 		instance0.m_userData1 = NULL;
@@ -1687,42 +1692,60 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 			break;
 		}
 	}
-
+//dgTrace (("\n"));
 	contactJoint->m_closestDistance = closestDist;
 
-	// check for extreme obtuse contacts 
-	dgFloat32 penetrations[DG_MAX_CONTATCS];
-	const dgCollisionInstance* const convexInstance = proxy.m_instance0;
-	const dgMatrix& matrix = convexInstance->GetGlobalMatrix();
+	const dgFloat32 dist = dgFloat32 (0.0078125f);
+	const dgFloat32 dist2 = dist * dist;
 	for (dgInt32 i = 0; i < count; i ++) {
-		const dgVector& normal = contactOut[i].m_normal;
-		dgVector minPenetration (contactOut[i].m_point - matrix.TransformVector(convexInstance->SupportVertex (matrix.UnrotateVector(normal.Scale3 (dgFloat32 (-1.0f))), NULL)));
-		penetrations[i] = minPenetration.DotProduct3(normal);
-	}
-
-	for (dgInt32 i = 0; i < count; i ++) {
-		const dgVector& n0 = contactOut[i].m_normal;
+		const dgVector& p0 = contactOut[i].m_point;
 		for (dgInt32 j = i + 1; j < count; j ++) {
-			const dgVector& n1 = contactOut[j].m_normal;
-			dgFloat32 dir = n0.DotProduct3(n1);
-			if (dir < dgFloat32 (-0.995f)) {
-				dgFloat32 dist0 = penetrations[i];
-				dgFloat32 dist1 = penetrations[j];
-				count --;
-				if (dist0 <= dist1) {
+			dgAssert (contactOut[i].m_normal.DotProduct3(contactOut[j].m_normal) > dgFloat32 (-0.9f));
+			const dgVector& p1 = contactOut[j].m_point;
+			dgVector step (p1 - p0);
+			dgFloat32 step2 = step.DotProduct4(step).GetScalar(); 
+			if (step2 < dist2) {
+				dgFloat32 project = (contactOut[i].m_normal.DotProduct4(contactOut[j].m_normal)).GetScalar();
+				if (project > dgFloat32 (0.999f)) {
+					count --;
 					contactOut[j] = contactOut[count];
-					penetrations[j] = penetrations[count];
 					j --;
-				} else {
-					contactOut[i] = contactOut[count];
-					penetrations[i] = penetrations[count];
-					i --;
-					break;
 				}
 			}
 		}
 	} 
 
+/*
+	// this was the method used in newton 1.5 for filtering contacts, but now I realized it did not really worked as I though
+	// the method is too good for an iterative solver  
+	dgJacobian jt[DG_CONSTRAINT_MAX_ROWS / 3];
+	dgFloat32 massMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS / 9];
+
+	const dgBody* const body = proxy.m_body0;
+	dgVector com (body->m_globalCentreOfMass - proxy.m_worldOrigin);
+	for (dgInt32 i = 0; i < count; i ++) {
+		jt[i].m_linear = contactOut[i].m_normal;
+		jt[i].m_angular = (contactOut[i].m_point - com).CrossProduct3(contactOut[i].m_normal);
+	}
+
+	dgInt32 index = 0;
+	for (dgInt32 i = 0; i < count; i ++) {
+		dgFloat32* const row = &massMatrix[index];
+		const dgJacobian& gInvMass = jt[i];
+		dgVector aii (gInvMass.m_linear.CompProduct4(jt[i].m_linear) + gInvMass.m_angular.CompProduct4(jt[i].m_angular));
+		row[i] = aii.AddHorizontal().GetScalar() * dgFloat32 (1.01f);
+		for (dgInt32 j = i + 1; j < count; j ++) {
+			dgVector aij (gInvMass.m_linear.CompProduct4(jt[j].m_linear) + gInvMass.m_angular.CompProduct4(jt[j].m_angular));
+			dgFloat32 b = aij.AddHorizontal().GetScalar();
+			row[j] = b;
+			massMatrix[j * count + i] = b;
+		}
+		index += count;
+	}
+
+	dgFloat32 eigenValues[DG_CONSTRAINT_MAX_ROWS / 3];
+	dgEigenValues(count, massMatrix, eigenValues);
+*/
 	proxy.m_contacts = contactOut;
 
 	// restore the pointer

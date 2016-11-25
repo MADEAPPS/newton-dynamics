@@ -42,7 +42,7 @@
 #define DG_CONTACT_DELAY_FRAMES			4
 
 
-dgVector dgBroadPhase::m_velocTol(dgFloat32(1.0e-18f)); 
+dgVector dgBroadPhase::m_velocTol(dgFloat32(1.0e-16f)); 
 dgVector dgBroadPhase::m_angularContactError2(DG_CONTACT_ANGULAR_ERROR * DG_CONTACT_ANGULAR_ERROR);
 dgVector dgBroadPhase::m_linearContactError2(DG_CONTACT_TRANSLATION_ERROR * DG_CONTACT_TRANSLATION_ERROR);
  
@@ -337,8 +337,8 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 					dynamicBody->m_equilibrium = true;
 				}
 
-				dynamicBody->m_prevExternalForce = dynamicBody->m_accel;
-				dynamicBody->m_prevExternalTorque = dynamicBody->m_alpha;
+				dynamicBody->m_savedExternalForce = dynamicBody->m_externalForce;
+				dynamicBody->m_savedExternalTorque = dynamicBody->m_externalTorque;
 			} else {
 				dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
 
@@ -1824,19 +1824,19 @@ void dgBroadPhase::UpdateContacts(dgBroadphaseSyncDescriptor* const descriptor, 
 
 				dgFloat32 distance = contact->m_separationDistance;
 				if (distance >= DG_NARROW_PHASE_DIST) {
-					const dgVector veloc0(body0->GetVelocity());
-					const dgVector veloc1(body1->GetVelocity());
-					const dgVector omega0(body0->GetOmega());
-					const dgVector omega1(body1->GetOmega());
+					const dgVector veloc0 (body0->GetVelocity());
+					const dgVector veloc1 (body1->GetVelocity());
+					const dgVector omega0 (body0->GetOmega());
+					const dgVector omega1 (body1->GetOmega());
 					const dgCollisionInstance* const collision0 = body0->GetCollision();
 					const dgCollisionInstance* const collision1 = body1->GetCollision();
-					const dgFloat32 maxDiameter0 = dgFloat32(3.5f) * collision0->GetBoxMaxRadius();
-					const dgFloat32 maxDiameter1 = dgFloat32(3.5f) * collision1->GetBoxMaxRadius();
+					const dgFloat32 maxDiameter0 = dgFloat32 (3.5f) * collision0->GetBoxMaxRadius(); 
+					const dgFloat32 maxDiameter1 = dgFloat32 (3.5f) * collision1->GetBoxMaxRadius(); 
 
-					const dgVector velocLinear(veloc1 - veloc0);
+					const dgVector velocLinear (veloc1 - veloc0);
 					const dgFloat32 velocAngular0 = dgSqrt((omega0.DotProduct4(omega0)).GetScalar()) * maxDiameter0;
 					const dgFloat32 velocAngular1 = dgSqrt((omega1.DotProduct4(omega1)).GetScalar()) * maxDiameter1;
-					const dgFloat32 speed = dgSqrt((velocLinear.DotProduct4(velocLinear)).GetScalar()) + velocAngular1 + velocAngular0 + dgFloat32(0.5f);
+					const dgFloat32 speed = dgSqrt ((velocLinear.DotProduct4(velocLinear)).GetScalar()) + velocAngular1 + velocAngular0 + dgFloat32 (0.5f);
 					distance -= speed * timestep;
 					contact->m_separationDistance = distance;
 				}
@@ -1861,7 +1861,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	const dgInt32 lastDirtyCount = m_dirtyNodesCount;
-        m_lru = m_lru + 1;
+    m_lru = m_lru + 1;
 	m_dirtyNodesCount = 0;
 
 	m_recursiveChunks = true;
