@@ -1465,14 +1465,14 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
 				bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
 				if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
-					dgAssert(0);
-/*
-					if (body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-						contact = new (m_world->m_allocator) dgDeformableContact(m_world, material);
+					//if (body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
+					if (body0->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI) || body1->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+						dgAssert (0);
+						//contact = new (m_world->m_allocator) dgDeformableContact(m_world, material);
 					} else {
 						contact = new (m_world->m_allocator) dgContact(m_world, material);
 					}
-*/
+
 					contact->AppendToActiveList();
 					m_world->AttachConstraint(contact, body0, body1);
 
