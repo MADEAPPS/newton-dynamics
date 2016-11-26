@@ -4286,24 +4286,6 @@ NewtonBody* NewtonCreateKinematicBody(const NewtonWorld* const newtonWorld, cons
 	return body;
 }
 
-NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const deformableMesh, const dFloat* const matrixPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
-
-#ifdef SAVE_COLLISION
-	SaveCollision (collisionPtr);
-#endif
-
-	dgMatrix matrix (matrixPtr);
-	matrix.m_front.m_w = dgFloat32 (0.0f);
-	matrix.m_up.m_w    = dgFloat32 (0.0f);
-	matrix.m_right.m_w = dgFloat32 (0.0f);
-	matrix.m_posit.m_w = dgFloat32 (1.0f);
-
-	return (NewtonBody*) world->CreateDeformableBody (collision, matrix);
-}
 
 /*!
   Destroy a rigid body.
@@ -4406,8 +4388,8 @@ int NewtonBodyGetType (const NewtonBody* const bodyPtr)
 		return NEWTON_DYNAMIC_BODY;
 	} else if (body->IsRTTIType(dgBody::m_kinematicBodyRTTI)) {
 		return NEWTON_KINEMATIC_BODY;
-	} else if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-		return NEWTON_DEFORMABLE_BODY;
+//	} else if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
+//		return NEWTON_DEFORMABLE_BODY;
 	}
 	dgAssert (0);
 	return 0;

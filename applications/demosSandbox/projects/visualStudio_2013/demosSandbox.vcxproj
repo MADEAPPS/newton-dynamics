@@ -639,9 +639,6 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2013\ampPhysics.vcxproj">
-      <Project>{4798da95-fe1b-4160-b752-24c4b1faba49}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2013\core.vcxproj">
       <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
     </ProjectReference>

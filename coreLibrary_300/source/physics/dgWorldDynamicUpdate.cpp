@@ -31,11 +31,6 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgCollisionDeformableMesh.h"
 
-
-#ifdef _NEWTON_AMP
-#include "dgAmpInstance.h"
-#endif
-
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
 #define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(256)
 #define DG_HEAVY_MASS_SCALE_FACTOR			(25.0f)
@@ -114,41 +109,35 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_equilibrium = true;
 	sentinelBody->m_sleeping = true;
 
-	if (!(world->m_amp && (world->m_hardwaredIndex > 0))) {
-		dgInt32 index = 0;
-		dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
-//useParallel = 1;
-		if (useParallel) {
-			dgInt32 sum = m_joints;
-			useParallel = useParallel && m_joints && m_islands;
-			useParallel = useParallel && ((threadCount * m_islandMemory[0].m_jointCount) >= sum);
-			useParallel = useParallel && (m_islandMemory[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
-//useParallel = 1;
-			while (useParallel) {
-				CalculateReactionForcesParallel(&m_islandMemory[index], timestep);
-				index ++;
-				sum -= m_islandMemory[index].m_jointCount;
-				useParallel = useParallel && (index < m_islands);
-				useParallel = useParallel && ((threadCount * m_islandMemory[index].m_jointCount) >= m_joints);
-				useParallel = useParallel && (m_islandMemory[index].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
-			}
+	dgInt32 index = 0;
+	dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
+	//useParallel = 1;
+	if (useParallel) {
+		dgInt32 sum = m_joints;
+		useParallel = useParallel && m_joints && m_islands;
+		useParallel = useParallel && ((threadCount * m_islandMemory[0].m_jointCount) >= sum);
+		useParallel = useParallel && (m_islandMemory[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
+		//useParallel = 1;
+		while (useParallel) {
+			CalculateReactionForcesParallel(&m_islandMemory[index], timestep);
+			index ++;
+			sum -= m_islandMemory[index].m_jointCount;
+			useParallel = useParallel && (index < m_islands);
+			useParallel = useParallel && ((threadCount * m_islandMemory[index].m_jointCount) >= m_joints);
+			useParallel = useParallel && (m_islandMemory[index].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
 		}
-
-		if (index < m_islands) {
-			descriptor.m_firstIsland = index;
-			descriptor.m_islandCount = m_islands - index;
-			descriptor.m_atomicCounter = 0;
-			for (dgInt32 i = 0; i < threadCount; i ++) {
-				world->QueueJob (CalculateIslandReactionForcesKernel, &descriptor, world);
-			}
-			world->SynchronizationBarrier();
-		}
-	} else {
-		#ifdef _NEWTON_AMP 
-			
-			world->m_amp->ConstraintSolver (m_islands, m_islandMemory, timestep);
-		#endif
 	}
+
+	if (index < m_islands) {
+		descriptor.m_firstIsland = index;
+		descriptor.m_islandCount = m_islands - index;
+		descriptor.m_atomicCounter = 0;
+		for (dgInt32 i = 0; i < threadCount; i ++) {
+			world->QueueJob (CalculateIslandReactionForcesKernel, &descriptor, world);
+		}
+		world->SynchronizationBarrier();
+	}
+
 
 	m_islandMemory = NULL;
 	// integrate soft body dynamics phase 2

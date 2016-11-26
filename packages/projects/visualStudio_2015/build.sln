@@ -23,8 +23,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\coreLib
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\coreLibrary_300\projects\windows\project_vs2015\newton.vcxproj", "{68D9962C-0EC7-445A-B0FD-F87B16D43901}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ampPhysics", "..\..\..\coreLibrary_300\projects\windows\project_vs2015\ampPhysics.vcxproj", "{4798DA95-FE1B-4160-B752-24C4B1FABA49}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\coreLibrary_300\source\pthreads.2\VS_2015\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
 Global
@@ -325,34 +323,6 @@ Global
 		{68D9962C-0EC7-445A-B0FD-F87B16D43901}.releaseDll|Win32.Build.0 = releaseDll|Win32
 		{68D9962C-0EC7-445A-B0FD-F87B16D43901}.releaseDll|x64.ActiveCfg = releaseDll|x64
 		{68D9962C-0EC7-445A-B0FD-F87B16D43901}.releaseDll|x64.Build.0 = releaseDll|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Debug_md|Win32.ActiveCfg = debug|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Debug_md|Win32.Build.0 = debug|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Debug_md|x64.ActiveCfg = debug|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Debug_md|x64.Build.0 = debug|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|Win32.ActiveCfg = debug|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|Win32.Build.0 = debug|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|x64.ActiveCfg = debug|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|x64.Build.0 = debug|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debugDll|Win32.ActiveCfg = debug|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debugDll|Win32.Build.0 = debug|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debugDll|x64.ActiveCfg = debug|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debugDll|x64.Build.0 = debug|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.profile|Win32.ActiveCfg = profile|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.profile|Win32.Build.0 = profile|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.profile|x64.ActiveCfg = profile|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.profile|x64.Build.0 = profile|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Release_md|Win32.ActiveCfg = release|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Release_md|Win32.Build.0 = release|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Release_md|x64.ActiveCfg = release|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.Release_md|x64.Build.0 = release|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|Win32.ActiveCfg = release|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|Win32.Build.0 = release|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|x64.ActiveCfg = release|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|x64.Build.0 = release|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.releaseDll|Win32.ActiveCfg = release|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.releaseDll|Win32.Build.0 = release|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.releaseDll|x64.ActiveCfg = release|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.releaseDll|x64.Build.0 = release|x64
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug_md|Win32.ActiveCfg = Debug|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug_md|Win32.Build.0 = Debug|Win32
 		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug_md|x64.ActiveCfg = Debug|x64

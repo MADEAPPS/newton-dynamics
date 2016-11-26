@@ -50,10 +50,6 @@
 #include "dgCorkscrewConstraint.h"
 
 
-#ifdef _NEWTON_AMP
-#include "dgAmpInstance.h"
-#endif
-
 #define DG_SOLVER_CONVERGENCE_COUNT			4
 #define DG_DEFAULT_SOLVER_ITERATION_COUNT	4
 
@@ -227,7 +223,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	,m_broadPhase(NULL)
 	,m_sentinelBody(NULL)
 	,m_pointCollision(NULL)
-	,m_amp(NULL)
 	,m_preListener(allocator)
 	,m_postListener(allocator)
 	,m_perInstanceData(allocator)
@@ -316,10 +311,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	pointCollison->Release();
 
 	AddSentinelBody();
-
-	#ifdef _NEWTON_AMP
-	m_amp = new (GetAllocator()) dgAmpInstance(this);
-	#endif
 }
 
 dgWorld::~dgWorld()
@@ -328,11 +319,6 @@ dgWorld::~dgWorld()
 	dgAsyncThread::Terminate();
 	dgMutexThread::Terminate();
 
-	#ifdef _NEWTON_AMP
-	if (m_amp) {
-		delete m_amp;
-	}
-	#endif
 	dgSkeletonList::Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++) {
 		delete iter.GetNode()->GetInfo();
@@ -388,13 +374,6 @@ void dgWorld::SetSolverConvergenceQuality (dgInt32 mode)
 dgInt32 dgWorld::EnumerateHardwareModes() const
 {
 	dgInt32 count = 1;
-
-	#ifdef _NEWTON_AMP
-		if (m_amp) {
-			count += m_amp->GetPlatformsCount();
-		}
-	#endif
-
 	return count;
 }
 
@@ -403,28 +382,12 @@ void dgWorld::GetHardwareVendorString (dgInt32 deviceIndex, char* const descript
 	deviceIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
 	if (deviceIndex == 0) {
 		sprintf (description, "newton cpu");
-
-	} else if (m_amp) {
-		#ifdef _NEWTON_AMP
-			m_amp->GetVendorString (deviceIndex - 1, description, maxlength);
-		#endif
 	}
 }
 
 void dgWorld::SetCurrentHardwareMode(dgInt32 deviceIndex)
 {
-	#ifdef _NEWTON_AMP
-	if (m_amp) {
-		m_amp->CleanUp();
-	}
-	#endif
-
 	m_hardwaredIndex = dgClamp(deviceIndex, 0, EnumerateHardwareModes() - 1);
-	if ((m_hardwaredIndex > 0) && m_amp){
-		#ifdef _NEWTON_AMP
-			m_amp->SelectPlaform (m_hardwaredIndex - 1);
-		#endif
-	}
 }
 
 
@@ -562,17 +525,6 @@ dgDynamicBody* dgWorld::CreateDynamicBody(dgCollisionInstance* const collision, 
 dgKinematicBody* dgWorld::CreateKinematicBody (dgCollisionInstance* const collision, const dgMatrix& matrix)
 {
 	dgKinematicBody* const body = new (m_allocator) dgKinematicBody();
-	dgAssert (dgInt32 (sizeof (dgBody) & 0xf) == 0);
-	dgAssert ((dgUnsigned64 (body) & 0xf) == 0);
-
-	InitBody (body, collision, matrix);
-	return body;
-}
-
-
-dgBody* dgWorld::CreateDeformableBody(dgCollisionInstance* const collision, const dgMatrix& matrix)
-{
-	dgBody* const body = new (m_allocator) dgDeformableBody();
 	dgAssert (dgInt32 (sizeof (dgBody) & 0xf) == 0);
 	dgAssert ((dgUnsigned64 (body) & 0xf) == 0);
 
@@ -1212,12 +1164,6 @@ void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDese
 			case dgBody::m_kinematicBody:
 			{
 				body = new (m_allocator) dgKinematicBody(this, &shapeMap, deserialization, fileHandle, revision);
-				break;
-			}
-
-			case dgBody::m_deformableBody:
-			{
-				dgAssert (0);
 				break;
 			}
 		}

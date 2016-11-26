@@ -70,14 +70,14 @@ class dgBody
 		m_baseBodyRTTI = 1<<0,
 		m_dynamicBodyRTTI = 1<<1,
 		m_kinematicBodyRTTI = 1<<2,
-		m_deformableBodyRTTI = 1<<3,
+		//m_deformableBodyRTTI = 1<<3,
 	};
 
 	enum dgType
 	{
 		m_dynamicBody = 0,
 		m_kinematicBody,
-		m_deformableBody,
+		//m_deformableBody,
 	};
 
 	DG_CLASS_ALLOCATOR(allocator)
@@ -269,7 +269,6 @@ class dgBody
 	friend class dgContact;
 	friend class dgConstraint;
 	friend class dgBroadPhase;
-	friend class dgAmpInstance;
 	friend class dgCollisionBVH;
 	friend class dgBroadPhaseNode;
 	friend class dgBodyMasterList;

@@ -240,7 +240,6 @@ void dgBodyMasterListRow::SortList()
 dgBodyMasterList::dgBodyMasterList (dgMemoryAllocator* const allocator)
 	:dgList<dgBodyMasterListRow>(allocator)
 	,m_disableBodies(allocator)
-	,m_deformableCount(0)
 	,m_constraintCount (0)
 {
 }
@@ -261,19 +260,10 @@ void dgBodyMasterList::AddBody (dgBody* const body)
 	if (GetFirst() != node) {
 		InsertAfter (GetFirst(), node);
 	}
-
-	if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-		m_deformableCount ++;
-	}
 }
 
 void dgBodyMasterList::RemoveBody (dgBody* const body)
 {
-	if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-		m_deformableCount --;
-	}
-	dgAssert (m_deformableCount >= 0);
-
 	dgListNode* const node = body->m_masterNode;
 	dgAssert (node);
 	
@@ -414,8 +404,7 @@ DG_INLINE dgUnsigned32 dgBodyMasterList::MakeSortMask(const dgBody* const body) 
 {
 	dgUnsigned32 val0 = body->IsRTTIType(dgBody::m_dynamicBodyRTTI) ? (body->GetInvMass().m_w > 0.0f) << 30 : 0;
 	dgUnsigned32 val1 = body->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? 1<<29 : 0;
-	dgUnsigned32 val2 = body->IsRTTIType(dgBody::m_deformableBodyRTTI) ? 1<<28 : 0;
-	return body->m_uniqueID | val0 | val1 | val2;
+	return body->m_uniqueID | val0 | val1;
 }
 
 

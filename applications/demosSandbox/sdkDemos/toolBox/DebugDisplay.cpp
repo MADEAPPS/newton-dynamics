@@ -301,6 +301,7 @@ static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MOD
 	{
 		case NEWTON_DYNAMIC_BODY:
 		{
+			dAssert(0);
 			int sleepState = NewtonBodyGetSleepState(body);
 			if (sleepState == 1) {
 				// indicate when body is sleeping 
@@ -314,10 +315,6 @@ static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MOD
 
 		case NEWTON_KINEMATIC_BODY:
 			glColor3f(1.0f, 1.0f, 0.0f);
-			break;
-
-		case NEWTON_DEFORMABLE_BODY:
-			glColor3f (0.0f, 1.0f, 1.0f);
 			break;
 	}
 	dMatrix matrix;

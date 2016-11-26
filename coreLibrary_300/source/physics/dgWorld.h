@@ -41,7 +41,6 @@
 #define DG_ENGINE_STACK_SIZE				(1024 * 1024)
 
 class dgBody;
-class dgAmpInstance;
 class dgDynamicBody;
 class dgKinematicBody;
 class dgCollisionPoint;
@@ -282,7 +281,6 @@ class dgWorld
 	void InitBody (dgBody* const body, dgCollisionInstance* const collision, const dgMatrix& matrix);
 	dgDynamicBody* CreateDynamicBody (dgCollisionInstance* const collision, const dgMatrix& matrix);
 	dgKinematicBody* CreateKinematicBody (dgCollisionInstance* const collision, const dgMatrix& matrix);
-	dgBody* CreateDeformableBody (dgCollisionInstance* const collision, const dgMatrix& matrix);
 	void DestroyBody(dgBody* const body);
 	void DestroyAllBodies ();
 
@@ -468,7 +466,6 @@ class dgWorld
 	dgDynamicBody* m_sentinelBody;
 	dgCollisionInstance* m_pointCollision;
 
-	dgAmpInstance* m_amp;
 	void* m_userData;
 	dgMemoryAllocator* m_allocator;
 	dgInt32 m_hardwaredIndex;
@@ -493,7 +490,6 @@ class dgWorld
 	friend class dgBroadPhase;
 	friend class dgDeadBodies;
 	friend class dgDeadJoints;
-	friend class dgAmpInstance;
 	friend class dgDeformableBody;
 	friend class dgActiveContacts;
 	friend class dgUserConstraint;

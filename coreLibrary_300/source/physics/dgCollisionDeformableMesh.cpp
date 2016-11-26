@@ -426,7 +426,9 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 
 dgBody* dgCollisionDeformableMesh::GetBody() const
 {
-	return m_myBody;
+	dgAssert(0);
+	return NULL;
+//	return m_myBody;
 }
 
 void dgCollisionDeformableMesh::SetCollisionBBox (const dgVector& p0, const dgVector& p1)

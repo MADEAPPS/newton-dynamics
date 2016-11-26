@@ -586,6 +586,8 @@ dgVector damp (0.3f);
 
 void dgCollisionDeformableSolidMesh::ResolvePositionsConstraints (dgFloat32 timestep)
 {
+	dgAssert(0);
+/*
 	dgAssert (m_myBody);
 
 	dgInt32 strideInBytes = sizeof (dgVector) * m_clustersCount + sizeof (dgMatrix) * m_clustersCount + sizeof (dgMatrix) * m_particles.m_count;
@@ -751,4 +753,5 @@ for (dgInt32 i = 0; i < m_particles.m_count; i ++) {
 //	UpdateCollision ();
 //	SetCollisionBBox (m_rootNode->m_minBox, m_rootNode->m_maxBox);
     SetCollisionBBox (minBox, maxBox);
+*/
 }

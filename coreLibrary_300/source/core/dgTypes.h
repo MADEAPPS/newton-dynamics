@@ -197,11 +197,6 @@
 
 #define DG_VECTOR_SIMD_SIZE		16
 
-// starting Visual studio 2012 an up we can use high performance computing using AMP
-//#if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1700)) && !defined(_DURANGO)
-//	#define _NEWTON_AMP
-//#endif
-
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#define	DG_GCC_VECTOR_ALIGMENT	
 	#define	DG_MSC_VECTOR_ALIGMENT			__declspec(align(DG_VECTOR_SIMD_SIZE))

@@ -299,7 +299,6 @@ class dgWorldDynamicUpdate
 	static dgVector m_eulerTaylorCorrection;
 
 	friend class dgWorld;
-	friend class dgAmpInstance;
 	friend class dgJacobianMemory;
 	friend class dgSkeletonContainer;
 	friend class dgSolverWorlkerThreads;

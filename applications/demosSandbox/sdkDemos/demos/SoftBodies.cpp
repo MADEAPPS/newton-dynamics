@@ -58,7 +58,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		SetMatrix(*scene, dQuaternion(), matrix.m_posit);
 		SetMatrix(*scene, dQuaternion(), matrix.m_posit);
 
-		NewtonBody* const deformableBody = NewtonCreateDeformableBody (world, softCollision, &matrix[0][0]);
+		NewtonBody* const deformableBody = NewtonCreateDynamicBody (world, softCollision, &matrix[0][0]);
 
 		// very important to remember that deformable collisions are instance, 
 		// therefore the one in the body is a copy of the one use to create the body 
@@ -392,7 +392,7 @@ void SoftBodies(DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
-
+/*
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "playground.ngd", 1);
@@ -414,7 +414,7 @@ void SoftBodies(DemoEntityManager* const scene)
 
 //	scene->SaveScene ("test1.ngd");
 //	dScene CreateAlchemediaFromPhysic(); 
-
+*/
 }
 
 

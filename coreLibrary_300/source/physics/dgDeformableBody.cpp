@@ -21,7 +21,7 @@
 
 #include "dgPhysicsStdafx.h"
 
-
+/*
 #include "dgWorld.h"
 #include "dgDeformableBody.h"
 #include "dgCollisionInstance.h"
@@ -120,14 +120,12 @@ void dgDeformableBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadInd
 
 void dgDeformableBody::SetVelocity (const dgVector& velocity)
 {
-	dgAssert(0);
-/*
+
 	dgBody::SetVelocity(velocity);
 	dgAssert (m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI));
 
 	dgCollisionDeformableMesh* const deformableCollision = (dgCollisionDeformableMesh*) m_collision;
 	deformableCollision->SetParticlesVelocities (velocity);
-*/
 }
 
 
@@ -163,3 +161,5 @@ void dgDeformableBody::SetMatrix(const dgMatrix& matrix)
    
     dgBody::SetMatrix(matrix);
 }
+
+*/

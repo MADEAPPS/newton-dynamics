@@ -26,6 +26,7 @@
 
 #include "dgBody.h"
 
+/*
 DG_MSC_VECTOR_ALIGMENT
 class dgDeformableBody: public dgBody
 {
@@ -90,7 +91,7 @@ inline bool dgDeformableBody::IsDeformable() const
 {
 	return true;
 }
-
+*/
 
 #endif 
 
