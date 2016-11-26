@@ -58,9 +58,9 @@ void dgCollisionCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 hei
 {
 	m_rtti |= dgCollisionCapsule_RTTI;
 
-	radio0 = dgAbsf(radio0);
-	radio1 = dgAbsf(radio1);
-	height = dgAbsf(height);
+	radio0 = dgMax (dgAbsf (radio0), D_MIN_CONVEX_SHAPE_SIZE);
+	radio1 = dgMax (dgAbsf (radio1), D_MIN_CONVEX_SHAPE_SIZE);
+	height = dgMax (dgAbsf (height), D_MIN_CONVEX_SHAPE_SIZE);
 
 	m_transform = dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
 	if (radio0 > radio1) {
@@ -363,7 +363,6 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& direction, dgInt32* 
 
 dgVector dgCollisionCapsule::SupportVertexSpecial(const dgVector& direction, dgInt32* const vertexIndex) const
 {
-//	*vertexIndex = -1;
 	dgVector dir(direction.CompProduct4(m_transform));
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
@@ -384,7 +383,7 @@ dgVector dgCollisionCapsule::SupportVertexSpecialProjectPoint (const dgVector& t
 {
 	dgVector dir(direction.CompProduct4(m_transform));
 	dgVector point(testPoint.CompProduct4(m_transform));
-	point += dir.Scale4(m_radio0);
+	point += dir.Scale4(m_radio0 - DG_PENETRATION_TOL);
 	return m_transform.CompProduct4(point);
 }
 

@@ -28,8 +28,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define D_CONE_SKIN_THINCKNESS	dgFloat32 (1.0f/64.0f)
-
 dgInt32 dgCollisionCone::m_shapeRefCount = 0;
 dgCollisionConvex::dgConvexSimplexEdge dgCollisionCone::m_edgeArray[DG_CONE_SEGMENTS * 4];
 
@@ -61,8 +59,8 @@ void dgCollisionCone::Init (dgFloat32 radius, dgFloat32 height)
 {
 	m_rtti |= dgCollisionCone_RTTI;
 
-	m_radius = dgMax(dgAbsf(radius), dgFloat32(2.0f) * D_CONE_SKIN_THINCKNESS);
-	m_height = dgMax (dgAbsf (height * dgFloat32 (0.5f)), dgFloat32 (2.0f) * D_CONE_SKIN_THINCKNESS);
+	m_radius = dgMax(dgAbsf(radius), D_MIN_CONVEX_SHAPE_SIZE);
+	m_height = dgMax (dgAbsf (height * dgFloat32 (0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
 
 	dgFloat32 angle = dgFloat32(0.0f);
 	for (dgInt32 i = 0; i < DG_CONE_SEGMENTS; i++) {
@@ -148,9 +146,6 @@ dgInt32 dgCollisionCone::CalculateSignature () const
 
 void dgCollisionCone::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-//dgCollisionConvex::DebugCollision (matrix, callback, userData);
-//return;
-
 	#define NUMBER_OF_DEBUG_SEGMENTS  40
 	dgTriplex pool[NUMBER_OF_DEBUG_SEGMENTS + 1];
 	dgTriplex face[NUMBER_OF_DEBUG_SEGMENTS];
@@ -227,9 +222,9 @@ dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgInt32* con
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
 	if (dir.m_x < dgFloat32(-0.9999f)) {
-		return dgVector(-(m_height - D_CONE_SKIN_THINCKNESS), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+		return dgVector(-(m_height - DG_PENETRATION_TOL), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 	} else if (dir.m_x > dgFloat32(0.9999f)) {
-		return dgVector(m_height - D_CONE_SKIN_THINCKNESS, dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+		return dgVector(m_height - DG_PENETRATION_TOL, dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 	} else {
 		dgVector dir_yz(dir);
 		dir_yz.m_x = dgFloat32(0.0f);
@@ -237,11 +232,11 @@ dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgInt32* con
 		dgAssert(mag2 > dgFloat32(0.0f));
 		dir_yz = dir_yz.Scale4(dgFloat32(1.0f) / dgSqrt(mag2));
 
-		dgVector p0(dir_yz.Scale4(m_radius - D_CONE_SKIN_THINCKNESS));
+		dgVector p0(dir_yz.Scale4(m_radius - DG_PENETRATION_TOL));
 		dgVector p1(dgVector::m_zero);
 
-		p0.m_x = -(m_height - D_CONE_SKIN_THINCKNESS);
-		p1.m_x =   m_height - D_CONE_SKIN_THINCKNESS;
+		p0.m_x = -(m_height - DG_PENETRATION_TOL);
+		p1.m_x =  m_height - DG_PENETRATION_TOL;
 
 		dgFloat32 dist0 = dir.DotProduct4(p0).GetScalar();
 		dgFloat32 dist1 = dir.DotProduct4(p1).GetScalar();
@@ -256,7 +251,7 @@ dgVector dgCollisionCone::SupportVertexSpecial(const dgVector& dir, dgInt32* con
 dgVector dgCollisionCone::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const
 {
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
-	return point + dir.Scale4(D_CONE_SKIN_THINCKNESS);
+	return point + dir.Scale4(DG_PENETRATION_TOL);
 }
 
 

@@ -22,11 +22,9 @@
 #include "dgPhysicsStdafx.h"
 #include "dgBody.h"
 #include "dgWorld.h"
-//#include "dgContact.h"
 #include "dgCollisionBox.h"
 #include "dgContactSolver.h"
 
-#define D_MIN_BOX_SIZE	dgFloat32 (1.0f/64.0f)
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -65,9 +63,9 @@ dgCollisionBox::dgCollisionBox(dgWorld* const world, dgDeserialize deserializati
 void dgCollisionBox::Init (dgFloat32 size_x, dgFloat32 size_y, dgFloat32 size_z)
 {
 	m_rtti |= dgCollisionBox_RTTI;
-	m_size[0].m_x = dgMax (dgAbsf (size_x) * dgFloat32 (0.5f), D_MIN_BOX_SIZE);
-	m_size[0].m_y = dgMax (dgAbsf (size_y) * dgFloat32 (0.5f), D_MIN_BOX_SIZE);
-	m_size[0].m_z = dgMax (dgAbsf (size_z) * dgFloat32 (0.5f), D_MIN_BOX_SIZE);
+	m_size[0].m_x = dgMax (dgAbsf (size_x) * dgFloat32 (0.5f), D_MIN_CONVEX_SHAPE_SIZE);
+	m_size[0].m_y = dgMax (dgAbsf (size_y) * dgFloat32 (0.5f), D_MIN_CONVEX_SHAPE_SIZE);
+	m_size[0].m_z = dgMax (dgAbsf (size_z) * dgFloat32 (0.5f), D_MIN_CONVEX_SHAPE_SIZE);
 	m_size[0].m_w = dgFloat32 (0.0f);
 
 	m_size[1].m_x = - m_size[0].m_x;
@@ -213,14 +211,17 @@ dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir, dgInt32* cons
 		*vertexIndex = dgInt32 (index.m_ix);
 	}
 
-//	dgVector size0 (m_size[0]);
-//	dgVector size1 (m_size[1]);
-	return (m_size[1] & mask) + m_size[0].AndNot(mask);
+	dgVector padd (DG_PENETRATION_TOL);
+	padd = padd & dgVector::m_triplexMask;
+	dgVector size0 (m_size[0] - padd);
+	dgVector size1 (m_size[1] + padd);
+	return (size1 & mask) + size0.AndNot(mask);
 }
 
 dgVector dgCollisionBox::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const
 {
-	return point;
+	dgAssert(dgAbsf((dir.DotProduct4(dir).GetScalar() - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
+	return point + dir.Scale4 (DG_PENETRATION_TOL);
 }
 
 

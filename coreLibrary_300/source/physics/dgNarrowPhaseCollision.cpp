@@ -77,17 +77,7 @@ dgCollisionInstance* dgWorld::CreateSphere(dgFloat32 radii, dgInt32 shapeID, con
 dgCollisionInstance* dgWorld::CreateBox(dgFloat32 dx, dgFloat32 dy, dgFloat32 dz, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
 	dgUnsigned32 crc = dgCollisionBox::CalculateSignature(dx, dy, dz);
-//	dgUnsigned32 pinNumber = dgCollisionBox::CalculateSignature(dy, dz, dx);
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
-
-/*
-	if (node && (node->GetInfo().m_pinNumber != pinNumber)) {
-		// shape was found but it is a CRC collision simple single out this shape as a unique entry in the cache
-		dgTrace (("we have a CRC collision simple single out this shape as a unique entry in the cache\n"));
-		dgCollision* const collision = new  (m_allocator) dgCollisionBox (m_allocator, pinNumber, dx, dy, dz);
-		node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), pinNumber);
-	}
-*/
 	if (!node) {
 		dgCollision* const collision = new  (m_allocator) dgCollisionBox (m_allocator, crc, dx, dy, dz);
 		node = dgBodyCollisionList::Insert (collision, crc);

@@ -38,7 +38,8 @@
 
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
 #define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(256)
-#define DG_MASS_SCALE_FACTOR				(25.0f)
+#define DG_HEAVY_MASS_SCALE_FACTOR			(25.0f)
+#define DG_LARGE_STACK_DAMP_FACTOR			(0.25f)
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-8f));
 dgVector dgWorldDynamicUpdate::m_eulerTaylorCorrection (dgFloat32 (1.0f / 12.0f));
@@ -224,6 +225,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	const dgInt32 vectorStride = dgInt32 (sizeof (dgVector) / sizeof (dgFloat32));
 
 	dgInt32 activeJointCount = 0;
+	bool globalAutoSleep = true;
 	while (stack) {
 		stack --;
 		dgDynamicBody* const srcBody = queueBuffer[stack];
@@ -236,8 +238,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			world->m_bodiesMemory.ExpandCapacityIfNeessesary(bodyIndex, sizeof (dgBodyInfo));
 			dgBodyInfo* const bodyArray1 = (dgBodyInfo*)&world->m_bodiesMemory[0];
 			bodyArray1[bodyIndex].m_body = srcBody;
-			isInEquilibrium &= srcBody->m_autoSleep;
 			isInEquilibrium &= srcBody->m_equilibrium;
+			globalAutoSleep &= (srcBody->m_autoSleep & srcBody->m_equilibrium); 
 			
 			srcBody->m_index = bodyCount;
 			srcBody->m_dynamicsLru = lruMark;
@@ -312,11 +314,11 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 
 
 	dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-	if (isInEquilibrium) {
-		for (dgInt32 i = 0; i < bodyCount; i++) {
+	if (globalAutoSleep) {
+		for (dgInt32 i = 1; i < bodyCount; i++) {
 			dgBody* const body = bodyArray[m_bodies + i].m_body;
 			body->m_dynamicsLru = m_markLru;
-			body->m_sleeping = true;
+			body->m_sleeping = globalAutoSleep;
 		}
 	} else {
 		if (world->m_islandUpdate) {
@@ -362,10 +364,13 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			jointInfo->m_m0 = m0;
 			jointInfo->m_m1 = m1;
 
+			dgBody* const body0 = joint->m_body0;
+			dgBody* const body1 = joint->m_body1;
+			body0->m_dynamicsLru = m_markLru;
+			body1->m_dynamicsLru = m_markLru;
+
 			rowsCount += constraintArray[i].m_pairCount;
 			if (joint->GetId() == dgConstraint::m_contactConstraint) {
-				const dgBody* const body0 = joint->m_body0;
-				const dgBody* const body1 = joint->m_body1;
 				if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 					dgInt32 ccdJoint = false;
 					const dgVector& veloc0 = body0->m_veloc;
@@ -412,6 +417,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 				}
 			}
 		}
+
 		if (isContinueCollisionIsland) {
 			rowsCount = dgMax(rowsCount, 64);
 		}
@@ -581,22 +587,17 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 	dgAssert(constraint->m_body0);
 	dgAssert(constraint->m_body1);
 
-	dgBody* const body0 = constraint->m_body0;
-	dgBody* const body1 = constraint->m_body1;
+	dgDynamicBody* const body0 = (dgDynamicBody*)constraint->m_body0;
+	dgDynamicBody* const body1 = (dgDynamicBody*)constraint->m_body1;
+	dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+	dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 
 	body0->m_inCallback = true;
 	body1->m_inCallback = true;
 	dof = dgInt32(constraint->JacobianDerivative(constraintParamOut));
 	body0->m_inCallback = false;
 	body1->m_inCallback = false;
-
-	//dgAssert(jointInfo->m_m0 < island->m_bodyCount);
-	//dgAssert(jointInfo->m_m1 < island->m_bodyCount);
-	//dgAssert(constraint->m_index == dgUnsigned32(j));
-
-	jointInfo->m_pairStart = rowCount;
-	jointInfo->m_pairCount = dof;
-
+	
 	jointInfo->m_scale0 = dgFloat32(1.0f);
 	jointInfo->m_scale1 = dgFloat32(1.0f);
 	const dgFloat32 invMass0 = body0->GetInvMass().m_w;
@@ -604,19 +605,37 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 	if ((invMass0 > dgFloat32(0.0f)) && (invMass1 > dgFloat32(0.0f)) && !body0->GetSkeleton() && !body1->GetSkeleton()) {
 		const dgFloat32 mass0 = body0->GetMass().m_w;
 		const dgFloat32 mass1 = body1->GetMass().m_w;
-		const dgFloat32 scaleFactor = dgFloat32 (DG_MASS_SCALE_FACTOR);
+		const dgFloat32 scaleFactor = dgFloat32 (DG_HEAVY_MASS_SCALE_FACTOR);
 			
 		if (mass0 > scaleFactor * mass1) {
 			jointInfo->m_scale0 = invMass1 * mass0 / scaleFactor;
 		} else if (mass1 > scaleFactor * mass0) {
 			jointInfo->m_scale1 = invMass0 * mass1 / scaleFactor;
 		}
-
-		//float xxx0 = jointInfo->m_scale0 * invMass0 + jointInfo->m_scale1 * invMass1;
-		//float xxx1 = invMass0 + invMass1;
-		//float xxx2 = invMass0 + invMass1;
 	}
 
+	
+	if (body0->m_equilibrium) {
+		if ((invMass0 > dgFloat32(0.0f)) && !body0->GetSkeleton() && !body1->GetSkeleton()) {
+			dgAssert (!body1->m_equilibrium);
+			dgVector isMovingMask(body0->m_veloc + body0->m_omega + body0->m_accel + body0->m_alpha);
+			dgAssert(dgCheckVector(isMovingMask));
+			if ((isMovingMask.TestZero().GetSignMask() & 7) == 7) {
+				jointInfo->m_scale0 *= DG_LARGE_STACK_DAMP_FACTOR;
+			}
+		}
+	} else if (body1->m_equilibrium) {
+		if ((invMass1 > dgFloat32(0.0f)) && !body0->GetSkeleton() && !body1->GetSkeleton()) {
+			dgVector isMovingMask(body1->m_veloc + body1->m_omega + body1->m_accel + body1->m_alpha);
+			dgAssert(dgCheckVector(isMovingMask));
+			if ((isMovingMask.TestZero().GetSignMask() & 7) == 7) {
+				jointInfo->m_scale1 *= DG_LARGE_STACK_DAMP_FACTOR;
+			}
+		}
+	}
+
+	jointInfo->m_pairCount = dof;
+	jointInfo->m_pairStart = rowCount;
 	for (dgInt32 i = 0; i < dof; i++) {
 		dgJacobianMatrixElement* const row = &matrixRow[rowCount];
 		dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);

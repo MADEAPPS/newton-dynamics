@@ -1383,6 +1383,12 @@ void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 	m_world->CalculateContacts(pair, threadID, false, false);
 
 	if (pair->m_contactCount) {
+		if (pair->m_contact->m_body0->m_invMass.m_w != dgFloat32 (0.0f)) {
+			pair->m_contact->m_body0->m_equilibrium = false;
+		}
+		if (pair->m_contact->m_body1->m_invMass.m_w != dgFloat32 (0.0f)) {
+			pair->m_contact->m_body1->m_equilibrium = false;
+		}
 		dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
 		if (pair->m_isDeformable) {
 			m_world->ProcessDeformableContacts(pair, threadID);

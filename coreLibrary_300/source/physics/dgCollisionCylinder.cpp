@@ -31,8 +31,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////// 
-#define D_MIN_CYLINDER_SIZE	dgFloat32 (1.0f/64.0f)
-
 
 dgInt32 dgCollisionCylinder::m_shapeRefCount = 0;
 dgCollisionConvex::dgConvexSimplexEdge dgCollisionCylinder::m_edgeArray[DG_TAPED_CYLINDER_SEGMENTS * 2 * 3];
@@ -55,9 +53,9 @@ dgCollisionCylinder::dgCollisionCylinder(dgWorld* const world, dgDeserialize des
 void dgCollisionCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 {
 	m_rtti |= dgCollisionCylinder_RTTI;
-	m_radio0 = dgMax (dgAbsf (radio0), D_MIN_CYLINDER_SIZE);
-	m_radio1 = dgMax (dgAbsf (radio1), D_MIN_CYLINDER_SIZE);
-	m_height = dgMax (dgAbsf (height * dgFloat32 (0.5f)), D_MIN_CYLINDER_SIZE);
+	m_radio0 = dgMax (dgAbsf (radio0), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radio1 = dgMax (dgAbsf (radio1), D_MIN_CONVEX_SHAPE_SIZE);
+	m_height = dgMax (dgAbsf (height * dgFloat32 (0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
 
 	dgFloat32 angle = dgFloat32 (0.0f);
 	for (dgInt32 i = 0; i < DG_TAPED_CYLINDER_SEGMENTS; i ++) {
@@ -241,22 +239,21 @@ dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32
 {
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
-//	*vertexIndex = -1;
 	if (dir.m_x < dgFloat32 (-0.9999f)) {
-		return dgVector (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
+		return dgVector (-(m_height - DG_PENETRATION_TOL), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
 	} else if (dir.m_x > dgFloat32 (0.9999f)) {
-		return dgVector ( m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
+		return dgVector ( m_height - DG_PENETRATION_TOL, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
 	} else {
 		dgVector dir_yz(dir);
 		dir_yz.m_x = dgFloat32(0.0f);
 		dgFloat32 mag2 = dir_yz.DotProduct4(dir_yz).GetScalar();
 		dgAssert (mag2 > dgFloat32 (0.0f));
 		dir_yz = dir_yz.Scale4(dgFloat32(1.0f) / dgSqrt(mag2));
-		dgVector p0(dir_yz.Scale4(m_radio0));
-		dgVector p1(dir_yz.Scale4(m_radio1));
+		dgVector p0(dir_yz.Scale4(m_radio0 - DG_PENETRATION_TOL));
+		dgVector p1(dir_yz.Scale4(m_radio1 - DG_PENETRATION_TOL));
 
-		p0.m_x = - m_height;
-		p1.m_x =   m_height;
+		p0.m_x = - (m_height - DG_PENETRATION_TOL);
+		p1.m_x =   m_height - DG_PENETRATION_TOL;
 
 		dgFloat32 dist0 = dir.DotProduct4(p0).GetScalar();
 		dgFloat32 dist1 = dir.DotProduct4(p1).GetScalar();
@@ -271,7 +268,7 @@ dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgInt32
 dgVector dgCollisionCylinder::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
-	return point;
+	return point + dir.Scale4 (DG_PENETRATION_TOL);
 }
 
 

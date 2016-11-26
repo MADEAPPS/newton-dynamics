@@ -392,12 +392,18 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 		}
 	}
 
-	body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
-	body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
 	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+		dgConstraint* const contact = (dgConstraint*) constraint;
+		if (contact->m_maxDOF) {
+			body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
+			body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
+		}
 		row0.RemoveContactJoint(constraint->m_link0);
 		row1.RemoveContactJoint(constraint->m_link1);
 	} else {
+		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
+		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
+
 		row0.RemoveBilateralJoint(constraint->m_link0);
 		row1.RemoveBilateralJoint(constraint->m_link1);
 	}
@@ -406,7 +412,6 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 
 DG_INLINE dgUnsigned32 dgBodyMasterList::MakeSortMask(const dgBody* const body) const
 {
-//	return body->m_uniqueID | ((body->GetInvMass().m_w > 0.0f) << 30);
 	dgUnsigned32 val0 = body->IsRTTIType(dgBody::m_dynamicBodyRTTI) ? (body->GetInvMass().m_w > 0.0f) << 30 : 0;
 	dgUnsigned32 val1 = body->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? 1<<29 : 0;
 	dgUnsigned32 val2 = body->IsRTTIType(dgBody::m_deformableBodyRTTI) ? 1<<28 : 0;
