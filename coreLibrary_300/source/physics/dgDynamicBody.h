@@ -75,6 +75,8 @@ class dgDynamicBody : public dgBody
 	virtual dgSkeletonContainer* GetSkeleton() const;
 	void SetSkeleton(dgSkeletonContainer* const skeleton);
 
+	void IntegrateOpenLoopExternalForce(dgFloat32 timeStep);
+
 	private:
 	virtual void AddDampingAcceleration(dgFloat32 timestep);
 
@@ -101,12 +103,14 @@ class dgDynamicBody : public dgBody
 	bool m_linearDampOn;
 	bool m_angularDampOn;
 	static dgVector m_equilibriumError2;
+	static dgVector m_eulerTaylorCorrection;
 
 	friend class dgWorld;
 	friend class dgBroadPhase;
 	friend class dgBodyMasterList;
 	friend class dgSkeletonContainer;
 	friend class dgWorldDynamicUpdate;
+	friend class dgCollisionDeformableMesh;
 } DG_GCC_VECTOR_ALIGMENT;
 
 
@@ -226,6 +230,7 @@ DG_INLINE void dgDynamicBody::SetSkeleton(dgSkeletonContainer* const skeleton)
 	dgAssert (!(m_skeleton && skeleton));
 	m_skeleton = skeleton;
 }
+
 
 
 #endif 

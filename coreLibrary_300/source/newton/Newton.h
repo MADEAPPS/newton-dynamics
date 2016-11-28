@@ -998,9 +998,10 @@ extern "C" {
 	// particle system interface (soft bodies, individual, pressure bodies and cloth)   
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial);
-	NEWTON_API NewtonCollision* NewtonCreateDeformableMesh (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID);
+	NEWTON_API NewtonCollision* NewtonCreateDeformableMesh(const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, int shapeID);
 
+/*
+	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial);
 	NEWTON_API void NewtonDeformableMeshCreateClusters (NewtonCollision* const deformableMesh, int clusterCount, dFloat overlapingWidth);
 	NEWTON_API void NewtonDeformableMeshSetDebugCallback (NewtonCollision* const deformableMesh, NewtonCollisionIterator callback);
 
@@ -1025,7 +1026,7 @@ extern "C" {
 	NEWTON_API int NewtonDeformableMeshSegmentGetMaterialID (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
 	NEWTON_API int NewtonDeformableMeshSegmentGetIndexCount (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
 	NEWTON_API const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const deformableMesh, const NewtonDeformableMeshSegment* const segment);
-
+*/
 	// **********************************************************************************************
 	//
 	// Ball and Socket joint functions
@@ -1203,7 +1204,7 @@ extern "C" {
 	NEWTON_API void NewtonMeshAddFace(const NewtonMesh* const mesh, int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex);
 	NEWTON_API void NewtonMeshEndFace(const NewtonMesh* const mesh);
 
-	NEWTON_API void NewtonMeshBuildFromVertexListIndexList(const NewtonMesh* const mesh,
+	NEWTON_API void NewtonMeshBuildFromPointListIndexList(const NewtonMesh* const mesh,
 														   int faceCount, const int* const faceIndexCount, const int* const faceMaterialIndex, 
 														   const dFloat* const vertex, int vertexStrideInBytes, const int* const vertexIndex,
 														   const dFloat* const normal, int normalStrideInBytes, const int* const normalIndex,

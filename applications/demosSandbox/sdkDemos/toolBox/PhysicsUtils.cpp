@@ -1181,32 +1181,14 @@ void ExportScene (NewtonWorld* const world, const char* const fileName)
 	testScene.Serialize (fileName);
 }
 
-
-
-
-
+/*
 NewtonMesh* LoadNewtonMesh (NewtonWorld* const world, const char* const name)
 {
-	char fileName[2048];
-	GetWorkingFileName (name, fileName);
-
-	NewtonMesh* mesh = NULL;
-	FILE* const file = fopen (fileName, "rb");
-	if (file) {
-		char skipName[2048];
-		fread (skipName, strlen(D_MESH_HEADER), 1, file);
-		if (!strncmp (skipName, D_MESH_HEADER, strlen(D_MESH_HEADER))) {
-			int size;
-			fread (&size, sizeof (int), 1, file);
-			dAssert (size < int (sizeof (name)));
-			fread (skipName, size, 1, file);
-			skipName[size] = 0;
-
-			mesh = NewtonMeshCreateFromSerialization (world, DemoEntityManager::DeserializeFile, file);
-		}
-		fclose (file);
-	}
-	return mesh;
+	DemoEntity entity (dGetIdentityMatrix(), NULL);
+	entity.LoadNGD_mesh(name, world);
+	DemoMeshInterface* const mesh = entity.GetMesh();
+	NewtonMesh* const newtonMesh = mesh->CreateNewtonMesh (world, dGetIdentityMatrix());
+	return newtonMesh;
 }
 
 void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
@@ -1225,7 +1207,7 @@ void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
 		fclose (file);
 	}
 }
-
+*/
 
 void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalSpace, dFloat timestep)
 {

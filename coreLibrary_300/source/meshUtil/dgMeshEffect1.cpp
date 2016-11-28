@@ -995,7 +995,7 @@ dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
 	memset (&m_normalUVIndex[0], 0, size_t (m_normalUVIndex.GetSizeInBytes()));
 
 	Init();
-	BuildFromVertexListIndexList(builder.m_faceCount, builder.m_faceIndexCount, &materialIndex[0],
+	BuildFromPointListIndexList(builder.m_faceCount, builder.m_faceIndexCount, &materialIndex[0],
 								 &builder.m_vertex[0].m_x, sizeof (dgVector), &indexList[0],
 								 &normalUV.m_x, sizeof (dgVector), &m_normalUVIndex[0],
 								 &normalUV.m_x, sizeof (dgVector), &m_normalUVIndex[0],
@@ -1004,7 +1004,6 @@ dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
     RepairTJoints();
 	CalculateNormals(dgFloat32 (45.0f * 3.141592f/180.0f));
 }
-
 
 dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const char* const fileName)
 	:dgPolyhedra (allocator) 
@@ -1931,7 +1930,7 @@ void dgMeshEffect::EndPolygon (dgFloat64 tol, bool fixTjoint)
 }
 
 
-void dgMeshEffect::BuildFromVertexListIndexList(
+void dgMeshEffect::BuildFromPointListIndexList(
 	dgInt32 faceCount, const dgInt32* const faceIndexCount, const dgInt32* const faceMaterialIndex, 
 	const dgFloat32* const vertex, dgInt32 vertexStrideInBytes, const dgInt32* const vertexIndex,
 	const dgFloat32* const normal, dgInt32  normalStrideInBytes, const dgInt32* const normalIndex,
@@ -2098,6 +2097,143 @@ void dgMeshEffect::BuildFromVertexListIndexList(
 	PackVertexArrays ();
 }
 
+/*
+void dgMeshEffect::BuildFromTriangleIndexList(dgInt32 faceCount, const dgInt32 * const faceMaterialIndex,
+	const dgFloat32* const vertex, dgInt32 vertexStrideInBytes, const dgInt32 * const vertexIndex)
+{
+	BeginPolygon();
+
+	// calculate vertex Count
+	dgInt32 vertexCount = 0;
+	for (dgInt32 i = 0; i < faceCount * 3; i++) {
+		vertexCount = dgMax(vertexCount, vertexIndex[i] + 1);
+	}
+
+	dgInt32 layerCountBase = 0;
+	dgInt32 vertexStride = dgInt32(vertexStrideInBytes / sizeof(dgFloat32));
+	for (dgInt32 i = 0; i < vertexCount; i++) {
+		dgInt32 index = i * vertexStride;
+		dgBigVector v(vertex[index + 0], vertex[index + 1], vertex[index + 2], dgFloat32 (0.0f));
+		AddVertex(v);
+		layerCountBase += (vertex[index + 3]) > dgFloat32(layerCountBase);
+	}
+
+	dgInt32 maxAttribCount = faceCount * 3;
+	dgStack<dgInt32>attrIndexMap(maxAttribCount);
+
+	dgInt32 currentCount = 0;
+	dgInt32 attributeCount = 0;
+	dgInt32 attributeCountMarker = 0;
+
+	for (dgInt32 j = 0; j < faceCount; j++) {
+		dgInt32 materialIndex = faceMaterialIndex[j];
+		for (dgInt32 i = 0; i < 3; i++) {
+			dgVertexAtribute point;
+			dgInt32 index = vertexIndex[j * 3 + i];
+			point.m_vertex = m_points[index];
+			point.m_vertex.m_w = dgFloat32(index);
+			
+			point.m_normal_x = dgFloat32(0.0f);
+			point.m_normal_y = dgFloat32(1.0f);
+			point.m_normal_z = dgFloat32(0.0f);
+						
+			point.m_u0 = dgFloat32(0.0f);
+			point.m_v0 = dgFloat32(0.0f);
+
+			point.m_u1 = dgFloat32(0.0f);
+			point.m_v1 = dgFloat32(0.0f);
+
+			point.m_material = materialIndex;
+			AddAtribute(point);
+
+			attrIndexMap[attributeCount] = attributeCount;
+			attributeCount++;
+		}
+
+		if (attributeCount >= (attributeCountMarker + 1024 * 256)) {
+			dgInt32 count = attributeCount - attributeCountMarker;
+			dgInt32 newCount = dgVertexListToIndexList(&m_attrib[currentCount].m_vertex.m_x, sizeof(dgVertexAtribute), sizeof(dgVertexAtribute) / sizeof(dgFloat64), count, &attrIndexMap[attributeCountMarker], DG_VERTEXLIST_INDEXLIST_TOL);
+			for (dgInt32 i = 0; i < count; i++) {
+				attrIndexMap[attributeCountMarker + i] += currentCount;
+			}
+			currentCount += newCount;
+			m_atribCount = currentCount;
+			attributeCountMarker = attributeCount;
+		}
+	}
+
+	if (attributeCountMarker) {
+		dgInt32 count = attributeCount - attributeCountMarker;
+		dgInt32 newCount = dgVertexListToIndexList(&m_attrib[currentCount].m_vertex.m_x, sizeof(dgVertexAtribute), sizeof(dgVertexAtribute) / sizeof(dgFloat64), count, &attrIndexMap[attributeCountMarker], DG_VERTEXLIST_INDEXLIST_TOL);
+		for (dgInt32 i = 0; i < count; i++) {
+			attrIndexMap[attributeCountMarker + i] += currentCount;
+		}
+		currentCount += newCount;
+		m_atribCount = currentCount;
+		attributeCountMarker = attributeCount;
+
+		dgStack<dgInt32>indirectAttrIndexMap(m_atribCount);
+		m_atribCount = dgVertexListToIndexList(&m_attrib[0].m_vertex.m_x, sizeof(dgVertexAtribute), sizeof(dgVertexAtribute) / sizeof(dgFloat64), m_atribCount, &indirectAttrIndexMap[0], DG_VERTEXLIST_INDEXLIST_TOL);
+
+		for (dgInt32 i = 0; i < maxAttribCount; i++) {
+			dgInt32 j = attrIndexMap[i];
+			attrIndexMap[i] = indirectAttrIndexMap[j];
+		}
+	} else {
+		m_atribCount = dgVertexListToIndexList(&m_attrib[0].m_vertex.m_x, sizeof(dgVertexAtribute), sizeof(dgVertexAtribute) / sizeof(dgFloat64), m_atribCount, &attrIndexMap[0], DG_VERTEXLIST_INDEXLIST_TOL);
+	}
+
+	bool hasFaces = true;
+	dgStack<dgInt8> faceMark(faceCount);
+	memset(&faceMark[0], 1, size_t(faceMark.GetSizeInBytes()));
+
+	dgInt32 layerCount = 0;
+	while (hasFaces) {
+		hasFaces = false;
+		dgInt32 vertexBank = layerCount * vertexCount;
+		for (dgInt32 j = 0; j < faceCount; j++) {
+			dgInt32 index[256];
+			dgInt64 userdata[256];
+			if (faceMark[j]) {
+				for (int i = 0; i < 3; i++) {
+					index[i] = vertexIndex[j * 3 + i] + vertexBank;
+					userdata[i] = attrIndexMap[j * 3 + i];
+				}
+				dgEdge* const edge = AddFace(3, index, userdata);
+				if (edge) {
+					faceMark[j] = 0;
+				}
+				else {
+					// check if the face is not degenerated
+					bool degeneratedFace = false;
+					for (int i = 0; i < 3 - 1; i++) {
+						for (int k = i + 1; k < 3; k++) {
+							if (index[i] == index[k]) {
+								degeneratedFace = true;
+							}
+						}
+					}
+					if (degeneratedFace) {
+						faceMark[j] = 0;
+					} else {
+						hasFaces = true;
+					}
+				}
+			}
+		}
+		if (hasFaces) {
+			layerCount++;
+			for (int i = 0; i < vertexCount; i++) {
+				int index = i * vertexStride;
+				AddVertex(dgBigVector(vertex[index + 0], vertex[index + 1], vertex[index + 2], dgFloat64(layerCount + layerCountBase)));
+			}
+		}
+	}
+
+	EndFace();
+	PackVertexArrays();
+}
+*/
 
 dgInt32 dgMeshEffect::GetTotalFaceCount() const
 {
@@ -2118,7 +2254,7 @@ dgInt32 dgMeshEffect::GetTotalIndexCount() const
 		if (edge->m_incidentFace < 0) {
 			continue;
 		}
-		
+
 		dgEdge* ptr = edge;
 		do {
 			count ++;
@@ -2180,7 +2316,7 @@ void* dgMeshEffect::GetFirstVertex () const
 			ptr = ptr->m_twin->m_next;
 		} while (ptr != edge);
 	}
-	return node; 
+	return node;
 }
 
 void* dgMeshEffect::GetNextVertex (const void* const vertex) const
@@ -2199,10 +2335,10 @@ void* dgMeshEffect::GetNextVertex (const void* const vertex) const
 				ptr->m_mark = mark;
 				ptr = ptr->m_twin->m_next;
 			} while (ptr != edge);
-			return node; 
+			return node;
 		}
 	}
-	return NULL; 
+	return NULL;
 }
 
 dgInt32 dgMeshEffect::GetVertexIndex (const void* const vertex) const
@@ -2223,7 +2359,7 @@ void* dgMeshEffect::GetFirstPoint () const
 			return node;
 		}
 	}
-	return NULL; 
+	return NULL;
 }
 
 void* dgMeshEffect::GetNextPoint (const void* const point) const
@@ -2234,10 +2370,10 @@ void* dgMeshEffect::GetNextPoint (const void* const point) const
 		dgTreeNode* const node = iter.GetNode();
 		dgEdge* const edge = &node->GetInfo();
 		if (edge->m_incidentFace > 0) {
-			return node; 
+			return node;
 		}
 	}
-	return NULL; 
+	return NULL;
 }
 
 dgInt32 dgMeshEffect::GetPointIndex (const void* const point) const
@@ -2292,7 +2428,7 @@ void* dgMeshEffect::GetFirstEdge () const
 		edge->m_mark = mark;
 		edge->m_twin->m_mark = mark;
 	}
-	return node; 
+	return node;
 }
 
 void* dgMeshEffect::GetNextEdge (const void* const edge) const
@@ -2303,14 +2439,14 @@ void* dgMeshEffect::GetNextEdge (const void* const edge) const
 	Iterator iter (*this);
 	iter.Set (node);
 	for (iter ++; iter; iter ++) {
-		dgTreeNode* node = iter.GetNode();
+		dgTreeNode* const node = iter.GetNode();
 		if (node->GetInfo().m_mark != mark) {
 			node->GetInfo().m_mark = mark;
 			node->GetInfo().m_twin->m_mark = mark;
-			return node; 
+			return node;
 		}
 	}
-	return NULL; 
+	return NULL;
 }
 
 
@@ -2371,10 +2507,10 @@ void* dgMeshEffect::GetNextFace (const void* const face) const
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
-			return node; 
+			return node;
 		}
 	}
-	return NULL; 
+	return NULL;
 }
 
 
@@ -2406,7 +2542,6 @@ void dgMeshEffect::SetFaceMaterial (const void* const face, int mateialID) const
 	}
 }
 
-
 dgInt32 dgMeshEffect::GetFaceIndexCount (const void* const face) const
 {
 	int count = 0;
@@ -2417,7 +2552,7 @@ dgInt32 dgMeshEffect::GetFaceIndexCount (const void* const face) const
 		count ++;
 		ptr = ptr->m_next;
 	} while (ptr != edge);
-	return count; 
+	return count;
 }
 
 void dgMeshEffect::GetFaceIndex (const void* const face, dgInt32* const indices) const
@@ -2464,7 +2599,7 @@ dgInt32 GetTotalFaceCount() const;
 	dgInt32 materialCount;
 	dgInt32 materials[256];
 	dgInt32 streamIndexMap[256];
-	dgIndexArray* array; 
+	dgIndexArray* array;
 
 	count = 0;
 	materialCount = 0;
@@ -2473,7 +2608,7 @@ dgInt32 GetTotalFaceCount() const;
 	array->m_indexList = (dgInt32*)&array[1];
 
 	mark = IncLRU();
-	dgPolyhedra::Iterator iter (*this);	
+	dgPolyhedra::Iterator iter (*this);
 	memset(streamIndexMap, 0, sizeof (streamIndexMap));
 	for(iter.Begin(); iter; iter ++){
 

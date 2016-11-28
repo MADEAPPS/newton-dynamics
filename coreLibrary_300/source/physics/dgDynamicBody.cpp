@@ -23,13 +23,14 @@
 #include "dgWorld.h"
 #include "dgDynamicBody.h"
 #include "dgCollisionInstance.h"
+#include "dgCollisionDeformableMesh.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
 dgVector dgDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
-
+dgVector dgDynamicBody::m_eulerTaylorCorrection(dgFloat32(1.0f / 12.0f));
 
 dgDynamicBody::dgDynamicBody()
 	:dgBody()
@@ -112,6 +113,53 @@ void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collis
 #endif
 }
 
+#ifdef DG_USEFULL_INERTIA_MATRIX
+
+void dgDynamicBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
+{
+	dgVector II;
+	m_principalAxis = inertia;
+	m_principalAxis.EigenVectors(II);
+	dgMatrix massMatrix(dgGetIdentityMatrix());
+	massMatrix[0][0] = II[0];
+	massMatrix[1][1] = II[1];
+	massMatrix[2][2] = II[2];
+	dgBody::SetMassMatrix(mass, massMatrix);
+}
+
+dgMatrix dgDynamicBody::CalculateLocalInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_mass[0];
+	diagonal[1][1] = m_mass[1];
+	diagonal[2][2] = m_mass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+
+dgMatrix dgDynamicBody::CalculateInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis * m_matrix);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_mass[0];
+	diagonal[1][1] = m_mass[1];
+	diagonal[2][2] = m_mass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+
+dgMatrix dgDynamicBody::CalculateInvInertiaMatrix() const
+{
+	dgMatrix matrix(m_principalAxis * m_matrix);
+	matrix.m_posit = dgVector::m_wOne;
+	dgMatrix diagonal(dgGetIdentityMatrix());
+	diagonal[0][0] = m_invMass[0];
+	diagonal[1][1] = m_invMass[1];
+	diagonal[2][2] = m_invMass[2];
+	return matrix * diagonal * matrix.Inverse();
+}
+#endif
 
 void dgDynamicBody::SetMatrixResetSleep(const dgMatrix& matrix)
 {
@@ -194,50 +242,29 @@ void dgDynamicBody::InvalidateCache ()
 	dgBody::InvalidateCache ();
 }
 
-#ifdef DG_USEFULL_INERTIA_MATRIX
-
-void dgDynamicBody::SetMassMatrix (dgFloat32 mass, const dgMatrix& inertia)
+void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 {
-	dgVector II;
-	m_principalAxis = inertia;
-	m_principalAxis.EigenVectors (II);
-	dgMatrix massMatrix (dgGetIdentityMatrix());
-	massMatrix[0][0] = II[0];
-	massMatrix[1][1] = II[1];
-	massMatrix[2][2] = II[2];
-	dgBody::SetMassMatrix (mass, massMatrix);
-}
+	if (!m_equilibrium) {
+		if (!m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+			AddDampingAcceleration(timestep);
+			CalcInvInertiaMatrix();
 
-dgMatrix dgDynamicBody::CalculateLocalInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_mass[0];
-	diagonal[1][1] = m_mass[1];
-	diagonal[2][2] = m_mass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
+			dgVector accel(m_externalForce.Scale4(m_invMass.m_w));
+			dgVector alpha(m_invWorldInertiaMatrix.RotateVector(m_externalTorque));
 
-dgMatrix dgDynamicBody::CalculateInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis * m_matrix);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_mass[0];
-	diagonal[1][1] = m_mass[1];
-	diagonal[2][2] = m_mass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
+			m_accel = accel;
+			m_alpha = alpha;
 
-dgMatrix dgDynamicBody::CalculateInvInertiaMatrix() const
-{
-	dgMatrix matrix (m_principalAxis * m_matrix);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_invMass[0];
-	diagonal[1][1] = m_invMass[1];
-	diagonal[2][2] = m_invMass[2];
-	return matrix * diagonal * matrix.Inverse();
+			dgVector timeStepVect(timestep);
+			m_veloc += accel.CompProduct4(timeStepVect);
+			dgVector correction(alpha.CrossProduct3(m_omega));
+			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
+		} else {
+			dgCollisionDeformableMesh* const deformableMesh = (dgCollisionDeformableMesh*)m_collision->m_childShape;
+			deformableMesh->ApplyExternalForces(this, timestep);
+		}
+	} else {
+		m_accel = dgVector::m_zero;
+		m_alpha = dgVector::m_zero;
+	}
 }
-#endif

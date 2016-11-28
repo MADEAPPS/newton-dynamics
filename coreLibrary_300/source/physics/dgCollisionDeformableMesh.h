@@ -27,15 +27,11 @@
 #include "dgCollision.h"
 #include "dgCollisionConvex.h"
 
-class dgDeformableBody;
-class dgDeformableContact;
-class dgCollisionConvexPolygon;
-
-#define DG_SOFTBODY_BASE_SIZE	8
 
 class dgCollisionDeformableMesh: public dgCollisionConvex
 {
 	public:
+/*
 	class dgParticle
 	{
 		public:
@@ -75,12 +71,33 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 		dgInt32 m_indexCount;
 		dgInt32* m_indexList;
 	};
+*/
 
 	dgCollisionDeformableMesh (const dgCollisionDeformableMesh& source);
 	dgCollisionDeformableMesh (dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collsionID);
 	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionDeformableMesh(void);
 
+	protected:
+	class dgEdge
+	{
+		public:
+		dgInt16 m_v0;
+		dgInt16 m_v1;
+	};
+
+	class dgJacobianPair
+	{
+		public:
+		dgVector m_j01;
+		dgVector m_j10;
+	};
+
+	virtual dgInt32 CalculateSignature() const;
+	virtual void SetCollisionBBox(const dgVector& p0, const dgVector& p1);
+	virtual void Serialize(dgSerialize callback, void* const userData) const;
+	virtual void CollideMasses(dgDynamicBody* const myBody, dgBody* const otherBody);
+/*
 	dgBody* GetBody() const;
 	dgInt32 GetParticleCount() const;
 	dgVector GetParticlePosition(dgInt32 index) const;
@@ -91,15 +108,13 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgInt32 GetVisualPointsCount() const;
 	void SetSkinThickness (dgFloat32 skinThickness);
 	void GetVisualVertexData(dgInt32 vertexStrideInByte, dgFloat32* const vertex, dgInt32 normalStrideInByte, dgFloat32* const normals, dgInt32 uvStrideInByte0, dgFloat32* const uv0);
-
-
 	
 	virtual void SetMass (dgFloat32 mass) = 0;
     virtual void SetMatrix(const dgMatrix& matrix) = 0;
-	virtual void ApplyExternalForces (dgFloat32 timestep) = 0;
+	
 	virtual void ResolvePositionsConstraints (dgFloat32 timestep) = 0;
 
-	virtual void CreateClusters (dgInt32 count, dgFloat32 overlaringWidth) = 0;
+//	virtual void CreateClusters (dgInt32 count, dgFloat32 overlaringWidth) = 0;
 
 	virtual void EndConfiguration () = 0;
 	virtual void ConstraintParticle (dgInt32 particleIndex, const dgVector& posit, const dgBody* const body) = 0;
@@ -112,8 +127,6 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 	protected:
 	class dgDeformableNode;
-
-	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual void DebugCollision (const dgMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
     virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 
@@ -123,7 +136,6 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgDeformableNode* BuildTopDown (dgInt32 count, dgDeformableNode* const children, dgDeformableNode* const parent);
 	dgFloat32 CalculateSurfaceArea (const dgDeformableNode* const node0, const dgDeformableNode* const node1, dgVector& minBox, dgVector& maxBox) const;
 	dgInt32 CalculateContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy);
-
 	dgFloat32 CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const;
 
 	dgVector m_basePosit;
@@ -145,7 +157,32 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	bool m_isdoubleSided;
 
 	friend class dgWorld;
-	friend class dgDeformableBody;
+*/	
+
+	class dgSpringMassSolver;
+	
+	virtual void CalcAABB(const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
+	virtual void ApplyInternalForces(dgDynamicBody* const body, dgFloat32 timestep);
+	virtual void ApplyExternalForces(dgDynamicBody* const body, dgFloat32 timestep);
+	virtual dgMatrix CalculateInertiaAndCenterOfMass(const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
+
+	dgVector* m_posit;
+	dgVector* m_veloc;
+	dgEdge* m_edgeList;
+	dgFloat32* m_lambda;
+	dgInt16* m_indexMap;
+	dgFloat32* m_restlength;
+	dgVector* m_externalforce;
+	dgVector* m_internalforce;
+	dgFloat32* m_unitMassScaler;
+
+	dgInt32 m_edgeCount;
+	dgInt32 m_massesCount;
+	dgInt32 m_vertexCount;
+
+	friend class dgBroadPhase;
+	friend class dgDynamicBody;
+	friend class dgWorldDynamicUpdate;
 };
 
 

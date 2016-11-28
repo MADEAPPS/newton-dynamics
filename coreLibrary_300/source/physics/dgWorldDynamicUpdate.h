@@ -84,7 +84,8 @@ class dgIsland
 	dgInt32 m_rowsCount;
 	dgInt32 m_islandLRU;
 	dgInt32 m_activeJointCount;
-	dgInt32 m_isContinueCollision;
+	dgInt16 m_isContinueCollision;
+	dgInt16 m_hasSoftBodies;
 };
 
 
@@ -247,6 +248,8 @@ class dgWorldDynamicUpdate
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
 	static dgInt32 CompareIslands (const dgIsland* const islandA, const dgIsland* const islandB, void* notUsed);
+
+	static void ApplySoftBodyIntenalForceKernel(void* const context, void* const worldContext, dgInt32 threadID);
 	static void CalculateIslandReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 
 	static void IntegrateInslandParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
@@ -267,6 +270,7 @@ class dgWorldDynamicUpdate
 	void SolverInitInternalForcesParallel (dgParallelSolverSyncData* const syncData) const; 
 	void CalculateForcesGameModeParallel (dgParallelSolverSyncData* const syncData) const; 
 
+	void ApplySoftBodyIntenalForce(dgIsland* const island, dgFloat32 timestep);
 	void CalculateReactionForcesParallel (const dgIsland* const island, dgFloat32 timestep) const;
 	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;
 	void ApplyNetTorqueAndForce (dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& accNorm, const dgVector& mask) const;
@@ -296,7 +300,7 @@ class dgWorldDynamicUpdate
 	dgIsland* m_islandMemory;
 	
 	static dgVector m_velocTol;
-	static dgVector m_eulerTaylorCorrection;
+	
 
 	friend class dgWorld;
 	friend class dgJacobianMemory;

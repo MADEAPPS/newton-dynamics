@@ -66,7 +66,7 @@ dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, const dgFloat64*
 				index ++;
 			}
 
-			BuildFromVertexListIndexList(triangleCount, faceCount, &materialsPool[0], 
+			BuildFromPointListIndexList(triangleCount, faceCount, &materialsPool[0], 
 				&points[0].m_x, sizeof (dgVector), vertexIndexList,
 				&normal.m_x, sizeof (dgVector), &normalIndexListPool[0],
 				&uv.m_x, sizeof (dgVector), &normalIndexListPool[0],

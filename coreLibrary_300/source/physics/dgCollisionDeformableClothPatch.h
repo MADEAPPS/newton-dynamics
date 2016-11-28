@@ -29,7 +29,7 @@
 #include "dgCollisionDeformableMesh.h"
 
 
-
+#if 0
 class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 {
 	public:
@@ -80,7 +80,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	dgSoftBodyEdge** m_particleToEddgeMap;
 	friend class dgWorld;
 };
-
+#endif
 
 
 #endif 

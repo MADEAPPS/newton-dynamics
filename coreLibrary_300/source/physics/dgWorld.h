@@ -29,7 +29,7 @@
 #include "dgCollisionScene.h"
 #include "dgBodyMasterList.h"
 #include "dgWorldDynamicUpdate.h"
-#include "dgDeformableBodiesUpdate.h"
+//#include "dgDeformableBodiesUpdate.h"
 #include "dgCollisionCompoundFractured.h"
 
 #define DG_REDUCE_CONTACT_TOLERANCE			dgFloat32 (5.0e-2f)
@@ -147,7 +147,7 @@ class dgWorld
 	:public dgBodyMasterList
 	,public dgBodyMaterialList
 	,public dgBodyCollisionList
-	,public dgDeformableBodiesUpdate
+//	,public dgDeformableBodiesUpdate
 	,public dgSkeletonList
 	,public dgActiveContacts 
 	,public dgWorldDynamicUpdate
@@ -312,6 +312,7 @@ class dgWorld
 	dgCollisionInstance* CreateCompound ();
 	dgCollisionInstance* CreateFracturedCompound (dgMeshEffect* const solidMesh, int shapeID, int fracturePhysicsMaterialID, int pointcloudCount, const dgFloat32* const vertexCloud, int strideInBytes, int materialID, const dgMatrix& textureMatrix,
 												  dgCollisionCompoundFractured::OnEmitFractureChunkCallBack emitFrafuredChunk, dgCollisionCompoundFractured::OnEmitNewCompundFractureCallBack emitFracturedCompound, dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack reconstructMainMesh);
+
 	dgCollisionInstance* CreateDeformableMesh (dgMeshEffect* const mesh, dgInt32 shapeID);
 	dgCollisionInstance* CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial);
 	dgCollisionInstance* CreateBVH ();	
@@ -406,13 +407,11 @@ class dgWorld
 	
 	void PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex);	
 	void ProcessContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex);
-	void ProcessDeformableContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex);
 	void ProcessCachedContacts (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex) const;
 
 	void ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	void CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-	void DeformableContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-
+	
 	void SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	void SceneChildContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 
@@ -490,7 +489,6 @@ class dgWorld
 	friend class dgBroadPhase;
 	friend class dgDeadBodies;
 	friend class dgDeadJoints;
-	friend class dgDeformableBody;
 	friend class dgActiveContacts;
 	friend class dgUserConstraint;
 	friend class dgBodyMasterList;

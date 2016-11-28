@@ -27,7 +27,6 @@
 #include "dgDynamicBody.h"
 #include "dgCollisionConvex.h"
 #include "dgCollisionInstance.h"
-#include "dgDeformableContact.h"
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
 #include "dgBroadPhaseAggregate.h"
@@ -161,6 +160,8 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_lru(DG_CONTACT_DELAY_FRAMES)
 	,m_contacJointLock()
 	,m_criticalSectionLock()
+	,m_pendingSoftBodyCollisions(32, world->GetAllocator(), 64)
+	,m_pendingSoftBodyPairsCount(0)
 	,m_dirtyNodesCount(0)
 	,m_scanTwoWays(false)
 	,m_recursiveChunks(false)
@@ -323,7 +324,6 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 				if (!dynamicBody->IsInEquilibrium()) {
 					dynamicBody->m_sleeping = false;
 					dynamicBody->m_equilibrium = false;
-					// update collision matrix only
 					dynamicBody->UpdateCollisionMatrix(timestep, threadID);
 				}
 				if (dynamicBody->GetInvMass().m_w == dgFloat32(0.0f) || body->m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
@@ -1385,12 +1385,8 @@ void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 			pair->m_contact->m_body1->m_equilibrium = false;
 		}
 		dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
-		if (pair->m_isDeformable) {
-			m_world->ProcessDeformableContacts(pair, threadID);
-		} else {
-			m_world->ProcessContacts(pair, threadID);
-			KinematicBodyActivation(pair->m_contact);
-		}
+		m_world->ProcessContacts(pair, threadID);
+		KinematicBodyActivation(pair->m_contact);
 	} else {
 		if (pair->m_cacheIsValid) {
 			//m_world->ProcessCachedContacts (pair->m_contact, timestep, threadID);
@@ -1432,7 +1428,6 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 			dgAssert (!body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
 
 			pair.m_contact = contact;
-			pair.m_isDeformable = 0;
 			pair.m_timestep = timestep;
             CalculatePairContacts (&pair, threadIndex);
 		}
@@ -1465,21 +1460,22 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
 				bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
 				if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
-					//if (body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-					if (body0->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI) || body1->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-						dgAssert (0);
-						//contact = new (m_world->m_allocator) dgDeformableContact(m_world, material);
+					const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI);
+					const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI);
+					if (isSofBody0 || isSofBody1) {
+						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body0 = body0;
+						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
+						m_pendingSoftBodyPairsCount++;
 					} else {
 						contact = new (m_world->m_allocator) dgContact(m_world, material);
+						contact->AppendToActiveList();
+						m_world->AttachConstraint(contact, body0, body1);
+
+						dgAssert(contact);
+						contact->m_contactActive = 0;
+						contact->m_positAcc = dgVector(dgFloat32(10.0f));
+						contact->m_timeOfImpact = dgFloat32(1.0e10f);
 					}
-
-					contact->AppendToActiveList();
-					m_world->AttachConstraint(contact, body0, body1);
-
-					dgAssert (contact);
-					contact->m_contactActive = 0;
-					contact->m_positAcc = dgVector (dgFloat32 (10.0f));
-					contact->m_timeOfImpact = dgFloat32 (1.0e10f);
 				}
 			}
 		}
@@ -1797,16 +1793,40 @@ xxx ++;
 
 }
 
-
-void dgBroadPhase::UpdateContactKernel(void* const context, void* const node, dgInt32 threadID)
+void dgBroadPhase::UpdateSoftBodyContactKernel(void* const context, void* const worldContext, dgInt32 threadID)
 {
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
-	broadPhase->UpdateContacts(descriptor, (dgActiveContacts::dgListNode*) node, descriptor->m_timestep, threadID);
+	broadPhase->UpdateSoftBodyContacts(descriptor, descriptor->m_timestep, threadID);
 }
 
-void dgBroadPhase::UpdateContacts(dgBroadphaseSyncDescriptor* const descriptor, dgActiveContacts::dgListNode* const nodePtr, dgFloat32 timeStep, dgInt32 threadID)
+void dgBroadPhase::UpdateRigidBodyContactKernel(void* const context, void* const node, dgInt32 threadID)
+{
+	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
+	dgWorld* const world = descriptor->m_world;
+	dgBroadPhase* const broadPhase = world->GetBroadPhase();
+	broadPhase->UpdateRigidBodyContacts(descriptor, (dgActiveContacts::dgListNode*) node, descriptor->m_timestep, threadID);
+}
+
+void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timeStep, dgInt32 threadID)
+{
+	const dgInt32 count = m_pendingSoftBodyPairsCount;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1)) {
+		dgPendingCollisionSofBodies& pair = m_pendingSoftBodyCollisions[i];
+		if (pair.m_body0->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+			dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)pair.m_body0->m_collision->GetChildShape();
+			dgAssert(pair.m_body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+			deformableShape->CollideMasses((dgDynamicBody*) pair.m_body0, pair.m_body1);
+		} else if (pair.m_body1->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+			dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)pair.m_body1->m_collision->GetChildShape();
+			dgAssert(pair.m_body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+			deformableShape->CollideMasses((dgDynamicBody*)pair.m_body1, pair.m_body0);
+		}
+	}
+}
+
+void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgActiveContacts::dgListNode* const nodePtr, dgFloat32 timeStep, dgInt32 threadID)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 
@@ -1866,6 +1886,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	dTimeTrackerEvent(__FUNCTION__);
 	const dgInt32 lastDirtyCount = m_dirtyNodesCount;
     m_lru = m_lru + 1;
+	m_pendingSoftBodyPairsCount = 0;
 	m_dirtyNodesCount = 0;
 
 	m_recursiveChunks = true;
@@ -1943,10 +1964,17 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	dgActiveContacts* const contactList = m_world;
 	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		m_world->QueueJob(UpdateContactKernel, &syncPoints, contactListNode);
+		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode);
 		contactListNode = contactListNode ? contactListNode->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
+
+	if (m_pendingSoftBodyPairsCount) {
+		for (dgInt32 i = 0; i < threadsCount; i++) {
+			m_world->QueueJob(UpdateSoftBodyContactKernel, &syncPoints, contactListNode);
+		}
+		m_world->SynchronizationBarrier();
+	}
 
 
 	m_recursiveChunks = false;
@@ -1967,8 +1995,4 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		m_generatedBodies.RemoveAll();
 */
 	}
-
-	// update soft body dynamics phase 1
-	dgDeformableBodiesUpdate* const softBodyList = m_world;
-	softBodyList->ApplyExternaForces(timestep);
 }

@@ -239,7 +239,7 @@ static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MOD
 		glBegin(GL_TRIANGLES);
 	}
 
-	NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);	
+	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);	
 	if (mass > 0.0f) {
 
 		int sleepState = NewtonBodyGetSleepState(body);

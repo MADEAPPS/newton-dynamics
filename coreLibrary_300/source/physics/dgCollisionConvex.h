@@ -65,9 +65,6 @@ class dgCollisionConvex: public dgCollision
 	virtual dgFloat32 GetBoxMinRadius () const; 
 	virtual dgFloat32 GetBoxMaxRadius () const;
 
-	virtual void* GetUserData () const;
-	virtual void SetUserData (void* const userData);
-
 	dgInt32 RayCastClosestFace (dgVector* tetrahedrum, const dgVector& origin, dgFloat32& pointDist) const;
 	dgInt32 SimplifyClipPolygon (dgInt32 count, const dgVector& normal, dgVector* const polygon) const;
 
@@ -91,7 +88,6 @@ class dgCollisionConvex: public dgCollision
 
 	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
 	
-	void* m_userData;
 	dgVector* m_vertex;
 	dgConvexSimplexEdge* m_simplex;
 	

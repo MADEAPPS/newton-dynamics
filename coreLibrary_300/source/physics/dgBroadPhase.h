@@ -30,6 +30,7 @@ class dgBody;
 class dgWorld;
 class dgContact;
 class dgCollision;
+class dgDynamicBody;
 class dgCollisionInstance;
 class dgBroadPhaseAggregate;
 
@@ -284,7 +285,6 @@ class dgBroadPhase
 		dgContactPoint* m_contactBuffer;
 		dgFloat32 m_timestep;
 		dgInt32 m_contactCount : 16;
-		dgInt32 m_isDeformable : 1;
 		dgInt32 m_cacheIsValid : 1;
 	};
 
@@ -376,16 +376,25 @@ class dgBroadPhase
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
 	
 	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
-	void UpdateContacts (dgBroadphaseSyncDescriptor* const descriptor, dgActiveContacts::dgListNode* const node, dgFloat32 timeStep, dgInt32 threadID);
+	void UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timeStep, dgInt32 threadID);
+	void UpdateRigidBodyContacts (dgBroadphaseSyncDescriptor* const descriptor, dgActiveContacts::dgListNode* const node, dgFloat32 timeStep, dgInt32 threadID);
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threaCount, dgInt32 threadID);
 		
 	static void SleepingStateKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void UpdateAggregateEntropyKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
-	static void AddGeneratedBodiesContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
-	static void UpdateContactKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void AddGeneratedBodiesContactsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void UpdateRigidBodyContactKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void UpdateSoftBodyContactKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static dgInt32 CompareNodes(const dgBroadPhaseNode* const nodeA, const dgBroadPhaseNode* const nodeB, void* const notUsed);
+
+	class dgPendingCollisionSofBodies
+	{
+		public:
+		dgBody* m_body0;
+		dgBody* m_body1;
+	};
 
 	dgWorld* m_world;
 	dgBroadPhaseNode* m_rootNode;
@@ -395,10 +404,11 @@ class dgBroadPhase
 	dgUnsigned32 m_lru;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
+	dgArray<dgPendingCollisionSofBodies> m_pendingSoftBodyCollisions;
+	dgInt32 m_pendingSoftBodyPairsCount;
 	dgInt32 m_dirtyNodesCount;
 	bool m_scanTwoWays;
 	bool m_recursiveChunks;
-	
 
 	DG_INLINE dgVector ReduceLine(dgVector* const simplex, dgInt32& indexOut) const;
 	DG_INLINE dgVector ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const;

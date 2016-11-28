@@ -873,9 +873,14 @@ DemoBezierCurve::DemoBezierCurve (const dBezierSpline& curve)
 	m_isVisible = false;
 }
 
-
 void DemoBezierCurve::RenderTransparency () const
 {
+}
+
+NewtonMesh* DemoBezierCurve::CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix)
+{
+	dAssert(0);
+	return NULL;
 }
 
 void DemoBezierCurve::RenderNormals ()

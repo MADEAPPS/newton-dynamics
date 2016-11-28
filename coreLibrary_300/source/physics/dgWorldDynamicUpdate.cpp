@@ -37,7 +37,7 @@
 #define DG_LARGE_STACK_DAMP_FACTOR			(0.25f)
 
 dgVector dgWorldDynamicUpdate::m_velocTol (dgFloat32 (1.0e-8f));
-dgVector dgWorldDynamicUpdate::m_eulerTaylorCorrection (dgFloat32 (1.0f / 12.0f));
+
 
 class dgWorldDynamicUpdateSyncDescriptor
 {
@@ -92,10 +92,12 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 	dgInt32 maxRowCount = 0;
 	dgInt32 blockMatrixSize = 0;
+	dgInt32 softBodiesCount = 0;
 	for (dgInt32 i = 0; i < m_islands; i ++) {
 		dgIsland& island = m_islandMemory[i];
 		island.m_rowsStart = maxRowCount;
 		maxRowCount += island.m_rowsCount;
+		softBodiesCount += island.m_hasSoftBodies;
 	}
 	m_solverMemory.Init (world, maxRowCount, m_bodies, blockMatrixSize);
 
@@ -103,13 +105,24 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 	dgWorldDynamicUpdateSyncDescriptor descriptor;
 	descriptor.m_timestep = timestep;
-	descriptor.m_firstIsland = 0;
-	descriptor.m_islandCount = m_islands;
-	descriptor.m_atomicCounter = 0;
-	sentinelBody->m_equilibrium = true;
-	sentinelBody->m_sleeping = true;
+
+	if (softBodiesCount) {
+		descriptor.m_firstIsland = 0;
+		descriptor.m_atomicCounter = 0;
+		descriptor.m_islandCount = softBodiesCount;
+		for (dgInt32 i = 0; i < threadCount; i++) {
+			world->QueueJob(ApplySoftBodyIntenalForceKernel, &descriptor, world);
+		}
+		world->SynchronizationBarrier();
+	}
 
 	dgInt32 index = 0;
+	descriptor.m_firstIsland = 0;
+	descriptor.m_atomicCounter = 0;
+	descriptor.m_islandCount = m_islands;
+	sentinelBody->m_sleeping = true;
+	sentinelBody->m_equilibrium = true;
+
 	dgInt32 useParallel = world->m_useParallelSolver && (threadCount > 1);
 	//useParallel = 1;
 	if (useParallel) {
@@ -138,11 +151,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		world->SynchronizationBarrier();
 	}
 
-
 	m_islandMemory = NULL;
-	// integrate soft body dynamics phase 2
-	dgDeformableBodiesUpdate* const softBodyList = world;
-    softBodyList->SolveConstraintsAndIntegrate (timestep);
 }
 
 void dgWorldDynamicUpdate::SortIslandByCount ()
@@ -197,6 +206,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	dgInt32 bodyCount = 1;
 	dgInt32 jointCount = 0;
 	dgInt32 isInEquilibrium = 1;
+	dgInt32 hasSoftBodies = 0;
 
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 islandLRU = world->m_islandLRU;
@@ -232,6 +242,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			
 			srcBody->m_index = bodyCount;
 			srcBody->m_dynamicsLru = lruMark;
+
+			hasSoftBodies |= (srcBody->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI) ? 1 : 0);
 
 			srcBody->m_sleeping = false;
 			const bool equilibrium0 = srcBody->m_equilibrium & !srcBody->GetSkeleton();
@@ -335,9 +347,10 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 		island.m_islandLRU = islandLRU;
 		island.m_jointCount = jointCount;
 		island.m_activeJointCount = activeJointCount;
-
+		
 		island.m_rowsStart = 0;
 		island.m_isContinueCollision = 0;
+		island.m_hasSoftBodies = dgInt16 (hasSoftBodies);
 
 		dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
 		dgJointInfo* const constraintArray = &constraintArrayPtr[m_joints];
@@ -411,7 +424,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			rowsCount = dgMax(rowsCount, 64);
 		}
 		island.m_rowsCount = rowsCount;
-		island.m_isContinueCollision = isContinueCollisionIsland;
+		island.m_isContinueCollision = dgInt16 (isContinueCollisionIsland);
 
 		m_islands++;
 		m_bodies += bodyCount;
@@ -533,8 +546,8 @@ dgBody* dgWorldDynamicUpdate::GetIslandBody(const void* const islandPtr, dgInt32
 // sort from high to low
 dgInt32 dgWorldDynamicUpdate::CompareIslands(const dgIsland* const islandA, const dgIsland* const islandB, void* notUsed)
 {
-	dgInt32 countA = islandA->m_activeJointCount;
-	dgInt32 countB = islandB->m_activeJointCount;
+	dgInt32 countA = islandA->m_activeJointCount + (islandA->m_hasSoftBodies << 30);
+	dgInt32 countB = islandB->m_activeJointCount + (islandB->m_hasSoftBodies << 30);
 
 	if (countA < countB) {
 		return 1;
@@ -545,6 +558,36 @@ dgInt32 dgWorldDynamicUpdate::CompareIslands(const dgIsland* const islandA, cons
 	return 0;
 }
 
+void dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(dgIsland* const island, dgFloat32 timestep)
+{
+	dgWorld* const world = (dgWorld*) this;
+	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
+	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
+
+	for (dgInt32 i = 1; i < island->m_bodyCount; i++) {
+		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
+		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+		if (body->m_collision->GetChildShape()->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+			dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)body->m_collision->GetChildShape();
+			deformableShape->ApplyInternalForces(body, timestep);
+		}
+	}
+}
+
+void dgWorldDynamicUpdate::ApplySoftBodyIntenalForceKernel(void* const context, void* const worldContext, dgInt32 threadID)
+{
+	dTimeTrackerEvent(__FUNCTION__);
+	dgWorldDynamicUpdateSyncDescriptor* const descriptor = (dgWorldDynamicUpdateSyncDescriptor*)context;
+	dgFloat32 timestep = descriptor->m_timestep;
+	dgWorld* const world = (dgWorld*)worldContext;
+	dgInt32 count = descriptor->m_islandCount;
+	dgIsland* const islands = &((dgIsland*)&world->m_islandMemory[0])[descriptor->m_firstIsland];
+
+	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
+		dgIsland* const island = &islands[i];
+		world->dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(island, timestep);
+	}
+}
 
 void dgWorldDynamicUpdate::CalculateIslandReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {

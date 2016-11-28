@@ -301,7 +301,6 @@ static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MOD
 	{
 		case NEWTON_DYNAMIC_BODY:
 		{
-			dAssert(0);
 			int sleepState = NewtonBodyGetSleepState(body);
 			if (sleepState == 1) {
 				// indicate when body is sleeping 

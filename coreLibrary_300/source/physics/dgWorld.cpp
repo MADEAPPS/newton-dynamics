@@ -28,7 +28,6 @@
 #include "dgKinematicBody.h"
 #include "dgCollisionNull.h"
 #include "dgCollisionCone.h"
-#include "dgDeformableBody.h"
 #include "dgCollisionScene.h"
 #include "dgCollisionSphere.h"
 #include "dgCollisionCapsule.h"
@@ -211,7 +210,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	:dgBodyMasterList(allocator)
 	,dgBodyMaterialList(allocator)
 	,dgBodyCollisionList(allocator)
-	,dgDeformableBodiesUpdate(allocator)
+//	,dgDeformableBodiesUpdate(allocator)
 	,dgSkeletonList(allocator)
 	,dgActiveContacts(allocator) 
 	,dgWorldDynamicUpdate()

@@ -61,10 +61,8 @@ bool dMeshTriangulateMesh::Execute (dPluginInterface* const interface)
 					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*) info;
 					render->InvalidateCachedDisplayList (meshInfo->GetMesh());
 
-NewtonMeshApplyAngleBasedMapping (meshInfo->GetMesh(), 0, ReportProgress, interface);
-//					NewtonMeshTriangulate(meshInfo->GetMesh());
-
-
+					//NewtonMeshApplyAngleBasedMapping (meshInfo->GetMesh(), 0, ReportProgress, interface);
+					NewtonMeshTriangulate(meshInfo->GetMesh());
 				}
 			}
 		}

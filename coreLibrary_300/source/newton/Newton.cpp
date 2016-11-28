@@ -7676,7 +7676,8 @@ void NewtonMeshEndFace(const NewtonMesh* const mesh)
 	meshEffect->EndPolygon(dgFloat64 (1.0e-8f));
 }
 
-void NewtonMeshBuildFromVertexListIndexList(const NewtonMesh* const mesh,
+
+void NewtonMeshBuildFromPointListIndexList(const NewtonMesh* const mesh,
 	int faceCount, const int* const faceIndexCount, const int* const faceMaterialIndex, 
 	const dFloat* const vertex, int vertexStrideInBytes, const int* const vertexIndex,
 	const dFloat* const normal, int normalStrideInBytes, const int* const normalIndex,
@@ -7686,7 +7687,7 @@ void NewtonMeshBuildFromVertexListIndexList(const NewtonMesh* const mesh,
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
 
-	meshEffect->BuildFromVertexListIndexList(faceCount, faceIndexCount, faceMaterialIndex, 
+	meshEffect->BuildFromPointListIndexList(faceCount, faceIndexCount, faceMaterialIndex, 
 											 vertex, vertexStrideInBytes, vertexIndex,
 											 normal, normalStrideInBytes, normalIndex,
 											 uv0, uv0StrideInBytes, uv0Index,
@@ -8071,6 +8072,9 @@ void NewtonMeshCalculateFaceNormal (const NewtonMesh* const mesh, const void* co
 
 NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial)
 {
+	dgAssert(0);
+	return NULL;
+/*
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 
@@ -8080,9 +8084,12 @@ NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, N
 	memcpy (&material0, structuralMaterial, sizeof (NewtonClothPatchMaterial));
 	memcpy (&material1, bendMaterial, sizeof (NewtonClothPatchMaterial));
 	return (NewtonCollision*) world->CreateClothPatchMesh((dgMeshEffect*)mesh, shapeID, material0, material1);
+*/
+
 }
 
-NewtonCollision* NewtonCreateDeformableMesh (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
+
+NewtonCollision* NewtonCreateDeformableMesh(const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, int shapeID)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
@@ -8092,14 +8099,17 @@ NewtonCollision* NewtonCreateDeformableMesh (const NewtonWorld* const newtonWorl
 
 void NewtonDeformableMeshCreateClusters (NewtonCollision* const deformableMesh, int clunsterCount, dFloat overlapingWidth)
 {
+	dgAssert(0);
+/*
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
 		deformableShape->CreateClusters(clunsterCount, overlapingWidth);
 	}
+*/
 }
-
+/*
 void NewtonDeformableMeshSetDebugCallback (NewtonCollision* const deformableMesh, NewtonCollisionIterator callback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8179,27 +8189,24 @@ void NewtonDeformableMeshSetPlasticity (NewtonCollision* const deformableMesh, d
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgAssert (0);
-/*
+
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
 		deformable->SetPlasticity (plasticity);
 	}
-*/
 }
 
 void NewtonDeformableMeshSetStiffness (NewtonCollision* const deformableMesh, dFloat stiffness)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgAssert (0);
-	/*
 
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
 		deformable->SetStiffness(stiffness);
 	}
-*/
 }
 
 
@@ -8233,8 +8240,6 @@ void NewtonDeformableMeshGetVertexStreams (const NewtonCollision* const deformab
 		deformableShape->GetVisualVertexData(vertexStrideInByte, vertex, normalStrideInByte, normal, uvStrideInByte0, uv0);
 	}
 }
-
-
 
 NewtonDeformableMeshSegment* NewtonDeformableMeshGetFirstSegment (const NewtonCollision* const deformableMesh)
 {
@@ -8290,15 +8295,14 @@ const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const
 	}
 	return NULL;
 }
+*/
 
 /*! @} */ // end of
 
-/*! @defgroup Unclassified Unclassified
+/*! @defgroup Hierarchical Skeleton arrangement
 
 @{
 */
-
-
 NewtonSkeletonContainer* NewtonSkeletonContainerCreate(NewtonWorld* const worldPtr, NewtonBody* const rootBone, NewtonSkeletontDestructor destructor)
 {
 	TRACE_FUNCTION(__FUNCTION__);

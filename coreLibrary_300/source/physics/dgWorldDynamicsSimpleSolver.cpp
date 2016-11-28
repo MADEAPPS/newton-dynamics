@@ -536,28 +536,11 @@ void dgWorldDynamicUpdate::IntegrateExternalForce(const dgIsland* const island, 
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 
-	dgVector timeStepVect (timestep);
 	dgAssert (timestep > dgFloat32 (0.0f));
 	const dgInt32 bodyCount = island->m_bodyCount;
 	for (dgInt32 i = 1; i < bodyCount; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-		if (!body->m_equilibrium) {
-			body->AddDampingAcceleration(timestep);
-			body->CalcInvInertiaMatrix();
-
-			dgVector accel (body->m_externalForce.Scale4 (body->m_invMass.m_w));
-			dgVector alpha (body->m_invWorldInertiaMatrix.RotateVector (body->m_externalTorque));
-
-			body->m_accel = accel;
-			body->m_alpha = alpha;
-
-			body->m_veloc += accel.CompProduct4(timeStepVect);
-			dgVector correction (alpha.CrossProduct3(body->m_omega));
-			body->m_omega += alpha.CompProduct4(timeStepVect.CompProduct4 (dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4 (m_eulerTaylorCorrection)));
-		} else {
-			body->m_accel = dgVector::m_zero;
-			body->m_alpha = dgVector::m_zero;
-		}
+		body->IntegrateOpenLoopExternalForce(timestep);
 	}
 }
 

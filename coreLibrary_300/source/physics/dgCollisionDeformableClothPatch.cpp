@@ -27,12 +27,10 @@
 #include "dgContact.h"
 #include "dgMeshEffect.h"
 #include "dgCollisionBVH.h"
-#include "dgDeformableBody.h"
-#include "dgDeformableContact.h"
 #include "dgCollisionConvexPolygon.h"
 #include "dgCollisionDeformableClothPatch.h"
 
-
+#if 0
 class dgCollisionDeformableClothPatch::dgClothLink
 {
 	public:
@@ -443,3 +441,5 @@ void dgCollisionDeformableClothPatch::ResolvePositionsConstraints (dgFloat32 tim
 		posit[index1] += relPosit.Scale4 (error * link->m_mass1_influence);
 	}
 }
+
+#endif
