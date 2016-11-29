@@ -46,6 +46,53 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 {
 	public:
 
+	enum dgChannelType
+	{
+		m_vertex,
+		m_layer,
+		m_normal,
+		m_binormal,
+		m_uv,
+		m_color,
+		m_material,
+		m_channelsCount,
+	};
+
+	template<class T, dgChannelType type>
+	class dgChannel
+	{
+		public:
+		dgChannel()
+			:m_type(type)
+			,m_data(NULL)
+		{
+
+		}
+		T* m_data;
+		dgChannelType m_type;
+	};
+
+	class dgVertexFormat
+	{
+		public:
+		class dgUV
+		{
+			public:
+			dgFloat32 m_u;
+			dgFloat32 m_v;
+		};
+
+		dgChannel<dgInt32, m_vertex> m_vertexChannel;
+		dgChannel<dgInt32, m_layer> m_layerChannel;
+		dgChannel<dgInt32, m_material> m_materialChannel;
+		dgChannel<dgTriplex, m_normal> m_normalChannel;
+		dgChannel<dgTriplex, m_normal> m_binormalChannel;
+		dgChannel<dgVector, m_color> m_colorChannel;
+		dgChannel<dgUV, m_uv> m_uv0Channel;
+		dgChannel<dgUV, m_uv> m_uv1Channel;
+	};
+
+
 	class dgVertexAtribute 
 	{
 		public:
@@ -326,6 +373,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	dgBigVector* m_points;
 	dgVertexAtribute* m_attrib;
+	dgVertexFormat m_vertexFormat;
 	
 	friend class dgConvexHull3d;
 	friend class dgConvexHull4d;
