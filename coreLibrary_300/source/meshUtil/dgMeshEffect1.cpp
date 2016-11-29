@@ -916,7 +916,6 @@ dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
 			dgInt32 vertexIndex; 
 			dgMeshEffectBuilder& builder = *((dgMeshEffectBuilder*)userData);
 
-
 			if (builder.m_faceCount >= builder.m_maxFaceCount) {
 				dgInt32* index;
 

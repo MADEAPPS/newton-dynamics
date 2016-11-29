@@ -55,6 +55,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		m_uv,
 		m_color,
 		m_material,
+		m_point,
 		m_channelsCount,
 	};
 
@@ -82,6 +83,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 			dgFloat32 m_v;
 		};
 
+		dgChannel<dgBigVector, m_point> m_pointChannel;
 		dgChannel<dgInt32, m_vertex> m_vertexChannel;
 		dgChannel<dgInt32, m_layer> m_layerChannel;
 		dgChannel<dgInt32, m_material> m_materialChannel;
@@ -90,6 +92,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgChannel<dgVector, m_color> m_colorChannel;
 		dgChannel<dgUV, m_uv> m_uv0Channel;
 		dgChannel<dgUV, m_uv> m_uv1Channel;
+		
 	};
 
 
