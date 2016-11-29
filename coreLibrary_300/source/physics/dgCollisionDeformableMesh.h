@@ -78,20 +78,18 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionDeformableMesh(void);
 
-	protected:
-	class dgEdge
-	{
-		public:
-		dgInt16 m_v0;
-		dgInt16 m_v1;
-	};
+	dgInt32 GetLinksCount() const;
+	dgInt32 GetParticleCount() const;
 
-	class dgJacobianPair
-	{
-		public:
-		dgVector m_j01;
-		dgVector m_j10;
-	};
+	const dgInt16* GetLinks() const;
+	const dgVector* GetVelocity() const;
+	const dgVector* GetPositions() const;
+	const dgInt32* GetParticleToVertexMap() const;
+	virtual void ConstraintParticle(dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
+
+	void DisableInactiveLinks ();
+
+	protected:
 
 	virtual dgInt32 CalculateSignature() const;
 	virtual void SetCollisionBBox(const dgVector& p0, const dgVector& p1);
@@ -159,26 +157,29 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	friend class dgWorld;
 */	
 
+	class dgSoftLink;
+	class dgJacobianPair;
 	class dgSpringMassSolver;
 	
 	virtual void CalcAABB(const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	virtual void ApplyInternalForces(dgDynamicBody* const body, dgFloat32 timestep);
-	virtual void ApplyExternalForces(dgDynamicBody* const body, dgFloat32 timestep);
+	virtual void IntegrateForces(dgDynamicBody* const body, dgFloat32 timestep);
 	virtual dgMatrix CalculateInertiaAndCenterOfMass(const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
 
 	dgVector* m_posit;
 	dgVector* m_veloc;
-	dgEdge* m_edgeList;
 	dgFloat32* m_lambda;
-	dgInt16* m_indexMap;
+	dgInt32* m_indexMap;
+	dgSoftLink* m_edgeList;
 	dgFloat32* m_restlength;
-	dgVector* m_externalforce;
+//	dgVector* m_externalforce;
 	dgVector* m_internalforce;
 	dgFloat32* m_unitMassScaler;
 
 	dgInt32 m_edgeCount;
 	dgInt32 m_massesCount;
 	dgInt32 m_vertexCount;
+	dgInt32 m_totalEdgeCount;
 
 	friend class dgBroadPhase;
 	friend class dgDynamicBody;

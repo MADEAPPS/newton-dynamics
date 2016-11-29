@@ -27,7 +27,17 @@ class SimpleSoftBodyEntity: public DemoEntity
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 	{
 		NewtonWorld* const world = scene->GetNewton();
-		LoadNGD_mesh(meshName, world);
+//		LoadNGD_mesh(meshName, world);
+		{
+			NewtonCollision* const box = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
+			NewtonMesh* const newtonMesh = NewtonMeshCreateFromCollision (box);
+			NewtonMeshTriangulate(newtonMesh);
+			DemoMesh* mesh1 = new DemoMesh(newtonMesh);
+			SetMesh (mesh1, dGetIdentityMatrix());
+			mesh1->Release();
+			NewtonMeshDestroy (newtonMesh);
+			NewtonDestroyCollision(box);
+		}
 
 		// add an new entity to the world
 		scene->Append(this);
@@ -60,6 +70,13 @@ class SimpleSoftBodyEntity: public DemoEntity
 											  mesh->m_uv, 2 * sizeof(dFloat), faceList);
 
 		NewtonCollision* const deformableCollision = NewtonCreateDeformableMesh(world, softBodyMesh, 0);
+
+//		dgVector xxx[4];
+//		NewtonDeformableMeshConstraintParticle (deformableCollision, 0, &xxx[0].m_x, NULL);
+//		NewtonDeformableMeshConstraintParticle (deformableCollision, 0, &xxx[1].m_x, NULL);
+//		NewtonDeformableMeshConstraintParticle (deformableCollision, 0, &xxx[2].m_x, NULL);
+//		NewtonDeformableMeshConstraintParticle (deformableCollision, 0, &xxx[3].m_x, NULL);
+	
 
 
 		dFloat mass = 8.0f;

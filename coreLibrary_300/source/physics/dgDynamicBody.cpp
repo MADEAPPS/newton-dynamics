@@ -261,7 +261,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
 		} else {
 			dgCollisionDeformableMesh* const deformableMesh = (dgCollisionDeformableMesh*)m_collision->m_childShape;
-			deformableMesh->ApplyExternalForces(this, timestep);
+			deformableMesh->IntegrateForces(this, timestep);
 		}
 	} else {
 		m_accel = dgVector::m_zero;

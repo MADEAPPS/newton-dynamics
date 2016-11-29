@@ -8096,20 +8096,43 @@ NewtonCollision* NewtonCreateDeformableMesh(const NewtonWorld* const newtonWorld
 	return (NewtonCollision*) world->CreateDeformableMesh ((dgMeshEffect*)mesh, shapeID);
 }
 
+int NewtonDeformableMeshGetParticleCount(const NewtonCollision* const deformableMesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)collision->GetChildShape();
+		return deformableShape->GetParticleCount();
+	}
+	return 0;
+}
 
+void NewtonDeformableMeshConstraintParticle(NewtonCollision* const deformableMesh, int particleIndex, const dFloat* const posit, const NewtonBody* const body)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)collision->GetChildShape();
+		dgVector position(posit[0], posit[1], posit[2], dgFloat32(0.0f));
+		deformableShape->ConstraintParticle(particleIndex, position, (dgBody*)body);
+	}
+}
+
+
+/*
 void NewtonDeformableMeshCreateClusters (NewtonCollision* const deformableMesh, int clunsterCount, dFloat overlapingWidth)
 {
 	dgAssert(0);
-/*
+
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
 		deformableShape->CreateClusters(clunsterCount, overlapingWidth);
 	}
-*/
+
 }
-/*
+
 void NewtonDeformableMeshSetDebugCallback (NewtonCollision* const deformableMesh, NewtonCollisionIterator callback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8118,18 +8141,6 @@ void NewtonDeformableMeshSetDebugCallback (NewtonCollision* const deformableMesh
 		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
 		deformableShape->SetOnDebugDisplay((dgCollision::OnDebugCollisionMeshCallback)callback); 
 	}
-}
-
-
-int NewtonDeformableMeshGetParticleCount (const NewtonCollision* const deformableMesh)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
-	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
-		return deformableShape->GetParticleCount();
-	}
-	return 0;
 }
 
 void NewtonDeformableMeshGetParticlePosition (NewtonCollision* const deformableMesh, int particleIndex, dFloat* const posit)
@@ -8163,16 +8174,6 @@ void NewtonDeformableMeshUnconstraintParticle (NewtonCollision* const deformable
 {
 }
 
-void NewtonDeformableMeshConstraintParticle (NewtonCollision* const deformableMesh, int particleIndex, const dFloat* const posit, const NewtonBody* const body)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
-	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
-		dgVector position(posit[0], posit[1], posit[2], dgFloat32 (0.0f));
-		deformableShape->ConstraintParticle (particleIndex, position, (dgBody*) body);
-	}
-}
 
 
 void NewtonDeformableMeshSetSkinThickness (NewtonCollision* const deformableMesh, dFloat skinThickness)
