@@ -462,8 +462,6 @@
     <ClCompile Include="..\..\..\source\physics\dgContact.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgContactSolver.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCorkscrewConstraint.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgDeformableContact.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDynamicBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgHingeConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgKinematicBody.cpp" />
@@ -498,7 +496,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionUserMesh.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBodyMasterList.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgDeformableBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgNarrowPhaseCollision.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgWorld.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -532,8 +529,6 @@
     <ClInclude Include="..\..\..\source\physics\dgContact.h" />
     <ClInclude Include="..\..\..\source\physics\dgContactSolver.h" />
     <ClInclude Include="..\..\..\source\physics\dgCorkscrewConstraint.h" />
-    <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h" />
-    <ClInclude Include="..\..\..\source\physics\dgDeformableContact.h" />
     <ClInclude Include="..\..\..\source\physics\dgDynamicBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgHingeConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h" />
@@ -563,7 +558,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionUserMesh.h" />
     <ClInclude Include="..\..\..\source\physics\dgBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgBodyMasterList.h" />
-    <ClInclude Include="..\..\..\source\physics\dgDeformableBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgPhysics.h" />
     <ClInclude Include="..\..\..\source\physics\dgPhysicsStdafx.h" />
     <ClInclude Include="..\..\..\source\physics\dgWorld.h" />
