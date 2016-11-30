@@ -123,9 +123,6 @@
     <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2013\newton.vcxproj">
       <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\thirdParty\tinyxml\vs2013_static_mt\tinyxml.vcxproj">
-      <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
-    </ProjectReference>
     <ProjectReference Include="dAnimation.vcxproj">
       <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
     </ProjectReference>

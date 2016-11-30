@@ -667,7 +667,7 @@ bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode
 //		&normals[0], 3 * sizeof (dFloat), normalVertexIndex,
 //		&uv0[0], 2 * sizeof (dFloat), uv0VertexIndex,
 //		&uv1[0], 2 * sizeof (dFloat), uv1VertexIndex);
-	NewtonMeshBuildFromVertexListIndexList(mesh, 
+	NewtonMeshBuildFromPointListIndexList(mesh, 
 		faceCount, faceIndexCount, faceMaterials, 
 		&positions[0], 4 * sizeof (dFloat), positionVertexIndex,
 		&normals[0], 3 * sizeof (dFloat), normalVertexIndex,

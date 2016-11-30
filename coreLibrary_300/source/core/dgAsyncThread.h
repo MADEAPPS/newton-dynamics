@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -39,7 +39,6 @@ class dgAsyncThread: public dgThread
 	virtual void TickCallback (dgInt32 threadID) = 0;
 
 	private:
-//	dgInt32 m_terminate;
 	dgSemaphore m_myMutex;
 	dgSemaphore m_callerMutex;
 };

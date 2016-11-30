@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 *
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -571,8 +571,6 @@ int NewtonGetMultiThreadSolverOnSingleIsland(const NewtonWorld* const newtonWorl
   the adaptive friction model combined with the linear model make for the fastest possible configuration
   of the Newton solver. This setup is best for games.
   If you need the best realistic behavior, we recommend the use of the exact solver and exact friction model which are the defaults.
-
-  See also: ::NewtonSetFrictionModel
 */
 void NewtonSetSolverModel(const NewtonWorld* const newtonWorld, int model)
 {
@@ -595,39 +593,6 @@ void NewtonSetSolverConvergenceQuality (const NewtonWorld* const newtonWorld, in
 	world->SetSolverConvergenceQuality(lowOrHigh);
 }
 
-/*!
-  Set coulomb model of friction.
-
-  @param *newtonWorld is the pointer to the Newton world
-  @param model friction model;  0 = exact coulomb, 1 = adaptive coulomb, The default is exact.
-
-  @return Nothing.
-
-  This function allows the application to chose between and exact or an adaptive coulomb friction model
-
-  0: Is the exact model. Friction forces are calculated in each frame.
-  This model is good for applications where precision is more important than speed, ex: realistic simulation.
-
-  1: Is the adaptive model. Here values from previous frames are used to determine the maximum friction values of the current frame.
-  This is about 10% faster than the exact model however it may introduce strange friction behaviors. For example a
-  bouncing object tumbling down a ramp will act as a friction less object because the contacts do not have continuity.
-  In general each time a new contact is generated the friction value is zero, only if the contact persist a non zero
-  friction values is used. The second effect is that if a normal force is very strong, and if the contact is suddenly
-  destroyed, a very strong friction force will be generated at the contact point making the object react in a non-familiar way.
-
-  the adaptive friction model combined with the linear model make for the fastest possible configuration
-  of the Newton solver. This setup is best for games.
-  If you need the best realistic behavior, we recommend the use of the exact solver and exact friction model which are the defaults.
-
-  See also: ::NewtonSetSolverModel
-*/
-void NewtonSetFrictionModel(const NewtonWorld* const newtonWorld, int model)
-{
-	Newton* const world = (Newton *)newtonWorld;
-
-	TRACE_FUNCTION(__FUNCTION__);
-	world->SetFrictionMode (model);
-}
 
 void NewtonSetPerformanceClock(const NewtonWorld* const newtonWorld, NewtonGetTimeInMicrosencondsCallback callback)
 {
@@ -661,10 +626,6 @@ void NewtonUpdate(const NewtonWorld* const newtonWorld, dFloat timestep)
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 
-//	dgFloat32 minstep = dgFloat32 (DG_MIN_TIMESTEP);
-//	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
-//	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
-
 //NewtonSerializeToFile (newtonWorld, "xxx.bin", NULL, NULL);
 	world->UpdatePhysics (timestep);
 }
@@ -674,10 +635,6 @@ void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-
-//	dgFloat32 minstep = dgFloat32 (DG_MIN_TIMESTEP);
-//	dgFloat32 maxstep = dgFloat32 (DG_MAX_TIMESTEP);
-//	timestep = dgClamp (dgFloat32 (timestep), minstep, maxstep);
 
 	world->UpdatePhysicsAsync(timestep);
 }
@@ -1209,7 +1166,6 @@ int NewtonWorldConvexCast(const NewtonWorld* const newtonWorld, const dFloat* co
 	Newton* const world = (Newton *) newtonWorld;
 	return world->GetBroadPhase()->ConvexCast ((dgCollisionInstance*) shape, dgMatrix (matrix), destination, param, (OnRayPrecastAction) prefilter, userData, (dgConvexCastReturnInfo*)info, maxContactsCount, threadIndex);
 }
-
 
 int NewtonWorldCollide (const NewtonWorld* const newtonWorld, const dFloat* const matrix, const NewtonCollision* const shape, void* const userData,  
 					   NewtonWorldRayPrefilterCallback prefilter, NewtonWorldConvexCastReturnInfo* const info, int maxContactsCount, int threadIndex)
@@ -3561,12 +3517,6 @@ void* NewtonSceneCollisionGetNextNode (NewtonCollision* const sceneCollision, co
 }
 
 
-dFloat NewtonCollisionGetSkinThickness (const NewtonCollision* const collision)
-{
-	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
-	return instance->GetChildShape()->GetSkinThickness();
-}
-
 /*! @} */ // end of CshapesConvexComples
 
 
@@ -4274,7 +4224,10 @@ NewtonBody* NewtonCreateDynamicBody(const NewtonWorld* const newtonWorld, const 
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgCollisionInstance* const collision = (dgCollisionInstance*) collisionPtr;
+	dgCollisionInstance* collision = (dgCollisionInstance*)collisionPtr;
+	if (!collisionPtr) {
+		collision = (dgCollisionInstance*) NewtonCreateNull(newtonWorld);
+	}
 
 	#ifdef SAVE_COLLISION
 	SaveCollision (collisionPtr);
@@ -4293,14 +4246,21 @@ NewtonBody* NewtonCreateDynamicBody(const NewtonWorld* const newtonWorld, const 
 	matrix.m_right.m_w = dgFloat32 (0.0f);
 	matrix.m_posit.m_w = dgFloat32 (1.0f);
 
-	return (NewtonBody*) world->CreateDynamicBody (collision, matrix);
+	NewtonBody* const body = (NewtonBody*)world->CreateDynamicBody (collision, matrix);
+	if (!collisionPtr) {
+		NewtonDestroyCollision((NewtonCollision*)collision);
+	}
+	return body;
 }
 
 NewtonBody* NewtonCreateKinematicBody(const NewtonWorld* const newtonWorld, const NewtonCollision* const collisionPtr, const dFloat* const matrixPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	dgCollisionInstance* const collision = (dgCollisionInstance*) collisionPtr;
+	dgCollisionInstance* collision = (dgCollisionInstance*)collisionPtr;
+	if (!collisionPtr) {
+		collision = (dgCollisionInstance*)NewtonCreateNull(newtonWorld);
+	}
 
 #ifdef SAVE_COLLISION
 	SaveCollision (collisionPtr);
@@ -4319,27 +4279,13 @@ NewtonBody* NewtonCreateKinematicBody(const NewtonWorld* const newtonWorld, cons
 	matrix.m_right.m_w = dgFloat32 (0.0f);
 	matrix.m_posit.m_w = dgFloat32 (1.0f);
 
-	return (NewtonBody*) world->CreateKinematicBody(collision, matrix);
+	NewtonBody* const body = (NewtonBody*) world->CreateKinematicBody(collision, matrix);
+	if (!collisionPtr) {
+		NewtonDestroyCollision((NewtonCollision*)collision);
+	}
+	return body;
 }
 
-NewtonBody* NewtonCreateDeformableBody (const NewtonWorld* const newtonWorld, const NewtonCollision* const deformableMesh, const dFloat* const matrixPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
-
-#ifdef SAVE_COLLISION
-	SaveCollision (collisionPtr);
-#endif
-
-	dgMatrix matrix (matrixPtr);
-	matrix.m_front.m_w = dgFloat32 (0.0f);
-	matrix.m_up.m_w    = dgFloat32 (0.0f);
-	matrix.m_right.m_w = dgFloat32 (0.0f);
-	matrix.m_posit.m_w = dgFloat32 (1.0f);
-
-	return (NewtonBody*) world->CreateDeformableBody (collision, matrix);
-}
 
 /*!
   Destroy a rigid body.
@@ -4442,8 +4388,8 @@ int NewtonBodyGetType (const NewtonBody* const bodyPtr)
 		return NEWTON_DYNAMIC_BODY;
 	} else if (body->IsRTTIType(dgBody::m_kinematicBodyRTTI)) {
 		return NEWTON_KINEMATIC_BODY;
-	} else if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-		return NEWTON_DEFORMABLE_BODY;
+//	} else if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
+//		return NEWTON_DEFORMABLE_BODY;
 	}
 	dgAssert (0);
 	return 0;
@@ -4951,27 +4897,6 @@ void  NewtonBodyAddForce(const NewtonBody* const bodyPtr, const dFloat* const ve
 }
 
 
-/*!
-  Get the force applied on the last call to apply force and torque callback.
-
-  @param *bodyPtr pointer to the body.
-  @param *vectorPtr pointer to an array of 3 floats to hold the net force of the body.
-
-  this function can be useful to modify force from joint callback
-
-  @return Nothing.
-
-  See also: ::NewtonBodyAddForce, ::NewtonBodyGetForce, ::NewtonBodyGetForce
-*/
-void NewtonBodyGetForceAcc(const NewtonBody* const bodyPtr, dFloat* const vectorPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)bodyPtr;
-	dgVector vector (body->GetForce());
-	vectorPtr[0] = vector.m_x;
-	vectorPtr[1] = vector.m_y;
-	vectorPtr[2] = vector.m_z;
-}
 
 
 /*!
@@ -4988,7 +4913,7 @@ void NewtonBodyGetForce(const NewtonBody* const bodyPtr, dFloat* const vectorPtr
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	dgVector vector (body->GetNetForce());
+	dgVector vector (body->GetForce());
 	vectorPtr[0] = vector.m_x;
 	vectorPtr[1] = vector.m_y;
 	vectorPtr[2] = vector.m_z;
@@ -5080,29 +5005,6 @@ void  NewtonBodyAddTorque(const NewtonBody* const bodyPtr, const dFloat* const v
 void NewtonBodyGetTorque(const NewtonBody* const bodyPtr, dFloat* const vectorPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)bodyPtr;
-	dgVector vector (body->GetNetTorque());
-	vectorPtr[0] = vector.m_x;
-	vectorPtr[1] = vector.m_y;
-	vectorPtr[2] = vector.m_z;
-}
-
-/*!
-  Get the torque applied on the last call to apply force and torque callback.
-
-  @param *bodyPtr pointer to the body.
-  @param *vectorPtr pointer to an array of 3 floats to hold the net force of the body.
-
-  this function can be useful to modify torque form joint callback
-
-  @return Nothing.
-
-  See also: ::NewtonBodyAddTorque, ::NewtonBodyGetTorque, ::NewtonBodyGetTorque
-*/
-void NewtonBodyGetTorqueAcc(const NewtonBody* const bodyPtr, dFloat* const vectorPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-
 	dgBody* const body = (dgBody *)bodyPtr;
 	dgVector vector (body->GetTorque());
 	vectorPtr[0] = vector.m_x;
@@ -6026,6 +5928,32 @@ void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const p
 	}
 }
 
+
+/*!
+  add a Euler Gyroscopic of the form
+
+  localAngularMomentum = localInertia * localAngularVelocity)
+  localTorque = crossProduct (localAngularVelocity, localAngularMomentum)
+  torque += localTorque.Rotate (localTorque.Scale (-1));
+
+  note: this is a simplified form of Euler equation of motion when the center of mass is set to the origin of the principal axis of the body
+  and the matrix of inertia of the shape is also aligned with the principals axis. 
+  This si the case for almost all bodies in newton, with the exception of compound collisions and bodies where the end application 
+  override set the center of mass or moment of inertia.
+*/
+void NewtonBodyApplyGyroscopicTorque (const NewtonBody* const bodyPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+
+	dgVector inertia(body->GetMass());
+	dgVector omega(body->GetMatrix().UnrotateVector(body->GetOmega()));
+
+	dgVector angularMomentum(inertia.CompProduct4(omega));
+	dgVector torque(omega.CrossProduct3(angularMomentum));
+	torque = body->GetMatrix().RotateVector(torque.CompProduct4(dgVector::m_negOne));
+	body->AddTorque(torque);
+}
 
 /*!
   Add an train of impulses to a specific point on a body.
@@ -7748,7 +7676,8 @@ void NewtonMeshEndFace(const NewtonMesh* const mesh)
 	meshEffect->EndPolygon(dgFloat64 (1.0e-8f));
 }
 
-void NewtonMeshBuildFromVertexListIndexList(const NewtonMesh* const mesh,
+
+void NewtonMeshBuildFromPointListIndexList(const NewtonMesh* const mesh,
 	int faceCount, const int* const faceIndexCount, const int* const faceMaterialIndex, 
 	const dFloat* const vertex, int vertexStrideInBytes, const int* const vertexIndex,
 	const dFloat* const normal, int normalStrideInBytes, const int* const normalIndex,
@@ -7758,7 +7687,7 @@ void NewtonMeshBuildFromVertexListIndexList(const NewtonMesh* const mesh,
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
 
-	meshEffect->BuildFromVertexListIndexList(faceCount, faceIndexCount, faceMaterialIndex, 
+	meshEffect->BuildFromPointListIndexList(faceCount, faceIndexCount, faceMaterialIndex, 
 											 vertex, vertexStrideInBytes, vertexIndex,
 											 normal, normalStrideInBytes, normalIndex,
 											 uv0, uv0StrideInBytes, uv0Index,
@@ -8143,6 +8072,9 @@ void NewtonMeshCalculateFaceNormal (const NewtonMesh* const mesh, const void* co
 
 NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial)
 {
+	dgAssert(0);
+	return NULL;
+/*
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 
@@ -8152,24 +8084,53 @@ NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, N
 	memcpy (&material0, structuralMaterial, sizeof (NewtonClothPatchMaterial));
 	memcpy (&material1, bendMaterial, sizeof (NewtonClothPatchMaterial));
 	return (NewtonCollision*) world->CreateClothPatchMesh((dgMeshEffect*)mesh, shapeID, material0, material1);
+*/
+
 }
 
-NewtonCollision* NewtonCreateDeformableMesh (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
+
+NewtonCollision* NewtonCreateDeformableMesh(const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, int shapeID)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 	return (NewtonCollision*) world->CreateDeformableMesh ((dgMeshEffect*)mesh, shapeID);
 }
 
+int NewtonDeformableMeshGetParticleCount(const NewtonCollision* const deformableMesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)collision->GetChildShape();
+		return deformableShape->GetParticleCount();
+	}
+	return 0;
+}
 
+void NewtonDeformableMeshConstraintParticle(NewtonCollision* const deformableMesh, int particleIndex, const dFloat* const posit, const NewtonBody* const body)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)collision->GetChildShape();
+		dgVector position(posit[0], posit[1], posit[2], dgFloat32(0.0f));
+		deformableShape->ConstraintParticle(particleIndex, position, (dgBody*)body);
+	}
+}
+
+
+/*
 void NewtonDeformableMeshCreateClusters (NewtonCollision* const deformableMesh, int clunsterCount, dFloat overlapingWidth)
 {
+	dgAssert(0);
+
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
 		deformableShape->CreateClusters(clunsterCount, overlapingWidth);
 	}
+
 }
 
 void NewtonDeformableMeshSetDebugCallback (NewtonCollision* const deformableMesh, NewtonCollisionIterator callback)
@@ -8180,18 +8141,6 @@ void NewtonDeformableMeshSetDebugCallback (NewtonCollision* const deformableMesh
 		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
 		deformableShape->SetOnDebugDisplay((dgCollision::OnDebugCollisionMeshCallback)callback); 
 	}
-}
-
-
-int NewtonDeformableMeshGetParticleCount (const NewtonCollision* const deformableMesh)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
-	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
-		return deformableShape->GetParticleCount();
-	}
-	return 0;
 }
 
 void NewtonDeformableMeshGetParticlePosition (NewtonCollision* const deformableMesh, int particleIndex, dFloat* const posit)
@@ -8225,16 +8174,6 @@ void NewtonDeformableMeshUnconstraintParticle (NewtonCollision* const deformable
 {
 }
 
-void NewtonDeformableMeshConstraintParticle (NewtonCollision* const deformableMesh, int particleIndex, const dFloat* const posit, const NewtonBody* const body)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
-	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*) collision->GetChildShape();
-		dgVector position(posit[0], posit[1], posit[2], dgFloat32 (0.0f));
-		deformableShape->ConstraintParticle (particleIndex, position, (dgBody*) body);
-	}
-}
 
 
 void NewtonDeformableMeshSetSkinThickness (NewtonCollision* const deformableMesh, dFloat skinThickness)
@@ -8251,27 +8190,24 @@ void NewtonDeformableMeshSetPlasticity (NewtonCollision* const deformableMesh, d
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgAssert (0);
-/*
+
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
 		deformable->SetPlasticity (plasticity);
 	}
-*/
 }
 
 void NewtonDeformableMeshSetStiffness (NewtonCollision* const deformableMesh, dFloat stiffness)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgAssert (0);
-	/*
 
 	dgCollisionInstance* const collision = (dgCollisionInstance*) deformableMesh;
 	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
 		dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) collision;
 		deformable->SetStiffness(stiffness);
 	}
-*/
 }
 
 
@@ -8305,8 +8241,6 @@ void NewtonDeformableMeshGetVertexStreams (const NewtonCollision* const deformab
 		deformableShape->GetVisualVertexData(vertexStrideInByte, vertex, normalStrideInByte, normal, uvStrideInByte0, uv0);
 	}
 }
-
-
 
 NewtonDeformableMeshSegment* NewtonDeformableMeshGetFirstSegment (const NewtonCollision* const deformableMesh)
 {
@@ -8362,15 +8296,14 @@ const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const
 	}
 	return NULL;
 }
+*/
 
 /*! @} */ // end of
 
-/*! @defgroup Unclassified Unclassified
+/*! @defgroup Hierarchical Skeleton arrangement
 
 @{
 */
-
-
 NewtonSkeletonContainer* NewtonSkeletonContainerCreate(NewtonWorld* const worldPtr, NewtonBody* const rootBone, NewtonSkeletontDestructor destructor)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8401,7 +8334,7 @@ void* NewtonSkeletonContainerGetParent(const NewtonSkeletonContainer* const skel
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetParent((dgSkeletonContainer::dgSkeletonGraph*) node);
+	return skeleton->GetParent((dgSkeletonContainer::dgGraph*) node);
 }
 
 
@@ -8409,45 +8342,53 @@ void* NewtonSkeletonContainerFirstChild(const NewtonSkeletonContainer* const ske
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetFirstChild((dgSkeletonContainer::dgSkeletonGraph*) parentNode);
+	return skeleton->GetFirstChild((dgSkeletonContainer::dgGraph*) parentNode);
 }
 
 void* NewtonSkeletonContainerNextSibling(const NewtonSkeletonContainer* const skeletonPtr, void* const siblingNode)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetNextSiblingChild((dgSkeletonContainer::dgSkeletonGraph*) siblingNode);
+	return skeleton->GetNextSiblingChild((dgSkeletonContainer::dgGraph*) siblingNode);
 }
 
 NewtonBody* NewtonSkeletonContainerGetBodyFromNode (const NewtonSkeletonContainer* const skeletonPtr, void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return (NewtonBody*) (skeleton->GetBody((dgSkeletonContainer::dgSkeletonGraph*) node));
+	return (NewtonBody*) (skeleton->GetBody((dgSkeletonContainer::dgGraph*) node));
 }
 
 NewtonJoint* NewtonSkeletonContainerGetParentJointFromNode (const NewtonSkeletonContainer* const skeletonPtr, void* const node)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return (NewtonJoint*)(skeleton->GetParentJoint((dgSkeletonContainer::dgSkeletonGraph*) node));
+	return (NewtonJoint*)(skeleton->GetParentJoint((dgSkeletonContainer::dgGraph*) node));
 }
 
-/*
-int NewtonSkeletonGetSolverMode(const NewtonSkeletonContainer* const skeletonPtr)
+NewtonSkeletonContainer* NewtonSkeletonGetSkeletonFromBody (NewtonBody* const body)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const newtonBody = (dgBody*) body;
+	return (NewtonSkeletonContainer*)newtonBody->GetSkeleton();
+}
+
+int NewtonSkeletonContainerAttachCyclingJoint (NewtonSkeletonContainer* const skeletonPtr, NewtonJoint* const jointPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetSolverMode();
+	dgBilateralConstraint* const joint = (dgBilateralConstraint*)jointPtr;
+	return skeleton->AttachCyclingJoint(joint) ? 1 : 0;
 }
 
-void NewtonSkeletonSetSolverMode(NewtonSkeletonContainer* const skeletonPtr, int hardJointMotors)
+void NewtonSkeletonContainerRemoveCyclingJoint(NewtonSkeletonContainer* const skeletonPtr, NewtonJoint* const jointPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	skeleton->SetSolverMode(hardJointMotors ? true : false);
+	dgBilateralConstraint* const joint = (dgBilateralConstraint*)jointPtr;
+	return skeleton->RemoveCyclingJoint(joint);
 }
-*/
+
 
 void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray)
 {

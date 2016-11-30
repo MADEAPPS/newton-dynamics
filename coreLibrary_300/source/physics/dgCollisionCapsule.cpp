@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -58,9 +58,9 @@ void dgCollisionCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 hei
 {
 	m_rtti |= dgCollisionCapsule_RTTI;
 
-	radio0 = dgAbsf(radio0);
-	radio1 = dgAbsf(radio1);
-	height = dgAbsf(height);
+	radio0 = dgMax (dgAbsf (radio0), D_MIN_CONVEX_SHAPE_SIZE);
+	radio1 = dgMax (dgAbsf (radio1), D_MIN_CONVEX_SHAPE_SIZE);
+	height = dgMax (dgAbsf (height), D_MIN_CONVEX_SHAPE_SIZE);
 
 	m_transform = dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
 	if (radio0 > radio1) {
@@ -363,7 +363,6 @@ dgVector dgCollisionCapsule::SupportVertex (const dgVector& direction, dgInt32* 
 
 dgVector dgCollisionCapsule::SupportVertexSpecial(const dgVector& direction, dgInt32* const vertexIndex) const
 {
-	*vertexIndex = -1;
 	dgVector dir(direction.CompProduct4(m_transform));
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 
@@ -384,7 +383,7 @@ dgVector dgCollisionCapsule::SupportVertexSpecialProjectPoint (const dgVector& t
 {
 	dgVector dir(direction.CompProduct4(m_transform));
 	dgVector point(testPoint.CompProduct4(m_transform));
-	point += dir.Scale4(m_radio0);
+	point += dir.Scale4(m_radio0 - DG_PENETRATION_TOL);
 	return m_transform.CompProduct4(point);
 }
 
@@ -398,12 +397,12 @@ void dgCollisionCapsule::GetCollisionInfo(dgCollisionInfo* const info) const
 {
 	dgCollisionConvex::GetCollisionInfo(info);
 
-	info->m_taperedCapsule.m_radio0 = m_radio0;
-	info->m_taperedCapsule.m_radio1 = m_radio1;
+	info->m_capsule.m_radio0 = m_radio0;
+	info->m_capsule.m_radio1 = m_radio1;
 	info->m_capsule.m_height = dgFloat32 (2.0f) * m_height;
 
 	if (m_transform.m_x < dgFloat32 (0.0f)) {
-		dgSwap(info->m_taperedCapsule.m_radio0, info->m_taperedCapsule.m_radio1);
+		dgSwap(info->m_capsule.m_radio0, info->m_capsule.m_radio1);
 	}
 }
 
@@ -424,7 +423,7 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& directio
 	dgVector p0 (-m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector dir0 (p0 - origin);
 	dgFloat32 dist0 = dir0.DotProduct4(normal).GetScalar();
-	if ((dist0 * dist0) < (m_radio0 * m_radio0)) {
+	if ((dist0 * dist0 - dgFloat32 (5.0e-5f)) < (m_radio0 * m_radio0)) {
 		contactsOut[count] = m_transform.CompProduct4 (p0 - normal.Scale4 (dist0));
 		count ++;
 	}
@@ -432,7 +431,7 @@ dgInt32 dgCollisionCapsule::CalculatePlaneIntersection (const dgVector& directio
 	dgVector p1 (m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 	dgVector dir1 (p1 - origin);
 	dgFloat32 dist1 = dir1.DotProduct4(normal).GetScalar();
-	if ((dist1 * dist1) < (m_radio1 * m_radio1)) {
+	if ((dist1 * dist1 - dgFloat32 (5.0e-5f)) < (m_radio1 * m_radio1)) {
 		contactsOut[count] = m_transform.CompProduct4(p1 - normal.Scale4 (dist1));
 		count ++;
 	}

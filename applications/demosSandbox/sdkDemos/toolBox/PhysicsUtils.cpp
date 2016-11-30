@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -688,6 +688,10 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 		{
 			// create the collision 
 			collision = NewtonCreateCylinder (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, NULL); 
+
+			NewtonCollisionInfoRecord collisionInfo;
+			NewtonCollisionGetInfo(collision, &collisionInfo);
+
 			break;
 		}
 
@@ -911,7 +915,6 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 
 void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP)
 {
-	dFloat skinThickness = NewtonCollisionGetSkinThickness (collision) * 0.125f;
 	for (int i = 0; i < 3; i ++) {
 		dVector support(0.0f);
 		dVector dir (0.0f);
@@ -920,12 +923,12 @@ void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matri
 		dVector localDir (matrix.UnrotateVector (dir));
 		NewtonCollisionSupportVertex (collision, &localDir[0], &support[0]);
 		support = matrix.TransformVector (support);
-		maxP[i] = support[i] - skinThickness;  
+		maxP[i] = support[i];  
 
 		localDir = localDir.Scale (-1.0f);
 		NewtonCollisionSupportVertex (collision, &localDir[0], &support[0]);
 		support = matrix.TransformVector (support);
-		minP[i] = support[i] + skinThickness;  
+		minP[i] = support[i];  
 	}
 }
 
@@ -1099,6 +1102,28 @@ NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent
 }
 
 
+NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, const dVector& size)
+{
+	// create the shape and visual mesh as a common data to be re used
+	NewtonWorld* const world = scene->GetNewton();
+	const int materialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, materialID);
+
+	// test collision mode
+	//NewtonCollisionSetCollisonMode(collision, 0);
+
+	DemoMesh* const geometry = new DemoMesh("primitive", collision, "wood_3.tga", "wood_3.tga", "wood_3.tga");
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+	NewtonBody* const body = CreateSimpleSolid(scene, geometry, 0.0f, matrix, collision, materialID);
+	// do not forget to release the assets	
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	return body;
+}
+
 
 
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const name, bool optimized)
@@ -1156,32 +1181,14 @@ void ExportScene (NewtonWorld* const world, const char* const fileName)
 	testScene.Serialize (fileName);
 }
 
-
-
-
-
+/*
 NewtonMesh* LoadNewtonMesh (NewtonWorld* const world, const char* const name)
 {
-	char fileName[2048];
-	GetWorkingFileName (name, fileName);
-
-	NewtonMesh* mesh = NULL;
-	FILE* const file = fopen (fileName, "rb");
-	if (file) {
-		char skipName[2048];
-		fread (skipName, strlen(D_MESH_HEADER), 1, file);
-		if (!strncmp (skipName, D_MESH_HEADER, strlen(D_MESH_HEADER))) {
-			int size;
-			fread (&size, sizeof (int), 1, file);
-			dAssert (size < int (sizeof (name)));
-			fread (skipName, size, 1, file);
-			skipName[size] = 0;
-
-			mesh = NewtonMeshCreateFromSerialization (world, DemoEntityManager::DeserializeFile, file);
-		}
-		fclose (file);
-	}
-	return mesh;
+	DemoEntity entity (dGetIdentityMatrix(), NULL);
+	entity.LoadNGD_mesh(name, world);
+	DemoMeshInterface* const mesh = entity.GetMesh();
+	NewtonMesh* const newtonMesh = mesh->CreateNewtonMesh (world, dGetIdentityMatrix());
+	return newtonMesh;
 }
 
 void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
@@ -1200,7 +1207,7 @@ void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
 		fclose (file);
 	}
 }
-
+*/
 
 void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalSpace, dFloat timestep)
 {

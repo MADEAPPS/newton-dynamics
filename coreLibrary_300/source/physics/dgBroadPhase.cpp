@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -27,7 +27,6 @@
 #include "dgDynamicBody.h"
 #include "dgCollisionConvex.h"
 #include "dgCollisionInstance.h"
-#include "dgDeformableContact.h"
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
 #include "dgBroadPhaseAggregate.h"
@@ -36,10 +35,13 @@
 #define DG_CONVEX_CAST_POOLSIZE			32
 #define DG_BROADPHASE_AABB_SCALE		dgFloat32 (8.0f)
 #define DG_BROADPHASE_AABB_INV_SCALE	(dgFloat32 (1.0f) / DG_BROADPHASE_AABB_SCALE)
-#define DG_CONTACT_TRANSLATION_ERROR (dgFloat32 (1.0e-3f))
-#define DG_CONTACT_ANGULAR_ERROR (dgFloat32 (0.25f * 3.141592f / 180.0f))
- 
-dgVector dgBroadPhase::m_velocTol(dgFloat32(1.0e-18f)); 
+#define DG_CONTACT_TRANSLATION_ERROR	dgFloat32 (1.0e-3f)
+#define DG_CONTACT_ANGULAR_ERROR		(dgFloat32 (0.25f * 3.141592f / 180.0f))
+#define DG_NARROW_PHASE_DIST			dgFloat32 (0.2f)
+#define DG_CONTACT_DELAY_FRAMES			4
+
+
+dgVector dgBroadPhase::m_velocTol(dgFloat32(1.0e-16f)); 
 dgVector dgBroadPhase::m_angularContactError2(DG_CONTACT_ANGULAR_ERROR * DG_CONTACT_ANGULAR_ERROR);
 dgVector dgBroadPhase::m_linearContactError2(DG_CONTACT_TRANSLATION_ERROR * DG_CONTACT_TRANSLATION_ERROR);
  
@@ -155,9 +157,13 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_generatedBodies(world->GetAllocator())
 	,m_updateList(world->GetAllocator())
 	,m_aggregateList(world->GetAllocator())
-	,m_lru(0)
+	,m_lru(DG_CONTACT_DELAY_FRAMES)
 	,m_contacJointLock()
 	,m_criticalSectionLock()
+	,m_pendingSoftBodyCollisions(32, world->GetAllocator(), 64)
+	,m_pendingSoftBodyPairsCount(0)
+	,m_dirtyNodesCount(0)
+	,m_scanTwoWays(false)
 	,m_recursiveChunks(false)
 {
 }
@@ -294,11 +300,6 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				dgDynamicBody* const dynamicBody = (dgDynamicBody*)body;
 				dynamicBody->ApplyExtenalForces(timestep, threadID);
-			} else {
-				dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
-				if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-					body->ApplyExtenalForces(timestep, threadID);
-				}
 			}
 		}
 
@@ -323,7 +324,6 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 				if (!dynamicBody->IsInEquilibrium()) {
 					dynamicBody->m_sleeping = false;
 					dynamicBody->m_equilibrium = false;
-					// update collision matrix only
 					dynamicBody->UpdateCollisionMatrix(timestep, threadID);
 				}
 				if (dynamicBody->GetInvMass().m_w == dgFloat32(0.0f) || body->m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
@@ -332,10 +332,10 @@ void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, d
 					dynamicBody->m_equilibrium = true;
 				}
 
-				dynamicBody->m_prevExternalForce = dynamicBody->m_accel;
-				dynamicBody->m_prevExternalTorque = dynamicBody->m_alpha;
+				dynamicBody->m_savedExternalForce = dynamicBody->m_externalForce;
+				dynamicBody->m_savedExternalTorque = dynamicBody->m_externalTorque;
 			} else {
-				dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI));
+				dgAssert(body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 
 				// kinematic bodies are always sleeping (skip collision with kinematic bodies)
 				if (body->IsCollidable()) {
@@ -699,37 +699,41 @@ void dgBroadPhase::CollisionChange (dgBody* const body, dgCollisionInstance* con
 
 void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 {
-	if (m_rootNode && !m_rootNode->IsLeafNode()) {
-		dgAssert (!body->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI));
+	if (m_rootNode && !m_rootNode->IsLeafNode() && body->m_masterNode) {
+		dgBroadPhaseBodyNode* const node = body->GetBroadPhase();
+		dgBody* const body = node->GetBody();
 
-		dgBroadPhaseNode* const node = body->GetBroadPhase();
-		dgAssert (!node->GetLeft());
-		dgAssert (!node->GetRight());
+		dgAssert(!node->GetLeft());
+		dgAssert(!node->GetRight());
+		dgAssert(!body->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
 
 		const dgBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
 
-		dgThreadHiveScopeLock lock (m_world, &m_criticalSectionLock, true);
+		dgThreadHiveScopeLock lock(m_world, &m_criticalSectionLock, true);
 		if (body->GetBroadPhaseAggregate()) {
 			dgBroadPhaseAggregate* const aggregate = body->GetBroadPhaseAggregate();
 			aggregate->m_isInEquilibrium = body->m_equilibrium;
+			aggregate->SetAsDirty(m_lru + 1);
 		}
 
-		if (!dgBoxInclusionTest (body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) {
-			dgAssert (!node->IsAggregate());
+		m_dirtyNodesCount += (node->m_nodeIsDirtyLru != (m_lru + 1)) ? 1 : 0;
+		node->SetAsDirty(m_lru + 1);
+		if (!dgBoxInclusionTest(body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) {
+			dgAssert(!node->IsAggregate());
 			node->SetAABB(body->m_minAABB, body->m_maxAABB);
 			for (dgBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) {
 				if (!parent->IsAggregate()) {
 					dgVector minBox;
 					dgVector maxBox;
-					dgFloat32 area = CalculateSurfaceArea (parent->GetLeft(), parent->GetRight(), minBox, maxBox);
-					if (dgBoxInclusionTest (minBox, maxBox, parent->m_minBox, parent->m_maxBox)) {
+					dgFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
+					if (dgBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) {
 						break;
 					}
 					parent->m_minBox = minBox;
 					parent->m_maxBox = maxBox;
 					parent->m_surfaceArea = area;
 				} else {
-					dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*) parent;
+					dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)parent;
 					aggregate->m_minBox = aggregate->m_root->m_minBox;
 					aggregate->m_maxBox = aggregate->m_root->m_maxBox;
 					aggregate->m_surfaceArea = aggregate->m_root->m_surfaceArea;
@@ -837,7 +841,8 @@ void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy,
 
 		if ((entropy > oldEntropy * dgFloat32(2.0f)) || (entropy < oldEntropy * dgFloat32(0.5f))) {
 			if (fitness.GetFirst()) {
-				dgBroadPhaseNode** const leafArray = dgAlloca (dgBroadPhaseNode*, fitness.GetCount() * 2 + 12);
+				m_world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(fitness.GetCount() * 2 + 12, sizeof (dgBroadPhaseNode*));
+				dgBroadPhaseNode** const leafArray = (dgBroadPhaseNode**)&m_world->m_solverJacobiansMemory[0];
 
 				dgInt32 leafNodesCount = 0;
 				for (dgFitnessList::dgListNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
@@ -1149,7 +1154,7 @@ DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgIn
 
 	dgInt32 faceIndex = -1;
 	dgFloat32 minDist = dgFloat32(dgFloat32(0.0f));
-	const dgVector origin(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	const dgVector origin(dgVector::m_zero);
 	for (dgInt32 i = 0; i < 4; i++) {
 		dgInt32 i0 = m_obbTestSimplex[i][0];
 		dgInt32 i1 = m_obbTestSimplex[i][1];
@@ -1197,8 +1202,7 @@ DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgIn
 	return origin;
 }
 
-
-
+/*
 bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
@@ -1212,7 +1216,6 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 	dgAssert (!body0->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI));
 	dgAssert (!body1->GetCollision()->IsType (dgCollision::dgCollisionNull_RTTI));
 
-	//bool tier1 = !(body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI) | body0->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
 	bool tier1 = true;
 	bool tier2 = !(body0->m_sleeping & body1->m_sleeping);
 	bool tier3 = isDynamic0 & mass0; 
@@ -1232,14 +1235,17 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 		instance0->CalcObb (origin0, obb0);
 		instance1->CalcObb (origin1, obb1);
 
-		obb0 -= dgCollisionInstance::m_padding;
-		obb1 -= dgCollisionInstance::m_padding;
-
 		dgAssert (origin0.m_w == dgFloat32 (0.0f));
 		dgAssert (origin1.m_w == dgFloat32 (0.0f));
-		dgMatrix matrix (instance1->GetGlobalMatrix() * instance0->GetGlobalMatrix().Inverse());
+		dgMatrix matrix0 (instance0->GetGlobalMatrix());
+		dgMatrix matrix1 (instance1->GetGlobalMatrix());
+		matrix0.m_posit -= matrix1.m_posit & dgVector::m_triplexMask + dgVector::m_wOne;
+		matrix1.m_posit = dgVector::m_wOne;
+		dgMatrix matrix (matrix1 * matrix0.Inverse());
 		matrix.m_posit = matrix.TransformVector (origin1) - origin0;
-//matrix.m_posit = dgVector (0.0f, 2.0f, 0.0f, 0.0f);
+
+		obb0 = dgVector::m_zero.GetMax(obb0 - m_padding - dgCollisionInstance::m_padding);
+		obb1 = dgVector::m_zero.GetMax(obb1 - m_padding - dgCollisionInstance::m_padding);
 
 		dgVector dir0 (matrix.m_posit & dgVector::m_triplexMask); 
 		dgFloat32 mag2 = dir0.DotProduct4 (dir0).GetScalar();
@@ -1322,8 +1328,8 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 			iter++;
 		} while (iter < 8);
 
-		dgFloat32 dist = v.DotProduct4 (v).GetScalar(); 
-		dgFloat32 testDist = dgFloat32(1.0e-3f * 1.0e-3f);
+		dgFloat32 dist = v.DotProduct4 (v).GetScalar() ; 
+		dgFloat32 testDist = DG_OBB_OVERLAP_PADDING_BOUND * DG_OBB_OVERLAP_PADDING_BOUND;
 		if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 			dgVector velRelative (body1->GetVelocity() - body0->GetVelocity());
 			dgVector step (velRelative.Scale4 (timestep * dgFloat32 (2.0f)));
@@ -1333,7 +1339,7 @@ bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* cons
 	}
 	return ret;
 }
-
+*/
 
 bool dgBroadPhase::ValidateContactCache(dgContact* const contact, dgFloat32 timestep) const
 {
@@ -1372,13 +1378,15 @@ void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 	m_world->CalculateContacts(pair, threadID, false, false);
 
 	if (pair->m_contactCount) {
-		dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
-		if (pair->m_isDeformable) {
-			m_world->ProcessDeformableContacts(pair, threadID);
-		} else {
-			m_world->ProcessContacts(pair, threadID);
-			KinematicBodyActivation(pair->m_contact);
+		if (pair->m_contact->m_body0->m_invMass.m_w != dgFloat32 (0.0f)) {
+			pair->m_contact->m_body0->m_equilibrium = false;
 		}
+		if (pair->m_contact->m_body1->m_invMass.m_w != dgFloat32 (0.0f)) {
+			pair->m_contact->m_body1->m_equilibrium = false;
+		}
+		dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
+		m_world->ProcessContacts(pair, threadID);
+		KinematicBodyActivation(pair->m_contact);
 	} else {
 		if (pair->m_cacheIsValid) {
 			//m_world->ProcessCachedContacts (pair->m_contact, timestep, threadID);
@@ -1420,7 +1428,6 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 			dgAssert (!body1->m_collision->IsType (dgCollision::dgCollisionNull_RTTI));
 
 			pair.m_contact = contact;
-			pair.m_isDeformable = 0;
 			pair.m_timestep = timestep;
             CalculatePairContacts (&pair, threadIndex);
 		}
@@ -1431,91 +1438,51 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFloat32 timestep, dgInt32 threadID)
 {
 	dTimeTrackerEvent(__FUNCTION__);
-	if (TestOverlaping (body0, body1, timestep)) {
-		dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI | dgBody::m_deformableBodyRTTI)));
 
-		// add all pairs 
-		bool isCollidable = true;
-		dgContact* contact = m_world->FindContactJoint (body0, body1);
-		if (!contact) {
-			const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint (body0, body1);
-			isCollidable = bilateral ? bilateral->IsCollidable() : true;
-		}
+	dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI)));
+	dgThreadHiveScopeLock lock(m_world, &m_contacJointLock, true);
+	dgContact* contact = m_world->FindContactJoint(body0, body1);
+	if (!contact) {
+		const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint (body0, body1);
+		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 
 		if (isCollidable) {
-			if (contact) {
-				contact->m_broadphaseLru = m_lru;
-				contact->m_timeOfImpact = dgFloat32(1.0e10f);
-				if (!ValidateContactCache (contact, timestep)) {
-					// It does not have to set the value because it should be the same ar previous update.
-					contact->m_contactActive = 0;
-					contact->m_positAcc = dgVector::m_zero;
-					contact->m_rotationAcc = dgQuaternion();
-					AddPair(contact, timestep, threadID);
-				}
+			dgUnsigned32 group0_ID = dgUnsigned32 (body0->m_bodyGroupId);
+			dgUnsigned32 group1_ID = dgUnsigned32 (body1->m_bodyGroupId);
+			if (group1_ID < group0_ID) {
+				dgSwap (group0_ID, group1_ID);
+			}
 
-			} else {
-				dgUnsigned32 group0_ID = dgUnsigned32 (body0->m_bodyGroupId);
-				dgUnsigned32 group1_ID = dgUnsigned32 (body1->m_bodyGroupId);
-				if (group1_ID < group0_ID) {
-					dgSwap (group0_ID, group1_ID);
-				}
+			dgUnsigned32 key = (group1_ID << 16) + group0_ID;
+			const dgBodyMaterialList* const materialList = m_world;  
+			const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
 
-				dgUnsigned32 key = (group1_ID << 16) + group0_ID;
-				const dgBodyMaterialList* const materialList = m_world;  
-				const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
-
-				if (material->m_flags & dgContactMaterial::m_collisionEnable) {
-					bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
-//					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium & (contact->m_closestDistance > (DG_CACHE_DIST_TOL * dgFloat32 (4.0f))))) {
-					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
-
-#if 1
-						m_world->GlobalLock(false);
-							if (body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-								contact = new (m_world->m_allocator) dgDeformableContact(m_world, material);
-							} else {
-								contact = new (m_world->m_allocator) dgContact(m_world, material);
-							}
-							contact->AppendToActiveList();
-						m_world->GlobalUnlock();
+			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
+				bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
+				if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
+					const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI);
+					const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI);
+					if (isSofBody0 || isSofBody1) {
+						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body0 = body0;
+						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
+						m_pendingSoftBodyPairsCount++;
+					} else {
+						contact = new (m_world->m_allocator) dgContact(m_world, material);
+						contact->AppendToActiveList();
 						m_world->AttachConstraint(contact, body0, body1);
 
-						dgAssert (contact);
+						dgAssert(contact);
 						contact->m_contactActive = 0;
-						contact->m_broadphaseLru = m_lru;
-						contact->m_timeOfImpact = dgFloat32 (1.0e10f);
-						AddPair(contact, timestep, threadID);
-#else
-
-						if (!(body0->IsRTTIType(dgBody::m_deformableBodyRTTI) || body1->IsRTTIType(dgBody::m_deformableBodyRTTI))) {
-							dgAssert(body0);
-							dgAssert(body1);
-
-							dgContact tempContact (m_world, material);
-							tempContact.m_body0 = body0;
-							tempContact.m_body1 = body1;
-							tempContact.m_contactActive = 0;
-							tempContact.m_broadphaseLru = m_lru;
-							tempContact.m_timeOfImpact = dgFloat32(1.0e10f);
-							AddPair(&tempContact, timestep, threadID);
-							if (tempContact.GetCount()) {
-								m_world->GlobalLock(false);
-								contact = new (m_world->m_allocator) dgContact(&tempContact);
-								contact->AppendToActiveList();
-								m_world->GlobalUnlock();
-								m_world->AttachConstraint(contact, body0, body1);
-							}
-						} else {
-							dgAssert (0);
-//							contact = new dgDeformableContact(m_world, material);
-						}
-#endif
-
+						contact->m_positAcc = dgVector(dgFloat32(10.0f));
+						contact->m_timeOfImpact = dgFloat32(1.0e10f);
 					}
 				}
 			}
 		}
+	}
+
+	if (contact) {
+		contact->m_broadphaseLru = m_lru;
 	}
 }
 
@@ -1567,7 +1534,7 @@ dgAssert (0);
 }
 
 
-void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threadID)
+void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threadCount, dgInt32 threadID)
 {
 	dgBroadPhaseNode* pool[DG_BROADPHASE_MAX_STACK_DEPTH];
 	pool[0] = node;
@@ -1687,7 +1654,7 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 	}
 }
 
-void dgBroadPhase::FindCollidingPairs(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
+void dgBroadPhase::FindCollidingPairsForward(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
 {
 	const dgFloat32 timestep = descriptor->m_timestep;
 
@@ -1699,7 +1666,7 @@ void dgBroadPhase::FindCollidingPairs(dgBroadphaseSyncDescriptor* const descript
 		dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
 
 		if (broadPhaseNode->IsAggregate()) {
-			((dgBroadPhaseAggregate*)broadPhaseNode)->SummitSeltPairs(timestep, threadID);
+			((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSeltPairs(timestep, threadID);
 		}
 
 		for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
@@ -1707,7 +1674,45 @@ void dgBroadPhase::FindCollidingPairs(dgBroadphaseSyncDescriptor* const descript
 			dgAssert(!parent->IsLeafNode());
 			dgBroadPhaseNode* const sibling = parent->m_right;
 			if (sibling != ptr) {
-				SubmitPairs(broadPhaseNode, sibling, timestep, threadID);
+				SubmitPairs(broadPhaseNode, sibling, timestep, 0, threadID);
+			}
+		}
+
+		for (dgInt32 i = 0; i < threadCount; i++) {
+			node = node ? node->GetNext() : NULL;
+		}
+	}
+}
+
+
+void dgBroadPhase::FindCollidingPairsForwardAndBackward(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
+{
+	const dgFloat32 timestep = descriptor->m_timestep;
+
+	dgList<dgBroadPhaseNode*>::dgListNode* node = nodePtr;
+	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
+	const dgUnsigned32 lru = m_lru + 1;
+	while (node) {
+		dgBroadPhaseNode* const broadPhaseNode = node->GetInfo();
+		dgAssert(broadPhaseNode->IsLeafNode());
+		dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
+
+		if (lru == broadPhaseNode->GetDirtyLru()) {
+		if (broadPhaseNode->IsAggregate()) {
+			((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSeltPairs(timestep, threadID);
+		}
+
+			for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
+				dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
+				dgAssert(!parent->IsLeafNode());
+				dgBroadPhaseNode* const rightSibling = parent->m_right;
+				if (rightSibling != ptr) {
+					SubmitPairs(broadPhaseNode, rightSibling, timestep, threadCount, threadID);
+				}
+				dgBroadPhaseNode* const leftSibling = parent->m_left;
+				if (leftSibling != ptr) {
+					SubmitPairs(broadPhaseNode, leftSibling, timestep, threadCount, threadID);
+				}
 			}
 		}
 
@@ -1724,7 +1729,11 @@ void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, d
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
-	broadPhase->FindCollidingPairs(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
+	if (broadPhase->m_scanTwoWays) {
+		broadPhase->FindCollidingPairsForwardAndBackward(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
+	} else {
+		broadPhase->FindCollidingPairsForward(descriptor, (dgList<dgBroadPhaseNode*>::dgListNode*) node, threadID);
+	}
 }
 
 
@@ -1737,60 +1746,10 @@ void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* 
 	broadPhase->FindGeneratedBodiesCollidingPairs (descriptor, threadID);
 }
 
-void dgBroadPhase::UpdateContactsBroadPhaseEnd ()
-{
-	dTimeTrackerEvent(__FUNCTION__);
-	// delete all non used contacts
-	dgInt32 count = 0;
-	dgUnsigned32 lru = m_lru;
-
-	dgActiveContacts* const contactList = m_world;
-	dgContact** const deadContacs = dgAlloca (dgContact*, contactList->GetCount() + 256);
-
-	const dgInt32 garbageCollectingCicle = 8;
-
-	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode; contactNode = contactNode->GetNext()) {
-		dgContact* const contact = contactNode->GetInfo();
-		if (contact->m_broadphaseLru != lru) {
-			const dgBody* const body0 = contact->m_body0;
-			const dgBody* const body1 = contact->m_body1;
-			if (! ((body0->m_sleeping | body0->m_equilibrium) & (body1->m_sleeping | body1->m_equilibrium)) ) {
-				if (contact->m_contactActive) {
-					contact->m_contactActive = 0;
-				} else {
-					deadContacs[count] = contact;
-					count ++;
-				}
-			} else if ((lru -  contact->m_broadphaseLru) > garbageCollectingCicle) {
-				dgVector minBox (body0->m_minAABB - body1->m_maxAABB);
-				dgVector maxBox (body0->m_maxAABB - body1->m_minAABB);
-				dgVector mask ((minBox.CompProduct4(maxBox)) > dgVector (dgFloat32 (0.0f)));
-				dgVector dist ((maxBox.Abs()).GetMin (minBox.Abs()) & mask);
-				dist = dist.GetMax(dist.ShiftTripleRight());
-				dist = dist.GetMax(dist.ShiftTripleRight());
-				if (dist.GetScalar() < dgFloat32(2.0f)) {
-					contact->m_broadphaseLru = lru - 1;
-				} else {
-					if (contact->m_contactActive) {
-						contact->m_contactActive = 0;
-					} else {
-						deadContacs[count] = contact;
-						count ++;
-					}
-				}
-			}
-		}
-	}
-
-	for (dgInt32 i = 0; i < count; i ++) {
-		dgContact* const contact = deadContacs[i];
-		m_world->DestroyConstraint (contact);
-	}
-}
-
 
 void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 {
+	dTimeTrackerEvent(__FUNCTION__);
 	dgInt32 threadsCount = m_world->GetThreadCount();
 	dgList<dgBroadPhaseNode*>::dgListNode* node = m_updateList.GetFirst();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
@@ -1798,14 +1757,137 @@ void dgBroadPhase::ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints)
 		node = node ? node->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
+
+	const dgUnsigned32 lru = m_lru - DG_CONTACT_DELAY_FRAMES;
+	dgActiveContacts* const contactList = m_world;
+	for (dgActiveContacts::dgListNode* contactNode = contactList->GetFirst(); contactNode;) {
+		dgContact* const contact = contactNode->GetInfo();
+		contactNode = contactNode->GetNext();
+		const dgBody* const body0 = contact->GetBody0();
+		const dgBody* const body1 = contact->GetBody1();
+		const dgInt32 equilbriun0 = body0->m_equilibrium;
+		const dgInt32 equilbriun1 = body1->m_equilibrium;
+		if (equilbriun0 & equilbriun1) {
+			contact->m_broadphaseLru = lru;
+		}
+		if (contact->m_broadphaseLru < lru) {
+			m_world->DestroyConstraint(contact);
+		}
+	}
+
+
+#if 0
+static dgInt32 xxx;
+dgInt32 xxx0 = 0;
+dgInt32 xxx1 = 0;
+	for (dgList<dgBroadPhaseNode*>::dgListNode* nodePtr = m_updateList.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+xxx0 ++;
+		dgBroadPhaseNode* const node = nodePtr->GetInfo();
+		dgAssert (node->IsLeafNode());
+		dgBroadPhaseBodyNode* const bodyNode = (dgBroadPhaseBodyNode*)node;
+xxx1 += bodyNode->m_nodeIsDirtyLru == (m_lru + 1) ? 1 : 0;
+	}
+dgTrace (("%d %d %d\n", xxx, xxx0, xxx1));
+xxx ++;
+#endif
+
 }
 
+void dgBroadPhase::UpdateSoftBodyContactKernel(void* const context, void* const worldContext, dgInt32 threadID)
+{
+	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
+	dgWorld* const world = descriptor->m_world;
+	dgBroadPhase* const broadPhase = world->GetBroadPhase();
+	broadPhase->UpdateSoftBodyContacts(descriptor, descriptor->m_timestep, threadID);
+}
+
+void dgBroadPhase::UpdateRigidBodyContactKernel(void* const context, void* const node, dgInt32 threadID)
+{
+	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
+	dgWorld* const world = descriptor->m_world;
+	dgBroadPhase* const broadPhase = world->GetBroadPhase();
+	broadPhase->UpdateRigidBodyContacts(descriptor, (dgActiveContacts::dgListNode*) node, descriptor->m_timestep, threadID);
+}
+
+void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timeStep, dgInt32 threadID)
+{
+	const dgInt32 count = m_pendingSoftBodyPairsCount;
+	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1)) {
+		dgPendingCollisionSofBodies& pair = m_pendingSoftBodyCollisions[i];
+		if (pair.m_body0->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+			dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)pair.m_body0->m_collision->GetChildShape();
+			dgAssert(pair.m_body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+			deformableShape->CollideMasses((dgDynamicBody*) pair.m_body0, pair.m_body1);
+		} else if (pair.m_body1->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+			dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)pair.m_body1->m_collision->GetChildShape();
+			dgAssert(pair.m_body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+			deformableShape->CollideMasses((dgDynamicBody*)pair.m_body1, pair.m_body0);
+		}
+	}
+}
+
+void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgActiveContacts::dgListNode* const nodePtr, dgFloat32 timeStep, dgInt32 threadID)
+{
+	dTimeTrackerEvent(__FUNCTION__);
+
+	dgActiveContacts::dgListNode* node = nodePtr;
+	const dgFloat32 timestep = descriptor->m_timestep;
+	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
+	while (node) {
+		dgContact* const contact = node->GetInfo();
+
+		const dgBody* const body0 = contact->GetBody0();
+		const dgBody* const body1 = contact->GetBody1();
+		if (!(body0->m_equilibrium & body1->m_equilibrium)) {
+			if (ValidateContactCache(contact, timestep)) {
+				contact->m_timeOfImpact = dgFloat32(1.0e10f);
+			} else {
+				contact->m_contactActive = 0;
+				contact->m_positAcc = dgVector::m_zero;
+				contact->m_rotationAcc = dgQuaternion();
+
+				dgFloat32 distance = contact->m_separationDistance;
+				if (distance >= DG_NARROW_PHASE_DIST) {
+					const dgVector veloc0 (body0->GetVelocity());
+					const dgVector veloc1 (body1->GetVelocity());
+					const dgVector omega0 (body0->GetOmega());
+					const dgVector omega1 (body1->GetOmega());
+					const dgCollisionInstance* const collision0 = body0->GetCollision();
+					const dgCollisionInstance* const collision1 = body1->GetCollision();
+					const dgFloat32 maxDiameter0 = dgFloat32 (3.5f) * collision0->GetBoxMaxRadius(); 
+					const dgFloat32 maxDiameter1 = dgFloat32 (3.5f) * collision1->GetBoxMaxRadius(); 
+
+					const dgVector velocLinear (veloc1 - veloc0);
+					const dgFloat32 velocAngular0 = dgSqrt((omega0.DotProduct4(omega0)).GetScalar()) * maxDiameter0;
+					const dgFloat32 velocAngular1 = dgSqrt((omega1.DotProduct4(omega1)).GetScalar()) * maxDiameter1;
+					const dgFloat32 speed = dgSqrt ((velocLinear.DotProduct4(velocLinear)).GetScalar()) + velocAngular1 + velocAngular0 + dgFloat32 (0.5f);
+					distance -= speed * timestep;
+					contact->m_separationDistance = distance;
+				}
+				//distance = 0.0f;
+				if (distance < DG_NARROW_PHASE_DIST) {
+					AddPair(contact, timestep, threadID);
+					if (contact->m_maxDOF) {
+						contact->m_timeOfImpact = dgFloat32(1.0e10f);
+					}
+				}
+			}
+		}
+
+		for (dgInt32 i = 0; i < threadCount; i++) {
+			node = node ? node->GetNext() : NULL;
+		}
+	}
+}
 
 
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
 	dTimeTrackerEvent(__FUNCTION__);
-	m_lru = m_lru + 1;
+	const dgInt32 lastDirtyCount = m_dirtyNodesCount;
+    m_lru = m_lru + 1;
+	m_pendingSoftBodyPairsCount = 0;
+	m_dirtyNodesCount = 0;
 
 	m_recursiveChunks = true;
 	dgInt32 threadsCount = m_world->GetThreadCount();
@@ -1838,16 +1920,19 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 
 
 #if 0
+	static dgInt32 xxx;
+	xxx ++;
 	for (dgBodyMasterList::dgListNode* node = masterList->GetLast(); node; node = node->GetPrev()) {
 		dgDynamicBody* const body = (dgDynamicBody*)node->GetInfo().GetBody();
 		if ((body->GetType() == dgBody::m_dynamicBody) && (body->GetInvMass().m_w > dgFloat32 (0.0f))) {
-			#if 1
+			#if 0
 				static FILE* file = fopen("replay.bin", "wb");
 				if (file) {
 					fwrite(&body->m_accel, sizeof (dgVector), 1, file);
 					fwrite(&body->m_alpha, sizeof (dgVector), 1, file);
 					fwrite(&body->m_veloc, sizeof (dgVector), 1, file);
 					fwrite(&body->m_omega, sizeof (dgVector), 1, file);
+					dgTrace (("%d f(%f %f %f) v(%f %f %f) \n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z));
 					fflush(file);
 				}
 			#else 
@@ -1857,6 +1942,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 					fread(&body->m_alpha, sizeof (dgVector), 1, file);
 					fread(&body->m_veloc, sizeof (dgVector), 1, file);
 					fread(&body->m_omega, sizeof (dgVector), 1, file);
+					dgTrace (("%d f(%f %f %f) v(%f %f %f) \n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z));
 				}
 			#endif
 		}
@@ -1870,9 +1956,26 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		aggregateNode = aggregateNode ? aggregateNode->GetNext() : NULL;
 	}
 	m_world->SynchronizationBarrier();
-
 	UpdateFitness();
+
+	m_scanTwoWays = (lastDirtyCount * 100) < (40 * m_updateList.GetCount());
 	ScanForContactJoints (syncPoints);
+
+	dgActiveContacts* const contactList = m_world;
+	dgActiveContacts::dgListNode* contactListNode = contactList->GetFirst();
+	for (dgInt32 i = 0; i < threadsCount; i++) {
+		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, contactListNode);
+		contactListNode = contactListNode ? contactListNode->GetNext() : NULL;
+	}
+	m_world->SynchronizationBarrier();
+
+	if (m_pendingSoftBodyPairsCount) {
+		for (dgInt32 i = 0; i < threadsCount; i++) {
+			m_world->QueueJob(UpdateSoftBodyContactKernel, &syncPoints, contactListNode);
+		}
+		m_world->SynchronizationBarrier();
+	}
+
 
 	m_recursiveChunks = false;
 	if (m_generatedBodies.GetCount()) {
@@ -1892,10 +1995,4 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		m_generatedBodies.RemoveAll();
 */
 	}
-
-	UpdateContactsBroadPhaseEnd();
-
-	// update soft body dynamics phase 1
-	dgDeformableBodiesUpdate* const softBodyList = m_world;
-	softBodyList->ApplyExternaForces(timestep);
 }

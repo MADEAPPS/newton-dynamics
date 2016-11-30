@@ -23,6 +23,47 @@
 #define MAX_PHYSICS_FPS				60.0f
 #define MAX_PHYSICS_SUB_STEPS		2
 
+#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+//#define DEFAULT_SCENE	1			// Coefficients of friction
+//#define DEFAULT_SCENE	2			// Coefficients of restitution
+//#define DEFAULT_SCENE	3			// Precessing tops
+//#define DEFAULT_SCENE	4			// closest distance
+//#define DEFAULT_SCENE	5			// primitive collision
+//#define DEFAULT_SCENE	6 			// Kinematic bodies
+//#define DEFAULT_SCENE	7			// primitive convex cast 
+//#define DEFAULT_SCENE	8			// Box stacks
+//#define DEFAULT_SCENE	9			// simple level mesh collision
+//#define DEFAULT_SCENE	10			// optimized level mesh collision
+//#define DEFAULT_SCENE	11			// height field Collision
+//#define DEFAULT_SCENE	12			// infinite user plane collision
+//#define DEFAULT_SCENE	13			// user height field Collision
+//#define DEFAULT_SCENE	14			// compound Collision
+//#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	16			// uniform Scaled Collision
+//#define DEFAULT_SCENE	17			// non uniform Scaled Collision
+//#define DEFAULT_SCENE	18			// scaled mesh collision
+//#define DEFAULT_SCENE	19			// continuous collision
+//#define DEFAULT_SCENE	20			// paper wall continuous collision
+//#define DEFAULT_SCENE	21			// puck slide continuous collision
+//#define DEFAULT_SCENE	22			// simple convex decomposition
+//#define DEFAULT_SCENE	23			// scene Collision
+//#define DEFAULT_SCENE	24          // simple boolean operators 
+//#define DEFAULT_SCENE	25			// simple convex fracturing 
+//#define DEFAULT_SCENE	26			// structured convex fracturing 
+//#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
+//#define DEFAULT_SCENE	28          // standard joints
+//#define DEFAULT_SCENE	29			// articulated joints
+//#define DEFAULT_SCENE	30			// basic rag doll
+//#define DEFAULT_SCENE	31			// dynamics rag doll
+//#define DEFAULT_SCENE	32			// basic Car
+//#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	34			// heavy vehicles
+//#define DEFAULT_SCENE	35			// basic player controller
+//#define DEFAULT_SCENE	36			// advanced player controller
+//#define DEFAULT_SCENE	37			// cloth patch			
+//#define DEFAULT_SCENE	38			// soft bodies			
+
+
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
 void Restitution (DemoEntityManager* const scene);
@@ -67,10 +108,76 @@ void StandardJoints (DemoEntityManager* const scene);
 
 DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] = 
 {
-	{"Using the newton mesh tool", "demonstrate how to use the newton mesh toll for mesh manipulation", UsingNewtonMeshTool},
+	{"Using the newton mesh tool", "demonstrate how to use the newton mesh tool for mesh manipulation", UsingNewtonMeshTool},
 	{"Coefficients of friction", "demonstrate the effect of various coefficient of friction", Friction},
+	{"Coefficients of restitution", "demonstrate the effect of various coefficient of restitution", Restitution},
+	{"Precessing tops", "show natural precession", PrecessingTops},
+	{"Closest distance", "demonstrate closest distance to a convex shape", ClosestDistance},
+	{"Primitive Collision", "demonstrate separate collision of primitives", PrimitiveCollision},
+	{"Kinematic bodies", "demonstrate separate collision of primitives", KinematicPlacement},
+	{"Primitive convex cast", "demonstrate separate primitive convex cast", ConvexCast},
+	{"Simple box Stacks", "show simple stack of Boxes", BasicBoxStacks},
+	{"Unoptimized mesh collision", "show simple level mesh", SimpleMeshLevelCollision},
+	{"Optimized mesh collision", "show optimized level mesh", OptimizedMeshLevelCollision},
+	{"Height field collision mesh", "show high file collision mesh", HeightFieldCollision},
+	{"User infinite Plane collision mesh", "show high file collision mesh", UserPlaneCollision},
+	{"User Height field collision mesh", "show high file collision mesh", UserHeightFieldCollision},
+	{"Compound collision shape", "demonstrate compound collision", CompoundCollision},
+	{"Archimedes Buoyancy", "show Archimedes Buoyancy using the trigger volume manager", AlchimedesBuoyancy},
+	{"Uniform scaled collision shape", "demonstrate scaling shape", UniformScaledCollision},
+	{"Non uniform scaled collision shape", "demonstrate scaling shape", NonUniformScaledCollision},
+	{"Scaled mesh collision", "demonstrate scaling mesh scaling collision", ScaledMeshCollision},
+	{"Continuous collision", "show continuous collision", ContinuousCollision },
+	{"Paper wall continuous collision", "show fast continuous collision", ContinuousCollision1 },
+	{"Puck slide", "show continuous collision", PuckSlide },
+	{"Simple convex decomposition", "demonstrate convex decomposition and compound collision", SimpleConvexApproximation},
+	{"Multi geometry collision", "show static mesh with the ability of moving internal parts", SceneCollision},
+	{"Simple boolean operations", "demonstrate simple boolean operations ", SimpleBooleanOperations},
+	{"Simple convex fracture", "demonstrate simple fracture destruction using Voronoi partition", SimpleConvexFracturing},
+	{"Structured convex fracture", "demonstrate structured fracture destruction using Voronoi partition", StructuredConvexFracturing},
+	{"Parallel ray cast", "using the threading Job scheduler", MultiRayCast},
+	{"Standard Joints", "show some of the common joints", StandardJoints},
+	{"Articulated robotic actuators joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
+	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagDoll},
+	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
+	{"Basic Car", "show how to set up a vehicle controller", BasicCar},
+	{"Super car", "implement a hight performance sport car", SuperCar},
+	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
+	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
+	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
+	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
+	{"Simple soft Body", "show simple soft body", SoftBodies},
 };
 
+
+DemoEntityManager::ButtonKey::ButtonKey (bool state)
+	:m_state(state)
+	,m_memory0(false)
+	,m_memory1(false)
+{
+}
+
+bool DemoEntityManager::ButtonKey::UpdateTriggerButton (const DemoEntityManager* const mainWin, int keyCode)
+{
+	m_memory0 = m_memory1;
+	m_memory1 = mainWin->GetKeyState (keyCode);
+	return !m_memory0 & m_memory1;
+}
+
+bool DemoEntityManager::ButtonKey::UpdateTriggerJoystick (const DemoEntityManager* const mainWin, int buttonMask)
+{
+	m_memory0 = m_memory1;
+	m_memory1 = buttonMask ? true : false;
+	return !m_memory0 & m_memory1;
+}
+
+bool DemoEntityManager::ButtonKey::UpdatePushButton (const DemoEntityManager* const mainWin, int keyCode)
+{
+	if (UpdateTriggerButton (mainWin, keyCode)) {
+		m_state = ! m_state;
+	}
+	return m_state;
+}
 
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
@@ -85,14 +192,19 @@ DemoEntityManager::DemoEntityManager ()
 	,m_renderHood(NULL)
 	,m_microsecunds(0)
 	,m_tranparentHeap()
+	,m_currentScene(DEFAULT_SCENE)
 	,m_framesCount(0)
+	,m_physicsFramesCount(0)
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)
+	,m_mainThreadPhysicsTimeAcc(0.0f)
 	,m_showStats(true)
 	,m_synchronousPhysicsUpdateMode(true)
+	,m_hideVisualMeshes(false)
 {
+m_synchronousPhysicsUpdateMode = false;
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
 
@@ -106,6 +218,7 @@ DemoEntityManager::DemoEntityManager ()
 
 	// Setup ImGui binding
 	ImGuiIO& io = ImGui::GetIO();
+	io.UserData = this;
 
 	// Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
 	io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;                     
@@ -184,6 +297,32 @@ DemoEntityManager::~DemoEntityManager ()
 
 	dAssert (NewtonGetMemoryUsed () == 0);
 }
+
+
+DemoCamera* DemoEntityManager::GetCamera() const
+{
+	return m_cameraManager->GetCamera();
+}
+
+
+bool DemoEntityManager::GetKeyState(int key) const
+{
+//	return wxGetKeyState(wxKeyCode(key & 0xff));
+	//	return m_key[m_keyMap[key & 0xff]] ? true : false;
+	dAssert (0);
+	return false;
+}
+
+bool DemoEntityManager::GetJoytickPosition (dFloat& posX, dFloat& posY, int& buttonsMask) const
+{
+	dAssert (0);
+	return false;
+//	buttonsMask = m_joytickButtonMask;
+//	posX = dFloat (m_joytickX - 32767) / 32768.0f;
+//	posY = -dFloat (m_joytickY - 32767) / 32768.0f;
+//	return m_hasJoysticController;
+}
+
 
 
 void DemoEntityManager::ResetTimer()
@@ -361,40 +500,10 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Demos")) {
-			//if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-			//if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-			//ImGui::Separator();
-			//if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-			//if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-			//if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-
-			//wxMenu* const sdkDemos = new wxMenu;
 			int demosCount = int (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
 			for (int i = 0; i < demosCount; i ++) {
-				if (ImGui::RadioButton(m_demosSelection[i].m_name, false)) {
-
-					//BEGIN_MENU_OPTION();
-					//NewtonWaitForUpdateToFinish (m_world);
-
-					Cleanup();
-
-					m_demosSelection[i].m_launchDemoCallback (this);
-					//m_scene->SwapBuffers(); 
-
-					//RestoreSettings ();
-					ResetTimer();
-
-					// clean up all caches the engine have saved
-					NewtonInvalidateCache(m_world);
-
-					dAssert (0);
-					//END_MENU_OPTION();
-					//NewtonWaitForUpdateToFinish (m_world);
-					//SetAutoSleepMode (m_world, !m_autoSleepState);
-					//NewtonSetSolverModel (m_world, m_solverModes[m_solverModeIndex]);
-					//NewtonSetSolverConvergenceQuality (m_world, m_solverModeQuality ? 1 : 0);
-					//NewtonSetMultiThreadSolverOnSingleIsland (m_world, m_useParallelSolver ? 1 : 0);	
-					//NewtonSelectBroadphaseAlgorithm (m_world, m_broadPhaseType);
+				if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) {
+					m_currentScene = i;
 				}
 			}
 
@@ -415,6 +524,32 @@ void DemoEntityManager::ShowMainMenuBar()
 		}
 
 		ImGui::EndMainMenuBar();
+	}
+
+	if (m_currentScene != -1) {
+		//BEGIN_MENU_OPTION();
+		//NewtonWaitForUpdateToFinish (m_world);
+
+		Cleanup();
+
+		m_demosSelection[m_currentScene].m_launchDemoCallback (this);
+
+		//RestoreSettings ();
+		ResetTimer();
+
+		// clean up all caches the engine have saved
+		NewtonInvalidateCache(m_world);
+
+		//dAssert (0);
+		//END_MENU_OPTION();
+		//NewtonWaitForUpdateToFinish (m_world);
+		//SetAutoSleepMode (m_world, !m_autoSleepState);
+		//NewtonSetSolverModel (m_world, m_solverModes[m_solverModeIndex]);
+		//NewtonSetSolverConvergenceQuality (m_world, m_solverModeQuality ? 1 : 0);
+		//NewtonSetMultiThreadSolverOnSingleIsland (m_world, m_useParallelSolver ? 1 : 0);	
+		//NewtonSelectBroadphaseAlgorithm (m_world, m_broadPhaseType);
+
+		m_currentScene = -1;
 	}
 }
 
@@ -461,88 +596,7 @@ bool DemoEntityManager::GetMousePosition (int& posX, int& posY) const
 }
 
 
-// This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
-// If text or lines are blurry when integrating ImGui in your engine:
-// - in your Render function, try translating your projection matrix by (0.5f,0.5f) or (0.375f,0.375f)
-void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
-{
-	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
-	ImGuiIO& io = ImGui::GetIO();
-	int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-	if (fb_width == 0 || fb_height == 0)
-		return;
-	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 
-	// We are using the OpenGL fixed pipeline to make the example code simpler to read!
-	// Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers.
-	GLint last_texture; glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-	GLint last_viewport[4]; glGetIntegerv(GL_VIEWPORT, last_viewport);
-	GLint last_scissor_box[4]; glGetIntegerv(GL_SCISSOR_BOX, last_scissor_box); 
-	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_SCISSOR_TEST);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glEnable(GL_TEXTURE_2D);
-	//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
-
-	// Setup viewport, orthographic projection matrix
-	glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	// Render command lists
-#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
-	for (int n = 0; n < draw_data->CmdListsCount; n++)
-	{
-		const ImDrawList* cmd_list = draw_data->CmdLists[n];
-		const ImDrawVert* vtx_buffer = cmd_list->VtxBuffer.Data;
-		const ImDrawIdx* idx_buffer = cmd_list->IdxBuffer.Data;
-		glVertexPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, pos)));
-		glTexCoordPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, uv)));
-		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, col)));
-
-		for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
-		{
-			const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
-			if (pcmd->UserCallback)
-			{
-				pcmd->UserCallback(cmd_list, pcmd);
-			}
-			else
-			{
-				glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
-				glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
-				glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
-			}
-			idx_buffer += pcmd->ElemCount;
-		}
-	}
-#undef OFFSETOF
-
-	// Restore modified state
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glBindTexture(GL_TEXTURE_2D, (GLuint)last_texture);
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
-	glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
-	glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
-}
 
 void DemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, int action, int mods)
 {
@@ -589,18 +643,20 @@ void DemoEntityManager::BeginFrame()
 
 	// Start the frame
 	ImGui::NewFrame();
-
 }
 
-void DemoEntityManager::EndFrame()
+void DemoEntityManager::RenderUI()
 {
 	dTimeTrackerEvent(__FUNCTION__);
-    ImVec4 clear_color = ImColor(114, 144, 154);
 
 	if (m_showStats) {
 		bool dommy;
 		char text[1024];
-
+		
+		//ImVec2 size ( 100, 400);
+		//int flags = ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoResize;
+		//bool ImGui::Begin(const char* name, bool* p_open, const ImVec2& size_on_first_use, float bg_alpha, ImGuiWindowFlags flags)
+		//if (ImGui::Begin("statistics", &dommy, size, -1.0f, flags)){
 		if (ImGui::Begin("statistics", &dommy)){
 			sprintf (text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text);
@@ -617,7 +673,7 @@ void DemoEntityManager::EndFrame()
 			sprintf (text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
 			ImGui::Text(text);
 
-			//sprintf (text, "auto sleep: %s"), m_autoSleepState ? wxT("on") : wxT("off"));
+			//sprintf (text, "auto sleep: %s", m_autoSleepState ? "on") : "off"));
 			//m_statusbar->SetStatusText (statusText, 5);
 
 /*
@@ -628,7 +684,7 @@ void DemoEntityManager::EndFrame()
 
 			char floatMode[128];
 			NewtonGetDeviceString (world, m_hardwareDevice, floatMode, sizeof (floatMode));
-			statusText.Printf (wxT ("instructions: %s"),  wxString::FromAscii(floatMode).wc_str());
+			statusText.Printf (wxT ("instructions: %s",  wxString::FromAscii(floatMode).wc_str());
 			m_statusbar->SetStatusText (statusText, 6);
 */
 
@@ -636,15 +692,6 @@ void DemoEntityManager::EndFrame()
 		}
 	}
 	ShowMainMenuBar();
-
-	// Rendering
-	int display_w, display_h;
-	glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
-	glViewport(0, 0, display_w, display_h);
-	glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-	glClear(GL_COLOR_BUFFER_BIT);
-	ImGui::Render();
-	glfwSwapBuffers(m_mainFrame);
 }
 
 void DemoEntityManager::CalculateFPS(dFloat timestep)
@@ -818,11 +865,11 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 	NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 	NewtonCollision* const collision = NewtonBodyGetCollision(body);
 
-#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
+	#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
 	if (NewtonCollisionGetType(collision) == SERIALIZE_ID_TREE) {
 		NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
 	}
-#endif
+	#endif
 
 	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
 	dTree <DemoMeshInterface*, const void*>* const cache = (dTree <DemoMeshInterface*, const void*>*)bodyUserData;
@@ -841,7 +888,6 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 
 void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {
-	dAssert (0);
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
 }
 
@@ -882,12 +928,242 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 		}
 
 		if (newUpdate) {
-			m_mainThreadPhysicsTime = physicsTime;
+			m_physicsFramesCount ++;
+			m_mainThreadPhysicsTimeAcc += physicsTime;
+			if (m_physicsFramesCount >= 16) {
+				m_mainThreadPhysicsTime = m_mainThreadPhysicsTimeAcc / m_physicsFramesCount;
+				m_physicsFramesCount = 0;
+				m_mainThreadPhysicsTimeAcc = 0.0f;
+			}
+
 		}
 		
 //dTrace (("%f\n", m_mainThreadPhysicsTime));
 	}
 }
+
+dFloat DemoEntityManager::CalculateInteplationParam () const
+{
+	unsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
+	dFloat param = (dFloat (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
+	dAssert (param >= 0.0f);
+	if (param > 1.0f) {
+		param = 1.0f;
+	}
+	return param;
+}
+
+
+// This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
+// If text or lines are blurry when integrating ImGui in your engine:
+// - in your Render function, try translating your projection matrix by (0.5f,0.5f) or (0.375f,0.375f)
+void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
+{
+	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
+	ImGuiIO& io = ImGui::GetIO();
+
+	int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	if (fb_width == 0 || fb_height == 0)
+		return;
+
+	DemoEntityManager* const window = (DemoEntityManager*)io.UserData;
+
+	ImVec4 clearColor = ImColor(114, 144, 154);
+	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
+
+	window->RenderScene();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glDisable (GL_LIGHTING);
+	glEnable(GL_SCISSOR_TEST);
+	glEnable(GL_TEXTURE_2D);
+	//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
+
+	// Setup viewport, orthographic projection matrix
+	glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	// Render command lists
+	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
+	#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
+	for (int n = 0; n < draw_data->CmdListsCount; n++)
+	{
+		const ImDrawList* cmd_list = draw_data->CmdLists[n];
+		const ImDrawVert* vtx_buffer = cmd_list->VtxBuffer.Data;
+		const ImDrawIdx* idx_buffer = cmd_list->IdxBuffer.Data;
+		glVertexPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, pos)));
+		glTexCoordPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, uv)));
+		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, col)));
+
+		for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+		{
+			const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
+			if (pcmd->UserCallback)
+			{
+				pcmd->UserCallback(cmd_list, pcmd);
+			}
+			else
+			{
+				glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
+				glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+				glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
+			}
+			idx_buffer += pcmd->ElemCount;
+		}
+	}
+	#undef OFFSETOF
+
+	// Restore modified state
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glPopAttrib();
+}
+
+
+void DemoEntityManager::RenderScene()
+{
+	dTimeTrackerEvent(__FUNCTION__);
+
+	dFloat timestep = dGetElapsedSeconds();	
+	CalculateFPS(timestep);
+	UpdatePhysics(timestep);
+
+	// Get the interpolated location of each body in the scene
+	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
+
+	ImGuiIO& io = ImGui::GetIO();
+	int display_w = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	int display_h = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	glViewport(0, 0, display_w, display_h);
+	glScissor(0, 0, display_w, display_h);
+	glEnable(GL_SCISSOR_TEST);	
+
+	// Rendering
+	// Our shading model--Goraud (smooth). 
+	glShadeModel (GL_SMOOTH);
+
+	// Culling. 
+	glCullFace (GL_BACK);
+	glFrontFace (GL_CCW);
+	glEnable (GL_CULL_FACE);
+
+	//	glEnable(GL_DITHER);
+	// z buffer test
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc (GL_LEQUAL);
+
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
+
+	// set default lightning
+	glEnable (GL_LIGHTING);
+
+	dFloat cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
+	glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
+	glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
+	glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	// one light form the Camera eye point
+	GLfloat lightDiffuse0[] = { 0.5f, 0.5f, 0.5f, 0.0 };
+	GLfloat lightAmbient0[] = { 0.0f, 0.0f, 0.0f, 0.0 };
+	dVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);
+	GLfloat lightPosition0[] = {GLfloat(camPosition.m_x), GLfloat(camPosition.m_y), GLfloat(camPosition.m_z)};
+
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse0);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, lightDiffuse0);
+	glEnable(GL_LIGHT0);
+
+	// set just one directional light
+	GLfloat lightDiffuse1[] = { 0.7f, 0.7f, 0.7f, 0.0 };
+	GLfloat lightAmbient1[] = { 0.2f, 0.2f, 0.2f, 0.0 };
+	GLfloat lightPosition1[] = { -500.0f, 200.0f, 500.0f, 0.0 };
+
+	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, lightDiffuse1);
+	glEnable(GL_LIGHT1);
+
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
+
+	// Setup matrix
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	//glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// make sure the model view matrix is set to identity before setting world space light sources
+	// update Camera
+	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
+
+	// render all entities
+	if (m_hideVisualMeshes) {
+		if (m_sky) {
+			glPushMatrix();	
+			m_sky->Render(timestep, this);
+			glPopMatrix();
+		}
+
+	} else {
+		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
+			DemoEntity* const entity = node->GetInfo();
+			glPushMatrix();	
+			entity->Render(timestep, this);
+			glPopMatrix();
+		}
+	}
+
+	if (m_tranparentHeap.GetCount()) {
+		//dMatrix modelView;
+		//glGetFloat (GL_MODELVIEW_MATRIX, &modelView[0][0]);
+		glPushMatrix();	
+		while (m_tranparentHeap.GetCount()) {
+			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
+			glLoadIdentity();
+			glLoadMatrix(&transparentMesh.m_matrix[0][0]);
+			transparentMesh.m_mesh->RenderTransparency();
+			m_tranparentHeap.Pop();
+		}
+		glPopMatrix();
+		//glLoadMatrix(&modelView[0][0]);
+	}
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+}
+
 
 void DemoEntityManager::Run()
 {
@@ -896,42 +1172,11 @@ void DemoEntityManager::Run()
     {
 		dTimeTrackerEvent(__FUNCTION__);
 
-		dFloat timestep = dGetElapsedSeconds();	
-		CalculateFPS(timestep);
-		UpdatePhysics(timestep);
+		BeginFrame();
 
-        BeginFrame();
-/*
-        // 1. Show a simple window
-        // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
-        {
-            static float f = 0.0f;
-            ImGui::Text("Hello, world!");
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit3("clear color", (float*)&clear_color);
-            if (ImGui::Button("Test Window")) show_test_window ^= 1;
-            if (ImGui::Button("Another Window")) show_another_window ^= 1;
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        }
+		RenderUI();
 
-        // 2. Show another simple window, this time using an explicit Begin/End pair
-        if (show_another_window)
-        {
-            ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("Another Window", &show_another_window);
-            ImGui::Text("Hello");
-            ImGui::End();
-        }
-
-        // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-        if (show_test_window)
-        {
-            ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-            ImGui::ShowTestWindow(&show_test_window);
-        }
-*/
-
-		EndFrame();
+		ImGui::Render();
+		glfwSwapBuffers(m_mainFrame);
     }
-
 }

@@ -291,7 +291,7 @@ class dMousePickClass
 		dFloat Izz;
 
 		dMousePickClass* const data = (dMousePickClass*) userData;
-		NewtonBodyGetMassMatrix (body, &mass, &Ixx, &Iyy, &Izz);
+		NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
 		if (mass > 0.0f) {
 			data->m_body = body;
 		}

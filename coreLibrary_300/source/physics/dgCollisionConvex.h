@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -26,6 +26,7 @@
 
 #define DG_CLIP_MAX_COUNT				512
 #define DG_CLIP_MAX_POINT_COUNT			64
+#define D_MIN_CONVEX_SHAPE_SIZE			dgFloat32 (1.0f/128.0f)
 
 
 DG_MSC_VECTOR_ALIGMENT
@@ -64,9 +65,6 @@ class dgCollisionConvex: public dgCollision
 	virtual dgFloat32 GetBoxMinRadius () const; 
 	virtual dgFloat32 GetBoxMaxRadius () const;
 
-	virtual void* GetUserData () const;
-	virtual void SetUserData (void* const userData);
-
 	dgInt32 RayCastClosestFace (dgVector* tetrahedrum, const dgVector& origin, dgFloat32& pointDist) const;
 	dgInt32 SimplifyClipPolygon (dgInt32 count, const dgVector& normal, dgVector* const polygon) const;
 
@@ -90,7 +88,6 @@ class dgCollisionConvex: public dgCollision
 
 	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
 	
-	void* m_userData;
 	dgVector* m_vertex;
 	dgConvexSimplexEdge* m_simplex;
 	

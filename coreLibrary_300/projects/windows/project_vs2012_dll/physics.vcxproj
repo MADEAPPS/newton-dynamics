@@ -87,7 +87,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
-      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../source/ampPhysics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../../packages/thirdParty/timeTracker</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
@@ -132,7 +132,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
-      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../source/ampPhysics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../../packages/thirdParty/timeTracker</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
@@ -272,8 +272,6 @@
     <ClCompile Include="..\..\..\source\physics\dgContact.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgContactSolver.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCorkscrewConstraint.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgDeformableContact.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgHingeConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgSkeletonContainer.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgSlidingConstraint.cpp" />
@@ -300,8 +298,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionNull.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionScene.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionSphere.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCapsule.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCylinder.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionUserMesh.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBodyMasterList.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgBroadPhase.cpp" />
@@ -323,7 +319,6 @@
     <ClCompile Include="..\..\..\source\physics\dgBody.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='release|x64'">MaxSpeed</Optimization>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgDeformableBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDynamicBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgKinematicBody.cpp" />
   </ItemGroup>
@@ -338,8 +333,6 @@
     <ClInclude Include="..\..\..\source\physics\dgContact.h" />
     <ClInclude Include="..\..\..\source\physics\dgContactSolver.h" />
     <ClInclude Include="..\..\..\source\physics\dgCorkscrewConstraint.h" />
-    <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h" />
-    <ClInclude Include="..\..\..\source\physics\dgDeformableContact.h" />
     <ClInclude Include="..\..\..\source\physics\dgHingeConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgSkeletonContainer.h" />
     <ClInclude Include="..\..\..\source\physics\dgSlidingConstraint.h" />
@@ -366,8 +359,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionNull.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionScene.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionSphere.h" />
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCapsule.h" />
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCylinder.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionUserMesh.h" />
     <ClInclude Include="..\..\..\source\physics\dgBodyMasterList.h" />
     <ClInclude Include="..\..\..\source\physics\dgBroadPhase.h" />
@@ -377,7 +368,6 @@
     <ClInclude Include="..\..\..\source\physics\dgWorldDynamicUpdate.h" />
     <ClInclude Include="..\..\..\source\meshUtil\dgMeshEffect.h" />
     <ClInclude Include="..\..\..\source\physics\dgBody.h" />
-    <ClInclude Include="..\..\..\source\physics\dgDeformableBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgDynamicBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h" />
   </ItemGroup>

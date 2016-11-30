@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -115,7 +115,7 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 	
 
 	// build the mesh from an index list vertex list, alternatively we can also build the mesh by parring one face at at time
-	NewtonMeshBuildFromVertexListIndexList(newtonMesh,
+	NewtonMeshBuildFromPointListIndexList(newtonMesh,
 		10, faceIndexList, faceMateriaIndexList,
 		&array[0].m_x, 4 * sizeof (dFloat), BoxIndices,
 		Normal, 3 * sizeof (dFloat), faceNormalIndex,

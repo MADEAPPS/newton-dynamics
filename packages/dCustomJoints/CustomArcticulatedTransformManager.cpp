@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -71,8 +71,9 @@ CustomArticulatedTransformController::CustomArticulatedTransformController()
 
 CustomArticulatedTransformController::~CustomArticulatedTransformController()
 {
-//	CustomArticulaledTransformManager* const manager = (CustomArticulaledTransformManager*) GetManager();
-	NewtonCollisionAggregateDestroy(m_collisionAggregate);
+	if (m_collisionAggregate) {
+		NewtonCollisionAggregateDestroy(m_collisionAggregate);
+	}
 }
 
 
@@ -118,7 +119,9 @@ CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTransformC
 	m_bones[m_boneCount].m_parent = parentBone;
 	m_bones[m_boneCount].m_bindMatrix = bindMatrix;
 
+	if (m_collisionAggregate) {
 	NewtonCollisionAggregateAddBody (m_collisionAggregate, bone);
+	}
 
 	m_boneCount ++;
 	dAssert (m_boneCount < D_HIERACHICAL_CONTROLLER_MAX_BONES);
@@ -175,7 +178,9 @@ void CustomArticulatedTransformController::SetDefaultSelfCollisionMask ()
 
 void CustomArticulatedTransformController::DisableAllSelfCollision ()
 {
-	NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
+	if (m_collisionAggregate) {
+		NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
+	}
 	for (int i = 0; i < m_boneCount; i ++) {
 		for (int j = i + 1; j < m_boneCount; j ++) {
 			SetSelfCollisionMask (&m_bones[i], &m_bones[j], false);
@@ -216,7 +221,7 @@ bool CustomArticulatedTransformController::SelfCollisionTest (const dSkeletonBon
 }
 
 
-void CustomArticulatedTransformController::MakeNewtonSkeleton() const
+void CustomArticulatedTransformController::MakeNewtonSkeleton()
 {
 	NewtonBody* bonePool[32];
 	NewtonBody* boneParent[32];

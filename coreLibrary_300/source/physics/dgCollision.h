@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -24,12 +24,14 @@
 
 
 class dgBody;
+class dgWorld;
 class dgCollision;
 class dgMeshEffect;
 class dgContactPoint;
 class dgPolygonSoupDesc;
 class dgCollisionConvex;
 class dgPolygonMeshDesc;
+class dgCollisionInstance;
 class dgCollisionConvexHull;
 class dgPolygonSoupRayHitDesc;
 
@@ -38,6 +40,11 @@ class dgPolygonSoupRayHitDesc;
 #endif
 
 #define PREFILTER_RAYCAST(filter,body,collision,userData) (filter && !filter(body,collision,userData)) 
+
+typedef dgInt32(dgApi *OnBodiesInAABB) (dgBody* body, void* const userData);
+typedef dgUnsigned32(dgApi *OnRayPrecastAction) (const dgBody* const body, const dgCollisionInstance* const collision, void* const userData);
+typedef dgFloat32(dgApi *OnRayCastAction) (const dgBody* const body, const dgCollisionInstance* const collision, const dgVector& contact, const dgVector& normal, dgInt64 collisionID, void* const userData, dgFloat32 intersetParam);
+
 
 enum dgCollisionID
 {
@@ -85,20 +92,6 @@ class dgCollisionInfo
 
 	struct dgCylinderData
 	{
-		dgFloat32 m_radius;
-		dgFloat32 m_height;
-	};
-
-	struct dgTaperedCapsuleData
-	{
-		dgFloat32 m_radio0;
-		dgFloat32 m_radio1;
-		dgFloat32 m_height;
-	};
-
-
-	struct dgTaperedCylinderData
-	{
 		dgFloat32 m_radio0;
 		dgFloat32 m_radio1;
 		dgFloat32 m_height;
@@ -106,7 +99,8 @@ class dgCollisionInfo
 
 	struct dgCapsuleData
 	{
-		dgFloat32 m_radio;
+		dgFloat32 m_radio0;
+		dgFloat32 m_radio1;
 		dgFloat32 m_height;
 	};
 
@@ -186,8 +180,6 @@ class dgCollisionInfo
 		dgSphereData m_sphere;
 		dgCapsuleData m_capsule;
 		dgCylinderData m_cylinder;
-		dgTaperedCapsuleData m_taperedCapsule;
-		dgTaperedCylinderData m_taperedCylinder;
 		dgChamferCylinderData m_chamferCylinder;
 		dgConvexHullData m_convexHull;
 		dgDeformableMeshData m_deformableMesh;
@@ -259,7 +251,6 @@ class dgCollision
 	virtual dgFloat32 CalculateMassProperties (const dgMatrix& offset, dgVector& inertia, dgVector& crossInertia, dgVector& centerOfMass) const {dgAssert (0); return 0;}
 	virtual dgMatrix CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const {dgAssert (0); return dgGetZeroMatrix();}
 
-	virtual dgFloat32 GetSkinThickness () const; 
 	virtual dgFloat32 GetBoxMinRadius () const = 0; 
 	virtual dgFloat32 GetBoxMaxRadius () const = 0; 
 	

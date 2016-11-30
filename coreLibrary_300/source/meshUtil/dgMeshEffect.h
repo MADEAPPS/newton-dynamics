@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -45,6 +45,56 @@ class dgCollisionInstance;
 class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 {
 	public:
+
+	enum dgChannelType
+	{
+		m_vertex,
+		m_layer,
+		m_normal,
+		m_binormal,
+		m_uv,
+		m_color,
+		m_material,
+		m_point,
+		m_channelsCount,
+	};
+
+	template<class T, dgChannelType type>
+	class dgChannel
+	{
+		public:
+		dgChannel()
+			:m_type(type)
+			,m_data(NULL)
+		{
+
+		}
+		T* m_data;
+		dgChannelType m_type;
+	};
+
+	class dgVertexFormat
+	{
+		public:
+		class dgUV
+		{
+			public:
+			dgFloat32 m_u;
+			dgFloat32 m_v;
+		};
+
+		dgChannel<dgBigVector, m_point> m_pointChannel;
+		dgChannel<dgInt32, m_vertex> m_vertexChannel;
+		dgChannel<dgInt32, m_layer> m_layerChannel;
+		dgChannel<dgInt32, m_material> m_materialChannel;
+		dgChannel<dgTriplex, m_normal> m_normalChannel;
+		dgChannel<dgTriplex, m_normal> m_binormalChannel;
+		dgChannel<dgVector, m_color> m_colorChannel;
+		dgChannel<dgUV, m_uv> m_uv0Channel;
+		dgChannel<dgUV, m_uv> m_uv1Channel;
+		
+	};
+
 
 	class dgVertexAtribute 
 	{
@@ -189,12 +239,14 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	void PackVertexArrays ();
 
-	void BuildFromVertexListIndexList(dgInt32 faceCount, const dgInt32 * const faceIndexCount, const dgInt32 * const faceMaterialIndex, 
+//	void BuildFromTriangleIndexList(dgInt32 faceCount, const dgInt32 * const faceMaterialIndex,
+//		const dgFloat32* const vertex, dgInt32  vertexStrideInBytes, const dgInt32 * const vertexIndex);
+
+	void BuildFromPointListIndexList(dgInt32 faceCount, const dgInt32 * const faceIndexCount, const dgInt32 * const faceMaterialIndex, 
 		const dgFloat32* const vertex, dgInt32  vertexStrideInBytes, const dgInt32 * const vertexIndex,
 		const dgFloat32* const normal, dgInt32  normalStrideInBytes, const dgInt32 * const normalIndex,
 		const dgFloat32* const uv0, dgInt32  uv0StrideInBytes, const dgInt32 * const uv0Index,
 		const dgFloat32* const uv1, dgInt32  uv1StrideInBytes, const dgInt32 * const uv1Index);
-
 
 	dgInt32 GetVertexCount() const;
 	dgInt32 GetVertexStrideInByte() const;
@@ -324,6 +376,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	dgBigVector* m_points;
 	dgVertexAtribute* m_attrib;
+	dgVertexFormat m_vertexFormat;
 	
 	friend class dgConvexHull3d;
 	friend class dgConvexHull4d;

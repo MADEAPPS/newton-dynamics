@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -25,35 +25,10 @@
 #include "NewtonStdAfx.h"
 #include "Newton.h"
 
-
-
-//#define DG_TIMESTEP (1.0f / 60.0f)	
-//#define DG_MAX_TIMESTEP (1.0f / 30.0f)	
-//#define DG_MIN_TIMESTEP (1.0f / 1000.0f)	
-
 class Newton; 
 
 
-class NewtonDeadBodies: public dgTree<dgBody*, void* >
-{
-	public: 
-	NewtonDeadBodies(dgMemoryAllocator* const allocator);
-	void DestroyBodies(Newton& world);
-};
-
-
-class NewtonDeadJoints: public dgTree<dgConstraint*, void* >
-{
-	public: 
-	NewtonDeadJoints(dgMemoryAllocator* const allocator);
-	void DestroyJoints(Newton& world);
-};
-
-
-class Newton:
-	public dgWorld, 
-	public NewtonDeadBodies,
-	public NewtonDeadJoints
+class Newton: public dgWorld 
 {
 	public:
 	DG_CLASS_ALLOCATOR(allocator)
@@ -61,15 +36,10 @@ class Newton:
 	Newton (dgFloat32 scale, dgMemoryAllocator* const allocator, dgInt32 stackSize = DG_ENGINE_STACK_SIZE);
 	~Newton ();
 
-	void DestroyBody(dgBody* const body);
-	void DestroyJoint(dgConstraint* const joint);
-
 	void UpdatePhysics (dgFloat32 timestep);
 	void UpdatePhysicsAsync (dgFloat32 timestep);
 	static void* DefaultAllocMemory (dgInt32 size);
 	static void DefaultFreeMemory (void* const ptr, dgInt32 size);
-
-//	dgFloat32 m_maxTimeStep;
 
 	NewtonWorldDestructorCallback m_destructor;
 };

@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -30,6 +30,7 @@ class DemoMeshInterface: public dClassInfo
 	virtual void RenderTransparency () const = 0;
 	virtual void Render (DemoEntityManager* const scene) = 0;
 	virtual void RenderNormals () = 0;
+	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix) = 0;
 
 	dAddRtti(dClassInfo,DOMMY_API);
 
@@ -85,7 +86,7 @@ class DemoMesh: public DemoMeshInterface, public dList<DemoSubMesh>
 	virtual void RenderNormals ();
 
 	void OptimizeForRender();
-	NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix);
+	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix);
 
 	protected:
 	virtual ~DemoMesh();
@@ -119,6 +120,8 @@ class DemoBezierCurve: public DemoMeshInterface
 	virtual void RenderTransparency () const;
 	virtual void Render (DemoEntityManager* const scene);
 	virtual void RenderNormals ();
+
+	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const workd, const dMatrix& meshMatrix);
 
 	dBezierSpline m_curve;
 	int m_renderResolution;

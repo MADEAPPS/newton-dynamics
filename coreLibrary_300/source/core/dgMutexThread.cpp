@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -55,13 +55,13 @@ void dgMutexThread::Execute (dgInt32 threadID)
 	dgAssert (threadID == m_id);
 	while (!m_terminate) {
 		// wait for the main thread to signal an update
-		dgInterlockedExchange(&m_isBusy, 0);
 		SuspendExecution(m_myMutex);
-		dgInterlockedExchange(&m_isBusy, 1);
 		if (!m_terminate) {
+			dgInterlockedExchange(&m_isBusy, 1);
 			TickCallback(threadID);
 			// let main thread resume execution
 			m_callerMutex.Release();
+			dgInterlockedExchange(&m_isBusy, 0);
 		}
 	}
 	dgInterlockedExchange(&m_isBusy, 0);

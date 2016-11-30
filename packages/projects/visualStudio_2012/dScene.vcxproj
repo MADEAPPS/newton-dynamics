@@ -316,7 +316,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/timeTracker;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -349,7 +349,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/timeTracker;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -381,7 +381,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/timeTracker;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -413,7 +413,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/timeTracker;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DSCENE_DLL;_DSCENE_EXPORTS;_DCONTAINERS_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -448,7 +448,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/timeTracker;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -480,7 +480,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/timeTracker;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -512,7 +512,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/timeTracker;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DSCENE_DLL;_DSCENE_EXPORTS;_DCONTAINERS_DLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -544,7 +544,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/timeTracker;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -571,7 +571,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_md|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/timeTracker;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DSCENE_EXPORTS;_NEWTON_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -580,7 +580,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_md|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dAnimation;../../dContainers;../../thirdParty/tinyxml;../../thirdParty/timeTracker;../../thirdParty/glew/include;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dSceneStdafx.h</PrecompiledHeaderFile>

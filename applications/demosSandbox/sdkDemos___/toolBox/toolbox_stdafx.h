@@ -172,7 +172,7 @@ typedef long long unsigned64;
 #ifdef _NEWTON_USE_DOUBLE
 inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
 {
-	GLfloat tmp[4] = {params[0], params[1], params[2], params[3]};
+	GLfloat tmp[4] = {GLfloat(params[0]), GLfloat(params[1]), GLfloat(params[2]), GLfloat(params[3])};
 	glMaterialfv (face, pname, &tmp[0]);
 }
 #define glMultMatrix(x) glMultMatrixd(x)

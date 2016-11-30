@@ -33,9 +33,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCorkscrewConstraint.cpp">
       <Filter>constraints</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgDeformableContact.cpp">
-      <Filter>constraints</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgHingeConstraint.cpp">
       <Filter>constraints</Filter>
     </ClCompile>
@@ -111,12 +108,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionSphere.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCapsule.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionTaperedCylinder.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionUserMesh.cpp">
       <Filter>collision</Filter>
     </ClCompile>
@@ -159,17 +150,11 @@
     <ClCompile Include="..\..\..\source\physics\dgBody.cpp">
       <Filter>bodies</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgDeformableBody.cpp">
-      <Filter>bodies</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgDynamicBody.cpp">
       <Filter>bodies</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgKinematicBody.cpp">
       <Filter>bodies</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp">
-      <Filter>systems</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundFractured.cpp">
       <Filter>collision</Filter>
@@ -207,9 +192,6 @@
       <Filter>constraints</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCorkscrewConstraint.h">
-      <Filter>constraints</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgDeformableContact.h">
       <Filter>constraints</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgHingeConstraint.h">
@@ -287,12 +269,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionSphere.h">
       <Filter>collision</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCapsule.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionTaperedCylinder.h">
-      <Filter>collision</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionUserMesh.h">
       <Filter>collision</Filter>
     </ClInclude>
@@ -320,17 +296,11 @@
     <ClInclude Include="..\..\..\source\physics\dgBody.h">
       <Filter>bodies</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgDeformableBody.h">
-      <Filter>bodies</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgDynamicBody.h">
       <Filter>bodies</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h">
       <Filter>bodies</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h">
-      <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundFractured.h">
       <Filter>collision</Filter>

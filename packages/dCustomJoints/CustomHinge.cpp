@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_CUSTON_JOINT(CustomHinge);
+IMPLEMENT_CUSTOM_JOINT(CustomHinge);
 
 CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -65,7 +65,7 @@ dgCollisionSphere::~dgCollisionSphere()
 void dgCollisionSphere::Init (dgFloat32 radius, dgMemoryAllocator* allocator)
 {
 	m_rtti |= dgCollisionSphere_RTTI;
-	m_radius = radius;
+	m_radius = dgMax (dgAbsf (radius), D_MIN_CONVEX_SHAPE_SIZE);
 
 	m_edgeCount = DG_SPHERE_EDGE_COUNT;
 	m_vertexCount = DG_SPHERE_VERTEX_COUNT;
@@ -306,12 +306,11 @@ void dgCollisionSphere::Serialize(dgSerialize callback, void* const userData) co
 
 dgVector dgCollisionSphere::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const 
 {
-	*vertexIndex = -1;
 	return dgVector (dgFloat32 (0.0f));
 }
 
 dgVector dgCollisionSphere::SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const
 {
-	return SupportVertex(dir, NULL);
+	return dir.Scale4 (m_radius - DG_PENETRATION_TOL);
 }
 

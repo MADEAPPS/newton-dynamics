@@ -12,13 +12,13 @@
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
 #include "DemoMesh.h"
-#include "NewtonDemos.h"
-#include "PhysicsUtils.h"
 #include "DemoCamera.h"
 #include "OpenGlUtil.h"
+#include "PhysicsUtils.h"
 #include "DemoEntityManager.h"
 #include "UserPlaneCollision.h"
 
+/*
 class StupidComplexOfConvexShapes: public DemoEntity
 {
 	public:
@@ -386,11 +386,13 @@ static void AddUserDefineStaticMesh(DemoEntityManager* const scene)
 	// destroy the collision shape
 	NewtonDestroyCollision (planeCollision);
 }
-
+*/
 
 // create physics scene
 void ConvexCast (DemoEntityManager* const scene)
 {
+	dAssert (0);
+/*
 	scene->CreateSkyBox();
 
 	//char fileName[2048];
@@ -423,6 +425,7 @@ void ConvexCast (DemoEntityManager* const scene)
 	dQuaternion rot (camMatrix);
 	dVector origin (-30.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
+*/
 }
 
 

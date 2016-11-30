@@ -9,15 +9,13 @@
  * freely
  */
 
+
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "TargaToOpenGl.h"
 #include "DemoMesh.h"
-#include "NewtonDemos.h"
-#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "DebugDisplay.h"
+#include "DemoEntityManager.h"
 #include "HeightFieldPrimitive.h"
 
 #if 0

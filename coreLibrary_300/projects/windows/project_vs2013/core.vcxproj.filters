@@ -219,6 +219,9 @@
     <ClInclude Include="..\..\..\source\core\dgObb.h">
       <Filter>math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\source\core\dgFastQueue.h">
+      <Filter>containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="base">

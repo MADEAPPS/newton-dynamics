@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -8,9 +8,6 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-
-// NewtonDemos.cpp : Defines the entry point for the application.
-//
 
 
 #include <toolbox_stdafx.h>
@@ -34,7 +31,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-//#define DEFAULT_SCENE	8			// Box stacks
+#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -59,7 +56,7 @@
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
 //#define DEFAULT_SCENE	32			// basic Car
-#define DEFAULT_SCENE	33			// super Car
+//#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
@@ -344,10 +341,12 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_showContactPoints = true;
 //m_showCenterOfMass = true;
 //m_hideVisualMeshes = true;
-//m_physicsUpdateMode = 1;
 //m_hardwareDevice = 2;
 //m_showStatistics = true;
 //*/
+
+//m_showCenterOfMass = true;
+//m_physicsUpdateMode = 1;
 //m_hideVisualMeshes = true;
 //m_showContactPoints = true;
 //m_debugDisplayMode = 2;

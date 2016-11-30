@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////////
 
 //dInitRtti(CustomRackAndPinion);
-IMPLEMENT_CUSTON_JOINT(CustomRackAndPinion);
+IMPLEMENT_CUSTOM_JOINT(CustomRackAndPinion);
 
 CustomRackAndPinion::CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody)
 	:CustomJoint(2, rotationalBody, linearBody)

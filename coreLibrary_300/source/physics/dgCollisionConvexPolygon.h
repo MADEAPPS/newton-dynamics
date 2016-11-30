@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -58,7 +58,6 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	virtual dgFloat32 GetBoxMaxRadius () const;
 	
 	void BeamClipping (const dgVector& origin, dgFloat32 size);
-	void SetFeatureHit (dgInt32 featureCount, const dgInt32* const index);
 
 	dgVector CalculateGlobalNormal (const dgCollisionInstance* const parentMesh, const dgVector& localNormal) const;
 	dgInt32 CalculateContactToConvexHullDescrete(const dgWorld* const world, const dgCollisionInstance* const parentMesh, dgCollisionParamProxy& proxy);
@@ -77,8 +76,8 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	dgInt32 m_faceId;
 	dgInt32 m_stride;
 	dgInt32 m_faceNormalIndex;
-	dgInt32 m_closestFeatureType;
-	dgInt32 m_closestFeatureStartIndex;
+//	dgInt32 m_closestFeatureType;
+//	dgInt32 m_closestFeatureStartIndex;
 	dgFloat32 m_faceClipSize; 
 	const dgFloat32* m_vertex;
 	const dgInt32* m_vertexIndex;

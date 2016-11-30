@@ -11,12 +11,12 @@
 
 
 #include <toolbox_stdafx.h>
-#include "DemoEntityManager.h"
-
-/*
 #include "SkyBox.h"
+#include "DemoMesh.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
+#include "DemoEntityManager.h"
+
 
 #define FRICTION_VAR_NAME "friction"
 static dCRCTYPE frictionCRC (dCRC64 (FRICTION_VAR_NAME));
@@ -55,12 +55,10 @@ static void UserContactFriction (const NewtonJoint* contactJoint, dFloat timeste
 		NewtonMaterialSetContactFrictionCoef (material, frictionValue + 0.1f, frictionValue, 1);
 	}
 }
-*/
+
 
 void Friction (DemoEntityManager* const scene)
 {
-	dAssert (0);
-/*
 	// load the skybox
 	scene->CreateSkyBox();
 
@@ -109,6 +107,5 @@ void Friction (DemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 
 //	ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
-*/
 }
 

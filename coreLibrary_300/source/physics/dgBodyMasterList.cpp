@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -25,7 +25,7 @@
 #include "dgConstraint.h"
 #include "dgDynamicBody.h"
 #include "dgBodyMasterList.h"
-
+#include "dgSkeletonContainer.h"
 
 dgInt32 dgBodyMasterListRow::m_contactCountReversal[] = {1, 0, 2};
 
@@ -240,7 +240,6 @@ void dgBodyMasterListRow::SortList()
 dgBodyMasterList::dgBodyMasterList (dgMemoryAllocator* const allocator)
 	:dgList<dgBodyMasterListRow>(allocator)
 	,m_disableBodies(allocator)
-	,m_deformableCount(0)
 	,m_constraintCount (0)
 {
 }
@@ -261,19 +260,10 @@ void dgBodyMasterList::AddBody (dgBody* const body)
 	if (GetFirst() != node) {
 		InsertAfter (GetFirst(), node);
 	}
-
-	if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-		m_deformableCount ++;
-	}
 }
 
 void dgBodyMasterList::RemoveBody (dgBody* const body)
 {
-	if (body->IsRTTIType(dgBody::m_deformableBodyRTTI)) {
-		m_deformableCount --;
-	}
-	dgAssert (m_deformableCount >= 0);
-
 	dgListNode* const node = body->m_masterNode;
 	dgAssert (node);
 	
@@ -375,22 +365,35 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 
 	if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 		dgDynamicBody* const dynBody0 = (dgDynamicBody*)body0;
-		dynBody0->m_prevExternalForce = dgVector(dgFloat32(0.0f));
-		dynBody0->m_prevExternalTorque = dgVector(dgFloat32(0.0f));
+		dynBody0->m_savedExternalForce = dgVector(dgFloat32(0.0f));
+		dynBody0->m_savedExternalTorque = dgVector(dgFloat32(0.0f));
+		if ((constraint->GetId() == dgConstraint::m_contactConstraint) && dynBody0->GetSkeleton()) {
+			dynBody0->GetSkeleton()->RemoveCyclingJoint((dgBilateralConstraint*)constraint);
+		}
 	}
 
 	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 		dgDynamicBody* const dynBody1 = (dgDynamicBody*)body1;
-		dynBody1->m_prevExternalForce = dgVector(dgFloat32(0.0f));
-		dynBody1->m_prevExternalTorque = dgVector(dgFloat32(0.0f));
+		dynBody1->m_savedExternalForce = dgVector(dgFloat32(0.0f));
+		dynBody1->m_savedExternalTorque = dgVector(dgFloat32(0.0f));
+
+		if ((constraint->GetId() == dgConstraint::m_contactConstraint) && dynBody1->GetSkeleton()) {
+			dynBody1->GetSkeleton()->RemoveCyclingJoint((dgBilateralConstraint*)constraint);
+		}
 	}
 
-	body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
-	body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
 	if (constraint->GetId() == dgConstraint::m_contactConstraint) {
+		dgConstraint* const contact = (dgConstraint*) constraint;
+		if (contact->m_maxDOF) {
+			body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
+			body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
+		}
 		row0.RemoveContactJoint(constraint->m_link0);
 		row1.RemoveContactJoint(constraint->m_link1);
 	} else {
+		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
+		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
+
 		row0.RemoveBilateralJoint(constraint->m_link0);
 		row1.RemoveBilateralJoint(constraint->m_link1);
 	}
@@ -399,11 +402,9 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 
 DG_INLINE dgUnsigned32 dgBodyMasterList::MakeSortMask(const dgBody* const body) const
 {
-//	return body->m_uniqueID | ((body->GetInvMass().m_w > 0.0f) << 30);
 	dgUnsigned32 val0 = body->IsRTTIType(dgBody::m_dynamicBodyRTTI) ? (body->GetInvMass().m_w > 0.0f) << 30 : 0;
 	dgUnsigned32 val1 = body->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? 1<<29 : 0;
-	dgUnsigned32 val2 = body->IsRTTIType(dgBody::m_deformableBodyRTTI) ? 1<<28 : 0;
-	return body->m_uniqueID | val0 | val1 | val2;
+	return body->m_uniqueID | val0 | val1;
 }
 
 

@@ -13,20 +13,17 @@
 #include "SkyBox.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
-#include "NewtonDemos.h"
 #include "PhysicsUtils.h"
+#include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-
-#include "DebugDisplay.h"
-#include "HeightFieldPrimitive.h"
-
 
 #define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
 //#define ARTICULATED_VEHICLE_CAMERA_DISTANCE		7.0f
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE			10.0f
 
+/*
 struct ARTICULATED_VEHICLE_DEFINITION
 {
 	enum
@@ -1017,7 +1014,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dAssert(threadPath);
 		DemoBezierCurve* const bezierPath = (DemoBezierCurve*) threadPath->GetMesh();
 
-		dFloat length = bezierPath->m_curve.CalculateLength (0.01f);
+		dFloat length = dFloat (bezierPath->m_curve.CalculateLength (0.01f));
 		int linksCount = int(length / linkLength) + 1;
 		linkLength = length / linksCount;
 
@@ -1035,11 +1032,11 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		dFloat stepAcc = linkLength;
 		dBigVector q(bezierPath->m_curve.CurvePoint(0.0f));
-		dVector p0(dVector(q.m_x, q.m_y, q.m_z, q.m_w));
+		dVector p0(dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w));
 		for (int i = 1; i < samplingRate + 45; i++) {
 			dFloat u = dFloat(i) / samplingRate;
 			dBigVector q(bezierPath->m_curve.CurvePoint(dMod(u, 1.0f)));
-			dVector p1(dVector(q.m_x, q.m_y, q.m_z, q.m_w));
+			dVector p1(dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w));
 			dVector err(p1 - p0);
 			dFloat errMag = dSqrt(err.DotProduct3(err));
 			distAcc += errMag;
@@ -1067,7 +1064,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dMatrix matrix(dGetIdentityMatrix());
 		dFloat u0 = CalculateKnotParam(steps, linksCount, s);
 		dBigVector r(bezierPath->m_curve.CurvePoint(u0));
-		dVector r0(dVector(r.m_x, r.m_y, r.m_z, 1.0f));
+		dVector r0(dFloat(r.m_x), dFloat(r.m_y), dFloat(r.m_z), 1.0f);
 
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -1088,7 +1085,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			s += linkLength;
 			dFloat u1 = CalculateKnotParam(steps, linksCount, dMod (s, length));
 			dBigVector r(bezierPath->m_curve.CurvePoint(u1));
-			dVector r1(dVector(r.m_x, r.m_y, r.m_z, 1.0f));
+			dVector r1(dFloat(r.m_x), dFloat(r.m_y), dFloat(r.m_z), 1.0f);
 			dVector dir(r1 - r0);
 
 			dir = dir.Scale(1.0f / dSqrt(dir.DotProduct3(dir)));
@@ -1411,36 +1408,36 @@ class AriculatedJointInputManager: public CustomInputManager
 	{
 		ArticulatedEntityModel::InputRecord inputs;
 
-		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
+		//NewtonDemos* const mainWindow = m_scene->GetRootWindow();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
-		inputs.m_wristAxis0 = int(mainWindow->GetKeyState('Y')) - int(mainWindow->GetKeyState('U'));
-		inputs.m_wristAxis1 = int(mainWindow->GetKeyState('I')) - int(mainWindow->GetKeyState('O'));
-		inputs.m_turnValue = int (mainWindow->GetKeyState ('R')) - int (mainWindow->GetKeyState ('T'));
-		inputs.m_tiltValue = int (mainWindow->GetKeyState ('Z')) - int (mainWindow->GetKeyState ('X'));
-		inputs.m_liftValue = int (mainWindow->GetKeyState ('Q')) - int (mainWindow->GetKeyState ('E'));
-		inputs.m_openValue = int (mainWindow->GetKeyState ('F')) - int (mainWindow->GetKeyState ('G'));
-		inputs.m_steerValue = int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'));
-		inputs.m_throttleValue = int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'));
+		inputs.m_wristAxis0 = int(m_scene->GetKeyState('Y')) - int(m_scene->GetKeyState('U'));
+		inputs.m_wristAxis1 = int(m_scene->GetKeyState('I')) - int(m_scene->GetKeyState('O'));
+		inputs.m_turnValue = int (m_scene->GetKeyState ('R')) - int (m_scene->GetKeyState ('T'));
+		inputs.m_tiltValue = int (m_scene->GetKeyState ('Z')) - int (m_scene->GetKeyState ('X'));
+		inputs.m_liftValue = int (m_scene->GetKeyState ('Q')) - int (m_scene->GetKeyState ('E'));
+		inputs.m_openValue = int (m_scene->GetKeyState ('F')) - int (m_scene->GetKeyState ('G'));
+		inputs.m_steerValue = int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'));
+		inputs.m_throttleValue = int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'));
 
 		// check if we must activate the player
-		if (mainWindow->GetKeyState ('A') || 
-			mainWindow->GetKeyState ('D') ||
-			mainWindow->GetKeyState ('W') ||
-			mainWindow->GetKeyState ('S') ||
+		if (m_scene->GetKeyState ('A') || 
+			m_scene->GetKeyState ('D') ||
+			m_scene->GetKeyState ('W') ||
+			m_scene->GetKeyState ('S') ||
 
-			mainWindow->GetKeyState ('R') ||
-			mainWindow->GetKeyState ('T') ||
-			mainWindow->GetKeyState ('I') ||
-			mainWindow->GetKeyState ('O') ||
-			mainWindow->GetKeyState ('Y') ||
-			mainWindow->GetKeyState ('U') ||
-			mainWindow->GetKeyState ('F') ||
-			mainWindow->GetKeyState ('G') ||
-			mainWindow->GetKeyState ('Q') ||
-			mainWindow->GetKeyState ('E') ||
-			mainWindow->GetKeyState ('Z') ||
-			mainWindow->GetKeyState ('X')) 
+			m_scene->GetKeyState ('R') ||
+			m_scene->GetKeyState ('T') ||
+			m_scene->GetKeyState ('I') ||
+			m_scene->GetKeyState ('O') ||
+			m_scene->GetKeyState ('Y') ||
+			m_scene->GetKeyState ('U') ||
+			m_scene->GetKeyState ('F') ||
+			m_scene->GetKeyState ('G') ||
+			m_scene->GetKeyState ('Q') ||
+			m_scene->GetKeyState ('E') ||
+			m_scene->GetKeyState ('Z') ||
+			m_scene->GetKeyState ('X')) 
 		{
 			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetBoneBody(0);
 			NewtonBodySetSleepState(body, false);
@@ -1586,9 +1583,12 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 		filter.Remove(filter.GetRoot());
 	}
 }
+*/
 
 void ArticulatedJoints (DemoEntityManager* const scene)
 {
+	dAssert (0);
+/*
 	// load the sky box
 	scene->CreateSkyBox();
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
@@ -1631,6 +1631,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
 	scene->SetCameraMatrix(rot, origin);
+*/
 }
 
 

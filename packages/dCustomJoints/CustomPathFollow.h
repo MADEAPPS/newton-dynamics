@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -23,7 +23,7 @@
 class CustomPathFollow: public CustomJoint  
 {
 	public:
-	CUSTOM_JOINTS_API CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body);
+	CUSTOM_JOINTS_API CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body, NewtonBody* const parentPath);
 	CUSTOM_JOINTS_API virtual ~CustomPathFollow();
 
 	virtual void GetPointAndTangentAtLocation (const dVector& location,  dVector& positOut, dVector& tangentOut) const = 0;
@@ -37,5 +37,5 @@ class CustomPathFollow: public CustomJoint
 //	dVector m_pointOnPath;
 };
 
-#endif // !defined(AFX_CUSTOM_PATH_FOLLOW_H_H)
+#endif
 

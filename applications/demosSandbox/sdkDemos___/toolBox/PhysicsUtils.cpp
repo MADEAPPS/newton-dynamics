@@ -1194,7 +1194,7 @@ void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
 		const char* const header = D_MESH_HEADER;
 		fwrite (header, strlen(D_MESH_HEADER), 1, file);
 
-		int size = strlen(name);
+		int size = int (strlen(name));
 		fwrite (&size, sizeof (int), 1, file);
 		fwrite (name, size, 1, file);
 		NewtonMeshSerialize (mesh, DemoEntityManager::SerializeFile, file);

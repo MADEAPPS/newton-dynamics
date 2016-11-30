@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -49,7 +49,6 @@ dgVector dgCollisionConvex::m_unitCircle[] = { dgVector(dgFloat32(0.0f), dgFloat
 
 dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id)
 	:dgCollision(allocator, signature, id) 
-	,m_userData (NULL)
 	,m_vertex (NULL)
 	,m_simplex (NULL)
 	,m_boxMinRadius (dgFloat32 (0.0f))
@@ -64,7 +63,6 @@ dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsi
 
 dgCollisionConvex::dgCollisionConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
 	:dgCollision (world, deserialization, userData, revisionNumber)
-	,m_userData (userData)
 	,m_vertex (NULL)
 	,m_simplex (NULL)
 	,m_boxMinRadius (dgFloat32 (0.0f))
@@ -92,17 +90,6 @@ void dgCollisionConvex::SerializeLow(dgSerialize callback, void* const userData)
 {
 	dgCollision::SerializeLow(callback, userData);
 }
-
-void* dgCollisionConvex::GetUserData () const
-{
-	return m_userData; 
-}
-
-void dgCollisionConvex::SetUserData (void* const userData)
-{
-	m_userData = userData;
-}
-
 
 
 void dgCollisionConvex::SetVolumeAndCG ()
@@ -230,10 +217,6 @@ void dgCollisionConvex::DebugCollision (const dgMatrix& matrix, dgCollision::OnD
 void dgCollisionConvex::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
 {
 	dgVector origin (matrix.TransformVector(m_boxOrigin));
-//	dgVector size (m_boxSize.m_x * dgAbsf(matrix[0][0]) + m_boxSize.m_y * dgAbsf(matrix[1][0]) + m_boxSize.m_z * dgAbsf(matrix[2][0]),  
-//				   m_boxSize.m_x * dgAbsf(matrix[0][1]) + m_boxSize.m_y * dgAbsf(matrix[1][1]) + m_boxSize.m_z * dgAbsf(matrix[2][1]),  
-//				   m_boxSize.m_x * dgAbsf(matrix[0][2]) + m_boxSize.m_y * dgAbsf(matrix[1][2]) + m_boxSize.m_z * dgAbsf(matrix[2][2]),
-//				   dgFloat32 (0.0f));
 	dgVector size (matrix.m_front.Abs().Scale4(m_boxSize.m_x) + matrix.m_up.Abs().Scale4(m_boxSize.m_y) + matrix.m_right.Abs().Scale4(m_boxSize.m_z));
 
 	p0 = (origin - size) & dgVector::m_triplexMask;
@@ -278,40 +261,9 @@ dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& m_a
 		dgAssert (m_alignMatrix[0][0] == dgFloat32(1.0f));
 		dgAssert (m_alignMatrix[1][1] == dgFloat32(1.0f));
 		dgAssert (m_alignMatrix[2][2] == dgFloat32(1.0f));
-		#ifdef _DEBUG
-				// using divergence theorem
-				dgVector inertiaII_;
-				dgVector crossInertia_;
-				dgVector centerOfMass_;
-				dgMatrix matrix_(matrix);
-				matrix_[0] = matrix_[0].Scale3(localScale.m_x);
-				matrix_[1] = matrix_[1].Scale3(localScale.m_y);
-				matrix_[2] = matrix_[2].Scale3(localScale.m_z);
-				dgFloat32 volume_ = CalculateMassProperties (matrix_, inertiaII_, crossInertia_, centerOfMass_);
-				if (volume_ < DG_MAX_MIN_VOLUME) {
-					volume_ = DG_MAX_MIN_VOLUME;
-				}
-
-				dgFloat32 invVolume_ = dgFloat32 (1.0f) / volume_;
-				centerOfMass_ = centerOfMass_.Scale3(invVolume_);
-				inertiaII_ = inertiaII_.Scale3 (invVolume_);
-				crossInertia_ = crossInertia_.Scale3 (invVolume_);
-				dgMatrix inertia_ (dgGetIdentityMatrix());
-				inertia_[0][0] = inertiaII_[0];
-				inertia_[1][1] = inertiaII_[1];
-				inertia_[2][2] = inertiaII_[2];
-				inertia_[0][1] = crossInertia_[2];
-				inertia_[1][0] = crossInertia_[2];
-				inertia_[0][2] = crossInertia_[1];
-				inertia_[2][0] = crossInertia_[1];
-				inertia_[1][2] = crossInertia_[0];
-				inertia_[2][1] = crossInertia_[0];
-				inertia_[3] = centerOfMass_;
-		#endif
 
 		// using general central theorem, is much faster and more accurate;
 		//IImatrix = IIorigin + mass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];
-
 		dgFloat32 mag2 = localScale.m_x * localScale.m_x;
 		dgMatrix inertia (dgGetIdentityMatrix());
 		inertia[0][0] = m_inertia[0] * mag2;
@@ -819,6 +771,8 @@ dgFloat32 dgCollisionConvex::RayCast(const dgVector& localP0, const dgVector& lo
 {
 	dgCollisionInstance instance(*body->GetCollision(), this);
 	dgContactSolver rayCaster(&instance);
+	instance.m_userData0 = NULL;
+	instance.m_userData1 = NULL;
 	return rayCaster.RayCast(localP0, localP1, maxT, contactOut);
 }
 

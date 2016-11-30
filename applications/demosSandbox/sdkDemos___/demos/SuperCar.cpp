@@ -9,17 +9,17 @@
 * freely
 */
 
+
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "NewtonDemos.h"
-#include "PhysicsUtils.h"
-#include "TargaToOpenGl.h"
-#include "HeightFieldPrimitive.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
-#include "DemoEntityManager.h"
+#include "PhysicsUtils.h"
 #include "DebugDisplay.h"
+#include "TargaToOpenGl.h"
+#include "DemoEntityManager.h"
 #include "UserPlaneCollision.h"
+
 
 // some figures form the 2000 SRT Viper data sheet: http://www.vipercentral.com/specifications/
 // the 2000 Vipers’ 8.4-liter engine generates
@@ -544,8 +544,8 @@ class SuperCarEntity: public DemoEntity
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		NewtonDemos* const mainWindow = scene->GetRootWindow();
+		DemoEntityManager* const mainWindow = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		//NewtonDemos* const mainWindow = scene->GetRootWindow();
 
 		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
 		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
@@ -779,7 +779,7 @@ class SuperCarEntity: public DemoEntity
 		dBigVector q; 
 		DemoBezierCurve* const path = (DemoBezierCurve*) pathEntity->GetMesh();
 		dFloat64 u = path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
-		dVector p1 (pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w)));
+		dVector p1 (pathMatrix.TransformVector(dVector (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w))));
 		p1.m_y = 0.0f;
 		dVector dist (p1 - p0);
 		dFloat angle = 0.0f;
@@ -795,7 +795,7 @@ class SuperCarEntity: public DemoEntity
 				u = path->m_curve.FindClosestKnot (q, q, 4);
 			}
 			averageTangent = averageTangent.Scale (1.0f / dSqrt (averageTangent.DotProduct3(averageTangent)));
-			dVector heading (pathMatrix.RotateVector(dVector (averageTangent.m_x, averageTangent.m_y, averageTangent.m_z, averageTangent.m_w)));
+			dVector heading (pathMatrix.RotateVector(dVector (dFloat(averageTangent.m_x), dFloat(averageTangent.m_y), dFloat(averageTangent.m_z), dFloat(averageTangent.m_w))));
 			heading.m_y = 0.0;
 			heading = vehicleMatrix.UnrotateVector(heading);
 			angle = dClamp (dAtan2 (heading.m_z, heading.m_x), -maxAngle, maxAngle);
@@ -808,7 +808,7 @@ class SuperCarEntity: public DemoEntity
 				path->m_curve.FindClosestKnot (q, q, 4);
 			}
 
-			m_debugTargetHeading = pathMatrix.TransformVector(dVector (q.m_x, q.m_y, q.m_z, q.m_w));
+			m_debugTargetHeading = pathMatrix.TransformVector(dVector (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w)));
 			dVector localDir (vehicleMatrix.UntransformVector(m_debugTargetHeading));
 			angle = dClamp (dAtan2 (localDir.m_z, localDir.m_x), -maxAngle, maxAngle);
 		}
@@ -898,17 +898,19 @@ class SuperCarEntity: public DemoEntity
 		glBegin(GL_LINES);
 
 		// draw vehicle weight at the center of mass
-		dFloat lenght = scale * mass * DEMO_GRAVITY;
+		dFloat length = scale * mass * DEMO_GRAVITY;
 		glColor3f(0.0f, 0.0f, 1.0f);
-		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-		glVertex3f (p0.m_x, p0.m_y - lenght, p0.m_z);
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y - length), GLfloat(p0.m_z));
+
 
 		// draw vehicle front dir
 		glColor3f(1.0f, 1.0f, 1.0f);
 		dVector r0 (p0 + matrix[1].Scale (1.0f));
 		dVector r1 (r0 + matrix[0].Scale (2.0f));
-		glVertex3f (r0.m_x, r0.m_y, r0.m_z);
-		glVertex3f (r1.m_x, r1.m_y, r1.m_z);
+		glVertex3f(GLfloat(r0.m_x), GLfloat(r0.m_y), GLfloat(r0.m_z));
+		glVertex3f(GLfloat(r1.m_x), GLfloat(r1.m_y), GLfloat(r1.m_z));
+
 
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
 		dVector veloc(0.0f);
@@ -916,8 +918,9 @@ class SuperCarEntity: public DemoEntity
 		dVector q0 (p0 + matrix[1].Scale (1.0f));
 		dVector q1 (q0 + veloc.Scale (0.25f));
 		glColor3f(1.0f, 1.0f, 0.0f);
-		glVertex3f (q0.m_x, q0.m_y, q0.m_z);
-		glVertex3f (q1.m_x, q1.m_y, q1.m_z);
+		glVertex3f(GLfloat(q0.m_x), GLfloat(q0.m_y), GLfloat(q0.m_z));
+		glVertex3f(GLfloat(q1.m_x), GLfloat(q1.m_y), GLfloat(q1.m_z));
+
 
 //int xxx = 0;
 		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
@@ -936,22 +939,23 @@ class SuperCarEntity: public DemoEntity
 			dVector p1 (p0 + normalLoad.Scale (scale));
 
 			glColor3f (0.0f, 0.0f, 1.0f);
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 
 			// show tire lateral force
 			dVector lateralForce (m_controller->GetTireLateralForce(tire));
 			dVector p2 (p0 - lateralForce.Scale (scale));
 			glColor3f(1.0f, 0.0f, 0.0f);
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f (p2.m_x, p2.m_y, p2.m_z);
+			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			glVertex3f(GLfloat(p2.m_x), GLfloat(p2.m_y), GLfloat(p2.m_z));
 
 			// show tire longitudinal force
 			dVector longitudinalForce (m_controller->GetTireLongitudinalForce(tire));
 			dVector p3 (p0 - longitudinalForce.Scale (scale));
 			glColor3f(0.0f, 1.0f, 0.0f);
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f (p3.m_x, p3.m_y, p3.m_z);
+			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			glVertex3f(GLfloat(p3.m_x), GLfloat(p3.m_y), GLfloat(p3.m_z));
+
 //if (!xxx)
 //dTrace(("%f ", tire.GetAligningTorque()));
 //xxx ++;
@@ -1011,8 +1015,9 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		,m_nexVehicle (true)
 	{
 		// hook a callback for 2d help display
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
+		dAssert (0);
+		//DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		//scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
 
 		// load 2d display assets
 		m_gears = LoadTexture ("gears_font.tga");
@@ -1038,9 +1043,9 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		me->RenderVehicleHud (scene, lineNumber);
 	}
 
-	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat size) const
+	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat sizef) const
 	{
-		size *= 0.5f;
+		GLfloat size = GLfloat(size * 0.5f);
 		dMatrix origin (dGetIdentityMatrix());
 		origin.m_posit = dVector(origin_x, origin_y, 0.0f, 1.0f);
 
@@ -1061,8 +1066,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		dFloat angle = minAngle + (maxAngle - minAngle) * param;
 		dMatrix needleMatrix (dRollMatrix (angle));
 
-		dFloat x = size * 0.7f;
-		dFloat y = size * 0.7f;
+		GLfloat x = size * 0.7f;
+		GLfloat y = size * 0.7f;
 
 		glPushMatrix();
 		glMultMatrix (&needleMatrix[0][0]);
@@ -1086,12 +1091,12 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		glPushMatrix();
 		glMultMatrix (&origin[0][0]);
 
-		dFloat uwith = 0.1f;
-		dFloat u0 = uwith * gear;
-		dFloat u1 = u0 + uwith;
+		GLfloat uwith = 0.1f;
+		GLfloat u0 = uwith * gear;
+		GLfloat u1 = u0 + uwith;
 
-		dFloat x1 = 10.0f;
-		dFloat y1 = 10.0f;
+		GLfloat x1 = 10.0f;
+		GLfloat y1 = 10.0f;
 		glColor4f(1, 1, 0, 1);
 		glBindTexture(GL_TEXTURE_2D, m_gears);
 		glBegin(GL_QUADS);
@@ -1106,6 +1111,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void DrawHelp(DemoEntityManager* const scene, int lineNumber)
 	{
+		dAssert (0);
+/*
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
@@ -1128,11 +1135,14 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		if (engineIgnitionKey) {
 			SetNextPlayer();
 		}
+*/
 	}
 
 
 	void RenderVehicleSchematic (DemoEntityManager* const scene) const
 	{
+		dAssert (0);
+/*
 		if (m_player) {
 			glDisable(GL_LIGHTING);
 			glDisable(GL_TEXTURE_2D);
@@ -1154,6 +1164,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glLineWidth(1.0f);
 			glEnable(GL_TEXTURE_2D);
 		}
+*/
 	}
 
 
@@ -1166,8 +1177,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			dVector p0 (lines[pointCount - 1]);
 			for (int i = 0; i < pointCount; i ++) {
 				dVector p1 (lines[i]);
-				glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-				glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+				glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+				glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 				p0 = p1;
 			}
 			glEnd();
@@ -1180,8 +1191,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			dVector p0 (lines[pointCount - 1]);
 			for (int i = 0; i < pointCount; i ++) {
 				dVector p1 (lines[i]);
-				glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-				glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+				glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+				glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 				p0 = p1;
 			}
 			glEnd();
@@ -1193,8 +1204,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glBegin(GL_LINES);
 			dVector p0 (lines[0]);
 			dVector p1 (lines[1]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 			glEnd();
 		}
 
@@ -1204,8 +1215,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glBegin(GL_LINES);
 			dVector p0(lines[0]);
 			dVector p1(lines[1]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 			glEnd();
 		}
 
@@ -1215,8 +1226,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glBegin(GL_LINES);
 			dVector p0(lines[0]);
 			dVector p1(lines[1]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 			glEnd();
 		}
 
@@ -1226,8 +1237,9 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glBegin(GL_LINES);
 			dVector p0 (lines[0]);
 			dVector p1 (lines[1]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+
 			glEnd();
 		}
 
@@ -1237,8 +1249,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glBegin(GL_LINES);
 			dVector p0 (lines[0]);
 			dVector p1 (lines[1]);
-			glVertex3f(p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f(p1.m_x, p1.m_y, p1.m_z);
+			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 			glEnd();
 		}
 	}
@@ -1315,7 +1327,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
 		// set the help key
-		m_helpKey.UpdatePushButton (scene->GetRootWindow(), 'H');
+		m_helpKey.UpdatePushButton (scene, 'H');
 		
 		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
 			CustomVehicleController* const controller = &ptr->GetInfo();
@@ -1399,10 +1411,10 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		dMatrix matrix (dGetIdentityMatrix());
 
 		dMatrix pathMatrix (m_raceTrackPath->GetMeshMatrix() * m_raceTrackPath->GetCurrentMatrix());
-		matrix.m_front = pathMatrix.RotateVector (dVector (dir.m_x, dir.m_y, dir.m_z, 0.0f));
+		matrix.m_front = pathMatrix.RotateVector (dVector (dFloat(dir.m_x), dFloat(dir.m_y), dFloat(dir.m_z), 0.0f));
 		matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
 		matrix.m_right.m_w = 0.0f;
-		matrix.m_posit = pathMatrix.TransformVector(dVector (origin.m_x, origin.m_y, origin.m_z, 1.0f));
+		matrix.m_posit = pathMatrix.TransformVector(dVector (dFloat(origin.m_x), dFloat(origin.m_y), dFloat(origin.m_z), 1.0f));
 		return matrix;
 	}
 
@@ -1422,7 +1434,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 1.0e-3f, 0, &offsetMatrix[0][0]);
 
 		dFloat64 slineLength = path->m_curve.CalculateLength(0.01f);
-		int segmentCount = slineLength / 5.0f;
+		int segmentCount = int (slineLength / 5.0f);
 
 		dFloat64 step = slineLength / segmentCount;
 

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -23,52 +23,6 @@
 #include "NewtonClass.h"
 
 
-
-
-
-NewtonDeadBodies::NewtonDeadBodies(dgMemoryAllocator* const allocator)
-	:dgTree<dgBody*, void*>(allocator)
-{
-	Insert((dgBody*)NULL, 0);
-}
-
-void NewtonDeadBodies::DestroyBodies(Newton& world)
-{
-	Iterator iter (*this);
-	for (iter.Begin(); iter; ) {
-		dgTreeNode* const node = iter.GetNode();
-		iter ++;
-		dgBody* const body = node->GetInfo();
-		if (body) {
-			Remove (node);
-			world.DestroyBody(body);
-		}
-	}
-}
-
-
-NewtonDeadJoints::NewtonDeadJoints(dgMemoryAllocator* const allocator)
-	:dgTree<dgConstraint*, void*>(allocator)
-{
-	Insert((dgConstraint*)NULL, 0);
-}
-
-
-void NewtonDeadJoints::DestroyJoints(Newton& world)
-{
-	Iterator iter (*this);
-	for (iter.Begin(); iter; ) {
-		dgTreeNode* const node = iter.GetNode();
-		iter ++;
-		dgConstraint* const joint = node->GetInfo();
-		if (joint) {
-			Remove (node);
-			world.DestroyConstraint (joint);
-		}
-	}
-}
-
-
 void* Newton::DefaultAllocMemory (dgInt32 size)
 {
 	return malloc (size_t (size));
@@ -83,9 +37,6 @@ void Newton::DefaultFreeMemory (void* const ptr, dgInt32 size)
 
 Newton::Newton (dgFloat32 scale, dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	:dgWorld(allocator, stackSize) 
-	,NewtonDeadBodies(allocator)
-	,NewtonDeadJoints(allocator)
-//	,m_maxTimeStep(DG_TIMESTEP)
 	,m_destructor(NULL)
 {
 }
@@ -100,53 +51,11 @@ Newton::~Newton ()
 void Newton::UpdatePhysics (dgFloat32 timestep)
 {
 	Update (timestep);
-
-	NewtonDeadBodies& bodyList = *this;
-	NewtonDeadJoints& jointList = *this;
-
-	dgAssert (bodyList.GetCount() == 1);
-	dgAssert (jointList.GetCount() == 1);
-	jointList.DestroyJoints (*this);
-	bodyList.DestroyBodies (*this);
 }
 
 void Newton::UpdatePhysicsAsync (dgFloat32 timestep)
 {
 	UpdateAsync (timestep);
-
-	if (!IsBusy()) {		
-		NewtonDeadBodies& bodyList = *this;
-		NewtonDeadJoints& jointList = *this;
-
-		dgAssert (bodyList.GetCount() == 1);
-		dgAssert (jointList.GetCount() == 1);
-
-		jointList.DestroyJoints (*this);
-		bodyList.DestroyBodies (*this);
-	} 
-}
-
-
-void Newton::DestroyJoint(dgConstraint* const joint)
-{
-	if (IsBusy()) {		
-		// the engine is busy in the previous update, deferred the deletion
-		NewtonDeadJoints& jointList = *this;
-		jointList.Insert (joint, joint);
-	} else {
-		dgWorld::DestroyConstraint (joint);
-	}
-}
-
-void Newton::DestroyBody(dgBody* const body)
-{
-	if (IsBusy()) {		
-		// the engine is busy in the previous update, deferred the deletion
-		NewtonDeadBodies& bodyList = *this;
-		bodyList.Insert (body, body);
-	} else {
-		dgWorld::DestroyBody(body);
-	}
 }
 
 

@@ -24,8 +24,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\coreLib
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\thirdParty\tinyxml\vs2012_static_md\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ampPhysics", "..\..\..\coreLibrary_300\projects\windows\project_vs2012_static_md\ampPhysics.vcxproj", "{4798DA95-FE1B-4160-B752-24C4B1FABA49}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|Win32 = debug|Win32
@@ -129,14 +127,6 @@ Global
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|Win32.Build.0 = release|Win32
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|x64.ActiveCfg = release|x64
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|x64.Build.0 = release|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|Win32.ActiveCfg = Debug|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|Win32.Build.0 = Debug|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|x64.ActiveCfg = debug|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.debug|x64.Build.0 = debug|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|Win32.ActiveCfg = release|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|Win32.Build.0 = release|Win32
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|x64.ActiveCfg = release|x64
-		{4798DA95-FE1B-4160-B752-24C4B1FABA49}.release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

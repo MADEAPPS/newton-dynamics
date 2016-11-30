@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -101,7 +101,8 @@ class CustomArticulatedTransformController: public CustomControllerBase
 
 	CUSTOM_JOINTS_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
 
-	CUSTOM_JOINTS_API void MakeNewtonSkeleton () const;
+	CUSTOM_JOINTS_API void LinkCycleBones(CustomJoint* ) const;
+	CUSTOM_JOINTS_API void MakeNewtonSkeleton ();
 
 	void SetCalculateLocalTransforms (bool val) {m_calculateLocalTransform = val;}
 	bool GetCalculateLocalTransforms () const {return m_calculateLocalTransform;}

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -30,6 +30,7 @@ class dgBody;
 class dgWorld;
 class dgContact;
 class dgCollision;
+class dgDynamicBody;
 class dgCollisionInstance;
 class dgBroadPhaseAggregate;
 
@@ -60,6 +61,7 @@ class dgBroadPhaseNode
 		,m_maxBox(dgFloat32(1.0e15f))
 		,m_parent(parent)
 		,m_surfaceArea(dgFloat32(1.0e20f))
+		,m_nodeIsDirtyLru(0)
 	{
 	}
 
@@ -80,6 +82,16 @@ class dgBroadPhaseNode
 	virtual bool IsAggregate() const
 	{
 		return false;
+	}
+
+	dgUnsigned32 GetDirtyLru() const
+	{
+		return m_nodeIsDirtyLru;
+	}
+
+	void SetAsDirty(dgInt32 lru)
+	{
+		m_nodeIsDirtyLru = lru;
 	}
 
 	void SetAABB(const dgVector& minBox, const dgVector& maxBox)
@@ -120,6 +132,7 @@ class dgBroadPhaseNode
 	dgVector m_maxBox;
 	dgBroadPhaseNode* m_parent;
 	dgFloat32 m_surfaceArea;
+	dgUnsigned32 m_nodeIsDirtyLru;
 
 	static dgVector m_broadPhaseScale;
 	static dgVector m_broadInvPhaseScale;
@@ -272,7 +285,6 @@ class dgBroadPhase
 		dgContactPoint* m_contactBuffer;
 		dgFloat32 m_timestep;
 		dgInt32 m_contactCount : 16;
-		dgInt32 m_isDeformable : 1;
 		dgInt32 m_cacheIsValid : 1;
 	};
 
@@ -312,14 +324,15 @@ class dgBroadPhase
 	virtual dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
 
 	void ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints);
-	void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
+	void FindCollidingPairsForward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
+	void FindCollidingPairsForwardAndBackward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
 
 	void UpdateBody(dgBody* const body, dgInt32 threadIndex);
 	void AddInternallyGeneratedBody(dgBody* const body)
 	{
 		m_generatedBodies.Append(body);
 	}
-	
+
 	void UpdateContacts(dgFloat32 timestep);
 	void CollisionChange (dgBody* const body, dgCollisionInstance* const collisionSrc);
 
@@ -342,7 +355,6 @@ class dgBroadPhase
 	bool ValidateContactCache(dgContact* const contact, dgFloat32 timestep) const;
     void AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex);
 	void AddPair (dgBody* const body0, dgBody* const body1, dgFloat32 timestep, dgInt32 threadID);	
-	bool TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const;
 
 	void ForEachBodyInAABB (const dgBroadPhaseNode** stackPool, dgInt32 stack, const dgVector& minBox, const dgVector& maxBox, OnBodiesInAABB callback, void* const userData) const;
 	void RayCast (const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& l0, const dgVector& l1, dgFastRayTest& ray, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
@@ -361,18 +373,28 @@ class dgBroadPhase
 	dgBroadPhaseNode* BuildTopDown(dgBroadPhaseNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 	dgBroadPhaseNode* BuildTopDownBig(dgBroadPhaseNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode);
 
-	void UpdateContactsBroadPhaseEnd ();
 	void KinematicBodyActivation (dgContact* const contatJoint) const;
-	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threadID);
+	
 	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
+	void UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timeStep, dgInt32 threadID);
+	void UpdateRigidBodyContacts (dgBroadphaseSyncDescriptor* const descriptor, dgActiveContacts::dgListNode* const node, dgFloat32 timeStep, dgInt32 threadID);
+	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threaCount, dgInt32 threadID);
 		
 	static void SleepingStateKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void UpdateAggregateEntropyKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
-	
-	static void AddGeneratedBodiesContactsKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void AddGeneratedBodiesContactsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void UpdateRigidBodyContactKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
+	static void UpdateSoftBodyContactKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static dgInt32 CompareNodes(const dgBroadPhaseNode* const nodeA, const dgBroadPhaseNode* const nodeB, void* const notUsed);
+
+	class dgPendingCollisionSofBodies
+	{
+		public:
+		dgBody* m_body0;
+		dgBody* m_body1;
+	};
 
 	dgWorld* m_world;
 	dgBroadPhaseNode* m_rootNode;
@@ -382,6 +404,10 @@ class dgBroadPhase
 	dgUnsigned32 m_lru;
 	dgThread::dgCriticalSection m_contacJointLock;
 	dgThread::dgCriticalSection m_criticalSectionLock;
+	dgArray<dgPendingCollisionSofBodies> m_pendingSoftBodyCollisions;
+	dgInt32 m_pendingSoftBodyPairsCount;
+	dgInt32 m_dirtyNodesCount;
+	bool m_scanTwoWays;
 	bool m_recursiveChunks;
 
 	DG_INLINE dgVector ReduceLine(dgVector* const simplex, dgInt32& indexOut) const;

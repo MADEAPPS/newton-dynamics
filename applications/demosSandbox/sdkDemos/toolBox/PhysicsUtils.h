@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -81,11 +81,8 @@ NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dF
 NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId);
 void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat findFloorElevation = 1000.0f);
 
+NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, const dVector& size);
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const levelName, bool optimized);
-
-
-void SaveNewtonMesh (NewtonMesh* const mesh, const char* const fileName);
-NewtonMesh* LoadNewtonMesh (NewtonWorld* const world, const char* const fileName);
 
 void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalScale, dFloat timestep);
 

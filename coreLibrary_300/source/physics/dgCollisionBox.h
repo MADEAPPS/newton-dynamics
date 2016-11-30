@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -47,7 +47,6 @@ class dgCollisionBox: public dgCollisionConvex
 	virtual dgInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
 	virtual void MassProperties ();
-	virtual dgFloat32 GetSkinThickness () const; 
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;

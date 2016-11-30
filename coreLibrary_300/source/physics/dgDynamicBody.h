@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -30,8 +30,8 @@
 #define DG_FREEZE_MAG		dgFloat32(0.1f)
 #define DG_FREEZE_MAG2		dgFloat32(DG_FREEZE_MAG * DG_FREEZE_MAG)
 
-#define DG_ErrTolerance		(1.0e-2f)
-#define DG_ErrTolerance2	(DG_ErrTolerance * DG_ErrTolerance)
+#define DG_ERR_TOLERANCE	dgFloat32(1.0e-2f)
+#define DG_ERR_TOLERANCE2	(DG_ERR_TOLERANCE * DG_ERR_TOLERANCE)
 
 class dgSkeletonContainer;
 
@@ -75,6 +75,8 @@ class dgDynamicBody : public dgBody
 	virtual dgSkeletonContainer* GetSkeleton() const;
 	void SetSkeleton(dgSkeletonContainer* const skeleton);
 
+	void IntegrateOpenLoopExternalForce(dgFloat32 timeStep);
+
 	private:
 	virtual void AddDampingAcceleration(dgFloat32 timestep);
 
@@ -89,10 +91,11 @@ class dgDynamicBody : public dgBody
 
 	dgVector m_accel;
 	dgVector m_alpha;
-	dgVector m_prevExternalForce;
-	dgVector m_prevExternalTorque;
+	dgVector m_externalForce;
+	dgVector m_externalTorque;
+	dgVector m_savedExternalForce;
+	dgVector m_savedExternalTorque;
 	dgVector m_dampCoef;
-	dgVector m_aparentMass;
 	dgInt32 m_sleepingCounter;
 	dgUnsigned32 m_isInDestructionArrayLRU;
 	dgSkeletonContainer* m_skeleton;
@@ -100,24 +103,25 @@ class dgDynamicBody : public dgBody
 	bool m_linearDampOn;
 	bool m_angularDampOn;
 	static dgVector m_equilibriumError2;
+	static dgVector m_eulerTaylorCorrection;
 
 	friend class dgWorld;
 	friend class dgBroadPhase;
-	friend class dgAmpInstance;
 	friend class dgBodyMasterList;
 	friend class dgSkeletonContainer;
 	friend class dgWorldDynamicUpdate;
+	friend class dgCollisionDeformableMesh;
 } DG_GCC_VECTOR_ALIGMENT;
 
 
 DG_INLINE const dgVector& dgDynamicBody::GetForce() const
 {
-	return m_accel; 
+	return m_externalForce; 
 }
 
 DG_INLINE const dgVector& dgDynamicBody::GetTorque() const
 {
-	return m_alpha;
+	return m_externalTorque;
 }
 
 
@@ -159,28 +163,28 @@ DG_INLINE void dgDynamicBody::SetAngularDamping (const dgVector& angularDamp)
 
 DG_INLINE void dgDynamicBody::AddForce (const dgVector& force)
 {
-	SetForce (m_accel + force);
+	SetForce (m_externalForce + force);
 }
 
 DG_INLINE void dgDynamicBody::AddTorque (const dgVector& torque)
 {
-	SetTorque (torque + m_alpha);
+	SetTorque (torque + m_externalTorque);
 }
 
 
 DG_INLINE void dgDynamicBody::SetForce (const dgVector& force)
 {
-	m_accel = force;
+	m_externalForce = force;
 }
 
 DG_INLINE void dgDynamicBody::SetTorque (const dgVector& torque)
 {
-	m_alpha = torque;
+	m_externalTorque = torque;
 }
 
 DG_INLINE void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
 {
-	const dgFloat32 tau = dgFloat32 (1.0f) / (dgFloat32(120.0f) * timestep);
+	const dgFloat32 tau = dgFloat32 (1.0f) / (dgFloat32(60.0f) * timestep);
 	if (m_linearDampOn) {
 		dgFloat32 velocDamp = dgPow(dgFloat32(1.0f) - m_dampCoef.m_w, tau);
 		m_veloc = m_veloc.Scale4(velocDamp);
@@ -197,12 +201,12 @@ DG_INLINE void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
 
 DG_INLINE dgVector dgDynamicBody::PredictLinearVelocity(dgFloat32 timestep) const
 {
-	return 	m_veloc + m_accel.Scale3 (timestep * m_invMass.m_w);
+	return 	m_veloc + m_externalForce.Scale3 (timestep * m_invMass.m_w);
 }
 
 DG_INLINE dgVector dgDynamicBody::PredictAngularVelocity(dgFloat32 timestep) const
 {
-	return m_omega + m_invWorldInertiaMatrix.RotateVector(m_alpha).Scale3 (timestep);
+	return m_omega + m_invWorldInertiaMatrix.RotateVector(m_externalTorque).Scale3 (timestep);
 }
 
 
@@ -226,6 +230,7 @@ DG_INLINE void dgDynamicBody::SetSkeleton(dgSkeletonContainer* const skeleton)
 	dgAssert (!(m_skeleton && skeleton));
 	m_skeleton = skeleton;
 }
+
 
 
 #endif 

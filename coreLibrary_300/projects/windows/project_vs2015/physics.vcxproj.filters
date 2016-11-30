@@ -67,9 +67,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCorkscrewConstraint.cpp">
       <Filter>constraints</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgDeformableContact.cpp">
-      <Filter>constraints</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgHingeConstraint.cpp">
       <Filter>constraints</Filter>
     </ClCompile>
@@ -121,9 +118,6 @@
     <ClCompile Include="..\..\..\source\physics\dgBody.cpp">
       <Filter>bodies</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgDeformableBody.cpp">
-      <Filter>bodies</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgDynamicBody.cpp">
       <Filter>bodies</Filter>
     </ClCompile>
@@ -138,9 +132,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.cpp">
       <Filter>collision</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp">
-      <Filter>systems</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundFractured.cpp">
       <Filter>collision</Filter>
@@ -237,9 +228,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCorkscrewConstraint.h">
       <Filter>constraints</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgDeformableContact.h">
-      <Filter>constraints</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgHingeConstraint.h">
       <Filter>constraints</Filter>
     </ClInclude>
@@ -276,9 +264,6 @@
     <ClInclude Include="..\..\..\source\physics\dgBody.h">
       <Filter>bodies</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgDeformableBody.h">
-      <Filter>bodies</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgDynamicBody.h">
       <Filter>bodies</Filter>
     </ClInclude>
@@ -293,9 +278,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.h">
       <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h">
-      <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundFractured.h">
       <Filter>collision</Filter>

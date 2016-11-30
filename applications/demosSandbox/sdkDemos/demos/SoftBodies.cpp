@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -19,34 +19,67 @@
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
 
-
-
 #if NEWTON_MAJOR_VERSION == 3
 class SimpleSoftBodyEntity: public DemoEntity
 {
 	public:
-	SimpleSoftBodyEntity (DemoEntityManager* const scene, NewtonCollision* const softCollision, const dVector& location)
+	SimpleSoftBodyEntity (DemoEntityManager* const scene, const char* const meshName, const dVector& location)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 	{
-		// add an new entity to the world
-		scene->Append (this);
-
-		// create the render mesh
-		DemoMesh* const mesh = new DemoMesh ("softMesh");
-		SetMesh(mesh, dGetIdentityMatrix());
-		mesh->Release();
-
 		NewtonWorld* const world = scene->GetNewton();
-		// calculate the moment of inertia and the relative center of mass of the solid
+//		LoadNGD_mesh(meshName, world);
+		{
+			NewtonCollision* const box = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
+			NewtonMesh* const newtonMesh = NewtonMeshCreateFromCollision (box);
+			NewtonMeshTriangulate(newtonMesh);
+			DemoMesh* mesh1 = new DemoMesh(newtonMesh);
+			SetMesh (mesh1, dGetIdentityMatrix());
+			mesh1->Release();
+			NewtonMeshDestroy (newtonMesh);
+			NewtonDestroyCollision(box);
+		}
 
-		dVector origin(0.0f);
-		dVector inertia(0.0f);
-		NewtonConvexCollisionCalculateInertialMatrix (softCollision, &inertia[0], &origin[0]);	
+		// add an new entity to the world
+		scene->Append(this);
+
+		DemoMesh* const mesh = (DemoMesh*) GetMesh();
+
+		int faceCount = 0;
+		int subMeshIndex = 0;
+		int faceList[2024 * 3];
+		int materialIndex[2024];
+		int faceIndexCount[1024];
+
+		NewtonMesh* const softBodyMesh = NewtonMeshCreate(world);
+		for (dList<DemoSubMesh>::dListNode* segmentNode = mesh->GetFirst(); segmentNode; segmentNode = segmentNode->GetNext()) {
+			const DemoSubMesh& subMesh = segmentNode->GetInfo();
+			for (int i = 0; i < subMesh.m_indexCount / 3; i++) {
+				faceIndexCount[i + faceCount] = 3;
+				materialIndex[i + faceCount] = subMeshIndex;
+				faceList[faceCount * 3 + i * 3 + 0] = subMesh.m_indexes[i * 3 + 0];
+				faceList[faceCount * 3 + i * 3 + 1] = subMesh.m_indexes[i * 3 + 1];
+				faceList[faceCount * 3 + i * 3 + 2] = subMesh.m_indexes[i * 3 + 2];
+			}
+			subMeshIndex++;
+			faceCount += subMesh.m_indexCount / 3;
+		}
+		NewtonMeshBuildFromPointListIndexList(softBodyMesh, faceCount, faceIndexCount, materialIndex,
+											  mesh->m_vertex, 3 * sizeof(dFloat), faceList,
+											  mesh->m_normal, 3 * sizeof(dFloat), faceList,
+											  mesh->m_uv, 2 * sizeof(dFloat), faceList,
+											  mesh->m_uv, 2 * sizeof(dFloat), faceList);
+
+		NewtonCollision* const deformableCollision = NewtonCreateDeformableMesh(world, softBodyMesh, 0);
+
+//		dgVector xxx[4];
+//		NewtonDeformableMeshConstraintParticle (deformableCollision, 0, &xxx[0].m_x, NULL);
+//		NewtonDeformableMeshConstraintParticle (deformableCollision, 0, &xxx[1].m_x, NULL);
+//		NewtonDeformableMeshConstraintParticle (deformableCollision, 0, &xxx[2].m_x, NULL);
+//		NewtonDeformableMeshConstraintParticle (deformableCollision, 0, &xxx[3].m_x, NULL);
+	
+
 
 		dFloat mass = 8.0f;
-		dFloat Ixx = mass * inertia[0];
-		dFloat Iyy = mass * inertia[1];
-		dFloat Izz = mass * inertia[2];
 
 		//create the rigid body
 		dMatrix matrix (dGetIdentityMatrix());
@@ -57,18 +90,10 @@ class SimpleSoftBodyEntity: public DemoEntity
 		//matrix.m_posit.m_y = FindFloor (world, matrix.m_posit.m_x, matrix.m_posit.m_z) + 4.0f;
 		SetMatrix(*scene, dQuaternion(), matrix.m_posit);
 		SetMatrix(*scene, dQuaternion(), matrix.m_posit);
-
-		NewtonBody* const deformableBody = NewtonCreateDeformableBody (world, softCollision, &matrix[0][0]);
-
-		// very important to remember that deformable collisions are instance, 
-		// therefore the one in the body is a copy of the one use to create the body 
-		m_softCollision = NewtonBodyGetCollision(deformableBody);
-
-		// set the correct center of gravity for this body
-		//	NewtonBodySetCentreOfMass (deformableBody, &origin[0]);
+		NewtonBody* const deformableBody = NewtonCreateDynamicBody (world, deformableCollision, &matrix[0][0]);
 
 		// set the mass matrix
-		NewtonBodySetMassMatrix (deformableBody, mass, Ixx, Iyy, Izz);
+		NewtonBodySetMassProperties(deformableBody, mass, deformableCollision);
 
 		// save the pointer to the graphic object with the body.
 		NewtonBodySetUserData (deformableBody, this);
@@ -86,11 +111,15 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonBodySetForceAndTorqueCallback (deformableBody, PhysicsApplyGravityForce);
 
 		// now create a visual representation for this entity
-		CreateVisualMesh ();
+//		CreateVisualMesh ();
+
+		NewtonDestroyCollision(deformableCollision);
+		NewtonMeshDestroy(softBodyMesh);
 	}
 
 	void CreateVisualMesh ()
 	{
+/*
 		DemoMesh* const mesh = (DemoMesh*)GetMesh();
 		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
@@ -123,27 +152,15 @@ class SimpleSoftBodyEntity: public DemoEntity
 				segment->m_indexes[i] = indexList[i];
 			}
 		}
+*/	
 	}
 
 	static NewtonCollision* CreateSoftBodyCollisionShape (DemoEntityManager* const scene, const char* const meshName, const char* const textureName)
 	{
-		NewtonWorld* const world = scene->GetNewton();
-#if 1
-		// load the mesh
+//		NewtonWorld* const world = scene->GetNewton();
+		return NULL;
+/*
 		NewtonMesh* const mesh = LoadNewtonMesh (world, meshName);
-		// replace the materials
-		int material = LoadTexture(textureName);
-		for (void* face = NewtonMeshGetFirstFace (mesh); face; face = NewtonMeshGetNextFace(mesh, face)) {
-			NewtonMeshSetFaceMaterial (mesh, face, material);
-		}
-#else
-		dVector size (2.0f, 2.0f, 2.0f, 0.0f);
-		NewtonCollision* const box = CreateConvexCollision (world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-		NewtonMesh* const mesh = NewtonMeshCreateFromCollision(box);
-		int material = LoadTexture("smilli.tga");
-		NewtonMeshApplyBoxMapping(mesh, material, material, material);
-		NewtonDestroyCollision(box);
-#endif
 
 		// now create a soft collision mesh
 		NewtonCollision* const softCollisionMesh = NewtonCreateDeformableMesh (world, mesh, 0);
@@ -159,12 +176,14 @@ class SimpleSoftBodyEntity: public DemoEntity
 		// destroy the auxiliary objects
 		NewtonMeshDestroy(mesh);
 		return softCollisionMesh;
+*/	
 	}
-
 
 	static NewtonCollision* CreateClothPatchShape (DemoEntityManager* const scene)
 	{
-
+		dAssert(0);
+		return NULL;
+/*
 		NewtonWorld* const world = scene->GetNewton();
 
 		// create two auxiliary objects to help with the graphics part
@@ -338,11 +357,12 @@ class SimpleSoftBodyEntity: public DemoEntity
 		// destroy the auxiliary objects
 		NewtonMeshDestroy(mesh);
 		return softCollisionMesh;
+*/	
 	}
-
-
+	
 	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
 	{
+/*
 		DemoMesh* const mesh = (DemoMesh*)GetMesh();
 		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 
@@ -351,7 +371,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 		// update the vertex array
 		NewtonDeformableMeshGetVertexStreams (m_softCollision, 3 * sizeof (dFloat), (dFloat*) mesh->m_vertex, 3 * sizeof (dFloat), (dFloat*) mesh->m_normal, 2 * sizeof (dFloat), (dFloat*) mesh->m_uv);
-
+*/
 		// proceed with normal rendering
 		DemoEntity::Render(timeStep, scene);
 	}
@@ -364,6 +384,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 void ClothPatch(DemoEntityManager* const scene)
 {
+	dAssert(0);
+/*
     // load the skybox
     scene->CreateSkyBox();
 
@@ -384,29 +406,23 @@ void ClothPatch(DemoEntityManager* const scene)
 
     //	scene->SaveScene ("test1.ngd");
     //	dScene CreateAlchemediaFromPhysic(); 
+*/
 }
 
 
 
 void SoftBodies(DemoEntityManager* const scene)
 {
-	// load the skybox
+	// load the sky box
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "playground.ngd", 1);
 
-//	dVector location (5.0f, 2.0f, 0.0f, 0.0f) ;
-	dVector location (0.0f, 2.0f, 0.0f, 0.0f);
+	dVector location (0.0f, 4.0f, 0.0f, 0.0f);
 
-	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softBox.nme", "smilli.tga");
-//	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "marble.tga");
-//	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softTPot.nme", "smilli.tga");
-//	NewtonCollision* const softBody = SimpleSoftBodyEntity::CreateSoftBodyCollisionShape (scene, "softVRaptor.nme", "smilli.tga");
-	
-	new SimpleSoftBodyEntity (scene, softBody, location);
-	NewtonDestroyCollision (softBody);
+	new SimpleSoftBodyEntity(scene, "softbox1.ngd", location);
 
 	dQuaternion rot;
 	dVector origin (location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);

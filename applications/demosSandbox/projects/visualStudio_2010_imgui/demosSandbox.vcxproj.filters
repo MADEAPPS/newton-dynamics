@@ -39,6 +39,108 @@
       <Filter>utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos___\DemoEntityListener.cpp" />
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicRestitution.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\PrecessingTops.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\ClosestDistance.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\PrimitiveCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\KinematicBodies.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\ConvexCast.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\UserPlaneCollision.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicStacking.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\MeshCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\HeighFieldCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\toolBox\HeightFieldPrimitive.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\UserStaticCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\CompoundCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\ArchimedesBuoyancy.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\ScaledCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\ContinueCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\ContinueCollision1.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\PuckSlide.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\ConvexApproximation.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\SceneCollision.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\SimpleBooleans.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\SimpleConvexFracturing.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\StructuredConvexFracturing.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\MultiRayCasting.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\StandardJoints.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\ArticulatedJoints.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicRagDoll.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\DynamicRagDoll.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\SoftBodies.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicCar.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\SuperCar.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\HeavyVehicles.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\BasicPlayerController.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos___\demos\AdvancedPlayerController.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos___\DemoEntityManager.h" />
@@ -72,6 +174,12 @@
       <Filter>utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos___\DemoEntityListener.h" />
+    <ClInclude Include="..\..\sdkDemos___\toolBox\UserPlaneCollision.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos___\toolBox\HeightFieldPrimitive.h">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="demos">

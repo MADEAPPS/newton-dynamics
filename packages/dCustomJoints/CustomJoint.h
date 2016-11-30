@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -66,7 +66,7 @@ typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const 
 	friend class SerializeMetaData_##className;																				\
 	CUSTOM_JOINTS_API static SerializeMetaData_##className m_metaData_##className;
 
-#define IMPLEMENT_CUSTON_JOINT(className)																					\
+#define IMPLEMENT_CUSTOM_JOINT(className)																					\
 	className::SerializeMetaData_##className className::m_metaData_##className(#className);									\
 
 // this is the base class to implement custom joints, it is not a joint it just provide functionality
@@ -174,6 +174,7 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API NewtonJoint* GetJoint () const;
 	CUSTOM_JOINTS_API const dMatrix& GetMatrix0 () const;
 	CUSTOM_JOINTS_API const dMatrix& GetMatrix1 () const;
+	CUSTOM_JOINTS_API void CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) const;
 
 	// the application needs to implement this function for serialization
 	CUSTOM_JOINTS_API virtual bool IsType (dCRCTYPE type) const;
@@ -209,7 +210,7 @@ class CustomJoint: public CustomAlloc
 	// the application needs to implement this function for each derived joint. See examples for more detail
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
-	CUSTOM_JOINTS_API void CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) const;
+
 	CUSTOM_JOINTS_API void CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 
 	CUSTOM_JOINTS_API static SerializeMetaDataDictionary& GetDictionary();

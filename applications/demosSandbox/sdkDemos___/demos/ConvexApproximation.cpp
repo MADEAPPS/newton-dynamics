@@ -12,12 +12,12 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "TargaToOpenGl.h"
 #include "DemoMesh.h"
-#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "HeightFieldPrimitive.h"
+#include "TargaToOpenGl.h"
+#include "DemoEntityManager.h"
+
 
 static bool ReportProgress (dFloat normalizedProgressPercent, void* const userData)
 {

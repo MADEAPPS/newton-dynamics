@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -119,8 +119,9 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 			m_childShape = new (m_world->GetAllocator()) dgCollisionCompound (*compound, this);
 		}
 	} else if (m_childShape->IsType (dgCollision::dgCollisionDeformableClothPatch_RTTI)) {
-		dgCollisionDeformableClothPatch* const deformable = (dgCollisionDeformableClothPatch*) m_childShape;
-		m_childShape = new (m_world->GetAllocator()) dgCollisionDeformableClothPatch (*deformable);
+		dgAssert(0);
+//		dgCollisionDeformableClothPatch* const deformable = (dgCollisionDeformableClothPatch*) m_childShape;
+//		m_childShape = new (m_world->GetAllocator()) dgCollisionDeformableClothPatch (*deformable);
 	} else if (m_childShape->IsType (dgCollision::dgCollisionDeformableSolidMesh_RTTI)) {
 		dgCollisionDeformableSolidMesh* const deformable = (dgCollisionDeformableSolidMesh*) m_childShape;
 		m_childShape = new (m_world->GetAllocator()) dgCollisionDeformableSolidMesh (*deformable);
@@ -511,10 +512,6 @@ dgInt32 dgCollisionInstance::CalculatePlaneIntersection (const dgVector& normal,
 
 void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
 {
-//	m_childShape->CalcAABB (matrix, p0, p1);
-//	p0 = (matrix.m_posit + (p0 - matrix.m_posit).CompProduct4(m_maxScale) - m_padding) & dgVector::m_triplexMask;
-//	p1 = (matrix.m_posit + (p1 - matrix.m_posit).CompProduct4(m_maxScale) + m_padding) & dgVector::m_triplexMask;
-
 	switch (m_scaleType)
 	{
 		case m_unit:

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -38,7 +38,7 @@ dgCollisionConvexPolygon::dgCollisionConvexPolygon (dgMemoryAllocator* const all
 	,m_paddedCount(0)
 	,m_stride(0)
 	,m_faceNormalIndex(0)
-	,m_closestFeatureType(-1)
+//	,m_closestFeatureType(-1)
 	,m_faceClipSize(0) 
 	,m_vertex(NULL)
 	,m_vertexIndex(NULL)
@@ -107,8 +107,9 @@ dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* 
 		}
 	}
 
-	dgAssert (vertexIndex);
-	*vertexIndex = index;
+	dgAssert (vertexIndex == NULL);
+//	dgAssert (vertexIndex);
+//	*vertexIndex = index;
 	return m_localPoly[index];
 }
 
@@ -285,57 +286,6 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 }
 
 
-void dgCollisionConvexPolygon::SetFeatureHit (dgInt32 featureCount, const dgInt32* const index)
-{
-	dgInt32 copy[3];
-	copy[0] = index[0];
-	copy[1] = index[1];
-	copy[2] = index[2];
-	switch (featureCount)
-	{
-		case 3:
-		{
-			if ((copy[0] != copy[1]) && (copy[0] != copy[2]) && (copy[1] != copy[2])) {
-				m_closestFeatureType = 3;
-				m_closestFeatureStartIndex = 0;
-				break;
-			} else {
-				if (copy[0] == copy[1]) {
-					copy[0] = copy[2];
-				}
-			}
-			featureCount = 2;
-		}
-
-		case 2:
-		{
-			if (copy[0] != copy[1]) {
-				dgInt32 n1 = (copy[0] + 1) % m_count;
-				if (n1 == copy[1]) {
-					m_closestFeatureType = 2;
-					m_closestFeatureStartIndex = copy[0];
-				} else {
-					n1 = (copy[1] + 1) % m_count;
-					if (n1 == copy[0]) {
-						m_closestFeatureType = 2;
-						m_closestFeatureStartIndex = copy[1];
-					} else {
-						m_closestFeatureType = 3;
-					}
-				}
-
-				break;
-			} 
-		}
-
-		case 1:
-		{
-			m_closestFeatureType = 1;
-			m_closestFeatureStartIndex = copy[0];
-			break;
-		}
-	}
-}
 
 dgInt32 dgCollisionConvexPolygon::CalculatePlaneIntersection (const dgVector& normalIn, const dgVector& origin, dgVector* const contactsOut) const
 {
@@ -663,7 +613,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 				proxy.m_closestPointBody1 = p0 + m_normal.Scale4(penetration);
 
 				if (!proxy.m_intersectionTestOnly) {
-					pointInHull -= normalInHull.Scale4 (DG_ROBUST_PLANE_CLIP);
+					dgAssert (0);
+					//pointInHull -= normalInHull.Scale4 (DG_ROBUST_PLANE_CLIP);
+					pointInHull -= normalInHull.Scale4 (-DG_PENETRATION_TOL);
 					count = proxy.m_instance0->CalculatePlaneIntersection(normalInHull, pointInHull, contactPoints);
 
 					dgVector step(relativeVelocity.Scale4(timetoImpact));
@@ -764,10 +716,10 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 
 	const dgInt32 hullId = hull->GetUserDataID();
 	if (inside & !proxy.m_intersectionTestOnly) {
-		penetration = dgMax (dgFloat32 (0.0f), penetration);
+		penetration = dgMax(dgFloat32(0.0f), penetration);
 		dgAssert(penetration >= dgFloat32(0.0f));
 		dgVector contactPoints[64];
-		dgVector point(pointInHull + normalInHull.Scale4(penetration + DG_ROBUST_PLANE_CLIP));
+		dgVector point(pointInHull + normalInHull.Scale4(penetration - DG_PENETRATION_TOL));
 
 		count = hull->CalculatePlaneIntersection(normalInHull.Scale4(dgFloat32(-1.0f)), point, contactPoints);
 		dgVector step(normalInHull.Scale4((proxy.m_skinThickness - penetration) * dgFloat32(0.5f)));
@@ -782,46 +734,41 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 			contactsOut[i].m_penetration = penetration;
 		}
 	} else {
-		m_vertexCount = dgUnsigned16 (m_count);
+		m_vertexCount = dgUnsigned16(m_count);
 		count = world->CalculateConvexToConvexContacts(proxy);
 		dgAssert(proxy.m_intersectionTestOnly || (count >= 0));
 
 		if (count >= 1) {
 			dgContactPoint* const contactsOut = proxy.m_contacts;
-			if (m_closestFeatureType == 3) {
+			dgVector normal(contactsOut[0].m_normal);
+			if (normal.DotProduct4(m_normal).GetScalar() < dgFloat32(0.9995f)) {
+				dgInt32 i0 = m_vertexCount - 1;
+				for (dgInt32 i1 = 0; i1 < m_vertexCount; i1++) {
+					dgVector sideDir(m_localPoly[i1] - m_localPoly[i0]);
+					dgAssert(sideDir.m_w == dgFloat32(0.0f));
+					const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
+					dgVector adjacentNormal(CalculateGlobalNormal(parentMesh, dgVector(&m_vertex[adjacentNormalIndex * m_stride])));
+					dgFloat32 val0 = sideDir.DotProduct4(normal.CrossProduct3(m_normal)).GetScalar();
+					dgFloat32 val1 = sideDir.DotProduct4(normal.CrossProduct3(adjacentNormal)).GetScalar();
+					if (((val0 * val1) > dgFloat32(0.0f)) && (val0 < dgFloat32(0.0f)) && (val1 < dgFloat32(0.0f))) {
+						dgVector lateral(sideDir.CompProduct4(sideDir.DotProduct4(adjacentNormal).GetScalar() / (sideDir.DotProduct4(sideDir).GetScalar())));
+						dgVector diff(adjacentNormal - lateral);
+						dgAssert(diff.m_w == dgFloat32(0.0f));
+						dgVector longitudinal(adjacentNormal.Scale4(dgSqrt(diff.DotProduct4(diff).GetScalar())));
+						normal = longitudinal + lateral;
+					}
+					i0 = i1;
+				}
+				normal = polygonInstance->m_globalMatrix.RotateVector(normal);
 				for (dgInt32 i = 0; i < count; i++) {
-					//contactsOut[i].m_userId = m_faceId;
+					contactsOut[i].m_normal = normal;
 					contactsOut[i].m_shapeId0 = hullId;
 					contactsOut[i].m_shapeId1 = m_faceId;
 				}
 			} else {
-				dgVector normal (contactsOut[0].m_normal);
-
-				if (normal.DotProduct4(m_normal).GetScalar() < dgFloat32(0.9995f)) {
-					dgInt32 index = m_adjacentFaceEdgeNormalIndex[m_closestFeatureStartIndex];
-					dgVector adjacentNormal (CalculateGlobalNormal (parentMesh, dgVector(&m_vertex[index * m_stride])));
-					if ((m_normal.DotProduct4(adjacentNormal).GetScalar() > dgFloat32(0.9995f))) {
-						normal = adjacentNormal;
-					} else {
-						dgVector dir0(adjacentNormal.CrossProduct3(m_normal));
-						dgVector dir1(adjacentNormal.CrossProduct3(normal));
-						dgFloat32 projection = dir0.DotProduct4(dir1).GetScalar();
-						if (projection <= dgFloat32(0.0f)) {
-							normal = adjacentNormal;
-						}
-					}
-					normal = polygonInstance->m_globalMatrix.RotateVector(normal);
-
-					for (dgInt32 i = 0; i < count; i++) {
-						contactsOut[i].m_normal = normal;
-						contactsOut[i].m_shapeId0 = hullId;
-						contactsOut[i].m_shapeId1 = m_faceId;
-					}
-				} else {
-					for (dgInt32 i = 0; i < count; i++) {
-						contactsOut[i].m_shapeId0 = hullId;
-						contactsOut[i].m_shapeId1 = m_faceId;
-					}
+				for (dgInt32 i = 0; i < count; i++) {
+					contactsOut[i].m_shapeId0 = hullId;
+					contactsOut[i].m_shapeId1 = m_faceId;
 				}
 			}
 		}

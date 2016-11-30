@@ -17,6 +17,7 @@ struct ImDrawData;
 
 class DemoMesh;
 class DemoEntity;
+class DemoCamera;
 class DemoMeshInterface;
 class DemoCameraListener;
 
@@ -26,6 +27,25 @@ class DemoEntityManager: public dList <DemoEntity*>
 	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
 	typedef void (*RenderHoodCallback) (DemoEntityManager* const manager, void* const context, int lineNumber);
 
+
+	class ButtonKey
+	{
+		public:
+		ButtonKey (bool initialState);
+
+		bool UpdateTriggerButton (const DemoEntityManager* const mainWin, int keyCode);
+		bool UpdatePushButton (const DemoEntityManager* const mainWin, int keyCode);
+		bool GetPushButtonState() const { return m_state;}
+
+		bool UpdateTriggerJoystick (const DemoEntityManager* const mainWin, int buttonMask);
+		//bool IsMouseKeyDown (const DemoEntityManager* const mainWin, int key);
+		//bool IsKeyDown (const DemoEntityManager* const mainWin, int key);
+
+		private:
+		bool m_state;
+		bool m_memory0;
+		bool m_memory1;
+	};
 
 	class EntityDictionary: public dTree<DemoEntity*, dScene::dTreeNode*>
 	{
@@ -83,13 +103,16 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void ResetTimer();
 	void LoadScene (const char* const name);
 	void RemoveEntity (DemoEntity* const ent);
+	void RemoveEntity (dListNode* const entNode);
 
-
+	DemoCamera* GetCamera() const;
 	bool GetMousePosition (int& posX, int& posY) const;
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
 	void PushTransparentMesh (const DemoMeshInterface* const mesh); 
 
+	bool GetKeyState(int key) const;
+	bool GetJoytickPosition (dFloat& posX, dFloat& posY, int& buttonsMask) const;
 
 	static void SerializeFile (void* const serializeHandle, const void* const buffer, int size);
 	static void DeserializeFile (void* const serializeHandle, void* const buffer, int size);
@@ -98,13 +121,16 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	private:
 	void BeginFrame();
-	void EndFrame();
+	void RenderUI();
 	void LoadFont();
 	void Cleanup();
+
+	void RenderScene();
 	void UpdatePhysics(dFloat timestep);
+	dFloat CalculateInteplationParam () const;
 
 	void CalculateFPS(dFloat timestep);
-	void RemoveEntity (dListNode* const entNode);
+
 	
 	void ShowMainMenuBar();
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
@@ -129,13 +155,17 @@ class DemoEntityManager: public dList <DemoEntity*>
 	unsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;
 
+	int m_currentScene;
 	int m_framesCount;
+	int m_physicsFramesCount;
 	dFloat m_fps;
 	dFloat m_timestepAcc;
 	dFloat m_currentListenerTimestep;
 	dFloat m_mainThreadPhysicsTime;
+	dFloat m_mainThreadPhysicsTimeAcc;
 	bool m_showStats;
 	bool m_synchronousPhysicsUpdateMode;
+	bool m_hideVisualMeshes;
 
 
 	static SDKDemos m_demosSelection[];

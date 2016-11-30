@@ -450,7 +450,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../thirdParty/timeTracker;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CustomJointLibraryStdAfx.h</PrecompiledHeaderFile>
       <WarningLevel>Level4</WarningLevel>

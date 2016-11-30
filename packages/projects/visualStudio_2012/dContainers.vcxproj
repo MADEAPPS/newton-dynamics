@@ -269,7 +269,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -295,7 +295,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DCONTAINERS_DLL;_DCONTAINERS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -324,7 +324,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -350,7 +350,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -376,7 +376,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DCONTAINERS_DLL;_DCONTAINERS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -402,7 +402,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -425,7 +425,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_md|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -434,7 +434,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -443,7 +443,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_md|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dContainersStdAfx.h</PrecompiledHeaderFile>
@@ -452,7 +452,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dContainersStdAfx.h</PrecompiledHeaderFile>
@@ -462,7 +462,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_DCONTAINERS_DLL;_DCONTAINERS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
@@ -476,7 +476,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_DCONTAINERS_DLL;_DCONTAINERS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/ai;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dContainersStdAfx.h</PrecompiledHeaderFile>

@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -244,7 +244,7 @@ bool dCholeskyFactorizationAddRow(int size, int n, T* const matrix)
 
 		if (n == j) {
 			T diag = rowN[n] - s;
-			if (diag <= T(1.0e-6f)) {
+			if (diag <= T(1.0e-10f)) {
 				dAssert(0);
 				return false;
 			}
@@ -258,6 +258,14 @@ bool dCholeskyFactorizationAddRow(int size, int n, T* const matrix)
 	}
 
 	return true;
+}
+
+template<class T>
+void dCholeskyFactorization(int size, T* const matrix)
+{
+	for (int i = 0; i < size; i++) {
+		dCholeskyFactorizationAddRow(size, i, matrix);
+	}
 }
 
 
@@ -315,10 +323,10 @@ void dCalculateDelta_x(int size, T dir, int n, const T* const matrix, T* const d
 {
 	const T* const row = &matrix[size * n];
 	for (int i = 0; i < n; i++) {
-		delta_x[i] = row[i] * dir;
+		delta_x[i] = -row[i] * dir;
 	}
 	dCholeskySolve(size, matrix, delta_x, n);
-	delta_x[n] = -dir;
+	delta_x[n] = dir;
 }
 
 
@@ -379,6 +387,11 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 	int stride = 0;
 	for (int i = 0; i < size; i++) {
 		x0[i] = dClamp(x[i], low[i], high[i]);
+		if ((low[i] > T(-D_LCP_MAX_VALUE)) || (high[i] < T(D_LCP_MAX_VALUE))) {
+			dAssert (0);
+			low[i] -= x0[i];
+			high[i] -= x0[i];
+		}
 		permute[i] = short(i);
 		diagonal[i] = matrix[stride + i];
 		stride += size;
@@ -478,7 +491,6 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 				}
 
 				dAssert(dAbs (s) >= T(0.0f));
-//				if (s > T(1.0e-12f)) {
 				for (int i = 0; i < size; i++) {
 					dAssert((x0[i] + dAbs(x0[i]) * T(1.0e-4f)) >= low[i]);
 					dAssert((x0[i] - dAbs(x0[i]) * T(1.0e-4f)) <= high[i]);
@@ -489,7 +501,6 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 					dAssert((x0[i] + dAbs(x0[i]) * T(1.0e-4f)) >= low[i]);
 					dAssert((x0[i] - dAbs(x0[i]) * T(1.0e-4f)) <= high[i]);
 				}
-//				}
 			}
 
 			if (swapIndex == -1) {

@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
 #include "CustomPulley.h"
 
 //dInitRtti(CustomPulley);
-IMPLEMENT_CUSTON_JOINT(CustomPulley);
+IMPLEMENT_CUSTOM_JOINT(CustomPulley);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -42,10 +42,12 @@ class dgMinkFace
 #define DG_CONVEX_MINK_MAX_FACES		512
 #define DG_CONVEX_MINK_MAX_POINTS		256
 #define DG_MAX_EDGE_COUNT				2048
-#define DG_ROBUST_PLANE_CLIP			dgFloat32 (1.0f / 256.0f)
+#define DG_PENETRATION_TOL			dgFloat32 (1.0f / 1024.0f)
 #define DG_MINK_VERTEX_ERR				(dgFloat32 (1.0e-3f))
 #define DG_MINK_VERTEX_ERR2				(DG_MINK_VERTEX_ERR * DG_MINK_VERTEX_ERR)
 
+
+class dgCollisionParamProxy;
 
 DG_MSC_VECTOR_ALIGMENT
 class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>  
@@ -99,7 +101,7 @@ class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>
 	bool SanityCheck() const;
 	dgInt32 ConvexPolygonsIntersection(const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgInt32 maxContacts) const;
 	dgInt32 ConvexPolygonToLineIntersection(const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgVector* const mem) const;
-	dgInt32 CalculateContacts (const dgVector& point, const dgVector& normal);
+	dgInt32 CalculateContacts (const dgVector& point0, const dgVector& point1, const dgVector& normal);
 	dgInt32 CalculateClosestSimplex();
 	dgInt32 CalculateClosestSimplexLarge ();
 	dgInt32 CalculateIntersectingPlane(dgInt32 count);
@@ -121,8 +123,6 @@ class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>
 	dgMinkFace* m_coneFaceList[DG_CONVEX_MINK_STACK_SIZE];
 	dgMinkFace* m_deletedFaceList[DG_CONVEX_MINK_STACK_SIZE];
 	dgMinkFace m_facePool[DG_CONVEX_MINK_MAX_FACES];
-	dgInt32 m_polygonFaceIndex0[DG_CONVEX_MINK_MAX_POINTS];
-	dgInt32 m_polygonFaceIndex1[DG_CONVEX_MINK_MAX_POINTS];
 	dgInt8 m_heapBuffer[DG_CONVEX_MINK_MAX_FACES * (sizeof (dgFloat32) + sizeof (dgMinkFace *))];
 
 	static dgVector m_hullDirs[14]; 

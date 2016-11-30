@@ -272,8 +272,6 @@
     <ClCompile Include="..\..\..\source\physics\dgContact.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgContactSolver.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCorkscrewConstraint.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgDeformableBodiesUpdate.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgDeformableContact.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgHingeConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgSkeletonContainer.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgSlidingConstraint.cpp" />
@@ -321,7 +319,6 @@
     <ClCompile Include="..\..\..\source\physics\dgBody.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='release|x64'">MaxSpeed</Optimization>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgDeformableBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDynamicBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgKinematicBody.cpp" />
   </ItemGroup>
@@ -336,8 +333,6 @@
     <ClInclude Include="..\..\..\source\physics\dgContact.h" />
     <ClInclude Include="..\..\..\source\physics\dgContactSolver.h" />
     <ClInclude Include="..\..\..\source\physics\dgCorkscrewConstraint.h" />
-    <ClInclude Include="..\..\..\source\physics\dgDeformableBodiesUpdate.h" />
-    <ClInclude Include="..\..\..\source\physics\dgDeformableContact.h" />
     <ClInclude Include="..\..\..\source\physics\dgHingeConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgSkeletonContainer.h" />
     <ClInclude Include="..\..\..\source\physics\dgSlidingConstraint.h" />
@@ -373,7 +368,6 @@
     <ClInclude Include="..\..\..\source\physics\dgWorldDynamicUpdate.h" />
     <ClInclude Include="..\..\..\source\meshUtil\dgMeshEffect.h" />
     <ClInclude Include="..\..\..\source\physics\dgBody.h" />
-    <ClInclude Include="..\..\..\source\physics\dgDeformableBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgDynamicBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h" />
   </ItemGroup>

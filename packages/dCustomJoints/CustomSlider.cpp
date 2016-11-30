@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////////
 
 //dInitRtti(CustomSlider);
-IMPLEMENT_CUSTON_JOINT(CustomSlider);
+IMPLEMENT_CUSTOM_JOINT(CustomSlider);
 
 CustomSlider::CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)

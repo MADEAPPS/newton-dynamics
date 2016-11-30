@@ -12,12 +12,11 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "DemoEntityManager.h"
-#include "DemoCamera.h"
-#include "PhysicsUtils.h"
 #include "DemoMesh.h"
-#include "../toolBox/OpenGlUtil.h"
-
+#include "DemoCamera.h"
+#include "OpenGlUtil.h"
+#include "PhysicsUtils.h"
+#include "DemoEntityManager.h"
 
 
 class dClosestDistanceRecord: public CustomControllerBase

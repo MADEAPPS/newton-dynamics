@@ -10,11 +10,12 @@
 */
 
 #include <toolbox_stdafx.h>
-#include "DemoEntityManager.h"
+#include "SkyBox.h"
+#include "DemoMesh.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "DemoMesh.h"
-#include "toolBox/OpenGlUtil.h"
+#include "DemoEntityManager.h"
+
 
 #define PHYSICS_WORLD_SCALE			50.0f											// conversion from meters to world units
 

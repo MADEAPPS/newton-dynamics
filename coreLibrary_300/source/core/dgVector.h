@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -649,10 +649,25 @@ class dgVector
 }DG_GCC_VECTOR_ALIGMENT;
 
 
-
+DG_MSC_VECTOR_ALIGMENT
 class dgSpatialVector
 {
 public:
+
+	DG_INLINE dgSpatialVector()
+	{
+		SetZero();
+	}
+
+	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
+	{
+		m_v[0] = low[0];
+		m_v[1] = low[1];
+		m_v[2] = low[2];
+		m_v[3] = high[0];
+		m_v[4] = high[1];
+		m_v[5] = high[2];
+	}
 
 	DG_INLINE dgFloat64& operator[] (dgInt32 i)
 	{
@@ -704,7 +719,7 @@ public:
 	}
 
 	dgFloat64 m_v[6];
-};
+}DG_GCC_VECTOR_ALIGMENT;
 
 #else
 
@@ -1122,7 +1137,7 @@ class dgVector
 	static dgVector m_wMask;
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
-};
+}DG_GCC_VECTOR_ALIGMENT;
 
 #else
 DG_MSC_VECTOR_ALIGMENT
@@ -1541,6 +1556,15 @@ class dgSpatialVector
 	{
 	}
 
+	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
+		:m_l(low)
+		,m_h(dgVector::m_zero)
+	{
+		m_l[3] = high[0];
+		m_h[0] = high[1];
+		m_h[1] = high[2];
+	}
+
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
 	{
 		dgAssert(i < 6);
@@ -1612,10 +1636,8 @@ class dgSpatialMatrix
 
 	DG_INLINE void SetZero()
 	{
-		dgVector zero (dgVector::m_zero);
 		for (dgInt32 i = 0; i < 6; i++) {
-			m_rows[i].m_l = zero;
-			m_rows[i].m_h = zero;
+			m_rows[i].SetZero();
 		}
 	}
 

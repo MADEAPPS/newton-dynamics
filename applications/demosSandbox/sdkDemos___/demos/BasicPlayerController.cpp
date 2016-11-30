@@ -9,16 +9,16 @@
 * freely
 */
 
-
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "NewtonDemos.h"
-#include "PhysicsUtils.h"
-#include "TargaToOpenGl.h"
 #include "DemoMesh.h"
-#include "DemoEntityManager.h"
 #include "DemoCamera.h"
+#include "PhysicsUtils.h"
 #include "DebugDisplay.h"
+#include "TargaToOpenGl.h"
+#include "DemoEntityManager.h"
+#include "UserPlaneCollision.h"
+
 
 #define PLAYER_MASS						80.0f
 #define PLAYER_WALK_SPEED				4.0f
@@ -165,7 +165,8 @@ class BasicPlayerInputManager: public CustomInputManager
 		,m_shootState(0)
 	{
 		// plug a callback for 2d help display
-		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
+		dAssert (0);
+		//scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
 	}
 
 	void SpawnRandomProp(const dMatrix& location) const
@@ -202,17 +203,17 @@ class BasicPlayerInputManager: public CustomInputManager
 		BasicPlayerEntity::InputRecord inputs;
 
 		DemoCamera* const camera = m_scene->GetCamera();
-		NewtonDemos* const mainWindow = m_scene->GetRootWindow();
+		//DemoEntityManager* const mainWindow = m_scene;
 
 		// set the help key
-		m_helpKey.UpdatePushButton (mainWindow, 'H');
+		m_helpKey.UpdatePushButton (m_scene, 'H');
 
 		// read the player inputs
 		inputs.m_headinAngle = camera->GetYawAngle();
-		inputs.m_cameraMode = m_cameraMode.UpdatePushButton(m_scene->GetRootWindow(), 'C') ? 1 : 0;
-		inputs.m_forwarSpeed = (int (mainWindow->GetKeyState ('W')) - int (mainWindow->GetKeyState ('S'))) * PLAYER_WALK_SPEED;
-		inputs.m_strafeSpeed = (int (mainWindow->GetKeyState ('D')) - int (mainWindow->GetKeyState ('A'))) * PLAYER_WALK_SPEED;
-		inputs.m_jumpSpeed = (m_jumpKey.UpdateTriggerButton(mainWindow, ' ')) ? PLAYER_JUMP_SPEED : 0.0f;
+		inputs.m_cameraMode = m_cameraMode.UpdatePushButton(m_scene, 'C') ? 1 : 0;
+		inputs.m_forwarSpeed = (int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'))) * PLAYER_WALK_SPEED;
+		inputs.m_strafeSpeed = (int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'))) * PLAYER_WALK_SPEED;
+		inputs.m_jumpSpeed = (m_jumpKey.UpdateTriggerButton(m_scene, ' ')) ? PLAYER_JUMP_SPEED : 0.0f;
 
 		// normalize player speed
 		dFloat mag2 = inputs.m_forwarSpeed * inputs.m_forwarSpeed + inputs.m_strafeSpeed * inputs.m_strafeSpeed;
@@ -223,7 +224,8 @@ class BasicPlayerInputManager: public CustomInputManager
 		}
 
 		// see if we are shotting some props
-		m_shootState = m_shootProp.UpdateTriggerButton(mainWindow, 0x0d) ? 1 : 0;
+		dAssert (0);
+		m_shootState = m_shootProp.UpdateTriggerButton(m_scene, 0x0d) ? 1 : 0;
 
 
 #if 0
@@ -284,6 +286,8 @@ class BasicPlayerInputManager: public CustomInputManager
 
 	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
 	{
+		dAssert (0);
+/*
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation Keys");
@@ -296,6 +300,7 @@ class BasicPlayerInputManager: public CustomInputManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
 		}
+*/	
 	}
 
 

@@ -676,7 +676,7 @@ rem xcopy  "$(OutDir)$(TargetName).dll" "C:\dev\pengII\pengII\Debug\*.*"  /F /Y 
       <ExceptionHandling>
       </ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>false</FunctionLevelLinking>

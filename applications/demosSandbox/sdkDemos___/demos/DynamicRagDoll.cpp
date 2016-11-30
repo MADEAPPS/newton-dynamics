@@ -9,18 +9,18 @@
 * freely
 */
 
+
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
-#include "NewtonDemos.h"
 #include "PhysicsUtils.h"
+#include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "CustomBallAndSocket.h"
-#include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
-#include "CustomDynamicRagDollManager.h"
+
+#include <CustomDynamicRagDollManager.h>
 
 
 struct RAGDOLL_BONE_DEFINITION

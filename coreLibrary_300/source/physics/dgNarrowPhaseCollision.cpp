@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -39,7 +39,6 @@
 #include "dgCollisionCompound.h"
 #include "dgCollisionUserMesh.h"
 #include "dgCollisionInstance.h"
-#include "dgDeformableContact.h"
 #include "dgWorldDynamicUpdate.h"
 #include "dgCollisionConvexHull.h"
 #include "dgCollisionHeightField.h"
@@ -77,17 +76,7 @@ dgCollisionInstance* dgWorld::CreateSphere(dgFloat32 radii, dgInt32 shapeID, con
 dgCollisionInstance* dgWorld::CreateBox(dgFloat32 dx, dgFloat32 dy, dgFloat32 dz, dgInt32 shapeID, const dgMatrix& offsetMatrix)
 {
 	dgUnsigned32 crc = dgCollisionBox::CalculateSignature(dx, dy, dz);
-//	dgUnsigned32 pinNumber = dgCollisionBox::CalculateSignature(dy, dz, dx);
 	dgBodyCollisionList::dgTreeNode* node = dgBodyCollisionList::Find (crc);
-
-/*
-	if (node && (node->GetInfo().m_pinNumber != pinNumber)) {
-		// shape was found but it is a CRC collision simple single out this shape as a unique entry in the cache
-		dgTrace (("we have a CRC collision simple single out this shape as a unique entry in the cache\n"));
-		dgCollision* const collision = new  (m_allocator) dgCollisionBox (m_allocator, pinNumber, dx, dy, dz);
-		node = dgBodyCollisionList::Insert (CollisionKeyPair(collision, pinNumber), pinNumber);
-	}
-*/
 	if (!node) {
 		dgCollision* const collision = new  (m_allocator) dgCollisionBox (m_allocator, crc, dx, dy, dz);
 		node = dgBodyCollisionList::Insert (collision, crc);
@@ -206,11 +195,15 @@ dgCollisionInstance* dgWorld::CreateFracturedCompound (dgMeshEffect* const solid
 
 dgCollisionInstance* dgWorld::CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial)
 {
+	dgAssert(0);
+	return NULL;
+/*
 	dgAssert (m_allocator == mesh->GetAllocator());
 	dgCollision* const collision = new (m_allocator) dgCollisionDeformableClothPatch (this, mesh, structuralMaterial, bendMaterial);
 	dgCollisionInstance* const instance = CreateInstance (collision, shapeID, dgGetIdentityMatrix()); 
 	collision->Release();
 	return instance;
+*/
 }
 
 dgCollisionInstance* dgWorld::CreateDeformableMesh (dgMeshEffect* const mesh, dgInt32 shapeID)
@@ -468,7 +461,6 @@ bool dgWorld::IntersectionTest (const dgCollisionInstance* const collisionSrcA, 
 	pair.m_contact = &contactJoint;
 	pair.m_contactBuffer = NULL; 
 	pair.m_timestep = dgFloat32 (0.0f);
-	pair.m_isDeformable = 0;
 	pair.m_cacheIsValid = 0;
 	CalculateContacts (&pair, threadIndex, false, true);
 	return (pair.m_contactCount == -1) ? true : false;
@@ -666,7 +658,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	dgAssert (body1);
 	dgAssert (contact->m_body0 == body0);
 	dgAssert (contact->m_body1 == body1);
-	dgAssert (contact->m_broadphaseLru == GetBroadPhase()->m_lru);
+	//dgAssert (contact->m_broadphaseLru == GetBroadPhase()->m_lru);
 
 	const dgContactMaterial* const material = contact->m_material;
 	const dgContactPoint* const contactArray = pair->m_contactBuffer;
@@ -881,7 +873,6 @@ void dgWorld::ProcessContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadI
 	dgAssert (pair->m_contact->m_body0);
 	dgAssert (pair->m_contact->m_body1);
 	dgAssert (pair->m_contact->m_body0 != pair->m_contact->m_body1);
-	dgAssert (pair->m_contact->m_broadphaseLru == GetBroadPhase()->m_lru);
 
 	pair->m_contact->m_positAcc = dgVector (dgFloat32 (0.0f));
 	pair->m_contact->m_rotationAcc = dgVector (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
@@ -889,72 +880,10 @@ void dgWorld::ProcessContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadI
 }
 
 
-void dgWorld::ProcessDeformableContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex)
-{
-	dgAssert (0);
-	/*
-	dgDeformableContact* contact = (dgDeformableContact*) pair->m_contact;
-	if (!contact) {
-	GetLock(threadIndex);
-	contact = new (m_allocator) dgDeformableContact (this);
-	pair->m_contact = contact;
-	AttachConstraint (contact, pair->m_body0, pair->m_body1);
-	ReleaseLock();
-	} else if (contact->GetBody0() != pair->m_body0) {
-	dgAssert (0);
-	dgAssert (contact->GetBody1() == pair->m_body0);
-	dgAssert (contact->GetBody0() == pair->m_body1);
-	Swap (contact->m_body0, contact->m_body1);
-	Swap (contact->m_link0, contact->m_link1);
-	}
-
-	PopulateContacts (contact, pair, timestep, threadIndex);
-	*/
-}
-
-
-void dgWorld::DeformableContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
-{
-	dgContact* const constraint = pair->m_contact;
-
-	pair->m_isDeformable = -1;
-	pair->m_contactCount = 0;
-
-	if (constraint) {
-		//dgInt32 contactCount = ValidateContactCache (pair->m_body0, pair->m_body1, constraint);
-		//if (contactCount) {
-		//pair->m_isDeformable = 1;
-		//pair->m_contactCount = 0;
-		//dgAssert (pair->m_contactBufferIndex == -1);
-		//pair->m_contactBufferIndex = 0;
-		//return ;
-		//}
-	}
-	dgAssert (constraint);
-	dgAssert (constraint->m_body0);
-	dgCollisionDeformableMesh* const deformable = (dgCollisionDeformableMesh*) constraint->m_body0->GetCollision()->GetChildShape();
-	dgAssert (constraint->m_body0->GetCollision()->IsType(dgCollision::dgCollisionDeformableMesh_RTTI));
-	deformable->CalculateContacts (pair, proxy);
-	//	if (pair->m_contactCount) {
-	//		// prune close contacts
-	//		pair->m_contactCount = dgInt16 (PruneContacts (pair->m_contactCount, proxy.m_contacts));
-	//	}
-}
-
-
 void dgWorld::ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContact* const constraint = pair->m_contact;
-/*
-	if (constraint->m_maxDOF != 0) {
-		if (ValidateContactCache (constraint, proxy.m_timestep)) {
-			pair->m_cacheIsValid = true;
-			pair->m_isDeformable = 0;
-			pair->m_contactCount = 0;
-			return ;
-		}
-	}
-*/
+
 	dgBody* const otherBody = constraint->m_body1;
 	dgBody* const convexBody = constraint->m_body0;
 	
@@ -978,18 +907,8 @@ void dgWorld::ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParam
 void dgWorld::CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContact* const constraint = pair->m_contact;
-	pair->m_isDeformable = 0;
 	pair->m_contactCount = 0;
-/*
-	if (constraint->m_maxDOF != 0) {
-		if (ValidateContactCache (constraint, proxy.m_timestep)) {
-			pair->m_cacheIsValid = true;
-			pair->m_isDeformable = 0;
-			pair->m_contactCount = 0;
-			return ;
-		}
-	}
-*/
+
 	dgCollisionInstance* const instance = constraint->m_body0->GetCollision();
 	dgCollisionCompound* const compound = (dgCollisionCompound*) instance->GetChildShape();
 	dgAssert (compound->IsType(dgCollision::dgCollisionCompound_RTTI));
@@ -998,6 +917,7 @@ void dgWorld::CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionPar
 		// prune close contacts
 		pair->m_contactCount = PruneContacts (pair->m_contactCount, proxy.m_contacts);
 	}
+	proxy.m_contactJoint->m_separationDistance = dgFloat32 (0.0f);
 }
 
 
@@ -1026,18 +946,8 @@ void dgWorld::SceneChildContacts (dgBroadPhase::dgPair* const pair, dgCollisionP
 void dgWorld::SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContact* const constraint = pair->m_contact;
-	pair->m_isDeformable = 0;
 	pair->m_contactCount = 0;
-/*
-	if (constraint->m_maxDOF != 0) {
-		if (ValidateContactCache (constraint, proxy.m_timestep)) {
-			pair->m_cacheIsValid = true;
-			pair->m_isDeformable = 0;
-			pair->m_contactCount = 0;
-			return ;
-		}
-	}
-*/
+
 	dgBody* const sceneBody = constraint->m_body1;
 	dgBody* const otherBody = constraint->m_body0;
 
@@ -1093,11 +1003,6 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threa
 		SceneContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
 		SceneContacts (pair, proxy);
-	} else if (body0->m_collision->IsType (dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		DeformableContacts (pair, proxy);
-	} else if (body1->m_collision->IsType (dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		contact->SwapBodies();
-		DeformableContacts (pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		CompoundContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
@@ -1140,11 +1045,6 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 		SceneContacts (&pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
 		SceneContacts (&pair, proxy);
-	} else if (body0->m_collision->IsType (dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		DeformableContacts (&pair, proxy);
-	} else if (body1->m_collision->IsType (dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		contact->SwapBodies();
-		DeformableContacts (&pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		CompoundContacts (&pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
@@ -1225,7 +1125,6 @@ dgInt32 dgWorld::CollideContinue (
 	pair.m_contactBuffer = contacts;
 	pair.m_timestep = retTimeStep;
 	pair.m_contactCount = 0;
-	pair.m_isDeformable = 0;
 	pair.m_cacheIsValid = 0;
 	CalculateContacts (&pair, threadIndex, true, maxContacts ? false : true);
 
@@ -1297,7 +1196,6 @@ dgInt32 dgWorld::Collide (
 	pair.m_contact = &contactJoint;
 	pair.m_contactBuffer = contacts; 
 	pair.m_timestep = dgFloat32 (0.0f);
-	pair.m_isDeformable = 0;
 	pair.m_cacheIsValid = 0;
 	CalculateContacts (&pair, threadIndex, false, false);
 
@@ -1347,6 +1245,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	dgAssert(contactJoint);
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
+	contactJoint->m_separationDistance = dgFloat32(0.0f);
 
 	dgCollisionInstance instance0(*collision0, collision0->m_childShape);
 	dgCollisionInstance instance1(*collision1, collision1->m_childShape);
@@ -1374,6 +1273,7 @@ dgInt32 dgWorld::ClosestPoint (dgCollisionParamProxy& proxy) const
 	contactOut[1].m_point = proxy.m_closestPointBody1;
 
 	contactJoint->m_closestDistance = (contactOut[1].m_point - contactOut[0].m_point).DotProduct4(proxy.m_normal).GetScalar();
+	contactJoint->m_separationDistance = dgFloat32(0.0f);
 
 	instance0.m_userData0 = NULL;
 	instance0.m_userData1 = NULL;
@@ -1422,6 +1322,8 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 	dgAssert(collision0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
 	dgAssert(collision1->IsType(dgCollision::dgCollisionConvexShape_RTTI));
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
+	contactJoint->m_separationDistance = dgFloat32(0.0f);
+
 	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount() && proxy.m_instance0->GetCollisionMode() && proxy.m_instance1->GetCollisionMode())) {
 		return count;
 	}
@@ -1470,7 +1372,15 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 			contactOut[i].m_collision1 = collision1;
 			contactOut[i].m_shapeId0 = collision0->GetUserDataID();
 			contactOut[i].m_shapeId1 = collision1->GetUserDataID();
+#if 0
+dgVector xxxx0 (instance0.m_globalMatrix.UntransformVector(contactOut[i].m_point));
+dgVector xxxx1 (instance0.m_globalMatrix.UnrotateVector(contactOut[i].m_normal));
+dgTrace (("%d %d %f ", proxy.m_body0->m_uniqueID, proxy.m_body1->m_uniqueID, contactOut[i].m_penetration));
+dgTrace (("p(%f %f %f) ", xxxx0[0], xxxx0[1], xxxx0[2]));
+dgTrace (("n(%f %f %f)\n", xxxx1[0], xxxx1[1], xxxx1[2]));
+#endif
 		}
+
 
 		instance0.m_userData0 = NULL;
 		instance0.m_userData1 = NULL;
@@ -1520,8 +1430,6 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		instance0.m_globalMatrix.m_posit = dgVector::m_wOne;
 		instance1.m_globalMatrix.m_posit -= origin;
 
-		contactJoint->m_closestDistance = dgFloat32(1.0e10f);
-
 		dgAssert(proxy.m_timestep <= dgFloat32(2.0f));
 		dgAssert(proxy.m_timestep >= dgFloat32(0.0f));
 
@@ -1534,9 +1442,10 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 
 			dgFloat32 baseLinearSpeed = dgSqrt(hullVeloc.DotProduct3(hullVeloc));
 			if (baseLinearSpeed > dgFloat32(1.0e-6f)) {
-				dgFloat32 minRadius = instance0.GetBoxMinRadius();
+				const dgFloat32 minRadius = instance0.GetBoxMinRadius();
+				const dgFloat32 maxRadius = instance0.GetBoxMaxRadius();
 				dgFloat32 maxAngularSpeed = dgSqrt(hullOmega.DotProduct3(hullOmega));
-				dgFloat32 angularSpeedBound = maxAngularSpeed * (instance0.GetBoxMaxRadius() - minRadius);
+				dgFloat32 angularSpeedBound = maxAngularSpeed * (maxRadius - minRadius);
 
 				dgFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
 				dgVector upperBoundVeloc(hullVeloc.Scale4(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
@@ -1595,6 +1504,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		}
 	}
 
+	contactJoint->m_separationDistance = dgFloat32(0.0f);
 	return count;
 }
 
@@ -1679,42 +1589,60 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 			break;
 		}
 	}
-
+//dgTrace (("\n"));
 	contactJoint->m_closestDistance = closestDist;
 
-	// check for extreme obtuse contacts 
-	dgFloat32 penetrations[DG_MAX_CONTATCS];
-	const dgCollisionInstance* const convexInstance = proxy.m_instance0;
-	const dgMatrix& matrix = convexInstance->GetGlobalMatrix();
+	const dgFloat32 dist = dgFloat32 (0.0078125f);
+	const dgFloat32 dist2 = dist * dist;
 	for (dgInt32 i = 0; i < count; i ++) {
-		const dgVector& normal = contactOut[i].m_normal;
-		dgVector minPenetration (contactOut[i].m_point - matrix.TransformVector(convexInstance->SupportVertex (matrix.UnrotateVector(normal.Scale3 (dgFloat32 (-1.0f))), NULL)));
-		penetrations[i] = minPenetration.DotProduct3(normal);
-	}
-
-	for (dgInt32 i = 0; i < count; i ++) {
-		const dgVector& n0 = contactOut[i].m_normal;
+		const dgVector& p0 = contactOut[i].m_point;
 		for (dgInt32 j = i + 1; j < count; j ++) {
-			const dgVector& n1 = contactOut[j].m_normal;
-			dgFloat32 dir = n0.DotProduct3(n1);
-			if (dir < dgFloat32 (-0.995f)) {
-				dgFloat32 dist0 = penetrations[i];
-				dgFloat32 dist1 = penetrations[j];
-				count --;
-				if (dist0 <= dist1) {
+			dgAssert (contactOut[i].m_normal.DotProduct3(contactOut[j].m_normal) > dgFloat32 (-0.9f));
+			const dgVector& p1 = contactOut[j].m_point;
+			dgVector step (p1 - p0);
+			dgFloat32 step2 = step.DotProduct4(step).GetScalar(); 
+			if (step2 < dist2) {
+				dgFloat32 project = (contactOut[i].m_normal.DotProduct4(contactOut[j].m_normal)).GetScalar();
+				if (project > dgFloat32 (0.999f)) {
+					count --;
 					contactOut[j] = contactOut[count];
-					penetrations[j] = penetrations[count];
 					j --;
-				} else {
-					contactOut[i] = contactOut[count];
-					penetrations[i] = penetrations[count];
-					i --;
-					break;
 				}
 			}
 		}
 	} 
 
+/*
+	// this was the method used in newton 1.5 for filtering contacts, but now I realized it did not really worked as I though
+	// the method is too good for an iterative solver  
+	dgJacobian jt[DG_CONSTRAINT_MAX_ROWS / 3];
+	dgFloat32 massMatrix[DG_CONSTRAINT_MAX_ROWS * DG_CONSTRAINT_MAX_ROWS / 9];
+
+	const dgBody* const body = proxy.m_body0;
+	dgVector com (body->m_globalCentreOfMass - proxy.m_worldOrigin);
+	for (dgInt32 i = 0; i < count; i ++) {
+		jt[i].m_linear = contactOut[i].m_normal;
+		jt[i].m_angular = (contactOut[i].m_point - com).CrossProduct3(contactOut[i].m_normal);
+	}
+
+	dgInt32 index = 0;
+	for (dgInt32 i = 0; i < count; i ++) {
+		dgFloat32* const row = &massMatrix[index];
+		const dgJacobian& gInvMass = jt[i];
+		dgVector aii (gInvMass.m_linear.CompProduct4(jt[i].m_linear) + gInvMass.m_angular.CompProduct4(jt[i].m_angular));
+		row[i] = aii.AddHorizontal().GetScalar() * dgFloat32 (1.01f);
+		for (dgInt32 j = i + 1; j < count; j ++) {
+			dgVector aij (gInvMass.m_linear.CompProduct4(jt[j].m_linear) + gInvMass.m_angular.CompProduct4(jt[j].m_angular));
+			dgFloat32 b = aij.AddHorizontal().GetScalar();
+			row[j] = b;
+			massMatrix[j * count + i] = b;
+		}
+		index += count;
+	}
+
+	dgFloat32 eigenValues[DG_CONSTRAINT_MAX_ROWS / 3];
+	dgEigenValues(count, massMatrix, eigenValues);
+*/
 	proxy.m_contacts = contactOut;
 
 	// restore the pointer

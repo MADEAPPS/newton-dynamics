@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2011> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -43,16 +43,13 @@ dgBody::dgBody()
 	,m_matrix (dgGetIdentityMatrix())
 	,m_rotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_mass(dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f))
-	,m_invMass(dgFloat32 (0.0))
-	,m_veloc(dgFloat32 (0.0))
-	,m_omega(dgFloat32 (0.0))
-	,m_minAABB(dgFloat32 (0.0))
-	,m_maxAABB(dgFloat32 (0.0))
-	,m_netForce(dgFloat32 (0.0))
-	,m_netTorque(dgFloat32 (0.0))
-	,m_localCentreOfMass(dgFloat32 (0.0))	
-	,m_globalCentreOfMass(dgFloat32 (0.0))	
-	,m_aparentMass(dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS))
+	,m_invMass(dgFloat32 (0.0f))
+	,m_veloc(dgFloat32 (0.0f))
+	,m_omega(dgFloat32 (0.0f))
+	,m_minAABB(dgFloat32 (0.0f))
+	,m_maxAABB(dgFloat32 (0.0f))
+	,m_localCentreOfMass(dgFloat32 (0.0f))	
+	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_maxAngulaRotationPerSet2(DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP )
 	,m_criticalSectionLock()
 	,m_flags(0)
@@ -72,7 +69,6 @@ dgBody::dgBody()
 	,m_dynamicsLru(0)
 	,m_genericLRUMark(0)
 {
-	m_resting = true;
 	m_autoSleep = true;
 	m_collidable = true;
 	m_collideWithLinkedBodies = true;
@@ -84,16 +80,13 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_matrix (dgGetIdentityMatrix())
 	,m_rotation(dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))
 	,m_mass(dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f), dgFloat32 (DG_INFINITE_MASS * 2.0f))
-	,m_invMass(dgFloat32 (0.0))
-	,m_veloc(dgFloat32 (0.0))
-	,m_omega(dgFloat32 (0.0))
-	,m_minAABB(dgFloat32 (0.0))
-	,m_maxAABB(dgFloat32 (0.0))
-	,m_netForce(dgFloat32 (0.0))
-	,m_netTorque(dgFloat32 (0.0))
-	,m_localCentreOfMass(dgFloat32 (0.0))	
-	,m_globalCentreOfMass(dgFloat32 (0.0))	
-	,m_aparentMass(dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS), dgFloat32 (DG_INFINITE_MASS))
+	,m_invMass(dgFloat32 (0.0f))
+	,m_veloc(dgFloat32 (0.0f))
+	,m_omega(dgFloat32 (0.0f))
+	,m_minAABB(dgFloat32 (0.0f))
+	,m_maxAABB(dgFloat32 (0.0f))
+	,m_localCentreOfMass(dgFloat32 (0.0f))	
+	,m_globalCentreOfMass(dgFloat32 (0.0f))	
 	,m_maxAngulaRotationPerSet2(DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP )
 	,m_criticalSectionLock()
 	,m_flags(0)
@@ -123,7 +116,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	serializeCallback (userData, &m_veloc, sizeof (m_veloc));
 	serializeCallback (userData, &m_omega, sizeof (m_omega));
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
-	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
+	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
 
@@ -165,7 +158,7 @@ void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRema
 	serializeCallback (userData, &m_veloc, sizeof (m_veloc));
 	serializeCallback (userData, &m_omega, sizeof (m_omega));
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
-	serializeCallback (userData, &m_aparentMass, sizeof (m_aparentMass));
+	serializeCallback(userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
 
@@ -218,7 +211,17 @@ void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 	if (m_broadPhaseNode) {
 		dgAssert (m_world);
 		
+//		dgAssert (m_equilibrium == m_sleeping);
+/*
+		if (!m_equilibrium) {
+			m_world->GetBroadPhase()->SetAsDirty(this);
+		}
+
 		if (!m_sleeping) {
+			m_world->GetBroadPhase()->UpdateBody (this, threadIndex);
+		}
+*/
+		if (!m_equilibrium) {
 			m_world->GetBroadPhase()->UpdateBody (this, threadIndex);
 		}
 	}
@@ -418,23 +421,6 @@ void dgBody::Unfreeze ()
 }
 
 
-
-void dgBody::SetAparentMassMatrix (const dgVector& massMatrix)
-{
-	m_aparentMass = massMatrix;
-	if (m_collision->IsType(dgCollision::dgCollisionMesh_RTTI)) {
-		m_aparentMass.m_w = DG_INFINITE_MASS * 2.0f;
-	}
-
-	if (m_aparentMass.m_w >= DG_INFINITE_MASS) {
-		m_aparentMass.m_x = DG_INFINITE_MASS;
-		m_aparentMass.m_y = DG_INFINITE_MASS;
-		m_aparentMass.m_z = DG_INFINITE_MASS;
-		m_aparentMass.m_w = DG_INFINITE_MASS;
-	}
-}
-
-
 void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 {
 	dgFloat32 Ixx = inertia[0][0];
@@ -468,7 +454,7 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 				masterList.InsertAfter (masterList.GetFirst(), m_masterNode);
 			}
 		}
-		SetAparentMassMatrix (m_mass);
+
 
 	} else {
 		Ixx = dgAbsf (Ixx);
@@ -497,7 +483,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 			dgBodyMasterList& masterList (*m_world);
 			masterList.RotateToEnd (m_masterNode);
 		}
-		SetAparentMassMatrix (dgVector (Ixx, Iyy, Izz, mass));
 	}
 
 #ifdef _DEBUG
