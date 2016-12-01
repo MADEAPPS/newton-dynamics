@@ -726,7 +726,8 @@ void dgWorldDynamicUpdate::IntegrateVelocity (const dgIsland* const island, dgFl
 	dgFloat32 maxSpeed = dgFloat32 (0.0f);
 	dgFloat32 maxOmega = dgFloat32 (0.0f);
 
-	const dgFloat32 smallIslandCutoff = ((island->m_jointCount <= DG_SMALL_ISLAND_COUNT) ? dgFloat32 (0.01f) : dgFloat32 (1.0f));
+//	const dgFloat32 smallIslandCutoff = ((island->m_jointCount <= DG_SMALL_ISLAND_COUNT) ? dgFloat32 (0.01f) : dgFloat32 (1.0f));
+	const dgFloat32 smallIslandCutoff = (island->m_jointCount ? dgFloat32(0.01f) : dgFloat32(1.0f));
 	const dgFloat32 speedFreeze = world->m_freezeSpeed2 * smallIslandCutoff;
 	const dgFloat32 accelFreeze = world->m_freezeAccel2 * smallIslandCutoff;
 	dgVector velocDragVect (velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dgFloat32 (0.0f));
@@ -773,7 +774,8 @@ void dgWorldDynamicUpdate::IntegrateVelocity (const dgIsland* const island, dgFl
 		}
 	}
 
-	if (isAutoSleep && (island->m_jointCount > DG_SMALL_ISLAND_COUNT)) {
+//	if (isAutoSleep && (island->m_jointCount > DG_SMALL_ISLAND_COUNT)) {
+	if (isAutoSleep && island->m_jointCount) {
 		if (stackSleeping) {
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;

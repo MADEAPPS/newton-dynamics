@@ -531,10 +531,10 @@ void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernel (void* const context
 
 	dgVector invTime (invTimestepSrc);
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
-	dgVector forceActiveMask ((syncData->m_jointCount <= DG_SMALL_ISLAND_COUNT) ?  dgVector (-1, -1, -1, -1) : dgFloat32 (0.0f));
+//	dgVector forceActiveMask ((syncData->m_jointCount <= DG_SMALL_ISLAND_COUNT) ?  dgVector (-1, -1, -1, -1) : dgFloat32 (0.0f));
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-		world->ApplyNetTorqueAndForce (body, invTime, maxAccNorm2, forceActiveMask);
+		world->ApplyNetTorqueAndForce (body, invTime, maxAccNorm2);
 	}
 }
 

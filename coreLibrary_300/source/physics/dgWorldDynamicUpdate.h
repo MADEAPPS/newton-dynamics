@@ -32,7 +32,7 @@
 
 
 #define	DG_BODY_LRU_STEP				2	
-#define	DG_SMALL_ISLAND_COUNT			2
+//#define	DG_SMALL_ISLAND_COUNT			2
 #define	DG_MAX_SKELETON_JOINT_COUNT		256
 
 #define	DG_FREEZZING_VELOCITY_DRAG		dgFloat32 (0.9f)
@@ -273,8 +273,9 @@ class dgWorldDynamicUpdate
 	void ApplySoftBodyIntenalForce(dgIsland* const island, dgFloat32 timestep);
 	void CalculateReactionForcesParallel (const dgIsland* const island, dgFloat32 timestep) const;
 	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const;
-	void ApplyNetTorqueAndForce (dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& accNorm, const dgVector& mask) const;
-	void ApplyNetVelcAndOmega(dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2, const dgVector& forceActiveMask) const;
+
+	void ApplyNetTorqueAndForce (dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
+	void ApplyNetVelcAndOmega(dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2) const;
 	
 	void CalculateIslandReactionForces (dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const;
 	void BuildJacobianMatrix (dgIsland* const island, dgInt32 threadID, dgFloat32 timestep) const;
