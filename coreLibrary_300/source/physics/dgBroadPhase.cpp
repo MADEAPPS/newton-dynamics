@@ -1545,6 +1545,7 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 	const dgVector boxP0 (body0 ? body0->m_minAABB : leafNode->m_minBox);
 	const dgVector boxP1 (body0 ? body0->m_maxAABB : leafNode->m_maxBox);
 
+	const bool test0 = body0->GetInvMass().m_w != dgFloat32(0.0f);
 	while (stack) {
 		stack--;
 		dgBroadPhaseNode* const rootNode = pool[stack];
@@ -1555,7 +1556,9 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 				dgBody* const body1 = rootNode->GetBody();
 				if (body0) {
 					if (body1) {
-						AddPair(body0, body1, timestep, threadID);
+						if (test0 || (body1->GetInvMass().m_w != dgFloat32(0.0f))) {
+							AddPair(body0, body1, timestep, threadID);
+						}
 					} else {
 						dgAssert (rootNode->IsAggregate());
 						dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*) rootNode;

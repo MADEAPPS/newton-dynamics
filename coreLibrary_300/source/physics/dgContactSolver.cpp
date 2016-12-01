@@ -1854,8 +1854,9 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 			m_proxy->m_closestPointBody1 = m_closestPoint1 + step;
 			m_proxy->m_normal = m_normal.Scale4 (dgFloat32 (-1.0f));
 			m_proxy->m_contactJoint->m_closestDistance = m_proxy->m_normal.DotProduct4(m_closestPoint0 - m_closestPoint1).GetScalar();
+			//!!  I am still no sure if thsi si right
 			//dgFloat32 penetration = dgMax(num * dgFloat32(-1.0f) - DG_RESTING_CONTACT_PENETRATION, dgFloat32(0.0f));
-dgAssert (0);
+			//dgFloat32 penetration = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar() - m_proxy->m_skinThickness - DG_PENETRATION_TOL;
 			dgFloat32 penetration = dgMax(num * dgFloat32(-1.0f) + DG_PENETRATION_TOL, dgFloat32(0.0f));
 			m_proxy->m_contactJoint->m_closestDistance = penetration;
 			if (m_proxy->m_contacts && !m_proxy->m_intersectionTestOnly) {
@@ -1864,10 +1865,9 @@ dgAssert (0);
 					m_normal = m_normal.Scale4 (dgFloat32 (-1.0f));
 					m_proxy->m_contactJoint->m_contactActive = 1;
 					dgVector contactPoint((m_closestPoint0 + m_closestPoint1).Scale4(dgFloat32(0.5f)));
-					dgAssert(0);
-//					count = CalculateContacts(contactPoint, m_normal);
+					//count = CalculateContacts(contactPoint, m_normal);
+					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_normal);
 					if (count) {
-			
 						count = dgMin(m_proxy->m_maxContacts, count);
 						dgContactPoint* const contactOut = m_proxy->m_contacts;
 

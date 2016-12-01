@@ -613,9 +613,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 				proxy.m_closestPointBody1 = p0 + m_normal.Scale4(penetration);
 
 				if (!proxy.m_intersectionTestOnly) {
-					dgAssert (0);
+					//dgAssert (0);
 					//pointInHull -= normalInHull.Scale4 (DG_ROBUST_PLANE_CLIP);
-					pointInHull -= normalInHull.Scale4 (-DG_PENETRATION_TOL);
+					pointInHull -= normalInHull.Scale4 (DG_PENETRATION_TOL);
 					count = proxy.m_instance0->CalculatePlaneIntersection(normalInHull, pointInHull, contactPoints);
 
 					dgVector step(relativeVelocity.Scale4(timetoImpact));

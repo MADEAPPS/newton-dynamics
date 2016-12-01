@@ -679,8 +679,11 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 
 static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sceneCollision)
 {
-	NewtonWorld* const world = scene->GetNewton();
+#if 1
+	AddFloorBox(scene, dVector(0.0f), dVector(256.0f, 0.1f, 256.0f, 0.0f));
+#else
 
+	NewtonWorld* const world = scene->GetNewton();
 	// add a flat plane
 	dMatrix matrix (dGetIdentityMatrix());
 	DemoEntityManager::dListNode* const floorNode = LoadScene(scene, "flatPlane.ngd", matrix);
@@ -706,14 +709,8 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 				face[j][1] = vertex[index + 1];
 				face[j][2] = vertex[index + 2];
 			}
-//			index = indices[i + 1] * 3;
-//			face[1] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
-
-//			index = indices[i + 2] * 3;
-//			face[2] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
 
 			int matID = 0;
-			//matID = matID == 2 ? 1 : 2 ;
 			NewtonTreeCollisionAddFace(tree, 3, &face[0][0], 3 * sizeof (dFloat), matID);
 		}
 	}
@@ -735,12 +732,11 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 
 	// set the application level callback, for debug display
 	#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
-	NewtonStaticCollisionSetDebugCallback (collisionTree, ShowMeshCollidingFaces);
+		NewtonStaticCollisionSetDebugCallback (collisionTree, ShowMeshCollidingFaces);
 	#endif
+#endif
 }
 #endif
-
-
 
 
 static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* const triggerManager, NewtonCollision* const sceneCollision, const char* const name, const dMatrix& location, NewtonBody* const playGroundBody)
@@ -921,7 +917,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 	NewtonWorld* const world = scene->GetNewton();
 	DemoEntityManager::dListNode* const bridgeNodes = scene->GetLast();
 	LoadScene(scene, name, location);
-
+return;
 	// add bridge foundations
 	for (DemoEntityManager::dListNode* node = bridgeNodes->GetNext(); node; node = node->GetNext()) {
 		DemoEntity* const entity = node->GetInfo();
@@ -1084,8 +1080,6 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* const triggerManager)
 {
 	NewtonWorld* const world = scene->GetNewton();
-	//	CreateLevelMesh (scene, "flatPlane.ngd", true);
-	//	return;
 
 	// make the body with a dummy null collision, so that we can use for attaching world objects
 	dMatrix matrix (dGetIdentityMatrix());
