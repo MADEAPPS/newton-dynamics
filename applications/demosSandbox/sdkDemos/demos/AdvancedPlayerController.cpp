@@ -917,7 +917,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 	NewtonWorld* const world = scene->GetNewton();
 	DemoEntityManager::dListNode* const bridgeNodes = scene->GetLast();
 	LoadScene(scene, name, location);
-return;
+
 	// add bridge foundations
 	for (DemoEntityManager::dListNode* node = bridgeNodes->GetNext(); node; node = node->GetNext()) {
 		DemoEntity* const entity = node->GetInfo();
