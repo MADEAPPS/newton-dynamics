@@ -37,7 +37,6 @@ typedef void (*dgCollisionMeshCollisionCallback) (const dgBody* const bodyWithTr
 												  dgInt32 vertexCount, const dgFloat32* const vertex, dgInt32 vertexStrideInBytes); 
 
 
-
 DG_MSC_VECTOR_ALIGMENT 
 class dgPolygonMeshDesc: public dgFastAABBInfo
 {

@@ -115,8 +115,6 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			dgVector minBox (p0 - obb.m_p1);
 			dgVector maxBox (p1 - obb.m_p0);
 			dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
-			//mask = mask & mask.ShiftTripleRight();
-			//mask = mask & mask.ShiftTripleRight();
 			dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
 			dist = dist.GetMin(dist.ShiftTripleRight());
 			dist = dist.GetMin(dist.ShiftTripleRight());
@@ -132,14 +130,15 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 				dgVector minBox (q0 - obb.m_size);
 				dgVector maxBox (q1 + obb.m_size);
 				dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
-				//mask = mask & mask.ShiftTripleRight();
-				//mask = mask & mask.ShiftTripleRight();
 				dgVector dist1 (maxBox.GetMin (minBox.Abs()) & mask);
 				dist1 = dist1.GetMin(dist1.ShiftTripleRight());
 				dist1 = dist1.GetMin(dist1.ShiftTripleRight());
 				dist = dist.GetMin(dist1);
+			} else {
+//				dgAssert(0);
 			}
-			return dist.GetScalar();
+
+			return	dist.GetScalar();
 		}
 
 		DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgFastRayTest& obbRay, const dgFastAABBInfo& obb, const dgTriplex* const vertexArray) const
@@ -168,8 +167,6 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			}
 			return dist;
 		}
-
-
 
 		dgInt32 m_indexBox0;
 		dgInt32 m_indexBox1;

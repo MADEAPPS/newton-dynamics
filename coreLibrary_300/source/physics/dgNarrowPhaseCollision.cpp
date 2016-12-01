@@ -1420,6 +1420,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		return count;
 	}
 
+	dgFloat32 separationDistance = dgFloat32 (0.0f);
 	if (!contactJoint->m_material->m_contactGeneration) {
 		dgCollisionInstance instance0(*collision0, collision0->m_childShape);
 		dgCollisionInstance instance1(*collision1, collision1->m_childShape);
@@ -1470,9 +1471,10 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 				count = PruneContacts(count, proxy.m_contacts);
 			}
 		}
-
+		
 		proxy.m_closestPointBody0 += origin;
 		proxy.m_closestPointBody1 += origin;
+		separationDistance = data.GetSeparetionDistance();
 		dgContactPoint* const contactOut = proxy.m_contacts;
 		for (dgInt32 i = 0; i < count; i++) {
 			contactOut[i].m_point += origin;
@@ -1490,6 +1492,8 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		instance1.m_userData1 = NULL;
 		proxy.m_instance0 = collision0;
 		proxy.m_instance1 = collision1;
+
+		
 	} else {
 		count = CalculateUserContacts(proxy);
 
@@ -1504,7 +1508,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 		}
 	}
 
-	contactJoint->m_separationDistance = dgFloat32(0.0f);
+	contactJoint->m_separationDistance = separationDistance;
 	return count;
 }
 

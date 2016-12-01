@@ -250,11 +250,13 @@ class dgFastAABBInfo: public dgObb
 	DG_INLINE dgFastAABBInfo()
 		:dgObb()
 		,m_absDir(dgGetIdentityMatrix())
+		,m_separationDistance(dgFloat32(1.0e10f))
 	{
 	}
 
 	DG_INLINE dgFastAABBInfo(const dgMatrix& matrix, const dgVector& size)
 		:dgObb(matrix, size)
+		,m_separationDistance(dgFloat32(1.0e10f))
 	{
 		SetTransposeAbsMatrix (matrix);
 		dgVector size1 (matrix[0].Abs().Scale4(size.m_x) + matrix[1].Abs().Scale4(size.m_y) + matrix[2].Abs().Scale4(size.m_z));
@@ -267,6 +269,7 @@ class dgFastAABBInfo: public dgObb
 		,m_absDir(dgGetIdentityMatrix())
 		,m_p0(p0)
 		,m_p1(p1)
+		,m_separationDistance(dgFloat32(1.0e10f))
 	{
 		m_posit = ((p1 + p0).CompProduct4(dgVector::m_half) & dgVector::m_triplexMask) | dgVector::m_wOne;
 	}
@@ -314,23 +317,23 @@ class dgFastAABBInfo: public dgObb
 		return dist0;
 	}
 
+	DG_INLINE dgFloat32 GetSeparetionDistance() const
+	{
+		return m_separationDistance;
+	}
+
+
 	private:
 	DG_INLINE void MakeBox1 (dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, dgVector& minBox, dgVector& maxBox) const
 	{
-		//const dgMatrix& matrix = *this;
-		//dgVector faceBoxP0 (m_scale.CompProduct4(matrix.UntransformVector(dgVector(&vertexArray[indexArray[0] * stride]))));
-		//dgVector faceBoxP0 (m_scale.CompProduct4(dgVector(&vertexArray[indexArray[0] * stride])));
 		dgVector faceBoxP0 (&vertexArray[indexArray[0] * stride]);
 		dgVector faceBoxP1 (faceBoxP0);
 		for (dgInt32 i = 1; i < indexCount; i ++) {
-			//dgVector p (m_scale.CompProduct4 (matrix.UntransformVector(dgVector(&vertexArray[indexArray[i] * stride]))));
-			//dgVector p (m_scale.CompProduct4 (dgVector(&vertexArray[indexArray[i] * stride])));
 			dgVector p (&vertexArray[indexArray[i] * stride]);
 			faceBoxP0 = faceBoxP0.GetMin(p); 
 			faceBoxP1 = faceBoxP1.GetMax(p); 
 		}
-		//minBox = faceBoxP0 - m_size;
-		//maxBox = faceBoxP1 + m_size;
+
 		minBox = faceBoxP0 - m_p1;
 		maxBox = faceBoxP1 - m_p0;
 	}
@@ -374,6 +377,7 @@ class dgFastAABBInfo: public dgObb
 	dgMatrix m_absDir;
 	dgVector m_p0;
 	dgVector m_p1;
+	mutable dgFloat32 m_separationDistance;
 
 	friend class dgAABBPolygonSoup;
 	friend class dgCollisionUserMesh;

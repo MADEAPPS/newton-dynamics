@@ -891,9 +891,6 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 
 	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
-	//dFloat startElevation = 1000.0f;
-	//dFloat startElevation = 20.0f;
-
 	dMatrix matrix (dGetIdentityMatrix());
 	for (int i = 0; i < xCount; i ++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
@@ -904,6 +901,7 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 			matrix.m_posit.m_z = z;
 			dVector floor (FindFloor (world, dVector (matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 			matrix.m_posit.m_y = floor.m_y + size.m_y * 0.5f;
+matrix.m_posit.m_y += 30.0f;
 			CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
 		}
 	}

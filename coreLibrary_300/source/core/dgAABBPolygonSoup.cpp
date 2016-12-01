@@ -1189,7 +1189,6 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgFloa
 
 void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
 {
-
 	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < dgFloat32 (1.0e-4f));
 	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < dgFloat32 (1.0e-4f));
 	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[2][2]) - obbAabbInfo.m_absDir[2][2]) < dgFloat32 (1.0e-4f));
@@ -1198,6 +1197,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[0][2]) - obbAabbInfo.m_absDir[2][0]) < dgFloat32 (1.0e-4f));
 	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[1][2]) - obbAabbInfo.m_absDir[2][1]) < dgFloat32 (1.0e-4f));
 
+	obbAabbInfo.m_separationDistance = dgFloat32(0.0f);
 	if (m_aabb) {
 		dgFloat32 distance[DG_STACK_DEPTH];
 		const dgNode* stackPool[DG_STACK_DEPTH];
