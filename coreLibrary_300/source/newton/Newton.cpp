@@ -728,7 +728,7 @@ void NewtonSetIslandUpdateEvent(const NewtonWorld* const newtonWorld, NewtonIsla
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->SetIslandUpdateCallback((dgWorld::OnIslandUpdate) islandUpdate); 
+	world->SetIslandUpdateCallback((dgWorld::OnClusterUpdate) islandUpdate); 
 }
 
 
@@ -1192,7 +1192,7 @@ NewtonBody* NewtonIslandGetBody(const void* const island, int bodyIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgWorld* const world = *(dgWorld**)island;
-	return (NewtonBody*)world->GetIslandBody (island, bodyIndex);
+	return (NewtonBody*)world->GetClusterBody (island, bodyIndex);
 }
 
 

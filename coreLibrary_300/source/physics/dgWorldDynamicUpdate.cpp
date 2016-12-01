@@ -50,8 +50,8 @@ class dgWorldDynamicUpdateSyncDescriptor
 	dgFloat32 m_timestep;
 	dgInt32 m_atomicCounter;
 	
-	dgInt32 m_islandCount;
-	dgInt32 m_firstIsland;
+	dgInt32 m_clusterCount;
+	dgInt32 m_firstCluster;
 	dgThread::dgCriticalSection* m_criticalSection;
 };
 
@@ -63,10 +63,10 @@ class dgWorldDynamicUpdateSyncDescriptor
 dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 	:m_bodies(0)
 	,m_joints(0)
-	,m_islands(0)
+	,m_clusters(0)
 	,m_markLru(0)
 	,m_softBodyCriticalSectionLock()
-	,m_islandMemory(NULL)
+	,m_clusterMemory(NULL)
 {
 }
 
@@ -78,7 +78,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	
 	m_bodies = 0;
 	m_joints = 0;
-	m_islands = 0;
+	m_clusters = 0;
 	m_solverConvergeQuality = world->m_solverConvergeQuality;
 	world->m_dynamicsLru = world->m_dynamicsLru + DG_BODY_LRU_STEP;
 	m_markLru = world->m_dynamicsLru;
@@ -87,17 +87,17 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_index = 0; 
 	sentinelBody->m_dynamicsLru = m_markLru;
 
-	BuildIslands(timestep);
-	SortIslandByCount();
+	BuildClusters(timestep);
+	SortIClustersByCount();
 
 	dgInt32 maxRowCount = 0;
 	dgInt32 blockMatrixSize = 0;
 	dgInt32 softBodiesCount = 0;
-	for (dgInt32 i = 0; i < m_islands; i ++) {
-		dgIsland& island = m_islandMemory[i];
-		island.m_rowsStart = maxRowCount;
-		maxRowCount += island.m_rowsCount;
-		softBodiesCount += island.m_hasSoftBodies;
+	for (dgInt32 i = 0; i < m_clusters; i ++) {
+		dgBodyCluster& cluster = m_clusterMemory[i];
+		cluster.m_rowsStart = maxRowCount;
+		maxRowCount += cluster.m_rowsCount;
+		softBodiesCount += cluster.m_hasSoftBodies;
 	}
 	m_solverMemory.Init (world, maxRowCount, m_bodies, blockMatrixSize);
 
@@ -107,9 +107,9 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	descriptor.m_timestep = timestep;
 
 	if (softBodiesCount) {
-		descriptor.m_firstIsland = 0;
+		descriptor.m_firstCluster = 0;
 		descriptor.m_atomicCounter = 0;
-		descriptor.m_islandCount = softBodiesCount;
+		descriptor.m_clusterCount = softBodiesCount;
 		for (dgInt32 i = 0; i < threadCount; i++) {
 			world->QueueJob(ApplySoftBodyIntenalForceKernel, &descriptor, world);
 		}
@@ -117,9 +117,9 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	}
 
 	dgInt32 index = 0;
-	descriptor.m_firstIsland = 0;
+	descriptor.m_firstCluster = 0;
 	descriptor.m_atomicCounter = 0;
-	descriptor.m_islandCount = m_islands;
+	descriptor.m_clusterCount = m_clusters;
 	sentinelBody->m_sleeping = true;
 	sentinelBody->m_equilibrium = true;
 
@@ -127,40 +127,40 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	//useParallel = 1;
 	if (useParallel) {
 		dgInt32 sum = m_joints;
-		useParallel = useParallel && m_joints && m_islands;
-		useParallel = useParallel && ((threadCount * m_islandMemory[0].m_jointCount) >= sum);
-		useParallel = useParallel && (m_islandMemory[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
+		useParallel = useParallel && m_joints && m_clusters;
+		useParallel = useParallel && ((threadCount * m_clusterMemory[0].m_jointCount) >= sum);
+		useParallel = useParallel && (m_clusterMemory[0].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
 		//useParallel = 1;
 		while (useParallel) {
-			CalculateReactionForcesParallel(&m_islandMemory[index], timestep);
+			CalculateReactionForcesParallel(&m_clusterMemory[index], timestep);
 			index ++;
-			sum -= m_islandMemory[index].m_jointCount;
-			useParallel = useParallel && (index < m_islands);
-			useParallel = useParallel && ((threadCount * m_islandMemory[index].m_jointCount) >= m_joints);
-			useParallel = useParallel && (m_islandMemory[index].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
+			sum -= m_clusterMemory[index].m_jointCount;
+			useParallel = useParallel && (index < m_clusters);
+			useParallel = useParallel && ((threadCount * m_clusterMemory[index].m_jointCount) >= m_joints);
+			useParallel = useParallel && (m_clusterMemory[index].m_jointCount > DG_PARALLEL_JOINT_COUNT_CUT_OFF);
 		}
 	}
 
-	if (index < m_islands) {
-		descriptor.m_firstIsland = index;
-		descriptor.m_islandCount = m_islands - index;
+	if (index < m_clusters) {
+		descriptor.m_firstCluster = index;
+		descriptor.m_clusterCount = m_clusters - index;
 		descriptor.m_atomicCounter = 0;
 		for (dgInt32 i = 0; i < threadCount; i ++) {
-			world->QueueJob (CalculateIslandReactionForcesKernel, &descriptor, world);
+			world->QueueJob (CalculateClusterReactionForcesKernel, &descriptor, world);
 		}
 		world->SynchronizationBarrier();
 	}
 
-	m_islandMemory = NULL;
+	m_clusterMemory = NULL;
 }
 
-void dgWorldDynamicUpdate::SortIslandByCount ()
+void dgWorldDynamicUpdate::SortIClustersByCount ()
 {
 	dTimeTrackerEvent(__FUNCTION__);
-	dgSort(m_islandMemory, m_islands, CompareIslands);
+	dgSort(m_clusterMemory, m_clusters, CompareClusters);
 }
 
-void dgWorldDynamicUpdate::BuildIslands(dgFloat32 timestep)
+void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 
@@ -209,10 +209,10 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	dgInt32 hasSoftBodies = 0;
 
 	dgWorld* const world = (dgWorld*) this;
-	const dgInt32 islandLRU = world->m_islandLRU;
+	const dgInt32 clusterLRU = world->m_clusterLRU;
 	const dgUnsigned32 lruMark = m_markLru - 1;
 
-	world->m_islandLRU ++;
+	world->m_clusterLRU ++;
 
 	queueBuffer[0] = body;
 	world->m_bodiesMemory.ExpandCapacityIfNeessesary(m_bodies, sizeof (dgBodyInfo));
@@ -269,7 +269,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
 
 						constraint->m_index = jointCount;
-						constraint->m_islandLRU = islandLRU;
+						constraint->m_clusterLRU = clusterLRU;
 						constraint->m_dynamicsLru = lruMark;
 
 						constraintArray[jointIndex].m_joint = constraint;
@@ -322,13 +322,13 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			body->m_sleeping = globalAutoSleep;
 		}
 	} else {
-		if (world->m_islandUpdate) {
-			dgIslandCallbackStruct record;
+		if (world->m_clusterUpdate) {
+			dgClusterCallbackStruct record;
 			record.m_world = world;
 			record.m_count = bodyCount;
 			record.m_strideInByte = sizeof (dgBodyInfo);
 			record.m_bodyArray = &bodyArray[m_bodies].m_body;
-			if (!world->m_islandUpdate(world, &record, bodyCount)) {
+			if (!world->m_clusterUpdate(world, &record, bodyCount)) {
 				for (dgInt32 i = 0; i < bodyCount; i++) {
 					dgBody* const body = bodyArray[m_bodies + i].m_body;
 					body->m_dynamicsLru = m_markLru;
@@ -337,26 +337,26 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			}
 		}
 
-		world->m_islandMemory.ExpandCapacityIfNeessesary (m_islands + 1, sizeof (dgIsland));
-		m_islandMemory = (dgIsland*) &world->m_islandMemory[0];
-		dgIsland& island = m_islandMemory[m_islands];
+		world->m_clusterMemory.ExpandCapacityIfNeessesary (m_clusters + 1, sizeof (dgBodyCluster));
+		m_clusterMemory = (dgBodyCluster*) &world->m_clusterMemory[0];
+		dgBodyCluster& cluster = m_clusterMemory[m_clusters];
 
-		island.m_bodyStart = m_bodies;
-		island.m_jointStart = m_joints;
-		island.m_bodyCount = bodyCount;
-		island.m_islandLRU = islandLRU;
-		island.m_jointCount = jointCount;
-		island.m_activeJointCount = activeJointCount;
+		cluster.m_bodyStart = m_bodies;
+		cluster.m_jointStart = m_joints;
+		cluster.m_bodyCount = bodyCount;
+		cluster.m_clusterLRU = clusterLRU;
+		cluster.m_jointCount = jointCount;
+		cluster.m_activeJointCount = activeJointCount;
 		
-		island.m_rowsStart = 0;
-		island.m_isContinueCollision = 0;
-		island.m_hasSoftBodies = dgInt16 (hasSoftBodies);
+		cluster.m_rowsStart = 0;
+		cluster.m_isContinueCollision = 0;
+		cluster.m_hasSoftBodies = dgInt16 (hasSoftBodies);
 
 		dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
 		dgJointInfo* const constraintArray = &constraintArrayPtr[m_joints];
 
 		dgInt32 rowsCount = 0;
-		dgInt32 isContinueCollisionIsland = 0;
+		dgInt32 isContinueCollisionCluster = 0;
 		for (dgInt32 i = 0; i < jointCount; i++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const joint = jointInfo->m_joint;
@@ -414,39 +414,39 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						}
 					}
 					//ccdJoint = body0->m_continueCollisionMode | body1->m_continueCollisionMode;
-					isContinueCollisionIsland |= ccdJoint;
+					isContinueCollisionCluster |= ccdJoint;
 					rowsCount += DG_CCD_EXTRA_CONTACT_COUNT;
 				}
 			}
 		}
 
-		if (isContinueCollisionIsland) {
+		if (isContinueCollisionCluster) {
 			rowsCount = dgMax(rowsCount, 64);
 		}
-		island.m_rowsCount = rowsCount;
-		island.m_isContinueCollision = dgInt16 (isContinueCollisionIsland);
+		cluster.m_rowsCount = rowsCount;
+		cluster.m_isContinueCollision = dgInt16 (isContinueCollisionCluster);
 
-		m_islands++;
+		m_clusters++;
 		m_bodies += bodyCount;
 		m_joints += jointCount;
 	}
 }
 
 
-void dgWorldDynamicUpdate::SortIsland(const dgIsland* const island, dgFloat32 timestep, dgInt32 threadID) const
+void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
 {
 	dgWorld* const world = (dgWorld*) this;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
-	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
+	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 
-	dgJointInfo** queueBuffer = dgAlloca(dgJointInfo*, island->m_jointCount * 2 + 1024);
-	dgJointInfo* const tmpInfoList = dgAlloca(dgJointInfo, island->m_jointCount);
-	dgQueue<dgJointInfo*> queue(queueBuffer, island->m_jointCount * 2 + 1024);
+	dgJointInfo** queueBuffer = dgAlloca(dgJointInfo*, cluster->m_jointCount * 2 + 1024);
+	dgJointInfo* const tmpInfoList = dgAlloca(dgJointInfo, cluster->m_jointCount);
+	dgQueue<dgJointInfo*> queue(queueBuffer, cluster->m_jointCount * 2 + 1024);
 	dgFloat32 heaviestMass = dgFloat32(1.0e20f);
 	dgJointInfo* heaviestBody = NULL;
 
 //	for (dgInt32 i = 0; i < island->m_jointCount; i++) {
-	for (dgInt32 i = 0; i < island->m_activeJointCount; i++) {
+	for (dgInt32 i = 0; i < cluster->m_activeJointCount; i++) {
 		dgJointInfo& jointInfo = constraintArray[i];
 		tmpInfoList[i] = jointInfo;
 		if (jointInfo.m_isFrontier) {
@@ -469,9 +469,9 @@ void dgWorldDynamicUpdate::SortIsland(const dgIsland* const island, dgFloat32 ti
 	}
 
 	dgInt32 infoIndex = 0;
-	const dgInt32 lru = island->m_islandLRU;
+	const dgInt32 lru = cluster->m_clusterLRU;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
+	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 
 	while (!queue.IsEmpty()) {
 		dgInt32 count = queue.m_firstIndex - queue.m_lastIndex;
@@ -485,15 +485,15 @@ void dgWorldDynamicUpdate::SortIsland(const dgIsland* const island, dgFloat32 ti
 		for (dgInt32 j = 0; j < count; j++) {
 			dgJointInfo* const jointInfo = queue.m_pool[index];
 			dgConstraint* const constraint = jointInfo->m_joint;
-			if (constraint->m_islandLRU == lru) {
-				dgAssert (dgInt32 (constraint->m_index) < island->m_activeJointCount);
+			if (constraint->m_clusterLRU == lru) {
+				dgAssert (dgInt32 (constraint->m_index) < cluster->m_activeJointCount);
 				constraint->m_index = infoIndex;
 				constraintArray[infoIndex] = *jointInfo;
-				constraint->m_islandLRU--;
+				constraint->m_clusterLRU--;
 				infoIndex++;
-				dgAssert(infoIndex <= island->m_jointCount);
+				dgAssert(infoIndex <= cluster->m_jointCount);
 				//if (infoIndex == island->m_jointCount) {
-				if (infoIndex == island->m_activeJointCount) {
+				if (infoIndex == cluster->m_activeJointCount) {
 					return;
 				}
 
@@ -503,7 +503,7 @@ void dgWorldDynamicUpdate::SortIsland(const dgIsland* const island, dgFloat32 ti
 					for (dgBodyMasterListRow::dgListNode* jointNode = body0->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 						dgConstraint* const constraint = cell->m_joint;
-						if ((constraint->m_islandLRU == lru) && (dgInt32 (constraint->m_index) < island->m_activeJointCount)){
+						if ((constraint->m_clusterLRU == lru) && (dgInt32 (constraint->m_index) < cluster->m_activeJointCount)){
 							dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
 							queue.Insert(nextInfo);
 						}
@@ -516,7 +516,7 @@ void dgWorldDynamicUpdate::SortIsland(const dgIsland* const island, dgFloat32 ti
 					for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 						dgConstraint* const constraint = cell->m_joint;
-						if ((constraint->m_islandLRU == lru) && (dgInt32 (constraint->m_index) < island->m_activeJointCount)){
+						if ((constraint->m_clusterLRU == lru) && (dgInt32 (constraint->m_index) < cluster->m_activeJointCount)){
 							dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
 							queue.Insert(nextInfo);
 						}
@@ -529,25 +529,25 @@ void dgWorldDynamicUpdate::SortIsland(const dgIsland* const island, dgFloat32 ti
 			}
 		}
 	}
-	dgAssert(infoIndex == island->m_activeJointCount);
+	dgAssert(infoIndex == cluster->m_activeJointCount);
 }
 
 
-dgBody* dgWorldDynamicUpdate::GetIslandBody(const void* const islandPtr, dgInt32 index) const
+dgBody* dgWorldDynamicUpdate::GetClusterBody(const void* const clusterPtr, dgInt32 index) const
 {
-	const dgIslandCallbackStruct* const island = (dgIslandCallbackStruct*)islandPtr;
+	const dgClusterCallbackStruct* const cluster = (dgClusterCallbackStruct*)clusterPtr;
 
-	char* const ptr = &((char*)island->m_bodyArray)[island->m_strideInByte * index];
+	char* const ptr = &((char*)cluster->m_bodyArray)[cluster->m_strideInByte * index];
 	dgBody** const bodyPtr = (dgBody**)ptr;
-	return (index < island->m_count) ? ((index >= 0) ? *bodyPtr : NULL) : NULL;
+	return (index < cluster->m_count) ? ((index >= 0) ? *bodyPtr : NULL) : NULL;
 }
 
 
 // sort from high to low
-dgInt32 dgWorldDynamicUpdate::CompareIslands(const dgIsland* const islandA, const dgIsland* const islandB, void* notUsed)
+dgInt32 dgWorldDynamicUpdate::CompareClusters(const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed)
 {
-	dgInt32 countA = islandA->m_activeJointCount + (islandA->m_hasSoftBodies << 30);
-	dgInt32 countB = islandB->m_activeJointCount + (islandB->m_hasSoftBodies << 30);
+	dgInt32 countA = clusterA->m_activeJointCount + (clusterA->m_hasSoftBodies << 30);
+	dgInt32 countB = clusterB->m_activeJointCount + (clusterB->m_hasSoftBodies << 30);
 
 	if (countA < countB) {
 		return 1;
@@ -558,13 +558,13 @@ dgInt32 dgWorldDynamicUpdate::CompareIslands(const dgIsland* const islandA, cons
 	return 0;
 }
 
-void dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(dgIsland* const island, dgFloat32 timestep)
+void dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(dgBodyCluster* const cluster, dgFloat32 timestep)
 {
 	dgWorld* const world = (dgWorld*) this;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
+	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 
-	for (dgInt32 i = 1; i < island->m_bodyCount; i++) {
+	for (dgInt32 i = 1; i < cluster->m_bodyCount; i++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 		if (body->m_collision->GetChildShape()->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
@@ -580,28 +580,28 @@ void dgWorldDynamicUpdate::ApplySoftBodyIntenalForceKernel(void* const context, 
 	dgWorldDynamicUpdateSyncDescriptor* const descriptor = (dgWorldDynamicUpdateSyncDescriptor*)context;
 	dgFloat32 timestep = descriptor->m_timestep;
 	dgWorld* const world = (dgWorld*)worldContext;
-	dgInt32 count = descriptor->m_islandCount;
-	dgIsland* const islands = &((dgIsland*)&world->m_islandMemory[0])[descriptor->m_firstIsland];
+	dgInt32 count = descriptor->m_clusterCount;
+	dgBodyCluster* const clusters = &((dgBodyCluster*)&world->m_clusterMemory[0])[descriptor->m_firstCluster];
 
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
-		dgIsland* const island = &islands[i];
-		world->dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(island, timestep);
+		dgBodyCluster* const cluster = &clusters[i];
+		world->dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(cluster, timestep);
 	}
 }
 
-void dgWorldDynamicUpdate::CalculateIslandReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
+void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	dgWorldDynamicUpdateSyncDescriptor* const descriptor = (dgWorldDynamicUpdateSyncDescriptor*) context;
 
 	dgFloat32 timestep = descriptor->m_timestep;
 	dgWorld* const world = (dgWorld*) worldContext;
-	dgInt32 count = descriptor->m_islandCount;
-	dgIsland* const islands = &((dgIsland*)&world->m_islandMemory[0])[descriptor->m_firstIsland];
+	dgInt32 count = descriptor->m_clusterCount;
+	dgBodyCluster* const clusters = &((dgBodyCluster*)&world->m_clusterMemory[0])[descriptor->m_firstCluster];
 
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
-		dgIsland* const island = &islands[i]; 
-		world->CalculateIslandReactionForces (island, timestep, threadID);
+		dgBodyCluster* const cluster = &clusters[i]; 
+		world->CalculateClusterReactionForces (cluster, timestep, threadID);
 	}
 }
 
@@ -699,7 +699,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 }
 
 
-void dgWorldDynamicUpdate::IntegrateVelocity (const dgIsland* const island, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadIndex) const
+void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const
 {
 	bool isAutoSleep = true;
 	bool stackSleeping = true;
@@ -709,8 +709,8 @@ void dgWorldDynamicUpdate::IntegrateVelocity (const dgIsland* const island, dgFl
 
 	dgFloat32 velocityDragCoeff = DG_FREEZZING_VELOCITY_DRAG;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart + 1]; 
-	dgInt32 count = island->m_bodyCount - 1;
+	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart + 1]; 
+	dgInt32 count = cluster->m_bodyCount - 1;
 	if (count <= 2) {
 		bool autosleep = bodyArray[0].m_body->m_autoSleep;
 		if (count == 2) {
@@ -727,9 +727,9 @@ void dgWorldDynamicUpdate::IntegrateVelocity (const dgIsland* const island, dgFl
 	dgFloat32 maxOmega = dgFloat32 (0.0f);
 
 //	const dgFloat32 smallIslandCutoff = ((island->m_jointCount <= DG_SMALL_ISLAND_COUNT) ? dgFloat32 (0.01f) : dgFloat32 (1.0f));
-	const dgFloat32 smallIslandCutoff = (island->m_jointCount ? dgFloat32(0.01f) : dgFloat32(1.0f));
-	const dgFloat32 speedFreeze = world->m_freezeSpeed2 * smallIslandCutoff;
-	const dgFloat32 accelFreeze = world->m_freezeAccel2 * smallIslandCutoff;
+	const dgFloat32 smallClusterCutoff = (cluster->m_jointCount ? dgFloat32(0.01f) : dgFloat32(1.0f));
+	const dgFloat32 speedFreeze = world->m_freezeSpeed2 * smallClusterCutoff;
+	const dgFloat32 accelFreeze = world->m_freezeAccel2 * smallClusterCutoff;
 	dgVector velocDragVect (velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
@@ -770,12 +770,12 @@ void dgWorldDynamicUpdate::IntegrateVelocity (const dgIsland* const island, dgFl
 
 			sleepCounter = dgMin (sleepCounter, body->m_sleepingCounter);
 
-			body->UpdateMatrix (timestep, threadIndex);
+			body->UpdateMatrix (timestep, threadID);
 		}
 	}
 
 //	if (isAutoSleep && (island->m_jointCount > DG_SMALL_ISLAND_COUNT)) {
-	if (isAutoSleep && island->m_jointCount) {
+	if (isAutoSleep && cluster->m_jointCount) {
 		if (stackSleeping) {
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;

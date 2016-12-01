@@ -216,7 +216,7 @@ class dgConstraint
 	dgBodyMasterListRow::dgListNode* m_link0;
 	dgBodyMasterListRow::dgListNode* m_link1;
 	ConstraintsForceFeeback m_updaFeedbackCallback;
-	dgInt32 m_islandLRU;
+	dgInt32 m_clusterLRU;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_index;
 	
@@ -245,7 +245,7 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_link0(NULL)
 	,m_link1(NULL)
 	,m_updaFeedbackCallback(NULL)
-	,m_islandLRU (-1)
+	,m_clusterLRU (-1)
 	,m_dynamicsLru(0)
 	,m_index(0)
 	,m_maxDOF(6)

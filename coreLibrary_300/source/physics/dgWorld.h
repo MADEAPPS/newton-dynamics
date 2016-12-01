@@ -159,7 +159,7 @@ class dgWorld
 {
 	public:
 	typedef dgUnsigned64 (dgApi *OnGetTimeInMicrosenconds) ();
-	typedef dgUnsigned32 (dgApi *OnIslandUpdate) (const dgWorld* const world, void* island, dgInt32 bodyCount);
+	typedef dgUnsigned32 (dgApi *OnClusterUpdate) (const dgWorld* const world, void* island, dgInt32 bodyCount);
 	typedef void (dgApi *OnListenerBodyDestroyCallback) (const dgWorld* const world, void* const listener, dgBody* const body);
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listener, dgFloat32 timestep);
 	typedef void (dgApi *OnListenerDestroyCallback) (const dgWorld* const world, void* const listener);
@@ -276,7 +276,7 @@ class dgWorld
 	void SetListenerBodyDestroyCallback (void* const listener, OnListenerBodyDestroyCallback callback);
 	OnListenerBodyDestroyCallback GetListenerBodyDestroyCallback (void* const listener) const;
 
-	void SetIslandUpdateCallback (OnIslandUpdate callback); 
+	void SetIslandUpdateCallback (OnClusterUpdate callback); 
 
 	void InitBody (dgBody* const body, dgCollisionInstance* const collision, const dgMatrix& matrix);
 	dgDynamicBody* CreateDynamicBody (dgCollisionInstance* const collision, const dgMatrix& matrix);
@@ -447,7 +447,7 @@ class dgWorld
 	dgUnsigned32 m_useParallelSolver;
 	dgUnsigned32 m_genericLRUMark;
 	dgInt32 m_delayDelateLock;
-	dgInt32 m_islandLRU;
+	dgInt32 m_clusterLRU;
 
 	dgFloat32 m_freezeAccel2;
 	dgFloat32 m_freezeAlpha2;
@@ -468,7 +468,7 @@ class dgWorld
 	void* m_userData;
 	dgMemoryAllocator* m_allocator;
 	dgInt32 m_hardwaredIndex;
-	OnIslandUpdate m_islandUpdate;
+	OnClusterUpdate m_clusterUpdate;
 	OnGetTimeInMicrosenconds m_getDebugTime;
 	OnCollisionInstanceDestroy	m_onCollisionInstanceDestruction;
 	OnCollisionInstanceDuplicate m_onCollisionInstanceCopyConstrutor;
@@ -482,7 +482,7 @@ class dgWorld
 	dgArray<dgUnsigned8> m_jointsMemory; 
 	dgArray<dgUnsigned8> m_solverJacobiansMemory;  
 	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;
-	dgArray<dgUnsigned8> m_islandMemory;
+	dgArray<dgUnsigned8> m_clusterMemory;
 	
 	
 	friend class dgBody;
