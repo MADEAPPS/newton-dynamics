@@ -307,14 +307,35 @@ class dgFastAABBInfo: public dgObb
 		dgVector minBox;
 		dgVector maxBox;
 		MakeBox1 (indexCount, indexArray, stride, vertexArray, minBox, maxBox);
-		dgFloat32 dist0 = BoxPenetration (minBox, maxBox);
+//		dgFloat32 dist0 = BoxPenetration (minBox, maxBox);
+		dgVector mask((minBox.CompProduct4(maxBox)) < dgVector(dgFloat32(0.0f)));
+		dgVector dist(maxBox.GetMin(minBox.Abs()) & mask);
+		dist = dist.GetMin(dist.ShiftTripleRight());
+		dist = dist.GetMin(dist.ShiftTripleRight());
+		dgFloat32 dist0 = dist.GetScalar();
 		if (dist0 > dgFloat32 (0.0f)) {
 			dgMatrix faceMatrix (MakeFaceMatrix (faceNormal, indexCount, indexArray, stride, vertexArray));
 			MakeBox2 (faceMatrix, indexCount, indexArray, stride, vertexArray, minBox, maxBox);
-			dgFloat32 dist1 = BoxPenetration (minBox, maxBox);
+			//dgFloat32 dist1 = BoxPenetration (minBox, maxBox);
+			dgVector mask((minBox.CompProduct4(maxBox)) < dgVector(dgFloat32(0.0f)));
+			dgVector dist(maxBox.GetMin(minBox.Abs()) & mask);
+			dist = dist.GetMin(dist.ShiftTripleRight());
+			dist = dist.GetMin(dist.ShiftTripleRight());
+			dgFloat32 dist1 = dist.GetScalar();
 			dist0 = (dist1 > dgFloat32 (0.0f)) ? dgMax (dist0, dist1) : dgFloat32 (0.0f);
+			if (dist0 <= dgFloat32(0.0f)) {
+				dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
+				dist = p1p0.DotProduct4(p1p0);
+				dist = (dist.Sqrt()).CompProduct4(dgVector::m_negOne);
+				dist0 = dist.GetScalar();
+			}
+		} else {
+			dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
+			dist = p1p0.DotProduct4(p1p0);
+			dist = (dist.Sqrt()).CompProduct4(dgVector::m_negOne);
+			dist0 = dist.GetScalar();
 		}
-		return dist0;
+		return	dist0;
 	}
 
 	DG_INLINE dgFloat32 GetSeparetionDistance() const

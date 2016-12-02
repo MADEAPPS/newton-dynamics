@@ -1231,6 +1231,8 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 								if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dist1) == t_StopSearh) {
 									return;
 								}
+							} else {
+								obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist1);
 							}
 						}
 
@@ -1266,6 +1268,8 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 								if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dist1) == t_StopSearh) {
 									return;
 								}
+							} else {
+								obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist1);
 							}
 						}
 
@@ -1369,8 +1373,6 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 			}
 		}
 	}
-
-obbAabbInfo.m_separationDistance = dgFloat32(0.0f);
 }
 
 
