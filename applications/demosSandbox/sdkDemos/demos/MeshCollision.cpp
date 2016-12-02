@@ -40,9 +40,9 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
 	dVector origin (-30.0f, 40.0f, -15.0f, 0.0f);
-	origin.m_x = -10.0f;
-	origin.m_y = 2.0f;
-	origin.m_z = -2.0f;
+//	origin.m_x = -10.0f;
+//	origin.m_y = 2.0f;
+//	origin.m_z = -2.0f;
 	scene->SetCameraMatrix(rot, origin);
 
 	NewtonWorld* const world = scene->GetNewton();
@@ -50,19 +50,19 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector size (0.5f, 0.5f, 1.0f, 0.0f);
 
-	int count = 1;
-//	int count = 6;
+//	int count = 1;
+	int count = 6;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-	for (int i = 0; i < 1; i ++) {
+	for (int i = 0; i < 3; i ++) {
 		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+		AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	}
 
 
