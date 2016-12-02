@@ -135,9 +135,10 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 				dist1 = dist1.GetMin(dist1.ShiftTripleRight());
 				dist = dist.GetMin(dist1);
 			} else {
-//				dgAssert(0);
+				dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
+				dist = p1p0.DotProduct4(p1p0);
+				dist = (dist.Sqrt()).CompProduct4(dgVector::m_negOne);
 			}
-
 			return	dist.GetScalar();
 		}
 
