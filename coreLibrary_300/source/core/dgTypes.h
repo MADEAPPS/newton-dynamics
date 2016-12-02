@@ -99,7 +99,7 @@
 #endif
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define DG_SSE4_INSTRUCTIONS_SET
+//	#define DG_SSE4_INSTRUCTIONS_SET
 	#include <intrin.h>
 	#include <emmintrin.h> 
 #endif

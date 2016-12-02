@@ -123,17 +123,6 @@ class dgTemplateVector
 									m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-	//DG_INLINE T operator% (const dgTemplateVector<T>& A) const
-	//{
-	//	return DotProduct3(A);
-	//}
-
-	//DG_INLINE dgTemplateVector<T> operator* (const dgTemplateVector<T>& B) const
-	//{
-	//	return CrossProduct3(B);
-	//}
-
-
 	// return dot 4d dot product
 	DG_INLINE dgTemplateVector<T> DotProduct4 (const dgTemplateVector &A) const
 	{
@@ -430,17 +419,6 @@ class dgVector
 						 m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-	//DG_INLINE dgFloat32 operator% (const dgVector& A) const
-	//{
-	//	return DotProduct3 (const dgVector& A) const
-	//}
-
-	//DG_INLINE dgTemplateVector<T> operator* (const dgTemplateVector<T>& B) const
-	//{
-	//	return CrossProduct3(B);
-	//}
-
-	
 	DG_INLINE dgVector GetInt () const
 	{
 		return dgVector (dgInt32 (dgFloor (m_x)), dgInt32(dgFloor (m_y)), dgInt32(dgFloor (m_z)), dgInt32 (dgFloor (m_w)));
@@ -838,17 +816,6 @@ class dgVector
 		dgVector tmp3 (B.ShiftTripleLeft ());
 		return tmp0.CompProduct4(tmp1) - tmp2.CompProduct4(tmp3);
 	}
-
-
-	//DG_INLINE dgFloat32 operator% (const dgVector& A) const
-	//{
-	//	return DotProduct3 (A);
-	//}
-
-	//DG_INLINE dgVector operator* (const dgVector& B) const
-	//{
-	//	return CrossProduct3(B);
-	//}
 
 	DG_INLINE dgVector DotProduct4 (const dgVector& A) const
 	{
@@ -1288,16 +1255,6 @@ class dgVector
 		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 1, 0, 2))),
 						   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 0, 2, 1))));
 	}
-
-	//DG_INLINE dgFloat32 operator% (const dgVector& A) const
-	//{
-	//	return DotProduct3 (A);
-	//}
-
-	//DG_INLINE dgVector operator* (const dgVector& B) const
-	//{
-	//	return CrossProduct3(B);
-	//}
 
 	DG_INLINE dgVector DotProduct4(const dgVector& A) const
 	{
