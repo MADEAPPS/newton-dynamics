@@ -34,6 +34,7 @@ class dgArray
 {
 	public:
 	dgArray (dgInt32 granulatitySize, dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY);
+	dgArray (const dgArray& source);
 	~dgArray ();
 
 	DG_CLASS_ALLOCATOR(allocator)
@@ -41,6 +42,8 @@ class dgArray
 	
 	T& operator[] (dgInt32 i);
 	const T& operator[] (dgInt32 i) const;
+	
+	void Clear () const;
 	void Resize (dgInt32 size) const;
 
 	dgInt32 GetElementSize() const;
@@ -66,6 +69,12 @@ dgArray<T>::dgArray (dgInt32 granulatitySize, dgMemoryAllocator* const allocator
 		m_aligmentInByte = 8;
 	}
 	m_aligmentInByte = 1 << dgExp2(m_aligmentInByte);
+}
+
+template<class T>
+dgArray<T>::dgArray (const dgArray& source)
+{
+	dgAssert (0);
 }
 
 template<class T>
@@ -117,7 +126,14 @@ dgInt32 dgArray<T>::GetBytesCapacity () const
 	return  m_maxSize * GetElementSize();
 }
 
-
+template<class T>
+void dgArray<T>::Clear () const
+{
+	if (m_array) {
+		m_allocator->FreeLow (m_array);
+	}
+	m_maxSize = 0;
+}
 
 template<class T>
 void dgArray<T>::Resize (dgInt32 size) const
