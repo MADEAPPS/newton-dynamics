@@ -180,6 +180,15 @@ class dgTemplateVector
 		return dgTemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
 	}
 
+	DG_INLINE dgTemplateVector<T> GetMax(const dgTemplateVector<T>& data) const
+	{
+		return dgTemplateVector<T>((m_x > data.m_x) ? m_x : data.m_x, (m_y > data.m_y) ? m_y : data.m_y, (m_z > data.m_z) ? m_z : data.m_z,	(m_w > data.m_w) ? m_w : data.m_w);
+	}
+
+	DG_INLINE dgTemplateVector<T> GetMin(const dgTemplateVector<T>& data) const
+	{
+		return dgTemplateVector<T>((m_x < data.m_x) ? m_x : data.m_x, (m_y < data.m_y) ? m_y : data.m_y, (m_z < data.m_z) ? m_z : data.m_z,	(m_w < data.m_w) ? m_w : data.m_w);
+	}
 
 	// check validity of floats
 #ifdef _DEBUG

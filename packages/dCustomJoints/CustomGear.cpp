@@ -272,8 +272,8 @@ void CustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonBodyGetVelocity(m_body1, &veloc1[0]);
 
 	// get angular velocity relative to the pin vector
-	dFloat w0 = omega0 % matrix0.m_front;
-	dFloat w1 = veloc1 % matrix1.m_front;
+	dFloat w0 = omega0.DotProduct3(matrix0.m_front);
+	dFloat w1 = veloc1.DotProduct3(matrix1.m_front);
 
 	// establish the gear equation.
 	dFloat relVeloc = w0 + w1;

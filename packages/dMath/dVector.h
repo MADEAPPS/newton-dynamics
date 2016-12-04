@@ -42,12 +42,6 @@ class TemplateVector
 	// component wise multiplication
 	TemplateVector CompProduct(const TemplateVector &A) const;
 
-	// legacy return dot product
-	T operator% (const TemplateVector &A) const {return A.DotProduct3(*this);} 
-
-	// legacy return cross product
-	TemplateVector operator* (const TemplateVector &A) const {return (*this).CrossProduct(A);}
-
 	T m_x;
 	T m_y;
 	T m_z;

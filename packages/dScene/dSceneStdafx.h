@@ -137,28 +137,16 @@
 #endif
 
 
-
-
-/*
-#ifdef _NEWTON_USE_DOUBLE
-	#define glMultMatrix(x) glMultMatrixd(x)
-	#define glLoadMatrix(x) glMultMatrixd(x)
-//	#define glGetFloat(x,y) glGetDoublev(x,(GLdouble *)y) 
-#else
-	#define glMultMatrix(x) glMultMatrixf(x)
-	#define glLoadMatrix(x) glMultMatrixf(x)
-	#define glGetFloat(x,y) glGetFloatv(x,(dFloat  *)y) 
+#ifndef _NEWTON_USE_DOUBLE
+DSCENE_API void dStringToFloatArray(const char* const string, dFloat64* const array, int maxCount);
+DSCENE_API void dFloatArrayToString (const dFloat64* const array, int count, char* const string, int maxSixeInBytes);
 #endif
-*/
 
+DSCENE_API void dStringToFloatArray (const char* const string, dFloat* const array, int maxCount);
+DSCENE_API void dFloatArrayToString (const dFloat* const array, int count, char* const string, int maxSixeInBytes);
 
 DSCENE_API void dStringToIntArray (const char* const string, int* const array, int maxCount);
-DSCENE_API void dStringToFloatArray (const char* const string, dFloat* const array, int maxCount);
-DSCENE_API void dStringToFloatArray (const char* const string, dFloat64* const array, int maxCount);
 DSCENE_API void dIntArrayToString (const int* const array, int count, char* const string, int maxSixeInBytes);
-DSCENE_API void dFloatArrayToString (const dFloat* const array, int count, char* const string, int maxSixeInBytes);
-DSCENE_API void dFloatArrayToString (const dFloat64* const array, int count, char* const string, int maxSixeInBytes);
-
 DSCENE_API const char* dGetNameFromPath (const char* const fullName);
 DSCENE_API void dExtractPathFromFullName (const char* const fullName, char* const path);
 

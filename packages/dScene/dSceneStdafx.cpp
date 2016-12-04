@@ -67,6 +67,26 @@ void dIntArrayToString (const int* const array, int count, char* const string, i
 	}
 }
 
+void dStringToIntArray(const char* const string, int* const array, int maxCount)
+{
+	const char* ptr = string;
+	for (int i = 0; i < maxCount; i++) {
+		char value[128];
+		while (*ptr == ' ') {
+			ptr++;
+		}
+		int j = 0;
+		while (*ptr != ' ' && *ptr) {
+			value[j] = *ptr;
+			ptr++;
+			j++;
+		}
+		value[j] = 0;
+		int val = atoi(value);
+		array[i] = val;
+	}
+}
+
 void dFloatArrayToString (const dFloat* const array, int count, char* const string, int maxSixeInBytes)
 {
 	if (count) {
@@ -78,6 +98,26 @@ void dFloatArrayToString (const dFloat* const array, int count, char* const stri
 			dAssert ((ptr - string) < maxSixeInBytes);
 		}
 		string[ptr - string - 1] = 0;
+	}
+}
+
+void dStringToFloatArray (const char* const string, dFloat* const array, int maxCount)
+{
+	const char* ptr = string;
+	for (int i = 0; i < maxCount; i ++) {
+		char value[128];		
+		while (*ptr == ' ') {
+			ptr ++;
+		}
+		int j = 0;
+		while (*ptr != ' ' && *ptr) {
+			value[j] = *ptr;
+			ptr ++;
+			j ++;
+		}
+		value[j] = 0;
+		dFloat val = dFloat (atof (value));
+		array[i] = val;
 	}
 }
 
@@ -95,49 +135,7 @@ void dFloatArrayToString (const dFloat64* const array, int count, char* const st
 		string[ptr - string - 1] = 0;
 	}
 }
-#endif
 
-void dStringToIntArray (const char* const string, int* const array, int maxCount)
-{
-	const char* ptr = string;
-	for (int i = 0; i < maxCount; i ++) {
-		char value[128];		
-		while (*ptr == ' ') {
-			ptr ++;
-		}
-		int j = 0;
-		while (*ptr != ' ' && *ptr) {
-			value[j] = *ptr;
-			ptr ++;
-			j ++;
-		}
-		value[j] = 0;
-		int val = atoi (value);
-		array[i] = val;
-	}
-}
-
-void dStringToFloatArray (const char* const string, dFloat* const array, int maxCount)
-{
-	const char* ptr = string;
-	for (int i = 0; i < maxCount; i ++) {
-		char value[128];
-		while (*ptr == ' ') {
-			ptr ++;
-		}
-		int j = 0;
-		while (*ptr != ' ' && *ptr) {
-			value[j] = *ptr;
-			ptr ++;
-			j ++;
-		}
-		value[j] = 0;
-		dFloat val = dFloat (atof (value));
-		array[i] = val;
-	}
-}
-
-#ifndef _NEWTON_USE_DOUBLE
 void dStringToFloatArray (const char* const string, dFloat64* const array, int maxCount)
 {
 	const char* ptr = string;

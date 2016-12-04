@@ -50,6 +50,8 @@ class dgArray
 	dgInt32 GetBytesCapacity () const;
 	dgInt32 GetElementsCapacity () const; 
 
+	dgMemoryAllocator* GetAllocator() const;
+
 	bool ExpandCapacityIfNeessesary (dgInt32 index, dgInt32 stride) const;
 
 	private:
@@ -131,6 +133,7 @@ void dgArray<T>::Clear () const
 {
 	if (m_array) {
 		m_allocator->FreeLow (m_array);
+		m_array = NULL;
 	}
 	m_maxSize = 0;
 }
@@ -163,6 +166,12 @@ void dgArray<T>::Resize (dgInt32 size) const
 		m_array = newArray;
 		m_maxSize = size;
 	}
+}
+
+template<class T>
+dgMemoryAllocator* dgArray<T>::GetAllocator() const
+{
+	return m_allocator;
 }
 
 template<class T>
