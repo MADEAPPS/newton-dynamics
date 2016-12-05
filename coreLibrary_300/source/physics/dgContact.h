@@ -82,13 +82,6 @@ class dgCollisionParamProxy
 }DG_GCC_VECTOR_ALIGMENT;
 
 
-class dgClothPatchMaterial
-{
-	public:
-	dgFloat32 m_damper;
-	dgFloat32 m_stiffness;
-};
-
 DG_MSC_VECTOR_ALIGMENT
 class dgContactPoint
 {

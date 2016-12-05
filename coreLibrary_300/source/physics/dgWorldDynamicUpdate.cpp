@@ -105,7 +105,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 
 	dgWorldDynamicUpdateSyncDescriptor descriptor;
 	descriptor.m_timestep = timestep;
-
+/*
 	if (softBodiesCount) {
 		descriptor.m_firstCluster = 0;
 		descriptor.m_atomicCounter = 0;
@@ -115,6 +115,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 		}
 		world->SynchronizationBarrier();
 	}
+*/
 
 	dgInt32 index = 0;
 	descriptor.m_firstCluster = 0;
@@ -558,6 +559,7 @@ dgInt32 dgWorldDynamicUpdate::CompareClusters(const dgBodyCluster* const cluster
 	return 0;
 }
 
+/*
 void dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(dgBodyCluster* const cluster, dgFloat32 timestep)
 {
 	dgWorld* const world = (dgWorld*) this;
@@ -574,6 +576,7 @@ void dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(dgBodyCluster* const cluste
 	}
 }
 
+
 void dgWorldDynamicUpdate::ApplySoftBodyIntenalForceKernel(void* const context, void* const worldContext, dgInt32 threadID)
 {
 	dTimeTrackerEvent(__FUNCTION__);
@@ -588,6 +591,7 @@ void dgWorldDynamicUpdate::ApplySoftBodyIntenalForceKernel(void* const context, 
 		world->dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(cluster, timestep);
 	}
 }
+*/
 
 void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {

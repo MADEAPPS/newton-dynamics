@@ -186,6 +186,8 @@ class dgCollisionCompoundFractured::dgFractureBuilder: public dgTree<dgMeshEffec
 		:dgTree<dgMeshEffect*, dgInt32>(allocator)
 		,m_conectivity(allocator)
 	{
+		dgAssert (0);
+/*
 		dgStack<dgBigVector> buffer(pointcloudCount + 16);
 		dgBigVector* const pool = &buffer[0];
 		dgFloat64 quantizeFactor = dgFloat64 (16.0f);
@@ -387,7 +389,7 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 	dgTrace (("\n"));
 }
 #endif
-
+*/
 		dgAssert (SanityCheck());
 	}
 
@@ -811,7 +813,8 @@ dgCollisionCompoundFractured::dgSubMesh* dgCollisionCompoundFractured::dgMesh::A
 	dgStack<dgVector>normal (vertexCount);
 	dgStack<dgVector>uv0 (vertexCount);
 	dgStack<dgVector>uv1 (vertexCount);
-	factureVisualMesh->GetVertexStreams (sizeof (dgVector), &vertex[0].m_x, sizeof (dgVector), &normal[0].m_x, sizeof (dgVector), &uv0[0].m_x, sizeof (dgVector), &uv1[0].m_x);
+	dgAssert (0);
+//	factureVisualMesh->GetVertexStreams (sizeof (dgVector), &vertex[0].m_x, sizeof (dgVector), &normal[0].m_x, sizeof (dgVector), &uv0[0].m_x, sizeof (dgVector), &uv1[0].m_x);
 		
 	// extract the materials index array for mesh
 	dgInt32 baseVertexCount = vertexArray.m_count;

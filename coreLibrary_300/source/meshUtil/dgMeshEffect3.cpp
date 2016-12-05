@@ -854,6 +854,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 
 	dgMeshEffect* CreatePartitionMesh (dgMeshEffect& mesh, dgInt32 maxVertexPerHull)
 	{
+		dgAssert (0);
 		dgMemoryAllocator* const allocator = mesh.GetAllocator();
 		dgMeshEffect* const convexPartionMesh = new (allocator) dgMeshEffect(allocator);
 
@@ -862,7 +863,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		dgArray<dgBigVector> convexVertexBuffer(mesh.GetCount(), GetAllocator());
 		const dgBigVector* const points = (dgBigVector*) mesh.GetVertexPool();
 
-		convexPartionMesh->BeginPolygon();
+		convexPartionMesh->BeginBuild();
 		dgFloat64 layer = dgFloat64 (0.0f);
 		for (dgList<dgHACDConvacityLookAheadTree*>::dgListNode* clusterNode = m_convexProximation.GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
 			dgHACDConvacityLookAheadTree* const cluster = clusterNode->GetInfo();
@@ -897,12 +898,13 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 					polygon[2].m_vertex = vertex[i2];
 					polygon[2].m_vertex.m_w = layer;
 
-					convexPartionMesh->AddPolygon(3, &polygon[0].m_vertex.m_x, sizeof(dgMeshEffect::dgVertexAtribute), 0);
+					dgAssert (0);
+//					convexPartionMesh->AddPolygon(3, &polygon[0].m_vertex.m_x, sizeof(dgMeshEffect::dgVertexAtribute), 0);
 				}
 				layer += dgFloat64 (1.0f);
 			}
 		}
-		convexPartionMesh->EndPolygon(1.0e-5f);
+		convexPartionMesh->EndBuild(1.0e-5f);
 
 		m_progress = m_faceCount - 1;
 		ReportProgress();
@@ -1346,6 +1348,9 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 
 dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullsCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const progressReportUserData) const
 {
+	dgAssert(0);
+	return NULL;
+/*
 	//	dgMeshEffect triangleMesh(*this);
 	if (maxHullsCount <= 1) {
 		maxHullsCount = 1;
@@ -1386,5 +1391,5 @@ dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dg
 	}
 
 	return partition;
-
+*/
 }

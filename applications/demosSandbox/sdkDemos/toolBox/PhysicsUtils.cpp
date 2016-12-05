@@ -459,9 +459,9 @@ NewtonMesh* CreateCollisionTreeDoubleFaces (NewtonWorld* world, NewtonCollision*
 	NewtonMesh* mesh = NewtonMeshCreate(world);
 	dMatrix matrix (dGetIdentityMatrix());
 
-	NewtonMeshBeginFace(mesh);
+	NewtonMeshBeginBuild(mesh);
 	NewtonCollisionForEachPolygonDo (optimizedDoubelFacesTree, &matrix[0][0], ExtrudeFaces, mesh);	
-	NewtonMeshEndFace(mesh);
+	NewtonMeshEndBuild(mesh);
 
 	return mesh;
 }

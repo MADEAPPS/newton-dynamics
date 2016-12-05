@@ -72,8 +72,8 @@ static void RenderBodyContactsForces (NewtonBody* const body, float scale)
 			NewtonMaterialGetContactTangentDirections(material, body, &tangnetDir0[0], &tangnetDir1[0]);
 
 			// these are the components of the tangents forces at the contact point, the can be display at the contact position point.
-			dVector tangentForce1 (tangnetDir0.Scale ((contactForce % tangnetDir0) * scale));
-			dVector tangentForce2 (tangnetDir1.Scale ((contactForce % tangnetDir1) * scale));
+			dVector tangentForce1 (tangnetDir0.Scale ((contactForce.DotProduct3(tangnetDir0)) * scale));
+			dVector tangentForce2 (tangnetDir1.Scale ((contactForce.DotProduct3(tangnetDir1)) * scale));
 
 				
 //			glVertex3f (p0.m_x, p0.m_y, p0.m_z);

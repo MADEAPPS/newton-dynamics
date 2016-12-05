@@ -338,7 +338,7 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 				meshMap.Insert(fbxMesh, ngdMeshNode);
 
 				dMatrix matrix (meshInfo->GetPivotMatrix());
-				dAssert (((matrix.m_front * matrix.m_up) % matrix.m_right) > 0.0f);
+				dAssert (((matrix.m_front.CrossProduct(matrix.m_up)).DotProduct3(matrix.m_right)) > 0.0f);
 				FbxAMatrix fbxMatrix;
 				double* const data = fbxMatrix;
 				for (int i = 0; i < 4; i ++) {
@@ -351,7 +351,7 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 				NewtonMesh* const mesh = meshInfo->GetMesh();
 				int vertexCount = NewtonMeshGetVertexCount(mesh);
 				int vertexStride = NewtonMeshGetVertexStrideInByte(mesh) / sizeof (dFloat64);
-				dFloat64* const vertex = NewtonMeshGetVertexArray (mesh); 
+				const dFloat64* const vertex = NewtonMeshGetVertexArray (mesh); 
 
 				fbxMesh->InitControlPoints (vertexCount);
 				FbxVector4* const points = fbxMesh->GetControlPoints();

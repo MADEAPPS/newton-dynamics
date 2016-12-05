@@ -29,6 +29,8 @@
 
 bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const convexFace)
 {
+	dgAssert(0);
+/*
 	dgAssert (convexFace->m_incidentFace > 0);
 
 	dgBigVector normal (convexMesh.FaceNormal(convexFace, &convexMesh.m_points[0].m_x, sizeof(dgBigVector)));
@@ -285,7 +287,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 			//dgAssert (leftOversOut.GetCount() == 0);
 		}
 	}
-
+*/
 	return true;
 }
 
@@ -810,8 +812,9 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			BeginFace ();
 			dgEdge* ptr = face;
 			do {
-				const dgMeshEffect::dgVertexAtribute& point =  mesh->GetAttribute(dgInt32 (ptr->m_userData));
-				AddPoint (&point.m_vertex.m_x, dgInt32 (point.m_material));
+				dgAssert (0);
+				//const dgMeshEffect::dgVertexAtribute& point =  mesh->GetAttribute(dgInt32 (ptr->m_userData));
+				//AddPoint (&point.m_vertex.m_x, dgInt32 (point.m_material));
 				faceIndex[indexCount] = indexCount;
 				faceDataIndex[indexCount] = indexCount;
 				indexCount ++;
@@ -824,6 +827,8 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 
 		void AddSegment (const dgBigVector& plane, const dgBigVector* const segment)
 		{
+			dgAssert (0);
+/*
 			dgCurvesNetwork::dgTreeNode* const node0 = m_curveNetwork.AddVertex (segment[0], GetAllocator());
 			dgCurvesNetwork::dgTreeNode* const node1 = m_curveNetwork.AddVertex (segment[1], GetAllocator());
 
@@ -831,6 +836,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 			dgPoint& pointB = node1->GetInfo();
 			pointA.m_links.Append(node1);
 			pointB.m_links.Append(node0);
+*/
 		}
 
 		dgCurvesNetwork m_curveNetwork;

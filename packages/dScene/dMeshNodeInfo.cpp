@@ -78,18 +78,19 @@ void dMeshNodeInfo::ReplaceMesh (NewtonMesh* const mesh)
 
 void dMeshNodeInfo::BeginBuild ()
 {
-	NewtonMeshBeginFace(m_mesh);
+	NewtonMeshBeginBuild(m_mesh);
 }
 
 
 void dMeshNodeInfo::AddPolygon (int pointsCount, const neMeshInfoFlatPoint* const points, int materialID)
 {
-	NewtonMeshAddFace(m_mesh, pointsCount, &points[0].m_x, sizeof (neMeshInfoFlatPoint), materialID);
+	dAssert (0);
+//	NewtonMeshAddFace(m_mesh, pointsCount, &points[0].m_x, sizeof (neMeshInfoFlatPoint), materialID);
 }
 
 void dMeshNodeInfo::EndBuild ()
 {
-	NewtonMeshEndFace(m_mesh);
+	NewtonMeshEndBuild(m_mesh);
 }
 
 void dMeshNodeInfo::ConvertToTriangles()
@@ -131,9 +132,12 @@ void dMeshNodeInfo::BuildFromVertexListIndexList(int faceCount, const int* const
 	const dFloat* const uv0, int uv0StrideInBytes, const int* uv0Index,
 	const dFloat* const uv1, int uv1StrideInBytes, const int* uv1Index)
 {
+dAssert (0);
+/*
 	NewtonMeshBuildFromPointListIndexList(m_mesh, faceCount, faceIndexCount, faceMaterialIndex, 
 		vertex, vertexStrideInBytes, vertexIndex,normal, normalStrideInBytes, normalIndex,
 		uv0, uv0StrideInBytes, uv0Index, uv1, uv1StrideInBytes, uv1Index);
+*/
 }
 
 void dMeshNodeInfo::RemoveUnusedVertices(dScene* const world, dScene::dTreeNode* const myNode)
@@ -187,7 +191,7 @@ void dMeshNodeInfo::CalcutateAABB (dVector& p0, dVector& p1) const
 
 	int strideInBytes = NewtonMeshGetVertexStrideInByte(m_mesh);
 	int stride = strideInBytes / sizeof (dFloat64) ;
-	dFloat64* const vertexList = NewtonMeshGetVertexArray(m_mesh);
+	const dFloat64* const vertexList = NewtonMeshGetVertexArray(m_mesh);
 	for (void* ptr = NewtonMeshGetFirstVertex(m_mesh); ptr; ptr = NewtonMeshGetNextVertex(m_mesh, ptr)) {
 		int index = NewtonMeshGetVertexIndex (m_mesh, ptr);
 
@@ -211,7 +215,7 @@ dFloat dMeshNodeInfo::RayCast (const dVector& q0, const dVector& q1) const
 {
 	//	int vertexCount = NewtonMeshGetVertexCount(m_mesh);
 	int strideInBytes = NewtonMeshGetVertexStrideInByte(m_mesh);
-	dFloat64* const vertexList = NewtonMeshGetVertexArray(m_mesh);
+	const dFloat64* const vertexList = NewtonMeshGetVertexArray(m_mesh);
 	dFloat t = 1.2f;
 
 	dVector p0 = m_matrix.UntransformVector(q0);

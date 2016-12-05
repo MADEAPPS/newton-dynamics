@@ -105,7 +105,7 @@ void dStringToFloatArray (const char* const string, dFloat* const array, int max
 {
 	const char* ptr = string;
 	for (int i = 0; i < maxCount; i ++) {
-		char value[128];		
+		char value[128];
 		while (*ptr == ' ') {
 			ptr ++;
 		}
@@ -603,23 +603,52 @@ bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode
 	// load all the vertexData
 	TiXmlElement* const pointElement = (TiXmlElement*) rootNode->FirstChild ("points");
 
+	//load face informations
+	TiXmlElement* const polygonsElement = (TiXmlElement*)rootNode->FirstChild("polygons");
+
+	int faceCount;
+	polygonsElement->Attribute("count", &faceCount);
+	int* const faceIndexCount = new int[faceCount];
+	dStringToIntArray(polygonsElement->Attribute("faceIndexCount"), faceIndexCount, faceCount);
+
+	int* const faceMaterials = new int[faceCount];
+	TiXmlElement* materialElement = (TiXmlElement*)polygonsElement->FirstChild("faceMaterial");
+	dStringToIntArray(materialElement->Attribute("index"), faceMaterials, faceCount);
+
+	int indexCount = 0;
+	for (int i = 0; i < faceCount; i++) {
+		indexCount += faceIndexCount[i];
+	}
+
+	int* const positionVertexIndex = new int[indexCount];
+	TiXmlElement* const positionVertexIndexElement = (TiXmlElement*)polygonsElement->FirstChild("position");
+	dStringToIntArray(positionVertexIndexElement->Attribute("index"), positionVertexIndex, indexCount);
+
 	int positionCount;
 	TiXmlElement* const positionsElement = (TiXmlElement*) pointElement->FirstChild ("position");
 	positionsElement->Attribute("float4", &positionCount);
-	dFloat* const positions = new dFloat[4 * positionCount];
+	dFloat64* const positions = new dFloat64[4 * positionCount];
 	dStringToFloatArray (positionsElement->Attribute("floats"), positions, 4 * positionCount);
 
 	int normalCount;
-	TiXmlElement* normalsElement = (TiXmlElement*) pointElement->FirstChild ("normal");
+	TiXmlElement* const normalsElement = (TiXmlElement*) pointElement->FirstChild ("normal");
 	normalsElement->Attribute("float3", &normalCount);
 	dFloat* const normals = new dFloat[3 * normalCount];
 	dStringToFloatArray (normalsElement->Attribute("floats"), normals, 3 * normalCount);
 
+	int* const normalVertexIndex = new int[indexCount];
+	TiXmlElement* const normalVertexIndexElement = (TiXmlElement*)polygonsElement->FirstChild("normal");
+	dStringToIntArray(normalVertexIndexElement->Attribute("index"), normalVertexIndex, indexCount);
+	
 	int uv0Count;
 	TiXmlElement* uv0Element = (TiXmlElement*) pointElement->FirstChild ("uv0");
 	uv0Element->Attribute("float2", &uv0Count);
 	dFloat* const uv0 = new dFloat[2 * uv0Count];
 	dStringToFloatArray (uv0Element->Attribute("floats"), uv0, 2 * uv0Count);
+
+	int* const uv0VertexIndex = new int[indexCount];
+	TiXmlElement* const uv0VertexIndexElement = (TiXmlElement*)polygonsElement->FirstChild("uv0");
+	dStringToIntArray(uv0VertexIndexElement->Attribute("index"), uv0VertexIndex, indexCount);
 
 	int uv1Count;
 	TiXmlElement* uv1Element = (TiXmlElement*) pointElement->FirstChild ("uv1");
@@ -627,61 +656,44 @@ bool DeserializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode
 	dFloat* const uv1 = new dFloat[2 * uv1Count];
 	dStringToFloatArray (uv1Element->Attribute("floats"), uv1, 2 * uv1Count);
 
-	//load face informations
-	TiXmlElement* polygonsElement = (TiXmlElement*) rootNode->FirstChild ("polygons");
-
-	int faceCount;
-	polygonsElement->Attribute("count", &faceCount);
-	int* const faceIndexCount = new int[faceCount];
-	dStringToIntArray (polygonsElement->Attribute("faceIndexCount"), faceIndexCount, faceCount);
-
-	int* const faceMaterials = new int [faceCount]; 
-	TiXmlElement* materialElement = (TiXmlElement*) polygonsElement->FirstChild ("faceMaterial");
-	dStringToIntArray (materialElement->Attribute("index"), faceMaterials, faceCount);
-
-	int indexCount = 0;
-	for (int i = 0; i < faceCount; i ++) {
-		indexCount += faceIndexCount[i];
-	}
-
-	int* const positionVertexIndex = new int [indexCount]; 
-	TiXmlElement* const positionVertexIndexElement = (TiXmlElement*) polygonsElement->FirstChild ("position");
-	dStringToIntArray (positionVertexIndexElement->Attribute("index"), positionVertexIndex, indexCount);
-
-	int* const normalVertexIndex = new int [indexCount]; 
-	TiXmlElement* const normalVertexIndexElement = (TiXmlElement*) polygonsElement->FirstChild ("normal");
-	dStringToIntArray (normalVertexIndexElement->Attribute("index"), normalVertexIndex, indexCount);
-
-	int* const uv0VertexIndex = new int [indexCount]; 
-	TiXmlElement* const uv0VertexIndexElement = (TiXmlElement*) polygonsElement->FirstChild ("uv0");
-	dStringToIntArray (uv0VertexIndexElement->Attribute("index"), uv0VertexIndex, indexCount);
-
 	int* const uv1VertexIndex = new int [indexCount]; 
 	TiXmlElement* const uv1VertexIndexElement = (TiXmlElement*) polygonsElement->FirstChild ("uv1");
 	dStringToIntArray (uv1VertexIndexElement->Attribute("index"), uv1VertexIndex, indexCount);
 
-//	BuildFromVertexListIndexList(faceCount, faceIndexCount, faceMaterials, 
-//		&positions[0], 4 * sizeof (dFloat), positionVertexIndex,
-//		&normals[0], 3 * sizeof (dFloat), normalVertexIndex,
-//		&uv0[0], 2 * sizeof (dFloat), uv0VertexIndex,
-//		&uv1[0], 2 * sizeof (dFloat), uv1VertexIndex);
-	NewtonMeshBuildFromPointListIndexList(mesh, 
-		faceCount, faceIndexCount, faceMaterials, 
-		&positions[0], 4 * sizeof (dFloat), positionVertexIndex,
-		&normals[0], 3 * sizeof (dFloat), normalVertexIndex,
-		&uv0[0], 2 * sizeof (dFloat), uv0VertexIndex,
-		&uv1[0], 2 * sizeof (dFloat), uv1VertexIndex);
+	NewtonMeshVertexFormat vertexFormat;
+	NewtonMeshClearVertexFormat(&vertexFormat);
 
+	vertexFormat.m_faceCount = faceCount;
+	vertexFormat.m_faceIndexCount = faceIndexCount;
+	vertexFormat.m_faceMaterial = faceMaterials;
 
+	vertexFormat.m_vertex.m_data = positions;
+	vertexFormat.m_vertex.m_indexList = positionVertexIndex;
+	vertexFormat.m_vertex.m_strideInBytes = 4 * sizeof (dFloat64);
+
+	vertexFormat.m_normal.m_data = normals;
+	vertexFormat.m_normal.m_indexList = normalVertexIndex;
+	vertexFormat.m_normal.m_strideInBytes = 3 * sizeof (dFloat);
+
+	vertexFormat.m_uv0.m_data = uv0;
+	vertexFormat.m_uv0.m_indexList = uv0VertexIndex;
+	vertexFormat.m_uv0.m_strideInBytes = 2 * sizeof (dFloat);
+
+	vertexFormat.m_uv1.m_data = uv1;
+	vertexFormat.m_uv1.m_indexList = uv1VertexIndex;
+	vertexFormat.m_uv1.m_strideInBytes = 2 * sizeof (dFloat);
+
+	NewtonMeshBuildFromVertexListIndexList (mesh, &vertexFormat);
+
+	delete[] uv1;	
 	delete[] uv1VertexIndex;
+	delete[] uv0;	
 	delete[] uv0VertexIndex;
 	delete[] normalVertexIndex;
+	delete[] normals;	
+	delete[] positions;	
 	delete[] positionVertexIndex;
 	delete[] faceMaterials;
 	delete[] faceIndexCount;
-	delete[] uv1;	
-	delete[] uv0;	
-	delete[] normals;	
-	delete[] positions;	
 	return true;
 }

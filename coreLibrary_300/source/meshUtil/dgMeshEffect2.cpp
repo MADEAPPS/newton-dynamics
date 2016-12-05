@@ -29,8 +29,12 @@
 // create a convex hull
 dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, const dgFloat64* const vertexCloud, dgInt32 count, dgInt32 strideInByte, dgFloat64 distTol)
 	:dgPolyhedra(allocator)
+	,m_layers(allocator)
+	,m_points(allocator)
+	,m_attrib(allocator)
 {
-	Init();
+//	Init();
+
 	if (count >= 4) {
 		dgConvexHull3d convexHull (allocator, vertexCloud, strideInByte, count, distTol);
 		if (convexHull.GetCount()) {
@@ -66,12 +70,14 @@ dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, const dgFloat64*
 				index ++;
 			}
 
+			dgAssert (0);
+/*
 			BuildFromPointListIndexList(triangleCount, faceCount, &materialsPool[0], 
 				&points[0].m_x, sizeof (dgVector), vertexIndexList,
 				&normal.m_x, sizeof (dgVector), &normalIndexListPool[0],
 				&uv.m_x, sizeof (dgVector), &normalIndexListPool[0],
 				&uv.m_x, sizeof (dgVector), &normalIndexListPool[0]);
-
+*/
             RepairTJoints ();
 		}
 	}
@@ -89,6 +95,9 @@ dgMeshEffect* dgMeshEffect::CreateDelaunayTetrahedralization (dgMemoryAllocator*
 
 dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix)
 {
+	dgAssert(0);
+	return NULL;
+/*
 	dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;
 
 	dgStack<dgBigVector> buffer(pointCount + 16);
@@ -221,4 +230,5 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 
 	//voronoiPartition->ConvertToPolygons();
 	return voronoiPartition;
+*/
 }

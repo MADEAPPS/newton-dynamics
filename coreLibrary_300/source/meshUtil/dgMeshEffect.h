@@ -45,37 +45,184 @@ class dgCollisionInstance;
 class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 {
 	public:
+	struct dgMeshVertexFormat
+	{
+		struct dgDoubleData
+		{
+			dgFloat64* m_data;
+			dgInt32* m_indexList;
+			dgInt32 m_strideInBytes;
+		};
+
+		struct dgFloatData
+		{
+			dgFloat32* m_data;
+			dgInt32* m_indexList;
+			dgInt32 m_strideInBytes;
+		};
+
+		dgMeshVertexFormat ()
+		{
+			Clear ();
+		}
+
+		void Clear ()
+		{
+			memset (this, 0, sizeof (dgMeshVertexFormat));
+		}
+
+		dgInt32 m_faceCount;
+		dgInt32* m_faceIndexCount;
+		dgInt32* m_faceMaterial;
+		dgDoubleData m_vertex;
+		dgFloatData m_normal;
+		dgFloatData m_binormal;
+		dgFloatData m_uv0;
+		dgFloatData m_uv1;
+		dgFloatData m_vertexColor;
+	};
 
 	enum dgChannelType
 	{
 		m_vertex,
-		m_layer,
 		m_normal,
 		m_binormal,
-		m_uv,
+		m_uv0,
+		m_uv1,
 		m_color,
 		m_material,
-		m_point,
 		m_channelsCount,
+		m_layer,
+		m_point,
 	};
 
-	template<class T, dgChannelType type>
-	class dgChannel
+	class ChannelInterface
 	{
 		public:
-		dgChannel()
-			:m_type(type)
-			,m_data(NULL)
+		ChannelInterface ()
 		{
-
 		}
-		T* m_data;
+		virtual ~ChannelInterface () {}
+		virtual void Clear() = 0;
+		virtual void Reserve (dgInt32 size) = 0;
+		virtual void SetCount (dgInt32 count) = 0;
+		virtual void PushBack (const void* const element) = 0;
+		virtual void CopyFrom (const ChannelInterface& source) = 0;
+	};
+	
+	template<class T, dgChannelType type>
+	class dgChannel: public ChannelInterface, public dgArray<T>
+	{
+		public:
+		dgChannel(dgMemoryAllocator* const allocator)
+			:ChannelInterface()
+			,dgArray<T>(DG_MESH_EFFECT_INITIAL_VERTEX_SIZE, allocator)
+			,m_count(0)
+			,m_type(type)
+		{
+		}
+
+		dgChannel(const dgChannel& source)
+			:ChannelInterface(source)
+			,dgArray<T>(source)
+			,m_count(source.m_count)
+			,m_type(source.m_type)
+		{
+			dgAssert (0);
+		}
+
+		virtual ~dgChannel()
+		{
+		}
+
+		virtual void CopyFrom (const ChannelInterface& source)
+		{
+			dgArray<T>& me = *this;
+			dgChannel& src = *((dgChannel*)&source);
+
+			Clear();
+			m_count = src.m_count;
+			dgAssert (m_type == src.m_type);
+			for (dgInt32 i = 0; i < m_count; i++) {
+				me[i] = src[i];
+			}
+		}
+
+		virtual void Clear()
+		{
+			m_count = 0;
+			dgArray<T>::Clear ();
+		}
+
+		virtual void Reserve (dgInt32 size)
+		{
+			T dommy;
+			memset (&dommy, 0, sizeof (T));
+			dgArray<T>& me = *this;
+			me[size - 1] = dommy;
+			m_count = size;
+		}
+
+		virtual void PushBack (const void* const element) 
+		{
+			dgArray<T>& me = *this;
+			const T& data = *((T*)element);
+			me[m_count] = data;
+			m_count ++;
+		}
+
+		virtual void SetCount (dgInt32 count) 
+		{
+			dgAssert (count >= 0);
+			dgAssert (count <= m_count);
+			m_count = count;
+		}
+
+		dgInt32 m_count;
 		dgChannelType m_type;
+	};
+
+	class dgPoint: public dgChannel <dgBigVector, m_point>
+	{
+		public:
+		dgPoint (dgMemoryAllocator* const allocator)
+			:dgChannel <dgBigVector, m_point>(allocator)
+		{
+		}
+
+		dgPoint (const dgPoint& source)
+			:dgChannel <dgBigVector, m_point>(source)
+		{
+			dgAssert (0);
+		}
+	};
+
+	class dgLayer: public dgChannel<dgInt32, m_layer>
+	{
+		public:
+		dgLayer(dgMemoryAllocator* const allocator)
+			:dgChannel<dgInt32, m_layer>(allocator)
+		{
+		}
+
+		dgLayer(const dgLayer& source)
+			:dgChannel <dgInt32, m_layer>(source)
+		{
+			dgAssert(0);
+		}
 	};
 
 	class dgVertexFormat
 	{
 		public:
+		class dgSortKey
+		{
+			public:
+			dgInt32 m_mask;
+			dgInt32 m_ordinal;
+			dgInt32 m_vertexIndex;
+			dgInt32 m_attibuteIndex;
+		};
 		class dgUV
 		{
 			public:
@@ -83,16 +230,36 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 			dgFloat32 m_v;
 		};
 
-		dgChannel<dgBigVector, m_point> m_pointChannel;
-		dgChannel<dgInt32, m_vertex> m_vertexChannel;
-		dgChannel<dgInt32, m_layer> m_layerChannel;
+		class VertexSortData
+		{
+			public:
+			const dgChannel<dgBigVector, m_point>* m_points;
+			dgInt32 m_vertexSortIndex;
+		};
+
+		dgVertexFormat(dgMemoryAllocator* const allocator);
+		dgVertexFormat(const dgVertexFormat& source);
+		~dgVertexFormat();
+
+		ChannelInterface* operator[] (dgInt32 index);
+		const ChannelInterface* operator[] (dgInt32 index) const;
+
+		void Clear();
+		void SetCount (dgInt32 count);
+		void CopyFrom (const dgVertexFormat& source);
+		void CompressData (const dgChannel<dgBigVector, m_point>& points, dgInt32* const indexList);
+
+		
+		static dgInt32 CompareVertex (const dgSortKey* const ptr0, const dgSortKey* const ptr1, void* const context);
+
+		dgChannel<dgInt32, m_vertex> m_pointChannel;
 		dgChannel<dgInt32, m_material> m_materialChannel;
 		dgChannel<dgTriplex, m_normal> m_normalChannel;
-		dgChannel<dgTriplex, m_normal> m_binormalChannel;
+		dgChannel<dgTriplex, m_binormal> m_binormalChannel;
 		dgChannel<dgVector, m_color> m_colorChannel;
-		dgChannel<dgUV, m_uv> m_uv0Channel;
-		dgChannel<dgUV, m_uv> m_uv1Channel;
-		
+		dgChannel<dgUV, m_uv0> m_uv0Channel;
+		dgChannel<dgUV, m_uv1> m_uv1Channel;
+		dgInt32 m_count;
 	};
 
 
@@ -119,8 +286,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgInt32 m_materialsIndexCount[256];
 		dgInt32* m_indexList;
 	};
-
-
 
 	public:
 	class dgMeshBVH
@@ -230,27 +395,16 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void ConvertToPolygons ();
 	void RemoveUnusedVertices(dgInt32* const vertexRemapTable);
 	
-	void BeginPolygon ();
-	void AddPolygon (dgInt32 count, const dgFloat32* const vertexList, dgInt32 strideInBytes, dgInt32 material);
-#ifndef _NEWTON_USE_DOUBLE
-	void AddPolygon (dgInt32 count, const dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 material);
-#endif
-	void EndPolygon (dgFloat64 tol, bool fixTjoint = true);
-
-	void PackVertexArrays ();
-
-//	void BuildFromTriangleIndexList(dgInt32 faceCount, const dgInt32 * const faceMaterialIndex,
-//		const dgFloat32* const vertex, dgInt32  vertexStrideInBytes, const dgInt32 * const vertexIndex);
-
-	void BuildFromPointListIndexList(dgInt32 faceCount, const dgInt32 * const faceIndexCount, const dgInt32 * const faceMaterialIndex, 
-		const dgFloat32* const vertex, dgInt32  vertexStrideInBytes, const dgInt32 * const vertexIndex,
-		const dgFloat32* const normal, dgInt32  normalStrideInBytes, const dgInt32 * const normalIndex,
-		const dgFloat32* const uv0, dgInt32  uv0StrideInBytes, const dgInt32 * const uv0Index,
-		const dgFloat32* const uv1, dgInt32  uv1StrideInBytes, const dgInt32 * const uv1Index);
+	void BeginBuild ();
+	void BeginBuildFace ();
+	void AddPoint (dgFloat64 x, dgFloat64 y, dgFloat64 z);
+	void AddMaterial (dgInt32 materialIndex);
+	void EndBuildFace ();
+	void EndBuild (dgFloat64 tol, bool fixTjoint = true);
 
 	dgInt32 GetVertexCount() const;
 	dgInt32 GetVertexStrideInByte() const;
-	dgFloat64* GetVertexPool () const;
+	const dgFloat64* GetVertexPool () const;
 
 	dgInt32 GetPropertiesCount() const;
 	dgInt32 GetPropertiesStrideInByte() const;
@@ -272,17 +426,21 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	dgFloat64 CalculateVolume () const;
 
-	void GetVertexStreams (dgInt32 vetexStrideInByte, dgFloat32* const vertex, 
-						   dgInt32 normalStrideInByte, dgFloat32* const normal, 
-						   dgInt32 uvStrideInByte0, dgFloat32* const uv0, 
-						   dgInt32 uvStrideInByte1, dgFloat32* const uv1);
+	void BuildFromIndexList(const dgMeshVertexFormat* const format);
 
-	void GetIndirectVertexStreams(dgInt32 vetexStrideInByte, dgFloat64* const vertex, dgInt32* const vertexIndices, dgInt32* const vertexCount,
-								  dgInt32 normalStrideInByte, dgFloat64* const normal, dgInt32* const normalIndices, dgInt32* const normalCount,
-								  dgInt32 uvStrideInByte0, dgFloat64* const uv0, dgInt32* const uvIndices0, dgInt32* const uvCount0,
-								  dgInt32 uvStrideInByte1, dgFloat64* const uv1, dgInt32* const uvIndices1, dgInt32* const uvCount1);
+	bool HasNormalChannel() const;
+	bool HasBinormalChannel() const;
+	bool HasUV0Channel() const;
+	bool HasUV1Channel() const;
+	bool HasVertexColorChannel() const;
 
-	
+	void GetVertexChannel64(dgInt32 strideInByte, dgFloat64* const bufferOut) const;
+	void GetVertexChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const;
+	void GetNormalChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const;
+	void GetBinormalChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const;
+	void GetUV0Channel(dgInt32 strideInByte, dgFloat32* const bufferOut) const;
+	void GetUV1Channel(dgInt32 strideInByte, dgFloat32* const bufferOut) const;
+	void GetVertexColorChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const;
 
 	dgIndexArray* MaterialGeometryBegin();
 	void MaterialGeomteryEnd(dgIndexArray* const handle);
@@ -305,10 +463,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	void Serialize (dgSerialize callback, void* const userData) const;
 
-	dgBigVector& GetVertex (dgInt32 index) const;
+	dgBigVector GetVertex (dgInt32 index) const;
 	dgVertexAtribute& GetAttribute (dgInt32 index) const;
 	void TransformMesh (const dgMatrix& matrix);
-
 
 	void* GetFirstVertex () const;
 	void* GetNextVertex (const void* const vertex) const;
@@ -335,28 +492,22 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void GetFaceAttributeIndex (const void* const face, dgInt32* const indices) const;
 	dgBigVector CalculateFaceNormal (const void* const face) const;
 
-	void SetFaceMaterial (const void* const face, int materialID) const;
-
+	void SetFaceMaterial (const void* const face, int materialID);
 	
 	dgVertexAtribute InterpolateVertex (const dgBigVector& point, const dgEdge* const face) const;
 
 	bool Sanity () const;
-	void AddVertex(const dgBigVector& vertex);
-	void AddAtribute (const dgVertexAtribute& attib);
-	void AddPoint(const dgFloat64* vertexList, dgInt32 material);
+	
 
 	protected:
 	virtual void BeginFace();
 	virtual void EndFace ();
 
-	void Init ();
 	dgBigVector GetOrigin ()const;
 	dgInt32 CalculateMaxAttributes () const;
 	dgFloat64 QuantizeCordinade(dgFloat64 val) const;
 
 	void ClearAttributeArray ();
-	dgInt32 EnumerateAttributeArray (dgVertexAtribute* const attib);
-	void ApplyAttributeArray (dgVertexAtribute* const attib, dgInt32 maxCount);
 	
 	void MergeFaces (const dgMeshEffect* const source);
 //	void ReverseMergeFaces (dgMeshEffect* const source);
@@ -366,17 +517,15 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	dgMeshEffect* GetNextLayer (dgInt32 mark);
 	dgMeshEffect* CreateVoronoiConvex (const dgBigVector* const conevexPointCloud, dgInt32 count, dgInt32 materialId, const dgMatrix& textureProjectionMatrix, dgFloat32 normalAngleInRadians) const;
+	
+	void PackAttibuteData ();
+	void UnpackAttibuteData ();
+	void FlatPointArray(dgPoint& points) const;
 
-
-	dgInt32 m_pointCount;
-	dgInt32 m_maxPointCount;
-
-	dgInt32 m_atribCount;
-	dgInt32 m_maxAtribCount;
-
-	dgBigVector* m_points;
-	dgVertexAtribute* m_attrib;
-	dgVertexFormat m_vertexFormat;
+	dgLayer m_layers;
+	dgPoint m_points;
+	dgVertexFormat m_attrib;
+	dgInt32 m_constructionIndex;
 	
 	friend class dgConvexHull3d;
 	friend class dgConvexHull4d;
@@ -389,12 +538,12 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 DG_INLINE dgInt32 dgMeshEffect::GetVertexCount() const
 {
-	return m_pointCount;
+	return m_points.m_count;
 }
 
 DG_INLINE dgInt32 dgMeshEffect::GetPropertiesCount() const
 {
-	return m_atribCount;
+	return m_attrib.m_count;
 }
 
 DG_INLINE dgInt32 dgMeshEffect::GetMaterialID (dgIndexArray* const handle, dgInt32 materialHandle) const
@@ -409,11 +558,16 @@ DG_INLINE dgInt32 dgMeshEffect::GetMaterialIndexCount (dgIndexArray* const handl
 
 DG_INLINE dgMeshEffect::dgVertexAtribute& dgMeshEffect::GetAttribute (dgInt32 index) const 
 {
-	return m_attrib[index];
+	dgAssert (0);
+
+static dgVertexAtribute xx;
+	return xx;
+//	return m_attrib[index];
 }
 
-DG_INLINE dgBigVector& dgMeshEffect::GetVertex (dgInt32 index) const
+DG_INLINE dgBigVector dgMeshEffect::GetVertex (dgInt32 index) const
 {
+	dgAssert (0);
 	return m_points[index];
 }
 
@@ -424,22 +578,30 @@ DG_INLINE dgInt32 dgMeshEffect::GetPropertiesStrideInByte() const
 
 DG_INLINE dgFloat64* dgMeshEffect::GetAttributePool() const 
 {
-	return &m_attrib->m_vertex.m_x;
+	dgAssert (0);
+	return NULL;
+//	return &m_attrib->m_vertex.m_x;
 }
 
 DG_INLINE dgFloat64* dgMeshEffect::GetNormalPool() const 
 {
-	return &m_attrib->m_normal_x;
+	dgAssert(0);
+	return NULL;
+//	return &m_attrib->m_normal_x;
 }
 
 DG_INLINE dgFloat64* dgMeshEffect::GetUV0Pool() const 
 {
-	return &m_attrib->m_u0;
+	dgAssert(0);
+	return NULL;
+//	return &m_attrib->m_u0;
 }
 
 DG_INLINE dgFloat64* dgMeshEffect::GetUV1Pool() const 
 {
-	return &m_attrib->m_u1;
+	dgAssert(0);
+	return NULL;
+//	return &m_attrib->m_u1;
 }
 
 DG_INLINE dgInt32 dgMeshEffect::GetVertexStrideInByte() const 
@@ -447,7 +609,7 @@ DG_INLINE dgInt32 dgMeshEffect::GetVertexStrideInByte() const
 	return sizeof (dgBigVector);
 }
 
-DG_INLINE dgFloat64* dgMeshEffect::GetVertexPool () const 
+DG_INLINE const dgFloat64* dgMeshEffect::GetVertexPool () const 
 {
 	return &m_points[0].m_x;
 }

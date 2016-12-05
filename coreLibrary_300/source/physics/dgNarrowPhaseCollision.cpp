@@ -193,20 +193,16 @@ dgCollisionInstance* dgWorld::CreateFracturedCompound (dgMeshEffect* const solid
 }
 
 
-dgCollisionInstance* dgWorld::CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID, const dgClothPatchMaterial& structuralMaterial, const dgClothPatchMaterial& bendMaterial)
+dgCollisionInstance* dgWorld::CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID)
 {
-	dgAssert(0);
-	return NULL;
-/*
-	dgAssert (m_allocator == mesh->GetAllocator());
-	dgCollision* const collision = new (m_allocator) dgCollisionDeformableClothPatch (this, mesh, structuralMaterial, bendMaterial);
-	dgCollisionInstance* const instance = CreateInstance (collision, shapeID, dgGetIdentityMatrix()); 
+	dgAssert(m_allocator == mesh->GetAllocator());
+	dgCollision* const collision = new (m_allocator)dgCollisionDeformableClothPatch(this, mesh);
+	dgCollisionInstance* const instance = CreateInstance(collision, shapeID, dgGetIdentityMatrix());
 	collision->Release();
 	return instance;
-*/
 }
 
-dgCollisionInstance* dgWorld::CreateDeformableMesh (dgMeshEffect* const mesh, dgInt32 shapeID)
+dgCollisionInstance* dgWorld::CreateDeformableSolid (dgMeshEffect* const mesh, dgInt32 shapeID)
 {
 	dgAssert (m_allocator == mesh->GetAllocator());
 	dgCollision* const collision = new (m_allocator) dgCollisionDeformableSolidMesh (this, mesh);
@@ -1471,7 +1467,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 				count = PruneContacts(count, proxy.m_contacts);
 			}
 		}
-		
+
 		proxy.m_closestPointBody0 += origin;
 		proxy.m_closestPointBody1 += origin;
 		separationDistance = data.GetSeparetionDistance();

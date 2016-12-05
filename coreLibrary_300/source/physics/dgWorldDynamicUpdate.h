@@ -248,7 +248,7 @@ class dgWorldDynamicUpdate
 	
 	static dgInt32 CompareClusters (const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
 
-	static void ApplySoftBodyIntenalForceKernel(void* const context, void* const worldContext, dgInt32 threadID);
+//	static void ApplySoftBodyIntenalForceKernel(void* const context, void* const worldContext, dgInt32 threadID);
 	static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 
 	static void IntegrateInslandParallelKernel (void* const context, void* const worldContext, dgInt32 threadID); 
@@ -269,7 +269,7 @@ class dgWorldDynamicUpdate
 	void SolverInitInternalForcesParallel (dgParallelSolverSyncData* const syncData) const; 
 	void CalculateForcesGameModeParallel (dgParallelSolverSyncData* const syncData) const; 
 
-	void ApplySoftBodyIntenalForce(dgBodyCluster* const cluster, dgFloat32 timestep);
+//	void ApplySoftBodyIntenalForce(dgBodyCluster* const cluster, dgFloat32 timestep);
 	void CalculateReactionForcesParallel (const dgBodyCluster* const cluster, dgFloat32 timestep) const;
 	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgBodyCluster* const cluster) const;
 
