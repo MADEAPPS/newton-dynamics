@@ -68,7 +68,8 @@ void dNewtonMesh::BeginPolygon()
 
 void dNewtonMesh::AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex)
 {
-	NewtonMeshAddFace (m_mesh, vertexCount, vertex, strideInBytes, materialIndex);
+	dAssert(0);
+//	NewtonMeshAddFace (m_mesh, vertexCount, vertex, strideInBytes, materialIndex);
 }
 
 void dNewtonMesh::EndPolygon()
