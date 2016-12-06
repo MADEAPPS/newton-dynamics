@@ -654,7 +654,7 @@
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015_static_mt\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015_static_mt\dJointLibrary.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015_static_mt\dCustomJoints.vcxproj">
       <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015_static_mt\dMath.vcxproj">
