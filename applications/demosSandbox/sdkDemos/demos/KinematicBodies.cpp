@@ -192,8 +192,14 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
         dLong attrbA[maxSize];
         dLong attrbB[maxSize];
 
-
         if( NewtonCollisionIntersectionTest(world, collisionA, &poseA[0][0], collisionB, &poseB[0][0],0) ) {
+/*
+			poseA = dMatrix (dVector(0.951201f, 0.308571f, 0.000000f, 0.000000f), 
+							dVector(-0.308571f, 0.951201f, -0.000000f, 0.000000f),
+							dVector(-0.000000f, 0.000000f, 1.000000f, 0.000000f),
+							dVector(-0.620709f, 1.965793f, 0.240484f, 1.000000f));
+			poseA.Trace();
+*/
             int contactCount = NewtonCollisionCollide(world, maxSize, collisionA, &poseA[0][0], collisionB, &poseB[0][0], &points[0][0], &normals[0][0], &penetrations[0], &attrbA[0], &attrbB[0], 0);
             if (contactCount && ((me->m_contactCount + contactCount) <= int (sizeof (me->m_contacts) / sizeof (me->m_contacts[0])))) {
                 for(int i = 0; i < contactCount; i ++) {

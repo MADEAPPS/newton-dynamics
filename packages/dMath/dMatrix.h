@@ -71,6 +71,14 @@ class dMatrix
 
 	dMatrix operator* (const dMatrix & B) const;
 
+	void Trace () const
+	{
+		dTrace (("(%ff, %ff, %ff, %ff)\n", m_front.m_x, m_front.m_y, m_front.m_z, m_front.m_w));
+		dTrace (("(%ff, %ff, %ff, %ff)\n", m_up.m_x, m_up.m_y, m_up.m_z, m_up.m_w));
+		dTrace (("(%ff, %ff, %ff, %ff)\n", m_right.m_x, m_right.m_y, m_right.m_z, m_right.m_w));
+		dTrace (("(%ff, %ff, %ff, %ff)\n", m_posit.m_x, m_posit.m_y, m_posit.m_z, m_posit.m_w));
+	}
+
 
 	bool SanityCheck() const;
 
