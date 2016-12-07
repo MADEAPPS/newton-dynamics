@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>core</ProjectName>
+    <ProjectName>wxcore</ProjectName>
     <ProjectGuid>{6744DAD8-9C70-574A-BFF2-9F8DDDB24A75}</ProjectGuid>
     <RootNamespace>core</RootNamespace>
   </PropertyGroup>

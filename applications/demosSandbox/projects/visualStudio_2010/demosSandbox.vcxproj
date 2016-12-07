@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="debugDll|Win32">
-      <Configuration>debugDll</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="debugDll|x64">
-      <Configuration>debugDll</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="debug_double|Win32">
       <Configuration>debug_double</Configuration>
       <Platform>Win32</Platform>
@@ -31,14 +23,6 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="profile|x64">
       <Configuration>profile</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="releaseDll|Win32">
-      <Configuration>releaseDll</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="releaseDll|x64">
-      <Configuration>releaseDll</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="release_double|Win32">
@@ -77,10 +61,6 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
@@ -93,10 +73,6 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
@@ -105,19 +81,11 @@
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -136,10 +104,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
@@ -152,10 +116,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
@@ -164,19 +124,11 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
   </ImportGroup>
@@ -192,56 +144,38 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">../../$(PlatformName)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">../../$(PlatformName)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">../../$(PlatformName)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">../../$(PlatformName)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">../../$(PlatformName)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">../../$(PlatformName)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">../../$(PlatformName)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">../../$(PlatformName)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">false</LinkIncremental>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='profile|x64'">false</LinkIncremental>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">false</LinkIncremental>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">$(ProjectName)_d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">$(ProjectName)_d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">$(ProjectName)_d</TargetName>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">../../$(PlatformName)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">../../$(PlatformName)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release|Win32'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">$(ProjectName)_profile</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='profile|x64'">$(ProjectName)</TargetName>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='release|Win32'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">false</EmbedManifest>
-    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">false</EmbedManifest>
-    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">false</EmbedManifest>
-    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">false</EmbedManifest>
-    <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">false</EmbedManifest>
     <EmbedManifest Condition="'$(Configuration)|$(Platform)'=='profile|x64'">false</EmbedManifest>
@@ -408,7 +342,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;D_TIME_TRACKER;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level4</WarningLevel>
@@ -437,46 +371,6 @@
     <PostBuildEvent>
       <Command>
       </Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">
-    <ClCompile>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-    </Link>
-    <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dContainers/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
@@ -590,93 +484,6 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">
-    <ClCompile>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_BUILD_DLL</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
-      <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <AdditionalOptions>
-      </AdditionalOptions>
-      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-    </Link>
-    <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dContainers/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Precise</FloatingPointModel>
-      <Optimization>Disabled</Optimization>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-    </Link>
-    <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dContainers/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">
-    <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
-    </Link>
-    <PostBuildEvent>
-      <Command>xcopy  "../../../../coreLibrary_300/projects/windows/project_vs2010/$(PlatformName)/newton/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dJointLibrary/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dContainers/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R
-xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$(ConfigurationName)/*.dll" "../../$(PlatformName)//*.*"  /F /Y /R</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../sdkDemos/windowsMain;../../../../coreLibrary_300/source/newton;../../../../packages;../../../../packages/dMath;../../../../packages/dScene;../../../../packages/dAnimation;../../../../packages/dContainers;../../../../packages/dCustomJoints;../../../../packages/dVisualDebuggerServer;../../../../packages/thirdParty/tinyxml;../../../../packages\thirdParty\timeTracker;../../../../packages/thirdParty/glew/include;../../../../packages/thirdParty/openAL/include;../../../../packages/thirdParty/freetype-2.4.0/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(PlatformName)</AdditionalIncludeDirectories>
@@ -750,15 +557,11 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='profile|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debugDll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debugDll|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -815,18 +618,14 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       <Message Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Performing Custom Build Step</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Performing Custom Build Step</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">Performing Custom Build Step</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">Performing Custom Build Step</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='release|x64'">Performing Custom Build Step</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Performing Custom Build Step</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='profile|x64'">Performing Custom Build Step</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">Performing Custom Build Step</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
       </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">
       </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">
-      </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">
       </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='release|x64'">
       </Command>
@@ -834,59 +633,44 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
       </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
       </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">
-      </Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release|Win32'">%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='release|Win32'">%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='releaseDll|Win32'">%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">%(Outputs)</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='releaseDll|x64'">%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010\core.vcxproj">
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_static_mt\core.vcxproj">
       <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010\newton.vcxproj">
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_static_mt\newton.vcxproj">
       <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010\physics.vcxproj">
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_static_mt\physics.vcxproj">
       <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2010\pthread.vcxproj">
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2010_static_mt\pthread.vcxproj">
       <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dAnimation.vcxproj">
-      <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dContainers.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_static_mt\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dJointLibrary.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_static_mt\dCustomJoints.vcxproj">
       <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dMath.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_static_mt\dMath.vcxproj">
       <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dScene.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_static_mt\dScene.vcxproj">
       <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010\dVisualDebuggerServer.vcxproj">
-      <Project>{2ffeb5b8-8929-469f-bb13-4e391cd3213c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\enet-1.2\VS_2010\enet.vcxproj">
-      <Project>{a862a496-668a-41ca-ba4b-8c86892006b7}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\freetype-2.4.0\builds\win32\vc2010_static_mt\freetype.vcxproj">
       <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
@@ -897,13 +681,13 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2010_static_mt\tinyxml.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010\wx_vc9_base.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_static_mt\wx_vc9_base.vcxproj">
       <Project>{3fcc50c2-81e9-5db2-b8d8-2129427568b1}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010\wx_vc9_core.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_static_mt\wx_vc9_core.vcxproj">
       <Project>{6744dad8-9c70-574a-bff2-9f8dddb24a75}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010\wx_vc9_gl.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_static_mt\wx_vc9_gl.vcxproj">
       <Project>{da8b15ef-6750-5928-bc0e-c748213cf9b2}</Project>
     </ProjectReference>
   </ItemGroup>
