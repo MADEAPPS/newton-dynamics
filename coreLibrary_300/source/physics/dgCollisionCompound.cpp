@@ -2144,7 +2144,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 	stackPool[0] = m_root;
 	const dgContactMaterial* const material = constraint->GetMaterial();
 
-	dgAssert (contacts);
+	dgAssert ((contacts != NULL) ^ proxy.m_intersectionTestOnly);
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 
 	while (stack) {
