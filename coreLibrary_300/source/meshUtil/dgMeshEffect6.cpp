@@ -1635,7 +1635,6 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
 void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMaterial)
 {
     dgBigVector origin (GetOrigin());
-    dgStack<dgBigVector>cylinder (m_points.m_count);
 
     dgBigVector pMin (dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (0.0f));
     dgBigVector pMax (dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (0.0f));
@@ -1649,6 +1648,7 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
         pMax.m_z = dgMax (pMax.m_z, tmp.m_z);
     }
 
+	dgStack<dgBigVector>cylinder (m_points.m_count);
     dgBigVector scale (dgFloat64 (1.0f)/ (pMax.m_x - pMin.m_x), dgFloat64 (1.0f)/ (pMax.m_y - pMin.m_y), dgFloat64 (1.0f)/ (pMax.m_z - pMin.m_z), dgFloat64 (0.0f));
     for (dgInt32 i = 0; i < m_points.m_count; i ++) {
         dgBigVector point (m_points[i] - origin);
@@ -1734,11 +1734,10 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
                 do {
 					dgVertexFormat::dgUV uv;
                     dgVector p (m_points[ptr->m_incidentVertex] - origin);
-
                     uv.m_u = dgFloat32 ((p.m_y - pMin.m_y) * scale.m_y);
                     uv.m_v = dgFloat32 ((p.m_z - pMin.m_z) * scale.m_z);
-					m_attrib.m_uv0Channel[dgInt32(edge->m_userData)] = uv;
-					m_attrib.m_materialChannel[dgInt32(edge->m_userData)] = capMaterial;
+					m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)] = uv;
+					m_attrib.m_materialChannel[dgInt32(ptr->m_userData)] = capMaterial;
 
                     ptr = ptr->m_next;
                 }while (ptr !=  edge);
@@ -1804,8 +1803,10 @@ void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
             }
             dgEdge* ptr = edge;
             do {
-				dgVertexFormat::dgUV uv (m_attrib.m_uv0Channel[dgInt32 (ptr->m_userData)]);
+				dgVertexFormat::dgUV uv;
                 dgBigVector p (scale.CompProduct3(m_points[ptr->m_incidentVertex] - minVal));
+				uv.m_u = dgFloat32 (p[u]);
+				uv.m_v = dgFloat32 (p[v]);
 				m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)] = uv;
 				m_attrib.m_materialChannel[dgInt32(ptr->m_userData)] = materialArray[index];
                 ptr = ptr->m_next;

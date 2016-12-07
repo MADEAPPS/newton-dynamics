@@ -509,7 +509,6 @@ NewtonBodySetMassProperties(body, 1.0, col);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
-
 	// place camera into position
 	dQuaternion rot;
 	dVector origin (-10.0f, 5.0f, 0.0f, 0.0f);
