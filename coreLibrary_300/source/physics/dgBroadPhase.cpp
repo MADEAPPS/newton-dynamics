@@ -1701,9 +1701,9 @@ void dgBroadPhase::FindCollidingPairsForwardAndBackward(dgBroadphaseSyncDescript
 		dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
 
 		if (lru == broadPhaseNode->GetDirtyLru()) {
-		if (broadPhaseNode->IsAggregate()) {
-			((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSeltPairs(timestep, threadID);
-		}
+			if (broadPhaseNode->IsAggregate()) {
+				((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSeltPairs(timestep, threadID);
+			}
 
 			for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
 				dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
