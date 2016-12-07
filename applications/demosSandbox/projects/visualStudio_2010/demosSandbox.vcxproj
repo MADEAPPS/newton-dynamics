@@ -888,13 +888,13 @@ xcopy  "../../../../packages/projects/visualStudio_2010/$(PlatformName)/dScene/$
     <ProjectReference Include="..\..\..\..\packages\thirdParty\enet-1.2\VS_2010\enet.vcxproj">
       <Project>{a862a496-668a-41ca-ba4b-8c86892006b7}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\freetype-2.4.0\builds\win32\vc2010\freetype.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\freetype-2.4.0\builds\win32\vc2010_static_mt\freetype.vcxproj">
       <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\glew\build\VS_2010\glew.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\glew\build\VS_2010_static_mt\glew.vcxproj">
       <Project>{0c9707f5-dec7-42eb-8ea1-a484df1e515b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2010\tinyxml.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2010_static_mt\tinyxml.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010\wx_vc9_base.vcxproj">
