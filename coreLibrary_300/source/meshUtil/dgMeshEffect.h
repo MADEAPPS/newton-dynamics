@@ -426,6 +426,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	dgFloat64 CalculateVolume () const;
 
+	void OptimizePoints();
+	void OptimizeAttibutes();
 	void BuildFromIndexList(const dgMeshVertexFormat* const format);
 
 	bool HasNormalChannel() const;

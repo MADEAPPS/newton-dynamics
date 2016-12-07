@@ -7702,6 +7702,28 @@ void NewtonMeshBuildFromVertexListIndexList (const NewtonMesh* const mesh, Newto
 	meshEffect->BuildFromIndexList((dgMeshEffect::dgMeshVertexFormat*) format);
 }
 
+void NewtonMeshOptimizePoints(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->OptimizePoints();
+}
+
+void NewtonMeshOptimizeVertex(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->OptimizeAttibutes();
+}
+
+void NewtonMeshOptimize(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonMeshOptimizePoints(mesh);
+	NewtonMeshOptimizeVertex(mesh);
+}
+
+
 int NewtonMeshGetVertexCount(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);	

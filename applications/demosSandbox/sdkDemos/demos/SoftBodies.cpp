@@ -37,21 +37,19 @@ class SimpleSoftBodyEntity: public DemoEntity
 		scene->Append(this);
 	}
 
-	void BuildSoftBody (DemoEntityManager* const scene, const char* const meshName)
+	void BuildSoftBody (DemoEntityManager* const scene, PrimitiveType type, int materialID)
 	{
-		NewtonWorld* const world = scene->GetNewton();
+//		NewtonWorld* const world = scene->GetNewton();
 //		LoadNGD_mesh(meshName, world);
-		{
-			NewtonCollision* const box = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
-			NewtonMesh* const newtonMesh = NewtonMeshCreateFromCollision (box);
-			NewtonMeshTriangulate(newtonMesh);
-			DemoMesh* mesh1 = new DemoMesh(newtonMesh);
-			SetMesh (mesh1, dGetIdentityMatrix());
-			mesh1->Release();
-			NewtonMeshDestroy (newtonMesh);
-			NewtonDestroyCollision(box);
-		}
-	
+/*
+		NewtonCollision* const box = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, NULL);
+		NewtonMesh* const newtonMesh = NewtonMeshCreateFromCollision (box);
+		NewtonMeshTriangulate(newtonMesh);
+		DemoMesh* mesh1 = new DemoMesh(newtonMesh);
+		SetMesh (mesh1, dGetIdentityMatrix());
+		mesh1->Release();
+		NewtonMeshDestroy (newtonMesh);
+		NewtonDestroyCollision(box);
 		DemoMesh* const mesh = (DemoMesh*) GetMesh();
 
 		int faceCount = 0;
@@ -101,7 +99,9 @@ class SimpleSoftBodyEntity: public DemoEntity
 		vertexFormat.m_uv0.m_strideInBytes = 2 * sizeof (dFloat);
 		NewtonMeshBuildFromVertexListIndexList (softBodyMesh, &vertexFormat);
 
+		NewtonMeshOptimize(softBodyMesh);
 		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, softBodyMesh, 0);
+		
 
 //		dgVector xxx[4];
 //		NewtonDeformableMeshConstraintParticle (deformableCollision, 0, &xxx[0].m_x, NULL);
@@ -117,6 +117,32 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 		// now create a visual representation for this entity
 		//	CreateVisualMesh ();
+*/
+		dFloat mass = 5.0f;
+		NewtonWorld* const world = scene->GetNewton();
+
+		dVector size(1.0f, 1.0f, 1.0f, 0.0f);
+		NewtonCollision* const collisionBox = CreateConvexCollision(world, dGetIdentityMatrix(), size, type, materialID);
+		NewtonMesh* const newtonMesh = NewtonMeshCreateFromCollision(collisionBox);
+
+		int tex = LoadTexture("smilli.tga");
+		NewtonMeshApplyBoxMapping (newtonMesh, tex, tex, tex);
+//		NewtonMeshTriangulate(newtonMesh);
+
+		DemoMesh* const mesh1 = new DemoMesh(newtonMesh);
+		SetMesh(mesh1, dGetIdentityMatrix());
+
+		// make a deformable collision mesh
+		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, newtonMesh, materialID);
+
+		//create a rigid body with a deformable mesh
+		CreateRigidBody (scene, mass, deformableCollision);
+
+		// do not forget to destroy this objects, else you bet bad memory leaks.
+		mesh1->Release();
+		NewtonMeshDestroy (newtonMesh);
+		NewtonDestroyCollision(collisionBox);
+		NewtonDestroyCollision(deformableCollision);
 	}
 
 	void BuildClothPatch (DemoEntityManager* const scene, int size_x, int size_z)
@@ -380,8 +406,9 @@ void SoftBodies(DemoEntityManager* const scene)
 
 	dVector location (0.0f, 4.0f, 0.0f, 0.0f);
 
+	//AddPrimitiveArray(scene, 10.0f, location, size, count, count, 3.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	SimpleSoftBodyEntity* const entity = new SimpleSoftBodyEntity(scene, location);
-	entity->BuildSoftBody (scene, "softbox1.ngd");
+	entity->BuildSoftBody (scene, _BOX_PRIMITIVE, 0);
 	
 	dQuaternion rot;
 	dVector origin (location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);
@@ -399,6 +426,8 @@ void ClothPatch(DemoEntityManager* const scene)
 
 	//	dVector location (8.0f, 0.0f, -10.0f, 0.0f) ;
 	dVector location(0.0f, 2.0f, 0.0f, 0.0f);
+
+
 
 	SimpleSoftBodyEntity* const entity = new SimpleSoftBodyEntity(scene, location);
 	entity->BuildClothPatch(scene, 1, 1);

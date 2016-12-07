@@ -197,7 +197,7 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 {
 	dgFree(m_posit);
 	dgFree(m_veloc);
-	dgFree(m_lambda);
+	dgFree(m_accel);
 	dgFree(m_linkList);
 	dgFree(m_indexMap);
 	dgFree(m_restlength);
@@ -209,8 +209,8 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	:dgCollisionConvex(mesh->GetAllocator(), 0, collsionID)
 	,m_posit(NULL)
 	,m_veloc(NULL)
+	,m_accel(NULL)
 	,m_linkList(NULL)
-	,m_lambda(NULL)
 	,m_indexMap(NULL)
 	,m_restlength(NULL)
 	,m_externalforce(NULL)
@@ -235,6 +235,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	m_unitMassScaler = (dgFloat32*)dgMallocStack(sizeof(dgFloat32) * m_massesCount);
 	m_posit = (dgVector*)dgMallocStack(sizeof(dgVector) * m_massesCount);
 	m_veloc = (dgVector*)dgMallocStack(sizeof(dgVector) * m_massesCount);
+	m_accel = (dgVector*)dgMallocStack(sizeof(dgVector) * m_massesCount);
 	m_externalforce = (dgVector*)dgMallocStack(sizeof(dgVector) * m_massesCount);
 	dgVector com(dgFloat32(0.0f));
 	for (dgInt32 i = 0; i < m_massesCount; i++) {
@@ -247,6 +248,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	m_boxOrigin = com.CompProduct4(dgFloat32(1.0f) / m_massesCount);
 
 	for (dgInt32 i = 0; i < m_massesCount; i++) {
+		m_accel[i] = dgVector(0.0f);
 		m_veloc[i] = dgVector(0.0f);
 		m_posit[i] = posit[i] - m_boxOrigin;
 	}
@@ -260,18 +262,19 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 	for (void* facePtr = mesh->GetFirstFace(); facePtr; facePtr = mesh->GetNextEdge(facePtr)) {
 		if (!mesh->IsFaceOpen(facePtr)) {
 			dgInt32 indices[256];
-			dgAssert(mesh->GetFaceIndexCount(facePtr) == 3);
+			dgInt32 count = mesh->GetFaceIndexCount (facePtr);
+			dgAssert(count == 256);
 			mesh->GetFaceIndex(facePtr, indices);
-			indices[0] = m_indexMap[indices[0]];
-			indices[1] = m_indexMap[indices[1]];
-			indices[2] = m_indexMap[indices[2]];
+			for (dgInt32 i = 0; i < count; i ++) {
+				dgInt32 j = indices[i];
+				indices[i] = m_indexMap[j];
+			}
 			polyhedra.AddFace(3, indices);
 		}
 	}
 	polyhedra.EndFace();
 	m_linksCount = polyhedra.GetCount() / 2;
 	m_linkList = (dgSoftLink*)dgMallocStack(sizeof(dgSoftLink) * m_linksCount);
-	m_lambda = (dgFloat32*)dgMallocStack(sizeof(dgFloat32) * m_linksCount);
 	m_restlength = (dgFloat32*)dgMallocStack(sizeof(dgFloat32) * m_linksCount);
 
 	dgInt32 edgeCount = 0;
@@ -282,11 +285,12 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 		if (edge.m_mark != lru) {
 			edge.m_mark = lru;
 			edge.m_twin->m_mark = lru;
-			m_linkList[edgeCount].m_v0 = dgInt16(edge.m_incidentVertex);
-			m_linkList[edgeCount].m_v1 = dgInt16(edge.m_twin->m_incidentVertex);
-			dgVector dp(m_posit[m_linkList[edgeCount].m_v0] - m_posit[m_linkList[edgeCount].m_v1]);
+			const dgInt16 v0 = dgInt16(edge.m_incidentVertex);
+			const dgInt16 v1 = dgInt16(edge.m_twin->m_incidentVertex);
+			m_linkList[edgeCount].m_v0 = v0;
+			m_linkList[edgeCount].m_v1 = v1;
+			dgVector dp(m_posit[v0] - m_posit[v1]);
 			m_restlength[edgeCount] = dgSqrt(dp.DotProduct3(dp));
-			m_lambda[edgeCount] = dgFloat32(0.0f);
 			edgeCount++;
 		}
 	}
@@ -295,8 +299,8 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMes
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformableMesh& source)
 	:dgCollisionConvex(source)
 	,m_posit((dgVector*)dgMallocStack(sizeof(dgVector) * source.m_massesCount))
-	,m_veloc ((dgVector*)dgMallocStack(sizeof(dgVector) * source.m_massesCount))
-	,m_lambda((dgFloat32*)dgMallocStack(sizeof(dgFloat32) * source.m_linksCount))
+	,m_veloc((dgVector*)dgMallocStack(sizeof(dgVector) * source.m_massesCount))
+	,m_accel((dgVector*)dgMallocStack(sizeof(dgVector) * source.m_massesCount))
 	,m_indexMap((dgInt32*)dgMallocStack(sizeof(dgInt32) * source.m_vertexCount))
 	,m_linkList((dgSoftLink*)dgMallocStack(sizeof(dgSoftLink) * source.m_linksCount))
 	,m_restlength((dgFloat32*)dgMallocStack(sizeof(dgFloat32) * source.m_linksCount))
@@ -309,8 +313,9 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformable
 	m_rtti = source.m_rtti;
 	memcpy(m_veloc, source.m_veloc, m_massesCount * sizeof(dgVector));
 	memcpy(m_posit, source.m_posit, m_massesCount * sizeof(dgVector));
+	memcpy(m_accel, source.m_posit, m_massesCount * sizeof(dgVector));
+
 	memcpy(m_unitMassScaler, source.m_unitMassScaler, m_massesCount * sizeof(dgFloat32));
-	memcpy(m_lambda, source.m_lambda, m_linksCount * sizeof(dgFloat32));
 	memcpy(m_linkList, source.m_linkList, m_linksCount * sizeof(dgSoftLink));
 	memcpy(m_indexMap, source.m_indexMap, m_vertexCount * sizeof(dgInt32));
 	memcpy(m_restlength, source.m_restlength, m_linksCount * sizeof(dgFloat32));
@@ -498,9 +503,9 @@ void dgCollisionDeformableMesh::IntegrateForces(dgDynamicBody* const body, dgFlo
 	dgFloat32* const spring_A01 = dgAlloca (dgFloat32, m_linksCount);
 	dgFloat32* const spring_B01 = dgAlloca (dgFloat32, m_linksCount);
 	dgVector* const linkDisplacement = dgAlloca (dgVector, m_linksCount);
-	dgVector* const rhs = dgAlloca (dgVector, m_massesCount);
+
 	CalculateGlobalConstants (timestep, spring_A01, spring_B01, linkDisplacement);
-	CalculateRightHandSide (rhs, body, spring_A01, spring_B01, linkDisplacement);
+	CalculateRightHandSide (body, spring_A01, spring_B01, linkDisplacement);
 
 /*
 	dgVector damp(dgFloat32(1.0f));
@@ -536,7 +541,9 @@ void dgCollisionDeformableMesh::IntegrateForces(dgDynamicBody* const body, dgFlo
 
 void dgCollisionDeformableMesh::CalculateGlobalConstants (dgFloat32 timestep, dgFloat32* const spring_A01, dgFloat32* const spring_B01, dgVector* const linkDisplacement) const
 {
-	dgFloat32 fKs = dgFloat32 (2.0f);
+	// K is in [sec^2] a spring constant acceleration, not a spring force acceleration. 
+	// for now make a share value for all springs. later this is a per material feature.
+	dgFloat32 fKs = dgFloat32 (100.0f);
 
 	dgVector timeV (timestep);
 	for (dgInt32 i = 0; i < m_linksCount; i ++) {
@@ -555,19 +562,20 @@ void dgCollisionDeformableMesh::CalculateGlobalConstants (dgFloat32 timestep, dg
 	}
 }
 
-void dgCollisionDeformableMesh::CalculateRightHandSide (dgVector* const rhs, const dgDynamicBody* const body, const dgFloat32* const spring_A01, const dgFloat32* const spring_B01, const dgVector* const linkDisplacement) const
+void dgCollisionDeformableMesh::CalculateRightHandSide (const dgDynamicBody* const body, const dgFloat32* const spring_A01, const dgFloat32* const spring_B01, const dgVector* const linkDisplacement) const
 {
-	dgVector den(dgFloat32(1.0f / m_massesCount));
-	dgVector unitforce(body->m_externalForce.CompProduct4(den));
+//	dgVector den(dgFloat32(1.0f / m_massesCount));
+//	dgVector unitforce(body->m_externalForce.CompProduct4(den));
+	dgVector unitAccel(body->m_externalForce.CompProduct4(body->m_invMass.m_w));
 
 	for (dgInt32 i = 0; i < m_massesCount; i ++) {
-		rhs[i] = unitforce;
+		m_accel[i] = unitAccel;
 	}
 
 	for (dgInt32 i = 0; i < m_linksCount; i++) {
 		const dgInt32 j0 = m_linkList[i].m_v0;
 		const dgInt32 j1 = m_linkList[i].m_v1;
-		rhs[j0] += linkDisplacement[j0].Scale4 (spring_A01[i]);
-		rhs[j1] -= linkDisplacement[j1].Scale4 (spring_A01[i]);
+		m_accel[j0] += linkDisplacement[j0].Scale4 (spring_A01[i]);
+		m_accel[j1] -= linkDisplacement[j1].Scale4 (spring_A01[i]);
 	}
 }

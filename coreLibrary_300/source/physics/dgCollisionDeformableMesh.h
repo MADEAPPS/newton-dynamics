@@ -61,11 +61,11 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 //	void CalculatePartialDerivatives (dgMatrix* const dfdx) const;
 	void CalculateGlobalConstants (dgFloat32 timestep, dgFloat32* const spring_A01, dgFloat32* const spring_B01, dgVector* const linkDisplacement) const;
-	void CalculateRightHandSide (dgVector* const rhs, const dgDynamicBody* const body, const dgFloat32* const spring_A01, const dgFloat32* const spring_B01, const dgVector* const linkDisplacement) const;
+	void CalculateRightHandSide (const dgDynamicBody* const body, const dgFloat32* const spring_A01, const dgFloat32* const spring_B01, const dgVector* const linkDisplacement) const;
 
 	dgVector* m_posit;
 	dgVector* m_veloc;
-	dgFloat32* m_lambda;
+	dgVector* m_accel;
 	dgInt32* m_indexMap;
 	dgSoftLink* m_linkList;
 	dgFloat32* m_restlength;

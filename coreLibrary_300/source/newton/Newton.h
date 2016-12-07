@@ -1207,7 +1207,9 @@ extern "C" {
 	NEWTON_API void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int frontMaterial, int sideMaterial, int topMaterial);
 	NEWTON_API void NewtonMeshApplyAngleBasedMapping(const NewtonMesh* const mesh, int material, NewtonReportProgress reportPrograssCallback, void* const reportPrgressUserData);
 	
-	
+	NEWTON_API void NewtonMeshOptimize (const NewtonMesh* const mesh);
+	NEWTON_API void NewtonMeshOptimizePoints (const NewtonMesh* const mesh);
+	NEWTON_API void NewtonMeshOptimizeVertex (const NewtonMesh* const mesh);
 	NEWTON_API int NewtonMeshIsOpenMesh (const NewtonMesh* const mesh);
 	NEWTON_API void NewtonMeshFixTJoints (const NewtonMesh* const mesh);
 
@@ -1288,7 +1290,6 @@ extern "C" {
 	NEWTON_API int NewtonMeshGetPointIndex (const NewtonMesh* const mesh, const void* const point);
 	NEWTON_API int NewtonMeshGetVertexIndexFromPoint (const NewtonMesh* const mesh, const void* const point);
 	
-
 	NEWTON_API void* NewtonMeshGetFirstEdge (const NewtonMesh* const mesh);
 	NEWTON_API void* NewtonMeshGetNextEdge (const NewtonMesh* const mesh, const void* const edge);
 	NEWTON_API void NewtonMeshGetEdgeIndices (const NewtonMesh* const mesh, const void* const edge, int* const v0, int* const v1);

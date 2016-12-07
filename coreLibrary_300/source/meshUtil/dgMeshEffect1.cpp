@@ -1517,28 +1517,28 @@ void dgMeshEffect::EndFace ()
 		}
 
 		dgAssert (!collisionFound.GetFirst() || Sanity());
-		for (dgList<dgTreeNode*>::dgListNode* node = collisionFound.GetFirst(); node; node = node->GetNext()) {
-			dgEdge* const edge = &node->GetInfo()->GetInfo();
+			for (dgList<dgTreeNode*>::dgListNode* node = collisionFound.GetFirst(); node; node = node->GetNext()) {
+				dgEdge* const edge = &node->GetInfo()->GetInfo();
 
-			// this is a vertex collision
-			dgBigVector point (m_points[edge->m_incidentVertex]);
+				// this is a vertex collision
+				dgBigVector point (m_points[edge->m_incidentVertex]);
 			m_points.PushBack (&point.m_x);
 
-			dgEdge* ptr = edge;
-			do {
-				ptr->m_incidentVertex = m_points.m_count - 1;
+				dgEdge* ptr = edge;
+				do {
+					ptr->m_incidentVertex = m_points.m_count - 1;
 
-				dgTreeNode* const edgeNode = GetNodeFromInfo (*ptr);
-				dgPairKey edgeKey (ptr->m_incidentVertex, ptr->m_twin->m_incidentVertex);
-				ReplaceKey (edgeNode, edgeKey.GetVal());
+					dgTreeNode* const edgeNode = GetNodeFromInfo (*ptr);
+					dgPairKey edgeKey (ptr->m_incidentVertex, ptr->m_twin->m_incidentVertex);
+					ReplaceKey (edgeNode, edgeKey.GetVal());
 
-				dgTreeNode* const twinNode = GetNodeFromInfo (*(ptr->m_twin));
-				dgPairKey twinKey (ptr->m_twin->m_incidentVertex, ptr->m_incidentVertex);
-				ReplaceKey (twinNode, twinKey.GetVal());
+					dgTreeNode* const twinNode = GetNodeFromInfo (*(ptr->m_twin));
+					dgPairKey twinKey (ptr->m_twin->m_incidentVertex, ptr->m_incidentVertex);
+					ReplaceKey (twinNode, twinKey.GetVal());
 
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != edge);
-		}
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != edge);
+			}
 		dgAssert (!collisionFound.GetFirst() || Sanity());
 	}
 }
@@ -2212,6 +2212,18 @@ void dgMeshEffect::PackAttibuteData()
 		}
 	}
 }
+
+void dgMeshEffect::OptimizePoints()
+{
+
+}
+
+void dgMeshEffect::OptimizeAttibutes()
+{
+	UnpackAttibuteData ();
+	PackAttibuteData();
+}
+
 
 void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 {
