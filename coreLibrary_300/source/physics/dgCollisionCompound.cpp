@@ -1768,8 +1768,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 	stackPool[0][1] = otherCompound->m_root;
 	const dgContactMaterial* const material = constraint->GetMaterial();
 
-
-	dgAssert (contacts);
+	dgAssert ((contacts != NULL) ^ proxy.m_intersectionTestOnly);
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	while (stack) {
 		stack --;
@@ -1927,7 +1926,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 	nodeProxi.m_right = NULL;
 	const dgContactMaterial* const material = constraint->GetMaterial();
 
-	dgAssert (contacts);
+	dgAssert ((contacts != NULL) ^ proxy.m_intersectionTestOnly);
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	while (stack) {
 		stack --;
@@ -2039,7 +2038,7 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase
 	nodeProxi.m_right = NULL;
 	const dgContactMaterial* const material = constraint->GetMaterial();
 
-	dgAssert (contacts);
+	dgAssert ((contacts != NULL) ^ proxy.m_intersectionTestOnly);
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	while (stack) {
 		stack --;
@@ -2210,7 +2209,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 }
 
 
-
 dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContactPoint* const contacts = proxy.m_contacts;
@@ -2250,7 +2248,7 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 	const dgContactMaterial* const material = constraint->GetMaterial();
 	const dgVector& treeScale = treeCollisionInstance->GetScale();
 
-	dgAssert (contacts);
+	dgAssert ((contacts != NULL) ^ proxy.m_intersectionTestOnly);
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	while (stack) {
 
