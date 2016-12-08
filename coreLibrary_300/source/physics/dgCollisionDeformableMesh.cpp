@@ -326,7 +326,7 @@ dgFloat32 fKs = dgFloat32(100.0f);
 	dgVector* const dx = dgAlloca(dgVector, m_linksCount);
 	dgVector* const dv = dgAlloca(dgVector, m_linksCount);
 	dgVector* const dpdv = dgAlloca(dgVector, m_linksCount);
-	dgVector* const diag = dgAlloca(dgVector, m_linksCount);
+	dgVector* const diag = dgAlloca(dgVector, m_particlesCount * 3);
 
 	//dgVector den(dgFloat32(1.0f / m_massesCount));
 	//dgVector unitforce(body->m_externalForce.CompProduct4(den));
@@ -336,34 +336,40 @@ dgFloat32 fKs = dgFloat32(100.0f);
 		diag[i] = dgVector::m_one;
 	}
 
+	dgFloat32 timestepTow = dgFloat32(2.0f) * timestep;
 	for (dgInt32 i = 0; i < m_linksCount; i++) {
 		const dgInt32 j0 = m_linkList[i].m_v0;
 		const dgInt32 j1 = m_linkList[i].m_v1;
 
-		dgVector p0p1(m_posit[j0] - m_posit[j1]);
-		dx[i] = p0p1;
+		dv[i] = m_veloc[j0] - m_veloc[j1];
+		dx[i] = m_posit[j0] - m_posit[j1];
+		const dgVector& p0p1 = dx[i];
+		const dgVector& v0v1 = dv[i];
+		dpdv[i] = p0p1.CompProduct4(v0v1);
+
 		dgVector length2(p0p1.DotProduct4(p0p1));
 		dgVector mask(length2 > m_smallestLenght2);
 		length2 = (length2 & mask) | length2.AndNot(mask);
 		dgFloat32 length = length2.Sqrt().GetScalar();
 		dgFloat32 lenghtRatio = m_restlength[i] / length;
 		spring_A01[i] = - fKs * (dgFloat32(1.0f) - lenghtRatio) * timestep;
-		spring_B01[i] = - dgFloat32 (2.0f) * fKs * lenghtRatio * timestep / length2.GetScalar();
-		dv[i] = m_veloc[j0] - m_veloc[j1];
-		dpdv[i] = dx[i].CompProduct4(dv[i]);
+		spring_B01[i] = - fKs * lenghtRatio * timestepTow / length2.GetScalar();
 	}
 
 	dgVector timeV(timestep);
 	for (dgInt32 i = 0; i < m_linksCount; i++) {
 		const dgInt32 j0 = m_linkList[i].m_v0;
 		const dgInt32 j1 = m_linkList[i].m_v1;
+		const dgVector& dv0 = dv[j0];
+		const dgVector& dv1 = dv[j1];
+		const dgVector& dpdv0 = dpdv[j0];
+		const dgVector& dpdv1 = dpdv[j1];
+		const dgVector A01(spring_A01[i]);
+		const dgVector B01(spring_B01[i]);
+		const dgVector dxdx(dx[i].CompProduct4(dx[i]));
 
-		dgVector A01 (spring_A01[i]);
-		dgVector B01 (spring_B01[i]);
-		dgVector dxdx (dx[i].CompProduct4(dx[i]));
-
-		m_accel[j0] += (A01.CompProduct4(dv[j0]) + B01.CompProduct4(dx[i].CompProduct4(dpdv[j0])));
-		m_accel[j1] -= (A01.CompProduct4(dv[j1]) + B01.CompProduct4(dx[i].CompProduct4(dpdv[j1])));
+		m_accel[j0] += (A01.CompProduct4(dv0) + B01.CompProduct4(dx[i].CompProduct4(dpdv0)));
+		m_accel[j1] -= (A01.CompProduct4(dv1) + B01.CompProduct4(dx[i].CompProduct4(dpdv1)));
 		
 		diag[j0] -= timeV.CompProduct4(A01 + B01.CompProduct4(dxdx));
 		diag[j1] -= timeV.CompProduct4(A01 + B01.CompProduct4(dxdx));
