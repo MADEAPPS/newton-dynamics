@@ -478,7 +478,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	int GetPointIndex (const void* const point) const;
 	int GetVertexIndexFromPoint (const void* const point) const;
 
-
 	void* GetFirstEdge () const;
 	void* GetNextEdge (const void* const edge) const;
 //	void* FindEdge (dgInt32 v0, dgInt32 v1) const;
@@ -569,7 +568,8 @@ static dgVertexAtribute xx;
 
 DG_INLINE dgBigVector dgMeshEffect::GetVertex (dgInt32 index) const
 {
-	dgAssert (0);
+	dgAssert(index >= 0);
+	dgAssert(index < m_points.m_count);
 	return m_points[index];
 }
 

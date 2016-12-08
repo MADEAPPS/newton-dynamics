@@ -2845,7 +2845,7 @@ bool dgMeshEffect::HasVertexColorChannel() const
 
 void dgMeshEffect::GetVertexChannel64(dgInt32 strideInByte, dgFloat64* const bufferOut) const
 {
-	dgInt32 stride = strideInByte /= sizeof (dgFloat64);
+	dgInt32 stride = strideInByte / sizeof (dgFloat64);
 	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i ++)	{
 		const dgInt32 j = i * stride;
 		const dgInt32 index = m_attrib.m_pointChannel[i];
@@ -2857,7 +2857,7 @@ void dgMeshEffect::GetVertexChannel64(dgInt32 strideInByte, dgFloat64* const buf
 
 void dgMeshEffect::GetVertexChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
 {
-	dgInt32 stride = strideInByte /= sizeof (dgFloat32);
+	dgInt32 stride = strideInByte / sizeof (dgFloat32);
 	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
 		const dgInt32 j = i * stride;
 		const dgInt32 index = m_attrib.m_pointChannel[i];
@@ -2869,7 +2869,7 @@ void dgMeshEffect::GetVertexChannel(dgInt32 strideInByte, dgFloat32* const buffe
 
 void dgMeshEffect::GetNormalChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
 {
-	dgInt32 stride = strideInByte /= sizeof (dgFloat32);
+	dgInt32 stride = strideInByte / sizeof (dgFloat32);
 	for (dgInt32 i = 0; i < m_attrib.m_normalChannel.m_count; i++) {
 		const dgInt32 j = i * stride;
 		bufferOut[j + 0] = dgFloat32(m_attrib.m_normalChannel[i].m_x);
@@ -2880,7 +2880,7 @@ void dgMeshEffect::GetNormalChannel(dgInt32 strideInByte, dgFloat32* const buffe
 
 void dgMeshEffect::GetBinormalChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
 {
-	dgInt32 stride = strideInByte /= sizeof (dgFloat32);
+	dgInt32 stride = strideInByte / sizeof (dgFloat32);
 	for (dgInt32 i = 0; i < m_attrib.m_binormalChannel.m_count; i++) {
 		const dgInt32 j = i * stride;
 		bufferOut[j + 0] = dgFloat32(m_attrib.m_binormalChannel[i].m_x);
@@ -2891,7 +2891,7 @@ void dgMeshEffect::GetBinormalChannel(dgInt32 strideInByte, dgFloat32* const buf
 
 void dgMeshEffect::GetUV0Channel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
 {
-	dgInt32 stride = strideInByte /= sizeof (dgFloat32);
+	dgInt32 stride = strideInByte / sizeof (dgFloat32);
 	for (dgInt32 i = 0; i < m_attrib.m_uv0Channel.m_count; i++) {
 		const dgInt32 j = i * stride;
 		bufferOut[j + 0] = dgFloat32(m_attrib.m_uv0Channel[i].m_u);
@@ -2901,7 +2901,7 @@ void dgMeshEffect::GetUV0Channel(dgInt32 strideInByte, dgFloat32* const bufferOu
 
 void dgMeshEffect::GetUV1Channel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
 {
-	dgInt32 stride = strideInByte /= sizeof (dgFloat32);
+	dgInt32 stride = strideInByte / sizeof (dgFloat32);
 	for (dgInt32 i = 0; i < m_attrib.m_uv1Channel.m_count; i++) {
 		const dgInt32 j = i * stride;
 		bufferOut[j + 0] = dgFloat32(m_attrib.m_uv1Channel[i].m_u);
@@ -2911,7 +2911,7 @@ void dgMeshEffect::GetUV1Channel(dgInt32 strideInByte, dgFloat32* const bufferOu
 
 void dgMeshEffect::GetVertexColorChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
 {
-	dgInt32 stride = strideInByte /= sizeof (dgFloat32);
+	dgInt32 stride = strideInByte / sizeof (dgFloat32);
 	for (dgInt32 i = 0; i < m_attrib.m_colorChannel.m_count; i++) {
 		const dgInt32 j = i * stride;
 		bufferOut[j + 0] = dgFloat32(m_attrib.m_colorChannel[i].m_x);

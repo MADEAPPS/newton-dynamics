@@ -193,107 +193,60 @@ void dgCollisionDeformableMesh::Serialize(dgSerialize callback, void* const user
 }
 
 
-dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
-{
-	dgFree(m_posit);
-	dgFree(m_veloc);
-	dgFree(m_accel);
-	dgFree(m_linkList);
-	dgFree(m_indexMap);
-	dgFree(m_restlength);
-	dgFree(m_externalforce);
-	dgFree(m_unitMassScaler);
-}
-
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collsionID)
 	:dgCollisionConvex(mesh->GetAllocator(), 0, collsionID)
 	,m_posit(NULL)
 	,m_veloc(NULL)
 	,m_accel(NULL)
 	,m_linkList(NULL)
-	,m_indexMap(NULL)
 	,m_restlength(NULL)
 	,m_externalforce(NULL)
 	,m_unitMassScaler(NULL)
-	,m_linksCount(0)
-	,m_massesCount(0)
-	,m_vertexCount(mesh->GetVertexCount())
+	,m_linksCount(mesh->GetEdgeCount() / 2)
+	,m_massesCount(mesh->GetVertexCount())
 {
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
 
-	dgStack<dgInt32> indexList(m_vertexCount);
-	dgStack<dgVector> positBuff(m_vertexCount);
-	dgVector* const posit = &positBuff[0];
-	const dgFloat64* const meshVertex = mesh->GetVertexPool();
-	const dgInt32 stride = mesh->GetVertexStrideInByte() / sizeof (dgFloat64);
-	for (dgInt32 i = 0; i < m_vertexCount; i++) {
-		posit[i] = dgVector(dgFloat32(meshVertex[i * stride + 0]), dgFloat32(meshVertex[i * stride + 1]), dgFloat32(meshVertex[i * stride + 2]), dgFloat32(0.0f));
-	}
-	m_massesCount = dgVertexListToIndexList(&posit[0].m_x, sizeof(dgVector), sizeof(dgVector), 0, m_vertexCount, &indexList[0], dgFloat32(1.0e-8f));
-
-	m_indexMap = (dgInt32*)dgMallocStack(sizeof(dgInt32) * m_vertexCount);
 	m_unitMassScaler = (dgFloat32*)dgMallocStack(sizeof(dgFloat32) * m_massesCount);
 	m_posit = (dgVector*)dgMallocStack(sizeof(dgVector) * m_massesCount);
 	m_veloc = (dgVector*)dgMallocStack(sizeof(dgVector) * m_massesCount);
 	m_accel = (dgVector*)dgMallocStack(sizeof(dgVector) * m_massesCount);
 	m_externalforce = (dgVector*)dgMallocStack(sizeof(dgVector) * m_massesCount);
+	m_linkList = (dgSoftLink*)dgMallocStack(sizeof(dgSoftLink) * m_linksCount);
+	m_restlength = (dgFloat32*)dgMallocStack(sizeof(dgFloat32) * m_linksCount);
+
 	dgVector com(dgFloat32(0.0f));
 	for (dgInt32 i = 0; i < m_massesCount; i++) {
-		com += posit[i];
+		dgBigVector p(mesh->GetVertex(i));
+		m_posit[i] = p;
+		com += m_posit[i];
 		m_unitMassScaler[i] = dgFloat32 (1.0f);
 		m_externalforce[i] = dgVector(dgFloat32(0.0f));
 	}
-// for now use a fix size box
+
+	// for now use a fix size box
 	m_boxSize = dgVector (dgFloat32 (1.0f), dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(0.0f));
 	m_boxOrigin = com.CompProduct4(dgFloat32(1.0f) / m_massesCount);
 
 	for (dgInt32 i = 0; i < m_massesCount; i++) {
 		m_accel[i] = dgVector(0.0f);
 		m_veloc[i] = dgVector(0.0f);
-		m_posit[i] = posit[i] - m_boxOrigin;
+		m_posit[i] = m_posit[i] - m_boxOrigin;
 	}
-
-	for (dgInt32 i = 0; i < m_vertexCount; i++) {
-		m_indexMap[i] = indexList[i];
-	}
-
-	dgPolyhedra polyhedra(GetAllocator());
-	polyhedra.BeginFace();
-	for (void* facePtr = mesh->GetFirstFace(); facePtr; facePtr = mesh->GetNextEdge(facePtr)) {
-		if (!mesh->IsFaceOpen(facePtr)) {
-			dgInt32 indices[256];
-			dgInt32 count = mesh->GetFaceIndexCount (facePtr);
-			dgAssert(count < 256);
-			mesh->GetFaceIndex(facePtr, indices);
-			for (dgInt32 i = 0; i < count; i ++) {
-				dgInt32 j = indices[i];
-				indices[i] = m_indexMap[j];
-			}
-			polyhedra.AddFace(3, indices);
-		}
-	}
-	polyhedra.EndFace();
-	m_linksCount = polyhedra.GetCount() / 2;
-	m_linkList = (dgSoftLink*)dgMallocStack(sizeof(dgSoftLink) * m_linksCount);
-	m_restlength = (dgFloat32*)dgMallocStack(sizeof(dgFloat32) * m_linksCount);
 
 	dgInt32 edgeCount = 0;
-	dgInt32 lru = polyhedra.IncLRU();
-	dgPolyhedra::Iterator iter(polyhedra);
-	for (iter.Begin(); iter; iter++) {
-		::dgEdge& edge = iter.GetNode()->GetInfo();
-		if (edge.m_mark != lru) {
-			edge.m_mark = lru;
-			edge.m_twin->m_mark = lru;
-			const dgInt16 v0 = dgInt16(edge.m_incidentVertex);
-			const dgInt16 v1 = dgInt16(edge.m_twin->m_incidentVertex);
-			m_linkList[edgeCount].m_v0 = v0;
-			m_linkList[edgeCount].m_v1 = v1;
-			dgVector dp(m_posit[v0] - m_posit[v1]);
-			m_restlength[edgeCount] = dgSqrt(dp.DotProduct3(dp));
-			edgeCount++;
-		}
+	for (void* edgePtr = mesh->GetFirstEdge(); edgePtr; edgePtr = mesh->GetNextEdge(edgePtr)) {
+		dgInt32 v0;
+		dgInt32 v1;
+		mesh->GetEdgeIndex(edgePtr, v0, v1);
+		m_linkList[edgeCount].m_v0 = dgInt16(v0);
+		m_linkList[edgeCount].m_v1 = dgInt16(v1);
+		dgVector dp(m_posit[v0] - m_posit[v1]);
+		m_restlength[edgeCount] = dgSqrt(dp.DotProduct3(dp));
+		dgAssert(edgeCount < m_linksCount);
+		edgeCount++;
 	}
+	dgAssert(edgeCount == m_linksCount);
 }
 
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformableMesh& source)
@@ -301,14 +254,12 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformable
 	,m_posit((dgVector*)dgMallocStack(sizeof(dgVector) * source.m_massesCount))
 	,m_veloc((dgVector*)dgMallocStack(sizeof(dgVector) * source.m_massesCount))
 	,m_accel((dgVector*)dgMallocStack(sizeof(dgVector) * source.m_massesCount))
-	,m_indexMap((dgInt32*)dgMallocStack(sizeof(dgInt32) * source.m_vertexCount))
 	,m_linkList((dgSoftLink*)dgMallocStack(sizeof(dgSoftLink) * source.m_linksCount))
 	,m_restlength((dgFloat32*)dgMallocStack(sizeof(dgFloat32) * source.m_linksCount))
-	,m_externalforce((dgVector*)dgMallocStack(sizeof(dgVector) * source.m_vertexCount))
+	,m_externalforce((dgVector*)dgMallocStack(sizeof(dgVector) * source.m_massesCount))
 	,m_unitMassScaler((dgFloat32*)dgMallocStack(sizeof(dgFloat32) * source.m_massesCount))
 	,m_linksCount(source.m_linksCount)
 	,m_massesCount(source.m_massesCount)
-	,m_vertexCount(source.m_vertexCount)
 {
 	m_rtti = source.m_rtti;
 	memcpy(m_veloc, source.m_veloc, m_massesCount * sizeof(dgVector));
@@ -317,10 +268,21 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformable
 
 	memcpy(m_unitMassScaler, source.m_unitMassScaler, m_massesCount * sizeof(dgFloat32));
 	memcpy(m_linkList, source.m_linkList, m_linksCount * sizeof(dgSoftLink));
-	memcpy(m_indexMap, source.m_indexMap, m_vertexCount * sizeof(dgInt32));
 	memcpy(m_restlength, source.m_restlength, m_linksCount * sizeof(dgFloat32));
 	memcpy(m_externalforce, source.m_externalforce, m_massesCount * sizeof(dgVector));
 }
+
+dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
+{
+	dgFree(m_posit);
+	dgFree(m_veloc);
+	dgFree(m_accel);
+	dgFree(m_linkList);
+	dgFree(m_restlength);
+	dgFree(m_externalforce);
+	dgFree(m_unitMassScaler);
+}
+
 
 dgMatrix dgCollisionDeformableMesh::CalculateInertiaAndCenterOfMass(const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const
 {
@@ -386,7 +348,9 @@ const dgVector* dgCollisionDeformableMesh::GetPositions() const
 
 const dgInt32* dgCollisionDeformableMesh::GetParticleToVertexMap() const
 {
-	return m_indexMap;
+	dgAssert(0);
+	return 0;
+//	return m_indexMap;
 }
 
 

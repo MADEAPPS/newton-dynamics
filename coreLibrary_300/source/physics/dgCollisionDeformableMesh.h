@@ -65,7 +65,6 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgVector* m_posit;
 	dgVector* m_veloc;
 	dgVector* m_accel;
-	dgInt32* m_indexMap;
 	dgSoftLink* m_linkList;
 	dgFloat32* m_restlength;
 	dgVector* m_externalforce;
@@ -73,7 +72,7 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 
 	dgInt32 m_linksCount;
 	dgInt32 m_massesCount;
-	dgInt32 m_vertexCount;
+
 
 	static dgVector m_smallestLenght2;
 

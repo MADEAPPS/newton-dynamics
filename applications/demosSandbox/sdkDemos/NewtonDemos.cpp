@@ -29,7 +29,7 @@
 //#define DEFAULT_SCENE	3			// Precessing tops
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
-#define DEFAULT_SCENE	6 			// Kinematic bodies
+//#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
 //#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
@@ -61,7 +61,7 @@
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
 //#define DEFAULT_SCENE	37			// cloth patch			
-//#define DEFAULT_SCENE	38			// soft bodies			
+#define DEFAULT_SCENE	38			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);

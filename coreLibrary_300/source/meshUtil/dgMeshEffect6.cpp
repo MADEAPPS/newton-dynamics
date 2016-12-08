@@ -1506,7 +1506,7 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
             do {
                 dgVector normal (FaceNormal (ptr, &m_points[0].m_x, sizeof (dgBigVector)));
 				dgAssert (normal.m_w == dgFloat32 (0.0f));
-                normal = normal.Scale4 (dgFloat32 (1.0f) / (sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
+                normal = normal.Scale4 (dgFloat32 (1.0f) / dgFloat32 (sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
                 faceNormal[edgeIndex] = normal;
                 normalsMap.Insert(edgeIndex, ptr);
                 edgeIndex ++;
@@ -1541,7 +1541,7 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
                 normal0 = normal1;
             } 
 
-            normal = normal.Scale3 (dgFloat32 (1.0f) / (sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
+            normal = normal.Scale3 (dgFloat32 (1.0f) / dgFloat32(sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
 			dgTriplex n;
 			n.m_x = normal.m_x;
 			n.m_y = normal.m_y;
