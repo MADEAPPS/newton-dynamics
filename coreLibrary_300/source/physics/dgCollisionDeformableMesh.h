@@ -29,6 +29,13 @@
 
 class dgCollisionDeformableMesh: public dgCollisionConvex
 {
+	class dgSoftLink
+	{
+		public:
+		dgInt16 m_v0;
+		dgInt16 m_v1;
+	};
+
 	public:
 	dgCollisionDeformableMesh (const dgCollisionDeformableMesh& source);
 	dgCollisionDeformableMesh (dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collsionID);
@@ -51,15 +58,9 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	virtual void SetCollisionBBox(const dgVector& p0, const dgVector& p1);
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void CollideMasses(dgDynamicBody* const myBody, dgBody* const otherBody);
-
-	class dgSoftLink;
-	class dgSpringMassSolver;
-	
 	virtual void CalcAABB(const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	virtual void IntegrateForces(dgDynamicBody* const body, dgFloat32 timestep);
 	virtual dgMatrix CalculateInertiaAndCenterOfMass(const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
-
-	protected:
 	void CalculateAcceleration(dgFloat32 timestep, const dgDynamicBody* const body);
 
 	dgVector* m_posit;
@@ -69,10 +70,8 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	dgFloat32* m_restlength;
 	dgVector* m_externalforce;
 	dgFloat32* m_unitMassScaler;
-
 	dgInt32 m_linksCount;
-	dgInt32 m_massesCount;
-
+	dgInt32 m_particlesCount;
 
 	static dgVector m_smallestLenght2;
 
