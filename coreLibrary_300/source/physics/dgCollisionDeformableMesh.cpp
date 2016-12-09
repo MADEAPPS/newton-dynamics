@@ -290,21 +290,24 @@ dgFloat32 fKs = dgFloat32(100.0f);
 	dgVector* const dx = dgAlloca(dgVector, m_linksCount);
 	dgVector* const dv = dgAlloca(dgVector, m_linksCount);
 	dgVector* const dpdv = dgAlloca(dgVector, m_linksCount);
-	dgVector* const diag = dgAlloca(dgVector, m_particlesCount * 3);
+	dgVector* const diag = dgAlloca(dgVector, m_particlesCount);
+	dgVector* const offDiag = dgAlloca(dgVector, m_particlesCount);
 
-	//dgVector den(dgFloat32(1.0f / m_massesCount));
-	//dgVector unitforce(body->m_externalForce.CompProduct4(den));
 	dgVector unitAccel(body->m_externalForce.CompProduct4(body->m_invMass.m_w));
+	// here I need to add other external accelration liek wind and presure, friction and collision .
+
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		accel[i] = unitAccel;
 		diag[i] = dgVector::m_one;
+		offDiag[i] = dgVector::m_zero;
 	}
 
+	const dgSoftLink* const links = &m_linkList[0];
 	dgFloat32 ksdt0 = -timestep * fKs;
 	dgFloat32 ksdt1 = -timestep * fKs * dgFloat32(2.0f);
 	for (dgInt32 i = 0; i < m_linksCount; i++) {
-		const dgInt32 j0 = m_linkList[i].m_v0;
-		const dgInt32 j1 = m_linkList[i].m_v1;
+		const dgInt32 j0 = links[i].m_v0;
+		const dgInt32 j1 = links[i].m_v1;
 
 		dv[i] = veloc[j0] - veloc[j1];
 		dx[i] = posit[j0] - posit[j1];
@@ -318,26 +321,37 @@ dgFloat32 fKs = dgFloat32(100.0f);
 		dgFloat32 length = length2.Sqrt().GetScalar();
 		dgFloat32 lenghtRatio = m_restlength[i] / length;
 
-		spring_A01[i] = ksdt0 * (dgFloat32(1.0f) - lenghtRatio);
+		dgFloat32 compression = dgFloat32(1.0f) - lenghtRatio;
+		dgVector fs(p0p1.Scale4(fKs * compression));
+		accel[j0] -= fs;
+		accel[j1] += fs;
+
+		spring_A01[i] = ksdt0 * compression;
 		spring_B01[i] = ksdt1 * lenghtRatio / length2.GetScalar();
 	}
 
 	dgVector timeV(timestep);
 	for (dgInt32 i = 0; i < m_linksCount; i++) {
-		const dgInt32 j0 = m_linkList[i].m_v0;
-		const dgInt32 j1 = m_linkList[i].m_v1;
-		const dgVector& dv0 = dv[j0];
-		const dgVector& dv1 = dv[j1];
-		const dgVector& dpdv0 = dpdv[j0];
-		const dgVector& dpdv1 = dpdv[j1];
+		const dgVector dx0 (dx[i]);
+		const dgVector dv0 (dv[i]);
+		const dgVector dpdv0 (dpdv[i]);
 		const dgVector A01(spring_A01[i]);
 		const dgVector B01(spring_B01[i]);
-		const dgVector dxdx(dx[i].CompProduct4(dx[i]));
+		const dgVector dxdx(dx0.CompProduct4(dx0));
+		const dgVector dxdy(dx0.CompProduct4(dx0.ShiftTripleRight()));
+		const dgVector diag0 (timeV.CompProduct4(A01 + B01.CompProduct4(dxdx)));
+		const dgVector offDiag0 (timeV.CompProduct4(A01 + B01.CompProduct4(dxdy)));
+		const dgVector dfdxdv0 (A01.CompProduct4(dv0) + B01.CompProduct4(dx[i].CompProduct4(dpdv0)));
 
-		accel[j0] += (A01.CompProduct4(dv0) + B01.CompProduct4(dx[i].CompProduct4(dpdv0)));
-		accel[j1] -= (A01.CompProduct4(dv1) + B01.CompProduct4(dx[i].CompProduct4(dpdv1)));
+		const dgInt32 j0 = links[i].m_v0;
+		const dgInt32 j1 = links[i].m_v1;
+
+		accel[j0] += dfdxdv0;
+		accel[j1] -= dfdxdv0;
 		
-		diag[j0] -= timeV.CompProduct4(A01 + B01.CompProduct4(dxdx));
-		diag[j1] -= timeV.CompProduct4(A01 + B01.CompProduct4(dxdx));
+		diag[j0] -= diag0;
+		diag[j1] -= diag0;
+		offDiag[j0] -= offDiag0;
+		offDiag[j1] -= offDiag0;
 	}
 }
