@@ -23,7 +23,7 @@
 #include "dgWorld.h"
 #include "dgDynamicBody.h"
 #include "dgCollisionInstance.h"
-#include "dgCollisionDeformableMesh.h"
+#include "dgCollisionLumpedMassParticles.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -222,6 +222,15 @@ bool dgDynamicBody::IsInEquilibrium() const
 	return false;
 }
 
+void dgDynamicBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
+{
+	dgBody::SetMassMatrix(mass, inertia);
+	if (m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+		dgCollisionLumpedMassParticles* const lumpedMass = (dgCollisionLumpedMassParticles*) m_collision->m_childShape;
+		lumpedMass->SetUnitMass(this);
+	}
+}
+
 
 void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 {
@@ -245,7 +254,7 @@ void dgDynamicBody::InvalidateCache ()
 void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 {
 	if (!m_equilibrium) {
-		if (!m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		if (!m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 			AddDampingAcceleration(timestep);
 			CalcInvInertiaMatrix();
 
@@ -260,8 +269,8 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			dgVector correction(alpha.CrossProduct3(m_omega));
 			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
 		} else {
-			dgCollisionDeformableMesh* const deformableMesh = (dgCollisionDeformableMesh*)m_collision->m_childShape;
-			deformableMesh->IntegrateForces(this, timestep);
+			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
+			lumpedMassShape->IntegrateForces(this, timestep);
 		}
 	} else {
 		m_accel = dgVector::m_zero;

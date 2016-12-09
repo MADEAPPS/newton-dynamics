@@ -20,8 +20,6 @@
 */
 
 #include "dgPhysicsStdafx.h"
-
-
 #include "dgBody.h"
 #include "dgWorld.h"
 #include "dgContact.h"

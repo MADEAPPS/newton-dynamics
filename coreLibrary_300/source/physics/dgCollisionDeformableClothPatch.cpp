@@ -42,7 +42,6 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(const dgCollisi
 	:dgCollisionDeformableMesh(source)
 {
 	m_rtti |= source.m_rtti;
-
 }
 
 dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)

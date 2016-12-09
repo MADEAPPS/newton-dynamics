@@ -20,40 +20,44 @@
 */
 
 
-#ifndef __DGCOLLISION_PARTICLES_H__
-#define __DGCOLLISION_PARTICLES_H__
+#ifndef __DGCOLLISION_LUMPED_MASS_PARTICLES_H__
+#define __DGCOLLISION_LUMPED_MASS_PARTICLES_H__
 
 
 #include "dgCollision.h"
 #include "dgCollisionConvex.h"
 
-class dgCollisionParticles: public dgCollisionConvex
+class dgCollisionLumpedMassParticles: public dgCollisionConvex
 {
 	public:
-	dgCollisionParticles (const dgCollisionParticles& source);
-	dgCollisionParticles (dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collsionID);
-	dgCollisionParticles (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
-	virtual ~dgCollisionParticles(void);
+	dgCollisionLumpedMassParticles (const dgCollisionLumpedMassParticles& source);
+	dgCollisionLumpedMassParticles (dgWorld* const world, dgInt32 reserveCount, dgCollisionID collisionID);
+	dgCollisionLumpedMassParticles (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
+	virtual ~dgCollisionLumpedMassParticles(void);
 
 	dgInt32 GetCount() const;
 	const dgVector* GetVelocity() const;
 	const dgVector* GetPositions() const;
-	const dgVector* GetAccelaration() const;
+	const dgVector* GetAcceleration() const;
+
+	virtual void SetUnitMass (const dgDynamicBody* const body) = 0;
+	virtual void IntegrateForces(dgDynamicBody* const body, dgFloat32 timestep) = 0;
+	virtual void CollideMasses(dgDynamicBody* const body, dgBody* const otherBody) = 0;
+	
 
 	protected:
 	virtual dgInt32 CalculateSignature() const;
 	virtual void SetCollisionBBox(const dgVector& p0, const dgVector& p1);
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
-	virtual void CollideMasses(dgDynamicBody* const myBody, dgBody* const otherBody);
 	virtual void CalcAABB(const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
-	virtual void IntegrateForces(dgDynamicBody* const body, dgFloat32 timestep);
 	virtual dgMatrix CalculateInertiaAndCenterOfMass(const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
-//	void CalculateAcceleration(dgFloat32 timestep, const dgDynamicBody* const body);
 
 	dgArray<dgVector> m_posit;
 	dgArray<dgVector> m_veloc;
 	dgArray<dgVector> m_accel;
 	dgArray<dgVector> m_externalforce;
+	dgFloat32 m_unitMass;
+	dgFloat32 m_unitInertia;
 	dgInt32 m_particlesCount;
 
 	friend class dgBroadPhase;

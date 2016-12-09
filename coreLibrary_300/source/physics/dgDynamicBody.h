@@ -78,6 +78,7 @@ class dgDynamicBody : public dgBody
 	void IntegrateOpenLoopExternalForce(dgFloat32 timeStep);
 
 	private:
+	void SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia);
 	virtual void AddDampingAcceleration(dgFloat32 timestep);
 
 #ifdef DG_USEFULL_INERTIA_MATRIX

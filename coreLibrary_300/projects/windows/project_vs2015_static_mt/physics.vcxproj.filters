@@ -160,6 +160,9 @@
     <ClCompile Include="..\..\..\source\physics\dgContactSolver.cpp">
       <Filter>systems</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgCollisionLumpedMassParticles.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h">
@@ -302,6 +305,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgContactSolver.h">
       <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgCollisionLumpedMassParticles.h">
+      <Filter>collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

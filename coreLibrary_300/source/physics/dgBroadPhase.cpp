@@ -30,7 +30,8 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
 #include "dgBroadPhaseAggregate.h"
-#include "dgCollisionDeformableMesh.h"
+#include "dgCollisionLumpedMassParticles.h"
+//#include "dgCollisionLumpedMassParticles.h"
 
 #define DG_CONVEX_CAST_POOLSIZE			32
 #define DG_BROADPHASE_AABB_SCALE		dgFloat32 (8.0f)
@@ -1460,8 +1461,8 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
 				bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
 				if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
-					const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI);
-					const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI);
+					const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
+					const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
 					if (isSofBody0 || isSofBody1) {
 						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body0 = body0;
 						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
@@ -1817,14 +1818,14 @@ void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const desc
 	const dgInt32 count = m_pendingSoftBodyPairsCount;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_pairsAtomicCounter, 1)) {
 		dgPendingCollisionSofBodies& pair = m_pendingSoftBodyCollisions[i];
-		if (pair.m_body0->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-			dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)pair.m_body0->m_collision->GetChildShape();
+		if (pair.m_body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)pair.m_body0->m_collision->GetChildShape();
 			dgAssert(pair.m_body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			deformableShape->CollideMasses((dgDynamicBody*) pair.m_body0, pair.m_body1);
-		} else if (pair.m_body1->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-			dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)pair.m_body1->m_collision->GetChildShape();
+			lumpedMassShape->CollideMasses((dgDynamicBody*) pair.m_body0, pair.m_body1);
+		} else if (pair.m_body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)pair.m_body1->m_collision->GetChildShape();
 			dgAssert(pair.m_body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			deformableShape->CollideMasses((dgDynamicBody*)pair.m_body1, pair.m_body0);
+			lumpedMassShape->CollideMasses((dgDynamicBody*)pair.m_body1, pair.m_body0);
 		}
 	}
 }

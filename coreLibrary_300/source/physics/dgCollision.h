@@ -215,13 +215,14 @@ class dgCollision
 		dgCollisionCompound_RTTI					= 1<<10,
 		dgCollisionBVH_RTTI							= 1<<11,
 		dgCollisionMesh_RTTI						= 1<<12,
-		dgCollisionDeformableMesh_RTTI				= 1<<13,
-		dgCollisionDeformableSolidMesh_RTTI			= 1<<14,
-		dgCollisionDeformableClothPatch_RTTI		= 1<<15,
-		dgCollisionUserMesh_RTTI					= 1<<16,
-		dgCollisionHeightField_RTTI					= 1<<17,
-		dgCollisionScene_RTTI						= 1<<18,
-		dgCollisionCompoundBreakable_RTTI			= 1<<19,
+		dgCollisionLumpedMass_RTTI					= 1<<13,
+		dgCollisionDeformableMesh_RTTI				= 1<<14,
+		dgCollisionDeformableSolidMesh_RTTI			= 1<<15,
+		dgCollisionDeformableClothPatch_RTTI		= 1<<16,
+		dgCollisionUserMesh_RTTI					= 1<<17,
+		dgCollisionHeightField_RTTI					= 1<<18,
+		dgCollisionScene_RTTI						= 1<<19,
+		dgCollisionCompoundBreakable_RTTI			= 1<<20,
 	};													 
 	
 	DG_CLASS_ALLOCATOR(allocator)

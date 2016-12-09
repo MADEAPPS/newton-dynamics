@@ -455,7 +455,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 			}
 		}
 
-
 	} else {
 		Ixx = dgAbsf (Ixx);
 		Iyy = dgAbsf (Iyy);
@@ -484,6 +483,7 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 			masterList.RotateToEnd (m_masterNode);
 		}
 	}
+
 
 #ifdef _DEBUG
 	dgBodyMasterList& me = *m_world;
@@ -521,8 +521,8 @@ void dgBody::SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const
 
 	// although the engine fully supports asymmetric inertia, I will ignore cross inertia for now
 	//SetMassMatrix(mass, inertia[0][0], inertia[1][1], inertia[2][2]);
-	SetMassMatrix(mass, inertia);
 	SetCentreOfMass(origin);
+	SetMassMatrix(mass, inertia);
 }
 
 

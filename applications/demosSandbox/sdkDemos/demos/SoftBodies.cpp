@@ -133,12 +133,13 @@ class SimpleSoftBodyEntity: public DemoEntity
 		SetMesh(mesh1, dGetIdentityMatrix());
 
 		// make a deformable collision mesh
-		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, newtonMesh, materialID);
+//		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, newtonMesh, materialID);
+		NewtonCollision* const deformableCollision = NewtonCreateClothPatch(world, newtonMesh, materialID);
 
 		//create a rigid body with a deformable mesh
 		CreateRigidBody (scene, mass, deformableCollision);
 
-		// do not forget to destroy this objects, else you bet bad memory leaks.
+		// do not forget to destroy this objects, else you get bad memory leaks.
 		mesh1->Release();
 		NewtonMeshDestroy (newtonMesh);
 		NewtonDestroyCollision(collisionBox);
