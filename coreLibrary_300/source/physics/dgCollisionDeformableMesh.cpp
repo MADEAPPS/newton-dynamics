@@ -300,7 +300,8 @@ dgFloat32 fKs = dgFloat32(100.0f);
 		diag[i] = dgVector::m_one;
 	}
 
-	dgFloat32 timestepTow = dgFloat32(2.0f) * timestep;
+	dgFloat32 ksdt0 = -timestep * fKs;
+	dgFloat32 ksdt1 = -timestep * fKs * dgFloat32(2.0f);
 	for (dgInt32 i = 0; i < m_linksCount; i++) {
 		const dgInt32 j0 = m_linkList[i].m_v0;
 		const dgInt32 j1 = m_linkList[i].m_v1;
@@ -316,8 +317,9 @@ dgFloat32 fKs = dgFloat32(100.0f);
 		length2 = (length2 & mask) | length2.AndNot(mask);
 		dgFloat32 length = length2.Sqrt().GetScalar();
 		dgFloat32 lenghtRatio = m_restlength[i] / length;
-		spring_A01[i] = - fKs * (dgFloat32(1.0f) - lenghtRatio) * timestep;
-		spring_B01[i] = - fKs * lenghtRatio * timestepTow / length2.GetScalar();
+
+		spring_A01[i] = ksdt0 * (dgFloat32(1.0f) - lenghtRatio);
+		spring_B01[i] = ksdt1 * lenghtRatio / length2.GetScalar();
 	}
 
 	dgVector timeV(timestep);
