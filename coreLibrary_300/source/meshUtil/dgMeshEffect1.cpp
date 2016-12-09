@@ -2033,7 +2033,7 @@ void dgMeshEffect::EndBuild (dgFloat64 tol, bool fixTjoint)
 {
 	dgStack<dgInt32>indexMapBuffer(m_points.m_count);
 	dgInt32* const indexMap = &indexMapBuffer[0];
-//	dgStack<dgInt32>attrIndexMap(m_atribCount);
+	m_attrib.m_count = m_points.m_count;
 
 #ifdef _DEBUG
 	for (dgInt32 i = 0; i < m_points.m_count; i += 3) {
@@ -2055,7 +2055,7 @@ void dgMeshEffect::EndBuild (dgFloat64 tol, bool fixTjoint)
 	}
 	m_points.Resize(newCount);
 	m_points.SetCount(newCount);
-//	m_atribCount = dgVertexListToIndexList (&m_attrib[0].m_vertex.m_x, sizeof (dgVertexAtribute), sizeof (dgVertexAtribute)/sizeof (dgFloat64), m_atribCount, &attrIndexMap[0], tol);
+	
 
 	for (dgInt32 i = 0; i < triangCount; i ++) {
 		dgInt32 index[3];
@@ -2159,7 +2159,6 @@ void dgMeshEffect::UnpackAttibuteData ()
 				m_attrib.m_pointChannel.PushBack(&ptr->m_incidentVertex);
 
 				if (attibutes.m_materialChannel.m_count) {
-					dgAssert (0);
 					m_attrib.m_materialChannel.PushBack(&attibutes.m_materialChannel[dgInt32 (ptr->m_userData)]);
 				}
 
@@ -3728,8 +3727,6 @@ void dgMeshEffect::RepairTJoints ()
 						}
 */
 					} else {
-dgAssert (0);
-/*
 						dgEdge* const openEdge = (edge->m_incidentFace <= 0) ? edge : edge->m_twin;
 						dgAssert (openEdge->m_incidentFace <= 0);
 
@@ -3779,14 +3776,16 @@ dgAssert (0);
 									dgFloat64 param1 = p3p0.DotProduct3(p1 - p0) / den;
 									dgVertexAtribute attib1 = InterpolateEdge (deletedEdge->m_twin, param1);
 									attib1.m_vertex = m_points[openEdge->m_next->m_incidentVertex];
-									AddAtribute(attib1);
-									openEdge->m_next->m_userData = m_atribCount  - 1;
+									dgAssert(0);
+									//AddAtribute(attib1);
+									//openEdge->m_next->m_userData = m_atribCount  - 1;
 
 									dgFloat64 param2 = p3p0.DotProduct3(p2 - p0) / den;
 									dgVertexAtribute attib2 = InterpolateEdge (deletedEdge->m_twin, param2);
 									attib2.m_vertex = m_points[openEdge->m_next->m_next->m_incidentVertex];
-									AddAtribute(attib2);
-									openEdge->m_next->m_next->m_userData = m_atribCount  - 1;
+									dgAssert(0);
+									//AddAtribute(attib2);
+									//openEdge->m_next->m_next->m_userData = m_atribCount  - 1;
 
 									deletedEdge->m_twin->m_prev->m_next = openEdge;
 									openEdge->m_prev = deletedEdge->m_twin->m_prev;
@@ -3803,7 +3802,6 @@ dgAssert (0);
 								}
 							}
 						}
-*/					
 					}
 				}
 			}

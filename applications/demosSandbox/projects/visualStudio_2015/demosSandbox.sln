@@ -25,6 +25,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "base", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2015_static_mt\wx_vc9_base.vcxproj", "{3FCC50C2-81E9-5DB2-B8D8-2129427568B1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2015_static_mt\wx_vc9_gl.vcxproj", "{DA8B15EF-6750-5928-BC0E-C748213CF9B2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA} = {57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}
+		{3FCC50C2-81E9-5DB2-B8D8-2129427568B1} = {3FCC50C2-81E9-5DB2-B8D8-2129427568B1}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dMath", "..\..\..\..\packages\projects\visualStudio_2015_static_mt\dMath.vcxproj", "{CBE9E751-E58B-46C1-B6B0-873670D0F981}"
 EndProject
