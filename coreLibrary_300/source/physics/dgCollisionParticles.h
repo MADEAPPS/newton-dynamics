@@ -20,38 +20,25 @@
 */
 
 
-#ifndef __DGCOLLISION_DEFORMABLE_MESH_H__
-#define __DGCOLLISION_DEFORMABLE_MESH_H__
+#ifndef __DGCOLLISION_PARTICLES_H__
+#define __DGCOLLISION_PARTICLES_H__
 
 
 #include "dgCollision.h"
 #include "dgCollisionConvex.h"
 
-class dgCollisionDeformableMesh: public dgCollisionConvex
+class dgCollisionParticles: public dgCollisionConvex
 {
-	class dgSoftLink
-	{
-		public:
-		dgInt16 m_v0;
-		dgInt16 m_v1;
-	};
-
 	public:
-	dgCollisionDeformableMesh (const dgCollisionDeformableMesh& source);
-	dgCollisionDeformableMesh (dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collsionID);
-	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
-	virtual ~dgCollisionDeformableMesh(void);
+	dgCollisionParticles (const dgCollisionParticles& source);
+	dgCollisionParticles (dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collsionID);
+	dgCollisionParticles (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
+	virtual ~dgCollisionParticles(void);
 
-	dgInt32 GetLinksCount() const;
-	dgInt32 GetParticleCount() const;
-
-	const dgInt16* GetLinks() const;
+	dgInt32 GetCount() const;
 	const dgVector* GetVelocity() const;
 	const dgVector* GetPositions() const;
-	const dgInt32* GetParticleToVertexMap() const;
-	virtual void ConstraintParticle(dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
-
-	void DisableInactiveLinks ();
+	const dgVector* GetAccelaration() const;
 
 	protected:
 	virtual dgInt32 CalculateSignature() const;
@@ -61,19 +48,13 @@ class dgCollisionDeformableMesh: public dgCollisionConvex
 	virtual void CalcAABB(const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	virtual void IntegrateForces(dgDynamicBody* const body, dgFloat32 timestep);
 	virtual dgMatrix CalculateInertiaAndCenterOfMass(const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
-	void CalculateAcceleration(dgFloat32 timestep, const dgDynamicBody* const body);
+//	void CalculateAcceleration(dgFloat32 timestep, const dgDynamicBody* const body);
 
-	dgVector* m_posit;
-	dgVector* m_veloc;
-	dgVector* m_accel;
-	dgSoftLink* m_linkList;
-	dgFloat32* m_restlength;
-	dgVector* m_externalforce;
-	dgFloat32* m_unitMassScaler;
-	dgInt32 m_linksCount;
+	dgArray<dgVector> m_posit;
+	dgArray<dgVector> m_veloc;
+	dgArray<dgVector> m_accel;
+	dgArray<dgVector> m_externalforce;
 	dgInt32 m_particlesCount;
-
-	static dgVector m_smallestLenght2;
 
 	friend class dgBroadPhase;
 	friend class dgDynamicBody;
