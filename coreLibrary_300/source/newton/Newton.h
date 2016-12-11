@@ -323,7 +323,7 @@ extern "C" {
 		dFloat64* m_data;
 		int* m_indexList;
 		int m_strideInBytes;
-	} NewtonMeshVertexData;
+	} NewtonMeshDoubleData;
 
 	typedef struct NewtonMeshFloatData
 	{
@@ -426,7 +426,7 @@ extern "C" {
 	typedef void (*NewtonSkeletontDestructor) (const NewtonSkeletonContainer* const me);
 
 	typedef void (*NewtonJobTask) (NewtonWorld* const world, void* const userData, int threadIndex);
-	typedef bool (*NewtonReportProgress) (dFloat normalizedProgressPercent, void* const userData);
+	typedef int (*NewtonReportProgress) (dFloat normalizedProgressPercent, void* const userData);
 
 	// **********************************************************************************************
 	//

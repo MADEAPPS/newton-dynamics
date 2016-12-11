@@ -19,9 +19,9 @@
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
 
-static bool ReportProgress (dFloat normalizedProgressPercent, void* const userData)
+static int ReportProgress (dFloat normalizedProgressPercent, void* const userData)
 {
-	return true; 
+	return 1; 
 }
 
 
