@@ -244,11 +244,20 @@ dgFloat32 restitution = dgFloat32 (-1.7f);
 		dgVector worldPosit(origin + posit[i]);
 		if (worldPosit.m_y < 0.0f) {
 			dgFloat32 penetration = -worldPosit.m_y;
-			dgFloat32 v = restitution * veloc[i].m_y + penetration * dgFloat32 (0.25f);
-			if (v > dgFloat32 (1.0e-3f)) {
-				normal[1] = dgFloat32 (1.0f);
-				accel[1] = v;
+			dgFloat32 boundSpeed = restitution * veloc[i].m_y;
+			if (boundSpeed * timestep > penetration) {
+				dgAssert (boundSpeed > 0.0f);
+				normal[1] = dgFloat32(1.0f);
+				accel[1] = boundSpeed;
 				accel = invTimeStep.CompProduct4(accel);
+			} else {
+				penetration = dgMin (dgFloat32 (0.25f), penetration);
+				boundSpeed += dgFloat32 (0.25f) * penetration * invTimeStep.GetScalar();
+				if (boundSpeed > dgFloat32 (1.0e-3f)) {
+					normal[1] = dgFloat32 (1.0f);				
+					accel[1] = boundSpeed;
+					accel = invTimeStep.CompProduct4(accel);
+				}
 			}
 		}
 
