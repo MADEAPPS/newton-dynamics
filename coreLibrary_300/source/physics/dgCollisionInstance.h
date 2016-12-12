@@ -108,7 +108,9 @@ class dgCollisionInstance
 
 	dgFloat32 GetBoxMinRadius () const; 
 	dgFloat32 GetBoxMaxRadius () const; 
+
 	dgMatrix CalculateInertia () const;
+	dgMatrix GetScaledTransform(const dgMatrix& matrix) const;
 	void DebugCollision  (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
@@ -513,6 +515,15 @@ DG_INLINE dgCollisionInstance::dgScaleType dgCollisionInstance::GetCombinedScale
 {
 	dgAssert (0);
 	return dgMax(m_scaleType, type);
+}
+
+DG_INLINE dgMatrix dgCollisionInstance::GetScaledTransform(const dgMatrix& matrix) const
+{
+	dgMatrix scaledMatrix(m_localMatrix * matrix);
+	scaledMatrix[0] = scaledMatrix[0].Scale3(m_scale[0]);
+	scaledMatrix[1] = scaledMatrix[1].Scale3(m_scale[1]);
+	scaledMatrix[2] = scaledMatrix[2].Scale3(m_scale[2]);
+	return m_aligmentMatrix * scaledMatrix;
 }
 
 DG_INLINE void dgCollisionInstance::CalcObb (dgVector& origin, dgVector& size) const

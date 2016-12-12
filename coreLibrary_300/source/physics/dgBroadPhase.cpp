@@ -1821,11 +1821,13 @@ void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const desc
 		if (pair.m_body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)pair.m_body0->m_collision->GetChildShape();
 			dgAssert(pair.m_body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			lumpedMassShape->CollideMasses((dgDynamicBody*) pair.m_body0, pair.m_body1);
+			dgAssert (pair.m_body0 == lumpedMassShape->GetOwner ());
+			lumpedMassShape->RegisterCollision(pair.m_body1);
 		} else if (pair.m_body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)pair.m_body1->m_collision->GetChildShape();
 			dgAssert(pair.m_body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			lumpedMassShape->CollideMasses((dgDynamicBody*)pair.m_body1, pair.m_body0);
+			dgAssert (pair.m_body1 == lumpedMassShape->GetOwner ());
+			lumpedMassShape->RegisterCollision(pair.m_body0);
 		}
 	}
 }
@@ -1936,7 +1938,9 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 					fwrite(&body->m_alpha, sizeof (dgVector), 1, file);
 					fwrite(&body->m_veloc, sizeof (dgVector), 1, file);
 					fwrite(&body->m_omega, sizeof (dgVector), 1, file);
-					dgTrace (("%d f(%f %f %f) v(%f %f %f) \n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z));
+					fwrite(&body->m_externalForce, sizeof (dgVector), 1, file);
+					fwrite(&body->m_externalTorque, sizeof (dgVector), 1, file);
+					//dgTrace (("%d f(%f %f %f) v(%f %f %f) f(%f %f %f)\n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z, body->m_externalForce.m_x, body->m_externalForce.m_y, body->m_externalForce.m_z));
 					fflush(file);
 				}
 			#else 
@@ -1946,7 +1950,9 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 					fread(&body->m_alpha, sizeof (dgVector), 1, file);
 					fread(&body->m_veloc, sizeof (dgVector), 1, file);
 					fread(&body->m_omega, sizeof (dgVector), 1, file);
-					dgTrace (("%d f(%f %f %f) v(%f %f %f) \n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z));
+					fread(&body->m_externalForce, sizeof (dgVector), 1, file);
+					fread(&body->m_externalTorque, sizeof (dgVector), 1, file);
+					//dgTrace (("%d f(%f %f %f) v(%f %f %f) f(%f %f %f)\n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z, body->m_externalForce.m_x, body->m_externalForce.m_y, body->m_externalForce.m_z));
 				}
 			#endif
 		}

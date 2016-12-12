@@ -439,6 +439,8 @@ void dRayToRayCast (const dVector& ray_p0, const dVector& ray_p1, const dVector&
 
 void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 {
+	dAssert (0);
+/*
 	TiXmlElement* pointElement = new TiXmlElement ("points");
 	rootNode->LinkEndChild(pointElement);
 
@@ -595,6 +597,7 @@ void SerializeMesh (const NewtonMesh* const mesh, TiXmlElement* const rootNode)
 	delete[] vertexIndexList;
 	delete[] packVertex;
 	delete[] buffer;
+*/
 }
 
 

@@ -24,6 +24,7 @@
 #include "dgContact.h"
 #include "dgCollision.h"
 #include "dgMeshEffect.h"
+#include "dgDynamicBody.h"
 #include "dgCollisionLumpedMassParticles.h"
 
 dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles(dgWorld* const world, dgInt32 reserveCount, dgCollisionID collisionID)
@@ -32,6 +33,7 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles(dgWorld* const wo
 	,m_veloc(reserveCount, world->GetAllocator())
 	,m_accel(reserveCount, world->GetAllocator())
 	,m_externalforce(reserveCount, world->GetAllocator())
+	,m_body(NULL)
 	,m_unitMass(dgFloat32 (1.0f))
 	,m_unitInertia(dgFloat32 (1.0f))
 	,m_particlesCount(reserveCount)
@@ -45,10 +47,10 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles (const dgCollisio
 	,m_veloc(source.m_particlesCount, source.GetAllocator())
 	,m_accel(source.m_particlesCount, source.GetAllocator())
 	,m_externalforce(source.m_particlesCount, source.GetAllocator())
+	,m_body(NULL)
 	,m_unitMass(source.m_unitMass)
 	,m_unitInertia(source.m_unitMass)
 	,m_particlesCount(source.m_particlesCount)
-
 {
 	m_rtti |= dgCollisionLumpedMass_RTTI;
 	memcpy(&m_posit[0], &source.m_posit[0], m_particlesCount * sizeof(dgVector));
@@ -64,6 +66,7 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles (dgWorld* const w
 	,m_veloc(0, world->GetAllocator())
 	,m_accel(0, world->GetAllocator())
 	,m_externalforce(0, world->GetAllocator())
+	,m_body(NULL)
 	,m_unitMass(dgFloat32(1.0f))
 	,m_unitInertia(dgFloat32(1.0f))
 	,m_particlesCount(0)
@@ -76,10 +79,63 @@ dgCollisionLumpedMassParticles::~dgCollisionLumpedMassParticles(void)
 {
 }
 
+void dgCollisionLumpedMassParticles::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
+{
+	dgAssert (0);
+}
+
+void dgCollisionLumpedMassParticles::SetOwnerAndUnitMass (dgDynamicBody* const body)
+{
+	m_body = body;
+
+	dgMatrix matrix (body->GetMatrix());
+	dgVector position (matrix.m_posit);
+	matrix.m_posit = dgVector::m_wOne;
+
+	dgVector* const posit = &m_posit[0];
+	dgMatrix scaledTranform (body->m_collision->GetScaledTransform(matrix));
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		posit[i] = scaledTranform.TransformVector(posit[i]) & dgVector::m_triplexMask;
+	}
+	body->m_collision->SetScale(dgVector (dgFloat32 (1.0f)));
+	body->m_collision->SetLocalMatrix (dgGetIdentityMatrix());
+	matrix.m_posit = position;
+	body->m_matrix = matrix;
+
+	dgVector xxSum(dgFloat32(0.0f));
+	dgVector xySum(dgFloat32(0.0f));
+	dgVector xxSum2(dgFloat32(0.0f));
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		xxSum += posit[i];
+		xxSum2 += posit[i].CompProduct4(posit[i]);
+		xySum += posit[i].CompProduct4(posit[i].ShiftTripleRight());
+	}
+	dgVector den (dgFloat32(1.0f / m_particlesCount));
+
+	body->m_localCentreOfMass = xxSum.CompProduct4(den);
+	dgVector com2(body->m_localCentreOfMass.CompProduct4(body->m_localCentreOfMass));
+	dgVector unitInertia(body->m_mass - com2.Scale4(body->m_mass.m_w));
+
+	m_unitMass = body->m_mass.m_w / m_particlesCount;
+	m_unitInertia = dgMax(unitInertia.m_x, unitInertia.m_y, unitInertia.m_z) / m_particlesCount;
+
+//	dgVector yySum(xxSum.ShiftTripleRight());
+//	dgVector com(xxSum.CompProduct4(den) + origin);
+//	dgVector pxx0(origin - com);
+//	dgVector pxy0(pxx0.ShiftTripleRight());
+//	dgVector Ixx(unitMass.CompProduct4(xxSum2 + xxSum.CompProduct4(pxx0.CompProduct4(dgVector::m_two))) + pxx0.CompProduct4(pxx0.Scale4(m_body->m_mass.m_w)));
+//	dgVector Ixy(unitMass.CompProduct4(xySum + xxSum.CompProduct4(pxy0) + yySum.CompProduct4(pxx0)) + pxx0.CompProduct4(pxy0.Scale4(m_body->m_mass.m_w)));
+//	dgVector com2(body->m_localCentreOfMass.CompProduct4(body->m_localCentreOfMass));
+}
 
 int dgCollisionLumpedMassParticles::GetCount() const
 {
 	return m_particlesCount;
+}
+
+dgInt32 dgCollisionLumpedMassParticles::GetStrideInByte() const
+{
+	return sizeof (dgVector);
 }
 
 const dgVector* dgCollisionLumpedMassParticles::GetVelocity() const
@@ -113,9 +169,9 @@ void dgCollisionLumpedMassParticles::Serialize(dgSerialize callback, void* const
 	dgAssert (0);
 }
 
-void dgCollisionLumpedMassParticles::CollideMasses(dgDynamicBody* const myBody, dgBody* const otherBody)
+void dgCollisionLumpedMassParticles::RegisterCollision(const dgBody* const otherBody)
 {
-	dgAssert (0);
+//	dgAssert (0);
 }
 
 void dgCollisionLumpedMassParticles::CalcAABB(const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
@@ -126,6 +182,29 @@ void dgCollisionLumpedMassParticles::CalcAABB(const dgMatrix& matrix, dgVector& 
 	p1 = (origin + size) & dgVector::m_triplexMask;
 }
 
+dgFloat32 dgCollisionLumpedMassParticles::RayCast(const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
+{
+	// for now brute force ray cast
+	dgVector p (m_posit[0]);
+	dgFloat32 distance = dgFloat32 (1.0e10f);
+	for (dgInt32 i = 0; i < m_particlesCount; i ++) {
+		dgVector posit (dgPointToRayDistance (m_posit[i], localP0, localP1)); 
+		dgVector step (posit - m_posit[i]);
+		
+		dgFloat32 dist2 = step.DotProduct3(step);
+		if (dist2 < distance) {
+			distance = dist2;
+			p = m_posit[i];
+		}
+	}
+
+	contactOut.m_point = p;
+	contactOut.m_normal = dgVector (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+	dgVector num (p - localP0);
+	dgVector den (localP1 - localP0);
+	dgFloat32 dist = num.DotProduct3(den) / den.DotProduct3(den);
+	return dist;
+}
 
 dgMatrix dgCollisionLumpedMassParticles::CalculateInertiaAndCenterOfMass(const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const
 {

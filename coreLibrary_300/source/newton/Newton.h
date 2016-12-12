@@ -1025,6 +1025,9 @@ extern "C" {
 	NEWTON_API NewtonCollision* NewtonCreateDeformableSolid(const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, int shapeID);
 
 	NEWTON_API int NewtonDeformableMeshGetParticleCount (const NewtonCollision* const deformableMesh); 
+	NEWTON_API int NewtonDeformableMeshGetParticleStrideInBytes (const NewtonCollision* const deformableMesh); 
+	NEWTON_API const dFloat* NewtonDeformableMeshGetParticleArray (const NewtonCollision* const deformableMesh); 
+		
 /*
 	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial);
 	NEWTON_API void NewtonDeformableMeshCreateClusters (NewtonCollision* const deformableMesh, int clusterCount, dFloat overlapingWidth);
@@ -1237,6 +1240,9 @@ extern "C" {
 	NEWTON_API void NewtonMeshClearVertexFormat (NewtonMeshVertexFormat* const format);
 	NEWTON_API void NewtonMeshBuildFromVertexListIndexList (const NewtonMesh* const mesh, NewtonMeshVertexFormat* const format);
 
+	NEWTON_API int NewtonMeshGetPointCount (const NewtonMesh* const mesh); 
+	NEWTON_API const int* NewtonMeshGetIndexToVertexMap(const NewtonMesh* const mesh);
+
 	NEWTON_API void NewtonMeshGetVertexDoubleChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat64* const outBuffer);
 	NEWTON_API void NewtonMeshGetVertexChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
 	NEWTON_API void NewtonMeshGetNormalChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
@@ -1270,12 +1276,11 @@ extern "C" {
 	NEWTON_API int NewtonMeshGetTotalIndexCount (const NewtonMesh* const mesh); 
 	NEWTON_API void NewtonMeshGetFaces (const NewtonMesh* const mesh, int* const faceIndexCount, int* const faceMaterial, void** const faceIndices); 
 
-	NEWTON_API int NewtonMeshGetPointCount (const NewtonMesh* const mesh); 
-	NEWTON_API int NewtonMeshGetPointStrideInByte (const NewtonMesh* const mesh); 
-	NEWTON_API dFloat64* NewtonMeshGetPointArray (const NewtonMesh* const mesh); 
-	NEWTON_API dFloat64* NewtonMeshGetNormalArray (const NewtonMesh* const mesh); 
-	NEWTON_API dFloat64* NewtonMeshGetUV0Array (const NewtonMesh* const mesh); 
-	NEWTON_API dFloat64* NewtonMeshGetUV1Array (const NewtonMesh* const mesh); 
+	//NEWTON_API int NewtonMeshGetPointStrideInByte (const NewtonMesh* const mesh); 
+	//NEWTON_API dFloat64* NewtonMeshGetPointArray (const NewtonMesh* const mesh); 
+	//NEWTON_API dFloat64* NewtonMeshGetNormalArray (const NewtonMesh* const mesh); 
+	//NEWTON_API dFloat64* NewtonMeshGetUV0Array (const NewtonMesh* const mesh); 
+	//NEWTON_API dFloat64* NewtonMeshGetUV1Array (const NewtonMesh* const mesh); 
 
 	NEWTON_API int NewtonMeshGetVertexCount (const NewtonMesh* const mesh); 
 	NEWTON_API int NewtonMeshGetVertexStrideInByte (const NewtonMesh* const mesh); 

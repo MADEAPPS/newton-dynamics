@@ -36,26 +36,33 @@ class dgCollisionLumpedMassParticles: public dgCollisionConvex
 	virtual ~dgCollisionLumpedMassParticles(void);
 
 	dgInt32 GetCount() const;
+	dgInt32 GetStrideInByte() const;
 	const dgVector* GetVelocity() const;
 	const dgVector* GetPositions() const;
 	const dgVector* GetAcceleration() const;
 
-	virtual void SetUnitMass (const dgDynamicBody* const body) = 0;
-	virtual void IntegrateForces(dgDynamicBody* const body, dgFloat32 timestep) = 0;
-	virtual void CollideMasses(dgDynamicBody* const body, dgBody* const otherBody) = 0;
-	
+	dgDynamicBody* GetOwner () const;
+	void SetOwnerAndUnitMass (dgDynamicBody* const body);
+	virtual void IntegrateForces (dgFloat32 timestep) = 0;
 
 	protected:
 	virtual dgInt32 CalculateSignature() const;
+	virtual void RegisterCollision(const dgBody* const otherBody);
 	virtual void SetCollisionBBox(const dgVector& p0, const dgVector& p1);
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void CalcAABB(const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	virtual dgMatrix CalculateInertiaAndCenterOfMass(const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
 
+	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	dgFloat32 RayCast(const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
+
+	virtual void HandleCollision (dgFloat32 timestep, dgVector* const dir0, dgVector* const dir1, dgVector* const dir2, dgVector* const collisionAccel) const = 0;
+
 	dgArray<dgVector> m_posit;
 	dgArray<dgVector> m_veloc;
 	dgArray<dgVector> m_accel;
 	dgArray<dgVector> m_externalforce;
+	dgDynamicBody* m_body;
 	dgFloat32 m_unitMass;
 	dgFloat32 m_unitInertia;
 	dgInt32 m_particlesCount;
@@ -65,6 +72,9 @@ class dgCollisionLumpedMassParticles: public dgCollisionConvex
 	friend class dgWorldDynamicUpdate;
 };
 
-
+inline dgDynamicBody* dgCollisionLumpedMassParticles::GetOwner () const
+{
+	return m_body;
+}
 #endif 
 

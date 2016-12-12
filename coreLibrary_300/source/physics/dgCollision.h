@@ -70,6 +70,7 @@ enum dgCollisionID
 
 	// these are for internal use only	
 	m_polygonCollision,
+	m_lumpedMassCollision
 };
 
 

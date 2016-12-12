@@ -31,8 +31,8 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 	class dgSoftLink
 	{
 		public:
-		dgInt16 m_v0;
-		dgInt16 m_v1;
+		dgInt16 m_m0;
+		dgInt16 m_m1;
 	};
 
 	public:
@@ -42,27 +42,23 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 	virtual ~dgCollisionDeformableMesh(void);
 
 	dgInt32 GetLinksCount() const;
-	dgInt32 GetParticleCount() const;
-
 	const dgInt16* GetLinks() const;
-	const dgInt32* GetParticleToVertexMap() const;
+	
 	virtual void ConstraintParticle(dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
 
 	void DisableInactiveLinks ();
 
 	protected:
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
-
-	virtual void SetUnitMass (const dgDynamicBody* const body);
-	virtual void CollideMasses(dgDynamicBody* const myBody, dgBody* const otherBody);
-	virtual void IntegrateForces(dgDynamicBody* const body, dgFloat32 timestep);
+	virtual void IntegrateForces(dgFloat32 timestep);
+	virtual void HandleCollision (dgFloat32 timestep, dgVector* const dir0, dgVector* const dir1, dgVector* const dir2, dgVector* const collisionAccel) const;
 /*
 	virtual dgInt32 CalculateSignature() const;
 	virtual void SetCollisionBBox(const dgVector& p0, const dgVector& p1);
 	virtual void CalcAABB(const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	virtual dgMatrix CalculateInertiaAndCenterOfMass(const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
 */
-	void CalculateAcceleration(dgFloat32 timestep, const dgDynamicBody* const body);
+	void CalculateAcceleration(dgFloat32 timestep);
 
 	dgArray<dgSoftLink> m_linkList;
 	dgArray<dgFloat32> m_restlength;

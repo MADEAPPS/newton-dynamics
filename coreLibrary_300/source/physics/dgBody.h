@@ -216,6 +216,7 @@ class dgBody
 		
 	// member variables:
 	protected:
+	void UpdateLumpedMatrix();
 	void CalcInvInertiaMatrix ();
 
 	dgMatrix m_invWorldInertiaMatrix;
@@ -283,6 +284,7 @@ class dgBody
 	friend class dgBroadPhaseAggregate;
 	friend class dgCollisionConvexPolygon;
 	friend class dgCollidingPairCollector;
+	friend class dgCollisionLumpedMassParticles;
 
 } DG_GCC_VECTOR_ALIGMENT;
 
@@ -540,6 +542,7 @@ DG_INLINE void dgBody::SetMatrixOriginAndRotation(const dgMatrix& matrix)
 
 	m_rotation = dgQuaternion (m_matrix);
 	m_globalCentreOfMass = m_matrix.TransformVector (m_localCentreOfMass);
+	UpdateLumpedMatrix();
 }
 
 

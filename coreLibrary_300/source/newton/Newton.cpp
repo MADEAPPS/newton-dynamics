@@ -7754,10 +7754,17 @@ int NewtonMeshGetPointCount (const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
 	return meshEffect->GetPropertiesCount();
 }
 
+const int* NewtonMeshGetIndexToVertexMap(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	return meshEffect->GetIndexToVertexMap();
+}
+
+/*
 int NewtonMeshGetPointStrideInByte (const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);	
@@ -7765,8 +7772,6 @@ int NewtonMeshGetPointStrideInByte (const NewtonMesh* const mesh)
 
 	return meshEffect->GetPropertiesStrideInByte();
 }
-
-
 
 dFloat64* NewtonMeshGetPointArray (const NewtonMesh* const mesh) 
 {
@@ -7800,6 +7805,7 @@ dFloat64* NewtonMeshGetUV1Array (const NewtonMesh* const mesh)
 
 	return meshEffect->GetUV1Pool();
 }
+*/
 
 int NewtonMeshHasNormalChannel(const NewtonMesh* const mesh)
 {
@@ -8169,13 +8175,40 @@ int NewtonDeformableMeshGetParticleCount(const NewtonCollision* const deformable
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
-	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)collision->GetChildShape();
-		return deformableShape->GetParticleCount();
+	if (collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+		dgCollisionLumpedMassParticles* const deformableShape = (dgCollisionLumpedMassParticles*)collision->GetChildShape();
+		return deformableShape->GetCount();
 	}
 	return 0;
 }
 
+
+const dFloat* NewtonDeformableMeshGetParticleArray(const NewtonCollision* const deformableMesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+		dgCollisionLumpedMassParticles* const deformableShape = (dgCollisionLumpedMassParticles*)collision->GetChildShape();
+		const dgVector* const posit = deformableShape->GetPositions();
+		return &posit[0].m_x;
+	}
+	return NULL;
+}
+
+int NewtonDeformableMeshGetParticleStrideInBytes(const NewtonCollision* const deformableMesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+		dgCollisionLumpedMassParticles* const deformableShape = (dgCollisionLumpedMassParticles*)collision->GetChildShape();
+		return deformableShape->GetStrideInByte();
+	}
+	return 0;
+}
+
+
+
+/*
 void NewtonDeformableMeshConstraintParticle(NewtonCollision* const deformableMesh, int particleIndex, const dFloat* const posit, const NewtonBody* const body)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8188,7 +8221,7 @@ void NewtonDeformableMeshConstraintParticle(NewtonCollision* const deformableMes
 }
 
 
-/*
+
 void NewtonDeformableMeshCreateClusters (NewtonCollision* const deformableMesh, int clunsterCount, dFloat overlapingWidth)
 {
 	dgAssert(0);

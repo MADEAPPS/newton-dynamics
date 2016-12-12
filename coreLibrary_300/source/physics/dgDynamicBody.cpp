@@ -222,16 +222,6 @@ bool dgDynamicBody::IsInEquilibrium() const
 	return false;
 }
 
-void dgDynamicBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
-{
-	dgBody::SetMassMatrix(mass, inertia);
-	if (m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
-		dgCollisionLumpedMassParticles* const lumpedMass = (dgCollisionLumpedMassParticles*) m_collision->m_childShape;
-		lumpedMass->SetUnitMass(this);
-	}
-}
-
-
 void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 {
 	m_externalForce = dgVector (dgFloat32 (0.0f));
@@ -239,8 +229,6 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 	if (m_applyExtForces) {
 		m_applyExtForces(*this, timestep, threadIndex);
 	}
-
-//_ASSERTE ((m_accel.m_y == -100.0f) || (m_accel.m_y == 0.0f)); 
 }
 
 void dgDynamicBody::InvalidateCache ()
@@ -270,7 +258,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
 		} else {
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
-			lumpedMassShape->IntegrateForces(this, timestep);
+			lumpedMassShape->IntegrateForces(timestep);
 		}
 	} else {
 		m_accel = dgVector::m_zero;

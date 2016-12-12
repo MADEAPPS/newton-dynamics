@@ -405,13 +405,12 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgInt32 GetVertexCount() const;
 	dgInt32 GetVertexStrideInByte() const;
 	const dgFloat64* GetVertexPool () const;
-
-	dgInt32 GetPropertiesCount() const;
-	dgInt32 GetPropertiesStrideInByte() const;
-	dgFloat64* GetAttributePool() const;
-	dgFloat64* GetNormalPool() const;
-	dgFloat64* GetUV0Pool() const;
-	dgFloat64* GetUV1Pool() const;
+	
+//	dgInt32 GetPropertiesStrideInByte() const;
+//	dgFloat64* GetAttributePool() const;
+//	dgFloat64* GetNormalPool() const;
+//	dgFloat64* GetUV0Pool() const;
+//	dgFloat64* GetUV1Pool() const;
 
 	dgEdge* SpliteFace (dgInt32 v0, dgInt32 v1);
 
@@ -430,12 +429,15 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void OptimizeAttibutes();
 	void BuildFromIndexList(const dgMeshVertexFormat* const format);
 
+	dgInt32 GetPropertiesCount() const;
+	const dgInt32* GetIndexToVertexMap() const;
+
 	bool HasNormalChannel() const;
 	bool HasBinormalChannel() const;
 	bool HasUV0Channel() const;
 	bool HasUV1Channel() const;
 	bool HasVertexColorChannel() const;
-
+	
 	void GetVertexChannel64(dgInt32 strideInByte, dgFloat64* const bufferOut) const;
 	void GetVertexChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const;
 	void GetNormalChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const;
@@ -542,9 +544,15 @@ DG_INLINE dgInt32 dgMeshEffect::GetVertexCount() const
 	return m_points.m_count;
 }
 
+
 DG_INLINE dgInt32 dgMeshEffect::GetPropertiesCount() const
 {
 	return m_attrib.m_count;
+}
+
+DG_INLINE const dgInt32* dgMeshEffect::GetIndexToVertexMap() const
+{
+	return &m_attrib.m_pointChannel[0];
 }
 
 DG_INLINE dgInt32 dgMeshEffect::GetMaterialID (dgIndexArray* const handle, dgInt32 materialHandle) const
@@ -573,6 +581,7 @@ DG_INLINE dgBigVector dgMeshEffect::GetVertex (dgInt32 index) const
 	return m_points[index];
 }
 
+/*
 DG_INLINE dgInt32 dgMeshEffect::GetPropertiesStrideInByte() const 
 {
 	return sizeof (dgVertexAtribute);
@@ -582,7 +591,6 @@ DG_INLINE dgFloat64* dgMeshEffect::GetAttributePool() const
 {
 	dgAssert (0);
 	return NULL;
-//	return &m_attrib->m_vertex.m_x;
 }
 
 DG_INLINE dgFloat64* dgMeshEffect::GetNormalPool() const 
@@ -605,6 +613,7 @@ DG_INLINE dgFloat64* dgMeshEffect::GetUV1Pool() const
 	return NULL;
 //	return &m_attrib->m_u1;
 }
+*/
 
 DG_INLINE dgInt32 dgMeshEffect::GetVertexStrideInByte() const 
 {

@@ -170,6 +170,16 @@ void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRema
 	m_collision->Serialize(serializeCallback, userData, false);
 }
 
+void dgBody::UpdateLumpedMatrix()
+{
+	if (m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+		dgAssert(IsRTTIType(dgBody::m_dynamicBodyRTTI));
+		dgCollisionLumpedMassParticles* const lumpedMass = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
+		lumpedMass->SetOwnerAndUnitMass((dgDynamicBody*) this); 
+	}
+}
+
+
 void dgBody::SetMatrix(const dgMatrix& matrix)
 {
 	SetMatrixOriginAndRotation(matrix);
@@ -500,6 +510,7 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 		}
 	}
 #endif
+	UpdateLumpedMatrix();
 }
 
 

@@ -23,6 +23,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2013_static_mt\wx_vc9_core.vcxproj", "{6744DAD8-9C70-574A-BFF2-9F8DDDB24A75}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2013_static_mt\wx_vc9_gl.vcxproj", "{DA8B15EF-6750-5928-BC0E-C748213CF9B2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FCC50C2-81E9-5DB2-B8D8-2129427568B1} = {3FCC50C2-81E9-5DB2-B8D8-2129427568B1}
+		{6744DAD8-9C70-574A-BFF2-9F8DDDB24A75} = {6744DAD8-9C70-574A-BFF2-9F8DDDB24A75}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew", "..\..\..\..\packages\thirdParty\glew\build\VS_2013_static_mt\glew.vcxproj", "{0C9707F5-DEC7-42EB-8EA1-A484DF1E515B}"
 EndProject
