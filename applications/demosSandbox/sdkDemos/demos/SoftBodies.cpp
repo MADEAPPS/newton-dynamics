@@ -123,7 +123,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 						AddTetra (tetrahedra, p1, p3, p0, p4, points, layer + 3);
 						AddTetra (tetrahedra, p1, p6, p3, p4, points, layer + 4);
 					} else {
-						AddTetra (tetrahedra, p2, p0, p1, p5, points, layer + 0);
+//						AddTetra (tetrahedra, p2, p0, p1, p5, points, layer + 0);
 						AddTetra (tetrahedra, p2, p7, p3, p0, points, layer + 1);
 //						AddTetra (tetrahedra, p2, p5, p6, p7, points, layer + 2);
 //						AddTetra (tetrahedra, p0, p7, p4, p5, points, layer + 3);
@@ -144,7 +144,6 @@ class SimpleSoftBodyEntity: public DemoEntity
 		int pointCount = NewtonMeshGetPointCount(tetrahedraMesh);
 		const int* const indexMap = NewtonMeshGetIndexToVertexMap(tetrahedraMesh);
 		m_indexMap = new int[pointCount];
-		//		memcpy(m_indexMap, indexMap, pointCount * sizeof (int));
 		const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
 		for (int i = 0; i < pointCount; i ++) {
 			int j = indexMap[i];
@@ -172,16 +171,6 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonMeshApplyBoxMapping (tetrahedra, material, material, material);
 		NewtonMeshCalculateVertexNormals (tetrahedra, 60.0f * 3.1416f / 180.0f);
 
-/*
-		int pointCount = NewtonMeshGetPointCount (tetrahedra); 
-		const int* const indexMap = NewtonMeshGetIndexToVertexMap(tetrahedra); 
-		m_indexMap = new int [pointCount]; 
-		memcpy (m_indexMap, indexMap, pointCount * sizeof (int));
-
-		DemoMesh* const mesh1 = new DemoMesh(tetrahedra);
-		SetMesh(mesh1, dGetIdentityMatrix());
-		mesh1->ResetOptimization();
-*/
 		// make a deformable collision mesh
 		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, tetrahedra, materialID);
 
@@ -210,11 +199,6 @@ class SimpleSoftBodyEntity: public DemoEntity
 		NewtonMeshApplyBoxMapping(tetraCube, material, material, material);
 		NewtonMeshCalculateVertexNormals(tetraCube, 60.0f * 3.1416f / 180.0f);
 
-/*
-		DemoMesh* const mesh1 = new DemoMesh(tetraCube);
-		SetMesh(mesh1, dGetIdentityMatrix());
-		mesh1->ResetOptimization();
-*/
 		// make a deformable collision mesh
 		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, tetraCube, materialID);
 
