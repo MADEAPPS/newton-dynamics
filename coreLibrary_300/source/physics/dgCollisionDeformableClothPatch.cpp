@@ -32,8 +32,9 @@
 
 
 dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const world, dgMeshEffect* const mesh)
-	:dgCollisionDeformableMesh(world, mesh, m_deformableSolidMesh)
+	:dgCollisionDeformableMesh(world, m_deformableSolidMesh)
 {
+	dgAssert (0);
 	m_rtti |= dgCollisionDeformableClothPatch_RTTI;
 }
 

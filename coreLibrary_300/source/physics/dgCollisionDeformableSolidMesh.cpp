@@ -29,11 +29,59 @@
 #include "dgCollisionDeformableSolidMesh.h"
 
 
-
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const world, dgMeshEffect* const mesh)
-	:dgCollisionDeformableMesh(world, mesh, m_deformableSolidMesh)
+	:dgCollisionDeformableMesh(world, m_deformableSolidMesh)
 {
 	m_rtti |= dgCollisionDeformableSolidMesh_RTTI;
+
+//	dgArray<dgVector> m_posit;
+//	dgArray<dgVector> m_veloc;
+//	dgArray<dgVector> m_accel;
+//	dgArray<dgVector> m_externalforce;
+
+	dgInt32 count = mesh->GetVertexCount();
+	dgVector* const points = dgAlloca (dgVector, count);
+
+	for (dgInt32 i = 0; i < count; i++) {
+		dgBigVector p(mesh->GetVertex(i));
+		points[i] = p;
+	}
+	m_indexToVertexMap.Resize(count);
+	dgInt32* const indexToVertexMap = &m_indexToVertexMap[0];
+	m_particlesCount = dgVertexListToIndexList (&points[0].m_x, sizeof (dgVector), 3 * sizeof (dgFloat32), 0, count, indexToVertexMap, dgFloat32 (1.0e-5f));
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		m_posit[i] = points[i];
+	}
+
+	dgInt32 edgeCount = 0;
+	dgSoftLink* const links = dgAlloca (dgSoftLink, mesh->GetCount() / 2);
+	for (void* edgePtr = mesh->GetFirstEdge(); edgePtr; edgePtr = mesh->GetNextEdge(edgePtr)) {
+		dgInt32 v0;
+		dgInt32 v1;
+		mesh->GetEdgeIndex(edgePtr, v0, v1);
+		v0 = indexToVertexMap[v0];
+		v1 = indexToVertexMap[v1];
+		links[edgeCount].m_m0 = dgInt16(dgMin (v0, v1));
+		links[edgeCount].m_m1 = dgInt16(dgMax (v0, v1));
+		edgeCount ++;
+	}
+	dgAssert(edgeCount == mesh->GetCount() / 2);
+	dgSort(links, edgeCount, CompareEdges);
+
+	dgInt32 uniqueEdgeCount = 0;
+	for (dgInt32 i = 1; i < edgeCount; i ++) {
+		if (CompareEdges (&links[i], &links[uniqueEdgeCount], NULL) > 0) {
+			uniqueEdgeCount++;
+			links[uniqueEdgeCount] = links[i];
+		}
+	}
+	uniqueEdgeCount++;
+	m_linksCount = uniqueEdgeCount;
+	m_indexToVertexMap.Resize(m_linksCount);
+	for (dgInt32 i = 0; i < m_linksCount; i ++) {
+		m_linkList[i] = links[i];
+	}
+	FinalizeBuild();
 }
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(const dgCollisionDeformableSolidMesh& source)
@@ -53,3 +101,14 @@ dgCollisionDeformableSolidMesh::~dgCollisionDeformableSolidMesh(void)
 }
 
 
+dgInt32 dgCollisionDeformableSolidMesh::CompareEdges (const dgSoftLink* const A, const dgSoftLink* const B, void* const context)
+{
+	dgInt64 m0 = (dgInt64(A->m_m0)<<32) + A->m_m1;
+	dgInt64 m1 = (dgInt64(B->m_m0)<<32) + B->m_m1;
+	if (m0 > m1) {
+		return 1;
+	} else if (m0 < m1) {
+		return -1;
+	} 
+	return 0;
+}

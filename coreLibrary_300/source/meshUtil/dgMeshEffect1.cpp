@@ -1636,7 +1636,7 @@ void dgMeshEffect::Triangulate  ()
 	dgPolyhedra polygon(GetAllocator());
 
 	dgPoint points (GetAllocator());
-	FlatPointArray(points);
+	UnpackPoints(points);
 
 	polygon.BeginFace();
 	dgInt32 mark = IncLRU();
@@ -1950,6 +1950,11 @@ void dgMeshEffect::AddPoint (dgFloat64 x, dgFloat64 y, dgFloat64 z)
 	m_points.PushBack(&p);
 }
 
+void dgMeshEffect::AddLayer(dgInt32 layer)
+{
+	m_layers.PushBack(&layer);
+}
+
 void dgMeshEffect::AddMaterial (dgInt32 materialIndex)
 {
 	m_attrib.m_materialChannel.PushBack(&materialIndex);
@@ -2029,10 +2034,43 @@ void dgMeshEffect::EndBuildFace ()
 	}
 }
 
+
+//void dgMeshEffect::PackPoints (dgInt32* const indexList, dgFloat64 tol)
+void dgMeshEffect::PackPoints (dgFloat64 tol)
+{
+	dgAssert (m_points.m_count == m_attrib.m_pointChannel.m_count);
+
+	dgInt32 count = 0;
+	if (m_layers.m_count == 0) {
+		count = dgVertexListToIndexList(&m_points[0].m_x, sizeof (dgBigVector), sizeof (dgBigVector) / sizeof (dgFloat64), m_points.m_count, &m_attrib.m_pointChannel[0], tol);
+	} else {
+		for (dgInt32 i = 0; i < m_points.m_count; i++) {
+			m_points[i].m_w = m_layers[i];
+		}
+		count = dgVertexListToIndexList(&m_points[0].m_x, sizeof (dgBigVector), sizeof (dgBigVector) / sizeof (dgFloat64), m_points.m_count, &m_attrib.m_pointChannel[0], tol);
+		for (dgInt32 i = 0; i < count; i++) {
+			m_layers[i] = dgInt32 (m_points[i].m_w);
+			m_points[i].m_w = dgFloat64 (0.0f);
+		}
+		m_layers.Resize(count);
+		m_layers.SetCount(count);
+	}
+	m_points.Resize(count);
+	m_points.SetCount(count);
+}
+
+void dgMeshEffect::UnpackPoints(dgPoint& points) const
+{
+	points.Reserve(m_attrib.m_count);
+	for (dgInt32 i = 0; i < m_attrib.m_count; i++) {
+		dgInt32 index = m_attrib.m_pointChannel[i];
+		points[i] = m_points[index];
+	}
+}
+
+
 void dgMeshEffect::EndBuild (dgFloat64 tol, bool fixTjoint)
 {
-	dgStack<dgInt32>indexMapBuffer(m_points.m_count);
-	dgInt32* const indexMap = &indexMapBuffer[0];
 	m_attrib.m_count = m_points.m_count;
 
 #ifdef _DEBUG
@@ -2048,22 +2086,18 @@ void dgMeshEffect::EndBuild (dgFloat64 tol, bool fixTjoint)
 	}
 #endif
 
-	dgInt32 triangCount = m_points.m_count / 3;
-	dgInt32 newCount = dgVertexListToIndexList (&m_points[0].m_x, sizeof (dgBigVector), sizeof (dgBigVector)/sizeof (dgFloat64), m_points.m_count, indexMap, tol);
-	for (dgInt32 i = 0; i < m_points.m_count; i ++) {
-		m_attrib.m_pointChannel[i] = indexMap[i];
-	}
-	m_points.Resize(newCount);
-	m_points.SetCount(newCount);
-	
 
+	dgInt32 triangCount = m_points.m_count / 3;
+	PackPoints (tol);
+
+	const dgInt32* const indexList = &m_attrib.m_pointChannel[0];
 	for (dgInt32 i = 0; i < triangCount; i ++) {
 		dgInt32 index[3];
 		dgInt64 userdata[3];
 
-		index[0] = indexMap[i * 3 + 0];
-		index[1] = indexMap[i * 3 + 1];
-		index[2] = indexMap[i * 3 + 2];
+		index[0] = indexList[i * 3 + 0];
+		index[1] = indexList[i * 3 + 1];
+		index[2] = indexList[i * 3 + 2];
 
 		dgBigVector e1 (m_points[index[1]] - m_points[index[0]]);
 		dgBigVector e2 (m_points[index[2]] - m_points[index[0]]);
@@ -2124,14 +2158,6 @@ void dgMeshEffect::EndBuild (dgFloat64 tol, bool fixTjoint)
 #endif
 }
 
-void dgMeshEffect::FlatPointArray(dgPoint& points) const
-{
-	points.Reserve(m_attrib.m_count);
-	for (dgInt32 i = 0; i < m_attrib.m_count; i ++) {
-		dgInt32 index = m_attrib.m_pointChannel[i];
-		points[i] = m_points[index];
-	}
-}
 
 void dgMeshEffect::UnpackAttibuteData ()
 {
@@ -3127,11 +3153,11 @@ void dgMeshEffect::TransformMesh (const dgMatrix& matrix)
 }
 
 
-dgMeshEffect::dgVertexAtribute dgMeshEffect::InterpolateEdge (dgEdge* const edge, dgFloat64 param) const
+//dgMeshEffect::dgVertexAtribute dgMeshEffect::InterpolateEdge (dgEdge* const edge, dgFloat64 param) const
+dgInt32 dgMeshEffect::InterpolateEdge (dgEdge* const edge, dgFloat64 param) const
 {
 dgAssert(0);
-dgVertexAtribute attrEdge;
-return attrEdge;
+return 0;
 /*
 	dgVertexAtribute attrEdge;
 	dgFloat64 t1 = param;
@@ -3209,11 +3235,11 @@ return NULL;
 
 
 
-dgMeshEffect::dgVertexAtribute dgMeshEffect::InterpolateVertex (const dgBigVector& srcPoint, const dgEdge* const face) const
+//dgMeshEffect::dgVertexAtribute dgMeshEffect::InterpolateVertex (const dgBigVector& srcPoint, const dgEdge* const face) const
+dgInt32 dgMeshEffect::InterpolateVertex (const dgBigVector& srcPoint, const dgEdge* const face) const
 {
 dgAssert(0);
-dgVertexAtribute attribute;
-return attribute;
+return 0;
 /*
 	const dgBigVector point (srcPoint);
 
@@ -3758,7 +3784,8 @@ void dgMeshEffect::RepairTJoints ()
 									//dgAssert (Sanity ());
 								} else if (openEdge->m_prev->m_twin->m_incidentFace > 0) {
 									dirty = true;
-
+									dgAssert (0);
+/*
 									dgEdge* const nextEdge = openEdge->m_next->m_next;
 									dgEdge* const deletedEdge = openEdge->m_prev;
 									while ((&(*iter) == deletedEdge) || (&(*iter) == deletedEdge->m_twin)) {
@@ -3799,6 +3826,7 @@ void dgMeshEffect::RepairTJoints ()
 									deletedEdge->m_prev = deletedEdge->m_twin;
 									DeleteEdge(deletedEdge);
 									//dgAssert (Sanity ());
+*/
 								}
 							}
 						}

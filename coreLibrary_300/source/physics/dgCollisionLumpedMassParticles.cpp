@@ -27,16 +27,18 @@
 #include "dgDynamicBody.h"
 #include "dgCollisionLumpedMassParticles.h"
 
-dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles(dgWorld* const world, dgInt32 reserveCount, dgCollisionID collisionID)
+
+
+dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles(dgWorld* const world, dgCollisionID collisionID)
 	:dgCollisionConvex(world->GetAllocator(), 0, collisionID)
-	,m_posit(reserveCount, world->GetAllocator())
-	,m_veloc(reserveCount, world->GetAllocator())
-	,m_accel(reserveCount, world->GetAllocator())
-	,m_externalforce(reserveCount, world->GetAllocator())
+	,m_posit(DG_LUMPED_MASSES_GRANULARITY, world->GetAllocator())
+	,m_veloc(DG_LUMPED_MASSES_GRANULARITY, world->GetAllocator())
+	,m_accel(DG_LUMPED_MASSES_GRANULARITY, world->GetAllocator())
+	,m_externalforce(DG_LUMPED_MASSES_GRANULARITY, world->GetAllocator())
 	,m_body(NULL)
 	,m_unitMass(dgFloat32 (1.0f))
 	,m_unitInertia(dgFloat32 (1.0f))
-	,m_particlesCount(reserveCount)
+	,m_particlesCount(0)
 {
 	m_rtti |= dgCollisionLumpedMass_RTTI;
 }
@@ -77,6 +79,29 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles (dgWorld* const w
 
 dgCollisionLumpedMassParticles::~dgCollisionLumpedMassParticles(void)
 {
+}
+
+void dgCollisionLumpedMassParticles::FinalizeBuild()
+{
+	m_veloc.Resize(m_particlesCount);
+	m_accel.Resize(m_particlesCount);
+	m_externalforce.Resize(m_particlesCount);
+
+	dgVector com(dgFloat32(0.0f));
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		com += m_posit[i];
+		m_accel[i] = dgVector::m_zero;
+		m_veloc[i] = dgVector::m_zero;
+		m_externalforce[i] = dgVector::m_zero;
+	}
+
+	// for now use a fix size box
+	m_boxSize = dgVector(dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(0.0f));
+	m_boxOrigin = com.CompProduct4(dgFloat32(1.0f) / m_particlesCount);
+
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		m_posit[i] = m_posit[i] - m_boxOrigin;
+	}
 }
 
 void dgCollisionLumpedMassParticles::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const

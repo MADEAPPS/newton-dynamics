@@ -39,63 +39,21 @@ static int xxx;
 
 
 
-dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collisionID)
-	:dgCollisionLumpedMassParticles(world, mesh->GetVertexCount(), collisionID)
-	,m_linkList(mesh->GetEdgeCount() / 2, world->GetAllocator())
-	,m_restlength(mesh->GetEdgeCount() / 2, world->GetAllocator())
-	,m_linksCount(mesh->GetEdgeCount() / 2)
+dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCollisionID collisionID)
+	:dgCollisionLumpedMassParticles(world, collisionID)
+	,m_linkList(DG_DEFORMABLE_MESH_LINKS_GRANULARITY, world->GetAllocator())
+	,m_restlength(DG_DEFORMABLE_MESH_LINKS_GRANULARITY, world->GetAllocator())
+	,m_indexToVertexMap(DG_LUMPED_MASSES_GRANULARITY, world->GetAllocator())
+	,m_linksCount(0)
 {
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
-
-	dgVector com(dgFloat32(0.0f));
-	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		dgBigVector p(mesh->GetVertex(i));
-		m_posit[i] = p;
-		com += m_posit[i];
-		m_accel[i] = dgVector::m_zero;
-		m_veloc[i] = dgVector::m_zero;
-		m_externalforce[i] = dgVector::m_zero;
-	}
-
-	// for now use a fix size box
-	m_boxSize = dgVector (dgFloat32 (1.0f), dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(0.0f));
-	m_boxOrigin = com.CompProduct4(dgFloat32(1.0f) / m_particlesCount);
-
-	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		m_posit[i] = m_posit[i] - m_boxOrigin;
-	}
-
-	dgInt32 edgeCount = 0;
-	for (void* edgePtr = mesh->GetFirstEdge(); edgePtr; edgePtr = mesh->GetNextEdge(edgePtr)) {
-		dgInt32 v0;
-		dgInt32 v1;
-		mesh->GetEdgeIndex(edgePtr, v0, v1);
-		m_linkList[edgeCount].m_m0 = dgInt16(v0);
-		m_linkList[edgeCount].m_m1 = dgInt16(v1);
-		const dgVector& p0 = m_posit[v0];
-		const dgVector& p1 = m_posit[v1];
-		dgVector dp(p0 - p1);
-		m_restlength[edgeCount] = dgSqrt(dp.DotProduct3(dp));
-		dgAssert(edgeCount < m_linksCount);
-		edgeCount++;
-	}
-	dgAssert(edgeCount == m_linksCount);
-
-#if 0
-m_linksCount = 1;
-m_particlesCount = 2;
-m_posit[1] = m_posit[0];
-m_posit[1].m_y -= 1.0f;
-m_restlength[0] = 1.0f;
-m_linkList[0].m_v0 = 0;
-m_linkList[0].m_v1 = 1;
-#endif
 }
 
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformableMesh& source)
 	:dgCollisionLumpedMassParticles(source)
 	,m_linkList(source.m_linksCount, source.GetAllocator())
 	,m_restlength(source.m_linksCount, source.GetAllocator())
+	,m_indexToVertexMap(source.m_linksCount, source.GetAllocator())
 	,m_linksCount(source.m_linksCount)
 {
 	m_rtti = source.m_rtti;
@@ -107,6 +65,8 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgDes
 	:dgCollisionLumpedMassParticles(world, deserialization, userData, revisionNumber)
 	,m_linkList(0, world->GetAllocator())
 	,m_restlength(0, world->GetAllocator())
+	,m_indexToVertexMap(0, world->GetAllocator())
+	,m_linksCount(0)
 {
 	dgAssert(0);
 }
@@ -116,9 +76,28 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 {
 }
 
+void dgCollisionDeformableMesh::FinalizeBuild()
+{
+	dgCollisionLumpedMassParticles::FinalizeBuild();
+#if 0
+	m_linksCount = 1;
+	m_particlesCount = 2;
+	m_posit[1] = m_posit[0];
+	m_posit[1].m_y -= 1.0f;
+	m_restlength[0] = 1.0f;
+	m_linkList[0].m_v0 = 0;
+	m_linkList[0].m_v1 = 1;
+#endif
+}
+
 void dgCollisionDeformableMesh::Serialize(dgSerialize callback, void* const userData) const
 {
 	dgAssert(0);
+}
+
+const dgInt32* dgCollisionDeformableMesh::GetIndexToVertexMap() const
+{
+	return &m_indexToVertexMap[0];
 }
 
 dgInt32 dgCollisionDeformableMesh::GetLinksCount() const
@@ -157,6 +136,7 @@ void dgCollisionDeformableMesh::ConstraintParticle(dgInt32 particleIndex, const 
 
 void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 {
+return;
 	dgAssert(m_body->m_invMass.m_w > dgFloat32(0.0f));
 
 	// calculate particles accelerations

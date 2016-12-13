@@ -262,21 +262,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgInt32 m_count;
 	};
 
-
-	class dgVertexAtribute 
-	{
-		public:
-		dgBigVector m_vertex;
-		dgFloat64 m_normal_x;
-		dgFloat64 m_normal_y;
-		dgFloat64 m_normal_z;
-		dgFloat64 m_u0;
-		dgFloat64 m_v0;
-		dgFloat64 m_u1;
-		dgFloat64 m_v1;
-		dgFloat64 m_material;
-	};
-
 	class dgIndexArray 
 	{
 		public:
@@ -398,6 +383,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void BeginBuild ();
 	void BeginBuildFace ();
 	void AddPoint (dgFloat64 x, dgFloat64 y, dgFloat64 z);
+	void AddLayer (dgInt32 layer);
 	void AddMaterial (dgInt32 materialIndex);
 	void EndBuildFace ();
 	void EndBuild (dgFloat64 tol, bool fixTjoint = true);
@@ -406,12 +392,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgInt32 GetVertexStrideInByte() const;
 	const dgFloat64* GetVertexPool () const;
 	
-//	dgInt32 GetPropertiesStrideInByte() const;
-//	dgFloat64* GetAttributePool() const;
-//	dgFloat64* GetNormalPool() const;
-//	dgFloat64* GetUV0Pool() const;
-//	dgFloat64* GetUV1Pool() const;
-
 	dgEdge* SpliteFace (dgInt32 v0, dgInt32 v1);
 
 	dgInt32 GetTotalFaceCount() const;
@@ -468,7 +448,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void Serialize (dgSerialize callback, void* const userData) const;
 
 	dgBigVector GetVertex (dgInt32 index) const;
-	dgVertexAtribute& GetAttribute (dgInt32 index) const;
 	void TransformMesh (const dgMatrix& matrix);
 
 	void* GetFirstVertex () const;
@@ -496,8 +475,12 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgBigVector CalculateFaceNormal (const void* const face) const;
 
 	void SetFaceMaterial (const void* const face, int materialID);
-	
-	dgVertexAtribute InterpolateVertex (const dgBigVector& point, const dgEdge* const face) const;
+
+//	dgVertexAtribute& GetAttribute (dgInt32 index) const;
+//	dgVertexAtribute InterpolateEdge (dgEdge* const edge, dgFloat64 param) const;
+//	dgVertexAtribute InterpolateVertex (const dgBigVector& point, const dgEdge* const face) const;
+	dgInt32 InterpolateEdge (dgEdge* const edge, dgFloat64 param) const;
+	dgInt32 InterpolateVertex (const dgBigVector& point, const dgEdge* const face) const;
 
 	bool Sanity () const;
 	
@@ -514,16 +497,18 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	
 	void MergeFaces (const dgMeshEffect* const source);
 //	void ReverseMergeFaces (dgMeshEffect* const source);
-	dgVertexAtribute InterpolateEdge (dgEdge* const edge, dgFloat64 param) const;
+	
 
 	bool PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const face);
 
 	dgMeshEffect* GetNextLayer (dgInt32 mark);
 	dgMeshEffect* CreateVoronoiConvex (const dgBigVector* const conevexPointCloud, dgInt32 count, dgInt32 materialId, const dgMatrix& textureProjectionMatrix, dgFloat32 normalAngleInRadians) const;
-	
+
 	void PackAttibuteData ();
 	void UnpackAttibuteData ();
-	void FlatPointArray(dgPoint& points) const;
+
+	void PackPoints (dgFloat64 tol);
+	void UnpackPoints(dgPoint& points) const;
 
 	dgLayer m_layers;
 	dgPoint m_points;
@@ -537,13 +522,10 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	friend class dgCollisionCompoundFractured;
 };
 
-
-
 DG_INLINE dgInt32 dgMeshEffect::GetVertexCount() const
 {
 	return m_points.m_count;
 }
-
 
 DG_INLINE dgInt32 dgMeshEffect::GetPropertiesCount() const
 {
@@ -565,14 +547,7 @@ DG_INLINE dgInt32 dgMeshEffect::GetMaterialIndexCount (dgIndexArray* const handl
 	return handle->m_materialsIndexCount[materialHandle];
 }
 
-DG_INLINE dgMeshEffect::dgVertexAtribute& dgMeshEffect::GetAttribute (dgInt32 index) const 
-{
-	dgAssert (0);
 
-static dgVertexAtribute xx;
-	return xx;
-//	return m_attrib[index];
-}
 
 DG_INLINE dgBigVector dgMeshEffect::GetVertex (dgInt32 index) const
 {
@@ -582,6 +557,13 @@ DG_INLINE dgBigVector dgMeshEffect::GetVertex (dgInt32 index) const
 }
 
 /*
+
+DG_INLINE dgMeshEffect::dgVertexAtribute& dgMeshEffect::GetAttribute (dgInt32 index) const
+{
+	dgAssert (0);
+//	return m_attrib[index];
+}
+
 DG_INLINE dgInt32 dgMeshEffect::GetPropertiesStrideInByte() const 
 {
 	return sizeof (dgVertexAtribute);

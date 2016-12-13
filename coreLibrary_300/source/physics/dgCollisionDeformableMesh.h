@@ -26,8 +26,25 @@
 #include "dgCollision.h"
 #include "dgCollisionLumpedMassParticles.h"
 
+#define DG_DEFORMABLE_MESH_LINKS_GRANULARITY	64
+
 class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 {
+	public:
+	dgCollisionDeformableMesh (const dgCollisionDeformableMesh& source);
+	dgCollisionDeformableMesh (dgWorld* const world, dgCollisionID collisionID);
+	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
+	virtual ~dgCollisionDeformableMesh(void);
+
+	dgInt32 GetLinksCount() const;
+	const dgInt16* GetLinks() const;
+	const dgInt32* GetIndexToVertexMap() const;
+	
+	virtual void ConstraintParticle(dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
+
+	void DisableInactiveLinks ();
+
+	protected:
 	class dgSoftLink
 	{
 		public:
@@ -35,33 +52,17 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 		dgInt16 m_m1;
 	};
 
-	public:
-	dgCollisionDeformableMesh (const dgCollisionDeformableMesh& source);
-	dgCollisionDeformableMesh (dgWorld* const world, dgMeshEffect* const mesh, dgCollisionID collisionID);
-	dgCollisionDeformableMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
-	virtual ~dgCollisionDeformableMesh(void);
-
-	dgInt32 GetLinksCount() const;
-	const dgInt16* GetLinks() const;
-	
-	virtual void ConstraintParticle(dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
-
-	void DisableInactiveLinks ();
-
-	protected:
+	virtual void FinalizeBuild();
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void IntegrateForces(dgFloat32 timestep);
 	virtual void HandleCollision (dgFloat32 timestep, dgVector* const dir0, dgVector* const dir1, dgVector* const dir2, dgVector* const collisionAccel) const;
-/*
-	virtual dgInt32 CalculateSignature() const;
-	virtual void SetCollisionBBox(const dgVector& p0, const dgVector& p1);
-	virtual void CalcAABB(const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
-	virtual dgMatrix CalculateInertiaAndCenterOfMass(const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const;
-*/
 	void CalculateAcceleration(dgFloat32 timestep);
+
+	
 
 	dgArray<dgSoftLink> m_linkList;
 	dgArray<dgFloat32> m_restlength;
+	dgArray<dgInt32> m_indexToVertexMap;
 	dgInt32 m_linksCount;
 
 	static dgVector m_smallestLenght2;

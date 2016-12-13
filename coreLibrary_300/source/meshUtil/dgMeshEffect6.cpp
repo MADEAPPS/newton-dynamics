@@ -117,11 +117,13 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 					ptr->m_mark = mark;
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != edge);
-
+				dgAssert (0);
+/*
 				dgInt32 index = dgInt32 (uvEdge->m_userData);
 				dgMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
 				m_uvArray[index * 2 + 0] = attribute.m_u0;
 				m_uvArray[index * 2 + 1] = attribute.m_v0;
+*/
 			}
 		}
 
@@ -154,8 +156,9 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 
 		LagrangeOptimization();
 
-		dgStack<dgMeshEffect::dgVertexAtribute>attribArray (m_mesh->GetCount());
 		dgAssert (0);
+/*
+		dgStack<dgMeshEffect::dgVertexAtribute>attribArray (m_mesh->GetCount());
 //		dgInt32 attribCount = m_mesh->EnumerateAttributeArray (&attribArray[0]);
 		mark = m_mesh->IncLRU();
 		for (iter.Begin(); iter; iter ++) {
@@ -179,6 +182,7 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 				} while (ptr != vertexEdge);
 			}
 		}
+*/
 		dgAssert (0);
 		//m_mesh->ApplyAttributeArray(&attribArray[0], attribCount);
 	}
@@ -844,6 +848,8 @@ class dgAngleBasedFlatteningMapping: public dgSymmetricBiconjugateGradientSolve
 		,m_progressReportUserData(userData)
 		,m_progressReportCallback(progressReportCallback)
 	{
+dgAssert (0);
+/*
 		AllocVectors();
 		InitEdgeVector();
 		CalculateInitialAngles ();
@@ -886,6 +892,7 @@ class dgAngleBasedFlatteningMapping: public dgSymmetricBiconjugateGradientSolve
 			m_deltaVariables[i] = 1.0f;
 		}
 		dgTriangleAnglesToUV anglesToUV (mesh, material, progressReportCallback, userData, m_deltaVariables, m_variables);
+*/
 	}
 
 	~dgAngleBasedFlatteningMapping()

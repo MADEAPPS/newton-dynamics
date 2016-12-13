@@ -27,11 +27,14 @@
 #include "dgCollision.h"
 #include "dgCollisionConvex.h"
 
+
+#define DG_LUMPED_MASSES_GRANULARITY	32
+
 class dgCollisionLumpedMassParticles: public dgCollisionConvex
 {
 	public:
 	dgCollisionLumpedMassParticles (const dgCollisionLumpedMassParticles& source);
-	dgCollisionLumpedMassParticles (dgWorld* const world, dgInt32 reserveCount, dgCollisionID collisionID);
+	dgCollisionLumpedMassParticles (dgWorld* const world, dgCollisionID collisionID);
 	dgCollisionLumpedMassParticles (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionLumpedMassParticles(void);
 
@@ -46,6 +49,7 @@ class dgCollisionLumpedMassParticles: public dgCollisionConvex
 	virtual void IntegrateForces (dgFloat32 timestep) = 0;
 
 	protected:
+	virtual void FinalizeBuild();
 	virtual dgInt32 CalculateSignature() const;
 	virtual void RegisterCollision(const dgBody* const otherBody);
 	virtual void SetCollisionBBox(const dgVector& p0, const dgVector& p1);

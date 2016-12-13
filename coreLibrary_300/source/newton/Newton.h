@@ -1027,6 +1027,8 @@ extern "C" {
 	NEWTON_API int NewtonDeformableMeshGetParticleCount (const NewtonCollision* const deformableMesh); 
 	NEWTON_API int NewtonDeformableMeshGetParticleStrideInBytes (const NewtonCollision* const deformableMesh); 
 	NEWTON_API const dFloat* NewtonDeformableMeshGetParticleArray (const NewtonCollision* const deformableMesh); 
+
+	NEWTON_API const int* NewtonDeformableMeshGetIndexToVertexMap (const NewtonCollision* const deformableMesh); 
 		
 /*
 	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial);
@@ -1233,6 +1235,7 @@ extern "C" {
 	NEWTON_API void NewtonMeshBeginBuild(const NewtonMesh* const mesh);
 	NEWTON_API void NewtonMeshBeginFace(const NewtonMesh* const mesh);
 	NEWTON_API void NewtonMeshAddPoint(const NewtonMesh* const mesh, dFloat64 x, dFloat64 y, dFloat64 z);
+	NEWTON_API void NewtonMeshAddLayer(const NewtonMesh* const mesh, int layerIndex);
 	NEWTON_API void NewtonMeshAddMaterial(const NewtonMesh* const mesh, int materialIndex);
 	NEWTON_API void NewtonMeshEndFace(const NewtonMesh* const mesh);
 	NEWTON_API void NewtonMeshEndBuild(const NewtonMesh* const mesh);

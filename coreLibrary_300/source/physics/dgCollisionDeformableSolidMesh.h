@@ -37,6 +37,8 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	dgCollisionDeformableSolidMesh (dgWorld* const world, dgMeshEffect* const mesh);
 	dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionDeformableSolidMesh(void);
+
+	static dgInt32 CompareEdges (const dgSoftLink* const A, const dgSoftLink* const B, void* const context);
 };
 
 

@@ -7680,6 +7680,14 @@ void NewtonMeshAddMaterial(const NewtonMesh* const mesh, int materialIndex)
 	meshEffect->AddMaterial(materialIndex);
 }
 
+void NewtonMeshAddLayer(const NewtonMesh* const mesh, int layer)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddLayer(layer);
+}
+
+
 void NewtonMeshEndBuild(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8194,6 +8202,19 @@ const dFloat* NewtonDeformableMeshGetParticleArray(const NewtonCollision* const 
 	}
 	return NULL;
 }
+
+const int* NewtonDeformableMeshGetIndexToVertexMap (const NewtonCollision* const deformableMesh) 
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)collision->GetChildShape();
+		return deformableShape->GetIndexToVertexMap();
+	}
+	return NULL;
+}
+
+
 
 int NewtonDeformableMeshGetParticleStrideInBytes(const NewtonCollision* const deformableMesh)
 {

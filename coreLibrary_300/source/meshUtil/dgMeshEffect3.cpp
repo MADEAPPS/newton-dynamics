@@ -851,10 +851,11 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 	};
 */
 
-
 	dgMeshEffect* CreatePartitionMesh (dgMeshEffect& mesh, dgInt32 maxVertexPerHull)
 	{
 		dgAssert (0);
+		return NULL;
+/*
 		dgMemoryAllocator* const allocator = mesh.GetAllocator();
 		dgMeshEffect* const convexPartionMesh = new (allocator) dgMeshEffect(allocator);
 
@@ -910,6 +911,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		ReportProgress();
 
 		return convexPartionMesh;
+*/
 	}
 
 	dgFloat64 ConcavityByFaceMedian (dgInt32 faceCountA, dgInt32 faceCountB) const
