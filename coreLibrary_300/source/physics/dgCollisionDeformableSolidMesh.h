@@ -38,7 +38,9 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dgCollisionDeformableSolidMesh(void);
 
+	virtual void CalculateAcceleration(dgFloat32 timestep);
 	static dgInt32 CompareEdges (const dgSoftLink* const A, const dgSoftLink* const B, void* const context);
+	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 };
 
 

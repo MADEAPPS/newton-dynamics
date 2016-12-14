@@ -89,20 +89,26 @@ void dgCollisionLumpedMassParticles::FinalizeBuild()
 
 	dgVector com(dgFloat32(0.0f));
 	dgVector* const posit = &m_posit[0];
+
+	dgVector minp(dgFloat32 (1.0e10f));
+	dgVector maxp(dgFloat32 (-1.0e10f));
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		com += posit[i];
+		minp = minp.GetMin(posit[i]);
+		maxp = maxp.GetMax(posit[i]);
 		m_accel[i] = dgVector::m_zero;
 		m_veloc[i] = dgVector::m_zero;
 		m_externalforce[i] = dgVector::m_zero;
 	}
 
 	// for now use a fix size box
-	m_boxSize = dgVector(dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(0.0f));
+	m_boxSize = (maxp - minp).CompProduct4(dgVector::m_half);
+	m_boxOrigin = (maxp + minp).CompProduct4(dgVector::m_half);
+/*
 	m_boxOrigin = com.CompProduct4(dgFloat32(1.0f) / m_particlesCount);
-
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		posit[i] = posit[i] - m_boxOrigin;
 	}
+*/
 }
 
 void dgCollisionLumpedMassParticles::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const

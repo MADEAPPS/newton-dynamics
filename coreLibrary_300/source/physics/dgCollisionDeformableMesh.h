@@ -56,7 +56,7 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void IntegrateForces(dgFloat32 timestep);
 	virtual void HandleCollision (dgFloat32 timestep, dgVector* const dir0, dgVector* const dir1, dgVector* const dir2, dgVector* const collisionAccel) const;
-	void CalculateAcceleration(dgFloat32 timestep);
+	virtual void CalculateAcceleration(dgFloat32 timestep);
 
 	dgArray<dgSoftLink> m_linkList;
 	dgArray<dgFloat32> m_restlength;
