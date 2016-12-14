@@ -88,8 +88,9 @@ void dgCollisionLumpedMassParticles::FinalizeBuild()
 	m_externalforce.Resize(m_particlesCount);
 
 	dgVector com(dgFloat32(0.0f));
+	dgVector* const posit = &m_posit[0];
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		com += m_posit[i];
+		com += posit[i];
 		m_accel[i] = dgVector::m_zero;
 		m_veloc[i] = dgVector::m_zero;
 		m_externalforce[i] = dgVector::m_zero;
@@ -100,7 +101,7 @@ void dgCollisionLumpedMassParticles::FinalizeBuild()
 	m_boxOrigin = com.CompProduct4(dgFloat32(1.0f) / m_particlesCount);
 
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		m_posit[i] = m_posit[i] - m_boxOrigin;
+		posit[i] = posit[i] - m_boxOrigin;
 	}
 }
 

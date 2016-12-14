@@ -96,6 +96,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 			for (int j = 0; j <= y; ++j) {
 				for (int k = 0; k <= z; ++k) {
 					points[index] = dVector(width*i, height*k, depth*j);
+// temp hack until I fox the com bug
+		points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 					index++;
 					dAssert (index < sizeof (points) / sizeof (points[0]));
 				}
@@ -123,11 +125,11 @@ class SimpleSoftBodyEntity: public DemoEntity
 						AddTetra (tetrahedra, p1, p3, p0, p4, points, layer + 3);
 						AddTetra (tetrahedra, p1, p6, p3, p4, points, layer + 4);
 					} else {
-//						AddTetra (tetrahedra, p2, p0, p1, p5, points, layer + 0);
+						AddTetra (tetrahedra, p2, p0, p1, p5, points, layer + 0);
 						AddTetra (tetrahedra, p2, p7, p3, p0, points, layer + 1);
-//						AddTetra (tetrahedra, p2, p5, p6, p7, points, layer + 2);
-//						AddTetra (tetrahedra, p0, p7, p4, p5, points, layer + 3);
-//						AddTetra (tetrahedra, p2, p0, p5, p7, points, layer + 4);
+						AddTetra (tetrahedra, p2, p5, p6, p7, points, layer + 2);
+						AddTetra (tetrahedra, p0, p7, p4, p5, points, layer + 3);
+						AddTetra (tetrahedra, p2, p0, p5, p7, points, layer + 4);
 					}
 					layer += 5;
 				}
