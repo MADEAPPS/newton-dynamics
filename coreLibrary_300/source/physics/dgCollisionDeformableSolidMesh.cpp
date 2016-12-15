@@ -30,23 +30,25 @@
 #include "dgCollisionDeformableSolidMesh.h"
 
 
+
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const world, dgMeshEffect* const mesh)
 	:dgCollisionDeformableMesh(world, m_deformableSolidMesh)
+	,m_finiteElements(64, world->GetAllocator())
+	,m_finiteElementsCount(0)
 {
 	m_rtti |= dgCollisionDeformableSolidMesh_RTTI;
-
-//	dgArray<dgVector> m_posit;
-//	dgArray<dgVector> m_veloc;
-//	dgArray<dgVector> m_accel;
-//	dgArray<dgVector> m_externalforce;
 
 	dgInt32 count = mesh->GetVertexCount();
 	dgVector* const points = dgAlloca (dgVector, count);
 
+	dgAssert (mesh->HasLayers());
 	for (dgInt32 i = 0; i < count; i++) {
 		dgBigVector p(mesh->GetVertex(i));
 		points[i] = p;
+		m_finiteElementsCount = dgMax (mesh->GetVertexLayer(i), m_finiteElementsCount);
 	}
+	m_finiteElementsCount ++;
+
 	m_indexToVertexMap.Resize(count);
 	dgInt32* const indexToVertexMap = &m_indexToVertexMap[0];
 	m_particlesCount = dgVertexListToIndexList (&points[0].m_x, sizeof (dgVector), 3 * sizeof (dgFloat32), 0, count, indexToVertexMap, dgFloat32 (1.0e-5f));
@@ -83,17 +85,82 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 		m_linkList[i] = links[i];
 	}
 	FinalizeBuild();
+
+	m_finiteElements.Resize(m_finiteElementsCount);
+
+	dgInt32 elementIndex = 0;
+	dgInt32 mark = mesh->IncLRU();	
+	dgMeshEffect::Iterator iter(*mesh);
+	for (iter.Begin (); iter; iter ++) {
+		dgEdge* const edge = &(*iter);
+		dgAssert (edge->m_incidentFace > 0);
+		if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
+			dgEdge* edgeStack[32];
+			dgFiniteElementCell& fem = m_finiteElements[elementIndex];
+			dgAssert (elementIndex < m_finiteElementsCount);
+			elementIndex ++;
+
+			dgInt32 tetraVertex = 0;
+			dgInt32 stackIndex = 1;
+			edgeStack[0] = edge; 
+			while (stackIndex){
+				stackIndex --;
+				dgEdge* const pointEdge = edgeStack[stackIndex];
+				dgAssert (pointEdge->m_incidentFace > 0);
+				if ((pointEdge->m_mark < mark) && (pointEdge->m_incidentFace > 0)) {
+					fem.m_index[tetraVertex] = dgInt16 (m_indexToVertexMap[pointEdge->m_incidentVertex]);
+					dgAssert (tetraVertex < 4);
+					tetraVertex ++;
+					dgEdge* edgePtr = pointEdge;
+					do {
+						dgAssert (mesh->GetVertexLayer(edge->m_incidentVertex) == mesh->GetVertexLayer(edgePtr->m_incidentVertex));
+						if (edgePtr->m_mark != mark) {
+							edgePtr->m_mark = mark;
+							edgeStack[stackIndex] = edgePtr->m_twin; 
+							stackIndex ++;
+						}
+						edgePtr = edgePtr->m_twin->m_next;
+					} while (edgePtr != pointEdge);
+				}
+			}
+		}
+	}
+	dgAssert (elementIndex == m_finiteElementsCount);
+
+	for (dgInt32 i = 0; i < m_finiteElementsCount; i ++) {
+		dgFiniteElementCell& fem = m_finiteElements[i];
+		const dgVector& p0 = points[fem.m_index[0]];
+		const dgVector& p1 = points[fem.m_index[1]];
+		const dgVector& p2 = points[fem.m_index[2]];
+		const dgVector& p3 = points[fem.m_index[3]];
+
+		dgVector p01 (p0 - p1);
+		dgVector p12 (p1 - p2);
+		dgVector p23 (p2 - p3);
+		dgFloat32 volume = (p01.DotProduct4(p12.CrossProduct3(p23))).GetScalar();
+		if (volume < dgFloat32 (0.0f)) {
+			volume = -volume;
+			dgSwap(fem.m_index[0], fem.m_index[1]);
+		}
+		fem.m_restVolume = volume;
+	}
 }
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(const dgCollisionDeformableSolidMesh& source)
 	:dgCollisionDeformableMesh(source)
+	,m_finiteElements(source.m_finiteElementsCount, source.GetAllocator())
+	,m_finiteElementsCount(source.m_finiteElementsCount)
 {
-	m_rtti |= source.m_rtti;
+	m_rtti = source.m_rtti;
+	memcpy(&m_finiteElements[0], &source.m_finiteElements[0], m_finiteElementsCount * sizeof(dgFiniteElementCell));
 }
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
 	:dgCollisionDeformableMesh(world, deserialization, userData, revisionNumber)
+	,m_finiteElements(64, world->GetAllocator())
+	,m_finiteElementsCount(0)
 {
+	dgAssert (0);
 }
 
 
@@ -143,6 +210,7 @@ void dgCollisionDeformableSolidMesh::CalculateAcceleration(dgFloat32 timestep)
 // for now make a share value for all springs. later this is a per material feature.
 dgFloat32 kSpring = dgFloat32(1000.0f);
 dgFloat32 kDamper = dgFloat32(15.0f);
+dgFloat32 kVolumetricStiffness = dgFloat32(500.0f);
 
 
 	dgInt32 iter = 4;
@@ -150,6 +218,7 @@ dgFloat32 kDamper = dgFloat32(15.0f);
 	dgVector* const veloc = &m_veloc[0];
 	dgVector* const posit = &m_posit[0];
 	const dgFloat32* const restLenght = &m_restlength[0];
+	const dgFiniteElementCell* const finiteElements = &m_finiteElements[0];
 
 	dgFloat32* const spring_A01 = dgAlloca(dgFloat32, m_linksCount);
 	dgFloat32* const spring_B01 = dgAlloca(dgFloat32, m_linksCount);
@@ -220,6 +289,40 @@ dgFloat32 kDamper = dgFloat32(15.0f);
 
 			spring_A01[i] = ks_dt * compression;
 			spring_B01[i] = ks_dt * lenghtRatio * den * den;
+		}
+
+		for (dgInt32 i = 0; i < m_finiteElementsCount; i++) {
+			const dgFiniteElementCell& fem = finiteElements[i];
+			const dgInt32 i0 = fem.m_index[0];
+			const dgInt32 i1 = fem.m_index[1];
+			const dgInt32 i2 = fem.m_index[2];
+			const dgInt32 i3 = fem.m_index[3];
+			const dgVector& p0 = posit[i0];
+			const dgVector& p1 = posit[i1];
+			const dgVector& p2 = posit[i2];
+			const dgVector& p3 = posit[i3];
+
+			const dgVector p01(p0 - p1);
+			const dgVector p12(p1 - p2);
+			const dgVector p23(p2 - p3);
+			const dgVector p30(p3 - p0);
+
+			dgVector area123 (p12.CrossProduct3(p23));
+			dgVector area013 (p30.CrossProduct3(p01));
+			dgVector area023 (p30.CrossProduct3(p23));
+			dgVector area012 (p12.CrossProduct3(p01));
+
+			dgFloat32 volume = (p01.DotProduct4(area123)).GetScalar();
+			dgVector stiffness (-kVolumetricStiffness * (volume - fem.m_restVolume));
+			dgVector f0 (stiffness.CompProduct4 (area123));
+			dgVector f1 (stiffness.CompProduct4 (area023));
+			dgVector f2 (stiffness.CompProduct4 (area013));
+			dgVector f3 (stiffness.CompProduct4 (area012));
+			
+			accel[i0] += f0;
+			accel[i1] += f1 - f0;
+			accel[i2] += f2 - f3;
+			accel[i3] += f3;
 		}
 
 		for (dgInt32 i = 0; i < m_linksCount; i++) {

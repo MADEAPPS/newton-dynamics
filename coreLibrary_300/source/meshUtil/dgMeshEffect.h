@@ -447,7 +447,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	void Serialize (dgSerialize callback, void* const userData) const;
 
+	bool HasLayers() const;
 	dgBigVector GetVertex (dgInt32 index) const;
+	dgInt32 GetVertexLayer (dgInt32 index) const;
 	void TransformMesh (const dgMatrix& matrix);
 
 	void* GetFirstVertex () const;
@@ -547,8 +549,6 @@ DG_INLINE dgInt32 dgMeshEffect::GetMaterialIndexCount (dgIndexArray* const handl
 	return handle->m_materialsIndexCount[materialHandle];
 }
 
-
-
 DG_INLINE dgBigVector dgMeshEffect::GetVertex (dgInt32 index) const
 {
 	dgAssert(index >= 0);
@@ -556,46 +556,18 @@ DG_INLINE dgBigVector dgMeshEffect::GetVertex (dgInt32 index) const
 	return m_points[index];
 }
 
-/*
-
-DG_INLINE dgMeshEffect::dgVertexAtribute& dgMeshEffect::GetAttribute (dgInt32 index) const
+DG_INLINE bool dgMeshEffect::HasLayers() const
 {
-	dgAssert (0);
-//	return m_attrib[index];
+	return m_layers.m_count != 0;
 }
 
-DG_INLINE dgInt32 dgMeshEffect::GetPropertiesStrideInByte() const 
+DG_INLINE dgInt32 dgMeshEffect::GetVertexLayer(dgInt32 index) const
 {
-	return sizeof (dgVertexAtribute);
+	dgAssert(index >= 0);
+	dgAssert(index < m_points.m_count);
+	return (m_layers.m_count) ? m_layers[index] : 0;
 }
 
-DG_INLINE dgFloat64* dgMeshEffect::GetAttributePool() const 
-{
-	dgAssert (0);
-	return NULL;
-}
-
-DG_INLINE dgFloat64* dgMeshEffect::GetNormalPool() const 
-{
-	dgAssert(0);
-	return NULL;
-//	return &m_attrib->m_normal_x;
-}
-
-DG_INLINE dgFloat64* dgMeshEffect::GetUV0Pool() const 
-{
-	dgAssert(0);
-	return NULL;
-//	return &m_attrib->m_u0;
-}
-
-DG_INLINE dgFloat64* dgMeshEffect::GetUV1Pool() const 
-{
-	dgAssert(0);
-	return NULL;
-//	return &m_attrib->m_u1;
-}
-*/
 
 DG_INLINE dgInt32 dgMeshEffect::GetVertexStrideInByte() const 
 {

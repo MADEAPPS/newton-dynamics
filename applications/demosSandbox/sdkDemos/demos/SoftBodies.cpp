@@ -97,7 +97,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 				for (int k = 0; k <= z; ++k) {
 					points[index] = dVector(width*i, height*k, depth*j);
 // temp hack until I fox the com bug
-		points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
+points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 					index++;
 					dAssert (index < sizeof (points) / sizeof (points[0]));
 				}

@@ -33,6 +33,13 @@
 class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 {
 	public:
+	class dgFiniteElementCell
+	{
+		public:
+		dgFloat32 m_restVolume; 
+		dgInt16 m_index[4];
+	};
+
 	dgCollisionDeformableSolidMesh (const dgCollisionDeformableSolidMesh& source);
 	dgCollisionDeformableSolidMesh (dgWorld* const world, dgMeshEffect* const mesh);
 	dgCollisionDeformableSolidMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
@@ -41,6 +48,10 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	virtual void CalculateAcceleration(dgFloat32 timestep);
 	static dgInt32 CompareEdges (const dgSoftLink* const A, const dgSoftLink* const B, void* const context);
 	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
+
+	dgArray<dgFiniteElementCell> m_finiteElements;
+	dgInt32 m_finiteElementsCount;
+	
 };
 
 
