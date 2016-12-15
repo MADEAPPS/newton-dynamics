@@ -305,23 +305,20 @@ dgFloat32 kVolumetricStiffness = dgFloat32(500.0f);
 			const dgVector p01(p0 - p1);
 			const dgVector p12(p1 - p2);
 			const dgVector p23(p2 - p3);
-			const dgVector p30(p3 - p0);
 
-			dgVector area123 (p12.CrossProduct3(p23));
-			dgVector area013 (p30.CrossProduct3(p01));
-			dgVector area023 (p30.CrossProduct3(p23));
-			dgVector area012 (p12.CrossProduct3(p01));
+			dgVector area123  (p12.CrossProduct3(p23));
+			dgVector area0123 (p23.CrossProduct3(p01));
+			dgVector area012  (p12.CrossProduct3(p01));
 
 			dgFloat32 volume = (p01.DotProduct4(area123)).GetScalar();
 			dgVector stiffness (-kVolumetricStiffness * (volume - fem.m_restVolume));
 			dgVector f0 (stiffness.CompProduct4 (area123));
-			dgVector f1 (stiffness.CompProduct4 (area023));
-			dgVector f2 (stiffness.CompProduct4 (area013));
+			dgVector f1 (stiffness.CompProduct4 (area0123));
 			dgVector f3 (stiffness.CompProduct4 (area012));
 			
 			accel[i0] += f0;
 			accel[i1] += f1 - f0;
-			accel[i2] += f2 - f3;
+			accel[i2] -= f1 + f3;
 			accel[i3] += f3;
 		}
 
