@@ -34,11 +34,6 @@
 #define DG_SMALLEST_SPRING_LENGTH						dgFloat32 (1.0e-3f) 
 dgVector dgCollisionDeformableMesh::m_smallestLenght2	(DG_SMALLEST_SPRING_LENGTH * DG_SMALLEST_SPRING_LENGTH);
 
-
-static int xxx;
-
-
-
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCollisionID collisionID)
 	:dgCollisionLumpedMassParticles(world, collisionID)
 	,m_linkList(DG_DEFORMABLE_MESH_LINKS_GRANULARITY, world->GetAllocator())
@@ -271,8 +266,6 @@ void dgCollisionDeformableMesh::CalculateAcceleration(dgFloat32 timestep)
 // for now make a share value for all springs. later this is a per material feature.
 dgFloat32 kSpring = dgFloat32(1000.0f);
 dgFloat32 kDamper = dgFloat32(15.0f);
-
-xxx++;
 
 	dgInt32 iter = 4;
 	dgVector* const accel = &m_accel[0];

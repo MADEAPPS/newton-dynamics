@@ -209,7 +209,7 @@ void dgCollisionDeformableSolidMesh::CalculateAcceleration(dgFloat32 timestep)
 
 // for now make a share value for all springs. later this is a per material feature.
 dgFloat32 kSpring = dgFloat32(1000.0f);
-dgFloat32 kDamper = dgFloat32(15.0f);
+dgFloat32 kDamper = dgFloat32(30.0f);
 dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 
 
@@ -253,6 +253,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 		accel[i] = unitAccel;
 		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
 		veloc0[i] = veloc[i];
+		tmp0[i] = dgVector::m_zero;
 	}
 
 	const dgSoftLink* const links = &m_linkList[0];
@@ -261,8 +262,42 @@ dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 //	dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
 
 	dgVector dtRK4 (timestep / iter);
+	dgVector volumetricStiffness (-kVolumetricStiffness);
 	HandleCollision (timestep, collisionDir0, collisionDir1, collisionDir2, collidingAccel);
 	for (dgInt32 k = 0; k < iter; k ++) {
+
+		for (dgInt32 i = 0; i < m_finiteElementsCount; i++) {
+			const dgFiniteElementCell& fem = finiteElements[i];
+			const dgInt32 i0 = fem.m_index[0];
+			const dgInt32 i1 = fem.m_index[1];
+			const dgInt32 i2 = fem.m_index[2];
+			const dgInt32 i3 = fem.m_index[3];
+			const dgVector& p0 = posit[i0];
+			const dgVector& p1 = posit[i1];
+			const dgVector& p2 = posit[i2];
+			const dgVector& p3 = posit[i3];
+
+			const dgVector p01(p0 - p1);
+			const dgVector p12(p1 - p2);
+			const dgVector p23(p2 - p3);
+
+			dgVector area123(p12.CrossProduct3(p23));
+			dgVector area0123(p23.CrossProduct3(p01));
+			dgVector area012(p12.CrossProduct3(p01));
+
+			dgFloat32 volume = (p01.DotProduct4(area123)).GetScalar();
+			//dgVector stiffness(-kVolumetricStiffness * (volume - fem.m_restVolume));
+			dgVector deltaVolume(volume - fem.m_restVolume);
+			dgVector a0(deltaVolume.CompProduct4(area123));
+			dgVector a1(deltaVolume.CompProduct4(area0123));
+			dgVector a3(deltaVolume.CompProduct4(area012));
+
+			tmp0[i0] += a0;
+			tmp0[i1] += a1 - a0;
+			tmp0[i2] -= a1 + a3;
+			tmp0[i3] += a3;
+		}
+
 		for (dgInt32 i = 0; i < m_linksCount; i++) {
 			const dgInt32 j0 = links[i].m_m0;
 			const dgInt32 j1 = links[i].m_m1;
@@ -291,37 +326,6 @@ dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 			spring_B01[i] = ks_dt * lenghtRatio * den * den;
 		}
 
-		for (dgInt32 i = 0; i < m_finiteElementsCount; i++) {
-			const dgFiniteElementCell& fem = finiteElements[i];
-			const dgInt32 i0 = fem.m_index[0];
-			const dgInt32 i1 = fem.m_index[1];
-			const dgInt32 i2 = fem.m_index[2];
-			const dgInt32 i3 = fem.m_index[3];
-			const dgVector& p0 = posit[i0];
-			const dgVector& p1 = posit[i1];
-			const dgVector& p2 = posit[i2];
-			const dgVector& p3 = posit[i3];
-
-			const dgVector p01(p0 - p1);
-			const dgVector p12(p1 - p2);
-			const dgVector p23(p2 - p3);
-
-			dgVector area123  (p12.CrossProduct3(p23));
-			dgVector area0123 (p23.CrossProduct3(p01));
-			dgVector area012  (p12.CrossProduct3(p01));
-
-			dgFloat32 volume = (p01.DotProduct4(area123)).GetScalar();
-			dgVector stiffness (-kVolumetricStiffness * (volume - fem.m_restVolume));
-			dgVector f0 (stiffness.CompProduct4 (area123));
-			dgVector f1 (stiffness.CompProduct4 (area0123));
-			dgVector f3 (stiffness.CompProduct4 (area012));
-			
-			accel[i0] += f0;
-			accel[i1] += f1 - f0;
-			accel[i2] -= f1 + f3;
-			accel[i3] += f3;
-		}
-
 		for (dgInt32 i = 0; i < m_linksCount; i++) {
 			const dgVector dv0 (dv[i]);
 			const dgVector A01(spring_A01[i]);
@@ -335,19 +339,21 @@ dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 		}
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
+			accel[i] += volumetricStiffness.CompProduct4(tmp0[i]);
 			tmp0[i] = accel[i].CompProduct4(collisionDir0[i]);
 			tmp1[i] = accel[i].CompProduct4(collisionDir1[i]);
 			tmp2[i] = accel[i].CompProduct4(collisionDir2[i]);
 		}
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			accel[i] = accel[i] - collisionDir0[i].CompProduct4(tmp0[i]) - collisionDir1[i].CompProduct4(tmp1[i])  - collisionDir2[i].CompProduct4(tmp2[i]) + collidingAccel[i];
+			accel[i] += (collidingAccel[i] - collisionDir0[i].CompProduct4(tmp0[i]) - collisionDir1[i].CompProduct4(tmp1[i]) - collisionDir2[i].CompProduct4(tmp2[i]));
 		}
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
 			veloc[i] += accel[i].CompProduct4 (dtRK4);
 			posit[i] += veloc[i].CompProduct4(dtRK4);
 			accel[i] = unitAccel;
+			tmp0[i] = dgVector::m_zero;
 		}
 	}
 
