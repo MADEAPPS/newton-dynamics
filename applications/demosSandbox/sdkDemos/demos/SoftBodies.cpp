@@ -194,7 +194,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 
 		NewtonMesh* const tetraCube = NewtonMeshCreate(scene->GetNewton());
 		NewtonMeshBeginBuild(tetraCube);
-			BuildTetraSolidBlock(tetraCube, 2, 2, 10, 0.5f, 0.5f, 0.5f);
+			BuildTetraSolidBlock(tetraCube, 2, 2, 15, 0.5f, 0.5f, 0.5f);
 		NewtonMeshEndBuild(tetraCube);
 
 		int material = LoadTexture("smilli.tga");
