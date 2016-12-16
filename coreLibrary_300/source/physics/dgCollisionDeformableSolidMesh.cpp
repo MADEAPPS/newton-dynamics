@@ -80,7 +80,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 	}
 	uniqueEdgeCount++;
 	m_linksCount = uniqueEdgeCount;
-	m_indexToVertexMap.Resize(m_linksCount);
+	m_linkList.Resize(m_linksCount);
 	for (dgInt32 i = 0; i < m_linksCount; i ++) {
 		m_linkList[i] = links[i];
 	}
@@ -210,7 +210,7 @@ void dgCollisionDeformableSolidMesh::CalculateAcceleration(dgFloat32 timestep)
 // for now make a share value for all springs. later this is a per material feature.
 dgFloat32 kSpring = dgFloat32(1000.0f);
 dgFloat32 kDamper = dgFloat32(15.0f);
-dgFloat32 kVolumetricStiffness = dgFloat32(500.0f);
+dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 
 
 	dgInt32 iter = 4;
