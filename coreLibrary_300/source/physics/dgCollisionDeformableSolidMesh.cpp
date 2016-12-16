@@ -212,7 +212,6 @@ dgFloat32 kSpring = dgFloat32(1000.0f);
 dgFloat32 kDamper = dgFloat32(30.0f);
 dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 
-
 	dgInt32 iter = 4;
 	dgVector* const accel = &m_accel[0];
 	dgVector* const veloc = &m_veloc[0];
@@ -250,10 +249,8 @@ dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 
 	// here I need to add all other external acceleration like wind and pressure, friction and collision.
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		accel[i] = unitAccel;
 		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
 		veloc0[i] = veloc[i];
-		tmp0[i] = dgVector::m_zero;
 	}
 
 	const dgSoftLink* const links = &m_linkList[0];
@@ -261,10 +258,18 @@ dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 //	dgFloat32 kd_dt0 = -timestep * kDamper;
 //	dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
 
+static int xxx;
+xxx ++;
+
 	dgVector dtRK4 (timestep / iter);
 	dgVector volumetricStiffness (-kVolumetricStiffness);
 	HandleCollision (timestep, collisionDir0, collisionDir1, collisionDir2, collidingAccel);
 	for (dgInt32 k = 0; k < iter; k ++) {
+
+		for (dgInt32 i = 0; i < m_particlesCount; i++) {
+			accel[i] = unitAccel;
+			tmp0[i] = dgVector::m_zero;
+		}
 
 		for (dgInt32 i = 0; i < m_finiteElementsCount; i++) {
 			const dgFiniteElementCell& fem = finiteElements[i];
@@ -286,7 +291,6 @@ dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 			dgVector area012(p12.CrossProduct3(p01));
 
 			dgFloat32 volume = (p01.DotProduct4(area123)).GetScalar();
-			//dgVector stiffness(-kVolumetricStiffness * (volume - fem.m_restVolume));
 			dgVector deltaVolume(volume - fem.m_restVolume);
 			dgVector a0(deltaVolume.CompProduct4(area123));
 			dgVector a1(deltaVolume.CompProduct4(area0123));
@@ -350,10 +354,8 @@ dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
 		}
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			veloc[i] += accel[i].CompProduct4 (dtRK4);
+			veloc[i] += accel[i].CompProduct4(dtRK4);
 			posit[i] += veloc[i].CompProduct4(dtRK4);
-			accel[i] = unitAccel;
-			tmp0[i] = dgVector::m_zero;
 		}
 	}
 

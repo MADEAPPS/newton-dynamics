@@ -222,37 +222,69 @@ void dgCollisionDeformableMesh::HandleCollision (dgFloat32 timestep, dgVector* c
 	dgVector origin(matrix.m_posit);
 
 dgFloat32 restitution = dgFloat32 (-1.7f);
+dgFloat32 staticFriction = dgFloat32 (0.7f);
+dgFloat32 keneticFriction = dgFloat32 (0.4f);
+
+	dgVector timestepV (timestep);
 	dgVector invTimeStep (dgFloat32 (1.0f / timestep));
+	const dgVector* const accel = &m_accel[0];
 	const dgVector* const veloc = &m_veloc[0];
 	const dgVector* const posit = &m_posit[0];
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		dgVector normal (dgVector::m_zero);
-		dgVector tangent (dgVector::m_zero);
-		dgVector accel (dgVector::m_zero);
+		dgVector tangent0 (dgVector::m_zero);
+		dgVector tangent1 (dgVector::m_zero);
+		dgVector accel1 (dgVector::m_zero);
 		dgVector worldPosit(origin + posit[i]);
 		if (worldPosit.m_y < 0.0f) {
+			dgVector n (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 			dgFloat32 penetration = -worldPosit.m_y;
-			dgFloat32 boundSpeed = restitution * veloc[i].m_y;
+			//dgFloat32 boundSpeed = restitution * veloc[i].m_y;
+			dgFloat32 boundSpeed = (n.DotProduct4 (veloc[i])).GetScalar() * restitution;
+			bool isColliding = false;
 			if (boundSpeed * timestep > penetration) {
+				normal = n;
+				isColliding = true;
 				dgAssert (boundSpeed > 0.0f);
-				normal[1] = dgFloat32(1.0f);
-				accel[1] = boundSpeed;
-				accel = invTimeStep.CompProduct4(accel);
+				accel1 = invTimeStep.CompProduct4(n.Scale4(boundSpeed));
 			} else {
+				// particle is receding form the surface
 				penetration = dgMin (dgFloat32 (0.25f), penetration);
 				boundSpeed += dgFloat32 (0.25f) * penetration * invTimeStep.GetScalar();
 				if (boundSpeed > dgFloat32 (1.0e-3f)) {
-					normal[1] = dgFloat32 (1.0f);				
-					accel[1] = boundSpeed;
-					accel = invTimeStep.CompProduct4(accel);
+					normal = n;
+					isColliding = true;
+					accel1 = invTimeStep.CompProduct4(n.Scale4(boundSpeed));
 				}
+			}
+
+			if (isColliding) {
+/*
+				dgVector tangenVeloc (veloc[i] - normal.CompProduct4(veloc[i].DotProduct4(normal)));
+				dgFloat32 speedMag = (tangenVeloc.DotProduct4(tangenVeloc)).GetScalar();
+
+				if (speedMag > dgFloat32 (0.1f)) {
+					dgFloat32 speed = dgSqrt(speedMag);
+					tangent0 = tangenVeloc.Scale4(1.0f / speed);
+					//tangent1 = normal.CrossProduct3(tangent0);
+					//accel1 -= invTimeStep.CompProduct4(tangent0.Scale4(speed));
+					// hack for now
+					dgMatrix matrix(normal);
+					tangent0 = matrix[1];
+					tangent1 = matrix[2];
+				} else {
+					dgMatrix matrix (normal);
+					tangent0 = matrix[1];
+					tangent1 = matrix[2];
+				}
+*/
 			}
 		}
 
 		dir0[i] = normal;
-		dir1[i] = tangent;
-		dir2[i] = tangent;
-		collisionAccel[i] = accel;
+		dir1[i] = tangent0;
+		dir2[i] = tangent1;
+		collisionAccel[i] = accel1;
 	}
 }
 

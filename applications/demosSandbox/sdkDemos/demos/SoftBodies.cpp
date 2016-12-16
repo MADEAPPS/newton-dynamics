@@ -410,7 +410,7 @@ void SoftBodies(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "playground.ngd", 1);
 
-	dVector location(0.0f, 4.0f, 0.0f, 0.0f);
+	dVector location(0.0f, 6.0f, 0.0f, 0.0f);
 
 	SimpleSoftBodyEntity* const entity = new SimpleSoftBodyEntity(scene, location);
 //	entity->BuildRegularTetraHedra(scene, 0);
