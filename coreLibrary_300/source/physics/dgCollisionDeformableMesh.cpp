@@ -218,12 +218,14 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 void dgCollisionDeformableMesh::HandleCollision (dgFloat32 timestep, dgVector* const dir0, dgVector* const dir1, dgVector* const dir2, dgVector* const collisionAccel) const
 {
 	const dgMatrix& matrix = m_body->GetCollision()->GetGlobalMatrix();
-//	dgVector origin(matrix.TransformVector(m_boxOrigin));
 	dgVector origin(matrix.m_posit);
 
-dgFloat32 restitution = dgFloat32 (-1.7f);
+
+dgVector restitution (dgFloat32(-1.4f));
 dgFloat32 staticFriction = dgFloat32 (0.7f);
 dgFloat32 keneticFriction = dgFloat32 (0.4f);
+dgFloat32 penetrationElasticity = dgFloat32(10.0f);
+dgFloat32 maxPenetration = dgFloat32(0.25f);
 
 	dgVector timestepV (timestep);
 	dgVector invTimeStep (dgFloat32 (1.0f / timestep));
@@ -237,10 +239,15 @@ dgFloat32 keneticFriction = dgFloat32 (0.4f);
 		dgVector accel1 (dgVector::m_zero);
 		dgVector worldPosit(origin + posit[i]);
 		if (worldPosit.m_y < 0.0f) {
+			dgVector n(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+			normal = n;
+			accel1 = invTimeStep.CompProduct4(m_veloc[i].CompProduct4(dgVector::m_negOne));
+
+/*
 			dgVector n (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 			dgFloat32 penetration = -worldPosit.m_y;
-			//dgFloat32 boundSpeed = restitution * veloc[i].m_y;
-			dgFloat32 boundSpeed = (n.DotProduct4 (veloc[i])).GetScalar() * restitution;
+			dgVector v2(veloc[i] + accel[i].CompProduct4(timestepV));
+			dgFloat32 boundSpeed = (n.DotProduct4(v2.CompProduct4(restitution))).GetScalar();
 			bool isColliding = false;
 			if (boundSpeed * timestep > penetration) {
 				normal = n;
@@ -248,18 +255,27 @@ dgFloat32 keneticFriction = dgFloat32 (0.4f);
 				dgAssert (boundSpeed > 0.0f);
 				accel1 = invTimeStep.CompProduct4(n.Scale4(boundSpeed));
 			} else {
-				// particle is receding form the surface
-				penetration = dgMin (dgFloat32 (0.25f), penetration);
-				boundSpeed += dgFloat32 (0.25f) * penetration * invTimeStep.GetScalar();
-				if (boundSpeed > dgFloat32 (1.0e-3f)) {
+				// resolve particle penetration
+				penetration = dgMin (maxPenetration, penetration);
+				if (penetration > dgFloat32(1.0e-3f)) {
 					normal = n;
 					isColliding = true;
-					accel1 = invTimeStep.CompProduct4(n.Scale4(boundSpeed));
+					dgFloat32 speed1 = n.DotProduct4(m_veloc[i]).GetScalar();
+					dgFloat32 speed2 = penetrationElasticity * penetration;
+					dgFloat32 speed = dgMax(speed1, speed2);
+					accel1 = invTimeStep.CompProduct4(n.Scale4(speed) - m_veloc[i]);
+				} else {
+					dgFloat32 a = n.DotProduct4(accel[i]).GetScalar();
+					if (a < -dgFloat32(1.0e-3f)) {
+						normal = n;
+						isColliding = true;
+						accel1 = invTimeStep.CompProduct4(m_veloc[i].CompProduct4(dgVector::m_negOne));
+					}
 				}
 			}
 
 			if (isColliding) {
-/*
+
 				dgVector tangenVeloc (veloc[i] - normal.CompProduct4(veloc[i].DotProduct4(normal)));
 				dgFloat32 speedMag = (tangenVeloc.DotProduct4(tangenVeloc)).GetScalar();
 
@@ -277,8 +293,8 @@ dgFloat32 keneticFriction = dgFloat32 (0.4f);
 					tangent0 = matrix[1];
 					tangent1 = matrix[2];
 				}
-*/
 			}
+*/
 		}
 
 		dir0[i] = normal;
@@ -286,6 +302,51 @@ dgFloat32 keneticFriction = dgFloat32 (0.4f);
 		dir2[i] = tangent1;
 		collisionAccel[i] = accel1;
 	}
+
+/*
+	dgFloat32 restitution = dgFloat32(-1.7f);
+	dgFloat32 staticFriction = dgFloat32(0.7f);
+	dgFloat32 keneticFriction = dgFloat32(0.4f);
+
+	dgVector timestepV(timestep);
+	dgVector invTimeStep(dgFloat32(1.0f / timestep));
+//	const dgVector* const accel = &m_accel[0];
+	const dgVector* const veloc = &m_veloc[0];
+	const dgVector* const posit = &m_posit[0];
+	dgVector accel(dgVector::m_zero);
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		dgVector normal(dgVector::m_zero);
+		dgVector tangent(dgVector::m_zero);
+		dgVector worldPosit(origin + posit[i]);
+		if (worldPosit.m_y < 0.0f) {
+			dgFloat32 penetration = -worldPosit.m_y;
+			dgFloat32 boundSpeed = restitution * veloc[i].m_y;
+			bool isColliding = false;
+			if (boundSpeed * timestep > penetration) {
+				isColliding = true;
+				dgAssert(boundSpeed > 0.0f);
+				normal[1] = dgFloat32(1.0f);
+				accel[1] = boundSpeed;
+				accel = invTimeStep.CompProduct4(accel);
+			} else {
+				// particle is receding form the surface
+				penetration = dgMin(dgFloat32(0.25f), penetration);
+				boundSpeed += dgFloat32(0.25f) * penetration * invTimeStep.GetScalar();
+				if (boundSpeed > dgFloat32(1.0e-3f)) {
+					isColliding = true;
+					normal[1] = dgFloat32(1.0f);
+					accel[1] = boundSpeed;
+					accel = invTimeStep.CompProduct4(accel);
+				}
+			}
+		}
+
+		dir0[i] = normal;
+		dir1[i] = tangent;
+		dir2[i] = tangent;
+		collisionAccel[i] = accel;
+	}
+*/
 }
 
 void dgCollisionDeformableMesh::CalculateAcceleration(dgFloat32 timestep)

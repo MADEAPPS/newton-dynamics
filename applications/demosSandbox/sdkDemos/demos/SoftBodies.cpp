@@ -413,8 +413,8 @@ void SoftBodies(DemoEntityManager* const scene)
 	dVector location(0.0f, 6.0f, 0.0f, 0.0f);
 
 	SimpleSoftBodyEntity* const entity = new SimpleSoftBodyEntity(scene, location);
-//	entity->BuildRegularTetraHedra(scene, 0);
-	entity->BuildTetraHedraCube (scene, 0);
+	entity->BuildRegularTetraHedra(scene, 0);
+//	entity->BuildTetraHedraCube (scene, 0);
 
 	dQuaternion rot;
 	dVector origin(location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);

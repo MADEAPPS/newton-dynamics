@@ -211,7 +211,7 @@ void dgCollisionDeformableSolidMesh::CalculateAcceleration(dgFloat32 timestep)
 dgFloat32 kSpring = dgFloat32(1000.0f);
 dgFloat32 kDamper = dgFloat32(30.0f);
 dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
-//kVolumetricStiffness = 1000.0f;
+kVolumetricStiffness = 0.0f;
 
 	dgInt32 iter = 4;
 	dgVector* const accel = &m_accel[0];
@@ -351,69 +351,12 @@ xxx ++;
 		}
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			accel[i] += (collidingAccel[i] - collisionDir0[i].CompProduct4(tmp0[i]) - collisionDir1[i].CompProduct4(tmp1[i]) - collisionDir2[i].CompProduct4(tmp2[i]));
+			tmp0[i] = accel[i] + collidingAccel[i] - collisionDir0[i].CompProduct4(tmp0[i]) - collisionDir1[i].CompProduct4(tmp1[i]) - collisionDir2[i].CompProduct4(tmp2[i]);
 		}
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			veloc[i] += accel[i].CompProduct4(dtRK4);
+			veloc[i] += tmp0[i].CompProduct4(dtRK4);
 			posit[i] += veloc[i].CompProduct4(dtRK4);
 		}
 	}
-
-/*
-	for (dgInt32 i = 0; i < m_linksCount; i++) {
-		const dgInt32 j0 = links[i].m_v0;
-		const dgInt32 j1 = links[i].m_v1;
-
-		dv[i] = veloc[j0] - veloc[j1];
-		dx[i] = posit[j0] - posit[j1];
-		const dgVector& p0p1 = dx[i];
-		const dgVector& v0v1 = dv[i];
-		dpdv[i] = p0p1.CompProduct4(v0v1);
-
-		dgVector length2(p0p1.DotProduct4(p0p1));
-		dgVector mask(length2 > m_smallestLenght2);
-		length2 = (length2 & mask) | length2.AndNot(mask);
-		dgFloat32 length = length2.Sqrt().GetScalar();
-		dgFloat32 den = dgFloat32 (1.0f) / length;
-//		dgFloat32 den2 = den * den;
-		dgFloat32 lenghtRatio = m_restlength[i] * den;
-
-		dgFloat32 compression = dgFloat32(1.0f) - lenghtRatio;
-		dgVector fs(p0p1.Scale4(kSpring * compression));
-		//dgVector fd(p0p1.Scale4(kDamper * den * v0v1.DotProduct4(p0p1).GetScalar()));
-
-		accel[j0] -= fs;
-		accel[j1] += fs;
-
-		spring_A01[i] = ks_dt0 * compression;
-		spring_B01[i] = ks_dt1 * lenghtRatio / length2.GetScalar();
-//		damper_A01[i] = 
-	}
-
-	dgVector timeV(timestep);
-	for (dgInt32 i = 0; i < m_linksCount; i++) {
-		const dgVector dx0 (dx[i]);
-		const dgVector dv0 (dv[i]);
-		const dgVector dpdv0 (dpdv[i]);
-		const dgVector A01(spring_A01[i]);
-		const dgVector B01(spring_B01[i]);
-		const dgVector dxdx(dx0.CompProduct4(dx0));
-		const dgVector dxdy(dx0.CompProduct4(dx0.ShiftTripleRight()));
-		const dgVector diag0 (timeV.CompProduct4(A01 + B01.CompProduct4(dxdx)));
-		const dgVector offDiag0 (timeV.CompProduct4(A01 + B01.CompProduct4(dxdy)));
-		const dgVector dfdxdv0 (A01.CompProduct4(dv0) + B01.CompProduct4(dx[i].CompProduct4(dpdv0)));
-
-		const dgInt32 j0 = links[i].m_v0;
-		const dgInt32 j1 = links[i].m_v1;
-
-		accel[j0] += dfdxdv0;
-		accel[j1] -= dfdxdv0;
-		
-		diag[j0] -= diag0;
-		diag[j1] -= diag0;
-		offDiag[j0] -= offDiag0;
-		offDiag[j1] -= offDiag0;
-	}
-*/
 }
