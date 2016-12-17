@@ -238,17 +238,22 @@ dgFloat32 maxPenetration = dgFloat32(0.25f);
 		dgVector tangent1 (dgVector::m_zero);
 		dgVector accel1 (dgVector::m_zero);
 		dgVector worldPosit(origin + posit[i]);
+
+		bool isColliding = false;
 		if (worldPosit.m_y < 0.0f) {
+			isColliding = true;
 			dgVector n(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 			normal = n;
-			accel1 = invTimeStep.CompProduct4(m_veloc[i].CompProduct4(dgVector::m_negOne));
+			dgVector speed(normal.DotProduct4(m_veloc[i].CompProduct4(dgVector::m_negOne)));
+			accel1 = invTimeStep.CompProduct4(normal.CompProduct4(speed));
+
 
 /*
 			dgVector n (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 			dgFloat32 penetration = -worldPosit.m_y;
 			dgVector v2(veloc[i] + accel[i].CompProduct4(timestepV));
 			dgFloat32 boundSpeed = (n.DotProduct4(v2.CompProduct4(restitution))).GetScalar();
-			bool isColliding = false;
+			
 			if (boundSpeed * timestep > penetration) {
 				normal = n;
 				isColliding = true;
