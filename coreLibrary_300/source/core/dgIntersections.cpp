@@ -274,8 +274,9 @@ dgVector dgPointToTriangleDistance(const dgVector& point, const dgVector& p0, co
 	const dgFloat64 det = a00 * a11 - a01 * a01;
 	dgAssert(det >= dgFloat32(0.0f));
 	if (dgAbsf(det) > dgFloat32(1.0e-24f)) {
-		const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
-		const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
+		dgBigVector p0Point (point - p0);
+		const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
+		const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
 
 		const dgFloat64 beta = b1 * a00 - a01 * b0;
 		const dgFloat64 alpha = b0 * a11 - a01 * b1;
@@ -311,11 +312,13 @@ dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0
 			const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
 			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
 			if (desc11 > dgFloat64(0.0f)) {
+				dgBigVector p0Point (point - p0);
 				const dgFloat64 d2 = sqrt(desc22);
 				const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
-				const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
-				const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
-				const dgFloat64 b2 = -e30.DotProduct4(p0).GetScalar();
+				
+				const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
+				const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
+				const dgFloat64 b2 = e30.DotProduct4(p0Point).GetScalar();
 
 				dgFloat64 u1 = b0 * invd0;
 				dgFloat64 u2 = (b1 - l10 * u1) * invd1;
