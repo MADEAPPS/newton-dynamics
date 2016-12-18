@@ -208,7 +208,6 @@ dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, co
 {
 	dgFloat32 t;
 	dgVector dp (ray_p1 - ray_p0);
-	dgAssert (0);
 	t = dgClamp (dp.DotProduct3 (point - ray_p0) / dp.DotProduct3 (dp), dgFloat32(dgFloat32 (0.0f)), dgFloat32 (1.0f));
 	return ray_p0 + dp.Scale3 (t);
 }
