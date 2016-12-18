@@ -7687,6 +7687,33 @@ void NewtonMeshAddLayer(const NewtonMesh* const mesh, int layer)
 	meshEffect->AddLayer(layer);
 }
 
+void NewtonMeshAddNormal(const NewtonMesh* const mesh, dFloat x, dFloat y, dFloat z)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddNormal(x, y, z);
+}
+
+void NewtonMeshAddBinormal(const NewtonMesh* const mesh, dFloat x, dFloat y, dFloat z)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddBinormal(x, y, z);
+}
+
+void NewtonMeshAddUV0(const NewtonMesh* const mesh, dFloat u, dFloat v)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddUV0(u, v);
+}
+
+void NewtonMeshAddUV1(const NewtonMesh* const mesh, dFloat u, dFloat v)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddUV1(u, v);
+}
 
 void NewtonMeshEndBuild(const NewtonMesh* const mesh)
 {

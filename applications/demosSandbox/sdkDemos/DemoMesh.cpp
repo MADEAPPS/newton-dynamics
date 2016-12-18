@@ -536,42 +536,30 @@ NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& 
 	NewtonMesh* const mesh = NewtonMeshCreate(world);
 
 	NewtonMeshBeginBuild (mesh);
-	dAssert (0);
-/*
 	dMatrix rotation ((meshMatrix.Inverse4x4()).Transpose4X4());
 
 	dFloat point[3][12];
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		DemoSubMesh& segment = node->GetInfo();
 		for (int i = 0; i < segment.m_indexCount; i += 3) {
+			NewtonMeshBeginFace(mesh);
 			for (int j = 0; j < 3; j ++) {
 				int index = segment.m_indexes[i + j];
-
-				dVector p (meshMatrix.TransformVector(dVector (m_vertex[index * 3 + 0], m_vertex[index * 3 + 1], m_vertex[index * 3 + 2], 1.0f)));
-				point[j][0] = p.m_x;
-				point[j][1] = p.m_y;
-				point[j][2] = p.m_z;
-				point[j][3] = 0.0f;
-
-				//dgVector (m_normal[index * 3 + 0], m_normal[index * 3 + 1], m_normal[index * 3 + 2], dgFloat32 (0.0f));
+				dVector p (meshMatrix.TransformVector(dVector (m_vertex[index * 3 + 0], m_vertex[index * 3 + 1], m_vertex[index * 3 + 2], 0.0f)));
 				dVector n (rotation.RotateVector(dVector (m_normal[index * 3 + 0], m_normal[index * 3 + 1], m_normal[index * 3 + 2], 0.0f)));
 				dAssert ((n.DotProduct3(n)) > 0.0f);
 				n = n.Scale (1.0f / dSqrt (n.DotProduct3(n)));
-
-				point[j][4] = n.m_x;
-				point[j][5] = n.m_y;
-				point[j][6] = n.m_z;
-
-				point[j][7] = m_uv[index * 2 + 0];
-				point[j][8] = m_uv[index * 2 + 1];
-
-				point[j][9] = 0.0f;
-				point[j][10] = 0.0f;
+				
+				NewtonMeshAddPoint(mesh, p.m_x, p.m_y, p.m_z);
+				NewtonMeshAddNormal(mesh, n.m_x, n.m_y, n.m_z);
+				NewtonMeshAddMaterial(mesh, segment.m_textureHandle);
+				NewtonMeshAddUV0(mesh, m_uv[index * 2 + 0], m_uv[index * 2 + 1]);
 			}
-			NewtonMeshAddFace(mesh, 3, &point[0][0], sizeof (point) / 3, segment.m_textureHandle);
+			NewtonMeshEndFace(mesh);
+//			NewtonMeshAddFace(mesh, 3, &point[0][0], sizeof (point) / 3, segment.m_textureHandle);
 		}
 	}
-*/
+
 	NewtonMeshEndBuild(mesh);
 	return mesh;
 }

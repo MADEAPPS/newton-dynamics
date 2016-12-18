@@ -385,6 +385,10 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void AddPoint (dgFloat64 x, dgFloat64 y, dgFloat64 z);
 	void AddLayer (dgInt32 layer);
 	void AddMaterial (dgInt32 materialIndex);
+	void AddNormal (dgFloat32 x, dgFloat32 y, dgFloat32 z);
+	void AddBinormal (dgFloat32 x, dgFloat32 y, dgFloat32 z);
+	void AddUV0 (dgFloat32 u, dgFloat32 v);
+	void AddUV1 (dgFloat32 u, dgFloat32 v);
 	void EndBuildFace ();
 	void EndBuild (dgFloat64 tol, bool fixTjoint = true);
 

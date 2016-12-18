@@ -1864,22 +1864,29 @@ dgAssert(0);
 
 void dgMeshEffect::ApplyTransform (const dgMatrix& matrix)
 {
-dgAssert(0);
-/*
-	matrix.TransformTriplex(&m_points[0].m_x, sizeof (dgBigVector), &m_points[0].m_x, sizeof (dgBigVector), m_pointCount);
-	matrix.TransformTriplex(&m_attrib[0].m_vertex.m_x, sizeof (dgVertexAtribute), &m_attrib[0].m_vertex.m_x, sizeof (dgVertexAtribute), m_atribCount);
+	matrix.TransformTriplex(&m_points[0].m_x, sizeof (dgBigVector), &m_points[0].m_x, sizeof (dgBigVector), m_points.m_count);
 
 	dgMatrix rotation ((matrix.Inverse4x4()).Transpose4X4());
-	for (dgInt32 i = 0; i < m_atribCount; i ++) {
-		dgVector n (dgFloat32 (m_attrib[i].m_normal_x), dgFloat32 (m_attrib[i].m_normal_y), dgFloat32 (m_attrib[i].m_normal_z), dgFloat32 (0.0f));
+	for (dgInt32 i = 0; i < m_attrib.m_normalChannel.m_count; i ++) {
+		dgVector n (dgFloat32 (m_attrib.m_normalChannel[i].m_x), dgFloat32 (m_attrib.m_normalChannel[i].m_y), dgFloat32 (m_attrib.m_normalChannel[i].m_z), dgFloat32 (0.0f));
 		n = rotation.RotateVector(n);
 		dgAssert (n.DotProduct3(n) > dgFloat32 (0.0f));
 		n = n.Scale3 (dgRsqrt (n.DotProduct3(n)));
-		m_attrib[i].m_normal_x = n.m_x;
-		m_attrib[i].m_normal_y = n.m_y;
-		m_attrib[i].m_normal_z = n.m_z;
+		m_attrib.m_normalChannel[i].m_x = n.m_x;
+		m_attrib.m_normalChannel[i].m_y = n.m_y;
+		m_attrib.m_normalChannel[i].m_z = n.m_z;
 	}
-*/
+
+	for (dgInt32 i = 0; i < m_attrib.m_binormalChannel.m_count; i++) {
+		dgVector n(dgFloat32(m_attrib.m_binormalChannel[i].m_x), dgFloat32(m_attrib.m_binormalChannel[i].m_y), dgFloat32(m_attrib.m_binormalChannel[i].m_z), dgFloat32(0.0f));
+		n = rotation.RotateVector(n);
+		dgAssert(n.DotProduct3(n) > dgFloat32(0.0f));
+		n = n.Scale3(dgRsqrt(n.DotProduct3(n)));
+		m_attrib.m_binormalChannel[i].m_x = n.m_x;
+		m_attrib.m_binormalChannel[i].m_y = n.m_y;
+		m_attrib.m_binormalChannel[i].m_z = n.m_z;
+	}
+
 }
 
 dgMatrix dgMeshEffect::CalculateOOBB (dgBigVector& size) const
@@ -1953,6 +1960,41 @@ void dgMeshEffect::AddPoint (dgFloat64 x, dgFloat64 y, dgFloat64 z)
 void dgMeshEffect::AddLayer(dgInt32 layer)
 {
 	m_layers.PushBack(&layer);
+}
+
+
+void dgMeshEffect::AddNormal(dgFloat32 x, dgFloat32 y, dgFloat32 z)
+{
+	dgTriplex n;
+	n.m_x = x;
+	n.m_y = y;
+	n.m_z = z;
+	m_attrib.m_normalChannel.PushBack(&n);
+}
+
+void dgMeshEffect::AddBinormal(dgFloat32 x, dgFloat32 y, dgFloat32 z)
+{
+	dgTriplex n;
+	n.m_x = x;
+	n.m_y = y;
+	n.m_z = z;
+	m_attrib.m_binormalChannel.PushBack(&n);
+}
+
+void dgMeshEffect::AddUV0(dgFloat32 u, dgFloat32 v)
+{
+	dgVertexFormat::dgUV uv;
+	uv.m_u = u;
+	uv.m_v = v;
+	m_attrib.m_uv0Channel.PushBack(&uv);
+}
+
+void dgMeshEffect::AddUV1(dgFloat32 u, dgFloat32 v)
+{
+	dgVertexFormat::dgUV uv;
+	uv.m_u = u;
+	uv.m_v = v;
+	m_attrib.m_uv1Channel.PushBack(&uv);
 }
 
 void dgMeshEffect::AddMaterial (dgInt32 materialIndex)

@@ -1233,11 +1233,15 @@ extern "C" {
 	NEWTON_API void NewtonRemoveUnusedVertices(const NewtonMesh* const mesh, int* const vertexRemapTable);
 
 	NEWTON_API void NewtonMeshBeginBuild(const NewtonMesh* const mesh);
-	NEWTON_API void NewtonMeshBeginFace(const NewtonMesh* const mesh);
-	NEWTON_API void NewtonMeshAddPoint(const NewtonMesh* const mesh, dFloat64 x, dFloat64 y, dFloat64 z);
-	NEWTON_API void NewtonMeshAddLayer(const NewtonMesh* const mesh, int layerIndex);
-	NEWTON_API void NewtonMeshAddMaterial(const NewtonMesh* const mesh, int materialIndex);
-	NEWTON_API void NewtonMeshEndFace(const NewtonMesh* const mesh);
+		NEWTON_API void NewtonMeshBeginFace(const NewtonMesh* const mesh);
+			NEWTON_API void NewtonMeshAddPoint(const NewtonMesh* const mesh, dFloat64 x, dFloat64 y, dFloat64 z);
+			NEWTON_API void NewtonMeshAddLayer(const NewtonMesh* const mesh, int layerIndex);
+			NEWTON_API void NewtonMeshAddMaterial(const NewtonMesh* const mesh, int materialIndex);
+			NEWTON_API void NewtonMeshAddNormal(const NewtonMesh* const mesh, dFloat x, dFloat y, dFloat z);
+			NEWTON_API void NewtonMeshAddBinormal(const NewtonMesh* const mesh, dFloat x, dFloat y, dFloat z);
+			NEWTON_API void NewtonMeshAddUV0(const NewtonMesh* const mesh, dFloat u, dFloat v);
+			NEWTON_API void NewtonMeshAddUV1(const NewtonMesh* const mesh, dFloat u, dFloat v);
+		NEWTON_API void NewtonMeshEndFace(const NewtonMesh* const mesh);
 	NEWTON_API void NewtonMeshEndBuild(const NewtonMesh* const mesh);
 
 	NEWTON_API void NewtonMeshClearVertexFormat (NewtonMeshVertexFormat* const format);
