@@ -176,66 +176,91 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTriangle (dgInt32& indexOut)
 	} 
 	// this is a degenerated triangle. this should never happens
 	dgAssert(0);
-	return dgBigVector::m_zero;
+	return dgBigVector(0.0f);
 }
 
 DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum (dgInt32& indexOut)
 {
-	const dgBigVector p0(m_hullDiff[0]);
-	const dgBigVector p1(m_hullDiff[1]);
-	const dgBigVector p2(m_hullDiff[2]);
-	const dgBigVector p3(m_hullDiff[3]);
-	const dgBigVector e10(p1 - p0);
-	const dgBigVector e20(p2 - p0);
-	const dgBigVector e30(p3 - p0);
+	dgBigVector tetraDiffExtended[4];
+	tetraDiffExtended[0] = m_hullDiff[0];
+	tetraDiffExtended[1] = m_hullDiff[1];
+	tetraDiffExtended[2] = m_hullDiff[2];
+	tetraDiffExtended[3] = m_hullDiff[3];
 
-	const dgFloat64 d0 = sqrt (e10.DotProduct4(e10).GetScalar());
-	if (d0 > dgFloat64 (0.0f)) {
-		const dgFloat64 invd0 = dgFloat64 (1.0f) / d0;
-		const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
-		const dgFloat64 l20 = e30.DotProduct4(e10).GetScalar() * invd0;
-		const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
-		if (desc11 > dgFloat64 (0.0f)) {
-			const dgFloat64 d1 = sqrt (desc11);
-			const dgFloat64 invd1 = dgFloat64 (1.0f) / d1;
-			const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
-			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
-			if (desc11 > dgFloat64 (0.0f)) {
-				const dgFloat64 d2 = sqrt (desc22);
-				const dgFloat64 invd2 = dgFloat64 (1.0f) / d2;
-				const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
-				const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
-				const dgFloat64 b2 = -e30.DotProduct4(p0).GetScalar();
+	dgInt32 i0 = m_rayCastSimplex[0][0];
+	dgInt32 i1 = m_rayCastSimplex[0][1];
+	dgInt32 i2 = m_rayCastSimplex[0][2];
+	dgInt32 i3 = m_rayCastSimplex[0][3];
+	const dgBigVector& p0 = tetraDiffExtended[i0];
+	const dgBigVector& p1 = tetraDiffExtended[i1]; 
+	const dgBigVector& p2 = tetraDiffExtended[i2];
+	const dgBigVector& p3 = tetraDiffExtended[i3];
 
-				dgFloat64 u0 = b0 * invd0; 
-				dgFloat64 u1 = (b1 - l10 * u0) * invd1;
-				dgFloat64 u2 = (b2 - l20 * u0- l21 * u1) * invd2;
+	dgBigVector p10 (p1 - p0);
+	dgBigVector p20 (p2 - p0);
+	dgBigVector p30 (p3 - p0);
+	dgFloat64 volume = p30.DotProduct3(p10.CrossProduct3(p20));
+	if (volume < dgFloat32 (0.0f)) {
+		volume = -volume;
+		dgSwap (m_hullSum[i2], m_hullSum[i3]);
+		dgSwap (m_hullDiff[i2], m_hullDiff[i3]);
+		dgSwap (tetraDiffExtended[i2], tetraDiffExtended[i3]);
+	}
+	if (volume < dgFloat32 (1.0e-8f)) {
+		dgAssert (0);
+	}
 
-				u2 = u2 * invd0;
-				u1 = (u1 - l21 * u2) * invd1;
-				u0 = (u0 - l10 * u1 - l20 * u2) * invd2;
-				if (u2 < dgFloat64(0.0f)) {
-					// this looks funny but it is correct
-				} else if (u1 < dgFloat64(0.0f)) {
-					m_hullSum[2] = m_hullSum[3];
-					m_hullDiff[2] = m_hullDiff[3];
-				} else if (u0 < dgFloat64 (0.0f)) {
-					m_hullSum[1] = m_hullSum[3];
-					m_hullDiff[1] = m_hullDiff[3];
-				} else if (u0 + u1 + u2 > dgFloat64 (1.0f)) {
-					m_hullSum[0] = m_hullSum[3];
-					m_hullDiff[0] = m_hullDiff[3];
-				} else {
-					return dgBigVector::m_zero;
-				}
-				indexOut = 3;
-				return ReduceTriangle (indexOut);
-			}
+	dgInt32 faceIndex = -1;
+	dgFloat64 minDist = dgFloat32 (0.0f);
+	const dgBigVector origin (dgFloat32 (0.0f));
+	for (dgInt32 i = 0; i < 4; i ++) {
+		dgInt32 i0 = m_rayCastSimplex[i][0];
+		dgInt32 i1 = m_rayCastSimplex[i][1];
+		dgInt32 i2 = m_rayCastSimplex[i][2];
+
+		const dgBigVector& p0 = tetraDiffExtended[i0];
+		const dgBigVector& p1 = tetraDiffExtended[i1]; 
+		const dgBigVector& p2 = tetraDiffExtended[i2];
+
+		dgBigVector p10 (p1 - p0);
+		dgBigVector p20 (p2 - p0);
+		dgBigVector normal (p10.CrossProduct3(p20));
+		dgFloat64 area = normal.DotProduct3(normal);
+		dgAssert (fabs (area) > dgFloat32 (0.0f));
+		normal = normal.Scale3 (dgFloat32 (1.0f) / sqrt (area));
+		dgFloat64 dist = normal.DotProduct3(origin - p0);
+		if (dist < minDist) {
+			minDist = dist;
+			faceIndex = i;
 		}
 	}
-	// this is a degenerated tetra. this should never happens
-	dgAssert (0);
-	return dgBigVector::m_zero;
+
+	if (faceIndex != -1) {
+		dgVector tmp[3];
+		dgInt32 i0 = m_rayCastSimplex[faceIndex][0];
+		dgInt32 i1 = m_rayCastSimplex[faceIndex][1];
+		dgInt32 i2 = m_rayCastSimplex[faceIndex][2];
+
+		tmp[0] = m_hullSum[i0];
+		tmp[1] = m_hullSum[i1];
+		tmp[2] = m_hullSum[i2];
+		m_hullSum[0] = tmp[0];
+		m_hullSum[1] = tmp[1];
+		m_hullSum[2] = tmp[2];
+
+		tmp[0] = m_hullDiff[i0];
+		tmp[1] = m_hullDiff[i1];
+		tmp[2] = m_hullDiff[i2];
+		m_hullDiff[0] = tmp[0];
+		m_hullDiff[1] = tmp[1];
+		m_hullDiff[2] = tmp[2];
+
+		indexOut = 3;
+		return ReduceTriangle (indexOut);
+	}
+
+ 	indexOut = 4;
+	return origin;
 }
 
 
@@ -1294,8 +1319,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVect
 						contactsOut[0] = p0 + p10.Scale4(clip0 - pl0);
 						contactsOut[1] = p0 + p10.Scale4(clip1 - pl0);
 					}
-				}
-				else {
+				} else {
 					count = 1;
 					dgVector c0;
 					dgVector c1;
