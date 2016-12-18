@@ -89,7 +89,7 @@ dgArray<T>::~dgArray ()
 
 
 template<class T>
-const T& dgArray<T>::operator[] (dgInt32 i) const
+DG_INLINE const T& dgArray<T>::operator[] (dgInt32 i) const
 { 
 	dgAssert (i >= 0);
 	while (i >= m_maxSize) {
@@ -100,7 +100,7 @@ const T& dgArray<T>::operator[] (dgInt32 i) const
 
 
 template<class T>
-T& dgArray<T>::operator[] (dgInt32 i)
+DG_INLINE T& dgArray<T>::operator[] (dgInt32 i)
 {
 	dgAssert (i >= 0);
 	while (i >= m_maxSize) {

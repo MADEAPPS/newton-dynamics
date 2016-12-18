@@ -94,6 +94,15 @@ class dgCollisionHeightField: public dgCollisionMesh
 	
 	void AddDisplacement (dgVector* const vertex, dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1) const;
 
+	DG_INLINE dgInt32 dgFastInt(dgFloat32 x) const
+	{
+		dgInt32 i = dgInt32(x);
+		if (dgFloat32(i) > x) {
+			i--;
+		}
+		return i;
+	}
+
 	dgVector m_minBox;
 	dgVector m_maxBox;
 

@@ -145,6 +145,7 @@
     #endif
 #endif
 
+//#define DG_SCALAR_VECTOR_CLASS
 
 #ifdef DG_SSE4_INSTRUCTIONS_SET
 	#undef DG_SCALAR_VECTOR_CLASS
@@ -686,67 +687,18 @@ dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBy
 	#define _stricmp(x,y) strcasecmp(x,y)
 #endif
 
-
-
-#ifndef _NEWTON_USE_DOUBLE
-DG_INLINE dgInt32 dgFastInt (dgFloat64 x)
-{
-	dgInt32 i = dgInt32 (x);
-	if (dgFloat64 (i) > x) {
-		i --;
-	}
-	return i;
-}
-#endif
-
-DG_INLINE dgInt32 dgFastInt (dgFloat32 x)
-{
-	dgInt32 i = dgInt32 (x);
-	if (dgFloat32 (i) > x) {
-		i --;
-	}
-	return i;
-}
-
-DG_INLINE dgFloat32 dgFloor(dgFloat32 x)
-{
-#ifdef _MSC_VER
-	dgFloat32 ret = dgFloat32 (dgFastInt (x));
-	dgAssert (ret == floor (x));
-	return  ret;
-#else 
-	return floor (x);
-#endif
-}
-
-DG_INLINE dgFloat32 dgCeil(dgFloat32 x)
-{
-#ifdef _MSC_VER
-	dgFloat32 ret = dgFloor(x);
-	if (ret < x) {
-		ret += dgFloat32 (1.0f);
-	}
-	dgAssert (ret == ceil (x));
-	return  ret;
-#else 
-	return ceil (x);
-#endif
-}
-
-DG_INLINE dgFloat32 dgRsqrt(dgFloat32 x)	
-{
-	return dgFloat32 (1.0f) / dgFloat32 (sqrt(x));		
-}
-
 #define dgSqrt(x)			dgFloat32 (sqrt(x))	
 #define dgSin(x)			dgFloat32 (sin(x))
 #define dgCos(x)			dgFloat32 (cos(x))
 #define dgAsin(x)			dgFloat32 (asin(x))
 #define dgAcos(x)			dgFloat32 (acos(x))
-#define dgAtan2(x,y)		dgFloat32 (atan2(x,y))
 #define dgLog(x)			dgFloat32 (log(x))
+#define dgCeil(x)			dgFloat32 (ceil(x))
+#define dgFloor(x)			dgFloat32 (floor(x))	
 #define dgPow(x,y)			dgFloat32 (pow(x,y))
 #define dgFmod(x,y)			dgFloat32 (fmod(x,y))
+#define dgAtan2(x,y)		dgFloat32 (atan2(x,y))
+#define dgRsqrt(x)			(dgFloat32 (1.0f) / dgSqrt(x))
 #define dgClearFP()			_clearfp() 
 #define dgControlFP(x,y)	_controlfp(x,y)
 

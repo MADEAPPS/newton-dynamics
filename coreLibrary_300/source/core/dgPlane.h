@@ -37,8 +37,6 @@ class dgPlane: public dgVector
 	dgPlane Scale (dgFloat32 s) const;
 	dgFloat32 Evalue (const dgFloat32* const point) const;
 	dgFloat32 Evalue (const dgVector &point) const;
-
-
 }DG_GCC_VECTOR_ALIGMENT;
 
 

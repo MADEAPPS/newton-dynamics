@@ -147,8 +147,8 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 //	dgBigVector minP (dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (0.0f));
 //	dgBigVector maxP (dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (0.0f));
 
-	dgBigVector xc(dgFloat64(0.0f), dgFloat64(0.0f), dgFloat64(0.0f), dgFloat64(0.0f));
-	dgBigVector x2c(dgFloat64(0.0f), dgFloat64(0.0f), dgFloat64(0.0f), dgFloat64(0.0f));
+	dgBigVector xc(dgFloat64(0.0f));
+	dgBigVector x2c(dgFloat64(0.0f));
 	dgBigVector minP (dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (0.0f));
 	dgBigVector maxP (dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (0.0f));
 
@@ -205,7 +205,7 @@ static dgInt32 SortVertices (dgFloat64* const vertexList,  dgInt32 stride, dgInt
 	dgFloat64 sweptWindow = dgFloat64 (2.0f) * tol;
 	sweptWindow += dgFloat64 (1.0e-4f);
 
-	x2c = x2c.Scale4 (vertexCount) - xc.CompProduct4(xc);
+	x2c = x2c.Scale4 (dgFloat32 (vertexCount)) - xc.CompProduct4(xc);
 //	x2c = vertexCount * x2c - xc * xc;
 //	y2c = vertexCount * y2c - yc * yc;
 //	z2c = vertexCount * z2c - zc * zc;

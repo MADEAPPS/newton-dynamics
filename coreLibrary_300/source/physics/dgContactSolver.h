@@ -90,20 +90,16 @@ class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>
 	
 	DG_INLINE void CalculateContactFromFeacture(dgInt32 featureType);
 	DG_INLINE dgPerimenterEdge* ReduceContacts(dgPerimenterEdge* poly, dgInt32 maxCount) const;
-	DG_INLINE void ReduceDegeneratedTriangle();
-	DG_INLINE dgVector ReduceLine(dgInt32& indexOut);
-	DG_INLINE dgVector ReduceTriangle(dgInt32& indexOut);
-	DG_INLINE dgVector ReduceTetrahedrum(dgInt32& indexOut);
-	DG_INLINE dgVector ReduceLineLarge(dgInt32& indexOut);
-	DG_INLINE dgVector ReduceTriangleLarge (dgInt32& indexOut);
-	DG_INLINE dgVector ReduceTetrahedrumLarge (dgInt32& indexOut);
+//	DG_INLINE void ReduceDegeneratedTriangle();
+	DG_INLINE dgBigVector ReduceLine(dgInt32& indexOut);
+	DG_INLINE dgBigVector ReduceTriangle (dgInt32& indexOut);
+	DG_INLINE dgBigVector ReduceTetrahedrum (dgInt32& indexOut);
 
 	bool SanityCheck() const;
 	dgInt32 ConvexPolygonsIntersection(const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgInt32 maxContacts) const;
 	dgInt32 ConvexPolygonToLineIntersection(const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgVector* const mem) const;
 	dgInt32 CalculateContacts (const dgVector& point0, const dgVector& point1, const dgVector& normal);
-	dgInt32 CalculateClosestSimplex();
-	dgInt32 CalculateClosestSimplexLarge ();
+	dgInt32 CalculateClosestSimplex ();
 	dgInt32 CalculateIntersectingPlane(dgInt32 count);
 
 	dgVector m_normal;
