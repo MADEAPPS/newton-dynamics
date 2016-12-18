@@ -3728,8 +3728,7 @@ void NewtonCollisionSupportVertex(const NewtonCollision* const collisionPtr, con
 	dgVector searchDir (matrix.UnrotateVector(dgVector (dir[0], dir[1], dir[2], dgFloat32 (0.0f)))); 
 	searchDir = searchDir.Scale3 (dgRsqrt (searchDir.DotProduct3(searchDir)));
 
-	dgInt32 index; 
-	dgVector vertexOut (matrix.TransformVector(collision->SupportVertex(searchDir, &index)));
+	dgVector vertexOut (matrix.TransformVector(collision->SupportVertex(searchDir)));
 
 	vertex[0] = vertexOut[0];
 	vertex[1] = vertexOut[1];

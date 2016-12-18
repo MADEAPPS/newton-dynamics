@@ -1262,7 +1262,7 @@ dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const
 	dgInt32 ix = (dir[0] > dgFloat32 (0.0f)) ? 1 : 0;
 	dgInt32 iy = (dir[1] > dgFloat32 (0.0f)) ? 1 : 0;
 	dgInt32 iz = (dir[2] > dgFloat32 (0.0f)) ? 1 : 0;
-	dgVector supportVertex (dgFloat32 (0.0f), dgFloat32 (0.0f),  dgFloat32 (0.0f),  dgFloat32 (0.0f));   
+	dgVector supportVertex (dgFloat32 (0.0f));   
 
 	while (stack) {
 
@@ -1272,11 +1272,11 @@ dgVector dgCollisionCompound::SupportVertex (const dgVector& dir, dgInt32* const
 			const dgNodeBase* const me = stackPool[stack];
 
 			if (me->m_type == m_leaf) {
-				dgInt32 index; 
+				//dgInt32 index; 
 				dgCollisionInstance* const subShape = me->GetShape();
 				const dgMatrix& matrix = subShape->GetLocalMatrix(); 
 				dgVector newDir (matrix.UnrotateVector(dir)); 
-				dgVector vertex (matrix.TransformVector (subShape->SupportVertex(newDir, &index)));		
+				dgVector vertex (matrix.TransformVector (subShape->SupportVertex(newDir)));		
 				dgFloat32 dist = dir.DotProduct3(vertex);
 				if (dist > maxProj) {
 					maxProj = dist;

@@ -165,17 +165,17 @@ void UniformScaledCollision(DemoEntityManager* const scene)
 //	dMatrix shapeOffsetMatrix(dGetIdentityMatrix);
 
 	int count = 5;
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size1, count, count, 4.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size1, count, count, 4.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size1, count, count, 4.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size1, count, count, 4.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }
 
 
@@ -185,10 +185,11 @@ void NonUniformScaledCollision(DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-	CreateLevelMesh(scene, "flatPlane.ngd", 1);
-	//	CreateLevelMesh (scene, "sponza.ngd", 1);
-	//	CreateLevelMesh (scene, "cattle.ngd", fileName);
-	//	CreateLevelMesh (scene, "playground.ngd", 1);
+	AddFloorBox(scene, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f));
+	//CreateLevelMesh(scene, "flatPlane.ngd", 1);
+	//CreateLevelMesh (scene, "sponza.ngd", 1);
+	//CreateLevelMesh (scene, "cattle.ngd", fileName);
+	//CreateLevelMesh (scene, "playground.ngd", 1);
 
 	dMatrix camMatrix(dRollMatrix(-20.0f * 3.1416f / 180.0f) * dYawMatrix(-45.0f * 3.1416f / 180.0f));
 	dQuaternion rot(camMatrix);
@@ -219,14 +220,14 @@ void NonUniformScaledCollision(DemoEntityManager* const scene)
 	AddNonUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }
 
-
 void ScaledMeshCollision (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	AddFloorBox(scene, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f));
+	//CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "flatPlaneDoubleFace.ngd", 1);
 	//CreateLevelMesh (scene, "sponza.ngd", 0);
 	//CreateLevelMesh (scene, "cattle.ngd", fileName);

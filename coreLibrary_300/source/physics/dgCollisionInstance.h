@@ -113,7 +113,7 @@ class dgCollisionInstance
 	dgMatrix GetScaledTransform(const dgMatrix& matrix) const;
 	void DebugCollision  (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 
-	dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
+	dgVector SupportVertex (const dgVector& dir) const;
 	dgInt32 CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const;
 
 	dgInt32 CalculateSignature () const;
@@ -357,7 +357,7 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetBoxMaxRadius () const
 } 
 
 
-DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt32* const vertexIndex) const
+DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir) const
 {
 	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-2f));
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
@@ -365,18 +365,18 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt
 	{
 		case m_unit:
 		{
-			return m_childShape->SupportVertex (dir, vertexIndex);
+			return m_childShape->SupportVertex (dir, NULL);
 		}
 		case m_uniform:
 		{
-			return m_scale.CompProduct4 (m_childShape->SupportVertex (dir, vertexIndex));
+			return m_scale.CompProduct4 (m_childShape->SupportVertex (dir, NULL));
 		}
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
 			dgVector dir1 (m_scale.CompProduct4(dir));
 			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
-			return m_scale.CompProduct4(m_childShape->SupportVertex (dir1, vertexIndex));
+			return m_scale.CompProduct4(m_childShape->SupportVertex (dir1, NULL));
 		}
 
 		case m_global:
@@ -384,7 +384,7 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir, dgInt
 		{
 			dgVector dir1 (m_aligmentMatrix.UnrotateVector(m_scale.CompProduct4(dir)));
 			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
-			return m_scale.CompProduct4(m_aligmentMatrix.TransformVector (m_childShape->SupportVertex (dir1, vertexIndex)));
+			return m_scale.CompProduct4(m_aligmentMatrix.TransformVector (m_childShape->SupportVertex (dir1, NULL)));
 		}
 	}
 }
