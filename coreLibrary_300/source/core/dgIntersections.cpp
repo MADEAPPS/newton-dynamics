@@ -204,7 +204,7 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 }
 
 
-dgVector dgApi dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, const dgVector& ray_p1)
+dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, const dgVector& ray_p1)
 {
 	dgFloat32 t;
 	dgVector dp (ray_p1 - ray_p0);
@@ -213,8 +213,9 @@ dgVector dgApi dgPointToRayDistance (const dgVector& point, const dgVector& ray_
 	return ray_p0 + dp.Scale3 (t);
 }
 
-dgVector dgPointToTriangleDistance(const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2, const dgVector& normal)
+dgVector dgPointToTriangleDistance(const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2)
 {
+/*
 #ifdef _DEBUG
 	dgVector faceNormal((p1 - p0).CrossProduct3(p2 - p0));
 	dgFloat64 faceNormal2 = faceNormal.DotProduct3(faceNormal);
@@ -262,10 +263,87 @@ dgVector dgPointToTriangleDistance(const dgVector& point, const dgVector& p0, co
 	} else {
 		return point - normal.Scale3(normal.DotProduct3(point - p0) / normal.DotProduct3(normal));
 	}
+*/
+
+	const dgBigVector e10(p1 - p0);
+	const dgBigVector e20(p2 - p0);
+	const dgFloat64 a00 = e10.DotProduct4(e10).GetScalar();
+	const dgFloat64 a11 = e20.DotProduct4(e20).GetScalar();
+	const dgFloat64 a01 = e10.DotProduct4(e20).GetScalar();
+
+	const dgFloat64 det = a00 * a11 - a01 * a01;
+	dgAssert(det >= dgFloat32(0.0f));
+	if (dgAbsf(det) > dgFloat32(1.0e-24f)) {
+		const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
+		const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
+
+		const dgFloat64 beta = b1 * a00 - a01 * b0;
+		const dgFloat64 alpha = b0 * a11 - a01 * b1;
+		if (beta < dgFloat32(0.0f)) {
+			return dgPointToRayDistance (point, p0, p1);
+		} else if (alpha < dgFloat32(0.0f)) {
+			return dgPointToRayDistance (point, p0, p2);
+		} else if ((alpha + beta) > det) {
+			return dgPointToRayDistance (point, p1, p2);
+		}
+		return p0 + (e10.Scale4(alpha) + e20.Scale4(beta)).Scale4(dgFloat64(1.0f) / det);
+	}
+	// this is a degenerated triangle. this should never happens
+	dgAssert(0);
+	return p0;
 }
 
+dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2, const dgVector& p3)
+{
+	const dgBigVector e10(p1 - p0);
+	const dgBigVector e20(p2 - p0);
+	const dgBigVector e30(p3 - p0);
 
-#include "dgSPDMatrix.h"
+	const dgFloat64 d0 = sqrt(e10.DotProduct4(e10).GetScalar());
+	if (d0 > dgFloat64(0.0f)) {
+		const dgFloat64 invd0 = dgFloat64(1.0f) / d0;
+		const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
+		const dgFloat64 l20 = e30.DotProduct4(e10).GetScalar() * invd0;
+		const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
+		if (desc11 > dgFloat64(0.0f)) {
+			const dgFloat64 d1 = sqrt(desc11);
+			const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
+			const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
+			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
+			if (desc11 > dgFloat64(0.0f)) {
+				const dgFloat64 d2 = sqrt(desc22);
+				const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
+				const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
+				const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
+				const dgFloat64 b2 = -e30.DotProduct4(p0).GetScalar();
+
+				dgFloat64 u1 = b0 * invd0;
+				dgFloat64 u2 = (b1 - l10 * u1) * invd1;
+				dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2;
+
+				u3 = u3 * invd0;
+				u2 = (u2 - l21 * u3) * invd1;
+				u1 = (u1 - l10 * u2 - l20 * u3) * invd2;
+				if (u3 < dgFloat64(0.0f)) {
+					// this looks funny but it is correct
+					return dgPointToTriangleDistance(point, p0, p1, p2);
+				} else if (u2 < dgFloat64(0.0f)) {
+					return dgPointToTriangleDistance(point, p0, p1, p3);
+				} else if (u1 < dgFloat64(0.0f)) {
+					return dgPointToTriangleDistance(point, p0, p2, p3);
+				} else if (u1 + u2 + u3 > dgFloat64(1.0f)) {
+					return dgPointToTriangleDistance(point, p1, p2, p3);
+				}
+				return p0 + e10.Scale4(u1) + e20.Scale4(u2) + e30.Scale4(u3);
+			}
+		}
+	}
+	// this is a degenerated tetra. this should never happens
+	dgAssert(0);
+	return p0;
+}
+
+//#include "dgSPDMatrix.h"
 void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, const dgVector& ray_q0, const dgVector& ray_q1, dgVector& pOut, dgVector& qOut)
 {
 	dgFloat32 sN;
