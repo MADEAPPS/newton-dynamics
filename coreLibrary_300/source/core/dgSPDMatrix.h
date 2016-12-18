@@ -520,7 +520,7 @@ DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, T* const m
 
 
 template<class T>
-DG_INLINE void dgCholeskyRestore(dgInt32 size, T* const matrix, const T* const diagonal, dgInt32 n, dgInt32 subSize)
+DG_INLINE void dgCholeskyRestore(dgInt32 size, dgInt32 n, T* const matrix, const T* const diagonal, dgInt32 subSize)
 {
 	dgInt32 stride = n * size;
 	for (dgInt32 i = n; i < subSize; i++) {
@@ -535,7 +535,7 @@ DG_INLINE void dgCholeskyRestore(dgInt32 size, T* const matrix, const T* const d
 
 
 template<class T>
-DG_INLINE void dgCholeskySolve(dgInt32 size, const T* const matrix, T* const x, dgInt32 n)
+DG_INLINE void dgCholeskySolve(dgInt32 size, dgInt32 n, const T* const matrix, T* const x)
 {
 	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < n; i++) {
@@ -575,7 +575,7 @@ DG_INLINE void dgCalculateDelta_x(dgInt32 size, T dir, dgInt32 n, const T* const
 	for (dgInt32 i = 0; i < n; i++) {
 		delta_x[i] = -row[i] * dir;
 	}
-	dgCholeskySolve(size, matrix, delta_x, n);
+	dgCholeskySolve(size, n, matrix, delta_x);
 	delta_x[n] = dir;
 }
 
@@ -673,7 +673,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 	}
 
 	if (index > 0) {
-		dgCholeskySolve(size, matrix, r0, index);
+		dgCholeskySolve(size, index, matrix, r0);
 		for (dgInt32 i = 0; i < index; i++) {
 			x0[i] -= r0[i];
 			r0[i] = T(dgFloat32 (0.0f));
@@ -796,7 +796,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 				x0[swapIndex] = clamp_x;
 				delta_x[index] = T(dgFloat32 (0.0f));
 
-				dgCholeskyRestore(size, matrix, diagonal, swapIndex, index);
+				dgCholeskyRestore(size, index, matrix, diagonal, swapIndex);
 				dgPermuteRows(size, swapIndex, index - 1, matrix, x0, r0, low, high, diagonal, permute);
 				dgPermuteRows(size, index - 1, index, matrix, x0, r0, low, high, diagonal, permute);
 				dgPermuteRows(size, clampedIndex - 1, index, matrix, x0, r0, low, high, diagonal, permute);
@@ -897,7 +897,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* co
 
 	bool ret = false;
 	if (unboundedSize > 0) {
-		dgCholeskySolve(size, matrix, x, unboundedSize);
+		dgCholeskySolve(size, unboundedSize, matrix, x);
 		dgInt32 base = unboundedSize * size;
 		for (dgInt32 i = unboundedSize; i < size; i++) {
 			const T* const row = &matrix[base];
@@ -924,7 +924,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* co
 			for (dgInt32 j = 0; j < unboundedSize; j++) {
 				g[j] = -row[j];
 			}
-			dgCholeskySolve(size, matrix, g, unboundedSize);
+			dgCholeskySolve(size, unboundedSize, matrix, g);
 
 			T* const arow = &a[i * boundedSize];
 			for (dgInt32 j = 0; j < boundedSize; j++) {

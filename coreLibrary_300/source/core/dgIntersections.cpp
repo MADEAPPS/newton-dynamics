@@ -321,9 +321,9 @@ dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0
 				dgFloat64 u2 = (b1 - l10 * u1) * invd1;
 				dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2;
 
-				u3 = u3 * invd0;
+				u3 = u3 * invd2;
 				u2 = (u2 - l21 * u3) * invd1;
-				u1 = (u1 - l10 * u2 - l20 * u3) * invd2;
+				u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
 				if (u3 < dgFloat64(0.0f)) {
 					// this looks funny but it is correct
 					return dgPointToTriangleDistance(point, p0, p1, p2);

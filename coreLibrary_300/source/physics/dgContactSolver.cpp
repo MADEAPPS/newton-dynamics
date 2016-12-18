@@ -206,23 +206,43 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum (dgInt32& indexOut)
 				const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
 				const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
 				const dgFloat64 b2 = -e30.DotProduct4(p0).GetScalar();
+/*
+dgFloat64 a[3][3];
+dgFloat64 x[3];
+a[0][0] = e10.DotProduct4(e10).GetScalar();
+a[1][1] = e20.DotProduct4(e20).GetScalar();
+a[2][2] = e30.DotProduct4(e30).GetScalar();
+a[0][1] = e20.DotProduct4(e10).GetScalar();
+a[1][0] = a[0][1];
+a[0][2] = e30.DotProduct4(e10).GetScalar();
+a[2][0] = a[0][2];
+a[1][2] = e30.DotProduct4(e20).GetScalar();
+a[2][1] = a[1][2];
+x[0] = b0;
+x[1] = b1;
+x[2] = b2;
+dgCholeskyFactorizationAddRow(3, 0, &a[0][0]);
+dgCholeskyFactorizationAddRow(3, 1, &a[0][0]);
+dgCholeskyFactorizationAddRow(3, 2, &a[0][0]);
+dgCholeskySolve(3, 3, &a[0][0], x);
+*/
 
-				dgFloat64 u0 = b0 * invd0;
-				dgFloat64 u1 = (b1 - l10 * u0) * invd1;
-				dgFloat64 u2 = (b2 - l20 * u0 - l21 * u1) * invd2;
+				dgFloat64 u1 = b0 * invd0;
+				dgFloat64 u2 = (b1 - l10 * u1) * invd1;
+				dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2;
 
-				u2 = u2 * invd0;
-				u1 = (u1 - l21 * u2) * invd1;
-				u0 = (u0 - l10 * u1 - l20 * u2) * invd2;
-				if (u2 < dgFloat64(0.0f)) {
+				u3 = u3 * invd2;
+				u2 = (u2 - l21 * u3) * invd1;
+				u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
+				if (u3 < dgFloat64(0.0f)) {
 					// this looks funny but it is correct
-				} else if (u1 < dgFloat64(0.0f)) {
+				} else if (u2 < dgFloat64(0.0f)) {
 					m_hullSum[2] = m_hullSum[3];
 					m_hullDiff[2] = m_hullDiff[3];
-				} else if (u0 < dgFloat64(0.0f)) {
+				} else if (u1 < dgFloat64(0.0f)) {
 					m_hullSum[1] = m_hullSum[3];
 					m_hullDiff[1] = m_hullDiff[3];
-				} else if (u0 + u1 + u2 > dgFloat64(1.0f)) {
+				} else if (u1 + u2 + u3 > dgFloat64(1.0f)) {
 					m_hullSum[0] = m_hullSum[3];
 					m_hullDiff[0] = m_hullDiff[3];
 				} else {
@@ -280,7 +300,6 @@ DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplex ()
 	dgInt32 cycling = 0;
 	dgFloat64 minDist = dgFloat32 (1.0e20f);
 	do {
-
 		dgFloat64 dist = v.DotProduct4(v).GetScalar();
 		if (dist < dgFloat32 (1.0e-9f)) {
 			// very deep penetration, resolve with generic minkowsky solver
@@ -297,15 +316,15 @@ DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplex ()
 			return -index;
 		}
 
-		dgVector dir (v.Scale4 (-dgRsqrt(dist)));
+		const dgVector dir (v.Scale4 (-dgRsqrt(dist)));
 		dgAssert (dir.m_w == dgFloat32 (0.0f));
 		SupportVertex (dir, index);
 
-		const dgVector w (m_hullDiff[index]);
-		dgVector wv (w - v);
+		const dgBigVector w (m_hullDiff[index]);
+		const dgVector wv (w - v);
 		dgAssert (wv.m_w == dgFloat32 (0.0f));
-		dist = dir.DotProduct4(wv).GetScalar();
-		if (dist < dgFloat64 (1.0e-3f)) {
+		const dgFloat64 dist1 = dir.DotProduct4(wv).GetScalar();
+		if (dist1 < dgFloat64 (1.0e-3f)) {
 			m_normal = dir;
 			break;
 		}
@@ -333,7 +352,6 @@ DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplex ()
 		}
 
 		iter ++;
-		cycling ++;
 	} while (iter < DG_CONNICS_CONTATS_ITERATIONS); 
 	return (index < 4) ? index : -4;
 }
@@ -1345,9 +1363,7 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 
 		do {
 			dgAssert (v.m_w == dgFloat32 (0.0f));
-			dgBigVector dist (v.DotProduct4(v));
-			dgFloat64 distance = dist.m_x;
-
+			const dgFloat64 distance = v.DotProduct4(v).GetScalar();
 			if (distance < dgFloat32 (1.0e-9f)) {
 				index = -1; 
 				break;
@@ -1364,15 +1380,15 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 				break;
 			}
 
-			//dgVector dir (v.Scale4 (-dgRsqrt(dist)));
-			dgVector dir (v.CompProduct4(dist.InvSqrt().CompProduct4(dgVector::m_negOne)));
+			dgVector dir (v.Scale4 (-dgRsqrt(dgFloat32 (distance))));
+			//dgVector dir (v.CompProduct4(dist.InvSqrt().CompProduct4(dgVector::m_negOne)));
 			dgAssert (dir.m_w == dgFloat32 (0.0f));
 			m_hullDiff[index] = collision->SupportVertex (dir, NULL) - point;
-			const dgVector w (m_hullDiff[index]);
-			dgVector wv (w - v);
+			const dgBigVector w (m_hullDiff[index]);
+			const dgVector wv (w - v);
 			dgAssert (wv.m_w == dgFloat32 (0.0f));
-			distance = dir.DotProduct4(wv).GetScalar();
-			if (distance < dgFloat64 (1.0e-3f)) {
+			const dgFloat32 distance1 = dir.DotProduct4(wv).GetScalar();
+			if (distance1 < dgFloat64 (1.0e-3f)) {
 				normal = dir;
 				break;
 			}
@@ -1400,7 +1416,6 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 			}
 
 			iter ++;
-			cycling ++;
 		} while (iter < DG_CONNICS_CONTATS_ITERATIONS); 
 
 		dgAssert (index);
