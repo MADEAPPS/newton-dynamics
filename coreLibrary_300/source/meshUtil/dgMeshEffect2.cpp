@@ -29,55 +29,31 @@
 // create a convex hull
 dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, const dgFloat64* const vertexCloud, dgInt32 count, dgInt32 strideInByte, dgFloat64 distTol)
 	:dgPolyhedra(allocator)
-	,m_layers(allocator)
 	,m_points(allocator)
 	,m_attrib(allocator)
 {
-//	Init();
-
 	if (count >= 4) {
 		dgConvexHull3d convexHull (allocator, vertexCloud, strideInByte, count, distTol);
 		if (convexHull.GetCount()) {
-
-			dgInt32 vertexCount = convexHull.GetVertexCount();
-			dgStack<dgVector> pointsPool (convexHull.GetVertexCount());
-			dgVector* const points = &pointsPool[0];
-			for (dgInt32 i = 0; i < vertexCount; i ++) {
-				points[i] = convexHull.GetVertex(i);
-			}
-			dgVector uv(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-			dgVector normal (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-
-			dgInt32 triangleCount = convexHull.GetCount();
-			dgStack<dgInt32> faceCountPool (triangleCount);
-			dgStack<dgInt32> materialsPool (triangleCount);
-			dgStack<dgInt32> vertexIndexListPool (triangleCount * 3);
-			dgStack<dgInt32> normalIndexListPool (triangleCount * 3);
-
-
-			memset (&materialsPool[0], 0, triangleCount * sizeof (dgInt32));
-			memset (&normalIndexListPool[0], 0, 3 * triangleCount * sizeof (dgInt32));
+			dgStack<dgInt32> faceCountPool (convexHull.GetCount());
+			dgStack<dgInt32> vertexIndexListPool (convexHull.GetCount() * 3);
 
 			dgInt32 index = 0;
-			dgInt32* const faceCount = &faceCountPool[0];
-			dgInt32* const vertexIndexList = &vertexIndexListPool[0];
+			dgMeshVertexFormat format;
+			format.m_faceCount = convexHull.GetCount();
+			format.m_faceIndexCount = &faceCountPool[0];
+			format.m_vertex.m_indexList = &vertexIndexListPool[0];
+			format.m_vertex.m_data = &convexHull.GetVertexPool()[0].m_x;
+			format.m_vertex.m_strideInBytes = sizeof (dgBigVector);
 			for (dgConvexHull3d::dgListNode* faceNode = convexHull.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
 				dgConvexHull3DFace& face = faceNode->GetInfo();
-				faceCount[index] = 3;
-				vertexIndexList[index * 3 + 0] = face.m_index[0]; 
-				vertexIndexList[index * 3 + 1] = face.m_index[1]; 
-				vertexIndexList[index * 3 + 2] = face.m_index[2]; 
+				faceCountPool[index] = 3;
+				vertexIndexListPool[index * 3 + 0] = face.m_index[0]; 
+				vertexIndexListPool[index * 3 + 1] = face.m_index[1]; 
+				vertexIndexListPool[index * 3 + 2] = face.m_index[2]; 
 				index ++;
 			}
-
-			dgAssert (0);
-/*
-			BuildFromPointListIndexList(triangleCount, faceCount, &materialsPool[0], 
-				&points[0].m_x, sizeof (dgVector), vertexIndexList,
-				&normal.m_x, sizeof (dgVector), &normalIndexListPool[0],
-				&uv.m_x, sizeof (dgVector), &normalIndexListPool[0],
-				&uv.m_x, sizeof (dgVector), &normalIndexListPool[0]);
-*/
+			BuildFromIndexList(&format);
             RepairTJoints ();
 		}
 	}
@@ -90,16 +66,8 @@ dgMeshEffect* dgMeshEffect::CreateDelaunayTetrahedralization (dgMemoryAllocator*
 	return NULL;
 }
 
-
-
-
 dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix)
 {
-	dgAssert(0);
-	return NULL;
-/*
-	dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;
-
 	dgStack<dgBigVector> buffer(pointCount + 16);
 	dgBigVector* const pool = &buffer[0];
 	dgInt32 count = 0;
@@ -142,7 +110,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	pMax += dgBigVector (maxSize, maxSize, maxSize, dgFloat64 (0.0f));
 
 	// add the a guard zone, so that we do no have to clip
-	dgInt32 guadVertexKey = count;
+	dgInt32 guardVertexKey = count;
 	pool[count + 0] = dgBigVector ( pMin.m_x, pMin.m_y, pMin.m_z, dgFloat64 (0.0f));
 	pool[count + 1] = dgBigVector ( pMax.m_x, pMin.m_y, pMin.m_z, dgFloat64 (0.0f));
 	pool[count + 2] = dgBigVector ( pMin.m_x, pMax.m_y, pMin.m_z, dgFloat64 (0.0f));
@@ -153,12 +121,10 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	pool[count + 7] = dgBigVector ( pMax.m_x, pMax.m_y, pMax.m_z, dgFloat64 (0.0f));
 	count += 8; 
 
-
 	dgDelaunayTetrahedralization delaunayTetrahedras (allocator, &pool[0].m_x, count, sizeof (dgBigVector), dgFloat32 (0.0f));
 	delaunayTetrahedras.RemoveUpperHull ();
 
 //	delaunayTetrahedras.Save("xxx0.txt");
-
 	dgInt32 tetraCount = delaunayTetrahedras.GetCount();
 	dgStack<dgBigVector> voronoiPoints(tetraCount + 32);
 	dgStack<dgDelaunayTetrahedralization::dgListNode*> tetradrumNode(tetraCount);
@@ -182,17 +148,17 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 		index ++;
 	}
 
+	const dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;
 	dgMeshEffect* const voronoiPartition = new (allocator) dgMeshEffect (allocator);
-	voronoiPartition->BeginPolygon();
-	dgFloat64 layer = dgFloat64 (0.0f);
-
+	voronoiPartition->BeginBuild();
+	dgInt32 layer = 0;
 	dgTree<dgList<dgInt32>, dgInt32>::Iterator iter (delanayNodes);
 	for (iter.Begin(); iter; iter ++) {
 		dgTree<dgList<dgInt32>, dgInt32>::dgTreeNode* const nodeNode = iter.GetNode();
 		const dgList<dgInt32>& list = nodeNode->GetInfo();
 		dgInt32 key = nodeNode->GetKey();
 
-		if (key < guadVertexKey) {
+		if (key < guardVertexKey) {
 			dgBigVector pointArray[512];
 			dgInt32 indexArray[512];
 			
@@ -211,24 +177,17 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 					convexMesh.CalculateNormals(normalAngleInRadians);
 					convexMesh.UniformBoxMapping (materialId, textureProjectionMatrix);
 
-					for (dgInt32 i = 0; i < convexMesh.m_pointCount; i ++) {
-						convexMesh.m_points[i].m_w = layer;
-					}
-					for (dgInt32 i = 0; i < convexMesh.m_atribCount; i ++) {
-						convexMesh.m_attrib[i].m_vertex.m_w = layer;
+					for (dgInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i ++) {
+						convexMesh.m_points.m_layers[i] = layer;
 					}
 					voronoiPartition->MergeFaces(&convexMesh);
-					layer += dgFloat64 (1.0f);
-
+					layer ++;
 				}
 			}
 		}
 	}
-	voronoiPartition->EndPolygon(dgFloat64 (1.0e-8f), false);
-
-//	voronoiPartition->SaveOFF("xxx0.off");
-
+	voronoiPartition->EndBuild(dgFloat64 (1.0e-8f), false);
+	//voronoiPartition->SaveOFF("xxx0.off");
 	//voronoiPartition->ConvertToPolygons();
 	return voronoiPartition;
-*/
 }

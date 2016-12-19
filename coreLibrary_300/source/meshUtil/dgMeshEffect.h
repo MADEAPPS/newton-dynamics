@@ -49,15 +49,15 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	{
 		struct dgDoubleData
 		{
-			dgFloat64* m_data;
-			dgInt32* m_indexList;
+			const dgFloat64* m_data;
+			const dgInt32* m_indexList;
 			dgInt32 m_strideInBytes;
 		};
 
 		struct dgFloatData
 		{
-			dgFloat32* m_data;
-			dgInt32* m_indexList;
+			const dgFloat32* m_data;
+			const dgInt32* m_indexList;
 			dgInt32 m_strideInBytes;
 		};
 
@@ -72,8 +72,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		}
 
 		dgInt32 m_faceCount;
-		dgInt32* m_faceIndexCount;
-		dgInt32* m_faceMaterial;
+		const dgInt32* m_faceIndexCount;
+		const dgInt32* m_faceMaterial;
 		dgDoubleData m_vertex;
 		dgFloatData m_normal;
 		dgFloatData m_binormal;
@@ -91,51 +91,35 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		m_uv1,
 		m_color,
 		m_material,
-		m_channelsCount,
+//		m_attibuteChannelsCount,
 		m_layer,
+		m_weight,
 		m_point,
 	};
 
-	class ChannelInterface
-	{
-		public:
-		ChannelInterface ()
-		{
-		}
-		virtual ~ChannelInterface () {}
-		virtual void Clear() = 0;
-		virtual void Reserve (dgInt32 size) = 0;
-		virtual void SetCount (dgInt32 count) = 0;
-		virtual void PushBack (const void* const element) = 0;
-		virtual void CopyFrom (const ChannelInterface& source) = 0;
-	};
-	
 	template<class T, dgChannelType type>
-	class dgChannel: public ChannelInterface, public dgArray<T>
+	class dgChannel: public dgArray<T>
 	{
 		public:
 		dgChannel(dgMemoryAllocator* const allocator)
-			:ChannelInterface()
-			,dgArray<T>(DG_MESH_EFFECT_INITIAL_VERTEX_SIZE, allocator)
+			:dgArray<T>(DG_MESH_EFFECT_INITIAL_VERTEX_SIZE, allocator)
 			,m_count(0)
 			,m_type(type)
 		{
 		}
 
 		dgChannel(const dgChannel& source)
-			:ChannelInterface(source)
-			,dgArray<T>(source)
+			:dgArray<T>(source)
 			,m_count(source.m_count)
 			,m_type(source.m_type)
 		{
-			dgAssert (0);
 		}
 
-		virtual ~dgChannel()
+		~dgChannel()
 		{
 		}
 
-		virtual void CopyFrom (const ChannelInterface& source)
+		void CopyFrom (const dgChannel<T, type>& source)
 		{
 			dgArray<T>& me = *this;
 			dgChannel& src = *((dgChannel*)&source);
@@ -148,13 +132,13 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 			}
 		}
 
-		virtual void Clear()
+		void Clear()
 		{
 			m_count = 0;
 			dgArray<T>::Clear ();
 		}
 
-		virtual void Reserve (dgInt32 size)
+		void Reserve (dgInt32 size)
 		{
 			T dommy;
 			memset (&dommy, 0, sizeof (T));
@@ -163,15 +147,14 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 			m_count = size;
 		}
 
-		virtual void PushBack (const void* const element) 
+		void PushBack (const T& element) 
 		{
 			dgArray<T>& me = *this;
-			const T& data = *((T*)element);
-			me[m_count] = data;
+			me[m_count] = element;
 			m_count ++;
 		}
 
-		virtual void SetCount (dgInt32 count) 
+		void SetCount (dgInt32 count) 
 		{
 			dgAssert (count >= 0);
 			dgAssert (count <= m_count);
@@ -182,37 +165,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgChannelType m_type;
 	};
 
-	class dgPoint: public dgChannel <dgBigVector, m_point>
-	{
-		public:
-		dgPoint (dgMemoryAllocator* const allocator)
-			:dgChannel <dgBigVector, m_point>(allocator)
-		{
-		}
-
-		dgPoint (const dgPoint& source)
-			:dgChannel <dgBigVector, m_point>(source)
-		{
-			dgAssert (0);
-		}
-	};
-
-	class dgLayer: public dgChannel<dgInt32, m_layer>
-	{
-		public:
-		dgLayer(dgMemoryAllocator* const allocator)
-			:dgChannel<dgInt32, m_layer>(allocator)
-		{
-		}
-
-		dgLayer(const dgLayer& source)
-			:dgChannel <dgInt32, m_layer>(source)
-		{
-			dgAssert(0);
-		}
-	};
-
-	class dgVertexFormat
+	class dgFormat
 	{
 		public:
 		class dgSortKey
@@ -223,13 +176,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 			dgInt32 m_vertexIndex;
 			dgInt32 m_attibuteIndex;
 		};
-		class dgUV
-		{
-			public:
-			dgFloat32 m_u;
-			dgFloat32 m_v;
-		};
-
 		class VertexSortData
 		{
 			public:
@@ -237,20 +183,56 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 			dgInt32 m_vertexSortIndex;
 		};
 
-		dgVertexFormat(dgMemoryAllocator* const allocator);
-		dgVertexFormat(const dgVertexFormat& source);
-		~dgVertexFormat();
+		dgInt32 GetSortIndex (const dgChannel<dgBigVector, m_point>& points, dgFloat64& dist) const;
+		static dgInt32 CompareVertex(const dgSortKey* const ptr0, const dgSortKey* const ptr1, void* const context);
+	};
 
-		ChannelInterface* operator[] (dgInt32 index);
-		const ChannelInterface* operator[] (dgInt32 index) const;
+	class dgPointFormat: public dgFormat
+	{
+		public:
+		class dgWeight
+		{
+			dgFloat32 m_weight;
+			dgInt32 m_controlIndex;
+		};
+
+		class dgWeightSet
+		{
+			public:
+			dgWeight m_weights[4];
+		};
+
+		dgPointFormat(dgMemoryAllocator* const allocator);
+		dgPointFormat(const dgPointFormat& source);
+		~dgPointFormat();
+
+		void Clear();
+		void CompressData(dgInt32* const indexList);
+
+		dgChannel<dgInt32, m_layer> m_layers;
+		dgChannel <dgBigVector, m_point> m_vertex;
+		dgChannel<dgWeightSet, m_weight> m_weights;
+	};
+
+	class dgAttibutFormat: public dgFormat
+	{
+		public:
+		class dgUV
+		{
+			public:
+			dgFloat32 m_u;
+			dgFloat32 m_v;
+		};
+
+		dgAttibutFormat(dgMemoryAllocator* const allocator);
+		dgAttibutFormat(const dgAttibutFormat& source);
+		~dgAttibutFormat();
 
 		void Clear();
 		void SetCount (dgInt32 count);
-		void CopyFrom (const dgVertexFormat& source);
+		void CopyFrom (const dgAttibutFormat& source);
+		void CopyEntryFrom (dgInt32 index, const dgAttibutFormat& source, dgInt32 sourceIndex);
 		void CompressData (const dgChannel<dgBigVector, m_point>& points, dgInt32* const indexList);
-
-		
-		static dgInt32 CompareVertex (const dgSortKey* const ptr0, const dgSortKey* const ptr1, void* const context);
 
 		dgChannel<dgInt32, m_vertex> m_pointChannel;
 		dgChannel<dgInt32, m_material> m_materialChannel;
@@ -259,7 +241,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgChannel<dgVector, m_color> m_colorChannel;
 		dgChannel<dgUV, m_uv0> m_uv0Channel;
 		dgChannel<dgUV, m_uv1> m_uv1Channel;
-		dgInt32 m_count;
 	};
 
 	class dgIndexArray 
@@ -381,15 +362,17 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void RemoveUnusedVertices(dgInt32* const vertexRemapTable);
 	
 	void BeginBuild ();
-	void BeginBuildFace ();
-	void AddPoint (dgFloat64 x, dgFloat64 y, dgFloat64 z);
-	void AddLayer (dgInt32 layer);
-	void AddMaterial (dgInt32 materialIndex);
-	void AddNormal (dgFloat32 x, dgFloat32 y, dgFloat32 z);
-	void AddBinormal (dgFloat32 x, dgFloat32 y, dgFloat32 z);
-	void AddUV0 (dgFloat32 u, dgFloat32 v);
-	void AddUV1 (dgFloat32 u, dgFloat32 v);
-	void EndBuildFace ();
+		void BeginBuildFace ();
+			void AddPoint (dgFloat64 x, dgFloat64 y, dgFloat64 z);
+			void AddLayer (dgInt32 layer);
+			void AddWeights (const dgPointFormat::dgWeightSet& weight);
+			void AddMaterial (dgInt32 materialIndex);
+			void AddNormal (dgFloat32 x, dgFloat32 y, dgFloat32 z);
+			void AddBinormal (dgFloat32 x, dgFloat32 y, dgFloat32 z);
+			void AddVertexColor (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w);
+			void AddUV0 (dgFloat32 u, dgFloat32 v);
+			void AddUV1 (dgFloat32 u, dgFloat32 v);
+		void EndBuildFace ();
 	void EndBuild (dgFloat64 tol, bool fixTjoint = true);
 
 	dgInt32 GetVertexCount() const;
@@ -481,15 +464,10 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgBigVector CalculateFaceNormal (const void* const face) const;
 
 	void SetFaceMaterial (const void* const face, int materialID);
-
-//	dgVertexAtribute& GetAttribute (dgInt32 index) const;
-//	dgVertexAtribute InterpolateEdge (dgEdge* const edge, dgFloat64 param) const;
-//	dgVertexAtribute InterpolateVertex (const dgBigVector& point, const dgEdge* const face) const;
 	dgInt32 InterpolateEdge (dgEdge* const edge, dgFloat64 param) const;
 	dgInt32 InterpolateVertex (const dgBigVector& point, const dgEdge* const face) const;
 
 	bool Sanity () const;
-	
 
 	protected:
 	virtual void BeginFace();
@@ -503,7 +481,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	
 	void MergeFaces (const dgMeshEffect* const source);
 //	void ReverseMergeFaces (dgMeshEffect* const source);
-	
 
 	bool PlaneClip (const dgMeshEffect& convexMesh, const dgEdge* const face);
 
@@ -514,11 +491,10 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void UnpackAttibuteData ();
 
 	void PackPoints (dgFloat64 tol);
-	void UnpackPoints(dgPoint& points) const;
+	void UnpackPoints();
 
-	dgLayer m_layers;
-	dgPoint m_points;
-	dgVertexFormat m_attrib;
+	dgPointFormat m_points;
+	dgAttibutFormat m_attrib;
 	dgInt32 m_constructionIndex;
 	
 	friend class dgConvexHull3d;
@@ -530,12 +506,12 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 DG_INLINE dgInt32 dgMeshEffect::GetVertexCount() const
 {
-	return m_points.m_count;
+	return m_points.m_vertex.m_count;
 }
 
 DG_INLINE dgInt32 dgMeshEffect::GetPropertiesCount() const
 {
-	return m_attrib.m_count;
+	return m_attrib.m_pointChannel.m_count;
 }
 
 DG_INLINE const dgInt32* dgMeshEffect::GetIndexToVertexMap() const
@@ -556,20 +532,20 @@ DG_INLINE dgInt32 dgMeshEffect::GetMaterialIndexCount (dgIndexArray* const handl
 DG_INLINE dgBigVector dgMeshEffect::GetVertex (dgInt32 index) const
 {
 	dgAssert(index >= 0);
-	dgAssert(index < m_points.m_count);
-	return m_points[index];
+	dgAssert(index < m_points.m_vertex.m_count);
+	return m_points.m_vertex[index];
 }
 
 DG_INLINE bool dgMeshEffect::HasLayers() const
 {
-	return m_layers.m_count != 0;
+	return m_points.m_layers.m_count != 0;
 }
 
 DG_INLINE dgInt32 dgMeshEffect::GetVertexLayer(dgInt32 index) const
 {
 	dgAssert(index >= 0);
-	dgAssert(index < m_points.m_count);
-	return (m_layers.m_count) ? m_layers[index] : 0;
+	dgAssert(index < m_points.m_vertex.m_count);
+	return (m_points.m_layers.m_count) ? m_points.m_layers[index] : 0;
 }
 
 
@@ -580,9 +556,8 @@ DG_INLINE dgInt32 dgMeshEffect::GetVertexStrideInByte() const
 
 DG_INLINE const dgFloat64* dgMeshEffect::GetVertexPool () const 
 {
-	return &m_points[0].m_x;
+	return &m_points.m_vertex[0].m_x;
 }
-
 
 DG_INLINE dgMeshEffect* dgMeshEffect::GetFirstLayer ()
 {
