@@ -215,22 +215,23 @@ void ClosestDistance (DemoEntityManager* const scene)
 
 	dClosestDistanceManager* const castManager = new dClosestDistanceManager (scene);
 
-	int count = 4;
-	castManager->AddPrimitives (count, dVector (  0, 0, 0), _SPHERE_PRIMITIVE, materialID, castinShapeType);
-	castManager->AddPrimitives (count, dVector (  2, 0, 2), _BOX_PRIMITIVE, materialID, castinShapeType);
-	castManager->AddPrimitives (count, dVector (  4, 0, 4), _CAPSULE_PRIMITIVE, materialID, castinShapeType);
+	int count = 1;
+//	castManager->AddPrimitives (count, dVector (  0, 0, 0), _SPHERE_PRIMITIVE, materialID, castinShapeType);
+//	castManager->AddPrimitives (count, dVector (  2, 0, 2), _BOX_PRIMITIVE, materialID, castinShapeType);
+//	castManager->AddPrimitives (count, dVector (  4, 0, 4), _CAPSULE_PRIMITIVE, materialID, castinShapeType);
 	castManager->AddPrimitives (count, dVector (  8, 0, 8), _CYLINDER_PRIMITIVE, materialID, castinShapeType);
-	castManager->AddPrimitives (count, dVector ( 10, 0, 10), _CHAMFER_CYLINDER_PRIMITIVE, materialID, castinShapeType);
-	castManager->AddPrimitives (count, dVector (- 4, 0, -4), _CONE_PRIMITIVE, materialID, castinShapeType);
-	castManager->AddPrimitives (count, dVector (-10, 0, -10), _REGULAR_CONVEX_HULL_PRIMITIVE, materialID, castinShapeType);
-	castManager->AddPrimitives (count, dVector (-12, 0, -12), _COMPOUND_CONVEX_CRUZ_PRIMITIVE, materialID, castinShapeType);
+//	castManager->AddPrimitives (count, dVector ( 10, 0, 10), _CHAMFER_CYLINDER_PRIMITIVE, materialID, castinShapeType);
+//	castManager->AddPrimitives (count, dVector (- 4, 0, -4), _CONE_PRIMITIVE, materialID, castinShapeType);
+//	castManager->AddPrimitives (count, dVector (-10, 0, -10), _REGULAR_CONVEX_HULL_PRIMITIVE, materialID, castinShapeType);
+//	castManager->AddPrimitives (count, dVector (-12, 0, -12), _COMPOUND_CONVEX_CRUZ_PRIMITIVE, materialID, castinShapeType);
 
 
 	// place camera into position
 	//dMatrix camMatrix (dYawMatrix(90.0f * 3.1416f /180.0f));
 	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
-	dVector origin (-30.0f, 10.0f, 0.0f, 0.0f);
+//	dVector origin (-30.0f, 10.0f, 0.0f, 0.0f);
+dVector origin(-0.0f, 2.0f, 5.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 

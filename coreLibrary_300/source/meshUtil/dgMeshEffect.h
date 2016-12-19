@@ -109,7 +109,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		}
 
 		dgChannel(const dgChannel& source)
-			:dgArray<T>(source)
+			:dgArray<T>(source, source.m_count)
 			,m_count(source.m_count)
 			,m_type(source.m_type)
 		{

@@ -206,32 +206,10 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum (dgInt32& indexOut)
 				const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
 				const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
 				const dgFloat64 b2 = -e30.DotProduct4(p0).GetScalar();
-/*
-dgFloat64 a[3][3];
-dgFloat64 x[3];
-a[0][0] = e10.DotProduct4(e10).GetScalar();
-a[1][1] = e20.DotProduct4(e20).GetScalar();
-a[2][2] = e30.DotProduct4(e30).GetScalar();
-a[0][1] = e20.DotProduct4(e10).GetScalar();
-a[1][0] = a[0][1];
-a[0][2] = e30.DotProduct4(e10).GetScalar();
-a[2][0] = a[0][2];
-a[1][2] = e30.DotProduct4(e20).GetScalar();
-a[2][1] = a[1][2];
-x[0] = b0;
-x[1] = b1;
-x[2] = b2;
-dgCholeskyFactorizationAddRow(3, 0, &a[0][0]);
-dgCholeskyFactorizationAddRow(3, 1, &a[0][0]);
-dgCholeskyFactorizationAddRow(3, 2, &a[0][0]);
-dgCholeskySolve(3, 3, &a[0][0], x);
-*/
 
 				dgFloat64 u1 = b0 * invd0;
 				dgFloat64 u2 = (b1 - l10 * u1) * invd1;
-				dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2;
-
-				u3 = u3 * invd2;
+				dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2 * invd2;
 				u2 = (u2 - l21 * u3) * invd1;
 				u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
 				if (u3 < dgFloat64(0.0f)) {
@@ -863,6 +841,9 @@ bool dgContactSolver::SanityCheck() const
 
 bool dgContactSolver::CalculateClosestPoints()
 {
+static int xxx;
+xxx++;
+
 	dgInt32 simplexPointCount = CalculateClosestSimplex();
 	if (simplexPointCount < 0) {
 		simplexPointCount = CalculateIntersectingPlane(-simplexPointCount);

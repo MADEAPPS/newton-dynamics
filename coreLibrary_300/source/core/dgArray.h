@@ -34,11 +34,10 @@ class dgArray
 {
 	public:
 	dgArray (dgInt32 granulatitySize, dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY);
-	dgArray (const dgArray& source);
+	dgArray (const dgArray& source, dgInt32 itemsToCopy);
+	dgArray(const dgArray& source);
 	~dgArray ();
-
 	DG_CLASS_ALLOCATOR(allocator)
-
 	
 	T& operator[] (dgInt32 i);
 	const T& operator[] (dgInt32 i) const;
@@ -78,7 +77,7 @@ dgArray<T>::dgArray (dgInt32 granulatitySize, dgMemoryAllocator* const allocator
 }
 
 template<class T>
-dgArray<T>::dgArray (const dgArray& source)
+dgArray<T>::dgArray (const dgArray& source, dgInt32 itemsToCopy)
 	:m_granulatity(source.m_granulatity)
 	,m_aligmentInBytes(source.m_aligmentInBytes)
 	,m_maxSize(source.m_maxSize)
@@ -87,7 +86,7 @@ dgArray<T>::dgArray (const dgArray& source)
 {
 	if (source.m_array) {
 		m_array = (T*) m_allocator->MallocLow (sizeof (T) * m_maxSize, m_aligmentInBytes);
-		for (dgInt32 i = 0; i < m_maxSize; i++) {
+		for (dgInt32 i = 0; i < itemsToCopy; i++) {
 			m_array[i] = source.m_array[i];
 		}
 	}
