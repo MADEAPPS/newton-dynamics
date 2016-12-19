@@ -538,7 +538,6 @@ NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& 
 	NewtonMeshBeginBuild (mesh);
 	dMatrix rotation ((meshMatrix.Inverse4x4()).Transpose4X4());
 
-	dFloat point[3][12];
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		DemoSubMesh& segment = node->GetInfo();
 		for (int i = 0; i < segment.m_indexCount; i += 3) {
