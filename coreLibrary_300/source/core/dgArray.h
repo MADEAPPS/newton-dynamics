@@ -56,7 +56,7 @@ class dgArray
 
 	private:
 	dgInt32 m_granulatity;
-	dgInt32 m_aligmentInByte;
+	dgInt32 m_aligmentInBytes;
 	mutable dgInt32 m_maxSize;
 	mutable T *m_array;
 	dgMemoryAllocator* m_allocator; 
@@ -65,18 +65,32 @@ class dgArray
 
 template<class T>
 dgArray<T>::dgArray (dgInt32 granulatitySize, dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes)
- :m_granulatity(granulatitySize), m_aligmentInByte(aligmentInBytes), m_maxSize(0), m_array(NULL), m_allocator(allocator)
+	:m_granulatity(granulatitySize)
+	,m_aligmentInBytes(aligmentInBytes)
+	,m_maxSize(0)
+	,m_array(NULL)
+	,m_allocator(allocator)
 {
-	if (m_aligmentInByte <= 0) {
-		m_aligmentInByte = 8;
+	if (m_aligmentInBytes <= 0) {
+		m_aligmentInBytes = 8;
 	}
-	m_aligmentInByte = 1 << dgExp2(m_aligmentInByte);
+	m_aligmentInBytes = 1 << dgExp2(m_aligmentInBytes);
 }
 
 template<class T>
 dgArray<T>::dgArray (const dgArray& source)
+	:m_granulatity(source.m_granulatity)
+	,m_aligmentInBytes(source.m_aligmentInBytes)
+	,m_maxSize(source.m_maxSize)
+	,m_array(NULL)
+	,m_allocator(source.m_allocator)
 {
-	dgAssert (0);
+	if (source.m_array) {
+		Resize(m_maxSize);
+		for (dgInt32 i = 0; i < m_maxSize; i++) {
+			m_array[i] = source.m_array[i];
+		}
+	}
 }
 
 template<class T>
@@ -144,7 +158,7 @@ void dgArray<T>::Resize (dgInt32 size) const
 	if (size >= m_maxSize) {
 		dgThreadYield();
 		size = size + m_granulatity - (size + m_granulatity) % m_granulatity;
-		T* const newArray = (T*) m_allocator->MallocLow (GetElementSize() * size, m_aligmentInByte);
+		T* const newArray = (T*) m_allocator->MallocLow (GetElementSize() * size, m_aligmentInBytes);
 		if (m_array) {
 			for (dgInt32 i = 0; i < m_maxSize; i ++) {
 				newArray[i]	= m_array[i];
@@ -156,7 +170,7 @@ void dgArray<T>::Resize (dgInt32 size) const
 	} else if (size < m_maxSize) {
 		dgThreadYield();
 		size = size + m_granulatity - (size + m_granulatity) % m_granulatity;
-		T* const newArray = (T*) m_allocator->MallocLow (GetElementSize() * size, m_aligmentInByte);
+		T* const newArray = (T*) m_allocator->MallocLow (GetElementSize() * size, m_aligmentInBytes);
 		if (m_array) {
 			for (dgInt32 i = 0; i < size; i ++) {
 				newArray[i]	= m_array[i];
