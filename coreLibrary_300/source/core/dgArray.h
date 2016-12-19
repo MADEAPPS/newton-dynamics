@@ -86,7 +86,7 @@ dgArray<T>::dgArray (const dgArray& source)
 	,m_allocator(source.m_allocator)
 {
 	if (source.m_array) {
-		Resize(m_maxSize);
+		m_array = (T*) m_allocator->MallocLow (sizeof (T) * m_maxSize, m_aligmentInBytes);
 		for (dgInt32 i = 0; i < m_maxSize; i++) {
 			m_array[i] = source.m_array[i];
 		}
@@ -158,7 +158,7 @@ void dgArray<T>::Resize (dgInt32 size) const
 	if (size >= m_maxSize) {
 		dgThreadYield();
 		size = size + m_granulatity - (size + m_granulatity) % m_granulatity;
-		T* const newArray = (T*) m_allocator->MallocLow (GetElementSize() * size, m_aligmentInBytes);
+		T* const newArray = (T*) m_allocator->MallocLow (sizeof (T) * size, m_aligmentInBytes);
 		if (m_array) {
 			for (dgInt32 i = 0; i < m_maxSize; i ++) {
 				newArray[i]	= m_array[i];
@@ -170,7 +170,7 @@ void dgArray<T>::Resize (dgInt32 size) const
 	} else if (size < m_maxSize) {
 		dgThreadYield();
 		size = size + m_granulatity - (size + m_granulatity) % m_granulatity;
-		T* const newArray = (T*) m_allocator->MallocLow (GetElementSize() * size, m_aligmentInBytes);
+		T* const newArray = (T*) m_allocator->MallocLow (sizeof (T) * size, m_aligmentInBytes);
 		if (m_array) {
 			for (dgInt32 i = 0; i < size; i ++) {
 				newArray[i]	= m_array[i];
