@@ -176,7 +176,6 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 				if (convexMesh.GetCount()) {
 					convexMesh.CalculateNormals(normalAngleInRadians);
 					convexMesh.UniformBoxMapping (materialId, textureProjectionMatrix);
-
 					for (dgInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i ++) {
 						convexMesh.m_points.m_layers[i] = layer;
 					}

@@ -31,6 +31,8 @@
 #include "dgCollisionConvexPolygon.h"
 
 
+//#define DG_CONTACT_SOLVE_USE_GEOMETRIC_INTERPRETATION
+
 dgVector dgContactSolver::m_hullDirs[] =
 {
 	dgVector(dgFloat32(0.577350f), dgFloat32(-0.577350f), dgFloat32(0.577350f), dgFloat32(0.0f)),
@@ -122,6 +124,9 @@ DG_INLINE dgBigVector dgContactSolver::ReduceLine(dgInt32& indexOut)
 	return v;
 }
 
+
+#ifdef DG_CONTACT_SOLVE_USE_GEOMETRIC_INTERPRETATION
+
 /*
 DG_INLINE void dgContactSolver::ReduceDegeneratedTriangle()
 {
@@ -140,6 +145,158 @@ DG_INLINE void dgContactSolver::ReduceDegeneratedTriangle()
 }
 */
 
+DG_INLINE dgBigVector dgContactSolver::ReduceTriangle(dgInt32& indexOut)
+{
+	dgBigVector triangleDiffExtended[3];
+	triangleDiffExtended[0] = m_hullDiff[0];
+	triangleDiffExtended[1] = m_hullDiff[1];
+	triangleDiffExtended[2] = m_hullDiff[2];
+
+	dgBigVector e10(triangleDiffExtended[1] - triangleDiffExtended[0]);
+	dgBigVector e20(triangleDiffExtended[2] - triangleDiffExtended[0]);
+	dgBigVector normal(e10.CrossProduct3(e20));
+	if (normal.DotProduct3(normal) > dgFloat32(1.0e-14f)) {
+		dgInt32 i0 = 2;
+		dgInt32 minIndex = -1;
+		for (dgInt32 i1 = 0; i1 < 3; i1++) {
+			dgBigVector p1p0(triangleDiffExtended[i0]);
+			dgBigVector p2p0(triangleDiffExtended[i1]);
+
+			dgFloat64 volume = normal.DotProduct3(p1p0.CrossProduct3(p2p0));
+			if (volume < dgFloat32(0.0f)) {
+				dgBigVector segment(triangleDiffExtended[i1] - triangleDiffExtended[i0]);
+				dgBigVector poinP0(triangleDiffExtended[i0].Scale3(dgFloat32(-1.0f)));
+				dgFloat64 den = segment.DotProduct3(segment);
+				dgAssert(den > dgFloat32(0.0f));
+				dgFloat64 num = poinP0.DotProduct3(segment);
+				if (num < dgFloat32(0.0f)) {
+					minIndex = i0;
+				} else if (num > den) {
+					minIndex = i1;
+				} else {
+					indexOut = 2;
+					dgBigVector tmp0(triangleDiffExtended[i0]);
+					dgBigVector tmp1(triangleDiffExtended[i1]);
+					triangleDiffExtended[0] = tmp0;
+					triangleDiffExtended[1] = tmp1;
+					m_hullDiff[0] = tmp0;
+					m_hullDiff[1] = tmp1;
+
+					tmp0 = m_hullSum[i0];
+					tmp1 = m_hullSum[i1];
+					m_hullSum[0] = tmp0;
+					m_hullSum[1] = tmp1;
+
+					return dgVector(triangleDiffExtended[0] + segment.Scale3(num / den));
+				}
+			}
+			i0 = i1;
+		}
+
+		if (minIndex != -1) {
+			indexOut = 1;
+			m_hullSum[0] = m_hullSum[minIndex];
+			m_hullDiff[0] = dgVector(m_hullDiff[minIndex]);
+			return m_hullDiff[0];
+		} else {
+			indexOut = 3;
+			return dgVector(normal.Scale3(normal.DotProduct3(triangleDiffExtended[0]) / normal.DotProduct3(normal)));
+		}
+	} else {
+//		indexOut = 2;
+//		ReduceDegeneratedTriangle();
+//		return ReduceLineLarge(indexOut);
+		dgAssert (0);
+		return dgBigVector (dgFloat64 (0.0f));
+	}
+}
+
+DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum(dgInt32& indexOut)
+{
+	dgBigVector tetraDiffExtended[4];
+	tetraDiffExtended[0] = m_hullDiff[0];
+	tetraDiffExtended[1] = m_hullDiff[1];
+	tetraDiffExtended[2] = m_hullDiff[2];
+	tetraDiffExtended[3] = m_hullDiff[3];
+
+	dgInt32 i0 = m_rayCastSimplex[0][0];
+	dgInt32 i1 = m_rayCastSimplex[0][1];
+	dgInt32 i2 = m_rayCastSimplex[0][2];
+	dgInt32 i3 = m_rayCastSimplex[0][3];
+	const dgBigVector& p0 = tetraDiffExtended[i0];
+	const dgBigVector& p1 = tetraDiffExtended[i1];
+	const dgBigVector& p2 = tetraDiffExtended[i2];
+	const dgBigVector& p3 = tetraDiffExtended[i3];
+
+	dgBigVector p10(p1 - p0);
+	dgBigVector p20(p2 - p0);
+	dgBigVector p30(p3 - p0);
+	dgFloat64 volume = p30.DotProduct3(p10.CrossProduct3(p20));
+	if (volume < dgFloat32(0.0f)) {
+		volume = -volume;
+		dgSwap(m_hullSum[i2], m_hullSum[i3]);
+		dgSwap(m_hullDiff[i2], m_hullDiff[i3]);
+		dgSwap(tetraDiffExtended[i2], tetraDiffExtended[i3]);
+	}
+	if (volume < dgFloat32(1.0e-8f)) {
+		dgAssert(0);
+	}
+
+	dgInt32 faceIndex = -1;
+	dgFloat64 minDist = dgFloat32(0.0f);
+	const dgBigVector origin(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	for (dgInt32 i = 0; i < 4; i++) {
+		dgInt32 i0 = m_rayCastSimplex[i][0];
+		dgInt32 i1 = m_rayCastSimplex[i][1];
+		dgInt32 i2 = m_rayCastSimplex[i][2];
+
+		const dgBigVector& p0 = tetraDiffExtended[i0];
+		const dgBigVector& p1 = tetraDiffExtended[i1];
+		const dgBigVector& p2 = tetraDiffExtended[i2];
+
+		dgBigVector p10(p1 - p0);
+		dgBigVector p20(p2 - p0);
+		dgBigVector normal(p10.CrossProduct3(p20));
+		dgFloat64 area = normal.DotProduct3(normal);
+		dgAssert(fabs(area) > dgFloat32(0.0f));
+		normal = normal.Scale3(dgFloat32(1.0f) / sqrt(area));
+		dgFloat64 dist = normal.DotProduct3(origin - p0);
+		if (dist < minDist) {
+			minDist = dist;
+			faceIndex = i;
+		}
+	}
+
+	if (faceIndex != -1) {
+		dgVector tmp[3];
+		dgInt32 i0 = m_rayCastSimplex[faceIndex][0];
+		dgInt32 i1 = m_rayCastSimplex[faceIndex][1];
+		dgInt32 i2 = m_rayCastSimplex[faceIndex][2];
+
+		tmp[0] = m_hullSum[i0];
+		tmp[1] = m_hullSum[i1];
+		tmp[2] = m_hullSum[i2];
+		m_hullSum[0] = tmp[0];
+		m_hullSum[1] = tmp[1];
+		m_hullSum[2] = tmp[2];
+
+		tmp[0] = m_hullDiff[i0];
+		tmp[1] = m_hullDiff[i1];
+		tmp[2] = m_hullDiff[i2];
+		m_hullDiff[0] = tmp[0];
+		m_hullDiff[1] = tmp[1];
+		m_hullDiff[2] = tmp[2];
+
+		indexOut = 3;
+		return ReduceTriangle(indexOut);
+	}
+
+	indexOut = 4;
+	return origin;
+}
+
+
+#else
 
 DG_INLINE dgBigVector dgContactSolver::ReduceTriangle (dgInt32& indexOut)
 {
@@ -248,7 +405,7 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum (dgInt32& indexOut)
 	dgAssert (0);
 	return dgBigVector::m_zero;
 }
-
+#endif
 
 DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplex ()
 {
@@ -1256,7 +1413,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVect
 			}
 			dgAssert(count0);
 			step = matrix0.UnrotateVector(normal.CompProduct4((alternatePoint - origin).DotProduct4(normal)));
-			for (dgInt32 i = 0; i < count1; i++) {
+			for (dgInt32 i = 0; i < count0; i++) {
 				shape0[i] -= step;
 			}
 		}

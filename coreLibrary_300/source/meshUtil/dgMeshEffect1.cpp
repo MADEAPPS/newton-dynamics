@@ -1554,12 +1554,19 @@ void dgMeshEffect::EndFace ()
 			dgEdge* const edge = &node->GetInfo()->GetInfo();
 
 			// this is a vertex collision
-			dgBigVector point (m_points.m_vertex[edge->m_incidentVertex]);
-			dgAssert (0);
-			//m_points.PushBack (&point.m_x);
+			m_points.m_vertex.PushBack (m_points.m_vertex[edge->m_incidentVertex]);
+			if (m_points.m_layers.m_count) {
+				m_points.m_layers.PushBack (m_points.m_layers[edge->m_incidentVertex]);
+			}
+			if (m_points.m_weights.m_count) {
+				m_points.m_weights.PushBack(m_points.m_weights[edge->m_incidentVertex]);
+			}
 
 			dgEdge* ptr = edge;
 			do {
+				if (ptr->m_incidentFace > 0) {
+					m_attrib.m_pointChannel[ptr->m_userData] = m_points.m_vertex.m_count - 1;
+				}
 				ptr->m_incidentVertex = m_points.m_vertex.m_count - 1;
 
 				dgTreeNode* const edgeNode = GetNodeFromInfo (*ptr);
@@ -2388,7 +2395,7 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 		m_points.m_vertex.PushBack(dgBigVector (vertex[index + 0], vertex[index + 1], vertex[index + 2], dgFloat64(0.0f)));
 	}
 
-	bool hasFaces = true;
+	bool pendingFaces = true;
 	dgInt32 layerBase = 0;
 	dgInt32 layerCount = 0;
 	dgInt32 attributeCount = 0;
@@ -2402,9 +2409,9 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 	dgStack<dgInt8> faceMark(format->m_faceCount);
 	memset(&faceMark[0], 0, faceMark.GetSizeInBytes());
 	const dgInt32* const vertexIndex = format->m_vertex.m_indexList;
-	while (hasFaces) {
+	while (pendingFaces) {
 		dgInt32 acc = 0;
-		hasFaces = false;
+		pendingFaces = false;
 		dgInt32 vertexBank = layerCount * vertexCount;
 		for (dgInt32 j = 0; j < format->m_faceCount; j++) {
 			dgInt32 indexCount = format->m_faceIndexCount[j];
@@ -2504,7 +2511,7 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 						if (degeneratedFace) {
 							faceMark[j] = 1;
 						} else {
-							hasFaces = true;
+							pendingFaces = true;
 						}
 					}
 				}
@@ -2512,7 +2519,7 @@ void dgMeshEffect::BuildFromIndexList(const dgMeshVertexFormat* const format)
 			}
 		}
 
-		if (hasFaces) {
+		if (pendingFaces) {
 			dgAssert (0);
 			layerIndex++;
 			layerBase += vertexCount;

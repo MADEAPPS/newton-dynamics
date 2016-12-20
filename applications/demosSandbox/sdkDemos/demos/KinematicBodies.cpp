@@ -511,7 +511,7 @@ NewtonBodySetMassProperties(body, 1.0, col);
 
 	// place camera into position
 	dQuaternion rot;
-	dVector origin (-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin (-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 

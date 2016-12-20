@@ -403,7 +403,7 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 		transformMatrix.m_posit = m_posit;
 	}
 */
-
+/*
 // test the fucking factorization 
 dgMatrix xxxxx(dgRollMatrix(30.0f * 3.1416f / 180.0f));
 xxxxx = dgYawMatrix(30.0f * 3.1416f / 180.0f) * xxxxx;
@@ -413,13 +413,10 @@ dgMatrix xxxxx2(xxxxx.Inverse() * xxxxx1 * xxxxx);
 dgMatrix xxxxx3 (xxxxx2);
 xxxxx2.EigenVectors(scale);
 dgMatrix xxxxx4(xxxxx2.Inverse() * xxxxx1 * xxxxx2);
-
+*/
 
 	const dgMatrix& me = *this;
-	//dgFloat32 sign = ((((*this)[0] * (*this)[1]) % (*this)[2]) > 0.0f) ? 1.0f : -1.0f;
-	//dgFloat32 sign = dgSign(((*this)[0] * (*this)[1]) % (*this)[2]);
 	dgFloat32 sign = dgSign (me[2].DotProduct3 (me[0].CrossProduct3(me[1])));
-	//stretchAxis = (*this) * Transpose();
 	stretchAxis = me * Transpose();
 	stretchAxis.EigenVectors (scale);
 
