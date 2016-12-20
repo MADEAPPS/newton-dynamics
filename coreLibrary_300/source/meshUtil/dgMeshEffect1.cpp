@@ -1565,7 +1565,7 @@ void dgMeshEffect::EndFace ()
 			dgEdge* ptr = edge;
 			do {
 				if (ptr->m_incidentFace > 0) {
-					m_attrib.m_pointChannel[ptr->m_userData] = m_points.m_vertex.m_count - 1;
+					m_attrib.m_pointChannel[dgInt32 (ptr->m_userData)] = m_points.m_vertex.m_count - 1;
 				}
 				ptr->m_incidentVertex = m_points.m_vertex.m_count - 1;
 

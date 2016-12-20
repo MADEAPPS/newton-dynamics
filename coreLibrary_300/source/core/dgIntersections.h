@@ -328,11 +328,10 @@ class dgFastAABBInfo: public dgObb
 		return	dist0;
 	}
 
-	DG_INLINE dgFloat32 GetSeparetionDistance() const
-	{
-		return m_separationDistance;
-	}
-
+	//DG_INLINE dgFloat32 GetSeparetionDistance() const
+	//{
+		//return m_separationDistance;
+	//}
 
 	private:
 	DG_INLINE void MakeBox1 (dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, dgVector& minBox, dgVector& maxBox) const

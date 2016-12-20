@@ -96,6 +96,12 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 		return dgFloat32 ((size >= 1) ? size : dgFloat32 (1.0f));
 	}
 
+	DG_INLINE dgFloat32 GetSeparetionDistance() const
+	{
+		return m_separationDistance * m_polySoupInstance->GetScale().GetScalar();
+	}
+
+
 	void SortFaceArray ();
 
 	dgVector m_boxDistanceTravelInMeshSpace;

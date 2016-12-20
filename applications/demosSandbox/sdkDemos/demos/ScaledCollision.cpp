@@ -59,7 +59,6 @@ static void AddNonUniformScaledPrimitives(DemoEntityManager* const scene, dFloat
 {
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
-	//     NewtonCollision* const collision = CreateConvexCollision (world, &shapeOffsetMatrix[0][0], size, type, materialID);
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, type, materialID);
 
 	dFloat startElevation = 1000.0f;
@@ -231,7 +230,7 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-	AddFloorBox(scene, dVector (0.0f, -0.5f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f));
+	//AddFloorBox(scene, dVector (0.0f, -0.5f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f));
 	//CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "flatPlaneDoubleFace.ngd", 1);
 	//CreateLevelMesh (scene, "sponza.ngd", 0);

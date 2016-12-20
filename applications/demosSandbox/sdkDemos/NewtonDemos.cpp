@@ -353,7 +353,8 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //SetDebugDisplayMode (m_debugDisplayMode);
 //m_showNormalForces = true;
 
-m_autoSleepState = false;
+m_showAABB = true;
+//m_autoSleepState = false;
 //m_microthreadIndex = 1;
 //m_useParallelSolver = true;
 
