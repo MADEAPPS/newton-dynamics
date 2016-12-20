@@ -26,7 +26,6 @@
 #include "dgCollision.h"
 #include "dgCollisionLumpedMassParticles.h"
 
-#define DG_DEFORMABLE_MESH_LINKS_GRANULARITY	64
 
 class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 {

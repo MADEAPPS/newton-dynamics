@@ -79,7 +79,7 @@ class dgPolygonSoupDatabaseBuilder
 	{	
 		public:
 		dgVertexArray(dgMemoryAllocator* const allocator)
-			:dgArray<dgBigVector>(1024 * 32, allocator)
+			:dgArray<dgBigVector>(allocator)
 		{
 		}
 	};
@@ -88,7 +88,7 @@ class dgPolygonSoupDatabaseBuilder
 	{
 		public:
 		dgIndexArray(dgMemoryAllocator* const allocator)
-			:dgArray<dgInt32>(1024 * 32, allocator)
+			:dgArray<dgInt32>(allocator)
 		{
 		}
 	};

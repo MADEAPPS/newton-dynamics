@@ -33,7 +33,7 @@ class dgCollisionInstance;
 #define DG_MESH_EFFECT_PRECISION_SCALE_INV	(dgFloat64 (1.0f) / DG_MESH_EFFECT_PRECISION_SCALE)
 
 
-#define DG_MESH_EFFECT_INITIAL_VERTEX_SIZE	8
+//#define DG_MESH_EFFECT_INITIAL_VERTEX_SIZE	8
 #define DG_VERTEXLIST_INDEXLIST_TOL			(dgFloat64 (0.0f))
 #define DG_MESH_EFFECT_POINT_SPLITED		512
 
@@ -102,7 +102,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	{
 		public:
 		dgChannel(dgMemoryAllocator* const allocator)
-			:dgArray<T>(DG_MESH_EFFECT_INITIAL_VERTEX_SIZE, allocator)
+			:dgArray<T>(allocator)
 			,m_count(0)
 			,m_type(type)
 		{

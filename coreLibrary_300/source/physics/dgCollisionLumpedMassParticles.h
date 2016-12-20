@@ -28,8 +28,6 @@
 #include "dgCollisionConvex.h"
 
 
-#define DG_LUMPED_MASSES_GRANULARITY	32
-
 class dgCollisionLumpedMassParticles: public dgCollisionConvex
 {
 	public:

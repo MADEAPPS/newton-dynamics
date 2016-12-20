@@ -44,8 +44,9 @@ class dgCollisionCompoundFractured: public dgCollisionCompound
 	{
 		public:
 		dgFlatVertexArray(dgMemoryAllocator* const allocator)
-			:dgArray<dgFlatVertex> (1024 * 4, allocator)
+			:dgArray<dgFlatVertex> (allocator)
 		{
+			dgAssert(0);
 			m_count = 0;
 		}
 

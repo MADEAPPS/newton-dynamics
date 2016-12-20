@@ -124,7 +124,7 @@ dgConvexHull3d::dgConvexHull3d (dgMemoryAllocator* const allocator)
 	,m_diag()
 	,m_aabbP0(dgBigVector (dgFloat64 (0.0), dgFloat64 (0.0), dgFloat64 (0.0), dgFloat64 (0.0)))
 	,m_aabbP1(dgBigVector (dgFloat64 (0.0), dgFloat64 (0.0), dgFloat64 (0.0), dgFloat64 (0.0)))
-	,m_points(1024, allocator)
+	,m_points(allocator)
 {
 }
 
@@ -134,7 +134,7 @@ dgConvexHull3d::dgConvexHull3d(const dgConvexHull3d& source)
 	,m_diag(source.m_diag)
 	,m_aabbP0 (source.m_aabbP0)
 	,m_aabbP1 (source.m_aabbP1)
-	,m_points(source.m_count, source.GetAllocator()) 
+	,m_points(source.GetAllocator(), source.m_count)
 {
 	m_points[m_count-1].m_w = dgFloat64 (0.0f);
 	for (int i = 0; i < m_count; i ++) {
@@ -166,7 +166,7 @@ dgConvexHull3d::dgConvexHull3d(dgMemoryAllocator* const allocator, const dgFloat
 	,m_diag()
 	,m_aabbP0 (dgBigVector (dgFloat64 (0.0), dgFloat64 (0.0), dgFloat64 (0.0), dgFloat64 (0.0)))
 	,m_aabbP1 (dgBigVector (dgFloat64 (0.0), dgFloat64 (0.0), dgFloat64 (0.0), dgFloat64 (0.0)))
-	,m_points(count, allocator) 
+	,m_points(allocator) 
 {
 	BuildHull (vertexCloud, strideInBytes, count, distTol, maxVertexCount);
 }

@@ -55,8 +55,8 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 {
 	public:
 	dgTriangleAnglesToUV (dgMeshEffect* const mesh, dgInt32 material, dgReportProgress progressReportCallback, void* const userData, const dgFloat64* const pinnedPoint, dgFloat64* const triangleAnglesVector = NULL)
-		:m_hessianCoLumnIndex (4 * mesh->GetVertexCount(), mesh->GetAllocator())
-		,m_hessianCoLumnValue(4 * mesh->GetVertexCount(), mesh->GetAllocator())
+		:m_hessianCoLumnIndex (mesh->GetAllocator())
+		,m_hessianCoLumnValue(mesh->GetAllocator())
 		,m_mesh(mesh)
 		,m_triangleAngles(triangleAnglesVector)
 		,m_pinnedPoints(pinnedPoint)

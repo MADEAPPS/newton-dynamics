@@ -33,7 +33,7 @@
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const world, dgMeshEffect* const mesh)
 	:dgCollisionDeformableMesh(world, m_deformableSolidMesh)
-	,m_finiteElements(64, world->GetAllocator())
+	,m_finiteElements(world->GetAllocator())
 	,m_finiteElementsCount(0)
 {
 	m_rtti |= dgCollisionDeformableSolidMesh_RTTI;
@@ -148,7 +148,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(const dgCollisionDeformableSolidMesh& source)
 	:dgCollisionDeformableMesh(source)
-	,m_finiteElements(source.m_finiteElementsCount, source.GetAllocator())
+	,m_finiteElements(source.m_finiteElements, source.m_finiteElementsCount)
 	,m_finiteElementsCount(source.m_finiteElementsCount)
 {
 	m_rtti = source.m_rtti;
@@ -157,7 +157,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(const dgCollision
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
 	:dgCollisionDeformableMesh(world, deserialization, userData, revisionNumber)
-	,m_finiteElements(64, world->GetAllocator())
+	,m_finiteElements(world->GetAllocator())
 	,m_finiteElementsCount(0)
 {
 	dgAssert (0);

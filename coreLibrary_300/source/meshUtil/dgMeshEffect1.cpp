@@ -1276,8 +1276,8 @@ dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
 			:m_brush(0)
 			,m_faceCount(0)
 			,m_vertexCount(0)
-			,m_vertex(256, allocator)
-			,m_faceIndexCount(128, allocator)
+			,m_vertex(allocator)
+			,m_faceIndexCount(allocator)
 		{
 		}
 
@@ -1427,7 +1427,7 @@ dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const char* const
 //					edgeCount = parcel.GetInteger();
 					parcel.SkipLine();
 
-					dgArray<dgBigVector> points(vertexCount, GetAllocator());
+					dgArray<dgBigVector> points(GetAllocator());
 					for (dgInt32 i = 0; i < vertexCount; i ++) {
 						dgFloat64 x = parcel.GetFloat();
 						dgFloat64 y = parcel.GetFloat();
@@ -1436,8 +1436,8 @@ dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const char* const
 						points[i] = p;
 					}
 
-					dgArray<dgInt32> indexList(256, GetAllocator()) ;
-					dgArray<dgInt32> faceVertex(faceCount, GetAllocator()); 
+					dgArray<dgInt32> indexList(GetAllocator()) ;
+					dgArray<dgInt32> faceVertex(GetAllocator()); 
 					dgInt32 index = 0;
 					for (dgInt32 i = 0; i < faceCount; i ++) {
 						const dgInt32 faceVertexCount = parcel.GetInteger();

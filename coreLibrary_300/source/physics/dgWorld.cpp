@@ -52,9 +52,9 @@
 #define DG_SOLVER_CONVERGENCE_COUNT			4
 #define DG_DEFAULT_SOLVER_ITERATION_COUNT	4
 
-#define DG_INITIAL_BODIES_SIZE		(1024 * 4)
-#define DG_INITIAL_JOINTS_SIZE		(1024 * 4)
-#define DG_INITIAL_JACOBIAN_SIZE	(1024 * 16)
+//#define DG_INITIAL_BODIES_SIZE		(1024 * 4)
+//#define DG_INITIAL_JOINTS_SIZE		(1024 * 4)
+//#define DG_INITIAL_JACOBIAN_SIZE	(1024 * 16)
 
 
 
@@ -225,11 +225,11 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	,m_preListener(allocator)
 	,m_postListener(allocator)
 	,m_perInstanceData(allocator)
-	,m_bodiesMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
-	,m_jointsMemory (DG_INITIAL_JOINTS_SIZE, allocator, 64)
-	,m_solverJacobiansMemory (DG_INITIAL_JACOBIAN_SIZE, allocator, 64)
-	,m_solverForceAccumulatorMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
-	,m_clusterMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
+	,m_bodiesMemory (allocator, 64)
+	,m_jointsMemory (allocator, 64)
+	,m_solverJacobiansMemory (allocator, 64)
+	,m_solverForceAccumulatorMemory (allocator, 64)
+	,m_clusterMemory (allocator, 64)
 {
 	dgMutexThread* const mutexThread = this;
 	SetMatertThread (mutexThread);

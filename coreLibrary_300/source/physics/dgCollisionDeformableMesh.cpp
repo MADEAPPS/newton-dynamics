@@ -36,9 +36,9 @@ dgVector dgCollisionDeformableMesh::m_smallestLenght2	(DG_SMALLEST_SPRING_LENGTH
 
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCollisionID collisionID)
 	:dgCollisionLumpedMassParticles(world, collisionID)
-	,m_linkList(DG_DEFORMABLE_MESH_LINKS_GRANULARITY, world->GetAllocator())
-	,m_restlength(DG_DEFORMABLE_MESH_LINKS_GRANULARITY, world->GetAllocator())
-	,m_indexToVertexMap(DG_LUMPED_MASSES_GRANULARITY, world->GetAllocator())
+	,m_linkList(world->GetAllocator())
+	,m_restlength(world->GetAllocator())
+	,m_indexToVertexMap(world->GetAllocator())
 	,m_linksCount(0)
 {
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
@@ -46,9 +46,9 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCol
 
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformableMesh& source)
 	:dgCollisionLumpedMassParticles(source)
-	,m_linkList(source.m_linksCount, source.GetAllocator())
-	,m_restlength(source.m_linksCount, source.GetAllocator())
-	,m_indexToVertexMap(source.m_linksCount, source.GetAllocator())
+	,m_linkList(source.m_linkList, m_linksCount)
+	,m_restlength(source.m_restlength, m_linksCount)
+	,m_indexToVertexMap(source.m_indexToVertexMap, m_linksCount)
 	,m_linksCount(source.m_linksCount)
 {
 	m_rtti = source.m_rtti;
@@ -58,9 +58,9 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformable
 
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
 	:dgCollisionLumpedMassParticles(world, deserialization, userData, revisionNumber)
-	,m_linkList(0, world->GetAllocator())
-	,m_restlength(0, world->GetAllocator())
-	,m_indexToVertexMap(0, world->GetAllocator())
+	,m_linkList(world->GetAllocator())
+	,m_restlength(world->GetAllocator())
+	,m_indexToVertexMap(world->GetAllocator())
 	,m_linksCount(0)
 {
 	dgAssert(0);
