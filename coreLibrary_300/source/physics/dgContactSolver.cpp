@@ -1523,7 +1523,7 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 			}
 			cycling ++;
 			if (cycling > 4) {
-				dgAssert (0);
+				//dgAssert (0);
 				index = -1; 
 				break;
 			}
