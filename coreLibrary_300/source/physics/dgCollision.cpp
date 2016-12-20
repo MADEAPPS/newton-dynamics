@@ -24,12 +24,11 @@
 #include "dgWorld.h"
 #include "dgCollision.h"
 
-//dgInitRtti(dgCollision);
+dgVector dgCollision::m_flushZero (dgFloat32 (1.0e-7f));
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-//dgCollision::dgCollision(dgMemoryAllocator* const allocator, dgUnsigned32 signature, const dgMatrix& matrix, dgCollisionID id)
 dgCollision::dgCollision(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id)
 	:m_inertia(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))	
 	,m_crossInertia(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f))		

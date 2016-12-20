@@ -461,19 +461,13 @@ bool dgWorld::IntersectionTest (const dgCollisionInstance* const collisionSrcA, 
 	return (pair.m_contactCount == -1) ? true : false;
 }
 
-
-//dgInt32 dgWorld::ClosestCompoundPoint (dgBody* const compoundConvexA, dgBody* const collisionB, dgTriplex& contactA, dgTriplex& contactB, dgTriplex& normalAB, dgInt32 threadIndex) const
 dgInt32 dgWorld::ClosestCompoundPoint (dgCollisionParamProxy& proxy) const
 {
-//	dgCollisionInstance* const instance = compoundConvexA->m_collision;
 	dgCollisionInstance* const instance = proxy.m_instance0;
 	dgAssert (instance->IsType(dgCollision::dgCollisionCompound_RTTI));
 	dgCollisionCompound* const collision = (dgCollisionCompound*) instance->GetChildShape();
-//	return collision->ClosestDistance (compoundConvexA, contactA, collisionB, contactB, normalAB);
 	return collision->ClosestDistance (proxy);
 }
-
-
 
 // **********************************************************************************
 //

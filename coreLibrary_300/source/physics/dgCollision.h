@@ -294,7 +294,7 @@ class dgCollision
 	dgCollisionID m_collisionId;
 	dgMemoryAllocator* m_allocator;
 
-
+	static dgVector m_flushZero;
 	friend class dgBody;
 	friend class dgWorld;
 	friend class dgMinkowskiConv;

@@ -158,18 +158,31 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTriangle (dgInt32& indexOut)
 		const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
 		const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
 
-		const dgFloat64 beta = b1 * a00 - a01 * b0;
-		const dgFloat64 alpha = b0 * a11 - a01 * b1;
-		if (beta < dgFloat32(0.0f)) {
+		const dgFloat64 u2 = b1 * a00 - a01 * b0;
+		const dgFloat64 u1 = b0 * a11 - a01 * b1;
+
+		/*
+		const dgFloat64 d0 = sqrt(e10.DotProduct4(e10).GetScalar());
+		const dgFloat64 invd0 = dgFloat64(1.0f) / d0;
+		const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
+		const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
+		const dgFloat64 d1 = sqrt(desc11);
+		const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
+		dgFloat64 u1__ = b0 * invd0;
+		dgFloat64 u2__ = (b1 - l10 * u1__) * invd1 * invd1;
+		u1__ = (u1__ - l10 * u2__) * invd0;
+		*/
+
+		if (u2 < dgFloat32(0.0f)) {
 			// this looks funny but it is correct
-		} else if (alpha < dgFloat32(0.0f)) {
+		} else if (u1 < dgFloat32(0.0f)) {
 			m_hullSum[1] = m_hullSum[2];
 			m_hullDiff[1] = m_hullDiff[2];
-		} else if ((alpha + beta) > det) {
+		} else if ((u1 + u2) > det) {
 			m_hullSum[0] = m_hullSum[2];
 			m_hullDiff[0] = m_hullDiff[2];
 		} else {
-			return p0 + (e10.Scale4(alpha) + e20.Scale4(beta)).Scale4(dgFloat64(1.0f) / det);
+			return p0 + (e10.Scale4(u1) + e20.Scale4(u2)).Scale4(dgFloat64(1.0f) / det);
 		}
 		indexOut = 2;
 		return ReduceLine(indexOut);
@@ -841,9 +854,6 @@ bool dgContactSolver::SanityCheck() const
 
 bool dgContactSolver::CalculateClosestPoints()
 {
-static int xxx;
-xxx++;
-
 	dgInt32 simplexPointCount = CalculateClosestSimplex();
 	if (simplexPointCount < 0) {
 		simplexPointCount = CalculateIntersectingPlane(-simplexPointCount);
