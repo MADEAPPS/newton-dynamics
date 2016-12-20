@@ -238,8 +238,9 @@ class dgFastAABBInfo: public dgObb
 	public:
 	DG_INLINE dgFastAABBInfo()
 		:dgObb()
-		,m_absDir(dgGetIdentityMatrix())
 		,m_separationDistance(dgFloat32(1.0e10f))
+		,m_absDir(dgGetIdentityMatrix())
+		
 	{
 	}
 
@@ -255,10 +256,10 @@ class dgFastAABBInfo: public dgObb
 
 	DG_INLINE dgFastAABBInfo(const dgVector& p0, const dgVector& p1)
 		:dgObb(dgGetIdentityMatrix(), (p1 - p0).CompProduct4(dgVector::m_half))
+		,m_separationDistance(dgFloat32(1.0e10f))
 		,m_absDir(dgGetIdentityMatrix())
 		,m_p0(p0)
 		,m_p1(p1)
-		,m_separationDistance(dgFloat32(1.0e10f))
 	{
 		m_posit = ((p1 + p0).CompProduct4(dgVector::m_half) & dgVector::m_triplexMask) | dgVector::m_wOne;
 	}
@@ -384,10 +385,10 @@ class dgFastAABBInfo: public dgObb
 	}
 
 	protected:
+	mutable dgFloat32 m_separationDistance;
 	dgMatrix m_absDir;
 	dgVector m_p0;
 	dgVector m_p1;
-	mutable dgFloat32 m_separationDistance;
 
 	friend class dgAABBPolygonSoup;
 	friend class dgCollisionUserMesh;
