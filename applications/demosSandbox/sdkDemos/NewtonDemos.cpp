@@ -34,14 +34,14 @@
 //#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
-#define DEFAULT_SCENE	11			// height field Collision
+//#define DEFAULT_SCENE	11			// height field Collision
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
 //#define DEFAULT_SCENE	14			// compound Collision
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
 //#define DEFAULT_SCENE	17			// non uniform Scaled Collision
-//#define DEFAULT_SCENE	18			// scaled mesh collision
+#define DEFAULT_SCENE	18			// scaled mesh collision
 //#define DEFAULT_SCENE	19			// continuous collision
 //#define DEFAULT_SCENE	20			// paper wall continuous collision
 //#define DEFAULT_SCENE	21			// puck slide continuous collision
