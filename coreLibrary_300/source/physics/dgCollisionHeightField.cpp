@@ -986,6 +986,7 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 	dgInt32 z0 = dgInt32 (p0.m_iz);
 	dgInt32 z1 = dgInt32 (p1.m_iz);
 
+	data->m_separationDistance = dgFloat32 (0.0f);
 	dgFloat32 minHeight = dgFloat32 (1.0e10f);
 	dgFloat32 maxHeight = dgFloat32 (-1.0e10f);
 	dgInt32 base = z0 * m_width;
