@@ -181,6 +181,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 
 		// if the force is bigger than N time Gravities, It is considered a collision force
 		breakImpact *= m_myMassInverse;
+breakImpact = 1000.0f;
 		if (breakImpact > BREAK_IMPACT_IN_METERS_PER_SECONDS) {
 			NewtonWorld* const world = NewtonBodyGetWorld(m_myBody);
 

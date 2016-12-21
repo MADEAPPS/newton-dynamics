@@ -2213,7 +2213,9 @@ void dgMeshEffect::PackPoints (dgFloat64 tol)
 			do {
 				ptr->m_mark = mark;
 				index[indexCount] = vertexIndexMap[ptr->m_incidentVertex];
+				m_attrib.m_pointChannel[dgInt32 (ptr->m_userData)] = vertexIndexMap[ptr->m_incidentVertex];
 				userData[indexCount] = ptr->m_userData;
+				
 				indexCount++;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
@@ -3270,35 +3272,73 @@ void dgMeshEffect::TransformMesh (const dgMatrix& matrix)
 }
 
 
-//dgMeshEffect::dgVertexAtribute dgMeshEffect::InterpolateEdge (dgEdge* const edge, dgFloat64 param) const
-dgInt32 dgMeshEffect::InterpolateEdge (dgEdge* const edge, dgFloat64 param) const
+void dgMeshEffect::AddInterpolateEdgeAttibute (dgEdge* const edge, dgFloat64 param)
 {
-dgAssert(0);
-return 0;
-/*
-	dgVertexAtribute attrEdge;
 	dgFloat64 t1 = param;
 	dgFloat64 t0 = dgFloat64 (1.0f) - t1;
 	dgAssert (t1 >= dgFloat64(0.0f));
 	dgAssert (t1 <= dgFloat64(1.0f));
 
-	const dgVertexAtribute& attrEdge0 = m_attrib[edge->m_userData];
-	const dgVertexAtribute& attrEdge1 = m_attrib[edge->m_next->m_userData];
+	const dgInt32 vertexIndex = m_points.m_vertex.m_count;
+	m_points.m_vertex.PushBack(m_points.m_vertex[edge->m_incidentVertex].Scale4(t0) + m_points.m_vertex[edge->m_next->m_incidentVertex].Scale4(t1));
+	if (m_points.m_layers.m_count) {
+		m_points.m_layers.PushBack(m_points.m_layers[edge->m_incidentVertex]);
+	}
+	if (m_points.m_weights.m_count) {
+		dgAssert(0);
+	}
 
-	attrEdge.m_vertex.m_x = attrEdge0.m_vertex.m_x * t0 + attrEdge1.m_vertex.m_x * t1;
-	attrEdge.m_vertex.m_y = attrEdge0.m_vertex.m_y * t0 + attrEdge1.m_vertex.m_y * t1;
-	attrEdge.m_vertex.m_z = attrEdge0.m_vertex.m_z * t0 + attrEdge1.m_vertex.m_z * t1;
-	attrEdge.m_vertex.m_w = dgFloat32(0.0f);
-	attrEdge.m_normal_x = attrEdge0.m_normal_x * t0 +  attrEdge1.m_normal_x * t1; 
-	attrEdge.m_normal_y = attrEdge0.m_normal_y * t0 +  attrEdge1.m_normal_y * t1; 
-	attrEdge.m_normal_z = attrEdge0.m_normal_z * t0 +  attrEdge1.m_normal_z * t1; 
-	attrEdge.m_u0 = attrEdge0.m_u0 * t0 +  attrEdge1.m_u0 * t1;
-	attrEdge.m_v0 = attrEdge0.m_v0 * t0 +  attrEdge1.m_v0 * t1;
-	attrEdge.m_u1 = attrEdge0.m_u1 * t0 +  attrEdge1.m_u1 * t1;
-	attrEdge.m_v1 = attrEdge0.m_v1 * t0 +  attrEdge1.m_v1 * t1;
-	attrEdge.m_material = attrEdge0.m_material;
-	return attrEdge;
-*/
+	m_attrib.m_pointChannel.PushBack(vertexIndex);
+	m_attrib.m_pointChannel.PushBack(vertexIndex);
+
+	if (m_attrib.m_materialChannel.m_count) {
+		m_attrib.m_materialChannel.PushBack(m_attrib.m_materialChannel[dgInt32(edge->m_userData)]);
+		m_attrib.m_materialChannel.PushBack(m_attrib.m_materialChannel[dgInt32(edge->m_twin->m_userData)]);
+	}
+	if (m_attrib.m_normalChannel.m_count) {
+		dgTriplex edgeNormal;
+		dgTriplex edgeNormal0(m_attrib.m_normalChannel[dgInt32(edge->m_userData)]);
+		dgTriplex edgeNormal1(m_attrib.m_normalChannel[dgInt32(edge->m_next->m_userData)]);
+		edgeNormal.m_x = edgeNormal0.m_x * dgFloat32(t0) + edgeNormal1.m_x * dgFloat32(t1);
+		edgeNormal.m_y = edgeNormal0.m_y * dgFloat32(t0) + edgeNormal1.m_y * dgFloat32(t1);
+		edgeNormal.m_z = edgeNormal0.m_z * dgFloat32(t0) + edgeNormal1.m_z * dgFloat32(t1);
+		m_attrib.m_normalChannel.PushBack(edgeNormal);
+		
+		dgTriplex twinNormal;
+		dgTriplex twinNormal0(m_attrib.m_normalChannel[dgInt32(edge->m_twin->m_next->m_userData)]);
+		dgTriplex twinNormal1(m_attrib.m_normalChannel[dgInt32(edge->m_twin->m_userData)]);
+		twinNormal.m_x = twinNormal0.m_x * dgFloat32(t0) + twinNormal1.m_x * dgFloat32(t1);
+		twinNormal.m_y = twinNormal0.m_y * dgFloat32(t0) + twinNormal1.m_y * dgFloat32(t1);
+		twinNormal.m_z = twinNormal0.m_z * dgFloat32(t0) + twinNormal1.m_z * dgFloat32(t1);
+		m_attrib.m_normalChannel.PushBack(twinNormal);
+	}
+	if (m_attrib.m_binormalChannel.m_count) {
+		dgAssert(0);
+	}
+
+	if (m_attrib.m_uv0Channel.m_count) {
+		dgAttibutFormat::dgUV edgeUV;
+		dgAttibutFormat::dgUV edgeUV0(m_attrib.m_uv0Channel[dgInt32(edge->m_userData)]);
+		dgAttibutFormat::dgUV edgeUV1(m_attrib.m_uv0Channel[dgInt32(edge->m_next->m_userData)]);
+		edgeUV.m_u = edgeUV0.m_u * dgFloat32(t0) + edgeUV1.m_u * dgFloat32(t1);
+		edgeUV.m_v = edgeUV0.m_v * dgFloat32(t0) + edgeUV1.m_v * dgFloat32(t1);
+		m_attrib.m_uv0Channel.PushBack(edgeUV);
+
+		dgAttibutFormat::dgUV twinUV;
+		dgAttibutFormat::dgUV twinUV0(m_attrib.m_uv0Channel[dgInt32(edge->m_twin->m_next->m_userData)]);
+		dgAttibutFormat::dgUV twinUV1(m_attrib.m_uv0Channel[dgInt32(edge->m_next->m_userData)]);
+		twinUV.m_u = twinUV0.m_u * dgFloat32(t0) + twinUV1.m_u * dgFloat32(t1);
+		twinUV.m_v = twinUV0.m_v * dgFloat32(t0) + twinUV1.m_v * dgFloat32(t1);
+		m_attrib.m_uv0Channel.PushBack(twinUV);
+	}
+
+	if (m_attrib.m_uv1Channel.m_count) {
+		dgAssert(0);
+	}
+
+	if (m_attrib.m_colorChannel.m_count) {
+		dgAssert(0);
+	}
 }
 
 bool dgMeshEffect::Sanity () const
@@ -3318,16 +3358,8 @@ bool dgMeshEffect::Sanity () const
 
 dgEdge* dgMeshEffect::InsertEdgeVertex (dgEdge* const edge, dgFloat64 param)
 {
-dgAssert(0);
-return NULL;
-	/*
 	dgEdge* const twin = edge->m_twin;
-	dgVertexAtribute attrEdge (InterpolateEdge (edge, param));
-	dgVertexAtribute attrTwin (InterpolateEdge (twin, dgFloat32 (1.0f) - param));
-
-	attrTwin.m_vertex = attrEdge.m_vertex;
-	AddPoint(&attrEdge.m_vertex.m_x, dgFastInt (attrEdge.m_material));
-	AddAtribute (attrTwin);
+	AddInterpolateEdgeAttibute(edge, param);
 
 	dgInt32 edgeAttrV0 = dgInt32 (edge->m_userData);
 	dgInt32 twinAttrV0 = dgInt32 (twin->m_userData);
@@ -3338,16 +3370,14 @@ return NULL;
 	dgEdge* const faceB1 = twin->m_prev;
 
 //	SpliteEdgeAndTriangulate (m_pointCount - 1, edge);
-	SpliteEdge (m_pointCount - 1, edge);
+	SpliteEdge (m_points.m_vertex.m_count - 1, edge);
 
-	faceA0->m_prev->m_userData = dgUnsigned64 (m_atribCount - 2);
+	faceA0->m_prev->m_userData = dgUnsigned64 (m_attrib.m_pointChannel.m_count - 2);
 	faceA1->m_next->m_userData = dgUnsigned64 (edgeAttrV0);
 
-	faceB0->m_prev->m_userData = dgUnsigned64 (m_atribCount - 1);
+	faceB0->m_prev->m_userData = dgUnsigned64 (m_attrib.m_pointChannel.m_count - 1);
 	faceB1->m_next->m_userData = dgUnsigned64 (twinAttrV0);
-
 	return faceA1->m_next;
-*/
 }
 
 
@@ -3821,7 +3851,7 @@ void dgMeshEffect::RepairTJoints ()
 								dgBigVector p2p0 (p2 - p0);
 								dgFloat64 den = p2p0.DotProduct3(p2p0);
 								dgFloat64 param1 = p2p0.DotProduct3(p1 - p0) / den;
-								dgVertexAtribute attib1 = InterpolateEdge (deletedEdge->m_twin, param1);
+								dgVertexAtribute attib1 = AddInterpolateEdgeAttibute (deletedEdge->m_twin, param1);
 								AddAtribute(attib1);
 								openEdge->m_next->m_userData = m_atribCount  - 1;
 
@@ -3864,7 +3894,7 @@ void dgMeshEffect::RepairTJoints ()
 							dgBigVector p2p0 (p2 - p0);
 							dgFloat64 den = p2p0.DotProduct3(p2p0);
 							dgFloat64 param1 = p2p0.DotProduct3(p1 - p0) / den;
-							dgVertexAtribute attib1 = InterpolateEdge (deletedEdge->m_twin, param1);
+							dgVertexAtribute attib1 = AddInterpolateEdgeAttibute (deletedEdge->m_twin, param1);
 							attib1.m_vertex = m_points[openEdge->m_next->m_incidentVertex];
 							AddAtribute(attib1);
 							openEdge->m_next->m_userData = m_atribCount  - 1;
@@ -3932,14 +3962,14 @@ void dgMeshEffect::RepairTJoints ()
 									dgBigVector p3p0 (p3 - p0);
 									dgFloat64 den = p3p0.DotProduct3(p3p0);
 									dgFloat64 param1 = p3p0.DotProduct3(p1 - p0) / den;
-									dgVertexAtribute attib1 = InterpolateEdge (deletedEdge->m_twin, param1);
+									dgVertexAtribute attib1 = AddInterpolateEdgeAttibute (deletedEdge->m_twin, param1);
 									attib1.m_vertex = m_points[openEdge->m_next->m_incidentVertex];
 									dgAssert(0);
 									//AddAtribute(attib1);
 									//openEdge->m_next->m_userData = m_atribCount  - 1;
 
 									dgFloat64 param2 = p3p0.DotProduct3(p2 - p0) / den;
-									dgVertexAtribute attib2 = InterpolateEdge (deletedEdge->m_twin, param2);
+									dgVertexAtribute attib2 = AddInterpolateEdgeAttibute (deletedEdge->m_twin, param2);
 									attib2.m_vertex = m_points[openEdge->m_next->m_next->m_incidentVertex];
 									dgAssert(0);
 									//AddAtribute(attib2);

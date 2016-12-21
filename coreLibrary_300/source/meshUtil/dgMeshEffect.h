@@ -464,7 +464,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgBigVector CalculateFaceNormal (const void* const face) const;
 
 	void SetFaceMaterial (const void* const face, int materialID);
-	dgInt32 InterpolateEdge (dgEdge* const edge, dgFloat64 param) const;
+	void AddInterpolateEdgeAttibute (dgEdge* const edge, dgFloat64 param);
 	dgInt32 InterpolateVertex (const dgBigVector& point, const dgEdge* const face) const;
 
 	bool Sanity () const;
