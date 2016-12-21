@@ -38,7 +38,6 @@ dgCollisionConvexPolygon::dgCollisionConvexPolygon (dgMemoryAllocator* const all
 	,m_paddedCount(0)
 	,m_stride(0)
 	,m_faceNormalIndex(0)
-//	,m_closestFeatureType(-1)
 	,m_faceClipSize(0) 
 	,m_vertex(NULL)
 	,m_vertexIndex(NULL)

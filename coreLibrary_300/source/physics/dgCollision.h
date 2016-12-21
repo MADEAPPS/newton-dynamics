@@ -69,6 +69,7 @@ enum dgCollisionID
 	m_compoundFracturedCollision,
 
 	// these are for internal use only	
+	m_contactCloud,
 	m_polygonCollision,
 	m_lumpedMassCollision
 };

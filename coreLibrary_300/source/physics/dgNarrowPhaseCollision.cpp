@@ -50,6 +50,81 @@
 #include "dgCollisionDeformableClothPatch.h"
 
 
+
+DG_MSC_VECTOR_ALIGMENT
+class dgCollisionContactCloud: public dgCollisionConvex
+{
+	public:
+	dgCollisionContactCloud(dgMemoryAllocator* const allocator, dgInt32 count, const dgContactPoint* const contacts)
+		:dgCollisionConvex(allocator, 0, m_contactCloud)
+		,m_contacts(contacts)
+		,m_count(count)
+	{
+	}
+	~dgCollisionContactCloud()
+	{
+	}
+
+	dgInt32 CalculateSignature() const
+	{
+		dgAssert (0);
+		return 0;
+	}
+	void Serialize(dgSerialize callback, void* const userData) const
+	{
+		dgAssert (0);
+	}
+	void SetCollisionBBox(const dgVector& p0, const dgVector& p1)
+	{
+		dgAssert (0);
+	}
+	dgFloat32 RayCast(const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
+	{
+		dgAssert (0);
+		return 0;
+	}
+
+	dgVector SupportVertex(const dgVector& dir, dgInt32* const vertexIndex) const
+	{
+		dgInt32 index = 0;
+		dgFloat32 dist = dgFloat32 (-1.0e10f);
+		for (dgInt32 i = 0; i < m_count; i ++) {
+			dgFloat32 dist1 = dir.DotProduct4(m_contacts[i].m_point).GetScalar();
+			if (dist1 > dist) {
+				index = i;
+				dist = dist1;
+			}
+		}
+		return m_contacts[index].m_point;
+	}
+
+	dgInt32 CalculatePlaneIntersection(const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
+	{
+		*contactsOut = point;
+		return 1;
+	}
+
+	dgFloat32 GetVolume() const
+	{
+		dgAssert (0);
+		return 0;
+	}
+	dgFloat32 GetBoxMinRadius() const
+	{
+		dgAssert (0);
+		return 0;
+	}
+	dgFloat32 GetBoxMaxRadius() const
+	{
+		dgAssert(0);
+		return 0;
+	}
+
+	const dgContactPoint* m_contacts;
+	dgInt32 m_count;
+} DG_GCC_VECTOR_ALIGMENT;
+
+
 dgCollisionInstance* dgWorld::CreateNull ()
 {
 	dgUnsigned32 crc = dgCollision::dgCollisionNull_RTTI;
@@ -1582,20 +1657,21 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 			break;
 		}
 	}
-//dgTrace (("\n"));
+
 	contactJoint->m_closestDistance = closestDist;
 
+	bool contactsValid = true;
 	const dgFloat32 dist = dgFloat32 (0.0078125f);
 	const dgFloat32 dist2 = dist * dist;
 	for (dgInt32 i = 0; i < count; i ++) {
 		const dgVector& p0 = contactOut[i].m_point;
 		for (dgInt32 j = i + 1; j < count; j ++) {
-			dgAssert (contactOut[i].m_normal.DotProduct3(contactOut[j].m_normal) > dgFloat32 (-0.9f));
+			const dgFloat32 project = (contactOut[i].m_normal.DotProduct4(contactOut[j].m_normal)).GetScalar();
+			contactsValid = contactsValid && (project > dgFloat32 (-0.5f));
 			const dgVector& p1 = contactOut[j].m_point;
-			dgVector step (p1 - p0);
-			dgFloat32 step2 = step.DotProduct4(step).GetScalar(); 
+			const dgVector step (p1 - p0);
+			const dgFloat32 step2 = step.DotProduct4(step).GetScalar(); 
 			if (step2 < dist2) {
-				dgFloat32 project = (contactOut[i].m_normal.DotProduct4(contactOut[j].m_normal)).GetScalar();
 				if (project > dgFloat32 (0.999f)) {
 					count --;
 					contactOut[j] = contactOut[count];
@@ -1604,6 +1680,27 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 			}
 		}
 	} 
+
+	if (!contactsValid) {
+		dgCollisionContactCloud contactCloud (GetAllocator(), count, contactOut);
+		dgCollisionInstance cloudInstance (*polySoupInstance, &contactCloud);
+		cloudInstance.m_globalMatrix = dgGetIdentityMatrix();
+		cloudInstance.SetScale(dgVector::m_one);
+		bool saveintersectionTestOnly = proxy.m_intersectionTestOnly;
+		proxy.m_instance1 = &cloudInstance;
+		proxy.m_intersectionTestOnly = true;
+		dgContactSolver contactSolver (&proxy);
+		contactSolver.CalculateConvexToConvexContacts();
+		dgVector normal = contactSolver.GetNormal().CompProduct4(dgVector::m_negOne);
+		for (dgInt32 i = 0; i < count; i ++) {
+			contactOut[i].m_normal = normal;
+		}
+
+		proxy.m_intersectionTestOnly = saveintersectionTestOnly;
+		cloudInstance.m_userData0 = NULL;
+		cloudInstance.m_userData1 = NULL;
+		
+	}
 
 /*
 	// this was the method used in newton 1.5 for filtering contacts, but now I realized it did not really worked as I though

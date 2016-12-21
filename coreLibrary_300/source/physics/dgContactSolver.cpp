@@ -1382,7 +1382,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVect
 			dgVector alternatePointOnInstance1(matrix1.UntransformVector(alternatePoint));
 			count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, alternatePointOnInstance1, shape1);
 		}
-		dgAssert(count1);
+		//dgAssert(count1);
 		step = matrix1.UnrotateVector(normal.CompProduct4 ((alternatePoint - origin).DotProduct4(normal)));
 		for (dgInt32 i = 0; i < count1; i++) {
 			shape1[i] -= step;

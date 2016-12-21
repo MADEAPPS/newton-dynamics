@@ -79,12 +79,12 @@ dgArray<T>::dgArray (dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes
 template<class T>
 dgArray<T>::dgArray (const dgArray& source, dgInt32 itemsToCopy)
 	:m_aligmentInBytes(source.m_aligmentInBytes)
-	,m_maxSize(source.m_maxSize)
+	,m_maxSize(itemsToCopy)
 	,m_array(NULL)
 	,m_allocator(source.m_allocator)
 {
 	if (source.m_array) {
-		m_array = (T*) m_allocator->MallocLow (sizeof (T) * m_maxSize, m_aligmentInBytes);
+		m_array = (T*) m_allocator->MallocLow (sizeof (T) * itemsToCopy, m_aligmentInBytes);
 		for (dgInt32 i = 0; i < itemsToCopy; i++) {
 			m_array[i] = source.m_array[i];
 		}
