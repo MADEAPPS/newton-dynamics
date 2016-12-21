@@ -344,7 +344,7 @@ void SceneCollision (DemoEntityManager* const scene)
 
 
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector size (0.5f, 0.5f, 0.5f, 0.0f);
+	dVector size (0.25f, 0.25f, 0.25f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	int count = 5;

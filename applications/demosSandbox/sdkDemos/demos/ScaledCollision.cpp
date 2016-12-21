@@ -157,11 +157,10 @@ void UniformScaledCollision(DemoEntityManager* const scene)
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	dVector location(0.0f, 0.0f, 0.0f, 0.0f);
-	dVector size0(0.5f, 0.5f, 0.75f, 0.0f);
-	dVector size1(0.5f, 0.5f, 0.5f, 0.0f);
+	dVector size0(0.5f, 0.5f, 0.5f, 0.0f);
+	dVector size1(0.25f, 0.5f, 0.5f, 0.0f);
 
 	dMatrix shapeOffsetMatrix(dRollMatrix(3.141592f / 2.0f));
-//	dMatrix shapeOffsetMatrix(dGetIdentityMatrix);
 
 	int count = 5;
 	AddUniformScaledPrimitives(scene, 10.0f, location, size0, count, count, 4.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -199,8 +198,8 @@ void NonUniformScaledCollision(DemoEntityManager* const scene)
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	dVector location(0.0f, 0.0f, 0.0f, 0.0f);
-	dVector size0(0.5f, 0.5f, 1.0f, 0.0f);
-	dVector size1(0.5f, 0.5f, 0.5f, 0.0f);
+	dVector size0(0.5f, 0.5f, 0.5f, 0.0f);
+	dVector size1(0.25f, 0.5f, 0.5f, 0.0f);
 
 	int count = 5;
 	dMatrix shapeOffsetMatrix(dRollMatrix(3.141592f / 2.0f));
@@ -274,8 +273,8 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	// do not forget to destroy the collision mesh helper
 	NewtonDestroyCollision(staticCollision);
 
-	dVector size0 (1.0f, 1.0f, 1.0f, 0.0f);
-	dVector size1 (0.5f, 1.0f, 1.0f, 0.0f);
+	dVector size0 (0.5f, 0.5f, 0.5f, 0.0f);
+	dVector size1 (0.25f, 0.5f, 0.5f, 0.0f);
 	dMatrix shapeOffsetMatrix (dRollMatrix(3.141592f/2.0f));
 
 	int count = 3;
