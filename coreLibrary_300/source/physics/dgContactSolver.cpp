@@ -970,8 +970,8 @@ DG_INLINE void dgContactSolver::CalculateContactFromFeacture(dgInt32 featureType
 		}
 	}
 
-	m_closestPoint0 = (s + d).Scale4(dgFloat32(0.5f));
-	m_closestPoint1 = (s - d).Scale4(dgFloat32(0.5f));
+	m_closestPoint0 = dgVector::m_half.CompProduct4(s + d);
+	m_closestPoint1 = dgVector::m_half.CompProduct4(s - d);
 	dgAssert(dgAbsf(m_normal.DotProduct3(m_normal) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 	m_proxy->m_contactJoint->m_separtingVector = m_normal;
 }

@@ -33,7 +33,7 @@
 //#define DEFAULT_SCENE	7			// primitive convex cast 
 //#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
-//#define DEFAULT_SCENE	10			// optimized level mesh collision
+#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
 //#define DEFAULT_SCENE	12			// infinite user plane collision
 //#define DEFAULT_SCENE	13			// user height field Collision
@@ -46,7 +46,7 @@
 //#define DEFAULT_SCENE	20			// paper wall continuous collision
 //#define DEFAULT_SCENE	21			// puck slide continuous collision
 //#define DEFAULT_SCENE	22			// simple convex decomposition
-#define DEFAULT_SCENE	23			// scene Collision
+//#define DEFAULT_SCENE	23			// scene Collision
 //#define DEFAULT_SCENE	24          // simple boolean operators 
 //#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
