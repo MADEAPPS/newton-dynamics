@@ -1870,7 +1870,6 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 					distance -= speed * timestep;
 					contact->m_separationDistance = distance;
 				}
-				//distance = 0.0f;
 				if (distance < DG_NARROW_PHASE_DIST) {
 					AddPair(contact, timestep, threadID);
 					if (contact->m_maxDOF) {

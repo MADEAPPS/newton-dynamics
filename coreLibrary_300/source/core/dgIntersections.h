@@ -103,7 +103,11 @@ DG_INLINE void dgMovingAABB (dgVector& p0, dgVector& p1, const dgVector& veloc, 
 
 DG_INLINE dgFloat32 BoxPenetration (const dgVector& minBox, const dgVector& maxBox)
 {
-	dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
+	dgAssert(maxBox.m_x >= minBox.m_x);
+	dgAssert(maxBox.m_y >= minBox.m_y);
+	dgAssert(maxBox.m_z >= minBox.m_z);
+
+	dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector::m_zero);
 	dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
 	dist = dist.GetMin(dist.ShiftTripleRight());
 	dist = dist.GetMin(dist.ShiftTripleRight());
@@ -112,7 +116,10 @@ DG_INLINE dgFloat32 BoxPenetration (const dgVector& minBox, const dgVector& maxB
 
 DG_INLINE dgFloat32 dgBoxDistanceToOrigin2 (const dgVector& minBox, const dgVector& maxBox)
 {
-	dgVector mask ((minBox.CompProduct4(maxBox)) > dgVector (dgFloat32 (0.0f)));
+	dgAssert(maxBox.m_x >= minBox.m_x);
+	dgAssert(maxBox.m_y >= minBox.m_y);
+	dgAssert(maxBox.m_z >= minBox.m_z);
+	dgVector mask ((minBox.CompProduct4(maxBox)) > dgVector::m_zero);
 	dgVector dist (maxBox.Abs().GetMin (minBox.Abs()) & mask);
 	return dist.DotProduct4(dist).GetScalar();
 }
@@ -124,11 +131,11 @@ class dgFastRayTest
 public:
 	DG_INLINE dgFastRayTest(const dgVector& l0, const dgVector& l1)
 		:m_p0(l0)
-		, m_p1(l1)
-		, m_diff((l1 - l0) & dgVector::m_triplexMask)
-		, m_minT(dgFloat32(0.0f))
-		, m_maxT(dgFloat32(1.0f))
-		, m_zero(dgFloat32(0.0f))
+		,m_p1(l1)
+		,m_diff((l1 - l0) & dgVector::m_triplexMask)
+		,m_minT(dgFloat32(0.0f))
+		,m_maxT(dgFloat32(1.0f))
+		,m_zero(dgFloat32(0.0f))
 	{
 		dgAssert(m_p0.m_w == dgFloat32(0.0f));
 		dgAssert(m_p1.m_w == dgFloat32(0.0f));

@@ -225,8 +225,8 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-	AddFloorBox(scene, dVector (0.0f, -0.5f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f));
-	//CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	//AddFloorBox(scene, dVector (0.0f, -0.5f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f));
+	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "flatPlaneDoubleFace.ngd", 1);
 	//CreateLevelMesh (scene, "sponza.ngd", 0);
 	//CreateLevelMesh (scene, "cattle.ngd", fileName);

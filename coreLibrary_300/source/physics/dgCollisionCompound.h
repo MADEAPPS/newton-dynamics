@@ -58,6 +58,8 @@ class dgCollisionCompound: public dgCollision
 		dgOOBBTestData (const dgMatrix& matrix);
 		dgOOBBTestData (const dgMatrix& matrix, const dgVector& origin, const dgVector& size);
 
+		DG_INLINE dgFloat32 UpdateSeparatingDistance(const dgVector& box0Min, const dgVector& box0Max, const dgVector& box1Min, const dgVector& box1Max) const;
+
 		dgMatrix m_matrix;
 		dgMatrix m_absMatrix;
 		dgVector m_origin;
@@ -72,6 +74,8 @@ class dgCollisionCompound: public dgCollision
 		dgVector m_crossAxisDotAbs[9];
 		dgVector m_extendsMinX[3];
 		dgVector m_extendsMaxX[3];
+		mutable dgFloat32 m_separatingDistance;
+		static dgVector m_maxDist;
 	} DG_GCC_VECTOR_ALIGMENT;
 
 
@@ -126,7 +130,6 @@ class dgCollisionCompound: public dgCollision
 		dgInt32 m_treeNodeIsLeaf;
 	};
 
-
 	class dgSpliteInfo;
 	class dgHeapNodePair;
 
@@ -149,7 +152,6 @@ class dgCollisionCompound: public dgCollision
 
 	dgInt32 GetNodeIndex(dgTreeArray::dgTreeNode* const node) const;
 	dgTreeArray::dgTreeNode* FindNodeByIndex (dgInt32 index) const;
-
 
 	dgTreeArray::dgTreeNode* GetFirstNode () const;
 	dgTreeArray::dgTreeNode* GetNextNode (dgTreeArray::dgTreeNode* const node) const;
@@ -191,14 +193,9 @@ class dgCollisionCompound: public dgCollision
 	dgInt32 CalculateContactsToCollisionTreeContinue (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsToHeightField (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateContactsUserDefinedCollision (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
-
-	//dgInt32 ClosestDistance (dgBody* const bodyA, dgTriplex& contactA, dgBody* const bodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
-	//dgInt32 ClosestDistanceToCompound (dgBody* const compoundBodyA, dgTriplex& contactA, dgBody* const compoundBodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
-	//dgInt32 ClosestDistanceToConvex (dgBody* const bodyA, dgTriplex& contactA, dgBody* const ConvetvBodyB, dgTriplex& contactB, dgTriplex& normalAB) const;
 	dgInt32 ClosestDistance (dgCollisionParamProxy& proxy) const;
 	dgInt32 ClosestDistanceToConvex (dgCollisionParamProxy& proxy) const;
 	dgInt32 ClosestDistanceToCompound (dgCollisionParamProxy& proxy) const;
-	
 
 #ifdef _DEBUG
 	dgVector InternalSupportVertex (const dgVector& dir) const;
@@ -235,6 +232,17 @@ class dgCollisionCompound: public dgCollision
 	friend class dgCollisionScene;
 };
 
+DG_INLINE dgFloat32 dgCollisionCompound::dgOOBBTestData::UpdateSeparatingDistance(const dgVector& box0Min, const dgVector& box0Max, const dgVector& box1Min, const dgVector& box1Max) const
+{
+	dgVector minBox(box0Min - box1Max);
+	dgVector maxBox(box0Max - box1Min);
+	dgVector mask((minBox.CompProduct4(maxBox)) < dgVector::m_zero);
+	dgVector dist((mask & m_maxDist) | ((maxBox.Abs()).GetMin(minBox.Abs())).AndNot(mask));
+//	dgVector dist(((maxBox.Abs()).GetMin(minBox.Abs())).AndNot(mask));
+	dist = dist.GetMin(dist.ShiftTripleRight());
+	dist = dist.GetMin(dist.ShiftTripleRight());
+	return dist.GetScalar();
+}
 
 
 #endif 

@@ -37,6 +37,7 @@
 
 
 dgVector dgCollisionCompound::m_padding (dgFloat32 (1.0e-3f)); 
+dgVector dgCollisionCompound::dgOOBBTestData::m_maxDist (dgFloat32 (1.0e10f));
 
 class dgCollisionCompound::dgHeapNodePair
 {
@@ -62,6 +63,7 @@ void dgCollisionCompound::dgTreeArray::AddNode (dgNodeBase* const node, dgInt32 
 
 dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix)
 	:m_matrix (matrix)
+	,m_separatingDistance(dgFloat32 (1.0e10f))
 {
 	m_absMatrix[0] = m_matrix[0].Abs();
 	m_absMatrix[1] = m_matrix[1].Abs();
@@ -102,6 +104,7 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 	,m_size(localSize)
 	,m_localP0 (localOrigin - localSize)
 	,m_localP1 (localOrigin + localSize)
+	,m_separatingDistance(dgFloat32 (1.0e10f))
 {
 	m_absMatrix[0] = m_matrix[0].Abs();
 	m_absMatrix[1] = m_matrix[1].Abs();
@@ -132,7 +135,6 @@ dgCollisionCompound::dgOOBBTestData::dgOOBBTestData (const dgMatrix& matrix, con
 			dgVector tmp (m_matrix.UnrotateVector(axis));
 			dgVector d (m_size.DotProduct4(tmp.Abs()) + m_padding);
 			dgVector c (origin.DotProduct4(axis));
-//			extends[index] = ((c - d).PackLow (c + d));
 			dgVector diff (c - d);
 			dgVector sum (c + d);
 			extends[index] = dgVector (diff.m_x, sum.m_x, diff.m_y, sum.m_y);
@@ -245,11 +247,14 @@ void dgCollisionCompound::dgNodeBase::CalculateAABB()
 
 bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
 {
+	dgFloat32 separatingDistance = data.UpdateSeparatingDistance (data.m_aabbP0, data.m_aabbP1, m_p0, m_p1);
 	if (dgOverlapTest (data.m_aabbP0, data.m_aabbP1, m_p0, m_p1)) {
+		dgAssert (separatingDistance > dgFloat32 (1000.0f));
 		dgVector origin (data.m_matrix.UntransformVector(m_origin));
 		dgVector size (data.m_absMatrix.UnrotateVector(m_size));
 		dgVector p0 (origin - size);
 		dgVector p1 (origin + size);
+		data.m_separatingDistance = dgMin(data.m_separatingDistance, data.UpdateSeparatingDistance (p0, p1, data.m_localP0, data.m_localP1));
 		if (dgOverlapTest (p0, p1, data.m_localP0, data.m_localP1)) {
 			dgVector size_x (m_size.m_x);
 			dgVector size_y (m_size.m_y);
@@ -274,6 +279,7 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
 			return ret;
 		}
 	}
+	data.m_separatingDistance = dgMin(data.m_separatingDistance, separatingDistance);
 	return false;
 }
 
@@ -284,13 +290,16 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const
 	dgVector otherSize (data.m_absMatrix.RotateVector(otherNode->m_size));
 	dgVector otherP0 ((otherOrigin - otherSize) & dgVector::m_triplexMask);
 	dgVector otherP1 ((otherOrigin + otherSize) & dgVector::m_triplexMask);
+	
+	dgFloat32 separatingDistance = data.UpdateSeparatingDistance (m_p0, m_p1, otherP0, otherP1);
 	if (dgOverlapTest (m_p0, m_p1, otherP0, otherP1)) {
+		dgAssert (separatingDistance > dgFloat32 (1000.0f));
 		dgVector origin (data.m_matrix.UntransformVector(m_origin));
 		dgVector size (data.m_absMatrix.UnrotateVector(m_size));
 		dgVector p0 (origin - size);
 		dgVector p1 (origin + size);
+		data.m_separatingDistance = dgMin(data.m_separatingDistance, data.UpdateSeparatingDistance (p0, p1, otherNode->m_p0, otherNode->m_p1));
 		if (dgOverlapTest (p0, p1, otherNode->m_p0, otherNode->m_p1)) {
-
 			dgVector size0_x (m_size.m_x);
 			dgVector size0_y (m_size.m_y);
 			dgVector size0_z (m_size.m_z);
@@ -327,6 +336,7 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data, const
 			return ret;
 		}
 	}
+	data.m_separatingDistance = dgMin(data.m_separatingDistance, separatingDistance);
 	return false;
 }
 
