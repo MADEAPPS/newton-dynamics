@@ -86,7 +86,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		m_uv1,
 		m_color,
 		m_material,
-//		m_attibuteChannelsCount,
 		m_layer,
 		m_weight,
 		m_point,
@@ -494,6 +493,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	friend class dgConvexHull3d;
 	friend class dgConvexHull4d;
 	friend class dgBooleanMeshBVH;
+	friend class dgHACDClusterGraph;
 	friend class dgTriangleAnglesToUV;
 	friend class dgCollisionCompoundFractured;
 };

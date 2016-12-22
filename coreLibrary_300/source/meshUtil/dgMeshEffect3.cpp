@@ -853,22 +853,20 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 
 	dgMeshEffect* CreatePartitionMesh (dgMeshEffect& mesh, dgInt32 maxVertexPerHull)
 	{
-		dgAssert (0);
-		return NULL;
-/*
 		dgMemoryAllocator* const allocator = mesh.GetAllocator();
 		dgMeshEffect* const convexPartionMesh = new (allocator) dgMeshEffect(allocator);
 
-		dgMeshEffect::dgVertexAtribute polygon[256];
-		memset(polygon, 0, sizeof(polygon));
-		dgArray<dgBigVector> convexVertexBuffer(mesh.GetCount(), GetAllocator());
+		//dgMeshEffect::dgVertexAtribute polygon[256];
+		//memset(polygon, 0, sizeof(polygon));
+		//dgArray<dgBigVector> convexVertexBuffer(mesh.GetCount(), GetAllocator());
+		dgArray<dgBigVector> convexVertexBuffer(mesh.m_points.m_vertex, mesh.m_points.m_vertex.m_count);
 		const dgBigVector* const points = (dgBigVector*) mesh.GetVertexPool();
 
 		convexPartionMesh->BeginBuild();
-		dgFloat64 layer = dgFloat64 (0.0f);
+		dgInt32 layer = 0;
 		for (dgList<dgHACDConvacityLookAheadTree*>::dgListNode* clusterNode = m_convexProximation.GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
 			dgHACDConvacityLookAheadTree* const cluster = clusterNode->GetInfo();
-
+/*
 			dgInt32 vertexCount = 0;
 			for (dgList<dgEdge*>::dgListNode* faceNode = cluster->m_faceList.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
 				dgEdge* const edge = faceNode->GetInfo();
@@ -904,7 +902,10 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 				}
 				layer += dgFloat64 (1.0f);
 			}
+*/
 		}
+
+/*
 		convexPartionMesh->EndBuild(1.0e-5f);
 
 		m_progress = m_faceCount - 1;
@@ -912,6 +913,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 
 		return convexPartionMesh;
 */
+		return NULL;
 	}
 
 	dgFloat64 ConcavityByFaceMedian (dgInt32 faceCountA, dgInt32 faceCountB) const
@@ -1367,8 +1369,28 @@ dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dg
 
 	// make a copy of the mesh
 	dgMeshEffect mesh(*this);
+	mesh.m_attrib.m_materialChannel.Clear();
+	mesh.m_attrib.m_normalChannel.Clear();
+	mesh.m_attrib.m_binormalChannel.Clear();
+	mesh.m_attrib.m_colorChannel.Clear();
+	mesh.m_attrib.m_uv0Channel.Clear();
+	mesh.m_attrib.m_uv1Channel.Clear();
 	mesh.Triangulate ();
-	if (mesh.Optimize (&mesh.m_points.m_vertex[0].m_x, sizeof (dgBigVector), reportProgressCallback, progressReportUserData, dgFloat32 (1.0e-3f), 1500)) {
+
+	mesh.UnpackAttibuteData();
+	mesh.PackAttibuteData();
+	mesh.UnpackPoints();
+	bool state = mesh.Optimize (&mesh.m_points.m_vertex[0].m_x, sizeof (dgBigVector), reportProgressCallback, progressReportUserData, dgFloat32 (1.0e-3f), 1500);
+	// optimized override userdata
+	dgPolyhedra::Iterator iter(mesh);
+	for (iter.Begin(); iter; iter++) {
+		dgEdge* const edge = &iter.GetNode()->GetInfo();
+		if (edge->m_incidentFace > 0) {
+			edge->m_userData = edge->m_incidentVertex;
+		}
+	}
+	mesh.PackPoints(dgFloat32 (1.0e-24f));
+	if (state) {
 		mesh.DeleteDegenerateFaces (&mesh.m_points.m_vertex[0].m_x, sizeof (dgBigVector), dgFloat32 (1.0e-12f));
 		mesh.RepairTJoints();
 		mesh.ConvertToPolygons();
