@@ -33,12 +33,8 @@
 // for the details http://kmamou.blogspot.com/
 
 
-#define DG_BUILD_HIERACHICAL_HACD
-
 #define DG_CONCAVITY_SCALE				dgFloat64 (100.0f)
 #define DG_CONCAVITY_PERIMETER_HANDICAP	dgFloat64 (0.5f)
-
-
 
 class dgHACDEdge
 {
@@ -840,34 +836,20 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		}
 		return state;
 	}
-/*
-	static bool ReportProgress (dgFloat32 progressNormalzedPercent)
-	{
-		bool state = true;
-		if (m_reportProgressCallback) {
-			state = m_reportProgressCallback(progressNormalzedPercent * 0.5f);
-		}
-		return state;
-	};
-*/
 
 	dgMeshEffect* CreatePartitionMesh (dgMeshEffect& mesh, dgInt32 maxVertexPerHull)
 	{
 		dgMemoryAllocator* const allocator = mesh.GetAllocator();
 		dgMeshEffect* const convexPartionMesh = new (allocator) dgMeshEffect(allocator);
 
-		//dgMeshEffect::dgVertexAtribute polygon[256];
-		//memset(polygon, 0, sizeof(polygon));
-		//dgArray<dgBigVector> convexVertexBuffer(mesh.GetCount(), GetAllocator());
 		dgArray<dgBigVector> convexVertexBuffer(mesh.m_points.m_vertex, mesh.m_points.m_vertex.m_count);
 		const dgBigVector* const points = (dgBigVector*) mesh.GetVertexPool();
 
-		dgAssert (0);
-		convexPartionMesh->BeginBuild();
 		dgInt32 layer = 0;
+		convexPartionMesh->BeginBuild();
 		for (dgList<dgHACDConvacityLookAheadTree*>::dgListNode* clusterNode = m_convexProximation.GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
 			dgHACDConvacityLookAheadTree* const cluster = clusterNode->GetInfo();
-/*
+
 			dgInt32 vertexCount = 0;
 			for (dgList<dgEdge*>::dgListNode* faceNode = cluster->m_faceList.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
 				dgEdge* const edge = faceNode->GetInfo();
@@ -879,42 +861,22 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 					ptr = ptr->m_next;
 				} while (ptr != edge);
 			}
-			dgConvexHull3d convexHull(allocator, &convexVertexBuffer[0].m_x, sizeof(dgBigVector), vertexCount, 0.0, maxVertexPerHull);
-			if (convexHull.GetCount()) {
-				const dgBigVector* const vertex = convexHull.GetVertexPool();
-				for (dgConvexHull3d::dgListNode* node = convexHull.GetFirst(); node; node = node->GetNext()) {
-					const dgConvexHull3DFace* const face = &node->GetInfo();
 
-					dgInt32 i0 = face->m_index[0];
-					dgInt32 i1 = face->m_index[1];
-					dgInt32 i2 = face->m_index[2];
-
-					polygon[0].m_vertex = vertex[i0];
-					polygon[0].m_vertex.m_w = layer;
-
-					polygon[1].m_vertex = vertex[i1];
-					polygon[1].m_vertex.m_w = layer;
-
-					polygon[2].m_vertex = vertex[i2];
-					polygon[2].m_vertex.m_w = layer;
-
-					dgAssert (0);
-//					convexPartionMesh->AddPolygon(3, &polygon[0].m_vertex.m_x, sizeof(dgMeshEffect::dgVertexAtribute), 0);
+			//dgConvexHull3d convexHull(allocator, &convexVertexBuffer[0].m_x, sizeof(dgBigVector), vertexCount, 0.0, maxVertexPerHull);
+			dgMeshEffect convexMesh(allocator, &convexVertexBuffer[0].m_x, vertexCount, sizeof(dgBigVector), dgFloat64(0.0f));
+			if (convexMesh.GetCount()) {
+				for (dgInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i++) {
+					convexMesh.m_points.m_layers[i] = layer;
 				}
-				layer += dgFloat64 (1.0f);
+				convexPartionMesh->MergeFaces(&convexMesh);
+				layer++;
 			}
-*/
 		}
-
-/*
 		convexPartionMesh->EndBuild(1.0e-5f);
 
 		m_progress = m_faceCount - 1;
 		ReportProgress();
-
 		return convexPartionMesh;
-*/
-		return NULL;
 	}
 
 	dgFloat64 ConcavityByFaceMedian (dgInt32 faceCountA, dgInt32 faceCountB) const
@@ -1249,7 +1211,6 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		return continueColapsing;
 	}
 
-#ifdef DG_BUILD_HIERACHICAL_HACD
 	bool CollapseClusters (dgMeshEffect& mesh, dgFloat64 maxConcavity___, dgInt32 maxClustesCount)
 	{
 		bool collapseEdgeState = true;
@@ -1315,24 +1276,6 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		return collapseEdgeState;
 	}
 
-#else 
-	void CollapseClusters (dgMeshEffect& mesh, dgFloat64 maxConcavity, dgInt32 maxClustesCount)
-	{
-		maxConcavity *= (m_diagonal * DG_CONCAVITY_SCALE);
-
-		bool terminate = false;
-		while (m_priorityHeap.GetCount() && !terminate) {
-			dgFloat64 concavity =  m_priorityHeap.Value();
-			dgList<dgPairProxy>::dgListNode* const pairNode = m_priorityHeap[0];
-			if ((concavity < maxConcavity) && (GetCount() < maxClustesCount)) {
-				terminate  = true;
-			} else {
-				m_priorityHeap.Pop();
-				CollapseEdge (pairNode, mesh, concavity);
-			}
-		}
-	}
-#endif
 
 	dgInt32 m_mark;
 	dgInt32 m_faceCount;

@@ -148,8 +148,6 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 		index ++;
 	}
 
-//static int xxx;
-
 	const dgFloat32 normalAngleInRadians = 30.0f * 3.1416f / 180.0f;
 	dgMeshEffect* const voronoiPartition = new (allocator) dgMeshEffect (allocator);
 	voronoiPartition->BeginBuild();
@@ -181,8 +179,6 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 					for (dgInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i ++) {
 						convexMesh.m_points.m_layers[i] = layer;
 					}
-//xxx ++;
-//if (xxx >= 22 && xxx < 23)
 					voronoiPartition->MergeFaces(&convexMesh);
 					layer ++;
 				}
