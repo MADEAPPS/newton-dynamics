@@ -45,7 +45,7 @@
 //#define DEFAULT_SCENE	19			// continuous collision
 //#define DEFAULT_SCENE	20			// paper wall continuous collision
 //#define DEFAULT_SCENE	21			// puck slide continuous collision
-#define DEFAULT_SCENE	22			// simple convex decomposition
+//#define DEFAULT_SCENE	22			// simple convex decomposition
 //#define DEFAULT_SCENE	23			// scene Collision
 //#define DEFAULT_SCENE	24          // simple boolean operators 
 //#define DEFAULT_SCENE	25			// simple convex fracturing 
@@ -61,7 +61,7 @@
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
 //#define DEFAULT_SCENE	37			// cloth patch			
-//#define DEFAULT_SCENE	38			// soft bodies			
+#define DEFAULT_SCENE	38			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);

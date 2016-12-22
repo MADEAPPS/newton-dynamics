@@ -45,20 +45,16 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles(dgWorld* const wo
 
 dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles (const dgCollisionLumpedMassParticles& source)
 	:dgCollisionConvex(source)
-	,m_posit(source.m_posit, m_particlesCount)
-	,m_veloc(source.m_veloc, m_particlesCount)
-	,m_accel(source.m_accel, m_particlesCount)
-	,m_externalforce(source.m_externalforce, m_particlesCount)
+	,m_posit(source.m_posit, source.m_particlesCount)
+	,m_veloc(source.m_veloc, source.m_particlesCount)
+	,m_accel(source.m_accel, source.m_particlesCount)
+	,m_externalforce(source.m_externalforce, source.m_particlesCount)
 	,m_body(NULL)
 	,m_unitMass(source.m_unitMass)
 	,m_unitInertia(source.m_unitMass)
 	,m_particlesCount(source.m_particlesCount)
 {
 	m_rtti |= dgCollisionLumpedMass_RTTI;
-	memcpy(&m_posit[0], &source.m_posit[0], m_particlesCount * sizeof(dgVector));
-	memcpy(&m_veloc[0], &source.m_veloc[0], m_particlesCount * sizeof(dgVector));
-	memcpy(&m_accel[0], &source.m_posit[0], m_particlesCount * sizeof(dgVector));
-	memcpy(&m_externalforce[0], &source.m_externalforce[0], m_particlesCount * sizeof(dgVector));
 }
 
 

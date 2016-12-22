@@ -46,14 +46,12 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCol
 
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformableMesh& source)
 	:dgCollisionLumpedMassParticles(source)
-	,m_linkList(source.m_linkList, m_linksCount)
-	,m_restlength(source.m_restlength, m_linksCount)
-	,m_indexToVertexMap(source.m_indexToVertexMap, m_linksCount)
+	,m_linkList(source.m_linkList, source.m_linksCount)
+	,m_restlength(source.m_restlength, source.m_linksCount)
+	,m_indexToVertexMap(source.m_indexToVertexMap, source.m_linksCount)
 	,m_linksCount(source.m_linksCount)
 {
 	m_rtti = source.m_rtti;
-	memcpy(&m_linkList[0], &source.m_linkList[0], m_linksCount * sizeof(dgSoftLink));
-	memcpy(&m_restlength[0], &source.m_restlength[0], m_linksCount * sizeof(dgFloat32));
 }
 
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)

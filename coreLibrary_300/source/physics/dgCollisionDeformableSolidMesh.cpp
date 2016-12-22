@@ -152,7 +152,6 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(const dgCollision
 	,m_finiteElementsCount(source.m_finiteElementsCount)
 {
 	m_rtti = source.m_rtti;
-	memcpy(&m_finiteElements[0], &source.m_finiteElements[0], m_finiteElementsCount * sizeof(dgFiniteElementCell));
 }
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)

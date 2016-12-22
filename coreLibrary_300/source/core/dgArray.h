@@ -54,22 +54,22 @@ class dgArray
 	bool ExpandCapacityIfNeessesary (dgInt32 index, dgInt32 stride) const;
 
 	private:
-	dgInt32 m_aligmentInBytes;
-	mutable dgInt32 m_maxSize;
 	mutable T *m_array;
-	dgMemoryAllocator* m_allocator; 
+	mutable dgInt32 m_maxSize;
+	dgInt32 m_aligmentInBytes;
+	dgMemoryAllocator* m_allocator;
 };
 
 
 template<class T>
 dgArray<T>::dgArray (dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes)
-	:m_aligmentInBytes(aligmentInBytes)
+	:m_array(NULL)
 	,m_maxSize(0)
-	,m_array(NULL)
+	,m_aligmentInBytes(aligmentInBytes)
 	,m_allocator(allocator)
 {
 	if (m_aligmentInBytes <= 0) {
-		m_aligmentInBytes = 8;
+		m_aligmentInBytes = DG_MEMORY_GRANULARITY;
 	}
 	m_aligmentInBytes = 1 << dgExp2(m_aligmentInBytes);
 }
@@ -78,9 +78,9 @@ dgArray<T>::dgArray (dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes
 
 template<class T>
 dgArray<T>::dgArray (const dgArray& source, dgInt32 itemsToCopy)
-	:m_aligmentInBytes(source.m_aligmentInBytes)
+	:m_array(NULL)
 	,m_maxSize(itemsToCopy)
-	,m_array(NULL)
+	,m_aligmentInBytes(source.m_aligmentInBytes)
 	,m_allocator(source.m_allocator)
 {
 	if (source.m_array) {
@@ -92,9 +92,9 @@ dgArray<T>::dgArray (const dgArray& source, dgInt32 itemsToCopy)
 }
 template<class T>
 dgArray<T>::dgArray(const dgArray& source)
-	:m_aligmentInBytes(source.m_aligmentInBytes)
+	:m_array(NULL)
 	,m_maxSize(source.m_maxSize)
-	,m_array(NULL)
+	,m_aligmentInBytes(source.m_aligmentInBytes)
 	,m_allocator(source.m_allocator)
 {
 	dgAssert(0);
@@ -182,7 +182,6 @@ void dgArray<T>::Resize (dgInt32 size) const
 		m_array = newArray;
 		m_maxSize = size;
 	} else if (size < m_maxSize) {
-//		dgThreadYield();
 		dgAssert(0);
 /*
 		size = size + m_granulatity - (size + m_granulatity) % m_granulatity;
