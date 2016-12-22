@@ -862,6 +862,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		dgArray<dgBigVector> convexVertexBuffer(mesh.m_points.m_vertex, mesh.m_points.m_vertex.m_count);
 		const dgBigVector* const points = (dgBigVector*) mesh.GetVertexPool();
 
+		dgAssert (0);
 		convexPartionMesh->BeginBuild();
 		dgInt32 layer = 0;
 		for (dgList<dgHACDConvacityLookAheadTree*>::dgListNode* clusterNode = m_convexProximation.GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
