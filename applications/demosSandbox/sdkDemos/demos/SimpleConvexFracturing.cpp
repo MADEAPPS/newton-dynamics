@@ -364,11 +364,7 @@ static void AddFracturedPrimitive (DemoEntityManager* const scene, dFloat mass, 
 	NewtonMeshDestroy (mesh);
 	visualMesh->Release(); 
 	NewtonDestroyCollision (collision);
-
 }
-
-
-
 
 void SimpleConvexFracturing (DemoEntityManager* const scene)
 {

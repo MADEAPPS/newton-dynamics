@@ -1350,9 +1350,6 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 
 dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullsCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const progressReportUserData) const
 {
-	dgAssert(0);
-	return NULL;
-/*
 	//	dgMeshEffect triangleMesh(*this);
 	if (maxHullsCount <= 1) {
 		maxHullsCount = 1;
@@ -1370,11 +1367,9 @@ dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dg
 
 	// make a copy of the mesh
 	dgMeshEffect mesh(*this);
-	mesh.ClearAttributeArray();
 	mesh.Triangulate ();
-	if (mesh.Optimize (&mesh.m_points->m_x, sizeof (dgBigVector), reportProgressCallback, progressReportUserData, dgFloat32 (1.0e-3f), 1500)) {
-		mesh.ClearAttributeArray();
-		mesh.DeleteDegenerateFaces (&mesh.m_points->m_x, sizeof (dgBigVector), dgFloat32 (1.0e-12f));
+	if (mesh.Optimize (&mesh.m_points.m_vertex[0].m_x, sizeof (dgBigVector), reportProgressCallback, progressReportUserData, dgFloat32 (1.0e-3f), 1500)) {
+		mesh.DeleteDegenerateFaces (&mesh.m_points.m_vertex[0].m_x, sizeof (dgBigVector), dgFloat32 (1.0e-12f));
 		mesh.RepairTJoints();
 		mesh.ConvertToPolygons();
 		//mesh.SaveOFF ("xxxxxx.off");
@@ -1393,5 +1388,4 @@ dgMeshEffect* dgMeshEffect::CreateConvexApproximation(dgFloat32 maxConcavity, dg
 	}
 
 	return partition;
-*/
 }

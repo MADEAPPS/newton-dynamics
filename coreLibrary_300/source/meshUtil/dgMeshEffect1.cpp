@@ -1671,11 +1671,10 @@ dgAssert(0);
 
 void dgMeshEffect::Triangulate  ()
 {
+/*
 	dgInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
 	dgInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
-
 	dgPolyhedra polygon(GetAllocator());
-
 	polygon.BeginFace();
 	dgInt32 mark = IncLRU();
 	dgPolyhedra::Iterator iter1 (*this);
@@ -1721,6 +1720,18 @@ void dgMeshEffect::Triangulate  ()
 		}
 	}
 	EndFace();
+*/
+	UnpackPoints();
+	dgPolyhedra leftOversOut(GetAllocator());
+	dgPolyhedra::Triangulate(&m_points.m_vertex[0].m_x, sizeof (dgBigVector), &leftOversOut);
+	dgAssert(leftOversOut.GetCount() == 0);
+
+	dgPolyhedra::Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) {
+		dgEdge* const edge = &iter.GetNode()->GetInfo();
+		edge->m_userData = (edge->m_incidentFace) > 0 ? edge->m_incidentVertex : 0;
+	}
+	PackPoints(dgFloat32(1.0e-24f));
 
 	RepairTJoints ();
 	dgAssert (Sanity ());
@@ -1730,7 +1741,7 @@ void dgMeshEffect::ConvertToPolygons ()
 {
 	UnpackPoints();
 	dgPolyhedra leftOversOut(GetAllocator());
-	ConvexPartition(&m_points.m_vertex[0].m_x, sizeof (dgBigVector), &leftOversOut);
+	dgPolyhedra::ConvexPartition(&m_points.m_vertex[0].m_x, sizeof (dgBigVector), &leftOversOut);
 	dgAssert(leftOversOut.GetCount() == 0);
 
 	dgPolyhedra::Iterator iter(*this);
@@ -2162,6 +2173,13 @@ void dgMeshEffect::UnpackPoints()
 		}
 	}
 	EndFace();
+
+	dgAssert (m_points.m_vertex.m_count = m_attrib.m_pointChannel.m_count);
+#ifdef _DEBUG
+	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i ++) {
+		dgAssert (m_attrib.m_pointChannel[i] == i);
+	}
+#endif
 }
 
 

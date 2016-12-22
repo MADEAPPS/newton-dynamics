@@ -32,13 +32,8 @@ class dgCollisionInstance;
 #define DG_MESH_EFFECT_PRECISION_SCALE		dgFloat64(dgInt64(1)<<DG_MESH_EFFECT_PRECISION_BITS)
 #define DG_MESH_EFFECT_PRECISION_SCALE_INV	(dgFloat64 (1.0f) / DG_MESH_EFFECT_PRECISION_SCALE)
 
-
-//#define DG_MESH_EFFECT_INITIAL_VERTEX_SIZE	8
 #define DG_VERTEXLIST_INDEXLIST_TOL			(dgFloat64 (0.0f))
 #define DG_MESH_EFFECT_POINT_SPLITED		512
-
-
-
 #define DG_MESH_EFFECT_BVH_STACK_DEPTH		256
 
 
@@ -478,8 +473,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgInt32 CalculateMaxAttributes () const;
 	dgFloat64 QuantizeCordinade(dgFloat64 val) const;
 
-	void ClearAttributeArray ();
-	
 	void MergeFaces (const dgMeshEffect* const source);
 //	void ReverseMergeFaces (dgMeshEffect* const source);
 

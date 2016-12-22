@@ -1459,10 +1459,11 @@ dgBigVector dgMeshEffect::GetOrigin ()const
     return origin.Scale3 (dgFloat64 (1.0f) / m_points.m_vertex.m_count);
 }
 
+/*
 void dgMeshEffect::ClearAttributeArray ()
 {
 	dgAssert(0);
-/*
+
     dgStack<dgVertexAtribute>attribArray (m_pointCount);
 
     memset (&attribArray[0], 0, m_pointCount * sizeof (dgVertexAtribute));
@@ -1485,9 +1486,8 @@ void dgMeshEffect::ClearAttributeArray ()
         }
     }
     ApplyAttributeArray (&attribArray[0], m_pointCount);
-*/
 }
-
+*/
 
 
 void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
