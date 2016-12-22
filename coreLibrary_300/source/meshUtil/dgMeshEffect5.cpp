@@ -299,7 +299,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const convexMeshSrc) const
 {
 	dgMeshEffect convexMesh (*convexMeshSrc);
-//	convexMesh.ConvertToPolygons();
+	convexMesh.ConvertToPolygons();
 	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
 	//convexIntersection->ConvertToPolygons();
 	//convexIntersection->Triangulate();
