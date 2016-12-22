@@ -2172,14 +2172,13 @@ void dgMeshEffect::UnpackPoints()
 			AddFace(indexCount, index, userData);
 		}
 	}
-	EndFace();
-
 	dgAssert (m_points.m_vertex.m_count = m_attrib.m_pointChannel.m_count);
 #ifdef _DEBUG
 	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i ++) {
 		dgAssert (m_attrib.m_pointChannel[i] == i);
 	}
 #endif
+	EndFace();
 }
 
 
