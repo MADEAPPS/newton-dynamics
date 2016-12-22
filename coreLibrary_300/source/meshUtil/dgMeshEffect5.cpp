@@ -301,9 +301,6 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 	dgMeshEffect convexMesh (*convexMeshSrc);
 	convexMesh.ConvertToPolygons();
 	dgMeshEffect* const convexIntersection = new (GetAllocator()) dgMeshEffect (*this);
-	//convexIntersection->ConvertToPolygons();
-	//convexIntersection->Triangulate();
-	convexIntersection->RemoveUnusedVertices(NULL);
 
 	dgInt32 mark = convexMesh.IncLRU();
 	dgPolyhedra::Iterator iter (convexMesh);

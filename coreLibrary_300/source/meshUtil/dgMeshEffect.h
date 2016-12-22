@@ -149,8 +149,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 		void PushBack (const T& element) 
 		{
+			T tmp (element);
 			dgArray<T>& me = *this;
-			me[m_count] = element;
+			me[m_count] = tmp;
 			m_count ++;
 		}
 
