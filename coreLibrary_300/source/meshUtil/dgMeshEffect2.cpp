@@ -60,12 +60,6 @@ dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, const dgFloat64*
 }
 
 
-dgMeshEffect* dgMeshEffect::CreateDelaunayTetrahedralization (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix)
-{
-	dgAssert (0);
-	return NULL;
-}
-
 dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix)
 {
 	dgStack<dgBigVector> buffer(pointCount + 16);
@@ -188,4 +182,11 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	voronoiPartition->EndBuild(dgFloat64 (1.0e-8f), false);
 	//voronoiPartition->SaveOFF("xxx0.off");
 	return voronoiPartition;
+}
+
+
+dgMeshEffect* dgMeshEffect::CreateDelaunayTetrahedralization(dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix)
+{
+	dgAssert(0);
+	return NULL;
 }

@@ -1546,7 +1546,7 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 	const dgVector boxP0 (body0 ? body0->m_minAABB : leafNode->m_minBox);
 	const dgVector boxP1 (body0 ? body0->m_maxAABB : leafNode->m_maxBox);
 
-	const bool test0 = body0->GetInvMass().m_w != dgFloat32(0.0f);
+	const bool test0 = body0 ? (body0->GetInvMass().m_w != dgFloat32(0.0f)) : true;
 	while (stack) {
 		stack--;
 		dgBroadPhaseNode* const rootNode = pool[stack];
