@@ -1856,8 +1856,8 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
                         dgVector p (textureMatrix.TransformVector(rotationMatrix.RotateVector(m_points.m_vertex[ptr->m_incidentVertex])));
                         uv.m_u = p.m_x;
                         uv.m_v = p.m_y;
-						m_attrib.m_uv0Channel[dgInt32(edge->m_userData)] = uv;
-						m_attrib.m_materialChannel[dgInt32(edge->m_userData)] = material;
+						m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)] = uv;
+						m_attrib.m_materialChannel[dgInt32(ptr->m_userData)] = material;
 
                         ptr = ptr->m_next;
                     }while (ptr !=  edge);

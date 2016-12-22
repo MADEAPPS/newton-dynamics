@@ -114,13 +114,21 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 		dgAssert (areaInv > dgFloat32 (0.0f));
 		areaInv = dgFloat32 (1.0f) / areaInv;
 
-//		dgVector uv0_0 (dgFloat32 (convexMesh.m_attrib[e0->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[e0->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
-//		dgVector uv0_1 (dgFloat32 (convexMesh.m_attrib[e1->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[e1->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
-//		dgVector uv0_2 (dgFloat32 (convexMesh.m_attrib[e2->m_userData].m_u0), dgFloat32 (convexMesh.m_attrib[e2->m_userData].m_v0), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		dgVector uv0[3];
+		dgVector uv1[3];
+		memset(uv0, 0, sizeof(uv0));
+		memset(uv1, 0, sizeof(uv1));
+		if (m_attrib.m_uv0Channel.m_count && convexMesh.m_attrib.m_uv0Channel.m_count) {
+			uv0[0] = dgVector (dgFloat32(convexMesh.m_attrib.m_uv0Channel[dgInt32 (e0->m_userData)].m_u), dgFloat32(convexMesh.m_attrib.m_uv0Channel[dgInt32(e0->m_userData)].m_v), dgFloat32(0.0f), dgFloat32(0.0f));
+			uv0[1] = dgVector(dgFloat32(convexMesh.m_attrib.m_uv0Channel[dgInt32 (e1->m_userData)].m_u), dgFloat32(convexMesh.m_attrib.m_uv0Channel[dgInt32(e1->m_userData)].m_v), dgFloat32(0.0f), dgFloat32(0.0f));
+			uv0[2] = dgVector(dgFloat32(convexMesh.m_attrib.m_uv0Channel[dgInt32 (e2->m_userData)].m_u), dgFloat32(convexMesh.m_attrib.m_uv0Channel[dgInt32(e2->m_userData)].m_v), dgFloat32(0.0f), dgFloat32(0.0f));
+		}
 
-//		dgVector uv1_0 (dgFloat32 (convexMesh.m_attrib[e0->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[e0->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
-//		dgVector uv1_1 (dgFloat32 (convexMesh.m_attrib[e1->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[e1->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
-//		dgVector uv1_2 (dgFloat32 (convexMesh.m_attrib[e2->m_userData].m_u1), dgFloat32 (convexMesh.m_attrib[e2->m_userData].m_v1), dgFloat32 (0.0f), dgFloat32 (0.0f));
+		if (m_attrib.m_uv1Channel.m_count && convexMesh.m_attrib.m_uv1Channel.m_count) {
+			uv1[0] = dgVector(dgFloat32(convexMesh.m_attrib.m_uv1Channel[dgInt32(e0->m_userData)].m_u), dgFloat32(convexMesh.m_attrib.m_uv1Channel[dgInt32(e0->m_userData)].m_v), dgFloat32(0.0f), dgFloat32(0.0f));
+			uv1[1] = dgVector(dgFloat32(convexMesh.m_attrib.m_uv1Channel[dgInt32(e1->m_userData)].m_u), dgFloat32(convexMesh.m_attrib.m_uv1Channel[dgInt32(e1->m_userData)].m_v), dgFloat32(0.0f), dgFloat32(0.0f));
+			uv1[2] = dgVector(dgFloat32(convexMesh.m_attrib.m_uv1Channel[dgInt32(e2->m_userData)].m_u), dgFloat32(convexMesh.m_attrib.m_uv1Channel[dgInt32(e2->m_userData)].m_v), dgFloat32(0.0f), dgFloat32(0.0f));
+		}
 
 		for (iter.Begin(); iter; iter ++){
 			dgEdge* const edge = &(*iter);
@@ -222,41 +230,62 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 			}
 		}
 
-//		const dgFloat64 capAttribute = convexMesh.m_attrib[convexFace->m_userData].m_material;
+
+		const dgInt32 capAttribute = convexMesh.m_attrib.m_materialChannel.m_count ? convexMesh.m_attrib.m_materialChannel[dgInt32 (convexFace->m_userData)] : 0;
 		for (dgList<dgEdge*>::dgListNode* node = faceList.GetFirst(); node; node = node->GetNext()) {
 			dgEdge* const face = node->GetInfo();
 
 			dgEdge* edge = face;
 			do {
-/*
-				dgVertexAtribute attibute;
-				attibute.m_vertex = m_points[edge->m_incidentVertex];
-				attibute.m_normal_x = normal.m_x;
-				attibute.m_normal_y = normal.m_y;
-				attibute.m_normal_z = normal.m_z;
-				attibute.m_material = capAttribute;
+				edge->m_incidentFace = 1;
+				edge->m_userData = m_attrib.m_pointChannel.m_count;
 
-				dgVector p (matrix.UntransformVector (attibute.m_vertex));
+				m_attrib.m_pointChannel.PushBack(edge->m_incidentVertex);
+				if (m_attrib.m_normalChannel.m_count) {
+					dgTriplex n;
+					n.m_x = dgFloat32(normal.m_x);
+					n.m_y = dgFloat32(normal.m_y);
+					n.m_z = dgFloat32(normal.m_z);
+					m_attrib.m_normalChannel.PushBack(n);
+				}
 
+				if (m_attrib.m_binormalChannel.m_count) {
+					dgAssert(0);
+				}
+
+				if (m_attrib.m_colorChannel.m_count) {
+					dgAssert(0);
+				}
+
+				if (m_attrib.m_materialChannel.m_count) {
+					m_attrib.m_materialChannel.PushBack(capAttribute);
+				}
+
+				//dgVector p (matrix.UntransformVector (attibute.m_vertex));
+				dgVector p (matrix.UntransformVector(m_points.m_vertex[edge->m_incidentVertex]));
 				dgVector p_p0 (p - q0);
 				dgVector p_p1 (p - q1);
 				dgVector p_p2 (p - q2);
-
 				dgFloat32 alpha0 = faceNormal.DotProduct3(p_p1.CrossProduct3(p_p2)) * areaInv;
 				dgFloat32 alpha1 = faceNormal.DotProduct3(p_p2.CrossProduct3(p_p0)) * areaInv;
 				dgFloat32 alpha2 = faceNormal.DotProduct3(p_p0.CrossProduct3(p_p1)) * areaInv;
 
-				attibute.m_u0 = uv0_0.m_x * alpha0 + uv0_1.m_x * alpha1 + uv0_2.m_x * alpha2; 
-				attibute.m_v0 = uv0_0.m_y * alpha0 + uv0_1.m_y * alpha1 + uv0_2.m_y * alpha2; 
-				attibute.m_u1 = uv1_0.m_x * alpha0 + uv1_1.m_x * alpha1 + uv1_2.m_x * alpha2; 
-				attibute.m_v1 = uv1_0.m_y * alpha0 + uv1_1.m_y * alpha1 + uv1_2.m_y * alpha2; 
+				//alpha0 = 0.0f;
+				//alpha1 = 0.0f;
+				//alpha2 = 0.0;;
+				if (m_attrib.m_uv0Channel.m_count && convexMesh.m_attrib.m_uv0Channel.m_count) {
+					dgAttibutFormat::dgUV uv;
+					uv.m_u = uv0[0].m_x * alpha0 + uv0[1].m_x * alpha1 + uv0[2].m_x * alpha2;
+					uv.m_v = uv0[0].m_y * alpha0 + uv0[1].m_y * alpha1 + uv0[2].m_y * alpha2;
+					m_attrib.m_uv0Channel.PushBack(uv);
+				}
 
-				AddAtribute (attibute);
-				edge->m_incidentFace = 1;
-				edge->m_userData = m_atribCount - 1;
-*/
-		edge->m_incidentFace = 1;
-		edge->m_userData = 0;
+				if (m_attrib.m_uv1Channel.m_count && convexMesh.m_attrib.m_uv1Channel.m_count) {
+					dgAttibutFormat::dgUV uv;
+					uv.m_u = uv1[0].m_x * alpha0 + uv1[1].m_x * alpha1 + uv1[2].m_x * alpha2;
+					uv.m_v = uv1[0].m_y * alpha0 + uv1[1].m_y * alpha1 + uv1[2].m_y * alpha2;
+					m_attrib.m_uv1Channel.PushBack(uv);
+				}
 
 				edge = edge->m_next;
 			} while (edge != face);
@@ -298,9 +327,7 @@ dgMeshEffect* dgMeshEffect::ConvexMeshIntersection (const dgMeshEffect* const co
 		delete convexIntersection;
 		return NULL;
 	}
-
 	convexIntersection->RemoveUnusedVertices(NULL);
-
 	return convexIntersection;
 }
 

@@ -1747,116 +1747,10 @@ void dgMeshEffect::ConvertToPolygons ()
 void dgMeshEffect::RemoveUnusedVertices(dgInt32* const vertexMapResult)
 {
 	dgAssert (!vertexMapResult);
-
 	UnpackAttibuteData();
 	PackAttibuteData();
 	UnpackPoints();
 	PackPoints(dgFloat32 (1.0e-24f));
-
-/*
-	dgPolyhedra polygon(GetAllocator());
-	dgStack<dgInt32>attrbMap(m_points.m_count);
-	dgStack<dgInt32>vertexMap(m_attrib.m_count);
-
-	dgInt32 savedPointCount = m_points.m_count;
-	memset(&vertexMap[0], -1, m_points.m_count * sizeof (dgInt32));
-	memset(&attrbMap[0], -1, m_attrib.m_count * sizeof (dgInt32));
-
-	int attribCount = 0;
-	int vertexCount = 0;
-
-//	dgStack<dgBigVector>points (m_pointCount);
-//	dgStack<dgVertexAtribute>atributes (m_atribCount);
-
-	dgLayer layers(m_layers);
-	dgPoint points(m_points);
-	dgVertexFormat attrib(m_attrib);
-
-	m_layers.Clear();
-	m_points.Clear();
-	m_attrib.Clear();
-
-	dgInt32 mark = IncLRU();
-	polygon.BeginFace();
-	dgPolyhedra::Iterator iter (*this);
-	for (iter.Begin(); iter; iter ++){
-		dgEdge* const face = &(*iter);
-		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
-			dgInt32	vertex[DG_MESH_EFFECT_POINT_SPLITED];
-			dgInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
-			int indexCount = 0;
-			dgEdge* ptr = face;
-			do {
-				ptr->m_mark = mark;
-
-				int index = ptr->m_incidentVertex;
-				if (vertexMap[index] == -1) {
-					vertexMap[index] = vertexCount;
-					m_points[vertexCount] = points[index];
-					if (m_layers.m_count) {
-						m_layers[vertexCount] = layers[index];
-					}
-					vertexCount ++;
-				}
-				vertex[indexCount] = vertexMap[index];
-
-				index = int (ptr->m_userData);
-				if (attrbMap[index] == -1) {
-					attrbMap[index] = attribCount;
-					m_attrib.CopyEntryFrom (attribCount, attrib, index);
-//					atributes[attribCount] = m_attrib[index];
-					attribCount ++;
-				}
-				userData[indexCount] = attrbMap[index];
-				indexCount ++;
-
-				ptr = ptr->m_next;
-			} while (ptr != face);
-			polygon.AddFace(indexCount, vertex, userData);
-		}
-	}
-	polygon.EndFace();
-
-
-	m_pointCount = vertexCount;
-	memcpy (&m_points[0].m_x, &points[0].m_x, m_pointCount * sizeof (dgBigVector));
-	 
-	m_atribCount = attribCount;
-	memcpy (&m_attrib[0].m_vertex.m_x, &atributes[0].m_vertex.m_x, m_atribCount * sizeof (dgVertexAtribute));
-
-
-	RemoveAll();
-	SetLRU (0);
-
-	BeginFace();
-	dgPolyhedra::Iterator iter1 (polygon);
-	for (iter1.Begin(); iter1; iter1 ++){
-		dgEdge* const face = &(*iter1);
-		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
-			dgInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
-			dgInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
-
-
-			void AddPolygon (dgInt32 count, const dgFloat32* const vertexList, dgInt32 stride, dgInt32 material);
-			dgEdge* ptr = face;
-			dgInt32 indexCount = 0;
-			do {
-				ptr->m_mark = mark;
-				index[indexCount] = ptr->m_incidentVertex;
-				userData[indexCount] = dgInt64 (ptr->m_userData);
-				indexCount ++;
-				ptr = ptr->m_next;
-			} while (ptr != face);
-			AddFace(indexCount, index, userData);
-		}
-	}
-	EndFace();
-	PackVertexArrays ();
-
-	if (vertexMapResult) {
-		memcpy (vertexMapResult, &vertexMap[0], savedPointCount * sizeof (dgInt32));
-	}
-*/
 }
 
 
@@ -3326,7 +3220,7 @@ void dgMeshEffect::AddInterpolateEdgeAttibute (dgEdge* const edge, dgFloat64 par
 
 		dgAttibutFormat::dgUV twinUV;
 		dgAttibutFormat::dgUV twinUV0(m_attrib.m_uv0Channel[dgInt32(edge->m_twin->m_next->m_userData)]);
-		dgAttibutFormat::dgUV twinUV1(m_attrib.m_uv0Channel[dgInt32(edge->m_next->m_userData)]);
+		dgAttibutFormat::dgUV twinUV1(m_attrib.m_uv0Channel[dgInt32(edge->m_twin->m_userData)]);
 		twinUV.m_u = twinUV0.m_u * dgFloat32(t0) + twinUV1.m_u * dgFloat32(t1);
 		twinUV.m_v = twinUV0.m_v * dgFloat32(t0) + twinUV1.m_v * dgFloat32(t1);
 		m_attrib.m_uv0Channel.PushBack(twinUV);
@@ -3368,8 +3262,6 @@ dgEdge* dgMeshEffect::InsertEdgeVertex (dgEdge* const edge, dgFloat64 param)
 	dgEdge* const faceA1 = edge->m_prev;
 	dgEdge* const faceB0 = twin->m_next;
 	dgEdge* const faceB1 = twin->m_prev;
-
-//	SpliteEdgeAndTriangulate (m_pointCount - 1, edge);
 	SpliteEdge (m_points.m_vertex.m_count - 1, edge);
 
 	faceA0->m_prev->m_userData = dgUnsigned64 (m_attrib.m_pointChannel.m_count - 2);
