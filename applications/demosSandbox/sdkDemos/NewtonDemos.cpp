@@ -40,7 +40,7 @@
 //#define DEFAULT_SCENE	14			// compound Collision
 //#define DEFAULT_SCENE	15			// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	16			// uniform Scaled Collision
-//#define DEFAULT_SCENE	17			// non uniform Scaled Collision
+#define DEFAULT_SCENE	17			// non uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
 //#define DEFAULT_SCENE	19			// continuous collision
 //#define DEFAULT_SCENE	20			// paper wall continuous collision
@@ -61,7 +61,7 @@
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
 //#define DEFAULT_SCENE	37			// cloth patch			
-#define DEFAULT_SCENE	38			// soft bodies			
+//#define DEFAULT_SCENE	38			// soft bodies			
 
 
 void Friction (DemoEntityManager* const scene);

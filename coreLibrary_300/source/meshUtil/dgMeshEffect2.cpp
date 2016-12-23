@@ -185,8 +185,17 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 }
 
 
-dgMeshEffect* dgMeshEffect::CreateDelaunayTetrahedralization(dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix)
+dgMeshEffect* dgMeshEffect::CreateDelaunayTetrahedralization() const
 {
+	dgStack<dgInt32> indexList(m_points.m_vertex.m_count);
+	dgArray<dgBigVector> meshPoints(m_points.m_vertex, m_points.m_vertex.m_count);
+
+	dgInt32 count = dgVertexListToIndexList(&meshPoints[0].m_x, sizeof(dgBigVector), 3, m_points.m_vertex.m_count, &indexList[0], dgFloat64(5.0e-2f));
+	dgAssert(count >= 8);
+	dgDelaunayTetrahedralization delaunayTetrahedras(GetAllocator(), &meshPoints[0].m_x, count, sizeof(dgBigVector), dgFloat32(0.0f));
+
+	dgInt32 tetraCount = delaunayTetrahedras.GetCount();
 	dgAssert(0);
+
 	return NULL;
 }

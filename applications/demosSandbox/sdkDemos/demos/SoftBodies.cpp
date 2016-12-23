@@ -406,6 +406,13 @@ void SoftBodies(DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
+dMatrix xxx3(dGetIdentityMatrix());
+NewtonCollision* xxx0 = NewtonCreateBox(scene->GetNewton(), 1, 1, 1, 0, NULL);
+NewtonMesh* xxx1 = NewtonMeshCreateFromCollision(xxx0);
+NewtonMesh* xxx2 = NewtonMeshCreateConformingTetrahedralization(xxx1);
+
+
+
 	// load the scene from a ngd file format
 	CreateLevelMesh(scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "playground.ngd", 1);
