@@ -28,7 +28,7 @@ static int ReportProgress (dFloat normalizedProgressPercent, void* const userDat
 static void CreateConvexAproximation (const char* const name, DemoEntityManager* const scene, const dVector& origin, int instaceCount, const char* const texture)
 {
 	char fileName[2048];
-	GetWorkingFileName (name, fileName);
+	dGetWorkingFileName (name, fileName);
 
 	NewtonWorld* const world = scene->GetNewton();
 	dScene compoundTestMesh (world);
@@ -64,7 +64,7 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 #if 1
 	NewtonMesh* const mesh = meshInfo->GetMesh();
 #else
-	GetWorkingFileName ("mesh.off", fileName);
+	dGetWorkingFileName ("mesh.off", fileName);
 	NewtonMesh* const mesh = NewtonMeshLoadOFF(world, fileName);
 //	dMatrix scale (GetIdentityMatrix());
 //	//dFloat scaleMag = 0.05f;

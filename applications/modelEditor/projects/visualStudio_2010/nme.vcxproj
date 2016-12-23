@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug|Win32">
@@ -312,7 +312,7 @@ xcopy   "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_201
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dJointLibrary.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dCustomJoints.vcxproj">
       <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dMath.vcxproj">

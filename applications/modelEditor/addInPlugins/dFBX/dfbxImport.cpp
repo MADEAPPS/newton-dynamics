@@ -786,7 +786,7 @@ void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const n
 		int* const uv0Index = new int [indexCount];
 		int* const uv1Index = new int [indexCount];
 
-		dVector* const vertexArray = new dVector[fbxMesh->GetControlPointsCount()]; 
+		dBigVector* const vertexArray = new dBigVector[fbxMesh->GetControlPointsCount()]; 
 		dVector* const normalArray = new dVector[indexCount];
 		dVector* const uv0Array = new dVector[indexCount];
 		dVector* const uv1Array = new dVector[indexCount];
@@ -841,19 +841,40 @@ void dfbxImport::ImportMeshNode (FbxScene* const fbxScene, dPluginScene* const n
 				uv0Index[index] = index;
 				uv0Array[index] = dVector (dFloat(uv[0]), dFloat(uv[1]), 0.0f, 0.0f);
 
-				uv1Index[index] = 0;
-				uv1Array[index] = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+				//uv1Index[index] = 0;
+				//uv1Array[index] = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 
 				index ++;
 				dAssert (index <= indexCount);
 			}
 		}
 
+
+		NewtonMeshVertexFormat format;
+		NewtonMeshClearVertexFormat (&format);
+		format.m_faceCount = faceCount;
+		format.m_faceIndexCount = faceIndexList;
+		format.m_faceMaterial = materialIndex;
+
+		format.m_vertex.m_data = &vertexArray[0].m_x;
+		format.m_vertex.m_indexList = vertexIndex;
+		format.m_vertex.m_strideInBytes = sizeof (dBigVector);
+
+		format.m_normal.m_data = &normalArray[0].m_x;
+		format.m_normal.m_indexList = vertexIndex;
+		format.m_normal.m_strideInBytes = sizeof (dVector);
+
+		format.m_uv0.m_data = &uv0Array[0].m_x;
+		format.m_uv0.m_indexList = uv0Index;
+		format.m_uv0.m_strideInBytes = sizeof (dVector);
+/*
 		instance->BuildFromVertexListIndexList(faceCount, faceIndexList, materialIndex, 
 											   &vertexArray[0].m_x, sizeof (dVector), vertexIndex, 
 											   &normalArray[0].m_x, sizeof (dVector), normalIndex,
 											   &uv0Array[0].m_x, sizeof (dVector), uv0Index,
 											   &uv1Array[0].m_x, sizeof (dVector), uv1Index);
+*/
+		instance->BuildFromVertexListIndexList(&format);
 
 		// some meshes has degenerated faces we must repair them to be legal manifold
 		instance->RepairTJoints();

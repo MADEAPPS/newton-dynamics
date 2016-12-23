@@ -59,11 +59,14 @@ class dMeshNodeInfo: public dGeometryNodeInfo
 	virtual void BeginBuild ();
 	virtual void AddPolygon (int pointsCount, const neMeshInfoFlatPoint* const points, int materialID);
 	virtual void EndBuild ();
+/*
 	virtual void BuildFromVertexListIndexList(int faceCount, const int* const faceIndexCount, const int* faceMaterialIndex, 
 												const dFloat* const vertex, int vertexStrideInBytes, const int* vertexIndex,
 												const dFloat* const normal, int normalStrideInBytes, const int* normalIndex,
 												const dFloat* const uv0, int uv0StrideInBytes, const int* uv0Index,
 												const dFloat* const uv1, int uv1StrideInBytes, const int* uv1Index);
+*/
+	virtual void BuildFromVertexListIndexList(const NewtonMeshVertexFormat* const format);
 
 
 	virtual void CalcutateAABB (dVector& p0, dVector& p1) const;

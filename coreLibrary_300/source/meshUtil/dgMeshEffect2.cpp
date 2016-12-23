@@ -185,7 +185,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 }
 
 
-dgMeshEffect* dgMeshEffect::CreateDelaunayTetrahedralization() const
+dgMeshEffect* dgMeshEffect::CreateConstrainedConformingTetrahedralization() const
 {
 	dgStack<dgInt32> indexList(m_points.m_vertex.m_count);
 	dgArray<dgBigVector> meshPoints(m_points.m_vertex, m_points.m_vertex.m_count);

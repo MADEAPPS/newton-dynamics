@@ -1644,8 +1644,6 @@ dgAssert (0);
 
 void dgMeshEffect::SaveOFF (const char* const fileName) const
 {
-dgAssert(0);
-/*
 	FILE* const file = fopen (fileName, "wb");
 
 	fprintf (file, "OFF\n");
@@ -1664,10 +1662,10 @@ dgAssert(0);
 			} while (edge != face);
 		}
 	}
-	fprintf (file, "%d %d 0\n", m_pointCount, faceCount);
+	fprintf (file, "%d %d 0\n", m_points.m_vertex.m_count, faceCount);
 
-	for (dgInt32 i = 0; i < m_pointCount; i ++) {
-		fprintf (file, "%f %f %f\n", m_points[i].m_x, m_points[i].m_y, m_points[i].m_z);
+	for (dgInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
+		fprintf (file, "%f %f %f\n", m_points.m_vertex[i].m_x, m_points.m_vertex[i].m_y, m_points.m_vertex[i].m_z);
 	}
 
 	filter.RemoveAll();
@@ -1692,7 +1690,6 @@ dgAssert(0);
 		}
 	}
 	fclose (file);
-*/
 }
 
 void dgMeshEffect::Triangulate  ()

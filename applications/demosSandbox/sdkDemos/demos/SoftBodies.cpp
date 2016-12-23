@@ -406,11 +406,14 @@ void SoftBodies(DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-dMatrix xxx3(dGetIdentityMatrix());
-NewtonCollision* xxx0 = NewtonCreateBox(scene->GetNewton(), 1, 1, 1, 0, NULL);
-NewtonMesh* xxx1 = NewtonMeshCreateFromCollision(xxx0);
-NewtonMesh* xxx2 = NewtonMeshCreateConformingTetrahedralization(xxx1);
-
+//dMatrix xxx3(dGetIdentityMatrix());
+//NewtonCollision* xxx0 = NewtonCreateBox(scene->GetNewton(), 1, 1, 1, 0, NULL);
+//NewtonMesh* xxx1 = NewtonMeshCreateFromCollision(xxx0);
+//
+char name[2048];
+dGetWorkingFileName ("prism.off", name);
+NewtonMesh* const xxx1 = NewtonMeshLoadOFF(scene->GetNewton(), name);
+NewtonMesh* xxx2 = NewtonMeshCreateConstrainedTetrahedralization(xxx1);
 
 
 	// load the scene from a ngd file format

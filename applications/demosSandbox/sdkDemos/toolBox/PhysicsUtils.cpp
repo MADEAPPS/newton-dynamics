@@ -727,9 +727,9 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 			int count = 6;
 			// populate the cloud with pseudo Gaussian random points
 			for (int i = 6; i < SAMPLE_COUNT; i ++) {
-				cloud [i].m_x = RandomVariable(size.m_x);
-				cloud [i].m_y = RandomVariable(size.m_y);
-				cloud [i].m_z = RandomVariable(size.m_z);
+				cloud [i].m_x = dRandomVariable(size.m_x);
+				cloud [i].m_y = dRandomVariable(size.m_y);
+				cloud [i].m_z = dRandomVariable(size.m_z);
 				count ++;
 			}
 			collision = NewtonCreateConvexHull (world, count, &cloud[0].m_x, sizeof (dVector), 0.01f, 0, NULL); 
@@ -1127,7 +1127,7 @@ NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const n
 {
 	// load the scene from a ngd file format
 	char fileName[2048];
-	GetWorkingFileName (name, fileName);
+	dGetWorkingFileName (name, fileName);
 	scene->LoadScene (fileName);
 
 	NewtonBody* levelBody = NULL;

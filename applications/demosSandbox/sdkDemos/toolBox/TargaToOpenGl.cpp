@@ -124,7 +124,7 @@ GLuint LoadTexture(const char* const filename)
 	#pragma pack(8)
 
 	char fullPathName[2048];
-	GetWorkingFileName (filename, fullPathName);
+	dGetWorkingFileName (filename, fullPathName);
 	TextureCache& cache = TextureCache::GetChache();
 	GLuint texture = cache.GetTexture(fullPathName);
 	if (!texture) {

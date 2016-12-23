@@ -96,10 +96,10 @@ class dClosestDistanceRecord: public CustomControllerBase
 
 	void Init (dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)
 	{
-		m_pith = RandomVariable(3.1416f * 2.0f);
-		m_yaw = RandomVariable(3.1416f * 2.0f);
-		m_roll = RandomVariable(3.1416f * 2.0f);
-		m_step = 15.0f * (dAbs (RandomVariable(0.25f)) + 0.0001f) * 3.1416f/180.0f;
+		m_pith = dRandomVariable(3.1416f * 2.0f);
+		m_yaw = dRandomVariable(3.1416f * 2.0f);
+		m_roll = dRandomVariable(3.1416f * 2.0f);
+		m_step = 15.0f * (dAbs (dRandomVariable(0.25f)) + 0.0001f) * 3.1416f/180.0f;
 
 		CreatCasterBody(location_x, location_z, shapeType, materialID);
 

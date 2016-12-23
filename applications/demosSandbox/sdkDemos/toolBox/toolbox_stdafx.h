@@ -235,9 +235,9 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
 
 unsigned dRand ();
 void dSetRandSeed (unsigned seed);
-dFloat RandomVariable(dFloat amp);
+dFloat dRandomVariable(dFloat amp);
 
-inline int TwosPower (int x)
+inline int dTwosPower (int x)
 {
 	int rval=1;
 	for (; rval < x; rval *= 2);
@@ -249,7 +249,7 @@ inline int TwosPower (int x)
 // and i have to specify a absolute path
 // #define ASSETS_PATH "."
 //void GetAplicationDirectory (char* const aplicationDir);
-void GetWorkingFileName (const char* const name, char* const outPathName);
+void dGetWorkingFileName (const char* const name, char* const outPathName);
 
 
 // little Indian/big Indian conversion

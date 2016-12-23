@@ -61,9 +61,9 @@ class FractureEffect: public dList<FractureAtom>
 		int count = 0;		
 		// pepper the inside of the BBox box of the mesh with random points
 		while (count < NUMBER_OF_INTERNAL_PARTS) {			
-			dFloat x = RandomVariable(size.m_x);
-			dFloat y = RandomVariable(size.m_y);
-			dFloat z = RandomVariable(size.m_z);
+			dFloat x = dRandomVariable(size.m_x);
+			dFloat y = dRandomVariable(size.m_y);
+			dFloat z = dRandomVariable(size.m_z);
 			if ((x <= size.m_x) && (x >= -size.m_x) && (y <= size.m_y) && (y >= -size.m_y) && (z <= size.m_z) && (z >= -size.m_z)){
 				points[count] = dVector (x, y, z);
 				count ++;
