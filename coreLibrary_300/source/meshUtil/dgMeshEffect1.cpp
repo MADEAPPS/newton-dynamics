@@ -1519,9 +1519,10 @@ void dgMeshEffect::BeginFace()
 	dgPolyhedra::BeginFace();
 }
 
-void dgMeshEffect::EndFace ()
+bool dgMeshEffect::EndFace ()
 {
 	dgPolyhedra::EndFace();
+	bool state = false;
 	for (bool hasVertexCollision = true; hasVertexCollision;) {
 		hasVertexCollision = false;
 		const dgInt32 currentCount = m_points.m_vertex.m_count;
@@ -1551,6 +1552,7 @@ void dgMeshEffect::EndFace ()
 
 		dgAssert (!collisionFound.GetFirst() || Sanity());
 		for (dgList<dgTreeNode*>::dgListNode* node = collisionFound.GetFirst(); node; node = node->GetNext()) {
+			state = true;
 			dgEdge* const edge = &node->GetInfo()->GetInfo();
 
 			// this is a vertex collision
@@ -1565,9 +1567,29 @@ void dgMeshEffect::EndFace ()
 			dgEdge* ptr = edge;
 			do {
 				if (ptr->m_incidentFace > 0) {
-					m_attrib.m_pointChannel[dgInt32 (ptr->m_userData)] = m_points.m_vertex.m_count - 1;
+					//m_attrib.m_pointChannel[dgInt32 (ptr->m_userData)] = m_points.m_vertex.m_count - 1;
+					dgInt32 index = dgInt32 (ptr->m_userData);
+					m_attrib.m_pointChannel.PushBack(m_points.m_vertex.m_count - 1);
+					if (m_attrib.m_materialChannel.m_count) {
+						m_attrib.m_materialChannel.PushBack(m_attrib.m_materialChannel[index]);
+					}
+					if (m_attrib.m_normalChannel.m_count) {
+						m_attrib.m_normalChannel.PushBack(m_attrib.m_normalChannel[index]);
+					}
+					if (m_attrib.m_binormalChannel.m_count) {
+						m_attrib.m_binormalChannel.PushBack(m_attrib.m_binormalChannel[index]);
+					}
+					if (m_attrib.m_colorChannel.m_count) {
+						m_attrib.m_colorChannel.PushBack(m_attrib.m_colorChannel[index]);
+					}
+					if (m_attrib.m_uv0Channel.m_count) {
+						m_attrib.m_uv0Channel.PushBack(m_attrib.m_uv0Channel[index]);
+					}
+					if (m_attrib.m_uv1Channel.m_count) {
+						m_attrib.m_uv1Channel.PushBack(m_attrib.m_uv1Channel[index]);
+					}
+					ptr->m_userData = m_attrib.m_pointChannel.m_count - 1;
 				}
-				ptr->m_incidentVertex = m_points.m_vertex.m_count - 1;
 
 				dgTreeNode* const edgeNode = GetNodeFromInfo (*ptr);
 				dgPairKey edgeKey (ptr->m_incidentVertex, ptr->m_twin->m_incidentVertex);
@@ -1577,11 +1599,15 @@ void dgMeshEffect::EndFace ()
 				dgPairKey twinKey (ptr->m_twin->m_incidentVertex, ptr->m_incidentVertex);
 				ReplaceKey (twinNode, twinKey.GetVal());
 
+				ptr->m_incidentVertex = m_points.m_vertex.m_count - 1;
+
 				ptr = ptr->m_twin->m_next;
 			} while (ptr != edge);
 		}
 		dgAssert (!collisionFound.GetFirst() || Sanity());
 	}
+
+	return !state;
 }
 
 
@@ -2135,50 +2161,53 @@ void dgMeshEffect::PackPoints (dgFloat64 tol)
 
 void dgMeshEffect::UnpackPoints()
 {
-	dgPointFormat points(m_points);
-	m_points.Clear();
-	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
-		dgInt32 index = m_attrib.m_pointChannel[i];
-		m_points.m_vertex.PushBack(points.m_vertex[index]);
-		if (points.m_layers.m_count) {
-			m_points.m_layers.PushBack(points.m_layers[index]);
+	do {
+		dgPointFormat points(m_points);
+		m_points.Clear();
+		for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
+			dgInt32 index = m_attrib.m_pointChannel[i];
+			m_points.m_vertex.PushBack(points.m_vertex[index]);
+			if (points.m_layers.m_count) {
+				m_points.m_layers.PushBack(points.m_layers[index]);
+			}
+			if (points.m_weights.m_count) {
+				m_points.m_weights.PushBack(points.m_weights[index]);
+			}
+			m_attrib.m_pointChannel[i] = i;
 		}
-		if (points.m_weights.m_count) {
-			m_points.m_weights.PushBack(points.m_weights[index]);
-		}
-		m_attrib.m_pointChannel[i] = i;
-	}
 
-	dgInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
-	dgInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
-	dgPolyhedra polygon(GetAllocator());
-	SwapInfo (polygon);
-	dgAssert (GetCount() == 0);
-	BeginFace();
-	const dgInt32 mark = IncLRU();
-	dgPolyhedra::Iterator iter(polygon);
-	for (iter.Begin(); iter; iter++) {
-		dgEdge* const face = &(*iter);
-		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
-			dgEdge* ptr = face;
-			dgInt32 indexCount = 0;
-			do {
-				ptr->m_mark = mark;
-				index[indexCount] = dgInt32(ptr->m_userData);
-				userData[indexCount] = ptr->m_userData;
-				indexCount++;
-				ptr = ptr->m_next;
-			} while (ptr != face);
-			AddFace(indexCount, index, userData);
+		dgInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
+		dgInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
+		dgPolyhedra polygon(GetAllocator());
+		SwapInfo (polygon);
+		dgAssert (GetCount() == 0);
+		BeginFace();
+		const dgInt32 mark = IncLRU();
+		dgPolyhedra::Iterator iter(polygon);
+		for (iter.Begin(); iter; iter++) {
+			dgEdge* const face = &(*iter);
+			if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
+				dgEdge* ptr = face;
+				dgInt32 indexCount = 0;
+				do {
+					ptr->m_mark = mark;
+					index[indexCount] = dgInt32(ptr->m_userData);
+					userData[indexCount] = ptr->m_userData;
+					indexCount++;
+					ptr = ptr->m_next;
+				} while (ptr != face);
+				AddFace(indexCount, index, userData);
+			}
 		}
-	}
-	dgAssert (m_points.m_vertex.m_count = m_attrib.m_pointChannel.m_count);
+	} while (!EndFace());
+
+	dgAssert(m_points.m_vertex.m_count == m_attrib.m_pointChannel.m_count);
 #ifdef _DEBUG
-	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i ++) {
-		dgAssert (m_attrib.m_pointChannel[i] == i);
+	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
+		dgAssert(m_attrib.m_pointChannel[i] == i);
 	}
 #endif
-	EndFace();
+
 }
 
 

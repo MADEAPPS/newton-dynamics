@@ -326,7 +326,7 @@ dgEdge* dgPolyhedra::AddFace ( dgInt32 count, const dgInt32* const index, const 
 }
 
 
-void dgPolyhedra::EndFace ()
+bool dgPolyhedra::EndFace ()
 {
 	dgPolyhedra::Iterator iter (*this);
 
@@ -376,6 +376,8 @@ void dgPolyhedra::EndFace ()
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
+
+	return true;
 }
 
 

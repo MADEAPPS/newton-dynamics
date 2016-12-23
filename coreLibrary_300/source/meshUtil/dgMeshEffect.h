@@ -467,7 +467,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	protected:
 	virtual void BeginFace();
-	virtual void EndFace ();
+	virtual bool EndFace ();
 
 	dgBigVector GetOrigin ()const;
 	dgInt32 CalculateMaxAttributes () const;

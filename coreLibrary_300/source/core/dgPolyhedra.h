@@ -113,7 +113,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	dgEdge* AddFace (dgInt32 v0, dgInt32 v1, dgInt32 v2);
 	dgEdge* AddFace (dgInt32 count, const dgInt32* const index);
 	dgEdge* AddFace (dgInt32 count, const dgInt32* const index, const dgInt64* const userdata);
-	virtual void EndFace ();
+	virtual bool EndFace ();
 	virtual void DeleteFace(dgEdge* const edge);
 
 	dgInt32 GetFaceCount() const;
