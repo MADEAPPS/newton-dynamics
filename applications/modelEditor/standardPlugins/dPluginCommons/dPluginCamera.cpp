@@ -54,8 +54,8 @@ void dPluginCamera::SetPerspectiveMatrix(dSceneRender* const render, int width, 
 	// calculate the same gluLookAt matrix
 	dMatrix modelViewMatrix(dGetIdentityMatrix());
 	modelViewMatrix[2] = m_matrix.m_front.Scale (-1.0f);
-	modelViewMatrix[0] = m_matrix.m_up * modelViewMatrix[2];
-	modelViewMatrix[1] = modelViewMatrix[2] * modelViewMatrix[0];
+	modelViewMatrix[0] = m_matrix.m_up.CrossProduct(modelViewMatrix[2]);
+	modelViewMatrix[1] = modelViewMatrix[2].CrossProduct(modelViewMatrix[0]);
 	modelViewMatrix[3] = m_matrix.m_posit;
 	modelViewMatrix = modelViewMatrix.Inverse();
 
@@ -251,7 +251,7 @@ void dPluginCamera::DrawGizmo(dSceneRender* const render, int font) const
 	dFloat length = 30.0f;
 	dVector p1 (render->ScreenToGlobal(dVector (x0 + length, y0, zbuffer, 1.0f)));
 	dVector p1p0(p1 - origin);
-	length = dSqrt (p1p0 % p1p0);
+	length = dSqrt (p1p0.DotProduct3(p1p0));
 	
 	// display x axis
 	{

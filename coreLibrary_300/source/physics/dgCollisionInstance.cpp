@@ -119,9 +119,8 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 			m_childShape = new (m_world->GetAllocator()) dgCollisionCompound (*compound, this);
 		}
 	} else if (m_childShape->IsType (dgCollision::dgCollisionDeformableClothPatch_RTTI)) {
-		dgAssert(0);
-//		dgCollisionDeformableClothPatch* const deformable = (dgCollisionDeformableClothPatch*) m_childShape;
-//		m_childShape = new (m_world->GetAllocator()) dgCollisionDeformableClothPatch (*deformable);
+		dgCollisionDeformableClothPatch* const deformable = (dgCollisionDeformableClothPatch*) m_childShape;
+		m_childShape = new (m_world->GetAllocator()) dgCollisionDeformableClothPatch (*deformable);
 	} else if (m_childShape->IsType (dgCollision::dgCollisionDeformableSolidMesh_RTTI)) {
 		dgCollisionDeformableSolidMesh* const deformable = (dgCollisionDeformableSolidMesh*) m_childShape;
 		m_childShape = new (m_world->GetAllocator()) dgCollisionDeformableSolidMesh (*deformable);
@@ -442,11 +441,14 @@ void dgCollisionInstance::SetLocalMatrix (const dgMatrix& matrix)
 
 void dgCollisionInstance::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
+/*
 	dgMatrix scaledMatrix (m_localMatrix * matrix);
 	scaledMatrix[0] = scaledMatrix[0].Scale3 (m_scale[0]);
 	scaledMatrix[1] = scaledMatrix[1].Scale3 (m_scale[1]);
 	scaledMatrix[2] = scaledMatrix[2].Scale3 (m_scale[2]);
 	m_childShape->DebugCollision (m_aligmentMatrix * scaledMatrix, callback, userData);
+*/
+	m_childShape->DebugCollision (GetScaledTransform(matrix), callback, userData);
 }
 
 

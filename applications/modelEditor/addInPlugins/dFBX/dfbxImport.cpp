@@ -124,7 +124,7 @@ bool dfbxImport::Import (const char* const fileName, dPluginInterface* const int
 		dMatrix axisMatrix (dGetIdentityMatrix());
 		axisMatrix.m_front = frontVector;
 		axisMatrix.m_up = upVector;
-		axisMatrix.m_right = frontVector * upVector;
+		axisMatrix.m_right = frontVector.CrossProduct(upVector);
 		convertMatrix = axisMatrix * convertMatrix;
 
 //		NewtonMeshFixTJoints (mesh);

@@ -62,17 +62,20 @@ NewtonMesh* dNewtonMesh::GetMesh() const
 
 void dNewtonMesh::BeginPolygon()
 {
-	NewtonMeshBeginFace(m_mesh);
+	dAssert (0);
+//	NewtonMeshBeginFace(m_mesh);
 }
 
 void dNewtonMesh::AddFace (int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex)
 {
-	NewtonMeshAddFace (m_mesh, vertexCount, vertex, strideInBytes, materialIndex);
+	dAssert(0);
+//	NewtonMeshAddFace (m_mesh, vertexCount, vertex, strideInBytes, materialIndex);
 }
 
 void dNewtonMesh::EndPolygon()
 {
-	NewtonMeshEndFace(m_mesh);
+	dAssert (0);
+//	NewtonMeshEndFace(m_mesh);
 }
 
 
@@ -108,7 +111,8 @@ int dNewtonMesh::GetPointCount() const
 
 void dNewtonMesh::GetVertexStreams(dPoint* const posit, dPoint* const normal, dUV* const uv0, dUV* const uv1) const
 {
-	NewtonMeshGetVertexStreams (m_mesh, sizeof (dPoint), &posit[0].m_x, sizeof (dPoint), &normal[0].m_x, sizeof (dUV), &uv0[0].m_u, sizeof (dUV), &uv1[0].m_u);
+	dAssert(0);
+//	NewtonMeshGetVertexStreams (m_mesh, sizeof (dPoint), &posit[0].m_x, sizeof (dPoint), &normal[0].m_x, sizeof (dUV), &uv0[0].m_u, sizeof (dUV), &uv1[0].m_u);
 }
 
 

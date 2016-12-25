@@ -22,20 +22,11 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 	// load the skybox
 	scene->CreateSkyBox();
 
-//dFloat xxx[] = {2.3257, -3.6253, -2.7155, 2.7075, -3.6253, -2.7155, 2.7075, -3.6253, -2.3337, 2.3257, -3.6253, -2.3337};
-//NewtonCollision* aaa = NewtonCreateConvexHull(scene->GetNewton(), sizeof (xxx) /(3 * sizeof (dFloat)), xxx, 3 * sizeof (dFloat), 0, 0, 0);
-
-
 	// load the scene from a ngd file format
 //	CreateLevelMesh (scene, "flatPlane.ngd", optimization);
 	CreateLevelMesh (scene, "sponza.ngd", optimization);
 //	CreateLevelMesh (scene, "cattle.ngd", fileName);
 //	CreateLevelMesh (scene, "playground.ngd", optimization);
-	
-	// place camera into position
-//	dQuaternion rot;
-//	dVector posit (0.0f, 1.0f, 0.0f, 0.0f);
-//	scene->SetCameraMatrix(rot, posit);
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
@@ -45,9 +36,8 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector size (0.5f, 0.5f, 1.0f, 0.0f);
+	dVector size (0.25f, 0.25f, 0.5f, 0.0f);
 
-//	int count = 1;
 	int count = 6;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	for (int i = 0; i < 3; i ++) {

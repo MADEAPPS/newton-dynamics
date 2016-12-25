@@ -46,141 +46,18 @@ typedef dgFloat32 (*dgRayIntersectCallback) (void* const context,
 											 const dgFloat32* const polygon, dgInt32 strideInBytes,
 											 const dgInt32* const indexArray, dgInt32 indexCount);
 
-
-
-DG_MSC_VECTOR_ALIGMENT 
-class dgFastRayTest
-{
-	public:
-	DG_INLINE dgFastRayTest(const dgVector& l0, const dgVector& l1)
-		:m_p0 (l0)
-		,m_p1(l1)
-		,m_diff ((l1 - l0) & dgVector::m_triplexMask)
-		,m_minT(dgFloat32 (0.0f))  
-		,m_maxT(dgFloat32 (1.0f))
-		,m_zero(dgFloat32 (0.0f)) 
-	{
-		dgAssert (m_p0.m_w == dgFloat32 (0.0f));
-		dgAssert (m_p1.m_w == dgFloat32 (0.0f));
-		dgAssert (m_diff.m_w == dgFloat32 (0.0f));
-
-		m_isParallel = (m_diff.Abs() < dgVector (1.0e-8f));
-
-		m_dpInv = (((dgVector (dgFloat32 (1.0e-20)) & m_isParallel) | m_diff.AndNot(m_isParallel)).Reciproc ()) & dgVector::m_triplexMask;
-		m_dpBaseInv = m_dpInv;
-
-		dgFloat32 mag = dgSqrt (m_diff.DotProduct4(m_diff).GetScalar());
-		m_dirError = -dgFloat32 (0.0175f) * mag;
-		m_magRayTest = dgMax (mag, dgFloat32 (1.0f));
-	}
-	
-	dgFloat32 PolygonIntersect (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
-	dgFloat32 PolygonIntersectFallback (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
-
-	DG_INLINE dgInt32 BoxTest (const dgVector& minBox, const dgVector& maxBox) const
-	{
-		#if 1
-			dgVector test (((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
-			if (test.GetSignMask() & 0x07) {
-				return 0;
-			}
-			dgVector tt0 ((minBox - m_p0).CompProduct4(m_dpInv));
-			dgVector tt1 ((maxBox - m_p0).CompProduct4(m_dpInv));
-			dgVector t0 (m_minT.GetMax(tt0.GetMin(tt1)));
-			dgVector t1 (m_maxT.GetMin(tt0.GetMax(tt1)));
-			t0 = t0.GetMax(t0.ShiftTripleRight());
-			t1 = t1.GetMin(t1.ShiftTripleRight());
-			t0 = t0.GetMax(t0.ShiftTripleRight());
-			t1 = t1.GetMin(t1.ShiftTripleRight());
-			return ((t0 < t1).GetSignMask() & 1);
-
-		#else
-
-			dgFloat32 tmin = 0.0f;          
-			dgFloat32 tmax = 1.0f;
-
-			for (dgInt32 i = 0; i < 3; i++) {
-				if (m_isParallel[i]) {
-					if (m_p0[i] <= minBox[i] || m_p0[i] >= maxBox[i]) {
-						return 0;
-					}
-				} else {
-					dgFloat32 t1 = (minBox[i] - m_p0[i]) * m_dpInv[i];
-					dgFloat32 t2 = (maxBox[i] - m_p0[i]) * m_dpInv[i];
-
-					if (t1 > t2) {
-						dgSwap(t1, t2);
-					}
-					if (t1 > tmin) {
-						tmin = t1;
-					}
-					if (t2 < tmax) {
-						tmax = t2;
-					}
-					if (tmin > tmax) {
-						return 0;
-					}
-				}
-			}
-			return 0x1;
-		#endif
-	}
-
-	DG_INLINE dgFloat32 BoxIntersect (const dgVector& minBox, const dgVector& maxBox) const
-	{
-		dgVector test (((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
-		if (test.GetSignMask() & 0x07) {
-			return dgFloat32 (1.2f);
-		}
-		dgVector tt0 ((minBox - m_p0).CompProduct4(m_dpInv));
-		dgVector tt1 ((maxBox - m_p0).CompProduct4(m_dpInv));
-		dgVector t0 (m_minT.GetMax(tt0.GetMin(tt1)));
-		dgVector t1 (m_maxT.GetMin(tt0.GetMax(tt1)));
-		t0 = t0.GetMax(t0.ShiftTripleRight());
-		t1 = t1.GetMin(t1.ShiftTripleRight());
-		t0 = t0.GetMax(t0.ShiftTripleRight());
-		t1 = t1.GetMin(t1.ShiftTripleRight());
-		dgVector mask (t0 < t1);
-		dgVector maxDist (dgFloat32 (1.2f));
-		t0 = (t0 & mask) | maxDist.AndNot(mask);
-		dgAssert ((mask.GetSignMask() & 1) == (t0.m_x < dgFloat32 (1.0f)));
-		return t0.GetScalar();
-	}
-
-
-	dgVector m_p0;
-	dgVector m_p1;
-	dgVector m_diff;
-	dgVector m_dpInv;
-	dgVector m_dpBaseInv;
-	dgVector m_minT;
-	dgVector m_maxT;
-	dgVector m_zero;
-	dgVector m_isParallel;
-	dgFloat32 m_dirError;
-	dgFloat32 m_magRayTest;
-} DG_GCC_VECTOR_ALIGMENT;
-
-
+dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, const dgVector& ray_p1); 
+dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2);
+dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2, const dgVector& p3);
 
 bool dgRayBoxClip (dgVector& ray_p0, dgVector& ray_p1, const dgVector& boxP0, const dgVector& boxP1); 
-dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, const dgVector& ray_p1); 
 void dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, const dgVector& ray_q0, const dgVector& ray_q1, dgVector& p0Out, dgVector& p1Out); 
-dgVector dgPointToTriangleDistance (const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2, const dgVector& normal);
-dgFloat32 dgSweepLineToPolygonTimeOfImpact (const dgVector& p0, const dgVector& p1, dgFloat32 radius, dgInt32 count, const dgVector* const polygon, const dgVector& normal, dgVector& normalOut, dgVector& contactOut);
 dgFloat32 dgRayCastBox (const dgVector& p0, const dgVector& p1, const dgVector& boxP0, const dgVector& boxP1, dgVector& normalOut);
 dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVector& origin, dgFloat32 radius);
 
-#ifndef _NEWTON_USE_DOUBLE
-dgBigVector dgPointToTriangleDistance (const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& normal);
-#endif
-
-//bool dgObbTest (const dgVector& origin0, const dgVector& size0, const dgMatrix& matrix0, const dgVector& origin1, const dgVector& size1, const dgMatrix& matrix1);
 
 DG_INLINE dgInt32 dgOverlapTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {
-//	dgInt32 test = ((p0.m_x < q1.m_x) && (p1.m_x > q0.m_x) && (p0.m_z < q1.m_z) && (p1.m_z > q0.m_z) && (p0.m_y < q1.m_y) && (p1.m_y > q0.m_y));
-//	return  test
 	dgVector val ((p0 < q1) & (p1 > q0));
 	dgInt32 mask = val.GetSignMask();
 	return ((mask & 0x07) == 0x07);
@@ -189,8 +66,6 @@ DG_INLINE dgInt32 dgOverlapTest (const dgVector& p0, const dgVector& p1, const d
 
 DG_INLINE dgInt32 dgBoxInclusionTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {
-//	dgInt32 test = (p0.m_x >= q0.m_x) && (p0.m_y >= q0.m_y) && (p0.m_z >= q0.m_z) && (p1.m_x <= q1.m_x) && (p1.m_y <= q1.m_y) && (p1.m_z <= q1.m_z);
-//	return test;
 	dgVector val ((p0 >= q0) & (p1 <= q1));
 	dgInt32 mask = val.GetSignMask();
 	return ((mask & 0x07) == 0x07);
@@ -228,7 +103,11 @@ DG_INLINE void dgMovingAABB (dgVector& p0, dgVector& p1, const dgVector& veloc, 
 
 DG_INLINE dgFloat32 BoxPenetration (const dgVector& minBox, const dgVector& maxBox)
 {
-	dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
+	dgAssert(maxBox.m_x >= minBox.m_x);
+	dgAssert(maxBox.m_y >= minBox.m_y);
+	dgAssert(maxBox.m_z >= minBox.m_z);
+
+	dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector::m_zero);
 	dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
 	dist = dist.GetMin(dist.ShiftTripleRight());
 	dist = dist.GetMin(dist.ShiftTripleRight());
@@ -237,10 +116,127 @@ DG_INLINE dgFloat32 BoxPenetration (const dgVector& minBox, const dgVector& maxB
 
 DG_INLINE dgFloat32 dgBoxDistanceToOrigin2 (const dgVector& minBox, const dgVector& maxBox)
 {
-	dgVector mask ((minBox.CompProduct4(maxBox)) > dgVector (dgFloat32 (0.0f)));
+	dgAssert(maxBox.m_x >= minBox.m_x);
+	dgAssert(maxBox.m_y >= minBox.m_y);
+	dgAssert(maxBox.m_z >= minBox.m_z);
+	dgVector mask ((minBox.CompProduct4(maxBox)) > dgVector::m_zero);
 	dgVector dist (maxBox.Abs().GetMin (minBox.Abs()) & mask);
 	return dist.DotProduct4(dist).GetScalar();
 }
+
+
+DG_MSC_VECTOR_ALIGMENT
+class dgFastRayTest
+{
+public:
+	DG_INLINE dgFastRayTest(const dgVector& l0, const dgVector& l1)
+		:m_p0(l0)
+		,m_p1(l1)
+		,m_diff((l1 - l0) & dgVector::m_triplexMask)
+		,m_minT(dgFloat32(0.0f))
+		,m_maxT(dgFloat32(1.0f))
+		,m_zero(dgFloat32(0.0f))
+	{
+		dgAssert(m_p0.m_w == dgFloat32(0.0f));
+		dgAssert(m_p1.m_w == dgFloat32(0.0f));
+		dgAssert(m_diff.m_w == dgFloat32(0.0f));
+
+		m_isParallel = (m_diff.Abs() < dgVector(1.0e-8f));
+
+		m_dpInv = (((dgVector(dgFloat32(1.0e-20)) & m_isParallel) | m_diff.AndNot(m_isParallel)).Reciproc()) & dgVector::m_triplexMask;
+		m_dpBaseInv = m_dpInv;
+
+		dgFloat32 mag = dgSqrt(m_diff.DotProduct4(m_diff).GetScalar());
+		m_dirError = -dgFloat32(0.0175f) * mag;
+		m_magRayTest = dgMax(mag, dgFloat32(1.0f));
+	}
+
+	dgFloat32 PolygonIntersect(const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
+	dgFloat32 PolygonIntersectFallback(const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
+
+	DG_INLINE dgInt32 BoxTest(const dgVector& minBox, const dgVector& maxBox) const
+	{
+#if 1
+		dgVector test(((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
+		if (test.GetSignMask() & 0x07) {
+			return 0;
+		}
+		dgVector tt0((minBox - m_p0).CompProduct4(m_dpInv));
+		dgVector tt1((maxBox - m_p0).CompProduct4(m_dpInv));
+		dgVector t0(m_minT.GetMax(tt0.GetMin(tt1)));
+		dgVector t1(m_maxT.GetMin(tt0.GetMax(tt1)));
+		t0 = t0.GetMax(t0.ShiftTripleRight());
+		t1 = t1.GetMin(t1.ShiftTripleRight());
+		t0 = t0.GetMax(t0.ShiftTripleRight());
+		t1 = t1.GetMin(t1.ShiftTripleRight());
+		return ((t0 < t1).GetSignMask() & 1);
+
+#else
+
+		dgFloat32 tmin = 0.0f;
+		dgFloat32 tmax = 1.0f;
+
+		for (dgInt32 i = 0; i < 3; i++) {
+			if (m_isParallel[i]) {
+				if (m_p0[i] <= minBox[i] || m_p0[i] >= maxBox[i]) {
+					return 0;
+				}
+			} else {
+				dgFloat32 t1 = (minBox[i] - m_p0[i]) * m_dpInv[i];
+				dgFloat32 t2 = (maxBox[i] - m_p0[i]) * m_dpInv[i];
+
+				if (t1 > t2) {
+					dgSwap(t1, t2);
+				}
+				if (t1 > tmin) {
+					tmin = t1;
+				}
+				if (t2 < tmax) {
+					tmax = t2;
+				}
+				if (tmin > tmax) {
+					return 0;
+				}
+			}
+		}
+		return 0x1;
+#endif
+	}
+
+	DG_INLINE dgFloat32 BoxIntersect(const dgVector& minBox, const dgVector& maxBox) const
+	{
+		dgVector test(((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
+		if (test.GetSignMask() & 0x07) {
+			return dgFloat32(1.2f);
+		}
+		dgVector tt0((minBox - m_p0).CompProduct4(m_dpInv));
+		dgVector tt1((maxBox - m_p0).CompProduct4(m_dpInv));
+		dgVector t0(m_minT.GetMax(tt0.GetMin(tt1)));
+		dgVector t1(m_maxT.GetMin(tt0.GetMax(tt1)));
+		t0 = t0.GetMax(t0.ShiftTripleRight());
+		t1 = t1.GetMin(t1.ShiftTripleRight());
+		t0 = t0.GetMax(t0.ShiftTripleRight());
+		t1 = t1.GetMin(t1.ShiftTripleRight());
+		dgVector mask(t0 < t1);
+		dgVector maxDist(dgFloat32(1.2f));
+		t0 = (t0 & mask) | maxDist.AndNot(mask);
+		dgAssert((mask.GetSignMask() & 1) == (t0.m_x < dgFloat32(1.0f)));
+		return t0.GetScalar();
+	}
+
+
+	dgVector m_p0;
+	dgVector m_p1;
+	dgVector m_diff;
+	dgVector m_dpInv;
+	dgVector m_dpBaseInv;
+	dgVector m_minT;
+	dgVector m_maxT;
+	dgVector m_zero;
+	dgVector m_isParallel;
+	dgFloat32 m_dirError;
+	dgFloat32 m_magRayTest;
+} DG_GCC_VECTOR_ALIGMENT;
 
 
 DG_MSC_VECTOR_ALIGMENT 
@@ -249,12 +245,15 @@ class dgFastAABBInfo: public dgObb
 	public:
 	DG_INLINE dgFastAABBInfo()
 		:dgObb()
+		,m_separationDistance(dgFloat32(1.0e10f))
 		,m_absDir(dgGetIdentityMatrix())
+		
 	{
 	}
 
 	DG_INLINE dgFastAABBInfo(const dgMatrix& matrix, const dgVector& size)
 		:dgObb(matrix, size)
+		,m_separationDistance(dgFloat32(1.0e10f))
 	{
 		SetTransposeAbsMatrix (matrix);
 		dgVector size1 (matrix[0].Abs().Scale4(size.m_x) + matrix[1].Abs().Scale4(size.m_y) + matrix[2].Abs().Scale4(size.m_z));
@@ -264,6 +263,7 @@ class dgFastAABBInfo: public dgObb
 
 	DG_INLINE dgFastAABBInfo(const dgVector& p0, const dgVector& p1)
 		:dgObb(dgGetIdentityMatrix(), (p1 - p0).CompProduct4(dgVector::m_half))
+		,m_separationDistance(dgFloat32(1.0e10f))
 		,m_absDir(dgGetIdentityMatrix())
 		,m_p0(p0)
 		,m_p1(p1)
@@ -304,33 +304,53 @@ class dgFastAABBInfo: public dgObb
 		dgVector minBox;
 		dgVector maxBox;
 		MakeBox1 (indexCount, indexArray, stride, vertexArray, minBox, maxBox);
-		dgFloat32 dist0 = BoxPenetration (minBox, maxBox);
+//		dgFloat32 dist0 = BoxPenetration (minBox, maxBox);
+		dgVector mask((minBox.CompProduct4(maxBox)) < dgVector(dgFloat32(0.0f)));
+		dgVector dist(maxBox.GetMin(minBox.Abs()) & mask);
+		dist = dist.GetMin(dist.ShiftTripleRight());
+		dist = dist.GetMin(dist.ShiftTripleRight());
+		dgFloat32 dist0 = dist.GetScalar();
 		if (dist0 > dgFloat32 (0.0f)) {
 			dgMatrix faceMatrix (MakeFaceMatrix (faceNormal, indexCount, indexArray, stride, vertexArray));
 			MakeBox2 (faceMatrix, indexCount, indexArray, stride, vertexArray, minBox, maxBox);
-			dgFloat32 dist1 = BoxPenetration (minBox, maxBox);
+			//dgFloat32 dist1 = BoxPenetration (minBox, maxBox);
+			dgVector mask((minBox.CompProduct4(maxBox)) < dgVector(dgFloat32(0.0f)));
+			dgVector dist(maxBox.GetMin(minBox.Abs()) & mask);
+			dist = dist.GetMin(dist.ShiftTripleRight());
+			dist = dist.GetMin(dist.ShiftTripleRight());
+			dgFloat32 dist1 = dist.GetScalar();
 			dist0 = (dist1 > dgFloat32 (0.0f)) ? dgMax (dist0, dist1) : dgFloat32 (0.0f);
+			if (dist0 <= dgFloat32(0.0f)) {
+				dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
+				dist = p1p0.DotProduct4(p1p0);
+				dist = (dist.Sqrt()).CompProduct4(dgVector::m_negOne);
+				dist0 = dist.GetScalar();
+			}
+		} else {
+			dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
+			dist = p1p0.DotProduct4(p1p0);
+			dist = (dist.Sqrt()).CompProduct4(dgVector::m_negOne);
+			dist0 = dist.GetScalar();
 		}
-		return dist0;
+		return	dist0;
 	}
+
+	//DG_INLINE dgFloat32 GetSeparetionDistance() const
+	//{
+		//return m_separationDistance;
+	//}
 
 	private:
 	DG_INLINE void MakeBox1 (dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, dgVector& minBox, dgVector& maxBox) const
 	{
-		//const dgMatrix& matrix = *this;
-		//dgVector faceBoxP0 (m_scale.CompProduct4(matrix.UntransformVector(dgVector(&vertexArray[indexArray[0] * stride]))));
-		//dgVector faceBoxP0 (m_scale.CompProduct4(dgVector(&vertexArray[indexArray[0] * stride])));
 		dgVector faceBoxP0 (&vertexArray[indexArray[0] * stride]);
 		dgVector faceBoxP1 (faceBoxP0);
 		for (dgInt32 i = 1; i < indexCount; i ++) {
-			//dgVector p (m_scale.CompProduct4 (matrix.UntransformVector(dgVector(&vertexArray[indexArray[i] * stride]))));
-			//dgVector p (m_scale.CompProduct4 (dgVector(&vertexArray[indexArray[i] * stride])));
 			dgVector p (&vertexArray[indexArray[i] * stride]);
 			faceBoxP0 = faceBoxP0.GetMin(p); 
 			faceBoxP1 = faceBoxP1.GetMax(p); 
 		}
-		//minBox = faceBoxP0 - m_size;
-		//maxBox = faceBoxP1 + m_size;
+
 		minBox = faceBoxP0 - m_p1;
 		maxBox = faceBoxP1 - m_p0;
 	}
@@ -371,6 +391,7 @@ class dgFastAABBInfo: public dgObb
 	}
 
 	protected:
+	mutable dgFloat32 m_separationDistance;
 	dgMatrix m_absDir;
 	dgVector m_p0;
 	dgVector m_p1;

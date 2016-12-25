@@ -185,21 +185,18 @@ DG_INLINE dgMatrix dgMatrix::Transpose4X4 () const
 
 DG_INLINE dgVector dgMatrix::RotateVector (const dgVector &v) const
 {
-//	return dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z));
 	return m_front.CompProduct4 (v.BroadcastX()) + m_up.CompProduct4 (v.BroadcastY()) + m_right.CompProduct4 (v.BroadcastZ());
 }
 
 
 DG_INLINE dgVector dgMatrix::UnrotateVector (const dgVector &v) const
 {
-//	return dgVector (v.DotProduct4(m_front).GetScalar(), v.DotProduct4(m_up).GetScalar(), v.DotProduct4(m_right).GetScalar(), dgFloat32 (0.0f));
 	return (v.DotProduct4(m_front) & dgVector::m_xMask) + (v.DotProduct4(m_up) & dgVector::m_yMask) + (v.DotProduct4(m_right) & dgVector::m_zMask);
 }
 
 
 DG_INLINE dgVector dgMatrix::TransformVector (const dgVector &v) const
 {
-//	return dgVector (m_front.Scale4(v.m_x) + m_up.Scale4(v.m_y) + m_right.Scale4(v.m_z) + m_posit);
 	return RotateVector(v) + m_posit;
 }
 

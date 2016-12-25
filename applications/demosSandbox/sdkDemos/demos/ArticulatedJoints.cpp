@@ -1666,12 +1666,13 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
 	CustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
 	inputManager->AddPlayer (robot);
-
+/*
 	matrix.m_posit.m_z += 4.0f;
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
 	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 	inputManager->AddPlayer(forklift);
+*/
 
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);

@@ -23,14 +23,12 @@
 #include "dgMatrix.h"
 #include "dgQuaternion.h"
 
-
-dgVector dgVector::m_xMask (dgInt32 (0xffffffff),		dgInt32 (0),				dgInt32 (0),          dgInt32 (0));
-dgVector dgVector::m_yMask (dgInt32 (0),				dgInt32 (0xffffffff),		dgInt32 (0),          dgInt32 (0));
-dgVector dgVector::m_zMask (dgInt32 (0),				dgInt32 (0),				dgInt32 (0xffffffff), dgInt32 (0));
-dgVector dgVector::m_wMask (dgInt32 (0),				dgInt32 (0),				dgInt32 (0),          dgInt32 (0xffffffff));
-dgVector dgVector::m_triplexMask (dgInt32 (0xffffffff), dgInt32 (0xffffffff),		dgInt32 (0xffffffff), dgInt32 (0));
-dgVector dgVector::m_signMask (dgVector(dgInt32 (0xffffffff), dgInt32 (0xffffffff), dgInt32 (0xffffffff), dgInt32 (0xffffffff)).ShiftRightLogical(1));
-
+dgVector dgVector::m_xMask (dgInt32 (-1), dgInt32 ( 0),	dgInt32 ( 0), dgInt32 ( 0));
+dgVector dgVector::m_yMask (dgInt32 ( 0), dgInt32 (-1),	dgInt32 ( 0), dgInt32 ( 0));
+dgVector dgVector::m_zMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 (-1), dgInt32 ( 0));
+dgVector dgVector::m_wMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 ( 0), dgInt32 (-1));
+dgVector dgVector::m_triplexMask (dgInt32 (-1), dgInt32 (-1), dgInt32 (-1), dgInt32 (0));
+dgVector dgVector::m_signMask (dgVector(dgInt32 (-1), dgInt32 (-1), dgInt32 (-1), dgInt32 (-1)).ShiftRightLogical(1));
 
 dgVector dgVector::m_zero (dgFloat32 (0.0f));
 dgVector dgVector::m_one  (dgFloat32 (1.0f));
@@ -49,6 +47,15 @@ dgMatrix dgMatrix::m_identityMatrix (dgVector (dgFloat32(1.0f), dgFloat32(0.0f),
 									 dgVector (dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f)),
 									 dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)),
 									 dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f)));
+
+
+#ifndef _NEWTON_USE_DOUBLE
+dgBigVector dgBigVector::m_one  (dgFloat64 (1.0f));
+dgBigVector dgBigVector::m_zero  (dgFloat64 (0.0f));
+dgBigVector dgBigVector::m_negOne  (dgFloat64 (-1.0f));
+dgBigVector dgBigVector::m_triplexMask (dgInt32 (-1), dgInt32 (-1),	dgInt32 (-1), dgInt32 (0));
+dgBigVector dgBigVector::m_signMask (dgBigVector(dgInt32 (-1), dgInt32 (-1), dgInt32 (-1), dgInt32 (-1)).ShiftRightLogical(1));
+#endif
 
 const dgMatrix& dgGetIdentityMatrix()
 {
@@ -112,17 +119,10 @@ dgMatrix dgMatrix::Multiply3X3 (const dgMatrix &B) const
 
 dgMatrix dgMatrix::operator* (const dgMatrix &B) const
 {
-#if 0
-	return dgMatrix (B.m_front.Scale4(m_front.m_x) + B.m_up.Scale4(m_front.m_y) + B.m_right.Scale4(m_front.m_z) + B.m_posit.Scale4 (m_front.m_w), 
-					 B.m_front.Scale4(m_up.m_x)    + B.m_up.Scale4(m_up.m_y)    + B.m_right.Scale4(m_up.m_z)    + B.m_posit.Scale4 (m_up.m_w), 
-					 B.m_front.Scale4(m_right.m_x) + B.m_up.Scale4(m_right.m_y) + B.m_right.Scale4(m_right.m_z) + B.m_posit.Scale4 (m_right.m_w), 
-					 B.m_front.Scale4(m_posit.m_x) + B.m_up.Scale4(m_posit.m_y) + B.m_right.Scale4(m_posit.m_z) + B.m_posit.Scale4 (m_posit.m_w)); 
-#else
 	return dgMatrix (B.m_front.CompProduct4(m_front.BroadcastX()) + B.m_up.CompProduct4(m_front.BroadcastY()) + B.m_right.CompProduct4(m_front.BroadcastZ()) + B.m_posit.CompProduct4 (m_front.BroadcastW()), 
 					 B.m_front.CompProduct4(m_up.BroadcastX())    + B.m_up.CompProduct4(m_up.BroadcastY())    + B.m_right.CompProduct4(m_up.BroadcastZ())    + B.m_posit.CompProduct4 (m_up.BroadcastW()), 
 					 B.m_front.CompProduct4(m_right.BroadcastX()) + B.m_up.CompProduct4(m_right.BroadcastY()) + B.m_right.CompProduct4(m_right.BroadcastZ()) + B.m_posit.CompProduct4 (m_right.BroadcastW()), 
 					 B.m_front.CompProduct4(m_posit.BroadcastX()) + B.m_up.CompProduct4(m_posit.BroadcastY()) + B.m_right.CompProduct4(m_posit.BroadcastZ()) + B.m_posit.CompProduct4 (m_posit.BroadcastW())); 
-#endif
 }
 
 
@@ -403,7 +403,7 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 		transformMatrix.m_posit = m_posit;
 	}
 */
-
+/*
 // test the fucking factorization 
 dgMatrix xxxxx(dgRollMatrix(30.0f * 3.1416f / 180.0f));
 xxxxx = dgYawMatrix(30.0f * 3.1416f / 180.0f) * xxxxx;
@@ -413,13 +413,10 @@ dgMatrix xxxxx2(xxxxx.Inverse() * xxxxx1 * xxxxx);
 dgMatrix xxxxx3 (xxxxx2);
 xxxxx2.EigenVectors(scale);
 dgMatrix xxxxx4(xxxxx2.Inverse() * xxxxx1 * xxxxx2);
-
+*/
 
 	const dgMatrix& me = *this;
-	//dgFloat32 sign = ((((*this)[0] * (*this)[1]) % (*this)[2]) > 0.0f) ? 1.0f : -1.0f;
-	//dgFloat32 sign = dgSign(((*this)[0] * (*this)[1]) % (*this)[2]);
 	dgFloat32 sign = dgSign (me[2].DotProduct3 (me[0].CrossProduct3(me[1])));
-	//stretchAxis = (*this) * Transpose();
 	stretchAxis = me * Transpose();
 	stretchAxis.EigenVectors (scale);
 

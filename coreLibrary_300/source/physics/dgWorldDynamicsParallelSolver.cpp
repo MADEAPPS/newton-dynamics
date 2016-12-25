@@ -31,7 +31,7 @@
 
 
 
-void dgWorldDynamicUpdate::CalculateReactionForcesParallel (const dgIsland* const island, dgFloat32 timestep) const
+void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* const cluster, dgFloat32 timestep) const
 {
 	dgAssert(0);
 	/*
@@ -91,10 +91,10 @@ dgInt32 dgWorldDynamicUpdate::SortJointInfoByColor(const dgParallelSolverSyncDat
 }
 
 
-void dgWorldDynamicUpdate::LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgIsland* const island) const
+void dgWorldDynamicUpdate::LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgBodyCluster* const cluster) const
 {
 	dgParallelSolverSyncData::dgParallelJointMap* const jointInfoMap = solverSyncData->m_jointConflicts;
-	dgInt32 count = island->m_jointCount;
+	dgInt32 count = cluster->m_jointCount;
 	for (dgInt32 i = 0; i < count; i++) {
 		dgConstraint* const joint = constraintArray[i].m_joint;
 		joint->m_index = i;
@@ -520,7 +520,7 @@ void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernel (void* const context
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 
-	const dgIsland* const island = syncData->m_island;
+	const dgBodyCluster* const island = syncData->m_cluster;
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[island->m_bodyStart];
 
@@ -531,10 +531,10 @@ void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernel (void* const context
 
 	dgVector invTime (invTimestepSrc);
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
-	dgVector forceActiveMask ((syncData->m_jointCount <= DG_SMALL_ISLAND_COUNT) ?  dgVector (-1, -1, -1, -1) : dgFloat32 (0.0f));
+//	dgVector forceActiveMask ((syncData->m_jointCount <= DG_SMALL_ISLAND_COUNT) ?  dgVector (-1, -1, -1, -1) : dgFloat32 (0.0f));
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-		world->ApplyNetTorqueAndForce (body, invTime, maxAccNorm2, forceActiveMask);
+		world->ApplyNetTorqueAndForce (body, invTime, maxAccNorm2);
 	}
 }
 
@@ -543,7 +543,7 @@ void dgWorldDynamicUpdate::KinematicCallbackUpdateParallelKernel (void* const co
 {
 	dgParallelSolverSyncData* const syncData = (dgParallelSolverSyncData*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
-	const dgIsland* const island = syncData->m_island;
+	const dgBodyCluster* const island = syncData->m_cluster;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[island->m_jointStart];
 
@@ -557,11 +557,11 @@ void dgWorldDynamicUpdate::KinematicCallbackUpdateParallelKernel (void* const co
 }
 
 
-void dgWorldDynamicUpdate::IntegrateIslandParallel(dgParallelSolverSyncData* const syncData) const
+void dgWorldDynamicUpdate::IntegrateClusterParallel(dgParallelSolverSyncData* const syncData) const
 {
 	dgWorld* const world = (dgWorld*) this;
 //	dgWorldDynamicUpdate::IntegrateIslandParallelKernel (syncData, world, 0);
-	world->IntegrateVelocity (syncData->m_island, DG_SOLVER_MAX_ERROR, syncData->m_timestep, 0); 
+	world->IntegrateVelocity (syncData->m_cluster, DG_SOLVER_MAX_ERROR, syncData->m_timestep, 0); 
 }
 
 

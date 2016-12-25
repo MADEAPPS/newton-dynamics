@@ -187,8 +187,11 @@ dgInt32 dgCollisionBox::CalculateSignature () const
 }
 
 
-dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionBox::SupportVertex (const dgVector& dir0, dgInt32* const vertexIndex) const
 {
+	dgVector mask0(dir0.Abs() > m_flushZero);
+	dgVector dir(dir0 & mask0);
+
 	dgAssert (dgAbsf(dir.DotProduct3(dir) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgVector mask (dir < dgVector (dgFloat32 (0.0f)));
@@ -200,11 +203,15 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir, dgInt32* const vert
 	return (m_size[1] & mask) + m_size[0].AndNot(mask);
 }
 
-dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir, dgInt32* const vertexIndex) const
+dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir0, dgInt32* const vertexIndex) const
 {
+	dgVector mask0(dir0.Abs() > m_flushZero);
+	dgVector dir(dir0 & mask0);
+
 	dgAssert(dgAbsf(dir.DotProduct3(dir) - dgFloat32(1.0f)) < dgFloat32(1.0e-3f));
 	dgAssert(dir.m_w == dgFloat32(0.0f));
 	dgVector mask(dir < dgVector(dgFloat32(0.0f)));
+//	dgAssert(vertexIndex);
 	if (vertexIndex) {
 		dgVector index(m_indexMark.CompProduct4(mask & dgVector::m_one));
 		index = (index.AddHorizontal()).GetInt();
@@ -218,12 +225,13 @@ dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir, dgInt32* cons
 	return (size1 & mask) + size0.AndNot(mask);
 }
 
-dgVector dgCollisionBox::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const
+dgVector dgCollisionBox::SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir0) const
 {
+	dgVector mask0(dir0.Abs() > m_flushZero);
+	dgVector dir(dir0 & mask0);
 	dgAssert(dgAbsf((dir.DotProduct4(dir).GetScalar() - dgFloat32(1.0f))) < dgFloat32(1.0e-3f));
 	return point + dir.Scale4 (DG_PENETRATION_TOL);
 }
-
 
 void dgCollisionBox::CalcAABB (const dgMatrix& matrix, dgVector &p0, dgVector &p1) const
 {

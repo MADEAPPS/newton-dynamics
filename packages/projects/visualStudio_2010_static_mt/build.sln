@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dContainers", "dContainers.vcxproj", "{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dJointLibrary", "dJointLibrary.vcxproj", "{721C99CE-4716-4146-9817-59BC2671B844}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dMath", "dMath.vcxproj", "{CBE9E751-E58B-46C1-B6B0-873670D0F981}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dScene", "dScene.vcxproj", "{B5EEC82D-938F-44C9-89BB-4A058581750B}"
@@ -22,6 +20,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\coreLibrary_300\projects\windows\project_vs2010_static_mt\physics.vcxproj", "{39737A8F-6151-4259-8E39-25530345D4B4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\thirdParty\tinyxml\vs2010_static_mt\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dCustomJoints", "dCustomJoints.vcxproj", "{721C99CE-4716-4146-9817-59BC2671B844}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,18 +45,6 @@ Global
 		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.release|Win32.Build.0 = release|Win32
 		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.release|x64.ActiveCfg = release|x64
 		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}.release|x64.Build.0 = release|x64
-		{721C99CE-4716-4146-9817-59BC2671B844}.debug|Win32.ActiveCfg = debug|Win32
-		{721C99CE-4716-4146-9817-59BC2671B844}.debug|Win32.Build.0 = debug|Win32
-		{721C99CE-4716-4146-9817-59BC2671B844}.debug|x64.ActiveCfg = debug|x64
-		{721C99CE-4716-4146-9817-59BC2671B844}.debug|x64.Build.0 = debug|x64
-		{721C99CE-4716-4146-9817-59BC2671B844}.release_double|Win32.ActiveCfg = release_double|Win32
-		{721C99CE-4716-4146-9817-59BC2671B844}.release_double|Win32.Build.0 = release_double|Win32
-		{721C99CE-4716-4146-9817-59BC2671B844}.release_double|x64.ActiveCfg = release_double|x64
-		{721C99CE-4716-4146-9817-59BC2671B844}.release_double|x64.Build.0 = release_double|x64
-		{721C99CE-4716-4146-9817-59BC2671B844}.release|Win32.ActiveCfg = release|Win32
-		{721C99CE-4716-4146-9817-59BC2671B844}.release|Win32.Build.0 = release|Win32
-		{721C99CE-4716-4146-9817-59BC2671B844}.release|x64.ActiveCfg = release|x64
-		{721C99CE-4716-4146-9817-59BC2671B844}.release|x64.Build.0 = release|x64
 		{CBE9E751-E58B-46C1-B6B0-873670D0F981}.debug|Win32.ActiveCfg = debug|Win32
 		{CBE9E751-E58B-46C1-B6B0-873670D0F981}.debug|Win32.Build.0 = debug|Win32
 		{CBE9E751-E58B-46C1-B6B0-873670D0F981}.debug|x64.ActiveCfg = debug|x64
@@ -165,6 +153,18 @@ Global
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|Win32.Build.0 = release|Win32
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|x64.ActiveCfg = release|x64
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|x64.Build.0 = release|x64
+		{721C99CE-4716-4146-9817-59BC2671B844}.debug|Win32.ActiveCfg = debug|Win32
+		{721C99CE-4716-4146-9817-59BC2671B844}.debug|Win32.Build.0 = debug|Win32
+		{721C99CE-4716-4146-9817-59BC2671B844}.debug|x64.ActiveCfg = debug|x64
+		{721C99CE-4716-4146-9817-59BC2671B844}.debug|x64.Build.0 = debug|x64
+		{721C99CE-4716-4146-9817-59BC2671B844}.release_double|Win32.ActiveCfg = release_double|Win32
+		{721C99CE-4716-4146-9817-59BC2671B844}.release_double|Win32.Build.0 = release_double|Win32
+		{721C99CE-4716-4146-9817-59BC2671B844}.release_double|x64.ActiveCfg = release_double|x64
+		{721C99CE-4716-4146-9817-59BC2671B844}.release_double|x64.Build.0 = release_double|x64
+		{721C99CE-4716-4146-9817-59BC2671B844}.release|Win32.ActiveCfg = release|Win32
+		{721C99CE-4716-4146-9817-59BC2671B844}.release|Win32.Build.0 = release|Win32
+		{721C99CE-4716-4146-9817-59BC2671B844}.release|x64.ActiveCfg = release|x64
+		{721C99CE-4716-4146-9817-59BC2671B844}.release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

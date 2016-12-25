@@ -19,9 +19,9 @@
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
 
-static bool ReportProgress (dFloat normalizedProgressPercent, void* const userData)
+static int ReportProgress (dFloat normalizedProgressPercent, void* const userData)
 {
-	return true; 
+	return 1; 
 }
 
 
@@ -37,7 +37,6 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 	// freeze the scale and pivot on the model 
 	compoundTestMesh.FreezeScale();
 //	compoundTestMesh.FreezeGeometryPivot ();
-
 	
 	dMeshNodeInfo* meshInfo = NULL;
 	dMatrix scale (dGetIdentityMatrix());
@@ -143,21 +142,18 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
-
 	// convex approximate some file meshes 
-
 	CreateConvexAproximation ("lshape.ngd", scene, location, 3, "camo.tga");
 	CreateConvexAproximation ("hollowBox.ngd", scene, location, 3, "KAMEN.tga");
-	CreateConvexAproximation ("hollowCylinder.ngd", scene, location, 3, "frowny.tga");
-//	CreateConvexAproximation ("chair.ngd", scene, location, 3, "checker.tga");
-	CreateConvexAproximation ("cow.ngd", scene, location + dVector (10, 0, 0, 0), 3, "cow.tga");
-	CreateConvexAproximation ("camel.ngd", scene, location + dVector (17, 0, 0, 0), 3, "jirafe.tga");
+//	CreateConvexAproximation ("hollowCylinder.ngd", scene, location, 3, "frowny.tga");
+////	CreateConvexAproximation ("chair.ngd", scene, location, 3, "checker.tga");
+//	CreateConvexAproximation ("cow.ngd", scene, location + dVector (10, 0, 0, 0), 3, "cow.tga");
+//	CreateConvexAproximation ("camel.ngd", scene, location + dVector (17, 0, 0, 0), 3, "jirafe.tga");
 
 //	CreateConvexAproximation ("tree.ngd", scene, location, 1, "KAMEN.tga");
 //	CreateConvexAproximation ("beetle.ngd", scene, location, 1, "KAMEN.tga");
 //	CreateConvexAproximation ("armadello.ngd", scene, location, 1, "KAMEN.tga");
-
-
+	
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	

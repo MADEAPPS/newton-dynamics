@@ -13,8 +13,8 @@
 #define __PHYSICS_UTIL__
 
 
-#define DEMO_GRAVITY  -10.0f
-//#define DEMO_GRAVITY  -0.0f
+//#define DEMO_GRAVITY  -10.0f
+#define DEMO_GRAVITY  -0.0f
 
 enum PrimitiveType
 {
@@ -79,7 +79,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& offse
 NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent, bool optimize);
 NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId);
 NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId);
-void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat findFloorElevation = 1000.0f);
+void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat findFloorElevation = 1000.0f, dFloat offsetHigh = 5.0f);
 
 NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, const dVector& size);
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const levelName, bool optimized);

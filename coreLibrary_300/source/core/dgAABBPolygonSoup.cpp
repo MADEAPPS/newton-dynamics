@@ -1189,7 +1189,6 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgFloa
 
 void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
 {
-
 	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < dgFloat32 (1.0e-4f));
 	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < dgFloat32 (1.0e-4f));
 	dgAssert (dgAbsf(dgAbsf(obbAabbInfo[2][2]) - obbAabbInfo.m_absDir[2][2]) < dgFloat32 (1.0e-4f));
@@ -1210,6 +1209,9 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 			dgInt32 stack = 1;
 			stackPool[0] = m_aabb;
 			distance[0] = m_aabb->BoxPenetration(obbAabbInfo, vertexArray);
+			if (distance[0] <= dgFloat32(0.0f)) {
+				obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -distance[0]);
+			}
 			while (stack) {
 				stack --;
 				dgFloat32 dist = distance[stack];
@@ -1224,10 +1226,13 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 							dgVector faceNormal (&vertexArray[normalIndex].m_x);
 							dgFloat32 dist1 = obbAabbInfo.PolygonBoxDistance (faceNormal, vCount, indices, stride, &vertexArray[0].m_x);
 							if (dist1 > dgFloat32 (0.0f)) {
+								obbAabbInfo.m_separationDistance = dgFloat32(0.0f);
 								dgAssert (vCount >= 3);
 								if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dist1) == t_StopSearh) {
 									return;
 								}
+							} else {
+								obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist1);
 							}
 						}
 
@@ -1244,6 +1249,8 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 							stackPool[j] = node;
 							distance[j] = dist;
 							stack++;
+						} else {
+							obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist);
 						}
 					}
 
@@ -1257,9 +1264,12 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 							dgFloat32 dist1 = obbAabbInfo.PolygonBoxDistance (faceNormal, vCount, indices, stride, &vertexArray[0].m_x);
 							if (dist1 > dgFloat32 (0.0f)) {
 								dgAssert (vCount >= 3);
+								obbAabbInfo.m_separationDistance = dgFloat32(0.0f);
 								if (callback(context, &vertexArray[0].m_x, sizeof (dgTriplex), indices, vCount, dist1) == t_StopSearh) {
 									return;
 								}
+							} else {
+								obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist1);
 							}
 						}
 
@@ -1276,6 +1286,8 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 							stackPool[j] = node;
 							distance[j] = dist;
 							stack++;
+						} else {
+							obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist);
 						}
 					}
 				}

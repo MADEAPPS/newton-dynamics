@@ -670,14 +670,6 @@
     <ClInclude Include="..\..\include\wx\msw\glcanvas.h" />
     <ClInclude Include="..\..\include\wx\glcanvas.h" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="wx_vc9_base.vcxproj">
-      <Project>{3fcc50c2-81e9-5db2-b8d8-2129427568b1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="wx_vc9_core.vcxproj">
-      <Project>{6744dad8-9c70-574a-bff2-9f8dddb24a75}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

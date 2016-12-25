@@ -19,8 +19,6 @@
 #include "DebugDisplay.h"
 
 
-
-
 #ifdef USE_TEST_ALL_FACE_USER_RAYCAST_CALLBACK
 static dFloat AllRayHitCallback (const NewtonBody* const body, const NewtonCollision* const treeCollision, dFloat intersection, dFloat* const normal, int faceId, void* const usedData)
 {
@@ -346,7 +344,7 @@ void SceneCollision (DemoEntityManager* const scene)
 
 
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector size (0.5f, 0.5f, 0.5f, 0.0f);
+	dVector size (0.25f, 0.25f, 0.25f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	int count = 5;
@@ -358,11 +356,9 @@ void SceneCollision (DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
-	dVector origin (-15.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin (-15.0f, 5.0f, -5.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
-
 }

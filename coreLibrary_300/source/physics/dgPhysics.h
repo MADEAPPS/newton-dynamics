@@ -53,6 +53,7 @@
 #include "dgCollisionConvexPolygon.h"
 #include "dgCollisionDeformableMesh.h"
 #include "dgCollisionCompoundFractured.h"
+#include "dgCollisionLumpedMassParticles.h"
 
 #endif 
 

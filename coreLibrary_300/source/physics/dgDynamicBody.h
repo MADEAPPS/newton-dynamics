@@ -111,6 +111,7 @@ class dgDynamicBody : public dgBody
 	friend class dgSkeletonContainer;
 	friend class dgWorldDynamicUpdate;
 	friend class dgCollisionDeformableMesh;
+	friend class dgCollisionDeformableSolidMesh;
 } DG_GCC_VECTOR_ALIGMENT;
 
 

@@ -31,7 +31,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-#define DEFAULT_SCENE	8			// Box stacks
+//#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -48,7 +48,7 @@
 //#define DEFAULT_SCENE	22			// simple convex decomposition
 //#define DEFAULT_SCENE	23			// scene Collision
 //#define DEFAULT_SCENE	24          // simple boolean operators 
-//#define DEFAULT_SCENE	25			// simple convex fracturing 
+#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
@@ -353,6 +353,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //SetDebugDisplayMode (m_debugDisplayMode);
 //m_showNormalForces = true;
 
+//m_showAABB = true;
 //m_autoSleepState = false;
 //m_microthreadIndex = 1;
 //m_useParallelSolver = true;

@@ -230,13 +230,13 @@ dgConvexHull4dTetraherum::dgTetrahedrumPlane dgConvexHull4dTetraherum::GetPlaneE
 }
 
 dgConvexHull4d::dgConvexHull4d (dgMemoryAllocator* const allocator)
-	:dgList<dgConvexHull4dTetraherum>(allocator), m_mark(0), m_count (0), m_diag(), m_points(1024, allocator) 
+	:dgList<dgConvexHull4dTetraherum>(allocator), m_mark(0), m_count (0), m_diag(), m_points(allocator) 
 {
 }
 
 
 dgConvexHull4d::dgConvexHull4d (dgMemoryAllocator* const allocator, const dgBigVector* const vertexCloud, dgInt32 count, dgFloat32 distTol)
-	:dgList<dgConvexHull4dTetraherum>(allocator), m_mark(0), m_count (0), m_diag(), m_points(count, allocator) 
+	:dgList<dgConvexHull4dTetraherum>(allocator), m_mark(0), m_count (0), m_diag(), m_points(allocator) 
 {
 	BuildHull (allocator, vertexCloud, count, distTol);
 }

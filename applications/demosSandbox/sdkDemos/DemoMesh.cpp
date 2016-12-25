@@ -179,10 +179,9 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode)
 
 	// extract vertex data  from the newton mesh		
 	AllocVertexData(NewtonMeshGetPointCount (mesh));
-	NewtonMeshGetVertexStreams (mesh, 3 * sizeof (dFloat), (dFloat*) m_vertex,
-									  3 * sizeof (dFloat), (dFloat*) m_normal,
-									  2 * sizeof (dFloat), (dFloat*) m_uv, 
-								      2 * sizeof (dFloat), (dFloat*) m_uv);
+	NewtonMeshGetVertexChannel (mesh, 3 * sizeof (dFloat), (dFloat*) m_vertex);
+	NewtonMeshGetNormalChannel (mesh, 3 * sizeof (dFloat), (dFloat*) m_normal);
+	NewtonMeshGetUV0Channel (mesh, 2 * sizeof (dFloat), (dFloat*) m_uv);
 
 	// bake the matrix into the vertex array
 	dMatrix matrix (meshInfo->GetPivotMatrix());
@@ -258,17 +257,15 @@ DemoMesh::DemoMesh(NewtonMesh* const mesh)
 {
 	// extract vertex data  from the newton mesh		
 	AllocVertexData(NewtonMeshGetPointCount (mesh));
-	NewtonMeshGetVertexStreams (mesh, 3 * sizeof (dFloat), (dFloat*) m_vertex, 3 * sizeof (dFloat), (dFloat*) m_normal,	2 * sizeof (dFloat), (dFloat*) m_uv, 2 * sizeof (dFloat), (dFloat*) m_uv);
 
-//	dTree<dScene::dTreeNode*, int> materialMap;
-//	for (void* ptr = scene->GetFirstChildLink(meshNode); ptr; ptr = scene->GetNextChildLink (meshNode, ptr)) {
-//		dScene::dTreeNode* node = scene->GetNodeFromLink(ptr);
-//		dNodeInfo* info = scene->GetInfoFromNode(node);
-//		if (info->GetTypeId() == dMaterialNodeInfo::GetRttiType()) {
-//			dMaterialNodeInfo* const material = (dMaterialNodeInfo*)info;
-//			materialMap.Insert(node, material->GetId());
-//		}
-//	}
+	// a valid newton mesh always has a vertex channel
+	NewtonMeshGetVertexChannel(mesh, 3 * sizeof (dFloat), (dFloat*)m_vertex);
+	if (NewtonMeshHasNormalChannel(mesh)) {
+		NewtonMeshGetNormalChannel(mesh, 3 * sizeof (dFloat), (dFloat*)m_normal);
+	}
+	if (NewtonMeshHasUV0Channel(mesh)) {
+		NewtonMeshGetUV0Channel(mesh, 2 * sizeof (dFloat), (dFloat*)m_uv);
+	}
 
 	// extract the materials index array for mesh
 	void* const meshCookie = NewtonMeshBeginHandle (mesh); 
@@ -277,26 +274,10 @@ DemoMesh::DemoMesh(NewtonMesh* const mesh)
 		int indexCount = NewtonMeshMaterialGetIndexCount (mesh, meshCookie, handle); 
 		DemoSubMesh* const segment = AddSubMesh();
 
-//		dTree<dScene::dTreeNode*, int>::dTreeNode* matNodeCache = materialMap.Find(materialIndex);
-//		if (matNodeCache) {
-//			dScene::dTreeNode* const matNode = matNodeCache->GetInfo();
-//			dMaterialNodeInfo* const material = (dMaterialNodeInfo*) scene->GetInfoFromNode(matNode);
-//			if (material->GetDiffuseTextId() != -1) {
-//				dScene::dTreeNode* const node = scene->FindTextureByTextId(matNode, material->GetDiffuseTextId());
-//				dAssert (node);
-//				dTextureNodeInfo* const texture = (dTextureNodeInfo*)scene->GetInfoFromNode(node);
-//
-//				segment->m_textureHandle = LoadTexture(texture->GetPathName());
-//				strcpy (segment->m_textureName, texture->GetPathName());
-//			}
-
-
-			segment->m_shiness = 1.0f;
-			segment->m_ambient = dVector (0.8f, 0.8f, 0.8f, 1.0f);
-			segment->m_diffuse = dVector (0.8f, 0.8f, 0.8f, 1.0f);
-			segment->m_specular = dVector (0.0f, 0.0f, 0.0f, 1.0f);
-//		}
-
+		segment->m_shiness = 1.0f;
+		segment->m_ambient = dVector (0.8f, 0.8f, 0.8f, 1.0f);
+		segment->m_diffuse = dVector (0.8f, 0.8f, 0.8f, 1.0f);
+		segment->m_specular = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 		segment->m_textureHandle = textureId;
 
 		segment->AllocIndexData (indexCount);
@@ -394,15 +375,12 @@ DemoMesh::DemoMesh(const char* const name, const NewtonCollision* const collisio
 		}
 	}
 
-
 	// extract vertex data  from the newton mesh		
 	int vertexCount = NewtonMeshGetPointCount (mesh); 
 	AllocVertexData(vertexCount);
-	NewtonMeshGetVertexStreams (mesh, 
-								3 * sizeof (dFloat), (dFloat*) m_vertex,
-								3 * sizeof (dFloat), (dFloat*) m_normal,
-								2 * sizeof (dFloat), (dFloat*) m_uv, 
-								2 * sizeof (dFloat), (dFloat*) m_uv);
+	NewtonMeshGetVertexChannel(mesh, 3 * sizeof (dFloat), (dFloat*)m_vertex);
+	NewtonMeshGetNormalChannel(mesh, 3 * sizeof (dFloat), (dFloat*)m_normal);
+	NewtonMeshGetUV0Channel(mesh, 2 * sizeof (dFloat), (dFloat*)m_uv);
 
 	// extract the materials index array for mesh
 	void* const geometryHandle = NewtonMeshBeginHandle (mesh); 
@@ -557,43 +535,31 @@ NewtonMesh* DemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& 
 {
 	NewtonMesh* const mesh = NewtonMeshCreate(world);
 
-	NewtonMeshBeginFace (mesh);
-
+	NewtonMeshBeginBuild (mesh);
 	dMatrix rotation ((meshMatrix.Inverse4x4()).Transpose4X4());
 
-	dFloat point[3][12];
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		DemoSubMesh& segment = node->GetInfo();
 		for (int i = 0; i < segment.m_indexCount; i += 3) {
+			NewtonMeshBeginFace(mesh);
 			for (int j = 0; j < 3; j ++) {
 				int index = segment.m_indexes[i + j];
-
-				dVector p (meshMatrix.TransformVector(dVector (m_vertex[index * 3 + 0], m_vertex[index * 3 + 1], m_vertex[index * 3 + 2], 1.0f)));
-				point[j][0] = p.m_x;
-				point[j][1] = p.m_y;
-				point[j][2] = p.m_z;
-				point[j][3] = 0.0f;
-
-				//dgVector (m_normal[index * 3 + 0], m_normal[index * 3 + 1], m_normal[index * 3 + 2], dgFloat32 (0.0f));
+				dVector p (meshMatrix.TransformVector(dVector (m_vertex[index * 3 + 0], m_vertex[index * 3 + 1], m_vertex[index * 3 + 2], 0.0f)));
 				dVector n (rotation.RotateVector(dVector (m_normal[index * 3 + 0], m_normal[index * 3 + 1], m_normal[index * 3 + 2], 0.0f)));
 				dAssert ((n.DotProduct3(n)) > 0.0f);
 				n = n.Scale (1.0f / dSqrt (n.DotProduct3(n)));
-
-				point[j][4] = n.m_x;
-				point[j][5] = n.m_y;
-				point[j][6] = n.m_z;
-
-				point[j][7] = m_uv[index * 2 + 0];
-				point[j][8] = m_uv[index * 2 + 1];
-
-				point[j][9] = 0.0f;
-				point[j][10] = 0.0f;
+				
+				NewtonMeshAddPoint(mesh, p.m_x, p.m_y, p.m_z);
+				NewtonMeshAddNormal(mesh, n.m_x, n.m_y, n.m_z);
+				NewtonMeshAddMaterial(mesh, segment.m_textureHandle);
+				NewtonMeshAddUV0(mesh, m_uv[index * 2 + 0], m_uv[index * 2 + 1]);
 			}
-			NewtonMeshAddFace(mesh, 3, &point[0][0], sizeof (point) / 3, segment.m_textureHandle);
+			NewtonMeshEndFace(mesh);
+//			NewtonMeshAddFace(mesh, 3, &point[0][0], sizeof (point) / 3, segment.m_textureHandle);
 		}
 	}
 
-	NewtonMeshEndFace(mesh);
+	NewtonMeshEndBuild(mesh);
 	return mesh;
 }
 
@@ -767,6 +733,9 @@ void DemoMesh::AllocVertexData (int vertexCount)
 	m_vertex = new dFloat[3 * m_vertexCount];
 	m_normal = new dFloat[3 * m_vertexCount];
 	m_uv = new dFloat[2 * m_vertexCount];
+
+	memset (m_vertex, 0, 3 * m_vertexCount * sizeof (dFloat));
+	memset (m_normal, 0, 3 * m_vertexCount * sizeof (dFloat));
 	memset (m_uv, 0, 2 * m_vertexCount * sizeof (dFloat));
 }
 

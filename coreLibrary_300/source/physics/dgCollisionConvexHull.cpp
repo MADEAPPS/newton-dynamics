@@ -866,10 +866,6 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 						dgAssert (p.m_z >= box.m_box[0].m_z);
 						dgAssert (p.m_z <= box.m_box[1].m_z);
 						dgVector dist (p.DotProduct4(dir));
-						//if (dist.m_x > maxProj.m_x) {
-						//	maxProj = dist;
-						//	index = box.m_vertexStart + i;
-						//}
 						dgVector mask (dist > maxProj);
 						dgInt32 intMask = *((dgInt32*) &mask.m_x);
 						index = ((box.m_vertexStart + i) & intMask) | (index & ~intMask);
@@ -882,10 +878,6 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 		for (dgInt32 i = 0; i < m_vertexCount; i ++) {
 			const dgVector& p = m_vertex[i];
 			dgVector dist (p.DotProduct4(dir));
-			//if (dist.m_x > maxProj.m_x) {
-			//	index = i;
-			//	maxProj = dist;
-			//}
 			dgVector mask (dist > maxProj);
 			dgInt32 intMask = *((dgInt32*) &mask.m_x);
 			index = (i & intMask) | (index & ~intMask);

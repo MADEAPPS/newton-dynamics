@@ -326,7 +326,7 @@ dgEdge* dgPolyhedra::AddFace ( dgInt32 count, const dgInt32* const index, const 
 }
 
 
-void dgPolyhedra::EndFace ()
+bool dgPolyhedra::EndFace ()
 {
 	dgPolyhedra::Iterator iter (*this);
 
@@ -376,6 +376,8 @@ void dgPolyhedra::EndFace ()
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert (SanityCheck ());
 #endif
+
+	return true;
 }
 
 
@@ -1082,6 +1084,7 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 	const dgFloat64 distanceFromPlane = dgFloat64 (1.0f / 128.0f);
 
 	dgInt32 faceIndex[DG_LOCAL_BUFFER_SIZE * 4];
+	dgInt64 userIndex[DG_LOCAL_BUFFER_SIZE * 4];
 	dgEdge* stack[DG_LOCAL_BUFFER_SIZE * 4];
 	dgEdge* deleteEdge[DG_LOCAL_BUFFER_SIZE * 4];
 
@@ -1111,11 +1114,12 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 		do {
 			ptr->m_mark = faceMark;
 			faceIndex[faceIndexCount] = ptr->m_incidentVertex;
+			userIndex[faceIndexCount] = ptr->m_userData;
 			faceIndexCount ++;
 			dgAssert (faceIndexCount < dgInt32 (sizeof (faceIndex) / sizeof (faceIndex[0])));
 			ptr = ptr ->m_next;
 		} while (ptr != face);
-		polyhedraOut.AddFace(faceIndexCount, faceIndex);
+		polyhedraOut.AddFace(faceIndexCount, faceIndex, userIndex);
 
 		dgInt32 index = 1;
 		deleteCount = 0;
@@ -1138,6 +1142,7 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 						do {
 							ptr1->m_mark = faceMark;
 							faceIndex[faceIndexCount] = ptr1->m_incidentVertex;
+							userIndex[faceIndexCount] = ptr1->m_userData;
 							dgAssert (faceIndexCount < dgInt32 (sizeof (faceIndex) / sizeof (faceIndex[0])));
 							faceIndexCount ++;
 							ptr1 = ptr1 ->m_next;
@@ -1150,7 +1155,6 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 							deleteCount ++;
 							dgAssert (deleteCount < dgInt32 (sizeof (deleteEdge) / sizeof (deleteEdge[0])));
 						} else {
-							//normal1 = normal1.Scale3 (dgFloat64 (1.0f) / sqrt (dot));
 							dgBigVector testNormal (normal1.Scale3 (dgFloat64 (1.0f) / sqrt (dot)));
 							dot = normal.DotProduct3(testNormal);
 							if (dot >= normalDeviation) {
@@ -1166,7 +1170,7 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 									testNormal = normalAverage.Scale3 (dgFloat64 (1.0f) / sqrt (normalAverage.DotProduct3 (normalAverage)));
 									testPlane = dgBigPlane (testNormal, - testPoint.DotProduct3 (testNormal));
 
-									polyhedraOut.AddFace(faceIndexCount, faceIndex);;
+									polyhedraOut.AddFace(faceIndexCount, faceIndex, userIndex);
 									stack[index] = ptr;
 									index ++;
 									dgAssert (index < dgInt32 (sizeof (stack) / sizeof (stack[0])));
@@ -1375,6 +1379,7 @@ void dgPolyhedra::RefineTriangulation (const dgFloat64* const vertex, dgInt32 st
 void dgPolyhedra::OptimizeTriangulation (const dgFloat64* const vertex, dgInt32 strideInBytes)
 {
 	dgInt32 polygon[DG_LOCAL_BUFFER_SIZE * 8];
+	dgInt64 userData[DG_LOCAL_BUFFER_SIZE * 8];
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
 
 	dgPolyhedra leftOver(GetAllocator());
@@ -1405,13 +1410,14 @@ void dgPolyhedra::OptimizeTriangulation (const dgFloat64* const vertex, dgInt32 
 							dgInt32 vertexCount = 0;
 							do {
 								polygon[vertexCount] = ptr->m_incidentVertex;				
+								userData[vertexCount] = ptr->m_userData;
 								vertexCount ++;
 								dgAssert (vertexCount < dgInt32 (sizeof (polygon) / sizeof (polygon[0])));
 								ptr->m_mark = mark;
 								ptr = ptr->m_next;
 							} while (ptr != edge);
 							if (vertexCount >= 3) {
-								buildConvex.AddFace (vertexCount, polygon);
+								buildConvex.AddFace (vertexCount, polygon, userData);
 							}
 						}
 					}

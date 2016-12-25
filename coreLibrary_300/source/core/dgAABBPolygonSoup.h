@@ -114,9 +114,11 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 			dgVector p1 (&vertexArray[m_indexBox1].m_x);
 			dgVector minBox (p0 - obb.m_p1);
 			dgVector maxBox (p1 - obb.m_p0);
-			dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
-			//mask = mask & mask.ShiftTripleRight();
-			//mask = mask & mask.ShiftTripleRight();
+			dgAssert(maxBox.m_x >= minBox.m_x);
+			dgAssert(maxBox.m_y >= minBox.m_y);
+			dgAssert(maxBox.m_z >= minBox.m_z);
+
+			dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector::m_zero);
 			dgVector dist (maxBox.GetMin (minBox.Abs()) & mask);
 			dist = dist.GetMin(dist.ShiftTripleRight());
 			dist = dist.GetMin(dist.ShiftTripleRight());
@@ -131,15 +133,20 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 				dgVector q1 (origin + size);
 				dgVector minBox (q0 - obb.m_size);
 				dgVector maxBox (q1 + obb.m_size);
-				dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector (dgFloat32 (0.0f)));
-				//mask = mask & mask.ShiftTripleRight();
-				//mask = mask & mask.ShiftTripleRight();
+				dgAssert(maxBox.m_x >= minBox.m_x);
+				dgAssert(maxBox.m_y >= minBox.m_y);
+				dgAssert(maxBox.m_z >= minBox.m_z);
+				dgVector mask ((minBox.CompProduct4(maxBox)) < dgVector::m_zero);
 				dgVector dist1 (maxBox.GetMin (minBox.Abs()) & mask);
 				dist1 = dist1.GetMin(dist1.ShiftTripleRight());
 				dist1 = dist1.GetMin(dist1.ShiftTripleRight());
 				dist = dist.GetMin(dist1);
+			} else {
+				dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
+				dist = p1p0.DotProduct4(p1p0);
+				dist = (dist.Sqrt()).CompProduct4(dgVector::m_negOne);
 			}
-			return dist.GetScalar();
+			return	dist.GetScalar();
 		}
 
 		DG_INLINE dgFloat32 BoxIntersect (const dgFastRayTest& ray, const dgFastRayTest& obbRay, const dgFastAABBInfo& obb, const dgTriplex* const vertexArray) const
@@ -161,15 +168,10 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 				dgVector minBox1 (q0 - obb.m_size);
 				dgVector maxBox1 (q1 + obb.m_size);
 				dgFloat32 dist1 = obbRay.BoxIntersect(minBox1, maxBox1);
-				//dgAssert (dist1 <= 1.0f);
-				//dgAssert (dist == dist1);
-				//dist = dist1;
 				dist = (dist1  > dgFloat32 (1.0f)) ? dist1 : dgMax (dist1, dist);
 			}
 			return dist;
 		}
-
-
 
 		dgInt32 m_indexBox0;
 		dgInt32 m_indexBox1;

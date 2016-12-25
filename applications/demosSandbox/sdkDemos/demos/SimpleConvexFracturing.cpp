@@ -181,6 +181,7 @@ class SimpleFracturedEffectEntity: public DemoEntity
 
 		// if the force is bigger than N time Gravities, It is considered a collision force
 		breakImpact *= m_myMassInverse;
+breakImpact = 1000.0f;
 		if (breakImpact > BREAK_IMPACT_IN_METERS_PER_SECONDS) {
 			NewtonWorld* const world = NewtonBodyGetWorld(m_myBody);
 
@@ -363,11 +364,7 @@ static void AddFracturedPrimitive (DemoEntityManager* const scene, dFloat mass, 
 	NewtonMeshDestroy (mesh);
 	visualMesh->Release(); 
 	NewtonDestroyCollision (collision);
-
 }
-
-
-
 
 void SimpleConvexFracturing (DemoEntityManager* const scene)
 {
@@ -380,14 +377,14 @@ void SimpleConvexFracturing (DemoEntityManager* const scene)
 //	CreateLevelMesh (scene, "sponza.ngd", true);
 
 	// create a shattered mesh array
-//CreateSimpleVoronoiFracture (scene);
+	//CreateSimpleVoronoiFracture (scene);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector size (0.75f, 0.75f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
-	int count = 4;
+	int count = 5;
 	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
@@ -395,7 +392,6 @@ void SimpleConvexFracturing (DemoEntityManager* const scene)
 	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-
 
 	// place camera into position
 	dQuaternion rot;

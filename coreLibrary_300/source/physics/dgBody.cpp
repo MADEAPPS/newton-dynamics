@@ -170,6 +170,16 @@ void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRema
 	m_collision->Serialize(serializeCallback, userData, false);
 }
 
+void dgBody::UpdateLumpedMatrix()
+{
+	if (m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+		dgAssert(IsRTTIType(dgBody::m_dynamicBodyRTTI));
+		dgCollisionLumpedMassParticles* const lumpedMass = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
+		lumpedMass->SetOwnerAndUnitMass((dgDynamicBody*) this); 
+	}
+}
+
+
 void dgBody::SetMatrix(const dgMatrix& matrix)
 {
 	SetMatrixOriginAndRotation(matrix);
@@ -455,7 +465,6 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 			}
 		}
 
-
 	} else {
 		Ixx = dgAbsf (Ixx);
 		Iyy = dgAbsf (Iyy);
@@ -485,6 +494,7 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 		}
 	}
 
+
 #ifdef _DEBUG
 	dgBodyMasterList& me = *m_world;
 	for (dgBodyMasterList::dgListNode* refNode = me.GetFirst(); refNode; refNode = refNode->GetNext()) {
@@ -500,6 +510,7 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 		}
 	}
 #endif
+	UpdateLumpedMatrix();
 }
 
 
@@ -521,8 +532,8 @@ void dgBody::SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const
 
 	// although the engine fully supports asymmetric inertia, I will ignore cross inertia for now
 	//SetMassMatrix(mass, inertia[0][0], inertia[1][1], inertia[2][2]);
-	SetMassMatrix(mass, inertia);
 	SetCentreOfMass(origin);
+	SetMassMatrix(mass, inertia);
 }
 
 

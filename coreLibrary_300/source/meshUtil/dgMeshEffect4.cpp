@@ -905,7 +905,7 @@ class dgHACDClusterGraph
 		dgArray<dgBigVector> convexVertexBuffer(mesh.GetCount(), GetAllocator());
 		const dgBigVector* const points = (dgBigVector*) mesh.GetVertexPool();
 
-		convexPartionMesh->BeginPolygon();
+		convexPartionMesh->BeginBuild();
 		dgFloat64 layer = dgFloat64 (0.0f);
 		for (dgList<dgHACDConvacityLookAheadTree*>::dgListNode* clusterNode = m_convexProximation.GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
 			dgHACDConvacityLookAheadTree* const cluster = clusterNode->GetInfo();
@@ -945,7 +945,7 @@ class dgHACDClusterGraph
 				layer += dgFloat64 (1.0f);
 			}
 		}
-		convexPartionMesh->EndPolygon(1.0e-5f);
+		convexPartionMesh->EndBuild(1.0e-5f);
 
 		m_progress = m_faceCount - 1;
 		ReportProgress();

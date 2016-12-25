@@ -31,6 +31,8 @@
 #include "dgCollisionConvexPolygon.h"
 
 
+//#define DG_CONTACT_SOLVE_USE_GEOMETRIC_INTERPRETATION
+
 dgVector dgContactSolver::m_hullDirs[] =
 {
 	dgVector(dgFloat32(0.577350f), dgFloat32(-0.577350f), dgFloat32(0.577350f), dgFloat32(0.0f)),
@@ -92,58 +94,27 @@ DG_INLINE void dgContactSolver::SupportVertex(const dgVector& dir0, dgInt32 vert
 	m_hullSum[vertexIndex] = p + q;
 }
 
-DG_INLINE dgVector dgContactSolver::ReduceLine(dgInt32& indexOut)
-{
-	const dgVector& p0 = m_hullDiff[0];
-	const dgVector& p1 = m_hullDiff[1];
-	dgVector dp(p1 - p0);
-	dgVector v;
 
-	dgAssert(dp.m_w == dgFloat32(0.0f));
-	dgFloat32 mag2 = dp.DotProduct4(dp).GetScalar();
-	if (mag2 < dgFloat32(1.0e-24f)) {
-		v = p0;
-		indexOut = 1;
-	} else {
-		//dgFloat32 alpha0 = - (p0 % dp) / mag2;
-		//if (alpha0 > dgFloat32 (1.0f)) {
-		dgFloat32 alpha0 = -p0.DotProduct4(dp).GetScalar();
-		if (alpha0 > mag2) {
-			v = p1;
-			indexOut = 1;
-			m_hullSum[0] = m_hullSum[1];
-			m_hullDiff[0] = m_hullDiff[1];
-		} else if (alpha0 < dgFloat32(0.0f)) {
-			v = p0;
-			indexOut = 1;
-		} else {
-			v = p0 + dp.Scale4(alpha0 / mag2);
-		}
-	}
-	return v;
-}
-
-DG_INLINE dgVector dgContactSolver::ReduceLineLarge(dgInt32& indexOut)
+DG_INLINE dgBigVector dgContactSolver::ReduceLine(dgInt32& indexOut)
 {
-	dgBigVector p0(m_hullDiff[0]);
-	dgBigVector p1(m_hullDiff[1]);
-	dgBigVector dp(p1 - p0);
+	const dgBigVector p0(m_hullDiff[0]);
+	const dgBigVector p1(m_hullDiff[1]);
+	const dgBigVector dp(p1 - p0);
 	dgBigVector v;
 
-	dgFloat64 mag2 = dp.DotProduct3(dp);
+	const dgFloat64 mag2 = dp.DotProduct4(dp).GetScalar();
+	dgAssert (mag2 > dgFloat64 (0.0f));
 	if (mag2 < dgFloat32(1.0e-24f)) {
 		v = p0;
 		indexOut = 1;
 	} else {
-		//dgFloat64 alpha0 = - (p0 % dp) / mag2;
-		//if (alpha0 > dgFloat32 (1.0f)) {
-		dgFloat64 alpha0 = - p0.DotProduct3(dp);
+		const dgFloat64 alpha0 = - p0.DotProduct4(dp).GetScalar();
 		if (alpha0 > mag2) {
 			v = p1;
 			indexOut = 1;
 			m_hullSum[0] = m_hullSum[1];
 			m_hullDiff[0] = m_hullDiff[1];
-		} else if (alpha0 < dgFloat32(0.0f)) {
+		} else if (alpha0 < dgFloat64(0.0f)) {
 			v = p0;
 			indexOut = 1;
 		} else {
@@ -154,6 +125,9 @@ DG_INLINE dgVector dgContactSolver::ReduceLineLarge(dgInt32& indexOut)
 }
 
 
+#ifdef DG_CONTACT_SOLVE_USE_GEOMETRIC_INTERPRETATION
+
+/*
 DG_INLINE void dgContactSolver::ReduceDegeneratedTriangle()
 {
 	dgVector e10(m_hullDiff[1] - m_hullDiff[0]);
@@ -169,100 +143,40 @@ DG_INLINE void dgContactSolver::ReduceDegeneratedTriangle()
 #endif
 	}
 }
+*/
 
-
-DG_INLINE dgVector dgContactSolver::ReduceTriangle(dgInt32& indexOut)
-{
-	dgVector e10(m_hullDiff[1] - m_hullDiff[0]);
-	dgVector e20(m_hullDiff[2] - m_hullDiff[0]);
-	dgVector normal(e10.CrossProduct3(e20));
-	dgAssert(normal.m_w == dgFloat32(0.0f));
-	//if ((normal % normal) > dgFloat32 (1.0e-14f)) {
-	if (normal.DotProduct4(normal).GetScalar() > dgFloat32(1.0e-14f)) {
-		dgInt32 i0 = 2;
-		dgInt32 minIndex = -1;
-		for (dgInt32 i1 = 0; i1 < 3; i1++) {
-			const dgVector& p1p0 = m_hullDiff[i0];
-			const dgVector& p2p0 = m_hullDiff[i1];
-
-			//dgFloat32 volume = (p1p0 * p2p0) % normal;
-			dgFloat32 volume = (normal.DotProduct4(p1p0.CrossProduct3(p2p0))).GetScalar();
-			if (volume < dgFloat32(0.0f)) {
-				dgVector segment(m_hullDiff[i1] - m_hullDiff[i0]);
-				dgAssert(segment.m_w == dgFloat32(0.0f));
-				dgVector poinP0(m_hullDiff[i0].CompProduct4(dgVector::m_negOne));
-				dgFloat32 den = segment.DotProduct4(segment).GetScalar();
-				dgAssert(den > dgFloat32(0.0f));
-				dgFloat32 num = poinP0.DotProduct4(segment).GetScalar();
-				if (num < dgFloat32(0.0f)) {
-					minIndex = i0;
-				} else if (num > den) {
-					minIndex = i1;
-				} else {
-					indexOut = 2;
-					dgVector tmp0(m_hullDiff[i0]);
-					dgVector tmp1(m_hullDiff[i1]);
-					m_hullDiff[0] = tmp0;
-					m_hullDiff[1] = tmp1;
-
-					tmp0 = m_hullSum[i0];
-					tmp1 = m_hullSum[i1];
-					m_hullSum[0] = tmp0;
-					m_hullSum[1] = tmp1;
-
-					return m_hullDiff[0] + segment.Scale4(num / den);
-				}
-			}
-			i0 = i1;
-		}
-		if (minIndex != -1) {
-			indexOut = 1;
-			m_hullSum[0] = m_hullSum[minIndex];
-			m_hullDiff[0] = m_hullDiff[minIndex];
-			return m_hullDiff[0];
-		} else {
-			indexOut = 3;
-			return normal.Scale4(normal.DotProduct4(m_hullDiff[0]).GetScalar() / normal.DotProduct4(normal).GetScalar());
-		}
-	} else {
-		indexOut = 2;
-		ReduceDegeneratedTriangle();
-		return ReduceLine(indexOut);
-	}
-}
-
-DG_INLINE dgVector dgContactSolver::ReduceTriangleLarge (dgInt32& indexOut)
+DG_INLINE dgBigVector dgContactSolver::ReduceTriangle(dgInt32& indexOut)
 {
 	dgBigVector triangleDiffExtended[3];
 	triangleDiffExtended[0] = m_hullDiff[0];
 	triangleDiffExtended[1] = m_hullDiff[1];
 	triangleDiffExtended[2] = m_hullDiff[2];
 
-	dgBigVector e10 (triangleDiffExtended[1] - triangleDiffExtended[0]);
-	dgBigVector e20 (triangleDiffExtended[2] - triangleDiffExtended[0]);
-	dgBigVector normal (e10.CrossProduct3(e20));
-	if (normal.DotProduct3(normal) > dgFloat32 (1.0e-14f)) {
+	dgBigVector e10(triangleDiffExtended[1] - triangleDiffExtended[0]);
+	dgBigVector e20(triangleDiffExtended[2] - triangleDiffExtended[0]);
+	dgBigVector normal(e10.CrossProduct3(e20));
+	if (normal.DotProduct3(normal) > dgFloat32(1.0e-14f)) {
 		dgInt32 i0 = 2;
 		dgInt32 minIndex = -1;
-		for (dgInt32 i1 = 0; i1 < 3; i1 ++) {
-			dgBigVector p1p0 (triangleDiffExtended[i0]);
-			dgBigVector p2p0 (triangleDiffExtended[i1]);
+		for (dgInt32 i1 = 0; i1 < 3; i1++) {
+			dgBigVector p1p0(triangleDiffExtended[i0]);
+			dgBigVector p2p0(triangleDiffExtended[i1]);
 
 			dgFloat64 volume = normal.DotProduct3(p1p0.CrossProduct3(p2p0));
-			if (volume < dgFloat32 (0.0f)) {
-				dgBigVector segment (triangleDiffExtended[i1] - triangleDiffExtended[i0]);
-				dgBigVector poinP0 (triangleDiffExtended[i0].Scale3 (dgFloat32 (-1.0f)));
+			if (volume < dgFloat32(0.0f)) {
+				dgBigVector segment(triangleDiffExtended[i1] - triangleDiffExtended[i0]);
+				dgBigVector poinP0(triangleDiffExtended[i0].Scale3(dgFloat32(-1.0f)));
 				dgFloat64 den = segment.DotProduct3(segment);
-				dgAssert (den > dgFloat32 (0.0f));
+				dgAssert(den > dgFloat32(0.0f));
 				dgFloat64 num = poinP0.DotProduct3(segment);
-				if (num < dgFloat32 (0.0f)) {
+				if (num < dgFloat32(0.0f)) {
 					minIndex = i0;
-				} else if (num > den){
+				} else if (num > den) {
 					minIndex = i1;
 				} else {
 					indexOut = 2;
-					dgBigVector tmp0 (triangleDiffExtended[i0]);
-					dgBigVector tmp1 (triangleDiffExtended[i1]);
+					dgBigVector tmp0(triangleDiffExtended[i0]);
+					dgBigVector tmp1(triangleDiffExtended[i1]);
 					triangleDiffExtended[0] = tmp0;
 					triangleDiffExtended[1] = tmp1;
 					m_hullDiff[0] = tmp0;
@@ -273,7 +187,7 @@ DG_INLINE dgVector dgContactSolver::ReduceTriangleLarge (dgInt32& indexOut)
 					m_hullSum[0] = tmp0;
 					m_hullSum[1] = tmp1;
 
-					return dgVector (triangleDiffExtended[0] + segment.Scale3 (num / den));
+					return dgVector(triangleDiffExtended[0] + segment.Scale3(num / den));
 				}
 			}
 			i0 = i1;
@@ -282,78 +196,74 @@ DG_INLINE dgVector dgContactSolver::ReduceTriangleLarge (dgInt32& indexOut)
 		if (minIndex != -1) {
 			indexOut = 1;
 			m_hullSum[0] = m_hullSum[minIndex];
-			m_hullDiff[0] = dgVector (m_hullDiff[minIndex]);
-			//triangleDiffExtended[0] = triangleDiffExtended[minIndex];
+			m_hullDiff[0] = dgVector(m_hullDiff[minIndex]);
 			return m_hullDiff[0];
 		} else {
 			indexOut = 3;
-			return dgVector (normal.Scale3(normal.DotProduct3(triangleDiffExtended[0]) / normal.DotProduct3(normal)));
+			return dgVector(normal.Scale3(normal.DotProduct3(triangleDiffExtended[0]) / normal.DotProduct3(normal)));
 		}
 	} else {
-		indexOut = 2;
-		ReduceDegeneratedTriangle ();
-		return ReduceLineLarge (indexOut);
+//		indexOut = 2;
+//		ReduceDegeneratedTriangle();
+//		return ReduceLineLarge(indexOut);
+		dgAssert (0);
+		return dgBigVector (dgFloat64 (0.0f));
 	}
 }
 
-DG_INLINE dgVector dgContactSolver::ReduceTetrahedrum(dgInt32& indexOut)
+DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum(dgInt32& indexOut)
 {
+	dgBigVector tetraDiffExtended[4];
+	tetraDiffExtended[0] = m_hullDiff[0];
+	tetraDiffExtended[1] = m_hullDiff[1];
+	tetraDiffExtended[2] = m_hullDiff[2];
+	tetraDiffExtended[3] = m_hullDiff[3];
+
 	dgInt32 i0 = m_rayCastSimplex[0][0];
 	dgInt32 i1 = m_rayCastSimplex[0][1];
 	dgInt32 i2 = m_rayCastSimplex[0][2];
 	dgInt32 i3 = m_rayCastSimplex[0][3];
-	const dgVector& p0 = m_hullDiff[i0];
-	const dgVector& p1 = m_hullDiff[i1];
-	const dgVector& p2 = m_hullDiff[i2];
-	const dgVector& p3 = m_hullDiff[i3];
+	const dgBigVector& p0 = tetraDiffExtended[i0];
+	const dgBigVector& p1 = tetraDiffExtended[i1];
+	const dgBigVector& p2 = tetraDiffExtended[i2];
+	const dgBigVector& p3 = tetraDiffExtended[i3];
 
-	dgVector p10(p1 - p0);
-	dgVector p20(p2 - p0);
-	dgVector p30(p3 - p0);
-	dgVector n(p10.CrossProduct3(p20));
-	dgAssert(n.m_w == dgFloat32(0.0f));
-	//dgFloat32 volume = p30 % n;
-	dgFloat32 volume = n.DotProduct4(p30).GetScalar();
+	dgBigVector p10(p1 - p0);
+	dgBigVector p20(p2 - p0);
+	dgBigVector p30(p3 - p0);
+	dgFloat64 volume = p30.DotProduct3(p10.CrossProduct3(p20));
 	if (volume < dgFloat32(0.0f)) {
 		volume = -volume;
 		dgSwap(m_hullSum[i2], m_hullSum[i3]);
 		dgSwap(m_hullDiff[i2], m_hullDiff[i3]);
+		dgSwap(tetraDiffExtended[i2], tetraDiffExtended[i3]);
 	}
 	if (volume < dgFloat32(1.0e-8f)) {
-		dgTrace(("very import to finish this\n"));
-		//		dgAssert (0);
+		dgAssert(0);
 	}
 
 	dgInt32 faceIndex = -1;
-	dgFloat32 minDist = dgFloat32(dgFloat32(0.0f));
-	const dgVector origin(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	dgFloat64 minDist = dgFloat32(0.0f);
+	const dgBigVector origin(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 	for (dgInt32 i = 0; i < 4; i++) {
 		dgInt32 i0 = m_rayCastSimplex[i][0];
 		dgInt32 i1 = m_rayCastSimplex[i][1];
 		dgInt32 i2 = m_rayCastSimplex[i][2];
 
-		const dgVector& p0 = m_hullDiff[i0];
-		const dgVector& p1 = m_hullDiff[i1];
-		const dgVector& p2 = m_hullDiff[i2];
+		const dgBigVector& p0 = tetraDiffExtended[i0];
+		const dgBigVector& p1 = tetraDiffExtended[i1];
+		const dgBigVector& p2 = tetraDiffExtended[i2];
 
-		dgVector p10(p1 - p0);
-		dgVector p20(p2 - p0);
-		dgVector normal(p10.CrossProduct3(p20));
-		dgAssert(normal.m_w == dgFloat32(0.0f));
-
-		//dgFloat32 area = normal % normal;
-		//dgAssert (dgAbsf (area) > dgFloat32 (0.0f));
-		//normal = normal.Scale3 (dgRsqrt (area));
-		dgVector normalDot4(normal.DotProduct4(normal));
-		dgAssert(normalDot4.GetScalar() > dgFloat32(0.0f));
-		if (normalDot4.GetScalar() > dgFloat32(1.0e-24f)) {
-			normal = normal.CompProduct4(normalDot4.InvSqrt());
-			//dgFloat32 dist = normal % (origin - p0);
-			dgFloat32 dist = normal.DotProduct4(origin - p0).GetScalar();
-			if (dist <= minDist) {
-				minDist = dist;
-				faceIndex = i;
-			}
+		dgBigVector p10(p1 - p0);
+		dgBigVector p20(p2 - p0);
+		dgBigVector normal(p10.CrossProduct3(p20));
+		dgFloat64 area = normal.DotProduct3(normal);
+		dgAssert(fabs(area) > dgFloat32(0.0f));
+		normal = normal.Scale3(dgFloat32(1.0f) / sqrt(area));
+		dgFloat64 dist = normal.DotProduct3(origin - p0);
+		if (dist < minDist) {
+			minDist = dist;
+			faceIndex = i;
 		}
 	}
 
@@ -385,191 +295,121 @@ DG_INLINE dgVector dgContactSolver::ReduceTetrahedrum(dgInt32& indexOut)
 	return origin;
 }
 
-DG_INLINE dgVector dgContactSolver::ReduceTetrahedrumLarge (dgInt32& indexOut)
+
+#else
+
+DG_INLINE dgBigVector dgContactSolver::ReduceTriangle (dgInt32& indexOut)
 {
-	dgBigVector tetraDiffExtended[4];
-	tetraDiffExtended[0] = m_hullDiff[0];
-	tetraDiffExtended[1] = m_hullDiff[1];
-	tetraDiffExtended[2] = m_hullDiff[2];
-	tetraDiffExtended[3] = m_hullDiff[3];
+	const dgBigVector p0(m_hullDiff[0]);
+	const dgBigVector p1(m_hullDiff[1]);
+	const dgBigVector p2(m_hullDiff[2]);
+	const dgBigVector e10 (p1 - p0);
+	const dgBigVector e20 (p2 - p0);
+	const dgFloat64 a00 = e10.DotProduct4(e10).GetScalar();
+	const dgFloat64 a11 = e20.DotProduct4(e20).GetScalar();
+	const dgFloat64 a01 = e10.DotProduct4(e20).GetScalar();
 
-	dgInt32 i0 = m_rayCastSimplex[0][0];
-	dgInt32 i1 = m_rayCastSimplex[0][1];
-	dgInt32 i2 = m_rayCastSimplex[0][2];
-	dgInt32 i3 = m_rayCastSimplex[0][3];
-	const dgBigVector& p0 = tetraDiffExtended[i0];
-	const dgBigVector& p1 = tetraDiffExtended[i1]; 
-	const dgBigVector& p2 = tetraDiffExtended[i2];
-	const dgBigVector& p3 = tetraDiffExtended[i3];
+	const dgFloat64 det = a00 * a11 - a01 * a01;
+	dgAssert(det >= dgFloat32(0.0f));
+	if (dgAbsf(det) > dgFloat32(1.0e-24f)) {
+		const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
+		const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
 
-	dgBigVector p10 (p1 - p0);
-	dgBigVector p20 (p2 - p0);
-	dgBigVector p30 (p3 - p0);
-	dgFloat64 volume = p30.DotProduct3(p10.CrossProduct3(p20));
-	if (volume < dgFloat32 (0.0f)) {
-		volume = -volume;
-		dgSwap (m_hullSum[i2], m_hullSum[i3]);
-		dgSwap (m_hullDiff[i2], m_hullDiff[i3]);
-		dgSwap (tetraDiffExtended[i2], tetraDiffExtended[i3]);
-	}
-	if (volume < dgFloat32 (1.0e-8f)) {
-		dgAssert (0);
-	}
+		const dgFloat64 u2 = b1 * a00 - a01 * b0;
+		const dgFloat64 u1 = b0 * a11 - a01 * b1;
 
-	dgInt32 faceIndex = -1;
-	dgFloat64 minDist = dgFloat32 (0.0f);
-	const dgBigVector origin (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	for (dgInt32 i = 0; i < 4; i ++) {
-		dgInt32 i0 = m_rayCastSimplex[i][0];
-		dgInt32 i1 = m_rayCastSimplex[i][1];
-		dgInt32 i2 = m_rayCastSimplex[i][2];
+		/*
+		const dgFloat64 d0 = sqrt(e10.DotProduct4(e10).GetScalar());
+		const dgFloat64 invd0 = dgFloat64(1.0f) / d0;
+		const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
+		const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
+		const dgFloat64 d1 = sqrt(desc11);
+		const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
+		dgFloat64 u1__ = b0 * invd0;
+		dgFloat64 u2__ = (b1 - l10 * u1__) * invd1 * invd1;
+		u1__ = (u1__ - l10 * u2__) * invd0;
+		*/
 
-		const dgBigVector& p0 = tetraDiffExtended[i0];
-		const dgBigVector& p1 = tetraDiffExtended[i1]; 
-		const dgBigVector& p2 = tetraDiffExtended[i2];
-
-		dgBigVector p10 (p1 - p0);
-		dgBigVector p20 (p2 - p0);
-		dgBigVector normal (p10.CrossProduct3(p20));
-		dgFloat64 area = normal.DotProduct3(normal);
-		dgAssert (fabs (area) > dgFloat32 (0.0f));
-		normal = normal.Scale3 (dgFloat32 (1.0f) / sqrt (area));
-		dgFloat64 dist = normal.DotProduct3(origin - p0);
-		if (dist < minDist) {
-			minDist = dist;
-			faceIndex = i;
+		if (u2 < dgFloat32(0.0f)) {
+			// this looks funny but it is correct
+		} else if (u1 < dgFloat32(0.0f)) {
+			m_hullSum[1] = m_hullSum[2];
+			m_hullDiff[1] = m_hullDiff[2];
+		} else if ((u1 + u2) > det) {
+			m_hullSum[0] = m_hullSum[2];
+			m_hullDiff[0] = m_hullDiff[2];
+		} else {
+			return p0 + (e10.Scale4(u1) + e20.Scale4(u2)).Scale4(dgFloat64(1.0f) / det);
 		}
-	}
-
-	if (faceIndex != -1) {
-		dgVector tmp[3];
-		dgInt32 i0 = m_rayCastSimplex[faceIndex][0];
-		dgInt32 i1 = m_rayCastSimplex[faceIndex][1];
-		dgInt32 i2 = m_rayCastSimplex[faceIndex][2];
-
-		tmp[0] = m_hullSum[i0];
-		tmp[1] = m_hullSum[i1];
-		tmp[2] = m_hullSum[i2];
-		m_hullSum[0] = tmp[0];
-		m_hullSum[1] = tmp[1];
-		m_hullSum[2] = tmp[2];
-
-		tmp[0] = m_hullDiff[i0];
-		tmp[1] = m_hullDiff[i1];
-		tmp[2] = m_hullDiff[i2];
-		m_hullDiff[0] = tmp[0];
-		m_hullDiff[1] = tmp[1];
-		m_hullDiff[2] = tmp[2];
-
-		indexOut = 3;
-		return ReduceTriangleLarge (indexOut);
-	}
-
-	indexOut = 4;
-	return origin;
+		indexOut = 2;
+		return ReduceLine(indexOut);
+	} 
+	// this is a degenerated triangle. this should never happens
+	dgAssert(0);
+	return dgBigVector::m_zero;
 }
 
-
-DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplex()
+DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum (dgInt32& indexOut)
 {
-	dgVector v(dgFloat32(0.0f));
-	dgInt32 index = 1;
-	if (m_vertexIndex <= 0) {
-		SupportVertex(m_proxy->m_contactJoint->m_separtingVector, 0);
-		v = m_hullDiff[0];
-	} else {
-		switch (m_vertexIndex) 
-		{
-			case 1:
-			{
-				  v = m_hullDiff[0];
-				  break;
-			}
+	const dgBigVector p0(m_hullDiff[0]);
+	const dgBigVector p1(m_hullDiff[1]);
+	const dgBigVector p2(m_hullDiff[2]);
+	const dgBigVector p3(m_hullDiff[3]);
+	const dgBigVector e10(p1 - p0);
+	const dgBigVector e20(p2 - p0);
+	const dgBigVector e30(p3 - p0);
 
-			case 2:
-			{
-				  v = ReduceLine(m_vertexIndex);
-				  break;
-			}
+	const dgFloat64 d0 = sqrt (e10.DotProduct4(e10).GetScalar());
+	if (d0 > dgFloat64(0.0f)) {
+		const dgFloat64 invd0 = dgFloat64(1.0f) / d0;
+		const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
+		const dgFloat64 l20 = e30.DotProduct4(e10).GetScalar() * invd0;
+		const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
+		if (desc11 > dgFloat64(0.0f)) {
+			const dgFloat64 d1 = sqrt(desc11);
+			const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
+			const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
+			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
+			if (desc11 > dgFloat64(0.0f)) {
+				const dgFloat64 d2 = sqrt(desc22);
+				const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
+				const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
+				const dgFloat64 b1 = -e20.DotProduct4(p0).GetScalar();
+				const dgFloat64 b2 = -e30.DotProduct4(p0).GetScalar();
 
-			case 3:
-			{
-				  v = ReduceTriangle(m_vertexIndex);
-				  break;
-			}
-
-			case 4:
-			{
-				  v = ReduceTetrahedrum(m_vertexIndex);
-				  break;
+				dgFloat64 u1 = b0 * invd0;
+				dgFloat64 u2 = (b1 - l10 * u1) * invd1;
+				dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2 * invd2;
+				u2 = (u2 - l21 * u3) * invd1;
+				u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
+				if (u3 < dgFloat64(0.0f)) {
+					// this looks funny but it is correct
+				} else if (u2 < dgFloat64(0.0f)) {
+					m_hullSum[2] = m_hullSum[3];
+					m_hullDiff[2] = m_hullDiff[3];
+				} else if (u1 < dgFloat64(0.0f)) {
+					m_hullSum[1] = m_hullSum[3];
+					m_hullDiff[1] = m_hullDiff[3];
+				} else if (u1 + u2 + u3 > dgFloat64(1.0f)) {
+					m_hullSum[0] = m_hullSum[3];
+					m_hullDiff[0] = m_hullDiff[3];
+				} else {
+					return dgBigVector::m_zero;
+				}
+				indexOut = 3;
+				return ReduceTriangle(indexOut);
 			}
 		}
-		index = m_vertexIndex;
 	}
-
-	dgInt32 iter = 0;
-	dgInt32 cycling = 0;
-	dgFloat32 minDist = dgFloat32(1.0e20f);
-	do {
-		dgFloat32 dist = v.DotProduct3(v);
-		if (dist < dgFloat32(1.0e-9f)) {
-			// very deep penetration, resolve with generic Mankowski solver
-			return -index;
-		}
-
-		if (dist < minDist) {
-			minDist = dist;
-			cycling = -1;
-		}
-		cycling++;
-		if (cycling > 4) {
-			// for now return -1
-			return -index;
-		}
-
-		dgVector dir(v.Scale4(-dgRsqrt(dist)));
-		SupportVertex(dir, index);
-
-		const dgVector& w = m_hullDiff[index];
-		dgVector wv(w - v);
-		dist = dir.DotProduct3(wv);
-		if (dist < dgFloat32(1.0e-3f)) {
-			m_normal = dir;
-			break;
-		}
-
-		index++;
-		switch (index) 
-		{
-			case 2:
-			{
-				v = ReduceLine(index);
-				break;
-			}
-
-			case 3:
-			{
-				v = ReduceTriangle(index);
-				break;
-			}
-
-			case 4:
-			{
-				v = ReduceTetrahedrum(index);
-				break;
-			}
-		}
-
-		iter++;
-		cycling++;
-	} while (iter < DG_CONNICS_CONTATS_ITERATIONS);
-
-	return (index < 4) ? index : -4;
+	// this is a degenerated tetra. this should never happens
+	dgAssert (0);
+	return dgBigVector::m_zero;
 }
+#endif
 
-DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplexLarge ()
+DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplex ()
 {
-	dgVector v(dgFloat32 (0.0f));
+	dgBigVector v(dgFloat32 (0.0f));
 	dgInt32 index = 1;
 	if (m_vertexIndex <= 0) {
 		SupportVertex (m_proxy->m_contactJoint->m_separtingVector, 0);
@@ -585,19 +425,19 @@ DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplexLarge ()
 
 			case 2:
 			{
-				v = ReduceLineLarge (m_vertexIndex);
+				v = ReduceLine (m_vertexIndex);
 				break;
 			}
 
 			case 3:
 			{
-				v = ReduceTriangleLarge (m_vertexIndex);
+				v = ReduceTriangle (m_vertexIndex);
 				break;
 			}
 
 			case 4:
 			{
-				v = ReduceTetrahedrumLarge (m_vertexIndex);
+				v = ReduceTetrahedrum (m_vertexIndex);
 				break;
 			}
 		}
@@ -606,10 +446,9 @@ DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplexLarge ()
 
 	dgInt32 iter = 0;
 	dgInt32 cycling = 0;
-	dgFloat32 minDist = dgFloat32 (1.0e20f);
+	dgFloat64 minDist = dgFloat32 (1.0e20f);
 	do {
-
-		dgFloat32 dist = v.DotProduct3(v);
+		dgFloat64 dist = v.DotProduct4(v).GetScalar();
 		if (dist < dgFloat32 (1.0e-9f)) {
 			// very deep penetration, resolve with generic minkowsky solver
 			return -index; 
@@ -625,13 +464,15 @@ DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplexLarge ()
 			return -index;
 		}
 
-		dgVector dir (v.Scale3 (-dgRsqrt(dist)));
+		const dgVector dir (v.Scale4 (-dgRsqrt(dist)));
+		dgAssert (dir.m_w == dgFloat32 (0.0f));
 		SupportVertex (dir, index);
 
-		const dgVector& w = m_hullDiff[index];
-		dgVector wv (w - v);
-		dist = dir.DotProduct3(wv);
-		if (dist < dgFloat32 (1.0e-3f)) {
+		const dgBigVector w (m_hullDiff[index]);
+		const dgVector wv (w - v);
+		dgAssert (wv.m_w == dgFloat32 (0.0f));
+		const dgFloat64 dist1 = dir.DotProduct4(wv).GetScalar();
+		if (dist1 < dgFloat64 (1.0e-3f)) {
 			m_normal = dir;
 			break;
 		}
@@ -641,25 +482,24 @@ DG_INLINE dgInt32 dgContactSolver::CalculateClosestSimplexLarge ()
 		{
 			case 2:
 			{
-				v = ReduceLineLarge (index);
+				v = ReduceLine (index);
 				break;
 			}
 
 			case 3:
 			{
-				v = ReduceTriangleLarge (index);
+				v = ReduceTriangle (index);
 				break;
 			}
 
 			case 4:
 			{
-				v = ReduceTetrahedrumLarge (index);
+				v = ReduceTetrahedrum (index);
 				break;
 			}
 		}
 
 		iter ++;
-		cycling ++;
 	} while (iter < DG_CONNICS_CONTATS_ITERATIONS); 
 	return (index < 4) ? index : -4;
 }
@@ -903,18 +743,14 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		Pop();
 
 		if (faceNode->m_alive) {
-
 			//SaveOFF ("xxx.off");
-
 			SupportVertex(faceNode->m_plane & dgVector::m_triplexMask, m_vertexIndex);
 			const dgVector& p = m_hullDiff[m_vertexIndex];
 			dgFloat32 dist = faceNode->m_plane.Evalue(p);
 			dgFloat32 distTolerance = dgMax(dgAbsf(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
 
 			if (dist < distTolerance) {
-				//if (xxx > 1000){
-				//	SaveOFF ("xxx.off");
-				//}
+				//SaveOFF ("xxx.off");
 				dgVector sum[3];
 				dgVector diff[3];
 				m_normal = faceNode->m_plane & dgVector::m_triplexMask;
@@ -1134,8 +970,8 @@ DG_INLINE void dgContactSolver::CalculateContactFromFeacture(dgInt32 featureType
 		}
 	}
 
-	m_closestPoint0 = (s + d).Scale4(dgFloat32(0.5f));
-	m_closestPoint1 = (s - d).Scale4(dgFloat32(0.5f));
+	m_closestPoint0 = dgVector::m_half.CompProduct4(s + d);
+	m_closestPoint1 = dgVector::m_half.CompProduct4(s - d);
 	dgAssert(dgAbsf(m_normal.DotProduct3(m_normal) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 	m_proxy->m_contactJoint->m_separtingVector = m_normal;
 }
@@ -1175,20 +1011,11 @@ bool dgContactSolver::SanityCheck() const
 
 bool dgContactSolver::CalculateClosestPoints()
 {
-	dgInt32 simplexPointCount = 0;
-	const dgFloat32 radius0 = m_instance0->GetBoxMaxRadius();
-	const dgFloat32 radius1 = m_instance1->GetBoxMaxRadius();
-	if ((radius1 * dgFloat32(8.0f) > radius0) && (radius0 * dgFloat32(8.0f) > radius1)) {
-		simplexPointCount = CalculateClosestSimplex();
-		if (simplexPointCount < 0) {
-			simplexPointCount = CalculateIntersectingPlane(-simplexPointCount);
-		}
-	} else {
-		simplexPointCount = CalculateClosestSimplexLarge();
-		if (simplexPointCount < 0) {
-			simplexPointCount = CalculateIntersectingPlane(-simplexPointCount);
-		}
+	dgInt32 simplexPointCount = CalculateClosestSimplex();
+	if (simplexPointCount < 0) {
+		simplexPointCount = CalculateIntersectingPlane(-simplexPointCount);
 	}
+
 	if (simplexPointCount > 0) {
 		dgAssert((simplexPointCount > 0) && (simplexPointCount <= 3));
 		CalculateContactFromFeacture(simplexPointCount);
@@ -1555,7 +1382,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVect
 			dgVector alternatePointOnInstance1(matrix1.UntransformVector(alternatePoint));
 			count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, alternatePointOnInstance1, shape1);
 		}
-		dgAssert(count1);
+		//dgAssert(count1);
 		step = matrix1.UnrotateVector(normal.CompProduct4 ((alternatePoint - origin).DotProduct4(normal)));
 		for (dgInt32 i = 0; i < count1; i++) {
 			shape1[i] -= step;
@@ -1586,7 +1413,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVect
 			}
 			dgAssert(count0);
 			step = matrix0.UnrotateVector(normal.CompProduct4((alternatePoint - origin).DotProduct4(normal)));
-			for (dgInt32 i = 0; i < count1; i++) {
+			for (dgInt32 i = 0; i < count0; i++) {
 				shape0[i] -= step;
 			}
 		}
@@ -1633,8 +1460,7 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVect
 						contactsOut[0] = p0 + p10.Scale4(clip0 - pl0);
 						contactsOut[1] = p0 + p10.Scale4(clip1 - pl0);
 					}
-				}
-				else {
+				} else {
 					count = 1;
 					dgVector c0;
 					dgVector c1;
@@ -1676,18 +1502,16 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 
 	const dgCollisionConvex* const collision = (dgCollisionConvex*)m_instance0->GetChildShape();
 	m_hullDiff[0] = collision->SupportVertex (dir, NULL) - point;
-	dgVector v (m_hullDiff[0]);
+	dgBigVector v (m_hullDiff[0]);
 	index = 1;
 	do {
 		dgInt32 iter = 0;
 		dgInt32 cycling = 0;
-		dgFloat32 minDist = dgFloat32 (1.0e20f);
+		dgFloat64 minDist = dgFloat32 (1.0e20f);
 
 		do {
 			dgAssert (v.m_w == dgFloat32 (0.0f));
-			dgVector dist (v.DotProduct4(v));
-			dgFloat32 distance = dist.m_x;
-
+			const dgFloat64 distance = v.DotProduct4(v).GetScalar();
 			if (distance < dgFloat32 (1.0e-9f)) {
 				index = -1; 
 				break;
@@ -1699,20 +1523,20 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 			}
 			cycling ++;
 			if (cycling > 4) {
-				dgAssert (0);
+				//dgAssert (0);
 				index = -1; 
 				break;
 			}
 
-			//dgVector dir (v.Scale4 (-dgRsqrt(dist)));
-			dgVector dir (v.CompProduct4(dist.InvSqrt().CompProduct4(dgVector::m_negOne)));
+			dgVector dir (v.Scale4 (-dgRsqrt(dgFloat32 (distance))));
+			//dgVector dir (v.CompProduct4(dist.InvSqrt().CompProduct4(dgVector::m_negOne)));
 			dgAssert (dir.m_w == dgFloat32 (0.0f));
 			m_hullDiff[index] = collision->SupportVertex (dir, NULL) - point;
-			const dgVector& w = m_hullDiff[index];
-			dgVector wv (w - v);
+			const dgBigVector w (m_hullDiff[index]);
+			const dgVector wv (w - v);
 			dgAssert (wv.m_w == dgFloat32 (0.0f));
-			distance = dir.DotProduct4(wv).m_x;
-			if (distance < dgFloat32 (1.0e-3f)) {
+			const dgFloat32 distance1 = dir.DotProduct4(wv).GetScalar();
+			if (distance1 < dgFloat64 (1.0e-3f)) {
 				normal = dir;
 				break;
 			}
@@ -1740,7 +1564,6 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 			}
 
 			iter ++;
-			cycling ++;
 		} while (iter < DG_CONNICS_CONTATS_ITERATIONS); 
 
 		dgAssert (index);
@@ -1814,8 +1637,6 @@ DG_INLINE void dgContactSolver::TranslateSimplex(const dgVector& step)
 	}
 }
 
-
-
 dgInt32 dgContactSolver::CalculateConvexCastContacts()
 {
 	dgInt32 iter = 0;
@@ -1854,8 +1675,6 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 			m_proxy->m_closestPointBody1 = m_closestPoint1 + step;
 			m_proxy->m_normal = m_normal.Scale4 (dgFloat32 (-1.0f));
 			m_proxy->m_contactJoint->m_closestDistance = m_proxy->m_normal.DotProduct4(m_closestPoint0 - m_closestPoint1).GetScalar();
-			//dgFloat32 penetration = dgMax(num * dgFloat32(-1.0f) - DG_RESTING_CONTACT_PENETRATION, dgFloat32(0.0f));
-dgAssert (0);
 			dgFloat32 penetration = dgMax(num * dgFloat32(-1.0f) + DG_PENETRATION_TOL, dgFloat32(0.0f));
 			m_proxy->m_contactJoint->m_closestDistance = penetration;
 			if (m_proxy->m_contacts && !m_proxy->m_intersectionTestOnly) {
@@ -1864,10 +1683,8 @@ dgAssert (0);
 					m_normal = m_normal.Scale4 (dgFloat32 (-1.0f));
 					m_proxy->m_contactJoint->m_contactActive = 1;
 					dgVector contactPoint((m_closestPoint0 + m_closestPoint1).Scale4(dgFloat32(0.5f)));
-					dgAssert(0);
-//					count = CalculateContacts(contactPoint, m_normal);
+					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_normal);
 					if (count) {
-			
 						count = dgMin(m_proxy->m_maxContacts, count);
 						dgContactPoint* const contactOut = m_proxy->m_contacts;
 

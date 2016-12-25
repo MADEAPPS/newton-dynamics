@@ -728,7 +728,7 @@ void NewtonSetIslandUpdateEvent(const NewtonWorld* const newtonWorld, NewtonIsla
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->SetIslandUpdateCallback((dgWorld::OnIslandUpdate) islandUpdate); 
+	world->SetIslandUpdateCallback((dgWorld::OnClusterUpdate) islandUpdate); 
 }
 
 
@@ -1192,7 +1192,7 @@ NewtonBody* NewtonIslandGetBody(const void* const island, int bodyIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgWorld* const world = *(dgWorld**)island;
-	return (NewtonBody*)world->GetIslandBody (island, bodyIndex);
+	return (NewtonBody*)world->GetClusterBody (island, bodyIndex);
 }
 
 
@@ -2170,7 +2170,7 @@ NewtonCollision* NewtonCreateBox(const NewtonWorld* const newtonWorld, dFloat dx
 
   @param *newtonWorld Pointer to the Newton world.
   @param radius sphere radius
-  @param shapeID fixme
+  @param shapeID user specified collision index that can be use for multi material collision.  
   @param *offsetMatrix pointer to an array of 16 floats containing the offset matrix of the sphere relative to the body. If this parameter is NULL then the sphere is centered at the origin of the body.
 
   @return Pointer to the generalized sphere.
@@ -2190,13 +2190,6 @@ NewtonCollision* NewtonCreateSphere(const NewtonWorld* const newtonWorld, dFloat
 		 matrix = dgMatrix (offsetMatrix);
 	}
 
-//	radiusX = dgAbsf (radiusX);
-//	radiusY = dgAbsf (radiusY);
-//	radiusZ = dgAbsf (radiusZ);
-//	if ((dgAbsf (radiusX - radiusY) < 1.0e-5f) && (dgAbsf (radiusX - radiusZ) < 1.0e-5f)) {
-//		return (NewtonCollision*) world->CreateSphere(radiusX, shapeID, matrix);
-//	} 
-//	return (NewtonCollision*) world->CreateEllipse (radiusX, radiusY, radiusZ, shapeID, matrix);
 	return (NewtonCollision*) world->CreateSphere(dgAbsf(radius), shapeID, matrix);
 }
 
@@ -2207,7 +2200,7 @@ NewtonCollision* NewtonCreateSphere(const NewtonWorld* const newtonWorld, dFloat
   @param *newtonWorld Pointer to the Newton world.
   @param radius cone radius at the base.
   @param height cone height along the x local axis from base to tip.
-  @param shapeID fixme
+  @param shapeID user specified collision index that can be use for multi material collision.
   @param *offsetMatrix pointer to an array of 16 floats containing the offset matrix of the box relative to the body. If this parameter is NULL, then the primitive is centered at the origin of the body.
 
   @return Pointer to the box
@@ -3735,8 +3728,7 @@ void NewtonCollisionSupportVertex(const NewtonCollision* const collisionPtr, con
 	dgVector searchDir (matrix.UnrotateVector(dgVector (dir[0], dir[1], dir[2], dgFloat32 (0.0f)))); 
 	searchDir = searchDir.Scale3 (dgRsqrt (searchDir.DotProduct3(searchDir)));
 
-	dgInt32 index; 
-	dgVector vertexOut (matrix.TransformVector(collision->SupportVertex(searchDir, &index)));
+	dgVector vertexOut (matrix.TransformVector(collision->SupportVertex(searchDir)));
 
 	vertex[0] = vertexOut[0];
 	vertex[1] = vertexOut[1];
@@ -7458,11 +7450,12 @@ NewtonMesh* NewtonMeshCreateConvexHull (const NewtonWorld* const newtonWorld, in
 	return (NewtonMesh*) mesh;
 }
 
-NewtonMesh* NewtonMeshCreateDelaunayTetrahedralization (const NewtonWorld* const newtonWorld, int pointCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix)
+NEWTON_API NewtonMesh* NewtonMeshCreateConformingTetrahedralization(const NewtonMesh* const closetMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	return (NewtonMesh*) dgMeshEffect::CreateDelaunayTetrahedralization (world->dgWorld::GetAllocator(), pointCount, strideInBytes, vertexCloud, materialID, dgMatrix (textureMatrix));
+	dgMeshEffect* const meshEffect = (dgMeshEffect*) closetMesh;
+//	return (NewtonMesh*) dgMeshEffect::CreateDelaunayTetrahedralization (world->dgWorld::GetAllocator(), interiorMaterialID, strideInBytes, vertexCloud, materialID, dgMatrix (textureMatrix));
+	return (NewtonMesh*)meshEffect->CreateDelaunayTetrahedralization();
 }
 
 NewtonMesh* NewtonMeshCreateVoronoiConvexDecomposition (const NewtonWorld* const newtonWorld, int pointCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix)
@@ -7652,46 +7645,117 @@ void NewtonRemoveUnusedVertices(const NewtonMesh* const mesh, int* const vertexR
 }
 
 
-void NewtonMeshBeginFace(const NewtonMesh* const mesh)
+void NewtonMeshBeginBuild(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-	meshEffect->BeginPolygon();
+	meshEffect->BeginBuild();
 }
 
-void NewtonMeshAddFace(const NewtonMesh* const mesh, int vertexCount, const dFloat* const vertex, int strideInBytes, int materialIndex)
+void NewtonMeshBeginFace (const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	meshEffect->AddPolygon (vertexCount, vertex, strideInBytes, materialIndex);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->BeginBuildFace();
 }
-
 
 void NewtonMeshEndFace(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	meshEffect->EndPolygon(dgFloat64 (1.0e-8f));
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->EndBuildFace();
 }
 
+void NewtonMeshAddPoint(const NewtonMesh* const mesh, dFloat64 x, dFloat64 y, dFloat64 z)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddPoint (x, y, z);
+}
 
-void NewtonMeshBuildFromPointListIndexList(const NewtonMesh* const mesh,
-	int faceCount, const int* const faceIndexCount, const int* const faceMaterialIndex, 
-	const dFloat* const vertex, int vertexStrideInBytes, const int* const vertexIndex,
-	const dFloat* const normal, int normalStrideInBytes, const int* const normalIndex,
-	const dFloat* const uv0, int uv0StrideInBytes, const int* const uv0Index,
-	const dFloat* const uv1, int uv1StrideInBytes, const int* const uv1Index)
+void NewtonMeshAddMaterial(const NewtonMesh* const mesh, int materialIndex)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddMaterial(materialIndex);
+}
+
+void NewtonMeshAddLayer(const NewtonMesh* const mesh, int layer)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddLayer(layer);
+}
+
+void NewtonMeshAddNormal(const NewtonMesh* const mesh, dFloat x, dFloat y, dFloat z)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddNormal(x, y, z);
+}
+
+void NewtonMeshAddBinormal(const NewtonMesh* const mesh, dFloat x, dFloat y, dFloat z)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddBinormal(x, y, z);
+}
+
+void NewtonMeshAddUV0(const NewtonMesh* const mesh, dFloat u, dFloat v)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddUV0(u, v);
+}
+
+void NewtonMeshAddUV1(const NewtonMesh* const mesh, dFloat u, dFloat v)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->AddUV1(u, v);
+}
+
+void NewtonMeshEndBuild(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
 
-	meshEffect->BuildFromPointListIndexList(faceCount, faceIndexCount, faceMaterialIndex, 
-											 vertex, vertexStrideInBytes, vertexIndex,
-											 normal, normalStrideInBytes, normalIndex,
-											 uv0, uv0StrideInBytes, uv0Index,
-											 uv1, uv1StrideInBytes, uv1Index);
+	meshEffect->EndBuild(dgFloat64 (1.0e-8f));
+}
+
+void NewtonMeshClearVertexFormat (NewtonMeshVertexFormat* const format)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect::dgMeshVertexFormat* const vertexFormat = (dgMeshEffect::dgMeshVertexFormat*) format;
+	vertexFormat->Clear ();
+}
+
+void NewtonMeshBuildFromVertexListIndexList (const NewtonMesh* const mesh, NewtonMeshVertexFormat* const format)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
+	meshEffect->BuildFromIndexList((dgMeshEffect::dgMeshVertexFormat*) format);
+}
+
+void NewtonMeshOptimizePoints(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->OptimizePoints();
+}
+
+void NewtonMeshOptimizeVertex(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->OptimizeAttibutes();
+}
+
+void NewtonMeshOptimize(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonMeshOptimizePoints(mesh);
+	NewtonMeshOptimizeVertex(mesh);
 }
 
 
@@ -7712,7 +7776,7 @@ int NewtonMeshGetVertexStrideInByte(const NewtonMesh* const mesh)
 	return meshEffect->GetVertexStrideInByte();
 }
 
-dFloat64* NewtonMeshGetVertexArray (const NewtonMesh* const mesh) 
+const dFloat64* NewtonMeshGetVertexArray (const NewtonMesh* const mesh) 
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
@@ -7725,10 +7789,17 @@ int NewtonMeshGetPointCount (const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
 	return meshEffect->GetPropertiesCount();
 }
 
+const int* NewtonMeshGetIndexToVertexMap(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	return meshEffect->GetIndexToVertexMap();
+}
+
+/*
 int NewtonMeshGetPointStrideInByte (const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);	
@@ -7736,8 +7807,6 @@ int NewtonMeshGetPointStrideInByte (const NewtonMesh* const mesh)
 
 	return meshEffect->GetPropertiesStrideInByte();
 }
-
-
 
 dFloat64* NewtonMeshGetPointArray (const NewtonMesh* const mesh) 
 {
@@ -7771,40 +7840,91 @@ dFloat64* NewtonMeshGetUV1Array (const NewtonMesh* const mesh)
 
 	return meshEffect->GetUV1Pool();
 }
+*/
 
-
-
-void NewtonMeshGetVertexStreams(const NewtonMesh* const mesh, 
-								dgInt32 vetexStrideInByte, dFloat* const vertex,
-								dgInt32 normalStrideInByte, dFloat* const normal,
-								dgInt32 uvStrideInByte0, dFloat* const uv0,
-								dgInt32 uvStrideInByte1, dFloat* const uv1)
+int NewtonMeshHasNormalChannel(const NewtonMesh* const mesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	return meshEffect->HasNormalChannel() ? 1 : 0;
+}
 
-	meshEffect->GetVertexStreams (vetexStrideInByte, (dgFloat32*) vertex,
-								  normalStrideInByte, (dgFloat32*) normal, uvStrideInByte0, (dgFloat32*) uv0, uvStrideInByte1, (dgFloat32*) uv1);
+int NewtonMeshHasBinormalChannel(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	return meshEffect->HasBinormalChannel() ? 1 : 0;
+}
+
+int NewtonMeshHasUV0Channel(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	return meshEffect->HasUV0Channel() ? 1 : 0;
+}
+
+int NewtonMeshHasUV1Channel(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	return meshEffect->HasUV1Channel() ? 1 : 0;
+}
+
+int NewtonMeshHasVertexColorChannel(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	return meshEffect->HasVertexColorChannel() ? 1 : 0;
 }
 
 
-void NewtonMeshGetIndirectVertexStreams(const NewtonMesh* const mesh, 
-										int vetexStrideInByte, dFloat* const vertex, int* const vertexIndices, int* const vertexCount,
-										int normalStrideInByte, dFloat* const normal, int* const normalIndices, int* const normalCount,
-										int uvStrideInByte0, dFloat* const uv0, int* const uvIndices0, int* const uvCount0,
-										int uvStrideInByte1, dFloat* const uv1, int* const uvIndices1, int* const uvCount1)
+void NewtonMeshGetVertexDoubleChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat64* const outBuffer)
 {
-	dgAssert (0);
-/*
-	
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
 	TRACE_FUNCTION(__FUNCTION__);
-	meshEffect->GetIndirectVertexStreams (vetexStrideInByte, (dgFloat32*) vertex, (dgInt32*) vertexIndices, (dgInt32*) vertexCount,
-										  normalStrideInByte, (dgFloat32*) normal, (dgInt32*) normalIndices, (dgInt32*) normalCount,
-										  uvStrideInByte0, (dgFloat32*) uv0, (dgInt32*) uvIndices0, (dgInt32*) uvCount0,
-										  uvStrideInByte1, (dgFloat32*) uv1, (dgInt32*) uvIndices1, (dgInt32*) uvCount1);
-*/
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->GetVertexChannel64(vertexStrideInByte, (dgFloat64*)outBuffer);
+}
+
+void NewtonMeshGetVertexChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->GetVertexChannel(vertexStrideInByte, (dgFloat32*)outBuffer);
+}
+
+void NewtonMeshGetNormalChannel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->GetNormalChannel(vertexStrideInByte, (dgFloat32*)outBuffer);
+}
+
+void NewtonMeshGetBinormalChannel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->GetBinormalChannel(vertexStrideInByte, (dgFloat32*)outBuffer);
+}
+
+void NewtonMeshGetUV0Channel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->GetUV0Channel(vertexStrideInByte, (dgFloat32*)outBuffer);
+}
+
+void NewtonMeshGetUV1Channel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->GetUV1Channel(vertexStrideInByte, (dgFloat32*)outBuffer);
+}
+
+void NewtonMeshGetVertexColorChannel(const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->GetVertexColorChannel(vertexStrideInByte, (dgFloat32*)outBuffer);
 }
 
 
@@ -8070,43 +8190,73 @@ void NewtonMeshCalculateFaceNormal (const NewtonMesh* const mesh, const void* co
 	normal[2] = n.m_z;
 }
 
-NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial)
+
+
+NewtonCollision* NewtonCreateDeformableSolid(const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, int shapeID)
 {
-	dgAssert(0);
-	return NULL;
-/*
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-
-	dgClothPatchMaterial material0;
-	dgClothPatchMaterial material1;
-
-	memcpy (&material0, structuralMaterial, sizeof (NewtonClothPatchMaterial));
-	memcpy (&material1, bendMaterial, sizeof (NewtonClothPatchMaterial));
-	return (NewtonCollision*) world->CreateClothPatchMesh((dgMeshEffect*)mesh, shapeID, material0, material1);
-*/
-
+	return (NewtonCollision*) world->CreateDeformableSolid ((dgMeshEffect*)mesh, shapeID);
 }
 
-
-NewtonCollision* NewtonCreateDeformableMesh(const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, int shapeID)
+NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return (NewtonCollision*) world->CreateDeformableMesh ((dgMeshEffect*)mesh, shapeID);
+	return (NewtonCollision*)world->CreateClothPatchMesh ((dgMeshEffect*)mesh, shapeID);
 }
 
 int NewtonDeformableMeshGetParticleCount(const NewtonCollision* const deformableMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
-	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)collision->GetChildShape();
-		return deformableShape->GetParticleCount();
+	if (collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+		dgCollisionLumpedMassParticles* const deformableShape = (dgCollisionLumpedMassParticles*)collision->GetChildShape();
+		return deformableShape->GetCount();
 	}
 	return 0;
 }
 
+
+const dFloat* NewtonDeformableMeshGetParticleArray(const NewtonCollision* const deformableMesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+		dgCollisionLumpedMassParticles* const deformableShape = (dgCollisionLumpedMassParticles*)collision->GetChildShape();
+		const dgVector* const posit = deformableShape->GetPositions();
+		return &posit[0].m_x;
+	}
+	return NULL;
+}
+
+const int* NewtonDeformableMeshGetIndexToVertexMap (const NewtonCollision* const deformableMesh) 
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)collision->GetChildShape();
+		return deformableShape->GetIndexToVertexMap();
+	}
+	return NULL;
+}
+
+
+
+int NewtonDeformableMeshGetParticleStrideInBytes(const NewtonCollision* const deformableMesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
+		dgCollisionLumpedMassParticles* const deformableShape = (dgCollisionLumpedMassParticles*)collision->GetChildShape();
+		return deformableShape->GetStrideInByte();
+	}
+	return 0;
+}
+
+
+
+/*
 void NewtonDeformableMeshConstraintParticle(NewtonCollision* const deformableMesh, int particleIndex, const dFloat* const posit, const NewtonBody* const body)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8119,7 +8269,7 @@ void NewtonDeformableMeshConstraintParticle(NewtonCollision* const deformableMes
 }
 
 
-/*
+
 void NewtonDeformableMeshCreateClusters (NewtonCollision* const deformableMesh, int clunsterCount, dFloat overlapingWidth)
 {
 	dgAssert(0);

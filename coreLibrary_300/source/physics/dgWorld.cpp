@@ -52,9 +52,9 @@
 #define DG_SOLVER_CONVERGENCE_COUNT			4
 #define DG_DEFAULT_SOLVER_ITERATION_COUNT	4
 
-#define DG_INITIAL_BODIES_SIZE		(1024 * 4)
-#define DG_INITIAL_JOINTS_SIZE		(1024 * 4)
-#define DG_INITIAL_JACOBIAN_SIZE	(1024 * 16)
+//#define DG_INITIAL_BODIES_SIZE		(1024 * 4)
+//#define DG_INITIAL_JOINTS_SIZE		(1024 * 4)
+//#define DG_INITIAL_JACOBIAN_SIZE	(1024 * 16)
 
 
 
@@ -225,18 +225,18 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	,m_preListener(allocator)
 	,m_postListener(allocator)
 	,m_perInstanceData(allocator)
-	,m_bodiesMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
-	,m_jointsMemory (DG_INITIAL_JOINTS_SIZE, allocator, 64)
-	,m_solverJacobiansMemory (DG_INITIAL_JACOBIAN_SIZE, allocator, 64)
-	,m_solverForceAccumulatorMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
-	,m_islandMemory (DG_INITIAL_BODIES_SIZE, allocator, 64)
+	,m_bodiesMemory (allocator, 64)
+	,m_jointsMemory (allocator, 64)
+	,m_solverJacobiansMemory (allocator, 64)
+	,m_solverForceAccumulatorMemory (allocator, 64)
+	,m_clusterMemory (allocator, 64)
 {
 	dgMutexThread* const mutexThread = this;
 	SetMatertThread (mutexThread);
 
 	m_savetimestep = dgFloat32 (0.0f);
 	m_allocator = allocator;
-	m_islandUpdate = NULL;
+	m_clusterUpdate = NULL;
 	m_getDebugTime = NULL;
 
 	m_onCollisionInstanceDestruction = NULL;
@@ -251,7 +251,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	m_defualtBodyGroupID = CreateBodyGroupID();
 	m_genericLRUMark = 0;
 	m_delayDelateLock = 0;
-	m_islandLRU = 0;
+	m_clusterLRU = 0;
 
 	m_useParallelSolver = 0;
 
@@ -263,7 +263,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	m_frictiomTheshold = dgFloat32 (0.25f);
 
 	m_userData = NULL;
-	m_islandUpdate = NULL;
+	m_clusterUpdate = NULL;
 
 	m_freezeAccel2 = DG_FREEZE_MAG2;
 	m_freezeAlpha2 = DG_FREEZE_MAG2;
@@ -589,9 +589,9 @@ void* dgWorld::GetUserData() const
 }
 
 
-void dgWorld::SetIslandUpdateCallback (OnIslandUpdate callback)
+void dgWorld::SetIslandUpdateCallback (OnClusterUpdate callback)
 {
-	m_islandUpdate = callback;
+	m_clusterUpdate = callback;
 }
 
 

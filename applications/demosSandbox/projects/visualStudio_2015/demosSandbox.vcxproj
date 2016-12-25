@@ -639,32 +639,29 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2015\newton.vcxproj">
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2015_static_mt\core.vcxproj">
+      <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2015_static_mt\newton.vcxproj">
       <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2015_static_mt\physics.vcxproj">
+      <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2015_static_mt\pthread.vcxproj">
       <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015\dAnimation.vcxproj">
-      <Project>{e3c14351-bad1-4add-ab9a-31054d6e7cdb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015\dContainers.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015_static_mt\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015\dJointLibrary.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015_static_mt\dCustomJoints.vcxproj">
       <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015\dMath.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015_static_mt\dMath.vcxproj">
       <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015\dScene.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015_static_mt\dScene.vcxproj">
       <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015\dVisualDebuggerServer.vcxproj">
-      <Project>{2ffeb5b8-8929-469f-bb13-4e391cd3213c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\enet-1.2\VS_2015_static_mt\enet.vcxproj">
-      <Project>{a862a496-668a-41ca-ba4b-8c86892006b7}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\freetype-2.4.0\builds\win32\vc2015_static_mt\freetype.vcxproj">
       <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
@@ -672,7 +669,7 @@
     <ProjectReference Include="..\..\..\..\packages\thirdParty\glew\build\VS_2015_static_mt\glew.vcxproj">
       <Project>{0c9707f5-dec7-42eb-8ea1-a484df1e515b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2015\tinyxml.vcxproj">
+    <ProjectReference Include="..\..\..\..\packages\thirdParty\tinyxml\vs2015_static_mt\tinyxml.vcxproj">
       <Project>{18e509cf-46d2-4749-b3bb-160937cf2481}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2015_static_mt\wx_vc9_base.vcxproj">

@@ -36,17 +36,14 @@ class dgStackBase
 };
 
 inline dgStackBase::dgStackBase (dgInt32 size)
+	:m_ptr (dgMallocStack (size_t (size)))
 {
-	m_ptr = dgMallocStack (size_t (size));
 }
 
 inline dgStackBase::~dgStackBase ()
 {
 	dgFreeStack ((void*)m_ptr);
 }
-
-
-
 
 template<class T>
 class dgStack: public dgStackBase
@@ -57,8 +54,8 @@ class dgStack: public dgStackBase
 	dgInt32 GetSizeInBytes() const;
 	dgInt32 GetElementsCount() const;
 	
-	T& operator[] (dgInt32 entry);
-	const T& operator[] (dgInt32 entry) const;
+	DG_INLINE T& operator[] (dgInt32 entry);
+	DG_INLINE const T& operator[] (dgInt32 entry) const;
 
 	private:
 	dgInt32 m_size;
@@ -90,27 +87,22 @@ dgInt32 dgStack<T>::GetSizeInBytes() const
  
 
 template<class T>
-T& dgStack<T>::operator[] (dgInt32 entry) 
+DG_INLINE T& dgStack<T>::operator[] (dgInt32 entry) 
 {
-	T *mem;
-
 	dgAssert (entry >= 0);
 	dgAssert ((entry < m_size) || ((m_size == 0) && (entry == 0)));
 
-	mem = (T*) m_ptr;
+	T* const mem = (T*) m_ptr;
 	return mem[entry];
 }
 
 template<class T>
-const T& dgStack<T>::operator[] (dgInt32 entry) const
+DG_INLINE const T& dgStack<T>::operator[] (dgInt32 entry) const
 {
-	T *mem;
-
-	dgAssert (0);
 	dgAssert (entry >= 0);
 	dgAssert ((entry < m_size) || ((m_size == 0) && (entry == 0)));
 
-	mem = (T*) m_ptr;
+	const T* const mem = (T*) m_ptr;
 	return mem[entry];
 }
 

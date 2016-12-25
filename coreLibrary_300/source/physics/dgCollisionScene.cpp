@@ -97,6 +97,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc.DotProduct3(hullVeloc));
 
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
+	dgFloat32 separatingDist = dgFloat32 (1.0e10f);
 	if (proxy.m_continueCollision && (baseLinearSpeed > dgFloat32 (1.0e-6f))) {
 		dgVector p0;
 		dgVector p1;
@@ -140,6 +141,9 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 
 						proxy.m_timestep = maxParam;
 						m_world->SceneChildContacts (pair, proxy);
+						// remember to update sperating distance
+						dgAssert (0);
+						//data.m_separatingDistance = dgMin(proxy.m_contactJoint->m_separationDistance, data.m_separatingDistance);
 						dgFloat32 param = proxy.m_timestep;
 						dgAssert(param >= dgFloat32(0.0f));
 						if (param < maxParam) {
@@ -201,6 +205,7 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 						proxy.m_instance1 = &childInstance;
 						dgInt32 count = pair->m_contactCount;
 						m_world->SceneChildContacts (pair, proxy);
+						data.m_separatingDistance = dgMin(proxy.m_contactJoint->m_separationDistance, data.m_separatingDistance);
 						if (pair->m_contactCount > count) {
 							dgContactPoint* const buffer = proxy.m_contacts;
 							for (dgInt32 i = count; i < pair->m_contactCount; i ++) {
@@ -227,9 +232,10 @@ void dgCollisionScene::CollidePair (dgBroadPhase::dgPair* const pair, dgCollisio
 				}
 			}
 		}
+		separatingDist = dgMin (separatingDist, data.m_separatingDistance);
 	}
 	constraint->m_closestDistance = closestDist;
-	constraint->m_separationDistance = closestDist;
+	constraint->m_separationDistance = separatingDist;
 }
 
 
@@ -265,6 +271,7 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 	dgFloat32 baseLinearSpeed = dgSqrt (hullVeloc.DotProduct3(hullVeloc));
 
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
+	dgFloat32 separatingDist = dgFloat32 (1.0e10f);
 	if (proxy.m_continueCollision && (baseLinearSpeed > dgFloat32 (1.0e-6f))) {
 		dgAssert (0);
 	} else {
@@ -288,8 +295,6 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 					if (processContacts) {
 						const dgCollisionInstance* const mySrcInstance =  me->GetShape();
 						const dgCollisionInstance* const otherSrcInstance =  other->GetShape();
-						//dgCollisionInstance childInstance (*mySrcInstance, mySrcInstance->GetChildShape());
-						//dgCollisionInstance otherInstance (*otherSrcInstance, otherSrcInstance->GetChildShape());
 						dgCollisionInstance childInstance (*me->GetShape(), me->GetShape()->GetChildShape());
 						dgCollisionInstance otherInstance (*other->GetShape(), other->GetShape()->GetChildShape());
 
@@ -316,6 +321,7 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 						}
 
 						closestDist = dgMin(closestDist, constraint->m_closestDistance);
+						data.m_separatingDistance = dgMin(proxy.m_contactJoint->m_separationDistance, data.m_separatingDistance);
 					}
 
 				} else if (me->m_type == m_leaf) {
@@ -370,9 +376,10 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 				}
 			}
 		}
+		separatingDist = dgMin (separatingDist, data.m_separatingDistance);
 	}
 	constraint->m_closestDistance = closestDist;
-	constraint->m_separationDistance = dgFloat32 (0.0f);
+	constraint->m_separationDistance = separatingDist;
 }
 
 

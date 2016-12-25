@@ -192,8 +192,14 @@ class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlace
         dLong attrbA[maxSize];
         dLong attrbB[maxSize];
 
-
         if( NewtonCollisionIntersectionTest(world, collisionA, &poseA[0][0], collisionB, &poseB[0][0],0) ) {
+/*
+			poseA = dMatrix (dVector(0.951201f, 0.308571f, 0.000000f, 0.000000f), 
+							dVector(-0.308571f, 0.951201f, -0.000000f, 0.000000f),
+							dVector(-0.000000f, 0.000000f, 1.000000f, 0.000000f),
+							dVector(-0.620709f, 1.965793f, 0.240484f, 1.000000f));
+			poseA.Trace();
+*/
             int contactCount = NewtonCollisionCollide(world, maxSize, collisionA, &poseA[0][0], collisionB, &poseB[0][0], &points[0][0], &normals[0][0], &penetrations[0], &attrbA[0], &attrbB[0], 0);
             if (contactCount && ((me->m_contactCount + contactCount) <= int (sizeof (me->m_contacts) / sizeof (me->m_contacts[0])))) {
                 for(int i = 0; i < contactCount; i ++) {
@@ -479,7 +485,7 @@ void KinematicPlacement (DemoEntityManager* const scene)
 	new dKinematicPlacementManager (scene);
 
 	// add some bodies 
-//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	dVector location (0,0,0,0);
 	location.m_x += 0.0f;
 	location.m_z += 0.0f;
@@ -491,22 +497,21 @@ NewtonCollision* col = NewtonCreateConvexHull(scene->GetNewton(), 8, pts, 12, 0.
 NewtonBody* body = NewtonCreateDynamicBody(scene->GetNewton(), col, &matrix[0][0]);
 NewtonBodySetMassProperties(body, 1.0, col);
 */
-//	int count = 1;
-//	dMatrix shapeOffsetMatrix (GetIdentityMatrix());
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-
+	int count = 3;
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 
 	// place camera into position
 	dQuaternion rot;
-	dVector origin (-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin (-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 

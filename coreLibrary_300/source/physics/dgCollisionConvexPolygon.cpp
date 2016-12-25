@@ -38,7 +38,6 @@ dgCollisionConvexPolygon::dgCollisionConvexPolygon (dgMemoryAllocator* const all
 	,m_paddedCount(0)
 	,m_stride(0)
 	,m_faceNormalIndex(0)
-//	,m_closestFeatureType(-1)
 	,m_faceClipSize(0) 
 	,m_vertex(NULL)
 	,m_vertexIndex(NULL)
@@ -594,7 +593,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 		if (inside & !proxy.m_intersectionTestOnly) {
 			const dgMatrix& matrixInstance0 = proxy.m_instance0->m_globalMatrix;
 			dgVector normalInHull(matrixInstance0.UnrotateVector(m_normal.Scale4(dgFloat32(-1.0f))));
-			dgVector pointInHull(proxy.m_instance0->SupportVertex(normalInHull, NULL));
+			dgVector pointInHull(proxy.m_instance0->SupportVertex(normalInHull));
 			dgVector p0 (matrixInstance0.TransformVector(pointInHull));
 
 			dgFloat32 timetoImpact = dgFloat32(0.0f);
@@ -613,9 +612,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 				proxy.m_closestPointBody1 = p0 + m_normal.Scale4(penetration);
 
 				if (!proxy.m_intersectionTestOnly) {
-					dgAssert (0);
+					//dgAssert (0);
 					//pointInHull -= normalInHull.Scale4 (DG_ROBUST_PLANE_CLIP);
-					pointInHull -= normalInHull.Scale4 (-DG_PENETRATION_TOL);
+					pointInHull -= normalInHull.Scale4 (DG_PENETRATION_TOL);
 					count = proxy.m_instance0->CalculatePlaneIntersection(normalInHull, pointInHull, contactPoints);
 
 					dgVector step(relativeVelocity.Scale4(timetoImpact));
@@ -665,7 +664,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	const dgCollisionInstance* const hull = proxy.m_instance0;
 
 	dgVector normalInHull(hullMatrix.UnrotateVector(m_normal));
-	dgVector pointInHull(hull->SupportVertex(normalInHull.Scale4(dgFloat32(-1.0f)), NULL));
+	dgVector pointInHull(hull->SupportVertex(normalInHull.Scale4(dgFloat32(-1.0f))));
 	dgVector p0(hullMatrix.TransformVector(pointInHull));
 
 	dgFloat32 penetration = m_normal.DotProduct3(m_localPoly[0] - p0) + proxy.m_skinThickness;
@@ -673,7 +672,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		return 0;
 	}
 
-	dgVector p1(hullMatrix.TransformVector(hull->SupportVertex(normalInHull, NULL)));
+	dgVector p1(hullMatrix.TransformVector(hull->SupportVertex(normalInHull)));
 	contactJoint->m_closestDistance = dgFloat32(0.0f);
 	dgFloat32 distance = m_normal.DotProduct3(m_localPoly[0] - p1);
 	if (distance >= dgFloat32(0.0f)) {

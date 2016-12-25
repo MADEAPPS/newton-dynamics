@@ -27,7 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>gl</ProjectName>
+    <ProjectName>wxgl</ProjectName>
     <ProjectGuid>{DA8B15EF-6750-5928-BC0E-C748213CF9B2}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

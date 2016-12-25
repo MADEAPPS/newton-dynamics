@@ -267,8 +267,8 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
-//	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	AddFloorBox(scene, dVector (0.0f, -0.05f, 0.0f, 0.0f), dVector(100.0f, 0.1f, 100.0f, 0.0f));
+	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+//	AddFloorBox(scene, dVector (0.0f, -0.05f, 0.0f, 0.0f), dVector(100.0f, 0.1f, 100.0f, 0.0f));
 
 	int high = 20;
 	for (int i = 0; i < 1; i ++) {

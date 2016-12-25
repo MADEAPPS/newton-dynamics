@@ -55,8 +55,8 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 {
 	public:
 	dgTriangleAnglesToUV (dgMeshEffect* const mesh, dgInt32 material, dgReportProgress progressReportCallback, void* const userData, const dgFloat64* const pinnedPoint, dgFloat64* const triangleAnglesVector = NULL)
-		:m_hessianCoLumnIndex (4 * mesh->GetVertexCount(), mesh->GetAllocator())
-		,m_hessianCoLumnValue(4 * mesh->GetVertexCount(), mesh->GetAllocator())
+		:m_hessianCoLumnIndex (mesh->GetAllocator())
+		,m_hessianCoLumnValue(mesh->GetAllocator())
 		,m_mesh(mesh)
 		,m_triangleAngles(triangleAnglesVector)
 		,m_pinnedPoints(pinnedPoint)
@@ -117,11 +117,13 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 					ptr->m_mark = mark;
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != edge);
-
+				dgAssert (0);
+/*
 				dgInt32 index = dgInt32 (uvEdge->m_userData);
 				dgMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
 				m_uvArray[index * 2 + 0] = attribute.m_u0;
 				m_uvArray[index * 2 + 1] = attribute.m_v0;
+*/
 			}
 		}
 
@@ -154,8 +156,10 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 
 		LagrangeOptimization();
 
+		dgAssert (0);
+/*
 		dgStack<dgMeshEffect::dgVertexAtribute>attribArray (m_mesh->GetCount());
-		dgInt32 attribCount = m_mesh->EnumerateAttributeArray (&attribArray[0]);
+//		dgInt32 attribCount = m_mesh->EnumerateAttributeArray (&attribArray[0]);
 		mark = m_mesh->IncLRU();
 		for (iter.Begin(); iter; iter ++) {
 			dgEdge* const edge = &iter.GetNode()->GetInfo();
@@ -178,7 +182,9 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 				} while (ptr != vertexEdge);
 			}
 		}
-		m_mesh->ApplyAttributeArray(&attribArray[0], attribCount);
+*/
+		dgAssert (0);
+		//m_mesh->ApplyAttributeArray(&attribArray[0], attribCount);
 	}
 
 	~dgTriangleAnglesToUV()
@@ -842,6 +848,8 @@ class dgAngleBasedFlatteningMapping: public dgSymmetricBiconjugateGradientSolve
 		,m_progressReportUserData(userData)
 		,m_progressReportCallback(progressReportCallback)
 	{
+dgAssert (0);
+/*
 		AllocVectors();
 		InitEdgeVector();
 		CalculateInitialAngles ();
@@ -884,6 +892,7 @@ class dgAngleBasedFlatteningMapping: public dgSymmetricBiconjugateGradientSolve
 			m_deltaVariables[i] = 1.0f;
 		}
 		dgTriangleAnglesToUV anglesToUV (mesh, material, progressReportCallback, userData, m_deltaVariables, m_variables);
+*/
 	}
 
 	~dgAngleBasedFlatteningMapping()
@@ -1444,31 +1453,17 @@ class dgAngleBasedFlatteningMapping: public dgSymmetricBiconjugateGradientSolve
 dgBigVector dgMeshEffect::GetOrigin ()const
 {
     dgBigVector origin (dgFloat64 (0.0f), dgFloat64 (0.0f), dgFloat64 (0.0f), dgFloat64 (0.0f));	
-    for (dgInt32 i = 0; i < m_pointCount; i ++) {
-        origin += m_points[i];
+    for (dgInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
+        origin += m_points.m_vertex[i];
     }	
-    return origin.Scale3 (dgFloat64 (1.0f) / m_pointCount);
+    return origin.Scale3 (dgFloat64 (1.0f) / m_points.m_vertex.m_count);
 }
 
-
-dgInt32 dgMeshEffect::EnumerateAttributeArray (dgVertexAtribute* const attib)
-{
-    dgInt32 index = 0;
-    dgPolyhedra::Iterator iter (*this);	
-    for(iter.Begin(); iter; iter ++){
-        dgEdge* const edge = &(*iter);
-        dgAssert (index < GetCount());
-        if (edge->m_incidentFace > 0) {
-            attib[index] = m_attrib[dgInt32 (edge->m_userData)];
-            edge->m_userData = dgUnsigned64 (index);
-            index ++;
-        }
-    }
-    return index;
-}
-
+/*
 void dgMeshEffect::ClearAttributeArray ()
 {
+	dgAssert(0);
+
     dgStack<dgVertexAtribute>attribArray (m_pointCount);
 
     memset (&attribArray[0], 0, m_pointCount * sizeof (dgVertexAtribute));
@@ -1492,68 +1487,43 @@ void dgMeshEffect::ClearAttributeArray ()
     }
     ApplyAttributeArray (&attribArray[0], m_pointCount);
 }
-
-
-void dgMeshEffect::ApplyAttributeArray (dgVertexAtribute* const attib, dgInt32 maxCount)
-{
-    dgStack<dgInt32>indexMap (dgMax (GetCount(), maxCount));
-
-    m_atribCount = dgVertexListToIndexList (&attib[0].m_vertex.m_x, sizeof (dgVertexAtribute), sizeof (dgVertexAtribute) / sizeof(dgFloat64), maxCount, &indexMap[0], DG_VERTEXLIST_INDEXLIST_TOL);
-    m_maxAtribCount = m_atribCount;
-
-    GetAllocator()->FreeLow (m_attrib);
-
-    m_attrib = (dgVertexAtribute*) GetAllocator()->MallocLow(dgInt32 (m_atribCount * sizeof(dgVertexAtribute)));
-    memcpy (m_attrib, attib, m_atribCount * sizeof(dgVertexAtribute));
-
-    dgPolyhedra::Iterator iter (*this);	
-    for(iter.Begin(); iter; iter ++){
-        dgEdge* const edge = &(*iter);
-        if (edge->m_incidentFace > 0) {
-            dgInt32 index = indexMap[dgInt32 (edge->m_userData)];
-            dgAssert (index >= 0);
-            dgAssert (index < m_atribCount);
-            edge->m_userData = dgUnsigned64 (index);
-        }
-    }
-}
-
+*/
 
 
 void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
 {
     dgEdge* edgeBuffer[256];
-    dgBigVector faceNormal[256];
-    dgVertexAtribute tmpAttributes[256];
-    dgStack<dgVertexAtribute> attibutes(m_atribCount);
-    memcpy (&attibutes[0], &m_attrib[0], m_atribCount * sizeof (dgVertexAtribute));
+	dgBigVector faceNormal[256];
 
-    m_atribCount = 0;
+	UnpackAttibuteData ();
+	m_attrib.m_normalChannel.Reserve(m_attrib.m_pointChannel.m_count);
+
     dgInt32 mark = IncLRU();
     dgPolyhedra::Iterator iter (*this);	
-
     dgFloat32 smoothValue = dgCos (angleInRadians); 
-    for(iter.Begin(); iter; iter ++){
+
+	dgTree<dgInt32, dgEdge*> normalsMap(GetAllocator()) ;
+    for(iter.Begin(); iter; iter ++) {
         dgEdge* const edge = &(*iter);
         if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
-            dgTree<dgInt32, dgEdge*> normalsMap(GetAllocator()) ;
-            dgInt32 edgeIndex = 0;
+			dgInt32 edgeIndex = 0;
+			normalsMap.RemoveAll();
             dgEdge* ptr = edge;
             do {
-                dgBigVector normal (FaceNormal (ptr, &m_points[0].m_x, sizeof (m_points[0])));
-                normal = normal.Scale3 (dgFloat32 (1.0f) / (sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
+                dgVector normal (FaceNormal (ptr, &m_points.m_vertex[0].m_x, sizeof (dgBigVector)));
+				dgAssert (normal.m_w == dgFloat32 (0.0f));
+                normal = normal.Scale4 (dgFloat32 (1.0f) / dgFloat32 (sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
                 faceNormal[edgeIndex] = normal;
                 normalsMap.Insert(edgeIndex, ptr);
                 edgeIndex ++;
                 ptr = ptr->m_twin->m_next;
             } while (ptr != edge);
 
-
             dgEdge* startEdge = edge;
-            dgBigVector normal0 (faceNormal[normalsMap.Find(startEdge)->GetInfo()]);
-            for (dgEdge* ptr = edge->m_prev->m_twin ; (ptr != edge) && (ptr->m_incidentFace > 0); ptr = ptr->m_prev->m_twin) {
-                const dgBigVector& normal1 (faceNormal[normalsMap.Find(ptr)->GetInfo()]);
-                dgFloat64 dot = normal0.DotProduct3(normal1);
+            dgVector normal0 (faceNormal[normalsMap.Find(startEdge)->GetInfo()]);
+            for (dgEdge* ptr = edge->m_prev->m_twin ; (ptr->m_mark != mark) && (ptr != edge) && (ptr->m_incidentFace > 0); ptr = ptr->m_prev->m_twin) {
+                const dgVector& normal1 (faceNormal[normalsMap.Find(ptr)->GetInfo()]);
+                dgFloat32 dot = normal0.DotProduct3(normal1);
                 if (dot < smoothValue) {
                     break;
                 }
@@ -1561,59 +1531,43 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
                 normal0 = normal1;
             }
 
-
             dgInt32 attribCount = 1;
             edgeBuffer[0] = startEdge;
-            tmpAttributes[0] = attibutes[dgInt32 (startEdge->m_userData)];
             normal0 = faceNormal[normalsMap.Find(startEdge)->GetInfo()];
-            dgBigVector normal (normal0);
-            for (dgEdge* ptr = startEdge->m_twin->m_next; (ptr != startEdge) && (ptr->m_incidentFace > 0); ptr = ptr->m_twin->m_next) { 
-                const dgBigVector& normal1 (faceNormal[normalsMap.Find(ptr)->GetInfo()]);
-                dgFloat64 dot = normal0.DotProduct3(normal1);
+            dgVector normal (normal0);
+            for (dgEdge* ptr = startEdge->m_twin->m_next; (ptr->m_mark != mark) && (ptr != startEdge) && (ptr->m_incidentFace > 0); ptr = ptr->m_twin->m_next) { 
+                const dgVector& normal1 (faceNormal[normalsMap.Find(ptr)->GetInfo()]);
+                dgFloat32 dot = normal0.DotProduct3(normal1);
                 if (dot < smoothValue)  {
                     break;
                 }
                 edgeBuffer[attribCount] = ptr;
-                tmpAttributes[attribCount] = attibutes[dgInt32 (ptr->m_userData)];
-                attribCount ++;
-
+				attribCount ++;
                 normal += normal1;
                 normal0 = normal1;
             } 
-            normal = normal.Scale3 (dgFloat32 (1.0f) / (sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
-            for (dgInt32 i = 0; i < attribCount; i ++) {
-                tmpAttributes[i].m_normal_x = normal.m_x;
-                tmpAttributes[i].m_normal_y = normal.m_y;
-                tmpAttributes[i].m_normal_z = normal.m_z;
-            }
-            if (attribCount == 1) {
-                edgeBuffer[0]->m_mark = mark;
-                edgeBuffer[0]->m_userData = m_atribCount;
-                AddAtribute(tmpAttributes[0]);
-            } else {
-                dgInt32 indexArray[256];
-                dgInt32 count = dgVertexListToIndexList (&tmpAttributes[0].m_vertex.m_x, sizeof (dgVertexAtribute), sizeof (dgVertexAtribute) / sizeof(dgFloat64), attribCount, &indexArray[0], DG_VERTEXLIST_INDEXLIST_TOL);
 
-                for (dgInt32 i = 0; i < attribCount; i ++) {
-                    edgeBuffer[i]->m_mark = mark;
-                    edgeBuffer[i]->m_userData = m_atribCount + indexArray[i];
-                }
-                for (dgInt32 i = 0; i < count; i ++) {
-                    AddAtribute(tmpAttributes[i]);
-                }
+            normal = normal.Scale3 (dgFloat32 (1.0f) / dgFloat32(sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
+			dgTriplex n;
+			n.m_x = normal.m_x;
+			n.m_y = normal.m_y;
+			n.m_z = normal.m_z;
+            for (dgInt32 i = 0; i < attribCount; i ++) {
+				edgeBuffer[i]->m_mark = mark;
+				dgInt32 index = dgInt32 (edgeBuffer[i]->m_userData);
+				m_attrib.m_normalChannel[index] = n;
             }
         }
     }
-    PackVertexArrays();
+	PackAttibuteData ();
 }
 
 void dgMeshEffect::SphericalMapping (dgInt32 material)
 {
     dgBigVector origin (GetOrigin());
-
-    dgStack<dgBigVector>sphere (m_pointCount);
-    for (dgInt32 i = 0; i < m_pointCount; i ++) {
-        dgBigVector point (m_points[i] - origin);
+    dgStack<dgBigVector>sphere (m_points.m_vertex.m_count);
+    for (dgInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
+        dgBigVector point (m_points.m_vertex[i] - origin);
         dgAssert (point.DotProduct3(point) > dgFloat32 (0.0f));
         point = point.Scale3 (dgFloat64 (1.0f) / sqrt (point.DotProduct3(point)));
 
@@ -1630,19 +1584,18 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
         sphere[i].m_y = u;
     }
 
-
-    dgStack<dgVertexAtribute>attribArray (GetCount());
-    dgInt32 count = EnumerateAttributeArray (&attribArray[0]);
-
+	UnpackAttibuteData ();
+	m_attrib.m_uv0Channel.Reserve(m_attrib.m_pointChannel.m_count);
+	m_attrib.m_materialChannel.Reserve(m_attrib.m_pointChannel.m_count);
+	
     dgPolyhedra::Iterator iter (*this);	
     for(iter.Begin(); iter; iter ++){
         dgEdge* const edge = &(*iter);
-        dgVertexAtribute& attrib = attribArray[dgInt32 (edge->m_userData)];
-        attrib.m_u0 = sphere[edge->m_incidentVertex].m_x;
-        attrib.m_v0 = sphere[edge->m_incidentVertex].m_y;
-        attrib.m_u1 = sphere[edge->m_incidentVertex].m_x;
-        attrib.m_v1 = sphere[edge->m_incidentVertex].m_y;
-        attrib.m_material = material;
+		dgAttibutFormat::dgUV uv;
+		uv.m_u = dgFloat32 (sphere[edge->m_incidentVertex].m_x);
+		uv.m_v = dgFloat32 (sphere[edge->m_incidentVertex].m_y);
+		m_attrib.m_uv0Channel[dgInt32 (edge->m_userData)] = uv;
+		m_attrib.m_materialChannel[dgInt32 (edge->m_userData)] = material;
     }
 
     dgInt32 mark = IncLRU ();
@@ -1652,16 +1605,16 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
             dgBigVector normal(0.0f); 
             edge->m_mark = mark;
             edge->m_next->m_mark = mark;
-            dgVertexAtribute& attrib0 = attribArray[dgInt32 (edge->m_userData)];
-            dgVertexAtribute& attrib1 = attribArray[dgInt32 (edge->m_next->m_userData)];
-            dgBigVector p0 (attrib0.m_u0, attrib0.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
-            dgBigVector p1 (attrib1.m_u0, attrib1.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
+			dgAttibutFormat::dgUV uv0 (m_attrib.m_uv0Channel[dgInt32 (edge->m_userData)]);
+			dgAttibutFormat::dgUV uv1 (m_attrib.m_uv0Channel[dgInt32 (edge->m_next->m_userData)]);
+            dgBigVector p0 (uv0.m_u, uv0.m_v, dgFloat64 (0.0f), dgFloat64 (0.0f));
+            dgBigVector p1 (uv1.m_u, uv1.m_v, dgFloat64 (0.0f), dgFloat64 (0.0f));
             dgBigVector e0 (p1 - p0);
             dgEdge* ptr = edge->m_next->m_next;
             do {
                 ptr->m_mark = mark;
-                dgVertexAtribute& attrib2 = attribArray[dgInt32 (ptr->m_userData)];
-                dgBigVector p2 (attrib2.m_u0, attrib2.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
+				dgAttibutFormat::dgUV uv2 (m_attrib.m_uv0Channel[dgInt32 (ptr->m_userData)]);
+                dgBigVector p2 (uv2.m_u, uv2.m_v, dgFloat64 (0.0f), dgFloat64 (0.0f));
                 dgBigVector e1 (p2 - p0);
                 normal += e1.CrossProduct3(e0);
                 ptr = ptr->m_next;
@@ -1670,10 +1623,10 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
             if (normal.m_z < dgFloat32 (0.0f)) {
                 dgEdge* ptr = edge;
                 do {
-                    dgVertexAtribute& attrib = attribArray[dgInt32 (ptr->m_userData)];
-                    if (attrib.m_u0 < dgFloat32(0.5f)) {
-                        attrib.m_u0 += dgFloat32(1.0f);
-                        attrib.m_u1 = attrib.m_u0;
+					dgAttibutFormat::dgUV uv (m_attrib.m_uv0Channel[dgInt32 (ptr->m_userData)]);
+                    if (uv.m_u < dgFloat32(0.5f)) {
+                        uv.m_u += dgFloat32(1.0f);
+						m_attrib.m_uv0Channel[dgInt32 (ptr->m_userData)] = uv;
                     }
                     ptr = ptr->m_next;
                 } while (ptr != edge);
@@ -1681,19 +1634,18 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
         }
     }
 
-    ApplyAttributeArray (&attribArray[0], count);
+	PackAttibuteData();
 }
 
 
 void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMaterial)
 {
     dgBigVector origin (GetOrigin());
-    dgStack<dgBigVector>cylinder (m_pointCount);
 
     dgBigVector pMin (dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (1.0e10f), dgFloat64 (0.0f));
     dgBigVector pMax (dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (-1.0e10f), dgFloat64 (0.0f));
-    for (dgInt32 i = 0; i < m_pointCount; i ++) {
-        dgBigVector tmp (m_points[i] - origin);
+    for (dgInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
+        dgBigVector tmp (m_points.m_vertex[i] - origin);
         pMin.m_x = dgMin (pMin.m_x, tmp.m_x);
         pMax.m_x = dgMax (pMax.m_x, tmp.m_x);
         pMin.m_y = dgMin (pMin.m_y, tmp.m_y);
@@ -1702,9 +1654,10 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
         pMax.m_z = dgMax (pMax.m_z, tmp.m_z);
     }
 
+	dgStack<dgBigVector>cylinder (m_points.m_vertex.m_count);
     dgBigVector scale (dgFloat64 (1.0f)/ (pMax.m_x - pMin.m_x), dgFloat64 (1.0f)/ (pMax.m_y - pMin.m_y), dgFloat64 (1.0f)/ (pMax.m_z - pMin.m_z), dgFloat64 (0.0f));
-    for (dgInt32 i = 0; i < m_pointCount; i ++) {
-        dgBigVector point (m_points[i] - origin);
+    for (dgInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
+        dgBigVector point (m_points.m_vertex[i] - origin);
         dgFloat64 u = (point.m_x - pMin.m_x) * scale.m_x;
 
         dgAssert (point.DotProduct3(point) > dgFloat32 (0.0f));
@@ -1716,19 +1669,18 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
         cylinder[i].m_y = v;
     }
 
-
-    dgStack<dgVertexAtribute>attribArray (GetCount());
-    dgInt32 count = EnumerateAttributeArray (&attribArray[0]);
+	UnpackAttibuteData();
+	m_attrib.m_uv0Channel.Reserve(m_attrib.m_pointChannel.m_count);
+	m_attrib.m_materialChannel.Reserve(m_attrib.m_pointChannel.m_count);
 
     dgPolyhedra::Iterator iter (*this);	
     for(iter.Begin(); iter; iter ++){
         dgEdge* const edge = &(*iter);
-        dgVertexAtribute& attrib = attribArray[dgInt32 (edge->m_userData)];
-        attrib.m_u0 = cylinder[edge->m_incidentVertex].m_x;
-        attrib.m_v0 = cylinder[edge->m_incidentVertex].m_y;
-        attrib.m_u1 = cylinder[edge->m_incidentVertex].m_x;
-        attrib.m_v1 = cylinder[edge->m_incidentVertex].m_y;
-        attrib.m_material = cylinderMaterial;
+		dgAttibutFormat::dgUV uv;
+		uv.m_u = dgFloat32(cylinder[edge->m_incidentVertex].m_x);
+		uv.m_v = dgFloat32(cylinder[edge->m_incidentVertex].m_y);
+		m_attrib.m_uv0Channel[dgInt32(edge->m_userData)] = uv;
+		m_attrib.m_materialChannel[dgInt32(edge->m_userData)] = cylinderMaterial;
     }
 
     dgInt32 mark = IncLRU ();
@@ -1738,16 +1690,16 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
             dgBigVector normal(0.0f); 
             edge->m_mark = mark;
             edge->m_next->m_mark = mark;
-            dgVertexAtribute& attrib0 = attribArray[dgInt32 (edge->m_userData)];
-            dgVertexAtribute& attrib1 = attribArray[dgInt32 (edge->m_next->m_userData)];
-            dgBigVector p0 (attrib0.m_u0, attrib0.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
-            dgBigVector p1 (attrib1.m_u0, attrib1.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
+			dgAttibutFormat::dgUV uv0(m_attrib.m_uv0Channel[dgInt32(edge->m_userData)]);
+			dgAttibutFormat::dgUV uv1(m_attrib.m_uv0Channel[dgInt32(edge->m_next->m_userData)]);
+			dgBigVector p0(uv0.m_u, uv0.m_v, dgFloat64(0.0f), dgFloat64(0.0f));
+			dgBigVector p1(uv1.m_u, uv1.m_v, dgFloat64(0.0f), dgFloat64(0.0f));
             dgBigVector e0 (p1 - p0);
             dgEdge* ptr = edge->m_next->m_next;
             do {
                 ptr->m_mark = mark;
-                dgVertexAtribute& attrib2 = attribArray[dgInt32 (ptr->m_userData)];
-                dgBigVector p2 (attrib2.m_u0, attrib2.m_v0, dgFloat64 (0.0f), dgFloat64 (0.0f));
+				dgAttibutFormat::dgUV uv2(m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)]);
+				dgBigVector p2(uv2.m_u, uv2.m_v, dgFloat64(0.0f), dgFloat64(0.0f));
                 dgBigVector e1 (p2 - p0);
                 normal += e0.CrossProduct3(e1);
                 ptr = ptr->m_next;
@@ -1756,27 +1708,25 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
             if (normal.m_z < dgFloat32 (0.0f)) {
                 dgEdge* ptr = edge;
                 do {
-                    dgVertexAtribute& attrib = attribArray[dgInt32 (ptr->m_userData)];
-                    if (attrib.m_v0 < dgFloat32(0.5f)) {
-                        attrib.m_v0 += dgFloat32(1.0f);
-                        attrib.m_v1 = attrib.m_v0;
-                    }
+					dgAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)]);
+					if (uv.m_u < dgFloat32(0.5f)) {
+						uv.m_u += dgFloat32(1.0f);
+						m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)] = uv;
+					}
                     ptr = ptr->m_next;
                 } while (ptr != edge);
             }
         }
     }
 
-
     // apply cap mapping
     mark = IncLRU ();
     for(iter.Begin(); iter; iter ++){
         dgEdge* const edge = &(*iter);
-        //if (edge->m_mark < mark){
         if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
-            const dgVector& p0 = m_points[edge->m_incidentVertex];
-            const dgVector& p1 = m_points[edge->m_next->m_incidentVertex];
-            const dgVector& p2 = m_points[edge->m_prev->m_incidentVertex];
+            const dgVector& p0 = m_points.m_vertex[edge->m_incidentVertex];
+            const dgVector& p1 = m_points.m_vertex[edge->m_next->m_incidentVertex];
+            const dgVector& p2 = m_points.m_vertex[edge->m_prev->m_incidentVertex];
 
             edge->m_mark = mark;
             edge->m_next->m_mark = mark;
@@ -1788,27 +1738,20 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
             if ((n.m_x * n.m_x) > (dgFloat32 (0.99f) * n.DotProduct3(n))) {
                 dgEdge* ptr = edge;
                 do {
-                    dgVertexAtribute& attrib = attribArray[dgInt32 (ptr->m_userData)];
-                    dgVector p (m_points[ptr->m_incidentVertex] - origin);
-                    dgFloat64 u = (p.m_y - pMin.m_y) * scale.m_y;
-                    dgFloat64 v = (p.m_z - pMin.m_z) * scale.m_z;
-
-                    attrib.m_u0 = u;
-                    attrib.m_v0 = v;
-                    attrib.m_u1 = u;
-                    attrib.m_v1 = v;
-                    attrib.m_material = capMaterial;
+					dgAttibutFormat::dgUV uv;
+                    dgVector p (m_points.m_vertex[ptr->m_incidentVertex] - origin);
+                    uv.m_u = dgFloat32 ((p.m_y - pMin.m_y) * scale.m_y);
+                    uv.m_v = dgFloat32 ((p.m_z - pMin.m_z) * scale.m_z);
+					m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)] = uv;
+					m_attrib.m_materialChannel[dgInt32(ptr->m_userData)] = capMaterial;
 
                     ptr = ptr->m_next;
                 }while (ptr !=  edge);
             }
         }
     }
-
-    ApplyAttributeArray (&attribArray[0], count);
+	PackAttibuteData();
 }
-
-
 
 void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
 {
@@ -1816,15 +1759,16 @@ void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
     dgBigVector maxVal;
     dgInt32 materialArray[3];
 
-    GetMinMax (minVal, maxVal, &m_points[0][0], m_pointCount, sizeof (dgBigVector));
+    GetMinMax (minVal, maxVal, &m_points.m_vertex[0][0], m_points.m_vertex.m_count, sizeof (dgBigVector));
     dgBigVector dist (maxVal - minVal);
     dist[0] = dgMax (dgFloat64 (1.0e-3f), dist[0]);
     dist[1] = dgMax (dgFloat64 (1.0e-3f), dist[1]);
     dist[2] = dgMax (dgFloat64 (1.0e-3f), dist[2]);
     dgBigVector scale (dgFloat64 (1.0f)/ dist[0], dgFloat64 (1.0f)/ dist[1], dgFloat64 (1.0f)/ dist[2], dgFloat64 (0.0f));
 
-    dgStack<dgVertexAtribute>attribArray (GetCount());
-    dgInt32 count = EnumerateAttributeArray (&attribArray[0]);
+	UnpackAttibuteData();
+	m_attrib.m_uv0Channel.Reserve(m_attrib.m_pointChannel.m_count);
+	m_attrib.m_materialChannel.Reserve(m_attrib.m_pointChannel.m_count);
 
     materialArray[0] = front;
     materialArray[1] = side;
@@ -1835,9 +1779,9 @@ void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
     for(iter.Begin(); iter; iter ++){
         dgEdge* const edge = &(*iter);
         if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
-            const dgBigVector& p0 = m_points[edge->m_incidentVertex];
-            const dgBigVector& p1 = m_points[edge->m_next->m_incidentVertex];
-            const dgBigVector& p2 = m_points[edge->m_prev->m_incidentVertex];
+            const dgBigVector& p0 = m_points.m_vertex[edge->m_incidentVertex];
+            const dgBigVector& p1 = m_points.m_vertex[edge->m_next->m_incidentVertex];
+            const dgBigVector& p2 = m_points.m_vertex[edge->m_prev->m_incidentVertex];
 
             edge->m_mark = mark;
             edge->m_next->m_mark = mark;
@@ -1865,27 +1809,25 @@ void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
             }
             dgEdge* ptr = edge;
             do {
-                dgVertexAtribute& attrib = attribArray[dgInt32 (ptr->m_userData)];
-                dgBigVector p (scale.CompProduct3(m_points[ptr->m_incidentVertex] - minVal));
-                attrib.m_u0 = p[u];
-                attrib.m_v0 = p[v];
-                attrib.m_u1 = dgFloat64(0.0f);
-                attrib.m_v1 = dgFloat64(0.0f);
-                attrib.m_material = materialArray[index];
-
+				dgAttibutFormat::dgUV uv;
+                dgBigVector p (scale.CompProduct3(m_points.m_vertex[ptr->m_incidentVertex] - minVal));
+				uv.m_u = dgFloat32 (p[u]);
+				uv.m_v = dgFloat32 (p[v]);
+				m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)] = uv;
+				m_attrib.m_materialChannel[dgInt32(ptr->m_userData)] = materialArray[index];
                 ptr = ptr->m_next;
             }while (ptr !=  edge);
         }
     }
-
-    ApplyAttributeArray (&attribArray[0], count);
+	PackAttibuteData();
 }
 
 
 void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureMatrix)
 {
-    dgStack<dgVertexAtribute>attribArray (GetCount());
-    dgInt32 count = EnumerateAttributeArray (&attribArray[0]);
+	UnpackAttibuteData();
+	m_attrib.m_uv0Channel.Reserve(m_attrib.m_pointChannel.m_count);
+	m_attrib.m_materialChannel.Reserve(m_attrib.m_pointChannel.m_count);
 
     dgInt32 mark = IncLRU();
     for (dgInt32 i = 0; i < 3; i ++) {
@@ -1901,7 +1843,7 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
         for(iter.Begin(); iter; iter ++){
             dgEdge* const edge = &(*iter);
             if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
-                dgBigVector n (FaceNormal(edge, &m_points[0].m_x, sizeof (dgBigVector)));
+                dgBigVector n (FaceNormal(edge, &m_points.m_vertex[0].m_x, sizeof (dgBigVector)));
                 dgVector normal (rotationMatrix.RotateVector(dgVector (n.Scale3 (dgFloat64 (1.0f) / sqrt (n.DotProduct3(n))))));
                 normal.m_x = dgAbsf (normal.m_x);
                 normal.m_y = dgAbsf (normal.m_y);
@@ -1910,13 +1852,13 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
                     dgEdge* ptr = edge;
                     do {
                         ptr->m_mark = mark;
-                        dgVertexAtribute& attrib = attribArray[dgInt32 (ptr->m_userData)];
-                        dgVector p (textureMatrix.TransformVector(rotationMatrix.RotateVector(m_points[ptr->m_incidentVertex])));
-                        attrib.m_u0 = p.m_x;
-                        attrib.m_v0 = p.m_y;
-                        attrib.m_u1 = dgFloat32 (0.0f);
-                        attrib.m_v1 = dgFloat32 (0.0f);
-                        attrib.m_material = material;
+						dgAttibutFormat::dgUV uv;
+                        dgVector p (textureMatrix.TransformVector(rotationMatrix.RotateVector(m_points.m_vertex[ptr->m_incidentVertex])));
+                        uv.m_u = p.m_x;
+                        uv.m_v = p.m_y;
+						m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)] = uv;
+						m_attrib.m_materialChannel[dgInt32(ptr->m_userData)] = material;
+
                         ptr = ptr->m_next;
                     }while (ptr !=  edge);
                 }
@@ -1924,9 +1866,8 @@ void dgMeshEffect::UniformBoxMapping (dgInt32 material, const dgMatrix& textureM
         }
     }
 
-    ApplyAttributeArray (&attribArray[0], count);
+    PackAttibuteData();
 }
-
 
 
 void dgMeshEffect::AngleBaseFlatteningMapping (dgInt32 material, dgReportProgress progressReportCallback, void* const userData)

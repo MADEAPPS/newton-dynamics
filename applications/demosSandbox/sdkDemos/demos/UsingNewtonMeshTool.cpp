@@ -26,7 +26,7 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 	// the vertex array, vertices's has for values, x, y, z, w
 	// w is use as a id to have multiple copy of the same very, like for example mesh that share more than two edges.
 	// in most case w can be set to 0.0
-	static dFloat BoxPoints[] = {
+	static dFloat64 BoxPoints[] = {
 		-1.0, -1.0, -1.0, 0.0,
 		-1.0, -1.0,  1.0, 0.0,
 		-1.0,  1.0,  1.0, 0.0,
@@ -62,7 +62,7 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 
 	// the normal is specified per vertex and each vertex can have a unique normal or a duplicated
 	// for example a cube has 6 normals
-	static const dFloat Normal[] = {
+	static dFloat normal[] = {
 		1.0, 0.0, 0.0,
 		-1.0, 0.0, 0.0,
 		0.0, 1.0, 0.0,
@@ -84,11 +84,11 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 		3, 2, 0,    
 	}; 
 	
-
+/*
 	// the UV are encode the same way as the vertex an the normals, a UV list and an index list
-	// since we do no have UV we can assign the all to zero
-	static const dFloat uv0[] = { 0, 0};
-	static const int uv0_indexList [] = { 
+	// since we do not have UV we can assign the all to zero
+	static dFloat uv0[] = { 0, 0};
+	static int uv0_indexList [] = { 
 		0, 0, 0, 0,
 		0, 0, 0,
 		0, 0, 0,
@@ -100,50 +100,45 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 		0, 0, 0,
 		0, 0, 0,
 	};
-	// we can reuse the same same UV input for the second channel, if they have different UV then it will be code the exact same way as UV0
+*/	
 
 
-	
-	// now we create and empty mesh
-	NewtonMesh* const newtonMesh = NewtonMeshCreate (scene->GetNewton());
-
-
-	dVector array[8] ;
+	dBigVector array[8];
+	dBigVector scale1 (scale);
 	for (int i = 0; i < 8; i ++) {
-		array[i] = scale.CompProduct(dVector (&BoxPoints[i * 4]));
+		dBigVector p(&BoxPoints[i * 4]);
+		array[i] = scale1.CompProduct(p);
 	}
-	
 
-	// build the mesh from an index list vertex list, alternatively we can also build the mesh by parring one face at at time
-	NewtonMeshBuildFromPointListIndexList(newtonMesh,
-		10, faceIndexList, faceMateriaIndexList,
-		&array[0].m_x, 4 * sizeof (dFloat), BoxIndices,
-		Normal, 3 * sizeof (dFloat), faceNormalIndex,
-		uv0, 2 * sizeof (dFloat), uv0_indexList,
-		uv0, 2 * sizeof (dFloat), uv0_indexList);
+	NewtonMeshVertexFormat vertexFormat;
+	NewtonMeshClearVertexFormat(&vertexFormat);
 
+	vertexFormat.m_faceCount = 10;
+	vertexFormat.m_faceIndexCount = faceIndexList;
+	vertexFormat.m_faceMaterial = faceMateriaIndexList;
 
+	vertexFormat.m_vertex.m_data = &array[0][0];
+	vertexFormat.m_vertex.m_indexList = BoxIndices;
+	vertexFormat.m_vertex.m_strideInBytes = sizeof (dBigVector);
+
+	vertexFormat.m_normal.m_data = normal;
+	vertexFormat.m_normal.m_indexList = faceNormalIndex;
+	vertexFormat.m_normal.m_strideInBytes = 3 * sizeof (dFloat);
+
+	// all channel are now optionals so we not longer has to pass default values
+//	vertexFormat.m_uv0.m_data = uv0;
+//	vertexFormat.m_uv0.m_indexList = uv0_indexList;
+//	vertexFormat.m_uv0.m_strideInBytes = 2 * sizeof (dFloat);
+
+	// now we create and empty mesh
+	NewtonMesh* const newtonMesh = NewtonMeshCreate(scene->GetNewton());
+	NewtonMeshBuildFromVertexListIndexList(newtonMesh, &vertexFormat);
 
 	// now we can use this mesh for lot of stuff, we can apply UV, we can decompose into convex, 
 	NewtonCollision* const collision = NewtonCreateConvexHullFromMesh(scene->GetNewton(), newtonMesh, 0.001f, 0);
 
 	// for now we will simple make simple Box,  make a visual Mesh
 	DemoMesh* const visualMesh = new DemoMesh (newtonMesh);
-
-//	int instaceCount = 2;
-//	int instaceCount = 1;
-//	dMatrix matrix (dGetIdentityMatrix());
-//	matrix.m_posit = origin;
-//	for (int ix = 0; ix < instaceCount; ix ++) {
-//		for (int iz = 0; iz < instaceCount; iz ++) {
-//			dFloat y = origin.m_y;
-//			dFloat x = origin.m_x + (ix - instaceCount/2) * 4.0f;
-//			dFloat z = origin.m_z + (iz - instaceCount/2) * 4.0f;
-//			matrix.m_posit = FindFloor (scene->GetNewton(), dVector (x, y + 10.0f, z, 0.0f), 20.0f); ;
-//			matrix.m_posit.m_y += 5.0f;
-//			CreateSimpleSolid (scene, visualMesh, 10.0f, matrix, collision, 0);
-//		}
-//	}
 
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;

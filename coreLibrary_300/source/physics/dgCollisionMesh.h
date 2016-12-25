@@ -37,7 +37,6 @@ typedef void (*dgCollisionMeshCollisionCallback) (const dgBody* const bodyWithTr
 												  dgInt32 vertexCount, const dgFloat32* const vertex, dgInt32 vertexStrideInBytes); 
 
 
-
 DG_MSC_VECTOR_ALIGMENT 
 class dgPolygonMeshDesc: public dgFastAABBInfo
 {
@@ -96,6 +95,12 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 		dgInt32 size = faceIndexArray[indexCount * 2 + 2];
 		return dgFloat32 ((size >= 1) ? size : dgFloat32 (1.0f));
 	}
+
+	DG_INLINE dgFloat32 GetSeparetionDistance() const
+	{
+		return m_separationDistance * m_polySoupInstance->GetScale().GetScalar();
+	}
+
 
 	void SortFaceArray ();
 
