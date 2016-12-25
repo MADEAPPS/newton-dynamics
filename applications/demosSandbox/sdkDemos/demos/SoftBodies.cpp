@@ -411,7 +411,8 @@ void SoftBodies(DemoEntityManager* const scene)
 //NewtonMesh* xxx1 = NewtonMeshCreateFromCollision(xxx0);
 //
 char name[2048];
-dGetWorkingFileName ("prism.off", name);
+//dGetWorkingFileName ("prism.off", name);
+dGetWorkingFileName ("box.off", name);
 NewtonMesh* const xxx1 = NewtonMeshLoadOFF(scene->GetNewton(), name);
 NewtonMesh* xxx2 = NewtonMeshCreateConstrainedTetrahedralization(xxx1);
 

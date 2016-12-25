@@ -1759,7 +1759,7 @@ void dgMeshEffect::BoxMapping (dgInt32 front, dgInt32 side, dgInt32 top)
     dgBigVector maxVal;
     dgInt32 materialArray[3];
 
-    GetMinMax (minVal, maxVal, &m_points.m_vertex[0][0], m_points.m_vertex.m_count, sizeof (dgBigVector));
+    dgGetMinMax (minVal, maxVal, &m_points.m_vertex[0][0], m_points.m_vertex.m_count, sizeof (dgBigVector));
     dgBigVector dist (maxVal - minVal);
     dist[0] = dgMax (dgFloat64 (1.0e-3f), dist[0]);
     dist[1] = dgMax (dgFloat64 (1.0e-3f), dist[1]);

@@ -7450,12 +7450,12 @@ NewtonMesh* NewtonMeshCreateConvexHull (const NewtonWorld* const newtonWorld, in
 	return (NewtonMesh*) mesh;
 }
 
-NEWTON_API NewtonMesh* NewtonMeshCreateConformingTetrahedralization(const NewtonMesh* const closetMesh)
+NEWTON_API NewtonMesh* NewtonMeshCreateConstrainedTetrahedralization(const NewtonMesh* const closetMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) closetMesh;
 //	return (NewtonMesh*) dgMeshEffect::CreateDelaunayTetrahedralization (world->dgWorld::GetAllocator(), interiorMaterialID, strideInBytes, vertexCloud, materialID, dgMatrix (textureMatrix));
-	return (NewtonMesh*)meshEffect->CreateDelaunayTetrahedralization();
+	return (NewtonMesh*)meshEffect->CreateConstrainedConformingTetrahedralization();
 }
 
 NewtonMesh* NewtonMeshCreateVoronoiConvexDecomposition (const NewtonWorld* const newtonWorld, int pointCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix)
@@ -7730,7 +7730,7 @@ void NewtonMeshClearVertexFormat (NewtonMeshVertexFormat* const format)
 	vertexFormat->Clear ();
 }
 
-void NewtonMeshBuildFromVertexListIndexList (const NewtonMesh* const mesh, NewtonMeshVertexFormat* const format)
+void NewtonMeshBuildFromVertexListIndexList (const NewtonMesh* const mesh, const NewtonMeshVertexFormat* const format)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;

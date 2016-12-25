@@ -125,7 +125,7 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	dgTree<dgList<dgInt32>, dgInt32> delanayNodes (allocator);	
 
 	dgInt32 index = 0;
-	const dgHullVector* const delanayPoints = delaunayTetrahedras.GetHullVertexArray();
+	const dgConvexHull4dVector* const delanayPoints = delaunayTetrahedras.GetHullVertexArray();
 	for (dgDelaunayTetrahedralization::dgListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) {
 		dgConvexHull4dTetraherum& tetra = node->GetInfo();
 		voronoiPoints[index] = tetra.CircumSphereCenter (delanayPoints);
@@ -187,12 +187,20 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 
 dgMeshEffect* dgMeshEffect::CreateConstrainedConformingTetrahedralization() const
 {
+	dgMeshEffect copy (*this);
+	return copy.CreateTetrahedralization();
+}
+
+dgMeshEffect* dgMeshEffect::CreateTetrahedralization()
+{
+	Triangulate();
 	dgStack<dgInt32> indexList(m_points.m_vertex.m_count);
 	dgArray<dgBigVector> meshPoints(m_points.m_vertex, m_points.m_vertex.m_count);
 
 	dgInt32 count = dgVertexListToIndexList(&meshPoints[0].m_x, sizeof(dgBigVector), 3, m_points.m_vertex.m_count, &indexList[0], dgFloat64(5.0e-2f));
-	dgAssert(count >= 8);
 	dgDelaunayTetrahedralization delaunayTetrahedras(GetAllocator(), &meshPoints[0].m_x, count, sizeof(dgBigVector), dgFloat32(0.0f));
+
+	delaunayTetrahedras.RemoveUpperHull ();
 
 	dgInt32 tetraCount = delaunayTetrahedras.GetCount();
 	dgAssert(0);

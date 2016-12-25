@@ -424,6 +424,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMeshEffect* CreateConvexApproximation (dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullOuputCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const userData) const;
 
 //	static dgMeshEffect* CreateDelaunayTetrahedralization (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
+	dgMeshEffect* CreateConstrainedConformingTetrahedralization() const;
 	static dgMeshEffect* CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
 	static dgMeshEffect* CreateFromSerialization (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
 
@@ -485,6 +486,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	void PackPoints (dgFloat64 tol);
 	void UnpackPoints();
+
+	dgMeshEffect* CreateTetrahedralization();
 
 	dgPointFormat m_points;
 	dgAttibutFormat m_attrib;

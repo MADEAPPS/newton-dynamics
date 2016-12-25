@@ -31,20 +31,29 @@ dgDelaunayTetrahedralization::dgDelaunayTetrahedralization(dgMemoryAllocator* co
 	:dgConvexHull4d(allocator)
 {
 	dgSetPrecisionDouble precision;
-
 	dgStack<dgBigVector> pool(count);
 
 	dgBigVector* const points = &pool[0];
 	dgInt32 stride = dgInt32 (strideInByte / sizeof (dgFloat64));
 	for (dgInt32 i = 0; i < count; i ++) {
-		dgFloat64 x = RoundToFloat (vertexCloud[i * stride + 0]);
-		dgFloat64 y = RoundToFloat (vertexCloud[i * stride + 1]);
-		dgFloat64 z = RoundToFloat (vertexCloud[i * stride + 2]);
+		dgFloat64 x = dgRoundToFloat (vertexCloud[i * stride + 0]);
+		dgFloat64 y = dgRoundToFloat (vertexCloud[i * stride + 1]);
+		dgFloat64 z = dgRoundToFloat (vertexCloud[i * stride + 2]);
 		points[i] = dgBigVector (x, y, z, x * x + y * y + z * z);
 	}
 
 	dgInt32 oldCount = count;
-	BuildHull (allocator, &pool[0], count, distTol);
+	BuildHull (allocator, &pool[0].m_x, sizeof (dgBigVector), count, distTol);
+	if (oldCount > m_count) {
+		for (dgInt32 i = 0; i < count; i++) {
+			dgFloat64 x = dgRoundToFloat(vertexCloud[i * stride + 0]);
+			dgFloat64 y = dgRoundToFloat(vertexCloud[i * stride + 1]);
+			dgFloat64 z = dgRoundToFloat(vertexCloud[i * stride + 2]);
+			points[i] = dgBigVector(x, y, z, x * x + y * y + z * z);
+		}
+		points[0].m_w -= (1.0e-2f);
+ 		BuildHull (allocator, &pool[0].m_x, sizeof (dgBigVector), count, distTol);
+	}
 	if (oldCount > m_count) {
 		// this is probably a regular convex solid, which will have a zero volume hull
 		// add the rest of the points by incremental insertion with small perturbation
@@ -52,7 +61,7 @@ dgDelaunayTetrahedralization::dgDelaunayTetrahedralization(dgMemoryAllocator* co
 		
 		for (dgInt32 i = 0; i < count; i ++) {
 			bool inHull = false;
-			const dgHullVector* const hullPoints = &m_points[0];
+			const dgConvexHull4dVector* const hullPoints = &m_points[0];
 			for (dgInt32 j = 0; j < hullCount; j ++) {
 				if (hullPoints[j].m_index == i) {
 					inHull = true;
@@ -97,7 +106,7 @@ dgInt32 dgDelaunayTetrahedralization::AddVertex (const dgBigVector& vertex)
 
 
 
-dgInt32 dgDelaunayTetrahedralization::CompareVertexByIndex(const dgHullVector* const  A, const dgHullVector* const B, void* const context)
+dgInt32 dgDelaunayTetrahedralization::CompareVertexByIndex(const dgConvexHull4dVector* const  A, const dgConvexHull4dVector* const B, void* const context)
 {
 	if (A->m_index < B ->m_index) {
 		return -1;
@@ -110,7 +119,7 @@ dgInt32 dgDelaunayTetrahedralization::CompareVertexByIndex(const dgHullVector* c
 
 void dgDelaunayTetrahedralization::SortVertexArray ()
 {
-	dgHullVector* const points = &m_points[0];
+	dgConvexHull4dVector* const points = &m_points[0];
 	for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {	
 		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
 		for (dgInt32 i = 0; i < 4; i ++) {
@@ -166,7 +175,7 @@ void dgDelaunayTetrahedralization::DeleteFace (dgListNode* const node)
 
 dgFloat64 dgDelaunayTetrahedralization::GetTetraVolume (const dgConvexHull4dTetraherum* const tetra) const
 {
-	const dgHullVector* const points = &m_points[0];
+	const dgConvexHull4dVector* const points = &m_points[0];
 	const dgBigVector &p0 = points[tetra->m_faces[0].m_index[0]];
 	const dgBigVector &p1 = points[tetra->m_faces[0].m_index[1]];
 	const dgBigVector &p2 = points[tetra->m_faces[0].m_index[2]];

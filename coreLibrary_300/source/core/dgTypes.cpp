@@ -26,9 +26,6 @@
 #include "dgMemory.h"
 #include "dgStack.h"
 
-
-
-
 dgUnsigned64 dgGetTimeInMicrosenconds()
 {
 
@@ -75,8 +72,22 @@ dgUnsigned64 dgGetTimeInMicrosenconds()
 }
 
 
+dgFloat64 dgRoundToFloat(dgFloat64 val)
+{
+	dgInt32 exp;
+	dgFloat64 mantissa = frexp(val, &exp);
 
-void GetMinMax (dgVector &minOut, dgVector &maxOut, const dgFloat32* const vertexArray, dgInt32 vCount, dgInt32 strideInBytes)
+	const dgFloat64 power = 1 << 23;
+	const dgFloat64 invPower = dgFloat64(1.0f) / power;
+	mantissa = floor(mantissa * power) * invPower;
+
+	dgFloat64 val1 = ldexp(mantissa, exp);
+	return val1;
+}
+
+
+
+void dgGetMinMax (dgVector &minOut, dgVector &maxOut, const dgFloat32* const vertexArray, dgInt32 vCount, dgInt32 strideInBytes)
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
 	const dgFloat32* vArray = vertexArray + stride;
@@ -99,7 +110,7 @@ void GetMinMax (dgVector &minOut, dgVector &maxOut, const dgFloat32* const verte
 }
 
 #ifndef _NEWTON_USE_DOUBLE
-void GetMinMax (dgBigVector &minOut, dgBigVector &maxOut, const dgFloat64* const vertexArray, dgInt32 vCount, dgInt32 strideInBytes)
+void dgGetMinMax (dgBigVector &minOut, dgBigVector &maxOut, const dgFloat64* const vertexArray, dgInt32 vCount, dgInt32 strideInBytes)
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
 	const dgFloat64* vArray = vertexArray + stride;

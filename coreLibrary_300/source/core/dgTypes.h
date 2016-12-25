@@ -304,6 +304,20 @@ DG_INLINE dgInt32 dgExp2 (dgInt32 x)
 	return exp;
 }
 
+DG_INLINE dgInt32 dgBitReversal(dgInt32 v, dgInt32 base)
+{
+	dgInt32 x = 0;
+	dgInt32 power = dgExp2 (base) - 1;
+	do {
+		x += (v & 1) << power;
+		v >>= 1;
+		power--;
+	} while (v);
+	dgAssert(x < base);
+	return x;
+}
+
+
 template <class T> 
 DG_INLINE T dgMin(T A, T B)
 {
@@ -487,15 +501,12 @@ void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 r
 		}
 	}
 
-
 #ifdef _DEBUG
 	for (dgInt32 i = 0; i < (elements - 1); i ++) {
 		dgAssert (getRadixKey (&array[i], context) <= getRadixKey (&array[i + 1], context));
 	}
 #endif
-
 }
-
 
 template <class T> 
 void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
@@ -637,7 +648,6 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 }
 
 
-
 #ifdef _NEWTON_USE_DOUBLE
 	union dgFloatSign
 	{
@@ -670,9 +680,9 @@ union dgDoubleInt
 
 
 #ifndef _NEWTON_USE_DOUBLE
-void GetMinMax (dgBigVector &Min, dgBigVector &Max, const dgFloat64* const vArray, dgInt32 vCount, dgInt32 strideInBytes);
+void dgGetMinMax (dgBigVector &Min, dgBigVector &Max, const dgFloat64* const vArray, dgInt32 vCount, dgInt32 strideInBytes);
 #endif
-void GetMinMax (dgVector &Min, dgVector &Max, const dgFloat32* const vArray, dgInt32 vCount, dgInt32 StrideInBytes);
+void dgGetMinMax (dgVector &Min, dgVector &Max, const dgFloat32* const vArray, dgInt32 vCount, dgInt32 StrideInBytes);
 
 dgInt32 dgVertexListToIndexList (dgFloat32* const vertexList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes, dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat32 tolerance = dgEPSILON);
 dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat64 tolerance = dgEPSILON);
@@ -702,7 +712,6 @@ dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBy
 #define dgClearFP()			_clearfp() 
 #define dgControlFP(x,y)	_controlfp(x,y)
 
-
 enum dgSerializeRevisionNumber
 {
 	m_firstRevision = 100,
@@ -710,13 +719,10 @@ enum dgSerializeRevisionNumber
 	m_currentRevision 
 };
 
-
+dgUnsigned64 dgGetTimeInMicrosenconds();
+dgFloat64 dgRoundToFloat(dgFloat64 val);
 void dgSerializeMarker(dgSerialize serializeCallback, void* const userData);
 dgInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData);
-
-
-dgUnsigned64 dgGetTimeInMicrosenconds();
-
 
 class dgFloatExceptions
 {
@@ -742,9 +748,6 @@ class dgSetPrecisionDouble
 	~dgSetPrecisionDouble();
 	dgInt32 m_mask; 
 };
-
-
-
 
 DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 {
