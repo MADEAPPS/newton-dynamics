@@ -199,22 +199,22 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedralization()
 
 	dgMeshEffect* voronoiPartition = NULL;
 	dgInt32 count = dgVertexListToIndexList(&meshPoints[0].m_x, sizeof(dgBigVector), 3, m_points.m_vertex.m_count, &indexList[0], dgFloat64(5.0e-2f));
-//meshPoints[0].m_x += 0.001f;
-	dgDelaunayTetrahedralization delaunayNodes(GetAllocator(), &meshPoints[0].m_x, count, sizeof(dgBigVector), dgFloat32(0.0f));
-	if (delaunayNodes.GetCount()) {
+	dgDelaunayTetrahedralization delaunay(GetAllocator(), &meshPoints[0].m_x, count, sizeof(dgBigVector), dgFloat32(0.0f));
+	if (delaunay.GetCount()) {
+		RecoverMissingEdges(delaunay, &indexList[0]);
 
 
-		delaunayNodes.RemoveUpperHull ();
+		delaunay.RemoveUpperHull ();
 		dgMemoryAllocator* const allocator = GetAllocator();
 		voronoiPartition = new (allocator) dgMeshEffect (allocator);
 		voronoiPartition->BeginBuild();
 		dgInt32 layer = 0;
 		dgBigVector pointArray[4];
-		for (dgDelaunayTetrahedralization::dgListNode* tetNode = delaunayNodes.GetFirst(); tetNode; tetNode = tetNode->GetNext()) {
+		for (dgDelaunayTetrahedralization::dgListNode* tetNode = delaunay.GetFirst(); tetNode; tetNode = tetNode->GetNext()) {
 			dgConvexHull4dTetraherum& tetra = tetNode->GetInfo();
 			for (dgInt32 i = 0; i < 4; i ++) {
 				dgInt32 index = tetra.m_faces[0].m_index[i];
-				pointArray[i] = delaunayNodes.GetVertex(index);
+				pointArray[i] = delaunay.GetVertex(index);
 			}
 			dgMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dgBigVector), dgFloat64(0.0f));
 			dgAssert (convexMesh.GetCount());
@@ -223,9 +223,6 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedralization()
 			for (dgInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i++) {
 				convexMesh.m_points.m_layers[i] = layer;
 			}
-
-//if ((layer >= 1) && (layer < 3)) 
-//if (layer < 2) 
 			voronoiPartition->MergeFaces(&convexMesh);
 			layer++;
 		}
@@ -233,4 +230,8 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedralization()
 	}
 
 	return voronoiPartition;
+}
+
+void dgMeshEffect::RecoverMissingEdges(dgDelaunayTetrahedralization& delaunay, const dgInt32* const indexMap)
+{
 }

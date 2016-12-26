@@ -488,6 +488,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void UnpackPoints();
 
 	dgMeshEffect* CreateTetrahedralization();
+	void RecoverMissingEdges(dgDelaunayTetrahedralization& delaunay, const dgInt32* const indexMap);
 
 	dgPointFormat m_points;
 	dgAttibutFormat m_attrib;
