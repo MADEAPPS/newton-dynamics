@@ -7454,7 +7454,6 @@ NEWTON_API NewtonMesh* NewtonMeshCreateConstrainedTetrahedralization(const Newto
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) closetMesh;
-//	return (NewtonMesh*) dgMeshEffect::CreateDelaunayTetrahedralization (world->dgWorld::GetAllocator(), interiorMaterialID, strideInBytes, vertexCloud, materialID, dgMatrix (textureMatrix));
 	return (NewtonMesh*)meshEffect->CreateConstrainedConformingTetrahedralization();
 }
 

@@ -603,7 +603,7 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgConvexHull4dVector* const points, cons
 	m_diag = dgFloat32 (sqrt (boxSize.DotProduct4(boxSize).m_x));
 
 	m_points[4].m_x = dgFloat64 (0.0f);
-	dgBigVector normals[4];
+	dgInt32 marks[4];
 
 	bool validTetrahedrum = false;
 	dgConvexHull4dVector* const convexPoints = &m_points[0]; 
@@ -611,19 +611,22 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgConvexHull4dVector* const points, cons
 	for (dgInt32 i = 0; !validTetrahedrum && (i < m_normalMap.m_count); i++) {
 		dgInt32 index = SupportVertex(&tree, points, m_normalMap.m_normal[i], false);
 		convexPoints[0] = points[index];
-		normals[0] = m_normalMap.m_normal[i];
+		marks[0] = index;
 		for (dgInt32 j = i + 1; !validTetrahedrum && (j < m_normalMap.m_count); j++) {
 			dgInt32 index = SupportVertex(&tree, points, m_normalMap.m_normal[j], false);
 			convexPoints[1] = points[index];
 			dgBigVector p10(convexPoints[1] - convexPoints[0]);
 			if (p10.DotProduct4(p10).GetScalar() >(dgFloat32(1.0e-3f) * m_diag)) {
-				normals[1] = m_normalMap.m_normal[j];
+				marks[1] = index;
 				for (dgInt32 k = j + 1; !validTetrahedrum && (k < m_normalMap.m_count); k++) {
 					dgInt32 index = SupportVertex(&tree, points, m_normalMap.m_normal[k], false);
 					convexPoints[2] = points[index];
 					dgBigVector p20(convexPoints[2] - convexPoints[0]);
-					if (p20.DotProduct4(p20).GetScalar() >(dgFloat32(1.0e-3f) * m_diag)) {
-						normals[2] = m_normalMap.m_normal[k];
+					dgBigVector p21(convexPoints[2] - convexPoints[1]);
+					bool test = p20.DotProduct4(p20).GetScalar() > (dgFloat32(1.0e-3f) * m_diag);
+					test = test && (p21.DotProduct4(p21).GetScalar() > (dgFloat32(1.0e-3f) * m_diag));
+					if (test) {
+						marks[2] = index;
 						for (dgInt32 l = k + 1; !validTetrahedrum && (l < m_normalMap.m_count); l++) {
 							dgInt32 index = SupportVertex(&tree, points, m_normalMap.m_normal[l], false);
 							convexPoints[3] = points[index];
@@ -632,7 +635,7 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgConvexHull4dVector* const points, cons
 							dgFloat64 volume = plane.DotProduct4(plane).GetScalar();
 							if (volume > testVol) {
 								validTetrahedrum = true;
-								normals[3] = m_normalMap.m_normal[l];
+								marks[3] = index;
 							}
 						}
 					}
@@ -648,9 +651,7 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgConvexHull4dVector* const points, cons
 
 	if (validTetrahedrum) {
 		for (dgInt32 i = 0; i < 4; i ++) {
-			dgInt32 index = SupportVertex(&tree, points, normals[i]);
-			dgAssert (!points[index].m_mark);
-			points[index].m_mark = 1;
+			points[marks[i]].m_mark = 1;
 		}
 	}
 

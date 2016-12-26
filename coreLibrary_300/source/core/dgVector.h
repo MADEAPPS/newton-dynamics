@@ -1470,9 +1470,9 @@ class dgVector
 	DG_CLASS_ALLOCATOR(allocator)
 	
 	union {
+		dgFloat32 m_f[4];
 		__m128 m_type;
 		__m128i m_typeInt;
-		dgFloat32 m_f[4];
 		struct {
 			dgFloat32 m_x;
 			dgFloat32 m_y;
@@ -1875,6 +1875,7 @@ class dgBigVector
 
 	union
 	{
+		dgFloat64 m_f[4];
 		struct
 		{
 			__m128d m_typeLow;
@@ -1885,8 +1886,6 @@ class dgBigVector
 			__m128i m_typeIntLow;
 			__m128i m_typeIntHigh;
 		};
-
-		dgFloat64 m_f[4];
 		struct
 		{
 			dgFloat64 m_x;

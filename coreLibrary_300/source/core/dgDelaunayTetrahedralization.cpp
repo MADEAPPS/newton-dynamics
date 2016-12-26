@@ -31,7 +31,7 @@ dgDelaunayTetrahedralization::dgDelaunayTetrahedralization(dgMemoryAllocator* co
 	:dgConvexHull4d(allocator)
 {
 	dgSetPrecisionDouble precision;
-	dgStack<dgBigVector> pool(count);
+	dgStack<dgBigVector> pool(count + 2);
 
 	dgBigVector* const points = &pool[0];
 	dgInt32 stride = dgInt32 (strideInByte / sizeof (dgFloat64));
@@ -45,14 +45,23 @@ dgDelaunayTetrahedralization::dgDelaunayTetrahedralization(dgMemoryAllocator* co
 	dgInt32 oldCount = count;
 	BuildHull (allocator, &pool[0].m_x, sizeof (dgBigVector), count, distTol);
 	if (oldCount > m_count) {
+		// the mesh is convex, need to add two steiners point to make tractable
+		dgBigVector origin (dgFloat64 (0.0f));
+		dgFloat64 maxW = dgFloat64 (-1.0e20f);
 		for (dgInt32 i = 0; i < count; i++) {
 			dgFloat64 x = dgRoundToFloat(vertexCloud[i * stride + 0]);
 			dgFloat64 y = dgRoundToFloat(vertexCloud[i * stride + 1]);
 			dgFloat64 z = dgRoundToFloat(vertexCloud[i * stride + 2]);
 			points[i] = dgBigVector(x, y, z, x * x + y * y + z * z);
+			origin += points[i];
+			maxW = dgMax (points[i].m_w, maxW);
 		}
-		points[0].m_w -= (1.0e-2f);
- 		BuildHull (allocator, &pool[0].m_x, sizeof (dgBigVector), count, distTol);
+		origin = origin.Scale4 (dgFloat64 (1.0f) / count);
+		points[count + 0] = origin;
+		points[count + 1] = origin;
+		points[count + 0].m_w += dgFloat64 (1.0f);
+		points[count + 1].m_w -= dgFloat64 (1.0f);
+ 		BuildHull (allocator, &pool[0].m_x, sizeof (dgBigVector), count + 2, distTol);
 	}
 	if (oldCount > m_count) {
 		// this is probably a regular convex solid, which will have a zero volume hull
