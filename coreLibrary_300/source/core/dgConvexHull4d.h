@@ -72,9 +72,9 @@ class dgConvexHull4dTetraherum
 
 	dgConvexHull4dTetraherum();
 	dgTetrahedrumPlane GetPlaneEquation (const dgConvexHull4dVector* const points) const;
-	dgFloat64 Evalue (const dgConvexHull4dVector* const pointArray, const dgBigVector& point) const;
-
+	dgFloat64 GetTetraVolume (const dgConvexHull4dVector* const pointArray) const;	
 	dgBigVector CircumSphereCenter (const dgConvexHull4dVector* const pointArray) const;
+	dgFloat64 Evalue (const dgConvexHull4dVector* const pointArray, const dgBigVector& point) const;
 
 	dgInt32 GetMark() const { return m_mark; }
 	void SetMark(dgInt32 mark) { m_mark = mark; }
@@ -106,6 +106,7 @@ class dgConvexHull4d: public dgList<dgConvexHull4dTetraherum>
 	const dgBigVector& GetVertex(dgInt32 i) const;
 
 	const dgConvexHull4dVector* GetHullVertexArray() const;
+	dgFloat64 GetTetraVolume (const dgConvexHull4dTetraherum* const tetra) const;
 
 	dgInt32 IncMark (); 
 	void Save (const char* const filename) const;
@@ -181,6 +182,11 @@ inline const dgBigVector& dgConvexHull4d::GetVertex(dgInt32 index) const
 inline const dgConvexHull4dVector* dgConvexHull4d::GetHullVertexArray() const
 {
 	return &m_points[0];
+}
+
+inline dgFloat64 dgConvexHull4d::GetTetraVolume (const dgConvexHull4dTetraherum* const tetra) const
+{
+	return tetra->GetTetraVolume (&m_points[0]);
 }
 
 #endif

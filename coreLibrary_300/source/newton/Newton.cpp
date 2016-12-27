@@ -7497,10 +7497,21 @@ NewtonMesh* NewtonMeshLoadOFF(const NewtonWorld* const newtonWorld, const char* 
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	dgMeshEffect* const mesh = new (world->dgWorld::GetAllocator()) dgMeshEffect (world->dgWorld::GetAllocator(), filename);
+	dgMemoryAllocator* const allocator = world->dgWorld::GetAllocator();
+	dgMeshEffect* const mesh = new (allocator) dgMeshEffect (allocator);
+	mesh->LoadOffMesh(filename);
 	return (NewtonMesh*) mesh;
 }
 
+NewtonMesh* NewtonMeshSolidTetrahedraMesh(const NewtonWorld* const newtonWorld, const char* const filename)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	dgMemoryAllocator* const allocator = world->dgWorld::GetAllocator();
+	dgMeshEffect* const mesh = new (allocator) dgMeshEffect(allocator);
+	mesh->LoadTetraSolidMesh (filename);
+	return (NewtonMesh*)mesh;
+}
 
 void NewtonMeshApplyTransform (const NewtonMesh* const mesh, const dFloat* const matrix)
 {

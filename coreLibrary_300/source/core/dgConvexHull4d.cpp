@@ -246,6 +246,39 @@ dgFloat64 dgConvexHull4dTetraherum::Evalue (const dgConvexHull4dVector* const po
 	return Determinant4x4(exactMatrix);
 }
 
+dgFloat64 dgConvexHull4dTetraherum::GetTetraVolume(const dgConvexHull4dVector* const points) const
+{
+	const dgBigVector &p0 = points[m_faces[0].m_index[0]];
+	const dgBigVector &p1 = points[m_faces[0].m_index[1]];
+	const dgBigVector &p2 = points[m_faces[0].m_index[2]];
+	const dgBigVector &p3 = points[m_faces[0].m_index[3]];
+
+	dgFloat64 matrix[3][3];
+	for (dgInt32 i = 0; i < 3; i++) {
+		matrix[0][i] = p2[i] - p0[i];
+		matrix[1][i] = p1[i] - p0[i];
+		matrix[2][i] = p3[i] - p0[i];
+	}
+
+	dgFloat64 error;
+	dgFloat64 det = Determinant3x3(matrix, &error);
+
+
+	dgFloat64 precision = dgFloat64(1.0f) / dgFloat64(1 << 24);
+	dgFloat64 errbound = error * precision;
+	if (fabs(det) > errbound) {
+		return det;
+	}
+
+	dgGoogol exactMatrix[3][3];
+	for (dgInt32 i = 0; i < 3; i++) {
+		exactMatrix[0][i] = dgGoogol(p2[i]) - dgGoogol(p0[i]);
+		exactMatrix[1][i] = dgGoogol(p1[i]) - dgGoogol(p0[i]);
+		exactMatrix[2][i] = dgGoogol(p3[i]) - dgGoogol(p0[i]);
+	}
+	return Determinant3x3(exactMatrix);
+}
+
 
 dgBigVector dgConvexHull4dTetraherum::CircumSphereCenter (const dgConvexHull4dVector* const pointArray) const
 {
@@ -599,12 +632,10 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgConvexHull4dVector* const points, cons
 	dgConvexHull4dAABBTreeNode* tree = BuildTree (NULL, points, count, 0, (dgInt8**) &memoryPool, maxMemSize);
 
 	dgBigVector boxSize (tree->m_box[1] - tree->m_box[0]);	
-	boxSize.m_w = dgFloat64 (0.0f);
 	m_diag = dgFloat32 (sqrt (boxSize.DotProduct4(boxSize).m_x));
 
-	m_points[4].m_x = dgFloat64 (0.0f);
 	dgInt32 marks[4];
-
+	m_points.Resize(count);
 	bool validTetrahedrum = false;
 	dgConvexHull4dVector* const convexPoints = &m_points[0]; 
 	const dgFloat64 testVol = dgFloat32 (1.0e-6f) * m_diag * m_diag * m_diag;

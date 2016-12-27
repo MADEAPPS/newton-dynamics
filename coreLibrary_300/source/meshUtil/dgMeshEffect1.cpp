@@ -1346,130 +1346,39 @@ dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
 	CalculateNormals(dgFloat32 (45.0f * 3.141592f/180.0f));
 }
 
-dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const char* const fileName)
-	:dgPolyhedra (allocator) 
+// create a convex hull
+dgMeshEffect::dgMeshEffect(dgMemoryAllocator* const allocator, const dgFloat64* const vertexCloud, dgInt32 count, dgInt32 strideInByte, dgFloat64 distTol)
+	:dgPolyhedra(allocator)
 	,m_points(allocator)
 	,m_attrib(allocator)
-	,m_constructionIndex(0)
 {
-	class ParceOFF
-	{
-		public:
-		enum Token
-		{
-			m_off,	
-			m_value,
-			m_end,
-		};
+	if (count >= 4) {
+		dgConvexHull3d convexHull(allocator, vertexCloud, strideInByte, count, distTol);
+		if (convexHull.GetCount()) {
+			dgStack<dgInt32> faceCountPool(convexHull.GetCount());
+			dgStack<dgInt32> vertexIndexListPool(convexHull.GetCount() * 3);
 
-		ParceOFF (FILE* const file)
-			:m_file (file)
-		{
-		}
-
-		Token GetToken(char* const buffer) const
-		{
-			while (!feof (m_file) && fscanf (m_file, "%s", buffer)) {
-				if (buffer[0] == '#') {
-					SkipLine();
-				} else {
-					if (!_stricmp (buffer, "OFF")) {
-						return m_off;
-					}
-					return m_value;
-				}
+			dgInt32 index = 0;
+			dgMeshVertexFormat format;
+			format.m_faceCount = convexHull.GetCount();
+			format.m_faceIndexCount = &faceCountPool[0];
+			format.m_vertex.m_indexList = &vertexIndexListPool[0];
+			format.m_vertex.m_data = &convexHull.GetVertexPool()[0].m_x;
+			format.m_vertex.m_strideInBytes = sizeof (dgBigVector);
+			for (dgConvexHull3d::dgListNode* faceNode = convexHull.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
+				dgConvexHull3DFace& face = faceNode->GetInfo();
+				faceCountPool[index] = 3;
+				vertexIndexListPool[index * 3 + 0] = face.m_index[0];
+				vertexIndexListPool[index * 3 + 1] = face.m_index[1];
+				vertexIndexListPool[index * 3 + 2] = face.m_index[2];
+				index++;
 			}
-			return m_end;
+			BuildFromIndexList(&format);
+			RepairTJoints();
 		}
-
-		char* SkipLine() const
-		{
-			char tmp[1024];
-			return fgets (tmp, sizeof (tmp), m_file);
-		}
-
-		dgInt32 GetInteger() const
-		{
-			char buffer[1024];
-			GetToken(buffer);
-			return atoi (buffer);	
-		}
-
-		dgFloat64 GetFloat() const
-		{
-			char buffer[1024];
-			GetToken(buffer);
-			return atof (buffer);	
-		}
-
-		FILE* m_file;
-	};
-
-
-	FILE* const file = fopen (fileName, "rb");
-	if (file) {
-		ParceOFF parcel (file);
-
-		dgInt32 vertexCount = 0;
-		dgInt32 faceCount = 0;
-//		dgInt32 edgeCount = 0;
-
-		char buffer[1024];
-		bool stillData = true;
-		while (stillData) {
-			ParceOFF::Token token = parcel.GetToken(buffer);
-			switch (token) 
-			{
-				case ParceOFF::m_off:
-				{
-					vertexCount = parcel.GetInteger();
-					faceCount = parcel.GetInteger();
-//					edgeCount = parcel.GetInteger();
-					parcel.SkipLine();
-
-					dgArray<dgBigVector> points(GetAllocator());
-					for (dgInt32 i = 0; i < vertexCount; i ++) {
-						dgFloat64 x = parcel.GetFloat();
-						dgFloat64 y = parcel.GetFloat();
-						dgFloat64 z = parcel.GetFloat();
-						dgBigVector p (x, y, z, dgFloat32 (0.0f));
-						points[i] = p;
-					}
-
-					dgArray<dgInt32> indexList(GetAllocator()) ;
-					dgArray<dgInt32> faceVertex(GetAllocator()); 
-					dgInt32 index = 0;
-					for (dgInt32 i = 0; i < faceCount; i ++) {
-						const dgInt32 faceVertexCount = parcel.GetInteger();
-						faceVertex[i] = faceVertexCount;
-						for (dgInt32 j = 0; j < faceVertexCount; j ++) {
-							indexList[index] = parcel.GetInteger();
-							index ++;
-						}
-						parcel.SkipLine();
-					}
-
-					dgMeshVertexFormat vertexFormat;
-					vertexFormat.m_faceCount = faceCount;
-					vertexFormat.m_faceIndexCount = &faceVertex[0];
-
-					vertexFormat.m_vertex.m_data = &points[0].m_x;
-					vertexFormat.m_vertex.m_strideInBytes = sizeof (dgBigVector);
-					vertexFormat.m_vertex.m_indexList = &indexList[0];
-					BuildFromIndexList(&vertexFormat);
-
-					CalculateNormals (3.1416f * 30.0f / 180.0f);
-					stillData = false;
-					break;
-				}
-					
-				default:;
-			}
-		}
-
-		fclose (file);
 	}
 }
+
 
 dgMeshEffect::dgMeshEffect (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
 	:dgPolyhedra (allocator) 
@@ -2024,7 +1933,7 @@ void dgMeshEffect::UnpackAttibuteData()
 	dgInt32 attributeCount = 0;
 	const dgInt32 lru = IncLRU();
 	for (iter.Begin(); iter; iter++) {
-		dgEdge* const edge = &(*iter);
+		dgEdge* const edge = &iter.GetNode()->GetInfo();
 		if ((edge->m_incidentFace > 0) && (edge->m_mark != lru)) {
 			dgEdge* ptr = edge;
 

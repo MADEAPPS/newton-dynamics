@@ -182,40 +182,5 @@ void dgDelaunayTetrahedralization::DeleteFace (dgListNode* const node)
 }
 
 
-dgFloat64 dgDelaunayTetrahedralization::GetTetraVolume (const dgConvexHull4dTetraherum* const tetra) const
-{
-	const dgConvexHull4dVector* const points = &m_points[0];
-	const dgBigVector &p0 = points[tetra->m_faces[0].m_index[0]];
-	const dgBigVector &p1 = points[tetra->m_faces[0].m_index[1]];
-	const dgBigVector &p2 = points[tetra->m_faces[0].m_index[2]];
-	const dgBigVector &p3 = points[tetra->m_faces[0].m_index[3]];
-
-	dgFloat64 matrix[3][3];
-	for (dgInt32 i = 0; i < 3; i ++) {
-		matrix[0][i] = p2[i] - p0[i];
-		matrix[1][i] = p1[i] - p0[i];
-		matrix[2][i] = p3[i] - p0[i];
-	}
-
-	dgFloat64 error;
-	dgFloat64 det = Determinant3x3 (matrix, &error);
-
-
-	dgFloat64 precision  = dgFloat64 (1.0f) / dgFloat64 (1<<24);
-	dgFloat64 errbound = error * precision; 
-	if (fabs(det) > errbound) {
-		return det;
-	}
-
-	dgGoogol exactMatrix[3][3];
-	for (dgInt32 i = 0; i < 3; i ++) {
-		exactMatrix[0][i] = dgGoogol(p2[i]) - dgGoogol(p0[i]);
-		exactMatrix[1][i] = dgGoogol(p1[i]) - dgGoogol(p0[i]);
-		exactMatrix[2][i] = dgGoogol(p3[i]) - dgGoogol(p0[i]);
-	}
-
-	return Determinant3x3(exactMatrix);
-}
-
 
 

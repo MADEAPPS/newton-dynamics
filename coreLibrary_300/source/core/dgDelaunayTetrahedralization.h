@@ -36,7 +36,6 @@ class dgDelaunayTetrahedralization: public dgConvexHull4d
 
 	protected:
 	virtual void DeleteFace (dgListNode* const node) ;
-	dgFloat64 GetTetraVolume (const dgConvexHull4dTetraherum* const tetra) const;
 
 	void SortVertexArray ();
 	static dgInt32 CompareVertexByIndex(const dgConvexHull4dVector* const  A, const dgConvexHull4dVector* const B, void* const context);

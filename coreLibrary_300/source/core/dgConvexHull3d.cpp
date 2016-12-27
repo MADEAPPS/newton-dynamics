@@ -409,13 +409,14 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 	}
 
 	dgConvexHull3dAABBTreeNode* tree = BuildTree (NULL, points, count, 0, (dgInt8**) &memoryPool, maxMemSize);
-	m_aabbP0 = tree->m_box[0];
-	m_aabbP1 = tree->m_box[1];
 
 	dgInt32 marks[4];
+	m_points.Resize(count);
+	m_aabbP0 = tree->m_box[0];
+	m_aabbP1 = tree->m_box[1];
+	bool validTetrahedrum = false;
 	dgBigVector boxSize (tree->m_box[1] - tree->m_box[0]);	
 	m_diag = dgFloat32 (sqrt (boxSize.DotProduct3(boxSize)));
-	bool validTetrahedrum = false;
 	dgBigVector* const convexPoints = &m_points[0]; 
 	const dgFloat64 testVol = dgFloat32(1.0e-6f) * m_diag * m_diag * m_diag;
 	for (dgInt32 i = 0; !validTetrahedrum && (i < m_normalMap.m_count); i++) {

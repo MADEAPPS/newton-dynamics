@@ -95,6 +95,17 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 			return m_keyHigh;
 		}
 
+		bool operator<(const dgPairKey& key) const
+		{
+			return m_key < key.m_key;
+		}
+
+		bool operator>(const dgPairKey& key) const
+		{
+			return m_key > key.m_key;
+		}
+
+
 		private:
 		union {
 			dgUnsigned64 m_key;
