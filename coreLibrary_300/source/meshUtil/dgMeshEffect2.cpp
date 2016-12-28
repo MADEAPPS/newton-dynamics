@@ -146,7 +146,7 @@ void dgMeshEffect::LoadOffMesh(const char* const fileName)
 	}
 }
 
-void dgMeshEffect::LoadTetraSolidMesh (const char* const filename)
+void dgMeshEffect::LoadTetraMesh (const char* const filename)
 {
 	FILE* const file = fopen(filename, "rb");
 	if (file) {
@@ -154,11 +154,10 @@ void dgMeshEffect::LoadTetraSolidMesh (const char* const filename)
 		fscanf(file, "%d", &vertexCount);
 		dgArray<dgBigVector> points(GetAllocator());
 		for (dgInt32 i = 0; i < vertexCount; i ++) {
-			dgInt32 index;
 			dgFloat32 x;
 			dgFloat32 y;
 			dgFloat32 z;
-			fscanf(file, "%d %f %f %f", &index, &x, &y, &z);
+			fscanf(file, "%f %f %f", &x, &y, &z);
 			points[i] = dgBigVector (x, y, z, dgFloat32 (0.0f));
 		}
 		
@@ -167,8 +166,8 @@ void dgMeshEffect::LoadTetraSolidMesh (const char* const filename)
 		fscanf(file, "%d", &tetras);
 		dgMemoryAllocator* const allocator = GetAllocator();
 		for (dgInt32 layers = 0; layers < tetras; layers ++) {
-			dgInt32 tetra[5];
-			fscanf(file, "%d %d %d %d %d", &tetra[4], &tetra[0], &tetra[1], &tetra[2], &tetra[3]);
+			dgInt32 tetra[4];
+			fscanf(file, "%d %d %d %d", &tetra[0], &tetra[1], &tetra[2], &tetra[3]);
 			dgBigVector pointArray[4];
 			for (dgInt32 i = 0; i < 4; i++) {
 				dgInt32 index = tetra[i];
@@ -314,39 +313,139 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 }
 
 
-dgMeshEffect* dgMeshEffect::CreateConstrainedConformingTetrahedralization() const
-{
-	dgMeshEffect copy (*this);
-	return copy.CreateTetrahedralization();
-}
 
-dgMeshEffect* dgMeshEffect::CreateTetrahedralization()
+class dgTetraIsoSufaceStuffing
 {
-	Triangulate();
-	dgStack<dgInt32> indexList(m_points.m_vertex.m_count + 32);
-	dgArray<dgBigVector> meshPoints(m_points.m_vertex, m_points.m_vertex.m_count);
-
-	dgMeshEffect* delaunayPartition = NULL;
-	dgInt32 count = dgVertexListToIndexList(&meshPoints[0].m_x, sizeof(dgBigVector), 3, m_points.m_vertex.m_count, &indexList[0], dgFloat64(5.0e-2f));
-	dgDelaunayTetrahedralization delaunay(GetAllocator(), &meshPoints[0].m_x, count, sizeof(dgBigVector), dgFloat32(0.0f));
-	if (delaunay.GetCount()) {
-		for (dgInt32 i = count; i < delaunay.GetVertexCount(); i ++) {
-			indexList[i] = -i;
+	public:
+	class dgTetrahedra
+	{
+		public:
+		const dgInt32& operator[] (dgInt32 i) const
+		{
+			return m_index[i];
 		}
 
-//		RecoverMissingEdges(delaunay, &indexList[0]);
-		
-		delaunay.RemoveUpperHull ();
+		dgInt32& operator[] (dgInt32 i)
+		{
+			return m_index[i];
+		}
+
+		private:
+		dgInt32 m_index[4];
+	};
+
+	dgTetraIsoSufaceStuffing (dgMeshEffect* const mesh, dgFloat64 cellSize)
+		:m_points(mesh->GetAllocator())
+		,m_tetraList(mesh->GetAllocator())
+		,m_pointCount(0)
+		,m_gridSizeX(0)
+		,m_gridSizeY(0)
+		,m_gridSizeZ(0)
+	{
+		dgBigVector origin (CalculateGridSize (mesh, cellSize));
+		PopulatePointCrid (origin, cellSize);
+		BuildTetraList ();
+	}
+
+	dgBigVector CalculateGridSize (const dgMeshEffect* const mesh, dgFloat64 cellsize)
+	{
+		dgBigVector minBox;
+		dgBigVector maxBox;
+		mesh->CalculateAABB(minBox, maxBox);
+		minBox -= (maxBox - minBox).Scale3(dgFloat64(1.e-3f));
+		maxBox += (maxBox - minBox).Scale3(dgFloat64(1.e-3f));
+
+		dgBigVector mMinInt((minBox.Scale4(dgFloat64(1.0f) / cellsize)).Floor());
+		dgBigVector mMaxInt((maxBox.Scale4(dgFloat64(1.0f) / cellsize)).Floor() + dgBigVector::m_one);
+
+		dgBigVector gridSize(mMaxInt - mMinInt + dgBigVector::m_one);
+		m_gridSizeX = dgInt32(gridSize.m_x);
+		m_gridSizeY = dgInt32(gridSize.m_y);
+		m_gridSizeZ = dgInt32(gridSize.m_z);
+		return minBox;
+	}
+
+	void PopulatePointCrid (const dgBigVector& origin, dgFloat64 cellsize)
+	{
+		m_pointCount = 0;
+		m_points.Resize(m_gridSizeX * m_gridSizeY * m_gridSizeZ + (m_gridSizeX + 1) * (m_gridSizeY + 1) * (m_gridSizeZ + 1));
+		for (dgInt32 z = 0; z < m_gridSizeZ; z++) {
+			for (dgInt32 y = 0; y < m_gridSizeY; y++) {
+				for (dgInt32 x = 0; x < m_gridSizeX; x++) {
+					m_points[m_pointCount] = origin + dgBigVector(x*cellsize, y*cellsize, z*cellsize, dgFloat64(0.0f));
+					m_pointCount++;
+				}
+			}
+		}
+
+		dgBigVector outerOrigin (origin - dgBigVector (cellsize * dgFloat64 (0.5f)));
+		for (dgInt32 z = 0; z < m_gridSizeZ + 1; z++) {
+			for (dgInt32 y = 0; y < m_gridSizeY + 1; y++) {
+				for (dgInt32 x = 0; x < m_gridSizeX + 1; x++) {
+					m_points[m_pointCount] = outerOrigin + dgBigVector(x*cellsize, y*cellsize, z*cellsize, dgFloat64(0.0f));
+					m_pointCount++;
+				}
+			}
+		}
+	}
+
+	void BuildTetraList ()
+	{
+		const dgInt32 base = m_gridSizeX * m_gridSizeY * m_gridSizeZ;
+		for (dgInt32 z = 0; z < m_gridSizeZ; z++) {
+			for (dgInt32 y = 0; y < m_gridSizeY; y++) {
+				for (dgInt32 x = 0; x < m_gridSizeX - 1; x++) {
+					dgTetrahedra tetra;
+					tetra[0] = ((z * m_gridSizeY + y) * m_gridSizeX) + x;
+					tetra[1] = ((z * m_gridSizeY + y) * m_gridSizeX) + x + 1;
+					tetra[2] = base + ((z * (m_gridSizeY + 1) + y + 0) * (m_gridSizeX + 1)) + x + 1;
+					tetra[3] = base + ((z * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					dgAssert (TestVolume(tetra));
+					m_tetraList.Append(tetra);
+				}
+			}
+		}
+	}
+
+	bool TestVolume (const dgTetrahedra& tetra) const
+	{
+		const dgBigVector& p0 = m_points[tetra[0]];
+		const dgBigVector& p1 = m_points[tetra[1]];
+		const dgBigVector& p2 = m_points[tetra[2]];
+		const dgBigVector& p3 = m_points[tetra[3]];
+		dgBigVector p10(p1 - p0);
+		dgBigVector p20(p2 - p0);
+		dgBigVector p30(p3 - p0);
+		return p10.DotProduct3(p20.CrossProduct3(p30)) > dgFloat64 (0.0f);
+	}
+
+	dgArray<dgBigVector> m_points;
+	dgList<dgTetrahedra> m_tetraList;
+	dgInt32 m_pointCount;
+	dgInt32 m_gridSizeX;
+	dgInt32 m_gridSizeY;
+	dgInt32 m_gridSizeZ;
+};
+
+dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
+{
+	dgMeshEffect copy(*this);
+	copy.Triangulate();
+
+	dgTetraIsoSufaceStuffing tetraIsoStuffing (&copy, dgFloat64(0.25f));
+
+	dgMeshEffect* delaunayPartition = NULL;
+	if (tetraIsoStuffing.m_tetraList.GetCount()) {
 		dgMemoryAllocator* const allocator = GetAllocator();
 		delaunayPartition = new (allocator) dgMeshEffect (allocator);
 		delaunayPartition->BeginBuild();
 		dgInt32 layer = 0;
 		dgBigVector pointArray[4];
-		for (dgDelaunayTetrahedralization::dgListNode* tetNode = delaunay.GetFirst(); tetNode; tetNode = tetNode->GetNext()) {
-			dgConvexHull4dTetraherum& tetra = tetNode->GetInfo();
+		for (dgList<dgTetraIsoSufaceStuffing::dgTetrahedra>::dgListNode* tetNode = tetraIsoStuffing.m_tetraList.GetFirst(); tetNode; tetNode = tetNode->GetNext()) {
+			dgTetraIsoSufaceStuffing::dgTetrahedra& tetra = tetNode->GetInfo();
 			for (dgInt32 i = 0; i < 4; i ++) {
-				dgInt32 index = tetra.m_faces[0].m_index[i];
-				pointArray[i] = delaunay.GetVertex(index);
+				dgInt32 index = tetra[i];
+				pointArray[i] = tetraIsoStuffing.m_points[index];
 			}
 			dgMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dgBigVector), dgFloat64(0.0f));
 			dgAssert (convexMesh.GetCount());
@@ -365,55 +464,5 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedralization()
 }
 
 
-void dgMeshEffect::RecoverMissingEdges(dgDelaunayTetrahedralization& delaunay, const dgInt32* const indexMap)
-{
-	dgAssert (0);
-/*
-	dgList<dgEdge*> edgeList(GetAllocator());
-	dgInt32 lru = IncLRU();
 
-dgEdge* xxx = FindEdge(1, 4);
-FlipEdge (xxx);
-dgEdge* xxx1 = FindEdge(3, 5);
 
-	Iterator iter(*this);
-	for (iter.Begin(); iter; iter++) {
-		dgEdge* const edge = &iter.GetNode()->GetInfo();
-		if (edge->m_mark != lru) {
-			edge->m_mark = lru; 
-			edge->m_twin->m_mark = lru; 
-			edgeList.Append(edge);
-		}
-	}
-
-	dgTree<dgDelaunayTetrahedralization::dgListNode*, dgPolyhedra::dgPairKey> delaunaySegmentMap (GetAllocator());
-	for (dgDelaunayTetrahedralization::dgListNode* tetNode = delaunay.GetFirst(); tetNode; tetNode = tetNode->GetNext()) {
-		dgConvexHull4dTetraherum& tetra = tetNode->GetInfo();
-		if (delaunay.GetTetraVolume (&tetra) < dgFloat64(0.0f)) {
-			for (dgInt32 i = 0; i < 3; i++) {
-				dgInt32 j0 = tetra.m_faces[0].m_index[i];
-				if (j0 >= 0) {
-					for (dgInt32 j = i + 1; j < 4; j++) {
-						dgInt32 j1 = tetra.m_faces[0].m_index[j];
-						if (j1 >= 0) {
-							dgPolyhedra::dgPairKey key (dgMax(j0, j1), dgMin(j0, j1));
-							delaunaySegmentMap.Insert(tetNode, key);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	for (dgList<dgEdge*>::dgListNode* ptr = edgeList.GetFirst(); ptr; ptr = edgeList.GetFirst()) {
-		dgEdge* const edge = ptr->GetInfo();
-		dgInt32 j0 = indexMap[edge->m_incidentVertex];
-		dgInt32 j1 = indexMap[edge->m_twin->m_incidentVertex];
-		dgPolyhedra::dgPairKey key (dgMax(j0, j1), dgMin(j0, j1));
-		if (!delaunaySegmentMap.Find(key)) {
-			dgAssert (0);
-		}
-		edgeList.Remove(ptr);
-	}
-*/
-}

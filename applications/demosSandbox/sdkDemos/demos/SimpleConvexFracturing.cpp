@@ -95,7 +95,13 @@ class DelaunayFractureEffect: public FractureEffect
 		NewtonDestroyCollision(collision1);
 
 		// now we call create we decompose the mesh into several convex pieces 
-		NewtonMesh* const debriMeshPieces = NewtonMeshCreateConstrainedTetrahedralization(mesh);
+#if 0
+		char name[2048];
+		dGetWorkingFileName("box.tet", name);
+		NewtonMesh* const debriMeshPieces = NewtonMeshLoadTetrahedraMesh(m_world, name);
+#else
+		NewtonMesh* const debriMeshPieces = NewtonMeshCreateTetrahedraIsoSurface(mesh);
+#endif
 		dAssert(debriMeshPieces);
 
 		// now we iterate over each pieces and for each one we create a visual entity and a rigid body
@@ -433,7 +439,6 @@ static void AddDelaunayFracturedPrimitive(DemoEntityManager* const scene, dFloat
 
 	// apply a material map
 	int externalMaterial = LoadTexture("reljef.tga");
-	//int internalMaterial = LoadTexture("KAMEN-stup.tga");
 	int internalMaterial = LoadTexture("concreteBrick.tga");
 	NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial);
 

@@ -414,7 +414,7 @@ char name[2048];
 //dGetWorkingFileName ("prism.off", name);
 dGetWorkingFileName ("box.off", name);
 NewtonMesh* const xxx1 = NewtonMeshLoadOFF(scene->GetNewton(), name);
-NewtonMesh* xxx2 = NewtonMeshCreateConstrainedTetrahedralization(xxx1);
+NewtonMesh* xxx2 = NewtonMeshCreateTetrahedraIsoSurface(xxx1);
 
 
 	// load the scene from a ngd file format

@@ -7450,11 +7450,11 @@ NewtonMesh* NewtonMeshCreateConvexHull (const NewtonWorld* const newtonWorld, in
 	return (NewtonMesh*) mesh;
 }
 
-NEWTON_API NewtonMesh* NewtonMeshCreateConstrainedTetrahedralization(const NewtonMesh* const closetMesh)
+NEWTON_API NewtonMesh* NewtonMeshCreateTetrahedraIsoSurface(const NewtonMesh* const closetMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) closetMesh;
-	return (NewtonMesh*)meshEffect->CreateConstrainedConformingTetrahedralization();
+	return (NewtonMesh*)meshEffect->CreateTetrahedraIsoSurface();
 }
 
 NewtonMesh* NewtonMeshCreateVoronoiConvexDecomposition (const NewtonWorld* const newtonWorld, int pointCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix)
@@ -7503,13 +7503,13 @@ NewtonMesh* NewtonMeshLoadOFF(const NewtonWorld* const newtonWorld, const char* 
 	return (NewtonMesh*) mesh;
 }
 
-NewtonMesh* NewtonMeshSolidTetrahedraMesh(const NewtonWorld* const newtonWorld, const char* const filename)
+NewtonMesh* NewtonMeshLoadTetrahedraMesh(const NewtonWorld* const newtonWorld, const char* const filename)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 	dgMemoryAllocator* const allocator = world->dgWorld::GetAllocator();
 	dgMeshEffect* const mesh = new (allocator) dgMeshEffect(allocator);
-	mesh->LoadTetraSolidMesh (filename);
+	mesh->LoadTetraMesh (filename);
 	return (NewtonMesh*)mesh;
 }
 
