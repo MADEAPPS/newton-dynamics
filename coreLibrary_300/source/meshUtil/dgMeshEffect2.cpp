@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
+﻿/* Copyright (c) <2003-2016> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -422,8 +422,8 @@ class dgTetraIsoSufaceStuffing
 					dgTetrahedra tetra;
 					tetra[0] = ((z * m_gridSizeY + (y + 0)) * m_gridSizeX) + x;
 					tetra[1] = ((z * m_gridSizeY + (y + 1)) * m_gridSizeX) + x;
-					tetra[2] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
-					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					tetra[3] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					tetra[2] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
 					dgAssert(TestVolume(tetra));
 					m_tetraList.Append(tetra);
 
@@ -471,9 +471,9 @@ class dgTetraIsoSufaceStuffing
 
 					tetra[0] = ((z * m_gridSizeY + (y + 0)) * m_gridSizeX) + x;
 					tetra[1] = ((z * m_gridSizeY + (y + 1)) * m_gridSizeX) + x;
-					tetra[2] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
-					tetra[3] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
-					dgAssert (TestVolume(tetra));
+					tetra[3] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
+					tetra[2] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					dgAssert(TestVolume(tetra));
 					m_tetraList.Append(tetra);
 				}
 			}
@@ -535,7 +535,5 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
 
 	return delaunayPartition;
 }
-
-
 
 
