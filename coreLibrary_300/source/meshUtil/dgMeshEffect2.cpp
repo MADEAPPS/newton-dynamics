@@ -312,8 +312,11 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	return voronoiPartition;
 }
 
-
-
+//
+//based on paper Isosurface Stuffing : Fast Tetrahedral Meshes with Good Dihedral Angles
+// by Francois Labelle Jonathan Richard Shewchuk
+// University of California at Berkeley
+// https://people.eecs.berkeley.edu/~jrs/papers/stuffing.pdf
 class dgTetraIsoSufaceStuffing
 {
 	public:
@@ -398,8 +401,78 @@ class dgTetraIsoSufaceStuffing
 					dgTetrahedra tetra;
 					tetra[0] = ((z * m_gridSizeY + y) * m_gridSizeX) + x;
 					tetra[1] = ((z * m_gridSizeY + y) * m_gridSizeX) + x + 1;
-					tetra[2] = base + ((z * (m_gridSizeY + 1) + y + 0) * (m_gridSizeX + 1)) + x + 1;
-					tetra[3] = base + ((z * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					tetra[2] = base + (((z + 0) * (m_gridSizeY + 1) + y + 0) * (m_gridSizeX + 1)) + x + 1;
+					tetra[3] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					dgAssert (TestVolume(tetra));
+					m_tetraList.Append(tetra);
+
+					tetra[0] = ((z * m_gridSizeY + y) * m_gridSizeX) + x;
+					tetra[1] = ((z * m_gridSizeY + y) * m_gridSizeX) + x + 1;
+					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 0) * (m_gridSizeX + 1)) + x + 1;
+					tetra[2] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					dgAssert(TestVolume(tetra));
+					m_tetraList.Append(tetra);
+				}
+			}
+		}
+
+		for (dgInt32 z = 0; z < m_gridSizeZ; z++) {
+			for (dgInt32 y = 0; y < m_gridSizeY - 1; y++) {
+				for (dgInt32 x = 0; x < m_gridSizeX; x++) {
+					dgTetrahedra tetra;
+					tetra[0] = ((z * m_gridSizeY + (y + 0)) * m_gridSizeX) + x;
+					tetra[1] = ((z * m_gridSizeY + (y + 1)) * m_gridSizeX) + x;
+					tetra[2] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					dgAssert(TestVolume(tetra));
+					m_tetraList.Append(tetra);
+
+					tetra[0] = ((z * m_gridSizeY + (y + 0)) * m_gridSizeX) + x;
+					tetra[1] = ((z * m_gridSizeY + (y + 1)) * m_gridSizeX) + x;
+					tetra[2] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
+					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
+					dgAssert(TestVolume(tetra));
+					m_tetraList.Append(tetra);
+				}
+			}
+		}
+
+		for (dgInt32 z = 0; z < m_gridSizeZ - 1; z++) {
+			for (dgInt32 y = 0; y < m_gridSizeY; y++) {
+				for (dgInt32 x = 0; x < m_gridSizeX; x++) {
+					dgTetrahedra tetra;
+					tetra[0] = (((z + 0) * m_gridSizeY + y + 0) * m_gridSizeX) + x;
+					tetra[1] = (((z + 1) * m_gridSizeY + y + 0) * m_gridSizeX) + x;
+					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 0) * (m_gridSizeX + 1)) + x + 0;
+					tetra[2] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
+					dgAssert(TestVolume(tetra));
+					m_tetraList.Append(tetra);
+
+					tetra[0] = (((z + 0) * m_gridSizeY + y + 0) * m_gridSizeX) + x;
+					tetra[1] = (((z + 1) * m_gridSizeY + y + 0) * m_gridSizeX) + x;
+					tetra[2] = base + (((z + 1) * (m_gridSizeY + 1) + y + 0) * (m_gridSizeX + 1)) + x + 1;
+					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					dgAssert(TestVolume(tetra));
+					m_tetraList.Append(tetra);
+				}
+			}
+		}
+
+		for (dgInt32 z = 0; z < m_gridSizeZ; z++) {
+			for (dgInt32 y = 0; y < m_gridSizeY - 1; y++) {
+				for (dgInt32 x = 0; x < m_gridSizeX; x++) {
+					dgTetrahedra tetra;
+					tetra[0] = ((z * m_gridSizeY + (y + 0)) * m_gridSizeX) + x;
+					tetra[1] = ((z * m_gridSizeY + (y + 1)) * m_gridSizeX) + x;
+					tetra[2] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
+					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
+					dgAssert(TestVolume(tetra));
+					m_tetraList.Append(tetra);
+
+					tetra[0] = ((z * m_gridSizeY + (y + 0)) * m_gridSizeX) + x;
+					tetra[1] = ((z * m_gridSizeY + (y + 1)) * m_gridSizeX) + x;
+					tetra[2] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
+					tetra[3] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
 					dgAssert (TestVolume(tetra));
 					m_tetraList.Append(tetra);
 				}
@@ -432,7 +505,7 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
 	dgMeshEffect copy(*this);
 	copy.Triangulate();
 
-	dgTetraIsoSufaceStuffing tetraIsoStuffing (&copy, dgFloat64(0.25f));
+	dgTetraIsoSufaceStuffing tetraIsoStuffing (&copy, dgFloat64(0.5f));
 
 	dgMeshEffect* delaunayPartition = NULL;
 	if (tetraIsoStuffing.m_tetraList.GetCount()) {
