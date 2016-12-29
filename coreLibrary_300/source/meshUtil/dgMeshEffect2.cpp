@@ -26,6 +26,297 @@
 #include "dgCollisionConvexHull.h"
 
 
+// based on paper iso surface Stuffing : Fast Tetrahedral Meshes with Good Dihedral Angles
+// by Francois Labelle Jonathan Richard Shewchuk
+// University of California at Berkeley
+// https://people.eecs.berkeley.edu/~jrs/papers/stuffing.pdf
+class dgTetraIsoSufaceStuffing
+{
+	public:
+	enum dgVertexSign
+	{
+		m_onSuface,
+		m_insdide,
+		m_ousize,
+		m_unprocessed,
+	};
+
+	class dgGridDimension 
+	{
+		public:
+		dgBigVector m_origin;
+		dgFloat64 m_cellSize;
+		dgInt32 m_gridSizeX;
+		dgInt32 m_gridSizeY;
+		dgInt32 m_gridSizeZ;
+		dgInt32 m_innerSize;
+		dgInt32 m_outerSize;
+	};
+
+	template<dgInt32 size>
+	class dgAssessor 
+	{
+		public:
+		dgAssessor() 
+			:m_count(0)
+		{
+		}
+		const dgInt32& operator[] (dgInt32 i) const
+		{
+			dgAssert(i >= 0);
+			dgAssert(i < size);
+			return m_elements[i];
+		}
+		dgInt32& operator[] (dgInt32 i)
+		{
+			dgAssert (i >= 0);
+			dgAssert (i < size);
+			return m_elements[i];
+		}
+
+		void PushBack (const dgInt32 data)
+		{
+			dgAssert(m_count >= 0);
+			dgAssert(m_count < size);
+			m_elements[m_count] = data;
+			m_count ++;
+		}
+
+		private:
+		dgInt32 m_count;
+		dgInt32 m_elements[size];
+	};
+
+	typedef dgAssessor<4> dgTetrahedra; 
+	typedef dgAssessor<16> dgTetraToVertexNode; 
+
+	class dgRayTracer: public dgMeshEffect::dgMeshBVH
+	{
+		public:
+		dgRayTracer(dgMeshEffect* const mesh)
+			:dgMeshEffect::dgMeshBVH(mesh)
+		{
+			Build();
+		}
+
+		dgFloat64 RayFaceIntersect(const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, bool doublesided) const
+		{
+			dgAssert (0);
+			return 0;
+/*
+			dgHACDCluster* const clusterFace = (dgHACDCluster*)face->m_userData;
+
+			dgFloat64 param = dgFloat32(100.0f);
+			if (clusterFace->m_color != m_clusterA->m_color) {
+				param = dgMeshEffect::dgMeshBVH::RayFaceIntersect(face, p1, p0, false);
+				if ((param >= dgFloat32(0.0f)) && (param <= dgFloat32(1.0f))) {
+					param = dgFloat32(1.0f) - param;
+				}
+			}
+			return param;
+*/
+		}
+	};
+
+	dgTetraIsoSufaceStuffing(dgMeshEffect* const mesh, dgFloat64 cellSize)
+		:m_points(mesh->GetAllocator())
+		,m_tetraList(mesh->GetAllocator())
+		,m_pointCount(0)
+		,m_tetraCount(0)
+	{
+		dgBigVector origin;
+		dgRayTracer rayTrace (mesh);
+		dgArray<dgVertexSign> vertexSigns (mesh->GetAllocator());
+		dgArray<dgTetraToVertexNode> tetraGraph (mesh->GetAllocator());
+		dgGridDimension gridDim (CalculateGridSize(mesh, cellSize));
+		PopulateGridPoints (gridDim);
+		BuildTetraList (gridDim, tetraGraph);
+		CalculateVertexSigns (vertexSigns, rayTrace, tetraGraph);
+	}
+
+	void CalculateVertexSigns (dgArray<dgVertexSign>& vertexSigns, const dgRayTracer& rayTrace, const dgArray<dgTetraToVertexNode>& tetraGraph)
+	{
+		vertexSigns.Resize(m_pointCount);
+		for (dgInt32 i = 0; i < m_pointCount; i ++) {
+			vertexSigns[i] = m_unprocessed;
+		}
+
+		for (dgInt32 i = 0; i < m_tetraCount; i ++) {
+			const dgTetrahedra& tetra = m_tetraList[i];
+			for (dgInt32 j = 0; j < 4; j ++) {
+				dgInt32 vertexIndex = tetra[j]; 
+				if (vertexSigns[vertexIndex] == m_unprocessed) {
+
+				}
+			}
+		}
+	}
+
+	dgGridDimension CalculateGridSize(const dgMeshEffect* const mesh, dgFloat64 cellsize) const
+	{
+		dgBigVector minBox;
+		dgBigVector maxBox;
+		mesh->CalculateAABB(minBox, maxBox);
+		minBox -= (maxBox - minBox).Scale3(dgFloat64(1.e-3f));
+		maxBox += (maxBox - minBox).Scale3(dgFloat64(1.e-3f));
+
+		dgBigVector mMinInt((minBox.Scale4(dgFloat64(1.0f) / cellsize)).Floor());
+		dgBigVector mMaxInt((maxBox.Scale4(dgFloat64(1.0f) / cellsize)).Floor() + dgBigVector::m_one);
+		dgBigVector gridSize(mMaxInt - mMinInt + dgBigVector::m_one);
+
+		dgGridDimension gridDimension;
+		gridDimension.m_origin = minBox; 
+		gridDimension.m_cellSize = cellsize;
+		gridDimension.m_gridSizeX = dgInt32(gridSize.m_x);
+		gridDimension.m_gridSizeY = dgInt32(gridSize.m_y);
+		gridDimension.m_gridSizeZ = dgInt32(gridSize.m_z);
+
+		gridDimension.m_innerSize = gridDimension.m_gridSizeX * gridDimension.m_gridSizeY * gridDimension.m_gridSizeZ;
+		gridDimension.m_outerSize = gridDimension.m_innerSize + (gridDimension.m_gridSizeX + 1) * (gridDimension.m_gridSizeY + 1) * (gridDimension.m_gridSizeZ + 1);
+		return gridDimension;
+	}
+
+	void PopulateGridPoints(const dgGridDimension& gridDimension)
+	{
+		m_pointCount = 0;
+		m_points.Resize(gridDimension.m_outerSize);
+
+		for (dgInt32 z = 0; z < gridDimension.m_gridSizeZ; z++) {
+			for (dgInt32 y = 0; y < gridDimension.m_gridSizeY; y++) {
+				for (dgInt32 x = 0; x < gridDimension.m_gridSizeX; x++) {
+					m_points[m_pointCount] = gridDimension.m_origin + dgBigVector(x * gridDimension.m_cellSize, y * gridDimension.m_cellSize, z * gridDimension.m_cellSize, dgFloat64(0.0f));
+					m_pointCount++;
+				}
+			}
+		}
+
+		dgBigVector outerOrigin(gridDimension.m_origin - dgBigVector(gridDimension.m_cellSize * dgFloat64(0.5f)));
+		for (dgInt32 z = 0; z < gridDimension.m_gridSizeZ + 1; z++) {
+			for (dgInt32 y = 0; y < gridDimension.m_gridSizeY + 1; y++) {
+				for (dgInt32 x = 0; x < gridDimension.m_gridSizeX + 1; x++) {
+					m_points[m_pointCount] = outerOrigin + dgBigVector(x * gridDimension.m_cellSize, y * gridDimension.m_cellSize, z * gridDimension.m_cellSize, dgFloat64(0.0f));
+					m_pointCount++;
+				}
+			}
+		}
+	}
+
+	void AddTetra(dgArray<dgTetraToVertexNode>& graph, const dgTetrahedra& tetra)
+	{
+		dgAssert(TestVolume(tetra));
+		m_tetraList[m_tetraCount] = tetra;
+		dgTetrahedra& tetraEntry = m_tetraList[m_tetraCount];
+		for (dgInt32 i = 0; i < 4; i ++) {
+			dgInt32 vertexIndex = tetra[i];
+			tetraEntry.PushBack(vertexIndex);
+			graph[vertexIndex].PushBack(m_tetraCount);
+		}
+		m_tetraCount ++;
+	}
+
+	void BuildTetraList(const dgGridDimension& gridDimension, dgArray<dgTetraToVertexNode>& graph)
+	{
+		graph.Resize(m_pointCount);
+		for (dgInt32 i = 0; i < m_pointCount; i ++) {
+			graph[i] = dgTetraToVertexNode();
+		}
+
+		const dgInt32 base = gridDimension.m_innerSize;
+		for (dgInt32 z = 0; z < gridDimension.m_gridSizeZ; z++) {
+			for (dgInt32 y = 0; y < gridDimension.m_gridSizeY; y++) {
+				for (dgInt32 x = 0; x < gridDimension.m_gridSizeX - 1; x++) {
+					dgTetrahedra tetra;
+					tetra[0] = ((z * gridDimension.m_gridSizeY + y) * gridDimension.m_gridSizeX) + x;
+					tetra[1] = ((z * gridDimension.m_gridSizeY + y) * gridDimension.m_gridSizeX) + x + 1;
+					tetra[2] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 1;
+					tetra[3] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
+					AddTetra(graph, tetra);
+
+					tetra[0] = ((z * gridDimension.m_gridSizeY + y) * gridDimension.m_gridSizeX) + x;
+					tetra[1] = ((z * gridDimension.m_gridSizeY + y) * gridDimension.m_gridSizeX) + x + 1;
+					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 1;
+					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
+					AddTetra(graph, tetra);
+				}
+			}
+		}
+
+		for (dgInt32 z = 0; z < gridDimension.m_gridSizeZ; z++) {
+			for (dgInt32 y = 0; y < gridDimension.m_gridSizeY - 1; y++) {
+				for (dgInt32 x = 0; x < gridDimension.m_gridSizeX; x++) {
+					dgTetrahedra tetra;
+					tetra[0] = ((z * gridDimension.m_gridSizeY + (y + 0)) * gridDimension.m_gridSizeX) + x;
+					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
+					tetra[3] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
+					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
+					AddTetra(graph, tetra);
+
+					tetra[0] = ((z * gridDimension.m_gridSizeY + (y + 0)) * gridDimension.m_gridSizeX) + x;
+					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
+					tetra[2] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
+					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
+					AddTetra(graph, tetra);
+				}
+			}
+		}
+
+		for (dgInt32 z = 0; z < gridDimension.m_gridSizeZ - 1; z++) {
+			for (dgInt32 y = 0; y < gridDimension.m_gridSizeY; y++) {
+				for (dgInt32 x = 0; x < gridDimension.m_gridSizeX; x++) {
+					dgTetrahedra tetra;
+					tetra[0] = (((z + 0) * gridDimension.m_gridSizeY + y + 0) * gridDimension.m_gridSizeX) + x;
+					tetra[1] = (((z + 1) * gridDimension.m_gridSizeY + y + 0) * gridDimension.m_gridSizeX) + x;
+					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 0;
+					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
+					AddTetra(graph, tetra);
+
+					tetra[0] = (((z + 0) * gridDimension.m_gridSizeY + y + 0) * gridDimension.m_gridSizeX) + x;
+					tetra[1] = (((z + 1) * gridDimension.m_gridSizeY + y + 0) * gridDimension.m_gridSizeX) + x;
+					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 1;
+					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
+					AddTetra(graph, tetra);
+				}
+			}
+		}
+
+		for (dgInt32 z = 0; z < gridDimension.m_gridSizeZ; z++) {
+			for (dgInt32 y = 0; y < gridDimension.m_gridSizeY - 1; y++) {
+				for (dgInt32 x = 0; x < gridDimension.m_gridSizeX; x++) {
+					dgTetrahedra tetra;
+					tetra[0] = ((z * gridDimension.m_gridSizeY + (y + 0)) * gridDimension.m_gridSizeX) + x;
+					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
+					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
+					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
+					AddTetra(graph, tetra);
+
+					tetra[0] = ((z * gridDimension.m_gridSizeY + (y + 0)) * gridDimension.m_gridSizeX) + x;
+					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
+					tetra[3] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
+					tetra[2] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
+					AddTetra(graph, tetra);
+				}
+			}
+		}
+	}
+
+	bool TestVolume(const dgTetrahedra& tetra) const
+	{
+		const dgBigVector& p0 = m_points[tetra[0]];
+		const dgBigVector& p1 = m_points[tetra[1]];
+		const dgBigVector& p2 = m_points[tetra[2]];
+		const dgBigVector& p3 = m_points[tetra[3]];
+		dgBigVector p10(p1 - p0);
+		dgBigVector p20(p2 - p0);
+		dgBigVector p30(p3 - p0);
+		return p10.DotProduct3(p20.CrossProduct3(p30)) > dgFloat64(0.0f);
+	}
+
+	dgArray<dgBigVector> m_points;
+	dgArray<dgTetrahedra> m_tetraList;
+	dgInt32 m_pointCount;
+	dgInt32 m_tetraCount;
+};
+
 void dgMeshEffect::LoadOffMesh(const char* const fileName)
 {
 	class ParceOFF
@@ -312,193 +603,6 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 	return voronoiPartition;
 }
 
-//
-//based on paper Isosurface Stuffing : Fast Tetrahedral Meshes with Good Dihedral Angles
-// by Francois Labelle Jonathan Richard Shewchuk
-// University of California at Berkeley
-// https://people.eecs.berkeley.edu/~jrs/papers/stuffing.pdf
-class dgTetraIsoSufaceStuffing
-{
-	public:
-	class dgTetrahedra
-	{
-		public:
-		const dgInt32& operator[] (dgInt32 i) const
-		{
-			return m_index[i];
-		}
-
-		dgInt32& operator[] (dgInt32 i)
-		{
-			return m_index[i];
-		}
-
-		private:
-		dgInt32 m_index[4];
-	};
-
-	dgTetraIsoSufaceStuffing (dgMeshEffect* const mesh, dgFloat64 cellSize)
-		:m_points(mesh->GetAllocator())
-		,m_tetraList(mesh->GetAllocator())
-		,m_pointCount(0)
-		,m_gridSizeX(0)
-		,m_gridSizeY(0)
-		,m_gridSizeZ(0)
-	{
-		dgBigVector origin (CalculateGridSize (mesh, cellSize));
-		PopulatePointCrid (origin, cellSize);
-		BuildTetraList ();
-	}
-
-	dgBigVector CalculateGridSize (const dgMeshEffect* const mesh, dgFloat64 cellsize)
-	{
-		dgBigVector minBox;
-		dgBigVector maxBox;
-		mesh->CalculateAABB(minBox, maxBox);
-		minBox -= (maxBox - minBox).Scale3(dgFloat64(1.e-3f));
-		maxBox += (maxBox - minBox).Scale3(dgFloat64(1.e-3f));
-
-		dgBigVector mMinInt((minBox.Scale4(dgFloat64(1.0f) / cellsize)).Floor());
-		dgBigVector mMaxInt((maxBox.Scale4(dgFloat64(1.0f) / cellsize)).Floor() + dgBigVector::m_one);
-
-		dgBigVector gridSize(mMaxInt - mMinInt + dgBigVector::m_one);
-		m_gridSizeX = dgInt32(gridSize.m_x);
-		m_gridSizeY = dgInt32(gridSize.m_y);
-		m_gridSizeZ = dgInt32(gridSize.m_z);
-		return minBox;
-	}
-
-	void PopulatePointCrid (const dgBigVector& origin, dgFloat64 cellsize)
-	{
-		m_pointCount = 0;
-		m_points.Resize(m_gridSizeX * m_gridSizeY * m_gridSizeZ + (m_gridSizeX + 1) * (m_gridSizeY + 1) * (m_gridSizeZ + 1));
-		for (dgInt32 z = 0; z < m_gridSizeZ; z++) {
-			for (dgInt32 y = 0; y < m_gridSizeY; y++) {
-				for (dgInt32 x = 0; x < m_gridSizeX; x++) {
-					m_points[m_pointCount] = origin + dgBigVector(x*cellsize, y*cellsize, z*cellsize, dgFloat64(0.0f));
-					m_pointCount++;
-				}
-			}
-		}
-
-		dgBigVector outerOrigin (origin - dgBigVector (cellsize * dgFloat64 (0.5f)));
-		for (dgInt32 z = 0; z < m_gridSizeZ + 1; z++) {
-			for (dgInt32 y = 0; y < m_gridSizeY + 1; y++) {
-				for (dgInt32 x = 0; x < m_gridSizeX + 1; x++) {
-					m_points[m_pointCount] = outerOrigin + dgBigVector(x*cellsize, y*cellsize, z*cellsize, dgFloat64(0.0f));
-					m_pointCount++;
-				}
-			}
-		}
-	}
-
-	void BuildTetraList ()
-	{
-		const dgInt32 base = m_gridSizeX * m_gridSizeY * m_gridSizeZ;
-		for (dgInt32 z = 0; z < m_gridSizeZ; z++) {
-			for (dgInt32 y = 0; y < m_gridSizeY; y++) {
-				for (dgInt32 x = 0; x < m_gridSizeX - 1; x++) {
-					dgTetrahedra tetra;
-					tetra[0] = ((z * m_gridSizeY + y) * m_gridSizeX) + x;
-					tetra[1] = ((z * m_gridSizeY + y) * m_gridSizeX) + x + 1;
-					tetra[2] = base + (((z + 0) * (m_gridSizeY + 1) + y + 0) * (m_gridSizeX + 1)) + x + 1;
-					tetra[3] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
-					dgAssert (TestVolume(tetra));
-					m_tetraList.Append(tetra);
-
-					tetra[0] = ((z * m_gridSizeY + y) * m_gridSizeX) + x;
-					tetra[1] = ((z * m_gridSizeY + y) * m_gridSizeX) + x + 1;
-					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 0) * (m_gridSizeX + 1)) + x + 1;
-					tetra[2] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
-					dgAssert(TestVolume(tetra));
-					m_tetraList.Append(tetra);
-				}
-			}
-		}
-
-		for (dgInt32 z = 0; z < m_gridSizeZ; z++) {
-			for (dgInt32 y = 0; y < m_gridSizeY - 1; y++) {
-				for (dgInt32 x = 0; x < m_gridSizeX; x++) {
-					dgTetrahedra tetra;
-					tetra[0] = ((z * m_gridSizeY + (y + 0)) * m_gridSizeX) + x;
-					tetra[1] = ((z * m_gridSizeY + (y + 1)) * m_gridSizeX) + x;
-					tetra[3] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
-					tetra[2] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
-					dgAssert(TestVolume(tetra));
-					m_tetraList.Append(tetra);
-
-					tetra[0] = ((z * m_gridSizeY + (y + 0)) * m_gridSizeX) + x;
-					tetra[1] = ((z * m_gridSizeY + (y + 1)) * m_gridSizeX) + x;
-					tetra[2] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
-					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
-					dgAssert(TestVolume(tetra));
-					m_tetraList.Append(tetra);
-				}
-			}
-		}
-
-		for (dgInt32 z = 0; z < m_gridSizeZ - 1; z++) {
-			for (dgInt32 y = 0; y < m_gridSizeY; y++) {
-				for (dgInt32 x = 0; x < m_gridSizeX; x++) {
-					dgTetrahedra tetra;
-					tetra[0] = (((z + 0) * m_gridSizeY + y + 0) * m_gridSizeX) + x;
-					tetra[1] = (((z + 1) * m_gridSizeY + y + 0) * m_gridSizeX) + x;
-					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 0) * (m_gridSizeX + 1)) + x + 0;
-					tetra[2] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
-					dgAssert(TestVolume(tetra));
-					m_tetraList.Append(tetra);
-
-					tetra[0] = (((z + 0) * m_gridSizeY + y + 0) * m_gridSizeX) + x;
-					tetra[1] = (((z + 1) * m_gridSizeY + y + 0) * m_gridSizeX) + x;
-					tetra[2] = base + (((z + 1) * (m_gridSizeY + 1) + y + 0) * (m_gridSizeX + 1)) + x + 1;
-					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
-					dgAssert(TestVolume(tetra));
-					m_tetraList.Append(tetra);
-				}
-			}
-		}
-
-		for (dgInt32 z = 0; z < m_gridSizeZ; z++) {
-			for (dgInt32 y = 0; y < m_gridSizeY - 1; y++) {
-				for (dgInt32 x = 0; x < m_gridSizeX; x++) {
-					dgTetrahedra tetra;
-					tetra[0] = ((z * m_gridSizeY + (y + 0)) * m_gridSizeX) + x;
-					tetra[1] = ((z * m_gridSizeY + (y + 1)) * m_gridSizeX) + x;
-					tetra[2] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
-					tetra[3] = base + (((z + 1) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
-					dgAssert(TestVolume(tetra));
-					m_tetraList.Append(tetra);
-
-					tetra[0] = ((z * m_gridSizeY + (y + 0)) * m_gridSizeX) + x;
-					tetra[1] = ((z * m_gridSizeY + (y + 1)) * m_gridSizeX) + x;
-					tetra[3] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 0;
-					tetra[2] = base + (((z + 0) * (m_gridSizeY + 1) + y + 1) * (m_gridSizeX + 1)) + x + 1;
-					dgAssert(TestVolume(tetra));
-					m_tetraList.Append(tetra);
-				}
-			}
-		}
-	}
-
-	bool TestVolume (const dgTetrahedra& tetra) const
-	{
-		const dgBigVector& p0 = m_points[tetra[0]];
-		const dgBigVector& p1 = m_points[tetra[1]];
-		const dgBigVector& p2 = m_points[tetra[2]];
-		const dgBigVector& p3 = m_points[tetra[3]];
-		dgBigVector p10(p1 - p0);
-		dgBigVector p20(p2 - p0);
-		dgBigVector p30(p3 - p0);
-		return p10.DotProduct3(p20.CrossProduct3(p30)) > dgFloat64 (0.0f);
-	}
-
-	dgArray<dgBigVector> m_points;
-	dgList<dgTetrahedra> m_tetraList;
-	dgInt32 m_pointCount;
-	dgInt32 m_gridSizeX;
-	dgInt32 m_gridSizeY;
-	dgInt32 m_gridSizeZ;
-};
 
 dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
 {
@@ -508,14 +612,14 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
 	dgTetraIsoSufaceStuffing tetraIsoStuffing (&copy, dgFloat64(0.5f));
 
 	dgMeshEffect* delaunayPartition = NULL;
-	if (tetraIsoStuffing.m_tetraList.GetCount()) {
+	if (tetraIsoStuffing.m_tetraCount) {
 		dgMemoryAllocator* const allocator = GetAllocator();
 		delaunayPartition = new (allocator) dgMeshEffect (allocator);
 		delaunayPartition->BeginBuild();
 		dgInt32 layer = 0;
 		dgBigVector pointArray[4];
-		for (dgList<dgTetraIsoSufaceStuffing::dgTetrahedra>::dgListNode* tetNode = tetraIsoStuffing.m_tetraList.GetFirst(); tetNode; tetNode = tetNode->GetNext()) {
-			dgTetraIsoSufaceStuffing::dgTetrahedra& tetra = tetNode->GetInfo();
+		for (dgInt32 j = 0; j < tetraIsoStuffing.m_tetraCount; j ++) {
+			dgTetraIsoSufaceStuffing::dgTetrahedra& tetra = tetraIsoStuffing.m_tetraList[j];
 			for (dgInt32 i = 0; i < 4; i ++) {
 				dgInt32 index = tetra[i];
 				pointArray[i] = tetraIsoStuffing.m_points[index];

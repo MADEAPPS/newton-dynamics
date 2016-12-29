@@ -111,11 +111,8 @@ class dgHACDCluster: public dgList<dgHACDClusterFace>
 
 
 class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge> 
-//	,public dgAABBPolygonSoup 
-//	,public dgMeshEffect::dgMeshBVH
 {
 	public:
-
 	class dgHACDConveHull: public dgConvexHull3d
 	{
 		class dgConvexHullRayCastData
