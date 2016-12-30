@@ -52,7 +52,7 @@ class dgTetraIsoSufaceStuffing
 		dgInt32 m_outerSize;
 	};
 
-	template<dgInt32 size>
+	template<class T, dgInt32 size>
 	class dgAssessor 
 	{
 		public:
@@ -66,20 +66,21 @@ class dgTetraIsoSufaceStuffing
 			return m_count; 
 		}
 
-		const dgInt32& operator[] (dgInt32 i) const
+		const T& operator[] (dgInt32 i) const
 		{
 			dgAssert(i >= 0);
 			dgAssert(i < size);
 			return m_elements[i];
 		}
-		dgInt32& operator[] (dgInt32 i)
+
+		T& operator[] (dgInt32 i)
 		{
 			dgAssert (i >= 0);
 			dgAssert (i < size);
 			return m_elements[i];
 		}
 
-		void PushBack (const dgInt32 data)
+		void PushBack (const T data)
 		{
 			dgAssert(m_count >= 0);
 			dgAssert(m_count < size);
@@ -88,12 +89,13 @@ class dgTetraIsoSufaceStuffing
 		}
 
 		private:
+		T m_elements[size];
 		dgInt32 m_count;
-		dgInt32 m_elements[size];
 	};
 
-	typedef dgAssessor<4> dgTetrahedra; 
-	typedef dgAssessor<16> dgTetraToVertexNode; 
+	typedef dgAssessor<dgInt32, 4> dgTetrahedra; 
+	typedef dgAssessor<dgFloat32, 6> dgTetraEdgeCuts; 
+	typedef dgAssessor<dgInt32, 16> dgTetraToVertexNode; 
 
 	class dgNormalMap
 	{
@@ -159,7 +161,7 @@ class dgTetraIsoSufaceStuffing
 		dgInt32 m_count;
 	};
 
-	class dgRayTracer: public dgMeshEffect::dgMeshBVH
+	class dgRayTraceAccelerator: public dgMeshEffect::dgMeshBVH
 	{
 		enum dgTraceType
 		{
@@ -190,7 +192,7 @@ class dgTetraIsoSufaceStuffing
 		};
 
 		public:
-		dgRayTracer(dgMeshEffect* const mesh, dgFloat64 diameter)
+		dgRayTraceAccelerator(dgMeshEffect* const mesh, dgFloat64 diameter)
 			:dgMeshEffect::dgMeshBVH(mesh)
 			,m_normals()
 			,m_diameter(diameter)
@@ -268,7 +270,7 @@ class dgTetraIsoSufaceStuffing
 			return dgFloat64 (-1.0f);
 		}
 
-		dgVertexSign CalculateVertexSign (const dgBigVector& point0) const
+		dgVertexSign CalculateVertexSide (const dgBigVector& point0) const
 		{
 			dgRayTracePointSide hits;
 			for (dgInt32 i = 0; (i < m_normals.m_count) && hits.m_rayIsDegenerate; i ++) {
@@ -281,6 +283,11 @@ class dgTetraIsoSufaceStuffing
 			return (hits.m_hitCount & 1) ? m_inside : m_outside;
 		}
 
+		dgFloat32 CalculateEdgeCut (const dgBigVector& point0, const dgBigVector& point1) const
+		{
+			return 0.0f;
+		}
+
 		dgNormalMap m_normals;
 		dgFloat64 m_diameter;
 	};
@@ -291,40 +298,63 @@ class dgTetraIsoSufaceStuffing
 		,m_pointCount(0)
 		,m_tetraCount(0)
 	{
+		dgArray<dgVertexSign> vertexSide(mesh->GetAllocator());
+		dgArray<dgTetraToVertexNode> tetraGraph(mesh->GetAllocator());
+		dgArray<dgTetraEdgeCuts> tetraEdgeCuts(mesh->GetAllocator());
+
 		dgGridDimension gridDim (CalculateGridSize(mesh, cellSize));
-		dgRayTracer rayTrace (mesh, gridDim.m_diameter);
-		dgArray<dgVertexSign> vertexSigns (mesh->GetAllocator());
-		dgArray<dgTetraToVertexNode> tetraGraph (mesh->GetAllocator());
+		dgRayTraceAccelerator rayAccelerator (mesh, gridDim.m_diameter);
 		
 		PopulateGridPoints (gridDim);
-		CalculateVertexSigns (vertexSigns, rayTrace);
-		BuildTetraList (gridDim, vertexSigns, tetraGraph);
+		CalculateVertexSide (vertexSide, rayAccelerator);
+		BuildTetraGraph (gridDim, vertexSide, tetraGraph);
+		CalculateEdgeCuts (tetraEdgeCuts, tetraGraph, vertexSide, rayAccelerator);
 	}
 
-	void CalculateVertexSigns (dgArray<dgVertexSign>& vertexSigns, const dgRayTracer& rayTrace)
+	void CalculateEdgeCuts (dgArray<dgTetraEdgeCuts>& tetraEdgeCuts, const dgArray<dgTetraToVertexNode>& tetraGraph, const dgArray<dgVertexSign>& vertexSide, const dgRayTraceAccelerator& rayAccelerator)
 	{
-		vertexSigns.Resize(m_pointCount);
-		for (dgInt32 i = 0; i < m_pointCount; i ++) {
-			vertexSigns[i] = rayTrace.CalculateVertexSign (m_points[i]);
-		}
-
-/*
-		for (dgInt32 i = 0; i < m_pointCount; i ++) {
-			const dgTetraToVertexNode& graphNode = tetraGraph[i];
-			for (dgInt32 j = 0; j < graphNode.GetCount(); j ++) {
-				dgInt32 tetraIndex = graphNode[j];
-				const dgTetrahedra& tetra = m_tetraList[tetraIndex];
-				dgAssert ((tetra[0] == i) || (tetra[1] == i) || (tetra[2] == i) || (tetra[3] == i));
-				RayTraceTetra (vertexSigns, rayTrace, tetra);
+		tetraEdgeCuts.Resize(m_tetraCount);
+		for (dgInt32 i = 0; i < m_tetraCount; i ++) {
+			tetraEdgeCuts[i] = dgTetraEdgeCuts();
+			for (dgInt32 j = 0; j < 6; j ++) {
+				tetraEdgeCuts[i].PushBack(dgFloat32(-1.0f));
 			}
 		}
-*/
+
+		for (dgInt32 i = 0; i < m_pointCount; i ++) {
+			if (vertexSide[i] == m_outside) {
+				const dgTetraToVertexNode& graphNode = tetraGraph[i];
+				for (dgInt32 j = 0; j < graphNode.GetCount(); j ++) {
+					dgTetraEdgeCuts& cuts = tetraEdgeCuts[graphNode[j]];
+					const dgTetrahedra& tetra = m_tetraList[graphNode[j]];
+					dgAssert ((tetra[0] == i) || (tetra[1] == i) || (tetra[2] == i) || (tetra[3] == i));
+					
+					dgInt32 index = 0;
+					for (dgInt32 i0 = 0; i0 < 3; i0 ++) {
+						const dgBigVector& p0 = m_points[tetra[i0]];
+						for (dgInt32 i1 = i0 + 1; i1 < 4; i1 ++) {
+							if ((tetra[i0] == i) && (vertexSide[tetra[i1]] == m_inside)) {
+								const dgBigVector& p1 = m_points[tetra[i1]];
+								dgFloat32 param = rayAccelerator.CalculateEdgeCut (p0, p1);
+								cuts[index] = param;
+							}
+							index ++;
+							dgAssert (index <= 6);
+						}
+					}
+				}
+			}
+		}
 	}
-/*
-	void RayTraceTetra (dgArray<dgVertexSign>& vertexSigns, const dgRayTracer& rayTrace, const dgTetrahedra& tetra)
+
+	void CalculateVertexSide (dgArray<dgVertexSign>& vertexSide, const dgRayTraceAccelerator& rayAccelerator)
 	{
+		vertexSide.Resize(m_pointCount);
+		for (dgInt32 i = 0; i < m_pointCount; i ++) {
+			vertexSide[i] = rayAccelerator.CalculateVertexSide (m_points[i]);
+		}
 	}
-*/
+
 	dgGridDimension CalculateGridSize(const dgMeshEffect* const mesh, dgFloat64 cellsize) const
 	{
 		dgBigVector minBox;
@@ -396,7 +426,7 @@ class dgTetraIsoSufaceStuffing
 		}
 	}
 
-	void BuildTetraList(const dgGridDimension& gridDimension, const dgArray<dgVertexSign>& vertexSigns, dgArray<dgTetraToVertexNode>& graph)
+	void BuildTetraGraph(const dgGridDimension& gridDimension, const dgArray<dgVertexSign>& vertexSigns, dgArray<dgTetraToVertexNode>& graph)
 	{
 		graph.Resize(m_pointCount);
 		for (dgInt32 i = 0; i < m_pointCount; i ++) {

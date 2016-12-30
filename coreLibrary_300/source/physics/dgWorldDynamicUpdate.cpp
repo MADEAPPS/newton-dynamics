@@ -171,7 +171,8 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	dgBodyMasterList& masterList = *world;
 
 	dgAssert (masterList.GetFirst()->GetInfo().GetBody() == world->m_sentinelBody);
-	world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(2 * (masterList.m_constraintCount + 1024), sizeof (dgDynamicBody*));
+	//world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(2 * (masterList.m_constraintCount + 1024), sizeof (dgDynamicBody*));
+	world->m_solverJacobiansMemory.ResizeIfNecessary ((2 * (masterList.m_constraintCount + 1024)) * sizeof (dgDynamicBody*));
 	dgDynamicBody** const stackPoolBuffer = (dgDynamicBody**)&world->m_solverJacobiansMemory[0];
 
 	for (dgBodyMasterList::dgListNode* node = masterList.GetLast(); node; node = node->GetPrev()) {
@@ -216,7 +217,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	world->m_clusterLRU ++;
 
 	queueBuffer[0] = body;
-	world->m_bodiesMemory.ExpandCapacityIfNeessesary(m_bodies, sizeof (dgBodyInfo));
+	//world->m_bodiesMemory.ExpandCapacityIfNeessesary(m_bodies, sizeof (dgBodyInfo));
+	world->m_bodiesMemory.ResizeIfNecessary (m_bodies * sizeof (dgBodyInfo));
 	dgBodyInfo* const bodyArray0 = (dgBodyInfo*)&world->m_bodiesMemory[0];
 
 	bodyArray0[m_bodies].m_body = world->m_sentinelBody;
@@ -235,7 +237,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			dgAssert(srcBody->m_masterNode);
 
 			dgInt32 bodyIndex = m_bodies + bodyCount;
-			world->m_bodiesMemory.ExpandCapacityIfNeessesary(bodyIndex, sizeof (dgBodyInfo));
+			//world->m_bodiesMemory.ExpandCapacityIfNeessesary(bodyIndex, sizeof (dgBodyInfo));
+			world->m_bodiesMemory.ResizeIfNecessary (bodyIndex * sizeof (dgBodyInfo));
 			dgBodyInfo* const bodyArray1 = (dgBodyInfo*)&world->m_bodiesMemory[0];
 			bodyArray1[bodyIndex].m_body = srcBody;
 			isInEquilibrium &= srcBody->m_equilibrium;
@@ -266,7 +269,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 					bool check1 = constraint->m_dynamicsLru != lruMark;
 					if (check1) {
 						const dgInt32 jointIndex = m_joints + jointCount;
-						world->m_jointsMemory.ExpandCapacityIfNeessesary(jointIndex, sizeof (dgJointInfo));
+						//world->m_jointsMemory.ExpandCapacityIfNeessesary(jointIndex, sizeof (dgJointInfo));
+						world->m_jointsMemory.ResizeIfNecessary (jointIndex * sizeof (dgJointInfo));
 						dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
 
 						constraint->m_index = jointCount;
@@ -338,7 +342,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			}
 		}
 
-		world->m_clusterMemory.ExpandCapacityIfNeessesary (m_clusters + 1, sizeof (dgBodyCluster));
+		//world->m_clusterMemory.ExpandCapacityIfNeessesary (m_clusters + 1, sizeof (dgBodyCluster));
+		world->m_clusterMemory.ResizeIfNecessary  ((m_clusters + 1) * sizeof (dgBodyCluster));
 		m_clusterMemory = (dgBodyCluster*) &world->m_clusterMemory[0];
 		dgBodyCluster& cluster = m_clusterMemory[m_clusters];
 
@@ -511,7 +516,7 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 							dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
 							//dgAssert (!nextInfo->m_isInQueueFrontier);
 							if (!nextInfo->m_isInQueueFrontier) {
-							queue.Insert(nextInfo);
+								queue.Insert(nextInfo);
 								nextInfo->m_isInQueueFrontier = 1;
 							}
 						}
@@ -528,7 +533,7 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 							dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
 //							dgAssert (!nextInfo->m_isInQueueFrontier);
 							if (!nextInfo->m_isInQueueFrontier) {
-							queue.Insert(nextInfo);
+								queue.Insert(nextInfo);
 								nextInfo->m_isInQueueFrontier = 1;
 							}
 						}
@@ -847,10 +852,12 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 
 void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes)
 {
-	world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(rowsCount, sizeof (dgJacobianMatrixElement));
+	//world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(rowsCount, sizeof (dgJacobianMatrixElement));
+	world->m_solverJacobiansMemory.ResizeIfNecessary (rowsCount * sizeof (dgJacobianMatrixElement));
 	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobiansMemory[0];
 
-	world->m_solverForceAccumulatorMemory.ExpandCapacityIfNeessesary(bodyCount + 8, sizeof (dgJacobian));
+	//world->m_solverForceAccumulatorMemory.ExpandCapacityIfNeessesary(bodyCount + 8, sizeof (dgJacobian));
+	world->m_solverForceAccumulatorMemory.ResizeIfNecessary ((bodyCount + 8) * sizeof (dgJacobian));
 	m_internalForcesBuffer = (dgJacobian*)&world->m_solverForceAccumulatorMemory[0];
 	dgAssert(bodyCount <= (((world->m_solverForceAccumulatorMemory.GetBytesCapacity() - 16) / dgInt32(sizeof (dgJacobian))) & (-8)));
 

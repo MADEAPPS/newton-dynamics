@@ -210,7 +210,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	:dgBodyMasterList(allocator)
 	,dgBodyMaterialList(allocator)
 	,dgBodyCollisionList(allocator)
-//	,dgDeformableBodiesUpdate(allocator)
 	,dgSkeletonList(allocator)
 	,dgActiveContacts(allocator) 
 	,dgWorldDynamicUpdate()
@@ -233,6 +232,13 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 {
 	dgMutexThread* const mutexThread = this;
 	SetMatertThread (mutexThread);
+
+	// avoid small memory fragmentations on initialization
+	m_bodiesMemory.Resize(1024 * 32);
+	m_jointsMemory.Resize(1024 * 32);
+	m_clusterMemory.Resize(1024 * 32);
+	m_solverJacobiansMemory.Resize(1024 * 64);
+	m_solverForceAccumulatorMemory.Resize(1024 * 32);
 
 	m_savetimestep = dgFloat32 (0.0f);
 	m_allocator = allocator;
