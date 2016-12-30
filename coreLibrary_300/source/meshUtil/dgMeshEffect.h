@@ -285,9 +285,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 		virtual void Build ();
 		virtual void Cleanup ();
-
+		
+		void FaceRayCast (const dgBigVector& l0, const dgBigVector& l1, void* const userData) const;
 		void GetOverlapNodes (dgList<dgMeshBVHNode*>& overlapNodes, const dgBigVector& p0, const dgBigVector& p1) const;
-		dgMeshBVHNode* FaceRayCast (const dgBigVector& l0, const dgBigVector& l1, dgFloat64& paramOut, bool doubleSidedFaces) const;
 
 		protected:
 		dgMeshBVHNode* AddFaceNode (dgEdge* const face, void* const userData);
@@ -297,9 +297,11 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgFloat32 CalculateSurfaceArea (dgMeshBVHNode* const node0, dgMeshBVHNode* const node1, dgVector& minBox, dgVector& maxBox) const;
 		virtual bool SanityCheck() const;
 
-		virtual dgFloat64 VertexRayCast (const dgBigVector& l0, const dgBigVector& l1) const;
-		virtual dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, bool dobleSidedFaces) const;
-		virtual bool RayRayIntersect (dgEdge* const edge, const dgMeshEffect* const otherMesh, dgEdge* const otherEdge, dgFloat64& param, dgFloat64& otherParam) const;
+		virtual dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, void* const userData) const;
+
+//		virtual dgFloat64 VertexRayCast (const dgBigVector& l0, const dgBigVector& l1) const;
+
+//		virtual bool RayRayIntersect (dgEdge* const edge, const dgMeshEffect* const otherMesh, dgEdge* const otherEdge, dgFloat64& param, dgFloat64& otherParam) const;
 		
 		dgMeshEffect* m_mesh;
 		dgMeshBVHNode* m_rootNode;

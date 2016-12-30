@@ -957,10 +957,11 @@ void dgMeshEffect::dgMeshBVH::GetOverlapNodes (dgList<dgMeshBVHNode*>& overlapNo
 	}
 }
 
+/*
 dgFloat64 dgMeshEffect::dgMeshBVH::VertexRayCast (const dgBigVector& p0, const dgBigVector& p1) const
 {
 	dgAssert (0);
-/*
+
 	dgMeshBVHNode* stackPool[DG_MESH_EFFECT_BVH_STACK_DEPTH];
 
 	dgInt32 stack = 1;
@@ -1009,16 +1010,14 @@ dgFloat64 dgMeshEffect::dgMeshBVH::VertexRayCast (const dgBigVector& p0, const d
 			}
 		}
 	}
-*/
 	return 1.2f;
 }
-
 
 
 bool dgMeshEffect::dgMeshBVH::RayRayIntersect (dgEdge* const edge, const dgMeshEffect* const otherMesh, dgEdge* const otherEdge, dgFloat64& param, dgFloat64& otherParam) const
 {
 	dgAssert (0);
-/*
+
 	dgBigVector ray_p0 (m_mesh->m_points[edge->m_incidentVertex]);
 	dgBigVector ray_p1 (m_mesh->m_points[edge->m_twin->m_incidentVertex]);
 
@@ -1062,13 +1061,16 @@ bool dgMeshEffect::dgMeshBVH::RayRayIntersect (dgEdge* const edge, const dgMeshE
 		param = t / den;
 		otherParam = s / den;
 	}
-*/
 	return true;
 }
+*/
 
 
-dgFloat64 dgMeshEffect::dgMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const faceNode, const dgBigVector& p0, const dgBigVector& p1, bool doubleSidedFaces) const
+dgFloat64 dgMeshEffect::dgMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const faceNode, const dgBigVector& p0, const dgBigVector& p1, void* const userData) const
 {
+	dgAssert (0);
+	return 0;
+/*
 	dgBigVector normal (m_mesh->FaceNormal(faceNode->m_face, m_mesh->GetVertexPool(), sizeof(dgBigVector)));
 
 	dgBigVector diff (p1 - p0);
@@ -1125,10 +1127,11 @@ dgFloat64 dgMeshEffect::dgMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const 
 		tOut = 2.0f;
 	}
 	return tOut;
+*/
 }
 
 
-dgMeshEffect::dgMeshBVH::dgMeshBVHNode* dgMeshEffect::dgMeshBVH::FaceRayCast (const dgBigVector& p0, const dgBigVector& p1, dgFloat64& paramOut, bool doubleSidedFaces) const
+void dgMeshEffect::dgMeshBVH::FaceRayCast (const dgBigVector& p0, const dgBigVector& p1, void* const userData) const
 {
 	dgMeshBVHNode* stackPool[DG_MESH_EFFECT_BVH_STACK_DEPTH];
 
@@ -1146,17 +1149,17 @@ dgMeshEffect::dgMeshBVH::dgMeshBVHNode* dgMeshEffect::dgMeshBVH::FaceRayCast (co
 	while (stack) {
 		stack --;
 		dgMeshBVHNode* const me = stackPool[stack];
-
 		if (me && ray.BoxTest (me->m_p0, me->m_p1)) {
-
 			if (!me->m_left) {
 				dgAssert (!me->m_right);
-				dgFloat64 param = RayFaceIntersect (me, p0, p1, doubleSidedFaces);
+				dgFloat64 param = RayFaceIntersect (me, p0, p1, userData);
+				if (param < dgFloat64 (0.0f)) {
+					break;
+				}
 				if (param < maxParam) {
 					node = me;
 					maxParam = param;
 				}
-
 			} else {
 				dgAssert (me->m_left);
 				dgAssert (me->m_right);
@@ -1170,9 +1173,6 @@ dgMeshEffect::dgMeshBVH::dgMeshBVHNode* dgMeshEffect::dgMeshBVH::FaceRayCast (co
 			}
 		}
 	}
-
-	paramOut = maxParam;
-	return node;
 }
 
 

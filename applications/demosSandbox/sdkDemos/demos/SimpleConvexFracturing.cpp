@@ -24,7 +24,7 @@
 
 class FractureAtom
 {
-public:
+	public:
 	FractureAtom()
 		:m_centerOfMass(0.0f)
 		, m_momentOfInirtia(0.0f)
@@ -40,23 +40,23 @@ public:
 
 class FractureEffect: public dList<FractureAtom>
 {
-public:
+	public:
 	FractureEffect(NewtonWorld* const world)
 		:dList<FractureAtom>()
-		, m_world(world)
+		,m_world(world)
 	{
-		}
+	}
 
 	FractureEffect(const FractureEffect& list)
 		:dList<FractureAtom>()
-		, m_world(list.m_world)
+		,m_world(list.m_world)
 	{
-			for (dListNode* node = list.GetFirst(); node; node = node->GetNext()) {
-				FractureAtom& atom = Append(node->GetInfo())->GetInfo();
-				atom.m_mesh->AddRef();
-				atom.m_collision = NewtonCollisionCreateInstance(atom.m_collision);
-			}
+		for (dListNode* node = list.GetFirst(); node; node = node->GetNext()) {
+			FractureAtom& atom = Append(node->GetInfo())->GetInfo();
+			atom.m_mesh->AddRef();
+			atom.m_collision = NewtonCollisionCreateInstance(atom.m_collision);
 		}
+	}
 
 	virtual ~FractureEffect()
 	{
@@ -70,10 +70,179 @@ public:
 	NewtonWorld* m_world;
 };
 
-class DelaunayFractureEffect: public FractureEffect
+class SimpleFracturedEffectEntity: public DemoEntity
 {
-        public:
-	DelaunayFractureEffect(NewtonWorld* const world, NewtonMesh* const mesh, int interiorMaterial)
+	public:
+	SimpleFracturedEffectEntity(DemoMesh* const mesh, const FractureEffect& columnDebris)
+		:DemoEntity(dGetIdentityMatrix(), NULL), m_delay(INITIAL_DELAY), m_effect(columnDebris), m_myBody(NULL)
+	{
+		SetMesh(mesh, dGetIdentityMatrix());
+	}
+
+	~SimpleFracturedEffectEntity()
+	{
+	}
+
+	void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep)
+	{
+		// see if the net force on the body comes fr a high impact collision
+		dFloat breakImpact = 0.0f;
+		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(m_myBody); joint; joint = NewtonBodyGetNextContactJoint(m_myBody, joint)) {
+			for (void* contact = NewtonContactJointGetFirstContact(joint); contact; contact = NewtonContactJointGetNextContact(joint, contact)) {
+				dVector contactForce;
+				NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+				dFloat impulseImpact = NewtonMaterialGetContactMaxNormalImpact(material);
+				if (impulseImpact > breakImpact) {
+					breakImpact = impulseImpact;
+				}
+			}
+		}
+
+
+		// if the force is bigger than N time Gravities, It is considered a collision force
+		breakImpact *= m_myMassInverse;
+		breakImpact = 1000.0f;
+		if (breakImpact > BREAK_IMPACT_IN_METERS_PER_SECONDS) {
+			NewtonWorld* const world = NewtonBodyGetWorld(m_myBody);
+
+			dMatrix bodyMatrix;
+			dVector com(0.0f);
+			dVector veloc(0.0f);
+			dVector omega(0.0f);
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+
+			NewtonBodyGetVelocity(m_myBody, &veloc[0]);
+			NewtonBodyGetOmega(m_myBody, &omega[0]);
+			NewtonBodyGetCentreOfMass(m_myBody, &com[0]);
+			NewtonBodyGetMatrix(m_myBody, &bodyMatrix[0][0]);
+			NewtonBodyGetMass(m_myBody, &mass, &Ixx, &Iyy, &Izz);
+
+			com = bodyMatrix.TransformVector(com);
+			dMatrix matrix(GetCurrentMatrix());
+			dQuaternion rotation(matrix);
+
+			// we need to lock the world before creation a bunch of bodies
+			scene->Lock(m_lock);
+
+			for (FractureEffect::dListNode* node = m_effect.GetFirst(); node; node = node->GetNext()) {
+				FractureAtom& atom = node->GetInfo();
+
+				DemoEntity* const entity = new DemoEntity(dMatrix(rotation, matrix.m_posit), NULL);
+				entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
+				scene->Append(entity);
+
+				int materialId = 0;
+
+				dFloat debriMass = mass * atom.m_massFraction;
+
+				//create the rigid body
+				NewtonBody* const rigidBody = NewtonCreateDynamicBody(world, atom.m_collision, &matrix[0][0]);
+
+				// calculate debris initial velocity
+				dVector center(matrix.TransformVector(atom.m_centerOfMass));
+				dVector v(veloc + omega.CrossProduct(center - com));
+
+				// set initial velocity
+				NewtonBodySetVelocity(rigidBody, &v[0]);
+				NewtonBodySetOmega(rigidBody, &omega[0]);
+
+				// set the debris mass properties, mass, center of mass, and inertia 
+				NewtonBodySetMassProperties(rigidBody, debriMass, atom.m_collision);
+
+				// save the pointer to the graphic object with the body.
+				NewtonBodySetUserData(rigidBody, entity);
+
+				// assign the wood id
+				NewtonBodySetMaterialGroupID(rigidBody, materialId);
+
+				//  set continuous collision mode
+				//	NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
+
+				// set a destructor for this rigid body
+				NewtonBodySetDestructorCallback(rigidBody, PhysicsBodyDestructor);
+
+				// set the transform call back function
+				NewtonBodySetTransformCallback(rigidBody, DemoEntity::TransformCallback);
+
+				// set the force and torque call back function
+				NewtonBodySetForceAndTorqueCallback(rigidBody, PhysicsApplyGravityForce);
+			}
+
+			NewtonDestroyBody(m_myBody);
+			scene->RemoveEntity(mynode);
+
+			// unlock the work after done with the effect 
+			scene->Unlock(m_lock);
+		}
+	}
+
+	static void AddFracturedEntity(DemoEntityManager* const scene, DemoMesh* const visualMesh, NewtonCollision* const collision, const FractureEffect& fractureEffect, const dVector& location)
+	{
+		dQuaternion rotation;
+		SimpleFracturedEffectEntity* const entity = new SimpleFracturedEffectEntity(visualMesh, fractureEffect);
+		entity->SetMatrix(*scene, rotation, location);
+		entity->InterpolateMatrix(*scene, 1.0f);
+		scene->Append(entity);
+
+		dVector origin(0.0f);
+		dVector inertia(0.0f);
+		NewtonConvexCollisionCalculateInertialMatrix(collision, &inertia[0], &origin[0]);
+
+		dFloat mass = 10.0f;
+		int materialId = 0;
+
+		//create the rigid body
+		dMatrix matrix(dGetIdentityMatrix());
+		matrix.m_posit = location;
+
+		NewtonWorld* const world = scene->GetNewton();
+		NewtonBody* const rigidBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+
+		entity->m_myBody = rigidBody;
+		entity->m_myMassInverse = 1.0f / mass;
+
+		// set the correct center of gravity for this body
+		//NewtonBodySetCentreOfMass (rigidBody, &origin[0]);
+
+		// set the mass matrix
+		NewtonBodySetMassProperties(rigidBody, mass, collision);
+
+		// save the pointer to the graphic object with the body.
+		NewtonBodySetUserData(rigidBody, entity);
+
+		// assign the wood id
+		NewtonBodySetMaterialGroupID(rigidBody, materialId);
+
+		//  set continuous collision mode
+		//	NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
+
+		// set a destructor for this rigid body
+		NewtonBodySetDestructorCallback(rigidBody, PhysicsBodyDestructor);
+
+		// set the transform call back function
+		NewtonBodySetTransformCallback(rigidBody, DemoEntity::TransformCallback);
+
+		// set the force and torque call back function
+		NewtonBodySetForceAndTorqueCallback(rigidBody, PhysicsApplyGravityForce);
+	}
+
+
+	int m_delay;
+	FractureEffect m_effect;
+	NewtonBody* m_myBody;
+	dFloat m_myMassInverse;
+	static unsigned m_lock;
+};
+unsigned SimpleFracturedEffectEntity::m_lock;
+
+
+class DelaunayEffect: public FractureEffect
+{
+    public:
+	DelaunayEffect(NewtonWorld* const world, NewtonMesh* const mesh, int interiorMaterial)
 		:FractureEffect(world)
 	{
 		// first we populate the bounding Box area with few random point to get some interior subdivisions.
@@ -95,13 +264,7 @@ class DelaunayFractureEffect: public FractureEffect
 		NewtonDestroyCollision(collision1);
 
 		// now we call create we decompose the mesh into several convex pieces 
-#if 0
-		char name[2048];
-		dGetWorkingFileName("box.tet", name);
-		NewtonMesh* const debriMeshPieces = NewtonMeshLoadTetrahedraMesh(m_world, name);
-#else
 		NewtonMesh* const debriMeshPieces = NewtonMeshCreateTetrahedraIsoSurface(mesh);
-#endif
 		dAssert(debriMeshPieces);
 
 		// now we iterate over each pieces and for each one we create a visual entity and a rigid body
@@ -126,13 +289,53 @@ class DelaunayFractureEffect: public FractureEffect
 
 		NewtonMeshDestroy(debriMeshPieces);
 	}
+
+	static void AddFracturedPrimitive(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
+	{
+		// create the shape and visual mesh as a common data to be re used
+		NewtonWorld* const world = scene->GetNewton();
+		NewtonCollision* const collision = CreateConvexCollision(world, shapeOffsetMatrix, size, type, materialID);
+
+		// create a newton mesh from the collision primitive
+		NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
+
+		// apply a material map
+		int externalMaterial = LoadTexture("reljef.tga");
+		int internalMaterial = LoadTexture("concreteBrick.tga");
+		NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial);
+
+		// create a newton mesh from the collision primitive
+		DelaunayEffect fracture(world, mesh, internalMaterial);
+
+		DemoMesh* const visualMesh = new DemoMesh(mesh);
+
+		dFloat startElevation = 100.0f;
+		dMatrix matrix(dGetIdentityMatrix());
+		for (int i = 0; i < xCount; i++) {
+			dFloat x = origin.m_x + (i - xCount / 2) * spacing;
+			for (int j = 0; j < zCount; j++) {
+				dFloat z = origin.m_z + (j - zCount / 2) * spacing;
+
+				matrix.m_posit.m_x = x;
+				matrix.m_posit.m_z = z;
+				dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+				matrix.m_posit.m_y = floor.m_y + 1.0f;
+				SimpleFracturedEffectEntity::AddFracturedEntity(scene, visualMesh, collision, fracture, matrix.m_posit);
+			}
+		}
+
+		// do not forget to release the assets	
+		NewtonMeshDestroy(mesh);
+		visualMesh->Release();
+		NewtonDestroyCollision(collision);
+	}
 };
 
 
-class VoronoidFractureEffect: public FractureEffect
+class VoronoidEffect: public FractureEffect
 {
 	public:
-	VoronoidFractureEffect(NewtonWorld* const world, NewtonMesh* const mesh, int interiorMaterial)
+	VoronoidEffect(NewtonWorld* const world, NewtonMesh* const mesh, int interiorMaterial)
 		:FractureEffect(world)
 	{
 		// first we populate the bounding Box area with few random point to get some interior subdivisions.
@@ -211,262 +414,48 @@ class VoronoidFractureEffect: public FractureEffect
 
 		NewtonMeshDestroy(debriMeshPieces);
 	}
-};
 
-
-
-class SimpleFracturedEffectEntity: public DemoEntity
-{
-public:
-	SimpleFracturedEffectEntity(DemoMesh* const mesh, const FractureEffect& columnDebris)
-		:DemoEntity(dGetIdentityMatrix(), NULL), m_delay(INITIAL_DELAY), m_effect(columnDebris), m_myBody(NULL)
+	static void AddFracturedPrimitive(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
 	{
-		SetMesh(mesh, dGetIdentityMatrix());
-	}
+		// create the shape and visual mesh as a common data to be re used
+		NewtonWorld* const world = scene->GetNewton();
+		NewtonCollision* const collision = CreateConvexCollision(world, shapeOffsetMatrix, size, type, materialID);
 
-	~SimpleFracturedEffectEntity()
-	{
-	}
+		// create a newton mesh from the collision primitive
+		NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
 
+		// apply a material map
+		int externalMaterial = LoadTexture("reljef.tga");
+		//int internalMaterial = LoadTexture("KAMEN-stup.tga");
+		int internalMaterial = LoadTexture("concreteBrick.tga");
+		NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial);
 
-	void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep)
-	{
-		// see if the net force on the body comes fr a high impact collision
-		dFloat breakImpact = 0.0f;
-		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(m_myBody); joint; joint = NewtonBodyGetNextContactJoint(m_myBody, joint)) {
-			for (void* contact = NewtonContactJointGetFirstContact(joint); contact; contact = NewtonContactJointGetNextContact(joint, contact)) {
-				dVector contactForce;
-				NewtonMaterial* const material = NewtonContactGetMaterial(contact);
-				dFloat impulseImpact = NewtonMaterialGetContactMaxNormalImpact(material);
-				if (impulseImpact > breakImpact) {
-					breakImpact = impulseImpact;
-				}
+		// create a newton mesh from the collision primitive
+		VoronoidEffect fracture(world, mesh, internalMaterial);
+
+		DemoMesh* const visualMesh = new DemoMesh(mesh);
+
+		dFloat startElevation = 100.0f;
+		dMatrix matrix(dGetIdentityMatrix());
+		for (int i = 0; i < xCount; i++) {
+			dFloat x = origin.m_x + (i - xCount / 2) * spacing;
+			for (int j = 0; j < zCount; j++) {
+				dFloat z = origin.m_z + (j - zCount / 2) * spacing;
+
+				matrix.m_posit.m_x = x;
+				matrix.m_posit.m_z = z;
+				dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+				matrix.m_posit.m_y = floor.m_y + 1.0f;
+				SimpleFracturedEffectEntity::AddFracturedEntity(scene, visualMesh, collision, fracture, matrix.m_posit);
 			}
 		}
 
-
-		// if the force is bigger than N time Gravities, It is considered a collision force
-		breakImpact *= m_myMassInverse;
-		breakImpact = 1000.0f;
-		if (breakImpact > BREAK_IMPACT_IN_METERS_PER_SECONDS) {
-			NewtonWorld* const world = NewtonBodyGetWorld(m_myBody);
-
-			dMatrix bodyMatrix;
-			dVector com(0.0f);
-			dVector veloc(0.0f);
-			dVector omega(0.0f);
-			dFloat Ixx;
-			dFloat Iyy;
-			dFloat Izz;
-			dFloat mass;
-
-			NewtonBodyGetVelocity(m_myBody, &veloc[0]);
-			NewtonBodyGetOmega(m_myBody, &omega[0]);
-			NewtonBodyGetCentreOfMass(m_myBody, &com[0]);
-			NewtonBodyGetMatrix(m_myBody, &bodyMatrix[0][0]);
-			NewtonBodyGetMass(m_myBody, &mass, &Ixx, &Iyy, &Izz);
-
-			com = bodyMatrix.TransformVector(com);
-			dMatrix matrix(GetCurrentMatrix());
-			dQuaternion rotation(matrix);
-
-			// we need to lock the world before creation a bunch of bodies
-			scene->Lock(m_lock);
-
-			for (VoronoidFractureEffect::dListNode* node = m_effect.GetFirst(); node; node = node->GetNext()) {
-				FractureAtom& atom = node->GetInfo();
-
-				DemoEntity* const entity = new DemoEntity(dMatrix(rotation, matrix.m_posit), NULL);
-				entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
-				scene->Append(entity);
-
-				int materialId = 0;
-
-				dFloat debriMass = mass * atom.m_massFraction;
-
-				//create the rigid body
-				NewtonBody* const rigidBody = NewtonCreateDynamicBody(world, atom.m_collision, &matrix[0][0]);
-
-				// calculate debris initial velocity
-				dVector center(matrix.TransformVector(atom.m_centerOfMass));
-				dVector v(veloc + omega.CrossProduct(center - com));
-
-				// set initial velocity
-				NewtonBodySetVelocity(rigidBody, &v[0]);
-				NewtonBodySetOmega(rigidBody, &omega[0]);
-
-				// set the debris mass properties, mass, center of mass, and inertia 
-				NewtonBodySetMassProperties(rigidBody, debriMass, atom.m_collision);
-
-				// save the pointer to the graphic object with the body.
-				NewtonBodySetUserData(rigidBody, entity);
-
-				// assign the wood id
-				NewtonBodySetMaterialGroupID(rigidBody, materialId);
-
-				//  set continuous collision mode
-				//	NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
-
-				// set a destructor for this rigid body
-				NewtonBodySetDestructorCallback(rigidBody, PhysicsBodyDestructor);
-
-				// set the transform call back function
-				NewtonBodySetTransformCallback(rigidBody, DemoEntity::TransformCallback);
-
-				// set the force and torque call back function
-				NewtonBodySetForceAndTorqueCallback(rigidBody, PhysicsApplyGravityForce);
-			}
-
-			NewtonDestroyBody(m_myBody);
-			scene->RemoveEntity(mynode);
-
-			// unlock the work after done with the effect 
-			scene->Unlock(m_lock);
-		}
+		// do not forget to release the assets	
+		NewtonMeshDestroy(mesh);
+		visualMesh->Release();
+		NewtonDestroyCollision(collision);
 	}
-
-
-	int m_delay;
-	FractureEffect m_effect;
-	NewtonBody* m_myBody;
-	dFloat m_myMassInverse;
-
-	static unsigned m_lock;
 };
-
-unsigned SimpleFracturedEffectEntity::m_lock;
-
-
-static void AddFracturedEntity(DemoEntityManager* const scene, DemoMesh* const visualMesh, NewtonCollision* const collision, const FractureEffect& fractureEffect, const dVector& location)
-{
-	dQuaternion rotation;
-	SimpleFracturedEffectEntity* const entity = new SimpleFracturedEffectEntity(visualMesh, fractureEffect);
-	entity->SetMatrix(*scene, rotation, location);
-	entity->InterpolateMatrix(*scene, 1.0f);
-	scene->Append(entity);
-
-	dVector origin(0.0f);
-	dVector inertia(0.0f);
-	NewtonConvexCollisionCalculateInertialMatrix(collision, &inertia[0], &origin[0]);
-
-	dFloat mass = 10.0f;
-	int materialId = 0;
-
-	//create the rigid body
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = location;
-
-	NewtonWorld* const world = scene->GetNewton();
-	NewtonBody* const rigidBody = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
-
-	entity->m_myBody = rigidBody;
-	entity->m_myMassInverse = 1.0f / mass;
-
-	// set the correct center of gravity for this body
-	//NewtonBodySetCentreOfMass (rigidBody, &origin[0]);
-
-	// set the mass matrix
-	NewtonBodySetMassProperties(rigidBody, mass, collision);
-
-	// save the pointer to the graphic object with the body.
-	NewtonBodySetUserData(rigidBody, entity);
-
-	// assign the wood id
-	NewtonBodySetMaterialGroupID(rigidBody, materialId);
-
-	//  set continuous collision mode
-	//	NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
-
-	// set a destructor for this rigid body
-	NewtonBodySetDestructorCallback(rigidBody, PhysicsBodyDestructor);
-
-	// set the transform call back function
-	NewtonBodySetTransformCallback(rigidBody, DemoEntity::TransformCallback);
-
-	// set the force and torque call back function
-	NewtonBodySetForceAndTorqueCallback(rigidBody, PhysicsApplyGravityForce);
-}
-
-static void AddVoronoidFracturedPrimitive(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
-{
-	// create the shape and visual mesh as a common data to be re used
-	NewtonWorld* const world = scene->GetNewton();
-	NewtonCollision* const collision = CreateConvexCollision(world, shapeOffsetMatrix, size, type, materialID);
-
-	// create a newton mesh from the collision primitive
-	NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
-
-	// apply a material map
-	int externalMaterial = LoadTexture("reljef.tga");
-	//int internalMaterial = LoadTexture("KAMEN-stup.tga");
-	int internalMaterial = LoadTexture("concreteBrick.tga");
-	NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial);
-
-	// create a newton mesh from the collision primitive
-	VoronoidFractureEffect fracture(world, mesh, internalMaterial);
-
-	DemoMesh* const visualMesh = new DemoMesh(mesh);
-
-	dFloat startElevation = 100.0f;
-	dMatrix matrix(dGetIdentityMatrix());
-	for (int i = 0; i < xCount; i++) {
-		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
-		for (int j = 0; j < zCount; j++) {
-			dFloat z = origin.m_z + (j - zCount / 2) * spacing;
-
-			matrix.m_posit.m_x = x;
-			matrix.m_posit.m_z = z;
-			dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
-			matrix.m_posit.m_y = floor.m_y + 1.0f;
-			AddFracturedEntity(scene, visualMesh, collision, fracture, matrix.m_posit);
-		}
-	}
-
-	// do not forget to release the assets	
-	NewtonMeshDestroy(mesh);
-	visualMesh->Release();
-	NewtonDestroyCollision(collision);
-}
-
-static void AddDelaunayFracturedPrimitive(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix)
-{
-	// create the shape and visual mesh as a common data to be re used
-	NewtonWorld* const world = scene->GetNewton();
-	NewtonCollision* const collision = CreateConvexCollision(world, shapeOffsetMatrix, size, type, materialID);
-
-	// create a newton mesh from the collision primitive
-	NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
-
-	// apply a material map
-	int externalMaterial = LoadTexture("reljef.tga");
-	int internalMaterial = LoadTexture("concreteBrick.tga");
-	NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial);
-
-	// create a newton mesh from the collision primitive
-	DelaunayFractureEffect fracture(world, mesh, internalMaterial);
-
-	DemoMesh* const visualMesh = new DemoMesh(mesh);
-
-	dFloat startElevation = 100.0f;
-	dMatrix matrix(dGetIdentityMatrix());
-	for (int i = 0; i < xCount; i++) {
-		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
-		for (int j = 0; j < zCount; j++) {
-			dFloat z = origin.m_z + (j - zCount / 2) * spacing;
-
-			matrix.m_posit.m_x = x;
-			matrix.m_posit.m_z = z;
-			dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
-			matrix.m_posit.m_y = floor.m_y + 1.0f;
-			AddFracturedEntity(scene, visualMesh, collision, fracture, matrix.m_posit);
-		}
-	}
-
-	// do not forget to release the assets	
-	NewtonMeshDestroy(mesh);
-	visualMesh->Release();
-	NewtonDestroyCollision(collision);
-}
 
 
 
@@ -485,18 +474,19 @@ void SimpleConvexFracturing(DemoEntityManager* const scene)
 	dVector size(0.75f, 0.75f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 
-#if 0
+#if 1
 	int count = 5;
-	AddVoronoidFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddVoronoidFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddVoronoidFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddVoronoidFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddVoronoidFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddVoronoidFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddVoronoidFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	VoronoidEffect::AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	VoronoidEffect::AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	VoronoidEffect::AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	VoronoidEffect::AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	VoronoidEffect::AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	VoronoidEffect::AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	VoronoidEffect::AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 #else
 	int count = 1;
-	AddDelaunayFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	DelaunayEffect::AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	DelaunayEffect::AddFracturedPrimitive(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 #endif
 
 	// place camera into position

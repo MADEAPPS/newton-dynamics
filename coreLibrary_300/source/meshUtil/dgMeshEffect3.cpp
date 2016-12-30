@@ -554,7 +554,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 			}
 		}
 
-		dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, bool doublesided) const
+		//dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, bool doublesided) const
+		dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, void* const userData) const
 		{
 			dgHACDCluster* const clusterFace = (dgHACDCluster*) face->m_userData;
 
@@ -580,7 +581,11 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 			dgBigVector end (origin - faceA.m_normal.Scale3 (rayDistance));
 
 			dgFloat64 paramOut;
-			dgMeshBVHNode* const node = FaceRayCast (origin, end, paramOut, false);
+			dgAssert (0);
+			//dgMeshBVHNode* const node = FaceRayCast (origin, end, paramOut, false);
+/*
+			dgMeshBVHNode* node;
+			FaceRayCast (origin, end, paramOut, &node);
 
 			if (node) {
 				dgHACDCluster* const clusterB = (dgHACDCluster*) node->m_userData;
@@ -630,6 +635,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 					}
 				}
 			}
+*/
 		}
 
 		

@@ -25,7 +25,6 @@
 #include "dgMeshEffect.h"
 #include "dgCollisionConvexHull.h"
 
-
 // based on paper iso surface Stuffing : Fast Tetrahedral Meshes with Good Dihedral Angles
 // by Francois Labelle Jonathan Richard Shewchuk
 // University of California at Berkeley
@@ -36,9 +35,8 @@ class dgTetraIsoSufaceStuffing
 	enum dgVertexSign
 	{
 		m_onSuface,
-		m_insdide,
-		m_ousize,
-		m_unprocessed,
+		m_inside,
+		m_outside,
 	};
 
 	class dgGridDimension 
@@ -46,6 +44,7 @@ class dgTetraIsoSufaceStuffing
 		public:
 		dgBigVector m_origin;
 		dgFloat64 m_cellSize;
+		dgFloat64 m_diameter;
 		dgInt32 m_gridSizeX;
 		dgInt32 m_gridSizeY;
 		dgInt32 m_gridSizeZ;
@@ -61,6 +60,12 @@ class dgTetraIsoSufaceStuffing
 			:m_count(0)
 		{
 		}
+
+		dgInt32 GetCount() const 
+		{
+			return m_count; 
+		}
+
 		const dgInt32& operator[] (dgInt32 i) const
 		{
 			dgAssert(i >= 0);
@@ -90,32 +95,194 @@ class dgTetraIsoSufaceStuffing
 	typedef dgAssessor<4> dgTetrahedra; 
 	typedef dgAssessor<16> dgTetraToVertexNode; 
 
-	class dgRayTracer: public dgMeshEffect::dgMeshBVH
+	class dgNormalMap
 	{
 		public:
-		dgRayTracer(dgMeshEffect* const mesh)
+		dgNormalMap()
+			:m_count(sizeof (m_normal)/sizeof (m_normal[0]))
+		{
+			dgVector p0(dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+			dgVector p1(dgFloat32(-1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+			dgVector p2(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+			dgVector p3(dgFloat32(0.0f), dgFloat32(-1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+			dgVector p4(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f));
+			dgVector p5(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(-1.0f), dgFloat32(0.0f));
+
+			dgInt32 count = 0;
+			dgInt32 subdivitions = 1;
+			TessellateTriangle(subdivitions, p4, p0, p2, count);
+			TessellateTriangle(subdivitions, p0, p5, p2, count);
+			TessellateTriangle(subdivitions, p5, p1, p2, count);
+			TessellateTriangle(subdivitions, p1, p4, p2, count);
+			TessellateTriangle(subdivitions, p0, p4, p3, count);
+			TessellateTriangle(subdivitions, p5, p0, p3, count);
+			TessellateTriangle(subdivitions, p1, p5, p3, count);
+			TessellateTriangle(subdivitions, p4, p1, p3, count);
+		}
+
+		private:
+		void TessellateTriangle(dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count)
+		{
+			if (level) {
+				dgAssert(dgAbsf(p0.DotProduct3(p0) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbsf(p1.DotProduct3(p1) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbsf(p2.DotProduct3(p2) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgVector p01(p0 + p1);
+				dgVector p12(p1 + p2);
+				dgVector p20(p2 + p0);
+
+				p01 = p01.Scale3(dgRsqrt(p01.DotProduct3(p01)));
+				p12 = p12.Scale3(dgRsqrt(p12.DotProduct3(p12)));
+				p20 = p20.Scale3(dgRsqrt(p20.DotProduct3(p20)));
+
+				dgAssert(dgAbsf(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbsf(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbsf(p20.DotProduct3(p20) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+
+				TessellateTriangle(level - 1, p0, p01, p20, count);
+				TessellateTriangle(level - 1, p1, p12, p01, count);
+				TessellateTriangle(level - 1, p2, p20, p12, count);
+				TessellateTriangle(level - 1, p01, p12, p20, count);
+			} else {
+				dgBigPlane n(p0, p1, p2);
+				n = n.Scale(dgFloat64(1.0f) / sqrt(n.DotProduct3(n)));
+				n.m_w = dgFloat64(0.0f);
+				dgInt32 index = dgBitReversal(count, sizeof (m_normal) / sizeof (m_normal[0]));
+				m_normal[index] = n;
+				count++;
+				dgAssert(count <= sizeof (m_normal) / sizeof (m_normal[0]));
+			}
+		}
+
+		public:
+		dgBigVector m_normal[32];
+		dgInt32 m_count;
+	};
+
+	class dgRayTracer: public dgMeshEffect::dgMeshBVH
+	{
+		enum dgTraceType
+		{
+			m_pointSide,
+		};
+
+		class dgRayTraceBase
+		{
+			public:
+			dgRayTraceBase(dgTraceType type)
+				:m_type(type)
+			{
+			}
+			dgTraceType m_type;
+		};
+
+		class dgRayTracePointSide: public dgRayTraceBase
+		{
+			public:
+			dgRayTracePointSide()
+				:dgRayTraceBase(m_pointSide)
+				,m_hitCount(0)
+				,m_rayIsDegenerate(true)
+			{
+			}
+			dgInt32 m_hitCount;
+			bool m_rayIsDegenerate;
+		};
+
+		public:
+		dgRayTracer(dgMeshEffect* const mesh, dgFloat64 diameter)
 			:dgMeshEffect::dgMeshBVH(mesh)
+			,m_normals()
+			,m_diameter(diameter)
 		{
 			Build();
 		}
 
-		dgFloat64 RayFaceIntersect(const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, bool doublesided) const
-		{
-			dgAssert (0);
-			return 0;
-/*
-			dgHACDCluster* const clusterFace = (dgHACDCluster*)face->m_userData;
 
-			dgFloat64 param = dgFloat32(100.0f);
-			if (clusterFace->m_color != m_clusterA->m_color) {
-				param = dgMeshEffect::dgMeshBVH::RayFaceIntersect(face, p1, p0, false);
-				if ((param >= dgFloat32(0.0f)) && (param <= dgFloat32(1.0f))) {
-					param = dgFloat32(1.0f) - param;
+		dgFloat64 dgPointToRayDistance (const dgBigVector& point, const dgBigVector& ray_p0, const dgBigVector& ray_p1, dgRayTracePointSide* const rayType) const
+		{
+			dgBigVector dp(ray_p1 - ray_p0);
+			dgFloat64 den = dp.DotProduct3(dp);
+			dgFloat64 num = dp.DotProduct3(point - ray_p0);
+			if ((num >= dgFloat64 (0.0f)) && (num <= den)) { 
+				dgBigVector p (ray_p0 + dp.Scale3 (num / den));
+				dgBigVector dp (point - p);
+				if (dp.DotProduct3(dp) < dgFloat64 (1.0e-12f)) {
+					rayType->m_rayIsDegenerate = true;
+					return dgFloat64 (-2.0f);
 				}
 			}
-			return param;
-*/
+
+			return dgFloat64 (2.0f);
 		}
+
+		dgFloat64 PointSideTest(const dgMeshBVHNode* const faceNode, const dgBigVector& point0, const dgBigVector& point1, dgRayTracePointSide* const rayType) const
+		{
+			const dgEdge* const edge = faceNode->m_face;
+			const dgBigVector p0 (m_mesh->GetVertex(edge->m_incidentVertex));
+			const dgBigVector p1 (m_mesh->GetVertex(edge->m_next->m_incidentVertex));
+			const dgBigVector p2 (m_mesh->GetVertex(edge->m_next->m_next->m_incidentVertex));
+
+			const dgBigVector e10(p1 - p0);
+			const dgBigVector e20(p2 - p0);
+			const dgFloat64 a00 = e10.DotProduct4(e10).GetScalar();
+			const dgFloat64 a11 = e20.DotProduct4(e20).GetScalar();
+			const dgFloat64 a01 = e10.DotProduct4(e20).GetScalar();
+
+			const dgFloat64 det = a00 * a11 - a01 * a01;
+			dgAssert(det >= dgFloat32(0.0f));
+			if (dgAbsf(det) > dgFloat32(1.0e-24f)) {
+				dgBigVector p0Point(point0 - p0);
+				dgBigVector normal(e10.CrossProduct3(e20));
+				dgFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
+				if ((t > dgFloat64(0.0f)) && (t < dgFloat64(1.0f))) {
+					dgBigVector point(point0 + (point1 - point0).Scale3(t));
+					dgBigVector p0Point(point - p0);	
+					const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
+					const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
+
+					dgFloat64 beta = b1 * a00 - a01 * b0;
+					dgFloat64 alpha = b0 * a11 - a01 * b1;
+
+					if (beta <= dgFloat32(0.0f)) {
+						return dgPointToRayDistance (point, p0, p1, rayType);
+					} else if (alpha <= dgFloat32(0.0f)) {
+						return dgPointToRayDistance (point, p0, p2, rayType);
+					} else if ((alpha + beta) >= det) {
+						return dgPointToRayDistance (point, p1, p2, rayType);
+					}
+					rayType->m_hitCount ++;
+				}
+			}
+			return dgFloat64 (2.0f);
+		}
+
+		dgFloat64 RayFaceIntersect(const dgMeshBVHNode* const faceNode, const dgBigVector& point0, const dgBigVector& point1, void* const userData) const
+		{
+			dgRayTraceBase* const rayType = (dgRayTraceBase*)userData;
+			if (rayType->m_type == m_pointSide) {
+				return PointSideTest(faceNode, point0, point1, (dgRayTracePointSide*) rayType);
+			}
+
+			dgAssert (0);
+			return dgFloat64 (-1.0f);
+		}
+
+		dgVertexSign CalculateVertexSign (const dgBigVector& point0) const
+		{
+			dgRayTracePointSide hits;
+			for (dgInt32 i = 0; (i < m_normals.m_count) && hits.m_rayIsDegenerate; i ++) {
+				hits.m_hitCount = 0;
+				hits.m_rayIsDegenerate = false;
+				dgBigVector point1 (point0 + dgBigVector (m_normals.m_normal[i].Scale3 (m_diameter))); 
+				FaceRayCast (point0, point1, &hits);
+			}
+			dgAssert (!hits.m_rayIsDegenerate);
+			return (hits.m_hitCount & 1) ? m_inside : m_outside;
+		}
+
+		dgNormalMap m_normals;
+		dgFloat64 m_diameter;
 	};
 
 	dgTetraIsoSufaceStuffing(dgMeshEffect* const mesh, dgFloat64 cellSize)
@@ -124,34 +291,40 @@ class dgTetraIsoSufaceStuffing
 		,m_pointCount(0)
 		,m_tetraCount(0)
 	{
-		dgBigVector origin;
-		dgRayTracer rayTrace (mesh);
+		dgGridDimension gridDim (CalculateGridSize(mesh, cellSize));
+		dgRayTracer rayTrace (mesh, gridDim.m_diameter);
 		dgArray<dgVertexSign> vertexSigns (mesh->GetAllocator());
 		dgArray<dgTetraToVertexNode> tetraGraph (mesh->GetAllocator());
-		dgGridDimension gridDim (CalculateGridSize(mesh, cellSize));
+		
 		PopulateGridPoints (gridDim);
-		BuildTetraList (gridDim, tetraGraph);
-		CalculateVertexSigns (vertexSigns, rayTrace, tetraGraph);
+		CalculateVertexSigns (vertexSigns, rayTrace);
+		BuildTetraList (gridDim, vertexSigns, tetraGraph);
 	}
 
-	void CalculateVertexSigns (dgArray<dgVertexSign>& vertexSigns, const dgRayTracer& rayTrace, const dgArray<dgTetraToVertexNode>& tetraGraph)
+	void CalculateVertexSigns (dgArray<dgVertexSign>& vertexSigns, const dgRayTracer& rayTrace)
 	{
 		vertexSigns.Resize(m_pointCount);
 		for (dgInt32 i = 0; i < m_pointCount; i ++) {
-			vertexSigns[i] = m_unprocessed;
+			vertexSigns[i] = rayTrace.CalculateVertexSign (m_points[i]);
 		}
 
-		for (dgInt32 i = 0; i < m_tetraCount; i ++) {
-			const dgTetrahedra& tetra = m_tetraList[i];
-			for (dgInt32 j = 0; j < 4; j ++) {
-				dgInt32 vertexIndex = tetra[j]; 
-				if (vertexSigns[vertexIndex] == m_unprocessed) {
-
-				}
+/*
+		for (dgInt32 i = 0; i < m_pointCount; i ++) {
+			const dgTetraToVertexNode& graphNode = tetraGraph[i];
+			for (dgInt32 j = 0; j < graphNode.GetCount(); j ++) {
+				dgInt32 tetraIndex = graphNode[j];
+				const dgTetrahedra& tetra = m_tetraList[tetraIndex];
+				dgAssert ((tetra[0] == i) || (tetra[1] == i) || (tetra[2] == i) || (tetra[3] == i));
+				RayTraceTetra (vertexSigns, rayTrace, tetra);
 			}
 		}
+*/
 	}
-
+/*
+	void RayTraceTetra (dgArray<dgVertexSign>& vertexSigns, const dgRayTracer& rayTrace, const dgTetrahedra& tetra)
+	{
+	}
+*/
 	dgGridDimension CalculateGridSize(const dgMeshEffect* const mesh, dgFloat64 cellsize) const
 	{
 		dgBigVector minBox;
@@ -164,9 +337,12 @@ class dgTetraIsoSufaceStuffing
 		dgBigVector mMaxInt((maxBox.Scale4(dgFloat64(1.0f) / cellsize)).Floor() + dgBigVector::m_one);
 		dgBigVector gridSize(mMaxInt - mMinInt + dgBigVector::m_one);
 
+		dgBigVector size(maxBox - minBox);
+		
 		dgGridDimension gridDimension;
 		gridDimension.m_origin = minBox; 
 		gridDimension.m_cellSize = cellsize;
+		gridDimension.m_diameter = sqrt (size.DotProduct3(size));
 		gridDimension.m_gridSizeX = dgInt32(gridSize.m_x);
 		gridDimension.m_gridSizeY = dgInt32(gridSize.m_y);
 		gridDimension.m_gridSizeZ = dgInt32(gridSize.m_z);
@@ -201,20 +377,26 @@ class dgTetraIsoSufaceStuffing
 		}
 	}
 
-	void AddTetra(dgArray<dgTetraToVertexNode>& graph, const dgTetrahedra& tetra)
+	void AddTetra(dgArray<dgTetraToVertexNode>& graph, const dgTetrahedra& tetra, const dgArray<dgVertexSign>& vertexSigns)
 	{
 		dgAssert(TestVolume(tetra));
-		m_tetraList[m_tetraCount] = tetra;
-		dgTetrahedra& tetraEntry = m_tetraList[m_tetraCount];
-		for (dgInt32 i = 0; i < 4; i ++) {
-			dgInt32 vertexIndex = tetra[i];
-			tetraEntry.PushBack(vertexIndex);
-			graph[vertexIndex].PushBack(m_tetraCount);
+		bool isOutSize = vertexSigns[tetra[0]] == m_outside;
+		isOutSize = isOutSize && (vertexSigns[tetra[1]] == m_outside);
+		isOutSize = isOutSize && (vertexSigns[tetra[2]] == m_outside);
+		isOutSize = isOutSize && (vertexSigns[tetra[3]] == m_outside);
+		if (!isOutSize) {
+			m_tetraList[m_tetraCount] = tetra;
+			dgTetrahedra& tetraEntry = m_tetraList[m_tetraCount];
+			for (dgInt32 i = 0; i < 4; i ++) {
+				dgInt32 vertexIndex = tetra[i];
+				tetraEntry.PushBack(vertexIndex);
+				graph[vertexIndex].PushBack(m_tetraCount);
+			}
+			m_tetraCount ++;
 		}
-		m_tetraCount ++;
 	}
 
-	void BuildTetraList(const dgGridDimension& gridDimension, dgArray<dgTetraToVertexNode>& graph)
+	void BuildTetraList(const dgGridDimension& gridDimension, const dgArray<dgVertexSign>& vertexSigns, dgArray<dgTetraToVertexNode>& graph)
 	{
 		graph.Resize(m_pointCount);
 		for (dgInt32 i = 0; i < m_pointCount; i ++) {
@@ -230,13 +412,13 @@ class dgTetraIsoSufaceStuffing
 					tetra[1] = ((z * gridDimension.m_gridSizeY + y) * gridDimension.m_gridSizeX) + x + 1;
 					tetra[2] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 1;
 					tetra[3] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra);
+					AddTetra(graph, tetra, vertexSigns);
 
 					tetra[0] = ((z * gridDimension.m_gridSizeY + y) * gridDimension.m_gridSizeX) + x;
 					tetra[1] = ((z * gridDimension.m_gridSizeY + y) * gridDimension.m_gridSizeX) + x + 1;
 					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 1;
 					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra);
+					AddTetra(graph, tetra, vertexSigns);
 				}
 			}
 		}
@@ -249,13 +431,13 @@ class dgTetraIsoSufaceStuffing
 					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
 					tetra[3] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
 					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra);
+					AddTetra(graph, tetra, vertexSigns);
 
 					tetra[0] = ((z * gridDimension.m_gridSizeY + (y + 0)) * gridDimension.m_gridSizeX) + x;
 					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
 					tetra[2] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
 					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
-					AddTetra(graph, tetra);
+					AddTetra(graph, tetra, vertexSigns);
 				}
 			}
 		}
@@ -268,13 +450,13 @@ class dgTetraIsoSufaceStuffing
 					tetra[1] = (((z + 1) * gridDimension.m_gridSizeY + y + 0) * gridDimension.m_gridSizeX) + x;
 					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 0;
 					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
-					AddTetra(graph, tetra);
+					AddTetra(graph, tetra, vertexSigns);
 
 					tetra[0] = (((z + 0) * gridDimension.m_gridSizeY + y + 0) * gridDimension.m_gridSizeX) + x;
 					tetra[1] = (((z + 1) * gridDimension.m_gridSizeY + y + 0) * gridDimension.m_gridSizeX) + x;
 					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 1;
 					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra);
+					AddTetra(graph, tetra, vertexSigns);
 				}
 			}
 		}
@@ -287,13 +469,13 @@ class dgTetraIsoSufaceStuffing
 					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
 					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
 					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra);
+					AddTetra(graph, tetra, vertexSigns);
 
 					tetra[0] = ((z * gridDimension.m_gridSizeY + (y + 0)) * gridDimension.m_gridSizeX) + x;
 					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
 					tetra[3] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
 					tetra[2] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra);
+					AddTetra(graph, tetra, vertexSigns);
 				}
 			}
 		}
@@ -609,7 +791,7 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
 	dgMeshEffect copy(*this);
 	copy.Triangulate();
 
-	dgTetraIsoSufaceStuffing tetraIsoStuffing (&copy, dgFloat64(0.5f));
+	dgTetraIsoSufaceStuffing tetraIsoStuffing (&copy, dgFloat64(0.125f));
 
 	dgMeshEffect* delaunayPartition = NULL;
 	if (tetraIsoStuffing.m_tetraCount) {

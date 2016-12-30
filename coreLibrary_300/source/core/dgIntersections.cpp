@@ -214,56 +214,6 @@ dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, co
 
 dgVector dgPointToTriangleDistance(const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2)
 {
-/*
-#ifdef _DEBUG
-	dgVector faceNormal((p1 - p0).CrossProduct3(p2 - p0));
-	dgFloat64 faceNormal2 = faceNormal.DotProduct3(faceNormal);
-	dgFloat64 normal2 = normal.DotProduct3(normal);
-	dgFloat64 faceNormalNormal = faceNormal.DotProduct3(normal);
-	dgFloat64 error = (faceNormalNormal * faceNormalNormal - faceNormal2 * normal2) / (faceNormalNormal * faceNormalNormal);
-	dgAssert(fabsf(error < dgFloat32(1.0e-5f)));
-	dgAssert(faceNormalNormal > dgFloat32(0.0f));
-#endif
-
-	dgVector array[3];
-	array[0] = p0;
-	array[1] = p1;
-	array[2] = p2;
-
-	dgInt32 i0 = 2;
-	dgInt32 closestIndex = -1;
-	dgVector p1p0(array[2] - point);
-	for (dgInt32 i1 = 0; i1 < 3; i1++) {
-		dgVector p2p0(array[i1] - point);
-		dgFloat32 volume = normal.DotProduct3(p1p0.CrossProduct3(p2p0));
-
-		if (volume < dgFloat32(0.0f)) {
-			dgVector segment(array[i1] - array[i0]);
-			dgVector poinP0(point - array[i0]);
-			dgFloat32 den = segment.DotProduct3(segment);
-			dgAssert(den > dgFloat32(0.0f));
-			dgFloat32 num = poinP0.DotProduct3(segment);
-			if (num < dgFloat32(0.0f)) {
-				closestIndex = i0;
-			}
-			else if (num > den) {
-				closestIndex = i1;
-			}
-			else {
-				return array[i0] + segment.Scale3(num / den);
-			}
-		}
-		p1p0 = p2p0;
-		i0 = i1;
-	}
-
-	if (closestIndex >= 0) {
-		return array[closestIndex];
-	} else {
-		return point - normal.Scale3(normal.DotProduct3(point - p0) / normal.DotProduct3(normal));
-	}
-*/
-
 	const dgBigVector e10(p1 - p0);
 	const dgBigVector e20(p2 - p0);
 	const dgFloat64 a00 = e10.DotProduct4(e10).GetScalar();

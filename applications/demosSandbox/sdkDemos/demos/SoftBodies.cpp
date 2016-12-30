@@ -185,8 +185,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		NewtonMeshDestroy (tetrahedra);
 		NewtonDestroyCollision(deformableCollision);
 	}
-
-
+	
 	void BuildTetraHedraCube(DemoEntityManager* const scene, int materialID)
 	{
 		dFloat mass = 5.0f;
@@ -213,6 +212,65 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		NewtonDestroyCollision(deformableCollision);
 		NewtonMeshDestroy(tetraCube);
 	}
+
+	void LoadTetraHedraCube(DemoEntityManager* const scene, int materialID)
+	{
+		dFloat mass = 5.0f;
+		NewtonWorld* const world = scene->GetNewton();
+
+		char name[2048];
+		dGetWorkingFileName ("box.tet", name);
+		NewtonMesh* const tetraCube = NewtonMeshLoadTetrahedraMesh(scene->GetNewton(), name);
+
+		int material = LoadTexture("smilli.tga");
+		NewtonMeshApplyBoxMapping(tetraCube, material, material, material);
+		NewtonMeshCalculateVertexNormals(tetraCube, 60.0f * 3.1416f / 180.0f);
+
+		// make a deformable collision mesh
+		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, tetraCube, materialID);
+
+		BuildMesh(tetraCube, deformableCollision);
+
+		//create a rigid body with a deformable mesh
+		m_body = CreateRigidBody(scene, mass, deformableCollision);
+
+		// do not forget to destroy this objects, else you get bad memory leaks.
+		NewtonDestroyCollision(deformableCollision);
+		NewtonMeshDestroy(tetraCube);
+	}
+
+	void CreateTetraHedraPrimitive(DemoEntityManager* const scene, int materialID)
+	{
+		dFloat mass = 5.0f;
+		dVector size (1.0f);
+
+		NewtonWorld* const world = scene->GetNewton();
+		NewtonCollision* const primitiveShape = CreateConvexCollision (world, dGetIdentityMatrix(), size, _SPHERE_PRIMITIVE, materialID);
+		NewtonMesh* const skinMesh = NewtonMeshCreateFromCollision(primitiveShape);
+
+		// now now make an tetrahedra iso surface approximation of this mesh
+		NewtonMesh* const tetraIsoSurface = NewtonMeshCreateTetrahedraIsoSurface(skinMesh);
+
+		NewtonDestroyCollision(primitiveShape);
+		NewtonMeshDestroy(skinMesh);
+
+		int material = LoadTexture("smilli.tga");
+		NewtonMeshApplyBoxMapping(tetraIsoSurface, material, material, material);
+		NewtonMeshCalculateVertexNormals(tetraIsoSurface, 60.0f * 3.1416f / 180.0f);
+
+		// make a deformable collision mesh
+		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, tetraIsoSurface, materialID);
+
+		BuildMesh(tetraIsoSurface, deformableCollision);
+
+		//create a rigid body with a deformable mesh
+		m_body = CreateRigidBody(scene, mass, deformableCollision);
+
+		// do not forget to destroy this objects, else you get bad memory leaks.
+		NewtonDestroyCollision(deformableCollision);
+		NewtonMeshDestroy(tetraIsoSurface);
+	}
+	
 
 	NewtonMesh* CreateFlatClothPatch(DemoEntityManager* const scene, int size_x, int size_z)
 	{
@@ -406,17 +464,6 @@ void SoftBodies(DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-//dMatrix xxx3(dGetIdentityMatrix());
-//NewtonCollision* xxx0 = NewtonCreateBox(scene->GetNewton(), 1, 1, 1, 0, NULL);
-//NewtonMesh* xxx1 = NewtonMeshCreateFromCollision(xxx0);
-//
-char name[2048];
-//dGetWorkingFileName ("prism.off", name);
-dGetWorkingFileName ("box.off", name);
-NewtonMesh* const xxx1 = NewtonMeshLoadOFF(scene->GetNewton(), name);
-NewtonMesh* xxx2 = NewtonMeshCreateTetrahedraIsoSurface(xxx1);
-
-
 	// load the scene from a ngd file format
 	CreateLevelMesh(scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "playground.ngd", 1);
@@ -424,8 +471,9 @@ NewtonMesh* xxx2 = NewtonMeshCreateTetrahedraIsoSurface(xxx1);
 	dVector location(0.0f, 6.0f, 0.0f, 0.0f);
 
 	SimpleSoftBodyEntity* const entity = new SimpleSoftBodyEntity(scene, location);
-	entity->BuildRegularTetraHedra(scene, 0);
-//	entity->BuildTetraHedraCube (scene, 0);
+//	entity->BuildRegularTetraHedra(scene, 0);
+//	entity->LoadTetraHedraCube (scene, 0);
+	entity->CreateTetraHedraPrimitive (scene, 0);
 
 	dQuaternion rot;
 	dVector origin(location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);
