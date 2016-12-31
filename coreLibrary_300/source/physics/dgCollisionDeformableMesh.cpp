@@ -239,7 +239,7 @@ void dgCollisionDeformableMesh::HandleCollision (dgFloat32 timestep, dgVector* c
 	dgVector timestepV (timestep);
 	dgVector invTimeStep (dgFloat32 (1.0f / timestep));
 	const dgVector* const accel = &m_accel[0];
-	const dgVector* const veloc = &m_veloc[0];
+//	const dgVector* const veloc = &m_veloc[0];
 	const dgVector* const posit = &m_posit[0];
 
 	// for now

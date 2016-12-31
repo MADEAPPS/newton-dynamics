@@ -308,7 +308,7 @@ class dgTetraIsoSufaceStuffing
 						return dgFloat64(2.0f);
 					}
 					if (t < rayType->m_param) {
-						rayType->m_param = t;
+						rayType->m_param = dgFloat32 (t);
 					}
 				}
 			}
@@ -417,8 +417,8 @@ class dgTetraIsoSufaceStuffing
 	{
 		for (dgInt32 i = 0; i < m_pointCount; i++) {
 			if (vertexSide[i] == m_outside) {
-				const dgTetraToVertexNode& graphNode = tetraGraph[i];
 /*
+				const dgTetraToVertexNode& graphNode = tetraGraph[i];
 				for (dgInt32 j = 0; j < graphNode.GetCount(); j++) {
 					dgTetraEdgeCuts& cuts = tetraEdgeCuts[graphNode[j]];
 					const dgTetrahedra& tetra = m_tetraList[graphNode[j]];
