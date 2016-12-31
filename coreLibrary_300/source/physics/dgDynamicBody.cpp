@@ -201,22 +201,6 @@ bool dgDynamicBody::IsInEquilibrium() const
 		if (deltaAlpha2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
-
-/*
-		dgVector netAccel(m_netForce.Scale4(m_invMass.m_w));
-		dgAssert(netAccel.m_w == 0.0f);
-		dgFloat32 netAccel2 = deltaAccel.DotProduct4(deltaAccel).GetScalar();
-		if (netAccel2 > DG_ERR_TOLERANCE2) {
-			return false;
-		}
-
-		dgVector netAlpha(m_matrix.UnrotateVector(m_netTorque).CompProduct4(m_invMass));
-		dgAssert(netAlpha.m_w == 0.0f);
-		dgFloat32 netAlpha2 = netAlpha.DotProduct4(netAlpha).GetScalar();
-		if (netAlpha2 > DG_ERR_TOLERANCE2) {
-			return false;
-		}
-*/
 		return true;
 	}
 	return false;

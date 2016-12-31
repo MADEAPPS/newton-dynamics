@@ -39,6 +39,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCol
 	,m_linkList(world->GetAllocator())
 	,m_restlength(world->GetAllocator())
 	,m_indexToVertexMap(world->GetAllocator())
+	,m_skinThickness (dgFloat32 (1.0f / 16.0f))
 	,m_linksCount(0)
 {
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
@@ -49,6 +50,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformable
 	,m_linkList(source.m_linkList, source.m_linksCount)
 	,m_restlength(source.m_restlength, source.m_linksCount)
 	,m_indexToVertexMap(source.m_indexToVertexMap, source.m_linksCount)
+	,m_skinThickness (source.m_skinThickness)
 	,m_linksCount(source.m_linksCount)
 {
 	m_rtti = source.m_rtti;
@@ -59,6 +61,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgDes
 	,m_linkList(world->GetAllocator())
 	,m_restlength(world->GetAllocator())
 	,m_indexToVertexMap(world->GetAllocator())
+	,m_skinThickness (dgFloat32 (1.0f / 16.0f))
 	,m_linksCount(0)
 {
 	dgAssert(0);
@@ -213,45 +216,59 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 	}
 }
 
+
+dgFloat32 dgCollisionDeformableMesh::CalculaleContactPenetration(const dgVector& point, const dgVector& normal) const
+{
+	dgVector otherPoint (point);
+	otherPoint.m_y = dgFloat32 (0.0f);
+	dgFloat32 penetration = normal.DotProduct4(point - otherPoint).GetScalar();
+	return penetration;
+}
+
 void dgCollisionDeformableMesh::HandleCollision (dgFloat32 timestep, dgVector* const dir0, dgVector* const dir1, dgVector* const dir2, dgVector* const collisionAccel) const
 {
 	const dgMatrix& matrix = m_body->GetCollision()->GetGlobalMatrix();
 	dgVector origin(matrix.m_posit);
 
 
-dgVector restitution (dgFloat32(-1.4f));
-dgFloat32 staticFriction = dgFloat32 (0.7f);
-dgFloat32 keneticFriction = dgFloat32 (0.4f);
-dgFloat32 penetrationElasticity = dgFloat32(10.0f);
-dgFloat32 maxPenetration = dgFloat32(0.25f);
+//dgFloat32 staticFriction = dgFloat32 (0.7f);
+//dgFloat32 keneticFriction = dgFloat32 (0.4f);
+//dgFloat32 penetrationElasticity = dgFloat32(10.0f);
+//dgFloat32 maxPenetration = dgFloat32(0.25f);
 
 	dgVector timestepV (timestep);
 	dgVector invTimeStep (dgFloat32 (1.0f / timestep));
 	const dgVector* const accel = &m_accel[0];
 	const dgVector* const veloc = &m_veloc[0];
 	const dgVector* const posit = &m_posit[0];
+
+	// for now
+	dgVector contactNormal (dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		dgVector normal (dgVector::m_zero);
 		dgVector tangent0 (dgVector::m_zero);
 		dgVector tangent1 (dgVector::m_zero);
 		dgVector accel1 (dgVector::m_zero);
-		dgVector worldPosit(origin + posit[i]);
+
+		dgVector contactPosition (origin + posit[i]);
+		dgFloat32 penetration = CalculaleContactPenetration(contactPosition, contactNormal);
 
 		bool isColliding = false;
-		if (worldPosit.m_y < 0.0f) {
-			isColliding = true;
-			dgVector n(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-			normal = n;
-			dgVector speed(normal.DotProduct4(m_veloc[i].CompProduct4(dgVector::m_negOne)));
-			accel1 = invTimeStep.CompProduct4(normal.CompProduct4(speed));
-
+		if ((penetration - m_skinThickness) < 0.0f) {
+			
+//			dgFloat32 maxPenetration = dgMax(penetration - m_skinThickness, dgFloat32 (-0.25f));
+//			dgFloat32 penetrationSpeed = maxPenetration * invTimeStep.GetScalar();
+			dgFloat32 penetrationSpeed = dgFloat32 (0.0f);
+			
+			dgFloat32 normalSpeed = (contactNormal.DotProduct4(accel[i].CompProduct4(timestepV) + m_veloc[i])).GetScalar();
+			if (normalSpeed < dgFloat32 (0.0f)) {
+				isColliding = true;
+				normal = contactNormal;	
+				dgVector speed(normal.DotProduct4(m_veloc[i].CompProduct4(dgVector::m_negOne)));
+				accel1 = invTimeStep.CompProduct4(normal.CompProduct4(speed + penetrationSpeed));
 
 /*
-			dgVector n (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-			dgFloat32 penetration = -worldPosit.m_y;
-			dgVector v2(veloc[i] + accel[i].CompProduct4(timestepV));
-			dgFloat32 boundSpeed = (n.DotProduct4(v2.CompProduct4(restitution))).GetScalar();
-			
 			if (boundSpeed * timestep > penetration) {
 				normal = n;
 				isColliding = true;
@@ -298,6 +315,8 @@ dgFloat32 maxPenetration = dgFloat32(0.25f);
 				}
 			}
 */
+
+			}
 		}
 
 		dir0[i] = normal;

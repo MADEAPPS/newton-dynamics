@@ -166,6 +166,7 @@ class dgTetraIsoSufaceStuffing
 		enum dgTraceType
 		{
 			m_pointSide,
+			m_pointOnSurface,
 		};
 
 		class dgRayTraceBase
@@ -191,6 +192,18 @@ class dgTetraIsoSufaceStuffing
 			bool m_rayIsDegenerate;
 		};
 
+		class dgRayPointOnSurface: public dgRayTraceBase
+		{
+			public:
+			dgRayPointOnSurface()
+				:dgRayTraceBase(m_pointOnSurface)
+				,m_param(2.0f)
+			{
+			}
+		
+			dgFloat32 m_param;
+		};
+
 		public:
 		dgRayTraceAccelerator(dgMeshEffect* const mesh, dgFloat64 diameter)
 			:dgMeshEffect::dgMeshBVH(mesh)
@@ -214,7 +227,6 @@ class dgTetraIsoSufaceStuffing
 					return dgFloat64 (-2.0f);
 				}
 			}
-
 			return dgFloat64 (2.0f);
 		}
 
@@ -259,11 +271,62 @@ class dgTetraIsoSufaceStuffing
 			return dgFloat64 (2.0f);
 		}
 
+
+		dgFloat64 PointSurfaceHit(const dgMeshBVHNode* const faceNode, const dgBigVector& point0, const dgBigVector& point1, dgRayPointOnSurface* const rayType) const
+		{
+			const dgEdge* const edge = faceNode->m_face;
+			const dgBigVector p0(m_mesh->GetVertex(edge->m_incidentVertex));
+			const dgBigVector p1(m_mesh->GetVertex(edge->m_next->m_incidentVertex));
+			const dgBigVector p2(m_mesh->GetVertex(edge->m_next->m_next->m_incidentVertex));
+
+			const dgBigVector e10(p1 - p0);
+			const dgBigVector e20(p2 - p0);
+			const dgFloat64 a00 = e10.DotProduct4(e10).GetScalar();
+			const dgFloat64 a11 = e20.DotProduct4(e20).GetScalar();
+			const dgFloat64 a01 = e10.DotProduct4(e20).GetScalar();
+
+			const dgFloat64 det = a00 * a11 - a01 * a01;
+			dgAssert(det >= dgFloat32(0.0f));
+			if (dgAbsf(det) > dgFloat32(1.0e-24f)) {
+				dgBigVector p0Point(point0 - p0);
+				dgBigVector normal(e10.CrossProduct3(e20));
+				dgFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
+				if ((t > dgFloat64(0.0f)) && (t < dgFloat64(1.0f))) {
+					dgBigVector point(point0 + (point1 - point0).Scale3(t));
+					dgBigVector p0Point(point - p0);
+					const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
+					const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
+
+					dgFloat64 beta = b1 * a00 - a01 * b0;
+					dgFloat64 alpha = b0 * a11 - a01 * b1;
+
+					if (beta <= dgFloat32(0.0f)) {
+						return dgFloat64(2.0f);
+					} else if (alpha <= dgFloat32(0.0f)) {
+						return dgFloat64(2.0f);
+					} else if ((alpha + beta) >= det) {
+						return dgFloat64(2.0f);
+					}
+					if (t < rayType->m_param) {
+						rayType->m_param = t;
+					}
+				}
+			}
+			return dgFloat64(2.0f);
+		}
+
+
 		dgFloat64 RayFaceIntersect(const dgMeshBVHNode* const faceNode, const dgBigVector& point0, const dgBigVector& point1, void* const userData) const
 		{
 			dgRayTraceBase* const rayType = (dgRayTraceBase*)userData;
-			if (rayType->m_type == m_pointSide) {
+			
+			switch (rayType->m_type)
+			{
+				case m_pointSide:
 				return PointSideTest(faceNode, point0, point1, (dgRayTracePointSide*) rayType);
+
+				case m_pointOnSurface:
+					return PointSurfaceHit(faceNode, point0, point1, (dgRayPointOnSurface*) rayType);
 			}
 
 			dgAssert (0);
@@ -285,7 +348,9 @@ class dgTetraIsoSufaceStuffing
 
 		dgFloat32 CalculateEdgeCut (const dgBigVector& point0, const dgBigVector& point1) const
 		{
-			return 0.0f;
+			dgRayPointOnSurface pointOnSurface;
+			FaceRayCast (point0, point1, &pointOnSurface);
+			return pointOnSurface.m_param;
 		}
 
 		dgNormalMap m_normals;
@@ -308,7 +373,8 @@ class dgTetraIsoSufaceStuffing
 		PopulateGridPoints (gridDim);
 		CalculateVertexSide (vertexSide, rayAccelerator);
 		BuildTetraGraph (gridDim, vertexSide, tetraGraph);
-		CalculateEdgeCuts (tetraEdgeCuts, tetraGraph, vertexSide, rayAccelerator);
+		//CalculateEdgeCuts (tetraEdgeCuts, tetraGraph, vertexSide, rayAccelerator);
+		//SnapClosePoints (tetraEdgeCuts, tetraGraph, vertexSide, rayAccelerator);
 	}
 
 	void CalculateEdgeCuts (dgArray<dgTetraEdgeCuts>& tetraEdgeCuts, const dgArray<dgTetraToVertexNode>& tetraGraph, const dgArray<dgVertexSign>& vertexSide, const dgRayTraceAccelerator& rayAccelerator)
@@ -343,6 +409,36 @@ class dgTetraIsoSufaceStuffing
 						}
 					}
 				}
+			}
+		}
+	}
+
+	void SnapClosePoints (dgArray<dgTetraEdgeCuts>& tetraEdgeCuts, const dgArray<dgTetraToVertexNode>& tetraGraph, const dgArray<dgVertexSign>& vertexSide, const dgRayTraceAccelerator& rayAccelerator)
+	{
+		for (dgInt32 i = 0; i < m_pointCount; i++) {
+			if (vertexSide[i] == m_outside) {
+				const dgTetraToVertexNode& graphNode = tetraGraph[i];
+/*
+				for (dgInt32 j = 0; j < graphNode.GetCount(); j++) {
+					dgTetraEdgeCuts& cuts = tetraEdgeCuts[graphNode[j]];
+					const dgTetrahedra& tetra = m_tetraList[graphNode[j]];
+					dgAssert((tetra[0] == i) || (tetra[1] == i) || (tetra[2] == i) || (tetra[3] == i));
+
+					dgInt32 index = 0;
+					for (dgInt32 i0 = 0; i0 < 3; i0++) {
+						const dgBigVector& p0 = m_points[tetra[i0]];
+						for (dgInt32 i1 = i0 + 1; i1 < 4; i1++) {
+							if ((tetra[i0] == i) && (vertexSide[tetra[i1]] == m_inside)) {
+								const dgBigVector& p1 = m_points[tetra[i1]];
+								dgFloat32 param = rayAccelerator.CalculateEdgeCut(p0, p1);
+								cuts[index] = param;
+							}
+							index++;
+							dgAssert(index <= 6);
+						}
+					}
+				}
+*/
 			}
 		}
 	}

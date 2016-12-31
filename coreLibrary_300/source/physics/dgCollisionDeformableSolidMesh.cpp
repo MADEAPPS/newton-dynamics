@@ -209,8 +209,10 @@ void dgCollisionDeformableSolidMesh::CalculateAcceleration(dgFloat32 timestep)
 // for now make a share value for all springs. later this is a per material feature.
 dgFloat32 kSpring = dgFloat32(1000.0f);
 dgFloat32 kDamper = dgFloat32(30.0f);
-dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
-kVolumetricStiffness = 0.0f;
+//dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
+dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
+//dgFloat32 kVolumetricStiffness = dgFloat32(1000.0f);
+//kVolumetricStiffness = 0.0f;
 
 	dgInt32 iter = 4;
 	dgVector* const accel = &m_accel[0];
