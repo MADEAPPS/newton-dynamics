@@ -58,7 +58,7 @@ class dgCollisionLumpedMassParticles: public dgCollisionConvex
 	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	dgFloat32 RayCast(const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 
-	virtual void HandleCollision (dgFloat32 timestep, dgVector* const dir0, dgVector* const dir1, dgVector* const dir2, dgVector* const collisionAccel) const = 0;
+	virtual void HandleCollision (dgFloat32 timestep, dgVector* const normalDir, dgVector* const normalAccel, dgFloat32* const frictionCoefficient) const = 0;
 
 	dgArray<dgVector> m_posit;
 	dgArray<dgVector> m_veloc;

@@ -229,13 +229,14 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 	dgVector* const dx = dgAlloca(dgVector, m_linksCount);
 	dgVector* const dv = dgAlloca(dgVector, m_linksCount);
 
-	dgVector* const collisionDir0 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const collisionDir1 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const collisionDir2 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const collidingAccel = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const tmp0 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const tmp1 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const tmp2 = dgAlloca(dgVector, m_particlesCount);
+	dgVector* const normalDir = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const collisionDir1 = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const collisionDir2 = dgAlloca(dgVector, m_particlesCount);
+	dgVector* const normalAccel = dgAlloca(dgVector, m_particlesCount);
+	dgFloat32* const frictionCoeffecient = dgAlloca(dgFloat32, m_particlesCount);
+	dgVector* const volumeAccel = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const tmp1 = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const tmp2 = dgAlloca(dgVector, m_particlesCount);
 	dgVector* const dpdv = dgAlloca(dgVector, m_linksCount);
 //	dgVector* const diag = dgAlloca(dgVector, m_particlesCount);
 //	dgVector* const offDiag = dgAlloca(dgVector, m_particlesCount);
@@ -260,17 +261,17 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 //	dgFloat32 kd_dt0 = -timestep * kDamper;
 //	dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
 
-static int xxx;
-xxx ++;
-
 	dgVector dtRK4 (timestep / iter);
 	dgVector volumetricStiffness (-kVolumetricStiffness);
-	HandleCollision (timestep, collisionDir0, collisionDir1, collisionDir2, collidingAccel);
+	dgVector epsilon (dgFloat32 (1.0e-14f));
+
+	dtRK4 = dtRK4 & dgVector::m_triplexMask;
+	HandleCollision (timestep, normalDir, normalAccel, frictionCoeffecient);
 	for (dgInt32 k = 0; k < iter; k ++) {
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
 			accel[i] = unitAccel;
-			tmp0[i] = dgVector::m_zero;
+			volumeAccel[i] = dgVector::m_zero;
 		}
 
 		for (dgInt32 i = 0; i < m_finiteElementsCount; i++) {
@@ -297,11 +298,14 @@ xxx ++;
 			dgVector a0(deltaVolume.CompProduct4(area123));
 			dgVector a1(deltaVolume.CompProduct4(area0123));
 			dgVector a3(deltaVolume.CompProduct4(area012));
+			dgAssert (a0.m_w == dgFloat32 (0.0f));
+			dgAssert (a1.m_w == dgFloat32 (0.0f));
+			dgAssert (a3.m_w == dgFloat32 (0.0f));
 
-			tmp0[i0] += a0;
-			tmp0[i1] += a1 - a0;
-			tmp0[i2] -= a1 + a3;
-			tmp0[i3] += a3;
+			volumeAccel[i0] += a0;
+			volumeAccel[i1] += a1 - a0;
+			volumeAccel[i2] -= a1 + a3;
+			volumeAccel[i3] += a3;
 		}
 
 		for (dgInt32 i = 0; i < m_linksCount; i++) {
@@ -323,8 +327,11 @@ xxx ++;
 			const dgVector fs(p0p1.Scale4(kSpring * compression));
 			const dgVector fd(p0p1.Scale4(kDamper * den * den * (v0v1.DotProduct4(p0p1)).GetScalar()));
 
-			dpdv[i] = p0p1.CompProduct4(v0v1);
+			dgAssert(fs.m_w == dgFloat32(0.0f));
+			dgAssert(fs.m_w == dgFloat32(0.0f));
+			dgAssert(p0p1.m_w == dgFloat32(0.0f));
 
+			dpdv[i] = p0p1.CompProduct4(v0v1);
 			accel[j0] -= (fs + fd);
 			accel[j1] += (fs + fd);
 
@@ -340,23 +347,27 @@ xxx ++;
 
 			const dgInt32 j0 = links[i].m_m0;
 			const dgInt32 j1 = links[i].m_m1;
+
+			dgAssert (dfdx.m_w == dgFloat32 (0.0f));
 			accel[j0] += dfdx;
 			accel[j1] -= dfdx;
 		}
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			accel[i] += volumetricStiffness.CompProduct4(tmp0[i]);
-			tmp0[i] = accel[i].CompProduct4(collisionDir0[i]);
-			tmp1[i] = accel[i].CompProduct4(collisionDir1[i]);
-			tmp2[i] = accel[i].CompProduct4(collisionDir2[i]);
-		}
+			accel[i] += volumetricStiffness.CompProduct4(volumeAccel[i]);
+			dgVector normalDirAccel (normalDir[i].CompProduct4(accel[i].DotProduct4(normalDir[i])));
+			//dgVector dirAccel1 (collisionDir1[i].CompProduct4(accel[i].DotProduct4(collisionDir1[i])));
+			//dgVector dirAccel2 (collisionDir2[i].CompProduct4(accel[i].DotProduct4(collisionDir2[i])));
+			//tmp0[i] = accel[i] + collidingAccel[i] - dirAccel0 - dirAccel1 - dirAccel2;
+			volumeAccel[i] = accel[i] + normalAccel[i] - normalDirAccel;
+			dgVector tangentDir (veloc[i] - normalDir[i].CompProduct4(normalDir[i].DotProduct4(veloc[i])));
+			dgVector mag (tangentDir.DotProduct4(tangentDir) + epsilon);
 
-		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			tmp0[i] = accel[i] + collidingAccel[i] - collisionDir0[i].CompProduct4(tmp0[i]) - collisionDir1[i].CompProduct4(tmp1[i]) - collisionDir2[i].CompProduct4(tmp2[i]);
-		}
+			dgFloat32 tangentFrictionAccel = dgAbsf (accel[i].DotProduct4(normalDir[i]).GetScalar());
+			dgVector friction (tangentDir.Scale4 (frictionCoeffecient[i] * tangentFrictionAccel / dgSqrt (mag.GetScalar())));
+			volumeAccel[i] -= friction;
 
-		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			veloc[i] += tmp0[i].CompProduct4(dtRK4);
+			veloc[i] += volumeAccel[i].CompProduct4(dtRK4);
 			posit[i] += veloc[i].CompProduct4(dtRK4);
 		}
 	}
