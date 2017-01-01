@@ -152,7 +152,7 @@ public:
 	}
 
 	dgFloat32 PolygonIntersect(const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
-	dgFloat32 PolygonIntersectFallback(const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
+//	dgFloat32 PolygonIntersectFallback(const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const;
 
 	DG_INLINE dgInt32 BoxTest(const dgVector& minBox, const dgVector& maxBox) const
 	{
@@ -223,7 +223,6 @@ public:
 		dgAssert((mask.GetSignMask() & 1) == (t0.m_x < dgFloat32(1.0f)));
 		return t0.GetScalar();
 	}
-
 
 	dgVector m_p0;
 	dgVector m_p1;
@@ -334,11 +333,6 @@ class dgFastAABBInfo: public dgObb
 		}
 		return	dist0;
 	}
-
-	//DG_INLINE dgFloat32 GetSeparetionDistance() const
-	//{
-		//return m_separationDistance;
-	//}
 
 	private:
 	DG_INLINE void MakeBox1 (dgInt32 indexCount, const dgInt32* const indexArray, dgInt32 stride, const dgFloat32* const vertexArray, dgVector& minBox, dgVector& maxBox) const

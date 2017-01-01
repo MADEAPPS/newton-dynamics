@@ -186,9 +186,7 @@ void dgArray<T>::Resize (dgInt32 size) const
 		m_array = newArray;
 		m_maxSize = size;
 	} else if (size < m_maxSize) {
-		dgAssert(0);
-/*
-		size = size + m_granulatity - (size + m_granulatity) % m_granulatity;
+		size = dgMax (size, 16);
 		T* const newArray = (T*) m_allocator->MallocLow (sizeof (T) * size, m_aligmentInBytes);
 		if (m_array) {
 			for (dgInt32 i = 0; i < size; i ++) {
@@ -198,7 +196,6 @@ void dgArray<T>::Resize (dgInt32 size) const
 		}
 		m_array = newArray;
 		m_maxSize = size;
-*/
 	}
 }
 

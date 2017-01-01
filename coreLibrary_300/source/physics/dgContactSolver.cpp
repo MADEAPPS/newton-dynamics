@@ -318,18 +318,6 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTriangle (dgInt32& indexOut)
 		const dgFloat64 u2 = b1 * a00 - a01 * b0;
 		const dgFloat64 u1 = b0 * a11 - a01 * b1;
 
-		/*
-		const dgFloat64 d0 = sqrt(e10.DotProduct4(e10).GetScalar());
-		const dgFloat64 invd0 = dgFloat64(1.0f) / d0;
-		const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
-		const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
-		const dgFloat64 d1 = sqrt(desc11);
-		const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
-		dgFloat64 u1__ = b0 * invd0;
-		dgFloat64 u2__ = (b1 - l10 * u1__) * invd1 * invd1;
-		u1__ = (u1__ - l10 * u2__) * invd0;
-		*/
-
 		if (u2 < dgFloat32(0.0f)) {
 			// this looks funny but it is correct
 		} else if (u1 < dgFloat32(0.0f)) {
@@ -370,7 +358,7 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum (dgInt32& indexOut)
 			const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
 			const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
 			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
-			if (desc11 > dgFloat64(0.0f)) {
+			if (desc22 > dgFloat64(0.0f)) {
 				const dgFloat64 d2 = sqrt(desc22);
 				const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
 				const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();

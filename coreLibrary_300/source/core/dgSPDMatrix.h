@@ -557,6 +557,16 @@ DG_INLINE void dgCholeskySolve(dgInt32 size, dgInt32 n, const T* const matrix, T
 	}
 }
 
+template<class T>
+void dgCholeskySolve(dgInt32 size, T* const matrix, T* const x)
+{
+	for (dgInt32 i = 0; i < size; i++) {
+		dgCholeskyFactorizationAddRow(size, i, matrix);
+	}
+	dgCholeskySolve(size, size, matrix, x);
+}
+
+
 // calculate delta_r = A * delta_x
 template<class T>
 DG_INLINE void dgCalculateDelta_r(dgInt32 size, dgInt32 n, const T* const matrix, const T* const delta_x, T* const delta_r)

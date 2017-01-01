@@ -784,6 +784,8 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 			}
 
 			body->m_equilibrium = dgUnsigned32 (equilibrium);
+//body->m_equilibrium &= body->m_autoSleep;
+
 			stackSleeping &= equilibrium;
 			isAutoSleep &= body->m_autoSleep;
 

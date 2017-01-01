@@ -132,6 +132,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	dgInt32 GetLastVertexIndex() const;
 
 	dgInt32 IncLRU() const;
+	dgInt32 GetLRU() const;
 	void SetLRU(dgInt32 lru) const;
 
 	dgEdge* FindEdge (dgInt32 v0, dgInt32 v1) const;
@@ -257,6 +258,11 @@ DG_INLINE dgInt32 dgPolyhedra::IncLRU() const
 {	
 	m_edgeMark ++;
 	dgAssert (m_edgeMark < 0x7fffffff);
+	return m_edgeMark;
+}
+
+DG_INLINE dgInt32 dgPolyhedra::GetLRU() const
+{
 	return m_edgeMark;
 }
 

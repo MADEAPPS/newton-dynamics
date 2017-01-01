@@ -33,7 +33,7 @@
 #define DG_RAY_TOL_ADAPTIVE_ERROR (dgFloat32 (1.0e-1f))
 
 
-
+/*
 dgFloat32 dgFastRayTest::PolygonIntersectFallback (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
@@ -71,7 +71,7 @@ dgFloat32 dgFastRayTest::PolygonIntersectFallback (const dgVector& normal, dgFlo
 	}
 	return dgFloat32 (1.2f);
 }
-
+*/
 
 
 dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const
@@ -260,7 +260,7 @@ dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0
 			const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
 			const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
 			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
-			if (desc11 > dgFloat64(0.0f)) {
+			if (desc22 > dgFloat64(0.0f)) {
 				dgBigVector p0Point (point - p0);
 				const dgFloat64 d2 = sqrt(desc22);
 				const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
@@ -271,9 +271,7 @@ dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0
 
 				dgFloat64 u1 = b0 * invd0;
 				dgFloat64 u2 = (b1 - l10 * u1) * invd1;
-				dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2;
-
-				u3 = u3 * invd2;
+				dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2 * invd2;
 				u2 = (u2 - l21 * u3) * invd1;
 				u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
 				if (u3 < dgFloat64(0.0f)) {
