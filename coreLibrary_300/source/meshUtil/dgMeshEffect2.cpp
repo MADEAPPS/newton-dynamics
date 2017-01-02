@@ -26,6 +26,7 @@
 #include "dgCollisionConvexHull.h"
 
 
+
 class dgRayTrataAABBAccelerator: public dgMeshEffect::dgMeshBVH
 {
 	public:
@@ -132,13 +133,13 @@ class dgTetraIsoSufaceStuffing
 		}
 
 		private:
-		T m_elements[size];
 		dgInt32 m_count;
+		T m_elements[size];
 	};
 
 	typedef dgAssessor<dgInt32, 4> dgTetrahedra; 
 	typedef dgAssessor<dgFloat32, 6> dgTetraEdgeCuts; 
-	typedef dgAssessor<dgInt32, 16> dgTetraToVertexNode; 
+	typedef dgAssessor<dgInt32, 32> dgTetraToVertexNode; 
 
 	class dgNormalMap
 	{
@@ -204,6 +205,74 @@ class dgTetraIsoSufaceStuffing
 		dgInt32 m_count;
 	};
 
+	class dgClosePointsAccelerator: public dgMeshEffect::dgMeshBVH
+	{
+		public:
+		dgClosePointsAccelerator(const dgMeshEffect* const mesh)
+			:dgMeshEffect::dgMeshBVH(mesh)
+		{
+			Build();
+		}
+
+		dgMeshBVHNode* CreateLeafNode(dgEdge* const face, void* const userData)
+		{
+			dgMemoryAllocator* const allocator = m_mesh->GetAllocator();
+			dgMeshBVHNode* const node = new (allocator)dgMeshBVHNode(m_mesh, face, userData);
+
+			dgInt32 mark = m_mesh->GetLRU();
+			dgAssert(mark != face->m_mark);
+
+			dgEdge* faceEdge = face;
+			do {
+				faceEdge->m_mark = mark;
+				faceEdge = faceEdge->m_twin->m_next;
+			} while (faceEdge != face);
+
+			dgVector padding(dgFloat32(1.0f / 32.0f));
+			dgVector p(m_mesh->GetVertex(face->m_incidentVertex));
+			dgVector p0(p - padding);
+			dgVector p1(p + padding);
+			node->SetBox(p0, p1);
+			return node;
+		}
+
+		bool DoesTetrahedrumHasInsidePoints (const dgArray<dgBigVector>& m_points, const dgTetrahedra& tetra) const 
+		{
+			dgBigVector box0(dgFloat64(1.0e10f));
+			dgBigVector box1(dgFloat64(-1.0e10f));
+			for (dgInt32 i = 0; i < 4; i++) {
+				box0 = box0.GetMin(m_points[tetra[i]]);
+				box1 = box1.GetMax(m_points[tetra[i]]);
+			}
+
+			dgBigVector padding (dgFloat64 (0.01f));
+			box0 -= padding;
+			box1 += padding;
+
+			dgList<dgMeshBVH::dgMeshBVHNode*> overlapNodes(m_mesh->GetAllocator());
+			GetOverlapNodes(overlapNodes, box0, box1);
+			if (overlapNodes.GetCount()) {
+				dgBigVector p0(m_points[tetra[0]]);
+				dgBigVector p1(m_points[tetra[1]]);
+				dgBigVector p2(m_points[tetra[2]]);
+				dgBigVector p3(m_points[tetra[3]]);
+
+				for (dgList<dgMeshBVH::dgMeshBVHNode*>::dgListNode* node = overlapNodes.GetFirst(); node; node = node->GetNext()) {
+					dgEdge* const edge = node->GetInfo()->m_face;
+					dgBigVector point(m_mesh->GetVertex(edge->m_incidentVertex));
+					dgBigVector closestPoint(dgPointToTetrahedrumDistance(point, p0, p1, p2, p3));
+					dgBigVector error(closestPoint - point);
+					dgFloat64 error2 = error.DotProduct3(error);
+					if (error2 < dgFloat64(1.0e-8f)) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+	};
+
 	class dgRayTraceAccelerator: public dgMeshEffect::dgMeshBVH
 	{
 		enum dgTraceType
@@ -243,7 +312,7 @@ class dgTetraIsoSufaceStuffing
 				,m_param(2.0f)
 			{
 			}
-		
+
 			dgFloat32 m_param;
 		};
 
@@ -379,7 +448,7 @@ class dgTetraIsoSufaceStuffing
 			switch (rayType->m_type)
 			{
 				case m_pointSide:
-				return PointSideTest(faceNode, point0, point1, (dgRayTracePointSide*) rayType);
+					return PointSideTest(faceNode, point0, point1, (dgRayTracePointSide*) rayType);
 
 				case m_pointOnSurface:
 					return PointSurfaceHit(faceNode, point0, point1, (dgRayPointOnSurface*) rayType);
@@ -424,11 +493,12 @@ class dgTetraIsoSufaceStuffing
 		dgArray<dgTetraEdgeCuts> tetraEdgeCuts(mesh->GetAllocator());
 
 		dgGridDimension gridDim (CalculateGridSize(mesh, cellSize));
+		dgClosePointsAccelerator closePointaAccelerator (mesh);
 		dgRayTraceAccelerator rayAccelerator (mesh, gridDim.m_diameter);
 		
 		PopulateGridPoints (gridDim);
 		CalculateVertexSide (vertexSide, rayAccelerator);
-		BuildTetraGraph (gridDim, vertexSide, tetraGraph);
+		BuildTetraGraph (gridDim, vertexSide, closePointaAccelerator, tetraGraph);
 		//CalculateEdgeCuts (tetraEdgeCuts, tetraGraph, vertexSide, rayAccelerator);
 		//SnapClosePoints (tetraEdgeCuts, tetraGraph, vertexSide, rayAccelerator);
 	}
@@ -560,14 +630,17 @@ class dgTetraIsoSufaceStuffing
 		}
 	}
 
-	void AddTetra(dgArray<dgTetraToVertexNode>& graph, const dgTetrahedra& tetra, const dgArray<dgVertexSign>& vertexSigns)
+	void AddTetra(dgArray<dgTetraToVertexNode>& graph, const dgTetrahedra& tetra, const dgArray<dgVertexSign>& vertexSigns, const dgClosePointsAccelerator& closePoint)
 	{
-		dgAssert(TestVolume(tetra));
-		bool isOutSize = vertexSigns[tetra[0]] == m_outside;
-		isOutSize = isOutSize && (vertexSigns[tetra[1]] == m_outside);
-		isOutSize = isOutSize && (vertexSigns[tetra[2]] == m_outside);
-		isOutSize = isOutSize && (vertexSigns[tetra[3]] == m_outside);
-		if (!isOutSize) {
+		dgAssert(CalculateVolume(tetra) > dgFloat64(0.0f));
+		bool hasInsizePoints = false;
+		hasInsizePoints = hasInsizePoints || (vertexSigns[tetra[0]] == m_inside);
+		hasInsizePoints = hasInsizePoints || (vertexSigns[tetra[1]] == m_inside);
+		hasInsizePoints = hasInsizePoints || (vertexSigns[tetra[2]] == m_inside);
+		hasInsizePoints = hasInsizePoints || (vertexSigns[tetra[3]] == m_inside);
+		hasInsizePoints = hasInsizePoints || closePoint.DoesTetrahedrumHasInsidePoints(m_points, tetra);
+
+		if (hasInsizePoints) {
 			m_tetraList[m_tetraCount] = tetra;
 			dgTetrahedra& tetraEntry = m_tetraList[m_tetraCount];
 			for (dgInt32 i = 0; i < 4; i ++) {
@@ -579,13 +652,36 @@ class dgTetraIsoSufaceStuffing
 		}
 	}
 
-	void BuildTetraGraph(const dgGridDimension& gridDimension, const dgArray<dgVertexSign>& vertexSigns, dgArray<dgTetraToVertexNode>& graph)
+	void BuildTetraGraph(const dgGridDimension& gridDimension, const dgArray<dgVertexSign>& vertexSigns, const dgClosePointsAccelerator& closePoint, dgArray<dgTetraToVertexNode>& graph)
 	{
 		graph.Resize(m_pointCount);
 		for (dgInt32 i = 0; i < m_pointCount; i ++) {
 			graph[i] = dgTetraToVertexNode();
 		}
 
+		dgDelaunayTetrahedralization delaunayTetrahedras(m_points.GetAllocator(), &m_points[0].m_x, m_pointCount, sizeof (dgBigVector), dgFloat32(0.0f));
+		delaunayTetrahedras.RemoveUpperHull();
+
+		dgInt32 index = 0;
+		const dgConvexHull4dVector* const convexHulPoints = delaunayTetrahedras.GetHullVertexArray();
+		for (dgDelaunayTetrahedralization::dgListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) {
+			dgTetrahedra stuffingTetra;
+			dgConvexHull4dTetraherum& delaunayTetra = node->GetInfo();
+			
+			for (dgInt32 i = 0; i < 4; i ++) {
+				stuffingTetra[i] = delaunayTetra.m_faces[0].m_index[i];
+			}
+			dgFloat64 volume = CalculateVolume(stuffingTetra);
+			if (volume < dgFloat64 (0.0f)) {
+				dgSwap(stuffingTetra[0], stuffingTetra[1]);
+			}
+
+			AddTetra(graph, stuffingTetra, vertexSigns, closePoint);
+
+		}
+
+		
+/*
 		const dgInt32 base = gridDimension.m_innerSize;
 		for (dgInt32 z = 0; z < gridDimension.m_gridSizeZ; z++) {
 			for (dgInt32 y = 0; y < gridDimension.m_gridSizeY; y++) {
@@ -595,13 +691,13 @@ class dgTetraIsoSufaceStuffing
 					tetra[1] = ((z * gridDimension.m_gridSizeY + y) * gridDimension.m_gridSizeX) + x + 1;
 					tetra[2] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 1;
 					tetra[3] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra, vertexSigns);
+					AddTetra(graph, tetra, vertexSigns, closePoint);
 
 					tetra[0] = ((z * gridDimension.m_gridSizeY + y) * gridDimension.m_gridSizeX) + x;
 					tetra[1] = ((z * gridDimension.m_gridSizeY + y) * gridDimension.m_gridSizeX) + x + 1;
 					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 1;
 					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra, vertexSigns);
+					AddTetra(graph, tetra, vertexSigns, closePoint);
 				}
 			}
 		}
@@ -614,13 +710,13 @@ class dgTetraIsoSufaceStuffing
 					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
 					tetra[3] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
 					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra, vertexSigns);
+					AddTetra(graph, tetra, vertexSigns, closePoint);
 
 					tetra[0] = ((z * gridDimension.m_gridSizeY + (y + 0)) * gridDimension.m_gridSizeX) + x;
 					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
 					tetra[2] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
 					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
-					AddTetra(graph, tetra, vertexSigns);
+					AddTetra(graph, tetra, vertexSigns, closePoint);
 				}
 			}
 		}
@@ -633,13 +729,13 @@ class dgTetraIsoSufaceStuffing
 					tetra[1] = (((z + 1) * gridDimension.m_gridSizeY + y + 0) * gridDimension.m_gridSizeX) + x;
 					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 0;
 					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
-					AddTetra(graph, tetra, vertexSigns);
+					AddTetra(graph, tetra, vertexSigns, closePoint);
 
 					tetra[0] = (((z + 0) * gridDimension.m_gridSizeY + y + 0) * gridDimension.m_gridSizeX) + x;
 					tetra[1] = (((z + 1) * gridDimension.m_gridSizeY + y + 0) * gridDimension.m_gridSizeX) + x;
 					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 0) * (gridDimension.m_gridSizeX + 1)) + x + 1;
 					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra, vertexSigns);
+					AddTetra(graph, tetra, vertexSigns, closePoint);
 				}
 			}
 		}
@@ -652,19 +748,20 @@ class dgTetraIsoSufaceStuffing
 					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
 					tetra[2] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
 					tetra[3] = base + (((z + 1) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra, vertexSigns);
+					AddTetra(graph, tetra, vertexSigns, closePoint);
 
 					tetra[0] = ((z * gridDimension.m_gridSizeY + (y + 0)) * gridDimension.m_gridSizeX) + x;
 					tetra[1] = ((z * gridDimension.m_gridSizeY + (y + 1)) * gridDimension.m_gridSizeX) + x;
 					tetra[3] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 0;
 					tetra[2] = base + (((z + 0) * (gridDimension.m_gridSizeY + 1) + y + 1) * (gridDimension.m_gridSizeX + 1)) + x + 1;
-					AddTetra(graph, tetra, vertexSigns);
+					AddTetra(graph, tetra, vertexSigns, closePoint);
 				}
 			}
 		}
+*/
 	}
 
-	bool TestVolume(const dgTetrahedra& tetra) const
+	dgFloat64 CalculateVolume(const dgTetrahedra& tetra) const
 	{
 		const dgBigVector& p0 = m_points[tetra[0]];
 		const dgBigVector& p1 = m_points[tetra[1]];
@@ -673,7 +770,7 @@ class dgTetraIsoSufaceStuffing
 		dgBigVector p10(p1 - p0);
 		dgBigVector p20(p2 - p0);
 		dgBigVector p30(p3 - p0);
-		return p10.DotProduct3(p20.CrossProduct3(p30)) > dgFloat64(0.0f);
+		return p10.DotProduct3(p20.CrossProduct3(p30));
 	}
 
 	dgArray<dgBigVector> m_points;
@@ -1006,11 +1103,8 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
 }
 
 
-
 void dgMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEffect* const tetrahedraMesh)
 {
-	dgAssert (0);
-	return; 
 	dgRayTrataAABBAccelerator accelerator (tetrahedraMesh);
 	m_points.m_weights.Clear();
 	m_points.m_weights.Reserve(m_points.m_vertex.m_count);
@@ -1096,8 +1190,10 @@ void dgMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEf
 		}
 //		dgAssert (weightFound);
 		if (!weightFound) {
-//			dgTrace (("%d %f %f %f\n", i, p.m_x, p.m_y, p.m_z));
+			dgTrace (("%d %f %f %f\n", i, p.m_x, p.m_y, p.m_z));
 		}
+
+
 		overlapNodes.RemoveAll();
 	}
 }

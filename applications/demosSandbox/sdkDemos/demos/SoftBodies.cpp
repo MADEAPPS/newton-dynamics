@@ -246,13 +246,15 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 
 		NewtonWorld* const world = scene->GetNewton();
 		NewtonCollision* const primitiveShape = CreateConvexCollision (world, dGetIdentityMatrix(), size, _SPHERE_PRIMITIVE, materialID);
+		//NewtonCollision* const primitiveShape = CreateConvexCollision (world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, materialID);
 		NewtonMesh* const skinMesh = NewtonMeshCreateFromCollision(primitiveShape);
 
 		// now now make an tetrahedra iso surface approximation of this mesh
 		NewtonMesh* const tetraIsoSurface = NewtonMeshCreateTetrahedraIsoSurface(skinMesh);
 
+		// calculate the linear blend weight for the tetrahedra mesh
+		NewtonCreateTetrahedraLinearBlendSkinWeightsChannel (tetraIsoSurface, skinMesh);
 		NewtonDestroyCollision(primitiveShape);
-		NewtonMeshDestroy(skinMesh);
 
 		int material = LoadTexture("smilli.tga");
 		NewtonMeshApplyBoxMapping(tetraIsoSurface, material, material, material);
@@ -261,12 +263,14 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		// make a deformable collision mesh
 		NewtonCollision* const deformableCollision = NewtonCreateDeformableSolid(world, tetraIsoSurface, materialID);
 
-		BuildMesh(tetraIsoSurface, deformableCollision);
+		//BuildMesh(tetraIsoSurface, deformableCollision);
+		m_mesh = new DemoMesh (skinMesh);
 
 		//create a rigid body with a deformable mesh
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
+		NewtonMeshDestroy(skinMesh);
 		NewtonDestroyCollision(deformableCollision);
 		NewtonMeshDestroy(tetraIsoSurface);
 	}
@@ -408,6 +412,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 
 	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
 	{
+#if 0
 		NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
 		dAssert ((NewtonCollisionGetType(deformableCollision) == SERIALIZE_ID_CLOTH_PATCH) ||
 				 (NewtonCollisionGetType(deformableCollision) == SERIALIZE_ID_DEFORMABLE_SOLID));
@@ -422,7 +427,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 			mesh->m_vertex[i* 3 + 1] = particles[index + 1];
 			mesh->m_vertex[i* 3 + 2] = particles[index + 2];
 		}
-
+#endif
 //		glDisable(GL_CULL_FACE);
 		DemoEntity::Render(timeStep, scene);
 //		glEnable(GL_CULL_FACE);
