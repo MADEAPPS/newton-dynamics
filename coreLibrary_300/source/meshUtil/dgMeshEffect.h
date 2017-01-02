@@ -41,17 +41,34 @@ class dgCollisionInstance;
 class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 {
 	public:
-	struct dgMeshVertexFormat
+	enum dgChannelType
 	{
-		struct dgDoubleData
+		m_vertex,
+		m_normal,
+		m_binormal,
+		m_uv0,
+		m_uv1,
+		m_color,
+		m_material,
+		m_layer,
+		m_weight,
+		m_point,
+	};
+
+	class dgMeshVertexFormat
+	{
+		public:
+		class dgDoubleData
 		{
+			public:
 			const dgFloat64* m_data;
 			const dgInt32* m_indexList;
 			dgInt32 m_strideInBytes;
 		};
 
-		struct dgFloatData
+		class dgFloatData
 		{
+			public:
 			const dgFloat32* m_data;
 			const dgInt32* m_indexList;
 			dgInt32 m_strideInBytes;
@@ -76,20 +93,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgFloatData m_uv0;
 		dgFloatData m_uv1;
 		dgFloatData m_vertexColor;
-	};
-
-	enum dgChannelType
-	{
-		m_vertex,
-		m_normal,
-		m_binormal,
-		m_uv0,
-		m_uv1,
-		m_color,
-		m_material,
-		m_layer,
-		m_weight,
-		m_point,
 	};
 
 	template<class T, dgChannelType type>
@@ -230,7 +233,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		void SetCount (dgInt32 count);
 		void CopyFrom (const dgAttibutFormat& source);
 		void CopyEntryFrom (dgInt32 index, const dgAttibutFormat& source, dgInt32 sourceIndex);
-		void CompressData (const dgChannel<dgBigVector, m_point>& points, dgInt32* const indexList);
+		//void CompressData (const dgChannel<dgBigVector, m_point>& points, dgInt32* const indexList);
+		void CompressData (const dgPointFormat& points, dgInt32* const indexList);
 
 		dgChannel<dgInt32, m_vertex> m_pointChannel;
 		dgChannel<dgInt32, m_material> m_materialChannel;

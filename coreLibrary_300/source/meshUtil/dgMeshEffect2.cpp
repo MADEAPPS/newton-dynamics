@@ -1083,14 +1083,15 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
 				pointArray[i] = tetraIsoStuffing.m_points[index];
 			}
 			dgMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dgBigVector), dgFloat64(0.0f));
-			dgAssert (convexMesh.GetCount());
-			convexMesh.CalculateNormals(dgFloat32 (30.0f * 3.1416f / 180.0f));
-
+			//dgAssert (convexMesh.GetCount());
+			//convexMesh.CalculateNormals(dgFloat32 (30.0f * 3.1416f / 180.0f));
 			for (dgInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i++) {
 				convexMesh.m_points.m_layers[i] = layer;
 			}
 			delaunayPartition->MergeFaces(&convexMesh);
 			layer++;
+//if (layer >= 5)
+//break;
 		}
 		delaunayPartition->EndBuild(dgFloat64(1.0e-8f), false);
 	}

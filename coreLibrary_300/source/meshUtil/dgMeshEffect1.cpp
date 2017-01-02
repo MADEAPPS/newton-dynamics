@@ -118,6 +118,7 @@ void dgMeshEffect::dgPointFormat::CompressData(dgInt32* const indexList)
 	dgPointFormat tmpFormat(*this);
 	VertexSortData sortContext;
 	sortContext.m_points = &tmpFormat.m_vertex;
+	//sortContext.m_points = &tmpFormat;
 	sortContext.m_vertexSortIndex = firstSortAxis;
 	dgSort(indirectList, m_vertex.m_count, dgFormat::CompareVertex, &sortContext);
 
@@ -253,10 +254,11 @@ void dgMeshEffect::dgAttibutFormat::CopyFrom (const dgAttibutFormat& source)
 }
 
 
-void dgMeshEffect::dgAttibutFormat::CompressData (const dgChannel<dgBigVector, m_point>& points, dgInt32* const indexList)
+//void dgMeshEffect::dgAttibutFormat::CompressData (const dgChannel<dgBigVector, m_point>& points, dgInt32* const indexList)
+void dgMeshEffect::dgAttibutFormat::CompressData (const dgPointFormat& points, dgInt32* const indexList)
 {
 	dgFloat64 minDist;
-	const dgInt32 firstSortAxis = GetSortIndex(points, minDist);
+	const dgInt32 firstSortAxis = GetSortIndex(points.m_vertex, minDist);
 
 	dgStack<dgFormat::dgSortKey> indirectListBuffer(m_pointChannel.m_count);
 	dgFormat::dgSortKey* indirectList = &indirectListBuffer[0];
@@ -268,7 +270,7 @@ void dgMeshEffect::dgAttibutFormat::CompressData (const dgChannel<dgBigVector, m
 	}
 
 	VertexSortData sortContext;
-	sortContext.m_points = &points;
+	sortContext.m_points = &points.m_vertex;
 	sortContext.m_vertexSortIndex = firstSortAxis;
 	dgSort (indirectList, m_pointChannel.m_count, dgFormat::CompareVertex, &sortContext);
 	dgAttibutFormat tmpFormat (*this);
@@ -283,23 +285,26 @@ void dgMeshEffect::dgAttibutFormat::CompressData (const dgChannel<dgBigVector, m
 		if (ii == -1) {
 			const dgInt32 i0 = indirectList[i].m_ordinal;
 			const dgInt32 iii = indirectList[i].m_vertexIndex;
-			const dgFloat64 swept = points[iii][firstSortAxis] + sweptWindow;
+			const dgFloat64 swept = points.m_vertex[iii][firstSortAxis] + sweptWindow;
 			for (dgInt32 j = i + 1; j < tmpFormat.m_pointChannel.m_count; j++) {
 				const dgInt32 jj = indirectList[j].m_mask;
 				if (jj == -1) {
 					const dgInt32 j0 = indirectList[j].m_ordinal;
 					const dgInt32 jjj = indirectList[j].m_vertexIndex;;
-					dgFloat64 val = points[jjj][firstSortAxis];
+					dgFloat64 val = points.m_vertex[jjj][firstSortAxis];
 					if (val >= swept) {
 						break;
 					}
 
 					bool test = true;
 					if (iii != jjj) {
-						dgBigVector dp (points[iii] - points[jjj]);
+						dgBigVector dp (points.m_vertex[iii] - points.m_vertex[jjj]);
 						for (dgInt32 k = 0; k < 3; k ++) {
 							test &= (fabs (dp[k]) <= tolerance);
 						}
+					}
+					if (test && points.m_layers.m_count) {
+						test &= (points.m_layers[iii] <= points.m_layers[jjj]);
 					}
 
 					if (test && tmpFormat.m_normalChannel.m_count) {
@@ -1988,7 +1993,8 @@ void dgMeshEffect::PackAttibuteData()
 {
 	dgStack<dgInt32>attrIndexBuffer(m_attrib.m_pointChannel.m_count);
 	dgInt32* const attrIndexMap = &attrIndexBuffer[0];
-	m_attrib.CompressData(m_points.m_vertex, &attrIndexMap[0]);
+	//m_attrib.CompressData(m_points.m_vertex, &attrIndexMap[0]);
+	m_attrib.CompressData(m_points, &attrIndexMap[0]);
 
 	Iterator iter(*this);
 	for (iter.Begin(); iter; iter++) {
