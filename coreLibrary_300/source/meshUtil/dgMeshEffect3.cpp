@@ -580,10 +580,11 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 			dgHACDClusterFace& faceA = m_clusterA->GetFirst()->GetInfo();
 			dgBigVector end (origin - faceA.m_normal.Scale3 (rayDistance));
 
-			dgFloat64 paramOut;
 			dgAssert (0);
-			//dgMeshBVHNode* const node = FaceRayCast (origin, end, paramOut, false);
 /*
+			dgFloat64 paramOut;
+			//dgMeshBVHNode* const node = FaceRayCast (origin, end, paramOut, false);
+
 			dgMeshBVHNode* node;
 			FaceRayCast (origin, end, paramOut, &node);
 
@@ -749,7 +750,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		}
 
 		Trace();
-
+		dgAssert (0);
+/*
 		// add links to back faces
 		dgBigVector minAABB;
 		dgBigVector maxAABB;
@@ -786,7 +788,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 				ptr = ptr->m_next;
 			} while (ptr != edgeA);
 		}
-
+*/
 		Trace();
 	}
 

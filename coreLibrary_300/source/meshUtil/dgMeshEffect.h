@@ -134,10 +134,11 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 		void Reserve (dgInt32 size)
 		{
-			T dommy;
-			memset (&dommy, 0, sizeof (T));
-			dgArray<T>& me = *this;
-			me[size - 1] = dommy;
+			//T dommy;
+			//memset (&dommy, 0, sizeof (T));
+			//dgArray<T>& me = *this;
+			//me[size - 1] = dommy;
+			Resize(size);
 			m_count = size;
 		}
 
@@ -185,8 +186,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	class dgPointFormat: public dgFormat
 	{
 		public:
-		class dgWeight
+		class dgWeightPair
 		{
+			public:
 			dgFloat32 m_weight;
 			dgInt32 m_controlIndex;
 		};
@@ -194,7 +196,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		class dgWeightSet
 		{
 			public:
-			dgWeight m_weights[4];
+			dgWeightPair m_weightPair[4];
 		};
 
 		dgPointFormat(dgMemoryAllocator* const allocator);
@@ -248,7 +250,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgInt32* m_indexList;
 	};
 
-	public:
 	class dgMeshBVH
 	{
 		public:
@@ -280,7 +281,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		};
 
 		
-		dgMeshBVH (dgMeshEffect* const mesh);
+		dgMeshBVH (const dgMeshEffect* const mesh);
 		virtual ~dgMeshBVH();
 
 		virtual void Build ();
@@ -290,6 +291,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		void GetOverlapNodes (dgList<dgMeshBVHNode*>& overlapNodes, const dgBigVector& p0, const dgBigVector& p1) const;
 
 		protected:
+		virtual dgMeshBVHNode* CreateLeafNode (dgEdge* const face, void* const userData) = 0;
+
 		dgMeshBVHNode* AddFaceNode (dgEdge* const face, void* const userData);
 		void RemoveNode (dgMeshBVHNode* const treeNode);
 		void ImproveNodeFitness ();
@@ -298,12 +301,10 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		virtual bool SanityCheck() const;
 
 		virtual dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, void* const userData) const;
-
 //		virtual dgFloat64 VertexRayCast (const dgBigVector& l0, const dgBigVector& l1) const;
-
 //		virtual bool RayRayIntersect (dgEdge* const edge, const dgMeshEffect* const otherMesh, dgEdge* const otherEdge, dgFloat64& param, dgFloat64& otherParam) const;
 		
-		dgMeshEffect* m_mesh;
+		const dgMeshEffect* m_mesh;
 		dgMeshBVHNode* m_rootNode;
 		dgFitnessList m_fitness;
 		friend class dgMeshEffect;
@@ -426,6 +427,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMeshEffect* CreateConvexApproximation (dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullOuputCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const userData) const;
 
 	dgMeshEffect* CreateTetrahedraIsoSurface() const;
+	void CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEffect* const tetrahedraMesh);
+
 	static dgMeshEffect* CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
 	static dgMeshEffect* CreateFromSerialization (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
 
@@ -499,6 +502,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	friend class dgBooleanMeshBVH;
 	friend class dgHACDClusterGraph;
 	friend class dgTriangleAnglesToUV;
+	friend class dgTetraIsoSufaceStuffing;
 	friend class dgCollisionCompoundFractured;
 };
 

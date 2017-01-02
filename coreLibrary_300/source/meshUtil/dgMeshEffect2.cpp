@@ -25,6 +25,49 @@
 #include "dgMeshEffect.h"
 #include "dgCollisionConvexHull.h"
 
+
+class dgRayTrataAABBAccelerator: public dgMeshEffect::dgMeshBVH
+{
+	public:
+	dgRayTrataAABBAccelerator(const dgMeshEffect* const tetraMesh)
+		:dgMeshEffect::dgMeshBVH(tetraMesh)
+	{
+		Build();
+	}
+
+	dgMeshBVHNode* CreateLeafNode(dgEdge* const face, void* const userData)
+	{
+		dgMemoryAllocator* const allocator = m_mesh->GetAllocator();
+		dgMeshBVHNode* const node = new (allocator)dgMeshBVHNode(m_mesh, face, userData);
+
+		dgInt32 mark = m_mesh->GetLRU();
+
+		dgVector p0(m_mesh->GetVertex(face->m_twin->m_prev->m_incidentVertex));
+		dgVector p1(p0);
+		dgEdge* faceEdge = face;
+		do {
+			dgEdge* twinFace = faceEdge->m_twin;
+			do {
+				twinFace->m_mark = mark;
+				twinFace = twinFace->m_next;
+			} while (twinFace != faceEdge->m_twin);
+
+			dgVector point(m_mesh->GetVertex(faceEdge->m_incidentVertex));
+			p0 = point.GetMin(p0);
+			p1 = point.GetMax(p1);
+
+			faceEdge = faceEdge->m_next;
+		} while (faceEdge != face);
+
+		dgVector padding(dgFloat32(0.01f));
+		p0 -= padding;
+		p1 += padding;
+		node->SetBox(p0, p1);
+		return node;
+	}
+};
+
+
 // based on paper iso surface Stuffing : Fast Tetrahedral Meshes with Good Dihedral Angles
 // by Francois Labelle Jonathan Richard Shewchuk
 // University of California at Berkeley
@@ -213,6 +256,20 @@ class dgTetraIsoSufaceStuffing
 			Build();
 		}
 
+		dgMeshBVHNode* CreateLeafNode(dgEdge* const face, void* const userData)
+		{
+			dgMemoryAllocator* const allocator = m_mesh->GetAllocator();
+			dgMeshBVHNode* const node = new (allocator)dgMeshBVHNode(m_mesh, face, userData);
+			dgInt32 mark = m_mesh->GetLRU();
+			dgAssert(mark != face->m_mark);
+
+			dgEdge* faceEdge = face;
+			do {
+				faceEdge->m_mark = mark;
+				faceEdge = faceEdge->m_next;
+			} while (faceEdge != face);
+			return node;
+		}
 
 		dgFloat64 dgPointToRayDistance (const dgBigVector& point, const dgBigVector& ray_p0, const dgBigVector& ray_p1, dgRayTracePointSide* const rayType) const
 		{
@@ -314,7 +371,6 @@ class dgTetraIsoSufaceStuffing
 			}
 			return dgFloat64(2.0f);
 		}
-
 
 		dgFloat64 RayFaceIntersect(const dgMeshBVHNode* const faceNode, const dgBigVector& point0, const dgBigVector& point1, void* const userData) const
 		{
@@ -493,6 +549,7 @@ class dgTetraIsoSufaceStuffing
 		}
 
 		dgBigVector outerOrigin(gridDimension.m_origin - dgBigVector(gridDimension.m_cellSize * dgFloat64(0.5f)));
+		outerOrigin.m_w = dgFloat64 (0.0f);
 		for (dgInt32 z = 0; z < gridDimension.m_gridSizeZ + 1; z++) {
 			for (dgInt32 y = 0; y < gridDimension.m_gridSizeY + 1; y++) {
 				for (dgInt32 x = 0; x < gridDimension.m_gridSizeX + 1; x++) {
@@ -949,3 +1006,98 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
 }
 
 
+
+void dgMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEffect* const tetrahedraMesh)
+{
+	dgAssert (0);
+	return; 
+	dgRayTrataAABBAccelerator accelerator (tetrahedraMesh);
+	m_points.m_weights.Clear();
+	m_points.m_weights.Reserve(m_points.m_vertex.m_count);
+
+	dgBigVector padding (dgFloat64(1.0f / 32.0f));
+	for (dgInt32 i = 0; i < m_points.m_weights.m_count; i ++) {
+		dgBigVector p (m_points.m_vertex[i]);
+		dgBigVector p0 (p - padding);
+		dgBigVector p1 (p + padding);
+		dgList<dgMeshBVH::dgMeshBVHNode*> overlapNodes (GetAllocator());
+		accelerator.GetOverlapNodes (overlapNodes, p0, p1);
+		dgAssert (overlapNodes.GetCount());
+
+		bool weightFound = false;
+		for (dgList<dgMeshBVH::dgMeshBVHNode*>::dgListNode* node = overlapNodes.GetFirst(); node; node = node->GetNext()) {
+			dgEdge* const edge = node->GetInfo()->m_face;
+
+			dgInt32 i0 = edge->m_incidentVertex;
+			dgInt32 i1 = edge->m_next->m_incidentVertex;
+			dgInt32 i2 = edge->m_prev->m_incidentVertex;
+			dgInt32 i3 = edge->m_twin->m_prev->m_incidentVertex;
+			dgBigVector p0 (tetrahedraMesh->m_points.m_vertex[i0]);
+			dgBigVector p1 (tetrahedraMesh->m_points.m_vertex[i1]);
+			dgBigVector p2 (tetrahedraMesh->m_points.m_vertex[i2]);
+			dgBigVector p3 (tetrahedraMesh->m_points.m_vertex[i3]);
+
+			const dgBigVector e10(p1 - p0);
+			const dgBigVector e20(p2 - p0);
+			const dgBigVector e30(p3 - p0);
+
+			const dgFloat64 d0 = sqrt(e10.DotProduct4(e10).GetScalar());
+			if (d0 > dgFloat64(0.0f)) {
+				const dgFloat64 invd0 = dgFloat64(1.0f) / d0;
+				const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
+				const dgFloat64 l20 = e30.DotProduct4(e10).GetScalar() * invd0;
+				const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
+				if (desc11 > dgFloat64(0.0f)) {
+					const dgFloat64 d1 = sqrt(desc11);
+					const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
+					const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
+					const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
+					if (desc11 > dgFloat64(0.0f)) {
+						dgBigVector p0Point(p - p0);
+						const dgFloat64 d2 = sqrt(desc22);
+						const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
+
+						const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
+						const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
+						const dgFloat64 b2 = e30.DotProduct4(p0Point).GetScalar();
+
+						dgFloat64 u1 = b0 * invd0;
+						dgFloat64 u2 = (b1 - l10 * u1) * invd1;
+						dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2;
+
+						u3 = u3 * invd2;
+						u2 = (u2 - l21 * u3) * invd1;
+						u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
+						if ((u1 >= dgFloat64(0.0f)) && (u2 >= dgFloat64(0.0f)) && (u3 >= dgFloat64(0.0f)) && ((u1 + u2 + u3) <= dgFloat64(1.0f))) {
+							dgBigVector q0 (p0 + e10.Scale4(u1) + e20.Scale4(u2) + e30.Scale4(u3));
+
+							dgFloat64 u0 = dgFloat64 (1.0f) - u1 - u2 - u3;
+							dgBigVector q1 (p0.Scale4 (u0) + p1.Scale4 (u1) + p2.Scale4 (u2) + p3.Scale4 (u3));
+							dgPointFormat::dgWeightSet& weighSet = m_points.m_weights[i];
+
+							weighSet.m_weightPair[0].m_controlIndex = i0;
+							weighSet.m_weightPair[0].m_weight = dgFloat32 (u0);
+
+							weighSet.m_weightPair[1].m_controlIndex = i1;
+							weighSet.m_weightPair[1].m_weight = dgFloat32(u1);
+
+							weighSet.m_weightPair[2].m_controlIndex = i2;
+							weighSet.m_weightPair[2].m_weight = dgFloat32(u2);
+
+							weighSet.m_weightPair[3].m_controlIndex = i3;
+							weighSet.m_weightPair[3].m_weight = dgFloat32(u3);
+
+							weightFound = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+//		dgAssert (weightFound);
+		if (!weightFound) {
+//			dgTrace (("%d %f %f %f\n", i, p.m_x, p.m_y, p.m_z));
+		}
+		overlapNodes.RemoveAll();
+	}
+}

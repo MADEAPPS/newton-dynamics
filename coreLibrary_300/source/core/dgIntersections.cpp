@@ -204,7 +204,7 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 }
 
 
-dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, const dgVector& ray_p1)
+dgBigVector dgPointToRayDistance (const dgBigVector& point, const dgBigVector& ray_p0, const dgBigVector& ray_p1)
 {
 	dgFloat32 t;
 	dgVector dp (ray_p1 - ray_p0);
@@ -212,7 +212,7 @@ dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, co
 	return ray_p0 + dp.Scale3 (t);
 }
 
-dgVector dgPointToTriangleDistance(const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2)
+dgBigVector dgPointToTriangleDistance(const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2)
 {
 	const dgBigVector e10(p1 - p0);
 	const dgBigVector e20(p2 - p0);
@@ -243,7 +243,7 @@ dgVector dgPointToTriangleDistance(const dgVector& point, const dgVector& p0, co
 	return p0;
 }
 
-dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2, const dgVector& p3)
+dgBigVector dgPointToTetrahedrumDistance (const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& p3)
 {
 	const dgBigVector e10(p1 - p0);
 	const dgBigVector e20(p2 - p0);

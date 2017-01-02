@@ -535,12 +535,12 @@ DG_INLINE void dgCholeskyRestore(dgInt32 size, dgInt32 n, T* const matrix, const
 
 
 template<class T>
-DG_INLINE void dgCholeskySolve(dgInt32 size, dgInt32 n, const T* const matrix, T* const x)
+DG_INLINE void dgCholeskySolve(dgInt32 size, dgInt32 n, const T* const choleskyMatrix, T* const x)
 {
 	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < n; i++) {
 		T acc(0.0f);
-		const T* const row = &matrix[stride];
+		const T* const row = &choleskyMatrix[stride];
 		for (dgInt32 j = 0; j < i; j++) {
 			acc = acc + row[j] * x[j];
 		}
@@ -551,19 +551,24 @@ DG_INLINE void dgCholeskySolve(dgInt32 size, dgInt32 n, const T* const matrix, T
 	for (dgInt32 i = n - 1; i >= 0; i--) {
 		T acc = 0.0f;
 		for (dgInt32 j = i + 1; j < n; j++) {
-			acc = acc + matrix[size * j + i] * x[j];
+			acc = acc + choleskyMatrix[size * j + i] * x[j];
 		}
-		x[i] = (x[i] - acc) / matrix[size * i + i];
+		x[i] = (x[i] - acc) / choleskyMatrix[size * i + i];
 	}
 }
 
 template<class T>
-void dgCholeskySolve(dgInt32 size, T* const matrix, T* const x)
+void dgCholeskyFactorization(dgInt32 size, T* const psdMatrix)
 {
 	for (dgInt32 i = 0; i < size; i++) {
-		dgCholeskyFactorizationAddRow(size, i, matrix);
+		dgCholeskyFactorizationAddRow(size, i, psdMatrix);
 	}
-	dgCholeskySolve(size, size, matrix, x);
+	}
+
+template<class T>
+void dgCholeskySolve(dgInt32 size, T* const choleskyMatrix, T* const x)
+{
+	dgCholeskySolve(size, size, choleskyMatrix, x);
 }
 
 

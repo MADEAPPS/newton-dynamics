@@ -847,7 +847,7 @@ class dgBooleanMeshClipper: public dgMeshEffect::dgMeshBVH
 		{
 		}
 
-		void ClipMeshesFaces(dgEdge* const faceA, dgMeshEffect* const meshB, dgEdge* const faceB, const dgBigVector& planeB, const dgBigVector* const segment)
+		void ClipMeshesFaces(dgEdge* const faceA, const dgMeshEffect* const meshB, dgEdge* const faceB, const dgBigVector& planeB, const dgBigVector* const segment)
 		{
 			dgTreeNode* node = Find (faceA);
 			if (!node) {
@@ -989,7 +989,7 @@ do {
 		return false;
 	}
 
-	static void CalculateIntersection (dgMeshEffect* const edgeOwnerMesh, dgEdge* const edgeStart, dgMeshEffect* const faceOwnerMesh, dgEdge* const face, const dgHugeVector& facePlane, dgBigVector* const data, dgInt32& index)
+	static void CalculateIntersection (const dgMeshEffect* const edgeOwnerMesh, dgEdge* const edgeStart, const dgMeshEffect* const faceOwnerMesh, dgEdge* const face, const dgHugeVector& facePlane, dgBigVector* const data, dgInt32& index)
 	{
 		dgEdge* edge = edgeStart;
 		do {
@@ -1003,8 +1003,8 @@ do {
 
 	static void ClipMeshesFaces(dgBooleanMeshClipper& bvhMeshA, dgEdge* const faceA, dgBooleanMeshClipper& bvhMeshB, dgEdge* const faceB)
 	{
-		dgMeshEffect* const meshA = bvhMeshA.m_mesh;
-		dgMeshEffect* const meshB = bvhMeshB.m_mesh;
+		const dgMeshEffect* const meshA = bvhMeshA.m_mesh;
+		const dgMeshEffect* const meshB = bvhMeshB.m_mesh;
 		dgAssert (meshA->FindEdge(faceA->m_incidentVertex, faceA->m_twin->m_incidentVertex) == faceA);
 		dgAssert (meshB->FindEdge(faceB->m_incidentVertex, faceB->m_twin->m_incidentVertex) == faceB);
 
@@ -1027,6 +1027,8 @@ do {
 
 	static void ClipMeshesAndColorize(dgMeshEffect* const meshA, dgMeshEffect* const meshB)
 	{
+		dgAssert (0);
+/*
 		dgBooleanMeshClipper BVHmeshA(meshA);
 		dgBooleanMeshClipper BVHmeshB(meshB);
 
@@ -1088,7 +1090,7 @@ do {
 				}
 			}
 		}
-
+*/
 		dgAssert (0);
 //		network.Colorize();
 	

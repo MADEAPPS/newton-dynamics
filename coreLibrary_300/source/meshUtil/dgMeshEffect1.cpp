@@ -435,8 +435,8 @@ dgMeshEffect::dgMeshBVH::dgMeshBVHNode::dgMeshBVHNode (const dgMeshEffect* const
 	,m_right(NULL)
 	,m_parent(NULL)
 {
-	dgBigVector p0(1.0e30, 1.0e30, 1.0e30, 0.0);
-	dgBigVector p1(-1.0e30, -1.0e30, -1.0e30, 0.0);
+	dgBigVector p0(dgFloat32 ( 1.0e30f));
+	dgBigVector p1(dgFloat32 (-1.0e30f));
 
 	const dgBigVector* const points = (dgBigVector*) mesh->GetVertexPool();
 
@@ -444,20 +444,14 @@ dgMeshEffect::dgMeshBVH::dgMeshBVHNode::dgMeshBVHNode (const dgMeshEffect* const
 	do {
 		dgInt32 i = ptr->m_incidentVertex;
 		const dgBigVector& p = points[i];
-		p0.m_x = dgMin(p.m_x, p0.m_x);
-		p0.m_y = dgMin(p.m_y, p0.m_y);
-		p0.m_z = dgMin(p.m_z, p0.m_z);
-
-		p1.m_x = dgMax(p.m_x, p1.m_x);
-		p1.m_y = dgMax(p.m_y, p1.m_y);
-		p1.m_z = dgMax(p.m_z, p1.m_z);
+		p0 = p.GetMin(p0);
+		p1 = p.GetMax(p1);
 
 		ptr = ptr->m_next;
 	} while (ptr != face);
 
-
-	SetBox (dgVector (dgFloat32 (p0.m_x) - dgFloat32 (0.1f), dgFloat32 (p0.m_y) - dgFloat32 (0.1f), dgFloat32 (p0.m_z) - dgFloat32 (0.1f), 0.0f), 
-			dgVector (dgFloat32 (p1.m_x) + dgFloat32 (0.1f), dgFloat32 (p1.m_y) + dgFloat32 (0.1f), dgFloat32 (p1.m_z) + dgFloat32 (0.1f), 0.0f));
+	dgVector padding (dgFloat32 (1.0f / 32.0f));
+	SetBox (p0 - padding, p1 + padding);
 }
 
 dgMeshEffect::dgMeshBVH::dgMeshBVHNode::dgMeshBVHNode (dgMeshBVHNode* const left, dgMeshBVHNode* const right)
@@ -471,8 +465,10 @@ dgMeshEffect::dgMeshBVH::dgMeshBVHNode::dgMeshBVHNode (dgMeshBVHNode* const left
 	m_left->m_parent = this;
 	m_right->m_parent = this;
 
-	dgVector p0 (dgMin (left->m_p0.m_x, right->m_p0.m_x), dgMin (left->m_p0.m_y, right->m_p0.m_y), dgMin (left->m_p0.m_z, right->m_p0.m_z), dgFloat32 (0.0f));
-	dgVector p1 (dgMax (left->m_p1.m_x, right->m_p1.m_x), dgMax (left->m_p1.m_y, right->m_p1.m_y), dgMax (left->m_p1.m_z, right->m_p1.m_z), dgFloat32 (0.0f));
+//	dgVector p0 (dgMin (left->m_p0.m_x, right->m_p0.m_x), dgMin (left->m_p0.m_y, right->m_p0.m_y), dgMin (left->m_p0.m_z, right->m_p0.m_z), dgFloat32 (0.0f));
+//	dgVector p1 (dgMax (left->m_p1.m_x, right->m_p1.m_x), dgMax (left->m_p1.m_y, right->m_p1.m_y), dgMax (left->m_p1.m_z, right->m_p1.m_z), dgFloat32 (0.0f));
+	dgVector p0 (left->m_p0.GetMin(right->m_p0));
+	dgVector p1 (left->m_p1.GetMax(right->m_p1));
 	SetBox(p0, p1);
 }
 
@@ -487,22 +483,16 @@ dgMeshEffect::dgMeshBVH::dgMeshBVHNode::~dgMeshBVHNode ()
 	}
 }
 
-
 void dgMeshEffect::dgMeshBVH::dgMeshBVHNode::SetBox (const dgVector& p0, const dgVector& p1)
 {
-	m_p0 = p0;
-	m_p1 = p1;
-	m_p0.m_w = 0.0f;
-	m_p1.m_w = 0.0f;
-
-	dgVector size ((m_p1 - m_p0).Scale3 (dgFloat32 (0.5f)));
-	dgVector size1(size.m_y, size.m_z, size.m_x, dgFloat32 (0.0f));
+	m_p0 = p0 & dgVector::m_triplexMask;
+	m_p1 = p1 & dgVector::m_triplexMask;
+	dgVector size ((m_p1 - m_p0).CompProduct4(dgVector::m_half));
+	dgVector size1(size.ShiftTripleLeftt());
 	m_area = size.DotProduct3(size1);
 }
 
-
-
-dgMeshEffect::dgMeshBVH::dgMeshBVH (dgMeshEffect* const mesh)
+dgMeshEffect::dgMeshBVH::dgMeshBVH (const dgMeshEffect* const mesh)
 	:m_mesh(mesh)
 	,m_rootNode(NULL)
 	,m_fitness(m_mesh->GetAllocator())
@@ -573,9 +563,21 @@ void dgMeshEffect::Serialize (dgSerialize callback, void* const userData) const
 
 void dgMeshEffect::dgMeshBVH::Build ()
 {
+	dgInt32 lru = m_mesh->IncLRU();
+/*
 	for (void* faceNode = m_mesh->GetFirstFace (); faceNode; faceNode = m_mesh->GetNextFace(faceNode)) {
 		if (!m_mesh->IsFaceOpen(faceNode)) {
 			dgEdge* const face = &((dgTreeNode*)faceNode)->GetInfo();
+			if (face->m_mark != mark) {
+				AddFaceNode(face, NULL);
+			}
+		}
+	}
+*/
+	dgMeshEffect::Iterator iter(*m_mesh);
+	for (iter.Begin(); iter; iter++) {
+		dgEdge* const face = &iter.GetNode()->GetInfo();
+		if (face->m_mark != lru) {
 			AddFaceNode(face, NULL);
 		}
 	}
@@ -753,12 +755,19 @@ void dgMeshEffect::dgMeshBVH::ImproveNodeFitness ()
 	} while (cost1 < (dgFloat32 (0.95f)) * cost0);
 }
 
+/*
+dgMeshEffect::dgMeshBVH::dgMeshBVHNode* dgMeshEffect::dgMeshBVH::CreateLeafNode (dgEdge* const face, void* const userData)
+{
+	dgMemoryAllocator* const allocator = m_mesh->GetAllocator();
+	return new (allocator) dgMeshBVHNode (m_mesh, face, userData);
+}
+*/
 
 dgMeshEffect::dgMeshBVH::dgMeshBVHNode* dgMeshEffect::dgMeshBVH::AddFaceNode (dgEdge* const face, void* const userData)
 {
 	dgMemoryAllocator* const allocator = m_mesh->GetAllocator();
 
-	dgMeshBVHNode* const newNode = new (allocator) dgMeshBVHNode (m_mesh, face, userData);
+	dgMeshBVHNode* const newNode = CreateLeafNode (face, userData);
 	if (!m_rootNode) {
 		m_rootNode = newNode;
 	} else {
