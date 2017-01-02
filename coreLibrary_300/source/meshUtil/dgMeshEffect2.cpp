@@ -69,10 +69,8 @@ class dgRayTrataAABBAccelerator: public dgMeshEffect::dgMeshBVH
 };
 
 
-// based on paper iso surface Stuffing : Fast Tetrahedral Meshes with Good Dihedral Angles
-// by Francois Labelle Jonathan Richard Shewchuk
-// University of California at Berkeley
-// https://people.eecs.berkeley.edu/~jrs/papers/stuffing.pdf
+// idea taken from paper: Fast Tetrahedral Meshes with Good Dihedral Angles, by Francois Labelle Jonathan Richard Shewchuk
+// but quite different approach.
 class dgTetraIsoSufaceStuffing
 {
 	public:
@@ -317,7 +315,7 @@ class dgTetraIsoSufaceStuffing
 		};
 
 		public:
-		dgRayTraceAccelerator(dgMeshEffect* const mesh, dgFloat64 diameter)
+		dgRayTraceAccelerator(const dgMeshEffect* const mesh, dgFloat64 diameter)
 			:dgMeshEffect::dgMeshBVH(mesh)
 			,m_normals()
 			,m_diameter(diameter)
@@ -482,7 +480,7 @@ class dgTetraIsoSufaceStuffing
 		dgFloat64 m_diameter;
 	};
 
-	dgTetraIsoSufaceStuffing(dgMeshEffect* const mesh, dgFloat64 cellSize)
+	dgTetraIsoSufaceStuffing(const dgMeshEffect* const mesh, dgFloat64 cellSize)
 		:m_points(mesh->GetAllocator())
 		,m_tetraList(mesh->GetAllocator())
 		,m_pointCount(0)
@@ -1064,10 +1062,37 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 
 dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
 {
-	dgMeshEffect copy(*this);
-	copy.Triangulate();
+/*
+dgMeshEffect xxxx  (GetAllocator());
+xxxx.BeginBuild();
 
-	dgTetraIsoSufaceStuffing tetraIsoStuffing (&copy, dgFloat64(0.125f));
+xxxx.BeginBuildFace ();
+xxxx.AddPoint (0.0, 0.0, -1.0);
+xxxx.AddLayer (0);
+
+xxxx.AddPoint (1.0, 0.0, 0.0);
+xxxx.AddLayer (0);
+
+xxxx.AddPoint (0.0, 0.0, 1.0);
+xxxx.AddLayer (0);
+xxxx.EndBuildFace ();
+
+xxxx.BeginBuildFace ();
+xxxx.AddPoint (0.0, 0.0, -1.0);
+xxxx.AddLayer (1);
+
+xxxx.AddPoint (0.0, 0.0, 1.0);
+xxxx.AddLayer (1);
+
+xxxx.AddPoint (-1.0, 0.0, 0.0);
+xxxx.AddLayer (1);
+
+xxxx.EndBuildFace ();
+xxxx.EndBuild(dgFloat64(1.0e-8f), false);
+*/
+
+
+	dgTetraIsoSufaceStuffing tetraIsoStuffing (this, dgFloat64(0.125f));
 
 	dgMeshEffect* delaunayPartition = NULL;
 	if (tetraIsoStuffing.m_tetraCount) {
@@ -1090,8 +1115,6 @@ dgMeshEffect* dgMeshEffect::CreateTetrahedraIsoSurface() const
 			}
 			delaunayPartition->MergeFaces(&convexMesh);
 			layer++;
-//if (layer >= 5)
-//break;
 		}
 		delaunayPartition->EndBuild(dgFloat64(1.0e-8f), false);
 	}

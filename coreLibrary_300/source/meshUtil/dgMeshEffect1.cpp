@@ -304,7 +304,7 @@ void dgMeshEffect::dgAttibutFormat::CompressData (const dgPointFormat& points, d
 						}
 					}
 					if (test && points.m_layers.m_count) {
-						test &= (points.m_layers[iii] <= points.m_layers[jjj]);
+						test &= (points.m_layers[iii] == points.m_layers[jjj]);
 					}
 
 					if (test && tmpFormat.m_normalChannel.m_count) {
@@ -1993,7 +1993,6 @@ void dgMeshEffect::PackAttibuteData()
 {
 	dgStack<dgInt32>attrIndexBuffer(m_attrib.m_pointChannel.m_count);
 	dgInt32* const attrIndexMap = &attrIndexBuffer[0];
-	//m_attrib.CompressData(m_points.m_vertex, &attrIndexMap[0]);
 	m_attrib.CompressData(m_points, &attrIndexMap[0]);
 
 	Iterator iter(*this);
