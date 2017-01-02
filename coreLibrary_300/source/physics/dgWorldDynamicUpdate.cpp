@@ -458,7 +458,7 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 		tmpInfoList[i] = jointInfo;
 		if (jointInfo.m_isFrontier) {
 			queue.Insert(&tmpInfoList[i]);
-			tmpInfoList[i].m_isInQueueFrontier = 1;
+			tmpInfoList[i].m_isInQueueFrontier = -1;
 		} else {
 			if (jointInfo.m_joint->m_body0->GetInvMass().m_w && (heaviestMass > jointInfo.m_joint->m_body0->GetInvMass().m_w)) {
 				heaviestMass = jointInfo.m_joint->m_body0->m_invMass.m_w;
@@ -474,7 +474,7 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 	if (queue.IsEmpty()) {
 		dgAssert(heaviestBody);
 		queue.Insert(heaviestBody);
-		heaviestBody->m_isInQueueFrontier = 1;
+		heaviestBody->m_isInQueueFrontier = -1;
 	}
 
 	dgInt32 infoIndex = 0;
@@ -517,7 +517,7 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 							//dgAssert (!nextInfo->m_isInQueueFrontier);
 							if (!nextInfo->m_isInQueueFrontier) {
 								queue.Insert(nextInfo);
-								nextInfo->m_isInQueueFrontier = 1;
+								nextInfo->m_isInQueueFrontier = -1;
 							}
 						}
 					}
@@ -534,7 +534,7 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 //							dgAssert (!nextInfo->m_isInQueueFrontier);
 							if (!nextInfo->m_isInQueueFrontier) {
 								queue.Insert(nextInfo);
-								nextInfo->m_isInQueueFrontier = 1;
+								nextInfo->m_isInQueueFrontier = -1;
 							}
 						}
 					}
