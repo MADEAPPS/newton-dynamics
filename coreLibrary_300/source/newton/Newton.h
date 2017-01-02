@@ -316,7 +316,6 @@ extern "C" {
 		int m_unused[3];
 	} NewtonUserContactPoint;
 
-
 	// data structure for interfacing with NewtonMesh
 	typedef struct NewtonMeshDoubleData
 	{
@@ -331,7 +330,6 @@ extern "C" {
 		int* m_indexList;
 		int m_strideInBytes;
 	} NewtonMeshFloatData;
-
 
 	typedef struct NewtonMeshVertexFormat
 	{
@@ -1212,7 +1210,7 @@ extern "C" {
 	NEWTON_API void NewtonMeshApplyCylindricalMapping(const NewtonMesh* const mesh, int cylinderMaterial, int capMaterial);
 	NEWTON_API void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int frontMaterial, int sideMaterial, int topMaterial);
 	NEWTON_API void NewtonMeshApplyAngleBasedMapping(const NewtonMesh* const mesh, int material, NewtonReportProgress reportPrograssCallback, void* const reportPrgressUserData);
-	
+
 	NEWTON_API void NewtonCreateTetrahedraLinearBlendSkinWeightsChannel(const NewtonMesh* const tetrahedraMesh, NewtonMesh* const skinMesh);
 	
 	NEWTON_API void NewtonMeshOptimize (const NewtonMesh* const mesh);
@@ -1252,6 +1250,7 @@ extern "C" {
 
 	NEWTON_API int NewtonMeshGetPointCount (const NewtonMesh* const mesh); 
 	NEWTON_API const int* NewtonMeshGetIndexToVertexMap(const NewtonMesh* const mesh);
+	NEWTON_API int NewtonMeshGetVertexWeights(const NewtonMesh* const mesh, int vertexIndex, int* const weightIndex, dFloat* const weightFactor);
 
 	NEWTON_API void NewtonMeshGetVertexDoubleChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat64* const outBuffer);
 	NEWTON_API void NewtonMeshGetVertexChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);

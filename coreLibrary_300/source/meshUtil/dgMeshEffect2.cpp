@@ -662,8 +662,6 @@ class dgTetraIsoSufaceStuffing
 		dgDelaunayTetrahedralization delaunayTetrahedras(m_points.GetAllocator(), &m_points[0].m_x, m_pointCount, sizeof (dgBigVector), dgFloat32(0.0f));
 		delaunayTetrahedras.RemoveUpperHull();
 
-		dgInt32 index = 0;
-		const dgConvexHull4dVector* const convexHulPoints = delaunayTetrahedras.GetHullVertexArray();
 		for (dgDelaunayTetrahedralization::dgListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) {
 			dgTetrahedra stuffingTetra;
 			dgConvexHull4dTetraherum& delaunayTetra = node->GetInfo();
@@ -675,9 +673,7 @@ class dgTetraIsoSufaceStuffing
 			if (volume < dgFloat64 (0.0f)) {
 				dgSwap(stuffingTetra[0], stuffingTetra[1]);
 			}
-
 			AddTetra(graph, stuffingTetra, vertexSigns, closePoint);
-
 		}
 
 		
@@ -1135,60 +1131,60 @@ void dgMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEf
 			const dgBigVector e20(p2 - p0);
 			const dgBigVector e30(p3 - p0);
 
+			dgAssert (e10.DotProduct4(e10).GetScalar() > dgFloat32 (0.0f));
 			const dgFloat64 d0 = sqrt(e10.DotProduct4(e10).GetScalar());
-			if (d0 > dgFloat64(0.0f)) {
-				const dgFloat64 invd0 = dgFloat64(1.0f) / d0;
-				const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
-				const dgFloat64 l20 = e30.DotProduct4(e10).GetScalar() * invd0;
-				const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
-				if (desc11 > dgFloat64(0.0f)) {
-					const dgFloat64 d1 = sqrt(desc11);
-					const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
-					const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
-					const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
-					if (desc11 > dgFloat64(0.0f)) {
-						dgBigVector p0Point(p - p0);
-						const dgFloat64 d2 = sqrt(desc22);
-						const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
+			const dgFloat64 invd0 = dgFloat64(1.0f) / d0;
+			const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
+			const dgFloat64 l20 = e30.DotProduct4(e10).GetScalar() * invd0;
 
-						const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
-						const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
-						const dgFloat64 b2 = e30.DotProduct4(p0Point).GetScalar();
+			dgAssert ((e20.DotProduct4(e20).GetScalar() - l10 * l10) > dgFloat32 (0.0f));
+			const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
 
-						dgFloat64 u1 = b0 * invd0;
-						dgFloat64 u2 = (b1 - l10 * u1) * invd1;
-						dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2;
+			const dgFloat64 d1 = sqrt(desc11);
+			const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
+			const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
+			dgAssert (e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21 > dgFloat32 (0.0f));
+			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
 
-						u3 = u3 * invd2;
-						u2 = (u2 - l21 * u3) * invd1;
-						u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
-						if ((u1 >= dgFloat64(0.0f)) && (u2 >= dgFloat64(0.0f)) && (u3 >= dgFloat64(0.0f)) && ((u1 + u2 + u3) <= dgFloat64(1.0f))) {
-							dgBigVector q0 (p0 + e10.Scale4(u1) + e20.Scale4(u2) + e30.Scale4(u3));
+			dgBigVector p0Point(p - p0);
+			const dgFloat64 d2 = sqrt(desc22);
+			const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
 
-							dgFloat64 u0 = dgFloat64 (1.0f) - u1 - u2 - u3;
-							dgBigVector q1 (p0.Scale4 (u0) + p1.Scale4 (u1) + p2.Scale4 (u2) + p3.Scale4 (u3));
-							dgPointFormat::dgWeightSet& weighSet = m_points.m_weights[i];
+			const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
+			const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
+			const dgFloat64 b2 = e30.DotProduct4(p0Point).GetScalar();
 
-							weighSet.m_weightPair[0].m_controlIndex = i0;
-							weighSet.m_weightPair[0].m_weight = dgFloat32 (u0);
+			dgFloat64 u1 = b0 * invd0;
+			dgFloat64 u2 = (b1 - l10 * u1) * invd1;
+			dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2;
 
-							weighSet.m_weightPair[1].m_controlIndex = i1;
-							weighSet.m_weightPair[1].m_weight = dgFloat32(u1);
+			u3 = u3 * invd2;
+			u2 = (u2 - l21 * u3) * invd1;
+			u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
+			if ((u1 >= dgFloat64(0.0f)) && (u2 >= dgFloat64(0.0f)) && (u3 >= dgFloat64(0.0f)) && ((u1 + u2 + u3) <= dgFloat64(1.0f))) {
+				dgBigVector q0 (p0 + e10.Scale4(u1) + e20.Scale4(u2) + e30.Scale4(u3));
 
-							weighSet.m_weightPair[2].m_controlIndex = i2;
-							weighSet.m_weightPair[2].m_weight = dgFloat32(u2);
+				dgFloat64 u0 = dgFloat64 (1.0f) - u1 - u2 - u3;
+				dgBigVector q1 (p0.Scale4 (u0) + p1.Scale4 (u1) + p2.Scale4 (u2) + p3.Scale4 (u3));
+				dgPointFormat::dgWeightSet& weighSet = m_points.m_weights[i];
 
-							weighSet.m_weightPair[3].m_controlIndex = i3;
-							weighSet.m_weightPair[3].m_weight = dgFloat32(u3);
+				weighSet.m_weightPair[0].m_controlIndex = i0;
+				weighSet.m_weightPair[0].m_weight = dgFloat32 (u0);
 
-							weightFound = true;
-							break;
-						}
-					}
-				}
+				weighSet.m_weightPair[1].m_controlIndex = i1;
+				weighSet.m_weightPair[1].m_weight = dgFloat32(u1);
+
+				weighSet.m_weightPair[2].m_controlIndex = i2;
+				weighSet.m_weightPair[2].m_weight = dgFloat32(u2);
+
+				weighSet.m_weightPair[3].m_controlIndex = i3;
+				weighSet.m_weightPair[3].m_weight = dgFloat32(u3);
+
+				weightFound = true;
+				break;
 			}
 		}
-//		dgAssert (weightFound);
+		dgAssert (weightFound);
 		if (!weightFound) {
 			dgTrace (("%d %f %f %f\n", i, p.m_x, p.m_y, p.m_z));
 		}

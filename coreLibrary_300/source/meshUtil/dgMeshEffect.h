@@ -36,6 +36,7 @@ class dgCollisionInstance;
 #define DG_MESH_EFFECT_POINT_SPLITED		512
 #define DG_MESH_EFFECT_BVH_STACK_DEPTH		256
 
+#define DG_MESH_WEIGHT_COUNT				4
 
 class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 {
@@ -196,7 +197,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		class dgWeightSet
 		{
 			public:
-			dgWeightPair m_weightPair[4];
+			dgWeightPair m_weightPair[DG_MESH_WEIGHT_COUNT];
 		};
 
 		dgPointFormat(dgMemoryAllocator* const allocator);
@@ -396,6 +397,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	dgInt32 GetPropertiesCount() const;
 	const dgInt32* GetIndexToVertexMap() const;
+	dgInt32 GetVertexWeights(dgInt32 vectexIndex, dgInt32* const weightIndices, dgFloat32* const weightFactors) const;
 
 	bool HasNormalChannel() const;
 	bool HasBinormalChannel() const;

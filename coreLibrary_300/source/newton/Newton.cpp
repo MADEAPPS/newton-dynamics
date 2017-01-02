@@ -7816,48 +7816,12 @@ const int* NewtonMeshGetIndexToVertexMap(const NewtonMesh* const mesh)
 	return meshEffect->GetIndexToVertexMap();
 }
 
-/*
-int NewtonMeshGetPointStrideInByte (const NewtonMesh* const mesh)
-{
-	TRACE_FUNCTION(__FUNCTION__);	
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	return meshEffect->GetPropertiesStrideInByte();
-}
-
-dFloat64* NewtonMeshGetPointArray (const NewtonMesh* const mesh) 
+int NewtonMeshGetVertexWeights(const NewtonMesh* const mesh, int vertexIndex, int* const weightIndices, dFloat* const weightFactors)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	return meshEffect->GetAttributePool();
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	return meshEffect->GetVertexWeights (vertexIndex, weightIndices, weightFactors);
 }
-
-
-dFloat64* NewtonMeshGetNormalArray (const NewtonMesh* const mesh)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	return meshEffect->GetNormalPool();
-}
-
-dFloat64* NewtonMeshGetUV0Array (const NewtonMesh* const mesh)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	return meshEffect->GetUV0Pool();
-}
-
-dFloat64* NewtonMeshGetUV1Array (const NewtonMesh* const mesh)
-{	
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	return meshEffect->GetUV1Pool();
-}
-*/
 
 int NewtonMeshHasNormalChannel(const NewtonMesh* const mesh)
 {

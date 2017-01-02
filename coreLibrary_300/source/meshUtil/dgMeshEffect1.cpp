@@ -3866,7 +3866,16 @@ void dgMeshEffect::RepairTJoints ()
 	dgAssert (Sanity ());
 }
 
-
-
-
-
+dgInt32 dgMeshEffect::GetVertexWeights(dgInt32 vertexIndex, dgInt32* const weightIndices, dgFloat32* const weightFactors) const
+{
+	dgInt32 count = 0;
+	if (m_points.m_weights.m_count) {
+		count = DG_MESH_WEIGHT_COUNT;
+		const dgPointFormat::dgWeightSet& weighSet = m_points.m_weights[vertexIndex];
+		for (dgInt32 i = 0; i < DG_MESH_WEIGHT_COUNT; i ++) {
+			weightFactors[i] = weighSet.m_weightPair[i].m_weight;
+			weightIndices[i] = weighSet.m_weightPair[i].m_controlIndex;
+		}
+	}
+	return count;
+}
