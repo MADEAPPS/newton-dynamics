@@ -93,30 +93,23 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
 
-			int pointCount = NewtonMeshGetPointCount(skinMesh);
-			const int* const indexMap = NewtonMeshGetIndexToVertexMap(skinMesh);
-			m_indexMap = new int[pointCount];
-			m_weightSet = new WeightIndexPair[pointCount];
-			const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
+			int skinPointCount = NewtonMeshGetPointCount(skinMesh);
+			const int* const deformableIndexMap = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
 
 			int weightIndex[16];
 			dFloat weightValue[16];
-			for (int i = 0; i < pointCount; i++) {
-				int j = indexMap[i];
-				int weightCount = NewtonMeshGetVertexWeights(skinMesh, j, weightIndex, weightValue);
+			m_weightSet = new WeightIndexPair[skinPointCount];
+			for (int i = 0; i < skinPointCount; i++) {
+				int weightCount = NewtonMeshGetVertexWeights(skinMesh, i, weightIndex, weightValue);
 				for (int k = 0; k < weightCount; k ++) {
-					m_weightSet[i].m_index[k] = weightIndex[k];
+					m_weightSet[i].m_index[k] = deformableIndexMap[weightIndex[k]];
 					m_weightSet[i].m_weight[k] = weightValue[k];
 				}
-				m_indexMap[i] = solidIndexList[j];
 			}
 		}
 
 		~LinearBlendMesh()
 		{
-			if (m_indexMap) {
-				delete[] m_indexMap;
-			}
 			if (m_weightSet) {
 				delete[] m_weightSet;
 			}
@@ -124,7 +117,6 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 		void Render (DemoEntityManager* const scene)
 		{
-/*
 			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
 			dAssert((NewtonCollisionGetType(deformableCollision) == SERIALIZE_ID_CLOTH_PATCH) || (NewtonCollisionGetType(deformableCollision) == SERIALIZE_ID_DEFORMABLE_SOLID));
 
@@ -132,19 +124,24 @@ class SimpleSoftBodyEntity: public DemoEntity
 			int stride = NewtonDeformableMeshGetParticleStrideInBytes(deformableCollision) / sizeof (dFloat);
 
 			for (int i = 0; i < m_vertexCount; i++) {
-				int index = m_indexMap[i] * stride;
-				m_vertex[i * 3 + 0] = particles[index + 0];
-				m_vertex[i * 3 + 1] = particles[index + 1];
-				m_vertex[i * 3 + 2] = particles[index + 2];
+				dVector p (0.0f);
+				const WeightIndexPair& weightSet = m_weightSet[i];
+				for (int j = 0; j < 4; j ++) {
+					int index = weightSet.m_index[j] * stride;
+					p.m_x += particles[index + 0] * weightSet.m_weight[j];
+					p.m_y += particles[index + 1] * weightSet.m_weight[j];
+					p.m_z += particles[index + 2] * weightSet.m_weight[j];
+				}
+				m_vertex[i * 3 + 0] = p.m_x;
+				m_vertex[i * 3 + 1] = p.m_y;
+				m_vertex[i * 3 + 2] = p.m_z;
 			}
-*/
-			//glDisable(GL_CULL_FACE);
+
 			DemoMesh::Render(scene);
-			//glEnable(GL_CULL_FACE);
 		}
 
 		NewtonBody* m_body;
-		int* m_indexMap;
+		//int* m_indexMap;
 		WeightIndexPair* m_weightSet;
 	};
 
@@ -374,8 +371,8 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
 		// create the soft body mesh
-		//m_mesh = new LinearBlendMesh(skinMesh, m_body);
-		m_mesh = new TetrahedraSoftMesh(tetraIsoSurface, m_body);
+		m_mesh = new LinearBlendMesh(skinMesh, m_body);
+		//m_mesh = new TetrahedraSoftMesh(tetraIsoSurface, m_body);
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
 		NewtonMeshDestroy(skinMesh);
