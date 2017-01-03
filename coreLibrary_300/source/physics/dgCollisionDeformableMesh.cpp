@@ -41,6 +41,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCol
 	,m_indexToVertexMap(world->GetAllocator())
 	,m_skinThickness (dgFloat32 (1.0f / 16.0f))
 	,m_linksCount(0)
+	,m_indexToVertexCount(0)
 {
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
 }
@@ -49,9 +50,10 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformable
 	:dgCollisionLumpedMassParticles(source)
 	,m_linkList(source.m_linkList, source.m_linksCount)
 	,m_restlength(source.m_restlength, source.m_linksCount)
-	,m_indexToVertexMap(source.m_indexToVertexMap, source.m_linksCount)
+	,m_indexToVertexMap(source.m_indexToVertexMap, source.m_indexToVertexCount)
 	,m_skinThickness (source.m_skinThickness)
 	,m_linksCount(source.m_linksCount)
+	,m_indexToVertexCount(source.m_indexToVertexCount)
 {
 	m_rtti = source.m_rtti;
 }
@@ -63,10 +65,10 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgDes
 	,m_indexToVertexMap(world->GetAllocator())
 	,m_skinThickness (dgFloat32 (1.0f / 16.0f))
 	,m_linksCount(0)
+	,m_indexToVertexCount(0)
 {
 	dgAssert(0);
 }
-
 
 dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 {

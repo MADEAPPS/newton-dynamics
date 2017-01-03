@@ -49,6 +49,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 	}
 	m_finiteElementsCount ++;
 
+	m_indexToVertexCount = count;
 	m_indexToVertexMap.Resize(count);
 	dgInt32* const indexToVertexMap = &m_indexToVertexMap[0];
 	m_particlesCount = dgVertexListToIndexList (&points[0].m_x, sizeof (dgVector), 3 * sizeof (dgFloat32), 0, count, indexToVertexMap, dgFloat32 (1.0e-5f));

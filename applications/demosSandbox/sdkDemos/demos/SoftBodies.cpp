@@ -35,8 +35,9 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 			int pointCount = NewtonMeshGetPointCount(tetrahedraMesh);
 			const int* const indexMap = NewtonMeshGetIndexToVertexMap(tetrahedraMesh);
-			m_indexMap = new int[pointCount];
 			const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
+
+			m_indexMap = new int[pointCount];
 			for (int i = 0; i < pointCount; i++) {
 				int j = indexMap[i];
 				m_indexMap[i] = solidIndexList[j];
@@ -65,9 +66,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 				m_vertex[i * 3 + 2] = particles[index + 2];
 			}
 
-			//glDisable(GL_CULL_FACE);
 			DemoMesh::Render(scene);
-			//glEnable(GL_CULL_FACE);
 		}
 
 		NewtonBody* m_body;
@@ -375,7 +374,8 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
 		// create the soft body mesh
-		m_mesh = new LinearBlendMesh(skinMesh, m_body);
+		//m_mesh = new LinearBlendMesh(skinMesh, m_body);
+		m_mesh = new TetrahedraSoftMesh(tetraIsoSurface, m_body);
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
 		NewtonMeshDestroy(skinMesh);

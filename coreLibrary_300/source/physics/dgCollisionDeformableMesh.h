@@ -65,6 +65,7 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 	dgArray<dgInt32> m_indexToVertexMap;
 	dgFloat32 m_skinThickness;
 	dgInt32 m_linksCount;
+	dgInt32 m_indexToVertexCount;
 	
 
 	static dgVector m_smallestLenght2;
