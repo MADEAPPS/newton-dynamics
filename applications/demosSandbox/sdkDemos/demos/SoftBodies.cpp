@@ -59,6 +59,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 			const dFloat* const particles = NewtonDeformableMeshGetParticleArray(deformableCollision);
 			int stride = NewtonDeformableMeshGetParticleStrideInBytes(deformableCollision) / sizeof (dFloat);
 
+			// calculate vertex skinning
 			for (int i = 0; i < m_vertexCount; i++) {
 				int index = m_indexMap[i] * stride;
 				m_vertex[i * 3 + 0] = particles[index + 0];
@@ -123,6 +124,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 			const dFloat* const particles = NewtonDeformableMeshGetParticleArray(deformableCollision);
 			int stride = NewtonDeformableMeshGetParticleStrideInBytes(deformableCollision) / sizeof (dFloat);
 
+			// calculate vertex skinning
 			for (int i = 0; i < m_vertexCount; i++) {
 				dVector p (0.0f);
 				const WeightIndexPair& weightSet = m_weightSet[i];
@@ -135,7 +137,52 @@ class SimpleSoftBodyEntity: public DemoEntity
 				m_vertex[i * 3 + 0] = p.m_x;
 				m_vertex[i * 3 + 1] = p.m_y;
 				m_vertex[i * 3 + 2] = p.m_z;
+
+				// clear the normal for next loop
+				m_normal[i * 3 + 0] = 0.0f;
+				m_normal[i * 3 + 1] = 0.0f;
+				m_normal[i * 3 + 2] = 0.0f;
 			}
+
+			// calculate vertex normals 
+			int normalStride = 3;
+			for (DemoMesh::dListNode* segmentNode = GetFirst(); segmentNode; segmentNode = segmentNode->GetNext()) {
+				const DemoSubMesh& subSegment = segmentNode->GetInfo();
+				for (int i = 0; i < subSegment.m_indexCount; i += 3) {
+					int i0 = subSegment.m_indexes[i + 0] * normalStride;
+					int i1 = subSegment.m_indexes[i + 1] * normalStride;
+					int i2 = subSegment.m_indexes[i + 2] * normalStride;
+					dVector p0(m_vertex[i0], m_vertex[i0 + 1], m_vertex[i0 + 2], 0.0f);
+					dVector p1(m_vertex[i1], m_vertex[i1 + 1], m_vertex[i1 + 2], 0.0f);
+					dVector p2(m_vertex[i2], m_vertex[i2 + 1], m_vertex[i2 + 2], 0.0f);
+					dVector p10(p1 - p0);
+					dVector p20(p2 - p0);
+					dVector normal(p10.CrossProduct(p20));
+					normal = normal.Scale(1.0f / dSqrt(normal.DotProduct3(normal)));
+
+					m_normal[i0 + 0] += normal.m_x;
+					m_normal[i0 + 1] += normal.m_y;
+					m_normal[i0 + 2] += normal.m_z;
+
+					m_normal[i1 + 0] += normal.m_x;
+					m_normal[i1 + 1] += normal.m_y;
+					m_normal[i1 + 2] += normal.m_z;
+
+					m_normal[i2 + 0] += normal.m_x;
+					m_normal[i2 + 1] += normal.m_y;
+					m_normal[i2 + 2] += normal.m_z;
+				}
+			}
+
+			// normalize all the normals
+			for (int i = 0; i < m_vertexCount; i++) {
+				dVector n(m_normal[i * 3 + 0], m_normal[i * 3 + 1], m_normal[i * 3 + 2], 0.0f);
+				n = n.Scale (1.0f / dSqrt(n.DotProduct3(n)));
+				m_normal[i * 3 + 0] = n.m_x;
+				m_normal[i * 3 + 1] = n.m_y;
+				m_normal[i * 3 + 2] = n.m_z;
+			}
+
 
 			DemoMesh::Render(scene);
 		}
