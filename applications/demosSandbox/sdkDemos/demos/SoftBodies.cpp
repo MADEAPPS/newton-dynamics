@@ -450,55 +450,28 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		NewtonMesh* const clothPatch = NewtonMeshCreate(scene->GetNewton());
 		NewtonMeshBeginBuild(clothPatch);
 		for (int i = 0; i < size_z - 1; i++) {
-			//if (i & 1) {
-			if (1) {
-				for (int j = 0; j < size_x - 1; j++) {
-					NewtonMeshBeginFace(clothPatch);
-						NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
+			for (int j = 0; j < size_x - 1; j++) {
+				NewtonMeshBeginFace(clothPatch);
+				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
 
-						NewtonMeshAddPoint(clothPatch, points[i + 0][j + 1].m_x, points[i + 0][j + 1].m_y, points[i + 0][j + 1].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
+				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 1].m_x, points[i + 0][j + 1].m_y, points[i + 0][j + 1].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
 
-						NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
-					NewtonMeshEndFace(clothPatch);
+				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+				NewtonMeshEndFace(clothPatch);
 
-					NewtonMeshBeginFace(clothPatch);
-						NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
+				NewtonMeshBeginFace(clothPatch);
+				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
 
-						NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
+				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
 
-						NewtonMeshAddPoint(clothPatch, points[i + 1][j + 0].m_x, points[i + 1][j + 0].m_y, points[i + 1][j + 0].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
-					NewtonMeshEndFace(clothPatch);
-				}
-			} else {
-				for (int j = 0; j < size_x - 1; j++) {
-					NewtonMeshBeginFace(clothPatch);
-						NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
-
-						NewtonMeshAddPoint(clothPatch, points[i + 0][j + 1].m_x, points[i + 0][j + 1].m_y, points[i + 0][j + 1].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
-
-						NewtonMeshAddPoint(clothPatch, points[i + 1][j + 0].m_x, points[i + 1][j + 0].m_y, points[i + 1][j + 0].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
-					NewtonMeshEndFace(clothPatch);
-
-					NewtonMeshBeginFace(clothPatch);
-						NewtonMeshAddPoint(clothPatch, points[i + 0][j + 1].m_x, points[i + 0][j + 1].m_y, points[i + 0][j + 1].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
-
-						NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
-
-						NewtonMeshAddPoint(clothPatch, points[i + 1][j + 0].m_x, points[i + 1][j + 0].m_y, points[i + 1][j + 0].m_z);
-						NewtonMeshAddMaterial(clothPatch, 0);
-					NewtonMeshEndFace(clothPatch);
-				}
+				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 0].m_x, points[i + 1][j + 0].m_y, points[i + 1][j + 0].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+				NewtonMeshEndFace(clothPatch);
 			}
 		}
 		NewtonMeshEndBuild(clothPatch);

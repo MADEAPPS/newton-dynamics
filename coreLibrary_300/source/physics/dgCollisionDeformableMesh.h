@@ -58,6 +58,7 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 	virtual void HandleCollision (dgFloat32 timestep, dgVector* const normalDir, dgVector* const normalAccel, dgFloat32* const frictionCoefficient) const;
 	virtual void CalculateAcceleration(dgFloat32 timestep);
 
+	static dgInt32 CompareEdges(const dgSoftLink* const A, const dgSoftLink* const B, void* const context);
 	dgFloat32 CalculaleContactPenetration(const dgVector& point, const dgVector& normal) const;
 
 	dgArray<dgSoftLink> m_linkList;

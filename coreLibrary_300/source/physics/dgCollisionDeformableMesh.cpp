@@ -74,6 +74,19 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 {
 }
 
+dgInt32 dgCollisionDeformableMesh::CompareEdges(const dgSoftLink* const A, const dgSoftLink* const B, void* const context)
+{
+	dgInt64 m0 = (dgInt64(A->m_m0) << 32) + A->m_m1;
+	dgInt64 m1 = (dgInt64(B->m_m0) << 32) + B->m_m1;
+	if (m0 > m1) {
+		return 1;
+	} else if (m0 < m1) {
+		return -1;
+	}
+	return 0;
+}
+
+
 void dgCollisionDeformableMesh::FinalizeBuild()
 {
 	dgCollisionLumpedMassParticles::FinalizeBuild();
@@ -88,17 +101,6 @@ void dgCollisionDeformableMesh::FinalizeBuild()
 		m_restlength[i] = dgSqrt(dp.DotProduct3(dp));
 		dgAssert(m_restlength[i] > dgFloat32(1.0e-2f));
 	}
-
-
-#if 0
-	m_linksCount = 1;
-	m_particlesCount = 2;
-	m_posit[1] = m_posit[0];
-	m_posit[1].m_y -= 1.0f;
-	m_restlength[0] = 1.0f;
-	m_linkList[0].m_v0 = 0;
-	m_linkList[0].m_v1 = 1;
-#endif
 }
 
 void dgCollisionDeformableMesh::Serialize(dgSerialize callback, void* const userData) const

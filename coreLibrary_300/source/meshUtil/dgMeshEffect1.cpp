@@ -2578,6 +2578,11 @@ dgEdge* dgMeshEffect::SpliteFace (dgInt32 v0, dgInt32 v1)
 	return NULL;
 }
 
+const dgEdge* dgMeshEffect::GetPolyhedraEdgeFromNode(const void* const edge) const
+{
+	dgTreeNode* const node = (dgTreeNode*)edge;
+	return &node->GetInfo();
+}
 
 void* dgMeshEffect::GetFirstEdge () const
 {
@@ -2618,7 +2623,7 @@ void* dgMeshEffect::GetNextEdge (const void* const edge) const
 
 void dgMeshEffect::GetEdgeIndex (const void* const edge, dgInt32& v0, dgInt32& v1) const
 {
-	dgTreeNode* node = (dgTreeNode*) edge;
+	dgTreeNode* const node = (dgTreeNode*) edge;
 	v0 = node->GetInfo().m_incidentVertex;
 	v1 = node->GetInfo().m_twin->m_incidentVertex;
 }

@@ -34,8 +34,59 @@
 dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const world, dgMeshEffect* const mesh)
 	:dgCollisionDeformableMesh(world, m_deformableSolidMesh)
 {
-	dgAssert (0);
 	m_rtti |= dgCollisionDeformableClothPatch_RTTI;
+	
+	dgInt32 count = mesh->GetVertexCount();
+	dgVector* const points = dgAlloca(dgVector, count);
+
+	for (dgInt32 i = 0; i < count; i++) {
+		dgBigVector p(mesh->GetVertex(i));
+		points[i] = p;
+	}
+
+	m_indexToVertexCount = count;
+	m_indexToVertexMap.Resize(count);
+	dgInt32* const indexToVertexMap = &m_indexToVertexMap[0];
+	m_particlesCount = dgVertexListToIndexList(&points[0].m_x, sizeof(dgVector), 3 * sizeof(dgFloat32), 0, count, indexToVertexMap, dgFloat32(1.0e-5f));
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		m_posit[i] = points[i];
+	}
+
+
+	dgInt32 edgeCount = 0;
+	dgSoftLink* const links = dgAlloca(dgSoftLink, mesh->GetCount() / 2);
+	for (void* edgePtr = mesh->GetFirstEdge(); edgePtr; edgePtr = mesh->GetNextEdge(edgePtr)) {
+		const dgEdge* const edge = mesh->GetPolyhedraEdgeFromNode(edgePtr);
+
+		dgInt32 v0 = indexToVertexMap[edge->m_incidentVertex];
+		dgInt32 v1 = indexToVertexMap[edge->m_twin->m_incidentVertex];
+		links[edgeCount].m_m0 = dgInt16(dgMin(v0, v1));
+		links[edgeCount].m_m1 = dgInt16(dgMax(v0, v1));
+		edgeCount++;
+		if ((edge->m_incidentFace > 0) && (edge->m_twin->m_incidentFace > 0)) {
+			v0 = indexToVertexMap[edge->m_prev->m_incidentVertex];
+			v1 = indexToVertexMap[edge->m_twin->m_prev->m_incidentVertex];
+			links[edgeCount].m_m0 = dgInt16(dgMin(v0, v1));
+			links[edgeCount].m_m1 = dgInt16(dgMax(v0, v1));
+			edgeCount++;
+		}
+	}
+	dgSort(links, edgeCount, CompareEdges);
+
+	dgInt32 uniqueEdgeCount = 0;
+	for (dgInt32 i = 1; i < edgeCount; i++) {
+		if (CompareEdges(&links[i], &links[uniqueEdgeCount], NULL) > 0) {
+			uniqueEdgeCount++;
+			links[uniqueEdgeCount] = links[i];
+		}
+	}
+	uniqueEdgeCount++;
+	m_linksCount = uniqueEdgeCount;
+	m_linkList.Resize(m_linksCount);
+	for (dgInt32 i = 0; i < m_linksCount; i++) {
+		m_linkList[i] = links[i];
+	}
+	FinalizeBuild();
 }
 
 

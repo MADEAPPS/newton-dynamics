@@ -169,18 +169,6 @@ dgCollisionDeformableSolidMesh::~dgCollisionDeformableSolidMesh(void)
 }
 
 
-dgInt32 dgCollisionDeformableSolidMesh::CompareEdges (const dgSoftLink* const A, const dgSoftLink* const B, void* const context)
-{
-	dgInt64 m0 = (dgInt64(A->m_m0)<<32) + A->m_m1;
-	dgInt64 m1 = (dgInt64(B->m_m0)<<32) + B->m_m1;
-	if (m0 > m1) {
-		return 1;
-	} else if (m0 < m1) {
-		return -1;
-	} 
-	return 0;
-}
-
 void dgCollisionDeformableSolidMesh::DebugCollision(const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	const dgVector* const posit = &m_posit[0];
