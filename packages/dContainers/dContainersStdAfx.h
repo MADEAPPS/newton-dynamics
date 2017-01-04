@@ -53,6 +53,11 @@
 #endif
 
 #ifdef _MACOSX_VER
+	//#ifndef _MAC_IPHONE
+	//	#include <pthread.h>
+	//	#include <semaphore.h>
+	//#endif	
+
 	#include <unistd.h>
 	#include <libkern/OSAtomic.h>
 	#include <sys/sysctl.h>
