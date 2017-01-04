@@ -189,29 +189,42 @@ dgThread::~dgThread ()
 
 void dgThread::Init (dgInt32 stacksize)
 {
+#ifdef DG_USE_PTHREADS
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
 	pthread_attr_setstacksize (&attr, stacksize);
 	pthread_create (&m_handle, &attr, dgThreadSystemCallback, this);
 	pthread_attr_destroy (&attr);
+#else 
+	m_handle = std::thread(dgThreadSystemCallback, this);
+#endif
 }
 
 void dgThread::Close ()
 {
+#ifdef DG_USE_PTHREADS
 	pthread_join (m_handle, NULL);
+#else 
+	m_handle.join();
+#endif
 }
 
 
 dgInt32 dgThread::GetPriority() const
 {
+#ifdef DG_USE_PTHREADS
 	dgInt32 policy;
 	sched_param param;
 	pthread_getschedparam (m_handle, &policy, &param);
 	return param.sched_priority;
+#else 
+	return 0;
+#endif
 }
 
 void dgThread::SetPriority(int priority)
 {
+#ifdef DG_USE_PTHREADS
 	dgInt32 policy;
 	sched_param param;
 
@@ -219,6 +232,7 @@ void dgThread::SetPriority(int priority)
 
 	param.sched_priority = priority;
 	pthread_setschedparam (m_handle, policy, &param);
+#endif
 }
 
 
