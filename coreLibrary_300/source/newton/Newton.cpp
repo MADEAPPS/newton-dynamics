@@ -2060,8 +2060,8 @@ void NewtonMaterialSetContactNormalDirection(const NewtonMaterial* const materia
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 	dgVector normal (direction[0], direction[1], direction[2], dgFloat32 (0.0f));
 
-
-	dgAssert (dgAbsf (normal.DotProduct3(material->m_normal) - dgFloat32(1.0f)) <dgFloat32 (0.01f));
+	//dgAssert (dgAbsf (normal.DotProduct3(material->m_normal) - dgFloat32(1.0f)) <dgFloat32 (0.01f));
+	dgAssert (normal.DotProduct3(material->m_normal) > dgFloat32 (0.01f));
 	if (normal.DotProduct3(material->m_normal) < dgFloat32 (0.0f)) {
 		normal = normal.Scale3 (-dgFloat32(1.0f));
 	}
