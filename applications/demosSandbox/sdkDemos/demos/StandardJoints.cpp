@@ -629,7 +629,7 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), parent, NULL);
 #endif
 
-	int count = 2;
+	int count = 6;
 	for (int i = 0; i < count; i ++) {
 		child = CreateBox (scene, position, size);
 		NewtonBodyGetMatrix(child, &matrix[0][0]);
