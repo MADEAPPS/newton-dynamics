@@ -270,10 +270,10 @@ void dCholeskyFactorization(int size, T* const matrix)
 
 
 template<class T>
-void dCholeskyRestore(int size, T* const matrix, const T* const diagonal, int n, int subSize)
+void dCholeskyRestore(int size, T* const matrix, const T* const diagonal, int from, int to)
 {
-	int stride = n * size;
-	for (int i = n; i < subSize; i++) {
+	int stride = from * size;
+	for (int i = from; i < to; i++) {
 		T* const row = &matrix[stride];
 		row[i] = diagonal[i];
 		for (int j = 0; j < i; j++) {

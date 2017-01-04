@@ -520,10 +520,10 @@ DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, T* const m
 
 
 template<class T>
-DG_INLINE void dgCholeskyRestore(dgInt32 size, dgInt32 n, T* const matrix, const T* const diagonal, dgInt32 subSize)
+DG_INLINE void dgCholeskyRestore(dgInt32 size, dgInt32 from, dgInt32 to, T* const matrix, const T* const diagonal)
 {
-	dgInt32 stride = n * size;
-	for (dgInt32 i = n; i < subSize; i++) {
+	dgInt32 stride = from * size;
+	for (dgInt32 i = from; i < to; i++) {
 		T* const row = &matrix[stride];
 		row[i] = diagonal[i];
 		for (dgInt32 j = 0; j < i; j++) {
@@ -811,7 +811,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 				x0[swapIndex] = clamp_x;
 				delta_x[index] = T(dgFloat32 (0.0f));
 
-				dgCholeskyRestore(size, index, matrix, diagonal, swapIndex);
+				dgAssert(swapIndex < index);
+				dgCholeskyRestore(size, swapIndex, index, matrix, diagonal);
 				dgPermuteRows(size, swapIndex, index - 1, matrix, x0, r0, low, high, diagonal, permute);
 				dgPermuteRows(size, index - 1, index, matrix, x0, r0, low, high, diagonal, permute);
 				dgPermuteRows(size, clampedIndex - 1, index, matrix, x0, r0, low, high, diagonal, permute);
