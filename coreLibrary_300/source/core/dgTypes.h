@@ -84,9 +84,6 @@
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
-#include <pthread.h>
-#include <sched.h>
-#include <semaphore.h>
 #include <dTimeTracker.h>
 
 #if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
@@ -159,6 +156,33 @@
 	#endif
 #endif
 
+
+
+// by default newton run on a separate thread, optionally concurrent with the calling thread, it also uses a thread job pool for multi core systems.
+// define DG_USE_THREAD_EMULATION on the command line for platform that do not support hardware multi threading or if multi threading is not stable 
+// #define DG_USE_THREAD_EMULATION
+
+// use thise define to link to pthread libraires else  
+// #define DG_USE_PTHREADS
+#define DG_USE_PTHREADS
+
+#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+	#if _MSC_VER < 1700
+		#ifndef DG_USE_PTHREADS
+			#define DG_USE_PTHREADS
+		#endif
+	#endif
+#endif
+
+#ifdef DG_USE_PTHREADS
+	#include <pthread.h>
+	#include <sched.h>
+	#include <semaphore.h>
+#else 
+	#include <thread>
+	#include <mutex>
+	#include <condition_variable>
+#endif
 
 
 //************************************************************
@@ -786,20 +810,24 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 
 DG_INLINE void dgThreadYield()
 {
-	#ifndef DG_USE_THREAD_EMULATION
-	sched_yield();
+#ifndef DG_USE_THREAD_EMULATION
+	#ifdef DG_USE_PTHREADS
+		sched_yield();
+	#else 
+		std::this_thread::yield(); 
+	#endif
 #endif
 }
 
 DG_INLINE void dgSpinLock (dgInt32* const ptr, bool yield)
 {
-	#ifndef DG_USE_THREAD_EMULATION 
+#ifndef DG_USE_THREAD_EMULATION 
 	while (dgInterlockedExchange(ptr, 1)) {
 		if (yield) {
 			dgThreadYield();
 		}
 	}
-	#endif
+#endif
 }
 
 DG_INLINE void dgSpinUnlock (dgInt32* const ptr)

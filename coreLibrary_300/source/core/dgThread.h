@@ -54,12 +54,20 @@ class dgThread
 		#ifdef DG_USE_THREAD_EMULATION
 			dgInt32 m_sem;
 		#else 
+/*
 			#if defined (_MACOSX_VER) || defined (IOS) || defined (__APPLE__)
 				sem_t* m_sem;
 				dgInt32 m_nameId;
 			#else
 				sem_t m_sem;
 			#endif
+*/
+		#ifdef DG_USE_PTHREADS
+			sem_t m_sem;
+		#else 
+			std::condition_variable m_sem;
+		#endif	
+
 		#endif
 		friend class dgThread;
 	};
@@ -81,10 +89,13 @@ class dgThread
 	void Init (dgInt32 stacksize = 0);
 	void Init (const char* const name, dgInt32 id, dgInt32 stacksize);
 	void Close ();
-
 	static void* dgThreadSystemCallback(void* threadData);
 
-	pthread_t m_handle;
+	#ifdef DG_USE_PTHREADS
+		pthread_t m_handle;
+	#else 
+		std::thread m_handle;
+	#endif
 	dgInt32 m_id;
 	dgInt32 m_terminate;
 	dgInt32 m_threadRunning;
