@@ -126,7 +126,11 @@ dgThread::dgSemaphore::dgSemaphore ()
         sem_unlink(temp);
 		m_sem = sem_open(temp, O_CREAT, S_IRUSR | S_IWUSR, 0);
 	#else
-		sem_init (&m_sem, 0, 0);
+		#ifdef DG_USE_PTHREADS
+			sem_init (&m_sem, 0, 0);
+		#else 
+			m_count = 0;
+		#endif	
 	#endif
 }
 
@@ -138,7 +142,9 @@ dgThread::dgSemaphore::~dgSemaphore ()
 		sem_close(m_sem);
 		sem_unlink(temp) ;
 	#else 
-		sem_destroy (&m_sem);
+		#ifdef DG_USE_PTHREADS
+			sem_destroy (&m_sem);
+		#endif	
 	#endif
 }
 
@@ -147,7 +153,13 @@ void dgThread::dgSemaphore::Release ()
 	#if defined (_MACOSX_VER) || defined (IOS) || defined (__APPLE__)
 		sem_post (m_sem);
 	#else 
-		sem_post (&m_sem);
+		#ifdef DG_USE_PTHREADS
+			sem_post (&m_sem);
+		#else 
+			std::unique_lock<std::mutex> lck(m_mutex);
+			m_count ++;
+			m_sem.notify_one();
+		#endif	
 	#endif
 }
 
@@ -156,7 +168,16 @@ void dgThread::dgSemaphore::Wait()
 	#if defined (_MACOSX_VER) || defined (IOS) || defined (__APPLE__)
 		sem_wait (m_sem);
 	#else 
-		sem_wait (&m_sem);
+		#ifdef DG_USE_PTHREADS
+			sem_wait (&m_sem);
+		#else	
+			std::unique_lock<std::mutex> lck(m_mutex);
+			while (m_count == 0)
+			{
+				m_sem.wait(lck);
+			}
+			m_count --;
+		#endif	
 	#endif
 }
 
@@ -166,7 +187,7 @@ dgThread::~dgThread ()
 {
 }
 
-void dgThread::Init (dgInt32  stacksize)
+void dgThread::Init (dgInt32 stacksize)
 {
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);

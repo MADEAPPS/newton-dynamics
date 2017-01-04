@@ -62,14 +62,14 @@ class dgThread
 				sem_t m_sem;
 			#endif
 */
-		#ifdef DG_USE_PTHREADS
-			sem_t m_sem;
-		#else 
-			std::condition_variable m_sem;
-		#endif	
-
+			#ifdef DG_USE_PTHREADS
+				sem_t m_sem;
+			#else 
+				std::condition_variable m_sem;
+				std::mutex m_mutex;
+				dgInt32 m_count;
+			#endif	
 		#endif
-		friend class dgThread;
 	};
 
 	dgThread ();
