@@ -16,8 +16,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dVisualDebuggerServer", "dV
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\thirdParty\tinyxml\vs2015_static_mt\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\coreLibrary_300\source\pthreads.2\VS_2015_static_mt\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\coreLibrary_300\projects\windows\project_vs2015_static_mt\core.vcxproj", "{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\coreLibrary_300\projects\windows\project_vs2015_static_mt\physics.vcxproj", "{39737A8F-6151-4259-8E39-25530345D4B4}"
@@ -25,7 +23,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\coreLibrary_300\projects\windows\project_vs2015_static_mt\newton.vcxproj", "{68D9962C-0EC7-445A-B0FD-F87B16D43901}"
 	ProjectSection(ProjectDependencies) = postProject
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA} = {57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96} = {03BCA23C-02A5-415B-A37B-26600BC2CE96}
 		{39737A8F-6151-4259-8E39-25530345D4B4} = {39737A8F-6151-4259-8E39-25530345D4B4}
 	EndProjectSection
 EndProject
@@ -94,14 +91,6 @@ Global
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|Win32.Build.0 = release|Win32
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|x64.ActiveCfg = release|x64
 		{18E509CF-46D2-4749-B3BB-160937CF2481}.release|x64.Build.0 = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.ActiveCfg = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.Build.0 = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.ActiveCfg = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.Build.0 = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.ActiveCfg = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.Build.0 = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.ActiveCfg = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.Build.0 = release|x64
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}.debug|Win32.ActiveCfg = debug|Win32
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}.debug|Win32.Build.0 = debug|Win32
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}.debug|x64.ActiveCfg = debug|x64

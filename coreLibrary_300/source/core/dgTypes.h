@@ -162,24 +162,18 @@
 // define DG_USE_THREAD_EMULATION on the command line for platform that do not support hardware multi threading or if multi threading is not stable 
 // #define DG_USE_THREAD_EMULATION
 
-// use these define to link to pthread libraries
-// #define DG_USE_PTHREADS
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#if _MSC_VER < 1700
-		#ifndef DG_USE_PTHREADS
-			#define DG_USE_PTHREADS
+		#ifndef DG_USE_THREAD_EMULATION
+			#define DG_USE_THREAD_EMULATION
 		#endif
 	#endif
 #endif
 
-#ifdef DG_USE_PTHREADS
-	#include <pthread.h>
-	#include <sched.h>
-	#include <semaphore.h>
-#else 
-	#include <thread>
+#ifndef DG_USE_THREAD_EMULATION
 	#include <mutex>
+	#include <thread>
 	#include <condition_variable>
 #endif
 
@@ -809,30 +803,26 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 
 DG_INLINE void dgThreadYield()
 {
-#ifndef DG_USE_THREAD_EMULATION
-	#ifdef DG_USE_PTHREADS
-		sched_yield();
-	#else 
+	#ifndef DG_USE_THREAD_EMULATION
 		std::this_thread::yield(); 
 	#endif
-#endif
 }
 
 DG_INLINE void dgSpinLock (dgInt32* const ptr, bool yield)
 {
-#ifndef DG_USE_THREAD_EMULATION 
-	while (dgInterlockedExchange(ptr, 1)) {
-		if (yield) {
-			dgThreadYield();
+	#ifndef DG_USE_THREAD_EMULATION 
+		while (dgInterlockedExchange(ptr, 1)) {
+			if (yield) {
+				dgThreadYield();
+			}
 		}
-	}
-#endif
+	#endif
 }
 
 DG_INLINE void dgSpinUnlock (dgInt32* const ptr)
 {
 	#ifndef DG_USE_THREAD_EMULATION 
-	dgInterlockedExchange(ptr, 0);
+		dgInterlockedExchange(ptr, 0);
 	#endif
 }
 

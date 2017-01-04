@@ -222,6 +222,7 @@
     <ClInclude Include="..\..\sdkDemos\DemoCameraListener.h">
       <Filter>mainLogic\listeners</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="demos">
@@ -241,5 +242,8 @@
     <CustomBuild Include="..\..\sdkDemos\NewtonDemos.h">
       <Filter>mainLogic</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="demosSandbox.rc" />
   </ItemGroup>
 </Project>

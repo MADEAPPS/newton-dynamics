@@ -7,7 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demosSandbox", "demosSandbo
 		{68D9962C-0EC7-445A-B0FD-F87B16D43901} = {68D9962C-0EC7-445A-B0FD-F87B16D43901}
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA} = {57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}
 		{B5EEC82D-938F-44C9-89BB-4A058581750B} = {B5EEC82D-938F-44C9-89BB-4A058581750B}
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96} = {03BCA23C-02A5-415B-A37B-26600BC2CE96}
 		{CBE9E751-E58B-46C1-B6B0-873670D0F981} = {CBE9E751-E58B-46C1-B6B0-873670D0F981}
 		{39737A8F-6151-4259-8E39-25530345D4B4} = {39737A8F-6151-4259-8E39-25530345D4B4}
 		{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0} = {F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}
@@ -20,11 +19,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demosSandbox", "demosSandbo
 		{0C9707F5-DEC7-42EB-8EA1-A484DF1E515B} = {0C9707F5-DEC7-42EB-8EA1-A484DF1E515B}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2015_static_mt\wx_vc9_core.vcxproj", "{6744DAD8-9C70-574A-BFF2-9F8DDDB24A75}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxcore", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2015_static_mt\wx_vc9_core.vcxproj", "{6744DAD8-9C70-574A-BFF2-9F8DDDB24A75}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "base", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2015_static_mt\wx_vc9_base.vcxproj", "{3FCC50C2-81E9-5DB2-B8D8-2129427568B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxbase", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2015_static_mt\wx_vc9_base.vcxproj", "{3FCC50C2-81E9-5DB2-B8D8-2129427568B1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2015_static_mt\wx_vc9_gl.vcxproj", "{DA8B15EF-6750-5928-BC0E-C748213CF9B2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxgl", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2015_static_mt\wx_vc9_gl.vcxproj", "{DA8B15EF-6750-5928-BC0E-C748213CF9B2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA} = {57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}
 		{3FCC50C2-81E9-5DB2-B8D8-2129427568B1} = {3FCC50C2-81E9-5DB2-B8D8-2129427568B1}
@@ -39,8 +38,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\..\coreLibrary_300\projects\windows\project_vs2015_static_mt\newton.vcxproj", "{68D9962C-0EC7-445A-B0FD-F87B16D43901}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\..\coreLibrary_300\projects\windows\project_vs2015_static_mt\physics.vcxproj", "{39737A8F-6151-4259-8E39-25530345D4B4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2015_static_mt\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dScene", "..\..\..\..\packages\projects\visualStudio_2015_static_mt\dScene.vcxproj", "{B5EEC82D-938F-44C9-89BB-4A058581750B}"
 EndProject
@@ -170,18 +167,6 @@ Global
 		{39737A8F-6151-4259-8E39-25530345D4B4}.release|Win32.Build.0 = release|Win32
 		{39737A8F-6151-4259-8E39-25530345D4B4}.release|x64.ActiveCfg = release|x64
 		{39737A8F-6151-4259-8E39-25530345D4B4}.release|x64.Build.0 = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.ActiveCfg = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.Build.0 = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.ActiveCfg = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.Build.0 = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.profile|Win32.ActiveCfg = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.profile|Win32.Build.0 = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.profile|x64.ActiveCfg = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.profile|x64.Build.0 = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.ActiveCfg = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.Build.0 = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.ActiveCfg = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.Build.0 = release|x64
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.debug|Win32.ActiveCfg = debug|Win32
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.debug|Win32.Build.0 = debug|Win32
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.debug|x64.ActiveCfg = debug|x64

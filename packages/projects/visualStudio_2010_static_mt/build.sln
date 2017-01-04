@@ -11,8 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dAnimation", "dAnimation.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dNewton", "dNewton.vcxproj", "{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\coreLibrary_300\source\pthreads.2\VS_2010_static_mt\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\coreLibrary_300\projects\windows\project_vs2010_static_mt\core.vcxproj", "{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\coreLibrary_300\projects\windows\project_vs2010_static_mt\newton.vcxproj", "{68D9962C-0EC7-445A-B0FD-F87B16D43901}"
@@ -93,18 +91,6 @@ Global
 		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.release|Win32.Build.0 = release|Win32
 		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.release|x64.ActiveCfg = release|x64
 		{8A04A234-B1CA-464D-A2DD-34CEB583BA6A}.release|x64.Build.0 = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.ActiveCfg = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.Build.0 = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.ActiveCfg = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.Build.0 = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release_double|Win32.ActiveCfg = release_double|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release_double|Win32.Build.0 = release_double|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release_double|x64.ActiveCfg = release_double|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release_double|x64.Build.0 = release_double|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.ActiveCfg = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.Build.0 = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.ActiveCfg = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.Build.0 = release|x64
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}.debug|Win32.ActiveCfg = debug|Win32
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}.debug|Win32.Build.0 = debug|Win32
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}.debug|x64.ActiveCfg = debug|x64
