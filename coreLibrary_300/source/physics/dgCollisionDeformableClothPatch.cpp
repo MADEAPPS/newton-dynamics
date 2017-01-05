@@ -106,3 +106,124 @@ dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
 }
 
 
+void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
+{
+	dgAssert(0);
+	/*
+	// Ks is in [sec^-2] a spring constant unit acceleration, not a spring force acceleration.
+	// Kc is in [sec^-1] a damper constant unit velocity, not a damper force acceleration.
+
+
+	dgAssert (0);
+	// for now make a share value for all springs. later this is a per material feature.
+	dgFloat32 kSpring = dgFloat32(1000.0f);
+	dgFloat32 kDamper = dgFloat32(15.0f);
+
+	dgInt32 iter = 4;
+	dgVector* const accel = &m_accel[0];
+	dgVector* const veloc = &m_veloc[0];
+	dgVector* const posit = &m_posit[0];
+	const dgFloat32* const restLenght = &m_restlength[0];
+
+	dgFloat32* const spring_A01 = dgAlloca(dgFloat32, m_linksCount);
+	dgFloat32* const spring_B01 = dgAlloca(dgFloat32, m_linksCount);
+	//	dgFloat32* const damper_A01 = dgAlloca(dgFloat32, m_linksCount);
+	//	dgFloat32* const damper_B01 = dgAlloca(dgFloat32, m_linksCount);
+	//	dgFloat32* const damper_C01 = dgAlloca(dgFloat32, m_linksCount);
+	dgVector* const dx = dgAlloca(dgVector, m_linksCount);
+	dgVector* const dv = dgAlloca(dgVector, m_linksCount);
+
+	dgVector* const collisionDir0 = dgAlloca(dgVector, m_particlesCount);
+	dgVector* const collisionDir1 = dgAlloca(dgVector, m_particlesCount);
+	dgVector* const collisionDir2 = dgAlloca(dgVector, m_particlesCount);
+	dgVector* const collidingAccel = dgAlloca(dgVector, m_particlesCount);
+	dgVector* const tmp0 = dgAlloca(dgVector, m_particlesCount);
+	//	dgVector* const tmp1 = dgAlloca(dgVector, m_particlesCount);
+	//	dgVector* const tmp2 = dgAlloca(dgVector, m_particlesCount);
+	dgVector* const dpdv = dgAlloca(dgVector, m_linksCount);
+	//	dgVector* const diag = dgAlloca(dgVector, m_particlesCount);
+	//	dgVector* const offDiag = dgAlloca(dgVector, m_particlesCount);
+	dgVector* const veloc0 = dgAlloca(dgVector, m_particlesCount);
+
+	dgVector unitAccel(m_body->m_externalForce.CompProduct4(m_body->m_invMass.m_w));
+	dgVector deltaOmega(m_body->m_invWorldInertiaMatrix.RotateVector (m_body->m_externalTorque.Scale4 (timestep)));
+
+	m_body->m_alpha = dgVector::m_zero;
+	m_body->m_omega = dgVector::m_zero;
+	m_body->m_externalForce = dgVector::m_zero;
+	m_body->m_externalTorque = dgVector::m_zero;
+
+	// here I need to add all other external acceleration like wind and pressure, friction and collision.
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+	accel[i] = unitAccel;
+	veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
+	veloc0[i] = veloc[i];
+	}
+
+	const dgSoftLink* const links = &m_linkList[0];
+	dgFloat32 ks_dt = - timestep * kSpring;
+	//	dgFloat32 kd_dt0 = -timestep * kDamper;
+	//	dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
+
+	dgVector dtRK4 (timestep / iter);
+	//	HandleCollision (timestep, collisionDir0, collisionDir1, collisionDir2, collidingAccel);
+	for (dgInt32 i = 0; i < iter; i ++) {
+	for (dgInt32 i = 0; i < m_linksCount; i++) {
+	const dgInt32 j0 = links[i].m_m0;
+	const dgInt32 j1 = links[i].m_m1;
+	dv[i] = veloc[j0] - veloc[j1];
+	dx[i] = posit[j0] - posit[j1];
+
+	const dgVector p0p1 (dx[i]);
+	const dgVector v0v1 (dv[i]);
+	const dgVector length2(p0p1.DotProduct4(p0p1));
+	const dgVector mask(length2 > m_smallestLenght2);
+
+	const dgVector lenght2 ((length2 & mask) | length2.AndNot(mask));
+	const dgFloat32 length = (lenght2.Sqrt()).GetScalar();
+	const dgFloat32 den = dgFloat32 (1.0f) / length;
+	const dgFloat32 lenghtRatio = restLenght[i] * den;
+	const dgFloat32 compression = dgFloat32(1.0f) - lenghtRatio;
+	const dgVector fs(p0p1.Scale4(kSpring * compression));
+	const dgVector fd(p0p1.Scale4(kDamper * den * den * (v0v1.DotProduct4(p0p1)).GetScalar()));
+
+	dpdv[i] = p0p1.CompProduct4(v0v1);
+
+	accel[j0] -= (fs + fd);
+	accel[j1] += (fs + fd);
+
+	spring_A01[i] = ks_dt * compression;
+	spring_B01[i] = ks_dt * lenghtRatio * den * den;
+	}
+
+	for (dgInt32 i = 0; i < m_linksCount; i++) {
+	const dgVector dv0 (dv[i]);
+	const dgVector A01(spring_A01[i]);
+	const dgVector B01(spring_B01[i]);
+	const dgVector dfdx (A01.CompProduct4(dv0) + B01.CompProduct4(dx[i].CompProduct4(dpdv[i])));
+
+	const dgInt32 j0 = links[i].m_m0;
+	const dgInt32 j1 = links[i].m_m1;
+	accel[j0] += dfdx;
+	accel[j1] -= dfdx;
+	}
+
+
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+	tmp0[i] = accel[i].CompProduct4(collisionDir0[i]);
+	//			tmp1[i] = accel[i].CompProduct4(collisionDir1[i]);
+	//			tmp2[i] = accel[i].CompProduct4(collisionDir2[i]);
+	}
+
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+	accel[i] = accel[i] - collisionDir0[i].CompProduct4(tmp0[i]) - collisionDir1[i].CompProduct4(tmp1[i])  - collisionDir2[i].CompProduct4(tmp2[i]) + collidingAccel[i];
+	}
+
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+	veloc[i] += accel[i].CompProduct4 (dtRK4);
+	posit[i] += veloc[i].CompProduct4(dtRK4);
+	accel[i] = unitAccel;
+	}
+	}
+	*/
+}

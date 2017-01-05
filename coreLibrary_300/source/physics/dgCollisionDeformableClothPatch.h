@@ -35,7 +35,9 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	dgCollisionDeformableClothPatch (const dgCollisionDeformableClothPatch& source);
 	dgCollisionDeformableClothPatch (dgWorld* const world, dgMeshEffect* const mesh);
 	dgCollisionDeformableClothPatch (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
+
 	virtual ~dgCollisionDeformableClothPatch(void);
+	virtual void CalculateAcceleration(dgFloat32 timestep);
 };
 
 
