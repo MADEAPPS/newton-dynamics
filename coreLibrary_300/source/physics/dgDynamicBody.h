@@ -112,6 +112,7 @@ class dgDynamicBody : public dgBody
 	friend class dgWorldDynamicUpdate;
 	friend class dgCollisionDeformableMesh;
 	friend class dgCollisionDeformableSolidMesh;
+	friend class dgCollisionDeformableClothPatch;
 } DG_GCC_VECTOR_ALIGMENT;
 
 

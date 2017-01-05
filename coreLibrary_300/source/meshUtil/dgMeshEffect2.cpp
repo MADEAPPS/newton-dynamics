@@ -234,13 +234,13 @@ class dgTetraIsoSufaceStuffing
 			return node;
 		}
 
-		bool DoesTetrahedrumHasInsidePoints (const dgArray<dgBigVector>& m_points, const dgTetrahedra& tetra) const 
+		bool DoesTetrahedrumHasInsidePoints (const dgArray<dgBigVector>& points, const dgTetrahedra& tetra) const 
 		{
-			dgBigVector box0(dgFloat64(1.0e10f));
+			dgBigVector box0(dgFloat64( 1.0e10f));
 			dgBigVector box1(dgFloat64(-1.0e10f));
 			for (dgInt32 i = 0; i < 4; i++) {
-				box0 = box0.GetMin(m_points[tetra[i]]);
-				box1 = box1.GetMax(m_points[tetra[i]]);
+				box0 = box0.GetMin(points[tetra[i]]);
+				box1 = box1.GetMax(points[tetra[i]]);
 			}
 
 			dgBigVector padding (dgFloat64 (0.01f));
@@ -250,10 +250,10 @@ class dgTetraIsoSufaceStuffing
 			dgList<dgMeshBVH::dgMeshBVHNode*> overlapNodes(m_mesh->GetAllocator());
 			GetOverlapNodes(overlapNodes, box0, box1);
 			if (overlapNodes.GetCount()) {
-				dgBigVector p0(m_points[tetra[0]]);
-				dgBigVector p1(m_points[tetra[1]]);
-				dgBigVector p2(m_points[tetra[2]]);
-				dgBigVector p3(m_points[tetra[3]]);
+				dgBigVector p0(points[tetra[0]]);
+				dgBigVector p1(points[tetra[1]]);
+				dgBigVector p2(points[tetra[2]]);
+				dgBigVector p3(points[tetra[3]]);
 
 				for (dgList<dgMeshBVH::dgMeshBVHNode*>::dgListNode* node = overlapNodes.GetFirst(); node; node = node->GetNext()) {
 					dgEdge* const edge = node->GetInfo()->m_face;

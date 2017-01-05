@@ -34,7 +34,7 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles(dgWorld* const wo
 	,m_posit(world->GetAllocator())
 	,m_veloc(world->GetAllocator())
 	,m_accel(world->GetAllocator())
-	,m_externalforce(world->GetAllocator())
+	,m_externalAccel(world->GetAllocator())
 	,m_body(NULL)
 	,m_unitMass(dgFloat32 (1.0f))
 	,m_unitInertia(dgFloat32 (1.0f))
@@ -48,7 +48,7 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles (const dgCollisio
 	,m_posit(source.m_posit, source.m_particlesCount)
 	,m_veloc(source.m_veloc, source.m_particlesCount)
 	,m_accel(source.m_accel, source.m_particlesCount)
-	,m_externalforce(source.m_externalforce, source.m_particlesCount)
+	,m_externalAccel(source.m_externalAccel, source.m_particlesCount)
 	,m_body(NULL)
 	,m_unitMass(source.m_unitMass)
 	,m_unitInertia(source.m_unitMass)
@@ -63,7 +63,7 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles (dgWorld* const w
 	,m_posit(world->GetAllocator())
 	,m_veloc(world->GetAllocator())
 	,m_accel(world->GetAllocator())
-	,m_externalforce(world->GetAllocator())
+	,m_externalAccel(world->GetAllocator())
 	,m_body(NULL)
 	,m_unitMass(dgFloat32(1.0f))
 	,m_unitInertia(dgFloat32(1.0f))
@@ -81,7 +81,7 @@ void dgCollisionLumpedMassParticles::FinalizeBuild()
 {
 	m_veloc.Resize(m_particlesCount);
 	m_accel.Resize(m_particlesCount);
-	m_externalforce.Resize(m_particlesCount);
+	m_externalAccel.Resize(m_particlesCount);
 
 	dgVector com(dgFloat32(0.0f));
 	dgVector* const posit = &m_posit[0];
@@ -93,18 +93,12 @@ void dgCollisionLumpedMassParticles::FinalizeBuild()
 		maxp = maxp.GetMax(posit[i]);
 		m_accel[i] = dgVector::m_zero;
 		m_veloc[i] = dgVector::m_zero;
-		m_externalforce[i] = dgVector::m_zero;
+		m_externalAccel[i] = dgVector::m_zero;
 	}
 
 	// for now use a fix size box
 	m_boxSize = (maxp - minp).CompProduct4(dgVector::m_half);
 	m_boxOrigin = (maxp + minp).CompProduct4(dgVector::m_half);
-/*
-	m_boxOrigin = com.CompProduct4(dgFloat32(1.0f) / m_particlesCount);
-	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		posit[i] = posit[i] - m_boxOrigin;
-	}
-*/
 }
 
 void dgCollisionLumpedMassParticles::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const

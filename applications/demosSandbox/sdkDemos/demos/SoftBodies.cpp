@@ -19,10 +19,108 @@
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
 
-#if NEWTON_MAJOR_VERSION == 3
+
 class SimpleSoftBodyEntity: public DemoEntity
 {
 	public:
+	class ClothPatchMesh: public DemoMesh
+	{
+		public:
+		ClothPatchMesh(NewtonMesh* const clothPatchMesh, NewtonBody* const body)
+			:DemoMesh(clothPatchMesh)
+			, m_body(body)
+		{
+			ResetOptimization();
+			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
+
+			int pointCount = NewtonMeshGetPointCount(clothPatchMesh);
+			const int* const indexMap = NewtonMeshGetIndexToVertexMap(clothPatchMesh);
+			const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
+
+			m_indexMap = new int[pointCount];
+			for (int i = 0; i < pointCount; i++) {
+				int j = indexMap[i];
+				m_indexMap[i] = solidIndexList[j];
+			}
+		}
+
+		~ClothPatchMesh()
+		{
+			if (m_indexMap) {
+				delete[] m_indexMap;
+			}
+		}
+
+		void Render(DemoEntityManager* const scene)
+		{
+			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
+			dAssert((NewtonCollisionGetType(deformableCollision) == SERIALIZE_ID_CLOTH_PATCH) || (NewtonCollisionGetType(deformableCollision) == SERIALIZE_ID_DEFORMABLE_SOLID));
+
+			const dFloat* const particles = NewtonDeformableMeshGetParticleArray(deformableCollision);
+			int stride = NewtonDeformableMeshGetParticleStrideInBytes(deformableCollision) / sizeof (dFloat);
+
+			// calculate vertex skinning
+			for (int i = 0; i < m_vertexCount; i++) {
+				int index = m_indexMap[i] * stride;
+				m_vertex[i * 3 + 0] = particles[index + 0];
+				m_vertex[i * 3 + 1] = particles[index + 1];
+				m_vertex[i * 3 + 2] = particles[index + 2];
+
+				// clear the normal for next loop
+				m_normal[i * 3 + 0] = 0.0f;
+				m_normal[i * 3 + 1] = 0.0f;
+				m_normal[i * 3 + 2] = 0.0f;
+			}
+
+			// calculate vertex normals 
+			int normalStride = 3;
+			for (DemoMesh::dListNode* segmentNode = GetFirst(); segmentNode; segmentNode = segmentNode->GetNext()) {
+				const DemoSubMesh& subSegment = segmentNode->GetInfo();
+				for (int i = 0; i < subSegment.m_indexCount; i += 3) {
+					int i0 = subSegment.m_indexes[i + 0] * normalStride;
+					int i1 = subSegment.m_indexes[i + 1] * normalStride;
+					int i2 = subSegment.m_indexes[i + 2] * normalStride;
+					dVector p0(m_vertex[i0], m_vertex[i0 + 1], m_vertex[i0 + 2], 0.0f);
+					dVector p1(m_vertex[i1], m_vertex[i1 + 1], m_vertex[i1 + 2], 0.0f);
+					dVector p2(m_vertex[i2], m_vertex[i2 + 1], m_vertex[i2 + 2], 0.0f);
+					dVector p10(p1 - p0);
+					dVector p20(p2 - p0);
+					dVector normal(p10.CrossProduct(p20));
+					normal = normal.Scale(1.0f / dSqrt(normal.DotProduct3(normal)));
+
+					m_normal[i0 + 0] += normal.m_x;
+					m_normal[i0 + 1] += normal.m_y;
+					m_normal[i0 + 2] += normal.m_z;
+
+					m_normal[i1 + 0] += normal.m_x;
+					m_normal[i1 + 1] += normal.m_y;
+					m_normal[i1 + 2] += normal.m_z;
+
+					m_normal[i2 + 0] += normal.m_x;
+					m_normal[i2 + 1] += normal.m_y;
+					m_normal[i2 + 2] += normal.m_z;
+				}
+			}
+
+			// normalize all the normals
+			for (int i = 0; i < m_vertexCount; i++) {
+				dVector n(m_normal[i * 3 + 0], m_normal[i * 3 + 1], m_normal[i * 3 + 2], 0.0f);
+				n = n.Scale(1.0f / dSqrt(n.DotProduct3(n)));
+				m_normal[i * 3 + 0] = n.m_x;
+				m_normal[i * 3 + 1] = n.m_y;
+				m_normal[i * 3 + 2] = n.m_z;
+			}
+
+			glDisable(GL_CULL_FACE);
+			DemoMesh::Render(scene);
+			glEnable(GL_CULL_FACE);
+		}
+
+		NewtonBody* m_body;
+		int* m_indexMap;
+	};
+
+
 	class TetrahedraSoftMesh: public DemoMesh
 	{
 		public:
@@ -74,8 +172,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		int* m_indexMap;
 	};
 
-
-	class LinearBlendMesh: public DemoMesh
+	class LinearBlendMeshTetra: public DemoMesh
 	{
 		public:
 		class WeightIndexPair
@@ -85,7 +182,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 			dFloat m_weight[4];
 		};
 
-		LinearBlendMesh (NewtonMesh* const skinMesh, NewtonBody* const body)
+		LinearBlendMeshTetra (NewtonMesh* const skinMesh, NewtonBody* const body)
 			:DemoMesh(skinMesh)
 			,m_body (body)
 			,m_weightSet(NULL)
@@ -109,7 +206,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 			}
 		}
 
-		~LinearBlendMesh()
+		~LinearBlendMeshTetra()
 		{
 			if (m_weightSet) {
 				delete[] m_weightSet;
@@ -212,6 +309,94 @@ class SimpleSoftBodyEntity: public DemoEntity
 	{
 	}
 
+
+	NewtonBody* CreateRigidBody(DemoEntityManager* const scene, dFloat mass, NewtonCollision* const deformableCollision)
+	{
+		//create the rigid body
+		NewtonWorld* const world = scene->GetNewton();
+		dMatrix matrix(GetCurrentMatrix());
+
+		//matrix.m_posit.m_y = FindFloor (world, matrix.m_posit.m_x, matrix.m_posit.m_z) + 4.0f;
+		SetMatrix(*scene, dQuaternion(), matrix.m_posit);
+		SetMatrix(*scene, dQuaternion(), matrix.m_posit);
+		NewtonBody* const deformableBody = NewtonCreateDynamicBody(world, deformableCollision, &matrix[0][0]);
+
+		// set the mass matrix
+		NewtonBodySetMassProperties(deformableBody, mass, deformableCollision);
+
+		// save the pointer to the graphic object with the body.
+		NewtonBodySetUserData(deformableBody, this);
+
+		// assign the wood id
+		//	NewtonBodySetMaterialGroupID (deformableBody, materialId);
+
+		// set a destructor for this rigid body
+		NewtonBodySetDestructorCallback(deformableBody, PhysicsBodyDestructor);
+
+		// set the transform call back function
+		NewtonBodySetTransformCallback(deformableBody, DemoEntity::TransformCallback);
+
+		// set the force and torque call back function
+		NewtonBodySetForceAndTorqueCallback(deformableBody, PhysicsApplyGravityForce);
+
+		return deformableBody;
+	}
+
+	NewtonMesh* CreateFlatClothPatch(DemoEntityManager* const scene, int size_x, int size_z)
+	{
+		size_x += 1;
+		size_z += 1;
+		dAssert(size_x < 128);
+		dAssert(size_z < 128);
+		dFloat dimension = 0.25f;
+		dVector points[128][128];
+
+		dFloat y = 0.0f;
+		int enumerator = 0;
+		for (int i = 0; i < size_z; i++) {
+			dFloat z = (i - size_z / 2) * dimension;
+			for (int j = 0; j < size_x; j++) {
+				dFloat x = (j - size_x / 2) * dimension;
+				points[i][j] = dVector(x, y, z, dFloat(enumerator));
+				enumerator++;
+			}
+		}
+
+		NewtonMesh* const clothPatch = NewtonMeshCreate(scene->GetNewton());
+		NewtonMeshBeginBuild(clothPatch);
+		for (int i = 0; i < size_z - 1; i++) {
+			for (int j = 0; j < size_x - 1; j++) {
+				NewtonMeshBeginFace(clothPatch);
+				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+
+				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 1].m_x, points[i + 0][j + 1].m_y, points[i + 0][j + 1].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+
+				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+				NewtonMeshEndFace(clothPatch);
+
+				NewtonMeshBeginFace(clothPatch);
+				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+
+				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+
+				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 0].m_x, points[i + 1][j + 0].m_y, points[i + 1][j + 0].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+				NewtonMeshEndFace(clothPatch);
+			}
+		}
+		NewtonMeshEndBuild(clothPatch);
+
+		int material = LoadTexture("persianRug.tga");
+		NewtonMeshApplyBoxMapping(clothPatch, material, material, material);
+		return clothPatch;
+	}
+
+
 	void AddTetra (NewtonMesh* const tetrahedra, int i0, int i1, int i2, int i3, const dVector* const tetra, int layer)
 	{
 		NewtonMeshBeginFace(tetrahedra);
@@ -302,7 +487,6 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		}
 	}
 
-
 	void BuildRegularTetrahedra (DemoEntityManager* const scene, int materialID)
 	{
 		dFloat mass = 5.0f;
@@ -329,9 +513,11 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		m_body = CreateRigidBody (scene, mass, deformableCollision);
 
 		// create the soft body mesh
-		m_mesh = new TetrahedraSoftMesh(tetrahedra, m_body);
+		DemoMesh* const mesh = new TetrahedraSoftMesh(tetrahedra, m_body);
+		SetMesh(mesh, dGetIdentityMatrix());
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
+		mesh->Release ();
 		NewtonMeshDestroy (tetrahedra);
 		NewtonDestroyCollision(deformableCollision);
 	}
@@ -357,9 +543,11 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
 		// create the soft body mesh
-		m_mesh = new TetrahedraSoftMesh(tetraCube, m_body);
+		DemoMesh* const mesh = new TetrahedraSoftMesh(tetraCube, m_body);
+		SetMesh(mesh, dGetIdentityMatrix());
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
+		mesh->Release ();
 		NewtonDestroyCollision(deformableCollision);
 		NewtonMeshDestroy(tetraCube);
 	}
@@ -384,9 +572,12 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
 		// create the soft body mesh
-		m_mesh = new TetrahedraSoftMesh(tetraCube, m_body);
+		//m_mesh = new TetrahedraSoftMesh(tetraCube, m_body);
+		DemoMesh* const mesh = new TetrahedraSoftMesh(tetraCube, m_body);
+		SetMesh(mesh, dGetIdentityMatrix());
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
+		mesh->Release ();
 		NewtonDestroyCollision(deformableCollision);
 		NewtonMeshDestroy(tetraCube);
 	}
@@ -418,69 +609,16 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
 		// create the soft body mesh
-		m_mesh = new LinearBlendMesh(skinMesh, m_body);
-		//m_mesh = new TetrahedraSoftMesh(tetraIsoSurface, m_body);
-
+		//DemoMesh* const mesh = new TetrahedraSoftMesh(tetraIsoSurface, m_body);
+		DemoMesh* const mesh = new LinearBlendMeshTetra(skinMesh, m_body);
+		SetMesh(mesh, dGetIdentityMatrix());
+		
 		// do not forget to destroy this objects, else you get bad memory leaks.
+		mesh->Release ();
 		NewtonMeshDestroy(skinMesh);
 		NewtonDestroyCollision(deformableCollision);
 		NewtonMeshDestroy(tetraIsoSurface);
 	}
-
-	NewtonMesh* CreateFlatClothPatch(DemoEntityManager* const scene, int size_x, int size_z)
-	{
-		size_x += 1;
-		size_z += 1;
-		dAssert(size_x < 128);
-		dAssert(size_z < 128);
-		dFloat dimension = 0.25f;
-		dVector points[128][128];
-
-		dFloat y = 0.0f;
-		int enumerator = 0;
-		for (int i = 0; i < size_z; i++) {
-			dFloat z = (i - size_z / 2) * dimension;
-			for (int j = 0; j < size_x; j++) {
-				dFloat x = (j - size_x / 2) * dimension;
-				points[i][j] = dVector(x, y, z, dFloat(enumerator));
-				enumerator++;
-			}
-		}
-
-		NewtonMesh* const clothPatch = NewtonMeshCreate(scene->GetNewton());
-		NewtonMeshBeginBuild(clothPatch);
-		for (int i = 0; i < size_z - 1; i++) {
-			for (int j = 0; j < size_x - 1; j++) {
-				NewtonMeshBeginFace(clothPatch);
-				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
-				NewtonMeshAddMaterial(clothPatch, 0);
-
-				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 1].m_x, points[i + 0][j + 1].m_y, points[i + 0][j + 1].m_z);
-				NewtonMeshAddMaterial(clothPatch, 0);
-
-				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
-				NewtonMeshAddMaterial(clothPatch, 0);
-				NewtonMeshEndFace(clothPatch);
-
-				NewtonMeshBeginFace(clothPatch);
-				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
-				NewtonMeshAddMaterial(clothPatch, 0);
-
-				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
-				NewtonMeshAddMaterial(clothPatch, 0);
-
-				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 0].m_x, points[i + 1][j + 0].m_y, points[i + 1][j + 0].m_z);
-				NewtonMeshAddMaterial(clothPatch, 0);
-				NewtonMeshEndFace(clothPatch);
-			}
-		}
-		NewtonMeshEndBuild(clothPatch);
-
-		int material = LoadTexture("persianRug.tga");
-		NewtonMeshApplyBoxMapping(clothPatch, material, material, material);
-		return clothPatch;
-	}
-
 
 	void BuildClothPatch (DemoEntityManager* const scene, int size_x, int size_z)
 	{
@@ -490,9 +628,9 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		NewtonCollision* const deformableCollision = NewtonCreateClothPatch(world, clothPatch, 0);
 
 		dFloat mass = 8.0f;
-		CreateRigidBody(scene, mass, deformableCollision);
+		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
-		DemoMesh* const mesh = new DemoMesh(clothPatch);
+		DemoMesh* const mesh = new ClothPatchMesh (clothPatch, m_body);
 		SetMesh(mesh, dGetIdentityMatrix());
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
@@ -500,68 +638,10 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		NewtonMeshDestroy(clothPatch);
 		NewtonDestroyCollision(deformableCollision);
 	}
-
-
-	NewtonBody* CreateRigidBody(DemoEntityManager* const scene, dFloat mass, NewtonCollision* const deformableCollision)
-	{
-		//create the rigid body
-		NewtonWorld* const world = scene->GetNewton();
-		dMatrix matrix(GetCurrentMatrix());
-
-		//matrix.m_posit.m_y = FindFloor (world, matrix.m_posit.m_x, matrix.m_posit.m_z) + 4.0f;
-		SetMatrix(*scene, dQuaternion(), matrix.m_posit);
-		SetMatrix(*scene, dQuaternion(), matrix.m_posit);
-		NewtonBody* const deformableBody = NewtonCreateDynamicBody(world, deformableCollision, &matrix[0][0]);
-
-		// set the mass matrix
-		NewtonBodySetMassProperties(deformableBody, mass, deformableCollision);
-
-		// save the pointer to the graphic object with the body.
-		NewtonBodySetUserData(deformableBody, this);
-
-		// assign the wood id
-		//	NewtonBodySetMaterialGroupID (deformableBody, materialId);
-
-		// set a destructor for this rigid body
-		NewtonBodySetDestructorCallback(deformableBody, PhysicsBodyDestructor);
-
-		// set the transform call back function
-		NewtonBodySetTransformCallback(deformableBody, DemoEntity::TransformCallback);
-
-		// set the force and torque call back function
-		NewtonBodySetForceAndTorqueCallback(deformableBody, PhysicsApplyGravityForce);
-
-		return deformableBody;
-	}
 	
 	NewtonBody* m_body;
 };
 
-#endif
-
-
-
-
-void ClothPatch(DemoEntityManager* const scene)
-{
-	// load the skybox
-	scene->CreateSkyBox();
-
-	// load the scene from a ngd file format
-	CreateLevelMesh(scene, "flatPlane.ngd", 1);
-	//CreateLevelMesh (scene, "playground.ngd", 1);
-
-	//	dVector location (8.0f, 0.0f, -10.0f, 0.0f) ;
-	dVector location(0.0f, 5.0f, 0.0f, 0.0f);
-
-	SimpleSoftBodyEntity* const entity = new SimpleSoftBodyEntity(scene, location);
-	//entity->BuildClothPatch(scene, 50, 50);
-	entity->BuildClothPatch(scene, 1, 1);
-
-	dQuaternion rot;
-	dVector origin(location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);
-	scene->SetCameraMatrix(rot, origin);
-}
 
 
 void SoftBodies(DemoEntityManager* const scene)
@@ -579,6 +659,28 @@ void SoftBodies(DemoEntityManager* const scene)
 	//entity->BuildRegularTetrahedra(scene, 0);
 	//entity->LoadTetrahedraCube (scene, 0);
 	entity->CreateTetrahedraPrimitive (scene, 0);
+
+	dQuaternion rot;
+	dVector origin(location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);
+	scene->SetCameraMatrix(rot, origin);
+}
+
+
+void ClothPatch(DemoEntityManager* const scene)
+{
+	// load the skybox
+	scene->CreateSkyBox();
+
+	// load the scene from a ngd file format
+	CreateLevelMesh(scene, "flatPlane.ngd", 1);
+	//CreateLevelMesh (scene, "playground.ngd", 1);
+
+	//	dVector location (8.0f, 0.0f, -10.0f, 0.0f) ;
+	dVector location(0.0f, 5.0f, 0.0f, 0.0f);
+
+	SimpleSoftBodyEntity* const entity = new SimpleSoftBodyEntity(scene, location);
+	//entity->BuildClothPatch(scene, 50, 50);
+	entity->BuildClothPatch(scene, 1, 1);
 
 	dQuaternion rot;
 	dVector origin(location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);

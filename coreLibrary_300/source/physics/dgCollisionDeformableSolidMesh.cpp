@@ -25,10 +25,7 @@
 #include "dgContact.h"
 #include "dgMeshEffect.h"
 #include "dgDynamicBody.h"
-#include "dgCollisionBVH.h"
-#include "dgCollisionConvexPolygon.h"
 #include "dgCollisionDeformableSolidMesh.h"
-
 
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const world, dgMeshEffect* const mesh)
@@ -169,26 +166,6 @@ dgCollisionDeformableSolidMesh::~dgCollisionDeformableSolidMesh(void)
 }
 
 
-void dgCollisionDeformableSolidMesh::DebugCollision(const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
-{
-	const dgVector* const posit = &m_posit[0];
-	const dgSoftLink* const links = &m_linkList[0];
-	for (dgInt32 i = 0; i < m_linksCount; i++) {
-		const dgInt32 j0 = links[i].m_m0;
-		const dgInt32 j1 = links[i].m_m1;
-		dgVector p0 (matrix.TransformVector(posit[j0]));
-		dgVector p1 (matrix.TransformVector(posit[j1]));
-		dgTriplex points[2];
-		points[0].m_x = p0.m_x;
-		points[0].m_y = p0.m_y;
-		points[0].m_z = p0.m_z;
-		points[1].m_x = p1.m_x;
-		points[1].m_y = p1.m_y;
-		points[1].m_z = p1.m_z;
-		callback(userData, 2, &points[0].m_x, 0);
-	}
-}
-
 
 void dgCollisionDeformableSolidMesh::CalculateAcceleration(dgFloat32 timestep)
 {
@@ -229,7 +206,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 	dgVector* const dpdv = dgAlloca(dgVector, m_linksCount);
 //	dgVector* const diag = dgAlloca(dgVector, m_particlesCount);
 //	dgVector* const offDiag = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const veloc0 = dgAlloca(dgVector, m_particlesCount);
+
 
 	dgVector unitAccel(m_body->m_externalForce.CompProduct4(m_body->m_invMass.m_w));
 	dgVector deltaOmega(m_body->m_invWorldInertiaMatrix.RotateVector (m_body->m_externalTorque.Scale4 (timestep)));
@@ -241,8 +218,8 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 
 	// here I need to add all other external acceleration like wind and pressure, friction and collision.
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		m_externalAccel[i] = unitAccel;
 		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
-		veloc0[i] = veloc[i];
 	}
 
 	const dgSoftLink* const links = &m_linkList[0];
@@ -259,7 +236,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 	for (dgInt32 k = 0; k < iter; k ++) {
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			accel[i] = unitAccel;
+			accel[i] = m_externalAccel[i];
 			volumeAccel[i] = dgVector::m_zero;
 		}
 
@@ -345,18 +322,19 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
 			accel[i] += volumetricStiffness.CompProduct4(volumeAccel[i]);
 			dgVector normalDirAccel (normalDir[i].CompProduct4(accel[i].DotProduct4(normalDir[i])));
+
 			//dgVector dirAccel1 (collisionDir1[i].CompProduct4(accel[i].DotProduct4(collisionDir1[i])));
 			//dgVector dirAccel2 (collisionDir2[i].CompProduct4(accel[i].DotProduct4(collisionDir2[i])));
 			//tmp0[i] = accel[i] + collidingAccel[i] - dirAccel0 - dirAccel1 - dirAccel2;
-			volumeAccel[i] = accel[i] + normalAccel[i] - normalDirAccel;
+			
 			dgVector tangentDir (veloc[i] - normalDir[i].CompProduct4(normalDir[i].DotProduct4(veloc[i])));
 			dgVector mag (tangentDir.DotProduct4(tangentDir) + epsilon);
 
 			dgFloat32 tangentFrictionAccel = dgAbsf (accel[i].DotProduct4(normalDir[i]).GetScalar());
 			dgVector friction (tangentDir.Scale4 (frictionCoeffecient[i] * tangentFrictionAccel / dgSqrt (mag.GetScalar())));
-			volumeAccel[i] -= friction;
 
-			veloc[i] += volumeAccel[i].CompProduct4(dtRK4);
+			accel[i] += (normalAccel[i] - normalDirAccel - friction);
+			veloc[i] += accel[i].CompProduct4(dtRK4);
 			posit[i] += veloc[i].CompProduct4(dtRK4);
 		}
 	}

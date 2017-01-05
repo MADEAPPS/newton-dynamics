@@ -52,12 +52,13 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 	};
 
 
+	virtual void CalculateAcceleration(dgFloat32 timestep) = 0;
+
 	virtual void FinalizeBuild();
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void IntegrateForces(dgFloat32 timestep);
+	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	virtual void HandleCollision (dgFloat32 timestep, dgVector* const normalDir, dgVector* const normalAccel, dgFloat32* const frictionCoefficient) const;
-	virtual void CalculateAcceleration(dgFloat32 timestep) = 0;
-
 	static dgInt32 CompareEdges(const dgSoftLink* const A, const dgSoftLink* const B, void* const context);
 	dgFloat32 CalculaleContactPenetration(const dgVector& point, const dgVector& normal) const;
 

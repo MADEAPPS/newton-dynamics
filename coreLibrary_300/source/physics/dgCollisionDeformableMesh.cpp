@@ -31,7 +31,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define DG_SMALLEST_SPRING_LENGTH						dgFloat32 (1.0e-3f) 
+#define DG_SMALLEST_SPRING_LENGTH			dgFloat32 (1.0e-3f) 
+#define DG_MINIMIM_THICKNESS				dgFloat32 (1.0f/32.0f)
+#define DG_MINIMIM_ZERO_SURFACE				(DG_MINIMIM_THICKNESS * dgFloat32 (0.25f))
+
 dgVector dgCollisionDeformableMesh::m_smallestLenght2	(DG_SMALLEST_SPRING_LENGTH * DG_SMALLEST_SPRING_LENGTH);
 
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCollisionID collisionID)
@@ -63,7 +66,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgDes
 	,m_linkList(world->GetAllocator())
 	,m_restlength(world->GetAllocator())
 	,m_indexToVertexMap(world->GetAllocator())
-	,m_skinThickness (dgFloat32 (1.0f / 16.0f))
+	,m_skinThickness (DG_MINIMIM_THICKNESS)
 	,m_linksCount(0)
 	,m_indexToVertexCount(0)
 {
@@ -144,6 +147,27 @@ const dgInt16* dgCollisionDeformableMesh::GetLinks() const
 void dgCollisionDeformableMesh::ConstraintParticle(dgInt32 particleIndex, const dgVector& posit, const dgBody* const body)
 {
 	dgAssert(0);
+}
+
+
+void dgCollisionDeformableMesh::DebugCollision(const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
+{
+	const dgVector* const posit = &m_posit[0];
+	const dgSoftLink* const links = &m_linkList[0];
+	for (dgInt32 i = 0; i < m_linksCount; i++) {
+		const dgInt32 j0 = links[i].m_m0;
+		const dgInt32 j1 = links[i].m_m1;
+		dgVector p0(matrix.TransformVector(posit[j0]));
+		dgVector p1(matrix.TransformVector(posit[j1]));
+		dgTriplex points[2];
+		points[0].m_x = p0.m_x;
+		points[0].m_y = p0.m_y;
+		points[0].m_z = p0.m_z;
+		points[1].m_x = p1.m_x;
+		points[1].m_y = p1.m_y;
+		points[1].m_z = p1.m_z;
+		callback(userData, 2, &points[0].m_x, 0);
+	}
 }
 
 
@@ -234,7 +258,8 @@ void dgCollisionDeformableMesh::HandleCollision (dgFloat32 timestep, dgVector* c
 	const dgMatrix& matrix = m_body->GetCollision()->GetGlobalMatrix();
 	dgVector origin(matrix.m_posit);
 
-	dgFloat32 staticFriction = dgFloat32 (0.7f);
+	dgFloat32 coeficientOfFriction = dgFloat32 (0.8f);
+	dgFloat32 coeficientOfPenetration = dgFloat32 (0.1f);
 
 	dgVector timestepV (timestep);
 	dgVector invTimeStep (dgFloat32 (1.0f / timestep));
@@ -242,32 +267,36 @@ void dgCollisionDeformableMesh::HandleCollision (dgFloat32 timestep, dgVector* c
 	const dgVector* const accel = &m_accel[0];
 	const dgVector* const veloc = &m_veloc[0];
 	const dgVector* const posit = &m_posit[0];
+	const dgVector* const externAccel = &m_externalAccel[0];
 
 	// for now
 	dgVector contactNormal (dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		dgVector normal (dgVector::m_zero);
+		dgVector accel1 (dgVector::m_zero);
 		dgVector tangent0 (dgVector::m_zero);
 		dgVector tangent1 (dgVector::m_zero);
-		dgVector accel1 (dgVector::m_zero);
 
 		dgVector contactPosition (origin + posit[i]);
-		dgFloat32 penetration = CalculaleContactPenetration(contactPosition, contactNormal);
+		dgFloat32 penetration = m_skinThickness - CalculaleContactPenetration(contactPosition, contactNormal);
 
 		dgFloat32 frictionCoef = dgFloat32 (0.0f);
-		if ((penetration - m_skinThickness) < 0.0f) {
-//			dgFloat32 maxPenetration = dgMax(penetration - m_skinThickness, dgFloat32 (-0.25f));
-//			dgFloat32 penetrationSpeed = maxPenetration * invTimeStep.GetScalar();
-//			dgFloat32 penetrationSpeed = dgFloat32 (0.0f);
-			
-			dgVector projectedVelocity (veloc[i] + accel[i].CompProduct4(timestepV));
+		if (penetration > 0.0f) {
+			dgVector projectedVelocity (veloc[i] + (accel[i] + externAccel[i]).CompProduct4(timestepV));
 			dgFloat32 projectedNormalSpeed = contactNormal.DotProduct4(projectedVelocity).GetScalar();
 			if (projectedNormalSpeed < dgFloat32 (0.0f)) {
 				normal = contactNormal;	
-				dgVector normalVelocity(normal.CompProduct4(normal.DotProduct4(veloc[i].CompProduct4(dgVector::m_negOne))));
+//float xxx = DG_MINIMIM_ZERO_SURFACE;
+//				penetration = dgMax (penetration - DG_MINIMIM_ZERO_SURFACE, dgFloat32 (0.0f));
+				dgFloat32 maxPenetration = dgMin(penetration, dgFloat32(0.25f));
+				dgVector penetrationSpeed (invTimeStep.Scale4 (coeficientOfPenetration * maxPenetration));
+				dgVector normalSpeed (normal.DotProduct4(veloc[i].CompProduct4(dgVector::m_negOne)));
+				dgVector restoringSpeed (normalSpeed.GetMax(penetrationSpeed));
+				//dgVector normalVelocity(normal.CompProduct4(normalSpeed));
+				dgVector normalVelocity(normal.CompProduct4(restoringSpeed));
 				accel1 = invTimeStep.CompProduct4(normalVelocity);
-				frictionCoef = staticFriction;
+				frictionCoef = coeficientOfFriction;
 			}
 		}
 

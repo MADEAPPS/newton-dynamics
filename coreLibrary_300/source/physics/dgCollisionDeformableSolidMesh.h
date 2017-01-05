@@ -46,12 +46,9 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 	virtual ~dgCollisionDeformableSolidMesh(void);
 
 	virtual void CalculateAcceleration(dgFloat32 timestep);
-	
-	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	dgArray<dgFiniteElementCell> m_finiteElements;
 	dgInt32 m_finiteElementsCount;
-	
 };
 
 
