@@ -44,6 +44,7 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles(dgWorld* const wo
 	,m_particleRadius (DG_MINIMIM_PARTCLE_RADIUS)
 	,m_particlesCount(0)
 {
+//m_particleRadius = 1.0f;
 	m_rtti |= dgCollisionLumpedMass_RTTI;
 }
 
@@ -247,7 +248,7 @@ dgMatrix dgCollisionLumpedMassParticles::CalculateInertiaAndCenterOfMass(const d
 	return inertia;
 }
 
-
+/*
 dgFloat32 dgCollisionLumpedMassParticles::CalculaleContactPenetration(const dgVector& point, const dgVector& normal) const
 {
 	dgVector otherPoint (point);
@@ -255,15 +256,25 @@ dgFloat32 dgCollisionLumpedMassParticles::CalculaleContactPenetration(const dgVe
 	dgFloat32 penetration = normal.DotProduct4(point - otherPoint).GetScalar();
 	return penetration;
 }
+*/
 
+dgVector dgCollisionLumpedMassParticles::CalculateContactNormalAndPenetration(const dgVector& worldPosition) const
+{
+	dgVector contactNormal(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	dgVector otherPoint(worldPosition);
+	otherPoint.m_y = dgFloat32(0.0f);
+	dgVector point(worldPosition - contactNormal.Scale4 (m_particleRadius));
+	contactNormal.m_w = contactNormal.DotProduct4(otherPoint - point).GetScalar();
 
+	return contactNormal;
+}
 
 void dgCollisionLumpedMassParticles::HandleCollision(dgFloat32 timestep, dgVector* const normalDir, dgVector* const normalAccel, dgFloat32* const frictionCoefficient) const
 {
 	const dgMatrix& matrix = m_body->GetCollision()->GetGlobalMatrix();
 	dgVector origin(matrix.m_posit);
 
-	dgFloat32 coeficientOfFriction = dgFloat32(0.8f);
+	dgFloat32 coeficientOfFriction = dgFloat32(0.6f);
 	dgFloat32 coeficientOfPenetration = dgFloat32(0.1f);
 
 	dgVector timestepV(timestep);
@@ -274,9 +285,6 @@ void dgCollisionLumpedMassParticles::HandleCollision(dgFloat32 timestep, dgVecto
 	const dgVector* const posit = &m_posit[0];
 	const dgVector* const externAccel = &m_externalAccel[0];
 
-	// for now
-	dgVector contactNormal(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		dgVector normal(dgVector::m_zero);
 		dgVector accel1(dgVector::m_zero);
@@ -284,24 +292,26 @@ void dgCollisionLumpedMassParticles::HandleCollision(dgFloat32 timestep, dgVecto
 		dgVector tangent1(dgVector::m_zero);
 
 		dgVector contactPosition(origin + posit[i]);
-		dgFloat32 penetration = m_particleRadius - CalculaleContactPenetration(contactPosition, contactNormal);
+		dgVector contactNormal(CalculateContactNormalAndPenetration (contactPosition));
 
 		dgFloat32 frictionCoef = dgFloat32(0.0f);
-		if (penetration > 0.0f) {
+		if (contactNormal.m_w > dgFloat32 (0.0f)) {
 			dgVector projectedVelocity(veloc[i] + (accel[i] + externAccel[i]).CompProduct4(timestepV));
-			dgFloat32 projectedNormalSpeed = contactNormal.DotProduct4(projectedVelocity).GetScalar();
+			dgFloat32 projectedNormalSpeed = contactNormal.DotProduct3(projectedVelocity);
 			if (projectedNormalSpeed < dgFloat32(0.0f)) {
-				normal = contactNormal;
-//float xxx = DG_MINIMIM_ZERO_SURFACE;
-//penetration = dgMax (penetration - DG_MINIMIM_ZERO_SURFACE, dgFloat32 (0.0f));
-				dgFloat32 maxPenetration = dgMin(penetration, dgFloat32(0.25f));
-				dgVector penetrationSpeed(invTimeStep.Scale4(coeficientOfPenetration * maxPenetration));
-				dgVector normalSpeed(normal.DotProduct4(veloc[i].CompProduct4(dgVector::m_negOne)));
-				dgVector restoringSpeed(normalSpeed.GetMax(penetrationSpeed));
-				//dgVector normalVelocity(normal.CompProduct4(normalSpeed));
-				dgVector normalVelocity(normal.CompProduct4(restoringSpeed));
-				accel1 = invTimeStep.CompProduct4(normalVelocity);
-				frictionCoef = coeficientOfFriction;
+				if (contactNormal.m_w > DG_MINIMIM_ZERO_SURFACE) {
+					normal = contactNormal & dgVector::m_triplexMask;
+					dgFloat32 penetration = dgClamp(contactNormal.m_w - DG_MINIMIM_ZERO_SURFACE, dgFloat32(0.0f), dgFloat32(0.25f));
+					dgVector penetrationSpeed(invTimeStep.Scale4(coeficientOfPenetration * penetration));
+
+					dgVector normalSpeed(normal.DotProduct4(veloc[i].CompProduct4(dgVector::m_negOne)));
+					dgVector restoringSpeed(normalSpeed.GetMax(penetrationSpeed));
+
+					dgVector normalVelocity(normal.CompProduct4(restoringSpeed));
+					
+					accel1 = invTimeStep.CompProduct4(normalVelocity);
+					frictionCoef = coeficientOfFriction;
+				}
 			}
 		}
 
