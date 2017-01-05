@@ -18,11 +18,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dContainers", "..\..\..\..\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\..\..\packages\thirdParty\tinyxml\vs2013_static_mt\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "base", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2013_static_mt\wx_vc9_base.vcxproj", "{3FCC50C2-81E9-5DB2-B8D8-2129427568B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxbase", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2013_static_mt\wx_vc9_base.vcxproj", "{3FCC50C2-81E9-5DB2-B8D8-2129427568B1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2013_static_mt\wx_vc9_core.vcxproj", "{6744DAD8-9C70-574A-BFF2-9F8DDDB24A75}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxcore", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2013_static_mt\wx_vc9_core.vcxproj", "{6744DAD8-9C70-574A-BFF2-9F8DDDB24A75}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2013_static_mt\wx_vc9_gl.vcxproj", "{DA8B15EF-6750-5928-BC0E-C748213CF9B2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxgl", "..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2013_static_mt\wx_vc9_gl.vcxproj", "{DA8B15EF-6750-5928-BC0E-C748213CF9B2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3FCC50C2-81E9-5DB2-B8D8-2129427568B1} = {3FCC50C2-81E9-5DB2-B8D8-2129427568B1}
 		{6744DAD8-9C70-574A-BFF2-9F8DDDB24A75} = {6744DAD8-9C70-574A-BFF2-9F8DDDB24A75}
@@ -31,8 +31,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew", "..\..\..\..\packages\thirdParty\glew\build\VS_2013_static_mt\glew.vcxproj", "{0C9707F5-DEC7-42EB-8EA1-A484DF1E515B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "..\..\..\..\packages\thirdParty\freetype-2.4.0\builds\win32\vc2013_static_mt\freetype.vcxproj", "{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2013_static_mt\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dScene", "..\..\..\..\packages\projects\visualStudio_2013_static_mt\dScene.vcxproj", "{B5EEC82D-938F-44C9-89BB-4A058581750B}"
 EndProject
@@ -202,18 +200,6 @@ Global
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|Win32.Build.0 = Release|Win32
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.ActiveCfg = Release|x64
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.Build.0 = Release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug|Win32.ActiveCfg = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug|Win32.Build.0 = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug|x64.ActiveCfg = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Debug|x64.Build.0 = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.profile|Win32.ActiveCfg = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.profile|Win32.Build.0 = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.profile|x64.ActiveCfg = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.profile|x64.Build.0 = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|Win32.ActiveCfg = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|Win32.Build.0 = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|x64.ActiveCfg = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.Release|x64.Build.0 = release|x64
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.Debug|Win32.ActiveCfg = debug|Win32
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.Debug|Win32.Build.0 = debug|Win32
 		{B5EEC82D-938F-44C9-89BB-4A058581750B}.Debug|x64.ActiveCfg = debug|x64
