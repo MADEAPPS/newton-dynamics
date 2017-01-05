@@ -48,6 +48,7 @@
 #include "dgCollisionCompoundFractured.h"
 #include "dgCollisionDeformableSolidMesh.h"
 #include "dgCollisionDeformableClothPatch.h"
+#include "dgCollisionIncompressibleParticles.h"
 
 
 

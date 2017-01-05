@@ -180,6 +180,9 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionLumpedMassParticles.cpp">
       <Filter>collision</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgCollisionIncompressibleParticles.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBallConstraint.h">
@@ -324,6 +327,9 @@
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionLumpedMassParticles.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgCollisionIncompressibleParticles.h">
       <Filter>collision</Filter>
     </ClInclude>
   </ItemGroup>

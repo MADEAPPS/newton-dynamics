@@ -221,10 +221,11 @@ class dgCollision
 		dgCollisionDeformableMesh_RTTI				= 1<<14,
 		dgCollisionDeformableSolidMesh_RTTI			= 1<<15,
 		dgCollisionDeformableClothPatch_RTTI		= 1<<16,
-		dgCollisionUserMesh_RTTI					= 1<<17,
-		dgCollisionHeightField_RTTI					= 1<<18,
-		dgCollisionScene_RTTI						= 1<<19,
-		dgCollisionCompoundBreakable_RTTI			= 1<<20,
+		dgCollisionIncompressibleParticles_RTTI		= 1<<17,
+		dgCollisionUserMesh_RTTI					= 1<<18,
+		dgCollisionHeightField_RTTI					= 1<<19,
+		dgCollisionScene_RTTI						= 1<<20,
+		dgCollisionCompoundBreakable_RTTI			= 1<<21,
 	};													 
 	
 	DG_CLASS_ALLOCATOR(allocator)

@@ -32,8 +32,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #define DG_SMALLEST_SPRING_LENGTH			dgFloat32 (1.0e-3f) 
-#define DG_MINIMIM_THICKNESS				dgFloat32 (1.0f/32.0f)
-#define DG_MINIMIM_ZERO_SURFACE				(DG_MINIMIM_THICKNESS * dgFloat32 (0.25f))
 
 dgVector dgCollisionDeformableMesh::m_smallestLenght2	(DG_SMALLEST_SPRING_LENGTH * DG_SMALLEST_SPRING_LENGTH);
 
@@ -42,7 +40,6 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCol
 	,m_linkList(world->GetAllocator())
 	,m_restlength(world->GetAllocator())
 	,m_indexToVertexMap(world->GetAllocator())
-	,m_skinThickness (dgFloat32 (1.0f / 16.0f))
 	,m_linksCount(0)
 	,m_indexToVertexCount(0)
 {
@@ -54,7 +51,6 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformable
 	,m_linkList(source.m_linkList, source.m_linksCount)
 	,m_restlength(source.m_restlength, source.m_linksCount)
 	,m_indexToVertexMap(source.m_indexToVertexMap, source.m_indexToVertexCount)
-	,m_skinThickness (source.m_skinThickness)
 	,m_linksCount(source.m_linksCount)
 	,m_indexToVertexCount(source.m_indexToVertexCount)
 {
@@ -66,7 +62,6 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgDes
 	,m_linkList(world->GetAllocator())
 	,m_restlength(world->GetAllocator())
 	,m_indexToVertexMap(world->GetAllocator())
-	,m_skinThickness (DG_MINIMIM_THICKNESS)
 	,m_linksCount(0)
 	,m_indexToVertexCount(0)
 {
@@ -244,65 +239,4 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 	}
 }
 
-
-dgFloat32 dgCollisionDeformableMesh::CalculaleContactPenetration(const dgVector& point, const dgVector& normal) const
-{
-	dgVector otherPoint (point);
-	otherPoint.m_y = dgFloat32 (0.0f);
-	dgFloat32 penetration = normal.DotProduct4(point - otherPoint).GetScalar();
-	return penetration;
-}
-
-void dgCollisionDeformableMesh::HandleCollision (dgFloat32 timestep, dgVector* const normalDir, dgVector* const normalAccel, dgFloat32* const frictionCoefficient) const
-{
-	const dgMatrix& matrix = m_body->GetCollision()->GetGlobalMatrix();
-	dgVector origin(matrix.m_posit);
-
-	dgFloat32 coeficientOfFriction = dgFloat32 (0.8f);
-	dgFloat32 coeficientOfPenetration = dgFloat32 (0.1f);
-
-	dgVector timestepV (timestep);
-	dgVector invTimeStep (dgFloat32 (1.0f / timestep));
-	invTimeStep = invTimeStep & dgVector::m_triplexMask;
-	const dgVector* const accel = &m_accel[0];
-	const dgVector* const veloc = &m_veloc[0];
-	const dgVector* const posit = &m_posit[0];
-	const dgVector* const externAccel = &m_externalAccel[0];
-
-	// for now
-	dgVector contactNormal (dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-
-	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		dgVector normal (dgVector::m_zero);
-		dgVector accel1 (dgVector::m_zero);
-		dgVector tangent0 (dgVector::m_zero);
-		dgVector tangent1 (dgVector::m_zero);
-
-		dgVector contactPosition (origin + posit[i]);
-		dgFloat32 penetration = m_skinThickness - CalculaleContactPenetration(contactPosition, contactNormal);
-
-		dgFloat32 frictionCoef = dgFloat32 (0.0f);
-		if (penetration > 0.0f) {
-			dgVector projectedVelocity (veloc[i] + (accel[i] + externAccel[i]).CompProduct4(timestepV));
-			dgFloat32 projectedNormalSpeed = contactNormal.DotProduct4(projectedVelocity).GetScalar();
-			if (projectedNormalSpeed < dgFloat32 (0.0f)) {
-				normal = contactNormal;	
-//float xxx = DG_MINIMIM_ZERO_SURFACE;
-//				penetration = dgMax (penetration - DG_MINIMIM_ZERO_SURFACE, dgFloat32 (0.0f));
-				dgFloat32 maxPenetration = dgMin(penetration, dgFloat32(0.25f));
-				dgVector penetrationSpeed (invTimeStep.Scale4 (coeficientOfPenetration * maxPenetration));
-				dgVector normalSpeed (normal.DotProduct4(veloc[i].CompProduct4(dgVector::m_negOne)));
-				dgVector restoringSpeed (normalSpeed.GetMax(penetrationSpeed));
-				//dgVector normalVelocity(normal.CompProduct4(normalSpeed));
-				dgVector normalVelocity(normal.CompProduct4(restoringSpeed));
-				accel1 = invTimeStep.CompProduct4(normalVelocity);
-				frictionCoef = coeficientOfFriction;
-			}
-		}
-
-		normalDir[i] = normal;
-		normalAccel[i] = accel1;
-		frictionCoefficient[i] = frictionCoef;
-	}
-}
 
