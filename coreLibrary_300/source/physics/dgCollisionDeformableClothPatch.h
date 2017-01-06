@@ -39,7 +39,7 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 	virtual ~dgCollisionDeformableClothPatch(void);
 	virtual void CalculateAcceleration(dgFloat32 timestep);
 
-	void* GetMemoryBuffer() const;
+	dgInt32 GetMemoryBufferSizeInBytes() const;
 };
 
 

@@ -47,7 +47,7 @@ class dgCollisionDeformableSolidMesh: public dgCollisionDeformableMesh
 
 	virtual void CalculateAcceleration(dgFloat32 timestep);
 
-	void* GetMemoryBuffer() const;
+	dgInt32 GetMemoryBufferSizeInBytes() const;
 
 	dgArray<dgFiniteElementCell> m_finiteElements;
 	dgInt32 m_finiteElementsCount;

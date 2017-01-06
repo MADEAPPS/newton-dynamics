@@ -102,19 +102,14 @@ dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
 {
 }
 
-void* dgCollisionDeformableClothPatch::GetMemoryBuffer() const
+dgInt32 dgCollisionDeformableClothPatch::GetMemoryBufferSizeInBytes() const
 {
-	dgWorld* const world = m_body->GetWorld();
-
 	dgInt32 sizeInByte = 0;
 	sizeInByte += 3 * m_linksCount * sizeof (dgVector);
 	sizeInByte += 2 * m_linksCount * sizeof (dgFloat32);
 	sizeInByte += 2 * m_particlesCount * sizeof (dgVector);
 	sizeInByte += 1 * m_particlesCount * sizeof (dgFloat32);
-	sizeInByte += 2048;
-
-	world->m_solverJacobiansMemory.ResizeIfNecessary (sizeInByte);
-	return &world->m_solverJacobiansMemory[0];
+	return sizeInByte;
 }
 
 
@@ -123,8 +118,6 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 {
 	// Ks is in [sec^-2] a spring constant unit acceleration, not a spring force acceleration. 
 	// Kc is in [sec^-1] a damper constant unit velocity, not a damper force acceleration. 
-
-	void* const memory = GetMemoryBuffer();
 
 	// for now make a share value for all springs. later this is a per material feature.
 	dgFloat32 kSpring = dgFloat32(1000.0f);
@@ -145,7 +138,9 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 	//dgFloat32* const spring_B01 = dgAlloca(dgFloat32, m_linksCount);
 	//dgFloat32* const frictionCoeffecient = dgAlloca(dgFloat32, m_particlesCount);
 
-	dgVector* const dx = (dgVector*)memory;
+	dgWorld* const world = m_body->GetWorld();
+	world->m_solverJacobiansMemory.ResizeIfNecessary (GetMemoryBufferSizeInBytes() + 1024);
+	dgVector* const dx = (dgVector*)&world->m_solverJacobiansMemory[0];
 	dgVector* const dv = &dx[m_linksCount];
 	dgVector* const dpdv = &dv[m_linksCount];
 	dgVector* const normalAccel = &dpdv[m_linksCount];
