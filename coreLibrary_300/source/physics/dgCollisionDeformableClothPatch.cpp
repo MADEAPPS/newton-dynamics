@@ -105,10 +105,9 @@ dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
 dgInt32 dgCollisionDeformableClothPatch::GetMemoryBufferSizeInBytes() const
 {
 	dgInt32 sizeInByte = 0;
-	sizeInByte += 3 * m_linksCount * sizeof (dgVector);
-	sizeInByte += 2 * m_linksCount * sizeof (dgFloat32);
 	sizeInByte += 2 * m_particlesCount * sizeof (dgVector);
 	sizeInByte += 1 * m_particlesCount * sizeof (dgFloat32);
+	sizeInByte += 2 * m_linksCount * sizeof(dgFloat32);
 	return sizeInByte;
 }
 
@@ -129,9 +128,6 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 	dgVector* const posit = &m_posit[0];
 	const dgFloat32* const restLenght = &m_restlength[0];
 
-	//dgVector* const dx = dgAlloca(dgVector, m_linksCount);
-	//dgVector* const dv = dgAlloca(dgVector, m_linksCount);
-	//dgVector* const dpdv = dgAlloca(dgVector, m_linksCount);
 	//dgVector* const normalAccel = dgAlloca(dgVector, m_particlesCount);
 	//dgVector* const normalDir = dgAlloca(dgVector, m_particlesCount);
 	//dgFloat32* const spring_A01 = dgAlloca(dgFloat32, m_linksCount);
@@ -140,10 +136,7 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 
 	dgWorld* const world = m_body->GetWorld();
 	world->m_solverJacobiansMemory.ResizeIfNecessary (GetMemoryBufferSizeInBytes() + 1024);
-	dgVector* const dx = (dgVector*)&world->m_solverJacobiansMemory[0];
-	dgVector* const dv = &dx[m_linksCount];
-	dgVector* const dpdv = &dv[m_linksCount];
-	dgVector* const normalAccel = &dpdv[m_linksCount];
+	dgVector* const normalAccel = (dgVector*)&world->m_solverJacobiansMemory[0];
 	dgVector* const normalDir = &normalAccel[m_particlesCount];
 	dgFloat32* const spring_A01 = (dgFloat32*) &normalDir[m_particlesCount];
 	dgFloat32* const spring_B01 = &spring_A01[m_linksCount];
@@ -193,11 +186,9 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 		for (dgInt32 i = 0; i < m_linksCount; i++) {
 			const dgInt32 j0 = links[i].m_m0;
 			const dgInt32 j1 = links[i].m_m1;
-			dv[i] = veloc[j0] - veloc[j1];
-			dx[i] = posit[j0] - posit[j1];
 
-			const dgVector p0p1(dx[i]);
-			const dgVector v0v1(dv[i]);
+			const dgVector p0p1(posit[j0] - posit[j1]);
+			const dgVector v0v1(veloc[j0] - veloc[j1]);
 			const dgVector length2(p0p1.DotProduct4(p0p1));
 			const dgVector mask(length2 > m_smallestLenght2);
 
@@ -213,7 +204,6 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(p0p1.m_w == dgFloat32(0.0f));
 
-			dpdv[i] = p0p1.CompProduct4(v0v1);
 			accel[j0] -= (fs + fd);
 			accel[j1] += (fs + fd);
 
@@ -222,13 +212,14 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 		}
 
 		for (dgInt32 i = 0; i < m_linksCount; i++) {
-			const dgVector dv0(dv[i]);
-			const dgVector A01(spring_A01[i]);
-			const dgVector B01(spring_B01[i]);
-			const dgVector dfdx(A01.CompProduct4(dv0) + B01.CompProduct4(dx[i].CompProduct4(dpdv[i])));
-
 			const dgInt32 j0 = links[i].m_m0;
 			const dgInt32 j1 = links[i].m_m1;
+			const dgVector A01(spring_A01[i]);
+			const dgVector B01(spring_B01[i]);
+			const dgVector p0p1(posit[j0] - posit[j1]);
+			const dgVector v0v1(veloc[j0] - veloc[j1]);
+			const dgVector dpdv (p0p1.CompProduct4(v0v1));
+			const dgVector dfdx(A01.CompProduct4(v0v1) + B01.CompProduct4(p0p1.CompProduct4(dpdv)));
 
 			dgAssert(dfdx.m_w == dgFloat32(0.0f));
 			accel[j0] += dfdx;

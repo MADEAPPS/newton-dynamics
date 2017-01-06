@@ -346,10 +346,10 @@ class SimpleSoftBodyEntity: public DemoEntity
 	{
 		size_x += 1;
 		size_z += 1;
-		dAssert(size_x < 128);
-		dAssert(size_z < 128);
+		dAssert(size_x <= 129);
+		dAssert(size_z <= 129);
 		dFloat dimension = 0.125f;
-		dVector points[128][128];
+		dVector points[129][129];
 
 		dFloat y = 0.0f;
 		int enumerator = 0;
@@ -680,7 +680,7 @@ void ClothPatch(DemoEntityManager* const scene)
 
 	SimpleSoftBodyEntity* const entity = new SimpleSoftBodyEntity(scene, location);
 	//entity->BuildClothPatch(scene, 50, 50);
-	entity->BuildClothPatch(scene, 64, 64);
+	entity->BuildClothPatch(scene, 32, 32);
 
 	dQuaternion rot;
 	dVector origin(location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);
