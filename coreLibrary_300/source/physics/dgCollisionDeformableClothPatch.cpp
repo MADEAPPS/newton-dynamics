@@ -107,10 +107,8 @@ dgInt32 dgCollisionDeformableClothPatch::GetMemoryBufferSizeInBytes() const
 	dgInt32 sizeInByte = 0;
 	sizeInByte += 2 * m_particlesCount * sizeof (dgVector);
 	sizeInByte += 1 * m_particlesCount * sizeof (dgFloat32);
-	sizeInByte += 2 * m_linksCount * sizeof(dgFloat32);
 	return sizeInByte;
 }
-
 
 
 void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
@@ -130,18 +128,13 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 
 	//dgVector* const normalAccel = dgAlloca(dgVector, m_particlesCount);
 	//dgVector* const normalDir = dgAlloca(dgVector, m_particlesCount);
-	//dgFloat32* const spring_A01 = dgAlloca(dgFloat32, m_linksCount);
-	//dgFloat32* const spring_B01 = dgAlloca(dgFloat32, m_linksCount);
 	//dgFloat32* const frictionCoeffecient = dgAlloca(dgFloat32, m_particlesCount);
 
 	dgWorld* const world = m_body->GetWorld();
 	world->m_solverJacobiansMemory.ResizeIfNecessary (GetMemoryBufferSizeInBytes() + 1024);
 	dgVector* const normalAccel = (dgVector*)&world->m_solverJacobiansMemory[0];
 	dgVector* const normalDir = &normalAccel[m_particlesCount];
-	dgFloat32* const spring_A01 = (dgFloat32*) &normalDir[m_particlesCount];
-	dgFloat32* const spring_B01 = &spring_A01[m_linksCount];
-	dgFloat32* const frictionCoeffecient = &spring_B01[m_linksCount];
-
+	dgFloat32* const frictionCoeffecient = (dgFloat32*) &normalDir[m_particlesCount];
 
 	//dgFloat32* const damper_A01 = dgAlloca(dgFloat32, m_linksCount);
 	//dgFloat32* const damper_B01 = dgAlloca(dgFloat32, m_linksCount);
@@ -189,6 +182,8 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 
 			const dgVector p0p1(posit[j0] - posit[j1]);
 			const dgVector v0v1(veloc[j0] - veloc[j1]);
+			const dgVector dpdv(p0p1.CompProduct4(v0v1));
+
 			const dgVector length2(p0p1.DotProduct4(p0p1));
 			const dgVector mask(length2 > m_smallestLenght2);
 
@@ -199,32 +194,16 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 			const dgFloat32 compression = dgFloat32(1.0f) - lenghtRatio;
 			const dgVector fs(p0p1.Scale4(kSpring * compression));
 			const dgVector fd(p0p1.Scale4(kDamper * den * den * (v0v1.DotProduct4(p0p1)).GetScalar()));
-
+			const dgVector dfdx(v0v1.Scale4 (ks_dt * compression) + (p0p1.CompProduct4(dpdv).Scale4 (ks_dt * lenghtRatio * den * den)));
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(p0p1.m_w == dgFloat32(0.0f));
-
-			accel[j0] -= (fs + fd);
-			accel[j1] += (fs + fd);
-
-			spring_A01[i] = ks_dt * compression;
-			spring_B01[i] = ks_dt * lenghtRatio * den * den;
-		}
-
-		for (dgInt32 i = 0; i < m_linksCount; i++) {
-			const dgInt32 j0 = links[i].m_m0;
-			const dgInt32 j1 = links[i].m_m1;
-			const dgVector A01(spring_A01[i]);
-			const dgVector B01(spring_B01[i]);
-			const dgVector p0p1(posit[j0] - posit[j1]);
-			const dgVector v0v1(veloc[j0] - veloc[j1]);
-			const dgVector dpdv (p0p1.CompProduct4(v0v1));
-			const dgVector dfdx(A01.CompProduct4(v0v1) + B01.CompProduct4(p0p1.CompProduct4(dpdv)));
-
 			dgAssert(dfdx.m_w == dgFloat32(0.0f));
-			accel[j0] += dfdx;
-			accel[j1] -= dfdx;
+
+			accel[j0] += ( dfdx - fs - fd);
+			accel[j1] += ( fs + fd - dfdx);
 		}
+
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
 			//dgVector dirAccel1 (collisionDir1[i].CompProduct4(accel[i].DotProduct4(collisionDir1[i])));
