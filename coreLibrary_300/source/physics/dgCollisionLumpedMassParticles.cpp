@@ -215,14 +215,14 @@ dgFloat32 dgCollisionLumpedMassParticles::RayCast(const dgVector& localP0, const
 {
 	// for now brute force ray cast
 	dgVector p (m_posit[0]);
-	dgFloat32 distance = dgFloat32 (1.0e10f);
+	dgFloat32 distance2 = dgFloat32 (0.01f);
 	for (dgInt32 i = 0; i < m_particlesCount; i ++) {
 		dgVector posit (dgPointToRayDistance (m_posit[i], localP0, localP1)); 
 		dgVector step (posit - m_posit[i]);
 		
 		dgFloat32 dist2 = step.DotProduct3(step);
-		if (dist2 < distance) {
-			distance = dist2;
+		if (dist2 < distance2) {
+			distance2 = dist2;
 			p = m_posit[i];
 		}
 	}
