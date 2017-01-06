@@ -227,11 +227,14 @@ dgFloat32 dgCollisionLumpedMassParticles::RayCast(const dgVector& localP0, const
 		}
 	}
 
-	contactOut.m_point = p;
-	contactOut.m_normal = dgVector (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-	dgVector num (p - localP0);
-	dgVector den (localP1 - localP0);
-	dgFloat32 dist = num.DotProduct3(den) / den.DotProduct3(den);
+	dgFloat32 dist = dgFloat32(1.0e10f);
+	if (distance2 < dgFloat32(0.01f)) {
+		contactOut.m_point = p;
+		contactOut.m_normal = dgVector(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+		dgVector num(p - localP0);
+		dgVector den(localP1 - localP0);
+		dist = num.DotProduct3(den) / den.DotProduct3(den);
+	}
 	return dist;
 }
 
