@@ -75,21 +75,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
-
-/*
-	float matrix[6][6] = { 4.40111303, 0.617763281, 1.69864392, -1.89820552, -0.703747034, -1.96619594,
-						  0.617763281, 5.48742199, 5.21686459, -0.955973744, -1.87188840, -2.73124170,
-						  1.69864392, 5.21686459, 14.9251909, -2.44485307, -2.07723260, -7.28379631,
-						 -1.89820552, -0.955973744, -2.44485307, 1.30613446, 0.823455930, 2.41332412,
-						 -0.703747034, -1.87188840, -2.07723260, 0.823455930, 1.21579146, 2.38235068,
-						 -1.96619594, -2.73124170, -7.28379631, 2.41332412, 2.38235068, 7.33168077 };
-
-	float low[6] = { -12.5327377, 0.000000000, -8.74969482, -4.75073147, 0.000000000, -27.5890961 };
-	float high[6] = { 7.46726227, 20.0000000, 11.2503052, 35.2492676, 40.0000000, 12.4109039 };
-	float x[6] = { 0.000000000, 0.000000000, 0.000000000, 0.000000000, 0.000000000, 0.000000000 };
-	float b[6] = { 4.78564644, -193.272110, -2.28792644, 2.96778202, -16.0478821, -2.94578266 };
-	dgSolveDantzigLCP(6, &matrix[0][0], x, b, low, high);
-*/
 	
 	m_bodies = 0;
 	m_joints = 0;
@@ -121,10 +106,11 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	dgWorldDynamicUpdateSyncDescriptor descriptor;
 	descriptor.m_timestep = timestep;
 
-	dgInt32 index = 0;
-	descriptor.m_firstCluster = 0;
+	dgInt32 index = softBodiesCount;
+
 	descriptor.m_atomicCounter = 0;
-	descriptor.m_clusterCount = m_clusters;
+	descriptor.m_firstCluster = index;
+	descriptor.m_clusterCount = m_clusters - index;
 	sentinelBody->m_sleeping = true;
 	sentinelBody->m_equilibrium = true;
 
@@ -147,13 +133,25 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	}
 
 	if (index < m_clusters) {
+		descriptor.m_atomicCounter = 0;
 		descriptor.m_firstCluster = index;
 		descriptor.m_clusterCount = m_clusters - index;
-		descriptor.m_atomicCounter = 0;
 		for (dgInt32 i = 0; i < threadCount; i ++) {
 			world->QueueJob (CalculateClusterReactionForcesKernel, &descriptor, world);
 		}
 		world->SynchronizationBarrier();
+	}
+
+	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
+	for (dgInt32 i = 0; i < softBodiesCount; i++) {
+		dgBodyCluster* const cluster = &m_clusterMemory[i];
+//		IntegrateExternalForce(cluster, timestep, 0);
+		dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
+		dgAssert (cluster->m_bodyCount == 2);
+		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[1].m_body;
+		dgAssert (body->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI));
+		body->IntegrateOpenLoopExternalForce(timestep);
+		IntegrateVelocity(cluster, DG_SOLVER_MAX_ERROR, timestep, 0);
 	}
 
 	m_clusterMemory = NULL;

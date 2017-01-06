@@ -165,6 +165,11 @@ dgCollisionDeformableSolidMesh::~dgCollisionDeformableSolidMesh(void)
 {
 }
 
+void* dgCollisionDeformableSolidMesh::GetMemoryBuffer() const
+{
+	dgAssert (0);
+	return 0;
+}
 
 
 void dgCollisionDeformableSolidMesh::CalculateAcceleration(dgFloat32 timestep)

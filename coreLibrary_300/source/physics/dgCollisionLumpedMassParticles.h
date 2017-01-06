@@ -62,6 +62,8 @@ class dgCollisionLumpedMassParticles: public dgCollisionConvex
 	dgVector CalculateContactNormalAndPenetration(const dgVector& worldPosition) const;
 	virtual void HandleCollision (dgFloat32 timestep, dgVector* const normalDir, dgVector* const normalAccel, dgFloat32* const frictionCoefficient) const;
 
+	virtual void* GetMemoryBuffer() const = 0;
+
 	dgArray<dgVector> m_posit;
 	dgArray<dgVector> m_veloc;
 	dgArray<dgVector> m_accel;

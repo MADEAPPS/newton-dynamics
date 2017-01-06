@@ -147,7 +147,6 @@ class dgWorld
 	:public dgBodyMasterList
 	,public dgBodyMaterialList
 	,public dgBodyCollisionList
-//	,public dgDeformableBodiesUpdate
 	,public dgSkeletonList
 	,public dgActiveContacts 
 	,public dgWorldDynamicUpdate
@@ -512,11 +511,13 @@ class dgWorld
 	friend class dgCollisionDeformableSolidMesh;
 	friend class dgBroadPhaseApplyExternalForce;
 	friend class dgParallelSolverCalculateForces;
+	friend class dgCollisionDeformableClothPatch;
 	friend class dgParallelSolverJointAcceleration;
 	friend class dgParallelSolverBuildJacobianRows;
 	friend class dgParallelSolverInitFeedbackUpdate;
 	friend class dgParallelSolverInitInternalForces;
 	friend class dgParallelSolverBuildJacobianMatrix;
+	
 
 	friend class dgBroadPhaseMaterialCallbackWorkerThread;
 	friend class dgBroadPhaseCalculateContactsWorkerThread;
