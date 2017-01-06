@@ -189,19 +189,19 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 
 			const dgVector lenght2((length2 & mask) | length2.AndNot(mask));
 			const dgFloat32 length = (lenght2.Sqrt()).GetScalar();
-			const dgFloat32 den = dgFloat32(1.0f) / length;
-			const dgFloat32 lenghtRatio = restLenght[i] * den;
+			const dgFloat32 invDen = dgFloat32(1.0f) / length;
+			const dgFloat32 lenghtRatio = restLenght[i] * invDen;
 			const dgFloat32 compression = dgFloat32(1.0f) - lenghtRatio;
 			const dgVector fs(p0p1.Scale4(kSpring * compression));
-			const dgVector fd(p0p1.Scale4(kDamper * den * den * (v0v1.DotProduct4(p0p1)).GetScalar()));
-			const dgVector dfdx(v0v1.Scale4 (ks_dt * compression) + (p0p1.CompProduct4(dpdv).Scale4 (ks_dt * lenghtRatio * den * den)));
+			const dgVector fd(p0p1.Scale4(kDamper * invDen * invDen * (v0v1.DotProduct4(p0p1)).GetScalar()));
+			const dgVector dfsdx(v0v1.Scale4 (ks_dt * compression) + (p0p1.CompProduct4(dpdv).Scale4 (ks_dt * lenghtRatio * invDen * invDen)));
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(p0p1.m_w == dgFloat32(0.0f));
-			dgAssert(dfdx.m_w == dgFloat32(0.0f));
+			dgAssert(dfsdx.m_w == dgFloat32(0.0f));
 
-			accel[j0] += ( dfdx - fs - fd);
-			accel[j1] += ( fs + fd - dfdx);
+			accel[j0] += ( dfsdx - fs - fd);
+			accel[j1] += ( fs + fd - dfsdx);
 		}
 
 
