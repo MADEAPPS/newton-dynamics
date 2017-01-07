@@ -680,7 +680,7 @@ void ClothPatch(DemoEntityManager* const scene)
 
 	SimpleSoftBodyEntity* const entity = new SimpleSoftBodyEntity(scene, location);
 	//entity->BuildClothPatch(scene, 50, 50);
-	entity->BuildClothPatch(scene, 32, 32);
+	entity->BuildClothPatch(scene, 16, 16);
 
 	dQuaternion rot;
 	dVector origin(location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);

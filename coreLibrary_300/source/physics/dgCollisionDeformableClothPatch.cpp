@@ -184,10 +184,10 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 			const dgVector v0v1(veloc[j0] - veloc[j1]);
 			const dgVector dpdv(p0p1.CompProduct4(v0v1));
 
-			const dgVector length2(p0p1.DotProduct4(p0p1));
-			const dgVector mask(length2 > m_smallestLenght2);
+			const dgVector mag2(p0p1.DotProduct4(p0p1));
+			const dgVector mask(mag2 > m_smallestLenght2);
 
-			const dgVector lenght2((length2 & mask) | length2.AndNot(mask));
+			const dgVector lenght2((mag2 & mask) | mag2.AndNot(mask));
 			const dgFloat32 length = (lenght2.Sqrt()).GetScalar();
 			const dgFloat32 invDen = dgFloat32(1.0f) / length;
 			const dgFloat32 lenghtRatio = restLenght[i] * invDen;
@@ -200,8 +200,9 @@ void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
 			dgAssert(p0p1.m_w == dgFloat32(0.0f));
 			dgAssert(dfsdx.m_w == dgFloat32(0.0f));
 
-			accel[j0] += ( dfsdx - fs - fd);
-			accel[j1] += ( fs + fd - dfsdx);
+			const dgVector nextAccel(fs + fd - dfsdx);
+			accel[j0] -= nextAccel;
+			accel[j1] += nextAccel;
 		}
 
 
