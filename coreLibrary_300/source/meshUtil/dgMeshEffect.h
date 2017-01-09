@@ -142,7 +142,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 			//memset (&dommy, 0, sizeof (T));
 			//dgArray<T>& me = *this;
 			//me[size - 1] = dommy;
-			Resize(size);
+			dgArray<T>::Resize(size);
 			m_count = size;
 		}
 
