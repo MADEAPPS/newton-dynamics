@@ -1019,7 +1019,12 @@ extern "C" {
 	// particle system interface (soft bodies, individual, pressure bodies and cloth)   
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID);
+//	NEWTON_API NewtonCollision* NewtonCreateSpringMassDamperSystem (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID);
+
+	NEWTON_API NewtonCollision* NewtonCreateSpringMassDamperSystem (const NewtonWorld* const newtonWorld, 
+																	const dFloat* const points, int pointCount, int strideInBytes, const dFloat* const pointMass, 
+																	const int* const link, int linksCount, const dFloat* const linkSpring, const dFloat* const linkDamper);
+
 	NEWTON_API NewtonCollision* NewtonCreateDeformableSolid(const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, int shapeID);
 
 	NEWTON_API int NewtonDeformableMeshGetParticleCount (const NewtonCollision* const deformableMesh); 
