@@ -269,10 +269,10 @@ dgCollisionInstance* dgWorld::CreateFracturedCompound (dgMeshEffect* const solid
 }
 
 
-dgCollisionInstance* dgWorld::CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID)
+//dgCollisionInstance* dgWorld::CreateSpringDamperSystem (dgMeshEffect* const mesh, dgInt32 shapeID)
+dgCollisionInstance* dgWorld::CreateMassSpringDamperSystem (dgInt32 shapeID, dgInt32 pointCount, const dgFloat32* const points, dgInt32 strideInBytes, const dgFloat32* const pointsMass, dgInt32 linksCount, const dgInt32* const links, const dgFloat32* const linksSpring, const dgFloat32* const LinksDamper)
 {
-	dgAssert(m_allocator == mesh->GetAllocator());
-	dgCollision* const collision = new (m_allocator)dgCollisionDeformableClothPatch(this, mesh);
+	dgCollision* const collision = new (m_allocator)dgCollisionDeformableClothPatch(this, shapeID, pointCount, points, strideInBytes, linksCount, links, linksSpring, LinksDamper);
 	dgCollisionInstance* const instance = CreateInstance(collision, shapeID, dgGetIdentityMatrix());
 	collision->Release();
 	return instance;

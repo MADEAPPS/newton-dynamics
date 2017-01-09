@@ -8180,15 +8180,13 @@ NewtonCollision* NewtonCreateDeformableSolid(const NewtonWorld* const newtonWorl
 	return (NewtonCollision*) world->CreateDeformableSolid ((dgMeshEffect*)mesh, shapeID);
 }
 
-//NewtonCollision* NewtonCreateSpringMassDamperSystem (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
-NewtonCollision* NewtonCreateSpringMassDamperSystem (const NewtonWorld* const newtonWorld, 
+NewtonCollision* NewtonCreateMassSpringDamperSystem (const NewtonWorld* const newtonWorld, int shapeID,
 													 const dFloat* const points, int pointCount, int strideInBytes, const dFloat* const pointMass, 
-													 int* const link, int linksCount, const dFloat* const linkSpring, const dFloat* const linkDamper)
+													 const int* const links, int linksCount, const dFloat* const linksSpring, const dFloat* const linksDamper)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-//	return (NewtonCollision*)world->CreateClothPatchMesh ((dgMeshEffect*)mesh, shapeID);
-	return NULL;
+	return (NewtonCollision*)world->CreateMassSpringDamperSystem (shapeID, pointCount, points, strideInBytes, pointMass, linksCount, links, linksSpring, linksDamper);
 }
 
 int NewtonDeformableMeshGetParticleCount(const NewtonCollision* const deformableMesh)

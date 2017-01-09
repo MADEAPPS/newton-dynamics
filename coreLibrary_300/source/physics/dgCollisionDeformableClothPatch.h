@@ -33,7 +33,8 @@ class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
 {
 	public:
 	dgCollisionDeformableClothPatch (const dgCollisionDeformableClothPatch& source);
-	dgCollisionDeformableClothPatch (dgWorld* const world, dgMeshEffect* const mesh);
+//	dgCollisionDeformableClothPatch (dgWorld* const world, dgMeshEffect* const mesh);
+	dgCollisionDeformableClothPatch (dgWorld* const world, dgInt32 shapeID, dgInt32 pointCount, const dgFloat32* const points, dgInt32 srideInBytes, dgInt32 linksCount, const dgInt32* const links, const dgFloat32* const linksSpring, const dgFloat32* const LinksDamper);
 	dgCollisionDeformableClothPatch (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 
 	virtual ~dgCollisionDeformableClothPatch(void);

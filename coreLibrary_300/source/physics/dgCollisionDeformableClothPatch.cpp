@@ -28,11 +28,15 @@
 #include "dgCollisionDeformableClothPatch.h"
 
 
-dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const world, dgMeshEffect* const mesh)
+//dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const world, dgMeshEffect* const mesh)
+//	:dgCollisionDeformableMesh(world, m_deformableSolidMesh)
+
+dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch (dgWorld* const world, dgInt32 shapeID, dgInt32 pointCount, const dgFloat32* const points, dgInt32 srideInBytes, dgInt32 linksCount, const dgInt32* const links, const dgFloat32* const linksSpring, const dgFloat32* const LinksDamper)
 	:dgCollisionDeformableMesh(world, m_deformableSolidMesh)
 {
 	m_rtti |= dgCollisionDeformableClothPatch_RTTI;
-	
+	dgAssert (0);
+/*	
 	dgInt32 count = mesh->GetVertexCount();
 	dgVector* const points = dgAlloca(dgVector, count);
 
@@ -84,6 +88,7 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 		m_linkList[i] = links[i];
 	}
 	FinalizeBuild();
+*/
 }
 
 

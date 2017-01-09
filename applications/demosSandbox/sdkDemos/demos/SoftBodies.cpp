@@ -628,18 +628,15 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 	void BuildClothPatch (DemoEntityManager* const scene, int size_x, int size_z)
 	{
 		NewtonWorld* const world = scene->GetNewton();
-
-
 		
 		NewtonMesh* const clothPatch = CreateQuadClothPatch(scene, size_x, size_z);
-
 
 		// create the array of points;
 		int vertexCount = NewtonMeshGetVertexCount(clothPatch);
 		int stride = NewtonMeshGetVertexStrideInByte (clothPatch) / sizeof (dFloat64); 
 		const dFloat64* const meshPoints = NewtonMeshGetVertexArray (clothPatch); 
 
-		dVector* points = new dVector[vertexCount];
+		dVector* const points = new dVector[vertexCount];
 		for (int i =0; i < vertexCount; i ++ ) {
 			points[i].m_x = meshPoints[i * stride + 0];
 			points[i].m_y = meshPoints[i * stride + 1];
@@ -658,36 +655,36 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		const int maxLinkCount = size_x * size_z * 16;
 
 		// create the structual constation array;
-		float sructuralDamper = 1000.0f;
-		float sructuralSpring = 100000.0f;
+		dFloat structuralDamper = 1000.0f;
+		dFloat structuralSpring = 100000.0f;
 
-		int* const spring = new int [maxLinkCount];
-		int* const damper = new int [maxLinkCount];
-		int* const link = new int [2 * maxLinkCount];
+		int* const links = new int[2 * maxLinkCount];
+		dFloat* const spring = new dFloat[maxLinkCount];
+		dFloat* const damper = new dFloat[maxLinkCount];
 		for (void* edgeNode = NewtonMeshGetFirstEdge (clothPatch); edgeNode; edgeNode = NewtonMeshGetNextEdge (clothPatch, edgeNode)) {
 			int v0;
 			int v1;
 			NewtonMeshGetEdgeIndices (clothPatch, edgeNode, &v0, &v1);
-			link[linksCount * 2 + 0] = v0;
-			link[linksCount * 2 + 1] = v1;
-			spring[linksCount] = sructuralSpring;
-			damper[linksCount] = sructuralDamper;
+			links[linksCount * 2 + 0] = v0;
+			links[linksCount * 2 + 1] = v1;
+			spring[linksCount] = structuralSpring;
+			damper[linksCount] = structuralDamper;
 			linksCount ++;
 			dAssert (linksCount <= maxLinkCount);
 		}
 		
 
 		// add shear constraints
-		float shearDamper = 1000.0f;
-		float shearSpring = 100000.0f;
+		dFloat shearDamper = 1000.0f;
+		dFloat shearSpring = 100000.0f;
 		for (void* faceNode = NewtonMeshGetFirstFace (clothPatch); faceNode; faceNode = NewtonMeshGetNextFace (clothPatch, faceNode)) {
 			if (!NewtonMeshIsFaceOpen(clothPatch, faceNode)) {
 				int face[8];
 				int indexCount = NewtonMeshGetFaceIndexCount (clothPatch, faceNode);
 				NewtonMeshGetFaceIndices (clothPatch, faceNode, face);
 				for (int i = 2; i < indexCount - 1; i ++) {
-					link[linksCount * 2 + 0] = face[0];
-					link[linksCount * 2 + 1] = face[i];
+					links[linksCount * 2 + 0] = face[0];
+					links[linksCount * 2 + 1] = face[i];
 					spring[linksCount] = shearSpring;
 					damper[linksCount] = shearDamper;
 
@@ -695,21 +692,19 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 					dAssert (linksCount <= maxLinkCount);
 				}
 				for (int i = 3; i < indexCount; i ++) {
-					link[linksCount * 2 + 0] = face[1];
-					link[linksCount * 2 + 1] = face[i];
+					links[linksCount * 2 + 0] = face[1];
+					links[linksCount * 2 + 1] = face[i];
 					spring[linksCount] = shearSpring;
 					damper[linksCount] = shearDamper;
 					linksCount ++;
 					dAssert (linksCount <= maxLinkCount);
 				}
 			}
-
 		}
-
-
 /*
-		NewtonCollision* const deformableCollision = NewtonCreateSpringMassDamperSystem(world, clothPatch, 0);
-
+		NewtonCollision* const deformableCollision = NewtonCreateMassSpringDamperSystem(world, 0, 
+													 &points[0].m_x, vertexCount, sizeof (dVector), clothMass,
+													 links, linksCount, spring, damper);
 		
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
@@ -720,9 +715,8 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		mesh->Release();
 		NewtonDestroyCollision(deformableCollision);
 */
-
 		NewtonMeshDestroy(clothPatch);
-		delete[] link;
+		delete[] links;
 		delete[] damper;
 		delete[] spring;
 		delete[] clothMass;
