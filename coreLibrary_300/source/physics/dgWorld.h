@@ -511,7 +511,7 @@ class dgWorld
 	friend class dgCollisionDeformableSolidMesh;
 	friend class dgBroadPhaseApplyExternalForce;
 	friend class dgParallelSolverCalculateForces;
-	friend class dgCollisionDeformableClothPatch;
+	friend class dgCollisionMassSpringDamperSystem;
 	friend class dgParallelSolverJointAcceleration;
 	friend class dgParallelSolverBuildJacobianRows;
 	friend class dgParallelSolverInitFeedbackUpdate;
