@@ -38,10 +38,7 @@ dgVector dgCollisionDeformableMesh::m_smallestLenght2	(DG_SMALLEST_SPRING_LENGTH
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCollisionID collisionID)
 	:dgCollisionLumpedMassParticles(world, collisionID)
 	,m_linkList(world->GetAllocator())
-	,m_restlength(world->GetAllocator())
-	,m_indexToVertexMap(world->GetAllocator())
 	,m_linksCount(0)
-	,m_indexToVertexCount(0)
 {
 	m_rtti |= dgCollisionDeformableMesh_RTTI;
 }
@@ -49,10 +46,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgCol
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformableMesh& source)
 	:dgCollisionLumpedMassParticles(source)
 	,m_linkList(source.m_linkList, source.m_linksCount)
-	,m_restlength(source.m_restlength, source.m_linksCount)
-	,m_indexToVertexMap(source.m_indexToVertexMap, source.m_indexToVertexCount)
 	,m_linksCount(source.m_linksCount)
-	,m_indexToVertexCount(source.m_indexToVertexCount)
 {
 	m_rtti = source.m_rtti;
 }
@@ -60,10 +54,7 @@ dgCollisionDeformableMesh::dgCollisionDeformableMesh(const dgCollisionDeformable
 dgCollisionDeformableMesh::dgCollisionDeformableMesh(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
 	:dgCollisionLumpedMassParticles(world, deserialization, userData, revisionNumber)
 	,m_linkList(world->GetAllocator())
-	,m_restlength(world->GetAllocator())
-	,m_indexToVertexMap(world->GetAllocator())
 	,m_linksCount(0)
-	,m_indexToVertexCount(0)
 {
 	dgAssert(0);
 }
@@ -72,24 +63,12 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 {
 }
 
-dgInt32 dgCollisionDeformableMesh::CompareEdges(const dgSoftLink* const A, const dgSoftLink* const B, void* const context)
-{
-	dgInt64 m0 = (dgInt64(A->m_m0) << 32) + A->m_m1;
-	dgInt64 m1 = (dgInt64(B->m_m0) << 32) + B->m_m1;
-	if (m0 > m1) {
-		return 1;
-	} else if (m0 < m1) {
-		return -1;
-	}
-	return 0;
-}
-
 
 void dgCollisionDeformableMesh::FinalizeBuild()
 {
 	dgCollisionLumpedMassParticles::FinalizeBuild();
-
-	m_restlength.Resize(m_linksCount);
+	dgAssert (0);
+/*
 	for (dgInt32 i = 0; i < m_linksCount; i++) {
 		const dgInt32 v0 = m_linkList[i].m_m0;
 		const dgInt32 v1 = m_linkList[i].m_m1;
@@ -99,6 +78,7 @@ void dgCollisionDeformableMesh::FinalizeBuild()
 		m_restlength[i] = dgSqrt(dp.DotProduct3(dp));
 		dgAssert(m_restlength[i] > dgFloat32(1.0e-2f));
 	}
+*/
 }
 
 void dgCollisionDeformableMesh::Serialize(dgSerialize callback, void* const userData) const
@@ -106,10 +86,6 @@ void dgCollisionDeformableMesh::Serialize(dgSerialize callback, void* const user
 	dgAssert(0);
 }
 
-const dgInt32* dgCollisionDeformableMesh::GetIndexToVertexMap() const
-{
-	return &m_indexToVertexMap[0];
-}
 
 dgInt32 dgCollisionDeformableMesh::GetLinksCount() const
 {

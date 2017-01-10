@@ -28,11 +28,13 @@ class SimpleSoftBodyEntity: public DemoEntity
 		public:
 		ClothPatchMesh(NewtonMesh* const clothPatchMesh, NewtonBody* const body)
 			:DemoMesh(clothPatchMesh)
-			, m_body(body)
+			,m_body(body)
 		{
 			ResetOptimization();
 			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
 
+dAssert (0);
+/*
 			int pointCount = NewtonMeshGetPointCount(clothPatchMesh);
 			const int* const indexMap = NewtonMeshGetIndexToVertexMap(clothPatchMesh);
 			const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
@@ -42,6 +44,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 				int j = indexMap[i];
 				m_indexMap[i] = solidIndexList[j];
 			}
+*/
 		}
 
 		~ClothPatchMesh()
@@ -130,7 +133,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 		{
 			ResetOptimization();
 			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
-
+dAssert (0);
+/*
 			int pointCount = NewtonMeshGetPointCount(tetrahedraMesh);
 			const int* const indexMap = NewtonMeshGetIndexToVertexMap(tetrahedraMesh);
 			const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
@@ -140,6 +144,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 				int j = indexMap[i];
 				m_indexMap[i] = solidIndexList[j];
 			}
+*/
 		}
 
 		~TetrahedraSoftMesh()
@@ -188,7 +193,8 @@ class SimpleSoftBodyEntity: public DemoEntity
 			,m_weightSet(NULL)
 		{
 			ResetOptimization();
-
+			dAssert (0);
+/*
 			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
 
 			int skinPointCount = NewtonMeshGetPointCount(skinMesh);
@@ -204,6 +210,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 					m_weightSet[i].m_weight[k] = weightValue[k];
 				}
 			}
+*/
 		}
 
 		~LinearBlendMeshTetra()

@@ -34,7 +34,8 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 	,m_finiteElementsCount(0)
 {
 	m_rtti |= dgCollisionDeformableSolidMesh_RTTI;
-
+	dgAssert (0);
+/*
 	dgInt32 count = mesh->GetVertexCount();
 	dgVector* const points = dgAlloca (dgVector, count);
 
@@ -142,6 +143,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 		}
 		fem.m_restVolume = volume;
 	}
+*/
 }
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(const dgCollisionDeformableSolidMesh& source)
