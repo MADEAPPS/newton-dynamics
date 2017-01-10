@@ -75,6 +75,10 @@ if(MSVC)
   add_definitions( /wd4786 /wd4503 /wd4251 /wd4275 /wd4290 /wd4661 /wd4996 /wd4127 /wd4100)
 endif()
 
+if(${CMAKE_C_COMPILER_ID} MATCHES "GNU" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
+endif()
+
 # determine if we are compiling for a 32bit or 64bit system
 include(CheckTypeSize)
 CHECK_TYPE_SIZE("void*" PTR_SIZE BUILTIN_TYPES_ONLY)
@@ -85,10 +89,15 @@ else ()
 endif ()
 
 option("DOUBLE_PRECISION" "Use Double Precision" OFF)
+option("USE_PTHREADS" "Use pthreads library instead of C++11 threads" OFF)
 option("NEWTON_DEMOS_SANDBOX" "Build demos sandbox" ON)
 
 if(DOUBLE_PRECISION)
  add_definitions(-D_NEWTON_USE_DOUBLE)
+endif()
+
+if(USE_PTHREADS)
+ add_definitions(-DDG_USE_PTHREADS)
 endif()
 
 if(NEWTON_DEMOS_SANDBOX)

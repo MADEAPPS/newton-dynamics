@@ -14,3 +14,9 @@ add_library(timeTracker ${timeTracker_srcs})
 
 target_include_directories(timeTracker PUBLIC timeTracker/)
 target_link_libraries(timeTracker dMath dContainers)
+
+# imgui
+file(GLOB imgui_srcs imgui/*.cpp)
+add_library(imgui ${imgui_srcs})
+
+target_include_directories(imgui PUBLIC imgui/)
