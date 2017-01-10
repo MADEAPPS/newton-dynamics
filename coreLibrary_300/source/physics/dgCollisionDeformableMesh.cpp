@@ -124,7 +124,7 @@ void dgCollisionDeformableMesh::ConstraintParticle(dgInt32 particleIndex, const 
 void dgCollisionDeformableMesh::DebugCollision(const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	const dgVector* const posit = &m_posit[0];
-	const dgSoftLink* const links = &m_linkList[0];
+	const dgSpringDamperLink* const links = &m_linkList[0];
 	for (dgInt32 i = 0; i < m_linksCount; i++) {
 		const dgInt32 j0 = links[i].m_m0;
 		const dgInt32 j1 = links[i].m_m1;

@@ -43,7 +43,7 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 	void DisableInactiveLinks ();
 
 	protected:
-	class dgSoftLink
+	class dgSpringDamperLink
 	{
 		public:
 		dgFloat32 m_spring;
@@ -61,7 +61,7 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 	virtual void IntegrateForces(dgFloat32 timestep);
 	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	
-	dgArray<dgSoftLink> m_linkList;
+	dgArray<dgSpringDamperLink> m_linkList;
 	dgInt32 m_linksCount;
 
 	static dgVector m_smallestLenght2;

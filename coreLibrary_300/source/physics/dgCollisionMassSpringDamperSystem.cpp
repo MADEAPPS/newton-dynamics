@@ -89,6 +89,8 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 	// Ks is in [sec^-2] a spring constant unit acceleration, not a spring force acceleration. 
 	// Kc is in [sec^-1] a damper constant unit velocity, not a damper force acceleration. 
 
+	dgAssert (0);
+/*
 	// for now make a share value for all springs. later this is a per material feature.
 	dgFloat32 kSpring = dgFloat32(1000.0f);
 	dgFloat32 kDamper = dgFloat32(30.0f);
@@ -133,7 +135,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
 	}
 
-	const dgSoftLink* const links = &m_linkList[0];
+	const dgSpringDamperLink* const links = &m_linkList[0];
 	dgFloat32 ks_dt = -timestep * kSpring;
 	//	dgFloat32 kd_dt0 = -timestep * kDamper;
 	//	dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
@@ -197,4 +199,5 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			posit[i] += veloc[i].CompProduct4(dtRK4);
 		}
 	}
+*/
 }
