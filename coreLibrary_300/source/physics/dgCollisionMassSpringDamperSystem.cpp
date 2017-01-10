@@ -29,24 +29,25 @@
 
 
 
-dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem (dgWorld* const world, dgInt32 shapeID, dgInt32 pointCount, const dgFloat32* const points, dgInt32 srideInBytes, dgInt32 linksCount, const dgInt32* const links, const dgFloat32* const linksSpring, const dgFloat32* const LinksDamper)
+dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem (dgWorld* const world, dgInt32 shapeID, dgInt32 pointCount, const dgFloat32* const points, dgInt32 srideInBytes, const dgFloat32* const pointsMasses, dgInt32 linksCount, const dgInt32* const links, const dgFloat32* const linksSpring, const dgFloat32* const LinksDamper)
 	:dgCollisionDeformableMesh(world, m_deformableSolidMesh)
 {
 	m_rtti |= dgCollisionDeformableClothPatch_RTTI;
 
 	m_particlesCount = pointCount;
 	m_posit.Resize(m_particlesCount);
+	m_invMass.Resize(m_particlesCount);
 	const dgInt32 stride = srideInBytes / sizeof (dgFloat32);
 	for (dgInt32 i = 0; i < pointCount; i++) {
-		dgVector p(points[i * stride + 0], points[i * stride + 1], points[i * stride + 2], dgFloat32 (0.0f));
-		m_posit[i] = points[i];
+		m_invMass[i] = dgFloat32(1.0f / pointsMasses[i]);
+		m_posit[i] = dgVector (points[i * stride + 0], points[i * stride + 1], points[i * stride + 2], dgFloat32(0.0f));
 	}
 
 	m_linksCount = linksCount;
 	m_linkList.Resize (linksCount);
 	for (dgInt32 i = 0; i < linksCount; i++) {
 		dgInt32 v0 = links[i * 2 + 0];
-		dgInt32 v1 = links[i * 2 + 0];
+		dgInt32 v1 = links[i * 2 + 1];
 		dgAssert (v0 != v1);
 		dgAssert (v0 >= 0);
 		dgAssert (v1 >= 0);

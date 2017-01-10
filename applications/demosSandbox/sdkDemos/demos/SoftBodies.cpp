@@ -33,18 +33,16 @@ class SimpleSoftBodyEntity: public DemoEntity
 			ResetOptimization();
 			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
 
-dAssert (0);
-/*
 			int pointCount = NewtonMeshGetPointCount(clothPatchMesh);
 			const int* const indexMap = NewtonMeshGetIndexToVertexMap(clothPatchMesh);
-			const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
+			//const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
 
 			m_indexMap = new int[pointCount];
 			for (int i = 0; i < pointCount; i++) {
 				int j = indexMap[i];
-				m_indexMap[i] = solidIndexList[j];
+				//m_indexMap[i] = solidIndexList[j];
+				m_indexMap[i] = j;
 			}
-*/
 		}
 
 		~ClothPatchMesh()
@@ -367,8 +365,7 @@ dAssert (0);
 			dFloat z = (i - size_z / 2) * dimension;
 			for (int j = 0; j < size_x; j++) {
 				dFloat x = (j - size_x / 2) * dimension;
-				//points[i][j] = dVector(x, y, z, 0);
-				points[vertexCount] = dVector(x, y, z, 0);
+				points[vertexCount] = dVector(x, y, z, 0.0f);
 				vertexCount++;
 			}
 		}
@@ -648,6 +645,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 			points[i].m_x = meshPoints[i * stride + 0];
 			points[i].m_y = meshPoints[i * stride + 1];
 			points[i].m_z = meshPoints[i * stride + 2];
+			points[i].m_w = 0.0f;
 		}
 		
 		dFloat mass = 8.0f;
@@ -708,7 +706,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 				}
 			}
 		}
-/*
+
 		NewtonCollision* const deformableCollision = NewtonCreateMassSpringDamperSystem(world, 0, 
 													 &points[0].m_x, vertexCount, sizeof (dVector), clothMass,
 													 links, linksCount, spring, damper);
@@ -721,7 +719,6 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		// do not forget to destroy this objects, else you get bad memory leaks.
 		mesh->Release();
 		NewtonDestroyCollision(deformableCollision);
-*/
 		NewtonMeshDestroy(clothPatch);
 		delete[] links;
 		delete[] damper;

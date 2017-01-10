@@ -66,7 +66,6 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 
 void dgCollisionDeformableMesh::FinalizeBuild()
 {
-	dgAssert (0);
 	dgCollisionLumpedMassParticles::FinalizeBuild();
 }
 
@@ -134,7 +133,7 @@ void dgCollisionDeformableMesh::DebugCollision(const dgMatrix& matrix, dgCollisi
 void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 {
 	dgAssert(m_body->m_invMass.m_w > dgFloat32(0.0f));
-
+/*
 	// calculate particles accelerations
 	CalculateAcceleration (timestep);
 
@@ -202,6 +201,7 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		posit[i] -= com;
 	}
+*/
 }
 
 
