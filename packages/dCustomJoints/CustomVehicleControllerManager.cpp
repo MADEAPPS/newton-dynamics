@@ -443,7 +443,7 @@ class CustomVehicleController::AxelJoint: public CustomGear
 		m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
 	}
 
-	void AxelJoint::SubmitConstraints(dFloat timestep, int threadIndex)
+	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dMatrix matrix0;
 		dMatrix matrix1;
