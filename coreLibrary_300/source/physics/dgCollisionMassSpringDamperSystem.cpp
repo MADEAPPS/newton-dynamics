@@ -54,6 +54,14 @@ dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem (dgWorld* c
 		dgAssert (v1 < pointCount);
 		m_linkList[i].m_m0 = dgInt16(dgMin(v0, v1));
 		m_linkList[i].m_m1 = dgInt16(dgMax(v0, v1));
+		m_linkList[i].m_spring = linksSpring[i];
+		m_linkList[i].m_damper = LinksDamper[i];
+
+		const dgVector& p0 = m_posit[v0];
+		const dgVector& p1 = m_posit[v1];
+		dgVector dp(p0 - p1);
+		m_linkList[i].m_restlength = dgSqrt(dp.DotProduct3(dp));
+		dgAssert(m_linkList[i].m_restlength > dgFloat32(1.0e-2f));
 	}
 
 	FinalizeBuild();

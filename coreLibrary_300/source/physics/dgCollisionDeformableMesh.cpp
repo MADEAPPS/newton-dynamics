@@ -66,19 +66,8 @@ dgCollisionDeformableMesh::~dgCollisionDeformableMesh(void)
 
 void dgCollisionDeformableMesh::FinalizeBuild()
 {
-	dgCollisionLumpedMassParticles::FinalizeBuild();
 	dgAssert (0);
-/*
-	for (dgInt32 i = 0; i < m_linksCount; i++) {
-		const dgInt32 v0 = m_linkList[i].m_m0;
-		const dgInt32 v1 = m_linkList[i].m_m1;
-		const dgVector& p0 = m_posit[v0];
-		const dgVector& p1 = m_posit[v1];
-		dgVector dp(p0 - p1);
-		m_restlength[i] = dgSqrt(dp.DotProduct3(dp));
-		dgAssert(m_restlength[i] > dgFloat32(1.0e-2f));
-	}
-*/
+	dgCollisionLumpedMassParticles::FinalizeBuild();
 }
 
 void dgCollisionDeformableMesh::Serialize(dgSerialize callback, void* const userData) const
