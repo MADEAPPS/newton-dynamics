@@ -148,7 +148,6 @@
 	#undef DG_SCALAR_VECTOR_CLASS
 #endif
 
-//#if defined (_NEWTON_USE_DOUBLE) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
 #if defined (__ppc__) || defined (ANDROID) || defined (IOS)
 	#undef DG_SSE4_INSTRUCTIONS_SET
 	#ifndef DG_SCALAR_VECTOR_CLASS
@@ -281,10 +280,11 @@ class dgTriplex
 #define dgKMH2MPSEC		 	dgFloat32 (0.278f)
 
 
-class dgVector;
-#ifndef _NEWTON_USE_DOUBLE
 class dgBigVector;
-#endif
+#ifndef _NEWTON_USE_DOUBLE
+class dgVector;
+#endif 
+
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#define dgApi __cdecl 	
@@ -696,15 +696,13 @@ union dgDoubleInt
 };
 
 
-#ifndef _NEWTON_USE_DOUBLE
 void dgGetMinMax (dgBigVector &Min, dgBigVector &Max, const dgFloat64* const vArray, dgInt32 vCount, dgInt32 strideInBytes);
-#endif
+#ifndef _NEWTON_USE_DOUBLE
 void dgGetMinMax (dgVector &Min, dgVector &Max, const dgFloat32* const vArray, dgInt32 vCount, dgInt32 StrideInBytes);
+#endif
 
+dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount,     dgInt32 vertexCount,         dgInt32* const indexListOut, dgFloat64 tolerance = dgEPSILON);
 dgInt32 dgVertexListToIndexList (dgFloat32* const vertexList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes, dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat32 tolerance = dgEPSILON);
-dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat64 tolerance = dgEPSILON);
-
-
 
 #define PointerToInt(x) ((size_t)x)
 #define IntToPointer(x) ((void*)(size_t(x)))

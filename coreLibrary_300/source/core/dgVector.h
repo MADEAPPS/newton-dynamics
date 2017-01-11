@@ -27,9 +27,7 @@
 #include "dgDebug.h"
 #include "dgMemory.h"
 
-
 #define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
-
 
 template<class T>
 class dgTemplateVector
@@ -203,22 +201,21 @@ class dgTemplateVector
 	T m_w;
 };
 
-class dgVector;
-
-#ifdef _NEWTON_USE_DOUBLE
-typedef dgVector dgBigVector;
-#else
-class dgBigVector;
-#endif
 
 
 #ifdef DG_SCALAR_VECTOR_CLASS
+
 
 // *****************************************************************************************
 //
 // 4 x 1 single precision vector class declaration
 //
 // *****************************************************************************************
+#ifdef _NEWTON_USE_DOUBLE
+	#define dgVector dgBigVector
+#else
+
+class dgBigVector;
 DG_MSC_VECTOR_ALIGMENT
 class dgVector
 {
@@ -255,9 +252,9 @@ class dgVector
 	{
 	}
 
-	#ifndef  _NEWTON_USE_DOUBLE 
+#ifndef  _NEWTON_USE_DOUBLE 
 	DG_INLINE dgVector (const dgBigVector& copy)
-//		:m_x(dgFloat32 (copy.m_x)), m_y(dgFloat32 (copy.m_y)), m_z(dgFloat32 (copy.m_z)), m_w(dgFloat32 (copy.m_w))
+		//		:m_x(dgFloat32 (copy.m_x)), m_y(dgFloat32 (copy.m_y)), m_z(dgFloat32 (copy.m_z)), m_w(dgFloat32 (copy.m_w))
 	{
 		dgAssert (0);
 		const dgFloat64* const ptr = (dgFloat64*) &copy;
@@ -267,7 +264,7 @@ class dgVector
 		m_w = dgFloat32 (ptr[3]);
 		dgAssert (dgCheckVector ((*this)));
 	}
-	#endif
+#endif
 
 	DG_INLINE dgFloat32 GetScalar () const
 	{
@@ -375,8 +372,8 @@ class dgVector
 	DG_INLINE dgVector CrossProduct3 (const dgVector& B) const
 	{
 		return dgVector (m_y * B.m_z - m_z * B.m_y,
-						 m_z * B.m_x - m_x * B.m_z,
-						 m_x * B.m_y - m_y * B.m_x, m_w);
+			m_z * B.m_x - m_x * B.m_z,
+			m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
 	DG_INLINE dgVector CrossProduct4 (const dgVector& A, const dgVector& B) const
@@ -426,9 +423,9 @@ class dgVector
 	{
 		const dgInt32* const a = (dgInt32*)&m_x;
 		return dgVector ((a[0] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
-						 (a[1] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
-						 (a[2] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
-					     (a[3] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f));
+			(a[1] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
+			(a[2] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f),
+			(a[3] == 0) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f));
 	}
 
 
@@ -465,25 +462,25 @@ class dgVector
 	dgVector Abs () const
 	{
 		return dgVector ((m_x > dgFloat32 (0.0f)) ? m_x : -m_x,
-			             (m_y > dgFloat32 (0.0f)) ? m_y : -m_y,
-			             (m_z > dgFloat32 (0.0f)) ? m_z : -m_z,
-			             (m_w > dgFloat32 (0.0f)) ? m_w : -m_w);
+			(m_y > dgFloat32 (0.0f)) ? m_y : -m_y,
+			(m_z > dgFloat32 (0.0f)) ? m_z : -m_z,
+			(m_w > dgFloat32 (0.0f)) ? m_w : -m_w);
 	}
 
 	dgVector GetMax (const dgVector& data) const
 	{
 		return dgVector ((m_x > data.m_x) ? m_x : data.m_x,
-			             (m_y > data.m_y) ? m_y : data.m_y,
-			             (m_z > data.m_z) ? m_z : data.m_z,
-			             (m_w > data.m_w) ? m_w : data.m_w);
+			(m_y > data.m_y) ? m_y : data.m_y,
+			(m_z > data.m_z) ? m_z : data.m_z,
+			(m_w > data.m_w) ? m_w : data.m_w);
 	}
 
 	dgVector GetMin (const dgVector& data) const
 	{
 		return dgVector ((m_x < data.m_x) ? m_x : data.m_x,
-			             (m_y < data.m_y) ? m_y : data.m_y,
-			             (m_z < data.m_z) ? m_z : data.m_z,
-			             (m_w < data.m_w) ? m_w : data.m_w);
+			(m_y < data.m_y) ? m_y : data.m_y,
+			(m_z < data.m_z) ? m_z : data.m_z,
+			(m_w < data.m_w) ? m_w : data.m_w);
 	}
 
 
@@ -491,41 +488,41 @@ class dgVector
 	DG_INLINE dgVector operator== (const dgVector& data) const
 	{
 		return dgVector ((m_x == data.m_x) ? dgInt32 (0xffffffff) : 0,
-					     (m_y == data.m_y) ? dgInt32 (0xffffffff) : 0,
-			             (m_z == data.m_z) ? dgInt32 (0xffffffff) : 0,
-			             (m_w == data.m_w) ? dgInt32 (0xffffffff) : 0);
+			(m_y == data.m_y) ? dgInt32 (0xffffffff) : 0,
+			(m_z == data.m_z) ? dgInt32 (0xffffffff) : 0,
+			(m_w == data.m_w) ? dgInt32 (0xffffffff) : 0);
 	}
 
 	DG_INLINE dgVector operator> (const dgVector& data) const
 	{
 		return dgVector ((m_x > data.m_x) ? dgInt32 (0xffffffff) : 0,
-					     (m_y > data.m_y) ? dgInt32 (0xffffffff) : 0,
-			             (m_z > data.m_z) ? dgInt32 (0xffffffff) : 0,
-			             (m_w > data.m_w) ? dgInt32 (0xffffffff) : 0);
+			(m_y > data.m_y) ? dgInt32 (0xffffffff) : 0,
+			(m_z > data.m_z) ? dgInt32 (0xffffffff) : 0,
+			(m_w > data.m_w) ? dgInt32 (0xffffffff) : 0);
 	}
 
 	DG_INLINE dgVector operator< (const dgVector& data) const
 	{
 		return dgVector ((m_x < data.m_x) ? dgInt32 (0xffffffff) : 0,
-					     (m_y < data.m_y) ? dgInt32 (0xffffffff) : 0,
-			             (m_z < data.m_z) ? dgInt32 (0xffffffff) : 0,
-			             (m_w < data.m_w) ? dgInt32 (0xffffffff) : 0);
+			(m_y < data.m_y) ? dgInt32 (0xffffffff) : 0,
+			(m_z < data.m_z) ? dgInt32 (0xffffffff) : 0,
+			(m_w < data.m_w) ? dgInt32 (0xffffffff) : 0);
 	}
 
 	DG_INLINE dgVector operator>= (const dgVector& data) const
 	{
 		return dgVector ((m_x >= data.m_x) ? dgInt32 (0xffffffff) : 0, 
-						 (m_y >= data.m_y) ? dgInt32 (0xffffffff) : 0,
-						 (m_z >= data.m_z) ? dgInt32 (0xffffffff) : 0,
-						 (m_w >= data.m_w) ? dgInt32 (0xffffffff) : 0);
+			(m_y >= data.m_y) ? dgInt32 (0xffffffff) : 0,
+			(m_z >= data.m_z) ? dgInt32 (0xffffffff) : 0,
+			(m_w >= data.m_w) ? dgInt32 (0xffffffff) : 0);
 	}
 
 	DG_INLINE dgVector operator<= (const dgVector& data) const
 	{
 		return dgVector ((m_x <= data.m_x) ? dgInt32 (0xffffffff) : 0,
-						 (m_y <= data.m_y) ? dgInt32 (0xffffffff) : 0,
-						 (m_z <= data.m_z) ? dgInt32 (0xffffffff) : 0,
-						 (m_w <= data.m_w) ? dgInt32 (0xffffffff) : 0);
+			(m_y <= data.m_y) ? dgInt32 (0xffffffff) : 0,
+			(m_z <= data.m_z) ? dgInt32 (0xffffffff) : 0,
+			(m_w <= data.m_w) ? dgInt32 (0xffffffff) : 0);
 	}
 
 
@@ -622,15 +619,10 @@ class dgVector
 	static dgVector m_wMask;
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
-}DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
 
-// *****************************************************************************************
-//
-// 4 x 1 double precision vector class declaration
-//
-// *****************************************************************************************
+#endif
 
-#ifndef _NEWTON_USE_DOUBLE
 DG_MSC_VECTOR_ALIGMENT
 class dgBigVector
 {
@@ -644,17 +636,23 @@ class dgBigVector
 	{
 	}
 
-	DG_INLINE dgBigVector (const dgVector& v)
-		:m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
-	{
-		dgAssert (dgCheckVector ((*this)));
-	}
-
 	DG_INLINE dgBigVector (const dgBigVector& v)
 		:m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
 	{
+	}
+
+#ifndef _NEWTON_USE_DOUBLE
+	DG_INLINE dgBigVector (const dgVector& v)
+		:m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
+	{
+	}
+
+	DG_INLINE dgBigVector (const dgFloat32* const ptr)
+		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (dgFloat32 (0.0f))
+	{
 		dgAssert (dgCheckVector ((*this)));
 	}
+#endif
 
 	DG_INLINE dgBigVector (const dgFloat64* const ptr)
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (dgFloat32 (0.0f))
@@ -668,8 +666,13 @@ class dgBigVector
 		dgAssert (dgCheckVector ((*this)));
 	}
 
+	DG_INLINE dgBigVector (dgInt32 ix, dgInt32 iy, dgInt32 iz, dgInt32 iw)
+		:m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
+	{
+	}
+
 	DG_INLINE dgBigVector (dgInt64 ix, dgInt64 iy, dgInt64 iz, dgInt64 iw)
-		:m_x(*((dgFloat64*)&ix)), m_y(*((dgFloat64*)&iy)), m_z(*((dgFloat64*)&iz)), m_w(*((dgFloat64*)&iw))
+		:m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
 
@@ -778,9 +781,7 @@ class dgBigVector
 	// return cross product
 	DG_INLINE dgBigVector CrossProduct3 (const dgBigVector& B) const
 	{
-		return dgBigVector (m_y * B.m_z - m_z * B.m_y,
-			m_z * B.m_x - m_x * B.m_z,
-			m_x * B.m_y - m_y * B.m_x, m_w);
+		return dgBigVector (m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
 	DG_INLINE dgBigVector CrossProduct4 (const dgBigVector& A, const dgBigVector& B) const
@@ -880,7 +881,7 @@ class dgBigVector
 							(m_y > data.m_y) ? m_y : data.m_y,
 							(m_z > data.m_z) ? m_z : data.m_z,
 							(m_w > data.m_w) ? m_w : data.m_w);
-	}
+					}
 
 	dgBigVector GetMin (const dgBigVector& data) const
 	{
@@ -1028,82 +1029,20 @@ class dgBigVector
 	static dgBigVector m_wMask;
 	static dgBigVector m_signMask;
 	static dgBigVector m_triplexMask;
-}DG_GCC_VECTOR_ALIGMENT;
-#endif
+} DG_GCC_VECTOR_ALIGMENT;
 
-DG_MSC_VECTOR_ALIGMENT
-class dgSpatialVector
-{
-	public:
-	DG_INLINE dgSpatialVector()
-	{
-		SetZero();
-	}
 
-	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
-	{
-		m_v[0] = low[0];
-		m_v[1] = low[1];
-		m_v[2] = low[2];
-		m_v[3] = high[0];
-		m_v[4] = high[1];
-		m_v[5] = high[2];
-	}
 
-	DG_INLINE dgFloat32& operator[] (dgInt32 i)
-	{
-		dgAssert(i < 6);
-		dgAssert(i >= 0);
-		return m_v[i];
-	}
 
-	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
-	{
-		dgAssert(i < 6);
-		dgAssert(i >= 0);
-		return m_v[i];
-	}
 
-	DG_INLINE void SetZero()
-	{
-		m_v[0] = dgFloat32(0.0f);
-		m_v[1] = dgFloat32(0.0f);
-		m_v[2] = dgFloat32(0.0f);
-		m_v[3] = dgFloat32(0.0f);
-		m_v[4] = dgFloat32(0.0f);
-		m_v[5] = dgFloat32(0.0f);
-	}
-
-	DG_INLINE dgFloat32 DotProduct(const dgSpatialVector& v) const
-	{
-		return m_v[0] * v[0] + m_v[1] * v[1] + m_v[2] * v[2] + m_v[3] * v[3] + m_v[4] * v[4] + m_v[5] * v[5];
-	}
-
-	DG_INLINE void Scale(dgFloat32 s, dgSpatialVector& dst) const
-	{
-		dst.m_v[0] = m_v[0] * s;
-		dst.m_v[1] = m_v[1] * s;
-		dst.m_v[2] = m_v[2] * s;
-		dst.m_v[3] = m_v[3] * s;
-		dst.m_v[4] = m_v[4] * s;
-		dst.m_v[5] = m_v[5] * s;
-	}
-
-	DG_INLINE void ScaleAdd(dgFloat32 s, const dgSpatialVector& b, dgSpatialVector& dst) const
-	{
-		dst.m_v[0] = b[0] + m_v[0] * s;
-		dst.m_v[1] = b[1] + m_v[1] * s;
-		dst.m_v[2] = b[2] + m_v[2] * s;
-		dst.m_v[3] = b[3] + m_v[3] * s;
-		dst.m_v[4] = b[4] + m_v[4] * s;
-		dst.m_v[5] = b[5] + m_v[5] * s;
-	}
-
-	dgFloat32 m_v[6];
-}DG_GCC_VECTOR_ALIGMENT;
 
 #else
 
+#ifdef _NEWTON_USE_DOUBLE
+	#define dgVector dgBigVector
+#else
+
+class dgBigVector;
 // *****************************************************************************************
 //
 // 4 x 1 single precision SSE vector class declaration
@@ -1113,7 +1052,6 @@ DG_MSC_VECTOR_ALIGMENT
 class dgVector
 {
 	#define PURMUT_MASK(w, z, y, x)		_MM_SHUFFLE (w, z, y, x)
-
 	public:
 	DG_INLINE dgVector() 
 	{
@@ -1145,13 +1083,11 @@ class dgVector
 	{
 	}
 
-	#ifndef  _NEWTON_USE_DOUBLE 
 	DG_INLINE dgVector (const dgBigVector& copy)
 		:m_type(_mm_shuffle_ps (_mm_cvtpd_ps (((__m128d*)&copy)[0]), _mm_cvtpd_ps (((__m128d*)&copy)[1]), PURMUT_MASK(1, 0, 1, 0)))
 	{
 		dgAssert (dgCheckVector ((*this)));
 	}
-	#endif
 
 	DG_INLINE dgVector (dgFloat32 x, dgFloat32 y, dgFloat32 z, dgFloat32 w)
 		:m_type(_mm_set_ps(w, z, y, x))
@@ -1162,7 +1098,7 @@ class dgVector
 		:m_type(_mm_set_ps(*(dgFloat32*)&iw, *(dgFloat32*)&iz, *(dgFloat32*)&iy, *(dgFloat32*)&ix))
 	{
 	}
-	
+
 
 	DG_INLINE dgFloat32 GetScalar () const
 	{
@@ -1195,7 +1131,7 @@ class dgVector
 	{
 		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 3, 3, 3));
 	}
-	
+
 	DG_INLINE dgVector Scale3 (dgFloat32 s) const
 	{
 		dgVector tmp (s, s, s, dgFloat32 (1.0f));
@@ -1257,7 +1193,7 @@ class dgVector
 	DG_INLINE dgVector CrossProduct3 (const dgVector& B) const
 	{
 		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 1, 0, 2))),
-						   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 0, 2, 1))));
+			_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PURMUT_MASK(3, 0, 2, 1))));
 	}
 
 	DG_INLINE dgVector DotProduct4(const dgVector& A) const
@@ -1386,7 +1322,7 @@ class dgVector
 	{
 		return DotProduct4(*this).InvSqrt();
 	}
-	
+
 	// relational operators
 	DG_INLINE dgVector operator> (const dgVector& data) const
 	{
@@ -1444,7 +1380,7 @@ class dgVector
 		return _mm_shuffle_ps(m_type, m_type, PURMUT_MASK(3, 1, 0, 2));
 	}
 
-	DG_INLINE dgVector ShiftTripleLeftt () const
+	DG_INLINE dgVector ShiftTripleLeft () const
 	{
 		return _mm_shuffle_ps (m_type, m_type, PURMUT_MASK(3, 0, 2, 1));
 	}
@@ -1468,7 +1404,7 @@ class dgVector
 	}
 
 	DG_CLASS_ALLOCATOR(allocator)
-	
+
 	union {
 		dgFloat32 m_f[4];
 		__m128 m_type;
@@ -1501,8 +1437,11 @@ class dgVector
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
+#endif
 
-#ifndef _NEWTON_USE_DOUBLE
+
+
+
 // *****************************************************************************************
 //
 // 4 x 1 double precision SSE2 vector class declaration
@@ -1531,11 +1470,13 @@ class dgBigVector
 		dgAssert(dgCheckVector((*this)));
 	}
 
+#ifndef _NEWTON_USE_DOUBLE
 	DG_INLINE dgBigVector(const dgFloat64* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
 		,m_typeHigh(_mm_set_pd(dgFloat64(0.0f), ptr[2]))
 	{
 	}
+#endif
 
 	DG_INLINE dgBigVector(const __m128d typeLow, const __m128d typeHigh)
 		:m_typeLow(typeLow)
@@ -1904,19 +1845,98 @@ class dgBigVector
 
 	static dgBigVector m_zero;
 	static dgBigVector m_one;
-	//	static dgBigVector m_wOne;
-	//	static dgBigVector m_two;
-	//	static dgBigVector m_half;
-	//	static dgBigVector m_three;
+	static dgBigVector m_wOne;
+	static dgBigVector m_two;
+	static dgBigVector m_half;
+	static dgBigVector m_three;
 	static dgBigVector m_negOne;
-	//	static dgBigVector m_xMask;
-	//	static dgBigVector m_yMask;
-	//	static dgBigVector m_zMask;
-	//	static dgBigVector m_wMask;
+	static dgBigVector m_xMask;
+	static dgBigVector m_yMask;
+	static dgBigVector m_zMask;
+	static dgBigVector m_wMask;
 	static dgBigVector m_signMask;
 	static dgBigVector m_triplexMask;
-}DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGMENT;
+
+
 #endif
+
+
+
+/*
+DG_MSC_VECTOR_ALIGMENT
+class dgSpatialVector
+{
+	public:
+	DG_INLINE dgSpatialVector()
+	{
+		SetZero();
+	}
+
+	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
+	{
+		m_v[0] = low[0];
+		m_v[1] = low[1];
+		m_v[2] = low[2];
+		m_v[3] = high[0];
+		m_v[4] = high[1];
+		m_v[5] = high[2];
+	}
+
+	DG_INLINE dgFloat32& operator[] (dgInt32 i)
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_v[i];
+	}
+
+	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_v[i];
+	}
+
+	DG_INLINE void SetZero()
+	{
+		m_v[0] = dgFloat32(0.0f);
+		m_v[1] = dgFloat32(0.0f);
+		m_v[2] = dgFloat32(0.0f);
+		m_v[3] = dgFloat32(0.0f);
+		m_v[4] = dgFloat32(0.0f);
+		m_v[5] = dgFloat32(0.0f);
+	}
+
+	DG_INLINE dgFloat32 DotProduct(const dgSpatialVector& v) const
+	{
+		return m_v[0] * v[0] + m_v[1] * v[1] + m_v[2] * v[2] + m_v[3] * v[3] + m_v[4] * v[4] + m_v[5] * v[5];
+	}
+
+	DG_INLINE void Scale(dgFloat32 s, dgSpatialVector& dst) const
+	{
+		dst.m_v[0] = m_v[0] * s;
+		dst.m_v[1] = m_v[1] * s;
+		dst.m_v[2] = m_v[2] * s;
+		dst.m_v[3] = m_v[3] * s;
+		dst.m_v[4] = m_v[4] * s;
+		dst.m_v[5] = m_v[5] * s;
+	}
+
+	DG_INLINE void ScaleAdd(dgFloat32 s, const dgSpatialVector& b, dgSpatialVector& dst) const
+	{
+		dst.m_v[0] = b[0] + m_v[0] * s;
+		dst.m_v[1] = b[1] + m_v[1] * s;
+		dst.m_v[2] = b[2] + m_v[2] * s;
+		dst.m_v[3] = b[3] + m_v[3] * s;
+		dst.m_v[4] = b[4] + m_v[4] * s;
+		dst.m_v[5] = b[5] + m_v[5] * s;
+	}
+
+	dgFloat32 m_v[6];
+} DG_GCC_VECTOR_ALIGMENT;
+*/
+
+
 
 // *****************************************************************************************
 //
@@ -1968,7 +1988,7 @@ class dgSpatialVector
 		dgVector p (m_l.CompProduct4(v.m_l) + m_h.CompProduct4(v.m_h));
 		return (p.AddHorizontal()).GetScalar(); 
 	}
-	
+
 	DG_INLINE void Scale(dgFloat32 s, dgSpatialVector& dst) const
 	{
 		dst.m_l = m_l.Scale4 (s);
@@ -1985,7 +2005,7 @@ class dgSpatialVector
 	dgVector m_h;
 
 } DG_GCC_VECTOR_ALIGMENT;
-#endif
+
 
 DG_MSC_VECTOR_ALIGMENT
 class dgSpatialMatrix
@@ -2069,6 +2089,4 @@ class dgSpatialMatrix
 	dgSpatialVector m_rows[6];
 } DG_GCC_VECTOR_ALIGMENT;
 
-
 #endif
-

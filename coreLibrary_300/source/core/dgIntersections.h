@@ -128,7 +128,7 @@ DG_INLINE dgFloat32 dgBoxDistanceToOrigin2 (const dgVector& minBox, const dgVect
 DG_MSC_VECTOR_ALIGMENT
 class dgFastRayTest
 {
-public:
+	public:
 	DG_INLINE dgFastRayTest(const dgVector& l0, const dgVector& l1)
 		:m_p0(l0)
 		,m_p1(l1)

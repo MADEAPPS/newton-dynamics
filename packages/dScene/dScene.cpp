@@ -1102,8 +1102,6 @@ void dScene::DeleteDuplicateTextures()
 			dList<dScene::dTreeNode*> textureNodes;
 			for (void* link1 = GetFirstChildLink(materialNode0); link1; link1 = GetNextChildLink(materialNode0, link1)) {
 				dScene::dTreeNode* const textureNode1 = GetNodeFromLink(link1);
-				dAssert(0); // I am sot sure whi si right !!!!
-				//dTextureNodeInfo* const materialInfo1 = (dTextureNodeInfo*)GetInfoFromNode(materialNode1);
 				dTextureNodeInfo* const materialInfo1 = (dTextureNodeInfo*)GetInfoFromNode(textureNode1);
 				if (materialInfo1->IsType(dTextureNodeInfo::GetRttiType())) {
 					textureNodes.Append(textureNode1);

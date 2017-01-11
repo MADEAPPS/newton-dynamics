@@ -36,8 +36,8 @@ class dgObb: public dgMatrix
 {
 	public:
 	DG_INLINE dgObb (){};
-	dgObb (const dgQuaternion &quat, const dgVector &position, const dgVector& dim = dgVector(0, 0, 0, 0));
-	dgObb (const dgMatrix& matrix, const dgVector& dim = dgVector(0, 0, 0, 0));
+	dgObb (const dgQuaternion &quat, const dgVector &position, const dgVector& dim = dgVector(0.0f));
+	dgObb (const dgMatrix& matrix, const dgVector& dim = dgVector(0.0f));
 
 	dgObb &operator= (const dgMatrix &arg);
 	void Scale (dgFloat32 Ws, dgFloat32 Hs, dgFloat32 Bs) ;

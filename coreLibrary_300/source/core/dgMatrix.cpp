@@ -23,6 +23,24 @@
 #include "dgMatrix.h"
 #include "dgQuaternion.h"
 
+dgBigVector dgBigVector::m_zero (dgFloat64 (0.0f));
+dgBigVector dgBigVector::m_one (dgFloat64 (1.0f));
+dgBigVector dgBigVector::m_two (dgFloat64 (2.0f));
+dgBigVector dgBigVector::m_half (dgFloat32 (0.5f));
+dgBigVector dgBigVector::m_three (dgFloat32 (3.0f));
+dgBigVector dgBigVector::m_negOne (dgFloat32 (-1.0f));
+dgBigVector dgBigVector::m_wOne (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f));
+dgBigVector dgBigVector::m_triplexMask (dgInt32 (-1), dgInt32 (-1),	dgInt32 (-1), dgInt32 (0));
+dgBigVector dgBigVector::m_signMask (dgBigVector(dgInt32 (-1), dgInt32 (-1), dgInt32 (-1), dgInt32 (-1)).ShiftRightLogical(1));
+
+dgBigVector dgBigVector::m_xMask (dgInt32 (-1), dgInt32 ( 0),	dgInt32 ( 0), dgInt32 ( 0));
+dgBigVector dgBigVector::m_yMask (dgInt32 ( 0), dgInt32 (-1),	dgInt32 ( 0), dgInt32 ( 0));
+dgBigVector dgBigVector::m_zMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 (-1), dgInt32 ( 0));
+dgBigVector dgBigVector::m_wMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 ( 0), dgInt32 (-1));
+
+
+#ifndef _NEWTON_USE_DOUBLE
+
 dgVector dgVector::m_xMask (dgInt32 (-1), dgInt32 ( 0),	dgInt32 ( 0), dgInt32 ( 0));
 dgVector dgVector::m_yMask (dgInt32 ( 0), dgInt32 (-1),	dgInt32 ( 0), dgInt32 ( 0));
 dgVector dgVector::m_zMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 (-1), dgInt32 ( 0));
@@ -38,6 +56,9 @@ dgVector dgVector::m_half (dgFloat32 (0.5f));
 dgVector dgVector::m_three (dgFloat32 (3.0f));
 dgVector dgVector::m_negOne (dgFloat32 (-1.0f));
 
+#endif
+
+
 dgMatrix dgMatrix::m_zeroMatrix (dgVector (dgFloat32(0.0f)),
 								 dgVector (dgFloat32(0.0f)),
 								 dgVector (dgFloat32(0.0f)),
@@ -50,11 +71,6 @@ dgMatrix dgMatrix::m_identityMatrix (dgVector (dgFloat32(1.0f), dgFloat32(0.0f),
 
 
 #ifndef _NEWTON_USE_DOUBLE
-dgBigVector dgBigVector::m_one  (dgFloat64 (1.0f));
-dgBigVector dgBigVector::m_zero  (dgFloat64 (0.0f));
-dgBigVector dgBigVector::m_negOne  (dgFloat64 (-1.0f));
-dgBigVector dgBigVector::m_triplexMask (dgInt32 (-1), dgInt32 (-1),	dgInt32 (-1), dgInt32 (0));
-dgBigVector dgBigVector::m_signMask (dgBigVector(dgInt32 (-1), dgInt32 (-1), dgInt32 (-1), dgInt32 (-1)).ShiftRightLogical(1));
 #endif
 
 const dgMatrix& dgGetIdentityMatrix()

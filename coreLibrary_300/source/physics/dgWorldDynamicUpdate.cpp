@@ -218,7 +218,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	world->m_clusterLRU ++;
 
 	queueBuffer[0] = body;
-	world->m_bodiesMemory.ResizeIfNecessary (m_bodies * sizeof (dgBodyInfo));
+	world->m_bodiesMemory.ResizeIfNecessary ((m_bodies + 1) * sizeof (dgBodyInfo));
 	dgBodyInfo* const bodyArray0 = (dgBodyInfo*)&world->m_bodiesMemory[0];
 
 	bodyArray0[m_bodies].m_body = world->m_sentinelBody;
@@ -237,7 +237,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			dgAssert(srcBody->m_masterNode);
 
 			dgInt32 bodyIndex = m_bodies + bodyCount;
-			world->m_bodiesMemory.ResizeIfNecessary (bodyIndex * sizeof (dgBodyInfo));
+			world->m_bodiesMemory.ResizeIfNecessary ((bodyIndex + 1) * sizeof (dgBodyInfo));
 			dgBodyInfo* const bodyArray1 = (dgBodyInfo*)&world->m_bodiesMemory[0];
 			bodyArray1[bodyIndex].m_body = srcBody;
 			isInEquilibrium &= srcBody->m_equilibrium;
@@ -268,7 +268,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 					bool check1 = constraint->m_dynamicsLru != lruMark;
 					if (check1) {
 						const dgInt32 jointIndex = m_joints + jointCount;
-						world->m_jointsMemory.ResizeIfNecessary (jointIndex * sizeof (dgJointInfo));
+						world->m_jointsMemory.ResizeIfNecessary ((jointIndex + 1) * sizeof (dgJointInfo));
 						dgJointInfo* const constraintArray = (dgJointInfo*)&world->m_jointsMemory[0];
 
 						constraint->m_index = jointCount;
@@ -375,6 +375,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			body0->m_dynamicsLru = m_markLru;
 			body1->m_dynamicsLru = m_markLru;
 
+			dgAssert (constraintArray[i].m_pairCount >= 0);
+			dgAssert (constraintArray[i].m_pairCount < 64);
 			rowsCount += constraintArray[i].m_pairCount;
 			if (joint->GetId() == dgConstraint::m_contactConstraint) {
 				if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
@@ -850,7 +852,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 
 void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount, dgInt32 blockMatrixSizeInBytes)
 {
-	world->m_solverJacobiansMemory.ResizeIfNecessary (rowsCount * sizeof (dgJacobianMatrixElement));
+	world->m_solverJacobiansMemory.ResizeIfNecessary ((rowsCount + 1) * sizeof (dgJacobianMatrixElement));
 	m_jacobianBuffer = (dgJacobianMatrixElement*)&world->m_solverJacobiansMemory[0];
 
 	world->m_solverForceAccumulatorMemory.ResizeIfNecessary ((bodyCount + 8) * sizeof (dgJacobian));
