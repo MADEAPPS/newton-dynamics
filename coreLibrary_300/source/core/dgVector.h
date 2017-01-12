@@ -1463,6 +1463,23 @@ class dgBigVector
 	{
 	}
 
+
+#ifdef _NEWTON_USE_DOUBLE
+	DG_INLINE dgBigVector(const dgVector& v)
+		:m_typeLow(v.m_typeLow)
+		,m_typeHigh(v.m_typeHigh)
+	{
+		//dgAssert(dgCheckVector((*this)));
+	}
+
+	DG_INLINE dgBigVector (const dgFloat32* const ptr)
+		:m_typeLow(_mm_loadu_pd(ptr))
+		,m_typeHigh(_mm_set_pd(dgFloat64(0.0f), ptr[2]))
+	{
+		dgAssert (dgCheckVector ((*this)));
+	}
+#else
+
 	DG_INLINE dgBigVector(const dgVector& v)
 		:m_typeLow(_mm_cvtps_pd (v.m_type))
 		,m_typeHigh(_mm_cvtps_pd (_mm_shuffle_ps (v.m_type, v.m_type, PURMUT_MASK(3, 2, 3, 2))))
@@ -1470,7 +1487,6 @@ class dgBigVector
 		dgAssert(dgCheckVector((*this)));
 	}
 
-#ifndef _NEWTON_USE_DOUBLE
 	DG_INLINE dgBigVector(const dgFloat64* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
 		,m_typeHigh(_mm_set_pd(dgFloat64(0.0f), ptr[2]))
