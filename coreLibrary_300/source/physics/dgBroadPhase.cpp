@@ -1933,12 +1933,14 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 			#if 0
 				static FILE* file = fopen("replay.bin", "wb");
 				if (file) {
+					dgInt32 sleepState = body->GetSleepState();
 					fwrite(&body->m_accel, sizeof (dgVector), 1, file);
 					fwrite(&body->m_alpha, sizeof (dgVector), 1, file);
 					fwrite(&body->m_veloc, sizeof (dgVector), 1, file);
 					fwrite(&body->m_omega, sizeof (dgVector), 1, file);
 					fwrite(&body->m_externalForce, sizeof (dgVector), 1, file);
 					fwrite(&body->m_externalTorque, sizeof (dgVector), 1, file);
+					fwrite(&sleepState, sizeof (dgInt32), 1, file);
 					//dgTrace (("%d f(%f %f %f) v(%f %f %f) f(%f %f %f)\n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z, body->m_externalForce.m_x, body->m_externalForce.m_y, body->m_externalForce.m_z));
 					fflush(file);
 				}
@@ -1951,6 +1953,9 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 					fread(&body->m_omega, sizeof (dgVector), 1, file);
 					fread(&body->m_externalForce, sizeof (dgVector), 1, file);
 					fread(&body->m_externalTorque, sizeof (dgVector), 1, file);
+					dgInt32 sleepState;
+					fread(&sleepState, sizeof (dgInt32), 1, file);
+					body->SetSleepState (sleepState ? true : false);
 					//dgTrace (("%d f(%f %f %f) v(%f %f %f) f(%f %f %f)\n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z, body->m_externalForce.m_x, body->m_externalForce.m_y, body->m_externalForce.m_z));
 				}
 			#endif
