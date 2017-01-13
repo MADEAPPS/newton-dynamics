@@ -1712,6 +1712,10 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 
 dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 {
+
+static int xxx;
+xxx ++;
+
 	dgInt32 count = 0;
 	if (m_proxy->m_intersectionTestOnly) {
 		CalculateClosestPoints();
@@ -1740,10 +1744,16 @@ dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 			m_proxy->m_normal = m_normal;
 			count = dgMin(m_proxy->m_maxContacts, count);
 			dgContactPoint* const contactOut = m_proxy->m_contacts;
+if (count)
+dgTrace (("%d\n", xxx)); 
 			for (int i = 0; i < count; i ++) {
 				contactOut[i].m_point = m_hullDiff[i];
 				contactOut[i].m_normal = m_normal;
 				contactOut[i].m_penetration = penetration;
+
+dgTrace (("p (%f %f %f) ", contactOut[i].m_point.m_x, contactOut[i].m_point.m_y, contactOut[i].m_point.m_z));
+dgTrace (("p (%f %f %f) ", contactOut[i].m_normal.m_x, contactOut[i].m_normal.m_y, contactOut[i].m_normal.m_z));
+dgTrace (("\n")); 
 			}
 		}
 	}

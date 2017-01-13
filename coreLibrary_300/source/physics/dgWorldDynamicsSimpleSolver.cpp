@@ -730,6 +730,8 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode(const dgBodyCluster* const cl
 		skeletonMemorySizeInBytes += memorySizes[i];
 	}
 
+static int xxx;
+
 	const dgFloat32 solverExtrapolator = (jointCount < 8) ? dgFloat32 (1.0f) : ((jointCount < 16) ? dgFloat32 (1.125f) : dgFloat32 (1.25f)); 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < maxPasses; step++) {
@@ -750,6 +752,7 @@ void dgWorldDynamicUpdate::CalculateForcesGameMode(const dgBodyCluster* const cl
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
 				dgFloat32 accel = CalculateJointForce(jointInfo, bodyArray, internalForces, matrixRow, solverExtrapolator, maxAccNorm);
+xxx ++;
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 		}
