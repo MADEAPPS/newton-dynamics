@@ -225,7 +225,10 @@ class dgWorld
 	dgFloat32 GetUpdateTime() const;
 	dgBroadPhase* GetBroadPhase() const;
 
+	dgInt32 GetSolverMode() const;
 	void SetSolverMode (dgInt32 mode);
+
+	dgInt32 GetSolverConvergenceQuality() const;
 	void SetSolverConvergenceQuality (dgInt32 mode);
 
 	dgInt32 EnumerateHardwareModes() const;

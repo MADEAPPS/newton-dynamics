@@ -49,13 +49,7 @@
 #include "dgCorkscrewConstraint.h"
 
 
-#define DG_SOLVER_CONVERGENCE_COUNT			4
 #define DG_DEFAULT_SOLVER_ITERATION_COUNT	4
-
-//#define DG_INITIAL_BODIES_SIZE		(1024 * 4)
-//#define DG_INITIAL_JOINTS_SIZE		(1024 * 4)
-//#define DG_INITIAL_JACOBIAN_SIZE	(1024 * 16)
-
 
 
 /*
@@ -276,8 +270,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	m_freezeSpeed2 = DG_FREEZE_MAG2 * dgFloat32 (0.1f);
 	m_freezeOmega2 = DG_FREEZE_MAG2 * dgFloat32 (0.1f);
 
+	m_solverConvergeQuality = 0;
 	m_contactTolerance = DG_PRUNE_CONTACT_TOLERANCE;
-	m_solverConvergeQuality = DG_SOLVER_CONVERGENCE_COUNT;
 
 	dgInt32 steps = 1;
 	dgFloat32 freezeAccel2 = m_freezeAccel2;
@@ -370,10 +364,19 @@ void dgWorld::SetSolverMode (dgInt32 mode)
 	m_solverMode = dgUnsigned32 (dgMax (1, mode));
 }
 
+dgInt32 dgWorld::GetSolverMode() const
+{
+	return m_solverMode;
+}
+
+dgInt32 dgWorld::GetSolverConvergenceQuality() const
+{
+	return m_solverConvergeQuality;
+}
 
 void dgWorld::SetSolverConvergenceQuality (dgInt32 mode)
 {
-	m_solverConvergeQuality = mode ? DG_SOLVER_CONVERGENCE_COUNT : 2 * DG_SOLVER_CONVERGENCE_COUNT;
+	m_solverConvergeQuality = mode ? 1 : 0;
 }
 
 dgInt32 dgWorld::EnumerateHardwareModes() const

@@ -552,25 +552,14 @@ int NewtonGetMultiThreadSolverOnSingleIsland(const NewtonWorld* const newtonWorl
   Set the solver precision mode.
 
   @param *newtonWorld is the pointer to the Newton world
-  @param model model of operation 0 = exact, 1 = adaptive, n = linear. The default is adaptive.
+  @param model model of operation n = number of iteration defual value is 4.
 
   @return Nothing
 
-  This function allows the application to configure the Newton solver to work in three different modes.
-
-  0: Is the exact mode. This is good for application where precision is more important than speed, ex: realistic simulation.
-
-  1 (default): Is the adaptive mode, the solver is not as exact but the simulation will still maintain a high degree of accuracy.
-  This mode is good for applications were a good degree of stability is important but not as important as speed.
-
-  n: Linear mode. The solver will not try to reduce the joints relative acceleration errors to below some limit,
-  instead it will perform up to n passes over the joint configuration each time reducing the acceleration error,
-  but it will terminate when the number of passes is exhausted regardless of the error magnitude.
-  In general this is the fastest mode and is is good for applications where speed is the only important factor, ex: video games.
-
-  the adaptive friction model combined with the linear model make for the fastest possible configuration
-  of the Newton solver. This setup is best for games.
-  If you need the best realistic behavior, we recommend the use of the exact solver and exact friction model which are the defaults.
+  n: the solve will execute a maximum of n iteration per cluster of connected joints and will terminnetare regarless of the 
+  of the joint recisual acceleration. 
+  If it happen that the joints residual acceleration fall below the minimum tolereance 1.0e-5
+  then the solve will terminar before the numer of ieteration reach N.
 */
 void NewtonSetSolverModel(const NewtonWorld* const newtonWorld, int model)
 {
@@ -580,10 +569,24 @@ void NewtonSetSolverModel(const NewtonWorld* const newtonWorld, int model)
 	world->SetSolverMode (model);
 }
 
+/*!
+Get the solver precision mode.
+*/
+int NewtonGetSolverModel(const NewtonWorld* const newtonWorld)
+{
+	Newton* const world = (Newton *)newtonWorld;
+
+	TRACE_FUNCTION(__FUNCTION__);
+	return world->GetSolverMode();
+}
+
 
 /*!
-  lowOrHigh = 0 the solver is controlled by high acceleration limit
-  lowOrHigh different than zero the solver controlled by low acceleration limit
+  Set solver block diaginal joint solver mode.
+  lowOrHigh == 0 Solver uses Gauss Seidel algorithm to solve constraints 
+  lowOrHigh != 0 Solver use Danzig algorithm to solve constraints 
+
+  when setting lowOrHigh != 0 this produces highest acuracacy but can be slower. 
 */
 void NewtonSetSolverConvergenceQuality (const NewtonWorld* const newtonWorld, int lowOrHigh)
 {
@@ -591,6 +594,14 @@ void NewtonSetSolverConvergenceQuality (const NewtonWorld* const newtonWorld, in
 
 	TRACE_FUNCTION(__FUNCTION__);
 	world->SetSolverConvergenceQuality(lowOrHigh);
+}
+
+int NewtonGetSolverConvergenceQuality(const NewtonWorld* const newtonWorld)
+{
+	Newton* const world = (Newton *)newtonWorld;
+
+	TRACE_FUNCTION(__FUNCTION__);
+	return world->GetSolverConvergenceQuality();
 }
 
 
