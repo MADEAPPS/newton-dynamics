@@ -638,6 +638,64 @@ DG_INLINE void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, T* const matrix
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
+void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high)
+{
+	const T* const me = matrix;
+	T* const invDiag1 = dgAlloca(T, size);
+
+	dgInt32 base = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		x[i] = dgClamp(x[i], low[i], high[i]);
+		invDiag1[i] = T(1.0f) / me[base + i];
+		base += size;
+	}
+
+	T tol(1.0e-6f);
+	T tol2 = tol * tol;
+	T tolerance(1.0e6f);
+	
+	const T* const invDiag = invDiag1;
+	const dgInt32 maxIterCount = size * size * size * size + 100000;
+	for (dgInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
+		tolerance = T(dgFloat32(0.0f));
+		dgInt32 base = 0;
+		for (dgInt32 j = 0; j < size; j++) {
+			const T* const row = &me[base];
+			T r (b[j] - dgDotProduct(size, row, x));
+			T f ((r + row[j] * x[j]) * invDiag[j]);
+			if (f > high[j]) {
+				f = high[j];
+			} else if (f < low[j]) {
+				f = low[j];
+			} else {
+				tolerance += r * r;
+			}
+			x[j] = f;
+			base += size;
+		}
+	}
+
+	tolerance*=1;
+}
+
+
+// solve a general Linear complementary program (LCP)
+// A * x = b + r
+// subjected to constraints
+// x(i) = low(i),  if r(i) >= 0  
+// x(i) = high(i), if r(i) <= 0  
+// low(i) <= x(i) <= high(i),  if r(i) == 0  
+//
+// return true is the system has a solution.
+// in return 
+// x is the solution,
+// r is return in vector b
+// note: although the system is called LCP, the solver is far more general than a strict LCP
+// to solve a strict LCP, set the following
+// low(i) = 0
+// high(i) = infinity.
+// this the same as enforcing the constraint: x(i) * r(i) = 0
+template <class T>
 bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
 {
 	T* const x0 = dgAlloca(T, size);
@@ -650,7 +708,8 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 	dgInt32 stride = 0;
 	bool applyInitialGuess = false;
 	for (dgInt32 i = 0; i < size; i++) {
-		x0[i] = dgClamp(x[i], low[i], high[i]);
+		x[i] = dgClamp(x[i], low[i], high[i]);
+		x0[i] = x[i];
 		if ((low[i] > T(-DG_LCP_MAX_VALUE)) || (high[i] < T(DG_LCP_MAX_VALUE))) {
 			low[i] -= x0[i];
 			high[i] -= x0[i];
@@ -718,7 +777,6 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 			if (dgAbsf(r0[index]) > T(1.0e-12f)) {
 
 				if (calculateDelta_x) {
-					//T dir = dgSign(r0[index]);
 					T dir (dgFloat32(1.0f));
 					dgCalculateDelta_x(size, dir, index, matrix, delta_x);
 				}

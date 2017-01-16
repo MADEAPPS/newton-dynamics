@@ -386,7 +386,8 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 
 	int stride = 0;
 	for (int i = 0; i < size; i++) {
-		x0[i] = dClamp(x[i], low[i], high[i]);
+		x[i] = dClamp(x[i], low[i], high[i]);
+		x0[i] = x[i];
 		if ((low[i] > T(-D_LCP_MAX_VALUE)) || (high[i] < T(D_LCP_MAX_VALUE))) {
 			dAssert (0);
 			low[i] -= x0[i];

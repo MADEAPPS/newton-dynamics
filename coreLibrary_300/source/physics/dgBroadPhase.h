@@ -410,10 +410,10 @@ class dgBroadPhase
 	bool m_scanTwoWays;
 	bool m_recursiveChunks;
 
-	DG_INLINE dgVector ReduceLine(dgVector* const simplex, dgInt32& indexOut) const;
-	DG_INLINE dgVector ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const;
-	DG_INLINE dgVector ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const;
-	DG_INLINE void ReduceDegeneratedTriangle(dgVector* const simplex) const;
+	//DG_INLINE dgVector ReduceLine(dgVector* const simplex, dgInt32& indexOut) const;
+	//DG_INLINE dgVector ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const;
+	//DG_INLINE dgVector ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const;
+	//DG_INLINE void ReduceDegeneratedTriangle(dgVector* const simplex) const;
 
 	static dgVector m_velocTol;
 	static dgVector m_linearContactError2;

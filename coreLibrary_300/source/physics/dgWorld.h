@@ -518,7 +518,6 @@ class dgWorld
 	friend class dgParallelSolverInitInternalForces;
 	friend class dgParallelSolverBuildJacobianMatrix;
 	
-
 	friend class dgBroadPhaseMaterialCallbackWorkerThread;
 	friend class dgBroadPhaseCalculateContactsWorkerThread;
 } DG_GCC_VECTOR_ALIGMENT ;

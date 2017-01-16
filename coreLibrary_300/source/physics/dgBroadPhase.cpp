@@ -1029,7 +1029,7 @@ void dgBroadPhase::RotateRight (dgBroadPhaseTreeNode* const node, dgBroadPhaseNo
 	}
 }
 
-
+/*
 DG_INLINE void dgBroadPhase::ReduceDegeneratedTriangle(dgVector* const simplex) const
 {
 	dgVector e10(simplex[1] - simplex[0]);
@@ -1142,7 +1142,6 @@ DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgIn
 	dgVector p30(p3 - p0);
 	dgVector n(p10.CrossProduct3(p20));
 	dgAssert(n.m_w == dgFloat32(0.0f));
-	//dgFloat32 volume = p30 % n;
 	dgFloat32 volume = n.DotProduct4(p30).GetScalar();
 	if (volume < dgFloat32(0.0f)) {
 		volume = -volume;
@@ -1203,7 +1202,7 @@ DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgIn
 	return origin;
 }
 
-/*
+
 bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
