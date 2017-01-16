@@ -23,7 +23,7 @@
 #define DEMO_HEIGHT  960
 
 
-#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+//#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// Precessing tops
@@ -31,7 +31,7 @@
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
 //#define DEFAULT_SCENE	7			// primitive convex cast 
-//#define DEFAULT_SCENE	8			// Box stacks
+#define DEFAULT_SCENE	8			// Box stacks
 //#define DEFAULT_SCENE	9			// simple level mesh collision
 //#define DEFAULT_SCENE	10			// optimized level mesh collision
 //#define DEFAULT_SCENE	11			// height field Collision
@@ -332,7 +332,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
-/*
+
 //m_broadPhaseType = 1;
 //m_autoSleepState = false;
 //m_microthreadIndex = 1;
@@ -343,13 +343,14 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_hideVisualMeshes = true;
 //m_hardwareDevice = 2;
 //m_showStatistics = true;
-//*/
+//
 
+//m_solverModeQuality = 1;
 //m_showCenterOfMass = true;
 //m_physicsUpdateMode = 1;
 //m_hideVisualMeshes = true;
 //m_showContactPoints = true;
-//m_debugDisplayMode = 2;
+m_debugDisplayMode = 2;
 //SetDebugDisplayMode (m_debugDisplayMode);
 //m_showNormalForces = true;
 
