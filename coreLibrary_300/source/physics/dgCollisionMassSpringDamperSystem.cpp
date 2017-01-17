@@ -28,61 +28,89 @@
 #include "dgCollisionMassSpringDamperSystem.h"
 
 
-dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem(dgWorld* const world, dgMeshEffect* const mesh)
+dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem (dgWorld* const world, dgInt32 shapeID, dgInt32 pointCount, const dgFloat32* const points, dgInt32 strideInBytes, const dgFloat32* const pointsMasses, dgInt32 linksCount, const dgInt32* const links, const dgFloat32* const linksSpring, const dgFloat32* const LinksDamper)
 	:dgCollisionDeformableMesh(world, m_deformableSolidMesh)
 {
 	m_rtti |= dgCollisionMassSpringDamperSystem_RTTI;
-	
-	dgInt32 count = mesh->GetVertexCount();
-	dgVector* const points = dgAlloca(dgVector, count);
 
-	for (dgInt32 i = 0; i < count; i++) {
-		dgBigVector p(mesh->GetVertex(i));
-		points[i] = p;
+	//dgInt32 count = mesh->GetVertexCount();
+	//dgVector* const points = dgAlloca(dgVector, count);
+	//for (dgInt32 i = 0; i < count; i++) {
+	//	dgBigVector p(mesh->GetVertex(i));
+	//	points[i] = p;
+	//}
+	//m_indexToVertexCount = count;
+	//m_indexToVertexMap.Resize(count);
+	//dgInt32* const indexToVertexMap = &m_indexToVertexMap[0];
+	//m_particlesCount = dgVertexListToIndexList(&points[0].m_x, sizeof(dgVector), 3 * sizeof(dgFloat32), 0, count, indexToVertexMap, dgFloat32(1.0e-5f));
+	//for (dgInt32 i = 0; i < m_particlesCount; i++) {
+	//	m_posit[i] = points[i];
+	//}
+
+	m_particlesCount = pointCount;
+	m_posit.Resize(m_particlesCount);
+	const dgInt32 stride = strideInBytes / sizeof (dgFloat32);
+	for (dgInt32 i = 0; i < pointCount; i++) {
+		//m_invMass[i] = dgFloat32(1.0f / pointsMasses[i]);
+		m_posit[i] = dgVector(points[i * stride + 0], points[i * stride + 1], points[i * stride + 2], dgFloat32(0.0f));
 	}
 
-	m_indexToVertexCount = count;
-	m_indexToVertexMap.Resize(count);
-	dgInt32* const indexToVertexMap = &m_indexToVertexMap[0];
-	m_particlesCount = dgVertexListToIndexList(&points[0].m_x, sizeof(dgVector), 3 * sizeof(dgFloat32), 0, count, indexToVertexMap, dgFloat32(1.0e-5f));
-	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		m_posit[i] = points[i];
+	//dgInt32 edgeCount = 0;
+	//dgSoftLink* const links = dgAlloca(dgSoftLink, mesh->GetCount() / 2);
+	//for (void* edgePtr = mesh->GetFirstEdge(); edgePtr; edgePtr = mesh->GetNextEdge(edgePtr)) {
+	//	const dgEdge* const edge = mesh->GetPolyhedraEdgeFromNode(edgePtr);
+	//	dgInt32 v0 = indexToVertexMap[edge->m_incidentVertex];
+	//	dgInt32 v1 = indexToVertexMap[edge->m_twin->m_incidentVertex];
+	//	links[edgeCount].m_m0 = dgInt16(dgMin(v0, v1));
+	//	links[edgeCount].m_m1 = dgInt16(dgMax(v0, v1));
+	//	edgeCount++;
+	//	if ((edge->m_incidentFace > 0) && (edge->m_twin->m_incidentFace > 0)) {
+	//		v0 = indexToVertexMap[edge->m_prev->m_incidentVertex];
+	//		v1 = indexToVertexMap[edge->m_twin->m_prev->m_incidentVertex];
+	//		links[edgeCount].m_m0 = dgInt16(dgMin(v0, v1));
+	//		links[edgeCount].m_m1 = dgInt16(dgMax(v0, v1));
+	//		edgeCount++;
+	//	}
+	//}
+	//dgSort(links, edgeCount, CompareEdges);
+	//dgInt32 uniqueEdgeCount = 0;
+	//for (dgInt32 i = 1; i < edgeCount; i++) {
+	//	if (CompareEdges(&links[i], &links[uniqueEdgeCount], NULL) > 0) {
+	//		uniqueEdgeCount++;
+	//		links[uniqueEdgeCount] = links[i];
+	//	}
+	//}
+	//uniqueEdgeCount++;
+	//m_linksCount = uniqueEdgeCount;
+	//m_linkList.Resize(m_linksCount);
+	//for (dgInt32 i = 0; i < m_linksCount; i++) {
+	//	m_linkList[i] = links[i];
+	//}
+
+	m_linksCount = linksCount;
+	m_linkList.Resize(linksCount);
+	for (dgInt32 i = 0; i < linksCount; i++) {
+		dgInt32 v0 = links[i * 2 + 0];
+		dgInt32 v1 = links[i * 2 + 1];
+		dgAssert(v0 != v1);
+		dgAssert(v0 >= 0);
+		dgAssert(v1 >= 0);
+		dgAssert(v0 < pointCount);
+		dgAssert(v1 < pointCount);
+		m_linkList[i].m_m0 = dgInt16(dgMin(v0, v1));
+		m_linkList[i].m_m1 = dgInt16(dgMax(v0, v1));
+		m_linkList[i].m_spring = linksSpring[i];
+		m_linkList[i].m_damper = LinksDamper[i];
+m_linkList[i].m_spring = dgFloat32(1000.0f);
+m_linkList[i].m_damper = dgFloat32(30.0f);
+
+		const dgVector& p0 = m_posit[v0];
+		const dgVector& p1 = m_posit[v1];
+		dgVector dp(p0 - p1);
+		m_linkList[i].m_restlength = dgSqrt(dp.DotProduct3(dp));
+		dgAssert(m_linkList[i].m_restlength > dgFloat32(1.0e-2f));
 	}
 
-
-	dgInt32 edgeCount = 0;
-	dgSoftLink* const links = dgAlloca(dgSoftLink, mesh->GetCount() / 2);
-	for (void* edgePtr = mesh->GetFirstEdge(); edgePtr; edgePtr = mesh->GetNextEdge(edgePtr)) {
-		const dgEdge* const edge = mesh->GetPolyhedraEdgeFromNode(edgePtr);
-
-		dgInt32 v0 = indexToVertexMap[edge->m_incidentVertex];
-		dgInt32 v1 = indexToVertexMap[edge->m_twin->m_incidentVertex];
-		links[edgeCount].m_m0 = dgInt16(dgMin(v0, v1));
-		links[edgeCount].m_m1 = dgInt16(dgMax(v0, v1));
-		edgeCount++;
-		if ((edge->m_incidentFace > 0) && (edge->m_twin->m_incidentFace > 0)) {
-			v0 = indexToVertexMap[edge->m_prev->m_incidentVertex];
-			v1 = indexToVertexMap[edge->m_twin->m_prev->m_incidentVertex];
-			links[edgeCount].m_m0 = dgInt16(dgMin(v0, v1));
-			links[edgeCount].m_m1 = dgInt16(dgMax(v0, v1));
-			edgeCount++;
-		}
-	}
-	dgSort(links, edgeCount, CompareEdges);
-
-	dgInt32 uniqueEdgeCount = 0;
-	for (dgInt32 i = 1; i < edgeCount; i++) {
-		if (CompareEdges(&links[i], &links[uniqueEdgeCount], NULL) > 0) {
-			uniqueEdgeCount++;
-			links[uniqueEdgeCount] = links[i];
-		}
-	}
-	uniqueEdgeCount++;
-	m_linksCount = uniqueEdgeCount;
-	m_linkList.Resize(m_linksCount);
-	for (dgInt32 i = 0; i < m_linksCount; i++) {
-		m_linkList[i] = links[i];
-	}
 	FinalizeBuild();
 }
 
@@ -124,7 +152,8 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 	dgVector* const accel = &m_accel[0];
 	dgVector* const veloc = &m_veloc[0];
 	dgVector* const posit = &m_posit[0];
-	const dgFloat32* const restLenght = &m_restlength[0];
+	//const dgFloat32* const restLenght = &m_restlength[0];
+	const dgSpringDamperLink* const links = &m_linkList[0];
 
 	dgVector* const dx = dgAlloca(dgVector, m_linksCount);
 	dgVector* const dv = dgAlloca(dgVector, m_linksCount);
@@ -160,7 +189,6 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
 	}
 
-	const dgSoftLink* const links = &m_linkList[0];
 	dgFloat32 ks_dt = -timestep * kSpring;
 	//	dgFloat32 kd_dt0 = -timestep * kDamper;
 	//	dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
@@ -190,7 +218,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			const dgVector lenght2((length2 & mask) | length2.AndNot(mask));
 			const dgFloat32 length = (lenght2.Sqrt()).GetScalar();
 			const dgFloat32 den = dgFloat32(1.0f) / length;
-			const dgFloat32 lenghtRatio = restLenght[i] * den;
+			const dgFloat32 lenghtRatio = links[i].m_restlength * den;
 			const dgFloat32 compression = dgFloat32(1.0f) - lenghtRatio;
 			const dgVector fs(p0p1.Scale4(kSpring * compression));
 			const dgVector fd(p0p1.Scale4(kDamper * den * den * (v0v1.DotProduct4(p0p1)).GetScalar()));
