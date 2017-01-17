@@ -34,8 +34,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 	,m_finiteElementsCount(0)
 {
 	m_rtti |= dgCollisionDeformableSolidMesh_RTTI;
-	dgAssert (0);
-/*
+
 	dgInt32 count = mesh->GetVertexCount();
 	dgVector* const points = dgAlloca (dgVector, count);
 
@@ -143,7 +142,6 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 		}
 		fem.m_restVolume = volume;
 	}
-*/
 }
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(const dgCollisionDeformableSolidMesh& source)
@@ -181,8 +179,6 @@ dgInt32 dgCollisionDeformableSolidMesh::GetMemoryBufferSizeInBytes() const
 
 void dgCollisionDeformableSolidMesh::CalculateAcceleration(dgFloat32 timestep)
 {
-	dgAssert (0);
-/*
 // Ks is in [sec^-2] a spring constant unit acceleration, not a spring force acceleration. 
 // Kc is in [sec^-1] a damper constant unit velocity, not a damper force acceleration. 
 
@@ -251,7 +247,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
 	}
 
-	const dgSpringDamperLink* const links = &m_linkList[0];
+	const dgSoftLink* const links = &m_linkList[0];
 	dgFloat32 ks_dt = - timestep * kSpring;
 //	dgFloat32 kd_dt0 = -timestep * kDamper;
 //	dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
@@ -367,5 +363,4 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 			posit[i] += veloc[i].CompProduct4(dtRK4);
 		}
 	}
-*/
 }

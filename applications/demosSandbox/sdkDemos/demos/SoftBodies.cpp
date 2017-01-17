@@ -35,13 +35,12 @@ class SimpleSoftBodyEntity: public DemoEntity
 
 			int pointCount = NewtonMeshGetPointCount(clothPatchMesh);
 			const int* const indexMap = NewtonMeshGetIndexToVertexMap(clothPatchMesh);
-			//const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
+			const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
 
 			m_indexMap = new int[pointCount];
 			for (int i = 0; i < pointCount; i++) {
 				int j = indexMap[i];
-				//m_indexMap[i] = solidIndexList[j];
-				m_indexMap[i] = j;
+				m_indexMap[i] = solidIndexList[j];
 			}
 		}
 
@@ -131,8 +130,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 		{
 			ResetOptimization();
 			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
-dAssert (0);
-/*
+
 			int pointCount = NewtonMeshGetPointCount(tetrahedraMesh);
 			const int* const indexMap = NewtonMeshGetIndexToVertexMap(tetrahedraMesh);
 			const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
@@ -142,7 +140,6 @@ dAssert (0);
 				int j = indexMap[i];
 				m_indexMap[i] = solidIndexList[j];
 			}
-*/
 		}
 
 		~TetrahedraSoftMesh()
@@ -191,8 +188,7 @@ dAssert (0);
 			,m_weightSet(NULL)
 		{
 			ResetOptimization();
-			dAssert (0);
-/*
+
 			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
 
 			int skinPointCount = NewtonMeshGetPointCount(skinMesh);
@@ -208,7 +204,6 @@ dAssert (0);
 					m_weightSet[i].m_weight[k] = weightValue[k];
 				}
 			}
-*/
 		}
 
 		~LinearBlendMeshTetra()
@@ -347,61 +342,57 @@ dAssert (0);
 		return deformableBody;
 	}
 
-	NewtonMesh* CreateQuadClothPatch(DemoEntityManager* const scene, int size_x, int size_z)
+	NewtonMesh* CreateFlatClothPatch(DemoEntityManager* const scene, int size_x, int size_z)
 	{
 		size_x += 1;
 		size_z += 1;
 		dAssert(size_x <= 129);
 		dAssert(size_z <= 129);
 		dFloat dimension = 0.125f;
-
-		dBigVector* const points = new dBigVector[size_x * size_z];
-		int* const faceIndexCount = new int[(size_x - 1) * (size_z - 1)];
-		int* const faceVertexIndex = new int[4 * (size_x - 1) * (size_z - 1)];
+		dVector points[129][129];
 
 		dFloat y = 0.0f;
-		int vertexCount = 0;
+		int enumerator = 0;
 		for (int i = 0; i < size_z; i++) {
 			dFloat z = (i - size_z / 2) * dimension;
 			for (int j = 0; j < size_x; j++) {
 				dFloat x = (j - size_x / 2) * dimension;
-				points[vertexCount] = dVector(x, y, z, 0.0f);
-				vertexCount++;
+				points[i][j] = dVector(x, y, z, dFloat(enumerator));
+				enumerator++;
 			}
 		}
 		
-		int faceCount = 0;
+		NewtonMesh* const clothPatch = NewtonMeshCreate(scene->GetNewton());
+		NewtonMeshBeginBuild(clothPatch);
 		for (int i = 0; i < size_z - 1; i++) {
 			for (int j = 0; j < size_x - 1; j++) {
-				faceIndexCount[faceCount] = 4;
-				faceVertexIndex[faceCount * 4 + 0] = (i + 0) * size_x + j + 0;
-				faceVertexIndex[faceCount * 4 + 1] = (i + 0) * size_x + j + 1;
-				faceVertexIndex[faceCount * 4 + 2] = (i + 1) * size_x + j + 1;
-				faceVertexIndex[faceCount * 4 + 3] = (i + 1) * size_x + j + 0;
-				faceCount++;
+				NewtonMeshBeginFace(clothPatch);
+				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+
+				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 1].m_x, points[i + 0][j + 1].m_y, points[i + 0][j + 1].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+
+				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+				NewtonMeshEndFace(clothPatch);
+
+				NewtonMeshBeginFace(clothPatch);
+				NewtonMeshAddPoint(clothPatch, points[i + 0][j + 0].m_x, points[i + 0][j + 0].m_y, points[i + 0][j + 0].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+
+				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 1].m_x, points[i + 1][j + 1].m_y, points[i + 1][j + 1].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+
+				NewtonMeshAddPoint(clothPatch, points[i + 1][j + 0].m_x, points[i + 1][j + 0].m_y, points[i + 1][j + 0].m_z);
+				NewtonMeshAddMaterial(clothPatch, 0);
+				NewtonMeshEndFace(clothPatch);
 			}
 		}
-
-
-		NewtonMeshVertexFormat vertexFormat;
-		NewtonMeshClearVertexFormat(&vertexFormat);
-
-		vertexFormat.m_faceCount = faceCount;
-		vertexFormat.m_faceIndexCount = faceIndexCount;
-
-		vertexFormat.m_vertex.m_data = &points[0][0];
-		vertexFormat.m_vertex.m_indexList = faceVertexIndex;
-		vertexFormat.m_vertex.m_strideInBytes = sizeof(dBigVector);
-
-		NewtonMesh* const clothPatch = NewtonMeshCreate(scene->GetNewton());
-		NewtonMeshBuildFromVertexListIndexList(clothPatch, &vertexFormat);
+		NewtonMeshEndBuild(clothPatch);
 
 		int material = LoadTexture("persianRug.tga");
 		NewtonMeshApplyBoxMapping(clothPatch, material, material, material);
-
-		delete[] points;
-		delete[] faceIndexCount;
-		delete[] faceVertexIndex;
 		return clothPatch;
 	}
 
@@ -633,84 +624,10 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 	{
 		NewtonWorld* const world = scene->GetNewton();
 		
-		NewtonMesh* const clothPatch = CreateQuadClothPatch(scene, size_x, size_z);
-
-		// create the array of points;
-		int vertexCount = NewtonMeshGetVertexCount(clothPatch);
-		int stride = NewtonMeshGetVertexStrideInByte (clothPatch) / sizeof (dFloat64); 
-		const dFloat64* const meshPoints = NewtonMeshGetVertexArray (clothPatch); 
-
-		dVector* const points = new dVector[vertexCount];
-		for (int i =0; i < vertexCount; i ++ ) {
-			points[i].m_x = meshPoints[i * stride + 0];
-			points[i].m_y = meshPoints[i * stride + 1];
-			points[i].m_z = meshPoints[i * stride + 2];
-			points[i].m_w = 0.0f;
-		}
+		NewtonMesh* const clothPatch = CreateFlatClothPatch(scene, size_x, size_z);
+		NewtonCollision* const deformableCollision = NewtonCreateClothPatch(world, clothPatch, 0);
 		
 		dFloat mass = 8.0f;
-		// set the particle masses 
-		dFloat unitMass = mass / vertexCount;
-		dFloat* const clothMass = new dFloat[vertexCount];
-		for (int i =0; i < vertexCount; i ++ ) {			
-			clothMass[i] = unitMass;
-		}
-
-		int linksCount = 0;
-		const int maxLinkCount = size_x * size_z * 16;
-
-		// create the structual constation array;
-		dFloat structuralDamper = 1000.0f;
-		dFloat structuralSpring = 100000.0f;
-
-		int* const links = new int[2 * maxLinkCount];
-		dFloat* const spring = new dFloat[maxLinkCount];
-		dFloat* const damper = new dFloat[maxLinkCount];
-		for (void* edgeNode = NewtonMeshGetFirstEdge (clothPatch); edgeNode; edgeNode = NewtonMeshGetNextEdge (clothPatch, edgeNode)) {
-			int v0;
-			int v1;
-			NewtonMeshGetEdgeIndices (clothPatch, edgeNode, &v0, &v1);
-			links[linksCount * 2 + 0] = v0;
-			links[linksCount * 2 + 1] = v1;
-			spring[linksCount] = structuralSpring;
-			damper[linksCount] = structuralDamper;
-			linksCount ++;
-			dAssert (linksCount <= maxLinkCount);
-		}
-		
-
-		// add shear constraints
-		dFloat shearDamper = 1000.0f;
-		dFloat shearSpring = 100000.0f;
-		for (void* faceNode = NewtonMeshGetFirstFace (clothPatch); faceNode; faceNode = NewtonMeshGetNextFace (clothPatch, faceNode)) {
-			if (!NewtonMeshIsFaceOpen(clothPatch, faceNode)) {
-				int face[8];
-				int indexCount = NewtonMeshGetFaceIndexCount (clothPatch, faceNode);
-				NewtonMeshGetFaceIndices (clothPatch, faceNode, face);
-				for (int i = 2; i < indexCount - 1; i ++) {
-					links[linksCount * 2 + 0] = face[0];
-					links[linksCount * 2 + 1] = face[i];
-					spring[linksCount] = shearSpring;
-					damper[linksCount] = shearDamper;
-
-					linksCount ++;
-					dAssert (linksCount <= maxLinkCount);
-				}
-				for (int i = 3; i < indexCount; i ++) {
-					links[linksCount * 2 + 0] = face[1];
-					links[linksCount * 2 + 1] = face[i];
-					spring[linksCount] = shearSpring;
-					damper[linksCount] = shearDamper;
-					linksCount ++;
-					dAssert (linksCount <= maxLinkCount);
-				}
-			}
-		}
-
-		NewtonCollision* const deformableCollision = NewtonCreateMassSpringDamperSystem(world, 0, 
-													 &points[0].m_x, vertexCount, sizeof (dVector), clothMass,
-													 links, linksCount, spring, damper);
-		
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
 
 		DemoMesh* const mesh = new ClothPatchMesh (clothPatch, m_body);
@@ -718,13 +635,8 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 
 		// do not forget to destroy this objects, else you get bad memory leaks.
 		mesh->Release();
-		NewtonDestroyCollision(deformableCollision);
 		NewtonMeshDestroy(clothPatch);
-		delete[] links;
-		delete[] damper;
-		delete[] spring;
-		delete[] clothMass;
-		delete[] points;
+		NewtonDestroyCollision(deformableCollision);
 	}
 	
 	NewtonBody* m_body;

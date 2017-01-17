@@ -68,10 +68,9 @@ class dgCollisionLumpedMassParticles: public dgCollisionConvex
 	dgArray<dgVector> m_veloc;
 	dgArray<dgVector> m_accel;
 	dgArray<dgVector> m_externalAccel;
-	dgArray<dgFloat32> m_invMass;
 	dgDynamicBody* m_body;
-//	dgFloat32 m_unitMass;
-//	dgFloat32 m_unitInertia;
+	dgFloat32 m_unitMass;
+	dgFloat32 m_unitInertia;
 	dgFloat32 m_particleRadius;
 	dgInt32 m_particlesCount;
 

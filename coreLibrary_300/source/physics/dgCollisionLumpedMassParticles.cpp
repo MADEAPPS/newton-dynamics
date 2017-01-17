@@ -38,8 +38,9 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles(dgWorld* const wo
 	,m_veloc(world->GetAllocator())
 	,m_accel(world->GetAllocator())
 	,m_externalAccel(world->GetAllocator())
-	,m_invMass(world->GetAllocator())
 	,m_body(NULL)
+	,m_unitMass(dgFloat32 (1.0f))
+	,m_unitInertia(dgFloat32 (1.0f))
 	,m_particleRadius (DG_MINIMIM_PARTCLE_RADIUS)
 	,m_particlesCount(0)
 {
@@ -53,8 +54,9 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles (const dgCollisio
 	,m_veloc(source.m_veloc, source.m_particlesCount)
 	,m_accel(source.m_accel, source.m_particlesCount)
 	,m_externalAccel(source.m_externalAccel, source.m_particlesCount)
-	,m_invMass(source.m_invMass, source.m_particlesCount)
 	,m_body(NULL)
+	,m_unitMass(source.m_unitMass)
+	,m_unitInertia(source.m_unitMass)
 	,m_particleRadius (source.m_particleRadius)
 	,m_particlesCount(source.m_particlesCount)
 {
@@ -68,8 +70,9 @@ dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles (dgWorld* const w
 	,m_veloc(world->GetAllocator())
 	,m_accel(world->GetAllocator())
 	,m_externalAccel(world->GetAllocator())
-	,m_invMass(world->GetAllocator())
 	,m_body(NULL)
+	,m_unitMass(dgFloat32(1.0f))
+	,m_unitInertia(dgFloat32(1.0f))
 	,m_particleRadius (DG_MINIMIM_PARTCLE_RADIUS)
 	,m_particlesCount(0)
 {
@@ -118,7 +121,6 @@ void dgCollisionLumpedMassParticles::SetOwnerAndUnitMass (dgDynamicBody* const b
 	dgVector position (matrix.m_posit);
 	matrix.m_posit = dgVector::m_wOne;
 
-	const dgFloat32* const invMass = &m_invMass[0];
 	dgVector* const posit = &m_posit[0];
 	dgMatrix scaledTranform (body->m_collision->GetScaledTransform(matrix));
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
@@ -129,30 +131,22 @@ void dgCollisionLumpedMassParticles::SetOwnerAndUnitMass (dgDynamicBody* const b
 	matrix.m_posit = position;
 	body->m_matrix = matrix;
 
-	dgFloat32 mass = dgFloat32(0.0f);
 	dgVector xxSum(dgFloat32(0.0f));
-//	dgVector xySum(dgFloat32(0.0f));
-//	dgVector xxSum2(dgFloat32(0.0f));
+	dgVector xySum(dgFloat32(0.0f));
+	dgVector xxSum2(dgFloat32(0.0f));
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		dgFloat32 particelMass = dgFloat32(1.0f) / invMass[i];
-		mass += particelMass;
-		xxSum += posit[i].Scale3 (particelMass);
-		//xxSum2 += posit[i].CompProduct4(posit[i]);
-		//xySum += posit[i].CompProduct4(posit[i].ShiftTripleRight());
+		xxSum += posit[i];
+		xxSum2 += posit[i].CompProduct4(posit[i]);
+		xySum += posit[i].CompProduct4(posit[i].ShiftTripleRight());
 	}
+	dgVector den (dgFloat32(1.0f / m_particlesCount));
 
-	//for now just make body inertial equal 1.0f
-	body->m_localCentreOfMass = xxSum.CompProduct4(dgFloat32 (1.0f) / mass);
-	body->m_mass = dgVector(dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f), mass);
-	body->m_invMass = dgVector(dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f) / mass);
+	body->m_localCentreOfMass = xxSum.CompProduct4(den);
+	dgVector com2(body->m_localCentreOfMass.CompProduct4(body->m_localCentreOfMass));
+	dgVector unitInertia(body->m_mass - com2.Scale4(body->m_mass.m_w));
 
-//	dgVector den (dgFloat32(1.0f / m_particlesCount));
-//	body->m_localCentreOfMass = xxSum.CompProduct4(den);
-//	dgVector com2(body->m_localCentreOfMass.CompProduct4(body->m_localCentreOfMass));
-//	dgVector unitInertia(body->m_mass - com2.Scale4(body->m_mass.m_w));
-
-//	m_unitMass = body->m_mass.m_w / m_particlesCount;
-//	m_unitInertia = dgMax(unitInertia.m_x, unitInertia.m_y, unitInertia.m_z) / m_particlesCount;
+	m_unitMass = body->m_mass.m_w / m_particlesCount;
+	m_unitInertia = dgMax(unitInertia.m_x, unitInertia.m_y, unitInertia.m_z) / m_particlesCount;
 
 //	dgVector yySum(xxSum.ShiftTripleRight());
 //	dgVector com(xxSum.CompProduct4(den) + origin);

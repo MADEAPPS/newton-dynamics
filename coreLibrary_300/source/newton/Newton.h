@@ -1022,16 +1022,14 @@ extern "C" {
 	// particle system interface (soft bodies, individual, pressure bodies and cloth)   
 	//
 	// **********************************************************************************************
-//	NEWTON_API NewtonCollision* NewtonCreateSpringMassDamperSystem (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID);
-	NEWTON_API NewtonCollision* NewtonCreateMassSpringDamperSystem (const NewtonWorld* const newtonWorld, int shapeID,
-																	const dFloat* const points, int pointCount, int strideInBytes, const dFloat* const pointMass, 
-																	const int* const links, int linksCount, const dFloat* const linksSpring, const dFloat* const linksDamper);
-
+	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID);
 	NEWTON_API NewtonCollision* NewtonCreateDeformableSolid(const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, int shapeID);
 
 	NEWTON_API int NewtonDeformableMeshGetParticleCount (const NewtonCollision* const deformableMesh); 
 	NEWTON_API int NewtonDeformableMeshGetParticleStrideInBytes (const NewtonCollision* const deformableMesh); 
 	NEWTON_API const dFloat* NewtonDeformableMeshGetParticleArray (const NewtonCollision* const deformableMesh); 
+		
+	NEWTON_API const int* NewtonDeformableMeshGetIndexToVertexMap (const NewtonCollision* const deformableMesh); 
 		
 /*
 	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial);

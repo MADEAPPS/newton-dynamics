@@ -37,18 +37,16 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 
 	dgInt32 GetLinksCount() const;
 	const dgInt16* GetLinks() const;
+	const dgInt32* GetIndexToVertexMap() const;
 	
 	virtual void ConstraintParticle(dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
 
 	void DisableInactiveLinks ();
 
 	protected:
-	class dgSpringDamperLink
+	class dgSoftLink
 	{
 		public:
-		dgFloat32 m_spring;
-		dgFloat32 m_damper;
-		dgFloat32 m_restlength;
 		dgInt16 m_m0;
 		dgInt16 m_m1;
 	};
@@ -60,9 +58,16 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void IntegrateForces(dgFloat32 timestep);
 	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	static dgInt32 CompareEdges(const dgSoftLink* const A, const dgSoftLink* const B, void* const context);
 	
-	dgArray<dgSpringDamperLink> m_linkList;
+
+	dgArray<dgSoftLink> m_linkList;
+	dgArray<dgFloat32> m_restlength;
+	dgArray<dgInt32> m_indexToVertexMap;
+
 	dgInt32 m_linksCount;
+	dgInt32 m_indexToVertexCount;
+	
 
 	static dgVector m_smallestLenght2;
 };

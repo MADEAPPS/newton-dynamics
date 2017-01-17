@@ -38,7 +38,7 @@
 #include "dgCollisionChamferCylinder.h"
 #include "dgCollisionCompoundFractured.h"
 #include "dgCollisionDeformableSolidMesh.h"
-#include "dgCollisionMassSpringDamperSystem.h"
+#include "dgCollisionDeformableClothPatch.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -119,8 +119,8 @@ dgCollisionInstance::dgCollisionInstance(const dgCollisionInstance& instance)
 			m_childShape = new (m_world->GetAllocator()) dgCollisionCompound (*compound, this);
 		}
 	} else if (m_childShape->IsType (dgCollision::dgCollisionDeformableClothPatch_RTTI)) {
-		dgCollisionMassSpringDamperSystem* const deformable = (dgCollisionMassSpringDamperSystem*) m_childShape;
-		m_childShape = new (m_world->GetAllocator()) dgCollisionMassSpringDamperSystem (*deformable);
+		dgCollisionDeformableClothPatch* const deformable = (dgCollisionDeformableClothPatch*) m_childShape;
+		m_childShape = new (m_world->GetAllocator()) dgCollisionDeformableClothPatch (*deformable);
 	} else if (m_childShape->IsType (dgCollision::dgCollisionDeformableSolidMesh_RTTI)) {
 		dgCollisionDeformableSolidMesh* const deformable = (dgCollisionDeformableSolidMesh*) m_childShape;
 		m_childShape = new (m_world->GetAllocator()) dgCollisionDeformableSolidMesh (*deformable);

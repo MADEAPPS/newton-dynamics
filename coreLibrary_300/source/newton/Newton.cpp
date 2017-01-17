@@ -8191,13 +8191,11 @@ NewtonCollision* NewtonCreateDeformableSolid(const NewtonWorld* const newtonWorl
 	return (NewtonCollision*) world->CreateDeformableSolid ((dgMeshEffect*)mesh, shapeID);
 }
 
-NewtonCollision* NewtonCreateMassSpringDamperSystem (const NewtonWorld* const newtonWorld, int shapeID,
-													 const dFloat* const points, int pointCount, int strideInBytes, const dFloat* const pointMass, 
-													 const int* const links, int linksCount, const dFloat* const linksSpring, const dFloat* const linksDamper)
+NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return (NewtonCollision*)world->CreateMassSpringDamperSystem (shapeID, pointCount, points, strideInBytes, pointMass, linksCount, links, linksSpring, linksDamper);
+	return (NewtonCollision*)world->CreateClothPatchMesh ((dgMeshEffect*)mesh, shapeID);
 }
 
 int NewtonDeformableMeshGetParticleCount(const NewtonCollision* const deformableMesh)
@@ -8223,6 +8221,18 @@ const dFloat* NewtonDeformableMeshGetParticleArray(const NewtonCollision* const 
 	}
 	return NULL;
 }
+
+const int* NewtonDeformableMeshGetIndexToVertexMap (const NewtonCollision* const deformableMesh) 
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
+	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
+		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)collision->GetChildShape();
+		return deformableShape->GetIndexToVertexMap();
+	}
+	return NULL;
+}
+
 
 
 int NewtonDeformableMeshGetParticleStrideInBytes(const NewtonCollision* const deformableMesh)
