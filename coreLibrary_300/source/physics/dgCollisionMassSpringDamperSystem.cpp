@@ -33,20 +33,6 @@ dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem (dgWorld* c
 {
 	m_rtti |= dgCollisionMassSpringDamperSystem_RTTI;
 
-	//dgInt32 count = mesh->GetVertexCount();
-	//dgVector* const points = dgAlloca(dgVector, count);
-	//for (dgInt32 i = 0; i < count; i++) {
-	//	dgBigVector p(mesh->GetVertex(i));
-	//	points[i] = p;
-	//}
-	//m_indexToVertexCount = count;
-	//m_indexToVertexMap.Resize(count);
-	//dgInt32* const indexToVertexMap = &m_indexToVertexMap[0];
-	//m_particlesCount = dgVertexListToIndexList(&points[0].m_x, sizeof(dgVector), 3 * sizeof(dgFloat32), 0, count, indexToVertexMap, dgFloat32(1.0e-5f));
-	//for (dgInt32 i = 0; i < m_particlesCount; i++) {
-	//	m_posit[i] = points[i];
-	//}
-
 	m_particlesCount = pointCount;
 	m_posit.Resize(m_particlesCount);
 	const dgInt32 stride = strideInBytes / sizeof (dgFloat32);
@@ -54,38 +40,6 @@ dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem (dgWorld* c
 		//m_invMass[i] = dgFloat32(1.0f / pointsMasses[i]);
 		m_posit[i] = dgVector(points[i * stride + 0], points[i * stride + 1], points[i * stride + 2], dgFloat32(0.0f));
 	}
-
-	//dgInt32 edgeCount = 0;
-	//dgSoftLink* const links = dgAlloca(dgSoftLink, mesh->GetCount() / 2);
-	//for (void* edgePtr = mesh->GetFirstEdge(); edgePtr; edgePtr = mesh->GetNextEdge(edgePtr)) {
-	//	const dgEdge* const edge = mesh->GetPolyhedraEdgeFromNode(edgePtr);
-	//	dgInt32 v0 = indexToVertexMap[edge->m_incidentVertex];
-	//	dgInt32 v1 = indexToVertexMap[edge->m_twin->m_incidentVertex];
-	//	links[edgeCount].m_m0 = dgInt16(dgMin(v0, v1));
-	//	links[edgeCount].m_m1 = dgInt16(dgMax(v0, v1));
-	//	edgeCount++;
-	//	if ((edge->m_incidentFace > 0) && (edge->m_twin->m_incidentFace > 0)) {
-	//		v0 = indexToVertexMap[edge->m_prev->m_incidentVertex];
-	//		v1 = indexToVertexMap[edge->m_twin->m_prev->m_incidentVertex];
-	//		links[edgeCount].m_m0 = dgInt16(dgMin(v0, v1));
-	//		links[edgeCount].m_m1 = dgInt16(dgMax(v0, v1));
-	//		edgeCount++;
-	//	}
-	//}
-	//dgSort(links, edgeCount, CompareEdges);
-	//dgInt32 uniqueEdgeCount = 0;
-	//for (dgInt32 i = 1; i < edgeCount; i++) {
-	//	if (CompareEdges(&links[i], &links[uniqueEdgeCount], NULL) > 0) {
-	//		uniqueEdgeCount++;
-	//		links[uniqueEdgeCount] = links[i];
-	//	}
-	//}
-	//uniqueEdgeCount++;
-	//m_linksCount = uniqueEdgeCount;
-	//m_linkList.Resize(m_linksCount);
-	//for (dgInt32 i = 0; i < m_linksCount; i++) {
-	//	m_linkList[i] = links[i];
-	//}
 
 	m_linksCount = linksCount;
 	m_linkList.Resize(linksCount);
@@ -101,8 +55,8 @@ dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem (dgWorld* c
 		m_linkList[i].m_m1 = dgInt16(dgMax(v0, v1));
 		m_linkList[i].m_spring = linksSpring[i];
 		m_linkList[i].m_damper = LinksDamper[i];
-m_linkList[i].m_spring = dgFloat32(1000.0f);
-m_linkList[i].m_damper = dgFloat32(30.0f);
+m_linkList[i].m_spring *= dgFloat32(0.1f);
+m_linkList[i].m_damper *= dgFloat32(0.01f);
 
 		const dgVector& p0 = m_posit[v0];
 		const dgVector& p1 = m_posit[v1];
@@ -143,10 +97,6 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 {
 	// Ks is in [sec^-2] a spring constant unit acceleration, not a spring force acceleration. 
 	// Kc is in [sec^-1] a damper constant unit velocity, not a damper force acceleration. 
-
-	// for now make a share value for all springs. later this is a per material feature.
-	dgFloat32 kSpring = dgFloat32(1000.0f);
-	dgFloat32 kDamper = dgFloat32(30.0f);
 
 	dgInt32 iter = 4;
 	dgVector* const accel = &m_accel[0];
@@ -189,9 +139,9 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
 	}
 
-	dgFloat32 ks_dt = -timestep * kSpring;
-	//	dgFloat32 kd_dt0 = -timestep * kDamper;
-	//	dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
+	//dgFloat32 ks_dt = -timestep * kSpring;
+	//dgFloat32 kd_dt0 = -timestep * kDamper;
+	//dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
 
 	dgVector dtRK4(timestep / iter);
 	dgVector epsilon(dgFloat32(1.0e-14f));
@@ -220,8 +170,8 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			const dgFloat32 den = dgFloat32(1.0f) / length;
 			const dgFloat32 lenghtRatio = links[i].m_restlength * den;
 			const dgFloat32 compression = dgFloat32(1.0f) - lenghtRatio;
-			const dgVector fs(p0p1.Scale4(kSpring * compression));
-			const dgVector fd(p0p1.Scale4(kDamper * den * den * (v0v1.DotProduct4(p0p1)).GetScalar()));
+			const dgVector fs(p0p1.Scale4(links[i].m_spring * compression));
+			const dgVector fd(p0p1.Scale4(links[i].m_damper * den * den * (v0v1.DotProduct4(p0p1)).GetScalar()));
 
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(fs.m_w == dgFloat32(0.0f));
@@ -231,6 +181,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			accel[j0] -= (fs + fd);
 			accel[j1] += (fs + fd);
 
+			dgFloat32 ks_dt = -timestep * links[i].m_spring;
 			spring_A01[i] = ks_dt * compression;
 			spring_B01[i] = ks_dt * lenghtRatio * den * den;
 		}
