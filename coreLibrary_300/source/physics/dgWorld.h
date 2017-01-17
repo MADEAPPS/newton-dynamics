@@ -316,7 +316,7 @@ class dgWorld
 												  dgCollisionCompoundFractured::OnEmitFractureChunkCallBack emitFrafuredChunk, dgCollisionCompoundFractured::OnEmitNewCompundFractureCallBack emitFracturedCompound, dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 
 	dgCollisionInstance* CreateDeformableSolid (dgMeshEffect* const mesh, dgInt32 shapeID);
-	dgCollisionInstance* CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID);
+	dgCollisionInstance* CreateMassSpringDamperSystem (dgMeshEffect* const mesh, dgInt32 shapeID);
 
 	dgCollisionInstance* CreateBVH ();	
 	dgCollisionInstance* CreateStaticUserMesh (const dgVector& boxP0, const dgVector& boxP1, const dgUserMeshCreation& data);
@@ -514,7 +514,7 @@ class dgWorld
 	friend class dgCollisionDeformableSolidMesh;
 	friend class dgBroadPhaseApplyExternalForce;
 	friend class dgParallelSolverCalculateForces;
-	friend class dgCollisionDeformableClothPatch;
+	friend class dgCollisionMassSpringDamperSystem;
 	friend class dgParallelSolverJointAcceleration;
 	friend class dgParallelSolverBuildJacobianRows;
 	friend class dgParallelSolverInitFeedbackUpdate;

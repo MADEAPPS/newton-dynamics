@@ -8191,11 +8191,11 @@ NewtonCollision* NewtonCreateDeformableSolid(const NewtonWorld* const newtonWorl
 	return (NewtonCollision*) world->CreateDeformableSolid ((dgMeshEffect*)mesh, shapeID);
 }
 
-NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
+NewtonCollision* NewtonCreateMassSpringDamperSystem (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return (NewtonCollision*)world->CreateClothPatchMesh ((dgMeshEffect*)mesh, shapeID);
+	return (NewtonCollision*)world->CreateMassSpringDamperSystem ((dgMeshEffect*)mesh, shapeID);
 }
 
 int NewtonDeformableMeshGetParticleCount(const NewtonCollision* const deformableMesh)

@@ -25,13 +25,13 @@
 #include "dgContact.h"
 #include "dgMeshEffect.h"
 #include "dgDynamicBody.h"
-#include "dgCollisionDeformableClothPatch.h"
+#include "dgCollisionMassSpringDamperSystem.h"
 
 
-dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const world, dgMeshEffect* const mesh)
+dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem(dgWorld* const world, dgMeshEffect* const mesh)
 	:dgCollisionDeformableMesh(world, m_deformableSolidMesh)
 {
-	m_rtti |= dgCollisionDeformableClothPatch_RTTI;
+	m_rtti |= dgCollisionMassSpringDamperSystem_RTTI;
 	
 	dgInt32 count = mesh->GetVertexCount();
 	dgVector* const points = dgAlloca(dgVector, count);
@@ -87,22 +87,22 @@ dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const 
 }
 
 
-dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(const dgCollisionDeformableClothPatch& source)
+dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem(const dgCollisionMassSpringDamperSystem& source)
 	:dgCollisionDeformableMesh(source)
 {
 	m_rtti |= source.m_rtti;
 }
 
-dgCollisionDeformableClothPatch::dgCollisionDeformableClothPatch(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
 	:dgCollisionDeformableMesh(world, deserialization, userData, revisionNumber)
 {
 }
 
-dgCollisionDeformableClothPatch::~dgCollisionDeformableClothPatch(void)
+dgCollisionMassSpringDamperSystem::~dgCollisionMassSpringDamperSystem(void)
 {
 }
 
-dgInt32 dgCollisionDeformableClothPatch::GetMemoryBufferSizeInBytes() const
+dgInt32 dgCollisionMassSpringDamperSystem::GetMemoryBufferSizeInBytes() const
 {
 	dgInt32 sizeInByte = 0;
 	sizeInByte += 2 * m_particlesCount * sizeof (dgVector);
@@ -111,7 +111,7 @@ dgInt32 dgCollisionDeformableClothPatch::GetMemoryBufferSizeInBytes() const
 }
 
 
-void dgCollisionDeformableClothPatch::CalculateAcceleration(dgFloat32 timestep)
+void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep)
 {
 	// Ks is in [sec^-2] a spring constant unit acceleration, not a spring force acceleration. 
 	// Kc is in [sec^-1] a damper constant unit velocity, not a damper force acceleration. 

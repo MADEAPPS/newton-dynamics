@@ -220,7 +220,7 @@ class dgCollision
 		dgCollisionLumpedMass_RTTI					= 1<<13,
 		dgCollisionDeformableMesh_RTTI				= 1<<14,
 		dgCollisionDeformableSolidMesh_RTTI			= 1<<15,
-		dgCollisionDeformableClothPatch_RTTI		= 1<<16,
+		dgCollisionMassSpringDamperSystem_RTTI		= 1<<16,
 		dgCollisionIncompressibleParticles_RTTI		= 1<<17,
 		dgCollisionUserMesh_RTTI					= 1<<18,
 		dgCollisionHeightField_RTTI					= 1<<19,

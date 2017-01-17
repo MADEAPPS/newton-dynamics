@@ -29,14 +29,14 @@
 #include "dgCollisionDeformableMesh.h"
 
 
-class dgCollisionDeformableClothPatch: public dgCollisionDeformableMesh
+class dgCollisionMassSpringDamperSystem: public dgCollisionDeformableMesh
 {
 	public:
-	dgCollisionDeformableClothPatch (const dgCollisionDeformableClothPatch& source);
-	dgCollisionDeformableClothPatch (dgWorld* const world, dgMeshEffect* const mesh);
-	dgCollisionDeformableClothPatch (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
+	dgCollisionMassSpringDamperSystem (const dgCollisionMassSpringDamperSystem& source);
+	dgCollisionMassSpringDamperSystem (dgWorld* const world, dgMeshEffect* const mesh);
+	dgCollisionMassSpringDamperSystem (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 
-	virtual ~dgCollisionDeformableClothPatch(void);
+	virtual ~dgCollisionMassSpringDamperSystem(void);
 	virtual void CalculateAcceleration(dgFloat32 timestep);
 
 	dgInt32 GetMemoryBufferSizeInBytes() const;

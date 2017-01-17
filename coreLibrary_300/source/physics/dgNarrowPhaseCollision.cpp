@@ -47,7 +47,7 @@
 #include "dgCollisionChamferCylinder.h"
 #include "dgCollisionCompoundFractured.h"
 #include "dgCollisionDeformableSolidMesh.h"
-#include "dgCollisionDeformableClothPatch.h"
+#include "dgCollisionMassSpringDamperSystem.h"
 #include "dgCollisionIncompressibleParticles.h"
 
 
@@ -269,10 +269,10 @@ dgCollisionInstance* dgWorld::CreateFracturedCompound (dgMeshEffect* const solid
 }
 
 
-dgCollisionInstance* dgWorld::CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID)
+dgCollisionInstance* dgWorld::CreateMassSpringDamperSystem (dgMeshEffect* const mesh, dgInt32 shapeID)
 {
 	dgAssert(m_allocator == mesh->GetAllocator());
-	dgCollision* const collision = new (m_allocator)dgCollisionDeformableClothPatch(this, mesh);
+	dgCollision* const collision = new (m_allocator)dgCollisionMassSpringDamperSystem(this, mesh);
 	dgCollisionInstance* const instance = CreateInstance(collision, shapeID, dgGetIdentityMatrix());
 	collision->Release();
 	return instance;

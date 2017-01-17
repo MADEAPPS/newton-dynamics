@@ -625,7 +625,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		NewtonWorld* const world = scene->GetNewton();
 		
 		NewtonMesh* const clothPatch = CreateFlatClothPatch(scene, size_x, size_z);
-		NewtonCollision* const deformableCollision = NewtonCreateClothPatch(world, clothPatch, 0);
+		NewtonCollision* const deformableCollision = NewtonCreateMassSpringDamperSystem(world, clothPatch, 0);
 		
 		dFloat mass = 8.0f;
 		m_body = CreateRigidBody(scene, mass, deformableCollision);
