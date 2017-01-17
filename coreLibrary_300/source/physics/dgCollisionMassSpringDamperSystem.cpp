@@ -55,8 +55,6 @@ dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem (dgWorld* c
 		m_linkList[i].m_m1 = dgInt16(dgMax(v0, v1));
 		m_linkList[i].m_spring = linksSpring[i];
 		m_linkList[i].m_damper = LinksDamper[i];
-m_linkList[i].m_spring *= dgFloat32(0.1f);
-m_linkList[i].m_damper *= dgFloat32(0.01f);
 
 		const dgVector& p0 = m_posit[v0];
 		const dgVector& p1 = m_posit[v1];
@@ -181,7 +179,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			accel[j0] -= (fs + fd);
 			accel[j1] += (fs + fd);
 
-			dgFloat32 ks_dt = -timestep * links[i].m_spring;
+			dgFloat32 ks_dt = -dtRK4.GetScalar() * links[i].m_spring;
 			spring_A01[i] = ks_dt * compression;
 			spring_B01[i] = ks_dt * lenghtRatio * den * den;
 		}

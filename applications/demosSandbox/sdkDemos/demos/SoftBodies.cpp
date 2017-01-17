@@ -658,8 +658,8 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		const int maxLinkCount = size_x * size_z * 16;
 
 		// create the structual constation array;
-		dFloat structuralDamper = 1000.0f;
-		dFloat structuralSpring = 100000.0f;
+		dFloat structuralSpring = dAbs(mass * DEMO_GRAVITY) / 0.01f;
+		dFloat structuralDamper = 30.0f;
 
 		int* const links = new int[2 * maxLinkCount];
 		dFloat* const spring = new dFloat[maxLinkCount];
@@ -678,8 +678,8 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 		
 
 		// add shear constraints
-		dFloat shearDamper = 1000.0f;
-		dFloat shearSpring = 100000.0f;
+		dFloat shearSpring = structuralSpring;
+		dFloat shearDamper = structuralDamper;
 		for (void* faceNode = NewtonMeshGetFirstFace (clothPatch); faceNode; faceNode = NewtonMeshGetNextFace (clothPatch, faceNode)) {
 			if (!NewtonMeshIsFaceOpen(clothPatch, faceNode)) {
 				int face[8];
