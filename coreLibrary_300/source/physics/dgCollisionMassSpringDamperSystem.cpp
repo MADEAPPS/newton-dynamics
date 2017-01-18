@@ -35,9 +35,14 @@ dgCollisionMassSpringDamperSystem::dgCollisionMassSpringDamperSystem (dgWorld* c
 
 	m_particlesCount = pointCount;
 	m_posit.Resize(m_particlesCount);
+	m_mass.Resize(m_particlesCount);
+	m_invMass.Resize(m_particlesCount);
 	const dgInt32 stride = strideInBytes / sizeof (dgFloat32);
+	m_totalMass = dgFloat32(0.0f);	
 	for (dgInt32 i = 0; i < pointCount; i++) {
-		//m_invMass[i] = dgFloat32(1.0f / pointsMasses[i]);
+		m_totalMass += m_totalMass;
+		m_mass[i] = pointsMasses[i];
+		m_invMass[i] = dgFloat32(1.0f / pointsMasses[i]);
 		m_posit[i] = dgVector(points[i * stride + 0], points[i * stride + 1], points[i * stride + 2], dgFloat32(0.0f));
 	}
 

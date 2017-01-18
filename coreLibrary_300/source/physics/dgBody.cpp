@@ -175,7 +175,7 @@ void dgBody::UpdateLumpedMatrix()
 	if (m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 		dgAssert(IsRTTIType(dgBody::m_dynamicBodyRTTI));
 		dgCollisionLumpedMassParticles* const lumpedMass = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
-		lumpedMass->SetOwnerAndUnitMass((dgDynamicBody*) this); 
+		lumpedMass->SetOwnerAndMassPraperties((dgDynamicBody*) this); 
 	}
 }
 
