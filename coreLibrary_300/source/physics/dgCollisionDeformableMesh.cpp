@@ -150,7 +150,7 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 	// rigid body dynamic state
 	dgVector timeV (timestep);
 
-	
+#if 1	
 	dgVector xMassSum(dgFloat32(0.0f));
 	dgVector xyMassSum(dgFloat32(0.0f));
 	dgVector xxMassSum2(dgFloat32(0.0f));
@@ -206,6 +206,47 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		posit[i] -= com;
 	}
+#else
+
+	dgVector comVeloc(dgFloat32(0.0f));
+	dgVector xMassSum(dgFloat32(0.0f));
+	dgVector xxMassSum(dgFloat32(0.0f));
+	dgVector origin(m_body->m_localCentreOfMass + matrix.m_posit);
+
+	dgVector* const posit = &m_posit[0];
+	dgVector* const veloc = &m_veloc[0];
+	const dgFloat32* const mass = &m_mass[0];
+
+	dgFloat32 inertiaSum = dgFloat32(0.0f);
+	dgVector invTimestep(dgFloat32(1.0f) / timestep);
+	dgFloat32 radius2 = m_particleRadius * m_particleRadius * dgFloat32(2.0f / 5.0f);
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		comVeloc += veloc[i].Scale4(mass[i]);
+		xMassSum += posit[i].Scale4(mass[i]);
+		inertiaSum += mass[i] * radius2;
+		xxMassSum += posit[i].CompProduct4(posit[i].Scale4(mass[i]));
+	}
+
+	dgVector invMass(dgFloat32(1.0f / m_totalMass));
+	dgVector inertia(xxMassSum.CompProduct4(invMass) - m_body->m_localCentreOfMass);
+	inertia += dgVector(inertiaSum);
+
+	dgMatrix inertiaMatrix(dgGetIdentityMatrix());
+	inertiaMatrix[0][0] = inertia[0];
+	inertiaMatrix[1][1] = inertia[1];
+	inertiaMatrix[2][2] = inertia[2];
+
+	comVeloc = comVeloc.CompProduct4(invMass);
+	m_body->m_accel = invTimestep.CompProduct4(comVeloc - m_body->m_veloc);
+	m_body->m_veloc = comVeloc;
+	m_body->m_invWorldInertiaMatrix = inertiaMatrix.Symetric3by3Inverse();
+
+	dgVector com(xMassSum.CompProduct4(invMass));
+	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		posit[i] -= com;
+	}
+#endif
+
 }
 
 

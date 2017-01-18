@@ -31,7 +31,7 @@ class SimpleSoftBodyEntity: public DemoEntity
 			,m_body(body)
 		{
 			ResetOptimization();
-			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
+			//NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
 
 			int pointCount = NewtonMeshGetPointCount(clothPatchMesh);
 			const int* const indexMap = NewtonMeshGetIndexToVertexMap(clothPatchMesh);
@@ -127,9 +127,10 @@ class SimpleSoftBodyEntity: public DemoEntity
 			,m_body (body)
 		{
 			ResetOptimization();
-			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
+			
 dAssert (0);
 /*
+			NewtonCollision* const deformableCollision = NewtonBodyGetCollision(m_body);
 			int pointCount = NewtonMeshGetPointCount(tetrahedraMesh);
 			const int* const indexMap = NewtonMeshGetIndexToVertexMap(tetrahedraMesh);
 			const int* const solidIndexList = NewtonDeformableMeshGetIndexToVertexMap(deformableCollision);
