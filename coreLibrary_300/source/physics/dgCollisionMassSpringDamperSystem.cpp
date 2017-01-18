@@ -139,7 +139,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 	// here I need to add all other external acceleration like wind and pressure, friction and collision.
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		m_externalAccel[i] = unitAccel;
-		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
+//		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
 	}
 
 	//dgFloat32 ks_dt = -timestep * kSpring;

@@ -127,36 +127,35 @@ void dgCollisionLumpedMassParticles::SetOwnerAndMassPraperties (dgDynamicBody* c
 	const dgFloat32* const mass = &m_mass[0];
 	
 	dgVector xMassSum(dgFloat32(0.0f));
-	dgVector xyMassSum(dgFloat32(0.0f));
-	dgVector xxMassSum(dgFloat32(0.0f));
+//	dgVector xyMassSum(dgFloat32(0.0f));
+//	dgVector xxMassSum(dgFloat32(0.0f));
 	dgFloat32 massSum = dgFloat32 (0.0f);
-	dgFloat32 inertiaSum = dgFloat32 (0.0f);
-
-	dgFloat32 radius2 = m_particleRadius * m_particleRadius * dgFloat32 (2.0f / 5.0f);
+//	dgFloat32 inertiaSum = dgFloat32 (0.0f);
+//	dgFloat32 radius2 = m_particleRadius * m_particleRadius * dgFloat32 (2.0f / 5.0f);
 	dgMatrix scaledTranform (body->m_collision->GetScaledTransform(matrix));
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		massSum += mass[i];
-		inertiaSum += mass[i] * radius2;
+		//inertiaSum += mass[i] * radius2;
 		posit[i] = scaledTranform.TransformVector(posit[i]) & dgVector::m_triplexMask;
 		xMassSum += posit[i].Scale4 (mass[i]);
-		xxMassSum += posit[i].CompProduct4(posit[i]).Scale4 (mass[i]);
-		xyMassSum += posit[i].CompProduct4(posit[i].ShiftTripleRight()).Scale4 (mass[i]);
+		//xxMassSum += posit[i].CompProduct4(posit[i]).Scale4 (mass[i]);
+		//xyMassSum += posit[i].CompProduct4(posit[i].ShiftTripleRight()).Scale4 (mass[i]);
 	}
-	m_totalMass = massSum ;
+	m_totalMass = massSum;
 	dgFloat32 invMass = dgFloat32(1.0f) / massSum;
 
 	body->m_collision->SetScale(dgVector (dgFloat32 (1.0f)));
 	body->m_collision->SetLocalMatrix (dgGetIdentityMatrix());
 	matrix.m_posit = position;
 	body->m_matrix = matrix;
-	
 	body->m_localCentreOfMass = xMassSum.CompProduct4(invMass);
-	dgVector inertia (xxMassSum.Scale4(invMass) - body->m_localCentreOfMass); 
-	inertia += dgVector (inertiaSum);
-	inertia.m_w = massSum;
 
-	body->m_mass = inertia; 
-	body->m_invMass = dgVector(dgFloat32 (1.0f) / inertia[0], dgFloat32 (1.0f) / inertia[1], dgFloat32 (1.0f) / inertia[2], invMass);
+	//dgVector inertia (xxMassSum.Scale4(invMass) - body->m_localCentreOfMass); 
+	//inertia += dgVector (inertiaSum);
+	//inertia.m_w = massSum;
+	//body->m_mass = inertia; 
+	body->m_mass = dgVector(dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f), m_totalMass);
+	body->m_invMass = dgVector(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), invMass);
 
 //	dgVector yySum(xxSum.ShiftTripleRight());
 //	dgVector com(xxSum.CompProduct4(den) + origin);
