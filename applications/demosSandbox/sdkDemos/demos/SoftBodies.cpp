@@ -705,6 +705,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 			}
 		}
 
+linksCount = 0;
 		NewtonCollision* const deformableCollision = NewtonCreateMassSpringDamperSystem(world, 0, 
 													 &points[0].m_x, vertexCount, sizeof (dVector), clothMass,
 													 links, linksCount, spring, damper);
