@@ -28,8 +28,9 @@
 #include "dgCollisionLumpedMassParticles.h"
 
 
-#define DG_MINIMIM_PARTCLE_RADIUS			dgFloat32 (1.0f/16.0f)
-#define DG_MINIMIM_ZERO_SURFACE				(DG_MINIMIM_PARTCLE_RADIUS * dgFloat32 (0.25f))
+#define DG_MINIMIM_ZERO_SPEED			dgFloat32 (1.0e-3f)
+#define DG_MINIMIM_PARTCLE_RADIUS		dgFloat32 (1.0f/16.0f)
+#define DG_MINIMIM_ZERO_SURFACE			(DG_MINIMIM_PARTCLE_RADIUS * dgFloat32 (0.25f))
 
 
 dgCollisionLumpedMassParticles::dgCollisionLumpedMassParticles(dgWorld* const world, dgCollisionID collisionID)
@@ -281,7 +282,7 @@ dgVector dgCollisionLumpedMassParticles::CalculateContactNormalAndPenetration(co
 	return contactNormal;
 }
 
-void dgCollisionLumpedMassParticles::HandleCollision(dgFloat32 timestep, dgVector* const normalDir, dgVector* const normalAccel, dgFloat32* const frictionCoefficient) const
+void dgCollisionLumpedMassParticles::HandleCollision(dgFloat32 timestep, dgVector* const normalDir, dgVector* const normalAccel, dgFloat32* const frictionCoefficient)
 {
 	const dgMatrix& matrix = m_body->GetCollision()->GetGlobalMatrix();
 	dgVector origin(matrix.m_posit);
@@ -290,12 +291,15 @@ void dgCollisionLumpedMassParticles::HandleCollision(dgFloat32 timestep, dgVecto
 	dgFloat32 coeficientOfPenetration = dgFloat32(0.1f);
 
 	dgVector timestepV(timestep);
-	dgVector invTimeStep(dgFloat32(1.0f / timestep));
-	invTimeStep = invTimeStep & dgVector::m_triplexMask;
+	dgFloat32 invTimeStep = dgFloat32 (1.0f) / timestep;
+	dgVector* const veloc = &m_veloc[0];
 	const dgVector* const accel = &m_accel[0];
-	const dgVector* const veloc = &m_veloc[0];
 	const dgVector* const posit = &m_posit[0];
-	const dgVector* const externAccel = &m_externalAccel[0];
+	const dgVector* const extAccel = &m_externalAccel[0];
+
+static int xxx;
+xxx ++;
+//dgTrace (("%d %f %f\n", xxx, externAccel[0].m_y, veloc[0].m_y));
 
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
 		dgVector normal(dgVector::m_zero);
@@ -308,20 +312,21 @@ void dgCollisionLumpedMassParticles::HandleCollision(dgFloat32 timestep, dgVecto
 
 		dgFloat32 frictionCoef = dgFloat32(0.0f);
 		if (contactNormal.m_w > dgFloat32 (0.0f)) {
-			dgVector projectedVelocity(veloc[i] + (accel[i] + externAccel[i]).CompProduct4(timestepV));
+			dgVector projectedVelocity(veloc[i] + (accel[i] + extAccel[i]).CompProduct4(timestepV));
 			dgFloat32 projectedNormalSpeed = contactNormal.DotProduct3(projectedVelocity);
-			if (projectedNormalSpeed < dgFloat32(0.0f)) {
+			if (projectedNormalSpeed < DG_MINIMIM_ZERO_SPEED) {
 				if (contactNormal.m_w > DG_MINIMIM_ZERO_SURFACE) {
 					normal = contactNormal & dgVector::m_triplexMask;
-					dgFloat32 penetration = dgClamp(contactNormal.m_w - DG_MINIMIM_ZERO_SURFACE, dgFloat32(0.0f), dgFloat32(0.25f));
-					dgVector penetrationSpeed(invTimeStep.Scale4(coeficientOfPenetration * penetration));
-
-					dgVector normalSpeed(normal.DotProduct4(veloc[i].CompProduct4(dgVector::m_negOne)));
-					dgVector restoringSpeed(normalSpeed.GetMax(penetrationSpeed));
-
-					dgVector normalVelocity(normal.CompProduct4(restoringSpeed));
-					
-					accel1 = invTimeStep.CompProduct4(normalVelocity);
+					dgFloat32 penetration = dgClamp(contactNormal.m_w - DG_MINIMIM_ZERO_SURFACE, dgFloat32(0.0f), dgFloat32(0.125f));
+					dgFloat32 s = dgFloat32 (2.0f) * invTimeStep * penetration;
+					dgFloat32 a = -s * invTimeStep;
+					veloc[i] += normal.Scale4 (s - veloc[i].DotProduct4(normal).GetScalar());
+					//dgVector penetrationSpeed(invTimeStep.Scale4(coeficientOfPenetration * penetration));
+					//dgVector normalSpeed(normal.DotProduct4(veloc[i].CompProduct4(dgVector::m_negOne)));
+					//dgVector restoringSpeed(normalSpeed.GetMax(penetrationSpeed));
+					//dgVector normalVelocity(normal.CompProduct4(restoringSpeed));
+					//accel1 = invTimeStep.CompProduct4(normalVelocity);
+					accel1 = normal.Scale4(a);
 					frictionCoef = coeficientOfFriction;
 				}
 			}

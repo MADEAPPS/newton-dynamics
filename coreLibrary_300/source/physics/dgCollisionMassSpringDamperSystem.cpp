@@ -105,7 +105,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 	dgVector* const accel = &m_accel[0];
 	dgVector* const veloc = &m_veloc[0];
 	dgVector* const posit = &m_posit[0];
-	//const dgFloat32* const restLenght = &m_restlength[0];
+	dgVector* const extAccel = &m_externalAccel[0];
 	const dgSpringDamperLink* const links = &m_linkList[0];
 
 	dgVector* const dx = dgAlloca(dgVector, m_linksCount);
@@ -138,8 +138,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 
 	// here I need to add all other external acceleration like wind and pressure, friction and collision.
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
-		m_externalAccel[i] = unitAccel;
-//		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
+		extAccel[i] = unitAccel;
 	}
 
 	//dgFloat32 ks_dt = -timestep * kSpring;
@@ -154,7 +153,8 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 	for (dgInt32 k = 0; k < iter; k++) {
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			accel[i] = m_externalAccel[i];
+//			accel[i] = m_externalAccel[i];
+			accel[i] = dgVector::m_zero; 
 		}
 
 		for (dgInt32 i = 0; i < m_linksCount; i++) {
@@ -208,16 +208,18 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			//dgVector dirAccel2 (collisionDir2[i].CompProduct4(accel[i].DotProduct4(collisionDir2[i])));
 			//tmp0[i] = accel[i] + collidingAccel[i] - dirAccel0 - dirAccel1 - dirAccel2;
 			
+			dgVector netAccel (accel[i] + extAccel[i]);
 			dgVector tangentDir(veloc[i] - normalDir[i].CompProduct4(normalDir[i].DotProduct4(veloc[i])));
 			dgVector mag(tangentDir.DotProduct4(tangentDir) + epsilon);
 			
-			dgFloat32 tangentFrictionAccel = dgAbsf(accel[i].DotProduct4(normalDir[i]).GetScalar());
+			dgFloat32 tangentFrictionAccel = dgAbsf(netAccel.DotProduct4(normalDir[i]).GetScalar());
 			dgVector friction(tangentDir.Scale4(frictionCoeffecient[i] * tangentFrictionAccel / dgSqrt(mag.GetScalar())));
 
 			//dgVector particleAccel (accel[i] + normalAccel[i] - normalDirAccel);
-			dgVector normalDirAccel(normalDir[i].CompProduct4(accel[i].DotProduct4(normalDir[i])));
-			accel[i] = accel[i] + normalAccel[i] - normalDirAccel - friction;
-			veloc[i] += accel[i].CompProduct4(dtRK4);
+			dgVector normalDirAccel(normalDir[i].CompProduct4(netAccel.DotProduct4(normalDir[i])));
+			//accel[i] = accel[i] + normalAccel[i] - normalDirAccel - friction;
+			netAccel = netAccel + normalAccel[i] - normalDirAccel - friction;
+			veloc[i] += netAccel.CompProduct4(dtRK4);
 			posit[i] += veloc[i].CompProduct4(dtRK4);
 		}
 	}

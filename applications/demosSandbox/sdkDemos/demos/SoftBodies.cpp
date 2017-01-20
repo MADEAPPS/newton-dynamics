@@ -705,7 +705,7 @@ points[index] -= dVector(width * 0.5f, height * 0.5f, depth * 0.5f, 0.0f);
 			}
 		}
 
-linksCount = 0;
+//linksCount = 0;
 		NewtonCollision* const deformableCollision = NewtonCreateMassSpringDamperSystem(world, 0, 
 													 &points[0].m_x, vertexCount, sizeof (dVector), clothMass,
 													 links, linksCount, spring, damper);
@@ -767,7 +767,7 @@ void ClothPatch(DemoEntityManager* const scene)
 
 	SimpleSoftBodyEntity* const entity = new SimpleSoftBodyEntity(scene, location);
 	//entity->BuildClothPatch(scene, 50, 50);
-	entity->BuildClothPatch(scene, 1, 1);
+	entity->BuildClothPatch(scene, 16, 16);
 
 	dQuaternion rot;
 	dVector origin(location.m_x - 10.0f, 2.0f, location.m_z, 0.0f);
