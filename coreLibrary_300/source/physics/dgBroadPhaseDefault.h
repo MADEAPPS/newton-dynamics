@@ -46,6 +46,8 @@ class dgBroadPhaseDefault: public dgBroadPhase
 	virtual void LinkAggregate (dgBroadPhaseAggregate* const aggregate); 
 	virtual void UnlinkAggregate (dgBroadPhaseAggregate* const aggregate); 
 	virtual void CheckStaticDynamic(dgBody* const body, dgFloat32 mass) {}
+	virtual void FindCollidingPairsForward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
+	virtual void FindCollidingPairsForwardAndBackward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
 
 	void RayCast (const dgVector& p0, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const;
 	dgInt32 Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const;
@@ -56,9 +58,7 @@ class dgBroadPhaseDefault: public dgBroadPhase
 	void AddNode(dgBroadPhaseNode* const node);	
 	void RemoveNode(dgBroadPhaseNode* const node);	
 
-//	static void UpdateSoftBodyForcesKernel (void* const descriptor, void* const worldContext, dgInt32 threadID);
 	void ApplyDeformableForceAndtorque (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
-//	void UpdateSoftBodyForcesKernel (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	
 	dgFloat64 m_treeEntropy;
 	dgFitnessList m_fitness;

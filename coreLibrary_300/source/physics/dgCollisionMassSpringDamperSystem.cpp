@@ -90,12 +90,12 @@ dgCollisionMassSpringDamperSystem::~dgCollisionMassSpringDamperSystem(void)
 dgInt32 dgCollisionMassSpringDamperSystem::GetMemoryBufferSizeInBytes() const
 {
 	dgInt32 sizeInByte = 0;
-	sizeInByte += 2 * m_particlesCount * sizeof (dgVector);
+	sizeInByte += 3 * m_particlesCount * sizeof (dgVector);
 	sizeInByte += 1 * m_particlesCount * sizeof (dgFloat32);
 	return sizeInByte;
 }
 
-
+#if 0
 void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep)
 {
 	// Ks is in [sec^-2] a spring constant unit acceleration, not a spring force acceleration. 
@@ -153,7 +153,6 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 	for (dgInt32 k = 0; k < iter; k++) {
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-//			accel[i] = m_externalAccel[i];
 			accel[i] = dgVector::m_zero; 
 		}
 
@@ -226,7 +225,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 }
 
 
-#if 0
+#else
 void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep)
 {
 	// Ks is in [sec^-2] a spring constant unit acceleration, not a spring force acceleration. 
@@ -266,12 +265,8 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 
 	dgVector* const normalAccel = (dgVector*)&world->m_solverJacobiansMemory[0];
 	dgVector* const normalDir = &normalAccel[m_particlesCount];
-	dgFloat32* const frictionCoeffecient = (dgFloat32*)&normalDir[m_particlesCount];
-
-	m_body->m_alpha = dgVector::m_zero;
-	m_body->m_omega = dgVector::m_zero;
-	m_body->m_externalForce = dgVector::m_zero;
-	m_body->m_externalTorque = dgVector::m_zero;
+	dgVector* const diagonal = &normalDir[m_particlesCount];
+	dgFloat32* const frictionCoeffecient = (dgFloat32*)&diagonal[m_particlesCount];
 
 	dgVector unitAccel(m_body->m_externalForce.CompProduct4(m_body->m_invMass.m_w));
 
@@ -280,64 +275,53 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 		extAccel[i] = unitAccel;
 	}
 
+	m_body->m_alpha = dgVector::m_zero;
+	m_body->m_omega = dgVector::m_zero;
+	m_body->m_externalForce = dgVector::m_zero;
+	m_body->m_externalTorque = dgVector::m_zero;
+
 	//dgFloat32 ks_dt = -timestep * kSpring;
 	//dgFloat32 kd_dt0 = -timestep * kDamper;
 	//dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
 
-	dgVector dtRK4(timestep / iter);
+	dgFloat32 dtRK4 = timestep / iter;
 	dgVector epsilon(dgFloat32(1.0e-14f));
 
-	dtRK4 = dtRK4 & dgVector::m_triplexMask;
+//	dtRK4 = dtRK4 & dgVector::m_triplexMask;
 	HandleCollision(timestep, normalDir, normalAccel, frictionCoeffecient);
 	for (dgInt32 k = 0; k < iter; k++) {
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
 			accel[i] = dgVector::m_zero; 
+			diagonal[i] = dgVector::m_zero; 
 		}
 /*
 		for (dgInt32 i = 0; i < m_linksCount; i++) {
 			const dgInt32 j0 = links[i].m_m0;
 			const dgInt32 j1 = links[i].m_m1;
-			dv[i] = veloc[j0] - veloc[j1];
-			dx[i] = posit[j0] - posit[j1];
 
-			const dgVector p0p1(dx[i]);
-			const dgVector v0v1(dv[i]);
-			const dgVector length2(p0p1.DotProduct4(p0p1));
-			const dgVector mask(length2 > m_smallestLenght2);
+			const dgVector p0p1(posit[j0] - posit[j1]);
+			const dgVector v0v1(veloc[j0] - veloc[j1]);
+			const dgVector dpdv(p0p1.CompProduct4(v0v1));
 
-			const dgVector lenght2((length2 & mask) | length2.AndNot(mask));
+			const dgVector mag2(p0p1.DotProduct4(p0p1));
+			const dgVector mask(mag2 > m_smallestLenght2);
+
+			const dgVector lenght2((mag2 & mask) | mag2.AndNot(mask));
 			const dgFloat32 length = (lenght2.Sqrt()).GetScalar();
-			const dgFloat32 den = dgFloat32(1.0f) / length;
-			const dgFloat32 lenghtRatio = links[i].m_restlength * den;
+			const dgFloat32 invDen = dgFloat32(1.0f) / length;
+			const dgFloat32 lenghtRatio = restLenght[i] * invDen;
 			const dgFloat32 compression = dgFloat32(1.0f) - lenghtRatio;
-			const dgVector fs(p0p1.Scale4(links[i].m_spring * compression));
-			const dgVector fd(p0p1.Scale4(links[i].m_damper * den * den * (v0v1.DotProduct4(p0p1)).GetScalar()));
-
+			const dgVector fs(p0p1.Scale4(kSpring * compression));
+			const dgVector fd(p0p1.Scale4(kDamper * invDen * invDen * (v0v1.DotProduct4(p0p1)).GetScalar()));
+			const dgVector dfsdx(v0v1.Scale4 (ks_dt * compression) + (p0p1.CompProduct4(dpdv).Scale4 (ks_dt * lenghtRatio * invDen * invDen)));
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(fs.m_w == dgFloat32(0.0f));
 			dgAssert(p0p1.m_w == dgFloat32(0.0f));
+			dgAssert(dfsdx.m_w == dgFloat32(0.0f));
 
-			dpdv[i] = p0p1.CompProduct4(v0v1);
-			accel[j0] -= (fs + fd);
-			accel[j1] += (fs + fd);
-
-			dgFloat32 ks_dt = -dtRK4.GetScalar() * links[i].m_spring;
-			spring_A01[i] = ks_dt * compression;
-			spring_B01[i] = ks_dt * lenghtRatio * den * den;
-		}
-
-		for (dgInt32 i = 0; i < m_linksCount; i++) {
-			const dgVector dv0(dv[i]);
-			const dgVector A01(spring_A01[i]);
-			const dgVector B01(spring_B01[i]);
-			const dgVector dfdx(A01.CompProduct4(dv0) + B01.CompProduct4(dx[i].CompProduct4(dpdv[i])));
-
-			const dgInt32 j0 = links[i].m_m0;
-			const dgInt32 j1 = links[i].m_m1;
-
-			dgAssert(dfdx.m_w == dgFloat32(0.0f));
-			accel[j0] += dfdx;
-			accel[j1] -= dfdx;
+			const dgVector nextAccel(fs + fd - dfsdx);
+			accel[j0] -= nextAccel;
+			accel[j1] += nextAccel;
 		}
 */
 
@@ -354,10 +338,19 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 
 			const dgFloat32 p0p1Length = p0p1Lenght2.Sqrt().GetScalar();
 			const dgFloat32 p0p1InvMag = dgFloat32 (1.0f) / p0p1Length;
-			const dgFloat32 k01 = links[i].m_spring * (p0p1Length - links[i].m_restlength) * p0p1InvMag;
-			const dgFloat32 d01 = links[i].m_damper * dvdp.GetScalar() * p0p1InvMag * p0p1InvMag;
-			const dgVector netForce (p0p1.Scale4(k01 + d01));
 
+			const dgFloat32 k01 = -links[i].m_spring * (p0p1Length - links[i].m_restlength) * p0p1InvMag;
+			const dgFloat32 d01 = -links[i].m_damper * dvdp.GetScalar() * p0p1InvMag * p0p1InvMag;
+			const dgFloat32 h01dt = - dtRK4 * links[i].m_spring * links[i].m_restlength * p0p1InvMag * p0p1InvMag * p0p1InvMag;
+
+			const dgVector diag ((p0p1.CompProduct4(p0p1)).Scale4(h01dt * dtRK4));
+
+			const dgFloat32 dtdfp0dx0 = h01dt * v0v1.DotProduct4(p0p1).GetScalar();
+			const dgVector netForce (p0p1.Scale4(k01 + d01 + dtdfp0dx0));
+			
+
+			diagonal[j0] -= diag;
+			diagonal[j1] -= diag;
 			accel[j0] += netForce;
 			accel[j1] -= netForce;
 		}
@@ -386,3 +379,4 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 	}
 }
 
+#endif

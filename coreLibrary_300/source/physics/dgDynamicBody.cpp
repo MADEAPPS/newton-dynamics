@@ -240,6 +240,60 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			m_veloc += accel.CompProduct4(timeStepVect);
 			dgVector correction(alpha.CrossProduct3(m_omega));
 			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
+
+/*
+			// experimenting with enforcing w x w * I dt = 0;		
+						
+			// delta omega due to angular external Torque
+			dgVector torqueOmega (alpha.CompProduct4(timeStepVect));
+
+			// from conservation of momentum we have that the angular momentum after a time step must be 
+			// equal to the angular momentum before the time step
+			// w1 * I = w0 * I + w0 x (w0 * I) * dt 
+			// let w1 = w0 + dw
+			// this means that  after a time step we need to enforce the condition
+			// f(w0) = w0 I + w0 x (w0 * I) * dt = 0
+
+			// this is a quadratic function of w0 which we can expanded using Taylor and set all higher order derivatives to zero 
+			// f(w0 + dw) = f(w0) + (f'(w0) / dw) * dw + O(dw^3) = 0;
+			// f(w0) + f'(w0) / dw * dw = 0
+			// let J = f'(w0) / dw;
+			// f(w0) + J dw = 0
+			// them when have the system
+			// J dw = -f(w0) = -w0 x (w0 * I) * dt
+			// using Mathematica the Jacobian matrix is 
+			//{{Ixx                , dt (-Iyy wz+Izz wz),  dt (-Iyy wy+Izz wy)},
+			// {dt ( Ixx wz-Izz wz),                 Iyy,  dt ( Ixx wx-Izz wx)},
+			// {dt (-Ixx wy+Iyy wy), dt (-Ixx wx+Iyy wx),  Izz                }}
+
+			// get local omega
+			dgVector localOmega (m_matrix.UnrotateVector(m_omega));
+			//dgVector localOmegaInertia (localOmega.CompProduct4(m_mass).CompProduct4(timeStepVect));
+
+			// get the gradient f'(w0) / dw
+			dgFloat32 J[3][3];
+			J[0][0] = m_mass[0];
+			J[0][1] = localOmega[2] * (m_mass[2] - m_mass[1]) * timestep;
+			J[0][2] = localOmega[1] * (m_mass[2] - m_mass[1]) * timestep;
+
+			J[1][0] = localOmega[2] * (m_mass[0] - m_mass[2]) * timestep;
+			J[1][1] = m_mass[1];
+			J[1][2] = localOmega[0] * (m_mass[0] - m_mass[2]) * timestep;
+
+			J[2][0] = localOmega[1] * (m_mass[1] - m_mass[0]) * timestep;
+			J[2][1] = localOmega[0] * (m_mass[1] - m_mass[0]) * timestep;
+			J[2][2] = m_mass[2];
+
+			// get gradient -f(w0)
+			dgVector localOmegaInertia (localOmega.CompProduct4(m_mass));
+			dgVector fw0 (localOmegaInertia + localOmega.CompProduct3(localOmegaInertia).Scale4(timestep));
+
+			dgSolveGaussian(3, &J[0][0], &fw0[0]);
+			fw0 = m_matrix.RotateVector(fw0);
+
+//			dgTrace (("(%f %f %f) (%f %f %f)\n", m_omega[0], m_omega[1], m_omega[2], fw0[0], fw0[1], fw0[2]));
+*/
+
 		} else {
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
 			lumpedMassShape->IntegrateForces(timestep);

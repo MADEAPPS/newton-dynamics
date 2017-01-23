@@ -40,7 +40,8 @@ void PrecessingTops (DemoEntityManager* const scene)
 	dVector size (3.0f, 2.0f, 0.0f, 0.0f);
 
 	// create an array of cones 
-	const int count = 10;
+//	const int count = 10;
+const int count = 1;
 
 	// all shapes use the x axis as the  axis of symmetry, to make an upright cone we apply a 90 degree rotation local matrix
 	dMatrix shapeOffsetMatrix (dRollMatrix(-3.141592f/2.0f));

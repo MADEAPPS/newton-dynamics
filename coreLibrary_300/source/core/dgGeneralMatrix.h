@@ -390,4 +390,55 @@ void dgGeneralMatrix<T, Rows, Columns>::MatrixTimeVector(const dgGeneralVector<T
 }
 
 
+
+
+template<class T>
+bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
+{
+	for (dgInt32 i = 0; i < size - 1; i++) {
+		const T* const rowI = &matrix[i * size];
+		dgInt32 k = i;
+		T maxVal (fabs(rowI[i]));
+		for (dgInt32 j = i + 1; j < size - 1; j++) {
+			T val (fabs(matrix[size * j + i]));
+			if (val > maxVal) {
+				k = j;
+				maxVal = val;
+			}
+		}
+
+		if (maxVal < T(1.0e-12f)) {
+			return false;
+		}
+
+		if (k != i) {
+			dgAssert(0);
+//			dgGeneralMatrix<T, Rows, Columns>::SwapRows(i, k);
+//			dgSwap(B[i], B[k]);
+		}
+
+		T den = T(1.0f) / rowI[i];
+		for (dgInt32 k = i + 1; k < size; k++) {
+			T* const rowK = &matrix[size * k];
+			T factor(-rowK[i] * den);
+			for (dgInt32 j = i + 1; j < size; j++) {
+				rowK[j] += rowI[j] * factor;
+			}
+			rowK[i] = T(0.0f);
+			b[k] += b[i] * factor;
+		}
+	}
+
+	for (dgInt32 i = size - 1; i >= 0; i--) {
+		T acc(0);
+		T* const rowI = &matrix[i * size];
+		for (dgInt32 j = i + 1; j < size; j++) {
+			acc = acc + rowI[j] * b[j];
+		}
+		b[i] = (b[i] - acc) / rowI[i];
+	}
+	return true;
+}
+
+
 #endif

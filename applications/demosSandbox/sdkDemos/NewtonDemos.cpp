@@ -26,7 +26,7 @@
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
-//#define DEFAULT_SCENE	3			// Precessing tops
+#define DEFAULT_SCENE	3			// Precessing tops
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
@@ -60,7 +60,7 @@
 //#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
-#define DEFAULT_SCENE	37			// cloth patch			
+//#define DEFAULT_SCENE	37			// cloth patch			
 //#define DEFAULT_SCENE	38			// soft bodies			
 
 
