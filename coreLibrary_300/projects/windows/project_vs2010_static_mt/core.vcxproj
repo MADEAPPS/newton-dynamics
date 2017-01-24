@@ -491,7 +491,6 @@
     <ClCompile Include="..\..\..\source\core\dgQuaternion.cpp" />
     <ClCompile Include="..\..\..\source\core\dgRandom.cpp" />
     <ClCompile Include="..\..\..\source\core\dgSmallDeterminant.cpp" />
-    <ClCompile Include="..\..\..\source\core\dgSPDMatrix.cpp" />
     <ClCompile Include="..\..\..\source\core\dgAsyncThread.cpp" />
     <ClCompile Include="..\..\..\source\core\dgMutexThread.cpp" />
     <ClCompile Include="..\..\..\source\core\dgThread.cpp" />
@@ -534,7 +533,6 @@
     <ClInclude Include="..\..\..\source\core\dgQuaternion.h" />
     <ClInclude Include="..\..\..\source\core\dgRandom.h" />
     <ClInclude Include="..\..\..\source\core\dgSmallDeterminant.h" />
-    <ClInclude Include="..\..\..\source\core\dgSPDMatrix.h" />
     <ClInclude Include="..\..\..\source\core\dgVector.h" />
     <ClInclude Include="..\..\..\source\core\dgAsyncThread.h" />
     <ClInclude Include="..\..\..\source\core\dgMutexThread.h" />

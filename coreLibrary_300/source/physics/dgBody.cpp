@@ -112,7 +112,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	m_invWorldInertiaMatrix[3][3] = dgFloat32 (1.0f);
 
 	serializeCallback (userData, &m_rotation, sizeof (m_rotation));
-	serializeCallback (userData, &m_matrix.m_posit, sizeof (m_matrix.m_posit));
+	serializeCallback (userData, &m_matrix, sizeof (m_matrix));
 	serializeCallback (userData, &m_veloc, sizeof (m_veloc));
 	serializeCallback (userData, &m_omega, sizeof (m_omega));
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
@@ -154,7 +154,7 @@ void dgBody::AttachCollision (dgCollisionInstance* const collisionSrc)
 void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
 	serializeCallback (userData, &m_rotation, sizeof (m_rotation));
-	serializeCallback (userData, &m_matrix.m_posit, sizeof (m_matrix.m_posit));
+	serializeCallback (userData, &m_matrix, sizeof (m_matrix));
 	serializeCallback (userData, &m_veloc, sizeof (m_veloc));
 	serializeCallback (userData, &m_omega, sizeof (m_omega));
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
