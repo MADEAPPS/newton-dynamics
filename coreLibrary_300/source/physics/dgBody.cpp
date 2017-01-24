@@ -120,8 +120,6 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
 
-	m_matrix = dgMatrix (m_rotation, m_matrix.m_posit);
-
 	dgInt32 id;
 	serializeCallback (userData, &id, sizeof (id));
 
