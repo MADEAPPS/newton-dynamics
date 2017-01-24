@@ -49,7 +49,7 @@ const int count = 1;
 
 	// till the cont 30 degrees, and apply a local high angular velocity
 	dMatrix matrix (dRollMatrix (-25.0f * 3.141592f / 180.0f));
-	dVector omega (0.0f, 50.0f, 0.0f);
+	dVector omega (1.0f, 5.0f, 0.0f);
 	omega = matrix.RotateVector (omega);
 	dVector damp (0.0f, 0.0f, 0.0f, 0.0f);
 
