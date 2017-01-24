@@ -240,18 +240,23 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			m_veloc += accel.CompProduct4(timeStepVect);
 
 			// simple Euler correction sub linear convergence,
+#if 0
 			dgVector correction(alpha.CrossProduct3(m_omega));
 			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
-/*
+#else
 			// Using predictor corrector integration 
+			dgVector omega(m_omega);
 			dgVector halfStep(dgVector::m_half.Scale4(timestep));
 			dgMatrix matrix (m_matrix);
-			dgVector alphaLocal(matrix.UnrotateVector(alpha));
-			dgVector omegaLocal(matrix.UnrotateVector.UnrotateVector (m_omega));
-			dgVector predictAlphaLocal(alphaLocal - omegaLocal.CompProduct4(m_invMass).CompProduct3(omegaLocal));
-			for (dgInt32 i = 0; i < 10; i++) {
+
+			for (dgInt32 i = 0; i < 2; i++) {
 				// integrate body locally to get matrix
-				dgVector predictOmega(matrix.RotateVector(omegaLocal + predictAlphaLocal.CompProduct4(timeStepVect)));
+				dgVector localOmega(matrix.UnrotateVector(m_omega));
+				dgVector localTorque(matrix.UnrotateVector(m_externalTorque));
+				dgVector predictDerivative(matrix.RotateVector(m_invMass.CompProduct4(localTorque - (localOmega.CrossProduct3(localOmega.CompProduct4(m_mass))))));
+				dgVector predictOmega(omega + predictDerivative.CompProduct4(timeStepVect));
+
+				// calculate new rotation matrix at time (dw, dt) 
 				dgFloat32 omegaMag2 = predictOmega.DotProduct3(predictOmega);
 				dgFloat32 invOmegaMag = dgRsqrt(omegaMag2 + dgFloat32(1.0e-14f));
 				dgVector omegaAxis(predictOmega.Scale4(invOmegaMag));
@@ -259,26 +264,14 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				dgQuaternion rotation(m_rotation * dgQuaternion(omegaAxis, omegaAngle));
 				matrix = dgMatrix(rotation, dgVector::m_wOne);
 
-				//calculate correction derivative
-				//dgMatrix tmp(matrix.Transpose4X4());
-				//tmp[0] = tmp[0].CompProduct4(m_invMass);
-				//tmp[1] = tmp[1].CompProduct4(m_invMass);
-				//tmp[2] = tmp[2].CompProduct4(m_invMass);
-				//dgMatrix invInertia(matrix.RotateVector(tmp[0]), matrix.RotateVector(tmp[1]), matrix.RotateVector(tmp[2]), dgVector::m_wOne);
-				//dgVector alpha(invInertia.RotateVector(m_externalTorque));
-				//dgVector correctionDerivative((alpha - predictOmega.CrossProduct3(matrix.RotateVector(predictOmega))).CompProduct4(timeStepVect));
-				//dgVector predictAlphaLocal = matrix.UnrotateVector(alpha);
-				//dgVector preditOmegaLocal(matrix.UnrotateVector.UnrotateVector (m_omega));
-				//omega = m_omega + dgVector::m_half.CompProduct4(predictAlpha + correctionDerivative);
-
-				dgVector correctionAlphaLocal(matrix.UnrotateVector(alpha));
-				dgVector correctionOmegaLocal(matrix.UnrotateVector.UnrotateVector (predictOmega));
-				dgVector predictAlphaLocal(alphaLocal - omegaLocal.CompProduct4(m_invMass).CompProduct3(omegaLocal));
-
-				dgVector correctionOmega(matrix.RotateVector(omegaLocal + predictAlphaLocal.CompProduct4(timeStepVect)));
+				localOmega = matrix.UnrotateVector(predictOmega);
+				localTorque = matrix.UnrotateVector(m_externalTorque);
+				dgVector correctionDerivative(matrix.RotateVector(m_invMass.CompProduct4(localTorque - (localOmega.CrossProduct3(localOmega.CompProduct4(m_mass))))));
+				omega = m_omega + halfStep.CompProduct4(correctionDerivative + predictDerivative);
 			}
 			m_omega = omega;
-*/
+#endif
+
 		} else {
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
 			lumpedMassShape->IntegrateForces(timestep);
