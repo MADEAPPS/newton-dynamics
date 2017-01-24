@@ -287,7 +287,6 @@
     <ClCompile Include="..\..\..\source\core\dgQuaternion.cpp" />
     <ClCompile Include="..\..\..\source\core\dgRandom.cpp" />
     <ClCompile Include="..\..\..\source\core\dgSmallDeterminant.cpp" />
-    <ClCompile Include="..\..\..\source\core\dgSPDMatrix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\core\dgAsyncThread.h" />
@@ -330,7 +329,6 @@
     <ClInclude Include="..\..\..\source\core\dgQuaternion.h" />
     <ClInclude Include="..\..\..\source\core\dgRandom.h" />
     <ClInclude Include="..\..\..\source\core\dgSmallDeterminant.h" />
-    <ClInclude Include="..\..\..\source\core\dgSPDMatrix.h" />
     <ClInclude Include="..\..\..\source\core\dgVector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

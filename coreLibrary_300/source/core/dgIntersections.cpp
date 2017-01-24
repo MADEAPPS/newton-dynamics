@@ -293,7 +293,6 @@ dgBigVector dgPointToTetrahedrumDistance (const dgBigVector& point, const dgBigV
 	return p0;
 }
 
-//#include "dgSPDMatrix.h"
 void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, const dgVector& ray_q0, const dgVector& ray_q1, dgVector& pOut, dgVector& qOut)
 {
 	dgFloat32 sN;

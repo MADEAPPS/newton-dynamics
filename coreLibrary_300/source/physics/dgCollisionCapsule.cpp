@@ -42,11 +42,7 @@ dgCollisionCapsule::dgCollisionCapsule(dgWorld* const world, dgDeserialize deser
 {
 	dgVector size;
 	deserialization(userData, &size, sizeof (dgVector));
-	m_radio0 = size.m_x;
-	m_radio1 = size.m_y;
-	m_height = size.m_z;
-
-	Init (size.m_x, size.m_y, size.m_z);
+	Init (size.m_x, size.m_y, size.m_z * dgFloat32 (2.0f));
 }
 
 
