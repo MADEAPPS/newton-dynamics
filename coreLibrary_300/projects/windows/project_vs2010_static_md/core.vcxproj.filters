@@ -93,9 +93,6 @@
     <ClCompile Include="..\..\..\source\core\dgSmallDeterminant.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\core\dgSPDMatrix.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\core\dgAsyncThread.cpp">
       <Filter>threading</Filter>
     </ClCompile>
@@ -216,9 +213,6 @@
       <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\core\dgSmallDeterminant.h">
-      <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\core\dgSPDMatrix.h">
       <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\core\dgVector.h">

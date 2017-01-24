@@ -240,8 +240,8 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			m_veloc += accel.CompProduct4(timeStepVect);
 
 			// simple Euler correction sub linear convergence,
-			//dgVector correction(alpha.CrossProduct3(m_omega));
-			//m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
+			dgVector correction(alpha.CrossProduct3(m_omega));
+			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
 /*
 			// Using predictor corrector integration 
 			dgVector halfStep(dgVector::m_half.Scale4(timestep));
