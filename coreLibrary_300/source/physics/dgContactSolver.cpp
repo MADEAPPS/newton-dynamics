@@ -1739,7 +1739,7 @@ dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 				contactOut[i].m_penetration = penetration;
 
 //dgTrace (("p (%f %f %f) ", contactOut[i].m_point.m_x, contactOut[i].m_point.m_y, contactOut[i].m_point.m_z));
-//dgTrace (("b (%f %f %f) ", contactOut[i].m_normal.m_x, contactOut[i].m_normal.m_y, contactOut[i].m_normal.m_z));
+//dgTrace (("n (%f %f %f) ", contactOut[i].m_normal.m_x, contactOut[i].m_normal.m_y, contactOut[i].m_normal.m_z));
 //dgTrace (("h (%f) ", contactOut[i].m_normal.m_x));
 //dgTrace (("\n", penetration)); 
 			}
