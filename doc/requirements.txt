@@ -1,2 +1,2 @@
--e git+https://github.com/michaeljones/breathe.git
+-e git+https://github.com/michaeljones/breathe.git#egg=breathe
 -e git+https://github.com/olitheolix/guzzle_sphinx_theme.git@bc7a87bc8accddbbf5954ed2825072cb47f166a0#egg=guzzle_sphinx_theme
