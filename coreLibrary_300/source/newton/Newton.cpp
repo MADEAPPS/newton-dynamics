@@ -5932,31 +5932,6 @@ void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const p
 }
 
 
-/*!
-  add a Euler Gyroscopic of the form
-
-  localAngularMomentum = localInertia * localAngularVelocity)
-  localTorque = crossProduct (localAngularVelocity, localAngularMomentum)
-  torque += localTorque.Rotate (localTorque.Scale (-1));
-
-  note: this is a simplified form of Euler equation of motion when the center of mass is set to the origin of the principal axis of the body
-  and the matrix of inertia of the shape is also aligned with the principals axis. 
-  This si the case for almost all bodies in newton, with the exception of compound collisions and bodies where the end application 
-  override set the center of mass or moment of inertia.
-*/
-void NewtonBodyApplyGyroscopicTorque (const NewtonBody* const bodyPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)bodyPtr;
-
-	dgVector inertia(body->GetMass());
-	dgVector omega(body->GetMatrix().UnrotateVector(body->GetOmega()));
-
-	dgVector angularMomentum(inertia.CompProduct4(omega));
-	dgVector torque(omega.CrossProduct3(angularMomentum));
-	torque = body->GetMatrix().RotateVector(torque.CompProduct4(dgVector::m_negOne));
-	body->AddTorque(torque);
-}
 
 /*!
   Add an train of impulses to a specific point on a body.

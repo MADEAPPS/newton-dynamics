@@ -1014,6 +1014,15 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 	#endif
 }
 
+dgInt32 dgWorld::SerializeToFileSort (const dgBody* const body0, const dgBody* const body1, void* const context)
+{
+	if (body0->m_uniqueID < body1->m_uniqueID) {
+		return -1;
+	} else if (body0->m_uniqueID > body1->m_uniqueID) {
+		return 1;
+	}
+	return 0;
+}
 
 void dgWorld::SerializeToFile (const char* const fileName, OnBodySerialize bodyCallback, void* const userData) const
 {
@@ -1029,6 +1038,8 @@ void dgWorld::SerializeToFile (const char* const fileName, OnBodySerialize bodyC
 			count ++;
 			dgAssert (count <= GetBodiesCount());
 		}
+
+		dgSortIndirect(array, count, SerializeToFileSort);
 		SerializeBodyArray (array, count, bodyCallback ? bodyCallback : OnBodySerializeToFile, userData, OnSerializeToFile, file);
 		SerializeJointArray (array, count, OnSerializeToFile, file);
 

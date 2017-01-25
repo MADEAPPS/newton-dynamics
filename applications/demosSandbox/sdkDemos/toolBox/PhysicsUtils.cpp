@@ -549,15 +549,6 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 
 	dVector force (dVector (0.0f, 1.0f, 0.0f).Scale (mass * DEMO_GRAVITY));
 	NewtonBodySetForce (body, &force.m_x);
-/*
-// check that angular momentum is conserved
-dMatrix I;
-dVector omega(0.0f);
-NewtonBodyGetInertiaMatrix(body, &I[0][0]);
-NewtonBodyGetOmega(body, &omega[0]);
-dVector L (I.RotateVector(omega));
-dTrace (("(%f %f %f) (%f %f %f)\n", omega[0], omega[1], omega[2], L[0], L[1], L[2]));
-*/
 }
 
 

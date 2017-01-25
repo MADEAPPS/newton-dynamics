@@ -18,12 +18,6 @@
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
 
-static void PhysicsApplyGyroscopyTorque (const NewtonBody* body, dFloat timestep, int threadIndex)
-{
-	PhysicsApplyGravityForce (body, timestep, threadIndex);
-	NewtonBodyApplyGyroscopicTorque (body);
-}
-
 
 void PrecessingTops (DemoEntityManager* const scene)
 {
@@ -71,7 +65,7 @@ const int count = 1;
 		matrix.m_posit = bodyMatrix.m_posit;
 		matrix.m_posit.m_y += 1.0f; 
 		NewtonBodySetMatrix(body, &matrix[0][0]);
-		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGyroscopyTorque);
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 
 		NewtonCollision* const shape = NewtonBodyGetCollision(body);
 		NewtonBodySetMassProperties (body, 5.0f, shape);

@@ -329,6 +329,7 @@ class dgWorld
 	void SetGetTimeInMicrosenconds (OnGetTimeInMicrosenconds callback);
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 
+	static dgInt32 SerializeToFileSort (const dgBody* const body0, const dgBody* const body1, void* const context);
 	static void OnSerializeToFile (void* const userData, const void* const buffer, size_t size);
 	static void OnDeserializeFromFile (void* const userData, void* const buffer, size_t size);
 
