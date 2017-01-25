@@ -112,15 +112,13 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	m_invWorldInertiaMatrix[3][3] = dgFloat32 (1.0f);
 
 	serializeCallback (userData, &m_rotation, sizeof (m_rotation));
-	serializeCallback (userData, &m_matrix.m_posit, sizeof (m_matrix.m_posit));
+	serializeCallback (userData, &m_matrix, sizeof (m_matrix));
 	serializeCallback (userData, &m_veloc, sizeof (m_veloc));
 	serializeCallback (userData, &m_omega, sizeof (m_omega));
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
-
-	m_matrix = dgMatrix (m_rotation, m_matrix.m_posit);
 
 	dgInt32 id;
 	serializeCallback (userData, &id, sizeof (id));
@@ -154,7 +152,7 @@ void dgBody::AttachCollision (dgCollisionInstance* const collisionSrc)
 void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
 	serializeCallback (userData, &m_rotation, sizeof (m_rotation));
-	serializeCallback (userData, &m_matrix.m_posit, sizeof (m_matrix.m_posit));
+	serializeCallback (userData, &m_matrix, sizeof (m_matrix));
 	serializeCallback (userData, &m_veloc, sizeof (m_veloc));
 	serializeCallback (userData, &m_omega, sizeof (m_omega));
 	serializeCallback (userData, &m_localCentreOfMass, sizeof (m_localCentreOfMass));
@@ -175,7 +173,7 @@ void dgBody::UpdateLumpedMatrix()
 	if (m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI)) {
 		dgAssert(IsRTTIType(dgBody::m_dynamicBodyRTTI));
 		dgCollisionLumpedMassParticles* const lumpedMass = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
-		lumpedMass->SetOwnerAndUnitMass((dgDynamicBody*) this); 
+		lumpedMass->SetOwnerAndMassPraperties((dgDynamicBody*) this); 
 	}
 }
 
@@ -283,6 +281,10 @@ void dgBody::UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
+//static int xxxx;
+//dgTrace (("frame %d  v(%f %f %f) w(%f %f %f)\n", xxxx, m_veloc[0], m_veloc[1], m_veloc[2], m_omega[0], m_omega[1], m_omega[2]));
+//xxxx ++;
+
 	m_globalCentreOfMass += m_veloc.Scale3 (timestep); 
 	while ((m_omega.DotProduct3(m_omega) * timestep * timestep) > m_maxAngulaRotationPerSet2) {
 		m_omega = m_omega.Scale4 (dgFloat32 (0.8f));

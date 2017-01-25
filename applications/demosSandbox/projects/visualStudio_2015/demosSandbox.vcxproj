@@ -595,6 +595,7 @@
     <ClInclude Include="..\..\sdkDemos\DemoMesh.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\UserHeightFieldCollision.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\UserPlaneCollision.h" />
+    <ClInclude Include="resource.h" />
     <CustomBuild Include="..\..\sdkDemos\NewtonDemos.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Performing Custom Build Step</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Performing Custom Build Step</Message>
@@ -648,9 +649,6 @@
     <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2015_static_mt\physics.vcxproj">
       <Project>{39737a8f-6151-4259-8e39-25530345d4b4}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2015_static_mt\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2015_static_mt\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>
@@ -681,6 +679,9 @@
     <ProjectReference Include="..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2015_static_mt\wx_vc9_gl.vcxproj">
       <Project>{da8b15ef-6750-5928-bc0e-c748213cf9b2}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="demosSandbox.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

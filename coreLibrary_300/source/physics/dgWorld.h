@@ -147,7 +147,6 @@ class dgWorld
 	:public dgBodyMasterList
 	,public dgBodyMaterialList
 	,public dgBodyCollisionList
-//	,public dgDeformableBodiesUpdate
 	,public dgSkeletonList
 	,public dgActiveContacts 
 	,public dgWorldDynamicUpdate
@@ -226,7 +225,10 @@ class dgWorld
 	dgFloat32 GetUpdateTime() const;
 	dgBroadPhase* GetBroadPhase() const;
 
+	dgInt32 GetSolverMode() const;
 	void SetSolverMode (dgInt32 mode);
+
+	dgInt32 GetSolverConvergenceQuality() const;
 	void SetSolverConvergenceQuality (dgInt32 mode);
 
 	dgInt32 EnumerateHardwareModes() const;
@@ -314,7 +316,7 @@ class dgWorld
 												  dgCollisionCompoundFractured::OnEmitFractureChunkCallBack emitFrafuredChunk, dgCollisionCompoundFractured::OnEmitNewCompundFractureCallBack emitFracturedCompound, dgCollisionCompoundFractured::OnReconstructFractureMainMeshCallBack reconstructMainMesh);
 
 	dgCollisionInstance* CreateDeformableSolid (dgMeshEffect* const mesh, dgInt32 shapeID);
-	dgCollisionInstance* CreateClothPatchMesh (dgMeshEffect* const mesh, dgInt32 shapeID);
+	dgCollisionInstance* CreateMassSpringDamperSystem (dgInt32 shapeID, dgInt32 pointCount, const dgFloat32* const points, dgInt32 srideInBytes, const dgFloat32* const pointsMass, dgInt32 linksCount, const dgInt32* const links, const dgFloat32* const linksSpring, const dgFloat32* const LinksDamper);
 
 	dgCollisionInstance* CreateBVH ();	
 	dgCollisionInstance* CreateStaticUserMesh (const dgVector& boxP0, const dgVector& boxP1, const dgUserMeshCreation& data);
@@ -327,6 +329,7 @@ class dgWorld
 	void SetGetTimeInMicrosenconds (OnGetTimeInMicrosenconds callback);
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 
+	static dgInt32 SerializeToFileSort (const dgBody* const body0, const dgBody* const body1, void* const context);
 	static void OnSerializeToFile (void* const userData, const void* const buffer, size_t size);
 	static void OnDeserializeFromFile (void* const userData, void* const buffer, size_t size);
 
@@ -512,12 +515,13 @@ class dgWorld
 	friend class dgCollisionDeformableSolidMesh;
 	friend class dgBroadPhaseApplyExternalForce;
 	friend class dgParallelSolverCalculateForces;
+	friend class dgCollisionMassSpringDamperSystem;
 	friend class dgParallelSolverJointAcceleration;
 	friend class dgParallelSolverBuildJacobianRows;
 	friend class dgParallelSolverInitFeedbackUpdate;
 	friend class dgParallelSolverInitInternalForces;
 	friend class dgParallelSolverBuildJacobianMatrix;
-
+	
 	friend class dgBroadPhaseMaterialCallbackWorkerThread;
 	friend class dgBroadPhaseCalculateContactsWorkerThread;
 } DG_GCC_VECTOR_ALIGMENT ;

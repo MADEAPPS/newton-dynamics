@@ -76,10 +76,11 @@ typedef long long unsigned64;
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <time.h>
-	#include <GL/glxew.h>
-	#include <GL/glew.h>
+
 	#include <GL/glu.h>
 	#include <GL/gl.h>
+	#include <imgui.h>
+	#include <GLFW/glfw3.h>
 
 	// audio library support
 	#include <AL/al.h>

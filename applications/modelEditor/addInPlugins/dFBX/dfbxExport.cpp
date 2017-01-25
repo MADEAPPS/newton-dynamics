@@ -360,9 +360,12 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 				}
 
 				int attibuteCount = NewtonMeshGetPointCount(mesh); 
-				int attibuteStride = NewtonMeshGetPointStrideInByte(mesh) / sizeof (dFloat64);
-				dFloat64* const normal = NewtonMeshGetNormalArray (mesh); 
-				dFloat64* const uv0 = NewtonMeshGetUV0Array (mesh); 
+				//int attibuteStride = sizeof (dVector) / sizeof (dFloat);
+
+				dVector* const uv0 = new dVector[attibuteCount];
+				dVector* const normal = new dVector[attibuteCount];
+				NewtonMeshGetUV0Channel (mesh, sizeof (dVector), &uv0[0].m_x);
+				NewtonMeshGetNormalChannel (mesh, sizeof (dVector), &normal[0].m_x);
 
 				// We want to have one normal for each vertex (or control point),
 				FbxGeometryElementNormal* const geometryElementNormal = fbxMesh->CreateElementNormal();
@@ -393,7 +396,7 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 						int faceId = NewtonMeshGetFaceMaterial (mesh, face);
 						MaterialIndex::dTreeNode* const matIndeNode = materialIndex.Find(faceId);
 						if (matIndeNode) {
-								matId = materialIndex.Find(faceId)->GetInfo();
+							matId = materialIndex.Find(faceId)->GetInfo();
 							dScene::dTreeNode* const materialNode = ngdScene->FindMaterialById(faceId);
 							dMaterialNodeInfo* const materialInfo = (dMaterialNodeInfo*) ngdScene->GetInfoFromNode(materialNode);
 							dCRCTYPE difusseTexture = materialInfo->GetDiffuseTextId();
@@ -413,12 +416,15 @@ void dfbxExport::BuildMeshes (dPluginScene* const ngdScene, FbxScene* const fbxS
 							fbxMesh->AddPolygon (faceVertexIndices[j], -1);
 
 							int k = facePointIndices[j];
-							geometryElementUV->GetDirectArray().Add(FbxVector2(uv0[attibuteStride * k + 0], uv0[attibuteStride * k + 1]));
-							geometryElementNormal->GetDirectArray().Add(FbxVector4(normal[attibuteStride * k + 0], normal[attibuteStride * k + 1], normal[attibuteStride * k + 2], 0.0));
+							geometryElementUV->GetDirectArray().Add(FbxVector2(uv0[k].m_x, uv0[k].m_y));
+							geometryElementNormal->GetDirectArray().Add(FbxVector4(normal[k].m_x, normal[k].m_y, normal[k].m_z, 0.0));
 						}
 						fbxMesh->EndPolygon();
 					}
 				}
+
+				delete[] uv0;
+				delete[] normal;
 			}
 		}
 	}

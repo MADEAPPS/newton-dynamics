@@ -84,9 +84,6 @@
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
-#include <pthread.h>
-#include <sched.h>
-#include <semaphore.h>
 #include <dTimeTracker.h>
 
 #if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
@@ -151,7 +148,6 @@
 	#undef DG_SCALAR_VECTOR_CLASS
 #endif
 
-//#if defined (_NEWTON_USE_DOUBLE) || defined (__ppc__) || defined (ANDROID) || defined (IOS)
 #if defined (__ppc__) || defined (ANDROID) || defined (IOS)
 	#undef DG_SSE4_INSTRUCTIONS_SET
 	#ifndef DG_SCALAR_VECTOR_CLASS
@@ -159,6 +155,26 @@
 	#endif
 #endif
 
+
+
+// by default newton run on a separate thread, optionally concurrent with the calling thread, it also uses a thread job pool for multi core systems.
+// define DG_USE_THREAD_EMULATION on the command line for platform that do not support hardware multi threading or if multi threading is not stable 
+// #define DG_USE_THREAD_EMULATION
+
+
+#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+	#if _MSC_VER < 1700
+		#ifndef DG_USE_THREAD_EMULATION
+			#define DG_USE_THREAD_EMULATION
+		#endif
+	#endif
+#endif
+
+#ifndef DG_USE_THREAD_EMULATION
+	#include <mutex>
+	#include <thread>
+	#include <condition_variable>
+#endif
 
 
 //************************************************************
@@ -264,10 +280,11 @@ class dgTriplex
 #define dgKMH2MPSEC		 	dgFloat32 (0.278f)
 
 
-class dgVector;
-#ifndef _NEWTON_USE_DOUBLE
 class dgBigVector;
-#endif
+#ifndef _NEWTON_USE_DOUBLE
+class dgVector;
+#endif 
+
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#define dgApi __cdecl 	
@@ -303,6 +320,20 @@ DG_INLINE dgInt32 dgExp2 (dgInt32 x)
 	}
 	return exp;
 }
+
+DG_INLINE dgInt32 dgBitReversal(dgInt32 v, dgInt32 base)
+{
+	dgInt32 x = 0;
+	dgInt32 power = dgExp2 (base) - 1;
+	do {
+		x += (v & 1) << power;
+		v >>= 1;
+		power--;
+	} while (v);
+	dgAssert(x < base);
+	return x;
+}
+
 
 template <class T> 
 DG_INLINE T dgMin(T A, T B)
@@ -487,15 +518,12 @@ void dgRadixSort (T* const array, T* const tmpArray, dgInt32 elements, dgInt32 r
 		}
 	}
 
-
 #ifdef _DEBUG
 	for (dgInt32 i = 0; i < (elements - 1); i ++) {
 		dgAssert (getRadixKey (&array[i], context) <= getRadixKey (&array[i + 1], context));
 	}
 #endif
-
 }
-
 
 template <class T> 
 void dgSort (T* const array, dgInt32 elements, dgInt32 (*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
@@ -637,7 +665,6 @@ void dgSortIndirect (T** const array, dgInt32 elements, dgInt32 (*compare) (cons
 }
 
 
-
 #ifdef _NEWTON_USE_DOUBLE
 	union dgFloatSign
 	{
@@ -669,15 +696,13 @@ union dgDoubleInt
 };
 
 
+void dgGetMinMax (dgBigVector &Min, dgBigVector &Max, const dgFloat64* const vArray, dgInt32 vCount, dgInt32 strideInBytes);
 #ifndef _NEWTON_USE_DOUBLE
-void GetMinMax (dgBigVector &Min, dgBigVector &Max, const dgFloat64* const vArray, dgInt32 vCount, dgInt32 strideInBytes);
+void dgGetMinMax (dgVector &Min, dgVector &Max, const dgFloat32* const vArray, dgInt32 vCount, dgInt32 StrideInBytes);
 #endif
-void GetMinMax (dgVector &Min, dgVector &Max, const dgFloat32* const vArray, dgInt32 vCount, dgInt32 StrideInBytes);
 
+dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount,     dgInt32 vertexCount,         dgInt32* const indexListOut, dgFloat64 tolerance = dgEPSILON);
 dgInt32 dgVertexListToIndexList (dgFloat32* const vertexList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes, dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat32 tolerance = dgEPSILON);
-dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat64 tolerance = dgEPSILON);
-
-
 
 #define PointerToInt(x) ((size_t)x)
 #define IntToPointer(x) ((void*)(size_t(x)))
@@ -702,7 +727,6 @@ dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBy
 #define dgClearFP()			_clearfp() 
 #define dgControlFP(x,y)	_controlfp(x,y)
 
-
 enum dgSerializeRevisionNumber
 {
 	m_firstRevision = 100,
@@ -710,13 +734,10 @@ enum dgSerializeRevisionNumber
 	m_currentRevision 
 };
 
-
+dgUnsigned64 dgGetTimeInMicrosenconds();
+dgFloat64 dgRoundToFloat(dgFloat64 val);
 void dgSerializeMarker(dgSerialize serializeCallback, void* const userData);
 dgInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData);
-
-
-dgUnsigned64 dgGetTimeInMicrosenconds();
-
 
 class dgFloatExceptions
 {
@@ -742,9 +763,6 @@ class dgSetPrecisionDouble
 	~dgSetPrecisionDouble();
 	dgInt32 m_mask; 
 };
-
-
-
 
 DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 {
@@ -784,25 +802,25 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 DG_INLINE void dgThreadYield()
 {
 	#ifndef DG_USE_THREAD_EMULATION
-	sched_yield();
-#endif
+		std::this_thread::yield(); 
+	#endif
 }
 
 DG_INLINE void dgSpinLock (dgInt32* const ptr, bool yield)
 {
 	#ifndef DG_USE_THREAD_EMULATION 
-	while (dgInterlockedExchange(ptr, 1)) {
-		if (yield) {
-			dgThreadYield();
+		while (dgInterlockedExchange(ptr, 1)) {
+			if (yield) {
+				dgThreadYield();
+			}
 		}
-	}
 	#endif
 }
 
 DG_INLINE void dgSpinUnlock (dgInt32* const ptr)
 {
 	#ifndef DG_USE_THREAD_EMULATION 
-	dgInterlockedExchange(ptr, 0);
+		dgInterlockedExchange(ptr, 0);
 	#endif
 }
 

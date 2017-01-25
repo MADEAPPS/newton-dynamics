@@ -111,11 +111,8 @@ class dgHACDCluster: public dgList<dgHACDClusterFace>
 
 
 class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge> 
-//	,public dgAABBPolygonSoup 
-//	,public dgMeshEffect::dgMeshBVH
 {
 	public:
-
 	class dgHACDConveHull: public dgConvexHull3d
 	{
 		class dgConvexHullRayCastData
@@ -557,7 +554,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 			}
 		}
 
-		dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, bool doublesided) const
+		//dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, bool doublesided) const
+		dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, void* const userData) const
 		{
 			dgHACDCluster* const clusterFace = (dgHACDCluster*) face->m_userData;
 
@@ -582,8 +580,13 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 			dgHACDClusterFace& faceA = m_clusterA->GetFirst()->GetInfo();
 			dgBigVector end (origin - faceA.m_normal.Scale3 (rayDistance));
 
+			dgAssert (0);
+/*
 			dgFloat64 paramOut;
-			dgMeshBVHNode* const node = FaceRayCast (origin, end, paramOut, false);
+			//dgMeshBVHNode* const node = FaceRayCast (origin, end, paramOut, false);
+
+			dgMeshBVHNode* node;
+			FaceRayCast (origin, end, paramOut, &node);
 
 			if (node) {
 				dgHACDCluster* const clusterB = (dgHACDCluster*) node->m_userData;
@@ -633,6 +636,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 					}
 				}
 			}
+*/
 		}
 
 		
@@ -746,7 +750,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 		}
 
 		Trace();
-
+		dgAssert (0);
+/*
 		// add links to back faces
 		dgBigVector minAABB;
 		dgBigVector maxAABB;
@@ -783,7 +788,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 				ptr = ptr->m_next;
 			} while (ptr != edgeA);
 		}
-
+*/
 		Trace();
 	}
 

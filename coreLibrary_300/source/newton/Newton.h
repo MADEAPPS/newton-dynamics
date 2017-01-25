@@ -316,7 +316,6 @@ extern "C" {
 		int m_unused[3];
 	} NewtonUserContactPoint;
 
-
 	// data structure for interfacing with NewtonMesh
 	typedef struct NewtonMeshDoubleData
 	{
@@ -331,7 +330,6 @@ extern "C" {
 		int* m_indexList;
 		int m_strideInBytes;
 	} NewtonMeshFloatData;
-
 
 	typedef struct NewtonMeshVertexFormat
 	{
@@ -465,8 +463,11 @@ extern "C" {
 	NEWTON_API void NewtonSetContactMergeTolerance (const NewtonWorld* const newtonWorld, dFloat tolerance);
 
 	NEWTON_API void NewtonInvalidateCache (const NewtonWorld* const newtonWorld);
+
 	NEWTON_API void NewtonSetSolverModel (const NewtonWorld* const newtonWorld, int model);
+	NEWTON_API int NewtonGetSolverModel(const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonSetSolverConvergenceQuality (const NewtonWorld* const newtonWorld, int lowOrHigh);
+	NEWTON_API int NewtonGetSolverConvergenceQuality(const NewtonWorld* const newtonWorld);
 
 	NEWTON_API void NewtonSetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld, int mode);
 	NEWTON_API int NewtonGetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld);
@@ -950,7 +951,6 @@ extern "C" {
 	
 	NEWTON_API void NewtonBodyGetPointVelocity (const NewtonBody* const body, const dFloat* const point, dFloat* const velocOut);
 
-	NEWTON_API void NewtonBodyApplyGyroscopicTorque (const NewtonBody* const body);
 	NEWTON_API void NewtonBodyAddImpulse (const NewtonBody* const body, const dFloat* const pointDeltaVeloc, const dFloat* const pointPosit);
 	NEWTON_API void NewtonBodyApplyImpulseArray (const NewtonBody* const body, int impuleCount, int strideInByte, const dFloat* const impulseArray, const dFloat* const pointArray);
 
@@ -1021,15 +1021,16 @@ extern "C" {
 	// particle system interface (soft bodies, individual, pressure bodies and cloth)   
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID);
+	NEWTON_API NewtonCollision* NewtonCreateMassSpringDamperSystem (const NewtonWorld* const newtonWorld, int shapeID,
+																	const dFloat* const points, int pointCount, int strideInBytes, const dFloat* const pointMass, 
+																	const int* const links, int linksCount, const dFloat* const linksSpring, const dFloat* const linksDamper);
+
 	NEWTON_API NewtonCollision* NewtonCreateDeformableSolid(const NewtonWorld* const newtonWorld, const NewtonMesh* const mesh, int shapeID);
 
 	NEWTON_API int NewtonDeformableMeshGetParticleCount (const NewtonCollision* const deformableMesh); 
 	NEWTON_API int NewtonDeformableMeshGetParticleStrideInBytes (const NewtonCollision* const deformableMesh); 
 	NEWTON_API const dFloat* NewtonDeformableMeshGetParticleArray (const NewtonCollision* const deformableMesh); 
 
-	NEWTON_API const int* NewtonDeformableMeshGetIndexToVertexMap (const NewtonCollision* const deformableMesh); 
-		
 /*
 	NEWTON_API NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID, NewtonClothPatchMaterial* const structuralMaterial, NewtonClothPatchMaterial* const bendMaterial);
 	NEWTON_API void NewtonDeformableMeshCreateClusters (NewtonCollision* const deformableMesh, int clusterCount, dFloat overlapingWidth);
@@ -1193,7 +1194,7 @@ extern "C" {
 	NEWTON_API NewtonMesh* NewtonMeshCreate(const NewtonWorld* const newtonWorld);
 	NEWTON_API NewtonMesh* NewtonMeshCreateFromMesh(const NewtonMesh* const mesh);
 	NEWTON_API NewtonMesh* NewtonMeshCreateFromCollision(const NewtonCollision* const collision);
-	NEWTON_API NewtonMesh* NewtonMeshCreateConformingTetrahedralization(const NewtonMesh* const closetMesh);
+	NEWTON_API NewtonMesh* NewtonMeshCreateTetrahedraIsoSurface(const NewtonMesh* const mesh);
 	NEWTON_API NewtonMesh* NewtonMeshCreateConvexHull (const NewtonWorld* const newtonWorld, int pointCount, const dFloat* const vertexCloud, int strideInBytes, dFloat tolerance);
 	NEWTON_API NewtonMesh* NewtonMeshCreateVoronoiConvexDecomposition (const NewtonWorld* const newtonWorld, int pointCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix);
 	NEWTON_API NewtonMesh* NewtonMeshCreateFromSerialization (const NewtonWorld* const newtonWorld, NewtonDeserializeCallback deserializeFunction, void* const serializeHandle);
@@ -1202,6 +1203,7 @@ extern "C" {
 	NEWTON_API void NewtonMeshSerialize (const NewtonMesh* const mesh, NewtonSerializeCallback serializeFunction, void* const serializeHandle);
 	NEWTON_API void NewtonMeshSaveOFF(const NewtonMesh* const mesh, const char* const filename);
 	NEWTON_API NewtonMesh* NewtonMeshLoadOFF(const NewtonWorld* const newtonWorld, const char* const filename);
+	NEWTON_API NewtonMesh* NewtonMeshLoadTetrahedraMesh(const NewtonWorld* const newtonWorld, const char* const filename);
 
 	NEWTON_API void NewtonMeshApplyTransform (const NewtonMesh* const mesh, const dFloat* const matrix);
 	NEWTON_API void NewtonMeshCalculateOOBB(const NewtonMesh* const mesh, dFloat* const matrix, dFloat* const x, dFloat* const y, dFloat* const z);
@@ -1211,6 +1213,8 @@ extern "C" {
 	NEWTON_API void NewtonMeshApplyCylindricalMapping(const NewtonMesh* const mesh, int cylinderMaterial, int capMaterial);
 	NEWTON_API void NewtonMeshApplyBoxMapping(const NewtonMesh* const mesh, int frontMaterial, int sideMaterial, int topMaterial);
 	NEWTON_API void NewtonMeshApplyAngleBasedMapping(const NewtonMesh* const mesh, int material, NewtonReportProgress reportPrograssCallback, void* const reportPrgressUserData);
+
+	NEWTON_API void NewtonCreateTetrahedraLinearBlendSkinWeightsChannel(const NewtonMesh* const tetrahedraMesh, NewtonMesh* const skinMesh);
 	
 	NEWTON_API void NewtonMeshOptimize (const NewtonMesh* const mesh);
 	NEWTON_API void NewtonMeshOptimizePoints (const NewtonMesh* const mesh);
@@ -1245,10 +1249,11 @@ extern "C" {
 	NEWTON_API void NewtonMeshEndBuild(const NewtonMesh* const mesh);
 
 	NEWTON_API void NewtonMeshClearVertexFormat (NewtonMeshVertexFormat* const format);
-	NEWTON_API void NewtonMeshBuildFromVertexListIndexList (const NewtonMesh* const mesh, NewtonMeshVertexFormat* const format);
+	NEWTON_API void NewtonMeshBuildFromVertexListIndexList (const NewtonMesh* const mesh, const NewtonMeshVertexFormat* const format);
 
 	NEWTON_API int NewtonMeshGetPointCount (const NewtonMesh* const mesh); 
 	NEWTON_API const int* NewtonMeshGetIndexToVertexMap(const NewtonMesh* const mesh);
+	NEWTON_API int NewtonMeshGetVertexWeights(const NewtonMesh* const mesh, int vertexIndex, int* const weightIndex, dFloat* const weightFactor);
 
 	NEWTON_API void NewtonMeshGetVertexDoubleChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat64* const outBuffer);
 	NEWTON_API void NewtonMeshGetVertexChannel (const NewtonMesh* const mesh, int vertexStrideInByte, dFloat* const outBuffer);
@@ -1282,12 +1287,6 @@ extern "C" {
 	NEWTON_API int NewtonMeshGetTotalFaceCount (const NewtonMesh* const mesh); 
 	NEWTON_API int NewtonMeshGetTotalIndexCount (const NewtonMesh* const mesh); 
 	NEWTON_API void NewtonMeshGetFaces (const NewtonMesh* const mesh, int* const faceIndexCount, int* const faceMaterial, void** const faceIndices); 
-
-	//NEWTON_API int NewtonMeshGetPointStrideInByte (const NewtonMesh* const mesh); 
-	//NEWTON_API dFloat64* NewtonMeshGetPointArray (const NewtonMesh* const mesh); 
-	//NEWTON_API dFloat64* NewtonMeshGetNormalArray (const NewtonMesh* const mesh); 
-	//NEWTON_API dFloat64* NewtonMeshGetUV0Array (const NewtonMesh* const mesh); 
-	//NEWTON_API dFloat64* NewtonMeshGetUV1Array (const NewtonMesh* const mesh); 
 
 	NEWTON_API int NewtonMeshGetVertexCount (const NewtonMesh* const mesh); 
 	NEWTON_API int NewtonMeshGetVertexStrideInByte (const NewtonMesh* const mesh); 

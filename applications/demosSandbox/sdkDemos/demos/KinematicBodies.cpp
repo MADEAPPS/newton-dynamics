@@ -453,7 +453,7 @@ static NewtonBody* AddStaticMesh(DemoEntityManager* const scene)
 	char fileName[2048];
 
 	NewtonWorld* const world = scene->GetNewton();
-	GetWorkingFileName ("ramp.off", fileName);
+	dGetWorkingFileName ("ramp.off", fileName);
 	NewtonMesh* const ntMesh = NewtonMeshLoadOFF(world, fileName);
 
 	dMatrix matrix (dGetIdentityMatrix());

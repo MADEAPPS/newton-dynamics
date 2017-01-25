@@ -26,250 +26,153 @@
 #include "dgDebug.h"
 #include "dgMemory.h"
 
-//template<class T, dgInt32 Size> class dgLCP;
-//template<class T, dgInt32 Size> class dgSPDMatrix;
-//template<class T, dgInt32 Size> class dgSquareMatrix;
-//template<class T, dgInt32 Rows, dgInt32 Columns> class dgGeneralMatrix;
-
-template<class T, dgInt32 Size>
-class dgGeneralVector
+template <class T>
+DG_INLINE T dgSQRH(const T num, const T den)
 {
-	public:
-	dgGeneralVector() {}
-	~dgGeneralVector() {}
-
-	T& operator[] (dgInt32 i);
-	const T& operator[] (dgInt32 i) const;
-
-	T DotProduct(const dgGeneralVector &b) const;
-	dgInt32 GetRowCount() const {return Size;}
-/*
-	void operator += (const dgGeneralVector &a);
-	void operator -= (const dgGeneralVector &a);
-
-	T Norm() const;
-	T Norm2() const;
-
-	void Clear(T val);
-	void Scale(T scale);
-	void Copy(const dgGeneralVector &src);
-	
-	void LinearCombine(T scale, const dgGeneralVector &a, const dgGeneralVector &b);
-
-	void Trace() const;
-
-	static dgInt32 CalculateMemorySize(dgInt32 size)
-	{
-		return size * sizeof (T) + 16;
-	}
-
-	protected:
-	dgGeneralVector();
-	DG_INLINE void Add(const T* const a);
-	DG_INLINE void Sub(const T* const a);
-	DG_INLINE T DotProduct (const T* const b) const;
-*/
-	T m_columns[Size];
-
-//	friend class dgLCP<T, Size>;
-//	friend class dgSPDMatrix<T, Size>;
-//	friend class dgSquareMatrix<T, Size>;
-};
-
-
-#if 0
-// ***********************************************************************************************
-//
-//   vector
-//
-// ***********************************************************************************************
-template<class T, dgInt32 Size>
-dgGeneralVector<T, Size>::dgGeneralVector()
-	:m_columns(NULL)
-	,m_allocator(NULL)
-	,m_colCount(0)
-{
+	T r(num / den);
+	return T(sqrt(T(1.0f) + r * r));
 }
 
-
-template<class T, dgInt32 Size>
-dgGeneralVector<T, Size>::dgGeneralVector(dgMemoryAllocator* const allocator, dgInt32 size)
-	:m_columns((T*) allocator->MallocLow (size * sizeof (T)))
-	,m_allocator(allocator)
-	,m_colCount(size)
+template <class T>
+DG_INLINE T dgPythag(const T a, const T b)
 {
-	dgAssert(size > 0);
-	dgAssert((((dgUnsigned32)m_columns) & 0x0f) == 0);
+	T absa(abs(a));
+	T absb(abs(b));
+	return (absa > absb) ? (absa * dgSQRH(absb, absa)) : ((absb == T(0.0f) ? T(0.0f) : (absb * dgSQRH(absa, absb))));
 }
 
-
-template<class T, dgInt32 Size>
-dgGeneralVector<T, Size>::dgGeneralVector(const dgGeneralVector<T, Size> &src)
-	:m_columns((T*)src.m_allocator->MallocLow(src.m_colCount * sizeof (T)))
-	,m_allocator(src.m_allocator)
-	,m_colCount(src.m_colCount)
+template <class T>
+DG_INLINE T dgSign(const T a, const T b)
 {
-	dgAssert((((dgUnsigned32)m_columns) & 0x0f) == 0);
-	Copy(src);
+	return (b >= T(0.0f)) ? (a >= T(0.0f) ? a : -a) : (a >= T(0.0f) ? -a : a);
 }
 
-template<class T, dgInt32 Size>
-void dgGeneralVector<T, Size>::Trace() const
-{
-	for (dgInt32 i = 0; i < m_colCount; i++) {
-		dgTrace(("%f ", m_columns[i]));
-	}
-	dgTrace(("\n"));
-}
-
-template<class T, dgInt32 Size>
-DG_INLINE T dgGeneralVector<T, Size>::DotProduct (const T* const A) const
-{
-	T val(0.0f);
-	const T* const me = m_columns;
-	for (dgInt32 i = 0; i < m_colCount; i++) {
-		val = val + me[i] * A[i];
-	}
-	return val;
-}
-
-template<class T, dgInt32 Size>
-void dgGeneralVector<T, Size>::Clear(T val)
-{
-	memset (&m_columns[0], 0, m_colCount * sizeof (T));
-}
-
-template<class T, dgInt32 Size>
-void dgGeneralVector<T, Size>::Copy(const dgGeneralVector<T, Size> &src)
-{
-	dgAssert(m_colCount == src.m_colCount);
-	memcpy (&m_columns[0], &src[0], m_colCount * sizeof (T));
-}
-
-template<class T, dgInt32 Size>
-void dgGeneralVector<T, Size>::Scale(T scale)
-{
-	for (dgInt32 i = 0; i < m_colCount; i++) {
-		m_columns[i] *= scale;
-	}
-}
-
-
-template<class T, dgInt32 Size>
-T dgGeneralVector<T, Size>::Norm2() const
-{
-	T norm(0);
-	for (dgInt32 i = 0; i < m_colCount; i++) {
-		norm = dgMax(m_columns[i] * m_columns[i], norm);
-	}
-	return norm;
-}
-
-template<class T, dgInt32 Size>
-T dgGeneralVector<T, Size>::Norm() const
-{
-	return T(sqrt(Norm2()));
-}
-
-template<class T, dgInt32 Size>
-void dgGeneralVector<T, Size>::LinearCombine(T scale, const dgGeneralVector<T, Size> &A, const dgGeneralVector<T, Size> &B)
-{
-	dgAssert(A.m_colCount == m_colCount);
-	dgAssert(B.m_colCount == m_colCount);
-	for (dgInt32 i = 0; i < m_colCount; i++) {
-		m_columns[i] = A.m_columns[i] * scale + B.m_columns[i];
-	}
-}
-
-template<class T, dgInt32 Size>
-void dgGeneralVector<T, Size>::operator+= (const dgGeneralVector<T, Size> &A)
-{
-	dgAssert(A.m_colCount == m_colCount);
-	dgAssert(A.m_colCount == m_colCount);
-	Add(&A[0]);
-}
-
-template<class T, dgInt32 Size>
-void dgGeneralVector<T, Size>::operator-= (const dgGeneralVector<T, Size> &A)
-{
-	dgAssert(A.m_colCount == m_colCount);
-	Sub(& A[0]);
-}
-
-template<class T, dgInt32 Size>
-DG_INLINE void dgGeneralVector<T, Size>::Add(const T* const a)
-{
-	T* const dst = &m_columns[0];
-	for (dgInt32 i = 0; i < m_colCount; i++) {
-		dst[i] -= a[i];
-	}
-}
-
-template<class T, dgInt32 Size>
-DG_INLINE void dgGeneralVector<T, Size>::Sub(const T* const a)
-{
-	T* const dst = &m_columns[0];
-	for (dgInt32 i = 0; i < m_colCount; i++) {
-		dst[i] -= a[i];
-	}
-}
-
-/*
-template<class T, dgInt32 Size>
-void* dgGeneralVector<T, Size>::operator new (size_t size)
-{
-	dgAssert(0);
-	return NULL;
-}
-
-template<class T, dgInt32 Size>
-void* dgGeneralVector<T, Size>::operator new (size_t size, dgMemoryAllocator* const allocator)
-{
-	return allocator->MallocLow(dgInt32 (size));
-}
-
-template<class T, dgInt32 Size>
-void dgGeneralVector<T, Size>::operator delete (void* const ptr, dgMemoryAllocator* const allocator)
-{
-	dgGeneralVector<T>* const me = (dgGeneralVector<T>*) ptr;
-	me->m_allocator->FreeLow(ptr);
-}
-
-template<class T, dgInt32 Size>
-void dgGeneralVector<T, Size>::operator delete (void* const ptr)
-{
-	dgGeneralVector<T>* const me = (dgGeneralVector<T>*) ptr;
-	me->m_allocator->FreeLow(ptr);
-}
-*/
-#endif
-
-template<class T, dgInt32 Size>
-T& dgGeneralVector<T, Size>::operator[] (dgInt32 i)
-{
-	dgAssert(i < Size);
-	dgAssert(i >= 0);
-	return m_columns[i];
-}
-
-template<class T, dgInt32 Size>
-const T& dgGeneralVector<T, Size>::operator[] (dgInt32 i) const
-{
-	dgAssert(i < Size);
-	dgAssert(i >= 0);
-	return m_columns[i];
-}
 
 // return dot product
-template<class T, dgInt32 Size>
-T dgGeneralVector<T, Size>::DotProduct(const dgGeneralVector<T, Size> &b) const
+template<class T>
+DG_INLINE T dgDotProduct(dgInt32 size, const T* const A, const T* const B)
 {
 	T val(0.0f);
-	dgAssert (Size == b.GetRowCount());
-	for (dgInt32 i = 0; i < Size; i++) {
-		val = val + m_columns[i] * b.m_columns[i];
+	for (dgInt32 i = 0; i < size; i++) {
+		val = val + A[i] * B[i];
 	}
 	return val;
+}
+
+
+template<class T>
+DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, T* const matrix)
+{
+	T* const rowN = &matrix[size * n];
+
+	dgInt32 stride = 0;
+	for (dgInt32 j = 0; j <= n; j++) {
+		T s(0.0f);
+		T* const rowJ = &matrix[stride];
+		for (dgInt32 k = 0; k < j; k++) {
+			s += rowN[k] * rowJ[k];
+		}
+
+		if (n == j) {
+			T diag = rowN[n] - s;
+			if (diag < T(dgFloat32(0.0f))) {
+				dgAssert(0);
+				return false;
+			}
+			rowN[n] = T(sqrt(diag));
+		} else {
+			rowN[j] = (T(1.0f) / rowJ[j] * (rowN[j] - s));
+		}
+
+		stride += size;
+	}
+	return true;
+}
+
+template<class T>
+DG_INLINE void dgCholeskyRestore(dgInt32 size, dgInt32 from, dgInt32 to, T* const matrix, const T* const diagonal)
+{
+	dgInt32 stride = from * size;
+	for (dgInt32 i = from; i < to; i++) {
+		T* const row = &matrix[stride];
+		row[i] = diagonal[i];
+		for (dgInt32 j = 0; j < i; j++) {
+			row[j] = matrix[size * j + i];
+		}
+		stride += size;
+	}
+}
+
+template<class T>
+DG_INLINE void dgCholeskySolve(dgInt32 size, dgInt32 n, const T* const choleskyMatrix, T* const x)
+{
+	dgInt32 stride = 0;
+	for (dgInt32 i = 0; i < n; i++) {
+		T acc(0.0f);
+		const T* const row = &choleskyMatrix[stride];
+		for (dgInt32 j = 0; j < i; j++) {
+			acc = acc + row[j] * x[j];
+		}
+		x[i] = (x[i] - acc) / row[i];
+		stride += size;
+	}
+
+	for (dgInt32 i = n - 1; i >= 0; i--) {
+		T acc = 0.0f;
+		for (dgInt32 j = i + 1; j < n; j++) {
+			acc = acc + choleskyMatrix[size * j + i] * x[j];
+		}
+		x[i] = (x[i] - acc) / choleskyMatrix[size * i + i];
+	}
+}
+
+
+// calculate delta_r = A * delta_x
+template<class T>
+DG_INLINE void dgCalculateDelta_r(dgInt32 size, dgInt32 n, const T* const matrix, const T* const delta_x, T* const delta_r)
+{
+	dgInt32 stride = n * size;
+	for (dgInt32 i = n; i < size; i++) {
+		delta_r[i] = dgDotProduct(size, &matrix[stride], delta_x);
+		stride += size;
+	}
+}
+
+template<class T>
+DG_INLINE void dgCalculateDelta_x(dgInt32 size, T dir, dgInt32 n, const T* const matrix, T* const delta_x)
+{
+	const T* const row = &matrix[size * n];
+	for (dgInt32 i = 0; i < n; i++) {
+		delta_x[i] = -row[i] * dir;
+	}
+	dgCholeskySolve(size, n, matrix, delta_x);
+	delta_x[n] = dir;
+}
+
+
+template<class T>
+DG_INLINE void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, T* const matrix, T* const x, T* const r, T* const low, T* const high, T* const diagonal, dgInt16* const permute)
+{
+	if (i != j) {
+		T* const A = &matrix[size * i];
+		T* const B = &matrix[size * j];
+		for (dgInt32 k = 0; k < size; k++) {
+			dgSwap(A[k], B[k]);
+		}
+
+		dgInt32 stride = 0;
+		for (dgInt32 k = 0; k < size; k++) {
+			dgSwap(matrix[stride + i], matrix[stride + j]);
+			stride += size;
+		}
+
+		dgSwap(x[i], x[j]);
+		dgSwap(r[i], r[j]);
+		dgSwap(low[i], low[j]);
+		dgSwap(high[i], high[j]);
+		dgSwap(diagonal[i], diagonal[j]);
+		dgSwap(permute[i], permute[j]);
+	}
 }
 
 #endif

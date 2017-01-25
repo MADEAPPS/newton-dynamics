@@ -87,7 +87,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
-      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../source/ampPhysics;../../../../packages/thirdParty/timeTracker</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../../packages/thirdParty/timeTracker</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
@@ -132,7 +132,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
-      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../source/ampPhysics;../../../../packages/thirdParty/timeTracker</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../../packages/thirdParty/timeTracker</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
@@ -174,7 +174,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../source/ampPhysics;../../../../packages/thirdParty/timeTracker</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../../packages/thirdParty/timeTracker</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_32_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
@@ -222,7 +222,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../source/pthreads.2;../../../source/ampPhysics;../../../../packages/thirdParty/timeTracker</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../source/core;../../../source/physics;../../../source/meshUtil;../../../../packages/thirdParty/timeTracker</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;PTW32_STATIC_LIB;_WIN_64_VER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
@@ -269,6 +269,7 @@
     <ClCompile Include="..\..\..\source\physics\dgBroadPhasePersistent.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionCompoundFractured.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionLumpedMassParticles.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgCollisionMassSpringDamperSystem.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgContact.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgContactSolver.cpp" />
@@ -290,7 +291,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionConvexHull.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionConvexPolygon.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionCylinder.cpp" />
-    <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableMesh.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgCollisionHeightField.cpp" />
@@ -331,6 +331,7 @@
     <ClInclude Include="..\..\..\source\physics\dgBroadPhasePersistent.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionCompoundFractured.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionLumpedMassParticles.h" />
+    <ClInclude Include="..\..\..\source\physics\dgCollisionMassSpringDamperSystem.h" />
     <ClInclude Include="..\..\..\source\physics\dgConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgContact.h" />
     <ClInclude Include="..\..\..\source\physics\dgContactSolver.h" />
@@ -352,7 +353,6 @@
     <ClInclude Include="..\..\..\source\physics\dgCollisionConvexHull.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionConvexPolygon.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionCylinder.h" />
-    <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableMesh.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableSolidMesh.h" />
     <ClInclude Include="..\..\..\source\physics\dgCollisionHeightField.h" />
@@ -374,9 +374,6 @@
     <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\pthreads.2\VS_2013_static_mt\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-    </ProjectReference>
     <ProjectReference Include="core.vcxproj">
       <Project>{57ac4f2d-b115-4931-8f6e-af8ad616b6aa}</Project>
     </ProjectReference>

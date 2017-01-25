@@ -16,8 +16,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dScene", "dScene.vcxproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dVisualDebuggerServer", "dVisualDebuggerServer.vcxproj", "{2FFEB5B8-8929-469F-BB13-4E391CD3213C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\coreLibrary_300\source\pthreads.2\VS_2013_static_md\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\coreLibrary_300\projects\windows\project_vs2013_static_md\core.vcxproj", "{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\coreLibrary_300\projects\windows\project_vs2013_static_md\newton.vcxproj", "{68D9962C-0EC7-445A-B0FD-F87B16D43901}"
@@ -89,14 +87,6 @@ Global
 		{2FFEB5B8-8929-469F-BB13-4E391CD3213C}.release|Win32.ActiveCfg = Release|Win32
 		{2FFEB5B8-8929-469F-BB13-4E391CD3213C}.release|Win32.Build.0 = Release|Win32
 		{2FFEB5B8-8929-469F-BB13-4E391CD3213C}.release|x64.ActiveCfg = Release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.ActiveCfg = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|Win32.Build.0 = debug|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.ActiveCfg = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.debug|x64.Build.0 = debug|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.ActiveCfg = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|Win32.Build.0 = release|Win32
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.ActiveCfg = release|x64
-		{03BCA23C-02A5-415B-A37B-26600BC2CE96}.release|x64.Build.0 = release|x64
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}.debug|Win32.ActiveCfg = debug|Win32
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}.debug|Win32.Build.0 = debug|Win32
 		{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}.debug|x64.ActiveCfg = debug|x64

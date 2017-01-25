@@ -322,10 +322,10 @@ class dgBroadPhase
 	virtual void RayCast (const dgVector& p0, const dgVector& p1, OnRayCastAction filter, OnRayPrecastAction prefilter, void* const userData) const = 0;
 	virtual dgInt32 Collide(dgCollisionInstance* const shape, const dgMatrix& matrix, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
 	virtual dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
+	virtual void FindCollidingPairsForward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID) = 0;
+	virtual void FindCollidingPairsForwardAndBackward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID) = 0;
 
 	void ScanForContactJoints(dgBroadphaseSyncDescriptor& syncPoints);
-	void FindCollidingPairsForward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
-	void FindCollidingPairsForwardAndBackward (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID);
 
 	void UpdateBody(dgBody* const body, dgInt32 threadIndex);
 	void AddInternallyGeneratedBody(dgBody* const body)
@@ -410,10 +410,10 @@ class dgBroadPhase
 	bool m_scanTwoWays;
 	bool m_recursiveChunks;
 
-	DG_INLINE dgVector ReduceLine(dgVector* const simplex, dgInt32& indexOut) const;
-	DG_INLINE dgVector ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const;
-	DG_INLINE dgVector ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const;
-	DG_INLINE void ReduceDegeneratedTriangle(dgVector* const simplex) const;
+	//DG_INLINE dgVector ReduceLine(dgVector* const simplex, dgInt32& indexOut) const;
+	//DG_INLINE dgVector ReduceTriangle(dgVector* const simplex, dgInt32& indexOut) const;
+	//DG_INLINE dgVector ReduceTetrahedrum(dgVector* const simplex, dgInt32& indexOut) const;
+	//DG_INLINE void ReduceDegeneratedTriangle(dgVector* const simplex) const;
 
 	static dgVector m_velocTol;
 	static dgVector m_linearContactError2;

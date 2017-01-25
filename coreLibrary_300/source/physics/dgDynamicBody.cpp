@@ -201,22 +201,6 @@ bool dgDynamicBody::IsInEquilibrium() const
 		if (deltaAlpha2 > DG_ERR_TOLERANCE2) {
 			return false;
 		}
-
-/*
-		dgVector netAccel(m_netForce.Scale4(m_invMass.m_w));
-		dgAssert(netAccel.m_w == 0.0f);
-		dgFloat32 netAccel2 = deltaAccel.DotProduct4(deltaAccel).GetScalar();
-		if (netAccel2 > DG_ERR_TOLERANCE2) {
-			return false;
-		}
-
-		dgVector netAlpha(m_matrix.UnrotateVector(m_netTorque).CompProduct4(m_invMass));
-		dgAssert(netAlpha.m_w == 0.0f);
-		dgFloat32 netAlpha2 = netAlpha.DotProduct4(netAlpha).GetScalar();
-		if (netAlpha2 > DG_ERR_TOLERANCE2) {
-			return false;
-		}
-*/
 		return true;
 	}
 	return false;
@@ -254,8 +238,48 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 			dgVector timeStepVect(timestep);
 			m_veloc += accel.CompProduct4(timeStepVect);
+			
+#if 0
+			// Using fordward half step euler integration 
+			// (not enough to cope with high angular velocities)
 			dgVector correction(alpha.CrossProduct3(m_omega));
 			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
+#else
+			// Using fordward and backward euler integration
+			// (good to resolve high angular velocity precessions) 
+			// alpha = (T * R^1 - (wl cross (wl * Il)) Il^1 * R
+			dgVector omega(m_omega);
+			dgVector halfStep(dgVector::m_half.Scale4(timestep));
+			dgMatrix matrix (m_matrix);
+
+			for (dgInt32 i = 0; i < 2; i++) {
+				// get forward derivative
+				dgVector localOmega(matrix.UnrotateVector(m_omega));
+				dgVector localTorque(matrix.UnrotateVector(m_externalTorque));
+				dgVector predictDerivative(matrix.RotateVector(m_invMass.CompProduct4(localTorque - (localOmega.CrossProduct3(localOmega.CompProduct4(m_mass))))));
+				dgVector predictOmega(omega + predictDerivative.CompProduct4(timeStepVect));
+
+				// calculate new rotation matrix at time (dw, dt) 
+				dgFloat32 omegaMag2 = predictOmega.DotProduct3(predictOmega);
+				dgFloat32 invOmegaMag = dgRsqrt(omegaMag2 + dgFloat32(1.0e-14f));
+				dgVector omegaAxis(predictOmega.Scale4(invOmegaMag));
+				dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
+				dgQuaternion rotation(m_rotation * dgQuaternion(omegaAxis, omegaAngle));
+				matrix = dgMatrix(rotation, dgVector::m_wOne);
+
+				// get backward derivative
+				localOmega = matrix.UnrotateVector(predictOmega);
+				localTorque = matrix.UnrotateVector(m_externalTorque);
+				dgVector correctionDerivative(matrix.RotateVector(m_invMass.CompProduct4(localTorque - (localOmega.CrossProduct3(localOmega.CompProduct4(m_mass))))));
+
+				// calculate omega as the average of forward and backward derivatives.
+				// In theory since alpha is a quadratic funtion of omega, this should converge to an eact value
+				// in one at most two steps.
+				omega = m_omega + halfStep.CompProduct4(correctionDerivative + predictDerivative);
+			}
+			m_omega = omega;
+#endif
+
 		} else {
 			dgCollisionLumpedMassParticles* const lumpedMassShape = (dgCollisionLumpedMassParticles*)m_collision->m_childShape;
 			lumpedMassShape->IntegrateForces(timestep);

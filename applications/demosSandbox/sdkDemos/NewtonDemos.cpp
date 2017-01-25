@@ -26,7 +26,7 @@
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
-//#define DEFAULT_SCENE	3			// Precessing tops
+#define DEFAULT_SCENE	3			// Precessing tops
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
@@ -48,7 +48,7 @@
 //#define DEFAULT_SCENE	22			// simple convex decomposition
 //#define DEFAULT_SCENE	23			// scene Collision
 //#define DEFAULT_SCENE	24          // simple boolean operators 
-#define DEFAULT_SCENE	25			// simple convex fracturing 
+//#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
@@ -332,7 +332,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_timestepAcc(0)
 	,m_fps(0.0f)
 {
-/*
+
 //m_broadPhaseType = 1;
 //m_autoSleepState = false;
 //m_microthreadIndex = 1;
@@ -343,8 +343,9 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_hideVisualMeshes = true;
 //m_hardwareDevice = 2;
 //m_showStatistics = true;
-//*/
+//
 
+//m_solverModeQuality = 1;
 //m_showCenterOfMass = true;
 //m_physicsUpdateMode = 1;
 //m_hideVisualMeshes = true;

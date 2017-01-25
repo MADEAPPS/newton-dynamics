@@ -59,7 +59,7 @@ unsigned dRand ()
 	return ___dRandSeed___ & dRAND_MAX;
 }
 
-dFloat RandomVariable(dFloat amp)
+dFloat dRandomVariable(dFloat amp)
 {
 	unsigned val;
 	val = dRand() + dRand();
@@ -68,7 +68,7 @@ dFloat RandomVariable(dFloat amp)
 
 
 // Windows user assets path
-void GetWorkingFileName (const char* const name, char* const outPathName)
+void dGetWorkingFileName (const char* const name, char* const outPathName)
 {
 	#if defined (_MSC_VER)
 

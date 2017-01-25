@@ -37,29 +37,31 @@ class dgCollisionDeformableMesh: public dgCollisionLumpedMassParticles
 
 	dgInt32 GetLinksCount() const;
 	const dgInt16* GetLinks() const;
-	const dgInt32* GetIndexToVertexMap() const;
 	
 	virtual void ConstraintParticle(dgInt32 particleIndex, const dgVector& posit, const dgBody* const body);
 
 	void DisableInactiveLinks ();
 
 	protected:
-	class dgSoftLink
+	class dgSpringDamperLink
 	{
 		public:
+		dgFloat32 m_spring;
+		dgFloat32 m_damper;
+		dgFloat32 m_restlength;
 		dgInt16 m_m0;
 		dgInt16 m_m1;
 	};
 
+
+	virtual void CalculateAcceleration(dgFloat32 timestep) = 0;
+
 	virtual void FinalizeBuild();
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	virtual void IntegrateForces(dgFloat32 timestep);
-	virtual void HandleCollision (dgFloat32 timestep, dgVector* const dir0, dgVector* const dir1, dgVector* const dir2, dgVector* const collisionAccel) const;
-	virtual void CalculateAcceleration(dgFloat32 timestep);
-
-	dgArray<dgSoftLink> m_linkList;
-	dgArray<dgFloat32> m_restlength;
-	dgArray<dgInt32> m_indexToVertexMap;
+	virtual void DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	
+	dgArray<dgSpringDamperLink> m_linkList;
 	dgInt32 m_linksCount;
 
 	static dgVector m_smallestLenght2;

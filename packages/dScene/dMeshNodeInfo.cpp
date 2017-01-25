@@ -125,19 +125,21 @@ void dMeshNodeInfo::BakeTransform (const dMatrix& transform)
 
 	NewtonMeshApplyTransform (m_mesh, &matrix[0][0]);
 }
-
+/*
 void dMeshNodeInfo::BuildFromVertexListIndexList(int faceCount, const int* const faceIndexCount, const int* faceMaterialIndex, 
 	const dFloat* const vertex, int vertexStrideInBytes, const int* vertexIndex,
 	const dFloat* const normal, int normalStrideInBytes, const int* normalIndex,
 	const dFloat* const uv0, int uv0StrideInBytes, const int* uv0Index,
 	const dFloat* const uv1, int uv1StrideInBytes, const int* uv1Index)
+*/
+void dMeshNodeInfo::BuildFromVertexListIndexList(const NewtonMeshVertexFormat* const format)
 {
-dAssert (0);
 /*
 	NewtonMeshBuildFromPointListIndexList(m_mesh, faceCount, faceIndexCount, faceMaterialIndex, 
 		vertex, vertexStrideInBytes, vertexIndex,normal, normalStrideInBytes, normalIndex,
 		uv0, uv0StrideInBytes, uv0Index, uv1, uv1StrideInBytes, uv1Index);
 */
+	NewtonMeshBuildFromVertexListIndexList (m_mesh, format);
 }
 
 void dMeshNodeInfo::RemoveUnusedVertices(dScene* const world, dScene::dTreeNode* const myNode)

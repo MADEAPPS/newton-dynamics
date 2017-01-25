@@ -601,7 +601,7 @@ class PlaformEntityEntity: public DemoEntity
 static DemoEntityManager::dListNode* LoadScene(DemoEntityManager* const scene, const char* const name, const dMatrix& location)
 {
 	char fileName[2048];
-	GetWorkingFileName (name, fileName);
+	dGetWorkingFileName (name, fileName);
 
 	DemoEntityManager::dListNode* const lastEnt = scene->GetLast();
 	scene->LoadScene (fileName);

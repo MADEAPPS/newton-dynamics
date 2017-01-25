@@ -39,19 +39,17 @@ class dgArray
 	~dgArray ();
 	DG_CLASS_ALLOCATOR(allocator)
 	
-	T& operator[] (dgInt32 i);
-	const T& operator[] (dgInt32 i) const;
+	DG_INLINE T& operator[] (dgInt32 i);
+	DG_INLINE const T& operator[] (dgInt32 i) const;
 	
 	void Clear () const;
 	void Resize (dgInt32 size) const;
+	DG_INLINE void ResizeIfNecessary  (dgInt32 index) const;
 
 	dgInt32 GetElementSize() const;
 	dgInt32 GetBytesCapacity () const;
 	dgInt32 GetElementsCapacity () const; 
-
 	dgMemoryAllocator* GetAllocator() const;
-
-	bool ExpandCapacityIfNeessesary (dgInt32 index, dgInt32 stride) const;
 
 	private:
 	mutable T *m_array;
@@ -168,6 +166,12 @@ void dgArray<T>::Clear () const
 }
 
 template<class T>
+dgMemoryAllocator* dgArray<T>::GetAllocator() const
+{
+	return m_allocator;
+}
+
+template<class T>
 void dgArray<T>::Resize (dgInt32 size) const
 {
 	if (size >= m_maxSize) {
@@ -182,9 +186,7 @@ void dgArray<T>::Resize (dgInt32 size) const
 		m_array = newArray;
 		m_maxSize = size;
 	} else if (size < m_maxSize) {
-		dgAssert(0);
-/*
-		size = size + m_granulatity - (size + m_granulatity) % m_granulatity;
+		size = dgMax (size, 16);
 		T* const newArray = (T*) m_allocator->MallocLow (sizeof (T) * size, m_aligmentInBytes);
 		if (m_array) {
 			for (dgInt32 i = 0; i < size; i ++) {
@@ -194,26 +196,16 @@ void dgArray<T>::Resize (dgInt32 size) const
 		}
 		m_array = newArray;
 		m_maxSize = size;
-*/
 	}
 }
 
-template<class T>
-dgMemoryAllocator* dgArray<T>::GetAllocator() const
-{
-	return m_allocator;
-}
 
 template<class T>
-bool dgArray<T>::ExpandCapacityIfNeessesary (dgInt32 index, dgInt32 stride) const
+DG_INLINE void dgArray<T>::ResizeIfNecessary  (dgInt32 size) const
 {
-	bool ret = false;
-	dgInt32 size = (index + 1) * stride;
 	while (size >= m_maxSize) {
-		ret = true;
 		Resize (m_maxSize * 2);
 	}
-	return ret;
 }
 
 #endif

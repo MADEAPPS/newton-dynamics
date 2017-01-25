@@ -33,7 +33,7 @@
 #define DG_RAY_TOL_ADAPTIVE_ERROR (dgFloat32 (1.0e-1f))
 
 
-
+/*
 dgFloat32 dgFastRayTest::PolygonIntersectFallback (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat32));
@@ -71,7 +71,7 @@ dgFloat32 dgFastRayTest::PolygonIntersectFallback (const dgVector& normal, dgFlo
 	}
 	return dgFloat32 (1.2f);
 }
-
+*/
 
 
 dgFloat32 dgFastRayTest::PolygonIntersect (const dgVector& normal, dgFloat32 maxT, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount) const
@@ -204,7 +204,7 @@ bool dgApi dgRayBoxClip (dgVector& p0, dgVector& p1, const dgVector& boxP0, cons
 }
 
 
-dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, const dgVector& ray_p1)
+dgBigVector dgPointToRayDistance (const dgBigVector& point, const dgBigVector& ray_p0, const dgBigVector& ray_p1)
 {
 	dgFloat32 t;
 	dgVector dp (ray_p1 - ray_p0);
@@ -212,58 +212,8 @@ dgVector dgPointToRayDistance (const dgVector& point, const dgVector& ray_p0, co
 	return ray_p0 + dp.Scale3 (t);
 }
 
-dgVector dgPointToTriangleDistance(const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2)
+dgBigVector dgPointToTriangleDistance(const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2)
 {
-/*
-#ifdef _DEBUG
-	dgVector faceNormal((p1 - p0).CrossProduct3(p2 - p0));
-	dgFloat64 faceNormal2 = faceNormal.DotProduct3(faceNormal);
-	dgFloat64 normal2 = normal.DotProduct3(normal);
-	dgFloat64 faceNormalNormal = faceNormal.DotProduct3(normal);
-	dgFloat64 error = (faceNormalNormal * faceNormalNormal - faceNormal2 * normal2) / (faceNormalNormal * faceNormalNormal);
-	dgAssert(fabsf(error < dgFloat32(1.0e-5f)));
-	dgAssert(faceNormalNormal > dgFloat32(0.0f));
-#endif
-
-	dgVector array[3];
-	array[0] = p0;
-	array[1] = p1;
-	array[2] = p2;
-
-	dgInt32 i0 = 2;
-	dgInt32 closestIndex = -1;
-	dgVector p1p0(array[2] - point);
-	for (dgInt32 i1 = 0; i1 < 3; i1++) {
-		dgVector p2p0(array[i1] - point);
-		dgFloat32 volume = normal.DotProduct3(p1p0.CrossProduct3(p2p0));
-
-		if (volume < dgFloat32(0.0f)) {
-			dgVector segment(array[i1] - array[i0]);
-			dgVector poinP0(point - array[i0]);
-			dgFloat32 den = segment.DotProduct3(segment);
-			dgAssert(den > dgFloat32(0.0f));
-			dgFloat32 num = poinP0.DotProduct3(segment);
-			if (num < dgFloat32(0.0f)) {
-				closestIndex = i0;
-			}
-			else if (num > den) {
-				closestIndex = i1;
-			}
-			else {
-				return array[i0] + segment.Scale3(num / den);
-			}
-		}
-		p1p0 = p2p0;
-		i0 = i1;
-	}
-
-	if (closestIndex >= 0) {
-		return array[closestIndex];
-	} else {
-		return point - normal.Scale3(normal.DotProduct3(point - p0) / normal.DotProduct3(normal));
-	}
-*/
-
 	const dgBigVector e10(p1 - p0);
 	const dgBigVector e20(p2 - p0);
 	const dgFloat64 a00 = e10.DotProduct4(e10).GetScalar();
@@ -293,7 +243,7 @@ dgVector dgPointToTriangleDistance(const dgVector& point, const dgVector& p0, co
 	return p0;
 }
 
-dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0, const dgVector& p1, const dgVector& p2, const dgVector& p3)
+dgBigVector dgPointToTetrahedrumDistance (const dgBigVector& point, const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& p3)
 {
 	const dgBigVector e10(p1 - p0);
 	const dgBigVector e20(p2 - p0);
@@ -310,7 +260,7 @@ dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0
 			const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
 			const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
 			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
-			if (desc11 > dgFloat64(0.0f)) {
+			if (desc22 > dgFloat64(0.0f)) {
 				dgBigVector p0Point (point - p0);
 				const dgFloat64 d2 = sqrt(desc22);
 				const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
@@ -321,9 +271,7 @@ dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0
 
 				dgFloat64 u1 = b0 * invd0;
 				dgFloat64 u2 = (b1 - l10 * u1) * invd1;
-				dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2;
-
-				u3 = u3 * invd2;
+				dgFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2 * invd2;
 				u2 = (u2 - l21 * u3) * invd1;
 				u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
 				if (u3 < dgFloat64(0.0f)) {
@@ -345,7 +293,6 @@ dgVector dgPointToTetrahedrumDistance (const dgVector& point, const dgVector& p0
 	return p0;
 }
 
-//#include "dgSPDMatrix.h"
 void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, const dgVector& ray_q0, const dgVector& ray_q1, dgVector& pOut, dgVector& qOut)
 {
 	dgFloat32 sN;

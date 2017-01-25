@@ -421,7 +421,6 @@ dgAssert (0);
 
 	dgVector speedFreeze2 (world->m_freezeSpeed2 * dgFloat32 (0.1f));
 	dgVector freezeOmega2 (world->m_freezeOmega2 * dgFloat32 (0.1f));
-	//dgVector forceActiveMask ((syncData->m_jointCount <= DG_SMALL_ISLAND_COUNT) ?  dgFloat32 (-1.0f): dgFloat32 (0.0f));
 	dgVector forceActiveMask ((syncData->m_jointCount <= DG_SMALL_ISLAND_COUNT) ?  dgVector (-1, -1, -1, -1) : dgFloat32 (0.0f));
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
 
@@ -531,7 +530,6 @@ void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernel (void* const context
 
 	dgVector invTime (invTimestepSrc);
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
-//	dgVector forceActiveMask ((syncData->m_jointCount <= DG_SMALL_ISLAND_COUNT) ?  dgVector (-1, -1, -1, -1) : dgFloat32 (0.0f));
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 		world->ApplyNetTorqueAndForce (body, invTime, maxAccNorm2);

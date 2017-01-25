@@ -549,15 +549,6 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 
 	dVector force (dVector (0.0f, 1.0f, 0.0f).Scale (mass * DEMO_GRAVITY));
 	NewtonBodySetForce (body, &force.m_x);
-/*
-// check that angular momentum is conserved
-dMatrix I;
-dVector omega(0.0f);
-NewtonBodyGetInertiaMatrix(body, &I[0][0]);
-NewtonBodyGetOmega(body, &omega[0]);
-dVector L (I.RotateVector(omega));
-dTrace (("(%f %f %f) (%f %f %f)\n", omega[0], omega[1], omega[2], L[0], L[1], L[2]));
-*/
 }
 
 
@@ -688,10 +679,6 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 		{
 			// create the collision 
 			collision = NewtonCreateCylinder (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, NULL); 
-
-			NewtonCollisionInfoRecord collisionInfo;
-			NewtonCollisionGetInfo(collision, &collisionInfo);
-
 			break;
 		}
 
@@ -727,9 +714,9 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* world, const dMatrix& srcMa
 			int count = 6;
 			// populate the cloud with pseudo Gaussian random points
 			for (int i = 6; i < SAMPLE_COUNT; i ++) {
-				cloud [i].m_x = RandomVariable(size.m_x);
-				cloud [i].m_y = RandomVariable(size.m_y);
-				cloud [i].m_z = RandomVariable(size.m_z);
+				cloud [i].m_x = dRandomVariable(size.m_x);
+				cloud [i].m_y = dRandomVariable(size.m_y);
+				cloud [i].m_z = dRandomVariable(size.m_z);
 				count ++;
 			}
 			collision = NewtonCreateConvexHull (world, count, &cloud[0].m_x, sizeof (dVector), 0.01f, 0, NULL); 
@@ -1127,7 +1114,7 @@ NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const n
 {
 	// load the scene from a ngd file format
 	char fileName[2048];
-	GetWorkingFileName (name, fileName);
+	dGetWorkingFileName (name, fileName);
 	scene->LoadScene (fileName);
 
 	NewtonBody* levelBody = NULL;

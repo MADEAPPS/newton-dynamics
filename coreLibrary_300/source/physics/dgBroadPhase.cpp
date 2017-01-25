@@ -842,7 +842,7 @@ void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy,
 
 		if ((entropy > oldEntropy * dgFloat32(2.0f)) || (entropy < oldEntropy * dgFloat32(0.5f))) {
 			if (fitness.GetFirst()) {
-				m_world->m_solverJacobiansMemory.ExpandCapacityIfNeessesary(fitness.GetCount() * 2 + 12, sizeof (dgBroadPhaseNode*));
+				m_world->m_solverJacobiansMemory.ResizeIfNecessary ((fitness.GetCount() * 2 + 16) * sizeof (dgBroadPhaseNode*));
 				dgBroadPhaseNode** const leafArray = (dgBroadPhaseNode**)&m_world->m_solverJacobiansMemory[0];
 
 				dgInt32 leafNodesCount = 0;
@@ -1029,7 +1029,7 @@ void dgBroadPhase::RotateRight (dgBroadPhaseTreeNode* const node, dgBroadPhaseNo
 	}
 }
 
-
+/*
 DG_INLINE void dgBroadPhase::ReduceDegeneratedTriangle(dgVector* const simplex) const
 {
 	dgVector e10(simplex[1] - simplex[0]);
@@ -1142,7 +1142,6 @@ DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgIn
 	dgVector p30(p3 - p0);
 	dgVector n(p10.CrossProduct3(p20));
 	dgAssert(n.m_w == dgFloat32(0.0f));
-	//dgFloat32 volume = p30 % n;
 	dgFloat32 volume = n.DotProduct4(p30).GetScalar();
 	if (volume < dgFloat32(0.0f)) {
 		volume = -volume;
@@ -1203,7 +1202,7 @@ DG_INLINE dgVector dgBroadPhase::ReduceTetrahedrum(dgVector* const simplex, dgIn
 	return origin;
 }
 
-/*
+
 bool dgBroadPhase::TestOverlaping (const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
@@ -1658,74 +1657,6 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 	}
 }
 
-void dgBroadPhase::FindCollidingPairsForward(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
-{
-	const dgFloat32 timestep = descriptor->m_timestep;
-
-	dgList<dgBroadPhaseNode*>::dgListNode* node = nodePtr;
-	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
-	while (node) {
-		dgBroadPhaseNode* const broadPhaseNode = node->GetInfo();
-		dgAssert(broadPhaseNode->IsLeafNode());
-		dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
-
-		if (broadPhaseNode->IsAggregate()) {
-			((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSeltPairs(timestep, threadID);
-		}
-
-		for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
-			dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
-			dgAssert(!parent->IsLeafNode());
-			dgBroadPhaseNode* const sibling = parent->m_right;
-			if (sibling != ptr) {
-				SubmitPairs(broadPhaseNode, sibling, timestep, 0, threadID);
-			}
-		}
-
-		for (dgInt32 i = 0; i < threadCount; i++) {
-			node = node ? node->GetNext() : NULL;
-		}
-	}
-}
-
-
-void dgBroadPhase::FindCollidingPairsForwardAndBackward(dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const nodePtr, dgInt32 threadID)
-{
-	const dgFloat32 timestep = descriptor->m_timestep;
-
-	dgList<dgBroadPhaseNode*>::dgListNode* node = nodePtr;
-	const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
-	const dgUnsigned32 lru = m_lru + 1;
-	while (node) {
-		dgBroadPhaseNode* const broadPhaseNode = node->GetInfo();
-		dgAssert(broadPhaseNode->IsLeafNode());
-		dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
-
-		if (lru == broadPhaseNode->GetDirtyLru()) {
-			if (broadPhaseNode->IsAggregate()) {
-				((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSeltPairs(timestep, threadID);
-			}
-
-			for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
-				dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
-				dgAssert(!parent->IsLeafNode());
-				dgBroadPhaseNode* const rightSibling = parent->m_right;
-				if (rightSibling != ptr) {
-					SubmitPairs(broadPhaseNode, rightSibling, timestep, threadCount, threadID);
-				}
-				dgBroadPhaseNode* const leftSibling = parent->m_left;
-				if (leftSibling != ptr) {
-					SubmitPairs(broadPhaseNode, leftSibling, timestep, threadCount, threadID);
-				}
-			}
-		}
-
-		for (dgInt32 i = 0; i < threadCount; i++) {
-			node = node ? node->GetNext() : NULL;
-		}
-	}
-}
-
 
 void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, dgInt32 threadID)
 {
@@ -1933,12 +1864,14 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 			#if 0
 				static FILE* file = fopen("replay.bin", "wb");
 				if (file) {
+					dgInt32 sleepState = body->GetSleepState();
 					fwrite(&body->m_accel, sizeof (dgVector), 1, file);
 					fwrite(&body->m_alpha, sizeof (dgVector), 1, file);
 					fwrite(&body->m_veloc, sizeof (dgVector), 1, file);
 					fwrite(&body->m_omega, sizeof (dgVector), 1, file);
 					fwrite(&body->m_externalForce, sizeof (dgVector), 1, file);
 					fwrite(&body->m_externalTorque, sizeof (dgVector), 1, file);
+					fwrite(&sleepState, sizeof (dgInt32), 1, file);
 					//dgTrace (("%d f(%f %f %f) v(%f %f %f) f(%f %f %f)\n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z, body->m_externalForce.m_x, body->m_externalForce.m_y, body->m_externalForce.m_z));
 					fflush(file);
 				}
@@ -1951,6 +1884,9 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 					fread(&body->m_omega, sizeof (dgVector), 1, file);
 					fread(&body->m_externalForce, sizeof (dgVector), 1, file);
 					fread(&body->m_externalTorque, sizeof (dgVector), 1, file);
+					dgInt32 sleepState;
+					fread(&sleepState, sizeof (dgInt32), 1, file);
+					body->SetSleepState (sleepState ? true : false);
 					//dgTrace (("%d f(%f %f %f) v(%f %f %f) f(%f %f %f)\n", xxx, body->m_accel.m_x, body->m_accel.m_y, body->m_accel.m_z, body->m_veloc.m_x, body->m_veloc.m_y, body->m_veloc.m_z, body->m_externalForce.m_x, body->m_externalForce.m_y, body->m_externalForce.m_z));
 				}
 			#endif

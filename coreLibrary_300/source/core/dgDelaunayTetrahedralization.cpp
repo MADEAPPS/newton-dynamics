@@ -31,20 +31,38 @@ dgDelaunayTetrahedralization::dgDelaunayTetrahedralization(dgMemoryAllocator* co
 	:dgConvexHull4d(allocator)
 {
 	dgSetPrecisionDouble precision;
-
-	dgStack<dgBigVector> pool(count);
+	dgStack<dgBigVector> pool(count + 2);
 
 	dgBigVector* const points = &pool[0];
 	dgInt32 stride = dgInt32 (strideInByte / sizeof (dgFloat64));
 	for (dgInt32 i = 0; i < count; i ++) {
-		dgFloat64 x = RoundToFloat (vertexCloud[i * stride + 0]);
-		dgFloat64 y = RoundToFloat (vertexCloud[i * stride + 1]);
-		dgFloat64 z = RoundToFloat (vertexCloud[i * stride + 2]);
+		dgFloat64 x = dgRoundToFloat (vertexCloud[i * stride + 0]);
+		dgFloat64 y = dgRoundToFloat (vertexCloud[i * stride + 1]);
+		dgFloat64 z = dgRoundToFloat (vertexCloud[i * stride + 2]);
 		points[i] = dgBigVector (x, y, z, x * x + y * y + z * z);
 	}
 
 	dgInt32 oldCount = count;
-	BuildHull (allocator, &pool[0], count, distTol);
+	BuildHull (allocator, &pool[0].m_x, sizeof (dgBigVector), count, distTol);
+	if (oldCount > m_count) {
+		// the mesh is convex, need to add two steiners point to make tractable
+		dgBigVector origin (dgFloat64 (0.0f));
+		dgFloat64 maxW = dgFloat64 (-1.0e20f);
+		for (dgInt32 i = 0; i < count; i++) {
+			dgFloat64 x = dgRoundToFloat(vertexCloud[i * stride + 0]);
+			dgFloat64 y = dgRoundToFloat(vertexCloud[i * stride + 1]);
+			dgFloat64 z = dgRoundToFloat(vertexCloud[i * stride + 2]);
+			points[i] = dgBigVector(x, y, z, x * x + y * y + z * z);
+			origin += points[i];
+			maxW = dgMax (points[i].m_w, maxW);
+		}
+		origin = origin.Scale4 (dgFloat64 (1.0f) / count);
+		points[count + 0] = origin;
+		points[count + 1] = origin;
+		points[count + 0].m_w += dgFloat64 (1.0f);
+		points[count + 1].m_w -= dgFloat64 (1.0f);
+ 		BuildHull (allocator, &pool[0].m_x, sizeof (dgBigVector), count + 2, distTol);
+	}
 	if (oldCount > m_count) {
 		// this is probably a regular convex solid, which will have a zero volume hull
 		// add the rest of the points by incremental insertion with small perturbation
@@ -52,7 +70,7 @@ dgDelaunayTetrahedralization::dgDelaunayTetrahedralization(dgMemoryAllocator* co
 		
 		for (dgInt32 i = 0; i < count; i ++) {
 			bool inHull = false;
-			const dgHullVector* const hullPoints = &m_points[0];
+			const dgConvexHull4dVector* const hullPoints = &m_points[0];
 			for (dgInt32 j = 0; j < hullCount; j ++) {
 				if (hullPoints[j].m_index == i) {
 					inHull = true;
@@ -97,7 +115,7 @@ dgInt32 dgDelaunayTetrahedralization::AddVertex (const dgBigVector& vertex)
 
 
 
-dgInt32 dgDelaunayTetrahedralization::CompareVertexByIndex(const dgHullVector* const  A, const dgHullVector* const B, void* const context)
+dgInt32 dgDelaunayTetrahedralization::CompareVertexByIndex(const dgConvexHull4dVector* const  A, const dgConvexHull4dVector* const B, void* const context)
 {
 	if (A->m_index < B ->m_index) {
 		return -1;
@@ -110,7 +128,7 @@ dgInt32 dgDelaunayTetrahedralization::CompareVertexByIndex(const dgHullVector* c
 
 void dgDelaunayTetrahedralization::SortVertexArray ()
 {
-	dgHullVector* const points = &m_points[0];
+	dgConvexHull4dVector* const points = &m_points[0];
 	for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {	
 		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
 		for (dgInt32 i = 0; i < 4; i ++) {
@@ -163,41 +181,6 @@ void dgDelaunayTetrahedralization::DeleteFace (dgListNode* const node)
 	dgConvexHull4d::DeleteFace (node);
 }
 
-
-dgFloat64 dgDelaunayTetrahedralization::GetTetraVolume (const dgConvexHull4dTetraherum* const tetra) const
-{
-	const dgHullVector* const points = &m_points[0];
-	const dgBigVector &p0 = points[tetra->m_faces[0].m_index[0]];
-	const dgBigVector &p1 = points[tetra->m_faces[0].m_index[1]];
-	const dgBigVector &p2 = points[tetra->m_faces[0].m_index[2]];
-	const dgBigVector &p3 = points[tetra->m_faces[0].m_index[3]];
-
-	dgFloat64 matrix[3][3];
-	for (dgInt32 i = 0; i < 3; i ++) {
-		matrix[0][i] = p2[i] - p0[i];
-		matrix[1][i] = p1[i] - p0[i];
-		matrix[2][i] = p3[i] - p0[i];
-	}
-
-	dgFloat64 error;
-	dgFloat64 det = Determinant3x3 (matrix, &error);
-
-
-	dgFloat64 precision  = dgFloat64 (1.0f) / dgFloat64 (1<<24);
-	dgFloat64 errbound = error * precision; 
-	if (fabs(det) > errbound) {
-		return det;
-	}
-
-	dgGoogol exactMatrix[3][3];
-	for (dgInt32 i = 0; i < 3; i ++) {
-		exactMatrix[0][i] = dgGoogol(p2[i]) - dgGoogol(p0[i]);
-		exactMatrix[1][i] = dgGoogol(p1[i]) - dgGoogol(p0[i]);
-		exactMatrix[2][i] = dgGoogol(p3[i]) - dgGoogol(p0[i]);
-	}
-
-	return Determinant3x3(exactMatrix);
-}
 
 
 

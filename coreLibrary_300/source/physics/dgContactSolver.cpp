@@ -318,18 +318,6 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTriangle (dgInt32& indexOut)
 		const dgFloat64 u2 = b1 * a00 - a01 * b0;
 		const dgFloat64 u1 = b0 * a11 - a01 * b1;
 
-		/*
-		const dgFloat64 d0 = sqrt(e10.DotProduct4(e10).GetScalar());
-		const dgFloat64 invd0 = dgFloat64(1.0f) / d0;
-		const dgFloat64 l10 = e20.DotProduct4(e10).GetScalar() * invd0;
-		const dgFloat64 desc11 = e20.DotProduct4(e20).GetScalar() - l10 * l10;
-		const dgFloat64 d1 = sqrt(desc11);
-		const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
-		dgFloat64 u1__ = b0 * invd0;
-		dgFloat64 u2__ = (b1 - l10 * u1__) * invd1 * invd1;
-		u1__ = (u1__ - l10 * u2__) * invd0;
-		*/
-
 		if (u2 < dgFloat32(0.0f)) {
 			// this looks funny but it is correct
 		} else if (u1 < dgFloat32(0.0f)) {
@@ -370,7 +358,7 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum (dgInt32& indexOut)
 			const dgFloat64 invd1 = dgFloat64(1.0f) / d1;
 			const dgFloat64 l21 = (e30.DotProduct4(e20).GetScalar() - l20 * l10) * invd1;
 			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
-			if (desc11 > dgFloat64(0.0f)) {
+			if (desc22 > dgFloat64(0.0f)) {
 				const dgFloat64 d2 = sqrt(desc22);
 				const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
 				const dgFloat64 b0 = -e10.DotProduct4(p0).GetScalar();
@@ -1365,62 +1353,49 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVect
 	dgVector* const shape1 = &contactsOut[baseCount];
 
 	dgAssert (normal.m_w == dgFloat32 (0.0f));
-
 	dgVector origin((point0 + point1).Scale4(dgFloat32(0.5f)));
+	dgVector relVeloc((m_proxy->m_body1->GetVelocity() - m_proxy->m_body0->GetVelocity()).Scale4 (m_proxy->m_timestep));
+	dgFloat32 relSpeed (relVeloc.DotProduct4(normal).GetScalar());
+	dgVector penetrationStep(normal.Scale4(DG_PENETRATION_TOL * dgFloat32(2.0f)));
+	dgVector velocStep(normal.CompProduct4((relSpeed > (DG_PENETRATION_TOL * dgFloat32(2.0f))) ? relSpeed : DG_PENETRATION_TOL * dgFloat32(2.0f)));
+
+	dgVector instance1StepAcc(velocStep);
 	const dgMatrix& matrix1 = m_instance1->m_globalMatrix;
-	dgVector ponintOnInstance1(matrix1.UntransformVector(origin));
 	dgVector normalOnInstance1(matrix1.UnrotateVector(normal));
-	dgFloat32 dist = (normal.DotProduct4(point0 - point1)).GetScalar();
-	if (dist < dgFloat32 (0.0f)) {
-		count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, ponintOnInstance1, shape1);
-	}
-	if (!count1) {
-		dgVector step(normal.Scale4(DG_PENETRATION_TOL * dgFloat32(2.0f)));
-		dgVector alternatePoint(point1);
-		for (dgInt32 i = 0; (i < 3) && !count1; i++) {
-			alternatePoint -= step;
-			dgVector alternatePointOnInstance1(matrix1.UntransformVector(alternatePoint));
-			count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, alternatePointOnInstance1, shape1);
+	for (dgInt32 i = 0; i < 4; i++) {
+		dgVector origin1(origin - instance1StepAcc);
+		dgVector pointOnInstance1(matrix1.UntransformVector(origin1));
+		count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, pointOnInstance1, shape1);
+		if (count1) {
+			break;
 		}
-		//dgAssert(count1);
-		step = matrix1.UnrotateVector(normal.CompProduct4 ((alternatePoint - origin).DotProduct4(normal)));
-		for (dgInt32 i = 0; i < count1; i++) {
-			shape1[i] -= step;
-		}
+		instance1StepAcc += penetrationStep;
 	}
 
 	if (count1) {
-		for (int i = 0; i < count1; i ++) {
-			shape1[i] = matrix1.TransformVector(shape1[i]);
+		for (int i = 0; i < count1; i++) {
+			shape1[i] = matrix1.TransformVector(shape1[i]) + instance1StepAcc;
 		}
 
 		dgInt32 count0 = 0;
 		dgVector* const shape0 = &contactsOut[baseCount + count1];
 
+		dgVector instance0StepAcc(velocStep);
 		const dgMatrix& matrix0 = m_instance0->m_globalMatrix;
-		dgVector pointOnInstance0(matrix0.UntransformVector(origin));
-		dgVector normalOnInstance0(matrix0.UnrotateVector(normal.Scale4(dgFloat32(-1.0f))));
-		if (dist < dgFloat32 (0.0f)) {
+		dgVector normalOnInstance0(matrix0.UnrotateVector(normal.CompProduct4(dgVector::m_negOne)));
+		for (dgInt32 i = 0; i < 4; i++) {
+			dgVector origin0(origin + instance0StepAcc);
+			dgVector pointOnInstance0(matrix0.UntransformVector(origin0));
 			count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0);
-		}
-		if (!count0) {
-			dgVector step(normal.Scale4(DG_PENETRATION_TOL * dgFloat32(2.0f)));
-			dgVector alternatePoint(point0);
-			for (dgInt32 i = 0; (i < 3) && !count0; i++) {
-				alternatePoint += step;
-				dgVector alternatePointOnInstance0(matrix0.UntransformVector(alternatePoint));
-				count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, alternatePointOnInstance0, shape0);
+			if (count0) {
+				break;
 			}
-			dgAssert(count0);
-			step = matrix0.UnrotateVector(normal.CompProduct4((alternatePoint - origin).DotProduct4(normal)));
-			for (dgInt32 i = 0; i < count0; i++) {
-				shape0[i] -= step;
-			}
+			instance0StepAcc += penetrationStep;
 		}
 
 		if (count0) {
-			for (dgInt32 i = 0; i < count0; i++) {
-				shape0[i] = matrix0.TransformVector(shape0[i]);
+			for (int i = 0; i < count0; i++) {
+				shape0[i] = matrix0.TransformVector(shape0[i]) - instance0StepAcc;
 			}
 
 			if (count1 == 1) {
@@ -1724,6 +1699,9 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 
 dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 {
+//static int xxx;
+//xxx ++;
+
 	dgInt32 count = 0;
 	if (m_proxy->m_intersectionTestOnly) {
 		CalculateClosestPoints();
@@ -1752,10 +1730,18 @@ dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 			m_proxy->m_normal = m_normal;
 			count = dgMin(m_proxy->m_maxContacts, count);
 			dgContactPoint* const contactOut = m_proxy->m_contacts;
+//if (count){
+//dgTrace (("%d\n", xxx)); 
+//}
 			for (int i = 0; i < count; i ++) {
 				contactOut[i].m_point = m_hullDiff[i];
 				contactOut[i].m_normal = m_normal;
 				contactOut[i].m_penetration = penetration;
+
+//dgTrace (("p (%f %f %f) ", contactOut[i].m_point.m_x, contactOut[i].m_point.m_y, contactOut[i].m_point.m_z));
+//dgTrace (("b (%f %f %f) ", contactOut[i].m_normal.m_x, contactOut[i].m_normal.m_y, contactOut[i].m_normal.m_z));
+//dgTrace (("h (%f) ", contactOut[i].m_normal.m_x));
+//dgTrace (("\n", penetration)); 
 			}
 		}
 	}

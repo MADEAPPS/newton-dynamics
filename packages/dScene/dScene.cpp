@@ -46,8 +46,8 @@ static void MakeSceneNodeMatricesLocalToNodeParent (dScene* const scene)
 {
 	dList<dMatrix> matrixPool;
 	dList<dScene::dTreeNode*> stackPool;
-	dScene::dTreeNode* const root = scene->GetRootNode();
-	for (void* link = scene->GetFirstChildLink(root); link; link = scene->GetNextChildLink(root, link)) {
+	dScene::dTreeNode* const rootNode = scene->GetRootNode();
+	for (void* link = scene->GetFirstChildLink(rootNode); link; link = scene->GetNextChildLink(rootNode, link)) {
 		dScene::dTreeNode* const sceneNode = scene->GetNodeFromLink(link);
 		dNodeInfo* const sceneNodeInfo = scene->GetInfoFromNode(sceneNode);
 		if (sceneNodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
@@ -62,11 +62,11 @@ static void MakeSceneNodeMatricesLocalToNodeParent (dScene* const scene)
 		stackPool.Remove(stackPool.GetLast());
 		matrixPool.Remove(matrixPool.GetLast());
 
-		dSceneNodeInfo* const nodeInfo = (dSceneNodeInfo*)scene->GetInfoFromNode(root);
-		dAssert (nodeInfo->IsType(dSceneNodeInfo::GetRttiType()));
-		dMatrix matrix (nodeInfo->GetTransform());
+		dSceneNodeInfo* const rootNodeInfo = (dSceneNodeInfo*)scene->GetInfoFromNode(root);
+		dAssert (rootNodeInfo->IsType(dSceneNodeInfo::GetRttiType()));
+		dMatrix matrix (rootNodeInfo->GetTransform());
 		dMatrix localMatrix = matrix * parentMatrix;
-		nodeInfo->SetTransform(localMatrix);
+		rootNodeInfo->SetTransform(localMatrix);
 
 		matrix = matrix.Inverse4x4();
 		for (void* link = scene->GetFirstChildLink(root); link; link = scene->GetNextChildLink(root, link)) {
@@ -729,12 +729,12 @@ void dScene::FreezeScale ()
 	dList<dTreeNode*> nodeStack;
 	dList<dMatrix> parentMatrixStack;
 
-	dTreeNode* const rootNode = GetRootNode();
-	for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
-		dTreeNode* const node = GetNodeFromLink(link);
-		dNodeInfo* const nodeInfo = GetInfoFromNode(node);
-		if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
-			nodeStack.Append(node);
+	dTreeNode* const rootNode0 = GetRootNode();
+	for (void* link0 = GetFirstChildLink(rootNode0); link0; link0 = GetNextChildLink(rootNode0, link0)) {
+		dTreeNode* const node0 = GetNodeFromLink(link0);
+		dNodeInfo* const nodeInfo0 = GetInfoFromNode(node0);
+		if (nodeInfo0->IsType(dSceneNodeInfo::GetRttiType())) {
+			nodeStack.Append(node0);
 			parentMatrixStack.Append(dGetIdentityMatrix());
 		}
 	}
@@ -777,12 +777,12 @@ void dScene::FreezeRootRotation ()
 	dList<dMatrix> parentMatrixStack;
 
 	dTreeNode* const rootNode = GetRootNode();
-	for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
-		dTreeNode* const node = GetNodeFromLink(link);
-		dNodeInfo* const nodeInfo = GetInfoFromNode(node);
-		if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+	for (void* link0 = GetFirstChildLink(rootNode); link0; link0 = GetNextChildLink(rootNode, link0)) {
+		dTreeNode* const node0 = GetNodeFromLink(link0);
+		dNodeInfo* const nodeInfo0 = GetInfoFromNode(node0);
+		if (nodeInfo0->IsType(dSceneNodeInfo::GetRttiType())) {
 			
-			dSceneNodeInfo* const sceneNodeInfo = (dSceneNodeInfo*) nodeInfo;
+			dSceneNodeInfo* const sceneNodeInfo = (dSceneNodeInfo*) nodeInfo0;
 			dMatrix matrix (sceneNodeInfo->GetTransform());
 			dMatrix unitRotation (dGetIdentityMatrix());
 			unitRotation.m_posit = matrix.m_posit;
@@ -790,11 +790,11 @@ void dScene::FreezeRootRotation ()
 			sceneNodeInfo->SetTransform(unitRotation);
 			sceneNodeInfo->SetGeometryTransform (sceneNodeInfo->GetGeometryTransform() * matrix);
 
-			for (void* link1 = GetFirstChildLink(node); link1; link1 = GetNextChildLink(node, link1)) {
-				dTreeNode* const node = GetNodeFromLink(link1);
-				dNodeInfo* const nodeInfo = GetInfoFromNode(node);
+			for (void* link1 = GetFirstChildLink(node0); link1; link1 = GetNextChildLink(node0, link1)) {
+				dTreeNode* const node1 = GetNodeFromLink(link1);
+				dNodeInfo* const nodeInfo = GetInfoFromNode(node1);
 				if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
-					nodeStack.Append(node);
+					nodeStack.Append(node1);
 					parentMatrixStack.Append(matrix);
 				}
 			}
@@ -803,7 +803,7 @@ void dScene::FreezeRootRotation ()
 
 	dTree<dGeometryNodeInfo*, dGeometryNodeInfo*> geoFilter;	
 	while (nodeStack.GetCount()) {
-		dTreeNode* const rootNode = nodeStack.GetLast()->GetInfo();
+		//dTreeNode* const rootNode = nodeStack.GetLast()->GetInfo();
 		dMatrix parentMatrix (parentMatrixStack.GetLast()->GetInfo());
 
 		nodeStack.Remove(nodeStack.GetLast());
@@ -1023,14 +1023,11 @@ void dScene::UnmergeScene (dScene* const scene)
 		map.Insert(node, GetInfoFromNode(node));
 	}
 
-static int xxx;
-
 	for (dTreeNode* parentNode = scene->GetFirstNode(); parentNode; parentNode = scene->GetNextNode(parentNode)) {
 		dNodeInfo* const parentInfo = GetInfoFromNode(parentNode);
-xxx ++;
-		dTree<dTreeNode*, const dNodeInfo*>::dTreeNode* const mapNode = map.Find(parentInfo);
-		if (mapNode) {
-			dTreeNode* const myParentNode = mapNode->GetInfo();
+		dTree<dTreeNode*, const dNodeInfo*>::dTreeNode* const parentMapNode = map.Find(parentInfo);
+		if (parentMapNode) {
+			dTreeNode* const myParentNode = parentMapNode->GetInfo();
 			for (void* link = scene->GetFirstChildLink(parentNode); link; link = scene->GetNextChildLink(parentNode, link)) {
 				dTreeNode* const childNode = scene->GetNodeFromLink(link);
 				if (childNode != scene->GetRootNode()) {
@@ -1096,18 +1093,18 @@ void dScene::DeleteDuplicateTextures()
 	}
 
 	dScene::dTreeNode* const materialCacheNode = GetMaterialCacheNode();
-	for (void* link = GetFirstChildLink(materialCacheNode); link; link = GetNextChildLink(materialCacheNode, link)) {
-		dScene::dTreeNode* const materialNode = GetNodeFromLink(link);
-		dMaterialNodeInfo* const materialInfo = (dMaterialNodeInfo*)GetInfoFromNode(materialNode);
+	for (void* link0 = GetFirstChildLink(materialCacheNode); link0; link0 = GetNextChildLink(materialCacheNode, link0)) {
+		dScene::dTreeNode* const materialNode0 = GetNodeFromLink(link0);
+		dMaterialNodeInfo* const materialInfo0 = (dMaterialNodeInfo*)GetInfoFromNode(materialNode0);
 
-		if (materialInfo->IsType(dMaterialNodeInfo::GetRttiType())) {
+		if (materialInfo0->IsType(dMaterialNodeInfo::GetRttiType())) {
 
 			dList<dScene::dTreeNode*> textureNodes;
-			for (void* link = GetFirstChildLink(materialNode); link; link = GetNextChildLink(materialNode, link)) {
-				dScene::dTreeNode* const textureNode = GetNodeFromLink(link);
-				dTextureNodeInfo* const materialInfo = (dTextureNodeInfo*)GetInfoFromNode(materialNode);
-				if (materialInfo->IsType(dTextureNodeInfo::GetRttiType())) {
-					textureNodes.Append(textureNode);
+			for (void* link1 = GetFirstChildLink(materialNode0); link1; link1 = GetNextChildLink(materialNode0, link1)) {
+				dScene::dTreeNode* const textureNode1 = GetNodeFromLink(link1);
+				dTextureNodeInfo* const materialInfo1 = (dTextureNodeInfo*)GetInfoFromNode(textureNode1);
+				if (materialInfo1->IsType(dTextureNodeInfo::GetRttiType())) {
+					textureNodes.Append(textureNode1);
 				}
 			}
 
@@ -1118,22 +1115,22 @@ void dScene::DeleteDuplicateTextures()
 
 				dScene::dTreeNode* const reUsedTextureNode = textureNodeMap.Find(textureNode)->GetInfo();
 
-				RemoveReference(materialNode, textureNode);
-				AddReference(materialNode, reUsedTextureNode);
+				RemoveReference(materialNode0, textureNode);
+				AddReference(materialNode0, reUsedTextureNode);
 			}
 		}
 	}
 
 	void* nextLink;
-	for (void* link = GetFirstChildLink(textureCacheNode); link; link = nextLink) {
-		nextLink = GetNextChildLink(textureCacheNode, link);
-		dScene::dTreeNode* const node = GetNodeFromLink(link);
+	for (void* link0 = GetFirstChildLink(textureCacheNode); link0; link0 = nextLink) {
+		nextLink = GetNextChildLink(textureCacheNode, link0);
+		dScene::dTreeNode* const node0 = GetNodeFromLink(link0);
 		int parents = 0;
-		for (void* link = GetFirstParentLink(node); link; link = GetNextParentLink(node, link)) {
+		for (void* link1 = GetFirstParentLink(node0); link1; link1 = GetNextParentLink(node0, link1)) {
 			parents ++;
 		}
 		if (parents == 1) {
-			RemoveReference(textureCacheNode, node);
+			RemoveReference(textureCacheNode, node0);
 		}
 	}
 }
@@ -1170,17 +1167,17 @@ void dScene::DeleteDuplicateMaterials()
 
 
 	dScene::dTreeNode* const geometryCacheNode = GetGeometryCacheNode();
-	for (void* link = GetFirstChildLink(geometryCacheNode); link; link = GetNextChildLink(geometryCacheNode, link)) {
-		dScene::dTreeNode* const geometryNode = GetNodeFromLink(link);
-		dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)GetInfoFromNode(geometryNode);
+	for (void* link0 = GetFirstChildLink(geometryCacheNode); link0; link0 = GetNextChildLink(geometryCacheNode, link0)) {
+		dScene::dTreeNode* const geometryNode0 = GetNodeFromLink(link0);
+		dGeometryNodeInfo* const geometryInfo0 = (dGeometryNodeInfo*)GetInfoFromNode(geometryNode0);
 
-		if (geometryInfo->IsType(dGeometryNodeInfo::GetRttiType())) {
+		if (geometryInfo0->IsType(dGeometryNodeInfo::GetRttiType())) {
 			dList<dScene::dTreeNode*> materialNodes;
-			for (void* link = GetFirstChildLink(geometryNode); link; link = GetNextChildLink(geometryNode, link)) {
-				dScene::dTreeNode* const materialNode = GetNodeFromLink(link);
-				dMaterialNodeInfo* const materialInfo = (dMaterialNodeInfo*)GetInfoFromNode(materialNode);
-				if (materialInfo->IsType(dMaterialNodeInfo::GetRttiType())) {
-					materialNodes.Append(materialNode);
+			for (void* link1 = GetFirstChildLink(geometryNode0); link1; link1 = GetNextChildLink(geometryNode0, link1)) {
+				dScene::dTreeNode* const materialNode1 = GetNodeFromLink(link1);
+				dMaterialNodeInfo* const materialInfo1 = (dMaterialNodeInfo*)GetInfoFromNode(materialNode1);
+				if (materialInfo1->IsType(dMaterialNodeInfo::GetRttiType())) {
+					materialNodes.Append(materialNode1);
 				}
 			}
 
@@ -1197,7 +1194,7 @@ void dScene::DeleteDuplicateMaterials()
 				int oldID = materialIDMap.Find(materialNode)->GetInfo();
 
 				if (newID != oldID) {
-					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)geometryInfo;
+					dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)geometryInfo0;
 					if (meshInfo->IsType(dMeshNodeInfo::GetRttiType())) {
 						NewtonMesh* const mesh = meshInfo->GetMesh();
 						for (void* face = NewtonMeshGetFirstFace(mesh); face; face = NewtonMeshGetNextFace(mesh, face)) {
@@ -1213,23 +1210,23 @@ void dScene::DeleteDuplicateMaterials()
 				}
 
 				// important to remove the reference first, because there cannot be duplicate edge in the graph
-				RemoveReference(geometryNode, materialNode);
-				AddReference(geometryNode, reUsedMaterialNode);
+				RemoveReference(geometryNode0, materialNode);
+				AddReference(geometryNode0, reUsedMaterialNode);
 				
 			}
 		}
 	}
 
 	void* nextLink;
-	for (void* link = GetFirstChildLink(materialCacheNode); link; link = nextLink) {
-		nextLink = GetNextChildLink(materialCacheNode, link);
-		dScene::dTreeNode* const node = GetNodeFromLink(link);
+	for (void* link0 = GetFirstChildLink(materialCacheNode); link0; link0 = nextLink) {
+		nextLink = GetNextChildLink(materialCacheNode, link0);
+		dScene::dTreeNode* const node0 = GetNodeFromLink(link0);
 		int parents = 0;
-		for (void* link = GetFirstParentLink(node); link; link = GetNextParentLink(node, link)) {
+		for (void* link1 = GetFirstParentLink(node0); link1; link1 = GetNextParentLink(node0, link1)) {
 			parents ++;
 		}
 		if (parents == 1) {
-			RemoveReference(materialCacheNode, node);
+			RemoveReference(materialCacheNode, node0);
 		}
 	}
 }
@@ -1289,15 +1286,15 @@ void dScene::DeleteDuplicateGeometries()
 
 
 	void* nextLink;
-	for (void* link = GetFirstChildLink(geometryCacheNode); link; link = nextLink) {
-		nextLink = GetNextChildLink(geometryCacheNode, link);
-		dScene::dTreeNode* const node = GetNodeFromLink(link);
+	for (void* link0 = GetFirstChildLink(geometryCacheNode); link0; link0 = nextLink) {
+		nextLink = GetNextChildLink(geometryCacheNode, link0);
+		dScene::dTreeNode* const node0 = GetNodeFromLink(link0);
 		int parents = 0;
-		for (void* link = GetFirstParentLink(node); link; link = GetNextParentLink(node, link)) {
+		for (void* link1 = GetFirstParentLink(node0); link1; link1 = GetNextParentLink(node0, link1)) {
 			parents ++;
 		}
 		if (parents == 1) {
-			RemoveReference(geometryCacheNode, node);
+			RemoveReference(geometryCacheNode, node0);
 		}
 	}
 }
@@ -1358,12 +1355,12 @@ dFloat dScene::RayCast (const dVector& globalP0, const dVector& globalP1, dList<
 	dList<dMatrix> rootMatrix;
 	dList<dTreeNode*> rootNodes;
 	
-	for (void* link = GetFirstChildLink(GetRootNode()); link; link = GetNextChildLink(GetRootNode(), link)) {
-		dTreeNode* const node = GetNodeFromLink(link);
-		dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*) GetInfoFromNode(node);
-		if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())){
+	for (void* link0 = GetFirstChildLink(GetRootNode()); link0; link0 = GetNextChildLink(GetRootNode(), link0)) {
+		dTreeNode* const node0 = GetNodeFromLink(link0);
+		dSceneNodeInfo* const sceneInfo0 = (dSceneNodeInfo*) GetInfoFromNode(node0);
+		if (sceneInfo0->IsType(dSceneNodeInfo::GetRttiType())){
 			rootMatrix.Append(dGetIdentityMatrix());
-			rootNodes.Append(node);
+			rootNodes.Append(node0);
 			parentIndex.Append(0);
 		}
 	}
@@ -1373,26 +1370,26 @@ dFloat dScene::RayCast (const dVector& globalP0, const dVector& globalP1, dList<
 	dVector globalP1p0 (globalP1 - globalP0);
 	dFloat	den = 1.0f / globalP1p0.DotProduct3(globalP1p0);
 	while (rootNodes.GetCount()) {
-		dTreeNode* const node = rootNodes.GetLast()->GetInfo();
+		dTreeNode* const node0 = rootNodes.GetLast()->GetInfo();
 		dMatrix parentMatrix (rootMatrix.GetLast()->GetInfo());
 		int index = parentIndex.GetLast()->GetInfo();
-		trace[index] = node;
+		trace[index] = node0;
 		index ++;
 
 		parentIndex.Remove(parentIndex.GetLast());
 		rootNodes.Remove(rootNodes.GetLast());
 		rootMatrix.Remove(rootMatrix.GetLast());
 
-		const dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*) GetInfoFromNode(node);
-		dAssert (sceneInfo->IsType(dSceneNodeInfo::GetRttiType()));
+		const dSceneNodeInfo* const sceneInfo0 = (dSceneNodeInfo*) GetInfoFromNode(node0);
+		dAssert (sceneInfo0->IsType(dSceneNodeInfo::GetRttiType()));
 
- 		dMatrix matrix (sceneInfo->GetTransform() * parentMatrix);
+ 		dMatrix matrix (sceneInfo0->GetTransform() * parentMatrix);
 		dMatrix invMatrix (matrix.Inverse4x4());
 		dVector q0 (invMatrix.RotateVector4x4(p0));
 		dVector q2 (invMatrix.RotateVector4x4(p2));
-		dFloat t1 = sceneInfo->RayCast(q0, q2);
+		dFloat t1 = sceneInfo0->RayCast(q0, q2);
 		if (t1 < 1.0f) {
-			dScene::dTreeNode* const geomNode = FindChildByType(node, dGeometryNodeInfo::GetRttiType());
+			dScene::dTreeNode* const geomNode = FindChildByType(node0, dGeometryNodeInfo::GetRttiType());
 			if (geomNode) {
 				dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*) GetInfoFromNode(geomNode);
 				t1 = geometryInfo->RayCast(q0, q2);
@@ -1409,12 +1406,12 @@ dFloat dScene::RayCast (const dVector& globalP0, const dVector& globalP1, dList<
 			}
 		}
 
-		for (void* link = GetFirstChildLink(node); link; link = GetNextChildLink(node, link)) {
-			dTreeNode* const sceneNode = GetNodeFromLink(link);
-			dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*) GetInfoFromNode( sceneNode);
-			if (sceneInfo->IsType(dSceneNodeInfo::GetRttiType())){
+		for (void* link1 = GetFirstChildLink(node0); link1; link1 = GetNextChildLink(node0, link1)) {
+			dTreeNode* const sceneNode1 = GetNodeFromLink(link1);
+			dSceneNodeInfo* const sceneInfo1 = (dSceneNodeInfo*) GetInfoFromNode(sceneNode1);
+			if (sceneInfo1->IsType(dSceneNodeInfo::GetRttiType())){
 				rootMatrix.Append(matrix);
-				rootNodes.Append(sceneNode);
+				rootNodes.Append(sceneNode1);
 				parentIndex.Append(index);
 			}
 		}
@@ -1545,8 +1542,8 @@ bool dScene::Deserialize (const char* const fileName)
 
 
 	bool state = true;
-	const TiXmlElement* const root = doc.RootElement();
-	if (root && (doc.FirstChild (D_SCENE_ROOT_NODE_NAME) || doc.FirstChild ("alchemedia"))){
+	const TiXmlElement* const rootNode = doc.RootElement();
+	if (rootNode && (doc.FirstChild (D_SCENE_ROOT_NODE_NAME) || doc.FirstChild ("alchemedia"))){
 
 		TiXmlElement* root = (TiXmlElement*) doc.FirstChild (D_SCENE_ROOT_NODE_NAME);
 		if (!root) {

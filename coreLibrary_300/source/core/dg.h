@@ -44,7 +44,6 @@
 #include "dgRandom.h"
 #include "dgThread.h"
 #include "dgFastQueue.h"
-#include "dgSPDMatrix.h"
 #include "dgPolyhedra.h"
 #include "dgThreadHive.h"
 #include "dgPathFinder.h"

@@ -25,10 +25,7 @@
 #include "dgContact.h"
 #include "dgMeshEffect.h"
 #include "dgDynamicBody.h"
-#include "dgCollisionBVH.h"
-#include "dgCollisionConvexPolygon.h"
 #include "dgCollisionDeformableSolidMesh.h"
-
 
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const world, dgMeshEffect* const mesh)
@@ -38,6 +35,8 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 {
 	m_rtti |= dgCollisionDeformableSolidMesh_RTTI;
 
+	dgAssert (0);
+/*
 	dgInt32 count = mesh->GetVertexCount();
 	dgVector* const points = dgAlloca (dgVector, count);
 
@@ -49,6 +48,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 	}
 	m_finiteElementsCount ++;
 
+	m_indexToVertexCount = count;
 	m_indexToVertexMap.Resize(count);
 	dgInt32* const indexToVertexMap = &m_indexToVertexMap[0];
 	m_particlesCount = dgVertexListToIndexList (&points[0].m_x, sizeof (dgVector), 3 * sizeof (dgFloat32), 0, count, indexToVertexMap, dgFloat32 (1.0e-5f));
@@ -144,6 +144,7 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 		}
 		fem.m_restVolume = volume;
 	}
+*/
 }
 
 dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(const dgCollisionDeformableSolidMesh& source)
@@ -165,52 +166,34 @@ dgCollisionDeformableSolidMesh::dgCollisionDeformableSolidMesh(dgWorld* const wo
 
 dgCollisionDeformableSolidMesh::~dgCollisionDeformableSolidMesh(void)
 {
+
 }
 
-
-dgInt32 dgCollisionDeformableSolidMesh::CompareEdges (const dgSoftLink* const A, const dgSoftLink* const B, void* const context)
+dgInt32 dgCollisionDeformableSolidMesh::GetMemoryBufferSizeInBytes() const
 {
-	dgInt64 m0 = (dgInt64(A->m_m0)<<32) + A->m_m1;
-	dgInt64 m1 = (dgInt64(B->m_m0)<<32) + B->m_m1;
-	if (m0 > m1) {
-		return 1;
-	} else if (m0 < m1) {
-		return -1;
-	} 
-	return 0;
-}
-
-void dgCollisionDeformableSolidMesh::DebugCollision(const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
-{
-	const dgVector* const posit = &m_posit[0];
-	const dgSoftLink* const links = &m_linkList[0];
-	for (dgInt32 i = 0; i < m_linksCount; i++) {
-		const dgInt32 j0 = links[i].m_m0;
-		const dgInt32 j1 = links[i].m_m1;
-		dgVector p0 (matrix.TransformVector(posit[j0]));
-		dgVector p1 (matrix.TransformVector(posit[j1]));
-		dgTriplex points[2];
-		points[0].m_x = p0.m_x;
-		points[0].m_y = p0.m_y;
-		points[0].m_z = p0.m_z;
-		points[1].m_x = p1.m_x;
-		points[1].m_y = p1.m_y;
-		points[1].m_z = p1.m_z;
-		callback(userData, 2, &points[0].m_x, 0);
-	}
+	dgInt32 sizeInByte = 0;
+	sizeInByte += 3 * m_linksCount * sizeof (dgVector);
+	sizeInByte += 2 * m_linksCount * sizeof (dgFloat32);
+	sizeInByte += 2 * m_particlesCount * sizeof (dgVector);
+	sizeInByte += 1 * m_particlesCount * sizeof (dgFloat32);
+	return sizeInByte;
 }
 
 
 void dgCollisionDeformableSolidMesh::CalculateAcceleration(dgFloat32 timestep)
 {
+	dgAssert (0);
+/*
 // Ks is in [sec^-2] a spring constant unit acceleration, not a spring force acceleration. 
 // Kc is in [sec^-1] a damper constant unit velocity, not a damper force acceleration. 
 
 // for now make a share value for all springs. later this is a per material feature.
 dgFloat32 kSpring = dgFloat32(1000.0f);
 dgFloat32 kDamper = dgFloat32(30.0f);
-dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
-kVolumetricStiffness = 0.0f;
+//dgFloat32 kVolumetricStiffness = dgFloat32(200000.0f);
+dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
+//dgFloat32 kVolumetricStiffness = dgFloat32(1000.0f);
+//kVolumetricStiffness = 0.0f;
 
 	dgInt32 iter = 4;
 	dgVector* const accel = &m_accel[0];
@@ -219,25 +202,41 @@ kVolumetricStiffness = 0.0f;
 	const dgFloat32* const restLenght = &m_restlength[0];
 	const dgFiniteElementCell* const finiteElements = &m_finiteElements[0];
 
-	dgFloat32* const spring_A01 = dgAlloca(dgFloat32, m_linksCount);
-	dgFloat32* const spring_B01 = dgAlloca(dgFloat32, m_linksCount);
+//	dgVector* const dx = dgAlloca(dgVector, m_linksCount);
+//	dgVector* const dv = dgAlloca(dgVector, m_linksCount);
+//	dgVector* const dpdv = dgAlloca(dgVector, m_linksCount);
+//	dgVector* const normalAccel = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const normalDir = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const volumeAccel = dgAlloca(dgVector, m_particlesCount);
+//	dgFloat32* const spring_A01 = dgAlloca(dgFloat32, m_linksCount);
+//	dgFloat32* const spring_B01 = dgAlloca(dgFloat32, m_linksCount);
+//	dgFloat32* const frictionCoeffecient = dgAlloca(dgFloat32, m_particlesCount);
+
+	dgWorld* const world = m_body->GetWorld();
+	world->m_solverJacobiansMemory.ResizeIfNecessary (GetMemoryBufferSizeInBytes() + 1024);
+	dgVector* const dx = (dgVector*)&world->m_solverJacobiansMemory[0];
+	dgVector* const dv = &dx[m_linksCount];
+	dgVector* const dpdv = &dv[m_linksCount];
+	dgVector* const normalAccel = &dpdv[m_linksCount];
+	dgVector* const normalDir = &normalAccel[m_particlesCount];
+	dgVector* const volumeAccel = &normalDir[m_particlesCount];
+	dgFloat32* const spring_A01 = (dgFloat32*) &volumeAccel[m_particlesCount];
+	dgFloat32* const spring_B01 = &spring_A01[m_linksCount];
+	dgFloat32* const frictionCoeffecient = &spring_B01[m_linksCount];
+
+
+//	dgVector* const collisionDir1 = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const collisionDir2 = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const tmp1 = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const tmp2 = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const diag = dgAlloca(dgVector, m_particlesCount);
+//	dgVector* const offDiag = dgAlloca(dgVector, m_particlesCount);
 //	dgFloat32* const damper_A01 = dgAlloca(dgFloat32, m_linksCount);
 //	dgFloat32* const damper_B01 = dgAlloca(dgFloat32, m_linksCount);
 //	dgFloat32* const damper_C01 = dgAlloca(dgFloat32, m_linksCount);
-	dgVector* const dx = dgAlloca(dgVector, m_linksCount);
-	dgVector* const dv = dgAlloca(dgVector, m_linksCount);
 
-	dgVector* const collisionDir0 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const collisionDir1 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const collisionDir2 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const collidingAccel = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const tmp0 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const tmp1 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const tmp2 = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const dpdv = dgAlloca(dgVector, m_linksCount);
-//	dgVector* const diag = dgAlloca(dgVector, m_particlesCount);
-//	dgVector* const offDiag = dgAlloca(dgVector, m_particlesCount);
-	dgVector* const veloc0 = dgAlloca(dgVector, m_particlesCount);
+
+
 
 	dgVector unitAccel(m_body->m_externalForce.CompProduct4(m_body->m_invMass.m_w));
 	dgVector deltaOmega(m_body->m_invWorldInertiaMatrix.RotateVector (m_body->m_externalTorque.Scale4 (timestep)));
@@ -249,26 +248,26 @@ kVolumetricStiffness = 0.0f;
 
 	// here I need to add all other external acceleration like wind and pressure, friction and collision.
 	for (dgInt32 i = 0; i < m_particlesCount; i++) {
+		m_externalAccel[i] = unitAccel;
 		veloc[i] += deltaOmega.CrossProduct3(m_posit[i]);
-		veloc0[i] = veloc[i];
 	}
 
-	const dgSoftLink* const links = &m_linkList[0];
+	const dgSpringDamperLink* const links = &m_linkList[0];
 	dgFloat32 ks_dt = - timestep * kSpring;
 //	dgFloat32 kd_dt0 = -timestep * kDamper;
 //	dgFloat32 kd_dt1 = -timestep * kDamper * dgFloat32(2.0f);
 
-static int xxx;
-xxx ++;
-
 	dgVector dtRK4 (timestep / iter);
 	dgVector volumetricStiffness (-kVolumetricStiffness);
-	HandleCollision (timestep, collisionDir0, collisionDir1, collisionDir2, collidingAccel);
+	dgVector epsilon (dgFloat32 (1.0e-14f));
+
+	dtRK4 = dtRK4 & dgVector::m_triplexMask;
+	HandleCollision (timestep, normalDir, normalAccel, frictionCoeffecient);
 	for (dgInt32 k = 0; k < iter; k ++) {
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			accel[i] = unitAccel;
-			tmp0[i] = dgVector::m_zero;
+			accel[i] = m_externalAccel[i];
+			volumeAccel[i] = dgVector::m_zero;
 		}
 
 		for (dgInt32 i = 0; i < m_finiteElementsCount; i++) {
@@ -295,11 +294,14 @@ xxx ++;
 			dgVector a0(deltaVolume.CompProduct4(area123));
 			dgVector a1(deltaVolume.CompProduct4(area0123));
 			dgVector a3(deltaVolume.CompProduct4(area012));
+			dgAssert (a0.m_w == dgFloat32 (0.0f));
+			dgAssert (a1.m_w == dgFloat32 (0.0f));
+			dgAssert (a3.m_w == dgFloat32 (0.0f));
 
-			tmp0[i0] += a0;
-			tmp0[i1] += a1 - a0;
-			tmp0[i2] -= a1 + a3;
-			tmp0[i3] += a3;
+			volumeAccel[i0] += a0;
+			volumeAccel[i1] += a1 - a0;
+			volumeAccel[i2] -= a1 + a3;
+			volumeAccel[i3] += a3;
 		}
 
 		for (dgInt32 i = 0; i < m_linksCount; i++) {
@@ -321,8 +323,11 @@ xxx ++;
 			const dgVector fs(p0p1.Scale4(kSpring * compression));
 			const dgVector fd(p0p1.Scale4(kDamper * den * den * (v0v1.DotProduct4(p0p1)).GetScalar()));
 
-			dpdv[i] = p0p1.CompProduct4(v0v1);
+			dgAssert(fs.m_w == dgFloat32(0.0f));
+			dgAssert(fs.m_w == dgFloat32(0.0f));
+			dgAssert(p0p1.m_w == dgFloat32(0.0f));
 
+			dpdv[i] = p0p1.CompProduct4(v0v1);
 			accel[j0] -= (fs + fd);
 			accel[j1] += (fs + fd);
 
@@ -338,24 +343,30 @@ xxx ++;
 
 			const dgInt32 j0 = links[i].m_m0;
 			const dgInt32 j1 = links[i].m_m1;
+
+			dgAssert (dfdx.m_w == dgFloat32 (0.0f));
 			accel[j0] += dfdx;
 			accel[j1] -= dfdx;
 		}
 
 		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			accel[i] += volumetricStiffness.CompProduct4(tmp0[i]);
-			tmp0[i] = accel[i].CompProduct4(collisionDir0[i]);
-			tmp1[i] = accel[i].CompProduct4(collisionDir1[i]);
-			tmp2[i] = accel[i].CompProduct4(collisionDir2[i]);
-		}
+			accel[i] += volumetricStiffness.CompProduct4(volumeAccel[i]);
+			dgVector normalDirAccel (normalDir[i].CompProduct4(accel[i].DotProduct4(normalDir[i])));
 
-		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			tmp0[i] = accel[i] + collidingAccel[i] - collisionDir0[i].CompProduct4(tmp0[i]) - collisionDir1[i].CompProduct4(tmp1[i]) - collisionDir2[i].CompProduct4(tmp2[i]);
-		}
+			//dgVector dirAccel1 (collisionDir1[i].CompProduct4(accel[i].DotProduct4(collisionDir1[i])));
+			//dgVector dirAccel2 (collisionDir2[i].CompProduct4(accel[i].DotProduct4(collisionDir2[i])));
+			//tmp0[i] = accel[i] + collidingAccel[i] - dirAccel0 - dirAccel1 - dirAccel2;
+			
+			dgVector tangentDir (veloc[i] - normalDir[i].CompProduct4(normalDir[i].DotProduct4(veloc[i])));
+			dgVector mag (tangentDir.DotProduct4(tangentDir) + epsilon);
 
-		for (dgInt32 i = 0; i < m_particlesCount; i++) {
-			veloc[i] += tmp0[i].CompProduct4(dtRK4);
+			dgFloat32 tangentFrictionAccel = dgAbsf (accel[i].DotProduct4(normalDir[i]).GetScalar());
+			dgVector friction (tangentDir.Scale4 (frictionCoeffecient[i] * tangentFrictionAccel / dgSqrt (mag.GetScalar())));
+
+			accel[i] += (normalAccel[i] - normalDirAccel - friction);
+			veloc[i] += accel[i].CompProduct4(dtRK4);
 			posit[i] += veloc[i].CompProduct4(dtRK4);
 		}
 	}
+*/
 }

@@ -43,7 +43,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		PrimitiveType selection[] = {_SPHERE_PRIMITIVE};
 		for (int i = 0; i < int (sizeof (collisionArray) / sizeof (collisionArray[0])); i ++) {
 			int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
-			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
+			dVector shapeSize (size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), 0.0f);
 			shapeSize = dVector(size, size, size, 0.0f);
 			collisionArray[i] = CreateConvexCollision (world, dGetIdentityMatrix(), shapeSize, selection[index], materialID);
 			gemetries[i] = new DemoMesh("geometry", collisionArray[i], "wood_4.tga", "wood_4.tga", "wood_1.tga");
@@ -55,13 +55,13 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		
 		for (int i = 0 ; i < count; i ++) {
 			for (int j = 0 ; j < count; j ++) {
-				dFloat pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
-				dFloat yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
-				dFloat roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
+				dFloat pitch = dRandomVariable (1.0f) * 2.0f * 3.1416f;
+				dFloat yaw = dRandomVariable (1.0f) * 2.0f * 3.1416f;
+				dFloat roll = dRandomVariable (1.0f) * 2.0f * 3.1416f;
 
-				dFloat x = size * (j - count / 2) + RandomVariable (size * 0.5f);
-				dFloat y = RandomVariable (size * 2.0f);
-				dFloat z = size * (i - count / 2) + RandomVariable (size * 0.5f);
+				dFloat x = size * (j - count / 2) + dRandomVariable (size * 0.5f);
+				dFloat y = dRandomVariable (size * 2.0f);
+				dFloat z = size * (i - count / 2) + dRandomVariable (size * 0.5f);
 
 				dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
 				matrix.m_posit = dVector (x, y, z, 1.0f);
@@ -117,7 +117,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 
 		dMatrix alignMatrix (dRollMatrix(3.141592f * 90.0f / 180.0f));
 		for (int i = 0; i < m_count; i ++) {
-			shapeSize = dVector (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
+			shapeSize = dVector (size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), 0.0f);
 #if 1
 			m_castingShapeArray[i] = CreateConvexCollision (world, &alignMatrix[0][0], shapeSize, castSelection[i], materialID);
 #else
@@ -345,7 +345,7 @@ static void AddStaticMesh(DemoEntityManager* const scene)
 	char fileName[2048];
 
 	NewtonWorld* const world = scene->GetNewton();
-	GetWorkingFileName ("ramp.off", fileName);
+	dGetWorkingFileName ("ramp.off", fileName);
 	NewtonMesh* const ntMesh = NewtonMeshLoadOFF(world, fileName);
 
 	dMatrix matrix (dGetIdentityMatrix());

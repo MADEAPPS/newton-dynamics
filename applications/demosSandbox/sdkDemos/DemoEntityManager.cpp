@@ -240,7 +240,7 @@ void DemoEntityManager::CreateOpenGlFont()
 		char fileName[2048];
 		//GetWorkingFileName ("arial.ttf", fileName);
 		//GetWorkingFileName ("calibri.ttf", fileName);
-		GetWorkingFileName ("courbd.ttf", fileName);
+		dGetWorkingFileName ("courbd.ttf", fileName);
 				
 
 		FT_Face face[96];   
@@ -276,8 +276,8 @@ void DemoEntityManager::CreateOpenGlFont()
 			height = (height > h) ? height : h;
 		}
 
-		int imageWidth = TwosPower (width);
-		int imageHeight = TwosPower (height);
+		int imageWidth = dTwosPower (width);
+		int imageHeight = dTwosPower (height);
 
 		char* const image = new char[2 * imageWidth * imageHeight];
 		memset (image, 0, 2 * imageWidth * imageHeight);

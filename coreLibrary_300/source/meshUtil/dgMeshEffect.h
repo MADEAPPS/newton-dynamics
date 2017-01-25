@@ -36,21 +36,39 @@ class dgCollisionInstance;
 #define DG_MESH_EFFECT_POINT_SPLITED		512
 #define DG_MESH_EFFECT_BVH_STACK_DEPTH		256
 
+#define DG_MESH_WEIGHT_COUNT				4
 
 class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 {
 	public:
-	struct dgMeshVertexFormat
+	enum dgChannelType
 	{
-		struct dgDoubleData
+		m_vertex,
+		m_normal,
+		m_binormal,
+		m_uv0,
+		m_uv1,
+		m_color,
+		m_material,
+		m_layer,
+		m_weight,
+		m_point,
+	};
+
+	class dgMeshVertexFormat
+	{
+		public:
+		class dgDoubleData
 		{
+			public:
 			const dgFloat64* m_data;
 			const dgInt32* m_indexList;
 			dgInt32 m_strideInBytes;
 		};
 
-		struct dgFloatData
+		class dgFloatData
 		{
+			public:
 			const dgFloat32* m_data;
 			const dgInt32* m_indexList;
 			dgInt32 m_strideInBytes;
@@ -75,20 +93,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgFloatData m_uv0;
 		dgFloatData m_uv1;
 		dgFloatData m_vertexColor;
-	};
-
-	enum dgChannelType
-	{
-		m_vertex,
-		m_normal,
-		m_binormal,
-		m_uv0,
-		m_uv1,
-		m_color,
-		m_material,
-		m_layer,
-		m_weight,
-		m_point,
 	};
 
 	template<class T, dgChannelType type>
@@ -134,10 +138,11 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 		void Reserve (dgInt32 size)
 		{
-			T dommy;
-			memset (&dommy, 0, sizeof (T));
-			dgArray<T>& me = *this;
-			me[size - 1] = dommy;
+			//T dommy;
+			//memset (&dommy, 0, sizeof (T));
+			//dgArray<T>& me = *this;
+			//me[size - 1] = dommy;
+			dgArray<T>::Resize(size);
 			m_count = size;
 		}
 
@@ -185,8 +190,9 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	class dgPointFormat: public dgFormat
 	{
 		public:
-		class dgWeight
+		class dgWeightPair
 		{
+			public:
 			dgFloat32 m_weight;
 			dgInt32 m_controlIndex;
 		};
@@ -194,7 +200,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		class dgWeightSet
 		{
 			public:
-			dgWeight m_weights[4];
+			dgWeightPair m_weightPair[DG_MESH_WEIGHT_COUNT];
 		};
 
 		dgPointFormat(dgMemoryAllocator* const allocator);
@@ -227,7 +233,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		void SetCount (dgInt32 count);
 		void CopyFrom (const dgAttibutFormat& source);
 		void CopyEntryFrom (dgInt32 index, const dgAttibutFormat& source, dgInt32 sourceIndex);
-		void CompressData (const dgChannel<dgBigVector, m_point>& points, dgInt32* const indexList);
+		//void CompressData (const dgChannel<dgBigVector, m_point>& points, dgInt32* const indexList);
+		void CompressData (const dgPointFormat& points, dgInt32* const indexList);
 
 		dgChannel<dgInt32, m_vertex> m_pointChannel;
 		dgChannel<dgInt32, m_material> m_materialChannel;
@@ -248,7 +255,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgInt32* m_indexList;
 	};
 
-	public:
 	class dgMeshBVH
 	{
 		public:
@@ -280,16 +286,18 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		};
 
 		
-		dgMeshBVH (dgMeshEffect* const mesh);
+		dgMeshBVH (const dgMeshEffect* const mesh);
 		virtual ~dgMeshBVH();
 
 		virtual void Build ();
 		virtual void Cleanup ();
-
+		
+		void FaceRayCast (const dgBigVector& l0, const dgBigVector& l1, void* const userData) const;
 		void GetOverlapNodes (dgList<dgMeshBVHNode*>& overlapNodes, const dgBigVector& p0, const dgBigVector& p1) const;
-		dgMeshBVHNode* FaceRayCast (const dgBigVector& l0, const dgBigVector& l1, dgFloat64& paramOut, bool doubleSidedFaces) const;
 
 		protected:
+		virtual dgMeshBVHNode* CreateLeafNode (dgEdge* const face, void* const userData) = 0;
+
 		dgMeshBVHNode* AddFaceNode (dgEdge* const face, void* const userData);
 		void RemoveNode (dgMeshBVHNode* const treeNode);
 		void ImproveNodeFitness ();
@@ -297,11 +305,11 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 		dgFloat32 CalculateSurfaceArea (dgMeshBVHNode* const node0, dgMeshBVHNode* const node1, dgVector& minBox, dgVector& maxBox) const;
 		virtual bool SanityCheck() const;
 
-		virtual dgFloat64 VertexRayCast (const dgBigVector& l0, const dgBigVector& l1) const;
-		virtual dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, bool dobleSidedFaces) const;
-		virtual bool RayRayIntersect (dgEdge* const edge, const dgMeshEffect* const otherMesh, dgEdge* const otherEdge, dgFloat64& param, dgFloat64& otherParam) const;
+		virtual dgFloat64 RayFaceIntersect (const dgMeshBVHNode* const face, const dgBigVector& p0, const dgBigVector& p1, void* const userData) const;
+//		virtual dgFloat64 VertexRayCast (const dgBigVector& l0, const dgBigVector& l1) const;
+//		virtual bool RayRayIntersect (dgEdge* const edge, const dgMeshEffect* const otherMesh, dgEdge* const otherEdge, dgFloat64& param, dgFloat64& otherParam) const;
 		
-		dgMeshEffect* m_mesh;
+		const dgMeshEffect* m_mesh;
 		dgMeshBVHNode* m_rootNode;
 		dgFitnessList m_fitness;
 		friend class dgMeshEffect;
@@ -393,6 +401,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 
 	dgInt32 GetPropertiesCount() const;
 	const dgInt32* GetIndexToVertexMap() const;
+	dgInt32 GetVertexWeights(dgInt32 vectexIndex, dgInt32* const weightIndices, dgFloat32* const weightFactors) const;
 
 	bool HasNormalChannel() const;
 	bool HasBinormalChannel() const;
@@ -423,11 +432,14 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMeshEffect* CreateSimplification (dgInt32 maxVertexCount, dgReportProgress reportProgressCallback, void* const userData) const;
 	dgMeshEffect* CreateConvexApproximation (dgFloat32 maxConcavity, dgFloat32 backFaceDistanceFactor, dgInt32 maxHullOuputCount, dgInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const userData) const;
 
-//	static dgMeshEffect* CreateDelaunayTetrahedralization (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
-	dgMeshEffect* CreateDelaunayTetrahedralization() const;
+	dgMeshEffect* CreateTetrahedraIsoSurface() const;
+	void CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEffect* const tetrahedraMesh);
+
 	static dgMeshEffect* CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dgInt32 pointCount, dgInt32 pointStrideInBytes, const dgFloat32* const pointCloud, dgInt32 materialId, const dgMatrix& textureProjectionMatrix);
 	static dgMeshEffect* CreateFromSerialization (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData);
 
+	void LoadOffMesh (const char* const filename);
+	void LoadTetraMesh (const char* const filename);
 	void Serialize (dgSerialize callback, void* const userData) const;
 
 	bool HasLayers() const;
@@ -450,6 +462,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void GetEdgeIndex (const void* const edge, dgInt32& v0, dgInt32& v1) const;
 //	void GetEdgeAttributeIndex (const void* edge, dgInt32& v0, dgInt32& v1) const;
 
+	const dgEdge* GetPolyhedraEdgeFromNode(const void* const edge) const;
+
 	void* GetFirstFace () const;
 	void* GetNextFace (const void* const face) const;
 	int IsFaceOpen (const void* const face) const;
@@ -460,7 +474,8 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgBigVector CalculateFaceNormal (const void* const face) const;
 
 	void SetFaceMaterial (const void* const face, int materialID);
-	void AddInterpolateEdgeAttibute (dgEdge* const edge, dgFloat64 param);
+	void AddInterpolatedEdgeAttribute (dgEdge* const edge, dgFloat64 param);
+	dgInt32 AddInterpolatedHalfAttribute(dgEdge* const edge, dgInt32 midPoint);
 	dgInt32 InterpolateVertex (const dgBigVector& point, const dgEdge* const face) const;
 
 	bool Sanity () const;
@@ -496,6 +511,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	friend class dgBooleanMeshBVH;
 	friend class dgHACDClusterGraph;
 	friend class dgTriangleAnglesToUV;
+	friend class dgTetraIsoSufaceStuffing;
 	friend class dgCollisionCompoundFractured;
 };
 

@@ -61,9 +61,6 @@
     <ClCompile Include="..\..\..\source\core\dgSmallDeterminant.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\core\dgSPDMatrix.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\core\dg.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -175,9 +172,6 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\core\dgSmallDeterminant.h">
-      <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\core\dgSPDMatrix.h">
       <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\core\dg.h">

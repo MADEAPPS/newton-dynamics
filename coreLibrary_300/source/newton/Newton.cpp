@@ -552,25 +552,14 @@ int NewtonGetMultiThreadSolverOnSingleIsland(const NewtonWorld* const newtonWorl
   Set the solver precision mode.
 
   @param *newtonWorld is the pointer to the Newton world
-  @param model model of operation 0 = exact, 1 = adaptive, n = linear. The default is adaptive.
+  @param model model of operation n = number of iteration defual value is 4.
 
   @return Nothing
 
-  This function allows the application to configure the Newton solver to work in three different modes.
-
-  0: Is the exact mode. This is good for application where precision is more important than speed, ex: realistic simulation.
-
-  1 (default): Is the adaptive mode, the solver is not as exact but the simulation will still maintain a high degree of accuracy.
-  This mode is good for applications were a good degree of stability is important but not as important as speed.
-
-  n: Linear mode. The solver will not try to reduce the joints relative acceleration errors to below some limit,
-  instead it will perform up to n passes over the joint configuration each time reducing the acceleration error,
-  but it will terminate when the number of passes is exhausted regardless of the error magnitude.
-  In general this is the fastest mode and is is good for applications where speed is the only important factor, ex: video games.
-
-  the adaptive friction model combined with the linear model make for the fastest possible configuration
-  of the Newton solver. This setup is best for games.
-  If you need the best realistic behavior, we recommend the use of the exact solver and exact friction model which are the defaults.
+  n: the solve will execute a maximum of n iteration per cluster of connected joints and will terminnetare regarless of the 
+  of the joint recisual acceleration. 
+  If it happen that the joints residual acceleration fall below the minimum tolereance 1.0e-5
+  then the solve will terminar before the numer of ieteration reach N.
 */
 void NewtonSetSolverModel(const NewtonWorld* const newtonWorld, int model)
 {
@@ -580,10 +569,24 @@ void NewtonSetSolverModel(const NewtonWorld* const newtonWorld, int model)
 	world->SetSolverMode (model);
 }
 
+/*!
+Get the solver precision mode.
+*/
+int NewtonGetSolverModel(const NewtonWorld* const newtonWorld)
+{
+	Newton* const world = (Newton *)newtonWorld;
+
+	TRACE_FUNCTION(__FUNCTION__);
+	return world->GetSolverMode();
+}
+
 
 /*!
-  lowOrHigh = 0 the solver is controlled by high acceleration limit
-  lowOrHigh different than zero the solver controlled by low acceleration limit
+  Set solver block diaginal joint solver mode.
+  lowOrHigh == 0 Solver uses Gauss Seidel algorithm to solve constraints 
+  lowOrHigh != 0 Solver use Danzig algorithm to solve constraints 
+
+  when setting lowOrHigh != 0 this produces highest acuracacy but can be slower. 
 */
 void NewtonSetSolverConvergenceQuality (const NewtonWorld* const newtonWorld, int lowOrHigh)
 {
@@ -591,6 +594,14 @@ void NewtonSetSolverConvergenceQuality (const NewtonWorld* const newtonWorld, in
 
 	TRACE_FUNCTION(__FUNCTION__);
 	world->SetSolverConvergenceQuality(lowOrHigh);
+}
+
+int NewtonGetSolverConvergenceQuality(const NewtonWorld* const newtonWorld)
+{
+	Newton* const world = (Newton *)newtonWorld;
+
+	TRACE_FUNCTION(__FUNCTION__);
+	return world->GetSolverConvergenceQuality();
 }
 
 
@@ -2060,8 +2071,8 @@ void NewtonMaterialSetContactNormalDirection(const NewtonMaterial* const materia
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 	dgVector normal (direction[0], direction[1], direction[2], dgFloat32 (0.0f));
 
-
-	dgAssert (dgAbsf (normal.DotProduct3(material->m_normal) - dgFloat32(1.0f)) <dgFloat32 (0.01f));
+	//dgAssert (dgAbsf (normal.DotProduct3(material->m_normal) - dgFloat32(1.0f)) <dgFloat32 (0.01f));
+	dgAssert (normal.DotProduct3(material->m_normal) > dgFloat32 (0.01f));
 	if (normal.DotProduct3(material->m_normal) < dgFloat32 (0.0f)) {
 		normal = normal.Scale3 (-dgFloat32(1.0f));
 	}
@@ -5921,31 +5932,6 @@ void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const p
 }
 
 
-/*!
-  add a Euler Gyroscopic of the form
-
-  localAngularMomentum = localInertia * localAngularVelocity)
-  localTorque = crossProduct (localAngularVelocity, localAngularMomentum)
-  torque += localTorque.Rotate (localTorque.Scale (-1));
-
-  note: this is a simplified form of Euler equation of motion when the center of mass is set to the origin of the principal axis of the body
-  and the matrix of inertia of the shape is also aligned with the principals axis. 
-  This si the case for almost all bodies in newton, with the exception of compound collisions and bodies where the end application 
-  override set the center of mass or moment of inertia.
-*/
-void NewtonBodyApplyGyroscopicTorque (const NewtonBody* const bodyPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)bodyPtr;
-
-	dgVector inertia(body->GetMass());
-	dgVector omega(body->GetMatrix().UnrotateVector(body->GetOmega()));
-
-	dgVector angularMomentum(inertia.CompProduct4(omega));
-	dgVector torque(omega.CrossProduct3(angularMomentum));
-	torque = body->GetMatrix().RotateVector(torque.CompProduct4(dgVector::m_negOne));
-	body->AddTorque(torque);
-}
 
 /*!
   Add an train of impulses to a specific point on a body.
@@ -7450,12 +7436,18 @@ NewtonMesh* NewtonMeshCreateConvexHull (const NewtonWorld* const newtonWorld, in
 	return (NewtonMesh*) mesh;
 }
 
-NEWTON_API NewtonMesh* NewtonMeshCreateConformingTetrahedralization(const NewtonMesh* const closetMesh)
+NEWTON_API NewtonMesh* NewtonMeshCreateTetrahedraIsoSurface(const NewtonMesh* const closeManifoldMesh)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) closetMesh;
-//	return (NewtonMesh*) dgMeshEffect::CreateDelaunayTetrahedralization (world->dgWorld::GetAllocator(), interiorMaterialID, strideInBytes, vertexCloud, materialID, dgMatrix (textureMatrix));
-	return (NewtonMesh*)meshEffect->CreateDelaunayTetrahedralization();
+	dgMeshEffect* const meshEffect = (dgMeshEffect*) closeManifoldMesh;
+	return (NewtonMesh*)meshEffect->CreateTetrahedraIsoSurface();
+}
+
+NEWTON_API void NewtonCreateTetrahedraLinearBlendSkinWeightsChannel(const NewtonMesh* const tetrahedraMesh, NewtonMesh* const skinMesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)skinMesh;
+	meshEffect->CreateTetrahedraLinearBlendSkinWeightsChannel((const dgMeshEffect*)tetrahedraMesh);
 }
 
 NewtonMesh* NewtonMeshCreateVoronoiConvexDecomposition (const NewtonWorld* const newtonWorld, int pointCount, const dFloat* const vertexCloud, int strideInBytes, int materialID, const dFloat* const textureMatrix)
@@ -7498,10 +7490,21 @@ NewtonMesh* NewtonMeshLoadOFF(const NewtonWorld* const newtonWorld, const char* 
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	dgMeshEffect* const mesh = new (world->dgWorld::GetAllocator()) dgMeshEffect (world->dgWorld::GetAllocator(), filename);
+	dgMemoryAllocator* const allocator = world->dgWorld::GetAllocator();
+	dgMeshEffect* const mesh = new (allocator) dgMeshEffect (allocator);
+	mesh->LoadOffMesh(filename);
 	return (NewtonMesh*) mesh;
 }
 
+NewtonMesh* NewtonMeshLoadTetrahedraMesh(const NewtonWorld* const newtonWorld, const char* const filename)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	dgMemoryAllocator* const allocator = world->dgWorld::GetAllocator();
+	dgMeshEffect* const mesh = new (allocator) dgMeshEffect(allocator);
+	mesh->LoadTetraMesh (filename);
+	return (NewtonMesh*)mesh;
+}
 
 void NewtonMeshApplyTransform (const NewtonMesh* const mesh, const dFloat* const matrix)
 {
@@ -7730,7 +7733,7 @@ void NewtonMeshClearVertexFormat (NewtonMeshVertexFormat* const format)
 	vertexFormat->Clear ();
 }
 
-void NewtonMeshBuildFromVertexListIndexList (const NewtonMesh* const mesh, NewtonMeshVertexFormat* const format)
+void NewtonMeshBuildFromVertexListIndexList (const NewtonMesh* const mesh, const NewtonMeshVertexFormat* const format)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
@@ -7799,48 +7802,12 @@ const int* NewtonMeshGetIndexToVertexMap(const NewtonMesh* const mesh)
 	return meshEffect->GetIndexToVertexMap();
 }
 
-/*
-int NewtonMeshGetPointStrideInByte (const NewtonMesh* const mesh)
-{
-	TRACE_FUNCTION(__FUNCTION__);	
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	return meshEffect->GetPropertiesStrideInByte();
-}
-
-dFloat64* NewtonMeshGetPointArray (const NewtonMesh* const mesh) 
+int NewtonMeshGetVertexWeights(const NewtonMesh* const mesh, int vertexIndex, int* const weightIndices, dFloat* const weightFactors)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	return meshEffect->GetAttributePool();
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	return meshEffect->GetVertexWeights (vertexIndex, weightIndices, weightFactors);
 }
-
-
-dFloat64* NewtonMeshGetNormalArray (const NewtonMesh* const mesh)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	return meshEffect->GetNormalPool();
-}
-
-dFloat64* NewtonMeshGetUV0Array (const NewtonMesh* const mesh)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	return meshEffect->GetUV0Pool();
-}
-
-dFloat64* NewtonMeshGetUV1Array (const NewtonMesh* const mesh)
-{	
-	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-
-	return meshEffect->GetUV1Pool();
-}
-*/
 
 int NewtonMeshHasNormalChannel(const NewtonMesh* const mesh)
 {
@@ -8199,11 +8166,13 @@ NewtonCollision* NewtonCreateDeformableSolid(const NewtonWorld* const newtonWorl
 	return (NewtonCollision*) world->CreateDeformableSolid ((dgMeshEffect*)mesh, shapeID);
 }
 
-NewtonCollision* NewtonCreateClothPatch (const NewtonWorld* const newtonWorld, NewtonMesh* const mesh, int shapeID)
+NewtonCollision* NewtonCreateMassSpringDamperSystem (const NewtonWorld* const newtonWorld, int shapeID,
+													 const dFloat* const points, int pointCount, int strideInBytes, const dFloat* const pointMass, 
+													 const int* const links, int linksCount, const dFloat* const linksSpring, const dFloat* const linksDamper)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return (NewtonCollision*)world->CreateClothPatchMesh ((dgMeshEffect*)mesh, shapeID);
+	return (NewtonCollision*)world->CreateMassSpringDamperSystem (shapeID, pointCount, points, strideInBytes, pointMass, linksCount, links, linksSpring, linksDamper);
 }
 
 int NewtonDeformableMeshGetParticleCount(const NewtonCollision* const deformableMesh)
@@ -8229,18 +8198,6 @@ const dFloat* NewtonDeformableMeshGetParticleArray(const NewtonCollision* const 
 	}
 	return NULL;
 }
-
-const int* NewtonDeformableMeshGetIndexToVertexMap (const NewtonCollision* const deformableMesh) 
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const collision = (dgCollisionInstance*)deformableMesh;
-	if (collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-		dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)collision->GetChildShape();
-		return deformableShape->GetIndexToVertexMap();
-	}
-	return NULL;
-}
-
 
 
 int NewtonDeformableMeshGetParticleStrideInBytes(const NewtonCollision* const deformableMesh)

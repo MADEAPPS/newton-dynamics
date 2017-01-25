@@ -81,9 +81,6 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionCylinder.cpp">
       <Filter>collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.cpp">
-      <Filter>collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\physics\dgCollisionDeformableMesh.cpp">
       <Filter>collision</Filter>
     </ClCompile>
@@ -180,6 +177,9 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionLumpedMassParticles.cpp">
       <Filter>collision</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgCollisionMassSpringDamperSystem.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBallConstraint.h">
@@ -243,9 +243,6 @@
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionCylinder.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableClothPatch.h">
       <Filter>collision</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionDeformableMesh.h">
@@ -324,6 +321,9 @@
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionLumpedMassParticles.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgCollisionMassSpringDamperSystem.h">
       <Filter>collision</Filter>
     </ClInclude>
   </ItemGroup>

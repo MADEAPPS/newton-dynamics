@@ -270,10 +270,10 @@ void dCholeskyFactorization(int size, T* const matrix)
 
 
 template<class T>
-void dCholeskyRestore(int size, T* const matrix, const T* const diagonal, int n, int subSize)
+void dCholeskyRestore(int size, T* const matrix, const T* const diagonal, int from, int to)
 {
-	int stride = n * size;
-	for (int i = n; i < subSize; i++) {
+	int stride = from * size;
+	for (int i = from; i < to; i++) {
 		T* const row = &matrix[stride];
 		row[i] = diagonal[i];
 		for (int j = 0; j < i; j++) {
@@ -386,7 +386,8 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 
 	int stride = 0;
 	for (int i = 0; i < size; i++) {
-		x0[i] = dClamp(x[i], low[i], high[i]);
+		x[i] = dClamp(x[i], low[i], high[i]);
+		x0[i] = x[i];
 		if ((low[i] > T(-D_LCP_MAX_VALUE)) || (high[i] < T(D_LCP_MAX_VALUE))) {
 			dAssert (0);
 			low[i] -= x0[i];

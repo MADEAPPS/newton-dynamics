@@ -124,7 +124,7 @@ void DemoEntity::LoadNGD_mesh (const char* const fileName, NewtonWorld* const wo
 	dScene scene (world);
 
 	char pathName[2048];
-	GetWorkingFileName (fileName, pathName);
+	dGetWorkingFileName (fileName, pathName);
 	scene.Deserialize(pathName);
 
 	// this will apply all global the scale to the mesh

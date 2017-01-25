@@ -18,12 +18,6 @@
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
 
-static void PhysicsApplyGyroscopyTorque (const NewtonBody* body, dFloat timestep, int threadIndex)
-{
-	PhysicsApplyGravityForce (body, timestep, threadIndex);
-	NewtonBodyApplyGyroscopicTorque (body);
-}
-
 
 void PrecessingTops (DemoEntityManager* const scene)
 {
@@ -40,7 +34,8 @@ void PrecessingTops (DemoEntityManager* const scene)
 	dVector size (3.0f, 2.0f, 0.0f, 0.0f);
 
 	// create an array of cones 
-	const int count = 10;
+//	const int count = 10;
+const int count = 1;
 
 	// all shapes use the x axis as the  axis of symmetry, to make an upright cone we apply a 90 degree rotation local matrix
 	dMatrix shapeOffsetMatrix (dRollMatrix(-3.141592f/2.0f));
@@ -48,7 +43,7 @@ void PrecessingTops (DemoEntityManager* const scene)
 
 	// till the cont 30 degrees, and apply a local high angular velocity
 	dMatrix matrix (dRollMatrix (-25.0f * 3.141592f / 180.0f));
-	dVector omega (0.0f, 50.0f, 0.0f);
+	dVector omega (1.0f, 5.0f, 0.0f);
 	omega = matrix.RotateVector (omega);
 	dVector damp (0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -70,7 +65,7 @@ void PrecessingTops (DemoEntityManager* const scene)
 		matrix.m_posit = bodyMatrix.m_posit;
 		matrix.m_posit.m_y += 1.0f; 
 		NewtonBodySetMatrix(body, &matrix[0][0]);
-		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGyroscopyTorque);
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 
 		NewtonCollision* const shape = NewtonBodyGetCollision(body);
 		NewtonBodySetMassProperties (body, 5.0f, shape);

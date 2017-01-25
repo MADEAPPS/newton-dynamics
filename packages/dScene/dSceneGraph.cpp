@@ -114,17 +114,17 @@ int dSceneGraph::GetLRU()
 }
 
 
-bool dSceneGraph::HasLinkToRoot (dTreeNode* const node)
+bool dSceneGraph::HasLinkToRoot (dTreeNode* const nodeIn)
 {
 	int stack;
 	char parentEdge[D_GRAPH_MAX_STACK_DEPTH];
 	dTreeNode* pool[D_GRAPH_MAX_STACK_DEPTH];
 
-	pool[0] = node;
+	pool[0] = nodeIn;
 	stack = 1;
 
 	int lru = GetLRU();
-	node->GetInfo().SetLRU (lru);
+	nodeIn->GetInfo().SetLRU (lru);
 
 	while (stack) {
 		stack --;
@@ -304,63 +304,62 @@ dSceneGraph::dTreeNode* dSceneGraph::AddNode (dNodeInfo* const info, dTreeNode* 
 }
 
 
-void dSceneGraph::DeleteNode (dTreeNode* const node)
+void dSceneGraph::DeleteNode (dTreeNode* const nodeIn)
 {
 	dList<dTreeNode*> conectedNodes;
 	dTree<dTreeNode*, unsigned> deleteList;
-	dGraphNode& info = node->GetInfo();
-	deleteList.Insert(node, node->GetKey());
+	dGraphNode& infoIn = nodeIn->GetInfo();
+	deleteList.Insert(nodeIn, nodeIn->GetKey());
 
-	while (info.m_parents.GetFirst()) {
-		dTreeNode* const twinNode = info.m_parents.GetFirst()->GetInfo();
+	while (infoIn.m_parents.GetFirst()) {
+		dTreeNode* const twinNode = infoIn.m_parents.GetFirst()->GetInfo();
 
 		conectedNodes.Append (twinNode);
 		dGraphNode& twinInfo = twinNode->GetInfo();
 		for (dGraphNode::dLink::dListNode* link = twinInfo.m_children.GetFirst(); link; link = link->GetNext()){
-			if (link->GetInfo() == node) {
+			if (link->GetInfo() == nodeIn) {
 				twinInfo.m_children.Remove (link);
 				break;
 			}
 		}
 		for (dGraphNode::dLink::dListNode* link = twinInfo.m_parents.GetFirst(); link; link = link->GetNext()){
-			if (link->GetInfo() == node) {
+			if (link->GetInfo() == nodeIn) {
 				twinInfo.m_parents.Remove (link);
 				break;
 			}
 		}
-		info.m_parents.Remove(info.m_parents.GetFirst());
+		infoIn.m_parents.Remove(infoIn.m_parents.GetFirst());
 	}
 
 	
-	while (info.m_children.GetFirst()) {
-		dTreeNode* const twinNode = info.m_children.GetFirst()->GetInfo();
+	while (infoIn.m_children.GetFirst()) {
+		dTreeNode* const twinNode = infoIn.m_children.GetFirst()->GetInfo();
 
 		conectedNodes.Append (twinNode);
 		dGraphNode& twinInfo = twinNode->GetInfo();
 		for (dGraphNode::dLink::dListNode* link = twinInfo.m_children.GetFirst(); link; link = link->GetNext()){
-			if (link->GetInfo() == node) {
+			if (link->GetInfo() == nodeIn) {
 				twinInfo.m_children.Remove (link);
 				break;
 			}
 		}
 		for (dGraphNode::dLink::dListNode* link = twinInfo.m_parents.GetFirst(); link; link = link->GetNext()){
-			if (link->GetInfo() == node) {
+			if (link->GetInfo() == nodeIn) {
 				twinInfo.m_parents.Remove (link);
 				break;
 			}
 		}
-		info.m_children.Remove(info.m_children.GetFirst());
+		infoIn.m_children.Remove(infoIn.m_children.GetFirst());
 	}
 
 	
 	for (dList<dTreeNode*>::dListNode* ptr = conectedNodes.GetFirst(); ptr; ptr = ptr->GetNext()){
-		//char parentEdge[D_GRAPH_MAX_STACK_DEPTH];
 		dTreeNode* pool[D_GRAPH_MAX_STACK_DEPTH];
 		
 		int stack = 1;
 		int lru = GetLRU();
 		pool[0] = ptr->GetInfo();
-		node->GetInfo().SetLRU (lru);
+		nodeIn->GetInfo().SetLRU (lru);
 		bool listIsDangling = true;
 		dList<dTreeNode*> danglingNodes;
 

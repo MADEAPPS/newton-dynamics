@@ -224,7 +224,7 @@ void ContinuousCollision1(DemoEntityManager* const scene)
 
 	// just see ground. it's not a rigid body.
 	char fileName[2048];
-	GetWorkingFileName("flatPlane.ngd", fileName);
+	dGetWorkingFileName("flatPlane.ngd", fileName);
 	scene->LoadScene(fileName);
 	
 
