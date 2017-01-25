@@ -238,19 +238,22 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 			dgVector timeStepVect(timestep);
 			m_veloc += accel.CompProduct4(timeStepVect);
-
-			// simple Euler correction sub linear convergence,
+			
 #if 0
+			// Using fordward half step euler integration 
+			// (not enough to cope with high angular velocities)
 			dgVector correction(alpha.CrossProduct3(m_omega));
 			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
 #else
-			// Using predictor corrector integration 
+			// Using fordward and backward euler integration
+			// (good to resolve high angular velocity precessions) 
+			// alpha = (T * R^1 - (wl cross (wl * Il)) Il^1 * R
 			dgVector omega(m_omega);
 			dgVector halfStep(dgVector::m_half.Scale4(timestep));
 			dgMatrix matrix (m_matrix);
 
 			for (dgInt32 i = 0; i < 2; i++) {
-				// integrate body locally to get matrix
+				// get forward derivative
 				dgVector localOmega(matrix.UnrotateVector(m_omega));
 				dgVector localTorque(matrix.UnrotateVector(m_externalTorque));
 				dgVector predictDerivative(matrix.RotateVector(m_invMass.CompProduct4(localTorque - (localOmega.CrossProduct3(localOmega.CompProduct4(m_mass))))));
@@ -264,9 +267,14 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				dgQuaternion rotation(m_rotation * dgQuaternion(omegaAxis, omegaAngle));
 				matrix = dgMatrix(rotation, dgVector::m_wOne);
 
+				// get backward derivative
 				localOmega = matrix.UnrotateVector(predictOmega);
 				localTorque = matrix.UnrotateVector(m_externalTorque);
 				dgVector correctionDerivative(matrix.RotateVector(m_invMass.CompProduct4(localTorque - (localOmega.CrossProduct3(localOmega.CompProduct4(m_mass))))));
+
+				// calculate omega as the average of forward and backward derivatives.
+				// In theory since alpha is a quadratic funtion of omega, this should converge to an eact value
+				// in one at most two steps.
 				omega = m_omega + halfStep.CompProduct4(correctionDerivative + predictDerivative);
 			}
 			m_omega = omega;
