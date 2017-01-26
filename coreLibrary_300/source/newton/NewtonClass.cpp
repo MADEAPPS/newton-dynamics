@@ -146,12 +146,20 @@ void NewtonUserJoint::GetJacobianAt(dgInt32 index, dgFloat32* const jacobian0, d
 	}
 }
 
+dFloat NewtonUserJoint::GetAcceleration () const
+{
+	dgInt32 index = m_rows - 1;
+	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
+		return GetRowAcceleration (index, *m_param);
+	}
+	return 0.0f;
+}
+
 
 void NewtonUserJoint::SetAcceleration (dgFloat32 acceleration)
 {
 	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
-//		m_param->m_jointAccel[index] = acceleration;
 		SetMotorAcceleration (index, acceleration, *m_param);
 	}
 }

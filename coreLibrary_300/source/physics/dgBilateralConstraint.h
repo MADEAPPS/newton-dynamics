@@ -49,6 +49,7 @@ class dgBilateralConstraint: public dgConstraint
 
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); 
 
+	dgFloat32 GetRowAcceleration (dgInt32 index, dgContraintDescritor& desc) const;
 	dgFloat32 CalculateMotorAcceleration (dgInt32 index, dgContraintDescritor& desc) const;
 	void SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc);
 	void SetSpringDamperAcceleration (dgInt32 index, dgContraintDescritor& desc, dgFloat32 spring, dgFloat32 damper);

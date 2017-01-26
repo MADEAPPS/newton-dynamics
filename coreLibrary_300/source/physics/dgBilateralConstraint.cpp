@@ -160,6 +160,11 @@ dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (dgMatrix& globalM
 */
 }
 
+dgFloat32 dgBilateralConstraint::GetRowAcceleration (dgInt32 index, dgContraintDescritor& desc) const
+{
+	return m_motorAcceleration[index];
+}
+
 void dgBilateralConstraint::SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc)
 {
 	m_rowIsMotor[index] = 1;

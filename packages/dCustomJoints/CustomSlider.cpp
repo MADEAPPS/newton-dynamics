@@ -30,7 +30,12 @@ CustomSlider::CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 	,m_posit(0.0f)
 	,m_minDist(-1.0f)
 	,m_maxDist(1.0f)
+	,m_spring(0.0f)
+	,m_damper(0.0f)
+	,m_relaxation(1.0f)
 	,m_limitsOn(false)
+	,m_setAsSpringDamper(false)
+	,m_lastRowWasUsed(false)
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -39,16 +44,15 @@ CustomSlider::CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 
 CustomSlider::CustomSlider (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomJoint(child, parent, callback, userData)
-	,m_lastRowWasUsed(false)
 {
 	callback (userData, &m_speed, sizeof (dFloat));
 	callback (userData, &m_posit, sizeof (dFloat));
 	callback (userData, &m_minDist, sizeof (dFloat));
 	callback (userData, &m_maxDist, sizeof (dFloat));
-
-	int tmp[1];
-	callback (userData, &tmp, sizeof (int));
-	m_limitsOn = tmp[0] ? true : false; 
+	callback (userData, &m_spring, sizeof (dFloat));
+	callback (userData, &m_damper, sizeof (dFloat));
+	callback (userData, &m_relaxation, sizeof (dFloat));
+	callback (userData, &m_flags, sizeof (int));
 }
 
 CustomSlider::~CustomSlider()
@@ -63,10 +67,10 @@ void CustomSlider::Serialize (NewtonSerializeCallback callback, void* const user
 	callback (userData, &m_posit, sizeof (dFloat));
 	callback (userData, &m_minDist, sizeof (dFloat));
 	callback (userData, &m_maxDist, sizeof (dFloat));
-
-	int tmp[1];
-	tmp[0] = m_limitsOn; 
-	callback (userData, tmp, sizeof (tmp));
+	callback (userData, &m_spring, sizeof (dFloat));
+	callback (userData, &m_damper, sizeof (dFloat));
+	callback (userData, &m_relaxation, sizeof (dFloat));
+	callback (userData, &m_flags, sizeof (int));
 }
 
 
@@ -81,6 +85,13 @@ void CustomSlider::SetLimits(dFloat minDist, dFloat maxDist)
 	m_maxDist = maxDist;
 }
 
+void CustomSlider::SetAsSpringDamper(bool state, dFloat relaxation, dFloat spring, dFloat damper)
+{
+	m_setAsSpringDamper = state;
+	m_relaxation = relaxation;
+	m_spring = spring;
+	m_damper = damper;
+}
 
 dFloat CustomSlider::GetJointPosit () const
 {
@@ -169,13 +180,42 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	m_lastRowWasUsed = false;
 	SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
-
  }
 
 void CustomSlider::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	// if limit are enable ...
-	if (m_limitsOn) {
+	if (m_limitsOn && m_setAsSpringDamper) {
+		m_lastRowWasUsed = true;
+		if (m_posit < m_minDist) {
+			// get a point along the up vector and set a constraint  
+			const dVector& p0 = matrix0.m_posit;
+			dVector p1 (p0 + matrix0.m_front.Scale (m_minDist - m_posit));
+			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+			dFloat accel = NewtonUserJointGetRowAcceleration(m_joint) + NewtonCalculateSpringDamperAcceleration(timestep, m_spring, m_posit, m_damper, m_speed);
+			NewtonUserJointSetRowAcceleration (m_joint, accel);
+			//NewtonUserJointSetRowStiffness (m_joint, m_relaxation);
+			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
+
+		} else if (m_posit > m_maxDist) {
+			// get a point along the up vector and set a constraint  
+
+			const dVector& p0 = matrix0.m_posit;
+			dVector p1 (p0 + matrix0.m_front.Scale (m_maxDist - m_posit));
+			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+			dFloat accel = NewtonUserJointGetRowAcceleration(m_joint) + NewtonCalculateSpringDamperAcceleration(timestep, m_spring, m_posit, m_damper, m_speed);
+			NewtonUserJointSetRowAcceleration (m_joint, accel);
+			//NewtonUserJointSetRowStiffness (m_joint, m_relaxation);
+			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
+		} else {
+			const dVector& p0 = matrix0.m_posit;
+			const dVector& p1 = matrix1.m_posit;
+			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_spring, m_damper);
+			NewtonUserJointSetRowStiffness (m_joint, m_relaxation);
+		}
+
+	} else if (m_limitsOn) {
 		if (m_posit < m_minDist) {
 			// get a point along the up vector and set a constraint  
 			const dVector& p0 = matrix0.m_posit;
@@ -194,7 +234,6 @@ void CustomSlider::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matr
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
 			m_lastRowWasUsed = true;
 		} else {
-
 /*
 			// uncomment this for a slider with friction
 
@@ -223,5 +262,12 @@ void CustomSlider::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matr
 			m_lastRowWasUsed = false;
 */
 		}
+	} else if (m_setAsSpringDamper) {
+		m_lastRowWasUsed = true;
+		const dVector& p0 = matrix0.m_posit;
+		const dVector& p1 = matrix1.m_posit;
+		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+		NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_spring, m_damper);
+		NewtonUserJointSetRowStiffness (m_joint, m_relaxation);
 	} 
 }

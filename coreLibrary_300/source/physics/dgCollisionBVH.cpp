@@ -27,6 +27,7 @@
 
 dgCollisionBVH::dgCollisionBVH(dgWorld* const world)
 	:dgCollisionMesh (world, m_boundingBoxHierachy), dgAABBPolygonSoup()
+	,m_trianglesCount(0)
 {
 	m_rtti |= dgCollisionBVH_RTTI;
 	m_builder = NULL;
@@ -36,6 +37,7 @@ dgCollisionBVH::dgCollisionBVH(dgWorld* const world)
 dgCollisionBVH::dgCollisionBVH (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
 	:dgCollisionMesh (world, deserialization, userData, revisionNumber)
 	,dgAABBPolygonSoup()
+	,m_trianglesCount(0)
 {
 	dgAssert (m_rtti | dgCollisionBVH_RTTI);
 	m_builder = NULL;;
@@ -47,6 +49,8 @@ dgCollisionBVH::dgCollisionBVH (dgWorld* const world, dgDeserialize deserializat
 	dgVector p1; 
 	GetAABB (p0, p1);
 	SetCollisionBBox(p0, p1);
+
+	deserialization(userData, &m_trianglesCount, sizeof (dgInt32));
 }
 
 dgCollisionBVH::~dgCollisionBVH(void)
@@ -57,6 +61,7 @@ void dgCollisionBVH::Serialize(dgSerialize callback, void* const userData) const
 {
 	SerializeLow(callback, userData);
 	dgAABBPolygonSoup::Serialize ((dgSerialize) callback, userData);
+	callback(userData, &m_trianglesCount, sizeof (dgInt32));
 }
 
 void dgCollisionBVH::BeginBuild()
@@ -100,27 +105,25 @@ void dgCollisionBVH::EndBuild(dgInt32 optimize)
 
 	delete m_builder;
 	m_builder = NULL;
-}
-
-
-
-void dgCollisionBVH::GetCollisionInfo(dgCollisionInfo* const info) const
-{
-	dgCollision::GetCollisionInfo(info);
 		
 	dgMeshVertexListIndexList data;
 	data.m_indexList = NULL;
 	data.m_userDataList = NULL;
 	data.m_maxIndexCount = 1000000000;
 	data.m_triangleCount = 0; 
-//	dgVector p0 (-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
-//	dgVector p1 ( 1.0e10f,  1.0e10f,  1.0e10f, 1.0f);
 	dgVector zero (dgFloat32 (0.0f));
 	dgFastAABBInfo box (dgGetIdentityMatrix(), dgVector (dgFloat32 (1.0e15f)));
 	ForAllSectors (box, zero, dgFloat32 (1.0f), GetTriangleCount, &data);
+	m_trianglesCount = data.m_triangleCount;
+}
+
+
+void dgCollisionBVH::GetCollisionInfo(dgCollisionInfo* const info) const
+{
+	dgCollision::GetCollisionInfo(info);
 
 	info->m_bvhCollision.m_vertexCount = GetVertexCount();
-	info->m_bvhCollision.m_indexCount = data.m_triangleCount * 3;
+	info->m_bvhCollision.m_indexCount = m_trianglesCount * 3;
 }
 
 void dgCollisionBVH::ForEachFace (dgAABBIntersectCallback callback, void* const context) const

@@ -28,6 +28,7 @@ class CustomSlider: public CustomJoint
 
 	CUSTOM_JOINTS_API void EnableLimits(bool state);
 	CUSTOM_JOINTS_API void SetLimits(dFloat mindist, dFloat maxdist);
+	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat relaxation, dFloat spring, dFloat damper);
 
 	CUSTOM_JOINTS_API dFloat GetJointPosit () const;
 	CUSTOM_JOINTS_API dFloat GetJointSpeed () const;
@@ -44,8 +45,17 @@ class CustomSlider: public CustomJoint
 	dFloat m_posit;
 	dFloat m_minDist;
 	dFloat m_maxDist;
-	bool m_limitsOn;
-	bool m_lastRowWasUsed;
+	dFloat m_spring;
+	dFloat m_damper;
+	dFloat m_relaxation;
+	union {
+		int m_flags;
+		struct {
+			int	m_limitsOn			: 1;
+			int	m_setAsSpringDamper : 1;
+			int	m_lastRowWasUsed	: 1;
+		};
+	};
 	DECLARE_CUSTOM_JOINT(CustomSlider, CustomJoint)
 };
 

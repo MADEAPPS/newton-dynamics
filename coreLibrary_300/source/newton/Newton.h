@@ -1150,6 +1150,7 @@ extern "C" {
 	NEWTON_API void NewtonUserJointSetRowMinimumFriction (const NewtonJoint* const joint, dFloat friction);
 	NEWTON_API void NewtonUserJointSetRowMaximumFriction (const NewtonJoint* const joint, dFloat friction);
 	NEWTON_API dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint);
+	NEWTON_API dFloat NewtonUserJointGetRowAcceleration (const NewtonJoint* const joint);
 	NEWTON_API void NewtonUserJointSetRowAcceleration (const NewtonJoint* const joint, dFloat acceleration);
 	NEWTON_API void NewtonUserJointSetRowSpringDamperAcceleration (const NewtonJoint* const joint, dFloat spring, dFloat damper);
 	NEWTON_API void NewtonUserJointSetRowStiffness (const NewtonJoint* const joint, dFloat stiffness);

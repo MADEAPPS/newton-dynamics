@@ -7055,6 +7055,13 @@ void NewtonUserJointSetRowAcceleration(const NewtonJoint* const joint, dFloat ac
 	userJoint->SetAcceleration (acceleration);
 }
 
+dFloat NewtonUserJointGetRowAcceleration (const NewtonJoint* const joint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
+	return userJoint->GetAcceleration();
+}
+
 dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)
 {
 	TRACE_FUNCTION(__FUNCTION__);

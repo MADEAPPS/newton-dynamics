@@ -240,13 +240,13 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 			m_veloc += accel.CompProduct4(timeStepVect);
 			
 #if 0
-			// Using fordward half step euler integration 
+			// Using forward half step Euler integration 
 			// (not enough to cope with high angular velocities)
 			dgVector correction(alpha.CrossProduct3(m_omega));
 			m_omega += alpha.CompProduct4(timeStepVect.CompProduct4(dgVector::m_half)) + correction.CompProduct4(timeStepVect.CompProduct4(timeStepVect.CompProduct4(m_eulerTaylorCorrection)));
 #else
-			// Using fordward and backward euler integration
-			// (good to resolve high angular velocity precessions) 
+			// Using forward and backward Euler integration
+			// (good to resolve high angular velocity precession) 
 			// alpha = (T * R^1 - (wl cross (wl * Il)) Il^1 * R
 			dgVector omega(m_omega);
 			dgVector halfStep(dgVector::m_half.Scale4(timestep));
@@ -273,7 +273,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 				dgVector correctionDerivative(matrix.RotateVector(m_invMass.CompProduct4(localTorque - (localOmega.CrossProduct3(localOmega.CompProduct4(m_mass))))));
 
 				// calculate omega as the average of forward and backward derivatives.
-				// In theory since alpha is a quadratic funtion of omega, this should converge to an eact value
+				// In theory since alpha is a quadratic function of omega, this should converge to an eact value
 				// in one at most two steps.
 				omega = m_omega + halfStep.CompProduct4(correctionDerivative + predictDerivative);
 			}
