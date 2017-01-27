@@ -336,6 +336,9 @@ void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* 
 	constraint->m_body1 = body1;
 
 	if (constraint->GetId() != dgConstraint::m_contactConstraint) {
+		dgWorld* const world = body0->GetWorld();
+		world->m_listIsDirty = world->m_listIsDirty || constraint->m_canBeSkeleton;
+
 		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
 		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
 		constraint->m_link0 = body0->m_masterNode->GetInfo().AddBilateralJoint (constraint, body1);
@@ -391,9 +394,11 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 		row0.RemoveContactJoint(constraint->m_link0);
 		row1.RemoveContactJoint(constraint->m_link1);
 	} else {
+		dgWorld* const world = body0->GetWorld();
+		world->m_listIsDirty = true;
+
 		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
 		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
-
 		row0.RemoveBilateralJoint(constraint->m_link0);
 		row1.RemoveBilateralJoint(constraint->m_link1);
 	}

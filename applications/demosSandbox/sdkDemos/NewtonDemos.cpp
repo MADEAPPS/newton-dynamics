@@ -26,7 +26,7 @@
 //#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
-#define DEFAULT_SCENE	3			// Precessing tops
+//#define DEFAULT_SCENE	3			// Precessing tops
 //#define DEFAULT_SCENE	4			// closest distance
 //#define DEFAULT_SCENE	5			// primitive collision
 //#define DEFAULT_SCENE	6 			// Kinematic bodies
@@ -51,7 +51,7 @@
 //#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	28          // standard joints
+#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
@@ -592,6 +592,7 @@ void NewtonDemos::LoadDemo (int index)
 	m_scene->Cleanup();
     
 	m_demosSelection[index].m_launchDemoCallback (m_scene);
+//m_scene->DeserializedPhysicScene ("C:/tmp/test.bin");
 	m_scene->SwapBuffers(); 
 
 	RestoreSettings ();
@@ -948,46 +949,3 @@ void NewtonDemos::OnSelectBroadPhase(wxCommandEvent& event)
 	END_MENU_OPTION();
 }
 
-#if 0
-long NewtonDemos::onLoad(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	BEGIN_MENU_OPTION();
-
-	const FXchar patterns[]="Newton Dynamics Files (*.ngd)";
-	FXFileDialog open(this,"Load Newton Dynamics scene");
-	open.setPatternList(patterns);
-	open.setDirectory ("../../../media");
-	if(open.execute()){
-
-		m_scene->Cleanup();
-
-		// load the scene from a ngd file format
-		m_scene->makeCurrent();
-		m_scene->LoadScene (open.getFilename().text());
-		m_scene->makeNonCurrent();
-
-		// add a sky box to the scene, make the first object
-		m_scene->Addtop (new SkyBox());
-
-		// place camera into position
-		dMatrix camMatrix (GetIdentityMatrix());
-		//		camMatrix.m_posit = dVector (-40.0f, 10.0f, 0.0f, 0.0f);
-		camMatrix = dYawMatrix(-0.0f * 3.1416f / 180.0f);
-		camMatrix.m_posit = dVector (-5.0f, 1.0f, -0.0f, 0.0f);
-		m_scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
-
-		RestoreSettings ();
-	}
-
-
-	m_scene->ResetTimer();
-	END_MENU_OPTION();
-	return 1;
-}
-
-long NewtonDemos::onSave(FXObject* sender, FXSelector id, void* eventPtr)
-{
-	return 1;
-}
-
-#endif

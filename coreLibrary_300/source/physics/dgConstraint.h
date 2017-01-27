@@ -167,6 +167,7 @@ class dgConstraint
 
 	bool IsActive() const;
 	bool IsCollidable () const;
+	void SetAsSkeletonCandidate(bool mode);
 		
 	virtual void ResetMaxDOF();
 	dgInt32 GetMaxDOF() const;
@@ -225,7 +226,8 @@ class dgConstraint
 	dgUnsigned32 m_enableCollision		: 1;
 	dgUnsigned32 m_contactActive		: 1;
 	dgUnsigned32 m_isBilateral			: 1;
-	dgUnsigned32 m_hasSkeleton			: 1;
+	dgUnsigned32 m_hasSkeleton___		: 1;
+	dgUnsigned32 m_canBeSkeleton		: 1;
 	
 	friend class dgWorld;
 	friend class dgJacobianMemory;
@@ -253,7 +255,8 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_enableCollision(false)
 	,m_contactActive(false)
 	,m_isBilateral(false)
-	,m_hasSkeleton(false)
+	,m_hasSkeleton___(false)
+	,m_canBeSkeleton(false)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 }
@@ -275,6 +278,11 @@ DG_INLINE bool dgConstraint::IsBilateral() const
 DG_INLINE bool dgConstraint::IsCollidable () const
 {
 	return m_enableCollision ? true : false;
+}
+
+DG_INLINE void dgConstraint::SetAsSkeletonCandidate(bool mode)
+{
+	m_canBeSkeleton = mode;
 }
 
 DG_INLINE void dgConstraint::SetCollidable (bool state)

@@ -454,7 +454,7 @@ void dgSkeletonContainer::SortGraph(dgGraph* const root, dgGraph* const parent, 
 	root->m_index = dgInt16(index);
 	index++;
 	if (root->m_joint) {
-		root->m_joint->m_hasSkeleton = true;
+		root->m_joint->m_hasSkeleton___ = true;
 	}
 	dgAssert(index <= m_nodeCount);
 }

@@ -80,8 +80,10 @@ class dgSkeletonList: public dgTree<dgSkeletonContainer*, dgInt32>
 	public:
 	dgSkeletonList(dgMemoryAllocator* const allocator)
 		:dgTree<dgSkeletonContainer*, dgInt32>(allocator)
+		,m_listIsDirty(true)
 	{
 	}
+	bool m_listIsDirty;
 };
 
 

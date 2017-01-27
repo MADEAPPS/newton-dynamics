@@ -70,7 +70,8 @@ CustomJoint::~CustomJoint()
 // if there is a C destructor call it form here
 	CustomJoint* const joint = (CustomJoint*) NewtonJointGetUserData (m_joint);  
 	if (joint->m_userDestructor) {
-		joint->m_userDestructor ((const NewtonUserJoint*) joint);
+		//joint->m_userDestructor ((const NewtonUserJoint*) joint);
+		joint->m_userDestructor (joint);
 	}
 
 //	if (NewtonJointGetUserData (m_joint)) {
@@ -169,7 +170,8 @@ void CustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timeste
 
 		// if there is a user define callback call it from here;
 		if (joint->m_userConstrationCallback) {
-			joint->m_userConstrationCallback ((const NewtonUserJoint*) joint, timestep, threadIndex);
+			//joint->m_userConstrationCallback ((const NewtonUserJoint*) joint, timestep, threadIndex);
+			joint->m_userConstrationCallback (joint, timestep, threadIndex);
 		}
 	}
 }
