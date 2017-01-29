@@ -320,7 +320,8 @@ dgWorld::~dgWorld()
 
 	dgSkeletonList::Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++) {
-		delete iter.GetNode()->GetInfo();
+		dgSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
+		delete skeleton;
 	}
 
 	m_preListener.RemoveAll();
@@ -1353,7 +1354,7 @@ dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootB
 		}
 		list->RemoveAll();
 
-		dgInt32 index = DG_SKELETON_BASEW_UNIQUE_ID;
+		dgInt32 index = DG_SKELETON_BASE_UNIQUE_ID;
 		for (dgList<dgSkeletonContainer*>::dgListNode* ptr = saveList.GetFirst(); ptr; ptr ++) {
 			dgSkeletonContainer* const skeleton = ptr->GetInfo();
 			skeleton->m_id = index;

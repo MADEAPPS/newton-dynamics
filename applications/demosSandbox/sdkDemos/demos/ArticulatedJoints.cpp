@@ -827,6 +827,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
 
+		dAssert (0);
+/*
 		// wrap the skeleton in a newton skeleton for exact accuracy
 		controller->MakeNewtonSkeleton();
 
@@ -834,7 +836,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		for (dList<CustomJoint*>::dListNode* ptr = cycleLinks.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			NewtonSkeletonContainerAttachCyclingJoint(skeleton, ptr->GetInfo()->GetJoint());
 		}
-
+*/
 		return controller;
 	}
 
@@ -1192,12 +1194,14 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dVector dist (matrix2.m_posit - matrix0.m_posit);
 		matrix1.m_posit += dist;
 		CustomHinge* const hinge = new ArticulatedEntityModel::TreadLink (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
-
+dAssert (0);
+/*
 		NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (world, link0, NULL);
 		NewtonSkeletonContainerAttachJointArray (skeleton, bodyCount - 1, hingeArray);
 		NewtonSkeletonContainerFinalize (skeleton);
 
 		NewtonSkeletonContainerAttachCyclingJoint(skeleton, hinge->GetJoint());
+*/
 	}
 
 	void MakeLeftThread(CustomArticulatedTransformController* const controller)
@@ -1430,18 +1434,21 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		controller->DisableAllSelfCollision();
 
 		// wrap the skeleton in a newton skeleton for exact accuracy
-		controller->MakeNewtonSkeleton();
+
 
 		controller->DisableAllSelfCollision();
 		for (int i = 0; i < controller->GetBoneCount(); i ++) {
 			CustomArticulatedTransformController::dSkeletonBone* const bone = controller->GetBone(i);
 			NewtonCollisionSetUserData (NewtonBodyGetCollision(bone->m_body), bone);
 		}
-
+dAssert (0);
+/*
+		controller->MakeNewtonSkeleton();
 		NewtonSkeletonContainer* const skeleton = NewtonSkeletonGetSkeletonFromBody (controller->GetBone(0)->m_body);
 		for (dList<CustomJoint*>::dListNode* ptr = cycleLinks.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			NewtonSkeletonContainerAttachCyclingJoint (skeleton, ptr->GetInfo()->GetJoint());
 		}
+*/
 		return controller;
 	}
 };

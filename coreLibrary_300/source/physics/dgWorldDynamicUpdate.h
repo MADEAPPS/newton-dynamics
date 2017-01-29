@@ -100,6 +100,7 @@ class dgJointInfo
 	dgInt32 m_pairCount;
 	dgInt32 m_isFrontier		: 1;
 	dgInt32 m_isInQueueFrontier : 1;
+	dgInt32 m_isSkeleton		: 1;
 };
 
 
@@ -215,8 +216,9 @@ class dgJacobianMatrixElement
 	dgFloat32 m_restitution;
 	dgFloat32 m_penetration;
 	dgFloat32 m_coordenateAccel;
+	dgFloat32 m_diagDampModifier;
 	dgFloat32 m_penetrationStiffness;
-
+	
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
 	dgFloat32 m_stiffness;
@@ -243,11 +245,13 @@ class dgWorldDynamicUpdate
 	dgBody* GetClusterBody (const void* const cluster, dgInt32 index) const;
 
 	private:
+	void UpdateSkeletons();
 	void BuildClusters(dgFloat32 timestep);
 	void SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
 	
 	static dgInt32 CompareClusters (const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
+	static dgInt32 CompareJointByInvMass (const dgBilateralConstraint* const jointA, const dgBilateralConstraint* const jointB, void* notUsed);
 
 //	static void ApplySoftBodyIntenalForceKernel(void* const context, void* const worldContext, dgInt32 threadID);
 	static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
@@ -286,7 +290,7 @@ class dgWorldDynamicUpdate
 	dgFloat32 CalculateJointForceDanzig(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const;
 	dgFloat32 CalculateJointForceGaussSeidel(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgFloat32 restAcceleration) const;
 
-	void SortIClustersByCount ();
+	void SortClustersByCount ();
 	void IntegrateExternalForce(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
 	void IntegrateVelocity (const dgBodyCluster* const cluster, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const;
 

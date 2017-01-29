@@ -226,7 +226,7 @@ class dgConstraint
 	dgUnsigned32 m_enableCollision		: 1;
 	dgUnsigned32 m_contactActive		: 1;
 	dgUnsigned32 m_isBilateral			: 1;
-	dgUnsigned32 m_hasSkeleton___		: 1;
+	dgUnsigned32 m_hasSkeleton			: 1;
 	dgUnsigned32 m_canBeSkeleton		: 1;
 	
 	friend class dgWorld;
@@ -255,7 +255,7 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_enableCollision(false)
 	,m_contactActive(false)
 	,m_isBilateral(false)
-	,m_hasSkeleton___(false)
+	,m_hasSkeleton(false)
 	,m_canBeSkeleton(false)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);

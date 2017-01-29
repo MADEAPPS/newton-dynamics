@@ -58,10 +58,10 @@ bool CustomArticulaledTransformManager::SelfCollisionTest (const CustomArticulat
 }
 
 
-void CustomArticulaledTransformManager::OnControllerDestroy (const NewtonSkeletonContainer* const me)
-{
+//void CustomArticulaledTransformManager::OnControllerDestroy (const NewtonSkeletonContainer* const me)
+//{
 //	dAssert (0);
-}
+//}
 
 CustomArticulatedTransformController::CustomArticulatedTransformController()
 	:m_collisionAggregate(NULL)
@@ -120,7 +120,7 @@ CustomArticulatedTransformController::dSkeletonBone* CustomArticulatedTransformC
 	m_bones[m_boneCount].m_bindMatrix = bindMatrix;
 
 	if (m_collisionAggregate) {
-	NewtonCollisionAggregateAddBody (m_collisionAggregate, bone);
+		NewtonCollisionAggregateAddBody (m_collisionAggregate, bone);
 	}
 
 	m_boneCount ++;
@@ -220,7 +220,7 @@ bool CustomArticulatedTransformController::SelfCollisionTest (const dSkeletonBon
 	return state;
 }
 
-
+/*
 void CustomArticulatedTransformController::MakeNewtonSkeleton()
 {
 	NewtonBody* bonePool[32];
@@ -253,13 +253,5 @@ void CustomArticulatedTransformController::MakeNewtonSkeleton()
 		}
 	}
 	NewtonSkeletonContainerFinalize(skeleton);
-
-/*
-for (int i = 0; i < m_boneCount; i++) {
-const CustomArticulatedTransformController::dSkeletonBone* const child = GetBone(i);
-NewtonCollisionAggregateRemoveBody (m_collisionAggregate, child->m_body);
 }
-NewtonCollisionAggregateDestroy(m_collisionAggregate);
 */
-
-}

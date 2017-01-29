@@ -756,7 +756,7 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			NewtonBodyGetMatrix (leftTireBody, &leftTireMatrix[0][0]);
 			leftTireMatrix = differential.m_axel.m_leftTire->GetJoint()->GetMatrix0() * leftTireMatrix;
 			AxelJoint* const leftGear = new AxelJoint(1.0f, leftTireMatrix[0], engineMatrix[0].Scale (-1.0f), chassisMatrix[2], leftTireBody, engineBody, chassisBody);
-			NewtonSkeletonContainerAttachCyclingJoint (controller->m_skeleton, leftGear->GetJoint());
+			//NewtonSkeletonContainerAttachCyclingJoint (controller->m_skeleton, leftGear->GetJoint());
 
 			dMatrix rightTireMatrix;
 			NewtonBody* const rightTireBody = differential.m_axel.m_rightTire->GetBody();
@@ -764,7 +764,7 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
 			rightTireMatrix = differential.m_axel.m_rightTire->GetJoint()->GetMatrix0() * rightTireMatrix;
 			AxelJoint* const rightGear = new AxelJoint(1.0f, rightTireMatrix[0], engineMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, engineBody, chassisBody);
-			NewtonSkeletonContainerAttachCyclingJoint (controller->m_skeleton, rightGear->GetJoint());
+			//NewtonSkeletonContainerAttachCyclingJoint (controller->m_skeleton, rightGear->GetJoint());
 
 			break;
 		}
@@ -1447,7 +1447,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
 	NewtonCollisionAggregateAddBody (m_collisionAggregate, m_body);
 
-	m_skeleton = NewtonSkeletonContainerCreate(world, m_body, NULL);
+	//m_skeleton = NewtonSkeletonContainerCreate(world, m_body, NULL);
 
 	m_chassis.Init(this, userData);
 	m_bodyPartsList.Append(&m_chassis);
@@ -1653,7 +1653,7 @@ void CustomVehicleController::Finalize()
 {
 //NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 	m_finalized = true;
-	NewtonSkeletonContainerFinalize(m_skeleton);
+	//NewtonSkeletonContainerFinalize(m_skeleton);
 	SetWeightDistribution (m_weightDistribution);
 }
 
@@ -1685,7 +1685,7 @@ CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const Bo
 
 	m_bodyPartsList.Append(&tire);
 	NewtonCollisionAggregateAddBody (m_collisionAggregate, tire.GetBody());
-	NewtonSkeletonContainerAttachBone (m_skeleton, tire.GetBody(), m_chassis.GetBody());
+	//NewtonSkeletonContainerAttachBone (m_skeleton, tire.GetBody(), m_chassis.GetBody());
 	return &tireNode->GetInfo();
 }
 
@@ -1695,7 +1695,7 @@ CustomVehicleController::BodyPartEngine* CustomVehicleController::AddEngine (dFl
 
 	m_bodyPartsList.Append(m_engine);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());
-	NewtonSkeletonContainerAttachBone(m_skeleton, m_engine->GetBody(), m_chassis.GetBody());
+	//NewtonSkeletonContainerAttachBone(m_skeleton, m_engine->GetBody(), m_chassis.GetBody());
 	return m_engine;
 }
 

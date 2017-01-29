@@ -5167,12 +5167,6 @@ NewtonJoint* NewtonBodyGetNextContactJoint(const NewtonBody* const bodyPtr, cons
 }
 
 
-NewtonSkeletonContainer* NewtonBodyGetSkeleton(const NewtonBody* const bodyPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)bodyPtr;
-	return (NewtonSkeletonContainer*) body->GetSkeleton();
-}
 
 int NewtonJointIsActive(const NewtonJoint* const jointPtr)
 {
@@ -8414,125 +8408,6 @@ const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const
 
 /*! @} */ // end of
 
-/*! @defgroup Hierarchical Skeleton arrangement
-
-@{
-*/
-NewtonSkeletonContainer* NewtonSkeletonContainerCreate(NewtonWorld* const worldPtr, NewtonBody* const rootBone, NewtonSkeletontDestructor destructor)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)rootBone;
-	dgWorld* const world = (dgWorld*) worldPtr;
-	dgSkeletonContainer* const skeleton = world->CreateNewtonSkeletonContainer (body);
-	skeleton->SetDestructorCallback ((dgOnSkeletonContainerDestroyCallback) destructor);
-	return (NewtonSkeletonContainer*) skeleton;
-}
-
-void NewtonSkeletonContainerDelete(NewtonSkeletonContainer* const skeletonPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*) skeletonPtr;
-	dgWorld* const world = skeleton->GetWorld();
-	world->DestroySkeletonContainer (skeleton);
-}
-
-
-void* NewtonSkeletonContainerGetRoot(const NewtonSkeletonContainer* const skeletonPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetRoot();
-}
-
-void* NewtonSkeletonContainerGetParent(const NewtonSkeletonContainer* const skeletonPtr, void* const node)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetParent((dgSkeletonContainer::dgGraph*) node);
-}
-
-
-void* NewtonSkeletonContainerFirstChild(const NewtonSkeletonContainer* const skeletonPtr, void* const parentNode)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetFirstChild((dgSkeletonContainer::dgGraph*) parentNode);
-}
-
-void* NewtonSkeletonContainerNextSibling(const NewtonSkeletonContainer* const skeletonPtr, void* const siblingNode)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetNextSiblingChild((dgSkeletonContainer::dgGraph*) siblingNode);
-}
-
-NewtonBody* NewtonSkeletonContainerGetBodyFromNode (const NewtonSkeletonContainer* const skeletonPtr, void* const node)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return (NewtonBody*) (skeleton->GetBody((dgSkeletonContainer::dgGraph*) node));
-}
-
-NewtonJoint* NewtonSkeletonContainerGetParentJointFromNode (const NewtonSkeletonContainer* const skeletonPtr, void* const node)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return (NewtonJoint*)(skeleton->GetParentJoint((dgSkeletonContainer::dgGraph*) node));
-}
-
-NewtonSkeletonContainer* NewtonSkeletonGetSkeletonFromBody (NewtonBody* const body)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const newtonBody = (dgBody*) body;
-	return (NewtonSkeletonContainer*)newtonBody->GetSkeleton();
-}
-
-int NewtonSkeletonContainerAttachCyclingJoint (NewtonSkeletonContainer* const skeletonPtr, NewtonJoint* const jointPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	dgBilateralConstraint* const joint = (dgBilateralConstraint*)jointPtr;
-	return skeleton->AttachCyclingJoint(joint) ? 1 : 0;
-}
-
-void NewtonSkeletonContainerRemoveCyclingJoint(NewtonSkeletonContainer* const skeletonPtr, NewtonJoint* const jointPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	dgBilateralConstraint* const joint = (dgBilateralConstraint*)jointPtr;
-	return skeleton->RemoveCyclingJoint(joint);
-}
-
-
-void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*)skeleton;
-	skeletonContainer->AddJointList(jointCount, (dgBilateralConstraint**) jointArray);
-}
-
-void* NewtonSkeletonContainerAttachBone(NewtonSkeletonContainer* const skeleton, NewtonBody* const childBone, NewtonBody* const parentBone)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*) skeleton;
-	return skeletonContainer->AddChild((dgBody*) childBone, (dgBody*) parentBone);
-}
-
-void NewtonSkeletonContainernDetachBone(NewtonSkeletonContainer* const skeleton, void* const bone)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert(0);
-//	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*)skeleton;
-//skeletonContainer->AddChild((dgBody*)childBone, (dgBody*)parentBone);
-}
-
-
-void NewtonSkeletonContainerFinalize (NewtonSkeletonContainer* const skeleton)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*)skeleton;
-	skeletonContainer->Finalize();
-}
 
 void* NewtonCollisionAggregateCreate(NewtonWorld* const worldPtr)
 {

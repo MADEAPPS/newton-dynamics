@@ -308,20 +308,6 @@ dgBilateralConstraint* dgBodyMasterList::FindBilateralJoint (const dgBody* body0
 	return body0->m_masterNode->GetInfo().FindBilateralJoint (body1);
 }
 
-/*
-dgBodyMasterListRow::dgListNode* dgBodyMasterList::FindConstraintLinkNext (const dgBodyMasterListRow::dgListNode* const me, const dgBody* const body) const
-{
-	dgAssert (0);
-	dgAssert (me);
-	dgAssert (body);
-	for (dgBodyMasterListRow::dgListNode* node = me->GetNext(); node; node = node->GetNext()) {
-		if (node->GetInfo().m_bodyNode == body) {
-			return node;
-		}
-	}
-	return NULL;
-}
-*/
 
 void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* const body0, dgBody* const srcbody1)
 {
@@ -337,7 +323,7 @@ void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* 
 
 	if (constraint->GetId() != dgConstraint::m_contactConstraint) {
 		dgWorld* const world = body0->GetWorld();
-		world->m_listIsDirty = world->m_listIsDirty || constraint->m_canBeSkeleton;
+		world->m_skelListIsDirty = world->m_skelListIsDirty || constraint->m_canBeSkeleton;
 
 		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
 		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;
@@ -395,7 +381,14 @@ void dgBodyMasterList::RemoveConstraint (dgConstraint* const constraint)
 		row1.RemoveContactJoint(constraint->m_link1);
 	} else {
 		dgWorld* const world = body0->GetWorld();
-		world->m_listIsDirty = true;
+		world->m_skelListIsDirty = true;
+
+		if (body0->GetSkeleton()) {
+			world->DestroySkeletonContainer (body0->GetSkeleton());
+		}
+		if (body1->GetSkeleton()) {
+			world->DestroySkeletonContainer(body1->GetSkeleton());
+		}
 
 		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
 		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;

@@ -98,7 +98,6 @@ extern "C" {
 	class NewtonJoint;
 	class NewtonMaterial;
 	class NewtonCollision;
-	class NewtonSkeletonContainer;
 	class NewtonDeformableMeshSegment;
 	class NewtonFracturedCompoundMeshPart;
 #else
@@ -108,7 +107,6 @@ extern "C" {
 	typedef struct NewtonJoint{} NewtonJoint;
 	typedef struct NewtonMaterial{} NewtonMaterial;
 	typedef struct NewtonCollision{} NewtonCollision;
-	typedef struct NewtonSkeletonContainer{} NewtonSkeletonContainer;
 	typedef struct NewtonDeformableMeshSegment{} NewtonDeformableMeshSegment;
 	typedef struct NewtonFracturedCompoundMeshPart{} NewtonFracturedCompoundMeshPart;
 #endif
@@ -293,19 +291,6 @@ extern "C" {
 		dFloat m_timestep;
 	} NewtonHingeSliderUpdateDesc;
 
-
-	typedef struct NewtonSkeletonBoneJacobian
-	{
-		dFloat m_linear[4];
-		dFloat m_angular[4];
-	} NewtonSkeletonBoneJacobian;
-
-	typedef struct NewtonSkeletonBoneJacobianPair
-	{
-		NewtonSkeletonBoneJacobian m_j01;
-		NewtonSkeletonBoneJacobian m_j10;
-	} NewtonSkeletonBoneJacobianPair;
-
 	typedef struct NewtonUserContactPoint
 	{
 		dFloat m_point[4];
@@ -421,7 +406,6 @@ extern "C" {
 	typedef void (*NewtonUserBilateralGetInfoCallback) (const NewtonJoint* const userJoint, NewtonJointRecord* const info);
 
 	typedef void (*NewtonConstraintDestructor) (const NewtonJoint* const me);
-	typedef void (*NewtonSkeletontDestructor) (const NewtonSkeletonContainer* const me);
 
 	typedef void (*NewtonJobTask) (NewtonWorld* const world, void* const userData, int threadIndex);
 	typedef int (*NewtonReportProgress) (dFloat normalizedProgressPercent, void* const userData);
@@ -967,8 +951,6 @@ extern "C" {
 	NEWTON_API NewtonJoint* NewtonBodyGetFirstContactJoint (const NewtonBody* const body);
 	NEWTON_API NewtonJoint* NewtonBodyGetNextContactJoint (const NewtonBody* const body, const NewtonJoint* const contactJoint);
 
-	NEWTON_API NewtonSkeletonContainer* NewtonBodyGetSkeleton(const NewtonBody* const body);
-
 	// **********************************************************************************************
 	//
 	// contact joints interface
@@ -1158,34 +1140,6 @@ extern "C" {
 	NEWTON_API void NewtonUserJointGetGeneralRow (const NewtonJoint* const joint, int index, dFloat* const jacobian0, dFloat* const jacobian1);
 	
 	NEWTON_API dFloat NewtonUserJointGetRowForce (const NewtonJoint* const joint, int row);
-
-	// ************************************************************************************************************************
-	// 
-	//	Skeleton offer the same level of accuracy that Feather stone reduced coordinate link chains algorithm  
-	//	these are good to make near perfect Rag dolls, physically based and inversed dynamics animated bodies, 
-	//	simple robotic contractions with not internal loops, Vehicles, Ropes, etc. That will all interact seamlessly and naturally with the physics world.
-	//	
-	// ************************************************************************************************************************
-	NEWTON_API NewtonSkeletonContainer* NewtonSkeletonContainerCreate (NewtonWorld* const world, NewtonBody* const rootBone, NewtonSkeletontDestructor onDestroyCallback);
-	NEWTON_API void NewtonSkeletonContainerDelete (NewtonSkeletonContainer* const skeleton);
-
-	NEWTON_API void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray);
-	NEWTON_API void* NewtonSkeletonContainerAttachBone (NewtonSkeletonContainer* const skeleton, NewtonBody* const childBone, NewtonBody* const parentBone);
-//	NEWTON_API void NewtonSkeletonContainerDetachBone (NewtonSkeletonContainer* const skeleton, void* const bone);
-	NEWTON_API void NewtonSkeletonContainerFinalize (NewtonSkeletonContainer* const skeleton);
-
-	NEWTON_API int NewtonSkeletonContainerAttachCyclingJoint (NewtonSkeletonContainer* const skeleton, NewtonJoint* const joint);
-	NEWTON_API void NewtonSkeletonContainerRemoveCyclingJoint (NewtonSkeletonContainer* const skeleton, NewtonJoint* const joint);
-
-	NEWTON_API void* NewtonSkeletonContainerGetRoot (const NewtonSkeletonContainer* const skeleton);
-	NEWTON_API void* NewtonSkeletonContainerGetParent (const NewtonSkeletonContainer* const skeleton, void* const node);
-	NEWTON_API void* NewtonSkeletonContainerFirstChild (const NewtonSkeletonContainer* const skeleton, void* const parent);
-	NEWTON_API void* NewtonSkeletonContainerNextSibling (const NewtonSkeletonContainer* const skeleton, void* const sibling);
-	NEWTON_API NewtonBody* NewtonSkeletonContainerGetBodyFromNode (const NewtonSkeletonContainer* const skeleton, void* const node);
-	NEWTON_API NewtonJoint* NewtonSkeletonContainerGetParentJointFromNode (const NewtonSkeletonContainer* const skeleton, void* const node);
-	NEWTON_API NewtonSkeletonContainer* NewtonSkeletonGetSkeletonFromBody (NewtonBody* const body);
-
-
 
 	// **********************************************************************************************
 	//
