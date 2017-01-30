@@ -280,7 +280,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						const dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
 						constraintArray[jointIndex].m_pairCount = dgInt16(rows);
 
-						constraintArray[jointIndex].m_isSkeleton = sourceSkel && (sourceSkel == linkBody->GetSkeleton());
+						constraintArray[jointIndex].m_isSkeleton = sourceSkel && constraint->IsBilateral() && (sourceSkel == linkBody->GetSkeleton());
 						constraintArray[jointIndex].m_isFrontier = equilibrium0 ^ linkBody->m_equilibrium;
 
 						const bool isEquilibrium = equilibrium0 & linkBody->m_equilibrium & !linkBody->GetSkeleton();
