@@ -174,7 +174,7 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 	m_posit = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix1.m_front);
 	m_speed = (veloc0 - veloc1).DotProduct3(matrix1.m_front);
 
-	m_lastRowWasUsed = false;
+	m_lastRowWasUsed = 0;
 	SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
  }
 
@@ -188,8 +188,9 @@ NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_spring, m_damper);
 return;
 */
+	dFloat springRelaxation = 0.7f;
 	if (m_limitsOn && m_setAsSpringDamper) {
-		m_lastRowWasUsed = true;
+		m_lastRowWasUsed = -1;
 		if (m_posit < m_minDist) {
 			// get a point along the up vector and set a constraint  
 			const dVector& p0 = matrix0.m_posit;
@@ -214,7 +215,7 @@ return;
 			const dVector& p0 = matrix0.m_posit;
 			const dVector& p1 = matrix1.m_posit;
 			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
-			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_spring, m_damper);
+			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, springRelaxation, m_spring, m_damper);
 		}
 
 	} else if (m_limitsOn) {
@@ -225,7 +226,7 @@ return;
 			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-			m_lastRowWasUsed = true;
+			m_lastRowWasUsed = -1;
 		} else if (m_posit > m_maxDist) {
 			// get a point along the up vector and set a constraint  
 
@@ -234,7 +235,7 @@ return;
 			NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
-			m_lastRowWasUsed = true;
+			m_lastRowWasUsed = -1;
 		} else {
 /*
 			// uncomment this for a slider with friction
@@ -265,10 +266,10 @@ return;
 */
 		}
 	} else if (m_setAsSpringDamper) {
-		m_lastRowWasUsed = true;
+		m_lastRowWasUsed = -1;
 		const dVector& p0 = matrix0.m_posit;
 		const dVector& p1 = matrix1.m_posit;
 		NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
-		NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_spring, m_damper);
+		NewtonUserJointSetRowSpringDamperAcceleration(m_joint, springRelaxation, m_spring, m_damper);
 	} 
 }

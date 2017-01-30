@@ -80,7 +80,7 @@ class ArticulatedEntityModel: public DemoEntity
 			CustomSlidingContact::SubmitConstraints(timestep, threadIndex);
 			CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_front[0]);
-			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 150.0f, 10.0f);
+			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.7f, 150.0f, 10.0f);
 		}
 	};
 
@@ -121,7 +121,7 @@ class ArticulatedEntityModel: public DemoEntity
 				CalculateGlobalMatrix(matrix0, matrix1);
 			
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-				NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.0f, 7.0f);
+				NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.7f, 0.0f, 7.0f);
 			#endif
 		}
 	};

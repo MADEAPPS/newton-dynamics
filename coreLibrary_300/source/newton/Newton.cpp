@@ -7067,6 +7067,7 @@ dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)
   Calculates the row acceleration to satisfy the specified the spring damper system.
 
   @param *joint pointer to the joint.
+  @param rowStiffness fraction of the row reaction forces used a sspring damper penalty.
   @param spring desired spring stiffness, it must be a positive value.
   @param damper desired damper coefficient, it must be a positive value.
 
@@ -7081,11 +7082,11 @@ dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)
 
   See also: ::NewtonUserJointSetRowAcceleration, ::NewtonUserJointSetRowStiffness
 */
-void NewtonUserJointSetRowSpringDamperAcceleration(const NewtonJoint* const joint, dFloat spring, dFloat damper)
+void NewtonUserJointSetRowSpringDamperAcceleration(const NewtonJoint* const joint, dFloat rowStiffness, dFloat spring, dFloat damper)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
-	userJoint->SetSpringDamperAcceleration (spring, damper);
+	userJoint->SetSpringDamperAcceleration (rowStiffness, spring, damper);
 }
 
 
