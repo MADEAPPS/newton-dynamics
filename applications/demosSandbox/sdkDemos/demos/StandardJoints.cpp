@@ -600,8 +600,29 @@ static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
 
     // set limit on second axis
     slider->SetLimits (-4.0f, 4.0f);
-
 }
+
+static void AddSliderSpringDamper (DemoEntityManager* const scene, const dVector& origin)
+{
+	// make a reel static
+	NewtonBody* const box0 = CreateBox(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), dVector(8.0f, 0.25f, 0.25f, 0.0f));
+	NewtonBody* const box1 = CreateWheel(scene, origin + dVector(0.0f, 4.0f, 0.0f, 0.0f), 1.0f, 0.5f);
+
+	dMatrix matrix;
+	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
+
+	// connect the bodies by a Slider joint
+	NewtonBodyGetMatrix(box1, &matrix[0][0]);
+	CustomSlider* const slider = new CustomSlider(matrix, box1, box0);
+
+	// enable limit of first axis
+	slider->EnableLimits(true);
+
+	// set limit on second axis
+	slider->SetLimits(-4.0f, 4.0f);
+	slider->SetAsSpringDamper(true, 50.0f, 0.0f);
+}
+
 
 static void AddSlidingContact(DemoEntityManager* const scene, const dVector& origin)
 {
@@ -969,12 +990,15 @@ void StandardJoints (DemoEntityManager* const scene)
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
 	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
 	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
+	AddSliderSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 7.0f)));
 	AddCylindrical (scene, dVector (-20.0f, 0.0f, 10.0f));
 	AddUniversal (scene, dVector (-20.0f, 0.0f, 15.0f));
 	AddGear (scene, dVector (-20.0f, 0.0f, 20.0f));
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
+
+	
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
     // place camera into position
