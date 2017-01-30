@@ -76,12 +76,17 @@ DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, T* const m
 		if (n == j) {
 			T diag = rowN[n] - s;
 			if (diag < T(dgFloat32(0.0f))) {
+				// hack to prevent explosions when round error make the diagonal a small negative value
+				if (diag < T(dgFloat32(-1.0e3f))) {
 				dgAssert(0);
 				return false;
 			}
+				diag = dgFloat32 (1.0e-12f);
+			}
+		
 			rowN[n] = T(sqrt(diag));
 		} else {
-			rowN[j] = (T(1.0f) / rowJ[j] * (rowN[j] - s));
+			rowN[j] = ((T(1.0f) / rowJ[j]) * (rowN[j] - s));
 		}
 
 		stride += size;

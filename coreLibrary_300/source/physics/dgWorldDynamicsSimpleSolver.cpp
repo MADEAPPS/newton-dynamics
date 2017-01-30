@@ -464,7 +464,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 				dgAssert (body->m_invMass.m_w > dgFloat32 (0.0f));
 				body->AddDampingAcceleration(timestep);
 				body->CalcInvInertiaMatrix ();
-				body->ApplyGyroTorque();
+//				body->ApplyGyroTorque();
 				internalForces[i].m_linear = dgVector::m_zero;
 				internalForces[i].m_angular = dgVector::m_zero;
 			} else {

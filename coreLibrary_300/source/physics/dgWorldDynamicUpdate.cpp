@@ -246,7 +246,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			
 			srcBody->m_index = bodyCount;
 			srcBody->m_dynamicsLru = lruMark;
-			dgSkeletonContainer* const sourceSkel = srcBody->GetSkeleton();
 			hasSoftBodies |= (srcBody->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI) ? 1 : 0);
 
 			srcBody->m_sleeping = false;
@@ -280,7 +279,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						const dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
 						constraintArray[jointIndex].m_pairCount = dgInt16(rows);
 
-						constraintArray[jointIndex].m_isSkeleton = sourceSkel && constraint->IsBilateral() && (sourceSkel == linkBody->GetSkeleton());
+						//constraintArray[jointIndex].m_isSkeleton = sourceSkel && constraint->IsBilateral() && (sourceSkel == linkBody->GetSkeleton());
+						constraintArray[jointIndex].m_isSkeleton = constraint->IsSkeleton();
 						constraintArray[jointIndex].m_isFrontier = equilibrium0 ^ linkBody->m_equilibrium;
 
 						const bool isEquilibrium = equilibrium0 & linkBody->m_equilibrium & !linkBody->GetSkeleton();
@@ -520,7 +520,7 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 								if (constraint->m_canBeSkeleton) {
 									dgDynamicBody* const childBody = (dgDynamicBody*) ((constraint->GetBody0() == parentBody) ? constraint->GetBody1() : constraint->GetBody0());
 
-									if (childBody->m_dynamicsLru != lru) {
+									if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dgFloat32 (0.0f))) {
 										childBody->m_dynamicsLru = lru;
 										dgSkeletonContainer::dgGraph* const childNode = skeleton->AddChild((dgBilateralConstraint*)constraint, parentNode);
 										queue.Insert (childNode);
@@ -528,7 +528,6 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 									} else if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
 										loopJoints[loopCount] = (dgBilateralConstraint*)constraint;
 										loopCount ++;
-										dgAssert (loopCount < (sizeof (loopJoints)/sizeof (loopJoints[0])));
 									}
 
 								} else if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints))) {
@@ -547,12 +546,14 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 				}
 				skeleton->Finalize();
 
+				if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
 				for (dgInt32 i = 0; i < loopCount; i ++) {
 					skeleton->AttachCyclingJoint(loopJoints[i]); 
 				}
 			}
 		}
 	}
+}
 }
 
 

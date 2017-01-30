@@ -167,6 +167,9 @@ class dgConstraint
 
 	bool IsActive() const;
 	bool IsCollidable () const;
+	bool IsBilateral () const;
+	bool IsSkeleton () const;
+
 	void SetAsSkeletonCandidate(bool mode);
 		
 	virtual void ResetMaxDOF();
@@ -194,8 +197,6 @@ class dgConstraint
 		dgVector m_centripetal1;
 		dgFloat32 m_stiffness;
 	};
-
-	bool IsBilateral () const;
 
 	protected:
 	dgConstraint();
@@ -226,7 +227,7 @@ class dgConstraint
 	dgUnsigned32 m_enableCollision		: 1;
 	dgUnsigned32 m_contactActive		: 1;
 	dgUnsigned32 m_isBilateral			: 1;
-	dgUnsigned32 m_hasSkeleton			: 1;
+	dgUnsigned32 m_isInSkeleton		: 1;
 	dgUnsigned32 m_canBeSkeleton		: 1;
 	
 	friend class dgWorld;
@@ -255,7 +256,7 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_enableCollision(false)
 	,m_contactActive(false)
 	,m_isBilateral(false)
-	,m_hasSkeleton(false)
+	,m_isInSkeleton(false)
 	,m_canBeSkeleton(false)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
@@ -273,6 +274,11 @@ DG_INLINE void dgConstraint::SetUpdateFeedbackFunction (ConstraintsForceFeeback 
 DG_INLINE bool dgConstraint::IsBilateral() const
 {
 	return m_isBilateral ? true : false;
+}
+
+DG_INLINE bool dgConstraint::IsSkeleton () const
+{
+	return m_isInSkeleton ? true : false;
 }
 
 DG_INLINE bool dgConstraint::IsCollidable () const

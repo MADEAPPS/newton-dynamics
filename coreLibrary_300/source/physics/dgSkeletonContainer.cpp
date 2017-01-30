@@ -404,7 +404,14 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 
 dgSkeletonContainer::~dgSkeletonContainer()
 {
+	for (dgList<dgConstraint*>::dgListNode* ptr = m_cyclingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		ptr->GetInfo()->m_isInSkeleton = false;
+	}
 	m_cyclingJoints.RemoveAll();
+
+	for (dgInt32 i = 0; i < m_nodeCount - 1; i ++) {
+		m_nodesOrder[i]->m_joint->m_isInSkeleton = false;
+	}
 
 	if (m_destructor) {
 		m_destructor (this);
@@ -414,6 +421,7 @@ dgSkeletonContainer::~dgSkeletonContainer()
 	if (m_nodesOrder) {
 		allocator->Free(m_nodesOrder);
 	}
+
 	delete m_skeleton;
 }
 
@@ -472,9 +480,6 @@ void dgSkeletonContainer::SortGraph(dgGraph* const root, dgGraph* const parent, 
 	m_nodesOrder[index] = root;
 	root->m_index = dgInt16(index);
 	index++;
-	if (root->m_joint) {
-		root->m_joint->m_hasSkeleton = true;
-	}
 	dgAssert(index <= m_nodeCount);
 }
 
@@ -507,6 +512,7 @@ dgSkeletonContainer::dgGraph* dgSkeletonContainer::AddChild(dgBilateralConstrain
 	dgGraph* const node = new (allocator)dgGraph(joint, parent);
 	m_nodeCount ++;
 
+	joint->m_isInSkeleton = true;
 	dgAssert (m_world->GetSentinelBody() != node->m_body);
 	node->m_body->SetSkeleton(this);
 	return node;
@@ -522,6 +528,7 @@ bool dgSkeletonContainer::AttachCyclingJoint(dgBilateralConstraint* const joint)
 	dgGraph* const node0 = FindNode (body0);
 	dgGraph* const node1 = FindNode (body1);
 
+	joint->m_isInSkeleton = true;
 	bool ret = node0 || node1; 
 	ret = ret && (node0 || (body0->GetSkeleton() ==  NULL));
 	ret = ret && (node1 || (body1->GetSkeleton() ==  NULL));
@@ -534,6 +541,7 @@ void dgSkeletonContainer::RemoveCyclingJoint(dgBilateralConstraint* const joint)
 {
 	for (dgList<dgConstraint*>::dgListNode* ptr = m_cyclingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		if (ptr->GetInfo() == joint) {
+			joint->m_isInSkeleton = false;
 			m_cyclingJoints.Remove(ptr);
 			break;
 		}

@@ -997,8 +997,6 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
-
-	
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 
     // place camera into position
