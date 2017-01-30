@@ -235,8 +235,8 @@ void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContra
 		dgFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
 		dgFloat32 den = dt * kd + dt * ksd;
 		dgFloat32 accel = num / (dgFloat32 (1.0f) + den);
-//		desc.m_jointStiffness[index] = - den / DG_PSD_DAMP_TOL ;
-		desc.m_jointStiffness[index] = - dgFloat32 (1.0f) - den / DG_PSD_DAMP_TOL;
+		//desc.m_jointStiffness[index] = - dgFloat32 (1.0f) - den / DG_PSD_DAMP_TOL;
+		desc.m_jointStiffness[index] = dgFloat32 (1.0f) - dgFloat32 (0.2f) / DG_PSD_DAMP_TOL;
 		SetMotorAcceleration (index, accel, desc);
 	}
 }

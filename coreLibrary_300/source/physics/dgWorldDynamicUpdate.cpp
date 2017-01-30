@@ -471,9 +471,8 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 				dgConstraint* const constraint = cell->m_joint;
 				dgAssert(constraint);
-				dgBody* const linkBody = cell->m_bodyNode;
 				dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
-				dgAssert((constraint->m_body0 == linkBody) || (constraint->m_body1 == linkBody));
+				dgAssert((constraint->m_body0 == cell->m_bodyNode) || (constraint->m_body1 == cell->m_bodyNode));
 				if (constraint->IsBilateral() && constraint->m_canBeSkeleton && (constraint->m_dynamicsLru != lru)) {
 					constraint->m_dynamicsLru = lru;
 					jointList[jointCount] = (dgBilateralConstraint*)constraint;
@@ -821,8 +820,8 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 
 		row->m_diagDamp = dgFloat32 (0.0f);
 		row->m_stiffness = DG_PSD_DAMP_TOL * (dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) + dgFloat32 (1.0e-6f);
-		row->m_diagDampModifier = (row->m_stiffness < dgFloat32 (1.0e-3f)) ? dgFloat32(0.0f) : dgFloat32 (1.0f);
 		dgAssert(row->m_stiffness >= dgFloat32(0.0f));
+		dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(1.0f));
 		dgAssert ((dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) >= dgFloat32 (0.0f));
 		row->m_coordenateAccel = constraintParamOut.m_jointAccel[i];
 		row->m_restitution = constraintParamOut.m_restitution[i];

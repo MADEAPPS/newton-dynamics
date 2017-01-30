@@ -81,7 +81,6 @@ class ArticulatedEntityModel: public DemoEntity
 			CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_front[0]);
 			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 150.0f, 10.0f);
-			NewtonUserJointSetRowStiffness (m_joint, 0.7f);
 		}
 	};
 
@@ -123,7 +122,6 @@ class ArticulatedEntityModel: public DemoEntity
 			
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
 				NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.0f, 7.0f);
-				NewtonUserJointSetRowStiffness(m_joint, 0.7f);
 			#endif
 		}
 	};

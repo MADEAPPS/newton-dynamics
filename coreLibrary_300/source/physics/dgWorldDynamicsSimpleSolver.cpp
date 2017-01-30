@@ -867,7 +867,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			}
 		}
 
-
 		if (timestepRK != dgFloat32(0.0f)) {
 			dgVector timestep4(timestepRK);
 			for (dgInt32 i = 1; i < bodyCount; i++) {

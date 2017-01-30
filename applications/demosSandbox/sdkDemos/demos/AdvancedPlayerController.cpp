@@ -907,7 +907,6 @@ class HangingBridgeFrictionJoint : public CustomHinge
 		CustomHinge::SubmitConstraints(timestep, threadIndex);
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
 		NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.0f, 5.0f);
-		NewtonUserJointSetRowStiffness(m_joint, 0.7f);
 	}
 };
 
