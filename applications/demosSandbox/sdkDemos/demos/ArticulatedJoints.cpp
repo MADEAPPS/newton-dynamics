@@ -1191,9 +1191,9 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		
 		dVector dist (matrix2.m_posit - matrix0.m_posit);
 		matrix1.m_posit += dist;
-		CustomHinge* const hinge = new ArticulatedEntityModel::TreadLink (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
 dAssert (0);
 /*
+		CustomHinge* const hinge = new ArticulatedEntityModel::TreadLink (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
 		NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (world, link0, NULL);
 		NewtonSkeletonContainerAttachJointArray (skeleton, bodyCount - 1, hingeArray);
 		NewtonSkeletonContainerFinalize (skeleton);

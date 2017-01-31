@@ -1341,6 +1341,7 @@ dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgIn
 
 dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVector& point1, const dgVector& normal)
 {
+#if 0
 	dgInt32 count = 0;
 
 	const dgInt32 baseCount = 16;
@@ -1455,6 +1456,139 @@ dgInt32 dgContactSolver::CalculateContacts (const dgVector& point0, const dgVect
 	}
 
 	return count;
+
+#else
+	dgInt32 count = 0;
+
+	const dgInt32 baseCount = 16;
+
+	dgVector* const contactsOut = &m_hullDiff[0];
+	dgAssert(m_instance1->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+	dgAssert(m_instance0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+
+	dgInt32 count1 = 0;
+	dgVector* const shape1 = &contactsOut[baseCount];
+
+	dgAssert(normal.m_w == dgFloat32(0.0f));
+
+	dgVector origin((point0 + point1).Scale4(dgFloat32(0.5f)));
+	const dgMatrix& matrix1 = m_instance1->m_globalMatrix;
+	dgVector ponintOnInstance1(matrix1.UntransformVector(origin));
+	dgVector normalOnInstance1(matrix1.UnrotateVector(normal));
+	dgFloat32 dist = (normal.DotProduct4(point0 - point1)).GetScalar();
+	if (dist < dgFloat32(0.0f)) {
+		count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, ponintOnInstance1, shape1);
+	}
+	if (!count1) {
+		dgVector step(normal.Scale4(DG_PENETRATION_TOL * dgFloat32(2.0f)));
+		dgVector alternatePoint(point1);
+		for (dgInt32 i = 0; (i < 3) && !count1; i++) {
+			alternatePoint -= step;
+			dgVector alternatePointOnInstance1(matrix1.UntransformVector(alternatePoint));
+			count1 = m_instance1->CalculatePlaneIntersection(normalOnInstance1, alternatePointOnInstance1, shape1);
+		}
+		//dgAssert(count1);
+		step = matrix1.UnrotateVector(normal.CompProduct4((alternatePoint - origin).DotProduct4(normal)));
+		for (dgInt32 i = 0; i < count1; i++) {
+			shape1[i] -= step;
+		}
+	}
+
+	if (count1) {
+		for (int i = 0; i < count1; i++) {
+			shape1[i] = matrix1.TransformVector(shape1[i]);
+		}
+
+		dgInt32 count0 = 0;
+		dgVector* const shape0 = &contactsOut[baseCount + count1];
+
+		const dgMatrix& matrix0 = m_instance0->m_globalMatrix;
+		dgVector pointOnInstance0(matrix0.UntransformVector(origin));
+		dgVector normalOnInstance0(matrix0.UnrotateVector(normal.Scale4(dgFloat32(-1.0f))));
+		if (dist < dgFloat32(0.0f)) {
+			count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0);
+		}
+		if (!count0) {
+			dgVector step(normal.Scale4(DG_PENETRATION_TOL * dgFloat32(2.0f)));
+			dgVector alternatePoint(point0);
+			for (dgInt32 i = 0; (i < 3) && !count0; i++) {
+				alternatePoint += step;
+				dgVector alternatePointOnInstance0(matrix0.UntransformVector(alternatePoint));
+				count0 = m_instance0->CalculatePlaneIntersection(normalOnInstance0, alternatePointOnInstance0, shape0);
+			}
+			dgAssert(count0);
+			step = matrix0.UnrotateVector(normal.CompProduct4((alternatePoint - origin).DotProduct4(normal)));
+			for (dgInt32 i = 0; i < count0; i++) {
+				shape0[i] -= step;
+			}
+		}
+
+		if (count0) {
+			for (dgInt32 i = 0; i < count0; i++) {
+				shape0[i] = matrix0.TransformVector(shape0[i]);
+			}
+
+			if (count1 == 1) {
+				count = 1;
+				contactsOut[0] = shape1[0];
+			}
+			else if (count0 == 1) {
+				count = 1;
+				contactsOut[0] = shape0[0];
+			}
+			else if ((count1 == 2) && (count0 == 2)) {
+				dgVector p0(shape1[0]);
+				dgVector p1(shape1[1]);
+				const dgVector& q0 = shape0[0];
+				const dgVector& q1 = shape0[1];
+				dgVector p10(p1 - p0);
+				dgVector q10(q1 - q0);
+				p10 = p10.Scale4(dgRsqrt(p10.DotProduct3(p10) + dgFloat32(1.0e-8f)));
+				q10 = q10.Scale4(dgRsqrt(q10.DotProduct3(q10) + dgFloat32(1.0e-8f)));
+				dgFloat32 dot = q10.DotProduct3(p10);
+				if (dgAbsf(dot) > dgFloat32(0.998f)) {
+					dgFloat32 pl0 = p0.DotProduct3(p10);
+					dgFloat32 pl1 = p1.DotProduct3(p10);
+					dgFloat32 ql0 = q0.DotProduct3(p10);
+					dgFloat32 ql1 = q1.DotProduct3(p10);
+					if (pl0 > pl1) {
+						dgSwap(pl0, pl1);
+						dgSwap(p0, p1);
+						p10 = p10.Scale4(dgFloat32(-1.0f));
+					}
+					if (ql0 > ql1) {
+						dgSwap(ql0, ql1);
+					}
+					if (!((ql0 > pl1) && (ql1 < pl0))) {
+						dgFloat32 clip0 = (ql0 > pl0) ? ql0 : pl0;
+						dgFloat32 clip1 = (ql1 < pl1) ? ql1 : pl1;
+
+						count = 2;
+						contactsOut[0] = p0 + p10.Scale4(clip0 - pl0);
+						contactsOut[1] = p0 + p10.Scale4(clip1 - pl0);
+					}
+				}
+				else {
+					count = 1;
+					dgVector c0;
+					dgVector c1;
+					dgRayToRayDistance(p0, p1, q0, q1, c0, c1);
+					contactsOut[0] = (c0 + c1).Scale4(dgFloat32(0.5f));
+				}
+			} else {
+				dgAssert((count1 >= 2) && (count0 >= 2));
+				count = ConvexPolygonsIntersection(normal, count0, shape0, count1, shape1, contactsOut, baseCount);
+			}
+		}
+	}
+
+	if (!count && m_proxy->m_continueCollision) {
+		count = 1;
+		contactsOut[0] = origin;
+	}
+
+	return count;
+#endif
 }
 
 dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut)

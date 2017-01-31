@@ -620,7 +620,7 @@ static void AddSliderSpringDamper (DemoEntityManager* const scene, const dVector
 
 	// set limit on second axis
 	slider->SetLimits(-4.0f, 4.0f);
-	slider->SetAsSpringDamper(true, 50.0f, 0.0f);
+	slider->SetAsSpringDamper(true, 0.5f, 50.0f, 0.0f);
 }
 
 
@@ -982,10 +982,6 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(80.0f, 20.0f, 0.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
 //	AddJoesPoweredRagDoll(scene, dVector( 5.0f, 20.0f, 0.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 
-	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
-	AddSlider (scene, dVector (-20.0f, 0.0f, 5.0f));
-
-/*
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -1001,7 +997,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
-*/
+
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
