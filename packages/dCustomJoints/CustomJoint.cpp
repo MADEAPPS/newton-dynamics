@@ -53,11 +53,15 @@ CustomJoint::CustomJoint (NewtonBody* const body0, NewtonBody* const body1, Newt
 	,m_maxDof(0)
 	,m_autoDestroy(0)
 {
+	int solverModel;
 	callback (userData, &m_localMatrix0, sizeof (m_localMatrix0));
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
 	callback (userData, &m_stiffness, sizeof (m_stiffness));
+	callback(userData, &solverModel, sizeof(solverModel));
+
 	Init (m_maxDof, body0, body1);
+	SetSolverModel(solverModel);
 }
 
 
@@ -151,7 +155,7 @@ void CustomJoint::SetSolverModel(int model)
 	NewtonUserJointSetSolverModel (m_joint, model);
 }
 
-int CustomJoint::GetSetSolverModel() const
+int CustomJoint::GetSolverModel() const
 {
 	return NewtonUserJointGetSolverModel(m_joint);
 }
@@ -355,9 +359,11 @@ CustomJoint::SerializeMetaDataDictionary& CustomJoint::GetDictionary()
 
 void CustomJoint::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
+	int solverModel = GetSolverModel();
 	callback (userData, &m_localMatrix0, sizeof (m_localMatrix0));
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
 	callback (userData, &m_stiffness, sizeof (m_stiffness));
+	callback(userData, &solverModel, sizeof(solverModel));
 }
 
