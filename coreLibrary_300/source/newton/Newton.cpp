@@ -6886,6 +6886,35 @@ NewtonJoint* NewtonConstraintCreateUserJoint(const NewtonWorld* const newtonWorl
 	return (NewtonJoint*) new (world->dgWorld::GetAllocator()) NewtonUserJoint (world, maxDOF, submitConstraints, getInfo, body0, body1);
 }
 
+/*!
+	Set the solver algorthm use to calculation the constraint forces.
+
+	@param *joint pointer to the joint.
+	@param  *model - solve model to choose.
+
+	model = 0  zero is the default value and tells the solver to use the best possible algorithm
+	model = 1  to signal the engine that is two joints from a kinematic loop the joint with the model set to zero, the algorithm should decide in favor of the joint with model set to 0
+	model = 2 to indicate the engine that this joint can be solved with a less accurate algorithm.
+
+	See also: NewtonUserJointGetSolverModel
+*/
+void NewtonUserJointSetSolverModel(const NewtonJoint* const joint, int model)
+{
+
+}
+
+/*!
+Get the solver algorthm use to calculation the constraint forces.
+@param *joint pointer to the joint.
+
+See also: NewtonUserJointGetSolverModel
+*/
+int NewtonUserJointGetSolverModel(const NewtonJoint* const joint)
+{
+	return 0;
+}
+
+
 
 /*!
   Add a linear restricted degree of freedom.

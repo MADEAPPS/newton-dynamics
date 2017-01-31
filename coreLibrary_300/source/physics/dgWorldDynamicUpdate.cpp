@@ -547,17 +547,17 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 				skeleton->Finalize();
 
 				if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
-				for (dgInt32 i = 0; i < loopCount; i ++) {
-					skeleton->AttachCyclingJoint(loopJoints[i]); 
+					for (dgInt32 i = 0; i < loopCount; i ++) {
+						skeleton->AttachCyclingJoint(loopJoints[i]); 
+					}
 				}
 			}
 		}
 	}
 }
-}
 
 
-void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
+dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
 {
 	dgWorld* const world = (dgWorld*) this;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
@@ -689,6 +689,8 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 		}
 	}
 	dgAssert(infoIndex == cluster->m_activeJointCount);
+
+	return 0;
 }
 
 

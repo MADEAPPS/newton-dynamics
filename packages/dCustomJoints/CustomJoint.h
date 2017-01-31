@@ -191,6 +191,9 @@ class CustomJoint: public CustomAlloc
 	CUSTOM_JOINTS_API dFloat GetStiffness () const;
 	CUSTOM_JOINTS_API void SetStiffness (dFloat stiffness);
 
+	CUSTOM_JOINTS_API void SetSolverModel(int model);
+	CUSTOM_JOINTS_API int GetSetSolverModel() const;
+
 	CUSTOM_JOINTS_API void SetUserDestructorCallback (JointUserDestructorCallback callback) {m_userDestructor = callback;}
 	CUSTOM_JOINTS_API void SetUserSubmintConstraintCallback (JointUserSubmitConstraintCallback callback) {m_userConstrationCallback = callback;}
 

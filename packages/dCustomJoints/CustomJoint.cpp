@@ -146,6 +146,16 @@ void CustomJoint::SetStiffness(dFloat stiffness)
 	m_stiffness = dClamp (stiffness, dFloat(0.0f), dFloat(1.0f));
 }
 
+void CustomJoint::SetSolverModel(int model)
+{
+	NewtonUserJointSetSolverModel (m_joint, model);
+}
+
+int CustomJoint::GetSetSolverModel() const
+{
+	return NewtonUserJointGetSolverModel(m_joint);
+}
+
 
 void CustomJoint::Destructor (const NewtonJoint* me)
 {
