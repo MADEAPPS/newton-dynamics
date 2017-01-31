@@ -59,17 +59,27 @@ dgBilateralConstraint::~dgBilateralConstraint ()
 }
 
 
+dgInt32 dgBilateralConstraint::GetSolverModel() const
+{
+	dgAssert(0);
+	return 0;
+}
+
+void dgBilateralConstraint::SetSolverModel(dgInt32 model)
+{
+	dgAssert(0);
+}
+
+
 dgFloat32 dgBilateralConstraint::GetStiffness() const
 {
 	return m_stiffness;
 }
 
-
 void dgBilateralConstraint::SetStiffness(dgFloat32 stiffness)
 {
 	m_stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
 }
-
 
 void dgBilateralConstraint::SetDestructorCallback (OnConstraintDestroy destructor)
 {

@@ -181,8 +181,11 @@ class dgConstraint
 
 	virtual dgFloat32 GetStiffness() const;
 	virtual void SetStiffness(dgFloat32 stiffness);
+
+	virtual dgInt32 GetSolverModel() const;
+	virtual void SetSolverModel(dgInt32 model);
+
 	virtual void GetInfo (dgConstraintInfo* const info) const;
-	
 
 	class dgPointParam
 	{
@@ -334,6 +337,15 @@ DG_INLINE dgFloat32 dgConstraint::GetStiffness() const
 }
 
 DG_INLINE void dgConstraint::SetStiffness(dgFloat32 stiffness)
+{
+}
+
+DG_INLINE dgInt32 dgConstraint::GetSolverModel() const
+{
+	return 0;
+}
+
+DG_INLINE void dgConstraint::SetSolverModel(dgInt32 model)
 {
 }
 

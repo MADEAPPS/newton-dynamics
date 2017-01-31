@@ -42,6 +42,9 @@ class dgBilateralConstraint: public dgConstraint
 	virtual dgFloat32 GetStiffness() const;
 	virtual void SetStiffness(dgFloat32 stiffness);
 
+	virtual dgInt32 GetSolverModel() const;
+	virtual void SetSolverModel(dgInt32 model);
+
 	void SetPivotAndPinDir(const dgVector &pivot, const dgVector &pinDirection);
 	void SetPivotAndPinDir (const dgVector& pivot, const dgVector& pinDirection0, const dgVector& pinDirection1);
 	dgVector CalculateGlobalMatrixAndAngle (dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const;

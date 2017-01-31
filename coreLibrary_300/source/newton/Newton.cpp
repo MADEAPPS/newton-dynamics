@@ -6900,7 +6900,9 @@ NewtonJoint* NewtonConstraintCreateUserJoint(const NewtonWorld* const newtonWorl
 */
 void NewtonUserJointSetSolverModel(const NewtonJoint* const joint, int model)
 {
-
+	TRACE_FUNCTION(__FUNCTION__);
+	dgConstraint* const contraint = (dgConstraint*)joint;
+	contraint->SetSolverModel(model);
 }
 
 /*!
@@ -6911,7 +6913,9 @@ See also: NewtonUserJointGetSolverModel
 */
 int NewtonUserJointGetSolverModel(const NewtonJoint* const joint)
 {
-	return 0;
+	TRACE_FUNCTION(__FUNCTION__);
+	dgConstraint* const contraint = (dgConstraint*)joint;
+	return contraint->GetSolverModel();
 }
 
 
