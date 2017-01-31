@@ -1134,7 +1134,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 
 dgInt32 dgSkeletonContainer::GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const
 {
-	if (m_bufferSize == -1) {
+//	if (m_bufferSize == -1) {
+	if (1) {
 		dgInt32 rowCount = 0;
 		dgInt32 auxiliaryRowCount = 0;
 		if (m_nodesOrder) {

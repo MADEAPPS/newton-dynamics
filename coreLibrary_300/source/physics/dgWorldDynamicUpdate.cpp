@@ -492,11 +492,11 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 			dgBilateralConstraint* const constraint = jointList[i];
 			if (constraint->m_dynamicsLru != lru) {
 				dgInt32 loopCount = 0;
-				dgDynamicBody* const parentBody = (dgDynamicBody*) ((constraint->GetBody0()->GetInvMass().m_w < constraint->GetBody1()->GetInvMass().m_w) ? constraint->GetBody0() : constraint->GetBody1());
-				dgSkeletonContainer* const skeleton = world->CreateNewtonSkeletonContainer (parentBody);
+				dgDynamicBody* const rootBody = (dgDynamicBody*) ((constraint->GetBody0()->GetInvMass().m_w < constraint->GetBody1()->GetInvMass().m_w) ? constraint->GetBody0() : constraint->GetBody1());
+				dgSkeletonContainer* const skeleton = world->CreateNewtonSkeletonContainer (rootBody);
 				dgQueue<dgSkeletonContainer::dgGraph*> queue(pool, poolSize); 
 				queue.Insert (skeleton->GetRoot());
-				parentBody->m_dynamicsLru = lru;
+				rootBody->m_dynamicsLru = lru;
 
 				while (!queue.IsEmpty()) {
 					dgInt32 count = queue.m_firstIndex - queue.m_lastIndex;
