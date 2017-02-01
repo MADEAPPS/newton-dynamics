@@ -6892,9 +6892,10 @@ NewtonJoint* NewtonConstraintCreateUserJoint(const NewtonWorld* const newtonWorl
 	@param *joint pointer to the joint.
 	@param  *model - solve model to choose.
 
-	model = 0  zero is the default value and tells the solver to use the best possible algorithm
-	model = 1  to signal the engine that is two joints from a kinematic loop the joint with the model set to zero, the algorithm should decide in favor of the joint with model set to 0
-	model = 2 to indicate the engine that this joint can be solved with a less accurate algorithm.
+	model = 0 zero is the default value and tells the solver to use the best possible algorithm
+	model = 1 to signal the engine that is two joints form a kinematic loop 
+	model = 2 to signal the engine this joint can be solved with a less accurate algorithm.
+	In case multiple joints form a kinematic loop, joints with a lower model are preffered towards an exact solution.
 
 	See also: NewtonUserJointGetSolverModel
 */
