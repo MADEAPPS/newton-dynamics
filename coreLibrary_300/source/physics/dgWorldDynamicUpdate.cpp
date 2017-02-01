@@ -474,7 +474,7 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 				dgAssert(constraint);
 				dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
 				dgAssert((constraint->m_body0 == cell->m_bodyNode) || (constraint->m_body1 == cell->m_bodyNode));
-				if (constraint->IsBilateral() && constraint->m_canBeSkeleton && (constraint->m_dynamicsLru != lru)) {
+				if (constraint->IsBilateral() && (constraint->m_solverModel < 2) && (constraint->m_dynamicsLru != lru)) {
 					constraint->m_dynamicsLru = lru;
 					jointList[jointCount] = (dgBilateralConstraint*)constraint;
 					jointCount++;
@@ -518,7 +518,7 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 							if (constraint->IsBilateral() && (constraint->m_dynamicsLru != lru)) {
 								constraint->m_dynamicsLru = lru;
 
-								if (constraint->m_canBeSkeleton) {
+								if (!constraint->m_solverModel) {
 									dgDynamicBody* const childBody = (dgDynamicBody*) ((constraint->GetBody0() == parentBody) ? constraint->GetBody1() : constraint->GetBody0());
 
 									if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dgFloat32 (0.0f))) {
@@ -531,8 +531,7 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 										loopCount ++;
 									}
 
-								} else if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints))) {
-
+								} else if ((constraint->m_solverModel != 2) && loopCount < (sizeof (loopJoints)/sizeof(loopJoints))) {
 									loopJoints[loopCount] = (dgBilateralConstraint*)constraint;
 									loopCount ++;
 									dgAssert(loopCount < (sizeof (loopJoints) / sizeof (loopJoints[0])));

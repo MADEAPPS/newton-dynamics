@@ -42,7 +42,7 @@ dgBilateralConstraint::dgBilateralConstraint ()
 	m_maxDOF = 6;
 	m_isBilateral = true;
 	m_contactActive = true;
-m_canBeSkeleton = true;
+	m_solverModel = 0;
 
 	SetStiffness (dgFloat32 (1.0f));
 

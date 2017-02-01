@@ -323,7 +323,7 @@ void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* 
 
 	if (constraint->GetId() != dgConstraint::m_contactConstraint) {
 		dgWorld* const world = body0->GetWorld();
-		world->m_skelListIsDirty = world->m_skelListIsDirty || constraint->m_canBeSkeleton;
+		world->m_skelListIsDirty = world->m_skelListIsDirty || (constraint->m_solverModel != 2);
 
 		body0->m_equilibrium = body0->GetInvMass().m_w ? false : true;
 		body1->m_equilibrium = body1->GetInvMass().m_w ? false : true;

@@ -169,8 +169,6 @@ class dgConstraint
 	bool IsCollidable () const;
 	bool IsBilateral () const;
 	bool IsSkeleton () const;
-
-	void SetAsSkeletonCandidate(bool mode);
 		
 	virtual void ResetMaxDOF();
 	dgInt32 GetMaxDOF() const;
@@ -228,12 +226,11 @@ class dgConstraint
 	dgUnsigned32 m_maxDOF				: 6;
 	dgUnsigned32 m_constId				: 6;
 	dgUnsigned32 m_graphDepth			: 10;
+	dgUnsigned32 m_solverModel			: 2;
 	dgUnsigned32 m_enableCollision		: 1;
 	dgUnsigned32 m_contactActive		: 1;
 	dgUnsigned32 m_isBilateral			: 1;
 	dgUnsigned32 m_isInSkeleton			: 1;
-	dgUnsigned32 m_canBeSkeleton		: 1;
-	
 	
 	friend class dgWorld;
 	friend class dgJacobianMemory;
@@ -259,11 +256,12 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_maxDOF(6)
 	,m_constId(m_unknownConstraint)
 	,m_graphDepth (1023)
+	,m_solverModel(2)
 	,m_enableCollision(false)
 	,m_contactActive(false)
 	,m_isBilateral(false)
 	,m_isInSkeleton(false)
-	,m_canBeSkeleton(false)
+
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 }
@@ -290,11 +288,6 @@ DG_INLINE bool dgConstraint::IsSkeleton () const
 DG_INLINE bool dgConstraint::IsCollidable () const
 {
 	return m_enableCollision ? true : false;
-}
-
-DG_INLINE void dgConstraint::SetAsSkeletonCandidate(bool mode)
-{
-	m_canBeSkeleton = mode;
 }
 
 DG_INLINE void dgConstraint::SetCollidable (bool state)
@@ -345,13 +338,13 @@ DG_INLINE void dgConstraint::SetStiffness(dgFloat32 stiffness)
 
 DG_INLINE dgInt32 dgConstraint::GetSolverModel() const
 {
-	return 0;
+	return m_solverModel;
 }
 
 DG_INLINE void dgConstraint::SetSolverModel(dgInt32 model)
 {
+	m_solverModel = dgClamp(model, 0, 2);
 }
-
 
 DG_INLINE void dgConstraint::ResetMaxDOF()
 {
