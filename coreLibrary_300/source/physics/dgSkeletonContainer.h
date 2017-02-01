@@ -58,6 +58,7 @@ class dgSkeletonContainer
 	dgGraph* GetParent (dgGraph* const node) const;
 	dgGraph* GetFirstChild (dgGraph* const parent) const;
 	dgGraph* GetNextSiblingChild (dgGraph* const sibling) const;
+	void SetGrapfDepth(dgInt32 depth);
 	
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;

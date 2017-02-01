@@ -41,7 +41,7 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 	if (!cluster->m_isContinueCollision) {
 		if (cluster->m_activeJointCount) {
 			BuildJacobianMatrix (cluster, threadID, timestep);
-			if (graphDepth < 3) {
+			if (graphDepth < 5) {
 				CalculateSinglePassClusterReactionForces(cluster, threadID, timestep, DG_SOLVER_MAX_ERROR);
 			} else {
 				CalculateClusterReactionForces(cluster, threadID, timestep, DG_SOLVER_MAX_ERROR);
