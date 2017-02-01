@@ -577,9 +577,9 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 		if (jointInfo.m_isFrontier) {
 			queue.Insert(&tmpInfoList[i]);
 			tmpInfoList[i].m_isInQueueFrontier = -1;
-			if (tmpInfoList[i].m_isSkeleton && (tmpInfoList[i].m_joint->m_graphDepth != 0)) {
-				dgSkeletonContainer* const container = heaviestBody->m_joint->m_body0->GetSkeleton();
-				dgAssert(container == heaviestBody->m_joint->m_body1->GetSkeleton());
+			if (jointInfo.m_isSkeleton && (jointInfo.m_joint->m_graphDepth != 0)) {
+				dgSkeletonContainer* const container = jointInfo.m_joint->m_body0->GetSkeleton();
+				dgAssert(container == jointInfo.m_joint->m_body1->GetSkeleton());
 				container->SetGrapfDepth(0);
 			}
 			tmpInfoList[i].m_joint->m_graphDepth = 0;
