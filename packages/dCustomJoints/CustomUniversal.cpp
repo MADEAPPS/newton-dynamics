@@ -22,6 +22,7 @@
 //////////////////////////////////////////////////////////////////////
 
 //dInitRtti(CustomUniversal);
+IMPLEMENT_CUSTOM_JOINT(CustomUniversal);
 
 CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
@@ -46,6 +47,29 @@ CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* co
 	m_jointOmega_1 = 0.0f;
 	m_minAngle_1 = -45.0f * 3.141592f / 180.0f;
 	m_maxAngle_1 =  45.0f * 3.141592f / 180.0f;
+}
+
+CustomUniversal::CustomUniversal(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+	dAssert(0);
+/*
+	callback(userData, &m_minAngle, sizeof(dFloat));
+	callback(userData, &m_minAngle, sizeof(dFloat));
+	callback(userData, &m_maxAngle, sizeof(dFloat));
+	callback(userData, &m_friction, sizeof(dFloat));
+	callback(userData, &m_jointOmega, sizeof(dFloat));
+	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
+	int tmp;
+	callback(userData, &tmp, sizeof(int));
+	m_limitsOn = tmp ? true : false;
+*/
+}
+
+void CustomUniversal::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize(callback, userData);
+	dAssert(0);
 }
 
 CustomUniversal::~CustomUniversal()

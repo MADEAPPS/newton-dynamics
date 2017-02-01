@@ -29,6 +29,8 @@ IMPLEMENT_CUSTOM_JOINT(CustomSatelliteGear);
 CustomGear::CustomGear(int dof, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(dof, child, parent)
 {
+	// set as kinematoc loop
+	SetSolverModel(1);
 }
 
 
@@ -147,6 +149,9 @@ CustomSatelliteGear::CustomSatelliteGear(dFloat gearRatio, const dVector& childP
 	dMatrix referenceMatrix;
 	NewtonBodyGetMatrix (m_parentReference, &referenceMatrix[0][0]);
 	m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
+
+	// set as kinematoc loop
+	SetSolverModel(1);
 }
 
 CustomSatelliteGear::CustomSatelliteGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
@@ -154,6 +159,9 @@ CustomSatelliteGear::CustomSatelliteGear (NewtonBody* const child, NewtonBody* c
 {
 	// remember to get referenceBody from the world 
 	dAssert (0);
+
+	// set as kinematoc loop
+	SetSolverModel(1);
 }
 
 void CustomSatelliteGear::Serialize (NewtonSerializeCallback callback, void* const userData) const
@@ -232,6 +240,9 @@ CustomGearAndSlide::CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, con
 	// calculate the local matrix for body body1  
 	dMatrix pinAndPivot1 (dGrammSchmidt(parentPin));
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
+
+	// set as kinematoc loop
+	SetSolverModel(1);
 }
 
 CustomGearAndSlide::~CustomGearAndSlide()

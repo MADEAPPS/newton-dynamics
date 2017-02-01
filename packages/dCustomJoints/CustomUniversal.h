@@ -49,9 +49,11 @@ class CustomUniversal: public CustomJoint
 	CUSTOM_JOINTS_API void SetDamp_1(dFloat damp);
 
 	protected:
+	CUSTOM_JOINTS_API CustomUniversal(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const {dAssert (0);} 
 
 	AngularIntegration m_curJointAngle_0;
 	AngularIntegration m_curJointAngle_1;
@@ -72,6 +74,7 @@ class CustomUniversal: public CustomJoint
 	bool m_limit_1_On;
 	bool m_angularMotor_0_On;
 	bool m_angularMotor_1_On;
+	DECLARE_CUSTOM_JOINT(CustomUniversal, CustomJoint)
 };
 
 #endif 

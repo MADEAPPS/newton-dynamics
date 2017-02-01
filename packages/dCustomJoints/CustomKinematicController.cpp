@@ -40,6 +40,9 @@ CustomKinematicController::CustomKinematicController(NewtonBody* const body, con
 	SetTargetMatrix (matrix);
 	SetMaxLinearFriction(1.0f); 
 	SetMaxAngularFriction(1.0f); 
+
+	// set as soft joint
+	SetSolverModel(2);
 }
 
 CustomKinematicController::~CustomKinematicController()
@@ -142,9 +145,7 @@ void CustomKinematicController::GetInfo (NewtonJointRecord* const info) const
 
 void CustomKinematicController::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-
 	// check if this is an impulsive time step
-	
 	if (timestep > 0.0f) {
 		dMatrix matrix0;
 		dVector v(0.0f);

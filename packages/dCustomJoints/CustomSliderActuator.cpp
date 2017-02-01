@@ -9,13 +9,14 @@
 * freely
 */
 
-
-
 // CustomSlider.cpp: implementation of the CustomSlider class.
 //
 //////////////////////////////////////////////////////////////////////
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomSliderActuator.h"
+
+
+IMPLEMENT_CUSTOM_JOINT(CustomSliderActuator);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -44,6 +45,19 @@ CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFl
 {
 	EnableLimits(false);
 }
+
+CustomSliderActuator::CustomSliderActuator(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomSlider(child, parent, callback, userData)
+{
+	dAssert(0);
+}
+
+void CustomSliderActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomSlider::Serialize(callback, userData);
+	dAssert(0);
+}
+
 
 CustomSliderActuator::~CustomSliderActuator()
 {

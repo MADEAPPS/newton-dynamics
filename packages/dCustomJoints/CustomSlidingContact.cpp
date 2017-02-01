@@ -21,6 +21,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+IMPLEMENT_CUSTOM_JOINT(CustomSlidingContact);
 
 CustomSlidingContact::CustomSlidingContact (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(6, child, parent)
@@ -36,6 +37,19 @@ CustomSlidingContact::CustomSlidingContact (const dMatrix& pinAndPivotFrame, New
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
+
+CustomSlidingContact::CustomSlidingContact(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+	dAssert(0);
+}
+
+void CustomSlidingContact::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize(callback, userData);
+	dAssert(0);
+}
+
 
 CustomSlidingContact::~CustomSlidingContact()
 {
