@@ -456,19 +456,35 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 		}
 	}
 
+#if 1
 	dgInt32 index = 0;
-	dgInt32 count = size;
-
-	for (dgInt32 i = 0; i < count; i++) {
+	dgInt32 last = size;
+	for (dgInt32 i = 0; i < last; i++) {
 		if ((low[i] <= T(-DG_LCP_MAX_VALUE)) && (high[i] >= T(DG_LCP_MAX_VALUE))) {
 			dgCholeskyFactorizationAddRow(size, index, matrix);
 			index++;
 		} else {
-			dgPermuteRows(size, i, count - 1, matrix, x0, r0, low, high, diagonal, permute);
+			dgPermuteRows(size, i, last - 1, matrix, x0, r0, low, high, diagonal, permute);
 			i--;
-			count--;
+			last--;
 		}
 	}
+#else
+	//dgInt32 begin = 0;
+	dgInt32 index = size;
+	for (; index > 0; index--) {
+		if ((low[index - 1] <= T(-DG_LCP_MAX_VALUE)) && (high[index - 1] >= T(DG_LCP_MAX_VALUE))) {
+			dgAssert(0);
+			//dgPermuteRows(size, i, count - 1, matrix, x0, r0, low, high, diagonal, permute);
+			//i--;
+			//count--;
+		}
+	}
+
+	for (dgInt32 i = 0; i < index; i++) {
+		dgCholeskyFactorizationAddRow(size, i, matrix);
+	}
+#endif
 
 	if (index > 0) {
 		dgCholeskySolve(size, index, matrix, r0);
@@ -481,7 +497,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 			r0[i] += delta_r[i];
 		}
 	}
-	count = size - index;
+	
 	for (dgInt32 i = 0; i < size; i++) {
 		delta_x[i] = T(dgFloat32(0.0f));
 		delta_r[i] = T(dgFloat32(0.0f));
@@ -489,6 +505,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 
 	const dgInt32 start = index;
 	dgInt32 clampedIndex = size;
+	dgInt32 count = size - index;
 	while (count) {
 		bool loop = true;
 		bool calculateDelta_x = true;
@@ -613,8 +630,18 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 		dgInt32 j = permute[i];
 		x[j] += x0[i];
 		b[j] = r0[i];
-	}
 
+	}
+/*
+static int xxx;
+xxx++;
+if (xxx == 973) {
+	dgTrace(("\n%d: ", xxx));
+	for (dgInt32 i = 0; i < size; i++) {
+		dgTrace(("%f ", x[i]))
+	}
+}
+*/
 	return true;
 }
 
