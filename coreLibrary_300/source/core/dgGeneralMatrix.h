@@ -694,8 +694,7 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* co
 	for (dgInt32 i = 0; i < unboundedSize; i++) {
 		if ((low[i] <= T(-DG_LCP_MAX_VALUE)) && (high[i] >= T(DG_LCP_MAX_VALUE))) {
 			dgCholeskyFactorizationAddRow(size, i, matrix);
-		}
-		else {
+		} else {
 			dgInt32 j = unboundedSize - 1;
 			if (i != j) {
 				T* const A = &matrix[size * i];

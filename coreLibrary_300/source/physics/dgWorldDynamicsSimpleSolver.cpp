@@ -857,7 +857,7 @@ void dgWorldDynamicUpdate::CalculateSinglePassClusterReactionForces(const dgBody
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 j = 0; (j < jointCount) && !constraintArray[j].m_isSkeleton; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
-				dgFloat32 accel = CalculateJointForceDanzig(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
+				dgFloat32 accel = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
 			for (dgInt32 j = 0; j < skeletonCount; j++) {
