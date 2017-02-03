@@ -419,6 +419,7 @@ void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, con
 // low(i) = 0
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
+#if 1
 template <class T>
 bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
 {
@@ -456,7 +457,6 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 		}
 	}
 
-#if 1
 	dgInt32 index = 0;
 	dgInt32 last = size;
 	for (dgInt32 i = 0; i < last; i++) {
@@ -469,22 +469,6 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 			last--;
 		}
 	}
-#else
-	//dgInt32 begin = 0;
-	dgInt32 index = size;
-	for (; index > 0; index--) {
-		if ((low[index - 1] <= T(-DG_LCP_MAX_VALUE)) && (high[index - 1] >= T(DG_LCP_MAX_VALUE))) {
-			dgAssert(0);
-			//dgPermuteRows(size, i, count - 1, matrix, x0, r0, low, high, diagonal, permute);
-			//i--;
-			//count--;
-		}
-	}
-
-	for (dgInt32 i = 0; i < index; i++) {
-		dgCholeskyFactorizationAddRow(size, i, matrix);
-	}
-#endif
 
 	if (index > 0) {
 		dgCholeskySolve(size, index, matrix, r0);
@@ -630,20 +614,168 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T*
 		dgInt32 j = permute[i];
 		x[j] += x0[i];
 		b[j] = r0[i];
-
 	}
-/*
-static int xxx;
-xxx++;
-if (xxx == 973) {
-	dgTrace(("\n%d: ", xxx));
-	for (dgInt32 i = 0; i < size; i++) {
-		dgTrace(("%f ", x[i]))
-	}
-}
-*/
 	return true;
 }
+
+#else
+template <class T>
+bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* const b, T* const low, T* const high)
+{
+	T* const x0 = dgAlloca(T, size);
+	T* const r0 = dgAlloca(T, size);
+	T* const delta_r = dgAlloca(T, size);
+	T* const diagonal = dgAlloca(T, size);
+	dgInt16* const permute = dgAlloca(short, size);
+	T* const delta_x = b;
+
+	dgInt32 stride = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		x[i] = dgClamp(x[i], low[i], high[i]);
+		x0[i] = x[i];
+		r0[i] = -b[i];
+		low[i] -= x0[i];
+		high[i] -= x0[i];
+		delta_x[i] = T(dgFloat32(0.0f));
+		delta_r[i] = T(dgFloat32(0.0f));
+		diagonal[i] = matrix[stride + i];
+		permute[i] = short(i);
+		stride += size;
+	}
+
+	dgInt32 index = 0;
+	dgInt32 count = size;
+	dgInt32 clampedIndex = size;
+	const dgInt32 start = 0;
+	while (count) {
+		bool loop = true;
+		bool calculateDelta_x = true;
+
+		while (loop) {
+			loop = false;
+			T clamp_x(0.0f);
+			dgInt32 swapIndex = -1;
+
+			if (dgAbsf(r0[index]) > T(1.0e-12f)) {
+
+				if (calculateDelta_x) {
+					T dir(dgFloat32(1.0f));
+					dgCalculateDelta_x(size, dir, index, matrix, delta_x);
+				}
+
+				calculateDelta_x = true;
+				dgCalculateDelta_r(size, index, matrix, delta_x, delta_r);
+				dgAssert(delta_r[index] != T(dgFloat32(0.0f)));
+				dgAssert(dgAbsf(delta_x[index]) == T(1.0f));
+
+				T s = -r0[index] / delta_r[index];
+				dgAssert(dgAbsf(s) >= T(dgFloat32(0.0f)));
+
+				for (dgInt32 i = start; i <= index; i++) {
+					T x1 = x0[i] + s * delta_x[i];
+					if (x1 > high[i]) {
+						swapIndex = i;
+						clamp_x = high[i];
+						s = (high[i] - x0[i]) / delta_x[i];
+					} else if (x1 < low[i]) {
+						swapIndex = i;
+						clamp_x = low[i];
+						s = (low[i] - x0[i]) / delta_x[i];
+					}
+				}
+				dgAssert(dgAbsf(s) >= T(dgFloat32(0.0f)));
+
+				for (dgInt32 i = clampedIndex; (i < size) && (s > T(1.0e-12f)); i++) {
+					T r1 = r0[i] + s * delta_r[i];
+					if ((r1 * r0[i]) < T(dgFloat32(0.0f))) {
+						dgAssert(dgAbsf(delta_r[i]) > T(dgFloat32(0.0f)));
+						T s1 = -r0[i] / delta_r[i];
+						dgAssert(dgAbsf(s1) >= T(dgFloat32(0.0f)));
+						dgAssert(dgAbsf(s1) <= dgAbsf(s));
+						if (dgAbsf(s1) < dgAbsf(s)) {
+							s = s1;
+							swapIndex = i;
+						}
+					}
+				}
+
+				for (dgInt32 i = 0; i < size; i++) {
+					dgAssert((x0[i] + dgAbsf(x0[i]) * T(dgFloat32(1.0e-4f))) >= low[i]);
+					dgAssert((x0[i] - dgAbsf(x0[i]) * T(dgFloat32(1.0e-4f))) <= high[i]);
+
+					x0[i] += s * delta_x[i];
+					r0[i] += s * delta_r[i];
+
+					dgAssert((x0[i] + dgFloat32(1.0f)) >= low[i]);
+					dgAssert((x0[i] - dgFloat32(1.0f)) <= high[i]);
+				}
+			}
+
+			if (swapIndex == -1) {
+				r0[index] = T(dgFloat32(0.0f));
+				delta_r[index] = T(dgFloat32(0.0f));
+				if (!dgCholeskyFactorizationAddRow(size, index, matrix)) {
+					return false;
+				}
+				index++;
+				count--;
+				loop = false;
+			} else if (swapIndex == index) {
+				count--;
+				clampedIndex--;
+				x0[index] = clamp_x;
+				dgPermuteRows(size, index, clampedIndex, matrix, x0, r0, low, high, diagonal, permute);
+				loop = count ? true : false;
+			} else if (swapIndex > index) {
+				loop = true;
+				r0[swapIndex] = T(dgFloat32(0.0f));
+				dgAssert(swapIndex < size);
+				dgAssert(clampedIndex <= size);
+				if (swapIndex < clampedIndex) {
+					count--;
+					clampedIndex--;
+					dgPermuteRows(size, clampedIndex, swapIndex, matrix, x0, r0, low, high, diagonal, permute);
+					dgAssert(clampedIndex >= index);
+				} else {
+					count++;
+					dgAssert(clampedIndex < size);
+					dgPermuteRows(size, clampedIndex, swapIndex, matrix, x0, r0, low, high, diagonal, permute);
+					clampedIndex++;
+					dgAssert(clampedIndex <= size);
+					dgAssert(clampedIndex >= index);
+				}
+				calculateDelta_x = false;
+
+			} else {
+				dgAssert(index > 0);
+				x0[swapIndex] = clamp_x;
+				delta_x[index] = T(dgFloat32(0.0f));
+
+				dgAssert(swapIndex < index);
+				dgCholeskyRestore(size, swapIndex, index, matrix, diagonal);
+				dgPermuteRows(size, swapIndex, index - 1, matrix, x0, r0, low, high, diagonal, permute);
+				dgPermuteRows(size, index - 1, index, matrix, x0, r0, low, high, diagonal, permute);
+				dgPermuteRows(size, clampedIndex - 1, index, matrix, x0, r0, low, high, diagonal, permute);
+
+				clampedIndex--;
+				index--;
+				for (dgInt32 i = swapIndex; i < index; i++) {
+					dgCholeskyFactorizationAddRow(size, i, matrix);
+				}
+				loop = true;
+			}
+		}
+	}
+
+	for (dgInt32 i = 0; i < size; i++) {
+		dgInt32 j = permute[i];
+		x[j] += x0[i];
+		b[j] = r0[i];
+
+	}
+	return true;
+}
+#endif
 
 
 // solve a general Linear complementary program (LCP)
@@ -694,7 +826,8 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* co
 	for (dgInt32 i = 0; i < unboundedSize; i++) {
 		if ((low[i] <= T(-DG_LCP_MAX_VALUE)) && (high[i] >= T(DG_LCP_MAX_VALUE))) {
 			dgCholeskyFactorizationAddRow(size, i, matrix);
-		} else {
+		}
+		else {
 			dgInt32 j = unboundedSize - 1;
 			if (i != j) {
 				T* const A = &matrix[size * i];
