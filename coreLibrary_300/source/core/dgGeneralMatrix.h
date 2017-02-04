@@ -42,10 +42,57 @@ void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T
 }
 
 template<class T>
+void dgMatrixTimeMatrix(dgInt32 size, const T* const matrixA, const T* const matrixB, T* const out)
+{
+	for (dgInt32 i = 0; i < size; i++) {
+		const T* const rowA = matrixA[i * size];
+		T* const rowOut = out[i * size];
+		for (dgInt32 j = 0; j < size; j++) {
+			T acc = T(0.0f);
+			for (dgInt32 k = 0; k < size; k++) {
+				acc += rowA[k] * matrixB[j * size + k];
+			}
+			rowOut[j] = acc;
+		}
+	}
+}
+
+template<class T>
 void dgCholeskyFactorization(dgInt32 size, T* const psdMatrix)
 {
 	for (dgInt32 i = 0; i < size; i++) {
 		dgCholeskyFactorizationAddRow(size, i, psdMatrix);
+	}
+}
+
+
+template<class T>
+void dgCholeskyInverse(dgInt32 size, T* const psdMatrix, T* const inverse)
+{
+	dgCholeskyFactorization(size, psdMatrix);
+	memset(inverse, 0, sizeof(T) * size * size);
+
+	for (dgInt32 i = 0; i < size; i++) {
+		inverse[i * size + i] = T(dgFloat32(0.0f));
+	}
+
+	for (dgInt32 i = 0; i < size; i++) {
+		T* const rowI = psdMatrix[i * size];
+		T* const invRowI = inverse[i * size];
+		T invDiag = T(dgFloat32(1.0f) / row[i]);
+		for (dgInt32 j = 0; j < i; j++) {
+			rowI[i] *= invDiag;
+			invRowI[i] *= invDiag;
+		}
+		for (dgInt32 j = i + 1; j < size; j++) {
+			T* const rowJ = psdMatrix[j * size];
+			T* const invRowJ = inverse[j * size];
+			T scale = invDiag * rowJ[j];
+			for (dgInt32 k = 0; k < size; k++) {
+				rowJ[k] += rowI[k] * scale;
+				invRowJ[k] += invRowI[k] * scale;
+			}
+		}
 	}
 }
 
