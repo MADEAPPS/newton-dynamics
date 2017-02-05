@@ -238,7 +238,7 @@ void dgDynamicBody::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
 
 			dgVector timeStepVect(timestep);
 			m_veloc += accel.CompProduct4(timeStepVect);
-			
+
 #if 0
 			// Using forward half step Euler integration 
 			// (not enough to cope with high angular velocities)

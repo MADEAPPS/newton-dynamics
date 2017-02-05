@@ -217,7 +217,7 @@ class dgJacobianMatrixElement
 	dgFloat32 m_penetration;
 	dgFloat32 m_coordenateAccel;
 	dgFloat32 m_penetrationStiffness;
-	
+
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
 	dgFloat32 m_stiffness;

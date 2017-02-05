@@ -388,6 +388,7 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_deltaForce(NULL)
 	,m_massMatrix11(NULL)
 	,m_massMatrix10(NULL)
+	,m_factoredMassMatrix11(NULL)
 	,m_rowArray(NULL)
 	,m_destructor(NULL)
 	,m_cyclingJoints(rootBody->GetWorld()->GetAllocator())
@@ -606,7 +607,8 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 		m_rowArray = (dgJacobianMatrixElement**) memoryBuffer;
 		m_pairs = (dgNodePair*) &m_rowArray[m_rowCount];
 		m_massMatrix11 = (dgFloat32*)&m_pairs[m_rowCount];
-		m_massMatrix10 = &m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
+		m_factoredMassMatrix11 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
+		m_massMatrix10 = &m_factoredMassMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 		m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 
 		for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
@@ -769,6 +771,15 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 				m_massMatrix11[j * m_auxiliaryRowCount + i] += acc;
 			}
 		}
+
+		memcpy (m_factoredMassMatrix11, m_massMatrix11, sizeof (dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
+		dgCholeskyFactorization(m_auxiliaryRowCount, m_factoredMassMatrix11);
+		for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
+			dgFloat32* const row = &m_factoredMassMatrix11[i * m_auxiliaryRowCount];
+			for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
+				row[j] = dgFloat32 (0.0f);
+			}
+		}
 	}
 }
 
@@ -805,7 +816,7 @@ DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, co
 	m_nodesOrder[m_nodeCount - 1]->BodyDiagInvTimeSolution(force[m_nodeCount - 1]);
 	for (dgInt32 i = m_nodeCount - 2; i >= 0; i--) {
 		dgGraph* const node = m_nodesOrder[i];
-		dgAssert (node->m_index == i);
+		dgAssert(node->m_index == i);
 		dgForcePair& f = force[i];
 		node->JointDiagInvTimeSolution(f);
 		node->JointJacobianTimeSolutionBackward(f, force[node->m_parent->m_index]);
@@ -943,8 +954,8 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 		
 		f[i] = dgFloat32 (0.0f);
 		b[i] = row_i->m_coordenateAccel - acc.AddHorizontal().GetScalar();
-		low[i] = row_i->m_lowerBoundFrictionCoefficent - row_i->m_force;
-		high[i] = row_i->m_upperBoundFrictionCoefficent - row_i->m_force;
+		low[i] = dgClamp (row_i->m_lowerBoundFrictionCoefficent - row_i->m_force, -DG_LCP_MAX_VALUE, dgFloat32 (0.0f));
+		high[i] = dgClamp (row_i->m_upperBoundFrictionCoefficent - row_i->m_force, dgFloat32 (0.0f), DG_LCP_MAX_VALUE);
 
 		for (dgInt32 j = i + 1; j < count; j++) {
 			const dgJacobianMatrixElement* const row_j = rowArray[j];
@@ -994,6 +1005,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 	dgFloat32* const low = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const high = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const massMatrix11 = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
+	dgFloat32* const factoredMassMatrix11 = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
 
 	dgInt32 primaryIndex = 0;
 	dgInt32 auxiliaryIndex = 0;
@@ -1017,11 +1029,10 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		for (dgInt32 j = 0; j < auxiliaryDof; j++) {
 			const dgInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
 			dgJacobianMatrixElement* const row = &matrixRow[first + index];
-			//f[auxiliaryIndex + primaryCount] = forceSpatial[primaryDof + j];
 			f[auxiliaryIndex + primaryCount] = dgFloat32 (0.0f);
 			b[auxiliaryIndex] = -accelSpatial[primaryDof + j];
-			low[auxiliaryIndex] = row->m_lowerBoundFrictionCoefficent - row->m_force;
-			high[auxiliaryIndex] = row->m_upperBoundFrictionCoefficent - row->m_force;
+			low[auxiliaryIndex] = dgClamp (row->m_lowerBoundFrictionCoefficent - row->m_force, -DG_LCP_MAX_VALUE, dgFloat32 (0.0f));
+			high[auxiliaryIndex] = dgClamp (row->m_upperBoundFrictionCoefficent - row->m_force, dgFloat32 (0.0f), DG_LCP_MAX_VALUE);
 			auxiliaryIndex++;
 		}
 	}
@@ -1050,6 +1061,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 	}
 
 	memcpy (massMatrix11, m_massMatrix11, sizeof (dgFloat32) * m_auxiliaryRowCount * m_auxiliaryRowCount);
+	memcpy (factoredMassMatrix11, m_factoredMassMatrix11, sizeof (dgFloat32) * m_auxiliaryRowCount * m_auxiliaryRowCount);
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i ++) {
 		dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 		u[i] = dgFloat32(0.0f);
@@ -1060,7 +1072,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		b[i] -= r;
 	}
 	
-	dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, u, b, low, high);
+	//dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, u, b, low, high);
+	dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, factoredMassMatrix11, u, b, low, high);
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32 s = u[i];
@@ -1111,7 +1124,7 @@ dgInt32 dgSkeletonContainer::GetMemoryBufferSizeInBytes (const dgJointInfo* cons
 		//dgInt32 size = m_nodeCount * sizeof (dgBodyJointMatrixDataPair);
 		dgInt32 size = sizeof (dgJacobianMatrixElement*) * rowCount;
 		size += sizeof (dgNodePair) * rowCount;
-		size += sizeof (dgFloat32) * auxiliaryRowCount * auxiliaryRowCount;
+		size += sizeof (dgFloat32) * auxiliaryRowCount * auxiliaryRowCount * 2;
 		size += sizeof (dgFloat32) * auxiliaryRowCount * (rowCount - auxiliaryRowCount);
 		size += sizeof (dgFloat32) * auxiliaryRowCount * (rowCount - auxiliaryRowCount);
 		m_bufferSize = (size + 1024) & -0x10;

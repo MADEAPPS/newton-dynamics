@@ -787,7 +787,7 @@ void dgWorldDynamicUpdate::CalculateSinglePassClusterReactionForces(const dgBody
 	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = cluster->m_bodyCount;
-	//	const dgInt32 jointCount = island->m_jointCount;
+//	const dgInt32 jointCount = island->m_jointCount;
 	const dgInt32 jointCount = cluster->m_activeJointCount;
 
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[cluster->m_bodyStart];
@@ -827,11 +827,11 @@ void dgWorldDynamicUpdate::CalculateSinglePassClusterReactionForces(const dgBody
 			skeletonMemorySizeInBytes += memorySizes[skeletonCount];
 			skeletonArray[skeletonCount] = container;
 			skeletonCount++;
-			dgAssert(skeletonCount < dgInt32(sizeof(skeletonArray) / sizeof(skeletonArray[0])));
+			dgAssert(skeletonCount < dgInt32(sizeof (skeletonArray) / sizeof (skeletonArray[0])));
 		}
 	}
 
-	dgInt8* const skeletonMemory = (dgInt8*)dgAlloca(dgVector, skeletonMemorySizeInBytes / sizeof(dgVector));
+	dgInt8* const skeletonMemory = (dgInt8*)dgAlloca(dgVector, skeletonMemorySizeInBytes / sizeof (dgVector));
 	dgAssert((dgInt64(skeletonMemory) & 0x0f) == 0);
 
 	skeletonMemorySizeInBytes = 0;
@@ -842,7 +842,7 @@ void dgWorldDynamicUpdate::CalculateSinglePassClusterReactionForces(const dgBody
 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
-
+		
 		for (dgInt32 i = 0; i < jointCount; i++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const constraint = jointInfo->m_joint;
@@ -851,7 +851,7 @@ void dgWorldDynamicUpdate::CalculateSinglePassClusterReactionForces(const dgBody
 			constraint->JointAccelerations(&joindDesc);
 		}
 		joindDesc.m_firstPassCoefFlag = dgFloat32(1.0f);
-
+		
 		dgFloat32 accNorm(maxAccNorm * dgFloat32(2.0f));
 		for (dgInt32 i = 0; (i < passes) && (accNorm > maxAccNorm); i++) {
 			accNorm = dgFloat32(0.0f);
@@ -934,7 +934,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = cluster->m_bodyCount;
-//	const dgInt32 jointCount = island->m_jointCount;
+	//	const dgInt32 jointCount = island->m_jointCount;
 	const dgInt32 jointCount = cluster->m_activeJointCount;
 
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[cluster->m_bodyStart];
@@ -974,11 +974,11 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			skeletonMemorySizeInBytes += memorySizes[skeletonCount];
 			skeletonArray[skeletonCount] = container;
 			skeletonCount++;
-			dgAssert(skeletonCount < dgInt32(sizeof (skeletonArray) / sizeof (skeletonArray[0])));
+			dgAssert(skeletonCount < dgInt32(sizeof(skeletonArray) / sizeof(skeletonArray[0])));
 		}
 	}
 
-	dgInt8* const skeletonMemory = (dgInt8*)dgAlloca(dgVector, skeletonMemorySizeInBytes / sizeof (dgVector));
+	dgInt8* const skeletonMemory = (dgInt8*)dgAlloca(dgVector, skeletonMemorySizeInBytes / sizeof(dgVector));
 	dgAssert((dgInt64(skeletonMemory) & 0x0f) == 0);
 
 	skeletonMemorySizeInBytes = 0;
@@ -989,7 +989,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
-		
+
 		for (dgInt32 i = 0; i < jointCount; i++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const constraint = jointInfo->m_joint;
@@ -998,7 +998,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			constraint->JointAccelerations(&joindDesc);
 		}
 		joindDesc.m_firstPassCoefFlag = dgFloat32(1.0f);
-		
+
 		dgFloat32 accNorm(maxAccNorm * dgFloat32(2.0f));
 		for (dgInt32 i = 0; (i < passes) && (accNorm > maxAccNorm); i++) {
 			accNorm = dgFloat32(0.0f);

@@ -423,7 +423,8 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 
 	int bodyIndex = 0;
 	NewtonBody* pickBody = 0;
-    for (int j=0; j < numArms; j++)
+	for (int j=0; j < numArms; j++)
+//	for (int j=1; j < 2; j++)
 	{
 		dFloat angle = dFloat(j) / dFloat(numArms) * M_PI*2.0f;
 		dMatrix armRotation = dPitchMatrix(angle);
@@ -434,6 +435,7 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 		int numBodies = numSegments;
 		if (randomness > 0.0f) numBodies += int (randF(j) * dFloat(numSegments) + 0.5f);
 		for (int i=0; i < numBodies; i++)
+//		for (int i=0; i < 2; i++)
 		{
 			dFloat height = armHeight;
 			dFloat width = armWidth;

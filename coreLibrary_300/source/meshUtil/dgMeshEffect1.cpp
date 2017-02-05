@@ -3863,21 +3863,21 @@ void dgMeshEffect::RepairTJoints ()
 									openEdge->m_incidentFace = deletedEdge->m_twin->m_incidentFace;
 									openEdge->m_next->m_incidentFace = deletedEdge->m_twin->m_incidentFace;
 									openEdge->m_next->m_next->m_incidentFace = deletedEdge->m_twin->m_incidentFace;
-									
+
 									dgInt32 attibuteIndex0 = AddInterpolatedHalfAttribute(deletedEdge->m_twin, openEdge->m_next->m_incidentVertex);
 									dgInt32 attibuteIndex1 = AddInterpolatedHalfAttribute(deletedEdge->m_twin, openEdge->m_next->m_next->m_incidentVertex);
 									
 									openEdge->m_userData = deletedEdge->m_twin->m_userData;
 									openEdge->m_next->m_userData = attibuteIndex0;
 									openEdge->m_next->m_next->m_userData = attibuteIndex1;
-									
+
 
 									deletedEdge->m_twin->m_prev->m_next = openEdge;
 									openEdge->m_prev = deletedEdge->m_twin->m_prev;
 
 									deletedEdge->m_twin->m_next->m_prev = deletedEdge->m_prev;
 									deletedEdge->m_prev->m_next = deletedEdge->m_twin->m_next;
-
+									
 									deletedEdge->m_twin->m_next = deletedEdge;
 									deletedEdge->m_twin->m_prev = deletedEdge;
 									deletedEdge->m_next = deletedEdge->m_twin;

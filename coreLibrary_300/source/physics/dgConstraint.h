@@ -169,7 +169,7 @@ class dgConstraint
 	bool IsCollidable () const;
 	bool IsBilateral () const;
 	bool IsSkeleton () const;
-		
+
 	virtual void ResetMaxDOF();
 	dgInt32 GetMaxDOF() const;
 	
@@ -179,7 +179,7 @@ class dgConstraint
 
 	virtual dgFloat32 GetStiffness() const;
 	virtual void SetStiffness(dgFloat32 stiffness);
-
+	
 	virtual dgInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dgInt32 model);
 
@@ -224,13 +224,13 @@ class dgConstraint
 	dgUnsigned32 m_index;
 	
 	dgUnsigned32 m_maxDOF				: 6;
-	dgUnsigned32 m_constId				: 6;
+	dgUnsigned32 m_constId				: 6;		
 	dgUnsigned32 m_graphDepth			: 10;
 	dgUnsigned32 m_solverModel			: 2;
 	dgUnsigned32 m_enableCollision		: 1;
 	dgUnsigned32 m_contactActive		: 1;
 	dgUnsigned32 m_isBilateral			: 1;
-	dgUnsigned32 m_isInSkeleton			: 1;
+	dgUnsigned32 m_isInSkeleton		: 1;
 	
 	friend class dgWorld;
 	friend class dgJacobianMemory;
