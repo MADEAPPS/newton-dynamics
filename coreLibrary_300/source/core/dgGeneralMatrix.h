@@ -983,12 +983,14 @@ void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const cholesk
 {
 	if (row != colum) {
 		dgAssert (row < colum);
-/*
-		for (dgInt32 i = row; i < size; i ++) {
+#if 1
+		// using Givens rotations, is much faster since Hessemberg matrices are very space, 
+		// however this is far more numerically unstable, I may have to use Householder
+		for (dgInt32 i = row; i < size - 1; i ++) {
 			T* const rowI = &choleskyMatrix[size * i];
 			for (dgInt32 j = colum; j > i; j--) {
 				T x1 = rowI[j];
-				if (x1 != T(dgFloat32(0.0f))) {
+				if (T(fabs (x1)) > T(dgFloat32(1.0e-6f))) {
 					T x0 = rowI[i];
 					T den = T (1.0f) / T (sqrt (x1 * x1 + x0 * x0));
 					x0 *= den;
@@ -1002,14 +1004,24 @@ void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const cholesk
 						rowk[j] = a1 * x0 - a0 * x1;
 					}
 					rowI[j] = T (dgFloat32 (0.0f));
+					dgAssert(rowI[i] > T(dgFloat32(0.0f)));
+					if (choleskyMatrix[size * j + j] < T (dgFloat32 (0.0f))) {
+						for (dgInt32 k = j; k < size; k++) {
+							choleskyMatrix[size * k + j] = -choleskyMatrix[size * k + j];
 				}
 			}
+				} else {
+					rowI[j] = T(dgFloat32(0.0f));
+				}
+			}
+			dgAssert (rowI[i] > T (dgFloat32 (1.0e-5f)));
 		}
-*/
+		dgAssert (choleskyMatrix[size * size - 1] > T (dgFloat32 (1.0e-5f)));
 
+#else
+		// using Householder rotations, much more stable than Givens rotations
 		T* const tmp = dgAlloca(T, size);
 		T* const reflexion = dgAlloca(T, size);
-
 		for (dgInt32 i = row; i < size; i ++) {
 			T* const rowI = &choleskyMatrix[size * i];
 			T mag (T (dgFloat32 (0.0f)));
@@ -1048,13 +1060,14 @@ void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* const cholesk
 				rowI[k] = T(dgFloat32(0.0f));
 			}
 
-			if (rowI[i] < T (dgFloat32 (1.0e-5f))) {
+			if (rowI[i] < T (dgFloat32 (0.0f))) {
 				for (dgInt32 k = i; k < size; k++) {
 					choleskyMatrix[size * k + i] = -choleskyMatrix[size * k + i];
 				}
 			}
-			dgAssert (rowI[i] > T (dgFloat32 (0.0f)));
+			dgAssert (rowI[i] > T (dgFloat32 (1.0e-5f)));
 		}
+#endif
 	}
 }
 
@@ -1062,6 +1075,7 @@ template<class T>
 bool dgCheckCholeskyUpdate(dgInt32 size, const T* const choleskyMatrix, const T* const matrixSource)
 {
 #ifdef _DEBUG
+/*
 	T* const matrix = dgAlloca(T, size * size);
 	memcpy (matrix, matrixSource, sizeof (T) * size * size);
 	dgCholeskyFactorization(size, matrix);
@@ -1069,9 +1083,10 @@ bool dgCheckCholeskyUpdate(dgInt32 size, const T* const choleskyMatrix, const T*
 		const T* const rowA = &matrix[i * size];
 		const T* const rowB = &choleskyMatrix[i * size];
 		for (dgInt32 j = 0; j <= i; j++) {
-//			dgAssert (dgAreEqual(rowA[j], rowB[j], T (dgFloat32 (1.0e-2f))));
+			dgAssert (dgAreEqual(rowA[j], rowB[j], T (dgFloat32 (1.0e-2f))));
 		}
 	}
+*/
 #endif
 	return true;
 }
@@ -1190,7 +1205,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const choleskyMatrix, T
 				x0[index] = clamp_x;
 				dgPermuteRows(size, index, clampedIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
 				dgCholeskyUpdate(size, index, clampedIndex, choleskyMatrix);
-				//dgAssert(dgCheckCholeskyUpdate(size, choleskyMatrix, matrix));
+				dgAssert(dgCheckCholeskyUpdate(size, choleskyMatrix, matrix));
 
 				loop = count ? true : false;
 			} else if (swapIndex > index) {
@@ -1203,14 +1218,14 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const choleskyMatrix, T
 					clampedIndex--;
 					dgPermuteRows(size, clampedIndex, swapIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
 					dgCholeskyUpdate(size, swapIndex, clampedIndex, choleskyMatrix);
-					//dgAssert(dgCheckCholeskyUpdate(size, choleskyMatrix, matrix));
+					dgAssert(dgCheckCholeskyUpdate(size, choleskyMatrix, matrix));
 					dgAssert(clampedIndex >= index);
 				} else {
 					count++;
 					dgAssert(clampedIndex < size);
 					dgPermuteRows(size, clampedIndex, swapIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
 					dgCholeskyUpdate(size, clampedIndex, swapIndex, choleskyMatrix);
-					//dgAssert(dgCheckCholeskyUpdate(size, choleskyMatrix, matrix));
+					dgAssert(dgCheckCholeskyUpdate(size, choleskyMatrix, matrix));
 					clampedIndex++;
 					dgAssert(clampedIndex <= size);
 					dgAssert(clampedIndex >= index);
@@ -1226,7 +1241,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const choleskyMatrix, T
 				dgPermuteRows(size, index - 1, index, matrix, choleskyMatrix, x0, r0, low, high, permute);
 				dgPermuteRows(size, clampedIndex - 1, index, matrix, choleskyMatrix, x0, r0, low, high, permute);
 				dgCholeskyUpdate (size, swapIndex, clampedIndex - 1, choleskyMatrix);
-				//dgAssert (dgCheckCholeskyUpdate(size, choleskyMatrix, matrix));
+				dgAssert (dgCheckCholeskyUpdate(size, choleskyMatrix, matrix));
 
 				clampedIndex--;
 				index--;
