@@ -389,6 +389,10 @@ DG_INLINE T dgSign(T A)
 template <class T> 
 DG_INLINE bool dgAreEqual(T A, T B, T tol)
 {
+	if ((dgAbsf(A) < tol) && (dgAbsf(B) < tol)) {
+		return true;
+	}
+/*
 	dgInt32 exp0;
 	dgFloat64 mantissa0 = frexp(dgFloat64 (A), &exp0);
 
@@ -402,7 +406,12 @@ DG_INLINE bool dgAreEqual(T A, T B, T tol)
 	if (exp0 != exp1) {
 		return false;
 	}
-	return dgAbsf(mantissa0 - mantissa1) < dgAbsf (tol);
+	return dgAbsf(mantissa0 - mantissa1) < tol;
+*/	
+	T den = dgMax(dgAbsf(A), dgAbsf(B)) + tol;
+	A /= den;
+	B /= den;
+	return dgAbsf(A - B) < tol;
 }
 
 template <class T> 
