@@ -954,8 +954,8 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 		
 		f[i] = dgFloat32 (0.0f);
 		b[i] = row_i->m_coordenateAccel - acc.AddHorizontal().GetScalar();
-		low[i] = dgClamp (row_i->m_lowerBoundFrictionCoefficent - row_i->m_force, -DG_LCP_MAX_VALUE, dgFloat32 (0.0f));
-		high[i] = dgClamp (row_i->m_upperBoundFrictionCoefficent - row_i->m_force, dgFloat32 (0.0f), DG_LCP_MAX_VALUE);
+		low[i] = dgClamp (row_i->m_lowerBoundFrictionCoefficent - row_i->m_force, -DG_MAX_BOUND, dgFloat32 (0.0f));
+		high[i] = dgClamp (row_i->m_upperBoundFrictionCoefficent - row_i->m_force, dgFloat32 (0.0f), DG_MAX_BOUND);
 
 		for (dgInt32 j = i + 1; j < count; j++) {
 			const dgJacobianMatrixElement* const row_j = rowArray[j];
@@ -1031,8 +1031,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			dgJacobianMatrixElement* const row = &matrixRow[first + index];
 			f[auxiliaryIndex + primaryCount] = dgFloat32 (0.0f);
 			b[auxiliaryIndex] = -accelSpatial[primaryDof + j];
-			low[auxiliaryIndex] = dgClamp (row->m_lowerBoundFrictionCoefficent - row->m_force, -DG_LCP_MAX_VALUE, dgFloat32 (0.0f));
-			high[auxiliaryIndex] = dgClamp (row->m_upperBoundFrictionCoefficent - row->m_force, dgFloat32 (0.0f), DG_LCP_MAX_VALUE);
+			low[auxiliaryIndex] = dgClamp (row->m_lowerBoundFrictionCoefficent - row->m_force, -DG_MAX_BOUND, dgFloat32 (0.0f));
+			high[auxiliaryIndex] = dgClamp (row->m_upperBoundFrictionCoefficent - row->m_force, dgFloat32 (0.0f), DG_MAX_BOUND);
 			auxiliaryIndex++;
 		}
 	}
@@ -1054,8 +1054,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			dgVector acc(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
 						 row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
 			b[auxiliaryIndex] = row->m_coordenateAccel - (acc.AddHorizontal()).GetScalar();
-			low[auxiliaryIndex] = row->m_lowerBoundFrictionCoefficent - row->m_force;
-			high[auxiliaryIndex] = row->m_upperBoundFrictionCoefficent - row->m_force;
+			low[auxiliaryIndex] = dgClamp (row->m_lowerBoundFrictionCoefficent - row->m_force, -DG_MAX_BOUND, dgFloat32 (0.0f));
+			high[auxiliaryIndex] = dgClamp (row->m_upperBoundFrictionCoefficent - row->m_force, dgFloat32 (0.0f), DG_MAX_BOUND);
 			auxiliaryIndex++;
 		}
 	}

@@ -28,6 +28,7 @@
 #include "dgVector.h"
 #include "dgGeneralVector.h"
 
+//#define DG_OLD_SOLVER
 #define DG_LCP_MAX_VALUE dgFloat32 (1.0e10f)
 
 class dgSymmetricBiconjugateGradientSolve
@@ -643,7 +644,7 @@ dgAssert (0);
 }
 
 
-#if 0
+#ifdef DG_OLD_SOLVER
 
 template<class T>
 DG_INLINE void dgPermuteRows(dgInt32 size, dgInt32 i, dgInt32 j, T* const matrix, T* const x, T* const r, T* const low, T* const high, T* const diagonal, dgInt16* const permute)
@@ -1062,7 +1063,9 @@ DG_INLINE void dgCholeskyUpdate(dgInt32 size, dgInt32 row, dgInt32 colum, T* con
 					choleskyMatrix[size * k + i] = -choleskyMatrix[size * k + i];
 				}
 			}
-			dgAssert (rowI[i] > T (dgFloat32 (1.0e-5f)));
+		}
+		for (dgInt32 i = row; i < size; i ++) {
+			choleskyMatrix[size * i + i] = dgMax(choleskyMatrix[size * i + i], T (dgFloat32 (1.0e-6f)));
 		}
 #endif
 	}
@@ -1116,10 +1119,6 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const choleskyMatrix, T
 	T* const tmp1 = dgAlloca(T, size);
 	dgInt16* const permute = dgAlloca(short, size);
 
-
-static int xxx;
-xxx++;
-
 	dgInt32 index = 0;
 	dgInt32 count = size;
 	dgInt32 clampedIndex = size;
@@ -1133,15 +1132,6 @@ xxx++;
 
 	bool findInitialGuess = size >= 6;
 	if (findInitialGuess) {
-/*
-		int xxx = size - 1;
-		for (dgInt32 i = 0; i < 10; i++) {
-			dgPermuteRows(size, i, xxx, matrix, choleskyMatrix, x0, r0, low, high, permute);
-			xxx--;
-		}
-		dgCholeskyUpdate(size, 0, size - 1, choleskyMatrix);
-*/
-
 		dgInt32 initialGuessCount = size;
 		for (dgInt32 j = 0; (j < 5) && findInitialGuess; j ++) {
 
@@ -1173,14 +1163,7 @@ xxx++;
 				x[i] = x0[i];
 				b[i] = T (dgFloat32 (0.0f));
 			}
-/*
-if (xxx >= 1040) {
-	dgTrace(("\n%d: ", xxx));
-	for (dgInt32 i = 0; i < size; i++) {
-		dgTrace(("%f ", x[i]));
-	}
-}
-*/
+
 			return true;
 		} else {
 			if (!findInitialGuess) {
@@ -1193,7 +1176,7 @@ if (xxx >= 1040) {
 				index = initialGuessCount;
 				count = size - initialGuessCount;
 			} else {
-				dgAssert(0);
+				//dgAssert(0);
 				for (dgInt32 i = 0; i < size; i++) {
 					x0[i] = dgFloat32(0.0f);
 				}
@@ -1203,6 +1186,7 @@ if (xxx >= 1040) {
 
 	while (count) {
 		bool loop = true;
+		bool calculateDelta_x = true;
 
 		while (loop) {
 			loop = false;
@@ -1210,12 +1194,16 @@ if (xxx >= 1040) {
 			dgInt32 swapIndex = -1;
 
 			if (dgAbsf(r0[index]) > T(1.0e-12f)) {
-
+				if (calculateDelta_x) {
 				T dir(dgFloat32(1.0f));
-				dgCalculateDelta_x(size, dir, index, matrix, choleskyMatrix, delta_x);
+					dgCalculateDelta_x(size, dir, index, matrix, choleskyMatrix, delta_x);
+				}
+
+				calculateDelta_x = true;
 				dgCalculateDelta_r(size, index, matrix, delta_x, delta_r);
 				dgAssert(delta_r[index] != T(dgFloat32(0.0f)));
 				dgAssert(dgAbsf(delta_x[index]) == T(1.0f));
+				delta_r[index] = (delta_r[index] == T(dgFloat32 (0.0f))) ? T(dgFloat32 (1.0e-12f)) : delta_r[index];
 
 				T s = -r0[index] / delta_r[index];
 				dgAssert(dgAbsf(s) >= T(dgFloat32(0.0f)));
@@ -1297,6 +1285,7 @@ if (xxx >= 1040) {
 					dgAssert(clampedIndex <= size);
 					dgAssert(clampedIndex >= index);
 				}
+				calculateDelta_x = false;
 
 			} else {
 				dgAssert(index > 0);
@@ -1324,14 +1313,6 @@ if (xxx >= 1040) {
 		b[j] = r0[i];
 	}
 
-/*
-if (xxx >= 1040) {
-	dgTrace(("\n%d: ", xxx));
-	for (dgInt32 i = 0; i < size; i++) {
-		dgTrace(("%f ", x[i]));
-	}
-}
-*/
 	return true;
 }
 

@@ -61,13 +61,12 @@ dgBilateralConstraint::~dgBilateralConstraint ()
 
 dgInt32 dgBilateralConstraint::GetSolverModel() const
 {
-	dgAssert(0);
-	return 0;
+	return m_solverModel;
 }
 
 void dgBilateralConstraint::SetSolverModel(dgInt32 model)
 {
-	dgAssert(0);
+	m_solverModel = dgClamp(model, 0, 2);
 }
 
 
