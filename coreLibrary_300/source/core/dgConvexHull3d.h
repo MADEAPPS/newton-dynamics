@@ -100,12 +100,13 @@ class dgConvexHull3d: public dgList<dgConvexHull3DFace>
 		dgInt32 m_count;
 	};
 
+	static const dgNormalMap& GetNormaMap();
+
 	dgInt32 m_count;
 	dgFloat64 m_diag;
 	dgBigVector m_aabbP0;
 	dgBigVector m_aabbP1;
 	dgArray<dgBigVector> m_points;
-	static dgNormalMap m_normalMap;
 };
 
 
