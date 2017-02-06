@@ -2186,7 +2186,7 @@ void CustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 	}
 
 	dCholeskyFactorization(tireCount, massMatrixMem);
-	dCholeskySolve(tireCount, massMatrixMem, accel, tireCount);
+	dCholeskySolve(tireCount, tireCount, massMatrixMem, accel);
 
 	dVector chassisForce(0.0f);
 	dVector chassisTorque(0.0f);
