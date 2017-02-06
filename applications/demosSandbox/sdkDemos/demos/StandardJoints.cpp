@@ -50,6 +50,25 @@ static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& loc
     return body;
 }
 
+static NewtonBody* CreateSphere(DemoEntityManager* const scene, const dVector& location, const dVector& size)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	int materialID = NewtonMaterialGetDefaultGroupID(world);
+	dMatrix matrix(dGetIdentityMatrix());
+	NewtonCollision* const collision = CreateConvexCollision(world, &matrix[0][0], size, _SPHERE_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	dFloat mass = 1.0f;
+	matrix.m_posit = location;
+	matrix.m_posit.m_w = 1.0f;
+	NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	return body;
+}
+
+
 static NewtonBody* CreateCapule (DemoEntityManager* const scene, const dVector& location, const dVector& size)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -134,6 +153,31 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 	// connect bodies at a corner
 	new CustomPointToPoint (pivot1, pivot0, box2, box1);
 }
+
+
+static void AddDistance___(DemoEntityManager* const scene, const dVector& origin)
+{
+	dVector size(1.0f, 1.0f, 1.0f);
+	NewtonBody* const box0 = CreateSphere(scene, origin + dVector(0.0f, 6.0f - size.m_y * 0.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box1 = CreateSphere(scene, origin + dVector(0.0f, 6.0f - size.m_y * 1.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box2 = CreateSphere(scene, origin + dVector(0.0f, 6.0  - size.m_y * 2.0f, 0.0f, 0.0f), size);
+
+	dMatrix pinMatrix(dGrammSchmidt(dVector(0.0f, -1.0f, 0.0f, 0.0f)));
+
+	// connect first box to the world
+	dMatrix matrix0;
+	dMatrix matrix1;
+	NewtonBodyGetMatrix(box0, &matrix0[0][0]);
+	NewtonBodyGetMatrix(box1, &matrix1[0][0]);
+	new CustomPointToPoint(matrix1.m_posit, matrix0.m_posit, box1, box0);
+
+	dMatrix matrix2;
+	NewtonBodyGetMatrix(box1, &matrix1[0][0]);
+	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
+	new CustomPointToPoint(matrix2.m_posit, matrix1.m_posit, box2, box1);
+}
+
+
 
 static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVector& origin)
 {
@@ -979,7 +1023,10 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, 5.0f), 1.5f, 4);
 //	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, 15.0f), 0.0f, 4);
 
-	AddJoesPoweredRagDoll(scene, dVector( 5.0f, 20.0f, 0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
+
+	AddDistance___(scene, dVector(-40.0f, 0.0f, 0.0f));
+
+//	AddJoesPoweredRagDoll(scene, dVector( 5.0f, 20.0f, 0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
 //	AddJoesPoweredRagDoll(scene, dVector(40.0f, 20.0f, 0.0f), 0.0f, 7, 2, 0.4f, 0.4f, 1.3f);
 //	AddJoesPoweredRagDoll(scene, dVector(80.0f, 20.0f, 0.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
 //	AddJoesPoweredRagDoll(scene, dVector( 5.0f, 20.0f, 0.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
