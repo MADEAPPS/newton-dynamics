@@ -110,8 +110,8 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 	public:
 	WheelJoint (const dMatrix& pinAndPivotFrame, NewtonBody* const tire, NewtonBody* const parentBody, BodyPartTire* const tireData)
 		:CustomJoint (6, tire, parentBody)
-		,m_lateralDir(0.0f, 0.0f, 0.0f, 0.0f)
-		,m_longitudinalDir(0.0f, 0.0f, 0.0f, 0.0f)
+		,m_lateralDir(0.0f)
+		,m_longitudinalDir(0.0f)
 		,m_tire (tireData)
 		,m_tireLoad(0.0f)
 		,m_steerRate (0.5f * 3.1416f)
@@ -584,7 +584,7 @@ void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, co
 	
 	NewtonBodySetMaterialGroupID(m_body, manager->GetTireMaterial());
 
-	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(m_body, 0);
 	NewtonBodySetAngularDamping(m_body, &drag[0]);
 	NewtonBodySetMaxRotationPerStep(m_body, 3.141692f);
@@ -671,7 +671,7 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine(CustomVehicleController*
 	dFloat inertia = 2.0f * mass * amatureRadius * amatureRadius / 5.0f;
 	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
 
-	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(m_body, 0);
 	NewtonBodySetAngularDamping(m_body, &drag[0]);
 	NewtonBodySetMaxRotationPerStep(m_body, 3.141692f);
@@ -1288,12 +1288,12 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 		localVelocity.m_y = 0.0f;
 
 		localVelocity = projectionMatrix.RotateVector(localVelocity);
-		array[0] = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+		array[0] = dVector(0.0f);
 		array[1] = localVelocity.Scale(velocityScale);
 		manager->DrawSchematicCallback(this, "velocity", 0, 2, array);
 
 		dVector localOmega(chassisMatrix.UnrotateVector(omega));
-		array[0] = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+		array[0] = dVector(0.0f);
 		array[1] = dVector(0.0f, localOmega.m_y * 10.0f, 0.0f, 0.0f);
 		manager->DrawSchematicCallback(this, "omega", 0, 2, array);
 	}
@@ -1429,7 +1429,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	NewtonWorld* const world = manager->GetWorld();
 
 	// set linear and angular drag to zero
-	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(m_body, 0);
 	NewtonBodySetAngularDamping(m_body, &drag[0]);
 

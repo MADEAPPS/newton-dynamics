@@ -436,7 +436,7 @@ void CustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadInde
 
 CustomControlledBallAndSocket::CustomControlledBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomBallAndSocket(pinAndPivotFrame, child, parent)
-	,m_targetAngles (0.0f, 0.0f, 0.0f, 0.0f)
+	,m_targetAngles (0.0f)
 	,m_pitch(0.0f)
 	,m_yaw(0.0f)
 	,m_roll(0.0f)

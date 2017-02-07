@@ -525,7 +525,6 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 										childBody->m_dynamicsLru = lru;
 										dgSkeletonContainer::dgGraph* const childNode = skeleton->AddChild((dgBilateralConstraint*)constraint, parentNode);
 										queue.Insert (childNode);
-										
 									} else if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
 										loopJoints[loopCount] = (dgBilateralConstraint*)constraint;
 										loopCount ++;

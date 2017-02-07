@@ -113,11 +113,13 @@ DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, T* const m
 
 
 template<class T>
-void dgCholeskyFactorization(dgInt32 size, T* const psdMatrix)
+bool dgCholeskyFactorization(dgInt32 size, T* const psdMatrix)
 {
-	for (dgInt32 i = 0; i < size; i++) {
-		dgCholeskyFactorizationAddRow(size, i, psdMatrix);
+	bool state = true;
+	for (dgInt32 i = 0; (i < size) && state; i++) {
+		state = state && dgCholeskyFactorizationAddRow(size, i, psdMatrix);
 	}
+	return state;
 }
 
 template<class T>

@@ -37,8 +37,8 @@ dSceneNodeInfo::dSceneNodeInfo(dScene* const world)
 	,m_eigenScaleAxis (dGetIdentityMatrix())
 	,m_geometryTransform(dGetIdentityMatrix())
 	,m_solidColor (0.75f, 0.75f, 0.0f, 0.0f)
-	,m_editorMinOOBB (0.0f, 0.0f, 0.0f, 0.0f) 
-	,m_editorMaxOOBB (0.0f, 0.0f, 0.0f, 0.0f)
+	,m_editorMinOOBB (0.0f) 
+	,m_editorMaxOOBB (0.0f)
 {
 	SetName ("sceneNode");
 }
@@ -51,8 +51,8 @@ dSceneNodeInfo::dSceneNodeInfo()
 	,m_eigenScaleAxis (dGetIdentityMatrix())
 	,m_geometryTransform(dGetIdentityMatrix())
 	,m_solidColor (0.75f, 0.75f, 0.0f, 0.0f)
-	,m_editorMinOOBB (0.0f, 0.0f, 0.0f, 0.0f) 
-	,m_editorMaxOOBB (0.0f, 0.0f, 0.0f, 0.0f)
+	,m_editorMinOOBB (0.0f) 
+	,m_editorMaxOOBB (0.0f)
 {
 	SetName ("sceneNode");
 }
@@ -157,8 +157,8 @@ void dSceneNodeInfo::UpdateOOBB (dScene* const scene, dScene::dTreeNode* const m
 {
 	dAssert (scene->GetInfoFromNode(myNode) == this);
 
-	m_editorMinOOBB = dVector (0.0f, 0.0f, 0.0f, 0.0f) ;	
-	m_editorMaxOOBB = dVector (0.0f, 0.0f, 0.0f, 0.0f) ;	
+	m_editorMinOOBB = dVector (0.0f);
+	m_editorMaxOOBB = dVector (0.0f);
 	for (void* link = scene->GetFirstChildLink(myNode); link; link = scene->GetNextChildLink(myNode, link)) {
 		dScene::dTreeNode* const node = scene->GetNodeFromLink(link);
 		dGeometryNodeInfo* const geometryInfo = (dGeometryNodeInfo*)scene->GetInfoFromNode(node);

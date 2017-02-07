@@ -74,10 +74,11 @@ class dgSkeletonContainer::dgGraph
 		,m_parent(NULL)
 		,m_child(NULL)
 		,m_sibling(NULL)
-		,m_index(0)
-		,m_dof(0)
 		,m_primaryStart(0)
 		,m_auxiliaryStart(0)
+		,m_index(0)
+		,m_dof(0)
+		,m_swapBodies(0)
 	{
 	}
 
@@ -87,10 +88,11 @@ class dgSkeletonContainer::dgGraph
 		,m_parent(parent)
 		,m_child(NULL)
 		,m_sibling(NULL)
-		,m_index(0)
-		,m_dof(0)
 		,m_primaryStart(0)
 		,m_auxiliaryStart(0)
+		,m_index(0)
+		,m_dof(0)
+		,m_swapBodies(joint->GetBody0() == parent->m_body)
 	{
 		dgAssert (m_parent);
 		dgAssert (m_body->GetInvMass().m_w != dgFloat32 (0.0f));
@@ -161,7 +163,7 @@ class dgSkeletonContainer::dgGraph
 		dgSpatialMatrix& jointMass = m_data.m_joint.m_mass;
 
 		const dgInt32 start = jointInfo->m_pairStart;
-		if (jointInfo->m_joint->GetBody0() == m_body) {
+		if (!m_swapBodies) {
 			for (dgInt32 i = 0; i < m_dof; i++) {
 				const dgInt32 k = m_sourceJacobianIndex[i];
 				const dgJacobianMatrixElement* const row = &matrixRow[start + k];
@@ -176,8 +178,8 @@ class dgSkeletonContainer::dgGraph
 				const dgJacobianMatrixElement* const row = &matrixRow[start + k];
 				jointMass[i].SetZero();
 				jointMass[i][i] = -row->m_diagDamp;
-				jointJ[i] = dgSpatialVector(row->m_Jt.m_jacobianM0.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM0.m_angular.CompProduct4(dgVector::m_negOne));
 				bodyJt[i] = dgSpatialVector(row->m_Jt.m_jacobianM1.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM1.m_angular.CompProduct4(dgVector::m_negOne));
+				jointJ[i] = dgSpatialVector(row->m_Jt.m_jacobianM0.m_linear.CompProduct4(dgVector::m_negOne), row->m_Jt.m_jacobianM0.m_angular.CompProduct4(dgVector::m_negOne));
 			}
 		}
 	}
@@ -366,10 +368,11 @@ class dgSkeletonContainer::dgGraph
 	dgGraph* m_parent;
 	dgGraph* m_child;
 	dgGraph* m_sibling;
-	dgInt16 m_index;
-	dgInt16 m_dof;
 	dgInt16 m_primaryStart;
 	dgInt16 m_auxiliaryStart;
+	dgInt16 m_index;
+	dgInt8 m_dof;
+	dgInt8 m_swapBodies;
 	union {
 		dgInt8 m_sourceJacobianIndex[8];
 		dgInt64 m_ordinals;
@@ -755,12 +758,13 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 			}
 
 			dgFloat32* const matrixRow11 = &m_massMatrix11[i * m_auxiliaryRowCount];
-			dgFloat32 acc = dgFloat32(0.0f);
-
+			dgFloat32 acc = matrixRow11[i];
 			for (dgInt32 k = 0; k < primaryCount; k++) {
 				acc += deltaForcePtr[k] * matrixRow10[k];
 			}
-			matrixRow11[i] += acc;
+			acc = dgMax(acc, dgFloat32 (1.0e-3f));
+			matrixRow11[i] = acc;
+
 			for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
 				dgFloat32 acc = dgFloat32(0.0f);
 				const dgFloat32* const matrixRow10 = &m_massMatrix10[j * primaryCount];
@@ -772,8 +776,33 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 			}
 		}
 
-		memcpy (m_factoredMassMatrix11, m_massMatrix11, sizeof (dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
-		dgCholeskyFactorization(m_auxiliaryRowCount, m_factoredMassMatrix11);
+		bool isPsdMatrix = false;
+		do {
+			memcpy (m_factoredMassMatrix11, m_massMatrix11, sizeof (dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
+			isPsdMatrix = dgCholeskyFactorization(m_auxiliaryRowCount, m_factoredMassMatrix11);
+			isPsdMatrix = true;
+/*
+			if (!isPsdMatrix) {
+				for (dgInt32 i = 0; (i < m_auxiliaryRowCount) & isPsdMatrix; i++) {
+					dgInt32 index = i * m_auxiliaryRowCount + i;
+					m_massMatrix11[index] = dgMax(m_massMatrix11[index], dgFloat32 (1.0e-3f));
+				}
+
+			}
+			isPsdMatrix = true;
+			for (dgInt32 i = 0; (i < m_auxiliaryRowCount) & isPsdMatrix; i++) {
+				dgInt32 index = i * m_auxiliaryRowCount + i;
+				isPsdMatrix = isPsdMatrix & (m_factoredMassMatrix11[index] > dgFloat32 (1.0e-3f));
+			}
+			if (!isPsdMatrix) {
+				for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
+					dgInt32 index = i * m_auxiliaryRowCount + i;
+					m_massMatrix11[index] *= dgFloat32 (1.01f);
+				}
+			}
+*/
+		} while (!isPsdMatrix);
+
 		for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 			dgFloat32* const row = &m_factoredMassMatrix11[i * m_auxiliaryRowCount];
 			for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
@@ -894,7 +923,6 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 			const dgJacobianMatrixElement* const row = &matrixRow[first + k];
 			dgVector diag(row->m_JMinv.m_jacobianM0.m_linear.CompProduct4(y0.m_linear) + row->m_JMinv.m_jacobianM0.m_angular.CompProduct4(y0.m_angular) +
 						  row->m_JMinv.m_jacobianM1.m_linear.CompProduct4(y1.m_linear) + row->m_JMinv.m_jacobianM1.m_angular.CompProduct4(y1.m_angular));
-			//a.m_joint[j] = - (row->m_coordenateAccel - (diag.AddHorizontal()).GetScalar());
 			a.m_joint[j] = -(row->m_coordenateAccel - row->m_force * row->m_diagDamp - (diag.AddHorizontal()).GetScalar());
 		}
 	}
