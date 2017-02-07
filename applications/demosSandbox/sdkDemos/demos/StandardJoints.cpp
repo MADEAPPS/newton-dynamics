@@ -135,6 +135,7 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
 	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
+	NewtonBodySetMassMatrix(box0, 8.0f, 1.0f, 1.0f, 1.0f);
 
 	// connect first box to the world
 	dMatrix matrix0;
@@ -155,12 +156,20 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 }
 
 
+static void PhysicsApplyGravityForce___(const NewtonBody* body, dFloat timestep, int threadIndex)
+{
+	dVector force(dVector(0.0f, 10.0f, 0.0f));
+	NewtonBodySetForce(body, &force.m_x);
+}
+
 static void AddDistance___(DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size(1.0f, 1.0f, 1.0f);
 	NewtonBody* const box0 = CreateSphere(scene, origin + dVector(0.0f, 6.0f - size.m_y * 0.0f, 0.0f, 0.0f), size);
 	NewtonBody* const box1 = CreateSphere(scene, origin + dVector(0.0f, 6.0f - size.m_y * 1.0f, 0.0f, 0.0f), size);
 	NewtonBody* const box2 = CreateSphere(scene, origin + dVector(0.0f, 6.0  - size.m_y * 2.0f, 0.0f, 0.0f), size);
+
+	NewtonBodySetForceAndTorqueCallback(box0, PhysicsApplyGravityForce___);
 
 	dMatrix pinMatrix(dGrammSchmidt(dVector(0.0f, -1.0f, 0.0f, 0.0f)));
 
