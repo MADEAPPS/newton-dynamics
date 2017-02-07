@@ -135,7 +135,7 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
 	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
-	NewtonBodySetMassMatrix(box0, 8.0f, 1.0f, 1.0f, 1.0f);
+	
 
 	// connect first box to the world
 	dMatrix matrix0;
@@ -170,10 +170,8 @@ static void AddDistance___(DemoEntityManager* const scene, const dVector& origin
 	NewtonBody* const box2 = CreateSphere(scene, origin + dVector(0.0f, 6.0  - size.m_y * 2.0f, 0.0f, 0.0f), size);
 
 	NewtonBodySetForceAndTorqueCallback(box0, PhysicsApplyGravityForce___);
+	NewtonBodySetMassMatrix(box0, 8.0f, 1.0f, 1.0f, 1.0f);
 
-	dMatrix pinMatrix(dGrammSchmidt(dVector(0.0f, -1.0f, 0.0f, 0.0f)));
-
-	// connect first box to the world
 	dMatrix matrix0;
 	dMatrix matrix1;
 	NewtonBodyGetMatrix(box0, &matrix0[0][0]);
@@ -185,8 +183,6 @@ static void AddDistance___(DemoEntityManager* const scene, const dVector& origin
 	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
 	new CustomPointToPoint(matrix2.m_posit, matrix1.m_posit, box2, box1);
 }
-
-
 
 static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVector& origin)
 {
