@@ -156,21 +156,24 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 }
 
 
-static void PhysicsApplyGravityForce___(const NewtonBody* body, dFloat timestep, int threadIndex)
+static void FunnyDistanceJointNullForce(const NewtonBody* body, dFloat timestep, int threadIndex)
 {
-	dVector force(dVector(0.0f, 10.0f, 0.0f));
+	dVector force(dVector(0.0f, 0.0f, 0.0f));
 	NewtonBodySetForce(body, &force.m_x);
 }
 
-static void AddDistance___(DemoEntityManager* const scene, const dVector& origin)
+static void FunnyAddDistance(DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size(1.0f, 1.0f, 1.0f);
 	NewtonBody* const box0 = CreateSphere(scene, origin + dVector(0.0f, 6.0f - size.m_y * 0.0f, 0.0f, 0.0f), size);
 	NewtonBody* const box1 = CreateSphere(scene, origin + dVector(0.0f, 6.0f - size.m_y * 1.0f, 0.0f, 0.0f), size);
 	NewtonBody* const box2 = CreateSphere(scene, origin + dVector(0.0f, 6.0  - size.m_y * 2.0f, 0.0f, 0.0f), size);
+	NewtonBody* const box3 = CreateSphere(scene, origin + dVector(0.0f, 6.0  - size.m_y * 3.0f, 0.0f, 0.0f), size);
 
-	NewtonBodySetForceAndTorqueCallback(box0, PhysicsApplyGravityForce___);
-	NewtonBodySetMassMatrix(box0, 8.0f, 1.0f, 1.0f, 1.0f);
+	NewtonBodySetForceAndTorqueCallback(box0, FunnyDistanceJointNullForce);
+	NewtonBodySetForceAndTorqueCallback(box1, FunnyDistanceJointNullForce);
+	NewtonBodySetForceAndTorqueCallback(box2, FunnyDistanceJointNullForce);
+	NewtonBodySetForceAndTorqueCallback(box3, FunnyDistanceJointNullForce);
 
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -182,6 +185,11 @@ static void AddDistance___(DemoEntityManager* const scene, const dVector& origin
 	NewtonBodyGetMatrix(box1, &matrix1[0][0]);
 	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
 	new CustomPointToPoint(matrix2.m_posit, matrix1.m_posit, box2, box1);
+
+	dMatrix matrix3;
+	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
+	NewtonBodyGetMatrix(box3, &matrix3[0][0]);
+	new CustomPointToPoint(matrix3.m_posit, matrix2.m_posit, box3, box2);
 }
 
 static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVector& origin)
@@ -191,6 +199,7 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	NewtonBody* const box0 = CreateCapule(scene, origin + dVector(0.0f, 5.0f, 0.0f, 0.0f), size);
 	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 5.0 - size.m_y * 2.0f, 0.0f, 0.0f), size);
 	NewtonBody* const box2 = CreateCapule(scene, origin + dVector(0.0f, 5.0 - size.m_y * 4.0f, 0.0f, 0.0f), size);
+
 
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix pinMatrix(dGrammSchmidt(dVector(0.0f, -1.0f, 0.0f, 0.0f)));
@@ -468,12 +477,12 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 
     dVector size (width, height, width);
     NewtonBody* torso = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
-	dMatrix torsoMatrix; NewtonBodyGetMatrix (torso, (dFloat*) &torsoMatrix);
+	dMatrix torsoMatrix; 
+	NewtonBodyGetMatrix (torso, (dFloat*) &torsoMatrix);
 
 	int bodyIndex = 0;
 	NewtonBody* pickBody = 0;
 	for (int j=0; j < numArms; j++)
-//	for (int j=1; j < 2; j++)
 	{
 		dFloat angle = dFloat(j) / dFloat(numArms) * M_PI*2.0f;
 		dMatrix armRotation = dPitchMatrix(angle);
@@ -484,7 +493,6 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 		int numBodies = numSegments;
 		if (randomness > 0.0f) numBodies += int (randF(j) * dFloat(numSegments) + 0.5f);
 		for (int i=0; i < numBodies; i++)
-//		for (int i=0; i < 2; i++)
 		{
 			dFloat height = armHeight;
 			dFloat width = armWidth;
@@ -493,7 +501,8 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 			dVector pos (0.0f,  height * dFloat(i + (numArms>1 ? 2 : 1)), 0.0f, 0.0f);
 			NewtonBody* child = CreateBox (scene, pos, size);
 			
-			dMatrix bodyMatrix; NewtonBodyGetMatrix (child, (dFloat*) &bodyMatrix);
+			dMatrix bodyMatrix; 
+			NewtonBodyGetMatrix (child, (dFloat*) &bodyMatrix);
 			bodyMatrix = bodyMatrix * armTransform;
 			NewtonBodySetMatrix (child, (dFloat*) &bodyMatrix);
 
@@ -1024,21 +1033,17 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
-//	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, -25.0f), 0.0f, 20);
-//	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, 5.0f), 1.5f, 4);
-//	AddJoesPoweredRagDoll(scene, dVector(0.0f, 0.0f, 15.0f), 0.0f, 4);
+	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
+	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
+	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
+	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,   0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
+	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  10.0f), 0.0f, 7, 2, 0.4f, 0.4f, 1.3f);
+	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  20.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
+	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 
-
-	AddDistance___(scene, dVector(-40.0f, 0.0f, 0.0f));
-
-//	AddJoesPoweredRagDoll(scene, dVector( 5.0f, 20.0f, 0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
-//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 20.0f, 0.0f), 0.0f, 7, 2, 0.4f, 0.4f, 1.3f);
-//	AddJoesPoweredRagDoll(scene, dVector(80.0f, 20.0f, 0.0f), 0.0f, 5, 3, 0.4f, 0.4f, 1.0f, 0.5f, 0.5f);
-//	AddJoesPoweredRagDoll(scene, dVector( 5.0f, 20.0f, 0.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
-
-/*
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
+	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -15.0f));
 //	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
@@ -1052,7 +1057,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
-*/
+
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
