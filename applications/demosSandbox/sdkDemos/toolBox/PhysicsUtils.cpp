@@ -23,7 +23,7 @@ static const char* D_MESH_HEADER = "Newton Mesh";
 
 dVector ForceBetweenBody (NewtonBody* const body0, NewtonBody* const body1)
 {
-	dVector reactionforce (0.0f, 0.0f, 0.0f, 0.0f);
+	dVector reactionforce (0.0f);
 	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body0); joint; joint = NewtonBodyGetNextContactJoint(body0, joint)) {
 		if ((NewtonJointGetBody0(joint) == body0) || (NewtonJointGetBody0(joint) == body1)) {
 			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {

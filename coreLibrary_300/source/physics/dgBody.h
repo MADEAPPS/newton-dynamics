@@ -56,7 +56,6 @@ struct dgLineBox
 } DG_GCC_VECTOR_ALIGMENT;
 
 
-//DG_MSC_VECTOR_ALIGMENT
 DG_MSC_VECTOR_ALIGMENT
 class dgBody  
 {
@@ -176,10 +175,6 @@ class dgBody
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const = 0;
 
-	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit);
-	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse);
-	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray);
-	
 	virtual void InvalidateCache();
 	
     virtual void SetMatrix(const dgMatrix& matrix);
@@ -209,6 +204,10 @@ class dgBody
 	dgBroadPhaseAggregate* GetBroadPhaseAggregate() const;
 	void SetBroadPhaseAggregate(dgBroadPhaseAggregate* const aggregate);
 
+	void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit, dgFloat32 timestep);
+	void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse, dgFloat32 timestep);
+	void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray, dgFloat32 timestep);
+
 	protected:
 	void UpdateWorlCollisionMatrix() const;
 	void UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex);
@@ -231,6 +230,8 @@ class dgBody
 	dgVector m_maxAABB;
 	dgVector m_localCentreOfMass;	
 	dgVector m_globalCentreOfMass;	
+	dgVector m_impulseForce;	
+	dgVector m_impulseTorque;	
 
 	dgFloat32 m_maxAngulaRotationPerSet2;
 	dgThread::dgCriticalSection m_criticalSectionLock;

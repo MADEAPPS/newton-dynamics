@@ -5260,10 +5260,15 @@ void NewtonContactJointRemoveContact(const NewtonJoint* const contactJoint, void
 	if ((joint->GetId() == dgConstraint::m_contactConstraint) && joint->GetCount()){
 		dgList<dgContactMaterial>::dgListNode* const node = (dgList<dgContactMaterial>::dgListNode*) contact;
 
-		dgBody* const body = joint->GetBody0() ? joint->GetBody0() : joint->GetBody1();
-		dgWorld* const world = body->GetWorld();
+		dgAssert (joint->GetBody0());
+		dgAssert (joint->GetBody1());
+		//dgBody* const body = joint->GetBody0() ? joint->GetBody0() : joint->GetBody1();
+		//dgWorld* const world = body->GetWorld();
+		dgWorld* const world = joint->GetBody0()->GetWorld();
 		world->GlobalLock(false);
 		joint->Remove(node);
+		joint->GetBody0()->SetSleepState(false);
+		joint->GetBody1()->SetSleepState(false);
 		world->GlobalUnlock();
 	}
 }
@@ -5900,6 +5905,7 @@ void NewtonBodyGetPointVelocity (const NewtonBody* const bodyPtr, const dFloat* 
   @param *bodyPtr is the pointer to the body.
   @param pointDeltaVeloc pointer to an array of at least three floats containing the desired change in velocity to point pointPosit.
   @param  pointPosit	- pointer to an array of at least three floats containing the center of the impulse in global space.
+  @param timestep - the update rate time step.
 
   @return Nothing.
 
@@ -5910,10 +5916,12 @@ void NewtonBodyGetPointVelocity (const NewtonBody* const bodyPtr, const dFloat* 
   *pointDeltaVeloc* represent a change in velocity. For example, a value of *pointDeltaVeloc* of (1, 0, 0) changes the velocity
   of *bodyPtr* in such a way that the velocity of point *pointDeltaVeloc* will increase by (1, 0, 0)
 
+  *the calculate impulse will be applied to the body on next frame update
+
   Because *pointDeltaVeloc* represents a change in velocity, this function must be used with care. Repeated calls
   to this function will result in an increase of the velocity of the body and may cause to integrator to lose stability.
 */
-void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const pointDeltaVeloc, const dFloat* const pointPosit)
+void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const pointDeltaVeloc, const dFloat* const pointPosit, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
@@ -5921,10 +5929,9 @@ void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const p
 	if (body->GetInvMass().m_w > dgFloat32 (0.0f)) {
 		dgVector p (pointPosit[0], pointPosit[1], pointPosit[2], dgFloat32 (0.0f));
 		dgVector v (pointDeltaVeloc[0], pointDeltaVeloc[1], pointDeltaVeloc[2], dgFloat32 (0.0f));
-		body->AddImpulse (v, p);
+		body->AddImpulse (v, p, timestep);
 	}
 }
-
 
 
 /*!
@@ -5933,8 +5940,9 @@ void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const p
   @param *bodyPtr is the pointer to the body.
   @param  impulseCount	- number of impulses and distances in the array distance
   @param  strideInByte	- sized in bytes of vector impulse and
-  @param impulseArray pointer to an array containing the desired impulse to apply ate psoition pointarray.
+  @param impulseArray pointer to an array containing the desired impulse to apply ate position point array.
   @param pointArray pointer to an array of at least three floats containing the center of the impulse in global space.
+  @param timestep - the update rate time step.
 
   @return Nothing.
 
@@ -5942,21 +5950,22 @@ void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const p
 
   *pointPosit* and *pointDeltaVeloc* must be specified in global space.
 
+  *the calculate impulse will be applied to the body on next frame update
 
   this function apply at general impulse to a body a oppose to a desired change on velocity
   this mean that the body mass, and Inertia will determine the gain on velocity.
 */
-void NewtonBodyApplyImpulseArray (const NewtonBody* const bodyPtr, int impulseCount, int strideInByte, const dFloat* const impulseArray, const dFloat* const pointArray)
+void NewtonBodyApplyImpulseArray (const NewtonBody* const bodyPtr, int impulseCount, int strideInByte, const dFloat* const impulseArray, const dFloat* const pointArray, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 
 	if (body->GetInvMass().m_w > dgFloat32 (0.0f)) {
-		body->ApplyImpulsesAtPoint (impulseCount, strideInByte, impulseArray, pointArray);
+		body->ApplyImpulsesAtPoint (impulseCount, strideInByte, impulseArray, pointArray, timestep);
 	}
 }
 
-void NewtonBodyApplyImpulsePair (const NewtonBody* const bodyPtr, dFloat* const linearImpulse, dFloat* const angularImpulse)
+void NewtonBodyApplyImpulsePair (const NewtonBody* const bodyPtr, dFloat* const linearImpulse, dFloat* const angularImpulse, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
@@ -5964,7 +5973,7 @@ void NewtonBodyApplyImpulsePair (const NewtonBody* const bodyPtr, dFloat* const 
 	if (body->GetInvMass().m_w > dgFloat32 (0.0f)) {
 		dgVector l (linearImpulse[0], linearImpulse[1], linearImpulse[2], dgFloat32 (0.0f));
 		dgVector a (angularImpulse[0], angularImpulse[1], angularImpulse[2], dgFloat32 (0.0f));
-		body->ApplyImpulsePair (l, a);
+		body->ApplyImpulsePair (l, a, timestep);
 	}
 }
 

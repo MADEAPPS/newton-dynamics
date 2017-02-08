@@ -208,11 +208,15 @@ bool dgDynamicBody::IsInEquilibrium() const
 
 void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 {
-	m_externalForce = dgVector (dgFloat32 (0.0f));
-	m_externalTorque = dgVector (dgFloat32 (0.0f));
+	m_externalForce = dgVector::m_zero;
+	m_externalTorque = dgVector::m_zero;
 	if (m_applyExtForces) {
 		m_applyExtForces(*this, timestep, threadIndex);
 	}
+	m_externalForce += m_impulseForce;
+	m_externalTorque += m_impulseTorque;
+	m_impulseForce = dgVector::m_zero;
+	m_impulseTorque = dgVector::m_zero;
 }
 
 void dgDynamicBody::InvalidateCache ()

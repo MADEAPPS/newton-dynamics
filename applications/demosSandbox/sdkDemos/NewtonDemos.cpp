@@ -201,9 +201,7 @@ class NewtonDemosApp: public wxApp
 			frame = new NewtonDemos(title, location, wxSize(DEMO_WIDTH, DEMO_HEIGHT));
 	}
 
-	frame->Show(TRUE);
-
-		frame->Show(true);
+	        frame->Show(TRUE);
 		SetTopWindow(frame);
 
 		// initialize opengl graphics
