@@ -1192,61 +1192,24 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 {
 	dMatrix matrix; 
 	dVector com(0.0f); 
-	dVector omega0(0.0f);
-	dVector veloc0(0.0f);
-	dVector omega1(0.0f);
-	dVector veloc1(0.0f);
 	dVector pointVeloc(0.0f);
-
-	const dFloat stiffness = 0.3f;
-	const dFloat angularDamp = 0.95f;
-
-	dFloat invTimeStep = 1.0f / timestep;
-	NewtonWorld* const world = NewtonBodyGetWorld (body);
-	NewtonWorldCriticalSectionLock (world, 0);
+	const dFloat stiffness = 0.33f;
 
 	// calculate the desired impulse
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	NewtonBodyGetOmega (body, &omega0[0]);
-	NewtonBodyGetVelocity (body, &veloc0[0]);
+	NewtonBodyGetCentreOfMass(body, &com[0]);
+	dVector posit(targetPositionInGlobalSpace - matrix.TransformVector(com));
+	dVector impulse(posit.Scale(stiffness));
 
-	NewtonBodyGetPointVelocity (body, &pointOnBodyInGlobalSpace[0], &pointVeloc[0]);
+	// apply linear impulse
+	NewtonBodyApplyImpulseArray(body, 1, sizeof (dVector), &impulse[0], &pointOnBodyInGlobalSpace[0], timestep);
 
-	dVector deltaVeloc (targetPositionInGlobalSpace - pointOnBodyInGlobalSpace);
-	deltaVeloc = deltaVeloc.Scale (stiffness * invTimeStep) - pointVeloc;
-	for (int i = 0; i < 3; i ++) {
-		dVector veloc (0.0f);
-		veloc[i] = deltaVeloc[i];
-		NewtonBodyAddImpulse (body, &veloc[0], &pointOnBodyInGlobalSpace[0]);
-	}
-
-	// damp angular velocity
-	NewtonBodyGetOmega (body, &omega1[0]);
-	NewtonBodyGetVelocity (body, &veloc1[0]);
-	omega1 = omega1.Scale (angularDamp);
-
-	// restore body velocity and angular velocity
-	NewtonBodySetOmega (body, &omega0[0]);
-	NewtonBodySetVelocity(body, &veloc0[0]);
-
-	// convert the delta velocity change to a external force and torque
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
-	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
-
-	dVector angularMomentum (Ixx, Iyy, Izz);
-	angularMomentum = matrix.RotateVector (angularMomentum.CompProduct(matrix.UnrotateVector(omega1 - omega0)));
-
-	dVector force ((veloc1 - veloc0).Scale (mass * invTimeStep));
-	dVector torque (angularMomentum.Scale(invTimeStep));
-
-	NewtonBodyAddForce(body, &force[0]);
-	NewtonBodyAddTorque(body, &torque[0]);
-
-	// make sure the body is unfrozen, if it is picked
-	NewtonBodySetSleepState (body, 0);
-
-	NewtonWorldCriticalSectionUnlock (world);
+	// apply anagular damping
+	dVector linearMomentum(0.0f);
+	dVector angularMomentum;
+	NewtonBodyGetOmega(body, &angularMomentum[0]);
+	NewtonBodyGetInertiaMatrix(body, &matrix[0][0]);
+	angularMomentum = matrix.RotateVector(angularMomentum);
+	angularMomentum = angularMomentum.Scale(-0.1f);
+	NewtonBodyApplyImpulsePair(body, &linearMomentum[0], &angularMomentum[0], timestep);
 }
