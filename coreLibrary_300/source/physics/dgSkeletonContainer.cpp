@@ -660,6 +660,8 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 			}
 		}
 
+
+		dgFloat32* const diagDamp = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 		const dgInt32 auxiliaryStart = m_rowCount - m_auxiliaryRowCount;
 		for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 			const dgJacobianMatrixElement* const row_i = m_rowArray[primaryCount + i];
@@ -672,7 +674,8 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 							 JMinvM1.m_linear.CompProduct4(row_i->m_Jt.m_jacobianM1.m_linear) + JMinvM1.m_angular.CompProduct4(row_i->m_Jt.m_jacobianM1.m_angular));
 			element = element.AddHorizontal();
 			dgFloat32 val = element.GetScalar() + row_i->m_diagDamp;
-			matrixRow11[i] = val;
+			matrixRow11[i] = val + row_i->m_diagDamp;
+			diagDamp[i] = matrixRow11[i] * dgFloat32 (5.0e-3f);
 
 			const dgInt32 m0 = m_pairs[auxiliaryStart + i].m_m0;
 			const dgInt32 m1 = m_pairs[auxiliaryStart + i].m_m1;
@@ -742,9 +745,8 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 				}
 			}
 
-			CalculateForce(forcePair, accelPair);
-
 			entry = 0;
+			CalculateForce(forcePair, accelPair);
 			dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
 			for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
 				const dgGraph* const node = m_nodesOrder[j];
@@ -762,8 +764,7 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 			for (dgInt32 k = 0; k < primaryCount; k++) {
 				acc += deltaForcePtr[k] * matrixRow10[k];
 			}
-			acc = dgMax(acc, dgFloat32 (1.0e-3f));
-			matrixRow11[i] = acc;
+			matrixRow11[i] = dgMax(acc, diagDamp[i]);
 
 			for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
 				dgFloat32 acc = dgFloat32(0.0f);
@@ -780,27 +781,11 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 		do {
 			memcpy (m_factoredMassMatrix11, m_massMatrix11, sizeof (dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
 			isPsdMatrix = dgCholeskyFactorization(m_auxiliaryRowCount, m_factoredMassMatrix11);
-			isPsdMatrix = true;
-/*
-			if (!isPsdMatrix) {
-				for (dgInt32 i = 0; (i < m_auxiliaryRowCount) & isPsdMatrix; i++) {
-					dgInt32 index = i * m_auxiliaryRowCount + i;
-					m_massMatrix11[index] = dgMax(m_massMatrix11[index], dgFloat32 (1.0e-3f));
-				}
-
-			}
-			isPsdMatrix = true;
-			for (dgInt32 i = 0; (i < m_auxiliaryRowCount) & isPsdMatrix; i++) {
-				dgInt32 index = i * m_auxiliaryRowCount + i;
-				isPsdMatrix = isPsdMatrix & (m_factoredMassMatrix11[index] > dgFloat32 (1.0e-3f));
-			}
 			if (!isPsdMatrix) {
 				for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
-					dgInt32 index = i * m_auxiliaryRowCount + i;
-					m_massMatrix11[index] *= dgFloat32 (1.01f);
+					m_massMatrix11[i * m_auxiliaryRowCount + i] += diagDamp[i];
 				}
 			}
-*/
 		} while (!isPsdMatrix);
 
 		for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {

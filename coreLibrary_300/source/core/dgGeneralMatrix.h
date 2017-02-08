@@ -92,13 +92,16 @@ DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, T* const m
 
 		if (n == j) {
 			T diag = rowN[n] - s;
-			if (diag < T(dgFloat32(0.0f))) {
+			if (diag < T(dgFloat32(1.0e-6f))) {
+				return false;
+/*
 				// hack to prevent explosions when round error make the diagonal a small negative value
 				if (diag < T(dgFloat32(-1.0e3f))) {
-					dgAssert(0);
+ 					dgAssert (0);
 					return false;
 				}
 				diag = dgFloat32(1.0e-12f);
+*/
 			}
 
 			rowN[n] = T(sqrt(diag));
@@ -312,9 +315,12 @@ DG_INLINE void dgHouseHolderReduction(const dgInt32 size, T* const matrix, T* co
 */
 
 template <class T>
-void dgEigenValues(const dgInt32 size, T* const matrix, T* const eigenValues)
+void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const eigenValues)
 {
 	T* const offDiag = dgAlloca(T, size);
+	T* const matrix = dgAlloca(T, size * size);
+	memcpy(matrix, choleskyMatrix, sizeof(T) * size * size);
+
 	for (dgInt32 i = size - 1; i > 0; i--) {
 		T h(0.0f);
 		T* const rowI = &matrix[i * size];
