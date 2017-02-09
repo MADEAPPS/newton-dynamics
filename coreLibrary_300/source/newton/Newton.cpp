@@ -4690,12 +4690,16 @@ void NewtonBodyGetInvMass(const NewtonBody* const bodyPtr, dFloat* const invMass
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 
-//	dgVector vector1 (body->GetApparentMass());
-	dgVector vector1 (body->GetMass());
-	invIxx[0] = dgFloat32 (1.0f) / (vector1.m_x + dgFloat32 (1.0e-8f));
-	invIyy[0] = dgFloat32 (1.0f) / (vector1.m_y + dgFloat32 (1.0e-8f)); 
-	invIzz[0] = dgFloat32 (1.0f) / (vector1.m_z + dgFloat32 (1.0e-8f));
-	invMass[0] = dgFloat32 (1.0f) / (vector1.m_w + dgFloat32 (1.0e-8f));
+//	dgVector vector1 (body->GetMass());
+//	invIxx[0] = dgFloat32 (1.0f) / (vector1.m_x + dgFloat32 (1.0e-8f));
+//	invIyy[0] = dgFloat32 (1.0f) / (vector1.m_y + dgFloat32 (1.0e-8f)); 
+//	invIzz[0] = dgFloat32 (1.0f) / (vector1.m_z + dgFloat32 (1.0e-8f));
+//	invMass[0] = dgFloat32 (1.0f) / (vector1.m_w + dgFloat32 (1.0e-8f));
+	dgVector inverseMass (body->GetInvMass());
+	invIxx[0] = inverseMass.m_x;
+	invIyy[0] = inverseMass.m_y; 
+	invIzz[0] = inverseMass.m_z;
+	invMass[0] = inverseMass.m_w;
 }
 
 
