@@ -360,7 +360,8 @@ public:
 		//m_rows[0].Scale(jacobian[0], tmp);
 		dgSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
 		for (dgInt32 i = 1; i < 6; i++) {
-			m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
+			//m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
+			tmp = tmp + m_rows[i].Scale(jacobian[i]);
 		}
 		out = tmp;
 	}
@@ -371,7 +372,8 @@ public:
 		//m_rows[0].Scale(jacobian[0], tmp);
 		dgSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
 		for (dgInt32 i = 1; i < dof; i++) {
-			m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
+			//m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
+			tmp = tmp + m_rows[i].Scale(jacobian[i]);
 		}
 		for (dgInt32 i = 0; i < dof; i++) {
 			out[i] = tmp[i];
@@ -399,8 +401,10 @@ public:
 			for (dgInt32 j = 0; j < rows; j++) {
 				if (j != i) {
 					dgFloat32 pivot = -copy[j][i];
-					dst[i].ScaleAdd(pivot, dst[j], dst[j]);
-					copy[i].ScaleAdd(pivot, copy[j], copy[j]);
+					//dst[i].ScaleAdd(pivot, dst[j], dst[j]);
+					dst[j] = dst[j] + dst[i].Scale(pivot);
+					//copy[i].ScaleAdd(pivot, copy[j], copy[j]);
+					copy[j] = copy[j] + copy[i].Scale(pivot);
 				}
 			}
 		}

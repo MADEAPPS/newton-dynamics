@@ -1973,13 +1973,19 @@ class dgSpatialVector
 	{
 	}
 
-	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
+	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high, int x)
 		:m_l(low)
 		,m_h(dgVector::m_zero)
 	{
 		m_l[3] = high[0];
 		m_h[0] = high[1];
 		m_h[1] = high[2];
+	}
+
+	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
+		:m_l(low)
+		,m_h(high)
+	{
 	}
 
 	DG_INLINE dgFloat32& operator[] (dgInt32 i)
@@ -1996,6 +2002,12 @@ class dgSpatialVector
 		return (&m_l.m_x)[i];
 	}
 
+
+	DG_INLINE dgSpatialVector operator+ (const dgSpatialVector& A) const
+	{
+		return dgSpatialVector(m_l + A.m_l, m_h + A.m_h);
+	}
+
 	DG_INLINE dgFloat32 DotProduct(const dgSpatialVector& v) const
 	{
 		dgAssert (v.m_h[2] == dgFloat32 (0.0f));
@@ -2007,12 +2019,6 @@ class dgSpatialVector
 	DG_INLINE dgSpatialVector Scale(dgFloat32 s) const
 	{
 		return dgSpatialVector(m_l.Scale4(s), m_h.Scale4(s));
-	}
-
-	DG_INLINE void ScaleAdd(dgFloat32 s, const dgSpatialVector& b, dgSpatialVector& dst) const
-	{
-		dst.m_l = b.m_l + m_l.Scale4 (s);
-		dst.m_h = b.m_h + m_h.Scale4 (s);
 	}
 
 	dgVector m_l;
