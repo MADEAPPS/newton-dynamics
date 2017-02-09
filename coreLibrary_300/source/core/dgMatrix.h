@@ -356,8 +356,9 @@ public:
 
 	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out) const
 	{
-		dgSpatialVector tmp;
-		m_rows[0].Scale(jacobian[0], tmp);
+		//dgSpatialVector tmp;
+		//m_rows[0].Scale(jacobian[0], tmp);
+		dgSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
 		for (dgInt32 i = 1; i < 6; i++) {
 			m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
 		}
@@ -366,8 +367,9 @@ public:
 
 	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out, dgInt32 dof) const
 	{
-		dgSpatialVector tmp;
-		m_rows[0].Scale(jacobian[0], tmp);
+		//dgSpatialVector tmp;
+		//m_rows[0].Scale(jacobian[0], tmp);
+		dgSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
 		for (dgInt32 i = 1; i < dof; i++) {
 			m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
 		}
@@ -390,8 +392,8 @@ public:
 			dgAssert(fabs(val) > dgFloat32(1.0e-12f));
 			dgFloat32 den = dgFloat32(1.0f) / val;
 
-			dst[i].Scale(den, dst[i]);
-			copy[i].Scale(den, copy[i]);
+			dst[i] = dst[i].Scale(den);
+			copy[i] = copy[i].Scale(den);
 			copy[i][i] = dgFloat32(1.0f);
 
 			for (dgInt32 j = 0; j < rows; j++) {

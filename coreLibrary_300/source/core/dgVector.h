@@ -1996,15 +1996,6 @@ class dgSpatialVector
 		return (&m_l.m_x)[i];
 	}
 
-/*
-	DG_INLINE void SetZero()
-	{
-		dgVector zero (dgVector::m_zero);
-		m_l = zero;
-		m_h = zero;
-	}
-*/
-
 	DG_INLINE dgFloat32 DotProduct(const dgSpatialVector& v) const
 	{
 		dgAssert (v.m_h[2] == dgFloat32 (0.0f));
@@ -2013,10 +2004,9 @@ class dgSpatialVector
 		return (p.AddHorizontal()).GetScalar(); 
 	}
 
-	DG_INLINE void Scale(dgFloat32 s, dgSpatialVector& dst) const
+	DG_INLINE dgSpatialVector Scale(dgFloat32 s) const
 	{
-		dst.m_l = m_l.Scale4 (s);
-		dst.m_h = m_h.Scale4 (s);
+		return dgSpatialVector(m_l.Scale4(s), m_h.Scale4(s));
 	}
 
 	DG_INLINE void ScaleAdd(dgFloat32 s, const dgSpatialVector& b, dgSpatialVector& dst) const
