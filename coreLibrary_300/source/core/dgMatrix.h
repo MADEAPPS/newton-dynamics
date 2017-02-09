@@ -318,9 +318,9 @@ DG_INLINE dgMatrix dgRollMatrix(dgFloat32 ang)
 	dgFloat32 sinAng = dgSin (ang);
 	dgFloat32 cosAng = dgCos (ang);
 	return dgMatrix (dgVector ( cosAng,          sinAng,          dgFloat32(0.0f), dgFloat32(0.0f)), 
-		dgVector (-sinAng,          cosAng,          dgFloat32(0.0f), dgFloat32(0.0f)),
-		dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)), 
-		dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f))); 
+					 dgVector (-sinAng,          cosAng,          dgFloat32(0.0f), dgFloat32(0.0f)),
+					 dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)), 
+					 dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f))); 
 }																		 
 
 
@@ -328,9 +328,16 @@ DG_INLINE dgMatrix dgRollMatrix(dgFloat32 ang)
 DG_MSC_VECTOR_ALIGMENT
 class dgSpatialMatrix
 {
-public:
+	public:
 	DG_INLINE dgSpatialMatrix()
 	{
+	}
+
+	DG_INLINE dgSpatialMatrix(dgFloat32 val)
+	{
+		for (dgInt32 i = 0; i < 6; i++) {
+			m_rows[i] = dgSpatialVector(val);
+		}
 	}
 
 	DG_INLINE dgSpatialVector& operator[] (dgInt32 i)
@@ -347,20 +354,18 @@ public:
 		return m_rows[i];
 	}
 
+/*
 	DG_INLINE void SetZero()
 	{
 		for (dgInt32 i = 0; i < 6; i++) {
 			m_rows[i] = dgSpatialVector(dgFloat32 (0.0f));
 		}
 	}
-
+*/
 	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out) const
 	{
-		//dgSpatialVector tmp;
-		//m_rows[0].Scale(jacobian[0], tmp);
 		dgSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
 		for (dgInt32 i = 1; i < 6; i++) {
-			//m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
 			tmp = tmp + m_rows[i].Scale(jacobian[i]);
 		}
 		out = tmp;

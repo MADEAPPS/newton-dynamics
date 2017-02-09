@@ -124,7 +124,7 @@ class dgSkeletonContainer::dgGraph
 			}
 			bodyMass.Inverse(bodyInvMass, 6);
 		} else {
-			bodyInvMass.SetZero();
+			bodyInvMass = dgSpatialMatrix (dgFloat32 (0.0f));
 		}
 
 		if (m_joint) {
@@ -188,7 +188,7 @@ class dgSkeletonContainer::dgGraph
 	{
 		dgSpatialMatrix& bodyMass = m_data.m_body.m_mass;
 
-		bodyMass.SetZero();
+		bodyMass = dgSpatialMatrix(dgFloat32(0.0f));
         if (m_body->GetInvMass().m_w != dgFloat32 (0.0f)) {
 			CalculateInertiaMatrix();
 		}
@@ -227,8 +227,7 @@ class dgSkeletonContainer::dgGraph
 	{
 		dgAssert(child->m_joint);
 		
-		dgSpatialMatrix copy;
-		copy.SetZero();
+		dgSpatialMatrix copy (dgSpatialMatrix(dgFloat32(0.0f)));
 		const dgInt32 dof = child->m_dof;
 		const dgSpatialMatrix& jacobianMatrix = child->m_data.m_joint.m_jt;
 		const dgSpatialMatrix& childDiagonal = child->m_data.m_joint.m_mass;
@@ -237,7 +236,6 @@ class dgSkeletonContainer::dgGraph
 			for (dgInt32 j = 0; j < dof ; j++) {
 				dgAssert(dgAreEqual (dgFloat64(childDiagonal[i][j]), dgFloat64(childDiagonal[j][i]), dgFloat64(1.0e-5f)));
 				dgFloat32 val = childDiagonal[i][j];
-				//jacobian.ScaleAdd(val, copy[j], copy[j]);
 				copy[j] = copy[j] + jacobian.Scale(val);
 			}
 		}
@@ -248,7 +246,6 @@ class dgSkeletonContainer::dgGraph
 			const dgSpatialVector& JacobianTranspose = jacobianMatrix[i];
 			for (dgInt32 j = 0; j < 6; j++) {
 				dgFloat32 val = -Jacobian[j];
-				//JacobianTranspose.ScaleAdd(val, bodyMass[j], bodyMass[j]);
 				bodyMass[j] = bodyMass[j] + JacobianTranspose.Scale(val);
 			}
 		}
@@ -295,7 +292,6 @@ class dgSkeletonContainer::dgGraph
 			const dgSpatialVector& invDiagonalRow = jointInvMass[i];
 			for (dgInt32 j = 0; j < m_dof; j++) {
 				dgFloat32 val = invDiagonalRow[j];
-				//jacobian.ScaleAdd(val, jointJ[j], jointJ[j]);
 				jointJ[j] = jointJ[j] + jacobian.Scale(val);
 			}
 		}
@@ -313,7 +309,6 @@ class dgSkeletonContainer::dgGraph
 	{
 		const dgSpatialMatrix& jointJ = m_data.m_joint.m_jt;
 		for (dgInt32 i = 0; i < m_dof; i++) {
-			//jointJ[i].ScaleAdd(-force.m_joint[i], parentForce.m_body, parentForce.m_body);
 			parentForce.m_body = parentForce.m_body + jointJ[i].Scale(-force.m_joint[i]);
 		}
 	}
@@ -331,7 +326,6 @@ class dgSkeletonContainer::dgGraph
 	{
 		const dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
 		for (dgInt32 i = 0; i < m_dof; i++) {
-			//bodyJt[i].ScaleAdd(-force.m_joint[i], force.m_body, force.m_body);
 			force.m_body = force.m_body + bodyJt[i].Scale(-force.m_joint[i]);
 		}
 	}

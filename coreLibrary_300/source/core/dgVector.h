@@ -2002,7 +2002,6 @@ class dgSpatialVector
 		return (&m_l.m_x)[i];
 	}
 
-
 	DG_INLINE dgSpatialVector operator+ (const dgSpatialVector& A) const
 	{
 		return dgSpatialVector(m_l + A.m_l, m_h + A.m_h);
