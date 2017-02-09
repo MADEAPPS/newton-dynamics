@@ -1967,6 +1967,12 @@ class dgSpatialVector
 	{
 	}
 
+	DG_INLINE dgSpatialVector(const dgFloat32 a)
+		:m_l(a)
+		,m_h(a)
+	{
+	}
+
 	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
 		:m_l(low)
 		,m_h(dgVector::m_zero)
@@ -1990,12 +1996,14 @@ class dgSpatialVector
 		return (&m_l.m_x)[i];
 	}
 
+/*
 	DG_INLINE void SetZero()
 	{
 		dgVector zero (dgVector::m_zero);
 		m_l = zero;
 		m_h = zero;
 	}
+*/
 
 	DG_INLINE dgFloat32 DotProduct(const dgSpatialVector& v) const
 	{
@@ -2022,87 +2030,5 @@ class dgSpatialVector
 
 } DG_GCC_VECTOR_ALIGMENT;
 
-
-DG_MSC_VECTOR_ALIGMENT
-class dgSpatialMatrix
-{
-	public:
-	DG_INLINE dgSpatialMatrix()
-	{
-	}
-
-	DG_INLINE dgSpatialVector& operator[] (dgInt32 i)
-	{
-		dgAssert(i < 6);
-		dgAssert(i >= 0);
-		return m_rows[i];
-	}
-
-	DG_INLINE const dgSpatialVector& operator[] (dgInt32 i) const
-	{
-		dgAssert(i < 6);
-		dgAssert(i >= 0);
-		return m_rows[i];
-	}
-
-	DG_INLINE void SetZero()
-	{
-		for (dgInt32 i = 0; i < 6; i++) {
-			m_rows[i].SetZero();
-		}
-	}
-
-	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out) const
-	{
-		dgSpatialVector tmp;
-		m_rows[0].Scale(jacobian[0], tmp);
-		for (dgInt32 i = 1; i < 6; i++) {
-			m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
-		}
-		out = tmp;
-	}
-
-	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out, dgInt32 dof) const
-	{
-		dgSpatialVector tmp;
-		m_rows[0].Scale(jacobian[0], tmp);
-		for (dgInt32 i = 1; i < dof; i++) {
-			m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
-		}
-		for (dgInt32 i = 0; i < dof; i++) {
-			out[i] = tmp[i];
-		}
-	}
-
-	DG_INLINE void Inverse(dgSpatialMatrix& dst, dgInt32 rows) const
-	{
-		dgSpatialMatrix copy;
-		for (dgInt32 i = 0; i < rows; i++) {
-			copy[i] = m_rows[i];
-			dst[i].SetZero();
-			dst[i][i] = dgFloat32(1.0f);
-		}
-
-		for (dgInt32 i = 0; i < rows; i++) {
-			dgFloat32 val = copy.m_rows[i][i];
-			dgAssert(fabs(val) > dgFloat32(1.0e-12f));
-			dgFloat32 den = dgFloat32(1.0f) / val;
-
-			dst[i].Scale(den, dst[i]);
-			copy[i].Scale(den, copy[i]);
-			copy[i][i] = dgFloat32(1.0f);
-
-			for (dgInt32 j = 0; j < rows; j++) {
-				if (j != i) {
-					dgFloat32 pivot = -copy[j][i];
-					dst[i].ScaleAdd(pivot, dst[j], dst[j]);
-					copy[i].ScaleAdd(pivot, copy[j], copy[j]);
-				}
-			}
-		}
-	}
-
-	dgSpatialVector m_rows[6];
-} DG_GCC_VECTOR_ALIGMENT;
 
 #endif
