@@ -57,12 +57,6 @@ bool CustomArticulaledTransformManager::SelfCollisionTest (const CustomArticulat
 	return (controller0 == controller1) ? controller0->SelfCollisionTest (bone0, bone1) : false;
 }
 
-
-//void CustomArticulaledTransformManager::OnControllerDestroy (const NewtonSkeletonContainer* const me)
-//{
-//	dAssert (0);
-//}
-
 CustomArticulatedTransformController::CustomArticulatedTransformController()
 	:m_collisionAggregate(NULL)
 	,m_boneCount(0)
@@ -220,38 +214,3 @@ bool CustomArticulatedTransformController::SelfCollisionTest (const dSkeletonBon
 	return state;
 }
 
-/*
-void CustomArticulatedTransformController::MakeNewtonSkeleton()
-{
-	NewtonBody* bonePool[32];
-	NewtonBody* boneParent[32];
-
-	int stack = 1;
-	bonePool[0] = GetBoneBody(0);
-	boneParent[0] = NULL;
-	NewtonWorld* const world = ((CustomArticulaledTransformManager*)GetManager())->GetWorld();
-
-	NewtonSkeletonContainer* skeleton = NULL;
-	while (stack) {
-		stack--;
-		NewtonBody* const bone = bonePool[stack];
-		NewtonBody* const parent = boneParent[stack];
-
-		if (!skeleton) {
-			skeleton = NewtonSkeletonContainerCreate(world, bone, CustomArticulaledTransformManager::OnControllerDestroy);
-		} else {
-			NewtonSkeletonContainerAttachBone(skeleton, bone, parent);
-		}
-
-		for (int i = 0; i < m_boneCount; i++) {
-			const CustomArticulatedTransformController::dSkeletonBone* const child = GetBone(i);
-			if (child->m_parent && child->m_parent->m_body == bone) {
-				boneParent[stack] = bone;
-				bonePool[stack] = child->m_body;
-				stack++;
-			}
-		}
-	}
-	NewtonSkeletonContainerFinalize(skeleton);
-}
-*/

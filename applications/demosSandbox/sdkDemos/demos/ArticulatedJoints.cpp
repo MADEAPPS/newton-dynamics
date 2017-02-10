@@ -635,7 +635,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		} else if (!strcmp (definition.m_shapeTypeName, "convexHull")) {
 			shape = MakeConvexHull(bodyPart);
 		} else if (!strcmp (definition.m_shapeTypeName, "convexHullAggregate")) {
-			shape = MakeConvexHullAggregate(bodyPart);
+			//shape = MakeConvexHullAggregate(bodyPart);
+			shape = MakeConvexHull(bodyPart);
 		} else {
 			dAssert (0);
 		}
@@ -824,17 +825,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
-
-		dAssert (0);
-/*
-		// wrap the skeleton in a newton skeleton for exact accuracy
-		controller->MakeNewtonSkeleton();
-
-		NewtonSkeletonContainer* const skeleton = NewtonSkeletonGetSkeletonFromBody(rootBody);
-		for (dList<CustomJoint*>::dListNode* ptr = cycleLinks.GetFirst(); ptr; ptr = ptr->GetNext()) {
-			NewtonSkeletonContainerAttachCyclingJoint(skeleton, ptr->GetInfo()->GetJoint());
-		}
-*/
 		return controller;
 	}
 
@@ -1169,7 +1159,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dMatrix aligment (dYawMatrix(90.0f * 3.1416f / 180.0f));
 		NewtonBody* link0 = linkArray[0];
 
-
 		NewtonJoint* hingeArray[1024];
 		for (int i = 1; i < bodyCount; i++) {
 			NewtonBody* const link1 = linkArray[i];
@@ -1191,15 +1180,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		
 		dVector dist (matrix2.m_posit - matrix0.m_posit);
 		matrix1.m_posit += dist;
-dAssert (0);
-/*
-		CustomHinge* const hinge = new ArticulatedEntityModel::TreadLink (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
-		NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (world, link0, NULL);
-		NewtonSkeletonContainerAttachJointArray (skeleton, bodyCount - 1, hingeArray);
-		NewtonSkeletonContainerFinalize (skeleton);
-
-		NewtonSkeletonContainerAttachCyclingJoint(skeleton, hinge->GetJoint());
-*/
+		new ArticulatedEntityModel::TreadLink (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
 	}
 
 	void MakeLeftThread(CustomArticulatedTransformController* const controller)
@@ -1362,7 +1343,6 @@ dAssert (0);
 		AddCraneLift(controller, baseBone);
 	}
 
-
 	CustomArticulatedTransformController* CreateRobot (const dMatrix& location, const DemoEntity* const model, int , ARTICULATED_VEHICLE_DEFINITION* const )
 	{
 		NewtonWorld* const world = GetWorld();
@@ -1432,21 +1412,11 @@ dAssert (0);
 		controller->DisableAllSelfCollision();
 
 		// wrap the skeleton in a newton skeleton for exact accuracy
-
-
 		controller->DisableAllSelfCollision();
 		for (int i = 0; i < controller->GetBoneCount(); i ++) {
 			CustomArticulatedTransformController::dSkeletonBone* const bone = controller->GetBone(i);
 			NewtonCollisionSetUserData (NewtonBodyGetCollision(bone->m_body), bone);
 		}
-dAssert (0);
-/*
-		controller->MakeNewtonSkeleton();
-		NewtonSkeletonContainer* const skeleton = NewtonSkeletonGetSkeletonFromBody (controller->GetBone(0)->m_body);
-		for (dList<CustomJoint*>::dListNode* ptr = cycleLinks.GetFirst(); ptr; ptr = ptr->GetNext()) {
-			NewtonSkeletonContainerAttachCyclingJoint (skeleton, ptr->GetInfo()->GetJoint());
-		}
-*/
 		return controller;
 	}
 };
@@ -1671,13 +1641,13 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
 	CustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
 	inputManager->AddPlayer (robot);
-/*
+
 	matrix.m_posit.m_z += 4.0f;
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
 	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 	inputManager->AddPlayer(forklift);
-*/
+
 
 	// add some object to play with
 	DemoEntity entity (dGetIdentityMatrix(), NULL);

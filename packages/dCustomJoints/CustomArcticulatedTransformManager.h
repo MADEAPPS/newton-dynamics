@@ -140,8 +140,6 @@ class CustomArticulaledTransformManager: public CustomControllerManager<CustomAr
 	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 
 	private: 
-	//static void OnControllerDestroy (const NewtonSkeletonContainer* const me);
-
 	friend class CustomArticulatedTransformController;
 };
 

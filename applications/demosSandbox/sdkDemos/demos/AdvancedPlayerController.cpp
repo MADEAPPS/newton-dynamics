@@ -997,9 +997,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 	int jointCount = 0; 
 	NewtonJoint* jointArray[256];
 	// for more accuracy, wrap the bridge in a Newton skeleton 
-	dAssert (0);
-/*
-	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), body0, NULL);
+
 	for (iter ++; iter; iter ++) {
 		NewtonBody* const body1 = iter.GetNode()->GetInfo();
 		
@@ -1033,13 +1031,6 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		body0 = body1;
 		matrix0 = matrix1;
 	}
-
-	// add all the joint to the Newton Skeleton 
-	NewtonSkeletonContainerAttachJointArray (skeleton, jointCount, jointArray);
-
-	// complete the skeleton construction
-	NewtonSkeletonContainerFinalize(skeleton);
-*/
 
 	// connect the last and first plank to the bridge base
 	{
