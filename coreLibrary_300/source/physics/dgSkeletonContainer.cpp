@@ -131,7 +131,6 @@ class dgSkeletonContainer::dgGraph
 			dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
 			dgAssert(m_parent);
 			for (dgInt32 i = 0; i < m_dof; i++) {
-				//bodyInvMass.MultiplyNxNMatrixTimeVector(bodyJt[i], bodyJt[i]);
 				bodyJt[i] = bodyInvMass.VectorTimeMatrix(bodyJt[i]);
 			}
 			CalculateJointDiagonal();
@@ -259,7 +258,6 @@ class dgSkeletonContainer::dgGraph
 
 		dgSpatialMatrix tmp;
 		for (dgInt32 i = 0; i < m_dof; i++) {
-			//bodyMass.MultiplyNxNMatrixTimeVector(bodyJt[i], tmp[i]);
 			tmp[i] = bodyMass.VectorTimeMatrix(bodyJt[i]);
 		}
 
