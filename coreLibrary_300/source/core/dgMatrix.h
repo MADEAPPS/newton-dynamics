@@ -371,35 +371,6 @@ class dgSpatialMatrix
 		}
 		return tmp;
 	}
-/*
-	DG_INLINE void Inverse(dgSpatialMatrix& dst, dgInt32 rows) const
-	{
-		dgSpatialMatrix copy;
-		for (dgInt32 i = 0; i < rows; i++) {
-			copy[i] = m_rows[i];
-			dst[i] = dgSpatialVector(dgFloat32(0.0f));
-			dst[i][i] = dgFloat32(1.0f);
-		}
-
-		for (dgInt32 i = 0; i < rows; i++) {
-			dgFloat32 val = copy.m_rows[i][i];
-			dgAssert(fabs(val) > dgFloat32(1.0e-12f));
-			dgFloat32 den = dgFloat32(1.0f) / val;
-
-			dst[i] = dst[i].Scale(den);
-			copy[i] = copy[i].Scale(den);
-			copy[i][i] = dgFloat32(1.0f);
-
-			for (dgInt32 j = 0; j < rows; j++) {
-				if (j != i) {
-					dgFloat32 pivot = -copy[j][i];
-					dst[j] = dst[j] + dst[i].Scale(pivot);
-					copy[j] = copy[j] + copy[i].Scale(pivot);
-				}
-			}
-		}
-	}
-*/
 
 	DG_INLINE dgSpatialMatrix Inverse(dgInt32 rows) const
 	{
@@ -410,22 +381,22 @@ class dgSpatialMatrix
 		}
 
 		for (dgInt32 i = 0; i < rows; i++) {
-			dgFloat32 val = copy[i][i];
+			dgFloat64 val = copy[i][i];
 			dgAssert(fabs(val) > dgFloat32(1.0e-12f));
-			dgFloat32 den = dgFloat32(1.0f) / val;
+			dgFloat64 den = dgFloat32(1.0f) / val;
 
 			copy[i] = copy[i].Scale(den);
 			copy[i][i] = dgFloat32(1.0f);
 			inverse[i] = inverse[i].Scale(den);
 
 			for (dgInt32 j = 0; j < i; j++) {
-				dgFloat32 pivot = -copy[j][i];
+				dgFloat64 pivot = -copy[j][i];
 				copy[j] = copy[j] + copy[i].Scale(pivot);
 				inverse[j] = inverse[j] + inverse[i].Scale(pivot);
 			}
 
 			for (dgInt32 j = i + 1; j < rows; j++) {
-				dgFloat32 pivot = -copy[j][i];
+				dgFloat64 pivot = -copy[j][i];
 				copy[j] = copy[j] + copy[i].Scale(pivot);
 				inverse[j] = inverse[j] + inverse[i].Scale(pivot);
 			}

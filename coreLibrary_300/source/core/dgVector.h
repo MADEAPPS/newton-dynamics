@@ -1953,7 +1953,7 @@ class dgSpatialVector
 */
 
 
-
+/*
 // *****************************************************************************************
 //
 // 6 x 1 vector class declaration
@@ -2024,6 +2024,83 @@ class dgSpatialVector
 	dgVector m_h;
 
 } DG_GCC_VECTOR_ALIGMENT;
+*/
 
+
+
+DG_MSC_VECTOR_ALIGMENT
+class dgSpatialVector
+{
+	public:
+	DG_INLINE dgSpatialVector()
+	{
+	}
+
+	DG_INLINE dgSpatialVector(const dgFloat32 a)
+		:m_d0(_mm_set1_pd(a))
+		,m_d1(_mm_set1_pd(a))
+		,m_d2(_mm_set1_pd(a))
+	{
+	}
+
+	DG_INLINE dgSpatialVector(const dgVector& low, const dgVector& high)
+		:m_d0(_mm_cvtps_pd(low.m_type))
+		,m_d1(_mm_cvtps_pd(_mm_unpackhi_ps(low.m_type, _mm_shuffle_ps(low.m_type, high.m_type, PURMUT_MASK(0, 0, 0, 2)))))
+		,m_d2(_mm_cvtps_pd(_mm_shuffle_ps(high.m_type, high.m_type, PURMUT_MASK(3, 3, 2, 1))))
+	{
+	}
+
+	DG_INLINE dgSpatialVector(const __m128d d0, const __m128d d1, const __m128d d2)
+		:m_d0(d0)
+		,m_d1(d1)
+		,m_d2(d2)
+	{
+	}
+
+	DG_INLINE dgFloat64& operator[] (dgInt32 i)
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return ((dgFloat64*)&m_d0)[i];
+	}
+
+	DG_INLINE const dgFloat64& operator[] (dgInt32 i) const
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return ((dgFloat64*)&m_d0)[i];
+	}
+
+	DG_INLINE dgSpatialVector operator+ (const dgSpatialVector& A) const
+	{
+		return dgSpatialVector(_mm_add_pd(m_d0, A.m_d0), _mm_add_pd(m_d1, A.m_d1), _mm_add_pd(m_d2, A.m_d2));
+	}
+
+	DG_INLINE dgSpatialVector CompProduct(const dgSpatialVector& A) const
+	{
+		return dgSpatialVector(_mm_mul_pd(m_d0, A.m_d0), _mm_mul_pd(m_d1, A.m_d1), _mm_mul_pd(m_d2, A.m_d2));
+	}
+
+	DG_INLINE dgFloat64 DotProduct(const dgSpatialVector& v) const
+	{
+		dgFloat64 ret;
+		dgSpatialVector tmp(v.CompProduct(*this));
+		__m128d tmp2(_mm_add_pd(tmp.m_d0, _mm_add_pd(tmp.m_d1, tmp.m_d2)));
+		__m128d dot(_mm_hadd_pd(tmp2, tmp2));
+		_mm_store_sd(&ret, dot);
+		return ret;
+
+	}
+
+	DG_INLINE dgSpatialVector Scale(dgFloat64 s) const
+	{
+		__m128d tmp(_mm_set1_pd(s));
+		return dgSpatialVector(_mm_mul_pd(m_d0, tmp), _mm_mul_pd(m_d1, tmp), _mm_mul_pd(m_d2, tmp));
+	}
+
+	__m128d m_d0;
+	__m128d m_d1;
+	__m128d m_d2;
+} DG_GCC_VECTOR_ALIGMENT;
 
 #endif
