@@ -371,7 +371,7 @@ class dgSpatialMatrix
 		}
 		return tmp;
 	}
-
+/*
 	DG_INLINE void Inverse(dgSpatialMatrix& dst, dgInt32 rows) const
 	{
 		dgSpatialMatrix copy;
@@ -398,6 +398,39 @@ class dgSpatialMatrix
 				}
 			}
 		}
+	}
+*/
+
+	DG_INLINE dgSpatialMatrix Inverse(dgInt32 rows) const
+	{
+		dgSpatialMatrix copy(*this);
+		dgSpatialMatrix inverse(dgFloat64(0.0f));
+		for (dgInt32 i = 0; i < rows; i++) {
+			inverse[i][i] = dgFloat32(1.0f);
+		}
+
+		for (dgInt32 i = 0; i < rows; i++) {
+			dgFloat32 val = copy[i][i];
+			dgAssert(fabs(val) > dgFloat32(1.0e-12f));
+			dgFloat32 den = dgFloat32(1.0f) / val;
+
+			copy[i] = copy[i].Scale(den);
+			copy[i][i] = dgFloat32(1.0f);
+			inverse[i] = inverse[i].Scale(den);
+
+			for (dgInt32 j = 0; j < i; j++) {
+				dgFloat32 pivot = -copy[j][i];
+				copy[j] = copy[j] + copy[i].Scale(pivot);
+				inverse[j] = inverse[j] + inverse[i].Scale(pivot);
+			}
+
+			for (dgInt32 j = i + 1; j < rows; j++) {
+				dgFloat32 pivot = -copy[j][i];
+				copy[j] = copy[j] + copy[i].Scale(pivot);
+				inverse[j] = inverse[j] + inverse[i].Scale(pivot);
+			}
+		}
+		return inverse;
 	}
 
 	dgSpatialVector m_rows[6];

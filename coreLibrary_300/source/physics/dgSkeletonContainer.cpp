@@ -122,7 +122,7 @@ class dgSkeletonContainer::dgGraph
 			for (dgGraph* child = m_child; child; child = child->m_sibling) {
 				CalculateBodyDiagonal(child);
 			}
-			bodyMass.Inverse(bodyInvMass, 6);
+			bodyInvMass = bodyMass.Inverse(6);
 		} else {
 			bodyInvMass = dgSpatialMatrix (dgFloat32 (0.0f));
 		}
@@ -275,7 +275,7 @@ class dgSkeletonContainer::dgGraph
 		}
 
 		dgSpatialMatrix& jointInvMass = m_data.m_joint.m_invMass;
-		jointMass.Inverse(jointInvMass, m_dof);
+		jointInvMass = jointMass.Inverse(m_dof);
 	}
 
 	DG_INLINE void CalculateJacobianBlock()
