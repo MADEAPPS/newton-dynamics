@@ -354,35 +354,22 @@ class dgSpatialMatrix
 		return m_rows[i];
 	}
 
-/*
-	DG_INLINE void SetZero()
-	{
-		for (dgInt32 i = 0; i < 6; i++) {
-			m_rows[i] = dgSpatialVector(dgFloat32 (0.0f));
-		}
-	}
-*/
-	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out) const
+	DG_INLINE dgSpatialVector VectorTimeMatrix(const dgSpatialVector& jacobian) const
 	{
 		dgSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
 		for (dgInt32 i = 1; i < 6; i++) {
 			tmp = tmp + m_rows[i].Scale(jacobian[i]);
 		}
-		out = tmp;
+		return tmp;
 	}
 
-	DG_INLINE void MultiplyNxNMatrixTimeVector(const dgSpatialVector& jacobian, dgSpatialVector& out, dgInt32 dof) const
+	DG_INLINE dgSpatialVector VectorTimeMatrix(const dgSpatialVector& jacobian, dgInt32 dof) const
 	{
-		//dgSpatialVector tmp;
-		//m_rows[0].Scale(jacobian[0], tmp);
-		dgSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
-		for (dgInt32 i = 1; i < dof; i++) {
-			//m_rows[i].ScaleAdd(jacobian[i], tmp, tmp);
+		dgSpatialVector tmp(dgFloat32 (0.0f));
+		for (dgInt32 i = 0; i < dof; i++) {
 			tmp = tmp + m_rows[i].Scale(jacobian[i]);
 		}
-		for (dgInt32 i = 0; i < dof; i++) {
-			out[i] = tmp[i];
-		}
+		return tmp;
 	}
 
 	DG_INLINE void Inverse(dgSpatialMatrix& dst, dgInt32 rows) const
@@ -406,9 +393,7 @@ class dgSpatialMatrix
 			for (dgInt32 j = 0; j < rows; j++) {
 				if (j != i) {
 					dgFloat32 pivot = -copy[j][i];
-					//dst[i].ScaleAdd(pivot, dst[j], dst[j]);
 					dst[j] = dst[j] + dst[i].Scale(pivot);
-					//copy[i].ScaleAdd(pivot, copy[j], copy[j]);
 					copy[j] = copy[j] + copy[i].Scale(pivot);
 				}
 			}

@@ -131,7 +131,8 @@ class dgSkeletonContainer::dgGraph
 			dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
 			dgAssert(m_parent);
 			for (dgInt32 i = 0; i < m_dof; i++) {
-				bodyInvMass.MultiplyNxNMatrixTimeVector(bodyJt[i], bodyJt[i]);
+				//bodyInvMass.MultiplyNxNMatrixTimeVector(bodyJt[i], bodyJt[i]);
+				bodyJt[i] = bodyInvMass.VectorTimeMatrix(bodyJt[i]);
 			}
 			CalculateJointDiagonal();
 			CalculateJacobianBlock();
@@ -258,7 +259,8 @@ class dgSkeletonContainer::dgGraph
 
 		dgSpatialMatrix tmp;
 		for (dgInt32 i = 0; i < m_dof; i++) {
-			bodyMass.MultiplyNxNMatrixTimeVector(bodyJt[i], tmp[i]);
+			//bodyMass.MultiplyNxNMatrixTimeVector(bodyJt[i], tmp[i]);
+			tmp[i] = bodyMass.VectorTimeMatrix(bodyJt[i]);
 		}
 
 		dgSpatialMatrix& jointMass = m_data.m_joint.m_mass;
@@ -333,13 +335,13 @@ class dgSkeletonContainer::dgGraph
 	DG_INLINE void BodyDiagInvTimeSolution(dgForcePair& force)
 	{
 		const dgSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
-		bodyInvMass.MultiplyNxNMatrixTimeVector(force.m_body, force.m_body);
+		force.m_body = bodyInvMass.VectorTimeMatrix(force.m_body);
 	}
 
 	DG_INLINE void JointDiagInvTimeSolution(dgForcePair& force)
 	{
 		const dgSpatialMatrix& jointInvMass = m_data.m_joint.m_invMass;
-		jointInvMass.MultiplyNxNMatrixTimeVector (force.m_joint, force.m_joint, m_dof);
+		force.m_joint = jointInvMass.VectorTimeMatrix(force.m_joint, m_dof);
 	}
 
 	DG_INLINE dgInt32 GetAuxiliaryRows(const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const
