@@ -320,34 +320,73 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 }
 
 
-class JoesRagdollJoint: public CustomBallAndSocket
+class JoesRagdollJoint
 {
 	public:
+	NewtonBody *m_body0;
+	NewtonBody *m_body1;
+	dMatrix m_localMatrix0;
+	dMatrix m_localMatrix1;
+	NewtonJoint* m_joint;
 	dQuaternion m_target; // relative target rotation to reach at next timestep
 
 	dFloat m_reduceError;
 	dFloat m_pin_length;
 	dFloat m_angularFriction;
-	dFloat m_stiffness;
+	dFloat m_angularStiffness;
+	dFloat m_linearFriction;
+	dFloat m_linearStiffness;
 
 	dFloat m_anim_speed;
 	dFloat m_anim_offset;
 	dFloat m_anim_time;
+	bool m_useMotor; // otherwise just ball and socket
 	
 	JoesRagdollJoint(NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world)
-		:CustomBallAndSocket(localMatrix0, localMatrix1, child, parent)
 	{
+		m_body0 = child;
+		m_body1 = parent;
 		m_localMatrix0 = localMatrix0;
 		m_localMatrix1 = localMatrix1;
 
 		m_target = dQuaternion(dVector(1.0f, 0, 0), 0.0f);
-		m_reduceError = 0.95f; // amount of error to reduce per timestep (more -> oszillation)
-		m_stiffness = 0.98f;
-		m_angularFriction = 300.0f;
+		m_reduceError = 0.3f; // amount of error to reduce per timestep
+
+		m_linearStiffness = 0.7f;
+		m_linearFriction = -1.0f; // 3000.0f;//
+
+		m_angularStiffness = 0.5f;
+		m_angularFriction = 1000.0f;
 
 		m_anim_speed = 0.0f;
 		m_anim_offset = 0.0f;
 		m_anim_time = 0.0f;
+		
+		m_useMotor = true;
+
+		m_joint = NULL;
+		m_joint = NewtonConstraintCreateUserJoint (world, 6, Callback, NULL, m_body0, m_body1); 
+
+		NewtonJointSetUserData (m_joint, this);
+		NewtonJointSetDestructor (m_joint, NULL);
+	}
+
+	void CalculateGlobalMatrix (dMatrix &matrix0, dMatrix &matrix1)
+	{
+		dMatrix body0Matrix; NewtonBodyGetMatrix (m_body0, &body0Matrix[0][0]);
+		dMatrix body1Matrix (dGetIdentityMatrix());
+		if (m_body1) NewtonBodyGetMatrix (m_body1, &body1Matrix[0][0]);
+		matrix0 = m_localMatrix0 * body0Matrix;
+		matrix1 = m_localMatrix1 * body1Matrix;
+	}
+
+	void TargetFromCurrentState ()
+	{
+		dMatrix matrix0, matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+		dQuaternion q0(matrix0);
+		dQuaternion q1(matrix1);
+		m_target = q0 * q1.Inverse();
 	}
 
 	dVector BodyGetPointVelocity(const NewtonBody* const body, const dVector &point)
@@ -363,13 +402,16 @@ class JoesRagdollJoint: public CustomBallAndSocket
 		return v + w.CrossProduct(point - c);
 	}
 
+	static void Callback (const NewtonJoint* const userJoint, dFloat timestep, int threadIndex)
+	{
+		((JoesRagdollJoint*)(NewtonJointGetUserData(userJoint)))->SubmitConstraints (timestep, threadIndex);
+	}
+
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dFloat invTimestep = 1.0f / timestep;
 
-		dMatrix matrix0;
-		dMatrix matrix1;
-
+		dMatrix matrix0, matrix1;
 		CalculateGlobalMatrix(matrix0, matrix1);
 
 		if (m_anim_speed != 0.0f) // some animation to illustrate purpose
@@ -410,50 +452,28 @@ class JoesRagdollJoint: public CustomBallAndSocket
 
 		dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);
 
-		CustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
-		// motors
 		for (int n = 0; n < 3; n++) {
+			NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0[n][0]);
+			if (m_linearFriction >= 0) NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
+			if (m_linearFriction >= 0) NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
+			NewtonUserJointSetRowStiffness(m_joint, m_linearStiffness);
+		}
+
+		// motors
+		if (m_useMotor) for (int n = 0; n < 3; n++) {
 			// calculate the desired acceleration
 			dVector &axis = basis[n];
 			dFloat relAccel = angAcc.DotProduct3(axis);
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			if (m_angularFriction >= 0) NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			if (m_angularFriction >= 0) NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+			NewtonUserJointSetRowStiffness(m_joint, m_angularStiffness);
 		}
 	}
 };
 
-/*
-void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments)
-{
-    dFloat height = 1.0f;
-    dFloat width = 4.0f;
-
-    dVector size (width, height, width);
-    NewtonBody* parent = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
-
-    for (int i=0; i < numSegments; i++)
-    {
-        dFloat height = 1.0f;
-        dFloat width = 0.5f;
-
-        dVector size (width, height, width);
-        NewtonBody* child = CreateBox (scene, origin + dVector (0.0f,  0.5f + height * dFloat(i+1), 0.0f, 0.0f), size);
-
-        dMatrix matrix0 = dGetIdentityMatrix(); matrix0.m_posit = dVector (0.0f, height*-0.5f, 0.0f, 1.0f);
-        dMatrix matrix1 = dGetIdentityMatrix(); matrix1.m_posit = dVector (0.0f, height*0.5f, 0.0f, 1.0f);
-        JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
-
-		if (animSpeed != 0.0f) {
-			joint->m_anim_speed = animSpeed, joint->m_anim_offset = dFloat(i) / dFloat(numSegments); // animated      
-		}
-
-        parent = child;
-    }
-}*/
 
 inline float randF (unsigned int time)
 {
@@ -463,14 +483,15 @@ inline float randF (unsigned int time)
 	return float(time) / float(0xFFFFFFFFu);
 }
 
-void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments,
+NewtonBody* AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments,
 	const int numArms = 1,
 	const dFloat torsoHeight = 1.0f, 
 	const dFloat torsoWidth = 4.0f, 
 	const dFloat randomness = 0.0f, 
 	const dFloat armHeight = 1.0f, 
 	const dFloat armWidth = 0.5f,
-	const int pickMe = -1)
+	const int pickMe = -1,
+	const int returnMe = 2)
 {
     dFloat height = torsoHeight;
     dFloat width = torsoWidth;
@@ -482,6 +503,8 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 
 	int bodyIndex = 0;
 	NewtonBody* pickBody = 0;
+	NewtonBody* returnBody = torso;
+
 	for (int j=0; j < numArms; j++)
 	{
 		dFloat angle = dFloat(j) / dFloat(numArms) * M_PI*2.0f;
@@ -530,6 +553,9 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 			if (bodyIndex == pickMe) {
 				pickBody = child;
 			}
+			if (bodyIndex == returnMe) {
+				returnBody = child;
+			}
 			bodyIndex++;
 		}
 	}
@@ -540,8 +566,262 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 		NewtonBodyGetMatrix(pickBody, &matrix[0][0]);
 		new CustomBallAndSocket(matrix, pickBody);
 	}
+
+	return returnBody;
 }
 
+void AddJoesStressTest (
+	DemoEntityManager* const scene, 
+	//int latTess = 3, int longTess = 3, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = false, // ok
+	//int latTess = 3, int longTess = 3, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = true, // ok
+	int latTess = 4, int longTess = 4, int numRandomInteriorBodies = 0, bool makePoles = false, bool useMotors = true, // ok
+	//int latTess = 4, int longTess = 3, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = false, // ok
+
+	//int latTess = 8, int longTess = 4, int numRandomInteriorBodies = 0, bool makePoles = false, bool useMotors = true, // ok (jitters badly)
+	//int latTess = 4, int longTess = 5, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = true, // ok (jitters a bit)
+	//int latTess = 4, int longTess = 5, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = false, // ok (no jitter with motors off :)
+
+	//int latTess = 12, int longTess = 8, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = false, // explodes if you drag around
+	//int latTess = 12, int longTess = 8, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = true, // stack overflow in dgWorldDynamicUpdate::ResolveClusterForces
+	//int latTess = 8, int longTess = 6, int numRandomInteriorBodies = 4, bool makePoles = true, bool useMotors = true, // interior bodies make it very slow
+	//int latTess = 6, int longTess = 4, int numRandomInteriorBodies = 4, bool makePoles = true, bool useMotors = false, // no help from motors towards correct solution, so very bad
+
+	bool randomOrder = true,
+	const dVector origin = dVector(10.0f, 16.0f, 10.0f, 1.0f), const float radius = 5.0f,
+	const int internalJointMode = 2)
+{
+	int const MAX_VERTS = 256;
+	int const MAX_EDGES = 512;
+	int const MAX_DEGREE = 16;
+
+	latTess = max(3, min(MAX_DEGREE, latTess));
+	longTess = max(3, min(MAX_DEGREE, longTess));
+	numRandomInteriorBodies = min(40, numRandomInteriorBodies);
+
+	struct Vertex
+	{
+		dVector pos;
+		int edges[MAX_DEGREE];
+		int degree;
+	} vertices[MAX_VERTS];
+	int numVertices = 0;
+
+	struct Edge
+	{
+		int vertices[2];
+		int makeBodyFlags;
+		NewtonBody *body;
+	} edges[MAX_EDGES];
+	int numEdges = 0;
+
+	// make rings
+
+	for (int lng = 1; lng < longTess-1; lng++) for (int lat = 0; lat < latTess; lat++) 
+	{
+		float latAngle = float(lat) / float(latTess) * M_PI * 2.0f;
+		float longAngle = (float(lng)) / float(longTess-1) * M_PI * 1.0f;
+
+		dVector norm(
+			sin(longAngle) * cos(latAngle),
+			sin(longAngle) * sin(latAngle),
+			cos(longAngle), 0);
+
+		Vertex &v = vertices[numVertices];
+		v.pos = origin + norm.Scale(radius);
+		v.degree = 2;
+		v.edges[0] = (lat==0 ? numEdges+latTess-1 : numEdges-1);
+		v.edges[1] = numEdges;
+
+		edges[v.edges[0]].makeBodyFlags = 1;
+		edges[v.edges[0]].vertices[1] = numVertices;
+		edges[v.edges[1]].vertices[0] = numVertices;
+
+		numVertices++;
+		numEdges++;
+	}
+
+	// add longitude edges
+
+	for (int lng = 0; lng < longTess-3; lng++) for (int lat = 0; lat < latTess; lat++) 
+	{
+		int vertexIndex0 = lat + lng * latTess;
+		int vertexIndex1 = vertexIndex0 + latTess;
+		Vertex &v0 = vertices[vertexIndex0];
+		Vertex &v1 = vertices[vertexIndex1];
+		v0.edges[v0.degree++] = numEdges;
+		v1.edges[v1.degree++] = numEdges;
+
+		edges[numEdges].makeBodyFlags = 2;
+		edges[numEdges].vertices[1] = vertexIndex0;
+		edges[numEdges].vertices[0] = vertexIndex1;
+		numEdges++;
+	}
+
+	// add poles
+
+	if (makePoles) for (int i=-1; i<=1; i+=2)
+	{
+		dVector norm(0, 0, float(i), 0);
+
+		Vertex &v = vertices[numVertices];
+		v.pos = origin + norm.Scale(radius);
+		v.degree = latTess;
+
+		for (int j=0; j<v.degree; j++)
+		{
+			v.edges[j] = numEdges;
+
+			edges[numEdges].makeBodyFlags = 4;
+			edges[numEdges].vertices[1] = numVertices;
+			edges[numEdges].vertices[0] = (i>0 ? j : latTess*(longTess-3)+j);
+		
+			Vertex &other = vertices[edges[numEdges].vertices[0]];
+			other.edges[other.degree++] = numEdges;
+			
+			numEdges++;
+		}
+
+		numVertices++;
+	}
+
+	// add interior random edges
+
+	for (int i=0; i<numRandomInteriorBodies; i++)
+	{
+		int vertexIndex0 = 0, vertexIndex1 = 0;
+
+		for (int j=0; j<100; j++)
+		{
+			int v0 = int (randF(i+j*1568) * float(numVertices-1) + 0.5f);
+			int v1 = int (randF(i+100+j*817) * float(numVertices-1) + 0.5f);
+			if ((v0 != v1) && (vertices[v0].degree < MAX_DEGREE) && (vertices[v1].degree < MAX_DEGREE))
+			{
+				bool exists = false;
+
+				for (int k=0; k<numEdges; k++)
+				{
+					if ((edges[k].vertices[1]==v0 && edges[k].vertices[0]==v1) ||
+						(edges[k].vertices[0]==v0 && edges[k].vertices[1]==v1))
+					{
+						exists = true;
+						break;
+					}
+				}
+
+				if (!exists)
+				{
+					dVector d = vertices[v0].pos - vertices[v1].pos;
+					float dist = dSqrt ((d).DotProduct3(d));
+					if (dist > radius * 1.33f)
+					{
+						vertexIndex0 = v0;
+						vertexIndex1 = v1;
+						break;
+					}
+				}
+			}
+		}
+
+		if (vertexIndex0 != vertexIndex1)
+		{
+			edges[numEdges].makeBodyFlags = 8;
+			edges[numEdges].vertices[0] = vertexIndex0;
+			edges[numEdges].vertices[1] = vertexIndex1;
+
+			Vertex &v0 = vertices[vertexIndex0];
+			Vertex &v1 = vertices[vertexIndex1];
+			v0.edges[v0.degree++] = numEdges;
+			v1.edges[v1.degree++] = numEdges;
+
+			numEdges++;
+		}
+	}
+
+	// create bodies
+
+	for (int i=0; i<numEdges; i++)
+	{
+		Edge &e = edges[i];
+		if (e.makeBodyFlags)
+		{
+			Vertex &v0 = vertices[e.vertices[0]];
+			Vertex &v1 = vertices[e.vertices[1]];
+			dVector d = v0.pos - v1.pos;
+
+			dMatrix matrix (dGrammSchmidt (d));
+			matrix.m_posit = (v0.pos + v1.pos).Scale(0.5f);
+			
+			NewtonBody* body;
+			{
+				float h = dSqrt ((d).DotProduct3(d));
+				float r = 2.0f / float(latTess) * M_PI;//h * 0.25f;
+				const dVector size (r, h, r, 0);
+
+				dMatrix aligment (dRollMatrix(0));
+				NewtonWorld* const world = scene->GetNewton();
+				int materialID =  NewtonMaterialGetDefaultGroupID (world);
+				NewtonCollision* const collision = CreateConvexCollision (world, &aligment[0][0], size, _CAPSULE_PRIMITIVE, 0);
+				DemoMesh* const geometry = new DemoMesh("primitive", collision, 0,0,0);
+
+				dFloat mass = 1.0f;
+				matrix.m_posit.m_w = 1.0f;
+				body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
+
+				geometry->Release();
+				NewtonDestroyCollision(collision);
+			}
+			e.body = body;
+		}
+		else e.body = NULL;
+	}
+
+	// create joints
+
+	for (int i=0; i<numVertices; i++)
+	{
+		Vertex &v = vertices[i];
+		for (int j=0; j<v.degree; j++)
+		{
+			Edge &e0 = edges[v.edges[j]];
+			if (e0.body == NULL) continue;
+
+			for (int k=j+1; k<v.degree; k++)
+			{
+				Edge &e1 = edges[v.edges[k]];
+				if (e1.body == NULL) continue;
+				assert (e0.body != e1.body);
+
+				dMatrix worldBody0; NewtonBodyGetMatrix (e0.body, (dFloat*) &worldBody0);
+				dMatrix worldBody1; NewtonBodyGetMatrix (e1.body, (dFloat*) &worldBody1);
+				dMatrix localMatrix0 (dGetIdentityMatrix());
+				dMatrix localMatrix1 (dGetIdentityMatrix());
+				localMatrix0.m_posit = worldBody0.UnrotateVector (v.pos - worldBody0.m_posit);
+				localMatrix1.m_posit = worldBody1.UnrotateVector (v.pos - worldBody1.m_posit);
+				localMatrix0.m_posit.m_w = 1.0f;
+				localMatrix1.m_posit.m_w = 1.0f;
+
+				JoesRagdollJoint* joint;
+				
+				float b = (randomOrder ? 0.5f : -1.0f);
+				if (randF(i*1000+j*10+k) > b)
+					joint = new JoesRagdollJoint (e0.body, e1.body, localMatrix0, localMatrix1, scene->GetNewton());
+				else 
+					joint = new JoesRagdollJoint (e1.body, e0.body, localMatrix1, localMatrix0, scene->GetNewton());
+
+				int flags = e0.makeBodyFlags | e1.makeBodyFlags;
+
+				if (joint)
+				{
+					joint->TargetFromCurrentState();
+					joint->m_useMotor = useMotors;
+					//joint->m_linearStiffness = 0.3f;
+					if (flags & 8) // interior
+						NewtonUserJointSetSolverModel (joint->m_joint, internalJointMode);
+				}
+			}
+		}
+	}
+}
 
 
 static void AddPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin)
@@ -1034,6 +1314,23 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 
+#if 0
+
+	//AddJoesStressTest (scene);
+
+	if (1)
+	{
+		NewtonBody *cruzBody0 = AddJoesPoweredRagDoll(scene, dVector( 5.0f, 20.0f, 0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
+		NewtonBody *cruzBody1 = AddJoesPoweredRagDoll(scene, dVector( 7.0f, 20.0f, 0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
+
+		dMatrix matrix0(dGetIdentityMatrix()); matrix0[3] = dVector(1,0,0,1);
+		dMatrix matrix1(dGetIdentityMatrix()); matrix1[3] = dVector(-1,0,0,1);
+		JoesRagdollJoint* joint = new JoesRagdollJoint (cruzBody0, cruzBody1, matrix0, matrix1, scene->GetNewton());
+		NewtonUserJointSetSolverModel (joint->m_joint, 2);
+	}
+
+#else
+
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
@@ -1058,6 +1355,8 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+
+#endif
 
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());
