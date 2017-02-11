@@ -996,7 +996,6 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 
 	int jointCount = 0; 
 	NewtonJoint* jointArray[256];
-	// for more accuracy, wrap the bridge in a Newton skeleton 
 
 	for (iter ++; iter; iter ++) {
 		NewtonBody* const body1 = iter.GetNode()->GetInfo();

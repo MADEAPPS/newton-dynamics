@@ -102,25 +102,19 @@ class ArticulatedEntityModel: public DemoEntity
 		void SetParameters ()
 		{
 			SetStiffness(0.99f);
-			#ifdef USE_DRY_FRICTION
-				// much more expensive since each link add a limited row
-				SetFriction(15.0f);
-			#endif
 		}
 
 		void SubmitConstraints(dFloat timestep, int threadIndex)
 		{
 			CustomHinge::SubmitConstraints(timestep, threadIndex);
 
-			#ifndef USE_DRY_FRICTION
-				// this is about twice as fast since the friction row in unbounded and does not require LCP solution
-				dMatrix matrix0;
-				dMatrix matrix1;
-				CalculateGlobalMatrix(matrix0, matrix1);
+			// this is about twice as fast since the friction row in unbounded and does not require LCP solution
+			dMatrix matrix0;
+			dMatrix matrix1;
+			CalculateGlobalMatrix(matrix0, matrix1);
 			
-				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-				NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.7f, 0.0f, 7.0f);
-			#endif
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.9f, 0.0f, 20.0f);
 		}
 	};
 

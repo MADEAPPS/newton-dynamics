@@ -1200,7 +1200,7 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 	// apply linear impulse
 	NewtonBodyApplyImpulseArray(body, 1, sizeof (dVector), &impulse[0], &pointOnBodyInGlobalSpace[0], timestep);
 
-	// apply linera and angular damping
+	// apply linear and angular damping
 	dMatrix inertia;
 	dVector linearMomentum;
 	dVector angularMomentum;
