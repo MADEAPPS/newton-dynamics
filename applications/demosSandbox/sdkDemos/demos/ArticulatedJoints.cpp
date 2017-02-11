@@ -80,14 +80,12 @@ class ArticulatedEntityModel: public DemoEntity
 			CustomSlidingContact::SubmitConstraints(timestep, threadIndex);
 			CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_front[0]);
-			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.7f, 150.0f, 10.0f);
+			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.9f, 1550.0f, 150.0f);
 		}
 	};
 
 	class TreadLink: public CustomHinge
 	{
-		//#define USE_DRY_FRICTION
-
 		public:
 		TreadLink(const dMatrix& pinAndPivotFrame, NewtonBody* const link0, NewtonBody* const link1)
 			:CustomHinge(pinAndPivotFrame, link0, link1)
