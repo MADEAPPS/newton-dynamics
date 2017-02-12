@@ -6895,12 +6895,13 @@ NewtonJoint* NewtonConstraintCreateUserJoint(const NewtonWorld* const newtonWorl
 	Newton* const world = (Newton *)newtonWorld;
 	dgBody* const body0 = (dgBody *)childBody;
 	dgBody* const body1 = (dgBody *)parentBody;
-
+	dgAssert(body0);
+	dgAssert(body0 != body1);
 	return (NewtonJoint*) new (world->dgWorld::GetAllocator()) NewtonUserJoint (world, maxDOF, submitConstraints, getInfo, body0, body1);
 }
 
 /*!
-	Set the solver algorthm use to calculation the constraint forces.
+	Set the solver algorithm use to calculation the constraint forces.
 
 	@param *joint pointer to the joint.
 	@param  *model - solve model to choose.
