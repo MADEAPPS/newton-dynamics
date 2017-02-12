@@ -70,7 +70,7 @@ class ArticulatedEntityModel: public DemoEntity
 			:CustomSlidingContact (pinAndPivotFrame, tire, chassis)
 		{
 			EnableLinearLimits(true);
-			SetLinearLimis (-0.5f, 0.01f);
+			SetLinearLimits (-0.5f, 0.01f);
 		}
 
 		void SubmitConstraints (dFloat timestep, int threadIndex)
@@ -90,31 +90,15 @@ class ArticulatedEntityModel: public DemoEntity
 		TreadLink(const dMatrix& pinAndPivotFrame, NewtonBody* const link0, NewtonBody* const link1)
 			:CustomHinge(pinAndPivotFrame, link0, link1)
 		{
-			SetParameters ();
+			SetStiffness(0.99f);
+			SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
 		}
 
 		TreadLink(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const link0, NewtonBody* const link1)
 			:CustomHinge(pinAndPivotFrame0, pinAndPivotFrame1, link0, link1)
 		{
-			SetParameters ();
-		}
-
-		void SetParameters ()
-		{
 			SetStiffness(0.99f);
-		}
-
-		void SubmitConstraints(dFloat timestep, int threadIndex)
-		{
-			CustomHinge::SubmitConstraints(timestep, threadIndex);
-
-			// this is about twice as fast since the friction row in unbounded and does not require LCP solution
-			dMatrix matrix0;
-			dMatrix matrix1;
-			CalculateGlobalMatrix(matrix0, matrix1);
-			
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.9f, 0.0f, 20.0f);
+			SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
 		}
 	};
 

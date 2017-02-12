@@ -890,23 +890,8 @@ class HangingBridgeFrictionJoint : public CustomHinge
 	HangingBridgeFrictionJoint(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const link0, NewtonBody* const link1)
 		:CustomHinge(pinAndPivotFrame0, pinAndPivotFrame1, link0, link1)
 	{
-		SetParameters();
-	}
-
-	void SetParameters()
-	{
 		SetStiffness(0.99f);
-	}
-
-	void SubmitConstraints(dFloat timestep, int threadIndex)
-	{
-		dMatrix matrix0;
-		dMatrix matrix1;
-		CalculateGlobalMatrix(matrix0, matrix1);
-
-		CustomHinge::SubmitConstraints(timestep, threadIndex);
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-		NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.7f, 0.0f, 5.0f);
+		SetAsSpringDamper(true, 0.9f, 0.0f, 10.0f);
 	}
 };
 

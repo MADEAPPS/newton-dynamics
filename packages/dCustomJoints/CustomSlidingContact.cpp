@@ -31,8 +31,8 @@ CustomSlidingContact::CustomSlidingContact (const dMatrix& pinAndPivotFrame, New
 {
 	EnableLinearLimits(false);
 	EnableAngularLimits(false);
-	SetLinearLimis(-1.0f, 1.0f);
-	SetAngularLimis(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
+	SetLinearLimits(-1.0f, 1.0f);
+	SetAngularLimits(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
 
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -65,13 +65,13 @@ void CustomSlidingContact::EnableAngularLimits(bool state)
 	m_limitsAngularOn = state;
 }
 
-void CustomSlidingContact::SetLinearLimis(dFloat minDist, dFloat maxDist)
+void CustomSlidingContact::SetLinearLimits(dFloat minDist, dFloat maxDist)
 {
 	m_minLinearDist = minDist;
 	m_maxLinearDist = maxDist;
 }
 
-void CustomSlidingContact::SetAngularLimis(dFloat minDist, dFloat maxDist)
+void CustomSlidingContact::SetAngularLimits(dFloat minDist, dFloat maxDist)
 {
 	m_minAngularDist = minDist;
 	m_maxAngularDist = maxDist;

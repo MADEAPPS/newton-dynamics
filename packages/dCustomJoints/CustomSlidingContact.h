@@ -28,8 +28,8 @@ class CustomSlidingContact: public CustomJoint
 
 	CUSTOM_JOINTS_API void EnableLinearLimits(bool state);
 	CUSTOM_JOINTS_API void EnableAngularLimits(bool state);
-	CUSTOM_JOINTS_API void SetLinearLimis(dFloat minDist, dFloat maxDist);
-	CUSTOM_JOINTS_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetLinearLimits(dFloat minDist, dFloat maxDist);
+	CUSTOM_JOINTS_API void SetAngularLimits(dFloat minAngle, dFloat maxAngle);
 
 	CUSTOM_JOINTS_API dFloat GetSpeed() const;
 	CUSTOM_JOINTS_API dFloat GetPosition() const;

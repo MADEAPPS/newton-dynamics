@@ -35,6 +35,8 @@ class CustomHinge: public CustomJoint
 	CUSTOM_JOINTS_API dVector GetPinAxis () const;
 	CUSTOM_JOINTS_API dFloat GetJointOmega () const;
 
+	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
+
 	CUSTOM_JOINTS_API void SetFriction (dFloat frictionTorque);
 	CUSTOM_JOINTS_API dFloat GetFriction () const;
 
@@ -45,14 +47,29 @@ class CustomHinge: public CustomJoint
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
+
+	CUSTOM_JOINTS_API void ApplySpringDamper (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 	
 	AngularIntegration m_curJointAngle;
 	dFloat m_minAngle;
 	dFloat m_maxAngle;
 	dFloat m_friction;
 	dFloat m_jointOmega;
-	bool m_limitsOn;
-	bool m_lastRowWasUsed;
+
+	dFloat m_spring;
+	dFloat m_damper;
+	dFloat m_springDamperRelaxation;
+	union
+	{
+		int m_flags;
+		struct
+		{
+			int	m_limitsOn			: 1;
+			int	m_setAsSpringDamper : 1;
+			int	m_lastRowWasUsed	: 1;
+		};
+	};
+
 	DECLARE_CUSTOM_JOINT(CustomHinge, CustomJoint)
 };
 
