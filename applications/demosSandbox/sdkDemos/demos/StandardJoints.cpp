@@ -303,17 +303,17 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	CustomUniversal* const joint1 = new CustomUniversal(matrix, box1, box0);
 	joint1->EnableLimit_0(true);
-	joint1->SetLimis_0 (-5.0f * 3.141592f, 2.0f * 3.141592f);
+	joint1->SetLimits_0 (-5.0f * 3.141592f, 2.0f * 3.141592f);
 	joint1->EnableLimit_1(true);
-	joint1->SetLimis_1 (-3.0f * 3.141592f, 4.0f * 3.141592f);
+	joint1->SetLimits_1 (-3.0f * 3.141592f, 4.0f * 3.141592f);
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	CustomUniversal* const joint2 = new CustomUniversal(matrix, box2, box0);
 	joint2->EnableLimit_0(true);
-	joint2->SetLimis_0 (-3.0f * 3.141592f, 5.0f * 3.141592f);
+	joint2->SetLimits_0 (-3.0f * 3.141592f, 5.0f * 3.141592f);
 	joint2->EnableLimit_1(true);
-	joint2->SetLimis_1(-4.0f * 3.141592f, 2.0f * 3.141592f);
+	joint2->SetLimits_1(-4.0f * 3.141592f, 2.0f * 3.141592f);
 }
 
 

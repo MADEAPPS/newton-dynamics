@@ -186,7 +186,7 @@ void CustomUniversal::SetDamp_1(dFloat damp)
 
 
 
-void CustomUniversal::SetLimis_0(dFloat minAngle, dFloat maxAngle)
+void CustomUniversal::SetLimits_0(dFloat minAngle, dFloat maxAngle)
 {
 	dAssert (minAngle < 0.0f);
 	dAssert (maxAngle > 0.0f);
@@ -195,7 +195,7 @@ void CustomUniversal::SetLimis_0(dFloat minAngle, dFloat maxAngle)
 	m_maxAngle_0 = maxAngle;
 }
 
-void CustomUniversal::SetLimis_1(dFloat minAngle, dFloat maxAngle)
+void CustomUniversal::SetLimits_1(dFloat minAngle, dFloat maxAngle)
 {
 	dAssert (minAngle < 0.0f);
 	dAssert (maxAngle > 0.0f);

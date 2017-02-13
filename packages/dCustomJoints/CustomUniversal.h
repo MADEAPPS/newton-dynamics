@@ -27,8 +27,8 @@ class CustomUniversal: public CustomJoint
 
 	CUSTOM_JOINTS_API void EnableLimit_0(bool state);
 	CUSTOM_JOINTS_API void EnableLimit_1(bool state);
-	CUSTOM_JOINTS_API void SetLimis_0(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetLimits_0(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetLimits_1(dFloat minAngle, dFloat maxAngle);
 
 	CUSTOM_JOINTS_API dFloat GetJointAngle_0 () const;
 	CUSTOM_JOINTS_API dFloat GetJointAngle_1 () const;
