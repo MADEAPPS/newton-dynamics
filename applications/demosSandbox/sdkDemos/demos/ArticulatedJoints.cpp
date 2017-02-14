@@ -71,16 +71,7 @@ class ArticulatedEntityModel: public DemoEntity
 		{
 			EnableLinearLimits(true);
 			SetLinearLimits (-0.5f, 0.01f);
-		}
-
-		void SubmitConstraints (dFloat timestep, int threadIndex)
-		{
-			dMatrix tireMatrix;
-			dMatrix chassisMatrix;
-			CustomSlidingContact::SubmitConstraints(timestep, threadIndex);
-			CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_front[0]);
-			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.9f, 1550.0f, 150.0f);
+			SetAsSpringDamper(true, 0.9f, 1550.0f, 150.0f);
 		}
 	};
 

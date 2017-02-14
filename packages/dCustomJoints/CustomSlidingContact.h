@@ -33,6 +33,7 @@ class CustomSlidingContact: public CustomJoint
 
 	CUSTOM_JOINTS_API dFloat GetSpeed() const;
 	CUSTOM_JOINTS_API dFloat GetPosition() const;
+	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
 	protected:
 	CUSTOM_JOINTS_API CustomSlidingContact(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
@@ -48,8 +49,21 @@ class CustomSlidingContact: public CustomJoint
 	dFloat m_maxLinearDist;
 	dFloat m_minAngularDist;
 	dFloat m_maxAngularDist;
-	bool m_limitsLinearOn;
-	bool m_limitsAngularOn;
+
+	dFloat m_spring;
+	dFloat m_damper;
+	dFloat m_springDamperRelaxation;
+	union
+	{
+		int m_flags;
+		struct
+		{
+			int	m_limitsLinearOn	: 1;
+			int m_limitsAngularOn	: 1;
+			int	m_setAsSpringDamper : 1;
+			int	m_lastRowWasUsed	: 1;
+		};
+	};
 	DECLARE_CUSTOM_JOINT(CustomSlidingContact, CustomJoint)
 };
 

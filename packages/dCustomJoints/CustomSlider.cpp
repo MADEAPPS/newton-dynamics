@@ -87,9 +87,9 @@ void CustomSlider::SetLimits(dFloat minDist, dFloat maxDist)
 
 void CustomSlider::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
-	m_setAsSpringDamper = state;
 	m_spring = spring;
 	m_damper = damper;
+	m_setAsSpringDamper = state;
 	m_springDamperRelaxation = dClamp(springDamperRelaxation, 0.0f, 0.99f);
 }
 
@@ -121,8 +121,7 @@ void CustomSlider::GetInfo(NewtonJointRecord* const info) const
 
 		info->m_minLinearDof[0] = m_minDist - dist;
 		info->m_maxLinearDof[0] = m_maxDist - dist;
-	}
-	else {
+	} else {
 		info->m_minLinearDof[0] = -D_CUSTOM_LARGE_VALUE;
 		info->m_maxLinearDof[0] = D_CUSTOM_LARGE_VALUE;
 	}
@@ -185,14 +184,6 @@ void CustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 void CustomSlider::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	// if limit are enable ...
-/*
-const dVector& p0 = matrix0.m_posit;
-const dVector& p1 = matrix1.m_posit;
-NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
-NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_spring, m_damper);
-return;
-*/
-
 	if (m_limitsOn && m_setAsSpringDamper) {
 		m_lastRowWasUsed = -1;
 		if (m_posit < m_minDist) {
