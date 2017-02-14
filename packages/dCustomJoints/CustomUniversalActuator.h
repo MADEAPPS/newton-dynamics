@@ -22,6 +22,7 @@
 class CustomUniversalActuator: public CustomUniversal
 {
 	public:
+	CUSTOM_JOINTS_API CustomUniversalActuator (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API CustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~CustomUniversalActuator();
 

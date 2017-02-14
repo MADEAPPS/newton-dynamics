@@ -17,6 +17,24 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomUniversalActuator.h"
 
+CustomUniversalActuator::CustomUniversalActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+	:CustomUniversal(pinAndPivotFrame, child, parent)
+	,m_angle0(0.0f)
+	,m_minAngle0(0.0f)
+	,m_maxAngle0(0.0f)
+	,m_angularRate0(0.0f)
+	,m_maxForce0(D_CUSTOM_LARGE_VALUE)
+	,m_angle1(0.0f)
+	,m_minAngle1(0.0f)
+	,m_maxAngle1(0.0f)
+	,m_angularRate1(0.0f)
+	,m_maxForce1(D_CUSTOM_LARGE_VALUE)
+	,m_flag0(true)
+	,m_flag1(true)
+{
+	EnableLimit_0(false);
+	EnableLimit_1(false);
+}
 
 
 CustomUniversalActuator::CustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent)
