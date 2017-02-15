@@ -129,8 +129,9 @@ void CustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatr
 	if (m_flag) {
 		dFloat jointangle = GetActuatorAngle();
 		dFloat relAngle = jointangle - m_angle;
+		
+/*
 		NewtonUserJointAddAngularRow (m_joint, -relAngle, &matrix0.m_front[0]);
-
 		dFloat step = m_angularRate * timestep;
 		if (dAbs (relAngle) > 2.0f * dAbs (step)) {
 			dFloat desiredSpeed = -dSign(relAngle) * m_angularRate;
@@ -141,6 +142,13 @@ void CustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatr
 			dFloat accel = -GetJointOmega() / timestep;
 			NewtonUserJointSetRowAcceleration(m_joint, accel);
 		}
+*/
+		dFloat currentSpeed = GetJointOmega();
+		dFloat step = dFloat(2.0f) * m_angularRate * timestep;
+		dFloat desiredSpeed = (dAbs(relAngle) > dAbs(step)) ? -dSign(relAngle) * m_angularRate : -dFloat(0.1f) * relAngle / timestep;
+		dFloat accel = (desiredSpeed - currentSpeed) / timestep;
+		NewtonUserJointAddAngularRow(m_joint, relAngle, &matrix0.m_front[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
         NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
         NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
