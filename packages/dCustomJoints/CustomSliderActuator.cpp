@@ -155,6 +155,9 @@ void CustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMatr
 			dFloat currentSpeed = GetJointSpeed ();
 			dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 			NewtonUserJointSetRowAcceleration (m_joint, accel);
+		} else {
+			dFloat accel = -GetJointSpeed() / timestep;
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
 		}
 
         NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);

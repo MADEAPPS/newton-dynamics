@@ -137,6 +137,9 @@ void CustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatr
 			dFloat currentSpeed = GetJointOmega ();
 			dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 			NewtonUserJointSetRowAcceleration (m_joint, accel);
+		} else {
+			dFloat accel = -GetJointOmega() / timestep;
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
 		}
         NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
         NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);

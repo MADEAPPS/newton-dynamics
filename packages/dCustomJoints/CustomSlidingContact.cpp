@@ -222,17 +222,25 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	if (m_setAsSpringDamper && m_limitsLinearOn) {
 		if (m_posit < m_minLinearDist) {
-			dAssert(0);
-			// get a point along the up vector and set a constraint  
-			dVector p(matrix1.m_posit + matrix1.m_front.Scale(m_minLinearDist));
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
-			// allow the object to return but not to kick going forward
+			//dVector p(matrix1.m_posit + matrix1.m_front.Scale(m_minLinearDist));
+			//NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
+			//NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			const dVector& p0 = matrix0.m_posit;
+			dVector p1(p0 + matrix0.m_front.Scale(m_minLinearDist - m_posit));
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+			dFloat accel = NewtonUserJointGetRowAcceleration(m_joint) + NewtonCalculateSpringDamperAcceleration(timestep, m_spring, m_posit, m_damper, m_speed);
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+
 		} else if (m_posit > m_maxLinearDist) {
-			dAssert(0);
-			dVector p(matrix1.m_posit + matrix1.m_front.Scale(m_maxLinearDist));
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
-			// allow the object to return but not to kick going forward
+			//dVector p(matrix1.m_posit + matrix1.m_front.Scale(m_maxLinearDist));
+			//NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
+			//NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			const dVector& p0 = matrix0.m_posit;
+			dVector p1(p0 + matrix0.m_front.Scale(m_maxLinearDist - m_posit));
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+			dFloat accel = NewtonUserJointGetRowAcceleration(m_joint) + NewtonCalculateSpringDamperAcceleration(timestep, m_spring, m_posit, m_damper, m_speed);
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else {
 			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
@@ -240,15 +248,12 @@ void CustomSlidingContact::SubmitConstraints (dFloat timestep, int threadIndex)
 		}
 	} else if (m_limitsLinearOn) {
 		if (m_posit < m_minLinearDist) {
-			// get a point along the up vector and set a constraint  
 			dVector p(matrix1.m_posit + matrix1.m_front.Scale(m_minLinearDist));
 			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
-			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		} else if (m_posit > m_maxLinearDist) {
 			dVector p(matrix1.m_posit + matrix1.m_front.Scale(m_maxLinearDist));
 			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &p[0], &matrix1.m_front[0]);
-			// allow the object to return but not to kick going forward
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		}
 	} else if (m_setAsSpringDamper) {

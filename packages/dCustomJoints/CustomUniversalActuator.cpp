@@ -221,6 +221,9 @@ void CustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadInde
 				dFloat currentSpeed = GetJointOmega_0 ();
 				dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 				NewtonUserJointSetRowAcceleration (m_joint, accel);
+			} else {
+				dFloat accel = -GetJointOmega_0() / timestep;
+				NewtonUserJointSetRowAcceleration(m_joint, accel);
 			}
             NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce0);
             NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce0);
@@ -232,11 +235,15 @@ void CustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadInde
 			dFloat relAngle = jointAngle - m_angle1;
 			NewtonUserJointAddAngularRow (m_joint, -relAngle, &matrix1.m_up[0]);
 			dFloat step = m_angularRate1 * timestep;
-			if (dAbs (relAngle) > 2.0f * dAbs (step)) {
+			if (dAbs (relAngle) > 2.0f * dAbs (step)) 
+			{
 				dFloat desiredSpeed = dSign(relAngle) * m_angularRate1;
 				dFloat currentSpeed = GetJointOmega_1 ();
 				dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 				NewtonUserJointSetRowAcceleration (m_joint, accel);
+			} else {
+				dFloat accel = -GetJointOmega_1() / timestep;
+				NewtonUserJointSetRowAcceleration(m_joint, accel);
 			}
             NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce1);
             NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce1);
