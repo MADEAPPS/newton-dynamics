@@ -303,7 +303,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						for (dgBodyMasterListRow::dgListNode* jointNode = adjacentBody->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 							dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 							dgDynamicBody* const otherBody = (dgDynamicBody*)cell->m_bodyNode;
-							if ((otherBody->GetSkeleton() == body->GetSkeleton()) && (otherBody->m_dynamicsLru != lruMark)) {
+							//if ((otherBody->GetSkeleton() == body->GetSkeleton()) && (otherBody->m_dynamicsLru != lruMark)) {
+							if ((otherBody->GetSkeleton() == adjacentBody->GetSkeleton()) && (otherBody->m_dynamicsLru != lruMark)) {
 								queueBuffer[stack] = otherBody;
 								stack ++;
 							}
