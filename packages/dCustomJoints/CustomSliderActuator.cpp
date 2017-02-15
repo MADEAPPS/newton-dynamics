@@ -148,18 +148,13 @@ void CustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMatr
 
 		dFloat jointosit = GetJointPosit();
 		dFloat relPosit = m_posit - jointosit;
-		dFloat step = m_linearRate * timestep;
+		dFloat step = dFloat(2.0f) * m_linearRate * timestep;
 
-		if (dAbs (relPosit) > 2.0f * dAbs (step)) {
-			dFloat desiredSpeed = dSign(relPosit) * m_linearRate;
-			dFloat currentSpeed = GetJointSpeed ();
-			dFloat accel = (desiredSpeed - currentSpeed) / timestep;
-			NewtonUserJointSetRowAcceleration (m_joint, accel);
-		} else {
-			dFloat accel = -GetJointSpeed() / timestep;
-			NewtonUserJointSetRowAcceleration(m_joint, accel);
-		}
+		dFloat currentSpeed = GetJointSpeed();
+		dFloat desiredSpeed = (dAbs(relPosit) > dAbs(step)) ? desiredSpeed = dSign(relPosit) * m_linearRate : dFloat(0.1f) * relPosit / timestep;
+		dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
         NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
         NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);
