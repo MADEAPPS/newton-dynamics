@@ -17,10 +17,9 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomGear.h"
 
-//dInitRtti(CustomGear);
 IMPLEMENT_CUSTOM_JOINT(CustomGear);
 IMPLEMENT_CUSTOM_JOINT(CustomGearAndSlide);
-IMPLEMENT_CUSTOM_JOINT(CustomSatelliteGear);
+IMPLEMENT_CUSTOM_JOINT(CustomDifferentialGear);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -142,7 +141,7 @@ void CustomGear::GetInfo (NewtonJointRecord* const info) const
 }
 
 
-CustomSatelliteGear::CustomSatelliteGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
+CustomDifferentialGear::CustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
 	:CustomGear(gearRatio, childPin, parentPin, child, parent)
 	,m_parentReference(parentReference)
 {
@@ -154,7 +153,7 @@ CustomSatelliteGear::CustomSatelliteGear(dFloat gearRatio, const dVector& childP
 	SetSolverModel(1);
 }
 
-CustomSatelliteGear::CustomSatelliteGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+CustomDifferentialGear::CustomDifferentialGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomGear(child, parent, callback, userData)
 {
 	// remember to get referenceBody from the world 
@@ -164,20 +163,20 @@ CustomSatelliteGear::CustomSatelliteGear (NewtonBody* const child, NewtonBody* c
 	SetSolverModel(1);
 }
 
-void CustomSatelliteGear::Serialize (NewtonSerializeCallback callback, void* const userData) const
+void CustomDifferentialGear::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	CustomGear::Serialize (callback,userData);
 	// remember to save information to later load the reference body form the world
 	dAssert(0);
 }
 
-void CustomSatelliteGear::GetInfo (NewtonJointRecord* const info) const
+void CustomDifferentialGear::GetInfo (NewtonJointRecord* const info) const
 {
 	dAssert (0);
 }
 
 
-void CustomSatelliteGear::SubmitConstraints(dFloat timestep, int threadIndex)
+void CustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
