@@ -42,8 +42,8 @@ class CustomUniversalActuator: public CustomUniversal
 	CUSTOM_JOINTS_API dFloat GetMaxAngularLimit0() const;
 	CUSTOM_JOINTS_API void SetMaxAngularLimit0(dFloat limit);
 
-    CUSTOM_JOINTS_API dFloat GetMaxForcePower0() const;
-    CUSTOM_JOINTS_API void SetMaxForcePower0(dFloat force);
+    CUSTOM_JOINTS_API dFloat GetMaxTorquePower0() const;
+    CUSTOM_JOINTS_API void SetMaxTorquePower0(dFloat force);
 
 	CUSTOM_JOINTS_API bool GetEnableFlag1 () const;
 	CUSTOM_JOINTS_API void SetEnableFlag1 (bool flag);
@@ -61,9 +61,8 @@ class CustomUniversalActuator: public CustomUniversal
 	CUSTOM_JOINTS_API dFloat GetMaxAngularLimit1() const;
 	CUSTOM_JOINTS_API void SetMaxAngularLimit1(dFloat limit);
 
-    CUSTOM_JOINTS_API dFloat GetMaxForcePower1() const;
-    CUSTOM_JOINTS_API void SetMaxForcePower1(dFloat force);
-
+    CUSTOM_JOINTS_API dFloat GetMaxTorquePower1() const;
+    CUSTOM_JOINTS_API void SetMaxTorquePower1(dFloat force);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
