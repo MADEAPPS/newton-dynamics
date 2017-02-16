@@ -141,90 +141,6 @@ void CustomGear::GetInfo (NewtonJointRecord* const info) const
 }
 
 
-CustomDifferentialGear::CustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
-	:CustomGear(gearRatio, childPin, parentPin, child, parent)
-	,m_parentReference(parentReference)
-{
-	dMatrix referenceMatrix;
-	NewtonBodyGetMatrix (m_parentReference, &referenceMatrix[0][0]);
-	m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
-
-	// set as kinematoc loop
-	SetSolverModel(1);
-}
-
-CustomDifferentialGear::CustomDifferentialGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomGear(child, parent, callback, userData)
-{
-	// remember to get referenceBody from the world 
-	dAssert (0);
-
-	// set as kinematoc loop
-	SetSolverModel(1);
-}
-
-void CustomDifferentialGear::Serialize (NewtonSerializeCallback callback, void* const userData) const
-{
-	CustomGear::Serialize (callback,userData);
-	// remember to save information to later load the reference body form the world
-	dAssert(0);
-}
-
-void CustomDifferentialGear::GetInfo (NewtonJointRecord* const info) const
-{
-	dAssert (0);
-}
-
-
-void CustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-	dVector omega0(0.0f);
-	dVector omega1(0.0f);
-	dFloat jacobian0[6];
-	dFloat jacobian1[6];
-
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	// calculate the angular velocity for both bodies
-	dVector dir0 (matrix0.m_front.Scale(m_gearRatio));
-	dVector dir2 (matrix1.m_front);
-
-	dMatrix referenceMatrix;
-	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
-	dVector dir3 (referenceMatrix.RotateVector(m_pintOnReference));
-	dVector dir1 (dir2 + dir3);
-
-	jacobian0[0] = 0.0f;
-	jacobian0[1] = 0.0f;
-	jacobian0[2] = 0.0f;
-	jacobian0[3] = dir0.m_x;
-	jacobian0[4] = dir0.m_y;
-	jacobian0[5] = dir0.m_z;
-
-	jacobian1[0] = 0.0f;
-	jacobian1[1] = 0.0f;
-	jacobian1[2] = 0.0f;
-	jacobian1[3] = dir1.m_x;
-	jacobian1[4] = dir1.m_y;
-	jacobian1[5] = dir1.m_z;
-
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	NewtonBodyGetOmega(m_body1, &omega1[0]);
-
-	dFloat w0 = omega0.DotProduct3(dir0);
-	dFloat w1 = omega1.DotProduct3(dir1);
-
-	dFloat relOmega = w0 + w1;
-	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
-	dFloat relAccel = -0.5f * relOmega * invTimestep;
-	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
-	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-}
-
-
 CustomGearAndSlide::CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent)
 	:CustomGear(2, child, parent)
 	,m_slideRatio (slideRatio)
@@ -331,4 +247,111 @@ void CustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 
 	// add the angular relation constraint form the base class
 	CustomGear::SubmitConstraints (timestep, threadIndex);
+}
+
+
+
+CustomDifferentialGear::CustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dMatrix& parentPin, NewtonBody* const child, NewtonBody* const parent)
+	:CustomJoint(1, child, parent)
+	,m_gearRatio(gearRatio)
+{
+	dMatrix dommyMatrix;
+	// calculate the local matrix for body body0
+	dMatrix pinAndPivot0(dGrammSchmidt(childPin));
+
+	CalculateLocalMatrix(pinAndPivot0, m_localMatrix0, dommyMatrix);
+	m_localMatrix0.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+
+	// calculate the local matrix for body body1  
+	dMatrix pinAndPivot1;
+	CalculateLocalMatrix(parentPin, dommyMatrix, m_localMatrix1);
+	m_localMatrix1.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+
+	// set as kinematoc loop
+	SetSolverModel(1);
+}
+
+CustomDifferentialGear::CustomDifferentialGear(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomJoint(child, parent, callback, userData)
+{
+	// remember to get referenceBody from the world 
+	dAssert(0);
+
+	// set as kinematoc loop
+	SetSolverModel(1);
+}
+
+void CustomDifferentialGear::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomJoint::Serialize(callback, userData);
+	// remember to save information to later load the reference body form the world
+	dAssert(0);
+}
+
+void CustomDifferentialGear::GetInfo(NewtonJointRecord* const info) const
+{
+	dAssert(0);
+}
+
+
+void CustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
+	dFloat jacobian0[6];
+	dFloat jacobian1[6];
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space.
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	// calculate the angular velocity for both bodies
+	dVector dir0 (matrix0.m_front.Scale(m_gearRatio));
+
+	//	dVector dir2 (matrix1.m_front);
+	//	dMatrix referenceMatrix;
+	//	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
+	//	dVector dir3 (referenceMatrix.RotateVector(m_pintOnReference));
+	//	dVector dir1 (dir2 + dir3);
+
+	dVector dir1 = matrix1.m_front;
+
+	jacobian0[0] = 0.0f;
+	jacobian0[1] = 0.0f;
+	jacobian0[2] = 0.0f;
+	jacobian0[3] = dir0.m_x;
+	jacobian0[4] = dir0.m_y;
+	jacobian0[5] = dir0.m_z;
+
+	jacobian1[0] = 0.0f;
+	jacobian1[1] = 0.0f;
+	jacobian1[2] = 0.0f;
+	jacobian1[3] = dir1.m_x;
+	jacobian1[4] = dir1.m_y;
+	jacobian1[5] = dir1.m_z;
+
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+static int xxx;
+xxx++;
+if (xxx & 1) {
+//float x0 = omega1.DotProduct3(matrix1[1]);
+dVector x(matrix1.UnrotateVector(omega1));
+dTrace(("(%f %f %f) (%f %f %f) (%f %f %f) (%f %f %f)\n", x[0], x[1], x[2],
+						matrix1[0][0], matrix1[0][1], matrix1[0][2], 
+						matrix1[1][0], matrix1[1][1], matrix1[1][2],
+						matrix1[2][0], matrix1[2][1], matrix1[2][2]));
+}
+
+
+	dFloat w0 = omega0.DotProduct3(dir0);
+	dFloat w1 = omega1.DotProduct3(dir1);
+
+	dFloat relOmega = w0 + w1;
+	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
+	dFloat relAccel = -0.5f * relOmega * invTimestep;
+//	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+//	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 }

@@ -639,14 +639,15 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	CustomUniversal* CreateEngineBodyPart(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const chassisBone)
 	{
 		NewtonWorld* const world = GetWorld();
-		NewtonCollision* const shape = NewtonCreateSphere (world, 0.5f, 0, NULL);
+		NewtonCollision* const shape = NewtonCreateCylinder (world, 0.125f, 0.125f, 0.75f, 0, NULL);
 
 		NewtonBody* const chassis = chassisBone->m_body;
 
 		// create the rigid body that will make this bone
 		dMatrix engineMatrix;
 		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
-		engineMatrix = dRollMatrix(0.5f * 3.1416f) * engineMatrix;
+		engineMatrix = dRollMatrix(0.5f * 3.141592f) * engineMatrix;
+		engineMatrix.m_posit.m_y += 1.0f;
 
 		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
 
@@ -908,17 +909,24 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		// link traction tire to the engine using a differential gear
 		dMatrix tireMatrix;
-		dMatrix chassisMatrix;
+//		dMatrix chassisMatrix;
 		NewtonBody* const tire = bone->m_body;
 		NewtonBody* const engine = vehicleModel->m_engineJoint->GetBody0();
-		NewtonBody* const chassis = vehicleModel->m_engineJoint->GetBody1();
+//		NewtonBody* const chassis = vehicleModel->m_engineJoint->GetBody1();
 		NewtonBodyGetMatrix(bone->m_body, &tireMatrix[0][0]);
-		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
-		chassisMatrix = vehicleModel->m_engineJoint->GetMatrix1() * chassisMatrix;
+//		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
+//		chassisMatrix = vehicleModel->m_engineJoint->GetMatrix1() * chassisMatrix;
+
+		dMatrix engineMatrix;
+		dMatrix chassisMatrix;
+		vehicleModel->m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 
 		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
-		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
-		CustomDifferentialGear* const axel = new CustomDifferentialGear(5.0f, tireHingeMatrix.m_front, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
+//		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
+		if (side < 0.0f) {
+			engineMatrix = dYawMatrix(3.141592f) * engineMatrix;
+		}
+		CustomDifferentialGear* const axel = new CustomDifferentialGear(5.0f, tireHingeMatrix.m_front, engineMatrix, tire, engine);
 		cycleLinks.Append (axel);
 
 		return bone;
@@ -1369,11 +1377,11 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		vehicleModel->m_maxTurmAccel = 10.0f;
 		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
 
-		AddCraneBase (controller);
+//		AddCraneBase (controller);
 		MakeLeftTrack (controller, cycleLinks);
 		MakeRightTrack (controller, cycleLinks);
-		MakeLeftThread(controller);
-		MakeRightThread(controller);
+//		MakeLeftThread(controller);
+//		MakeRightThread(controller);
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
