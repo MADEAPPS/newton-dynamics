@@ -336,13 +336,22 @@ void CustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
 
 static int xxx;
 xxx++;
-if (xxx & 1) {
+if (!(xxx & 1)) {
 //float x0 = omega1.DotProduct3(matrix1[1]);
 dVector x(matrix1.UnrotateVector(omega1));
+
+//float wx = omega1.DotProduct3(matrix1[0]);
+float wy0 = omega1.DotProduct3(matrix1[1]) + omega1.DotProduct3(matrix1[2]);
+float wy1 = x.DotProduct3(m_localMatrix1[1]) - x.DotProduct3(m_localMatrix1[2]);
+dTrace(("(%f %f %f)  wy0 = %f   wy1 = %f\n", x[0], x[1], x[2], wy0, wy1));
+//dTrace(("(%f %f %f) %f   wx = %f   wy = %f\n", x[0], x[1], x[2], x[1] * x[1] + x[2] * x[2], wx, wy));
+
+/*
 dTrace(("(%f %f %f) (%f %f %f) (%f %f %f) (%f %f %f)\n", x[0], x[1], x[2],
 						matrix1[0][0], matrix1[0][1], matrix1[0][2], 
 						matrix1[1][0], matrix1[1][1], matrix1[1][2],
 						matrix1[2][0], matrix1[2][1], matrix1[2][2]));
+*/
 }
 
 
