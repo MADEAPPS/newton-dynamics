@@ -250,40 +250,31 @@ void CustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 }
 
 
-
-CustomDifferentialGear::CustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dMatrix& parentPin, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(1, child, parent)
-	,m_gearRatio(gearRatio)
+CustomDifferentialGear::CustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
+:CustomGear(gearRatio, childPin, parentPin, child, parent)
+, m_parentReference(parentReference)
 {
-	dMatrix dommyMatrix;
-	// calculate the local matrix for body body0
-	dMatrix pinAndPivot0(dGrammSchmidt(childPin));
-
-	CalculateLocalMatrix(pinAndPivot0, m_localMatrix0, dommyMatrix);
-	m_localMatrix0.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
-
-	// calculate the local matrix for body body1  
-	dMatrix pinAndPivot1;
-	CalculateLocalMatrix(parentPin, dommyMatrix, m_localMatrix1);
-	m_localMatrix1.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+	dMatrix referenceMatrix;
+	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
+	m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
 
 	// set as kinematoc loop
 	SetSolverModel(1);
 }
 
 CustomDifferentialGear::CustomDifferentialGear(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:CustomGear(child, parent, callback, userData)
 {
 	// remember to get referenceBody from the world 
 	dAssert(0);
 
-	// set as kinematoc loop
+	// set as kinematic loop
 	SetSolverModel(1);
 }
 
 void CustomDifferentialGear::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize(callback, userData);
+	CustomGear::Serialize(callback, userData);
 	// remember to save information to later load the reference body form the world
 	dAssert(0);
 }
@@ -298,6 +289,7 @@ void CustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
+	dMatrix referenceMatrix;
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
 	dFloat jacobian0[6];
@@ -305,17 +297,16 @@ void CustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space.
 	CalculateGlobalMatrix(matrix0, matrix1);
+	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
 
 	// calculate the angular velocity for both bodies
 	dVector dir0 (matrix0.m_front.Scale(m_gearRatio));
+	dVector dir2(matrix1.m_front);
+	dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
+//	dVector dir1(dir2 + dir3);
+	dVector dir1(dir2);
 
-	//	dVector dir2 (matrix1.m_front);
-	//	dMatrix referenceMatrix;
-	//	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
-	//	dVector dir3 (referenceMatrix.RotateVector(m_pintOnReference));
-	//	dVector dir1 (dir2 + dir3);
-
-	dVector dir1 = matrix1.m_front;
+dTrace(("(%f %f %f) (%f %f %f)\n", dir2[0], dir2[1], dir2[2], dir3[0], dir3[1], dir3[2]));
 
 	jacobian0[0] = 0.0f;
 	jacobian0[1] = 0.0f;
@@ -334,27 +325,6 @@ void CustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
 	NewtonBodyGetOmega(m_body0, &omega0[0]);
 	NewtonBodyGetOmega(m_body1, &omega1[0]);
 
-static int xxx;
-xxx++;
-if (!(xxx & 1)) {
-//float x0 = omega1.DotProduct3(matrix1[1]);
-dVector x(matrix1.UnrotateVector(omega1));
-
-//float wx = omega1.DotProduct3(matrix1[0]);
-float wy0 = omega1.DotProduct3(matrix1[1]) + omega1.DotProduct3(matrix1[2]);
-float wy1 = x.DotProduct3(m_localMatrix1[1]) - x.DotProduct3(m_localMatrix1[2]);
-dTrace(("(%f %f %f)  wy0 = %f   wy1 = %f\n", x[0], x[1], x[2], wy0, wy1));
-//dTrace(("(%f %f %f) %f   wx = %f   wy = %f\n", x[0], x[1], x[2], x[1] * x[1] + x[2] * x[2], wx, wy));
-
-/*
-dTrace(("(%f %f %f) (%f %f %f) (%f %f %f) (%f %f %f)\n", x[0], x[1], x[2],
-						matrix1[0][0], matrix1[0][1], matrix1[0][2], 
-						matrix1[1][0], matrix1[1][1], matrix1[1][2],
-						matrix1[2][0], matrix1[2][1], matrix1[2][2]));
-*/
-}
-
-
 	dFloat w0 = omega0.DotProduct3(dir0);
 	dFloat w1 = omega1.DotProduct3(dir1);
 
@@ -364,3 +334,4 @@ dTrace(("(%f %f %f) (%f %f %f) (%f %f %f) (%f %f %f)\n", x[0], x[1], x[2],
 //	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
 //	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 }
+
