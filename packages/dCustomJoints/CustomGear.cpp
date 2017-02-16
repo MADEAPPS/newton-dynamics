@@ -251,8 +251,8 @@ void CustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 
 
 CustomDifferentialGear::CustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
-:CustomGear(gearRatio, childPin, parentPin, child, parent)
-, m_parentReference(parentReference)
+	:CustomGear(gearRatio, childPin, parentPin, child, parent)
+	,m_parentReference(parentReference)
 {
 	dMatrix referenceMatrix;
 	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
@@ -303,8 +303,7 @@ void CustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
 	dVector dir0 (matrix0.m_front.Scale(m_gearRatio));
 	dVector dir2(matrix1.m_front);
 	dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
-//	dVector dir1(dir2 + dir3);
-	dVector dir1(dir2);
+	dVector dir1(dir2 + dir3);
 
 dTrace(("(%f %f %f) (%f %f %f)\n", dir2[0], dir2[1], dir2[2], dir3[0], dir3[1], dir3[2]));
 
@@ -331,7 +330,7 @@ dTrace(("(%f %f %f) (%f %f %f)\n", dir2[0], dir2[1], dir2[2], dir3[0], dir3[1], 
 	dFloat relOmega = w0 + w1;
 	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
 	dFloat relAccel = -0.5f * relOmega * invTimestep;
-//	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
-//	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 }
 
