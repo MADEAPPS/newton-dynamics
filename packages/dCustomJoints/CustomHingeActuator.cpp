@@ -29,8 +29,8 @@ CustomHingeActuator::CustomHingeActuator(const dMatrix& pinAndPivotFrame, Newton
 	,m_maxAngle( D_CUSTOM_LARGE_VALUE)
 	,m_angularRate(0.0f)
 	,m_maxForce(1.0e20f)
-	,m_flag(false)
 {
+	m_actuatorFlag = false;
 	EnableLimits(false);
 }
 
@@ -41,8 +41,8 @@ CustomHingeActuator::CustomHingeActuator(const dMatrix& pinAndPivotFrame, dFloat
 	,m_maxAngle(maxAngle)
 	,m_angularRate(angularRate)
     ,m_maxForce(1.0e20f)
-	,m_flag(true)
 {
+	m_actuatorFlag = true;
 	EnableLimits(false);
 }
 
@@ -52,7 +52,7 @@ CustomHingeActuator::~CustomHingeActuator()
 
 bool CustomHingeActuator::GetEnableFlag () const
 {
-	return m_flag;
+	return m_actuatorFlag;
 }
 
 dFloat CustomHingeActuator::GetTargetAngle() const
@@ -99,7 +99,7 @@ void CustomHingeActuator::SetTargetAngle(dFloat angle)
 
 void CustomHingeActuator::SetEnableFlag (bool flag)
 {
-	m_flag = flag;
+	m_actuatorFlag = flag;
 }
 
 dFloat CustomHingeActuator::GetActuatorAngle() const
@@ -126,23 +126,9 @@ void CustomHingeActuator::GetInfo (NewtonJointRecord* const info) const
 
 void CustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	if (m_flag) {
+	if (m_actuatorFlag) {
 		dFloat jointangle = GetActuatorAngle();
 		dFloat relAngle = jointangle - m_angle;
-		
-/*
-		NewtonUserJointAddAngularRow (m_joint, -relAngle, &matrix0.m_front[0]);
-		dFloat step = m_angularRate * timestep;
-		if (dAbs (relAngle) > 2.0f * dAbs (step)) {
-			dFloat desiredSpeed = -dSign(relAngle) * m_angularRate;
-			dFloat currentSpeed = GetJointOmega ();
-			dFloat accel = (desiredSpeed - currentSpeed) / timestep;
-			NewtonUserJointSetRowAcceleration (m_joint, accel);
-		} else {
-			dFloat accel = -GetJointOmega() / timestep;
-			NewtonUserJointSetRowAcceleration(m_joint, accel);
-		}
-*/
 		dFloat currentSpeed = GetJointOmega();
 		dFloat step = dFloat(2.0f) * m_angularRate * timestep;
 		dFloat desiredSpeed = (dAbs(relAngle) > dAbs(step)) ? -dSign(relAngle) * m_angularRate : -dFloat(0.1f) * relAngle / timestep;

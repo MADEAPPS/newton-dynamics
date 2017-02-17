@@ -58,7 +58,6 @@ class CustomSliderActuator: public CustomSlider
 	dFloat m_maxPosit;
 	dFloat m_linearRate;
     dFloat m_maxForce;
-	bool m_flag;
 	DECLARE_CUSTOM_JOINT(CustomSliderActuator, CustomSlider)
 
 };

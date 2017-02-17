@@ -20,40 +20,43 @@
 CustomUniversalActuator::CustomUniversalActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent)
 	:CustomUniversal(pinAndPivotFrame, child, parent)
 	,m_angle0(0.0f)
-	,m_minAngle0(minAngle0)
-	,m_maxAngle0(maxAngle0)
 	,m_angularRate0(angularRate0)
     ,m_maxForce0(D_CUSTOM_LARGE_VALUE)
 	,m_angle1(0.0f)
-	,m_minAngle1(minAngle1)
-	,m_maxAngle1(maxAngle1)
 	,m_angularRate1(angularRate1)
     ,m_maxForce1(D_CUSTOM_LARGE_VALUE)
-	,m_flag0(true)
-	,m_flag1(true)
 {
 	EnableLimit_0(false);
 	EnableLimit_1(false);
+
+	m_actuator_0 = true;
+	m_actuator_1 = true;
+	m_minAngle_0 = minAngle0;
+	m_maxAngle_0 = maxAngle0;
+	m_minAngle_1 = minAngle1;
+	m_maxAngle_1 = maxAngle1;
 }
 
 
 CustomUniversalActuator::CustomUniversalActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomUniversal(pinAndPivotFrame, child, parent)
 	,m_angle0(0.0f)
-	,m_minAngle0(0.0f)
-	,m_maxAngle0(0.0f)
 	,m_angularRate0(0.0f)
 	,m_maxForce0(D_CUSTOM_LARGE_VALUE)
 	,m_angle1(0.0f)
-	,m_minAngle1(0.0f)
-	,m_maxAngle1(0.0f)
 	,m_angularRate1(0.0f)
 	,m_maxForce1(D_CUSTOM_LARGE_VALUE)
-	,m_flag0(true)
-	,m_flag1(true)
 {
 	EnableLimit_0(false);
 	EnableLimit_1(false);
+
+	m_actuator_0 = true;
+	m_actuator_1 = true;
+	m_minAngle_0 = 0.0f;
+	m_maxAngle_0 = 0.0f;
+	m_minAngle_1 = 0.0f;
+	m_maxAngle_1 = 0.0f;
+
 }
 
 
@@ -61,21 +64,12 @@ CustomUniversalActuator::CustomUniversalActuator(NewtonBody* const child, Newton
 	:CustomUniversal(child, parent, callback, userData)
 {
 	callback(userData, &m_angle0, sizeof(dFloat));
-	callback(userData, &m_minAngle0, sizeof(dFloat));
-	callback(userData, &m_maxAngle0, sizeof(dFloat));
-	callback(userData, &m_angularRate0, sizeof(dFloat));
 	callback(userData, &m_maxForce0, sizeof(dFloat));
+	callback(userData, &m_angularRate0, sizeof(dFloat));
 
 	callback(userData, &m_angle1, sizeof(dFloat));
-	callback(userData, &m_minAngle1, sizeof(dFloat));
-	callback(userData, &m_maxAngle1, sizeof(dFloat));
-	callback(userData, &m_angularRate1, sizeof(dFloat));
 	callback(userData, &m_maxForce1, sizeof(dFloat));
-
-	int flag;
-	callback(userData, &flag, sizeof(int));
-	m_flag0 = bool(flag & 1);
-	m_flag1 = (flag >> 8) & 1;
+	callback(userData, &m_angularRate1, sizeof(dFloat));
 }
 
 CustomUniversalActuator::~CustomUniversalActuator()
@@ -87,24 +81,17 @@ void CustomUniversalActuator::Serialize(NewtonSerializeCallback callback, void* 
 	CustomUniversal::Serialize(callback, userData);
 
 	callback(userData, &m_angle0, sizeof(dFloat));
-	callback(userData, &m_minAngle0, sizeof(dFloat));
-	callback(userData, &m_maxAngle0, sizeof(dFloat));
-	callback(userData, &m_angularRate0, sizeof(dFloat));
 	callback(userData, &m_maxForce0, sizeof(dFloat));
+	callback(userData, &m_angularRate0, sizeof(dFloat));
 
 	callback(userData, &m_angle1, sizeof(dFloat));
-	callback(userData, &m_minAngle1, sizeof(dFloat));
-	callback(userData, &m_maxAngle1, sizeof(dFloat));
-	callback(userData, &m_angularRate1, sizeof(dFloat));
 	callback(userData, &m_maxForce1, sizeof(dFloat));
-
-	int flag = m_flag0 + (m_flag1 << 8);
-	callback(userData, &flag, sizeof(int));
+	callback(userData, &m_angularRate1, sizeof(dFloat));
 }
 
 bool CustomUniversalActuator::GetEnableFlag0 () const
 {
-	return m_flag0;
+	return m_actuator_0;
 }
 
 dFloat CustomUniversalActuator::GetTargetAngle0() const
@@ -117,19 +104,10 @@ dFloat CustomUniversalActuator::GetAngularRate0() const
 	return m_angularRate0;
 }
 
-dFloat CustomUniversalActuator::GetMinAngularLimit0() const
-{
-	return m_minAngle0;
-}
-
-dFloat CustomUniversalActuator::GetMaxAngularLimit0() const
-{
-	return m_maxAngle0;
-}
 
 bool CustomUniversalActuator::GetEnableFlag1 () const
 {
-	return m_flag1;
+	return m_actuator_1;
 }
 
 dFloat CustomUniversalActuator::GetTargetAngle1() const
@@ -142,36 +120,17 @@ dFloat CustomUniversalActuator::GetAngularRate1() const
 	return m_angularRate1;
 }
 
-dFloat CustomUniversalActuator::GetMinAngularLimit1() const
-{
-	return m_minAngle1;
-}
-
-dFloat CustomUniversalActuator::GetMaxAngularLimit1() const
-{
-	return m_maxAngle1;
-}
-
 
 void CustomUniversalActuator::SetEnableFlag0 (bool flag)
 {
-	m_flag0 = flag;
+	m_actuator_0 = flag;
 }
 
 void CustomUniversalActuator::SetTargetAngle0(dFloat angle)
 {
-	m_angle0 = dClamp (angle, m_minAngle0, m_maxAngle0);
+	m_angle0 = dClamp (angle, m_minAngle_0, m_maxAngle_0);
 }
 
-void CustomUniversalActuator::SetMinAngularLimit0(dFloat limit)
-{
-	m_minAngle0 = limit;
-}
-
-void CustomUniversalActuator::SetMaxAngularLimit0(dFloat limit)
-{
-	m_maxAngle0 = limit;
-}
 
 dFloat CustomUniversalActuator::GetMaxTorquePower0() const
 {
@@ -191,38 +150,18 @@ void CustomUniversalActuator::SetAngularRate0(dFloat rate)
 
 void CustomUniversalActuator::SetEnableFlag1 (bool flag)
 {
-	m_flag1 = flag;
+	m_actuator_1 = flag;
 }
 
 void CustomUniversalActuator::SetTargetAngle1(dFloat angle)
 {
-	m_angle1 = dClamp (angle, m_minAngle1, m_maxAngle1);
+	m_angle1 = dClamp (angle, m_minAngle_1, m_maxAngle_1);
 }
 
 
 void CustomUniversalActuator::SetAngularRate1(dFloat rate)
 {
 	m_angularRate1 = rate;
-}
-
-void CustomUniversalActuator::SetMinAngularLimit1(dFloat limit)
-{
-	m_minAngle1 = limit;
-}
-
-void CustomUniversalActuator::SetMaxAngularLimit1(dFloat limit)
-{
-	m_maxAngle1 = limit;
-}
-
-dFloat CustomUniversalActuator::GetActuatorAngle0() const
-{
-	return GetJointAngle_0();
-}
-
-dFloat CustomUniversalActuator::GetActuatorAngle1() const
-{
-	return GetJointAngle_1();
 }
 
 dFloat CustomUniversalActuator::GetMaxTorquePower1() const
@@ -244,27 +183,14 @@ void CustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadInde
 {
 	CustomUniversal::SubmitConstraints (timestep, threadIndex);
 
-	if (m_flag0 | m_flag1){
+	if (m_actuator_0 | m_actuator_1){
 		dMatrix matrix0;
 		dMatrix matrix1;
 
 		CalculateGlobalMatrix (matrix0, matrix1);
-		if (m_flag0) {
+		if (m_actuator_0) {
 			dFloat jointAngle = GetJointAngle_0();
 			dFloat relAngle = jointAngle - m_angle0;
-/*
-			NewtonUserJointAddAngularRow (m_joint, -relAngle, &matrix0.m_front[0]);
-			dFloat step = m_angularRate0 * timestep;
-			if (dAbs (relAngle) > 2.0f * dAbs (step)) {
-				dFloat desiredSpeed = dSign(relAngle) * m_angularRate0;
-				dFloat currentSpeed = GetJointOmega_0 ();
-				dFloat accel = (desiredSpeed - currentSpeed) / timestep;
-				NewtonUserJointSetRowAcceleration (m_joint, accel);
-			} else {
-				dFloat accel = -GetJointOmega_0() / timestep;
-				NewtonUserJointSetRowAcceleration(m_joint, accel);
-			}
-*/
 
 			dFloat currentSpeed = GetJointOmega_0();
 			dFloat step = dFloat(2.0f) * m_angularRate0 * timestep;
@@ -278,23 +204,9 @@ void CustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadInde
 			NewtonUserJointSetRowStiffness (m_joint, 1.0f);
 		}
 
-		if (m_flag1) {
+		if (m_actuator_1) {
 			dFloat jointAngle = GetJointAngle_1();
 			dFloat relAngle = jointAngle - m_angle1;
-/*
-			NewtonUserJointAddAngularRow (m_joint, -relAngle, &matrix1.m_up[0]);
-			dFloat step = m_angularRate1 * timestep;
-			if (dAbs (relAngle) > 2.0f * dAbs (step)) 
-			{
-				dFloat desiredSpeed = dSign(relAngle) * m_angularRate1;
-				dFloat currentSpeed = GetJointOmega_1 ();
-				dFloat accel = (desiredSpeed - currentSpeed) / timestep;
-				NewtonUserJointSetRowAcceleration (m_joint, accel);
-			} else {
-				dFloat accel = -GetJointOmega_1() / timestep;
-				NewtonUserJointSetRowAcceleration(m_joint, accel);
-			}
-*/
 
 			dFloat currentSpeed = GetJointOmega_1();
 			dFloat step = dFloat(2.0f) * m_angularRate1 * timestep;

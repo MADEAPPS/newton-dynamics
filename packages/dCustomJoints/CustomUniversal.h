@@ -30,6 +30,12 @@ class CustomUniversal: public CustomJoint
 	CUSTOM_JOINTS_API void SetLimits_0(dFloat minAngle, dFloat maxAngle);
 	CUSTOM_JOINTS_API void SetLimits_1(dFloat minAngle, dFloat maxAngle);
 
+	CUSTOM_JOINTS_API dFloat GetMinAngularLimit_0() const;
+	CUSTOM_JOINTS_API dFloat GetMinAngularLimit_1() const;
+
+	CUSTOM_JOINTS_API dFloat GetMaxAngularLimit_0() const;
+	CUSTOM_JOINTS_API dFloat GetMaxAngularLimit_1() const;
+
 	CUSTOM_JOINTS_API dFloat GetJointAngle_0 () const;
 	CUSTOM_JOINTS_API dFloat GetJointAngle_1 () const;
 
@@ -70,10 +76,18 @@ class CustomUniversal: public CustomJoint
 	dFloat m_angularDamp_1;
 	dFloat m_angularAccel_1;
 
-	bool m_limit_0_On;
-	bool m_limit_1_On;
-	bool m_angularMotor_0_On;
-	bool m_angularMotor_1_On;
+	union {
+		int m_flags;
+		struct {
+			unsigned m_limit_0_On		 : 1;
+			unsigned m_limit_1_On		 : 1;
+			unsigned m_angularMotor_0_On : 1;
+			unsigned m_angularMotor_1_On : 1;
+			unsigned m_actuator_0		 : 1;
+			unsigned m_actuator_1		 : 1;
+		};
+	};
+
 	DECLARE_CUSTOM_JOINT(CustomUniversal, CustomJoint)
 };
 

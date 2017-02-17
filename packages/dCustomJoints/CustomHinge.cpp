@@ -70,12 +70,11 @@ CustomHinge::~CustomHinge()
 CustomHinge::CustomHinge (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomJoint(child, parent, callback, userData)
 {
-	callback (userData, &m_minAngle, sizeof (dFloat));
+	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
 	callback (userData, &m_minAngle, sizeof (dFloat));
 	callback (userData, &m_maxAngle, sizeof (dFloat));
 	callback (userData, &m_friction, sizeof (dFloat));
 	callback (userData, &m_jointOmega, sizeof (dFloat));
-	callback (userData, &m_curJointAngle, sizeof (AngularIntegration));
 	callback (userData, &m_spring, sizeof (dFloat));
 	callback (userData, &m_damper, sizeof (dFloat));
 	callback (userData, &m_springDamperRelaxation, sizeof (dFloat));
@@ -85,12 +84,11 @@ CustomHinge::CustomHinge (NewtonBody* const child, NewtonBody* const parent, New
 void CustomHinge::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	CustomJoint::Serialize (callback, userData);
-	callback (userData, &m_minAngle, sizeof (dFloat));
+	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
 	callback (userData, &m_minAngle, sizeof (dFloat));
 	callback (userData, &m_maxAngle, sizeof (dFloat));
 	callback (userData, &m_friction, sizeof (dFloat));
 	callback (userData, &m_jointOmega, sizeof (dFloat));
-	callback (userData, &m_curJointAngle, sizeof (AngularIntegration));
 	callback(userData, &m_spring, sizeof (dFloat));
 	callback(userData, &m_damper, sizeof (dFloat));
 	callback(userData, &m_springDamperRelaxation, sizeof (dFloat));

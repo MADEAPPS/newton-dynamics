@@ -28,10 +28,11 @@ CustomSlidingContact::CustomSlidingContact (const dMatrix& pinAndPivotFrame, New
 	,m_curJointAngle()
 	,m_speed(0.0f)
 	,m_posit(0.0f)
+	,m_flags(0)
 {
+	m_lastRowWasUsed = true;
 	EnableLinearLimits(false);
 	EnableAngularLimits(false);
-	m_lastRowWasUsed = true;
 	SetLinearLimits(-1.0f, 1.0f);
 	SetAngularLimits(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
 	SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
@@ -43,13 +44,34 @@ CustomSlidingContact::CustomSlidingContact (const dMatrix& pinAndPivotFrame, New
 CustomSlidingContact::CustomSlidingContact(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomJoint(child, parent, callback, userData)
 {
-	dAssert(0);
+	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
+	callback(userData, &m_speed, sizeof(dFloat));
+	callback(userData, &m_posit, sizeof(dFloat));
+	callback(userData, &m_spring, sizeof(dFloat));
+	callback(userData, &m_damper, sizeof(dFloat));
+	callback(userData, &m_minLinearDist, sizeof(dFloat));
+	callback(userData, &m_maxLinearDist, sizeof(dFloat));
+	callback(userData, &m_minAngularDist, sizeof(dFloat));
+	callback(userData, &m_maxAngularDist, sizeof(dFloat));
+	callback(userData, &m_springDamperRelaxation, sizeof(dFloat));
+	callback(userData, &m_flags, sizeof(int));
 }
 
 void CustomSlidingContact::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	CustomJoint::Serialize(callback, userData);
-	dAssert(0);
+
+	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
+	callback(userData, &m_speed, sizeof(dFloat));
+	callback(userData, &m_posit, sizeof(dFloat));
+	callback(userData, &m_spring, sizeof(dFloat));
+	callback(userData, &m_damper, sizeof(dFloat));
+	callback(userData, &m_minLinearDist, sizeof(dFloat));
+	callback(userData, &m_maxLinearDist, sizeof(dFloat));
+	callback(userData, &m_minAngularDist, sizeof(dFloat));
+	callback(userData, &m_maxAngularDist, sizeof(dFloat));
+	callback(userData, &m_springDamperRelaxation, sizeof(dFloat));
+	callback(userData, &m_flags, sizeof(int));
 }
 
 

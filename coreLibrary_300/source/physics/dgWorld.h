@@ -341,11 +341,13 @@ class dgWorld
 	void SerializeToFile (const char* const fileName, OnBodySerialize bodyCallback, void* const userData) const;
 	void DeserializeFromFile (const char* const fileName, OnBodyDeserialize bodyCallback, void* const userData);
 
-	void SerializeJointArray (dgBody** const array, dgInt32 count, dgSerialize serializeCallback, void* const serializeHandle) const;
+	void SerializeJointArray (dgInt32 count, dgSerialize serializeCallback, void* const serializeHandle) const;
 	void DeserializeJointArray (const dgTree<dgBody*, dgInt32>&bodyMap, dgDeserialize serializeCallback, void* const serializeHandle);
 
 	void SerializeBodyArray (dgBody** const array, dgInt32 count, OnBodySerialize bodyCallback, void* const userData, dgSerialize serializeCallback, void* const serializeHandle) const;
 	void DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDeserialize bodyCallback, void* const userData, dgDeserialize deserializeCallback, void* const serializeHandle);
+
+	dgBody* FindBodyFromSerializedID(dgInt32 serializedID) const;
 
 	void SetJointSerializationCallbacks (OnJointSerializationCallback serializeJoint, OnJointDeserializationCallback deserializeJoint);
 	void GetJointSerializationCallbacks (OnJointSerializationCallback* const serializeJoint, OnJointDeserializationCallback* const deserializeJoint) const;

@@ -64,9 +64,10 @@ class CustomHinge: public CustomJoint
 		int m_flags;
 		struct
 		{
-			int	m_limitsOn			: 1;
-			int	m_setAsSpringDamper : 1;
-			int	m_lastRowWasUsed	: 1;
+			unsigned m_limitsOn			 : 1;
+			unsigned m_setAsSpringDamper : 1;
+			unsigned m_actuatorFlag		 : 1;
+			unsigned m_lastRowWasUsed	 : 1;
 		};
 	};
 

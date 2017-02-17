@@ -58,10 +58,10 @@ class CustomSlidingContact: public CustomJoint
 		int m_flags;
 		struct
 		{
-			int	m_limitsLinearOn	: 1;
-			int m_limitsAngularOn	: 1;
-			int	m_setAsSpringDamper : 1;
-			int	m_lastRowWasUsed	: 1;
+			unsigned m_limitsLinearOn	 : 1;
+			unsigned m_limitsAngularOn	 : 1;
+			unsigned m_setAsSpringDamper : 1;
+			unsigned m_lastRowWasUsed	 : 1;
 		};
 	};
 	DECLARE_CUSTOM_JOINT(CustomSlidingContact, CustomJoint)

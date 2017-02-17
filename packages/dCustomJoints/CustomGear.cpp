@@ -258,7 +258,7 @@ CustomDifferentialGear::CustomDifferentialGear(dFloat gearRatio, const dVector& 
 	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
 	m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
 
-	// set as kinematoc loop
+	// set as kinematic loop
 	SetSolverModel(1);
 }
 
@@ -266,7 +266,12 @@ CustomDifferentialGear::CustomDifferentialGear(NewtonBody* const child, NewtonBo
 	:CustomGear(child, parent, callback, userData)
 {
 	// remember to get referenceBody from the world 
-	dAssert(0);
+	int refeBodyID;
+	callback(userData, &m_pintOnReference, sizeof(dVector));
+	callback(userData, &refeBodyID, sizeof(int));
+
+	NewtonWorld* const world = NewtonBodyGetWorld(child);
+	m_parentReference = NewtonFindSerializedBody(world, refeBodyID);
 
 	// set as kinematic loop
 	SetSolverModel(1);
@@ -275,8 +280,9 @@ CustomDifferentialGear::CustomDifferentialGear(NewtonBody* const child, NewtonBo
 void CustomDifferentialGear::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	CustomGear::Serialize(callback, userData);
-	// remember to save information to later load the reference body form the world
-	dAssert(0);
+	int refeBodyID = NewtonBodyGetSerializedID(m_parentReference);
+	callback(userData, &m_pintOnReference, sizeof(dVector));
+	callback(userData, &refeBodyID, sizeof(int));
 }
 
 void CustomDifferentialGear::GetInfo(NewtonJointRecord* const info) const

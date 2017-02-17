@@ -292,6 +292,13 @@ void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char
 	world->DeserializeFromFile (filename, dgWorld::OnBodyDeserialize (bodyCallback), bodyUserData);
 }
 
+NewtonBody* NewtonFindSerializedBody(const NewtonWorld* const newtonWorld, int bodySerializedID)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return (NewtonBody*) world->FindBodyFromSerializedID(bodySerializedID);
+}
+
 /*
 void NewtonSerializeBodyArray (const NewtonWorld* const newtonWorld, NewtonBody** const bodyArray, int bodyCount, NewtonOnBodySerializationCallback serializeBody, NewtonSerializeCallback serializeFunction, void* const serializeHandle)
 {
@@ -5479,6 +5486,12 @@ void NewtonBodySetContinuousCollisionMode(const NewtonBody* const bodyPtr, unsig
 	body->SetContinueCollisionMode (state ? true : false);
 }
 
+int NewtonBodyGetSerializedID(const NewtonBody* const bodyPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	return body->GetSerialisedID();
+}
 
 /*!
   Get the continuous collision state mode for this rigid body.

@@ -28,9 +28,13 @@ CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* co
 	:CustomJoint(6, child, parent)
 	,m_curJointAngle_0()
 	,m_curJointAngle_1()
+	,m_flags(0)
 {
 	// calculate the relative matrix of the pin and pivot on each body
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+
+	m_actuator_0 = false;
+	m_actuator_1 = false;
 
 	m_limit_0_On = true;
 	m_angularMotor_0_On = false;
@@ -52,24 +56,44 @@ CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* co
 CustomUniversal::CustomUniversal(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomJoint(child, parent, callback, userData)
 {
-	dAssert(0);
-/*
-	callback(userData, &m_minAngle, sizeof(dFloat));
-	callback(userData, &m_minAngle, sizeof(dFloat));
-	callback(userData, &m_maxAngle, sizeof(dFloat));
-	callback(userData, &m_friction, sizeof(dFloat));
-	callback(userData, &m_jointOmega, sizeof(dFloat));
-	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
-	int tmp;
-	callback(userData, &tmp, sizeof(int));
-	m_limitsOn = tmp ? true : false;
-*/
+	callback(userData, &m_curJointAngle_0, sizeof(AngularIntegration));
+	callback(userData, &m_curJointAngle_1, sizeof(AngularIntegration));
+
+	callback(userData, &m_minAngle_0, sizeof(dFloat));
+	callback(userData, &m_maxAngle_0, sizeof(dFloat));
+	callback(userData, &m_jointOmega_0, sizeof(dFloat));
+	callback(userData, &m_angularDamp_0, sizeof(dFloat));
+	callback(userData, &m_angularAccel_0, sizeof(AngularIntegration));
+
+	callback(userData, &m_minAngle_1, sizeof(dFloat));
+	callback(userData, &m_maxAngle_1, sizeof(dFloat));
+	callback(userData, &m_jointOmega_1, sizeof(dFloat));
+	callback(userData, &m_angularDamp_1, sizeof(dFloat));
+	callback(userData, &m_angularAccel_1, sizeof(AngularIntegration));
+
+	callback(userData, &m_flags, sizeof(int));
 }
 
 void CustomUniversal::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	CustomJoint::Serialize(callback, userData);
-	dAssert(0);
+
+	callback(userData, &m_curJointAngle_0, sizeof(AngularIntegration));
+	callback(userData, &m_curJointAngle_1, sizeof(AngularIntegration));
+
+	callback(userData, &m_minAngle_0, sizeof(dFloat));
+	callback(userData, &m_maxAngle_0, sizeof(dFloat));
+	callback(userData, &m_jointOmega_0, sizeof(dFloat));
+	callback(userData, &m_angularDamp_0, sizeof(dFloat));
+	callback(userData, &m_angularAccel_0, sizeof(AngularIntegration));
+
+	callback(userData, &m_minAngle_1, sizeof(dFloat));
+	callback(userData, &m_maxAngle_1, sizeof(dFloat));
+	callback(userData, &m_jointOmega_1, sizeof(dFloat));
+	callback(userData, &m_angularDamp_1, sizeof(dFloat));
+	callback(userData, &m_angularAccel_1, sizeof(AngularIntegration));
+
+	callback(userData, &m_flags, sizeof(int));
 }
 
 CustomUniversal::~CustomUniversal()
@@ -184,8 +208,6 @@ void CustomUniversal::SetDamp_1(dFloat damp)
 	m_angularDamp_1 = damp;
 }
 
-
-
 void CustomUniversal::SetLimits_0(dFloat minAngle, dFloat maxAngle)
 {
 	dAssert (minAngle < 0.0f);
@@ -195,6 +217,16 @@ void CustomUniversal::SetLimits_0(dFloat minAngle, dFloat maxAngle)
 	m_maxAngle_0 = maxAngle;
 }
 
+dFloat CustomUniversal::GetMinAngularLimit_0() const
+{
+	return m_minAngle_0;
+}
+
+dFloat CustomUniversal::GetMaxAngularLimit_0() const
+{
+	return m_maxAngle_0;
+}
+
 void CustomUniversal::SetLimits_1(dFloat minAngle, dFloat maxAngle)
 {
 	dAssert (minAngle < 0.0f);
@@ -202,6 +234,16 @@ void CustomUniversal::SetLimits_1(dFloat minAngle, dFloat maxAngle)
 
 	m_minAngle_1 = minAngle;
 	m_maxAngle_1 = maxAngle;
+}
+
+dFloat CustomUniversal::GetMinAngularLimit_1() const
+{
+	return m_minAngle_1;
+}
+
+dFloat CustomUniversal::GetMaxAngularLimit_1() const
+{
+	return m_maxAngle_1;
 }
 
 

@@ -29,8 +29,8 @@ CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, New
 	,m_maxPosit( D_CUSTOM_LARGE_VALUE)
 	,m_linearRate(0.0f)
 	,m_maxForce(1.0e20f)
-	,m_flag(false)
 {
+	m_actuatorFlag = false;
 	EnableLimits(false);
 }
 
@@ -41,21 +41,30 @@ CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFl
 	,m_maxPosit(maxPosit)
 	,m_linearRate(speed)
     ,m_maxForce(D_CUSTOM_LARGE_VALUE)
-	,m_flag(true)
 {
+	m_actuatorFlag = true;
 	EnableLimits(false);
 }
 
 CustomSliderActuator::CustomSliderActuator(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomSlider(child, parent, callback, userData)
 {
-	dAssert(0);
+	callback(userData, &m_posit, sizeof(dFloat));
+	callback(userData, &m_minPosit, sizeof(dFloat));
+	callback(userData, &m_maxPosit, sizeof(dFloat));
+	callback(userData, &m_linearRate, sizeof(dFloat));
+	callback(userData, &m_maxForce, sizeof(dFloat));
 }
 
 void CustomSliderActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	CustomSlider::Serialize(callback, userData);
-	dAssert(0);
+
+	callback(userData, &m_posit, sizeof(dFloat));
+	callback(userData, &m_minPosit, sizeof(dFloat));
+	callback(userData, &m_maxPosit, sizeof(dFloat));
+	callback(userData, &m_linearRate, sizeof(dFloat));
+	callback(userData, &m_maxForce, sizeof(dFloat));
 }
 
 
@@ -66,7 +75,7 @@ CustomSliderActuator::~CustomSliderActuator()
 
 bool CustomSliderActuator::GetEnableFlag () const
 {
-	return m_flag;
+	return m_actuatorFlag;
 }
 
 dFloat CustomSliderActuator::GetTargetPosit() const
@@ -114,7 +123,7 @@ void CustomSliderActuator::SetLinearRate(dFloat rate)
 
 void CustomSliderActuator::SetEnableFlag (bool flag)
 {
-	m_flag = flag;
+	m_actuatorFlag = flag;
 }
 
 
@@ -141,7 +150,7 @@ void CustomSliderActuator::GetInfo (NewtonJointRecord* const info) const
 
 void CustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	if (m_flag) {
+	if (m_actuatorFlag) {
 		dVector posit1 (matrix1.m_posit);
 		dVector posit0 (matrix0.m_posit - matrix1.m_front.Scale (m_posit));
 		dFloat jointosit = GetJointPosit();
