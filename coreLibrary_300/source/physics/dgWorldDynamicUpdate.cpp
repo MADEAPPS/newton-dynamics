@@ -531,7 +531,7 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 										loopCount ++;
 									}
 
-								} else if ((constraint->m_solverModel != 2) && loopCount < (sizeof (loopJoints)/sizeof(loopJoints))) {
+								} else if ((constraint->m_solverModel != 2) && loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
 									loopJoints[loopCount] = (dgBilateralConstraint*)constraint;
 									loopCount ++;
 									dgAssert(loopCount < (sizeof (loopJoints) / sizeof (loopJoints[0])));
