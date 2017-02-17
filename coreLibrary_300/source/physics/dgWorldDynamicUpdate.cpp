@@ -487,7 +487,8 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 
 		const dgInt32 poolSize = 1024 * 4;
 		dgSkeletonContainer::dgGraph* pool [poolSize];
-		dgBilateralConstraint* loopJoints[16];
+
+		dgBilateralConstraint* loopJoints[64];
 		world->m_dynamicsLru = world->m_dynamicsLru + 1;
 		lru = world->m_dynamicsLru;
 		for (dgInt32 i = 0; i < jointCount; i++) {
