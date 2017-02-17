@@ -1283,13 +1283,8 @@ void dgWorld::SerializeJointArray (dgInt32 bodyCount, dgSerialize serializeCallb
 			if (joint->IsBilateral()) {
 				if (!map.Find(joint)) {
 					map.Insert (0, joint);
-					//dgInt32 body0; 
-					//dgInt32 body1; 
 					dgAssert (joint->GetBody0());
 					dgAssert (joint->GetBody1());
-					//body0 = (joint->GetBody0() != m_sentinelBody) ? bodyMap.Find (joint->GetBody0())->GetInfo() : -1;
-					//body1 = (joint->GetBody1() != m_sentinelBody) ? bodyMap.Find (joint->GetBody1())->GetInfo() : -1;
-
 					const dgInt32 body0 = (joint->GetBody0() != m_sentinelBody) ? joint->GetBody0()->m_serializeEnum : -1;
 					const dgInt32 body1 = (joint->GetBody1() != m_sentinelBody) ? joint->GetBody1()->m_serializeEnum : -1;
 

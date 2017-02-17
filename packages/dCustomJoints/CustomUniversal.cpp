@@ -63,13 +63,13 @@ CustomUniversal::CustomUniversal(NewtonBody* const child, NewtonBody* const pare
 	callback(userData, &m_maxAngle_0, sizeof(dFloat));
 	callback(userData, &m_jointOmega_0, sizeof(dFloat));
 	callback(userData, &m_angularDamp_0, sizeof(dFloat));
-	callback(userData, &m_angularAccel_0, sizeof(AngularIntegration));
+	callback(userData, &m_angularAccel_0, sizeof(dFloat));
 
 	callback(userData, &m_minAngle_1, sizeof(dFloat));
 	callback(userData, &m_maxAngle_1, sizeof(dFloat));
 	callback(userData, &m_jointOmega_1, sizeof(dFloat));
 	callback(userData, &m_angularDamp_1, sizeof(dFloat));
-	callback(userData, &m_angularAccel_1, sizeof(AngularIntegration));
+	callback(userData, &m_angularAccel_1, sizeof(dFloat));
 
 	callback(userData, &m_flags, sizeof(int));
 }
@@ -85,13 +85,13 @@ void CustomUniversal::Serialize(NewtonSerializeCallback callback, void* const us
 	callback(userData, &m_maxAngle_0, sizeof(dFloat));
 	callback(userData, &m_jointOmega_0, sizeof(dFloat));
 	callback(userData, &m_angularDamp_0, sizeof(dFloat));
-	callback(userData, &m_angularAccel_0, sizeof(AngularIntegration));
+	callback(userData, &m_angularAccel_0, sizeof(dFloat));
 
 	callback(userData, &m_minAngle_1, sizeof(dFloat));
 	callback(userData, &m_maxAngle_1, sizeof(dFloat));
 	callback(userData, &m_jointOmega_1, sizeof(dFloat));
 	callback(userData, &m_angularDamp_1, sizeof(dFloat));
-	callback(userData, &m_angularAccel_1, sizeof(AngularIntegration));
+	callback(userData, &m_angularAccel_1, sizeof(dFloat));
 
 	callback(userData, &m_flags, sizeof(int));
 }
