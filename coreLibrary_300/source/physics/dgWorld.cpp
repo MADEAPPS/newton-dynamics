@@ -1045,8 +1045,9 @@ void dgWorld::SerializeToFile (const char* const fileName, OnBodySerialize bodyC
 		SerializeBodyArray (array, count, bodyCallback ? bodyCallback : OnBodySerializeToFile, userData, OnSerializeToFile, file);
 		SerializeJointArray (count, OnSerializeToFile, file);
 
-		for (dgInt32 i = 0; i < count; i++) {
-			array[i]->m_serializeEnum = -1;
+		for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
+			const dgBodyMasterListRow& graphNode = node->GetInfo();
+			graphNode.GetBody()->m_serializeEnum = -1;;
 		}
 
 		delete[] array;
@@ -1075,6 +1076,12 @@ void dgWorld::DeserializeFromFile (const char* const fileName, OnBodyDeserialize
 		DeserializeBodyArray (bodyMap, bodyCallback ? bodyCallback : OnBodyDeserializeFromFile, userData, OnDeserializeFromFile, file);
 		DeserializeJointArray (bodyMap, OnDeserializeFromFile, file);
 		fclose (file);
+
+		const dgBodyMasterList& me = *this;
+		for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
+			const dgBodyMasterListRow& graphNode = node->GetInfo();
+			graphNode.GetBody()->m_serializeEnum = -1;;
+		}
 	}
 }
 
