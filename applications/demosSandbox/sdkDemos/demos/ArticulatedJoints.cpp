@@ -335,11 +335,13 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		// update steering wheels
 		if (vehicleModel->m_rearTiresCount) {
-			dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetActuatorAngle1();
+			dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetJointAngle_1();
 			if (vehicleModel->m_inputs.m_steerValue > 0) {
-				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
+				//steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
+				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit_1();
 			} else if (vehicleModel->m_inputs.m_steerValue < 0) {
-				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit0(); 
+				//steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit0(); 
+				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit_1();
 			}
 			for (int i = 0; i < vehicleModel->m_rearTiresCount; i ++) {
 				vehicleModel->m_rearTireJoints[i]->SetTargetAngle1(steeringAngle);
@@ -412,20 +414,20 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		if (vehicleModel->m_universalActuatorsCount) {
 			dFloat posit0 = vehicleModel->m_wristAxis0;
 			if (vehicleModel->m_inputs.m_wristAxis0 > 0) {
-				posit0 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit0();
-				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetActuatorAngle0();
+				posit0 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit_0();
+				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetJointAngle_0();
 			} else if (vehicleModel->m_inputs.m_wristAxis0 < 0) {
-				posit0 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit0();
-				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetActuatorAngle0();
+				posit0 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit_0();
+				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
 			}
 
 			dFloat posit1 = vehicleModel->m_wristAxis1;
 			if (vehicleModel->m_inputs.m_wristAxis1 > 0) {
-				posit1 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit1();
-				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetActuatorAngle1();
+				posit1 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit_1();
+				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
 			} else if (vehicleModel->m_inputs.m_wristAxis1 < 0) {
-				posit1 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit1();
-				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetActuatorAngle1();
+				posit1 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit_1();
+				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
 			}
 
 			for (int i = 0; i < vehicleModel->m_universalActuatorsCount; i ++) {
