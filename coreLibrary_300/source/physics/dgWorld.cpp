@@ -1225,7 +1225,7 @@ void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDese
 		// load user related data 
 		bodyCallback (*body, userData, deserialization, fileHandle);
 
-		bodyMap.Insert(body, i);
+		bodyMap.Insert(body, body->m_serializeEnum);
 
 		// sync to next body
 		dgDeserializeMarker (deserialization, fileHandle);
