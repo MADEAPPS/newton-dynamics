@@ -10,7 +10,6 @@
 */
 
 
-
 // CustomUniversal.cpp: implementation of the CustomUniversal class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -40,26 +39,67 @@ CustomUniversalActuator::CustomUniversalActuator (const dMatrix& pinAndPivotFram
 
 CustomUniversalActuator::CustomUniversalActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:CustomUniversal(pinAndPivotFrame, child, parent)
-	, m_angle0(0.0f)
-	, m_minAngle0(0.0f)
-	, m_maxAngle0(0.0f)
-	, m_angularRate0(0.0f)
-	, m_maxForce0(D_CUSTOM_LARGE_VALUE)
-	, m_angle1(0.0f)
-	, m_minAngle1(0.0f)
-	, m_maxAngle1(0.0f)
-	, m_angularRate1(0.0f)
-	, m_maxForce1(D_CUSTOM_LARGE_VALUE)
-	, m_flag0(true)
-	, m_flag1(true)
+	,m_angle0(0.0f)
+	,m_minAngle0(0.0f)
+	,m_maxAngle0(0.0f)
+	,m_angularRate0(0.0f)
+	,m_maxForce0(D_CUSTOM_LARGE_VALUE)
+	,m_angle1(0.0f)
+	,m_minAngle1(0.0f)
+	,m_maxAngle1(0.0f)
+	,m_angularRate1(0.0f)
+	,m_maxForce1(D_CUSTOM_LARGE_VALUE)
+	,m_flag0(true)
+	,m_flag1(true)
 {
 	EnableLimit_0(false);
 	EnableLimit_1(false);
 }
 
 
+CustomUniversalActuator::CustomUniversalActuator(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomUniversal(child, parent, callback, userData)
+{
+	callback(userData, &m_angle0, sizeof(dFloat));
+	callback(userData, &m_minAngle0, sizeof(dFloat));
+	callback(userData, &m_maxAngle0, sizeof(dFloat));
+	callback(userData, &m_angularRate0, sizeof(dFloat));
+	callback(userData, &m_maxForce0, sizeof(dFloat));
+
+	callback(userData, &m_angle1, sizeof(dFloat));
+	callback(userData, &m_minAngle1, sizeof(dFloat));
+	callback(userData, &m_maxAngle1, sizeof(dFloat));
+	callback(userData, &m_angularRate1, sizeof(dFloat));
+	callback(userData, &m_maxForce1, sizeof(dFloat));
+
+	int flag;
+	callback(userData, &flag, sizeof(int));
+	m_flag0 = bool(flag & 1);
+	m_flag1 = (flag >> 8) & 1;
+}
+
 CustomUniversalActuator::~CustomUniversalActuator()
 {
+}
+
+void CustomUniversalActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const 
+{ 
+	CustomUniversal::Serialize(callback, userData);
+
+	callback(userData, &m_angle0, sizeof(dFloat));
+	callback(userData, &m_minAngle0, sizeof(dFloat));
+	callback(userData, &m_maxAngle0, sizeof(dFloat));
+	callback(userData, &m_angularRate0, sizeof(dFloat));
+	callback(userData, &m_maxForce0, sizeof(dFloat));
+
+	callback(userData, &m_angle1, sizeof(dFloat));
+	callback(userData, &m_minAngle1, sizeof(dFloat));
+	callback(userData, &m_maxAngle1, sizeof(dFloat));
+	callback(userData, &m_angularRate1, sizeof(dFloat));
+	callback(userData, &m_maxForce1, sizeof(dFloat));
+
+	int flag = m_flag0 + (m_flag1 << 8);
+	callback(userData, &flag, sizeof(int));
 }
 
 bool CustomUniversalActuator::GetEnableFlag0 () const
@@ -194,8 +234,6 @@ void CustomUniversalActuator::SetMaxTorquePower1(dFloat force)
 {
     m_maxForce1 = dAbs (force);
 }
-
-
 
 void CustomUniversalActuator::GetInfo (NewtonJointRecord* const info) const
 {

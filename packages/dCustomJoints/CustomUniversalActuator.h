@@ -65,9 +65,10 @@ class CustomUniversalActuator: public CustomUniversal
     CUSTOM_JOINTS_API void SetMaxTorquePower1(dFloat force);
 
 	protected:
+	CUSTOM_JOINTS_API CustomUniversalActuator(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const {dAssert (0);} 
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
 	dFloat m_angle0;
 	dFloat m_minAngle0;
