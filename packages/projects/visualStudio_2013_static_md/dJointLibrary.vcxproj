@@ -22,6 +22,7 @@
     <ProjectGuid>{721C99CE-4716-4146-9817-59BC2671B844}</ProjectGuid>
     <RootNamespace>JointLibrary</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>dCustomJoints</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
@@ -223,6 +224,7 @@
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\CustomKinematicController.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPathFollow.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomPlane.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomRackAndPinion.cpp" />
@@ -252,6 +254,7 @@
     <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomPlane.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomRackAndPinion.h" />
