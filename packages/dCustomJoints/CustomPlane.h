@@ -20,6 +20,22 @@
 
 #include "CustomJoint.h"
 
+class CustomPlane5DOF : public CustomJoint
+{
+	public:
+	CUSTOM_JOINTS_API CustomPlane5DOF(const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~CustomPlane5DOF();
+
+protected:
+	CUSTOM_JOINTS_API CustomPlane5DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+
+	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
+
+	DECLARE_CUSTOM_JOINT(CustomPlane5DOF, CustomJoint)
+};
+
 class CustomPlane3DOF: public CustomJoint  
 {
 	public:
@@ -35,6 +51,9 @@ class CustomPlane3DOF: public CustomJoint
 	
 	DECLARE_CUSTOM_JOINT(CustomPlane3DOF, CustomJoint)
 };
+
+
+
 
 #endif 
 

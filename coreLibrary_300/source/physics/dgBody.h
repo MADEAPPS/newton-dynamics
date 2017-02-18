@@ -208,7 +208,7 @@ class dgBody
 	void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse, dgFloat32 timestep);
 	void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray, dgFloat32 timestep);
 
-	dgInt32 GetSerialisedID() const;
+	dgInt32 GetSerializedID() const;
 
 	protected:
 	void UpdateWorlCollisionMatrix() const;
@@ -267,7 +267,7 @@ class dgBody
 	dgInt32 m_bodyGroupId;
 	dgInt32 m_rtti;
 	dgInt32 m_type;
-	dgInt32 m_serializeEnum;
+	dgInt32 m_serializedEnum;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_genericLRUMark;
 
@@ -597,9 +597,9 @@ DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const
 	return NULL;
 }
 
-DG_INLINE dgInt32 dgBody::GetSerialisedID() const
+DG_INLINE dgInt32 dgBody::GetSerializedID() const
 {
-	return m_serializeEnum;
+	return m_serializedEnum;
 }
 
 #endif 

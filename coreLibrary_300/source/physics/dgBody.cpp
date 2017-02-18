@@ -68,7 +68,7 @@ dgBody::dgBody()
 	,m_bodyGroupId(0)
 	,m_rtti(m_baseBodyRTTI)
 	,m_type(0)
-	,m_serializeEnum(-1)
+	,m_serializedEnum(-1)
 	,m_dynamicsLru(0)
 	,m_genericLRUMark(0)
 {
@@ -108,7 +108,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_bodyGroupId(0)
 	,m_rtti(m_baseBodyRTTI)
 	,m_type(0)
-	,m_serializeEnum(-1)
+	,m_serializedEnum(-1)
 	,m_dynamicsLru(0)
 	,m_genericLRUMark(0)
 {
@@ -125,7 +125,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
-	serializeCallback (userData, &m_serializeEnum, sizeof(dgInt32));
+	serializeCallback (userData, &m_serializedEnum, sizeof(dgInt32));
 
 	dgInt32 id;
 	serializeCallback (userData, &id, sizeof (id));
@@ -166,7 +166,7 @@ void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRema
 	serializeCallback(userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
-	serializeCallback(userData, &m_serializeEnum, sizeof(dgInt32));
+	serializeCallback(userData, &m_serializedEnum, sizeof(dgInt32));
 
 	dgTree<dgInt32, const dgCollision*>::dgTreeNode* const node = collisionRemapId.Find(m_collision->GetChildShape());
 	dgAssert (node);

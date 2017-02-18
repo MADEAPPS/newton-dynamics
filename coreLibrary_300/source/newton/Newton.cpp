@@ -5490,7 +5490,7 @@ int NewtonBodyGetSerializedID(const NewtonBody* const bodyPtr)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
-	return body->GetSerialisedID();
+	return body->GetSerializedID();
 }
 
 /*!
