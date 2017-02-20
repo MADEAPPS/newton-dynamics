@@ -139,6 +139,9 @@ void dgThread::Init (dgInt32 stacksize)
 void dgThread::Close ()
 {
 	m_handle.join();
+	// wait two time slot after a thread is terminated, 
+	dgThreadYield();
+	dgThreadYield();
 }
 
 void dgThread::SuspendExecution (dgSemaphore& mutex)
