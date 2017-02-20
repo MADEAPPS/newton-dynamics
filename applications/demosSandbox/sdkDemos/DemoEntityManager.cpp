@@ -130,6 +130,13 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	h[1] = 1.0f;
 	dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
 */
+
+/*
+for (int ii = 0; ii < 10000; ii++) {
+	NewtonDestroy(NewtonCreate());
+}
+*/
+
 }
 
 
