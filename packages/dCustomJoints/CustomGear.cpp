@@ -48,6 +48,9 @@ CustomGear::CustomGear(dFloat gearRatio, const dVector& childPin, const dVector&
 	dMatrix pinAndPivot1 (dGrammSchmidt(parentPin));
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
 	m_localMatrix1.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+
+	// set as kinematic loop
+	SetSolverModel(1);
 }
 
 
@@ -58,6 +61,9 @@ CustomGear::~CustomGear()
 CustomGear::CustomGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomJoint(child, parent, callback, userData)
 {
+	// set as kinematic loop
+	SetSolverModel(1);
+
 	callback (userData, &m_gearRatio, sizeof (dFloat));
 }
 
@@ -167,6 +173,9 @@ CustomGearAndSlide::~CustomGearAndSlide()
 CustomGearAndSlide::CustomGearAndSlide (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomGear(child, parent, callback, userData)
 {
+	// set as kinematic loop
+	SetSolverModel(1);
+
 	callback (userData, &m_slideRatio, sizeof (dFloat));
 }
 
