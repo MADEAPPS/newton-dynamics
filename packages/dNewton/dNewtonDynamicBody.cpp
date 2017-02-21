@@ -53,9 +53,9 @@ void dNewtonDynamicBody::SetBody (NewtonBody* const body)
 	NewtonBodySetForceAndTorqueCallback(m_body, OnForceAndTorque);
 }
 
-void dNewtonDynamicBody::ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc)
+void dNewtonDynamicBody::ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc, dFloat timestep)
 {
-	NewtonBodyAddImpulse (m_body, &desiredveloc[0], &point[0]);
+	NewtonBodyAddImpulse (m_body, &desiredveloc[0], &point[0], timestep);
 }
 
 

@@ -74,8 +74,8 @@ class dNewtonJoint: public dNewtonAlloc
 	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
 
 	private:
-	CNEWTON_API static void OnJointDestroyCallback (const NewtonUserJoint* const me);
-	CNEWTON_API static void OnSubmitConstraintCallback (const NewtonUserJoint* const me, dFloat timestep, int threadIndex);
+	CNEWTON_API static void OnJointDestroyCallback (const CustomJoint* const me);
+	CNEWTON_API static void OnSubmitConstraintCallback (const CustomJoint* const me, dFloat timestep, int threadIndex);
 
 	protected:
 	dJointType m_type;
@@ -115,8 +115,8 @@ class dNewtonUniversalJoint: public dNewtonJoint
 	CNEWTON_API dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
 	CNEWTON_API void EnableLimit_0(bool state);
 	CNEWTON_API void EnableLimit_1(bool state);
-	CNEWTON_API void SetLimis_0(dFloat minAngle, dFloat maxAngle);
-	CNEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
+	CNEWTON_API void SetLimits_0(dFloat minAngle, dFloat maxAngle);
+	CNEWTON_API void SetLimits_1(dFloat minAngle, dFloat maxAngle);
 };
 
 class dNewtonCylindricalJoint: public dNewtonJoint 
@@ -125,8 +125,8 @@ class dNewtonCylindricalJoint: public dNewtonJoint
     CNEWTON_API dNewtonCylindricalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1 = NULL);
     CNEWTON_API void EnableLimit_0(bool state);
     CNEWTON_API void EnableLimit_1(bool state);
-    CNEWTON_API void SetLimis_0(dFloat minDist, dFloat maxDist);
-    CNEWTON_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
+    CNEWTON_API void SetLimits_0(dFloat minDist, dFloat maxDist);
+    CNEWTON_API void SetLimits_1(dFloat minAngle, dFloat maxAngle);
 };
 
 

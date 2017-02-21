@@ -56,7 +56,6 @@ struct dgLineBox
 } DG_GCC_VECTOR_ALIGMENT;
 
 
-//DG_MSC_VECTOR_ALIGMENT
 DG_MSC_VECTOR_ALIGMENT
 class dgBody  
 {
@@ -176,10 +175,6 @@ class dgBody
 	virtual dgVector PredictLinearVelocity(dgFloat32 timestep) const = 0;
 	virtual dgVector PredictAngularVelocity(dgFloat32 timestep) const = 0;
 
-	virtual void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit);
-	virtual void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse);
-	virtual void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray);
-	
 	virtual void InvalidateCache();
 	
     virtual void SetMatrix(const dgMatrix& matrix);
@@ -209,6 +204,12 @@ class dgBody
 	dgBroadPhaseAggregate* GetBroadPhaseAggregate() const;
 	void SetBroadPhaseAggregate(dgBroadPhaseAggregate* const aggregate);
 
+	void AddImpulse (const dgVector& pointVeloc, const dgVector& pointPosit, dgFloat32 timestep);
+	void ApplyImpulsePair (const dgVector& linearImpulse, const dgVector& angularImpulse, dgFloat32 timestep);
+	void ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray, dgFloat32 timestep);
+
+	dgInt32 GetSerializedID() const;
+
 	protected:
 	void UpdateWorlCollisionMatrix() const;
 	void UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex);
@@ -218,6 +219,7 @@ class dgBody
 	protected:
 	void UpdateLumpedMatrix();
 	void CalcInvInertiaMatrix ();
+	void ApplyGyroTorque ();
 
 	dgMatrix m_invWorldInertiaMatrix;
 	dgMatrix m_matrix;
@@ -230,6 +232,8 @@ class dgBody
 	dgVector m_maxAABB;
 	dgVector m_localCentreOfMass;	
 	dgVector m_globalCentreOfMass;	
+	dgVector m_impulseForce;	
+	dgVector m_impulseTorque;	
 
 	dgFloat32 m_maxAngulaRotationPerSet2;
 	dgThread::dgCriticalSection m_criticalSectionLock;
@@ -263,6 +267,7 @@ class dgBody
 	dgInt32 m_bodyGroupId;
 	dgInt32 m_rtti;
 	dgInt32 m_type;
+	dgInt32 m_serializedEnum;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_genericLRUMark;
 
@@ -581,12 +586,21 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
 }
 
+DG_INLINE void dgBody::ApplyGyroTorque ()
+{
+	dgVector gyroTorque (m_omega.CrossProduct3(m_matrix.RotateVector(m_mass.CompProduct4(m_matrix.UnrotateVector(m_omega)))));
+	SetTorque (GetTorque() - gyroTorque);
+}
+
 DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const
 {
 	return NULL;
 }
 
-
+DG_INLINE dgInt32 dgBody::GetSerializedID() const
+{
+	return m_serializedEnum;
+}
 
 #endif 
 

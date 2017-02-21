@@ -528,7 +528,6 @@ class CustomVehicleController: public CustomControllerBase
 	dList<BodyPart*> m_bodyPartsList;
 	BodyPartEngine* m_engine;
 	
-	NewtonSkeletonContainer* m_skeleton;
 	void* m_collisionAggregate;
 	
 	BrakeController* m_brakesControl;

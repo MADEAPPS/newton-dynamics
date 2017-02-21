@@ -108,6 +108,35 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 
 	dTimeTrackerSetThreadName ("mainThread");
 	m_context = new wxGLContext(this);
+
+/*
+	dFloat A[2][2];
+	dFloat x[2];
+	dFloat b[2];
+	dFloat l[2];
+	dFloat h[2];
+
+	A[0][0] = 2.0f;
+	A[0][1] = 1.0f;
+	A[1][0] = 1.0f;
+	A[1][1] = 2.0f;
+	b[0] = 1.0f;
+	b[1] = 1.0f;
+	x[0] = 0;
+	x[1] = 0;
+	l[0] = 0.0f;
+	l[1] = 0.0f;
+	h[0] = 0.25f;
+	h[1] = 1.0f;
+	dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
+*/
+
+/*
+for (int ii = 0; ii < 10000; ii++) {
+	NewtonDestroy(NewtonCreate());
+}
+*/
+
 }
 
 

@@ -292,6 +292,13 @@ void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char
 	world->DeserializeFromFile (filename, dgWorld::OnBodyDeserialize (bodyCallback), bodyUserData);
 }
 
+NewtonBody* NewtonFindSerializedBody(const NewtonWorld* const newtonWorld, int bodySerializedID)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return (NewtonBody*) world->FindBodyFromSerializedID(bodySerializedID);
+}
+
 /*
 void NewtonSerializeBodyArray (const NewtonWorld* const newtonWorld, NewtonBody** const bodyArray, int bodyCount, NewtonOnBodySerializationCallback serializeBody, NewtonSerializeCallback serializeFunction, void* const serializeHandle)
 {
@@ -4690,12 +4697,16 @@ void NewtonBodyGetInvMass(const NewtonBody* const bodyPtr, dFloat* const invMass
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 
-//	dgVector vector1 (body->GetApparentMass());
-	dgVector vector1 (body->GetMass());
-	invIxx[0] = dgFloat32 (1.0f) / (vector1.m_x + dgFloat32 (1.0e-8f));
-	invIyy[0] = dgFloat32 (1.0f) / (vector1.m_y + dgFloat32 (1.0e-8f)); 
-	invIzz[0] = dgFloat32 (1.0f) / (vector1.m_z + dgFloat32 (1.0e-8f));
-	invMass[0] = dgFloat32 (1.0f) / (vector1.m_w + dgFloat32 (1.0e-8f));
+//	dgVector vector1 (body->GetMass());
+//	invIxx[0] = dgFloat32 (1.0f) / (vector1.m_x + dgFloat32 (1.0e-8f));
+//	invIyy[0] = dgFloat32 (1.0f) / (vector1.m_y + dgFloat32 (1.0e-8f)); 
+//	invIzz[0] = dgFloat32 (1.0f) / (vector1.m_z + dgFloat32 (1.0e-8f));
+//	invMass[0] = dgFloat32 (1.0f) / (vector1.m_w + dgFloat32 (1.0e-8f));
+	dgVector inverseMass (body->GetInvMass());
+	invIxx[0] = inverseMass.m_x;
+	invIyy[0] = inverseMass.m_y; 
+	invIzz[0] = inverseMass.m_z;
+	invMass[0] = inverseMass.m_w;
 }
 
 
@@ -5167,12 +5178,6 @@ NewtonJoint* NewtonBodyGetNextContactJoint(const NewtonBody* const bodyPtr, cons
 }
 
 
-NewtonSkeletonContainer* NewtonBodyGetSkeleton(const NewtonBody* const bodyPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)bodyPtr;
-	return (NewtonSkeletonContainer*) body->GetSkeleton();
-}
 
 int NewtonJointIsActive(const NewtonJoint* const jointPtr)
 {
@@ -5266,10 +5271,15 @@ void NewtonContactJointRemoveContact(const NewtonJoint* const contactJoint, void
 	if ((joint->GetId() == dgConstraint::m_contactConstraint) && joint->GetCount()){
 		dgList<dgContactMaterial>::dgListNode* const node = (dgList<dgContactMaterial>::dgListNode*) contact;
 
-		dgBody* const body = joint->GetBody0() ? joint->GetBody0() : joint->GetBody1();
-		dgWorld* const world = body->GetWorld();
+		dgAssert (joint->GetBody0());
+		dgAssert (joint->GetBody1());
+		//dgBody* const body = joint->GetBody0() ? joint->GetBody0() : joint->GetBody1();
+		//dgWorld* const world = body->GetWorld();
+		dgWorld* const world = joint->GetBody0()->GetWorld();
 		world->GlobalLock(false);
 		joint->Remove(node);
+		joint->GetBody0()->SetSleepState(false);
+		joint->GetBody1()->SetSleepState(false);
 		world->GlobalUnlock();
 	}
 }
@@ -5476,6 +5486,12 @@ void NewtonBodySetContinuousCollisionMode(const NewtonBody* const bodyPtr, unsig
 	body->SetContinueCollisionMode (state ? true : false);
 }
 
+int NewtonBodyGetSerializedID(const NewtonBody* const bodyPtr)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+	return body->GetSerializedID();
+}
 
 /*!
   Get the continuous collision state mode for this rigid body.
@@ -5906,6 +5922,7 @@ void NewtonBodyGetPointVelocity (const NewtonBody* const bodyPtr, const dFloat* 
   @param *bodyPtr is the pointer to the body.
   @param pointDeltaVeloc pointer to an array of at least three floats containing the desired change in velocity to point pointPosit.
   @param  pointPosit	- pointer to an array of at least three floats containing the center of the impulse in global space.
+  @param timestep - the update rate time step.
 
   @return Nothing.
 
@@ -5916,10 +5933,12 @@ void NewtonBodyGetPointVelocity (const NewtonBody* const bodyPtr, const dFloat* 
   *pointDeltaVeloc* represent a change in velocity. For example, a value of *pointDeltaVeloc* of (1, 0, 0) changes the velocity
   of *bodyPtr* in such a way that the velocity of point *pointDeltaVeloc* will increase by (1, 0, 0)
 
+  *the calculate impulse will be applied to the body on next frame update
+
   Because *pointDeltaVeloc* represents a change in velocity, this function must be used with care. Repeated calls
   to this function will result in an increase of the velocity of the body and may cause to integrator to lose stability.
 */
-void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const pointDeltaVeloc, const dFloat* const pointPosit)
+void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const pointDeltaVeloc, const dFloat* const pointPosit, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
@@ -5927,10 +5946,9 @@ void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const p
 	if (body->GetInvMass().m_w > dgFloat32 (0.0f)) {
 		dgVector p (pointPosit[0], pointPosit[1], pointPosit[2], dgFloat32 (0.0f));
 		dgVector v (pointDeltaVeloc[0], pointDeltaVeloc[1], pointDeltaVeloc[2], dgFloat32 (0.0f));
-		body->AddImpulse (v, p);
+		body->AddImpulse (v, p, timestep);
 	}
 }
-
 
 
 /*!
@@ -5939,8 +5957,9 @@ void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const p
   @param *bodyPtr is the pointer to the body.
   @param  impulseCount	- number of impulses and distances in the array distance
   @param  strideInByte	- sized in bytes of vector impulse and
-  @param impulseArray pointer to an array containing the desired impulse to apply ate psoition pointarray.
+  @param impulseArray pointer to an array containing the desired impulse to apply ate position point array.
   @param pointArray pointer to an array of at least three floats containing the center of the impulse in global space.
+  @param timestep - the update rate time step.
 
   @return Nothing.
 
@@ -5948,21 +5967,22 @@ void NewtonBodyAddImpulse(const NewtonBody* const bodyPtr, const dFloat* const p
 
   *pointPosit* and *pointDeltaVeloc* must be specified in global space.
 
+  *the calculate impulse will be applied to the body on next frame update
 
   this function apply at general impulse to a body a oppose to a desired change on velocity
   this mean that the body mass, and Inertia will determine the gain on velocity.
 */
-void NewtonBodyApplyImpulseArray (const NewtonBody* const bodyPtr, int impulseCount, int strideInByte, const dFloat* const impulseArray, const dFloat* const pointArray)
+void NewtonBodyApplyImpulseArray (const NewtonBody* const bodyPtr, int impulseCount, int strideInByte, const dFloat* const impulseArray, const dFloat* const pointArray, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
 
 	if (body->GetInvMass().m_w > dgFloat32 (0.0f)) {
-		body->ApplyImpulsesAtPoint (impulseCount, strideInByte, impulseArray, pointArray);
+		body->ApplyImpulsesAtPoint (impulseCount, strideInByte, impulseArray, pointArray, timestep);
 	}
 }
 
-void NewtonBodyApplyImpulsePair (const NewtonBody* const bodyPtr, dFloat* const linearImpulse, dFloat* const angularImpulse)
+void NewtonBodyApplyImpulsePair (const NewtonBody* const bodyPtr, dFloat* const linearImpulse, dFloat* const angularImpulse, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgBody* const body = (dgBody *)bodyPtr;
@@ -5970,7 +5990,7 @@ void NewtonBodyApplyImpulsePair (const NewtonBody* const bodyPtr, dFloat* const 
 	if (body->GetInvMass().m_w > dgFloat32 (0.0f)) {
 		dgVector l (linearImpulse[0], linearImpulse[1], linearImpulse[2], dgFloat32 (0.0f));
 		dgVector a (angularImpulse[0], angularImpulse[1], angularImpulse[2], dgFloat32 (0.0f));
-		body->ApplyImpulsePair (l, a);
+		body->ApplyImpulsePair (l, a, timestep);
 	}
 }
 
@@ -6888,9 +6908,44 @@ NewtonJoint* NewtonConstraintCreateUserJoint(const NewtonWorld* const newtonWorl
 	Newton* const world = (Newton *)newtonWorld;
 	dgBody* const body0 = (dgBody *)childBody;
 	dgBody* const body1 = (dgBody *)parentBody;
-
+	dgAssert(body0);
+	dgAssert(body0 != body1);
 	return (NewtonJoint*) new (world->dgWorld::GetAllocator()) NewtonUserJoint (world, maxDOF, submitConstraints, getInfo, body0, body1);
 }
+
+/*!
+	Set the solver algorithm use to calculation the constraint forces.
+
+	@param *joint pointer to the joint.
+	@param  *model - solve model to choose.
+
+	model = 0  zero is the default value and tells the solver to use the best possible algorithm
+	model = 1 to signal the engine that is two joints form a kinematic loop 
+	model = 2 to signal the engine this joint can be solved with a less accurate algorithm.
+	In case multiple joints form a kinematic loop, joints with a lower model are preffered towards an exact solution.
+
+	See also: NewtonUserJointGetSolverModel
+*/
+void NewtonUserJointSetSolverModel(const NewtonJoint* const joint, int model)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgConstraint* const contraint = (dgConstraint*)joint;
+	contraint->SetSolverModel(model);
+}
+
+/*!
+Get the solver algorthm use to calculation the constraint forces.
+@param *joint pointer to the joint.
+
+See also: NewtonUserJointGetSolverModel
+*/
+int NewtonUserJointGetSolverModel(const NewtonJoint* const joint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgConstraint* const contraint = (dgConstraint*)joint;
+	return contraint->GetSolverModel();
+}
+
 
 
 /*!
@@ -7055,6 +7110,13 @@ void NewtonUserJointSetRowAcceleration(const NewtonJoint* const joint, dFloat ac
 	userJoint->SetAcceleration (acceleration);
 }
 
+dFloat NewtonUserJointGetRowAcceleration (const NewtonJoint* const joint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
+	return userJoint->GetAcceleration();
+}
+
 dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -7066,6 +7128,7 @@ dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)
   Calculates the row acceleration to satisfy the specified the spring damper system.
 
   @param *joint pointer to the joint.
+  @param rowStiffness fraction of the row reaction forces used a sspring damper penalty.
   @param spring desired spring stiffness, it must be a positive value.
   @param damper desired damper coefficient, it must be a positive value.
 
@@ -7080,11 +7143,11 @@ dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)
 
   See also: ::NewtonUserJointSetRowAcceleration, ::NewtonUserJointSetRowStiffness
 */
-void NewtonUserJointSetRowSpringDamperAcceleration(const NewtonJoint* const joint, dFloat spring, dFloat damper)
+void NewtonUserJointSetRowSpringDamperAcceleration(const NewtonJoint* const joint, dFloat rowStiffness, dFloat spring, dFloat damper)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
-	userJoint->SetSpringDamperAcceleration (spring, damper);
+	userJoint->SetSpringDamperAcceleration (rowStiffness, spring, damper);
 }
 
 
@@ -8407,125 +8470,6 @@ const int* NewtonDeformableMeshSegmentGetIndexList (const NewtonCollision* const
 
 /*! @} */ // end of
 
-/*! @defgroup Hierarchical Skeleton arrangement
-
-@{
-*/
-NewtonSkeletonContainer* NewtonSkeletonContainerCreate(NewtonWorld* const worldPtr, NewtonBody* const rootBone, NewtonSkeletontDestructor destructor)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)rootBone;
-	dgWorld* const world = (dgWorld*) worldPtr;
-	dgSkeletonContainer* const skeleton = world->CreateNewtonSkeletonContainer (body);
-	skeleton->SetDestructorCallback ((dgOnSkeletonContainerDestroyCallback) destructor);
-	return (NewtonSkeletonContainer*) skeleton;
-}
-
-void NewtonSkeletonContainerDelete(NewtonSkeletonContainer* const skeletonPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*) skeletonPtr;
-	dgWorld* const world = skeleton->GetWorld();
-	world->DestroySkeletonContainer (skeleton);
-}
-
-
-void* NewtonSkeletonContainerGetRoot(const NewtonSkeletonContainer* const skeletonPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetRoot();
-}
-
-void* NewtonSkeletonContainerGetParent(const NewtonSkeletonContainer* const skeletonPtr, void* const node)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetParent((dgSkeletonContainer::dgGraph*) node);
-}
-
-
-void* NewtonSkeletonContainerFirstChild(const NewtonSkeletonContainer* const skeletonPtr, void* const parentNode)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetFirstChild((dgSkeletonContainer::dgGraph*) parentNode);
-}
-
-void* NewtonSkeletonContainerNextSibling(const NewtonSkeletonContainer* const skeletonPtr, void* const siblingNode)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return skeleton->GetNextSiblingChild((dgSkeletonContainer::dgGraph*) siblingNode);
-}
-
-NewtonBody* NewtonSkeletonContainerGetBodyFromNode (const NewtonSkeletonContainer* const skeletonPtr, void* const node)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return (NewtonBody*) (skeleton->GetBody((dgSkeletonContainer::dgGraph*) node));
-}
-
-NewtonJoint* NewtonSkeletonContainerGetParentJointFromNode (const NewtonSkeletonContainer* const skeletonPtr, void* const node)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	return (NewtonJoint*)(skeleton->GetParentJoint((dgSkeletonContainer::dgGraph*) node));
-}
-
-NewtonSkeletonContainer* NewtonSkeletonGetSkeletonFromBody (NewtonBody* const body)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const newtonBody = (dgBody*) body;
-	return (NewtonSkeletonContainer*)newtonBody->GetSkeleton();
-}
-
-int NewtonSkeletonContainerAttachCyclingJoint (NewtonSkeletonContainer* const skeletonPtr, NewtonJoint* const jointPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	dgBilateralConstraint* const joint = (dgBilateralConstraint*)jointPtr;
-	return skeleton->AttachCyclingJoint(joint) ? 1 : 0;
-}
-
-void NewtonSkeletonContainerRemoveCyclingJoint(NewtonSkeletonContainer* const skeletonPtr, NewtonJoint* const jointPtr)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)skeletonPtr;
-	dgBilateralConstraint* const joint = (dgBilateralConstraint*)jointPtr;
-	return skeleton->RemoveCyclingJoint(joint);
-}
-
-
-void NewtonSkeletonContainerAttachJointArray (NewtonSkeletonContainer* const skeleton, int jointCount, NewtonJoint** const jointArray)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*)skeleton;
-	skeletonContainer->AddJointList(jointCount, (dgBilateralConstraint**) jointArray);
-}
-
-void* NewtonSkeletonContainerAttachBone(NewtonSkeletonContainer* const skeleton, NewtonBody* const childBone, NewtonBody* const parentBone)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*) skeleton;
-	return skeletonContainer->AddChild((dgBody*) childBone, (dgBody*) parentBone);
-}
-
-void NewtonSkeletonContainernDetachBone(NewtonSkeletonContainer* const skeleton, void* const bone)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert(0);
-//	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*)skeleton;
-//skeletonContainer->AddChild((dgBody*)childBone, (dgBody*)parentBone);
-}
-
-
-void NewtonSkeletonContainerFinalize (NewtonSkeletonContainer* const skeleton)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgSkeletonContainer* const skeletonContainer = (dgSkeletonContainer*)skeleton;
-	skeletonContainer->Finalize();
-}
 
 void* NewtonCollisionAggregateCreate(NewtonWorld* const worldPtr)
 {

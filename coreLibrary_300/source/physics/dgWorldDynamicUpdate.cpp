@@ -27,8 +27,9 @@
 #include "dgConstraint.h"
 #include "dgDynamicBody.h"
 #include "dgCollisionInstance.h"
-#include "dgBilateralConstraint.h"
+#include "dgSkeletonContainer.h"
 #include "dgWorldDynamicUpdate.h"
+#include "dgBilateralConstraint.h"
 #include "dgCollisionDeformableMesh.h"
 
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
@@ -70,11 +71,12 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate()
 {
 }
 
-
 void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
+	
+	UpdateSkeletons();
 	
 	m_bodies = 0;
 	m_joints = 0;
@@ -88,7 +90,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	sentinelBody->m_dynamicsLru = m_markLru;
 
 	BuildClusters(timestep);
-	SortIClustersByCount();
+	SortClustersByCount();
 
 	dgInt32 maxRowCount = 0;
 	dgInt32 blockMatrixSize = 0;
@@ -157,7 +159,7 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	m_clusterMemory = NULL;
 }
 
-void dgWorldDynamicUpdate::SortIClustersByCount ()
+void dgWorldDynamicUpdate::SortClustersByCount ()
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	dgSort(m_clusterMemory, m_clusters, CompareClusters);
@@ -202,7 +204,6 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	}
 }
 
-
 void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep)
 {
 	dgInt32 stack = 1;
@@ -245,7 +246,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			
 			srcBody->m_index = bodyCount;
 			srcBody->m_dynamicsLru = lruMark;
-
 			hasSoftBodies |= (srcBody->m_collision->IsType(dgCollision::dgCollisionDeformableMesh_RTTI) ? 1 : 0);
 
 			srcBody->m_sleeping = false;
@@ -278,6 +278,9 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						constraintArray[jointIndex].m_joint = constraint;
 						const dgInt32 rows = (constraint->m_maxDOF + vectorStride - 1) & (-vectorStride);
 						constraintArray[jointIndex].m_pairCount = dgInt16(rows);
+
+						//constraintArray[jointIndex].m_isSkeleton = sourceSkel && constraint->IsBilateral() && (sourceSkel == linkBody->GetSkeleton());
+						constraintArray[jointIndex].m_isSkeleton = constraint->IsSkeleton();
 						constraintArray[jointIndex].m_isFrontier = equilibrium0 ^ linkBody->m_equilibrium;
 
 						const bool isEquilibrium = equilibrium0 & linkBody->m_equilibrium & !linkBody->GetSkeleton();
@@ -300,7 +303,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 						for (dgBodyMasterListRow::dgListNode* jointNode = adjacentBody->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 							dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 							dgDynamicBody* const otherBody = (dgDynamicBody*)cell->m_bodyNode;
-							if ((otherBody->GetSkeleton() == body->GetSkeleton()) && (otherBody->m_dynamicsLru != lruMark)) {
+							//if ((otherBody->GetSkeleton() == body->GetSkeleton()) && (otherBody->m_dynamicsLru != lruMark)) {
+							if ((otherBody->GetSkeleton() == adjacentBody->GetSkeleton()) && (otherBody->m_dynamicsLru != lruMark)) {
 								queueBuffer[stack] = otherBody;
 								stack ++;
 							}
@@ -363,6 +367,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 		for (dgInt32 i = 0; i < jointCount; i++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const joint = jointInfo->m_joint;
+			joint->m_graphDepth = 1023;
 
 			dgInt32 m0 = (joint->m_body0->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body0->m_index : 0;
 			dgInt32 m1 = (joint->m_body1->GetInvMass().m_w != dgFloat32(0.0f)) ? joint->m_body1->m_index : 0;
@@ -438,8 +443,121 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	}
 }
 
+void dgWorldDynamicUpdate::UpdateSkeletons()
+{
+	dgWorld* const world = (dgWorld*) this;
+	dgSkeletonList& skelManager = *world;
+	if (skelManager.m_skelListIsDirty) {
+		dTimeTrackerEvent(__FUNCTION__);
+		skelManager.m_skelListIsDirty = false;
+		dgSkeletonList::Iterator iter(skelManager);
+		for (iter.Begin(); iter; iter++) {
+			dgSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
+			delete skeleton;
+		}
+		skelManager.RemoveAll();
 
-void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
+		world->m_dynamicsLru = world->m_dynamicsLru + 1;
+		dgUnsigned32 lru = world->m_dynamicsLru;
+
+		dgBodyMasterList& masterList = *world;
+		world->m_solverJacobiansMemory.ResizeIfNecessary((2 * (masterList.m_constraintCount + 1024)) * sizeof (dgBilateralConstraint*));
+		dgBilateralConstraint** const jointList = (dgBilateralConstraint**)&world->m_solverJacobiansMemory[0];
+
+		dgInt32 jointCount = 0;
+		for (dgBodyMasterList::dgListNode* node = masterList.GetFirst(); node; node = node->GetNext()) {
+			const dgBodyMasterListRow& graphNode = node->GetInfo();
+			dgBody* const srcBody = graphNode.GetBody();
+
+			for (dgBodyMasterListRow::dgListNode* jointNode = srcBody->m_masterNode->GetInfo().GetLast(); jointNode; jointNode = jointNode->GetPrev()) {
+				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+				dgConstraint* const constraint = cell->m_joint;
+				dgAssert(constraint);
+				dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
+				dgAssert((constraint->m_body0 == cell->m_bodyNode) || (constraint->m_body1 == cell->m_bodyNode));
+				if (constraint->IsBilateral() && (constraint->m_solverModel < 2) && (constraint->m_dynamicsLru != lru)) {
+					constraint->m_dynamicsLru = lru;
+					jointList[jointCount] = (dgBilateralConstraint*)constraint;
+					jointCount++;
+				}
+			}
+		}
+
+		dgSortIndirect(jointList, jointCount, CompareJointByInvMass);
+
+		const dgInt32 poolSize = 1024 * 4;
+		dgSkeletonContainer::dgGraph* pool [poolSize];
+
+		dgBilateralConstraint* loopJoints[64];
+		world->m_dynamicsLru = world->m_dynamicsLru + 1;
+		lru = world->m_dynamicsLru;
+		for (dgInt32 i = 0; i < jointCount; i++) {
+			dgBilateralConstraint* const constraint = jointList[i];
+			if (constraint->m_dynamicsLru != lru) {
+				dgInt32 loopCount = 0;
+				dgDynamicBody* const rootBody = (dgDynamicBody*) ((constraint->GetBody0()->GetInvMass().m_w < constraint->GetBody1()->GetInvMass().m_w) ? constraint->GetBody0() : constraint->GetBody1());
+				dgSkeletonContainer* const skeleton = world->CreateNewtonSkeletonContainer (rootBody);
+				dgQueue<dgSkeletonContainer::dgGraph*> queue(pool, poolSize); 
+				queue.Insert (skeleton->GetRoot());
+				rootBody->m_dynamicsLru = lru;
+
+				while (!queue.IsEmpty()) {
+					dgInt32 count = queue.m_firstIndex - queue.m_lastIndex;
+					if (count < 0) {
+						count += queue.m_mod;
+					}
+
+					dgInt32 index = queue.m_lastIndex;
+					queue.Reset();
+
+					for (dgInt32 j = 0; j < count; j++) {
+						dgSkeletonContainer::dgGraph* const parentNode (queue.m_pool[index]);
+						dgDynamicBody* const parentBody = skeleton->GetBody(parentNode);
+
+						for (dgBodyMasterListRow::dgListNode* jointNode = parentBody->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+							dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+							dgConstraint* const constraint = cell->m_joint;
+							if (constraint->IsBilateral() && (constraint->m_dynamicsLru != lru)) {
+								constraint->m_dynamicsLru = lru;
+
+								if (!constraint->m_solverModel) {
+									dgDynamicBody* const childBody = (dgDynamicBody*) ((constraint->GetBody0() == parentBody) ? constraint->GetBody1() : constraint->GetBody0());
+
+									if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dgFloat32 (0.0f))) {
+										childBody->m_dynamicsLru = lru;
+										dgSkeletonContainer::dgGraph* const childNode = skeleton->AddChild((dgBilateralConstraint*)constraint, parentNode);
+										queue.Insert (childNode);
+									} else if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
+										loopJoints[loopCount] = (dgBilateralConstraint*)constraint;
+										loopCount ++;
+									}
+
+								} else if ((constraint->m_solverModel != 2) && loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
+									loopJoints[loopCount] = (dgBilateralConstraint*)constraint;
+									loopCount ++;
+								}
+							}
+						}
+						index++;
+						if (index >= queue.m_mod) {
+							index = 0;
+						}
+					}
+				}
+				skeleton->Finalize();
+
+				if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
+					for (dgInt32 i = 0; i < loopCount; i ++) {
+						skeleton->AttachCyclingJoint(loopJoints[i]); 
+					}
+				}
+			}
+		}
+	}
+}
+
+
+dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
 {
 	dgWorld* const world = (dgWorld*) this;
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*)&world->m_jointsMemory[0];
@@ -458,13 +576,20 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 		if (jointInfo.m_isFrontier) {
 			queue.Insert(&tmpInfoList[i]);
 			tmpInfoList[i].m_isInQueueFrontier = -1;
+			if (jointInfo.m_isSkeleton && (jointInfo.m_joint->m_graphDepth != 0)) {
+				dgSkeletonContainer* const container = jointInfo.m_joint->m_body0->GetSkeleton() ? jointInfo.m_joint->m_body0->GetSkeleton() : jointInfo.m_joint->m_body1->GetSkeleton();
+				dgAssert(container);
+				//dgAssert(container == jointInfo.m_joint->m_body1->GetSkeleton());
+				container->SetGrapfDepth(0);
+			}
+			tmpInfoList[i].m_joint->m_graphDepth = 0;
 		} else {
 			if (jointInfo.m_joint->m_body0->GetInvMass().m_w && (heaviestMass > jointInfo.m_joint->m_body0->GetInvMass().m_w)) {
-				heaviestMass = jointInfo.m_joint->m_body0->m_invMass.m_w;
+				heaviestMass = jointInfo.m_joint->m_body0->GetInvMass().m_w;
 				heaviestBody = &tmpInfoList[i];
 			}
 			if (jointInfo.m_joint->m_body1->GetInvMass().m_w && (heaviestMass > jointInfo.m_joint->m_body1->GetInvMass().m_w)) {
-				heaviestMass = jointInfo.m_joint->m_body1->m_invMass.m_w;
+				heaviestMass = jointInfo.m_joint->m_body1->GetInvMass().m_w;
 				heaviestBody = &tmpInfoList[i];
 			}
 		}
@@ -473,6 +598,12 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 	if (queue.IsEmpty()) {
 		dgAssert(heaviestBody);
 		queue.Insert(heaviestBody);
+		if (heaviestBody->m_isSkeleton) {
+			dgSkeletonContainer* const container = heaviestBody->m_joint->m_body0->GetSkeleton();
+			dgAssert (container == heaviestBody->m_joint->m_body1->GetSkeleton());
+			container->SetGrapfDepth(0);
+		}
+		heaviestBody->m_joint->m_graphDepth = 0;
 		heaviestBody->m_isInQueueFrontier = -1;
 	}
 
@@ -481,6 +612,8 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
 	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 
+	dgInt32 maxGraphdepth = 0;
+	bool hasSkel = false;
 	while (!queue.IsEmpty()) {
 		dgInt32 count = queue.m_firstIndex - queue.m_lastIndex;
 		if (count < 0) {
@@ -500,40 +633,58 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 				constraint->m_clusterLRU--;
 				infoIndex++;
 				dgAssert(infoIndex <= cluster->m_jointCount);
-				//if (infoIndex == island->m_jointCount) {
-				if (infoIndex == cluster->m_activeJointCount) {
-					return;
-				}
+
+				maxGraphdepth = dgMin(maxGraphdepth, dgInt32 (constraint->m_graphDepth)) + 1;
 
 				const dgInt32 m0 = jointInfo->m_m0;
 				const dgBody* const body0 = bodyArray[m0].m_body;
+				hasSkel = hasSkel || body0->GetSkeleton();
+
+				const dgInt32 m1 = jointInfo->m_m1;
+				const dgBody* const body1 = bodyArray[m1].m_body;
+				hasSkel = hasSkel || body1->GetSkeleton();
+
+				//if (infoIndex == island->m_jointCount) {
+				if (infoIndex == cluster->m_activeJointCount) {
+					queue.Reset();
+					break;
+				}
+				
 				if (body0->GetInvMass().m_w > dgFloat32(0.0f)) {
 					for (dgBodyMasterListRow::dgListNode* jointNode = body0->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 						dgConstraint* const constraint = cell->m_joint;
 						if ((constraint->m_clusterLRU == lru) && (dgInt32 (constraint->m_index) < cluster->m_activeJointCount)){
 							dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
-							//dgAssert (!nextInfo->m_isInQueueFrontier);
 							if (!nextInfo->m_isInQueueFrontier) {
 								queue.Insert(nextInfo);
 								nextInfo->m_isInQueueFrontier = -1;
+								if (nextInfo->m_isSkeleton && (dgInt32 (constraint->m_graphDepth) > maxGraphdepth)) {
+									dgSkeletonContainer* const container = body0->GetSkeleton();
+									dgAssert(container);
+									container->SetGrapfDepth(maxGraphdepth);
+								}
+								constraint->m_graphDepth = dgMin(maxGraphdepth, dgInt32 (constraint->m_graphDepth));
 							}
 						}
 					}
 				}
 
-				const dgInt32 m1 = jointInfo->m_m1;
-				const dgBody* const body1 = bodyArray[m1].m_body;
 				if (body1->GetInvMass().m_w > dgFloat32(0.0f)) {
 					for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 						dgConstraint* const constraint = cell->m_joint;
 						if ((constraint->m_clusterLRU == lru) && (dgInt32 (constraint->m_index) < cluster->m_activeJointCount)){
 							dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
-//							dgAssert (!nextInfo->m_isInQueueFrontier);
 							if (!nextInfo->m_isInQueueFrontier) {
 								queue.Insert(nextInfo);
 								nextInfo->m_isInQueueFrontier = -1;
+								if (nextInfo->m_isSkeleton && (dgInt32(constraint->m_graphDepth) > maxGraphdepth)) {
+									dgSkeletonContainer* const container = body1->GetSkeleton();
+									dgAssert(container);
+									container->SetGrapfDepth(maxGraphdepth);
+								}
+								constraint->m_graphDepth = dgMin(maxGraphdepth, dgInt32(constraint->m_graphDepth));
 							}
 						}
 					}
@@ -545,7 +696,27 @@ void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFl
 			}
 		}
 	}
+
+	if (hasSkel) {
+		dgInt32 j = 0;
+		for (dgInt32 i = 0; (i < cluster->m_activeJointCount) && (j < cluster->m_activeJointCount); i ++) {
+			if (constraintArray[i].m_isSkeleton) {
+				for (j = dgMax (j, i + 1); j < cluster->m_activeJointCount; j ++) {
+					if (!constraintArray[j].m_isSkeleton) {
+						dgConstraint* const constraint0 = constraintArray[i].m_joint;
+						dgConstraint* const constraint1 = constraintArray[j].m_joint;
+						dgSwap(constraint0->m_index, constraint1->m_index); 
+						dgSwap(constraintArray[j], constraintArray[i]);
+						j ++;
+						break;
+					}
+				}
+			}
+		}
+	}
 	dgAssert(infoIndex == cluster->m_activeJointCount);
+
+	return maxGraphdepth - 1;
 }
 
 
@@ -574,39 +745,19 @@ dgInt32 dgWorldDynamicUpdate::CompareClusters(const dgBodyCluster* const cluster
 	return 0;
 }
 
-/*
-void dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(dgBodyCluster* const cluster, dgFloat32 timestep)
-{
-	dgWorld* const world = (dgWorld*) this;
-	dgBodyInfo* const bodyArrayPtr = (dgBodyInfo*)&world->m_bodiesMemory[0];
-	dgBodyInfo* const bodyArray = &bodyArrayPtr[cluster->m_bodyStart];
 
-	for (dgInt32 i = 1; i < cluster->m_bodyCount; i++) {
-		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-		if (body->m_collision->GetChildShape()->IsType(dgCollision::dgCollisionDeformableMesh_RTTI)) {
-			dgCollisionDeformableMesh* const deformableShape = (dgCollisionDeformableMesh*)body->m_collision->GetChildShape();
-			deformableShape->ApplyInternalForces(body, timestep);
-		}
+dgInt32 dgWorldDynamicUpdate::CompareJointByInvMass (const dgBilateralConstraint* const jointA, const dgBilateralConstraint* const jointB, void* notUsed)
+{
+	dgFloat32 invMass0 = dgMin (jointA->GetBody0()->m_invMass.m_w, jointA->GetBody1()->m_invMass.m_w);
+	dgFloat32 invMass1 = dgMin (jointB->GetBody0()->m_invMass.m_w, jointB->GetBody1()->m_invMass.m_w);
+	if (invMass0 < invMass1) {
+		return -1;
+	} else if (invMass0 > invMass1) {
+		return 1;
 	}
+	return 0;
 }
 
-
-void dgWorldDynamicUpdate::ApplySoftBodyIntenalForceKernel(void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dTimeTrackerEvent(__FUNCTION__);
-	dgWorldDynamicUpdateSyncDescriptor* const descriptor = (dgWorldDynamicUpdateSyncDescriptor*)context;
-	dgFloat32 timestep = descriptor->m_timestep;
-	dgWorld* const world = (dgWorld*)worldContext;
-	dgInt32 count = descriptor->m_clusterCount;
-	dgBodyCluster* const clusters = &((dgBodyCluster*)&world->m_clusterMemory[0])[descriptor->m_firstCluster];
-
-	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
-		dgBodyCluster* const cluster = &clusters[i];
-		world->dgWorldDynamicUpdate::ApplySoftBodyIntenalForce(cluster, timestep);
-	}
-}
-*/
 
 void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
@@ -699,6 +850,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 		row->m_diagDamp = dgFloat32 (0.0f);
 		row->m_stiffness = DG_PSD_DAMP_TOL * (dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) + dgFloat32 (1.0e-6f);
 		dgAssert(row->m_stiffness >= dgFloat32(0.0f));
+		dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(1.0f));
 		dgAssert ((dgFloat32 (1.0f) - constraintParamOut.m_jointStiffness[i]) >= dgFloat32 (0.0f));
 		row->m_coordenateAccel = constraintParamOut.m_jointAccel[i];
 		row->m_restitution = constraintParamOut.m_restitution[i];

@@ -28,13 +28,17 @@ class CustomSlidingContact: public CustomJoint
 
 	CUSTOM_JOINTS_API void EnableLinearLimits(bool state);
 	CUSTOM_JOINTS_API void EnableAngularLimits(bool state);
-	CUSTOM_JOINTS_API void SetLinearLimis(dFloat minDist, dFloat maxDist);
-	CUSTOM_JOINTS_API void SetAngularLimis(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetLinearLimits(dFloat minDist, dFloat maxDist);
+	CUSTOM_JOINTS_API void SetAngularLimits(dFloat minAngle, dFloat maxAngle);
 
 	CUSTOM_JOINTS_API dFloat GetSpeed() const;
 	CUSTOM_JOINTS_API dFloat GetPosition() const;
+	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
 	protected:
+	CUSTOM_JOINTS_API CustomSlidingContact(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
@@ -45,9 +49,23 @@ class CustomSlidingContact: public CustomJoint
 	dFloat m_maxLinearDist;
 	dFloat m_minAngularDist;
 	dFloat m_maxAngularDist;
-	bool m_limitsLinearOn;
-	bool m_limitsAngularOn;
+
+	dFloat m_spring;
+	dFloat m_damper;
+	dFloat m_springDamperRelaxation;
+	union
+	{
+		int m_flags;
+		struct
+		{
+			unsigned m_limitsLinearOn	 : 1;
+			unsigned m_limitsAngularOn	 : 1;
+			unsigned m_setAsSpringDamper : 1;
+			unsigned m_lastRowWasUsed	 : 1;
+		};
+	};
+	DECLARE_CUSTOM_JOINT(CustomSlidingContact, CustomJoint)
 };
 
-#endif // !defined(AFX_CustomSlidingContact_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)
+#endif 
 

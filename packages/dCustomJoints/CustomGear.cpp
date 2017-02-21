@@ -17,10 +17,9 @@
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomGear.h"
 
-//dInitRtti(CustomGear);
 IMPLEMENT_CUSTOM_JOINT(CustomGear);
 IMPLEMENT_CUSTOM_JOINT(CustomGearAndSlide);
-IMPLEMENT_CUSTOM_JOINT(CustomSatelliteGear);
+IMPLEMENT_CUSTOM_JOINT(CustomDifferentialGear);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -29,6 +28,8 @@ IMPLEMENT_CUSTOM_JOINT(CustomSatelliteGear);
 CustomGear::CustomGear(int dof, NewtonBody* const child, NewtonBody* const parent)
 	:CustomJoint(dof, child, parent)
 {
+	// set as kinematoc loop
+	SetSolverModel(1);
 }
 
 
@@ -47,6 +48,9 @@ CustomGear::CustomGear(dFloat gearRatio, const dVector& childPin, const dVector&
 	dMatrix pinAndPivot1 (dGrammSchmidt(parentPin));
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
 	m_localMatrix1.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+
+	// set as kinematic loop
+	SetSolverModel(1);
 }
 
 
@@ -57,6 +61,9 @@ CustomGear::~CustomGear()
 CustomGear::CustomGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomJoint(child, parent, callback, userData)
 {
+	// set as kinematic loop
+	SetSolverModel(1);
+
 	callback (userData, &m_gearRatio, sizeof (dFloat));
 }
 
@@ -140,84 +147,6 @@ void CustomGear::GetInfo (NewtonJointRecord* const info) const
 }
 
 
-CustomSatelliteGear::CustomSatelliteGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
-	:CustomGear(gearRatio, childPin, parentPin, child, parent)
-	,m_parentReference(parentReference)
-{
-	dMatrix referenceMatrix;
-	NewtonBodyGetMatrix (m_parentReference, &referenceMatrix[0][0]);
-	m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
-}
-
-CustomSatelliteGear::CustomSatelliteGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomGear(child, parent, callback, userData)
-{
-	// remember to get referenceBody from the world 
-	dAssert (0);
-}
-
-void CustomSatelliteGear::Serialize (NewtonSerializeCallback callback, void* const userData) const
-{
-	CustomGear::Serialize (callback,userData);
-	// remember to save information to later load the reference body form the world
-	dAssert(0);
-}
-
-void CustomSatelliteGear::GetInfo (NewtonJointRecord* const info) const
-{
-	dAssert (0);
-}
-
-
-void CustomSatelliteGear::SubmitConstraints(dFloat timestep, int threadIndex)
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-	dVector omega0(0.0f);
-	dVector omega1(0.0f);
-	dFloat jacobian0[6];
-	dFloat jacobian1[6];
-
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	// calculate the angular velocity for both bodies
-	dVector dir0 (matrix0.m_front.Scale(m_gearRatio));
-	dVector dir2 (matrix1.m_front);
-
-	dMatrix referenceMatrix;
-	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
-	dVector dir3 (referenceMatrix.RotateVector(m_pintOnReference));
-	dVector dir1 (dir2 + dir3);
-
-	jacobian0[0] = 0.0f;
-	jacobian0[1] = 0.0f;
-	jacobian0[2] = 0.0f;
-	jacobian0[3] = dir0.m_x;
-	jacobian0[4] = dir0.m_y;
-	jacobian0[5] = dir0.m_z;
-
-	jacobian1[0] = 0.0f;
-	jacobian1[1] = 0.0f;
-	jacobian1[2] = 0.0f;
-	jacobian1[3] = dir1.m_x;
-	jacobian1[4] = dir1.m_y;
-	jacobian1[5] = dir1.m_z;
-
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	NewtonBodyGetOmega(m_body1, &omega1[0]);
-
-	dFloat w0 = omega0.DotProduct3(dir0);
-	dFloat w1 = omega1.DotProduct3(dir1);
-
-	dFloat relOmega = w0 + w1;
-	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
-	dFloat relAccel = -0.5f * relOmega * invTimestep;
-	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
-	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-}
-
-
 CustomGearAndSlide::CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent)
 	:CustomGear(2, child, parent)
 	,m_slideRatio (slideRatio)
@@ -232,6 +161,9 @@ CustomGearAndSlide::CustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, con
 	// calculate the local matrix for body body1  
 	dMatrix pinAndPivot1 (dGrammSchmidt(parentPin));
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
+
+	// set as kinematoc loop
+	SetSolverModel(1);
 }
 
 CustomGearAndSlide::~CustomGearAndSlide()
@@ -241,6 +173,9 @@ CustomGearAndSlide::~CustomGearAndSlide()
 CustomGearAndSlide::CustomGearAndSlide (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomGear(child, parent, callback, userData)
 {
+	// set as kinematic loop
+	SetSolverModel(1);
+
 	callback (userData, &m_slideRatio, sizeof (dFloat));
 }
 
@@ -322,3 +257,95 @@ void CustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 	// add the angular relation constraint form the base class
 	CustomGear::SubmitConstraints (timestep, threadIndex);
 }
+
+
+CustomDifferentialGear::CustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
+	:CustomGear(gearRatio, childPin, parentPin, child, parent)
+	,m_parentReference(parentReference)
+{
+	dMatrix referenceMatrix;
+	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
+	m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
+
+	// set as kinematic loop
+	SetSolverModel(1);
+}
+
+CustomDifferentialGear::CustomDifferentialGear(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomGear(child, parent, callback, userData)
+{
+	// remember to get referenceBody from the world 
+	int refeBodyID;
+	callback(userData, &m_pintOnReference, sizeof(dVector));
+	callback(userData, &refeBodyID, sizeof(int));
+
+	NewtonWorld* const world = NewtonBodyGetWorld(child);
+	m_parentReference = NewtonFindSerializedBody(world, refeBodyID);
+
+	// set as kinematic loop
+	SetSolverModel(1);
+}
+
+void CustomDifferentialGear::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomGear::Serialize(callback, userData);
+	int refeBodyID = NewtonBodyGetSerializedID(m_parentReference);
+	callback(userData, &m_pintOnReference, sizeof(dVector));
+	callback(userData, &refeBodyID, sizeof(int));
+}
+
+void CustomDifferentialGear::GetInfo(NewtonJointRecord* const info) const
+{
+	dAssert(0);
+}
+
+
+void CustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	dMatrix referenceMatrix;
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
+	dFloat jacobian0[6];
+	dFloat jacobian1[6];
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space.
+	CalculateGlobalMatrix(matrix0, matrix1);
+	NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
+
+	// calculate the angular velocity for both bodies
+	dVector dir0 (matrix0.m_front.Scale(m_gearRatio));
+	dVector dir2(matrix1.m_front);
+	dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
+	dVector dir1(dir2 + dir3);
+
+//dTrace(("(%f %f %f) (%f %f %f)\n", dir2[0], dir2[1], dir2[2], dir3[0], dir3[1], dir3[2]));
+
+	jacobian0[0] = 0.0f;
+	jacobian0[1] = 0.0f;
+	jacobian0[2] = 0.0f;
+	jacobian0[3] = dir0.m_x;
+	jacobian0[4] = dir0.m_y;
+	jacobian0[5] = dir0.m_z;
+
+	jacobian1[0] = 0.0f;
+	jacobian1[1] = 0.0f;
+	jacobian1[2] = 0.0f;
+	jacobian1[3] = dir1.m_x;
+	jacobian1[4] = dir1.m_y;
+	jacobian1[5] = dir1.m_z;
+
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+	dFloat w0 = omega0.DotProduct3(dir0);
+	dFloat w1 = omega1.DotProduct3(dir1);
+
+	dFloat relOmega = w0 + w1;
+	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
+	dFloat relAccel = -0.5f * relOmega * invTimestep;
+	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+}
+

@@ -27,8 +27,14 @@ class CustomUniversal: public CustomJoint
 
 	CUSTOM_JOINTS_API void EnableLimit_0(bool state);
 	CUSTOM_JOINTS_API void EnableLimit_1(bool state);
-	CUSTOM_JOINTS_API void SetLimis_0(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API void SetLimis_1(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetLimits_0(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetLimits_1(dFloat minAngle, dFloat maxAngle);
+
+	CUSTOM_JOINTS_API dFloat GetMinAngularLimit_0() const;
+	CUSTOM_JOINTS_API dFloat GetMinAngularLimit_1() const;
+
+	CUSTOM_JOINTS_API dFloat GetMaxAngularLimit_0() const;
+	CUSTOM_JOINTS_API dFloat GetMaxAngularLimit_1() const;
 
 	CUSTOM_JOINTS_API dFloat GetJointAngle_0 () const;
 	CUSTOM_JOINTS_API dFloat GetJointAngle_1 () const;
@@ -49,9 +55,11 @@ class CustomUniversal: public CustomJoint
 	CUSTOM_JOINTS_API void SetDamp_1(dFloat damp);
 
 	protected:
+	CUSTOM_JOINTS_API CustomUniversal(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const {dAssert (0);} 
 
 	AngularIntegration m_curJointAngle_0;
 	AngularIntegration m_curJointAngle_1;
@@ -68,10 +76,19 @@ class CustomUniversal: public CustomJoint
 	dFloat m_angularDamp_1;
 	dFloat m_angularAccel_1;
 
-	bool m_limit_0_On;
-	bool m_limit_1_On;
-	bool m_angularMotor_0_On;
-	bool m_angularMotor_1_On;
+	union {
+		int m_flags;
+		struct {
+			unsigned m_limit_0_On		 : 1;
+			unsigned m_limit_1_On		 : 1;
+			unsigned m_angularMotor_0_On : 1;
+			unsigned m_angularMotor_1_On : 1;
+			unsigned m_actuator_0		 : 1;
+			unsigned m_actuator_1		 : 1;
+		};
+	};
+
+	DECLARE_CUSTOM_JOINT(CustomUniversal, CustomJoint)
 };
 
 #endif 

@@ -320,7 +320,8 @@ dgWorld::~dgWorld()
 
 	dgSkeletonList::Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++) {
-		delete iter.GetNode()->GetInfo();
+		dgSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
+		delete skeleton;
 	}
 
 	m_preListener.RemoveAll();
@@ -1035,18 +1036,37 @@ void dgWorld::SerializeToFile (const char* const fileName, OnBodySerialize bodyC
 		for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
 			const dgBodyMasterListRow& graphNode = node->GetInfo();
 			array[count] = graphNode.GetBody();	
+			array[count]->m_serializedEnum = count;
 			count ++;
 			dgAssert (count <= GetBodiesCount());
 		}
 
 		dgSortIndirect(array, count, SerializeToFileSort);
 		SerializeBodyArray (array, count, bodyCallback ? bodyCallback : OnBodySerializeToFile, userData, OnSerializeToFile, file);
-		SerializeJointArray (array, count, OnSerializeToFile, file);
+		SerializeJointArray (count, OnSerializeToFile, file);
+
+		for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
+			const dgBodyMasterListRow& graphNode = node->GetInfo();
+			graphNode.GetBody()->m_serializedEnum = -1;
+		}
 
 		delete[] array;
 		fclose (file);
 	}
 }
+
+dgBody* dgWorld::FindBodyFromSerializedID(dgInt32 serializedID) const
+{
+	const dgBodyMasterList& me = *this;
+	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
+		const dgBodyMasterListRow& graphNode = node->GetInfo();
+		if (graphNode.GetBody()->m_serializedEnum == serializedID) {
+			return graphNode.GetBody();
+		}
+	}
+	return NULL;
+}
+
 
 void dgWorld::DeserializeFromFile (const char* const fileName, OnBodyDeserialize bodyCallback, void* const userData)
 {
@@ -1056,6 +1076,12 @@ void dgWorld::DeserializeFromFile (const char* const fileName, OnBodyDeserialize
 		DeserializeBodyArray (bodyMap, bodyCallback ? bodyCallback : OnBodyDeserializeFromFile, userData, OnDeserializeFromFile, file);
 		DeserializeJointArray (bodyMap, OnDeserializeFromFile, file);
 		fclose (file);
+
+		const dgBodyMasterList& me = *this;
+		for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
+			const dgBodyMasterListRow& graphNode = node->GetInfo();
+			graphNode.GetBody()->m_serializedEnum = -1;;
+		}
 	}
 }
 
@@ -1206,7 +1232,7 @@ void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDese
 		// load user related data 
 		bodyCallback (*body, userData, deserialization, fileHandle);
 
-		bodyMap.Insert(body, i);
+		bodyMap.Insert(body, body->m_serializedEnum);
 
 		// sync to next body
 		dgDeserializeMarker (deserialization, fileHandle);
@@ -1232,7 +1258,7 @@ void dgWorld::GetJointSerializationCallbacks (OnJointSerializationCallback* cons
 }
 
 
-void dgWorld::SerializeJointArray (dgBody** const bodyArray, dgInt32 bodyCount, dgSerialize serializeCallback, void* const userData) const
+void dgWorld::SerializeJointArray (dgInt32 bodyCount, dgSerialize serializeCallback, void* const userData) const
 {
 	dgInt32 count = 0;
 	const dgBodyMasterList* me = this;
@@ -1245,12 +1271,12 @@ void dgWorld::SerializeJointArray (dgBody** const bodyArray, dgInt32 bodyCount, 
 			count += joint->IsBilateral() ? 1 : 0;
 		}
 	}
-
+/*
 	dgTree<int, dgBody*> bodyMap (GetAllocator());
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
 		bodyMap.Insert (i, bodyArray[i]);
 	}
-
+*/
 	count /= 2;
 	dgSerializeMarker (serializeCallback, userData);
 	serializeCallback(userData, &count, sizeof (count));	
@@ -1264,15 +1290,13 @@ void dgWorld::SerializeJointArray (dgBody** const bodyArray, dgInt32 bodyCount, 
 			if (joint->IsBilateral()) {
 				if (!map.Find(joint)) {
 					map.Insert (0, joint);
-					dgInt32 body0; 
-					dgInt32 body1; 
 					dgAssert (joint->GetBody0());
 					dgAssert (joint->GetBody1());
-					body0 = (joint->GetBody0() != m_sentinelBody) ? bodyMap.Find (joint->GetBody0())->GetInfo() : -1;
-					body1 = (joint->GetBody1() != m_sentinelBody) ? bodyMap.Find (joint->GetBody1())->GetInfo() : -1;
+					const dgInt32 body0 = (joint->GetBody0() != m_sentinelBody) ? joint->GetBody0()->m_serializedEnum : -1;
+					const dgInt32 body1 = (joint->GetBody1() != m_sentinelBody) ? joint->GetBody1()->m_serializedEnum : -1;
 
-					serializeCallback(userData, &body0, sizeof (body0));
-					serializeCallback(userData, &body1, sizeof (body1));
+					serializeCallback(userData, &body0, sizeof (dgInt32));
+					serializeCallback(userData, &body1, sizeof (dgInt32));
 
 					dgBilateralConstraint* const bilateralJoint = (dgBilateralConstraint*) joint;
 					bilateralJoint->Serialize (serializeCallback, userData);
@@ -1353,7 +1377,7 @@ dgSkeletonContainer* dgWorld::CreateNewtonSkeletonContainer (dgBody* const rootB
 		}
 		list->RemoveAll();
 
-		dgInt32 index = DG_SKELETON_BASEW_UNIQUE_ID;
+		dgInt32 index = DG_SKELETON_BASE_UNIQUE_ID;
 		for (dgList<dgSkeletonContainer*>::dgListNode* ptr = saveList.GetFirst(); ptr; ptr ++) {
 			dgSkeletonContainer* const skeleton = ptr->GetInfo();
 			skeleton->m_id = index;

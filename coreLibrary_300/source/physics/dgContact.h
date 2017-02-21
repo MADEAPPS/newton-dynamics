@@ -52,7 +52,10 @@ class dgCollisionParamProxy
 {	
 	public:
 	dgCollisionParamProxy(dgContact* const contact, dgContactPoint* const contactBuffer, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly)
-		:m_contactJoint(contact)
+		:m_normal(dgVector::m_zero)
+		,m_closestPointBody0(dgVector::m_zero)
+		,m_closestPointBody1(dgVector::m_zero)
+		,m_contactJoint(contact)
 		,m_contacts(contactBuffer)
 		,m_polyMeshData(NULL)		
 		,m_threadIndex(threadIndex)

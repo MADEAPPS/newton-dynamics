@@ -110,8 +110,8 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 	public:
 	WheelJoint (const dMatrix& pinAndPivotFrame, NewtonBody* const tire, NewtonBody* const parentBody, BodyPartTire* const tireData)
 		:CustomJoint (6, tire, parentBody)
-		,m_lateralDir(0.0f, 0.0f, 0.0f, 0.0f)
-		,m_longitudinalDir(0.0f, 0.0f, 0.0f, 0.0f)
+		,m_lateralDir(0.0f)
+		,m_longitudinalDir(0.0f)
 		,m_tire (tireData)
 		,m_tireLoad(0.0f)
 		,m_steerRate (0.5f * 3.1416f)
@@ -584,7 +584,7 @@ void CustomVehicleController::BodyPartTire::Init (BodyPart* const parentPart, co
 	
 	NewtonBodySetMaterialGroupID(m_body, manager->GetTireMaterial());
 
-	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(m_body, 0);
 	NewtonBodySetAngularDamping(m_body, &drag[0]);
 	NewtonBodySetMaxRotationPerStep(m_body, 3.141692f);
@@ -671,7 +671,7 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine(CustomVehicleController*
 	dFloat inertia = 2.0f * mass * amatureRadius * amatureRadius / 5.0f;
 	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
 
-	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(m_body, 0);
 	NewtonBodySetAngularDamping(m_body, &drag[0]);
 	NewtonBodySetMaxRotationPerStep(m_body, 3.141692f);
@@ -756,7 +756,6 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			NewtonBodyGetMatrix (leftTireBody, &leftTireMatrix[0][0]);
 			leftTireMatrix = differential.m_axel.m_leftTire->GetJoint()->GetMatrix0() * leftTireMatrix;
 			AxelJoint* const leftGear = new AxelJoint(1.0f, leftTireMatrix[0], engineMatrix[0].Scale (-1.0f), chassisMatrix[2], leftTireBody, engineBody, chassisBody);
-			NewtonSkeletonContainerAttachCyclingJoint (controller->m_skeleton, leftGear->GetJoint());
 
 			dMatrix rightTireMatrix;
 			NewtonBody* const rightTireBody = differential.m_axel.m_rightTire->GetBody();
@@ -764,8 +763,6 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
 			rightTireMatrix = differential.m_axel.m_rightTire->GetJoint()->GetMatrix0() * rightTireMatrix;
 			AxelJoint* const rightGear = new AxelJoint(1.0f, rightTireMatrix[0], engineMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, engineBody, chassisBody);
-			NewtonSkeletonContainerAttachCyclingJoint (controller->m_skeleton, rightGear->GetJoint());
-
 			break;
 		}
 /*
@@ -1288,12 +1285,12 @@ void CustomVehicleController::DrawSchematic(dFloat scale) const
 		localVelocity.m_y = 0.0f;
 
 		localVelocity = projectionMatrix.RotateVector(localVelocity);
-		array[0] = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+		array[0] = dVector(0.0f);
 		array[1] = localVelocity.Scale(velocityScale);
 		manager->DrawSchematicCallback(this, "velocity", 0, 2, array);
 
 		dVector localOmega(chassisMatrix.UnrotateVector(omega));
-		array[0] = dVector(0.0f, 0.0f, 0.0f, 0.0f);
+		array[0] = dVector(0.0f);
 		array[1] = dVector(0.0f, localOmega.m_y * 10.0f, 0.0f, 0.0f);
 		manager->DrawSchematicCallback(this, "omega", 0, 2, array);
 	}
@@ -1429,7 +1426,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	NewtonWorld* const world = manager->GetWorld();
 
 	// set linear and angular drag to zero
-	dVector drag(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(m_body, 0);
 	NewtonBodySetAngularDamping(m_body, &drag[0]);
 
@@ -1446,8 +1443,6 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 	NewtonCollisionAggregateSetSelfCollision (m_collisionAggregate, 0);
 	NewtonCollisionAggregateAddBody (m_collisionAggregate, m_body);
-
-	m_skeleton = NewtonSkeletonContainerCreate(world, m_body, NULL);
 
 	m_chassis.Init(this, userData);
 	m_bodyPartsList.Append(&m_chassis);
@@ -1653,7 +1648,6 @@ void CustomVehicleController::Finalize()
 {
 //NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 	m_finalized = true;
-	NewtonSkeletonContainerFinalize(m_skeleton);
 	SetWeightDistribution (m_weightDistribution);
 }
 
@@ -1685,7 +1679,6 @@ CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const Bo
 
 	m_bodyPartsList.Append(&tire);
 	NewtonCollisionAggregateAddBody (m_collisionAggregate, tire.GetBody());
-	NewtonSkeletonContainerAttachBone (m_skeleton, tire.GetBody(), m_chassis.GetBody());
 	return &tireNode->GetInfo();
 }
 
@@ -1695,7 +1688,6 @@ CustomVehicleController::BodyPartEngine* CustomVehicleController::AddEngine (dFl
 
 	m_bodyPartsList.Append(m_engine);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());
-	NewtonSkeletonContainerAttachBone(m_skeleton, m_engine->GetBody(), m_chassis.GetBody());
 	return m_engine;
 }
 
@@ -2186,7 +2178,7 @@ void CustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 	}
 
 	dCholeskyFactorization(tireCount, massMatrixMem);
-	dCholeskySolve(tireCount, massMatrixMem, accel, tireCount);
+	dCholeskySolve(tireCount, tireCount, massMatrixMem, accel);
 
 	dVector chassisForce(0.0f);
 	dVector chassisTorque(0.0f);

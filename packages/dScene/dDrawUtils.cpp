@@ -108,7 +108,7 @@ static void SetMaterial (const dVector& color)
 	dAssert (0);
 /*
 	SetDefaultLight ();
-	dVector ambient(0.0f, 0.0f, 0.0f, 0.0f);
+	dVector ambient(0.0f);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, &color.m_x);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, &ambient.m_x);
 	glMaterialfv(GL_FRONT, GL_AMBIENT, &ambient.m_x);

@@ -30,7 +30,12 @@ CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_maxAngle(45.0f * 3.141592f / 180.0f)
 	,m_friction(0.0f)
 	,m_jointOmega(0.0f)
+	,m_spring(0.0f)
+	,m_damper(0.0f)
+	,m_springDamperRelaxation(0.6f)
 	,m_limitsOn(false)
+	,m_setAsSpringDamper(false)
+	,m_actuatorFlag(false)
 	,m_lastRowWasUsed(false)
 {
 	// calculate the two local matrix of the pivot point
@@ -45,7 +50,12 @@ CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& p
 	,m_maxAngle(45.0f * 3.141592f / 180.0f)
 	,m_friction(0.0f)
 	,m_jointOmega(0.0f)
+	,m_spring(0.0f)
+	,m_damper(0.0f)
+	,m_springDamperRelaxation(0.6f)
 	,m_limitsOn(false)
+	,m_setAsSpringDamper(false)
+	,m_actuatorFlag(false)
 	,m_lastRowWasUsed(false)
 {
 	dMatrix	dummy;
@@ -59,31 +69,30 @@ CustomHinge::~CustomHinge()
 
 CustomHinge::CustomHinge (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:CustomJoint(child, parent, callback, userData)
-	,m_lastRowWasUsed(false)
 {
-	callback (userData, &m_minAngle, sizeof (dFloat));
+	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
 	callback (userData, &m_minAngle, sizeof (dFloat));
 	callback (userData, &m_maxAngle, sizeof (dFloat));
 	callback (userData, &m_friction, sizeof (dFloat));
 	callback (userData, &m_jointOmega, sizeof (dFloat));
-	callback (userData, &m_curJointAngle, sizeof (AngularIntegration));
-	int tmp;
-	callback (userData, &tmp, sizeof (int));
-	m_limitsOn = tmp ? true : false; 
+	callback (userData, &m_spring, sizeof (dFloat));
+	callback (userData, &m_damper, sizeof (dFloat));
+	callback (userData, &m_springDamperRelaxation, sizeof (dFloat));
+	callback (userData, &m_flags, sizeof (int));
 }
 
 void CustomHinge::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	CustomJoint::Serialize (callback, userData);
-	callback (userData, &m_minAngle, sizeof (dFloat));
+	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
 	callback (userData, &m_minAngle, sizeof (dFloat));
 	callback (userData, &m_maxAngle, sizeof (dFloat));
 	callback (userData, &m_friction, sizeof (dFloat));
 	callback (userData, &m_jointOmega, sizeof (dFloat));
-	callback (userData, &m_curJointAngle, sizeof (AngularIntegration));
-
-	int tmp = m_limitsOn;
-	callback (userData, &tmp, sizeof (int));
+	callback(userData, &m_spring, sizeof (dFloat));
+	callback(userData, &m_damper, sizeof (dFloat));
+	callback(userData, &m_springDamperRelaxation, sizeof (dFloat));
+	callback(userData, &m_flags, sizeof (int));
 }
 
 
@@ -98,6 +107,13 @@ void CustomHinge::SetLimits(dFloat minAngle, dFloat maxAngle)
 	m_maxAngle = maxAngle;
 }
 
+void CustomHinge::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
+{
+	m_setAsSpringDamper = state;
+	m_spring = spring;
+	m_damper = damper;
+	m_springDamperRelaxation = dClamp(springDamperRelaxation, 0.0f, 0.999f);
+}
 
 dFloat CustomHinge::GetJointAngle () const
 {
@@ -125,8 +141,6 @@ dFloat CustomHinge::GetFriction () const
 {
 	return m_friction;
 }
-
-
 
 
 void CustomHinge::GetInfo (NewtonJointRecord* const info) const
@@ -207,17 +221,19 @@ void CustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 	m_jointOmega = (omega0 - omega1).DotProduct3(matrix1.m_front);
 
-//dTrace (("%f %f\n", GetJointAngle(), GetJointOmega()));
-
 	m_lastRowWasUsed = false;
-	SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
+	if (m_setAsSpringDamper) {
+		ApplySpringDamper (timestep, matrix0, matrix1);
+	} else {
+		SubmitConstraintsFreeDof (timestep, matrix0, matrix1);
+	}
 }
-
 
 void CustomHinge::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	// four possibilities
 	dFloat angle = m_curJointAngle.GetAngle();
+
 	if (m_friction != 0.0f) {
 		if (m_limitsOn) {
 			// friction and limits at the same time
@@ -302,4 +318,11 @@ void CustomHinge::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matri
 			m_lastRowWasUsed = true;
 		}
 	}
+}
+
+void CustomHinge::ApplySpringDamper (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
+{
+	m_lastRowWasUsed = true;
+	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
+	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
 }

@@ -318,11 +318,94 @@ DG_INLINE dgMatrix dgRollMatrix(dgFloat32 ang)
 	dgFloat32 sinAng = dgSin (ang);
 	dgFloat32 cosAng = dgCos (ang);
 	return dgMatrix (dgVector ( cosAng,          sinAng,          dgFloat32(0.0f), dgFloat32(0.0f)), 
-		dgVector (-sinAng,          cosAng,          dgFloat32(0.0f), dgFloat32(0.0f)),
-		dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)), 
-		dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f))); 
+					 dgVector (-sinAng,          cosAng,          dgFloat32(0.0f), dgFloat32(0.0f)),
+					 dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)), 
+					 dgVector ( dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f))); 
 }																		 
 
+
+
+DG_MSC_VECTOR_ALIGMENT
+class dgSpatialMatrix
+{
+	public:
+	DG_INLINE dgSpatialMatrix()
+	{
+	}
+
+	DG_INLINE dgSpatialMatrix(dgFloat32 val)
+	{
+		for (dgInt32 i = 0; i < 6; i++) {
+			m_rows[i] = dgSpatialVector(val);
+		}
+	}
+
+	DG_INLINE dgSpatialVector& operator[] (dgInt32 i)
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_rows[i];
+	}
+
+	DG_INLINE const dgSpatialVector& operator[] (dgInt32 i) const
+	{
+		dgAssert(i < 6);
+		dgAssert(i >= 0);
+		return m_rows[i];
+	}
+
+	DG_INLINE dgSpatialVector VectorTimeMatrix(const dgSpatialVector& jacobian) const
+	{
+		dgSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
+		for (dgInt32 i = 1; i < 6; i++) {
+			tmp = tmp + m_rows[i].Scale(jacobian[i]);
+		}
+		return tmp;
+	}
+
+	DG_INLINE dgSpatialVector VectorTimeMatrix(const dgSpatialVector& jacobian, dgInt32 dof) const
+	{
+		dgSpatialVector tmp(dgFloat32 (0.0f));
+		for (dgInt32 i = 0; i < dof; i++) {
+			tmp = tmp + m_rows[i].Scale(jacobian[i]);
+		}
+		return tmp;
+	}
+
+	DG_INLINE dgSpatialMatrix Inverse(dgInt32 rows) const
+	{
+		dgSpatialMatrix copy(*this);
+		dgSpatialMatrix inverse(dgFloat64(0.0f));
+		for (dgInt32 i = 0; i < rows; i++) {
+			inverse[i][i] = dgFloat32(1.0f);
+		}
+
+		for (dgInt32 i = 0; i < rows; i++) {
+			dgFloat64 val = copy[i][i];
+			dgAssert(fabs(val) > dgFloat32(1.0e-12f));
+			dgFloat64 den = dgFloat32(1.0f) / val;
+
+			copy[i] = copy[i].Scale(den);
+			copy[i][i] = dgFloat32(1.0f);
+			inverse[i] = inverse[i].Scale(den);
+
+			for (dgInt32 j = 0; j < i; j++) {
+				dgFloat64 pivot = -copy[j][i];
+				copy[j] = copy[j] + copy[i].Scale(pivot);
+				inverse[j] = inverse[j] + inverse[i].Scale(pivot);
+			}
+
+			for (dgInt32 j = i + 1; j < rows; j++) {
+				dgFloat64 pivot = -copy[j][i];
+				copy[j] = copy[j] + copy[i].Scale(pivot);
+				inverse[j] = inverse[j] + inverse[i].Scale(pivot);
+			}
+		}
+		return inverse;
+	}
+
+	dgSpatialVector m_rows[6];
+} DG_GCC_VECTOR_ALIGMENT;
 
 
 #endif

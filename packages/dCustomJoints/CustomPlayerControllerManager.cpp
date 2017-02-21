@@ -57,8 +57,8 @@ void CustomPlayerController::Init(dFloat mass, dFloat outerRadius, dFloat innerR
 	m_upVector = localAxis[0];
 	m_frontVector = localAxis[1];
 
-	m_groundPlane = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-	m_groundVelocity = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	m_groundPlane = dVector (0.0f);
+	m_groundVelocity = dVector (0.0f);
 
 	const int steps = 12;
 	dVector convexPoints[2][steps];
@@ -294,7 +294,7 @@ void CustomPlayerController::SetPlayerVelocity (dFloat forwardSpeed, dFloat late
 
 dFloat CustomPlayerController::CalculateContactKinematics(const dVector& veloc, const NewtonWorldConvexCastReturnInfo* const contactInfo) const
 {
-	dVector contactVeloc(0.0f, 0.0f, 0.0f, 0.0f) ;
+	dVector contactVeloc(0.0f) ;
 	if (contactInfo->m_hitBody) {
 		NewtonBodyGetPointVelocity (contactInfo->m_hitBody, contactInfo->m_point, &contactVeloc[0]);
 	}
@@ -444,7 +444,7 @@ void CustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 			}
 
 			dFloat residual = 10.0f;
-			dVector auxBounceVeloc (0.0f, 0.0f, 0.0f, 0.0f);
+			dVector auxBounceVeloc (0.0f);
 			for (int i = 0; (i < D_PLAYER_MAX_SOLVER_ITERATIONS) && (residual > 1.0e-3f); i ++) {
 				residual = 0.0f;
 				for (int k = 0; k < count; k ++) {

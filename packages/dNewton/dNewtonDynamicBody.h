@@ -36,7 +36,7 @@ class dNewtonDynamicBody: public dNewtonBody
 	CNEWTON_API virtual ~dNewtonDynamicBody();
 
 	CNEWTON_API void GetPointVeloc (const dFloat* const point, dFloat* const veloc) const;
-	CNEWTON_API void ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc);
+	CNEWTON_API void ApplyImpulseToDesiredPointVeloc (const dFloat* const point, const dFloat* const desiredveloc, dFloat timestep);
 
 	CNEWTON_API virtual void OnForceAndTorque (dFloat timestep, int threadIndex) = 0;
 

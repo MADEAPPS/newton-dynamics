@@ -25,7 +25,7 @@
 // velErro = -(W0 * r0 + W1 *  r1)
 // where w0 and W1 are the angular velocity
 // r0 and r1 are the radius of the spinning disk
-class CustomGear: public CustomJoint  
+class CustomGear: public CustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API CustomGear(int dof, NewtonBody* const child, NewtonBody* const parent);
@@ -61,18 +61,18 @@ class CustomGearAndSlide: public CustomGear
 };
 
 
-class CustomSatelliteGear: public CustomGear
+class CustomDifferentialGear: public CustomGear
 {
 	public:
-	CUSTOM_JOINTS_API CustomSatelliteGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference);
+	CUSTOM_JOINTS_API CustomDifferentialGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference);
 
 	protected:
-	CUSTOM_JOINTS_API CustomSatelliteGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API CustomDifferentialGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	DECLARE_CUSTOM_JOINT(CustomSatelliteGear, CustomGear)
+	DECLARE_CUSTOM_JOINT(CustomDifferentialGear, CustomGear)
 
 	dVector m_pintOnReference;
 	NewtonBody* m_parentReference;

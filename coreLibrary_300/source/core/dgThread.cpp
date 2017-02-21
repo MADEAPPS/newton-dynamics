@@ -134,6 +134,7 @@ dgThread::~dgThread ()
 void dgThread::Init (dgInt32 stacksize)
 {
 	m_handle = std::thread(dgThreadSystemCallback, this);
+	dgThreadYield();
 }
 
 void dgThread::Close ()

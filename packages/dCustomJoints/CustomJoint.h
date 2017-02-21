@@ -24,9 +24,9 @@
 #include "dQuaternion.h"
 #include "CustomAlloc.h"
 
-struct NewtonUserJoint;
-typedef void (*JointUserDestructorCallback) (const NewtonUserJoint* const me);	
-typedef void (*JointUserSubmitConstraintCallback) (const NewtonUserJoint* const me, dFloat timestep, int threadIndex);
+class CustomJoint;
+typedef void (*JointUserDestructorCallback) (const CustomJoint* const me);	
+typedef void (*JointUserSubmitConstraintCallback) (const CustomJoint* const me, dFloat timestep, int threadIndex);
 
 
 #define D_CUSTOM_LARGE_VALUE		dFloat (1.0e20f)
@@ -190,6 +190,9 @@ class CustomJoint: public CustomAlloc
 
 	CUSTOM_JOINTS_API dFloat GetStiffness () const;
 	CUSTOM_JOINTS_API void SetStiffness (dFloat stiffness);
+
+	CUSTOM_JOINTS_API void SetSolverModel(int model);
+	CUSTOM_JOINTS_API int GetSolverModel() const;
 
 	CUSTOM_JOINTS_API void SetUserDestructorCallback (JointUserDestructorCallback callback) {m_userDestructor = callback;}
 	CUSTOM_JOINTS_API void SetUserSubmintConstraintCallback (JointUserSubmitConstraintCallback callback) {m_userConstrationCallback = callback;}
