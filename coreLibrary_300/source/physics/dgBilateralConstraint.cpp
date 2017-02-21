@@ -42,6 +42,7 @@ dgBilateralConstraint::dgBilateralConstraint ()
 	m_maxDOF = 6;
 	m_isBilateral = true;
 	m_contactActive = true;
+	m_solverModel = 0;
 
 	SetStiffness (dgFloat32 (1.0f));
 
@@ -58,17 +59,26 @@ dgBilateralConstraint::~dgBilateralConstraint ()
 }
 
 
+dgInt32 dgBilateralConstraint::GetSolverModel() const
+{
+	return m_solverModel;
+}
+
+void dgBilateralConstraint::SetSolverModel(dgInt32 model)
+{
+	m_solverModel = dgClamp(model, 0, 2);
+}
+
+
 dgFloat32 dgBilateralConstraint::GetStiffness() const
 {
 	return m_stiffness;
 }
 
-
 void dgBilateralConstraint::SetStiffness(dgFloat32 stiffness)
 {
 	m_stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
 }
-
 
 void dgBilateralConstraint::SetDestructorCallback (OnConstraintDestroy destructor)
 {
@@ -160,6 +170,11 @@ dgVector dgBilateralConstraint::CalculateGlobalMatrixAndAngle (dgMatrix& globalM
 */
 }
 
+dgFloat32 dgBilateralConstraint::GetRowAcceleration (dgInt32 index, dgContraintDescritor& desc) const
+{
+	return m_motorAcceleration[index];
+}
+
 void dgBilateralConstraint::SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc)
 {
 	m_rowIsMotor[index] = 1;
@@ -203,8 +218,7 @@ void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDes
 	desc.m_forceBounds[index].m_jointForce = jointForce;
 }
 
-
-void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContraintDescritor& desc, dgFloat32 spring, dgFloat32 damper)
+void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContraintDescritor& desc, dgFloat32 rowStiffness, dgFloat32 spring, dgFloat32 damper)
 {
 	if (desc.m_timestep > dgFloat32 (0.0f)) {
 
@@ -229,8 +243,9 @@ void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContra
 		dgFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
 		dgFloat32 den = dt * kd + dt * ksd;
 		dgFloat32 accel = num / (dgFloat32 (1.0f) + den);
-//		desc.m_jointStiffness[index] = - den / DG_PSD_DAMP_TOL ;
-		desc.m_jointStiffness[index] = - dgFloat32 (1.0f) - den / DG_PSD_DAMP_TOL;
+//		desc.m_jointStiffness[index] = dgFloat32 (1.0f) - dgFloat32 (0.2f) / DG_PSD_DAMP_TOL;
+		rowStiffness = dgClamp(rowStiffness, dgFloat32(0.0f), dgFloat32(1.0f));
+		desc.m_jointStiffness[index] = dgFloat32(1.0f) - rowStiffness / DG_PSD_DAMP_TOL;
 		SetMotorAcceleration (index, accel, desc);
 	}
 }

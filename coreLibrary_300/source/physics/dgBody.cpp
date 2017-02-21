@@ -50,6 +50,8 @@ dgBody::dgBody()
 	,m_maxAABB(dgFloat32 (0.0f))
 	,m_localCentreOfMass(dgFloat32 (0.0f))	
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
+	,m_impulseForce(dgFloat32 (0.0f))		
+	,m_impulseTorque(dgFloat32 (0.0f))		
 	,m_maxAngulaRotationPerSet2(DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP )
 	,m_criticalSectionLock()
 	,m_flags(0)
@@ -66,6 +68,7 @@ dgBody::dgBody()
 	,m_bodyGroupId(0)
 	,m_rtti(m_baseBodyRTTI)
 	,m_type(0)
+	,m_serializedEnum(-1)
 	,m_dynamicsLru(0)
 	,m_genericLRUMark(0)
 {
@@ -87,6 +90,8 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_maxAABB(dgFloat32 (0.0f))
 	,m_localCentreOfMass(dgFloat32 (0.0f))	
 	,m_globalCentreOfMass(dgFloat32 (0.0f))	
+	,m_impulseForce(dgFloat32 (0.0f))		
+	,m_impulseTorque(dgFloat32 (0.0f))		
 	,m_maxAngulaRotationPerSet2(DG_MAX_ANGLE_STEP * DG_MAX_ANGLE_STEP )
 	,m_criticalSectionLock()
 	,m_flags(0)
@@ -103,6 +108,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	,m_bodyGroupId(0)
 	,m_rtti(m_baseBodyRTTI)
 	,m_type(0)
+	,m_serializedEnum(-1)
 	,m_dynamicsLru(0)
 	,m_genericLRUMark(0)
 {
@@ -119,6 +125,7 @@ dgBody::dgBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>*
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
+	serializeCallback (userData, &m_serializedEnum, sizeof(dgInt32));
 
 	dgInt32 id;
 	serializeCallback (userData, &id, sizeof (id));
@@ -159,6 +166,7 @@ void dgBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collisionRema
 	serializeCallback(userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_flags, sizeof (m_flags));
 	serializeCallback (userData, &m_maxAngulaRotationPerSet2, sizeof (m_maxAngulaRotationPerSet2));
+	serializeCallback(userData, &m_serializedEnum, sizeof(dgInt32));
 
 	dgTree<dgInt32, const dgCollision*>::dgTreeNode* const node = collisionRemapId.Find(m_collision->GetChildShape());
 	dgAssert (node);
@@ -576,7 +584,7 @@ void dgBody::InvalidateCache ()
 }
 
 
-void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointPosit)
+void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointPosit, dgFloat32 timestep)
 {
 	dgMatrix invInertia (CalculateInvInertiaMatrix());
 
@@ -620,41 +628,45 @@ void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointP
 	dgVector changeOfMomentum (contactMatrix.RotateVector (pointDeltaVeloc));
 
 
-	dgVector dv (changeOfMomentum.Scale3 (m_invMass.m_w));
-	dgVector dw (invInertia.RotateVector (globalContact.CrossProduct3(changeOfMomentum)));
+//	dgVector dv (changeOfMomentum.Scale3 (m_invMass.m_w));
+//	dgVector dw (invInertia.RotateVector (globalContact.CrossProduct3(changeOfMomentum)));
+//	m_veloc += dv;
+//	m_omega += dw;
 
-	m_veloc += dv;
-	m_omega += dw;
+	m_impulseForce += changeOfMomentum.Scale4(1.0f / timestep);
+	m_impulseTorque += globalContact.CrossProduct3(m_impulseForce);
 
 	m_sleeping	= false;
 	m_equilibrium = false;
 	Unfreeze ();
 }
 
-void dgBody::ApplyImpulsePair (const dgVector& linearImpulseIn, const dgVector& angularImpulseIn)
+void dgBody::ApplyImpulsePair (const dgVector& linearImpulseIn, const dgVector& angularImpulseIn, dgFloat32 timestep)
 {
-	dgMatrix inertia (CalculateInertiaMatrix());
-	dgMatrix invInertia (CalculateInvInertiaMatrix());
+//	dgMatrix inertia (CalculateInertiaMatrix());
+//	dgMatrix invInertia (CalculateInvInertiaMatrix());
+//	dgVector linearImpulse (m_veloc.Scale3 (m_mass.m_w) + linearImpulseIn);
+//	dgVector angularImpulse (inertia.RotateVector (m_omega) + angularImpulseIn);
+//	m_veloc = linearImpulse.Scale3(m_invMass.m_w);
+//	m_omega = invInertia.RotateVector(angularImpulse);
 
-	dgVector linearImpulse (m_veloc.Scale3 (m_mass.m_w) + linearImpulseIn);
-	dgVector angularImpulse (inertia.RotateVector (m_omega) + angularImpulseIn);
-
-	m_veloc = linearImpulse.Scale3(m_invMass.m_w);
-	m_omega = invInertia.RotateVector(angularImpulse);
+	m_impulseForce += linearImpulseIn.Scale4(1.0f / timestep);
+	m_impulseTorque += angularImpulseIn.Scale4(1.0f / timestep);
 
 	m_sleeping	= false;
 	m_equilibrium = false;
 	Unfreeze ();
 }
 
-void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray)
+void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray, dgFloat32 timestep)
 {
 	dgInt32 stride = strideInBytes / sizeof (dgFloat32);
 
 	dgMatrix inertia (CalculateInertiaMatrix());
 
-	dgVector impulse (m_veloc.Scale3 (m_mass.m_w));
-	dgVector angularImpulse (inertia.RotateVector (m_omega));
+	//dgVector impulse (m_veloc.Scale3 (m_mass.m_w));
+	dgVector impulse (dgFloat32 (0.0f));
+	dgVector angularImpulse (dgFloat32 (0.0f));
 
 	dgVector com (m_globalCentreOfMass);
 	for (dgInt32 i = 0; i < count; i ++) {
@@ -667,9 +679,12 @@ void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const d
 		angularImpulse += Q;
 	}
 
-	dgMatrix invInertia (CalculateInvInertiaMatrix());
-	m_veloc = impulse.Scale3(m_invMass.m_w);
-	m_omega = invInertia.RotateVector(angularImpulse);
+//	dgMatrix invInertia (CalculateInvInertiaMatrix());
+//	m_veloc = impulse.Scale3(m_invMass.m_w);
+//	m_omega = invInertia.RotateVector(angularImpulse);
+
+	m_impulseForce += impulse.Scale4(1.0f / timestep);
+	m_impulseTorque += angularImpulse.Scale4(1.0f / timestep);
 
 	m_sleeping	= false;
 	m_equilibrium = false;

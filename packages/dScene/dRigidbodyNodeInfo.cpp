@@ -27,23 +27,23 @@
 D_IMPLEMENT_CLASS_NODE(dRigidbodyNodeInfo);
 
 dRigidbodyNodeInfo::dRigidbodyNodeInfo(dScene* const world) 
-	:dNodeInfo (), 
-	m_centerOfMass (0.0f, 0.0f, 0.0f, 0.0f),
-	m_massMatrix (0.0f, 0.0f, 0.0f, 0.0f),
-	m_velocity (0.0f, 0.0f, 0.0f, 0.0f),
-	m_omega (0.0f, 0.0f, 0.0f, 0.0f),
-	m_internalDamp (0.0f, 0.0f, 0.0f, 0.0f)
+	:dNodeInfo () 
+	,m_centerOfMass (0.0f)
+	,m_massMatrix (0.0f)
+	,m_velocity (0.0f)
+	,m_omega (0.0f)
+	,m_internalDamp (0.0f)
 {
 	SetName ("rigidBody");
 }
 
 dRigidbodyNodeInfo::dRigidbodyNodeInfo()
-	:dNodeInfo (), 
-	m_centerOfMass (0.0f, 0.0f, 0.0f, 0.0f),
-	m_massMatrix (0.0f, 0.0f, 0.0f, 0.0f),
-	m_velocity (0.0f, 0.0f, 0.0f, 0.0f),
-	m_omega (0.0f, 0.0f, 0.0f, 0.0f),
-	m_internalDamp (0.0f, 0.0f, 0.0f, 0.0f)
+	:dNodeInfo () 
+	,m_centerOfMass (0.0f)
+	,m_massMatrix (0.0f)
+	,m_velocity (0.0f)
+	,m_omega (0.0f)
+	,m_internalDamp (0.0f)
 {
 	SetName ("rigidBody");
 }
@@ -456,7 +456,7 @@ return m_noHandle;
 
 			dFloat t = 1.2f;
 
-			p[0] = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+			p[0] = dVector (0.0f);
 			for (int i = 0; i < 3; i ++) {
 				dVector tmp (0.0f, 0.0f, 0.0f, 0.0);
 				p[2] = tmp;
@@ -748,8 +748,8 @@ dAssert (0);
 					glMultMatrix(&matrix[0][0]);
 					glBegin(GL_TRIANGLES);
 					for (int i = 0; i < 3; i ++) {
-						p[0] = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-						dVector tmp (0.0f, 0.0f, 0.0f, 0.0);
+						p[0] = dVector (0.0f);
+						dVector tmp (0.0f);
 						p[2] = tmp;
 						tmp[i] = size * NE_SCALE_UNIFORM_SCALE_FACTOR;
 						p[1] = tmp;

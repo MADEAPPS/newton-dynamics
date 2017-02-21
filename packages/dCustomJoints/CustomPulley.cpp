@@ -10,7 +10,6 @@
 */
 
 
-
 // CustomPulley.cpp: implementation of the CustomPulley class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -39,6 +38,9 @@ CustomPulley::CustomPulley(dFloat gearRatio, const dVector& childPin, const dVec
 	dMatrix pinAndPivot1 (dGrammSchmidt (parentPin));
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
 	m_localMatrix1.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+
+	// set as kinematoc loop
+	SetSolverModel(1);
 }
 
 CustomPulley::~CustomPulley()

@@ -22,7 +22,7 @@
 #ifndef _DG_SKELETON_CONTAINER_H__
 #define _DG_SKELETON_CONTAINER_H__
 
-#define DG_SKELETON_BASEW_UNIQUE_ID	10
+#define DG_SKELETON_BASE_UNIQUE_ID	10
 
 #include "dgConstraint.h"
 
@@ -47,33 +47,32 @@ class dgSkeletonContainer
 	dgWorld* GetWorld() const; 
 	dgInt32 GetId () const {return m_id;}
 	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
-	dgGraph* AddChild (dgBody* const child, dgBody* const parent);
-	void AddJointList (dgInt32 count, dgBilateralConstraint** const array);
+	dgGraph* AddChild (dgBilateralConstraint* const joint, dgGraph* const parent);
 	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
 	bool AttachCyclingJoint(dgBilateralConstraint* const jointPtr); 
 	void RemoveCyclingJoint(dgBilateralConstraint* const jointPtr);  
 	
 	dgGraph* GetRoot () const;
-	dgBody* GetBody(dgGraph* const node) const;
+	dgDynamicBody* GetBody(dgGraph* const node) const;
 	dgBilateralConstraint* GetParentJoint(dgGraph* const node) const;
 	dgGraph* GetParent (dgGraph* const node) const;
 	dgGraph* GetFirstChild (dgGraph* const parent) const;
 	dgGraph* GetNextSiblingChild (dgGraph* const sibling) const;
+	void SetGrapfDepth(dgInt32 depth);
 	
 	private:
-	DG_INLINE void SolveBackward (dgForcePair* const force) const;
-	DG_INLINE void SolveFoward (dgForcePair* const force, const dgForcePair* const accel) const;
+	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
+	DG_INLINE void CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const force) const;
 		
 	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
-	dgInt32 CalculateMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
+	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
 	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void BruteForceSolve (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
 	
 	dgGraph* FindNode (dgDynamicBody* const node) const;
-	dgGraph* AddChild (dgDynamicBody* const child, dgDynamicBody* const parent);
 	void SortGraph (dgGraph* const root, dgGraph* const parent, dgInt32& index);
 	
 	static void ResetUniqueId(dgInt32 id);
@@ -85,12 +84,13 @@ class dgSkeletonContainer
 	dgFloat32* m_deltaForce;
 	dgFloat32* m_massMatrix11;
 	dgFloat32* m_massMatrix10;
+	dgFloat32* m_factoredMassMatrix11;
 	dgJacobianMatrixElement** m_rowArray;
-	dgBodyJointMatrixDataPair* m_localMatrices;
 	dgOnSkeletonContainerDestroyCallback m_destructor;
 	dgList<dgConstraint*> m_cyclingJoints;
 	dgInt32 m_id;
 	dgInt32 m_lru;
+	mutable dgInt32 m_bufferSize;
 	dgInt16 m_nodeCount;
 	dgInt16 m_rowCount;
 	dgInt16 m_auxiliaryRowCount;

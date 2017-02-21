@@ -145,11 +145,12 @@ class dgConvexHull4d: public dgList<dgConvexHull4dTetraherum>
 		dgInt32 m_count;
 		friend class dgConvexHull4d; 
 	};
+	static const dgNormalMap& GetNormaMap();
+
 	dgInt32 m_mark;
 	dgInt32 m_count;
 	dgFloat64 m_diag;
 	dgArray<dgConvexHull4dVector> m_points;
-	static dgNormalMap m_normalMap;
 };
 
 

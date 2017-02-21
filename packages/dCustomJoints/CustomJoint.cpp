@@ -53,11 +53,15 @@ CustomJoint::CustomJoint (NewtonBody* const body0, NewtonBody* const body1, Newt
 	,m_maxDof(0)
 	,m_autoDestroy(0)
 {
+	int solverModel;
 	callback (userData, &m_localMatrix0, sizeof (m_localMatrix0));
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
 	callback (userData, &m_stiffness, sizeof (m_stiffness));
+	callback(userData, &solverModel, sizeof(solverModel));
+
 	Init (m_maxDof, body0, body1);
+	SetSolverModel(solverModel);
 }
 
 
@@ -70,7 +74,8 @@ CustomJoint::~CustomJoint()
 // if there is a C destructor call it form here
 	CustomJoint* const joint = (CustomJoint*) NewtonJointGetUserData (m_joint);  
 	if (joint->m_userDestructor) {
-		joint->m_userDestructor ((const NewtonUserJoint*) joint);
+		//joint->m_userDestructor ((const NewtonUserJoint*) joint);
+		joint->m_userDestructor (joint);
 	}
 
 //	if (NewtonJointGetUserData (m_joint)) {
@@ -145,6 +150,16 @@ void CustomJoint::SetStiffness(dFloat stiffness)
 	m_stiffness = dClamp (stiffness, dFloat(0.0f), dFloat(1.0f));
 }
 
+void CustomJoint::SetSolverModel(int model)
+{
+	NewtonUserJointSetSolverModel (m_joint, model);
+}
+
+int CustomJoint::GetSolverModel() const
+{
+	return NewtonUserJointGetSolverModel(m_joint);
+}
+
 
 void CustomJoint::Destructor (const NewtonJoint* me)
 {
@@ -169,7 +184,8 @@ void CustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timeste
 
 		// if there is a user define callback call it from here;
 		if (joint->m_userConstrationCallback) {
-			joint->m_userConstrationCallback ((const NewtonUserJoint*) joint, timestep, threadIndex);
+			//joint->m_userConstrationCallback ((const NewtonUserJoint*) joint, timestep, threadIndex);
+			joint->m_userConstrationCallback (joint, timestep, threadIndex);
 		}
 	}
 }
@@ -343,9 +359,11 @@ CustomJoint::SerializeMetaDataDictionary& CustomJoint::GetDictionary()
 
 void CustomJoint::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
+	int solverModel = GetSolverModel();
 	callback (userData, &m_localMatrix0, sizeof (m_localMatrix0));
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
 	callback (userData, &m_stiffness, sizeof (m_stiffness));
+	callback(userData, &solverModel, sizeof(solverModel));
 }
 

@@ -102,7 +102,6 @@ class CustomArticulatedTransformController: public CustomControllerBase
 	CUSTOM_JOINTS_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
 
 	CUSTOM_JOINTS_API void LinkCycleBones(CustomJoint* ) const;
-	CUSTOM_JOINTS_API void MakeNewtonSkeleton ();
 
 	void SetCalculateLocalTransforms (bool val) {m_calculateLocalTransform = val;}
 	bool GetCalculateLocalTransforms () const {return m_calculateLocalTransform;}
@@ -141,8 +140,6 @@ class CustomArticulaledTransformManager: public CustomControllerManager<CustomAr
 	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 
 	private: 
-	static void OnControllerDestroy (const NewtonSkeletonContainer* const me);
-
 	friend class CustomArticulatedTransformController;
 };
 

@@ -34,6 +34,10 @@ CustomDryRollingFriction::CustomDryRollingFriction(NewtonBody* child, dFloat rad
 
 	m_frictionCoef = coefficient;
 	m_frictionTorque = Ixx * radius;
+
+	// set as soft joint loop
+	SetSolverModel(2);
+
 }
 
 

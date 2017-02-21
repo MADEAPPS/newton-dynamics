@@ -26,21 +26,21 @@
 D_IMPLEMENT_CLASS_NODE(dCollisionNodeInfo);
 
 dCollisionNodeInfo::dCollisionNodeInfo(dScene* const world) 
-	:dNodeInfo (), 
-	m_matrix (dGetIdentityMatrix()),
-	m_geometricInertia(0.0f, 0.0f, 0.0f, 0.0f),
-	m_geometricCenterAndVolume(0.0f, 0.0f, 0.0f, 0.0f),
-	m_shapeID(0)
+	:dNodeInfo() 
+	,m_matrix (dGetIdentityMatrix())
+	,m_geometricInertia(0.0f)
+	,m_geometricCenterAndVolume(0.0f)
+	,m_shapeID(0)
 {
 	SetName ("collision");
 }
 
 dCollisionNodeInfo::dCollisionNodeInfo()
-	:dNodeInfo (), 
-	m_matrix (dGetIdentityMatrix()), 
-	m_geometricInertia(0.0f, 0.0f, 0.0f, 0.0f),
-	m_geometricCenterAndVolume(0.0f, 0.0f, 0.0f, 0.0f),
-	m_shapeID(0)
+	:dNodeInfo() 
+	,m_matrix (dGetIdentityMatrix()) 
+	,m_geometricInertia(0.0f)
+	,m_geometricCenterAndVolume(0.0f)
+	,m_shapeID(0)
 {
 	SetName ("collision");
 }
@@ -75,8 +75,8 @@ void dCollisionNodeInfo::BakeTransform (const dMatrix& transform)
 
 void dCollisionNodeInfo::CalculateInertiaGeometry (dScene* const world, dVector& inertia, dVector& centerOfMass) const
 {
-	inertia = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-	centerOfMass = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	inertia = dVector (0.0f);
+	centerOfMass = dVector (0.0f);
 }
 
 

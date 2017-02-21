@@ -308,6 +308,7 @@
     <ClCompile Include="..\..\dCustomJoints\CustomJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomKinematicController.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPathFollow.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomPlane.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomRackAndPinion.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlider.cpp" />
@@ -345,6 +346,7 @@
     <ClInclude Include="..\..\dCustomJoints\CustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomPlane.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomRackAndPinion.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlider.h" />

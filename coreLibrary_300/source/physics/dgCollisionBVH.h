@@ -88,6 +88,7 @@ class dgCollisionBVH: public dgCollisionMesh, public dgAABBPolygonSoup
 	dgPolygonSoupDatabaseBuilder* m_builder;
 	dgCollisionBVHUserRayCastCallback m_userRayCastCallback;
 
+	dgInt32 m_trianglesCount;
 	friend class dgCollisionCompound;
 	friend class dgCollisionDeformableMesh;
 };

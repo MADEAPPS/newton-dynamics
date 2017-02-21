@@ -10,7 +10,6 @@
 */
 
 
-
 // CustomSliderActuator.h: interface for the CustomSliderActuator class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -48,6 +47,9 @@ class CustomSliderActuator: public CustomSlider
     CUSTOM_JOINTS_API void SetMaxForcePower(dFloat force);
 
 	protected:
+	CUSTOM_JOINTS_API CustomSliderActuator(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	CUSTOM_JOINTS_API void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 
@@ -56,7 +58,8 @@ class CustomSliderActuator: public CustomSlider
 	dFloat m_maxPosit;
 	dFloat m_linearRate;
     dFloat m_maxForce;
-	bool m_flag;
+	DECLARE_CUSTOM_JOINT(CustomSliderActuator, CustomSlider)
+
 };
 
 #endif

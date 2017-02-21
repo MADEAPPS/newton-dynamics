@@ -9,8 +9,6 @@
 * freely
 */
 
-
-
 // CustomWormGear.cpp: implementation of the CustomWormGear class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -39,6 +37,9 @@ CustomRackAndPinion::CustomRackAndPinion(dFloat gearRatio, const dVector& rotati
 	dMatrix pinAndPivot1 (dGrammSchmidt(linearPin));
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
 	m_localMatrix1.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+
+	// set as kinematoc loop
+	SetSolverModel(1);
 }
 
 CustomRackAndPinion::~CustomRackAndPinion()

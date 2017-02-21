@@ -890,24 +890,8 @@ class HangingBridgeFrictionJoint : public CustomHinge
 	HangingBridgeFrictionJoint(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const link0, NewtonBody* const link1)
 		:CustomHinge(pinAndPivotFrame0, pinAndPivotFrame1, link0, link1)
 	{
-		SetParameters();
-	}
-
-	void SetParameters()
-	{
 		SetStiffness(0.99f);
-	}
-
-	void SubmitConstraints(dFloat timestep, int threadIndex)
-	{
-		dMatrix matrix0;
-		dMatrix matrix1;
-		CalculateGlobalMatrix(matrix0, matrix1);
-
-		CustomHinge::SubmitConstraints(timestep, threadIndex);
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-		NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 0.0f, 5.0f);
-		NewtonUserJointSetRowStiffness(m_joint, 0.7f);
+		SetAsSpringDamper(true, 0.9f, 0.0f, 10.0f);
 	}
 };
 
@@ -997,8 +981,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 
 	int jointCount = 0; 
 	NewtonJoint* jointArray[256];
-	// for more accuracy, wrap the bridge in a Newton skeleton 
-	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), body0, NULL);
+
 	for (iter ++; iter; iter ++) {
 		NewtonBody* const body1 = iter.GetNode()->GetInfo();
 		
@@ -1033,12 +1016,6 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		matrix0 = matrix1;
 	}
 
-	// add all the joint to the Newton Skeleton 
-	NewtonSkeletonContainerAttachJointArray (skeleton, jointCount, jointArray);
-
-	// complete the skeleton construction
-	NewtonSkeletonContainerFinalize(skeleton);
-	
 	// connect the last and first plank to the bridge base
 	{
 		iter.Begin();

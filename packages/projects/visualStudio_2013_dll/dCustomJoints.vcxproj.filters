@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\dCustomJoints\CustomAlloc.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\Custom6DOF.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomBallAndSocket.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomCorkScrew.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomDryRollingFriction.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomGear.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomHinge.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomHingeActuator.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomJoint.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomKinematicController.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomPathFollow.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomRackAndPinion.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomSlider.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomSliderActuator.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomSlidingContact.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomUniversal.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomUniversalActuator.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomUpVector.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomUserBlank.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomControllerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomDynamicRagDollManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomInputManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\CustomPlane.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\dCustomJoints\CustomAlloc.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomJointLibraryStdAfx.h" />
+    <ClInclude Include="..\..\dCustomJoints\Custom6DOF.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomBallAndSocket.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomCorkScrew.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomDryRollingFriction.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomGear.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomHinge.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomHingeActuator.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomJoint.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomRackAndPinion.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomSlider.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomSliderActuator.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomSlidingContact.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomUniversal.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomUniversalActuator.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomUserBlank.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomControllerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomDynamicRagDollManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomInputManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\CustomPlane.h" />
+  </ItemGroup>
+</Project>

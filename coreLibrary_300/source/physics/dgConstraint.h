@@ -167,7 +167,9 @@ class dgConstraint
 
 	bool IsActive() const;
 	bool IsCollidable () const;
-		
+	bool IsBilateral () const;
+	bool IsSkeleton () const;
+
 	virtual void ResetMaxDOF();
 	dgInt32 GetMaxDOF() const;
 	
@@ -177,8 +179,11 @@ class dgConstraint
 
 	virtual dgFloat32 GetStiffness() const;
 	virtual void SetStiffness(dgFloat32 stiffness);
-	virtual void GetInfo (dgConstraintInfo* const info) const;
 	
+	virtual dgInt32 GetSolverModel() const;
+	virtual void SetSolverModel(dgInt32 model);
+
+	virtual void GetInfo (dgConstraintInfo* const info) const;
 
 	class dgPointParam
 	{
@@ -193,8 +198,6 @@ class dgConstraint
 		dgVector m_centripetal1;
 		dgFloat32 m_stiffness;
 	};
-
-	bool IsBilateral () const;
 
 	protected:
 	dgConstraint();
@@ -222,10 +225,12 @@ class dgConstraint
 	
 	dgUnsigned32 m_maxDOF				: 6;
 	dgUnsigned32 m_constId				: 6;		
+	dgUnsigned32 m_graphDepth			: 10;
+	dgUnsigned32 m_solverModel			: 2;
 	dgUnsigned32 m_enableCollision		: 1;
 	dgUnsigned32 m_contactActive		: 1;
 	dgUnsigned32 m_isBilateral			: 1;
-	dgUnsigned32 m_hasSkeleton			: 1;
+	dgUnsigned32 m_isInSkeleton		: 1;
 	
 	friend class dgWorld;
 	friend class dgJacobianMemory;
@@ -250,10 +255,13 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_index(0)
 	,m_maxDOF(6)
 	,m_constId(m_unknownConstraint)
+	,m_graphDepth (1023)
+	,m_solverModel(2)
 	,m_enableCollision(false)
 	,m_contactActive(false)
 	,m_isBilateral(false)
-	,m_hasSkeleton(false)
+	,m_isInSkeleton(false)
+
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 }
@@ -270,6 +278,11 @@ DG_INLINE void dgConstraint::SetUpdateFeedbackFunction (ConstraintsForceFeeback 
 DG_INLINE bool dgConstraint::IsBilateral() const
 {
 	return m_isBilateral ? true : false;
+}
+
+DG_INLINE bool dgConstraint::IsSkeleton () const
+{
+	return m_isInSkeleton ? true : false;
 }
 
 DG_INLINE bool dgConstraint::IsCollidable () const
@@ -323,6 +336,15 @@ DG_INLINE void dgConstraint::SetStiffness(dgFloat32 stiffness)
 {
 }
 
+DG_INLINE dgInt32 dgConstraint::GetSolverModel() const
+{
+	return m_solverModel;
+}
+
+DG_INLINE void dgConstraint::SetSolverModel(dgInt32 model)
+{
+	m_solverModel = dgClamp(model, 0, 2);
+}
 
 DG_INLINE void dgConstraint::ResetMaxDOF()
 {

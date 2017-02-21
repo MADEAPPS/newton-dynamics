@@ -61,7 +61,7 @@ class CustomHingeActuator: public CustomHinge
 	dFloat m_maxAngle;
 	dFloat m_angularRate;
     dFloat m_maxForce;
-	bool m_flag;
+//	bool m_flag;
 };
 
 #endif

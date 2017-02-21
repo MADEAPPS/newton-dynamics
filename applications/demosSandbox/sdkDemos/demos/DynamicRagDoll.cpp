@@ -373,7 +373,8 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 		NewtonBodySetMatrixRecursive (rootBone, &worldMatrix[0][0]);
 
 		// wrap the skeleton in a newton skeleton for exact accuracy
-		controller->MakeNewtonSkeleton();
+		dAssert (0);
+		//controller->MakeNewtonSkeleton();
 	}
 
 

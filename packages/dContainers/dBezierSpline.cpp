@@ -264,7 +264,7 @@ void dBezierSpline::BasicsFunctionsDerivatives (dFloat64 u, int span, dFloat64* 
 
 dBigVector dBezierSpline::CurvePoint (dFloat64 u, int span) const
 {
-	dBigVector point (0.0f, 0.0f, 0.0f, 0.0f);
+	dBigVector point (0.0f);
 	dFloat64 basicFunctions[D_BEZIER_LOCAL_BUFFER_SIZE];
 	BasicsFunctions (u, span, basicFunctions);
 	for (int i = 0; i <= m_degree; i ++) {
@@ -290,7 +290,7 @@ dBigVector dBezierSpline::CurveDerivative (dFloat64 u, int index) const
 	BasicsFunctionsDerivatives (u, span, basicsFuncDerivatives);
 
 	const int with = m_degree + 1;
-	dBigVector point (0.0f, 0.0f, 0.0f, 0.0f);
+	dBigVector point (0.0f);
 	for (int i = 0; i <= m_degree; i ++) {
 		point += m_controlPoints[span - m_degree + i].Scale (basicsFuncDerivatives[with * index + i]);
 	}
@@ -305,9 +305,9 @@ int dBezierSpline::CurveAllDerivatives (dFloat64 u, dBigVector* const derivative
 	BasicsFunctionsDerivatives (u, span, basicsFuncDerivatives);
 
 	const int with = m_degree + 1;
-	dBigVector point (0.0f, 0.0f, 0.0f, 0.0f);
+	dBigVector point (0.0f);
 	for (int j = 0; j <= m_degree; j ++) {
-		dBigVector ck (0.0f, 0.0f, 0.0f, 0.0f);
+		dBigVector ck (0.0f);
 		for (int i = 0; i <= m_degree; i ++) {
 			ck += m_controlPoints[span - m_degree + i].Scale (basicsFuncDerivatives[with * j + i]);
 		}

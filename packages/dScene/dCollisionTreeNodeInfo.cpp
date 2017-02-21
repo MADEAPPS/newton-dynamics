@@ -76,8 +76,8 @@ void dCollisionTreeNodeInfo::BakeTransform (const dMatrix& transform)
 
 void dCollisionTreeNodeInfo::CalculateInertiaGeometry (dScene* const world, dVector& inertia, dVector& centerOfMass) const
 {
-	inertia = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-	centerOfMass = dVector (0.0f, 0.0f, 0.0f, 0.0f);
+	inertia = dVector (0.0f);
+	centerOfMass = dVector (0.0f);
 }
 
 

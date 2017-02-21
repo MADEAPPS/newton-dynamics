@@ -9,13 +9,14 @@
 * freely
 */
 
-
-
 // CustomSlider.cpp: implementation of the CustomSlider class.
 //
 //////////////////////////////////////////////////////////////////////
 #include "CustomJointLibraryStdAfx.h"
 #include "CustomSliderActuator.h"
+
+
+IMPLEMENT_CUSTOM_JOINT(CustomSliderActuator);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -28,8 +29,8 @@ CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, New
 	,m_maxPosit( D_CUSTOM_LARGE_VALUE)
 	,m_linearRate(0.0f)
 	,m_maxForce(1.0e20f)
-	,m_flag(false)
 {
+	m_actuatorFlag = false;
 	EnableLimits(false);
 }
 
@@ -40,10 +41,32 @@ CustomSliderActuator::CustomSliderActuator (const dMatrix& pinAndPivotFrame, dFl
 	,m_maxPosit(maxPosit)
 	,m_linearRate(speed)
     ,m_maxForce(D_CUSTOM_LARGE_VALUE)
-	,m_flag(true)
 {
+	m_actuatorFlag = true;
 	EnableLimits(false);
 }
+
+CustomSliderActuator::CustomSliderActuator(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:CustomSlider(child, parent, callback, userData)
+{
+	callback(userData, &m_posit, sizeof(dFloat));
+	callback(userData, &m_minPosit, sizeof(dFloat));
+	callback(userData, &m_maxPosit, sizeof(dFloat));
+	callback(userData, &m_linearRate, sizeof(dFloat));
+	callback(userData, &m_maxForce, sizeof(dFloat));
+}
+
+void CustomSliderActuator::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	CustomSlider::Serialize(callback, userData);
+
+	callback(userData, &m_posit, sizeof(dFloat));
+	callback(userData, &m_minPosit, sizeof(dFloat));
+	callback(userData, &m_maxPosit, sizeof(dFloat));
+	callback(userData, &m_linearRate, sizeof(dFloat));
+	callback(userData, &m_maxForce, sizeof(dFloat));
+}
+
 
 CustomSliderActuator::~CustomSliderActuator()
 {
@@ -52,7 +75,7 @@ CustomSliderActuator::~CustomSliderActuator()
 
 bool CustomSliderActuator::GetEnableFlag () const
 {
-	return m_flag;
+	return m_actuatorFlag;
 }
 
 dFloat CustomSliderActuator::GetTargetPosit() const
@@ -100,7 +123,7 @@ void CustomSliderActuator::SetLinearRate(dFloat rate)
 
 void CustomSliderActuator::SetEnableFlag (bool flag)
 {
-	m_flag = flag;
+	m_actuatorFlag = flag;
 }
 
 
@@ -127,22 +150,19 @@ void CustomSliderActuator::GetInfo (NewtonJointRecord* const info) const
 
 void CustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	if (m_flag) {
+	if (m_actuatorFlag) {
 		dVector posit1 (matrix1.m_posit);
 		dVector posit0 (matrix0.m_posit - matrix1.m_front.Scale (m_posit));
-		NewtonUserJointAddLinearRow (m_joint, &posit0[0], &posit1[0], &matrix1.m_front[0]);
-
 		dFloat jointosit = GetJointPosit();
 		dFloat relPosit = m_posit - jointosit;
-		dFloat step = m_linearRate * timestep;
+		dFloat step = dFloat(2.0f) * m_linearRate * timestep;
 
-		if (dAbs (relPosit) > 2.0f * dAbs (step)) {
-			dFloat desiredSpeed = dSign(relPosit) * m_linearRate;
-			dFloat currentSpeed = GetJointSpeed ();
-			dFloat accel = (desiredSpeed - currentSpeed) / timestep;
-			NewtonUserJointSetRowAcceleration (m_joint, accel);
-		}
+		dFloat currentSpeed = GetJointSpeed();
+		dFloat desiredSpeed = (dAbs(relPosit) > dAbs(step)) ? dSign(relPosit) * m_linearRate : dFloat(0.1f) * relPosit / timestep;
+		dFloat accel = (desiredSpeed - currentSpeed) / timestep;
 
+		NewtonUserJointAddLinearRow(m_joint, &posit0[0], &posit1[0], &matrix1.m_front[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
         NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxForce);
         NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxForce);
 		NewtonUserJointSetRowStiffness (m_joint, 1.0f);

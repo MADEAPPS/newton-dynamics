@@ -289,6 +289,7 @@ void dgCollisionLumpedMassParticles::HandleCollision(dgFloat32 timestep, dgVecto
 
 	dgFloat32 coeficientOfFriction = dgFloat32(0.6f);
 	dgFloat32 coeficientOfPenetration = dgFloat32(0.1f);
+coeficientOfPenetration *= 1.0f;
 
 	dgVector timestepV(timestep);
 	dgFloat32 invTimeStep = dgFloat32 (1.0f) / timestep;
