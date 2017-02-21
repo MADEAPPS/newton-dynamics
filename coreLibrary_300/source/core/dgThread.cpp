@@ -134,14 +134,12 @@ dgThread::~dgThread ()
 void dgThread::Init (dgInt32 stacksize)
 {
 	m_handle = std::thread(dgThreadSystemCallback, this);
+	dgThreadYield();
 }
 
 void dgThread::Close ()
 {
 	m_handle.join();
-	// wait two time slot after a thread is terminated, 
-	dgThreadYield();
-	dgThreadYield();
 }
 
 void dgThread::SuspendExecution (dgSemaphore& mutex)
