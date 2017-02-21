@@ -35,7 +35,7 @@ CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	,m_springDamperRelaxation(0.6f)
 	,m_limitsOn(false)
 	,m_setAsSpringDamper(false)
-  ,m_actuatorFlag(false)
+	,m_actuatorFlag(false)
 	,m_lastRowWasUsed(false)
 {
 	// calculate the two local matrix of the pivot point
@@ -55,7 +55,7 @@ CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& p
 	,m_springDamperRelaxation(0.6f)
 	,m_limitsOn(false)
 	,m_setAsSpringDamper(false)
-  ,m_actuatorFlag(false)
+	,m_actuatorFlag(false)
 	,m_lastRowWasUsed(false)
 {
 	dMatrix	dummy;
