@@ -16,8 +16,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dScene", "dScene.vcxproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dVisualDebuggerServer", "dVisualDebuggerServer.vcxproj", "{2FFEB5B8-8929-469F-BB13-4E391CD3213C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\coreLibrary_300\source\pthreads.2\VS_2013_static_mt\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\thirdParty\tinyxml\vs2013_static_mt\tinyxml.vcxproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\coreLibrary_300\projects\windows\project_vs2013_static_mt\core.vcxproj", "{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}"

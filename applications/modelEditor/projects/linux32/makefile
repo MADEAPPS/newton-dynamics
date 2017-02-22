@@ -74,7 +74,7 @@ SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
 
 
 
-LIBS  = -L/usr/lib -lGL -lGLU -lGLEW -lpthread -lQtCore -lQtGui -lQtOpenGL 
+LIBS  = -L/usr/lib -lGL -lGLU -lGLEW -lQtCore -lQtGui -lQtOpenGL 
 			
 
 # this use newton as shared or static library

@@ -111,9 +111,6 @@
     <ProjectReference Include="..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\newton.vcxproj">
       <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2010_static_mt\pthread.vcxproj">
-      <Project>{03bca23c-02a5-415b-a37b-26600bc2ce96}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\packages\projects\visualStudio_2010_dll\dContainers.vcxproj">
       <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
     </ProjectReference>

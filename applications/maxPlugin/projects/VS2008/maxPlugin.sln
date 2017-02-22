@@ -22,8 +22,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\..\coreL
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\..\coreLibrary_300\projects\windows\project_vs2008_static_md\physics.vcproj", "{39737A8F-6151-4259-8E39-25530345D4B4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2008_static_md\pthread.vcproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "..\..\..\..\packages\thirdParty\tinyxml\vs2008_static_md\tinyxml.vcproj", "{18E509CF-46D2-4749-B3BB-160937CF2481}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dContainers", "..\..\..\..\packages\projects\visualStudio_2008_static_md\dContainers.vcproj", "{F67C4593-A914-4DDF-8CB5-C59A3EF3ECE0}"
