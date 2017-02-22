@@ -2819,7 +2819,7 @@ int NewtonCollisionGetMode(const NewtonCollision* const convexCollision)
 // Set a flag on a convex collision shape to indicate that no contacts should calculated for this shape.
 //
 // @param convexCollision is the pointer to a convex collision primitive.
-// @param triggerMode 1 set diecable contact calculation 0 enable contact calculation.
+// @param triggerMode 1 disable contact calculation, 0 enable contact calculation.
 // 
 // @return nothing
 //
