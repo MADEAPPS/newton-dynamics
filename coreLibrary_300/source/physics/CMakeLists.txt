@@ -9,10 +9,9 @@
 # freely
 
 set (projectName dgPhysics)
-include_directories ("${corePath}/core") 
-include_directories ("${corePath}/physics") 
-include_directories ("${corePath}/meshUtil") 
-include_directories ("${corePath}/pthreads.2") 
+include_directories ("${corePath}/core")
+include_directories ("${corePath}/physics")
+include_directories ("${corePath}/meshUtil")
 
 file(GLOB_RECURSE headers *.h)
 file(GLOB_RECURSE sources *.cpp)
