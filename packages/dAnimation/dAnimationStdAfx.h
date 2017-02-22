@@ -31,7 +31,6 @@
 
 #ifdef _MACOSX_VER
 	#ifndef _MAC_IPHONE
-		#include <pthread.h>
 		#include <semaphore.h>
 	#endif	
 
