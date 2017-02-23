@@ -1190,12 +1190,18 @@ void SaveNewtonMesh (NewtonMesh* const mesh, const char* const name)
 
 void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalSpace, dFloat timestep)
 {
+	dFloat mass;
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
 	const dFloat stiffness = 0.33f;
 	const dFloat damping = -0.05f;
 
+	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+
 	// calculate the desired impulse
 	dVector posit(targetPositionInGlobalSpace - pointOnBodyInGlobalSpace);
-	dVector impulse(posit.Scale(stiffness));
+	dVector impulse(posit.Scale(stiffness * mass));
 
 	// apply linear impulse
 	NewtonBodyApplyImpulseArray(body, 1, sizeof (dVector), &impulse[0], &pointOnBodyInGlobalSpace[0], timestep);
@@ -1204,15 +1210,11 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 	dMatrix inertia;
 	dVector linearMomentum;
 	dVector angularMomentum;
-	dFloat mass;
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
 
 	NewtonBodyGetOmega(body, &angularMomentum[0]);
 	NewtonBodyGetVelocity(body, &linearMomentum[0]);
 
-	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+
 	NewtonBodyGetInertiaMatrix(body, &inertia[0][0]);
 
 	angularMomentum = inertia.RotateVector(angularMomentum);
