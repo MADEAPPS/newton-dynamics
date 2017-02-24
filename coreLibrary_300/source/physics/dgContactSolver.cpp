@@ -731,14 +731,12 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		Pop();
 
 		if (faceNode->m_alive) {
-			//SaveOFF ("xxx.off");
 			SupportVertex(faceNode->m_plane & dgVector::m_triplexMask, m_vertexIndex);
 			const dgVector& p = m_hullDiff[m_vertexIndex];
 			dgFloat32 dist = faceNode->m_plane.Evalue(p);
 			dgFloat32 distTolerance = dgMax(dgAbsf(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
 
 			if (dist < distTolerance) {
-				//SaveOFF ("xxx.off");
 				dgVector sum[3];
 				dgVector diff[3];
 				m_normal = faceNode->m_plane & dgVector::m_triplexMask;
@@ -1012,7 +1010,6 @@ bool dgContactSolver::CalculateClosestPoints()
 		const dgMatrix& matrix1 = m_instance1->m_globalMatrix;
 		m_closestPoint0 = matrix0.TransformVector(m_instance0->SupportVertexSpecialProjectPoint(matrix0.UntransformVector(m_closestPoint0), matrix0.UnrotateVector(m_normal)));
 		m_closestPoint1 = matrix1.TransformVector(m_instance1->SupportVertexSpecialProjectPoint(matrix1.UntransformVector(m_closestPoint1), matrix1.UnrotateVector(m_normal.Scale4(-1.0f))));
-
 		m_vertexIndex = simplexPointCount;
 	}
 	return simplexPointCount >= 0;
