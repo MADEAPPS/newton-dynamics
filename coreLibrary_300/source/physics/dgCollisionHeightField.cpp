@@ -258,6 +258,7 @@ dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserial
 	dgInt32 elevationDataType;
 
 	m_userRayCastCallback = NULL;
+	m_horizontalDisplacement = NULL;
 	deserialization (userData, &m_width, sizeof (dgInt32));
 	deserialization (userData, &m_height, sizeof (dgInt32));
 	deserialization (userData, &m_diagonalMode, sizeof (dgInt32));
