@@ -767,6 +767,7 @@ extern "C" {
 	NEWTON_API int NewtonCollisionIsStaticShape (const NewtonCollision* const collision);
 
 	// for the end user
+	NEWTON_API NewtonWorld* NewtonCollisionGetWorld(const NewtonCollision* const collision);
 	NEWTON_API void NewtonCollisionSetUserData (const NewtonCollision* const collision, void* const userData);
 	NEWTON_API void* NewtonCollisionGetUserData (const NewtonCollision* const collision);
 	
