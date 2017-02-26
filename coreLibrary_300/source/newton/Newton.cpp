@@ -3858,13 +3858,6 @@ void NewtonCollisionForEachPolygonDo(const NewtonCollision* const collisionPtr, 
 }
 
 
-NewtonWorld* NewtonCollisionGetWorld(const NewtonCollision* const collision)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgCollisionInstance* const instance = (dgCollisionInstance*)collision;
-	return (NewtonWorld*)instance->GetWorld();
-}
-
 int NewtonCollisionGetType(const NewtonCollision* const collision)
 {
 	TRACE_FUNCTION(__FUNCTION__);
