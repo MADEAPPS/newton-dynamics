@@ -229,7 +229,6 @@ dgCollisionHeightField::dgCollisionHeightField(
 	}
 	memcpy (m_atributeMap, atributeMap, m_width * m_height * sizeof (dgInt8));
 
-
 	dgTree<void*, unsigned>::dgTreeNode* nodeData = world->m_perInstanceData.Find(DG_HIGHTFIELD_DATA_ID);
 	if (!nodeData) {
 		m_instanceData = (dgPerIntanceData*) new dgPerIntanceData();
@@ -305,19 +304,21 @@ dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserial
 
 	m_horizontalScaleInv_x = dgFloat32 (1.0f) / m_horizontalScale_x;
 	m_horizontalScaleInv_z = dgFloat32 (1.0f) / m_horizontalScale_z;
+
 	dgTree<void*, unsigned>::dgTreeNode* nodeData = world->m_perInstanceData.Find(DG_HIGHTFIELD_DATA_ID);
 	if (!nodeData) {
-		m_instanceData = (dgPerIntanceData*) dgMallocStack (sizeof (dgPerIntanceData));
+		m_instanceData = (dgPerIntanceData*) new dgPerIntanceData();
 		m_instanceData->m_refCount = 0;
 		m_instanceData->m_world = world;
-		for (dgInt32 i = 0 ; i < DG_MAX_THREADS_HIVE_COUNT; i ++) {
+		for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
 			m_instanceData->m_vertex[i] = NULL;
 			m_instanceData->m_vertexCount[i] = 8 * 8;
+			m_instanceData->m_vertex[i].SetAllocator(world->GetAllocator());
 			AllocateVertex(world, i);
 		}
-		nodeData = world->m_perInstanceData.Insert (m_instanceData, DG_HIGHTFIELD_DATA_ID);
+		nodeData = world->m_perInstanceData.Insert(m_instanceData, DG_HIGHTFIELD_DATA_ID);
 	}
-	m_instanceData = (dgPerIntanceData*) nodeData->GetInfo();
+	m_instanceData = (dgPerIntanceData*)nodeData->GetInfo();
 
 	m_instanceData->m_refCount ++;
 	SetCollisionBBox(m_minBox, m_maxBox);
