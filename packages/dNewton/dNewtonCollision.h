@@ -153,10 +153,10 @@ class dNewtonCollisionScene: public dNewtonCollision
 class dNewtonCollisionHeightField: public dNewtonCollision
 {
 	public: 
-	CNEWTON_API dNewtonCollisionHeightField (dNewton* const world, int width, int height, int gridsDiagonals, int elevationdataType, dFloat vertcalScale, dFloat horizontalScale, const void* const elevationMap, const char* const attributeMap, dLong collisionMask)
+	CNEWTON_API dNewtonCollisionHeightField (dNewton* const world, int width, int height, int gridsDiagonals, int elevationdataType, dFloat vertcalScale, dFloat horizontalScale_x, dFloat horizontalScale_z, const void* const elevationMap, const char* const attributeMap, dLong collisionMask)
 		:dNewtonCollision(m_heighfield, collisionMask)
 	{
-		SetShape (NewtonCreateHeightFieldCollision (world->GetNewton(), width, height, gridsDiagonals, elevationdataType, elevationMap, attributeMap, vertcalScale, horizontalScale, 0));
+		SetShape (NewtonCreateHeightFieldCollision (world->GetNewton(), width, height, gridsDiagonals, elevationdataType, elevationMap, attributeMap, vertcalScale, horizontalScale_x, horizontalScale_z, 0));
 	}
 
 	CNEWTON_API dNewtonCollision* Clone (NewtonCollision* const shape) const 

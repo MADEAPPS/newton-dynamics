@@ -185,9 +185,11 @@ extern "C" {
 		int m_height;
 		int m_gridsDiagonals;
 		int m_elevationDataType;	// 0 = 32 bit floats, 1 = unsigned 16 bit integers
-		dFloat m_horizonalScale;
 		dFloat m_verticalScale;
-		dFloat m_horizonalDisplacementScale;
+		dFloat m_horizonalScale_x;
+		dFloat m_horizonalScale_z;
+		dFloat m_horizonalDisplacementScale_x;
+		dFloat m_horizonalDisplacementScale_z;
 		void* m_vertialElevation;
 		short* m_horizotalDisplacement;
 		char* m_atributes;
@@ -733,7 +735,7 @@ extern "C" {
 	//
 	// **********************************************************************************************
 	NEWTON_API NewtonCollision* NewtonCreateHeightFieldCollision (const NewtonWorld* const newtonWorld, int width, int height, int gridsDiagonals, int elevationdatType,
-																  const void* const elevationMap, const char* const attributeMap, dFloat verticalScale, dFloat horizontalScale, int shapeID);
+																  const void* const elevationMap, const char* const attributeMap, dFloat verticalScale, dFloat horizontalScale_x, dFloat horizontalScale_z, int shapeID);
 	NEWTON_API void NewtonHeightFieldSetUserRayCastCallback (const NewtonCollision* const heightfieldCollision, NewtonHeightFieldRayCastCallback rayHitCallback);
 	NEWTON_API void NewtonHeightFieldSetHorizontalDisplacement (const NewtonCollision* const heightfieldCollision, const unsigned short* const horizontalMap, dFloat scale);
 

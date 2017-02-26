@@ -51,7 +51,7 @@ class dgCollisionHeightField: public dgCollisionMesh
 	};
 	dgCollisionHeightField (dgWorld* const world, dgInt32 width, dgInt32 height, dgInt32 contructionMode, 
 							const void* const elevationMap, dgElevationType elevationDataType, dgFloat32 verticalScale, 
-							const dgInt8* const atributeMap, dgFloat32 horizontalScale);
+							const dgInt8* const atributeMap, dgFloat32 horizontalScale_x, dgFloat32 horizontalScale_z);
 
 	dgCollisionHeightField (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 
@@ -69,7 +69,7 @@ class dgCollisionHeightField: public dgCollisionMesh
 		dgWorld* m_world;
 		dgInt32 m_refCount;
 		dgInt32 m_vertexCount[DG_MAX_THREADS_HIVE_COUNT];
-		dgVector *m_vertex[DG_MAX_THREADS_HIVE_COUNT];
+		dgArray<dgVector> m_vertex[DG_MAX_THREADS_HIVE_COUNT];
 	};
 
 	void CalculateAABB();
@@ -114,9 +114,12 @@ class dgCollisionHeightField: public dgCollisionMesh
 	void* m_elevationMap;
 	dgUnsigned16* m_horizontalDisplacement;
 	dgFloat32 m_verticalScale;
-	dgFloat32 m_horizontalScale;
-	dgFloat32 m_horizontalScaleInv;
-	dgFloat32 m_horizontalDisplacementScale;
+	dgFloat32 m_horizontalScale_x;
+	dgFloat32 m_horizontalScaleInv_x;
+	dgFloat32 m_horizontalDisplacementScale_x;
+	dgFloat32 m_horizontalScale_z;
+	dgFloat32 m_horizontalScaleInv_z;
+	dgFloat32 m_horizontalDisplacementScale_z;
 	dgCollisionHeightFieldRayCastCallback m_userRayCastCallback;
 	dgElevationType m_elevationDataType;
 
