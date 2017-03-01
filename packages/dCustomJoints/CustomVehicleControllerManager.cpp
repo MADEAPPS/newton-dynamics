@@ -346,8 +346,8 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 	public:
 	EngineJoint (const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 		:CustomUniversal(pinAndPivotFrame, engineBody, chassisBody)
-		,m_sleepDifrentialSpeed()
-		,m_slipDifrentialOn(true)
+		,m_slipDifferentialSpeed(0.0f)
+		,m_slipDifferentialOn(true)
 //		,m_turRateAccel(3.0f)
 //		,m_turnRate(0.0f)
 //		,m_turnRateTarget(0.0f)
@@ -376,6 +376,10 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 */
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
+
+//m_angularMotor_0_On = true;
+//m_angularAccel_0 = 1.0f;
+
 		CustomUniversal::SubmitConstraints(timestep, threadIndex);
 
 		// y axis controls the slip differential feature.
@@ -393,16 +397,24 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 
-		dFloat wRel = engineMatrix.m_front.DotProduct3(engineOmega) - chassisMatrix.m_front.DotProduct3(chassisOmega);
+//		dFloat wRel = engineMatrix.m_front.DotProduct3(engineOmega) - chassisMatrix.m_front.DotProduct3(chassisOmega);
+		dFloat wRel = engineMatrix.m_front.DotProduct3(engineOmega - chassisOmega);
+
+		//dFloat wAlpha = (D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - wRel) / timestep;
+		//NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_front[0]);
+		//NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
 		if (wRel > D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
-			wRel -= D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS;
-			NewtonUserJointAddAngularRow(m_joint, -0.5f * wRel/timestep, &chassisMatrix.m_front[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		} else if (wRel < - D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
-			wRel -= -D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS;
-			NewtonUserJointAddAngularRow(m_joint, -0.5f * wRel / timestep, &chassisMatrix.m_front[0]);
+			dFloat wAlpha = (D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - wRel) / timestep;
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_front[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		} else if (wRel < - D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
+			dFloat wAlpha = (-D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - wRel) / timestep;
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_front[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		}
+
 /*
 		const dVector& pin = differentialMatrix.m_front;
 		dVector relOmega(chassisOmega - differentialOmega);
@@ -412,8 +424,8 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 */	
 	}
 
-	dFloat m_sleepDifrentialSpeed;
-	bool m_slipDifrentialOn;
+	dFloat m_slipDifferentialSpeed;
+	bool m_slipDifferentialOn;
 //	dFloat m_turRateAccel;
 //	dFloat m_turnRate;
 //	dFloat m_turnRateTarget;
@@ -494,8 +506,6 @@ class CustomVehicleController::AxelJoint: public CustomGear
 	dVector m_pintOnReference;
 	NewtonBody* m_parentReference;
 };
-
-
 
 void CustomVehicleController::BodyPartChassis::ApplyDownForce ()
 {
@@ -646,29 +656,32 @@ dFloat CustomVehicleController::BodyPartTire::GetLongitudinalSlip () const
 CustomVehicleController::BodyPartEngine::BodyPartEngine(CustomVehicleController* const controller, dFloat mass, dFloat amatureRadius)
 	:BodyPart()
 {
+	dMatrix matrix;
+	dVector origin;
+
 	m_parent = &controller->m_chassis;
 	m_controller = controller;
 
 	NewtonBody* const chassisBody = m_controller->GetBody();
 	NewtonWorld* const world = ((CustomVehicleControllerManager*)m_controller->GetManager())->GetWorld();
 
-	//NewtonCollision* const collision = NewtonCreateNull(world);
-	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
-	NewtonCollisionSetMode (collision, 0);
-	
-	dVector origin;
+	// get engine location (place at the body center of mass)
 	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
-//origin.m_y -= 0.5f;
-
-	dMatrix matrix;
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
+
+origin.m_y += 2.0f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
+	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.5f, 0.5f, 1.0f, 0, NULL);
+	NewtonCollisionSetMode(collision, 0);
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
 
-	dFloat inertia = 2.0f * mass * amatureRadius * amatureRadius / 5.0f;
+	// make engine inertia spherical (also make scale inertia but twice the radio for more stability)
+	const dFloat engineInertiaScale = 9.0f;
+	const dFloat inertia = 2.0f * engineInertiaScale * mass * amatureRadius * amatureRadius / 5.0f;
 	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
 
 	dVector drag(0.0f);
@@ -1008,7 +1021,7 @@ void CustomVehicleController::EngineController::ApplyTorque(dFloat torque, dFloa
 
 void CustomVehicleController::EngineController::Update(dFloat timestep)
 {
-
+/*
 static int xxxx;
 xxxx ++;
 if (xxxx > 500){
@@ -1019,6 +1032,7 @@ NewtonBodyGetMatrix(m_controller->m_chassis.GetBody(), &xxx1[0][0]);
 dVector xxxx (xxx1.m_right.Scale (50.0f));
 NewtonBodySetOmega (m_controller->m_engine->GetBody(), &xxxx[0]);
 }
+*/
 
 /*
 	if (m_automaticTransmissionMode) {
@@ -1396,7 +1410,7 @@ void CustomVehicleController::Init(NewtonCollision* const chassisShape, const dM
 	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
 
 	// set vehicle mass, inertia and center of mass
-//mass = 0;
+mass = 0;
 	NewtonBodySetMassProperties(body, mass, chassisShape);
 
 	// initialize 
