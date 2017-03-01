@@ -766,7 +766,6 @@ class BasicCarEntity: public DemoEntity
 		glVertex3f(s1.m_x, s1.m_y, s1.m_z);
 
 
-		//int xxx = 0;
 		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
 			const CustomVehicleController::BodyPartTire* const tire = &node->GetInfo();
 			NewtonBody* const tireBody = tire->GetBody();
