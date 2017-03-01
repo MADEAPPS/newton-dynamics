@@ -251,68 +251,55 @@ void dCholeskySolve(int size, int n, const T* const choleskyMatrix, T* const x)
 	}
 }
 
-/*
-template<class T>
-void dCholeskySolve(int size, T* const choleskyMatrix, T* const x)
-{
-	dCholeskySolve(size, size, choleskyMatrix, x);
-}
-*/
 
 template<class T>
-bool dCholeskyFactorizationAddRow(int size, int n, T* const matrix)
+bool dCholeskyFactorization(int size, T* const matrix)
 {
-	T* const rowN = &matrix[size * n];
+	for (int i = 0; i < size; i++) {
+		T* const rowN = &matrix[size * i];
 
-	int stride = 0;
-	for (int j = 0; j <= n; j++) {
-		T s(0.0f);
-		T* const rowJ = &matrix[stride];
-		for (int k = 0; k < j; k++) {
-			s += rowN[k] * rowJ[k];
-		}
-
-		if (n == j) {
-			T diag = rowN[n] - s;
-			if (diag < T(dFloat(0.0f))) {
-				// hack to prevent explosions when round error make the diagonal a small negative value
-				if (diag < T(dFloat(-1.0e3f))) {
-					dAssert(0);
-					return false;
-				}
-				diag = dFloat(1.0e-12f);
+		int stride = 0;
+		for (int j = 0; j <= i; j++) {
+			T s(0.0f);
+			T* const rowJ = &matrix[stride];
+			for (int k = 0; k < j; k++) {
+				s += rowN[k] * rowJ[k];
 			}
 
-			rowN[n] = T(sqrt(diag));
-		} else {
-			rowN[j] = ((T(1.0f) / rowJ[j]) * (rowN[j] - s));
-		}
+			if (i == j) {
+				T diag = rowN[i] - s;
+				if (diag < T(dFloat(0.0f))) {
+					// hack to prevent explosions when round error make the diagonal a small negative value
+					if (diag < T(dFloat(-1.0e3f))) {
+						dAssert(0);
+						return false;
+					}
+					diag = dFloat(1.0e-12f);
+				}
 
-		stride += size;
+				rowN[i] = T(sqrt(diag));
+			} else {
+				rowN[j] = ((T(1.0f) / rowJ[j]) * (rowN[j] - s));
+			}
+
+			stride += size;
+		}
 	}
 	return true;
 }
 
-template<class T>
-void dCholeskyFactorization(int size, T* const psdMatrix)
-{
-	for (int i = 0; i < size; i++) {
-		dCholeskyFactorizationAddRow(size, i, psdMatrix);
-	}
-}
-
 
 template<class T>
-void dgPermuteRows(int size, int i, int j, T* const matrix, T* const choleskyMatrix, T* const x, T* const r, T* const low, T* const high, int* const permute)
+void dPermuteRows(int size, int i, int j, T* const matrix, T* const choleskyMatrix, T* const x, T* const r, T* const low, T* const high, int* const permute)
 {
 	if (i != j) {
-		T* const A = &matrix[size * i];
-		T* const B = &matrix[size * j];
-		T* const invA = &choleskyMatrix[size * i];
-		T* const invB = &choleskyMatrix[size * j];
+		T* const matrixRowA = &matrix[size * i];
+		T* const matrixRowB = &matrix[size * j];
+		T* const choleskyRowA = &choleskyMatrix[size * i];
+		T* const choleskyRowB = &choleskyMatrix[size * j];
 		for (int k = 0; k < size; k++) {
-			dSwap(A[k], B[k]);
-			dSwap(invA[k], invB[k]);
+			dSwap(matrixRowA[k], matrixRowB[k]);
+			dSwap(choleskyRowA[k], choleskyRowB[k]);
 		}
 
 		int stride = 0;
@@ -330,7 +317,7 @@ void dgPermuteRows(int size, int i, int j, T* const matrix, T* const choleskyMat
 }
 
 template<class T>
-void dgCholeskyUpdate(int size, int row, int colum, T* const choleskyMatrix, T* const tmp, T* const reflexion)
+void dCholeskyUpdate(int size, int row, int colum, T* const choleskyMatrix, T* const tmp, T* const reflexion)
 {
 	if (row != colum) {
 		dAssert(row < colum);
@@ -386,7 +373,7 @@ void dgCholeskyUpdate(int size, int row, int colum, T* const choleskyMatrix, T* 
 }
 
 template<class T>
-void dgCalculateDelta_x(int size, T dir, int n, const T* const matrix, const T* const choleskyMatrix, T* const delta_x)
+void dCalculateDelta_x(int size, T dir, int n, const T* const matrix, const T* const choleskyMatrix, T* const delta_x)
 {
 	const T* const row = &matrix[size * n];
 	for (int i = 0; i < n; i++) {
@@ -398,7 +385,7 @@ void dgCalculateDelta_x(int size, T dir, int n, const T* const matrix, const T* 
 
 // calculate delta_r = A * delta_x
 template<class T>
-void dgCalculateDelta_r(int size, int n, const T* const matrix, const T* const delta_x, T* const delta_r)
+void dCalculateDelta_r(int size, int n, const T* const matrix, const T* const delta_x, T* const delta_r)
 {
 	int stride = n * size;
 	for (int i = n; i < size; i++) {
@@ -473,14 +460,14 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 				if ((f < low[i]) || (f > high[i])) {
 					findInitialGuess = true;
 					x0[i] = T(dFloat(0.0f));
-					dgPermuteRows(size, i, initialGuessCount - 1, matrix, choleskyMatrix, x0, r0, low, high, permute);
+					dPermuteRows(size, i, initialGuessCount - 1, matrix, choleskyMatrix, x0, r0, low, high, permute);
 					permuteStart = dMin(permuteStart, i);
 					i--;
 					initialGuessCount--;
 				}
 			}
 			if (findInitialGuess) {
-				dgCholeskyUpdate(size, permuteStart, size - 1, choleskyMatrix, tmp0, tmp1);
+				dCholeskyUpdate(size, permuteStart, size - 1, choleskyMatrix, tmp0, tmp1);
 			}
 		}
 
@@ -521,11 +508,11 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 			if (dAbs(r0[index]) > T(1.0e-12f)) {
 				if (calculateDelta_x) {
 					T dir(dFloat(1.0f));
-					dgCalculateDelta_x(size, dir, index, matrix, choleskyMatrix, delta_x);
+					dCalculateDelta_x(size, dir, index, matrix, choleskyMatrix, delta_x);
 				}
 
 				calculateDelta_x = true;
-				dgCalculateDelta_r(size, index, matrix, delta_x, delta_r);
+				dCalculateDelta_r(size, index, matrix, delta_x, delta_r);
 				dAssert(delta_r[index] != T(dFloat(0.0f)));
 				dAssert(dAbs(delta_x[index]) == T(1.0f));
 				delta_r[index] = (delta_r[index] == T(dFloat(0.0f))) ? T(dFloat(1.0e-12f)) : delta_r[index];
@@ -583,8 +570,8 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 				count--;
 				clampedIndex--;
 				x0[index] = clamp_x;
-				dgPermuteRows(size, index, clampedIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
-				dgCholeskyUpdate(size, index, clampedIndex, choleskyMatrix, tmp0, tmp1);
+				dPermuteRows(size, index, clampedIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
+				dCholeskyUpdate(size, index, clampedIndex, choleskyMatrix, tmp0, tmp1);
 
 				loop = count ? true : false;
 			} else if (swapIndex > index) {
@@ -595,14 +582,14 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 				if (swapIndex < clampedIndex) {
 					count--;
 					clampedIndex--;
-					dgPermuteRows(size, clampedIndex, swapIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
-					dgCholeskyUpdate(size, swapIndex, clampedIndex, choleskyMatrix, tmp0, tmp1);
+					dPermuteRows(size, clampedIndex, swapIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
+					dCholeskyUpdate(size, swapIndex, clampedIndex, choleskyMatrix, tmp0, tmp1);
 					dAssert(clampedIndex >= index);
 				} else {
 					count++;
 					dAssert(clampedIndex < size);
-					dgPermuteRows(size, clampedIndex, swapIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
-					dgCholeskyUpdate(size, clampedIndex, swapIndex, choleskyMatrix, tmp0, tmp1);
+					dPermuteRows(size, clampedIndex, swapIndex, matrix, choleskyMatrix, x0, r0, low, high, permute);
+					dCholeskyUpdate(size, clampedIndex, swapIndex, choleskyMatrix, tmp0, tmp1);
 					clampedIndex++;
 					dAssert(clampedIndex <= size);
 					dAssert(clampedIndex >= index);
@@ -614,10 +601,10 @@ bool dSolveDantzigLCP(int size, T* const matrix, T* const x, T* const b, T* cons
 				delta_x[index] = T(dFloat(0.0f));
 
 				dAssert(swapIndex < index);
-				dgPermuteRows(size, swapIndex, index - 1, matrix, choleskyMatrix, x0, r0, low, high, permute);
-				dgPermuteRows(size, index - 1, index, matrix, choleskyMatrix, x0, r0, low, high, permute);
-				dgPermuteRows(size, clampedIndex - 1, index, matrix, choleskyMatrix, x0, r0, low, high, permute);
-				dgCholeskyUpdate(size, swapIndex, clampedIndex - 1, choleskyMatrix, tmp0, tmp1);
+				dPermuteRows(size, swapIndex, index - 1, matrix, choleskyMatrix, x0, r0, low, high, permute);
+				dPermuteRows(size, index - 1, index, matrix, choleskyMatrix, x0, r0, low, high, permute);
+				dPermuteRows(size, clampedIndex - 1, index, matrix, choleskyMatrix, x0, r0, low, high, permute);
+				dCholeskyUpdate(size, swapIndex, clampedIndex - 1, choleskyMatrix, tmp0, tmp1);
 
 				clampedIndex--;
 				index--;

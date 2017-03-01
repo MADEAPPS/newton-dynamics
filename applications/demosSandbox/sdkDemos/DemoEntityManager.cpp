@@ -122,12 +122,15 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	A[1][1] = 2.0f;
 	b[0] = 1.0f;
 	b[1] = 1.0f;
-	x[0] = 0;
-	x[1] = 0;
+	x[0] = 1;
+	x[1] = 2;
+	
 	l[0] = 0.0f;
 	l[1] = 0.0f;
 	h[0] = 0.25f;
 	h[1] = 1.0f;
+	
+	dMatrixTimeVector(2, &A[0][0], x, b);
 	dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
 */
 
