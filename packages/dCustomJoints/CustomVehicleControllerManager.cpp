@@ -1417,7 +1417,7 @@ mass = 0;
 	Init(body, vehicleFrame, forceAndTorque, userData, gravityMag);
 }
 
-void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData, dFloat gravityMag)
+void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicleFrame___, NewtonApplyForceAndTorque forceAndTorque, void* const userData, dFloat gravityMag)
 {
 	m_body = body;
 	m_finalized = false;

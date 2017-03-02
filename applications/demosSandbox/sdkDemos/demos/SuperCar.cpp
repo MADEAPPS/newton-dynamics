@@ -47,51 +47,52 @@
 
 struct CarDefinition 
 {
-	dFloat TIRE_MASS;
-	dFloat ENGINE_MASS;
-	dFloat MASS;
-	dFloat ENGINE_RADIO;
-	dFloat FRONT_AXEL_STEER_ANGLE;
-	dFloat REAR_AXEL_STEER_ANGLE;
-	dFloat VEHICLE_WEIGHT_DISTRIBUTION;
-	dFloat CLUTCH_FRICTION_TORQUE;
-	dFloat IDLE_TORQUE;
-	dFloat IDLE_TORQUE_RPM;
-	dFloat PEAK_TORQUE;
-	dFloat PEAK_TORQUE_RPM;
-	dFloat PEAK_HP;
-	dFloat PEAK_HP_RPM;
-	dFloat REDLINE_RPM;
-	dFloat VEHICLE_TOP_SPEED_KMH;
-	dFloat TIRE_LATERAL_STIFFNESS;
-	dFloat TIRE_LONGITUDINAL_STIFFNESS;
-	dFloat TIRE_ALIGNING_MOMENT_TRAIL;
-	dFloat TIRE_SUSPENSION_SPRING;
-	dFloat TIRE_SUSPENSION_DAMPER;
-	dFloat TIRE_SUSPENSION_LENGTH;
-	CustomVehicleController::BodyPartTire::Info::SuspensionType TIRE_SUSPENSION_TYPE;
-	dFloat TIRE_BRAKE_TORQUE;
-	dFloat TIRE_PIVOT_OFFSET_Y;
-	dFloat TIRE_GEAR_1;
-	dFloat TIRE_GEAR_2;
-	dFloat TIRE_GEAR_3;
-	dFloat TIRE_GEAR_4;
-	dFloat TIRE_GEAR_5;
-	dFloat TIRE_GEAR_6;
-	dFloat TIRE_REVERSE_GEAR;
-	dFloat COM_Y_OFFSET;
-	dFloat DOWNFORCE_WEIGHT_FACTOR_0;
-	dFloat DOWNFORCE_WEIGHT_FACTOR_1;
-	dFloat DOWNFORCE_WEIGHT_FACTOR_SPEED;
-	int WHEEL_HAS_FENDER;
-	int DIFFERENTIAL_TYPE;
+	dFloat m_tireMass;
+	dFloat m_engineMass;
+	dFloat m_vehicleMass;
+	dFloat m_engineRotorRadios;
+	dFloat m_frontSteeringAngle;
+	dFloat m_rearSteeringAngle;
+	dFloat m_vehicleWeightDistribution;
+	dFloat m_cluthFrictionTorque;
+	dFloat m_engineIdleTorque;
+	dFloat m_engineRPMAtIdleTorque;
+	dFloat m_enginePeakTorque;
+	dFloat m_engineRPMAtPeakTorque;
+	dFloat m_enginePeakHorsePower;
+	dFloat m_egineRPMAtPeakHorsePower;
+	dFloat m_engineRedLineTorque;
+	dFloat m_engineRPMAtRedLine;
+	dFloat m_vehicleTopSpeed;
+	dFloat m_tireLaretalStiffeness;
+	dFloat m_tireLongitudinalStiffness;
+	dFloat m_tireAligningMomemtTrail;
+	dFloat m_TireSuspensionSpringConstant;
+	dFloat m_TireSuspensionDamperConstant;
+	dFloat m_TireSuspensionLength;
+	CustomVehicleController::BodyPartTire::Info::SuspensionType m_TireSuspensionType;
+	dFloat m_TireBrakesTorque;
+	dFloat m_tirePivotOffset;
+	dFloat m_transmissionGearRatio0;
+	dFloat m_transmissionGearRatio1;
+	dFloat m_transmissionGearRatio2;
+	dFloat m_transmissionGearRatio3;
+	dFloat m_transmissionGearRatio4;
+	dFloat m_transmissionGearRatio6;
+	dFloat m_transmissionRevereGearRatio;
+	dFloat m_chassisYaxisComBias;
+	dFloat m_aerodynamicsDownForceWeightCoeffecient0;
+	dFloat m_aerodynamicsDownForceWeightCoeffecient1;
+	dFloat m_aerodynamicsDownForceSpeedFactor;
+	int m_wheelHasCollisionFenders;
+	int m_differentialType;
 };
 
 static CarDefinition monsterTruck = 
 {
+	(3380.0f * 0.454f),							// MASS
 	40.0f,										// TIRE_MASS	
 	100.0f,										// ENGINE_MASS
-	(3380.0f * 0.454f),							// MASS
 	0.125f,										// ENGINE_RADIO
 	15.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
 	-5.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
@@ -103,7 +104,8 @@ static CarDefinition monsterTruck =
 	3000.0f,									// PEAK_TORQUE_RPM
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
-	6000.0f,									// REDLINE_TORQUE_RPM
+	1000.0f,									// TORQUE AT RED LINE RPM
+	6000.0f,									// REDLINE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),	// TIRE_LATERAL_STIFFNESS
 	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),	// TIRE_LONGITUDINAL_STIFFNESS
@@ -131,9 +133,9 @@ static CarDefinition monsterTruck =
 
 static CarDefinition viper = 
 {
+	(3380.0f * 0.454f),							// MASS
 	40.0f,										// TIRE_MASS	
 	100.0f,										// ENGINE_MASS
-	(3380.0f * 0.454f),							// MASS
 	0.125f,										// ENGINE_RADIO
 	20.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
 	 0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
@@ -145,6 +147,7 @@ static CarDefinition viper =
 	3000.0f,									// PEAK_TORQUE_RPM
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
+	1000.0f,									// TORQUE AT RED LINE RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),  // TIRE_LATERAL_STIFFNESS
@@ -168,7 +171,7 @@ static CarDefinition viper =
 	2.0f,										// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	1,											// WHEEL_HAS_FENDER
-	2,											// DIFFERENTIAL_TYPE
+	0,											// DIFFERENTIAL_TYPE
 };
 
 
@@ -237,7 +240,7 @@ class SuperCarEntity: public DemoEntity
 
 		// create a default vehicle 
 		//m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.VEHICLE_MASS, PhysicsApplyGravityForce, this, dAbs (DEMO_GRAVITY));
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.MASS, PhysicsApplyGravityForce, this, dAbs (DEMO_GRAVITY));
+		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.m_vehicleMass, PhysicsApplyGravityForce, this, dAbs (DEMO_GRAVITY));
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();
@@ -363,7 +366,7 @@ class SuperCarEntity: public DemoEntity
 
 		// add the offset location
 
-		tireMatrix.m_posit.m_y += definition.TIRE_PIVOT_OFFSET_Y;
+		tireMatrix.m_posit.m_y += definition.m_tirePivotOffset;
 
 		// add and alignment matrix,to match visual mesh to physics collision shape
 		dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dGetIdentityMatrix() : dYawMatrix(3.141592f));
@@ -375,18 +378,18 @@ class SuperCarEntity: public DemoEntity
 		CustomVehicleController::BodyPartTire::Info tireInfo;
 
 		tireInfo.m_location = tireMatrix.m_posit;
-		tireInfo.m_mass = definition.TIRE_MASS;
+		tireInfo.m_mass = definition.m_tireMass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
 		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416f / 180.0f; 
-		tireInfo.m_dampingRatio = definition.TIRE_SUSPENSION_DAMPER;
-		tireInfo.m_springStrength = definition.TIRE_SUSPENSION_SPRING;
-		tireInfo.m_suspesionlenght = definition.TIRE_SUSPENSION_LENGTH;
-		tireInfo.m_lateralStiffness = dAbs (definition.TIRE_LATERAL_STIFFNESS);
-		tireInfo.m_longitudialStiffness = dAbs (definition.TIRE_LONGITUDINAL_STIFFNESS);
-		tireInfo.m_aligningMomentTrail =  definition.TIRE_ALIGNING_MOMENT_TRAIL;
-		tireInfo.m_hasFender = definition.WHEEL_HAS_FENDER;
-		tireInfo.m_suspentionType = definition.TIRE_SUSPENSION_TYPE;
+		tireInfo.m_dampingRatio = definition.m_TireSuspensionDamperConstant;
+		tireInfo.m_springStrength = definition.m_TireSuspensionSpringConstant;
+		tireInfo.m_suspesionlenght = definition.m_TireSuspensionLength;
+		tireInfo.m_lateralStiffness = dAbs (definition.m_tireLaretalStiffeness);
+		tireInfo.m_longitudialStiffness = dAbs (definition.m_tireLongitudinalStiffness);
+		tireInfo.m_aligningMomentTrail =  definition.m_tireAligningMomemtTrail;
+		tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
+		tireInfo.m_suspentionType = definition.m_TireSuspensionType;
 		tireInfo.m_userData = tirePart;
 
 		return m_controller->AddTire (tireInfo);
@@ -427,20 +430,20 @@ class SuperCarEntity: public DemoEntity
 		dFloat radius;
 
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (0.0f, definition.COM_Y_OFFSET, 0.0f, 0.0f)); 
+		m_controller->SetCenterOfGravity (dVector (0.0f, definition.m_chassisYaxisComBias, 0.0f, 0.0f)); 
 
 		// add front axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
 		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
-		CustomVehicleController::BodyPartTire* const leftFrontTire = AddTire ("fl_tire", width, radius, definition.FRONT_AXEL_STEER_ANGLE, definition);
-		CustomVehicleController::BodyPartTire* const rightFrontTire = AddTire ("fr_tire", width, radius, definition.FRONT_AXEL_STEER_ANGLE, definition);
+		CustomVehicleController::BodyPartTire* const leftFrontTire = AddTire ("fl_tire", width, radius, definition.m_frontSteeringAngle, definition);
+		CustomVehicleController::BodyPartTire* const rightFrontTire = AddTire ("fr_tire", width, radius, definition.m_frontSteeringAngle, definition);
 
 		// add rear axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", width, radius, definition.REAR_AXEL_STEER_ANGLE, definition);
-		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", width, radius, definition.REAR_AXEL_STEER_ANGLE, definition);
+		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", width, radius, definition.m_rearSteeringAngle, definition);
+		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", width, radius, definition.m_rearSteeringAngle, definition);
 
 		//calculate the Ackerman parameters
 		// add a steering Wheel component
@@ -452,7 +455,7 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetSteering(steering);
 		
 		// add vehicle brakes
-		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController (m_controller, definition.TIRE_BRAKE_TORQUE);
+		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController (m_controller, definition.m_TireBrakesTorque);
 		brakes->AddTire (leftFrontTire);
 		brakes->AddTire (rightFrontTire);
 		brakes->AddTire (leftRearTire);
@@ -460,37 +463,37 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetBrakes(brakes);
 
 		// add vehicle hand brakes
-		CustomVehicleController::BrakeController* const handBrakes = new CustomVehicleController::BrakeController (m_controller, definition.TIRE_BRAKE_TORQUE);
+		CustomVehicleController::BrakeController* const handBrakes = new CustomVehicleController::BrakeController (m_controller, definition.m_TireBrakesTorque);
 		handBrakes->AddTire (leftRearTire);
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
 		// add the engine, differential and transmission 
 		CustomVehicleController::EngineController::Info engineInfo;
-		engineInfo.m_mass = definition.ENGINE_MASS; 
-		engineInfo.m_radio = definition.ENGINE_RADIO; 
-		engineInfo.m_vehicleTopSpeed = definition.VEHICLE_TOP_SPEED_KMH;
-		engineInfo.m_clutchFrictionTorque = definition.CLUTCH_FRICTION_TORQUE;
+		engineInfo.m_mass = definition.m_engineMass; 
+		engineInfo.m_radio = definition.m_engineRotorRadios; 
+		engineInfo.m_vehicleTopSpeed = definition.m_vehicleTopSpeed;
+		engineInfo.m_clutchFrictionTorque = definition.m_cluthFrictionTorque;
 
-		engineInfo.m_idleTorque = definition.IDLE_TORQUE;
-		engineInfo.m_idleTorqueRpm = definition.IDLE_TORQUE_RPM;
-		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
-		engineInfo.m_peakTorqueRpm = definition.PEAK_TORQUE_RPM;
-		engineInfo.m_peakHorsePower = definition.PEAK_HP;
-		engineInfo.m_peakHorsePowerRpm = definition.PEAK_HP_RPM;
-		engineInfo.m_readLineRpm = definition.REDLINE_RPM;
+		engineInfo.m_idleTorque = definition.m_engineIdleTorque;
+		engineInfo.m_idleTorqueRpm = definition.m_engineRPMAtIdleTorque;
+		engineInfo.m_peakTorque = definition.m_enginePeakTorque;
+		engineInfo.m_peakTorqueRpm = definition.m_engineRPMAtPeakTorque;
+		engineInfo.m_peakHorsePower = definition.m_enginePeakHorsePower;
+		engineInfo.m_peakHorsePowerRpm = definition.m_egineRPMAtPeakHorsePower;
+		engineInfo.m_readLineRpm = definition.m_engineRPMAtRedLine;
 
 		engineInfo.m_gearsCount = 6;
-		engineInfo.m_gearRatios[0] = definition.TIRE_GEAR_1;
-		engineInfo.m_gearRatios[1] = definition.TIRE_GEAR_2;
-		engineInfo.m_gearRatios[2] = definition.TIRE_GEAR_3;
-		engineInfo.m_gearRatios[3] = definition.TIRE_GEAR_4;
-		engineInfo.m_gearRatios[4] = definition.TIRE_GEAR_5;
-		engineInfo.m_gearRatios[5] = definition.TIRE_GEAR_6;
-		engineInfo.m_reverseGearRatio = definition.TIRE_REVERSE_GEAR;
+		engineInfo.m_gearRatios[0] = definition.m_transmissionGearRatio0;
+		engineInfo.m_gearRatios[1] = definition.m_transmissionGearRatio1;
+		engineInfo.m_gearRatios[2] = definition.m_transmissionGearRatio2;
+		engineInfo.m_gearRatios[3] = definition.m_transmissionGearRatio3;
+		engineInfo.m_gearRatios[4] = definition.m_transmissionGearRatio4;
+		engineInfo.m_gearRatios[5] = definition.m_transmissionGearRatio6;
+		engineInfo.m_reverseGearRatio = definition.m_transmissionRevereGearRatio;
 
 		CustomVehicleController::EngineController::Differential4wd differential;
-		switch (definition.DIFFERENTIAL_TYPE) 
+		switch (definition.m_differentialType) 
 		{
 			case 0:
 				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
@@ -529,12 +532,12 @@ class SuperCarEntity: public DemoEntity
 		SetGearMap(engineControl);
 
 		// set the vehicle weigh distribution 
-		m_controller->SetWeightDistribution (definition.VEHICLE_WEIGHT_DISTRIBUTION);
+		m_controller->SetWeightDistribution (definition.m_vehicleWeightDistribution);
 
 		// set the vehicle aerodynamics
-		dFloat weightRatio0 = definition.DOWNFORCE_WEIGHT_FACTOR_0;
-		dFloat weightRatio1 = definition.DOWNFORCE_WEIGHT_FACTOR_1;
-		dFloat speedFactor = definition.DOWNFORCE_WEIGHT_FACTOR_SPEED / definition.VEHICLE_TOP_SPEED_KMH;
+		dFloat weightRatio0 = definition.m_aerodynamicsDownForceWeightCoeffecient0;
+		dFloat weightRatio1 = definition.m_aerodynamicsDownForceWeightCoeffecient1;
+		dFloat speedFactor = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 		m_controller->SetAerodynamicsDownforceCoefficient(weightRatio0, speedFactor, weightRatio1);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
@@ -1542,7 +1545,7 @@ void SuperCar (DemoEntityManager* const scene)
 	dFloat u = 1.0f;
 	dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
 	for (int i = 0; i < 1; i ++) {
-
+/*
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
@@ -1551,7 +1554,7 @@ void SuperCar (DemoEntityManager* const scene)
 		vehicle0->BuildWheelCar(monsterTruck);
 		u -= 0.005f;
 
-/*
+
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit += location1.m_right.Scale ( 3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + offset, 200.0f);
