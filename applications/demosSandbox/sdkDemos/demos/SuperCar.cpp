@@ -50,7 +50,7 @@ struct CarDefinition
 	dFloat m_tireMass;
 	dFloat m_engineMass;
 	dFloat m_vehicleMass;
-	dFloat m_engineRotorRadios;
+	dFloat m_engineRotorRadio;
 	dFloat m_frontSteeringAngle;
 	dFloat m_rearSteeringAngle;
 	dFloat m_vehicleWeightDistribution;
@@ -104,7 +104,7 @@ static CarDefinition monsterTruck =
 	3000.0f,									// PEAK_TORQUE_RPM
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
-	1000.0f,									// TORQUE AT RED LINE RPM
+	 100.0f,									// TORQUE_AT_RED_LINE
 	6000.0f,									// REDLINE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),	// TIRE_LATERAL_STIFFNESS
@@ -147,7 +147,7 @@ static CarDefinition viper =
 	3000.0f,									// PEAK_TORQUE_RPM
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
-	1000.0f,									// TORQUE AT RED LINE RPM
+	100.0f, 									// TORQUE_AT_RED_LINE
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),  // TIRE_LATERAL_STIFFNESS
@@ -471,7 +471,7 @@ class SuperCarEntity: public DemoEntity
 		// add the engine, differential and transmission 
 		CustomVehicleController::EngineController::Info engineInfo;
 		engineInfo.m_mass = definition.m_engineMass; 
-		engineInfo.m_radio = definition.m_engineRotorRadios; 
+		engineInfo.m_radio = definition.m_engineRotorRadio; 
 		engineInfo.m_vehicleTopSpeed = definition.m_vehicleTopSpeed;
 		engineInfo.m_clutchFrictionTorque = definition.m_cluthFrictionTorque;
 
@@ -518,6 +518,8 @@ class SuperCarEntity: public DemoEntity
 
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
+
+		m_controller->AddEngine (engineInfo.m_mass, engineInfo.m_radio);
 		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, differential);
 
 		// the the default transmission type
