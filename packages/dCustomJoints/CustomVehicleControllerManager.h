@@ -172,6 +172,9 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		BodyPartEngine(CustomVehicleController* const controller, dFloat mass, dFloat amatureRadius);
 		~BodyPartEngine();
+
+		void SetFriction(dFloat friction);
+		void ApplyTorque(dFloat torque);
 	};
 	
 	class BodyPartTire: public BodyPart
@@ -389,7 +392,7 @@ class CustomVehicleController: public CustomControllerBase
 		CUSTOM_JOINTS_API EngineController(CustomVehicleController* const controller, const Info& info, const Differential& differential);
 		CUSTOM_JOINTS_API ~EngineController();
 
-		CUSTOM_JOINTS_API void ApplyTorque(dFloat torque, dFloat timestep);
+		CUSTOM_JOINTS_API void ApplyTorque(dFloat torque);
 
 		CUSTOM_JOINTS_API Info GetInfo() const;
 		CUSTOM_JOINTS_API void SetInfo(const Info& info);
@@ -427,7 +430,7 @@ class CustomVehicleController: public CustomControllerBase
 		void CalculateCrownGear();
 		dFloat GetGearRatio () const;
 		virtual void Update(dFloat timestep);
-		void UpdateAutomaticGearBox(dFloat timestep);
+		void UpdateAutomaticGearBox(dFloat timestep, dFloat omega);
 
 		Info m_info;
 		Info m_infoCopy;

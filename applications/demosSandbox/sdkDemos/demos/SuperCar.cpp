@@ -521,6 +521,10 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
 
+		engineInfo.m_aerodynamicDownforceFactor = definition.m_aerodynamicsDownForceWeightCoeffecient0;
+		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
+		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
+
 		m_controller->AddEngine (engineInfo.m_mass, engineInfo.m_radio);
 		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, differential);
 

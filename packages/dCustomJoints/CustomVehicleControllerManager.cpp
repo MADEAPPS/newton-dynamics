@@ -701,6 +701,17 @@ CustomVehicleController::BodyPartEngine::~BodyPartEngine()
 {
 }
 
+void CustomVehicleController::BodyPartEngine::SetFriction(dFloat friction)
+{
+
+}
+
+void CustomVehicleController::BodyPartEngine::ApplyTorque(dFloat torque)
+{
+	//	m_engine->m_omega.m_x = dClamp(m_engine->m_omega.m_x, dFloat (0.0f), m_info.m_readLineRpm);
+	dTrace(("%f\n", torque));
+}
+
 
 void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
 {
@@ -950,13 +961,12 @@ dFloat CustomVehicleController::EngineController::GetGearRatio () const
 }
 
 
-void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat timestep)
+void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat timestep, dFloat omega)
 {
 //m_info.m_gearsCount = 4;
 //m_currentGear = D_VEHICLE_NEUTRAL_GEAR;
 	m_gearTimer--;
 	if (m_gearTimer < 0) {
-		dFloat omega = GetRadiansPerSecond();
 		switch (m_currentGear) 
 		{
 			case D_VEHICLE_NEUTRAL_GEAR:
@@ -989,11 +999,9 @@ void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat ti
 	}
 }
 
-void CustomVehicleController::EngineController::ApplyTorque(dFloat torque, dFloat timestep)
+void CustomVehicleController::EngineController::ApplyTorque(dFloat torque)
 {
-	dAssert (0);
-//	m_engine->m_omega.m_x = dClamp(m_engine->m_omega.m_x, dFloat (0.0f), m_info.m_readLineRpm);
-//	m_engine->Update(this, torque, timestep);
+	m_controller->m_engine->ApplyTorque(torque);
 }
 
 void CustomVehicleController::EngineController::Update(dFloat timestep)
@@ -1011,29 +1019,27 @@ NewtonBodySetOmega (m_controller->m_engine->GetBody(), &xxxx[0]);
 }
 */
 
+	dFloat omega = GetRadiansPerSecond();
 	if (m_automaticTransmissionMode) {
-		UpdateAutomaticGearBox (timestep);
+		UpdateAutomaticGearBox (timestep, omega);
 	}
 
-/*
 	dFloat torque = 0.0f;
 	if (m_ignitionKey) {
-		dFloat omega = m_engine->m_omega.m_x;
 		if (m_param < D_VEHICLE_ENGINE_IDLE_GAS_VALVE) {
-			m_engine->SetFriction(m_info.m_idleFriction);
+			m_controller->m_engine->SetFriction(m_info.m_idleFriction);
 			dFloat viscuosFriction0 = dClamp (m_info.m_idleViscousDrag2 * omega * omega, dFloat (0.0), m_info.m_idleFriction);
 			dFloat viscuosFriction1 = m_info.m_driveViscousDrag2 * omega * omega;
 			torque = m_info.m_idleFriction + (m_torqueRPMCurve.GetValue(omega) - m_info.m_idleFriction) * D_VEHICLE_ENGINE_IDLE_GAS_VALVE - viscuosFriction0 - viscuosFriction1;
 		} else {
-			m_engine->SetFriction(m_info.m_idleFriction);
+			m_controller->m_engine->SetFriction(m_info.m_idleFriction);
 			torque = (m_torqueRPMCurve.GetValue(omega) - m_info.m_idleFriction) * m_param - m_info.m_driveViscousDrag2 * omega * omega;
 		}
 	} else {
-		m_engine->SetFriction(m_info.m_idleFriction);
+		m_controller->m_engine->SetFriction(m_info.m_idleFriction);
 	}
 
-	ApplyTorque(torque, timestep);
-*/
+	ApplyTorque(torque);
 }
 
 bool CustomVehicleController::EngineController::GetTransmissionMode() const
@@ -2026,7 +2032,7 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 				dVector tireSizeVeloc (controller->m_localOmega.CrossProduct(tireLocalPosit));
 				tire->m_lateralSlip = dAtan2(controller->m_localVeloc.m_z + tireSizeVeloc.m_z, controller->m_localVeloc.m_x + tireSizeVeloc.m_x) - tireJoint->m_steerAngle0;
 
-dTrace(("slip (%d %f) ", tire->m_index, tire->m_lateralSlip * 180.0f / 3.1416));
+//dTrace(("slip (%d %f) ", tire->m_index, tire->m_lateralSlip * 180.0f / 3.1416));
 
 				if (dAbs(controller->m_sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) {
 /*
@@ -2233,7 +2239,7 @@ if (xxx > 3000)
 		m_sideSlipRate = (sideSlipAngle - m_sideSlipAngle) / timestep;
 		m_sideSlipAngle = sideSlipAngle;
 	}
-	dTrace(("\n%d omega(%f) sideSlipRate (%f) sideSlip(%f) tires: ", xxx, m_localOmega.m_y * 180.0f / 3.141416f, m_sideSlipRate * 180.0f / 3.141416f, m_sideSlipAngle * 180.0f / 3.141416f));
+//	dTrace(("\n%d omega(%f) sideSlipRate (%f) sideSlip(%f) tires: ", xxx, m_localOmega.m_y * 180.0f / 3.141416f, m_sideSlipRate * 180.0f / 3.141416f, m_sideSlipAngle * 180.0f / 3.141416f));
 }
 
 
