@@ -21,7 +21,6 @@
 #include "DebugDisplay.h"
 #include "UserPlaneCollision.h"
 
-#if 0
 // some figures form the 2000 SRT Viper data sheet: http://www.vipercentral.com/specifications/
 // the 2000 Vipers’ 8.4-liter engine generates
 // max speed: 164 miles per hours					= 73.0f meter per seconds		
@@ -237,7 +236,8 @@ class SuperCarEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle 
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.MASS, PhysicsApplyGravityForce, this);
+		//m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.VEHICLE_MASS, PhysicsApplyGravityForce, this, dAbs (DEMO_GRAVITY));
+		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.MASS, PhysicsApplyGravityForce, this, dAbs (DEMO_GRAVITY));
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();
@@ -535,7 +535,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat weightRatio0 = definition.DOWNFORCE_WEIGHT_FACTOR_0;
 		dFloat weightRatio1 = definition.DOWNFORCE_WEIGHT_FACTOR_1;
 		dFloat speedFactor = definition.DOWNFORCE_WEIGHT_FACTOR_SPEED / definition.VEHICLE_TOP_SPEED_KMH;
-		m_controller->SetAerodynamicsDownforceCoefficient(DEMO_GRAVITY, weightRatio0, speedFactor, weightRatio1);
+		m_controller->SetAerodynamicsDownforceCoefficient(weightRatio0, speedFactor, weightRatio1);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
@@ -771,7 +771,9 @@ class SuperCarEntity: public DemoEntity
 		dVector lookAheadPoint (veloc.Scale (distanceAhead / dSqrt (veloc.DotProduct3(veloc))));
 
 		// find the closet point to the past on the spline
-		dMatrix vehicleMatrix (m_controller->GetLocalFrame() * matrix);
+		dAssert (0);
+		//dMatrix vehicleMatrix (m_controller->GetLocalFrame() * matrix);
+		dMatrix vehicleMatrix (matrix);
 		dMatrix pathMatrix (pathEntity->GetMeshMatrix() * pathEntity->GetCurrentMatrix());
 
 		dVector p0 (vehicleMatrix.m_posit + lookAheadPoint);
@@ -887,7 +889,9 @@ class SuperCarEntity: public DemoEntity
 		NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 		matrix.m_posit = matrix.TransformVector(com);
-		matrix = m_controller->GetLocalFrame() * matrix;
+		dAssert (0);
+		//matrix = m_controller->GetLocalFrame() * matrix;
+		matrix = matrix;
 
 		dFloat scale = -4.0f / (mass * DEMO_GRAVITY);
 		dVector p0 (matrix.m_posit);
@@ -1495,7 +1499,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	void* m_engineSounds[16];
 };
 
-#endif
+
 
 // *************************************************************************************************
 // 
@@ -1507,7 +1511,7 @@ void SuperCar (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-#if 0
+
 	//CreateLevelMesh (scene, "flatPlane1.ngd", 0);
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
@@ -1609,6 +1613,6 @@ void SuperCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-#endif
+
 }
 
