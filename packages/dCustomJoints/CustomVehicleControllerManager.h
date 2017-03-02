@@ -298,12 +298,12 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			Differential4wd()
 				:Differential()
-				,m_secundAxel()
+				,m_secondAxel()
 			{
 				m_type = m_4wd;
 			}
 
-			Differential m_secundAxel;
+			Differential m_secondAxel;
 		};
 
 
@@ -312,12 +312,12 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			Differential8wd()
 				:Differential4wd()
-				,m_secund4Wd()
+				,m_second4Wd()
 			{
 				m_type = m_4wd;
 			}
 
-			Differential4wd m_secund4Wd;
+			Differential4wd m_second4Wd;
 		};
 
 		class DifferentialTracked: public Differential
@@ -371,7 +371,7 @@ class CustomVehicleController: public CustomControllerBase
 			int m_gearsCount;
 			int m_differentialLock;
 			void* m_userData;
-	
+
 			private:
 			void ConvertToMetricSystem();
 
@@ -422,6 +422,7 @@ class CustomVehicleController: public CustomControllerBase
 
 		protected:
 		dFloat GetTopGear() const;
+		dFloat GetRadiansPerSecond() const;
 		void InitEngineTorqueCurve();
 		void CalculateCrownGear();
 		dFloat GetGearRatio () const;
@@ -431,6 +432,7 @@ class CustomVehicleController: public CustomControllerBase
 		Info m_info;
 		Info m_infoCopy;
 		CustomVehicleController* m_controller;
+		BodyPartTire* m_crownGearCalculator;
 		dInterpolationCurve m_torqueRPMCurve;
 		dFloat m_clutchParam;
 		int m_gearTimer;

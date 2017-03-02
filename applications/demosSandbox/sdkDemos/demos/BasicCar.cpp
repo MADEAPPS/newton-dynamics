@@ -389,8 +389,8 @@ class BasicCarEntity: public DemoEntity
 				differential.m_type = CustomVehicleController::EngineController::Differential::m_4wd;
 				differential.m_axel.m_leftTire = rearTires[0];
 				differential.m_axel.m_rightTire = rearTires[1];
-				differential.m_secundAxel.m_axel.m_leftTire = frontTires[0];
-				differential.m_secundAxel.m_axel.m_rightTire = frontTires[1];
+				differential.m_secondAxel.m_axel.m_leftTire = frontTires[0];
+				differential.m_secondAxel.m_axel.m_rightTire = frontTires[1];
 		}
 
 		CustomVehicleController::EngineController::Info engineInfo;

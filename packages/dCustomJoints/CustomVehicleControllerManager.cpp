@@ -741,6 +741,7 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 	,m_info(info)
 	,m_infoCopy(info)
 	,m_controller(controller)
+	,m_crownGearCalculator(NULL)
 	,m_clutchParam(1.0f)
 	,m_gearTimer(0)
 	,m_currentGear(D_VEHICLE_NEUTRAL_GEAR)
@@ -769,14 +770,16 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			dAssert (leftTireBody == differential.m_axel.m_leftTire->GetJoint()->GetBody0());
 			NewtonBodyGetMatrix (leftTireBody, &leftTireMatrix[0][0]);
 			leftTireMatrix = differential.m_axel.m_leftTire->GetJoint()->GetMatrix0() * leftTireMatrix;
-			new AxelJoint(1.0f, leftTireMatrix[0], engineMatrix[0].Scale (-1.0f), chassisMatrix[2], leftTireBody, engineBody, chassisBody);
+			//new AxelJoint(1.0f, leftTireMatrix[0], engineMatrix[0].Scale (-1.0f), chassisMatrix[2], leftTireBody, engineBody, chassisBody);
 
 			dMatrix rightTireMatrix;
 			NewtonBody* const rightTireBody = differential.m_axel.m_rightTire->GetBody();
 			dAssert(rightTireBody == differential.m_axel.m_rightTire->GetJoint()->GetBody0());
 			NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
 			rightTireMatrix = differential.m_axel.m_rightTire->GetJoint()->GetMatrix0() * rightTireMatrix;
-			new AxelJoint(1.0f, rightTireMatrix[0], engineMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, engineBody, chassisBody);
+			//new AxelJoint(1.0f, rightTireMatrix[0], engineMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, engineBody, chassisBody);
+
+			m_crownGearCalculator = differential.m_axel.m_leftTire;
 			break;
 		}
 /*
@@ -821,17 +824,9 @@ void CustomVehicleController::EngineController::SetInfo(const Info& info)
 {
 	m_info = info;
 	m_infoCopy = info;
-
-//	dFloat inertiaInv = 1.0f / (2.0f * m_info.m_mass * m_info.m_radio * m_info.m_radio / 5.0f);
-//	dVector invInertia (inertiaInv, inertiaInv, inertiaInv, 0.0f);
-
 	m_info.m_clutchFrictionTorque = dMax (dFloat(10.0f), dAbs (m_info.m_clutchFrictionTorque));
 	m_infoCopy.m_clutchFrictionTorque = m_info.m_clutchFrictionTorque;
-
-//	m_engine->RebuildEngine (dVector (inertiaInv, inertiaInv, inertiaInv, 0.0f));
-/*
 	InitEngineTorqueCurve();
-
 
 	dAssert(info.m_gearsCount < (int(sizeof (m_info.m_gearRatios) / sizeof (m_info.m_gearRatios[0])) - D_VEHICLE_FIRST_GEAR));
 	m_info.m_gearsCount = info.m_gearsCount + D_VEHICLE_FIRST_GEAR;
@@ -847,9 +842,7 @@ void CustomVehicleController::EngineController::SetInfo(const Info& info)
 		dFloat angle = (1.0f / 30.0f) * (0.277778f) * info.m_vehicleTopSpeed / tire.m_data.m_radio;
 		NewtonBodySetMaxRotationPerStep(tire.GetBody(), angle);
 	}
-
 	m_controller->SetAerodynamicsDownforceCoefficient (info.m_aerodynamicDownforceFactor, info.m_aerodynamicDownForceSurfaceCoeficident, info.m_aerodynamicDownforceFactorAtTopSpeed);
-*/
 }
 
 bool CustomVehicleController::EngineController::GetDifferentialLock() const
@@ -872,20 +865,8 @@ void CustomVehicleController::EngineController::CalculateCrownGear()
 	dAssert(m_info.m_vehicleTopSpeed >= 0.0f);
 	dAssert(m_info.m_vehicleTopSpeed < 100.0f);
 
-/*
-	DriveTrain* nodeArray[256];
-	int nodesCount = m_engine->GetNodeArray(nodeArray);
-
-	BodyPartTire* tire = NULL;
-	for (int i = 0; i < nodesCount; i ++) {
-		DriveTrainTire* const tireNode = nodeArray[i]->CastAsTire();
-		if (tireNode) {
-			tire = tireNode->m_tire;
-			break;
-		}
-	}
+	BodyPartTire* const tire = m_crownGearCalculator;
 	dAssert (tire);
-
 
 	// drive train geometrical relations
 	// G0 = m_differentialGearRatio
@@ -899,11 +880,9 @@ void CustomVehicleController::EngineController::CalculateCrownGear()
 	// we = G0 * G1 * s / r
 	// G0 = r * we / (G1 * s)
 	// using the top gear and the optimal engine torque for the calculations
-	
 	dFloat topGearRatio = GetTopGear();
 	dFloat tireRadio = tire->GetInfo().m_radio;
-	m_info.m_crownGearRatio = tireRadio * m_info.m_peakHorsePowerRpm / (m_info.m_vehicleTopSpeed * topGearRatio);
-*/
+	m_info.m_crownGearRatio = tireRadio * m_info.m_rpmAtPeakHorsePower / (m_info.m_vehicleTopSpeed * topGearRatio);
 }
 
 
@@ -975,11 +954,9 @@ void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat ti
 {
 //m_info.m_gearsCount = 4;
 //m_currentGear = D_VEHICLE_NEUTRAL_GEAR;
-dAssert (0);
-/*
 	m_gearTimer--;
 	if (m_gearTimer < 0) {
-		dFloat omega = m_engine->m_omega.m_x;
+		dFloat omega = GetRadiansPerSecond();
 		switch (m_currentGear) 
 		{
 			case D_VEHICLE_NEUTRAL_GEAR:
@@ -1010,7 +987,6 @@ dAssert (0);
 			}
 		}
 	}
-*/
 }
 
 void CustomVehicleController::EngineController::ApplyTorque(dFloat torque, dFloat timestep)
@@ -1035,11 +1011,11 @@ NewtonBodySetOmega (m_controller->m_engine->GetBody(), &xxxx[0]);
 }
 */
 
-/*
 	if (m_automaticTransmissionMode) {
 		UpdateAutomaticGearBox (timestep);
 	}
 
+/*
 	dFloat torque = 0.0f;
 	if (m_ignitionKey) {
 		dFloat omega = m_engine->m_omega.m_x;
@@ -1118,8 +1094,7 @@ int CustomVehicleController::EngineController::GetLastGear() const
 	return m_info.m_gearsCount - 1;
 }
 
-
-dFloat CustomVehicleController::EngineController::GetRPM() const
+dFloat CustomVehicleController::EngineController::GetRadiansPerSecond() const
 {
 	dMatrix matrix;
 	dVector omega(0.0f);
@@ -1129,7 +1104,12 @@ dFloat CustomVehicleController::EngineController::GetRPM() const
 
 	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
 	NewtonBodyGetOmega(engine, &omega[0]);
-	return omega.DotProduct3 (matrix.m_right) * 9.55f;
+	return omega.DotProduct3(matrix.m_right);
+}
+
+dFloat CustomVehicleController::EngineController::GetRPM() const
+{
+	return GetRadiansPerSecond() * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineController::GetIdleRPM() const

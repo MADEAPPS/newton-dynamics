@@ -513,8 +513,8 @@ class SuperCarEntity: public DemoEntity
 				differential.m_type = CustomVehicleController::EngineController::Differential::m_4wd;
 				differential.m_axel.m_leftTire = leftRearTire;
 				differential.m_axel.m_rightTire = rightRearTire;
-				differential.m_secundAxel.m_axel.m_leftTire = leftFrontTire;
-				differential.m_secundAxel.m_axel.m_rightTire = rightFrontTire;
+				differential.m_secondAxel.m_axel.m_leftTire = leftFrontTire;
+				differential.m_secondAxel.m_axel.m_rightTire = rightFrontTire;
 		}
 
 
@@ -615,8 +615,8 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 
-#if 0
-	#if 1
+#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
