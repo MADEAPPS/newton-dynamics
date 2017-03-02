@@ -1059,15 +1059,15 @@ class HeavyVehicleEntity: public DemoEntity
 		engineInfo.m_clutchFrictionTorque = definition.CLUTCH_FRICTION_TORQUE;
 
 		engineInfo.m_idleTorque = definition.IDLE_TORQUE;
-		engineInfo.m_idleTorqueRpm = definition.IDLE_TORQUE_RPM;
+		engineInfo.m_rpmAtIdleTorque = definition.IDLE_TORQUE_RPM;
 
 		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
-		engineInfo.m_peakTorqueRpm = definition.PEAK_TORQUE_RPM;
+		engineInfo.m_rpmAtPeakTorque = definition.PEAK_TORQUE_RPM;
 
 		engineInfo.m_peakHorsePower = definition.PEAK_HP;
-		engineInfo.m_peakHorsePowerRpm = definition.PEAK_HP_RPM;
+		engineInfo.m_rpmAtPeakHorsePower = definition.PEAK_HP_RPM;
 
-		engineInfo.m_readLineRpm = definition.REDLINE_RPM;
+		engineInfo.m_redLineRpm = definition.REDLINE_RPM;
 
 		engineInfo.m_gearsCount = 3;
 		engineInfo.m_gearRatios[0] = definition.GEAR_1;
@@ -1142,15 +1142,15 @@ class HeavyVehicleEntity: public DemoEntity
 		engineInfo.m_clutchFrictionTorque = definition.CLUTCH_FRICTION_TORQUE;
 
 		engineInfo.m_idleTorque = definition.IDLE_TORQUE;
-		engineInfo.m_idleTorqueRpm = definition.IDLE_TORQUE_RPM;
+		engineInfo.m_rpmAtIdleTorque = definition.IDLE_TORQUE_RPM;
 
 		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
-		engineInfo.m_peakTorqueRpm = definition.PEAK_TORQUE_RPM;
+		engineInfo.m_rpmAtPeakTorque = definition.PEAK_TORQUE_RPM;
 
 		engineInfo.m_peakHorsePower = definition.PEAK_HP;
-		engineInfo.m_peakHorsePowerRpm = definition.PEAK_HP_RPM;
+		engineInfo.m_rpmAtPeakHorsePower = definition.PEAK_HP_RPM;
 
-		engineInfo.m_readLineRpm = definition.REDLINE_RPM;
+		engineInfo.m_redLineRpm = definition.REDLINE_RPM;
 
 		engineInfo.m_gearsCount = 3;
 		engineInfo.m_gearRatios[0] = definition.GEAR_1;

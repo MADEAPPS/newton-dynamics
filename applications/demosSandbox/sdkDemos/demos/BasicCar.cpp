@@ -49,6 +49,7 @@ struct BasciCarParameters
 	dFloat PEAK_HP;
 	dFloat PEAK_HP_RPM;
 
+	dFloat REDLINE_TORQUE;
 	dFloat REDLINE_RPM;
 
 	dFloat GEAR_1;
@@ -88,6 +89,7 @@ static BasciCarParameters basicCarParameters =
 	3000.0f,			// PEAK_TORQUE_RPM
 	 190.0f,			// PEAK_HP
 	4000.0f,			// PEAK_HP_RPM
+	  50.0f,			// LINE_RPM_TORQUE;
 	4500.0f,			// REDLINE_RPM
 		2.5f,			// GEAR_1
 		2.0f,			// GEAR_2
@@ -398,15 +400,16 @@ class BasicCarEntity: public DemoEntity
 		engineInfo.m_clutchFrictionTorque = parameters.CLUTCH_FRICTION_TORQUE;
 		
 		engineInfo.m_idleTorque = parameters.IDLE_TORQUE;
-		engineInfo.m_idleTorqueRpm = parameters.IDLE_TORQUE_RPM;
+		engineInfo.m_rpmAtIdleTorque = parameters.IDLE_TORQUE_RPM;
 
 		engineInfo.m_peakTorque = parameters.PEAK_TORQUE;
-		engineInfo.m_peakTorqueRpm = parameters.PEAK_TORQUE_RPM;
+		engineInfo.m_rpmAtPeakTorque = parameters.PEAK_TORQUE_RPM;
 
 		engineInfo.m_peakHorsePower = parameters.PEAK_HP;
-		engineInfo.m_peakHorsePowerRpm = parameters.PEAK_HP_RPM;
+		engineInfo.m_rpmAtPeakHorsePower = parameters.PEAK_HP_RPM;
 
-		engineInfo.m_readLineRpm = parameters.REDLINE_RPM;
+		engineInfo.m_redLineTorque = parameters.REDLINE_TORQUE;
+		engineInfo.m_rpmAtRedLine = parameters.REDLINE_RPM;
 
 		engineInfo.m_gearsCount = 3;
 		engineInfo.m_gearRatios[0] = parameters.GEAR_1;

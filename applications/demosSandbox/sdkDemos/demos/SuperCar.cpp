@@ -476,12 +476,13 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_clutchFrictionTorque = definition.m_cluthFrictionTorque;
 
 		engineInfo.m_idleTorque = definition.m_engineIdleTorque;
-		engineInfo.m_idleTorqueRpm = definition.m_engineRPMAtIdleTorque;
+		engineInfo.m_rpmAtIdleTorque = definition.m_engineRPMAtIdleTorque;
 		engineInfo.m_peakTorque = definition.m_enginePeakTorque;
-		engineInfo.m_peakTorqueRpm = definition.m_engineRPMAtPeakTorque;
+		engineInfo.m_rpmAtPeakTorque = definition.m_engineRPMAtPeakTorque;
 		engineInfo.m_peakHorsePower = definition.m_enginePeakHorsePower;
-		engineInfo.m_peakHorsePowerRpm = definition.m_egineRPMAtPeakHorsePower;
-		engineInfo.m_readLineRpm = definition.m_engineRPMAtRedLine;
+		engineInfo.m_rpmAtPeakHorsePower = definition.m_egineRPMAtPeakHorsePower;
+		engineInfo.m_redLineTorque = definition.m_engineRedLineTorque;
+		engineInfo.m_rpmAtRedLine = definition.m_engineRPMAtRedLine;
 
 		engineInfo.m_gearsCount = 6;
 		engineInfo.m_gearRatios[0] = definition.m_transmissionGearRatio0;

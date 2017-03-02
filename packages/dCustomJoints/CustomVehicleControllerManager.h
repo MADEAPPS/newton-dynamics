@@ -351,12 +351,13 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_mass;
 			dFloat m_radio;
 			dFloat m_idleTorque;
-			dFloat m_idleTorqueRpm;
+			dFloat m_rpmAtIdleTorque;
 			dFloat m_peakTorque;
-			dFloat m_peakTorqueRpm;
+			dFloat m_rpmAtPeakTorque;
 			dFloat m_peakHorsePower;
-			dFloat m_peakHorsePowerRpm;
-			dFloat m_readLineRpm;
+			dFloat m_rpmAtPeakHorsePower;
+			dFloat m_redLineTorque;
+			dFloat m_rpmAtRedLine;
 
 			dFloat m_vehicleTopSpeed;
 			dFloat m_reverseGearRatio;

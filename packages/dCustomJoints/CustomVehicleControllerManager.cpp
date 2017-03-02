@@ -711,27 +711,28 @@ void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
 
 	m_idleTorque *= poundFootToNewtonMeters;
 	m_peakTorque *= poundFootToNewtonMeters;
+	m_redLineTorque *= poundFootToNewtonMeters;
 
-	m_peakTorqueRpm *= rpmToRadiansPerSecunds;
-	m_peakHorsePowerRpm *= rpmToRadiansPerSecunds;
-	m_readLineRpm *= rpmToRadiansPerSecunds;
-	m_idleTorqueRpm *= rpmToRadiansPerSecunds;
+	m_rpmAtPeakTorque *= rpmToRadiansPerSecunds;
+	m_rpmAtPeakHorsePower *= rpmToRadiansPerSecunds;
+	m_rpmAtRedLine *= rpmToRadiansPerSecunds;
+	m_rpmAtIdleTorque *= rpmToRadiansPerSecunds;
 
 	m_peakHorsePower *= horsePowerToWatts;
 	m_vehicleTopSpeed *= kmhToMetersPerSecunds;
 
-	m_peakPowerTorque = m_peakHorsePower / m_peakHorsePowerRpm;
+	m_peakPowerTorque = m_peakHorsePower / m_rpmAtPeakHorsePower;
 
-	dAssert(m_idleTorqueRpm > 0.0f);
-	dAssert(m_idleTorqueRpm < m_peakHorsePowerRpm);
-	dAssert(m_peakTorqueRpm < m_peakHorsePowerRpm);
-	dAssert(m_peakHorsePowerRpm < m_readLineRpm);
+	dAssert(m_rpmAtIdleTorque > 0.0f);
+	dAssert(m_rpmAtIdleTorque < m_rpmAtPeakHorsePower);
+	dAssert(m_rpmAtPeakTorque < m_rpmAtPeakHorsePower);
+	dAssert(m_rpmAtPeakHorsePower < m_rpmAtRedLine);
 
 	dAssert(m_idleTorque > 0.0f);
 	dAssert(m_peakTorque > m_peakPowerTorque);
 	//dAssert(m_peakPowerTorque > m_redLineTorque);
 	//dAssert(m_redLineTorque > 0.0f);
-	dAssert((m_peakTorque * m_peakTorqueRpm) < m_peakHorsePower);
+	dAssert((m_peakTorque * m_rpmAtPeakTorque) < m_peakHorsePower);
 }
 
 
@@ -768,14 +769,14 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			dAssert (leftTireBody == differential.m_axel.m_leftTire->GetJoint()->GetBody0());
 			NewtonBodyGetMatrix (leftTireBody, &leftTireMatrix[0][0]);
 			leftTireMatrix = differential.m_axel.m_leftTire->GetJoint()->GetMatrix0() * leftTireMatrix;
-			AxelJoint* const leftGear = new AxelJoint(1.0f, leftTireMatrix[0], engineMatrix[0].Scale (-1.0f), chassisMatrix[2], leftTireBody, engineBody, chassisBody);
+			new AxelJoint(1.0f, leftTireMatrix[0], engineMatrix[0].Scale (-1.0f), chassisMatrix[2], leftTireBody, engineBody, chassisBody);
 
 			dMatrix rightTireMatrix;
 			NewtonBody* const rightTireBody = differential.m_axel.m_rightTire->GetBody();
 			dAssert(rightTireBody == differential.m_axel.m_rightTire->GetJoint()->GetBody0());
 			NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
 			rightTireMatrix = differential.m_axel.m_rightTire->GetJoint()->GetMatrix0() * rightTireMatrix;
-			AxelJoint* const rightGear = new AxelJoint(1.0f, rightTireMatrix[0], engineMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, engineBody, chassisBody);
+			new AxelJoint(1.0f, rightTireMatrix[0], engineMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, engineBody, chassisBody);
 			break;
 		}
 /*
@@ -916,10 +917,10 @@ void CustomVehicleController::EngineController::InitEngineTorqueCurve()
 	dFloat torqueTable[5];
 
 	rpsTable[0] = 0.0f;
-	rpsTable[1] = m_info.m_idleTorqueRpm;
-	rpsTable[2] = m_info.m_peakTorqueRpm;
-	rpsTable[3] = m_info.m_peakHorsePowerRpm;
-	rpsTable[4] = m_info.m_readLineRpm;
+	rpsTable[1] = m_info.m_rpmAtIdleTorque;
+	rpsTable[2] = m_info.m_rpmAtPeakTorque;
+	rpsTable[3] = m_info.m_rpmAtPeakHorsePower;
+	rpsTable[4] = m_info.m_rpmAtRedLine;
 
 	m_info.m_readLineTorque = m_info.m_peakPowerTorque * 0.75f;
 
@@ -932,11 +933,11 @@ void CustomVehicleController::EngineController::InitEngineTorqueCurve()
 
 	m_info.m_idleFriction = dMin (m_info.m_idleTorque, m_info.m_readLineTorque) * D_VEHICLE_ENGINE_IDLE_FRICTION_COEFFICIENT;
 
-	dFloat speed = m_info.m_idleTorqueRpm;
+	dFloat speed = m_info.m_rpmAtIdleTorque;
 	dFloat torque = m_info.m_idleTorque - m_info.m_idleFriction;
 	m_info.m_idleViscousDrag2 = torque / (speed * speed);
 
-	speed = m_info.m_readLineRpm * 1.1f;
+	speed = m_info.m_rpmAtRedLine * 1.1f;
 	torque = m_info.m_readLineTorque - m_info.m_idleFriction;
 	m_info.m_driveViscousDrag2 = torque / (speed * speed);
 
@@ -1127,12 +1128,12 @@ return 0;
 
 dFloat CustomVehicleController::EngineController::GetIdleRPM() const
 {
-	return m_info.m_idleTorqueRpm * 9.55f;
+	return m_info.m_rpmAtIdleTorque * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineController::GetRedLineRPM() const
 {
-	return m_info.m_readLineRpm * 9.55f;
+	return m_info.m_rpmAtRedLine * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineController::GetSpeed() const
