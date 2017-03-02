@@ -653,7 +653,7 @@ dFloat CustomVehicleController::BodyPartTire::GetLongitudinalSlip () const
 }
 
 
-CustomVehicleController::BodyPartEngine::BodyPartEngine(CustomVehicleController* const controller, dFloat mass, dFloat amatureRadius)
+CustomVehicleController::BodyPartEngine::BodyPartEngine(CustomVehicleController* const controller, dFloat mass, dFloat armatureRadius)
 	:BodyPart()
 {
 	dMatrix matrix;
@@ -681,7 +681,7 @@ origin.m_y += 2.0f;
 
 	// make engine inertia spherical (also make scale inertia but twice the radio for more stability)
 	const dFloat engineInertiaScale = 9.0f;
-	const dFloat inertia = 2.0f * engineInertiaScale * mass * amatureRadius * amatureRadius / 5.0f;
+	const dFloat inertia = 2.0f * engineInertiaScale * mass * armatureRadius * armatureRadius / 5.0f;
 	NewtonBodySetMassMatrix(m_body, mass, inertia, inertia, inertia);
 
 	dVector drag(0.0f);
@@ -747,7 +747,7 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 	,m_ignitionKey(false)
 	,m_automaticTransmissionMode(true)
 {
-	controller->m_engineControl = this;
+//	controller->m_engineControl = this;
 
 	dMatrix engineMatrix;
 	dMatrix chassisMatrix;
@@ -1121,9 +1121,15 @@ int CustomVehicleController::EngineController::GetLastGear() const
 
 dFloat CustomVehicleController::EngineController::GetRPM() const
 {
-dAssert (0);
-//	return m_engine->m_omega.m_x * 9.55f;
-return 0;
+	dMatrix matrix;
+	dVector omega(0.0f);
+
+	NewtonBody* const chassis = m_controller->GetBody();
+	NewtonBody* const engine = m_controller->m_engine->GetBody();
+
+	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
+	NewtonBodyGetOmega(engine, &omega[0]);
+	return omega.DotProduct3 (matrix.m_right) * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineController::GetIdleRPM() const
@@ -1145,7 +1151,6 @@ dFloat CustomVehicleController::EngineController::GetSpeed() const
 	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
 	NewtonBodyGetVelocity(chassis, &veloc[0]);
 
-dAssert (0);
 //	dVector pin (matrix.RotateVector (m_controller->m_localFrame.m_front));
 	dVector pin (matrix.m_front);
 	return pin.DotProduct3(veloc);
@@ -1697,9 +1702,9 @@ CustomVehicleController::BodyPartTire* CustomVehicleController::AddTire(const Bo
 	return &tireNode->GetInfo();
 }
 
-CustomVehicleController::BodyPartEngine* CustomVehicleController::AddEngine (dFloat mass, dFloat amatureRadius)
+CustomVehicleController::BodyPartEngine* CustomVehicleController::AddEngine (dFloat mass, dFloat armatureRadius)
 {
-	m_engine = new BodyPartEngine (this, mass, amatureRadius);
+	m_engine = new BodyPartEngine (this, mass, armatureRadius);
 
 	m_bodyPartsList.Append(m_engine);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, m_engine->GetBody());

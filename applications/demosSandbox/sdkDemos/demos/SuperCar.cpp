@@ -309,7 +309,9 @@ class SuperCarEntity: public DemoEntity
 			for (dList<CustomVehicleController::BodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
 				CustomVehicleController::BodyPart* const part = node->GetInfo();
 				DemoEntity* const entPart = (DemoEntity*) part->GetUserData();
-				entPart->InterpolateMatrix (world, param);
+				if (entPart) {
+					entPart->InterpolateMatrix(world, param);
+				}
 			}
 		}
 	}
@@ -1581,7 +1583,6 @@ void SuperCar (DemoEntityManager* const scene)
 		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "viper.ngd", -3.0f, viper);
 		vehicle3->BuildWheelCar(viper);
 		u -= 0.005f;
-
 	}
 
 	CustomVehicleController* const controller = &manager->GetLast()->GetInfo();
@@ -1602,7 +1603,7 @@ void SuperCar (DemoEntityManager* const scene)
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
 	location.m_posit.m_x += 44.0f;
-
+/*
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
@@ -1619,6 +1620,6 @@ void SuperCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-
+*/
 }
 

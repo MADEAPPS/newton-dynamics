@@ -67,9 +67,9 @@ class CustomVehicleController: public CustomControllerBase
 		public:
 		Controller(CustomVehicleController* const controller)
 			:m_controller(controller)
-			, m_param(0.0f)
-			, m_paramMemory(0.0f)
-			, m_timer(60)
+			,m_param(0.0f)
+			,m_paramMemory(0.0f)
+			,m_timer(60)
 		{
 		}
 
@@ -472,7 +472,7 @@ class CustomVehicleController: public CustomControllerBase
 	CUSTOM_JOINTS_API void Finalize();
 
 	CUSTOM_JOINTS_API BodyPartTire* AddTire (const BodyPartTire::Info& tireInfo);
-	CUSTOM_JOINTS_API BodyPartEngine* AddEngine (dFloat mass, dFloat amatureRadius);
+	CUSTOM_JOINTS_API BodyPartEngine* AddEngine (dFloat mass, dFloat armatureRadius);
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
 	const CUSTOM_JOINTS_API BodyPart* GetChassis() const;
