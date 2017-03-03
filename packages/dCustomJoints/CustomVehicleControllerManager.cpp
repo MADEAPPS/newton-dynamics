@@ -1028,7 +1028,7 @@ static int xxx;
 xxx++;
 
 	dFloat omega = GetRadiansPerSecond();
-dTrace(("%d %f\n", xxx, omega));
+dTrace(("%d %f\n", xxx, GetRPM()));
 
 	if (m_automaticTransmissionMode) {
 		UpdateAutomaticGearBox (timestep, omega);
