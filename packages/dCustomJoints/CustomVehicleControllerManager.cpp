@@ -74,37 +74,6 @@ class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexC
 };
 
 
-void CustomVehicleController::dInterpolationCurve::InitalizeCurve(int points, const dFloat* const steps, const dFloat* const values)
-{
-	m_count = points;
-	dAssert(points <= int(sizeof(m_nodes) / sizeof (m_nodes[0])));
-	memset(m_nodes, 0, sizeof (m_nodes));
-	for (int i = 0; i < m_count; i++) {
-		m_nodes[i].m_param = steps[i];
-		m_nodes[i].m_value = values[i];
-	}
-}
-
-dFloat CustomVehicleController::dInterpolationCurve::GetValue(dFloat param) const
-{
-	dFloat interplatedValue = 0.0f;
-	if (m_count) {
-		param = dClamp(param, dFloat(0.0f), m_nodes[m_count - 1].m_param);
-		interplatedValue = m_nodes[m_count - 1].m_value;
-		for (int i = 1; i < m_count; i++) {
-			if (param < m_nodes[i].m_param) {
-				dFloat df = m_nodes[i].m_value - m_nodes[i - 1].m_value;
-				dFloat ds = m_nodes[i].m_param - m_nodes[i - 1].m_param;
-				dFloat step = param - m_nodes[i - 1].m_param;
-
-				interplatedValue = m_nodes[i - 1].m_value + df * step / ds;
-				break;
-			}
-		}
-	}
-	return interplatedValue;
-}
-
 class CustomVehicleController::WheelJoint: public CustomJoint
 {
 	public:
@@ -742,7 +711,6 @@ void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
 
 	m_idleTorque *= poundFootToNewtonMeters;
 	m_peakTorque *= poundFootToNewtonMeters;
-	m_redLineTorque *= poundFootToNewtonMeters;
 
 	m_rpmAtPeakTorque *= rpmToRadiansPerSecunds;
 	m_rpmAtPeakHorsePower *= rpmToRadiansPerSecunds;
@@ -761,8 +729,6 @@ void CustomVehicleController::EngineController::Info::ConvertToMetricSystem()
 
 	dAssert(m_idleTorque > 0.0f);
 	dAssert(m_peakTorque > m_peakPowerTorque);
-	//dAssert(m_peakPowerTorque > m_redLineTorque);
-	//dAssert(m_redLineTorque > 0.0f);
 	dAssert((m_peakTorque * m_rpmAtPeakTorque) < m_peakHorsePower);
 }
 
@@ -914,6 +880,16 @@ void CustomVehicleController::EngineController::CalculateCrownGear()
 	dFloat topGearRatio = GetTopGear();
 	dFloat tireRadio = tire->GetInfo().m_radio;
 	m_info.m_crownGearRatio = tireRadio * m_info.m_rpmAtPeakHorsePower / (m_info.m_vehicleTopSpeed * topGearRatio);
+
+	// bake crown gear with the engine pwer curve
+	m_info.m_idleFriction *= m_info.m_crownGearRatio;
+	m_info.m_idleTorque *= m_info.m_crownGearRatio;
+	m_info.m_peakPowerTorque *= m_info.m_crownGearRatio;
+	m_info.m_peakTorque *= m_info.m_crownGearRatio;
+	m_info.m_rpmAtIdleTorque /= m_info.m_crownGearRatio;
+	m_info.m_rpmAtPeakTorque /= m_info.m_crownGearRatio;
+	m_info.m_rpmAtPeakHorsePower /= m_info.m_crownGearRatio;
+	m_info.m_rpmAtRedLine /= m_info.m_crownGearRatio;
 }
 
 
@@ -923,35 +899,19 @@ void CustomVehicleController::EngineController::InitEngineTorqueCurve()
 
 	CalculateCrownGear();
 
-	dFloat rpsTable[5];
-	dFloat torqueTable[5];
+	m_info.m_idleFriction = m_info.m_idleTorque * D_VEHICLE_ENGINE_IDLE_FRICTION_COEFFICIENT;
 
-	rpsTable[0] = 0.0f;
-	rpsTable[1] = m_info.m_rpmAtIdleTorque;
-	rpsTable[2] = m_info.m_rpmAtPeakTorque;
-	rpsTable[3] = m_info.m_rpmAtPeakHorsePower;
-	rpsTable[4] = m_info.m_rpmAtRedLine;
-
-	m_info.m_readLineTorque = m_info.m_peakPowerTorque * 0.75f;
-
-	torqueTable[0] = m_info.m_idleTorque;
-	torqueTable[1] = m_info.m_idleTorque;
-	torqueTable[2] = m_info.m_peakTorque;
-//	torqueTable[3] = m_info.m_peakPowerTorque;
-//	torqueTable[4] = m_info.m_readLineTorque;
-	torqueTable[3] = m_info.m_peakTorque;
-	torqueTable[4] = m_info.m_peakTorque;
-
-	m_info.m_idleFriction = dMin (m_info.m_idleTorque, m_info.m_readLineTorque) * D_VEHICLE_ENGINE_IDLE_FRICTION_COEFFICIENT;
-
-	dFloat torqueLose = m_info.m_idleTorque - m_info.m_idleFriction;
 	dFloat rpmStep = m_info.m_rpmAtIdleTorque;
+	dFloat torqueLose = m_info.m_idleTorque + (m_info.m_peakTorque - m_info.m_idleTorque) * rpmStep / m_info.m_rpmAtPeakTorque - m_info.m_idleFriction;
 	m_info.m_viscousDrag0 = torqueLose / (rpmStep * rpmStep);
 
-	torqueLose = m_info.m_peakTorque - m_info.m_peakPowerTorque;
+	torqueLose = m_info.m_peakTorque - m_info.m_peakPowerTorque - m_info.m_idleFriction;
 	rpmStep = m_info.m_rpmAtPeakHorsePower - m_info.m_rpmAtPeakTorque;
 	m_info.m_viscousDrag1 = torqueLose / (rpmStep * rpmStep);
 
+	torqueLose = m_info.m_peakPowerTorque - m_info.m_idleFriction;
+	rpmStep = m_info.m_rpmAtRedLine - m_info.m_rpmAtPeakHorsePower;
+	m_info.m_viscousDrag2 = torqueLose / (rpmStep * rpmStep);
 
 /*
 	dFloat speed = m_info.m_rpmAtIdleTorque;
@@ -962,7 +922,6 @@ void CustomVehicleController::EngineController::InitEngineTorqueCurve()
 	torque = m_info.m_readLineTorque - m_info.m_idleFriction;
 	m_info.m_driveViscousDrag2 = torque / (speed * speed);
 */
-	m_torqueRPMCurve.InitalizeCurve(sizeof (rpsTable) / sizeof (rpsTable[0]), rpsTable, torqueTable);
 }
 
 void CustomVehicleController::EngineController::PlotEngineCurve() const
@@ -1014,6 +973,8 @@ void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat ti
 
 			default:
 			{
+				//dAssert(0);
+/*
 			   if (omega > m_torqueRPMCurve.GetValue(3).m_param) {
 					if (m_currentGear < (m_info.m_gearsCount - 1)) {
 						SetGear(m_currentGear + 1);
@@ -1023,6 +984,7 @@ void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat ti
 						SetGear(m_currentGear - 1);
 					}
 				}
+*/
 			}
 		}
 	}
@@ -1040,22 +1002,18 @@ void CustomVehicleController::EngineController::Update(dFloat timestep)
 		UpdateAutomaticGearBox (timestep, omega);
 	}
 
-
-
-
 	dFloat engineTorque = 0.0f;
 	if (m_ignitionKey) {
-		if (m_param < D_VEHICLE_ENGINE_IDLE_GAS_VALVE) {
-			engineTorque = m_torqueRPMCurve.GetValue(omega);
-		} else {
-			engineTorque = m_torqueRPMCurve.GetValue(omega) * m_param;
-		}
-
+		engineTorque = m_info.m_idleTorque + (m_info.m_peakTorque - m_info.m_idleTorque) * m_param;
 		dFloat rpmIdleStep = dMin(omega, m_info.m_rpmAtIdleTorque);
 		engineTorque -= m_info.m_viscousDrag0 * rpmIdleStep * rpmIdleStep;
 		if (omega > m_info.m_rpmAtPeakTorque) {
-			dFloat rpmStep = dMin(omega, m_info.m_peakPowerTorque) - m_info.m_rpmAtIdleTorque;
+			dFloat rpmStep = dMin(omega, m_info.m_rpmAtPeakHorsePower) - m_info.m_rpmAtPeakTorque;
 			engineTorque -= m_info.m_viscousDrag1 * rpmStep * rpmStep;
+			if (omega > m_info.m_rpmAtPeakHorsePower) {
+				dFloat rpmStep = omega - m_info.m_rpmAtPeakHorsePower;
+				engineTorque -= m_info.m_viscousDrag2 * rpmStep * rpmStep;
+			}
 		}
 	}
 
@@ -1138,17 +1096,17 @@ dFloat CustomVehicleController::EngineController::GetRadiansPerSecond() const
 
 dFloat CustomVehicleController::EngineController::GetRPM() const
 {
-	return GetRadiansPerSecond() * 9.55f;
+	return m_info.m_crownGearRatio * GetRadiansPerSecond() * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineController::GetIdleRPM() const
 {
-	return m_info.m_rpmAtIdleTorque * 9.55f;
+	return m_info.m_crownGearRatio * m_info.m_rpmAtIdleTorque * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineController::GetRedLineRPM() const
 {
-	return m_info.m_rpmAtRedLine * 9.55f;
+	return m_info.m_crownGearRatio * m_info.m_rpmAtRedLine * 9.55f;
 }
 
 dFloat CustomVehicleController::EngineController::GetSpeed() const

@@ -61,7 +61,6 @@ struct CarDefinition
 	dFloat m_engineRPMAtPeakTorque;
 	dFloat m_enginePeakHorsePower;
 	dFloat m_egineRPMAtPeakHorsePower;
-	dFloat m_engineRedLineTorque;
 	dFloat m_engineRPMAtRedLine;
 	dFloat m_vehicleTopSpeed;
 	dFloat m_tireLaretalStiffeness;
@@ -104,7 +103,6 @@ static CarDefinition monsterTruck =
 	3000.0f,									// PEAK_TORQUE_RPM
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
-	 100.0f,									// TORQUE_AT_RED_LINE
 	6000.0f,									// REDLINE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),	// TIRE_LATERAL_STIFFNESS
@@ -141,13 +139,12 @@ static CarDefinition viper =
 	 0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
 	0.55f,										// VEHICLE_WEIGHT_DISTRIBUTION
 	2000.0f,									// CLUTCH_FRICTION_TORQUE
-	350.0f,										// IDLE_TORQUE
+	200.0f,										// IDLE_TORQUE
 	800.0f,										// IDLE_TORQUE_RPM
 	500.0f,										// PEAK_TORQUE
 	3000.0f,									// PEAK_TORQUE_RPM
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
-	100.0f, 									// TORQUE_AT_RED_LINE
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),  // TIRE_LATERAL_STIFFNESS
@@ -483,7 +480,6 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_rpmAtPeakTorque = definition.m_engineRPMAtPeakTorque;
 		engineInfo.m_peakHorsePower = definition.m_enginePeakHorsePower;
 		engineInfo.m_rpmAtPeakHorsePower = definition.m_egineRPMAtPeakHorsePower;
-		engineInfo.m_redLineTorque = definition.m_engineRedLineTorque;
 		engineInfo.m_rpmAtRedLine = definition.m_engineRPMAtRedLine;
 
 		engineInfo.m_gearsCount = 6;

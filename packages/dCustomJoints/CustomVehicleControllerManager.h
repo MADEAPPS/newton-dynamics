@@ -35,33 +35,6 @@ class CustomVehicleController: public CustomControllerBase
 	class EngineController;
 	class SteeringController;
 
-	class dInterpolationCurve
-	{
-		public:
-		class dNot
-		{
-			public:
-			dFloat m_param;
-			dFloat m_value;
-		};
-
-		dInterpolationCurve()
-		{
-			m_count = 0;
-		}
-
-		~dInterpolationCurve()
-		{
-		}
-
-		void InitalizeCurve(int points, const dFloat* const steps, const dFloat* const values);
-		dFloat GetValue(dFloat param) const;
-		const dNot& GetValue(int entry) const {return m_nodes[entry];}
-
-		dNot m_nodes[6];
-		int m_count;
-	};
-
 	class Controller: public CustomAlloc
 	{
 		public:
@@ -360,7 +333,6 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_rpmAtPeakTorque;
 			dFloat m_peakHorsePower;
 			dFloat m_rpmAtPeakHorsePower;
-			dFloat m_redLineTorque;
 			dFloat m_rpmAtRedLine;
 
 			dFloat m_vehicleTopSpeed;
@@ -381,10 +353,10 @@ class CustomVehicleController: public CustomControllerBase
 
 			dFloat m_crownGearRatio;
 			dFloat m_idleFriction;
-			dFloat m_readLineTorque;
 			dFloat m_peakPowerTorque;
 			dFloat m_viscousDrag0;
 			dFloat m_viscousDrag1;
+			dFloat m_viscousDrag2;
 			
 			//dFloat m_driveViscousDrag2;
 
@@ -439,7 +411,6 @@ class CustomVehicleController: public CustomControllerBase
 		Info m_infoCopy;
 		CustomVehicleController* m_controller;
 		BodyPartTire* m_crownGearCalculator;
-		dInterpolationCurve m_torqueRPMCurve;
 		dFloat m_clutchParam;
 		int m_gearTimer;
 		int m_currentGear;
