@@ -912,16 +912,6 @@ void CustomVehicleController::EngineController::InitEngineTorqueCurve()
 	torqueLose = m_info.m_peakPowerTorque - m_info.m_idleFriction;
 	rpmStep = m_info.m_rpmAtRedLine - m_info.m_rpmAtPeakHorsePower;
 	m_info.m_viscousDrag2 = torqueLose / (rpmStep * rpmStep);
-
-/*
-	dFloat speed = m_info.m_rpmAtIdleTorque;
-	dFloat torque = m_info.m_idleTorque - m_info.m_idleFriction;
-	m_info.m_idleViscousDrag2 = torque / (speed * speed);
-
-	speed = m_info.m_rpmAtRedLine;
-	torque = m_info.m_readLineTorque - m_info.m_idleFriction;
-	m_info.m_driveViscousDrag2 = torque / (speed * speed);
-*/
 }
 
 void CustomVehicleController::EngineController::PlotEngineCurve() const
