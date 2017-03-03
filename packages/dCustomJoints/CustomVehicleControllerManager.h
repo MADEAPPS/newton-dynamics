@@ -357,9 +357,6 @@ class CustomVehicleController: public CustomControllerBase
 			dFloat m_viscousDrag0;
 			dFloat m_viscousDrag1;
 			dFloat m_viscousDrag2;
-			
-			//dFloat m_driveViscousDrag2;
-
 			friend class EngineController;
 		};
 
@@ -409,6 +406,8 @@ class CustomVehicleController: public CustomControllerBase
 
 		Info m_info;
 		Info m_infoCopy;
+		AxelJoint* m_leftAxel;
+		AxelJoint* m_rightAxel;
 		CustomVehicleController* m_controller;
 		BodyPartTire* m_crownGearCalculator;
 		dFloat m_clutchParam;

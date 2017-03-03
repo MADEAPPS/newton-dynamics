@@ -381,12 +381,15 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 		dVector relOmega (engineOmega - chassisOmega);
+
+		// apply engine internal dry friction
 		dFloat engineSpeed = chassisMatrix.m_up.DotProduct3(relOmega);
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &chassisMatrix.m_up[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, -engineSpeed/timestep);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_dryFrictionTorque);
 		NewtonUserJointSetRowMaximumFriction(m_joint,  m_dryFrictionTorque);
 		
+		// apply diffential
 		dFloat differentailOmega = engineMatrix.m_front.DotProduct3(relOmega);
 		if (differentailOmega > D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
 			dFloat wAlpha = (D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
@@ -399,14 +402,6 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		}
-
-/*
-		const dVector& pin = differentialMatrix.m_front;
-		dVector relOmega(chassisOmega - differentialOmega);
-		dFloat accel = 0.5f * (relOmega.DotProduct3(pin) + m_turnRate) / timestep;
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
-		NewtonUserJointSetRowAcceleration(m_joint, accel);
-*/	
 	}
 
 	dMatrix m_offsetLocalMatrix;
@@ -437,6 +432,11 @@ class CustomVehicleController::AxelJoint: public CustomGear
 		dMatrix referenceMatrix;
 		NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
 		m_pintOnReference = referenceMatrix.UnrotateVector(referencePin);
+	}
+
+	void SetGear(dFloat gearRatio)
+	{
+		m_gearRatio = gearRatio;
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -737,6 +737,8 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 	:Controller(controller)
 	,m_info(info)
 	,m_infoCopy(info)
+	,m_leftAxel(NULL)
+	,m_rightAxel(NULL)
 	,m_controller(controller)
 	,m_crownGearCalculator(NULL)
 	,m_clutchParam(1.0f)
@@ -745,8 +747,6 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 	,m_ignitionKey(false)
 	,m_automaticTransmissionMode(true)
 {
-//	controller->m_engineControl = this;
-
 	dMatrix engineMatrix;
 	dMatrix chassisMatrix;
 	NewtonBody* const chassisBody = controller->m_chassis.GetBody();
@@ -767,14 +767,14 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			dAssert (leftTireBody == differential.m_axel.m_leftTire->GetJoint()->GetBody0());
 			NewtonBodyGetMatrix (leftTireBody, &leftTireMatrix[0][0]);
 			leftTireMatrix = differential.m_axel.m_leftTire->GetJoint()->GetMatrix0() * leftTireMatrix;
-			//new AxelJoint(1.0f, leftTireMatrix[0], engineMatrix[0].Scale (-1.0f), chassisMatrix[2], leftTireBody, engineBody, chassisBody);
+			m_leftAxel = new AxelJoint(1.0f, leftTireMatrix[0], engineMatrix[0].Scale (-1.0f), chassisMatrix[2], leftTireBody, engineBody, chassisBody);
 
 			dMatrix rightTireMatrix;
 			NewtonBody* const rightTireBody = differential.m_axel.m_rightTire->GetBody();
 			dAssert(rightTireBody == differential.m_axel.m_rightTire->GetJoint()->GetBody0());
 			NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
 			rightTireMatrix = differential.m_axel.m_rightTire->GetJoint()->GetMatrix0() * rightTireMatrix;
-			//new AxelJoint(1.0f, rightTireMatrix[0], engineMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, engineBody, chassisBody);
+			m_rightAxel = new AxelJoint(1.0f, rightTireMatrix[0], engineMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, engineBody, chassisBody);
 
 			m_crownGearCalculator = differential.m_axel.m_leftTire;
 			break;
@@ -963,18 +963,15 @@ void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat ti
 
 			default:
 			{
-				//dAssert(0);
-/*
-			   if (omega > m_torqueRPMCurve.GetValue(3).m_param) {
+			   if (omega > m_info.m_rpmAtPeakHorsePower) {
 					if (m_currentGear < (m_info.m_gearsCount - 1)) {
 						SetGear(m_currentGear + 1);
 					}
-				} else if (omega < m_torqueRPMCurve.GetValue(2).m_param) {
+				} else if (omega < m_info.m_rpmAtPeakTorque) {
 					if (m_currentGear > D_VEHICLE_FIRST_GEAR) {
 						SetGear(m_currentGear - 1);
 					}
 				}
-*/
 			}
 		}
 	}
@@ -1047,8 +1044,10 @@ int CustomVehicleController::EngineController::GetGear() const
 
 void CustomVehicleController::EngineController::SetGear(int gear)
 {
-	m_currentGear = dClamp(gear, 0, m_info.m_gearsCount);
 	m_gearTimer = 30;
+	m_currentGear = dClamp(gear, 0, m_info.m_gearsCount);
+	m_leftAxel->SetGear(m_info.m_gearRatios[m_currentGear]);
+	m_rightAxel->SetGear(m_info.m_gearRatios[m_currentGear]);
 }
 
 int CustomVehicleController::EngineController::GetNeutralGear() const
