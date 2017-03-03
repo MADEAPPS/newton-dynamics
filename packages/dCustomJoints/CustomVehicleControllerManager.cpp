@@ -687,7 +687,7 @@ origin.m_y += 2.0f;
 	dVector drag(0.0f);
 	NewtonBodySetLinearDamping(m_body, 0);
 	NewtonBodySetAngularDamping(m_body, &drag[0]);
-	NewtonBodySetMaxRotationPerStep(m_body, 3.141692f);
+	NewtonBodySetMaxRotationPerStep(m_body, 3.141692f * 2.0f);
 	NewtonBodySetForceAndTorqueCallback(m_body, m_controller->m_forceAndTorque);
 
 	dMatrix pinMatrix (matrix);
@@ -706,10 +706,17 @@ void CustomVehicleController::BodyPartEngine::SetFriction(dFloat friction)
 
 }
 
-void CustomVehicleController::BodyPartEngine::ApplyTorque(dFloat torque)
+void CustomVehicleController::BodyPartEngine::ApplyTorque(dFloat torqueMag)
 {
 	//	m_engine->m_omega.m_x = dClamp(m_engine->m_omega.m_x, dFloat (0.0f), m_info.m_readLineRpm);
-	dTrace(("%f\n", torque));
+
+
+	dMatrix matrix;
+	NewtonBody* const chassis = m_controller->GetBody();
+	NewtonBody* const engine = m_controller->m_engine->GetBody();
+	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
+	dVector torque(matrix.m_right.Scale(torqueMag));
+	NewtonBodyAddTorque(engine, &torque[0]);
 }
 
 
@@ -983,12 +990,10 @@ void CustomVehicleController::EngineController::UpdateAutomaticGearBox(dFloat ti
 
 			default:
 			{
-				//if (omega > m_info.m_rpmAtPeakHorsePower) {
 			   if (omega > m_torqueRPMCurve.GetValue(3).m_param) {
 					if (m_currentGear < (m_info.m_gearsCount - 1)) {
 						SetGear(m_currentGear + 1);
 					}
-				//} else if (omega < m_info.m_rpmAtPeakTorque) {
 				} else if (omega < m_torqueRPMCurve.GetValue(2).m_param) {
 					if (m_currentGear > D_VEHICLE_FIRST_GEAR) {
 						SetGear(m_currentGear - 1);
@@ -1019,7 +1024,12 @@ NewtonBodySetOmega (m_controller->m_engine->GetBody(), &xxxx[0]);
 }
 */
 
+static int xxx;
+xxx++;
+
 	dFloat omega = GetRadiansPerSecond();
+dTrace(("%d %f\n", xxx, omega));
+
 	if (m_automaticTransmissionMode) {
 		UpdateAutomaticGearBox (timestep, omega);
 	}
@@ -2070,7 +2080,6 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 		}
-//		}
 
 		NewtonMaterialSetContactElasticity(material, 0.0f);
 	}
@@ -2214,11 +2223,6 @@ void CustomVehicleController::CalculateLateralDynamicState(dFloat timestep)
 	NewtonBodyGetOmega(chassisBody, &m_localOmega[0]);
 	NewtonBodyGetVelocity(chassisBody, &m_localVeloc[0]);
 
-static int xxx;
-xxx++;
-if (xxx > 3000)
-	xxx *= 1;
-
 	m_localVeloc = m_vehicleGlobalMatrix.UnrotateVector(m_localVeloc);
 	m_localOmega = m_vehicleGlobalMatrix.UnrotateVector(m_localOmega);
 	m_localOmega.m_x = 0.0f;
@@ -2245,7 +2249,6 @@ if (xxx > 3000)
 
 void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
-//dTrace (("\n"));
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		if (!NewtonBodyGetSleepState(m_body)) {
@@ -2259,7 +2262,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 			}
 		}
 
-//dTrace (("\n"));
+
 
 #ifdef D_PLOT_ENGINE_CURVE 
 		dFloat engineOmega = m_engine->GetRPM();
