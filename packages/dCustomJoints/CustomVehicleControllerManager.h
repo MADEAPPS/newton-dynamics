@@ -127,6 +127,7 @@ class CustomVehicleController: public CustomControllerBase
 		CustomJoint* GetJoint() const{return m_joint;}
 		void* GetUserData() const {return m_userData;}
 		CustomVehicleController* GetController() const{return m_controller;}
+		virtual void ProjectError() {}
 		
 		protected:
 		BodyPart* m_parent;
@@ -173,8 +174,8 @@ class CustomVehicleController: public CustomControllerBase
 		BodyPartEngine(CustomVehicleController* const controller, dFloat mass, dFloat amatureRadius);
 		~BodyPartEngine();
 
-		void SetFriction(dFloat friction);
 		void ApplyTorque(dFloat torque);
+		void ProjectError();
 	};
 	
 	class BodyPartTire: public BodyPart

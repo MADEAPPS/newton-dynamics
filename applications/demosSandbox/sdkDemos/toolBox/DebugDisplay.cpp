@@ -318,9 +318,6 @@ static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MOD
 	}
 	dMatrix matrix;
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
-
-
-
 	NewtonCollisionForEachPolygonDo (NewtonBodyGetCollision(body), &matrix[0][0], DebugShowGeometryCollision, (void*) mode);
 }
 

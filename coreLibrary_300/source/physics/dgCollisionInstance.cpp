@@ -441,13 +441,6 @@ void dgCollisionInstance::SetLocalMatrix (const dgMatrix& matrix)
 
 void dgCollisionInstance::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-/*
-	dgMatrix scaledMatrix (m_localMatrix * matrix);
-	scaledMatrix[0] = scaledMatrix[0].Scale3 (m_scale[0]);
-	scaledMatrix[1] = scaledMatrix[1].Scale3 (m_scale[1]);
-	scaledMatrix[2] = scaledMatrix[2].Scale3 (m_scale[2]);
-	m_childShape->DebugCollision (m_aligmentMatrix * scaledMatrix, callback, userData);
-*/
 	m_childShape->DebugCollision (GetScaledTransform(matrix), callback, userData);
 }
 

@@ -348,38 +348,32 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 		:CustomUniversal(pinAndPivotFrame, engineBody, chassisBody)
 		,m_slipDifferentialSpeed(0.0f)
 		,m_slipDifferentialOn(true)
-//		,m_turRateAccel(3.0f)
-//		,m_turnRate(0.0f)
-//		,m_turnRateTarget(0.0f)
 	{
 		EnableLimit_0(false);
 		EnableLimit_1(false);
-	}
-/*
-	void ApplySteering(SteeringController* const steering, dFloat timestep)
-	{
-		dAssert(0);
-		m_turnRateTarget = steering->m_param * 10.0f;
 
-		if (m_turnRate < m_turnRateTarget) {
-			m_turnRate += m_turRateAccel * timestep;
-			if (m_turnRate > m_turnRateTarget) {
-				m_turnRate = m_turnRateTarget;
-			}
-		} else if (m_turnRate > m_turnRateTarget) {
-			m_turnRate -= m_turRateAccel * timestep;
-			if (m_turnRate < m_turnRateTarget) {
-				m_turnRate = m_turnRateTarget;
-			}
-		}
+		dMatrix engineMatrix;
+		dMatrix chassisMatrix;
+		NewtonBodyGetMatrix(engineBody, &engineMatrix[0][0]);
+		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+		m_offsetLocalMatrix = engineMatrix * chassisMatrix.Inverse();
 	}
-*/
+
+	void ProjectIntegrationError()
+	{
+		dMatrix chassisMatrix;
+
+		NewtonBody* const engineBody = GetBody0();
+		NewtonBody* const chassisBody = GetBody1();
+		
+		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+		dMatrix engineMatrix(m_offsetLocalMatrix * chassisMatrix);
+		NewtonBodySetMatrixNoSleep(engineBody, &engineMatrix[0][0]);
+	}
+
+
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
-
-//m_angularMotor_0_On = true;
-//m_angularAccel_0 = 1.0f;
-
 		CustomUniversal::SubmitConstraints(timestep, threadIndex);
 
 		// y axis controls the slip differential feature.
@@ -424,11 +418,9 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 */	
 	}
 
+	dMatrix m_offsetLocalMatrix;
 	dFloat m_slipDifferentialSpeed;
 	bool m_slipDifferentialOn;
-//	dFloat m_turRateAccel;
-//	dFloat m_turnRate;
-//	dFloat m_turnRateTarget;
 };
 
 class CustomVehicleController::AxelJoint: public CustomGear
@@ -701,9 +693,10 @@ CustomVehicleController::BodyPartEngine::~BodyPartEngine()
 {
 }
 
-void CustomVehicleController::BodyPartEngine::SetFriction(dFloat friction)
+void CustomVehicleController::BodyPartEngine::ProjectError()
 {
-
+	EngineJoint* const joint = (EngineJoint*)m_joint;
+	joint->ProjectIntegrationError();
 }
 
 void CustomVehicleController::BodyPartEngine::ApplyTorque(dFloat torqueMag)
@@ -1035,18 +1028,19 @@ dTrace(("%d %f\n", xxx, GetRPM()));
 	}
 
 	dFloat torque = 0.0f;
+
 	if (m_ignitionKey) {
 		if (m_param < D_VEHICLE_ENGINE_IDLE_GAS_VALVE) {
-			m_controller->m_engine->SetFriction(m_info.m_idleFriction);
+//			m_controller->m_engine->SetFriction(m_info.m_idleFriction);
 			dFloat viscuosFriction0 = dClamp (m_info.m_idleViscousDrag2 * omega * omega, dFloat (0.0), m_info.m_idleFriction);
 			dFloat viscuosFriction1 = m_info.m_driveViscousDrag2 * omega * omega;
 			torque = m_info.m_idleFriction + (m_torqueRPMCurve.GetValue(omega) - m_info.m_idleFriction) * D_VEHICLE_ENGINE_IDLE_GAS_VALVE - viscuosFriction0 - viscuosFriction1;
 		} else {
-			m_controller->m_engine->SetFriction(m_info.m_idleFriction);
+//			m_controller->m_engine->SetFriction(m_info.m_idleFriction);
 			torque = (m_torqueRPMCurve.GetValue(omega) - m_info.m_idleFriction) * m_param - m_info.m_driveViscousDrag2 * omega * omega;
 		}
 	} else {
-		m_controller->m_engine->SetFriction(m_info.m_idleFriction);
+//		m_controller->m_engine->SetFriction(m_info.m_idleFriction);
 	}
 
 	ApplyTorque(torque);
@@ -2252,17 +2246,17 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		if (!NewtonBodyGetSleepState(m_body)) {
+			for (dList<BodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
+				BodyPart* const bodyPart = bodyPartNode->GetInfo();
+				bodyPart->ProjectError();
+			}
+
 			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
 			for (dList<BodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
 				BodyPartTire& tire = tireNode->GetInfo();
-				//WheelJoint* const tireJoint = (WheelJoint*)tire.GetJoint();
-				//tireJoint->RemoveKinematicError(timestep);
-				//int collided = manager->Collide(&tire, threadIndex);
 				manager->Collide(&tire, threadIndex);
 			}
 		}
-
-
 
 #ifdef D_PLOT_ENGINE_CURVE 
 		dFloat engineOmega = m_engine->GetRPM();
@@ -2278,6 +2272,13 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
+for (dList<BodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
+	BodyPart* const bodyPart = bodyPartNode->GetInfo();
+	bodyPart->ProjectError();
+}
+
+
+
 		m_chassis.ApplyDownForce ();
 		CalculateLateralDynamicState(timestep);
 		ApplySuspensionForces (timestep);
