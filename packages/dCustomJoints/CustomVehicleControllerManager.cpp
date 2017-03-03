@@ -362,15 +362,30 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 	void ProjectIntegrationError()
 	{
 		dMatrix chassisMatrix;
-
 		NewtonBody* const engineBody = GetBody0();
 		NewtonBody* const chassisBody = GetBody1();
 		
 		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 		dMatrix engineMatrix(m_offsetLocalMatrix * chassisMatrix);
 		NewtonBodySetMatrixNoSleep(engineBody, &engineMatrix[0][0]);
-	}
 
+		dVector engineOmega;
+		dVector chassisOmega;
+		dVector engineVelocity;
+		NewtonBodyGetOmega(engineBody, &engineOmega[0]);
+		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
+		dVector relOmega (engineOmega - chassisOmega);
+		dVector upPin(chassisMatrix.RotateVector(GetMatrix1().m_right));
+		relOmega -= upPin.Scale(relOmega.DotProduct3(upPin));
+		engineOmega = chassisOmega + relOmega;
+		NewtonBodyGetPointVelocity(chassisBody, &engineMatrix.m_posit[0], &engineVelocity[0]);
+
+		NewtonBodySetVelocityNoSleep(engineBody, &engineOmega[0]);
+		NewtonBodySetVelocityNoSleep(engineBody, &engineVelocity[0]);
+		//static int xxx;
+		//xxx++;
+		//dTrace(("%d w(%f %f %f) v(%f %f %f)\n", xxx, engineOmega[0], engineOmega[1], engineOmega[2], engineVelocity.m_x, engineVelocity.m_y, engineVelocity.m_z));
+	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
@@ -1004,31 +1019,12 @@ void CustomVehicleController::EngineController::ApplyTorque(dFloat torque)
 
 void CustomVehicleController::EngineController::Update(dFloat timestep)
 {
-/*
-static int xxxx;
-xxxx ++;
-if (xxxx > 500){
-dMatrix xxx1;
-dVector xxx2;
-NewtonBodyGetOmega (m_controller->m_chassis.GetBody(), &xxx2[0]);
-NewtonBodyGetMatrix(m_controller->m_chassis.GetBody(), &xxx1[0][0]);
-dVector xxxx (xxx1.m_right.Scale (50.0f));
-NewtonBodySetOmega (m_controller->m_engine->GetBody(), &xxxx[0]);
-}
-*/
-
-static int xxx;
-xxx++;
-
 	dFloat omega = GetRadiansPerSecond();
-dTrace(("%d %f\n", xxx, GetRPM()));
-
 	if (m_automaticTransmissionMode) {
 		UpdateAutomaticGearBox (timestep, omega);
 	}
 
 	dFloat torque = 0.0f;
-
 	if (m_ignitionKey) {
 		if (m_param < D_VEHICLE_ENGINE_IDLE_GAS_VALVE) {
 //			m_controller->m_engine->SetFriction(m_info.m_idleFriction);
