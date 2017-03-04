@@ -102,78 +102,6 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		return num / den;
 	}
 
-/*
-	void ApplyBumperImpactLimit(const dVector& dir, dFloat param)
-	{
-		dComplentaritySolver::dJacobian tireJacobian;
-		dComplentaritySolver::dJacobian chassisJacobian;
-
-		dMatrix tireMatrix;
-		dMatrix tireInvInertia;
-		dMatrix chassisMatrix;
-		dMatrix chassisInvInertia;
-		dVector com(0.0f);
-		dVector tireVeloc(0.0f);
-		dVector tireOmega(0.0f);
-		dVector chassisVeloc(0.0f);
-		dVector chassisOmega(0.0f);
-
-		dFloat tireInvMass;
-		dFloat chassisInvMass;
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-
-		NewtonBody* const tire = m_body0;
-		NewtonBody* const chassis = m_body1;
-		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-		NewtonBodyGetMatrix(chassis, &chassisMatrix[0][0]);
-		NewtonBodyGetCentreOfMass(chassis, &com[0]);
-
-		NewtonBodyGetOmega(tire, &tireOmega[0]);
-		NewtonBodyGetVelocity(tire, &tireVeloc[0]);
-		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
-		NewtonBodyGetVelocity(chassis, &chassisVeloc[0]);
-
-		dVector r (tireMatrix.m_posit - chassisMatrix.TransformVector(com));
-		tireJacobian.m_linear = dir;
-		tireJacobian.m_angular = dVector (0.0f);
-		chassisJacobian.m_linear = dir.Scale (-1.0f);
-		chassisJacobian.m_angular = r.CrossProduct(chassisJacobian.m_linear);
-
-		dFloat relativeVeloc = tireVeloc.DotProduct3(tireJacobian.m_linear) + tireOmega.DotProduct3(tireJacobian.m_angular) + chassisVeloc.DotProduct3(chassisJacobian.m_linear) + chassisOmega.DotProduct3(chassisJacobian.m_angular);
-		if (relativeVeloc > 0.0f) {
-			dComplentaritySolver::dJacobian tireInvMassJacobianTrans;
-			dComplentaritySolver::dJacobian chassisInvMassJacobianTrans;
-
-			NewtonBodyGetInvMass(tire, &tireInvMass, &Ixx, &Ixx, &Ixx);
-			NewtonBodyGetInvMass(chassis, &chassisInvMass, &Ixx, &Iyy, &Izz);
-			NewtonBodyGetInvInertiaMatrix(tire, &tireInvInertia[0][0]);
-			NewtonBodyGetInvInertiaMatrix(chassis, &chassisInvInertia[0][0]);
-
-			tireInvMassJacobianTrans.m_linear = tireJacobian.m_linear.Scale (tireInvMass);
-			tireInvMassJacobianTrans.m_angular = tireInvInertia.RotateVector(tireJacobian.m_angular);
-
-			chassisInvMassJacobianTrans.m_linear = chassisJacobian.m_linear.Scale(tireInvMass);
-			chassisInvMassJacobianTrans.m_angular = chassisInvInertia.RotateVector (chassisJacobian.m_angular);
-
-			dFloat den = tireJacobian.m_linear.DotProduct3(tireInvMassJacobianTrans.m_linear) + tireJacobian.m_angular.DotProduct3(tireInvMassJacobianTrans.m_angular) + 
-						 chassisJacobian.m_linear.DotProduct3(chassisInvMassJacobianTrans.m_linear) + chassisJacobian.m_angular.DotProduct3(chassisInvMassJacobianTrans.m_angular);
-
-			dFloat impulse = - relativeVeloc / den;
-			tireVeloc += tireInvMassJacobianTrans.m_linear.Scale (impulse);
-			tireOmega += tireInvMassJacobianTrans.m_angular.Scale (impulse);
-			chassisVeloc += chassisInvMassJacobianTrans.m_linear.Scale (impulse);
-			chassisOmega += chassisInvMassJacobianTrans.m_angular.Scale (impulse);
-
-			NewtonBodySetOmega(tire, &tireOmega[0]);
-			NewtonBodySetVelocity(tire, &tireVeloc[0]);
-			NewtonBodySetOmega(chassis, &chassisOmega[0]);
-			NewtonBodySetVelocity(chassis, &chassisVeloc[0]);
-		}
-	}
-*/
-
 	void ProjectError()
 	{
 		dMatrix tireMatrix;
@@ -1129,10 +1057,6 @@ void CustomVehicleController::SteeringController::Update(dFloat timestep)
 		tire.SetSteerAngle(m_param, timestep);
 		m_isSleeping &= dAbs (joint->m_steerAngle1 - joint->m_steerAngle0) < 1.0e-4f;
 	}
-
-//	if (m_controller->m_engineControl) {
-//		m_controller->m_engineControl->m_engine->ApplySteering(this, timestep);
-//	}
 }
 
 void CustomVehicleController::SteeringController::AddTire (CustomVehicleController::BodyPartTire* const tire)
@@ -1368,7 +1292,7 @@ void CustomVehicleController::Init(NewtonCollision* const chassisShape, const dM
 	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
 
 	// set vehicle mass, inertia and center of mass
-mass = 0;
+//mass = 0;
 	NewtonBodySetMassProperties(body, mass, chassisShape);
 
 	// initialize 
@@ -1407,6 +1331,7 @@ void CustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehicl
 
 	m_contactFilter = new BodyPartTire::FrictionModel(this);
 
+	m_engine = NULL;
 	m_brakesControl = NULL;
 	m_engineControl = NULL;
 	m_handBrakesControl = NULL;
@@ -1618,7 +1543,6 @@ void CustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 
 void CustomVehicleController::Finalize()
 {
-//NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 	m_finalized = true;
 	SetWeightDistribution (m_weightDistribution);
 }
@@ -2048,7 +1972,6 @@ dVector CustomVehicleController::GetLastLateralForce(BodyPartTire* const tire) c
 }
 
 
-
 void CustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 {
 	NewtonBody* const chassisBody = m_chassis.GetBody();
@@ -2140,7 +2063,7 @@ void CustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 		dFloat aii = m_jInvMass[i].m_jacobian_IM0.m_linear.DotProduct3(m_jt[i].m_jacobian_IM0.m_linear) + m_jInvMass[i].m_jacobian_IM0.m_angular.DotProduct3(m_jt[i].m_jacobian_IM0.m_angular) +
 					 m_jInvMass[i].m_jacobian_IM1.m_linear.DotProduct3(m_jt[i].m_jacobian_IM1.m_linear) + m_jInvMass[i].m_jacobian_IM1.m_angular.DotProduct3(m_jt[i].m_jacobian_IM1.m_angular);
 
-		row[i] = aii;
+		row[i] = aii * 1.0001f;
 		for (int j = i + 1; j < tireCount; j++) {
 			dFloat aij = m_jInvMass[i].m_jacobian_IM1.m_linear.DotProduct3(m_jt[j].m_jacobian_IM1.m_linear) + m_jInvMass[i].m_jacobian_IM1.m_angular.DotProduct3(m_jt[j].m_jacobian_IM1.m_angular);
 			row[j] = aij;
@@ -2210,7 +2133,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 		if (!NewtonBodyGetSleepState(m_body)) {
 			for (dList<BodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
 				BodyPart* const bodyPart = bodyPartNode->GetInfo();
-				bodyPart->ProjectError();
+//				bodyPart->ProjectError();
 			}
 
 			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
@@ -2236,10 +2159,8 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	if (m_finalized) {
 for (dList<BodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
 	BodyPart* const bodyPart = bodyPartNode->GetInfo();
-	bodyPart->ProjectError();
+//	bodyPart->ProjectError();
 }
-
-
 
 		m_chassis.ApplyDownForce ();
 		CalculateLateralDynamicState(timestep);

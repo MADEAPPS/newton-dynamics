@@ -47,9 +47,9 @@
 
 struct CarDefinition 
 {
-	dFloat m_tireMass;
-	dFloat m_engineMass;
 	dFloat m_vehicleMass;
+	dFloat m_engineMass;
+	dFloat m_tireMass;
 	dFloat m_engineRotorRadio;
 	dFloat m_frontSteeringAngle;
 	dFloat m_rearSteeringAngle;
@@ -90,8 +90,8 @@ struct CarDefinition
 static CarDefinition monsterTruck = 
 {
 	(3380.0f * 0.454f),							// MASS
-	40.0f,										// TIRE_MASS	
 	100.0f,										// ENGINE_MASS
+	40.0f,										// TIRE_MASS	
 	0.125f,										// ENGINE_RADIO
 	15.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
 	-5.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
@@ -132,8 +132,8 @@ static CarDefinition monsterTruck =
 static CarDefinition viper = 
 {
 	(3380.0f * 0.454f),							// MASS
-	40.0f,										// TIRE_MASS	
 	100.0f,										// ENGINE_MASS
+	40.0f,										// TIRE_MASS	
 	0.125f,										// ENGINE_RADIO
 	20.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
 	 0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
@@ -150,8 +150,8 @@ static CarDefinition viper =
 	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),  // TIRE_LATERAL_STIFFNESS
 	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),	// TIRE_LONGITUDINAL_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
-	300.0f,										// TIRE_SUSPENSION_SPRING
-	10.0f,										// TIRE_SUSPENSION_DAMPER
+	30000.0f,									// TIRE_SUSPENSION_SPRING
+	700.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
 	CustomVehicleController::BodyPartTire::Info::m_confort, //TIRE_SUSPENSION_TYPE
 	3000.0f,									// TIRE_BRAKE_TORQUE
@@ -520,7 +520,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownforceFactor = definition.m_aerodynamicsDownForceWeightCoeffecient0;
 		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
-
+/*
 		m_controller->AddEngine (engineInfo.m_mass, engineInfo.m_radio);
 		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, differential);
 
@@ -544,7 +544,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat weightRatio1 = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		dFloat speedFactor = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 		m_controller->SetAerodynamicsDownforceCoefficient(weightRatio0, speedFactor, weightRatio1);
-
+*/
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 	}
@@ -566,10 +566,10 @@ class SuperCarEntity: public DemoEntity
 		dFloat joyPosY;
 		int joyButtons;
 
-		int gear = engine->GetGear();
+		int gear = engine ? engine->GetGear() : 0;
 		int engineIgnitionKey = 0;
 		int engineDifferentialLock = 0;
-		int automaticTransmission = engine->GetTransmissionMode();
+		int automaticTransmission = engine ? engine->GetTransmissionMode() : 1;
 		dFloat cluthPedal = 1.0f;
 		dFloat steeringVal = 0.0f;
 		dFloat reverseGasPedal = 0.0f;
@@ -647,118 +647,120 @@ class SuperCarEntity: public DemoEntity
 #endif
 
 		steering->SetParam(steeringVal);
-		engine->SetDifferentialLock (engineDifferentialLock ? true : false);
+		if (engine) {
+			engine->SetDifferentialLock (engineDifferentialLock ? true : false);
 	
-		switch (m_drivingState)
-		{
-			case m_engineOff:
+			switch (m_drivingState)
 			{
-				if (engineIgnitionKey) {
-					m_drivingState = m_engineIdle;
-					engine->SetIgnition (true);
-					handBrakes->SetParam(0.0f);
-					engine->SetGear (engine->GetNeutralGear());
-				} else {
-					engine->SetIgnition (false);
-					engine->SetGear(engine->GetFirstGear());
-					handBrakes->SetParam(1.0f);
+				case m_engineOff:
+				{
+					if (engineIgnitionKey) {
+						m_drivingState = m_engineIdle;
+						engine->SetIgnition (true);
+						handBrakes->SetParam(0.0f);
+						engine->SetGear (engine->GetNeutralGear());
+					} else {
+						engine->SetIgnition (false);
+						engine->SetGear(engine->GetFirstGear());
+						handBrakes->SetParam(1.0f);
+					}
+					break;
 				}
-				break;
-			}
 
-			case m_engineIdle:
-			{
-				brakes->SetParam(0.0f);
-				handBrakes->SetParam(handBrakePedal);
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineOff;
-				} else {
+				case m_engineIdle:
+				{
+					brakes->SetParam(0.0f);
+					handBrakes->SetParam(handBrakePedal);
+					if (!engineIgnitionKey) {
+						m_drivingState = m_engineOff;
+					} else {
+						if (forwardGasPedal) {
+							m_drivingState = m_preDriveForward;
+						} else if (reverseGasPedal) {
+							m_drivingState = m_preDriveReverse;
+						}
+					}
+					break;
+				}
+
+				case m_engineStop:
+				{
+					if (forwardGasPedal || reverseGasPedal) {
+						brakes->SetParam(1.0f);
+					} else {
+						m_drivingState = m_engineIdle;
+					}
+					break;
+				}
+
+				case m_preDriveForward:
+				{
+					if (engine->GetSpeed() < -5.0f) {
+						brakes->SetParam(0.5f);
+						engine->SetClutchParam(0.0f);
+						engine->SetGear(engine->GetNeutralGear());
+					} else {
+						m_drivingState = m_driveForward;
+						engine->SetGear(engine->GetFirstGear());
+					}
+					break;
+				}	
+
+				case m_driveForward:
+				{
+					engine->SetParam(forwardGasPedal);
+					engine->SetClutchParam(cluthPedal);
+					handBrakes->SetParam(handBrakePedal);
+					if (reverseGasPedal) {
+						brakes->SetParam(reverseGasPedal * 0.25f);
+						if (engine->GetSpeed() < 5.0f) {
+							engine->SetGear(engine->GetNeutralGear());
+							m_drivingState = m_engineStop;
+						}
+					} else {
+						brakes->SetParam(0.0f);
+					}
+
+					if (!engineIgnitionKey) {
+						m_drivingState = m_engineStop;
+					}
+
+					break;
+				}
+
+				case m_preDriveReverse:
+				{
+					if (engine->GetSpeed() > 5.0f) {
+						brakes->SetParam(0.5f);
+						engine->SetClutchParam(0.0f);
+						engine->SetGear(engine->GetNeutralGear());
+					} else {
+						m_drivingState = m_driveReverse;
+						engine->SetGear(engine->GetReverseGear());
+					}
+					break;
+				}
+
+				case m_driveReverse:
+				{
+					engine->SetParam(reverseGasPedal);
+					engine->SetClutchParam(cluthPedal);
+					handBrakes->SetParam(handBrakePedal);
 					if (forwardGasPedal) {
-						m_drivingState = m_preDriveForward;
-					} else if (reverseGasPedal) {
-						m_drivingState = m_preDriveReverse;
+						brakes->SetParam(forwardGasPedal * 0.25f);
+						if (engine->GetSpeed() > -5.0f) {
+							engine->SetGear(engine->GetNeutralGear());
+							m_drivingState = m_engineStop;
+						}
+					} else {
+						brakes->SetParam(0.0f);
 					}
-				}
-				break;
-			}
 
-			case m_engineStop:
-			{
-				if (forwardGasPedal || reverseGasPedal) {
-					brakes->SetParam(1.0f);
-				} else {
-					m_drivingState = m_engineIdle;
-				}
-				break;
-			}
-
-			case m_preDriveForward:
-			{
-				if (engine->GetSpeed() < -5.0f) {
-					brakes->SetParam(0.5f);
-					engine->SetClutchParam(0.0f);
-					engine->SetGear(engine->GetNeutralGear());
-				} else {
-					m_drivingState = m_driveForward;
-					engine->SetGear(engine->GetFirstGear());
-				}
-				break;
-			}	
-
-			case m_driveForward:
-			{
-				engine->SetParam(forwardGasPedal);
-				engine->SetClutchParam(cluthPedal);
-				handBrakes->SetParam(handBrakePedal);
-				if (reverseGasPedal) {
-					brakes->SetParam(reverseGasPedal * 0.25f);
-					if (engine->GetSpeed() < 5.0f) {
-						engine->SetGear(engine->GetNeutralGear());
+					if (!engineIgnitionKey) {
 						m_drivingState = m_engineStop;
 					}
-				} else {
-					brakes->SetParam(0.0f);
+					break;
 				}
-
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineStop;
-				}
-
-				break;
-			}
-
-			case m_preDriveReverse:
-			{
-				if (engine->GetSpeed() > 5.0f) {
-					brakes->SetParam(0.5f);
-					engine->SetClutchParam(0.0f);
-					engine->SetGear(engine->GetNeutralGear());
-				} else {
-					m_drivingState = m_driveReverse;
-					engine->SetGear(engine->GetReverseGear());
-				}
-				break;
-			}
-
-			case m_driveReverse:
-			{
-				engine->SetParam(reverseGasPedal);
-				engine->SetClutchParam(cluthPedal);
-				handBrakes->SetParam(handBrakePedal);
-				if (forwardGasPedal) {
-					brakes->SetParam(forwardGasPedal * 0.25f);
-					if (engine->GetSpeed() > -5.0f) {
-						engine->SetGear(engine->GetNeutralGear());
-						m_drivingState = m_engineStop;
-					}
-				} else {
-					brakes->SetParam(0.0f);
-				}
-
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineStop;
-				}
-				break;
 			}
 		}
 	}
@@ -1301,7 +1303,9 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	void SetAsPlayer (SuperCarEntity* const player)
 	{
 		CustomVehicleController::EngineController* const engine = player->m_controller->GetEngine();
-		engine->SetIgnition(false);
+		if (engine) {
+			engine->SetIgnition(false);
+		}
 		m_player = player;
 	}
 

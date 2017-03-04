@@ -295,7 +295,6 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 
 	m_globalCentreOfMass += m_veloc.Scale3 (timestep); 
 	while ((m_omega.DotProduct3(m_omega) * timestep * timestep) > m_maxAngulaRotationPerSet2) {
-		dgAssert (0);
 		m_omega = m_omega.Scale4 (dgFloat32 (0.9f));
 	}
 
