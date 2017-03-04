@@ -664,12 +664,11 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine(CustomVehicleController*
 	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 
-origin.m_y += 2.0f;
+//origin.m_y += 2.0f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
 	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
-	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.5f, 0.5f, 1.0f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
