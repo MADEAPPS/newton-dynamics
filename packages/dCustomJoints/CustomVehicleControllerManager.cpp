@@ -2155,11 +2155,15 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
+static int xxx=0;
+xxx ++;
+
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
+if (xxx>1000)
 for (dList<BodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
 	BodyPart* const bodyPart = bodyPartNode->GetInfo();
-//	bodyPart->ProjectError();
+	bodyPart->ProjectError();
 }
 
 		m_chassis.ApplyDownForce ();

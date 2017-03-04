@@ -289,10 +289,6 @@ void dgBody::UpdateMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
-//static int xxxx;
-//dgTrace (("frame %d  v(%f %f %f) w(%f %f %f)\n", xxxx, m_veloc[0], m_veloc[1], m_veloc[2], m_omega[0], m_omega[1], m_omega[2]));
-//xxxx ++;
-
 	m_globalCentreOfMass += m_veloc.Scale3 (timestep); 
 	while ((m_omega.DotProduct3(m_omega) * timestep * timestep) > m_maxAngulaRotationPerSet2) {
 		m_omega = m_omega.Scale4 (dgFloat32 (0.9f));
