@@ -218,6 +218,7 @@ class CustomVehicleController: public CustomControllerBase
 		protected:
 		void Init(BodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const Info& info);
 
+		void ProjectError();
 		void SetBrakeTorque(dFloat torque);
 		void SetSteerAngle(dFloat angleParam, dFloat timestep);
 
