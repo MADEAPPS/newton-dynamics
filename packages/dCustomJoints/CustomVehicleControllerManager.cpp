@@ -124,7 +124,7 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		tireMatrix.m_up = tireMatrix.m_right.CrossProduct(tireMatrix.m_front);
 
 		dVector positError (tireMatrix.m_posit - chassisMatrix.m_posit);
-		tireMatrix.m_posit = chassisMatrix.m_posit + tireMatrix.m_up.Scale (tireMatrix.m_up.DotProduct3(positError));
+		tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale (chassisMatrix.m_up.DotProduct3(positError));
 
 		tireMatrix = GetMatrix0().Inverse() * tireMatrix;
 		NewtonBodySetMatrixNoSleep(tire, &tireMatrix[0][0]);
@@ -132,14 +132,13 @@ class CustomVehicleController::WheelJoint: public CustomJoint
 		NewtonBodyGetVelocity(tire, &tireVeloc[0]);
 		NewtonBodyGetPointVelocity(chassis, &tireMatrix.m_posit[0], &chassisVeloc[0]);
 
-		dVector omegaError(tireVeloc - chassisVeloc);
-		tireVeloc = chassisVeloc + chassisMatrix.m_up.Scale(chassisMatrix.m_up.DotProduct3(omegaError));
+		dVector velocError(tireVeloc - chassisVeloc);
+		dVector tireVeloc1 (chassisVeloc + chassisMatrix.m_up.Scale(chassisMatrix.m_up.DotProduct3(velocError)));
+		NewtonBodySetVelocityNoSleep(tire, &tireVeloc1[0]);
 
 		NewtonBodyGetOmega(tire, &tireOmega[0]);
 		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
-		tireOmega = chassisOmega + tireMatrix.m_front.Scale(tireOmega.DotProduct3(tireMatrix.m_front));
-
-		NewtonBodySetVelocityNoSleep(tire, &tireVeloc[0]);
+		tireOmega = chassisOmega + chassisMatrix.m_front.Scale(tireOmega.DotProduct3(chassisMatrix.m_front));
 		NewtonBodySetOmegaNoSleep(tire, &tireOmega[0]);
 	}
 
@@ -257,6 +256,10 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 	void ProjectError()
 	{
 		dMatrix chassisMatrix;
+		dVector engineOmega(0.0f);
+		dVector chassisOmega(0.0f);
+		dVector engineVelocity(0.0f);
+
 		NewtonBody* const engineBody = GetBody0();
 		NewtonBody* const chassisBody = GetBody1();
 		
@@ -264,16 +267,13 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 		dMatrix engineMatrix(m_baseOffsetMatrix * chassisMatrix);
 		NewtonBodySetMatrixNoSleep(engineBody, &engineMatrix[0][0]);
 
-		dVector engineOmega;
-		dVector chassisOmega;
-		dVector engineVelocity;
 		NewtonBodyGetOmega(engineBody, &engineOmega[0]);
 		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
+		NewtonBodyGetPointVelocity(chassisBody, &engineMatrix.m_posit[0], &engineVelocity[0]);
+
 		dVector relOmega (engineOmega - chassisOmega);
 		dVector upPin(chassisMatrix.RotateVector(GetMatrix1().m_right));
-		relOmega -= upPin.Scale(relOmega.DotProduct3(upPin));
-		engineOmega = chassisOmega + relOmega;
-		NewtonBodyGetPointVelocity(chassisBody, &engineMatrix.m_posit[0], &engineVelocity[0]);
+		engineOmega = chassisOmega + relOmega - upPin.Scale(relOmega.DotProduct3(upPin));
 
 		NewtonBodySetVelocityNoSleep(engineBody, &engineOmega[0]);
 		NewtonBodySetVelocityNoSleep(engineBody, &engineVelocity[0]);
@@ -281,16 +281,16 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
+		dMatrix chassisMatrix;
+		dMatrix engineMatrix;
+		dVector chassisOmega(0.0f);
+		dVector engineOmega(0.0f);
+
 		CustomUniversal::SubmitConstraints(timestep, threadIndex);
 
 		// y axis controls the slip differential feature.
 		NewtonBody* const engineBody = GetBody0();
 		NewtonBody* const chassisBody = GetBody1();
-
-		dMatrix chassisMatrix;
-		dMatrix engineMatrix;
-		dVector chassisOmega;
-		dVector engineOmega;
 
 		NewtonBodyGetOmega(engineBody, &engineOmega[0]);
 		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
@@ -2133,7 +2133,7 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 		if (!NewtonBodyGetSleepState(m_body)) {
 			for (dList<BodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
 				BodyPart* const bodyPart = bodyPartNode->GetInfo();
-//				bodyPart->ProjectError();
+				bodyPart->ProjectError();
 			}
 
 			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)GetManager();
@@ -2155,17 +2155,8 @@ void CustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
-static int xxx=0;
-xxx ++;
-
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
-if (xxx>1000)
-for (dList<BodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
-	BodyPart* const bodyPart = bodyPartNode->GetInfo();
-	bodyPart->ProjectError();
-}
-
 		m_chassis.ApplyDownForce ();
 		CalculateLateralDynamicState(timestep);
 		ApplySuspensionForces (timestep);
