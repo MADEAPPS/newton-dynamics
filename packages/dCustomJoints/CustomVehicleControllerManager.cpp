@@ -39,8 +39,6 @@ static FILE* file_xxx;
 #define D_VEHICLE_MAX_SIDESLIP_ANGLE				dFloat(35.0f * 3.1416f / 180.0f)
 #define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(15.0f * 3.1416f / 180.0f)
 
-
-
 class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexCastPreFilter
 {
 	public:
@@ -145,9 +143,9 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 
 		// apply engine internal dry friction
 		dFloat engineSpeed = chassisMatrix.m_up.DotProduct3(relOmega);
-static int xxx;
-xxx ++;
-dTrace (("rpm %d %f %f %f\n", xxx, relOmega[0], relOmega[1], relOmega[2]));
+//static int xxx;
+//xxx ++;
+//dTrace (("rpm %d %f %f %f\n", xxx, relOmega[0], relOmega[1], relOmega[2]));
 
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &chassisMatrix.m_up[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, -engineSpeed/timestep);
@@ -581,7 +579,7 @@ CustomVehicleController::BodyPartEngine::BodyPartEngine(CustomVehicleController*
 	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 
-//origin.m_y += 2.0f;
+origin.m_y += 2.0f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
 	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
@@ -684,7 +682,10 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 	dAssert (engineBody == controller->m_engine->GetJoint()->GetBody0());
 	NewtonBodyGetMatrix (engineBody, &engineMatrix[0][0]);
 
-	engineMatrix = controller->m_engine->GetJoint()->GetMatrix0() * engineMatrix;
+	m_crownGearCalculator = differential.m_axel.m_leftTire;
+
+/*
+	//engineMatrix = controller->m_engine->GetJoint()->GetMatrix0() * engineMatrix;
 	switch (differential.m_type)
 	{
 		case Differential::m_2wd:
@@ -706,32 +707,11 @@ CustomVehicleController::EngineController::EngineController (CustomVehicleContro
 			m_crownGearCalculator = differential.m_axel.m_leftTire;
 			break;
 		}
-/*
-		case Differential::m_4wd:
-		{
-			const Differential4wd& diff = (Differential4wd&) differential;
-			m_engine = new DriveTrainEngine4W (invInertia, diff.m_axel, diff.m_secundAxel.m_axel);
-			break;
-		}
 
-		case Differential::m_8wd:
-		{
-			const Differential8wd& diff = (Differential8wd&) differential;
-			m_engine = new DriveTrainEngine8W (invInertia, diff.m_axel, diff.m_secundAxel.m_axel, diff.m_secund4Wd.m_axel, diff.m_secund4Wd.m_secundAxel.m_axel);
-			break;
-		}
-
-		case Differential::m_track:
-		{
-			const DifferentialTracked& diff = (DifferentialTracked&) differential;
-			m_engine = new DriveTrainEngineTracked(invInertia, diff, controller);
-			break;
-		}
 		default:
 			dAssert(0);
-*/
 	}
-
+*/
 	SetInfo(info);
 }
 
@@ -789,8 +769,9 @@ void CustomVehicleController::EngineController::CalculateCrownGear()
 	dAssert(m_info.m_vehicleTopSpeed >= 0.0f);
 	dAssert(m_info.m_vehicleTopSpeed < 100.0f);
 
+	m_info.m_crownGearRatio = 1.0f;
 	BodyPartTire* const tire = m_crownGearCalculator;
-	dAssert (tire);
+	dAssert(tire);
 
 	// drive train geometrical relations
 	// G0 = m_differentialGearRatio
@@ -935,7 +916,7 @@ void CustomVehicleController::EngineController::Update(dFloat timestep)
 
 	dFloat dryFriction = m_info.m_idleFriction;
 	if ((omega > m_info.m_rpmAtRedLine) || (omega <= 0.0f)) {
-		dryFriction *= 10.0f;
+//		dryFriction *= 10.0f;
 	}
 	engineJoint->SetDryFriction(dryFriction);
 
@@ -978,8 +959,8 @@ void CustomVehicleController::EngineController::SetGear(int gear)
 {
 	m_gearTimer = 30;
 	m_currentGear = dClamp(gear, 0, m_info.m_gearsCount);
-	m_leftAxel->SetGear(m_info.m_gearRatios[m_currentGear]);
-	m_rightAxel->SetGear(m_info.m_gearRatios[m_currentGear]);
+//	m_leftAxel->SetGear(m_info.m_gearRatios[m_currentGear]);
+//	m_rightAxel->SetGear(m_info.m_gearRatios[m_currentGear]);
 }
 
 int CustomVehicleController::EngineController::GetNeutralGear() const
@@ -1300,7 +1281,7 @@ void CustomVehicleController::Init(NewtonCollision* const chassisShape, const dM
 	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
 
 	// set vehicle mass, inertia and center of mass
-//mass = 0;
+mass = 0;
 	NewtonBodySetMassProperties(body, mass, chassisShape);
 
 	// initialize 
@@ -1880,9 +1861,9 @@ void CustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* co
 		dVector lateralPin (tireMatrix.m_front);
 //		dVector lateralPin (0, 0, 1,0);
 
-dMatrix xxxx;
-NewtonBody* xxx = controller->GetBody();
-NewtonBodyGetMatrix(xxx, &xxxx[0][0]);
+//dMatrix xxxx;
+//NewtonBody* xxx = controller->GetBody();
+//NewtonBodyGetMatrix(xxx, &xxxx[0][0]);
 //dTrace(("%d (%f %f %f) (%f %f %f)\n", tire->m_index, tireMatrix.m_front[0], tireMatrix.m_front[1], tireMatrix.m_front[2], xxxx[2][0], xxxx[2][1], xxxx[2][2]));
 
 		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
@@ -2176,6 +2157,13 @@ void CustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
+
+for (dList<BodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
+BodyPart* const bodyPart = bodyPartNode->GetInfo();
+bodyPart->ProjectError();
+}
+
+
 		m_chassis.ApplyDownForce ();
 		CalculateLateralDynamicState(timestep);
 		ApplySuspensionForces (timestep);

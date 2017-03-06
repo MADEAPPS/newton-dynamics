@@ -133,7 +133,6 @@ class CustomVehicleController: public CustomControllerBase
 		}
 
 		CUSTOM_JOINTS_API void ApplyDownForce ();
-		
 
 		dFloat m_aerodynamicsDownForce0;
 		dFloat m_aerodynamicsDownForce1;
@@ -255,20 +254,55 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			enum type
 			{
+				m_2d,
+				m_4d,
 				m_2wd,
 				m_4wd,
 				m_8wd,
 				m_track,
+				m_undefined,
 			};
 
 			Differential()
 				:m_axel()
-				,m_type(m_2wd)
+				,m_type(m_undefined)
 			{
 			}
 
 			DifferentialAxel m_axel;
 			int m_type;
+		};
+
+		class Differential2d : public Differential
+		{
+			public:
+			Differential2d()
+				:Differential()
+			{
+				m_type = m_2d;
+			}
+		};
+
+		class Differential2wd : public Differential
+		{
+			public:
+			Differential2wd()
+				:Differential()
+			{
+				m_type = m_2wd;
+			}
+		};
+
+		class Differential4d: public Differential
+		{
+			public:
+			Differential4d()
+				:Differential()
+				, m_secondAxel()
+			{
+				m_type = m_4d;
+			}
+			Differential m_secondAxel;
 		};
 
 		class Differential4wd: public Differential
@@ -283,7 +317,6 @@ class CustomVehicleController: public CustomControllerBase
 
 			Differential m_secondAxel;
 		};
-
 
 		class Differential8wd: public Differential4wd
 		{

@@ -495,17 +495,22 @@ class SuperCarEntity: public DemoEntity
 		switch (definition.m_differentialType) 
 		{
 			case 0:
+				// rear wheel drive no differential vehicle
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_2d;
+				differential.m_axel.m_leftTire = leftRearTire;
+				differential.m_axel.m_rightTire = rightRearTire;
+				break;
+
+			case 1:
+				// rear wheel drive vehicle with differential
+				dAssert(0);
 				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
 				differential.m_axel.m_leftTire = leftRearTire;
 				differential.m_axel.m_rightTire = rightRearTire;
 				break;
-			case 1:
-				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
-				differential.m_axel.m_leftTire = leftFrontTire;
-				differential.m_axel.m_rightTire = rightFrontTire;
-				break;
 
 			default:
+				dAssert(0);
 				differential.m_type = CustomVehicleController::EngineController::Differential::m_4wd;
 				differential.m_axel.m_leftTire = leftRearTire;
 				differential.m_axel.m_rightTire = rightRearTire;
@@ -616,7 +621,7 @@ class SuperCarEntity: public DemoEntity
 		}
 
 #if 1
-	#if 0
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
