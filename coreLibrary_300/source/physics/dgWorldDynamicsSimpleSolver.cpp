@@ -553,11 +553,21 @@ void dgWorldDynamicUpdate::IntegrateExternalForce(const dgBodyCluster* const clu
 }
 
 
-void dgWorldDynamicUpdate::ApplyNetVelcAndOmega(dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2) const
+void dgWorldDynamicUpdate::ApplyForceAndTorque(dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2) const
 {
 	dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 	dgVector force(body->m_externalForce + forceAndTorque.m_linear);
 	dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
+
+
+//if (body->m_uniqueID == 3)
+{
+//force[2] = 0;
+//torque[1] = 0;
+	dgVector F (force.Scale4(body->m_invMass.m_w));
+	dgVector T (body->m_invWorldInertiaMatrix.RotateVector(torque));
+	dgTrace (("%d f(%f %f %f) T(%f %f %f)\n", body->m_uniqueID, F[0], F[1], F[2], T[0], T[1], T[2]));
+}
 
 	dgVector velocStep((force.Scale4(body->m_invMass.m_w)).CompProduct4(timestep4));
 	dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)).CompProduct4(timestep4));
@@ -568,13 +578,12 @@ void dgWorldDynamicUpdate::ApplyNetVelcAndOmega(dgDynamicBody* const body, const
 	dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
 }
 
-void dgWorldDynamicUpdate::ApplyNetTorqueAndForce(dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& maxAccNorm2) const
+void dgWorldDynamicUpdate::CalculateNetAcceleration(dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& maxAccNorm2) const
 {
 	dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-	// the initial velocity and angular velocity were stored in net force and net torque, for memory saving
+	// the initial velocity and angular velocity were stored in m_accel and body->m_alpha for memory saving
 	dgVector accel = (body->m_veloc - body->m_accel).CompProduct4(invTimeStep);
 	dgVector alpha = (body->m_omega - body->m_alpha).CompProduct4(invTimeStep);
-//	dgVector accelTest((accel.DotProduct4(accel) > maxAccNorm2) | (alpha.DotProduct4(alpha) > maxAccNorm2) | forceActiveMask);
 	dgVector accelTest((accel.DotProduct4(accel) > maxAccNorm2) | (alpha.DotProduct4(alpha) > maxAccNorm2));
 	accel = accel & accelTest;
 	alpha = alpha & accelTest;
@@ -870,7 +879,7 @@ void dgWorldDynamicUpdate::CalculateSinglePassClusterReactionForces(const dgBody
 			for (dgInt32 i = 1; i < bodyCount; i++) {
 				dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 				dgAssert(body->m_index == i);
-				ApplyNetVelcAndOmega(body, internalForces[i], timestep4, speedFreeze2);
+				ApplyForceAndTorque(body, internalForces[i], timestep4, speedFreeze2);
 				dgAssert(body->m_index == i);
 			}
 		} else {
@@ -909,7 +918,7 @@ void dgWorldDynamicUpdate::CalculateSinglePassClusterReactionForces(const dgBody
 		for (dgInt32 i = 1; i < bodyCount; i++) {
 			dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 			dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			ApplyNetTorqueAndForce(body, invTime, maxAccNorm2);
+			CalculateNetAcceleration(body, invTime, maxAccNorm2);
 		}
 		if (hasJointFeeback) {
 			for (dgInt32 i = 0; i < jointCount; i++) {
@@ -1017,7 +1026,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			for (dgInt32 i = 1; i < bodyCount; i++) {
 				dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 				dgAssert(body->m_index == i);
-				ApplyNetVelcAndOmega(body, internalForces[i], timestep4, speedFreeze2);
+				ApplyForceAndTorque(body, internalForces[i], timestep4, speedFreeze2);
 				dgAssert(body->m_index == i);
 			}
 		} else {
@@ -1056,7 +1065,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 		for (dgInt32 i = 1; i < bodyCount; i++) {
 			dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 			dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			ApplyNetTorqueAndForce(body, invTime, maxAccNorm2);
+			CalculateNetAcceleration(body, invTime, maxAccNorm2);
 		}
 		if (hasJointFeeback) {
 			for (dgInt32 i = 0; i < jointCount; i++) {

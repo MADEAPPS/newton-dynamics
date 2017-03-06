@@ -532,7 +532,7 @@ void dgWorldDynamicUpdate::UpdateBodyVelocityParallelKernel (void* const context
 	dgInt32* const atomicIndex = &syncData->m_atomicIndex;
 	for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < syncData->m_bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-		world->ApplyNetTorqueAndForce (body, invTime, maxAccNorm2);
+		world->CalculateNetAcceleration (body, invTime, maxAccNorm2);
 	}
 }
 
