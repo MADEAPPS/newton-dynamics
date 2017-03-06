@@ -560,13 +560,15 @@ void dgWorldDynamicUpdate::ApplyForceAndTorque(dgDynamicBody* const body, const 
 	dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
 
 
-//if (body->m_uniqueID == 3)
+if (body->m_uniqueID == 3)
 {
 //force[2] = 0;
 //torque[1] = 0;
-	dgVector F (force.Scale4(body->m_invMass.m_w));
-	dgVector T (body->m_invWorldInertiaMatrix.RotateVector(torque));
-	dgTrace (("%d f(%f %f %f) T(%f %f %f)\n", body->m_uniqueID, F[0], F[1], F[2], T[0], T[1], T[2]));
+//	dgVector F (force.Scale4(body->m_invMass.m_w));
+//	dgVector T (body->m_invWorldInertiaMatrix.RotateVector(torque));
+//	dgTrace (("%d f(%f %f %f) T(%f %f %f)\n", body->m_uniqueID, F[0], F[1], F[2], T[0], T[1], T[2]));
+//dgMatrix xxxx (body->m_matrix);
+//dgTrace(("%d (%f %f %f)\n", body->m_uniqueID, xxxx[2][0], xxxx[2][1], xxxx[2][2]));
 }
 
 	dgVector velocStep((force.Scale4(body->m_invMass.m_w)).CompProduct4(timestep4));
