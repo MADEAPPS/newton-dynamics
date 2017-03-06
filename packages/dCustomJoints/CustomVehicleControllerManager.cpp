@@ -1972,21 +1972,24 @@ dVector CustomVehicleController::GetLastLateralForce(BodyPartTire* const tire) c
 
 void CustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 {
-	NewtonBody* const chassisBody = m_chassis.GetBody();
-	dComplentaritySolver::dJacobianPair m_jt[64];
-	dComplentaritySolver::dJacobianPair m_jInvMass[64];
-	dFloat massMatrix[64][64];
-	dFloat accel[64];
-	BodyPartTire* tires[64];
-
-	dVector chassisOrigin;
 	dMatrix chassisMatrix;
 	dMatrix chassisInvInertia;
+	dVector chassisOrigin(0.0f);
+	dVector chassisForce(0.0f);
+	dVector chassisTorque(0.0f);
+
+	const int maxSize = 64;
+	dComplentaritySolver::dJacobianPair m_jt[maxSize];
+	dComplentaritySolver::dJacobianPair m_jInvMass[maxSize];
+	BodyPartTire* tires[maxSize];
+	dFloat accel[maxSize];
+	dFloat massMatrix[maxSize * maxSize];
 	dFloat chassisMass;
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
 
+	NewtonBody* const chassisBody = m_chassis.GetBody();
 	NewtonBodyGetCentreOfMass(chassisBody, &chassisOrigin[0]);
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 	NewtonBodyGetInvMass(chassisBody, &chassisMass, &Ixx, &Iyy, &Izz);
@@ -2015,7 +2018,7 @@ void CustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 			NewtonBodyGetPointVelocity(chassisBody, &tireMatrix.m_posit[0], &chassisPivotVeloc[0]);
 
 			dFloat param = joint->CalculateTireParametricPosition(tireMatrix, chassisMatrix);
-			param = dClamp(param, dFloat(0.0f), dFloat(1.0f));
+			param = dClamp(param, dFloat(-0.25f), dFloat(1.0f));
 
 			dFloat x = tire.m_data.m_suspesionlenght * param;
 			dFloat v = ((tireVeloc - chassisPivotVeloc).DotProduct3(chassisMatrix.m_up));
@@ -2055,9 +2058,8 @@ void CustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 		}
 	}
 
-	dFloat*const massMatrixMem = &massMatrix[0][0];
 	for (int i = 0; i < tireCount; i++) {
-		dFloat* const row = &massMatrixMem[i * tireCount];
+		dFloat* const row = &massMatrix[i * tireCount];
 		dFloat aii = m_jInvMass[i].m_jacobian_IM0.m_linear.DotProduct3(m_jt[i].m_jacobian_IM0.m_linear) + m_jInvMass[i].m_jacobian_IM0.m_angular.DotProduct3(m_jt[i].m_jacobian_IM0.m_angular) +
 					 m_jInvMass[i].m_jacobian_IM1.m_linear.DotProduct3(m_jt[i].m_jacobian_IM1.m_linear) + m_jInvMass[i].m_jacobian_IM1.m_angular.DotProduct3(m_jt[i].m_jacobian_IM1.m_angular);
 
@@ -2065,15 +2067,13 @@ void CustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 		for (int j = i + 1; j < tireCount; j++) {
 			dFloat aij = m_jInvMass[i].m_jacobian_IM1.m_linear.DotProduct3(m_jt[j].m_jacobian_IM1.m_linear) + m_jInvMass[i].m_jacobian_IM1.m_angular.DotProduct3(m_jt[j].m_jacobian_IM1.m_angular);
 			row[j] = aij;
-			massMatrixMem[j * tireCount + i] = aij;
+			massMatrix[j * tireCount + i] = aij;
 		}
 	}
 
-	dCholeskyFactorization(tireCount, massMatrixMem);
-	dCholeskySolve(tireCount, tireCount, massMatrixMem, accel);
+	dCholeskyFactorization(tireCount, massMatrix);
+	dCholeskySolve(tireCount, tireCount, massMatrix, accel);
 
-	dVector chassisForce(0.0f);
-	dVector chassisTorque(0.0f);
 	for (int i = 0; i < tireCount; i++) {
 		dVector tireForce(m_jt[i].m_jacobian_IM0.m_linear.Scale(accel[i]));
 		dVector tireTorque(m_jt[i].m_jacobian_IM0.m_angular.Scale(accel[i]));
