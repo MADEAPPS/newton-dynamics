@@ -150,6 +150,15 @@ class dCustomVehicleController: public dCustomControllerBase
 		void ApplyTorque(dFloat torque);
 		void ProjectError();
 	};
+
+	class dBodyPartDifferential: public dBodyPart
+	{
+		public:
+		dBodyPartDifferential(dCustomVehicleController* const controller);
+		~dBodyPartDifferential();
+		void ProjectError();
+	};
+
 	
 	class dBodyPartTire: public dBodyPart
 	{
@@ -417,10 +426,11 @@ class dCustomVehicleController: public dCustomControllerBase
 
 		dInfo m_info;
 		dInfo m_infoCopy;
-		dAxelJoint* m_leftAxel;
-		dAxelJoint* m_rightAxel;
+//		dAxelJoint* m_leftAxel;
+//		dAxelJoint* m_rightAxel;
 		dCustomVehicleController* m_controller;
 		dBodyPartTire* m_crownGearCalculator;
+		dBodyPartDifferential* m_differential;
 		dFloat m_clutchParam;
 		int m_gearTimer;
 		int m_currentGear;
