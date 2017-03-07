@@ -22,7 +22,7 @@
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
-#include "CustomInputManager.h"
+#include "dCustomInputManager.h"
 #include "NewtonDemos.h"
 #include "DebugDisplay.h"
 
@@ -84,11 +84,11 @@ static void FireNewtonCcdBox(NewtonWorld* world, const dVector & postion, const 
 }
 
 // we recommend using and input manage to control input for all games
-class CCDInputManager : public CustomInputManager
+class CCDInputManager : public dCustomInputManager
 {
 	public:
 	CCDInputManager(DemoEntityManager* const scene)
-		:CustomInputManager(scene->GetNewton())
+		:dCustomInputManager(scene->GetNewton())
 		, m_scene(scene)
 	{
 		scene->Set2DDisplayRenderFunction (DrawHelpMenu, this);

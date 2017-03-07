@@ -16,17 +16,17 @@
 #define D_CUSTOM_DYNAMIC_RAGDOLL_MANAGER_H_
 
 #include <dCustomJointLibraryStdAfx.h>
-#include <CustomBallAndSocket.h>
-#include <CustomArcticulatedTransformManager.h>
+#include <dCustomBallAndSocket.h>
+#include <dCustomArcticulatedTransformManager.h>
 
 
 #define DYNAMIC_RAGDOLL_PLUGIN_NAME	"__dynamicRagDollManager__"
 
-class DynamicRagDollJoint: public CustomBallAndSocket
+class dDynamicRagDollJoint: public dCustomBallAndSocket
 {
 	public:
-	CUSTOM_JOINTS_API DynamicRagDollJoint(const dMatrix& globalChildPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
-	CUSTOM_JOINTS_API virtual ~DynamicRagDollJoint();
+	CUSTOM_JOINTS_API dDynamicRagDollJoint(const dMatrix& globalChildPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
+	CUSTOM_JOINTS_API virtual ~dDynamicRagDollJoint();
 
 	CUSTOM_JOINTS_API void SetConeAngle(dFloat angle);
 	CUSTOM_JOINTS_API void SetTwistAngle(dFloat minAngle, dFloat maxAngle);
@@ -35,7 +35,7 @@ class DynamicRagDollJoint: public CustomBallAndSocket
 	CUSTOM_JOINTS_API void GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const;
 
 	protected:
-	CUSTOM_JOINTS_API DynamicRagDollJoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API dDynamicRagDollJoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
@@ -49,21 +49,21 @@ class DynamicRagDollJoint: public CustomBallAndSocket
 	dFloat m_coneAngleSin;
 	dFloat m_coneAngleHalfCos;
 	dFloat m_coneAngleHalfSin;
-	DECLARE_CUSTOM_JOINT(DynamicRagDollJoint, CustomBallAndSocket)
+	DECLARE_CUSTOM_JOINT(dDynamicRagDollJoint, dCustomBallAndSocket)
 };
 
-class CustomDynamicRagDollManager: public CustomArticulaledTransformManager
+class dCustomDynamicRagDollManager: public dCustomArticulaledTransformManager
 {
 	public:
-	CUSTOM_JOINTS_API CustomDynamicRagDollManager(NewtonWorld* const world);
-	CUSTOM_JOINTS_API virtual ~CustomDynamicRagDollManager();
+	CUSTOM_JOINTS_API dCustomDynamicRagDollManager(NewtonWorld* const world);
+	CUSTOM_JOINTS_API virtual ~dCustomDynamicRagDollManager();
 
 	CUSTOM_JOINTS_API virtual void Debug () const;
 
-	CUSTOM_JOINTS_API virtual CustomArticulatedTransformController* CreateTransformController (void* const userData);
+	CUSTOM_JOINTS_API virtual dCustomArticulatedTransformController* CreateTransformController (void* const userData);
 
-	CUSTOM_JOINTS_API virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const;
-	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
+	CUSTOM_JOINTS_API virtual void OnPreUpdate (dCustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const;
+	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
 };
 
 

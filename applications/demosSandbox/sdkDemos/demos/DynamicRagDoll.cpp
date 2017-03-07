@@ -17,10 +17,10 @@
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "CustomBallAndSocket.h"
+#include "dCustomBallAndSocket.h"
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
-#include "CustomDynamicRagDollManager.h"
+#include "dCustomDynamicRagDollManager.h"
 
 
 struct RAGDOLL_BONE_DEFINITION
@@ -116,11 +116,11 @@ static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 
 
 
-class DynamicsRagDollManager: public CustomDynamicRagDollManager
+class DynamicsRagDollManager: public dCustomDynamicRagDollManager
 {
 	public: 
 	DynamicsRagDollManager (DemoEntityManager* const scene)
-		:CustomDynamicRagDollManager (scene->GetNewton())
+		:dCustomDynamicRagDollManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
@@ -128,17 +128,17 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
 	}
 
-	virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
+	virtual void OnPreUpdate (dCustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
 	{
-		CustomDynamicRagDollManager::OnPreUpdate (constroller, timestep, threadIndex);
+		dCustomDynamicRagDollManager::OnPreUpdate (constroller, timestep, threadIndex);
 	}
 
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 	{
 		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-		CustomArticulatedTransformController::dSkeletonBone* const bone0 = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
-		CustomArticulatedTransformController::dSkeletonBone* const bone1 = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
+		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
+		dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
 
 		dAssert (bone0);
 		dAssert (bone1);
@@ -215,7 +215,7 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 	}
 
 	
-	virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	virtual void OnUpdateTransform (const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
@@ -223,7 +223,7 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 		dQuaternion rot (localMatrix);
 		ent->SetMatrix (*scene, rot, localMatrix.m_posit);
 
-		CustomDynamicRagDollManager::OnUpdateTransform (bone, localMatrix);
+		dCustomDynamicRagDollManager::OnUpdateTransform (bone, localMatrix);
 	}
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
@@ -295,7 +295,7 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 		dMatrix childPinAndPivotInGlobalSpace (dPitchMatrix (definition.m_childPitch * 3.141592f / 180.0f) * dYawMatrix (definition.m_childYaw * 3.141592f / 180.0f) * dRollMatrix (definition.m_childRoll * 3.141592f / 180.0f));
 		childPinAndPivotInGlobalSpace = childPinAndPivotInGlobalSpace * matrix;
 
-		DynamicRagDollJoint* const joint = new DynamicRagDollJoint (childPinAndPivotInGlobalSpace, bone, parentPinAndPivotInGlobalSpace, parent);
+		dDynamicRagDollJoint* const joint = new dDynamicRagDollJoint (childPinAndPivotInGlobalSpace, bone, parentPinAndPivotInGlobalSpace, parent);
 
 		joint->SetConeAngle (definition.m_coneAngle * 3.141592f / 180.0f);
 		joint->SetTwistAngle (definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
@@ -313,7 +313,7 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 
 		// build the ragdoll with rigid bodies connected by joints
 		// create a transform controller
-		CustomArticulatedTransformController* const controller = CreateTransformController (ragDollEntity);
+		dCustomArticulatedTransformController* const controller = CreateTransformController (ragDollEntity);
 		controller->SetCalculateLocalTransforms (true);
 
 		// add the root bone
@@ -322,13 +322,13 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 		// for debugging
 		//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
-		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, dGetIdentityMatrix());
+		dCustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBone), bone);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
-		CustomArticulatedTransformController::dSkeletonBone* parentBones[32];
+		dCustomArticulatedTransformController::dSkeletonBone* parentBones[32];
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
 			parentBones[stackIndex] = bone;
 			childEntities[stackIndex] = child;
@@ -339,7 +339,7 @@ class DynamicsRagDollManager: public CustomDynamicRagDollManager
 		while (stackIndex) {
 			stackIndex --;
 			DemoEntity* const entity = childEntities[stackIndex];
-			CustomArticulatedTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
+			dCustomArticulatedTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < defintionCount; i ++) {

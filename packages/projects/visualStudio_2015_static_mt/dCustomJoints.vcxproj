@@ -204,32 +204,28 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dCustomJoints\Custom6DOF.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomBallAndSocket.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomControllerManager.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomCorkScrew.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomDryRollingFriction.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomDynamicRagDollManager.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomGear.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomHinge.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomHingeActuator.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomInputManager.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomKinematicController.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPathFollow.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPlane.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomRackAndPinion.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlider.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSliderActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomSlidingContact.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomTriggerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUniversal.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUniversalActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\CustomUpVector.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomVehicleControllerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustom6DOF.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomAlloc.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomArcticulatedTransformManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomBallAndSocket.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomControllerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomCorkScrew.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomDryRollingFriction.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomDynamicRagDollManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomGear.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomHinge.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomHingeActuator.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomInputManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomJointLibraryStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|Win32'">Create</PrecompiledHeader>
@@ -237,36 +233,40 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\dCustomJoints\dCustomKinematicController.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomPlayerControllerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomTriggerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomVehicleControllerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dCustomJoints\Custom6DOF.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomArcticulatedTransformManager.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomBallAndSocket.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomControllerManager.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomCorkScrew.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomDryRollingFriction.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomDynamicRagDollManager.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomGear.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomHinge.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomHingeActuator.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomInputManager.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomKinematicController.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPlane.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomRackAndPinion.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlider.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSliderActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomSlidingContact.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomTriggerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUniversal.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUniversalActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomVehicleControllerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustom6DOF.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomAlloc.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomArcticulatedTransformManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomBallAndSocket.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomControllerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomCorkScrew.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomDryRollingFriction.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomDynamicRagDollManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomGear.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomHinge.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomHingeActuator.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomInputManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomJointLibraryStdAfx.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomKinematicController.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomPlayerControllerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomTriggerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomVehicleControllerManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

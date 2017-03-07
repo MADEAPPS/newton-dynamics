@@ -131,22 +131,22 @@ typedef long long unsigned64;
 #include <dBezierSpline.h>
 
 #include <dCustomJoint.h>
-#include <CustomGear.h>
-#include <CustomHinge.h>
-#include <CustomHingeActuator.h>
-#include <CustomBallAndSocket.h>
+#include <dCustomGear.h>
+#include <dCustomHinge.h>
+#include <dCustomHingeActuator.h>
+#include <dCustomBallAndSocket.h>
 #include <CustomSliderActuator.h>
 #include <CustomSlidingContact.h>
 #include <CustomUniversalActuator.h>
 
-#include <CustomInputManager.h>
-#include <CustomTriggerManager.h>
-#include <CustomControllerManager.h>
-#include <CustomKinematicController.h>
-#include <CustomPlayerControllerManager.h>
-#include <CustomPlayerControllerManager.h>
-#include <CustomVehicleControllerManager.h>
-#include <CustomArcticulatedTransformManager.h>
+#include <dCustomInputManager.h>
+#include <dCustomTriggerManager.h>
+#include <dCustomControllerManager.h>
+#include <dCustomKinematicController.h>
+#include <dCustomPlayerControllerManager.h>
+#include <dCustomPlayerControllerManager.h>
+#include <dCustomVehicleControllerManager.h>
+#include <dCustomArcticulatedTransformManager.h>
 
 #include <dCRC.h>
 #include <dHeap.h>

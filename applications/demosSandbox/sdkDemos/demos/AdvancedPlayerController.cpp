@@ -15,7 +15,7 @@
 #include "NewtonDemos.h"
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
-#include "CustomHinge.h"
+#include "dCustomHinge.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
 #include "DebugDisplay.h"
@@ -41,16 +41,16 @@ class PlaformEntityEntity;
 class AdvancePlayerControllerManager;
 
 // this demo use a trigger and player controller to automate the operation of a mini game environment
-class TriggerManager: public CustomTriggerManager
+class TriggerManager: public dCustomTriggerManager
 {
 	public:
 	TriggerManager(NewtonWorld* const world, AdvancePlayerControllerManager* const playerManager)
-		:CustomTriggerManager(world)
+		:dCustomTriggerManager(world)
 		,m_playerManager(playerManager)
 	{
 	}
 
-	virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType event, NewtonBody* const visitor) const
+	virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType event, NewtonBody* const visitor) const
 	{
 		// send this message to the entity
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(visitor);
@@ -99,7 +99,7 @@ class AdvancePlayerEntity: public DemoEntity
 		int m_cameraMode;
 	};
 
-	AdvancePlayerEntity (DemoEntityManager* const scene, CustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
+	AdvancePlayerEntity (DemoEntityManager* const scene, dCustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_inputs()
 		,m_currentTrigger(NULL)
@@ -146,7 +146,7 @@ class AdvancePlayerEntity: public DemoEntity
 	~AdvancePlayerEntity ()
 	{
 		// destroy the player controller and its rigid body
-		((CustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
+		((dCustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 	void SetInput (const InputRecord& inputs)
@@ -170,7 +170,7 @@ class AdvancePlayerEntity: public DemoEntity
 			case ENTER_TRIGGER:
 			{
 				// the player enter a trigger, we most verify what trigger is this so that we can start some action
-				CustomTriggerController* const trigger = (CustomTriggerController*) data;
+				dCustomTriggerController* const trigger = (dCustomTriggerController*) data;
 				DemoEntity* const entity = (DemoEntity*) trigger->GetUserData();
 
 				// we are simple going to signal to the entity controlled by this trigger that a player enter the trigger
@@ -181,7 +181,7 @@ class AdvancePlayerEntity: public DemoEntity
 			case EXIT_TRIGGER:
 			{
 				// the player exit a trigger, we most verify what trigger is this so that we can finalized some action
-				CustomTriggerController* const trigger = (CustomTriggerController*) data;
+				dCustomTriggerController* const trigger = (dCustomTriggerController*) data;
 				DemoEntity* const entity = (DemoEntity*) trigger->GetUserData();
 
 				// the player left the trigger and tell the ferry driver to start to move to the next destination
@@ -193,15 +193,15 @@ class AdvancePlayerEntity: public DemoEntity
 
 	InputRecord	m_inputs;
 	NewtonBody* m_currentTrigger;
-	CustomPlayerController* m_controller; 
+	dCustomPlayerController* m_controller; 
 	PlaformEntityEntity* m_currentPlatform;
 };
 
-class AdvancePlayerControllerManager: public CustomPlayerControllerManager
+class AdvancePlayerControllerManager: public dCustomPlayerControllerManager
 {
 	public:
 	AdvancePlayerControllerManager (NewtonWorld* const world)
-		:CustomPlayerControllerManager (world)
+		:dCustomPlayerControllerManager (world)
 	{
 	}
 
@@ -210,7 +210,7 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 	}
 
 	// apply gravity 
-	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep)
+	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
 		NewtonBody* const body = controller->GetBody();
 		AdvancePlayerEntity* const player = (AdvancePlayerEntity*) NewtonBodyGetUserData(body);
@@ -223,7 +223,7 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 	}
 
 
-	virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
+	virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
 	{
 		// here you need to process the contact and reject the one you do not need.
 		//there are different ways to do this:
@@ -247,18 +247,18 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 				newCount --;
 			}
 		}
-		count = CustomPlayerControllerManager::ProcessContacts (controller, contacts, newCount); 
+		count = dCustomPlayerControllerManager::ProcessContacts (controller, contacts, newCount); 
 		return count;
 	}
 };
 
 
 // we recommend using and input manage to control input for all games
-class AdvancedPlayerInputManager: public CustomInputManager
+class AdvancedPlayerInputManager: public dCustomInputManager
 {
 	public:
 	AdvancedPlayerInputManager (DemoEntityManager* const scene)
-		:CustomInputManager(scene->GetNewton())
+		:dCustomInputManager(scene->GetNewton())
 		,m_scene(scene)
 		,m_player(NULL)
 		,m_jumpKey(false)
@@ -358,7 +358,7 @@ class AdvancedPlayerInputManager: public CustomInputManager
 
 		    dVector frontDir (camMatrix[0]);
 
-		    CustomPlayerController* const controller = m_player->m_controller; 
+		    dCustomPlayerController* const controller = m_player->m_controller; 
 		    dFloat height = controller->GetHigh();
 		    dVector upDir (controller->GetUpDir());
 
@@ -427,7 +427,7 @@ class AdvancedPlayerInputManager: public CustomInputManager
 class PlaformEntityEntity: public DemoEntity
 {
 	public:
-	class FerryDriver: public CustomKinematicController
+	class FerryDriver: public dCustomKinematicController
 	{
 		public:
 		enum State
@@ -437,7 +437,7 @@ class PlaformEntityEntity: public DemoEntity
 		};
 
 		FerryDriver (NewtonBody* const body, const dVector& pivot, NewtonBody* const triggerPort0, NewtonBody* const triggerPort1)
-			:CustomKinematicController (body, pivot)
+			:dCustomKinematicController (body, pivot)
 			,m_target(0.0f)
 			,m_triggerPort0(triggerPort0)
 			,m_triggerPort1(triggerPort1)
@@ -495,7 +495,7 @@ class PlaformEntityEntity: public DemoEntity
 				dAssert (0);
 			}
 
-			CustomKinematicController::SubmitConstraints (timestep, threadIndex);
+			dCustomKinematicController::SubmitConstraints (timestep, threadIndex);
 		}
 
 		void Stop ()
@@ -582,7 +582,7 @@ class PlaformEntityEntity: public DemoEntity
 			}
 			case PLAYER_CALL_FERRY_DRIVER:
 			{
-				CustomTriggerController* const trigger = (CustomTriggerController*) data;
+				dCustomTriggerController* const trigger = (dCustomTriggerController*) data;
 				dAssert (trigger->GetUserData() == this);
 				m_driver->MoveToTarget (trigger->GetBody());
 				break;
@@ -765,8 +765,8 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 	}
 
 	// add start triggers
-	CustomTriggerController* trigger0 = NULL;
-	CustomTriggerController* trigger1 = NULL;
+	dCustomTriggerController* trigger0 = NULL;
+	dCustomTriggerController* trigger1 = NULL;
 	for (DemoEntityManager::dListNode* node = bridgeNodes->GetNext(); node;) {
 		DemoEntity* const entity = node->GetInfo();
 		node = node->GetNext() ;
@@ -778,7 +778,7 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 			// create a trigger to match his mesh
 			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, &meshMatrix[0][0]);
 			dMatrix matrix (entity->GetNextMatrix());
-			CustomTriggerController* const controller = triggerManager->CreateTrigger(matrix, collision, NULL);
+			dCustomTriggerController* const controller = triggerManager->CreateTrigger(matrix, collision, NULL);
 			NewtonDestroyCollision (collision);
 
 			if (!trigger0) {
@@ -884,11 +884,11 @@ static void LoadSlide (DemoEntityManager* const scene, TriggerManager* const tri
 }
 */
 
-class HangingBridgeFrictionJoint : public CustomHinge
+class HangingBridgeFrictionJoint : public dCustomHinge
 {
 	public:
 	HangingBridgeFrictionJoint(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const link0, NewtonBody* const link1)
-		:CustomHinge(pinAndPivotFrame0, pinAndPivotFrame1, link0, link1)
+		:dCustomHinge(pinAndPivotFrame0, pinAndPivotFrame1, link0, link1)
 	{
 		SetStiffness(0.99f);
 		SetAsSpringDamper(true, 0.9f, 0.0f, 10.0f);
@@ -1006,7 +1006,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		pinMatrix1[3][3] = 1.0f;
 
 		// connect these two plank by a hinge, there a wiggle space between eh hinge that give therefore use the alternate hinge constructor
-		CustomHinge* const joint = new HangingBridgeFrictionJoint(pinMatrix0, pinMatrix1, body0, body1);
+		dCustomHinge* const joint = new HangingBridgeFrictionJoint(pinMatrix0, pinMatrix1, body0, body1);
 
 		// save the joint for later used
 		jointArray[jointCount] = joint->GetJoint();
@@ -1031,7 +1031,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		pinMatrix0[2][3] = 0.0f;
 		pinMatrix0[3] = matrix0.m_posit - pinMatrix0[2].Scale (plankwidth);
 
-		new CustomHinge (pinMatrix0, body0, playGroundBody);
+		new dCustomHinge (pinMatrix0, body0, playGroundBody);
 	}
 
 	{
@@ -1048,7 +1048,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		pinMatrix0[2][3] = 0.0f;
 		pinMatrix0[3] = matrix0.m_posit + pinMatrix0[2].Scale (plankwidth);
 
-		new CustomHinge (pinMatrix0, body0, playGroundBody);
+		new dCustomHinge (pinMatrix0, body0, playGroundBody);
 	}
 }
 

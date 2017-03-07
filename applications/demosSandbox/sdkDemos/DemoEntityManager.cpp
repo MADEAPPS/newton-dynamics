@@ -24,8 +24,8 @@
 #include "DemoEntityListener.h"
 #include "DemoCameraListener.h"
 //#include "DemoVisualDebugerListener.h"
-#include "CustomPlayerControllerManager.h"
-#include "CustomVehicleControllerManager.h"
+#include "dCustomPlayerControllerManager.h"
+#include "dCustomVehicleControllerManager.h"
 
 
 #ifdef _MACOSX_VER
@@ -926,13 +926,13 @@ void DemoEntityManager::RenderFrame ()
 		// see if there is a vehicle controller and 
 		void* const vehListerNode = NewtonWorldGetPreListener(GetNewton(), VEHICLE_PLUGIN_NAME);
 		if (vehListerNode) {
-			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
+			dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
 			manager->Debug();
 		}
 
 		void* const characterListerNode = NewtonWorldGetPreListener(GetNewton(), PLAYER_PLUGIN_NAME);
 		if (characterListerNode) {
-			CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
+			dCustomPlayerControllerManager* const manager = (dCustomPlayerControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
 			manager->Debug();
 		}
 	}

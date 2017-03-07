@@ -43,7 +43,7 @@ class BasicPlayerEntity: public DemoEntity
 		int m_cameraMode;
 	};
 
-	BasicPlayerEntity (DemoEntityManager* const scene, CustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
+	BasicPlayerEntity (DemoEntityManager* const scene, dCustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 	{
 		// add this entity to the scene for rendering
@@ -95,7 +95,7 @@ class BasicPlayerEntity: public DemoEntity
 	~BasicPlayerEntity ()
 	{
 		// destroy the player controller and its rigid body
-		((CustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
+		((dCustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 	void SetInput (const InputRecord& inputs)
@@ -112,14 +112,14 @@ class BasicPlayerEntity: public DemoEntity
 	}
 
 	InputRecord	m_inputs;
-	CustomPlayerController* m_controller; 
+	dCustomPlayerController* m_controller; 
 };
 
-class BasicPlayerControllerManager: public CustomPlayerControllerManager
+class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 {
 	public:
 	BasicPlayerControllerManager (NewtonWorld* const world)
-		:CustomPlayerControllerManager (world)
+		:dCustomPlayerControllerManager (world)
 	{
 	}
 
@@ -128,7 +128,7 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 	}
 
 	// apply gravity 
-	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep)
+	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
 		NewtonBody* const body = controller->GetBody();
 		BasicPlayerEntity* const player = (BasicPlayerEntity*) NewtonBodyGetUserData(body);
@@ -141,9 +141,9 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 	}
 
 
-	virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
+	virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
 	{
-		count = CustomPlayerControllerManager::ProcessContacts (controller, contacts, count); 
+		count = dCustomPlayerControllerManager::ProcessContacts (controller, contacts, count); 
 		return count;
 	}
 };
@@ -151,11 +151,11 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 
 
 // we recommend using and input manage to control input for all games
-class BasicPlayerInputManager: public CustomInputManager
+class BasicPlayerInputManager: public dCustomInputManager
 {
 	public:
 	BasicPlayerInputManager (DemoEntityManager* const scene)
-		:CustomInputManager(scene->GetNewton())
+		:dCustomInputManager(scene->GetNewton())
 		,m_scene(scene)
 		,m_player(NULL)
 		,m_jumpKey(false)
@@ -253,7 +253,7 @@ class BasicPlayerInputManager: public CustomInputManager
 
 		dVector frontDir (camMatrix[0]);
 
-		CustomPlayerController* const controller = m_player->m_controller; 
+		dCustomPlayerController* const controller = m_player->m_controller; 
 		dFloat height = controller->GetHigh();
 		dVector upDir (controller->GetUpDir());
 

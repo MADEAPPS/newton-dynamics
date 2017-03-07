@@ -827,9 +827,9 @@ class HeavyVehicleEntity: public DemoEntity
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 		NewtonDemos* const mainWindow = scene->GetRootWindow();
 
-		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
-		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
-		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
+		dCustomVehicleController::dEngineController* const engine = m_controller->GetEngine();
+		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
+		dCustomVehicleController::dBrakeController* const brakes = m_controller->GetBrakes();
 		//CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
 
 		//int gear = engine->GetGear();
@@ -1022,21 +1022,21 @@ class HeavyVehicleEntity: public DemoEntity
 		CalculateTireDimensions("ltire_0", width, radius);
 
 		// add left tires
-		CustomVehicleController::BodyPartTire* leftTire[4];
+		dCustomVehicleController::dBodyPartTire* leftTire[4];
 		leftTire[0] = AddTire("ltire_0", width, radius, definition.STEER_ANGLE, definition);
 		leftTire[1] = AddTire("ltire_1", width, radius, definition.STEER_ANGLE, definition);
 		leftTire[2] = AddTire("ltire_2", width, radius, 				  0.0f, definition);
 		leftTire[3] = AddTire("ltire_3", width, radius, 				  0.0f, definition);
 
 		// add right tires
-		CustomVehicleController::BodyPartTire* rightTire[4];
+		dCustomVehicleController::dBodyPartTire* rightTire[4];
 		rightTire[0] = AddTire("rtire_0", width, radius, definition.STEER_ANGLE, definition);
 		rightTire[1] = AddTire("rtire_1", width, radius, definition.STEER_ANGLE, definition);
 		rightTire[2] = AddTire("rtire_2", width, radius, 				   0.0f, definition);
 		rightTire[3] = AddTire("rtire_3", width, radius, 				   0.0f, definition);
 
 		// add a steering Wheel
-		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController(m_controller);
+		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller);
 		for (int i = 0; i < 2; i++) {
 			steering->AddTire(leftTire[i]);
 			steering->AddTire(rightTire[i]);
@@ -1044,7 +1044,7 @@ class HeavyVehicleEntity: public DemoEntity
 		m_controller->SetSteering(steering);
 
 		// add vehicle brakes
-		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController(m_controller, definition.BRAKE_TORQUE);
+		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController(m_controller, definition.BRAKE_TORQUE);
 		for (int i = 0; i < 4; i++) {
 			brakes->AddTire(leftTire[i]);
 			brakes->AddTire(rightTire[i]);
@@ -1052,7 +1052,7 @@ class HeavyVehicleEntity: public DemoEntity
 		m_controller->SetBrakes(brakes);
 
 		// add the engine, differential and transmission 
-		CustomVehicleController::EngineController::Info engineInfo;
+		dCustomVehicleController::dEngineController::dInfo engineInfo;
 		engineInfo.m_mass = definition.ENGINE_MASS;
 		engineInfo.m_radio = definition.ENGINE_RADIO;
 		engineInfo.m_vehicleTopSpeed = definition.VEHICLE_TOP_SPEED_KMH;
@@ -1075,8 +1075,8 @@ class HeavyVehicleEntity: public DemoEntity
 		engineInfo.m_gearRatios[2] = definition.GEAR_3;
 		engineInfo.m_reverseGearRatio = definition.REVERSE_GEAR;
 
-		CustomVehicleController::EngineController::Differential8wd differential;
-		differential.m_type = CustomVehicleController::EngineController::Differential::m_8wd;
+		dCustomVehicleController::dEngineController::dDifferential8wd differential;
+		differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_8wd;
 		differential.m_axel.m_leftTire = leftTire[0];
 		differential.m_axel.m_rightTire = rightTire[0];
 		differential.m_secondAxel.m_axel.m_leftTire = leftTire[1];
@@ -1088,7 +1088,7 @@ class HeavyVehicleEntity: public DemoEntity
 	
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
-		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController(m_controller, engineInfo, differential);
+		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController(m_controller, engineInfo, differential);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
@@ -1107,8 +1107,8 @@ class HeavyVehicleEntity: public DemoEntity
 		m_controller->SetCenterOfGravity(dVector(0.0f, definition.COM_Y_OFFSET, 0.0f, 0.0f));
 
 		// add all the tank tires
-		CustomVehicleController::BodyPartTire* leftTire[8];
-		CustomVehicleController::BodyPartTire* rightTire[8];
+		dCustomVehicleController::dBodyPartTire* leftTire[8];
+		dCustomVehicleController::dBodyPartTire* rightTire[8];
 		for (int i = 0; i < 8; i++) {
 			char name[32];
 			dFloat width;
@@ -1124,18 +1124,18 @@ class HeavyVehicleEntity: public DemoEntity
 		}
 
 		// add vehicle brakes
-		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController(m_controller, definition.BRAKE_TORQUE);
+		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController(m_controller, definition.BRAKE_TORQUE);
 		brakes->AddTire(leftTire[0]);
 		brakes->AddTire(rightTire[0]);
 		m_controller->SetBrakes(brakes);
 
 		// add a tank skid steering engine
-		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController(m_controller);
+		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller);
 		brakes->AddTire(leftTire[0]);
 		brakes->AddTire(rightTire[0]);
 		m_controller->SetSteering(steering);
 
-		CustomVehicleController::EngineController::Info engineInfo;
+		dCustomVehicleController::dEngineController::dInfo engineInfo;
 		engineInfo.m_mass = definition.ENGINE_MASS;
 		engineInfo.m_radio = definition.ENGINE_RADIO;
 		engineInfo.m_vehicleTopSpeed = definition.VEHICLE_TOP_SPEED_KMH;
@@ -1158,12 +1158,12 @@ class HeavyVehicleEntity: public DemoEntity
 		engineInfo.m_gearRatios[2] = definition.GEAR_3;
 		engineInfo.m_reverseGearRatio = definition.REVERSE_GEAR;
 
-		CustomVehicleController::EngineController::DifferentialTracked differential (8, leftTire, rightTire);
+		dCustomVehicleController::dEngineController::dDifferentialTracked differential (8, leftTire, rightTire);
 		//CustomVehicleController::EngineController::DifferentialTracked differential (2, leftTire, rightTire);
 
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
-		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController(m_controller, engineInfo, differential);
+		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController(m_controller, engineInfo, differential);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
@@ -1179,7 +1179,7 @@ class HeavyVehicleEntity: public DemoEntity
 		m_controller->Finalize();
 	}
 
-	void SetTracks(CustomVehicleController::BodyPartTire* const leftTire, CustomVehicleController::BodyPartTire* const rightTire)
+	void SetTracks(dCustomVehicleController::dBodyPartTire* const leftTire, dCustomVehicleController::dBodyPartTire* const rightTire)
 	{
 		m_leftTrack.Init(this, "leftTrackPath", leftTire);
 		m_rightTrack.Init(this, "rightTrackPath", rightTire);
@@ -1191,8 +1191,8 @@ class HeavyVehicleEntity: public DemoEntity
 	{
 		DemoEntity::InterpolateMatrix(world, param);
 		if (m_controller) {
-			for (dList<CustomVehicleController::BodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
-				CustomVehicleController::BodyPart* const part = node->GetInfo();
+			for (dList<dCustomVehicleController::dBodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
+				dCustomVehicleController::dBodyPart* const part = node->GetInfo();
 				DemoEntity* const entPart = (DemoEntity*)part->GetUserData();
 				entPart->InterpolateMatrix(world, param);
 			}
@@ -1210,9 +1210,9 @@ class HeavyVehicleEntity: public DemoEntity
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
-		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			const CustomVehicleController::BodyPartTire* const part = &node->GetInfo();
-			CustomVehicleController::BodyPart* const parent = part->GetParent();
+		for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			const dCustomVehicleController::dBodyPartTire* const part = &node->GetInfo();
+			dCustomVehicleController::dBodyPart* const parent = part->GetParent();
 
 			NewtonBody* const body = part->GetBody();
 			NewtonBody* const parentBody = parent->GetBody();
@@ -1239,7 +1239,7 @@ class HeavyVehicleEntity: public DemoEntity
 
 	TrackSystem m_leftTrack;
 	TrackSystem m_rightTrack;
-	CustomVehicleController* m_controller;
+	dCustomVehicleController* m_controller;
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;
 	DemoEntityManager::ButtonKey m_reverseGear;
@@ -1252,11 +1252,11 @@ class HeavyVehicleEntity: public DemoEntity
 };
 
 
-class HeavyVehicleControllerManager: public CustomVehicleControllerManager
+class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 {
 	public:
 	HeavyVehicleControllerManager (NewtonWorld* const world, int materialsCount, int* const materialList)
-		:CustomVehicleControllerManager (world, materialsCount, materialList)
+		:dCustomVehicleControllerManager (world, materialsCount, materialList)
 		,m_externalView(true)
 		,m_changeVehicle(false)
 		,m_player (NULL) 
@@ -1486,11 +1486,11 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 		if (changeVehicle) {
 			dListNode* nextPlater = GetLast();
 			for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-				CustomVehicleController* const controller = &ptr->GetInfo();
+				dCustomVehicleController* const controller = &ptr->GetInfo();
 				NewtonBody* const body = controller->GetBody();
 				HeavyVehicleEntity* const vehicleEntity = (HeavyVehicleEntity*)NewtonBodyGetUserData(body);
 				if (vehicleEntity == m_player) {
-					CustomVehicleController* const controller1 = &nextPlater->GetInfo();
+					dCustomVehicleController* const controller1 = &nextPlater->GetInfo();
 					NewtonBody* const body1 = controller1->GetBody();
 					SetAsPlayer((HeavyVehicleEntity*)NewtonBodyGetUserData(body1));
 					break;
@@ -1501,7 +1501,7 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 
 
 		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			CustomVehicleController* const controller = &ptr->GetInfo();
+			dCustomVehicleController* const controller = &ptr->GetInfo();
 
 			NewtonBody* const body = controller->GetBody();
 			HeavyVehicleEntity* const vehicleEntity = (HeavyVehicleEntity*)NewtonBodyGetUserData(body);
@@ -1516,18 +1516,18 @@ class HeavyVehicleControllerManager: public CustomVehicleControllerManager
 		}
 
 		// do the base class post update
-		CustomVehicleControllerManager::PreUpdate(timestep);
+		dCustomVehicleControllerManager::PreUpdate(timestep);
 	}
 
 
 	virtual void PostUpdate(dFloat timestep)
 	{
 		// do the base class post update
-		CustomVehicleControllerManager::PostUpdate(timestep);
+		dCustomVehicleControllerManager::PostUpdate(timestep);
 
 		// update the visual transformation matrices for all vehicle tires
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			CustomVehicleController* const controller = &node->GetInfo();
+			dCustomVehicleController* const controller = &node->GetInfo();
 			HeavyVehicleEntity* const vehicleEntity = (HeavyVehicleEntity*)NewtonBodyGetUserData(controller->GetBody());
 			vehicleEntity->UpdateTireTransforms(timestep);
 		}
