@@ -14,7 +14,7 @@
 #include "dCustomJoint.h"
 #include "dCustomGear.h"
 #include "dCustomHinge.h"
-#include "CustomUniversal.h"
+#include "dCustomUniversal.h"
 #include "dCustomVehicleControllerManager.h"
 
 //#define D_PLOT_ENGINE_CURVE

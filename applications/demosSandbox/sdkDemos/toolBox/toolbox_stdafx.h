@@ -135,9 +135,9 @@ typedef long long unsigned64;
 #include <dCustomHinge.h>
 #include <dCustomHingeActuator.h>
 #include <dCustomBallAndSocket.h>
-#include <CustomSliderActuator.h>
-#include <CustomSlidingContact.h>
-#include <CustomUniversalActuator.h>
+#include <dCustomSliderActuator.h>
+#include <dCustomSlidingContact.h>
+#include <dCustomUniversalActuator.h>
 
 #include <dCustomInputManager.h>
 #include <dCustomTriggerManager.h>

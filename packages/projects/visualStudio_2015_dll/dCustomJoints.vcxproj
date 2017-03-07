@@ -221,16 +221,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dCustomJoints\CustomPathFollow.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomPlane.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomPulley.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomRackAndPinion.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomSlider.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomSliderActuator.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomSlidingContact.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomUniversal.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomUniversalActuator.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\CustomUpVector.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustom6DOF.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomArcticulatedTransformManager.cpp" />
@@ -251,21 +241,21 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dCustomJoints\dCustomKinematicController.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomPathFollow.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomPlane.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPlayerControllerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomPulley.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomRackAndPinion.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomSlider.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomSliderActuator.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomSlidingContact.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomTriggerManager.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomUniversal.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomUniversalActuator.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomUpVector.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomVehicleControllerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dCustomJoints\CustomPathFollow.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomPlane.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomPulley.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomRackAndPinion.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomSlider.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomSliderActuator.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomSlidingContact.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomUniversal.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomUniversalActuator.h" />
-    <ClInclude Include="..\..\dCustomJoints\CustomUpVector.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustom6DOF.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomArcticulatedTransformManager.h" />
@@ -281,8 +271,18 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomJointLibraryStdAfx.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomKinematicController.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomPathFollow.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomPlane.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPlayerControllerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomPulley.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomRackAndPinion.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomSlider.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomSliderActuator.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomSlidingContact.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomTriggerManager.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomUniversal.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomUniversalActuator.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomUpVector.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomVehicleControllerManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

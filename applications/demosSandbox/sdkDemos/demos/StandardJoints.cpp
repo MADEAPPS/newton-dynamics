@@ -19,14 +19,14 @@
 #include <dCustomGear.h>
 #include <dCustom6DOF.h>
 #include <dCustomHinge.h>
-#include <CustomSlider.h>
-#include <CustomPulley.h>
+#include <dCustomSlider.h>
+#include <dCustomPulley.h>
 #include <dBezierSpline.h>
 #include <dCustomCorkScrew.h>
-#include <CustomPathFollow.h>
+#include <dCustomPathFollow.h>
 #include <dCustomBallAndSocket.h>
-#include <CustomRackAndPinion.h>
-#include <CustomSlidingContact.h>
+#include <dCustomRackAndPinion.h>
+#include <dCustomSlidingContact.h>
 
 
 static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& location, const dVector& size)
@@ -301,7 +301,7 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	CustomUniversal* const joint1 = new CustomUniversal(matrix, box1, box0);
+	dCustomUniversal* const joint1 = new dCustomUniversal(matrix, box1, box0);
 	joint1->EnableLimit_0(true);
 	joint1->SetLimits_0 (-5.0f * 3.141592f, 2.0f * 3.141592f);
 	joint1->EnableLimit_1(true);
@@ -309,7 +309,7 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
-	CustomUniversal* const joint2 = new CustomUniversal(matrix, box2, box0);
+	dCustomUniversal* const joint2 = new dCustomUniversal(matrix, box2, box0);
 	joint2->EnableLimit_0(true);
 	joint2->SetLimits_0 (-3.0f * 3.141592f, 5.0f * 3.141592f);
 	joint2->EnableLimit_1(true);
@@ -650,7 +650,7 @@ static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
 
 	// connect the bodies by a Slider joint
     NewtonBodyGetMatrix (box1, &matrix[0][0]);
-    CustomSlider* const slider = new CustomSlider (matrix, box1, box0);
+    dCustomSlider* const slider = new dCustomSlider (matrix, box1, box0);
 
     // enable limit of first axis
     slider->EnableLimits(true);
@@ -670,7 +670,7 @@ static void AddSliderSpringDamper (DemoEntityManager* const scene, const dVector
 
 	// connect the bodies by a Slider joint
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	CustomSlider* const slider = new CustomSlider(matrix, box1, box0);
+	dCustomSlider* const slider = new dCustomSlider(matrix, box1, box0);
 
 	// enable limit of first axis
 	slider->EnableLimits(true);
@@ -695,7 +695,7 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	matrix = dPitchMatrix(45.0f * 3.141592f / 160.0f) * matrix;
 
-	CustomSlidingContact* const slider = new CustomSlidingContact(matrix, box1, box0);
+	dCustomSlidingContact* const slider = new dCustomSlidingContact(matrix, box1, box0);
 	slider->EnableLinearLimits (true);
 	slider->SetLinearLimits (-4.0f, 4.0f);
 
@@ -770,7 +770,7 @@ static void AddGear (DemoEntityManager* const scene, const dVector& origin)
 }
 
 
-static CustomSlider* AddSliderWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
+static dCustomSlider* AddSliderWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
 {
     NewtonBody* const wheel = CreateWheel (scene, origin, height, radius);
 
@@ -782,7 +782,7 @@ static CustomSlider* AddSliderWheel (DemoEntityManager* const scene, const dVect
     matrix = localPin * matrix;
 
     // connect first box to the world
-    return new CustomSlider (matrix, wheel, parent);
+    return new dCustomSlider (matrix, wheel, parent);
 }
 
 void AddPulley (DemoEntityManager* const scene, const dVector& origin)
@@ -794,8 +794,8 @@ void AddPulley (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodySetMassMatrix (reel1, 0.0f, 0.0f, 0.0f, 0.0f);
     
 	dMatrix matrix;
-    CustomSlider* const slider0 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 2.0f), 0.5f, 1.0f, reel0);
-    CustomSlider* const slider1 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
+    dCustomSlider* const slider0 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 2.0f), 0.5f, 1.0f, reel0);
+    dCustomSlider* const slider1 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
 
     slider0->EnableLimits(true);
     slider0->SetLimits (-2.0f, 2.0f);
@@ -810,7 +810,7 @@ void AddPulley (DemoEntityManager* const scene, const dVector& origin)
 
     dVector pin0 (matrix0.RotateVector(dVector (1.0f, 0.0f, 0.0f)));
     dVector pin1 (matrix1.RotateVector(dVector (1.0f, 0.0f, 0.0f)));
-    new CustomPulley (4.0f, pin0, pin1, body0, body1);
+    new dCustomPulley (4.0f, pin0, pin1, body0, body1);
 
 	// make an aggregate for disabling collisions
 	void* const aggregate = NewtonCollisionAggregateCreate (scene->GetNewton());
@@ -867,7 +867,7 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
     dVector pin2 (matrix2.RotateVector(dVector( 1.0f, 0.0f, 0.0f)));
 
     new dCustomGear (5.0f, pin0, pin2, body0, body2);
-    new CustomRackAndPinion (0.125f, pin1, pin2, body1, body2);
+    new dCustomRackAndPinion (0.125f, pin1, pin2, body1, body2);
 
 	// make an aggregate for disabling collisions
 	void* const aggregate = NewtonCollisionAggregateCreate(scene->GetNewton());
@@ -880,11 +880,11 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
 }
 
 
-class MyPathFollow: public CustomPathFollow
+class MyPathFollow: public dCustomPathFollow
 {
 	public:
 	MyPathFollow(const dMatrix& pinAndPivotFrame, NewtonBody* const body, NewtonBody* const pathBody)
-		:CustomPathFollow (pinAndPivotFrame, body, pathBody)
+		:dCustomPathFollow (pinAndPivotFrame, body, pathBody)
 	{
 	}
 

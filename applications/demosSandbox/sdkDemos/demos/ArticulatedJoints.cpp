@@ -63,11 +63,11 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 class ArticulatedEntityModel: public DemoEntity
 {
 	public:
-	class SuspensionTire: public CustomSlidingContact
+	class SuspensionTire: public dCustomSlidingContact
 	{
 		public:
 		SuspensionTire (const dMatrix& pinAndPivotFrame, NewtonBody* const tire, NewtonBody* const chassis)
-			:CustomSlidingContact (pinAndPivotFrame, tire, chassis)
+			:dCustomSlidingContact (pinAndPivotFrame, tire, chassis)
 		{
 			EnableLinearLimits(true);
 			SetLinearLimits (-0.5f, 0.01f);
@@ -197,7 +197,7 @@ class ArticulatedEntityModel: public DemoEntity
 
 		dFloat angleLimit = 30.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 60.0f * 3.141592f / 180.0f;
-		m_rearTireJoints[m_rearTiresCount] = new CustomUniversalActuator (&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
+		m_rearTireJoints[m_rearTiresCount] = new dCustomUniversalActuator (&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
 		m_rearTireJoints[m_rearTiresCount]->SetEnableFlag0 (false);
 		m_rearTiresCount ++;
 	}
@@ -222,7 +222,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat minLimit = -0.25f;
 		dFloat maxLimit = 1.5f;
 		dFloat linearRate = 0.125f;
-		m_liftJoints[m_liftActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+		m_liftJoints[m_liftActuatorsCount] = new dCustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
 		m_liftActuatorsCount ++;
 	}
 
@@ -234,7 +234,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat minLimit = -0.25f;
 		dFloat maxLimit = 0.2f;
 		dFloat linearRate = 0.25f;
-		m_paletteJoints[m_paletteActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+		m_paletteJoints[m_paletteActuatorsCount] = new dCustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
 		m_paletteActuatorsCount ++;
 	}
 
@@ -261,13 +261,13 @@ class ArticulatedEntityModel: public DemoEntity
 		
 	NewtonBody* m_tractionTires[4];
 	dCustomHinge* m_tractionTiresJoints[4];
-	CustomSliderActuator* m_liftJoints[4];
-	CustomSliderActuator* m_paletteJoints[4];
+	dCustomSliderActuator* m_liftJoints[4];
+	dCustomSliderActuator* m_paletteJoints[4];
 	dCustomHingeActuator* m_angularActuator0[4];
 	dCustomHingeActuator* m_angularActuator1[4];
-	CustomUniversalActuator* m_rearTireJoints[4];
-	CustomUniversalActuator* m_universalActuator[4];
-	CustomUniversal* m_engineJoint;
+	dCustomUniversalActuator* m_rearTireJoints[4];
+	dCustomUniversalActuator* m_universalActuator[4];
+	dCustomUniversal* m_engineJoint;
 
 	InputRecord m_inputs;
 };
@@ -638,7 +638,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		return body;
 	}
 
-	CustomUniversal* CreateEngineBodyPart(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const chassisBone)
+	dCustomUniversal* CreateEngineBodyPart(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const chassisBone)
 	{
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* const shape = NewtonCreateCylinder (world, 0.125f, 0.125f, 0.75f, 0, NULL);
@@ -677,7 +677,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		engineAxis.m_right = engineAxis.m_front.CrossProduct(engineAxis.m_up);
 		engineAxis.m_posit = engineMatrix.m_posit;
 
-		CustomUniversal* const engineJoint = new CustomUniversal(engineAxis, engineBody, chassis);
+		dCustomUniversal* const engineJoint = new dCustomUniversal(engineAxis, engineBody, chassis);
 		engineJoint->EnableLimit_0(false);
 		engineJoint->EnableLimit_1(false);
 
@@ -1189,7 +1189,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat minLimit =  0.0f;
 		dFloat maxLimit =  4.0f;
 		dFloat linearRate = 2.0f;
-		vehicleModel->m_liftJoints[vehicleModel->m_liftActuatorsCount] = new CustomSliderActuator(&matrix[0][0], linearRate, minLimit, maxLimit, boomBody, baseBone->m_body);
+		vehicleModel->m_liftJoints[vehicleModel->m_liftActuatorsCount] = new dCustomSliderActuator(&matrix[0][0], linearRate, minLimit, maxLimit, boomBody, baseBone->m_body);
 		vehicleModel->m_liftActuatorsCount++;
 		dCustomArticulatedTransformController::dSkeletonBone* const boomBone = controller->AddBone(boomBody, dGetIdentityMatrix(), baseBone);
 		return boomBone;
@@ -1218,7 +1218,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat maxLimit =  1.25f;
 		dFloat rate = 2.0f;
 
-		vehicleModel->m_paletteJoints[vehicleModel->m_paletteActuatorsCount] = new CustomSliderActuator(&matrix[0][0], rate, minLimit, maxLimit, paletteBody, baseBone->m_body);
+		vehicleModel->m_paletteJoints[vehicleModel->m_paletteActuatorsCount] = new dCustomSliderActuator(&matrix[0][0], rate, minLimit, maxLimit, paletteBody, baseBone->m_body);
 		vehicleModel->m_paletteActuatorsCount++;
 		controller->AddBone(paletteBody, dGetIdentityMatrix(), baseBone);
 	}
@@ -1246,7 +1246,7 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat maxAngleLimit =  120.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 30.0f * 3.141592f / 180.0f;
 
-		vehicleModel->m_universalActuator[vehicleModel->m_universalActuatorsCount] = new CustomUniversalActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, wristBody, baseBone->m_body);
+		vehicleModel->m_universalActuator[vehicleModel->m_universalActuatorsCount] = new dCustomUniversalActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, wristBody, baseBone->m_body);
 		vehicleModel->m_universalActuatorsCount++;
 		dCustomArticulatedTransformController::dSkeletonBone* const wristBone = controller->AddBone(wristBody, dGetIdentityMatrix(), baseBone);
 		AddCranekPaletteActuator (controller, wristBone, "leftHand");

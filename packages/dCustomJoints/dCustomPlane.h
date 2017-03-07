@@ -11,7 +11,7 @@
 
 
 
-// CustomPlane3DOF.h: interface for the CustomPlane3DOF class.
+// dCustomPlane3DOF.h: interface for the dCustomPlane3DOF class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -21,37 +21,37 @@
 #include "dCustomJoint.h"
 
 
-class CustomPlane3DOF: public dCustomJoint  
+class dCustomPlane3DOF: public dCustomJoint  
 {
 	public:
-	CUSTOM_JOINTS_API CustomPlane3DOF (const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API virtual ~CustomPlane3DOF();
+	CUSTOM_JOINTS_API dCustomPlane3DOF (const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~dCustomPlane3DOF();
 
 	protected:
-	CUSTOM_JOINTS_API CustomPlane3DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API dCustomPlane3DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	
-	DECLARE_CUSTOM_JOINT(CustomPlane3DOF, dCustomJoint)
+	DECLARE_CUSTOM_JOINT(dCustomPlane3DOF, dCustomJoint)
 };
 
 
-class CustomPlane5DOF : public dCustomJoint
+class dCustomPlane5DOF : public dCustomJoint
 {
 	public:
-	CUSTOM_JOINTS_API CustomPlane5DOF(const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API virtual ~CustomPlane5DOF();
+	CUSTOM_JOINTS_API dCustomPlane5DOF(const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~dCustomPlane5DOF();
 
 	protected:
-	CUSTOM_JOINTS_API CustomPlane5DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API dCustomPlane5DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
 
-	DECLARE_CUSTOM_JOINT(CustomPlane5DOF, dCustomJoint)
+	DECLARE_CUSTOM_JOINT(dCustomPlane5DOF, dCustomJoint)
 };
 
 

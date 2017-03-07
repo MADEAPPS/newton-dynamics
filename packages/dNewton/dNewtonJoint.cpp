@@ -120,43 +120,43 @@ void dNewtonHingeJoint::SetLimits(dFloat minAngle, dFloat maxAngle)
 dNewtonSliderJoint::dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_slider)
 {
-	SetJoint (new CustomSlider (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	SetJoint (new dCustomSlider (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
 void dNewtonSliderJoint::EnableLimits(bool state)
 {
-    ((CustomSlider*) m_joint)->EnableLimits(state);
+    ((dCustomSlider*) m_joint)->EnableLimits(state);
 }
 
 void dNewtonSliderJoint::SetLimits(dFloat minDist, dFloat maxDist)
 {
-    ((CustomSlider*) m_joint)->SetLimits(minDist, maxDist);
+    ((dCustomSlider*) m_joint)->SetLimits(minDist, maxDist);
 }
 
 dNewtonUniversalJoint::dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_universal)
 {
-	SetJoint (new CustomUniversal (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	SetJoint (new dCustomUniversal (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
 void dNewtonUniversalJoint::EnableLimit_0(bool state)
 {
-	((CustomUniversal*) m_joint)->EnableLimit_0(state);
+	((dCustomUniversal*) m_joint)->EnableLimit_0(state);
 }
 
 void dNewtonUniversalJoint::EnableLimit_1(bool state)
 {
-	((CustomUniversal*) m_joint)->EnableLimit_1(state);
+	((dCustomUniversal*) m_joint)->EnableLimit_1(state);
 }
 
 void dNewtonUniversalJoint::SetLimits_0(dFloat minAngle, dFloat maxAngle)
 {
-	((CustomUniversal*) m_joint)->SetLimits_0 (minAngle, maxAngle);
+	((dCustomUniversal*) m_joint)->SetLimits_0 (minAngle, maxAngle);
 }
 
 void dNewtonUniversalJoint::SetLimits_1(dFloat minAngle, dFloat maxAngle)
 {
-	((CustomUniversal*) m_joint)->SetLimits_1 (minAngle, maxAngle);
+	((dCustomUniversal*) m_joint)->SetLimits_1 (minAngle, maxAngle);
 }
 
 
@@ -196,12 +196,12 @@ dNewtonGearJoint::dNewtonGearJoint(dFloat ratio, const dFloat* const body0Pin, d
 dNewtonPulleyJoint::dNewtonPulleyJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1)
     :dNewtonJoint(m_pulley)
 {
-    SetJoint (new CustomPulley (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
+    SetJoint (new dCustomPulley (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
 }
 
 dNewtonGearAndRackJoint::dNewtonGearAndRackJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1)
     :dNewtonJoint(m_gearAndRack)
 {
-    SetJoint (new CustomRackAndPinion (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
+    SetJoint (new dCustomRackAndPinion (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
 }
 

@@ -10,21 +10,21 @@
 */
 
 
-// CustomPlane3DOF.cpp: implementation of the CustomPlane3DOF class.
+// dCustomPlane3DOF.cpp: implementation of the dCustomPlane3DOF class.
 //
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
-#include "CustomPlane.h"
+#include "dCustomPlane.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_CUSTOM_JOINT(CustomPlane3DOF);
-IMPLEMENT_CUSTOM_JOINT(CustomPlane5DOF);
+IMPLEMENT_CUSTOM_JOINT(dCustomPlane3DOF);
+IMPLEMENT_CUSTOM_JOINT(dCustomPlane5DOF);
 
 
-CustomPlane5DOF::CustomPlane5DOF(const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent)
+dCustomPlane5DOF::dCustomPlane5DOF(const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(1, child, parent)
 {
 	dMatrix pinAndPivotFrame(dGrammSchmidt(normal));
@@ -34,30 +34,30 @@ CustomPlane5DOF::CustomPlane5DOF(const dVector& pivot, const dVector& normal, Ne
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-CustomPlane5DOF::CustomPlane5DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+dCustomPlane5DOF::dCustomPlane5DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:dCustomJoint(child, parent, callback, userData)
 {
 }
 
-void CustomPlane5DOF::Serialize(NewtonSerializeCallback callback, void* const userData) const
+void dCustomPlane5DOF::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize(callback, userData);
 }
 
 
-CustomPlane5DOF::~CustomPlane5DOF()
+dCustomPlane5DOF::~dCustomPlane5DOF()
 {
 }
 
 
-void CustomPlane5DOF::GetInfo(NewtonJointRecord* const info) const
+void dCustomPlane5DOF::GetInfo(NewtonJointRecord* const info) const
 {
 	strcpy(info->m_descriptionType, GetTypeName());
 	dAssert(0);
 }
 
 
-void CustomPlane5DOF::SubmitConstraints(dFloat timestep, int threadIndex)
+void dCustomPlane5DOF::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -73,18 +73,7 @@ void CustomPlane5DOF::SubmitConstraints(dFloat timestep, int threadIndex)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-CustomPlane3DOF::CustomPlane3DOF (const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent)
+dCustomPlane3DOF::dCustomPlane3DOF (const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(3, child, parent)
 {
 	dMatrix pinAndPivotFrame(dGrammSchmidt(normal));
@@ -94,23 +83,23 @@ CustomPlane3DOF::CustomPlane3DOF (const dVector& pivot, const dVector& normal, N
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-CustomPlane3DOF::CustomPlane3DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+dCustomPlane3DOF::dCustomPlane3DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:dCustomJoint(child, parent, callback, userData)
 {
 }
 
-void CustomPlane3DOF::Serialize(NewtonSerializeCallback callback, void* const userData) const
+void dCustomPlane3DOF::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize(callback, userData);
 }
 
 
-CustomPlane3DOF::~CustomPlane3DOF()
+dCustomPlane3DOF::~dCustomPlane3DOF()
 {
 }
 
 
-void CustomPlane3DOF::GetInfo (NewtonJointRecord* const info) const
+void dCustomPlane3DOF::GetInfo (NewtonJointRecord* const info) const
 {
 	strcpy (info->m_descriptionType, GetTypeName());
 	dAssert(0);
@@ -119,7 +108,7 @@ void CustomPlane3DOF::GetInfo (NewtonJointRecord* const info) const
 
 
 
-void CustomPlane3DOF::SubmitConstraints (dFloat timestep, int threadIndex)
+void dCustomPlane3DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
