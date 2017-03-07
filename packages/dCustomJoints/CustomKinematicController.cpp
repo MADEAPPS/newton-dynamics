@@ -13,7 +13,7 @@
 // CustomKinematicController.cpp: implementation of the CustomKinematicController class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <CustomJointLibraryStdAfx.h>
+#include <dCustomJointLibraryStdAfx.h>
 #include <CustomKinematicController.h>
 
 //////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@
 //dInitRtti(CustomKinematicController);
 
 CustomKinematicController::CustomKinematicController(NewtonBody* const body, const dVector& handleInGlobalSpace)
-	:CustomJoint(6, body, NULL)
+	:dCustomJoint(6, body, NULL)
 {
 	dMatrix matrix;
 

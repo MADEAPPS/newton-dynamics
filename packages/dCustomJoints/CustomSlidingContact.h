@@ -18,9 +18,9 @@
 #ifndef _CUSTOM_SLIDING_H_
 #define _CUSTOM_SLIDING_H_
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
-class CustomSlidingContact: public CustomJoint  
+class CustomSlidingContact: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomSlidingContact (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -64,7 +64,7 @@ class CustomSlidingContact: public CustomJoint
 			unsigned m_lastRowWasUsed	 : 1;
 		};
 	};
-	DECLARE_CUSTOM_JOINT(CustomSlidingContact, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomSlidingContact, dCustomJoint)
 };
 
 #endif 

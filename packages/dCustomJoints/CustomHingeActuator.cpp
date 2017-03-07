@@ -19,7 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomHingeActuator.h"
 
 CustomHingeActuator::CustomHingeActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)

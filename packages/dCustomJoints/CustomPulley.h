@@ -17,7 +17,7 @@
 #ifndef _CustomPulley_H__
 #define _CustomPulley_H__
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
 // this joint is for used in conjunction with Slider of other linear joints
 // is is useful for establishing synchronization between the rel;ative position 
@@ -26,7 +26,7 @@
 // where v0 and v1 are the linear velocity
 // n is the number of turn on the pulley, in the case of this joint N coudl
 // be a value with fraction, as this joint is a generalization of the pulley idea.
-class CustomPulley: public CustomJoint  
+class CustomPulley: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomPulley(dFloat pulleyRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const parenPin, NewtonBody* const parent);
@@ -40,7 +40,7 @@ class CustomPulley: public CustomJoint
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_gearRatio;
-	DECLARE_CUSTOM_JOINT(CustomPulley, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomPulley, dCustomJoint)
 };
 
 /*

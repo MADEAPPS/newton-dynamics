@@ -17,7 +17,7 @@
 #ifndef D_CUSTOM_PLAYER_CONTROLLER_MANAGER_H_
 #define D_CUSTOM_PLAYER_CONTROLLER_MANAGER_H_
 
-#include <CustomJointLibraryStdAfx.h>
+#include <dCustomJointLibraryStdAfx.h>
 #include <CustomControllerManager.h>
 
 

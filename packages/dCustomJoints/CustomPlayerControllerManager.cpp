@@ -13,8 +13,8 @@
 // NewtonCustomJoint.cpp: implementation of the NewtonCustomJoint class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <CustomJointLibraryStdAfx.h>
-#include <CustomJoint.h>
+#include <dCustomJointLibraryStdAfx.h>
+#include <dCustomJoint.h>
 #include <CustomPlayerControllerManager.h>
 
 

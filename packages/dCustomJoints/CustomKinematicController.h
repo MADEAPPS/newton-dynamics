@@ -19,9 +19,9 @@
 #define __CUSTOM_KINEMATIC_CONTROLLER_H__
 
 
-#include <CustomJoint.h>
+#include <dCustomJoint.h>
 
-class CustomKinematicController: public CustomJoint
+class CustomKinematicController: public dCustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API CustomKinematicController (NewtonBody* const body, const dVector& attachmentPointInGlobalSpace);

@@ -18,7 +18,7 @@
 #define _DRY_ROLLOING_FRICTION3D1046F4_
 
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
 
 // this joint is usefully to simulate the rolling friction of a rolling ball over 
@@ -26,7 +26,7 @@
 // normally this is not important for non spherical objects, but for games like 
 // poll, pinball, bolling, golf or any other where the movement of balls is the main objective
 // the rolling friction is a real big problem.
-class CustomDryRollingFriction: public CustomJoint  
+class CustomDryRollingFriction: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomDryRollingFriction(NewtonBody* const child, dFloat radius, dFloat coefficient);

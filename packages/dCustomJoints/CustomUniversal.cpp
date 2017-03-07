@@ -14,7 +14,7 @@
 // CustomUniversal.cpp: implementation of the CustomUniversal class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomUniversal.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@
 IMPLEMENT_CUSTOM_JOINT(CustomUniversal);
 
 CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 	,m_curJointAngle_0()
 	,m_curJointAngle_1()
 	,m_flags(0)
@@ -54,7 +54,7 @@ CustomUniversal::CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* co
 }
 
 CustomUniversal::CustomUniversal(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 	callback(userData, &m_curJointAngle_0, sizeof(AngularIntegration));
 	callback(userData, &m_curJointAngle_1, sizeof(AngularIntegration));
@@ -76,7 +76,7 @@ CustomUniversal::CustomUniversal(NewtonBody* const child, NewtonBody* const pare
 
 void CustomUniversal::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize(callback, userData);
+	dCustomJoint::Serialize(callback, userData);
 
 	callback(userData, &m_curJointAngle_0, sizeof(AngularIntegration));
 	callback(userData, &m_curJointAngle_1, sizeof(AngularIntegration));

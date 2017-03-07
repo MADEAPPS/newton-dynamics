@@ -12,7 +12,7 @@
 // CustomSlider.cpp: implementation of the CustomSlider class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomSliderActuator.h"
 
 

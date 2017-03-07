@@ -14,7 +14,7 @@
 // CustomSlidingContact.cpp: implementation of the CustomSlidingContact class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomSlidingContact.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@
 IMPLEMENT_CUSTOM_JOINT(CustomSlidingContact);
 
 CustomSlidingContact::CustomSlidingContact (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 	,m_curJointAngle()
 	,m_speed(0.0f)
 	,m_posit(0.0f)
@@ -42,7 +42,7 @@ CustomSlidingContact::CustomSlidingContact (const dMatrix& pinAndPivotFrame, New
 }
 
 CustomSlidingContact::CustomSlidingContact(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
 	callback(userData, &m_speed, sizeof(dFloat));
@@ -59,7 +59,7 @@ CustomSlidingContact::CustomSlidingContact(NewtonBody* const child, NewtonBody* 
 
 void CustomSlidingContact::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize(callback, userData);
+	dCustomJoint::Serialize(callback, userData);
 
 	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
 	callback(userData, &m_speed, sizeof(dFloat));

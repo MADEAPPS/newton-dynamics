@@ -13,7 +13,7 @@
 // CustomPulley.cpp: implementation of the CustomPulley class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomPulley.h"
 
 //dInitRtti(CustomPulley);
@@ -23,7 +23,7 @@ IMPLEMENT_CUSTOM_JOINT(CustomPulley);
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 CustomPulley::CustomPulley(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(1, child, parent)
+	:dCustomJoint(1, child, parent)
 {
 	m_gearRatio = gearRatio;
 
@@ -48,14 +48,14 @@ CustomPulley::~CustomPulley()
 }
 
 CustomPulley::CustomPulley (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 	callback (userData, &m_gearRatio, sizeof (dFloat));
 }
 
 void CustomPulley::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize (callback, userData);
+	dCustomJoint::Serialize (callback, userData);
 	callback (userData, &m_gearRatio, sizeof (dFloat));
 }
 

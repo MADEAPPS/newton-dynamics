@@ -13,7 +13,7 @@
 // CustomCorkScrew.cpp: implementation of the CustomCorkScrew class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomCorkScrew.h"
 
 
@@ -25,7 +25,7 @@ IMPLEMENT_CUSTOM_JOINT(CustomCorkScrew);
 //////////////////////////////////////////////////////////////////////
 
 CustomCorkScrew::CustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 	,m_curJointAngle()
 {
 	m_limitsLinearOn = false;
@@ -48,7 +48,7 @@ CustomCorkScrew::~CustomCorkScrew()
 }
 
 CustomCorkScrew::CustomCorkScrew (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 	callback (userData, &m_minLinearDist, sizeof (dFloat));
 	callback (userData, &m_maxLinearDist, sizeof (dFloat));
@@ -67,7 +67,7 @@ CustomCorkScrew::CustomCorkScrew (NewtonBody* const child, NewtonBody* const par
 
 void CustomCorkScrew::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize (callback, userData);
+	dCustomJoint::Serialize (callback, userData);
 
 	callback (userData, &m_minLinearDist, sizeof (dFloat));
 	callback (userData, &m_maxLinearDist, sizeof (dFloat));

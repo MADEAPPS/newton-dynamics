@@ -18,10 +18,10 @@
 #ifndef _CUSTOM_PLANE_H_
 #define _CUSTOM_PLANE_H_
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
 
-class CustomPlane3DOF: public CustomJoint  
+class CustomPlane3DOF: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomPlane3DOF (const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -34,11 +34,11 @@ class CustomPlane3DOF: public CustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	
-	DECLARE_CUSTOM_JOINT(CustomPlane3DOF, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomPlane3DOF, dCustomJoint)
 };
 
 
-class CustomPlane5DOF : public CustomJoint
+class CustomPlane5DOF : public dCustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API CustomPlane5DOF(const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -51,7 +51,7 @@ class CustomPlane5DOF : public CustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
 
-	DECLARE_CUSTOM_JOINT(CustomPlane5DOF, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomPlane5DOF, dCustomJoint)
 };
 
 

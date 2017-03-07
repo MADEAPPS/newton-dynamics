@@ -13,7 +13,7 @@
 // CustomUpVector.cpp: implementation of the CustomUpVector class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomDryRollingFriction.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@
 //dInitRtti(CustomDryRollingFriction);
 
 CustomDryRollingFriction::CustomDryRollingFriction(NewtonBody* child, dFloat radius, dFloat coefficient)
-	:CustomJoint(1, child, NULL)
+	:dCustomJoint(1, child, NULL)
 {
 	dFloat mass;
 	dFloat Ixx;

@@ -14,7 +14,7 @@
 // CustomSlider.cpp: implementation of the CustomSlider class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomSlider.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@
 IMPLEMENT_CUSTOM_JOINT(CustomSlider);
 
 CustomSlider::CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 	,m_speed(0.0f)
 	,m_posit(0.0f)
 	,m_minDist(-1.0f)
@@ -43,7 +43,7 @@ CustomSlider::CustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const c
 
 
 CustomSlider::CustomSlider (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 	callback (userData, &m_speed, sizeof (dFloat));
 	callback (userData, &m_posit, sizeof (dFloat));
@@ -61,7 +61,7 @@ CustomSlider::~CustomSlider()
 
 void CustomSlider::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize (callback, userData);
+	dCustomJoint::Serialize (callback, userData);
 
 	callback (userData, &m_speed, sizeof (dFloat));
 	callback (userData, &m_posit, sizeof (dFloat));

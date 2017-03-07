@@ -17,7 +17,7 @@
 #ifndef _CustomWormGear_H_
 #define _CustomWormGear_H_
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
 // this joint is for used in conjunction with Hinge of other spherical joints
 // is is useful for establishing synchronization between the phase angle other the 
@@ -25,7 +25,7 @@
 // velErro = -(W0 * r0 + W1 * r1)
 // where w0 and W1 are the angular velocity
 // r0 and r1 are the radius of the spinning disk
-class CustomRackAndPinion: public CustomJoint  
+class CustomRackAndPinion: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody);
@@ -39,7 +39,7 @@ class CustomRackAndPinion: public CustomJoint
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_gearRatio;
-	DECLARE_CUSTOM_JOINT(CustomRackAndPinion, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomRackAndPinion, dCustomJoint)
 };
 
 #endif // !defined(AFX_CustomWormGear_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)

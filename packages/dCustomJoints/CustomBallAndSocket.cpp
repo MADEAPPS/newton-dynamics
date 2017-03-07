@@ -13,7 +13,7 @@
 // CustomBallAndSocket.cpp: implementation of the CustomBallAndSocket class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomBallAndSocket.h"
 
 
@@ -29,7 +29,7 @@ IMPLEMENT_CUSTOM_JOINT(CustomControlledBallAndSocket);
 
 
 CustomPointToPoint::CustomPointToPoint(const dVector& pivotInChildInGlobalSpace, const dVector& pivotInParentInGlobalSpace, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 {
 	dVector dist(pivotInChildInGlobalSpace - pivotInParentInGlobalSpace);
 	m_distance = dSqrt(dist.DotProduct3(dist));
@@ -53,18 +53,18 @@ CustomPointToPoint::~CustomPointToPoint()
 
 
 CustomPointToPoint::CustomPointToPoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 }
 
 void CustomPointToPoint::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize (callback, userData);
+	dCustomJoint::Serialize (callback, userData);
 }
 
 void CustomPointToPoint::GetInfo(NewtonJointRecord* const info) const
 {
-	CustomJoint::GetInfo(info);
+	dCustomJoint::GetInfo(info);
 }
 
 
@@ -143,13 +143,13 @@ void CustomPointToPoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 
 CustomBallAndSocket::CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 {
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
 CustomBallAndSocket::CustomBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix (pinAndPivotFrame0, m_localMatrix0, dummy);
@@ -162,13 +162,13 @@ CustomBallAndSocket::~CustomBallAndSocket()
 }
 
 CustomBallAndSocket::CustomBallAndSocket (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 }
 
 void CustomBallAndSocket::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize (callback, userData);
+	dCustomJoint::Serialize (callback, userData);
 }
 
 

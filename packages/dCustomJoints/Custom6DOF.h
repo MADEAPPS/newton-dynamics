@@ -18,9 +18,9 @@
 #ifndef _CUSTOM_6DOF_H_
 #define _CUSTOM_6DOF_H_
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
-class Custom6DOF: public CustomJoint  
+class Custom6DOF: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API Custom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pinsAndPivotParentFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -45,7 +45,7 @@ class Custom6DOF: public CustomJoint
 	AngularIntegration m_pitch;
 	AngularIntegration m_yaw;
 	AngularIntegration m_roll;
-	DECLARE_CUSTOM_JOINT(Custom6DOF, CustomJoint)
+	DECLARE_CUSTOM_JOINT(Custom6DOF, dCustomJoint)
 };
 
 #endif // !defined(AFX_Custom6DOF_H__B631F556_B7D7_F85ECF3E9ADE_H)

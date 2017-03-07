@@ -130,7 +130,7 @@ typedef long long unsigned64;
 #include <dMathDefines.h>
 #include <dBezierSpline.h>
 
-#include <CustomJoint.h>
+#include <dCustomJoint.h>
 #include <CustomGear.h>
 #include <CustomHinge.h>
 #include <CustomHingeActuator.h>

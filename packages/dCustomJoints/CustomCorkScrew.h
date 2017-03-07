@@ -17,9 +17,9 @@
 #ifndef _CUSTOMCORKSCREW_H_
 #define _CUSTOMCORKSCREW_H_
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
-class CustomCorkScrew: public CustomJoint  
+class CustomCorkScrew: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomCorkScrew (const dMatrix& pinAndPivotFrame, NewtonBody* child, NewtonBody* parent = NULL);
@@ -48,7 +48,7 @@ class CustomCorkScrew: public CustomJoint
 	bool m_limitsAngularOn;
 	bool m_angularmotorOn;
 
-	DECLARE_CUSTOM_JOINT(CustomCorkScrew, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomCorkScrew, dCustomJoint)
 };
 
 #endif // !defined(AFX_CUSTOMCORKSCREW_H__B631F556_468B_4331_B7D7_F85ECF3E9ADE_H)

@@ -10,9 +10,10 @@
 */
 
 
-#include "CustomJointLibraryStdAfx.h"
-#include "CustomJoint.h"
+#include "dCustomJointLibraryStdAfx.h"
+#include "dCustomJoint.h"
 #include "CustomGear.h"
+#include "CustomHinge.h"
 #include "CustomUniversal.h"
 #include "CustomVehicleControllerManager.h"
 
@@ -72,20 +73,18 @@ class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexC
 };
 
 
-class CustomVehicleController::EngineJoint: public CustomUniversal
+class CustomVehicleController::EngineJoint: public CustomHinge
 {
 	public:
 	EngineJoint (const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
-		:CustomUniversal(pinAndPivotFrame, engineBody, chassisBody)
-		,m_dryFrictionTorque(20.0f)
-		,m_slipDifferentialSpeed(0.0f)
-		,m_slipDifferentialOn(true)
+		:CustomHinge(pinAndPivotFrame, engineBody, chassisBody)
 	{
-		EnableLimit_0(false);
-		EnableLimit_1(false);
-
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
+
+		EnableLimits(false);
+		SetDryFriction(0.0f);
+
 		NewtonBodyGetMatrix(engineBody, &engineMatrix[0][0]);
 		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 		m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
@@ -93,7 +92,8 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 
 	void SetDryFriction(dFloat friction)
 	{
-		m_dryFrictionTorque = dMax (friction, 1.0f);
+		friction = dAbs(friction);
+		SetFriction(friction > 1.0f ? friction : 0.0f);
 	}
 
 	void ProjectError()
@@ -122,56 +122,7 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 		NewtonBodySetVelocityNoSleep(engineBody, &engineVelocity[0]);
 	}
 
-	void SubmitConstraints(dFloat timestep, int threadIndex)
-	{
-		dMatrix chassisMatrix;
-		dMatrix engineMatrix;
-		dVector chassisOmega(0.0f);
-		dVector engineOmega(0.0f);
-
-		CustomUniversal::SubmitConstraints(timestep, threadIndex);
-
-		// y axis controls the slip differential feature.
-		NewtonBody* const engineBody = GetBody0();
-		NewtonBody* const chassisBody = GetBody1();
-
-		NewtonBodyGetOmega(engineBody, &engineOmega[0]);
-		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
-
-		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-		CalculateGlobalMatrix(engineMatrix, chassisMatrix);
-		dVector relOmega (engineOmega - chassisOmega);
-
-		// apply engine internal dry friction
-		dFloat engineSpeed = chassisMatrix.m_up.DotProduct3(relOmega);
-//static int xxx;
-//xxx ++;
-//dTrace (("rpm %d %f %f %f\n", xxx, relOmega[0], relOmega[1], relOmega[2]));
-
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &chassisMatrix.m_up[0]);
-		NewtonUserJointSetRowAcceleration(m_joint, -engineSpeed/timestep);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_dryFrictionTorque);
-		NewtonUserJointSetRowMaximumFriction(m_joint,  m_dryFrictionTorque);
-		
-		// apply differential
-		dFloat differentailOmega = engineMatrix.m_front.DotProduct3(relOmega);
-		if (differentailOmega > D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
-			dFloat wAlpha = (D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_front[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
-			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-		} else if (differentailOmega < - D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
-			dFloat wAlpha = (-D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_front[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		}
-	}
-
 	dMatrix m_baseOffsetMatrix;
-	dFloat m_dryFrictionTorque;
-	dFloat m_slipDifferentialSpeed;
-	bool m_slipDifferentialOn;
 };
 
 
@@ -280,11 +231,11 @@ class CustomVehicleController::DifferentialJoint : public CustomUniversal
 };
 */
 
-class CustomVehicleController::WheelJoint : public CustomJoint
+class CustomVehicleController::WheelJoint : public dCustomJoint
 {
 	public:
 	WheelJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const tireBody, NewtonBody* const chassisBody, BodyPartTire* const tireData)
-		:CustomJoint(6, tireBody, chassisBody)
+		:dCustomJoint(6, tireBody, chassisBody)
 		,m_lateralDir(0.0f)
 		,m_longitudinalDir(0.0f)
 		,m_tire(tireData)

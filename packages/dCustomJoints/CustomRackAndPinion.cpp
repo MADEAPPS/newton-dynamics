@@ -12,7 +12,7 @@
 // CustomWormGear.cpp: implementation of the CustomWormGear class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomRackAndPinion.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@
 IMPLEMENT_CUSTOM_JOINT(CustomRackAndPinion);
 
 CustomRackAndPinion::CustomRackAndPinion(dFloat gearRatio, const dVector& rotationalPin, const dVector& linearPin, NewtonBody* rotationalBody, NewtonBody* linearBody)
-	:CustomJoint(2, rotationalBody, linearBody)
+	:dCustomJoint(2, rotationalBody, linearBody)
 {
 	m_gearRatio = gearRatio;
 
@@ -47,14 +47,14 @@ CustomRackAndPinion::~CustomRackAndPinion()
 }
 
 CustomRackAndPinion::CustomRackAndPinion (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 	callback (userData, &m_gearRatio, sizeof (dFloat));
 }
 
 void CustomRackAndPinion::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize (callback, userData);
+	dCustomJoint::Serialize (callback, userData);
 	callback (userData, &m_gearRatio, sizeof (dFloat));
 }
 

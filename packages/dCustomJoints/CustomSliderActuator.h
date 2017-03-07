@@ -17,7 +17,7 @@
 #ifndef _CUSTOM_SLIDER_ACTUATOR_H__
 #define _CUSTOM_SLIDER_ACTUATOR_H__
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 #include "CustomSlider.h"
 
 class CustomSliderActuator: public CustomSlider

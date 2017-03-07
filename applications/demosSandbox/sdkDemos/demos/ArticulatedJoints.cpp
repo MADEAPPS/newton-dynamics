@@ -163,7 +163,7 @@ class ArticulatedEntityModel: public DemoEntity
 		m_inputs = inputs;
 	}
 
-	void LinkFrontTire (NewtonBody* const chassis, NewtonBody* const tire, dList<CustomJoint*>& cycleLinks)
+	void LinkFrontTire (NewtonBody* const chassis, NewtonBody* const tire, dList<dCustomJoint*>& cycleLinks)
 	{
 		dMatrix tireMatrix;
 		dMatrix chassisMatrix;
@@ -688,7 +688,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 
 
-	void ConnectBodyPart (ArticulatedEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<CustomJoint*>& cycleLinks)
+	void ConnectBodyPart (ArticulatedEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
 	{
 		if (jointArticulation == "") {
 			// this is the root body do nothing
@@ -763,7 +763,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			stackIndex ++;
 		}
 
-		dList<CustomJoint*> cycleLinks;
+		dList<dCustomJoint*> cycleLinks;
 		while (stackIndex) {
 			stackIndex --;
 			DemoEntity* const entity = childEntities[stackIndex];
@@ -925,7 +925,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return bone;
 	}
 
-	CustomJoint* LinkTires(CustomArticulatedTransformController::dSkeletonBone* const master, CustomArticulatedTransformController::dSkeletonBone* const slave, CustomArticulatedTransformController::dSkeletonBone* const root)
+	dCustomJoint* LinkTires(CustomArticulatedTransformController::dSkeletonBone* const master, CustomArticulatedTransformController::dSkeletonBone* const slave, CustomArticulatedTransformController::dSkeletonBone* const root)
 	{
 		NewtonCollisionInfoRecord masterTire;
 		NewtonCollisionInfoRecord slaveTire;

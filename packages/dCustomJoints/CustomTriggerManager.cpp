@@ -13,8 +13,8 @@
 // NewtonPlayerControllerManager.h: interface for the NewtonPlayerControllerManager class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <CustomJointLibraryStdAfx.h>
-#include <CustomJoint.h>
+#include <dCustomJointLibraryStdAfx.h>
+#include <dCustomJoint.h>
 #include <CustomTriggerManager.h>
 
 CustomTriggerManager::CustomTriggerManager(NewtonWorld* const world)
@@ -56,7 +56,7 @@ void CustomTriggerManager::OnDestroyBody (NewtonBody* const body)
 		if (passengerNode) {
 			//EventCallback (&controller, m_exitTrigger, body);
 
-			CustomScopeLock lock (&m_lock);
+			dCustomScopeLock lock (&m_lock);
 			manifest.Remove (passengerNode);
 		}
 	}
@@ -80,7 +80,7 @@ void CustomTriggerManager::UpdateTrigger (CustomTriggerController* const control
 				EventCallback (controller, m_inTrigger, passangerBody);
 
 			} else {
-				CustomScopeLock lock (&m_lock);
+				dCustomScopeLock lock (&m_lock);
 				manifest.Insert (passangerBody, passangerBody);
 				EventCallback (controller, m_enterTrigger, passangerBody);
 			} 
@@ -90,7 +90,7 @@ void CustomTriggerManager::UpdateTrigger (CustomTriggerController* const control
 			if (passengerNode) {
 				EventCallback (controller, m_exitTrigger, passangerBody);
 
-				CustomScopeLock lock (&m_lock);
+				dCustomScopeLock lock (&m_lock);
 				manifest.Remove (passengerNode);
 			}
 		}

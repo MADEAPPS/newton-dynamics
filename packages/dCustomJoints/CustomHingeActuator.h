@@ -23,7 +23,7 @@
 #ifndef _CUSTOM_HINGE_ACTUATOR_H_
 #define _CUSTOM_HINGE_ACTUATOR_H_
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 #include "CustomHinge.h"
 
 class CustomHingeActuator: public CustomHinge

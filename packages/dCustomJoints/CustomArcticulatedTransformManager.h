@@ -15,7 +15,7 @@
 #ifndef D_CUSTOM_ARTICULATED_TRANSFORM_MANAGER_H_
 #define D_CUSTOM_ARTICULATED_TRANSFORM_MANAGER_H_
 
-#include <CustomJointLibraryStdAfx.h>
+#include <dCustomJointLibraryStdAfx.h>
 #include <CustomControllerManager.h>
 
 #define D_HIERACHICAL_CONTROLLER_MAX_BONES	64
@@ -101,7 +101,7 @@ class CustomArticulatedTransformController: public CustomControllerBase
 
 	CUSTOM_JOINTS_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
 
-	CUSTOM_JOINTS_API void LinkCycleBones(CustomJoint* ) const;
+	CUSTOM_JOINTS_API void LinkCycleBones(dCustomJoint* ) const;
 
 	void SetCalculateLocalTransforms (bool val) {m_calculateLocalTransform = val;}
 	bool GetCalculateLocalTransforms () const {return m_calculateLocalTransform;}

@@ -17,8 +17,8 @@
 #ifndef D_CUSTOM_VEHICLE_CONTROLLER_MANAGER_H_
 #define D_CUSTOM_VEHICLE_CONTROLLER_MANAGER_H_
 
-#include <CustomJointLibraryStdAfx.h>
-#include <CustomAlloc.h>
+#include <dCustomJointLibraryStdAfx.h>
+#include <dCustomAlloc.h>
 #include <CustomControllerManager.h>
 
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
@@ -36,7 +36,7 @@ class CustomVehicleController: public CustomControllerBase
 	class DifferentialJoint;
 	class SteeringController;
 
-	class Controller: public CustomAlloc
+	class Controller: public dCustomAlloc
 	{
 		public:
 		Controller(CustomVehicleController* const controller)
@@ -83,7 +83,7 @@ class CustomVehicleController: public CustomControllerBase
 		mutable dFloat m_timer;
 	};
 
-	class BodyPart: public CustomAlloc
+	class BodyPart: public dCustomAlloc
 	{
 		public:
 		BodyPart()
@@ -98,7 +98,7 @@ class CustomVehicleController: public CustomControllerBase
 
 		BodyPart* GetParent() const {return m_parent;}
 		NewtonBody* GetBody() const	{return m_body;}
-		CustomJoint* GetJoint() const{return m_joint;}
+		dCustomJoint* GetJoint() const{return m_joint;}
 		void* GetUserData() const {return m_userData;}
 		CustomVehicleController* GetController() const{return m_controller;}
 		virtual void ProjectError() {}
@@ -106,7 +106,7 @@ class CustomVehicleController: public CustomControllerBase
 		protected:
 		BodyPart* m_parent;
 		NewtonBody* m_body;
-		CustomJoint* m_joint;
+		dCustomJoint* m_joint;
 		
 		void* m_userData;
 		CustomVehicleController* m_controller;

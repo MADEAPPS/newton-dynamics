@@ -10,7 +10,7 @@
 */
 
 //////////////////////////////////////////////////////////////////////
-#include <CustomJointLibraryStdAfx.h>
+#include <dCustomJointLibraryStdAfx.h>
 #include <CustomDynamicRagDollManager.h>
 
 IMPLEMENT_CUSTOM_JOINT(DynamicRagDollJoint);

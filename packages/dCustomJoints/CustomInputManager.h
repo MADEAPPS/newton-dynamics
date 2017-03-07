@@ -23,7 +23,7 @@
 #ifndef D_CUSTOM_IMPUT_MANAGER_H_
 #define D_CUSTOM_IMPUT_MANAGER_H_
 
-#include <CustomJointLibraryStdAfx.h>
+#include <dCustomJointLibraryStdAfx.h>
 #include <CustomControllerManager.h>
 
 #define INPUT_PLUGIN_NAME				"__inputManager__"

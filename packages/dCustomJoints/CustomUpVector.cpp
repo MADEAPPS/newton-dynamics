@@ -14,7 +14,7 @@
 // CustomUpVector.cpp: implementation of the CustomUpVector class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomUpVector.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@
 //dInitRtti(CustomUpVector);
 
 CustomUpVector::CustomUpVector(const dVector& pin, NewtonBody* child)
-	:CustomJoint(2, child, NULL)
+	:dCustomJoint(2, child, NULL)
 {
 	dMatrix pivot;
 

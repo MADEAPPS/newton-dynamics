@@ -13,7 +13,7 @@
 // CustomPathFollow.cpp: implementation of the CustomPathFollow class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomPathFollow.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@
 
 
 CustomPathFollow::CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);

@@ -17,10 +17,10 @@
 #ifndef _CUSTOMUPVECTOR_H_
 #define _CUSTOMUPVECTOR_H_
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
 // This joint is useful to for implementing character controllers, and also precise object picking
-class CustomUpVector: public CustomJoint
+class CustomUpVector: public dCustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API CustomUpVector(const dVector& pin, NewtonBody* child);

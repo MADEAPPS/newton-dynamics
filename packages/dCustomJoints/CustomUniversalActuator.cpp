@@ -13,7 +13,7 @@
 // CustomUniversal.cpp: implementation of the CustomUniversal class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomUniversalActuator.h"
 
 

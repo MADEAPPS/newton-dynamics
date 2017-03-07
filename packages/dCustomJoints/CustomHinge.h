@@ -17,9 +17,9 @@
 #ifndef _CUSTOMHINGE_H_
 #define _CUSTOMHINGE_H_
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
-class CustomHinge: public CustomJoint  
+class CustomHinge: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -71,7 +71,7 @@ class CustomHinge: public CustomJoint
 		};
 	};
 
-	DECLARE_CUSTOM_JOINT(CustomHinge, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomHinge, dCustomJoint)
 };
 
 #endif 

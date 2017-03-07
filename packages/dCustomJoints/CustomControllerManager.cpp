@@ -15,8 +15,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#include <CustomJointLibraryStdAfx.h>
-#include <CustomJoint.h>
+#include <dCustomJointLibraryStdAfx.h>
+#include <dCustomJoint.h>
 #include <CustomControllerManager.h>
 
 

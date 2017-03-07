@@ -13,7 +13,7 @@
 // CustomPlane3DOF.cpp: implementation of the CustomPlane3DOF class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomPlane.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ IMPLEMENT_CUSTOM_JOINT(CustomPlane5DOF);
 
 
 CustomPlane5DOF::CustomPlane5DOF(const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(1, child, parent)
+	:dCustomJoint(1, child, parent)
 {
 	dMatrix pinAndPivotFrame(dGrammSchmidt(normal));
 	pinAndPivotFrame.m_posit = pivot;
@@ -35,13 +35,13 @@ CustomPlane5DOF::CustomPlane5DOF(const dVector& pivot, const dVector& normal, Ne
 }
 
 CustomPlane5DOF::CustomPlane5DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 }
 
 void CustomPlane5DOF::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize(callback, userData);
+	dCustomJoint::Serialize(callback, userData);
 }
 
 
@@ -85,7 +85,7 @@ void CustomPlane5DOF::SubmitConstraints(dFloat timestep, int threadIndex)
 
 
 CustomPlane3DOF::CustomPlane3DOF (const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(3, child, parent)
+	:dCustomJoint(3, child, parent)
 {
 	dMatrix pinAndPivotFrame(dGrammSchmidt(normal));
 	pinAndPivotFrame.m_posit = pivot;
@@ -95,13 +95,13 @@ CustomPlane3DOF::CustomPlane3DOF (const dVector& pivot, const dVector& normal, N
 }
 
 CustomPlane3DOF::CustomPlane3DOF(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 }
 
 void CustomPlane3DOF::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize(callback, userData);
+	dCustomJoint::Serialize(callback, userData);
 }
 
 

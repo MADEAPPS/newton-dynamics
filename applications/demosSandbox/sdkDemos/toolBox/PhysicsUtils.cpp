@@ -45,7 +45,7 @@ dVector ForceBetweenBody (NewtonBody* const body0, NewtonBody* const body1)
 void GetConnectedBodiesByJoints (NewtonBody* const body) 
 {
 	for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body); joint; joint = NewtonBodyGetNextJoint(body, joint)) {
-		CustomJoint* const customJoint = (CustomJoint*) NewtonJointGetUserData(joint);
+		dCustomJoint* const customJoint = (dCustomJoint*) NewtonJointGetUserData(joint);
 		NewtonBody* const body0 = customJoint->GetBody0();
 		NewtonBody* const body1 = customJoint->GetBody1();
 		NewtonBody* const otherBody = (body0 == body) ? body1 : body0;

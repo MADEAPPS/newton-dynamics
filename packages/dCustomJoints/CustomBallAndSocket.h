@@ -17,10 +17,10 @@
 #ifndef _CUSTOMBALLANDSOCKET_H_
 #define _CUSTOMBALLANDSOCKET_H_
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
 
-class CustomPointToPoint: public CustomJoint  
+class CustomPointToPoint: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomPointToPoint(const dVector& pivotFrame0, const dVector& pivotFrame1, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -34,11 +34,11 @@ class CustomPointToPoint: public CustomJoint
 	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
 
 	dFloat m_distance;
-	DECLARE_CUSTOM_JOINT(CustomPointToPoint, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomPointToPoint, dCustomJoint)
 };
 
 
-class CustomBallAndSocket: public CustomJoint  
+class CustomBallAndSocket: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomBallAndSocket(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -52,7 +52,7 @@ class CustomBallAndSocket: public CustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	DECLARE_CUSTOM_JOINT(CustomBallAndSocket, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomBallAndSocket, dCustomJoint)
 };
 
 

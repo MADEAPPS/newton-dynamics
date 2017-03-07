@@ -18,9 +18,9 @@
 #if !defined(AFX_CUSTOM_PATH_FOLLOW_H_H)
 #define AFX_CUSTOM_PATH_FOLLOW_H_H
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
-class CustomPathFollow: public CustomJoint  
+class CustomPathFollow: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body, NewtonBody* const parentPath);

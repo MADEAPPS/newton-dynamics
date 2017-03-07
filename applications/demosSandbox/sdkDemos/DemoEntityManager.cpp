@@ -198,7 +198,7 @@ void DemoEntityManager::Cleanup ()
 	NewtonWorldSetUserData(m_world, this);
 
 	// set joint serialization call back
-	CustomJoint::Initalize(m_world);
+	dCustomJoint::Initalize(m_world);
 
 	// add all physics pre and post listeners
 	//	m_preListenerManager.Append(new DemoVisualDebugerListener("visualDebuger", m_world));

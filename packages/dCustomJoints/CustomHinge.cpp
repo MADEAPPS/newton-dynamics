@@ -14,7 +14,7 @@
 // CustomHinge.cpp: implementation of the CustomHinge class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomHinge.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@
 IMPLEMENT_CUSTOM_JOINT(CustomHinge);
 
 CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 	,m_curJointAngle()
 	,m_minAngle(-45.0f * 3.141592f / 180.0f)
 	,m_maxAngle(45.0f * 3.141592f / 180.0f)
@@ -44,7 +44,7 @@ CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 
 
 CustomHinge::CustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix& pinAndPivotFrameParent, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 	,m_curJointAngle()
 	,m_minAngle(-45.0f * 3.141592f / 180.0f)
 	,m_maxAngle(45.0f * 3.141592f / 180.0f)
@@ -68,7 +68,7 @@ CustomHinge::~CustomHinge()
 }
 
 CustomHinge::CustomHinge (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
 	callback (userData, &m_minAngle, sizeof (dFloat));
@@ -83,7 +83,7 @@ CustomHinge::CustomHinge (NewtonBody* const child, NewtonBody* const parent, New
 
 void CustomHinge::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize (callback, userData);
+	dCustomJoint::Serialize (callback, userData);
 	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
 	callback (userData, &m_minAngle, sizeof (dFloat));
 	callback (userData, &m_maxAngle, sizeof (dFloat));

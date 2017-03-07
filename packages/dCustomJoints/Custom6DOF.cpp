@@ -13,7 +13,7 @@
 // Custom6DOF.cpp: implementation of the Custom6DOF class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "Custom6DOF.h"
 
 //dInitRtti(Custom6DOF);
@@ -29,7 +29,7 @@ IMPLEMENT_CUSTOM_JOINT(Custom6DOF);
 #define D_6DOF_ANGULAR_MAX_ANGULAR_CORRECTION	10.0f
 
 Custom6DOF::Custom6DOF (const dMatrix& pinsAndPivotChildFrame, const dMatrix& pinsAndPivotParentFrame___, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(6, child, parent)
+	:dCustomJoint(6, child, parent)
 	,m_minLinearLimits(0.0f)
 	,m_maxLinearLimits(0.0f)
 	,m_minAngularLimits(0.0f)
@@ -47,7 +47,7 @@ Custom6DOF::~Custom6DOF()
 }
 
 Custom6DOF::Custom6DOF (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 	callback (userData, &m_minLinearLimits, sizeof (dVector));
 	callback (userData, &m_maxLinearLimits, sizeof (dVector));
@@ -60,7 +60,7 @@ Custom6DOF::Custom6DOF (NewtonBody* const child, NewtonBody* const parent, Newto
 
 void Custom6DOF::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize (callback, userData);
+	dCustomJoint::Serialize (callback, userData);
 	callback(userData, &m_minLinearLimits, sizeof (dVector));
 	callback(userData, &m_maxLinearLimits, sizeof (dVector));
 	callback(userData, &m_minAngularLimits, sizeof (dVector));

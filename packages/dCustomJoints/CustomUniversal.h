@@ -17,9 +17,9 @@
 #ifndef _CUSTOMUNIVERSAL_H_
 #define _CUSTOMUNIVERSAL_H_
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
-class CustomUniversal: public CustomJoint  
+class CustomUniversal: public dCustomJoint  
 {
 	public:
 	CUSTOM_JOINTS_API CustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
@@ -88,7 +88,7 @@ class CustomUniversal: public CustomJoint
 		};
 	};
 
-	DECLARE_CUSTOM_JOINT(CustomUniversal, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomUniversal, dCustomJoint)
 };
 
 #endif 

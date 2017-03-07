@@ -14,7 +14,7 @@
 // CustomGear.cpp: implementation of the CustomGear class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "CustomJointLibraryStdAfx.h"
+#include "dCustomJointLibraryStdAfx.h"
 #include "CustomGear.h"
 
 IMPLEMENT_CUSTOM_JOINT(CustomGear);
@@ -26,7 +26,7 @@ IMPLEMENT_CUSTOM_JOINT(CustomDifferentialGear);
 //////////////////////////////////////////////////////////////////////
 
 CustomGear::CustomGear(int dof, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(dof, child, parent)
+	:dCustomJoint(dof, child, parent)
 {
 	// set as kinematoc loop
 	SetSolverModel(1);
@@ -34,7 +34,7 @@ CustomGear::CustomGear(int dof, NewtonBody* const child, NewtonBody* const paren
 
 
 CustomGear::CustomGear(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent)
-	:CustomJoint(1, child, parent)
+	:dCustomJoint(1, child, parent)
 	,m_gearRatio (gearRatio)
 {
 	dMatrix dommyMatrix;
@@ -59,7 +59,7 @@ CustomGear::~CustomGear()
 }
 
 CustomGear::CustomGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-	:CustomJoint(child, parent, callback, userData)
+	:dCustomJoint(child, parent, callback, userData)
 {
 	// set as kinematic loop
 	SetSolverModel(1);
@@ -69,7 +69,7 @@ CustomGear::CustomGear (NewtonBody* const child, NewtonBody* const parent, Newto
 
 void CustomGear::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
-	CustomJoint::Serialize (callback, userData);
+	dCustomJoint::Serialize (callback, userData);
 	callback (userData, &m_gearRatio, sizeof (dFloat));
 }
 

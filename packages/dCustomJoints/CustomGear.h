@@ -17,7 +17,7 @@
 #ifndef _CustomGear_H__
 #define _CustomGear_H__
 
-#include "CustomJoint.h"
+#include "dCustomJoint.h"
 
 // this joint is for used in conjunction with Hinge of other spherical joints
 // is is usefully for establishing synchronization between the phase angle other the 
@@ -25,7 +25,7 @@
 // velErro = -(W0 * r0 + W1 *  r1)
 // where w0 and W1 are the angular velocity
 // r0 and r1 are the radius of the spinning disk
-class CustomGear: public CustomJoint
+class CustomGear: public dCustomJoint
 {
 	public:
 	CUSTOM_JOINTS_API CustomGear(int dof, NewtonBody* const child, NewtonBody* const parent);
@@ -40,7 +40,7 @@ class CustomGear: public CustomJoint
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_gearRatio;
-	DECLARE_CUSTOM_JOINT(CustomGear, CustomJoint)
+	DECLARE_CUSTOM_JOINT(CustomGear, dCustomJoint)
 };
 
 class CustomGearAndSlide: public CustomGear
