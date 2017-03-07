@@ -26,7 +26,7 @@
 #include "dStdAfxNewton.h"
 #include "dNewtonDynamicBody.h"
 
-class dNewtonVehicleManager: public CustomVehicleControllerManager
+class dNewtonVehicleManager: public dCustomVehicleControllerManager
 {
 	public:
 	class dNewtonVehicle: public dNewtonDynamicBody
@@ -40,7 +40,7 @@ class dNewtonVehicleManager: public CustomVehicleControllerManager
 //		CNEWTON_API void SetVehicleVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dFloat* const gravity, dFloat timestep);
 
 		private:
-		CustomVehicleController* m_controller;
+		dCustomVehicleController* m_controller;
 		friend class dNewtonVehicleManager;
 	};
 

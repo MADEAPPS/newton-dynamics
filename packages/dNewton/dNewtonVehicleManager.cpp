@@ -27,7 +27,7 @@
 
 
 dNewtonVehicleManager::dNewtonVehicleManager (dNewton* const world)
-	:CustomVehicleControllerManager (world->GetNewton(), 0, NULL)
+	:dCustomVehicleControllerManager (world->GetNewton(), 0, NULL)
 {
 	dAssert (0);
 }
@@ -38,7 +38,7 @@ dNewtonVehicleManager::~dNewtonVehicleManager ()
 
 dNewton* dNewtonVehicleManager::GetWorld() const 
 {
-	NewtonWorld* const workd = CustomVehicleControllerManager::GetWorld();
+	NewtonWorld* const workd = dCustomVehicleControllerManager::GetWorld();
 
 	return (dNewton*) NewtonWorldGetUserData(workd);
 }
