@@ -71,6 +71,7 @@ class CustomVehicleControllerManager::TireFilter: public CustomControllerConvexC
 	const CustomVehicleController::BodyPartTire* m_tire;
 };
 
+
 class CustomVehicleController::EngineJoint: public CustomUniversal
 {
 	public:
@@ -172,6 +173,112 @@ class CustomVehicleController::EngineJoint: public CustomUniversal
 	dFloat m_slipDifferentialSpeed;
 	bool m_slipDifferentialOn;
 };
+
+
+/*
+class CustomVehicleController::DifferentialJoint : public CustomUniversal
+{
+	public:
+	DifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
+		:CustomUniversal(pinAndPivotFrame, engineBody, chassisBody)
+		, m_dryFrictionTorque(20.0f)
+		, m_slipDifferentialSpeed(0.0f)
+		, m_slipDifferentialOn(true)
+	{
+		EnableLimit_0(false);
+		EnableLimit_1(false);
+
+		dMatrix engineMatrix;
+		dMatrix chassisMatrix;
+		NewtonBodyGetMatrix(engineBody, &engineMatrix[0][0]);
+		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+		m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
+	}
+
+	void SetDryFriction(dFloat friction)
+	{
+		m_dryFrictionTorque = dMax(friction, 1.0f);
+	}
+
+	void ProjectError()
+	{
+		dMatrix chassisMatrix;
+		dVector engineOmega(0.0f);
+		dVector chassisOmega(0.0f);
+		dVector engineVelocity(0.0f);
+
+		NewtonBody* const engineBody = GetBody0();
+		NewtonBody* const chassisBody = GetBody1();
+
+		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
+		dMatrix engineMatrix(m_baseOffsetMatrix * chassisMatrix);
+		NewtonBodySetMatrixNoSleep(engineBody, &engineMatrix[0][0]);
+
+		NewtonBodyGetOmega(engineBody, &engineOmega[0]);
+		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
+		NewtonBodyGetPointVelocity(chassisBody, &engineMatrix.m_posit[0], &engineVelocity[0]);
+
+		dVector relOmega(engineOmega - chassisOmega);
+		dVector upPin(chassisMatrix.RotateVector(GetMatrix1().m_right));
+		engineOmega = chassisOmega + relOmega - upPin.Scale(relOmega.DotProduct3(upPin));
+
+		NewtonBodySetVelocityNoSleep(engineBody, &engineOmega[0]);
+		NewtonBodySetVelocityNoSleep(engineBody, &engineVelocity[0]);
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix chassisMatrix;
+		dMatrix engineMatrix;
+		dVector chassisOmega(0.0f);
+		dVector engineOmega(0.0f);
+
+		CustomUniversal::SubmitConstraints(timestep, threadIndex);
+
+		// y axis controls the slip differential feature.
+		NewtonBody* const engineBody = GetBody0();
+		NewtonBody* const chassisBody = GetBody1();
+
+		NewtonBodyGetOmega(engineBody, &engineOmega[0]);
+		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
+
+		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+		CalculateGlobalMatrix(engineMatrix, chassisMatrix);
+		dVector relOmega(engineOmega - chassisOmega);
+
+		// apply engine internal dry friction
+		dFloat engineSpeed = chassisMatrix.m_up.DotProduct3(relOmega);
+		//static int xxx;
+		//xxx ++;
+		//dTrace (("rpm %d %f %f %f\n", xxx, relOmega[0], relOmega[1], relOmega[2]));
+
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &chassisMatrix.m_up[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, -engineSpeed / timestep);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_dryFrictionTorque);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_dryFrictionTorque);
+
+		// apply differential
+		dFloat differentailOmega = engineMatrix.m_front.DotProduct3(relOmega);
+		if (differentailOmega > D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
+			dFloat wAlpha = (D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_front[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		}
+		else if (differentailOmega < -D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
+			dFloat wAlpha = (-D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_front[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		}
+	}
+
+	dMatrix m_baseOffsetMatrix;
+	dFloat m_dryFrictionTorque;
+	dFloat m_slipDifferentialSpeed;
+	bool m_slipDifferentialOn;
+};
+*/
 
 class CustomVehicleController::WheelJoint : public CustomJoint
 {

@@ -33,6 +33,7 @@ class CustomVehicleController: public CustomControllerBase
 	class WheelJoint;
 	class EngineJoint;
 	class EngineController;
+	class DifferentialJoint;
 	class SteeringController;
 
 	class Controller: public CustomAlloc
@@ -254,8 +255,6 @@ class CustomVehicleController: public CustomControllerBase
 			public:
 			enum type
 			{
-				m_2d,
-				m_4d,
 				m_2wd,
 				m_4wd,
 				m_8wd,
@@ -273,16 +272,6 @@ class CustomVehicleController: public CustomControllerBase
 			int m_type;
 		};
 
-		class Differential2d : public Differential
-		{
-			public:
-			Differential2d()
-				:Differential()
-			{
-				m_type = m_2d;
-			}
-		};
-
 		class Differential2wd : public Differential
 		{
 			public:
@@ -291,18 +280,6 @@ class CustomVehicleController: public CustomControllerBase
 			{
 				m_type = m_2wd;
 			}
-		};
-
-		class Differential4d: public Differential
-		{
-			public:
-			Differential4d()
-				:Differential()
-				, m_secondAxel()
-			{
-				m_type = m_4d;
-			}
-			Differential m_secondAxel;
 		};
 
 		class Differential4wd: public Differential

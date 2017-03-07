@@ -1079,12 +1079,12 @@ class HeavyVehicleEntity: public DemoEntity
 		differential.m_type = CustomVehicleController::EngineController::Differential::m_8wd;
 		differential.m_axel.m_leftTire = leftTire[0];
 		differential.m_axel.m_rightTire = rightTire[0];
-		differential.m_secundAxel.m_axel.m_leftTire = leftTire[1];
-		differential.m_secundAxel.m_axel.m_rightTire = rightTire[1];
-		differential.m_secund4Wd.m_axel.m_leftTire = leftTire[2];
-		differential.m_secund4Wd.m_axel.m_rightTire = rightTire[2];
-		differential.m_secund4Wd.m_secundAxel.m_axel.m_leftTire = leftTire[3];
-		differential.m_secund4Wd.m_secundAxel.m_axel.m_rightTire = rightTire[3];
+		differential.m_secondAxel.m_axel.m_leftTire = leftTire[1];
+		differential.m_secondAxel.m_axel.m_rightTire = rightTire[1];
+		differential.m_second4Wd.m_axel.m_leftTire = leftTire[2];
+		differential.m_second4Wd.m_axel.m_rightTire = rightTire[2];
+		differential.m_second4Wd.m_secondAxel.m_axel.m_leftTire = leftTire[3];
+		differential.m_second4Wd.m_secondAxel.m_axel.m_rightTire = rightTire[3];
 	
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;

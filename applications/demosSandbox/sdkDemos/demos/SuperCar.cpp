@@ -496,7 +496,7 @@ class SuperCarEntity: public DemoEntity
 		{
 			case 0:
 				// rear wheel drive no differential vehicle
-				differential.m_type = CustomVehicleController::EngineController::Differential::m_2d;
+				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
 				differential.m_axel.m_leftTire = leftRearTire;
 				differential.m_axel.m_rightTire = rightRearTire;
 				break;
