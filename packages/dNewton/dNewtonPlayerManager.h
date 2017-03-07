@@ -26,7 +26,7 @@
 #include "dStdAfxNewton.h"
 #include "dNewtonKinematicBody.h"
 
-class dNewtonPlayerManager: public CustomPlayerControllerManager
+class dNewtonPlayerManager: public dCustomPlayerControllerManager
 {
 	public:
 	class dNewtonPlayer: public dNewtonKinematicBody
@@ -41,7 +41,7 @@ class dNewtonPlayerManager: public CustomPlayerControllerManager
 		CNEWTON_API void SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dFloat* const gravity, dFloat timestep);
 
 		private:
-		CustomPlayerController* m_controller;
+		dCustomPlayerController* m_controller;
 
 		friend class dNewtonPlayerManager;
 	};
@@ -52,7 +52,7 @@ class dNewtonPlayerManager: public CustomPlayerControllerManager
 	CNEWTON_API dNewtonPlayer* GetFirstPlayer() const;
 	CNEWTON_API dNewtonPlayer* GetNextPlayer(const dNewtonPlayer* const player) const;
 
-	CNEWTON_API virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep);
+	CNEWTON_API virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep);
 };
 
 

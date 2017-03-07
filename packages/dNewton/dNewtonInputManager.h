@@ -25,7 +25,7 @@
 
 class dNewton;
 
-class dNewtonInputManager: public CustomInputManager
+class dNewtonInputManager: public dCustomInputManager
 {
 	public:
 	CNEWTON_API dNewtonInputManager (dNewton* const world);

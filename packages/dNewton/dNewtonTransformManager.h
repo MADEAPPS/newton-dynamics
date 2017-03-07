@@ -15,20 +15,20 @@
 #ifndef D_CUSTOM_TRANSFORM_MANAGER_H_
 #define D_CUSTOM_TRANSFORM_MANAGER_H_
 
-#include "CustomJointLibraryStdAfx.h"
-#include "CustomControllerManager.h"
+#include "dCustomJointLibraryStdAfx.h"
+#include "dCustomControllerManager.h"
 
 class dNewton;
 
 // a Skeleton Transform controller is use to calculate local transform on contractions of rigid bodies and joint that form part of a hierarchical Skeleton
-class dNewtonTransformController: public CustomControllerBase
+class dNewtonTransformController: public dCustomControllerBase
 {
 	private:
 	CNEWTON_API virtual void PreUpdate(dFloat timestep, int threadIndex){}
 	CNEWTON_API virtual void PostUpdate(dFloat timestep, int threadIndex){}
 };
 
-class dNewtonTransformManager: public CustomControllerManager<dNewtonTransformController> 
+class dNewtonTransformManager: public dCustomControllerManager<dNewtonTransformController> 
 {
 	public:
 	CNEWTON_API dNewtonTransformManager (dNewton* const world);

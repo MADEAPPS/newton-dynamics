@@ -27,7 +27,7 @@
 
 
 dNewtonTriggerManager::dNewtonTriggerManager (dNewton* const world)
-	:CustomTriggerManager (world->GetNewton())
+	:dCustomTriggerManager (world->GetNewton())
 {
 }
 
@@ -76,7 +76,7 @@ dNewtonTriggerManager::dNewtonTrigger::~dNewtonTrigger ()
 }
 
 
-void dNewtonTriggerManager::EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const guess) const
+void dNewtonTriggerManager::EventCallback (const dCustomTriggerController* const trigger, dTriggerEventType event, NewtonBody* const guess) const
 {
 	dNewtonTrigger* const callback = (dNewtonTrigger*) trigger->GetUserData();
 	dNewtonBody* const guessBody = (dNewtonBody*) NewtonBodyGetUserData(guess);

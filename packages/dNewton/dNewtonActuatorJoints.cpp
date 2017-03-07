@@ -28,64 +28,64 @@
 dNewtonHingeActuator::dNewtonHingeActuator(const dFloat* const pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_hingeActuator)
 {
-	SetJoint (new CustomHingeActuator (pinAndPivotFrame, angularRate, minAngle, maxAngle, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	SetJoint (new dCustomHingeActuator (pinAndPivotFrame, angularRate, minAngle, maxAngle, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
 bool dNewtonHingeActuator::GetEnableFlag () const
 {
-	return ((CustomHingeActuator*)m_joint)->GetEnableFlag();
+	return ((dCustomHingeActuator*)m_joint)->GetEnableFlag();
 }
 
 dFloat dNewtonHingeActuator::GetTargetAngle() const
 {
-	return ((CustomHingeActuator*)m_joint)->GetTargetAngle();
+	return ((dCustomHingeActuator*)m_joint)->GetTargetAngle();
 }
 
 dFloat dNewtonHingeActuator::GetMinAngularLimit() const
 {
-	return ((CustomHingeActuator*)m_joint)->GetMinAngularLimit();
+	return ((dCustomHingeActuator*)m_joint)->GetMinAngularLimit();
 }
 
 dFloat dNewtonHingeActuator::GetMaxAngularLimit() const
 {
-	return ((CustomHingeActuator*)m_joint)->GetMaxAngularLimit();
+	return ((dCustomHingeActuator*)m_joint)->GetMaxAngularLimit();
 }
 
 dFloat dNewtonHingeActuator::GetAngularRate() const
 {
-	return ((CustomHingeActuator*)m_joint)->GetAngularRate();
+	return ((dCustomHingeActuator*)m_joint)->GetAngularRate();
 }
 
 
 void dNewtonHingeActuator::SetMinAngularLimit(dFloat limit)
 {
-	((CustomHingeActuator*)m_joint)->SetMinAngularLimit(limit);
+	((dCustomHingeActuator*)m_joint)->SetMinAngularLimit(limit);
 }
 
 void dNewtonHingeActuator::SetMaxAngularLimit(dFloat limit)
 {
-	((CustomHingeActuator*)m_joint)->SetMaxAngularLimit(limit);
+	((dCustomHingeActuator*)m_joint)->SetMaxAngularLimit(limit);
 }
 
 
 void dNewtonHingeActuator::SetAngularRate(dFloat rate)
 {
-	((CustomHingeActuator*)m_joint)->SetAngularRate(rate);
+	((dCustomHingeActuator*)m_joint)->SetAngularRate(rate);
 }
 
 void dNewtonHingeActuator::SetTargetAngle(dFloat angle)
 {
-	((CustomHingeActuator*)m_joint)->SetTargetAngle(angle);
+	((dCustomHingeActuator*)m_joint)->SetTargetAngle(angle);
 }
 
 void dNewtonHingeActuator::SetEnableFlag (bool flag)
 {
-	((CustomHingeActuator*)m_joint)->SetEnableFlag (flag);
+	((dCustomHingeActuator*)m_joint)->SetEnableFlag (flag);
 }
 
 dFloat dNewtonHingeActuator::GetActuatorAngle() const
 {
-	return ((CustomHingeActuator*)m_joint)->GetActuatorAngle();
+	return ((dCustomHingeActuator*)m_joint)->GetActuatorAngle();
 }
 
 

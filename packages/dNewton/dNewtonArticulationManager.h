@@ -27,7 +27,7 @@
 
 class dNewtonBody;
 
-class dNewtonArticulationManager: public CustomArticulaledTransformManager
+class dNewtonArticulationManager: public dCustomArticulaledTransformManager
 {
 	public:
 	class dNewtonArticulationController: public dNewtonAlloc
@@ -53,21 +53,21 @@ class dNewtonArticulationManager: public CustomArticulaledTransformManager
 		
 
 		private:
-		CustomArticulatedTransformController* m_controller;
+		dCustomArticulatedTransformController* m_controller;
 		friend class dNewtonArticulationManager;
 	};
 
 	CNEWTON_API dNewtonArticulationManager (dNewton* const world);
 	CNEWTON_API virtual ~dNewtonArticulationManager ();
 
-	CNEWTON_API void DisableAllSelfCollision (CustomArticulatedTransformController* const controller);
-	CNEWTON_API void SetDefaultSelfCollisionMask (CustomArticulatedTransformController* const controller);
+	CNEWTON_API void DisableAllSelfCollision (dCustomArticulatedTransformController* const controller);
+	CNEWTON_API void SetDefaultSelfCollisionMask (dCustomArticulatedTransformController* const controller);
 	CNEWTON_API void SetSelfCollisionMask (void* const boneNode0, void* const boneNode1, bool mode);
 	CNEWTON_API bool SelfCollisionTest (const void* const boneNode0, const void* const boneNode1) const;
 
-	CNEWTON_API virtual void OnPreUpdate (CustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const;
-	CNEWTON_API virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
-	CNEWTON_API void DestroyController (CustomArticulatedTransformController* const controller);
+	CNEWTON_API virtual void OnPreUpdate (dCustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const;
+	CNEWTON_API virtual void OnUpdateTransform (const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
+	CNEWTON_API void DestroyController (dCustomArticulatedTransformController* const controller);
 
 	CNEWTON_API dNewtonArticulationController* GetFirstController() const;
 	CNEWTON_API dNewtonArticulationController* GetNextController(const dNewtonArticulationController* const controller) const;
