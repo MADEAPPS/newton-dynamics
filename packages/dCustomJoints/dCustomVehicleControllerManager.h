@@ -427,8 +427,6 @@ class dCustomVehicleController: public dCustomControllerBase
 
 		dInfo m_info;
 		dInfo m_infoCopy;
-//		dAxelJoint* m_leftAxel;
-//		dAxelJoint* m_rightAxel;
 		dCustomVehicleController* m_controller;
 		dBodyPartTire* m_crownGearCalculator;
 		dBodyPartDifferential* m_differential;

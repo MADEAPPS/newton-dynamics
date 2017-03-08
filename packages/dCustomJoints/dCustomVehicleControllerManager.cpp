@@ -321,7 +321,7 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 		}
 */
-/*
+
 		if (m_brakeTorque > 1.0e-3f) {
 			dVector tireOmega(0.0f);
 			dVector chassisOmega(0.0f);
@@ -335,7 +335,7 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_brakeTorque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_brakeTorque);
 		}
-*/
+
 		m_brakeTorque = 0.0f;
 	}
 
@@ -368,8 +368,10 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 class dCustomVehicleController::dGearBoxJoint: public dCustomGear
 {
 	public:
-	dGearBoxJoint(const dVector& childPin, NewtonBody* const differential, NewtonBody* const engine)
+	dGearBoxJoint(const dVector& childPin, NewtonBody* const differential, NewtonBody* const engine, dFloat maxFrictionToque)
 		:dCustomGear(1, differential, engine)
+		,m_param (1.0f)
+		,m_cluthFrictionTorque (maxFrictionToque)
 	{
 		dMatrix pinAndPivotFrame(dGrammSchmidt(childPin));
 		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -379,6 +381,25 @@ class dCustomVehicleController::dGearBoxJoint: public dCustomGear
 	{
 		m_gearRatio = -gear;
 	}
+
+	void SetFritionTorque(dFloat param)
+	{
+		m_param = param;
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		if (m_param > 0.1f) {
+			dCustomGear::SubmitConstraints(timestep, threadIndex);
+			if (m_param < 0.9f) {
+				NewtonUserJointSetRowMinimumFriction(m_joint, -m_param * m_cluthFrictionTorque);
+				NewtonUserJointSetRowMaximumFriction(m_joint,  m_param * m_cluthFrictionTorque);
+			}
+		}
+	}
+
+	dFloat m_param;
+	dFloat m_cluthFrictionTorque;
 };
 
 
@@ -773,8 +794,6 @@ dCustomVehicleController::dEngineController::dEngineController (dCustomVehicleCo
 	:dController(controller)
 	,m_info(info)
 	,m_infoCopy(info)
-//	,m_leftAxel(NULL)
-//	,m_rightAxel(NULL)
 	,m_controller(controller)
 	,m_crownGearCalculator(NULL)
 	,m_differential(NULL)
@@ -803,7 +822,7 @@ dCustomVehicleController::dEngineController::dEngineController (dCustomVehicleCo
 
 	NewtonBody* const differentialBody = m_differential->GetBody();
 	NewtonBodyGetMatrix (engineBody, &differentialMatrix[0][0]);
-	m_gearBoxJoint = new dGearBoxJoint(chassisMatrix.m_right, differentialBody, engineBody);
+	m_gearBoxJoint = new dGearBoxJoint(chassisMatrix.m_right, differentialBody, engineBody, m_info.m_clutchFrictionTorque);
 
 	//engineMatrix = controller->m_engine->GetJoint()->GetMatrix0() * engineMatrix;
 	switch (differential.m_type)
@@ -1068,6 +1087,9 @@ void dCustomVehicleController::dEngineController::SetTransmissionMode(bool mode)
 void dCustomVehicleController::dEngineController::SetClutchParam (dFloat cluthParam)
 {
 	m_clutchParam = dClamp (cluthParam, dFloat(0.0f), dFloat(1.0f));
+	if (m_gearBoxJoint) {
+		m_gearBoxJoint->SetFritionTorque(m_clutchParam);
+	}
 }
 
 
