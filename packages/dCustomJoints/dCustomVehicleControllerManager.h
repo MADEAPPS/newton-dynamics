@@ -432,6 +432,7 @@ class dCustomVehicleController: public dCustomControllerBase
 		dCustomVehicleController* m_controller;
 		dBodyPartTire* m_crownGearCalculator;
 		dBodyPartDifferential* m_differential;
+		dGearBoxJoint* m_gearBoxJoint;
 		dFloat m_clutchParam;
 		int m_gearTimer;
 		int m_currentGear;

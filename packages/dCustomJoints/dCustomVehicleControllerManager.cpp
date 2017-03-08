@@ -370,12 +370,14 @@ class dCustomVehicleController::dGearBoxJoint: public dCustomGear
 	dGearBoxJoint(const dVector& childPin, NewtonBody* const differential, NewtonBody* const engine)
 		:dCustomGear(1, differential, engine)
 	{
-		dAssert(0);
+		dMatrix pinAndPivotFrame(dGrammSchmidt(childPin));
+		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+		//SetGearRatio(10.0f);
 	}
 
-	void SubmitConstraints(dFloat timestep, int threadIndex)
+	void SetGearRatio(dFloat gear)
 	{
-		dAssert(0);
+		m_gearRatio = gear;
 	}
 };
 
@@ -777,6 +779,7 @@ dCustomVehicleController::dEngineController::dEngineController (dCustomVehicleCo
 	,m_controller(controller)
 	,m_crownGearCalculator(NULL)
 	,m_differential(NULL)
+	,m_gearBoxJoint(NULL)
 	,m_clutchParam(1.0f)
 	,m_gearTimer(0)
 	,m_currentGear(D_VEHICLE_NEUTRAL_GEAR)
@@ -799,6 +802,7 @@ dCustomVehicleController::dEngineController::dEngineController (dCustomVehicleCo
 	m_differential = new dBodyPartDifferential(controller);
 	controller->m_bodyPartsList.Append(m_differential);
 	NewtonCollisionAggregateAddBody(controller->m_collisionAggregate, m_differential->GetBody());
+	m_gearBoxJoint = new dGearBoxJoint(chassisMatrix.m_right, m_differential->GetBody(), engineBody);
 
 /*
 	//engineMatrix = controller->m_engine->GetJoint()->GetMatrix0() * engineMatrix;

@@ -27,6 +27,7 @@ IMPLEMENT_CUSTOM_JOINT(dCustomDifferentialGear);
 
 dCustomGear::dCustomGear(int dof, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(dof, child, parent)
+	,m_gearRatio(1.0f)
 {
 	// set as kinematoc loop
 	SetSolverModel(1);
@@ -60,6 +61,7 @@ dCustomGear::~dCustomGear()
 
 dCustomGear::dCustomGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:dCustomJoint(child, parent, callback, userData)
+	,m_gearRatio(1.0f)
 {
 	// set as kinematic loop
 	SetSolverModel(1);
