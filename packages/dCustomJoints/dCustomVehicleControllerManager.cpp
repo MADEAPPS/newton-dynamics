@@ -385,8 +385,8 @@ class dCustomVehicleController::dGearBoxJoint: public dCustomGear
 class dCustomVehicleController::dAxelJoint: public dCustomGear
 {
 	public:
-	dAxelJoint(dFloat gearRatio, const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
-		:dCustomGear(gearRatio, childPin, parentPin, child, parent)
+	dAxelJoint(const dVector& childPin, const dVector& parentPin, const dVector& referencePin, NewtonBody* const child, NewtonBody* const parent, NewtonBody* const parentReference)
+		:dCustomGear(1.0f, childPin, parentPin, child, parent)
 		,m_parentReference(parentReference)
 	{
 		dMatrix dommyMatrix;
@@ -413,52 +413,51 @@ class dCustomVehicleController::dAxelJoint: public dCustomGear
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
-		if (dAbs(m_gearRatio) > 1.0e-3f) {
-			dMatrix matrix0;
-			dMatrix matrix1;
-			dVector omega0(0.0f);
-			dVector omega1(0.0f);
-			dFloat jacobian0[6];
-			dFloat jacobian1[6];
+		dMatrix matrix0;
+		dMatrix matrix1;
+		dVector omega0(0.0f);
+		dVector omega1(0.0f);
+		dFloat jacobian0[6];
+		dFloat jacobian1[6];
 
-			// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-			CalculateGlobalMatrix(matrix0, matrix1);
+		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+		CalculateGlobalMatrix(matrix0, matrix1);
 
-			// calculate the angular velocity for both bodies
-			dVector dir0(matrix0.m_front.Scale(m_gearRatio));
-			dVector dir2(matrix1.m_front);
+		// calculate the angular velocity for both bodies
+		//dVector dir0(matrix0.m_front.Scale(m_gearRatio));
+		dVector dir0(matrix0.m_front);
+		dVector dir2(matrix1.m_front);
 
-			dMatrix referenceMatrix;
-			NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
-			dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
-			dVector dir1(dir2 + dir3);
+		dMatrix referenceMatrix;
+		NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
+		dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
+		dVector dir1(dir2 + dir3);
 
-			jacobian0[0] = 0.0f;
-			jacobian0[1] = 0.0f;
-			jacobian0[2] = 0.0f;
-			jacobian0[3] = dir0.m_x;
-			jacobian0[4] = dir0.m_y;
-			jacobian0[5] = dir0.m_z;
+		jacobian0[0] = 0.0f;
+		jacobian0[1] = 0.0f;
+		jacobian0[2] = 0.0f;
+		jacobian0[3] = dir0.m_x;
+		jacobian0[4] = dir0.m_y;
+		jacobian0[5] = dir0.m_z;
 
-			jacobian1[0] = 0.0f;
-			jacobian1[1] = 0.0f;
-			jacobian1[2] = 0.0f;
-			jacobian1[3] = dir1.m_x;
-			jacobian1[4] = dir1.m_y;
-			jacobian1[5] = dir1.m_z;
+		jacobian1[0] = 0.0f;
+		jacobian1[1] = 0.0f;
+		jacobian1[2] = 0.0f;
+		jacobian1[3] = dir1.m_x;
+		jacobian1[4] = dir1.m_y;
+		jacobian1[5] = dir1.m_z;
 
-			NewtonBodyGetOmega(m_body0, &omega0[0]);
-			NewtonBodyGetOmega(m_body1, &omega1[0]);
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
 
-			dFloat w0 = omega0.DotProduct3(dir0);
-			dFloat w1 = omega1.DotProduct3(dir1);
+		dFloat w0 = omega0.DotProduct3(dir0);
+		dFloat w1 = omega1.DotProduct3(dir1);
 
-			dFloat relOmega = w0 + w1;
-			dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
-			dFloat relAccel = -0.5f * relOmega * invTimestep;
-			NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
-			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-		}
+		dFloat relOmega = w0 + w1;
+		dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
+		dFloat relAccel = -0.5f * relOmega * invTimestep;
+		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 	}
 
 	dVector m_pintOnReference;
@@ -786,15 +785,14 @@ dCustomVehicleController::dEngineController::dEngineController (dCustomVehicleCo
 	,m_ignitionKey(false)
 	,m_automaticTransmissionMode(true)
 {
-	dMatrix engineMatrix;
 	dMatrix chassisMatrix;
+	dMatrix differentialMatrix;
 	NewtonBody* const chassisBody = controller->m_chassis.GetBody();
 	NewtonBodyGetMatrix (chassisBody, &chassisMatrix[0][0]);
 //	chassisMatrix = controller->m_localFrame * chassisMatrix;
 	
 	NewtonBody* const engineBody = controller->m_engine->GetBody();
 	dAssert (engineBody == controller->m_engine->GetJoint()->GetBody0());
-	NewtonBodyGetMatrix (engineBody, &engineMatrix[0][0]);
 
 	m_crownGearCalculator = differential.m_axel.m_leftTire;
 
@@ -802,9 +800,11 @@ dCustomVehicleController::dEngineController::dEngineController (dCustomVehicleCo
 	m_differential = new dBodyPartDifferential(controller);
 	controller->m_bodyPartsList.Append(m_differential);
 	NewtonCollisionAggregateAddBody(controller->m_collisionAggregate, m_differential->GetBody());
-	m_gearBoxJoint = new dGearBoxJoint(chassisMatrix.m_right, m_differential->GetBody(), engineBody);
 
-/*
+	NewtonBody* const differentialBody = m_differential->GetBody();
+	NewtonBodyGetMatrix (engineBody, &differentialMatrix[0][0]);
+	m_gearBoxJoint = new dGearBoxJoint(chassisMatrix.m_right, differentialBody, engineBody);
+
 	//engineMatrix = controller->m_engine->GetJoint()->GetMatrix0() * engineMatrix;
 	switch (differential.m_type)
 	{
@@ -815,23 +815,21 @@ dCustomVehicleController::dEngineController::dEngineController (dCustomVehicleCo
 			dAssert (leftTireBody == differential.m_axel.m_leftTire->GetJoint()->GetBody0());
 			NewtonBodyGetMatrix (leftTireBody, &leftTireMatrix[0][0]);
 			leftTireMatrix = differential.m_axel.m_leftTire->GetJoint()->GetMatrix0() * leftTireMatrix;
-			m_leftAxel = new dAxelJoint(1.0f, leftTireMatrix[0], engineMatrix[0].Scale (-1.0f), chassisMatrix[2], leftTireBody, engineBody, chassisBody);
+			new dAxelJoint(leftTireMatrix[0], differentialMatrix[0].Scale (-1.0f), chassisMatrix[2], leftTireBody, differentialBody, chassisBody);
 
 			dMatrix rightTireMatrix;
 			NewtonBody* const rightTireBody = differential.m_axel.m_rightTire->GetBody();
 			dAssert(rightTireBody == differential.m_axel.m_rightTire->GetJoint()->GetBody0());
 			NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
 			rightTireMatrix = differential.m_axel.m_rightTire->GetJoint()->GetMatrix0() * rightTireMatrix;
-			m_rightAxel = new dAxelJoint(1.0f, rightTireMatrix[0], engineMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, engineBody, chassisBody);
-
-			m_crownGearCalculator = differential.m_axel.m_leftTire;
+			new dAxelJoint(rightTireMatrix[0], differentialMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, differentialBody, chassisBody);
 			break;
 		}
 
 		default:
 			dAssert(0);
 	}
-*/
+
 	SetInfo(info);
 }
 
