@@ -125,7 +125,6 @@ class dCustomVehicleController::dEngineJoint: public dCustomHinge
 	dMatrix m_baseOffsetMatrix;
 };
 
-
 class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 {
 	public:
@@ -363,6 +362,23 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 	dFloat m_steerAngle1;
 	dFloat m_brakeTorque;
 };
+
+
+class dCustomVehicleController::dGearBoxJoint: public dCustomGear
+{
+	public:
+	dGearBoxJoint(const dVector& childPin, NewtonBody* const differential, NewtonBody* const engine)
+		:dCustomGear(1, differential, engine)
+	{
+		dAssert(0);
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dAssert(0);
+	}
+};
+
 
 class dCustomVehicleController::dAxelJoint: public dCustomGear
 {
@@ -684,7 +700,7 @@ origin.m_y += 1.5f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
 	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.6f, 0.6f, 0.5f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);

@@ -32,6 +32,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	class dAxelJoint;
 	class dWheelJoint;
 	class dEngineJoint;
+	class dGearBoxJoint;
 	class dEngineController;
 	class dDifferentialJoint;
 	class dSteeringController;
