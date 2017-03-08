@@ -76,8 +76,9 @@ class dCustomVehicleControllerManager::TireFilter: public dCustomControllerConve
 class dCustomVehicleController::dEngineJoint: public dCustomHinge
 {
 	public:
-	dEngineJoint (const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
+		dEngineJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
 		:dCustomHinge(pinAndPivotFrame, engineBody, chassisBody)
+		,m_maxrmp(50.0f)
 	{
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
@@ -88,6 +89,11 @@ class dCustomVehicleController::dEngineJoint: public dCustomHinge
 		NewtonBodyGetMatrix(engineBody, &engineMatrix[0][0]);
 		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 		m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
+	}
+
+	void SetRedLineRPM(dFloat redLineRmp)
+	{
+		m_maxrmp = dAbs(redLineRmp);
 	}
 
 	void SetDryFriction(dFloat friction)
@@ -122,7 +128,28 @@ class dCustomVehicleController::dEngineJoint: public dCustomHinge
 		NewtonBodySetVelocityNoSleep(engineBody, &engineVelocity[0]);
 	}
 
+	void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
+	{
+		dFloat alpha = m_jointOmega / timestep;
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_front[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, -alpha);
+		if (m_jointOmega <= 0.0f) {
+			dFloat idleAlpha = - m_jointOmega / timestep;
+			NewtonUserJointSetRowAcceleration(m_joint, idleAlpha);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+		} else if (m_jointOmega >= m_maxrmp) {
+			dFloat redLineAlpha = (m_maxrmp - m_jointOmega) / timestep;
+			NewtonUserJointSetRowAcceleration(m_joint, redLineAlpha);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		} else {
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		}
+		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
+	}
+
 	dMatrix m_baseOffsetMatrix;
+	dFloat m_maxrmp;
 };
 
 class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
@@ -1039,7 +1066,6 @@ void dCustomVehicleController::dEngineController::Update(dFloat timestep)
 static int xxx;
 xxx++;
 
-
 	dFloat engineTorque = 0.0f;
 	if (m_ignitionKey) {
 		engineTorque = m_info.m_idleTorque + (m_info.m_peakTorque - m_info.m_idleTorque) * m_param;
@@ -1057,12 +1083,8 @@ xxx++;
 
 	dEngineJoint* const engineJoint = (dEngineJoint*) m_controller->m_engine->m_joint;
 
-	dFloat dryFriction = m_info.m_idleFriction;
-	if ((omega > m_info.m_rpmAtRedLine) || (omega <= 0.0f)) {
-//		dryFriction *= 10.0f;
-	}
-	engineJoint->SetDryFriction(dryFriction);
-
+	engineJoint->SetRedLineRPM(m_info.m_rpmAtRedLine);
+	engineJoint->SetDryFriction(m_info.m_idleFriction);
 	ApplyTorque(engineTorque);
 }
 
