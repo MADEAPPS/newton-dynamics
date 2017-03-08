@@ -307,7 +307,7 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 		angle = -CalculateAngle(tireMatrix.m_front, chassisMatrix.m_front, chassisMatrix.m_up);
 		NewtonUserJointAddAngularRow(m_joint, -angle, &chassisMatrix.m_up[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, NewtonUserCalculateRowZeroAccelaration(m_joint));
-/*
+
 		dFloat param = CalculateTireParametricPosition(tireMatrix, chassisMatrix);
 		if (param >= 1.0f) {
 			dVector posit(chassisMatrix.m_posit + m_tire->m_data.m_suspesionlenght);
@@ -320,7 +320,6 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 			dAssert(0);
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 		}
-*/
 
 		if (m_brakeTorque > 1.0e-3f) {
 			dVector tireOmega(0.0f);
@@ -991,8 +990,8 @@ dFloat dCustomVehicleController::dEngineController::GetGearRatio () const
 
 void dCustomVehicleController::dEngineController::UpdateAutomaticGearBox(dFloat timestep, dFloat omega)
 {
-//m_info.m_gearsCount = 4;
-//m_currentGear = D_VEHICLE_NEUTRAL_GEAR;
+m_info.m_gearsCount = 4;
+
 	m_gearTimer--;
 	if (m_gearTimer < 0) {
 		switch (m_currentGear) 
@@ -1036,6 +1035,10 @@ void dCustomVehicleController::dEngineController::Update(dFloat timestep)
 	if (m_automaticTransmissionMode) {
 		UpdateAutomaticGearBox (timestep, omega);
 	}
+
+static int xxx;
+xxx++;
+
 
 	dFloat engineTorque = 0.0f;
 	if (m_ignitionKey) {
@@ -1423,7 +1426,7 @@ void dCustomVehicleController::Init(NewtonCollision* const chassisShape, const d
 	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
 
 	// set vehicle mass, inertia and center of mass
-mass = 0;
+//mass = 0;
 	NewtonBodySetMassProperties(body, mass, chassisShape);
 
 	// initialize 
