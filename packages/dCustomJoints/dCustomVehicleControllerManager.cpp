@@ -2010,7 +2010,6 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 
 	dAssert(tireJoint->GetBody0() == tireBody);
 
-
 	NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
 	tireMatrix = tireJoint->GetMatrix0() * tireMatrix;
 
@@ -2026,12 +2025,6 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 		dVector contactNormal(0.0f);
 
 		dVector lateralPin (tireMatrix.m_front);
-//		dVector lateralPin (0, 0, 1,0);
-
-//dMatrix xxxx;
-//NewtonBody* xxx = controller->GetBody();
-//NewtonBodyGetMatrix(xxx, &xxxx[0][0]);
-//dTrace(("%d (%f %f %f) (%f %f %f)\n", tire->m_index, tireMatrix.m_front[0], tireMatrix.m_front[1], tireMatrix.m_front[2], xxxx[2][0], xxxx[2][1], xxxx[2][2]));
 
 		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
 		NewtonMaterialContactRotateTangentDirections(material, &lateralPin[0]);
@@ -2054,10 +2047,15 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 			dFloat tireContactLongitudinalSpeed = -longitudinalContactDir.DotProduct3 (tireOmega.CrossProduct(radius));
 
 			if ((dAbs(tireOriginLongitudinalSpeed) < (1.0f)) || (dAbs(tireContactLongitudinalSpeed) < 0.1f)) {
-				// vehicle  moving at speed for which tire physics is undefined, simple do a kinematic motion
+				// vehicle moving low speed, do normal coulomb friction
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 			} else {
+
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+
+/*
 				// calculating Brush tire model with longitudinal and lateral coupling 
 				// for friction coupling according to Motor Vehicle dynamics by: Giancarlo Genta 
 				// reduces to this, which may have a divide by zero locked, so I am clamping to some small value
@@ -2084,23 +2082,15 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 				dVector tireLocalPosit (controller->m_vehicleGlobalMatrix.UntransformVector(tireMatrix.m_posit));
 				dVector tireLocalVelocity (controller->m_localOmega.CrossProduct(tireLocalPosit));
 				tire->m_lateralSlip = dAtan2(controller->m_localVeloc.m_z + tireLocalVelocity.m_z, controller->m_localVeloc.m_x + tireLocalVelocity.m_x) - tireJoint->m_steerAngle0;
-
-//dTrace(("slip (%d %f) ", tire->m_index, tire->m_lateralSlip * 180.0f / 3.1416));
-
 				if (dAbs(controller->m_sideSlipAngle) > D_VEHICLE_MAX_SIDESLIP_ANGLE) {
-/*
-					dFloat tanBeta = dTan (D_VEHICLE_MAX_SIDESLIP_ANGLE * dSign (controller->m_sideSlipAngle) + tireJoint->m_steerAngle0);
-					dFloat den = tanBeta * tireLocalPosit.m_z + tireLocalPosit.m_x;
-					dFloat w = (controller->m_localVeloc.m_x - tanBeta * controller->m_localVeloc.m_z) / den;
-
-					dFloat dvx = w * tireLocalPosit.m_z - tireSizeVeloc.m_x;
-					dFloat dvz = -w * tireLocalPosit.m_x - tireSizeVeloc.m_z;
-					lateralAccel = -dvz / timestep;
-					longitudinalAccel = -dvx / timestep;
-*/
+//					dFloat tanBeta = dTan (D_VEHICLE_MAX_SIDESLIP_ANGLE * dSign (controller->m_sideSlipAngle) + tireJoint->m_steerAngle0);
+//					dFloat den = tanBeta * tireLocalPosit.m_z + tireLocalPosit.m_x;
+//					dFloat w = (controller->m_localVeloc.m_x - tanBeta * controller->m_localVeloc.m_z) / den;
+//					dFloat dvx = w * tireLocalPosit.m_z - tireSizeVeloc.m_x;
+//					dFloat dvz = -w * tireLocalPosit.m_x - tireSizeVeloc.m_z;
+//					lateralAccel = -dvz / timestep;
+//					longitudinalAccel = -dvx / timestep;
 				}
-//dTrace (("beta (%d %f) ", tire->m_index, tire->m_lateralSlip * 180.0f/ 3.141416f));
-
 
 				dFloat lateralForce;
 				dFloat aligningMoment;
@@ -2117,13 +2107,13 @@ lateralAccel = -tireVeloc.DotProduct3(lateralPin) / timestep;
 
 				NewtonMaterialSetContactTangentAcceleration (material, lateralAccel, 0);
 				NewtonMaterialSetContactTangentFriction(material, dAbs (lateralForce), 0);
-//dTrace (("side force (%d %f %f)\n", tire->m_index, lateralAccel, lateralForce));
-
 				NewtonMaterialSetContactTangentAcceleration (material, longitudinalAccel, 1);
 				NewtonMaterialSetContactTangentFriction(material, dAbs (longitudinalForce), 1);
+*/
 			}
 
 		} else {
+			// vehicle moving low speed, do normal coulomb friction
 			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
 			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 		}
