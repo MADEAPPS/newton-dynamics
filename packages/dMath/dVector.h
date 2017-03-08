@@ -112,14 +112,6 @@ class dBigVector: public TemplateVector<dFloat64>
 template<class T>
 TemplateVector<T>::TemplateVector() 
 {
-/*
-#ifdef _DEBUG
-	static int xxxx;
-	xxxx ++;
-	if (xxxx > 1024 * 10)
-		dAssert (0);
-#endif
-*/
 }
 
 template<class T>
