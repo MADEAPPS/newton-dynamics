@@ -1082,8 +1082,7 @@ void dCustomVehicleController::dEngineController::SetGear(int gear)
 {
 	m_gearTimer = 30;
 	m_currentGear = dClamp(gear, 0, m_info.m_gearsCount);
-//	m_leftAxel->SetGear(m_info.m_gearRatios[m_currentGear]);
-//	m_rightAxel->SetGear(m_info.m_gearRatios[m_currentGear]);
+	m_gearBoxJoint->SetGearRatio(m_info.m_gearRatios[m_currentGear]);
 }
 
 int dCustomVehicleController::dEngineController::GetNeutralGear() const
