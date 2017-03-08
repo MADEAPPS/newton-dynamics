@@ -118,7 +118,7 @@ class dCustomVehicleController::dEngineJoint: public dCustomHinge
 		dVector upPin(chassisMatrix.RotateVector(GetMatrix1().m_right));
 		engineOmega = chassisOmega + relOmega - upPin.Scale(relOmega.DotProduct3(upPin));
 
-		NewtonBodySetVelocityNoSleep(engineBody, &engineOmega[0]);
+		NewtonBodySetOmegaNoSleep(engineBody, &engineOmega[0]);
 		NewtonBodySetVelocityNoSleep(engineBody, &engineVelocity[0]);
 	}
 
@@ -129,8 +129,8 @@ class dCustomVehicleController::dEngineJoint: public dCustomHinge
 class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 {
 	public:
-	dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const engineBody, NewtonBody* const chassisBody)
-		:dCustomUniversal(pinAndPivotFrame, engineBody, chassisBody)
+	dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
+		:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
 		,m_slipDifferentialSpeed(0.0f)
 		,m_slipDifferentialOn(true)
 	{
@@ -139,73 +139,69 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
-		NewtonBodyGetMatrix(engineBody, &engineMatrix[0][0]);
+		NewtonBodyGetMatrix(differentialBody, &engineMatrix[0][0]);
 		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 		m_baseOffsetMatrix = engineMatrix * chassisMatrix.Inverse();
 	}
 
 	void ProjectError()
 	{
-/*
 		dMatrix chassisMatrix;
-		dVector engineOmega(0.0f);
 		dVector chassisOmega(0.0f);
-		dVector engineVelocity(0.0f);
+		dVector differentialOmega(0.0f);
+		dVector differentialVelocity(0.0f);
 
-		NewtonBody* const engineBody = GetBody0();
 		NewtonBody* const chassisBody = GetBody1();
+		NewtonBody* const differentialBody = GetBody0();
 
 		NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
-		dMatrix engineMatrix(m_baseOffsetMatrix * chassisMatrix);
-		NewtonBodySetMatrixNoSleep(engineBody, &engineMatrix[0][0]);
+		dMatrix differentialMatrix(m_baseOffsetMatrix * chassisMatrix);
+		NewtonBodySetMatrixNoSleep(differentialBody, &differentialMatrix[0][0]);
 
-		NewtonBodyGetOmega(engineBody, &engineOmega[0]);
 		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
-		NewtonBodyGetPointVelocity(chassisBody, &engineMatrix.m_posit[0], &engineVelocity[0]);
+		NewtonBodyGetOmega(differentialBody, &differentialOmega[0]);
+		NewtonBodyGetPointVelocity(chassisBody, &differentialMatrix.m_posit[0], &differentialVelocity[0]);
 
-		dVector relOmega(engineOmega - chassisOmega);
+		dVector relOmega(differentialOmega - chassisOmega);
 		dVector upPin(chassisMatrix.RotateVector(GetMatrix1().m_right));
-		engineOmega = chassisOmega + relOmega - upPin.Scale(relOmega.DotProduct3(upPin));
-
-		NewtonBodySetVelocityNoSleep(engineBody, &engineOmega[0]);
-		NewtonBodySetVelocityNoSleep(engineBody, &engineVelocity[0]);
-*/
+		differentialOmega = chassisOmega + relOmega - upPin.Scale(relOmega.DotProduct3(upPin));
+		NewtonBodySetOmegaNoSleep(differentialBody, &differentialOmega[0]);
+		NewtonBodySetVelocityNoSleep(differentialBody, &differentialVelocity[0]);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dMatrix chassisMatrix;
-		dMatrix engineMatrix;
+		dMatrix differentialMatrix;
 		dVector chassisOmega(0.0f);
-		dVector engineOmega(0.0f);
+		dVector differentialOmega(0.0f);
 
 		dCustomUniversal::SubmitConstraints(timestep, threadIndex);
-/*
-		// y axis controls the slip differential feature.
-		NewtonBody* const diffentialBody = GetBody0();
-		NewtonBody* const chassisBody = GetBody1();
 
-		NewtonBodyGetOmega(diffentialBody, &engineOmega[0]);
+		// y axis controls the slip differential feature.
+		NewtonBody* const chassisBody = GetBody1();
+		NewtonBody* const diffentialBody = GetBody0();
+
+		NewtonBodyGetOmega(diffentialBody, &differentialOmega[0]);
 		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
 
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-		CalculateGlobalMatrix(engineMatrix, chassisMatrix);
-		dVector relOmega(engineOmega - chassisOmega);
+		CalculateGlobalMatrix(differentialMatrix, chassisMatrix);
+		dVector relOmega(differentialOmega - chassisOmega);
 
 		// apply differential
-		dFloat differentailOmega = engineMatrix.m_front.DotProduct3(relOmega);
+		dFloat differentailOmega = differentialMatrix.m_front.DotProduct3(relOmega);
 		if (differentailOmega > D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
 			dFloat wAlpha = (D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_front[0]);
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else if (differentailOmega < -D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
 			dFloat wAlpha = (-D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &engineMatrix.m_front[0]);
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		}
-*/
 	}
 
 	dMatrix m_baseOffsetMatrix;
@@ -688,7 +684,7 @@ origin.m_y += 1.5f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
 	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.6f, 0.6f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
@@ -708,8 +704,8 @@ origin.m_y += 1.5f;
 	NewtonBodySetForceAndTorqueCallback(m_body, m_controller->m_forceAndTorque);
 
 	dMatrix pinMatrix(matrix);
-	pinMatrix.m_front = matrix.m_right;
-	pinMatrix.m_up = matrix.m_up;
+	pinMatrix.m_front = matrix.m_front;
+	pinMatrix.m_up = matrix.m_right;
 	pinMatrix.m_right = pinMatrix.m_front.CrossProduct(pinMatrix.m_up);
 	m_joint = new dDifferentialJoint(pinMatrix, m_body, chassisBody);
 }
