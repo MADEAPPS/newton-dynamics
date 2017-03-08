@@ -320,7 +320,8 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 			dAssert(0);
 			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_up[0]);
 		}
-
+*/
+/*
 		if (m_brakeTorque > 1.0e-3f) {
 			dVector tireOmega(0.0f);
 			dVector chassisOmega(0.0f);
@@ -632,11 +633,11 @@ dCustomVehicleController::dBodyPartEngine::dBodyPartEngine(dCustomVehicleControl
 	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 
-origin.m_y += 2.0f;
+//origin.m_y += 2.0f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
-	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
@@ -696,11 +697,11 @@ dCustomVehicleController::dBodyPartDifferential::dBodyPartDifferential(dCustomVe
 	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 
-origin.m_y += 1.5f;
+//origin.m_y += 1.5f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
-	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
@@ -2249,12 +2250,12 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
-		if (!NewtonBodyGetSleepState(m_body)) {
-			for (dList<dBodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
-				dBodyPart* const bodyPart = bodyPartNode->GetInfo();
-				bodyPart->ProjectError();
-			}
+		for (dList<dBodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
+			dBodyPart* const bodyPart = bodyPartNode->GetInfo();
+			bodyPart->ProjectError();
+		}
 
+		if (!NewtonBodyGetSleepState(m_body)) {
 			dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 			for (dList<dBodyPartTire>::dListNode* tireNode = m_tireList.GetFirst(); tireNode; tireNode = tireNode->GetNext()) {
 				dBodyPartTire& tire = tireNode->GetInfo();
@@ -2276,13 +2277,6 @@ void dCustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
-
-for (dList<dBodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
-dBodyPart* const bodyPart = bodyPartNode->GetInfo();
-bodyPart->ProjectError();
-}
-
-
 		m_chassis.ApplyDownForce ();
 		CalculateLateralDynamicState(timestep);
 		ApplySuspensionForces (timestep);
