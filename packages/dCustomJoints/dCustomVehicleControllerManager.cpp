@@ -372,12 +372,11 @@ class dCustomVehicleController::dGearBoxJoint: public dCustomGear
 	{
 		dMatrix pinAndPivotFrame(dGrammSchmidt(childPin));
 		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
-		//SetGearRatio(10.0f);
 	}
 
 	void SetGearRatio(dFloat gear)
 	{
-		m_gearRatio = gear;
+		m_gearRatio = -gear;
 	}
 };
 
