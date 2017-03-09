@@ -285,8 +285,12 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right.DotProduct3(tireMatrix.m_right)));
 		tireMatrix.m_up = tireMatrix.m_right.CrossProduct(tireMatrix.m_front);
 
-		dVector positError(tireMatrix.m_posit - chassisMatrix.m_posit);
-		tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(chassisMatrix.m_up.DotProduct3(positError));
+		//dVector positError(tireMatrix.m_posit - chassisMatrix.m_posit);
+		//dVector projectPosition1 (chassisMatrix.m_posit + chassisMatrix.m_up.Scale(chassisMatrix.m_up.DotProduct3(positError)));
+		dVector projectPosition(chassisMatrix.m_up.Scale(tireMatrix.m_posit.DotProduct3(chassisMatrix.m_up)) +
+								chassisMatrix.m_front.Scale(chassisMatrix.m_posit.DotProduct3(chassisMatrix.m_front)) +
+								chassisMatrix.m_right.Scale(chassisMatrix.m_posit.DotProduct3(chassisMatrix.m_right)));
+		tireMatrix.m_posit = projectPosition;
 
 		tireMatrix = GetMatrix0().Inverse() * tireMatrix;
 		NewtonBodySetMatrixNoSleep(tire, &tireMatrix[0][0]);
