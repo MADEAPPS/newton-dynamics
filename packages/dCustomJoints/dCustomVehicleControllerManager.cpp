@@ -293,15 +293,17 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 
 		NewtonBodyGetVelocity(tire, &tireVeloc[0]);
 		NewtonBodyGetPointVelocity(chassis, &tireMatrix.m_posit[0], &chassisVeloc[0]);
-
-		dVector velocError(tireVeloc - chassisVeloc);
-		dVector tireVeloc1(chassisVeloc + chassisMatrix.m_up.Scale(chassisMatrix.m_up.DotProduct3(velocError)));
-		NewtonBodySetVelocityNoSleep(tire, &tireVeloc1[0]);
+		dVector projectVelocity(chassisMatrix.m_up.Scale(tireVeloc.DotProduct3(chassisMatrix.m_up)) +
+								chassisMatrix.m_front.Scale(chassisVeloc.DotProduct3(chassisMatrix.m_front)) +
+								chassisMatrix.m_right.Scale(chassisVeloc.DotProduct3(chassisMatrix.m_right)));
+		NewtonBodySetVelocityNoSleep(tire, &projectVelocity[0]);
 
 		NewtonBodyGetOmega(tire, &tireOmega[0]);
 		NewtonBodyGetOmega(chassis, &chassisOmega[0]);
-		tireOmega = chassisOmega + chassisMatrix.m_front.Scale(tireOmega.DotProduct3(chassisMatrix.m_front));
-		NewtonBodySetOmegaNoSleep(tire, &tireOmega[0]);
+		dVector projectOmega(chassisMatrix.m_front.Scale(tireOmega.DotProduct3(chassisMatrix.m_front)) +
+							 chassisMatrix.m_up.Scale(chassisOmega.DotProduct3(chassisMatrix.m_up)) +
+							 chassisMatrix.m_right.Scale(chassisOmega.DotProduct3(chassisMatrix.m_right)));
+		NewtonBodySetOmegaNoSleep(tire, &projectOmega[0]);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
