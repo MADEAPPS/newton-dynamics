@@ -158,6 +158,9 @@ class dCustomVehicleController: public dCustomControllerBase
 		dBodyPartDifferential(dCustomVehicleController* const controller);
 		~dBodyPartDifferential();
 		void ProjectError();
+
+		dBodyPartDifferential* m_rearDiff;
+		dBodyPartDifferential* m_frontDiff;
 	};
 
 	

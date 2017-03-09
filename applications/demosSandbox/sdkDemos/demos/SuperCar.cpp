@@ -93,26 +93,26 @@ static CarDefinition monsterTruck =
 	100.0f,										// ENGINE_MASS
 	40.0f,										// TIRE_MASS	
 	0.125f,										// ENGINE_RADIO
-	15.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
-	-5.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
+	20.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
+	0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
 	0.55f,										// VEHICLE_WEIGHT_DISTRIBUTION
 	2000.0f,									// CLUTCH_FRICTION_TORQUE
-	350.0f,										// IDLE_TORQUE
+	200.0f,										// IDLE_TORQUE
 	800.0f,										// IDLE_TORQUE_RPM
 	500.0f,										// PEAK_TORQUE
 	3000.0f,									// PEAK_TORQUE_RPM
 	400.0f,										// PEAK_HP
 	5200.0f,									// PEAK_HP_RPM
-	6000.0f,									// REDLINE_RPM
+	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	DEMO_GRAVITY * 10.0f,						// TIRE_LATERAL_STIFFNESS
-	DEMO_GRAVITY *  8.0f,						// TIRE_LONGITUDINAL_STIFFNESS
+	DEMO_GRAVITY * 4.0f,						// TIRE_LATERAL_STIFFNESS
+	DEMO_GRAVITY * 3.0f,						// TIRE_LONGITUDINAL_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
-	200.0f,										// TIRE_SUSPENSION_SPRING
-	10.0f,										// TIRE_SUSPENSION_DAMPER
-	0.5f,										// TIRE_SUSPENSION_LENGTH
-	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
-	3000.0f,									// TIRE_BRAKE_TORQUE
+	20000.0f,									// TIRE_SUSPENSION_SPRING
+	300.0f,										// TIRE_SUSPENSION_DAMPER
+	0.25f,										// TIRE_SUSPENSION_LENGTH
+	dCustomVehicleController::dBodyPartTire::Info::m_confort, //TIRE_SUSPENSION_TYPE
+	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
 	1.78f,										// TIRE_GEAR_2
@@ -502,16 +502,15 @@ class SuperCarEntity: public DemoEntity
 				break;
 
 			case 1:
-				// rear wheel drive vehicle with differential
+				// front wheel drive vehicle with differential
 				dAssert(0);
 				differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_2wd;
-				differential.m_axel.m_leftTire = leftRearTire;
-				differential.m_axel.m_rightTire = rightRearTire;
+				differential.m_axel.m_leftTire = leftFrontTire;
+				differential.m_axel.m_rightTire = rightFrontTire;
 				break;
 
 			default:
-				dAssert(0);
-				differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_4wd;
+				differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_2wd;
 				differential.m_axel.m_leftTire = leftRearTire;
 				differential.m_axel.m_rightTire = rightRearTire;
 				differential.m_secondAxel.m_axel.m_leftTire = leftFrontTire;
@@ -1559,7 +1558,7 @@ void SuperCar (DemoEntityManager* const scene)
 	dFloat u = 1.0f;
 	dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
 	for (int i = 0; i < 1; i ++) {
-/*
+
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
@@ -1567,7 +1566,7 @@ void SuperCar (DemoEntityManager* const scene)
 		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "monsterTruck.ngd", 3.0f, monsterTruck);
 		vehicle0->BuildWheelCar(monsterTruck);
 		u -= 0.005f;
-
+/*
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit += location1.m_right.Scale ( 3.0f);
@@ -1584,15 +1583,14 @@ void SuperCar (DemoEntityManager* const scene)
 		SuperCarEntity* const vehicle2 = new SuperCarEntity(scene, manager, location2, "lambDiablo.ngd", 3.0f, viper);
 		vehicle2->BuildWheelCar(viper);
 		u -= 0.005f;
-*/
 
-//		dMatrix location3(manager->CalculateSplineMatrix(u));
-		dMatrix location3(dGetIdentityMatrix());
+		dMatrix location3(manager->CalculateSplineMatrix(u));
 		location3.m_posit = FindFloor(scene->GetNewton(), location3.m_posit + offset, 200.0f);
 		location3.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "viper.ngd", -3.0f, viper);
 		vehicle3->BuildWheelCar(viper);
 		u -= 0.005f;
+*/
 	}
 
 	dCustomVehicleController* const controller = &manager->GetLast()->GetInfo();

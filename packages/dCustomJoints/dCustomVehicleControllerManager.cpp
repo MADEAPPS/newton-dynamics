@@ -730,6 +730,8 @@ void dCustomVehicleController::dBodyPartEngine::ApplyTorque(dFloat torqueMag)
 
 dCustomVehicleController::dBodyPartDifferential::dBodyPartDifferential(dCustomVehicleController* const controller)
 	:dBodyPart()
+	,m_rearDiff(NULL)
+	,m_frontDiff(NULL)
 {
 	dMatrix matrix;
 	dVector origin;
@@ -776,6 +778,12 @@ dCustomVehicleController::dBodyPartDifferential::dBodyPartDifferential(dCustomVe
 
 dCustomVehicleController::dBodyPartDifferential::~dBodyPartDifferential()
 {
+	if (m_rearDiff) {
+		delete m_rearDiff;
+	}
+	if (m_frontDiff) {
+		delete m_frontDiff;
+	}
 }
 
 void dCustomVehicleController::dBodyPartDifferential::ProjectError()
@@ -869,6 +877,40 @@ dCustomVehicleController::dEngineController::dEngineController (dCustomVehicleCo
 			rightTireMatrix = differential.m_axel.m_rightTire->GetJoint()->GetMatrix0() * rightTireMatrix;
 			new dAxelJoint(rightTireMatrix[0], differentialMatrix[0].Scale (1.0f), chassisMatrix[2], rightTireBody, differentialBody, chassisBody);
 			break;
+		}
+
+		case dDifferential::m_4wd:
+		{
+			m_differential->m_rearDiff = new dBodyPartDifferential(controller);
+			controller->m_bodyPartsList.Append(m_differential->m_rearDiff);
+			NewtonCollisionAggregateAddBody(controller->m_collisionAggregate, m_differential->m_rearDiff->GetBody());
+
+//			NewtonBody* const rearDiffBody = m_differential->m_rearDiff->GetBody();
+//			NewtonBodyGetMatrix(engineBody, &differentialMatrix[0][0]);
+//			new dAxelJoint(leftTireMatrix[0], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], rearDiffBody, differentialBody, chassisBody);
+
+
+/*
+
+			m_differential->m_frontDiff = new dBodyPartDifferential(controller);
+			controller->m_bodyPartsList.Append(m_differential->m_frontDiff);
+			NewtonCollisionAggregateAddBody(controller->m_collisionAggregate, m_differential->m_frontDiff->GetBody());
+
+			dMatrix leftTireMatrix;
+			NewtonBody* const leftTireBody = differential.m_axel.m_leftTire->GetBody();
+			dAssert(leftTireBody == differential.m_axel.m_leftTire->GetJoint()->GetBody0());
+			NewtonBodyGetMatrix(leftTireBody, &leftTireMatrix[0][0]);
+			leftTireMatrix = differential.m_axel.m_leftTire->GetJoint()->GetMatrix0() * leftTireMatrix;
+			new dAxelJoint(leftTireMatrix[0], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftTireBody, differentialBody, chassisBody);
+
+			dMatrix rightTireMatrix;
+			NewtonBody* const rightTireBody = differential.m_axel.m_rightTire->GetBody();
+			dAssert(rightTireBody == differential.m_axel.m_rightTire->GetJoint()->GetBody0());
+			NewtonBodyGetMatrix(rightTireBody, &rightTireMatrix[0][0]);
+			rightTireMatrix = differential.m_axel.m_rightTire->GetJoint()->GetMatrix0() * rightTireMatrix;
+			new dAxelJoint(rightTireMatrix[0], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightTireBody, differentialBody, chassisBody);
+			break;
+*/
 		}
 
 		default:
