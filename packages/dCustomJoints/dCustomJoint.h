@@ -26,7 +26,6 @@
 
 class dCustomJoint;
 typedef void (*JointUserDestructorCallback) (const dCustomJoint* const me);	
-typedef void (*JointUserSubmitConstraintCallback) (const dCustomJoint* const me, dFloat timestep, int threadIndex);
 
 
 #define D_CUSTOM_LARGE_VALUE		dFloat (1.0e20f)
@@ -195,9 +194,6 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API int GetSolverModel() const;
 
 	CUSTOM_JOINTS_API void SetUserDestructorCallback (JointUserDestructorCallback callback) {m_userDestructor = callback;}
-	CUSTOM_JOINTS_API void SetUserSubmintConstraintCallback (JointUserSubmitConstraintCallback callback) {m_userConstrationCallback = callback;}
-
-	CUSTOM_JOINTS_API virtual void UserUpdate(dFloat timestep, int threadIndex) { dAssert (0);}
 
 	private:
 	// this are the callback needed to have transparent c++ method interfaces 
@@ -229,7 +225,6 @@ class dCustomJoint: public dCustomAlloc
 	NewtonJoint* m_joint;
 	NewtonWorld* m_world;
 	JointUserDestructorCallback m_userDestructor;
-	JointUserSubmitConstraintCallback m_userConstrationCallback;
 	dFloat m_stiffness;
 	int m_maxDof;
 	int m_autoDestroy;

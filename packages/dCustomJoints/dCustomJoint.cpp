@@ -29,7 +29,6 @@ dCustomJoint::dCustomJoint ()
 	,m_joint(NULL)
 	,m_world(NULL)
 	,m_userDestructor(NULL)
-	,m_userConstrationCallback(NULL)
 	,m_stiffness(1.0f)
 	,m_maxDof(0)
 	,m_autoDestroy(0)
@@ -48,7 +47,6 @@ dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, Ne
 	,m_joint(NULL)
 	,m_world(NULL)
 	,m_userDestructor(NULL)
-	,m_userConstrationCallback(NULL)
 	,m_stiffness(1.0f)
 	,m_maxDof(0)
 	,m_autoDestroy(0)
@@ -110,7 +108,6 @@ void dCustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const 
 
 	m_userData = NULL;
 	m_userDestructor = NULL;
-	m_userConstrationCallback = NULL;
 }
 
 
@@ -181,12 +178,6 @@ void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timest
 
 		// call the constraint call back
 		joint->SubmitConstraints(timestep, threadIndex);
-
-		// if there is a user define callback call it from here;
-		if (joint->m_userConstrationCallback) {
-			//joint->m_userConstrationCallback ((const NewtonUserJoint*) joint, timestep, threadIndex);
-			joint->m_userConstrationCallback (joint, timestep, threadIndex);
-		}
 	}
 }
 
