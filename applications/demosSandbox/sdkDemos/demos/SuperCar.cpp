@@ -524,7 +524,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownforceFactor = definition.m_aerodynamicsDownForceWeightCoeffecient0;
 		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
-
+/*
 		m_controller->AddEngine (engineInfo.m_mass, engineInfo.m_radio);
 		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential);
 
@@ -548,7 +548,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat weightRatio1 = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		dFloat speedFactor = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 		m_controller->SetAerodynamicsDownforceCoefficient(weightRatio0, speedFactor, weightRatio1);
-
+*/
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 	}
@@ -903,9 +903,8 @@ class SuperCarEntity: public DemoEntity
 		NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 		matrix.m_posit = matrix.TransformVector(com);
-		dAssert (0);
 		//matrix = m_controller->GetLocalFrame() * matrix;
-		matrix = matrix;
+		//matrix = matrix;
 
 		dFloat scale = -4.0f / (mass * DEMO_GRAVITY);
 		dVector p0 (matrix.m_posit);

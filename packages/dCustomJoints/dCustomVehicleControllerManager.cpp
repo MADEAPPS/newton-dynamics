@@ -1490,7 +1490,6 @@ void dCustomVehicleController::Init(NewtonCollision* const chassisShape, const d
 	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
 
 	// set vehicle mass, inertia and center of mass
-//mass = 0;
 	NewtonBodySetMassProperties(body, mass, chassisShape);
 
 	// initialize 
@@ -2376,7 +2375,7 @@ void dCustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 			m_engineControl->Update(timestep);
 		}
 
-//		if (ControlStateChanged()) 
+		if (ControlStateChanged()) 
 		{
 			NewtonBodySetSleepState(m_body, 0);
 		}
