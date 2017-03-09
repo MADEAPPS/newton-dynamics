@@ -2376,7 +2376,8 @@ void dCustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 			m_engineControl->Update(timestep);
 		}
 
-		if (ControlStateChanged()) {
+//		if (ControlStateChanged()) 
+		{
 			NewtonBodySetSleepState(m_body, 0);
 		}
 	}

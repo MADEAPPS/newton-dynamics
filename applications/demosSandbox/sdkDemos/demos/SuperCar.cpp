@@ -108,8 +108,8 @@ static CarDefinition monsterTruck =
 	DEMO_GRAVITY * 4.0f,						// TIRE_LATERAL_STIFFNESS
 	DEMO_GRAVITY * 3.0f,						// TIRE_LONGITUDINAL_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
-	20000.0f,									// TIRE_SUSPENSION_SPRING
-	300.0f,										// TIRE_SUSPENSION_DAMPER
+	4000.0f,									// TIRE_SUSPENSION_SPRING
+	200.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
 	dCustomVehicleController::dBodyPartTire::Info::m_confort, //TIRE_SUSPENSION_TYPE
 	20000.0f,									// TIRE_BRAKE_TORQUE
