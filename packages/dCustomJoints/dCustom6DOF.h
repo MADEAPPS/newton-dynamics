@@ -42,9 +42,9 @@ class dCustom6DOF: public dCustomJoint
 	dVector m_maxLinearLimits;
 	dVector m_minAngularLimits;
 	dVector m_maxAngularLimits;
-	AngularIntegration m_pitch;
-	AngularIntegration m_yaw;
-	AngularIntegration m_roll;
+	dAngularIntegration m_pitch;
+	dAngularIntegration m_yaw;
+	dAngularIntegration m_roll;
 	DECLARE_CUSTOM_JOINT(dCustom6DOF, dCustomJoint)
 };
 

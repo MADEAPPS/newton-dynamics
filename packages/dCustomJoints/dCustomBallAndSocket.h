@@ -127,9 +127,9 @@ class dCustomControlledBallAndSocket: public dCustomBallAndSocket
 
 	dVector m_targetAngles;
 	dMatrix m_targetRotation;
-	AngularIntegration m_pitch;
-	AngularIntegration m_yaw;
-	AngularIntegration m_roll;
+	dAngularIntegration m_pitch;
+	dAngularIntegration m_yaw;
+	dAngularIntegration m_roll;
 	dFloat m_angulaSpeed;
 	DECLARE_CUSTOM_JOINT(dCustomControlledBallAndSocket, dCustomBallAndSocket)
 };

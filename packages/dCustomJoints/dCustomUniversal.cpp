@@ -56,8 +56,8 @@ dCustomUniversal::dCustomUniversal(const dMatrix& pinAndPivotFrame, NewtonBody* 
 dCustomUniversal::dCustomUniversal(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:dCustomJoint(child, parent, callback, userData)
 {
-	callback(userData, &m_curJointAngle_0, sizeof(AngularIntegration));
-	callback(userData, &m_curJointAngle_1, sizeof(AngularIntegration));
+	callback(userData, &m_curJointAngle_0, sizeof(dAngularIntegration));
+	callback(userData, &m_curJointAngle_1, sizeof(dAngularIntegration));
 
 	callback(userData, &m_minAngle_0, sizeof(dFloat));
 	callback(userData, &m_maxAngle_0, sizeof(dFloat));
@@ -78,8 +78,8 @@ void dCustomUniversal::Serialize(NewtonSerializeCallback callback, void* const u
 {
 	dCustomJoint::Serialize(callback, userData);
 
-	callback(userData, &m_curJointAngle_0, sizeof(AngularIntegration));
-	callback(userData, &m_curJointAngle_1, sizeof(AngularIntegration));
+	callback(userData, &m_curJointAngle_0, sizeof(dAngularIntegration));
+	callback(userData, &m_curJointAngle_1, sizeof(dAngularIntegration));
 
 	callback(userData, &m_minAngle_0, sizeof(dFloat));
 	callback(userData, &m_maxAngle_0, sizeof(dFloat));

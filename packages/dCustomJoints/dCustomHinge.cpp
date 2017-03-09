@@ -70,7 +70,7 @@ dCustomHinge::~dCustomHinge()
 dCustomHinge::dCustomHinge (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:dCustomJoint(child, parent, callback, userData)
 {
-	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
+	callback(userData, &m_curJointAngle, sizeof(dAngularIntegration));
 	callback (userData, &m_minAngle, sizeof (dFloat));
 	callback (userData, &m_maxAngle, sizeof (dFloat));
 	callback (userData, &m_friction, sizeof (dFloat));
@@ -84,7 +84,7 @@ dCustomHinge::dCustomHinge (NewtonBody* const child, NewtonBody* const parent, N
 void dCustomHinge::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize (callback, userData);
-	callback(userData, &m_curJointAngle, sizeof(AngularIntegration));
+	callback(userData, &m_curJointAngle, sizeof(dAngularIntegration));
 	callback (userData, &m_minAngle, sizeof (dFloat));
 	callback (userData, &m_maxAngle, sizeof (dFloat));
 	callback (userData, &m_friction, sizeof (dFloat));

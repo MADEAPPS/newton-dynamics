@@ -17,7 +17,7 @@
 #include "dCustomJoint.h"
 
 dCRCTYPE dCustomJoint::m_key = dCRC64 ("dCustomJoint");
-dCustomJoint::SerializeMetaData m_metaData_CustomJoint("dCustomJoint");
+dCustomJoint::dSerializeMetaData m_metaData_CustomJoint("dCustomJoint");
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -195,10 +195,10 @@ void dCustomJoint::Serialize (const NewtonJoint* const me, NewtonSerializeCallba
 	dCRCTYPE key = joint->GetSerializeKey();
 	callback (userData, &key, sizeof (key));
 
-	const SerializeMetaDataDictionary& dictionary = GetDictionary();
-	SerializeMetaDataDictionary::dTreeNode* const node = dictionary.Find(key); 
+	const dSerializeMetaDataDictionary& dictionary = GetDictionary();
+	dSerializeMetaDataDictionary::dTreeNode* const node = dictionary.Find(key); 
 	if (node) {
-		SerializeMetaData* const meta = node->GetInfo();
+		dSerializeMetaData* const meta = node->GetInfo();
 		meta->SerializeJoint(joint, callback, userData);
 	}
 }
@@ -207,11 +207,11 @@ void dCustomJoint::Deserialize (NewtonBody* const body0, NewtonBody* const body1
 {
 	dCRCTYPE key;
 	callback (userData, &key, sizeof (key));
-	const SerializeMetaDataDictionary& dictionary = GetDictionary();
+	const dSerializeMetaDataDictionary& dictionary = GetDictionary();
 
-	SerializeMetaDataDictionary::dTreeNode* const node = dictionary.Find(key); 
+	dSerializeMetaDataDictionary::dTreeNode* const node = dictionary.Find(key); 
 	if (node) {
-		SerializeMetaData* const meta = node->GetInfo();
+		dSerializeMetaData* const meta = node->GetInfo();
 		meta->DeserializeJoint (body0, body1, callback, userData);
 	}
 }
@@ -324,26 +324,26 @@ dCRCTYPE dCustomJoint::GetSerializeKey() const
 }
 
 
-dCustomJoint::SerializeMetaData::SerializeMetaData(const char* const name)
+dCustomJoint::dSerializeMetaData::dSerializeMetaData(const char* const name)
 {
 	dCustomJoint::GetDictionary().Insert(this, dCRC64(name));
 }
 
 
-void dCustomJoint::SerializeMetaData::SerializeJoint (dCustomJoint* const joint, NewtonSerializeCallback callback, void* const userData)
+void dCustomJoint::dSerializeMetaData::SerializeJoint (dCustomJoint* const joint, NewtonSerializeCallback callback, void* const userData)
 {
 	dAssert (0);
 }
 
-dCustomJoint* dCustomJoint::SerializeMetaData::DeserializeJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData)
+dCustomJoint* dCustomJoint::dSerializeMetaData::DeserializeJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData)
 {
 	dAssert (0);
 	return NULL;
 }
 
-dCustomJoint::SerializeMetaDataDictionary& dCustomJoint::GetDictionary()
+dCustomJoint::dSerializeMetaDataDictionary& dCustomJoint::GetDictionary()
 {
-	static SerializeMetaDataDictionary dictionary;
+	static dSerializeMetaDataDictionary dictionary;
 	return dictionary;
 }
 

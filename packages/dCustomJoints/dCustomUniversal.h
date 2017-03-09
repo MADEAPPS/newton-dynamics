@@ -61,8 +61,8 @@ class dCustomUniversal: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	AngularIntegration m_curJointAngle_0;
-	AngularIntegration m_curJointAngle_1;
+	dAngularIntegration m_curJointAngle_0;
+	dAngularIntegration m_curJointAngle_1;
 
 	dFloat m_minAngle_0;
 	dFloat m_maxAngle_0;

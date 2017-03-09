@@ -53,9 +53,9 @@ dCustom6DOF::dCustom6DOF (NewtonBody* const child, NewtonBody* const parent, New
 	callback (userData, &m_maxLinearLimits, sizeof (dVector));
 	callback (userData, &m_minAngularLimits, sizeof (dVector));
 	callback (userData, &m_maxAngularLimits, sizeof (dVector));
-	callback (userData, &m_pitch, sizeof (AngularIntegration));
-	callback (userData, &m_yaw, sizeof (AngularIntegration));
-	callback (userData, &m_roll, sizeof (AngularIntegration));
+	callback (userData, &m_pitch, sizeof (dAngularIntegration));
+	callback (userData, &m_yaw, sizeof (dAngularIntegration));
+	callback (userData, &m_roll, sizeof (dAngularIntegration));
 }
 
 void dCustom6DOF::Serialize (NewtonSerializeCallback callback, void* const userData) const
@@ -65,9 +65,9 @@ void dCustom6DOF::Serialize (NewtonSerializeCallback callback, void* const userD
 	callback(userData, &m_maxLinearLimits, sizeof (dVector));
 	callback(userData, &m_minAngularLimits, sizeof (dVector));
 	callback(userData, &m_maxAngularLimits, sizeof (dVector));
-	callback(userData, &m_pitch, sizeof (AngularIntegration));
-	callback(userData, &m_yaw, sizeof (AngularIntegration));
-	callback(userData, &m_roll, sizeof (AngularIntegration));
+	callback(userData, &m_pitch, sizeof (dAngularIntegration));
+	callback(userData, &m_yaw, sizeof (dAngularIntegration));
+	callback(userData, &m_roll, sizeof (dAngularIntegration));
 }
 
 
@@ -209,8 +209,8 @@ void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix localMatrix (matrix0 * matrix1.Inverse());
 	localMatrix.GetEulerAngles(euler0, euler1);
 
-	AngularIntegration pitchStep0 (AngularIntegration (euler0.m_x) - m_pitch);
-	AngularIntegration pitchStep1 (AngularIntegration (euler1.m_x) - m_pitch);
+	dAngularIntegration pitchStep0 (dAngularIntegration (euler0.m_x) - m_pitch);
+	dAngularIntegration pitchStep1 (dAngularIntegration (euler1.m_x) - m_pitch);
 	if (dAbs (pitchStep0.GetAngle()) > dAbs (pitchStep1.GetAngle())) {
 		euler0 = euler1;
 	}

@@ -56,7 +56,7 @@ dCustomCorkScrew::dCustomCorkScrew (NewtonBody* const child, NewtonBody* const p
 	callback (userData, &m_maxAngularDist, sizeof (dFloat));
 	callback (userData, &m_angularDamp, sizeof (dFloat));
 	callback (userData, &m_angularAccel, sizeof (dFloat));
-	callback (userData, &m_curJointAngle, sizeof (AngularIntegration));
+	callback (userData, &m_curJointAngle, sizeof (dAngularIntegration));
 
 	int tmp[3];
 	callback (userData, tmp, sizeof (tmp));
@@ -75,7 +75,7 @@ void dCustomCorkScrew::Serialize (NewtonSerializeCallback callback, void* const 
 	callback (userData, &m_maxAngularDist, sizeof (dFloat));
 	callback (userData, &m_angularDamp, sizeof (dFloat));
 	callback (userData, &m_angularAccel, sizeof (dFloat));
-	callback (userData, &m_curJointAngle, sizeof (AngularIntegration));
+	callback (userData, &m_curJointAngle, sizeof (dAngularIntegration));
 
 	int tmp[3];
 	tmp[0] = m_limitsLinearOn ; 

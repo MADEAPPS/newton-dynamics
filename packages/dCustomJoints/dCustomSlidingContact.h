@@ -42,7 +42,7 @@ class dCustomSlidingContact: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	AngularIntegration m_curJointAngle;
+	dAngularIntegration m_curJointAngle;
 	dFloat m_speed;
 	dFloat m_posit;
 	dFloat m_minLinearDist;

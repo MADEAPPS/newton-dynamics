@@ -37,7 +37,7 @@ class dCustomCorkScrew: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
-	AngularIntegration m_curJointAngle;
+	dAngularIntegration m_curJointAngle;
 	dFloat m_minLinearDist;
 	dFloat m_maxLinearDist;
 	dFloat m_minAngularDist;

@@ -25,7 +25,7 @@
 #include "dCustomAlloc.h"
 
 class dCustomJoint;
-typedef void (*JointUserDestructorCallback) (const dCustomJoint* const me);	
+typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);	
 
 
 #define D_CUSTOM_LARGE_VALUE		dFloat (1.0e20f)
@@ -36,11 +36,11 @@ typedef void (*JointUserDestructorCallback) (const dCustomJoint* const me);
 	virtual dCRCTYPE GetSerializeKey() const { return m_metaData_##className.m_key_##className;}							\
 	static dCRCTYPE GetKeyType () { return m_metaData_##className.m_key_##className; }										\
 	virtual const char* GetTypeName() const { return #className; }															\
-	class SerializeMetaData_##className: public baseClass::SerializeMetaData												\
+	class SerializeMetaData_##className: public baseClass::dSerializeMetaData												\
 	{																														\
 		public:																												\
 		SerializeMetaData_##className(const char* const name)																\
-			:baseClass::SerializeMetaData(name)																				\
+			:baseClass::dSerializeMetaData(name)																				\
 			,m_key_##className (dCRC64(#className))																			\
 		{																													\
 		}																													\
@@ -58,7 +58,7 @@ typedef void (*JointUserDestructorCallback) (const dCustomJoint* const me);
 			if (type == m_key_##className) {																				\
 				return true;																								\
 			}																												\
-			return baseClass::SerializeMetaData::IsType(type);																\
+			return baseClass::dSerializeMetaData::IsType(type);																\
 		}																													\
 		dCRCTYPE m_key_##className;																							\
 	};																														\
@@ -73,33 +73,33 @@ typedef void (*JointUserDestructorCallback) (const dCustomJoint* const me);
 class dCustomJoint: public dCustomAlloc  
 {
 	public:
-	class SerializeMetaData
+	class dSerializeMetaData
 	{
 		public:
-		CUSTOM_JOINTS_API SerializeMetaData(const char* const name);
+		CUSTOM_JOINTS_API dSerializeMetaData(const char* const name);
 		CUSTOM_JOINTS_API virtual void SerializeJoint (dCustomJoint* const joint, NewtonSerializeCallback callback, void* const userData);
 		CUSTOM_JOINTS_API virtual dCustomJoint* DeserializeJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
 		CUSTOM_JOINTS_API virtual bool IsType (dCRCTYPE type) const {return false;}
 	};
 
-	class SerializeMetaDataDictionary: public dTree<SerializeMetaData*, dCRCTYPE>
+	class dSerializeMetaDataDictionary: public dTree<dSerializeMetaData*, dCRCTYPE>
 	{
 		public:
-		SerializeMetaDataDictionary()
-			:dTree<SerializeMetaData*, dCRCTYPE>()
+		dSerializeMetaDataDictionary()
+			:dTree<dSerializeMetaData*, dCRCTYPE>()
 		{
 		}
 	};
 
-	class AngularIntegration
+	class dAngularIntegration
 	{
 		public:
-		AngularIntegration()
+		dAngularIntegration()
 		{
 			SetAngle (0.0f);
 		}
 
-		AngularIntegration(dFloat angle)
+		dAngularIntegration(dFloat angle)
 		{
 			SetAngle (angle);
 		}
@@ -127,20 +127,20 @@ class dCustomJoint: public dCustomAlloc
 			return m_angle;
 		}
 
-		AngularIntegration operator+ (const AngularIntegration& angle) const
+		dAngularIntegration operator+ (const dAngularIntegration& angle) const
 		{
 			dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle + angle.m_cosJointAngle * m_sinJointAngle; 
 			dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle - angle.m_sinJointAngle * m_sinJointAngle; 
 			dFloat angle_da = dAtan2 (sin_da, cos_da);
-			return AngularIntegration(m_angle + angle_da);
+			return dAngularIntegration(m_angle + angle_da);
 		}
 
-		AngularIntegration operator- (const AngularIntegration& angle) const
+		dAngularIntegration operator- (const dAngularIntegration& angle) const
 		{
 			dFloat sin_da = angle.m_sinJointAngle * m_cosJointAngle - angle.m_cosJointAngle * m_sinJointAngle; 
 			dFloat cos_da = angle.m_cosJointAngle * m_cosJointAngle + angle.m_sinJointAngle * m_sinJointAngle; 
 			dFloat angle_da = dAtan2 (sin_da, cos_da);
-			return AngularIntegration (angle_da);
+			return dAngularIntegration (angle_da);
 		}
 
 
@@ -193,7 +193,7 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API void SetSolverModel(int model);
 	CUSTOM_JOINTS_API int GetSolverModel() const;
 
-	CUSTOM_JOINTS_API void SetUserDestructorCallback (JointUserDestructorCallback callback) {m_userDestructor = callback;}
+	CUSTOM_JOINTS_API void SetUserDestructorCallback (dJointUserDestructorCallback callback) {m_userDestructor = callback;}
 
 	private:
 	// this are the callback needed to have transparent c++ method interfaces 
@@ -212,7 +212,7 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API void CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 
-	CUSTOM_JOINTS_API static SerializeMetaDataDictionary& GetDictionary();
+	CUSTOM_JOINTS_API static dSerializeMetaDataDictionary& GetDictionary();
 
 	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir) const;
 	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const;
@@ -224,12 +224,12 @@ class dCustomJoint: public dCustomAlloc
 	NewtonBody* m_body1;
 	NewtonJoint* m_joint;
 	NewtonWorld* m_world;
-	JointUserDestructorCallback m_userDestructor;
+	dJointUserDestructorCallback m_userDestructor;
 	dFloat m_stiffness;
 	int m_maxDof;
 	int m_autoDestroy;
 	CUSTOM_JOINTS_API static dCRCTYPE m_key;
-	CUSTOM_JOINTS_API static SerializeMetaData m_metaData_CustomJoint;
+	CUSTOM_JOINTS_API static dSerializeMetaData m_metaData_CustomJoint;
 };
 
 

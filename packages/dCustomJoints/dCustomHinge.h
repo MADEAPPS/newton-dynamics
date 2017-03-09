@@ -50,7 +50,7 @@ class dCustomHinge: public dCustomJoint
 
 	CUSTOM_JOINTS_API void ApplySpringDamper (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 	
-	AngularIntegration m_curJointAngle;
+	dAngularIntegration m_curJointAngle;
 	dFloat m_minAngle;
 	dFloat m_maxAngle;
 	dFloat m_friction;
