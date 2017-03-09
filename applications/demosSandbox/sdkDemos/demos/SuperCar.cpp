@@ -495,26 +495,32 @@ class SuperCarEntity: public DemoEntity
 		switch (definition.m_differentialType) 
 		{
 			case 0:
+			{
 				// rear wheel drive no differential vehicle
 				differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_2wd;
 				differential.m_axel.m_leftTire = leftRearTire;
 				differential.m_axel.m_rightTire = rightRearTire;
 				break;
+			}
 
 			case 1:
+			{
 				// front wheel drive vehicle with differential
 				dAssert(0);
 				differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_2wd;
 				differential.m_axel.m_leftTire = leftFrontTire;
 				differential.m_axel.m_rightTire = rightFrontTire;
 				break;
+			}
 
 			default:
+			{
 				differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_2wd;
 				differential.m_axel.m_leftTire = leftRearTire;
 				differential.m_axel.m_rightTire = rightRearTire;
 				differential.m_secondAxel.m_axel.m_leftTire = leftFrontTire;
 				differential.m_secondAxel.m_axel.m_rightTire = rightFrontTire;
+			}
 		}
 
 
@@ -766,7 +772,12 @@ class SuperCarEntity: public DemoEntity
 					break;
 				}
 			}
+
+		} else if (handBrakes) {
+			handBrakes->SetParam(handBrakePedal);
 		}
+			
+
 	}
 
 	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/

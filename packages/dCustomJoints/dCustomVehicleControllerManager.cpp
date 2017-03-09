@@ -1957,10 +1957,11 @@ int dCustomVehicleControllerManager::Collide(dCustomVehicleController::dBodyPart
 					NewtonWorldConvexCast (world, &chassisMatrix[0][0], &tireSweeptMatrix.m_posit[0], tireCollision, &param, &filter, dCustomControllerConvexCastPreFilter::Prefilter, NULL, 0, threadIndex);
 					count = (param < 1.0f) ? 0 : count;
 				}
-				if (count) {
-					tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(x1);
-					NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
-				}
+				// with the old hybrid model this was ok by that is very bad 
+				//if (count) {
+				//	tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(x1);
+				//	NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
+				//}
 			}
 		} else {
 			count = 0;
@@ -2326,6 +2327,9 @@ void dCustomVehicleController::CalculateLateralDynamicState(dFloat timestep)
 
 void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
+static int xxx;
+xxx++;
+
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		for (dList<dBodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
