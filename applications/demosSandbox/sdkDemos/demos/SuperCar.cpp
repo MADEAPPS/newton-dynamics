@@ -154,7 +154,7 @@ static CarDefinition viper =
 	700.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
 	dCustomVehicleController::dBodyPartTire::Info::m_confort, //TIRE_SUSPENSION_TYPE
-	3000.0f,									// TIRE_BRAKE_TORQUE
+	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
 	1.78f,										// TIRE_GEAR_2
@@ -462,7 +462,7 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetBrakes(brakes);
 
 		// add vehicle hand brakes
-		dCustomVehicleController::dBrakeController* const handBrakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque);
+		dCustomVehicleController::dBrakeController* const handBrakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque * 0.25f);
 		handBrakes->AddTire (leftRearTire);
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
@@ -1026,7 +1026,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		,m_externalView(true)
 		,m_player (NULL) 
 		//,m_debugVehicle (NULL) 
-		,m_drawShematic(false)
+		,m_drawShematic(true)
 		,m_helpKey (true)
 		,m_nexVehicle (true)
 	{
@@ -1269,7 +1269,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		if (m_drawShematic) {
 			RenderVehicleSchematic (scene);
 		}
-		m_drawShematic = false;
+		//m_drawShematic = false;
 
 		// set to transparent color
 		glEnable (GL_BLEND);
