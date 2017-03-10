@@ -2356,6 +2356,10 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 
 void dCustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 {
+
+static int xxx;
+xxx++;
+
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		m_chassis.ApplyDownForce ();
