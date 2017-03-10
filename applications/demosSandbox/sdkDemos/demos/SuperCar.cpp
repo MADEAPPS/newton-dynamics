@@ -679,6 +679,7 @@ class SuperCarEntity: public DemoEntity
 				case m_engineIdle:
 				{
 					brakes->SetParam(0.0f);
+					engine->SetClutchParam(0.0f);
 					handBrakes->SetParam(handBrakePedal);
 					if (!engineIgnitionKey) {
 						m_drivingState = m_engineOff;
