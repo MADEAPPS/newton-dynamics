@@ -556,9 +556,9 @@ dCustomVehicleController::dBodyPartTire::~dBodyPartTire()
 {
 }
 
+/*
 // Using brush tire model explained on this paper
-// https://ddl.stanford.edu/sites/default/files/2013_Thesis_Hindiyeh_Dynamics_and_Control_of_Drifting_in_Automobiles.pdf
-void dCustomVehicleController::dBodyPartTire::dFrictionModel::GetForces(const dBodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
+void dCustomVehicleController::dBodyPartTire::dFrictionModel::CalculateTireFrictionCoeficents(const dBodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
 {
 	const dCustomVehicleController* const controller = tire->GetController();
 //	const dFloat gravityMag = controller->m_gravityMag;
@@ -579,6 +579,33 @@ void dCustomVehicleController::dBodyPartTire::dFrictionModel::GetForces(const dB
 
 	aligningTorque = 0.0f;
 }
+*/
+
+// Using brush tire model explained on by Giancarlo Genta, adapted to calculate friction coeficient instead tire forces
+void dCustomVehicleController::dBodyPartTire::dFrictionModel::CalculateTireFrictionCoeficents(const dBodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat& longitudinalFrictionCoef, dFloat& lateralFrictionCoef, dFloat& aligningTorqueCoef) const
+{
+	dFloat phy_y = dAbs (tire->m_lateralSlip * tire->m_data.m_lateralStiffness);
+	dFloat phy_x = dAbs (tire->m_longitudinalSlip * tire->m_data.m_longitudialStiffness);
+
+	dFloat gamma = dMax(dSqrt(phy_x * phy_x + phy_y * phy_y), dFloat(0.1f));
+	dFloat fritionCoeficicent = dClamp(GetFrictionCoefficient(material, tire->GetBody(), otherBody), dFloat(0.0f), dFloat(1.0f));
+
+	dFloat normalTireLoad = 1.0f * fritionCoeficicent;
+	dFloat phyMax = 3.0f * normalTireLoad + 1.0e-3f;
+	dFloat F = (gamma <= phyMax) ? (gamma * (1.0f - gamma / phyMax + gamma * gamma / (3.0f * phyMax * phyMax))) : normalTireLoad;
+
+	dFloat fraction = F / gamma;
+	lateralFrictionCoef = phy_y * fraction;
+	longitudinalFrictionCoef = phy_x * fraction;
+
+	dAssert (lateralFrictionCoef >= 0.0f);
+	dAssert (lateralFrictionCoef <= 1.0f);
+	dAssert (longitudinalFrictionCoef >= 0.0f);
+	dAssert (longitudinalFrictionCoef <= 1.0f);
+
+	aligningTorqueCoef = 0.0f;
+}
+
 
 
 void dCustomVehicleController::dBodyPartTire::Init (dBodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const Info& info)
@@ -2134,27 +2161,26 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 //					longitudinalAccel = -dvx / timestep;
 				}
 
-				dFloat lateralForce;
+//				dFloat lateralForce;
+//				dFloat aligningMoment;
+//				dFloat longitudinalForce;
+//				dVector tireLoadForce(0.0f);
+//				NewtonMaterialGetContactForce(material, tireBody, &tireLoadForce.m_x);
+//				dFloat tireLoad = tireLoadForce.DotProduct3(contactNormal);
+//				controller->m_contactFilter->CalculateTireFrictionCoeficents(tire, otherBody, material, tireLoad, longitudinalForce, lateralForce, aligningMoment);
+//				NewtonMaterialSetContactTangentAcceleration (material, lateralAccel, 0);
+//				NewtonMaterialSetContactTangentFriction(material, dAbs (lateralForce), 0);
+//				NewtonMaterialSetContactTangentAcceleration (material, longitudinalAccel, 1);
+//				NewtonMaterialSetContactTangentFriction(material, dAbs (longitudinalForce), 1);
+
 				dFloat aligningMoment;
-				dFloat longitudinalForce;
-
-				dVector tireLoadForce(0.0f);
-				NewtonMaterialGetContactForce(material, tireBody, &tireLoadForce.m_x);
-				dFloat tireLoad = tireLoadForce.DotProduct3(contactNormal);
-				controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, longitudinalForce, lateralForce, aligningMoment);
-
-/*
-//lateralAccel = -(controller->m_localVeloc.m_z + tireLocalVelocity.m_z)/timestep;
-lateralAccel = -tireVeloc.DotProduct3(lateralPin) / timestep;
-
-				NewtonMaterialSetContactTangentAcceleration (material, lateralAccel, 0);
-				NewtonMaterialSetContactTangentFriction(material, dAbs (lateralForce), 0);
-				NewtonMaterialSetContactTangentAcceleration (material, longitudinalAccel, 1);
-				NewtonMaterialSetContactTangentFriction(material, dAbs (longitudinalForce), 1);
-*/
-
-				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
-				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+				dFloat lateralFrictionCoef;
+				dFloat longitudinalFrictionCoef;
+				controller->m_contactFilter->CalculateTireFrictionCoeficents(tire, otherBody, material, longitudinalFrictionCoef, lateralFrictionCoef, aligningMoment);
+//				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
+//				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+				NewtonMaterialSetContactFrictionCoef(material, lateralFrictionCoef, lateralFrictionCoef, 0);
+				NewtonMaterialSetContactFrictionCoef(material, longitudinalFrictionCoef, longitudinalFrictionCoef, 1);
 			}
 
 		} else {

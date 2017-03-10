@@ -213,7 +213,7 @@ class dCustomVehicleController: public dCustomControllerBase
 				return 1.0f;
 			}
 
-			virtual void GetForces(const dBodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const;
+			virtual void CalculateTireFrictionCoeficents(const dBodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat& longitudinalFrictionCoef, dFloat& lateralFrictionCoef, dFloat& aligningTorqueCoef) const;
 
 			const dCustomVehicleController* m_controller;
 		};

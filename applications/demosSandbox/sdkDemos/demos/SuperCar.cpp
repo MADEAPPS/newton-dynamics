@@ -105,8 +105,8 @@ static CarDefinition monsterTruck =
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	DEMO_GRAVITY * 4.0f,						// TIRE_LATERAL_STIFFNESS
-	DEMO_GRAVITY * 3.0f,						// TIRE_LONGITUDINAL_STIFFNESS
+	1.0f,										// TIRE_LATERAL_STIFFNESS
+	1.0f,										// TIRE_LONGITUDINAL_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
 	4000.0f,									// TIRE_SUSPENSION_SPRING
 	200.0f,										// TIRE_SUSPENSION_DAMPER
@@ -147,8 +147,8 @@ static CarDefinition viper =
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	DEMO_GRAVITY * 4.0f,						// TIRE_LATERAL_STIFFNESS
-	DEMO_GRAVITY * 3.0f,						// TIRE_LONGITUDINAL_STIFFNESS
+	1.0f,										// TIRE_LATERAL_STIFFNESS
+	1.0f,										// TIRE_LONGITUDINAL_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
 	30000.0f,									// TIRE_SUSPENSION_SPRING
 	700.0f,										// TIRE_SUSPENSION_DAMPER
@@ -624,8 +624,8 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 
-#if 0
-	#if 1
+#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
@@ -1595,7 +1595,8 @@ void SuperCar (DemoEntityManager* const scene)
 		vehicle2->BuildWheelCar(viper);
 		u -= 0.005f;
 */
-		dMatrix location3(manager->CalculateSplineMatrix(u));
+//		dMatrix location3(manager->CalculateSplineMatrix(u));
+		dMatrix location3(dGetIdentityMatrix());
 		location3.m_posit = FindFloor(scene->GetNewton(), location3.m_posit + offset, 200.0f);
 		location3.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "viper.ngd", -3.0f, viper);
