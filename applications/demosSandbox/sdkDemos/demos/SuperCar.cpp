@@ -1568,7 +1568,7 @@ void SuperCar (DemoEntityManager* const scene)
 	dFloat u = 1.0f;
 	dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
 	for (int i = 0; i < 1; i ++) {
-
+/*
 		dMatrix location0 (manager->CalculateSplineMatrix (u));
 		location0.m_posit += location0.m_right.Scale (3.0f);
 		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
@@ -1576,6 +1576,7 @@ void SuperCar (DemoEntityManager* const scene)
 		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "monsterTruck.ngd", 3.0f, monsterTruck);
 		vehicle0->BuildWheelCar(monsterTruck);
 		u -= 0.005f;
+*/
 /*
 
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
@@ -1593,14 +1594,14 @@ void SuperCar (DemoEntityManager* const scene)
 		SuperCarEntity* const vehicle2 = new SuperCarEntity(scene, manager, location2, "lambDiablo.ngd", 3.0f, viper);
 		vehicle2->BuildWheelCar(viper);
 		u -= 0.005f;
-
+*/
 		dMatrix location3(manager->CalculateSplineMatrix(u));
 		location3.m_posit = FindFloor(scene->GetNewton(), location3.m_posit + offset, 200.0f);
 		location3.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "viper.ngd", -3.0f, viper);
 		vehicle3->BuildWheelCar(viper);
 		u -= 0.005f;
-*/
+
 	}
 
 	dCustomVehicleController* const controller = &manager->GetLast()->GetInfo();
