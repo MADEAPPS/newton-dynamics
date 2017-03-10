@@ -1112,9 +1112,6 @@ void dCustomVehicleController::dEngineController::Update(dFloat timestep)
 		UpdateAutomaticGearBox (timestep, omega);
 	}
 
-static int xxx;
-xxx++;
-
 	dFloat engineTorque = 0.0f;
 	if (m_ignitionKey) {
 		engineTorque = m_info.m_idleTorque + (m_info.m_peakTorque - m_info.m_idleTorque) * m_param;
@@ -2101,10 +2098,6 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 			} else {
 
-				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
-				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
-
-/*
 				// calculating Brush tire model with longitudinal and lateral coupling 
 				// for friction coupling according to Motor Vehicle dynamics by: Giancarlo Genta 
 				// reduces to this, which may have a divide by zero locked, so I am clamping to some small value
@@ -2148,9 +2141,9 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 				dVector tireLoadForce(0.0f);
 				NewtonMaterialGetContactForce(material, tireBody, &tireLoadForce.m_x);
 				dFloat tireLoad = tireLoadForce.DotProduct3(contactNormal);
-
 				controller->m_contactFilter->GetForces(tire, otherBody, material, tireLoad, longitudinalForce, lateralForce, aligningMoment);
-				
+
+/*
 //lateralAccel = -(controller->m_localVeloc.m_z + tireLocalVelocity.m_z)/timestep;
 lateralAccel = -tireVeloc.DotProduct3(lateralPin) / timestep;
 
@@ -2159,6 +2152,9 @@ lateralAccel = -tireVeloc.DotProduct3(lateralPin) / timestep;
 				NewtonMaterialSetContactTangentAcceleration (material, longitudinalAccel, 1);
 				NewtonMaterialSetContactTangentFriction(material, dAbs (longitudinalForce), 1);
 */
+
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
 			}
 
 		} else {
@@ -2328,15 +2324,11 @@ void dCustomVehicleController::CalculateLateralDynamicState(dFloat timestep)
 		m_sideSlipRate = (sideSlipAngle - m_sideSlipAngle) / timestep;
 		m_sideSlipAngle = sideSlipAngle;
 	}
-//	dTrace(("\n%d omega(%f) sideSlipRate (%f) sideSlip(%f) tires: ", xxx, m_localOmega.m_y * 180.0f / 3.141416f, m_sideSlipRate * 180.0f / 3.141416f, m_sideSlipAngle * 180.0f / 3.141416f));
 }
 
 
 void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
-static int xxx;
-xxx++;
-
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		for (dList<dBodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
