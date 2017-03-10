@@ -126,7 +126,7 @@ static CarDefinition monsterTruck =
 	2.0f,										// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,											// WHEEL_HAS_FENDER
-	2,											// DIFFERENTIAL_TYPE
+	1,											// DIFFERENTIAL_TYPE
 };
 
 static CarDefinition viper = 
@@ -506,7 +506,6 @@ class SuperCarEntity: public DemoEntity
 			case 1:
 			{
 				// front wheel drive vehicle with differential
-				dAssert(0);
 				differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_2wd;
 				differential.m_axel.m_leftTire = leftFrontTire;
 				differential.m_axel.m_rightTire = rightFrontTire;
@@ -530,7 +529,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownforceFactor = definition.m_aerodynamicsDownForceWeightCoeffecient0;
 		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
-/*
+
 		m_controller->AddEngine (engineInfo.m_mass, engineInfo.m_radio);
 		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential);
 
@@ -554,7 +553,7 @@ class SuperCarEntity: public DemoEntity
 		dFloat weightRatio1 = definition.m_aerodynamicsDownForceWeightCoeffecient1;
 		dFloat speedFactor = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 		m_controller->SetAerodynamicsDownforceCoefficient(weightRatio0, speedFactor, weightRatio1);
-*/
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
 	}

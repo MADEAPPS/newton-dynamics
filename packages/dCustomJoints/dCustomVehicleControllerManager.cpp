@@ -116,16 +116,17 @@ class dCustomVehicleController::dEngineJoint: public dCustomHinge
 		dMatrix engineMatrix(m_baseOffsetMatrix * chassisMatrix);
 		NewtonBodySetMatrixNoSleep(engineBody, &engineMatrix[0][0]);
 
+		NewtonBodyGetPointVelocity(chassisBody, &engineMatrix.m_posit[0], &engineVelocity[0]);
+		NewtonBodySetVelocityNoSleep(engineBody, &engineVelocity[0]);
+
 		NewtonBodyGetOmega(engineBody, &engineOmega[0]);
 		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
-		NewtonBodyGetPointVelocity(chassisBody, &engineMatrix.m_posit[0], &engineVelocity[0]);
 
-		dVector relOmega (engineOmega - chassisOmega);
-		dVector upPin(chassisMatrix.RotateVector(GetMatrix1().m_right));
-		engineOmega = chassisOmega + relOmega - upPin.Scale(relOmega.DotProduct3(upPin));
-
-		NewtonBodySetOmegaNoSleep(engineBody, &engineOmega[0]);
-		NewtonBodySetVelocityNoSleep(engineBody, &engineVelocity[0]);
+		chassisMatrix = GetMatrix1() * chassisMatrix;
+		dVector projectOmega(chassisMatrix.m_front.Scale(engineOmega.DotProduct3(chassisMatrix.m_front)) +
+							 chassisMatrix.m_up.Scale(chassisOmega.DotProduct3(chassisMatrix.m_up)) +
+							 chassisMatrix.m_right.Scale(chassisOmega.DotProduct3(chassisMatrix.m_right)));
+		NewtonBodySetOmegaNoSleep(engineBody, &projectOmega[0]);
 	}
 
 	void SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
@@ -184,15 +185,17 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 		dMatrix differentialMatrix(m_baseOffsetMatrix * chassisMatrix);
 		NewtonBodySetMatrixNoSleep(differentialBody, &differentialMatrix[0][0]);
 
+		NewtonBodyGetPointVelocity(chassisBody, &differentialMatrix.m_posit[0], &differentialVelocity[0]);
+		NewtonBodySetVelocityNoSleep(differentialBody, &differentialVelocity[0]);
+
 		NewtonBodyGetOmega(chassisBody, &chassisOmega[0]);
 		NewtonBodyGetOmega(differentialBody, &differentialOmega[0]);
-		NewtonBodyGetPointVelocity(chassisBody, &differentialMatrix.m_posit[0], &differentialVelocity[0]);
 
-		dVector relOmega(differentialOmega - chassisOmega);
-		dVector upPin(chassisMatrix.RotateVector(GetMatrix1().m_right));
-		differentialOmega = chassisOmega + relOmega - upPin.Scale(relOmega.DotProduct3(upPin));
+		chassisMatrix = GetMatrix1() * chassisMatrix;
+		dVector projectOmega(chassisMatrix.m_front.Scale(differentialOmega.DotProduct3(chassisMatrix.m_front)) +
+							 chassisMatrix.m_up.Scale(differentialOmega.DotProduct3(chassisMatrix.m_up)) +
+							 chassisMatrix.m_right.Scale(chassisOmega.DotProduct3(chassisMatrix.m_right)));
 		NewtonBodySetOmegaNoSleep(differentialBody, &differentialOmega[0]);
-		NewtonBodySetVelocityNoSleep(differentialBody, &differentialVelocity[0]);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -285,8 +288,6 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 		tireMatrix.m_right = tireMatrix.m_right.Scale(1.0f / dSqrt(tireMatrix.m_right.DotProduct3(tireMatrix.m_right)));
 		tireMatrix.m_up = tireMatrix.m_right.CrossProduct(tireMatrix.m_front);
 
-		//dVector positError(tireMatrix.m_posit - chassisMatrix.m_posit);
-		//dVector projectPosition1 (chassisMatrix.m_posit + chassisMatrix.m_up.Scale(chassisMatrix.m_up.DotProduct3(positError)));
 		dVector projectPosition(chassisMatrix.m_up.Scale(tireMatrix.m_posit.DotProduct3(chassisMatrix.m_up)) +
 								chassisMatrix.m_front.Scale(chassisMatrix.m_posit.DotProduct3(chassisMatrix.m_front)) +
 								chassisMatrix.m_right.Scale(chassisMatrix.m_posit.DotProduct3(chassisMatrix.m_right)));
@@ -1964,10 +1965,10 @@ int dCustomVehicleControllerManager::Collide(dCustomVehicleController::dBodyPart
 					count = (param < 1.0f) ? 0 : count;
 				}
 				// with the old hybrid model this was ok by that is very bad 
-				//if (count) {
-				//	tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(x1);
-				//	NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
-				//}
+				if (count) {
+					tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(x1);
+					NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
+				}
 			}
 		} else {
 			count = 0;
