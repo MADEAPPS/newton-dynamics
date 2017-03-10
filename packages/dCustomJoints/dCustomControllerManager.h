@@ -200,6 +200,7 @@ dCustomControllerManager<CONTROLLER_BASE>::dCustomControllerManager(NewtonWorld*
 template<class CONTROLLER_BASE>
 dCustomControllerManager<CONTROLLER_BASE>::~dCustomControllerManager()
 {
+
 }
 
 template<class CONTROLLER_BASE>

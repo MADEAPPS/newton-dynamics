@@ -42,7 +42,6 @@ void dNewtonJoint::SetJoint(dCustomJoint* const joint)
 	m_joint = joint;
 	m_joint->SetUserData (this);
 	m_joint->SetUserDestructorCallback (OnJointDestroyCallback);
-	m_joint->SetUserSubmintConstraintCallback (OnSubmitConstraintCallback);
 }
 
 dNewtonJoint::~dNewtonJoint()
@@ -50,7 +49,6 @@ dNewtonJoint::~dNewtonJoint()
 	if (m_joint && m_joint->GetUserData()) {
 		m_joint->SetUserData (NULL);
 		m_joint->SetUserDestructorCallback (NULL);
-		m_joint->SetUserSubmintConstraintCallback (NULL);
 		delete m_joint;
 	}
 }
@@ -68,19 +66,10 @@ dNewtonDynamicBody* dNewtonJoint::GetBody1 () const
 
 void dNewtonJoint::OnJointDestroyCallback (const dCustomJoint* const customJoint)
 {
-//	CustomJoint* const customJoint = (dCustomJoint*)me;
-
 	dNewtonJoint* const joint = (dNewtonJoint*) customJoint->GetUserData();
 	joint->m_joint = NULL;
 	((dCustomJoint*)customJoint)->SetUserData(NULL);
 	delete joint;
-}
-
-void dNewtonJoint::OnSubmitConstraintCallback (const dCustomJoint* const customJoint, dFloat timestep, int threadIndex)
-{
-//	CustomJoint* const customJoint = (dCustomJoint*)me;
-	dNewtonJoint* const joint = (dNewtonJoint*) customJoint->GetUserData();
-	joint->OnSubmitConstraint (timestep, threadIndex);
 }
 
 

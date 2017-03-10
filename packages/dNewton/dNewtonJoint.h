@@ -74,7 +74,6 @@ class dNewtonJoint: public dNewtonAlloc
 
 	private:
 	CNEWTON_API static void OnJointDestroyCallback (const dCustomJoint* const me);
-	CNEWTON_API static void OnSubmitConstraintCallback (const dCustomJoint* const me, dFloat timestep, int threadIndex);
 
 	protected:
 	dJointType m_type;
