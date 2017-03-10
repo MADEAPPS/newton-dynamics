@@ -2136,10 +2136,8 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 					tireContactLongitudinalSpeed = 0.01f * dSign(tireContactLongitudinalSpeed);
 				}
 
-
-				dFloat lateralAccel = 0.0f;
+				
 				dFloat longitudinalAccel = 0.0f;
-
 				tire->m_longitudinalSlip = (tireContactLongitudinalSpeed - tireOriginLongitudinalSpeed) / tireOriginLongitudinalSpeed;
 
 				if (tire->m_longitudinalSlip > 1.0f) {
@@ -2161,26 +2159,17 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 //					longitudinalAccel = -dvx / timestep;
 				}
 
-//				dFloat lateralForce;
-//				dFloat aligningMoment;
-//				dFloat longitudinalForce;
-//				dVector tireLoadForce(0.0f);
-//				NewtonMaterialGetContactForce(material, tireBody, &tireLoadForce.m_x);
-//				dFloat tireLoad = tireLoadForce.DotProduct3(contactNormal);
-//				controller->m_contactFilter->CalculateTireFrictionCoeficents(tire, otherBody, material, tireLoad, longitudinalForce, lateralForce, aligningMoment);
-//				NewtonMaterialSetContactTangentAcceleration (material, lateralAccel, 0);
-//				NewtonMaterialSetContactTangentFriction(material, dAbs (lateralForce), 0);
-//				NewtonMaterialSetContactTangentAcceleration (material, longitudinalAccel, 1);
-//				NewtonMaterialSetContactTangentFriction(material, dAbs (longitudinalForce), 1);
-
 				dFloat aligningMoment;
 				dFloat lateralFrictionCoef;
 				dFloat longitudinalFrictionCoef;
 				controller->m_contactFilter->CalculateTireFrictionCoeficents(tire, otherBody, material, longitudinalFrictionCoef, lateralFrictionCoef, aligningMoment);
-//				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
-//				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+
 				NewtonMaterialSetContactFrictionCoef(material, lateralFrictionCoef, lateralFrictionCoef, 0);
 				NewtonMaterialSetContactFrictionCoef(material, longitudinalFrictionCoef, longitudinalFrictionCoef, 1);
+#if 1
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 0);
+				NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+#endif
 			}
 
 		} else {
