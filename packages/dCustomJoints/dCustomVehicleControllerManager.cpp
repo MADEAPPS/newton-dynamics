@@ -2323,10 +2323,10 @@ dTrace (("b(%f) rate(%f)\n", beta * 180.0f/3.1416f, betaRate * 180.0f/3.1416f ))
 //if (dAbs (betaRate * 180.0f/3.1416f) > 30.0f) {
 if ((dAbs (beta * 180.0f/3.1416f) > 35.0f))  {
 	dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(beta)));
-//	NewtonBodyAddTorque (chassisBody, &xxx[0]);
+	NewtonBodyAddTorque (chassisBody, &xxx[0]);
 } else if (dAbs (betaRate * 180.0f/3.1416f) > 30.0f) {
 	dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(betaRate)));
-//	NewtonBodyAddTorque (chassisBody, &xxx[0]);
+	NewtonBodyAddTorque (chassisBody, &xxx[0]);
 }
 
 	}
