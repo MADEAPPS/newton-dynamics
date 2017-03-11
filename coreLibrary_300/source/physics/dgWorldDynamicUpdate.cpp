@@ -789,10 +789,16 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 	dgAssert(constraint->m_body0);
 	dgAssert(constraint->m_body1);
 
-	dgDynamicBody* const body0 = (dgDynamicBody*)constraint->m_body0;
-	dgDynamicBody* const body1 = (dgDynamicBody*)constraint->m_body1;
-	dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-	dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+//	dgDynamicBody* const body0 = (dgDynamicBody*)constraint->m_body0;
+//	dgDynamicBody* const body1 = (dgDynamicBody*)constraint->m_body1;
+
+	dgBody* const body0 = constraint->m_body0;
+	dgBody* const body1 = constraint->m_body1;
+
+	//dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+	//dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+	dgAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body0->IsRTTIType(dgBody::m_kinematicBodyRTTI));
+	dgAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body1->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 
 	body0->m_inCallback = true;
 	body1->m_inCallback = true;
@@ -902,14 +908,17 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 	const dgFloat32 accelFreeze = world->m_freezeAccel2 * smallClusterCutoff;
 	dgVector velocDragVect (velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dgFloat32 (0.0f));
 	for (dgInt32 i = 0; i < count; i ++) {
-		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-
+		//dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
+		dgBody* const body = bodyArray[i].m_body;
+		dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBody));
+		
 		dgVector isMovingMask (body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
 		dgAssert (dgCheckVector(isMovingMask));
 		if (!body->m_equilibrium || ((isMovingMask.TestZero().GetSignMask() & 7) != 7)) {
 			dgAssert (body->m_invMass.m_w);
-			body->IntegrateVelocity(timestep);
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+				body->IntegrateVelocity(timestep);
+			}
 
 			dgAssert (body->m_accel.m_w == dgFloat32 (0.0f));
 			dgAssert (body->m_alpha.m_w == dgFloat32 (0.0f));
@@ -939,8 +948,9 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 
 			stackSleeping &= equilibrium;
 			isAutoSleep &= body->m_autoSleep;
-
-			sleepCounter = dgMin (sleepCounter, body->m_sleepingCounter);
+			if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+				sleepCounter = dgMin (sleepCounter, ((dgDynamicBody*)body)->m_sleepingCounter);
+			}
 
 			body->UpdateMatrix (timestep, threadID);
 		}
@@ -950,8 +960,8 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 	if (isAutoSleep && cluster->m_jointCount) {
 		if (stackSleeping) {
 			for (dgInt32 i = 0; i < count; i ++) {
-				dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-				dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+				dgBody* const body =  bodyArray[i].m_body;
+				dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 				body->m_accel = dgVector::m_zero;
 				body->m_alpha = dgVector::m_zero;
 				body->m_veloc = dgVector::m_zero;
@@ -981,8 +991,8 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 				dgInt32 timeScaleSleepCount = dgInt32 (dgFloat32 (60.0f) * sleepCounter * timestep);
 				if (timeScaleSleepCount > world->m_sleepTable[index].m_steps) {
 					for (dgInt32 i = 0; i < count; i ++) {
-						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+						dgBody* const body = bodyArray[i].m_body;
+						dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 						body->m_accel = dgVector::m_zero;
 						body->m_alpha = dgVector::m_zero;
 						body->m_veloc = dgVector::m_zero;
@@ -993,8 +1003,9 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 					sleepCounter ++;
 					for (dgInt32 i = 0; i < count; i ++) {
 						dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-						dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-						body->m_sleepingCounter = sleepCounter;
+						if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+							body->m_sleepingCounter = sleepCounter;
+						}
 					}
 				}
 			}

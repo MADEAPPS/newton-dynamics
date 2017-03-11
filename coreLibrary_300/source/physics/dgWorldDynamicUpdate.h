@@ -275,7 +275,7 @@ class dgWorldDynamicUpdate
 	void CalculateReactionForcesParallel (const dgBodyCluster* const cluster, dgFloat32 timestep) const;
 	void LinearizeJointParallelArray(dgParallelSolverSyncData* const solverSyncData, dgJointInfo* const constraintArray, const dgBodyCluster* const cluster) const;
 
-	void CalculateNetAcceleration (dgDynamicBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
+	void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
 	void ApplyForceAndTorque(dgDynamicBody* const body, const dgJacobian& forceAndTorque, const dgVector& timestep4, const dgVector& speedFreeze2) const;
 	
 	void BuildJacobianMatrix (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
