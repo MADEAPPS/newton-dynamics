@@ -557,7 +557,7 @@ dCustomVehicleController::dBodyPartTire::~dBodyPartTire()
 }
 
 /*
-// Using brush tire model explained on this paper
+// Using brush tire model explained by Giancarlo Genta in his book
 void dCustomVehicleController::dBodyPartTire::dFrictionModel::CalculateTireFrictionCoeficents(const dBodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat tireLoad, dFloat& longitudinalForce, dFloat& lateralForce, dFloat& aligningTorque) const
 {
 	const dCustomVehicleController* const controller = tire->GetController();
@@ -581,8 +581,8 @@ void dCustomVehicleController::dBodyPartTire::dFrictionModel::CalculateTireFrict
 }
 */
 
-// Using brush tire model explained on by Giancarlo Genta, adapted to calculate friction coeficient instead tire forces
-void dCustomVehicleController::dBodyPartTire::dFrictionModel::CalculateTireFrictionCoeficents(const dBodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat& longitudinalFrictionCoef, dFloat& lateralFrictionCoef, dFloat& aligningTorqueCoef) const
+// Using brush tire model explained by Giancarlo Genta in his book, adapted to calculate friction coefficient instead tire forces
+void dCustomVehicleController::dBodyPartTire::dFrictionModel::CalculateTireFrictionCoefficents(const dBodyPartTire* const tire, const NewtonBody* const otherBody, const NewtonMaterial* const material, dFloat& longitudinalFrictionCoef, dFloat& lateralFrictionCoef, dFloat& aligningTorqueCoef) const
 {
 //	dFloat phy_y = dAbs (tire->m_lateralSlip * tire->m_data.m_lateralStiffness * 4.0f);
 //	dFloat phy_x = dAbs (tire->m_longitudinalSlip * tire->m_data.m_longitudialStiffness);
@@ -2156,7 +2156,7 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 				dFloat aligningMoment;
 				dFloat lateralFrictionCoef;
 				dFloat longitudinalFrictionCoef;
-				controller->m_contactFilter->CalculateTireFrictionCoeficents(tire, otherBody, material, longitudinalFrictionCoef, lateralFrictionCoef, aligningMoment);
+				controller->m_contactFilter->CalculateTireFrictionCoefficents(tire, otherBody, material, longitudinalFrictionCoef, lateralFrictionCoef, aligningMoment);
 //				lateralFrictionCoef = dMax (lateralFrictionCoef, 0.3f);
 
 				NewtonMaterialSetContactFrictionCoef(material, lateralFrictionCoef, lateralFrictionCoef, 0);

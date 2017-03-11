@@ -201,6 +201,10 @@ void *dgMemoryAllocator::MallocLow (dgInt32 workingSize, dgInt32 alignment)
 	dgInt32 size = workingSize + alignment * 2;
 	void* const ptr = m_malloc(dgUnsigned32 (size));
 	dgAssert (ptr);
+#ifdef _DEBUG
+	memset(ptr, 99, size);
+#endif
+
 	dgUnsigned64 val = dgUnsigned64 (PointerToInt(ptr));
 	val = (val & dgUnsigned64(-alignment)) + alignment * 2;
 	void* const retPtr = IntToPointer (val);
