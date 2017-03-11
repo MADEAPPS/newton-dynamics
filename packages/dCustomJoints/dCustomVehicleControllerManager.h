@@ -538,16 +538,17 @@ class dCustomVehicleController: public dCustomControllerBase
 	dBrakeController* m_handBrakesControl;
 	dSteeringController* m_steeringControl; 
 	dBodyPartTire::dFrictionModel* m_contactFilter;
-	NewtonApplyForceAndTorque m_forceAndTorque;
+	NewtonApplyForceAndTorque m_forceAndTorqueCallback;
 
-	dMatrix m_vehicleGlobalMatrix;
-	dVector m_localOmega;
-	dVector m_localVeloc;
 	dFloat m_speed;
 	dFloat m_totalMass;
-	dFloat m_speedRate;
-	dFloat m_sideSlipRate;
-	dFloat m_sideSlipAngle;
+
+//	dMatrix m_vehicleGlobalMatrix;
+//	dVector m_localOmega;
+//	dVector m_localVeloc;
+//	dFloat m_speedRate;
+//	dFloat m_sideSlipRate;
+//	dFloat m_sideSlipAngle;
 	dFloat m_gravityMag;
 	dFloat m_weightDistribution;
 
