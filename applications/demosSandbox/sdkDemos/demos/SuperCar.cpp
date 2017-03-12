@@ -105,8 +105,8 @@ static CarDefinition monsterTruck =
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	0.5f,										// TIRE_LATERAL_STIFFNESS
-	0.5f,										// TIRE_LONGITUDINAL_STIFFNESS
+	1.2f,										// TIRE_LATERAL_STIFFNESS
+	1.2f,										// TIRE_LONGITUDINAL_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
 	4000.0f,									// TIRE_SUSPENSION_SPRING
 	200.0f,										// TIRE_SUSPENSION_DAMPER
