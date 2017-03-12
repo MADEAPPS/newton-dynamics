@@ -90,6 +90,12 @@ endif ()
 
 option("DOUBLE_PRECISION" "Use Double Precision" OFF)
 option("NEWTON_DEMOS_SANDBOX" "Build demos sandbox" ON)
+option("THREAD_EMULATION" "Use single thread only" OFF)
+
+
+if(THREAD_EMULATION)
+  add_definitions(-DDG_USE_THREAD_EMULATION)
+endif()
 
 if(DOUBLE_PRECISION)
  add_definitions(-D_NEWTON_USE_DOUBLE)
