@@ -34,8 +34,6 @@ dgVector dgDynamicBody::m_eulerTaylorCorrection(dgFloat32(1.0f / 12.0f));
 
 dgDynamicBody::dgDynamicBody()
 	:dgBody()
-	,m_accel(dgFloat32 (0.0f))
-	,m_alpha(dgFloat32 (0.0f))
 	,m_externalForce(dgFloat32 (0.0f))
 	,m_externalTorque(dgFloat32 (0.0f))
 	,m_savedExternalForce(dgFloat32 (0.0f))
@@ -58,8 +56,6 @@ dgDynamicBody::dgDynamicBody()
 
 dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionCashe, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
 	:dgBody(world, collisionCashe, serializeCallback, userData, revisionNumber)
-	,m_accel(dgFloat32 (0.0f))
-	,m_alpha(dgFloat32 (0.0f))
 	,m_externalForce(dgFloat32 (0.0f))
 	,m_externalTorque(dgFloat32 (0.0f))
 	,m_savedExternalForce(dgFloat32 (0.0f))

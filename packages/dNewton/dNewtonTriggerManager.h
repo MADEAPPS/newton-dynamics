@@ -28,7 +28,7 @@
 
 class dNewtonBody;
 
-class dNewtonTriggerManager: public CustomTriggerManager
+class dNewtonTriggerManager: public dCustomTriggerManager
 {
 	public:
 	class dNewtonTrigger: public dNewtonKinematicBody
@@ -42,7 +42,7 @@ class dNewtonTriggerManager: public CustomTriggerManager
 		virtual void OnExit (dNewtonBody* const visitor) = 0;
 
 		private:
-		CustomTriggerController* m_controller;
+		dCustomTriggerController* m_controller;
 
 		friend class dNewtonTriggerManager;
 	};
@@ -52,7 +52,7 @@ class dNewtonTriggerManager: public CustomTriggerManager
 
 	CNEWTON_API dNewtonTrigger* GetFirstTrigger() const;
 	CNEWTON_API dNewtonTrigger* GetNextTrigger(const dNewtonTrigger* const trigger) const;
-	CNEWTON_API virtual void EventCallback (const CustomTriggerController* const trigger, TriggerEventType event, NewtonBody* const guess) const;
+	CNEWTON_API virtual void EventCallback (const dCustomTriggerController* const trigger, dTriggerEventType event, NewtonBody* const guess) const;
 };
 
 

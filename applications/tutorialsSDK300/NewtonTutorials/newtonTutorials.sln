@@ -7,8 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\coreLibr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "..\..\..\coreLibrary_300\projects\windows\project_vs2010_static_md\physics.vcxproj", "{39737A8F-6151-4259-8E39-25530345D4B4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\coreLibrary_300\source\pthreads.2\VS_2010_static_md\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tutorial_101_GettingStarted", "tutorial_101_GettingStarted\tutorial_101_GettingStarted.vcxproj", "{7FB7F3A0-7508-4DB5-A79A-EBEDE896DB71}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dMath", "..\..\..\packages\projects\visualStudio_2010_static_md\dMath.vcxproj", "{CBE9E751-E58B-46C1-B6B0-873670D0F981}"

@@ -28,129 +28,129 @@
 dNewtonHingeActuator::dNewtonHingeActuator(const dFloat* const pinAndPivotFrame, dFloat angularRate, dFloat minAngle, dFloat maxAngle, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_hingeActuator)
 {
-	SetJoint (new CustomHingeActuator (pinAndPivotFrame, angularRate, minAngle, maxAngle, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	SetJoint (new dCustomHingeActuator (pinAndPivotFrame, angularRate, minAngle, maxAngle, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
 bool dNewtonHingeActuator::GetEnableFlag () const
 {
-	return ((CustomHingeActuator*)m_joint)->GetEnableFlag();
+	return ((dCustomHingeActuator*)m_joint)->GetEnableFlag();
 }
 
 dFloat dNewtonHingeActuator::GetTargetAngle() const
 {
-	return ((CustomHingeActuator*)m_joint)->GetTargetAngle();
+	return ((dCustomHingeActuator*)m_joint)->GetTargetAngle();
 }
 
 dFloat dNewtonHingeActuator::GetMinAngularLimit() const
 {
-	return ((CustomHingeActuator*)m_joint)->GetMinAngularLimit();
+	return ((dCustomHingeActuator*)m_joint)->GetMinAngularLimit();
 }
 
 dFloat dNewtonHingeActuator::GetMaxAngularLimit() const
 {
-	return ((CustomHingeActuator*)m_joint)->GetMaxAngularLimit();
+	return ((dCustomHingeActuator*)m_joint)->GetMaxAngularLimit();
 }
 
 dFloat dNewtonHingeActuator::GetAngularRate() const
 {
-	return ((CustomHingeActuator*)m_joint)->GetAngularRate();
+	return ((dCustomHingeActuator*)m_joint)->GetAngularRate();
 }
 
 
 void dNewtonHingeActuator::SetMinAngularLimit(dFloat limit)
 {
-	((CustomHingeActuator*)m_joint)->SetMinAngularLimit(limit);
+	((dCustomHingeActuator*)m_joint)->SetMinAngularLimit(limit);
 }
 
 void dNewtonHingeActuator::SetMaxAngularLimit(dFloat limit)
 {
-	((CustomHingeActuator*)m_joint)->SetMaxAngularLimit(limit);
+	((dCustomHingeActuator*)m_joint)->SetMaxAngularLimit(limit);
 }
 
 
 void dNewtonHingeActuator::SetAngularRate(dFloat rate)
 {
-	((CustomHingeActuator*)m_joint)->SetAngularRate(rate);
+	((dCustomHingeActuator*)m_joint)->SetAngularRate(rate);
 }
 
 void dNewtonHingeActuator::SetTargetAngle(dFloat angle)
 {
-	((CustomHingeActuator*)m_joint)->SetTargetAngle(angle);
+	((dCustomHingeActuator*)m_joint)->SetTargetAngle(angle);
 }
 
 void dNewtonHingeActuator::SetEnableFlag (bool flag)
 {
-	((CustomHingeActuator*)m_joint)->SetEnableFlag (flag);
+	((dCustomHingeActuator*)m_joint)->SetEnableFlag (flag);
 }
 
 dFloat dNewtonHingeActuator::GetActuatorAngle() const
 {
-	return ((CustomHingeActuator*)m_joint)->GetActuatorAngle();
+	return ((dCustomHingeActuator*)m_joint)->GetActuatorAngle();
 }
 
 
 dNewtonSliderActuator::dNewtonSliderActuator(const dFloat* const pinAndPivotFrame, dFloat speed, dFloat minPosit, dFloat maxPosit, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_sliderActuator)
 {
-	SetJoint (new CustomSliderActuator (pinAndPivotFrame, speed, minPosit, maxPosit, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL)); 
+	SetJoint (new dCustomSliderActuator (pinAndPivotFrame, speed, minPosit, maxPosit, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL)); 
 }
 
 bool dNewtonSliderActuator::GetEnableFlag () const
 {
-	return ((CustomSliderActuator*)m_joint)->GetEnableFlag ();
+	return ((dCustomSliderActuator*)m_joint)->GetEnableFlag ();
 }
 
 dFloat dNewtonSliderActuator::GetTargetPosit() const
 {
-	return ((CustomSliderActuator*)m_joint)->GetTargetPosit();
+	return ((dCustomSliderActuator*)m_joint)->GetTargetPosit();
 }
 
 dFloat dNewtonSliderActuator::GetLinearRate() const
 {
-	return ((CustomSliderActuator*)m_joint)->GetLinearRate();
+	return ((dCustomSliderActuator*)m_joint)->GetLinearRate();
 }
 
 
 dFloat dNewtonSliderActuator::GetMinPositLimit() const
 {
-	return ((CustomSliderActuator*)m_joint)->GetMinPositLimit();
+	return ((dCustomSliderActuator*)m_joint)->GetMinPositLimit();
 }
 
 dFloat dNewtonSliderActuator::GetMaxPositLimit() const
 {
-	return ((CustomSliderActuator*)m_joint)->GetMaxPositLimit();
+	return ((dCustomSliderActuator*)m_joint)->GetMaxPositLimit();
 }
 
 
 void dNewtonSliderActuator::SetTargetPosit(dFloat posit)
 {
-	((CustomSliderActuator*)m_joint)->SetTargetPosit(posit);
+	((dCustomSliderActuator*)m_joint)->SetTargetPosit(posit);
 }
 
 
 void dNewtonSliderActuator::SetMinPositLimit(dFloat limit)
 {
-	((CustomSliderActuator*)m_joint)->SetMinPositLimit(limit);
+	((dCustomSliderActuator*)m_joint)->SetMinPositLimit(limit);
 }
 
 void dNewtonSliderActuator::SetMaxPositLimit(dFloat limit)
 {
-	((CustomSliderActuator*)m_joint)->SetMaxPositLimit(limit);
+	((dCustomSliderActuator*)m_joint)->SetMaxPositLimit(limit);
 }
 
 void dNewtonSliderActuator::SetLinearRate(dFloat rate)
 {
-	((CustomSliderActuator*)m_joint)->SetLinearRate (rate);
+	((dCustomSliderActuator*)m_joint)->SetLinearRate (rate);
 }
 
 void dNewtonSliderActuator::SetEnableFlag (bool flag)
 {
-	((CustomSliderActuator*)m_joint)->SetEnableFlag (flag);
+	((dCustomSliderActuator*)m_joint)->SetEnableFlag (flag);
 }
 
 dFloat dNewtonSliderActuator::GetActuatorPosit() const
 {
-	return ((CustomSliderActuator*)m_joint)->GetActuatorPosit();
+	return ((dCustomSliderActuator*)m_joint)->GetActuatorPosit();
 }
 
 
@@ -158,126 +158,126 @@ dFloat dNewtonSliderActuator::GetActuatorPosit() const
 dNewtonUniversalActuator::dNewtonUniversalActuator(const dFloat* const pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_universalActuator)
 {
-	SetJoint (new CustomUniversalActuator (pinAndPivotFrame, angularRate0, minAngle0, maxAngle0, angularRate1, minAngle1, maxAngle1, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	SetJoint (new dCustomUniversalActuator (pinAndPivotFrame, angularRate0, minAngle0, maxAngle0, angularRate1, minAngle1, maxAngle1, body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
 
 void dNewtonUniversalActuator::SetEnableFlag0 (bool flag)
 {
-	((CustomUniversalActuator*)m_joint)->SetEnableFlag0 (flag);
+	((dCustomUniversalActuator*)m_joint)->SetEnableFlag0 (flag);
 }
 
 
 void dNewtonUniversalActuator::SetTargetAngle0(dFloat angle)
 {
-	((CustomUniversalActuator*)m_joint)->SetTargetAngle0 (angle);
+	((dCustomUniversalActuator*)m_joint)->SetTargetAngle0 (angle);
 }
 
 void dNewtonUniversalActuator::SetMinAngularLimit0(dFloat limit)
 {
-	CustomUniversalActuator* const joint = (CustomUniversalActuator*)m_joint;
+	dCustomUniversalActuator* const joint = (dCustomUniversalActuator*)m_joint;
 	joint->SetLimits_0(limit, joint->GetMaxAngularLimit_0());
 }
 
 void dNewtonUniversalActuator::SetMaxAngularLimit0(dFloat limit)
 {
-	CustomUniversalActuator* const joint = (CustomUniversalActuator*)m_joint;
+	dCustomUniversalActuator* const joint = (dCustomUniversalActuator*)m_joint;
 	joint->SetLimits_0(joint->GetMinAngularLimit_0(), limit);
 }
 
 void dNewtonUniversalActuator::SetAngularRate0(dFloat rate)
 {
-	((CustomUniversalActuator*)m_joint)->SetAngularRate0(rate);
+	((dCustomUniversalActuator*)m_joint)->SetAngularRate0(rate);
 }
 
 
 void dNewtonUniversalActuator::SetEnableFlag1 (bool flag)
 {
-	((CustomUniversalActuator*)m_joint)->SetEnableFlag1 (flag);
+	((dCustomUniversalActuator*)m_joint)->SetEnableFlag1 (flag);
 }
 
 void dNewtonUniversalActuator::SetTargetAngle1(dFloat angle)
 {
-	((CustomUniversalActuator*)m_joint)->SetTargetAngle1 (angle);
+	((dCustomUniversalActuator*)m_joint)->SetTargetAngle1 (angle);
 }
 
 void dNewtonUniversalActuator::SetMinAngularLimit1(dFloat limit)
 {
-	CustomUniversalActuator* const joint = (CustomUniversalActuator*)m_joint;
+	dCustomUniversalActuator* const joint = (dCustomUniversalActuator*)m_joint;
 	joint->SetLimits_1(limit, joint->GetMaxAngularLimit_1());
 }
 
 void dNewtonUniversalActuator::SetMaxAngularLimit1(dFloat limit)
 {
-//	((CustomUniversalActuator*)m_joint)->SetMaxAngularLimit1(limit);
-	CustomUniversalActuator* const joint = (CustomUniversalActuator*)m_joint;
+//	((dCustomUniversalActuator*)m_joint)->SetMaxAngularLimit1(limit);
+	dCustomUniversalActuator* const joint = (dCustomUniversalActuator*)m_joint;
 	joint->SetLimits_1(joint->GetMaxAngularLimit_1(), limit);
 }
 
 void dNewtonUniversalActuator::SetAngularRate1(dFloat rate)
 {
-	((CustomUniversalActuator*)m_joint)->SetAngularRate1(rate);
+	((dCustomUniversalActuator*)m_joint)->SetAngularRate1(rate);
 }
 
 
 
 bool dNewtonUniversalActuator::GetEnableFlag0 () const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetEnableFlag0();
+	return ((dCustomUniversalActuator*)m_joint)->GetEnableFlag0();
 }
 
 dFloat dNewtonUniversalActuator::GetTargetAngle0() const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetTargetAngle0();
+	return ((dCustomUniversalActuator*)m_joint)->GetTargetAngle0();
 }
 
 dFloat dNewtonUniversalActuator::GetAngularRate0() const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetAngularRate0();
+	return ((dCustomUniversalActuator*)m_joint)->GetAngularRate0();
 }
 
 dFloat dNewtonUniversalActuator::GetMinAngularLimit0() const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetMinAngularLimit_0();
+	return ((dCustomUniversalActuator*)m_joint)->GetMinAngularLimit_0();
 }
 
 dFloat dNewtonUniversalActuator::GetMaxAngularLimit0() const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetMaxAngularLimit_0();
+	return ((dCustomUniversalActuator*)m_joint)->GetMaxAngularLimit_0();
 }
 
 bool dNewtonUniversalActuator::GetEnableFlag1 () const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetEnableFlag1();
+	return ((dCustomUniversalActuator*)m_joint)->GetEnableFlag1();
 }
 
 dFloat dNewtonUniversalActuator::GetTargetAngle1() const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetTargetAngle1();
+	return ((dCustomUniversalActuator*)m_joint)->GetTargetAngle1();
 }
 
 dFloat dNewtonUniversalActuator::GetAngularRate1() const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetAngularRate1();
+	return ((dCustomUniversalActuator*)m_joint)->GetAngularRate1();
 }
 
 dFloat dNewtonUniversalActuator::GetMinAngularLimit1() const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetMinAngularLimit_1();
+	return ((dCustomUniversalActuator*)m_joint)->GetMinAngularLimit_1();
 }
 
 dFloat dNewtonUniversalActuator::GetMaxAngularLimit1() const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetMaxAngularLimit_1();
+	return ((dCustomUniversalActuator*)m_joint)->GetMaxAngularLimit_1();
 }
 
 dFloat dNewtonUniversalActuator::GetActuatorAngle0() const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetJointAngle_0();
+	return ((dCustomUniversalActuator*)m_joint)->GetJointAngle_0();
 }
 
 dFloat dNewtonUniversalActuator::GetActuatorAngle1() const
 {
-	return ((CustomUniversalActuator*)m_joint)->GetJointAngle_1();
+	return ((dCustomUniversalActuator*)m_joint)->GetJointAngle_1();
 }
 

@@ -4,6 +4,8 @@
 #include <dMatrix.h>
 #include <newton.h>
 
+#if 0
+
 NewtonBody* CreateBackgroundBody(NewtonWorld* const world)
 {
 	dFloat points[4][3] = 
@@ -100,3 +102,59 @@ int _tmain(int argc, _TCHAR* argv[])
 	return 0;
 }
 
+#else
+
+
+#include <stdio.h>
+#include "Newton.h"
+#include "dVector.h"
+#include "dMatrix.h"
+
+using namespace std;
+
+int main (int argc, const char * argv[]) 
+{
+	NewtonWorld *world = NewtonCreate();
+
+	// Dummy transform matrix.
+	dMatrix tm(dGetIdentityMatrix());
+
+	// Create kinematic sphere.
+	NewtonCollision *cs = nullptr;
+	cs = NewtonCreateSphere(world, 2, 0, nullptr);
+	auto kin = NewtonCreateKinematicBody(world, cs, &tm[0][0]);
+	NewtonDestroyCollision(cs);
+
+	// Create dynamic box.
+	cs = NewtonCreateBox(world, 0.5, 0.5, 0.5, 0, nullptr);
+	auto dyn = NewtonCreateDynamicBody(world, cs, &tm[0][0]);
+	NewtonDestroyCollision(cs);
+	cs = nullptr;
+
+	// Both bodies have unit mass and inertia.
+	NewtonBodySetMassMatrix(kin, 1, 1, 1, 1);
+	NewtonBodySetMassMatrix(dyn, 1, 1, 1, 1);
+
+	// Place the dynamic box to the right of the sphere, such that they touch.
+	tm[3] = dVector(0, 0, 0);
+	NewtonBodySetMatrix(kin, &tm[0][0]);
+	tm[3] = dVector(2, 0, 0);
+	NewtonBodySetMatrix(dyn, &tm[0][0]);
+
+	// If enabled, Valgrind reports a conditional jump based on an uninitialized value.
+#if 1
+	NewtonBodySetCollidable(kin, true);
+#endif
+
+	// Step the world.
+	NewtonUpdate(world, 1.0f / 60);
+
+	// Tear down.
+	NewtonMaterialDestroyAllGroupID(world);
+	NewtonDestroyAllBodies(world);
+	NewtonDestroy(world);
+
+	return 0;
+}
+
+#endif

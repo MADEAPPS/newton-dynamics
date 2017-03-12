@@ -33,6 +33,7 @@ template<class T>
 class dgArray
 {
 	public:
+	dgArray ();
 	dgArray (dgMemoryAllocator* const allocator, dgInt32 aligmentInBytes = DG_MEMORY_GRANULARITY);
 	dgArray (const dgArray& source, dgInt32 itemsToCopy);
 	dgArray(const dgArray& source);
@@ -50,6 +51,7 @@ class dgArray
 	dgInt32 GetBytesCapacity () const;
 	dgInt32 GetElementsCapacity () const; 
 	dgMemoryAllocator* GetAllocator() const;
+	void SetAllocator(dgMemoryAllocator* const allocator);
 
 	private:
 	mutable T *m_array;
@@ -57,6 +59,17 @@ class dgArray
 	dgInt32 m_aligmentInBytes;
 	dgMemoryAllocator* m_allocator;
 };
+
+
+template<class T>
+dgArray<T>::dgArray()
+	:m_array(NULL)
+	,m_maxSize(0)
+	,m_aligmentInBytes(DG_MEMORY_GRANULARITY)
+	,m_allocator(NULL)
+{
+	m_aligmentInBytes = 1 << dgExp2(m_aligmentInBytes);
+}
 
 
 template<class T>
@@ -169,6 +182,13 @@ template<class T>
 dgMemoryAllocator* dgArray<T>::GetAllocator() const
 {
 	return m_allocator;
+}
+
+template<class T>
+void dgArray<T>::SetAllocator(dgMemoryAllocator* const allocator)
+{
+	dgAssert (!m_allocator);
+	m_allocator = allocator;
 }
 
 template<class T>

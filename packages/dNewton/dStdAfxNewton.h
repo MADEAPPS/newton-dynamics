@@ -63,24 +63,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Newton.h>
-#include <CustomJoint.h>
-#include <CustomGear.h>
-#include <CustomHinge.h>
-#include <CustomSlider.h>
-#include <CustomPulley.h>
-#include <CustomCorkScrew.h>
-#include <CustomUniversal.h>
-#include <CustomInputManager.h>
-#include <CustomBallAndSocket.h>
-#include <CustomHingeActuator.h>
-#include <CustomRackAndPinion.h>
-#include <CustomSliderActuator.h>
-#include <CustomTriggerManager.h>
-#include <CustomUniversalActuator.h>
-#include <CustomControllerManager.h>
-#include <CustomPlayerControllerManager.h>
-#include <CustomVehicleControllerManager.h>
-#include <CustomArcticulatedTransformManager.h>
+#include <dCustomJoint.h>
+#include <dCustomGear.h>
+#include <dCustomHinge.h>
+#include <dCustomSlider.h>
+#include <dCustomPulley.h>
+#include <dCustomCorkScrew.h>
+#include <dCustomUniversal.h>
+#include <dCustomInputManager.h>
+#include <dCustomBallAndSocket.h>
+#include <dCustomHingeActuator.h>
+#include <dCustomRackAndPinion.h>
+#include <dCustomSliderActuator.h>
+#include <dCustomTriggerManager.h>
+#include <dCustomUniversalActuator.h>
+#include <dCustomControllerManager.h>
+#include <dCustomPlayerControllerManager.h>
+#include <dCustomVehicleControllerManager.h>
+#include <dCustomArcticulatedTransformManager.h>
 
 
 

@@ -201,7 +201,7 @@ class ComplexScene: public DemoEntity
 		int height = size;
 		char* const attibutes = new char [size * size];
 		memset (attibutes, 0, width * height * sizeof (char));
-		NewtonCollision* const collision = NewtonCreateHeightFieldCollision (scene->GetNewton(), width, height, 1, 0, elevation, attibutes, 1.0f, cellsize, 0);
+		NewtonCollision* const collision = NewtonCreateHeightFieldCollision (scene->GetNewton(), width, height, 1, 0, elevation, attibutes, 1.0f, cellsize, cellsize, 0);
 
 		void* const proxy  = NewtonSceneCollisionAddSubCollision (m_sceneCollision, collision);
 		NewtonDestroyCollision(collision);

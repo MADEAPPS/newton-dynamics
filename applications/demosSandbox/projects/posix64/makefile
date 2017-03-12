@@ -79,8 +79,8 @@ SDK_VISUALDEBUGGER_MAKE = ../../../../packages/projects/$(PLATFORM)/dVisualDebug
 SDK_XML_MAKE = ../../../../packages/projects/$(PLATFORM)/thirdParty/tinyxml
 
 
-#LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lgtk-x11-2.0 -lenet
-LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread -lenet `wx-config --libs --gl-libs` `freetype-config --libs`
+#LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lgtk-x11-2.0 -lenet
+LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lenet `wx-config --libs --gl-libs` `freetype-config --libs`
 
 # this use newton as shared or static library
 NEWTON_LIB = \

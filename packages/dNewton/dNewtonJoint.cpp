@@ -37,12 +37,11 @@ void dNewtonJoint::OnSubmitConstraint (dFloat timestep, int threadIndex)
 }
 
 
-void dNewtonJoint::SetJoint(CustomJoint* const joint)
+void dNewtonJoint::SetJoint(dCustomJoint* const joint)
 {
 	m_joint = joint;
 	m_joint->SetUserData (this);
 	m_joint->SetUserDestructorCallback (OnJointDestroyCallback);
-	m_joint->SetUserSubmintConstraintCallback (OnSubmitConstraintCallback);
 }
 
 dNewtonJoint::~dNewtonJoint()
@@ -50,7 +49,6 @@ dNewtonJoint::~dNewtonJoint()
 	if (m_joint && m_joint->GetUserData()) {
 		m_joint->SetUserData (NULL);
 		m_joint->SetUserDestructorCallback (NULL);
-		m_joint->SetUserSubmintConstraintCallback (NULL);
 		delete m_joint;
 	}
 }
@@ -66,142 +64,133 @@ dNewtonDynamicBody* dNewtonJoint::GetBody1 () const
 }
 
 
-void dNewtonJoint::OnJointDestroyCallback (const CustomJoint* const customJoint)
+void dNewtonJoint::OnJointDestroyCallback (const dCustomJoint* const customJoint)
 {
-//	CustomJoint* const customJoint = (CustomJoint*)me;
-
 	dNewtonJoint* const joint = (dNewtonJoint*) customJoint->GetUserData();
 	joint->m_joint = NULL;
-	((CustomJoint*)customJoint)->SetUserData(NULL);
+	((dCustomJoint*)customJoint)->SetUserData(NULL);
 	delete joint;
-}
-
-void dNewtonJoint::OnSubmitConstraintCallback (const CustomJoint* const customJoint, dFloat timestep, int threadIndex)
-{
-//	CustomJoint* const customJoint = (CustomJoint*)me;
-	dNewtonJoint* const joint = (dNewtonJoint*) customJoint->GetUserData();
-	joint->OnSubmitConstraint (timestep, threadIndex);
 }
 
 
 dNewtonBallAndSocketJoint::dNewtonBallAndSocketJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
     :dNewtonJoint(m_ballAndSocket)
 {
-    SetJoint (new CustomBallAndSocket (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+    SetJoint (new dCustomBallAndSocket (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
 
 dNewtonHingeJoint::dNewtonHingeJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_hinge)
 {
-	SetJoint (new CustomHinge (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	SetJoint (new dCustomHinge (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
 dFloat dNewtonHingeJoint::GetFriction () const
 {
-	return ((CustomHinge*)m_joint)->GetFriction();
+	return ((dCustomHinge*)m_joint)->GetFriction();
 }
 
 void dNewtonHingeJoint::SetFriction (dFloat friction)
 {
-	((CustomHinge*)m_joint)->SetFriction(friction);
+	((dCustomHinge*)m_joint)->SetFriction(friction);
 }
 
 void dNewtonHingeJoint::EnableLimits(bool state)
 {
-    ((CustomHinge*)m_joint)->EnableLimits(state);
+    ((dCustomHinge*)m_joint)->EnableLimits(state);
 }
 
 void dNewtonHingeJoint::SetLimits(dFloat minAngle, dFloat maxAngle)
 {
-    ((CustomHinge*)m_joint)->SetLimits(minAngle, maxAngle);
+    ((dCustomHinge*)m_joint)->SetLimits(minAngle, maxAngle);
 }
 
 dNewtonSliderJoint::dNewtonSliderJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_slider)
 {
-	SetJoint (new CustomSlider (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	SetJoint (new dCustomSlider (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
 void dNewtonSliderJoint::EnableLimits(bool state)
 {
-    ((CustomSlider*) m_joint)->EnableLimits(state);
+    ((dCustomSlider*) m_joint)->EnableLimits(state);
 }
 
 void dNewtonSliderJoint::SetLimits(dFloat minDist, dFloat maxDist)
 {
-    ((CustomSlider*) m_joint)->SetLimits(minDist, maxDist);
+    ((dCustomSlider*) m_joint)->SetLimits(minDist, maxDist);
 }
 
 dNewtonUniversalJoint::dNewtonUniversalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
 	:dNewtonJoint(m_universal)
 {
-	SetJoint (new CustomUniversal (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+	SetJoint (new dCustomUniversal (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
 void dNewtonUniversalJoint::EnableLimit_0(bool state)
 {
-	((CustomUniversal*) m_joint)->EnableLimit_0(state);
+	((dCustomUniversal*) m_joint)->EnableLimit_0(state);
 }
 
 void dNewtonUniversalJoint::EnableLimit_1(bool state)
 {
-	((CustomUniversal*) m_joint)->EnableLimit_1(state);
+	((dCustomUniversal*) m_joint)->EnableLimit_1(state);
 }
 
 void dNewtonUniversalJoint::SetLimits_0(dFloat minAngle, dFloat maxAngle)
 {
-	((CustomUniversal*) m_joint)->SetLimits_0 (minAngle, maxAngle);
+	((dCustomUniversal*) m_joint)->SetLimits_0 (minAngle, maxAngle);
 }
 
 void dNewtonUniversalJoint::SetLimits_1(dFloat minAngle, dFloat maxAngle)
 {
-	((CustomUniversal*) m_joint)->SetLimits_1 (minAngle, maxAngle);
+	((dCustomUniversal*) m_joint)->SetLimits_1 (minAngle, maxAngle);
 }
 
 
 dNewtonCylindricalJoint::dNewtonCylindricalJoint(const dFloat* const pinAndPivotFrame, dNewtonDynamicBody* const body0, dNewtonDynamicBody* const body1)
     :dNewtonJoint(m_cylindrical)
 {
-    SetJoint (new CustomCorkScrew (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
+    SetJoint (new dCustomCorkScrew (dMatrix(pinAndPivotFrame), body0->GetNewtonBody(), body1 ? body1->GetNewtonBody() : NULL));
 }
 
 void dNewtonCylindricalJoint::EnableLimit_0(bool state)
 {
-    ((CustomCorkScrew*) m_joint)->EnableLinearLimits(state);
+    ((dCustomCorkScrew*) m_joint)->EnableLinearLimits(state);
 }
 
 void dNewtonCylindricalJoint::EnableLimit_1(bool state)
 {
-    ((CustomCorkScrew*) m_joint)->EnableAngularLimits(state);
+    ((dCustomCorkScrew*) m_joint)->EnableAngularLimits(state);
 }
 
 void dNewtonCylindricalJoint::SetLimits_0(dFloat minDist, dFloat maxDist)
 {
-    ((CustomCorkScrew*) m_joint)->SetLinearLimis (minDist, maxDist);
+    ((dCustomCorkScrew*) m_joint)->SetLinearLimis (minDist, maxDist);
 }
 
 void dNewtonCylindricalJoint::SetLimits_1(dFloat minAngle, dFloat maxAngle)
 {
-    ((CustomCorkScrew*) m_joint)->SetAngularLimis(minAngle, maxAngle);
+    ((dCustomCorkScrew*) m_joint)->SetAngularLimis(minAngle, maxAngle);
 }
 
 
 dNewtonGearJoint::dNewtonGearJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1)
     :dNewtonJoint(m_gear)
 {
-    SetJoint (new CustomGear (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
+    SetJoint (new dCustomGear (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
 }
 
 dNewtonPulleyJoint::dNewtonPulleyJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1)
     :dNewtonJoint(m_pulley)
 {
-    SetJoint (new CustomPulley (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
+    SetJoint (new dCustomPulley (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
 }
 
 dNewtonGearAndRackJoint::dNewtonGearAndRackJoint(dFloat ratio, const dFloat* const body0Pin, dNewtonDynamicBody* const body0, const dFloat* const body1Pin, dNewtonDynamicBody* const body1)
     :dNewtonJoint(m_gearAndRack)
 {
-    SetJoint (new CustomRackAndPinion (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
+    SetJoint (new dCustomRackAndPinion (ratio, body0Pin, body1Pin, body0->GetNewtonBody(), body1->GetNewtonBody()));
 }
 

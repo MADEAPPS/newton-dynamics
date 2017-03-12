@@ -775,7 +775,6 @@ class dgSetPrecisionDouble
 
 DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 {
-	// it is a pity that pthread does not supports cross platform atomics, it would be nice if it did
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchangeAdd((long*) addend, long (amount));
 	#endif
@@ -792,7 +791,6 @@ DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 
 DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 {
-	// it is a pity that pthread does not supports cross platform atomics, it would be nice if it did
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchange((long*) ptr, value);
 	#endif

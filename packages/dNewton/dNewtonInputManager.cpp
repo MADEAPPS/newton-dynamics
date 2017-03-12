@@ -27,7 +27,7 @@
 
 
 dNewtonInputManager::dNewtonInputManager (dNewton* const world)
-	:CustomInputManager (world->GetNewton())
+	:dCustomInputManager (world->GetNewton())
 {
 }
 

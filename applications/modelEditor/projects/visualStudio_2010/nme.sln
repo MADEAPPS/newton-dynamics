@@ -12,8 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "plugins", "plugins", "{657B
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nme", "nme.vcxproj", "{E7F83F91-569D-4540-9F8B-9FD2DD20DE8A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pthread", "..\..\..\..\coreLibrary_300\source\pthreads.2\VS_2010_static_mt\pthread.vcxproj", "{03BCA23C-02A5-415B-A37B-26600BC2CE96}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\core.vcxproj", "{57AC4F2D-B115-4931-8F6E-AF8AD616B6AA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "newton", "..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\newton.vcxproj", "{68D9962C-0EC7-445A-B0FD-F87B16D43901}"

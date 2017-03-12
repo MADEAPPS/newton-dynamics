@@ -125,6 +125,7 @@ bool dgCholeskyFactorization(dgInt32 size, T* const psdMatrix)
 	return state;
 }
 
+/*
 template<class T>
 void dgCholeskyInverse(dgInt32 size, T* const matrix, T* const invMatrix)
 {
@@ -165,6 +166,7 @@ void dgCholeskyInverse(dgInt32 size, T* const matrix, T* const invMatrix)
 		}
 	}
 }
+*/
 
 template<class T>
 DG_INLINE void dgSolveCholesky(dgInt32 size, dgInt32 n, const T* const choleskyMatrix, T* const x)

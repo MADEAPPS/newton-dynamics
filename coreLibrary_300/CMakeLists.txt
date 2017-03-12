@@ -20,20 +20,7 @@ file(GLOB physics_srcs source/physics/*.cpp) # physics engine
 file(GLOB mesh_srcs source/meshUtil/*.cpp)   # mesh geometry
 file(GLOB newton_srcs source/newton/*.cpp)   # Newton engine
 
-if (WIN32)
-  # modified pthread library
-  file(GLOB_RECURSE pthread_srcs ${NEWTON_SOURCE}/pthreads.2/pthread.c)
-else (WIN32)
-  set(pthread_srcs "")
-endif (WIN32)
-
-add_library(NewtonObj OBJECT ${dg_srcs} ${physics_srcs} ${mesh_srcs} ${newton_srcs} ${pthread_srcs})
-
-
-if (WIN32)
-  # add modified pthread library
-  target_include_directories(NewtonObj PRIVATE ${NEWTON_SOURCE}/pthreads.2)
-endif (WIN32)
+add_library(NewtonObj OBJECT ${dg_srcs} ${physics_srcs} ${mesh_srcs} ${newton_srcs})
 
 target_include_directories(NewtonObj PRIVATE ${NEWTON_SOURCE}/core)
 target_include_directories(NewtonObj PRIVATE ${NEWTON_SOURCE}/physics)

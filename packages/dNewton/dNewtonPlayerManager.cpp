@@ -27,7 +27,7 @@
 
 
 dNewtonPlayerManager::dNewtonPlayerManager (dNewton* const world)
-	:CustomPlayerControllerManager (world->GetNewton())
+	:dCustomPlayerControllerManager (world->GetNewton())
 {
 }
 
@@ -57,7 +57,7 @@ dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetNextPlayer(const d
 
 
 
-void dNewtonPlayerManager::ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep)
+void dNewtonPlayerManager::ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 {
 	dNewtonPlayer* const body = (dNewtonPlayer*) NewtonBodyGetUserData(controller->GetBody());
 	body->OnPlayerMove (timestep);

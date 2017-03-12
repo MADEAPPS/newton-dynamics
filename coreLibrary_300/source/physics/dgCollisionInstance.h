@@ -403,6 +403,10 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& di
 		{
 			return m_scale.CompProduct4(m_childShape->SupportVertexSpecial(dir, vertexIndex));
 		}
+
+		default:
+			return SupportVertex(dir);
+/*
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
@@ -418,6 +422,7 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& di
 			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
 			return m_scale.CompProduct4(m_aligmentMatrix.TransformVector(m_childShape->SupportVertexSpecial(dir1, vertexIndex)));
 		}
+*/
 	}
 }
 
@@ -435,6 +440,10 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecialProjectPoint (const 
 		{
 			return m_scale.CompProduct4(m_childShape->SupportVertexSpecialProjectPoint(point.CompProduct4(m_invScale), dir));
 		}
+
+		default:
+			return point;
+/*
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p/S, n * transp(S)) 
@@ -450,6 +459,7 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecialProjectPoint (const 
 			dir1 = dir1.CompProduct4(dir1.InvMagSqrt());
 			return m_scale.CompProduct4(m_aligmentMatrix.TransformVector(m_childShape->SupportVertexSpecialProjectPoint(m_aligmentMatrix.UntransformVector(point.CompProduct4(m_invScale)), dir1)));
 		}
+*/
 	}
 }
 

@@ -561,7 +561,7 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 
 			dgFloat64 param = dgFloat32 (100.0f);
 			if (clusterFace->m_color != m_clusterA->m_color) {
-				param = dgMeshEffect::dgMeshBVH::RayFaceIntersect (face, p1, p0, false);
+				param = dgMeshEffect::dgMeshBVH::RayFaceIntersect (face, p1, p0, NULL);
 				if ((param >= dgFloat32 (0.0f)) && (param <= dgFloat32(1.0f))) {
 					param = dgFloat32 (1.0f) - param;
 				}

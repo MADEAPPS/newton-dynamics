@@ -89,15 +89,10 @@ else ()
 endif ()
 
 option("DOUBLE_PRECISION" "Use Double Precision" OFF)
-option("USE_PTHREADS" "Use pthreads library instead of C++11 threads" OFF)
 option("NEWTON_DEMOS_SANDBOX" "Build demos sandbox" ON)
 
 if(DOUBLE_PRECISION)
  add_definitions(-D_NEWTON_USE_DOUBLE)
-endif()
-
-if(USE_PTHREADS)
- add_definitions(-DDG_USE_PTHREADS)
 endif()
 
 if(NEWTON_DEMOS_SANDBOX)

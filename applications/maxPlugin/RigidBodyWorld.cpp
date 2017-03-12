@@ -159,16 +159,11 @@ RigidBodyWorldDesc::RigidBodyWorldDesc ()
 //	Interface* const inteface = GetCOREInterface();
 //	RigBodyWorldUpdate* const timeCallback = this;
 //	inteface->RegisterTimeChangeCallback(timeCallback);	
-
-	// I can not create the body here because pthreads can no be destroyed at C++ start pr when calling at exit.
-	// basically I need to plug this in a Max Notification functions, for now just comment this out
 //	m_newton = NewtonCreate();
 }
 
 RigidBodyWorldDesc::~RigidBodyWorldDesc ()
 {
-	// I can no create the body here because pthreads can no be destroyed at C++ start pr when calling at exit.
-	// basically I need to plug this in a Max Notification functions, for now just comment this out
 //	_ASSERTE (m_newton);
 //	NewtonDestroy (m_newton);
 

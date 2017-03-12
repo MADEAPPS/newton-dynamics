@@ -81,7 +81,7 @@ SDK_FOX_MAKE = ../../../../packages/thirdParty/fox/fox-1.6.44
 SDK_ENET_MAKE = ../../../../packages/thirdParty/enet-1.2
 
 
-LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW -lpthread 
+LIBS  = -L/usr/lib -lstdc++ -lrt -lm -lGL -lGLU -lGLEW
 #-lfmodex
 
 # this use newton as shared or static library

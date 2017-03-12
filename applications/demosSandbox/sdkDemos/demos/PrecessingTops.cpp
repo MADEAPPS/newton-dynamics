@@ -56,7 +56,7 @@ void PrecessingFlightWheel(DemoEntityManager* const scene)
 	NewtonBodySetOmega(wheelBody, &omega[0]);
 
 	matrix.m_posit.m_x -= lenght * 0.5f;
-	new CustomBallAndSocket(matrix, wheelBody, NULL);
+	new dCustomBallAndSocket(matrix, wheelBody, NULL);
 	
 	// place camera into position
 	dMatrix camMatrix(dGetIdentityMatrix());

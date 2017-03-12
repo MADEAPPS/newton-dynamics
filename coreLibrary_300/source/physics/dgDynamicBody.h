@@ -89,8 +89,6 @@ class dgDynamicBody : public dgBody
 	dgMatrix m_principalAxis;
 #endif
 
-	dgVector m_accel;
-	dgVector m_alpha;
 	dgVector m_externalForce;
 	dgVector m_externalTorque;
 	dgVector m_savedExternalForce;

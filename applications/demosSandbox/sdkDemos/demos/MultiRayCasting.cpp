@@ -23,7 +23,7 @@
 
 #define PARALLET_RAYS_COUNT 1000
 
-class dRayCastRecord: public CustomControllerBase
+class dRayCastRecord: public dCustomControllerBase
 {
 	public:
 	dRayCastRecord()
@@ -68,7 +68,7 @@ class dRayCastRecord: public CustomControllerBase
 class LineOfSightRayCastEntity: public DemoEntity
 {
 	public:
-	LineOfSightRayCastEntity (DemoEntityManager* const scene, CustomControllerManager<dRayCastRecord>* casterManager)
+	LineOfSightRayCastEntity (DemoEntityManager* const scene, dCustomControllerManager<dRayCastRecord>* casterManager)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_casterManager(casterManager)
 	{
@@ -87,7 +87,7 @@ class LineOfSightRayCastEntity: public DemoEntity
 	
 		glColor3f(0.0f, 0.5f, 0.5f);
 		glBegin(GL_LINES);
-		for (CustomControllerManager<dRayCastRecord>::dListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
+		for (dCustomControllerManager<dRayCastRecord>::dListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
 			dRayCastRecord* const ray = &node->GetInfo();
 			glVertex3f(ray->m_p0.m_x, ray->m_p0.m_y, ray->m_p0.m_z);
 			glVertex3f(ray->m_p1.m_x, ray->m_p1.m_y, ray->m_p1.m_z);
@@ -98,7 +98,7 @@ class LineOfSightRayCastEntity: public DemoEntity
 		glColor3f(1.0f, 0.0f, 0.0f);
 		glPointSize(6.0f);
 		glBegin(GL_POINTS);
-		for (CustomControllerManager<dRayCastRecord>::dListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
+		for (dCustomControllerManager<dRayCastRecord>::dListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
 			dRayCastRecord* const ray = &node->GetInfo();
 			glVertex3f(ray->m_p1.m_x, ray->m_p1.m_y, ray->m_p1.m_z);
 		}
@@ -108,15 +108,15 @@ class LineOfSightRayCastEntity: public DemoEntity
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 
-	CustomControllerManager<dRayCastRecord>* m_casterManager; 
+	dCustomControllerManager<dRayCastRecord>* m_casterManager; 
 };
 
 
-class dRayCasterManager: public CustomControllerManager<dRayCastRecord> 
+class dRayCasterManager: public dCustomControllerManager<dRayCastRecord> 
 {
 	public:
 	dRayCasterManager(DemoEntityManager* const scene, NewtonBody* const skipLevelMesh)
-		:CustomControllerManager<dRayCastRecord>(scene->GetNewton(), "dRayCasterManager")
+		:dCustomControllerManager<dRayCastRecord>(scene->GetNewton(), "dRayCasterManager")
 	{
 		// make 16 casting center
 		dVector location[16];

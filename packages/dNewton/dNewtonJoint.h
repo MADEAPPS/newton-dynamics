@@ -67,19 +67,17 @@ class dNewtonJoint: public dNewtonAlloc
 	CNEWTON_API dNewtonDynamicBody* GetBody0 () const;
 	CNEWTON_API dNewtonDynamicBody* GetBody1 () const;
 
-
 	protected:
 	CNEWTON_API dNewtonJoint(dJointType type);
-	CNEWTON_API void SetJoint(CustomJoint* const joint);
+	CNEWTON_API void SetJoint(dCustomJoint* const joint);
 	CNEWTON_API virtual void OnSubmitConstraint (dFloat timestep, int threadIndex);
 
 	private:
-	CNEWTON_API static void OnJointDestroyCallback (const CustomJoint* const me);
-	CNEWTON_API static void OnSubmitConstraintCallback (const CustomJoint* const me, dFloat timestep, int threadIndex);
+	CNEWTON_API static void OnJointDestroyCallback (const dCustomJoint* const me);
 
 	protected:
 	dJointType m_type;
-	CustomJoint* m_joint;
+	dCustomJoint* m_joint;
 };
 
 class dNewtonBallAndSocketJoint: public dNewtonJoint 

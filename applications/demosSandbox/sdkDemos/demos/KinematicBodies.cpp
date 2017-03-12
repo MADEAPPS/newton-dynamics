@@ -72,7 +72,7 @@ class PhantomPlacement: public DemoEntity
     DemoMesh* m_blueMesh;
 };
 
-class dKinematicPlacement: public CustomControllerBase
+class dKinematicPlacement: public dCustomControllerBase
 {
 	public:
 	void PreUpdate(dFloat timestep, int threadIndex)
@@ -86,12 +86,12 @@ class dKinematicPlacement: public CustomControllerBase
 
 
 
-class dKinematicPlacementManager: public CustomControllerManager<dKinematicPlacement>, public dComplentaritySolver 
+class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlacement>, public dComplentaritySolver 
 {
 	public:
 
 	dKinematicPlacementManager(DemoEntityManager* const scene)
-		:CustomControllerManager<dKinematicPlacement>(scene->GetNewton(), "dKinematicPlacementManager")
+		:dCustomControllerManager<dKinematicPlacement>(scene->GetNewton(), "dKinematicPlacementManager")
 		,m_castDir (0.0f, -1.0f, 0.0f, 0.0f)
 		,m_phantomEntity(NULL)
 		,m_helpKey (true)

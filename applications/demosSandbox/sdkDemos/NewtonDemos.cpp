@@ -52,11 +52,11 @@
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	28          // standard joints
-#define DEFAULT_SCENE	29			// articulated joints
+//#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
 //#define DEFAULT_SCENE	32			// basic Car
-//#define DEFAULT_SCENE	33			// super Car
+#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// heavy vehicles
 //#define DEFAULT_SCENE	35			// basic player controller
 //#define DEFAULT_SCENE	36			// advanced player controller
@@ -341,7 +341,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_hideVisualMeshes = true;
 //m_hardwareDevice = 2;
 //m_showStatistics = true;
-//
+
 
 //m_solverModeQuality = 1;
 //m_showCenterOfMass = true;
@@ -350,7 +350,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_showContactPoints = true;
 //m_debugDisplayMode = 2;
 //SetDebugDisplayMode (m_debugDisplayMode);
-//m_showNormalForces = true;
+m_showNormalForces = true;
 
 //m_showAABB = true;
 //m_autoSleepState = false;

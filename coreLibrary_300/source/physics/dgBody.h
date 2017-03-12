@@ -228,6 +228,8 @@ class dgBody
 	dgVector m_invMass;
 	dgVector m_veloc;
 	dgVector m_omega;
+	dgVector m_accel;
+	dgVector m_alpha;
 	dgVector m_minAABB;
 	dgVector m_maxAABB;
 	dgVector m_localCentreOfMass;	

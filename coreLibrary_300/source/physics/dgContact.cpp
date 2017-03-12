@@ -310,6 +310,8 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 			dgFloat32 aRel = row->m_deltaAccel;
 
 			if (row->m_normalForceIndex < 0) {
+				dgAssert (row->m_restitution >= 0.0f);
+				dgAssert (row->m_restitution <= 2.0f);
 				dgFloat32 restitution = (vRel <= dgFloat32 (0.0f)) ? (dgFloat32 (1.0f) + row->m_restitution) : dgFloat32 (1.0f);
 
 				dgFloat32 penetrationVeloc = dgFloat32 (0.0f);

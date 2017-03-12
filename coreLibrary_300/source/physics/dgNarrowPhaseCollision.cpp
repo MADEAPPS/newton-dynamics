@@ -306,11 +306,12 @@ dgCollisionInstance* dgWorld::CreateStaticUserMesh (const dgVector& boxP0, const
 
 dgCollisionInstance* dgWorld::CreateHeightField(
 	dgInt32 width, dgInt32 height, dgInt32 contructionMode, dgInt32 elevationDataType, 
-	const void* const elevationMap, const dgInt8* const atributeMap, dgFloat32 verticalScale, dgFloat32 horizontalScale)
+	const void* const elevationMap, const dgInt8* const atributeMap, 
+	dgFloat32 verticalScale, dgFloat32 horizontalScale_x, dgFloat32 horizontalScale_z)
 {
 	dgCollision* const collision = new  (m_allocator) dgCollisionHeightField (this, width, height, contructionMode, elevationMap, 
 																			  elevationDataType	? dgCollisionHeightField::m_unsigned16Bit : dgCollisionHeightField::m_float32Bit,	
-																			  verticalScale, atributeMap, horizontalScale);
+																			  verticalScale, atributeMap, horizontalScale_x, horizontalScale_z);
 	dgCollisionInstance* const instance = CreateInstance (collision, 0, dgGetIdentityMatrix()); 
 	collision->Release();
 	return instance;
@@ -1388,7 +1389,8 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
 	contactJoint->m_separationDistance = dgFloat32(0.0f);
 
-	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount() && proxy.m_instance0->GetCollisionMode() && proxy.m_instance1->GetCollisionMode())) {
+//	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount() && proxy.m_instance0->GetCollisionMode() && proxy.m_instance1->GetCollisionMode())) {
+	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount())) {
 		return count;
 	}
 
@@ -1480,7 +1482,8 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 	dgAssert(collision1->IsType(dgCollision::dgCollisionMesh_RTTI));
 	dgAssert(collision0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
-	if (!(collision0->GetConvexVertexCount() && proxy.m_instance0->GetCollisionMode() && proxy.m_instance1->GetCollisionMode())) {
+	//if (!(collision0->GetConvexVertexCount() && proxy.m_instance0->GetCollisionMode() && proxy.m_instance1->GetCollisionMode())) {
+	if (!collision0->GetConvexVertexCount()) {
 		return count;
 	}
 

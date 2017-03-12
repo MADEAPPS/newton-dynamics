@@ -24,8 +24,8 @@
 #include "DemoEntityListener.h"
 #include "DemoCameraListener.h"
 //#include "DemoVisualDebugerListener.h"
-#include "CustomPlayerControllerManager.h"
-#include "CustomVehicleControllerManager.h"
+#include "dCustomPlayerControllerManager.h"
+#include "dCustomVehicleControllerManager.h"
 
 
 #ifdef _MACOSX_VER
@@ -122,12 +122,15 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	A[1][1] = 2.0f;
 	b[0] = 1.0f;
 	b[1] = 1.0f;
-	x[0] = 0;
-	x[1] = 0;
+	x[0] = 1;
+	x[1] = 2;
+	
 	l[0] = 0.0f;
 	l[1] = 0.0f;
 	h[0] = 0.25f;
 	h[1] = 1.0f;
+	
+	dMatrixTimeVector(2, &A[0][0], x, b);
 	dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
 */
 
@@ -195,7 +198,7 @@ void DemoEntityManager::Cleanup ()
 	NewtonWorldSetUserData(m_world, this);
 
 	// set joint serialization call back
-	CustomJoint::Initalize(m_world);
+	dCustomJoint::Initalize(m_world);
 
 	// add all physics pre and post listeners
 	//	m_preListenerManager.Append(new DemoVisualDebugerListener("visualDebuger", m_world));
@@ -923,13 +926,13 @@ void DemoEntityManager::RenderFrame ()
 		// see if there is a vehicle controller and 
 		void* const vehListerNode = NewtonWorldGetPreListener(GetNewton(), VEHICLE_PLUGIN_NAME);
 		if (vehListerNode) {
-			CustomVehicleControllerManager* const manager = (CustomVehicleControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
+			dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
 			manager->Debug();
 		}
 
 		void* const characterListerNode = NewtonWorldGetPreListener(GetNewton(), PLAYER_PLUGIN_NAME);
 		if (characterListerNode) {
-			CustomPlayerControllerManager* const manager = (CustomPlayerControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
+			dCustomPlayerControllerManager* const manager = (dCustomPlayerControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
 			manager->Debug();
 		}
 	}

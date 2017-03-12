@@ -15,11 +15,10 @@ file(GLOB_RECURSE sources *.cpp)
 
 add_library(${project} STATIC ${sources} ${headers})
 
-include_directories ("${corePath}/core") 
-include_directories ("${corePath}/newton") 
-include_directories ("${corePath}/physics") 
-include_directories ("${corePath}/meshUtil") 
-include_directories ("${corePath}/pthreads.2") 
+include_directories ("${corePath}/core")
+include_directories ("${corePath}/newton")
+include_directories ("${corePath}/physics")
+include_directories ("${corePath}/meshUtil")
 
 if (MSVC)
 	set_target_properties (${project} PROPERTIES COMPILE_FLAGS "/YuNewtonStdAfx.h")

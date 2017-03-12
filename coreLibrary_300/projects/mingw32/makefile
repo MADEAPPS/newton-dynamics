@@ -18,9 +18,6 @@
 #
 # ******************************************************
 
-#   $(DG_PTHREAD_PATH)/pthread.c \
-
-DG_PTHREAD_PATH = ../../source/pthreads.2
 DG_INCLUDED_PATH = ../../source/core
 DG_PATH = $(DG_INCLUDED_PATH)/
 DG_SRCS = \
@@ -172,7 +169,7 @@ COMPILER = gcc
 #CPU_FLAGS = -m32 -O2 -fpic -g -msse -msse4.1 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
 CPU_FLAGS = -m32 -O2 -g -msse -msse3 -mfpmath=sse -ffloat-store -ffast-math -freciprocal-math -funsafe-math-optimizations -fsingle-precision-constant
 
-FLAGS  = -c -Wall -Wno-strict-aliasing -DPTW32_BUILD -DPTW32_STATIC_LIB -D_NEWTON_STATIC_LIB -D_MINGW_32_VER $(CPU_FLAGS) -I$(DG_PTHREAD_PATH) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH)
+FLAGS  = -c -Wall -Wno-strict-aliasing -DPTW32_BUILD -DPTW32_STATIC_LIB -D_NEWTON_STATIC_LIB -D_MINGW_32_VER $(CPU_FLAGS) -I$(DG_INCLUDED_PATH) -I$(DG_INCLUDED_PHYSICS_PATH) -I$(DG_INCLUDED_MESH_PATH) -I$(DG_INCLUDED_OPENCL_PATH)
 
 INSTALL_PATH = mingw32
 

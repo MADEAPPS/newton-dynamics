@@ -275,6 +275,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 		extAccel[i] = unitAccel;
 	}
 
+	dgAssert(m_body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
 	m_body->m_alpha = dgVector::m_zero;
 	m_body->m_omega = dgVector::m_zero;
 	m_body->m_externalForce = dgVector::m_zero;
