@@ -135,7 +135,7 @@ static CarDefinition viper =
 	100.0f,										// ENGINE_MASS
 	40.0f,										// TIRE_MASS	
 	0.125f,										// ENGINE_RADIO
-	20.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
+	25.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
 	 0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
 	0.55f,										// VEHICLE_WEIGHT_DISTRIBUTION
 	2000.0f,									// CLUTCH_FRICTION_TORQUE
@@ -147,8 +147,8 @@ static CarDefinition viper =
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	0.5f,										// TIRE_LATERAL_STIFFNESS
-	0.5f,										// TIRE_LONGITUDINAL_STIFFNESS
+	1.0f,										// TIRE_LATERAL_STIFFNESS
+	1.0f,										// TIRE_LONGITUDINAL_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
 	30000.0f,									// TIRE_SUSPENSION_SPRING
 	700.0f,										// TIRE_SUSPENSION_DAMPER
@@ -625,7 +625,7 @@ class SuperCarEntity: public DemoEntity
 		}
 
 #if 1
-	#if 0
+	#if 1
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
@@ -1627,7 +1627,7 @@ void SuperCar (DemoEntityManager* const scene)
 	dMatrix location (camMatrix);
 	location.m_posit.m_z += 4.0f;
 	location.m_posit.m_x += 44.0f;
-/*
+
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
@@ -1644,6 +1644,6 @@ void SuperCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-*/
+
 }
 

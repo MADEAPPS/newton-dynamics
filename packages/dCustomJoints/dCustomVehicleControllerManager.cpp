@@ -2151,13 +2151,18 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 				dFloat longitudinalSpeed = tireVeloc.DotProduct3(longitudinalPin);
 				dAssert (dAbs (longitudinalSpeed) > 0.01f);
 
-				//tire->m_lateralSlip = dAtan2(dAbs(lateralSpeed), dAbs(longitudinalSpeed));
 				tire->m_lateralSlip = dAbs(lateralSpeed / longitudinalSpeed);
 	
 				dFloat aligningMoment;
 				dFloat lateralFrictionCoef;
 				dFloat longitudinalFrictionCoef;
-				controller->m_contactFilter->CalculateTireFrictionCoefficents(tire, otherBody, material, tire->m_longitudinalSlip, tire->m_lateralSlip, tire->m_data.m_longitudialStiffness, tire->m_data.m_lateralStiffness, longitudinalFrictionCoef, lateralFrictionCoef, aligningMoment);
+				dFloat lateralSlipSensitivity = 5.0f;
+				controller->m_contactFilter->CalculateTireFrictionCoefficents(tire, otherBody, material, 
+					tire->m_longitudinalSlip, tire->m_lateralSlip * lateralSlipSensitivity, 
+					tire->m_data.m_longitudialStiffness, tire->m_data.m_lateralStiffness, 
+					longitudinalFrictionCoef, lateralFrictionCoef, aligningMoment);
+
+//dTrace (("%d %f %f\n", tire->m_index, longitudinalFrictionCoef, lateralFrictionCoef));
 
 				NewtonMaterialSetContactFrictionCoef(material, lateralFrictionCoef, lateralFrictionCoef, 0);
 				NewtonMaterialSetContactFrictionCoef(material, longitudinalFrictionCoef, longitudinalFrictionCoef, 1);
@@ -2318,7 +2323,7 @@ static dFloat betaRate0 = 0;
 		dFloat beta = dAtan2(speed_z, speed_x);
 		dFloat betaRate = (beta - betaRate0) / timestep;
 		betaRate0 = beta; 
-dTrace (("b(%f) rate(%f)\n", beta * 180.0f/3.1416f, betaRate * 180.0f/3.1416f ));
+//dTrace (("b(%f) rate(%f)\n", beta * 180.0f/3.1416f, betaRate * 180.0f/3.1416f ));
 
 //if (dAbs (betaRate * 180.0f/3.1416f) > 30.0f) {
 if ((dAbs (beta * 180.0f/3.1416f) > 35.0f))  {
