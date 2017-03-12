@@ -40,10 +40,10 @@ static FILE* file_xxx;
 #define D_VEHICLE_MAX_SIDESLIP_ANGLE				dFloat(35.0f * 3.1416f / 180.0f)
 #define D_VEHICLE_MAX_SIDESLIP_RATE					dFloat(15.0f * 3.1416f / 180.0f)
 
-class dCustomVehicleControllerManager::TireFilter: public dCustomControllerConvexCastPreFilter
+class dCustomVehicleControllerManager::dTireFilter: public dCustomControllerConvexCastPreFilter
 {
 	public:
-	TireFilter(const dCustomVehicleController::dBodyPartTire* const tire, const dCustomVehicleController* const controller)
+	dTireFilter(const dCustomVehicleController::dBodyPartTire* const tire, const dCustomVehicleController* const controller)
 		:dCustomControllerConvexCastPreFilter(tire->GetBody())
 		,m_tire (tire)
 		,m_controller(controller)
@@ -1969,13 +1969,55 @@ int dCustomVehicleControllerManager::Collide(dCustomVehicleController::dBodyPart
 	tireSweeptMatrix.m_posit = chassisMatrix.m_posit + suspensionSpan;
 
 	NewtonCollision* const tireCollision = NewtonBodyGetCollision(tireBody);
-	TireFilter filter(tire, controller);
+	dTireFilter filter(tire, controller);
 
 	dFloat timeOfImpact;
 	tire->m_collidingCount = 0;
 	const int maxContactCount = 2;
 	dAssert (sizeof (tire->m_contactInfo) / sizeof (tire->m_contactInfo[0]) > 2);
 	int count = NewtonWorldConvexCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, &timeOfImpact, &filter, dCustomControllerConvexCastPreFilter::Prefilter, tire->m_contactInfo, maxContactCount, threadIndex);
+
+	if (timeOfImpact < 1.0e-2f) {
+		class CheckBadContact: public dTireFilter
+		{
+			public:
+			CheckBadContact(const dCustomVehicleController::dBodyPartTire* const tire, const dCustomVehicleController* const controller, int oldCount, NewtonWorldConvexCastReturnInfo* const oldInfo)
+				:dTireFilter(tire, controller)
+				,m_oldCount(oldCount) 
+				,m_oldInfo(oldInfo)
+			{
+			}
+
+			unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
+			{
+				for (int i = 0; i < m_oldCount; i ++) {
+					if (body == m_oldInfo[i].m_hitBody) {
+						return 0;
+					}
+				}
+
+				return dTireFilter::Prefilter(body, myCollision);
+			}
+
+			int m_oldCount;
+			NewtonWorldConvexCastReturnInfo* m_oldInfo;
+		};
+			
+		
+		dFloat timeOfImpact1;
+		NewtonWorldConvexCastReturnInfo contactInfo[4];
+		CheckBadContact checkfilter (tire, controller, count, tire->m_contactInfo);
+		int count1 = NewtonWorldConvexCast (world, &tireSweeptMatrix[0][0], &chassisMatrix.m_posit[0], tireCollision, &timeOfImpact1, &checkfilter, dCustomControllerConvexCastPreFilter::Prefilter, contactInfo, maxContactCount, threadIndex);
+		if (count1) {
+			count = count1;
+			timeOfImpact = timeOfImpact1;
+			for (int i = 0; i < count; i ++) {
+				tire->m_contactInfo[i] = contactInfo[i];
+			}
+		}
+	}
+
+
 	if (count) {
 		timeOfImpact = 1.0f - timeOfImpact;
 		dFloat num = (tireMatrix.m_posit - chassisMatrix.m_up.Scale (0.25f * tire->m_data.m_suspesionlenght) - chassisMatrix.m_posit).DotProduct3(suspensionSpan);
@@ -1991,6 +2033,7 @@ int dCustomVehicleControllerManager::Collide(dCustomVehicleController::dBodyPart
 				}
 			}
 			if (count) {
+/*
 				dFloat x1 = timeOfImpact * tire->m_data.m_suspesionlenght;
 				dFloat x0 = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
 				dFloat x10 = x1 - x0;
@@ -2002,9 +2045,19 @@ int dCustomVehicleControllerManager::Collide(dCustomVehicleController::dBodyPart
 					NewtonWorldConvexCast (world, &chassisMatrix[0][0], &tireSweeptMatrix.m_posit[0], tireCollision, &param, &filter, dCustomControllerConvexCastPreFilter::Prefilter, NULL, 0, threadIndex);
 					count = (param < 1.0f) ? 0 : count;
 				}
-				// with the old hybrid model this was ok by that is very bad 
 				if (count) {
 					tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(x1);
+					NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
+				}
+*/
+				dFloat x = timeOfImpact * tire->m_data.m_suspesionlenght;
+				dFloat step = (tireSweeptMatrix.m_posit - tireMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
+				if (step < -1.0f / 32.0f) {
+					count = 0;
+				}
+
+				if (count) {
+					tireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(x);
 					NewtonBodySetMatrixNoSleep(tireBody, &tireMatrix[0][0]);
 				}
 			}
@@ -2320,12 +2373,11 @@ static dFloat betaRate0 = 0;
 	dFloat speed_z = veloc.DotProduct3(matrix.m_right);
 	if (dAbs (speed_x) > 0.25f) {
 
-		dFloat beta = dAtan2(speed_z, speed_x);
+		dFloat beta = dAtan2(speed_z, dAbs(speed_x));
 		dFloat betaRate = (beta - betaRate0) / timestep;
 		betaRate0 = beta; 
+/*
 //dTrace (("b(%f) rate(%f)\n", beta * 180.0f/3.1416f, betaRate * 180.0f/3.1416f ));
-
-//if (dAbs (betaRate * 180.0f/3.1416f) > 30.0f) {
 if ((dAbs (beta * 180.0f/3.1416f) > 35.0f))  {
 	dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(beta)));
 	NewtonBodyAddTorque (chassisBody, &xxx[0]);
@@ -2333,7 +2385,7 @@ if ((dAbs (beta * 180.0f/3.1416f) > 35.0f))  {
 	dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(betaRate)));
 	NewtonBodyAddTorque (chassisBody, &xxx[0]);
 }
-
+*/
 	}
 }
 

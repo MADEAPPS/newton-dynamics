@@ -545,12 +545,6 @@ class dCustomVehicleController: public dCustomControllerBase
 	dFloat m_speed;
 	dFloat m_totalMass;
 
-//	dMatrix m_vehicleGlobalMatrix;
-//	dVector m_localOmega;
-//	dVector m_localVeloc;
-//	dFloat m_speedRate;
-//	dFloat m_sideSlipRate;
-//	dFloat m_sideSlipAngle;
 	dFloat m_gravityMag;
 	dFloat m_weightDistribution;
 
@@ -562,7 +556,7 @@ class dCustomVehicleController: public dCustomControllerBase
 
 class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVehicleController> 
 {
-	class TireFilter;
+	class dTireFilter;
 	public:
 	CUSTOM_JOINTS_API dCustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const otherMaterials);
 	CUSTOM_JOINTS_API virtual ~dCustomVehicleControllerManager();
