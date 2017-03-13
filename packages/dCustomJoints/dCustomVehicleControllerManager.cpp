@@ -1511,11 +1511,9 @@ int dCustomVehicleControllerManager::GetTireMaterial() const
 
 dCustomVehicleController* dCustomVehicleControllerManager::CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData, dFloat gravityMag)
 {
-	dAssert (0);
-//	dCustomVehicleController* const controller = CreateController();
-//	controller->Init(body, vehicleFrame, gravityVector);
-//	return controller;
-return NULL;	
+	dCustomVehicleController* const controller = CreateController();
+	controller->Init (body, vehicleFrame, forceAndTorque, userData, gravityMag);
+	return controller;
 }
 
 dCustomVehicleController* dCustomVehicleControllerManager::CreateVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData, dFloat gravityMag)

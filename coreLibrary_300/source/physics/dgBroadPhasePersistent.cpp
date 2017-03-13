@@ -521,7 +521,7 @@ void dgBroadPhasePersistent::FindCollidingPairsForward (dgBroadphaseSyncDescript
 		}
 
 		for (dgInt32 i = 0; i < threadCount; i++) {
-			node = (node && (node->GetInfo()->GetBody()->GetInvMass().m_w != dgFloat32(0.0f))) ? node->GetNext() : NULL;
+			node = (node && node->GetInfo()->GetBody() && (node->GetInfo()->GetBody()->GetInvMass().m_w != dgFloat32(0.0f))) ? node->GetNext() : NULL;
 		}
 	}	
 }
@@ -558,8 +558,7 @@ void dgBroadPhasePersistent::FindCollidingPairsForwardAndBackward (dgBroadphaseS
 		}
 
 		for (dgInt32 i = 0; i < threadCount; i++) {
-			node = (node && (node->GetInfo()->GetBody()->GetInvMass().m_w != dgFloat32(0.0f))) ? node->GetNext() : NULL;
+			node = (node && node->GetInfo()->GetBody() && (node->GetInfo()->GetBody()->GetInvMass().m_w != dgFloat32(0.0f))) ? node->GetNext() : NULL;
 		}
 	}
-
 }

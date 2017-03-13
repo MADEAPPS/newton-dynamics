@@ -655,7 +655,9 @@ class SuperCarEntity: public DemoEntity
 	#endif
 #endif
 
-		steering->SetParam(steeringVal);
+		if (steering) {
+			steering->SetParam(steeringVal);
+		}
 		if (engine) {
 			engine->SetDifferentialLock (engineDifferentialLock ? true : false);
 	
@@ -780,8 +782,6 @@ class SuperCarEntity: public DemoEntity
 		} else if (handBrakes) {
 			handBrakes->SetParam(handBrakePedal);
 		}
-			
-
 	}
 
 	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/
