@@ -73,15 +73,14 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 		dgFloat32 maxSpeed = dgFloat32 (0.0f);
 		dgFloat32 maxOmega = dgFloat32 (0.0f);
 
-		//const dgFloat32 speedFreeze = world->m_freezeSpeed2;
-		//const dgFloat32 accelFreeze = world->m_freezeAccel2;
+		const dgFloat32 speedFreeze = world->m_freezeSpeed2;
+		const dgFloat32 accelFreeze = world->m_freezeAccel2;
 		const dgVector forceDampVect (forceDamp, forceDamp, forceDamp, dgFloat32 (0.0f));
 		for (dgInt32 i = 1; i < bodyCount; i ++) {
 			dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 			if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
 				dgAssert (body->m_invMass.m_w);
-				dgAssert (0);
-/*
+
 				const dgFloat32 accel2 = body->m_accel.DotProduct3(body->m_accel);
 				const dgFloat32 alpha2 = body->m_alpha.DotProduct3(body->m_alpha);
 				const dgFloat32 speed2 = body->m_veloc.DotProduct3(body->m_veloc);
@@ -105,12 +104,10 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 				isAutoSleep &= body->m_autoSleep;
 
 				sleepCounter = dgMin (sleepCounter, body->m_sleepingCounter);
-
-				// clear accel and angular acceleration
-				body->m_accel = dgVector::m_zero;
-				body->m_alpha = dgVector::m_zero;
-*/
 			}
+			// clear accel and angular acceleration
+			body->m_accel = dgVector::m_zero;
+			body->m_alpha = dgVector::m_zero;
 		}
 
 		if (isAutoSleep) {
@@ -119,12 +116,10 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 				for (dgInt32 i = 1; i < bodyCount; i ++) {
 					dgBody* const body = bodyArray[i].m_body;
 					dgAssert (body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || body->IsRTTIType (dgBody::m_kinematicBodyRTTI));
-//					if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-						body->m_accel = dgVector::m_zero;
-						body->m_alpha = dgVector::m_zero;
-						body->m_veloc = dgVector::m_zero;
-						body->m_omega = dgVector::m_zero;
-//					}
+					body->m_accel = dgVector::m_zero;
+					body->m_alpha = dgVector::m_zero;
+					body->m_veloc = dgVector::m_zero;
+					body->m_omega = dgVector::m_zero;
 				}
 			} else {
 				// island is not sleeping but may be resting with small residual velocity for a long time
@@ -156,16 +151,13 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 						// force island to sleep
 						stackSleeping = true;
 						for (dgInt32 i = 1; i < bodyCount; i ++) {
-							//dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
 							dgBody* const body = bodyArray[i].m_body;
 							dgAssert (body->IsRTTIType (dgBody::m_dynamicBodyRTTI) || body->IsRTTIType (dgBody::m_kinematicBodyRTTI));
-							//if (body->IsRTTIType (dgBody::m_dynamicBodyRTTI)) {
-								body->m_accel = dgVector::m_zero;
-								body->m_alpha = dgVector::m_zero;
-								body->m_veloc = dgVector::m_zero;
-								body->m_omega = dgVector::m_zero;
-								body->m_equilibrium = true;
-							//}
+							body->m_accel = dgVector::m_zero;
+							body->m_alpha = dgVector::m_zero;
+							body->m_veloc = dgVector::m_zero;
+							body->m_omega = dgVector::m_zero;
+							body->m_equilibrium = true;
 						}
 					} else {
 						sleepCounter ++;
@@ -183,7 +175,6 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 
 		if (!(isAutoSleep & stackSleeping)) {
 			// island is not sleeping, need to integrate island velocity
-
 			const dgUnsigned32 lru = world->GetBroadPhase()->m_lru;
 			const dgInt32 jointCount = cluster->m_jointCount;
 			dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
@@ -192,7 +183,6 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 			dgFloat32 timeRemaining = timestep;
 			const dgFloat32 timeTol = dgFloat32 (0.01f) * timestep;
 			for (dgInt32 i = 0; (i < DG_MAX_CONTINUE_COLLISON_STEPS) && (timeRemaining > timeTol); i ++) {
-//				dgAssert((i + 1) < DG_MAX_CONTINUE_COLLISON_STEPS);
 				// calculate the closest time to impact 
 				dgFloat32 timeToImpact = timeRemaining;
 				for (dgInt32 j = 0; (j < jointCount) && (timeToImpact > timeTol); j ++) {
