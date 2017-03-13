@@ -107,6 +107,13 @@
 #endif
 
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+  /* CMake defines NDEBUG for _not_ debug builds. Therefore, set
+     Newton's _DEBUG flag only when NDEBUG is not defined.
+  */
+  #ifndef NDEBUG
+    #define _DEBUG 1
+  #endif
+
 	#include <unistd.h>
 	#include <assert.h>
 	#ifndef __ARMCC_VERSION
