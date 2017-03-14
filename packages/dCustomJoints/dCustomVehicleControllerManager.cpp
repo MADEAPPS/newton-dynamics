@@ -2378,16 +2378,16 @@ static dFloat betaRate0 = 0;
 		dFloat beta = dAtan2(speed_z, dAbs(speed_x));
 		dFloat betaRate = (beta - betaRate0) / timestep;
 		betaRate0 = beta; 
-/*
-//dTrace (("b(%f) rate(%f)\n", beta * 180.0f/3.1416f, betaRate * 180.0f/3.1416f ));
+dTrace (("b(%f) rate(%f)\n", beta * 180.0f/3.1416f, betaRate * 180.0f/3.1416f ));
+
 if ((dAbs (beta * 180.0f/3.1416f) > 35.0f))  {
 	dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(beta)));
 	NewtonBodyAddTorque (chassisBody, &xxx[0]);
-} else if (dAbs (betaRate * 180.0f/3.1416f) > 30.0f) {
+} else if (dAbs (betaRate * 180.0f/3.1416f) > 15.0f) {
 	dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(betaRate)));
 	NewtonBodyAddTorque (chassisBody, &xxx[0]);
 }
-*/
+
 	}
 }
 
