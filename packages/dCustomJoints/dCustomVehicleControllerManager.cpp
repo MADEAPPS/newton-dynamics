@@ -619,8 +619,6 @@ void dCustomVehicleController::dBodyPartTire::dFrictionModel::CalculateTireFrict
 	aligningTorqueCoef = 0.0f;
 }
 
-
-
 void dCustomVehicleController::dBodyPartTire::Init (dBodyPart* const parentPart, const dMatrix& locationInGlobalSpase, const Info& info)
 {
 	m_data = info;
@@ -658,7 +656,12 @@ void dCustomVehicleController::dBodyPartTire::Init (dBodyPart* const parentPart,
 	dFloat inertia = 2.0f * m_data.m_mass * m_data.m_radio * m_data.m_radio / 5.0f;
 	NewtonBodySetMassMatrix (m_body, m_data.m_mass, inertia, inertia, inertia);
 
+	matrix.m_posit += matrix.m_front.Scale(m_data.m_pivotOffset);
 	m_joint = new dWheelJoint (matrix, m_body, parentPart->m_body, this);
+	
+	dMatrix chassisMatrix;
+	NewtonBodyGetMatrix(parentPart->m_body, &chassisMatrix[0][0]);
+	m_data.m_location = chassisMatrix.UntransformVector(matrix.m_posit);
 }
 
 dFloat dCustomVehicleController::dBodyPartTire::GetRPM() const
@@ -1954,7 +1957,8 @@ int dCustomVehicleControllerManager::Collide(dCustomVehicleController::dBodyPart
 	NewtonBodyGetMatrix(vehicleBody, &chassisMatrix[0][0]);
 
 //	chassisMatrix = controller->m_localFrame * chassisMatrix;
-	chassisMatrix.m_posit = chassisMatrix.TransformVector(tire->m_data.m_location);
+	dVector tireSidePin (tireMatrix.RotateVector(tire->GetJoint()->GetMatrix0().m_front));
+	chassisMatrix.m_posit = chassisMatrix.TransformVector(tire->m_data.m_location) - tireSidePin.Scale (tire->m_data.m_pivotOffset);
 	chassisMatrix.m_posit.m_w = 1.0f;
 
 	dVector suspensionSpan (chassisMatrix.m_up.Scale(tire->m_data.m_suspesionlenght));
