@@ -162,7 +162,6 @@ class dCustomVehicleController: public dCustomControllerBase
 		dBodyPartDifferential* m_rearDiff;
 		dBodyPartDifferential* m_frontDiff;
 	};
-
 	
 	class dBodyPartTire: public dBodyPart
 	{
@@ -187,6 +186,7 @@ class dCustomVehicleController: public dCustomControllerBase
 			dFloat m_mass;
 			dFloat m_radio;
 			dFloat m_width;
+			dFloat m_pivotOffset;
 			dFloat m_maxSteeringAngle;
 			dFloat m_dampingRatio;
 			dFloat m_springStrength;
