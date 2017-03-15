@@ -2211,7 +2211,7 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 				dFloat aligningMoment;
 				dFloat lateralFrictionCoef;
 				dFloat longitudinalFrictionCoef;
-				dFloat lateralSlipSensitivity = 5.0f;
+				dFloat lateralSlipSensitivity = 2.0f;
 				controller->m_contactFilter->CalculateTireFrictionCoefficents(tire, otherBody, material, 
 					tire->m_longitudinalSlip, tire->m_lateralSlip * lateralSlipSensitivity, 
 					tire->m_data.m_longitudialStiffness, tire->m_data.m_lateralStiffness, 

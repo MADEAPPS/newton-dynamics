@@ -137,7 +137,7 @@ static CarDefinition viper =
 	0.125f,										// ENGINE_RADIO
 	25.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
 	 0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
-	0.55f,										// VEHICLE_WEIGHT_DISTRIBUTION
+	0.6f,										// VEHICLE_WEIGHT_DISTRIBUTION
 	2000.0f,									// CLUTCH_FRICTION_TORQUE
 	200.0f,										// IDLE_TORQUE
 	800.0f,										// IDLE_TORQUE_RPM
@@ -624,8 +624,9 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 
+//xxxxxxx
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);

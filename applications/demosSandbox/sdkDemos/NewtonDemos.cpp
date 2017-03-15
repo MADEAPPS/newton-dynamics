@@ -350,7 +350,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_showContactPoints = true;
 //m_debugDisplayMode = 2;
 //SetDebugDisplayMode (m_debugDisplayMode);
-//m_showNormalForces = true;
+m_showNormalForces = true;
 
 //m_showAABB = true;
 //m_autoSleepState = false;
