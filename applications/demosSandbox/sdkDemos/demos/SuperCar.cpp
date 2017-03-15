@@ -1408,6 +1408,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		if (m_externalView) {
 			camOrigin = playerMatrix.m_posit + dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f);
 			camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
+camOrigin = dVector (-7.0f, 3.0f, 0.0f, 0.0f);
 		} else {
 			dAssert (0);
 			//           camMatrix = camMatrix * playerMatrix;

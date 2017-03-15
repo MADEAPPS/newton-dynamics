@@ -397,7 +397,6 @@ class dCustomVehicleController::dWheelJoint: public dCustomJoint
 	dFloat m_brakeTorque;
 };
 
-
 class dCustomVehicleController::dGearBoxJoint: public dCustomGear
 {
 	public:
@@ -434,7 +433,6 @@ class dCustomVehicleController::dGearBoxJoint: public dCustomGear
 	dFloat m_param;
 	dFloat m_cluthFrictionTorque;
 };
-
 
 class dCustomVehicleController::dAxelJoint: public dCustomGear
 {
@@ -516,6 +514,59 @@ class dCustomVehicleController::dAxelJoint: public dCustomGear
 
 	dVector m_pintOnReference;
 	NewtonBody* m_parentReference;
+};
+
+
+class dCustomVehicleController::dLateralDynamicsJoint: public dCustomJoint
+{
+	public:
+	dLateralDynamicsJoint(dCustomVehicleController* const vehicle)
+		:dCustomJoint(2, vehicle->m_chassis.GetBody(), NULL)
+		,m_vehicle (vehicle)
+		,m_sideSlipAngle(0.0f)
+		,m_maxSideSlipAngle(35.0f * 3.1416f / 180.0f)
+		,m_maxSideSlipAngleRate(15.0f * 3.1416f / 180.0f)
+	{
+		SetSolverModel(1);
+	}
+
+	~dLateralDynamicsJoint()
+	{
+	}
+	
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix;
+		dVector veloc;
+
+		NewtonBody* const chassisBody = m_vehicle->m_chassis.GetBody();
+		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
+		NewtonBodyGetVelocity(chassisBody, &veloc[0]);
+
+		dFloat speed_x = veloc.DotProduct3(matrix.m_front);
+		dFloat speed_z = veloc.DotProduct3(matrix.m_right);
+		if (dAbs(speed_x) > 1.0f) {
+
+			dFloat beta = dAtan2(speed_z, dAbs(speed_x));
+			dFloat betaRate = (beta - m_sideSlipAngle) / timestep;
+			m_sideSlipAngle = beta;
+			dTrace(("b(%f) rate(%f)\n", beta * 180.0f / 3.1416f, betaRate * 180.0f / 3.1416f));
+
+			if ((dAbs(beta) > m_maxSideSlipAngle)) {
+				dVector xxx(matrix.m_up.Scale(-8000.0f * dSign(beta)));
+				NewtonBodyAddTorque(chassisBody, &xxx[0]);
+			} else if (dAbs(betaRate) > m_maxSideSlipAngleRate) {
+				dVector xxx(matrix.m_up.Scale(-8000.0f * dSign(betaRate)));
+				NewtonBodyAddTorque(chassisBody, &xxx[0]);
+			}
+		}
+	}
+
+	dCustomVehicleController* m_vehicle;
+	
+	dFloat m_sideSlipAngle;
+	dFloat m_maxSideSlipAngle;
+	dFloat m_maxSideSlipAngleRate;
 };
 
 void dCustomVehicleController::dBodyPartChassis::ApplyDownForce ()
@@ -1547,19 +1598,10 @@ void dCustomVehicleController::Init(NewtonBody* const body, const dMatrix& vehic
 	m_body = body;
 	m_finalized = false;
 	m_speed = 0.0f;
-//	m_speedRate = 0.0f;
-//	m_sideSlipRate = 0.0f;
-//	m_sideSlipAngle = 0.0f;
 	m_weightDistribution = 0.5f;
 	m_gravityMag = gravityMag;	
 	m_forceAndTorqueCallback = forceAndTorque;
-
-//	m_localFrame = vehicleFrame;
-//	m_localFrame.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
-	
-//	m_localOmega = dVector(0.0f);
-//	m_localVeloc = dVector(0.0f);
-//	m_vehicleGlobalMatrix = dGetIdentityMatrix();
+	m_lateralDynamicControl = NULL;
 
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = manager->GetWorld();
@@ -1605,6 +1647,7 @@ void dCustomVehicleController::Cleanup()
 	SetSteering(NULL);
 	SetHandBrakes(NULL);
 	SetContactFilter(NULL);
+	m_lateralDynamicControl = NULL;
 }
 
 const dCustomVehicleController::dBodyPart* dCustomVehicleController::GetChassis() const
@@ -1785,8 +1828,12 @@ void dCustomVehicleController::SetWeightDistribution(dFloat weightDistribution)
 		NewtonBodySetCentreOfMass(m_body, &vehCom[0]);
 		m_totalMass = totalMass;
 	}
-}
 
+	if (m_lateralDynamicControl) {
+		delete m_lateralDynamicControl;
+	}
+	m_lateralDynamicControl = new dLateralDynamicsJoint(this);
+}
 
 void dCustomVehicleController::Finalize()
 {
@@ -2360,38 +2407,6 @@ void dCustomVehicleController::ApplySuspensionForces(dFloat timestep) const
 	NewtonBodyAddTorque(chassisBody, &chassisTorque[0]);
 }
 
-
-void dCustomVehicleController::CalculateLateralDynamicState(dFloat timestep)
-{
-	dMatrix matrix;
-	dVector veloc;
-
-	NewtonBody* const chassisBody = m_chassis.GetBody();
-	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
-	NewtonBodyGetVelocity(chassisBody, &veloc[0]);
-
-static dFloat betaRate0 = 0;
-	dFloat speed_x = veloc.DotProduct3(matrix.m_front);
-	dFloat speed_z = veloc.DotProduct3(matrix.m_right);
-	if (dAbs (speed_x) > 0.25f) {
-
-		dFloat beta = dAtan2(speed_z, dAbs(speed_x));
-		dFloat betaRate = (beta - betaRate0) / timestep;
-		betaRate0 = beta; 
-dTrace (("b(%f) rate(%f)\n", beta * 180.0f/3.1416f, betaRate * 180.0f/3.1416f ));
-
-if ((dAbs (beta * 180.0f/3.1416f) > 35.0f))  {
-	dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(beta)));
-	NewtonBodyAddTorque (chassisBody, &xxx[0]);
-} else if (dAbs (betaRate * 180.0f/3.1416f) > 15.0f) {
-	dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(betaRate)));
-	NewtonBodyAddTorque (chassisBody, &xxx[0]);
-}
-
-	}
-}
-
-
 void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 {
 	dTimeTrackerEvent(__FUNCTION__);
@@ -2424,7 +2439,6 @@ void dCustomVehicleController::PreUpdate(dFloat timestep, int threadIndex)
 	dTimeTrackerEvent(__FUNCTION__);
 	if (m_finalized) {
 		m_chassis.ApplyDownForce ();
-		CalculateLateralDynamicState(timestep);
 		ApplySuspensionForces (timestep);
 
 		if (m_brakesControl) {
