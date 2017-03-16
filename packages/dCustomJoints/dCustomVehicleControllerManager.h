@@ -36,7 +36,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	class dEngineController;
 	class dDifferentialJoint;
 	class dSteeringController;
-	class dLateralDynamicsJoint;
+//	class dLateralDynamicsJoint;
 
 	class dController: public dCustomAlloc
 	{
@@ -523,6 +523,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	void Init (NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, void* const userData, dFloat gravityMag);
 	void Init (NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, void* const userData, dFloat gravityMag);
 	
+	void CalculateSideSlipDynamics(dFloat timestep);
 	void ApplySuspensionForces (dFloat timestep) const;
 	dVector GetLastLateralForce(dBodyPartTire* const tire) const;
 	void Cleanup();
@@ -539,13 +540,14 @@ class dCustomVehicleController: public dCustomControllerBase
 	dEngineController* m_engineControl;
 	dBrakeController* m_handBrakesControl;
 	dSteeringController* m_steeringControl; 
-	dLateralDynamicsJoint* m_lateralDynamicControl;
+//	dLateralDynamicsJoint* m_lateralDynamicControl;
 	dBodyPartTire::dFrictionModel* m_contactFilter;
 	NewtonApplyForceAndTorque m_forceAndTorqueCallback;
 
 	dFloat m_speed;
 	dFloat m_totalMass;
-
+	dFloat m_sideSlip;
+	dFloat m_sideSlip0;
 	dFloat m_gravityMag;
 	dFloat m_weightDistribution;
 
