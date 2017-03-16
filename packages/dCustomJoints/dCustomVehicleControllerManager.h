@@ -547,7 +547,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	dFloat m_speed;
 	dFloat m_totalMass;
 	dFloat m_sideSlip;
-	dFloat m_sideSlip0;
+	dFloat m_prevSideSlip;
 	dFloat m_gravityMag;
 	dFloat m_weightDistribution;
 
