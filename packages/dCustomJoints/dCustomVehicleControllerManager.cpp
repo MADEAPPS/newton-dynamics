@@ -1218,7 +1218,7 @@ void dCustomVehicleController::dEngineController::Update(dFloat timestep)
 			engineTorque -= m_info.m_viscousDrag1 * rpmStep1 * rpmStep1;
 			if (omega > m_info.m_rpmAtPeakHorsePower) {
 				dFloat rpmStep2 = omega - m_info.m_rpmAtPeakHorsePower;
-				engineTorque = dMax (engineTorque - m_info.m_viscousDrag2 * rpmStep2 * rpmStep2, 0.0f);
+				engineTorque = dMax (engineTorque - m_info.m_viscousDrag2 * rpmStep2 * rpmStep2, dFloat(0.0f));
 			}
 		}
 	}
@@ -2267,11 +2267,9 @@ NewtonBodyGetVelocity(chassisBody, &chassisVeloc[0]);
 NewtonBodyGetMatrix(chassisBody, &chassisMatrix1[0][0]);
 dFloat x = chassisVeloc.DotProduct3 (chassisMatrix1.m_front);
 dFloat y = chassisOmega.CrossProduct(tireMatrix.m_posit - chassisMatrix1.m_posit).DotProduct3 (chassisMatrix1.m_right);
-float xxx = tireJoint->m_steerAngle0;
-float xxxx = atan (controller->m_sideSlip + y/x) + xxx;
-dTrace (("%d %f %f\n", tire->m_index, xxxx, dAtan2 (lateralSpeed, dAbs(longitudinalSpeed))));
-
-
+dFloat xxx = tireJoint->m_steerAngle0;
+dFloat xxxx = atan (controller->m_sideSlip + y/x) + xxx;
+dTrace (("%d %f %f\n", tire->m_index, xxxx * 180.0f/3.1416f, dAtan2 (lateralSpeed, dAbs(longitudinalSpeed)) * 180.0f/3.1416f));
 
 	
 				dFloat aligningMoment;
@@ -2439,8 +2437,6 @@ void dCustomVehicleController::CalculateSideSlipDynamics(dFloat timestep)
 	dFloat speed_x = veloc.DotProduct3(matrix.m_front);
 	dFloat speed_z = veloc.DotProduct3(matrix.m_right);
 	if (dAbs(speed_x) > 1.0f) {
-		//dFloat beta = dAtan2(speed_z, dAbs(speed_x));
-		//dFloat sideSlip = dAtan2(speed_z, dAbs(speed_x));
 		m_prevSideSlip = m_sideSlip;
 		m_sideSlip = speed_z / dAbs(speed_x);
 	} else {
@@ -2448,13 +2444,16 @@ void dCustomVehicleController::CalculateSideSlipDynamics(dFloat timestep)
 		m_prevSideSlip = 0.0f;
 	}
 
-//dTrace (("b(%f) rate(%f)\n", m_sideSlip * 180.0f/3.1416f, (m_sideSlip - m_prevSideSlip) * (180.0f / 3.1416f) / timestep));
+static int xxx;
+dTrace (("\n%d b(%f) rate(%f)\n", xxx, m_sideSlip * 180.0f/3.1416f, (m_sideSlip - m_prevSideSlip) * (180.0f / 3.1416f) / timestep));
+xxx ++;
+
 if ((dAbs (m_sideSlip * 180.0f/3.1416f) > 35.0f))  {
 	dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(m_sideSlip)));
 	NewtonBodyAddTorque (chassisBody, &xxx[0]);
 } else {
 	dFloat betaRate = (m_sideSlip - m_prevSideSlip) / timestep;
-	if (dAbs (betaRate * 180.0f/3.1416f) > 30.0f) {
+	if (dAbs (betaRate * 180.0f/3.1416f) > 15.0f) {
 		dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(betaRate)));
 		NewtonBodyAddTorque (chassisBody, &xxx[0]);
 	}

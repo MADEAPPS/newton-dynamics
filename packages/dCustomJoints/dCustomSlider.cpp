@@ -90,7 +90,7 @@ void dCustomSlider::SetAsSpringDamper(bool state, dFloat springDamperRelaxation,
 	m_spring = spring;
 	m_damper = damper;
 	m_setAsSpringDamper = state;
-	m_springDamperRelaxation = dClamp(springDamperRelaxation, 0.0f, 0.99f);
+	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.99f));
 }
 
 dFloat dCustomSlider::GetJointPosit () const
