@@ -709,7 +709,13 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	//inside = false;
 	dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
 	if (m_faceClipSize > convexSphapeUmbra) {
-		BeamClipping(dgVector(dgFloat32(0.0f)), convexSphapeUmbra);
+		dgVector p0;
+		dgVector p1;
+		hull->CalcAABB (hullMatrix, p0, p1);
+		dgVector origin (dgVector::m_half.CompProduct4 (p1 + p1));
+
+		//BeamClipping(dgVector(dgFloat32(0.0f)), convexSphapeUmbra);
+		BeamClipping(origin, convexSphapeUmbra);
 		m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 	}
 

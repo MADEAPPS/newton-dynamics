@@ -590,7 +590,7 @@ void NewtonDemos::LoadDemo (int index)
 	m_scene->Cleanup();
     
 	m_demosSelection[index].m_launchDemoCallback (m_scene);
-//m_scene->DeserializedPhysicScene ("C:/tmp/test.bin");
+//	m_scene->DeserializedPhysicScene ("C:/Users/julio/Downloads/tree_vs_convex.bin");
 	m_scene->SwapBuffers(); 
 
 	RestoreSettings ();

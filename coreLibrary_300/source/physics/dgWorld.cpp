@@ -1214,6 +1214,8 @@ void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDese
 		body->m_spawnnedFromCallback = false;
 		body->m_uniqueID = dgInt32 (m_bodiesUniqueID);
 
+//if (body->m_uniqueID == 5 || body->m_uniqueID == 33)
+//{
 		dgBodyMasterList::AddBody(body);
 		body->SetMatrix (body->GetMatrix());
 		m_broadPhase->Add (body);
@@ -1226,6 +1228,9 @@ void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDese
 		bodyCallback (*body, userData, deserialization, fileHandle);
 
 		bodyMap.Insert(body, body->m_serializedEnum);
+//} else {
+//delete body;
+//}
 
 		// sync to next body
 		dgDeserializeMarker (deserialization, fileHandle);
