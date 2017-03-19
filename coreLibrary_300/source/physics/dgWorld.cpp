@@ -900,13 +900,6 @@ void dgWorld::FlushCache()
 
 void dgWorld::StepDynamics (dgFloat32 timestep)
 {
-
-//static int xxx ;
-//xxx ++;
-//dgTrace (("%d\n", xxx));
-//if (xxx >= 2000)
-//xxx *=1;
-
 	//xxxxx();
 	//SerializeToFile ("xxx.bin");
 

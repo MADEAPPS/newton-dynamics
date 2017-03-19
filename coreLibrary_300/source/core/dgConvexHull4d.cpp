@@ -787,7 +787,6 @@ bool dgConvexHull4d::Sanity() const
 	}
 */
 
-	//dgTrace (("\n"));
 	return true;
 }
 

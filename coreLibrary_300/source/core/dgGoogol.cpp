@@ -570,10 +570,6 @@ bool dgGoogol::operator!= (const dgGoogol &A) const
 	return dgFloat64 (tmp) != 0.0;
 }
 
-
-
-
-
 void dgGoogol::Trace () const
 {
 	dgTrace (("%f ", dgFloat64 (*this)));
