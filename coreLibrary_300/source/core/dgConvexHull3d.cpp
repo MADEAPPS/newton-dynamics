@@ -429,28 +429,28 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 		convexPoints[0] = points[index];
 		marks[0] = index;
 		for (dgInt32 j = i + 1; !validTetrahedrum && (j < normalMap.m_count); j++) {
-			dgInt32 index = SupportVertex(&tree, points, normalMap.m_normal[j], false);
-			convexPoints[1] = points[index];
+			dgInt32 index1 = SupportVertex(&tree, points, normalMap.m_normal[j], false);
+			convexPoints[1] = points[index1];
 			dgBigVector p10(convexPoints[1] - convexPoints[0]);
 			if (p10.DotProduct4(p10).GetScalar() >(dgFloat32(1.0e-3f) * m_diag)) {
-				marks[1] = index;
+				marks[1] = index1;
 				for (dgInt32 k = j + 1; !validTetrahedrum && (k < normalMap.m_count); k++) {
-					dgInt32 index = SupportVertex(&tree, points, normalMap.m_normal[k], false);
-					convexPoints[2] = points[index];
+					dgInt32 index2 = SupportVertex(&tree, points, normalMap.m_normal[k], false);
+					convexPoints[2] = points[index2];
 					dgBigVector p20(convexPoints[2] - convexPoints[0]);
 					dgBigVector p21(convexPoints[2] - convexPoints[1]);
 					bool test = p20.DotProduct4(p20).GetScalar() > (dgFloat32(1.0e-3f) * m_diag);
 					test = test && (p21.DotProduct4(p21).GetScalar() > (dgFloat32(1.0e-3f) * m_diag));
 					if (test) {
-						marks[2] = index;
+						marks[2] = index2;
 						for (dgInt32 l = k + 1; !validTetrahedrum && (l < normalMap.m_count); l++) {
-							dgInt32 index = SupportVertex(&tree, points, normalMap.m_normal[l], false);
-							convexPoints[3] = points[index];
+							dgInt32 index3 = SupportVertex(&tree, points, normalMap.m_normal[l], false);
+							convexPoints[3] = points[index3];
 							dgBigVector p30(convexPoints[3] - convexPoints[0]);
 							dgFloat64 volume = p30.DotProduct3(p20.CrossProduct3(p10));
 							if (volume > testVol) {
 								validTetrahedrum = true;
-								marks[3] = index;
+								marks[3] = index3;
 							}
 						}
 					}
@@ -727,22 +727,22 @@ void dgConvexHull3d::CalculateConvexHull (dgConvexHull3dAABBTreeNode* vertexTree
 
 			while (stackIndex) {
 				stackIndex --;
-				dgListNode* const node = stack[stackIndex];
-				dgConvexHull3DFace* const face = &node->GetInfo();
+				dgListNode* const node1 = stack[stackIndex];
+				dgConvexHull3DFace* const face1 = &node1->GetInfo();
 
-				if (!face->m_mark && (face->Evalue(&m_points[0], p) > dgFloat64(0.0f))) { 
+				if (!face1->m_mark && (face1->Evalue(&m_points[0], p) > dgFloat64(0.0f))) { 
 					#ifdef _DEBUG
 					for (dgInt32 i = 0; i < deletedCount; i ++) {
-						dgAssert (deleteList[i] != node);
+						dgAssert (deleteList[i] != node1);
 					}
 					#endif
 
-					deleteList[deletedCount] = node;
+					deleteList[deletedCount] = node1;
 					deletedCount ++;
 					dgAssert (deletedCount < dgInt32 (deleteListPool.GetElementsCount()));
-					face->m_mark = 1;
+					face1->m_mark = 1;
 					for (dgInt32 i = 0; i < 3; i ++) {
-						dgListNode* const twinNode = (dgListNode*)face->m_twin[i];
+						dgListNode* const twinNode = (dgListNode*)face1->m_twin[i];
 						dgAssert (twinNode);
 						dgConvexHull3DFace* const twinFace = &twinNode->GetInfo();
 						if (!twinFace->m_mark) {
@@ -759,21 +759,21 @@ void dgConvexHull3d::CalculateConvexHull (dgConvexHull3dAABBTreeNode* vertexTree
 
 			dgInt32 newCount = 0;
 			for (dgInt32 i = 0; i < deletedCount; i ++) {
-				dgListNode* const node = deleteList[i];
-				dgConvexHull3DFace* const face = &node->GetInfo();
-				dgAssert (face->m_mark == 1);
+				dgListNode* const node1 = deleteList[i];
+				dgConvexHull3DFace* const face1 = &node1->GetInfo();
+				dgAssert (face1->m_mark == 1);
 				for (dgInt32 j0 = 0; j0 < 3; j0 ++) {
-					dgListNode* const twinNode = face->m_twin[j0];
+					dgListNode* const twinNode = face1->m_twin[j0];
 					dgConvexHull3DFace* const twinFace = &twinNode->GetInfo();
 					if (!twinFace->m_mark) {
 						dgInt32 j1 = (j0 == 2) ? 0 : j0 + 1;
-						dgListNode* const newNode = AddFace (currentIndex, face->m_index[j0], face->m_index[j1]);
+						dgListNode* const newNode = AddFace (currentIndex, face1->m_index[j0], face1->m_index[j1]);
 						boundaryFaces.Addtop(newNode);
 
 						dgConvexHull3DFace* const newFace = &newNode->GetInfo();
 						newFace->m_twin[1] = twinNode;
 						for (dgInt32 k = 0; k < 3; k ++) {
-							if (twinFace->m_twin[k] == node) {
+							if (twinFace->m_twin[k] == node1) {
 								twinFace->m_twin[k] = newNode;
 							}
 						}

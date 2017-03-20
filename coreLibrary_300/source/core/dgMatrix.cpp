@@ -579,22 +579,22 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initia
 					mat[ip][iq] = dgFloat32(0.0f);
 
 					for (dgInt32 j = 0; j <= ip - 1; j ++) {
-						dgFloat32 g = mat[j][ip]; 
-						dgFloat32 h = mat[j][iq]; 
-						mat[j][ip] = g - s * (h + g * tau); 
-						mat[j][iq] = h + s * (g - h * tau);
+						dgFloat32 g0 = mat[j][ip]; 
+						dgFloat32 h0 = mat[j][iq]; 
+						mat[j][ip] = g0 - s * (h0 + g0 * tau); 
+						mat[j][iq] = h0 + s * (g0 - h0 * tau);
 					}
 					for (dgInt32 j = ip + 1; j <= iq - 1; j ++) {
-						dgFloat32 g = mat[ip][j]; 
-						dgFloat32 h = mat[j][iq]; 
-						mat[ip][j] = g - s * (h + g * tau); 
-						mat[j][iq] = h + s * (g - h * tau);
+						dgFloat32 g0 = mat[ip][j]; 
+						dgFloat32 h0 = mat[j][iq]; 
+						mat[ip][j] = g0 - s * (h0 + g0 * tau); 
+						mat[j][iq] = h0 + s * (g0 - h0 * tau);
 					}
 					for (dgInt32 j = iq + 1; j < 3; j ++) {
-						dgFloat32 g = mat[ip][j]; 
-						dgFloat32 h = mat[iq][j]; 
-						mat[ip][j] = g - s * (h + g * tau); 
-						mat[iq][j] = h + s * (g - h * tau);
+						dgFloat32 g0 = mat[ip][j]; 
+						dgFloat32 h0 = mat[iq][j]; 
+						mat[ip][j] = g0 - s * (h0 + g0 * tau); 
+						mat[iq][j] = h0 + s * (g0 - h0 * tau);
 					}
 
 					dgVector sv (s);

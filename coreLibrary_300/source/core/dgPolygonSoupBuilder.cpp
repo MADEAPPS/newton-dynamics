@@ -224,8 +224,8 @@ void dgPolygonSoupDatabaseBuilder::AddMesh (const dgFloat32* const vertex, dgInt
 		if (count == 3) {
 			convexFaces = 1;
 			dgBigVector p0 (m_vertexPoints[pool[2]]);
-			for (dgInt32 i = 0; i < 3; i ++) {
-				dgBigVector p1 (m_vertexPoints[pool[i]]);
+			for (dgInt32 j = 0; j < 3; j ++) {
+				dgBigVector p1 (m_vertexPoints[pool[j]]);
 				dgBigVector edge (p1 - p0);
 				dgFloat64 mag2 = edge.DotProduct3(edge);
 				if (mag2 < dgFloat32 (1.0e-6f)) {
@@ -253,15 +253,15 @@ void dgPolygonSoupDatabaseBuilder::AddMesh (const dgFloat32* const vertex, dgInt
 		}
 
 		dgInt32 indexAcc = 0;
-		for (dgInt32 k = 0; k < convexFaces; k ++) {
-			dgInt32 count = faces[k];
-			m_vertexIndex[m_indexCount + count] = faceMaterialId[i];
-			for (dgInt32 j = 0; j < count; j ++) {
-				m_vertexIndex[m_indexCount + j] = pool[indexAcc + j];
+		for (dgInt32 j = 0; j < convexFaces; j ++) {
+			dgInt32 count1 = faces[j];
+			m_vertexIndex[m_indexCount + count1] = faceMaterialId[i];
+			for (dgInt32 m = 0; m < count1; m ++) {
+				m_vertexIndex[m_indexCount + m] = pool[indexAcc + m];
 			}
-			indexAcc += count;
-			m_indexCount += (count + 1);
-			m_faceVertexCount[m_faceCount] = count + 1;
+			indexAcc += count1;
+			m_indexCount += (count1 + 1);
+			m_faceVertexCount[m_faceCount] = count1 + 1;
 			m_faceCount ++;
 		}
 	}
@@ -545,16 +545,16 @@ void dgPolygonSoupDatabaseBuilder::Optimize(dgInt32 faceId, const dgFaceBucket& 
 				for (dgInt32 i = 0; i < faceCount; i ++) {
 					const dgFaceInfo& faceInfo = array[faceStart + i]->GetInfo();
 
-					dgInt32 count = faceInfo.indexCount - 1;
-					dgInt32 start = faceInfo.indexStart;
-					dgAssert (faceId == indexArray[start + count]);
-					for (dgInt32 j = 0; j < count; j ++) {
-						dgInt32 index = indexArray[start + j];
+					dgInt32 count1 = faceInfo.indexCount - 1;
+					dgInt32 start1 = faceInfo.indexStart;
+					dgAssert (faceId == indexArray[start1 + count1]);
+					for (dgInt32 j = 0; j < count1; j ++) {
+						dgInt32 index = indexArray[start1 + j];
 						face[j] = points[index];
 						faceIndex[j] = j;
 					}
-					dgInt32 faceIndexCount = count;
-					tmpBuilder.AddMesh (&face[0].m_x, count, sizeof (dgVector), 1, &faceIndexCount, &faceIndex[0], &faceId, dgGetIdentityMatrix()); 
+					dgInt32 faceIndexCount = count1;
+					tmpBuilder.AddMesh (&face[0].m_x, count1, sizeof (dgVector), 1, &faceIndexCount, &faceIndex[0], &faceId, dgGetIdentityMatrix()); 
 				}
 				tmpBuilder.FinalizeAndOptimize ();
 
@@ -577,12 +577,12 @@ void dgPolygonSoupDatabaseBuilder::Optimize(dgInt32 faceId, const dgFaceBucket& 
 				dgBigVector varian (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 				for (dgInt32 i = 0; i < faceCount; i ++) {
 					const dgFaceInfo& faceInfo = array[faceStart + i]->GetInfo();
-					dgInt32 count = faceInfo.indexCount - 1;
-					dgInt32 start = faceInfo.indexStart;
+					dgInt32 count1 = faceInfo.indexCount - 1;
+					dgInt32 start1 = faceInfo.indexStart;
 					dgBigVector p0 (dgFloat32 ( 1.0e10f), dgFloat32 ( 1.0e10f), dgFloat32 ( 1.0e10f), dgFloat32 (0.0f));
 					dgBigVector p1 (dgFloat32 (-1.0e10f), dgFloat32 (-1.0e10f), dgFloat32 (-1.0e10f), dgFloat32 (0.0f));
-					for (dgInt32 j = 0; j < count; j ++) {
-						dgInt32 index = indexArray[start + j];
+					for (dgInt32 j = 0; j < count1; j ++) {
+						dgInt32 index = indexArray[start1 + j];
 						const dgBigVector& p = points[index];
 						p0.m_x = dgMin (p0.m_x, p.m_x);
 						p0.m_y = dgMin (p0.m_y, p.m_y);
@@ -616,10 +616,10 @@ void dgPolygonSoupDatabaseBuilder::Optimize(dgInt32 faceId, const dgFaceBucket& 
 					dgInt32 side = 0;
 					const dgFaceInfo& faceInfo = array[faceStart + i]->GetInfo();
 
-					dgInt32 start = faceInfo.indexStart;
-					dgInt32 count = faceInfo.indexCount - 1;
-					for (dgInt32 j = 0; j < count; j ++) {
-						dgInt32 index = indexArray[start + j];
+					dgInt32 start1 = faceInfo.indexStart;
+					dgInt32 count1 = faceInfo.indexCount - 1;
+					for (dgInt32 j = 0; j < count1; j ++) {
+						dgInt32 index = indexArray[start1 + j];
 						const dgBigVector& p = points[index];
 						if (p[axis] > axisVal) {
 							side = 1;
@@ -956,8 +956,8 @@ dgInt32 dgPolygonSoupDatabaseBuilder::AddConvexFace (dgInt32 count, dgInt32* con
 				e1 = e1.Scale3 (dgFloat64 (1.0f) / sqrt (e1.DotProduct3(e1) + dgFloat32(1.0e-24f)));
 
 				dgBigVector n (e0.CrossProduct3(e1));
-				dgFloat64 mag2 = n.DotProduct3(normal);
-				if (mag2 < dgFloat32 (1.0e-5f)) {
+				dgFloat64 magnitud2 = n.DotProduct3(normal);
+				if (magnitud2 < dgFloat32 (1.0e-5f)) {
 					isconvex = 0;
 					break;
 				}
@@ -1012,15 +1012,15 @@ dgInt32 dgPolygonSoupDatabaseBuilder::AddConvexFace (dgInt32 count, dgInt32* con
 		dgInt32 index = 0;
 		dgPolyhedra::Iterator iter (polyhedra2);
 		for (iter.Begin(); iter; iter ++) {
-			dgEdge* const edge = &(*iter);
-			if (edge->m_incidentFace < 0) {
+			dgEdge* const edge1 = &(*iter);
+			if (edge1->m_incidentFace < 0) {
 				continue;
 			}
-			if (edge->m_mark == mark) {
+			if (edge1->m_mark == mark) {
 				continue;
 			}
 
-			ptr = edge;
+			ptr = edge1;
 			count = 0;
 			do {
 				ptr->m_mark = mark;
@@ -1028,7 +1028,7 @@ dgInt32 dgPolygonSoupDatabaseBuilder::AddConvexFace (dgInt32 count, dgInt32* con
 				index ++;
 				count ++;
 				ptr = ptr->m_next;
-			} while (ptr != edge);
+			} while (ptr != edge1);
 
 			facesArray[facesCount] = count;
 			facesCount ++;

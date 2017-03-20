@@ -865,32 +865,29 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 				dgAssert (dgAbsf(contactMaterial->m_normal.DotProduct3(contactMaterial->m_dir0.CrossProduct3(contactMaterial->m_dir1)) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 			}
 		} else {
+			dgVector veloc0 (v0 + w0.CrossProduct3(contactMaterial->m_point - com0));
+			dgVector veloc1 (v1 + w1.CrossProduct3(contactMaterial->m_point - com1));
+			dgVector relReloc (veloc1 - veloc0);
 
-			//dgVector vel0 (v0 + w0 * (contactMaterial->m_point - matrix0.m_posit));
-			//dgVector vel1 (v1 + w1 * (contactMaterial->m_point - matrix1.m_posit));
-			dgVector vel0 (v0 + w0.CrossProduct3(contactMaterial->m_point - com0));
-			dgVector vel1 (v1 + w1.CrossProduct3(contactMaterial->m_point - com1));
-			dgVector vRel (vel1 - vel0);
-
-			dgFloat32 impulse = vRel.DotProduct3(contactMaterial->m_normal);
+			dgFloat32 impulse = relReloc.DotProduct3(contactMaterial->m_normal);
 			if (dgAbsf (impulse) > maxImpulse) {
 				maxImpulse = dgAbsf (impulse); 
 //				breakImpulse0 = contactMaterial->m_collision0->GetBreakImpulse();
 //				breakImpulse1 = contactMaterial->m_collision1->GetBreakImpulse();
 			}
 
-			dgVector tangDir (vRel - contactMaterial->m_normal.Scale3 (impulse));
-			diff = tangDir.DotProduct3(tangDir);
+			dgVector tangentDir (relReloc - contactMaterial->m_normal.Scale3 (impulse));
+			diff = tangentDir.DotProduct3(tangentDir);
 
 			if (diff > dgFloat32 (1.0e-2f)) {
-				contactMaterial->m_dir0 = tangDir.Scale3 (dgRsqrt (diff));
+				contactMaterial->m_dir0 = tangentDir.Scale3 (dgRsqrt (diff));
 			} else {
 				if (dgAbsf (contactMaterial->m_normal.m_z) > dgFloat32 (0.577f)) {
-					tangDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_z, dgFloat32 (0.0f), dgFloat32 (0.0f));
+					tangentDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_z, dgFloat32 (0.0f), dgFloat32 (0.0f));
 				} else {
-					tangDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
+					tangentDir = dgVector (-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_x, dgFloat32 (0.0f), dgFloat32 (0.0f));
 				}
-				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct3(tangDir);
+				contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct3(tangentDir);
 				dgAssert (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0) > dgFloat32 (1.0e-8f));
 				contactMaterial->m_dir0 = contactMaterial->m_dir0.Scale3 (dgRsqrt (contactMaterial->m_dir0.DotProduct3(contactMaterial->m_dir0)));
 			}
@@ -1824,8 +1821,8 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 			if (error < epsilon) {
 				count = 0;
 				countleft = maxContacts;
-				for (dgInt32 i = 0; i < count1; i++) {
-					contactOut[i] = proxy.m_contacts[i];
+				for (dgInt32 j = 0; j < count1; j++) {
+					contactOut[j] = proxy.m_contacts[j];
 				}
 			}
 			count += count1;

@@ -300,9 +300,9 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 					dgDynamicBody* const adjacentBody = (dgDynamicBody*)linkBody;
 	
 					if (adjacentBody->GetSkeleton() && (adjacentBody->GetInvMass().m_w == dgFloat32(0.0f))) {
-						for (dgBodyMasterListRow::dgListNode* jointNode = adjacentBody->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-							dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-							dgDynamicBody* const otherBody = (dgDynamicBody*)cell->m_bodyNode;
+						for (dgBodyMasterListRow::dgListNode* jointNode1 = adjacentBody->m_masterNode->GetInfo().GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) {
+							dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
+							dgDynamicBody* const otherBody = (dgDynamicBody*)cell1->m_bodyNode;
 							//if ((otherBody->GetSkeleton() == body->GetSkeleton()) && (otherBody->m_dynamicsLru != lruMark)) {
 							if ((otherBody->GetSkeleton() == adjacentBody->GetSkeleton()) && (otherBody->m_dynamicsLru != lruMark)) {
 								queueBuffer[stack] = otherBody;
@@ -514,26 +514,26 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 						dgSkeletonContainer::dgGraph* const parentNode (queue.m_pool[index]);
 						dgDynamicBody* const parentBody = skeleton->GetBody(parentNode);
 
-						for (dgBodyMasterListRow::dgListNode* jointNode = parentBody->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-							dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-							dgConstraint* const constraint = cell->m_joint;
-							if (constraint->IsBilateral() && (constraint->m_dynamicsLru != lru)) {
-								constraint->m_dynamicsLru = lru;
+						for (dgBodyMasterListRow::dgListNode* jointNode1 = parentBody->m_masterNode->GetInfo().GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) {
+							dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
+							dgConstraint* const constraint1 = cell1->m_joint;
+							if (constraint1->IsBilateral() && (constraint1->m_dynamicsLru != lru)) {
+								constraint1->m_dynamicsLru = lru;
 
-								if (!constraint->m_solverModel) {
-									dgDynamicBody* const childBody = (dgDynamicBody*) ((constraint->GetBody0() == parentBody) ? constraint->GetBody1() : constraint->GetBody0());
+								if (!constraint1->m_solverModel) {
+									dgDynamicBody* const childBody = (dgDynamicBody*) ((constraint1->GetBody0() == parentBody) ? constraint1->GetBody1() : constraint1->GetBody0());
 
 									if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dgFloat32 (0.0f))) {
 										childBody->m_dynamicsLru = lru;
-										dgSkeletonContainer::dgGraph* const childNode = skeleton->AddChild((dgBilateralConstraint*)constraint, parentNode);
+										dgSkeletonContainer::dgGraph* const childNode = skeleton->AddChild((dgBilateralConstraint*)constraint1, parentNode);
 										queue.Insert (childNode);
 									} else if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
-										loopJoints[loopCount] = (dgBilateralConstraint*)constraint;
+										loopJoints[loopCount] = (dgBilateralConstraint*)constraint1;
 										loopCount ++;
 									}
 
-								} else if ((constraint->m_solverModel != 2) && loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
-									loopJoints[loopCount] = (dgBilateralConstraint*)constraint;
+								} else if ((constraint1->m_solverModel != 2) && loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
+									loopJoints[loopCount] = (dgBilateralConstraint*)constraint1;
 									loopCount ++;
 								}
 							}
@@ -547,8 +547,8 @@ void dgWorldDynamicUpdate::UpdateSkeletons()
 				skeleton->Finalize();
 
 				if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
-					for (dgInt32 i = 0; i < loopCount; i ++) {
-						skeleton->AttachCyclingJoint(loopJoints[i]); 
+					for (dgInt32 j = 0; j < loopCount; j ++) {
+						skeleton->AttachCyclingJoint(loopJoints[j]); 
 					}
 				}
 			}
@@ -651,40 +651,40 @@ dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, d
 				}
 				
 				if (body0->GetInvMass().m_w > dgFloat32(0.0f)) {
-					for (dgBodyMasterListRow::dgListNode* jointNode = body0->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-						dgConstraint* const constraint = cell->m_joint;
-						if ((constraint->m_clusterLRU == lru) && (dgInt32 (constraint->m_index) < cluster->m_activeJointCount)){
-							dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
+					for (dgBodyMasterListRow::dgListNode* jointNode1 = body0->m_masterNode->GetInfo().GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) {
+						dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
+						dgConstraint* const constraint1 = cell1->m_joint;
+						if ((constraint1->m_clusterLRU == lru) && (dgInt32 (constraint1->m_index) < cluster->m_activeJointCount)){
+							dgJointInfo* const nextInfo = &tmpInfoList[constraint1->m_index];
 							if (!nextInfo->m_isInQueueFrontier) {
 								queue.Insert(nextInfo);
 								nextInfo->m_isInQueueFrontier = -1;
-								if (nextInfo->m_isSkeleton && (dgInt32 (constraint->m_graphDepth) > maxGraphdepth)) {
+								if (nextInfo->m_isSkeleton && (dgInt32 (constraint1->m_graphDepth) > maxGraphdepth)) {
 									dgSkeletonContainer* const container = body0->GetSkeleton();
 									dgAssert(container);
 									container->SetGrapfDepth(maxGraphdepth);
 								}
-								constraint->m_graphDepth = dgMin(maxGraphdepth, dgInt32 (constraint->m_graphDepth));
+								constraint1->m_graphDepth = dgMin(maxGraphdepth, dgInt32 (constraint1->m_graphDepth));
 							}
 						}
 					}
 				}
 
 				if (body1->GetInvMass().m_w > dgFloat32(0.0f)) {
-					for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-						dgConstraint* const constraint = cell->m_joint;
-						if ((constraint->m_clusterLRU == lru) && (dgInt32 (constraint->m_index) < cluster->m_activeJointCount)){
-							dgJointInfo* const nextInfo = &tmpInfoList[constraint->m_index];
+					for (dgBodyMasterListRow::dgListNode* jointNode1 = body1->m_masterNode->GetInfo().GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) {
+						dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
+						dgConstraint* const constraint1 = cell1->m_joint;
+						if ((constraint1->m_clusterLRU == lru) && (dgInt32 (constraint1->m_index) < cluster->m_activeJointCount)){
+							dgJointInfo* const nextInfo = &tmpInfoList[constraint1->m_index];
 							if (!nextInfo->m_isInQueueFrontier) {
 								queue.Insert(nextInfo);
 								nextInfo->m_isInQueueFrontier = -1;
-								if (nextInfo->m_isSkeleton && (dgInt32(constraint->m_graphDepth) > maxGraphdepth)) {
+								if (nextInfo->m_isSkeleton && (dgInt32(constraint1->m_graphDepth) > maxGraphdepth)) {
 									dgSkeletonContainer* const container = body1->GetSkeleton();
 									dgAssert(container);
 									container->SetGrapfDepth(maxGraphdepth);
 								}
-								constraint->m_graphDepth = dgMin(maxGraphdepth, dgInt32(constraint->m_graphDepth));
+								constraint1->m_graphDepth = dgMin(maxGraphdepth, dgInt32(constraint1->m_graphDepth));
 							}
 						}
 					}

@@ -404,8 +404,8 @@ dgFloat32 dgAABBPolygonSoup::CalculateFaceMaxSize (const dgVector* const vertex,
 	dgInt32 index = indexArray[indexCount - 1];
 	dgVector p0 (vertex[index]);
 	for (dgInt32 i = 0; i < indexCount; i ++) {
-		dgInt32 index = indexArray[i];
-		dgVector p1 (vertex[index]);
+		dgInt32 index1 = indexArray[i];
+		dgVector p1 (vertex[index1]);
 
 		dgVector dir (p1 - p0);
 		dir = dir.Scale3 (dgRsqrt (dir.DotProduct3(dir)));
@@ -413,8 +413,8 @@ dgFloat32 dgAABBPolygonSoup::CalculateFaceMaxSize (const dgVector* const vertex,
 		dgFloat32 maxVal = dgFloat32 (-1.0e10f);
 		dgFloat32 minVal = dgFloat32 ( 1.0e10f);
 		for (dgInt32 j = 0; j < indexCount; j ++) {
-			dgInt32 index = indexArray[j];
-			dgVector q (vertex[index]);
+			dgInt32 index2 = indexArray[j];
+			dgVector q (vertex[index2]);
 			dgFloat32 val = dir.DotProduct3(q);
 			minVal = dgMin(minVal, val);
 			maxVal = dgMax(maxVal, val);
@@ -465,12 +465,12 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 				dgInt32 j0 = 2 * (vCount + 1) - 1;
 				dgVector normal (&vertexArray[face[vCount + 1]].m_x);
 				dgAssert (dgAbsf (normal.DotProduct3(normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
-				dgVector p0 (&vertexArray[face[vCount - 1]].m_x);
+				dgVector q0 (&vertexArray[face[vCount - 1]].m_x);
 				for (dgInt32 j = 0; j < vCount; j ++) {
 					dgInt32 j1 = vCount + 2 + j;
-					dgVector p1 (&vertexArray[face[j]].m_x);
+					dgVector q1 (&vertexArray[face[j]].m_x);
 					if (face[j0] == -1) {
-						dgVector e (p1 - p0);
+						dgVector e (q1 - q0);
 						dgVector n (e.CrossProduct3(normal));
 						n = n.Scale4(dgFloat32 (1.0f) / dgSqrt (n.DotProduct3(n)));
 						dgAssert (dgAbsf (n.DotProduct3(n) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
@@ -480,7 +480,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 						face[j0] = -normalCount - 1;
 						normalCount ++;
 					}
-					p0 = p1;
+					q0 = q1;
 					j0 = j1;
 				}
 			}
@@ -495,12 +495,12 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 				dgInt32 j0 = 2 * (vCount + 1) - 1;
 				dgVector normal (&vertexArray[face[vCount + 1]].m_x);
 				dgAssert (dgAbsf (normal.DotProduct3(normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
-				dgVector p0 (&vertexArray[face[vCount - 1]].m_x);
+				dgVector q0 (&vertexArray[face[vCount - 1]].m_x);
 				for (dgInt32 j = 0; j < vCount; j ++) {
 					dgInt32 j1 = vCount + 2 + j;
-					dgVector p1 (&vertexArray[face[j]].m_x);
+					dgVector q1 (&vertexArray[face[j]].m_x);
 					if (face[j0] == -1) {
-						dgVector e (p1 - p0);
+						dgVector e (q1 - q0);
 						dgVector n (e.CrossProduct3(normal));
 						n = n.Scale4(dgFloat32 (1.0f) / dgSqrt (n.DotProduct3(n)));
 						dgAssert (dgAbsf (n.DotProduct3(n) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
@@ -510,7 +510,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 						face[j0] = -normalCount - 1;
 						normalCount ++;
 					}
-					p0 = p1;
+					q0 = q1;
 					j0 = j1;
 				}
 			}
@@ -522,12 +522,12 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 		dgInt32 newNormalCount = dgVertexListToIndexList (&pool[0].m_x, sizeof (dgTriplex), sizeof (dgTriplex), 0, normalCount, &indexArray[0], dgFloat32 (1.0e-6f));
 
 		dgInt32 oldCount = GetVertexCount();
-		dgTriplex* const vertexArray = (dgTriplex*) dgMallocStack (sizeof (dgTriplex) * (oldCount + newNormalCount));
-		memcpy (vertexArray, GetLocalVertexPool(), sizeof (dgTriplex) * oldCount);
-		memcpy (&vertexArray[oldCount], &pool[0].m_x, sizeof (dgTriplex) * newNormalCount);
+		dgTriplex* const vertexArray1 = (dgTriplex*) dgMallocStack (sizeof (dgTriplex) * (oldCount + newNormalCount));
+		memcpy (vertexArray1, GetLocalVertexPool(), sizeof (dgTriplex) * oldCount);
+		memcpy (&vertexArray1[oldCount], &pool[0].m_x, sizeof (dgTriplex) * newNormalCount);
 		dgFreeStack(GetLocalVertexPool());
 
-		m_localVertex = &vertexArray[0].m_x;
+		m_localVertex = &vertexArray1[0].m_x;
 		m_vertexCount = oldCount + newNormalCount;
 
 		for (dgInt32 i = 0; i < m_nodesCount; i ++) {
@@ -542,7 +542,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 						face[vCount + 2 + j] = indexArray[k] + oldCount;
 					}
 					#ifdef _DEBUG	
-						dgVector normal (&vertexArray[face[vCount + 2 + j]].m_x);
+						dgVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
 						dgAssert (dgAbsf (normal.DotProduct3 (normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
 					#endif
 				}
@@ -559,7 +559,7 @@ void dgAABBPolygonSoup::CalculateAdjacendy ()
 					}
 
 					#ifdef _DEBUG	
-						dgVector normal (&vertexArray[face[vCount + 2 + j]].m_x);
+						dgVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
 						dgAssert (dgAbsf (normal.DotProduct3 (normal) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-6f));
 					#endif
 				}
@@ -590,9 +590,9 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateAllFaceEdgeNormals (void* const co
 	for (dgInt32 i = 0; i < indexCount; i ++) {
 		dgInt32 i1 = indexArray[i];
 		dgInt32 index = i1 * stride;
-		dgVector p (&polygon[index]);
-		p0 = p0.GetMin(p);
-		p1 = p1.GetMax(p);
+		dgVector point (&polygon[index]);
+		p0 = p0.GetMin(point);
+		p1 = p1.GetMax(point);
 		adjacentFaces.m_edgeMap[edgeIndex] = (dgInt64 (i1) << 32) + i0;
 		edgeIndex = i;
 		i0 = i1;
@@ -659,9 +659,9 @@ dgIntersectStatus dgAABBPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* c
 								dgFloat32 maxDist = dgFloat32 (0.0f);
 								for (dgInt32 k = 0; k < indexCount; k ++) {
 									dgVector r (&polygon[indexArray[k] * stride]);
-									dgFloat32 dist = adjacentFace.m_normal.Evalue(r);
-									if (dgAbsf (dist) > dgAbsf (maxDist)) {
-										maxDist = dist;
+									dgFloat32 dist1 = adjacentFace.m_normal.Evalue(r);
+									if (dgAbsf (dist1) > dgAbsf (maxDist)) {
+										maxDist = dist1;
 									}
 								}
 
@@ -1139,16 +1139,16 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgFloa
 
 			} else {
 				const dgNode* const node = me->m_left.GetNode(m_aabb);
-				dgFloat32 dist = node->RayDistance(ray, vertexArray);
-				if (dist < maxParam) {
+				dgFloat32 dist1 = node->RayDistance(ray, vertexArray);
+				if (dist1 < maxParam) {
 					dgInt32 j = stack;
-					for ( ; j && (dist > distance[j - 1]); j --) {
+					for ( ; j && (dist1 > distance[j - 1]); j --) {
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
 					dgAssert (stack < DG_STACK_DEPTH);
 					stackPool[j] = node;
-					distance[j] = dist;
+					distance[j] = dist1;
 					stack++;
 				}
 			}
@@ -1169,16 +1169,16 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgFloa
 
 			} else {
 				const dgNode* const node = me->m_right.GetNode(m_aabb);
-				dgFloat32 dist = node->RayDistance(ray, vertexArray);
-				if (dist < maxParam) {
+				dgFloat32 dist1 = node->RayDistance(ray, vertexArray);
+				if (dist1 < maxParam) {
 					dgInt32 j = stack;
-					for ( ; j && (dist > distance[j - 1]); j --) {
+					for ( ; j && (dist1 > distance[j - 1]); j --) {
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
 					dgAssert (stack < DG_STACK_DEPTH);
 					stackPool[j] = node;
-					distance[j] = dist;
+					distance[j] = dist1;
 					stack++;
 				}
 			}
@@ -1238,19 +1238,19 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					} else {
 						const dgNode* const node = me->m_left.GetNode(m_aabb);
-						dgFloat32 dist = node->BoxPenetration(obbAabbInfo, vertexArray);
-						if (dist > dgFloat32 (0.0f)) {
+						dgFloat32 dist1 = node->BoxPenetration(obbAabbInfo, vertexArray);
+						if (dist1 > dgFloat32 (0.0f)) {
 							dgInt32 j = stack;
-							for ( ; j && (dist > distance[j - 1]); j --) {
+							for ( ; j && (dist1 > distance[j - 1]); j --) {
 								stackPool[j] = stackPool[j - 1];
 								distance[j] = distance[j - 1];
 							}
 							dgAssert (stack < DG_STACK_DEPTH);
 							stackPool[j] = node;
-							distance[j] = dist;
+							distance[j] = dist1;
 							stack++;
 						} else {
-							obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist);
+							obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist1);
 						}
 					}
 
@@ -1275,19 +1275,19 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					} else {
 						const dgNode* const node = me->m_right.GetNode(m_aabb);
-						dgFloat32 dist = node->BoxPenetration(obbAabbInfo, vertexArray);
-						if (dist > dgFloat32 (0.0f)) {
+						dgFloat32 dist1 = node->BoxPenetration(obbAabbInfo, vertexArray);
+						if (dist1 > dgFloat32 (0.0f)) {
 							dgInt32 j = stack;
-							for ( ; j && (dist > distance[j - 1]); j --) {
+							for ( ; j && (dist1 > distance[j - 1]); j --) {
 								stackPool[j] = stackPool[j - 1];
 								distance[j] = distance[j - 1];
 							}
 							dgAssert (stack < DG_STACK_DEPTH);
 							stackPool[j] = node;
-							distance[j] = dist;
+							distance[j] = dist1;
 							stack++;
 						} else {
-							obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist);
+							obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist1);
 						}
 					}
 				}
@@ -1324,16 +1324,16 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					} else {
 						const dgNode* const node = me->m_left.GetNode(m_aabb);
-						dgFloat32 dist = node->BoxIntersect (ray, obbRay, obbAabbInfo, vertexArray);
-						if (dist < dgFloat32 (1.0f)) {
+						dgFloat32 dist1 = node->BoxIntersect (ray, obbRay, obbAabbInfo, vertexArray);
+						if (dist1 < dgFloat32 (1.0f)) {
 							dgInt32 j = stack;
-							for ( ; j && (dist > distance[j - 1]); j --) {
+							for ( ; j && (dist1 > distance[j - 1]); j --) {
 								stackPool[j] = stackPool[j - 1];
 								distance[j] = distance[j - 1];
 							}
 							dgAssert (stack < DG_STACK_DEPTH);
 							stackPool[j] = node;
-							distance[j] = dist;
+							distance[j] = dist1;
 							stack++;
 						}
 					}
@@ -1356,16 +1356,16 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 
 					} else {
 						const dgNode* const node = me->m_right.GetNode(m_aabb);
-						dgFloat32 dist = node->BoxIntersect (ray, obbRay, obbAabbInfo, vertexArray);
-						if (dist < dgFloat32 (1.0f)) {
+						dgFloat32 dist1 = node->BoxIntersect (ray, obbRay, obbAabbInfo, vertexArray);
+						if (dist1 < dgFloat32 (1.0f)) {
 							dgInt32 j = stack;
-							for ( ; j && (dist > distance[j - 1]); j --) {
+							for ( ; j && (dist1 > distance[j - 1]); j --) {
 								stackPool[j] = stackPool[j - 1];
 								distance[j] = distance[j - 1];
 							}
 							dgAssert (stack < DG_STACK_DEPTH);
 							stackPool[j] = node;
-							distance[j] = dist;
+							distance[j] = dist1;
 							stack ++;
 						}
 					}

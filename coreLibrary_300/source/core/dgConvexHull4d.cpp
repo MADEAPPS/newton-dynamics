@@ -308,8 +308,8 @@ dgBigVector dgConvexHull4dTetraherum::CircumSphereCenter (const dgConvexHull4dVe
 			}
 			matrix[i][3] = dgGoogol (1.0f);
 		}
-		dgGoogol det (Determinant4x4(matrix));
-		dgFloat64 val = dgFloat64 (det) * sign;
+		dgGoogol det1 (Determinant4x4(matrix));
+		dgFloat64 val = dgFloat64 (det1) * sign;
 		sign *= dgFloat64 (-1.0f);
 		centerOut[k] = val * invDen; 
 	}
@@ -650,29 +650,29 @@ dgInt32 dgConvexHull4d::InitVertexArray(dgConvexHull4dVector* const points, cons
 		convexPoints[0] = points[index];
 		marks[0] = index;
 		for (dgInt32 j = i + 1; !validTetrahedrum && (j < normalMap.m_count); j++) {
-			dgInt32 index = SupportVertex(&tree, points, normalMap.m_normal[j], false);
-			convexPoints[1] = points[index];
+			dgInt32 index1 = SupportVertex(&tree, points, normalMap.m_normal[j], false);
+			convexPoints[1] = points[index1];
 			dgBigVector p10(convexPoints[1] - convexPoints[0]);
 			if (p10.DotProduct4(p10).GetScalar() >(dgFloat32(1.0e-3f) * m_diag)) {
-				marks[1] = index;
+				marks[1] = index1;
 				for (dgInt32 k = j + 1; !validTetrahedrum && (k < normalMap.m_count); k++) {
-					dgInt32 index = SupportVertex(&tree, points, normalMap.m_normal[k], false);
-					convexPoints[2] = points[index];
+					dgInt32 index2 = SupportVertex(&tree, points, normalMap.m_normal[k], false);
+					convexPoints[2] = points[index2];
 					dgBigVector p20(convexPoints[2] - convexPoints[0]);
 					dgBigVector p21(convexPoints[2] - convexPoints[1]);
 					bool test = p20.DotProduct4(p20).GetScalar() > (dgFloat32(1.0e-3f) * m_diag);
 					test = test && (p21.DotProduct4(p21).GetScalar() > (dgFloat32(1.0e-3f) * m_diag));
 					if (test) {
-						marks[2] = index;
+						marks[2] = index2;
 						for (dgInt32 l = k + 1; !validTetrahedrum && (l < normalMap.m_count); l++) {
-							dgInt32 index = SupportVertex(&tree, points, normalMap.m_normal[l], false);
-							convexPoints[3] = points[index];
+							dgInt32 index3 = SupportVertex(&tree, points, normalMap.m_normal[l], false);
+							convexPoints[3] = points[index3];
 							dgBigVector p30(convexPoints[3] - convexPoints[0]);
 							dgBigVector plane(p10.CrossProduct4(p20, p30));
 							dgFloat64 volume = plane.DotProduct4(plane).GetScalar();
 							if (volume > testVol) {
 								validTetrahedrum = true;
-								marks[3] = index;
+								marks[3] = index3;
 							}
 						}
 					}
@@ -920,34 +920,34 @@ dgConvexHull4d::dgListNode* dgConvexHull4d::FindFacingNode(const dgBigVector& ve
 	dgInt32 maxCount = heap.GetMaxCount() - 1;
 	dgInt32 releafCount = maxCount >> 3;
 	while (heap.GetCount()) {
-		dgListNode* const node = heap[0];
-		dgFloat64 dist = heap.Value();
-		if (dist > dgFloat64 (1.0e-5f)) {
-			return node;
+		dgListNode* const node1 = heap[0];
+		dgFloat64 dist1 = heap.Value();
+		if (dist1 > dgFloat64 (1.0e-5f)) {
+			return node1;
 		}
 		heap.Pop();
-		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
+		dgConvexHull4dTetraherum* const tetra1 = &node1->GetInfo();
 		for (dgInt32 i = 0; i < 4; i ++) {
-			dgListNode* neigborghNode = tetra->m_faces[i].m_twin;
+			dgListNode* neigborghNode = tetra1->m_faces[i].m_twin;
 			dgConvexHull4dTetraherum* const neighborgh = &neigborghNode->GetInfo();
 			if (neighborgh->GetMark() != mark) {
 				neighborgh->SetMark(mark);
 				if (heap.GetCount() >= maxCount) {
-					for (dgInt32 i = 0; i < releafCount; i ++) {
+					for (dgInt32 j = 0; j < releafCount; j ++) {
 						heap.Remove(heap.GetCount() - 1);
 					}
 				}
-				dgConvexHull4dTetraherum::dgTetrahedrumPlane plane (neighborgh->GetPlaneEquation (hullVertexArray));
-				heap.Push(neigborghNode, plane.Evalue(vertex));
+				dgConvexHull4dTetraherum::dgTetrahedrumPlane plane1 (neighborgh->GetPlaneEquation (hullVertexArray));
+				heap.Push(neigborghNode, plane1.Evalue(vertex));
 			}
 		}
 	}
 
-	for (dgListNode* node = GetFirst(); node; node = node->GetNext()) {
-		dgConvexHull4dTetraherum* const tetra = &node->GetInfo();
-		dgFloat64 dist = tetra->Evalue(hullVertexArray, vertex);
-		if (dist > dgFloat64(0.0f)) {
-			return node;
+	for (dgListNode* node1 = GetFirst(); node1; node1 = node1->GetNext()) {
+		dgConvexHull4dTetraherum* const tetra1 = &node1->GetInfo();
+		dgFloat64 dist1 = tetra1->Evalue(hullVertexArray, vertex);
+		if (dist1 > dgFloat64(0.0f)) {
+			return node1;
 		}
 	}
 

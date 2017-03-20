@@ -733,9 +733,9 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForceDanzig(const dgJointInfo* con
 			dgVector offDiag(JMinvM0.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM0.m_linear) + JMinvM0.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM0.m_angular) +
 							 JMinvM1.m_linear.CompProduct4(row_j->m_Jt.m_jacobianM1.m_linear) + JMinvM1.m_angular.CompProduct4(row_j->m_Jt.m_jacobianM1.m_angular));
 			offDiag = offDiag.AddHorizontal();
-			dgFloat32 val = offDiag.GetScalar();
-			massMatrixRow[j] = val;
-			massMatrix[j * rowsCount + i] = val;
+			dgFloat32 val1 = offDiag.GetScalar();
+			massMatrixRow[j] = val1;
+			massMatrix[j * rowsCount + i] = val1;
 		}
 	}
 

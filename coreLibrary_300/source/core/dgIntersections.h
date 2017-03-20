@@ -313,17 +313,17 @@ class dgFastAABBInfo: public dgObb
 			dgMatrix faceMatrix (MakeFaceMatrix (faceNormal, indexCount, indexArray, stride, vertexArray));
 			MakeBox2 (faceMatrix, indexCount, indexArray, stride, vertexArray, minBox, maxBox);
 			//dgFloat32 dist1 = BoxPenetration (minBox, maxBox);
-			dgVector mask((minBox.CompProduct4(maxBox)) < dgVector(dgFloat32(0.0f)));
-			dgVector dist(maxBox.GetMin(minBox.Abs()) & mask);
-			dist = dist.GetMin(dist.ShiftTripleRight());
-			dist = dist.GetMin(dist.ShiftTripleRight());
-			dgFloat32 dist1 = dist.GetScalar();
+			dgVector mask2((minBox.CompProduct4(maxBox)) < dgVector(dgFloat32(0.0f)));
+			dgVector dist2(maxBox.GetMin(minBox.Abs()) & mask2);
+			dist2 = dist2.GetMin(dist2.ShiftTripleRight());
+			dist2 = dist2.GetMin(dist2.ShiftTripleRight());
+			dgFloat32 dist1 = dist2.GetScalar();
 			dist0 = (dist1 > dgFloat32 (0.0f)) ? dgMax (dist0, dist1) : dgFloat32 (0.0f);
 			if (dist0 <= dgFloat32(0.0f)) {
-				dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));
-				dist = p1p0.DotProduct4(p1p0);
-				dist = (dist.Sqrt()).CompProduct4(dgVector::m_negOne);
-				dist0 = dist.GetScalar();
+				dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask2));
+				dist2 = p1p0.DotProduct4(p1p0);
+				dist2 = (dist2.Sqrt()).CompProduct4(dgVector::m_negOne);
+				dist0 = dist2.GetScalar();
 			}
 		} else {
 			dgVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask));

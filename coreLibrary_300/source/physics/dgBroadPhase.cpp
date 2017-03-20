@@ -467,15 +467,15 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 				if (node) {
 					dgVector minBox(node->m_minBox - boxP1);
 					dgVector maxBox(node->m_maxBox - boxP0);
-					dgFloat32 dist = ray.BoxIntersect(minBox, maxBox);
-					if (dist < maxParam) {
+					dgFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
+					if (dist1 < maxParam) {
 						dgInt32 j = stack;
-						for (; j && (dist > distance[j - 1]); j--) {
+						for (; j && (dist1 > distance[j - 1]); j--) {
 							stackPool[j] = stackPool[j - 1];
 							distance[j] = distance[j - 1];
 						}
 						stackPool[j] = node;
-						distance[j] = dist;
+						distance[j] = dist1;
 						stack++;
 						dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
 					}
@@ -487,15 +487,15 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 				dgAssert(left);
 				dgVector minBox(left->m_minBox - boxP1);
 				dgVector maxBox(left->m_maxBox - boxP0);
-				dgFloat32 dist = ray.BoxIntersect(minBox, maxBox);
-				if (dist < maxParam) {
+				dgFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
+				if (dist1 < maxParam) {
 					dgInt32 j = stack;
-					for (; j && (dist > distance[j - 1]); j--) {
+					for (; j && (dist1 > distance[j - 1]); j--) {
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
 					stackPool[j] = left;
-					distance[j] = dist;
+					distance[j] = dist1;
 					stack++;
 					dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
 				}
@@ -504,15 +504,15 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 				dgAssert(right);
 				minBox = right->m_minBox - boxP1;
 				maxBox = right->m_maxBox - boxP0;
-				dist = ray.BoxIntersect(minBox, maxBox);
-				if (dist < maxParam) {
+				dist1 = ray.BoxIntersect(minBox, maxBox);
+				if (dist1 < maxParam) {
 					dgInt32 j = stack;
-					for (; j && (dist > distance[j - 1]); j--) {
+					for (; j && (dist1 > distance[j - 1]); j--) {
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
 					stackPool[j] = right;
-					distance[j] = dist;
+					distance[j] = dist1;
 					stack++;
 					dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
 				}
@@ -635,15 +635,15 @@ void dgBroadPhase::RayCast(const dgBroadPhaseNode** stackPool, dgFloat32* const 
 				if (aggregate->m_root) {
 					const dgBroadPhaseNode* const child = aggregate->m_root;
 					dgAssert(child);
-					dgFloat32 dist = ray.BoxIntersect(child->m_minBox, child->m_maxBox);
-					if (dist < maxParam) {
+					dgFloat32 dist1 = ray.BoxIntersect(child->m_minBox, child->m_maxBox);
+					if (dist1 < maxParam) {
 						dgInt32 j = stack;
-						for (; j && (dist > distance[j - 1]); j--) {
+						for (; j && (dist1 > distance[j - 1]); j--) {
 							stackPool[j] = stackPool[j - 1];
 							distance[j] = distance[j - 1];
 						}
 						stackPool[j] = child;
-						distance[j] = dist;
+						distance[j] = dist1;
 						stack++;
 						dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
 					}
@@ -651,30 +651,30 @@ void dgBroadPhase::RayCast(const dgBroadPhaseNode** stackPool, dgFloat32* const 
 			} else {
 				const dgBroadPhaseNode* const left = me->GetLeft();
 				dgAssert(left);
-				dgFloat32 dist = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
-				if (dist < maxParam) {
+				dgFloat32 dist1 = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
+				if (dist1 < maxParam) {
 					dgInt32 j = stack;
-					for (; j && (dist > distance[j - 1]); j--) {
+					for (; j && (dist1 > distance[j - 1]); j--) {
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
 					stackPool[j] = left;
-					distance[j] = dist;
+					distance[j] = dist1;
 					stack++;
 					dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
 				}
 
 				const dgBroadPhaseNode* const right = me->GetRight();
 				dgAssert(right);
-				dist = ray.BoxIntersect(right->m_minBox, right->m_maxBox);
-				if (dist < maxParam) {
+				dist1 = ray.BoxIntersect(right->m_minBox, right->m_maxBox);
+				if (dist1 < maxParam) {
 					dgInt32 j = stack;
-					for (; j && (dist > distance[j - 1]); j--) {
+					for (; j && (dist1 > distance[j - 1]); j--) {
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
 					stackPool[j] = right;
-					distance[j] = dist;
+					distance[j] = dist1;
 					stack++;
 					dgAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
 				}
@@ -1530,8 +1530,8 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	// update pre-listeners after the force and true are applied
 	if (m_world->m_preListener.GetCount()) {
 		dTimeTrackerEvent("preListeners");
-		for (dgWorld::dgListenerList::dgListNode* node = m_world->m_preListener.GetFirst(); node; node = node->GetNext()) {
-			dgWorld::dgListener& listener = node->GetInfo();
+		for (dgWorld::dgListenerList::dgListNode* node1 = m_world->m_preListener.GetFirst(); node1; node1 = node1->GetNext()) {
+			dgWorld::dgListener& listener = node1->GetInfo();
 			listener.m_onListenerUpdate(m_world, listener.m_userData, timestep);
 		}
 	}
