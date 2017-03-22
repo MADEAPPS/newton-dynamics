@@ -263,8 +263,8 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 	
 	dgClippedFaceEdge* ptr = first;
 	do {
-		dgVector dist (points[ptr->m_next->m_incidentVertex] - points[ptr->m_incidentVertex]);
-		dgFloat32 error = dist.DotProduct3(dist);
+		dgVector dist1 (points[ptr->m_next->m_incidentVertex] - points[ptr->m_incidentVertex]);
+		dgFloat32 error = dist1.DotProduct3(dist1);
 		if (error < dgFloat32 (1.0e-6f)) {
 			ptr->m_next = ptr->m_next->m_next;
 			first = ptr;
@@ -709,10 +709,10 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	//inside = false;
 	dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
 	if (m_faceClipSize > convexSphapeUmbra) {
-		dgVector p0;
-		dgVector p1;
-		hull->CalcAABB (hullMatrix, p0, p1);
-		dgVector origin (dgVector::m_half.CompProduct4 (p1 + p1));
+		dgVector boxP0;
+		dgVector boxP1;
+		hull->CalcAABB (hullMatrix, boxP0, boxP1);
+		dgVector origin (dgVector::m_half.CompProduct4 (boxP1 + boxP1));
 
 		//BeamClipping(dgVector(dgFloat32(0.0f)), convexSphapeUmbra);
 		BeamClipping(origin, convexSphapeUmbra);
@@ -747,11 +747,10 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 			dgContactPoint* const contactsOut = proxy.m_contacts;
 			dgVector normal(contactsOut[0].m_normal);
 			if (normal.DotProduct4(m_normal).GetScalar() < dgFloat32(0.9995f)) {
-				dgInt32 i0 = m_vertexCount - 1;
-				for (dgInt32 i1 = 0; i1 < m_vertexCount; i1++) {
-					dgVector sideDir(m_localPoly[i1] - m_localPoly[i0]);
+				for (dgInt32 j0 = m_vertexCount - 1, j1 = 0; j1 < m_vertexCount; j1++) {
+					dgVector sideDir(m_localPoly[j1] - m_localPoly[j0]);
 					dgAssert(sideDir.m_w == dgFloat32(0.0f));
-					const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
+					const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[j0];
 					dgVector adjacentNormal(CalculateGlobalNormal(parentMesh, dgVector(&m_vertex[adjacentNormalIndex * m_stride])));
 					dgFloat32 val0 = sideDir.DotProduct4(normal.CrossProduct3(m_normal)).GetScalar();
 					dgFloat32 val1 = sideDir.DotProduct4(normal.CrossProduct3(adjacentNormal)).GetScalar();
@@ -762,7 +761,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 						dgVector longitudinal(adjacentNormal.Scale4(dgSqrt(diff.DotProduct4(diff).GetScalar())));
 						normal = longitudinal + lateral;
 					}
-					i0 = i1;
+					j0 = j1;
 				}
 				normal = polygonInstance->m_globalMatrix.RotateVector(normal);
 				for (dgInt32 i = 0; i < count; i++) {

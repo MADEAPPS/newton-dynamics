@@ -950,7 +950,7 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 		const dgJacobianMatrixElement* const row_i = rowArray[i];
 		const dgInt32 m0 = pairs[i].m_m0;
 		const dgInt32 m1 = pairs[i].m_m1;
-		dgFloat32* const matrixRow = &massMatrix[count * i];
+		dgFloat32* const matrixRow1 = &massMatrix[count * i];
 
 		dgJacobian JMinvM0(row_i->m_JMinv.m_jacobianM0);
 		dgJacobian JMinvM1(row_i->m_JMinv.m_jacobianM1);
@@ -958,7 +958,7 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 						 JMinvM1.m_linear.CompProduct4(row_i->m_Jt.m_jacobianM1.m_linear) + JMinvM1.m_angular.CompProduct4(row_i->m_Jt.m_jacobianM1.m_angular));
 		element = element.AddHorizontal();
 		dgFloat32 diagonal = element.GetScalar() + row_i->m_diagDamp;
-		matrixRow[i] = diagonal;
+		matrixRow1[i] = diagonal;
 
 		const dgJacobian& y0 = internalForces[m0];
 		const dgJacobian& y1 = internalForces[m1];
@@ -987,7 +987,7 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 			}
 			offDiagValue = offDiagValue.AddHorizontal();
 			dgFloat32 offDiagonal = offDiagValue.GetScalar();
-			matrixRow[j] = offDiagonal;
+			matrixRow1[j] = offDiagonal;
 			massMatrix[j * count + i] = offDiagonal;
 		}
 	}

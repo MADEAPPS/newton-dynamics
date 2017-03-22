@@ -324,9 +324,9 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	dgBodyInfo* const bodyArray = (dgBodyInfo*) &world->m_bodiesMemory[0]; 
 	if (globalAutoSleep) {
 		for (dgInt32 i = 1; i < bodyCount; i++) {
-			dgBody* const body = bodyArray[m_bodies + i].m_body;
-			body->m_dynamicsLru = m_markLru;
-			body->m_sleeping = globalAutoSleep;
+			dgBody* const body1 = bodyArray[m_bodies + i].m_body;
+			body1->m_dynamicsLru = m_markLru;
+			body1->m_sleeping = globalAutoSleep;
 		}
 	} else {
 		if (world->m_clusterUpdate) {
@@ -337,8 +337,8 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 			record.m_bodyArray = &bodyArray[m_bodies].m_body;
 			if (!world->m_clusterUpdate(world, &record, bodyCount)) {
 				for (dgInt32 i = 0; i < bodyCount; i++) {
-					dgBody* const body = bodyArray[m_bodies + i].m_body;
-					body->m_dynamicsLru = m_markLru;
+					dgBody* const body1 = bodyArray[m_bodies + i].m_body;
+					body1->m_dynamicsLru = m_markLru;
 				}
 				return;
 			}

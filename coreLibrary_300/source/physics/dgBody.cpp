@@ -360,9 +360,9 @@ dgConstraint* dgBody::GetNextJoint(dgConstraint* const joint) const
 
 	if (node->GetInfo().m_joint == joint) {
 		for (node = node->GetNext(); node; node = node->GetNext()) {
-			dgConstraint* const joint = node->GetInfo().m_joint;
-			if (joint->GetId() >= dgConstraint::m_unknownConstraint) {
-				return joint;
+			dgConstraint* const joint1 = node->GetInfo().m_joint;
+			if (joint1->GetId() >= dgConstraint::m_unknownConstraint) {
+				return joint1;
 			}
 		}
 	}
@@ -394,10 +394,10 @@ dgConstraint* dgBody::GetNextContact(dgConstraint* const joint) const
 
 	if (node->GetInfo().m_joint == joint) {
 		for (node = node->GetNext(); node; node = node->GetNext()) {
-			dgConstraint* const joint = node->GetInfo().m_joint;
+			dgConstraint* const joint1 = node->GetInfo().m_joint;
 			//if ((joint->GetId() == dgConstraint::m_contactConstraint) && (joint->GetMaxDOF() != 0)) {
-			if (joint->GetId() == dgConstraint::m_contactConstraint) {
-				return joint;
+			if (joint1->GetId() == dgConstraint::m_contactConstraint) {
+				return joint1;
 			}
 		}
 	}
@@ -519,8 +519,8 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 		if (invMass.m_w != 0.0f) {
 			for (; refNode; refNode = refNode->GetNext()) {
 				dgBody* const body1 = refNode->GetInfo().GetBody();
-				dgVector invMass (body1->GetInvMass());
-				dgAssert (invMass.m_w != 0.0f);
+				dgVector invMass1 (body1->GetInvMass());
+				dgAssert (invMass1.m_w != 0.0f);
 			}
 			break;
 		}

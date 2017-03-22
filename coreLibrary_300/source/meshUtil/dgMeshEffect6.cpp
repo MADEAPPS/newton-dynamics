@@ -1341,8 +1341,8 @@ dgAssert (0);
 					dgFloat64 product = m_cosTable[index];
 					dgEdge* ptr = edge->m_twin->m_next; 
 					do {
-						dgInt32 index = GetAlphaLandaIndex(ptr->m_next);
-						product *= m_sinTable[index];
+						dgInt32 m = GetAlphaLandaIndex(ptr->m_next);
+						product *= m_sinTable[m];
 						ptr = ptr->m_twin->m_next;
 					} while (ptr != edge);
 					out[i] += v[vertexIndex + m_interiorVertexCount] * product;
@@ -1358,8 +1358,8 @@ dgAssert (0);
 					dgFloat64 product = m_cosTable[index];
 					dgEdge* ptr = edge->m_twin->m_next; 
 					do {
-						dgInt32 index = GetAlphaLandaIndex(ptr->m_prev);
-						product *= m_sinTable[index];
+						dgInt32 m = GetAlphaLandaIndex(ptr->m_prev);
+						product *= m_sinTable[m];
 						ptr = ptr->m_twin->m_next;
 					} while (ptr != edge);
 					out[i] -= v[vertexIndex + m_interiorVertexCount] * product;
@@ -1508,16 +1508,16 @@ void dgMeshEffect::CalculateNormals (dgFloat64 angleInRadians)
         if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
 			dgInt32 edgeIndex = 0;
 			normalsMap.RemoveAll();
-            dgEdge* ptr = edge;
+            dgEdge* edgePtr = edge;
             do {
-                dgVector normal (FaceNormal (ptr, &m_points.m_vertex[0].m_x, sizeof (dgBigVector)));
+                dgVector normal (FaceNormal (edgePtr, &m_points.m_vertex[0].m_x, sizeof (dgBigVector)));
 				dgAssert (normal.m_w == dgFloat32 (0.0f));
                 normal = normal.Scale4 (dgFloat32 (1.0f) / dgFloat32 (sqrt(normal.DotProduct3(normal)) + dgFloat32(1.0e-16f)));
                 faceNormal[edgeIndex] = normal;
-                normalsMap.Insert(edgeIndex, ptr);
+                normalsMap.Insert(edgeIndex, edgePtr);
                 edgeIndex ++;
-                ptr = ptr->m_twin->m_next;
-            } while (ptr != edge);
+                edgePtr = edgePtr->m_twin->m_next;
+            } while (edgePtr != edge);
 
             dgEdge* startEdge = edge;
             dgVector normal0 (faceNormal[normalsMap.Find(startEdge)->GetInfo()]);
@@ -1621,15 +1621,15 @@ void dgMeshEffect::SphericalMapping (dgInt32 material)
             } while (ptr != edge);
 
             if (normal.m_z < dgFloat32 (0.0f)) {
-                dgEdge* ptr = edge;
+                dgEdge* ptr1 = edge;
                 do {
-					dgAttibutFormat::dgUV uv (m_attrib.m_uv0Channel[dgInt32 (ptr->m_userData)]);
+					dgAttibutFormat::dgUV uv (m_attrib.m_uv0Channel[dgInt32 (ptr1->m_userData)]);
                     if (uv.m_u < dgFloat32(0.5f)) {
                         uv.m_u += dgFloat32(1.0f);
-						m_attrib.m_uv0Channel[dgInt32 (ptr->m_userData)] = uv;
+						m_attrib.m_uv0Channel[dgInt32 (ptr1->m_userData)] = uv;
                     }
-                    ptr = ptr->m_next;
-                } while (ptr != edge);
+                    ptr1 = ptr1->m_next;
+                } while (ptr1 != edge);
             }
         }
     }
@@ -1706,15 +1706,15 @@ void dgMeshEffect::CylindricalMapping (dgInt32 cylinderMaterial, dgInt32 capMate
             } while (ptr != edge);
 
             if (normal.m_z < dgFloat32 (0.0f)) {
-                dgEdge* ptr = edge;
+                dgEdge* ptr1 = edge;
                 do {
-					dgAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)]);
+					dgAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dgInt32(ptr1->m_userData)]);
 					if (uv.m_u < dgFloat32(0.5f)) {
 						uv.m_u += dgFloat32(1.0f);
-						m_attrib.m_uv0Channel[dgInt32(ptr->m_userData)] = uv;
+						m_attrib.m_uv0Channel[dgInt32(ptr1->m_userData)] = uv;
 					}
-                    ptr = ptr->m_next;
-                } while (ptr != edge);
+                    ptr1 = ptr1->m_next;
+                } while (ptr1 != edge);
             }
         }
     }

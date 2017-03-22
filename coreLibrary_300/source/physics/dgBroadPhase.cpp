@@ -702,26 +702,27 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 {
 	if (m_rootNode && !m_rootNode->IsLeafNode() && body->m_masterNode) {
 		dgBroadPhaseBodyNode* const node = body->GetBroadPhase();
-		dgBody* const body = node->GetBody();
+		dgBody* const body1 = node->GetBody();
+		dgAssert(body1 == body);
 
 		dgAssert(!node->GetLeft());
 		dgAssert(!node->GetRight());
-		dgAssert(!body->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
+		dgAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
 
 		const dgBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
 
 		dgThreadHiveScopeLock lock(m_world, &m_criticalSectionLock, true);
-		if (body->GetBroadPhaseAggregate()) {
-			dgBroadPhaseAggregate* const aggregate = body->GetBroadPhaseAggregate();
-			aggregate->m_isInEquilibrium = body->m_equilibrium;
+		if (body1->GetBroadPhaseAggregate()) {
+			dgBroadPhaseAggregate* const aggregate = body1->GetBroadPhaseAggregate();
+			aggregate->m_isInEquilibrium = body1->m_equilibrium;
 			aggregate->SetAsDirty(m_lru + 1);
 		}
 
 		m_dirtyNodesCount += (node->m_nodeIsDirtyLru != (m_lru + 1)) ? 1 : 0;
 		node->SetAsDirty(m_lru + 1);
-		if (!dgBoxInclusionTest(body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) {
+		if (!dgBoxInclusionTest(body1->m_minAABB, body1->m_maxAABB, node->m_minBox, node->m_maxBox)) {
 			dgAssert(!node->IsAggregate());
-			node->SetAABB(body->m_minAABB, body->m_maxAABB);
+			node->SetAABB(body1->m_minAABB, body1->m_maxAABB);
 			for (dgBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) {
 				if (!parent->IsAggregate()) {
 					dgVector minBox;

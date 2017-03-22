@@ -799,28 +799,28 @@ void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 	dgMatrix relMatrix (body->GetMatrix().Inverse() * matrix);
 	while (index) {
 		index --;
-		dgBody* body = queue[index];
-		dgAssert (body != m_sentinelBody);
+		dgBody* body1 = queue[index];
+		dgAssert (body1 != m_sentinelBody);
 
 		// why should I do this? I do no remember the reason
 		//m_broadPhase->Remove (body);
 		//m_broadPhase->Add (body);
 
-		dgMatrix matrix (body->GetMatrix() * relMatrix);
-		body->SetVelocity (dgVector (dgFloat32 (0.0f)));    
-		body->SetOmega (dgVector (dgFloat32 (0.0f)));    
-		body->SetMatrix (matrix);
+		dgMatrix matrix1 (body1->GetMatrix() * relMatrix);
+		body1->SetVelocity (dgVector (dgFloat32 (0.0f)));    
+		body1->SetOmega (dgVector (dgFloat32 (0.0f)));    
+		body1->SetMatrix (matrix1);
 
-		for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+		for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 			dgBodyMasterListCell& cell = jointNode->GetInfo();
-			body = cell.m_bodyNode;
-			if (body != m_sentinelBody) {
-				if (body->m_genericLRUMark != m_genericLRUMark) {
+			body1 = cell.m_bodyNode;
+			if (body1 != m_sentinelBody) {
+				if (body1->m_genericLRUMark != m_genericLRUMark) {
 					dgConstraint* constraint;
 					constraint = cell.m_joint;
 					if (constraint->GetId() != dgConstraint::m_contactConstraint) {
-						body->m_genericLRUMark = m_genericLRUMark;
-						queue[index] = body;
+						body1->m_genericLRUMark = m_genericLRUMark;
+						queue[index] = body1;
 						index ++;
 						dgAssert (index < DG_RECURSIVE_SIZE);
 					}

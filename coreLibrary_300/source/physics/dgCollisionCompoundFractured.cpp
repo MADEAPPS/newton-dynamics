@@ -585,13 +585,13 @@ for (dgFractureConectivity::dgListNode* node = m_conectivity.GetFirst(); node; n
 				dgBigVector planeA (meshA->CalculateFaceNormal (faceA));
 				planeA.m_w = - planeA.DotProduct3(pointsA[vertexIndexA]);
 
-				dgInt32 indexB = 0;
+				dgInt32 index = 0;
 				for (void* faceB = meshB->GetFirstFace(); faceB; faceB = meshB->GetNextFace(faceB)) {
 					if (!meshB->IsFaceOpen (faceB)) {
-						if (ArePlaneCoplanar (meshA, faceA, planeA, meshB, faceB, planeB_array[indexB])) {
+						if (ArePlaneCoplanar (meshA, faceA, planeA, meshB, faceB, planeB_array[index])) {
 							return true;
 						}
-						indexB ++;
+						index ++;
 					}
 				}
 			}
@@ -1336,8 +1336,8 @@ void dgCollisionCompoundFractured::RemoveCollision (dgTreeArray::dgTreeNode* con
 	dgConectivityGraph::dgListNode* const chunkNode = mapNode->GetInfo();
 
 	for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
-		dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
-		dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+		dgConectivityGraph::dgListNode* const node1 = edgeNode->GetInfo().m_node;
+		dgDebriNodeInfo& childNodeInfo = node1->GetInfo().m_nodeData;
 		childNodeInfo.m_mesh->m_isVisible = true;
 		for (dgMesh::dgListNode* meshSegment = childNodeInfo.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
 			dgSubMesh* const subMesh = &meshSegment->GetInfo();
@@ -1368,8 +1368,8 @@ int dgCollisionCompoundFractured::GetFirstNiegborghArray (dgTreeArray::dgTreeNod
 
 	dgConectivityGraph::dgListNode* const chunkNode = mapNode->GetInfo();
 	for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = chunkNode->GetInfo().GetFirst(); edgeNode && (count < maxCount); edgeNode = edgeNode->GetNext()) {
-		dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
-		dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
+		dgConectivityGraph::dgListNode* const node1 = edgeNode->GetInfo().m_node;
+		dgDebriNodeInfo& childNodeInfo = node1->GetInfo().m_nodeData;
 		nodesArray[count] = childNodeInfo.m_shapeNode;
 		count ++;
 	}

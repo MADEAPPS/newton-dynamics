@@ -167,11 +167,11 @@ bool dgCollisionConvex::SanityCheck (dgPolyhedra& hull) const
 
 		ptr = edge;
 		do {
-			dgVector p0 (m_vertex[ptr->m_twin->m_incidentVertex]);
+			dgVector q0 (m_vertex[ptr->m_twin->m_incidentVertex]);
 			for (dgEdge* neiborg = ptr->m_twin->m_next->m_next; neiborg != ptr->m_twin; neiborg = neiborg->m_next) { 
-				dgVector p1 (m_vertex[neiborg->m_incidentVertex]);
-				dgVector dp (p1 - p0);
-				dgFloat32 project = dp.DotProduct3(n0);
+				dgVector q1 (m_vertex[neiborg->m_incidentVertex]);
+				dgVector q1q0 (q1 - q0);
+				dgFloat32 project = q1q0.DotProduct3(n0);
 				if (project > dgFloat32 (1.0e-5f)) {
 					return false;
 				}
@@ -574,8 +574,8 @@ bool dgCollisionConvex::SanityCheck(dgInt32 count, const dgVector& normal, dgVec
 			j = count - 1;
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgVector e1 (contactsOut[i] - contactsOut[j]);
-				dgVector n (e0.CrossProduct3(e1));
-				dgFloat32 error = n.DotProduct3(normal);
+				dgVector n1 (e0.CrossProduct3(e1));
+				dgFloat32 error = n1.DotProduct3(normal);
 				dgAssert (error >= dgFloat32 (-1.0e-4f));
 				if (error < dgFloat32 (-1.0e-4f)) {
 					return false;
@@ -600,9 +600,9 @@ dgInt32 dgCollisionConvex::SimplifyClipPolygon (dgInt32 count, const dgVector& n
 	while (count > DG_MAX_VERTEX_CLIP_FACE) {
 		sortHeap.Flush();
 
-		dgInt32 i0 = count - 2;
-		dgInt32 i1 = count - 1;
-		for (dgInt32 i2 = 0; i2 < count; i2 ++) {
+		//dgInt32 i0 = count - 2;
+		//dgInt32 i1 = count - 1;
+		for (dgInt32 i0 = count - 2, i1 = count - 1, i2 = 0; i2 < count; i2 ++) {
 			mark[i2] = 0;
 
 			dgVector e0 = polygon[i1] - polygon[i0];
@@ -617,20 +617,20 @@ dgInt32 dgCollisionConvex::SimplifyClipPolygon (dgInt32 count, const dgVector& n
 
 		dgInt32 removeCount = count - DG_MAX_VERTEX_CLIP_FACE;
 		while (sortHeap.GetCount() && removeCount) {
-			dgInt32 i1 = sortHeap[0];
+			dgInt32 m1 = sortHeap[0];
 			sortHeap.Pop();
 
-			dgInt32 i0 = (i1 - 1) >= 0 ? i1 - 1 : count - 1;
-			dgInt32 i2 = (i1 + 1) < count ? i1 + 1 : 0;
-			dgAssert (i0 >= 0);
+			dgInt32 m0 = (m1 - 1) >= 0 ? m1 - 1 : count - 1;
+			dgInt32 m2 = (m1 + 1) < count ? m1 + 1 : 0;
+			dgAssert (m0 >= 0);
 
-			if (!(mark[i0] || mark[i2])) {
-				mark[i1] = 1;
+			if (!(mark[m0] || mark[m2])) {
+				mark[m1] = 1;
 				removeCount --;
 			}
 		}
 
-		i0 = 0;
+		dgInt32 i0 = 0;
 		for (dgInt32 i1 = 0; i1 < count; i1 ++) {
 			if (!mark[i1]) {
 				polygon[i0] = polygon[i1];
@@ -870,11 +870,14 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 				} while (ptr != edge);
 
 				if (!firstEdge) {
-					// we may have a local minimal in the convex hull do to a big flat face
+					// we may have a local minimal in the convex hull due to a big flat face
+					dgAssert(0);
 					for (dgInt32 i = 0; i < m_edgeCount; i ++) {
 						ptr = &m_simplex[i];
 						side0 = plane.Evalue (m_vertex[ptr->m_vertex]);
-						dgFloat32 side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
+						dgAssert(0);
+						//dgFloat32 side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
+						side1 = plane.Evalue(m_vertex[ptr->m_twin->m_vertex]);
 						if ((side1 < dgFloat32 (0.0f)) && (side0 > dgFloat32 (0.0f))){
 							firstEdge = ptr;
 							break;

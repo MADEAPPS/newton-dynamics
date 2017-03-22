@@ -1325,20 +1325,20 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 
 		#ifdef _DEBUG
 			for (dgInt32 i = 0; i < data->m_faceCount; i ++) {
-				dgInt32 base = address[i];
-				const dgInt32* const localIndexArray = &data->m_faceVertexIndex[base];
+				dgInt32 base1 = address[i];
+				const dgInt32* const localIndexArray = &data->m_faceVertexIndex[base1];
 
-				int index = data->GetNormalIndex (localIndexArray, 3);
-				dgVector n (vertex[index]);
-				dgVector p0 (vertex[data->m_faceVertexIndex[base + 0]]);
-				dgVector p1 (vertex[data->m_faceVertexIndex[base + 1]]);
-				dgVector p2 (vertex[data->m_faceVertexIndex[base + 2]]);
+				dgInt32 index1 = data->GetNormalIndex (localIndexArray, 3);
+				dgVector n (vertex[index1]);
+				dgVector q0 (vertex[data->m_faceVertexIndex[base1 + 0]]);
+				dgVector q1 (vertex[data->m_faceVertexIndex[base1 + 1]]);
+				dgVector q2 (vertex[data->m_faceVertexIndex[base1 + 2]]);
 
-				dgVector n1 ((p1 - p0).CrossProduct3(p2 - p0));
+				dgVector n1 ((q1 - q0).CrossProduct3(q2 - q0));
 				n1 = n1.CompProduct4(n1.InvMagSqrt());
 
 				dgMatrix polygonMatrix;
-				polygonMatrix[0] = p1 - p0;
+				polygonMatrix[0] = q1 - q0;
 				polygonMatrix[0] = polygonMatrix[0].CompProduct4 (polygonMatrix[0].DotProduct4(polygonMatrix[0]).InvSqrt());
 				polygonMatrix[1] = n.CrossProduct3(polygonMatrix[0]);
 				polygonMatrix[2] = n;

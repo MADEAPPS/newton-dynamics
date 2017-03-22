@@ -3466,8 +3466,8 @@ void* NewtonSceneCollisionAddSubCollision (NewtonCollision* const sceneCollision
 	dgCollisionInstance* const sceneInstance = (dgCollisionInstance*) sceneCollision;
 	dgCollisionInstance* const sceneInstanceChild = (dgCollisionInstance*) collision;
 	if (sceneInstance->IsType (dgCollision::dgCollisionScene_RTTI) && !sceneInstanceChild->IsType(dgCollision::dgCollisionCompound_RTTI)) {
-		dgCollisionScene* const collision = (dgCollisionScene*) sceneInstance->GetChildShape();
-		return collision->AddCollision (sceneInstanceChild);
+		dgCollisionScene* const collision1 = (dgCollisionScene*) sceneInstance->GetChildShape();
+		return collision1->AddCollision (sceneInstanceChild);
 	}
 	return NULL;
 }

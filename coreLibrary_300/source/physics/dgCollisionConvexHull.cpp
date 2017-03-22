@@ -186,11 +186,11 @@ dgBigVector dgCollisionConvexHull::FaceNormal (const dgEdge *face, const dgBigVe
 	edge = face;
 	dgBigVector e0 (pool[edge->m_incidentVertex] - pool[edge->m_prev->m_incidentVertex]);	
 	do {
-		dgBigVector e1 (pool[edge->m_next->m_incidentVertex] - pool[edge->m_incidentVertex]);	
-		dgBigVector n1 (e0.CrossProduct3(e1));
-		dgFloat64 x = normal.DotProduct3(n1);
+		dgBigVector de1 (pool[edge->m_next->m_incidentVertex] - pool[edge->m_incidentVertex]);	
+		dgBigVector dn1 (e0.CrossProduct3(de1));
+		dgFloat64 x = normal.DotProduct3(dn1);
 		dgAssert (x > -dgFloat64 (0.01f));
-		e0 = e1;
+		e0 = de1;
 		edge = edge->m_next;
 	} while (edge != face);
 #endif
@@ -242,17 +242,15 @@ bool dgCollisionConvexHull::RemoveCoplanarEdge (dgPolyhedra& polyhedra, const dg
 						dgFloat64 projection = n1.DotProduct3(normal0);
 						if (projection >= DG_MAX_EDGE_ANGLE) {
 
-							dgBigVector e1 (hullVertexArray[edge0->m_next->m_next->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_incidentVertex]);
-							dgBigVector e0 (hullVertexArray[edge0->m_twin->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_prev->m_incidentVertex]);
-							dgAssert (e0.DotProduct3(e0) >= dgFloat64 (0.0f));
-							dgAssert (e1.DotProduct3(e1) >= dgFloat64 (0.0f));
-							//e0 = e0.Scale3 (dgRsqrt (e0 % e0));
-							//e1 = e1.Scale3 (dgRsqrt (e1 % e1));
-							e0 = e0.Scale3 (dgFloat64 (1.0f) / sqrt (e0.DotProduct3(e0)));
-							e1 = e1.Scale3 (dgFloat64 (1.0f) / sqrt (e1.DotProduct3(e1)));
+							dgBigVector e11 (hullVertexArray[edge0->m_next->m_next->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_incidentVertex]);
+							dgBigVector e00 (hullVertexArray[edge0->m_twin->m_incidentVertex] - hullVertexArray[edge0->m_twin->m_prev->m_incidentVertex]);
+							dgAssert (e00.DotProduct3(e00) >= dgFloat64 (0.0f));
+							dgAssert (e11.DotProduct3(e11) >= dgFloat64 (0.0f));
+							e00 = e00.Scale3 (dgFloat64 (1.0f) / sqrt (e00.DotProduct3(e00)));
+							e11 = e11.Scale3 (dgFloat64 (1.0f) / sqrt (e11.DotProduct3(e11)));
 
-							dgBigVector n1 (e0.CrossProduct3(e1));
-							projection = n1.DotProduct3(normal0);
+							dgBigVector n11 (e00.CrossProduct3(e11));
+							projection = n11.DotProduct3(normal0);
 							if (projection >= DG_MAX_EDGE_ANGLE) {
 								dgAssert (&(*iter) != edge0);
 								dgAssert (&(*iter) != edge0->m_twin);
@@ -423,18 +421,18 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			}
 		}
 		if (!success) {
-			dgInt32 count = 0;
+			dgInt32 count1 = 0;
 			dgInt32 vertexCount = convexHull->GetVertexCount();
 			for (dgInt32 i = 0; i < vertexCount; i ++) {
 				if (mask[i]) {
-					buffer[count * 3 + 0] = hullVertexArray[i].m_x;
-					buffer[count * 3 + 1] = hullVertexArray[i].m_y;
-					buffer[count * 3 + 2] = hullVertexArray[i].m_z;
-					count ++;
+					buffer[count1 * 3 + 0] = hullVertexArray[i].m_x;
+					buffer[count1 * 3 + 1] = hullVertexArray[i].m_y;
+					buffer[count1 * 3 + 2] = hullVertexArray[i].m_z;
+					count1 ++;
 				}
 			}
 			delete convexHull;
-			convexHull =  new (GetAllocator()) dgConvexHull3d (GetAllocator(), &buffer[0], 3 * sizeof (dgFloat64), count, tolerance);
+			convexHull =  new (GetAllocator()) dgConvexHull3d (GetAllocator(), &buffer[0], 3 * sizeof (dgFloat64), count1, tolerance);
 		}
 	}
 
@@ -552,22 +550,17 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 		dgTree<dgVector,dgInt32> sortTree(GetAllocator());
 		dgStack<dgTree<dgVector,dgInt32>::dgTreeNode*> vertexNodeList(vertexCount);
 
-		dgVector minP ( dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 
-		dgVector maxP (-dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 	
+		dgVector boxP0 ( dgFloat32 (1.0e15f)); 
+		dgVector boxP1 (-dgFloat32 (1.0e15f));
 		for (dgInt32 i = 0; i < vertexCount; i ++) {
 			const dgVector& p = m_vertex[i];
 			vertexNodeList[i] = sortTree.Insert (p, i);
-			minP.m_x = dgMin (p.m_x, minP.m_x); 
-			minP.m_y = dgMin (p.m_y, minP.m_y); 
-			minP.m_z = dgMin (p.m_z, minP.m_z); 
-			
-			maxP.m_x = dgMax (p.m_x, maxP.m_x); 
-			maxP.m_y = dgMax (p.m_y, maxP.m_y); 
-			maxP.m_z = dgMax (p.m_z, maxP.m_z); 
+			boxP0 = boxP0.GetMin(p);
+			boxP1 = boxP1.GetMax(p);
 		}
 
-		boxTree[0].m_box[0] = minP;
-		boxTree[0].m_box[1] = maxP;
+		boxTree[0].m_box[0] = boxP0 & dgVector::m_triplexMask;
+		boxTree[0].m_box[1] = boxP1 & dgVector::m_triplexMask;
 		boxTree[0].m_leftBox = -1;
 		boxTree[0].m_rightBox = -1;
 		boxTree[0].m_vertexStart = 0;
@@ -583,18 +576,12 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			dgInt32 boxIndex = stackBoxPool[stack];
 			dgConvexBox& box = boxTree[boxIndex];
 			if (box.m_vertexCount > DG_CONVEX_VERTEX_CHUNK_SIZE) {
-				dgVector median (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
-				dgVector varian (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
+				dgVector median (dgFloat32 (0.0f));
+				dgVector varian (dgFloat32 (0.0f));
 				for (dgInt32 i = 0; i < box.m_vertexCount; i ++) {
 					dgVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
-					minP.m_x = dgMin (p.m_x, minP.m_x); 
-					minP.m_y = dgMin (p.m_y, minP.m_y); 
-					minP.m_z = dgMin (p.m_z, minP.m_z); 
-
-					maxP.m_x = dgMax (p.m_x, maxP.m_x); 
-					maxP.m_y = dgMax (p.m_y, maxP.m_y); 
-					maxP.m_z = dgMax (p.m_z, maxP.m_z); 
-
+					boxP0 = boxP0.GetMin(p);
+					boxP1 = boxP1.GetMax(p);
 					median += p;
 					varian += p.CompProduct3 (p);
 				}
@@ -644,22 +631,18 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 
 
 				{
-					dgVector minP ( dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 
-					dgVector maxP (-dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 	
+					// insert right branch AABB
+					dgVector rightBoxP0 ( dgFloat32 (1.0e15f)); 
+					dgVector rightBoxP1 (-dgFloat32 (1.0e15f)); 	
 					for (dgInt32 i = i0; i < box.m_vertexCount; i ++) {
 						const dgVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
-						minP.m_x = dgMin (p.m_x, minP.m_x); 
-						minP.m_y = dgMin (p.m_y, minP.m_y); 
-						minP.m_z = dgMin (p.m_z, minP.m_z); 
-
-						maxP.m_x = dgMax (p.m_x, maxP.m_x); 
-						maxP.m_y = dgMax (p.m_y, maxP.m_y); 
-						maxP.m_z = dgMax (p.m_z, maxP.m_z); 
+						rightBoxP0 = rightBoxP0.GetMin(p);
+						rightBoxP1 = rightBoxP1.GetMax(p);
 					}
 
 					box.m_rightBox = boxCount;
-					boxTree[boxCount].m_box[0] = minP;
-					boxTree[boxCount].m_box[1] = maxP;
+					boxTree[boxCount].m_box[0] = rightBoxP0 & dgVector::m_triplexMask;
+					boxTree[boxCount].m_box[1] = rightBoxP1 & dgVector::m_triplexMask;
 					boxTree[boxCount].m_leftBox = -1;
 					boxTree[boxCount].m_rightBox = -1;
 					boxTree[boxCount].m_vertexStart = box.m_vertexStart + i0;
@@ -670,22 +653,18 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 				}
 
 				{
-					dgVector minP ( dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f),  dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 
-					dgVector maxP (-dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), -dgFloat32 (1.0e15f), dgFloat32 (0.0f)); 	
+					// insert left branch AABB
+					dgVector leftBoxP0 ( dgFloat32 (1.0e15f));
+					dgVector leftBoxP1 (-dgFloat32 (1.0e15f));
 					for (dgInt32 i = 0; i < i0; i ++) {
 						const dgVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
-						minP.m_x = dgMin (p.m_x, minP.m_x); 
-						minP.m_y = dgMin (p.m_y, minP.m_y); 
-						minP.m_z = dgMin (p.m_z, minP.m_z); 
-
-						maxP.m_x = dgMax (p.m_x, maxP.m_x); 
-						maxP.m_y = dgMax (p.m_y, maxP.m_y); 
-						maxP.m_z = dgMax (p.m_z, maxP.m_z); 
+						leftBoxP0 = leftBoxP0.GetMin(p);
+						leftBoxP1 = leftBoxP1.GetMax(p);
 					}
 
 					box.m_leftBox = boxCount;
-					boxTree[boxCount].m_box[0] = minP;
-					boxTree[boxCount].m_box[1] = maxP;
+					boxTree[boxCount].m_box[0] = leftBoxP0 & dgVector::m_triplexMask;;
+					boxTree[boxCount].m_box[1] = leftBoxP1 & dgVector::m_triplexMask;;
 					boxTree[boxCount].m_leftBox = -1;
 					boxTree[boxCount].m_rightBox = -1;
 					boxTree[boxCount].m_vertexStart = box.m_vertexStart;
@@ -826,33 +805,33 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 
 				if (box.m_leftBox > 0) {
 					dgAssert (box.m_rightBox > 0);
-					const dgConvexBox& leftBox = m_supportTree[box.m_leftBox];
-					const dgConvexBox& rightBox = m_supportTree[box.m_rightBox];
+					const dgConvexBox& leftBox1 = m_supportTree[box.m_leftBox];
+					const dgConvexBox& rightBox1 = m_supportTree[box.m_rightBox];
 
-					dgVector leftP (leftBox.m_box[ix][0], leftBox.m_box[iy][1], leftBox.m_box[iz][2], dgFloat32 (0.0f));
-					dgVector rightP (rightBox.m_box[ix][0], rightBox.m_box[iy][1], rightBox.m_box[iz][2], dgFloat32 (0.0f));
+					dgVector leftBoxP (leftBox1.m_box[ix][0], leftBox1.m_box[iy][1], leftBox1.m_box[iz][2], dgFloat32 (0.0f));
+					dgVector rightBoxP (rightBox1.m_box[ix][0], rightBox1.m_box[iy][1], rightBox1.m_box[iz][2], dgFloat32 (0.0f));
 
-					dgFloat32 leftDist = leftP.DotProduct4(dir).m_x;
-					dgFloat32 rightDist = rightP.DotProduct4(dir).m_x;
-					if (rightDist >= leftDist) {
-						distPool[stack] = leftDist;
-						stackPool[stack] = &leftBox; 
+					dgFloat32 leftBoxDist = leftBoxP.DotProduct4(dir).m_x;
+					dgFloat32 rightBoxDist = rightBoxP.DotProduct4(dir).m_x;
+					if (rightBoxDist >= leftBoxDist) {
+						distPool[stack] = leftBoxDist;
+						stackPool[stack] = &leftBox1; 
 						stack ++;
 						dgAssert (stack < sizeof (distPool)/sizeof (distPool[0]));
 
-						distPool[stack] = rightDist;
-						stackPool[stack] = &rightBox; 
+						distPool[stack] = rightBoxDist;
+						stackPool[stack] = &rightBox1; 
 						stack ++;
 						dgAssert (stack < sizeof (distPool)/sizeof (distPool[0]));
 
 					} else {
-						distPool[stack] = rightDist;
-						stackPool[stack] = &rightBox; 
+						distPool[stack] = rightBoxDist;
+						stackPool[stack] = &rightBox1; 
 						stack ++;
 						dgAssert (stack < sizeof (distPool)/sizeof (distPool[0]));
 
-						distPool[stack] = leftDist;
-						stackPool[stack] = &leftBox; 
+						distPool[stack] = leftBoxDist;
+						stackPool[stack] = &leftBox1; 
 						stack ++;
 						dgAssert (stack < sizeof (distPool)/sizeof (distPool[0]));
 					}
@@ -865,11 +844,11 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 						dgAssert (p.m_y <= box.m_box[1].m_y);
 						dgAssert (p.m_z >= box.m_box[0].m_z);
 						dgAssert (p.m_z <= box.m_box[1].m_z);
-						dgVector dist (p.DotProduct4(dir));
-						dgVector mask (dist > maxProj);
+						dgVector projectionDist (p.DotProduct4(dir));
+						dgVector mask (projectionDist > maxProj);
 						dgInt32 intMask = *((dgInt32*) &mask.m_x);
 						index = ((box.m_vertexStart + i) & intMask) | (index & ~intMask);
-						maxProj = maxProj.GetMax(dist);
+						maxProj = maxProj.GetMax(projectionDist);
 					}
 				}
 			}

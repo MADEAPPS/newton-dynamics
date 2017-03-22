@@ -1126,13 +1126,13 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 		stack[0] = face;
 		while (index) {
 			index --;
-			dgEdge* const face = stack[index];
-			deleteEdge[deleteCount] = face;
+			dgEdge* const face1 = stack[index];
+			deleteEdge[deleteCount] = face1;
 			deleteCount ++;
 			dgAssert (deleteCount < dgInt32 (sizeof (deleteEdge) / sizeof (deleteEdge[0])));
-			dgAssert (face->m_next->m_next->m_next == face);
+			dgAssert (face1->m_next->m_next->m_next == face1);
 
-			dgEdge* edge = face;
+			dgEdge* edge = face1;
 			do {
 				dgEdge* const ptr1 = edge->m_twin;
 				if (ptr1->m_incidentFace > 0) {
@@ -1181,7 +1181,7 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 				}
 
 				edge = edge->m_next;
-			} while (edge != face);
+			} while (edge != face1);
 		}
 		polyhedraOut.EndFace();
 	}
