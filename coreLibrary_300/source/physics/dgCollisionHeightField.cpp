@@ -1189,13 +1189,13 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 			//const dgInt32 triangleIndexBase = vertexBase * (2 * 9);
 			const dgInt32 triangleIndexBase = (z - z0) * stepBase;
 			for (dgInt32 x = x0; x < (x1 - 1); x ++) {
-				int index = (x - x0) * (2 * 9) + triangleIndexBase;
-				if (index < maxIndex) {
+				dgInt32 index1 = (x - x0) * (2 * 9) + triangleIndexBase;
+				if (index1 < maxIndex) {
 					const dgInt32 code = (m_diagonals[diagBase + x] << 1) + m_diagonals[diagBase + x + 1];
 					const dgInt32* const edgeMap = &m_horizontalEdgeMap[code][0];
 				
 					//dgInt32* const triangles = &indices[(x - x0) * (2 * 9) + triangleIndexBase];
-					dgInt32* const triangles = &indices[index];
+					dgInt32* const triangles = &indices[index1];
 					const dgInt32 i0 = triangles[edgeMap[0]];
 					const dgInt32 i1 = triangles[edgeMap[1]];
 					const dgInt32 i2 = triangles[edgeMap[2]];
@@ -1222,14 +1222,14 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 		for (dgInt32 x = x0; x < x1; x ++) {
 			const dgInt32 triangleIndexBase = (x - x0) * (2 * 9);
 			for (dgInt32 z = z0; z < (z1 - 1); z ++) {	
-				int index = (z - z0) * stepBase + triangleIndexBase;
-				if (index < maxIndex) {
+				dgInt32 index1 = (z - z0) * stepBase + triangleIndexBase;
+				if (index1 < maxIndex) {
 					const dgInt32 diagBase = m_width * z;
 					const dgInt32 code = (m_diagonals[diagBase + x] << 1) + m_diagonals[diagBase + m_width + x];
 					const dgInt32* const edgeMap = &m_verticalEdgeMap[code][0];
 
 					//dgInt32* const triangles = &indices[(z - z0) * stepBase + triangleIndexBase];
-					dgInt32* const triangles = &indices[index];
+					dgInt32* const triangles = &indices[index1];
 					const dgInt32 i0 = triangles[edgeMap[0]];
 					const dgInt32 i1 = triangles[edgeMap[1] + stepBase];
 					const dgInt32 i2 = triangles[edgeMap[2]];
@@ -1307,17 +1307,17 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 				dgMatrix matrix(data->m_polySoupInstance->GetLocalMatrix() * data->m_polySoupBody->GetMatrix());
 
 				for (dgInt32 i = 0; i < data->m_faceCount; i ++) {
-					dgInt32 base = address[i];
+					dgInt32 base1 = address[i];
 					for (dgInt32 j = 0; j < 3; j ++) {
-						dgInt32 index = data->m_faceVertexIndex[base + j];
+						dgInt32 index1 = data->m_faceVertexIndex[base1 + j];
 						//dgVector p (matrix.TransformVector(vertex[index]));
 						//p = matrix.TransformVector(scale.CompProduct4(p));
-						dgVector p (matrix.TransformVector(scale.CompProduct4(dgVector(vertex[index])))); 
+						dgVector p (matrix.TransformVector(scale.CompProduct4(dgVector(vertex[index1])))); 
 						triplex[j].m_x = p.m_x;
 						triplex[j].m_y = p.m_y;
 						triplex[j].m_z = p.m_z;
 					}
-					GetDebugCollisionCallback() (data->m_polySoupBody, data->m_objBody, data->m_faceVertexIndex[base + 4], 3, &triplex[0].m_x, sizeof (dgTriplex));
+					GetDebugCollisionCallback() (data->m_polySoupBody, data->m_objBody, data->m_faceVertexIndex[base1 + 4], 3, &triplex[0].m_x, sizeof (dgTriplex));
 				}
 			}
 		}

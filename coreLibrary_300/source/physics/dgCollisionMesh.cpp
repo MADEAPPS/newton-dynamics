@@ -318,7 +318,7 @@ dgInt32 dgCollisionMesh::CalculatePlaneIntersection (const dgFloat32* const vert
 	dgVector p0 (&vertex[j]);
 	dgFloat32 side0 = localPlane.Evalue (p0);
 	for (dgInt32 i = 0; i < indexCount; i ++) {
-		dgInt32 j = index[i] * stride;
+		j = index[i] * stride;
 		dgVector p1 (&vertex[j]);
 		dgFloat32 side1 = localPlane.Evalue (p1);
 

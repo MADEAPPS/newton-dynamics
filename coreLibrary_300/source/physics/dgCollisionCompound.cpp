@@ -691,30 +691,30 @@ dgFloat32 dgCollisionCompound::RayCast (const dgVector& localP0, const dgVector&
 				dgAssert (me->m_type == m_node);
 				const dgNodeBase* const left = me->m_left;
 				dgAssert (left);
-				dgFloat32 dist = ray.BoxIntersect(left->m_p0, left->m_p1);
-				if (dist < maxT) {
+				dgFloat32 dist1 = ray.BoxIntersect(left->m_p0, left->m_p1);
+				if (dist1 < maxT) {
 					dgInt32 j = stack;
-					for ( ; j && (dist > distance[j - 1]); j --) {
+					for ( ; j && (dist1 > distance[j - 1]); j --) {
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
 					stackPool[j] = left;
-					distance[j] = dist;
+					distance[j] = dist1;
 					stack++;
 					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 				}
 
 				const dgNodeBase* const right = me->m_right;
 				dgAssert (right);
-				dist = ray.BoxIntersect(right->m_p0, right->m_p1);
-				if (dist < maxT) {
+				dist1 = ray.BoxIntersect(right->m_p0, right->m_p1);
+				if (dist1 < maxT) {
 					dgInt32 j = stack;
-					for ( ; j && (dist > distance[j - 1]); j --) {
+					for ( ; j && (dist1 > distance[j - 1]); j --) {
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
 					stackPool[j] = right;
-					distance[j] = dist;
+					distance[j] = dist1;
 					stack++;
 					dgAssert (stack < dgInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 				}
@@ -1606,10 +1606,10 @@ dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& pro
 	dgContactPoint contact1;
 	dgFloat32 minDist2 = dgFloat32 (1.0e10f);
 	while (heap.GetCount() && (heap.Value() <= minDist2)) {
-		const dgNodeBase* const node = heap[0];
+		const dgNodeBase* const node1 = heap[0];
 		heap.Pop();
-		if (node->m_type == m_leaf) {
-			dgCollisionInstance* const subShape = node->GetShape();
+		if (node1->m_type == m_leaf) {
+			dgCollisionInstance* const subShape = node1->GetShape();
 			dgCollisionInstance childInstance (*subShape, subShape->GetChildShape());
 
 			childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
@@ -1633,8 +1633,8 @@ dgInt32 dgCollisionCompound::ClosestDistanceToConvex (dgCollisionParamProxy& pro
 			}
 
 		} else {
-			dgNodeBase* left = node->m_left;
-			dgNodeBase* right = node->m_right;
+			dgNodeBase* left = node1->m_left;
+			dgNodeBase* right = node1->m_right;
 
 			dgVector leftBoxP0 (p0 - left->m_p1);
 			dgVector leftBoxP1 (p1 - left->m_p0);

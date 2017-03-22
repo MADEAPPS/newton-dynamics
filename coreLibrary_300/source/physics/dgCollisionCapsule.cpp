@@ -300,22 +300,22 @@ void dgCollisionCapsule::DebugCollision (const dgMatrix& matrix, dgCollision::On
 				callback(userData, 3, &face[0].m_x, 0);
 			}
 			if (positive == 1) {
-				dgVector p0(tmpVectex[i + 0]);
-				dgVector p1(tmpVectex[i + 1]);
+				dgVector q0(tmpVectex[i + 0]);
+				dgVector q1(tmpVectex[i + 1]);
 				if ((tmpVectex[i + 1].m_x == dgFloat32(0.0f)) && (tmpVectex[i + 2].m_x == dgFloat32(0.0f))) {
-					p0 = tmpVectex[i + 1];
-					p1 = tmpVectex[i + 2];
+					q0 = tmpVectex[i + 1];
+					q1 = tmpVectex[i + 2];
 				}
 				else if ((tmpVectex[i + 2].m_x == dgFloat32(0.0f)) && (tmpVectex[i + 0].m_x == dgFloat32(0.0f))) {
-					p0 = tmpVectex[i + 2];
-					p1 = tmpVectex[i + 0];
+					q0 = tmpVectex[i + 2];
+					q1 = tmpVectex[i + 0];
 				}
 
 				dgVector face[4];
-				face[0] = p1;
-				face[1] = p0;
-				face[2] = p0;
-				face[3] = p1;
+				face[0] = q1;
+				face[1] = q0;
+				face[2] = q0;
+				face[3] = q1;
 				face[0].m_x += m_height;
 				face[1].m_x += m_height;
 				face[2].m_x -= m_height;

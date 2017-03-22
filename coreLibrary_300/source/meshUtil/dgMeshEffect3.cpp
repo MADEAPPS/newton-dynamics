@@ -312,16 +312,16 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 			dgConvexHullRayCastData data;
 			data.m_face = face;
 			dgFloat64 t = FaceRayCast (face, localP0, dS, data.m_normalProjection);
-			if (data.m_normalProjection >= dgFloat32 (0.0)) {
+			if (data.m_normalProjection >= dgFloat32 (0.0f)) {
 				t = dgFloat64 (-1.0e30);
 			}
 
 			heap.Push (data, t);
 			while (heap.GetCount()) {
-				dgConvexHullRayCastData data (heap[0]);
-				dgFloat64 t = heap.Value();
-				dgConvexHull3DFace* face = data.m_face;
-				dgFloat64 normalDistProjection = data.m_normalProjection;
+				dgConvexHullRayCastData data1 (heap[0]);
+				t = heap.Value();
+				dgConvexHull3DFace* const face1 = data1.m_face;
+				dgFloat64 normalDistProjection = data1.m_normalProjection;
 				heap.Pop();
 				bool foundThisBestFace = true;
 				if (normalDistProjection < dgFloat64 (0.0f)) {
@@ -336,14 +336,14 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 				}
 
 				for (dgInt32 i = 0; i < 3; i ++) {
-					dgConvexHull3DFace* const face1 = &face->GetTwin(i)->GetInfo();
+					dgConvexHull3DFace* const face2 = &face1->GetTwin(i)->GetInfo();
 
-					if (face1->GetMark() != m_mark) {
-						face1->SetMark (m_mark);
-						dgConvexHullRayCastData data;
-						data.m_face = face1;
-						dgFloat64 t = FaceRayCast (face1, localP0, dS, data.m_normalProjection);
-						if (data.m_normalProjection >= dgFloat32 (0.0)) {
+					if (face2->GetMark() != m_mark) {
+						face2->SetMark (m_mark);
+						dgConvexHullRayCastData data2;
+						data2.m_face = face2;
+						t = FaceRayCast (face2, localP0, dS, data2.m_normalProjection);
+						if (data2.m_normalProjection >= dgFloat32 (0.0)) {
 							t = dgFloat64 (-1.0e30);
 						} else if (t > t0) {
 							foundThisBestFace = false;
@@ -352,20 +352,20 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 						}
 						if ((heap.GetCount() + 2)>= heap.GetMaxCount()) {
 							// remove t values that are old and way outside interval [0.0, 1.0]  
-							for (dgInt32 i = heap.GetCount() - 1; i >= 0; i--) {
-								dgFloat64 val = heap.Value(i);
+							for (dgInt32 j = heap.GetCount() - 1; j >= 0; j--) {
+								dgFloat64 val = heap.Value(j);
 								if ((val < dgFloat64 (-100.0f)) || (val > dgFloat64 (100.0f))) {
-									heap.Remove(i);
+									heap.Remove(j);
 								}
 							}
 						}
-						heap.Push (data, t);
+						heap.Push (data2, t);
 					}
 				}
 				if (foundThisBestFace) {
 					if ((t0 >= dgFloat64 (0.0f)) && (t0 <= dgFloat64 (1.0f))) {
 						if (firstFaceGuess) {
-							*firstFaceGuess = face;
+							*firstFaceGuess = face1;
 						}
 						return t0;
 					}
@@ -1073,8 +1073,8 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 				HeapCollectGarbage ();
 
 				// add a new pair to the heap
-				dgList<dgPairProxy>::dgListNode* pairNode = m_proxyList.Append();
-				dgPairProxy& pair = pairNode->GetInfo();
+				dgList<dgPairProxy>::dgListNode* pairNode1 = m_proxyList.Append();
+				dgPairProxy& pair = pairNode1->GetInfo();
 				pair.m_nodeA = clusterNodeA;
 				pair.m_nodeB = clusterNodeB;
 				pair.m_distanceConcavity = concavity;
@@ -1083,9 +1083,9 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 
 				pair.m_area = area;
 				dgFloat64 cost = CalculateConcavityMetric (concavity, area * perimeterHandicap, perimeter * perimeterHandicap, clusterA.GetCount(), clusterB.GetCount());
-				m_priorityHeap.Push(pairNode, cost);
+				m_priorityHeap.Push(pairNode1, cost);
 
-				return pairNode;
+				return pairNode1;
 			}
 		}
 		return pairNode;
@@ -1195,13 +1195,13 @@ class dgHACDClusterGraph: public dgGraph<dgHACDCluster, dgHACDEdge>
 			// submit all new costs for each edge connecting this new node to any other node 
 			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dgListNode* edgeNodeAB = clusterNodeA->GetInfo().GetFirst(); edgeNodeAB; edgeNodeAB = edgeNodeAB->GetNext()) {
 				dgHACDEdge& edgeAB = edgeNodeAB->GetInfo().m_edgeData;
-				dgListNode* const clusterNodeB = edgeNodeAB->GetInfo().m_node;
 				dgFloat64 weigh = edgeAB.m_backFaceHandicap;
-				for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dgListNode* edgeNodeBA = clusterNodeB->GetInfo().GetFirst(); edgeNodeBA; edgeNodeBA = edgeNodeBA->GetNext()) {
+				dgListNode* const clusterNodeB1 = edgeNodeAB->GetInfo().m_node;
+				for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dgListNode* edgeNodeBA = clusterNodeB1->GetInfo().GetFirst(); edgeNodeBA; edgeNodeBA = edgeNodeBA->GetNext()) {
 					dgListNode* const clusterNode = edgeNodeBA->GetInfo().m_node;
 					if (clusterNode == clusterNodeA) {
 						dgHACDEdge& edgeBA = edgeNodeBA->GetInfo().m_edgeData;
-						dgList<dgPairProxy>::dgListNode* const proxyNode = SubmitEdgeCost (mesh, clusterNodeA, clusterNodeB, weigh * edgeBA.m_backFaceHandicap);
+						dgList<dgPairProxy>::dgListNode* const proxyNode = SubmitEdgeCost (mesh, clusterNodeA, clusterNodeB1, weigh * edgeBA.m_backFaceHandicap);
 						if (proxyNode) {
 							edgeBA.m_proxyListNode = proxyNode;
 							edgeAB.m_proxyListNode = proxyNode;

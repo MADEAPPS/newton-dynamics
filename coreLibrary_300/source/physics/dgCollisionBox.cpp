@@ -355,8 +355,8 @@ dgInt32 dgCollisionBox::CalculatePlaneIntersection (const dgVector& normal, cons
 				do {
 					const dgVector& p = m_vertex[ptr->m_twin->m_vertex];
 					dgFloat32 test1 = testPlane.Evalue(p);
-					dgVector dist (p - support[0]);
-					dgFloat32 angle2 = test1 * test1 / (dist.DotProduct4(dist).GetScalar());
+					dgVector dist1 (p - support[0]);
+					dgFloat32 angle2 = test1 * test1 / (dist1.DotProduct4(dist1).GetScalar());
 					if (angle2 < tiltAngle2) {
 						support[featureCount] = p;
 						featureCount ++;

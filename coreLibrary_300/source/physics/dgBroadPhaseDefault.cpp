@@ -229,15 +229,15 @@ void dgBroadPhaseDefault::RemoveNode(dgBroadPhaseNode* const node)
 				}
 			} else {
 				dgAssert(!node->m_parent->IsLeafNode());
-				dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)node->m_parent;
-				if (parent->m_right == node) {
-					m_rootNode = parent->m_left;
+				dgBroadPhaseTreeNode* const parent1 = (dgBroadPhaseTreeNode*)node->m_parent;
+				if (parent1->m_right == node) {
+					m_rootNode = parent1->m_left;
 					m_rootNode->m_parent = NULL;
-					parent->m_left = NULL;
+					parent1->m_left = NULL;
 				} else {
-					m_rootNode = parent->m_right;
+					m_rootNode = parent1->m_right;
 					m_rootNode->m_parent = NULL;
-					parent->m_right = NULL;
+					parent1->m_right = NULL;
 				}
 			}
 

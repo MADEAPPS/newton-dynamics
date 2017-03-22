@@ -83,16 +83,16 @@ void dgCollisionSphere::Init (dgFloat32 radius, dgMemoryAllocator* allocator)
 		dgVector p4 ( dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
 		dgVector p5 ( dgFloat32 (0.0f), dgFloat32 (0.0f),-dgFloat32 (1.0f), dgFloat32 (0.0f));
 
-		dgInt32 i = 1;
+		dgInt32 index = 1;
 		dgInt32 count = 0;
-		TesselateTriangle (i, p4, p0, p2, count, tmpVectex);
-		TesselateTriangle (i, p4, p2, p1, count, tmpVectex);
-		TesselateTriangle (i, p4, p1, p3, count, tmpVectex);
-		TesselateTriangle (i, p4, p3, p0, count, tmpVectex);
-		TesselateTriangle (i, p5, p2, p0, count, tmpVectex);
-		TesselateTriangle (i, p5, p1, p2, count, tmpVectex);
-		TesselateTriangle (i, p5, p3, p1, count, tmpVectex);
-		TesselateTriangle (i, p5, p0, p3, count, tmpVectex);
+		TesselateTriangle (index, p4, p0, p2, count, tmpVectex);
+		TesselateTriangle (index, p4, p2, p1, count, tmpVectex);
+		TesselateTriangle (index, p4, p1, p3, count, tmpVectex);
+		TesselateTriangle (index, p4, p3, p0, count, tmpVectex);
+		TesselateTriangle (index, p5, p2, p0, count, tmpVectex);
+		TesselateTriangle (index, p5, p1, p2, count, tmpVectex);
+		TesselateTriangle (index, p5, p3, p1, count, tmpVectex);
+		TesselateTriangle (index, p5, p0, p3, count, tmpVectex);
 
 		//dgAssert (count == EDGE_COUNT);
 		dgInt32 vertexCount = dgVertexListToIndexList (&tmpVectex[0].m_x, sizeof (dgVector), 3 * sizeof (dgFloat32), 0, count, indexList, 0.001f); 
@@ -227,16 +227,16 @@ void dgCollisionSphere::DebugCollision (const dgMatrix& matrix, dgCollision::OnD
 	dgVector p4 ( dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
 	dgVector p5 ( dgFloat32 (0.0f), dgFloat32 (0.0f),-dgFloat32 (1.0f), dgFloat32 (0.0f));
 
-	dgInt32 i = 3;
+	dgInt32 index = 3;
 	dgInt32 count = 0;
-	TesselateTriangle (i, p4, p0, p2, count, tmpVectex);
-	TesselateTriangle (i, p4, p2, p1, count, tmpVectex);
-	TesselateTriangle (i, p4, p1, p3, count, tmpVectex);
-	TesselateTriangle (i, p4, p3, p0, count, tmpVectex);
-	TesselateTriangle (i, p5, p2, p0, count, tmpVectex);
-	TesselateTriangle (i, p5, p1, p2, count, tmpVectex);
-	TesselateTriangle (i, p5, p3, p1, count, tmpVectex);
-	TesselateTriangle (i, p5, p0, p3, count, tmpVectex);
+	TesselateTriangle (index, p4, p0, p2, count, tmpVectex);
+	TesselateTriangle (index, p4, p2, p1, count, tmpVectex);
+	TesselateTriangle (index, p4, p1, p3, count, tmpVectex);
+	TesselateTriangle (index, p4, p3, p0, count, tmpVectex);
+	TesselateTriangle (index, p5, p2, p0, count, tmpVectex);
+	TesselateTriangle (index, p5, p1, p2, count, tmpVectex);
+	TesselateTriangle (index, p5, p3, p1, count, tmpVectex);
+	TesselateTriangle (index, p5, p0, p3, count, tmpVectex);
 
 	for (dgInt32 i = 0; i < count; i ++) {
 		tmpVectex[i] = tmpVectex[i].Scale4 (m_radius);

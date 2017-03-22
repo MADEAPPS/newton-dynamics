@@ -97,17 +97,17 @@ void dgCollisionChamferCylinder::Init (dgFloat32 radius, dgFloat32 height)
 		}
 
 
-		dgInt32 index = 0;
+		dgInt32 index0 = 0;
 		for (dgInt32 j = 0; j < DG_CHAMFERCYLINDER_SLICES; j ++) {
-			dgInt32 index0 = index + DG_CHAMFERCYLINDER_BRAKES - 1;
+			dgInt32 index1 = index0 + DG_CHAMFERCYLINDER_BRAKES - 1;
 			for (dgInt32 i = 0; i < DG_CHAMFERCYLINDER_BRAKES; i ++) {
-				wireframe[0] = index;
-				wireframe[1] = index0;
-				wireframe[2] = index0 + DG_CHAMFERCYLINDER_BRAKES;
-				wireframe[3] = index + DG_CHAMFERCYLINDER_BRAKES;
+				wireframe[0] = index0;
+				wireframe[1] = index1;
+				wireframe[2] = index1 + DG_CHAMFERCYLINDER_BRAKES;
+				wireframe[3] = index0 + DG_CHAMFERCYLINDER_BRAKES;
 
-				index0 = index;
-				index ++;
+				index1 = index0;
+				index0 ++;
 				polyhedra.AddFace (4, wireframe);
 			}
 		}

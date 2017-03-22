@@ -673,12 +673,12 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 
 #ifdef _DEBUG
 		{
-			dgVector e0(m_hullDiff[1] - m_hullDiff[0]);
-			dgVector e1(m_hullDiff[2] - m_hullDiff[0]);
-			dgVector e2(m_hullDiff[3] - m_hullDiff[0]);
-			dgVector n(e1.CrossProduct3(e2));
-			dgFloat32 volume = e0.DotProduct3(n);
-			dgAssert(volume < dgFloat32(0.0f));
+			dgVector f0(m_hullDiff[1] - m_hullDiff[0]);
+			dgVector f1(m_hullDiff[2] - m_hullDiff[0]);
+			dgVector f2(m_hullDiff[3] - m_hullDiff[0]);
+			dgVector n(f1.CrossProduct3(f2));
+			dgFloat32 volume1 = f0.DotProduct3(n);
+			dgAssert(volume1 < dgFloat32(0.0f));
 		}
 #endif
 	}
@@ -897,9 +897,8 @@ DG_INLINE void dgContactSolver::CalculateContactFromFeacture(dgInt32 featureType
 			dgVector normal(e10.CrossProduct3(e20));
 			dgAssert(normal.DotProduct3(normal) > dgFloat32(0.0f));
 
-			dgInt32 i0 = 2;
 			dgFloat32 alphas[3];
-			for (dgInt32 i1 = 0; i1 < 3; i1++) {
+			for (dgInt32 i0 = 2, i1 = 0; i1 < 3; i1++) {
 				const dgVector& p1p0 = m_hullDiff[i0];
 				const dgVector& p2p0 = m_hullDiff[i1];
 				alphas[i0] = normal.DotProduct3(p1p0.CrossProduct3(p2p0));
@@ -1353,10 +1352,10 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 
 	dgInt32 index = 0;
 	memset (m_hullSum, 0, 4 * sizeof (m_hullSum[0]));
-	dgVector dir (p0p1.CompProduct4 (p0p1.DotProduct4(p0p1).InvSqrt ()));
-
 	const dgCollisionConvex* const collision = (dgCollisionConvex*)m_instance0->GetChildShape();
-	m_hullDiff[0] = collision->SupportVertex (dir, NULL) - point;
+
+	dgVector dir1(p0p1.CompProduct4(p0p1.DotProduct4(p0p1).InvSqrt()));
+	m_hullDiff[0] = collision->SupportVertex (dir1, NULL) - point;
 	dgBigVector v (m_hullDiff[0]);
 	index = 1;
 	do {

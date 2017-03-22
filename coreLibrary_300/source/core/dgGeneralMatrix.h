@@ -1009,12 +1009,12 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const matrix, T* const x, T* co
 
 			T* const arow = &a[i * boundedSize];
 			for (dgInt32 j = 0; j < boundedSize; j++) {
-				T* const row = &matrix[(unboundedSize + j) * size];
+				T* const row1 = &matrix[(unboundedSize + j) * size];
 				T acc = dgFloat32(0.0f);
 				for (dgInt32 k = 0; k < unboundedSize; k++) {
-					acc += row[k] * g[k];
+					acc += row1[k] * g[k];
 				}
-				arow[j] = acc + row[unboundedSize + i];
+				arow[j] = acc + row1[unboundedSize + i];
 			}
 			u[i] = T(dgFloat32(0.0f));
 			c[i] = -b[i + unboundedSize];

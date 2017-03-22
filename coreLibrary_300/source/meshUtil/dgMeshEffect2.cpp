@@ -340,13 +340,13 @@ class dgTetraIsoSufaceStuffing
 
 		dgFloat64 dgPointToRayDistance (const dgBigVector& point, const dgBigVector& ray_p0, const dgBigVector& ray_p1, dgRayTracePointSide* const rayType) const
 		{
-			dgBigVector dp(ray_p1 - ray_p0);
-			dgFloat64 den = dp.DotProduct3(dp);
-			dgFloat64 num = dp.DotProduct3(point - ray_p0);
+			dgBigVector dp___(ray_p1 - ray_p0);
+			dgFloat64 den = dp___.DotProduct3(dp___);
+			dgFloat64 num = dp___.DotProduct3(point - ray_p0);
 			if ((num >= dgFloat64 (0.0f)) && (num <= den)) { 
-				dgBigVector p (ray_p0 + dp.Scale3 (num / den));
-				dgBigVector dp (point - p);
-				if (dp.DotProduct3(dp) < dgFloat64 (1.0e-12f)) {
+				dgBigVector p (ray_p0 + dp___.Scale3 (num / den));
+				dgBigVector dist (point - p);
+				if (dist.DotProduct3(dist) < dgFloat64 (1.0e-12f)) {
 					rayType->m_rayIsDegenerate = true;
 					return dgFloat64 (-2.0f);
 				}
@@ -375,9 +375,9 @@ class dgTetraIsoSufaceStuffing
 				dgFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
 				if ((t > dgFloat64(0.0f)) && (t < dgFloat64(1.0f))) {
 					dgBigVector point(point0 + (point1 - point0).Scale3(t));
-					dgBigVector p0Point(point - p0);	
-					const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
-					const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
+					dgBigVector variPoint(point - p0);	
+					const dgFloat64 b0 = e10.DotProduct4(variPoint).GetScalar();
+					const dgFloat64 b1 = e20.DotProduct4(variPoint).GetScalar();
 
 					dgFloat64 beta = b1 * a00 - a01 * b0;
 					dgFloat64 alpha = b0 * a11 - a01 * b1;
@@ -417,9 +417,9 @@ class dgTetraIsoSufaceStuffing
 				dgFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
 				if ((t > dgFloat64(0.0f)) && (t < dgFloat64(1.0f))) {
 					dgBigVector point(point0 + (point1 - point0).Scale3(t));
-					dgBigVector p0Point(point - p0);
-					const dgFloat64 b0 = e10.DotProduct4(p0Point).GetScalar();
-					const dgFloat64 b1 = e20.DotProduct4(p0Point).GetScalar();
+					dgBigVector variPoint(point - p0);
+					const dgFloat64 b0 = e10.DotProduct4(variPoint).GetScalar();
+					const dgFloat64 b1 = e20.DotProduct4(variPoint).GetScalar();
 
 					dgFloat64 beta = b1 * a00 - a01 * b0;
 					dgFloat64 alpha = b0 * a11 - a01 * b1;
@@ -1031,17 +1031,17 @@ dgMeshEffect* dgMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator*
 			dgBigVector pointArray[512];
 			dgInt32 indexArray[512];
 			
-			dgInt32 count = 0;
+			dgInt32 count1 = 0;
 			for (dgList<dgInt32>::dgListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) {
 				dgInt32 i = ptr->GetInfo();
-				pointArray[count] = voronoiPoints[i];
-				count ++;
-				dgAssert (count < dgInt32 (sizeof (pointArray) / sizeof (pointArray[0])));
+				pointArray[count1] = voronoiPoints[i];
+				count1 ++;
+				dgAssert (count1 < dgInt32 (sizeof (pointArray) / sizeof (pointArray[0])));
 			}
 
-			count = dgVertexListToIndexList(&pointArray[0].m_x, sizeof (dgBigVector), 3, count, &indexArray[0], dgFloat64 (1.0e-3f));	
-			if (count >= 4) {
-				dgMeshEffect convexMesh (allocator, &pointArray[0].m_x, count, sizeof (dgBigVector), dgFloat64 (0.0f));
+			count1 = dgVertexListToIndexList(&pointArray[0].m_x, sizeof (dgBigVector), 3, count1, &indexArray[0], dgFloat64 (1.0e-3f));	
+			if (count1 >= 4) {
+				dgMeshEffect convexMesh (allocator, &pointArray[0].m_x, count1, sizeof (dgBigVector), dgFloat64 (0.0f));
 				if (convexMesh.GetCount()) {
 					convexMesh.CalculateNormals(normalAngleInRadians);
 					convexMesh.UniformBoxMapping (materialId, textureProjectionMatrix);
@@ -1146,14 +1146,14 @@ void dgMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEf
 			dgInt32 i1 = edge->m_next->m_incidentVertex;
 			dgInt32 i2 = edge->m_prev->m_incidentVertex;
 			dgInt32 i3 = edge->m_twin->m_prev->m_incidentVertex;
-			dgBigVector p0 (tetrahedraMesh->m_points.m_vertex[i0]);
-			dgBigVector p1 (tetrahedraMesh->m_points.m_vertex[i1]);
-			dgBigVector p2 (tetrahedraMesh->m_points.m_vertex[i2]);
-			dgBigVector p3 (tetrahedraMesh->m_points.m_vertex[i3]);
+			dgBigVector q0 (tetrahedraMesh->m_points.m_vertex[i0]);
+			dgBigVector q1 (tetrahedraMesh->m_points.m_vertex[i1]);
+			dgBigVector q2 (tetrahedraMesh->m_points.m_vertex[i2]);
+			dgBigVector q3 (tetrahedraMesh->m_points.m_vertex[i3]);
 
-			const dgBigVector e10(p1 - p0);
-			const dgBigVector e20(p2 - p0);
-			const dgBigVector e30(p3 - p0);
+			const dgBigVector e10(q1 - q0);
+			const dgBigVector e20(q2 - q0);
+			const dgBigVector e30(q3 - q0);
 
 			dgAssert (e10.DotProduct4(e10).GetScalar() > dgFloat32 (0.0f));
 			const dgFloat64 d0 = sqrt(e10.DotProduct4(e10).GetScalar());
@@ -1170,7 +1170,7 @@ void dgMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEf
 			dgAssert (e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21 > dgFloat32 (0.0f));
 			const dgFloat64 desc22 = e30.DotProduct4(e30).GetScalar() - l20 * l20 - l21 * l21;
 
-			dgBigVector p0Point(p - p0);
+			dgBigVector p0Point(p - q0);
 			const dgFloat64 d2 = sqrt(desc22);
 			const dgFloat64 invd2 = dgFloat64(1.0f) / d2;
 
@@ -1186,10 +1186,10 @@ void dgMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dgMeshEf
 			u2 = (u2 - l21 * u3) * invd1;
 			u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
 			if ((u1 >= dgFloat64(0.0f)) && (u2 >= dgFloat64(0.0f)) && (u3 >= dgFloat64(0.0f)) && ((u1 + u2 + u3) <= dgFloat64(1.0f))) {
-				dgBigVector q0 (p0 + e10.Scale4(u1) + e20.Scale4(u2) + e30.Scale4(u3));
+				dgBigVector r0 (q0 + e10.Scale4(u1) + e20.Scale4(u2) + e30.Scale4(u3));
 
 				dgFloat64 u0 = dgFloat64 (1.0f) - u1 - u2 - u3;
-				dgBigVector q1 (p0.Scale4 (u0) + p1.Scale4 (u1) + p2.Scale4 (u2) + p3.Scale4 (u3));
+				dgBigVector r1 (q0.Scale4 (u0) + q1.Scale4 (u1) + q2.Scale4 (u2) + q3.Scale4 (u3));
 				dgPointFormat::dgWeightSet& weighSet = m_points.m_weights[i];
 
 				weighSet.m_weightPair[0].m_controlIndex = i0;

@@ -84,18 +84,18 @@ void dgCollisionCompoundFractured::dgConectivityGraph::Serialize(dgSerialize cal
 		data.m_mesh->Serialize(callback, userData);
 	}
 
-	dgListNode* node = GetLast();
-	dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
+	dgListNode* const lastNode = GetLast();
+	dgDebriNodeInfo& data = lastNode->GetInfo().m_nodeData;
 	data.m_mesh->Serialize(callback, userData);
 
 	for (dgListNode* node = GetFirst(); node != GetLast(); node = node->GetNext()) {
-		dgInt32 count = node->GetInfo().GetCount();
-		callback (userData, &count, dgInt32 (sizeof (dgInt32)));
+		dgInt32 count1 = node->GetInfo().GetCount();
+		callback (userData, &count1, dgInt32 (sizeof (dgInt32)));
 		for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
 			dgListNode* const otherNode = edgeNode->GetInfo().m_node;
-			dgInt32 index = enumMap.Find(otherNode)->GetInfo();
+			dgInt32 index1 = enumMap.Find(otherNode)->GetInfo();
 			dgVector normal (edgeNode->GetInfo().m_edgeData.m_normal); 
-			callback (userData, &index, dgInt32 (sizeof (dgInt32)));
+			callback (userData, &index1, dgInt32 (sizeof (dgInt32)));
 			callback (userData, &normal, dgInt32 (sizeof (dgVector)));
 		}
 	}
@@ -120,15 +120,15 @@ void dgCollisionCompoundFractured::dgConectivityGraph::Deserialize (dgCollisionC
 		data.m_mesh = new (GetAllocator()) dgMesh (GetAllocator(), callback, userData);
 	}
 
-	dgListNode* const node = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode();
-	dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
+	dgListNode* const nodePtr = dgGraph<dgDebriNodeInfo, dgSharedNodeMesh>::AddNode();
+	dgDebriNodeInfo& data = nodePtr->GetInfo().m_nodeData;
 	data.m_mesh = new (GetAllocator()) dgMesh (GetAllocator(), callback, userData);
 
 	for (dgListNode* node = GetFirst(); node != GetLast(); node = node->GetNext()) {
-		dgInt32 count;
-		callback (userData, &count, dgInt32 (sizeof (dgInt32)));
+		dgInt32 count1;
+		callback (userData, &count1, dgInt32 (sizeof (dgInt32)));
 
-		for (dgInt32 i = 0; i < count; i ++) {
+		for (dgInt32 i = 0; i < count1; i ++) {
 			dgInt32 index;
 			dgVector normal;
 			callback (userData, &index, dgInt32 (sizeof (dgInt32)));
@@ -742,17 +742,17 @@ dgCollisionCompoundFractured::dgMesh::dgMesh (dgMemoryAllocator* const allocator
 	:dgList<dgSubMesh>(allocator), dgRefCounter ()
 {
 	dgInt32 count;
-	dgInt32 visible;
+	dgInt32 isVisible;
 	callback (userData, &m_vertexOffsetStart, dgInt32 (sizeof (m_vertexOffsetStart)));
 	callback (userData, &m_vertexCount, dgInt32 (sizeof (m_vertexCount)));
-	callback (userData, &visible, dgInt32 (sizeof (m_vertexCount)));
+	callback (userData, &isVisible, dgInt32 (sizeof (m_vertexCount)));
 	callback (userData, &count, dgInt32 (sizeof (dgInt32)));
-	m_isVisible = visible ? true : false;
+	m_isVisible = isVisible ? true : false;
 
 	for (dgInt32 i = 0; i < count; i ++) {
+		dgInt32 visible;
 		dgInt32 material;
 		dgInt32 faceCount;
-		dgInt32 visible;
 		dgInt32 materialOrdinal;
 
 		callback (userData, &material, dgInt32 (sizeof (dgInt32)));
@@ -1054,14 +1054,14 @@ dgCollisionCompoundFractured::dgCollisionCompoundFractured (
 		dgDebriNodeInfo& data = node->GetInfo().m_nodeData;
 		for (dgMesh::dgListNode* meshSegment = data.m_mesh->GetFirst(); meshSegment; meshSegment = meshSegment->GetNext()) {
 			dgSubMesh* const subMesh = &meshSegment->GetInfo();
-			dgTree<dgInt32, dgInt32>::dgTreeNode* node = materailOrdinalMap.Find(subMesh->m_material);
-			if (!node) {
-				node = materailOrdinalMap.Insert(m_materialCount, subMesh->m_material);
+			dgTree<dgInt32, dgInt32>::dgTreeNode* node1 = materailOrdinalMap.Find(subMesh->m_material);
+			if (!node1) {
+				node1 = materailOrdinalMap.Insert(m_materialCount, subMesh->m_material);
 				m_materialCount ++;
 				dgAssert (m_materialCount < DG_FRACTURE_MAX_METERIAL_COUNT);
 			}
 
-			dgInt32 materialIndex = node->GetInfo();
+			dgInt32 materialIndex = node1->GetInfo();
 			subMesh->m_materialOrdinal = materialIndex;
 		}
 	}
@@ -1403,9 +1403,9 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 			himespherePlane = dgMatrix (rot, dgVector::m_wOne).RotateVector(himespherePlane);
 
 			for (dgInt32 j = 0; j < i; j ++) {
-				dgVector projection (himespherePlane.DotProduct4(directionsMap[j]));
-				dgInt32 sign = (projection < error).GetSignMask();
-				if (sign & 0x0f) {
+				dgVector projection1 (himespherePlane.DotProduct4(directionsMap[j]));
+				dgInt32 sign1 = (projection1 < error).GetSignMask();
+				if (sign1 & 0x0f) {
 					return false;
 				}
 			}
@@ -1464,11 +1464,11 @@ dgCollisionCompoundFractured::dgConectivityGraph::dgListNode* dgCollisionCompoun
 		for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = startNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
 			dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
 			dgDebriNodeInfo& neighborgInfo = node->GetInfo().m_nodeData;
-			dgCollisionInstance* const instance = neighborgInfo.m_shapeNode->GetInfo()->GetShape();
+			dgCollisionInstance* const instance1 = neighborgInfo.m_shapeNode->GetInfo()->GetShape();
 
-			const dgMatrix& matrix = instance->GetLocalMatrix(); 
-			dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(dir))));
-			dgFloat32 dist1 = (support.DotProduct4(plane)).GetScalar();
+			const dgMatrix& matrix1 = instance1->GetLocalMatrix(); 
+			dgVector support1 (matrix1.TransformVector(instance1->SupportVertex(matrix1.UnrotateVector(dir))));
+			dgFloat32 dist1 = (support1.DotProduct4(plane)).GetScalar();
 			if (dist1 > dist) {
 				dist = dist1;
 				foundBetterNode = true;
@@ -1541,9 +1541,9 @@ dgCollisionCompoundFractured* dgCollisionCompoundFractured::PlaneClip (const dgV
 
 
 						} else {
-							dgVector support (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(posgDir))));
-							dgFloat32 dist = (support.DotProduct4(plane)).GetScalar();
-							if (dist > dgFloat32 (0.0f)) {
+							dgVector support1 (matrix.TransformVector(instance->SupportVertex(matrix.UnrotateVector(posgDir))));
+							dgFloat32 dist1 = (support1.DotProduct4(plane)).GetScalar();
+							if (dist1 > dgFloat32 (0.0f)) {
 								pool[stack] = node;
 								stack ++;
 								dgAssert (stack < sizeof (pool) / sizeof (pool[0]));
@@ -1633,11 +1633,11 @@ void dgCollisionCompoundFractured::ColorDisjoinChunksIsland ()
 		if (nodeInfo.m_lru <= stackMark) {
 			nodeInfo.m_lru = m_lru;
 			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
-				dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
-				dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
-				if (childNodeInfo.m_lru < stackMark) {
-					childNodeInfo.m_lru = stackMark;
-					pool[stack] = node;
+				dgConectivityGraph::dgListNode* const node1 = edgeNode->GetInfo().m_node;
+				dgDebriNodeInfo& childNodeInfo1 = node1->GetInfo().m_nodeData;
+				if (childNodeInfo1.m_lru < stackMark) {
+					childNodeInfo1.m_lru = stackMark;
+					pool[stack] = node1;
 					stack ++;
 					dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
 				}
@@ -1717,11 +1717,11 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 
 			nodeInfo.m_lru = m_lru;
 			for (dgGraphNode<dgDebriNodeInfo, dgSharedNodeMesh>::dgListNode* edgeNode = node->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
-				dgConectivityGraph::dgListNode* const node = edgeNode->GetInfo().m_node;
-				dgDebriNodeInfo& childNodeInfo = node->GetInfo().m_nodeData;
-				if (childNodeInfo.m_lru < stackMark) {
-					childNodeInfo.m_lru = stackMark;
-					pool[stack] = node;
+				dgConectivityGraph::dgListNode* const node1 = edgeNode->GetInfo().m_node;
+				dgDebriNodeInfo& childNodeInfo1 = node1->GetInfo().m_nodeData;
+				if (childNodeInfo1.m_lru < stackMark) {
+					childNodeInfo1.m_lru = stackMark;
+					pool[stack] = node1;
 					stack ++;
 					dgAssert (stack < sizeof (pool)/sizeof (pool[0]));
 				}

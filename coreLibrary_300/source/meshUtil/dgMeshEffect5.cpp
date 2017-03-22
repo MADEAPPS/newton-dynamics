@@ -93,11 +93,11 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 		if (e2->m_next != e0) {
 			const dgEdge* edge = e2;
 			dgVector r1 (q2);
-			dgVector p10 (p20);
+			dgVector q10 (p20);
 			do {
 				dgVector r2 (matrix.UntransformVector(dgVector(convexMesh.m_points.m_vertex[edge->m_next->m_incidentVertex])));
-				dgVector p20 (r2 - q0);
-				dgFloat32 areaInv1 = faceNormal.DotProduct3(p10.CrossProduct3(p20));
+				dgVector q20 (r2 - q0);
+				dgFloat32 areaInv1 = faceNormal.DotProduct3(q10.CrossProduct3(q20));
 				if (areaInv1 > areaInv) {
 					e1 = edge;
 					e2 = edge->m_next;
@@ -106,7 +106,7 @@ bool dgMeshEffect::PlaneClip(const dgMeshEffect& convexMesh, const dgEdge* const
 					areaInv = areaInv1;
 				}
 				r1 = r2;
-				p10 = p20;
+				q10 = q20;
 				edge = edge->m_next;
 			} while (edge->m_next != e0);
 		}

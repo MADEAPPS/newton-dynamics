@@ -854,11 +854,11 @@ bool dgWorld::AreBodyConnectedByJoints (dgBody* const originSrc, dgBody* const t
 	origin->m_genericLRUMark = m_genericLRUMark;
 
 	while (start != end) {
-		dgBody* const origin = queue[start];
+		dgBody* const originVar = queue[start];
 		start ++;
 		start &= (DG_QEUEU_SIZE - 1);
 	
-		for (dgBodyMasterListRow::dgListNode* jointNode = origin->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+		for (dgBodyMasterListRow::dgListNode* jointNode = originVar->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 			dgBodyMasterListCell& cell = jointNode->GetInfo();
 
 			dgBody* const body = cell.m_bodyNode;
