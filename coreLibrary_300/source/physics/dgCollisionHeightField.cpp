@@ -266,8 +266,8 @@ dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserial
 	deserialization (userData, &m_verticalScale, sizeof (dgFloat32));
 	deserialization (userData, &m_horizontalScale_x, sizeof (dgFloat32));
 	deserialization (userData, &m_horizontalDisplacementScale_x, sizeof (dgFloat32));
-	deserialization(userData, &m_horizontalScale_z, sizeof (dgFloat32));
-	deserialization(userData, &m_horizontalDisplacementScale_z, sizeof (dgFloat32));
+	deserialization (userData, &m_horizontalScale_z, sizeof (dgFloat32));
+	deserialization (userData, &m_horizontalDisplacementScale_z, sizeof (dgFloat32));
 	deserialization (userData, &m_minBox.m_x, sizeof (dgVector)); 
 	deserialization (userData, &m_maxBox.m_x, sizeof (dgVector)); 
 
