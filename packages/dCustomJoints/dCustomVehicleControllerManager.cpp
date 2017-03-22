@@ -2268,7 +2268,7 @@ NewtonBodyGetMatrix(chassisBody, &chassisMatrix1[0][0]);
 dFloat x = chassisVeloc.DotProduct3 (chassisMatrix1.m_front);
 dFloat y = chassisOmega.CrossProduct(tireMatrix.m_posit - chassisMatrix1.m_posit).DotProduct3 (chassisMatrix1.m_right);
 dFloat xxx = tireJoint->m_steerAngle0;
-dFloat xxxx = atan (controller->m_sideSlip + y/x) + xxx;
+dFloat xxxx = dFloat(atan (controller->m_sideSlip + y/x)) + xxx;
 dTrace (("%d %f %f\n", tire->m_index, xxxx * 180.0f/3.1416f, dAtan2 (lateralSpeed, dAbs(longitudinalSpeed)) * 180.0f/3.1416f));
 
 	
@@ -2449,13 +2449,13 @@ dTrace (("\n%d b(%f) rate(%f)\n", xxx, m_sideSlip * 180.0f/3.1416f, (m_sideSlip 
 xxx ++;
 
 if ((dAbs (m_sideSlip * 180.0f/3.1416f) > 35.0f))  {
-	dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(m_sideSlip)));
-	NewtonBodyAddTorque (chassisBody, &xxx[0]);
+	dVector xxx1 (matrix.m_up.Scale (-8000.0f * dSign(m_sideSlip)));
+	NewtonBodyAddTorque (chassisBody, &xxx1[0]);
 } else {
 	dFloat betaRate = (m_sideSlip - m_prevSideSlip) / timestep;
 	if (dAbs (betaRate * 180.0f/3.1416f) > 15.0f) {
-		dVector xxx (matrix.m_up.Scale (-8000.0f * dSign(betaRate)));
-		NewtonBodyAddTorque (chassisBody, &xxx[0]);
+		dVector xxx1 (matrix.m_up.Scale (-8000.0f * dSign(betaRate)));
+		NewtonBodyAddTorque (chassisBody, &xxx1[0]);
 	}
 }
 

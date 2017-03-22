@@ -236,7 +236,7 @@ dgCollisionHeightField::dgCollisionHeightField(
 		m_instanceData->m_world = world;
 		for (dgInt32 i = 0 ; i < DG_MAX_THREADS_HIVE_COUNT; i ++) {
 			m_instanceData->m_vertex[i] = NULL;
-			m_instanceData->m_vertexCount[i] = 8 * 8;
+			m_instanceData->m_vertexCount[i] = 0;
 			m_instanceData->m_vertex[i].SetAllocator(world->GetAllocator());
 			AllocateVertex(world, i);
 		}
@@ -313,7 +313,7 @@ dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserial
 		m_instanceData->m_world = world;
 		for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
 			m_instanceData->m_vertex[i] = NULL;
-			m_instanceData->m_vertexCount[i] = 8 * 8;
+			m_instanceData->m_vertexCount[i] = 0;
 			m_instanceData->m_vertex[i].SetAllocator(world->GetAllocator());
 			AllocateVertex(world, i);
 		}
