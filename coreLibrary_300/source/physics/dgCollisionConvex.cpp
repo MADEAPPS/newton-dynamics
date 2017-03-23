@@ -871,11 +871,9 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 
 				if (!firstEdge) {
 					// we may have a local minimal in the convex hull due to a big flat face
-					dgAssert(0);
 					for (dgInt32 i = 0; i < m_edgeCount; i ++) {
 						ptr = &m_simplex[i];
 						side0 = plane.Evalue (m_vertex[ptr->m_vertex]);
-						dgAssert(0);
 						//dgFloat32 side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
 						side1 = plane.Evalue(m_vertex[ptr->m_twin->m_vertex]);
 						if ((side1 < dgFloat32 (0.0f)) && (side0 > dgFloat32 (0.0f))){

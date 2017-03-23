@@ -370,7 +370,8 @@ dgVector dgCollisionChamferCylinder::SupportVertexSpecialProjectPoint (const dgV
 dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
 {
 	dgInt32 count = 0;
-	if (normal.m_x < dgFloat32 (-0.997f)) {
+	const dgFloat32 inclination = dgFloat32 (0.9999f);
+	if (normal.m_x < -inclination) {
 		dgMatrix matrix(normal);
 		dgFloat32 x = dgSqrt (dgMax (m_height * m_height - origin.m_x * origin.m_x, dgFloat32 (0.0f)));
 		matrix.m_posit.m_x = origin.m_x;
@@ -380,7 +381,7 @@ dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& 
 			contactsOut[i] = matrix.TransformVector(m_unitCircle[i].CompProduct4(scale)) & dgVector::m_triplexMask;
 		}
 		count = RectifyConvexSlice(n, normal, contactsOut);
-	} else if (normal.m_x > dgFloat32 (0.997f)) {
+	} else if (normal.m_x > inclination) {
 		dgMatrix matrix(normal);
 		dgFloat32 x = dgSqrt (dgMax (m_height * m_height - origin.m_x * origin.m_x, dgFloat32 (0.0f)));
 		matrix.m_posit.m_x = origin.m_x;

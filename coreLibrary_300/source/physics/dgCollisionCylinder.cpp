@@ -280,8 +280,9 @@ dgFloat32 dgCollisionCylinder::CalculateMassProperties (const dgMatrix& offset, 
 dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
 {
 	dgInt32 count = 0;
+	const dgFloat32 inclination = dgFloat32(0.9998f);
 	if (normal.m_x < dgFloat32 (-0.995f)) {
-		if (normal.m_x < dgFloat32(-0.9995f)) {
+		if (normal.m_x < -inclination) {
 			dgMatrix matrix(normal);
 			matrix.m_posit.m_x = origin.m_x;
 			dgVector scale(m_radio0);
@@ -324,7 +325,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 			}
 		}
 	} else if (normal.m_x > dgFloat32 (0.995f)) {
-		if (normal.m_x > dgFloat32 (0.9995f)) {
+		if (normal.m_x > inclination) {
 			dgMatrix matrix(normal);
 			matrix.m_posit.m_x = origin.m_x;
 			dgVector scale(m_radio1);

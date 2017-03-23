@@ -279,7 +279,8 @@ dgInt32 dgCollisionCone::CalculatePlaneIntersection (const dgVector& normal, con
 		contactsOut[0] = dgVector(m_height, dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
 		count = 1;
 	} else if (normal.m_x < dgFloat32(-0.995f)) {
-		if (normal.m_x < dgFloat32(-0.9995f)) {
+		const dgFloat32 inclination = dgFloat32(0.9998f);
+		if (normal.m_x < -inclination) {
 			dgMatrix matrix(normal);
 			matrix.m_posit.m_x = origin.m_x;
 			dgVector scale(m_radius);
