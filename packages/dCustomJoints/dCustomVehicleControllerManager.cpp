@@ -174,7 +174,6 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 
 	void ProjectError()
 	{
-return;
 		dMatrix chassisMatrix;
 		dVector chassisOmega(0.0f);
 		dVector differentialOmega(0.0f);
@@ -1872,21 +1871,22 @@ dCustomVehicleController::dBodyPartDifferential* dCustomVehicleController::AddDi
 	dMatrix differentialMatrix;
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 	NewtonBodyGetMatrix(differentialBody, &differentialMatrix[0][0]);
-
+/*
 	dMatrix leftDifferentialMatrix;
 	NewtonBody* const leftDifferentialBody = leftDifferential->GetBody();
 	dAssert(leftDifferentialBody == leftDifferential->GetJoint()->GetBody0());
 	NewtonBodyGetMatrix(leftDifferentialBody, &leftDifferentialMatrix[0][0]);
 	leftDifferentialMatrix = leftDifferential->GetJoint()->GetMatrix0() * leftDifferentialMatrix;
 	new dAxelJoint(leftDifferentialMatrix[1], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftDifferentialBody, differentialBody, chassisBody);
-/*
+*/
+
 	dMatrix rightDifferentialMatrix;
 	NewtonBody* const rightDifferentialBody = rightDifferential->GetBody();
 	dAssert(rightDifferentialBody == rightDifferential->GetJoint()->GetBody0());
 	NewtonBodyGetMatrix(rightDifferentialBody, &rightDifferentialMatrix[0][0]);
 	rightDifferentialMatrix = rightDifferential->GetJoint()->GetMatrix0() * rightDifferentialMatrix;
 	new dAxelJoint(rightDifferentialMatrix[1], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightDifferentialBody, differentialBody, chassisBody);
-*/
+
 	return differential;
 }
 
