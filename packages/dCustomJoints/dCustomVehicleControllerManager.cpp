@@ -471,8 +471,8 @@ xxxx ++;
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
-if (xxx < 4)
-return;
+//if (xxx < 4)
+//return;
 
 		dMatrix matrix0;
 		dMatrix matrix1;
@@ -487,12 +487,10 @@ return;
 		NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
 
 		// calculate the angular velocity for both bodies
-		//dVector dir0(matrix0.m_front.Scale(m_gearRatio));
 		dVector dir0(matrix0.m_front);
 		dVector dir2(matrix1.m_front);
 		dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
-//		dVector dir1(dir2 + dir3);
-		dVector dir1(dir3);
+		dVector dir1(dir2 + dir3);
 
 		jacobian0[0] = 0.0f;
 		jacobian0[1] = 0.0f;
@@ -2485,7 +2483,7 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 	if (m_finalized) {
 		for (dList<dBodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
 			dBodyPart* const bodyPart = bodyPartNode->GetInfo();
-//			bodyPart->ProjectError();
+			bodyPart->ProjectError();
 		}
 
 		if (!NewtonBodyGetSleepState(m_body)) {
