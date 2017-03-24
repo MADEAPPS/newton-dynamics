@@ -514,8 +514,7 @@ class SuperCarEntity: public DemoEntity
 			{
 				dCustomVehicleController::dBodyPartDifferential* const rearDifferential = m_controller->AddDifferential(leftRearTire, rightRearTire);
 				dCustomVehicleController::dBodyPartDifferential* const frontDifferential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
-//				differential = m_controller->AddDifferential(rearDifferential, frontDifferential);
-				differential = frontDifferential;
+				differential = m_controller->AddDifferential(rearDifferential, frontDifferential);
 			}
 		}
 		dAssert(differential);

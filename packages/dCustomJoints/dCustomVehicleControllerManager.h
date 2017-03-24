@@ -383,9 +383,9 @@ class dCustomVehicleController: public dCustomControllerBase
 
 
 	CUSTOM_JOINTS_API void Finalize();
-
 	CUSTOM_JOINTS_API dBodyPartTire* AddTire (const dBodyPartTire::Info& tireInfo);
-	CUSTOM_JOINTS_API dBodyPartDifferential* AddDifferential(dBodyPart* const leftPart, dBodyPart* const rightPart);
+	CUSTOM_JOINTS_API dBodyPartDifferential* AddDifferential(dBodyPartTire* const leftTire, dBodyPartTire* const rightTire);
+	CUSTOM_JOINTS_API dBodyPartDifferential* AddDifferential(dBodyPartDifferential* const leftDifferential, dBodyPartDifferential* const rightDifferential);
 
 	CUSTOM_JOINTS_API dBodyPartEngine* AddEngine (dFloat mass, dFloat armatureRadius);
 
