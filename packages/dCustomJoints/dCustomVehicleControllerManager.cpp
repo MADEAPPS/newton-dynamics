@@ -442,11 +442,6 @@ class dCustomVehicleController::dAxelJoint: public dCustomGear
 		:dCustomGear(1.0f, childPin, parentPin, child, parent)
 		,m_parentReference(parentReference)
 	{
-
-static int xxxx;
-xxx = xxxx;
-xxxx ++;
-
 		dMatrix dommyMatrix;
 		// calculate the local matrix for body body0
  		dMatrix pinAndPivot0(dGrammSchmidt(childPin));
@@ -471,9 +466,6 @@ xxxx ++;
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
-//if (xxx < 4)
-//return;
-
 		dMatrix matrix0;
 		dMatrix matrix1;
 		dMatrix referenceMatrix;
@@ -519,7 +511,6 @@ xxxx ++;
 		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 	}
 
-int xxx;
 	dVector m_pintOnReference;
 	NewtonBody* m_parentReference;
 };
@@ -790,11 +781,11 @@ dCustomVehicleController::dBodyPartEngine::dBodyPartEngine(dCustomVehicleControl
 	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 
-origin.m_y += 2.0f;
+//origin.m_y += 2.0f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
-//	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
@@ -857,7 +848,7 @@ void dCustomVehicleController::dBodyPartDifferential::Init(dCustomVehicleControl
 	// get engine location (place at the body center of mass)
 	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
-
+/*
 static int xxx;
 origin.m_y += 1.0f;
 if (xxx == 0)
@@ -865,11 +856,11 @@ origin.m_x -= 1.0f;
 else if (xxx == 1)
 origin.m_x += 1.0f;
 xxx++;
-
+*/
 	matrix.m_posit = matrix.TransformVector(origin);
 
-//	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
+	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
