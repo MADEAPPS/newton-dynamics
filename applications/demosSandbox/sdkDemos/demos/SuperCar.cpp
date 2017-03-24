@@ -84,7 +84,7 @@ struct CarDefinition
 	dFloat m_aerodynamicsDownForceWeightCoeffecient1;
 	dFloat m_aerodynamicsDownForceSpeedFactor;
 	int m_wheelHasCollisionFenders;
-	int m_differentialType;
+	int m_differentialType; // 0 rear wheel drive, 1 front wheel drive, 3 four wheel drive
 };
 
 static CarDefinition monsterTruck = 
@@ -168,7 +168,7 @@ static CarDefinition viper =
 	2.0f,										// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	1,											// WHEEL_HAS_FENDER
-	0,											// DIFFERENTIAL_TYPE
+	1,											// DIFFERENTIAL_TYPE
 };
 
 
@@ -491,37 +491,34 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_gearRatios[5] = definition.m_transmissionGearRatio6;
 		engineInfo.m_reverseGearRatio = definition.m_transmissionRevereGearRatio;
 
-		dCustomVehicleController::dEngineController::dDifferential4wd differential;
+//		dCustomVehicleController::dEngineController::dDifferential4wd differential;
+
+		dCustomVehicleController::dBodyPartDifferential* differential = NULL;
 		switch (definition.m_differentialType) 
 		{
 			case 0:
 			{
-				// rear wheel drive no differential vehicle
-				differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_2wd;
-				differential.m_axel.m_leftTire = leftRearTire;
-				differential.m_axel.m_rightTire = rightRearTire;
+				// rear wheel drive differential vehicle
+				differential = m_controller->AddDifferential(leftRearTire, rightRearTire);
 				break;
 			}
 
 			case 1:
 			{
 				// front wheel drive vehicle with differential
-				differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_2wd;
-				differential.m_axel.m_leftTire = leftFrontTire;
-				differential.m_axel.m_rightTire = rightFrontTire;
+				differential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
 				break;
 			}
 
 			default:
 			{
-				differential.m_type = dCustomVehicleController::dEngineController::dDifferential::m_2wd;
-				differential.m_axel.m_leftTire = leftRearTire;
-				differential.m_axel.m_rightTire = rightRearTire;
-				differential.m_secondAxel.m_axel.m_leftTire = leftFrontTire;
-				differential.m_secondAxel.m_axel.m_rightTire = rightFrontTire;
+				dCustomVehicleController::dBodyPartDifferential* const rearDifferential = m_controller->AddDifferential(leftRearTire, rightRearTire);
+				dCustomVehicleController::dBodyPartDifferential* const frontDifferential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
+				differential = m_controller->AddDifferential(rearDifferential, frontDifferential);
 			}
 		}
 
+		dAssert(differential);
 
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
@@ -531,7 +528,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
 
 		m_controller->AddEngine (engineInfo.m_mass, engineInfo.m_radio);
-		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential);
+		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential, rightRearTire);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());

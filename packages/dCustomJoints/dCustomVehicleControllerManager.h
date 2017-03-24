@@ -156,14 +156,12 @@ class dCustomVehicleController: public dCustomControllerBase
 	class dBodyPartDifferential: public dBodyPart
 	{
 		public:
-		dBodyPartDifferential(dCustomVehicleController* const controller);
+		dBodyPartDifferential();
+		void Init(dCustomVehicleController* const controller, dFloat mass, dFloat inertia);
 		~dBodyPartDifferential();
 		void ProjectError();
-
-		dBodyPartDifferential* m_rearDiff;
-		dBodyPartDifferential* m_frontDiff;
 	};
-	
+
 	class dBodyPartTire: public dBodyPart
 	{
 		public:
@@ -253,96 +251,6 @@ class dCustomVehicleController: public dCustomControllerBase
 	class dEngineController: public dController
 	{
 		public:
-		class DifferentialAxel
-		{
-			public:
-			DifferentialAxel()
-				:m_leftTire(NULL)
-				,m_rightTire(NULL)
-			{
-			}
-
-			dBodyPartTire* m_leftTire;
-			dBodyPartTire* m_rightTire;
-		};
-
-		class dDifferential
-		{
-			public:
-			enum type
-			{
-				m_2wd,
-				m_4wd,
-				m_8wd,
-				m_track,
-				m_undefined,
-			};
-
-			dDifferential()
-				:m_axel()
-				,m_type(m_undefined)
-			{
-			}
-
-			DifferentialAxel m_axel;
-			int m_type;
-		};
-
-		class dDifferential2wd : public dDifferential
-		{
-			public:
-			dDifferential2wd()
-				:dDifferential()
-			{
-				m_type = m_2wd;
-			}
-		};
-
-		class dDifferential4wd: public dDifferential
-		{
-			public:
-			dDifferential4wd()
-				:dDifferential()
-				,m_secondAxel()
-			{
-				m_type = m_4wd;
-			}
-
-			dDifferential m_secondAxel;
-		};
-
-		class dDifferential8wd: public dDifferential4wd
-		{
-			public:
-			dDifferential8wd()
-				:dDifferential4wd()
-				,m_second4Wd()
-			{
-				m_type = m_4wd;
-			}
-
-			dDifferential4wd m_second4Wd;
-		};
-
-		class dDifferentialTracked: public dDifferential
-		{
-			public:
-			dDifferentialTracked(int tiresCount, dBodyPartTire** const leftTrack, dBodyPartTire** const rightTrack)
-				:dDifferential()
-				,m_leftTrack(leftTrack)
-				,m_rightTrack(rightTrack)
-				,m_count (tiresCount)
-			{
-				m_type = m_track;
-				m_axel.m_leftTire = leftTrack[0];
-				m_axel.m_rightTire = rightTrack[0];
-			}
-
-			dBodyPartTire** m_leftTrack;
-			dBodyPartTire** m_rightTrack;
-			int m_count;
-		};
-
 		class dInfo
 		{
 			public:
@@ -388,7 +296,7 @@ class dCustomVehicleController: public dCustomControllerBase
 		};
 
 		public:
-		CUSTOM_JOINTS_API dEngineController(dCustomVehicleController* const controller, const dInfo& info, const dDifferential& differential);
+		CUSTOM_JOINTS_API dEngineController(dCustomVehicleController* const controller, const dInfo& info, dBodyPartDifferential* const differential, dBodyPartTire* const crownGearCalculator);
 		CUSTOM_JOINTS_API ~dEngineController();
 
 		CUSTOM_JOINTS_API void ApplyTorque(dFloat torque);
@@ -477,6 +385,8 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void Finalize();
 
 	CUSTOM_JOINTS_API dBodyPartTire* AddTire (const dBodyPartTire::Info& tireInfo);
+	CUSTOM_JOINTS_API dBodyPartDifferential* AddDifferential(dBodyPart* const leftPart, dBodyPart* const rightPart);
+
 	CUSTOM_JOINTS_API dBodyPartEngine* AddEngine (dFloat mass, dFloat armatureRadius);
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);
@@ -531,6 +441,7 @@ class dCustomVehicleController: public dCustomControllerBase
 //	dMatrix m_localFrame;
 	dBodyPartChassis m_chassis;
 	dList<dBodyPartTire> m_tireList;
+	dList<dBodyPartDifferential> m_differentialList;
 	dList<dBodyPart*> m_bodyPartsList;
 	dBodyPartEngine* m_engine;
 	

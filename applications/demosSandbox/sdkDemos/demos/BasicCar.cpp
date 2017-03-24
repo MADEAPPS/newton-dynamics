@@ -366,6 +366,8 @@ class BasicCarEntity: public DemoEntity
 		handBrakes->AddTire (rearTires[1]);
 		m_controller->SetHandBrakes (handBrakes);
 
+		dAssert(0);
+/*
 		dCustomVehicleController::dEngineController::dDifferential8wd differential;
 		switch (parameters.m_differentialType) 
 		{
@@ -420,6 +422,7 @@ class BasicCarEntity: public DemoEntity
 
 		m_controller->AddEngine (parameters.ENGINE_MASS, parameters.ENGINE_ARMATURE_RADIO);
 		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential);
+*/
 
 	/*
 		// the the default transmission type
