@@ -490,8 +490,7 @@ class SuperCarEntity: public DemoEntity
 		engineInfo.m_gearRatios[4] = definition.m_transmissionGearRatio4;
 		engineInfo.m_gearRatios[5] = definition.m_transmissionGearRatio6;
 		engineInfo.m_reverseGearRatio = definition.m_transmissionRevereGearRatio;
-
-//		dCustomVehicleController::dEngineController::dDifferential4wd differential;
+		engineInfo.m_gearRatiosSign = 1.0f;
 
 		dCustomVehicleController::dBodyPartDifferential* differential = NULL;
 		switch (definition.m_differentialType) 
@@ -499,6 +498,7 @@ class SuperCarEntity: public DemoEntity
 			case 0:
 			{
 				// rear wheel drive differential vehicle
+				engineInfo.m_gearRatiosSign = 1.0f;
 				differential = m_controller->AddDifferential(leftRearTire, rightRearTire);
 				break;
 			}
@@ -506,6 +506,7 @@ class SuperCarEntity: public DemoEntity
 			case 1:
 			{
 				// front wheel drive vehicle with differential
+				engineInfo.m_gearRatiosSign = 1.0f;
 				differential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
 				break;
 			}
@@ -515,6 +516,8 @@ class SuperCarEntity: public DemoEntity
 				dCustomVehicleController::dBodyPartDifferential* const rearDifferential = m_controller->AddDifferential(leftRearTire, rightRearTire);
 				dCustomVehicleController::dBodyPartDifferential* const frontDifferential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
 				differential = m_controller->AddDifferential(rearDifferential, frontDifferential);
+
+				engineInfo.m_gearRatiosSign = -1.0f;
 			}
 		}
 		dAssert(differential);

@@ -1202,7 +1202,7 @@ void dCustomVehicleController::dEngineController::SetGear(int gear)
 {
 	m_gearTimer = 30;
 	m_currentGear = dClamp(gear, 0, m_info.m_gearsCount);
-	m_gearBoxJoint->SetGearRatio(m_info.m_gearRatios[m_currentGear]);
+	m_gearBoxJoint->SetGearRatio(m_info.m_gearRatios[m_currentGear] * m_info.m_gearRatiosSign);
 }
 
 int dCustomVehicleController::dEngineController::GetNeutralGear() const
@@ -1879,13 +1879,14 @@ dCustomVehicleController::dBodyPartDifferential* dCustomVehicleController::AddDi
 	NewtonBodyGetMatrix(leftDifferentialBody, &leftDifferentialMatrix[0][0]);
 	leftDifferentialMatrix = leftDifferential->GetJoint()->GetMatrix0() * leftDifferentialMatrix;
 	new dAxelJoint(leftDifferentialMatrix[1], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftDifferentialBody, differentialBody, chassisBody);
-
+/*
 	dMatrix rightDifferentialMatrix;
 	NewtonBody* const rightDifferentialBody = rightDifferential->GetBody();
 	dAssert(rightDifferentialBody == rightDifferential->GetJoint()->GetBody0());
 	NewtonBodyGetMatrix(rightDifferentialBody, &rightDifferentialMatrix[0][0]);
 	rightDifferentialMatrix = rightDifferential->GetJoint()->GetMatrix0() * rightDifferentialMatrix;
 	new dAxelJoint(rightDifferentialMatrix[1], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightDifferentialBody, differentialBody, chassisBody);
+*/
 	return differential;
 }
 

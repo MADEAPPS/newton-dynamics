@@ -273,6 +273,7 @@ class dCustomVehicleController: public dCustomControllerBase
 			dFloat m_vehicleTopSpeed;
 			dFloat m_reverseGearRatio;
 			dFloat m_gearRatios[10];
+			dFloat m_gearRatiosSign;
 			dFloat m_clutchFrictionTorque;
 
 			dFloat m_aerodynamicDownforceFactor; 
