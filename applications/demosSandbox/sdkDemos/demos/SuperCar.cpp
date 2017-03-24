@@ -168,7 +168,7 @@ static CarDefinition viper =
 	2.0f,										// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	1,											// WHEEL_HAS_FENDER
-	1,											// DIFFERENTIAL_TYPE
+	2,											// DIFFERENTIAL_TYPE
 };
 
 
@@ -514,10 +514,10 @@ class SuperCarEntity: public DemoEntity
 			{
 				dCustomVehicleController::dBodyPartDifferential* const rearDifferential = m_controller->AddDifferential(leftRearTire, rightRearTire);
 				dCustomVehicleController::dBodyPartDifferential* const frontDifferential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
-				differential = m_controller->AddDifferential(rearDifferential, frontDifferential);
+//				differential = m_controller->AddDifferential(rearDifferential, frontDifferential);
+				differential = frontDifferential;
 			}
 		}
-
 		dAssert(differential);
 
 		engineInfo.m_differentialLock = 0;
@@ -1405,7 +1405,7 @@ class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 		if (m_externalView) {
 			camOrigin = playerMatrix.m_posit + dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f);
 			camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
-camOrigin = dVector (-7.0f, 3.0f, 0.0f, 0.0f);
+//camOrigin = dVector (-7.0f, 3.0f, 0.0f, 0.0f);
 		} else {
 			dAssert (0);
 			//           camMatrix = camMatrix * playerMatrix;

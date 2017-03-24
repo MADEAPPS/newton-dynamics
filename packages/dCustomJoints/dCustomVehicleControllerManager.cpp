@@ -174,6 +174,7 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 
 	void ProjectError()
 	{
+return;
 		dMatrix chassisMatrix;
 		dVector chassisOmega(0.0f);
 		dVector differentialOmega(0.0f);
@@ -232,6 +233,7 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		}
+
 	}
 
 	dMatrix m_baseOffsetMatrix;
@@ -442,6 +444,11 @@ class dCustomVehicleController::dAxelJoint: public dCustomGear
 		:dCustomGear(1.0f, childPin, parentPin, child, parent)
 		,m_parentReference(parentReference)
 	{
+
+static int xxxx;
+xxx = xxxx;
+xxxx ++;
+
 		dMatrix dommyMatrix;
 		// calculate the local matrix for body body0
  		dMatrix pinAndPivot0(dGrammSchmidt(childPin));
@@ -468,6 +475,7 @@ class dCustomVehicleController::dAxelJoint: public dCustomGear
 	{
 		dMatrix matrix0;
 		dMatrix matrix1;
+		dMatrix referenceMatrix;
 		dVector omega0(0.0f);
 		dVector omega1(0.0f);
 		dFloat jacobian0[6];
@@ -475,16 +483,15 @@ class dCustomVehicleController::dAxelJoint: public dCustomGear
 
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(matrix0, matrix1);
+		NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
 
 		// calculate the angular velocity for both bodies
 		//dVector dir0(matrix0.m_front.Scale(m_gearRatio));
 		dVector dir0(matrix0.m_front);
 		dVector dir2(matrix1.m_front);
-
-		dMatrix referenceMatrix;
-		NewtonBodyGetMatrix(m_parentReference, &referenceMatrix[0][0]);
 		dVector dir3(referenceMatrix.RotateVector(m_pintOnReference));
-		dVector dir1(dir2 + dir3);
+//		dVector dir1(dir2 + dir3);
+		dVector dir1(dir3);
 
 		jacobian0[0] = 0.0f;
 		jacobian0[1] = 0.0f;
@@ -513,6 +520,7 @@ class dCustomVehicleController::dAxelJoint: public dCustomGear
 		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 	}
 
+int xxx;
 	dVector m_pintOnReference;
 	NewtonBody* m_parentReference;
 };
@@ -851,10 +859,17 @@ void dCustomVehicleController::dBodyPartDifferential::Init(dCustomVehicleControl
 	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 
-origin.m_y += 1.5f;
+static int xxx;
+origin.m_y += 1.0f;
+if (xxx == 0)
+origin.m_x -= 1.0f;
+else if (xxx == 1)
+origin.m_x += 1.0f;
+xxx++;
+
 	matrix.m_posit = matrix.TransformVector(origin);
 
-	//NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+//	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
 NewtonCollision* const collision = NewtonCreateCylinder(world, 0.25f, 0.25f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
