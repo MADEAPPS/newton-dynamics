@@ -74,6 +74,7 @@ packages/dCompilerKit/dLittleScriptLanguage/dLittleScriptParser.cpp.txt
 *.bsc
 *.sbr
 *.res
+*.opendb
 
 #
 # Ignore auxiliary output from Doxygen and Sphinx
