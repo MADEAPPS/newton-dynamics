@@ -1632,7 +1632,7 @@ void SuperCar (DemoEntityManager* const scene)
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
 /*
 	size = dVector(0.75f, 0.35f, 0.75f, 0.0f);
 	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);

@@ -471,6 +471,9 @@ xxxx ++;
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
+if (xxx < 4)
+return;
+
 		dMatrix matrix0;
 		dMatrix matrix1;
 		dMatrix referenceMatrix;
@@ -789,11 +792,11 @@ dCustomVehicleController::dBodyPartEngine::dBodyPartEngine(dCustomVehicleControl
 	NewtonBodyGetCentreOfMass(chassisBody, &origin[0]);
 	NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 
-//origin.m_y += 2.0f;
+origin.m_y += 2.0f;
 	matrix.m_posit = matrix.TransformVector(origin);
 
-	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
-	//NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
+//	NewtonCollision* const collision = NewtonCreateSphere(world, 0.1f, 0, NULL);
+NewtonCollision* const collision = NewtonCreateCylinder(world, 0.1f, 0.1f, 0.5f, 0, NULL);
 	NewtonCollisionSetMode(collision, 0);
 	m_body = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
@@ -1871,14 +1874,13 @@ dCustomVehicleController::dBodyPartDifferential* dCustomVehicleController::AddDi
 	dMatrix differentialMatrix;
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
 	NewtonBodyGetMatrix(differentialBody, &differentialMatrix[0][0]);
-/*
+
 	dMatrix leftDifferentialMatrix;
 	NewtonBody* const leftDifferentialBody = leftDifferential->GetBody();
 	dAssert(leftDifferentialBody == leftDifferential->GetJoint()->GetBody0());
 	NewtonBodyGetMatrix(leftDifferentialBody, &leftDifferentialMatrix[0][0]);
 	leftDifferentialMatrix = leftDifferential->GetJoint()->GetMatrix0() * leftDifferentialMatrix;
 	new dAxelJoint(leftDifferentialMatrix[1], differentialMatrix[0].Scale(-1.0f), chassisMatrix[2], leftDifferentialBody, differentialBody, chassisBody);
-*/
 
 	dMatrix rightDifferentialMatrix;
 	NewtonBody* const rightDifferentialBody = rightDifferential->GetBody();
@@ -2483,7 +2485,7 @@ void dCustomVehicleController::PostUpdate(dFloat timestep, int threadIndex)
 	if (m_finalized) {
 		for (dList<dBodyPart*>::dListNode* bodyPartNode = m_bodyPartsList.GetFirst(); bodyPartNode; bodyPartNode = bodyPartNode->GetNext()) {
 			dBodyPart* const bodyPart = bodyPartNode->GetInfo();
-			bodyPart->ProjectError();
+//			bodyPart->ProjectError();
 		}
 
 		if (!NewtonBodyGetSleepState(m_body)) {
