@@ -52,7 +52,7 @@ struct VehicleParameters
 	dFloat m_TireSuspensionLength;
 	dCustomVehicleController::dBodyPartTire::Info::SuspensionType m_TireSuspensionType;
 	dFloat m_TireBrakesTorque;
-	dFloat m_tirePivotOffset;
+	dFloat m_chassisYaxisComBias;
 	dFloat m_transmissionGearRatio0;
 	dFloat m_transmissionGearRatio1;
 	dFloat m_transmissionGearRatio2;
@@ -60,7 +60,7 @@ struct VehicleParameters
 	dFloat m_transmissionGearRatio4;
 	dFloat m_transmissionGearRatio6;
 	dFloat m_transmissionRevereGearRatio;
-	dFloat m_chassisYaxisComBias;
+	dFloat m_tirePivotOffset;
 	dFloat m_aerodynamicsDownForceWeightCoeffecient0;
 	dFloat m_aerodynamicsDownForceWeightCoeffecient1;
 	dFloat m_aerodynamicsDownForceSpeedFactor;
@@ -210,9 +210,9 @@ static VehicleParameters m1a1Param =
 	75.0f,								// m_tireMass
 	0.125f,								// m_engineRotorRadio
 
-	25.0f,							// m_frontSteeringAngle
-	0.0f,							// m_rearSteeringAngle
-	0.5f,							// m_vehicleWeightDistribution
+	0.0f,								// m_frontSteeringAngle
+	0.0f,								// m_rearSteeringAngle
+	0.5f,								// m_vehicleWeightDistribution
 
 	10000.0f,							// m_cluthFrictionTorque
 
@@ -1190,10 +1190,8 @@ class HeavyVehicleEntity: public DemoEntity
 
 	void BuildTrackedVehicle(const VehicleParameters& definition)
 	{
-		dAssert(0);
-/*
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity(dVector(0.0f, definition.COM_Y_OFFSET, 0.0f, 0.0f));
+		m_controller->SetCenterOfGravity(dVector(0.0f, definition.m_chassisYaxisComBias, 0.0f, 0.0f));
 
 		// add all the tank tires
 		dCustomVehicleController::dBodyPartTire* leftTire[8];
@@ -1207,11 +1205,12 @@ class HeavyVehicleEntity: public DemoEntity
 			// add the tire thread thickness
 			radius += 0.1f;
 			
-			leftTire[i] = AddTire(name, width, radius, definition.STEER_ANGLE, definition);	
+//			leftTire[i] = AddTire(name, width, radius, definition.m_frontSteeringAngle, definition);
 			sprintf(name, "r_tire%d", i);
-			rightTire[i] = AddTire(name, width, radius, definition.STEER_ANGLE, definition);	
+//			rightTire[i] = AddTire(name, width, radius, definition.m_frontSteeringAngle, definition);
 		}
-
+//dAssert(0);
+/*
 		// add vehicle brakes
 		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController(m_controller, definition.BRAKE_TORQUE);
 		brakes->AddTire(leftTire[0]);
@@ -1662,7 +1661,7 @@ location.m_posit.m_z = 50.0f;
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 3.0f;
 	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1_.ngd", m1a1Param);
-//	m1a1Tank->BuildTrackedVehicle (m1a1Param);
+	m1a1Tank->BuildTrackedVehicle (m1a1Param);
 
 	// set this vehicle as the player
 	manager->SetAsPlayer(m1a1Tank);
