@@ -1383,41 +1383,25 @@ class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 		}
 		//TestSpline();
 	}
-/*
-	void DrawHelp(DemoEntityManager* const scene, int lineNumber) const
-	{
-		if (m_player->m_helpKey.GetPushButtonState()) {
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "key switch          : 'Y'           start engine");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         : 'W'           stick forward");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              : 'S'           stick back");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'D'           stick right");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          : 'S'           stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Reverse Gear : 'R'           toggle reverse Gear");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "toggle Vehicle      : 'V'           change vehicle");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           : 'H'");
-		}
-	}
-*/
+
 	void DrawHelp(DemoEntityManager* const scene, int lineNumber)
 	{
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engine switch					: 'I'           start engine");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator         			: 'W'           stick forward");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes              			: 'S'           stick back");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left           			: 'A'           stick left");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right          			: 'D'           stick right");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage clutch       			: 'K'           button 5");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:               Joystick control");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "engine switch                   : 'I'           start engine");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "accelerator                     : 'W'           stick forward");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "brakes                          : 'S'           stick back");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn left                       : 'A'           stick left");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "turn right                      : 'D'           stick right");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage clutch                   : 'K'           button 5");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "engage differential lock        : 'L'           button 5");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up             			: '>'           button 2");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down           			: '<'           button 3");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission 			: enter         button 4");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes         			: space         button 1");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "next vehicle        			: 'V'");
-			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help           			: 'H'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear up                         : '>'           button 2");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "gear down                       : '<'           button 3");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "manual transmission             : enter         button 4");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hand brakes                     : space         button 1");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "next vehicle                    : 'V'");
+			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help                       : 'H'");
 		}
 
 //		bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene->GetRootWindow(), 'V');

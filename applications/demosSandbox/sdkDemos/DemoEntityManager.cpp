@@ -968,8 +968,8 @@ void DemoEntityManager::RenderFrame ()
 		Print (color, 10, 130, "auto sleep: %s", m_mainWindow->m_autoSleepState ? "on" : "off");
 	}
 
-	int lineNumber = 130 + 22;
-
+	//int lineNumber = 130 + 22;
+	int lineNumber = 30;
 	if (m_renderHood) {
 
 		// set display for 2d render mode
