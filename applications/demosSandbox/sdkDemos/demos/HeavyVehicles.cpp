@@ -583,8 +583,6 @@ class HeavyVehicleEntity: public DemoEntity
 		,m_engineRPMOn(false)
 		,m_drivingState(m_engineOff)
 	{
-		dAssert(0);
-/*
 		// add this entity to the scene for rendering
 		scene->Append(this);
 
@@ -608,7 +606,7 @@ class HeavyVehicleEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle 
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.MASS, PhysicsApplyGravityForce, this);
+		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.m_vehicleMass, PhysicsApplyGravityForce, this, dAbs(DEMO_GRAVITY));
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();
@@ -633,7 +631,6 @@ class HeavyVehicleEntity: public DemoEntity
 		}
 		m_gearMap[0] = 1;
 		m_gearMap[1] = 0;
-*/
 	}
 
 	~HeavyVehicleEntity ()
@@ -1680,11 +1677,11 @@ location.m_posit.m_z = 50.0f;
 	location.m_posit.m_z -= 12.0f;
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 3.0f;
-//	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1_.ngd", m1a1Param);
+	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1_.ngd", m1a1Param);
 //	m1a1Tank->BuildTrackedVehicle (m1a1Param);
 
 	// set this vehicle as the player
-//	manager->SetAsPlayer(m1a1Tank);
+	manager->SetAsPlayer(m1a1Tank);
 //	manager->SetAsPlayer(heavyVehicle);
 
 //NewtonDestroyBody (m1a1Tank->m_controller->GetBody());
@@ -1702,10 +1699,10 @@ for (int i = 0; i < 5; i ++){
 }
 */
 	
-//	dMatrix camMatrix (manager->m_player->GetNextMatrix());
-//	camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
+	dMatrix camMatrix (manager->m_player->GetNextMatrix());
+	//camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
 	//scene->SetCameraMouseLock (true);
-//	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
+	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 	location.m_posit.m_x += 20.0f;
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
@@ -1723,6 +1720,5 @@ for (int i = 0; i < 5; i ++){
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
 }
 
