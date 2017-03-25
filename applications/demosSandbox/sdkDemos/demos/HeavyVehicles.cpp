@@ -20,7 +20,7 @@
 #include "HeightFieldPrimitive.h"
 #include "DebugDisplay.h"
 
-#if 0
+
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_DIST		12.0f
 #define HEAVY_VEHICLE_THIRD_PERSON_VIEW_FILTER		0.125f
@@ -28,60 +28,60 @@
 
 struct VehicleParameters
 {
-	dFloat MASS;
-	dFloat ENGINE_MASS;
-	dFloat ENGINE_RADIO;
-
-	dFloat TIRE_MASS;
-	dFloat STEER_ANGLE;
-	dFloat BRAKE_TORQUE;
-	dFloat COM_Y_OFFSET;
-
-	dFloat VEHICLE_TOP_SPEED_KMH;
-	dFloat CLUTCH_FRICTION_TORQUE;
-
-	dFloat IDLE_TORQUE;
-	dFloat IDLE_TORQUE_RPM;
-
-	dFloat PEAK_TORQUE;
-	dFloat PEAK_TORQUE_RPM;
-
-	dFloat PEAK_HP;
-	dFloat PEAK_HP_RPM;
-
-	dFloat REDLINE_RPM;
-
-	dFloat GEAR_1;
-	dFloat GEAR_2;
-	dFloat GEAR_3;
-	dFloat REVERSE_GEAR;
-
-	dFloat SUSPENSION_LENGTH;
-	dFloat SUSPENSION_SPRING;
-	dFloat SUSPENSION_DAMPER;
-	dFloat TIRE_PIVOT_OFFSET_Y;
-	CustomVehicleController::BodyPartTire::Info::SuspensionType TIRE_SUSPENSION_TYPE;
-
-	dFloat LATERAL_STIFFNESS;
-	dFloat LONGITUDINAL_STIFFNESS;
-	dFloat ALIGNING_MOMENT_TRAIL;
-
-	dMatrix m_tireAligment;
-	int WHEEL_HAS_FENDER;
-	int DIFFERENTIAL_TYPE;
+	dFloat m_vehicleMass;
+	dFloat m_engineMass;
+	dFloat m_tireMass;
+	dFloat m_engineRotorRadio;
+	dFloat m_frontSteeringAngle;
+	dFloat m_rearSteeringAngle;
+	dFloat m_vehicleWeightDistribution;
+	dFloat m_cluthFrictionTorque;
+	dFloat m_engineIdleTorque;
+	dFloat m_engineRPMAtIdleTorque;
+	dFloat m_enginePeakTorque;
+	dFloat m_engineRPMAtPeakTorque;
+	dFloat m_enginePeakHorsePower;
+	dFloat m_egineRPMAtPeakHorsePower;
+	dFloat m_engineRPMAtRedLine;
+	dFloat m_vehicleTopSpeed;
+	dFloat m_tireLaretalStiffeness;
+	dFloat m_tireLongitudinalStiffness;
+	dFloat m_tireAligningMomemtTrail;
+	dFloat m_TireSuspensionSpringConstant;
+	dFloat m_TireSuspensionDamperConstant;
+	dFloat m_TireSuspensionLength;
+	dCustomVehicleController::dBodyPartTire::Info::SuspensionType m_TireSuspensionType;
+	dFloat m_TireBrakesTorque;
+	dFloat m_tirePivotOffset;
+	dFloat m_transmissionGearRatio0;
+	dFloat m_transmissionGearRatio1;
+	dFloat m_transmissionGearRatio2;
+	dFloat m_transmissionGearRatio3;
+	dFloat m_transmissionGearRatio4;
+	dFloat m_transmissionGearRatio6;
+	dFloat m_transmissionRevereGearRatio;
+	dFloat m_chassisYaxisComBias;
+	dFloat m_aerodynamicsDownForceWeightCoeffecient0;
+	dFloat m_aerodynamicsDownForceWeightCoeffecient1;
+	dFloat m_aerodynamicsDownForceSpeedFactor;
+	int m_wheelHasCollisionFenders;
+	int m_differentialType; // 0 rear wheel drive, 1 front wheel drive, 3 four wheel drive
 };
+
 
 static VehicleParameters heavyTruck = 
 {
-	2000.0f,							// MASS
-	100.0f,								// TIRE_MASS
-	0.125f,								// ENGINE_RADIO
-	 100.0f,							// TIRE_MASS
-	  25.0f,							// STEER_ANGLE
-	10000.0f,							// BRAKE_TORQUE
-	  -0.6f,							// COM_Y_OFFSET
-	 60.0f,								// VEHICLE_TOP_SPEED_KMH
-	10000.0f,							// CLUTCH_FRICTION_TORQUE
+	2000.0f,							// m_vehicleMass
+	100.0f,								// m_engineMass
+	 75.0f,								// m_tireMass
+	0.125f,								// m_engineRotorRadio
+	 
+	  25.0f,							// m_frontSteeringAngle
+	   0.0f,							// m_rearSteeringAngle
+	   0.5f,							// m_vehicleWeightDistribution
+
+    10000.0f,							// m_cluthFrictionTorque
+	
 	3500.0f,							// IDLE_TORQUE
 	 700.0f,							// IDLE_TORQUE_RPM
 	2800.0f,							// PEAK_TORQUE
@@ -89,60 +89,89 @@ static VehicleParameters heavyTruck =
 	2000.0f,							// PEAK_HP
 	4000.0f,							// PEAK_HP_RPM
 	4500.0f,							// REDLINE_RPM
-		2.5f,							// GEAR_1
-		2.0f,							// GEAR_2
-		1.5f,							// GEAR_3
-		2.9f,							// REVERSE_GEAR
-	   0.7f,							// SUSPENSION_LENGTH
-	 100.0f,							// SUSPENSION_SPRING
-	  10.0f,							// SUSPENSION_DAMPER
-		0.15f,							// TIRE_PIVOT_OFFSET_Y
-	  CustomVehicleController::BodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
-  (5000.0f * DEMO_GRAVITY * 10.0f),		// LATERAL_STIFFNESS
-  (5000.0f * DEMO_GRAVITY *  2.0f),		// LONGITUDINAL_STIFFNESS
-	   1.5f,							// ALIGNING_MOMENT_TRAIL
-	   dGetIdentityMatrix(),
-	   0,								// WHEEL_HAS_FENDER	
-	   3,								// DIFFERENTIAL_TYPE
+
+	60.0f,								// VEHICLE_TOP_SPEED_KMH
+
+	1.0f,								// LATERAL_STIFFNESS
+	1.0f,								// LONGITUDINAL_STIFFNESS
+	1.5f,								// ALIGNING_MOMENT_TRAIL
+	
+	100.0f,								// SUSPENSION_SPRING
+	10.0f,								// SUSPENSION_DAMPER
+	0.7f,								// SUSPENSION_LENGTH
+	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+
+	10000.0f,							// BRAKE_TORQUE
+	-0.6f,								// COM_Y_OFFSET
+
+	2.5f,								// GEAR_1
+	2.0f,								// GEAR_2
+	1.5f,								// GEAR_3
+	1.5f,								// GEAR_4
+	1.5f,								// GEAR_5
+	2.9f,								// REVERSE_GEAR
+	0.15f,								// TIRE_PIVOT_OFFSET_Y
+
+	1.0f,								// DOWNFORCE_WEIGHT_FACTOR_0
+	2.0f,								// DOWNFORCE_WEIGHT_FACTOR_1
+	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
+	0,									// WHEEL_HAS_FENDER
+	1,									// DIFFERENTIAL_TYPE
 };
 
 static VehicleParameters lightTruck = 
 {
-	2000.0f,								// MASS
-	100.0f,									// TIRE_MASS
-	0.125f,									// ENGINE_RADIO
-	100.0f,									// TIRE_MASS
-	25.0f,									// STEER_ANGLE
-	3000.0f,								// BRAKE_TORQUE
-	-0.6f,									// COM_Y_OFFSET
-	72.0f,									// VEHICLE_TOP_SPEED_KMH
-	10000.0f,								// CLUTCH_FRICTION_TORQUE
-	1200.0f,								// IDLE_TORQUE
-	500.0f,									// IDLE_TORQUE_RPM
-	 500.0f,								// PEAK_TORQUE
-	3000.0f,								// PEAK_TORQUE_RPM
-	 300.0f,								// PEAK_HP
-	4000.0f,								// PEAK_HP_RPM
-	4500.0f,								// REDLINE_RPM
-	2.5f,									// GEAR_1
-	2.0f,									// GEAR_2
-	1.5f,									// GEAR_3
-	2.9f,									// REVERSE_GEAR
-	0.6f,									// SUSPENSION_LENGTH
-	2000.0f,								// SUSPENSION_SPRING
-	100.0f,									// SUSPENSION_DAMPER
-	0.0,										// TIRE_PIVOT_OFFSET_Y
-	CustomVehicleController::BodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
-	20.0f,									// LATERAL_STIFFNESS
-	20000.0f,								// LONGITUDINAL_STIFFNESS
-	1.5f,									// ALIGNING_MOMENT_TRAIL
-	dRollMatrix(3.141592f * 90.0f / 180.0f),
-	0,										// WHEEL_HAS_FENDER	
-	0,										// DIFFERENTIAL_TYPE
+	2000.0f,							// m_vehicleMass
+	100.0f,								// m_engineMass
+	75.0f,								// m_tireMass
+	0.125f,								// m_engineRotorRadio
+
+	25.0f,							// m_frontSteeringAngle
+	0.0f,							// m_rearSteeringAngle
+	0.5f,							// m_vehicleWeightDistribution
+
+	10000.0f,							// m_cluthFrictionTorque
+
+	3500.0f,							// IDLE_TORQUE
+	700.0f,							// IDLE_TORQUE_RPM
+	2800.0f,							// PEAK_TORQUE
+	3000.0f,							// PEAK_TORQUE_RPM
+	2000.0f,							// PEAK_HP
+	4000.0f,							// PEAK_HP_RPM
+	4500.0f,							// REDLINE_RPM
+
+	60.0f,								// VEHICLE_TOP_SPEED_KMH
+
+	1.0f,								// LATERAL_STIFFNESS
+	1.0f,								// LONGITUDINAL_STIFFNESS
+	1.5f,								// ALIGNING_MOMENT_TRAIL
+
+	100.0f,								// SUSPENSION_SPRING
+	10.0f,								// SUSPENSION_DAMPER
+	0.7f,								// SUSPENSION_LENGTH
+	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+
+	10000.0f,							// BRAKE_TORQUE
+	-0.6f,								// COM_Y_OFFSET
+
+	2.5f,								// GEAR_1
+	2.0f,								// GEAR_2
+	1.5f,								// GEAR_3
+	1.5f,								// GEAR_4
+	1.5f,								// GEAR_5
+	2.9f,								// REVERSE_GEAR
+	0.15f,								// TIRE_PIVOT_OFFSET_Y
+
+	1.0f,								// DOWNFORCE_WEIGHT_FACTOR_0
+	2.0f,								// DOWNFORCE_WEIGHT_FACTOR_1
+	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
+	0,									// WHEEL_HAS_FENDER
+	1,									// DIFFERENTIAL_TYPE
 };
 
 static VehicleParameters m1a1Param = 
 {
+/*
 	5000.0f,								// MASS
 	100.0f,									// TIRE_MASS
 	0.125f,									// ENGINE_RADIO
@@ -167,13 +196,61 @@ static VehicleParameters m1a1Param =
 	350.0f,									// SUSPENSION_SPRING
 	20.0f,									// SUSPENSION_DAMPER
 	0.10f,									// TIRE_PIVOT_OFFSET_Y
-	CustomVehicleController::BodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
 	(5000.0f * DEMO_GRAVITY * 10.0f),		// LATERAL_STIFFNESS
 	(5000.0f * DEMO_GRAVITY *  2.0f),		// LONGITUDINAL_STIFFNESS
 	1.5f,									// ALIGNING_MOMENT_TRAIL
 	dRollMatrix(3.141592f * 90.0f / 180.0f),
 	0,										// WHEEL_HAS_FENDER	
 	0,										// DIFFERENTIAL_TYPE
+*/
+
+	2000.0f,							// m_vehicleMass
+	100.0f,								// m_engineMass
+	75.0f,								// m_tireMass
+	0.125f,								// m_engineRotorRadio
+
+	25.0f,							// m_frontSteeringAngle
+	0.0f,							// m_rearSteeringAngle
+	0.5f,							// m_vehicleWeightDistribution
+
+	10000.0f,							// m_cluthFrictionTorque
+
+	3500.0f,							// IDLE_TORQUE
+	700.0f,							// IDLE_TORQUE_RPM
+	2800.0f,							// PEAK_TORQUE
+	3000.0f,							// PEAK_TORQUE_RPM
+	2000.0f,							// PEAK_HP
+	4000.0f,							// PEAK_HP_RPM
+	4500.0f,							// REDLINE_RPM
+
+	60.0f,								// VEHICLE_TOP_SPEED_KMH
+
+	1.0f,								// LATERAL_STIFFNESS
+	1.0f,								// LONGITUDINAL_STIFFNESS
+	1.5f,								// ALIGNING_MOMENT_TRAIL
+
+	100.0f,								// SUSPENSION_SPRING
+	10.0f,								// SUSPENSION_DAMPER
+	0.7f,								// SUSPENSION_LENGTH
+	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
+
+	10000.0f,							// BRAKE_TORQUE
+	-0.6f,								// COM_Y_OFFSET
+
+	2.5f,								// GEAR_1
+	2.0f,								// GEAR_2
+	1.5f,								// GEAR_3
+	1.5f,								// GEAR_4
+	1.5f,								// GEAR_5
+	2.9f,								// REVERSE_GEAR
+	0.15f,								// TIRE_PIVOT_OFFSET_Y
+
+	1.0f,								// DOWNFORCE_WEIGHT_FACTOR_0
+	2.0f,								// DOWNFORCE_WEIGHT_FACTOR_1
+	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
+	0,									// WHEEL_HAS_FENDER
+	1,									// DIFFERENTIAL_TYPE
 };
 
 
@@ -227,12 +304,15 @@ class HeavyVehicleEntity: public DemoEntity
 
 		dFloat GetTireRadius (DemoEntity* const tire) const
 		{
-			for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_vehicle->m_controller->GetFirstTire(); node; node = m_vehicle->m_controller->GetNextTire(node)) {
-				const CustomVehicleController::BodyPartTire* const part = &node->GetInfo();
+			dAssert(0);
+/*
+			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_vehicle->m_controller->GetFirstTire(); node; node = m_vehicle->m_controller->GetNextTire(node)) {
+				const dCustomVehicleController::dBodyPartTire* const part = &node->GetInfo();
 				if (part->GetUserData() == tire) {
 					return part->GetInfo().m_radio;
 				}
 			}
+*/
 			dAssert (0);
 			return 0.0f;
 		}
@@ -345,7 +425,7 @@ class HeavyVehicleEntity: public DemoEntity
 			m_shapeMatrix = m_bezierEntity->GetMeshMatrix() * m_bezierEntity->GetCurrentMatrix();
 		}
 
-		void Init (HeavyVehicleEntity* const me, const char* const name, CustomVehicleController::BodyPartTire* const tire)
+		void Init (HeavyVehicleEntity* const me, const char* const name, dCustomVehicleController::dBodyPartTire* const tire)
 		{
 			m_vehicle = me;
 			m_tire = tire;
@@ -462,7 +542,7 @@ class HeavyVehicleEntity: public DemoEntity
 		HeavyVehicleEntity* m_vehicle;
 		DemoEntity* m_bezierEntity;
 		DemoBezierCurve* m_bezierMesh;
-		CustomVehicleController::BodyPartTire* m_tire;
+		dCustomVehicleController::dBodyPartTire* m_tire;
 		ConstantSpeedKnotInterpolant* m_intepolants;
 		DemoEntity* m_bindingTires[8];
 		DemoEntity** m_linksEntity;
@@ -491,7 +571,7 @@ class HeavyVehicleEntity: public DemoEntity
 		dMatrix m_matrix;
 	};
 
-	HeavyVehicleEntity (DemoEntityManager* const scene, CustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename, const VehicleParameters& parameters)
+	HeavyVehicleEntity (DemoEntityManager* const scene, dCustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename, const VehicleParameters& parameters)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_controller(NULL)
 		,m_gearUpKey (false)
@@ -503,6 +583,8 @@ class HeavyVehicleEntity: public DemoEntity
 		,m_engineRPMOn(false)
 		,m_drivingState(m_engineOff)
 	{
+		dAssert(0);
+/*
 		// add this entity to the scene for rendering
 		scene->Append(this);
 
@@ -551,11 +633,12 @@ class HeavyVehicleEntity: public DemoEntity
 		}
 		m_gearMap[0] = 1;
 		m_gearMap[1] = 0;
+*/
 	}
 
 	~HeavyVehicleEntity ()
 	{
-		((CustomVehicleControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
+		((dCustomVehicleControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 
@@ -617,8 +700,10 @@ class HeavyVehicleEntity: public DemoEntity
 	}
 
 
-	CustomVehicleController::BodyPartTire* AddTire(const char* const tireName, dFloat width, dFloat radius, dFloat maxSteerAngle, const VehicleParameters& definition) 
+	dCustomVehicleController::dBodyPartTire* AddTire(const char* const tireName, dFloat width, dFloat radius, dFloat maxSteerAngle, const VehicleParameters& definition) 
 	{
+		dAssert(0);
+/*
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
 		DemoEntity* const tirePart = entity->Find (tireName);
@@ -641,7 +726,7 @@ class HeavyVehicleEntity: public DemoEntity
 		tirePart->SetUserData(aligmentTransform);
 
 		// add the tire to the vehicle
-		CustomVehicleController::BodyPartTire::Info  tireInfo;
+		dCustomVehicleController::dBodyPartTire::Info  tireInfo;
 
 		tireInfo.m_userData = tirePart;
 		tireInfo.m_location = tireMatrix.m_posit;
@@ -659,6 +744,8 @@ class HeavyVehicleEntity: public DemoEntity
 		tireInfo.m_hasFender = definition.WHEEL_HAS_FENDER;
 
 		return m_controller->AddTire (tireInfo);
+*/
+		return NULL;
 	}
 
 
@@ -1013,6 +1100,8 @@ class HeavyVehicleEntity: public DemoEntity
 	// this function is an example of how to make a high performance super car
 	void BuildAllWheelDriveVehicle(const VehicleParameters& definition)
 	{
+		dAssert(0);
+/*
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity(dVector(0.0f, definition.COM_Y_OFFSET, 0.0f, 0.0f));
 
@@ -1098,11 +1187,14 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
+*/
 	}
 
 
 	void BuildTrackedVehicle(const VehicleParameters& definition)
 	{
+		dAssert(0);
+/*
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
 		m_controller->SetCenterOfGravity(dVector(0.0f, definition.COM_Y_OFFSET, 0.0f, 0.0f));
 
@@ -1177,6 +1269,7 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
+*/
 	}
 
 	void SetTracks(dCustomVehicleController::dBodyPartTire* const leftTire, dCustomVehicleController::dBodyPartTire* const rightTire)
@@ -1540,14 +1633,14 @@ class HeavyVehicleControllerManager: public dCustomVehicleControllerManager
 	HeavyVehicleEntity* m_player;
 	DemoEntityManager::ButtonKey m_helpKey;
 };
-#endif
+
 
 void MilitaryTransport (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
 
-#if 0
+
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.1f, 200.0f, -30.0f);
 
@@ -1570,6 +1663,8 @@ location.m_posit.m_z = 50.0f;
 	NewtonMaterialSetDefaultFriction(world, defaulMaterial, defaulMaterial, 0.6f, 0.5f);
 	int materialList[] = { defaulMaterial };
 	HeavyVehicleControllerManager* const manager = new HeavyVehicleControllerManager (world, 1, materialList);
+
+
 /*	
 	HeavyVehicleEntity* const heavyVehicle = new HeavyVehicleEntity (scene, manager, location, "lav-25.ngd", heavyTruck);
 	heavyVehicle->BuildAllWheelDriveVehicle (heavyTruck);
@@ -1585,11 +1680,11 @@ location.m_posit.m_z = 50.0f;
 	location.m_posit.m_z -= 12.0f;
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 3.0f;
-	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1_.ngd", m1a1Param);
-	m1a1Tank->BuildTrackedVehicle (m1a1Param);
+//	HeavyVehicleEntity* const m1a1Tank = new HeavyVehicleEntity (scene, manager, location, "m1a1_.ngd", m1a1Param);
+//	m1a1Tank->BuildTrackedVehicle (m1a1Param);
 
 	// set this vehicle as the player
-	manager->SetAsPlayer(m1a1Tank);
+//	manager->SetAsPlayer(m1a1Tank);
 //	manager->SetAsPlayer(heavyVehicle);
 
 //NewtonDestroyBody (m1a1Tank->m_controller->GetBody());
@@ -1607,11 +1702,10 @@ for (int i = 0; i < 5; i ++){
 }
 */
 	
-	dMatrix camMatrix (manager->m_player->GetNextMatrix());
+//	dMatrix camMatrix (manager->m_player->GetNextMatrix());
 //	camMatrix = dYawMatrix (-0.5f * 3.1416f) * camMatrix;
 	//scene->SetCameraMouseLock (true);
-	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
-
+//	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
 	location.m_posit.m_x += 20.0f;
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
@@ -1630,6 +1724,5 @@ for (int i = 0; i < 5; i ++){
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-#endif
 }
 
