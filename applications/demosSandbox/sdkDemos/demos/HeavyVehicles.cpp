@@ -236,8 +236,8 @@ static VehicleParameters m1a1Param =
 	1.0f,								// LONGITUDINAL_STIFFNESS
 	1.5f,								// ALIGNING_MOMENT_TRAIL
 
-	100.0f,								// SUSPENSION_SPRING
-	10.0f,								// SUSPENSION_DAMPER
+	2000.0f,							// SUSPENSION_SPRING
+	100.0f,								// SUSPENSION_DAMPER
 	0.7f,								// SUSPENSION_LENGTH
 	dCustomVehicleController::dBodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
 
@@ -1264,11 +1264,10 @@ class HeavyVehicleEntity: public DemoEntity
 
 		// set up the tank Track
 		SetTracks(leftTire[0], rightTire[0]);
-
+*/
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
-*/
 	}
 
 	void SetTracks(dCustomVehicleController::dBodyPartTire* const leftTire, dCustomVehicleController::dBodyPartTire* const rightTire)
