@@ -1204,6 +1204,7 @@ class HeavyVehicleEntity: public DemoEntity
 			CalculateTireDimensions(name, width, radius);
 			// add the tire thread thickness
 			radius += 0.1f;
+			width *= 2.0f;
 
 			leftTire[i] = AddTire(name, width, radius, definition.m_frontSteeringAngle, definition);
 			sprintf(name, "r_tire%d", i);
