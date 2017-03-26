@@ -313,15 +313,12 @@ class HeavyVehicleEntity: public DemoEntity
 
 		dFloat GetTireRadius (DemoEntity* const tire) const
 		{
-			dAssert(0);
-/*
 			for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_vehicle->m_controller->GetFirstTire(); node; node = m_vehicle->m_controller->GetNextTire(node)) {
 				const dCustomVehicleController::dBodyPartTire* const part = &node->GetInfo();
 				if (part->GetUserData() == tire) {
 					return part->GetInfo().m_radio;
 				}
 			}
-*/
 			dAssert (0);
 			return 0.0f;
 		}
@@ -1270,10 +1267,9 @@ class HeavyVehicleEntity: public DemoEntity
 		engineControl->SetIgnition(true);
 
 		m_controller->SetEngine(engineControl);
-
+*/
 		// set up the tank Track
 		SetTracks(leftTire[0], rightTire[0]);
-*/
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
@@ -1633,9 +1629,8 @@ void MilitaryTransport (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-//	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.1f, 200.0f, -30.0f);
+//	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.1f, 200.0f, -30.0f);
 
 //	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dMatrix location (dGetIdentityMatrix());
