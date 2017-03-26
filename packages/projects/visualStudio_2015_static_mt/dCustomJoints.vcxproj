@@ -208,11 +208,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../thirdParty/timeTracker;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -224,6 +224,7 @@
       </AdditionalOptions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <PostBuildEvent>
       <Command>
@@ -239,11 +240,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>../../;../../dMath;../../dContainers;../../dCustomJoints;../../thirdParty/timeTracker;../../../coreLibrary_300/source/newton</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -255,6 +256,7 @@
       </AdditionalOptions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <PostBuildEvent>
       <Command>
