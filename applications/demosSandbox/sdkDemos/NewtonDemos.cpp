@@ -127,9 +127,9 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Uniform scaled collision shape"), wxT("demonstrate scaling shape"), UniformScaledCollision},
 	{wxT("Non uniform scaled collision shape"), wxT("demonstrate scaling shape"), NonUniformScaledCollision},
 	{wxT("Scaled mesh collision"), wxT("demonstrate scaling mesh scaling collision"), ScaledMeshCollision},
-	{ wxT("Continuous collision"), wxT("show continuous collision"), ContinuousCollision },
-	{ wxT("Paper wall continuous collision"), wxT("show fast continuous collision"), ContinuousCollision1 },
-	{ wxT("Puck slide"), wxT("show continuous collision"), PuckSlide },
+	{wxT("Continuous collision"), wxT("show continuous collision"), ContinuousCollision },
+	{wxT("Paper wall continuous collision"), wxT("show fast continuous collision"), ContinuousCollision1 },
+	{wxT("Puck slide"), wxT("show continuous collision"), PuckSlide },
 	{wxT("Simple convex decomposition"), wxT("demonstrate convex decomposition and compound collision"), SimpleConvexApproximation},
 	{wxT("Multi geometry collision"), wxT("show static mesh with the ability of moving internal parts"), SceneCollision},
 	{wxT("Simple boolean operations"), wxT("demonstrate simple boolean operations "), SimpleBooleanOperations},
@@ -348,9 +348,9 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_physicsUpdateMode = 1;
 //m_hideVisualMeshes = true;
 //m_showContactPoints = true;
-m_debugDisplayMode = 2;
+//m_debugDisplayMode = 2;
 //SetDebugDisplayMode (m_debugDisplayMode);
-m_showNormalForces = true;
+//m_showNormalForces = true;
 
 //m_showAABB = true;
 //m_autoSleepState = false;

@@ -388,6 +388,8 @@ class dCustomVehicleController: public dCustomControllerBase
 	CUSTOM_JOINTS_API dBodyPartDifferential* AddDifferential(dBodyPartTire* const leftTire, dBodyPartTire* const rightTire);
 	CUSTOM_JOINTS_API dBodyPartDifferential* AddDifferential(dBodyPartDifferential* const leftDifferential, dBodyPartDifferential* const rightDifferential);
 
+	CUSTOM_JOINTS_API void LinkTiresKinematically(dBodyPartTire* const tire0, dBodyPartTire* const tire1);
+
 	CUSTOM_JOINTS_API dBodyPartEngine* AddEngine (dFloat mass, dFloat armatureRadius);
 
 	CUSTOM_JOINTS_API void SetCenterOfGravity(const dVector& comRelativeToGeomtriCenter);

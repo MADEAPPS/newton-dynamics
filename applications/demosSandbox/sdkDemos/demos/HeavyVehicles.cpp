@@ -1207,15 +1207,23 @@ class HeavyVehicleEntity: public DemoEntity
 			CalculateTireDimensions(name, width, radius);
 			// add the tire thread thickness
 			radius += 0.1f;
-			
+
 			leftTire[i] = AddTire(name, width, radius, definition.m_frontSteeringAngle, definition);
 			sprintf(name, "r_tire%d", i);
 			rightTire[i] = AddTire(name, width, radius, definition.m_frontSteeringAngle, definition);
 		}
-//dAssert(0);
-/*
+		for (int i = 1; i < 8; i++) {
+			m_controller->LinkTiresKinematically(leftTire[0], leftTire[i]);
+			m_controller->LinkTiresKinematically(rightTire[0], rightTire[i]);
+		}
+
+		dCustomVehicleController::dEngineController::dInfo engineInfo;
+
+		engineInfo.m_gearRatiosSign = 1.0f;
+		dCustomVehicleController::dBodyPartDifferential* const differential = m_controller->AddDifferential(leftTire[0], rightTire[0]);
+
 		// add vehicle brakes
-		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController(m_controller, definition.BRAKE_TORQUE);
+		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController(m_controller, definition.m_tireBrakesTorque);
 		brakes->AddTire(leftTire[0]);
 		brakes->AddTire(rightTire[0]);
 		m_controller->SetBrakes(brakes);
@@ -1226,6 +1234,7 @@ class HeavyVehicleEntity: public DemoEntity
 		brakes->AddTire(rightTire[0]);
 		m_controller->SetSteering(steering);
 
+/*
 		dCustomVehicleController::dEngineController::dInfo engineInfo;
 		engineInfo.m_mass = definition.ENGINE_MASS;
 		engineInfo.m_radio = definition.ENGINE_RADIO;
@@ -1285,7 +1294,9 @@ class HeavyVehicleEntity: public DemoEntity
 			for (dList<dCustomVehicleController::dBodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
 				dCustomVehicleController::dBodyPart* const part = node->GetInfo();
 				DemoEntity* const entPart = (DemoEntity*)part->GetUserData();
-				entPart->InterpolateMatrix(world, param);
+				if (entPart) {
+					entPart->InterpolateMatrix(world, param);
+				}
 			}
 		}
 

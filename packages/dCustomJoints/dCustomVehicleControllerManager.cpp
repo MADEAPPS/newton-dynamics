@@ -1881,6 +1881,22 @@ dCustomVehicleController::dBodyPartDifferential* dCustomVehicleController::AddDi
 	return differential;
 }
 
+
+void dCustomVehicleController::LinkTiresKinematically(dBodyPartTire* const tire0, dBodyPartTire* const tire1)
+{
+	dWheelJoint* const joint0 = (dWheelJoint*)tire0->GetJoint();
+	dWheelJoint* const joint1 = (dWheelJoint*)tire1->GetJoint();
+
+	dMatrix matrix;
+	dMatrix tireMatrix0;
+	dMatrix tireMatrix1;
+	joint0->CalculateGlobalMatrix(tireMatrix0, matrix);
+	joint1->CalculateGlobalMatrix(tireMatrix1, matrix);
+
+	dFloat gearRatio = tire0->m_data.m_radio / tire1->m_data.m_radio;
+	new dCustomGear(gearRatio, tireMatrix0.m_front, tireMatrix1.m_front.Scale (-1.0f), tire0->GetBody(), tire1->GetBody());
+}
+
 dCustomVehicleController::dBodyPartEngine* dCustomVehicleController::AddEngine (dFloat mass, dFloat armatureRadius)
 {
 	m_engine = new dBodyPartEngine (this, mass, armatureRadius);
