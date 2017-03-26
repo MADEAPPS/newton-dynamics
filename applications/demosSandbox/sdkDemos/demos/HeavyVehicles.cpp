@@ -47,11 +47,11 @@ struct VehicleParameters
 	dFloat m_tireLaretalStiffeness;
 	dFloat m_tireLongitudinalStiffness;
 	dFloat m_tireAligningMomemtTrail;
-	dFloat m_TireSuspensionSpringConstant;
-	dFloat m_TireSuspensionDamperConstant;
-	dFloat m_TireSuspensionLength;
+	dFloat m_tireSuspensionSpringConstant;
+	dFloat m_tireSuspensionDamperConstant;
+	dFloat m_tireSuspensionLength;
 	dCustomVehicleController::dBodyPartTire::Info::SuspensionType m_TireSuspensionType;
-	dFloat m_TireBrakesTorque;
+	dFloat m_tireBrakesTorque;
 	dFloat m_chassisYaxisComBias;
 	dFloat m_transmissionGearRatio0;
 	dFloat m_transmissionGearRatio1;
@@ -66,6 +66,7 @@ struct VehicleParameters
 	dFloat m_aerodynamicsDownForceSpeedFactor;
 	int m_wheelHasCollisionFenders;
 	int m_differentialType; // 0 rear wheel drive, 1 front wheel drive, 3 four wheel drive
+	dMatrix m_aligmentMatrix;
 };
 
 
@@ -109,6 +110,7 @@ static VehicleParameters heavyTruck =
 	1.5f,								// GEAR_3
 	1.5f,								// GEAR_4
 	1.5f,								// GEAR_5
+	1.5f,								// GEAR_5
 	2.9f,								// REVERSE_GEAR
 	0.15f,								// TIRE_PIVOT_OFFSET_Y
 
@@ -116,7 +118,8 @@ static VehicleParameters heavyTruck =
 	2.0f,								// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,									// WHEEL_HAS_FENDER
-	1,									// DIFFERENTIAL_TYPE
+	2,									// DIFFERENTIAL_TYPE
+	dRollMatrix(3.141592f * 90.0f / 180.0f),
 };
 
 static VehicleParameters lightTruck = 
@@ -159,14 +162,17 @@ static VehicleParameters lightTruck =
 	1.5f,								// GEAR_3
 	1.5f,								// GEAR_4
 	1.5f,								// GEAR_5
+	1.5f,								// GEAR_5
 	2.9f,								// REVERSE_GEAR
+
 	0.15f,								// TIRE_PIVOT_OFFSET_Y
 
 	1.0f,								// DOWNFORCE_WEIGHT_FACTOR_0
 	2.0f,								// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,									// WHEEL_HAS_FENDER
-	1,									// DIFFERENTIAL_TYPE
+	2,									// DIFFERENTIAL_TYPE
+	dRollMatrix(3.141592f * 90.0f / 180.0f),
 };
 
 static VehicleParameters m1a1Param = 
@@ -243,14 +249,17 @@ static VehicleParameters m1a1Param =
 	1.5f,								// GEAR_3
 	1.5f,								// GEAR_4
 	1.5f,								// GEAR_5
+	1.5f,								// GEAR_6
 	2.9f,								// REVERSE_GEAR
-	0.15f,								// TIRE_PIVOT_OFFSET_Y
+
+   -0.0f,								// TIRE_PIVOT_OFFSET_Y
 
 	1.0f,								// DOWNFORCE_WEIGHT_FACTOR_0
 	2.0f,								// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 								// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,									// WHEEL_HAS_FENDER
 	1,									// DIFFERENTIAL_TYPE
+	dRollMatrix(3.141592f * 90.0f / 180.0f),
 };
 
 
@@ -699,8 +708,6 @@ class HeavyVehicleEntity: public DemoEntity
 
 	dCustomVehicleController::dBodyPartTire* AddTire(const char* const tireName, dFloat width, dFloat radius, dFloat maxSteerAngle, const VehicleParameters& definition) 
 	{
-		dAssert(0);
-/*
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
 		DemoEntity* const tirePart = entity->Find (tireName);
@@ -709,9 +716,7 @@ class HeavyVehicleEntity: public DemoEntity
 		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(entity));
 
 		// add the offset location
-		tireMatrix.m_posit += definition.TIRE_PIVOT_OFFSET_Y;
-		//lower the tire base position by some distance
-		//tireMatrix.m_posit.m_y -= suspensionLength * 0.25f;
+		tireMatrix.m_posit.m_y += definition.m_tirePivotOffset;
 
 		// add and alignment matrix,to match visual mesh to physics collision shape
 		dMatrix aligmentMatrix (dGetIdentityMatrix());
@@ -719,7 +724,7 @@ class HeavyVehicleEntity: public DemoEntity
 			aligmentMatrix = dYawMatrix(3.141592f);
 		}
 
-		TireAligmentTransform* const aligmentTransform = new TireAligmentTransform (definition.m_tireAligment * aligmentMatrix);
+		TireAligmentTransform* const aligmentTransform = new TireAligmentTransform (definition.m_aligmentMatrix * aligmentMatrix);
 		tirePart->SetUserData(aligmentTransform);
 
 		// add the tire to the vehicle
@@ -727,22 +732,20 @@ class HeavyVehicleEntity: public DemoEntity
 
 		tireInfo.m_userData = tirePart;
 		tireInfo.m_location = tireMatrix.m_posit;
-		tireInfo.m_mass = definition.TIRE_MASS;
+		tireInfo.m_mass = definition.m_tireMass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
 		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416 / 180.0f;
-		tireInfo.m_dampingRatio = definition.SUSPENSION_DAMPER;
-		tireInfo.m_springStrength = definition.SUSPENSION_SPRING;
-		tireInfo.m_suspesionlenght = definition.SUSPENSION_LENGTH;
-		tireInfo.m_lateralStiffness = definition.LATERAL_STIFFNESS;
-		tireInfo.m_longitudialStiffness = definition.LONGITUDINAL_STIFFNESS;
-		tireInfo.m_aligningMomentTrail = definition.ALIGNING_MOMENT_TRAIL;
-		tireInfo.m_suspentionType = definition.TIRE_SUSPENSION_TYPE;
-		tireInfo.m_hasFender = definition.WHEEL_HAS_FENDER;
+		tireInfo.m_dampingRatio = definition.m_tireSuspensionDamperConstant;
+		tireInfo.m_springStrength = definition.m_tireSuspensionSpringConstant;
+		tireInfo.m_suspesionlenght = definition.m_tireSuspensionLength;
+		tireInfo.m_lateralStiffness = definition.m_tireLaretalStiffeness;
+		tireInfo.m_longitudialStiffness = definition.m_tireLongitudinalStiffness;
+		tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
+		tireInfo.m_suspentionType = definition.m_TireSuspensionType;
+		tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
 
 		return m_controller->AddTire (tireInfo);
-*/
-		return NULL;
 	}
 
 
@@ -1205,9 +1208,9 @@ class HeavyVehicleEntity: public DemoEntity
 			// add the tire thread thickness
 			radius += 0.1f;
 			
-//			leftTire[i] = AddTire(name, width, radius, definition.m_frontSteeringAngle, definition);
+			leftTire[i] = AddTire(name, width, radius, definition.m_frontSteeringAngle, definition);
 			sprintf(name, "r_tire%d", i);
-//			rightTire[i] = AddTire(name, width, radius, definition.m_frontSteeringAngle, definition);
+			rightTire[i] = AddTire(name, width, radius, definition.m_frontSteeringAngle, definition);
 		}
 //dAssert(0);
 /*
@@ -1621,8 +1624,8 @@ void MilitaryTransport (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 
-//	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.1f, 200.0f, -30.0f);
+	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+//	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.1f, 200.0f, -30.0f);
 
 //	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dMatrix location (dGetIdentityMatrix());
@@ -1687,6 +1690,7 @@ for (int i = 0; i < 5; i ++){
 	//scene->SetCameraMouseLock (true);
 	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
 
+/*
 	location.m_posit.m_x += 20.0f;
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	int count = 5;
@@ -1703,5 +1707,6 @@ for (int i = 0; i < 5; i ++){
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+*/
 }
 

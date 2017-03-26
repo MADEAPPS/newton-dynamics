@@ -163,9 +163,13 @@
 
 
 
-// by default newton run on a separate thread, optionally concurrent with the calling thread, it also uses a thread job pool for multi core systems.
-// define DG_USE_THREAD_EMULATION on the command line for platform that do not support hardware multi threading or if multi threading is not stable 
-// #define DG_USE_THREAD_EMULATION
+// by default newton run on a separate thread and 
+// optionally concurrent with the calling thread,
+// it also uses a thread job pool for multi core systems.
+// define DG_USE_THREAD_EMULATION on the command line for 
+// platform that do not support hardware multi threading or 
+// if the and application want to control threading at the application level 
+//#define DG_USE_THREAD_EMULATION
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#if _MSC_VER < 1700
