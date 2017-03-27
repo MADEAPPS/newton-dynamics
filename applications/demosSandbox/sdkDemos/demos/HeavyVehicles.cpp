@@ -939,10 +939,8 @@ class HeavyVehicleEntity: public DemoEntity
 			reverseGasPedal = 1.0f;
 		}
 
-
-		// see if Brake is on
-		if (mainWindow->GetKeyState ('S')) {
-			brakePedal = 1.0f;
+		if (mainWindow->GetKeyState(' ')) {
+			handBrakePedal = 1.0f;
 		}
 
 #if 0
@@ -977,122 +975,130 @@ class HeavyVehicleEntity: public DemoEntity
 		if (steering) {
 			steering->SetParam(steeringVal);
 		}
-
-		if (!engine) {
-			return;
-		}
-
-		engine->SetDifferentialLock (engineDifferentialLock ? true : false);
-		switch (m_drivingState) 
-		{
-			case m_engineOff:
+		
+		if (engine) {
+			engine->SetDifferentialLock(engineDifferentialLock ? true : false);
+			switch (m_drivingState)
 			{
-				if (engineIgnitionKey) {
-					m_drivingState = m_engineIdle;
-					engine->SetIgnition(true);
-					brakes->SetParam(0.0f);
-					engine->SetGear(engine->GetNeutralGear());
-				} else {
-					engine->SetIgnition(false);
-					engine->SetGear(engine->GetFirstGear());
-					brakes->SetParam(1.0f);
+				case m_engineOff:
+				{
+					if (engineIgnitionKey) {
+						m_drivingState = m_engineIdle;
+						engine->SetIgnition(true);
+						brakes->SetParam(0.0f);
+						engine->SetGear(engine->GetNeutralGear());
+					}
+					else {
+						engine->SetIgnition(false);
+						engine->SetGear(engine->GetFirstGear());
+						brakes->SetParam(1.0f);
+					}
+					break;
 				}
-				break;
-			}
 
-			case m_engineIdle:
-			{
-				//brakes->SetParam(0.0f);
-				brakes->SetParam(handBrakePedal);
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineOff;
-				} else {
+				case m_engineIdle:
+				{
+					//brakes->SetParam(0.0f);
+					brakes->SetParam(handBrakePedal);
+					if (!engineIgnitionKey) {
+						m_drivingState = m_engineOff;
+					}
+					else {
+						if (forwardGasPedal) {
+							m_drivingState = m_preDriveForward;
+						}
+						else if (reverseGasPedal) {
+							m_drivingState = m_preDriveReverse;
+						}
+					}
+					break;
+				}
+
+				case m_engineStop:
+				{
+					if (forwardGasPedal || reverseGasPedal) {
+						brakes->SetParam(1.0f);
+					}
+					else {
+						m_drivingState = m_engineIdle;
+					}
+					break;
+				}
+
+				case m_preDriveForward:
+				{
+					if (engine->GetSpeed() < -5.0f) {
+						brakes->SetParam(0.5f);
+						engine->SetClutchParam(0.0f);
+						engine->SetGear(engine->GetNeutralGear());
+					}
+					else {
+						m_drivingState = m_driveForward;
+						engine->SetGear(engine->GetFirstGear());
+					}
+					break;
+				}
+
+				case m_driveForward:
+				{
+					engine->SetParam(forwardGasPedal);
+					engine->SetClutchParam(cluthPedal);
+					brakes->SetParam(handBrakePedal);
+					if (reverseGasPedal) {
+						brakes->SetParam(reverseGasPedal * 0.25f);
+						if (engine->GetSpeed() < 5.0f) {
+							engine->SetGear(engine->GetNeutralGear());
+							m_drivingState = m_engineStop;
+						}
+					}
+					else {
+						brakes->SetParam(0.0f);
+					}
+
+					if (!engineIgnitionKey) {
+						m_drivingState = m_engineStop;
+					}
+					break;
+				}
+
+				case m_preDriveReverse:
+				{
+					if (engine->GetSpeed() > 5.0f) {
+						brakes->SetParam(0.5f);
+						engine->SetClutchParam(0.0f);
+						engine->SetGear(engine->GetNeutralGear());
+					}
+					else {
+						m_drivingState = m_driveReverse;
+						engine->SetGear(engine->GetReverseGear());
+					}
+					break;
+				}
+
+				case m_driveReverse:
+				{
+					engine->SetParam(reverseGasPedal);
+					engine->SetClutchParam(cluthPedal);
+					brakes->SetParam(handBrakePedal);
 					if (forwardGasPedal) {
-						m_drivingState = m_preDriveForward;
-					} else if (reverseGasPedal) {
-						m_drivingState = m_preDriveReverse;
+						brakes->SetParam(forwardGasPedal * 0.25f);
+						if (engine->GetSpeed() > -5.0f) {
+							engine->SetGear(engine->GetNeutralGear());
+							m_drivingState = m_engineStop;
+						}
 					}
-				}
-				break;
-			}
+					else {
+						brakes->SetParam(0.0f);
+					}
 
-			case m_engineStop:
-			{
-				if (forwardGasPedal || reverseGasPedal) {
-					brakes->SetParam(1.0f);
-				} else {
-					m_drivingState = m_engineIdle;
-				}
-				break;
-			}
-
-			case m_preDriveForward:
-			{
-				if (engine->GetSpeed() < -5.0f) {
-					brakes->SetParam(0.5f);
-					engine->SetClutchParam(0.0f);
-					engine->SetGear(engine->GetNeutralGear());
-				} else {
-					m_drivingState = m_driveForward;
-					engine->SetGear(engine->GetFirstGear());
-				}
-				break;
-			}
-
-			case m_driveForward:
-			{
-				engine->SetParam(forwardGasPedal);
-				engine->SetClutchParam(cluthPedal);
-				brakes->SetParam(handBrakePedal);
-				if (reverseGasPedal) {
-					brakes->SetParam(reverseGasPedal * 0.25f);
-					if (engine->GetSpeed() < 5.0f) {
-						engine->SetGear(engine->GetNeutralGear());
+					if (!engineIgnitionKey) {
 						m_drivingState = m_engineStop;
 					}
-				} else {
-					brakes->SetParam(0.0f);
+					break;
 				}
-
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineStop;
-				}
-				break;
 			}
-
-			case m_preDriveReverse:
-			{
-				if (engine->GetSpeed() > 5.0f) {
-					brakes->SetParam(0.5f);
-					engine->SetClutchParam(0.0f);
-					engine->SetGear(engine->GetNeutralGear());
-				} else {
-					m_drivingState = m_driveReverse;
-					engine->SetGear(engine->GetReverseGear());
-				}
-				break;
-			}
-
-			case m_driveReverse:
-			{
-				engine->SetParam(reverseGasPedal);
-				engine->SetClutchParam(cluthPedal);
-				brakes->SetParam(handBrakePedal);
-				if (forwardGasPedal) {
-					brakes->SetParam(forwardGasPedal * 0.25f);
-					if (engine->GetSpeed() > -5.0f) {
-						engine->SetGear(engine->GetNeutralGear());
-						m_drivingState = m_engineStop;
-					}
-				} else {
-					brakes->SetParam(0.0f);
-				}
-
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineStop;
-				}
-				break;
-			}
+		} else if (brakes) {
+ 			brakes->SetParam(handBrakePedal);
 		}
 	}
 
