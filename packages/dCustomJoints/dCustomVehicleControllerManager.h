@@ -159,7 +159,12 @@ class dCustomVehicleController: public dCustomControllerBase
 		dBodyPartDifferential();
 		void Init(dCustomVehicleController* const controller, dFloat mass, dFloat inertia);
 		~dBodyPartDifferential();
+
+		void SetTrackMode(bool mode);
 		void ProjectError();
+
+		dFloat m_turnTrackeSpeed;
+		bool m_isTracked;
 	};
 
 	class dBodyPartTire: public dBodyPart

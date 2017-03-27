@@ -159,8 +159,10 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 	public:
 	dDifferentialJoint(const dMatrix& pinAndPivotFrame, NewtonBody* const differentialBody, NewtonBody* const chassisBody)
 		:dCustomUniversal(pinAndPivotFrame, differentialBody, chassisBody)
-		,m_slipDifferentialSpeed(0.0f)
-		,m_slipDifferentialOn(true)
+//		,m_slipDifferentialSpeed(0.0f)
+//		,m_slipDifferentialOn(true)
+		,m_turnSpeed(0.0f)
+		,m_isTractionDifferential(false)
 	{
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
@@ -221,22 +223,35 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 
 		// apply differential
 		dFloat differentailOmega = differentialMatrix.m_front.DotProduct3(relOmega);
-		if (differentailOmega > D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
-			dFloat wAlpha = (D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
+
+m_isTractionDifferential = true;
+m_turnSpeed = 5.0f;
+
+		if (m_isTractionDifferential) {
+			dFloat wAlpha = (m_turnSpeed - differentailOmega) / timestep;
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
-			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-		} else if (differentailOmega < -D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
-			dFloat wAlpha = (-D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		} else {
+			if (differentailOmega > D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
+				dFloat wAlpha = (D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
+				NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
+				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			}
+			else if (differentailOmega < -D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS) {
+				dFloat wAlpha = (-D_LIMITED_SLIP_DIFFERENTIAL_LOCK_RPS - differentailOmega) / timestep;
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
+				NewtonUserJointSetRowAcceleration(m_joint, wAlpha);
+				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			}
 		}
 	}
 
 	dMatrix m_baseOffsetMatrix;
-	dFloat m_slipDifferentialSpeed;
-	bool m_slipDifferentialOn;
+//	dFloat m_slipDifferentialSpeed;
+//	bool m_slipDifferentialOn;
+	dFloat m_turnSpeed;
+	bool m_isTractionDifferential;
 };
 
 
@@ -831,6 +846,8 @@ void dCustomVehicleController::dBodyPartEngine::ApplyTorque(dFloat torqueMag)
 
 dCustomVehicleController::dBodyPartDifferential::dBodyPartDifferential()
 	:dBodyPart()
+	,m_turnTrackeSpeed(0.0f)
+	,m_isTracked(false)
 {
 }
 
@@ -882,6 +899,11 @@ xxx++;
 
 dCustomVehicleController::dBodyPartDifferential::~dBodyPartDifferential()
 {
+}
+
+void dCustomVehicleController::dBodyPartDifferential::SetTrackMode(bool mode)
+{
+	m_isTracked = mode;
 }
 
 void dCustomVehicleController::dBodyPartDifferential::ProjectError()
@@ -1839,7 +1861,6 @@ dCustomVehicleController::dBodyPartDifferential* dCustomVehicleController::AddDi
 
 	return differential;
 }
-
 
 dCustomVehicleController::dBodyPartDifferential* dCustomVehicleController::AddDifferential(dBodyPartDifferential* const leftDifferential, dBodyPartDifferential* const rightDifferential)
 {
