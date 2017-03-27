@@ -795,7 +795,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 
 						for (dgInt32 i = 0; i < 3; i++) {
 							dgMinkFace* const twinFace = face->m_twin[i];
-							if (!twinFace->m_mark) {
+							if (twinFace && !twinFace->m_mark) {
 								m_faceStack[stackIndex] = twinFace;
 								stackIndex++;
 								dgAssert(stackIndex < sizeof (m_faceStack) / sizeof (m_faceStack[0]));
@@ -813,7 +813,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 					dgInt32 j0 = 2;
 					for (dgInt32 j1 = 0; j1 < 3; j1++) {
 						dgMinkFace* const twinFace = face->m_twin[j0];
-						if (!twinFace->m_mark) {
+						if (twinFace && !twinFace->m_mark) {
 							dgMinkFace* const newFace = AddFace(m_vertexIndex, face->m_vertex[j0], face->m_vertex[j1]);
 							PushFace(newFace);
 

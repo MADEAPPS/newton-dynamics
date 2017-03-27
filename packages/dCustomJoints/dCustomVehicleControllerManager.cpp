@@ -224,9 +224,6 @@ class dCustomVehicleController::dDifferentialJoint: public dCustomUniversal
 		// apply differential
 		dFloat differentailOmega = differentialMatrix.m_front.DotProduct3(relOmega);
 
-m_isTractionDifferential = true;
-m_turnSpeed = 5.0f;
-
 		if (m_isTractionDifferential) {
 			dFloat wAlpha = (m_turnSpeed - differentailOmega) / timestep;
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &differentialMatrix.m_front[0]);
@@ -846,8 +843,7 @@ void dCustomVehicleController::dBodyPartEngine::ApplyTorque(dFloat torqueMag)
 
 dCustomVehicleController::dBodyPartDifferential::dBodyPartDifferential()
 	:dBodyPart()
-	,m_turnTrackeSpeed(0.0f)
-	,m_isTracked(false)
+	,m_differentialSpeed(0.0f)
 {
 }
 
@@ -901,9 +897,11 @@ dCustomVehicleController::dBodyPartDifferential::~dBodyPartDifferential()
 {
 }
 
-void dCustomVehicleController::dBodyPartDifferential::SetTrackMode(bool mode)
+void dCustomVehicleController::dBodyPartDifferential::SetTrackMode(bool mode, dFloat trackTurnSpeed)
 {
-	m_isTracked = mode;
+	dDifferentialJoint* const joint = (dDifferentialJoint*)m_joint;
+	joint->m_isTractionDifferential = mode;
+	m_differentialSpeed = trackTurnSpeed;
 }
 
 void dCustomVehicleController::dBodyPartDifferential::ProjectError()
@@ -1285,8 +1283,9 @@ dFloat dCustomVehicleController::dEngineController::GetTopSpeed() const
 	return m_info.m_vehicleTopSpeed;
 }
 
-dCustomVehicleController::dSteeringController::dSteeringController (dCustomVehicleController* const controller)
+dCustomVehicleController::dSteeringController::dSteeringController (dCustomVehicleController* const controller, dBodyPartDifferential* const differential)
 	:dController(controller)
+	,m_differential(differential)
 	,m_isSleeping(false)
 {
 }
@@ -1294,12 +1293,18 @@ dCustomVehicleController::dSteeringController::dSteeringController (dCustomVehic
 
 void dCustomVehicleController::dSteeringController::Update(dFloat timestep)
 {
-	m_isSleeping = true;
-	for (dList<dBodyPartTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
-		dBodyPartTire& tire = *node->GetInfo();
-		dWheelJoint* const joint = (dWheelJoint*)tire.m_joint;
-		tire.SetSteerAngle(m_param, timestep);
-		m_isSleeping &= dAbs (joint->m_steerAngle1 - joint->m_steerAngle0) < 1.0e-4f;
+	dDifferentialJoint* const joint = (dDifferentialJoint*) m_differential->GetJoint();
+	if (joint->m_isTractionDifferential) {
+		joint->m_turnSpeed = -m_param * m_differential->m_differentialSpeed;
+
+	} else {
+		m_isSleeping = true;
+		for (dList<dBodyPartTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
+			dBodyPartTire& tire = *node->GetInfo();
+			dWheelJoint* const joint = (dWheelJoint*)tire.m_joint;
+			tire.SetSteerAngle(m_param, timestep);
+			m_isSleeping &= dAbs(joint->m_steerAngle1 - joint->m_steerAngle0) < 1.0e-4f;
+		}
 	}
 }
 
@@ -2300,7 +2305,7 @@ void dCustomVehicleControllerManager::OnTireContactsProcess(const NewtonJoint* c
 				dAssert (dAbs (longitudinalSpeed) > 0.01f);
 
 				tire->m_lateralSlip = dAbs(lateralSpeed / longitudinalSpeed);
-
+/*
 dVector chassisVeloc;
 dVector chassisOmega;
 dMatrix chassisMatrix1;
@@ -2313,7 +2318,7 @@ dFloat y = chassisOmega.CrossProduct(tireMatrix.m_posit - chassisMatrix1.m_posit
 dFloat xxx = tireJoint->m_steerAngle0;
 dFloat xxxx = dFloat(atan (controller->m_sideSlip + y/x)) + xxx;
 dTrace (("%d %f %f\n", tire->m_index, xxxx * 180.0f/3.1416f, dAtan2 (lateralSpeed, dAbs(longitudinalSpeed)) * 180.0f/3.1416f));
-
+*/
 	
 				dFloat aligningMoment;
 				dFloat lateralFrictionCoef;
@@ -2488,7 +2493,7 @@ void dCustomVehicleController::CalculateSideSlipDynamics(dFloat timestep)
 	}
 
 static int xxx;
-dTrace (("\n%d b(%f) rate(%f)\n", xxx, m_sideSlip * 180.0f/3.1416f, (m_sideSlip - m_prevSideSlip) * (180.0f / 3.1416f) / timestep));
+//dTrace (("\n%d b(%f) rate(%f)\n", xxx, m_sideSlip * 180.0f/3.1416f, (m_sideSlip - m_prevSideSlip) * (180.0f / 3.1416f) / timestep));
 xxx ++;
 
 if ((dAbs (m_sideSlip * 180.0f/3.1416f) > 35.0f))  {

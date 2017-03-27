@@ -160,11 +160,9 @@ class dCustomVehicleController: public dCustomControllerBase
 		void Init(dCustomVehicleController* const controller, dFloat mass, dFloat inertia);
 		~dBodyPartDifferential();
 
-		void SetTrackMode(bool mode);
+		void SetTrackMode(bool mode, dFloat differentialSpeed);
 		void ProjectError();
-
-		dFloat m_turnTrackeSpeed;
-		bool m_isTracked;
+		dFloat m_differentialSpeed;
 	};
 
 	class dBodyPartTire: public dBodyPart
@@ -362,13 +360,13 @@ class dCustomVehicleController: public dCustomControllerBase
 	class dSteeringController: public dController
 	{
 		public:
-		CUSTOM_JOINTS_API dSteeringController (dCustomVehicleController* const controller);
+		CUSTOM_JOINTS_API dSteeringController (dCustomVehicleController* const controller, dBodyPartDifferential* const differential);
 		CUSTOM_JOINTS_API void AddTire (dBodyPartTire* const tire);
 		
 		protected:
 		virtual void Update(dFloat timestep);
-
 		dList<dBodyPartTire*> m_tires;
+		dBodyPartDifferential* m_differential;
 		bool m_isSleeping;
 		friend class dCustomVehicleController;
 	};

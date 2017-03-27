@@ -346,12 +346,14 @@ class BasicCarEntity: public DemoEntity
 		offset2 = dVector (-1.7f, -0.1f, 1.0f, 1.0f);
 		rearTires[1] = AddTire (offset2, width, radius, parameters.TIRE_MASS, 0.0f, parameters.SUSPENSION_LENGTH, parameters.SUSPENSION_SPRING, parameters.SUSPENSION_DAMPER, parameters.LATERAL_STIFFNESS, parameters.LONGITUDINAL_STIFFNESS, parameters.ALIGNING_MOMENT_TRAIL, parameters.m_tireaLigment);
 
+		dAssert(0);
+/*
 		// add a steering Wheel component
 		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController (m_controller);
 		steering->AddTire (frontTires[0]);
 		steering->AddTire (frontTires[1]);
 		m_controller->SetSteering(steering);
-
+*/
 		// add all wheels brakes component
 		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController (m_controller, parameters.BRAKE_TORQUE);
 		for (int i = 0; i < 2; i ++) {

@@ -974,12 +974,15 @@ class HeavyVehicleEntity: public DemoEntity
 	#endif
 #endif
 
-		if (!(steering && engine)) {
+		if (steering) {
+			steering->SetParam(steeringVal);
+		}
+
+		if (!engine) {
 			return;
 		}
 
 		engine->SetDifferentialLock (engineDifferentialLock ? true : false);
-		steering->SetParam(steeringVal);
 		switch (m_drivingState) 
 		{
 			case m_engineOff:
@@ -1219,6 +1222,7 @@ class HeavyVehicleEntity: public DemoEntity
 
 		engineInfo.m_gearRatiosSign = 1.0f;
 		dCustomVehicleController::dBodyPartDifferential* const differential = m_controller->AddDifferential(leftTire[0], rightTire[0]);
+		differential->SetTrackMode(true, 5.0f);
 
 		// add vehicle brakes
 		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController(m_controller, definition.m_tireBrakesTorque);
@@ -1227,7 +1231,7 @@ class HeavyVehicleEntity: public DemoEntity
 		m_controller->SetBrakes(brakes);
 
 		// add a tank skid steering engine
-		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller);
+		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller, differential);
 		brakes->AddTire(leftTire[0]);
 		brakes->AddTire(rightTire[0]);
 		m_controller->SetSteering(steering);

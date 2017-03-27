@@ -441,15 +441,6 @@ class SuperCarEntity: public DemoEntity
 		CalculateTireDimensions ("rl_tire", width, radius);
 		dCustomVehicleController::dBodyPartTire* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		dCustomVehicleController::dBodyPartTire* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
-
-		//calculate the Ackerman parameters
-		// add a steering Wheel component
-		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController (m_controller);
-		steering->AddTire(leftFrontTire);
-		steering->AddTire(rightFrontTire);
-		steering->AddTire(leftRearTire);
-		steering->AddTire(rightRearTire);
-		m_controller->SetSteering(steering);
 		
 		// add vehicle brakes
 		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque);
@@ -519,6 +510,15 @@ class SuperCarEntity: public DemoEntity
 			}
 		}
 		dAssert(differential);
+
+		// add a steering Wheel component
+		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller, differential);
+		steering->AddTire(leftFrontTire);
+		steering->AddTire(rightFrontTire);
+		steering->AddTire(leftRearTire);
+		steering->AddTire(rightRearTire);
+		m_controller->SetSteering(steering);
+
 
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
