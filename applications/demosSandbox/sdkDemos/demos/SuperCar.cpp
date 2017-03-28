@@ -124,7 +124,7 @@ static CarDefinition monsterTruck =
 	2.0f,										// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	0,											// WHEEL_HAS_FENDER
-	1,											// DIFFERENTIAL_TYPE
+	2,											// DIFFERENTIAL_TYPE
 };
 
 static CarDefinition viper = 
@@ -166,7 +166,7 @@ static CarDefinition viper =
 	2.0f,										// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	1,											// WHEEL_HAS_FENDER
-	2,											// DIFFERENTIAL_TYPE
+	0,											// DIFFERENTIAL_TYPE
 };
 
 
@@ -1571,17 +1571,6 @@ void SuperCar (DemoEntityManager* const scene)
 	dFloat u = 1.0f;
 	dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
 	for (int i = 0; i < 1; i ++) {
-/*
-		dMatrix location0 (manager->CalculateSplineMatrix (u));
-		location0.m_posit += location0.m_right.Scale (3.0f);
-		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
-		location0.m_posit.m_y += 2.0f;
-		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "monsterTruck.ngd", 3.0f, monsterTruck);
-		vehicle0->BuildWheelCar(monsterTruck);
-		u -= 0.005f;
-*/
-/*
-
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit += location1.m_right.Scale ( 3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + offset, 200.0f);
@@ -1591,21 +1580,26 @@ void SuperCar (DemoEntityManager* const scene)
 		u -= 0.005f;
 
 		dMatrix location2(manager->CalculateSplineMatrix(u));
-		location2.m_posit += location0.m_right.Scale(3.0f);
 		location2.m_posit = FindFloor(scene->GetNewton(), location2.m_posit + offset, 200.0f);
 		location2.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle2 = new SuperCarEntity(scene, manager, location2, "lambDiablo.ngd", 3.0f, viper);
 		vehicle2->BuildWheelCar(viper);
 		u -= 0.005f;
-*/
-//		dMatrix location3(manager->CalculateSplineMatrix(u));
-		dMatrix location3(dGetIdentityMatrix());
+
+		dMatrix location3(manager->CalculateSplineMatrix(u));
 		location3.m_posit = FindFloor(scene->GetNewton(), location3.m_posit + offset, 200.0f);
 		location3.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle3 = new SuperCarEntity(scene, manager, location3, "viper.ngd", -3.0f, viper);
 		vehicle3->BuildWheelCar(viper);
 		u -= 0.005f;
 
+		dMatrix location0(manager->CalculateSplineMatrix(u));
+		location0.m_posit += location0.m_right.Scale(3.0f);
+		location0.m_posit = FindFloor(scene->GetNewton(), location0.m_posit + offset, 200.0f);
+		location0.m_posit.m_y += 2.0f;
+		SuperCarEntity* const vehicle0 = new SuperCarEntity(scene, manager, location0, "monsterTruck.ngd", 3.0f, monsterTruck);
+		vehicle0->BuildWheelCar(monsterTruck);
+		u -= 0.005f;
 	}
 
 	dCustomVehicleController* const controller = &manager->GetLast()->GetInfo();
@@ -1631,7 +1625,7 @@ void SuperCar (DemoEntityManager* const scene)
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
 	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
-/*
+
 	size = dVector(0.75f, 0.35f, 0.75f, 0.0f);
 	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
@@ -1643,6 +1637,6 @@ void SuperCar (DemoEntityManager* const scene)
 //	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-*/
+
 }
 
