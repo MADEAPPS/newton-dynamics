@@ -901,9 +901,9 @@ void dgMeshEffect::LoadTetraMesh (const char* const filename)
 		fscanf(file, "%d", &vertexCount);
 		dgArray<dgBigVector> points(GetAllocator());
 		for (dgInt32 i = 0; i < vertexCount; i ++) {
-			dgFloat32 x;
-			dgFloat32 y;
-			dgFloat32 z;
+			float x;
+			float y;
+			float z;
 			fscanf(file, "%f %f %f", &x, &y, &z);
 			points[i] = dgBigVector (x, y, z, dgFloat32 (0.0f));
 		}
