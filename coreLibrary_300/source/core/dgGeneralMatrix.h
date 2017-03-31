@@ -765,7 +765,7 @@ bool dgSolveDantzigLCP(dgInt32 size, T* const matrix, T* const choleskyMatrix, T
 
 			if (dgAbsf(r0[index]) > T(1.0e-12f)) {
 				if (calculateDelta_x) {
-				T dir(dgFloat32(1.0f));
+					T dir(dgFloat32(1.0f));
 					dgCalculateDelta_x(size, dir, index, matrix, choleskyMatrix, delta_x);
 				}
 
