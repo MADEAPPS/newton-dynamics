@@ -19,13 +19,17 @@
 class dInverseKinematic: public dContainersAlloc
 {
 	public:
-	class dIKNode
+	class dIKNode: public dContainersAlloc
 	{
 		public:
+		DCONTAINERS_API dIKNode();
 		DCONTAINERS_API dIKNode(dIKNode* const parent);
 		DCONTAINERS_API ~dIKNode();
 
 		protected:
+		dMatrix m_matrix;
+		dVector m_pin;
+
 		dIKNode* m_parent;
 		dIKNode* m_child;
 		dIKNode* m_sibling;

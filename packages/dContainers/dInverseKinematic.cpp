@@ -13,8 +13,21 @@
 #include "dInverseKinematic.h"
 
 
+dInverseKinematic::dIKNode::dIKNode()
+	:dContainersAlloc()
+	,m_matrix(dGetIdentityMatrix())
+	,m_pin(0.0f)
+	,m_parent(NULL)
+	,m_child(NULL)
+	,m_sibling(NULL)
+{
+}
+
 dInverseKinematic::dIKNode::dIKNode(dIKNode* const parent)
-	:m_parent(parent)
+	:dContainersAlloc()
+	,m_matrix(dGetIdentityMatrix())
+	,m_pin(0.0f)
+	,m_parent(parent)
 	,m_child(NULL)
 	,m_sibling(NULL)
 {
