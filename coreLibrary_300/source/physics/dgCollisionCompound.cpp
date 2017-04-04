@@ -1149,7 +1149,14 @@ void dgCollisionCompound::SetCollisionMatrix (dgTreeArray::dgTreeNode* const nod
 		dgWorld* const world = m_world;
 		dgNodeBase* const baseNode = node->GetInfo();
 		dgCollisionInstance* const instance = baseNode->GetShape();
-		instance->SetLocalMatrix(matrix);
+
+		dgVector scale;
+		dgMatrix localMatrix;
+		matrix.PolarDecomposition(localMatrix, scale, instance->m_aligmentMatrix);
+
+//		instance->SetLocalMatrix(matrix);
+		instance->SetLocalMatrix(localMatrix);
+		instance->SetScale(scale);
 
 		dgVector p0;
 		dgVector p1;

@@ -430,12 +430,7 @@ void dgCollisionInstance::SetLocalMatrix (const dgMatrix& matrix)
 	m_localMatrix[1][3] = dgFloat32 (0.0f);
 	m_localMatrix[2][3] = dgFloat32 (0.0f);
 	m_localMatrix[3][3] = dgFloat32 (1.0f);
-
-#ifdef _DEBUG
-	dgFloat32 det = m_localMatrix.m_right.DotProduct3(m_localMatrix.m_front.CrossProduct3(m_localMatrix.m_up));
-	dgAssert (det > dgFloat32 (0.999f));
-	dgAssert (det < dgFloat32 (1.001f));
-#endif
+	dgAssert(m_localMatrix.TestOrthogonal());
 }
 
 
