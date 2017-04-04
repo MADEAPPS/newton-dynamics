@@ -15,16 +15,20 @@
 
 #include "dContainersStdAfx.h"
 #include "dContainersAlloc.h"
-#include "dBaseHierarchy.h"
 
 class dInverseKinematic: public dContainersAlloc
 {
 	public:
-	class dIKNode: public dHierarchy<dIKNode>
+	class dIKNode
 	{
 		public:
-		DCONTAINERS_API dIKNode();
+		DCONTAINERS_API dIKNode(dIKNode* const parent);
 		DCONTAINERS_API ~dIKNode();
+
+		protected:
+		dIKNode* m_parent;
+		dIKNode* m_child;
+		dIKNode* m_sibling;
 	};
 
 	DCONTAINERS_API dInverseKinematic();

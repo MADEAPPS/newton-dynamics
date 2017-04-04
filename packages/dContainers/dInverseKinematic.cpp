@@ -13,13 +13,24 @@
 #include "dInverseKinematic.h"
 
 
-dInverseKinematic::dIKNode::dIKNode()
-	:dHierarchy<dIKNode>()
+dInverseKinematic::dIKNode::dIKNode(dIKNode* const parent)
+	:m_parent(parent)
+	,m_child(NULL)
+	,m_sibling(NULL)
 {
+	if (m_parent) {
+		m_sibling = m_parent->m_child;
+		m_parent->m_child = this;
+	}
 }
 
 dInverseKinematic::dIKNode::~dIKNode()
 {
+	dIKNode* next;
+	for (dIKNode* ptr = m_child; ptr; ptr = next) {
+		next = ptr->m_sibling;
+		delete ptr;
+	}
 }
 
 
