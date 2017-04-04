@@ -15,7 +15,8 @@
 #define D_BEZIER_LOCAL_BUFFER_SIZE 256
 
 dBezierSpline::dBezierSpline ()
-	:m_knotVector(NULL)
+	:dContainersAlloc()
+	,m_knotVector(NULL)
 	,m_controlPoints(NULL) 
 	,m_degree(0)
 	,m_knotsCount(0)

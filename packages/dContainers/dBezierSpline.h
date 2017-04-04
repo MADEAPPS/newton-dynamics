@@ -15,7 +15,7 @@
 #ifndef __D_BEZIER_SPLINE_H__
 #define __D_BEZIER_SPLINE_H__
 
-class dBezierSpline : public dContainersAlloc
+class dBezierSpline: public dContainersAlloc
 {
 	public:
 
