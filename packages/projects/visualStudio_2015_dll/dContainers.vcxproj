@@ -238,9 +238,6 @@
     <ClInclude Include="..\..\dContainers\dTree.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2015_dll\newton.vcxproj">
-      <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
-    </ProjectReference>
     <ProjectReference Include="dMath.vcxproj">
       <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
     </ProjectReference>
