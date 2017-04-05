@@ -13,49 +13,125 @@
 #include "dInverseKinematic.h"
 
 
-dInverseKinematic::dIKNode::dIKNode()
-	:dContainersAlloc()
-	,m_matrix(dGetIdentityMatrix())
-	,m_pin(0.0f)
-	,m_parent(NULL)
-	,m_child(NULL)
-	,m_sibling(NULL)
+class dInverseKinematic::dIKNode: public dContainersAlloc
 {
-}
-
-dInverseKinematic::dIKNode::dIKNode(dIKNode* const parent)
-	:dContainersAlloc()
-	,m_matrix(dGetIdentityMatrix())
-	,m_pin(0.0f)
-	,m_parent(parent)
-	,m_child(NULL)
-	,m_sibling(NULL)
-{
-	if (m_parent) {
-		m_sibling = m_parent->m_child;
-		m_parent->m_child = this;
+	public:
+	dIKNode(dIKNode* const parent)
+		:dContainersAlloc()
+		,m_parent(parent)
+		,m_child(NULL)
+		,m_sibling(NULL)
+	{
+		if (m_parent) {
+			m_sibling = m_parent->m_child;
+			m_parent->m_child = this;
+		}
 	}
-}
 
-dInverseKinematic::dIKNode::~dIKNode()
-{
-	dIKNode* next;
-	for (dIKNode* ptr = m_child; ptr; ptr = next) {
-		next = ptr->m_sibling;
-		delete ptr;
+	virtual ~dIKNode()
+	{
+		dIKNode* next;
+		for (dIKNode* ptr = m_child; ptr; ptr = next) {
+			next = ptr->m_sibling;
+			delete ptr;
+		}
 	}
-}
+
+	virtual void SetPin(const dVector& pin) = 0;
+	virtual void SetPivot(const dVector& pivot) = 0;
+
+	protected:
+	dIKNode* m_parent;
+	dIKNode* m_child;
+	dIKNode* m_sibling;
+};
+
+
+class dIKNodeRoot: public dInverseKinematic::dIKNode
+{
+	public:
+	dIKNodeRoot()
+		:dIKNode(NULL)
+		,m_matrix(dGetIdentityMatrix())
+	{
+	}
+
+	virtual void SetPin(const dVector& )
+	{
+	}
+
+	virtual void SetPivot(const dVector& pivot)
+	{
+		m_matrix.m_posit = pivot;
+		m_matrix.m_posit.m_w = 1.0f;
+	}
+
+	dMatrix m_matrix;
+};
+
+
+class dIKNodeLink: public dInverseKinematic::dIKNode
+{
+	public:
+	dIKNodeLink(dIKNode* const parent)
+		:dIKNode(parent)
+		,m_axis (1.0f, 0.0f, 0.0f, 0.0f)
+		,m_pivot (0.0f)
+		,m_jointAngle(0.0f)
+	{
+	}
+
+	virtual void SetPin(const dVector& pin)
+	{
+		dFloat mag = pin.DotProduct3(pin);
+		if (mag > 1.0e-8f) {
+			m_axis = pin.Scale(1.0f / dSqrt(mag));
+		} else {
+			m_axis = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+		}
+		m_axis.m_w = 0.0f;
+	}
+
+
+	virtual void SetPivot(const dVector& pivot)
+	{
+		m_pivot = pivot;
+		m_pivot.m_w = 1.0f;
+	}
+
+	dVector m_axis;
+	dVector m_pivot;
+	dFloat m_jointAngle;
+};
 
 
 dInverseKinematic::dInverseKinematic()
 	:dContainersAlloc()
-	,m_ikRoot(NULL)
+	,m_root(new dIKNodeRoot())
 {
 }
 
 dInverseKinematic::~dInverseKinematic()
 {
-	if (m_ikRoot) {
-		delete m_ikRoot;
-	}
+	delete m_root;
+}
+
+dInverseKinematic::dIKNode* dInverseKinematic::GetRoot() const
+{
+	return m_root;
+}
+
+dInverseKinematic::dIKNode* dInverseKinematic::AttachLink(dIKNode* const parent) const
+{
+	return new dIKNodeLink(parent);
+}
+
+void dInverseKinematic::SetPivot(dIKNode* const node, const dVector& pivot) const
+{
+	node->SetPivot(pivot);
+}
+
+void dInverseKinematic::SetAxis(dIKNode* const node, const dVector& pin) const
+{
+	node->SetPin(pin);
 }

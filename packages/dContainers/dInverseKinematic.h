@@ -19,27 +19,19 @@
 class dInverseKinematic: public dContainersAlloc
 {
 	public:
-	class dIKNode: public dContainersAlloc
-	{
-		public:
-		DCONTAINERS_API dIKNode();
-		DCONTAINERS_API dIKNode(dIKNode* const parent);
-		DCONTAINERS_API ~dIKNode();
-
-		protected:
-		dMatrix m_matrix;
-		dVector m_pin;
-
-		dIKNode* m_parent;
-		dIKNode* m_child;
-		dIKNode* m_sibling;
-	};
+	class dIKNode;
 
 	DCONTAINERS_API dInverseKinematic();
 	DCONTAINERS_API ~dInverseKinematic();
 
+	DCONTAINERS_API dIKNode* GetRoot() const;
+	DCONTAINERS_API dIKNode* AttachLink(dIKNode* const parent) const;
+
+	DCONTAINERS_API void SetAxis(dIKNode* const node, const dVector& pin) const;
+	DCONTAINERS_API void SetPivot(dIKNode* const node, const dVector& pivot) const;
+
 	protected:
-	dIKNode* m_ikRoot;
+	dIKNode* m_root;
 };
 #endif
 
