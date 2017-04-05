@@ -37,6 +37,7 @@ bld/
 *.pdb
 *.dll
 *.lib
+*.dat
 *.log
 *.exp
 *.ilk

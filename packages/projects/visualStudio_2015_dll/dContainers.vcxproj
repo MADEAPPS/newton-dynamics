@@ -217,6 +217,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dContainers\dCRC.cpp" />
+    <ClCompile Include="..\..\dContainers\dInverseKinematic.cpp" />
     <ClCompile Include="..\..\dContainers\dRefCounter.cpp" />
     <ClCompile Include="..\..\dContainers\dString.cpp" />
     <ClCompile Include="..\..\dContainers\dTree.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="..\..\dContainers\dContainersStdAfx.h" />
     <ClInclude Include="..\..\dContainers\dCRC.h" />
     <ClInclude Include="..\..\dContainers\dHeap.h" />
+    <ClInclude Include="..\..\dContainers\dInverseKinematic.h" />
     <ClInclude Include="..\..\dContainers\dList.h" />
     <ClInclude Include="..\..\dContainers\dRefCounter.h" />
     <ClInclude Include="..\..\dContainers\dRtti.h" />
@@ -238,6 +240,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\coreLibrary_300\projects\windows\project_vs2015_dll\newton.vcxproj">
       <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
+    </ProjectReference>
+    <ProjectReference Include="dMath.vcxproj">
+      <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
