@@ -84,7 +84,7 @@ class dgSkeletonContainer
 	dgFloat32* m_deltaForce;
 	dgFloat32* m_massMatrix11;
 	dgFloat32* m_massMatrix10;
-	dgFloat32* m_factoredMassMatrix11;
+	dgFloat32* m_lowerTriangularMassMatrix11;
 	dgJacobianMatrixElement** m_rowArray;
 	dgOnSkeletonContainerDestroyCallback m_destructor;
 	dgList<dgConstraint*> m_cyclingJoints;

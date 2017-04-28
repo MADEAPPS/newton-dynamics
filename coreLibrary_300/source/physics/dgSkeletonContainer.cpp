@@ -390,7 +390,7 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_deltaForce(NULL)
 	,m_massMatrix11(NULL)
 	,m_massMatrix10(NULL)
-	,m_factoredMassMatrix11(NULL)
+	,m_lowerTriangularMassMatrix11(NULL)
 	,m_rowArray(NULL)
 	,m_destructor(NULL)
 	,m_cyclingJoints(rootBody->GetWorld()->GetAllocator())
@@ -609,8 +609,8 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 		m_rowArray = (dgJacobianMatrixElement**) memoryBuffer;
 		m_pairs = (dgNodePair*) &m_rowArray[m_rowCount];
 		m_massMatrix11 = (dgFloat32*)&m_pairs[m_rowCount];
-		m_factoredMassMatrix11 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
-		m_massMatrix10 = &m_factoredMassMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
+		m_lowerTriangularMassMatrix11 = (dgFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
+		m_massMatrix10 = &m_lowerTriangularMassMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 		m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 
 		for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
@@ -779,8 +779,8 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 
 		bool isPsdMatrix = false;
 		do {
-			memcpy (m_factoredMassMatrix11, m_massMatrix11, sizeof (dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
-			isPsdMatrix = dgCholeskyFactorization(m_auxiliaryRowCount, m_factoredMassMatrix11);
+			memcpy (m_lowerTriangularMassMatrix11, m_massMatrix11, sizeof (dgFloat32) * (m_auxiliaryRowCount * m_auxiliaryRowCount));
+			isPsdMatrix = dgCholeskyFactorization(m_auxiliaryRowCount, m_lowerTriangularMassMatrix11);
 			if (!isPsdMatrix) {
 				for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 					m_massMatrix11[i * m_auxiliaryRowCount + i] += diagDamp[i];
@@ -789,7 +789,7 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 		} while (!isPsdMatrix);
 
 		for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
-			dgFloat32* const row = &m_factoredMassMatrix11[i * m_auxiliaryRowCount];
+			dgFloat32* const row = &m_lowerTriangularMassMatrix11[i * m_auxiliaryRowCount];
 			for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
 				row[j] = dgFloat32 (0.0f);
 			}
@@ -1008,9 +1008,64 @@ void dgSkeletonContainer::BruteForceSolve(const dgJointInfo* const jointInfoArra
 	}
 }
 
+void xxxxx()
+{
+	dgFloat32 x[4];
+	dgFloat32 b[4];
+	dgFloat32 l[4];
+	dgFloat32 h[4];
+	dgFloat32 A[4][4];
+
+	A[0][0] = 2.0f;
+	A[0][1] = 1.0f;
+	A[0][2] = 1.0f;
+	A[0][3] = 1.0f;
+
+	A[1][0] = 1.0f;
+	A[1][1] = 2.0f;
+	A[1][2] = 1.0f;
+	A[1][3] = 1.0f;
+
+	A[2][0] = 1.0f;
+	A[2][1] = 1.0f;
+	A[2][2] = 2.0f;
+	A[2][3] = 1.0f;
+
+	A[3][0] = 1.0f;
+	A[3][1] = 1.0f;
+	A[3][2] = 1.0f;
+	A[3][3] = 2.0f;
+
+	x[0] =  10.0f;
+	x[1] = -10.0f;
+	x[2] =   5.0f;
+	x[3] =   5.0f;
+
+	b[0] = 1.0f;
+	b[1] = 1.0f;
+	b[2] = 1.0f;
+	b[3] = 1.0f;
+
+	l[0] = -1.0e20f;
+	l[1] = -1.0e20f;
+	l[2] = -1.0f;
+	l[3] = -1.0f;
+	h[0] = 1.0e20f;
+	h[1] = 1.0e20f;
+	h[2] = 1.0f;
+	h[3] = 1.0f;
+
+	dgMatrixTimeVector(4, &A[0][0], x, b);
+	dgSolveDantzigLCP(4, &A[0][0], x, b, l, h);
+//	dgSolvePartitionDantzigLCP(4, &A[0][0], x, b, l, h);
+}
+
+
 void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
+
+//xxxxx();
 	
 	dgFloat32* const f = dgAlloca(dgFloat32, m_rowCount);
 	dgFloat32* const u = dgAlloca(dgFloat32, m_auxiliaryRowCount);
@@ -1018,7 +1073,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 	dgFloat32* const low = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const high = dgAlloca(dgFloat32, m_auxiliaryRowCount);
 	dgFloat32* const massMatrix11 = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
-	dgFloat32* const factoredMassMatrix11 = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
+	dgFloat32* const lowerTriangularMassMatrix11 = dgAlloca(dgFloat32, m_auxiliaryRowCount * m_auxiliaryRowCount);
 
 	dgInt32 primaryIndex = 0;
 	dgInt32 auxiliaryIndex = 0;
@@ -1074,7 +1129,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 	}
 
 	memcpy (massMatrix11, m_massMatrix11, sizeof (dgFloat32) * m_auxiliaryRowCount * m_auxiliaryRowCount);
-	memcpy (factoredMassMatrix11, m_factoredMassMatrix11, sizeof (dgFloat32) * m_auxiliaryRowCount * m_auxiliaryRowCount);
+	memcpy (lowerTriangularMassMatrix11, m_lowerTriangularMassMatrix11, sizeof (dgFloat32) * m_auxiliaryRowCount * m_auxiliaryRowCount);
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i ++) {
 		dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 		u[i] = dgFloat32(0.0f);
@@ -1085,7 +1140,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 		b[i] -= r;
 	}
 	
-	dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, factoredMassMatrix11, u, b, low, high);
+	dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, lowerTriangularMassMatrix11, u, b, low, high);
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32 s = u[i];
