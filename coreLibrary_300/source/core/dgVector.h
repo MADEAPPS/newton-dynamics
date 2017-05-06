@@ -2099,7 +2099,6 @@ class dgSpatialVector
 		__m128d dot(_mm_hadd_pd(tmp2, tmp2));
 		_mm_store_sd(&ret, dot);
 		return ret;
-
 	}
 
 	DG_INLINE dgSpatialVector Scale(dgFloat64 s) const

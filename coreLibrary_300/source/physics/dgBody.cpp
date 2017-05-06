@@ -564,20 +564,56 @@ dgMatrix dgBody::CalculateLocalInertiaMatrix () const
 
 dgMatrix dgBody::CalculateInertiaMatrix () const
 {
+#if 0
 	dgMatrix tmp (m_matrix.Transpose4X4());
 	tmp[0] = tmp[0].CompProduct4 (m_mass);
 	tmp[1] = tmp[1].CompProduct4 (m_mass);
 	tmp[2] = tmp[2].CompProduct4 (m_mass);
 	return dgMatrix (m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
+#else
+	const dgVector Ixx(m_mass[0]);
+	const dgVector Iyy(m_mass[1]);
+	const dgVector Izz(m_mass[2]);
+	return dgMatrix (m_matrix.m_front.Scale4(m_matrix.m_front[0]).CompProduct4(Ixx) +
+					 m_matrix.m_up.Scale4(m_matrix.m_up[0]).CompProduct4(Iyy) +
+					 m_matrix.m_right.Scale4(m_matrix.m_right[0]).CompProduct4(Izz),
+
+					 m_matrix.m_front.Scale4(m_matrix.m_front[1]).CompProduct4(Ixx) +
+					 m_matrix.m_up.Scale4(m_matrix.m_up[1]).CompProduct4(Iyy) +
+					 m_matrix.m_right.Scale4(m_matrix.m_right[1]).CompProduct4(Izz),
+
+					 m_matrix.m_front.Scale4(m_matrix.m_front[2]).CompProduct4(Ixx) +
+					 m_matrix.m_up.Scale4(m_matrix.m_up[2]).CompProduct4(Iyy) +
+					 m_matrix.m_right.Scale4(m_matrix.m_right[2]).CompProduct4(Izz),
+					 dgVector::m_wOne);
+#endif
 }
 
 dgMatrix dgBody::CalculateInvInertiaMatrix () const
 {
+#if 0
 	dgMatrix tmp (m_matrix.Transpose4X4());
 	tmp[0] = tmp[0].CompProduct4(m_invMass);
 	tmp[1] = tmp[1].CompProduct4(m_invMass);
 	tmp[2] = tmp[2].CompProduct4(m_invMass);
 	return dgMatrix (m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
+#else
+	const dgVector invIxx(m_invMass[0]);
+	const dgVector invIyy(m_invMass[1]);
+	const dgVector invIzz(m_invMass[2]);
+	return dgMatrix(m_matrix.m_front.Scale4(m_matrix.m_front[0]).CompProduct4(invIxx) +
+					m_matrix.m_up.Scale4(m_matrix.m_up[0]).CompProduct4(invIyy) +
+					m_matrix.m_right.Scale4(m_matrix.m_right[0]).CompProduct4(invIzz),
+
+					m_matrix.m_front.Scale4(m_matrix.m_front[1]).CompProduct4(invIxx) +
+					m_matrix.m_up.Scale4(m_matrix.m_up[1]).CompProduct4(invIyy) +
+					m_matrix.m_right.Scale4(m_matrix.m_right[1]).CompProduct4(invIzz),
+
+					m_matrix.m_front.Scale4(m_matrix.m_front[2]).CompProduct4(invIxx) +
+					m_matrix.m_up.Scale4(m_matrix.m_up[2]).CompProduct4(invIyy) +
+					m_matrix.m_right.Scale4(m_matrix.m_right[2]).CompProduct4(invIzz),
+					dgVector::m_wOne);
+#endif
 }
 
 void dgBody::InvalidateCache ()
