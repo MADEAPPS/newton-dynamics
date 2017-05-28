@@ -1208,8 +1208,8 @@ void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& p
 
 	// apply linear and angular damping
 	dMatrix inertia;
-	dVector linearMomentum;
-	dVector angularMomentum;
+	dVector linearMomentum(0.0f);
+	dVector angularMomentum(0.0f);
 
 	NewtonBodyGetOmega(body, &angularMomentum[0]);
 	NewtonBodyGetVelocity(body, &linearMomentum[0]);
