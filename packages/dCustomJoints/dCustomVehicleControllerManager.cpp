@@ -1293,17 +1293,17 @@ dCustomVehicleController::dSteeringController::dSteeringController (dCustomVehic
 
 void dCustomVehicleController::dSteeringController::Update(dFloat timestep)
 {
-	dDifferentialJoint* const joint = (dDifferentialJoint*) m_differential->GetJoint();
-	if (joint->m_isTractionDifferential) {
-		joint->m_turnSpeed = -m_param * m_differential->m_differentialSpeed;
+	dDifferentialJoint* const diffJoint = (dDifferentialJoint*) m_differential->GetJoint();
+	if (diffJoint->m_isTractionDifferential) {
+		diffJoint->m_turnSpeed = -m_param * m_differential->m_differentialSpeed;
 
 	} else {
 		m_isSleeping = true;
 		for (dList<dBodyPartTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
 			dBodyPartTire& tire = *node->GetInfo();
-			dWheelJoint* const joint = (dWheelJoint*)tire.m_joint;
+			dWheelJoint* const wheelJoint = (dWheelJoint*)tire.m_joint;
 			tire.SetSteerAngle(m_param, timestep);
-			m_isSleeping &= dAbs(joint->m_steerAngle1 - joint->m_steerAngle0) < 1.0e-4f;
+			m_isSleeping &= dAbs(wheelJoint->m_steerAngle1 - wheelJoint->m_steerAngle0) < 1.0e-4f;
 		}
 	}
 }
