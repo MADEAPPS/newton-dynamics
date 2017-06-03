@@ -29,6 +29,7 @@
 #define REST_RELATIVE_VELOCITY			dgFloat32 (1.0e-3f)
 #define MAX_DYNAMIC_FRICTION_SPEED		dgFloat32 (0.3f)
 #define MAX_PENETRATION_STIFFNESS		dgFloat32 (50.0f)
+#define MAX_SEPARATING_SPEED			dgFloat32 (4.0f)
 
 
 //////////////////////////////////////////////////////////////////////
@@ -219,7 +220,8 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_jointStiffness[normalIndex] = dgFloat32 (0.5f);
 
 //	params.m_jointAccel[normalIndex] = GetMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * params.m_invTimestep;
-	params.m_jointAccel[normalIndex] = dgMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * impulseOrForceScale;
+//	params.m_jointAccel[normalIndex] = dgMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * impulseOrForceScale;
+	params.m_jointAccel[normalIndex] = dgMax (dgFloat32 (-MAX_SEPARATING_SPEED), relVelocErr + penetrationVeloc) * impulseOrForceScale;
 	if (contact.m_flags & dgContactMaterial::m_overrideNormalAccel) {
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
@@ -329,10 +331,10 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 					penetrationVeloc = -(row->m_penetration * row->m_penetrationStiffness);
 				}
 
-				vRel *= restitution;
-				vRel = dgMin (dgFloat32 (4.0f), vRel + penetrationVeloc);
+				vRel = vRel * restitution + penetrationVeloc;
+				vRel = dgMin (MAX_SEPARATING_SPEED, vRel);
 			}
-			row->m_coordenateAccel = (aRel - vRel * invTimestep);
+			row->m_coordenateAccel = aRel - vRel * invTimestep;
 		}
 	}
 }

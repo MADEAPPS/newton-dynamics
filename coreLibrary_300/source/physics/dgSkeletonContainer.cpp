@@ -563,13 +563,6 @@ void dgSkeletonContainer::Finalize()
 	dgAssert(index == m_nodeCount);
 }
 
-void dgSkeletonContainer::SetGrapfDepth(dgInt32 depth)
-{
-	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
-		dgGraph* const node = m_nodesOrder[i];
-		node->m_joint->m_graphDepth = depth;
-	}
-}
 
 void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer)
 {

@@ -270,7 +270,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	m_freezeSpeed2 = DG_FREEZE_MAG2 * dgFloat32 (0.1f);
 	m_freezeOmega2 = DG_FREEZE_MAG2 * dgFloat32 (0.1f);
 
-	m_solverConvergeQuality = 0;
 	m_contactTolerance = DG_PRUNE_CONTACT_TOLERANCE;
 
 	dgInt32 steps = 1;
@@ -370,15 +369,6 @@ dgInt32 dgWorld::GetSolverMode() const
 	return m_solverMode;
 }
 
-dgInt32 dgWorld::GetSolverConvergenceQuality() const
-{
-	return m_solverConvergeQuality;
-}
-
-void dgWorld::SetSolverConvergenceQuality (dgInt32 mode)
-{
-	m_solverConvergeQuality = mode ? 1 : 0;
-}
 
 dgInt32 dgWorld::EnumerateHardwareModes() const
 {

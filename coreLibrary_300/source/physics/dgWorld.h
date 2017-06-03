@@ -230,9 +230,6 @@ class dgWorld
 	dgInt32 GetSolverMode() const;
 	void SetSolverMode (dgInt32 mode);
 
-	dgInt32 GetSolverConvergenceQuality() const;
-	void SetSolverConvergenceQuality (dgInt32 mode);
-
 	dgInt32 EnumerateHardwareModes() const;
 	dgInt32 GetCurrentHardwareMode() const;
 	void SetCurrentHardwareMode(dgInt32 deviceIndex);
@@ -465,7 +462,6 @@ class dgWorld
 	dgFloat32 m_savetimestep;
 	dgFloat32 m_contactTolerance;
 	dgFloat32 m_lastExecutionTime;
-	dgInt32 m_solverConvergeQuality;
 
 	dgSolverSleepTherfesholds m_sleepTable[DG_SLEEP_ENTRIES];
 	
