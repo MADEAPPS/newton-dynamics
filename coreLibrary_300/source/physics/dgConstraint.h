@@ -225,7 +225,6 @@ class dgConstraint
 	
 	dgUnsigned32 m_maxDOF				: 6;
 	dgUnsigned32 m_constId				: 6;		
-	dgUnsigned32 m_graphDepth			: 10;
 	dgUnsigned32 m_solverModel			: 2;
 	dgUnsigned32 m_enableCollision		: 1;
 	dgUnsigned32 m_contactActive		: 1;
@@ -255,13 +254,11 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_index(0)
 	,m_maxDOF(6)
 	,m_constId(m_unknownConstraint)
-	,m_graphDepth (1023)
 	,m_solverModel(2)
 	,m_enableCollision(false)
 	,m_contactActive(false)
 	,m_isBilateral(false)
 	,m_isInSkeleton(false)
-
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 }
