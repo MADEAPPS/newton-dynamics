@@ -544,9 +544,6 @@ void NewtonSyncThreadJobs(const NewtonWorld* const newtonWorld)
 	world->SynchronizationBarrier();
 }
 
-
-
-
 int NewtonGetMultiThreadSolverOnSingleIsland(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -554,19 +551,18 @@ int NewtonGetMultiThreadSolverOnSingleIsland(const NewtonWorld* const newtonWorl
 	return world->GetThreadOnSingleIsland();
 }
 
-
 /*!
   Set the solver precision mode.
 
   @param *newtonWorld is the pointer to the Newton world
-  @param model model of operation n = number of iteration defual value is 4.
+  @param model model of operation n = number of iteration default value is 4.
 
   @return Nothing
 
-  n: the solve will execute a maximum of n iteration per cluster of connected joints and will terminnetare regarless of the 
-  of the joint recisual acceleration. 
-  If it happen that the joints residual acceleration fall below the minimum tolereance 1.0e-5
-  then the solve will terminar before the numer of ieteration reach N.
+  n: the solve will execute a maximum of n iteration per cluster of connected joints and will terminate regardless of the 
+  of the joint residual acceleration. 
+  If it happen that the joints residual acceleration fall below the minimum tolerance 1.0e-5
+  then the solve will terminate before the number of iteration reach N.
 */
 void NewtonSetSolverModel(const NewtonWorld* const newtonWorld, int model)
 {
@@ -587,29 +583,6 @@ int NewtonGetSolverModel(const NewtonWorld* const newtonWorld)
 	return world->GetSolverMode();
 }
 
-
-/*!
-  Set solver block diaginal joint solver mode.
-  lowOrHigh == 0 Solver uses Gauss Seidel algorithm to solve constraints 
-  lowOrHigh != 0 Solver use Danzig algorithm to solve constraints 
-
-  when setting lowOrHigh != 0 this produces highest acuracacy but can be slower. 
-*/
-void NewtonSetSolverConvergenceQuality (const NewtonWorld* const newtonWorld, int lowOrHigh)
-{
-	Newton* const world = (Newton *)newtonWorld;
-
-	TRACE_FUNCTION(__FUNCTION__);
-	world->SetSolverConvergenceQuality(lowOrHigh);
-}
-
-int NewtonGetSolverConvergenceQuality(const NewtonWorld* const newtonWorld)
-{
-	Newton* const world = (Newton *)newtonWorld;
-
-	TRACE_FUNCTION(__FUNCTION__);
-	return world->GetSolverConvergenceQuality();
-}
 
 
 void NewtonSetPerformanceClock(const NewtonWorld* const newtonWorld, NewtonGetTimeInMicrosencondsCallback callback)
@@ -632,10 +605,6 @@ void NewtonSetPerformanceClock(const NewtonWorld* const newtonWorld, NewtonGetTi
   The Newton Engine does not perform sub-steps, nor  does it need
   tuning parameters. As a consequence, the application is responsible for
   requesting sane time steps.
-
-  @return This function call NewtonCollisionUpdate at the lower level
-  to get the colliding contacts. fixme: is this true? there is no
-  such function.
 
   See also: ::NewtonInvalidateCache
 */

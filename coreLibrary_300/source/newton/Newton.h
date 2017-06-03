@@ -452,8 +452,6 @@ extern "C" {
 
 	NEWTON_API void NewtonSetSolverModel (const NewtonWorld* const newtonWorld, int model);
 	NEWTON_API int NewtonGetSolverModel(const NewtonWorld* const newtonWorld);
-	NEWTON_API void NewtonSetSolverConvergenceQuality (const NewtonWorld* const newtonWorld, int lowOrHigh);
-	NEWTON_API int NewtonGetSolverConvergenceQuality(const NewtonWorld* const newtonWorld);
 
 	NEWTON_API void NewtonSetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld, int mode);
 	NEWTON_API int NewtonGetMultiThreadSolverOnSingleIsland (const NewtonWorld* const newtonWorld);

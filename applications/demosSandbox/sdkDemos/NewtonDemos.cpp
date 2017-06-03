@@ -51,10 +51,10 @@
 //#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	28          // standard joints
+#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
-#define DEFAULT_SCENE	31			// dynamics rag doll
+//#define DEFAULT_SCENE	31			// dynamics rag doll
 //#define DEFAULT_SCENE	32			// basic Car
 //#define DEFAULT_SCENE	33			// super Car
 //#define DEFAULT_SCENE	34			// heavy vehicles
@@ -153,7 +153,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 
 
 int NewtonDemos::m_threadsTracks[] = {1, 2, 3, 4, 8, 12, 16};
-int NewtonDemos::m_solverModes[] = {0, 1, 2, 4, 8};
+int NewtonDemos::m_solverModes[] = {1, 2, 4, 8, 12};
 
 
 class NewtonDemosApp: public wxApp
@@ -261,8 +261,6 @@ BEGIN_EVENT_TABLE(NewtonDemos, wxFrame)
 	EVT_MENU(ID_USE_PARALLEL_SOLVER, NewtonDemos::OnUseParallelSolver)
 	EVT_MENU_RANGE(ID_SOLVER_MODE, ID_SOLVER_MODE_COUNT, NewtonDemos::OnSelectSolverMode)
 
-	EVT_MENU_RANGE(ID_SOLVER_QUALITY, ID_SOLVER_QUALITY_COUNT, NewtonDemos::OnSelectSolverQuality)
-
 	EVT_MENU(ID_HIDE_VISUAL_MESHES,	NewtonDemos::OnHideVisualMeshes)
 
 	EVT_MENU_RANGE(ID_SHOW_COLLISION_MESH, ID_SHOW_COLLISION_MESH_RANGE, NewtonDemos::OnShowCollisionLines)
@@ -316,8 +314,7 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 	,m_hasJoysticController(false)
 	,m_shiftKey(false)
 	,m_controlKey(false)
-	,m_solverModeIndex(3)
-	,m_solverModeQuality(0)
+	,m_solverModeIndex(2)
 	,m_debugDisplayMode(0)
 	,m_mousePosX(0)
 	,m_mousePosY(0)
@@ -343,7 +340,6 @@ NewtonDemos::NewtonDemos(const wxString& title, const wxPoint& pos, const wxSize
 //m_showStatistics = true;
 
 
-//m_solverModeQuality = 1;
 //m_showCenterOfMass = true;
 //m_physicsUpdateMode = 1;
 //m_hideVisualMeshes = true;
@@ -473,20 +469,15 @@ wxMenuBar* NewtonDemos::CreateMainMenu()
 		optionsMenu->AppendRadioItem(ID_BROADPHSE_TYPE1, wxT("Persintent broaphase"), wxT("for scenes with lot more static bodies than dynamics"));
 
 		optionsMenu->AppendSeparator();
-		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 0, wxT("Exact solver on"));
-		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 1, wxT("Iterative solver one passes"));
-		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 2, wxT("Iterative solver two passes"));
-		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 3, wxT("Iterative solver four passes"));
-		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 4, wxT("Iterative solver eight passes"));
+		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 0, wxT("Solver one passes"));
+		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 1, wxT("Solver two passes"));
+		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 2, wxT("Solver four passes"));
+		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 3, wxT("Solver eight passes"));
+		optionsMenu->AppendRadioItem(ID_SOLVER_MODE + 4, wxT("Solver twelve passes"));
 
 		dAssert (m_solverModeIndex >= 0);
 		dAssert (m_solverModeIndex < int (sizeof (m_solverModes)/sizeof (m_solverModes[0])));
 		optionsMenu->Check (ID_SOLVER_MODE + m_solverModeIndex, true);
-
-		optionsMenu->AppendSeparator();
-		optionsMenu->AppendRadioItem(ID_SOLVER_QUALITY + 0, wxT("Iterative Solver Quality Low"));
-		optionsMenu->AppendRadioItem(ID_SOLVER_QUALITY + 1, wxT("Iterative Solver Quality High"));
-		optionsMenu->Check (ID_SOLVER_QUALITY + m_solverModeQuality, true);
 
 		optionsMenu->AppendSeparator();
 		optionsMenu->AppendRadioItem(ID_SHOW_COLLISION_MESH, wxT("Hide collision Mesh"));
@@ -569,7 +560,6 @@ void NewtonDemos::END_MENU_OPTION()
 		NewtonWaitForUpdateToFinish (m_scene->GetNewton());
 		SetAutoSleepMode (m_scene->GetNewton(), !m_autoSleepState);
 		NewtonSetSolverModel (m_scene->GetNewton(), m_solverModes[m_solverModeIndex]);
-		NewtonSetSolverConvergenceQuality (m_scene->GetNewton(), m_solverModeQuality ? 1 : 0);
 		NewtonSetMultiThreadSolverOnSingleIsland (m_scene->GetNewton(), m_useParallelSolver ? 1 : 0);	
 		NewtonSelectBroadphaseAlgorithm (m_scene->GetNewton(), m_broadPhaseType);
 	}
@@ -590,7 +580,7 @@ void NewtonDemos::LoadDemo (int index)
 	m_scene->Cleanup();
     
 	m_demosSelection[index].m_launchDemoCallback (m_scene);
-//	m_scene->DeserializedPhysicScene ("C:/Users/julio/Downloads/tree_vs_convex.bin");
+	//m_scene->DeserializedPhysicScene ("C:/Users/julio/Downloads/OrbitalScene.bin");
 	m_scene->SwapBuffers(); 
 
 	RestoreSettings ();
@@ -850,13 +840,6 @@ void NewtonDemos::OnSelectSolverMode(wxCommandEvent& event)
 {
 	BEGIN_MENU_OPTION();
 	m_solverModeIndex = dClamp (event.GetId() - ID_SOLVER_MODE, 0, int (sizeof (m_solverModes)/sizeof (m_solverModes[0])));
-	END_MENU_OPTION();
-}
-
-void NewtonDemos::OnSelectSolverQuality(wxCommandEvent& event)
-{
-	BEGIN_MENU_OPTION();
-	m_solverModeQuality = dClamp(event.GetId() - ID_SOLVER_QUALITY, 0, 1);
 	END_MENU_OPTION();
 }
 
