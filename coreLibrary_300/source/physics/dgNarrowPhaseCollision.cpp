@@ -1056,24 +1056,28 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threa
 	const dgContactMaterial* const material = contact->m_material;
 	dgCollisionParamProxy proxy(contact, pair->m_contactBuffer, threadIndex, ccdMode, intersectionTestOnly);
 
+	pair->m_flipContacts = false;
 	proxy.m_timestep = pair->m_timestep;
 	proxy.m_maxContacts = DG_MAX_CONTATCS;
 	proxy.m_skinThickness = material->m_skinThickness;
 
-	if (body0->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
+	if (body1->m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) {
+		SceneContacts(pair, proxy);
+	} else if (body0->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
 		contact->SwapBodies();
-		SceneContacts (pair, proxy);
-	} else if (body1->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
+		pair->m_flipContacts = true;
 		SceneContacts (pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		CompoundContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		contact->SwapBodies();
+		pair->m_flipContacts = true;
 		CompoundContacts (pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		ConvexContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		contact->SwapBodies();
+		pair->m_flipContacts = true;
 		ConvexContacts (pair, proxy);
 	}
 
@@ -1199,18 +1203,33 @@ dgInt32 dgWorld::CollideContinue (
 		if (count > maxContacts) {
 			count = PruneContacts (count, contacts, maxContacts);
 		}
-		dgFloat32 swapContactScale = (contactJoint.GetBody0() != &collideBodyA) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f);
-		for (dgInt32 i = 0; i < count; i ++) {
-			points[i].m_x = contacts[i].m_point.m_x; 
-			points[i].m_y = contacts[i].m_point.m_y; 
-			points[i].m_z = contacts[i].m_point.m_z; 
-			normals[i].m_x = contacts[i].m_normal.m_x * swapContactScale;  
-			normals[i].m_y = contacts[i].m_normal.m_y * swapContactScale;  
-			normals[i].m_z = contacts[i].m_normal.m_z * swapContactScale;  
-			penetration[i] = contacts[i].m_penetration; 
-			attibuteA[i] = contacts[i].m_shapeId0;
-			attibuteB[i] = contacts[i].m_shapeId1;
-		}
+		//dgFloat32 swapContactScale = (contactJoint.GetBody0() != &collideBodyA) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f);
+		if (pair.m_flipContacts) {
+ 			for (dgInt32 i = 0; i < count; i++) {
+				dgVector step ((collideBodyA.m_veloc - collideBodyB.m_veloc).Scale4 (pair.m_timestep));
+				points[i].m_x = contacts[i].m_point.m_x + step.m_x;
+				points[i].m_y = contacts[i].m_point.m_y + step.m_y;
+				points[i].m_z = contacts[i].m_point.m_z + step.m_z;
+				normals[i].m_x = -contacts[i].m_normal.m_x;
+				normals[i].m_y = -contacts[i].m_normal.m_y;
+				normals[i].m_z = -contacts[i].m_normal.m_z;
+				penetration[i] = contacts[i].m_penetration;
+				attibuteA[i] = contacts[i].m_shapeId1;
+				attibuteB[i] = contacts[i].m_shapeId0;
+			}
+		} else {
+			for (dgInt32 i = 0; i < count; i ++) {
+				points[i].m_x = contacts[i].m_point.m_x; 
+				points[i].m_y = contacts[i].m_point.m_y; 
+				points[i].m_z = contacts[i].m_point.m_z; 
+					normals[i].m_x = contacts[i].m_normal.m_x;  
+					normals[i].m_y = contacts[i].m_normal.m_y;  
+					normals[i].m_z = contacts[i].m_normal.m_z;  
+				penetration[i] = contacts[i].m_penetration; 
+				attibuteA[i] = contacts[i].m_shapeId0;
+				attibuteB[i] = contacts[i].m_shapeId1;
+			}
+		} 
 	} 
 	return count;
 }
