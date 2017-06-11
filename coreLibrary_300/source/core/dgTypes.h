@@ -222,14 +222,29 @@
 
 
 #define DG_VECTOR_SIMD_SIZE		16
+#define DG_VECTOR_AVX2_SIZE		32
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#define	DG_GCC_VECTOR_ALIGMENT	
 	#define	DG_MSC_VECTOR_ALIGMENT			__declspec(align(DG_VECTOR_SIMD_SIZE))
 #else
-	#define	DG_MSC_VECTOR_ALIGMENT			
 	#define	DG_GCC_VECTOR_ALIGMENT			__attribute__ ((aligned (DG_VECTOR_SIMD_SIZE)))
+	#define	DG_MSC_VECTOR_ALIGMENT			
 #endif
+
+#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+	#define	DG_GCC_AVX2_ALIGMENT	
+	#define	DG_MSC_AVX2_ALIGMENT			__declspec(align(DG_VECTOR_AVX2_SIZE))
+#else
+	#define	DG_GCC_AVX2_ALIGMENT			__attribute__ ((aligned (DG_VECTOR_AVX2_SIZE)))
+	#define	DG_MSC_AVX2_ALIGMENT			
+#endif
+
+
+#if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER >= 1800))
+//	#define DG_USE_AVX2
+#endif
+
 
 #if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1600))
 	#include <stdint.h>

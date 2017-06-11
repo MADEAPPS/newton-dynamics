@@ -218,8 +218,9 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 					IntegrateReactionsForces (cluster, threadID, 0.0f, DG_SOLVER_MAX_ERROR);
 
 					bool clusterReceding = true;
+					const dgFloat32 step = timestep * dgFloat32 (1.0f / DG_MAX_CONTINUE_COLLISON_STEPS); 
 					for (dgInt32 k = 0; (k < DG_MAX_CONTINUE_COLLISON_STEPS) && clusterReceding; k ++) {
-						dgFloat32 smallTimeStep = dgMin (timestep * dgFloat32 (1.0f / 8.0f), timeRemaining);
+						dgFloat32 smallTimeStep = dgMin (step, timeRemaining);
 						timeRemaining -= smallTimeStep;
 						for (dgInt32 j = 1; j < bodyCount; j ++) {
 							dgDynamicBody* const body = (dgDynamicBody*) bodyArray[j].m_body;
@@ -295,6 +296,8 @@ void dgWorldDynamicUpdate::CalculateClusterContacts(dgBodyCluster* const cluster
 	dgJointInfo* const constraintArrayPtr = (dgJointInfo*) &world->m_jointsMemory[0];
 	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
 
+	dgBroadPhase::dgPair pair;
+	dgContactPoint contactArray[DG_MAX_CONTATCS];
 	for (dgInt32 j = 0; (j < jointCount); j ++) {
 		dgContact* const contact = (dgContact*) constraintArray[j].m_joint;
 		if (contact->GetId() == dgConstraint::m_contactConstraint) {
@@ -306,10 +309,7 @@ void dgWorldDynamicUpdate::CalculateClusterContacts(dgBodyCluster* const cluster
 				}
 
 				if (processContacts) {
-					dgContactPoint contactArray[DG_MAX_CONTATCS];
-					dgBroadPhase::dgPair pair;
 					contact->m_maxDOF = 0;
-					dgAssert (0);
 					contact->m_broadphaseLru = currLru;
 					pair.m_contact = contact;
 					pair.m_cacheIsValid = false;

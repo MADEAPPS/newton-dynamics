@@ -691,7 +691,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 	if (!isScaled) {
 		if (body0->m_equilibrium) {
 			if ((invMass0 > dgFloat32(0.0f)) && !body0->GetSkeleton() && !body1->GetSkeleton()) {
-				dgAssert (!body1->m_equilibrium);
+				//dgAssert (!body1->m_equilibrium);
 				dgVector isMovingMask(body0->m_veloc + body0->m_omega + body0->m_accel + body0->m_alpha);
 				dgAssert(dgCheckVector(isMovingMask));
 				if ((isMovingMask.TestZero().GetSignMask() & 7) == 7) {

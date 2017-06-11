@@ -1091,6 +1091,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 
 	dgInt32 isActive = contact->m_contactActive;
 	dgInt32 contactCount = contact->m_maxDOF;
+	dgFloat32 separationDistance = contact->m_separationDistance;
 
 	contact->m_maxDOF = 0;
 	pair.m_contact = contact;
@@ -1135,8 +1136,9 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 		q = proxy.m_closestPointBody0;
 	}
 
-	contact->m_contactActive = isActive;
 	contact->m_maxDOF = contactCount;
+	contact->m_contactActive = isActive;
+	contact->m_separationDistance = separationDistance;
 	return proxy.m_timestep;
 }
 
