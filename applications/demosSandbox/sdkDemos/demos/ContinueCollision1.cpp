@@ -97,7 +97,7 @@ class CCDInputManager : public dCustomInputManager
 	static void DrawHelpMenu (DemoEntityManager* const scene, void* const context, int lineNumber)
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		lineNumber = scene->Print (color, 10, lineNumber + 20, "Hit R key to shot  boxes to teh wall");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "Hit R key to shot  boxes to the wall");
 	}
 
 	void OnBeginUpdate(dFloat timestepInSecunds)

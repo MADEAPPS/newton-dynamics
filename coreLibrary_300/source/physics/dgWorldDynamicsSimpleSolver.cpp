@@ -207,7 +207,14 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 						for (dgInt32 j = 1; j < bodyCount; j++) {
 							dgDynamicBody* const body = (dgDynamicBody*)bodyArray[j].m_body;
 							if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-								body->IntegrateVelocity(timeToImpact);
+								dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
+								const dgVector speed2(body->m_veloc.DotProduct4(body->m_veloc));
+								dgFloat32 timestep = timeToImpact;
+								if (speed2.GetScalar() > dgFloat32 (0.0f)) {
+									dgFloat32 invSpeed = speed2.InvSqrt().GetScalar();
+									timestep = dgMax (dgFloat32 (1.e-2f) * invSpeed, timestep);
+								}
+								body->IntegrateVelocity(timestep);
 								body->UpdateWorlCollisionMatrix();
 							}
 						}
