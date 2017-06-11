@@ -401,7 +401,9 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_rowCount(0)
 	,m_auxiliaryRowCount(0)
 {
-	rootBody->SetSkeleton(this);
+	if (rootBody->GetInvMass().m_w != dgFloat32 (0.0f)) {
+	      rootBody->SetSkeleton(this);
+	}
 	m_uniqueID++;
 }
 

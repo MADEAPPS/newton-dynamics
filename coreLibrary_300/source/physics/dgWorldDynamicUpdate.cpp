@@ -76,8 +76,6 @@ void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	
-	UpdateSkeletons();
-	
 	m_bodies = 0;
 	m_joints = 0;
 	m_clusters = 0;
@@ -300,7 +298,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 					}
 
 					dgDynamicBody* const adjacentBody = (dgDynamicBody*)linkBody;
-	
+					/*
 					if (adjacentBody->GetSkeleton() && (adjacentBody->GetInvMass().m_w == dgFloat32(0.0f))) {
 						for (dgBodyMasterListRow::dgListNode* jointNode1 = adjacentBody->m_masterNode->GetInfo().GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) {
 							dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
@@ -312,6 +310,7 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 							}
 						}
 					}
+					*/
 
 					if ((adjacentBody->m_dynamicsLru != lruMark) && (adjacentBody->GetInvMass().m_w > dgFloat32(0.0f))) {
 						queueBuffer[stack] = adjacentBody;
@@ -444,118 +443,6 @@ void dgWorldDynamicUpdate::SpanningTree (dgDynamicBody* const body, dgDynamicBod
 	}
 }
 
-void dgWorldDynamicUpdate::UpdateSkeletons()
-{
-	dgWorld* const world = (dgWorld*) this;
-	dgSkeletonList& skelManager = *world;
-	if (skelManager.m_skelListIsDirty) {
-		dTimeTrackerEvent(__FUNCTION__);
-		skelManager.m_skelListIsDirty = false;
-		dgSkeletonList::Iterator iter(skelManager);
-		for (iter.Begin(); iter; iter++) {
-			dgSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
-			delete skeleton;
-		}
-		skelManager.RemoveAll();
-
-		world->m_dynamicsLru = world->m_dynamicsLru + 1;
-		dgUnsigned32 lru = world->m_dynamicsLru;
-
-		dgBodyMasterList& masterList = *world;
-		world->m_solverJacobiansMemory.ResizeIfNecessary((2 * (masterList.m_constraintCount + 1024)) * sizeof (dgBilateralConstraint*));
-		dgBilateralConstraint** const jointList = (dgBilateralConstraint**)&world->m_solverJacobiansMemory[0];
-
-		dgInt32 jointCount = 0;
-		for (dgBodyMasterList::dgListNode* node = masterList.GetFirst(); node; node = node->GetNext()) {
-			const dgBodyMasterListRow& graphNode = node->GetInfo();
-			dgBody* const srcBody = graphNode.GetBody();
-
-			for (dgBodyMasterListRow::dgListNode* jointNode = srcBody->m_masterNode->GetInfo().GetLast(); jointNode; jointNode = jointNode->GetPrev()) {
-				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-				dgConstraint* const constraint = cell->m_joint;
-				dgAssert(constraint);
-				dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
-				dgAssert((constraint->m_body0 == cell->m_bodyNode) || (constraint->m_body1 == cell->m_bodyNode));
-				if (constraint->IsBilateral() && (constraint->m_solverModel < 2) && (constraint->m_dynamicsLru != lru)) {
-					constraint->m_dynamicsLru = lru;
-					jointList[jointCount] = (dgBilateralConstraint*)constraint;
-					jointCount++;
-				}
-			}
-		}
-
-		dgSortIndirect(jointList, jointCount, CompareJointByInvMass);
-
-		const dgInt32 poolSize = 1024 * 4;
-		dgSkeletonContainer::dgGraph* pool [poolSize];
-
-		dgBilateralConstraint* loopJoints[64];
-		world->m_dynamicsLru = world->m_dynamicsLru + 1;
-		lru = world->m_dynamicsLru;
-		for (dgInt32 i = 0; i < jointCount; i++) {
-			dgBilateralConstraint* const constraint = jointList[i];
-			if (constraint->m_dynamicsLru != lru) {
-				dgInt32 loopCount = 0;
-				dgDynamicBody* const rootBody = (dgDynamicBody*) ((constraint->GetBody0()->GetInvMass().m_w < constraint->GetBody1()->GetInvMass().m_w) ? constraint->GetBody0() : constraint->GetBody1());
-				dgSkeletonContainer* const skeleton = world->CreateNewtonSkeletonContainer (rootBody);
-				dgQueue<dgSkeletonContainer::dgGraph*> queue(pool, poolSize); 
-				queue.Insert (skeleton->GetRoot());
-				rootBody->m_dynamicsLru = lru;
-
-				while (!queue.IsEmpty()) {
-					dgInt32 count = queue.m_firstIndex - queue.m_lastIndex;
-					if (count < 0) {
-						count += queue.m_mod;
-					}
-
-					dgInt32 index = queue.m_lastIndex;
-					queue.Reset();
-
-					for (dgInt32 j = 0; j < count; j++) {
-						dgSkeletonContainer::dgGraph* const parentNode (queue.m_pool[index]);
-						dgDynamicBody* const parentBody = skeleton->GetBody(parentNode);
-
-						for (dgBodyMasterListRow::dgListNode* jointNode1 = parentBody->m_masterNode->GetInfo().GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) {
-							dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
-							dgConstraint* const constraint1 = cell1->m_joint;
-							if (constraint1->IsBilateral() && (constraint1->m_dynamicsLru != lru)) {
-								constraint1->m_dynamicsLru = lru;
-
-								if (!constraint1->m_solverModel) {
-									dgDynamicBody* const childBody = (dgDynamicBody*) ((constraint1->GetBody0() == parentBody) ? constraint1->GetBody1() : constraint1->GetBody0());
-
-									if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dgFloat32 (0.0f))) {
-										childBody->m_dynamicsLru = lru;
-										dgSkeletonContainer::dgGraph* const childNode = skeleton->AddChild((dgBilateralConstraint*)constraint1, parentNode);
-										queue.Insert (childNode);
-									} else if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
-										loopJoints[loopCount] = (dgBilateralConstraint*)constraint1;
-										loopCount ++;
-									}
-
-								} else if ((constraint1->m_solverModel != 2) && loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
-									loopJoints[loopCount] = (dgBilateralConstraint*)constraint1;
-									loopCount ++;
-								}
-							}
-						}
-						index++;
-						if (index >= queue.m_mod) {
-							index = 0;
-						}
-					}
-				}
-				skeleton->Finalize();
-
-				if (loopCount < (sizeof (loopJoints)/sizeof(loopJoints[0]))) {
-					for (dgInt32 j = 0; j < loopCount; j ++) {
-						skeleton->AttachCyclingJoint(loopJoints[j]); 
-					}
-				}
-			}
-		}
-	}
-}
 
 
 void dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const

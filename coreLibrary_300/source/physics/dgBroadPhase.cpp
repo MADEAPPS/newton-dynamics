@@ -414,9 +414,6 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 	dgAssert(matrix.TestOrthogonal());
 	shape->CalcAABB(matrix, boxP0, boxP1);
 
-//static int xxx;
-//xxx ++;
-
 	maxContacts = dgMin (maxContacts, DG_CONVEX_CAST_POOLSIZE);
 	dgAssert (!maxContacts || (maxContacts && info));
 	dgFloat32 maxParam = *param;
@@ -456,8 +453,6 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 							info[totalCount].m_normal[3] = dgFloat32(0.0f);
 							info[totalCount].m_penetration = penetration[i];
 							info[totalCount].m_contaID = attributeB[i];
-
-//dgTrace (("frame: %d, t: %f, p(%f %f %f) n(%f %f %f)\n", xxx, maxParam, points[i].m_x, points[i].m_y, points[i].m_z, normals[i].m_x, normals[i].m_y, normals[i].m_z));
 
 							info[totalCount].m_hitBody = body;
 							totalCount++;

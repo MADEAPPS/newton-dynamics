@@ -427,6 +427,7 @@ class dgWorld
 
 	bool AreBodyConnectedByJoints (dgBody* const origin, dgBody* const target);
 	
+	void UpdateSkeletons();
 	void AddSentinelBody();
 	void InitConvexCollision ();
 	static dgUnsigned32 dgApi GetPerformanceCount ();

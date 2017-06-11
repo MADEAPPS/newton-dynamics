@@ -244,7 +244,6 @@ class dgWorldDynamicUpdate
 	dgBody* GetClusterBody (const void* const cluster, dgInt32 index) const;
 
 	private:
-	void UpdateSkeletons();
 	void BuildClusters(dgFloat32 timestep);
 	void SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const;
 	void SpanningTree (dgDynamicBody* const body, dgDynamicBody** const queueBuffer, dgFloat32 timestep);
