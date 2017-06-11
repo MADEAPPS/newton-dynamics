@@ -106,8 +106,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\KinematicJoint/*.*"  /F /Y /R
+rem xcopy  "$(OutDir)$(TargetName).dll" "C:\Users\julio\Downloads\KinematicJoint/*.*"  /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
