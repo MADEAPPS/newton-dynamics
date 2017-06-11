@@ -900,8 +900,8 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	m_inUpdate ++;
 
 	UpdateSkeletons();
-	m_broadPhase->UpdateContacts (timestep);
-	UpdateDynamics (timestep);
+	UpdateContacts(timestep);
+	UpdateDynamics(timestep);
 
 	if (m_postListener.GetCount()) {
 		dTimeTrackerEvent("postListeners");
@@ -1460,6 +1460,11 @@ void dgDeadBodies::DestroyBodies(dgWorld& world)
 	}
 	RemoveAll ();
 	dgSpinUnlock(&m_lock);
+}
+
+void dgWorld::UpdateContacts(dgFloat32 timestep)
+{
+	m_broadPhase->UpdateContacts (timestep);
 }
 
 void dgWorld::UpdateSkeletons()
