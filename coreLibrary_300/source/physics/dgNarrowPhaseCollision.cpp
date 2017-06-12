@@ -1085,7 +1085,7 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threa
 }
 
 
-dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex, dgVector& p, dgVector& q, dgVector& normal) const
+dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex, dgVector& p, dgVector& q, dgVector& normal, dgFloat32 dist) const
 {
 	dgBroadPhase::dgPair pair;
 
@@ -1100,12 +1100,13 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 
 	dgBody* const body0 = contact->m_body0;
 	dgBody* const body1 = contact->m_body1;
-	const dgContactMaterial* const material = contact->m_material;
+//	const dgContactMaterial* const material = contact->m_material;
 	dgCollisionParamProxy proxy(contact, NULL, threadIndex, true, true);
 
 	proxy.m_maxContacts = 0;
 	proxy.m_timestep = timestep;
-	proxy.m_skinThickness = material->m_skinThickness;
+//	proxy.m_skinThickness = material->m_skinThickness;
+	proxy.m_skinThickness = dist;
 
 	if (body0->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
 		contact->SwapBodies();

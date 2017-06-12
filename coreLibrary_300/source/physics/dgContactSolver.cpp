@@ -1520,7 +1520,7 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 			break;
 		}
 
-		dgFloat32 num = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar();
+		dgFloat32 num = m_normal.DotProduct4(m_closestPoint1 - m_closestPoint0).GetScalar() - m_proxy->m_skinThickness;
 		if ((num <= dgFloat32(1.0e-5f)) && (tacc <= timestep)) {
 			// bodies collide at time tacc, but we do not set it yet
 			dgVector step(relVeloc.Scale4(tacc));
