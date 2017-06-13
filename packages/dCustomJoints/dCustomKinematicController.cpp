@@ -88,11 +88,13 @@ void dCustomKinematicController::SetMaxAngularFriction(dFloat alpha)
 
 void dCustomKinematicController::SetTargetRotation(const dQuaternion& rotation)
 {
+	NewtonBodySetSleepState(m_body0, 0);
 	m_targetRot = rotation;
 }
 
 void dCustomKinematicController::SetTargetPosit(const dVector& posit)
 {
+	NewtonBodySetSleepState(m_body0, 0);
 	m_targetPosit = posit;
 }
 
