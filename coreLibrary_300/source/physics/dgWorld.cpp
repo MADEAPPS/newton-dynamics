@@ -999,103 +999,6 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 	#endif
 }
 
-dgInt32 dgWorld::SerializeToFileSort (const dgBody* const body0, const dgBody* const body1, void* const context)
-{
-	if (body0->m_uniqueID < body1->m_uniqueID) {
-		return -1;
-	} else if (body0->m_uniqueID > body1->m_uniqueID) {
-		return 1;
-	}
-	return 0;
-}
-
-void dgWorld::SerializeToFile (const char* const fileName, OnBodySerialize bodyCallback, void* const userData) const
-{
-	FILE* const file = fopen (fileName, "wb");
-	if (file) {
-		dgBody** const array = new dgBody*[GetBodiesCount()];
-
-		dgInt32 count = 0;
-		const dgBodyMasterList& me = *this;
-		for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
-			const dgBodyMasterListRow& graphNode = node->GetInfo();
-			array[count] = graphNode.GetBody();	
-			array[count]->m_serializedEnum = count;
-			count ++;
-			dgAssert (count <= GetBodiesCount());
-		}
-
-		dgSortIndirect(array, count, SerializeToFileSort);
-		SerializeBodyArray (array, count, bodyCallback ? bodyCallback : OnBodySerializeToFile, userData, OnSerializeToFile, file);
-		SerializeJointArray (count, OnSerializeToFile, file);
-
-		for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
-			const dgBodyMasterListRow& graphNode = node->GetInfo();
-			graphNode.GetBody()->m_serializedEnum = -1;
-		}
-
-		delete[] array;
-		fclose (file);
-	}
-}
-
-dgBody* dgWorld::FindBodyFromSerializedID(dgInt32 serializedID) const
-{
-	const dgBodyMasterList& me = *this;
-	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
-		const dgBodyMasterListRow& graphNode = node->GetInfo();
-		if (graphNode.GetBody()->m_serializedEnum == serializedID) {
-			return graphNode.GetBody();
-		}
-	}
-	return NULL;
-}
-
-
-void dgWorld::DeserializeFromFile (const char* const fileName, OnBodyDeserialize bodyCallback, void* const userData)
-{
-	FILE* const file = fopen (fileName, "rb");
-	if (file) {
-		dgTree<dgBody*, dgInt32> bodyMap (GetAllocator());
-		DeserializeBodyArray (bodyMap, bodyCallback ? bodyCallback : OnBodyDeserializeFromFile, userData, OnDeserializeFromFile, file);
-		DeserializeJointArray (bodyMap, OnDeserializeFromFile, file);
-		fclose (file);
-
-		const dgBodyMasterList& me = *this;
-		for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
-			const dgBodyMasterListRow& graphNode = node->GetInfo();
-			graphNode.GetBody()->m_serializedEnum = -1;;
-		}
-	}
-}
-
-
-
-void dgWorld::OnSerializeToFile (void* const fileHandle, const void* const buffer, size_t size)
-{
-	dgAssert ((size & 0x03) == 0);
-	fwrite (buffer, size, 1, (FILE*) fileHandle);
-}
-
-void dgWorld::OnDeserializeFromFile (void* const fileHandle, void* const buffer, size_t size)
-{
-	dgAssert ((size & 0x03) == 0);
-	fread (buffer, size, 1, (FILE*) fileHandle);
-}
-
-void dgWorld::OnBodySerializeToFile (dgBody& body, void* const userData, dgSerialize serializeCallback, void* const fileHandle)
-{
-	const char* const bodyIndentification = "NewtonGravityBody\0\0\0\0";
-	int size = (dgInt32 (strlen (bodyIndentification)) + 3) & -4;
-	serializeCallback (fileHandle, &size, sizeof (size));
-	serializeCallback (fileHandle, bodyIndentification, size);
-}
-
-void dgWorld::OnBodyDeserializeFromFile (dgBody& body, void* const userData, dgDeserialize serializeCallback, void* const fileHandle)
-{
-
-}
-
 
 void dgWorld::SetGetTimeInMicrosenconds (OnGetTimeInMicrosenconds callback)
 {
@@ -1108,221 +1011,6 @@ void dgWorld::SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDupl
 	m_onCollisionInstanceCopyConstrutor = constructor;
 }
 
-
-void dgWorld::SerializeBodyArray (dgBody** const array, dgInt32 count, OnBodySerialize bodyCallback, void* const userData, dgSerialize serializeCallback, void* const fileHandle) const
-{
-	dgSerializeMarker (serializeCallback, fileHandle);
-
-	// serialize all collisions
-	dgInt32 uniqueShapes = 0;
-	dgTree<dgInt32, const dgCollision*> shapeMap(GetAllocator());
-	for (dgInt32 i = 0; i < count; i ++) {
-		dgBody* const body = array[i];
-		dgAssert (body->m_world == this);
-		dgCollisionInstance* const instance = body->GetCollision();
-		const dgCollision* const collision = instance->GetChildShape();
-		dgTree<dgInt32, const dgCollision*>::dgTreeNode* const shapeNode = shapeMap.Insert(uniqueShapes, collision);
-		if (shapeNode) {
-			uniqueShapes ++;
-		}
-	}
-
-	serializeCallback(fileHandle, &uniqueShapes, sizeof (uniqueShapes));	
-	dgTree<dgInt32, const dgCollision*>::Iterator iter (shapeMap);
-	for (iter.Begin(); iter; iter ++) {
-		dgInt32 id = iter.GetNode()->GetInfo();
-		const dgCollision* const collision = iter.GetKey();
-		dgCollisionInstance instance (this, collision, 0, dgMatrix (dgGetIdentityMatrix()));
-		serializeCallback(fileHandle, &id, sizeof (id));	
-		instance.Serialize(serializeCallback, fileHandle);
-		dgSerializeMarker(serializeCallback, fileHandle);
-	}
-
-	serializeCallback(fileHandle, &count, sizeof (count));	
-	for (dgInt32 i = 0; i < count; i ++) {
-		dgBody* const body = array[i];
-
-		dgInt32 bodyType = body->GetType();
-		serializeCallback(fileHandle, &bodyType, sizeof (bodyType));	
-
-		// serialize the body
-		body->Serialize(shapeMap, serializeCallback, fileHandle);
-
-		// serialize body custom data
-		bodyCallback (*body, userData, serializeCallback, fileHandle);
-
-		dgSerializeMarker(serializeCallback, fileHandle);
-	}
-}
-
-
-void dgWorld::DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDeserialize bodyCallback, void* const userData, dgDeserialize deserialization, void* const fileHandle)
-{
-	dgInt32 revision = dgDeserializeMarker (deserialization, fileHandle);
-
-	dgTree<const dgCollision*, dgInt32> shapeMap(GetAllocator());
-
-	dgInt32 uniqueShapes;
-	deserialization(fileHandle, &uniqueShapes, sizeof (uniqueShapes));	
-	for (dgInt32 i = 0; i < uniqueShapes; i ++) {
-		dgInt32 id;
-
-		deserialization(fileHandle, &id, sizeof (id));	
-		dgCollisionInstance instance (this, deserialization, fileHandle, revision);
-		dgDeserializeMarker (deserialization, fileHandle);
-
-		const dgCollision* const shape = instance.GetChildShape();
-		shapeMap.Insert(shape, id);
-		shape->AddRef();
-	}
-
-	dgInt32 bodyCount;
-	deserialization (fileHandle, &bodyCount, sizeof (bodyCount));	
-	for (dgInt32 i = 0; i < bodyCount; i ++) {
-		dgInt32 bodyType;
-		deserialization(fileHandle, &bodyType, sizeof (bodyType));	
-		dgBody* body = NULL; 
-
-		switch (bodyType)
-		{
-			case dgBody::m_dynamicBody:
-			{
-				body = new (m_allocator) dgDynamicBody(this, &shapeMap, deserialization, fileHandle, revision);
-				break;
-			}
-			case dgBody::m_kinematicBody:
-			{
-				body = new (m_allocator) dgKinematicBody(this, &shapeMap, deserialization, fileHandle, revision);
-				break;
-			}
-		}
-
-		dgAssert (body);
-		m_bodiesUniqueID ++;
-		body->m_freeze = false;
-		body->m_sleeping = false;
-		body->m_equilibrium = false;
-		body->m_spawnnedFromCallback = false;
-		body->m_uniqueID = dgInt32 (m_bodiesUniqueID);
-
-//if (body->m_uniqueID == 5 || body->m_uniqueID == 33)
-//{
-		dgBodyMasterList::AddBody(body);
-		body->SetMatrix (body->GetMatrix());
-		m_broadPhase->Add (body);
-		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-			dgDynamicBody* const dynBody = (dgDynamicBody*)body;
-			dynBody->SetMassMatrix (dynBody->m_mass.m_w, dynBody->CalculateLocalInertiaMatrix());
-		}
-
-		// load user related data 
-		bodyCallback (*body, userData, deserialization, fileHandle);
-
-		bodyMap.Insert(body, body->m_serializedEnum);
-//} else {
-//delete body;
-//}
-
-		// sync to next body
-		dgDeserializeMarker (deserialization, fileHandle);
-	}
-
-	dgTree<const dgCollision*, dgInt32>::Iterator iter (shapeMap);
-	for (iter.Begin(); iter; iter ++) {
-		const dgCollision* const collision = iter.GetNode()->GetInfo();
-		collision->Release();
-	}
-}
-
-void dgWorld::SetJointSerializationCallbacks (OnJointSerializationCallback serializeJoint, OnJointDeserializationCallback deserializeJoint)
-{
-	m_serializedJointCallback = serializeJoint;
-	m_deserializedJointCallback = deserializeJoint;
-}
-
-void dgWorld::GetJointSerializationCallbacks (OnJointSerializationCallback* const serializeJoint, OnJointDeserializationCallback* const deserializeJoint) const
-{
-	*serializeJoint = m_serializedJointCallback;
-	*deserializeJoint = m_deserializedJointCallback;
-}
-
-
-void dgWorld::SerializeJointArray (dgInt32 bodyCount, dgSerialize serializeCallback, void* const userData) const
-{
-	dgInt32 count = 0;
-	const dgBodyMasterList* me = this;
-	for (dgBodyMasterList::dgListNode* node = me->GetFirst(); node; node = node->GetNext()) {
-		const dgBodyMasterListRow& info = node->GetInfo();
-		for (dgBodyMasterListRow::dgListNode *jointNode = info.GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-			const dgBodyMasterListCell& cell = jointNode->GetInfo();
-
-			dgConstraint* const joint = cell.m_joint;
-			count += joint->IsBilateral() ? 1 : 0;
-		}
-	}
-/*
-	dgTree<int, dgBody*> bodyMap (GetAllocator());
-	for (dgInt32 i = 0; i < bodyCount; i ++) {
-		bodyMap.Insert (i, bodyArray[i]);
-	}
-*/
-	count /= 2;
-	dgSerializeMarker (serializeCallback, userData);
-	serializeCallback(userData, &count, sizeof (count));	
-
-	dgTree<int, dgConstraint*> map (GetAllocator());
-	for (dgBodyMasterList::dgListNode* node = me->GetFirst(); node; node = node->GetNext()) {
-		dgBodyMasterListRow& info = node->GetInfo();
-		for (dgBodyMasterListRow::dgListNode *jointNode = info.GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-			const dgBodyMasterListCell& cell = jointNode->GetInfo();
-			dgConstraint* const joint = cell.m_joint;
-			if (joint->IsBilateral()) {
-				if (!map.Find(joint)) {
-					map.Insert (0, joint);
-					dgAssert (joint->GetBody0());
-					dgAssert (joint->GetBody1());
-					const dgInt32 body0 = (joint->GetBody0() != m_sentinelBody) ? joint->GetBody0()->m_serializedEnum : -1;
-					const dgInt32 body1 = (joint->GetBody1() != m_sentinelBody) ? joint->GetBody1()->m_serializedEnum : -1;
-
-					serializeCallback(userData, &body0, sizeof (dgInt32));
-					serializeCallback(userData, &body1, sizeof (dgInt32));
-
-					dgBilateralConstraint* const bilateralJoint = (dgBilateralConstraint*) joint;
-					bilateralJoint->Serialize (serializeCallback, userData);
-
-					dgSerializeMarker(serializeCallback, userData);
-				}
-			}
-		}
-	}
-
-	dgSerializeMarker(serializeCallback, userData);
-}
-
-void dgWorld::DeserializeJointArray (const dgTree<dgBody*, dgInt32>&bodyMap, dgDeserialize serializeCallback, void* const userData)
-{
-	dgInt32 count = 0;
-
-	dgDeserializeMarker (serializeCallback, userData);
-	serializeCallback(userData, &count, sizeof (count));	
-
-	for (dgInt32 i = 0; i < count; i ++) {
-		if (m_deserializedJointCallback) {
-			dgInt32 bodyIndex0; 
-			dgInt32 bodyIndex1; 
-
-			serializeCallback(userData, &bodyIndex0, sizeof (bodyIndex0));
-			serializeCallback(userData, &bodyIndex1, sizeof (bodyIndex1));
-
-			dgBody* const body0 = (bodyIndex0 != -1) ? bodyMap.Find (bodyIndex0)->GetInfo() : NULL;
-			dgBody* const body1 = (bodyIndex1 != -1) ? bodyMap.Find (bodyIndex1)->GetInfo() : NULL;
-			m_deserializedJointCallback (body0, body1, serializeCallback, userData);
-		}
-		dgDeserializeMarker(serializeCallback, userData);
-	}
-
-	dgDeserializeMarker(serializeCallback, userData);
-}
 
 
 dgInt32 dgWorld::GetBroadPhaseType() const
@@ -1592,4 +1280,310 @@ void dgWorld::UpdateSkeletons()
 			}
 		}
 	}
+}
+
+
+void dgWorld::OnSerializeToFile(void* const fileHandle, const void* const buffer, dgInt32 size)
+{
+	dgAssert((size & 0x03) == 0);
+	fwrite(buffer, size, 1, (FILE*)fileHandle);
+}
+
+void dgWorld::OnDeserializeFromFile(void* const fileHandle, void* const buffer, dgInt32 size)
+{
+	dgAssert((size & 0x03) == 0);
+	fread(buffer, size, 1, (FILE*)fileHandle);
+}
+
+void dgWorld::OnBodySerializeToFile(dgBody& body, void* const userData, dgSerialize serializeCallback, void* const serializeHandle)
+{
+	const char* const bodyIndentification = "NewtonGravityBody\0\0\0\0";
+	int size = (dgInt32(strlen(bodyIndentification)) + 3) & -4;
+	serializeCallback(serializeHandle, &size, sizeof (size));
+	serializeCallback(serializeHandle, bodyIndentification, size);
+}
+
+
+void dgWorld::SetJointSerializationCallbacks(OnJointSerializationCallback serializeJoint, OnJointDeserializationCallback deserializeJoint)
+{
+	m_serializedJointCallback = serializeJoint;
+	m_deserializedJointCallback = deserializeJoint;
+}
+
+void dgWorld::GetJointSerializationCallbacks(OnJointSerializationCallback* const serializeJoint, OnJointDeserializationCallback* const deserializeJoint) const
+{
+	*serializeJoint = m_serializedJointCallback;
+	*deserializeJoint = m_deserializedJointCallback;
+}
+
+dgBody* dgWorld::FindBodyFromSerializedID(dgInt32 serializedID) const
+{
+	const dgBodyMasterList& me = *this;
+	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
+		const dgBodyMasterListRow& graphNode = node->GetInfo();
+		if (graphNode.GetBody()->m_serializedEnum == serializedID) {
+			return graphNode.GetBody();
+		}
+	}
+	return NULL;
+}
+
+dgInt32 dgWorld::SerializeToFileSort(const dgBody* const body0, const dgBody* const body1, void* const context)
+{
+	if (body0->m_uniqueID < body1->m_uniqueID) {
+		return -1;
+	} else if (body0->m_uniqueID > body1->m_uniqueID) {
+		return 1;
+	}
+	return 0;
+}
+
+
+void dgWorld::SerializeScene(void* const userData, OnBodySerialize bodyCallback, dgSerialize serializeCallback, void* const serializeHandle) const
+{
+	dgBody** const array = new dgBody*[GetBodiesCount()];
+
+	dgInt32 count = 0;
+	const dgBodyMasterList& me = *this;
+	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
+		const dgBodyMasterListRow& graphNode = node->GetInfo();
+		array[count] = graphNode.GetBody();
+		array[count]->m_serializedEnum = count;
+		count++;
+		dgAssert(count <= GetBodiesCount());
+	}
+
+
+	dgSortIndirect(array, count, SerializeToFileSort);
+	SerializeBodyArray(userData, bodyCallback ? bodyCallback : OnBodySerializeToFile, array, count, serializeCallback, serializeHandle);
+	SerializeJointArray(count, OnSerializeToFile, serializeHandle);
+
+	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
+		const dgBodyMasterListRow& graphNode = node->GetInfo();
+		graphNode.GetBody()->m_serializedEnum = -1;
+	}
+
+	delete[] array;
+}
+
+
+void dgWorld::DeserializeScene(void* const userData, OnBodyDeserialize bodyCallback, dgDeserialize deserializeCallback, void* const serializeHandle)
+{
+	dgTree<dgBody*, dgInt32> bodyMap(GetAllocator());
+	DeserializeBodyArray(userData, bodyCallback ? bodyCallback : OnBodyDeserializeFromFile, bodyMap, deserializeCallback, serializeHandle);
+	DeserializeJointArray(bodyMap, deserializeCallback, serializeHandle);
+
+	const dgBodyMasterList& me = *this;
+	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; node = node->GetNext()) {
+		const dgBodyMasterListRow& graphNode = node->GetInfo();
+		graphNode.GetBody()->m_serializedEnum = -1;
+	}
+}
+
+void dgWorld::OnBodyDeserializeFromFile(dgBody& body, void* const userData, dgDeserialize deserializeCallback, void* const fileHandle)
+{
+}
+
+
+void dgWorld::DeserializeBodyArray (void* const userData, OnBodyDeserialize bodyCallback, dgTree<dgBody*, dgInt32>&bodyMap, dgDeserialize deserializeCallback, void* const serializeHandle)
+{
+	dgInt32 revision = dgDeserializeMarker(deserializeCallback, serializeHandle);
+
+	dgTree<const dgCollision*, dgInt32> shapeMap(GetAllocator());
+
+	dgInt32 uniqueShapes;
+	deserializeCallback(serializeHandle, &uniqueShapes, sizeof (uniqueShapes));
+	for (dgInt32 i = 0; i < uniqueShapes; i++) {
+		dgInt32 id;
+
+		deserializeCallback(serializeHandle, &id, sizeof (id));
+		dgCollisionInstance instance(this, deserializeCallback, serializeHandle, revision);
+		dgDeserializeMarker(deserializeCallback, serializeHandle);
+
+		const dgCollision* const shape = instance.GetChildShape();
+		shapeMap.Insert(shape, id);
+		shape->AddRef();
+	}
+
+	dgInt32 bodyCount;
+	deserializeCallback(serializeHandle, &bodyCount, sizeof (bodyCount));
+	for (dgInt32 i = 0; i < bodyCount; i++) {
+		dgInt32 bodyType;
+		deserializeCallback(serializeHandle, &bodyType, sizeof (bodyType));
+		dgBody* body = NULL;
+
+		switch (bodyType) 
+		{
+			case dgBody::m_dynamicBody:
+			{
+				body = new (m_allocator)dgDynamicBody(this, &shapeMap, deserializeCallback, serializeHandle, revision);
+				break;
+			}
+			case dgBody::m_kinematicBody:
+			{
+				body = new (m_allocator)dgKinematicBody(this, &shapeMap, deserializeCallback, serializeHandle, revision);
+				break;
+			}
+		}
+
+		dgAssert(body);
+		m_bodiesUniqueID++;
+		body->m_freeze = false;
+		body->m_sleeping = false;
+		body->m_equilibrium = false;
+		body->m_spawnnedFromCallback = false;
+		body->m_uniqueID = dgInt32(m_bodiesUniqueID);
+
+//if (body->m_uniqueID == 5 || body->m_uniqueID == 33)
+//{
+		dgBodyMasterList::AddBody(body);
+		body->SetMatrix(body->GetMatrix());
+		m_broadPhase->Add(body);
+		if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+			dgDynamicBody* const dynBody = (dgDynamicBody*)body;
+			dynBody->SetMassMatrix(dynBody->m_mass.m_w, dynBody->CalculateLocalInertiaMatrix());
+		}
+
+		// load user related data 
+		bodyCallback(*body, userData, deserializeCallback, serializeHandle);
+
+		bodyMap.Insert(body, body->m_serializedEnum);
+//} else {
+//delete body;
+//}
+
+		// sync to next body
+		dgDeserializeMarker(deserializeCallback, serializeHandle);
+	}
+
+	dgTree<const dgCollision*, dgInt32>::Iterator iter(shapeMap);
+	for (iter.Begin(); iter; iter++) {
+		const dgCollision* const collision = iter.GetNode()->GetInfo();
+		collision->Release();
+	}
+}
+
+
+void dgWorld::DeserializeJointArray (const dgTree<dgBody*, dgInt32>&bodyMap, dgDeserialize serializeCallback, void* const userData)
+{
+	dgInt32 count = 0;
+
+	dgDeserializeMarker (serializeCallback, userData);
+	serializeCallback(userData, &count, sizeof (count));	
+
+	for (dgInt32 i = 0; i < count; i ++) {
+		if (m_deserializedJointCallback) {
+			dgInt32 bodyIndex0; 
+			dgInt32 bodyIndex1; 
+
+			serializeCallback(userData, &bodyIndex0, sizeof (bodyIndex0));
+			serializeCallback(userData, &bodyIndex1, sizeof (bodyIndex1));
+
+			dgBody* const body0 = (bodyIndex0 != -1) ? bodyMap.Find (bodyIndex0)->GetInfo() : NULL;
+			dgBody* const body1 = (bodyIndex1 != -1) ? bodyMap.Find (bodyIndex1)->GetInfo() : NULL;
+			m_deserializedJointCallback (body0, body1, serializeCallback, userData);
+		}
+		dgDeserializeMarker(serializeCallback, userData);
+	}
+
+	dgDeserializeMarker(serializeCallback, userData);
+}
+
+
+void dgWorld::SerializeBodyArray(void* const userData, OnBodySerialize bodyCallback, dgBody** const array, dgInt32 count, dgSerialize serializeCallback, void* const fileHandle) const
+{
+	dgSerializeMarker(serializeCallback, fileHandle);
+
+	// serialize all collisions
+	dgInt32 uniqueShapes = 0;
+	dgTree<dgInt32, const dgCollision*> shapeMap(GetAllocator());
+	for (dgInt32 i = 0; i < count; i++) {
+		dgBody* const body = array[i];
+		dgAssert(body->m_world == this);
+		dgCollisionInstance* const instance = body->GetCollision();
+		const dgCollision* const collision = instance->GetChildShape();
+		dgTree<dgInt32, const dgCollision*>::dgTreeNode* const shapeNode = shapeMap.Insert(uniqueShapes, collision);
+		if (shapeNode) {
+			uniqueShapes++;
+		}
+	}
+
+	serializeCallback(fileHandle, &uniqueShapes, sizeof (uniqueShapes));
+	dgTree<dgInt32, const dgCollision*>::Iterator iter(shapeMap);
+	for (iter.Begin(); iter; iter++) {
+		dgInt32 id = iter.GetNode()->GetInfo();
+		const dgCollision* const collision = iter.GetKey();
+		dgCollisionInstance instance(this, collision, 0, dgMatrix(dgGetIdentityMatrix()));
+		serializeCallback(fileHandle, &id, sizeof (id));
+		instance.Serialize(serializeCallback, fileHandle);
+		dgSerializeMarker(serializeCallback, fileHandle);
+	}
+
+	serializeCallback(fileHandle, &count, sizeof (count));
+	for (dgInt32 i = 0; i < count; i++) {
+		dgBody* const body = array[i];
+
+		dgInt32 bodyType = body->GetType();
+		serializeCallback(fileHandle, &bodyType, sizeof (bodyType));
+
+		// serialize the body
+		body->Serialize(shapeMap, serializeCallback, fileHandle);
+
+		// serialize body custom data
+		bodyCallback(*body, userData, serializeCallback, fileHandle);
+
+		dgSerializeMarker(serializeCallback, fileHandle);
+	}
+}
+
+void dgWorld::SerializeJointArray(dgInt32 bodyCount, dgSerialize serializeCallback, void* const userData) const
+{
+	dgInt32 count = 0;
+	const dgBodyMasterList* me = this;
+	for (dgBodyMasterList::dgListNode* node = me->GetFirst(); node; node = node->GetNext()) {
+		const dgBodyMasterListRow& info = node->GetInfo();
+		for (dgBodyMasterListRow::dgListNode *jointNode = info.GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+			const dgBodyMasterListCell& cell = jointNode->GetInfo();
+
+			dgConstraint* const joint = cell.m_joint;
+			count += joint->IsBilateral() ? 1 : 0;
+		}
+	}
+
+	//	dgTree<int, dgBody*> bodyMap (GetAllocator());
+	//	for (dgInt32 i = 0; i < bodyCount; i ++) {
+	//		bodyMap.Insert (i, bodyArray[i]);
+	//	}
+
+	count /= 2;
+	dgSerializeMarker(serializeCallback, userData);
+	serializeCallback(userData, &count, sizeof (count));
+
+	dgTree<int, dgConstraint*> map(GetAllocator());
+	for (dgBodyMasterList::dgListNode* node = me->GetFirst(); node; node = node->GetNext()) {
+		dgBodyMasterListRow& info = node->GetInfo();
+		for (dgBodyMasterListRow::dgListNode *jointNode = info.GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+			const dgBodyMasterListCell& cell = jointNode->GetInfo();
+			dgConstraint* const joint = cell.m_joint;
+			if (joint->IsBilateral()) {
+				if (!map.Find(joint)) {
+					map.Insert(0, joint);
+					dgAssert(joint->GetBody0());
+					dgAssert(joint->GetBody1());
+					const dgInt32 body0 = (joint->GetBody0() != m_sentinelBody) ? joint->GetBody0()->m_serializedEnum : -1;
+					const dgInt32 body1 = (joint->GetBody1() != m_sentinelBody) ? joint->GetBody1()->m_serializedEnum : -1;
+
+					serializeCallback(userData, &body0, sizeof (dgInt32));
+					serializeCallback(userData, &body1, sizeof (dgInt32));
+
+					dgBilateralConstraint* const bilateralJoint = (dgBilateralConstraint*)joint;
+					bilateralJoint->Serialize(serializeCallback, userData);
+
+					dgSerializeMarker(serializeCallback, userData);
+				}
+			}
+		}
+	}
+
+	dgSerializeMarker(serializeCallback, userData);
 }

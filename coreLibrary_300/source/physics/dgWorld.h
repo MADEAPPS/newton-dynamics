@@ -164,6 +164,10 @@ class dgWorld
 	typedef void (dgApi *OnListenerBodyDestroyCallback) (const dgWorld* const world, void* const listener, dgBody* const body);
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listener, dgFloat32 timestep);
 	typedef void (dgApi *OnListenerDestroyCallback) (const dgWorld* const world, void* const listener);
+
+//	typedef void (dgApi *OnSerialize) (void* const userData, dgSerialize funt, void* const serilalizeObject);
+//	typedef void (dgApi *OnDeserialize) (void* const userData, dgDeserialize funt, void* const serilalizeObject);
+
 	typedef void (dgApi *OnBodySerialize) (dgBody& me, void* const userData, dgSerialize funt, void* const serilalizeObject);
 	typedef void (dgApi *OnBodyDeserialize) (dgBody& me, void* const userData, dgDeserialize funt, void* const serilalizeObject);
 	typedef void (dgApi *OnCollisionInstanceDestroy) (const dgWorld* const world, const dgCollisionInstance* const collision);
@@ -328,26 +332,25 @@ class dgWorld
 	void SetGetTimeInMicrosenconds (OnGetTimeInMicrosenconds callback);
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 
+
+	static void OnDeserializeFromFile(void* const userData, void* const buffer, dgInt32 size);
+	static void OnSerializeToFile(void* const userData, const void* const buffer, dgInt32 size);
 	static dgInt32 SerializeToFileSort (const dgBody* const body0, const dgBody* const body1, void* const context);
-	static void OnSerializeToFile (void* const userData, const void* const buffer, size_t size);
-	static void OnDeserializeFromFile (void* const userData, void* const buffer, size_t size);
-
 	static void OnBodySerializeToFile (dgBody& body, void* const userData, dgSerialize serializeCallback, void* const serializeHandle);
-	static void OnBodyDeserializeFromFile (dgBody& body, void* const userData, dgDeserialize serializeCallback, void* const serializeHandle);
+	static void OnBodyDeserializeFromFile (dgBody& body, void* const userData, dgDeserialize deserializeCallback, void* const serializeHandle);
 
-	void SerializeToFile (const char* const fileName, OnBodySerialize bodyCallback, void* const userData) const;
-	void DeserializeFromFile (const char* const fileName, OnBodyDeserialize bodyCallback, void* const userData);
+	dgBody* FindBodyFromSerializedID(dgInt32 serializedID) const;
+	void SetJointSerializationCallbacks(OnJointSerializationCallback serializeJointCallback, OnJointDeserializationCallback deserializeJointCallback);
+	void GetJointSerializationCallbacks(OnJointSerializationCallback* const serializeJointCallback, OnJointDeserializationCallback* const deserializeJointCallback) const;
+
+	void SerializeScene(void* const userData, OnBodySerialize bodyCallback, dgSerialize serializeCallback, void* const serializeHandle) const;
+	void DeserializeScene(void* const userData, OnBodyDeserialize bodyCallback, dgDeserialize deserializeCallback, void* const serializeHandle);
+
+	void SerializeBodyArray (void* const userData, OnBodySerialize bodyCallback, dgBody** const array, dgInt32 count, dgSerialize serializeCallback, void* const serializeHandle) const;
+	void DeserializeBodyArray (void* const userData, OnBodyDeserialize bodyCallback, dgTree<dgBody*, dgInt32>&bodyMap, dgDeserialize deserializeCallback, void* const serializeHandle);
 
 	void SerializeJointArray (dgInt32 count, dgSerialize serializeCallback, void* const serializeHandle) const;
 	void DeserializeJointArray (const dgTree<dgBody*, dgInt32>&bodyMap, dgDeserialize serializeCallback, void* const serializeHandle);
-
-	void SerializeBodyArray (dgBody** const array, dgInt32 count, OnBodySerialize bodyCallback, void* const userData, dgSerialize serializeCallback, void* const serializeHandle) const;
-	void DeserializeBodyArray (dgTree<dgBody*, dgInt32>&bodyMap, OnBodyDeserialize bodyCallback, void* const userData, dgDeserialize deserializeCallback, void* const serializeHandle);
-
-	dgBody* FindBodyFromSerializedID(dgInt32 serializedID) const;
-
-	void SetJointSerializationCallbacks (OnJointSerializationCallback serializeJoint, OnJointDeserializationCallback deserializeJoint);
-	void GetJointSerializationCallbacks (OnJointSerializationCallback* const serializeJoint, OnJointDeserializationCallback* const deserializeJoint) const;
 
 	void SerializeCollision (dgCollisionInstance* const shape, dgSerialize deserialization, void* const userData) const;
 	dgCollisionInstance* CreateCollisionFromSerialization (dgDeserialize deserialization, void* const userData);

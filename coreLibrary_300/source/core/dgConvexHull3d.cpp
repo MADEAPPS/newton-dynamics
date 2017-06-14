@@ -907,4 +907,24 @@ dgFloat64 dgConvexHull3d::RayCast (const dgBigVector& localP0, const dgBigVector
 	return interset;
 }
 
+void dgConvexHull3d::Save (const char* const filename) const
+{
+	FILE* const file = fopen(filename, "wb");
+	int index = 0;
+//	fprintf(file, "final\n");
+	for (dgListNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+		fprintf(file, "triangle %d\n", index);
+		index++;
+		const dgConvexHull3DFace& face = nodePtr->GetInfo();
+		const dgBigVector& p0 = m_points[face.m_index[0]];
+		const dgBigVector& p1 = m_points[face.m_index[1]];
+		const dgBigVector& p2 = m_points[face.m_index[2]];
 
+		fprintf(file, "p0(%f %f %f)\n", p0[0], p0[1], p0[2]);
+		fprintf(file, "p1(%f %f %f)\n", p1[0], p1[1], p1[2]);
+		fprintf(file, "p2(%f %f %f)\n", p2[0], p2[1], p2[2]);
+	}
+	fprintf(file, "\n");
+
+	fclose(file);
+}

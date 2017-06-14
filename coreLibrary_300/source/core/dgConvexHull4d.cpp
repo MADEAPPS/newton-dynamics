@@ -354,7 +354,7 @@ void dgConvexHull4d::Save (const char* const filename) const
 {
 	FILE* const file = fopen (filename, "wb");
 	int index = 0;
-	fprintf (file, "final\n");
+//	fprintf (file, "final\n");
 	for (dgListNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
 		fprintf (file, "tetra %d\n", index);
 		index ++;

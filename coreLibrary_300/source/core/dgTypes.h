@@ -330,8 +330,8 @@ class dgVector;
 
 
 
-typedef void (dgApi *dgDeserialize) (void* const userData, void* buffer, size_t size);
-typedef void (dgApi *dgSerialize) (void* const userData, const void* const buffer, size_t size);
+typedef void (dgApi *dgDeserialize) (void* const userData, void* buffer, dgInt32 size);
+typedef void (dgApi *dgSerialize) (void* const userData, const void* const buffer, dgInt32 size);
 typedef bool (dgApi *dgReportProgress) (dgFloat32 progressNormalzedPercent, void* const userData);
 
 #define dgAlloca(type, size) (type*) alloca ((size) * sizeof (type))

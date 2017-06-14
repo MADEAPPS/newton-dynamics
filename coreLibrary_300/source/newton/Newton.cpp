@@ -278,42 +278,50 @@ void NewtonGetJointSerializationCallbacks (const NewtonWorld* const newtonWorld,
 }
 
 
+void NewtonSerializeScene(const NewtonWorld* const newtonWorld, NewtonOnBodySerializationCallback bodyCallback, void* const bodyUserData,
+	NewtonSerializeCallback serializeCallback, void* const serializeHandle)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	world->SerializeScene(bodyUserData, dgWorld::OnBodySerialize(bodyCallback), (dgSerialize) serializeCallback, serializeHandle);
+}
+
+void NewtonDeserializeScene(const NewtonWorld* const newtonWorld, NewtonOnBodyDeserializationCallback bodyCallback, void* const bodyUserData,
+							NewtonDeserializeCallback deserializeCallback, void* const serializeHandle)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	world->DeserializeScene(bodyUserData, (dgWorld::OnBodyDeserialize)bodyCallback, (dgDeserialize) deserializeCallback, serializeHandle);
+}
+
+
 void NewtonSerializeToFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodySerializationCallback bodyCallback, void* const bodyUserData)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	world->SerializeToFile (filename, dgWorld::OnBodySerialize (bodyCallback), bodyUserData);
+	FILE* const file = fopen(filename, "wb");
+	if (file) {
+		NewtonSerializeScene(newtonWorld, bodyCallback, bodyUserData, dgWorld::OnSerializeToFile, file);
+		fclose (file);
+	}
 }
 
 void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char* const filename, NewtonOnBodyDeserializationCallback bodyCallback, void* const bodyUserData)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	world->DeserializeFromFile (filename, dgWorld::OnBodyDeserialize (bodyCallback), bodyUserData);
+	FILE* const file = fopen(filename, "rb");
+	if (file) {
+		NewtonDeserializeScene(newtonWorld, bodyCallback, bodyUserData, dgWorld::OnDeserializeFromFile, file);
+		fclose (file);
+	}
 }
 
 NewtonBody* NewtonFindSerializedBody(const NewtonWorld* const newtonWorld, int bodySerializedID)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
+	dgAssert (0);
 	return (NewtonBody*) world->FindBodyFromSerializedID(bodySerializedID);
 }
-
-/*
-void NewtonSerializeBodyArray (const NewtonWorld* const newtonWorld, NewtonBody** const bodyArray, int bodyCount, NewtonOnBodySerializationCallback serializeBody, NewtonSerializeCallback serializeFunction, void* const serializeHandle)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	world->SerializeBodyArray ((dgBody**)bodyArray, bodyCount, dgWorld::OnBodySerialize (serializeBody), (dgSerialize) serializeFunction, serializeHandle);
-}
-
-void NewtonDeserializeBodyArray (const NewtonWorld* const newtonWorld, NewtonOnBodyDeserializationCallback deserializeBody, NewtonDeserializeCallback serializeFunction, void* const serializeHandle)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	world->DeserializeBodyArray (dgWorld::OnBodyDeserialize (deserializeBody), (dgDeserialize) serializeFunction, serializeHandle);
-}
-*/
 
 
 int NewtonGetCurrentDevice (const NewtonWorld* const newtonWorld)

@@ -85,8 +85,9 @@ class dgConvexHull3d: public dgList<dgConvexHull3DFace>
 	dgFloat64 TetrahedrumVolume (const dgBigVector& p0, const dgBigVector& p1, const dgBigVector& p2, const dgBigVector& p3) const;
 
 	dgConvexHull3dAABBTreeNode* BuildTree (dgConvexHull3dAABBTreeNode* const parent, dgConvexHull3DVertex* const points, dgInt32 count, dgInt32 baseIndex, dgInt8** const memoryPool, dgInt32& maxMemSize) const;
-	static dgInt32 ConvexCompareVertex(const dgConvexHull3DVertex* const  A, const dgConvexHull3DVertex* const B, void* const context);
+	static dgInt32 ConvexCompareVertex(const dgConvexHull3DVertex* const A, const dgConvexHull3DVertex* const B, void* const context);
 	bool Sanity() const;
+	void Save (const char* const filename) const;
 
 	class dgNormalMap
 	{
