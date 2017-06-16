@@ -241,10 +241,6 @@
 #endif
 
 
-#if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER >= 1800))
-//	#define DG_USE_AVX2
-#endif
-
 
 #if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1600))
 	#include <stdint.h>
