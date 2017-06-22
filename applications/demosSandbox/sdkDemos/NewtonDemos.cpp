@@ -581,6 +581,8 @@ void NewtonDemos::LoadDemo (int index)
     
 	m_demosSelection[index].m_launchDemoCallback (m_scene);
 	//m_scene->DeserializedPhysicScene ("C:/Users/julio/Downloads/OrbitalScene.bin");
+	//m_scene->DeserializedPhysicScene ("C:/Users/julio/Downloads/tree_collision_bug_min.bin");
+	
 	m_scene->SwapBuffers(); 
 
 	RestoreSettings ();

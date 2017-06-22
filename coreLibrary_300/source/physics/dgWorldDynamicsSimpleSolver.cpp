@@ -934,7 +934,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	}
 }
 
-
 void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep, dgFloat32 maxAccNorm) const
 {
 	dTimeTrackerEvent(__FUNCTION__);
@@ -965,7 +964,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 	joindDesc.m_timeStep = timestepRK;
 	joindDesc.m_invTimeStep = invTimestepRK;
 	joindDesc.m_firstPassCoefFlag = dgFloat32(0.0f);
-
+/*
 	dgInt32 skeletonCount = 0;
 	dgInt32 skeletonMemorySizeInBytes = 0;
 	dgInt32 lru = dgAtomicExchangeAndAdd(&dgSkeletonContainer::m_lruMarker, 1);
@@ -992,6 +991,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 		skeletonArray[i]->InitMassMatrix(constraintArray, matrixRow, &skeletonMemory[skeletonMemorySizeInBytes]);
 		skeletonMemorySizeInBytes += memorySizes[i];
 	}
+*/
 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
@@ -1008,14 +1008,15 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 		dgFloat32 accNorm(maxAccNorm * dgFloat32(2.0f));
 		for (dgInt32 i = 0; (i < passes) && (accNorm > maxAccNorm); i++) {
 			accNorm = dgFloat32(0.0f);
-			for (dgInt32 j = 0; (j < jointCount) && !constraintArray[j].m_isSkeleton; j++) {
+//			for (dgInt32 j = 0; (j < jointCount) && !constraintArray[j].m_isSkeleton; j++) {
+			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
 				dgFloat32 accel = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
-			for (dgInt32 j = 0; j < skeletonCount; j++) {
-				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
-			}
+//			for (dgInt32 j = 0; j < skeletonCount; j++) {
+//				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
+//			}
 		}
 
 		if (timestepRK != dgFloat32(0.0f)) {
@@ -1023,8 +1024,8 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 			for (dgInt32 i = 1; i < bodyCount; i++) {
 				dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 				dgAssert(body->m_index == i);
-				//ApplyForceAndTorque(body, internalForces[i], timestep4, speedFreeze2);
-
+				dgAssert (body->IsRTTIType(dgBody::m_dynamicBodyRTTI));
+				//if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
 				const dgJacobian& forceAndTorque = internalForces[i];
 				dgVector force(body->m_externalForce + forceAndTorque.m_linear);
 				dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
@@ -1036,6 +1037,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 
 				dgAssert(body->m_veloc.m_w == dgFloat32(0.0f));
 				dgAssert(body->m_omega.m_w == dgFloat32(0.0f));
+//				}
 			}
 		} else {
 			for (dgInt32 i = 1; i < bodyCount; i++) {
