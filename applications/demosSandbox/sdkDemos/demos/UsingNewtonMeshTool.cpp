@@ -142,7 +142,6 @@ static NewtonBody* CreateSimpleNewtonMeshBox (DemoEntityManager* const scene, co
 
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = origin;
-matrix.m_posit.m_y += 10.0f;
 	matrix.m_posit.m_w = 1.0f;
 	NewtonBody* const body = CreateSimpleSolid (scene, visualMesh, mass, matrix, collision, 0);
 
