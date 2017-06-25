@@ -5688,7 +5688,6 @@ void NewtonBodyGetAABB(const NewtonBody* const bodyPtr, dFloat* const p0, dFloat
 	p1[0] = vector1.m_x;
 	p1[1] = vector1.m_y;
 	p1[2] = vector1.m_z;
-
 }
 
 /*!
@@ -5738,7 +5737,6 @@ void NewtonBodyGetVelocity(const NewtonBody* const bodyPtr, dFloat* const veloci
 	velocity[2] = vector.m_z;
 }
 
-
 /*!
   Set the global angular velocity of the body.
 
@@ -5755,6 +5753,8 @@ void NewtonBodySetOmega(const NewtonBody* const bodyPtr, const dFloat* const ome
 	dgVector vector (omega[0], omega[1], omega[2], dgFloat32 (0.0f));
 	body->SetOmega (vector);
 }
+
+
 
 void NewtonBodySetOmegaNoSleep(const NewtonBody* const bodyPtr, const dFloat* const omega)
 {
@@ -5786,6 +5786,43 @@ void NewtonBodyGetOmega(const NewtonBody* const bodyPtr, dFloat* const omega)
 	omega[2] = vector.m_z;
 }
 
+
+/*!
+Get the global angular accelration of the body.
+
+@param *bodyPtr is the pointer to the body
+@param *omega pointer to an array of at least three floats to hold the angular acceleration vector.
+*/
+void NewtonBodyGetAlpha(const NewtonBody* const bodyPtr, dFloat* const alpha)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+
+	dgVector vector(body->GetNetAlpha());
+	alpha[0] = vector.m_x;
+	alpha[1] = vector.m_y;
+	alpha[2] = vector.m_z;
+}
+
+
+/*!
+Get the global linear velocity of the body.
+
+@param *bodyPtr is the pointer to the body.
+@param *velocity pointer to an array of at least three floats to hold the velocity vector.
+
+See also: ::NewtonBodySetVelocity
+*/
+void NewtonBodyGetAcceleration(const NewtonBody* const bodyPtr, dFloat* const acceleration)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgBody* const body = (dgBody *)bodyPtr;
+
+	dgVector vector(body->GetNetAccel());
+	acceleration[0] = vector.m_x;
+	acceleration[1] = vector.m_y;
+	acceleration[2] = vector.m_z;
+}
 
 /*!
   Apply the linear viscous damping coefficient to the body.

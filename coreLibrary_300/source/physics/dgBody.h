@@ -152,6 +152,13 @@ class dgBody
 	virtual dgMatrix CalculateInvInertiaMatrix () const;
 	virtual dgMatrix CalculateLocalInertiaMatrix () const;
 
+	virtual dgVector GetNetAlpha() const;
+	virtual dgVector GetNetAccel() const;
+
+	virtual void SetNetAlpha(const dgVector& alpha);
+	virtual void SetNetAccel(const dgVector& accel);
+
+
 	bool IsCollidable() const;
 	virtual void SetCollidable (bool state) = 0;
 	virtual bool IsInEquilibrium () const = 0;
@@ -603,6 +610,7 @@ DG_INLINE dgInt32 dgBody::GetSerializedID() const
 {
 	return m_serializedEnum;
 }
+
 
 #endif 
 

@@ -482,9 +482,9 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 
 	const dgNormalMap& normalMap = GetNormaMap();
 
-	dgInt32 index = SupportVertex (&tree, points, normalMap.m_normal[0]);
-	m_points[0] = points[index];
-	points[index].m_mark = 1;
+	dgInt32 index0 = SupportVertex (&tree, points, normalMap.m_normal[0]);
+	m_points[0] = points[index0];
+	points[index0].m_mark = 1;
 
 	bool validTetrahedrum = false;
 	dgBigVector e1 (dgFloat64 (0.0f), dgFloat64 (0.0f), dgFloat64 (0.0f), dgFloat64 (0.0f)) ;
@@ -534,13 +534,13 @@ dgInt32 dgConvexHull3d::InitVertexArray(dgConvexHull3DVertex* const points, cons
 	validTetrahedrum = false;
 	dgBigVector e3(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f));
 
-	index = SupportVertex (&tree, points, normal);
-	e3 = points[index] - m_points[0];
-	dgFloat64 error2 = normal.DotProduct3(e3);
-	if (fabs (error2) > (dgFloat64 (1.0e-6f) * m_diag * m_diag)) {
+	index0 = SupportVertex (&tree, points, normal);
+	e3 = points[index0] - m_points[0];
+	dgFloat64 err2 = normal.DotProduct3(e3);
+	if (fabs (err2) > (dgFloat64 (1.0e-6f) * m_diag * m_diag)) {
 		// we found a valid tetrahedral, about and start build the hull by adding the rest of the points
-		m_points[3] = points[index];
-		points[index].m_mark = 1;
+		m_points[3] = points[index0];
+		points[index0].m_mark = 1;
 		validTetrahedrum = true;
 	}
 	if (!validTetrahedrum) {

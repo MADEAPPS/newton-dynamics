@@ -151,6 +151,26 @@ dgBody::~dgBody()
 {
 }
 
+dgVector dgBody::GetNetAlpha() const
+{
+	return dgVector::m_zero;
+}
+dgVector dgBody::GetNetAccel() const
+{
+	return dgVector::m_zero;
+}
+
+void dgBody::SetNetAlpha(const dgVector& alpha)
+{
+}
+
+void dgBody::SetNetAccel(const dgVector& accel)
+{
+}
+
+
+
+
 void dgBody::AttachCollision (dgCollisionInstance* const collisionSrc)
 {
 	dgCollisionInstance* const instance = new (m_world->GetAllocator()) dgCollisionInstance (*collisionSrc);

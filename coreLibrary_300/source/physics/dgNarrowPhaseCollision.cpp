@@ -1065,19 +1065,19 @@ void dgWorld::CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threa
 		SceneContacts(pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionScene_RTTI)) {
 		contact->SwapBodies();
-		pair->m_flipContacts = true;
+		pair->m_flipContacts = -1;
 		SceneContacts (pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		CompoundContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionCompound_RTTI)) {
 		contact->SwapBodies();
-		pair->m_flipContacts = true;
+		pair->m_flipContacts = -1;
 		CompoundContacts (pair, proxy);
 	} else if (body0->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		ConvexContacts (pair, proxy);
 	} else if (body1->m_collision->IsType (dgCollision::dgCollisionConvexShape_RTTI)) {
 		contact->SwapBodies();
-		pair->m_flipContacts = true;
+		pair->m_flipContacts = -1;
 		ConvexContacts (pair, proxy);
 	}
 

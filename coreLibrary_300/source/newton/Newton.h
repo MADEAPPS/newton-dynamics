@@ -934,6 +934,8 @@ extern "C" {
 	NEWTON_API void NewtonBodyGetInvInertiaMatrix(const NewtonBody* const body, dFloat* const invInertiaMatrix);
 	NEWTON_API void NewtonBodyGetOmega(const NewtonBody* const body, dFloat* const vector);
 	NEWTON_API void NewtonBodyGetVelocity(const NewtonBody* const body, dFloat* const vector);
+	NEWTON_API void NewtonBodyGetAlpha(const NewtonBody* const body, dFloat* const vector);
+	NEWTON_API void NewtonBodyGetAcceleration(const NewtonBody* const body, dFloat* const vector);
 	NEWTON_API void NewtonBodyGetForce(const NewtonBody* const body, dFloat* const vector);
 	NEWTON_API void NewtonBodyGetTorque(const NewtonBody* const body, dFloat* const vector);
 //	NEWTON_API void NewtonBodyGetForceAcc(const NewtonBody* const body, dFloat* const vector);

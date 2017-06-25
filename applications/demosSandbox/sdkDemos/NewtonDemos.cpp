@@ -23,7 +23,7 @@
 #define DEMO_HEIGHT  960
 
 
-//#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// Precessing tops
@@ -43,7 +43,7 @@
 //#define DEFAULT_SCENE	17			// non uniform Scaled Collision
 //#define DEFAULT_SCENE	18			// scaled mesh collision
 //#define DEFAULT_SCENE	19			// continuous collision
-#define DEFAULT_SCENE	20			// paper wall continuous collision
+//#define DEFAULT_SCENE	20			// paper wall continuous collision
 //#define DEFAULT_SCENE	21			// puck slide continuous collision
 //#define DEFAULT_SCENE	22			// simple convex decomposition
 //#define DEFAULT_SCENE	23			// scene Collision
