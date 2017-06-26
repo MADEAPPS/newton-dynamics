@@ -75,6 +75,11 @@ class dVector: public TemplateVector<dFloat>
 		:TemplateVector<dFloat>(x, y, z, w)
 	{
 	}
+
+	dVector(const TemplateVector<dFloat64>& v)
+		:TemplateVector<dFloat>(dFloat(v.m_x), dFloat(v.m_y), dFloat(v.m_z), dFloat(v.m_w))
+	{
+	}
 };
 
 

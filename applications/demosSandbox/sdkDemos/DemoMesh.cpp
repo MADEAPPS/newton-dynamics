@@ -879,8 +879,8 @@ void DemoBezierCurve::Render (DemoEntityManager* const scene)
 		dBigVector p0 (m_curve.CurvePoint(0.0f)) ;
 		for (int i = 1; i <= m_renderResolution; i ++) {
 			dBigVector p1 (m_curve.CurvePoint(i * scale));
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
-			glVertex3f (p1.m_x, p1.m_y, p1.m_z);
+			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 			p0 = p1;
 		}
 		glEnd();

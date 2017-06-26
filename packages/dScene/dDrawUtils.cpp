@@ -25,8 +25,8 @@
 int CreateCone (dVector* const points, dVector* const normals, int segments, dFloat radius, dFloat height, int maxPoints)
 {
 	dMatrix rotation (dPitchMatrix((-360.0f / segments) * 3.141592f/180.0f));
-	dVector p0 (0.0, 0.0f, 0.0f, 0.0f);
-	dVector p1 (0.0, radius, 0.0f, 0.0f);
+	dVector p0 (0.0f, 0.0f, 0.0f, 0.0f);
+	dVector p1 (0.0f, radius, 0.0f, 0.0f);
 	dVector q1 (height, 0.0f, 0.0f, 0.0f);
 
 	dVector n (radius, height, 0.0f, 0.0f);
@@ -57,12 +57,12 @@ int CreateCone (dVector* const points, dVector* const normals, int segments, dFl
 int CreateCylinder (dVector* const points, dVector* const normals, int segments, dFloat radius, dFloat height, int maxPoints)
 {
 	dMatrix rotation (dPitchMatrix((-360.0f / segments) * 3.141592f/180.0f));
-	dVector p0 (0.0, 0.0f, 0.0f, 0.0f);
-	dVector p1 (0.0, radius, 0.0f, 0.0f);
+	dVector p0 (0.0f, 0.0f, 0.0f, 0.0f);
+	dVector p1 (0.0f, radius, 0.0f, 0.0f);
 
 	dVector q0 (height, 0.0f, 0.0f, 0.0f);
 	dVector q1 (height, radius, 0.0f, 0.0f);
-	dVector n (0, 1.0f, 0.0f, 0.0f);
+	dVector n (0.0f, 1.0f, 0.0f, 0.0f);
 
 	int count = 0;
 	for (int i = 0; (i < segments) && (count < maxPoints); i ++) {

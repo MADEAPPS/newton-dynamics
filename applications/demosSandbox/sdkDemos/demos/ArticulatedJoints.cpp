@@ -1044,12 +1044,10 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat distAcc = 0.0f;
 
 		dFloat stepAcc = linkLength;
-		dBigVector q(bezierPath->m_curve.CurvePoint(0.0f));
-		dVector p0(dVector(q.m_x, q.m_y, q.m_z, q.m_w));
+		dVector p0(bezierPath->m_curve.CurvePoint(0.0f));
 		for (int i = 1; i < samplingRate + 45; i++) {
 			dFloat u = dFloat(i) / samplingRate;
-			dBigVector q(bezierPath->m_curve.CurvePoint(dMod(u, 1.0f)));
-			dVector p1(dVector(q.m_x, q.m_y, q.m_z, q.m_w));
+			dVector p1(bezierPath->m_curve.CurvePoint(dMod(u, 1.0f)));
 			dVector err(p1 - p0);
 			dFloat errMag = dSqrt(err.DotProduct3(err));
 			distAcc += errMag;
@@ -1076,8 +1074,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		dFloat s = 0.0f;
 		dMatrix matrix(dGetIdentityMatrix());
 		dFloat u0 = CalculateKnotParam(steps, linksCount, s);
-		dBigVector r(bezierPath->m_curve.CurvePoint(u0));
-		dVector r0(dVector(r.m_x, r.m_y, r.m_z, 1.0f));
+//		dBigVector r(bezierPath->m_curve.CurvePoint(u0));
+//		dVector r0(r.m_x, r.m_y, r.m_z, dFloat64(1.0f));
+		dVector r0(bezierPath->m_curve.CurvePoint(u0));
 
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -1097,8 +1096,9 @@ class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManage
 		for (int i = 1; i < linksCount + 1; i++) {
 			s += linkLength;
 			dFloat u1 = CalculateKnotParam(steps, linksCount, dMod (s, length));
-			dBigVector r(bezierPath->m_curve.CurvePoint(u1));
-			dVector r1(dVector(r.m_x, r.m_y, r.m_z, 1.0f));
+			//dBigVector r(bezierPath->m_curve.CurvePoint(u1));
+			//dVector r1(r.m_x, r.m_y, r.m_z, dFloat64(1.0f));
+			dVector r1(bezierPath->m_curve.CurvePoint(u1));
 			dVector dir(r1 - r0);
 
 			dir = dir.Scale(1.0f / dSqrt(dir.DotProduct3(dir)));
