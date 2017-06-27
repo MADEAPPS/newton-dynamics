@@ -492,6 +492,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -508,6 +509,7 @@
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;HAVE_GL_H;HAVE_GLU_H;GLEW_STATIC;AL_LIBTYPE_STATIC;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE</PreprocessorDefinitions>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>

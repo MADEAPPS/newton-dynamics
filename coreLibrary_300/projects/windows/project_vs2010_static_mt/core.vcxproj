@@ -445,6 +445,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>dgStdafx.h</PrecompiledHeaderFile>
       <Optimization>Disabled</Optimization>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -489,6 +489,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>NewtonStdAfx.h</PrecompiledHeaderFile>
       <Optimization>Disabled</Optimization>
+      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
