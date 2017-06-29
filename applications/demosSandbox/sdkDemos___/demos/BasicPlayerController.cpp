@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -9,16 +9,15 @@
 * freely
 */
 
+
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "DemoMesh.h"
-#include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
+#include "DemoMesh.h"
 #include "DemoEntityManager.h"
-#include "UserPlaneCollision.h"
-
+#include "DemoCamera.h"
+#include "DebugDisplay.h"
 
 #define PLAYER_MASS						80.0f
 #define PLAYER_WALK_SPEED				4.0f
@@ -43,7 +42,7 @@ class BasicPlayerEntity: public DemoEntity
 		int m_cameraMode;
 	};
 
-	BasicPlayerEntity (DemoEntityManager* const scene, CustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
+	BasicPlayerEntity (DemoEntityManager* const scene, dCustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 	{
 		// add this entity to the scene for rendering
@@ -95,7 +94,7 @@ class BasicPlayerEntity: public DemoEntity
 	~BasicPlayerEntity ()
 	{
 		// destroy the player controller and its rigid body
-		((CustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
+		((dCustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 	void SetInput (const InputRecord& inputs)
@@ -112,14 +111,14 @@ class BasicPlayerEntity: public DemoEntity
 	}
 
 	InputRecord	m_inputs;
-	CustomPlayerController* m_controller; 
+	dCustomPlayerController* m_controller; 
 };
 
-class BasicPlayerControllerManager: public CustomPlayerControllerManager
+class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 {
 	public:
 	BasicPlayerControllerManager (NewtonWorld* const world)
-		:CustomPlayerControllerManager (world)
+		:dCustomPlayerControllerManager (world)
 	{
 	}
 
@@ -128,7 +127,7 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 	}
 
 	// apply gravity 
-	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep)
+	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
 		NewtonBody* const body = controller->GetBody();
 		BasicPlayerEntity* const player = (BasicPlayerEntity*) NewtonBodyGetUserData(body);
@@ -141,9 +140,9 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 	}
 
 
-	virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
+	virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
 	{
-		count = CustomPlayerControllerManager::ProcessContacts (controller, contacts, count); 
+		count = dCustomPlayerControllerManager::ProcessContacts (controller, contacts, count); 
 		return count;
 	}
 };
@@ -151,11 +150,11 @@ class BasicPlayerControllerManager: public CustomPlayerControllerManager
 
 
 // we recommend using and input manage to control input for all games
-class BasicPlayerInputManager: public CustomInputManager
+class BasicPlayerInputManager: public dCustomInputManager
 {
 	public:
 	BasicPlayerInputManager (DemoEntityManager* const scene)
-		:CustomInputManager(scene->GetNewton())
+		:dCustomInputManager(scene->GetNewton())
 		,m_scene(scene)
 		,m_player(NULL)
 		,m_jumpKey(false)
@@ -165,8 +164,7 @@ class BasicPlayerInputManager: public CustomInputManager
 		,m_shootState(0)
 	{
 		// plug a callback for 2d help display
-		dAssert (0);
-		//scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
+		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
 	}
 
 	void SpawnRandomProp(const dMatrix& location) const
@@ -203,7 +201,6 @@ class BasicPlayerInputManager: public CustomInputManager
 		BasicPlayerEntity::InputRecord inputs;
 
 		DemoCamera* const camera = m_scene->GetCamera();
-		//DemoEntityManager* const mainWindow = m_scene;
 
 		// set the help key
 		m_helpKey.UpdatePushButton (m_scene, 'H');
@@ -224,7 +221,6 @@ class BasicPlayerInputManager: public CustomInputManager
 		}
 
 		// see if we are shotting some props
-		dAssert (0);
 		m_shootState = m_shootProp.UpdateTriggerButton(m_scene, 0x0d) ? 1 : 0;
 
 
@@ -255,7 +251,7 @@ class BasicPlayerInputManager: public CustomInputManager
 
 		dVector frontDir (camMatrix[0]);
 
-		CustomPlayerController* const controller = m_player->m_controller; 
+		dCustomPlayerController* const controller = m_player->m_controller; 
 		dFloat height = controller->GetHigh();
 		dVector upDir (controller->GetUpDir());
 
@@ -286,8 +282,6 @@ class BasicPlayerInputManager: public CustomInputManager
 
 	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
 	{
-		dAssert (0);
-/*
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation Keys");
@@ -300,7 +294,6 @@ class BasicPlayerInputManager: public CustomInputManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
 		}
-*/	
 	}
 
 

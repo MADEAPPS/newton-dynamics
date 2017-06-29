@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -12,13 +12,13 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
+#include "PhysicsUtils.h"
+#include "TargaToOpenGl.h"
+#include "dCustomHinge.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
-#include "PhysicsUtils.h"
 #include "DebugDisplay.h"
-#include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
-#include "UserPlaneCollision.h"
 
 
 #define PLAYER_MASS						80.0f
@@ -40,16 +40,16 @@ class PlaformEntityEntity;
 class AdvancePlayerControllerManager;
 
 // this demo use a trigger and player controller to automate the operation of a mini game environment
-class TriggerManager: public CustomTriggerManager
+class TriggerManager: public dCustomTriggerManager
 {
 	public:
 	TriggerManager(NewtonWorld* const world, AdvancePlayerControllerManager* const playerManager)
-		:CustomTriggerManager(world)
+		:dCustomTriggerManager(world)
 		,m_playerManager(playerManager)
 	{
 	}
 
-	virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType event, NewtonBody* const visitor) const
+	virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType event, NewtonBody* const visitor) const
 	{
 		// send this message to the entity
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(visitor);
@@ -98,7 +98,7 @@ class AdvancePlayerEntity: public DemoEntity
 		int m_cameraMode;
 	};
 
-	AdvancePlayerEntity (DemoEntityManager* const scene, CustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
+	AdvancePlayerEntity (DemoEntityManager* const scene, dCustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_inputs()
 		,m_currentTrigger(NULL)
@@ -145,7 +145,7 @@ class AdvancePlayerEntity: public DemoEntity
 	~AdvancePlayerEntity ()
 	{
 		// destroy the player controller and its rigid body
-		((CustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
+		((dCustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 	void SetInput (const InputRecord& inputs)
@@ -169,7 +169,7 @@ class AdvancePlayerEntity: public DemoEntity
 			case ENTER_TRIGGER:
 			{
 				// the player enter a trigger, we most verify what trigger is this so that we can start some action
-				CustomTriggerController* const trigger = (CustomTriggerController*) data;
+				dCustomTriggerController* const trigger = (dCustomTriggerController*) data;
 				DemoEntity* const entity = (DemoEntity*) trigger->GetUserData();
 
 				// we are simple going to signal to the entity controlled by this trigger that a player enter the trigger
@@ -180,7 +180,7 @@ class AdvancePlayerEntity: public DemoEntity
 			case EXIT_TRIGGER:
 			{
 				// the player exit a trigger, we most verify what trigger is this so that we can finalized some action
-				CustomTriggerController* const trigger = (CustomTriggerController*) data;
+				dCustomTriggerController* const trigger = (dCustomTriggerController*) data;
 				DemoEntity* const entity = (DemoEntity*) trigger->GetUserData();
 
 				// the player left the trigger and tell the ferry driver to start to move to the next destination
@@ -192,15 +192,15 @@ class AdvancePlayerEntity: public DemoEntity
 
 	InputRecord	m_inputs;
 	NewtonBody* m_currentTrigger;
-	CustomPlayerController* m_controller; 
+	dCustomPlayerController* m_controller; 
 	PlaformEntityEntity* m_currentPlatform;
 };
 
-class AdvancePlayerControllerManager: public CustomPlayerControllerManager
+class AdvancePlayerControllerManager: public dCustomPlayerControllerManager
 {
 	public:
 	AdvancePlayerControllerManager (NewtonWorld* const world)
-		:CustomPlayerControllerManager (world)
+		:dCustomPlayerControllerManager (world)
 	{
 	}
 
@@ -209,7 +209,7 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 	}
 
 	// apply gravity 
-	virtual void ApplyPlayerMove (CustomPlayerController* const controller, dFloat timestep)
+	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
 		NewtonBody* const body = controller->GetBody();
 		AdvancePlayerEntity* const player = (AdvancePlayerEntity*) NewtonBodyGetUserData(body);
@@ -222,7 +222,7 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 	}
 
 
-	virtual int ProcessContacts (const CustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
+	virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
 	{
 		// here you need to process the contact and reject the one you do not need.
 		//there are different ways to do this:
@@ -246,18 +246,18 @@ class AdvancePlayerControllerManager: public CustomPlayerControllerManager
 				newCount --;
 			}
 		}
-		count = CustomPlayerControllerManager::ProcessContacts (controller, contacts, newCount); 
+		count = dCustomPlayerControllerManager::ProcessContacts (controller, contacts, newCount); 
 		return count;
 	}
 };
 
 
 // we recommend using and input manage to control input for all games
-class AdvancedPlayerInputManager: public CustomInputManager
+class AdvancedPlayerInputManager: public dCustomInputManager
 {
 	public:
 	AdvancedPlayerInputManager (DemoEntityManager* const scene)
-		:CustomInputManager(scene->GetNewton())
+		:dCustomInputManager(scene->GetNewton())
 		,m_scene(scene)
 		,m_player(NULL)
 		,m_jumpKey(false)
@@ -267,8 +267,7 @@ class AdvancedPlayerInputManager: public CustomInputManager
 		,m_shootState(0)
 	{
 		// plug a callback for 2d help display
-		dAssert (0);
-		//scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
+		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, this);
 	}
 
 	void SpawnRandomProp(const dMatrix& location) const
@@ -306,8 +305,7 @@ class AdvancedPlayerInputManager: public CustomInputManager
 		    AdvancePlayerEntity::InputRecord inputs;
 
 		    DemoCamera* const camera = m_scene->GetCamera();
-		    //NewtonDemos* const mainWindow = m_scene->GetRootWindow();
-
+			
 		    // set the help key
 		    m_helpKey.UpdatePushButton (m_scene, 'H');
 
@@ -327,7 +325,6 @@ class AdvancedPlayerInputManager: public CustomInputManager
 		    }
 
 		    // see if we are shotting some props
-			dAssert (0);
 		    m_shootState = m_shootProp.UpdateTriggerButton(m_scene, 0x0d) ? 1 : 0;
 
 
@@ -359,7 +356,7 @@ class AdvancedPlayerInputManager: public CustomInputManager
 
 		    dVector frontDir (camMatrix[0]);
 
-		    CustomPlayerController* const controller = m_player->m_controller; 
+		    dCustomPlayerController* const controller = m_player->m_controller; 
 		    dFloat height = controller->GetHigh();
 		    dVector upDir (controller->GetUpDir());
 
@@ -391,8 +388,6 @@ class AdvancedPlayerInputManager: public CustomInputManager
 
 	void RenderPlayerHelp (DemoEntityManager* const scene, int lineNumber) const
 	{
-		dAssert (0);
-/*
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Navigation Keys");
@@ -406,7 +401,6 @@ class AdvancedPlayerInputManager: public CustomInputManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help:               H");
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "change player direction: Left mouse button");
 		}
-*/	
 	}
 
 	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context, int lineNumber)
@@ -431,7 +425,7 @@ class AdvancedPlayerInputManager: public CustomInputManager
 class PlaformEntityEntity: public DemoEntity
 {
 	public:
-	class FerryDriver: public CustomKinematicController
+	class FerryDriver: public dCustomKinematicController
 	{
 		public:
 		enum State
@@ -441,7 +435,7 @@ class PlaformEntityEntity: public DemoEntity
 		};
 
 		FerryDriver (NewtonBody* const body, const dVector& pivot, NewtonBody* const triggerPort0, NewtonBody* const triggerPort1)
-			:CustomKinematicController (body, pivot)
+			:dCustomKinematicController (body, pivot)
 			,m_target(0.0f)
 			,m_triggerPort0(triggerPort0)
 			,m_triggerPort1(triggerPort1)
@@ -499,7 +493,7 @@ class PlaformEntityEntity: public DemoEntity
 				dAssert (0);
 			}
 
-			CustomKinematicController::SubmitConstraints (timestep, threadIndex);
+			dCustomKinematicController::SubmitConstraints (timestep, threadIndex);
 		}
 
 		void Stop ()
@@ -586,7 +580,7 @@ class PlaformEntityEntity: public DemoEntity
 			}
 			case PLAYER_CALL_FERRY_DRIVER:
 			{
-				CustomTriggerController* const trigger = (CustomTriggerController*) data;
+				dCustomTriggerController* const trigger = (dCustomTriggerController*) data;
 				dAssert (trigger->GetUserData() == this);
 				m_driver->MoveToTarget (trigger->GetBody());
 				break;
@@ -605,7 +599,7 @@ class PlaformEntityEntity: public DemoEntity
 static DemoEntityManager::dListNode* LoadScene(DemoEntityManager* const scene, const char* const name, const dMatrix& location)
 {
 	char fileName[2048];
-	GetWorkingFileName (name, fileName);
+	dGetWorkingFileName (name, fileName);
 
 	DemoEntityManager::dListNode* const lastEnt = scene->GetLast();
 	scene->LoadScene (fileName);
@@ -683,8 +677,11 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 
 static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sceneCollision)
 {
-	NewtonWorld* const world = scene->GetNewton();
+#if 1
+	AddFloorBox(scene, dVector(0.0f), dVector(256.0f, 0.1f, 256.0f, 0.0f));
+#else
 
+	NewtonWorld* const world = scene->GetNewton();
 	// add a flat plane
 	dMatrix matrix (dGetIdentityMatrix());
 	DemoEntityManager::dListNode* const floorNode = LoadScene(scene, "flatPlane.ngd", matrix);
@@ -710,14 +707,8 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 				face[j][1] = vertex[index + 1];
 				face[j][2] = vertex[index + 2];
 			}
-//			index = indices[i + 1] * 3;
-//			face[1] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
-
-//			index = indices[i + 2] * 3;
-//			face[2] = dVector (vertex[index + 0], vertex[index + 1], vertex[index + 2]);
 
 			int matID = 0;
-			//matID = matID == 2 ? 1 : 2 ;
 			NewtonTreeCollisionAddFace(tree, 3, &face[0][0], 3 * sizeof (dFloat), matID);
 		}
 	}
@@ -739,12 +730,11 @@ static void LoadFloor(DemoEntityManager* const scene, NewtonCollision* const sce
 
 	// set the application level callback, for debug display
 	#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
-	NewtonStaticCollisionSetDebugCallback (collisionTree, ShowMeshCollidingFaces);
+		NewtonStaticCollisionSetDebugCallback (collisionTree, ShowMeshCollidingFaces);
 	#endif
+#endif
 }
 #endif
-
-
 
 
 static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* const triggerManager, NewtonCollision* const sceneCollision, const char* const name, const dMatrix& location, NewtonBody* const playGroundBody)
@@ -773,8 +763,8 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 	}
 
 	// add start triggers
-	CustomTriggerController* trigger0 = NULL;
-	CustomTriggerController* trigger1 = NULL;
+	dCustomTriggerController* trigger0 = NULL;
+	dCustomTriggerController* trigger1 = NULL;
 	for (DemoEntityManager::dListNode* node = bridgeNodes->GetNext(); node;) {
 		DemoEntity* const entity = node->GetInfo();
 		node = node->GetNext() ;
@@ -786,7 +776,7 @@ static void LoadFerryBridge (DemoEntityManager* const scene, TriggerManager* con
 			// create a trigger to match his mesh
 			NewtonCollision* const collision = NewtonCreateConvexHull(world, mesh->m_vertexCount, mesh->m_vertex, 3 * sizeof (dFloat), 0, 0, &meshMatrix[0][0]);
 			dMatrix matrix (entity->GetNextMatrix());
-			CustomTriggerController* const controller = triggerManager->CreateTrigger(matrix, collision, NULL);
+			dCustomTriggerController* const controller = triggerManager->CreateTrigger(matrix, collision, NULL);
 			NewtonDestroyCollision (collision);
 
 			if (!trigger0) {
@@ -892,6 +882,18 @@ static void LoadSlide (DemoEntityManager* const scene, TriggerManager* const tri
 }
 */
 
+class HangingBridgeFrictionJoint : public dCustomHinge
+{
+	public:
+	HangingBridgeFrictionJoint(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const link0, NewtonBody* const link1)
+		:dCustomHinge(pinAndPivotFrame0, pinAndPivotFrame1, link0, link1)
+	{
+		SetStiffness(0.99f);
+		SetAsSpringDamper(true, 0.9f, 0.0f, 10.0f);
+	}
+};
+
+
 static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* const triggerManager, NewtonCollision* const sceneCollision, const char* const name, const dMatrix& location, NewtonBody* const playGroundBody)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -977,8 +979,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 
 	int jointCount = 0; 
 	NewtonJoint* jointArray[256];
-	// for more accuracy, wrap the bridge in a Newton skeleton 
-	NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate(scene->GetNewton(), body0, NULL);
+
 	for (iter ++; iter; iter ++) {
 		NewtonBody* const body1 = iter.GetNode()->GetInfo();
 		
@@ -1003,8 +1004,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		pinMatrix1[3][3] = 1.0f;
 
 		// connect these two plank by a hinge, there a wiggle space between eh hinge that give therefore use the alternate hinge constructor
-		CustomHinge* const joint = new CustomHinge (pinMatrix0, pinMatrix1, body0, body1);
-		joint->SetFriction(1000.0f);
+		dCustomHinge* const joint = new HangingBridgeFrictionJoint(pinMatrix0, pinMatrix1, body0, body1);
 
 		// save the joint for later used
 		jointArray[jointCount] = joint->GetJoint();
@@ -1014,12 +1014,6 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		matrix0 = matrix1;
 	}
 
-	// add all the joint to the Newton Skeleton 
-	NewtonSkeletonContainerAttachJointArray (skeleton, jointCount, jointArray);
-
-	// complete the skeleton construction
-	NewtonSkeletonContainerFinalize(skeleton);
-	
 	// connect the last and first plank to the bridge base
 	{
 		iter.Begin();
@@ -1035,7 +1029,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		pinMatrix0[2][3] = 0.0f;
 		pinMatrix0[3] = matrix0.m_posit - pinMatrix0[2].Scale (plankwidth);
 
-		new CustomHinge (pinMatrix0, body0, playGroundBody);
+		new dCustomHinge (pinMatrix0, body0, playGroundBody);
 	}
 
 	{
@@ -1052,7 +1046,7 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 		pinMatrix0[2][3] = 0.0f;
 		pinMatrix0[3] = matrix0.m_posit + pinMatrix0[2].Scale (plankwidth);
 
-		new CustomHinge (pinMatrix0, body0, playGroundBody);
+		new dCustomHinge (pinMatrix0, body0, playGroundBody);
 	}
 }
 
@@ -1061,8 +1055,6 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* const triggerManager)
 {
 	NewtonWorld* const world = scene->GetNewton();
-	//	CreateLevelMesh (scene, "flatPlane.ngd", true);
-	//	return;
 
 	// make the body with a dummy null collision, so that we can use for attaching world objects
 	dMatrix matrix (dGetIdentityMatrix());

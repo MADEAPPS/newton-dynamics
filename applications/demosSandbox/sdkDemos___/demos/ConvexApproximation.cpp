@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -12,23 +12,23 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
+#include "TargaToOpenGl.h"
 #include "DemoMesh.h"
+#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "TargaToOpenGl.h"
-#include "DemoEntityManager.h"
+#include "HeightFieldPrimitive.h"
 
-
-static bool ReportProgress (dFloat normalizedProgressPercent, void* const userData)
+static int ReportProgress (dFloat normalizedProgressPercent, void* const userData)
 {
-	return true; 
+	return 1; 
 }
 
 
 static void CreateConvexAproximation (const char* const name, DemoEntityManager* const scene, const dVector& origin, int instaceCount, const char* const texture)
 {
 	char fileName[2048];
-	GetWorkingFileName (name, fileName);
+	dGetWorkingFileName (name, fileName);
 
 	NewtonWorld* const world = scene->GetNewton();
 	dScene compoundTestMesh (world);
@@ -37,7 +37,6 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 	// freeze the scale and pivot on the model 
 	compoundTestMesh.FreezeScale();
 //	compoundTestMesh.FreezeGeometryPivot ();
-
 	
 	dMeshNodeInfo* meshInfo = NULL;
 	dMatrix scale (dGetIdentityMatrix());
@@ -65,7 +64,7 @@ static void CreateConvexAproximation (const char* const name, DemoEntityManager*
 #if 1
 	NewtonMesh* const mesh = meshInfo->GetMesh();
 #else
-	GetWorkingFileName ("mesh.off", fileName);
+	dGetWorkingFileName ("mesh.off", fileName);
 	NewtonMesh* const mesh = NewtonMeshLoadOFF(world, fileName);
 //	dMatrix scale (GetIdentityMatrix());
 //	//dFloat scaleMag = 0.05f;
@@ -143,21 +142,18 @@ void SimpleConvexApproximation (DemoEntityManager* const scene)
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
-
 	// convex approximate some file meshes 
-
 	CreateConvexAproximation ("lshape.ngd", scene, location, 3, "camo.tga");
 	CreateConvexAproximation ("hollowBox.ngd", scene, location, 3, "KAMEN.tga");
-	CreateConvexAproximation ("hollowCylinder.ngd", scene, location, 3, "frowny.tga");
-//	CreateConvexAproximation ("chair.ngd", scene, location, 3, "checker.tga");
-	CreateConvexAproximation ("cow.ngd", scene, location + dVector (10, 0, 0, 0), 3, "cow.tga");
-	CreateConvexAproximation ("camel.ngd", scene, location + dVector (17, 0, 0, 0), 3, "jirafe.tga");
+//	CreateConvexAproximation ("hollowCylinder.ngd", scene, location, 3, "frowny.tga");
+////	CreateConvexAproximation ("chair.ngd", scene, location, 3, "checker.tga");
+//	CreateConvexAproximation ("cow.ngd", scene, location + dVector (10, 0, 0, 0), 3, "cow.tga");
+//	CreateConvexAproximation ("camel.ngd", scene, location + dVector (17, 0, 0, 0), 3, "jirafe.tga");
 
 //	CreateConvexAproximation ("tree.ngd", scene, location, 1, "KAMEN.tga");
 //	CreateConvexAproximation ("beetle.ngd", scene, location, 1, "KAMEN.tga");
 //	CreateConvexAproximation ("armadello.ngd", scene, location, 1, "KAMEN.tga");
-
-
+	
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	

@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
  *
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -12,13 +12,12 @@
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
 #include "DemoMesh.h"
+#include "PhysicsUtils.h"
 #include "DemoCamera.h"
 #include "OpenGlUtil.h"
-#include "PhysicsUtils.h"
 #include "DemoEntityManager.h"
 #include "UserPlaneCollision.h"
 
-/*
 class StupidComplexOfConvexShapes: public DemoEntity
 {
 	public:
@@ -43,7 +42,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		PrimitiveType selection[] = {_SPHERE_PRIMITIVE};
 		for (int i = 0; i < int (sizeof (collisionArray) / sizeof (collisionArray[0])); i ++) {
 			int index = dRand() % (sizeof (selection) / sizeof (selection[0]));
-			dVector shapeSize (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
+			dVector shapeSize (size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), 0.0f);
 			shapeSize = dVector(size, size, size, 0.0f);
 			collisionArray[i] = CreateConvexCollision (world, dGetIdentityMatrix(), shapeSize, selection[index], materialID);
 			gemetries[i] = new DemoMesh("geometry", collisionArray[i], "wood_4.tga", "wood_4.tga", "wood_1.tga");
@@ -55,13 +54,13 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		
 		for (int i = 0 ; i < count; i ++) {
 			for (int j = 0 ; j < count; j ++) {
-				dFloat pitch = RandomVariable (1.0f) * 2.0f * 3.1416f;
-				dFloat yaw = RandomVariable (1.0f) * 2.0f * 3.1416f;
-				dFloat roll = RandomVariable (1.0f) * 2.0f * 3.1416f;
+				dFloat pitch = dRandomVariable (1.0f) * 2.0f * 3.1416f;
+				dFloat yaw = dRandomVariable (1.0f) * 2.0f * 3.1416f;
+				dFloat roll = dRandomVariable (1.0f) * 2.0f * 3.1416f;
 
-				dFloat x = size * (j - count / 2) + RandomVariable (size * 0.5f);
-				dFloat y = RandomVariable (size * 2.0f);
-				dFloat z = size * (i - count / 2) + RandomVariable (size * 0.5f);
+				dFloat x = size * (j - count / 2) + dRandomVariable (size * 0.5f);
+				dFloat y = dRandomVariable (size * 2.0f);
+				dFloat z = size * (i - count / 2) + dRandomVariable (size * 0.5f);
 
 				dMatrix matrix (dPitchMatrix (pitch) * dYawMatrix (yaw) * dRollMatrix (roll));
 				matrix.m_posit = dVector (x, y, z, 1.0f);
@@ -117,7 +116,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 
 		dMatrix alignMatrix (dRollMatrix(3.141592f * 90.0f / 180.0f));
 		for (int i = 0; i < m_count; i ++) {
-			shapeSize = dVector (size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), size + RandomVariable (size / 2.0f), 0.0f);
+			shapeSize = dVector (size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), size + dRandomVariable (size / 2.0f), 0.0f);
 #if 1
 			m_castingShapeArray[i] = CreateConvexCollision (world, &alignMatrix[0][0], shapeSize, castSelection[i], materialID);
 #else
@@ -173,8 +172,8 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		glDisable(GL_TEXTURE_2D);
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glBegin(GL_LINES);
-		glVertex3f (m_rayP0.m_x, m_rayP0.m_y, m_rayP0.m_z);
-		glVertex3f (m_rayP1.m_x, m_rayP1.m_y, m_rayP1.m_z);
+		glVertex3f (GLfloat(m_rayP0.m_x), GLfloat(m_rayP0.m_y), GLfloat(m_rayP0.m_z));
+		glVertex3f (GLfloat(m_rayP1.m_x), GLfloat(m_rayP1.m_y), GLfloat(m_rayP1.m_z));
 		glEnd();
 	}
 
@@ -189,7 +188,7 @@ class StupidComplexOfConvexShapes: public DemoEntity
 };
 
 
-class dConvexCastRecord: public CustomControllerBase
+class dConvexCastRecord: public dCustomControllerBase
 {
 public:
 	void PreUpdate(dFloat timestep, int threadIndex)
@@ -206,11 +205,11 @@ public:
 };
 
 
-class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
+class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
 {
 	public:
 	dConvexCastManager(DemoEntityManager* const scene, StupidComplexOfConvexShapes* const stupidLevel)
-	:CustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
+	:dCustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
 	,m_helpKey (true)
 	,m_selectShape (true)
 	,m_stupidLevel(stupidLevel)
@@ -250,21 +249,20 @@ class dConvexCastManager: public CustomControllerManager<dConvexCastRecord>
 
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		NewtonDemos* const mainWindow = scene->GetRootWindow();
 		DemoCamera* const camera = scene->GetCamera();
 
-		m_helpKey.UpdatePushButton (mainWindow, 'H');
-		if (m_selectShape.UpdateTriggerButton (mainWindow, ' ')) {
+		m_helpKey.UpdatePushButton (scene, 'H');
+		if (m_selectShape.UpdateTriggerButton (scene, ' ')) {
 			m_stupidLevel->ChangeCastingShape();
 		}
 
-		bool buttonState = mainWindow->GetMouseKeyState(1);
+		bool buttonState = scene->GetMouseKeyState(1);
 		if (buttonState) {
 			int mouseX;
 			int mouseY;
 
 			buttonState = false;
-			mainWindow->GetMousePosition (mouseX, mouseY);
+			scene->GetMousePosition (mouseX, mouseY);
 
 			dFloat x = dFloat (mouseX);
 			dFloat y = dFloat (mouseY);
@@ -345,7 +343,7 @@ static void AddStaticMesh(DemoEntityManager* const scene)
 	char fileName[2048];
 
 	NewtonWorld* const world = scene->GetNewton();
-	GetWorkingFileName ("ramp.off", fileName);
+	dGetWorkingFileName ("ramp.off", fileName);
 	NewtonMesh* const ntMesh = NewtonMeshLoadOFF(world, fileName);
 
 	dMatrix matrix (dGetIdentityMatrix());
@@ -386,13 +384,11 @@ static void AddUserDefineStaticMesh(DemoEntityManager* const scene)
 	// destroy the collision shape
 	NewtonDestroyCollision (planeCollision);
 }
-*/
+
 
 // create physics scene
 void ConvexCast (DemoEntityManager* const scene)
 {
-	dAssert (0);
-/*
 	scene->CreateSkyBox();
 
 	//char fileName[2048];
@@ -425,7 +421,6 @@ void ConvexCast (DemoEntityManager* const scene)
 	dQuaternion rot (camMatrix);
 	dVector origin (-30.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
-*/
 }
 
 

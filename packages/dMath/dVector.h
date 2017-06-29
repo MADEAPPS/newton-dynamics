@@ -76,10 +76,12 @@ class dVector: public TemplateVector<dFloat>
 	{
 	}
 
+#ifndef _NEWTON_USE_DOUBLE
 	dVector(const TemplateVector<dFloat64>& v)
 		:TemplateVector<dFloat>(dFloat(v.m_x), dFloat(v.m_y), dFloat(v.m_z), dFloat(v.m_w))
 	{
 	}
+#endif
 };
 
 

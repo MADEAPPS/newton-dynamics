@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -123,23 +123,23 @@ typedef long long unsigned64;
 #include <dMathDefines.h>
 #include <dBezierSpline.h>
 
-#include <CustomJoint.h>
-#include <CustomGear.h>
-#include <CustomHinge.h>
-#include <CustomHingeActuator.h>
-#include <CustomBallAndSocket.h>
-#include <CustomSliderActuator.h>
-#include <CustomSlidingContact.h>
-#include <CustomUniversalActuator.h>
+#include <dCustomJoint.h>
+#include <dCustomGear.h>
+#include <dCustomHinge.h>
+#include <dCustomHingeActuator.h>
+#include <dCustomBallAndSocket.h>
+#include <dCustomSliderActuator.h>
+#include <dCustomSlidingContact.h>
+#include <dCustomUniversalActuator.h>
 
-#include <CustomInputManager.h>
-#include <CustomTriggerManager.h>
-#include <CustomControllerManager.h>
-#include <CustomKinematicController.h>
-#include <CustomPlayerControllerManager.h>
-#include <CustomPlayerControllerManager.h>
-#include <CustomVehicleControllerManager.h>
-#include <CustomArcticulatedTransformManager.h>
+#include <dCustomInputManager.h>
+#include <dCustomTriggerManager.h>
+#include <dCustomControllerManager.h>
+#include <dCustomKinematicController.h>
+#include <dCustomPlayerControllerManager.h>
+#include <dCustomPlayerControllerManager.h>
+#include <dCustomVehicleControllerManager.h>
+#include <dCustomArcticulatedTransformManager.h>
 
 #include <dCRC.h>
 #include <dHeap.h>
@@ -166,9 +166,21 @@ typedef long long unsigned64;
 #include <dCollisionConvexHullNodeInfo.h>
 #include <dGeometryNodeSkinModifierInfo.h>
 		 
+#include <dgTimeTracker.h>
 
-#include <dTimeTracker.h>
 
+
+/*
+#ifdef _NEWTON_USE_DOUBLE
+	#define glMultMatrix(x) glMultMatrixd(x)
+	#define glLoadMatrix(x) glMultMatrixd(x)
+	#define glGetFloat(x,y) glGetDoublev(x,(GLdouble *)y) 
+#else
+	#define glMultMatrix(x) glMultMatrixf(x)
+	#define glLoadMatrix(x) glMultMatrixf(x)
+	#define glGetFloat(x,y) glGetFloatv(x,(dFloat  *)y) 
+#endif
+*/
 
 #ifdef _NEWTON_USE_DOUBLE
 inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
@@ -215,9 +227,9 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
 
 unsigned dRand ();
 void dSetRandSeed (unsigned seed);
-dFloat RandomVariable(dFloat amp);
+dFloat dRandomVariable(dFloat amp);
 
-inline int TwosPower (int x)
+inline int dTwosPower (int x)
 {
 	int rval=1;
 	for (; rval < x; rval *= 2);
@@ -229,7 +241,8 @@ inline int TwosPower (int x)
 // and i have to specify a absolute path
 // #define ASSETS_PATH "."
 //void GetAplicationDirectory (char* const aplicationDir);
-void GetWorkingFileName (const char* const name, char* const outPathName);
+void dGetWorkingFileName (const char* const name, char* const outPathName);
+
 
 // little Indian/big Indian conversion
 unsigned SWAP_INT32(unsigned x);

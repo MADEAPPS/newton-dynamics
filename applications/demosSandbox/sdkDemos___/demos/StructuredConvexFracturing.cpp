@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -10,15 +10,14 @@
 */
 
 
+
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
+#include "TargaToOpenGl.h"
 #include "DemoMesh.h"
+#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "DebugDisplay.h"
-#include "TargaToOpenGl.h"
-#include "DemoEntityManager.h"
-
 
 #define MAX_POINT_CLOUD_SIZE		500
 #define POINT_DENSITY_PER_METERS	0.5f  
@@ -39,14 +38,14 @@ static int MakeRandomGuassianPointCloud (NewtonMesh* const mesh, dVector* const 
 
 	dFloat biasExp = 10.0f;
 	dFloat r = dSqrt (size.DotProduct3(size));
-	r = dPow(r, 1.0f/biasExp);
+	r = dFloat (pow(r, 1.0f/biasExp));
 	for (int i = 0; i < count; i++) {
 		dVector& p = points[i];
 		bool test;
 		do {
-			p = dVector (2.0f * RandomVariable(r), 2.0f * RandomVariable(r), 2.0f * RandomVariable(r), 0.0f);
+			p = dVector (2.0f * dRandomVariable(r), 2.0f * dRandomVariable(r), 2.0f * dRandomVariable(r), 0.0f);
 			dFloat len = dSqrt (p.DotProduct3(p));
-			dFloat scale = dPow(len, biasExp) / len;
+			dFloat scale = dFloat (pow(len, biasExp) / len);
 			p = p.Scale (scale) + origin;
 			test = (p.m_x > minBox.m_x) && (p.m_x < maxBox.m_x) && (p.m_y > minBox.m_y) && (p.m_y < maxBox.m_y) && (p.m_z > minBox.m_z) && (p.m_z < maxBox.m_z);
 		} while (!test);
@@ -80,9 +79,9 @@ static int MakeRandomPoisonPointCloud(NewtonMesh* const mesh, dVector* const poi
 				dFloat x = x0;
 				dFloat y = y0;
 				dFloat z = z0;
-				x += RandomVariable(POISON_VARIANCE);
-				y += RandomVariable(POISON_VARIANCE);
-				z += RandomVariable(POISON_VARIANCE);
+				x += dRandomVariable(POISON_VARIANCE);
+				y += dRandomVariable(POISON_VARIANCE);
+				z += dRandomVariable(POISON_VARIANCE);
 				points[count] = dVector (x, y, z);
 				count ++;
 				x0 += POINT_DENSITY_PER_METERS;

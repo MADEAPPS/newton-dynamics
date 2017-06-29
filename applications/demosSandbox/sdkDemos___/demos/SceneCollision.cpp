@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -13,11 +13,10 @@
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
 #include "DemoMesh.h"
+#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
-#include "TargaToOpenGl.h"
-#include "DemoEntityManager.h"
 
 
 #ifdef USE_TEST_ALL_FACE_USER_RAYCAST_CALLBACK
@@ -107,7 +106,7 @@ class ComplexScene: public DemoEntity
 	{
 		// open the level data
 		char fullPathName[2048];
-		GetWorkingFileName ("playground.ngd", fullPathName);
+		dGetWorkingFileName ("playground.ngd", fullPathName);
 
 		scene->LoadScene (fullPathName);
 
@@ -202,7 +201,7 @@ class ComplexScene: public DemoEntity
 		int height = size;
 		char* const attibutes = new char [size * size];
 		memset (attibutes, 0, width * height * sizeof (char));
-		NewtonCollision* const collision = NewtonCreateHeightFieldCollision (scene->GetNewton(), width, height, 1, 0, elevation, attibutes, 1.0f, cellsize, 0);
+		NewtonCollision* const collision = NewtonCreateHeightFieldCollision (scene->GetNewton(), width, height, 1, 0, elevation, attibutes, 1.0f, cellsize, cellsize, 0);
 
 		void* const proxy  = NewtonSceneCollisionAddSubCollision (m_sceneCollision, collision);
 		NewtonDestroyCollision(collision);
@@ -345,7 +344,7 @@ void SceneCollision (DemoEntityManager* const scene)
 
 
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
-	dVector size (0.5f, 0.5f, 0.5f, 0.0f);
+	dVector size (0.25f, 0.25f, 0.25f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	int count = 5;
@@ -357,11 +356,9 @@ void SceneCollision (DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 1.7f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * 3.1416f /180.0f) * dYawMatrix(-45.0f * 3.1416f /180.0f));
 	dQuaternion rot (camMatrix);
-	dVector origin (-15.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin (-15.0f, 5.0f, -5.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
-
 }

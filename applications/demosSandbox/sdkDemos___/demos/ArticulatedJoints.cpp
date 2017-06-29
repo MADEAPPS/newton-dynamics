@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -14,16 +14,18 @@
 #include "DemoMesh.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
+
+#include "DebugDisplay.h"
+#include "HeightFieldPrimitive.h"
+
 
 #define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
 //#define ARTICULATED_VEHICLE_CAMERA_DISTANCE		7.0f
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE			10.0f
 
-/*
 struct ARTICULATED_VEHICLE_DEFINITION
 {
 	enum
@@ -60,31 +62,36 @@ static ARTICULATED_VEHICLE_DEFINITION forkliftDefinition[] =
 class ArticulatedEntityModel: public DemoEntity
 {
 	public:
-	class SuspensionTire: public CustomSlidingContact
+	class SuspensionTire: public dCustomSlidingContact
 	{
 		public:
 		SuspensionTire (const dMatrix& pinAndPivotFrame, NewtonBody* const tire, NewtonBody* const chassis)
-			:CustomSlidingContact (pinAndPivotFrame, tire, chassis)
+			:dCustomSlidingContact (pinAndPivotFrame, tire, chassis)
 		{
 			EnableLinearLimits(true);
-			SetLinearLimis (-0.5f, 0.01f);
-		}
-
-		void SubmitConstraints (dFloat timestep, int threadIndex)
-		{
-			CustomSlidingContact::SubmitConstraints(timestep, threadIndex);
-
-			//NewtonBody* const tire = GetBody0();
-			//NewtonBody* const chassis = GetBody1();
-
-			dMatrix tireMatrix;
-			dMatrix chassisMatrix;
-			CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-			NewtonUserJointAddLinearRow(m_joint, &tireMatrix.m_posit[0], &chassisMatrix.m_posit[0], &chassisMatrix.m_front[0]);
-			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, 150.0f, 10.0f);
-			NewtonUserJointSetRowStiffness (m_joint, 0.7f);
+			SetLinearLimits (-0.5f, 0.01f);
+			SetAsSpringDamper(true, 0.9f, 1550.0f, 150.0f);
 		}
 	};
+
+	class TreadLink: public dCustomHinge
+	{
+		public:
+		TreadLink(const dMatrix& pinAndPivotFrame, NewtonBody* const link0, NewtonBody* const link1)
+			:dCustomHinge(pinAndPivotFrame, link0, link1)
+		{
+			SetStiffness(0.99f);
+			SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+		}
+
+		TreadLink(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const link0, NewtonBody* const link1)
+			:dCustomHinge(pinAndPivotFrame0, pinAndPivotFrame1, link0, link1)
+		{
+			SetStiffness(0.99f);
+			SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+		}
+	};
+
 
 	class InputRecord
 	{
@@ -155,7 +162,7 @@ class ArticulatedEntityModel: public DemoEntity
 		m_inputs = inputs;
 	}
 
-	void LinkFrontTire (NewtonBody* const chassis, NewtonBody* const tire)
+	void LinkFrontTire (NewtonBody* const chassis, NewtonBody* const tire, dList<dCustomJoint*>& cycleLinks)
 	{
 		dMatrix tireMatrix;
 		dMatrix chassisMatrix;
@@ -167,9 +174,10 @@ class ArticulatedEntityModel: public DemoEntity
 		chassisMatrix = dYawMatrix(90.0f * 3.141592f / 180.0f) * chassisMatrix;
 		chassisMatrix.m_posit = tireMatrix.m_posit;
 
-		new CustomGear(5.0f, chassisMatrix.m_front, chassisMatrix.m_front, tire, m_engineJoint->GetBody0());
+		dCustomGear* const axel = new dCustomGear(5.0f, chassisMatrix.m_front, chassisMatrix.m_front, tire, m_engineJoint->GetBody0());
+		cycleLinks.Append(axel);
 
-		m_tractionTiresJoints[m_tractionTiresCount] = new CustomHinge (&chassisMatrix[0][0], tire, chassis);
+		m_tractionTiresJoints[m_tractionTiresCount] = new dCustomHinge (&chassisMatrix[0][0], tire, chassis);
 		m_tractionTires[m_tractionTiresCount] = tire;
 		m_tractionTiresCount ++;
 	}
@@ -188,7 +196,7 @@ class ArticulatedEntityModel: public DemoEntity
 
 		dFloat angleLimit = 30.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 60.0f * 3.141592f / 180.0f;
-		m_rearTireJoints[m_rearTiresCount] = new CustomUniversalActuator (&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
+		m_rearTireJoints[m_rearTiresCount] = new dCustomUniversalActuator (&chassisMatrix[0][0], angularRate, -angleLimit, angleLimit, angularRate, -angleLimit, angleLimit, tire, chassis);
 		m_rearTireJoints[m_rearTiresCount]->SetEnableFlag0 (false);
 		m_rearTiresCount ++;
 	}
@@ -201,7 +209,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat minAngleLimit = -20.0f * 3.141592f / 180.0f;
 		dFloat maxAngleLimit =  20.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 10.0f * 3.141592f / 180.0f;
-		m_angularActuator0[m_angularActuatorsCount0] = new CustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
+		m_angularActuator0[m_angularActuatorsCount0] = new dCustomHingeActuator (&baseMatrix[0][0], angularRate, minAngleLimit, maxAngleLimit, child, parent);
 		m_angularActuatorsCount0 ++;
 	}
 
@@ -213,7 +221,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat minLimit = -0.25f;
 		dFloat maxLimit = 1.5f;
 		dFloat linearRate = 0.125f;
-		m_liftJoints[m_liftActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+		m_liftJoints[m_liftActuatorsCount] = new dCustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
 		m_liftActuatorsCount ++;
 	}
 
@@ -225,7 +233,7 @@ class ArticulatedEntityModel: public DemoEntity
 		dFloat minLimit = -0.25f;
 		dFloat maxLimit = 0.2f;
 		dFloat linearRate = 0.25f;
-		m_paletteJoints[m_paletteActuatorsCount] = new CustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
+		m_paletteJoints[m_paletteActuatorsCount] = new dCustomSliderActuator (&baseMatrix[0][0], linearRate, minLimit, maxLimit, child, parent);
 		m_paletteActuatorsCount ++;
 	}
 
@@ -251,24 +259,24 @@ class ArticulatedEntityModel: public DemoEntity
 	dFloat m_wristAxis1;
 		
 	NewtonBody* m_tractionTires[4];
-	CustomHinge* m_tractionTiresJoints[4];
-	CustomSliderActuator* m_liftJoints[4];
-	CustomSliderActuator* m_paletteJoints[4];
-	CustomHingeActuator* m_angularActuator0[4];
-	CustomHingeActuator* m_angularActuator1[4];
-	CustomUniversalActuator* m_rearTireJoints[4];
-	CustomUniversalActuator* m_universalActuator[4];
-	CustomUniversal* m_engineJoint;
+	dCustomHinge* m_tractionTiresJoints[4];
+	dCustomSliderActuator* m_liftJoints[4];
+	dCustomSliderActuator* m_paletteJoints[4];
+	dCustomHingeActuator* m_angularActuator0[4];
+	dCustomHingeActuator* m_angularActuator1[4];
+	dCustomUniversalActuator* m_rearTireJoints[4];
+	dCustomUniversalActuator* m_universalActuator[4];
+	dCustomUniversal* m_engineJoint;
 
 	InputRecord m_inputs;
 };
 
-class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
+class ArticulatedVehicleManagerManager: public dCustomArticulaledTransformManager
 {
 	public:
 
 	ArticulatedVehicleManagerManager (DemoEntityManager* const scene)
-		:CustomArticulaledTransformManager (scene->GetNewton())
+		:dCustomArticulaledTransformManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
@@ -276,9 +284,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, OnBoneAABBOverlap, OnContactsProcess);
 	}
 
-	virtual void OnPreUpdate (CustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
+	virtual void OnPreUpdate (dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
-//xxxxxxxx
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
 
 		if (vehicleModel->m_engineJoint) {
@@ -327,11 +334,13 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		// update steering wheels
 		if (vehicleModel->m_rearTiresCount) {
-			dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetActuatorAngle1();
+			dFloat steeringAngle = vehicleModel->m_rearTireJoints[0]->GetJointAngle_1();
 			if (vehicleModel->m_inputs.m_steerValue > 0) {
-				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
+				//steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit0(); 
+				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMinAngularLimit_1();
 			} else if (vehicleModel->m_inputs.m_steerValue < 0) {
-				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit0(); 
+				//steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit0(); 
+				steeringAngle = vehicleModel->m_rearTireJoints[0]->GetMaxAngularLimit_1();
 			}
 			for (int i = 0; i < vehicleModel->m_rearTiresCount; i ++) {
 				vehicleModel->m_rearTireJoints[i]->SetTargetAngle1(steeringAngle);
@@ -404,20 +413,20 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		if (vehicleModel->m_universalActuatorsCount) {
 			dFloat posit0 = vehicleModel->m_wristAxis0;
 			if (vehicleModel->m_inputs.m_wristAxis0 > 0) {
-				posit0 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit0();
-				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetActuatorAngle0();
+				posit0 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit_0();
+				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetJointAngle_0();
 			} else if (vehicleModel->m_inputs.m_wristAxis0 < 0) {
-				posit0 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit0();
-				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetActuatorAngle0();
+				posit0 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit_0();
+				vehicleModel->m_wristAxis0 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
 			}
 
 			dFloat posit1 = vehicleModel->m_wristAxis1;
 			if (vehicleModel->m_inputs.m_wristAxis1 > 0) {
-				posit1 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit1();
-				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetActuatorAngle1();
+				posit1 = vehicleModel->m_universalActuator[0]->GetMinAngularLimit_1();
+				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
 			} else if (vehicleModel->m_inputs.m_wristAxis1 < 0) {
-				posit1 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit1();
-				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetActuatorAngle1();
+				posit1 = vehicleModel->m_universalActuator[0]->GetMaxAngularLimit_1();
+				vehicleModel->m_wristAxis1 = vehicleModel->m_universalActuator[0]->GetJointAngle_1();
 			}
 
 			for (int i = 0; i < vehicleModel->m_universalActuatorsCount; i ++) {
@@ -434,8 +443,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		int id0 = NewtonCollisionGetUserID(collision0);
 		int id1 = NewtonCollisionGetUserID(collision1);
 		if (id0 & id1 & ARTICULATED_VEHICLE_DEFINITION::m_bodyPart) {
-			CustomArticulatedTransformController::dSkeletonBone* const bone0 = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
-			CustomArticulatedTransformController::dSkeletonBone* const bone1 = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
+			dCustomArticulatedTransformController::dSkeletonBone* const bone0 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
+			dCustomArticulatedTransformController::dSkeletonBone* const bone1 = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
 			if (bone0 && bone1 && (bone0->m_myController == bone1->m_myController)) {
 				dAssert (!bone0->m_myController->SelfCollisionTest (bone0, bone1));
 				return bone0->m_myController->SelfCollisionTest (bone0, bone1) ? 1 : 0;
@@ -462,8 +471,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		if (linkBody && !tireBody) {
 			// find the root body from the articulated structure 
 			NewtonCollision* const linkCollision = NewtonBodyGetCollision(linkBody);
-			const CustomArticulatedTransformController::dSkeletonBone* const rootbone = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData(linkCollision);
-			CustomArticulatedTransformController* const controller = rootbone->m_myController;
+			const dCustomArticulatedTransformController::dSkeletonBone* const rootbone = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData(linkCollision);
+			dCustomArticulatedTransformController* const controller = rootbone->m_myController;
 			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
 
 			int countCount = 0;
@@ -494,10 +503,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 			// find the root body from the articulated structure 
 			NewtonCollision* const tireCollsion = NewtonBodyGetCollision(tireBody);
-			const CustomArticulatedTransformController::dSkeletonBone* const bone = (CustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (tireCollsion);
+			const dCustomArticulatedTransformController::dSkeletonBone* const bone = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (tireCollsion);
 
-			CustomArticulatedTransformController* const controller = bone->m_myController;
-			const CustomArticulatedTransformController::dSkeletonBone* const rootbone = controller->GetParent(bone);
+			dCustomArticulatedTransformController* const controller = bone->m_myController;
+			const dCustomArticulatedTransformController::dSkeletonBone* const rootbone = controller->GetParent(bone);
 			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
 
 			// Get the root and tire matrices
@@ -519,13 +528,15 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		}
 	}
 	
-	virtual void OnUpdateTransform (const CustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	virtual void OnUpdateTransform (const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
+		if (ent) {
+			DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
 
-		dQuaternion rot (localMatrix);
-		ent->SetMatrix (*scene, rot, localMatrix.m_posit);
+			dQuaternion rot (localMatrix);
+			ent->SetMatrix (*scene, rot, localMatrix.m_posit);
+		}
 	}
 
 	NewtonCollision* MakeForkLiftTireShape (DemoEntity* const bodyPart) const
@@ -592,7 +603,8 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		} else if (!strcmp (definition.m_shapeTypeName, "convexHull")) {
 			shape = MakeConvexHull(bodyPart);
 		} else if (!strcmp (definition.m_shapeTypeName, "convexHullAggregate")) {
-			shape = MakeConvexHullAggregate(bodyPart);
+			//shape = MakeConvexHullAggregate(bodyPart);
+			shape = MakeConvexHull(bodyPart);
 		} else {
 			dAssert (0);
 		}
@@ -625,18 +637,18 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return body;
 	}
 
-	CustomUniversal* CreateEngineBodyPart(NewtonBody* const chassis)
+	dCustomUniversal* CreateEngineBodyPart(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const chassisBone)
 	{
 		NewtonWorld* const world = GetWorld();
-		NewtonCollision* shape = NewtonCreateSphere (world, 0.5f, 0, NULL);
-//		NewtonCollision* shape = NewtonCreateCylinder (world, 0.5f, 0.5f, 2.0f, 0, NULL);
+		NewtonCollision* const shape = NewtonCreateCylinder (world, 0.125f, 0.125f, 0.75f, 0, NULL);
+
+		NewtonBody* const chassis = chassisBone->m_body;
 
 		// create the rigid body that will make this bone
 		dMatrix engineMatrix;
 		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
-		engineMatrix = dRollMatrix(0.5f * 3.1416f) * engineMatrix;
-//engineMatrix.m_posit.m_y += 3.0f;
-//engineMatrix.m_posit.m_x -= 1.0f;
+		engineMatrix = dRollMatrix(0.5f * 3.141592f) * engineMatrix;
+		engineMatrix.m_posit.m_y += 1.0f;
 
 		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
 
@@ -664,20 +676,24 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		engineAxis.m_right = engineAxis.m_front.CrossProduct(engineAxis.m_up);
 		engineAxis.m_posit = engineMatrix.m_posit;
 
-		CustomUniversal* const engineJoint = new CustomUniversal(engineAxis, engineBody, chassis);
+		dCustomUniversal* const engineJoint = new dCustomUniversal(engineAxis, engineBody, chassis);
 		engineJoint->EnableLimit_0(false);
 		engineJoint->EnableLimit_1(false);
+
+		dCustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
+		NewtonCollisionSetUserData(NewtonBodyGetCollision(engineBody), bone);
+
 		return engineJoint;
 	}
 
 
-	void ConnectBodyPart (ArticulatedEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation)
+	void ConnectBodyPart (ArticulatedEntityModel* const vehicleModel, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
 	{
 		if (jointArticulation == "") {
 			// this is the root body do nothing
 
 		} else if (jointArticulation == "frontTire") {
-			vehicleModel->LinkFrontTire (parent, child);
+			vehicleModel->LinkFrontTire (parent, child, cycleLinks);
 		} else if (jointArticulation == "rearTire") {
 			vehicleModel->LinkRearTire (parent, child);
 		} else if (jointArticulation == "hingeActuator") {
@@ -692,7 +708,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 
 
-	CustomArticulatedTransformController* CreateForklift (const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, ARTICULATED_VEHICLE_DEFINITION* const definition)
+	dCustomArticulatedTransformController* CreateForklift (const dMatrix& location, const DemoEntity* const model, int bodyPartsCount, ARTICULATED_VEHICLE_DEFINITION* const definition)
 	{
 		NewtonWorld* const world = GetWorld(); 
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -704,7 +720,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// plane the model at its location
 		vehicleModel->ResetMatrix (*scene, location);
 
-		CustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel);
+		dCustomArticulatedTransformController* const controller = CreateTransformController (vehicleModel);
 		controller->SetCalculateLocalTransforms (true);
 
 		DemoEntity* const rootEntity = (DemoEntity*) vehicleModel->Find (definition[0].m_boneName);
@@ -717,8 +733,14 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		com.m_y -= 0.25f;
 		NewtonBodySetCentreOfMass(rootBody, &com[0]);
 
+		// add the root bone to the articulation manager
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddBone (rootBody, dGetIdentityMatrix());
+		// save the bone as the shape use data for self collision test
+		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBody), chassisBone);
+
+
 		// add engine
-		vehicleModel->m_engineJoint = CreateEngineBodyPart(rootBody);
+		vehicleModel->m_engineJoint = CreateEngineBodyPart(controller, chassisBone);
 
 		// set power parameter for a simple DC engine
 		dFloat maxOmega = 40.0f;
@@ -728,28 +750,23 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		vehicleModel->m_maxTurmDamp = 0.0f;
 		vehicleModel->m_maxTurmAccel = 0.0f;
 
-		// for debugging joints
-		//NewtonBodySetMassMatrix(rootBody, 0,0,0,0);
 
-		// add the root bone to the articulation manager
-		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone (rootBody, dGetIdentityMatrix());
-		// save the bone as the shape use data for self collision test
-		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBody), bone);
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
-		CustomArticulatedTransformController::dSkeletonBone* parentBones[32];
+		dCustomArticulatedTransformController::dSkeletonBone* parentBones[32];
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = bone;
+			parentBones[stackIndex] = chassisBone;
 			childEntities[stackIndex] = child;
 			stackIndex ++;
 		}
 
+		dList<dCustomJoint*> cycleLinks;
 		while (stackIndex) {
 			stackIndex --;
 			DemoEntity* const entity = childEntities[stackIndex];
-			CustomArticulatedTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
+			dCustomArticulatedTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < bodyPartsCount; i ++) {
@@ -757,7 +774,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 					NewtonBody* const bone = CreateBodyPart (entity, definition[i]);
 
 					// connect this body part to its parent with a vehicle joint
-					ConnectBodyPart (vehicleModel, parentBone->m_body, bone, definition[i].m_articulationName);
+					ConnectBodyPart (vehicleModel, parentBone->m_body, bone, definition[i].m_articulationName, cycleLinks);
 
 					dMatrix bindMatrix (entity->GetParent()->CalculateGlobalMatrix ((DemoEntity*)NewtonBodyGetUserData (parentBone->m_body)).Inverse());
 					parentBone = controller->AddBone (bone, bindMatrix, parentBone);
@@ -777,10 +794,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
-
-		// wrap the skeleton in a newton skeleton for exact accuracy
-		controller->MakeNewtonSkeleton();
-
 		return controller;
 	}
 
@@ -808,7 +821,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 	}
 
 
-	CustomArticulatedTransformController::dSkeletonBone* MakeTireBody(const char* const entName, const char* const tireName, CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const parentBone)
+	dCustomArticulatedTransformController::dSkeletonBone* MakeTireBody(const char* const entName, const char* const tireName, dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const parentBone)
 	{
 		ARTICULATED_VEHICLE_DEFINITION definition;
 		strcpy(definition.m_boneName, entName);
@@ -849,28 +862,28 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback(tireBody, PhysicsApplyGravityForce);
 
-		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(tireBody, dGetIdentityMatrix(), parentBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(tireBody, dGetIdentityMatrix(), parentBone);
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(tireBody), bone);
 
 		return bone;
 	}
 
-	CustomArticulatedTransformController::dSkeletonBone* MakeTire(const char* const entName, const char* const tireName, CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const parentBone)
+	dCustomArticulatedTransformController::dSkeletonBone* MakeTire(const char* const entName, const char* const tireName, dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const parentBone)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const bone = MakeTireBody (entName, tireName, controller, parentBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const bone = MakeTireBody (entName, tireName, controller, parentBone);
 
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix (bone->m_body, &matrix[0][0]);
 		dMatrix hingeFrame (dRollMatrix(90.0f * 3.141592f / 180.0f) * matrix);
-		new CustomHinge (hingeFrame, bone->m_body, parentBone->m_body);
+		new dCustomHinge (hingeFrame, bone->m_body, parentBone->m_body);
 
 		return bone;
 	}
 
-	CustomArticulatedTransformController::dSkeletonBone* MakeSuspensionTire(const char* const entName, const char* const tireName, CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const parentBone)
+	dCustomArticulatedTransformController::dSkeletonBone* MakeSuspensionTire(const char* const entName, const char* const tireName, dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const parentBone)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone);
 
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
@@ -880,10 +893,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return bone;
 	}
 
-	CustomArticulatedTransformController::dSkeletonBone* MakeTractionTire(const char* const entName, const char* const tireName, CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const parentBone)
+	dCustomArticulatedTransformController::dSkeletonBone* MakeTractionTire(const char* const entName, const char* const tireName, dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const parentBone)
 	{
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)controller->GetUserData();
-		CustomArticulatedTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone);
 
 		// connect the tire tp the body with a hinge
 		dMatrix matrix;
@@ -892,7 +905,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		// save tractions tires 
 		vehicleModel->m_tractionTires[vehicleModel->m_tractionTiresCount] = bone->m_body;
-		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount] = new CustomHinge(tireHingeMatrix, bone->m_body, parentBone->m_body);
+		vehicleModel->m_tractionTiresJoints[vehicleModel->m_tractionTiresCount] = new dCustomHinge(tireHingeMatrix, bone->m_body, parentBone->m_body);
 		vehicleModel->m_tractionTiresCount ++;
 
 		// link traction tire to the engine using a differential gear
@@ -907,12 +920,11 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		dFloat side = (tireMatrix.m_posit - chassisMatrix.m_posit).DotProduct3(chassisMatrix.m_up);
 		dVector sidePin ((side > 0.0f) ? chassisMatrix.m_front : chassisMatrix.m_front.Scale (-1.0f));
-		new CustomSatelliteGear(5.0f, tireHingeMatrix.m_front, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
-
+		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_front, sidePin, chassisMatrix.m_up, tire, engine, chassis);		
 		return bone;
 	}
 
-	void LinkTires(CustomArticulatedTransformController::dSkeletonBone* const master, CustomArticulatedTransformController::dSkeletonBone* const slave, CustomArticulatedTransformController::dSkeletonBone* const root)
+	dCustomJoint* LinkTires(dCustomArticulatedTransformController::dSkeletonBone* const master, dCustomArticulatedTransformController::dSkeletonBone* const slave, dCustomArticulatedTransformController::dSkeletonBone* const root)
 	{
 		NewtonCollisionInfoRecord masterTire;
 		NewtonCollisionInfoRecord slaveTire;
@@ -928,16 +940,16 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 
 		dMatrix pinMatrix;
 		NewtonBodyGetMatrix(root->m_body, &pinMatrix[0][0]);
-		new CustomGear(slaveRadio / masterRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
+		return new dCustomGear(slaveRadio / masterRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
 	}
 	
 
-	void MakeLeftTrack(CustomArticulatedTransformController* const controller)
+	void MakeLeftTrack(dCustomArticulatedTransformController* const controller)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		
-		CustomArticulatedTransformController::dSkeletonBone* const leftTire_0 = MakeTractionTire ("leftTire_0", "tractionLeftTire", controller, chassisBone);
-		CustomArticulatedTransformController::dSkeletonBone* const leftTire_7 = MakeTire ("leftTire_7", "tire", controller, chassisBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const leftTire_0 = MakeTractionTire ("leftTire_0", "tractionLeftTire", controller, chassisBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const leftTire_7 = MakeTire ("leftTire_7", "tire", controller, chassisBone);
 		LinkTires (leftTire_0, leftTire_7, chassisBone);
 
 		MakeTire ("leftTireSuport_0", "suportTire", controller, chassisBone);
@@ -946,17 +958,17 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		for (int i = 1; i < 7; i++) {
 			char name[64];
 			sprintf(name, "leftTire_%d", i);
-			CustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
+			dCustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
 			LinkTires (leftTire_0, childBone, chassisBone);
 		}
 	}
 
-	void MakeRightTrack(CustomArticulatedTransformController* const controller)
+	void MakeRightTrack(dCustomArticulatedTransformController* const controller)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 
-		CustomArticulatedTransformController::dSkeletonBone* const rightTire_0 = MakeTractionTire("rightTire_0", "tractionrightTire", controller, chassisBone);
-		CustomArticulatedTransformController::dSkeletonBone* const rightTire_7 = MakeTire("rightTire_7", "tire", controller, chassisBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const rightTire_0 = MakeTractionTire("rightTire_0", "tractionrightTire", controller, chassisBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const rightTire_7 = MakeTire("rightTire_7", "tire", controller, chassisBone);
 		LinkTires (rightTire_0, rightTire_7, chassisBone);
 
 		MakeTire("rightTireSuport_0", "suportTire", controller, chassisBone);
@@ -965,7 +977,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		for (int i = 1; i < 7; i++) {
 			char name[64];
 			sprintf(name, "rightTire_%d", i);
-			CustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
+			dCustomArticulatedTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
 			LinkTires(rightTire_0, childBone, chassisBone);
 		}
 	}
@@ -1006,7 +1018,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		return dMod(u0 + du * (t - h0) / dh, 1.0f);
 	}
 
-	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, dFloat offset, CustomArticulatedTransformController::dSkeletonBone* const rootNode)
+	void CalculaterUniformSpaceSamples(DemoEntity* const chassis, dFloat offset, dCustomArticulatedTransformController::dSkeletonBone* const rootNode)
 	{
 		dFloat linkLength = 0.33f;
 
@@ -1031,12 +1043,10 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dFloat distAcc = 0.0f;
 
 		dFloat stepAcc = linkLength;
-		dBigVector q(bezierPath->m_curve.CurvePoint(0.0f));
-		dVector p0(dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w));
+		dVector p0(bezierPath->m_curve.CurvePoint(0.0f));
 		for (int i = 1; i < samplingRate + 45; i++) {
 			dFloat u = dFloat(i) / samplingRate;
-			dBigVector q(bezierPath->m_curve.CurvePoint(dMod(u, 1.0f)));
-			dVector p1(dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w));
+			dVector p1(bezierPath->m_curve.CurvePoint(dMod(u, 1.0f)));
 			dVector err(p1 - p0);
 			dFloat errMag = dSqrt(err.DotProduct3(err));
 			distAcc += errMag;
@@ -1063,8 +1073,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dFloat s = 0.0f;
 		dMatrix matrix(dGetIdentityMatrix());
 		dFloat u0 = CalculateKnotParam(steps, linksCount, s);
-		dBigVector r(bezierPath->m_curve.CurvePoint(u0));
-		dVector r0(dFloat(r.m_x), dFloat(r.m_y), dFloat(r.m_z), 1.0f);
+		dVector r0(bezierPath->m_curve.CurvePoint(u0));
 
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -1084,8 +1093,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		for (int i = 1; i < linksCount + 1; i++) {
 			s += linkLength;
 			dFloat u1 = CalculateKnotParam(steps, linksCount, dMod (s, length));
-			dBigVector r(bezierPath->m_curve.CurvePoint(u1));
-			dVector r1(dFloat(r.m_x), dFloat(r.m_y), dFloat(r.m_z), 1.0f);
+			dVector r1(bezierPath->m_curve.CurvePoint(u1));
 			dVector dir(r1 - r0);
 
 			dir = dir.Scale(1.0f / dSqrt(dir.DotProduct3(dir)));
@@ -1114,7 +1122,6 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dMatrix aligment (dYawMatrix(90.0f * 3.1416f / 180.0f));
 		NewtonBody* link0 = linkArray[0];
 
-		dFloat linkFriction = 15.0f;
 		NewtonJoint* hingeArray[1024];
 		for (int i = 1; i < bodyCount; i++) {
 			NewtonBody* const link1 = linkArray[i];
@@ -1122,9 +1129,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 			dMatrix matrix;
 			NewtonBodyGetMatrix(link1, &matrix[0][0]);
 			dMatrix franmeMatrix (aligment * matrix);
-			CustomHinge* const hinge = new CustomHinge (franmeMatrix, link1, link0);
-			hinge->SetStiffness (0.99f);
-			hinge->SetFriction(linkFriction);
+			dCustomHinge* const hinge = new ArticulatedEntityModel::TreadLink (franmeMatrix, link1, link0);
 			hingeArray[i-1] = hinge->GetJoint();
 			link0 = link1;
 		}
@@ -1138,33 +1143,28 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		
 		dVector dist (matrix2.m_posit - matrix0.m_posit);
 		matrix1.m_posit += dist;
-		CustomHinge* const hinge = new CustomHinge (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
-		hinge->SetFriction(linkFriction);
-
-		NewtonSkeletonContainer* const skeleton = NewtonSkeletonContainerCreate (world, link0, NULL);
-		NewtonSkeletonContainerAttachJointArray (skeleton, bodyCount - 1, hingeArray);
-		NewtonSkeletonContainerFinalize (skeleton);
+		new ArticulatedEntityModel::TreadLink (aligment * matrix0, aligment * matrix1, linkArray[0], linkArray[bodyCount - 1]);
 	}
 
-	void MakeLeftThread(CustomArticulatedTransformController* const controller)
+	void MakeLeftThread(dCustomArticulatedTransformController* const controller)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		DemoEntity* const chassis = (DemoEntity*) NewtonBodyGetUserData (chassisBone->m_body);
 		DemoEntity* const pivot = chassis->Find ("leftTire_0");
 		CalculaterUniformSpaceSamples (chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
 	}
 
-	void MakeRightThread(CustomArticulatedTransformController* const controller)
+	void MakeRightThread(dCustomArticulatedTransformController* const controller)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		DemoEntity* const chassis = (DemoEntity*)NewtonBodyGetUserData(chassisBone->m_body);
 		DemoEntity* const pivot = chassis->Find("rightTire_0");
 		CalculaterUniformSpaceSamples(chassis, pivot->GetCurrentMatrix().m_posit.m_z, chassisBone);
 	}
 	
-	CustomArticulatedTransformController::dSkeletonBone* AddCraneBoom(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone, const char* name)
+	dCustomArticulatedTransformController::dSkeletonBone* AddCraneBoom(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const baseBone, const char* name)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
 		DemoEntity* const boom = vehicleModel->Find(name);
@@ -1184,15 +1184,15 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dFloat minLimit =  0.0f;
 		dFloat maxLimit =  4.0f;
 		dFloat linearRate = 2.0f;
-		vehicleModel->m_liftJoints[vehicleModel->m_liftActuatorsCount] = new CustomSliderActuator(&matrix[0][0], linearRate, minLimit, maxLimit, boomBody, baseBone->m_body);
+		vehicleModel->m_liftJoints[vehicleModel->m_liftActuatorsCount] = new dCustomSliderActuator(&matrix[0][0], linearRate, minLimit, maxLimit, boomBody, baseBone->m_body);
 		vehicleModel->m_liftActuatorsCount++;
-		CustomArticulatedTransformController::dSkeletonBone* const boomBone = controller->AddBone(boomBody, dGetIdentityMatrix(), baseBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const boomBone = controller->AddBone(boomBody, dGetIdentityMatrix(), baseBone);
 		return boomBone;
 	}
 
-	void AddCranekPaletteActuator(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone, const char* const name)
+	void AddCranekPaletteActuator(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const baseBone, const char* const name)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
 		DemoEntity* const palette = vehicleModel->Find(name);
@@ -1213,14 +1213,14 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dFloat maxLimit =  1.25f;
 		dFloat rate = 2.0f;
 
-		vehicleModel->m_paletteJoints[vehicleModel->m_paletteActuatorsCount] = new CustomSliderActuator(&matrix[0][0], rate, minLimit, maxLimit, paletteBody, baseBone->m_body);
+		vehicleModel->m_paletteJoints[vehicleModel->m_paletteActuatorsCount] = new dCustomSliderActuator(&matrix[0][0], rate, minLimit, maxLimit, paletteBody, baseBone->m_body);
 		vehicleModel->m_paletteActuatorsCount++;
 		controller->AddBone(paletteBody, dGetIdentityMatrix(), baseBone);
 	}
 
-	void AddCraneWrist(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone)
+	void AddCraneWrist(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const baseBone)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
 		DemoEntity* const wrist = vehicleModel->Find("effector");
@@ -1241,16 +1241,16 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dFloat maxAngleLimit =  120.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 30.0f * 3.141592f / 180.0f;
 
-		vehicleModel->m_universalActuator[vehicleModel->m_universalActuatorsCount] = new CustomUniversalActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, wristBody, baseBone->m_body);
+		vehicleModel->m_universalActuator[vehicleModel->m_universalActuatorsCount] = new dCustomUniversalActuator(&matrix[0][0], angularRate, minAngleLimit * 2.0f, maxAngleLimit * 2.0f, angularRate, minAngleLimit, maxAngleLimit, wristBody, baseBone->m_body);
 		vehicleModel->m_universalActuatorsCount++;
-		CustomArticulatedTransformController::dSkeletonBone* const wristBone = controller->AddBone(wristBody, dGetIdentityMatrix(), baseBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const wristBone = controller->AddBone(wristBody, dGetIdentityMatrix(), baseBone);
 		AddCranekPaletteActuator (controller, wristBone, "leftHand");
 		AddCranekPaletteActuator (controller, wristBone, "rightHand");
 	}
 
-	void AddCraneLift(CustomArticulatedTransformController* const controller, CustomArticulatedTransformController::dSkeletonBone* const baseBone)
+	void AddCraneLift(dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const baseBone)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
 		DemoEntity* const boom = vehicleModel->Find("Boom1");
@@ -1270,17 +1270,17 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dFloat minAngleLimit = -60.0f * 3.141592f / 180.0f;
 		dFloat maxAngleLimit =  10.0f * 3.141592f / 180.0f;
 		dFloat angularRate = 20.0f * 3.141592f / 180.0f;
-		vehicleModel->m_angularActuator0[vehicleModel->m_angularActuatorsCount0] = new CustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, boomBody, baseBone->m_body);
+		vehicleModel->m_angularActuator0[vehicleModel->m_angularActuatorsCount0] = new dCustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, boomBody, baseBone->m_body);
 		vehicleModel->m_angularActuatorsCount0++;
-		CustomArticulatedTransformController::dSkeletonBone* const boomBone1 = controller->AddBone(boomBody, dGetIdentityMatrix(), baseBone);
-		CustomArticulatedTransformController::dSkeletonBone* const boomBone2 = AddCraneBoom (controller, boomBone1, "Boom2");
-		CustomArticulatedTransformController::dSkeletonBone* const boomBone3 = AddCraneBoom (controller, boomBone2, "Boom3");
+		dCustomArticulatedTransformController::dSkeletonBone* const boomBone1 = controller->AddBone(boomBody, dGetIdentityMatrix(), baseBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const boomBone2 = AddCraneBoom (controller, boomBone1, "Boom2");
+		dCustomArticulatedTransformController::dSkeletonBone* const boomBone3 = AddCraneBoom (controller, boomBone2, "Boom3");
 		AddCraneWrist(controller, boomBone3);
 	}
 
-	void AddCraneBase(CustomArticulatedTransformController* const controller)
+	void AddCraneBase(dCustomArticulatedTransformController* const controller)
 	{
-		CustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->GetBone(0);
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)NewtonBodyGetUserData(chassisBone->m_body);
 
 		DemoEntity* const base = vehicleModel->Find("base");
@@ -1300,14 +1300,13 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		dFloat minAngleLimit = -1.0e10f;
 		dFloat maxAngleLimit = 1.0e10f;
 		dFloat angularRate = 20.0f * 3.141592f / 180.0f;
-		vehicleModel->m_angularActuator1[vehicleModel->m_angularActuatorsCount1] = new CustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, baseBody, chassisBone->m_body);
+		vehicleModel->m_angularActuator1[vehicleModel->m_angularActuatorsCount1] = new dCustomHingeActuator(&matrix[0][0], angularRate, minAngleLimit, maxAngleLimit, baseBody, chassisBone->m_body);
 		vehicleModel->m_angularActuatorsCount1++;
-		CustomArticulatedTransformController::dSkeletonBone* const baseBone = controller->AddBone(baseBody, dGetIdentityMatrix(), chassisBone);
+		dCustomArticulatedTransformController::dSkeletonBone* const baseBone = controller->AddBone(baseBody, dGetIdentityMatrix(), chassisBone);
 		AddCraneLift(controller, baseBone);
 	}
 
-
-	CustomArticulatedTransformController* CreateRobot (const dMatrix& location, const DemoEntity* const model, int , ARTICULATED_VEHICLE_DEFINITION* const )
+	dCustomArticulatedTransformController* CreateRobot (const dMatrix& location, const DemoEntity* const model, int , ARTICULATED_VEHICLE_DEFINITION* const )
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -1321,7 +1320,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		matrix.m_posit = location.m_posit;
 		vehicleModel->ResetMatrix(*scene, matrix);
 
-		CustomArticulatedTransformController* const controller = CreateTransformController(vehicleModel);
+		dCustomArticulatedTransformController* const controller = CreateTransformController(vehicleModel);
 		controller->SetCalculateLocalTransforms (true);
 
 		ARTICULATED_VEHICLE_DEFINITION definition;
@@ -1331,18 +1330,7 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		definition.m_bodyPartID = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
 		strcpy (definition.m_articulationName, "mainBody");
 		NewtonBody* const chassis = CreateBodyPart (vehicleModel, definition);
-
-		// add engine
-		vehicleModel->m_engineJoint = CreateEngineBodyPart(chassis);
-
-		// set power parameter for a simple DC engine
-		dFloat maxOmega = 100.0f;
-		vehicleModel->m_maxEngineTorque = 1250.0f;
-		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
-
-		vehicleModel->m_maxTurmAccel = 10.0f;
-		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
-
+		
 		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
 		NewtonCompoundCollisionBeginAddRemove(compound);
 		NewtonCompoundCollisionAddSubCollision (compound, NewtonBodyGetCollision(chassis));
@@ -1362,38 +1350,46 @@ class ArticulatedVehicleManagerManager: public CustomArticulaledTransformManager
 		NewtonBodySetCollision(chassis, compound);
 		NewtonDestroyCollision(compound);
 
-		CustomArticulatedTransformController::dSkeletonBone* const bone = controller->AddBone(chassis, dGetIdentityMatrix());
-		NewtonCollisionSetUserData(NewtonBodyGetCollision(chassis), bone);
+		dCustomArticulatedTransformController::dSkeletonBone* const chassisBone = controller->AddBone(chassis, dGetIdentityMatrix());
+		NewtonCollisionSetUserData(NewtonBodyGetCollision(chassis), chassisBone);
 
+		// add engine
+		vehicleModel->m_engineJoint = CreateEngineBodyPart(controller, chassisBone);
+
+		// set power parameter for a simple DC engine
+		dFloat maxOmega = 100.0f;
+		vehicleModel->m_maxEngineTorque = 1250.0f;
+		vehicleModel->m_omegaResistance = vehicleModel->m_maxEngineTorque / maxOmega;
+
+		vehicleModel->m_maxTurmAccel = 10.0f;
+		vehicleModel->m_engineJoint->SetDamp_0(0.5f);
+
+		AddCraneBase (controller);
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
 		MakeLeftThread(controller);
 		MakeRightThread(controller);
-		AddCraneBase (controller);
 
 		// disable self collision between all body parts
 		controller->DisableAllSelfCollision();
 
 		// wrap the skeleton in a newton skeleton for exact accuracy
-		controller->MakeNewtonSkeleton();
-
 		controller->DisableAllSelfCollision();
 		for (int i = 0; i < controller->GetBoneCount(); i ++) {
-			CustomArticulatedTransformController::dSkeletonBone* const bone = controller->GetBone(i);
+			dCustomArticulatedTransformController::dSkeletonBone* const bone = controller->GetBone(i);
 			NewtonCollisionSetUserData (NewtonBodyGetCollision(bone->m_body), bone);
 		}
-
 		return controller;
 	}
 };
 
 
 // we recommend using and input manage to control input for all games
-class AriculatedJointInputManager: public CustomInputManager
+class AriculatedJointInputManager: public dCustomInputManager
 {
 	public:
 	AriculatedJointInputManager (DemoEntityManager* const scene)
-		:CustomInputManager(scene->GetNewton())
+		:dCustomInputManager(scene->GetNewton())
 		,m_scene(scene)
 		,m_cameraMode(true)
 		,m_changeVehicle(true)
@@ -1408,7 +1404,6 @@ class AriculatedJointInputManager: public CustomInputManager
 	{
 		ArticulatedEntityModel::InputRecord inputs;
 
-		//NewtonDemos* const mainWindow = m_scene->GetRootWindow();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
 		inputs.m_wristAxis0 = int(m_scene->GetKeyState('Y')) - int(m_scene->GetKeyState('U'));
@@ -1465,7 +1460,7 @@ class AriculatedJointInputManager: public CustomInputManager
 		DemoCamera* const camera = m_scene->GetCamera();
 		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
 
-		if (m_changeVehicle.UpdateTriggerButton(m_scene->GetRootWindow(), 'P')) {
+		if (m_changeVehicle.UpdateTriggerButton(m_scene, 'P')) {
 			m_currentPlayer ++;
 		}
 		
@@ -1474,7 +1469,7 @@ class AriculatedJointInputManager: public CustomInputManager
 
 		dVector frontDir (camMatrix[0]);
 		dVector camOrigin(0.0f); 
-		m_cameraMode.UpdatePushButton(m_scene->GetRootWindow(), 'C');
+		m_cameraMode.UpdatePushButton(m_scene, 'C');
 		if (m_cameraMode.GetPushButtonState()) {
 			camOrigin = playerMatrix.TransformVector( dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
 			camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
@@ -1486,7 +1481,7 @@ class AriculatedJointInputManager: public CustomInputManager
 		camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
 	}
 
-	void AddPlayer(CustomArticulatedTransformController* const player)
+	void AddPlayer(dCustomArticulatedTransformController* const player)
 	{
 		m_player[m_playersCount] = player;
 		m_playersCount ++;
@@ -1522,7 +1517,7 @@ class AriculatedJointInputManager: public CustomInputManager
 
 
 	DemoEntityManager* m_scene;
-	CustomArticulatedTransformController* m_player[2];
+	dCustomArticulatedTransformController* m_player[2];
 	DemoEntityManager::ButtonKey m_cameraMode;
 	DemoEntityManager::ButtonKey m_changeVehicle;
 	int m_playersCount;
@@ -1583,12 +1578,9 @@ static void LoadLumberYardMesh (DemoEntityManager* const scene, const DemoEntity
 		filter.Remove(filter.GetRoot());
 	}
 }
-*/
 
 void ArticulatedJoints (DemoEntityManager* const scene)
 {
-	dAssert (0);
-/*
 	// load the sky box
 	scene->CreateSkyBox();
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
@@ -1608,13 +1600,13 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 
 	ArticulatedEntityModel robotModel(scene, "robot.ngd");
-	CustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
+	dCustomArticulatedTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
 	inputManager->AddPlayer (robot);
 
 	matrix.m_posit.m_z += 4.0f;
 	// load a the mesh of the articulate vehicle
 	ArticulatedEntityModel forkliftModel(scene, "forklift.ngd");
-	CustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
+	dCustomArticulatedTransformController* const forklift = vehicleManager->CreateForklift(matrix, &forkliftModel, sizeof(forkliftDefinition) / sizeof (forkliftDefinition[0]), forkliftDefinition);
 	inputManager->AddPlayer(forklift);
 
 	// add some object to play with
@@ -1631,7 +1623,6 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * 3.141592f / 180.0f);  
 	scene->SetCameraMatrix(rot, origin);
-*/
 }
 
 

@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -12,11 +12,10 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "DemoMesh.h"
-#include "DemoCamera.h"
-#include "OpenGlUtil.h"
-#include "PhysicsUtils.h"
 #include "DemoEntityManager.h"
+#include "DemoCamera.h"
+#include "DemoMesh.h"
+#include "PhysicsUtils.h"
 
 static void BuildJenga (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
 {
@@ -82,11 +81,8 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	int defaultMaterialID;
 	defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);
 
-	//dMatrix shapeMatrix (dRollMatrix(3.141692f * 0.5f));
 	NewtonCollision* const collision = CreateConvexCollision (world, shapeMatrix, size, type, defaultMaterialID);
-
 	DemoMesh* const geometry = new DemoMesh("cylinder_1", collision, "wood_4.tga", "wood_4.tga", "wood_1.tga");
-	//DemoMesh____* const geometry = new DemoMesh____("cylinder_1", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	//	matrix = dRollMatrix(3.141592f/2.0f);
 	dFloat startElevation = 100.0f;
@@ -100,14 +96,15 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	CalculateAABB (collision, dGetIdentityMatrix(), minP, maxP);
 
 	//dFloat stepz = size.m_z + 0.01f;
-	dFloat stepz = maxP.m_z - minP.m_z + 0.01f;
-	dFloat stepy = maxP.m_y - minP.m_y;
+	dFloat stepz = maxP.m_z - minP.m_z + 0.03125f;
+	dFloat stepy = (maxP.m_y - minP.m_y);
 
 	dFloat y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	dFloat z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 	matrix.m_posit.m_y = y0;
 	for (int j = 0; j < count; j ++) {
+//	for (int j = 0; j < 10; j ++) {
 		matrix.m_posit.m_z = z0;
 		for (int i = 0; i < (count - j) ; i ++) {
 			CreateSimpleSolid (scene, geometry, mass, matrix, collision, defaultMaterialID);
@@ -121,7 +118,6 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	geometry->Release(); 
 	NewtonDestroyCollision (collision);
 }
-
 
 
 static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
@@ -156,6 +152,110 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
 	}
 
+	//baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 4.0f);
+	DemoMesh* const geometry1 = new DemoMesh("sphere", collision, "wood_1.tga", "wood_1.tga", "wood_1.tga");
+	CreateSimpleSolid(scene, geometry1, mass * 1000.0f, baseMatrix, collision, defaultMaterialID);
+
+	// do not forget to release the assets	
+	geometry1->Release();
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+}
+
+static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
+{
+	// build a standard block stack of 20 * 3 boxes for a total of 60
+	NewtonWorld* const world = scene->GetNewton();
+
+	dVector blockBoxSize(size);
+
+	// create the stack
+	dMatrix baseMatrix(dGetIdentityMatrix());
+
+	// for the elevation of the floor at the stack position
+	baseMatrix.m_posit.m_x = origin.m_x;
+	baseMatrix.m_posit.m_z = origin.m_z;
+
+	dFloat startElevation = 100.0f;
+	dVector floor(FindFloor(world, dVector(baseMatrix.m_posit.m_x, startElevation, baseMatrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
+
+	// create a material to control collision with this objects
+	int defaultMaterialID;
+	defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
+
+	// create the shape and visual mesh as a common data to be re used
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _CAPSULE_PRIMITIVE, defaultMaterialID);
+	DemoMesh* const geometry = new DemoMesh("sphere", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	dFloat vertialStep = blockBoxSize.m_x;
+	dFloat horizontalStep = blockBoxSize.m_y * 0.8f;
+	dMatrix matrix0(dGetIdentityMatrix());
+	matrix0.m_posit = origin;
+	matrix0.m_posit.m_y += vertialStep * 0.5f;
+	matrix0.m_posit.m_w = 1.0f;
+
+	dMatrix matrix1(matrix0);
+	matrix1.m_posit.m_z += horizontalStep;
+
+	dMatrix matrix2(dYawMatrix(3.141592f * 0.5f) * matrix0);
+	matrix2.m_posit.m_x += horizontalStep * 0.5f;
+	matrix2.m_posit.m_z += horizontalStep * 0.5f;
+	matrix2.m_posit.m_y += vertialStep;
+
+	dMatrix matrix3(matrix2);
+	matrix3.m_posit.m_x -= horizontalStep;
+	
+	for (int i = 0; i < count/2; i++) {
+		CreateSimpleSolid(scene, geometry, mass, matrix0, collision, defaultMaterialID);
+		CreateSimpleSolid(scene, geometry, mass, matrix1, collision, defaultMaterialID);
+		CreateSimpleSolid(scene, geometry, mass, matrix2, collision, defaultMaterialID);
+		CreateSimpleSolid(scene, geometry, mass, matrix3, collision, defaultMaterialID);
+
+		matrix0.m_posit.m_y += vertialStep * 2.0f;
+		matrix1.m_posit.m_y += vertialStep * 2.0f;
+		matrix2.m_posit.m_y += vertialStep * 2.0f;
+		matrix3.m_posit.m_y += vertialStep * 2.0f;
+	}
+
+	// do not forget to release the assets	
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+}
+
+
+static void BoxStack(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count)
+{
+	// build a standard block stack of 20 * 3 boxes for a total of 60
+	NewtonWorld* const world = scene->GetNewton();
+
+	dVector blockBoxSize(size);
+	blockBoxSize = blockBoxSize.Scale(2.0f);
+
+	// create the stack
+	dMatrix baseMatrix(dGetIdentityMatrix());
+
+	// for the elevation of the floor at the stack position
+	baseMatrix.m_posit.m_x = origin.m_x;
+	baseMatrix.m_posit.m_z = origin.m_z;
+
+	dFloat startElevation = 100.0f;
+	dVector floor(FindFloor(world, dVector(baseMatrix.m_posit.m_x, startElevation, baseMatrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
+
+	// create a material to control collision with this objects
+	int defaultMaterialID;
+	defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
+
+	// create the shape and visual mesh as a common data to be re used
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _BOX_PRIMITIVE, defaultMaterialID);
+	DemoMesh* const geometry = new DemoMesh("sphere", collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+
+	for (int i = 0; i < count; i++) {
+		CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);
+		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
+	}
+
 	// do not forget to release the assets	
 	geometry->Release();
 	NewtonDestroyCollision(collision);
@@ -168,25 +268,15 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+//	AddFloorBox(scene, dVector (0.0f, -0.05f, 0.0f, 0.0f), dVector(100.0f, 0.1f, 100.0f, 0.0f));
 
-	// load the scene from a ngd file format
-#if 0
-	char fileName[2048];
-	//GetWorkingFileName ("boxStacks_1.ngd", fileName);
-	//GetWorkingFileName ("boxStacks_3.ngd", fileName);
-	//GetWorkingFileName ("boxStacks.ngd", fileName);
-	//GetWorkingFileName ("pyramid20x20.ngd", fileName);
-	GetWorkingFileName ("pyramid40x40.ngd", fileName);
-	scene->LoadScene (fileName);
-#else
-	
 	int high = 20;
 	for (int i = 0; i < 1; i ++) {
 		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _BOX_PRIMITIVE);
 		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 		BuildPyramid (scene, 10.0f, dVector( 20.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 		BuildPyramid (scene, 10.0f, dVector( 30.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
-		BuildPyramid (scene, 10.0f, dVector( 40.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CHAMFER_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
+		//BuildPyramid (scene, 10.0f, dVector( 40.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0), high, _CHAMFER_CYLINDER_PRIMITIVE, dRollMatrix(0.5f * 3.14159f));
 	}
 
 	high = 20;
@@ -197,25 +287,19 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	}
 
 	high = 20;
+high = 10;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
-			SphereStack(scene, 5.0f, dVector(5.0f + j * 8, 0.0f, -10.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0), high);
+			SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
+			CapsuleStack (scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, 0.0f + i * 8, 0.0f), dVector (0.5f, 4.0f, 0.5f, 0.0f), high);
+			BoxStack(scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, 6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
 		}
 	}
-
-#endif
-
 
 	// place camera into position
 	dQuaternion rot;
 	dVector origin (-40.0f, 10.0f, 0.0f, 0.0f);
-//origin.m_x = -10.0f;
-//origin.m_x = 20.0f;
-//origin.m_y = 1.0f;
 	scene->SetCameraMatrix(rot, origin);
-
-
-	//	ExportScene (scene->GetNewton(), "../../../media/test1.ngd");
 }
 
 

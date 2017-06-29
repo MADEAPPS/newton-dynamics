@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -122,7 +122,7 @@ GLuint LoadTexture(const char* const filename)
 	#pragma pack(8)
 
 	char fullPathName[2048];
-	GetWorkingFileName (filename, fullPathName);
+	dGetWorkingFileName (filename, fullPathName);
 	TextureCache& cache = TextureCache::GetChache();
 	GLuint texture = cache.GetTexture(fullPathName);
 	if (!texture) {
@@ -226,7 +226,7 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 			//eFormat = GL_RGB;
 			iComponents = 4;
 			break;
-			
+
 		case m_rgba:
 			eFormat = GL_BGRA;
 			//eFormat = GL_RGBA;

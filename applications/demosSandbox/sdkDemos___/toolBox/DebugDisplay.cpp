@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -87,6 +87,7 @@ static void RenderBodyContactsForces (NewtonBody* const body, dFloat scale)
 					glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
 					glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 
+
 					// these are the components of the tangents forces at the contact point, the can be display at the contact position point.
 					NewtonMaterialGetContactTangentDirections(material, body, &tangnetDir0[0], &tangnetDir1[0]);
 					dVector tangentForce1 (tangnetDir0.Scale ((contactForce.DotProduct3(tangnetDir0)) * scale));
@@ -99,6 +100,7 @@ static void RenderBodyContactsForces (NewtonBody* const body, dFloat scale)
 					p1 = point + tangentForce2.Scale (scale);
 					glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
 					glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+
 				}
 			}
 		}
@@ -128,43 +130,42 @@ void RenderAABB (NewtonWorld* const world)
 		NewtonCollisionCalculateAABB (collision, &matrix[0][0], &p0[0], &p1[0]);
 //		CalculateAABB (collision, matrix, p0, p1);
 
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
 
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
 
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
 
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
 
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
 
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
 
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
 
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
-		glVertex3f (GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
-		glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
 	}
 	glEnd();
 }
@@ -188,18 +189,18 @@ void RenderCenterOfMass (NewtonWorld* const world)
 
 		dVector x (o + matrix.RotateVector (dVector (1.0f, 0.0f, 0.0f, 0.0f)));
 		glColor3f (1.0f, 0.0f, 0.0f);
-		glVertex3f (GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
-		glVertex3f (GLfloat(x.m_x), GLfloat(x.m_y), GLfloat(x.m_z));
+		glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
+		glVertex3f(GLfloat(x.m_x), GLfloat(x.m_y), GLfloat(x.m_z));
 
 		dVector y (o + matrix.RotateVector (dVector (0.0f, 1.0f, 0.0f, 0.0f)));
 		glColor3f (0.0f, 1.0f, 0.0f);
-		glVertex3f (GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
-		glVertex3f (GLfloat(y.m_x), GLfloat(y.m_y), GLfloat(y.m_z));
+		glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
+		glVertex3f(GLfloat(y.m_x), GLfloat(y.m_y), GLfloat(y.m_z));
 
 		dVector z (o + matrix.RotateVector (dVector (0.0f, 0.0f, 1.0f, 0.0f)));
 		glColor3f (0.0f, 0.0f, 1.0f);
-		glVertex3f (GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
-		glVertex3f (GLfloat(z.m_x), GLfloat(z.m_y), GLfloat(z.m_z));
+		glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
+		glVertex3f(GLfloat(z.m_x), GLfloat(z.m_y), GLfloat(z.m_z));
 	}
 	glEnd();
 }
@@ -314,16 +315,9 @@ static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MOD
 		case NEWTON_KINEMATIC_BODY:
 			glColor3f(1.0f, 1.0f, 0.0f);
 			break;
-
-		case NEWTON_DEFORMABLE_BODY:
-			glColor3f (0.0f, 1.0f, 1.0f);
-			break;
 	}
 	dMatrix matrix;
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
-
-
-
 	NewtonCollisionForEachPolygonDo (NewtonBodyGetCollision(body), &matrix[0][0], DebugShowGeometryCollision, (void*) mode);
 }
 
@@ -469,7 +463,6 @@ void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
 				glVertex3f(GLfloat(o0.m_x), GLfloat(o0.m_y), GLfloat(o0.m_z));
 				glVertex3f(GLfloat(z.m_x), GLfloat(z.m_y), GLfloat(z.m_z));
 
-
 				// draw second frame
 				dMatrix matrix1 (dGetIdentityMatrix());
 				if (info.m_attachBody_1) {
@@ -488,11 +481,11 @@ void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
 				glVertex3f(GLfloat(o1.m_x), GLfloat(o1.m_y), GLfloat(o1.m_z));
 				glVertex3f(GLfloat(y.m_x), GLfloat(y.m_y), GLfloat(y.m_z));
 
+
 				z = o1 + matrix1.RotateVector (dVector (0.0f, 0.0f, size, 0.0f));
 				glColor3f (0.0f, 0.0f, 1.0f);
 				glVertex3f(GLfloat(o1.m_x), GLfloat(o1.m_y), GLfloat(o1.m_z));
 				glVertex3f(GLfloat(z.m_x), GLfloat(z.m_y), GLfloat(z.m_z));
-
 
 				if (!strcmp (info.m_descriptionType, "limitballsocket")) {
 					// draw the cone limit of this joint
@@ -510,7 +503,7 @@ void RenderJointsDebugInfo (NewtonWorld* const world, dFloat size)
 
 						glVertex3f(GLfloat(o0.m_x), GLfloat(o0.m_y), GLfloat(o0.m_z));
 						glVertex3f(GLfloat(q1.m_x), GLfloat(q1.m_y), GLfloat(q1.m_z));
-
+				
 						glVertex3f(GLfloat(q0.m_x), GLfloat(q0.m_y), GLfloat(q0.m_z));
 						glVertex3f(GLfloat(q1.m_x), GLfloat(q1.m_y), GLfloat(q1.m_z));
 

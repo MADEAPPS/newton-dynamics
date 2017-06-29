@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -9,17 +9,16 @@
 * freely
 */
 
-
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
+#include "PhysicsUtils.h"
+#include "TargaToOpenGl.h"
+#include "HeightFieldPrimitive.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
-#include "PhysicsUtils.h"
-#include "DebugDisplay.h"
-#include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
+#include "DebugDisplay.h"
 #include "UserPlaneCollision.h"
-
 
 // some figures form the 2000 SRT Viper data sheet: http://www.vipercentral.com/specifications/
 // the 2000 Vipers’ 8.4-liter engine generates
@@ -41,63 +40,61 @@
 
 #define VEHICLE_THIRD_PERSON_VIEW_HIGHT		2.0f
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
-//#define VEHICLE_THIRD_PERSON_VIEW_HIGHT		10.0f
-//#define VEHICLE_THIRD_PERSON_VIEW_DIST		35.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
 struct CarDefinition 
 {
-	dFloat TIRE_MASS;
-	dFloat ENGINE_MASS;
-	dFloat MASS;
-	dFloat ENGINE_RADIO;
-	dFloat FRONT_AXEL_STEER_ANGLE;
-	dFloat REAR_AXEL_STEER_ANGLE;
-	dFloat VEHICLE_WEIGHT_DISTRIBUTION;
-	dFloat CLUTCH_FRICTION_TORQUE;
-	dFloat IDLE_TORQUE;
-	dFloat IDLE_TORQUE_RPM;
-	dFloat PEAK_TORQUE;
-	dFloat PEAK_TORQUE_RPM;
-	dFloat PEAK_HP;
-	dFloat PEAK_HP_RPM;
-	dFloat REDLINE_RPM;
-	dFloat VEHICLE_TOP_SPEED_KMH;
-	dFloat TIRE_LATERAL_STIFFNESS;
-	dFloat TIRE_LONGITUDINAL_STIFFNESS;
-	dFloat TIRE_ALIGNING_MOMENT_TRAIL;
-	dFloat TIRE_SUSPENSION_SPRING;
-	dFloat TIRE_SUSPENSION_DAMPER;
-	dFloat TIRE_SUSPENSION_LENGTH;
-	CustomVehicleController::BodyPartTire::Info::SuspensionType TIRE_SUSPENSION_TYPE;
-	dFloat TIRE_BRAKE_TORQUE;
-	dFloat TIRE_PIVOT_OFFSET_Y;
-	dFloat TIRE_GEAR_1;
-	dFloat TIRE_GEAR_2;
-	dFloat TIRE_GEAR_3;
-	dFloat TIRE_GEAR_4;
-	dFloat TIRE_GEAR_5;
-	dFloat TIRE_GEAR_6;
-	dFloat TIRE_REVERSE_GEAR;
-	dFloat COM_Y_OFFSET;
-	dFloat DOWNFORCE_WEIGHT_FACTOR_0;
-	dFloat DOWNFORCE_WEIGHT_FACTOR_1;
-	dFloat DOWNFORCE_WEIGHT_FACTOR_SPEED;
-	int WHEEL_HAS_FENDER;
-	int DIFFERENTIAL_TYPE;
+	dFloat m_vehicleMass;
+	dFloat m_engineMass;
+	dFloat m_tireMass;
+	dFloat m_engineRotorRadio;
+	dFloat m_frontSteeringAngle;
+	dFloat m_rearSteeringAngle;
+	dFloat m_vehicleWeightDistribution;
+	dFloat m_cluthFrictionTorque;
+	dFloat m_engineIdleTorque;
+	dFloat m_engineRPMAtIdleTorque;
+	dFloat m_enginePeakTorque;
+	dFloat m_engineRPMAtPeakTorque;
+	dFloat m_enginePeakHorsePower;
+	dFloat m_egineRPMAtPeakHorsePower;
+	dFloat m_engineRPMAtRedLine;
+	dFloat m_vehicleTopSpeed;
+	dFloat m_tireLaretalStiffeness;
+	dFloat m_tireLongitudinalStiffness;
+	dFloat m_tireAligningMomemtTrail;
+	dFloat m_TireSuspensionSpringConstant;
+	dFloat m_TireSuspensionDamperConstant;
+	dFloat m_TireSuspensionLength;
+	dCustomVehicleController::dBodyPartTire::Info::SuspensionType m_TireSuspensionType;
+	dFloat m_TireBrakesTorque;
+	dFloat m_tirePivotOffset;
+	dFloat m_transmissionGearRatio0;
+	dFloat m_transmissionGearRatio1;
+	dFloat m_transmissionGearRatio2;
+	dFloat m_transmissionGearRatio3;
+	dFloat m_transmissionGearRatio4;
+	dFloat m_transmissionGearRatio6;
+	dFloat m_transmissionRevereGearRatio;
+	dFloat m_chassisYaxisComBias;
+	dFloat m_aerodynamicsDownForceWeightCoeffecient0;
+	dFloat m_aerodynamicsDownForceWeightCoeffecient1;
+	dFloat m_aerodynamicsDownForceSpeedFactor;
+	int m_wheelHasCollisionFenders;
+	int m_differentialType; // 0 rear wheel drive, 1 front wheel drive, 3 four wheel drive
 };
 
 static CarDefinition monsterTruck = 
 {
-	40.0f,										// TIRE_MASS	
-	100.0f,										// ENGINE_MASS
 	(3380.0f * 0.454f),							// MASS
+	100.0f,										// ENGINE_MASS
+	40.0f,										// TIRE_MASS	
 	0.125f,										// ENGINE_RADIO
-	15.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
-	-5.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
+	20.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
+	0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
 	0.55f,										// VEHICLE_WEIGHT_DISTRIBUTION
 	2000.0f,									// CLUTCH_FRICTION_TORQUE
-	350.0f,										// IDLE_TORQUE
+	200.0f,										// IDLE_TORQUE
 	800.0f,										// IDLE_TORQUE_RPM
 	500.0f,										// PEAK_TORQUE
 	3000.0f,									// PEAK_TORQUE_RPM
@@ -105,14 +102,14 @@ static CarDefinition monsterTruck =
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),	// TIRE_LATERAL_STIFFNESS
-	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),	// TIRE_LONGITUDINAL_STIFFNESS
+	1.2f,										// TIRE_LATERAL_STIFFNESS
+	1.2f,										// TIRE_LONGITUDINAL_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
-	200.0f,										// TIRE_SUSPENSION_SPRING
-	10.0f,										// TIRE_SUSPENSION_DAMPER
-	0.5f,										// TIRE_SUSPENSION_LENGTH
-	CustomVehicleController::BodyPartTire::Info::m_offroad, //TIRE_SUSPENSION_TYPE
-	3000.0f,									// TIRE_BRAKE_TORQUE
+	4000.0f,									// TIRE_SUSPENSION_SPRING
+	200.0f,										// TIRE_SUSPENSION_DAMPER
+	0.25f,										// TIRE_SUSPENSION_LENGTH
+	dCustomVehicleController::dBodyPartTire::Info::m_confort, //TIRE_SUSPENSION_TYPE
+	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
 	1.78f,										// TIRE_GEAR_2
@@ -131,15 +128,15 @@ static CarDefinition monsterTruck =
 
 static CarDefinition viper = 
 {
-	40.0f,										// TIRE_MASS	
-	100.0f,										// ENGINE_MASS
 	(3380.0f * 0.454f),							// MASS
+	100.0f,										// ENGINE_MASS
+	40.0f,										// TIRE_MASS	
 	0.125f,										// ENGINE_RADIO
-	20.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
+	25.0f,										// FRONT_AXEL_TIRE_STEER_ANGLE
 	 0.0f,										// REAR_AXEL_TIRE_STEER_ANGLE
-	0.55f,										// VEHICLE_WEIGHT_DISTRIBUTION
+	0.6f,										// VEHICLE_WEIGHT_DISTRIBUTION
 	2000.0f,									// CLUTCH_FRICTION_TORQUE
-	350.0f,										// IDLE_TORQUE
+	200.0f,										// IDLE_TORQUE
 	800.0f,										// IDLE_TORQUE_RPM
 	500.0f,										// PEAK_TORQUE
 	3000.0f,									// PEAK_TORQUE_RPM
@@ -147,14 +144,14 @@ static CarDefinition viper =
 	5200.0f,									// PEAK_HP_RPM
 	6000.0f,									// REDLINE_TORQUE_RPM
 	264.0f,										// VEHICLE_TOP_SPEED_KMH
-	(3380.0f * 0.454f * DEMO_GRAVITY * 10.0f),  // TIRE_LATERAL_STIFFNESS
-	(3380.0f * 0.454f * DEMO_GRAVITY *  2.0f),	// TIRE_LONGITUDINAL_STIFFNESS
+	1.0f,										// TIRE_LATERAL_STIFFNESS
+	1.0f,										// TIRE_LONGITUDINAL_STIFFNESS
 	0.5f,										// TIRE_ALIGNING_MOMENT_TRAIL
-	300.0f,										// TIRE_SUSPENSION_SPRING
-	10.0f,										// TIRE_SUSPENSION_DAMPER
+	30000.0f,									// TIRE_SUSPENSION_SPRING
+	700.0f,										// TIRE_SUSPENSION_DAMPER
 	0.25f,										// TIRE_SUSPENSION_LENGTH
-	CustomVehicleController::BodyPartTire::Info::m_confort, //TIRE_SUSPENSION_TYPE
-	3000.0f,									// TIRE_BRAKE_TORQUE
+	dCustomVehicleController::dBodyPartTire::Info::m_confort, //TIRE_SUSPENSION_TYPE
+	20000.0f,									// TIRE_BRAKE_TORQUE
 	-0.0f,										// TIRE_PIVOT_OFFSET_Y
 	2.66f,										// TIRE_GEAR_1
 	1.78f,										// TIRE_GEAR_2
@@ -168,7 +165,7 @@ static CarDefinition viper =
 	2.0f,										// DOWNFORCE_WEIGHT_FACTOR_1
 	80.0f, 										// DOWNFORCE_WEIGHT_FACTOR_SPEED
 	1,											// WHEEL_HAS_FENDER
-	2,											// DIFFERENTIAL_TYPE
+	0,											// DIFFERENTIAL_TYPE
 };
 
 
@@ -202,7 +199,7 @@ class SuperCarEntity: public DemoEntity
 	};
 
 
-	SuperCarEntity (DemoEntityManager* const scene, CustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename, dFloat distanceToPath, const CarDefinition& definition)
+	SuperCarEntity (DemoEntityManager* const scene, dCustomVehicleControllerManager* const manager, const dMatrix& location, const char* const filename, dFloat distanceToPath, const CarDefinition& definition)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_controller(NULL)
 		,m_gearUpKey (false)
@@ -236,7 +233,8 @@ class SuperCarEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle 
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.MASS, PhysicsApplyGravityForce, this);
+		//m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, parameters.VEHICLE_MASS, PhysicsApplyGravityForce, this, dAbs (DEMO_GRAVITY));
+		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.m_vehicleMass, PhysicsApplyGravityForce, this, dAbs (DEMO_GRAVITY));
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();
@@ -260,10 +258,10 @@ class SuperCarEntity: public DemoEntity
 
 	~SuperCarEntity ()
 	{
-		((CustomVehicleControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
+		((dCustomVehicleControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
-	void SetGearMap(CustomVehicleController::EngineController* const engine)
+	void SetGearMap(dCustomVehicleController::dEngineController* const engine)
 	{
 		int start = engine->GetFirstGear();
 		int count = engine->GetLastGear() - start;
@@ -302,10 +300,12 @@ class SuperCarEntity: public DemoEntity
 	{
 		DemoEntity::InterpolateMatrix (world, param);
 		if (m_controller){
-			for (dList<CustomVehicleController::BodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
-				CustomVehicleController::BodyPart* const part = node->GetInfo();
+			for (dList<dCustomVehicleController::dBodyPart*>::dListNode* node = m_controller->GetFirstBodyPart()->GetNext(); node; node = m_controller->GetNextBodyPart(node)) {
+				dCustomVehicleController::dBodyPart* const part = node->GetInfo();
 				DemoEntity* const entPart = (DemoEntity*) part->GetUserData();
-				entPart->InterpolateMatrix (world, param);
+				if (entPart) {
+					entPart->InterpolateMatrix(world, param);
+				}
 			}
 		}
 	}
@@ -351,7 +351,7 @@ class SuperCarEntity: public DemoEntity
 		NewtonDestroyCollision (collision);	
 	}
 
-	CustomVehicleController::BodyPartTire* AddTire (const char* const tireName, dFloat width, dFloat radius, dFloat maxSteerAngle, const CarDefinition& definition) 
+	dCustomVehicleController::dBodyPartTire* AddTire (const char* const tireName, dFloat width, dFloat radius, dFloat pivotOffset, dFloat maxSteerAngle, const CarDefinition& definition)
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntity* const entity = (DemoEntity*) NewtonBodyGetUserData(body);
@@ -361,8 +361,7 @@ class SuperCarEntity: public DemoEntity
 		dMatrix tireMatrix (tirePart->CalculateGlobalMatrix(entity));
 
 		// add the offset location
-
-		tireMatrix.m_posit.m_y += definition.TIRE_PIVOT_OFFSET_Y;
+		tireMatrix.m_posit.m_y += definition.m_tirePivotOffset;
 
 		// add and alignment matrix,to match visual mesh to physics collision shape
 		dMatrix aligmentMatrix ((tireMatrix[0][2] > 0.0f) ? dGetIdentityMatrix() : dYawMatrix(3.141592f));
@@ -371,21 +370,22 @@ class SuperCarEntity: public DemoEntity
 		tirePart->SetUserData(m_ligmentMatrix);
 
 		// add the tire to the vehicle
-		CustomVehicleController::BodyPartTire::Info tireInfo;
+		dCustomVehicleController::dBodyPartTire::Info tireInfo;
 
 		tireInfo.m_location = tireMatrix.m_posit;
-		tireInfo.m_mass = definition.TIRE_MASS;
+		tireInfo.m_mass = definition.m_tireMass;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
+		tireInfo.m_pivotOffset = pivotOffset;
 		tireInfo.m_maxSteeringAngle = maxSteerAngle * 3.1416f / 180.0f; 
-		tireInfo.m_dampingRatio = definition.TIRE_SUSPENSION_DAMPER;
-		tireInfo.m_springStrength = definition.TIRE_SUSPENSION_SPRING;
-		tireInfo.m_suspesionlenght = definition.TIRE_SUSPENSION_LENGTH;
-		tireInfo.m_lateralStiffness = dAbs (definition.TIRE_LATERAL_STIFFNESS);
-		tireInfo.m_longitudialStiffness = dAbs (definition.TIRE_LONGITUDINAL_STIFFNESS);
-		tireInfo.m_aligningMomentTrail =  definition.TIRE_ALIGNING_MOMENT_TRAIL;
-		tireInfo.m_hasFender = definition.WHEEL_HAS_FENDER;
-		tireInfo.m_suspentionType = definition.TIRE_SUSPENSION_TYPE;
+		tireInfo.m_dampingRatio = definition.m_TireSuspensionDamperConstant;
+		tireInfo.m_springStrength = definition.m_TireSuspensionSpringConstant;
+		tireInfo.m_suspesionlenght = definition.m_TireSuspensionLength;
+		tireInfo.m_lateralStiffness = dAbs (definition.m_tireLaretalStiffeness);
+		tireInfo.m_longitudialStiffness = dAbs (definition.m_tireLongitudinalStiffness);
+		tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
+		tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
+		tireInfo.m_suspentionType = definition.m_TireSuspensionType;
 		tireInfo.m_userData = tirePart;
 
 		return m_controller->AddTire (tireInfo);
@@ -397,9 +397,9 @@ class SuperCarEntity: public DemoEntity
 		NewtonBody* const body = m_controller->GetBody();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
-		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			const CustomVehicleController::BodyPartTire* const part = &node->GetInfo();
-			CustomVehicleController::BodyPart* const parent = part->GetParent();
+		for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			const dCustomVehicleController::dBodyPartTire* const part = &node->GetInfo();
+			dCustomVehicleController::dBodyPart* const parent = part->GetParent();
 
 			NewtonBody* const body = part->GetBody();
 			NewtonBody* const parentBody = parent->GetBody();
@@ -426,32 +426,23 @@ class SuperCarEntity: public DemoEntity
 		dFloat radius;
 
 		// Muscle cars have the front engine, we need to shift the center of mass to the front to represent that
-		m_controller->SetCenterOfGravity (dVector (0.0f, definition.COM_Y_OFFSET, 0.0f, 0.0f)); 
+		m_controller->SetCenterOfGravity (dVector (0.0f, definition.m_chassisYaxisComBias, 0.0f, 0.0f)); 
 
 		// add front axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("fl_tire", width, radius);
 		dVector offset (0.0f, 0.0f, 0.0f, 0.0f);
-		CustomVehicleController::BodyPartTire* const leftFrontTire = AddTire ("fl_tire", width, radius, definition.FRONT_AXEL_STEER_ANGLE, definition);
-		CustomVehicleController::BodyPartTire* const rightFrontTire = AddTire ("fr_tire", width, radius, definition.FRONT_AXEL_STEER_ANGLE, definition);
+		dCustomVehicleController::dBodyPartTire* const leftFrontTire = AddTire ("fl_tire", width, radius, 0.25f, definition.m_frontSteeringAngle, definition);
+		dCustomVehicleController::dBodyPartTire* const rightFrontTire = AddTire ("fr_tire", width, radius, -0.25f, definition.m_frontSteeringAngle, definition);
 
 		// add rear axle
 		// a car may have different size front an rear tire, therefore we do this separate for front and rear tires
 		CalculateTireDimensions ("rl_tire", width, radius);
-		CustomVehicleController::BodyPartTire* const leftRearTire = AddTire ("rl_tire", width, radius, definition.REAR_AXEL_STEER_ANGLE, definition);
-		CustomVehicleController::BodyPartTire* const rightRearTire = AddTire ("rr_tire", width, radius, definition.REAR_AXEL_STEER_ANGLE, definition);
-
-		//calculate the Ackerman parameters
-		// add a steering Wheel component
-		CustomVehicleController::SteeringController* const steering = new CustomVehicleController::SteeringController (m_controller);
-		steering->AddTire(leftFrontTire);
-		steering->AddTire(rightFrontTire);
-		steering->AddTire(leftRearTire);
-		steering->AddTire(rightRearTire);
-		m_controller->SetSteering(steering);
+		dCustomVehicleController::dBodyPartTire* const leftRearTire = AddTire ("rl_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
+		dCustomVehicleController::dBodyPartTire* const rightRearTire = AddTire ("rr_tire", width, radius, 0.0f, definition.m_rearSteeringAngle, definition);
 		
 		// add vehicle brakes
-		CustomVehicleController::BrakeController* const brakes = new CustomVehicleController::BrakeController (m_controller, definition.TIRE_BRAKE_TORQUE);
+		dCustomVehicleController::dBrakeController* const brakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque);
 		brakes->AddTire (leftFrontTire);
 		brakes->AddTire (rightFrontTire);
 		brakes->AddTire (leftRearTire);
@@ -459,61 +450,84 @@ class SuperCarEntity: public DemoEntity
 		m_controller->SetBrakes(brakes);
 
 		// add vehicle hand brakes
-		CustomVehicleController::BrakeController* const handBrakes = new CustomVehicleController::BrakeController (m_controller, definition.TIRE_BRAKE_TORQUE);
+		dCustomVehicleController::dBrakeController* const handBrakes = new dCustomVehicleController::dBrakeController (m_controller, definition.m_TireBrakesTorque * 0.25f);
 		handBrakes->AddTire (leftRearTire);
 		handBrakes->AddTire (rightRearTire);
 		m_controller->SetHandBrakes(handBrakes);
 
 		// add the engine, differential and transmission 
-		CustomVehicleController::EngineController::Info engineInfo;
-		engineInfo.m_mass = definition.ENGINE_MASS; 
-		engineInfo.m_radio = definition.ENGINE_RADIO; 
-		engineInfo.m_vehicleTopSpeed = definition.VEHICLE_TOP_SPEED_KMH;
-		engineInfo.m_clutchFrictionTorque = definition.CLUTCH_FRICTION_TORQUE;
+		dCustomVehicleController::dEngineController::dInfo engineInfo;
+		engineInfo.m_mass = definition.m_engineMass; 
+		engineInfo.m_radio = definition.m_engineRotorRadio; 
+		engineInfo.m_vehicleTopSpeed = definition.m_vehicleTopSpeed;
+		engineInfo.m_clutchFrictionTorque = definition.m_cluthFrictionTorque;
 
-		engineInfo.m_idleTorque = definition.IDLE_TORQUE;
-		engineInfo.m_idleTorqueRpm = definition.IDLE_TORQUE_RPM;
-		engineInfo.m_peakTorque = definition.PEAK_TORQUE;
-		engineInfo.m_peakTorqueRpm = definition.PEAK_TORQUE_RPM;
-		engineInfo.m_peakHorsePower = definition.PEAK_HP;
-		engineInfo.m_peakHorsePowerRpm = definition.PEAK_HP_RPM;
-		engineInfo.m_readLineRpm = definition.REDLINE_RPM;
+		engineInfo.m_idleTorque = definition.m_engineIdleTorque;
+		engineInfo.m_rpmAtIdleTorque = definition.m_engineRPMAtIdleTorque;
+		engineInfo.m_peakTorque = definition.m_enginePeakTorque;
+		engineInfo.m_rpmAtPeakTorque = definition.m_engineRPMAtPeakTorque;
+		engineInfo.m_peakHorsePower = definition.m_enginePeakHorsePower;
+		engineInfo.m_rpmAtPeakHorsePower = definition.m_egineRPMAtPeakHorsePower;
+		engineInfo.m_rpmAtRedLine = definition.m_engineRPMAtRedLine;
 
 		engineInfo.m_gearsCount = 6;
-		engineInfo.m_gearRatios[0] = definition.TIRE_GEAR_1;
-		engineInfo.m_gearRatios[1] = definition.TIRE_GEAR_2;
-		engineInfo.m_gearRatios[2] = definition.TIRE_GEAR_3;
-		engineInfo.m_gearRatios[3] = definition.TIRE_GEAR_4;
-		engineInfo.m_gearRatios[4] = definition.TIRE_GEAR_5;
-		engineInfo.m_gearRatios[5] = definition.TIRE_GEAR_6;
-		engineInfo.m_reverseGearRatio = definition.TIRE_REVERSE_GEAR;
+		engineInfo.m_gearRatios[0] = definition.m_transmissionGearRatio0;
+		engineInfo.m_gearRatios[1] = definition.m_transmissionGearRatio1;
+		engineInfo.m_gearRatios[2] = definition.m_transmissionGearRatio2;
+		engineInfo.m_gearRatios[3] = definition.m_transmissionGearRatio3;
+		engineInfo.m_gearRatios[4] = definition.m_transmissionGearRatio4;
+		engineInfo.m_gearRatios[5] = definition.m_transmissionGearRatio6;
+		engineInfo.m_reverseGearRatio = definition.m_transmissionRevereGearRatio;
+		engineInfo.m_gearRatiosSign = 1.0f;
 
-		CustomVehicleController::EngineController::Differential4wd differential;
-		switch (definition.DIFFERENTIAL_TYPE) 
+		dCustomVehicleController::dBodyPartDifferential* differential = NULL;
+		switch (definition.m_differentialType) 
 		{
 			case 0:
-				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
-				differential.m_axel.m_leftTire = leftRearTire;
-				differential.m_axel.m_rightTire = rightRearTire;
+			{
+				// rear wheel drive differential vehicle
+				engineInfo.m_gearRatiosSign = 1.0f;
+				differential = m_controller->AddDifferential(leftRearTire, rightRearTire);
 				break;
+			}
+
 			case 1:
-				differential.m_type = CustomVehicleController::EngineController::Differential::m_2wd;
-				differential.m_axel.m_leftTire = leftFrontTire;
-				differential.m_axel.m_rightTire = rightFrontTire;
+			{
+				// front wheel drive vehicle with differential
+				engineInfo.m_gearRatiosSign = 1.0f;
+				differential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
 				break;
+			}
 
 			default:
-				differential.m_type = CustomVehicleController::EngineController::Differential::m_4wd;
-				differential.m_axel.m_leftTire = leftRearTire;
-				differential.m_axel.m_rightTire = rightRearTire;
-				differential.m_secundAxel.m_axel.m_leftTire = leftFrontTire;
-				differential.m_secundAxel.m_axel.m_rightTire = rightFrontTire;
+			{
+				dCustomVehicleController::dBodyPartDifferential* const rearDifferential = m_controller->AddDifferential(leftRearTire, rightRearTire);
+				dCustomVehicleController::dBodyPartDifferential* const frontDifferential = m_controller->AddDifferential(leftFrontTire, rightFrontTire);
+				differential = m_controller->AddDifferential(rearDifferential, frontDifferential);
+
+				engineInfo.m_gearRatiosSign = -1.0f;
+			}
 		}
+		dAssert(differential);
+
+		// add a steering Wheel component
+		dCustomVehicleController::dSteeringController* const steering = new dCustomVehicleController::dSteeringController(m_controller, differential);
+		steering->AddTire(leftFrontTire);
+		steering->AddTire(rightFrontTire);
+		steering->AddTire(leftRearTire);
+		steering->AddTire(rightRearTire);
+		m_controller->SetSteering(steering);
 
 
 		engineInfo.m_differentialLock = 0;
 		engineInfo.m_userData = this;
-		CustomVehicleController::EngineController* const engineControl = new CustomVehicleController::EngineController (m_controller, engineInfo, differential);
+
+		engineInfo.m_aerodynamicDownforceFactor = definition.m_aerodynamicsDownForceWeightCoeffecient0;
+		engineInfo.m_aerodynamicDownforceFactorAtTopSpeed = definition.m_aerodynamicsDownForceWeightCoeffecient1;
+		engineInfo.m_aerodynamicDownForceSurfaceCoeficident = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
+
+		m_controller->AddEngine (engineInfo.m_mass, engineInfo.m_radio);
+		dCustomVehicleController::dEngineController* const engineControl = new dCustomVehicleController::dEngineController (m_controller, engineInfo, differential, rightRearTire);
 
 		// the the default transmission type
 		engineControl->SetTransmissionMode(m_automaticTransmission.GetPushButtonState());
@@ -528,13 +542,13 @@ class SuperCarEntity: public DemoEntity
 		SetGearMap(engineControl);
 
 		// set the vehicle weigh distribution 
-		m_controller->SetWeightDistribution (definition.VEHICLE_WEIGHT_DISTRIBUTION);
+		m_controller->SetWeightDistribution (definition.m_vehicleWeightDistribution);
 
 		// set the vehicle aerodynamics
-		dFloat weightRatio0 = definition.DOWNFORCE_WEIGHT_FACTOR_0;
-		dFloat weightRatio1 = definition.DOWNFORCE_WEIGHT_FACTOR_1;
-		dFloat speedFactor = definition.DOWNFORCE_WEIGHT_FACTOR_SPEED / definition.VEHICLE_TOP_SPEED_KMH;
-		m_controller->SetAerodynamicsDownforceCoefficient(DEMO_GRAVITY, weightRatio0, speedFactor, weightRatio1);
+		dFloat weightRatio0 = definition.m_aerodynamicsDownForceWeightCoeffecient0;
+		dFloat weightRatio1 = definition.m_aerodynamicsDownForceWeightCoeffecient1;
+		dFloat speedFactor = definition.m_aerodynamicsDownForceSpeedFactor / definition.m_vehicleTopSpeed;
+		m_controller->SetAerodynamicsDownforceCoefficient(weightRatio0, speedFactor, weightRatio1);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		m_controller->Finalize();
@@ -544,30 +558,29 @@ class SuperCarEntity: public DemoEntity
 	{
 		NewtonBody* const body = m_controller->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
-		DemoEntityManager* const mainWindow = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		//NewtonDemos* const mainWindow = scene->GetRootWindow();
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
-		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
-		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
-		CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
-		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
+		dCustomVehicleController::dEngineController* const engine = m_controller->GetEngine();
+		dCustomVehicleController::dBrakeController* const brakes = m_controller->GetBrakes();
+		dCustomVehicleController::dBrakeController* const handBrakes = m_controller->GetHandBrakes();
+		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
 
 		// get the throttler input
 		dFloat joyPosX;
 		dFloat joyPosY;
 		int joyButtons;
 
-		int gear = engine->GetGear();
+		int gear = engine ? engine->GetGear() : 0;
 		int engineIgnitionKey = 0;
 		int engineDifferentialLock = 0;
-		int automaticTransmission = engine->GetTransmissionMode();
+		int automaticTransmission = engine ? engine->GetTransmissionMode() : 1;
 		dFloat cluthPedal = 1.0f;
 		dFloat steeringVal = 0.0f;
 		dFloat reverseGasPedal = 0.0f;
 		dFloat forwardGasPedal = 0.0f;
 		dFloat handBrakePedal = 0.0f;
 		
-		bool hasJopytick = mainWindow->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
+		bool hasJopytick = scene->GetJoytickPosition (joyPosX, joyPosY, joyButtons);
 		if (hasJopytick) {
 /*
 			// apply a cubic attenuation to the joystick inputs
@@ -578,36 +591,37 @@ class SuperCarEntity: public DemoEntity
 			brakePedal = (joyPosY < 0.0f) ? -joyPosY: 0.0f;
 			engineGasPedal = (joyPosY >= 0.0f) ? joyPosY: 0.0f;
 
-			gear += int (m_gearUpKey.UpdateTriggerJoystick(mainWindow, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(mainWindow, joyButtons & 4));
+			gear += int (m_gearUpKey.UpdateTriggerJoystick(scene, joyButtons & 2)) - int (m_gearDownKey.UpdateTriggerJoystick(scene, joyButtons & 4));
 			handBrakePedal = (joyButtons & 1) ? 1.0f : 0.0f;
 */
 		} else {
 
-			engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(mainWindow, 'I');
-			engineDifferentialLock = m_engineDifferentialLock.UpdatePushButton(mainWindow, 'L');
-			automaticTransmission = m_automaticTransmission.UpdatePushButton (mainWindow, 0x0d);
-			steeringVal = (dFloat(mainWindow->GetKeyState('D')) - dFloat(mainWindow->GetKeyState('A')));
-			gear += int(m_gearUpKey.UpdateTriggerButton(mainWindow, '.')) - int(m_gearDownKey.UpdateTriggerButton(mainWindow, ','));
+			engineIgnitionKey = m_engineKeySwitch.UpdatePushButton(scene, 'I');
+			engineDifferentialLock = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
+			automaticTransmission = m_automaticTransmission.UpdatePushButton (scene, 0x0d);
+			steeringVal = (dFloat(scene->GetKeyState('D')) - dFloat(scene->GetKeyState('A')));
+			gear += int(m_gearUpKey.UpdateTriggerButton(scene, '.')) - int(m_gearDownKey.UpdateTriggerButton(scene, ','));
 
-			if (mainWindow->GetKeyState ('W')) {
+			if (scene->GetKeyState ('W')) {
 				forwardGasPedal = 1.0f;
 			}
 
-			if (mainWindow->GetKeyState('S')) {
+			if (scene->GetKeyState('S')) {
 				reverseGasPedal = 1.0f;
 			}
 
-			if (mainWindow->GetKeyState(' ')) {
+			if (scene->GetKeyState(' ')) {
 				handBrakePedal = 1.0f;
 			}
 
-			if (mainWindow->GetKeyState ('K')) {
+			if (scene->GetKeyState ('K')) {
  				cluthPedal = 0.0f;
 			}
 		}
 
+//xxxxxxx
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen ("log.bin", "wb");                                         
 		if (file) {
 			fwrite (&engineIgnitionKey, sizeof (int), 1, file);
@@ -637,130 +651,142 @@ class SuperCarEntity: public DemoEntity
 	#endif
 #endif
 
-		steering->SetParam(steeringVal);
-		engine->SetDifferentialLock (engineDifferentialLock ? true : false);
+		if (steering) {
+			steering->SetParam(steeringVal);
+		}
+		if (engine) {
+			engine->SetDifferentialLock (engineDifferentialLock ? true : false);
 	
-		switch (m_drivingState)
-		{
-			case m_engineOff:
+			switch (m_drivingState)
 			{
-				if (engineIgnitionKey) {
-					m_drivingState = m_engineIdle;
-					engine->SetIgnition (true);
-					handBrakes->SetParam(0.0f);
-					engine->SetGear (engine->GetNeutralGear());
-				} else {
-					engine->SetIgnition (false);
-					engine->SetGear(engine->GetFirstGear());
-					handBrakes->SetParam(1.0f);
+				case m_engineOff:
+				{
+					if (engineIgnitionKey) {
+						m_drivingState = m_engineIdle;
+						engine->SetIgnition (true);
+						handBrakes->SetParam(0.0f);
+						engine->SetGear (engine->GetNeutralGear());
+					} else {
+						engine->SetIgnition (false);
+						engine->SetGear(engine->GetFirstGear());
+						handBrakes->SetParam(1.0f);
+					}
+					break;
 				}
-				break;
-			}
 
-			case m_engineIdle:
-			{
-				brakes->SetParam(0.0f);
-				handBrakes->SetParam(handBrakePedal);
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineOff;
-				} else {
+				case m_engineIdle:
+				{
+					brakes->SetParam(0.0f);
+					engine->SetClutchParam(0.0f);
+					handBrakes->SetParam(handBrakePedal);
+					if (!engineIgnitionKey) {
+						m_drivingState = m_engineOff;
+					} else {
+						if (forwardGasPedal) {
+							m_drivingState = m_preDriveForward;
+						} else if (reverseGasPedal) {
+							m_drivingState = m_preDriveReverse;
+						}
+					}
+					break;
+				}
+
+				case m_engineStop:
+				{
+					engine->SetClutchParam(0.0f);
+					if (forwardGasPedal || reverseGasPedal) {
+						brakes->SetParam(1.0f);
+					} else {
+						m_drivingState = m_engineIdle;
+					}
+					break;
+				}
+
+				case m_preDriveForward:
+				{
+					if (engine->GetSpeed() < -5.0f) {
+						brakes->SetParam(0.5f);
+						engine->SetClutchParam(0.0f);
+						engine->SetGear(engine->GetNeutralGear());
+					} else {
+						m_drivingState = m_driveForward;
+						engine->SetGear(engine->GetFirstGear());
+					}
+					break;
+				}	
+
+				case m_driveForward:
+				{
+					engine->SetParam(forwardGasPedal);
+					engine->SetClutchParam(cluthPedal);
+					handBrakes->SetParam(handBrakePedal);
+					if (reverseGasPedal) {
+						brakes->SetParam(reverseGasPedal * 0.25f);
+						if (engine->GetSpeed() < 5.0f) {
+							engine->SetGear(engine->GetNeutralGear());
+							m_drivingState = m_engineStop;
+						}
+					} else {
+						if (handBrakePedal && (engine->GetSpeed() < 2.0f)) {
+							engine->SetClutchParam(0.0f);
+						}
+						brakes->SetParam(0.0f);
+					}
+
+					if (!engineIgnitionKey) {
+						m_drivingState = m_engineStop;
+					}
+
+					break;
+				}
+
+				case m_preDriveReverse:
+				{
+					if (engine->GetSpeed() > 5.0f) {
+						brakes->SetParam(0.5f);
+						engine->SetClutchParam(0.0f);
+						engine->SetGear(engine->GetNeutralGear());
+					} else {
+						m_drivingState = m_driveReverse;
+						engine->SetGear(engine->GetReverseGear());
+					}
+					break;
+				}
+
+				case m_driveReverse:
+				{
+					engine->SetParam(reverseGasPedal);
+					engine->SetClutchParam(cluthPedal);
+					handBrakes->SetParam(handBrakePedal);
 					if (forwardGasPedal) {
-						m_drivingState = m_preDriveForward;
-					} else if (reverseGasPedal) {
-						m_drivingState = m_preDriveReverse;
+						brakes->SetParam(forwardGasPedal * 0.25f);
+						if (engine->GetSpeed() > -5.0f) {
+							engine->SetGear(engine->GetNeutralGear());
+							m_drivingState = m_engineStop;
+						}
+					} else {
+						brakes->SetParam(0.0f);
 					}
-				}
-				break;
-			}
 
-			case m_engineStop:
-			{
-				if (forwardGasPedal || reverseGasPedal) {
-					brakes->SetParam(1.0f);
-				} else {
-					m_drivingState = m_engineIdle;
-				}
-				break;
-			}
-
-			case m_preDriveForward:
-			{
-				if (engine->GetSpeed() < -5.0f) {
-					brakes->SetParam(0.5f);
-					engine->SetClutchParam(0.0f);
-					engine->SetGear(engine->GetNeutralGear());
-				} else {
-					m_drivingState = m_driveForward;
-					engine->SetGear(engine->GetFirstGear());
-				}
-				break;
-			}	
-
-			case m_driveForward:
-			{
-				engine->SetParam(forwardGasPedal);
-				engine->SetClutchParam(cluthPedal);
-				handBrakes->SetParam(handBrakePedal);
-				if (reverseGasPedal) {
-					brakes->SetParam(reverseGasPedal * 0.25f);
-					if (engine->GetSpeed() < 5.0f) {
-						engine->SetGear(engine->GetNeutralGear());
+					if (!engineIgnitionKey) {
 						m_drivingState = m_engineStop;
 					}
-				} else {
-					brakes->SetParam(0.0f);
+					break;
 				}
-
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineStop;
-				}
-
-				break;
 			}
 
-			case m_preDriveReverse:
-			{
-				if (engine->GetSpeed() > 5.0f) {
-					brakes->SetParam(0.5f);
-					engine->SetClutchParam(0.0f);
-					engine->SetGear(engine->GetNeutralGear());
-				} else {
-					m_drivingState = m_driveReverse;
-					engine->SetGear(engine->GetReverseGear());
-				}
-				break;
-			}
-
-			case m_driveReverse:
-			{
-				engine->SetParam(reverseGasPedal);
-				engine->SetClutchParam(cluthPedal);
-				handBrakes->SetParam(handBrakePedal);
-				if (forwardGasPedal) {
-					brakes->SetParam(forwardGasPedal * 0.25f);
-					if (engine->GetSpeed() > -5.0f) {
-						engine->SetGear(engine->GetNeutralGear());
-						m_drivingState = m_engineStop;
-					}
-				} else {
-					brakes->SetParam(0.0f);
-				}
-
-				if (!engineIgnitionKey) {
-					m_drivingState = m_engineStop;
-				}
-				break;
-			}
+		} else if (handBrakes) {
+			handBrakes->SetParam(handBrakePedal);
 		}
 	}
 
 	// based on the work of Craig Reynolds http://www.red3d.com/cwr/steer/
 	dFloat CalculateNPCControlSteerinValue (dFloat distanceAhead, dFloat pathWidth, DemoEntity* const pathEntity)
 	{
-		const CustomVehicleController::BodyPart& chassis = *m_controller->GetChassis();
+		const dCustomVehicleController::dBodyPart& chassis = *m_controller->GetChassis();
 		//CustomVehicleControllerComponentSteering* const steering = m_controller->GetSteering();
 
-		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
+		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
 
 		dMatrix matrix;
 		dVector veloc(0.0f);
@@ -770,7 +796,9 @@ class SuperCarEntity: public DemoEntity
 		dVector lookAheadPoint (veloc.Scale (distanceAhead / dSqrt (veloc.DotProduct3(veloc))));
 
 		// find the closet point to the past on the spline
-		dMatrix vehicleMatrix (m_controller->GetLocalFrame() * matrix);
+		dAssert (0);
+		//dMatrix vehicleMatrix (m_controller->GetLocalFrame() * matrix);
+		dMatrix vehicleMatrix (matrix);
 		dMatrix pathMatrix (pathEntity->GetMeshMatrix() * pathEntity->GetCurrentMatrix());
 
 		dVector p0 (vehicleMatrix.m_posit + lookAheadPoint);
@@ -779,7 +807,7 @@ class SuperCarEntity: public DemoEntity
 		dBigVector q; 
 		DemoBezierCurve* const path = (DemoBezierCurve*) pathEntity->GetMesh();
 		dFloat64 u = path->m_curve.FindClosestKnot (q, pathMatrix.UntransformVector(p0), 4);
-		dVector p1 (pathMatrix.TransformVector(dVector (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w))));
+		dVector p1 (pathMatrix.TransformVector(q));
 		p1.m_y = 0.0f;
 		dVector dist (p1 - p0);
 		dFloat angle = 0.0f;
@@ -795,7 +823,7 @@ class SuperCarEntity: public DemoEntity
 				u = path->m_curve.FindClosestKnot (q, q, 4);
 			}
 			averageTangent = averageTangent.Scale (1.0f / dSqrt (averageTangent.DotProduct3(averageTangent)));
-			dVector heading (pathMatrix.RotateVector(dVector (dFloat(averageTangent.m_x), dFloat(averageTangent.m_y), dFloat(averageTangent.m_z), dFloat(averageTangent.m_w))));
+			dVector heading (pathMatrix.RotateVector(averageTangent));
 			heading.m_y = 0.0;
 			heading = vehicleMatrix.UnrotateVector(heading);
 			angle = dClamp (dAtan2 (heading.m_z, heading.m_x), -maxAngle, maxAngle);
@@ -808,7 +836,7 @@ class SuperCarEntity: public DemoEntity
 				path->m_curve.FindClosestKnot (q, q, 4);
 			}
 
-			m_debugTargetHeading = pathMatrix.TransformVector(dVector (dFloat(q.m_x), dFloat(q.m_y), dFloat(q.m_z), dFloat(q.m_w)));
+			m_debugTargetHeading = pathMatrix.TransformVector(q);
 			dVector localDir (vehicleMatrix.UntransformVector(m_debugTargetHeading));
 			angle = dClamp (dAtan2 (localDir.m_z, localDir.m_x), -maxAngle, maxAngle);
 		}
@@ -822,13 +850,12 @@ class SuperCarEntity: public DemoEntity
 		//NewtonBody* const body = m_controller->GetBody();
 		//NewtonWorld* const world = NewtonBodyGetWorld(body);
 		//DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		//NewtonDemos* const mainWindow = scene->GetRootWindow();
 		 
-		CustomVehicleController::EngineController* const engine = m_controller->GetEngine();
-		CustomVehicleController::SteeringController* const steering = m_controller->GetSteering();
+		dCustomVehicleController::dEngineController* const engine = m_controller->GetEngine();
+		dCustomVehicleController::dSteeringController* const steering = m_controller->GetSteering();
 		//CustomVehicleController::ClutchController* const clutch = m_controller->GetClutch();
-		CustomVehicleController::BrakeController* const brakes = m_controller->GetBrakes();
-		CustomVehicleController::BrakeController* const handBrakes = m_controller->GetHandBrakes();
+		dCustomVehicleController::dBrakeController* const brakes = m_controller->GetBrakes();
+		dCustomVehicleController::dBrakeController* const handBrakes = m_controller->GetHandBrakes();
 		if (!engine) {
 			return;
 		}
@@ -879,14 +906,15 @@ class SuperCarEntity: public DemoEntity
 		dFloat Izz;
 		dFloat mass;
 
-		const CustomVehicleController::BodyPart* const chassis = m_controller->GetChassis ();
+		const dCustomVehicleController::dBodyPart* const chassis = m_controller->GetChassis ();
 		NewtonBody* const chassisBody = chassis->GetBody();
 		
 		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
 		NewtonBodyGetMass(chassisBody, &mass, &Ixx, &Iyy, &Izz);
 		NewtonBodyGetMatrix(chassisBody, &matrix[0][0]);
 		matrix.m_posit = matrix.TransformVector(com);
-		matrix = m_controller->GetLocalFrame() * matrix;
+		//matrix = m_controller->GetLocalFrame() * matrix;
+		//matrix = matrix;
 
 		dFloat scale = -4.0f / (mass * DEMO_GRAVITY);
 		dVector p0 (matrix.m_posit);
@@ -898,11 +926,10 @@ class SuperCarEntity: public DemoEntity
 		glBegin(GL_LINES);
 
 		// draw vehicle weight at the center of mass
-		dFloat length = scale * mass * DEMO_GRAVITY;
+		dFloat lenght = scale * mass * DEMO_GRAVITY;
 		glColor3f(0.0f, 0.0f, 1.0f);
 		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y - length), GLfloat(p0.m_z));
-
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y - lenght), GLfloat(p0.m_z));
 
 		// draw vehicle front dir
 		glColor3f(1.0f, 1.0f, 1.0f);
@@ -910,7 +937,6 @@ class SuperCarEntity: public DemoEntity
 		dVector r1 (r0 + matrix[0].Scale (2.0f));
 		glVertex3f(GLfloat(r0.m_x), GLfloat(r0.m_y), GLfloat(r0.m_z));
 		glVertex3f(GLfloat(r1.m_x), GLfloat(r1.m_y), GLfloat(r1.m_z));
-
 
 		// draw the velocity vector, a little higher so that is not hidden by the vehicle mesh 
 		dVector veloc(0.0f);
@@ -921,10 +947,9 @@ class SuperCarEntity: public DemoEntity
 		glVertex3f(GLfloat(q0.m_x), GLfloat(q0.m_y), GLfloat(q0.m_z));
 		glVertex3f(GLfloat(q1.m_x), GLfloat(q1.m_y), GLfloat(q1.m_z));
 
-
 //int xxx = 0;
-		for (dList<CustomVehicleController::BodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
-			const CustomVehicleController::BodyPartTire* const tire = &node->GetInfo();
+		for (dList<dCustomVehicleController::dBodyPartTire>::dListNode* node = m_controller->GetFirstTire(); node; node = m_controller->GetNextTire(node)) {
+			const dCustomVehicleController::dBodyPartTire* const tire = &node->GetInfo();
 			NewtonBody* const tireBody = tire->GetBody();
 
 			dMatrix tireMatrix;
@@ -955,7 +980,6 @@ class SuperCarEntity: public DemoEntity
 			glColor3f(0.0f, 1.0f, 0.0f);
 			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
 			glVertex3f(GLfloat(p3.m_x), GLfloat(p3.m_y), GLfloat(p3.m_z));
-
 //if (!xxx)
 //dTrace(("%f ", tire.GetAligningTorque()));
 //xxx ++;
@@ -974,7 +998,7 @@ class SuperCarEntity: public DemoEntity
 
 		glBegin(GL_LINES);
 		glColor3f (1.0f, 0.0f, 1.0f);
-		glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
 		glVertex3f (p1.m_x, p1.m_y, p1.m_z);
 		glEnd();
 
@@ -987,7 +1011,7 @@ class SuperCarEntity: public DemoEntity
 	}
 
 
-	CustomVehicleController* m_controller;
+	dCustomVehicleController* m_controller;
 	DemoEntityManager::ButtonKey m_gearUpKey;
 	DemoEntityManager::ButtonKey m_gearDownKey;
 	DemoEntityManager::ButtonKey m_engineKeySwitch;
@@ -1001,23 +1025,22 @@ class SuperCarEntity: public DemoEntity
 };
 
 
-class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
+class SuperCarVehicleControllerManager: public dCustomVehicleControllerManager
 {
 	public:
 
 	SuperCarVehicleControllerManager (NewtonWorld* const world, int materialsCount, int* const materialList)
-		:CustomVehicleControllerManager (world, materialsCount, materialList)
+		:dCustomVehicleControllerManager (world, materialsCount, materialList)
 		,m_externalView(true)
 		,m_player (NULL) 
 		//,m_debugVehicle (NULL) 
-		,m_drawShematic(false)
+		,m_drawShematic(true)
 		,m_helpKey (true)
 		,m_nexVehicle (true)
 	{
 		// hook a callback for 2d help display
-		dAssert (0);
-		//DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-		//scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+		scene->Set2DDisplayRenderFunction (RenderVehicleHud, this);
 
 		// load 2d display assets
 		m_gears = LoadTexture ("gears_font.tga");
@@ -1043,9 +1066,9 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		me->RenderVehicleHud (scene, lineNumber);
 	}
 
-	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat sizef) const
+	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat size) const
 	{
-		GLfloat size = GLfloat(size * 0.5f);
+		size *= 0.5f;
 		dMatrix origin (dGetIdentityMatrix());
 		origin.m_posit = dVector(origin_x, origin_y, 0.0f, 1.0f);
 
@@ -1054,10 +1077,10 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		glMultMatrix (&origin[0][0]);
 		glBindTexture(GL_TEXTURE_2D, gage);
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(-size,  size, 0.0f);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(-size, -size, 0.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f( size, -size, 0.0f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f( size,  size, 0.0f);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(GLfloat(-size), GLfloat( size), 0.0f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(GLfloat(-size), GLfloat(-size), 0.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat( size), GLfloat(-size), 0.0f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(GLfloat( size), GLfloat( size), 0.0f);
 		glEnd();
 
 		// render needle
@@ -1066,17 +1089,17 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		dFloat angle = minAngle + (maxAngle - minAngle) * param;
 		dMatrix needleMatrix (dRollMatrix (angle));
 
-		GLfloat x = size * 0.7f;
-		GLfloat y = size * 0.7f;
+		dFloat x = size * 0.7f;
+		dFloat y = size * 0.7f;
 
 		glPushMatrix();
 		glMultMatrix (&needleMatrix[0][0]);
 		glBindTexture(GL_TEXTURE_2D, needle);
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(-x,  y, 0.0f);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(-x, -y, 0.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f( x, -y, 0.0f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f( x,  y, 0.0f);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(GLfloat(-x), GLfloat( y), 0.0f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(GLfloat(-x), GLfloat(-y), 0.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat( x), GLfloat(-y), 0.0f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(GLfloat( x), GLfloat( y), 0.0f);
 		glEnd();
 
 		glPopMatrix();
@@ -1091,19 +1114,19 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		glPushMatrix();
 		glMultMatrix (&origin[0][0]);
 
-		GLfloat uwith = 0.1f;
-		GLfloat u0 = uwith * gear;
-		GLfloat u1 = u0 + uwith;
+		dFloat uwith = 0.1f;
+		dFloat u0 = uwith * gear;
+		dFloat u1 = u0 + uwith;
 
-		GLfloat x1 = 10.0f;
-		GLfloat y1 = 10.0f;
+		dFloat x1 = 10.0f;
+		dFloat y1 = 10.0f;
 		glColor4f(1, 1, 0, 1);
 		glBindTexture(GL_TEXTURE_2D, m_gears);
 		glBegin(GL_QUADS);
-		glTexCoord2f(u0, 1.0f); glVertex3f(-x1,  y1, 0.0f);
-		glTexCoord2f(u0, 0.0f); glVertex3f(-x1, -y1, 0.0f);
-		glTexCoord2f(u1, 0.0f); glVertex3f( x1, -y1, 0.0f);
-		glTexCoord2f(u1, 1.0f); glVertex3f( x1,  y1, 0.0f);
+		glTexCoord2f(GLfloat(u0), 1.0f); glVertex3f(GLfloat(-x1), GLfloat( y1), 0.0f);
+		glTexCoord2f(GLfloat(u0), 0.0f); glVertex3f(GLfloat(-x1), GLfloat(-y1), 0.0f);
+		glTexCoord2f(GLfloat(u1), 0.0f); glVertex3f(GLfloat( x1), GLfloat(-y1), 0.0f);
+		glTexCoord2f(GLfloat(u1), 1.0f); glVertex3f(GLfloat( x1), GLfloat( y1), 0.0f);
 		glEnd();
 
 		glPopMatrix();
@@ -1111,8 +1134,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void DrawHelp(DemoEntityManager* const scene, int lineNumber)
 	{
-		dAssert (0);
-/*
 		if (m_helpKey.GetPushButtonState()) {
 			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "Vehicle driving keyboard control:   Joystick control");
@@ -1131,18 +1152,15 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			lineNumber = scene->Print (color, 10, lineNumber + 20, "hide help                 : 'H'");
 		}
 
-		bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene->GetRootWindow(), 'V');
+		bool engineIgnitionKey = m_nexVehicle.UpdateTriggerButton(scene, 'V');
 		if (engineIgnitionKey) {
 			SetNextPlayer();
 		}
-*/
 	}
 
 
 	void RenderVehicleSchematic (DemoEntityManager* const scene) const
 	{
-		dAssert (0);
-/*
 		if (m_player) {
 			glDisable(GL_LIGHTING);
 			glDisable(GL_TEXTURE_2D);
@@ -1150,8 +1168,8 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glDisable (GL_BLEND);
 
 			dFloat scale = 100.0f;
-			dFloat width = scene->GetWidth();
-			dFloat height = scene->GetHeight();
+			dFloat width = dFloat(scene->GetWidth());
+			dFloat height = dFloat(scene->GetHeight());
 
 			dMatrix origin (dGetIdentityMatrix());
 			origin.m_posit = dVector(width - 300, height - 200, 0.0f, 1.0f);
@@ -1164,11 +1182,10 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			glLineWidth(1.0f);
 			glEnable(GL_TEXTURE_2D);
 		}
-*/
 	}
 
 
-	void DrawSchematicCallback (const CustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
+	void DrawSchematicCallback (const dCustomVehicleController* const controller, const char* const partName, dFloat value, int pointCount, const dVector* const lines) const
 	{
 		if (!strcmp (partName, "chassis")) {
 			glLineWidth(3.0f);
@@ -1206,6 +1223,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			dVector p1 (lines[1]);
 			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
 			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+
 			glEnd();
 		}
 
@@ -1239,7 +1257,6 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 			dVector p1 (lines[1]);
 			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
 			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-
 			glEnd();
 		}
 
@@ -1261,14 +1278,14 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		if (m_drawShematic) {
 			RenderVehicleSchematic (scene);
 		}
-		m_drawShematic = false;
+		//m_drawShematic = false;
 
 		// set to transparent color
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		if (m_player) {
-			CustomVehicleController::EngineController* const engine = m_player->m_controller->GetEngine();
+			dCustomVehicleController::dEngineController* const engine = m_player->m_controller->GetEngine();
 			if (engine) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				dFloat gageSize = 200.0f;
@@ -1299,8 +1316,10 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 
 	void SetAsPlayer (SuperCarEntity* const player)
 	{
-		CustomVehicleController::EngineController* const engine = player->m_controller->GetEngine();
-		engine->SetIgnition(false);
+		dCustomVehicleController::dEngineController* const engine = player->m_controller->GetEngine();
+		if (engine) {
+			engine->SetIgnition(false);
+		}
 		m_player = player;
 	}
 
@@ -1330,7 +1349,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		m_helpKey.UpdatePushButton (scene, 'H');
 		
 		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			CustomVehicleController* const controller = &ptr->GetInfo();
+			dCustomVehicleController* const controller = &ptr->GetInfo();
 		
 			NewtonBody* const body = controller->GetBody();
 			SuperCarEntity* const vehicleEntity = (SuperCarEntity*) NewtonBodyGetUserData(body);
@@ -1345,18 +1364,18 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		}
 
 		// do the base class post update
-		CustomVehicleControllerManager::PreUpdate(timestep);
+		dCustomVehicleControllerManager::PreUpdate(timestep);
 
 	}
 
 	virtual void PostUpdate (dFloat timestep)
 	{
 		// do the base class post update
-		CustomVehicleControllerManager::PostUpdate(timestep);
+		dCustomVehicleControllerManager::PostUpdate(timestep);
 		
 		// update the visual transformation matrices for all vehicle tires
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			CustomVehicleController* const controller = &node->GetInfo();
+			dCustomVehicleController* const controller = &node->GetInfo();
 			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->UpdateTireTransforms();
 		}
@@ -1364,7 +1383,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		if (m_player) {
 			UpdateCamera (m_player, timestep);
 		} else {
-			CustomVehicleController* const controller = &GetLast()->GetInfo();
+			dCustomVehicleController* const controller = &GetLast()->GetInfo();
 			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
 			UpdateCamera (vehicleEntity, timestep);
 		}
@@ -1384,6 +1403,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		if (m_externalView) {
 			camOrigin = playerMatrix.m_posit + dVector(0.0f, VEHICLE_THIRD_PERSON_VIEW_HIGHT, 0.0f, 0.0f);
 			camOrigin -= frontDir.Scale(VEHICLE_THIRD_PERSON_VIEW_DIST);
+//camOrigin = dVector (-7.0f, 3.0f, 0.0f, 0.0f);
 		} else {
 			dAssert (0);
 			//           camMatrix = camMatrix * playerMatrix;
@@ -1411,10 +1431,10 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 		dMatrix matrix (dGetIdentityMatrix());
 
 		dMatrix pathMatrix (m_raceTrackPath->GetMeshMatrix() * m_raceTrackPath->GetCurrentMatrix());
-		matrix.m_front = pathMatrix.RotateVector (dVector (dFloat(dir.m_x), dFloat(dir.m_y), dFloat(dir.m_z), 0.0f));
+		matrix.m_front = pathMatrix.RotateVector (dir);
 		matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
 		matrix.m_right.m_w = 0.0f;
-		matrix.m_posit = pathMatrix.TransformVector(dVector (dFloat(origin.m_x), dFloat(origin.m_y), dFloat(origin.m_z), 1.0f));
+		matrix.m_posit = pathMatrix.TransformVector(origin);
 		return matrix;
 	}
 
@@ -1481,7 +1501,7 @@ class SuperCarVehicleControllerManager: public CustomVehicleControllerManager
 	{
 		m_drawShematic = true;
 		for (dListNode* ptr = GetFirst(); ptr; ptr = ptr->GetNext()) {
-			CustomVehicleController* const controller = &ptr->GetInfo();
+			dCustomVehicleController* const controller = &ptr->GetInfo();
 			SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
 			vehicleEntity->Debug(m_raceTrackPath);
 		}
@@ -1518,6 +1538,7 @@ void SuperCar (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
+
 	//CreateLevelMesh (scene, "flatPlane1.ngd", 0);
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
@@ -1530,16 +1551,16 @@ void SuperCar (DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 
-	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
-	NewtonMaterialSetDefaultFriction(world, defaulMaterial, defaulMaterial, 0.6f, 0.5f);
+	int defaultMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	NewtonMaterialSetDefaultFriction(world, defaultMaterial, defaultMaterial, 0.6f, 0.5f);
 
-	int materialList[] = {defaulMaterial };
+	int materialList[] = {defaultMaterial };
 
 	// create a vehicle controller manager
 	SuperCarVehicleControllerManager* const manager = new SuperCarVehicleControllerManager (world, 1, materialList);
 
-//	int defaulMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
-//	NewtonMaterialSetDefaultFriction(scene->GetNewton(), defaulMaterial, defaulMaterial, 0.9f, 0.9f);
+//	int defaultMaterial = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+//	NewtonMaterialSetDefaultFriction(scene->GetNewton(), defaultMaterial, defaultMaterial, 0.9f, 0.9f);
 
 	// create a Bezier Spline path for AI car to drive 
 	manager->CreatedrivingTestCourt (scene);
@@ -1548,16 +1569,6 @@ void SuperCar (DemoEntityManager* const scene)
 	dFloat u = 1.0f;
 	dVector offset (0.0f, 100.0f, 0.0f, 0.0f);
 	for (int i = 0; i < 1; i ++) {
-
-		dMatrix location0 (manager->CalculateSplineMatrix (u));
-		location0.m_posit += location0.m_right.Scale (3.0f);
-		location0.m_posit = FindFloor (scene->GetNewton(), location0.m_posit + offset, 200.0f);
-		location0.m_posit.m_y += 2.0f;
-		SuperCarEntity* const vehicle0 = new SuperCarEntity (scene, manager, location0, "monsterTruck.ngd", 3.0f, monsterTruck);
-		vehicle0->BuildWheelCar(monsterTruck);
-		u -= 0.005f;
-
-/*
 		dMatrix location1 (manager->CalculateSplineMatrix (u));
 		location1.m_posit += location1.m_right.Scale ( 3.0f);
 		location1.m_posit = FindFloor (scene->GetNewton(), location1.m_posit + offset, 200.0f);
@@ -1567,13 +1578,11 @@ void SuperCar (DemoEntityManager* const scene)
 		u -= 0.005f;
 
 		dMatrix location2(manager->CalculateSplineMatrix(u));
-		location2.m_posit += location0.m_right.Scale(3.0f);
 		location2.m_posit = FindFloor(scene->GetNewton(), location2.m_posit + offset, 200.0f);
 		location2.m_posit.m_y += 1.0f;
 		SuperCarEntity* const vehicle2 = new SuperCarEntity(scene, manager, location2, "lambDiablo.ngd", 3.0f, viper);
 		vehicle2->BuildWheelCar(viper);
 		u -= 0.005f;
-*/
 
 		dMatrix location3(manager->CalculateSplineMatrix(u));
 		location3.m_posit = FindFloor(scene->GetNewton(), location3.m_posit + offset, 200.0f);
@@ -1582,9 +1591,16 @@ void SuperCar (DemoEntityManager* const scene)
 		vehicle3->BuildWheelCar(viper);
 		u -= 0.005f;
 
+		dMatrix location0(manager->CalculateSplineMatrix(u));
+		location0.m_posit += location0.m_right.Scale(3.0f);
+		location0.m_posit = FindFloor(scene->GetNewton(), location0.m_posit + offset, 200.0f);
+		location0.m_posit.m_y += 2.0f;
+		SuperCarEntity* const vehicle0 = new SuperCarEntity(scene, manager, location0, "monsterTruck.ngd", 3.0f, monsterTruck);
+		vehicle0->BuildWheelCar(monsterTruck);
+		u -= 0.005f;
 	}
 
-	CustomVehicleController* const controller = &manager->GetLast()->GetInfo();
+	dCustomVehicleController* const controller = &manager->GetLast()->GetInfo();
 	SuperCarEntity* const vehicleEntity = (SuperCarEntity*)NewtonBodyGetUserData (controller->GetBody());
 
 	// set this vehicle as the player
@@ -1606,17 +1622,17 @@ void SuperCar (DemoEntityManager* const scene)
 	int count = 5;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
 
 	size = dVector(0.75f, 0.35f, 0.75f, 0.0f);
-	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CAPSULE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CYLINDER_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CONE_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaulMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _SPHERE_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CAPSULE_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CYLINDER_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _CONE_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 50.0f, location.m_posit, size, count, count, 6.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterial, shapeOffsetMatrix);
 
 //	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
 

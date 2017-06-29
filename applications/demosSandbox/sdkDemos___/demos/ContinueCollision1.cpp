@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -18,9 +18,12 @@
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
 #include "DemoMesh.h"
+#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "DemoEntityManager.h"
+#include "HeightFieldPrimitive.h"
+#include "dCustomInputManager.h"
+#include "DebugDisplay.h"
 #include "dHighResolutionTimer.h"
 
 
@@ -81,28 +84,25 @@ static void FireNewtonCcdBox(NewtonWorld* world, const dVector & postion, const 
 }
 
 // we recommend using and input manage to control input for all games
-class CCDInputManager : public CustomInputManager
+class CCDInputManager : public dCustomInputManager
 {
 	public:
 	CCDInputManager(DemoEntityManager* const scene)
-		:CustomInputManager(scene->GetNewton())
+		:dCustomInputManager(scene->GetNewton())
 		, m_scene(scene)
 	{
-		dAssert (0);
-//		scene->Set2DDisplayRenderFunction (DrawHelpMenu, this);
+		scene->Set2DDisplayRenderFunction (DrawHelpMenu, this);
 	}
 
 	static void DrawHelpMenu (DemoEntityManager* const scene, void* const context, int lineNumber)
 	{
-		dAssert (0);
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-//		lineNumber = scene->Print (color, 10, lineNumber + 20, "Hit R key to shot  boxes to teh wall");
+		lineNumber = scene->Print (color, 10, lineNumber + 20, "Hit R key to shot  boxes to the wall");
 	}
 
 	void OnBeginUpdate(dFloat timestepInSecunds)
 	{
-dAssert (0);
-/*
+
         int key = 0;
         static dLong timer = dGetTimeInMicrosenconds() + 100000;
         if (dGetTimeInMicrosenconds() > timer) {
@@ -115,13 +115,11 @@ dAssert (0);
 		// fire ammo
 		if (key)
 		{
-
 			dFloat ammo_vel = 1000.0f;
 			dVector vel(dir.m_x*ammo_vel, dir.m_y*ammo_vel, dir.m_z*ammo_vel);
 
 			FireNewtonCcdBox(m_scene->GetNewton(), pos, vel);
 		}
-*/	
 	}
 
 	void OnEndUpdate(dFloat timestepInSecunds)
@@ -223,7 +221,7 @@ void ContinuousCollision1(DemoEntityManager* const scene)
 
 	// just see ground. it's not a rigid body.
 	char fileName[2048];
-	GetWorkingFileName("flatPlane.ngd", fileName);
+	dGetWorkingFileName("flatPlane.ngd", fileName);
 	scene->LoadScene(fileName);
 	
 
@@ -233,14 +231,12 @@ void ContinuousCollision1(DemoEntityManager* const scene)
 	pos.m_y = 50.0f;
 	pos.m_z = 0.0f;
 
-	dQuaternion rot(dVector(1.f,0.f,0.f), 3.14159f/4.0f);
+	dQuaternion rot(dVector(1.f,0.f,0.f),(dFloat)3.141592f/4.0f);
 	scene->SetCameraMatrix(rot, pos);
 
 	CreateBackgroundWallsAndCellingBody(scene->GetNewton());
 	new CCDInputManager(scene);
 
 	// compel to change debug display mode. just for convenience.
-	dAssert (0);
-//	NewtonDemos* const mainWindow = scene->GetRootWindow();
-//	scene->m_debugDisplayMode = 2;
+	scene->SetDebugDisplay (2);
 }

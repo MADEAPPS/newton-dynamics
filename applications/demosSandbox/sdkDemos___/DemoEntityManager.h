@@ -96,6 +96,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void Lock(unsigned& atomicLock);
 	void Unlock(unsigned& atomicLock);
 
+	int GetWidth() const;
+	int GetHeight() const;
 
 	NewtonWorld* GetNewton() const;
 	void CreateSkyBox();
@@ -110,6 +112,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
 	void PushTransparentMesh (const DemoMeshInterface* const mesh); 
+	void Set2DDisplayRenderFunction (RenderHoodCallback callback, void* const context);
 
 	bool GetKeyState(int key) const;
 	bool GetJoytickPosition (dFloat& posX, dFloat& posY, int& buttonsMask) const;
@@ -118,6 +121,11 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void DeserializeFile (void* const serializeHandle, void* const buffer, int size);
 	static void BodySerialization (NewtonBody* const body, void* const userData, NewtonSerializeCallback serializecallback, void* const serializeHandle);
 	static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
+
+	bool GetMouseKeyState (int button ) const;
+	int Print (const dVector& color, int x, int y, const char *fmt, ... ) const;
+	int GetDebugDisplay() const;
+	void SetDebugDisplay(int mode) const;
 
 	private:
 	void BeginFrame();
@@ -163,6 +171,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	dFloat m_currentListenerTimestep;
 	dFloat m_mainThreadPhysicsTime;
 	dFloat m_mainThreadPhysicsTimeAcc;
+
+	int m_debugDisplayMode;
 	bool m_showStats;
 	bool m_synchronousPhysicsUpdateMode;
 	bool m_hideVisualMeshes;
@@ -193,6 +203,42 @@ inline void DemoEntityManager::Unlock(unsigned& atomicLock)
 {
 	NewtonAtomicSwap((int*)&atomicLock, 0);
 }
+
+inline int DemoEntityManager::GetWidth() const 
+{ 
+	dAssert (0);
+	return 0;
+/*
+	int width;
+	int height;
+	GetSize (&width, &height);
+	return width; 
+*/
+}
+
+inline int DemoEntityManager::GetHeight() const 
+{ 
+	dAssert (0);
+	return 0;
+/*
+	int width;
+	int height;
+	GetSize (&width, &height);
+	return height; 
+*/
+}
+
+inline int DemoEntityManager::GetDebugDisplay() const
+{
+	dAssert (0);
+	return 0;
+}
+
+inline void DemoEntityManager::SetDebugDisplay(int mode) const
+{
+	dAssert (0);
+}
+
 
 
 #endif

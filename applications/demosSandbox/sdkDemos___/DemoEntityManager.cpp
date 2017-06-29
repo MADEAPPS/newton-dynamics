@@ -200,6 +200,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_currentListenerTimestep(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)
 	,m_mainThreadPhysicsTimeAcc(0.0f)
+	,m_debugDisplayMode(0)
 	,m_showStats(true)
 	,m_synchronousPhysicsUpdateMode(true)
 	,m_hideVisualMeshes(false)
@@ -313,6 +314,27 @@ bool DemoEntityManager::GetKeyState(int key) const
 	return false;
 }
 
+
+bool DemoEntityManager::GetMouseKeyState (int button) const
+{
+	dAssert (0);
+/*
+	if ((button >= 0) && (button <= 2)) {
+		return m_key[m_keyMap[button]] ? true : false;
+	}
+*/
+	return false;
+}
+
+
+void DemoEntityManager::Set2DDisplayRenderFunction (RenderHoodCallback callback, void* const context)
+{
+	dAssert (0);
+	m_renderHood = callback;
+	m_renderHoodContext = context;
+}
+
+
 bool DemoEntityManager::GetJoytickPosition (dFloat& posX, dFloat& posY, int& buttonsMask) const
 {
 	dAssert (0);
@@ -381,7 +403,7 @@ void DemoEntityManager::Cleanup ()
 	NewtonWorldSetUserData(m_world, this);
 
 	// set joint serialization call back
-	CustomJoint::Initalize(m_world);
+	dCustomJoint::Initalize(m_world);
 
 	// add all physics pre and post listeners
 	//	m_preListenerManager.Append(new DemoVisualDebugerListener("visualDebuger", m_world));
@@ -434,7 +456,7 @@ void DemoEntityManager::LoadFont()
 	//char* const name = "calibri.ttf";
 	//char* const name = "courbd.ttf";
 
-	GetWorkingFileName (name, pathName);
+	dGetWorkingFileName (name, pathName);
     io.Fonts->AddFontFromFileTTF(pathName, pixedSize);
     //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
 
@@ -885,6 +907,67 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 }
+
+int DemoEntityManager::Print (const dVector& color, int x, int y, const char *fmt, ... ) const
+{
+	dAssert (0);
+	return 0;
+/*
+	glColor3f(color.m_x, color.m_y, color.m_z);
+
+	glPushMatrix();
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0, GetWidth(), GetHeight(), 0.0, 0.0, 1.0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glTranslated(x, y, 0);
+	//	glRasterPos2f(x, y + 16);
+
+	va_list argptr;
+	char string[1024];
+
+	va_start (argptr, fmt);
+	vsprintf (string, fmt, argptr);
+	va_end( argptr );
+
+	glDisable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc (GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);      
+
+	glBindTexture(GL_TEXTURE_2D, m_fontImage);
+
+	glPushAttrib(GL_LIST_BIT);
+	glListBase(m_font - 32);	
+	int lenght = (int) strlen (string);
+	glCallLists (lenght, GL_UNSIGNED_BYTE, string);	
+	glPopAttrib();				
+
+	glDisable(GL_BLEND);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glLoadIdentity();
+
+	return y;
+*/
+}
+
+
+
 
 void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {

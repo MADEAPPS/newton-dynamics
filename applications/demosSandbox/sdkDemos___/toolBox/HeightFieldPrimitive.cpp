@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -10,14 +10,13 @@
 */
 
 #include <toolbox_stdafx.h>
-#include "SkyBox.h"
+#include "TargaToOpenGl.h"
 #include "DemoMesh.h"
+#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 #include "DebugDisplay.h"
-#include "DemoEntityManager.h"
 #include "HeightFieldPrimitive.h"
-
 
 #define GAUSSIAN_BELL 2
 //#define GAUSSIAN_BELL	1
@@ -320,7 +319,7 @@ freq *= 0.5f;
 		int height = size;
 		char* const attibutes = new char [size * size];
 		memset (attibutes, 0, width * height * sizeof (char));
-		NewtonCollision* collision = NewtonCreateHeightFieldCollision (scene->GetNewton(), width, height, 1, 0, elevation, attibutes, 1.0f, cellSize, 0);
+		NewtonCollision* collision = NewtonCreateHeightFieldCollision (scene->GetNewton(), width, height, 1, 0, elevation, attibutes, 1.0f, cellSize, cellSize, 0);
 
 
 #ifdef USE_STATIC_MESHES_DEBUG_COLLISION

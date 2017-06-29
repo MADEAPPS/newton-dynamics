@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -10,12 +10,11 @@
 */
 
 #include <toolbox_stdafx.h>
-#include "SkyBox.h"
-#include "DemoMesh.h"
+#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "DemoEntityManager.h"
-
+#include "DemoMesh.h"
+#include "toolBox/OpenGlUtil.h"
 
 #define PHYSICS_WORLD_SCALE			50.0f											// conversion from meters to world units
 

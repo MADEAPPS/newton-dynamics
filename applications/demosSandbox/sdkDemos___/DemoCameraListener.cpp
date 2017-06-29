@@ -59,7 +59,6 @@ void DemoCameraListener::PreUpdate (const NewtonWorld* const world, dFloat times
 {
 	// update the camera;
 	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-//	NewtonDemos* const mainWin = scene->GetRootWindow();
 
 	dMatrix targetMatrix (m_camera->GetNextMatrix());
 
@@ -195,8 +194,6 @@ void DemoCameraListener::UpdatePickBody(DemoEntityManager* const scene, dFloat t
 {
 dAssert (0);
 /*
-
-	NewtonDemos* const mainWin = scene->GetRootWindow();
 
 	// handle pick body from the screen
 	bool mousePickState = mainWin->GetMouseKeyState(0);

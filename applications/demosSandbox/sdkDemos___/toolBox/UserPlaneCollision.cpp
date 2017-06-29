@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -11,16 +11,13 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "DemoMesh.h"
-#include "DemoCamera.h"
-#include "OpenGlUtil.h"
-#include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
+#include "DemoMesh.h"
 #include "DemoEntityManager.h"
+#include "DemoCamera.h"
+#include "PhysicsUtils.h"
+#include "DebugDisplay.h"
 #include "UserPlaneCollision.h"
-
-//#include "DebugDisplay.h"
-//#include "UserPlaneCollision.h"
 
 #define PASS_A_QUAD
 #define MAX_THREAD_FACES	32
@@ -126,8 +123,7 @@ class dInfinitePlane
 													 UserCollisionSerializationCallback, 0);
 
 		// set a debug display call back
-dAssert (0);
-//		NewtonStaticCollisionSetDebugCallback (m_collision, ShowMeshCollidingFaces);
+		NewtonStaticCollisionSetDebugCallback (m_collision, ShowMeshCollidingFaces);
 
 		// set the collisoin offset Matrix;
 		NewtonCollisionSetMatrix(m_collision, &m_rotation[0][0]);
@@ -246,9 +242,7 @@ dAssert (0);
 			polygon[4] =  me->m_plane;
 
 			// show debug display info
-dAssert (0);
-//			if (DebugDisplayOn()) 
-			{
+			if (DebugDisplayOn()) {
 				dMatrix matrix;
 				dVector face[64];
 
@@ -307,9 +301,7 @@ dAssert (0);
 			polygon[4] =  me->m_plane;
 
 			// show debug display info
-dAssert (0);
-//			if (DebugDisplayOn()) 
-			{
+			if (DebugDisplayOn()) {
 				dMatrix matrix;
 				dVector face[64];
 

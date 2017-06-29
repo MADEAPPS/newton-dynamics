@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -50,7 +50,7 @@ unsigned dRand ()
 	return ___dRandSeed___ & dRAND_MAX;
 }
 
-dFloat RandomVariable(dFloat amp)
+dFloat dRandomVariable(dFloat amp)
 {
 	unsigned val;
 	val = dRand() + dRand();
@@ -59,7 +59,7 @@ dFloat RandomVariable(dFloat amp)
 
 
 // Windows user assets path
-void GetWorkingFileName (const char* const name, char* const outPathName)
+void dGetWorkingFileName (const char* const name, char* const outPathName)
 {
 	#if defined (_MSC_VER)
 
@@ -99,7 +99,7 @@ void GetWorkingFileName (const char* const name, char* const outPathName)
 		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
 
 	#else
-		#error  "error: need to implement \"GetWorkingFileName\" here for this platform"
+		#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
 	#endif
 }
 

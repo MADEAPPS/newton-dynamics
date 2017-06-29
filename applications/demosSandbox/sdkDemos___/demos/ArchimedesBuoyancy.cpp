@@ -1,29 +1,20 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
-* 
-* This software is provided 'as-is', without any express or implied
-* warranty. In no event will the authors be held liable for any damages
-* arising from the use of this software.
-* 
-* Permission is granted to anyone to use this software for any purpose,
-* including commercial applications, and to alter it and redistribute it
-* freely
-*/
-
-
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "DemoMesh.h"
+#include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-#include "DemoEntityManager.h"
+#include "DemoMesh.h"
 
-class MyTriggerManager: public CustomTriggerManager
+#include "OpenGlUtil.h"
+
+
+class MyTriggerManager: public dCustomTriggerManager
 {
 	public:
 	class TriggerCallback
 	{
 		public:
-		TriggerCallback(CustomTriggerController* const controller)
+		TriggerCallback(dCustomTriggerController* const controller)
 			:m_controller(controller)
 		{
 		}
@@ -44,13 +35,13 @@ class MyTriggerManager: public CustomTriggerManager
 		{
 		}
 
-		CustomTriggerController* m_controller;
+		dCustomTriggerController* m_controller;
 	};
 
 	class BuoyancyForce: public TriggerCallback
 	{
 		public:
-		BuoyancyForce(CustomTriggerController* const controller)
+		BuoyancyForce(dCustomTriggerController* const controller)
 			:TriggerCallback (controller)
 			,m_plane(0.0f)
 			,m_waterToSolidVolumeRatio(0.9f)
@@ -107,26 +98,26 @@ class MyTriggerManager: public CustomTriggerManager
 
 
 	MyTriggerManager(NewtonWorld* const world)
-		:CustomTriggerManager(world)
+		:dCustomTriggerManager(world)
 	{
 	}
 
 	void CreateBuoyancyTrigger (const dMatrix& matrix, NewtonCollision* const convexShape)
 	{
-		CustomTriggerController* const controller = CreateTrigger (matrix, convexShape, NULL);
+		dCustomTriggerController* const controller = CreateTrigger (matrix, convexShape, NULL);
 		BuoyancyForce* const buoyancyForce = new BuoyancyForce (controller);
 		controller->SetUserData (buoyancyForce);
 	}
 
-	void DestroyController (CustomTriggerController* const controller)
+	void DestroyController (dCustomTriggerController* const controller)
 	{
 		TriggerCallback* const userData = (TriggerCallback*) controller->GetUserData();
 		delete userData;
-		CustomTriggerManager::DestroyController (controller);
+		dCustomTriggerManager::DestroyController (controller);
 	}
 	
 
-	virtual void EventCallback (const CustomTriggerController* const me, TriggerEventType event, NewtonBody* const visitor) const
+	virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType event, NewtonBody* const visitor) const
 	{
 		TriggerCallback* const callback = (TriggerCallback*) me->GetUserData();
 		switch (event) 

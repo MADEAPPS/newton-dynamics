@@ -1,4 +1,4 @@
-/* Copyright (c) <2009> <Newton Game Dynamics>
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -12,14 +12,15 @@
 
 #include <toolbox_stdafx.h>
 #include "SkyBox.h"
-#include "DemoMesh.h"
-#include "DemoCamera.h"
-#include "OpenGlUtil.h"
-#include "PhysicsUtils.h"
 #include "DemoEntityManager.h"
+#include "DemoCamera.h"
+#include "PhysicsUtils.h"
+#include "DemoMesh.h"
+#include "../toolBox/OpenGlUtil.h"
 
 
-class dClosestDistanceRecord: public CustomControllerBase
+
+class dClosestDistanceRecord: public dCustomControllerBase
 {
 	class ClosestDistanceEntity: public DemoEntity
 	{
@@ -95,14 +96,14 @@ class dClosestDistanceRecord: public CustomControllerBase
 
 	void Init (dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)
 	{
-		m_pith = RandomVariable(3.1416f * 2.0f);
-		m_yaw = RandomVariable(3.1416f * 2.0f);
-		m_roll = RandomVariable(3.1416f * 2.0f);
-		m_step = 15.0f * (dAbs (RandomVariable(0.25f)) + 0.0001f) * 3.1416f/180.0f;
+		m_pith = dRandomVariable(3.1416f * 2.0f);
+		m_yaw = dRandomVariable(3.1416f * 2.0f);
+		m_roll = dRandomVariable(3.1416f * 2.0f);
+		m_step = 15.0f * (dAbs (dRandomVariable(0.25f)) + 0.0001f) * 3.1416f/180.0f;
 
 		CreatCasterBody(location_x, location_z, shapeType, materialID);
 
-		NewtonWorld* const world = ((CustomControllerManager<dClosestDistanceRecord>*)GetManager())->GetWorld();
+		NewtonWorld* const world = ((dCustomControllerManager<dClosestDistanceRecord>*)GetManager())->GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		dMatrix matrix;
@@ -115,7 +116,7 @@ class dClosestDistanceRecord: public CustomControllerBase
 	private:
 	void CreatCasterBody(dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID)
 	{
-		NewtonWorld* const world = ((CustomControllerManager<dClosestDistanceRecord>*)GetManager())->GetWorld();
+		NewtonWorld* const world = ((dCustomControllerManager<dClosestDistanceRecord>*)GetManager())->GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		//dMatrix matrix (GetIdentityMatrix());
@@ -129,13 +130,8 @@ class dClosestDistanceRecord: public CustomControllerBase
 		dVector size(0.5f, 0.5f, 0.75f, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, shapeType, materialID);
 
-		//	DemoMesh____* const geometry = new DemoMesh____("cylinder_1", collision, "wood_0.tga", "wood_0.tga", "wood_1.tga");
 		DemoMesh* const geometry = new DemoMesh("convexShape", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 		m_body = CreateSimpleSolid (scene, geometry, 1.0f, matrix, collision, materialID);
-
-		// disable gravity and apply a force that only spin the body 
-		//NewtonBodySetForceAndTorqueCallback(m_myBody, PhysicsSpinBody);
-		//NewtonBodySetAutoSleep (m_myBody, 0);
 
 		geometry->Release(); 
 		NewtonDestroyCollision (collision);
@@ -151,11 +147,11 @@ class dClosestDistanceRecord: public CustomControllerBase
 };
 
 
-class dClosestDistanceManager: public CustomControllerManager<dClosestDistanceRecord> 
+class dClosestDistanceManager: public dCustomControllerManager<dClosestDistanceRecord> 
 {
 	public:
 	dClosestDistanceManager(DemoEntityManager* const scene)
-		:CustomControllerManager<dClosestDistanceRecord>(scene->GetNewton(), "dConvexCastManager")
+		:dCustomControllerManager<dClosestDistanceRecord>(scene->GetNewton(), "dConvexCastManager")
 	{
 	}
 
@@ -164,20 +160,19 @@ class dClosestDistanceManager: public CustomControllerManager<dClosestDistanceRe
 
 	void AddPrimitives (int count, const dVector& location, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)
 	{
-		dFloat step = 3.0f;
+		dFloat step = 4.0f;
 		dFloat z = location.m_x - step * count / 2;
 		for (int i = 0; i < count; i ++) {
 			dFloat x = location.m_x - step * count / 2;
 			for (int j = 0; j < count; j ++) {
-				dClosestDistanceRecord* const caster = (dClosestDistanceRecord*) CreateController();
-				caster->Init (x, z, shapeType, materialID, castingShapeType);
+				dClosestDistanceRecord* const caster = (dClosestDistanceRecord*)CreateController();
+				caster->Init(x, z, shapeType, materialID, castingShapeType);
 				x += step;
 			}
 			z += step;
 		}
 	}
 };
-
 
 
 // create physics scene
@@ -196,23 +191,17 @@ void ClosestDistance (DemoEntityManager* const scene)
 
 	int materialID = NewtonMaterialGetDefaultGroupID (world);
 
-	// disable collision
-//	NewtonMaterialSetDefaultCollidable (world, materialID, materialID, 0);
-
-//	PrimitiveType castinShapeType = _SPHERE_PRIMITIVE;
-//	PrimitiveType castinShapeType = _BOX_PRIMITIVE;
-//	PrimitiveType castinShapeType = _CAPSULE_PRIMITIVE;
-//	PrimitiveType castinShapeType = _CYLINDER_PRIMITIVE;
-//	PrimitiveType castinShapeType = _CONE_PRIMITIVE;
-//	PrimitiveType castinShapeType = _CHAMFER_CYLINDER_PRIMITIVE;
-//	PrimitiveType castinShapeType = _RANDOM_CONVEX_HULL_PRIMITIVE;
-//	PrimitiveType castinShapeType = _REGULAR_CONVEX_HULL_PRIMITIVE;
-	PrimitiveType castinShapeType = _COMPOUND_CONVEX_CRUZ_PRIMITIVE;
-
-
-//	ClosestDistanceEntityManager* const parallelManager = new ClosestDistanceEntityManager (scene);
-
 	dClosestDistanceManager* const castManager = new dClosestDistanceManager (scene);
+
+	//PrimitiveType castinShapeType = _SPHERE_PRIMITIVE;
+	//PrimitiveType castinShapeType = _BOX_PRIMITIVE;
+	//PrimitiveType castinShapeType = _CAPSULE_PRIMITIVE;
+	//PrimitiveType castinShapeType = _CYLINDER_PRIMITIVE;
+	//PrimitiveType castinShapeType = _CONE_PRIMITIVE;
+	//PrimitiveType castinShapeType = _CHAMFER_CYLINDER_PRIMITIVE;
+	//PrimitiveType castinShapeType = _RANDOM_CONVEX_HULL_PRIMITIVE;
+	//PrimitiveType castinShapeType = _REGULAR_CONVEX_HULL_PRIMITIVE;
+	PrimitiveType castinShapeType = _COMPOUND_CONVEX_CRUZ_PRIMITIVE;
 
 	int count = 4;
 	castManager->AddPrimitives (count, dVector (  0, 0, 0), _SPHERE_PRIMITIVE, materialID, castinShapeType);
