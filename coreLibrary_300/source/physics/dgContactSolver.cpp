@@ -389,8 +389,10 @@ DG_INLINE dgBigVector dgContactSolver::ReduceTetrahedrum (dgInt32& indexOut)
 			}
 		}
 	}
-	// this is a degenerated tetra. this should never happens
-	dgAssert (0);
+	// this is a degenerated tetra. this should never happens.
+	// it seems this does happens about once per several millions calls, 
+	// I will assume is acceptable. No fall back needed
+	//dgAssert (0);
 	return dgBigVector::m_zero;
 }
 #endif

@@ -23,7 +23,7 @@
 #define DEMO_HEIGHT  960
 
 
-#define DEFAULT_SCENE	0			// using NetwonMesh Tool
+//#define DEFAULT_SCENE	0			// using NetwonMesh Tool
 //#define DEFAULT_SCENE	1			// Coefficients of friction
 //#define DEFAULT_SCENE	2			// Coefficients of restitution
 //#define DEFAULT_SCENE	3			// Precessing tops
@@ -51,7 +51,7 @@
 //#define DEFAULT_SCENE	25			// simple convex fracturing 
 //#define DEFAULT_SCENE	26			// structured convex fracturing 
 //#define DEFAULT_SCENE	27			// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	28          // standard joints
+#define DEFAULT_SCENE	28          // standard joints
 //#define DEFAULT_SCENE	29			// articulated joints
 //#define DEFAULT_SCENE	30			// basic rag doll
 //#define DEFAULT_SCENE	31			// dynamics rag doll
@@ -931,4 +931,3 @@ void NewtonDemos::OnSelectBroadPhase(wxCommandEvent& event)
 	m_broadPhaseType = dClamp (event.GetId() - ID_BROADPHSE_TYPE0, 0, 1);
 	END_MENU_OPTION();
 }
-

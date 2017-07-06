@@ -288,7 +288,6 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 
 //			CalculatePointDerivative (ret, params, dir0, pointDataP, &m_jointForce[ret]); 
 			CalculateAngularDerivative (ret, params, dir0, m_stiffness, dgFloat32 (0.0f), &m_jointForce[ret]);
-			//params.m_jointAccel[ret] = axisParam[0].m_accel;
 			SetMotorAcceleration (ret, axisParam[0].m_accel, params);
 			ret ++;
 		}
@@ -300,7 +299,6 @@ dgUnsigned32 dgUniversalConstraint::JacobianDerivative (dgContraintDescritor& pa
 				params.m_forceBounds[ret].m_normalIndex = DG_BILATERAL_FRICTION_CONSTRAINT;
 			}
 			CalculateAngularDerivative (ret, params, dir1, m_stiffness, dgFloat32 (0.0f), &m_jointForce[ret]);
-			//params.m_jointAccel[ret] = axisParam[1].m_accel;
 			SetMotorAcceleration (ret, axisParam[1].m_accel, params);
 			ret ++;
 

@@ -198,7 +198,6 @@ dgUnsigned32 dgSlidingConstraint::JacobianDerivative (dgContraintDescritor& para
 			}
 
 			CalculatePointDerivative (5, params, matrix0.m_front, pointDataP, &m_jointForce[5]); 
-			//params.m_jointAccel[5] = axisParam.m_accel;
 			SetMotorAcceleration (5, axisParam.m_accel, params);
 			ret = 6;
 		}

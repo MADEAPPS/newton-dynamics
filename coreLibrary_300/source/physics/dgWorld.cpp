@@ -901,7 +901,7 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 
 	UpdateSkeletons();
 	UpdateContacts(timestep);
-	UpdateDynamics(timestep);
+	UpdateDynamics (timestep);
 
 	if (m_postListener.GetCount()) {
 		dTimeTrackerEvent("postListeners");
@@ -1270,13 +1270,8 @@ void dgWorld::UpdateSkeletons()
 						}
 					}
 				}
-				skeleton->Finalize();
 
-				if (loopCount < (sizeof (loopJoints) / sizeof(loopJoints[0]))) {
-					for (dgInt32 j = 0; j < loopCount; j++) {
-						skeleton->AttachCyclingJoint(loopJoints[j]);
-					}
-				}
+				skeleton->Finalize(loopCount, loopJoints);
 			}
 		}
 	}

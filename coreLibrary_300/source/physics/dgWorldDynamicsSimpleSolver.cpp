@@ -40,8 +40,12 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 	if (!cluster->m_isContinueCollision) {
 		if (cluster->m_activeJointCount) {
 			BuildJacobianMatrix (cluster, threadID, timestep);
+#ifdef DG_EXPERIMENTAL_SOLVER
+			CalculateClusterReactionForcesExperimental(cluster, threadID, timestep, DG_SOLVER_MAX_ERROR);
+#else
 			CalculateClusterReactionForces(cluster, threadID, timestep, DG_SOLVER_MAX_ERROR);
-			//CalculateClusterReactionForcesExperimental(cluster, threadID, timestep, DG_SOLVER_MAX_ERROR);
+#endif
+			
 		} else {
 			IntegrateExternalForce(cluster, timestep, threadID);
 		}
@@ -567,8 +571,8 @@ void dgWorldDynamicUpdate::CalculateNetAcceleration(dgBody* const body, const dg
 {
 	dgAssert(body->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body->IsRTTIType(dgBody::m_kinematicBodyRTTI));
 	// the initial velocity and angular velocity were stored in m_accel and body->m_alpha for memory saving
-	dgVector accel = (body->m_veloc - body->m_accel).CompProduct4(invTimeStep);
-	dgVector alpha = (body->m_omega - body->m_alpha).CompProduct4(invTimeStep);
+	dgVector accel ((body->m_veloc - body->m_accel).CompProduct4(invTimeStep));
+	dgVector alpha ((body->m_omega - body->m_alpha).CompProduct4(invTimeStep));
 	dgVector accelTest((accel.DotProduct4(accel) > maxAccNorm2) | (alpha.DotProduct4(alpha) > maxAccNorm2));
 	accel = accel & accelTest;
 	alpha = alpha & accelTest;
@@ -941,7 +945,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 	dTimeTrackerEvent(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = cluster->m_bodyCount;
-//	const dgInt32 jointCount = island->m_jointCount;
+	//	const dgInt32 jointCount = island->m_jointCount;
 	const dgInt32 jointCount = cluster->m_activeJointCount;
 
 	dgJacobian* const internalForces = &m_solverMemory.m_internalForcesBuffer[cluster->m_bodyStart];
@@ -966,38 +970,10 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 	joindDesc.m_timeStep = timestepRK;
 	joindDesc.m_invTimeStep = invTimestepRK;
 	joindDesc.m_firstPassCoefFlag = dgFloat32(0.0f);
-/*
-	dgInt32 skeletonCount = 0;
-	dgInt32 skeletonMemorySizeInBytes = 0;
-	dgInt32 lru = dgAtomicExchangeAndAdd(&dgSkeletonContainer::m_lruMarker, 1);
-	dgSkeletonContainer* skeletonArray[DG_MAX_SKELETON_JOINT_COUNT];
-	dgInt32 memorySizes[DG_MAX_SKELETON_JOINT_COUNT];
-	for (dgInt32 i = 1; i < bodyCount; i++) {
-		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
-		dgSkeletonContainer* const container = body->GetSkeleton();
-		if (container && (container->m_lru != lru)) {
-			container->m_lru = lru;
-			memorySizes[skeletonCount] = container->GetMemoryBufferSizeInBytes(constraintArray, matrixRow);
-			skeletonMemorySizeInBytes += memorySizes[skeletonCount];
-			skeletonArray[skeletonCount] = container;
-			skeletonCount++;
-			dgAssert(skeletonCount < dgInt32(sizeof (skeletonArray) / sizeof (skeletonArray[0])));
-		}
-	}
-
-	dgInt8* const skeletonMemory = (dgInt8*)dgAlloca(dgVector, skeletonMemorySizeInBytes / sizeof (dgVector));
-	dgAssert((dgInt64(skeletonMemory) & 0x0f) == 0);
-
-	skeletonMemorySizeInBytes = 0;
-	for (dgInt32 i = 0; i < skeletonCount; i++) {
-		skeletonArray[i]->InitMassMatrix(constraintArray, matrixRow, &skeletonMemory[skeletonMemorySizeInBytes]);
-		skeletonMemorySizeInBytes += memorySizes[i];
-	}
-*/
 
 	const dgInt32 passes = world->m_solverMode;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
-		
+
 		for (dgInt32 i = 0; i < jointCount; i++) {
 			dgJointInfo* const jointInfo = &constraintArray[i];
 			dgConstraint* const constraint = jointInfo->m_joint;
@@ -1006,19 +982,15 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 			constraint->JointAccelerations(&joindDesc);
 		}
 		joindDesc.m_firstPassCoefFlag = dgFloat32(1.0f);
-		
+
 		dgFloat32 accNorm(maxAccNorm * dgFloat32(2.0f));
 		for (dgInt32 i = 0; (i < passes) && (accNorm > maxAccNorm); i++) {
 			accNorm = dgFloat32(0.0f);
-//			for (dgInt32 j = 0; (j < jointCount) && !constraintArray[j].m_isSkeleton; j++) {
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
 				dgFloat32 accel = CalculateJointForceGaussSeidel(jointInfo, bodyArray, internalForces, matrixRow, maxAccNorm);
 				accNorm = (accel > accNorm) ? accel : accNorm;
 			}
-//			for (dgInt32 j = 0; j < skeletonCount; j++) {
-//				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces, matrixRow);
-//			}
 		}
 
 		if (timestepRK != dgFloat32(0.0f)) {
@@ -1050,6 +1022,16 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 				body->m_veloc += linearMomentum.Scale4(body->m_invMass.m_w);
 				body->m_omega += body->m_invWorldInertiaMatrix.RotateVector(angularMomentum);
 			}
+		}
+	}
+
+	dgInt32 lru = dgAtomicExchangeAndAdd(&dgSkeletonContainer::m_lruMarker, 1);
+	for (dgInt32 i = 1; i < bodyCount; i++) {
+		dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
+		dgSkeletonContainer* const container = body->GetSkeleton();
+		if (container && (container->m_lru != lru)) {
+			container->m_lru = lru;
+			container->UpdateForces (constraintArray, matrixRow, timestep);
 		}
 	}
 

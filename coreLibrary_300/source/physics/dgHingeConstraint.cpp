@@ -188,7 +188,6 @@ dgUnsigned32 dgHingeConstraint::JacobianDerivative (dgContraintDescritor& params
 			}
 
 			CalculateAngularDerivative (5, params, dir0, m_stiffness, dgFloat32 (0.0f), &m_jointForce[5]);
-//			params.m_jointAccel[5] = axisParam.m_accel;
 			SetMotorAcceleration (5, axisParam.m_accel, params);
 			ret = 6;
 		}

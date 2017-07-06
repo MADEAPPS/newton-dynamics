@@ -180,6 +180,7 @@ void dgBilateralConstraint::SetMotorAcceleration (dgInt32 index, dgFloat32 accel
 	m_rowIsMotor[index] = 1;
 	m_motorAcceleration[index] = acceleration;
 	desc.m_jointAccel[index] = acceleration;
+	desc.m_penetrationStiffness[index] = acceleration; 
 }
 
 
@@ -297,17 +298,17 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 		desc.m_zeroRowAcceleration[index] = (jointAngle + omegaError * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep;
 
 		desc.m_penetration[index] = jointAngle;
-		desc.m_jointAccel[index] = alphaError;
 		desc.m_restitution[index] = dgFloat32 (0.0f);
 		desc.m_jointStiffness[index] = stiffness;
-		desc.m_penetrationStiffness[index] = dgFloat32 (0.0f);
+		desc.m_jointAccel[index] = alphaError;
+		desc.m_penetrationStiffness[index] = alphaError;
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	} else {
 		desc.m_penetration[index] = dgFloat32 (0.0f);
-		desc.m_jointAccel[index] = omegaError;
 		desc.m_restitution[index] = dgFloat32 (0.0f);
 		desc.m_jointStiffness[index] = stiffness;
-		desc.m_penetrationStiffness[index] = dgFloat32 (0.0f);
+		desc.m_jointAccel[index] = omegaError;
+		desc.m_penetrationStiffness[index] = omegaError;;
 		desc.m_zeroRowAcceleration[index]  = dgFloat32 (0.0f);
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	}
@@ -367,17 +368,17 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		dgFloat32 accelError = num / den;
 
 		desc.m_penetration[index] = relPosit;
-		desc.m_penetrationStiffness[index] = dgFloat32 (0.01f/4.0f);
 		desc.m_jointStiffness[index] = param.m_stiffness;
 		desc.m_jointAccel[index] = accelError + relCentr;
+		desc.m_penetrationStiffness[index] = accelError + relCentr;
 		// save centripetal acceleration in the restitution member
 		desc.m_restitution[index] = relCentr;
 		desc.m_forceBounds[index].m_jointForce = jointForce;
 	} else {
 		desc.m_penetration[index] = dgFloat32 (0.0f);
-		desc.m_penetrationStiffness[index] = dgFloat32 (0.0f);
 		desc.m_jointStiffness[index] = param.m_stiffness;
 		desc.m_jointAccel[index] = relVeloc;
+		desc.m_penetrationStiffness[index] = relVeloc;
 		desc.m_restitution[index] = dgFloat32 (0.0f);
 		desc.m_zeroRowAcceleration[index]  = dgFloat32 (0.0f);
 		desc.m_forceBounds[index].m_jointForce = jointForce;
@@ -386,9 +387,6 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 
 dgFloat32 dgBilateralConstraint::CalculateMotorAcceleration (dgInt32 index, dgContraintDescritor& desc) const
 {
-//static int xxx;
-//dgTrace (("%d %f %f\n", xxx, desc.m_zeroRowAcceleration[index], desc.m_jointAccel[index]));
-//xxx ++;
 	return desc.m_zeroRowAcceleration[index];
 }
 
