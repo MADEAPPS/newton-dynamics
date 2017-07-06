@@ -51,7 +51,7 @@
 // http://pathfinder.scar.utoronto.ca/~dyer/csca57/book_P/node51.html
 
 
-#define DG_EXPERIMENTAL_SOLVER
+//#define DG_EXPERIMENTAL_SOLVER
 
 #define DG_MAX_CONTINUE_COLLISON_STEPS	8
 
