@@ -392,12 +392,10 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_massMatrix10(NULL)
 	,m_lowerTriangularMassMatrix11(NULL)
 	,m_rowArray(NULL)
-	,m_destructor(NULL)
 	,m_cyclingBodies(rootBody->GetWorld()->GetAllocator())
 	,m_cyclingJoints(rootBody->GetWorld()->GetAllocator())
 	,m_id(m_uniqueID)
 	,m_lru(0)
-	,m_bufferSize(-1)
 	,m_nodeCount(1)
 	,m_rowCount(0)
 	,m_auxiliaryRowCount(0)
@@ -420,10 +418,6 @@ dgSkeletonContainer::~dgSkeletonContainer()
 		m_nodesOrder[i]->m_joint->m_isInSkeleton = false;
 	}
 
-	if (m_destructor) {
-		m_destructor (this);
-	}
-	
 	dgMemoryAllocator* const allocator = m_world->GetAllocator();
 	if (m_nodesOrder) {
 		allocator->Free(m_nodesOrder);
@@ -465,11 +459,6 @@ dgSkeletonContainer::dgGraph* dgSkeletonContainer::GetNextSiblingChild(dgSkeleto
 dgWorld* dgSkeletonContainer::GetWorld() const
 {
 	return m_world;
-}
-
-void dgSkeletonContainer::SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor)
-{
-	m_destructor = destructor;
 }
 
 void dgSkeletonContainer::ResetUniqueId(dgInt32 id)
@@ -1103,8 +1092,7 @@ dgInt32 dgSkeletonContainer::GetMemoryBufferSizeInBytes (const dgJointInfo* cons
 	size += sizeof (dgFloat32) * auxiliaryRowCount * auxiliaryRowCount * 2;
 	size += sizeof (dgFloat32) * auxiliaryRowCount * (rowCount - auxiliaryRowCount);
 	size += sizeof (dgFloat32) * auxiliaryRowCount * (rowCount - auxiliaryRowCount);
-	m_bufferSize = (size + 1024) & -0x10;
-	return m_bufferSize;
+	return (size + 1024) & -0x10;
 }
 
 

@@ -28,7 +28,6 @@
 
 class dgDynamicBody;
 class dgSkeletonContainer;
-typedef void (dgApi *dgOnSkeletonContainerDestroyCallback) (dgSkeletonContainer* const me);
 
 class dgSkeletonContainer
 {
@@ -61,7 +60,6 @@ class dgSkeletonContainer
 	dgInt32 GetId () const {return m_id;}
 	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
 	dgGraph* AddChild (dgBilateralConstraint* const joint, dgGraph* const parent);
-	void SetDestructorCallback (dgOnSkeletonContainerDestroyCallback destructor);
 	void RemoveCyclingJoint(dgBilateralConstraint* const joint);  
 	void Finalize (dgInt32 loopJoints, dgBilateralConstraint** const loopJointArray);
 	
@@ -103,12 +101,10 @@ class dgSkeletonContainer
 	dgFloat32* m_massMatrix10;
 	dgFloat32* m_lowerTriangularMassMatrix11;
 	dgJacobianMatrixElement** m_rowArray;
-	dgOnSkeletonContainerDestroyCallback m_destructor;
 	dgList<dgDynamicBody*> m_cyclingBodies;
 	dgList<dgCyclingJoint> m_cyclingJoints;
 	dgInt32 m_id;
 	dgInt32 m_lru;
-	mutable dgInt32 m_bufferSize;
 	dgInt16 m_nodeCount;
 	dgInt16 m_rowCount;
 	dgInt16 m_auxiliaryRowCount;

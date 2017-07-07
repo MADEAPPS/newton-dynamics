@@ -188,14 +188,12 @@ TemplateVector<T>& TemplateVector<T>::operator-= (const TemplateVector<T>& A)
 }
 
 template<class T>
-//T TemplateVector<T>::operator% (const TemplateVector<T>& A) const
 T TemplateVector<T>::DotProduct3 (const TemplateVector<T>& A) const
 {
 	return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 }
 
 template<class T>
-//TemplateVector<T> TemplateVector<T>::operator* (const TemplateVector<T>& A) const
 TemplateVector<T> TemplateVector<T>::CrossProduct (const TemplateVector<T>& A) const
 {
 	return TemplateVector<T> (m_y * A.m_z - m_z * A.m_y, m_z * A.m_x - m_x * A.m_z, m_x * A.m_y - m_y * A.m_x, m_w);
@@ -206,6 +204,86 @@ TemplateVector<T> TemplateVector<T>::CompProduct (const TemplateVector<T>& A) co
 {
 	return TemplateVector<T> (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 }
+
+
+
+
+class dSpatialVector
+{
+	public:
+	inline dSpatialVector()
+	{
+	}
+
+	inline dSpatialVector(const dFloat a)
+	{
+		for (int i = 0; i < 6; i++) {
+			m_d[i] = a;
+		}
+	}
+
+	inline dSpatialVector(const dVector& low, const dVector& high)
+	{
+		m_d[0] = low[0];
+		m_d[1] = low[1];
+		m_d[2] = low[2];
+		m_d[3] = high[0];
+		m_d[4] = high[1];
+		m_d[5] = high[2];
+	}
+
+	inline dFloat& operator[] (int i)
+	{
+		dAssert(i < 6);
+		dAssert(i >= 0);
+		return m_d[i];
+	}
+
+	inline const dFloat& operator[] (int i) const
+	{
+		dAssert(i < 6);
+		dAssert(i >= 0);
+		return m_d[i];
+	}
+
+	inline dSpatialVector operator+ (const dSpatialVector& A) const
+	{
+		dSpatialVector tmp;
+		for (int i = 0; i < 6; i++) {
+			tmp[i] = m_d[i] + A.m_d[i];
+		}
+		return tmp;
+	}
+
+	inline dSpatialVector CompProduct(const dSpatialVector& A) const
+	{
+		dSpatialVector tmp;
+		for (int i = 0; i < 6; i++) {
+			tmp[i] = m_d[i] * A.m_d[i];
+		}
+		return tmp;
+	}
+
+	inline dFloat DotProduct(const dSpatialVector& v) const
+	{
+		dFloat acc = dFloat (0.0f);
+		for (int i = 0; i < 6; i++) {
+			acc += m_d[i] * v.m_d[i];
+		}
+		return acc;
+	}
+
+	inline dSpatialVector Scale(dFloat s) const
+	{
+		dSpatialVector tmp;
+		for (int i = 0; i < 6; i++) {
+			tmp[i] = m_d[i] * s;
+		}
+		return tmp;
+	}
+
+	dFloat m_d[6];
+};
 
 
 #endif
