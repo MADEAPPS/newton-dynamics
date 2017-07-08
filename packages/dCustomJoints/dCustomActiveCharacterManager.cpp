@@ -11,12 +11,12 @@
 
 //////////////////////////////////////////////////////////////////////
 #include <dCustomJointLibraryStdAfx.h>
-#include <dCustomDynamicRagDollManager.h>
+#include <dCustomActiveCharacterManager.h>
 
-IMPLEMENT_CUSTOM_JOINT(dDynamicRagDollJoint);
+IMPLEMENT_CUSTOM_JOINT(dCustomActiveCharacterJoint);
 
 
-dDynamicRagDollJoint::dDynamicRagDollJoint(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent)
+dCustomActiveCharacterJoint::dCustomActiveCharacterJoint(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent)
 	:dCustomBallAndSocket(childPinAndPivotFrame, child, parent)
 	,m_rotationOffset(childPinAndPivotFrame * parentPinAndPivotFrame.Inverse())
 {
@@ -27,12 +27,12 @@ dDynamicRagDollJoint::dDynamicRagDollJoint(const dMatrix& childPinAndPivotFrame,
 }
 
 
-dDynamicRagDollJoint::~dDynamicRagDollJoint()
+dCustomActiveCharacterJoint::~dCustomActiveCharacterJoint()
 {
 }
 
-dDynamicRagDollJoint::dDynamicRagDollJoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
-:dCustomBallAndSocket(child, parent, callback, userData)
+dCustomActiveCharacterJoint::dCustomActiveCharacterJoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:dCustomBallAndSocket(child, parent, callback, userData)
 {
 	callback(userData, &m_rotationOffset, sizeof (dMatrix));
 	callback(userData, &m_minTwistAngle, sizeof (dFloat));
@@ -43,7 +43,7 @@ dDynamicRagDollJoint::dDynamicRagDollJoint(NewtonBody* const child, NewtonBody* 
 	callback(userData, &m_coneAngleHalfSin, sizeof (dFloat));
 }
 
-void dDynamicRagDollJoint::Serialize(NewtonSerializeCallback callback, void* const userData) const
+void dCustomActiveCharacterJoint::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomBallAndSocket::Serialize(callback, userData);
 
@@ -57,7 +57,7 @@ void dDynamicRagDollJoint::Serialize(NewtonSerializeCallback callback, void* con
 }
 
 
-void dDynamicRagDollJoint::SetConeAngle(dFloat angle)
+void dCustomActiveCharacterJoint::SetConeAngle(dFloat angle)
 {
 	m_coneAngle = angle;
 	m_coneAngleCos = dCos(angle);
@@ -67,25 +67,25 @@ void dDynamicRagDollJoint::SetConeAngle(dFloat angle)
 }
 
 
-void dDynamicRagDollJoint::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
+void dCustomActiveCharacterJoint::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
 {
 	m_minTwistAngle = minAngle;
 	m_maxTwistAngle = maxAngle;
 }
 
-dFloat dDynamicRagDollJoint::GetConeAngle() const
+dFloat dCustomActiveCharacterJoint::GetConeAngle() const
 {
 	return m_coneAngle;
 }
 
-void dDynamicRagDollJoint::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
+void dCustomActiveCharacterJoint::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
 {
 	minAngle = m_minTwistAngle;
 	maxAngle = m_maxTwistAngle;
 }
 
 
-void dDynamicRagDollJoint::GetInfo(NewtonJointRecord* const info) const
+void dCustomActiveCharacterJoint::GetInfo(NewtonJointRecord* const info) const
 {
 	dCustomBallAndSocket::GetInfo(info);
 
@@ -104,7 +104,7 @@ void dDynamicRagDollJoint::GetInfo(NewtonJointRecord* const info) const
 	strcpy(info->m_descriptionType, GetTypeName());
 }
 
-void dDynamicRagDollJoint::SubmitConstraints(dFloat timestep, int threadIndex)
+void dCustomActiveCharacterJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -183,33 +183,87 @@ void dDynamicRagDollJoint::SubmitConstraints(dFloat timestep, int threadIndex)
 
 
 
-dCustomDynamicRagDollManager::dCustomDynamicRagDollManager(NewtonWorld* const world)
-	:dCustomArticulaledTransformManager(world, DYNAMIC_RAGDOLL_PLUGIN_NAME)
+
+#if 0
+
+
+#endif
+
+
+dCustomActiveCharacterManager::dCustomActiveCharacterManager(NewtonWorld* const world, const char* const name)
+	:dCustomControllerManager<dCustomActiveCharacterController>(world, name)
 {
 }
 
-dCustomDynamicRagDollManager::~dCustomDynamicRagDollManager()
+dCustomActiveCharacterManager::~dCustomActiveCharacterManager()
 {
 }
 
 
-void dCustomDynamicRagDollManager::Debug() const 
+void dCustomActiveCharacterManager::Debug() const
+{
+	dAssert(0);
+}
+
+
+dCustomActiveCharacterController::dCustomActiveCharacterController()
 {
 	dAssert (0);
 }
 
-dCustomArticulatedTransformController* dCustomDynamicRagDollManager::CreateTransformController(void* const userData)
+dCustomActiveCharacterController::~dCustomActiveCharacterController()
 {
-	dCustomArticulatedTransformController* const controller = dCustomArticulaledTransformManager::CreateTransformController(userData);
-	return controller;
+	dAssert (0);
 }
 
-void dCustomDynamicRagDollManager::OnPreUpdate(dCustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const
+
+dCustomActiveCharacterController* dCustomActiveCharacterManager::CreateTransformController(void* const userData)
 {
-//	dAssert (0);
+	dAssert (0);
+//	dCustomArticulatedTransformController* const controller = dCustomArticulaledTransformManager::CreateTransformController(userData);
+//	return controller;
+	return NULL;
 }
 
-void dCustomDynamicRagDollManager::OnUpdateTransform(const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+/*
+void dCustomActiveCharacterManager::OnUpdateTransform(const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 {
-//	dAssert (0);
+	//	dAssert (0);
+}
+*/
+
+void dCustomActiveCharacterManager::OnPreUpdate(dCustomActiveCharacterController* const controller, dFloat timestep, int threadIndex) const
+{
+	dAssert (0);
+}
+
+
+void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadIndex)
+{
+	dAssert (0);
+/*
+	dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*)GetManager();
+	manager->OnPreUpdate(this, timestep, threadIndex);
+*/
+}
+
+void dCustomActiveCharacterController::PostUpdate(dFloat timestep, int threadIndex)
+{
+	dAssert (0);
+/*
+	if (m_calculateLocalTransform) {
+		dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*)GetManager();
+		for (int i = 0; i < m_boneCount; i++) {
+			const dSkeletonBone& bone = m_bones[i];
+			dMatrix matrix;
+			NewtonBodyGetMatrix(bone.m_body, &matrix[0][0]);
+			if (bone.m_parent) {
+				dMatrix parentMatrix;
+				NewtonBodyGetMatrix(bone.m_parent->m_body, &parentMatrix[0][0]);
+				matrix = matrix * parentMatrix.Inverse() * bone.m_bindMatrix;
+			}
+			manager->OnUpdateTransform(&bone, matrix);
+		}
+	}
+*/
 }

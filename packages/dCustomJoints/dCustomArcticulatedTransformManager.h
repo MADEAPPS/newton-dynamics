@@ -136,7 +136,7 @@ class dCustomArticulaledTransformManager: public dCustomControllerManager<dCusto
 	CUSTOM_JOINTS_API virtual void SetCollisionMask (dCustomArticulatedTransformController::dSkeletonBone* const bone0, dCustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode);
 	CUSTOM_JOINTS_API virtual bool SelfCollisionTest (const dCustomArticulatedTransformController::dSkeletonBone* const bone0, const dCustomArticulatedTransformController::dSkeletonBone* const bone1) const;
 
-	CUSTOM_JOINTS_API virtual void OnPreUpdate (dCustomArticulatedTransformController* const constroller, dFloat timestep, int threadIndex) const = 0;
+	CUSTOM_JOINTS_API virtual void OnPreUpdate (dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const = 0;
 	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 
 	private: 
