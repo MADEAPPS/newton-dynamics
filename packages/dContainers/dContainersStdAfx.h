@@ -25,7 +25,7 @@
 #include <dMathDefines.h>
 #include <dVector.h>
 #include <dMatrix.h>
-
+#include <Newton.h>
 
 
 #ifdef _DCONTAINERS_DLL

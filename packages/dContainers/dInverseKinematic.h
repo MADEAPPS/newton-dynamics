@@ -9,29 +9,112 @@
 * freely
 */
 
-#ifndef __D_INVERSE_KINEMATIC_H__
-#define __D_INVERSE_KINEMATIC_H__
+#ifndef _D_INVERSE_KINEMATICS_H__
+#define _D_INVERSE_KINEMATICS_H__
 
 
-#include "dContainersStdAfx.h"
+
 #include "dContainersAlloc.h"
 
-class dInverseKinematic: public dContainersAlloc
+
+//class dDynamicBody;
+//class dInverseKinematicSolver;
+
+
+class dInverseKinematicSolver: public dContainersAlloc
 {
-	public:
-	class dIKNode;
+/*
+	class dNodePair;
+	class dForcePair;
+	class dMatriData;
+	class dBodyJointMatrixDataPair;
+	class dCyclingJoint
+	{
+		public: 
+		dgCyclingJoint(dgBilateralConstraint* const joint, dgInt32 index0, dgInt32 index1)
+			:m_joint(joint)
+			,m_m0(dgInt16 (index0))
+			,m_m1(dgInt16 (index1))
+		{
+		}
 
-	DCONTAINERS_API dInverseKinematic();
-	DCONTAINERS_API ~dInverseKinematic();
+		dgBilateralConstraint* m_joint;
+		dgInt16 m_m0;
+		dgInt16 m_m1;
+	};
 
-	DCONTAINERS_API dIKNode* GetRoot() const;
-	DCONTAINERS_API dIKNode* AttachLink(dIKNode* const parent) const;
 
-	DCONTAINERS_API void SetAxis(dIKNode* const node, const dVector& pin) const;
-	DCONTAINERS_API void SetPivot(dIKNode* const node, const dVector& pivot) const;
+
+	dgWorld* GetWorld() const; 
+	dgInt32 GetId () const {return m_id;}
+	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
+	dgGraph* AddChild (dgBilateralConstraint* const joint, dgGraph* const parent);
+	void RemoveCyclingJoint(dgBilateralConstraint* const joint);  
+	void Finalize (dgInt32 loopJoints, dgBilateralConstraint** const loopJointArray);
+	
+	dgGraph* GetRoot () const;
+	dgDynamicBody* GetBody(dgGraph* const node) const;
+	dgBilateralConstraint* GetParentJoint(dgGraph* const node) const;
+	dgGraph* GetParent (dgGraph* const node) const;
+	dgGraph* GetFirstChild (dgGraph* const parent) const;
+	dgGraph* GetNextSiblingChild (dgGraph* const sibling) const;
+	
+	private:
+	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
+	inline void CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const;
+	inline void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
+	inline void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
+
+	static void ResetUniqueId(dgInt32 id);
+
+	dgGraph* FindNode(dgDynamicBody* const node) const;
+	void SortGraph(dgGraph* const root, dgGraph* const parent, dgInt32& index);
+		
+	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
+	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
+	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
+	void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
+	
+	inline void CalculateBodyAcceleration (dgJacobian* const externalAccel, dgFloat32 timestep) const;
+	inline void CalculateJointAccel(const dgJacobian* const externalAccel, dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
+	void UpdateVelocity (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgJacobian* const externalAccel, dgFloat32 timestep) const;
+	void SolveAuxiliaryVelocity (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force, dgJacobian* const externalAccel, dgFloat32 timestep) const;
+	void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep);
+
+	dgWorld* m_world;
+	dgGraph* m_skeleton;
+	dgGraph** m_nodesOrder;
+	dgNodePair* m_pairs;
+	dgFloat32* m_deltaForce;
+	dgFloat32* m_massMatrix11;
+	dgFloat32* m_massMatrix10;
+	dgFloat32* m_lowerTriangularMassMatrix11;
+	dgJacobianMatrixElement** m_rowArray;
+	dgList<dgDynamicBody*> m_cyclingBodies;
+	dgList<dgCyclingJoint> m_cyclingJoints;
+	dgInt32 m_id;
+	dgInt32 m_lru;
+	dgInt16 m_nodeCount;
+	dgInt16 m_rowCount;
+	dgInt16 m_auxiliaryRowCount;
+	static dgInt32 m_uniqueID;
+	static dgInt32 m_lruMarker;
+
+	friend class dWorld;
+	friend class dWorldDynamicUpdate;
+*/
+
+	public: 
+	class dGraph;
+
+
+	DCONTAINERS_API dInverseKinematicSolver(NewtonBody* const rootBody);
+	DCONTAINERS_API ~dInverseKinematicSolver();
+
 
 	protected:
-	dIKNode* m_root;
+	dGraph* m_skeleton;
 };
+
 #endif
 

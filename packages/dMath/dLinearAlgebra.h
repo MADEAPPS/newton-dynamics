@@ -24,8 +24,167 @@
 #endif
 
 
-#define D_MAX_PRAM_INFO_SIZE		16 
+#define D_MAX_PARAM_INFO_SIZE		16 
 #define D_MAX_PLACEMENT_CONTACTS	128
+
+
+class dSpatialVector
+{
+	public:
+	inline dSpatialVector()
+	{
+	}
+
+	inline dSpatialVector(const dFloat a)
+	{
+		for (int i = 0; i < 6; i++) {
+			m_d[i] = a;
+		}
+	}
+
+	inline dSpatialVector(const dVector& low, const dVector& high)
+	{
+		m_d[0] = low[0];
+		m_d[1] = low[1];
+		m_d[2] = low[2];
+		m_d[3] = high[0];
+		m_d[4] = high[1];
+		m_d[5] = high[2];
+	}
+
+	inline dFloat& operator[] (int i)
+	{
+		dAssert(i < 6);
+		dAssert(i >= 0);
+		return m_d[i];
+	}
+
+	inline const dFloat& operator[] (int i) const
+	{
+		dAssert(i < 6);
+		dAssert(i >= 0);
+		return m_d[i];
+	}
+
+	inline dSpatialVector operator+ (const dSpatialVector& A) const
+	{
+		dSpatialVector tmp;
+		for (int i = 0; i < 6; i++) {
+			tmp[i] = m_d[i] + A.m_d[i];
+		}
+		return tmp;
+	}
+
+	inline dSpatialVector CompProduct(const dSpatialVector& A) const
+	{
+		dSpatialVector tmp;
+		for (int i = 0; i < 6; i++) {
+			tmp[i] = m_d[i] * A.m_d[i];
+		}
+		return tmp;
+	}
+
+	inline dFloat DotProduct(const dSpatialVector& v) const
+	{
+		dFloat acc = dFloat (0.0f);
+		for (int i = 0; i < 6; i++) {
+			acc += m_d[i] * v.m_d[i];
+		}
+		return acc;
+	}
+
+	inline dSpatialVector Scale(dFloat s) const
+	{
+		dSpatialVector tmp;
+		for (int i = 0; i < 6; i++) {
+			tmp[i] = m_d[i] * s;
+		}
+		return tmp;
+	}
+
+	dFloat m_d[6];
+};
+
+class dSpatialMatrix
+{
+	public:
+	inline dSpatialMatrix()
+	{
+	}
+
+	inline dSpatialMatrix(dFloat val)
+	{
+		for (int i = 0; i < 6; i++) {
+			m_rows[i] = dSpatialVector(val);
+		}
+	}
+
+	inline dSpatialVector& operator[] (int i)
+	{
+		dAssert(i < 6);
+		dAssert(i >= 0);
+		return m_rows[i];
+	}
+
+	inline const dSpatialVector& operator[] (int i) const
+	{
+		dAssert(i < 6);
+		dAssert(i >= 0);
+		return m_rows[i];
+	}
+
+	inline dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian) const
+	{
+		dSpatialVector tmp(m_rows[0].Scale(jacobian[0]));
+		for (int i = 1; i < 6; i++) {
+			tmp = tmp + m_rows[i].Scale(jacobian[i]);
+		}
+		return tmp;
+	}
+
+	inline dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian, int dof) const
+	{
+		dSpatialVector tmp(0.0f);
+		for (int i = 0; i < dof; i++) {
+			tmp = tmp + m_rows[i].Scale(jacobian[i]);
+		}
+		return tmp;
+	}
+
+	inline dSpatialMatrix Inverse(int rows) const
+	{
+		dSpatialMatrix copy(*this);
+		dSpatialMatrix inverse(0.0f);
+		for (int i = 0; i < rows; i++) {
+			inverse[i][i] = dFloat(1.0f);
+		}
+
+		for (int i = 0; i < rows; i++) {
+			dFloat val = copy[i][i];
+			dAssert(dAbs(val) > 1.0e-12f);
+			dFloat den = 1.0f / val;
+
+			copy[i] = copy[i].Scale(den);
+			copy[i][i] = 1.0f;
+			inverse[i] = inverse[i].Scale(den);
+
+			for (int j = 0; j < i; j++) {
+				dFloat pivot = -copy[j][i];
+				copy[j] = copy[j] + copy[i].Scale(pivot);
+				inverse[j] = inverse[j] + inverse[i].Scale(pivot);
+			}
+
+			for (int j = i + 1; j < rows; j++) {
+				dFloat pivot = -copy[j][i];
+				copy[j] = copy[j] + copy[i].Scale(pivot);
+				inverse[j] = inverse[j] + inverse[i].Scale(pivot);
+			}
+		}
+		return inverse;
+	}
+
+	dSpatialVector m_rows[6];
+};
 
 class dSymmetricBiconjugateGradientSolve
 {
@@ -100,10 +259,10 @@ class dComplentaritySolver
 	class dParamInfo
 	{
 		public:
-		dJacobianPair m_jacobians[D_MAX_PRAM_INFO_SIZE];
-		dFloat m_jointAccel[D_MAX_PRAM_INFO_SIZE];
-		dFloat m_jointLowFriction[D_MAX_PRAM_INFO_SIZE];
-		dFloat m_jointHighFriction[D_MAX_PRAM_INFO_SIZE];
+		dJacobianPair m_jacobians[D_MAX_PARAM_INFO_SIZE];
+		dFloat m_jointAccel[D_MAX_PARAM_INFO_SIZE];
+		dFloat m_jointLowFriction[D_MAX_PARAM_INFO_SIZE];
+		dFloat m_jointHighFriction[D_MAX_PARAM_INFO_SIZE];
 		dFloat m_timestep;
 		dFloat m_timestepInv;
 		int m_count;
@@ -171,9 +330,9 @@ class dComplentaritySolver
 		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat ratio);
 		void CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param);
 
-		dFloat m_motorAcceleration[D_MAX_PRAM_INFO_SIZE];
-		dFloat m_jointFeebackForce[D_MAX_PRAM_INFO_SIZE];
-		int m_rowIsMotor[D_MAX_PRAM_INFO_SIZE];
+		dFloat m_motorAcceleration[D_MAX_PARAM_INFO_SIZE];
+		dFloat m_jointFeebackForce[D_MAX_PARAM_INFO_SIZE];
+		int m_rowIsMotor[D_MAX_PARAM_INFO_SIZE];
 		dBodyState* m_state0;
 		dBodyState* m_state1;
 		int m_start;
@@ -203,7 +362,7 @@ class dComplentaritySolver
 		void JacobianDerivative (dParamInfo* const constraintParams);
 		void JointAccelerations (dJointAccelerationDecriptor* const params);
 
-		dContact m_contacts[D_MAX_PRAM_INFO_SIZE];
+		dContact m_contacts[D_MAX_PARAM_INFO_SIZE];
 		dFloat m_restitution;
 		int m_count;
 	};
