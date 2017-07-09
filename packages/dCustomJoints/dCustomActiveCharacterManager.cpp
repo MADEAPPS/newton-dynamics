@@ -183,13 +183,6 @@ void dCustomActiveCharacterJoint::SubmitConstraints(dFloat timestep, int threadI
 
 
 
-
-#if 0
-
-
-#endif
-
-
 dCustomActiveCharacterManager::dCustomActiveCharacterManager(NewtonWorld* const world, const char* const name)
 	:dCustomControllerManager<dCustomActiveCharacterController>(world, name)
 {
@@ -208,7 +201,7 @@ void dCustomActiveCharacterManager::Debug() const
 
 dCustomActiveCharacterController::dCustomActiveCharacterController()
 {
-	dAssert (0);
+
 }
 
 dCustomActiveCharacterController::~dCustomActiveCharacterController()
@@ -217,12 +210,25 @@ dCustomActiveCharacterController::~dCustomActiveCharacterController()
 }
 
 
+void dCustomActiveCharacterController::Init(void* const userData)
+{
+	//dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
+	//NewtonWorld* const world = manager->GetWorld();
+
+	m_userData = userData;
+/*
+	m_boneCount = 0;
+	m_calculateLocalTransform = false;
+	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
+*/
+}
+
+
 dCustomActiveCharacterController* dCustomActiveCharacterManager::CreateTransformController(void* const userData)
 {
-	dAssert (0);
-//	dCustomArticulatedTransformController* const controller = dCustomArticulaledTransformManager::CreateTransformController(userData);
-//	return controller;
-	return NULL;
+	dCustomActiveCharacterController* const controller = (dCustomActiveCharacterController*)CreateController();
+	controller->Init(userData);
+	return controller;
 }
 
 /*

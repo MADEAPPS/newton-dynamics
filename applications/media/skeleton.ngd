@@ -232,8 +232,8 @@
         </dMeshNodeInfo>
         <dMaterialNodeInfo id="0">
             <dNodeInfo name="default material" />
-            <ambient textureId="-1" color="0.800000 0.800000 0.800000 1.000000" />
-            <diffuse textureId="-1" color="0.800000 0.800000 0.800000 1.000000" />
+            <ambient textureId="-1" color="0.800000 0.800000 0.000000 1.000000" />
+            <diffuse textureId="-1" color="0.800000 0.800000 0.000000 1.000000" />
             <specular textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
             <emissive textureId="-1" color="0.000000 0.000000 0.000000 1.000000" />
             <shininess float="0.000000" />

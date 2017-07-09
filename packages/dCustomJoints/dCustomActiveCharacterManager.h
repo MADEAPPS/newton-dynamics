@@ -140,7 +140,7 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	bool GetCalculateLocalTransforms() const { return m_calculateLocalTransform; }
 
 	protected:
-	CUSTOM_JOINTS_API void Init(void* const userData);
+	
 
 
 	private:
@@ -148,12 +148,15 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	void* m_collisionAggregate;
 	int m_boneCount;
 	bool m_calculateLocalTransform;
-	friend class dCustomArticulaledTransformManager;
+	
 */
 	protected:
+	CUSTOM_JOINTS_API void Init(void* const userData);
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
+
+	friend class dCustomActiveCharacterManager;
 };
 
 

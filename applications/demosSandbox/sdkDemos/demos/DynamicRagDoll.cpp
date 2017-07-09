@@ -22,7 +22,7 @@
 #include "HeightFieldPrimitive.h"
 #include "dCustomActiveCharacterManager.h"
 
-
+/*
 struct RAGDOLL_BONE_DEFINITION
 {
 	char m_boneName[32];
@@ -54,7 +54,7 @@ struct RAGDOLL_BONE_DEFINITION
 	dFloat m_parentRoll;
 };
 
-/*
+
 static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 {
 	{ "PELVIS",		"capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 30.0f, 0.0f, -0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f },
@@ -82,7 +82,7 @@ static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 	//	{"Bip01_R_Forearm",  "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.12f, 0.03f, 0.23f,  7.0f,		  0.0f, -150.0f,  0.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 	//	{"Bip01_R_Hand",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		  0.0f,  -45.0f, 45.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 };
-*/
+
 
 static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 {
@@ -112,7 +112,7 @@ static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 //	{"Bip01_R_Hand",  "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,  2.0f,		  0.0f,  -45.0f, 45.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 };
 
-
+*/
 
 
 
@@ -124,19 +124,21 @@ class DynamicsRagDollManager: public dCustomActiveCharacterManager
 	{
 		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
-		NewtonMaterialSetCallbackUserData (scene->GetNewton(), m_material, m_material, this);
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
+		//NewtonMaterialSetCallbackUserData (scene->GetNewton(), m_material, m_material, this);
+		//NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
 	}
 
 	virtual void OnPreUpdate (dCustomActiveCharacterController* const controller, dFloat timestep, int threadIndex) const
 	{
+		dAssert (0);
 		dCustomActiveCharacterManager::OnPreUpdate (controller, timestep, threadIndex);
 	}
 
+#if 0
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
 	{
 		dAssert (0);
-/*
+
 		NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 		NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 		dCustomActiveCharacterController::dSkeletonBone* const bone0 = (dCustomActiveCharacterController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
@@ -179,7 +181,6 @@ class DynamicsRagDollManager: public dCustomActiveCharacterManager
 		origin.m_w = 1.0f;
 	}
 
-
 	NewtonCollision* MakeSphere(DemoEntity* const bodyPart, const RAGDOLL_BONE_DEFINITION& definition) const
 	{
 		dVector size(0.0f);
@@ -216,7 +217,7 @@ class DynamicsRagDollManager: public dCustomActiveCharacterManager
 		return NULL;
 	}
 
-/*	
+
 	virtual void OnUpdateTransform (const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
 		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
@@ -227,7 +228,7 @@ class DynamicsRagDollManager: public dCustomActiveCharacterManager
 
 		dCustomActiveCharacterControllerManager::OnUpdateTransform (bone, localMatrix);
 	}
-*/
+
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
 	{
 		dFloat points[1024 * 16][3];
@@ -312,22 +313,23 @@ class DynamicsRagDollManager: public dCustomActiveCharacterManager
 		// make a clone of the mesh 
 		DemoEntity* const ragDollEntity = (DemoEntity*) model->CreateClone();
 		scene->Append(ragDollEntity);
-dAssert (0);
-/*
-		// build the ragdoll with rigid bodies connected by joints
-		// create a transform controller
-		dCustomActiveCharacterController* const controller = CreateTransformController (ragDollEntity);
-		controller->SetCalculateLocalTransforms (true);
 
-		// add the root bone
-		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
-		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
+		// make the root body for this character, in general this body is the pelvis
+		DemoEntity* const rootEntity = (DemoEntity*)ragDollEntity->Find(definition[0].m_boneName);
+		NewtonBody* const rootBone = CreateRagDollBodyPart(rootEntity, definition[0]);
 		// for debugging
 		//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
-
-		dCustomActiveCharacterController::dSkeletonBone* const bone = controller->AddBone (rootBone, dGetIdentityMatrix());
+		//dCustomActiveCharacterController::dSkeletonBone* const bone = controller->AddBone(rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
-		NewtonCollisionSetUserData (NewtonBodyGetCollision(rootBone), bone);
+		//NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), bone);
+
+		// build the rag doll with rigid bodies connected by joints
+		// create a transform controller
+//		dCustomActiveCharacterController* const controller = CreateTransformController (ragDollEntity);
+
+
+		controller->SetCalculateLocalTransforms (true);
+
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
@@ -374,7 +376,68 @@ dAssert (0);
 		// transform the entire contraction to its location
 		dMatrix worldMatrix (rootEntity->GetCurrentMatrix() * location);
 		NewtonBodySetMatrixRecursive (rootBone, &worldMatrix[0][0]);
-*/
+	}
+#endif
+
+	void CreateBasicGait (dMatrix& matrix)
+	{
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		dMatrix offsetMatrix(dGetIdentityMatrix());
+
+		// make the pelvis
+		dFloat pelvisMass = 12.0f;
+		dVector pelvisSize(0.25f, 0.15f, 0.25f, 0.0f);
+		NewtonCollision* const pelvisShape = CreateConvexCollision(world, offsetMatrix, pelvisSize, _CAPSULE_PRIMITIVE, 0);
+NewtonCollisionSetMode(pelvisShape, 0);
+		DemoMesh* const pelvisMesh = new DemoMesh("pelvis", pelvisShape, "smilli.tga", "smilli.tga", "smilli.tga");
+		NewtonBody* const pelvisBody = CreateSimpleSolid (scene, pelvisMesh, pelvisMass, matrix, pelvisShape, m_material);
+
+		// add right legs
+		dFloat legMass = 8.0f;
+		dVector legSize(0.25f, 0.4f, 0.20f, 0.0f);
+		NewtonCollision* const legShape = CreateConvexCollision(world, offsetMatrix, legSize, _CAPSULE_PRIMITIVE, 0);
+NewtonCollisionSetMode(legShape, 0);
+		DemoMesh* const legMesh = new DemoMesh("leg", legShape, "smilli.tga", "smilli.tga", "smilli.tga");
+
+		dMatrix rightLegMatrix (dRollMatrix(-100.0f * 3.14159f / 180.0f) * matrix);
+		rightLegMatrix.m_posit.m_y -= 0.30f;
+		rightLegMatrix.m_posit.m_z += 0.20f;
+		NewtonBody* const rightLegBody = CreateSimpleSolid(scene, legMesh, legMass, rightLegMatrix, legShape, m_material);
+
+		dMatrix leftLegMatrix(dRollMatrix(-80.0f * 3.14159f / 180.0f) * matrix);
+		leftLegMatrix.m_posit.m_y -= 0.30f;
+		leftLegMatrix.m_posit.m_z -= 0.20f;
+		NewtonBody* const leftLegBody = CreateSimpleSolid(scene, legMesh, legMass, leftLegMatrix, legShape, m_material);
+
+		// add calfs
+		dFloat calfMass = 6.0f;
+		dVector calfSize(0.20f, 0.4f, 0.20f, 0.0f);
+		NewtonCollision* const calfShape = CreateConvexCollision(world, offsetMatrix, calfSize, _CAPSULE_PRIMITIVE, 0);
+NewtonCollisionSetMode(calfShape, 0);
+		DemoMesh* const calfMesh = new DemoMesh("calf", calfShape, "smilli.tga", "smilli.tga", "smilli.tga");
+
+		dMatrix rightCalfMatrix (rightLegMatrix);
+		rightCalfMatrix.m_posit.m_y -= 0.46f;
+		rightCalfMatrix.m_posit.m_z += 0.09f;
+		NewtonBody* const rightCalfBody = CreateSimpleSolid(scene, calfMesh, calfMass, rightCalfMatrix, calfShape, m_material);
+
+		dMatrix leftCalfMatrix(leftLegMatrix);
+		leftCalfMatrix.m_posit.m_y -= 0.46f;
+		leftCalfMatrix.m_posit.m_z -= 0.09f;
+		NewtonBody* const leftCalfBody = CreateSimpleSolid(scene, calfMesh, calfMass, leftCalfMatrix, calfShape, m_material);
+
+
+		// add foots
+
+
+		legMesh->Release();
+		calfMesh->Release();
+		pelvisMesh->Release();
+		NewtonDestroyCollision(legShape);
+		NewtonDestroyCollision(calfShape);
+		NewtonDestroyCollision(pelvisShape);
 	}
 
 	int m_material;
@@ -397,10 +460,11 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	DynamicsRagDollManager* const manager = new DynamicsRagDollManager (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
-	dMatrix matrix (dGetIdentityMatrix());
+	//dMatrix matrix (dGetIdentityMatrix());
+	dMatrix matrix (dYawMatrix(3.131592f * 0.5f));
 
 //	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
-	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+	dVector origin (FindFloor (world, dVector (-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
 //	int count = 10;
 	int count = 1;
@@ -408,8 +472,10 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
 			matrix.m_posit = FindFloor (world, p, 100.0f);
-			matrix.m_posit.m_y += 1.0f;
-			manager->CreateRagDoll (matrix, &ragDollModel, skeletonRagDoll, sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]));
+			matrix.m_posit.m_y += 1.3f;
+			//manager->CreateRagDoll (matrix, &ragDollModel, skeletonRagDoll, sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]));
+			manager->CreateBasicGait (matrix);
+
 		}
 	}
 /*
@@ -420,10 +486,10 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	const dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 	AddPrimitiveArray(scene, 10.0f, location, size, count1, count1, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 */
-//	origin.m_x -= 25.0f;
-	origin.m_x -= 7.0f;
+
+	origin.m_x = -8.0f;
 //	origin.m_x -= 2.0f;
-	origin.m_y += 3.0f;
+	origin.m_y  = 1.5f;
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }
