@@ -90,7 +90,7 @@ class dCustomArticulatedTransformController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void SetSelfCollisionMask (dSkeletonBone* const bone0, dSkeletonBone* const bone1, bool mode);
 
 	CUSTOM_JOINTS_API bool SelfCollisionTest (const dSkeletonBone* const bone0, const dSkeletonBone* const bone1) const;
-	CUSTOM_JOINTS_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
+	CUSTOM_JOINTS_API dSkeletonBone* AddBone (NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBone = NULL);
 
 	CUSTOM_JOINTS_API int GetBoneCount() const;
 	CUSTOM_JOINTS_API dSkeletonBone* GetBone(int index);

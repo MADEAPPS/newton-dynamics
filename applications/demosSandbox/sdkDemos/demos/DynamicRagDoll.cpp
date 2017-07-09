@@ -374,24 +374,32 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 	}
 #endif
 
-/*
-	void ConnectBodyParts(NewtonBody* const bone, NewtonBody* const parent, const RAGDOLL_BONE_DEFINITION& definition) const
-	{
-		dMatrix matrix;
-		NewtonBodyGetMatrix(bone, &matrix[0][0]);
 
-		dMatrix parentPinAndPivotInGlobalSpace(dPitchMatrix(definition.m_parentPitch * 3.141592f / 180.0f) * dYawMatrix(definition.m_parentYaw * 3.141592f / 180.0f) * dRollMatrix(definition.m_parentRoll * 3.141592f / 180.0f));
+	//void ConnectBodyParts(NewtonBody* const child, NewtonBody* const parent, const RAGDOLL_BONE_DEFINITION& definition) const
+	dCustomActiveCharacterJoint* ConnectBodyParts(NewtonBody* const child, NewtonBody* const parent) const
+	{
+
+		dMatrix matrix;
+		NewtonBodyGetMatrix(child, &matrix[0][0]);
+
+		//dMatrix parentPinAndPivotInGlobalSpace(dPitchMatrix(definition.m_parentPitch * 3.141592f / 180.0f) * dYawMatrix(definition.m_parentYaw * 3.141592f / 180.0f) * dRollMatrix(definition.m_parentRoll * 3.141592f / 180.0f));
+		dMatrix parentPinAndPivotInGlobalSpace(dGetIdentityMatrix());
 		parentPinAndPivotInGlobalSpace = parentPinAndPivotInGlobalSpace * matrix;
 
-		dMatrix childPinAndPivotInGlobalSpace(dPitchMatrix(definition.m_childPitch * 3.141592f / 180.0f) * dYawMatrix(definition.m_childYaw * 3.141592f / 180.0f) * dRollMatrix(definition.m_childRoll * 3.141592f / 180.0f));
+		//dMatrix childPinAndPivotInGlobalSpace(dPitchMatrix(definition.m_childPitch * 3.141592f / 180.0f) * dYawMatrix(definition.m_childYaw * 3.141592f / 180.0f) * dRollMatrix(definition.m_childRoll * 3.141592f / 180.0f));
+		dMatrix childPinAndPivotInGlobalSpace(dGetIdentityMatrix());
 		childPinAndPivotInGlobalSpace = childPinAndPivotInGlobalSpace * matrix;
 
-		dCustomActiveCharacterJoint* const joint = new dCustomActiveCharacterJoint(childPinAndPivotInGlobalSpace, bone, parentPinAndPivotInGlobalSpace, parent);
+		dCustomActiveCharacterJoint* const joint = new dCustomActiveCharacterJoint(childPinAndPivotInGlobalSpace, child, parentPinAndPivotInGlobalSpace, parent);
 
-		joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
-		joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+		//joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
+		joint->SetConeAngle(30.0f * 3.141592f / 180.0f);
+		//joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+		joint->SetTwistAngle(30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
+
+		return joint;
 	}
-*/
+
 
 	void CreateBasicGait (dMatrix& matrix)
 	{
@@ -416,17 +424,23 @@ NewtonCollisionSetMode(pelvisShape, 0);
 		NewtonCollision* const legShape = CreateConvexCollision(world, offsetMatrix, legSize, _CAPSULE_PRIMITIVE, 0);
 NewtonCollisionSetMode(legShape, 0);
 		DemoMesh* const legMesh = new DemoMesh("leg", legShape, "smilli.tga", "smilli.tga", "smilli.tga");
+		{
+			dMatrix rightLegMatrix (dRollMatrix(-100.0f * 3.14159f / 180.0f) * matrix);
+			rightLegMatrix.m_posit.m_y -= 0.30f;
+			rightLegMatrix.m_posit.m_z += 0.20f;
+			NewtonBody* const rightLegBody = CreateSimpleSolid(scene, legMesh, legMass, rightLegMatrix, legShape, m_material);
+			dCustomActiveCharacterJoint* const joint = ConnectBodyParts(rightLegBody, pelvisBody);
+			controller->AddBone (joint->GetJacobianCalculator(), controller->GetRoot());
+		}
 
-		dMatrix rightLegMatrix (dRollMatrix(-100.0f * 3.14159f / 180.0f) * matrix);
-		rightLegMatrix.m_posit.m_y -= 0.30f;
-		rightLegMatrix.m_posit.m_z += 0.20f;
-		NewtonBody* const rightLegBody = CreateSimpleSolid(scene, legMesh, legMass, rightLegMatrix, legShape, m_material);
+		{
+			dMatrix leftLegMatrix(dRollMatrix(-80.0f * 3.14159f / 180.0f) * matrix);
+			leftLegMatrix.m_posit.m_y -= 0.30f;
+			leftLegMatrix.m_posit.m_z -= 0.20f;
+			//NewtonBody* const leftLegBody = CreateSimpleSolid(scene, legMesh, legMass, leftLegMatrix, legShape, m_material);
+		}
 
-		dMatrix leftLegMatrix(dRollMatrix(-80.0f * 3.14159f / 180.0f) * matrix);
-		leftLegMatrix.m_posit.m_y -= 0.30f;
-		leftLegMatrix.m_posit.m_z -= 0.20f;
-		NewtonBody* const leftLegBody = CreateSimpleSolid(scene, legMesh, legMass, leftLegMatrix, legShape, m_material);
-
+/*
 		// add calfs
 		dFloat calfMass = 6.0f;
 		dVector calfSize(0.20f, 0.4f, 0.20f, 0.0f);
@@ -434,25 +448,29 @@ NewtonCollisionSetMode(legShape, 0);
 NewtonCollisionSetMode(calfShape, 0);
 		DemoMesh* const calfMesh = new DemoMesh("calf", calfShape, "smilli.tga", "smilli.tga", "smilli.tga");
 
-		dMatrix rightCalfMatrix (rightLegMatrix);
-		rightCalfMatrix.m_posit.m_y -= 0.46f;
-		rightCalfMatrix.m_posit.m_z += 0.09f;
-		NewtonBody* const rightCalfBody = CreateSimpleSolid(scene, calfMesh, calfMass, rightCalfMatrix, calfShape, m_material);
+		{
+			dMatrix rightCalfMatrix (rightLegMatrix);
+			rightCalfMatrix.m_posit.m_y -= 0.46f;
+			rightCalfMatrix.m_posit.m_z += 0.09f;
+			NewtonBody* const rightCalfBody = CreateSimpleSolid(scene, calfMesh, calfMass, rightCalfMatrix, calfShape, m_material);
+		}
 
-		dMatrix leftCalfMatrix(leftLegMatrix);
-		leftCalfMatrix.m_posit.m_y -= 0.46f;
-		leftCalfMatrix.m_posit.m_z -= 0.09f;
-		NewtonBody* const leftCalfBody = CreateSimpleSolid(scene, calfMesh, calfMass, leftCalfMatrix, calfShape, m_material);
+		{
+			dMatrix leftCalfMatrix(leftLegMatrix);
+			leftCalfMatrix.m_posit.m_y -= 0.46f;
+			leftCalfMatrix.m_posit.m_z -= 0.09f;
+			NewtonBody* const leftCalfBody = CreateSimpleSolid(scene, calfMesh, calfMass, leftCalfMatrix, calfShape, m_material);
+		}
 
 
 		// add foots
-		//xxxxxxxxxxxx
+*/		
 
 		legMesh->Release();
-		calfMesh->Release();
+		//calfMesh->Release();
 		pelvisMesh->Release();
 		NewtonDestroyCollision(legShape);
-		NewtonDestroyCollision(calfShape);
+		//NewtonDestroyCollision(calfShape);
 		NewtonDestroyCollision(pelvisShape);
 	}
 

@@ -921,7 +921,7 @@ class HeavyVehicleEntity: public DemoEntity
 		int engineDifferentialLock = m_engineDifferentialLock.UpdatePushButton(mainWindow, 'L');
 		//int automaticTransmission = engine->GetTransmissionMode();
 
-		dFloat brakePedal = 0.0f;
+		//dFloat brakePedal = 0.0f;
 		dFloat handBrakePedal = 0.0f;
 		dFloat cluthPedal = 1.0f;
 		dFloat reverseGasPedal = 0.0f;

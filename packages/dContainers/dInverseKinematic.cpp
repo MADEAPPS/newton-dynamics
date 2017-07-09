@@ -12,6 +12,7 @@
 #include "dContainersStdAfx.h"
 #include "dInverseKinematic.h"
 
+
 /*
 #include "dgPhysicsStdafx.h"
 #include "dgBody.h"
@@ -58,24 +59,11 @@ dgInt32 dInverseKinematicSolver::m_lruMarker = 1;
 dgInt32 dInverseKinematicSolver::m_uniqueID = DG_SKELETON_BASE_UNIQUE_ID;
 */
 
+/*
 class dInverseKinematicSolver::dGraph
 {
 	public:
 
-	dGraph(NewtonBody* const body)
-		:m_body (body)
-		,m_joint(NULL)
-		,m_parent(NULL)
-		,m_child(NULL)
-		,m_sibling(NULL)
-//		,m_primaryStart(0)
-//		,m_auxiliaryStart(0)
-//		,m_index(0)
-//		,m_dof(0)
-//		,m_swapJacobianBodiesIndex(0)
-	{
-	}
-/*
 	dGraph (dgBilateralConstraint* const joint, dGraph* const parent)
 		:m_body ((dgDynamicBody*) ((joint->GetBody0() == parent->m_body) ? joint->GetBody1() : joint->GetBody0()))
 		,m_joint (joint)
@@ -95,17 +83,8 @@ class dInverseKinematicSolver::dGraph
 		}
 		m_parent->m_child = this;
 	}
-*/
-	inline ~dGraph()
-	{
-		dGraph* next;
-		for (dGraph* ptr = m_child; ptr; ptr = next) {
-			next = ptr->m_sibling;
-			delete ptr;
-		}
-	}
 
-/*
+
 	inline void Factorize()
 	{
 		const dgSpatialMatrix& bodyMass = m_data.m_body.m_mass;
@@ -366,15 +345,8 @@ class dInverseKinematicSolver::dGraph
 	dgInt8 m_dof;
 	dgInt8 m_swapJacobianBodiesIndex;
 	static dgInt64 m_ordinalInit;
-*/
-
-	NewtonBody* m_body;
-	dInverseKinematicConstraint* m_joint;
-	dGraph* m_parent;
-	dGraph* m_child;
-	dGraph* m_sibling;
 };
-
+*/
 
 
 #if 0
@@ -1389,9 +1361,60 @@ void dInverseKinematicSolver::UpdateForces (dgJointInfo* const jointInfoArray, d
 #endif
 
 
+dInverseKinematicSolver::dJoint::dJoint(NewtonBody* const body)
+	:dContainersAlloc()
+	,m_body(body)
+	,m_parent(NULL)
+	,m_child(NULL)
+	,m_sibling(NULL)
+	,m_jacobian(NULL)
+//,m_primaryStart(0)
+//,m_auxiliaryStart(0)
+//,m_index(0)
+//,m_dof(0)
+//,m_swapJacobianBodiesIndex(0)
+{
+}
+
+
+dInverseKinematicSolver::dJoint::dJoint(dJacobian* const jacobian, dJoint* const parent)
+	:dContainersAlloc()
+	,m_body(jacobian->GetBody0())
+	,m_parent(parent)
+	,m_child(NULL)
+	,m_sibling(NULL)
+	,m_jacobian(jacobian)
+//	,m_joint(joint)
+//	, m_primaryStart(0)
+//	, m_auxiliaryStart(0)
+//	, m_index(0)
+//	, m_dof(0)
+//	, m_swapJacobianBodiesIndex(joint->GetBody0() == parent->m_body)
+{
+	dAssert(m_parent);
+	dAssert(m_jacobian->GetBody1() == parent->m_body);
+	dAssert(m_jacobian->GetBodyInvMass(m_body) != dFloat(0.0f));
+
+	if (m_parent->m_child) {
+		m_sibling = m_parent->m_child;
+	}
+	m_parent->m_child = this;
+}
+
+
+dInverseKinematicSolver::dJoint::~dJoint()
+{
+	for (dJoint* ptr = m_child, *next = NULL; ptr; ptr = next) {
+		next = ptr->m_sibling; 
+		delete ptr;
+	}
+}
+
+
+
 dInverseKinematicSolver::dInverseKinematicSolver(NewtonBody* const rootBody)
 	:dContainersAlloc()
-	,m_skeleton(new dGraph(rootBody))
+	,m_skeleton(new dJoint(rootBody))
 /*
 	,m_nodesOrder(NULL)
 	,m_pairs(NULL)
@@ -1408,6 +1431,7 @@ dInverseKinematicSolver::dInverseKinematicSolver(NewtonBody* const rootBody)
 */
 {
 }
+
 
 dInverseKinematicSolver::~dInverseKinematicSolver()
 {
@@ -1430,4 +1454,9 @@ dInverseKinematicSolver::~dInverseKinematicSolver()
 	if (m_skeleton) {
 		delete m_skeleton;
 	}
+}
+
+dInverseKinematicSolver::dJoint* dInverseKinematicSolver::GetRoot () const
+{
+	return m_skeleton;
 }

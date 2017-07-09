@@ -20,22 +20,10 @@
 //class dDynamicBody;
 //class dInverseKinematicSolver;
 
+class dCustomJoint;
 
 class dInverseKinematicSolver: public dContainersAlloc
 {
-	class dInverseKinematicConstraint: public dContainersAlloc
-	{
-		public:
-		dInverseKinematicConstraint ()
-		{
-		}
-		~dInverseKinematicConstraint ()
-		{
-		}
-
-		virtual void GetJacobians () = 0;
-	};
-
 /*
 	class dNodePair;
 	class dForcePair;
@@ -65,7 +53,7 @@ class dInverseKinematicSolver: public dContainersAlloc
 	void RemoveCyclingJoint(dgBilateralConstraint* const joint);  
 	void Finalize (dgInt32 loopJoints, dgBilateralConstraint** const loopJointArray);
 	
-	dgGraph* GetRoot () const;
+
 	dgDynamicBody* GetBody(dgGraph* const node) const;
 	dgBilateralConstraint* GetParentJoint(dgGraph* const node) const;
 	dgGraph* GetParent (dgGraph* const node) const;
@@ -112,14 +100,54 @@ class dInverseKinematicSolver: public dContainersAlloc
 */
 
 	public: 
-	class dGraph;
+	class dJoint;
+
+	class dJacobian: public dContainersAlloc
+	{
+		public:
+		dJacobian(dCustomJoint* const joint)
+			:dContainersAlloc()
+			,m_customJoint(joint)
+		{
+		}
+
+		~dJacobian()
+		{
+		}
+
+		virtual void CalculateJacobians() = 0;
+		virtual NewtonBody* GetBody0() const = 0;
+		virtual NewtonBody* GetBody1() const = 0;
+		virtual dFloat GetBodyMass(const NewtonBody* const body) const = 0;
+		virtual dFloat GetBodyInvMass(const NewtonBody* const body) const = 0;
+
+		dCustomJoint* m_customJoint;
+	};
+
+
+	class dJoint: public dContainersAlloc
+	{
+		public:
+		DCONTAINERS_API dJoint(NewtonBody* const body);
+		DCONTAINERS_API dJoint(dJacobian* const jacobian, dJoint* const parent);
+		DCONTAINERS_API ~dJoint();
+
+		private:
+		NewtonBody* m_body;
+		dJoint* m_parent;
+		dJoint* m_child;
+		dJoint* m_sibling;
+		dJacobian* m_jacobian;
+	};
+
 
 	DCONTAINERS_API dInverseKinematicSolver(NewtonBody* const rootBody);
 	DCONTAINERS_API ~dInverseKinematicSolver();
 
+	DCONTAINERS_API dJoint* GetRoot () const;
 
 	protected:
-	dGraph* m_skeleton;
+	dJoint* m_skeleton;
 };
 
 #endif

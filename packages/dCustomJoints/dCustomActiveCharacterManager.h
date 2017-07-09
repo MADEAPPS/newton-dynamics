@@ -23,6 +23,51 @@
 
 
 class dInverseKinematicSolver;
+
+class dInverseKinematicJacobian: public dInverseKinematicSolver::dJacobian 
+{
+	public:
+	dInverseKinematicJacobian(dCustomJoint* const joint)
+		:dJacobian(joint)
+	{
+	}
+
+	NewtonBody* GetBody0() const
+	{
+		return m_customJoint->GetBody0();
+	}
+
+	NewtonBody* GetBody1() const
+	{
+		return m_customJoint->GetBody1(); 
+	}
+
+	dFloat GetBodyMass(const NewtonBody* const body) const
+	{
+		dFloat mass;
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		NewtonBodyGetInvMass(body, &mass, &Ixx, &Iyy, &Izz);
+		return mass;
+	}
+
+	dFloat GetBodyInvMass(const NewtonBody* const body) const
+	{
+		dFloat invMass;
+		dFloat invIxx;
+		dFloat invIyy;
+		dFloat invIzz;
+		NewtonBodyGetInvMass(body, &invMass, &invIxx, &invIyy, &invIzz);
+		return invMass;
+	}
+
+	void CalculateJacobians()
+	{
+		dAssert (0);
+	}
+};
+
 class dCustomActiveCharacterJoint: public dCustomBallAndSocket
 {
 	public:
@@ -34,6 +79,8 @@ class dCustomActiveCharacterJoint: public dCustomBallAndSocket
 
 	CUSTOM_JOINTS_API dFloat GetConeAngle() const;
 	CUSTOM_JOINTS_API void GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const;
+
+	CUSTOM_JOINTS_API dInverseKinematicJacobian* GetJacobianCalculator ();
 
 	protected:
 	CUSTOM_JOINTS_API dCustomActiveCharacterJoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
@@ -50,6 +97,8 @@ class dCustomActiveCharacterJoint: public dCustomBallAndSocket
 	dFloat m_coneAngleSin;
 	dFloat m_coneAngleHalfCos;
 	dFloat m_coneAngleHalfSin;
+	dInverseKinematicJacobian m_jacobian;
+	
 	DECLARE_CUSTOM_JOINT(dCustomActiveCharacterJoint, dCustomBallAndSocket)
 };
 
@@ -115,8 +164,6 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 		dSelfCollisionBitmask m_bitField;
 	};
 */
-	CUSTOM_JOINTS_API dCustomActiveCharacterController();
-	CUSTOM_JOINTS_API ~dCustomActiveCharacterController();
 
 /*
 	CUSTOM_JOINTS_API void DisableAllSelfCollision();
@@ -124,7 +171,7 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void SetSelfCollisionMask(dSkeletonBone* const bone0, dSkeletonBone* const bone1, bool mode);
 
 	CUSTOM_JOINTS_API bool SelfCollisionTest(const dSkeletonBone* const bone0, const dSkeletonBone* const bone1) const;
-	CUSTOM_JOINTS_API dSkeletonBone* AddBone(NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBodne = NULL);
+	CUSTOM_JOINTS_API dSkeletonBone* AddBone(NewtonBody* const bone, const dMatrix& bindMatrix, dSkeletonBone* const parentBone = NULL);
 
 	CUSTOM_JOINTS_API int GetBoneCount() const;
 	CUSTOM_JOINTS_API dSkeletonBone* GetBone(int index);
@@ -151,11 +198,19 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	bool m_calculateLocalTransform;
 	
 */
-	protected:
-	CUSTOM_JOINTS_API void Init(NewtonBody* const rootBone);
+
+	CUSTOM_JOINTS_API dCustomActiveCharacterController();
+	CUSTOM_JOINTS_API ~dCustomActiveCharacterController();
+
+	CUSTOM_JOINTS_API dInverseKinematicSolver::dJoint* GetRoot() const;
+	CUSTOM_JOINTS_API dInverseKinematicSolver::dJoint* AddBone(dInverseKinematicSolver::dJacobian* const child, dInverseKinematicSolver::dJoint* const parentBone);
+	
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
+	protected:
+
+	void Init(NewtonBody* const rootBone);
 	dInverseKinematicSolver* m_kinemativSolver;
 	friend class dCustomActiveCharacterManager;
 };
