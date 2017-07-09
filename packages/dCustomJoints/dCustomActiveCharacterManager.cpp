@@ -182,7 +182,6 @@ void dCustomActiveCharacterJoint::SubmitConstraints(dFloat timestep, int threadI
 
 
 
-
 dCustomActiveCharacterManager::dCustomActiveCharacterManager(NewtonWorld* const world, const char* const name)
 	:dCustomControllerManager<dCustomActiveCharacterController>(world, name)
 {
@@ -199,35 +198,12 @@ void dCustomActiveCharacterManager::Debug() const
 }
 
 
-dCustomActiveCharacterController::dCustomActiveCharacterController()
-{
-
-}
-
-dCustomActiveCharacterController::~dCustomActiveCharacterController()
-{
-	dAssert (0);
-}
 
 
-void dCustomActiveCharacterController::Init(void* const userData)
-{
-	//dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
-	//NewtonWorld* const world = manager->GetWorld();
-
-	m_userData = userData;
-/*
-	m_boneCount = 0;
-	m_calculateLocalTransform = false;
-	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
-*/
-}
-
-
-dCustomActiveCharacterController* dCustomActiveCharacterManager::CreateTransformController(void* const userData)
+dCustomActiveCharacterController* dCustomActiveCharacterManager::CreateTransformController(NewtonBody* const rootBone)
 {
 	dCustomActiveCharacterController* const controller = (dCustomActiveCharacterController*)CreateController();
-	controller->Init(userData);
+	controller->Init(rootBone);
 	return controller;
 }
 
@@ -238,24 +214,51 @@ void dCustomActiveCharacterManager::OnUpdateTransform(const dCustomActiveCharact
 }
 */
 
-void dCustomActiveCharacterManager::OnPreUpdate(dCustomActiveCharacterController* const controller, dFloat timestep, int threadIndex) const
+
+
+
+
+dCustomActiveCharacterController::dCustomActiveCharacterController()
+	:m_kinemativSolver(NULL)
 {
-	dAssert (0);
+}
+
+dCustomActiveCharacterController::~dCustomActiveCharacterController()
+{
+	if (m_kinemativSolver) {
+		delete m_kinemativSolver;
+	}
 }
 
 
-void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadIndex)
+void dCustomActiveCharacterController::Init(NewtonBody* const rootBone)
 {
-	dAssert (0);
+	//dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
+	//NewtonWorld* const world = manager->GetWorld();
+
+	m_body = rootBone;
+	m_kinemativSolver = new dInverseKinematicSolver (m_body);
 /*
-	dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*)GetManager();
-	manager->OnPreUpdate(this, timestep, threadIndex);
+	m_userData = userData;
+	m_boneCount = 0;
+	m_calculateLocalTransform = false;
+	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
 */
 }
 
+/*
+void dCustomActiveCharacterManager::OnUpdateTransform(const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+{
+	//	dAssert (0);
+}
+*/
+
+
+
+
 void dCustomActiveCharacterController::PostUpdate(dFloat timestep, int threadIndex)
 {
-	dAssert (0);
+//	dAssert (0);
 /*
 	if (m_calculateLocalTransform) {
 		dCustomArticulaledTransformManager* const manager = (dCustomArticulaledTransformManager*)GetManager();
@@ -273,3 +276,12 @@ void dCustomActiveCharacterController::PostUpdate(dFloat timestep, int threadInd
 	}
 */
 }
+
+
+void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadIndex)
+{
+//	dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
+//	manager->OnPreUpdate(this, timestep, threadIndex);
+}
+
+

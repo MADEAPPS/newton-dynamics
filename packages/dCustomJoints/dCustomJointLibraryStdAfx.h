@@ -57,12 +57,13 @@
 #include <dCRC.h>
 #include <dTree.h>
 #include <dList.h>
-#include <dMathDefines.h>
 #include <dVector.h>
 #include <dMatrix.h>
 #include <dQuaternion.h>
 #include <dTimeTracker.h>
+#include <dMathDefines.h>
 #include <dLinearAlgebra.h>
+#include <dInverseKinematic.h>
 
 #endif
 

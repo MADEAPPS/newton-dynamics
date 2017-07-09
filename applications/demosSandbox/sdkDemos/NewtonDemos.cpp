@@ -99,7 +99,7 @@ void AdvancedPlayerController (DemoEntityManager* const scene);
 void HeightFieldCollision (DemoEntityManager* const scene);
 void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
-void PassiveRagDoll (DemoEntityManager* const scene);
+void PassiveRagdoll (DemoEntityManager* const scene);
 void DynamicRagDoll (DemoEntityManager* const scene);
 void ArticulatedJoints (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
@@ -138,7 +138,7 @@ NewtonDemos::SDKDemos NewtonDemos::m_demosSelection[] =
 	{wxT("Parallel ray cast"), wxT("using the threading Job scheduler"), MultiRayCast},
     {wxT("Standard Joints"), wxT("show some of the common joints"), StandardJoints},
 	{wxT("Articulated robotic actuators joints"), wxT("demonstrate complex array of bodies interconnect by joints"), ArticulatedJoints},
-	{wxT("Pasive rag doll"), wxT("demonstrate parsive rag doll"), PassiveRagDoll},
+	{wxT("Pasive rag doll"), wxT("demonstrate parsive rag doll"), PassiveRagdoll},
 	{wxT("Dynamic rag doll"), wxT("demonstrate dynamic rag doll"), DynamicRagDoll},
 	{wxT("Basic Car"), wxT("show how to set up a vehicle controller"), BasicCar},
 	{wxT("Super car"), wxT("implement a hight performance sport car"), SuperCar},

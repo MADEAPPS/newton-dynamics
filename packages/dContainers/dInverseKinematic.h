@@ -23,6 +23,19 @@
 
 class dInverseKinematicSolver: public dContainersAlloc
 {
+	class dInverseKinematicConstraint: public dContainersAlloc
+	{
+		public:
+		dInverseKinematicConstraint ()
+		{
+		}
+		~dInverseKinematicConstraint ()
+		{
+		}
+
+		virtual void GetJacobians () = 0;
+	};
+
 /*
 	class dNodePair;
 	class dForcePair;
@@ -82,7 +95,6 @@ class dInverseKinematicSolver: public dContainersAlloc
 	void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep);
 
 	dgWorld* m_world;
-	dgGraph* m_skeleton;
 	dgGraph** m_nodesOrder;
 	dgNodePair* m_pairs;
 	dgFloat32* m_deltaForce;
@@ -97,16 +109,10 @@ class dInverseKinematicSolver: public dContainersAlloc
 	dgInt16 m_nodeCount;
 	dgInt16 m_rowCount;
 	dgInt16 m_auxiliaryRowCount;
-	static dgInt32 m_uniqueID;
-	static dgInt32 m_lruMarker;
-
-	friend class dWorld;
-	friend class dWorldDynamicUpdate;
 */
 
 	public: 
 	class dGraph;
-
 
 	DCONTAINERS_API dInverseKinematicSolver(NewtonBody* const rootBody);
 	DCONTAINERS_API ~dInverseKinematicSolver();

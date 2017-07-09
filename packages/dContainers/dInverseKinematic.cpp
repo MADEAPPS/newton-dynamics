@@ -64,10 +64,10 @@ class dInverseKinematicSolver::dGraph
 
 	dGraph(NewtonBody* const body)
 		:m_body (body)
-//		,m_joint(NULL)
-//		,m_parent(NULL)
-//		,m_child(NULL)
-//		,m_sibling(NULL)
+		,m_joint(NULL)
+		,m_parent(NULL)
+		,m_child(NULL)
+		,m_sibling(NULL)
 //		,m_primaryStart(0)
 //		,m_auxiliaryStart(0)
 //		,m_index(0)
@@ -95,11 +95,9 @@ class dInverseKinematicSolver::dGraph
 		}
 		m_parent->m_child = this;
 	}
-
+*/
 	inline ~dGraph()
 	{
-		m_body->SetSkeleton(NULL);
-
 		dGraph* next;
 		for (dGraph* ptr = m_child; ptr; ptr = next) {
 			next = ptr->m_sibling;
@@ -107,6 +105,7 @@ class dInverseKinematicSolver::dGraph
 		}
 	}
 
+/*
 	inline void Factorize()
 	{
 		const dgSpatialMatrix& bodyMass = m_data.m_body.m_mass;
@@ -356,11 +355,6 @@ class dInverseKinematicSolver::dGraph
 	}
 	
 	dgBodyJointMatrixDataPair m_data;
-	dgDynamicBody* m_body;
-	dgBilateralConstraint* m_joint;
-	dGraph* m_parent;
-	dGraph* m_child;
-	dGraph* m_sibling;
 	union
 	{
 		dgInt64 m_ordinals;
@@ -375,6 +369,10 @@ class dInverseKinematicSolver::dGraph
 */
 
 	NewtonBody* m_body;
+	dInverseKinematicConstraint* m_joint;
+	dGraph* m_parent;
+	dGraph* m_child;
+	dGraph* m_sibling;
 };
 
 
@@ -1404,19 +1402,11 @@ dInverseKinematicSolver::dInverseKinematicSolver(NewtonBody* const rootBody)
 	,m_rowArray(NULL)
 	,m_cyclingBodies(rootBody->GetWorld()->GetAllocator())
 	,m_cyclingJoints(rootBody->GetWorld()->GetAllocator())
-	,m_id(m_uniqueID)
-	,m_lru(0)
 	,m_nodeCount(1)
 	,m_rowCount(0)
 	,m_auxiliaryRowCount(0)
 */
 {
-/*
-	if (rootBody->GetInvMass().m_w != dgFloat32 (0.0f)) {
-		rootBody->SetSkeleton(this);
-	}
-	m_uniqueID++;
-*/
 }
 
 dInverseKinematicSolver::~dInverseKinematicSolver()
@@ -1436,7 +1426,8 @@ dInverseKinematicSolver::~dInverseKinematicSolver()
 	if (m_nodesOrder) {
 		allocator->Free(m_nodesOrder);
 	}
-
-	delete m_skeleton;
 */
+	if (m_skeleton) {
+		delete m_skeleton;
+	}
 }

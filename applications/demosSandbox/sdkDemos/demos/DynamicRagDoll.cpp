@@ -116,10 +116,10 @@ static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
 
 
 
-class DynamicsRagDollManager: public dCustomActiveCharacterManager
+class DynamicRagdollManager: public dCustomActiveCharacterManager
 {
 	public: 
-	DynamicsRagDollManager (DemoEntityManager* const scene)
+	DynamicRagdollManager (DemoEntityManager* const scene)
 		:dCustomActiveCharacterManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
@@ -128,11 +128,6 @@ class DynamicsRagDollManager: public dCustomActiveCharacterManager
 		//NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
 	}
 
-	virtual void OnPreUpdate (dCustomActiveCharacterController* const controller, dFloat timestep, int threadIndex) const
-	{
-		dAssert (0);
-		dCustomActiveCharacterManager::OnPreUpdate (controller, timestep, threadIndex);
-	}
 
 #if 0
 	static int OnBoneAABBOverlap (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex)
@@ -379,6 +374,25 @@ class DynamicsRagDollManager: public dCustomActiveCharacterManager
 	}
 #endif
 
+/*
+	void ConnectBodyParts(NewtonBody* const bone, NewtonBody* const parent, const RAGDOLL_BONE_DEFINITION& definition) const
+	{
+		dMatrix matrix;
+		NewtonBodyGetMatrix(bone, &matrix[0][0]);
+
+		dMatrix parentPinAndPivotInGlobalSpace(dPitchMatrix(definition.m_parentPitch * 3.141592f / 180.0f) * dYawMatrix(definition.m_parentYaw * 3.141592f / 180.0f) * dRollMatrix(definition.m_parentRoll * 3.141592f / 180.0f));
+		parentPinAndPivotInGlobalSpace = parentPinAndPivotInGlobalSpace * matrix;
+
+		dMatrix childPinAndPivotInGlobalSpace(dPitchMatrix(definition.m_childPitch * 3.141592f / 180.0f) * dYawMatrix(definition.m_childYaw * 3.141592f / 180.0f) * dRollMatrix(definition.m_childRoll * 3.141592f / 180.0f));
+		childPinAndPivotInGlobalSpace = childPinAndPivotInGlobalSpace * matrix;
+
+		dCustomActiveCharacterJoint* const joint = new dCustomActiveCharacterJoint(childPinAndPivotInGlobalSpace, bone, parentPinAndPivotInGlobalSpace, parent);
+
+		joint->SetConeAngle(definition.m_coneAngle * 3.141592f / 180.0f);
+		joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+	}
+*/
+
 	void CreateBasicGait (dMatrix& matrix)
 	{
 		NewtonWorld* const world = GetWorld();
@@ -393,6 +407,8 @@ class DynamicsRagDollManager: public dCustomActiveCharacterManager
 NewtonCollisionSetMode(pelvisShape, 0);
 		DemoMesh* const pelvisMesh = new DemoMesh("pelvis", pelvisShape, "smilli.tga", "smilli.tga", "smilli.tga");
 		NewtonBody* const pelvisBody = CreateSimpleSolid (scene, pelvisMesh, pelvisMass, matrix, pelvisShape, m_material);
+
+		dCustomActiveCharacterController* const controller = CreateTransformController(pelvisBody);
 
 		// add right legs
 		dFloat legMass = 8.0f;
@@ -430,7 +446,7 @@ NewtonCollisionSetMode(calfShape, 0);
 
 
 		// add foots
-
+		//xxxxxxxxxxxx
 
 		legMesh->Release();
 		calfMesh->Release();
@@ -457,7 +473,7 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 //	ragDollModel.LoadNGD_mesh ("gymnast.ngd", scene->GetNewton());
 
 	//  create a skeletal transform controller for controlling rag doll
-	DynamicsRagDollManager* const manager = new DynamicsRagDollManager (scene);
+	DynamicRagdollManager* const manager = new DynamicRagdollManager (scene);
 
 	NewtonWorld* const world = scene->GetNewton();
 	//dMatrix matrix (dGetIdentityMatrix());

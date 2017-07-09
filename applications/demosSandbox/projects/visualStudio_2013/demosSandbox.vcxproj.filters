@@ -133,9 +133,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoCameraListener.cpp">
       <Filter>mainLogic\listeners</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\BasicRagDoll.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -160,7 +157,10 @@
     <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\DynamicRagDoll.cpp">
+    <ClCompile Include="..\..\sdkDemos\demos\BasicRagdoll.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\DynamicRagdoll.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>

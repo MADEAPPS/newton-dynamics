@@ -19,9 +19,10 @@
 #include <dCustomControllerManager.h>
 #include <dCustomBallAndSocket.h>
 
-
 #define DYNAMIC_RAGDOLL_PLUGIN_NAME	"__dynamicRagDollManager__"
 
+
+class dInverseKinematicSolver;
 class dCustomActiveCharacterJoint: public dCustomBallAndSocket
 {
 	public:
@@ -151,11 +152,11 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	
 */
 	protected:
-	CUSTOM_JOINTS_API void Init(void* const userData);
+	CUSTOM_JOINTS_API void Init(NewtonBody* const rootBone);
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
-
+	dInverseKinematicSolver* m_kinemativSolver;
 	friend class dCustomActiveCharacterManager;
 };
 
@@ -168,9 +169,8 @@ class dCustomActiveCharacterManager: public dCustomControllerManager<dCustomActi
 
 	CUSTOM_JOINTS_API virtual void Debug () const;
 
-	CUSTOM_JOINTS_API virtual dCustomActiveCharacterController* CreateTransformController (void* const userData);
+	CUSTOM_JOINTS_API virtual dCustomActiveCharacterController* CreateTransformController (NewtonBody* const rootBone);
 
-	CUSTOM_JOINTS_API virtual void OnPreUpdate (dCustomActiveCharacterController* const controller, dFloat timestep, int threadIndex) const;
 //	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
 //	dCustomDynamicRagDollManager
 	
@@ -182,8 +182,6 @@ class dCustomActiveCharacterManager: public dCustomControllerManager<dCustomActi
 
 	CUSTOM_JOINTS_API virtual void SetCollisionMask(dCustomArticulatedTransformController::dSkeletonBone* const bone0, dCustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode);
 	CUSTOM_JOINTS_API virtual bool SelfCollisionTest(const dCustomArticulatedTransformController::dSkeletonBone* const bone0, const dCustomArticulatedTransformController::dSkeletonBone* const bone1) const;
-
-	CUSTOM_JOINTS_API virtual void OnPreUpdate(dCustomArticulatedTransformController* const controller, dFloat timestep, int threadIndex) const = 0;
 	CUSTOM_JOINTS_API virtual void OnUpdateTransform(const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 */
 };
