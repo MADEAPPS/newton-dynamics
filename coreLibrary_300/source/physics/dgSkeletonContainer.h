@@ -79,7 +79,7 @@ class dgSkeletonContainer
 	static void ResetUniqueId(dgInt32 id);
 
 	dgGraph* FindNode(dgDynamicBody* const node) const;
-	void SortGraph(dgGraph* const root, dgGraph* const parent, dgInt32& index);
+	void SortGraph(dgGraph* const root, dgInt32& index);
 		
 	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
 	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;

@@ -466,10 +466,10 @@ void dgSkeletonContainer::ResetUniqueId(dgInt32 id)
 	m_uniqueID = id;
 }
 
-void dgSkeletonContainer::SortGraph(dgGraph* const root, dgGraph* const parent, dgInt32& index)
+void dgSkeletonContainer::SortGraph(dgGraph* const root, dgInt32& index)
 {
 	for (dgGraph* node = root->m_child; node; node = node->m_sibling) {
-		SortGraph(node, root, index);
+		SortGraph(node, index);
 	}
 
 	dgAssert((m_nodeCount - index - 1) >= 0);
@@ -545,7 +545,7 @@ void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstrain
 	m_nodesOrder = (dgGraph**)allocator->Malloc(m_nodeCount * sizeof (dgGraph*));
 
 	dgInt32 index = 0;
-	SortGraph(m_skeleton, NULL, index);
+	SortGraph(m_skeleton, index);
 	dgAssert(index == m_nodeCount);
 
 	if (loopJointsCount) {

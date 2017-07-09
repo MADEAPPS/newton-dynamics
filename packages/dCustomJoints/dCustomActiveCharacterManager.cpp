@@ -287,11 +287,6 @@ void dCustomActiveCharacterController::PostUpdate(dFloat timestep, int threadInd
 }
 
 
-void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadIndex)
-{
-//	dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
-//	manager->OnPreUpdate(this, timestep, threadIndex);
-}
 
 dInverseKinematicSolver::dJoint* dCustomActiveCharacterController::GetRoot() const
 {
@@ -300,7 +295,23 @@ dInverseKinematicSolver::dJoint* dCustomActiveCharacterController::GetRoot() con
 
 dInverseKinematicSolver::dJoint* dCustomActiveCharacterController::AddBone(dInverseKinematicSolver::dJacobian* const jacobian, dInverseKinematicSolver::dJoint* const parentBone)
 {
-	dAssert (parentBone);
-	dInverseKinematicSolver::dJoint* const child = new dInverseKinematicSolver::dJoint (jacobian, parentBone);
-	return child;
+	dAssert (m_kinemativSolver);
+	return m_kinemativSolver->AddChild(jacobian, parentBone);
+}
+
+void dCustomActiveCharacterController::Finalize ()
+{
+	if (m_kinemativSolver) {
+		m_kinemativSolver->Finalize(0);
+	}
+}
+
+void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadIndex)
+{
+	//	dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
+	//	manager->OnPreUpdate(this, timestep, threadIndex);
+
+	if (m_kinemativSolver) {
+		m_kinemativSolver->UpdateJointAngles (timestep);
+	}
 }

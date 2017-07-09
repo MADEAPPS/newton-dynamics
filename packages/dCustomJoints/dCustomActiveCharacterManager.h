@@ -204,6 +204,7 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 
 	CUSTOM_JOINTS_API dInverseKinematicSolver::dJoint* GetRoot() const;
 	CUSTOM_JOINTS_API dInverseKinematicSolver::dJoint* AddBone(dInverseKinematicSolver::dJacobian* const child, dInverseKinematicSolver::dJoint* const parentBone);
+	CUSTOM_JOINTS_API virtual void Finalize ();
 	
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
@@ -225,6 +226,7 @@ class dCustomActiveCharacterManager: public dCustomControllerManager<dCustomActi
 	CUSTOM_JOINTS_API virtual void Debug () const;
 
 	CUSTOM_JOINTS_API virtual dCustomActiveCharacterController* CreateTransformController (NewtonBody* const rootBone);
+	
 
 //	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
 //	dCustomDynamicRagDollManager

@@ -32,7 +32,7 @@ class dInverseKinematicSolver: public dContainersAlloc
 	class dCyclingJoint
 	{
 		public: 
-		dgCyclingJoint(dgBilateralConstraint* const joint, dgInt32 index0, dgInt32 index1)
+		dgCyclingJoint(dgBilateralConstraint* const joint, int index0, int index1)
 			:m_joint(joint)
 			,m_m0(dgInt16 (index0))
 			,m_m1(dgInt16 (index1))
@@ -47,11 +47,11 @@ class dInverseKinematicSolver: public dContainersAlloc
 
 
 	dgWorld* GetWorld() const; 
-	dgInt32 GetId () const {return m_id;}
-	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
+	int GetId () const {return m_id;}
+	int GetJointCount () const {return m_nodeCount - 1;}
 	dgGraph* AddChild (dgBilateralConstraint* const joint, dgGraph* const parent);
 	void RemoveCyclingJoint(dgBilateralConstraint* const joint);  
-	void Finalize (dgInt32 loopJoints, dgBilateralConstraint** const loopJointArray);
+	
 	
 
 	dgDynamicBody* GetBody(dgGraph* const node) const;
@@ -66,13 +66,10 @@ class dInverseKinematicSolver: public dContainersAlloc
 	inline void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
 	inline void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
 
-	static void ResetUniqueId(dgInt32 id);
+	static void ResetUniqueId(int id);
 
 	dgGraph* FindNode(dgDynamicBody* const node) const;
-	void SortGraph(dgGraph* const root, dgGraph* const parent, dgInt32& index);
-		
-	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
-	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
+	int GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
 	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
 	
@@ -80,10 +77,10 @@ class dInverseKinematicSolver: public dContainersAlloc
 	inline void CalculateJointAccel(const dgJacobian* const externalAccel, dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
 	void UpdateVelocity (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgJacobian* const externalAccel, dgFloat32 timestep) const;
 	void SolveAuxiliaryVelocity (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force, dgJacobian* const externalAccel, dgFloat32 timestep) const;
-	void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep);
+
 
 	dgWorld* m_world;
-	dgGraph** m_nodesOrder;
+	
 	dgNodePair* m_pairs;
 	dgFloat32* m_deltaForce;
 	dgFloat32* m_massMatrix11;
@@ -92,9 +89,9 @@ class dInverseKinematicSolver: public dContainersAlloc
 	dgJacobianMatrixElement** m_rowArray;
 	dgList<dgDynamicBody*> m_cyclingBodies;
 	dgList<dgCyclingJoint> m_cyclingJoints;
-	dgInt32 m_id;
-	dgInt32 m_lru;
-	dgInt16 m_nodeCount;
+	int m_id;
+	int m_lru;
+	
 	dgInt16 m_rowCount;
 	dgInt16 m_auxiliaryRowCount;
 */
@@ -124,30 +121,48 @@ class dInverseKinematicSolver: public dContainersAlloc
 		dCustomJoint* m_customJoint;
 	};
 
-
 	class dJoint: public dContainersAlloc
 	{
 		public:
 		DCONTAINERS_API dJoint(NewtonBody* const body);
-		DCONTAINERS_API dJoint(dJacobian* const jacobian, dJoint* const parent);
 		DCONTAINERS_API ~dJoint();
 
 		private:
+		dJoint(dJacobian* const jacobian, dJoint* const parent);
+
 		NewtonBody* m_body;
 		dJoint* m_parent;
 		dJoint* m_child;
 		dJoint* m_sibling;
 		dJacobian* m_jacobian;
+
+		short m_index;
+
+		friend class dInverseKinematicSolver;  
 	};
 
 
 	DCONTAINERS_API dInverseKinematicSolver(NewtonBody* const rootBody);
 	DCONTAINERS_API ~dInverseKinematicSolver();
-
 	DCONTAINERS_API dJoint* GetRoot () const;
+	DCONTAINERS_API dJoint* AddChild (dJacobian* const jacobian, dJoint* const parentBone);
+
+	//void Finalize (int loopJoints, dgBilateralConstraint** const loopJointArray);
+	void Finalize (int loopJoints);
+
+	DCONTAINERS_API void UpdateJointAngles (dFloat timestep);
+
+	private:
+	void InitMassMatrix ();
+	void SortGraph(dJoint* const root, int& index);
 
 	protected:
 	dJoint* m_skeleton;
+
+	dJoint** m_nodesOrder;
+
+	
+	short m_nodeCount;
 };
 
 #endif

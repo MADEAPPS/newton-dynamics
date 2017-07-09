@@ -472,6 +472,8 @@ NewtonCollisionSetMode(calfShape, 0);
 		NewtonDestroyCollision(legShape);
 		//NewtonDestroyCollision(calfShape);
 		NewtonDestroyCollision(pelvisShape);
+
+		controller->Finalize();
 	}
 
 	int m_material;
