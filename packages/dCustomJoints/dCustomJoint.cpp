@@ -306,7 +306,10 @@ void dCustomJoint::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 }
 
-
+int dCustomJoint::GetIKJacobians (dFloat timestep, NewtonIKJacobianMatrixElement* const jacobians) const
+{
+	return NewtonUserJointGetIKJacobians (m_joint, timestep, jacobians);
+}
 
 const char* dCustomJoint::GetTypeName() const
 {

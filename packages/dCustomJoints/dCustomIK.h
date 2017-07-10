@@ -15,14 +15,15 @@
 
 
 #include "dContainersAlloc.h"
+#include "dCustomJoint.h"
 
 
 //class dDynamicBody;
-//class dInverseKinematicSolver;
+//class dCustomIKSolver;
 
 class dCustomJoint;
 
-class dInverseKinematicSolver: public dContainersAlloc
+class dCustomIKSolver: public dContainersAlloc
 {
 /*
 	class dNodePair;
@@ -98,71 +99,94 @@ class dInverseKinematicSolver: public dContainersAlloc
 
 	public: 
 	class dJoint;
-
-	class dJacobian: public dContainersAlloc
-	{
-		public:
-		dJacobian(dCustomJoint* const joint)
-			:dContainersAlloc()
-			,m_customJoint(joint)
-		{
-		}
-
-		~dJacobian()
-		{
-		}
-
-		virtual void CalculateJacobians() = 0;
-		virtual NewtonBody* GetBody0() const = 0;
-		virtual NewtonBody* GetBody1() const = 0;
-		virtual dFloat GetBodyMass(const NewtonBody* const body) const = 0;
-		virtual dFloat GetBodyInvMass(const NewtonBody* const body) const = 0;
-
-		dCustomJoint* m_customJoint;
-	};
+	class dJointInfo;
+	class dMatriData;
+	class dBodyJointMatrixDataPair;
 
 	class dJoint: public dContainersAlloc
 	{
 		public:
-		DCONTAINERS_API dJoint(NewtonBody* const body);
-		DCONTAINERS_API ~dJoint();
+		CUSTOM_JOINTS_API dJoint(NewtonBody* const body);
+		CUSTOM_JOINTS_API ~dJoint();
+
+		dFloat GetBodyInvMass() const
+		{
+			dFloat invMass;
+			dFloat invIxx;
+			dFloat invIyy;
+			dFloat invIzz;
+			NewtonBodyGetInvMass(m_body, &invMass, &invIxx, &invIyy, &invIzz);
+			return invMass;
+		}
+
+		dFloat GetBodyMass() const
+		{
+			dFloat mass;
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			NewtonBodyGetMass(m_body, &mass, &Ixx, &Iyy, &Izz);
+			return mass;
+		}
+
+		dMatrix GetInertiaMatrix() const
+		{
+			dMatrix matrix;
+			NewtonBodyGetInertiaMatrix(m_body, &matrix[0][0]);
+			return matrix;
+		}
 
 		private:
-		dJoint(dJacobian* const jacobian, dJoint* const parent);
+		dJoint(dCustomJoint* const child, dJoint* const parent);
+
+		inline void CalculateInertiaMatrix(dBodyJointMatrixDataPair* const massMatrix);
+		inline void CalculateJointDiagonal(dBodyJointMatrixDataPair* const massMatrix);
+		inline void CalculateJacobianBlock(dBodyJointMatrixDataPair* const massMatrix);
+		inline void CalculateBodyDiagonal(dBodyJointMatrixDataPair* const massMatrix, dJoint* const child);
+		inline void GetJacobians(const dJointInfo* const jointInfo, const NewtonIKJacobianMatrixElement* const matrixRow, dBodyJointMatrixDataPair* const massMatrix);
+		inline int Factorize (const dJointInfo* const jointInfo, const NewtonIKJacobianMatrixElement* const jacobianMatrix, dBodyJointMatrixDataPair* const massMatrix);
+		
 
 		NewtonBody* m_body;
 		dJoint* m_parent;
 		dJoint* m_child;
 		dJoint* m_sibling;
-		dJacobian* m_jacobian;
+		dCustomJoint* m_customJoint;
 
+		short m_dof;
 		short m_index;
+		short m_primaryStart;
+		short m_auxiliaryStart;
+		union
+		{
+			long long m_ordinals;
+			char m_sourceJacobianIndex[8];
+		};
+		static long long m_ordinalInit;
 
-		friend class dInverseKinematicSolver;  
+		friend class dCustomIKSolver;  
 	};
 
 
-	DCONTAINERS_API dInverseKinematicSolver(NewtonBody* const rootBody);
-	DCONTAINERS_API ~dInverseKinematicSolver();
-	DCONTAINERS_API dJoint* GetRoot () const;
-	DCONTAINERS_API dJoint* AddChild (dJacobian* const jacobian, dJoint* const parentBone);
+	CUSTOM_JOINTS_API dCustomIKSolver(NewtonBody* const rootBody);
+	CUSTOM_JOINTS_API ~dCustomIKSolver();
+	CUSTOM_JOINTS_API dJoint* GetRoot () const;
+	CUSTOM_JOINTS_API dJoint* AddChild (dCustomJoint* const childJoint, dJoint* const parentBone);
 
 	//void Finalize (int loopJoints, dgBilateralConstraint** const loopJointArray);
-	void Finalize (int loopJoints);
-
-	DCONTAINERS_API void UpdateJointAngles (dFloat timestep);
+	CUSTOM_JOINTS_API void Finalize (int loopJoints);
+	CUSTOM_JOINTS_API void UpdateJointAngles (dFloat timestep);
 
 	private:
-	void InitMassMatrix ();
 	void SortGraph(dJoint* const root, int& index);
+	void InitMassMatrix (dFloat timestep, dBodyJointMatrixDataPair* const massMatrix, dJointInfo* const jointInfo, NewtonIKJacobianMatrixElement* const jacobianMatrix);
 
 	protected:
 	dJoint* m_skeleton;
-
 	dJoint** m_nodesOrder;
-
-	
+	short m_rowCount;
 	short m_nodeCount;
+	short m_auxiliaryRowCount;
 };
 
 #endif

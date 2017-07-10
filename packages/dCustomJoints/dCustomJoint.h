@@ -193,6 +193,8 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API void SetSolverModel(int model);
 	CUSTOM_JOINTS_API int GetSolverModel() const;
 
+	CUSTOM_JOINTS_API virtual int GetIKJacobians (dFloat timestep, NewtonIKJacobianMatrixElement* const jacobians) const;
+
 	CUSTOM_JOINTS_API void SetUserDestructorCallback (dJointUserDestructorCallback callback) {m_userDestructor = callback;}
 
 	private:

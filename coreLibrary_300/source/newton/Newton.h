@@ -331,6 +331,36 @@ extern "C" {
 		NewtonMeshFloatData m_vertexColor;
 	} NewtonMeshVertexFormat;
 
+	typedef struct NewtonIKJacobianMatrixElement
+	{
+		public:
+		dFloat m_Jt01[6];
+		dFloat m_Jt10[6];
+		dFloat m_diagDamp;
+		dFloat m_coordenateAccel;
+
+		dFloat m_stiffness;
+		dFloat m_lowerBoundFrictionCoefficent;
+		dFloat m_upperBoundFrictionCoefficent;
+		
+/*
+		dFloat m_force;
+		
+		dFloat m_jMinvJt;
+		dFloat m_invJMinvJt;
+
+		dFloat m_deltaAccel;
+		dFloat m_restitution;
+		dFloat m_penetration;
+		
+		dFloat m_penetrationStiffness;
+
+		
+		dFloat m_maxImpact;
+*/
+	} NewtonIKJacobianMatrixElement;
+
+
 	// Newton callback functions
 	typedef void* (*NewtonAllocMemory) (int sizeInBytes);
 	typedef void (*NewtonFreeMemory) (void* const ptr, int sizeInBytes);
@@ -1148,8 +1178,9 @@ extern "C" {
 	NEWTON_API void NewtonUserJointSetRowStiffness (const NewtonJoint* const joint, dFloat stiffness);
 	NEWTON_API int NewtonUserJoinRowsCount (const NewtonJoint* const joint);
 	NEWTON_API void NewtonUserJointGetGeneralRow (const NewtonJoint* const joint, int index, dFloat* const jacobian0, dFloat* const jacobian1);
-	
 	NEWTON_API dFloat NewtonUserJointGetRowForce (const NewtonJoint* const joint, int row);
+	NEWTON_API int NewtonUserJointGetIKJacobians (const NewtonJoint* const joint, dFloat timestep, NewtonIKJacobianMatrixElement* const jacobians);
+
 
 	// **********************************************************************************************
 	//

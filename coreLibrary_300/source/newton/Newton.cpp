@@ -7219,6 +7219,14 @@ void NewtonUserJointSetFeedbackCollectorCallback(const NewtonJoint* const joint,
 }
 
 
+int NewtonUserJointGetIKJacobians (const NewtonJoint* const joint, dFloat timestep, NewtonIKJacobianMatrixElement* const jacobians)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
+	return userJoint->GetIKJacobians (timestep, jacobians);
+}
+
+
 /*! @} */ // end of JointUser
 
 /*! @defgroup JointCommon JointCommon

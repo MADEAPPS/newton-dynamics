@@ -430,7 +430,7 @@ NewtonCollisionSetMode(legShape, 0);
 			rightLegMatrix.m_posit.m_z += 0.20f;
 			NewtonBody* const rightLegBody = CreateSimpleSolid(scene, legMesh, legMass, rightLegMatrix, legShape, m_material);
 			dCustomActiveCharacterJoint* const joint = ConnectBodyParts(rightLegBody, pelvisBody);
-			controller->AddBone (joint->GetJacobianCalculator(), controller->GetRoot());
+			controller->AddBone (joint, controller->GetRoot());
 		}
 
 		{

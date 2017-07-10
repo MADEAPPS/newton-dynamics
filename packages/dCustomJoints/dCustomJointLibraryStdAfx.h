@@ -63,7 +63,6 @@
 #include <dTimeTracker.h>
 #include <dMathDefines.h>
 #include <dLinearAlgebra.h>
-#include <dInverseKinematic.h>
 
 #endif
 

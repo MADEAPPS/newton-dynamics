@@ -355,7 +355,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dContainers\dCRC.cpp" />
-    <ClCompile Include="..\..\dContainers\dInverseKinematic.cpp" />
     <ClCompile Include="..\..\dContainers\dRefCounter.cpp" />
     <ClCompile Include="..\..\dContainers\dString.cpp" />
     <ClCompile Include="..\..\dContainers\dTree.cpp" />
@@ -368,7 +367,6 @@
     <ClInclude Include="..\..\dContainers\dContainersStdAfx.h" />
     <ClInclude Include="..\..\dContainers\dCRC.h" />
     <ClInclude Include="..\..\dContainers\dHeap.h" />
-    <ClInclude Include="..\..\dContainers\dInverseKinematic.h" />
     <ClInclude Include="..\..\dContainers\dList.h" />
     <ClInclude Include="..\..\dContainers\dRefCounter.h" />
     <ClInclude Include="..\..\dContainers\dRtti.h" />

@@ -74,6 +74,8 @@ class NewtonUserJoint: public dgUserConstraint
 
 	void SetUpdateFeedbackFunction (NewtonUserBilateralCallback getFeedback);
 
+	dgInt32 GetIKJacobians (dFloat timestep, NewtonIKJacobianMatrixElement* const jacobians);
+
 	private:
 	NewtonUserBilateralCallback m_jacobianFnt;
 	NewtonUserBilateralGetInfoCallback m_getInfoCallback;

@@ -42,6 +42,14 @@ class dSpatialVector
 		}
 	}
 
+	inline dSpatialVector(const dFloat* const ptr)
+	{
+		for (int i = 0; i < 6; i++) {
+			m_d[i] = ptr[i];
+		}
+	}
+
+
 	inline dSpatialVector(const dVector& low, const dVector& high)
 	{
 		m_d[0] = low[0];

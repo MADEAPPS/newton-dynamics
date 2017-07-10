@@ -338,12 +338,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		// transform the entire contraction to its location
 		dMatrix worldMatrix (rootEntity->GetCurrentMatrix() * location);
 		NewtonBodySetMatrixRecursive (rootBone, &worldMatrix[0][0]);
-
-		// wrap the skeleton in a newton skeleton for exact accuracy
-		dAssert (0);
-		//controller->MakeNewtonSkeleton();
 	}
-
 
 	int m_material;
 };

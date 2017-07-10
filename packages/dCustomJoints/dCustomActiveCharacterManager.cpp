@@ -18,7 +18,6 @@ IMPLEMENT_CUSTOM_JOINT(dCustomActiveCharacterJoint);
 
 dCustomActiveCharacterJoint::dCustomActiveCharacterJoint(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent)
 	:dCustomBallAndSocket(childPinAndPivotFrame, child, parent)
-	,m_jacobian(this)
 	,m_rotationOffset(childPinAndPivotFrame * parentPinAndPivotFrame.Inverse())
 {
 	SetConeAngle(0.0f);
@@ -32,17 +31,9 @@ dCustomActiveCharacterJoint::~dCustomActiveCharacterJoint()
 {
 }
 
-dInverseKinematicJacobian* dCustomActiveCharacterJoint::GetJacobianCalculator()
-{
-	return &m_jacobian;
-}
-
-
 dCustomActiveCharacterJoint::dCustomActiveCharacterJoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:dCustomBallAndSocket(child, parent, callback, userData)
-	,m_jacobian(this)
 {
-	dAssert (0);
 	callback(userData, &m_rotationOffset, sizeof (dMatrix));
 	callback(userData, &m_minTwistAngle, sizeof (dFloat));
 	callback(userData, &m_maxTwistAngle, sizeof (dFloat));
@@ -93,6 +84,10 @@ void dCustomActiveCharacterJoint::GetTwistAngle(dFloat& minAngle, dFloat& maxAng
 	maxAngle = m_maxTwistAngle;
 }
 
+int dCustomActiveCharacterJoint::GetDOF () const
+{
+	return 6;
+}
 
 void dCustomActiveCharacterJoint::GetInfo(NewtonJointRecord* const info) const
 {
@@ -246,7 +241,7 @@ void dCustomActiveCharacterController::Init(NewtonBody* const rootBone)
 	//NewtonWorld* const world = manager->GetWorld();
 
 	m_body = rootBone;
-	m_kinemativSolver = new dInverseKinematicSolver (m_body);
+	m_kinemativSolver = new dCustomIKSolver (m_body);
 /*
 	m_userData = userData;
 	m_boneCount = 0;
@@ -288,15 +283,15 @@ void dCustomActiveCharacterController::PostUpdate(dFloat timestep, int threadInd
 
 
 
-dInverseKinematicSolver::dJoint* dCustomActiveCharacterController::GetRoot() const
+dCustomIKSolver::dJoint* dCustomActiveCharacterController::GetRoot() const
 {
 	return m_kinemativSolver ? m_kinemativSolver->GetRoot() : NULL;
 }
 
-dInverseKinematicSolver::dJoint* dCustomActiveCharacterController::AddBone(dInverseKinematicSolver::dJacobian* const jacobian, dInverseKinematicSolver::dJoint* const parentBone)
+dCustomIKSolver::dJoint* dCustomActiveCharacterController::AddBone(dCustomJoint* const childJoint, dCustomIKSolver::dJoint* const parentBone)
 {
 	dAssert (m_kinemativSolver);
-	return m_kinemativSolver->AddChild(jacobian, parentBone);
+	return m_kinemativSolver->AddChild(childJoint, parentBone);
 }
 
 void dCustomActiveCharacterController::Finalize ()

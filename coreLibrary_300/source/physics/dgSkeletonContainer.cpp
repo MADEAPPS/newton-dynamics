@@ -113,6 +113,7 @@ class dgSkeletonContainer::dgGraph
 		}
 	}
 
+/*
 	DG_INLINE void Factorize()
 	{
 		const dgSpatialMatrix& bodyMass = m_data.m_body.m_mass;
@@ -137,6 +138,7 @@ class dgSkeletonContainer::dgGraph
 			CalculateJacobianBlock();
 		}
 	}
+*/
 
 	DG_INLINE void CalculateInertiaMatrix()
 	{
@@ -187,6 +189,7 @@ class dgSkeletonContainer::dgGraph
 	DG_INLINE dgInt32 Factorize(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow)
 	{
 		dgSpatialMatrix& bodyMass = m_data.m_body.m_mass;
+		dgSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
 
 		bodyMass = dgSpatialMatrix(dgFloat32(0.0f));
         if (m_body->GetInvMass().m_w != dgFloat32 (0.0f)) {
@@ -219,7 +222,26 @@ class dgSkeletonContainer::dgGraph
 			boundedDof += jointInfo->m_pairCount - count;
 			GetJacobians(jointInfo, matrixRow);
 		}
-		Factorize();
+
+		//Factorize();
+		if (m_body->GetInvMass().m_w != dgFloat32(0.0f)) {
+			for (dgGraph* child = m_child; child; child = child->m_sibling) {
+				CalculateBodyDiagonal(child);
+			}
+			bodyInvMass = bodyMass.Inverse(6);
+		} else {
+			bodyInvMass = dgSpatialMatrix(dgFloat32(0.0f));
+		}
+
+		if (m_joint) {
+			dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
+			dgAssert(m_parent);
+			for (dgInt32 i = 0; i < m_dof; i++) {
+				bodyJt[i] = bodyInvMass.VectorTimeMatrix(bodyJt[i]);
+			}
+			CalculateJointDiagonal();
+			CalculateJacobianBlock();
+		}
 		return boundedDof;
 	}
 
