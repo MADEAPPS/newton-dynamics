@@ -30,6 +30,7 @@
 #include "dgCollisionCone.h"
 #include "dgCollisionScene.h"
 #include "dgCollisionSphere.h"
+#include "dgInverseDynamics.h"
 #include "dgCollisionCapsule.h"
 #include "dgBroadPhaseDefault.h"
 #include "dgCollisionInstance.h"
@@ -205,6 +206,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	,dgBodyMaterialList(allocator)
 	,dgBodyCollisionList(allocator)
 	,dgSkeletonList(allocator)
+	,dgInverseDynamicsList(allocator)
 	,dgActiveContacts(allocator) 
 	,dgWorldDynamicUpdate()
 	,dgMutexThread("newtonSyncThread", DG_MUTEX_THREAD_ID, stackSize)
@@ -317,12 +319,6 @@ dgWorld::~dgWorld()
 	dgAsyncThread::Terminate();
 	dgMutexThread::Terminate();
 
-	dgSkeletonList::Iterator iter (*this);
-	for (iter.Begin(); iter; iter ++) {
-		dgSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
-		delete skeleton;
-	}
-
 	m_preListener.RemoveAll();
 	m_postListener.RemoveAll();
 
@@ -333,6 +329,43 @@ dgWorld::~dgWorld()
 
 	delete m_broadPhase;
 }
+
+
+void dgWorld::DestroyAllBodies()
+{
+	dgBodyMasterList& me = *this;
+
+	Sync();
+
+	dgInverseDynamicsList& ikList = *this;
+	for (dgInverseDynamicsList::dgListNode* ptr = ikList.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		delete ptr->GetInfo();
+	}
+
+	dgSkeletonList::Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) {
+		dgSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
+		delete skeleton;
+	}
+
+	while (m_disableBodies.GetRoot()) {
+		dgBody* const body = m_disableBodies.GetRoot()->GetKey();
+		BodyEnableSimulation(body);
+	}
+
+	dgAssert(dgBodyMasterList::GetFirst()->GetInfo().GetBody() == m_sentinelBody);
+	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node;) {
+		dgBody* const body = node->GetInfo().GetBody();
+		node = node->GetNext();
+		DestroyBody(body);
+	}
+
+	dgAssert(me.GetFirst()->GetInfo().GetCount() == 0);
+	dgAssert(dgBodyCollisionList::GetCount() == 0);
+}
+
+
+
 
 void dgWorld::SetThreadsCount (dgInt32 count)
 {
@@ -430,28 +463,6 @@ void dgWorld::RemoveAllGroupID()
 	}
 	m_bodyGroupID = 0;
 	m_defualtBodyGroupID = CreateBodyGroupID();
-}
-
-void dgWorld::DestroyAllBodies ()
-{
-	dgBodyMasterList& me = *this;
-
-	Sync ();
-
-	while (m_disableBodies.GetRoot()) {
-		dgBody* const body = m_disableBodies.GetRoot()->GetKey();
-		BodyEnableSimulation(body);
-	}
-
-	dgAssert (dgBodyMasterList::GetFirst()->GetInfo().GetBody() == m_sentinelBody);
-	for (dgBodyMasterList::dgListNode* node = me.GetFirst()->GetNext(); node; ) {
-		dgBody* const body = node->GetInfo().GetBody();
-		node = node->GetNext();
-		DestroyBody (body);
-	}
-
-	dgAssert (me.GetFirst()->GetInfo().GetCount() == 0);
-	dgAssert (dgBodyCollisionList::GetCount() == 0);
 }
 
 
@@ -1089,6 +1100,19 @@ void dgWorld::DestroyAggregate(dgBroadPhaseAggregate* const aggregate) const
 	m_broadPhase->DestroyAggregate((dgBroadPhaseAggregate*) aggregate);
 }
 
+dgInverseDynamics* dgWorld::CreateInverseDynamics()
+{
+	dgInverseDynamicsList& list = *this;
+	dgInverseDynamics* const ik = new (m_allocator) dgInverseDynamics(this);
+	ik->m_reference = list.Append (ik);
+	return ik;
+}
+
+void dgWorld::DestroyInverseDynamics(dgInverseDynamics* const inverseDynamics)
+{
+	dgAssert (0);
+}
+
 
 void dgDeadJoints::DestroyJoint(dgConstraint* const joint)
 {
@@ -1198,19 +1222,19 @@ void dgWorld::UpdateSkeletons()
 
 		const dgInt32 poolSize = 1024 * 4;
 		dgBilateralConstraint* loopJoints[64];
-		dgSkeletonContainer::dgGraph* queuePool[poolSize];
+		dgSkeletonContainer::dgNode* queuePool[poolSize];
 
 		m_dynamicsLru = m_dynamicsLru + 1;
 		lru = m_dynamicsLru;
 		for (dgInt32 i = 0; i < jointCount; i++) {
 			dgBilateralConstraint* const constraint = jointList[i];
 			if (constraint->m_dynamicsLru != lru) {
-				dgQueue<dgSkeletonContainer::dgGraph*> queue(queuePool, poolSize);
+				dgQueue<dgSkeletonContainer::dgNode*> queue(queuePool, poolSize);
 
 				dgInt32 loopCount = 0;
 				dgDynamicBody* const rootBody = (dgDynamicBody*)((constraint->GetBody0()->GetInvMass().m_w < constraint->GetBody1()->GetInvMass().m_w) ? constraint->GetBody0() : constraint->GetBody1());
 				dgSkeletonContainer* const skeleton = CreateNewtonSkeletonContainer(rootBody);
-				dgSkeletonContainer::dgGraph* const rootNode = skeleton->GetRoot();
+				dgSkeletonContainer::dgNode* const rootNode = skeleton->GetRoot();
 				if (rootBody->GetInvMass().m_w == dgFloat32 (0.0f)) {
 					if (constraint->IsBilateral() && (constraint->m_dynamicsLru != lru)) {
 						constraint->m_dynamicsLru = lru;
@@ -1218,7 +1242,7 @@ void dgWorld::UpdateSkeletons()
 						if (!constraint->m_solverModel) {
 							if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dgFloat32(0.0f))) {
 								childBody->m_dynamicsLru = lru;
-								dgSkeletonContainer::dgGraph* const node = skeleton->AddChild((dgBilateralConstraint*)constraint, rootNode);
+								dgSkeletonContainer::dgNode* const node = skeleton->AddChild((dgBilateralConstraint*)constraint, rootNode);
 								queue.Insert(node);
 							}
 						}
@@ -1238,7 +1262,7 @@ void dgWorld::UpdateSkeletons()
 					queue.Reset();
 
 					for (dgInt32 j = 0; j < count; j++) {
-						dgSkeletonContainer::dgGraph* const parentNode = queue.m_pool[index];
+						dgSkeletonContainer::dgNode* const parentNode = queue.m_pool[index];
 						dgDynamicBody* const parentBody = skeleton->GetBody(parentNode);
 
 						for (dgBodyMasterListRow::dgListNode* jointNode1 = parentBody->m_masterNode->GetInfo().GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) {
@@ -1251,7 +1275,7 @@ void dgWorld::UpdateSkeletons()
 								if (!constraint1->m_solverModel) {
 									if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dgFloat32(0.0f))) {
 										childBody->m_dynamicsLru = lru;
-										dgSkeletonContainer::dgGraph* const childNode = skeleton->AddChild((dgBilateralConstraint*)constraint1, parentNode);
+										dgSkeletonContainer::dgNode* const childNode = skeleton->AddChild((dgBilateralConstraint*)constraint1, parentNode);
 										queue.Insert(childNode);
 									} else if (loopCount < (sizeof (loopJoints) / sizeof(loopJoints[0]))) {
 										loopJoints[loopCount] = (dgBilateralConstraint*)constraint1;

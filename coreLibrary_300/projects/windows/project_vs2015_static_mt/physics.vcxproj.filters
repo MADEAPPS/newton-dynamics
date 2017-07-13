@@ -166,6 +166,9 @@
     <ClCompile Include="..\..\..\source\physics\dgCollisionMassSpringDamperSystem.cpp">
       <Filter>collision</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\physics\dgInverseDynamics.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\physics\dgBilateralConstraint.h">
@@ -314,6 +317,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\physics\dgCollisionMassSpringDamperSystem.h">
       <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\physics\dgInverseDynamics.h">
+      <Filter>systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

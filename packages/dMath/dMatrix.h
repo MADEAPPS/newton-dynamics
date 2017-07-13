@@ -141,5 +141,87 @@ dMatrix dPitchMatrix(dFloat ang);
 dMatrix dGrammSchmidt(const dVector& dir);
 
 
+class dSpatialMatrix
+{
+	public:
+	inline dSpatialMatrix()
+	{
+	}
+
+	inline dSpatialMatrix(dFloat val)
+	{
+		for (int i = 0; i < 6; i++) {
+			m_rows[i] = dSpatialVector(val);
+		}
+	}
+
+	inline dSpatialVector& operator[] (int i)
+	{
+		dAssert(i < 6);
+		dAssert(i >= 0);
+		return m_rows[i];
+	}
+
+	inline const dSpatialVector& operator[] (int i) const
+	{
+		dAssert(i < 6);
+		dAssert(i >= 0);
+		return m_rows[i];
+	}
+
+	inline dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian) const
+	{
+		dSpatialVector tmp(m_rows[0].Scale(jacobian[0]));
+		for (int i = 1; i < 6; i++) {
+			tmp = tmp + m_rows[i].Scale(jacobian[i]);
+		}
+		return tmp;
+	}
+
+	inline dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian, int dof) const
+	{
+		dSpatialVector tmp(0.0f);
+		for (int i = 0; i < dof; i++) {
+			tmp = tmp + m_rows[i].Scale(jacobian[i]);
+		}
+		return tmp;
+	}
+
+	inline dSpatialMatrix Inverse(int rows) const
+	{
+		dSpatialMatrix copy(*this);
+		dSpatialMatrix inverse(0.0f);
+		for (int i = 0; i < rows; i++) {
+			inverse[i][i] = dFloat(1.0f);
+		}
+
+		for (int i = 0; i < rows; i++) {
+			dFloat val = copy[i][i];
+			dAssert(dAbs(val) > 1.0e-12f);
+			dFloat den = 1.0f / val;
+
+			copy[i] = copy[i].Scale(den);
+			copy[i][i] = 1.0f;
+			inverse[i] = inverse[i].Scale(den);
+
+			for (int j = 0; j < i; j++) {
+				dFloat pivot = -copy[j][i];
+				copy[j] = copy[j] + copy[i].Scale(pivot);
+				inverse[j] = inverse[j] + inverse[i].Scale(pivot);
+			}
+
+			for (int j = i + 1; j < rows; j++) {
+				dFloat pivot = -copy[j][i];
+				copy[j] = copy[j] + copy[i].Scale(pivot);
+				inverse[j] = inverse[j] + inverse[i].Scale(pivot);
+			}
+		}
+		return inverse;
+	}
+
+	dSpatialVector m_rows[6];
+};
+
+
 #endif
 

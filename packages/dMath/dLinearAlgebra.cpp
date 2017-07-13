@@ -570,7 +570,7 @@ void dComplentaritySolver::dFrictionLessContactJoint::SetContacts (int count, dC
 {
 	dFloat tol = 5.0e-3f;
 	count = ReduceContacts(count, contacts, tol);
-	while (count > D_MAX_PARAM_INFO_SIZE) {
+	while (count > D_MAX_PRAM_INFO_SIZE) {
 		tol *= 2.0f; 
 		count = ReduceContacts(count, contacts, tol);
 	}

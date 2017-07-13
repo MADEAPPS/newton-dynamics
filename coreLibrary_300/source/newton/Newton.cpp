@@ -23,6 +23,7 @@
 #include "Newton.h"
 #include "NewtonClass.h"
 
+
 #ifdef _NEWTON_BUILD_DLL
 	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
 		int main(int argc, char* argv[])
@@ -282,7 +283,7 @@ void NewtonSerializeScene(const NewtonWorld* const newtonWorld, NewtonOnBodySeri
 	NewtonSerializeCallback serializeCallback, void* const serializeHandle)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
+	Newton* const world = (Newton *) newtonWorld;
 	world->SerializeScene(bodyUserData, dgWorld::OnBodySerialize(bodyCallback), (dgSerialize) serializeCallback, serializeHandle);
 }
 
@@ -290,7 +291,7 @@ void NewtonDeserializeScene(const NewtonWorld* const newtonWorld, NewtonOnBodyDe
 							NewtonDeserializeCallback deserializeCallback, void* const serializeHandle)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
+	Newton* const world = (Newton *) newtonWorld;
 	world->DeserializeScene(bodyUserData, (dgWorld::OnBodyDeserialize)bodyCallback, (dgDeserialize) deserializeCallback, serializeHandle);
 }
 
@@ -318,7 +319,7 @@ void NewtonDeserializeFromFile (const NewtonWorld* const newtonWorld, const char
 NewtonBody* NewtonFindSerializedBody(const NewtonWorld* const newtonWorld, int bodySerializedID)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
+	Newton* const world = (Newton *) newtonWorld;
 	dgAssert (0);
 	return (NewtonBody*) world->FindBodyFromSerializedID(bodySerializedID);
 }
@@ -5164,6 +5165,59 @@ int NewtonJointIsActive(const NewtonJoint* const jointPtr)
 }
 
 
+NewtonInverseDynamics* NewtonCreateInverseDynamics(const NewtonWorld* const newtonWorld)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return (NewtonInverseDynamics*)world->CreateInverseDynamics();
+}
+
+void NewtonInverseDynamicsDestroy(NewtonInverseDynamics* const inverseDynamics)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*) inverseDynamics;
+	Newton* const world = (Newton*)ik->GetWorld();
+	world->DestroyInverseDynamics(ik);
+}
+
+void NewtonInverseDynamicsEndBuild (NewtonInverseDynamics* const inverseDynamics)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
+	ik->Finalize();
+}
+
+void NewtonInverseDynamicsUpdate (NewtonInverseDynamics* const inverseDynamics, dFloat timestep)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
+	ik->Update(timestep);
+
+}
+
+void* NewtonInverseDynamicsGetRoot(NewtonInverseDynamics* const inverseDynamics)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
+	return ik->GetRoot();
+}
+
+void* NewtonInverseDynamicsAddRoot(NewtonInverseDynamics* const inverseDynamics, NewtonBody* const root)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*) inverseDynamics;
+	return ik->AddRoot((dgDynamicBody*)root);
+}
+
+NEWTON_API void* NewtonInverseDynamicsAddChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode, NewtonJoint* const joint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*) inverseDynamics;
+	return ik->AddChild((dgBilateralConstraint*)joint, (dgInverseDynamics::dgNode*) parentNode);
+}
+
+
+
 /*!
   Return to number of contact in this contact joint.
 
@@ -7216,14 +7270,6 @@ void NewtonUserJointSetFeedbackCollectorCallback(const NewtonJoint* const joint,
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
 	return userJoint->SetUpdateFeedbackFunction (getFeedback);
-}
-
-
-int NewtonUserJointGetIKJacobians (const NewtonJoint* const joint, dFloat timestep, NewtonIKJacobianMatrixElement* const jacobians)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
-	return userJoint->GetIKJacobians (timestep, jacobians);
 }
 
 

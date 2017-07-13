@@ -19,22 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_SKELETON_CONTAINER_H__
-#define _DG_SKELETON_CONTAINER_H__
-
-#define DG_SKELETON_BASE_UNIQUE_ID	10
+#ifndef _DG_INVERESE_DYNAMINS_H_
+#define _DG_INVERESE_DYNAMINS_H_
 
 #include "dgConstraint.h"
 
 class dgDynamicBody;
 
-class dgSkeletonContainer
+class dgInverseDynamics
 {
 	public:
 	class dgNode;
 	class dgNodePair;
 	class dgForcePair;
 	class dgMatriData;
+	class dgJointInfo___;
 	class dgBodyJointMatrixDataPair;
 	class dgLoopingJoint
 	{
@@ -52,39 +51,41 @@ class dgSkeletonContainer
 	};
 
 	DG_CLASS_ALLOCATOR(allocator)
-	dgSkeletonContainer(dgWorld* const world, dgDynamicBody* const rootBody);
-	~dgSkeletonContainer();
+	dgInverseDynamics(dgWorld* const world);
+	~dgInverseDynamics();
 
 	dgWorld* GetWorld() const; 
-	dgInt32 GetId () const {return m_id;}
 	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
-	dgNode* AddChild (dgBilateralConstraint* const joint, dgNode* const parent);
+	
 	void RemoveLoopJoint(dgBilateralConstraint* const joint);  
-	void Finalize (dgInt32 loopJoints, dgBilateralConstraint** const loopJointArray);
+	void Finalize ();
 	
 	dgNode* GetRoot () const;
+	dgNode* AddRoot(dgDynamicBody* const rootBody);
+	dgNode* AddChild (dgBilateralConstraint* const joint, dgNode* const parent);
+
 	dgDynamicBody* GetBody(dgNode* const node) const;
 	dgBilateralConstraint* GetParentJoint(dgNode* const node) const;
 	dgNode* GetParent (dgNode* const node) const;
 	dgNode* GetFirstChild (dgNode* const parent) const;
 	dgNode* GetNextSiblingChild (dgNode* const sibling) const;
+
+	void Update (dgFloat32 timestep);
 	
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
-	DG_INLINE void CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const;
-	DG_INLINE void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
-	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
 
-	static void ResetUniqueId(dgInt32 id);
+	void Finalize (dgInt32 loopJoints, dgBilateralConstraint** const loopJointArray);
+	DG_INLINE void CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const;
 
 	dgNode* FindNode(dgDynamicBody* const node) const;
 	void SortGraph(dgNode* const root, dgInt32& index);
 		
 	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
 	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
-	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 
-	void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, dgJacobianMatrixElement* const matrixRow);
+	dgInt32 GetJacobianDerivatives(dgJointInfo___* const jointInfo, dgJacobianMatrixElement* const matrixRow) const;
+	dgInt32 GetJacobianDerivatives(dgContraintDescritor& constraintParamOut, dgJointInfo___* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgInt32 rowCount) const;
 	
 	DG_INLINE void CalculateBodyAccel (dgJacobian* const externalAccel, dgFloat32 timestep) const;
 	DG_INLINE void CalculateJointAccel(const dgJacobian* const externalAccel, dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
@@ -101,15 +102,12 @@ class dgSkeletonContainer
 	dgFloat32* m_massMatrix10;
 	dgFloat32* m_lowerTriangularMassMatrix11;
 	dgJacobianMatrixElement** m_rowArray;
+	dgInverseDynamicsList::dgListNode* m_reference;
 	dgList<dgDynamicBody*> m_loopingBodies;
 	dgList<dgLoopingJoint> m_loopingJoints;
-	dgInt32 m_id;
-	dgInt32 m_lru;
 	dgInt16 m_nodeCount;
 	dgInt16 m_rowCount;
 	dgInt16 m_auxiliaryRowCount;
-	static dgInt32 m_uniqueID;
-	static dgInt32 m_lruMarker;
 
 	friend class dgWorld;
 	friend class dgWorldDynamicUpdate;

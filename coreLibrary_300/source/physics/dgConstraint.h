@@ -234,6 +234,7 @@ class dgConstraint
 	friend class dgWorld;
 	friend class dgJacobianMemory;
 	friend class dgBodyMasterList;
+	friend class dgInverseDynamics;
 	friend class dgSkeletonContainer;
 	friend class dgWorldDynamicUpdate;
 	friend class dgParallelSolverJointAcceleration;

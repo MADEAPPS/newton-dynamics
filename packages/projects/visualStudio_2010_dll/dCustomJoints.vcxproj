@@ -339,7 +339,6 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
     <ClCompile Include="..\..\dCustomJoints\dCustomGear.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomHinge.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomHingeActuator.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomIK.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomInputManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomJointLibraryStdAfx.cpp">
@@ -377,7 +376,6 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
     <ClInclude Include="..\..\dCustomJoints\dCustomGear.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomHinge.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomHingeActuator.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomIK.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomInputManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomJointLibraryStdAfx.h" />

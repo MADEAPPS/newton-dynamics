@@ -83,73 +83,13 @@ NewtonUserJoint::~NewtonUserJoint ()
 	}
 }
 
+
 dgUnsigned32 NewtonUserJoint::JacobianDerivative (dgContraintDescritor& params)
 {
 	m_rows = 0;
 	m_param = &params;
 	m_jacobianFnt ((NewtonJoint*)this, params.m_timestep, params.m_threadIndex);
 	return dgUnsigned32 (m_rows);
-}
-
-dgInt32 NewtonUserJoint::GetIKJacobians (dFloat timestep, NewtonIKJacobianMatrixElement* const jacobians)
-{
-	dgContraintDescritor constraintParamOut;
-
-	dgInt32 dof = dgInt32(m_maxDOF);
-	dgAssert(dof <= DG_CONSTRAINT_MAX_ROWS);
-	for (dgInt32 i = 0; i < dof; i++) {
-		constraintParamOut.m_forceBounds[i].m_low = DG_MIN_BOUND;
-		constraintParamOut.m_forceBounds[i].m_upper = DG_MAX_BOUND;
-		constraintParamOut.m_forceBounds[i].m_jointForce = NULL;
-		constraintParamOut.m_forceBounds[i].m_normalIndex = DG_BILATERAL_CONSTRAINT;
-	}
-
-	dgAssert(m_body0);
-	dgAssert(m_body1);
-
-	m_rows = 0;
-	constraintParamOut.m_threadIndex = 0;
-	constraintParamOut.m_timestep = timestep;
-	constraintParamOut.m_invTimestep = dgFloat32 (1.0f) / timestep;
-
-	m_param = &constraintParamOut;
-	m_jacobianFnt((NewtonJoint*)this, timestep, 0);
-
-	dof = m_rows;
-
-	for (dgInt32 i = 0; i < dof; i++) {
-		NewtonIKJacobianMatrixElement* const row = &jacobians[i];
-		dgAssert(constraintParamOut.m_forceBounds[i].m_jointForce);
-		row->m_Jt01[0] = constraintParamOut.m_jacobian[i].m_jacobianM0.m_linear[0];
-		row->m_Jt01[1] = constraintParamOut.m_jacobian[i].m_jacobianM0.m_linear[1];
-		row->m_Jt01[2] = constraintParamOut.m_jacobian[i].m_jacobianM0.m_linear[2];
-		row->m_Jt01[3] = constraintParamOut.m_jacobian[i].m_jacobianM0.m_angular[0];
-		row->m_Jt01[4] = constraintParamOut.m_jacobian[i].m_jacobianM0.m_angular[1];
-		row->m_Jt01[5] = constraintParamOut.m_jacobian[i].m_jacobianM0.m_angular[2];
-
-		row->m_Jt10[0] = constraintParamOut.m_jacobian[i].m_jacobianM1.m_linear[0];
-		row->m_Jt10[1] = constraintParamOut.m_jacobian[i].m_jacobianM1.m_linear[1];
-		row->m_Jt10[2] = constraintParamOut.m_jacobian[i].m_jacobianM1.m_linear[2];
-		row->m_Jt10[3] = constraintParamOut.m_jacobian[i].m_jacobianM1.m_angular[0];
-		row->m_Jt10[4] = constraintParamOut.m_jacobian[i].m_jacobianM1.m_angular[1];
-		row->m_Jt10[5] = constraintParamOut.m_jacobian[i].m_jacobianM1.m_angular[2];
-
-		row->m_coordenateAccel = constraintParamOut.m_jointAccel[i];
-		row->m_lowerBoundFrictionCoefficent = constraintParamOut.m_forceBounds[i].m_low;
-		row->m_upperBoundFrictionCoefficent = constraintParamOut.m_forceBounds[i].m_upper;
-		row->m_stiffness = DG_PSD_DAMP_TOL * (dgFloat32(1.0f) - constraintParamOut.m_jointStiffness[i]) + dgFloat32(1.0e-6f);
-		dgAssert(row->m_stiffness >= dgFloat32(0.0f));
-		dgAssert(constraintParamOut.m_jointStiffness[i] <= dgFloat32(1.0f));
-		dgAssert((dgFloat32(1.0f) - constraintParamOut.m_jointStiffness[i]) >= dgFloat32(0.0f));
-
-		row->m_diagDamp = dgFloat32(0.0f);
-		//row->m_restitution = constraintParamOut.m_restitution[i];
-		//row->m_penetration = constraintParamOut.m_penetration[i];
-		//row->m_penetrationStiffness = constraintParamOut.m_penetrationStiffness[i];
-		//row->m_jointFeebackForce = constraintParamOut.m_forceBounds[i].m_jointForce;
-	}
-
-	return m_rows;
 }
 
 void NewtonUserJoint::Serialize (dgSerialize serializeCallback, void* const userData)

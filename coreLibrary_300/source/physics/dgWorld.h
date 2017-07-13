@@ -47,6 +47,7 @@ class dgCollisionPoint;
 class dgUserConstraint;
 class dgBallConstraint;
 class dgHingeConstraint;
+class dgInverseDynamics;
 class dgUserMeshCreation;
 class dgSlidingConstraint;
 class dgCollisionInstance;
@@ -55,7 +56,6 @@ class dgUpVectorConstraint;
 class dgUniversalConstraint;
 class dgCorkscrewConstraint;
 class dgCollisionDeformableMesh;
-
 
 class dgBodyCollisionList: public dgTree<const dgCollision*, dgUnsigned32>
 {
@@ -84,6 +84,15 @@ class dgSkeletonList: public dgTree<dgSkeletonContainer*, dgInt32>
 	{
 	}
 	bool m_skelListIsDirty;
+};
+
+class dgInverseDynamicsList: public dgList<dgInverseDynamics*>
+{
+	public:
+	dgInverseDynamicsList(dgMemoryAllocator* const allocator)
+		:dgList<dgInverseDynamics*>(allocator)
+	{
+	}
 };
 
 
@@ -150,6 +159,7 @@ class dgWorld
 	,public dgBodyMaterialList
 	,public dgBodyCollisionList
 	,public dgSkeletonList
+	,public dgInverseDynamicsList
 	,public dgActiveContacts 
 	,public dgWorldDynamicUpdate
 	,public dgMutexThread
@@ -328,6 +338,9 @@ class dgWorld
 
 	dgBroadPhaseAggregate* CreateAggreGate() const; 
 	void DestroyAggregate(dgBroadPhaseAggregate* const aggregate) const; 
+
+	dgInverseDynamics* CreateInverseDynamics();
+	void DestroyInverseDynamics(dgInverseDynamics* const inverseDynamics);
 
 	void SetGetTimeInMicrosenconds (OnGetTimeInMicrosenconds callback);
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);

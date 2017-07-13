@@ -289,6 +289,7 @@
     <ClCompile Include="..\..\..\source\physics\dgCorkscrewConstraint.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgDynamicBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgHingeConstraint.cpp" />
+    <ClCompile Include="..\..\..\source\physics\dgInverseDynamics.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgKinematicBody.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgSkeletonContainer.cpp" />
     <ClCompile Include="..\..\..\source\physics\dgSlidingConstraint.cpp" />
@@ -352,6 +353,7 @@
     <ClInclude Include="..\..\..\source\physics\dgCorkscrewConstraint.h" />
     <ClInclude Include="..\..\..\source\physics\dgDynamicBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgHingeConstraint.h" />
+    <ClInclude Include="..\..\..\source\physics\dgInverseDynamics.h" />
     <ClInclude Include="..\..\..\source\physics\dgKinematicBody.h" />
     <ClInclude Include="..\..\..\source\physics\dgSkeletonContainer.h" />
     <ClInclude Include="..\..\..\source\physics\dgSlidingConstraint.h" />

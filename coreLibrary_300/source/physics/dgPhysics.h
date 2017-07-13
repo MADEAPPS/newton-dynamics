@@ -39,6 +39,7 @@
 #include "dgBodyMasterList.h"
 #include "dgUserConstraint.h"
 #include "dgBallConstraint.h"
+#include "dgInverseDynamics.h"
 #include "dgHingeConstraint.h"
 #include "dgSkeletonContainer.h"
 #include "dgCollisionInstance.h"

@@ -230,18 +230,20 @@ dCustomActiveCharacterController::dCustomActiveCharacterController()
 dCustomActiveCharacterController::~dCustomActiveCharacterController()
 {
 	if (m_kinemativSolver) {
-		delete m_kinemativSolver;
+		NewtonInverseDynamicsDestroy (m_kinemativSolver);
 	}
 }
 
 
 void dCustomActiveCharacterController::Init(NewtonBody* const rootBone)
 {
-	//dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
-	//NewtonWorld* const world = manager->GetWorld();
+	dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
+	NewtonWorld* const world = manager->GetWorld();
 
 	m_body = rootBone;
-	m_kinemativSolver = new dCustomIKSolver (m_body);
+	m_kinemativSolver = NewtonCreateInverseDynamics (world);
+	NewtonInverseDynamicsAddRoot (m_kinemativSolver, m_body);
+
 /*
 	m_userData = userData;
 	m_boneCount = 0;
@@ -283,21 +285,21 @@ void dCustomActiveCharacterController::PostUpdate(dFloat timestep, int threadInd
 
 
 
-dCustomIKSolver::dJoint* dCustomActiveCharacterController::GetRoot() const
+void* dCustomActiveCharacterController::GetRoot() const
 {
-	return m_kinemativSolver ? m_kinemativSolver->GetRoot() : NULL;
+	return m_kinemativSolver ? NewtonInverseDynamicsGetRoot (m_kinemativSolver) : NULL;
 }
 
-dCustomIKSolver::dJoint* dCustomActiveCharacterController::AddBone(dCustomJoint* const childJoint, dCustomIKSolver::dJoint* const parentBone)
+void* dCustomActiveCharacterController::AddBone(dCustomJoint* const childJoint, void* const parentBone)
 {
 	dAssert (m_kinemativSolver);
-	return m_kinemativSolver->AddChild(childJoint, parentBone);
+	return NewtonInverseDynamicsAddChildNode (m_kinemativSolver, parentBone, childJoint->GetJoint());
 }
 
 void dCustomActiveCharacterController::Finalize ()
 {
 	if (m_kinemativSolver) {
-		m_kinemativSolver->Finalize(0);
+		NewtonInverseDynamicsEndBuild (m_kinemativSolver);
 	}
 }
 
@@ -307,6 +309,6 @@ void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadInde
 	//	manager->OnPreUpdate(this, timestep, threadIndex);
 
 	if (m_kinemativSolver) {
-		m_kinemativSolver->UpdateJointAngles (timestep);
+		NewtonInverseDynamicsUpdate (m_kinemativSolver, timestep);
 	}
 }

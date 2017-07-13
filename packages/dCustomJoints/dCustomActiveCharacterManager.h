@@ -18,7 +18,6 @@
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomControllerManager.h"
 #include "dCustomBallAndSocket.h"
-#include "dCustomIK.h"
 
 #define DYNAMIC_RAGDOLL_PLUGIN_NAME	"__dynamicRagDollManager__"
 
@@ -156,8 +155,8 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	CUSTOM_JOINTS_API dCustomActiveCharacterController();
 	CUSTOM_JOINTS_API ~dCustomActiveCharacterController();
 
-	CUSTOM_JOINTS_API dCustomIKSolver::dJoint* GetRoot() const;
-	CUSTOM_JOINTS_API dCustomIKSolver::dJoint* AddBone(dCustomJoint* const childJoint, dCustomIKSolver::dJoint* const parentBone);
+	CUSTOM_JOINTS_API void* GetRoot() const;
+	CUSTOM_JOINTS_API void* AddBone(dCustomJoint* const childJoint, void* const parentBone);
 	CUSTOM_JOINTS_API virtual void Finalize ();
 	
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
@@ -166,7 +165,7 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	protected:
 
 	void Init(NewtonBody* const rootBone);
-	dCustomIKSolver* m_kinemativSolver;
+	NewtonInverseDynamics* m_kinemativSolver;
 	friend class dCustomActiveCharacterManager;
 };
 
