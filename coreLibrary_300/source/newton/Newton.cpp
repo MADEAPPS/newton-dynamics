@@ -5187,11 +5187,11 @@ void NewtonInverseDynamicsEndBuild (NewtonInverseDynamics* const inverseDynamics
 	ik->Finalize();
 }
 
-void NewtonInverseDynamicsUpdate (NewtonInverseDynamics* const inverseDynamics, dFloat timestep)
+void NewtonInverseDynamicsUpdate (NewtonInverseDynamics* const inverseDynamics, dFloat timestep, int threadIndex)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
-	ik->Update(timestep);
+	ik->Update(timestep, threadIndex);
 
 }
 

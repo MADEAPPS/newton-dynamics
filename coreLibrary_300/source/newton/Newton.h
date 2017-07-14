@@ -1023,7 +1023,7 @@ extern "C" {
 
 	NEWTON_API void NewtonInverseDynamicsEndBuild (NewtonInverseDynamics* const inverseDynamics);
 
-	NEWTON_API void NewtonInverseDynamicsUpdate (NewtonInverseDynamics* const inverseDynamics, dFloat timestep);
+	NEWTON_API void NewtonInverseDynamicsUpdate (NewtonInverseDynamics* const inverseDynamics, dFloat timestep, int threadIndex);
 
 	// **********************************************************************************************
 	//

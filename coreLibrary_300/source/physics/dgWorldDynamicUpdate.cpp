@@ -665,7 +665,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives (dgContraintDescritor& cons
 
 	body0->m_inCallback = true;
 	body1->m_inCallback = true;
-	dof = dgInt32(constraint->JacobianDerivative(constraintParamOut));
+	dof = constraint->JacobianDerivative(constraintParamOut);
 	body0->m_inCallback = false;
 	body1->m_inCallback = false;
 	

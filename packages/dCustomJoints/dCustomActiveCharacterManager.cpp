@@ -309,6 +309,6 @@ void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadInde
 	//	manager->OnPreUpdate(this, timestep, threadIndex);
 
 	if (m_kinemativSolver) {
-		NewtonInverseDynamicsUpdate (m_kinemativSolver, timestep);
+		NewtonInverseDynamicsUpdate (m_kinemativSolver, timestep, threadIndex);
 	}
 }

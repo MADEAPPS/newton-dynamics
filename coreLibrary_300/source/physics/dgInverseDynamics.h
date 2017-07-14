@@ -33,7 +33,7 @@ class dgInverseDynamics
 	class dgNodePair;
 	class dgForcePair;
 	class dgMatriData;
-	class dgJointInfo___;
+	class dgJointInfo;
 	class dgBodyJointMatrixDataPair;
 	class dgLoopingJoint
 	{
@@ -70,28 +70,26 @@ class dgInverseDynamics
 	dgNode* GetFirstChild (dgNode* const parent) const;
 	dgNode* GetNextSiblingChild (dgNode* const sibling) const;
 
-	void Update (dgFloat32 timestep);
+	void Update (dgFloat32 timestep, dgInt32 threadIndex);
 	
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
 
 	void Finalize (dgInt32 loopJoints, dgBilateralConstraint** const loopJointArray);
 	DG_INLINE void CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const;
+	DG_INLINE void CalculateJointAccel(const dgJacobian* const externalAccel, dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
 
 	dgNode* FindNode(dgDynamicBody* const node) const;
 	void SortGraph(dgNode* const root, dgInt32& index);
 		
 	void InitMassMatrix (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer);
-	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
 
-	dgInt32 GetJacobianDerivatives(dgJointInfo___* const jointInfo, dgJacobianMatrixElement* const matrixRow) const;
-	dgInt32 GetJacobianDerivatives(dgContraintDescritor& constraintParamOut, dgJointInfo___* const jointInfo, dgConstraint* const constraint, dgJacobianMatrixElement* const matrixRow, dgInt32 rowCount) const;
+	dgInt32 GetMemoryBufferSizeInBytes (const dgJointInfo* const jointInfoArray, const dgJacobianMatrixElement* const matrixRow) const;
+	dgInt32 GetJacobianDerivatives(dgJointInfo* const jointInfo, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep, dgInt32 threadIndex) const;
 	
-	DG_INLINE void CalculateBodyAccel (dgJacobian* const externalAccel, dgFloat32 timestep) const;
-	DG_INLINE void CalculateJointAccel(const dgJacobian* const externalAccel, dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
-	void UpdateVelocity (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force, dgJacobian* const externalAccel, dgFloat32 timestep) const;
-	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force, dgJacobian* const externalAccel, dgFloat32 timestep) const;
-	void UpdateForces (dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep);
+	void CalculateExternalForces (dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
+	void CalculateLoopAndExternalForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
+	void CalculateMotorsAccelerations (const dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow) const;
 
 	dgWorld* m_world;
 	dgNode* m_skeleton;

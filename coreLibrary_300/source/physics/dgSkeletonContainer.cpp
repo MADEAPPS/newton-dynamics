@@ -850,9 +850,10 @@ DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, co
 		dgForcePair& f = force[i];
 		const dgForcePair& a = accel[i];
 		f.m_body = a.m_body;
-		for (dgInt32 j = 0; j < node->m_dof; j ++) {
-			f.m_joint[j] = a.m_joint[j]; 
-		}
+		f.m_joint = a.m_joint; 
+		//for (dgInt32 j = 0; j < node->m_dof; j ++) {
+		//	f.m_joint[j] = a.m_joint[j]; 
+		//}
 		for (dgNode* child = node->m_child; child; child = child->m_sibling) {
 			dgAssert(child->m_joint);
 			dgAssert(child->m_parent->m_index == i);
