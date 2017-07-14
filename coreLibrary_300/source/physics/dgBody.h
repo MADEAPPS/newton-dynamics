@@ -289,6 +289,7 @@ class dgBody
 	friend class dgBodyMasterList;
 	friend class dgCollisionScene;
 	friend class dgCollisionConvex;
+	friend class dgInverseDynamics;
 	friend class dgCollisionCompound;
 	friend class dgCollisionUserMesh;
 	friend class dgBodyMasterListRow;
