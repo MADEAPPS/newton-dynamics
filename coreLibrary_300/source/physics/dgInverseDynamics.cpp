@@ -111,8 +111,6 @@ class dgInverseDynamics::dgNode
 
 	DG_INLINE ~dgNode()
 	{
-		m_body->SetSkeleton(NULL);
-
 		dgNode* next;
 		for (dgNode* ptr = m_child; ptr; ptr = next) {
 			next = ptr->m_sibling;
@@ -411,10 +409,6 @@ dgInverseDynamics::~dgInverseDynamics()
 		entry.m_joint->m_isInSkeleton = false;
 	}
 	m_loopingJoints.RemoveAll();
-
-	for (dgInt32 i = 0; i < m_nodeCount - 1; i ++) {
-		m_nodesOrder[i]->m_joint->m_isInSkeleton = false;
-	}
 
 	dgMemoryAllocator* const allocator = m_world->GetAllocator();
 	if (m_nodesOrder) {
@@ -1371,6 +1365,7 @@ void dgInverseDynamics::CalculateMotorsAccelerations (const dgJacobian* const ex
 
 void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
 {
+return;
 	dgJointInfo* const jointInfoArray = dgAlloca (dgJointInfo, m_nodeCount + m_loopingBodies.GetCount());
 	dgJacobianMatrixElement* const matrixRow = dgAlloca (dgJacobianMatrixElement, 6 * (m_nodeCount + m_loopingBodies.GetCount()));
 

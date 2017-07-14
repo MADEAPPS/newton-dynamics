@@ -1110,7 +1110,12 @@ dgInverseDynamics* dgWorld::CreateInverseDynamics()
 
 void dgWorld::DestroyInverseDynamics(dgInverseDynamics* const inverseDynamics)
 {
-	dgAssert (0);
+	if (inverseDynamics->m_reference) {
+		dgInverseDynamicsList& ikList = *this;
+		ikList.Remove (inverseDynamics->m_reference);
+		inverseDynamics->m_reference = NULL;
+	}
+	delete inverseDynamics;
 }
 
 
