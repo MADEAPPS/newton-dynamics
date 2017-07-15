@@ -204,10 +204,9 @@ void dCustomActiveCharacterManager::Debug() const
 
 
 
-dCustomActiveCharacterController* dCustomActiveCharacterManager::CreateTransformController(NewtonBody* const rootBone)
+dCustomActiveCharacterController* dCustomActiveCharacterManager::CreateTransformController()
 {
 	dCustomActiveCharacterController* const controller = (dCustomActiveCharacterController*)CreateController();
-	controller->Init(rootBone);
 	return controller;
 }
 
@@ -235,22 +234,6 @@ dCustomActiveCharacterController::~dCustomActiveCharacterController()
 }
 
 
-void dCustomActiveCharacterController::Init(NewtonBody* const rootBone)
-{
-	dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
-	NewtonWorld* const world = manager->GetWorld();
-
-	m_body = rootBone;
-	m_kinemativSolver = NewtonCreateInverseDynamics (world);
-	NewtonInverseDynamicsAddRoot (m_kinemativSolver, m_body);
-
-/*
-	m_userData = userData;
-	m_boneCount = 0;
-	m_calculateLocalTransform = false;
-	m_collisionAggregate = NewtonCollisionAggregateCreate(world);
-*/
-}
 
 /*
 void dCustomActiveCharacterManager::OnUpdateTransform(const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const

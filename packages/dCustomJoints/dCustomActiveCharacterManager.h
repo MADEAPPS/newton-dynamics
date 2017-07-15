@@ -163,8 +163,6 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
 
 	protected:
-
-	void Init(NewtonBody* const rootBone);
 	NewtonInverseDynamics* m_kinemativSolver;
 	friend class dCustomActiveCharacterManager;
 };
@@ -178,7 +176,7 @@ class dCustomActiveCharacterManager: public dCustomControllerManager<dCustomActi
 
 	CUSTOM_JOINTS_API virtual void Debug () const;
 
-	CUSTOM_JOINTS_API virtual dCustomActiveCharacterController* CreateTransformController (NewtonBody* const rootBone);
+	CUSTOM_JOINTS_API virtual dCustomActiveCharacterController* CreateTransformController ();
 	
 
 //	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;

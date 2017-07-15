@@ -338,6 +338,113 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		// transform the entire contraction to its location
 		dMatrix worldMatrix (rootEntity->GetCurrentMatrix() * location);
 		NewtonBodySetMatrixRecursive (rootBone, &worldMatrix[0][0]);
+
+		PrintRagdoll (controller, "balancingGait.txt");
+	}
+
+
+	void PrintRagdoll (FILE* const file, dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const bone, int stackIndex, dTree<int, dCustomArticulatedTransformController::dSkeletonBone*>& filter)
+	{
+		filter.Insert(0, bone);
+		NewtonBody* const body = controller->GetBoneBody(bone);
+		DemoEntity* entity = (DemoEntity*)NewtonBodyGetUserData(body);
+
+		dFloat mass;
+		dFloat ixx;
+		dVector euler0;
+		dVector euler1;
+		NewtonCollisionInfoRecord collisionInfo;
+
+		dMatrix boneMatrix;
+		NewtonBodyGetMatrix(body, &boneMatrix[0][0]);
+		boneMatrix.GetEulerAngles(euler0, euler1);
+		
+		NewtonBodyGetMass(body, &mass, &ixx, &ixx, &ixx);
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+		NewtonCollisionGetInfo (collision, &collisionInfo);
+
+		fprintf (file, "node: %s\n", entity->GetName().GetStr());
+		fprintf (file, "  mass: %f\n", mass);
+		fprintf (file, "  position: %f %f %f\n", boneMatrix.m_posit.m_x, boneMatrix.m_posit.m_y, boneMatrix.m_posit.m_z);
+		fprintf (file, "  eulerAngles: %f %f %f\n", euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f);
+
+		switch (collisionInfo.m_collisionType) 
+		{
+			case SERIALIZE_ID_SPHERE:
+			{
+				fprintf(file, "  shapeType: sphere\n");
+				fprintf(file, "    radio: %f\n", collisionInfo.m_sphere.m_radio);
+				break;
+			}
+
+			case SERIALIZE_ID_CAPSULE:
+			{
+				fprintf (file, "  shapeType: capsule\n");
+				fprintf (file, "    radio0: %f\n", collisionInfo.m_capsule.m_radio0);
+				fprintf (file, "    radio1: %f\n", collisionInfo.m_capsule.m_radio1);
+				fprintf (file, "    height: %f\n", collisionInfo.m_capsule.m_height);
+				break;
+			}
+
+			case SERIALIZE_ID_CONVEXHULL:
+			{
+				fprintf(file, "  shapeType: convexHull\n");
+				fprintf(file, "    points: %d\n", collisionInfo.m_convexHull.m_vertexCount);
+				const int stride = collisionInfo.m_convexHull.m_vertexStrideInBytes / sizeof (dFloat);
+				const dFloat* points = collisionInfo.m_convexHull.m_vertex;
+				for (int i = 0 ; i < collisionInfo.m_convexHull.m_vertexCount; i ++) {
+					dFloat x = points[i * stride + 0];
+					dFloat y = points[i * stride + 1];
+					dFloat z = points[i * stride + 2];
+					fprintf(file, "    convexHullPoint: %f %f %f\n", x, y, z);
+				}
+				break;
+			}
+
+			default:
+			{
+				dAssert (0);
+			}
+		}
+
+		dMatrix shapeMatrix (&collisionInfo.m_offsetMatrix[0][0]);
+		shapeMatrix.GetEulerAngles(euler0, euler1);
+		fprintf (file, "    shapeScale: %f %f %f\n", 1.0f, 1.0f, 1.0f);
+		fprintf (file, "    shapePosition: %f %f %f\n", shapeMatrix.m_posit.m_x, shapeMatrix.m_posit.m_y, shapeMatrix.m_posit.m_z);
+		fprintf (file, "    shapeEulerAngle: %f %f %f\n", euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f);
+		fprintf (file, "nodeEnd:\n\n");
+
+		const int bonesCount = controller->GetBoneCount();
+		for (int i = 1; i < bonesCount; i++) {
+			dCustomArticulatedTransformController::dSkeletonBone* const child = controller->GetBone(i);
+			if (!filter.Find(child)) {
+				if (controller->GetParent(child) == bone) {
+					PrintRagdoll (file, controller, child, stackIndex + 1, filter);
+				}
+			}
+		}
+		
+	}
+
+
+	void PrintRagdoll (dCustomArticulatedTransformController* const controller, const char* const name)
+	{
+		char fileName[2048];
+		dGetWorkingFileName(name, fileName);
+
+		FILE* const file = fopen (fileName, "wt");
+		dAssert (file);
+
+		dTree<int, dCustomArticulatedTransformController::dSkeletonBone*> filter;
+
+		NewtonBody* const body = controller->GetBoneBody(controller->GetBone(0));
+		DemoEntity* entity = (DemoEntity*)NewtonBodyGetUserData(body);
+		fprintf (file, "nodesCount: %d\n", controller->GetBoneCount());
+		fprintf (file, "rootBone: %s\n\n", entity->GetName().GetStr());
+		
+		PrintRagdoll (file, controller, controller->GetBone(0), 0, filter);
+
+		fclose (file);
 	}
 
 	int m_material;
@@ -364,7 +471,8 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 //	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
-	int count = 10;
+//	int count = 10;
+	int count = 1;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));

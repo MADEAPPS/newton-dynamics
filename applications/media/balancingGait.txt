@@ -1,0 +1,327 @@
+nodesCount: 18
+rootBone: Bip01_Pelvis
+
+node: Bip01_Pelvis
+  mass: 30.000000
+  position: -10.020121 1.897650 0.000003
+  eulerAngles: 90.000000 -0.000057 -180.000015
+  shapeType: capsule
+    radio0: 0.070000
+    radio1: 0.070000
+    height: 0.160000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.010000
+    shapeEulerAngle: 0.000000 -0.000000 -90.000000
+nodeEnd:
+
+node: Bip01_Spine
+  mass: 20.000000
+  position: -10.020011 1.989208 0.000003
+  eulerAngles: 89.999992 -0.004240 -179.954407
+  shapeType: capsule
+    radio0: 0.070000
+    radio1: 0.070000
+    height: 0.140000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.060000
+    shapeEulerAngle: 0.000000 -0.000000 -90.000000
+nodeEnd:
+
+node: Bip01_Spine1
+  mass: 20.000000
+  position: -10.020011 2.127208 0.000003
+  eulerAngles: 89.999992 -0.004240 -179.954407
+  shapeType: capsule
+    radio0: 0.070000
+    radio1: 0.070000
+    height: 0.120000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.060000
+    shapeEulerAngle: 0.000000 -0.000000 -90.000000
+nodeEnd:
+
+node: Bip01_Spine2
+  mass: 20.000000
+  position: -10.020011 2.265208 0.000003
+  eulerAngles: 89.999992 -0.004240 -179.954407
+  shapeType: capsule
+    radio0: 0.070000
+    radio1: 0.070000
+    height: 0.080000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.060000
+    shapeEulerAngle: 0.000000 -0.000000 -90.000000
+nodeEnd:
+
+node: Bip01_Neck
+  mass: 5.000000
+  position: -10.020073 2.403208 0.000003
+  eulerAngles: 89.999992 -0.004240 -179.954407
+  shapeType: capsule
+    radio0: 0.030000
+    radio1: 0.030000
+    height: 0.040000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.050000
+    shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd:
+
+node: Bip01_Head
+  mass: 5.000000
+  position: -10.020121 2.462920 0.000003
+  eulerAngles: 90.000000 -0.004240 179.999939
+  shapeType: sphere
+    radio: 0.090000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.090000
+    shapeEulerAngle: 0.000000 -0.000000 0.000000
+nodeEnd:
+
+node: Bip01_L_UpperArm
+  mass: 10.000000
+  position: -10.020108 2.403208 0.173405
+  eulerAngles: 84.270905 0.004069 5.729489
+  shapeType: capsule
+    radio0: 0.030000
+    radio1: 0.030000
+    height: 0.230000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.120000
+    shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd:
+
+node: Bip01_L_Forearm
+  mass: 7.000000
+  position: -9.996381 2.166742 0.204878
+  eulerAngles: 84.383507 -1.132390 -5.673910
+  shapeType: capsule
+    radio0: 0.030000
+    radio1: 0.030000
+    height: 0.230000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.120000
+    shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd:
+
+node: Bip01_L_Hand
+  mass: 2.000000
+  position: -10.020340 1.930252 0.235728
+  eulerAngles: 11.863406 84.261520 -83.863823
+  shapeType: convexHull
+    points: 25
+    convexHullPoint: 0.013422 0.001152 -0.007176
+    convexHullPoint: 0.012685 -0.014386 -0.002538
+    convexHullPoint: -0.008643 -0.014032 -0.001974
+    convexHullPoint: 0.022874 -0.005788 0.022221
+    convexHullPoint: -0.021079 -0.010660 0.045791
+    convexHullPoint: -0.012169 -0.039770 0.048334
+    convexHullPoint: 0.018042 -0.026160 0.038319
+    convexHullPoint: -0.007797 0.017047 0.000077
+    convexHullPoint: 0.013531 0.016693 -0.000488
+    convexHullPoint: 0.016285 0.026146 0.036400
+    convexHullPoint: -0.009985 0.031915 0.042692
+    convexHullPoint: -0.020130 0.014852 0.044500
+    convexHullPoint: 0.012349 0.031495 0.042183
+    convexHullPoint: -0.005680 -0.045021 0.079264
+    convexHullPoint: 0.009828 -0.039713 0.056090
+    convexHullPoint: 0.015747 -0.034906 0.074401
+    convexHullPoint: 0.012260 -0.028634 0.098425
+    convexHullPoint: -0.007312 -0.031038 0.093965
+    convexHullPoint: 0.006622 -0.044381 0.084639
+    convexHullPoint: -0.012445 0.015995 0.095227
+    convexHullPoint: -0.007298 0.029716 0.094866
+    convexHullPoint: -0.003462 0.040705 0.083730
+    convexHullPoint: 0.017292 0.028260 0.076800
+    convexHullPoint: 0.008839 0.041346 0.089105
+    convexHullPoint: 0.010357 0.030686 0.099634
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.000000
+    shapeEulerAngle: 0.000000 -0.000000 0.000000
+nodeEnd:
+
+node: Bip01_R_UpperArm
+  mass: 10.000000
+  position: -10.020133 2.403208 -0.173399
+  eulerAngles: 95.730072 0.004136 5.729539
+  shapeType: capsule
+    radio0: 0.030000
+    radio1: 0.030000
+    height: 0.230000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.120000
+    shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd:
+
+node: Bip01_R_Forearm
+  mass: 7.000000
+  position: -9.996409 2.166742 -0.204876
+  eulerAngles: 95.615654 1.140617 -5.673876
+  shapeType: capsule
+    radio0: 0.030000
+    radio1: 0.030000
+    height: 0.230000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.120000
+    shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd:
+
+node: Bip01_R_Hand
+  mass: 2.000000
+  position: -10.020372 1.930253 -0.235721
+  eulerAngles: 168.054306 -84.260666 -83.781860
+  shapeType: convexHull
+    points: 25
+    convexHullPoint: 0.013531 -0.016693 -0.000488
+    convexHullPoint: -0.007798 -0.017047 0.000077
+    convexHullPoint: 0.016285 -0.026145 0.036400
+    convexHullPoint: -0.009985 -0.031915 0.042692
+    convexHullPoint: 0.012348 -0.031494 0.042183
+    convexHullPoint: -0.020130 -0.014853 0.044500
+    convexHullPoint: -0.008643 0.014032 -0.001974
+    convexHullPoint: 0.012685 0.014386 -0.002538
+    convexHullPoint: 0.013422 -0.001152 -0.007176
+    convexHullPoint: 0.022874 0.005789 0.022221
+    convexHullPoint: -0.012168 0.039770 0.048334
+    convexHullPoint: -0.021078 0.010660 0.045790
+    convexHullPoint: 0.018042 0.026160 0.038319
+    convexHullPoint: -0.007298 -0.029716 0.094866
+    convexHullPoint: -0.003463 -0.040705 0.083730
+    convexHullPoint: -0.012445 -0.015995 0.095227
+    convexHullPoint: 0.017292 -0.028259 0.076800
+    convexHullPoint: 0.008838 -0.041346 0.089105
+    convexHullPoint: 0.010356 -0.030685 0.099634
+    convexHullPoint: -0.005679 0.045021 0.079264
+    convexHullPoint: 0.015747 0.034907 0.074401
+    convexHullPoint: 0.009829 0.039714 0.056090
+    convexHullPoint: 0.006623 0.044381 0.084639
+    convexHullPoint: -0.007312 0.031038 0.093964
+    convexHullPoint: 0.012260 0.028634 0.098425
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.000000
+    shapeEulerAngle: 0.000000 -0.000000 0.000000
+nodeEnd:
+
+node: Bip01_L_Thigh
+  mass: 10.000000
+  position: -10.020114 1.897650 0.105096
+  eulerAngles: -89.999687 -0.004392 174.270477
+  shapeType: capsule
+    radio0: 0.050000
+    radio1: 0.050000
+    height: 0.340000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.190000
+    shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd:
+
+node: Bip01_L_Calf
+  mass: 5.000000
+  position: -10.059855 1.501561 0.105099
+  eulerAngles: -90.000565 -0.004370 -174.270447
+  shapeType: capsule
+    radio0: 0.050000
+    radio1: 0.050000
+    height: 0.340000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.190000
+    shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd:
+
+node: Bip01_L_Foot
+  mass: 3.000000
+  position: -10.020114 1.105472 0.105095
+  eulerAngles: -90.000130 -0.004403 -180.000015
+  shapeType: convexHull
+    points: 25
+    convexHullPoint: -0.003232 -0.010903 -0.011682
+    convexHullPoint: 0.016709 -0.000000 -0.011682
+    convexHullPoint: 0.005028 -0.015420 -0.011682
+    convexHullPoint: 0.013288 -0.010903 -0.011682
+    convexHullPoint: -0.003232 0.010903 -0.011682
+    convexHullPoint: -0.006654 0.000000 -0.011682
+    convexHullPoint: 0.013288 0.010903 -0.011682
+    convexHullPoint: 0.005028 -0.000000 -0.016520
+    convexHullPoint: 0.005028 0.015420 -0.011682
+    convexHullPoint: -0.029280 -0.051203 0.091752
+    convexHullPoint: -0.035196 -0.051203 0.076171
+    convexHullPoint: -0.013619 -0.037752 0.021462
+    convexHullPoint: -0.023068 -0.028726 0.026363
+    convexHullPoint: -0.035196 0.052023 0.076171
+    convexHullPoint: -0.013619 0.038572 0.021462
+    convexHullPoint: -0.029377 0.052023 0.091752
+    convexHullPoint: -0.023068 0.029546 0.026363
+    convexHullPoint: 0.060606 -0.051491 0.056712
+    convexHullPoint: 0.116177 -0.051492 0.092188
+    convexHullPoint: 0.025222 -0.037752 0.021546
+    convexHullPoint: 0.117831 -0.051492 0.080844
+    convexHullPoint: 0.025222 0.038571 0.021546
+    convexHullPoint: 0.117831 0.052309 0.080844
+    convexHullPoint: 0.060606 0.052310 0.056712
+    convexHullPoint: 0.116177 0.052309 0.092188
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.000000
+    shapeEulerAngle: 0.000000 -0.000000 0.000000
+nodeEnd:
+
+node: Bip01_R_Thigh
+  mass: 10.000000
+  position: -10.020128 1.897650 -0.105090
+  eulerAngles: -89.999687 -0.004392 174.270477
+  shapeType: capsule
+    radio0: 0.050000
+    radio1: 0.050000
+    height: 0.340000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.190000
+    shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd:
+
+node: Bip01_R_Calf
+  mass: 5.000000
+  position: -10.059870 1.501561 -0.105087
+  eulerAngles: -90.000565 -0.004370 -174.270447
+  shapeType: capsule
+    radio0: 0.050000
+    radio1: 0.050000
+    height: 0.340000
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.190000
+    shapeEulerAngle: 0.000000 90.000000 0.000000
+nodeEnd:
+
+node: Bip01_R_Foot
+  mass: 3.000000
+  position: -10.020128 1.105472 -0.105091
+  eulerAngles: -90.000130 -0.004403 -180.000015
+  shapeType: convexHull
+    points: 25
+    convexHullPoint: -0.003232 -0.010903 -0.011682
+    convexHullPoint: 0.016709 -0.000000 -0.011682
+    convexHullPoint: 0.005028 -0.015420 -0.011682
+    convexHullPoint: 0.013288 -0.010903 -0.011682
+    convexHullPoint: -0.003232 0.010903 -0.011682
+    convexHullPoint: -0.006654 0.000000 -0.011682
+    convexHullPoint: 0.013288 0.010903 -0.011682
+    convexHullPoint: 0.005028 -0.000000 -0.016520
+    convexHullPoint: 0.005028 0.015420 -0.011682
+    convexHullPoint: -0.029280 -0.051203 0.091752
+    convexHullPoint: -0.035196 -0.051203 0.076171
+    convexHullPoint: -0.013619 -0.037752 0.021462
+    convexHullPoint: -0.023068 -0.028726 0.026363
+    convexHullPoint: -0.035196 0.052023 0.076171
+    convexHullPoint: -0.013619 0.038572 0.021462
+    convexHullPoint: -0.029377 0.052023 0.091752
+    convexHullPoint: -0.023068 0.029546 0.026363
+    convexHullPoint: 0.060606 -0.051491 0.056712
+    convexHullPoint: 0.116177 -0.051492 0.092188
+    convexHullPoint: 0.025222 -0.037752 0.021546
+    convexHullPoint: 0.117831 -0.051492 0.080844
+    convexHullPoint: 0.025222 0.038571 0.021546
+    convexHullPoint: 0.117831 0.052309 0.080844
+    convexHullPoint: 0.060606 0.052310 0.056712
+    convexHullPoint: 0.116177 0.052309 0.092188
+    shapeScale: 1.000000 1.000000 1.000000
+    shapePosition: 0.000000 0.000000 0.000000
+    shapeEulerAngle: 0.000000 -0.000000 0.000000
+nodeEnd:
+

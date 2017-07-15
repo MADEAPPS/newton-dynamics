@@ -556,7 +556,7 @@ void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstrain
 
 			dgNode* const node0 = FindNode(body0);
 			dgNode* const node1 = FindNode(body1);
-			dgAssert((node0 && !node1) || (node1 && !node0));
+			dgAssert((node0 || node1));
 			joint->m_isInSkeleton = true;
 		
 			if (node0) {
