@@ -125,7 +125,7 @@ NewtonCollisionSetMode(collision, 0);
 		return body;
 	}
 
-	void ParseRigidBody(FILE* const file, dTree<NewtonBody*, dString>& bodyMap)
+	void ParseRigidBody(FILE* const file, dTree<NewtonBody*, const dString>& bodyMap)
 	{
 		dVector posit(0.0f);
 		dVector euler(0.0f);
@@ -160,19 +160,97 @@ NewtonCollisionSetMode(collision, 0);
 		}
 	}
 
+	void ParseJoint(FILE* const file, const dTree<NewtonBody*, const dString>& bodyMap)
+	{
+		char name[256];
+		char token[256];
+		char jointType[256];
+
+		NewtonBody* child;
+		NewtonBody* parent;
+
+		dVector childPivot;
+		dVector parentPivot;
+		dVector childEuler;
+		dVector parentEuler;
+		dFloat coneAngle;
+		dFloat minTwistAngle;
+		dFloat maxTwistAngle;
+
+		while (!feof(file)) {
+			fscanf(file, "%s", token);
+			if (!strcmp(token, "joint:")) {
+				fscanf(file, "%s", &jointType);
+			} else if (!strcmp(token, "childBody:")) {
+				fscanf(file, "%s", name);
+				child = bodyMap.Find(name)->GetInfo();
+			} else if (!strcmp(token, "parentBody:")) {
+				fscanf(file, "%s", name);
+				parent = bodyMap.Find(name)->GetInfo();
+			} else if (!strcmp(token, "childPivot:")) {
+				fscanf(file, "%f %f %f", &childPivot.m_x, &childPivot.m_y, &childPivot.m_z);
+			} else if (!strcmp(token, "childEulers:")) {
+				fscanf(file, "%f %f %f", &childEuler.m_x, &childEuler.m_y, &childEuler.m_z);
+			} else if (!strcmp(token, "parentPivot:")) {
+				fscanf(file, "%f %f %f", &parentPivot.m_x, &parentPivot.m_y, &parentPivot.m_z);
+			} else if (!strcmp(token, "parentEulers:")) {
+				fscanf(file, "%f %f %f", &parentEuler.m_x, &parentEuler.m_y, &parentEuler.m_z);
+			} else if (!strcmp(token, "coneAngle:")) {
+				fscanf(file, "%f", &coneAngle);
+			} else if (!strcmp(token, "minTwistAngle:")) {
+				fscanf(file, "%f", &minTwistAngle);
+			} else if (!strcmp(token, "maxTwistAngle:")) {
+				fscanf(file, "%f", &maxTwistAngle);
+			} else if (!strcmp(token, "endJoint:")) {
+				break;
+			} else {
+				dAssert(0);
+			}
+		}
+
+
+		dMatrix childBodyMatrix;
+		dMatrix parentBodyMatrix;
+
+		childEuler = childEuler.Scale (3.141592f / 180.0f);
+		parentEuler = parentEuler.Scale(3.141592f / 180.0f);
+
+		NewtonBodyGetMatrix(child, &childBodyMatrix[0][0]);
+		NewtonBodyGetMatrix(parent, &parentBodyMatrix[0][0]);
+		dMatrix childPinAndPivotInGlobalSpace (childEuler.m_x, childEuler.m_y, childEuler.m_z, childPivot);
+		dMatrix parentPinAndPivotInGlobalSpace (parentEuler.m_x, parentEuler.m_y, parentEuler.m_z, parentPivot);
+
+		childPinAndPivotInGlobalSpace = childPinAndPivotInGlobalSpace * childBodyMatrix;
+		parentPinAndPivotInGlobalSpace = parentPinAndPivotInGlobalSpace * parentBodyMatrix;
+
+		if (!strcmp(jointType, "dCustomRagdollMotor")) {
+			dCustomRagdollMotor* const joint = new dCustomRagdollMotor(childPinAndPivotInGlobalSpace, child, parentPinAndPivotInGlobalSpace, parent);
+			joint->SetConeAngle(coneAngle * 3.141592f / 180.0f);
+			joint->SetTwistAngle(minTwistAngle * 3.141592f / 180.0f, maxTwistAngle * 3.141592f / 180.0f);
+
+		} else {
+			dAssert(0);
+		}
+	}
+
 	NewtonBody* ParseRigidBodies(FILE* const file, NewtonBody* const parentNode)
 	{
 		char token[256];
 		char rootBodyName[256];
 
-		dTree<NewtonBody*, dString> bodyMap;
+		dTree<NewtonBody*, const dString> bodyMap;
 
 		int nodesCount;
 		fscanf(file, "%s %d", token, &nodesCount);
 		fscanf(file, "%s %s", token, rootBodyName);
-
 		for (int i = 0; i < nodesCount; i ++) {
 			ParseRigidBody(file, bodyMap);
+		}
+
+		int jointsCount;
+		fscanf(file, "%s %d", token, &jointsCount);
+		for (int i = 0; i < jointsCount; i++) {
+			ParseJoint(file, bodyMap);
 		}
 
 		return bodyMap.Find(rootBodyName)->GetInfo();
