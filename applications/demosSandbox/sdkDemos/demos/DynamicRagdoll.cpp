@@ -125,7 +125,7 @@ NewtonCollisionSetMode(collision, 0);
 		return body;
 	}
 
-	void ParseRigidBody(FILE* const file, dTree<NewtonBody*, dString> bodyMap)
+	void ParseRigidBody(FILE* const file, dTree<NewtonBody*, dString>& bodyMap)
 	{
 		dVector posit(0.0f);
 		dVector euler(0.0f);
@@ -162,52 +162,7 @@ NewtonCollisionSetMode(collision, 0);
 
 	NewtonBody* ParseRigidBodies(FILE* const file, NewtonBody* const parentNode)
 	{
-/*
-		dVector posit(0.0f);
-		dVector euler(0.0f);
-		NewtonBody* body = NULL;
-		NewtonCollision* collision = NULL;
-		
-		dFloat mass;
-
 		char token[256];
-		char nodeName[256];
-
-		while(!feof (file)) {
-			fscanf (file, "%s", token);
-
-			if (!strcmp(token, "mass:")) {
-				fscanf(file, "%f", &mass);
-			} else if (!strcmp(token, "position:")) {
-				fscanf(file, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
-			} else if (!strcmp(token, "eulerAngles:")) {
-				fscanf(file, "%f %f %f", &euler.m_x, &euler.m_y, &euler.m_z);
-				euler = euler.Scale (3.141592f / 180.0f);
-			} else if (!strcmp(token, "shapeType:")) {
-				collision = ParseCollisonShape(file);
-			} else if (!strcmp(token, "node:") || !strcmp(token, "endNode:")) {
-				body = MakeRigidBody (posit, euler, mass, collision, parentNode);
-				if (!strcmp(token, "node:")) {
-					fscanf(file, "%s", nodeName);
-					return ParseRigidBodies(file, body);
-				} else {
-					fscanf (file, "%s", token);
-					if (!strcmp(token, "node:")) {
-						fscanf(file, "%s", nodeName);
-						return ParseRigidBodies(file, parentNode);
-					} else {
-						return body;
-					}
-				}
-			} else {
-				dAssert (0);
-			}
-		}
-		return body;
-*/
-
-		char token[256];
-		//char nodeName[256];
 		char rootBodyName[256];
 
 		dTree<NewtonBody*, dString> bodyMap;
@@ -220,13 +175,11 @@ NewtonCollisionSetMode(collision, 0);
 			ParseRigidBody(file, bodyMap);
 		}
 
-		return NULL;
+		return bodyMap.Find(rootBodyName)->GetInfo();
 	}
 
 
-
-
-	void ParseRagdollFile(const char* const name, dCustomActiveCharacterController* const controller)
+	NewtonBody* ParseRagdollFile(const char* const name, dCustomActiveCharacterController* const controller)
 	{
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
@@ -237,84 +190,22 @@ NewtonCollisionSetMode(collision, 0);
 		NewtonBody* const rootBone = ParseRigidBodies (file, NULL);
 
 		fclose (file);
+
+		return rootBone;
 	}
 
 
 	void CreateBasicGait (dMatrix& matrix)
 	{
-#if 0
-/*
-		NewtonWorld* const world = GetWorld();
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+		dCustomActiveCharacterController* const controller = CreateTransformController();
+		NewtonBody* const root = ParseRagdollFile("balancingGait.txt", controller);
 
-		dMatrix offsetMatrix(dGetIdentityMatrix());
+		void* const rootNode = controller->AddRoot(root);
 
-		// make the pelvis
-		dFloat pelvisMass = 12.0f;
-		dVector pelvisSize(0.25f, 0.15f, 0.25f, 0.0f);
-		NewtonCollision* const pelvisShape = CreateConvexCollision(world, offsetMatrix, pelvisSize, _CAPSULE_PRIMITIVE, 0);
-NewtonCollisionSetMode(pelvisShape, 0);
-		DemoMesh* const pelvisMesh = new DemoMesh("pelvis", pelvisShape, "smilli.tga", "smilli.tga", "smilli.tga");
-		NewtonBody* const pelvisBody = CreateSimpleSolid (scene, pelvisMesh, pelvisMass, matrix, pelvisShape, m_material);
 
-		dCustomActiveCharacterController* const controller = CreateTransformController(pelvisBody);
 
-		// add right legs
-		dFloat legMass = 8.0f;
-		dVector legSize(0.25f, 0.4f, 0.20f, 0.0f);
-		NewtonCollision* const legShape = CreateConvexCollision(world, offsetMatrix, legSize, _CAPSULE_PRIMITIVE, 0);
-NewtonCollisionSetMode(legShape, 0);
-		DemoMesh* const legMesh = new DemoMesh("leg", legShape, "smilli.tga", "smilli.tga", "smilli.tga");
-		{
-			dMatrix rightLegMatrix (dRollMatrix(-100.0f * 3.14159f / 180.0f) * matrix);
-			rightLegMatrix.m_posit.m_y -= 0.30f;
-			rightLegMatrix.m_posit.m_z += 0.20f;
-			NewtonBody* const rightLegBody = CreateSimpleSolid(scene, legMesh, legMass, rightLegMatrix, legShape, m_material);
-			dCustomActiveCharacterJoint* const joint = ConnectBodyParts(rightLegBody, pelvisBody);
-			controller->AddBone (joint, controller->GetRoot());
-		}
-
-		{
-			dMatrix leftLegMatrix(dRollMatrix(-80.0f * 3.14159f / 180.0f) * matrix);
-			leftLegMatrix.m_posit.m_y -= 0.30f;
-			leftLegMatrix.m_posit.m_z -= 0.20f;
-			//NewtonBody* const leftLegBody = CreateSimpleSolid(scene, legMesh, legMass, leftLegMatrix, legShape, m_material);
-		}
-
-		// add calfs
-		dFloat calfMass = 6.0f;
-		dVector calfSize(0.20f, 0.4f, 0.20f, 0.0f);
-		NewtonCollision* const calfShape = CreateConvexCollision(world, offsetMatrix, calfSize, _CAPSULE_PRIMITIVE, 0);
-NewtonCollisionSetMode(calfShape, 0);
-		DemoMesh* const calfMesh = new DemoMesh("calf", calfShape, "smilli.tga", "smilli.tga", "smilli.tga");
-
-		{
-			dMatrix rightCalfMatrix (rightLegMatrix);
-			rightCalfMatrix.m_posit.m_y -= 0.46f;
-			rightCalfMatrix.m_posit.m_z += 0.09f;
-			NewtonBody* const rightCalfBody = CreateSimpleSolid(scene, calfMesh, calfMass, rightCalfMatrix, calfShape, m_material);
-		}
-
-		{
-			dMatrix leftCalfMatrix(leftLegMatrix);
-			leftCalfMatrix.m_posit.m_y -= 0.46f;
-			leftCalfMatrix.m_posit.m_z -= 0.09f;
-			NewtonBody* const leftCalfBody = CreateSimpleSolid(scene, calfMesh, calfMass, leftCalfMatrix, calfShape, m_material);
-		}
-		// add foots
-		legMesh->Release();
-		//calfMesh->Release();
-		pelvisMesh->Release();
-		NewtonDestroyCollision(legShape);
-		//NewtonDestroyCollision(calfShape);
-		NewtonDestroyCollision(pelvisShape);
 
 		controller->Finalize();
-*/
-#endif
-
-		dCustomActiveCharacterController* const controller = CreateTransformController();
-		ParseRagdollFile("balancingGait.txt", controller);
 	}
 
 	int m_material;

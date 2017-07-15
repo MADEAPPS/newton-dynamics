@@ -266,11 +266,24 @@ void dCustomActiveCharacterController::PostUpdate(dFloat timestep, int threadInd
 */
 }
 
-
-
 void* dCustomActiveCharacterController::GetRoot() const
 {
 	return m_kinemativSolver ? NewtonInverseDynamicsGetRoot (m_kinemativSolver) : NULL;
+}
+
+void* dCustomActiveCharacterController::AddRoot(NewtonBody* const rootBody)
+{
+	dAssert (!m_kinemativSolver);
+	if (m_kinemativSolver) {
+		NewtonInverseDynamicsDestroy (m_kinemativSolver);
+	}
+
+	dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();
+	NewtonWorld* const world = manager->GetWorld();
+
+	m_body = rootBody;
+	m_kinemativSolver = NewtonCreateInverseDynamics(world);
+	return NewtonInverseDynamicsAddRoot(m_kinemativSolver, m_body);
 }
 
 void* dCustomActiveCharacterController::AddBone(dCustomJoint* const childJoint, void* const parentBone)

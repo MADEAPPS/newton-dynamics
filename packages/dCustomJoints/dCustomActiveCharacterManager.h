@@ -156,6 +156,7 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	CUSTOM_JOINTS_API ~dCustomActiveCharacterController();
 
 	CUSTOM_JOINTS_API void* GetRoot() const;
+	CUSTOM_JOINTS_API void* AddRoot(NewtonBody* const root);
 	CUSTOM_JOINTS_API void* AddBone(dCustomJoint* const childJoint, void* const parentBone);
 	CUSTOM_JOINTS_API virtual void Finalize ();
 	
