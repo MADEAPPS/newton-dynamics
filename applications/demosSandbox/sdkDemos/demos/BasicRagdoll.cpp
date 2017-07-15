@@ -261,7 +261,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		dMatrix childPinAndPivotInGlobalSpace (dPitchMatrix (definition.m_childPitch * 3.141592f / 180.0f) * dYawMatrix (definition.m_childYaw * 3.141592f / 180.0f) * dRollMatrix (definition.m_childRoll * 3.141592f / 180.0f));
 		childPinAndPivotInGlobalSpace = childPinAndPivotInGlobalSpace * matrix;
 
-		dCustomLimitBallAndSocket* const joint = new dCustomLimitBallAndSocket (childPinAndPivotInGlobalSpace, bone, parentPinAndPivotInGlobalSpace, parent);
+		dCustomRagdollMotor* const joint = new dCustomRagdollMotor (childPinAndPivotInGlobalSpace, bone, parentPinAndPivotInGlobalSpace, parent);
 
 		joint->SetConeAngle (definition.m_coneAngle * 3.141592f / 180.0f);
 		joint->SetTwistAngle (definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
@@ -342,8 +342,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		PrintRagdoll (controller, "balancingGait.txt");
 	}
 
-
-	void PrintRagdoll (FILE* const file, dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const bone, int stackIndex, dTree<int, dCustomArticulatedTransformController::dSkeletonBone*>& filter)
+	void PrintRagdollBodies (FILE* const file, dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const bone, int stackIndex, dTree<int, dCustomArticulatedTransformController::dSkeletonBone*>& filter)
 	{
 		filter.Insert(0, bone);
 		NewtonBody* const body = controller->GetBoneBody(bone);
@@ -419,13 +418,86 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 			dCustomArticulatedTransformController::dSkeletonBone* const child = controller->GetBone(i);
 			if (!filter.Find(child)) {
 				if (controller->GetParent(child) == bone) {
-					PrintRagdoll (file, controller, child, stackIndex + 1, filter);
+					PrintRagdollBodies (file, controller, child, stackIndex + 1, filter);
 				}
 			}
 		}
-		
 	}
 
+	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
+	{
+		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(child); joint; joint = NewtonBodyGetNextJoint(child, joint)) {
+			dCustomJoint* const cJoint = (dCustomJoint*) NewtonJointGetUserData(joint);
+			if (((child == cJoint->GetBody0()) && (parent == cJoint->GetBody1())) ||
+				((child == cJoint->GetBody1()) && (parent == cJoint->GetBody0()))) {
+				return cJoint;
+			}
+		}
+		dAssert (0);
+		return NULL;
+	}
+
+	void PrintRagdollJoints (FILE* const file, dCustomArticulatedTransformController* const controller, dCustomArticulatedTransformController::dSkeletonBone* const bone, int stackIndex, dTree<int, dCustomArticulatedTransformController::dSkeletonBone*>& filter)
+	{
+		filter.Insert(0, bone);
+		if (bone != controller->GetBone(0)) {
+			NewtonBody* const body = controller->GetBoneBody(bone);
+			const dCustomArticulatedTransformController::dSkeletonBone* const parentBone = controller->GetParent(bone);
+
+			NewtonBody* const parentBody = controller->GetBoneBody(parentBone);
+			DemoEntity* entity = (DemoEntity*)NewtonBodyGetUserData(body);
+			DemoEntity* parentEntity = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+
+			dCustomJoint* const joint = FindJoint(body, parentBody);
+			
+			fprintf(file, "joint: %s\n", joint->GetTypeName());
+			fprintf(file, "  childBody: %s\n", entity->GetName().GetStr());
+			fprintf(file, "  parentBody: %s\n", parentEntity->GetName().GetStr());
+
+			dMatrix childMatrix (joint->GetMatrix0());
+			dMatrix parentMatrix (joint->GetMatrix1());
+
+			dVector euler;
+			dVector childEuler;
+			dVector parentEuler;
+
+			childMatrix.GetEulerAngles(childEuler, euler);
+			parentMatrix.GetEulerAngles(parentEuler, euler);
+
+			childEuler = childEuler.Scale (180.0f / 3.141592f);
+			parentEuler = parentEuler.Scale (180.0f / 3.141592f);
+
+			fprintf(file, "  childPivot: %f %f %f\n", childMatrix.m_posit.m_x, childMatrix.m_posit.m_y, childMatrix.m_posit.m_z);
+			fprintf(file, "  childEulers: %f %f %f\n", childEuler.m_x, childEuler.m_y, childEuler.m_z);
+
+			fprintf(file, "  parentPivot: %f %f %f\n", parentMatrix.m_posit.m_x, parentMatrix.m_posit.m_y, parentMatrix.m_posit.m_z);
+			fprintf(file, "  parentEulers: %f %f %f\n", parentEuler.m_x, parentEuler.m_y, parentEuler.m_z);
+
+			if (joint->IsType(dCustomRagdollMotor::GetKeyType())) {
+				dFloat minAngle;
+				dFloat maxAngle;
+
+				dCustomRagdollMotor* const ragdollJoint = (dCustomRagdollMotor*) joint;
+				ragdollJoint->GetTwistAngle(minAngle, maxAngle);
+
+				fprintf(file, "  coneAngle: %f\n", ragdollJoint->GetConeAngle() * 180.0f / 3.141592f);
+				fprintf(file, "  minTwistAngle: %f\n", minAngle * 180.0f / 3.141592f);
+				fprintf(file, "  maxTwistAngle: %f\n", maxAngle * 180.0f / 3.141592f);
+			}
+
+			fprintf(file, "endJoint:\n\n");
+
+		}
+		const int bonesCount = controller->GetBoneCount();
+		for (int i = 1; i < bonesCount; i++) {
+			dCustomArticulatedTransformController::dSkeletonBone* const child = controller->GetBone(i);
+			if (!filter.Find(child)) {
+				if (controller->GetParent(child) == bone) {
+					PrintRagdollJoints(file, controller, child, stackIndex + 1, filter);
+				}
+			}
+		}
+	}
 
 	void PrintRagdoll (dCustomArticulatedTransformController* const controller, const char* const name)
 	{
@@ -442,7 +514,11 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		fprintf (file, "nodesCount: %d\n", controller->GetBoneCount());
 		fprintf (file, "rootBone: %s\n\n", entity->GetName().GetStr());
 		
-		PrintRagdoll (file, controller, controller->GetBone(0), 0, filter);
+		PrintRagdollBodies (file, controller, controller->GetBone(0), 0, filter);
+		filter.RemoveAll();
+
+		fprintf (file, "jointsCount: %d\n", controller->GetBoneCount() - 1);
+		PrintRagdollJoints (file, controller, controller->GetBone(0), 0, filter);
 
 		fclose (file);
 	}
