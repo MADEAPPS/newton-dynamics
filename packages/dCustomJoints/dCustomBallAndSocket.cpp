@@ -861,6 +861,5 @@ void dCustomRagdollMotor::Submit1DOFConstraints(const dMatrix& matrix0, const dM
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_jointTorque);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_jointTorque);
 	}
-
 }
 
