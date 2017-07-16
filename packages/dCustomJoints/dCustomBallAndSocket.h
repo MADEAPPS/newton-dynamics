@@ -150,14 +150,22 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	CUSTOM_JOINTS_API dFloat GetConeAngle() const;
 	CUSTOM_JOINTS_API void GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const;
 
+	CUSTOM_JOINTS_API void SetJointTorque(dFloat torque);
+	CUSTOM_JOINTS_API dFloat GetJointTorque() const;
+	
 	protected:
 	CUSTOM_JOINTS_API dCustomRagdollMotor(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+	
+	private:
+	virtual void GetInfo(NewtonJointRecord* const info) const;
+	virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+	
+	void Submit1DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+	void Submit2DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+	void Submit3DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
-	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
-
-	dMatrix m_rotationOffset____;
+	dMatrix m_rotationOffset;
 	dFloat m_coneAngle;
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
@@ -165,6 +173,7 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	dFloat m_coneAngleSin;
 	dFloat m_coneAngleHalfCos;
 	dFloat m_coneAngleHalfSin;
+	dFloat m_jointTorque;
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor, dCustomBallAndSocket)
 };
 
