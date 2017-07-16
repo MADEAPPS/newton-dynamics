@@ -636,6 +636,7 @@ dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, Newton
 {
 	SetConeAngle(0.0f);
 	SetTwistAngle(0.0f, 0.0f);
+	SetJointTorque(1000.0f);
 }
 
 
@@ -645,6 +646,7 @@ dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, N
 {
 	SetConeAngle(0.0f);
 	SetTwistAngle(0.0f, 0.0f);
+	SetJointTorque(1000.0f);
 	dMatrix matrix;
 	CalculateLocalMatrix(parentPinAndPivotFrame, matrix, m_localMatrix1);
 }

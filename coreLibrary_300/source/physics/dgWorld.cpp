@@ -811,6 +811,8 @@ void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 		body1->SetVelocity (dgVector (dgFloat32 (0.0f)));    
 		body1->SetOmega (dgVector (dgFloat32 (0.0f)));    
 		body1->SetMatrix (matrix1);
+		body1->UpdateMatrix (dgFloat32 (0.0f), 0);
+		body1->SetSleepState(false);
 
 		for (dgBodyMasterListRow::dgListNode* jointNode = body1->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 			dgBodyMasterListCell& cell = jointNode->GetInfo();

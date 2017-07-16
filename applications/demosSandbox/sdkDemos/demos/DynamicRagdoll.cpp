@@ -273,16 +273,20 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 	}
 
 
-	void CreateBasicGait (dMatrix& matrix)
+	void CreateBasicGait (const dVector& posit, dFloat angle)
 	{
 		dCustomActiveCharacterController* const controller = CreateTransformController();
 		NewtonBody* const root = ParseRagdollFile("balancingGait.txt", controller);
 
+		dMatrix bodyMatrix;
+		NewtonBodyGetMatrix (root, &bodyMatrix[0][0]);
+
+		bodyMatrix = dYawMatrix(angle) * bodyMatrix;
+		bodyMatrix.m_posit = posit;
+		bodyMatrix.m_posit.m_w = 1.0f;
+		NewtonBodySetMatrixRecursive (root, &bodyMatrix[0][0]);
+
 		void* const rootNode = controller->AddRoot(root);
-
-
-
-
 		controller->Finalize();
 	}
 
@@ -307,7 +311,6 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 	//dMatrix matrix (dGetIdentityMatrix());
-	dMatrix matrix (dYawMatrix(3.141592f * 0.5f));
 
 //	dVector origin (-10.0f, 1.0f, 0.0f, 1.0f);
 	dVector origin (FindFloor (world, dVector (-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
@@ -317,11 +320,9 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector ((x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
-			matrix.m_posit = FindFloor (world, p, 100.0f);
-			matrix.m_posit.m_y += 1.3f;
-			//manager->CreateRagDoll (matrix, &ragDollModel, skeletonRagDoll, sizeof (skeletonRagDoll) / sizeof (skeletonRagDoll[0]));
-			manager->CreateBasicGait (matrix);
-
+			p = FindFloor (world, p, 100.0f);
+			p.m_y += 0.9f;
+			manager->CreateBasicGait (p, 0.0f);
 		}
 	}
 /*
@@ -333,7 +334,7 @@ void DynamicRagDoll (DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count1, count1, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 */
 
-	origin.m_x = -14.0f;
+	origin.m_x = -8.0f;
 //	origin.m_x -= 2.0f;
 	origin.m_y  = 1.5f;
 	dQuaternion rot;
