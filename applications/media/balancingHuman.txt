@@ -336,7 +336,7 @@ joint: dCustomRagdollMotor
   coneAngle: 29.999998
   minTwistAngle: -29.999998
   maxTwistAngle: 29.999998
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_Spine1
@@ -348,7 +348,7 @@ joint: dCustomRagdollMotor
   coneAngle: 29.999998
   minTwistAngle: -29.999998
   maxTwistAngle: 29.999998
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_Spine2
@@ -360,7 +360,7 @@ joint: dCustomRagdollMotor
   coneAngle: 29.999998
   minTwistAngle: -29.999998
   maxTwistAngle: 29.999998
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_Neck
@@ -372,7 +372,7 @@ joint: dCustomRagdollMotor
   coneAngle: 29.999998
   minTwistAngle: -29.999998
   maxTwistAngle: 29.999998
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_Head
@@ -384,7 +384,7 @@ joint: dCustomRagdollMotor
   coneAngle: 29.999998
   minTwistAngle: -59.999996
   maxTwistAngle: 59.999996
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_L_UpperArm
@@ -396,7 +396,7 @@ joint: dCustomRagdollMotor
   coneAngle: 80.000000
   minTwistAngle: 29.999998
   maxTwistAngle: 29.999998
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_L_Forearm
@@ -408,7 +408,7 @@ joint: dCustomRagdollMotor
   coneAngle: 0.000000
   minTwistAngle: 0.000000
   maxTwistAngle: 150.000000
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_L_Hand
@@ -420,7 +420,7 @@ joint: dCustomRagdollMotor
   coneAngle: 0.000000
   minTwistAngle: -45.000000
   maxTwistAngle: 45.000000
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_R_UpperArm
@@ -432,7 +432,7 @@ joint: dCustomRagdollMotor
   coneAngle: 80.000000
   minTwistAngle: 29.999998
   maxTwistAngle: 29.999998
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_R_Forearm
@@ -444,7 +444,7 @@ joint: dCustomRagdollMotor
   coneAngle: 0.000000
   minTwistAngle: -150.000000
   maxTwistAngle: 0.000000
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_R_Hand
@@ -456,7 +456,7 @@ joint: dCustomRagdollMotor
   coneAngle: 0.000000
   minTwistAngle: -45.000000
   maxTwistAngle: 45.000000
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_L_Thigh
@@ -468,7 +468,7 @@ joint: dCustomRagdollMotor
   coneAngle: 80.000000
   minTwistAngle: -29.999998
   maxTwistAngle: 29.999998
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_L_Calf
@@ -480,7 +480,7 @@ joint: dCustomRagdollMotor
   coneAngle: 0.000000
   minTwistAngle: -150.000000
   maxTwistAngle: 0.000000
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_L_Foot
@@ -492,7 +492,7 @@ joint: dCustomRagdollMotor
   coneAngle: 0.000000
   minTwistAngle: -45.000000
   maxTwistAngle: 45.000000
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_R_Thigh
@@ -504,7 +504,7 @@ joint: dCustomRagdollMotor
   coneAngle: 80.000000
   minTwistAngle: -29.999998
   maxTwistAngle: 29.999998
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_R_Calf
@@ -516,7 +516,7 @@ joint: dCustomRagdollMotor
   coneAngle: 0.000000
   minTwistAngle: 0.000000
   maxTwistAngle: 150.000000
-endJoint:
+jointEnd:
 
 joint: dCustomRagdollMotor
   childBody: Bip01_R_Foot
@@ -528,5 +528,5 @@ joint: dCustomRagdollMotor
   coneAngle: 0.000000
   minTwistAngle: -45.000000
   maxTwistAngle: 45.000000
-endJoint:
+jointEnd:
 

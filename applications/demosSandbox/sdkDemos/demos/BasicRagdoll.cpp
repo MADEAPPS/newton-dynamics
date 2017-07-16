@@ -485,7 +485,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 				fprintf(file, "  maxTwistAngle: %f\n", maxAngle * 180.0f / 3.141592f);
 			}
 
-			fprintf(file, "endJoint:\n\n");
+			fprintf(file, "jointEnd:\n\n");
 
 		}
 		const int bonesCount = controller->GetBoneCount();

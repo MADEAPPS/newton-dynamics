@@ -109,7 +109,7 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		euler = euler.Scale (3.141592f / 180.0f);
 		dMatrix matrix (euler.m_x, euler.m_y, euler.m_z, posit);
 		NewtonCollisionSetMatrix(collision, &matrix[0][0]);
-NewtonCollisionSetMode(collision, 0);
+//NewtonCollisionSetMode(collision, 0);
 		return collision;
 	}
 
@@ -201,7 +201,7 @@ NewtonCollisionSetMode(collision, 0);
 				fscanf(file, "%f", &minTwistAngle);
 			} else if (!strcmp(token, "maxTwistAngle:")) {
 				fscanf(file, "%f", &maxTwistAngle);
-			} else if (!strcmp(token, "endJoint:")) {
+			} else if (!strcmp(token, "jointEnd:")) {
 				break;
 			} else {
 				dAssert(0);
