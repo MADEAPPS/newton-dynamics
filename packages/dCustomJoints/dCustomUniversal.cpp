@@ -301,6 +301,7 @@ void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	dMatrix matrix1_1;
 	matrix1_1.m_up = matrix1.m_up;
 	matrix1_1.m_right = matrix0.m_front.CrossProduct(matrix1.m_up);
+	dAssert (matrix1_1.m_right.DotProduct3(matrix1_1.m_right) > 0.0f);
 	matrix1_1.m_right = matrix1_1.m_right.Scale (1.0f / dSqrt (matrix1_1.m_right.DotProduct3(matrix1_1.m_right)));
 	matrix1_1.m_front = matrix1_1.m_up.CrossProduct(matrix1_1.m_right);
 	
@@ -314,14 +315,9 @@ void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	}
 	dVector relOmega(omega0 - omega1);
 
-//static int xxx;
-//dTrace (("%d: %f %f %f\n", xxx, relOmega[0], relOmega[1], relOmega[2]));
-//xxx ++;
-
 	dFloat angle = -CalculateAngle(matrix0.m_front, matrix1_1.m_front, matrix1_1.m_right);
 	dFloat omega = (relOmega.DotProduct3(matrix1_1.m_right));
 	dFloat alphaError = -(angle + omega * timestep) / (timestep * timestep);
-	//dTrace(("%f  ", alphaError));
 	
 	NewtonUserJointAddAngularRow (m_joint, -angle, &matrix1_1.m_right[0]);
 	NewtonUserJointSetRowAcceleration (m_joint, alphaError);
@@ -337,9 +333,7 @@ void dCustomUniversal::SubmitConstraints (dFloat timestep, int threadIndex)
 	CalculateAngle(matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up, sinAngle_1, cosAngle_1);
 	dFloat angle1 = -m_curJointAngle_1.Update (cosAngle_1, sinAngle_1);
 
-
 	// calculate the desired acceleration
-	
 	m_jointOmega_0 = relOmega.DotProduct3(matrix0.m_front);
 	m_jointOmega_1 = relOmega.DotProduct3(matrix1.m_up);
 	

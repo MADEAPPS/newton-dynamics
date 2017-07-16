@@ -651,7 +651,6 @@ dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, N
 	CalculateLocalMatrix(parentPinAndPivotFrame, matrix, m_localMatrix1);
 }
 
-
 dCustomRagdollMotor::~dCustomRagdollMotor()
 {
 }
@@ -663,7 +662,8 @@ dCustomRagdollMotor::dCustomRagdollMotor(NewtonBody* const child, NewtonBody* co
 	callback(userData, &m_minTwistAngle, sizeof(dFloat));
 	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
 	callback(userData, &m_coneAngleCos, sizeof(dFloat));
-	callback(userData, &m_coneAngleSin, sizeof(dFloat));
+	callback(userData, &m_jointTorque, sizeof(dFloat));
+	//callback(userData, &m_coneAngleSin, sizeof(dFloat));
 	callback(userData, &m_coneAngleHalfCos, sizeof(dFloat));
 	callback(userData, &m_coneAngleHalfSin, sizeof(dFloat));
 }
@@ -676,21 +676,20 @@ void dCustomRagdollMotor::Serialize(NewtonSerializeCallback callback, void* cons
 	callback(userData, &m_minTwistAngle, sizeof(dFloat));
 	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
 	callback(userData, &m_coneAngleCos, sizeof(dFloat));
-	callback(userData, &m_coneAngleSin, sizeof(dFloat));
+	callback(userData, &m_jointTorque, sizeof(dFloat));
+	//callback(userData, &m_coneAngleSin, sizeof(dFloat));
 	callback(userData, &m_coneAngleHalfCos, sizeof(dFloat));
 	callback(userData, &m_coneAngleHalfSin, sizeof(dFloat));
 }
-
 
 void dCustomRagdollMotor::SetConeAngle(dFloat angle)
 {
 	m_coneAngle = angle;
 	m_coneAngleCos = dCos(angle);
-	m_coneAngleSin = dSin(angle);
+	//m_coneAngleSin = dSin(angle);
 	m_coneAngleHalfCos = dCos(angle * 0.5f);
 	m_coneAngleHalfSin = dSin(angle * 0.5f);
 }
-
 
 void dCustomRagdollMotor::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
 {
@@ -750,15 +749,15 @@ void dCustomRagdollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
 		// this is a hinge
 		Submit1DOFConstraints(matrix0, matrix1, timestep);
 	} else if ((m_maxTwistAngle - m_minTwistAngle) < 1.0e-4f) {
-		// this sis a universal joint
+		// this is a universal joint
 //		Submit2DOFConstraints(matrix0, matrix1, timestep);
 
-Submit1DOFConstraints(matrix0, matrix1, timestep);
+Submit2DOFConstraints(matrix0, matrix1, timestep);
 	} else {
 		// this is a general three dof joint
 		//Submit3DOFConstraints(matrix0, matrix1, timestep);
 
-Submit1DOFConstraints(matrix0, matrix1, timestep);
+Submit2DOFConstraints(matrix0, matrix1, timestep);
 	}
 }
 
@@ -807,40 +806,6 @@ void dCustomRagdollMotor::Submit3DOFConstraints(const dMatrix& matrix0, const dM
 }
 
 
-void dCustomRagdollMotor::Submit2DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
-{
-
-	dFloat pitchAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-	NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix1.m_front[0]);
-
-	const dVector& coneDir0 = matrix0.m_front;
-	const dVector& coneDir1 = matrix1.m_front;
-	dFloat cosAngle = coneDir0.DotProduct3(coneDir1);
-	if (cosAngle <= m_coneAngleCos) {
-		// limit is broken, summit a hard constraint
-		dAssert (0);
-/*
-		dVector lateralDir(coneDir0.CrossProduct(coneDir1));
-		dFloat mag2 = lateralDir.DotProduct3(lateralDir);
-		dAssert(mag2 > 1.0e-4f);
-		lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
-
-		dQuaternion rot(m_coneAngleHalfCos, lateralDir.m_x * m_coneAngleHalfSin, lateralDir.m_y * m_coneAngleHalfSin, lateralDir.m_z * m_coneAngleHalfSin);
-		dVector frontDir(rot.UnrotateVector(coneDir1));
-		dVector upDir(lateralDir.CrossProduct(frontDir));
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
-		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(coneDir0, frontDir, lateralDir), &lateralDir[0]);
-		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-*/
-	} else {
-		dAssert (0);
-		// limit is not broken submit a motor to simulate a muscle 
-	}
-
-}
-
-
-
 void dCustomRagdollMotor::Submit1DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	// handle special case of the joint being a hinge
@@ -865,3 +830,52 @@ void dCustomRagdollMotor::Submit1DOFConstraints(const dMatrix& matrix0, const dM
 	}
 }
 
+
+
+void dCustomRagdollMotor::Submit2DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
+	dMatrix matrix1_1;
+	matrix1_1.m_up = matrix1.m_up;
+	matrix1_1.m_front = matrix1.m_up.CrossProduct(matrix0.m_right);
+	dAssert (matrix1_1.m_front.DotProduct3(matrix1_1.m_front) > 0.0f);
+	matrix1_1.m_front = matrix1_1.m_front.Scale(1.0f / dSqrt(matrix1_1.m_front.DotProduct3(matrix1_1.m_front)));
+	matrix1_1.m_right = matrix1_1.m_front.CrossProduct(matrix1_1.m_up);
+
+	dFloat angle = -CalculateAngle(matrix0.m_right, matrix1_1.m_right, matrix1_1.m_front);
+	NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1_1.m_front[0]);
+
+	const dVector& coneDir0 = matrix0.m_front;
+	const dVector& coneDir1 = matrix1.m_front;
+	dFloat cosAngle = coneDir0.DotProduct3(coneDir1);
+	if (cosAngle <= m_coneAngleCos) {
+/*
+		// limit is broken, summit a hard constraint
+		dVector pin (coneDir0.CrossProduct(coneDir1));
+		pin = pin.Scale (m_coneAngleHalfSin / dSqrt(pin.DotProduct3(pin)));
+
+		dQuaternion rot (m_coneAngleHalfCos, pin.m_x, pin.m_y, pin.m_z);
+		dMatrix matrix (rot, dVector(0.0f, 0.0f, 0.0f, 1.0f));
+		dMatrix matrix11 (matrix1 * matrix);
+
+		//	dFloat pitchAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+		//	NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix1.m_front[0]);
+//		dAssert (0);
+
+		dVector lateralDir(coneDir0.CrossProduct(coneDir1));
+		dFloat mag2 = lateralDir.DotProduct3(lateralDir);
+		dAssert(mag2 > 1.0e-4f);
+		lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
+
+		dQuaternion rot(m_coneAngleHalfCos, lateralDir.m_x * m_coneAngleHalfSin, lateralDir.m_y * m_coneAngleHalfSin, lateralDir.m_z * m_coneAngleHalfSin);
+		dVector frontDir(rot.UnrotateVector(coneDir1));
+		dVector upDir(lateralDir.CrossProduct(frontDir));
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
+		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(coneDir0, frontDir, lateralDir), &lateralDir[0]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+*/
+	} else {
+//		dAssert (0);
+		// limit is not broken submit a motor to simulate a muscle 
+	}
+
+}

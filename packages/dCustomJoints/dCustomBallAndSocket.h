@@ -170,10 +170,11 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
 	dFloat m_coneAngleCos;
-	dFloat m_coneAngleSin;
+	//dFloat m_coneAngleSin;
 	dFloat m_coneAngleHalfCos;
 	dFloat m_coneAngleHalfSin;
 	dFloat m_jointTorque;
+
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor, dCustomBallAndSocket)
 };
 
