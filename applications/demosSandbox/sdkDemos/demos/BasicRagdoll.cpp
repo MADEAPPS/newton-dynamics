@@ -504,6 +504,9 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
+		char* const oldloc = setlocale(LC_ALL, 0);
+		setlocale(LC_ALL, "C");
+
 		FILE* const file = fopen (fileName, "wt");
 		dAssert (file);
 
@@ -521,6 +524,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		PrintRagdollJoints (file, controller, controller->GetBone(0), 0, filter);
 
 		fclose (file);
+		setlocale (LC_ALL, oldloc);
 	}
 
 	int m_material;

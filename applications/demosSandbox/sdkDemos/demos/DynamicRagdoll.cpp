@@ -262,12 +262,15 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
+		char* const oldloc = setlocale( LC_ALL, 0 );
+		setlocale( LC_ALL, "C" );
 		FILE* const file = fopen(fileName, "rt");
 		dAssert(file);
 
 		NewtonBody* const rootBone = ParseRigidBodies (file, NULL);
 
 		fclose (file);
+		setlocale (LC_ALL, oldloc);
 
 		return rootBone;
 	}
