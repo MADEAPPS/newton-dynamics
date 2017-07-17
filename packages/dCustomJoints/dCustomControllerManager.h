@@ -173,6 +173,7 @@ class dCustomControllerManager: public dList<CONTROLLER_BASE>
 	private:
 	void DestroyAllController ();
 
+	static void Debug (const NewtonWorld* const world, void* const listenerUserData);
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
 	static void PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
 	static void PostUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
@@ -192,9 +193,13 @@ dCustomControllerManager<CONTROLLER_BASE>::dCustomControllerManager(NewtonWorld*
 	:m_world(world)
 	,m_curTimestep(0.0f)
 {
-	void* const prelistener = NewtonWorldAddPreListener (world, managerName, this, PreUpdate, NULL);
-	NewtonWorldAddPostListener (world, managerName, this, PostUpdate, Destroy);
-	NewtonWorldListenerSetBodyDestroyCallback (world, prelistener, OnBodyDestroy);
+	void* const listener = NewtonWorldAddListener(world, managerName, this);
+
+	NewtonWorldListenerSetDebugCallback(world, listener, Debug);
+	NewtonWorldListenerSetDestroctorCallback(world, listener, Destroy);
+	NewtonWorldListenerSetPreUpdateCallback(world, listener, PreUpdate);
+	NewtonWorldListenerSetPostUpdateCallback(world, listener, PostUpdate);
+	NewtonWorldListenerSetBodyDestroyCallback(world, listener, OnBodyDestroy);
 }
 
 template<class CONTROLLER_BASE>
@@ -249,6 +254,14 @@ void dCustomControllerManager<CONTROLLER_BASE>::PostUpdate (const NewtonWorld* c
 	dCustomControllerManager* const me = (dCustomControllerManager*) listenerUserData;
 	me->m_curTimestep = timestep;
 	me->PostUpdate(timestep);
+}
+
+
+template<class CONTROLLER_BASE>
+void dCustomControllerManager<CONTROLLER_BASE>::Debug (const NewtonWorld* const world, void* const listenerUserData)
+{
+	dCustomControllerManager* const me = (dCustomControllerManager*) listenerUserData;
+	me->Debug();
 }
 
 template<class CONTROLLER_BASE>

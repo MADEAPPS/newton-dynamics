@@ -1530,11 +1530,11 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	m_world->SynchronizationBarrier();
 
 	// update pre-listeners after the force and true are applied
-	if (m_world->m_preListener.GetCount()) {
+	if (m_world->m_listeners.GetCount()) {
 		dTimeTrackerEvent("preListeners");
-		for (dgWorld::dgListenerList::dgListNode* node1 = m_world->m_preListener.GetFirst(); node1; node1 = node1->GetNext()) {
+		for (dgWorld::dgListenerList::dgListNode* node1 = m_world->m_listeners.GetFirst(); node1; node1 = node1->GetNext()) {
 			dgWorld::dgListener& listener = node1->GetInfo();
-			listener.m_onListenerUpdate(m_world, listener.m_userData, timestep);
+			listener.m_onPreUpdate(m_world, listener.m_userData, timestep);
 		}
 	}
 

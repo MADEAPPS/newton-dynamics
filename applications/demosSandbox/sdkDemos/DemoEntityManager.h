@@ -156,7 +156,7 @@ class DemoEntityManager: public wxGLCanvas, public dList <DemoEntity*>
 	bool m_physicsUpdate;
 	bool m_reEntrantUpdate;
 	void* m_renderHoodContext;
-	RenderHoodCallback m_renderHood;
+	RenderHoodCallback m_renderUI;
 	GLuint m_font;
 	GLuint m_fontImage;
 	DemoCameraListener* m_cameraManager;

@@ -92,7 +92,7 @@ DemoEntityManager::DemoEntityManager(NewtonDemos* const parent)
 	,m_physicsUpdate(true) 
 	,m_reEntrantUpdate (false)
 	,m_renderHoodContext(NULL)
-	,m_renderHood(NULL)
+	,m_renderUI(NULL)
 	,m_font(0)
 	,m_fontImage(0)
 	,m_cameraManager(NULL)
@@ -226,7 +226,7 @@ void DemoEntityManager::Cleanup ()
 
 
 	// we start without 2d render
-	m_renderHood = NULL;
+	m_renderUI = NULL;
 	m_renderHoodContext = NULL;
 }
 
@@ -551,7 +551,7 @@ void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVec
 
 void DemoEntityManager::Set2DDisplayRenderFunction (RenderHoodCallback callback, void* const context)
 {
-	m_renderHood = callback;
+	m_renderUI = callback;
 	m_renderHoodContext = context;
 }
 
@@ -924,13 +924,13 @@ void DemoEntityManager::RenderFrame ()
 	if (m_mainWindow->m_showNormalForces) {
 //	if (1) {
 		// see if there is a vehicle controller and 
-		void* const vehListerNode = NewtonWorldGetPreListener(GetNewton(), VEHICLE_PLUGIN_NAME);
+		void* const vehListerNode = NewtonWorldGetListener(GetNewton(), VEHICLE_PLUGIN_NAME);
 		if (vehListerNode) {
 			dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), vehListerNode);
 			manager->Debug();
 		}
 
-		void* const characterListerNode = NewtonWorldGetPreListener(GetNewton(), PLAYER_PLUGIN_NAME);
+		void* const characterListerNode = NewtonWorldGetListener(GetNewton(), PLAYER_PLUGIN_NAME);
 		if (characterListerNode) {
 			dCustomPlayerControllerManager* const manager = (dCustomPlayerControllerManager*)NewtonWorldGetListenerUserData(GetNewton(), characterListerNode);
 			manager->Debug();
@@ -970,7 +970,7 @@ void DemoEntityManager::RenderFrame ()
 
 	//int lineNumber = 130 + 22;
 	int lineNumber = 30;
-	if (m_renderHood) {
+	if (m_renderUI) {
 
 		// set display for 2d render mode
 
@@ -996,7 +996,7 @@ void DemoEntityManager::RenderFrame ()
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 			// render 2d display
-			m_renderHood (this, m_renderHoodContext, lineNumber);
+			m_renderUI (this, m_renderHoodContext, lineNumber);
 
 			// restore display mode
 			glMatrixMode(GL_PROJECTION);

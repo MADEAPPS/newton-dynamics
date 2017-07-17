@@ -17,10 +17,12 @@
 DemoListenerBase::DemoListenerBase(DemoEntityManager* const scene, const char* const listenerName)
 {
 	NewtonWorld* const world = scene->GetNewton();
-	void* const prelistener = NewtonWorldAddPreListener (world, listenerName, this, PreUpdate, NULL);
-	NewtonWorldAddPostListener (world, listenerName, this, PostUpdate, Destroy);
+	void* const listener = NewtonWorldAddListener (world, listenerName, this);
 
-	NewtonWorldListenerSetBodyDestroyCallback (world, prelistener, OnBodyDetroy);
+	NewtonWorldListenerSetDestroctorCallback (world, listener, Destroy);
+	NewtonWorldListenerSetPreUpdateCallback (world, listener, PreUpdate);
+	NewtonWorldListenerSetPostUpdateCallback (world, listener, PostUpdate);
+	NewtonWorldListenerSetBodyDestroyCallback (world, listener, OnBodyDestroy);
 }
 
 DemoListenerBase::~DemoListenerBase()
@@ -50,7 +52,7 @@ void DemoListenerBase::Destroy (const NewtonWorld* const world, void* const list
 	delete me;
 }
 
-void DemoListenerBase::OnBodyDetroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body)
+void DemoListenerBase::OnBodyDestroy (const NewtonWorld* const world, void* const listener, NewtonBody* const body)
 {
 	DemoListenerBase* const me = (DemoListenerBase*) NewtonWorldGetListenerUserData(world, listener);
 	me->OnBodyDestroy(body);

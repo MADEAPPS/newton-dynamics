@@ -836,15 +836,13 @@ void dCustomRagdollMotor::Submit1DOFConstraints(const dMatrix& matrix0, const dM
 		NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix0.m_front[0]);
 		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 	} else {
-		NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix0.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 		dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration (m_joint);
 		NewtonUserJointSetRowAcceleration (m_joint, accel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 	}
 }
-
-
 
 void dCustomRagdollMotor::Submit2DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
@@ -858,54 +856,23 @@ void dCustomRagdollMotor::Submit2DOFConstraints(const dMatrix& matrix0, const dM
 	dFloat angle = -CalculateAngle(matrix0.m_right, matrix1_1.m_right, matrix1_1.m_front);
 	NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1_1.m_front[0]);
 
-/*
-//	dFloat sinAngle_0;
-//	dFloat cosAngle_0;
-	dFloat angle0 = -CalculateAngle(matrix1_1.m_up, matrix0.m_up, matrix1_1.m_front, sinAngle_0, cosAngle_0);
-//	dFloat angle0 = -m_curJointAngle_0.Update(cosAngle_0, sinAngle_0);
-
-//	dFloat sinAngle_1;
-//	dFloat cosAngle_1;
-	dFloat angle1 = -CalculateAngle(matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up, sinAngle_1, cosAngle_1);
-//	dFloat angle1 = -m_curJointAngle_1.Update(cosAngle_1, sinAngle_1);
-
-
-
-
-
-
-	const dVector& coneDir0 = matrix0.m_front;
-	const dVector& coneDir1 = matrix1.m_front;
-	dFloat cosAngle = coneDir0.DotProduct3(coneDir1);
-	if (cosAngle <= m_coneAngleCos) {
-
-		// limit is broken, summit a hard constraint
-		dVector pin (coneDir0.CrossProduct(coneDir1));
-		pin = pin.Scale (m_coneAngleHalfSin / dSqrt(pin.DotProduct3(pin)));
-
-		dQuaternion rot (m_coneAngleHalfCos, pin.m_x, pin.m_y, pin.m_z);
-		dMatrix matrix (rot, dVector(0.0f, 0.0f, 0.0f, 1.0f));
-		dMatrix matrix11 (matrix1 * matrix);
-
-		//	dFloat pitchAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-		//	NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix1.m_front[0]);
+	dFloat angle0 = -CalculateAngle(matrix1_1.m_right, matrix1.m_right, matrix1.m_right);
+	if (angle0 < m_minAngle0) {
 //		dAssert (0);
-
-		dVector lateralDir(coneDir0.CrossProduct(coneDir1));
-		dFloat mag2 = lateralDir.DotProduct3(lateralDir);
-		dAssert(mag2 > 1.0e-4f);
-		lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
-
-		dQuaternion rot(m_coneAngleHalfCos, lateralDir.m_x * m_coneAngleHalfSin, lateralDir.m_y * m_coneAngleHalfSin, lateralDir.m_z * m_coneAngleHalfSin);
-		dVector frontDir(rot.UnrotateVector(coneDir1));
-		dVector upDir(lateralDir.CrossProduct(frontDir));
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
-		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(coneDir0, frontDir, lateralDir), &lateralDir[0]);
-		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-
+	} else if (angle0 > m_maxAngle0) {
+//		dAssert (0);
 	} else {
-//		dAssert (0);
-		// limit is not broken submit a motor to simulate a muscle 
+//		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1_1.m_up[0]);
+//		dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+//		NewtonUserJointSetRowAcceleration(m_joint, accel);
+//		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+//		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 	}
-*/
+
+//	dFloat angle0 = -CalculateAngle(matrix0.m_front, matrix0.m_up, matrix1_1.m_front);
+	
+
+
+
+
 }

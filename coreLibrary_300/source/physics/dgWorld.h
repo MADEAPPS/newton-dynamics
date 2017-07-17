@@ -174,6 +174,7 @@ class dgWorld
 	typedef void (dgApi *OnListenerBodyDestroyCallback) (const dgWorld* const world, void* const listener, dgBody* const body);
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listener, dgFloat32 timestep);
 	typedef void (dgApi *OnListenerDestroyCallback) (const dgWorld* const world, void* const listener);
+	typedef void (dgApi *OnListenerDebugCallback) (const dgWorld* const world, void* const listener);
 
 //	typedef void (dgApi *OnSerialize) (void* const userData, dgSerialize funt, void* const serilalizeObject);
 //	typedef void (dgApi *OnDeserialize) (void* const userData, dgDeserialize funt, void* const serilalizeObject);
@@ -198,7 +199,9 @@ class dgWorld
 		dgListener()
 			:m_world(NULL)
 			,m_userData(NULL)
-			,m_onListenerUpdate(NULL)
+			,m_onPreUpdate(NULL)
+			,m_onPostUpdate(NULL)
+			,m_onDebugCallback(NULL)
 			,m_onListenerDestroy(NULL)
 			,m_onBodyDestroy(NULL)
 		{
@@ -214,7 +217,9 @@ class dgWorld
 		char m_name[32];
 		dgWorld* m_world;
 		void* m_userData;
-		OnListenerUpdateCallback m_onListenerUpdate;
+		OnListenerUpdateCallback m_onPreUpdate;
+		OnListenerUpdateCallback m_onPostUpdate;
+		OnListenerDebugCallback m_onDebugCallback;
 		OnListenerDestroyCallback m_onListenerDestroy;
 		OnListenerBodyDestroyCallback m_onBodyDestroy;
 	};
@@ -280,14 +285,18 @@ class dgWorld
 						  const dgCollisionInstance* const collisionB, const dgMatrix& matrixB, 
 						  dgTriplex& contactA, dgTriplex& contactB, dgTriplex& normalAB, dgInt32 threadIndex);
 
-
 	void SetFrictionThreshold (dgFloat32 acceletion);
 
+	void ListenersDebug();
 	void* GetListenerUserData (void* const listener) const;
-	void* FindPreListener (const char* const nameid) const;
-	void* FindPostListener (const char* const nameid) const;
-	void* AddPreListener (const char* const nameid, void* const userData, OnListenerUpdateCallback updateCallback, OnListenerDestroyCallback destroyCallback);
-	void* AddPostListener (const char* const nameid, void* const userData, OnListenerUpdateCallback updateCallback, OnListenerDestroyCallback destroyCallback);
+	void* FindListener (const char* const nameid) const;
+
+	void* AddListener (const char* const nameid, void* const userData);
+	void ListenerSetDestroyCallback (void* const listener, OnListenerDestroyCallback destroyCallback);
+	void ListenerSetPreUpdate (void* const listener, OnListenerUpdateCallback updateCallback);
+	void ListenerSetPostUpdate (void* const listener, OnListenerUpdateCallback updateCallback);
+	
+	void SetListenerBodyDebugCallback (void* const listener, OnListenerDebugCallback callback);
 	void SetListenerBodyDestroyCallback (void* const listener, OnListenerBodyDestroyCallback callback);
 	OnListenerBodyDestroyCallback GetListenerBodyDestroyCallback (void* const listener) const;
 
@@ -498,8 +507,7 @@ class dgWorld
 	OnJointSerializationCallback m_serializedJointCallback;	
 	OnJointDeserializationCallback m_deserializedJointCallback;	
 
-	dgListenerList m_preListener;
-	dgListenerList m_postListener;
+	dgListenerList m_listeners;
 	dgTree<void*, unsigned> m_perInstanceData;
 	dgArray<dgUnsigned8> m_bodiesMemory; 
 	dgArray<dgUnsigned8> m_jointsMemory; 

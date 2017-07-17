@@ -341,6 +341,7 @@ extern "C" {
 	
 	typedef void (*NewtonWorldDestructorCallback) (const NewtonWorld* const world);
 
+	typedef void (*NewtonWorldListenerDebugCallback) (const NewtonWorld* const world, void* const listener);
 	typedef void (*NewtonWorldListenerBodyDestroyCallback) (const NewtonWorld* const world, void* const listenerUserData, NewtonBody* const body);
 	typedef void (*NewtonWorldUpdateListenerCallback) (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep);
 	typedef void (*NewtonWorldDestroyListenerCallback) (const NewtonWorld* const world, void* const listenerUserData);
@@ -510,19 +511,22 @@ extern "C" {
 	NEWTON_API void NewtonWorldSetUserData (const NewtonWorld* const newtonWorld, void* const userData);
 	NEWTON_API void* NewtonWorldGetUserData (const NewtonWorld* const newtonWorld);
 
-	NEWTON_API void* NewtonWorldGetListenerUserData (const NewtonWorld* const newtonWorld, void* const listener);
-	NEWTON_API NewtonWorldListenerBodyDestroyCallback NewtonWorldListenerGetBodyDestroyCallback (const NewtonWorld* const newtonWorld, void* const listener);
-	NEWTON_API void NewtonWorldListenerSetBodyDestroyCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerBodyDestroyCallback bodyDestroyCallback);
-
-	NEWTON_API void* NewtonWorldGetPreListener (const NewtonWorld* const newtonWorld, const char* const nameId);
-	NEWTON_API void* NewtonWorldAddPreListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData, NewtonWorldUpdateListenerCallback update, NewtonWorldDestroyListenerCallback destroy);
 	
-	NEWTON_API void*  NewtonWorldGetPostListener (const NewtonWorld* const newtonWorld, const char* const nameId);
-	NEWTON_API void* NewtonWorldAddPostListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData, NewtonWorldUpdateListenerCallback update, NewtonWorldDestroyListenerCallback destroy);
+	NEWTON_API void* NewtonWorldAddListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData);
+	NEWTON_API void* NewtonWorldGetListener (const NewtonWorld* const newtonWorld, const char* const nameId);
+
+	NEWTON_API void NewtonWorldListenerSetDestroctorCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldDestroyListenerCallback destroy);
+	NEWTON_API void NewtonWorldListenerSetPreUpdateCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback update);
+	NEWTON_API void NewtonWorldListenerSetPostUpdateCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback update);
+	NEWTON_API void NewtonWorldListenerSetDebugCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerDebugCallback debugCallback);
+	NEWTON_API void NewtonWorldListenerSetBodyDestroyCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerBodyDestroyCallback bodyDestroyCallback);
+	NEWTON_API void NewtonWorldListenerDebug(const NewtonWorld* const newtonWorld);
+	NEWTON_API void* NewtonWorldGetListenerUserData(const NewtonWorld* const newtonWorld, void* const listener);
+	NEWTON_API NewtonWorldListenerBodyDestroyCallback NewtonWorldListenerGetBodyDestroyCallback (const NewtonWorld* const newtonWorld, void* const listener);
+
 
 	NEWTON_API void NewtonWorldSetDestructorCallback (const NewtonWorld* const newtonWorld, NewtonWorldDestructorCallback destructor);
 	NEWTON_API NewtonWorldDestructorCallback NewtonWorldGetDestructorCallback (const NewtonWorld* const newtonWorld);
-
 	NEWTON_API void NewtonWorldSetCollisionConstructorDestructorCallback (const NewtonWorld* const newtonWorld, NewtonCollisionCopyConstructionCallback constructor, NewtonCollisionDestructorCallback destructor);
 
 	NEWTON_API void NewtonWorldRayCast (const NewtonWorld* const newtonWorld, const dFloat* const p0, const dFloat* const p1, NewtonWorldRayFilterCallback filter, void* const userData, NewtonWorldRayPrefilterCallback prefilter, int threadIndex);

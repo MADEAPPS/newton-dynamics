@@ -34,7 +34,17 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
 		//NewtonMaterialSetCallbackUserData (scene->GetNewton(), m_material, m_material, this);
 		//NewtonMaterialSetCollisionCallback (scene->GetNewton(), m_material, m_material, OnBoneAABBOverlap, NULL);
+
+		scene->Set2DDisplayRenderFunction (Debug, this);
 	}
+
+
+	static void Debug (DemoEntityManager* const scene, void* const context, int lineNumber)
+	{
+//		SuperCarVehicleControllerManager* const me = (SuperCarVehicleControllerManager*) context;
+//		me->RenderVehicleHud (scene, lineNumber);
+	}
+
 
 
 #if 0
@@ -162,9 +172,10 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 
 	void ParseJoint(FILE* const file, const dTree<NewtonBody*, const dString>& bodyMap)
 	{
-		char name[256];
 		char token[256];
 		char jointType[256];
+		char childName[256];
+		char parentName[256];
 
 		NewtonBody* child;
 		NewtonBody* parent;
@@ -182,11 +193,11 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 			if (!strcmp(token, "joint:")) {
 				fscanf(file, "%s", &jointType);
 			} else if (!strcmp(token, "childBody:")) {
-				fscanf(file, "%s", name);
-				child = bodyMap.Find(name)->GetInfo();
+				fscanf(file, "%s", childName);
+				child = bodyMap.Find(childName)->GetInfo();
 			} else if (!strcmp(token, "parentBody:")) {
-				fscanf(file, "%s", name);
-				parent = bodyMap.Find(name)->GetInfo();
+				fscanf(file, "%s", parentName);
+				parent = bodyMap.Find(parentName)->GetInfo();
 			} else if (!strcmp(token, "childPivot:")) {
 				fscanf(file, "%f %f %f", &childPivot.m_x, &childPivot.m_y, &childPivot.m_z);
 			} else if (!strcmp(token, "childEulers:")) {

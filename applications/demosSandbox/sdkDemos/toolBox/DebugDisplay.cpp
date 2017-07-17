@@ -369,6 +369,8 @@ void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE 
 		glVertex3f (g_debugDisplayCallback[i+1].m_x, g_debugDisplayCallback[i+1].m_y, g_debugDisplayCallback[i+1].m_z);
 	}
 	glEnd();
+
+	NewtonWorldListenerDebug(world);
 }
 
 void DebugDrawPoint (const dVector& p, dFloat size)

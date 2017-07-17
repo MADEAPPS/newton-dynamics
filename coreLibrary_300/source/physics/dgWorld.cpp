@@ -217,8 +217,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator, dgInt32 stackSize)
 	,m_broadPhase(NULL)
 	,m_sentinelBody(NULL)
 	,m_pointCollision(NULL)
-	,m_preListener(allocator)
-	,m_postListener(allocator)
+	,m_listeners(allocator)
 	,m_perInstanceData(allocator)
 	,m_bodiesMemory (allocator, 64)
 	,m_jointsMemory (allocator, 64)
@@ -319,8 +318,7 @@ dgWorld::~dgWorld()
 	dgAsyncThread::Terminate();
 	dgMutexThread::Terminate();
 
-	m_preListener.RemoveAll();
-	m_postListener.RemoveAll();
+	m_listeners.RemoveAll();
 
 	DestroyAllBodies();
 	RemoveAllGroupID();
@@ -545,20 +543,12 @@ dgKinematicBody* dgWorld::CreateKinematicBody (dgCollisionInstance* const collis
 
 void dgWorld::DestroyBody(dgBody* const body)
 {
-	for (dgListenerList::dgListNode* node = m_postListener.GetLast(); node; node = node->GetPrev()) {
+	for (dgListenerList::dgListNode* node = m_listeners.GetLast(); node; node = node->GetPrev()) {
 		dgListener& listener = node->GetInfo();
 		if (listener.m_onBodyDestroy) {
 			listener.m_onBodyDestroy (this, node, body);
 		}
 	}
-
-	for (dgListenerList::dgListNode* node = m_preListener.GetLast(); node; node = node->GetPrev()) {
-		dgListener& listener = node->GetInfo();
-		if (listener.m_onBodyDestroy) {
-			listener.m_onBodyDestroy (this, node, body);
-		}
-	}
-
 
 	if (body->m_destructor) {
 		body->m_destructor (*body);
@@ -606,30 +596,35 @@ void dgWorld::SetIslandUpdateCallback (OnClusterUpdate callback)
 }
 
 
-void* dgWorld::AddPreListener (const char* const nameid, void* const userData, OnListenerUpdateCallback updateCallback, OnListenerDestroyCallback destroyCallback)
+void* dgWorld::AddListener (const char* const nameid, void* const userData)
 {
-	dgListenerList::dgListNode* const node = m_preListener.Append();
+	dgListenerList::dgListNode* const node = m_listeners.Append();
 	dgListener& listener = node->GetInfo();
 	strncpy (listener.m_name, nameid, sizeof (listener.m_name));
 	listener.m_world = this;
 	listener.m_userData = userData;
-	listener.m_onListenerUpdate = updateCallback;
-	listener.m_onListenerDestroy = destroyCallback;
 	return node;
 }
 
-
-void* dgWorld::AddPostListener (const char* const nameid, void* const userData, OnListenerUpdateCallback updateCallback, OnListenerDestroyCallback destroyCallback)
+void dgWorld::ListenerSetDestroyCallback(void* const listenerNode, OnListenerDestroyCallback destroyCallback)
 {
-	dgListenerList::dgListNode* const node = m_postListener.Append();
-	dgListener& listener = node->GetInfo();
-	strncpy (listener.m_name, nameid, sizeof (listener.m_name));
-	listener.m_world = this;
-	listener.m_userData = userData;
-	listener.m_onListenerUpdate = updateCallback;
+	dgListener& listener = ((dgListenerList::dgListNode*) listenerNode)->GetInfo();
 	listener.m_onListenerDestroy = destroyCallback;
-	return node;
 }
+
+void dgWorld::ListenerSetPreUpdate(void* const listenerNode, OnListenerUpdateCallback updateCallback)
+{
+	dgListener& listener = ((dgListenerList::dgListNode*) listenerNode)->GetInfo();
+	listener.m_onPreUpdate = updateCallback;
+}
+
+void dgWorld::ListenerSetPostUpdate(void* const listenerNode, OnListenerUpdateCallback updateCallback)
+{
+	dgListener& listener = ((dgListenerList::dgListNode*) listenerNode)->GetInfo();
+	listener.m_onPostUpdate = updateCallback;
+}
+
+
 
 void* dgWorld::GetListenerUserData (void* const listenerNode) const
 {
@@ -643,6 +638,12 @@ void dgWorld::SetListenerBodyDestroyCallback (void* const listenerNode, OnListen
 	listener.m_onBodyDestroy = callback;
 }
 
+void dgWorld::SetListenerBodyDebugCallback (void* const listenerNode, OnListenerDebugCallback callback)
+{
+	dgListener& listener = ((dgListenerList::dgListNode*) listenerNode)->GetInfo();
+	listener.m_onDebugCallback = callback;
+}
+
 dgWorld::OnListenerBodyDestroyCallback dgWorld::GetListenerBodyDestroyCallback (void* const listenerNode) const
 {
 	dgListener& listener = ((dgListenerList::dgListNode*) listenerNode)->GetInfo();
@@ -650,9 +651,19 @@ dgWorld::OnListenerBodyDestroyCallback dgWorld::GetListenerBodyDestroyCallback (
 }
 
 
-void* dgWorld::FindPreListener (const char* const nameid) const
+void dgWorld::ListenersDebug()
 {
-	for (dgListenerList::dgListNode* node = m_preListener.GetFirst(); node; node = node->GetNext()) {
+	for (dgListenerList::dgListNode* node = m_listeners.GetFirst(); node; node = node->GetNext()) {
+		dgListener& listener = node->GetInfo();
+		if (listener.m_onDebugCallback) {
+			listener.m_onDebugCallback (this, listener.m_userData);
+		}
+	}
+}
+
+void* dgWorld::FindListener (const char* const nameid) const
+{
+	for (dgListenerList::dgListNode* node = m_listeners.GetFirst(); node; node = node->GetNext()) {
 		dgListener& listener = node->GetInfo();
 		if (!strcmp (nameid, listener.m_name)) {
 			return node;
@@ -660,18 +671,6 @@ void* dgWorld::FindPreListener (const char* const nameid) const
 	}
 	return NULL;
 }
-
-void* dgWorld::FindPostListener (const char* const nameid) const 
-{
-	for (dgListenerList::dgListNode* node = m_postListener.GetFirst(); node; node = node->GetNext()) {
-		dgListener& listener = node->GetInfo();
-		if (!strcmp (nameid, listener.m_name)) {
-			return node;
-		}
-	}
-	return NULL;
-}
-
 
 
 dgBallConstraint* dgWorld::CreateBallConstraint (
@@ -916,11 +915,11 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	UpdateContacts(timestep);
 	UpdateDynamics (timestep);
 
-	if (m_postListener.GetCount()) {
+	if (m_listeners.GetCount()) {
 		dTimeTrackerEvent("postListeners");
-		for (dgListenerList::dgListNode* node = m_postListener.GetFirst(); node; node = node->GetNext()) {
+		for (dgListenerList::dgListNode* node = m_listeners.GetFirst(); node; node = node->GetNext()) {
 			dgListener& listener = node->GetInfo();
-			listener.m_onListenerUpdate (this, listener.m_userData, timestep);
+			listener.m_onPostUpdate (this, listener.m_userData, timestep);
 		}
 	}
 

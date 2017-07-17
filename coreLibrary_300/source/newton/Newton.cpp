@@ -995,34 +995,56 @@ void NewtonWorldListenerSetBodyDestroyCallback (const NewtonWorld* const newtonW
 }
 
 
-void* NewtonWorldAddPreListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData, NewtonWorldUpdateListenerCallback update, NewtonWorldDestroyListenerCallback destroy)
+void* NewtonWorldAddListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	return world->AddPreListener (nameId, listenerUserData, (dgWorld::OnListenerUpdateCallback) update, (dgWorld::OnListenerDestroyCallback) destroy);
+	return world->AddListener (nameId, listenerUserData);
 }
 
-void* NewtonWorldGetPreListener (const NewtonWorld* const newtonWorld, const char* const nameId)
+void NewtonWorldListenerSetDestroctorCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldDestroyListenerCallback destroy)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->ListenerSetDestroyCallback(listener, (dgWorld::OnListenerDestroyCallback) destroy);
+}
+
+void NewtonWorldListenerSetPreUpdateCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback update)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->ListenerSetPreUpdate(listener, (dgWorld::OnListenerUpdateCallback) update);
+}
+
+void NewtonWorldListenerSetPostUpdateCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback update)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->ListenerSetPostUpdate(listener, (dgWorld::OnListenerUpdateCallback) update);
+}
+
+
+void* NewtonWorldGetListener (const NewtonWorld* const newtonWorld, const char* const nameId)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	return world->FindPreListener (nameId);
+	return world->FindListener (nameId);
 }
 
-void* NewtonWorldAddPostListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData, NewtonWorldUpdateListenerCallback update, NewtonWorldDestroyListenerCallback destroy)
+
+void NewtonWorldListenerSetDebugCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerDebugCallback debugCallback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	return world->AddPostListener (nameId, listenerUserData, (dgWorld::OnListenerUpdateCallback) update, (dgWorld::OnListenerDestroyCallback) destroy);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->SetListenerBodyDebugCallback (listener, (dgWorld::OnListenerDebugCallback) debugCallback);
 }
 
-void* NewtonWorldGetPostListener (const NewtonWorld* const newtonWorld, const char* const nameId)
+void NewtonWorldListenerDebug(const NewtonWorld* const newtonWorld)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	return world->FindPostListener (nameId);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->ListenersDebug();
 }
-
 
 /*!
   Return the total number of rigid bodies in the world.

@@ -22,40 +22,6 @@
 #define DYNAMIC_RAGDOLL_PLUGIN_NAME	"__dynamicRagDollManager__"
 
 
-class dCustomActiveCharacterJoint: public dCustomBallAndSocket
-{
-	public:
-	CUSTOM_JOINTS_API dCustomActiveCharacterJoint(const dMatrix& globalChildPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
-	CUSTOM_JOINTS_API virtual ~dCustomActiveCharacterJoint();
-
-	CUSTOM_JOINTS_API void SetConeAngle(dFloat angle);
-	CUSTOM_JOINTS_API void SetTwistAngle(dFloat minAngle, dFloat maxAngle);
-
-	CUSTOM_JOINTS_API dFloat GetConeAngle() const;
-	CUSTOM_JOINTS_API void GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const;
-
-	protected:
-	CUSTOM_JOINTS_API dCustomActiveCharacterJoint(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
-
-	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
-
-	CUSTOM_JOINTS_API virtual int GetDOF () const;
-
-	dMatrix m_rotationOffset;
-	dFloat m_coneAngle;
-	dFloat m_minTwistAngle;
-	dFloat m_maxTwistAngle;
-	dFloat m_coneAngleCos;
-	dFloat m_coneAngleSin;
-	dFloat m_coneAngleHalfCos;
-	dFloat m_coneAngleHalfSin;
-	
-	DECLARE_CUSTOM_JOINT(dCustomActiveCharacterJoint, dCustomBallAndSocket)
-};
-
-
 // a Skeleton Transform controller is use to calculate local transform on contractions of rigid bodies and joint that form part of a hierarchical Skeleton
 class dCustomActiveCharacterController: public dCustomControllerBase
 {
@@ -183,20 +149,13 @@ class dCustomActiveCharacterManager: public dCustomControllerManager<dCustomActi
 
 	CUSTOM_JOINTS_API virtual dCustomActiveCharacterController* CreateTransformController ();
 	
-
 //	CUSTOM_JOINTS_API virtual void OnUpdateTransform (const dCustomActiveCharacterController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
-//	dCustomDynamicRagDollManager
-	
-/*
-	CUSTOM_JOINTS_API virtual dCustomArticulatedTransformController* CreateTransformController(void* const userData);
-
-	CUSTOM_JOINTS_API virtual void DisableAllSelfCollision(dCustomArticulatedTransformController* const controller);
-	CUSTOM_JOINTS_API virtual void SetDefaultSelfCollisionMask(dCustomArticulatedTransformController* const controller);
-
-	CUSTOM_JOINTS_API virtual void SetCollisionMask(dCustomArticulatedTransformController::dSkeletonBone* const bone0, dCustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode);
-	CUSTOM_JOINTS_API virtual bool SelfCollisionTest(const dCustomArticulatedTransformController::dSkeletonBone* const bone0, const dCustomArticulatedTransformController::dSkeletonBone* const bone1) const;
-	CUSTOM_JOINTS_API virtual void OnUpdateTransform(const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
-*/
+//	CUSTOM_JOINTS_API virtual dCustomArticulatedTransformController* CreateTransformController(void* const userData);
+//	CUSTOM_JOINTS_API virtual void DisableAllSelfCollision(dCustomArticulatedTransformController* const controller);
+//	CUSTOM_JOINTS_API virtual void SetDefaultSelfCollisionMask(dCustomArticulatedTransformController* const controller);
+//	CUSTOM_JOINTS_API virtual void SetCollisionMask(dCustomArticulatedTransformController::dSkeletonBone* const bone0, dCustomArticulatedTransformController::dSkeletonBone* const bone1, bool mode);
+//	CUSTOM_JOINTS_API virtual bool SelfCollisionTest(const dCustomArticulatedTransformController::dSkeletonBone* const bone0, const dCustomArticulatedTransformController::dSkeletonBone* const bone1) const;
+//	CUSTOM_JOINTS_API virtual void OnUpdateTransform(const dCustomArticulatedTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const = 0;
 };
 
 
