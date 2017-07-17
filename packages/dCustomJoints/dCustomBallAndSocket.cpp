@@ -632,23 +632,26 @@ void dCustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thr
 
 dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
-	,m_rotationOffset(dGetIdentityMatrix())
+	,m_torque(1000.0f)
+	,m_minAngle0(0.0f)
+	,m_maxAngle0(0.0f)
+	,m_minAngle1(0.0f)
+	,m_maxAngle1(0.0f)
+	,m_minTwistAngle(0.0f)
+	,m_maxTwistAngle(0.0f)
 {
-	SetConeAngle(0.0f);
-	SetTwistAngle(0.0f, 0.0f);
-	SetJointTorque(1000.0f);
 }
 
-
 dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent)
-	:dCustomBallAndSocket(childPinAndPivotFrame, child, parent)
-	,m_rotationOffset(childPinAndPivotFrame * parentPinAndPivotFrame.Inverse())
+	:dCustomBallAndSocket(childPinAndPivotFrame, parentPinAndPivotFrame, child, parent)
+	,m_torque(1000.0f)
+	,m_minAngle0(0.0f)
+	,m_maxAngle0(0.0f)
+	,m_minAngle1(0.0f)
+	,m_maxAngle1(0.0f)
+	,m_minTwistAngle(0.0f)
+	,m_maxTwistAngle(0.0f)
 {
-	SetConeAngle(0.0f);
-	SetTwistAngle(0.0f, 0.0f);
-	SetJointTorque(1000.0f);
-	dMatrix matrix;
-	CalculateLocalMatrix(parentPinAndPivotFrame, matrix, m_localMatrix1);
 }
 
 dCustomRagdollMotor::~dCustomRagdollMotor()
@@ -658,48 +661,66 @@ dCustomRagdollMotor::~dCustomRagdollMotor()
 dCustomRagdollMotor::dCustomRagdollMotor(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:dCustomBallAndSocket(child, parent, callback, userData)
 {
-	callback(userData, &m_rotationOffset, sizeof(dMatrix));
+	callback(userData, &m_torque, sizeof(dFloat));
+	callback(userData, &m_minAngle0, sizeof(dFloat));
+	callback(userData, &m_maxAngle0, sizeof(dFloat));
+	callback(userData, &m_minAngle1, sizeof(dFloat));
+	callback(userData, &m_maxAngle1, sizeof(dFloat));
 	callback(userData, &m_minTwistAngle, sizeof(dFloat));
 	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
-	callback(userData, &m_coneAngleCos, sizeof(dFloat));
-	callback(userData, &m_jointTorque, sizeof(dFloat));
-	//callback(userData, &m_coneAngleSin, sizeof(dFloat));
-	callback(userData, &m_coneAngleHalfCos, sizeof(dFloat));
-	callback(userData, &m_coneAngleHalfSin, sizeof(dFloat));
 }
 
 void dCustomRagdollMotor::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomBallAndSocket::Serialize(callback, userData);
 
-	callback(userData, &m_rotationOffset, sizeof(dMatrix));
+	callback(userData, &m_torque, sizeof(dFloat));
+	callback(userData, &m_minAngle0, sizeof(dFloat));
+	callback(userData, &m_maxAngle0, sizeof(dFloat));
+	callback(userData, &m_minAngle1, sizeof(dFloat));
+	callback(userData, &m_maxAngle1, sizeof(dFloat));
 	callback(userData, &m_minTwistAngle, sizeof(dFloat));
 	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
-	callback(userData, &m_coneAngleCos, sizeof(dFloat));
-	callback(userData, &m_jointTorque, sizeof(dFloat));
-	//callback(userData, &m_coneAngleSin, sizeof(dFloat));
-	callback(userData, &m_coneAngleHalfCos, sizeof(dFloat));
-	callback(userData, &m_coneAngleHalfSin, sizeof(dFloat));
 }
 
-void dCustomRagdollMotor::SetConeAngle(dFloat angle)
+void dCustomRagdollMotor::SetJointTorque(dFloat torque)
 {
-	m_coneAngle = angle;
-	m_coneAngleCos = dCos(angle);
-	//m_coneAngleSin = dSin(angle);
-	m_coneAngleHalfCos = dCos(angle * 0.5f);
-	m_coneAngleHalfSin = dSin(angle * 0.5f);
+	m_torque = dAbs(torque);
+}
+
+void dCustomRagdollMotor::SetAngle0(dFloat minAngle, dFloat maxAngle)
+{
+	m_minAngle0 = -dAbs (minAngle);
+	m_maxAngle0 = dAbs (maxAngle);
+}
+
+void dCustomRagdollMotor::SetAngle1(dFloat minAngle, dFloat maxAngle)
+{
+	m_minAngle1 = -dAbs(minAngle);
+	m_maxAngle1 = dAbs(maxAngle);
 }
 
 void dCustomRagdollMotor::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
 {
-	m_minTwistAngle = minAngle;
-	m_maxTwistAngle = maxAngle;
+	m_minTwistAngle = -dAbs(minAngle);
+	m_maxTwistAngle = dAbs(maxAngle);
 }
 
-dFloat dCustomRagdollMotor::GetConeAngle() const
+dFloat dCustomRagdollMotor::GetJointTorque() const
 {
-	return m_coneAngle;
+	return m_torque;
+}
+
+void dCustomRagdollMotor::GetAngle0(dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_minAngle0;
+	maxAngle = m_maxAngle0;
+}
+
+void dCustomRagdollMotor::GetAngle1(dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_minAngle1;
+	maxAngle = m_maxAngle1;
 }
 
 void dCustomRagdollMotor::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
@@ -708,21 +729,12 @@ void dCustomRagdollMotor::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) cons
 	maxAngle = m_maxTwistAngle;
 }
 
-void dCustomRagdollMotor::SetJointTorque(dFloat torque)
-{
-	m_jointTorque = dAbs (torque);
-}
-
-dFloat dCustomRagdollMotor::GetJointTorque() const
-{
-	return m_jointTorque;
-}
-
 
 void dCustomRagdollMotor::GetInfo(NewtonJointRecord* const info) const
 {
 	dCustomBallAndSocket::GetInfo(info);
-
+	dAssert (0);
+/*
 	info->m_minAngularDof[0] = m_minTwistAngle;
 	info->m_maxAngularDof[0] = m_maxTwistAngle;
 
@@ -732,6 +744,7 @@ void dCustomRagdollMotor::GetInfo(NewtonJointRecord* const info) const
 	info->m_maxAngularDof[2] = m_coneAngle;
 
 	strcpy(info->m_descriptionType, GetTypeName());
+*/
 }
 
 void dCustomRagdollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
@@ -739,13 +752,16 @@ void dCustomRagdollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
+	dAssert ((m_maxAngle0 - m_minAngle0) >= 0.0f);
+	dAssert ((m_maxAngle1 - m_minAngle1) >= 0.0f);
+	dAssert ((m_maxTwistAngle - m_minTwistAngle) >= 0.0f);
+
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	matrix1 = m_rotationOffset * matrix1;
 
 	dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
-	dAssert ((m_maxTwistAngle - m_minTwistAngle) >= 0.0f);
-	if (m_coneAngleCos > 0.9999f) {
+
+	if (((m_maxAngle0 - m_minAngle0) < 1.0e-4f) && ((m_maxAngle1 - m_minAngle1) < 1.0e-4f)) {
 		// this is a hinge
 		Submit1DOFConstraints(matrix0, matrix1, timestep);
 	} else if ((m_maxTwistAngle - m_minTwistAngle) < 1.0e-4f) {
@@ -760,9 +776,6 @@ Submit2DOFConstraints(matrix0, matrix1, timestep);
 Submit2DOFConstraints(matrix0, matrix1, timestep);
 	}
 }
-
-
-
 
 void dCustomRagdollMotor::Submit3DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
@@ -824,9 +837,10 @@ void dCustomRagdollMotor::Submit1DOFConstraints(const dMatrix& matrix0, const dM
 		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 	} else {
 		NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix0.m_front[0]);
-		NewtonUserJointSetRowAcceleration (m_joint, 0.0f);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_jointTorque);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_jointTorque);
+		dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration (m_joint);
+		NewtonUserJointSetRowAcceleration (m_joint, accel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 	}
 }
 
@@ -844,11 +858,27 @@ void dCustomRagdollMotor::Submit2DOFConstraints(const dMatrix& matrix0, const dM
 	dFloat angle = -CalculateAngle(matrix0.m_right, matrix1_1.m_right, matrix1_1.m_front);
 	NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1_1.m_front[0]);
 
+/*
+//	dFloat sinAngle_0;
+//	dFloat cosAngle_0;
+	dFloat angle0 = -CalculateAngle(matrix1_1.m_up, matrix0.m_up, matrix1_1.m_front, sinAngle_0, cosAngle_0);
+//	dFloat angle0 = -m_curJointAngle_0.Update(cosAngle_0, sinAngle_0);
+
+//	dFloat sinAngle_1;
+//	dFloat cosAngle_1;
+	dFloat angle1 = -CalculateAngle(matrix1.m_front, matrix1_1.m_front, matrix1_1.m_up, sinAngle_1, cosAngle_1);
+//	dFloat angle1 = -m_curJointAngle_1.Update(cosAngle_1, sinAngle_1);
+
+
+
+
+
+
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
 	dFloat cosAngle = coneDir0.DotProduct3(coneDir1);
 	if (cosAngle <= m_coneAngleCos) {
-/*
+
 		// limit is broken, summit a hard constraint
 		dVector pin (coneDir0.CrossProduct(coneDir1));
 		pin = pin.Scale (m_coneAngleHalfSin / dSqrt(pin.DotProduct3(pin)));
@@ -872,10 +902,10 @@ void dCustomRagdollMotor::Submit2DOFConstraints(const dMatrix& matrix0, const dM
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
 		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(coneDir0, frontDir, lateralDir), &lateralDir[0]);
 		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-*/
+
 	} else {
 //		dAssert (0);
 		// limit is not broken submit a motor to simulate a muscle 
 	}
-
+*/
 }
