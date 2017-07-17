@@ -52,8 +52,10 @@ class dgBilateralConstraint: public dgConstraint
 	dgVector CalculateGlobalMatrixAndAngle (dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const;
 	void CalculateMatrixOffset (const dgVector& pivot, const dgVector& dir, dgMatrix& matrix0, dgMatrix& matrix1);
 
+
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); 
 
+	dgFloat32 GetInverseDynamicAcceleration (dgInt32 index) const;
 	dgFloat32 GetRowAcceleration (dgInt32 index, dgContraintDescritor& desc) const;
 	dgFloat32 CalculateMotorAcceleration (dgInt32 index, dgContraintDescritor& desc) const;
 	void SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc);
@@ -64,6 +66,7 @@ class dgBilateralConstraint: public dgConstraint
 	
 	dgForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
+	dgFloat32 m_inverseDynamicsAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	dgInt8	  m_rowIsMotor[DG_BILATERAL_CONTRAINT_DOF];
 	OnConstraintDestroy m_destructor;
 	dgFloat32 m_stiffness;

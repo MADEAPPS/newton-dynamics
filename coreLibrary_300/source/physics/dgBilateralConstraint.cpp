@@ -49,6 +49,7 @@ dgBilateralConstraint::dgBilateralConstraint ()
 	memset (m_jointForce, 0, sizeof (m_jointForce));
 	memset (m_rowIsMotor, 0, sizeof (m_rowIsMotor));
 	memset (m_motorAcceleration, 0, sizeof (m_motorAcceleration));
+	memset (m_inverseDynamicsAcceleration, 0, sizeof (m_inverseDynamicsAcceleration));
 }
 
 dgBilateralConstraint::~dgBilateralConstraint ()
@@ -389,6 +390,14 @@ dgFloat32 dgBilateralConstraint::CalculateMotorAcceleration (dgInt32 index, dgCo
 {
 	return desc.m_zeroRowAcceleration[index];
 }
+
+dgFloat32 dgBilateralConstraint::GetInverseDynamicAcceleration(dgInt32 index) const
+{
+	dgAssert (index >= 0);
+	dgAssert (index < DG_BILATERAL_CONTRAINT_DOF);
+	return m_inverseDynamicsAcceleration[index];
+}
+
 
 void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* const params)
 {

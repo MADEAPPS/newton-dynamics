@@ -5192,7 +5192,6 @@ void NewtonInverseDynamicsUpdate (NewtonInverseDynamics* const inverseDynamics, 
 	TRACE_FUNCTION(__FUNCTION__);
 	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
 	ik->Update(timestep, threadIndex);
-
 }
 
 void* NewtonInverseDynamicsGetRoot(NewtonInverseDynamics* const inverseDynamics)
@@ -5200,6 +5199,21 @@ void* NewtonInverseDynamicsGetRoot(NewtonInverseDynamics* const inverseDynamics)
 	TRACE_FUNCTION(__FUNCTION__);
 	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
 	return ik->GetRoot();
+}
+
+
+NewtonBody* NewtonInverseDynamicsGetBody(NewtonInverseDynamics* const inverseDynamics, void* const node)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
+	return (NewtonBody*) ik->GetBody((dgInverseDynamics::dgNode*) node);
+}
+
+NewtonJoint* NewtonInverseDynamicsGetJoint(NewtonInverseDynamics* const inverseDynamics, void* const node)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
+	return (NewtonJoint*) ik->GetJoint((dgInverseDynamics::dgNode*) node);
 }
 
 void* NewtonInverseDynamicsAddRoot(NewtonInverseDynamics* const inverseDynamics, NewtonBody* const root)
@@ -7183,6 +7197,13 @@ dFloat NewtonUserJointGetRowAcceleration (const NewtonJoint* const joint)
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
 	return userJoint->GetAcceleration();
+}
+
+dFloat NewtonUserJointGetRowInverseDynamicsAcceleration (const NewtonJoint* const joint)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
+	return userJoint->GetInverseDynamicsAcceleration();
 }
 
 dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint)

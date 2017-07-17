@@ -225,7 +225,8 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 
 		if (!strcmp(jointType, "dCustomRagdollMotor")) {
 			dCustomRagdollMotor* const joint = new dCustomRagdollMotor(childPinAndPivotInGlobalSpace, child, parentPinAndPivotInGlobalSpace, parent);
-			joint->SetConeAngle(coneAngle * 3.141592f / 180.0f);
+			joint->SetAngle0(-coneAngle * 3.141592f / 180.0f, coneAngle * 3.141592f / 180.0f);
+			joint->SetAngle1(-coneAngle * 3.141592f / 180.0f, coneAngle * 3.141592f / 180.0f);
 			joint->SetTwistAngle(minTwistAngle * 3.141592f / 180.0f, maxTwistAngle * 3.141592f / 180.0f);
 
 		} else {
@@ -290,6 +291,29 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		NewtonBodySetMatrixRecursive (root, &bodyMatrix[0][0]);
 
 		void* const rootNode = controller->AddRoot(root);
+
+		int stack = 1;
+		void* stackPool[128];
+		stackPool[0] = rootNode;
+
+		dTree<int, NewtonJoint*> filter; 
+		while (stack) {
+			stack --;
+			void* const node = stackPool[stack];
+			NewtonBody* const rootBody = controller->GetBody(node);
+
+			for (NewtonJoint* joint = NewtonBodyGetFirstJoint(rootBody); joint; joint = NewtonBodyGetNextJoint(rootBody, joint)) {
+				if (!filter.Find(joint)) {
+					filter.Insert(joint);
+					dCustomJoint* const cJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
+					void* const bone = controller->AddBone(cJoint, node);
+					stackPool[stack] = bone;
+					stack ++;
+				}
+			}
+		}
+
+
 		controller->Finalize();
 	}
 

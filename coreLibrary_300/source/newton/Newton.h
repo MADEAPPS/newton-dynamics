@@ -1017,6 +1017,8 @@ extern "C" {
 	NEWTON_API void NewtonInverseDynamicsDestroy (NewtonInverseDynamics* const inverseDynamics);
 	
 	NEWTON_API void* NewtonInverseDynamicsGetRoot(NewtonInverseDynamics* const inverseDynamics);
+	NEWTON_API NewtonBody* NewtonInverseDynamicsGetBody(NewtonInverseDynamics* const inverseDynamics, void* const node);
+	NEWTON_API NewtonJoint* NewtonInverseDynamicsGetJoint(NewtonInverseDynamics* const inverseDynamics, void* const node);
 
 	NEWTON_API void* NewtonInverseDynamicsAddRoot(NewtonInverseDynamics* const inverseDynamics, NewtonBody* const root);
 	NEWTON_API void* NewtonInverseDynamicsAddChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode, NewtonJoint* const joint);
@@ -1162,12 +1164,12 @@ extern "C" {
 	NEWTON_API void NewtonUserJointSetRowMaximumFriction (const NewtonJoint* const joint, dFloat friction);
 	NEWTON_API dFloat NewtonUserCalculateRowZeroAccelaration (const NewtonJoint* const joint);
 	NEWTON_API dFloat NewtonUserJointGetRowAcceleration (const NewtonJoint* const joint);
+	NEWTON_API dFloat NewtonUserJointGetRowInverseDynamicsAcceleration (const NewtonJoint* const joint);
 	NEWTON_API void NewtonUserJointSetRowAcceleration (const NewtonJoint* const joint, dFloat acceleration);
 	NEWTON_API void NewtonUserJointSetRowSpringDamperAcceleration (const NewtonJoint* const joint, dFloat rowStiffness, dFloat spring, dFloat damper);
 	NEWTON_API void NewtonUserJointSetRowStiffness (const NewtonJoint* const joint, dFloat stiffness);
 	NEWTON_API int NewtonUserJoinRowsCount (const NewtonJoint* const joint);
 	NEWTON_API void NewtonUserJointGetGeneralRow (const NewtonJoint* const joint, int index, dFloat* const jacobian0, dFloat* const jacobian1);
-	
 	NEWTON_API dFloat NewtonUserJointGetRowForce (const NewtonJoint* const joint, int row);
 
 	// **********************************************************************************************

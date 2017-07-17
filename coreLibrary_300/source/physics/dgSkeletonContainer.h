@@ -64,7 +64,7 @@ class dgSkeletonContainer
 	
 	dgNode* GetRoot () const;
 	dgDynamicBody* GetBody(dgNode* const node) const;
-	dgBilateralConstraint* GetParentJoint(dgNode* const node) const;
+	dgBilateralConstraint* GetJoint(dgNode* const node) const;
 	dgNode* GetParent (dgNode* const node) const;
 	dgNode* GetFirstChild (dgNode* const parent) const;
 	dgNode* GetNextSiblingChild (dgNode* const sibling) const;

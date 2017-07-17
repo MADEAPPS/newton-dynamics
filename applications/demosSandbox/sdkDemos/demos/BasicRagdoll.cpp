@@ -263,7 +263,8 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 
 		dCustomRagdollMotor* const joint = new dCustomRagdollMotor (childPinAndPivotInGlobalSpace, bone, parentPinAndPivotInGlobalSpace, parent);
 
-		joint->SetConeAngle (definition.m_coneAngle * 3.141592f / 180.0f);
+		joint->SetAngle0(-definition.m_coneAngle * 3.141592f / 180.0f, definition.m_coneAngle * 3.141592f / 180.0f);
+		joint->SetAngle1(-definition.m_coneAngle * 3.141592f / 180.0f, definition.m_coneAngle * 3.141592f / 180.0f);
 		joint->SetTwistAngle (definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
 	}
 
@@ -479,10 +480,11 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 
 				dCustomRagdollMotor* const ragdollJoint = (dCustomRagdollMotor*) joint;
 				ragdollJoint->GetTwistAngle(minAngle, maxAngle);
-
-				fprintf(file, "  coneAngle: %f\n", ragdollJoint->GetConeAngle() * 180.0f / 3.141592f);
 				fprintf(file, "  minTwistAngle: %f\n", minAngle * 180.0f / 3.141592f);
 				fprintf(file, "  maxTwistAngle: %f\n", maxAngle * 180.0f / 3.141592f);
+
+				ragdollJoint->GetAngle0(minAngle, maxAngle);
+				fprintf(file, "  coneAngle: %f\n", maxAngle * 180.0f / 3.141592f);
 			}
 
 			fprintf(file, "jointEnd:\n\n");

@@ -436,7 +436,7 @@ dgDynamicBody* dgSkeletonContainer::GetBody(dgSkeletonContainer::dgNode* const n
 	return node->m_body;
 }
 
-dgBilateralConstraint* dgSkeletonContainer::GetParentJoint(dgSkeletonContainer::dgNode* const node) const
+dgBilateralConstraint* dgSkeletonContainer::GetJoint(dgSkeletonContainer::dgNode* const node) const
 {
 	return node->m_joint;
 }

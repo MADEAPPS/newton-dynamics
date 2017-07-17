@@ -271,6 +271,17 @@ void* dCustomActiveCharacterController::GetRoot() const
 	return m_kinemativSolver ? NewtonInverseDynamicsGetRoot (m_kinemativSolver) : NULL;
 }
 
+NewtonBody* dCustomActiveCharacterController::GetBody(void* const node) const
+{
+	return m_kinemativSolver ? NewtonInverseDynamicsGetBody (m_kinemativSolver, node) : NULL;
+}
+
+dCustomJoint* const dCustomActiveCharacterController::childJoint(void* const node) const
+{
+	NewtonJoint* const joint = m_kinemativSolver ? NewtonInverseDynamicsGetJoint (m_kinemativSolver, node) : NULL;
+	return joint ? (dCustomJoint*) NewtonJointGetUserData(joint) : NULL;
+}
+
 void* dCustomActiveCharacterController::AddRoot(NewtonBody* const rootBody)
 {
 	dAssert (!m_kinemativSolver);
