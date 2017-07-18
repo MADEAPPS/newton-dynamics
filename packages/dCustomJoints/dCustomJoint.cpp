@@ -169,6 +169,10 @@ void dCustomJoint::Destructor (const NewtonJoint* me)
 	delete joint;
 }
 
+void dCustomJoint::Debug(dDebugDisplay* const debugDisplay) const
+{
+
+}
 
 void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex)
 {
@@ -357,3 +361,20 @@ void dCustomJoint::Serialize (NewtonSerializeCallback callback, void* const user
 	callback(userData, &solverModel, sizeof(solverModel));
 }
 
+void dCustomJoint::dDebugDisplay::DrawFrame(const dCustomJoint* const joint, const dMatrix& matrix)
+{
+	dVector o0(matrix.m_posit);
+
+	dFloat size = 0.25f;
+	dVector x(matrix.m_posit + matrix.RotateVector(dVector(size, 0.0f, 0.0f, 0.0f)));
+	SetColor(joint, dVector (1.0f, 0.0f, 0.0f));
+	DrawLine (joint, matrix.m_posit, x);
+
+	dVector y(matrix.m_posit + matrix.RotateVector(dVector(0.0f, size, 0.0f, 0.0f)));
+	SetColor(joint, dVector (0.0f, 1.0f, 0.0f));
+	DrawLine (joint, matrix.m_posit, y);
+
+	dVector z(matrix.m_posit + matrix.RotateVector(dVector(0.0f, 0.0f, size, 0.0f)));
+	SetColor(joint, dVector (0.0f, 0.0f, 1.0f));
+	DrawLine (joint, matrix.m_posit, z);
+}

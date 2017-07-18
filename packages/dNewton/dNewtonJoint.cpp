@@ -26,6 +26,7 @@
 #include "dNewtonDynamicBody.h"
 
 
+
 dNewtonJoint::dNewtonJoint(dJointType type)
 	:m_type(type) 
 	,m_joint(NULL)

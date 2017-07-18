@@ -1130,50 +1130,53 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 {
 	dTimeTrackerEvent(__FUNCTION__);
 
-	dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI)));
-	dgThreadHiveScopeLock lock(m_world, &m_contacJointLock, true);
-	dgContact* contact = m_world->FindContactJoint(body0, body1);
-	if (!contact) {
-		const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint (body0, body1);
-		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
+//	dgAssert ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || (body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI)));
+	if ((body0->GetInvMass().m_w != dgFloat32 (0.0f)) || (body1->GetInvMass().m_w != dgFloat32 (0.0f)) || 
+		(body0->IsRTTIType(dgBody::m_kinematicBodyRTTI)) || (body1->IsRTTIType(dgBody::m_kinematicBodyRTTI))) {
+		dgThreadHiveScopeLock lock(m_world, &m_contacJointLock, true);
+		dgContact* contact = m_world->FindContactJoint(body0, body1);
+		if (!contact) {
+			const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint (body0, body1);
+			const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 
-		if (isCollidable) {
-			dgUnsigned32 group0_ID = dgUnsigned32 (body0->m_bodyGroupId);
-			dgUnsigned32 group1_ID = dgUnsigned32 (body1->m_bodyGroupId);
-			if (group1_ID < group0_ID) {
-				dgSwap (group0_ID, group1_ID);
-			}
+			if (isCollidable) {
+				dgUnsigned32 group0_ID = dgUnsigned32 (body0->m_bodyGroupId);
+				dgUnsigned32 group1_ID = dgUnsigned32 (body1->m_bodyGroupId);
+				if (group1_ID < group0_ID) {
+					dgSwap (group0_ID, group1_ID);
+				}
 
-			dgUnsigned32 key = (group1_ID << 16) + group0_ID;
-			const dgBodyMaterialList* const materialList = m_world;  
-			const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
+				dgUnsigned32 key = (group1_ID << 16) + group0_ID;
+				const dgBodyMaterialList* const materialList = m_world;  
+				const dgContactMaterial* const material = &materialList->Find (key)->GetInfo();
 
-			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
-				bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
-				if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
-					const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
-					const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
-					if (isSofBody0 || isSofBody1) {
-						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body0 = body0;
-						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
-						m_pendingSoftBodyPairsCount++;
-					} else {
-						contact = new (m_world->m_allocator) dgContact(m_world, material);
-						contact->AppendToActiveList();
-						m_world->AttachConstraint(contact, body0, body1);
+				if (material->m_flags & dgContactMaterial::m_collisionEnable) {
+					bool kinematicBodyEquilibrium = (((body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body0->IsCollidable()) | ((body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) ? true : false) & body1->IsCollidable())) ? false : true;
+					if (!(body0->m_equilibrium & body1->m_equilibrium & kinematicBodyEquilibrium)) {
+						const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
+						const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
+						if (isSofBody0 || isSofBody1) {
+							m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body0 = body0;
+							m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
+							m_pendingSoftBodyPairsCount++;
+						} else {
+							contact = new (m_world->m_allocator) dgContact(m_world, material);
+							contact->AppendToActiveList();
+							m_world->AttachConstraint(contact, body0, body1);
 
-						dgAssert(contact);
-						contact->m_contactActive = 0;
-						contact->m_positAcc = dgVector(dgFloat32(10.0f));
-						contact->m_timeOfImpact = dgFloat32(1.0e10f);
+							dgAssert(contact);
+							contact->m_contactActive = 0;
+							contact->m_positAcc = dgVector(dgFloat32(10.0f));
+							contact->m_timeOfImpact = dgFloat32(1.0e10f);
+						}
 					}
 				}
 			}
 		}
-	}
 
-	if (contact) {
-		contact->m_broadphaseLru = m_lru;
+		if (contact) {
+			contact->m_broadphaseLru = m_lru;
+		}
 	}
 }
 

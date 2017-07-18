@@ -200,6 +200,17 @@ void dCustomBallAndSocket::GetInfo (NewtonJointRecord* const info) const
 }
 
 
+void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
+{
+	dCustomJoint::Debug(debugDisplay);
+
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	debugDisplay->DrawFrame(this, matrix0);
+	debugDisplay->DrawFrame(this, matrix1);
+}
+
 void dCustomBallAndSocket::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -630,6 +641,40 @@ void dCustomControlledBallAndSocket::SubmitConstraints (dFloat timestep, int thr
 ////***************
 
 
+void dCustomRagdollMotor::dSaveLoad::Save (const char* const fileName, NewtonBody* const rootbody)
+{
+return;
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
+	FILE* const file = fopen(fileName, "wt");
+	dAssert(file);
+
+	const char* const xxx = GetBodyUniqueName (rootbody);
+/*
+	dTree<int, dCustomArticulatedTransformController::dSkeletonBone*> filter;
+
+	NewtonBody* const body = controller->GetBoneBody(controller->GetBone(0));
+	DemoEntity* entity = (DemoEntity*)NewtonBodyGetUserData(body);
+	fprintf(file, "nodesCount: %d\n", controller->GetBoneCount());
+	fprintf(file, "rootBone: %s\n\n", entity->GetName().GetStr());
+
+	PrintRagdollBodies(file, controller, controller->GetBone(0), 0, filter);
+	filter.RemoveAll();
+
+	fprintf(file, "jointsCount: %d\n", controller->GetBoneCount() - 1);
+	PrintRagdollJoints(file, controller, controller->GetBone(0), 0, filter);
+*/
+	fclose(file);
+	setlocale(LC_ALL, oldloc);
+}
+
+NewtonBody* dCustomRagdollMotor::dSaveLoad::Load(const char* const name)
+{
+	dAssert (0);
+	return NULL;
+}
+
 dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
 	,m_torque(1000.0f)
@@ -870,9 +915,6 @@ void dCustomRagdollMotor::Submit2DOFConstraints(const dMatrix& matrix0, const dM
 	}
 
 //	dFloat angle0 = -CalculateAngle(matrix0.m_front, matrix0.m_up, matrix1_1.m_front);
-	
-
-
-
-
 }
+
+

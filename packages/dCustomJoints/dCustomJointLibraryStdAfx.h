@@ -53,6 +53,7 @@
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 #include <Newton.h>
 #include <dCRC.h>
 #include <dTree.h>

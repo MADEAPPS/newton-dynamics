@@ -52,6 +52,8 @@ class dCustomBallAndSocket: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+
 	DECLARE_CUSTOM_JOINT(dCustomBallAndSocket, dCustomJoint)
 };
 
@@ -140,6 +142,18 @@ class dCustomControlledBallAndSocket: public dCustomBallAndSocket
 class dCustomRagdollMotor: public dCustomBallAndSocket
 {
 	public:
+	class dSaveLoad
+	{
+		public:
+		dSaveLoad() {}
+		virtual ~dSaveLoad() {}
+		virtual const char* GetBodyUniqueName(const NewtonBody* const body) const = 0;
+
+		virtual NewtonBody* Load(const char* const name);
+		virtual void Save(const char* const name, NewtonBody* const roobody);
+	};
+
+
 	CUSTOM_JOINTS_API dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
 	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor();
@@ -160,6 +174,8 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	CUSTOM_JOINTS_API dCustomRagdollMotor(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	
+	
+
 	private:
 	virtual void GetInfo(NewtonJointRecord* const info) const;
 	virtual void SubmitConstraints(dFloat timestep, int threadIndex);

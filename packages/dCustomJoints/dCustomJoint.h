@@ -73,6 +73,19 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 class dCustomJoint: public dCustomAlloc  
 {
 	public:
+	class dDebugDisplay
+	{
+		public:
+		dDebugDisplay () {}
+		virtual ~dDebugDisplay () {}
+
+		virtual void SetColor(const dCustomJoint* const joint, const dVector& color) = 0;
+		virtual void DrawLine(const dCustomJoint* const joint, const dVector& p0, const dVector& p1) = 0;
+
+		CUSTOM_JOINTS_API void DrawFrame(const dCustomJoint* const joint, const dMatrix& matrix);
+	};
+
+
 	class dSerializeMetaData
 	{
 		public:
@@ -192,8 +205,8 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API void SetSolverModel(int model);
 	CUSTOM_JOINTS_API int GetSolverModel() const;
-
-	CUSTOM_JOINTS_API void SetUserDestructorCallback (dJointUserDestructorCallback callback) {m_userDestructor = callback;}
+	
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	private:
 	// this are the callback needed to have transparent c++ method interfaces 
@@ -203,6 +216,7 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API static void Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API static void Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
 
+	CUSTOM_JOINTS_API void SetUserDestructorCallback (dJointUserDestructorCallback callback) {m_userDestructor = callback;}
 	protected:
 	CUSTOM_JOINTS_API void Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
 
