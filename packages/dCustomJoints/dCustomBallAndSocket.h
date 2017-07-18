@@ -154,8 +154,8 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	};
 
 
-	CUSTOM_JOINTS_API dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
+	CUSTOM_JOINTS_API dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent);
+//	CUSTOM_JOINTS_API dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
 	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor();
 
 	CUSTOM_JOINTS_API void SetAngle0(dFloat minAngle, dFloat maxAngle);

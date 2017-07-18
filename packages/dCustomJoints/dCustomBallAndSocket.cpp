@@ -687,6 +687,7 @@ dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, Newton
 {
 }
 
+/*
 dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent)
 	:dCustomBallAndSocket(childPinAndPivotFrame, parentPinAndPivotFrame, child, parent)
 	,m_torque(1000.0f)
@@ -698,6 +699,7 @@ dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, N
 	,m_maxTwistAngle(0.0f)
 {
 }
+*/
 
 dCustomRagdollMotor::~dCustomRagdollMotor()
 {

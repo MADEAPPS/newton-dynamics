@@ -234,11 +234,12 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 		childPinAndPivotInGlobalSpace = childPinAndPivotInGlobalSpace * childBodyMatrix;
 		parentPinAndPivotInGlobalSpace = parentPinAndPivotInGlobalSpace * parentBodyMatrix;
 
+dAssert(0);
 		if (!strcmp(jointType, "dCustomRagdollMotor")) {
-			dCustomRagdollMotor* const joint = new dCustomRagdollMotor(childPinAndPivotInGlobalSpace, child, parentPinAndPivotInGlobalSpace, parent);
-			joint->SetAngle0(-coneAngle * 3.141592f / 180.0f, coneAngle * 3.141592f / 180.0f);
-			joint->SetAngle1(-coneAngle * 3.141592f / 180.0f, coneAngle * 3.141592f / 180.0f);
-			joint->SetTwistAngle(minTwistAngle * 3.141592f / 180.0f, maxTwistAngle * 3.141592f / 180.0f);
+//			dCustomRagdollMotor* const joint = new dCustomRagdollMotor(childPinAndPivotInGlobalSpace, child, parentPinAndPivotInGlobalSpace, parent);
+//			joint->SetAngle0(-coneAngle * 3.141592f / 180.0f, coneAngle * 3.141592f / 180.0f);
+//			joint->SetAngle1(-coneAngle * 3.141592f / 180.0f, coneAngle * 3.141592f / 180.0f);
+//			joint->SetTwistAngle(minTwistAngle * 3.141592f / 180.0f, maxTwistAngle * 3.141592f / 180.0f);
 
 		} else {
 			dAssert(0);
