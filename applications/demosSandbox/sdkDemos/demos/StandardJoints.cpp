@@ -16,30 +16,27 @@
 #include "PhysicsUtils.h"
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
-#include <CustomGear.h>
-#include <Custom6DOF.h>
-#include <CustomHinge.h>
-#include <CustomSlider.h>
-#include <CustomPulley.h>
+#include <dCustomGear.h>
+#include <dCustom6DOF.h>
+#include <dCustomHinge.h>
+#include <dCustomSlider.h>
+#include <dCustomPulley.h>
 #include <dBezierSpline.h>
-#include <CustomCorkScrew.h>
-#include <CustomPathFollow.h>
-#include <CustomBallAndSocket.h>
-#include <CustomRackAndPinion.h>
-#include <CustomSlidingContact.h>
-
-// optionally uncomment this for hard joint simulations 
-#define _USE_HARD_JOINTS
+#include <dCustomCorkScrew.h>
+#include <dCustomPathFollow.h>
+#include <dCustomBallAndSocket.h>
+#include <dCustomRackAndPinion.h>
+#include <dCustomSlidingContact.h>
 
 
-static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& location, const dVector& size)
+static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& location, const dVector& size, const dFloat mass = 1.0f)
 {
     NewtonWorld* const world = scene->GetNewton();
     int materialID =  NewtonMaterialGetDefaultGroupID (world);
     NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
    	DemoMesh* const geometry = new DemoMesh("primitive", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
-    dFloat mass = 1.0f;
+    
     dMatrix matrix (dGetIdentityMatrix());
     matrix.m_posit = location;
     matrix.m_posit.m_w = 1.0f;
@@ -141,7 +138,7 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box1, &matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	new CustomBallAndSocket (pinMatrix, box1, box0);
+	new dCustomBallAndSocket (pinMatrix, box1, box0);
 
 	// link the two boxes with a distance joint
 	dMatrix matrix1;
@@ -152,7 +149,7 @@ static void AddDistance (DemoEntityManager* const scene, const dVector& origin)
 	dVector pivot1 (matrix1.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f));
 
 	// connect bodies at a corner
-	new CustomPointToPoint (pivot1, pivot0, box2, box1);
+	new dCustomPointToPoint (pivot1, pivot0, box2, box1);
 }
 
 
@@ -179,17 +176,17 @@ static void FunnyAddDistance(DemoEntityManager* const scene, const dVector& orig
 	dMatrix matrix1;
 	NewtonBodyGetMatrix(box0, &matrix0[0][0]);
 	NewtonBodyGetMatrix(box1, &matrix1[0][0]);
-	new CustomPointToPoint(matrix1.m_posit, matrix0.m_posit, box1, box0);
+	new dCustomPointToPoint(matrix1.m_posit, matrix0.m_posit, box1, box0);
 
 	dMatrix matrix2;
 	NewtonBodyGetMatrix(box1, &matrix1[0][0]);
 	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
-	new CustomPointToPoint(matrix2.m_posit, matrix1.m_posit, box2, box1);
+	new dCustomPointToPoint(matrix2.m_posit, matrix1.m_posit, box2, box1);
 
 	dMatrix matrix3;
 	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
 	NewtonBodyGetMatrix(box3, &matrix3[0][0]);
-	new CustomPointToPoint(matrix3.m_posit, matrix2.m_posit, box3, box2);
+	new dCustomPointToPoint(matrix3.m_posit, matrix2.m_posit, box3, box2);
 }
 
 static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVector& origin)
@@ -209,7 +206,7 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	NewtonBodyGetMatrix(box0, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
-	CustomLimitBallAndSocket* const joint0 = new CustomLimitBallAndSocket(pinMatrix, box0, base);
+	dCustomLimitBallAndSocket* const joint0 = new dCustomLimitBallAndSocket(pinMatrix, box0, base);
 	joint0->SetConeAngle (30.0f * 3.141592f / 180.0f);
 	joint0->SetTwistAngle (-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
 
@@ -217,7 +214,7 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
-	CustomLimitBallAndSocket* const joint1 = new CustomLimitBallAndSocket(pinMatrix, box1, box0);
+	dCustomLimitBallAndSocket* const joint1 = new dCustomLimitBallAndSocket(pinMatrix, box1, box0);
 	joint1->SetConeAngle(30.0f * 3.141592f / 180.0f);
 	joint1->SetTwistAngle(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
 
@@ -225,7 +222,7 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
-	CustomLimitBallAndSocket* const joint2 = new CustomLimitBallAndSocket(pinMatrix, box2, box1);
+	dCustomLimitBallAndSocket* const joint2 = new dCustomLimitBallAndSocket(pinMatrix, box2, box1);
 	joint2->SetConeAngle(30.0f * 3.141592f / 180.0f);
 	joint2->SetTwistAngle(-30.0f * 3.141592f / 180.0f, 30.0f * 3.141592f / 180.0f);
 }
@@ -245,13 +242,13 @@ static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, &matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	new CustomBallAndSocketWithFriction (pinMatrix, box0, base, 20.0f);
+	new dCustomBallAndSocketWithFriction (pinMatrix, box0, base, 20.0f);
 
 	// link the two boxes
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, & matrix1[0][0]);
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	new CustomBallAndSocketWithFriction (pinMatrix, box1, box0, 10.0f);
+	new dCustomBallAndSocketWithFriction (pinMatrix, box1, box0, 10.0f);
 }
 
 static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
@@ -269,14 +266,14 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	Custom6DOF* const joint0 = new Custom6DOF (pinMatrix, pinMatrix, box0, base);
+	dCustom6DOF* const joint0 = new dCustom6DOF (pinMatrix, pinMatrix, box0, base);
 	joint0->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
 
 	// link the two boxes
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	Custom6DOF* const joint1 = new Custom6DOF (pinMatrix, pinMatrix, box1, box0);
+	dCustom6DOF* const joint1 = new dCustom6DOF (pinMatrix, pinMatrix, box1, box0);
 	joint1->SetAngularLimits (dVector (-angle, -angle, -angle, 0.0f), dVector (angle, angle, angle, 0.0f));
 }
 
@@ -304,89 +301,79 @@ static void AddUniversal(DemoEntityManager* const scene, const dVector& origin)
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	CustomUniversal* const joint1 = new CustomUniversal(matrix, box1, box0);
+	dCustomUniversal* const joint1 = new dCustomUniversal(matrix, box1, box0);
 	joint1->EnableLimit_0(true);
-	joint1->SetLimis_0 (-5.0f * 3.141592f, 2.0f * 3.141592f);
+	joint1->SetLimits_0 (-5.0f * 3.141592f, 2.0f * 3.141592f);
 	joint1->EnableLimit_1(true);
-	joint1->SetLimis_1 (-3.0f * 3.141592f, 4.0f * 3.141592f);
+	joint1->SetLimits_1 (-3.0f * 3.141592f, 4.0f * 3.141592f);
 
 	// link the two boxes
 	NewtonBodyGetMatrix(box2, &matrix[0][0]);
-	CustomUniversal* const joint2 = new CustomUniversal(matrix, box2, box0);
+	dCustomUniversal* const joint2 = new dCustomUniversal(matrix, box2, box0);
 	joint2->EnableLimit_0(true);
-	joint2->SetLimis_0 (-3.0f * 3.141592f, 5.0f * 3.141592f);
+	joint2->SetLimits_0 (-3.0f * 3.141592f, 5.0f * 3.141592f);
 	joint2->EnableLimit_1(true);
-	joint2->SetLimis_1(-4.0f * 3.141592f, 2.0f * 3.141592f);
+	joint2->SetLimits_1(-4.0f * 3.141592f, 2.0f * 3.141592f);
 }
 
 
-class JoesRagdollJoint
+class JoesRagdollJoint: public dCustomBallAndSocket
 {
 	public:
-	NewtonBody *m_body0;
-	NewtonBody *m_body1;
-	dMatrix m_localMatrix0;
-	dMatrix m_localMatrix1;
-	NewtonJoint* m_joint;
 	dQuaternion m_target; // relative target rotation to reach at next timestep
 
+	// motor:
 	dFloat m_reduceError;
 	dFloat m_pin_length;
 	dFloat m_angularFriction;
-	dFloat m_angularStiffness;
-	dFloat m_linearFriction;
-	dFloat m_linearStiffness;
+	dFloat m_stiffness;
 
 	dFloat m_anim_speed;
 	dFloat m_anim_offset;
 	dFloat m_anim_time;
-	bool m_useMotor; // otherwise just ball and socket
+
+	// limits:
+	bool m_isLimitJoint;
+
+	dFloat m_minTwistAngle;
+	dFloat m_maxTwistAngle;
+
+	dFloat m_coneAngle;
+	dFloat m_arcAngleCos;
+	dFloat m_arcAngleSin;
+
 	
-	JoesRagdollJoint(NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world)
+	JoesRagdollJoint(NewtonBody* child, NewtonBody* parent, const dMatrix &localMatrix0, const dMatrix &localMatrix1, NewtonWorld *world, bool isLimitJoint = false)
+		:dCustomBallAndSocket(localMatrix0, localMatrix1, child, parent)
 	{
-		m_body0 = child;
-		m_body1 = parent;
 		m_localMatrix0 = localMatrix0;
 		m_localMatrix1 = localMatrix1;
 
 		m_target = dQuaternion(dVector(1.0f, 0, 0), 0.0f);
-		m_reduceError = 0.3f; // amount of error to reduce per timestep
-
-		m_linearStiffness = 0.7f;
-		m_linearFriction = -1.0f; // 3000.0f;//
-
-		m_angularStiffness = 0.5f;
-		m_angularFriction = 1000.0f;
+		m_reduceError = 0.95f; // amount of error to reduce per timestep (more -> oszillation)
+		m_stiffness = 0.98f;
+		m_angularFriction = 300.0f;
 
 		m_anim_speed = 0.0f;
 		m_anim_offset = 0.0f;
 		m_anim_time = 0.0f;
 		
-		m_useMotor = true;
+		m_isLimitJoint = isLimitJoint;
 
-		m_joint = NULL;
-		m_joint = NewtonConstraintCreateUserJoint (world, 6, Callback, NULL, m_body0, m_body1); 
-
-		NewtonJointSetUserData (m_joint, this);
-		NewtonJointSetDestructor (m_joint, NULL);
+		SetTwistSwingLimits (0.1f, 0.2f, -0.1f, 0.1f);
 	}
 
-	void CalculateGlobalMatrix (dMatrix &matrix0, dMatrix &matrix1)
+	void SetTwistSwingLimits (const float coneAngle, const float arcAngle, const float minTwistAngle, const float maxTwistAngle)
 	{
-		dMatrix body0Matrix; NewtonBodyGetMatrix (m_body0, &body0Matrix[0][0]);
-		dMatrix body1Matrix (dGetIdentityMatrix());
-		if (m_body1) NewtonBodyGetMatrix (m_body1, &body1Matrix[0][0]);
-		matrix0 = m_localMatrix0 * body0Matrix;
-		matrix1 = m_localMatrix1 * body1Matrix;
-	}
+		float const maxAng = 2.8f; // to prevent flipping on the pole on the backside
 
-	void TargetFromCurrentState ()
-	{
-		dMatrix matrix0, matrix1;
-		CalculateGlobalMatrix(matrix0, matrix1);
-		dQuaternion q0(matrix0);
-		dQuaternion q1(matrix1);
-		m_target = q0 * q1.Inverse();
+		m_coneAngle = min (maxAng, coneAngle);
+		float angle = max (0.0f, min (maxAng, arcAngle + m_coneAngle) - m_coneAngle);
+		m_arcAngleCos = cos (angle);
+		m_arcAngleSin = sin (angle);
+
+		m_minTwistAngle = minTwistAngle;
+		m_maxTwistAngle = maxTwistAngle;
 	}
 
 	dVector BodyGetPointVelocity(const NewtonBody* const body, const dVector &point)
@@ -402,78 +389,190 @@ class JoesRagdollJoint
 		return v + w.CrossProduct(point - c);
 	}
 
-	static void Callback (const NewtonJoint* const userJoint, dFloat timestep, int threadIndex)
-	{
-		((JoesRagdollJoint*)(NewtonJointGetUserData(userJoint)))->SubmitConstraints (timestep, threadIndex);
-	}
-
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dFloat invTimestep = 1.0f / timestep;
 
-		dMatrix matrix0, matrix1;
+		dMatrix matrix0;
+		dMatrix matrix1;
+
 		CalculateGlobalMatrix(matrix0, matrix1);
 
-		if (m_anim_speed != 0.0f) // some animation to illustrate purpose
+		if (m_isLimitJoint)
 		{
-			m_anim_time += timestep * m_anim_speed;
-			dFloat a0 = sin(m_anim_time);
-			dFloat a1 = m_anim_offset * 3.14f;
-			dVector axis(sin(a1), 0.0f, cos(a1));
-			//dVector axis (1,0,0);
-			m_target = dQuaternion(axis, a0 * 0.5f);
+
+			const dVector& p0 = matrix0.m_posit;
+			const dVector& p1 = matrix1.m_posit;
+
+			// Restrict the movement on the pivot point along all tree orthonormal direction
+			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
+			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
+			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
+			dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
+
+
+			const dVector& coneDir0 = matrix0.m_front;
+			const dVector& coneDir1 = matrix1.m_front;
+			float dot = coneDir0.DotProduct3(coneDir1);
+			if (dot < -0.999) return; // should never happen
+
+			// do the twist
+
+			if (m_maxTwistAngle >= m_minTwistAngle) // twist restricted?
+			{
+				dQuaternion quat0(matrix0), quat1(matrix1);      
+				float *q0 = (float*)&quat0;
+				float *q1 = (float*)&quat1;
+
+				// factor rotation about x axis between quat0 and quat1. Code is an optimization of this: qt = q0.Inversed() * q1; halfTwistAngle = atan (qt.x / qt.w);
+				float twistAngle = 2.0f * atan (
+					( ( ( (q0[0] * q1[1]) + (-q0[1] * q1[0]) ) + (-q0[2] * q1[3]) ) - (-q0[3] * q1[2]) ) /
+					( ( ( (q0[0] * q1[0]) - (-q0[1] * q1[1]) ) - (-q0[2] * q1[2]) ) - (-q0[3] * q1[3]) ) );
+
+				// select an axis for the twist - any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
+				dVector twistAxis = coneDir0 + coneDir1;
+				twistAxis.Scale (1.0f / sqrt (twistAxis.DotProduct3(twistAxis)));
+
+				if (m_maxTwistAngle == m_minTwistAngle) // no freedom for any twist
+				{
+					NewtonUserJointAddAngularRow (m_joint, twistAngle - m_maxTwistAngle, (float*)&twistAxis);
+				}
+				else if (twistAngle > m_maxTwistAngle)
+				{
+					NewtonUserJointAddAngularRow (m_joint, twistAngle - m_maxTwistAngle, (float*)&twistAxis);
+					NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
+				}
+				else if (twistAngle < m_minTwistAngle)
+				{
+					NewtonUserJointAddAngularRow (m_joint, twistAngle - m_minTwistAngle, (float*)&twistAxis);
+					NewtonUserJointSetRowMaximumFriction (m_joint, 0.0f);
+				}
+			}
+
+			// do the swing
+#if 0
+			// simple cone limit:
+
+			float angle = acos (dot) - m_coneAngle;
+			if (angle > 0)
+			{
+				dVector swingAxis = (coneDir0.CrossProduct(coneDir1));
+				swingAxis.Scale (1.0 / sqrt (swingAxis.DotProduct3(swingAxis)));
+				NewtonUserJointAddAngularRow (m_joint, angle, (float*)&swingAxis);
+				NewtonUserJointSetRowMinimumFriction (m_joint, 0.0);
+			}
+#else
+			// cone / arc limit - think of an piece of pizza (arc) and an allowed max distance from it (cone):
+
+			if (m_coneAngle > 0.0f && dot < 0.999f) 
+			{
+				// project current axis to the arc plane (y)
+				dVector d = matrix1.UnrotateVector (matrix0.m_front);
+				dVector cone = d; cone.m_y = 0; cone.Scale (1.0f / sqrt (cone.DotProduct3(cone)));
+
+				// clamp the result to be within the arc angle
+				if (cone.m_x < m_arcAngleCos)
+					cone = dVector (m_arcAngleCos, 0.0f, ( (cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
+
+				// do a regular cone constraint from that
+				float angle = acos (max(-1.0f, min(1.0f, d.DotProduct3(cone)))) - m_coneAngle;
+				if (angle > 0.0f)
+				{
+					dVector swingAxis = matrix1.RotateVector(d.CrossProduct(cone));
+					swingAxis.Scale (1.0f / sqrt (swingAxis.DotProduct3(swingAxis)));
+					NewtonUserJointAddAngularRow (m_joint, angle, (float*)&swingAxis);
+					NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
+				}	
+			}
+#endif
 		}
+		else
+		{
 
-		// measure error
-		dQuaternion q0(matrix0);
-		dQuaternion q1(matrix1);
-		dQuaternion qt0 = m_target * q1;
-		dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f)	? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
-		qErr.Normalize();
+			if (m_anim_speed != 0.0f) // some animation to illustrate purpose
+			{
+				m_anim_time += timestep * m_anim_speed;
+				dFloat a0 = sin(m_anim_time);
+				dFloat a1 = m_anim_offset * 3.14f;
+				dVector axis(sin(a1), 0.0f, cos(a1));
+				//dVector axis (1,0,0);
+				m_target = dQuaternion(axis, a0 * 0.5f);
+			}
 
-		dFloat errorAngle = 2.0f * acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
-		dVector errorAngVel(0, 0, 0);
+			// measure error
+			dQuaternion q0(matrix0);
+			dQuaternion q1(matrix1);
+			dQuaternion qt0 = m_target * q1;
+			dQuaternion qErr = ((q0.DotProduct(qt0) < 0.0f)	? dQuaternion(-q0.m_q0, q0.m_q1, q0.m_q2, q0.m_q3) : dQuaternion(q0.m_q0, -q0.m_q1, -q0.m_q2, -q0.m_q3)) * qt0;
+			qErr.Normalize();
 
-		dMatrix basis;
-		if (errorAngle > 1.0e-10f) {
-			dVector errorAxis(qErr.m_q1, qErr.m_q2, qErr.m_q3, 0.0f);
-			errorAxis = errorAxis.Scale(1.0f / dSqrt(errorAxis.DotProduct3(errorAxis)));
-			errorAngVel = errorAxis.Scale(errorAngle * invTimestep);
+			dFloat errorAngle = 2.0f * acos(dMax(dFloat(-1.0f), dMin(dFloat(1.0f), qErr.m_q0)));
+			dVector errorAngVel(0, 0, 0);
 
-			basis = dGrammSchmidt(errorAxis);
-		} else {
-			basis = dMatrix(qt0, dVector(0.0f, 0.0f, 0.0f, 1.0f));
-		}
+			dMatrix basis;
+			if (errorAngle > 1.0e-10f) {
+				dVector errorAxis(qErr.m_q1, qErr.m_q2, qErr.m_q3, 0.0f);
+				errorAxis = errorAxis.Scale(1.0f / dSqrt(errorAxis.DotProduct3(errorAxis)));
+				errorAngVel = errorAxis.Scale(errorAngle * invTimestep);
 
-		dVector angVel0(0.0f);
-		dVector angVel1(0.0f);
-		NewtonBodyGetOmega(m_body0, (dFloat*)&angVel0);
-		NewtonBodyGetOmega(m_body1, (dFloat*)&angVel1);
+				basis = dGrammSchmidt(errorAxis);
+			} else {
+				basis = dMatrix(qt0, dVector(0.0f, 0.0f, 0.0f, 1.0f));
+			}
 
-		dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);
+			dVector angVel0(0.0f);
+			dVector angVel1(0.0f);
+			NewtonBodyGetOmega(m_body0, (dFloat*)&angVel0);
+			NewtonBodyGetOmega(m_body1, (dFloat*)&angVel1);
 
-		for (int n = 0; n < 3; n++) {
-			NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix0[n][0]);
-			if (m_linearFriction >= 0) NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
-			if (m_linearFriction >= 0) NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
-			NewtonUserJointSetRowStiffness(m_joint, m_linearStiffness);
-		}
+			dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);
 
-		// motors
-		if (m_useMotor) for (int n = 0; n < 3; n++) {
-			// calculate the desired acceleration
-			dVector &axis = basis[n];
-			dFloat relAccel = angAcc.DotProduct3(axis);
+			dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
+			// motors
+			for (int n = 0; n < 3; n++) {
+				// calculate the desired acceleration
+				dVector &axis = basis[n];
+				dFloat relAccel = angAcc.DotProduct3(axis);
 
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-			if (m_angularFriction >= 0) NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-			if (m_angularFriction >= 0) NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-			NewtonUserJointSetRowStiffness(m_joint, m_angularStiffness);
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &axis[0]);
+				NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			}
+
 		}
 	}
 };
 
+/*
+void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments)
+{
+    dFloat height = 1.0f;
+    dFloat width = 4.0f;
+
+    dVector size (width, height, width);
+    NewtonBody* parent = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
+	
+    for (int i=0; i < numSegments; i++)
+	{
+        dFloat height = 1.0f;
+        dFloat width = 0.5f;
+
+        dVector size (width, height, width);
+        NewtonBody* child = CreateBox (scene, origin + dVector (0.0f,  0.5f + height * dFloat(i+1), 0.0f, 0.0f), size);
+
+        dMatrix matrix0 = dGetIdentityMatrix(); matrix0.m_posit = dVector (0.0f, height*-0.5f, 0.0f, 1.0f);
+        dMatrix matrix1 = dGetIdentityMatrix(); matrix1.m_posit = dVector (0.0f, height*0.5f, 0.0f, 1.0f);
+        JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
+
+		if (animSpeed != 0.0f) {
+			joint->m_anim_speed = animSpeed, joint->m_anim_offset = dFloat(i) / dFloat(numSegments); // animated      
+	}
+
+        parent = child;
+	}
+}*/
 
 inline float randF (unsigned int time)
 {
@@ -483,15 +582,14 @@ inline float randF (unsigned int time)
 	return float(time) / float(0xFFFFFFFFu);
 }
 
-NewtonBody* AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments,
+void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments,
 	const int numArms = 1,
 	const dFloat torsoHeight = 1.0f, 
 	const dFloat torsoWidth = 4.0f, 
 	const dFloat randomness = 0.0f, 
 	const dFloat armHeight = 1.0f, 
 	const dFloat armWidth = 0.5f,
-	const int pickMe = -1,
-	const int returnMe = 2)
+	const int pickMe = -1)
 {
     dFloat height = torsoHeight;
     dFloat width = torsoWidth;
@@ -503,8 +601,6 @@ NewtonBody* AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector
 
 	int bodyIndex = 0;
 	NewtonBody* pickBody = 0;
-	NewtonBody* returnBody = torso;
-
 	for (int j=0; j < numArms; j++)
 	{
 		dFloat angle = dFloat(j) / dFloat(numArms) * M_PI*2.0f;
@@ -553,9 +649,6 @@ NewtonBody* AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector
 			if (bodyIndex == pickMe) {
 				pickBody = child;
 			}
-			if (bodyIndex == returnMe) {
-				returnBody = child;
-			}
 			bodyIndex++;
 		}
 	}
@@ -564,265 +657,30 @@ NewtonBody* AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(pickBody, &matrix[0][0]);
-		new CustomBallAndSocket(matrix, pickBody);
+		new dCustomBallAndSocket(matrix, pickBody);
 	}
-
-	return returnBody;
 }
 
-void AddJoesStressTest (
-	DemoEntityManager* const scene, 
-	//int latTess = 3, int longTess = 3, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = false, // ok
-	//int latTess = 3, int longTess = 3, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = true, // ok
-	int latTess = 4, int longTess = 4, int numRandomInteriorBodies = 0, bool makePoles = false, bool useMotors = true, // ok
-	//int latTess = 4, int longTess = 3, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = false, // ok
-
-	//int latTess = 8, int longTess = 4, int numRandomInteriorBodies = 0, bool makePoles = false, bool useMotors = true, // ok (jitters badly)
-	//int latTess = 4, int longTess = 5, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = true, // ok (jitters a bit)
-	//int latTess = 4, int longTess = 5, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = false, // ok (no jitter with motors off :)
-
-	//int latTess = 12, int longTess = 8, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = false, // explodes if you drag around
-	//int latTess = 12, int longTess = 8, int numRandomInteriorBodies = 0, bool makePoles = true, bool useMotors = true, // stack overflow in dgWorldDynamicUpdate::ResolveClusterForces
-	//int latTess = 8, int longTess = 6, int numRandomInteriorBodies = 4, bool makePoles = true, bool useMotors = true, // interior bodies make it very slow
-	//int latTess = 6, int longTess = 4, int numRandomInteriorBodies = 4, bool makePoles = true, bool useMotors = false, // no help from motors towards correct solution, so very bad
-
-	bool randomOrder = true,
-	const dVector origin = dVector(10.0f, 16.0f, 10.0f, 1.0f), const float radius = 5.0f,
-	const int internalJointMode = 2)
+void AddJoesLimitJoint (DemoEntityManager* const scene, const dVector& origin)
 {
-	int const MAX_VERTS = 256;
-	int const MAX_EDGES = 512;
-	int const MAX_DEGREE = 16;
+	NewtonBody* shoulder =	CreateBox (scene, origin + dVector (-0.5f,  2.0f, 0.0f, 0.0f), dVector (0.5f,  0.5f, 0.5f, 0.0f), 0);
+	NewtonBody* bicep =		CreateBox (scene, origin + dVector ( 0.0f,  2.0f, 0.0f, 0.0f), dVector (1.0f,  0.25f, 0.25f, 0.0f));
+	NewtonBody* arm =		CreateBox (scene, origin + dVector ( 1.0f,  2.0f, 0.0f, 0.0f), dVector (1.0f,  0.2f, 0.2f, 0.0f));
 
-	latTess = max(3, min(MAX_DEGREE, latTess));
-	longTess = max(3, min(MAX_DEGREE, longTess));
-	numRandomInteriorBodies = min(40, numRandomInteriorBodies);
+	dMatrix localMatShoulder0 = dGetIdentityMatrix(); localMatShoulder0.m_posit = dVector (0.25f, 0.0f, 0.0f, 1.0f);
+	dMatrix localMatShoulder1 = dGetIdentityMatrix(); localMatShoulder1.m_posit = dVector (-0.5f, 0.0f, 0.0f, 1.0f);
 
-	struct Vertex
-	{
-		dVector pos;
-		int edges[MAX_DEGREE];
-		int degree;
-	} vertices[MAX_VERTS];
-	int numVertices = 0;
-
-	struct Edge
-	{
-		int vertices[2];
-		int makeBodyFlags;
-		NewtonBody *body;
-	} edges[MAX_EDGES];
-	int numEdges = 0;
-
-	// make rings
-
-	for (int lng = 1; lng < longTess-1; lng++) for (int lat = 0; lat < latTess; lat++) 
-	{
-		float latAngle = float(lat) / float(latTess) * M_PI * 2.0f;
-		float longAngle = (float(lng)) / float(longTess-1) * M_PI * 1.0f;
-
-		dVector norm(
-			sin(longAngle) * cos(latAngle),
-			sin(longAngle) * sin(latAngle),
-			cos(longAngle), 0);
-
-		Vertex &v = vertices[numVertices];
-		v.pos = origin + norm.Scale(radius);
-		v.degree = 2;
-		v.edges[0] = (lat==0 ? numEdges+latTess-1 : numEdges-1);
-		v.edges[1] = numEdges;
-
-		edges[v.edges[0]].makeBodyFlags = 1;
-		edges[v.edges[0]].vertices[1] = numVertices;
-		edges[v.edges[1]].vertices[0] = numVertices;
-
-		numVertices++;
-		numEdges++;
-	}
-
-	// add longitude edges
-
-	for (int lng = 0; lng < longTess-3; lng++) for (int lat = 0; lat < latTess; lat++) 
-	{
-		int vertexIndex0 = lat + lng * latTess;
-		int vertexIndex1 = vertexIndex0 + latTess;
-		Vertex &v0 = vertices[vertexIndex0];
-		Vertex &v1 = vertices[vertexIndex1];
-		v0.edges[v0.degree++] = numEdges;
-		v1.edges[v1.degree++] = numEdges;
-
-		edges[numEdges].makeBodyFlags = 2;
-		edges[numEdges].vertices[1] = vertexIndex0;
-		edges[numEdges].vertices[0] = vertexIndex1;
-		numEdges++;
-	}
-
-	// add poles
-
-	if (makePoles) for (int i=-1; i<=1; i+=2)
-	{
-		dVector norm(0, 0, float(i), 0);
-
-		Vertex &v = vertices[numVertices];
-		v.pos = origin + norm.Scale(radius);
-		v.degree = latTess;
-
-		for (int j=0; j<v.degree; j++)
-		{
-			v.edges[j] = numEdges;
-
-			edges[numEdges].makeBodyFlags = 4;
-			edges[numEdges].vertices[1] = numVertices;
-			edges[numEdges].vertices[0] = (i>0 ? j : latTess*(longTess-3)+j);
-		
-			Vertex &other = vertices[edges[numEdges].vertices[0]];
-			other.edges[other.degree++] = numEdges;
-			
-			numEdges++;
-		}
-
-		numVertices++;
-	}
-
-	// add interior random edges
-
-	for (int i=0; i<numRandomInteriorBodies; i++)
-	{
-		int vertexIndex0 = 0, vertexIndex1 = 0;
-
-		for (int j=0; j<100; j++)
-		{
-			int v0 = int (randF(i+j*1568) * float(numVertices-1) + 0.5f);
-			int v1 = int (randF(i+100+j*817) * float(numVertices-1) + 0.5f);
-			if ((v0 != v1) && (vertices[v0].degree < MAX_DEGREE) && (vertices[v1].degree < MAX_DEGREE))
-			{
-				bool exists = false;
-
-				for (int k=0; k<numEdges; k++)
-				{
-					if ((edges[k].vertices[1]==v0 && edges[k].vertices[0]==v1) ||
-						(edges[k].vertices[0]==v0 && edges[k].vertices[1]==v1))
-					{
-						exists = true;
-						break;
-					}
-				}
-
-				if (!exists)
-				{
-					dVector d = vertices[v0].pos - vertices[v1].pos;
-					float dist = dSqrt ((d).DotProduct3(d));
-					if (dist > radius * 1.33f)
-					{
-						vertexIndex0 = v0;
-						vertexIndex1 = v1;
-						break;
-					}
-				}
-			}
-		}
-
-		if (vertexIndex0 != vertexIndex1)
-		{
-			edges[numEdges].makeBodyFlags = 8;
-			edges[numEdges].vertices[0] = vertexIndex0;
-			edges[numEdges].vertices[1] = vertexIndex1;
-
-			Vertex &v0 = vertices[vertexIndex0];
-			Vertex &v1 = vertices[vertexIndex1];
-			v0.edges[v0.degree++] = numEdges;
-			v1.edges[v1.degree++] = numEdges;
-
-			numEdges++;
-		}
-	}
-
-	// create bodies
-
-	for (int i=0; i<numEdges; i++)
-	{
-		Edge &e = edges[i];
-		if (e.makeBodyFlags)
-		{
-			Vertex &v0 = vertices[e.vertices[0]];
-			Vertex &v1 = vertices[e.vertices[1]];
-			dVector d = v0.pos - v1.pos;
-
-			dMatrix matrix (dGrammSchmidt (d));
-			matrix.m_posit = (v0.pos + v1.pos).Scale(0.5f);
-			
-			NewtonBody* body;
-			{
-				float h = dSqrt ((d).DotProduct3(d));
-				float r = 2.0f / float(latTess) * M_PI;//h * 0.25f;
-				const dVector size (r, h, r, 0);
-
-				dMatrix aligment (dRollMatrix(0));
-				NewtonWorld* const world = scene->GetNewton();
-				int materialID =  NewtonMaterialGetDefaultGroupID (world);
-				NewtonCollision* const collision = CreateConvexCollision (world, &aligment[0][0], size, _CAPSULE_PRIMITIVE, 0);
-				DemoMesh* const geometry = new DemoMesh("primitive", collision, 0,0,0);
-
-				dFloat mass = 1.0f;
-				matrix.m_posit.m_w = 1.0f;
-				body = CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
-
-				geometry->Release();
-				NewtonDestroyCollision(collision);
-			}
-			e.body = body;
-		}
-		else e.body = NULL;
-	}
-
-	// create joints
-
-	for (int i=0; i<numVertices; i++)
-	{
-		Vertex &v = vertices[i];
-		for (int j=0; j<v.degree; j++)
-		{
-			Edge &e0 = edges[v.edges[j]];
-			if (e0.body == NULL) continue;
-
-			for (int k=j+1; k<v.degree; k++)
-			{
-				Edge &e1 = edges[v.edges[k]];
-				if (e1.body == NULL) continue;
-				assert (e0.body != e1.body);
-
-				dMatrix worldBody0; NewtonBodyGetMatrix (e0.body, (dFloat*) &worldBody0);
-				dMatrix worldBody1; NewtonBodyGetMatrix (e1.body, (dFloat*) &worldBody1);
-				dMatrix localMatrix0 (dGetIdentityMatrix());
-				dMatrix localMatrix1 (dGetIdentityMatrix());
-				localMatrix0.m_posit = worldBody0.UnrotateVector (v.pos - worldBody0.m_posit);
-				localMatrix1.m_posit = worldBody1.UnrotateVector (v.pos - worldBody1.m_posit);
-				localMatrix0.m_posit.m_w = 1.0f;
-				localMatrix1.m_posit.m_w = 1.0f;
-
-				JoesRagdollJoint* joint;
-				
-				float b = (randomOrder ? 0.5f : -1.0f);
-				if (randF(i*1000+j*10+k) > b)
-					joint = new JoesRagdollJoint (e0.body, e1.body, localMatrix0, localMatrix1, scene->GetNewton());
-				else 
-					joint = new JoesRagdollJoint (e1.body, e0.body, localMatrix1, localMatrix0, scene->GetNewton());
-
-				int flags = e0.makeBodyFlags | e1.makeBodyFlags;
-
-				if (joint)
-				{
-					joint->TargetFromCurrentState();
-					joint->m_useMotor = useMotors;
-					//joint->m_linearStiffness = 0.3f;
-					if (flags & 8) // interior
-						NewtonUserJointSetSolverModel (joint->m_joint, internalJointMode);
-				}
-			}
-		}
-	}
+	dMatrix localMatBicep0 = dGetIdentityMatrix(); localMatBicep0.m_posit = dVector (0.5f, 0.0f, 0.0f, 1.0f);
+	dMatrix localMatBicep1 = dGetIdentityMatrix(); localMatBicep1.m_posit = dVector (-0.5f, 0.0f, 0.0f, 1.0f);
+	/*{
+		dMatrix rotation =  dPitchMatrix(randF(bodyIndex*3+0) * M_PI * 0.25f * randomness);
+		rotation = rotation * dYawMatrix(randF(bodyIndex*3+1) * M_PI * 0.25f * randomness);
+		rotation = rotation * dYawMatrix(randF(bodyIndex*3+2) * M_PI * 0.25f * randomness);
+		matrix0 = matrix0 * rotation;
+	}*/
+	JoesRagdollJoint* ellbowJoint = new JoesRagdollJoint (arm, bicep, localMatBicep1, localMatBicep0, scene->GetNewton(), true);
+	JoesRagdollJoint* shoulderJoint = new JoesRagdollJoint (bicep, shoulder, localMatShoulder1, localMatShoulder0, scene->GetNewton(), true);
 }
-
 
 static void AddPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin)
 {
@@ -839,7 +697,7 @@ static void AddPoweredRagDoll (DemoEntityManager* const scene, const dVector& or
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	CustomControlledBallAndSocket* const joint0 = new CustomControlledBallAndSocket (pinMatrix, box0, NULL);
+	dCustomControlledBallAndSocket* const joint0 = new dCustomControlledBallAndSocket (pinMatrix, box0, NULL);
 	joint0->SetAngularVelocity (2000.0f * 3.141592f / 180.0f);
 //	joint0->SetPitchAngle (-45.0f * 3.141592f / 180.0f);
 //	joint0->SetYawAngle (-85.0f * 3.141592f / 180.0f);
@@ -899,7 +757,7 @@ void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 		NewtonBodyGetMatrix(child, &matrix[0][0]);
 		matrix.m_posit += dVector(-size.m_x * 0.5f, 0.0f, 0.0f);
 		matrix = localPin * matrix;
-		CustomHinge* const hinge = new CustomHinge (matrix, child, parent);
+		dCustomHinge* const hinge = new dCustomHinge (matrix, child, parent);
 
 		hinge->EnableLimits (true);
 		hinge->SetLimits (-45.0f * 3.141592f / 180.0f, 45.0f * 3.141592f / 180.0f);
@@ -933,7 +791,7 @@ static void AddSlider (DemoEntityManager* const scene, const dVector& origin)
 
 	// connect the bodies by a Slider joint
     NewtonBodyGetMatrix (box1, &matrix[0][0]);
-    CustomSlider* const slider = new CustomSlider (matrix, box1, box0);
+    dCustomSlider* const slider = new dCustomSlider (matrix, box1, box0);
 
     // enable limit of first axis
     slider->EnableLimits(true);
@@ -953,7 +811,7 @@ static void AddSliderSpringDamper (DemoEntityManager* const scene, const dVector
 
 	// connect the bodies by a Slider joint
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	CustomSlider* const slider = new CustomSlider(matrix, box1, box0);
+	dCustomSlider* const slider = new dCustomSlider(matrix, box1, box0);
 
 	// enable limit of first axis
 	slider->EnableLimits(true);
@@ -976,13 +834,15 @@ static void AddSlidingContact(DemoEntityManager* const scene, const dVector& ori
 
 	// connect the bodies by a Slider joint
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	CustomSlidingContact* const slider = new CustomSlidingContact(matrix, box1, box0);
+	matrix = dPitchMatrix(45.0f * 3.141592f / 160.0f) * matrix;
+
+	dCustomSlidingContact* const slider = new dCustomSlidingContact(matrix, box1, box0);
 	slider->EnableLinearLimits (true);
-	slider->SetLinearLimis (-4.0f, 4.0f);
+	slider->SetLinearLimits (-4.0f, 4.0f);
 
 	// enable limit of first axis
 	slider->EnableAngularLimits(true);
-	slider->SetAngularLimis (-7.0f * 3.1416f, 5.0f * 3.1416f);
+	slider->SetAngularLimits (-7.0f * 3.1416f, 5.0f * 3.1416f);
 }
 
 
@@ -997,7 +857,7 @@ static void AddCylindrical (DemoEntityManager* const scene, const dVector& origi
 
 	// connect the bodies by a CorkScrew joint
     NewtonBodyGetMatrix (box1, &matrix[0][0]);
-    CustomCorkScrew* const cylinder = new CustomCorkScrew (matrix, box1, box0);
+    dCustomCorkScrew* const cylinder = new dCustomCorkScrew (matrix, box1, box0);
 
     // enable limit of first axis
     cylinder->EnableLinearLimits(true);
@@ -1009,7 +869,7 @@ static void AddCylindrical (DemoEntityManager* const scene, const dVector& origi
 }
 
 
-static CustomHinge* AddHingeWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
+static dCustomHinge* AddHingeWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
 {
     NewtonBody* const wheel = CreateWheel (scene, origin, height, radius);
 
@@ -1021,7 +881,7 @@ static CustomHinge* AddHingeWheel (DemoEntityManager* const scene, const dVector
     matrix = localPin * matrix;
 
     // connect first box to the world
-    return new CustomHinge (matrix, wheel, parent);
+    return new dCustomHinge (matrix, wheel, parent);
 }
 
 
@@ -1033,8 +893,8 @@ static void AddGear (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodySetMassMatrix(box0, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	// connect two bodies with a hinge 
-    CustomHinge* const hinge0 = AddHingeWheel (scene, origin + dVector (-1.0f, 4.0f, 0.0f), 0.5f, 1.0f, box0);
-    CustomHinge* const hinge1 = AddHingeWheel (scene, origin + dVector ( 1.0f, 4.0f, 0.0f), 0.5f, 1.0f, box0);
+    dCustomHinge* const hinge0 = AddHingeWheel (scene, origin + dVector (-1.0f, 4.0f, 0.0f), 0.5f, 1.0f, box0);
+    dCustomHinge* const hinge1 = AddHingeWheel (scene, origin + dVector ( 1.0f, 4.0f, 0.0f), 0.5f, 1.0f, box0);
 
     NewtonBody* const body0 = hinge0->GetBody0();
     NewtonBody* const body1 = hinge1->GetBody0();
@@ -1047,11 +907,11 @@ static void AddGear (DemoEntityManager* const scene, const dVector& origin)
 	// relate the two body motion with a gear joint
     dVector pin0 (matrix0.RotateVector(dVector (1.0f, 0.0f, 0.0f)));
     dVector pin1 (matrix1.RotateVector(dVector (1.0f, 0.0f, 0.0f)));
-    new CustomGear (4.0f, pin0, pin1, body0, body1);
+    new dCustomGear (4.0f, pin0, pin1, body0, body1);
 }
 
 
-static CustomSlider* AddSliderWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
+static dCustomSlider* AddSliderWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
 {
     NewtonBody* const wheel = CreateWheel (scene, origin, height, radius);
 
@@ -1063,7 +923,7 @@ static CustomSlider* AddSliderWheel (DemoEntityManager* const scene, const dVect
     matrix = localPin * matrix;
 
     // connect first box to the world
-    return new CustomSlider (matrix, wheel, parent);
+    return new dCustomSlider (matrix, wheel, parent);
 }
 
 void AddPulley (DemoEntityManager* const scene, const dVector& origin)
@@ -1075,8 +935,8 @@ void AddPulley (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBodySetMassMatrix (reel1, 0.0f, 0.0f, 0.0f, 0.0f);
     
 	dMatrix matrix;
-    CustomSlider* const slider0 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 2.0f), 0.5f, 1.0f, reel0);
-    CustomSlider* const slider1 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
+    dCustomSlider* const slider0 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 2.0f), 0.5f, 1.0f, reel0);
+    dCustomSlider* const slider1 = AddSliderWheel (scene, origin + dVector (0.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
 
     slider0->EnableLimits(true);
     slider0->SetLimits (-2.0f, 2.0f);
@@ -1091,7 +951,7 @@ void AddPulley (DemoEntityManager* const scene, const dVector& origin)
 
     dVector pin0 (matrix0.RotateVector(dVector (1.0f, 0.0f, 0.0f)));
     dVector pin1 (matrix1.RotateVector(dVector (1.0f, 0.0f, 0.0f)));
-    new CustomPulley (4.0f, pin0, pin1, body0, body1);
+    new dCustomPulley (4.0f, pin0, pin1, body0, body1);
 
 	// make an aggregate for disabling collisions
 	void* const aggregate = NewtonCollisionAggregateCreate (scene->GetNewton());
@@ -1103,7 +963,7 @@ void AddPulley (DemoEntityManager* const scene, const dVector& origin)
 }
 
 
-static CustomCorkScrew* AddCylindricalWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
+static dCustomCorkScrew* AddCylindricalWheel (DemoEntityManager* const scene, const dVector& origin, dFloat radius, dFloat height, NewtonBody* const parent)
 {
     NewtonBody* const wheel = CreateWheel (scene, origin, height, radius);
 
@@ -1111,7 +971,7 @@ static CustomCorkScrew* AddCylindricalWheel (DemoEntityManager* const scene, con
     dMatrix matrix;
     NewtonBodyGetMatrix (wheel, &matrix[0][0]);
 
-    return new CustomCorkScrew (matrix, wheel, parent);
+    return new dCustomCorkScrew (matrix, wheel, parent);
 }
 
 
@@ -1124,9 +984,9 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
 	NewtonBodySetMassMatrix(reel0, 0.0f, 0.0f, 0.0f, 0.0f);
 	NewtonBodySetMassMatrix(reel1, 0.0f, 0.0f, 0.0f, 0.0f);
 
-    CustomHinge* const hinge0 = AddHingeWheel (scene, origin + dVector (-1.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
-    CustomHinge* const hinge1 = AddHingeWheel (scene, origin + dVector ( 1.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
-    CustomCorkScrew* const cylinder = AddCylindricalWheel(scene, origin + dVector (0.0f, 4.0f, 2.0f), 0.5f, 1.0f, reel0);
+    dCustomHinge* const hinge0 = AddHingeWheel (scene, origin + dVector (-1.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
+    dCustomHinge* const hinge1 = AddHingeWheel (scene, origin + dVector ( 1.0f, 4.0f, 0.0f), 0.5f, 0.5f, reel0);
+    dCustomCorkScrew* const cylinder = AddCylindricalWheel(scene, origin + dVector (0.0f, 4.0f, 2.0f), 0.5f, 1.0f, reel0);
 
     cylinder->EnableLinearLimits(true);
     cylinder->SetLinearLimis(-2.0f, 2.0f);
@@ -1147,8 +1007,8 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
     dVector pin1 (matrix1.RotateVector(dVector( 1.0f, 0.0f, 0.0f)));
     dVector pin2 (matrix2.RotateVector(dVector( 1.0f, 0.0f, 0.0f)));
 
-    new CustomGear (5.0f, pin0, pin2, body0, body2);
-    new CustomRackAndPinion (0.125f, pin1, pin2, body1, body2);
+    new dCustomGear (5.0f, pin0, pin2, body0, body2);
+    new dCustomRackAndPinion (0.125f, pin1, pin2, body1, body2);
 
 	// make an aggregate for disabling collisions
 	void* const aggregate = NewtonCollisionAggregateCreate(scene->GetNewton());
@@ -1161,11 +1021,11 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
 }
 
 
-class MyPathFollow: public CustomPathFollow
+class MyPathFollow: public dCustomPathFollow
 {
 	public:
 	MyPathFollow(const dMatrix& pinAndPivotFrame, NewtonBody* const body, NewtonBody* const pathBody)
-		:CustomPathFollow (pinAndPivotFrame, body, pathBody)
+		:dCustomPathFollow (pinAndPivotFrame, body, pathBody)
 	{
 	}
 
@@ -1288,7 +1148,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 		matrix1.m_posit.m_y += attachmentOffset;
 
 		//new CustomDistanceRope (matrix1.m_posit, matrix0.m_posit, box1, box0);
-		new CustomPointToPoint (matrix1.m_posit, matrix0.m_posit, box1, box0);
+		new dCustomPointToPoint (matrix1.m_posit, matrix0.m_posit, box1, box0);
 	}
 
 	void* const aggregate = NewtonCollisionAggregateCreate (scene->GetNewton());
@@ -1313,24 +1173,9 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
+//	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f,  30.0f), 0.0f, 3, 5, 1.0f, 1.0f, 1.3f, 0.5f, 0.5f, 4); // no picking problem here
 
 #if 0
-
-	//AddJoesStressTest (scene);
-
-	if (1)
-	{
-		NewtonBody *cruzBody0 = AddJoesPoweredRagDoll(scene, dVector( 5.0f, 20.0f, 0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
-		NewtonBody *cruzBody1 = AddJoesPoweredRagDoll(scene, dVector( 7.0f, 20.0f, 0.0f), 0.0f, 4, 4, 1.0f, 1.0f);
-
-		dMatrix matrix0(dGetIdentityMatrix()); matrix0[3] = dVector(1,0,0,1);
-		dMatrix matrix1(dGetIdentityMatrix()); matrix1[3] = dVector(-1,0,0,1);
-		JoesRagdollJoint* joint = new JoesRagdollJoint (cruzBody0, cruzBody1, matrix0, matrix1, scene->GetNewton());
-		NewtonUserJointSetSolverModel (joint->m_joint, 2);
-	}
-
-#else
-
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -30.0f), 0.0f, 20);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -20.0f), 1.5f, 4);
 	AddJoesPoweredRagDoll(scene, dVector(40.0f, 10.0f, -10.0f), 0.0f, 4);
@@ -1342,7 +1187,6 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddDistance (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -20.0f));
 	FunnyAddDistance(scene, dVector(-20.0f, 0.0f, -15.0f));
-//	AddPoweredRagDoll (scene, dVector (-20.0f, 0.0f, -15.0f));
 	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -5.0f));
 	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
@@ -1355,7 +1199,10 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 30.0f));
 	AddSlidingContact (scene, dVector (-20.0f, 0.0f, 35.0f));
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+#endif
 
+#if 1
+	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -0.0f));
 #endif
 
     // place camera into position
