@@ -29,7 +29,7 @@
     <ClCompile Include="..\..\dCustomJoints\dCustomUpVector.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomVehicleControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomActiveCharacterManager.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomIK.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomRagdollMotor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\dCustom6DOF.h" />
@@ -60,6 +60,6 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomUpVector.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomVehicleControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomActiveCharacterManager.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomIK.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomRagdollMotor.h" />
   </ItemGroup>
 </Project>

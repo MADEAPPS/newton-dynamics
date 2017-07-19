@@ -204,7 +204,8 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API void SetSolverModel(int model);
 	CUSTOM_JOINTS_API int GetSolverModel() const;
-	
+
+	CUSTOM_JOINTS_API void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	private:
@@ -214,7 +215,6 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API static void Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API static void Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
 
-	CUSTOM_JOINTS_API void SetUserDestructorCallback (dJointUserDestructorCallback callback) {m_userDestructor = callback;}
 	protected:
 	CUSTOM_JOINTS_API void Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
 

@@ -14,8 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _CUSTOMBALLANDSOCKET_H_
-#define _CUSTOMBALLANDSOCKET_H_
+#ifndef _D_CUSTOM_BALLANDSOCKET_H_
+#define _D_CUSTOM_BALLANDSOCKET_H_
 
 #include "dCustomJoint.h"
 
@@ -130,62 +130,6 @@ class dCustomControlledBallAndSocket: public dCustomBallAndSocket
 	dAngularIntegration m_roll;
 	dFloat m_angulaSpeed;
 	DECLARE_CUSTOM_JOINT(dCustomControlledBallAndSocket, dCustomBallAndSocket)
-};
-
-
-
-// this joint is for controlling rag dolls muscles
-class dCustomRagdollMotor: public dCustomBallAndSocket
-{
-	public:
-	class dSaveLoad
-	{
-		public:
-		dSaveLoad() {}
-		virtual ~dSaveLoad() {}
-		virtual const char* GetBodyUniqueName(const NewtonBody* const body) const = 0;
-
-		virtual NewtonBody* Load(const char* const name);
-		virtual void Save(const char* const name, NewtonBody* const roobody);
-	};
-
-
-	CUSTOM_JOINTS_API dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent);
-//	CUSTOM_JOINTS_API dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
-	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor();
-
-	CUSTOM_JOINTS_API void SetYawAngles(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API void GetAngle0(dFloat& minAngle, dFloat& maxAngle) const;
-
-	CUSTOM_JOINTS_API void SetRollAngles(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API void GetAngle1(dFloat& minAngle, dFloat& maxAngle) const;
-
-	CUSTOM_JOINTS_API void SetTwistAngle(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API void GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const;
-
-	CUSTOM_JOINTS_API dFloat GetJointTorque() const;
-	CUSTOM_JOINTS_API void SetJointTorque(dFloat torque);
-	
-	protected:
-	CUSTOM_JOINTS_API dCustomRagdollMotor(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
-	
-	private:
-	virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-	
-	void Submit1DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
-	void Submit2DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
-	void Submit3DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
-
-	dFloat m_torque;
-	dFloat m_minYaw;
-	dFloat m_maxYaw;
-	dFloat m_minRoll;
-	dFloat m_maxRoll;
-	dFloat m_minTwistAngle;
-	dFloat m_maxTwistAngle;
-
-	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor, dCustomBallAndSocket)
 };
 
 
