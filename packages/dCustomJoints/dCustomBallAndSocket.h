@@ -154,10 +154,10 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 //	CUSTOM_JOINTS_API dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent);
 	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor();
 
-	CUSTOM_JOINTS_API void SetAngle0(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetYawAngles(dFloat minAngle, dFloat maxAngle);
 	CUSTOM_JOINTS_API void GetAngle0(dFloat& minAngle, dFloat& maxAngle) const;
 
-	CUSTOM_JOINTS_API void SetAngle1(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void SetRollAngles(dFloat minAngle, dFloat maxAngle);
 	CUSTOM_JOINTS_API void GetAngle1(dFloat& minAngle, dFloat& maxAngle) const;
 
 	CUSTOM_JOINTS_API void SetTwistAngle(dFloat minAngle, dFloat maxAngle);
@@ -178,10 +178,10 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	void Submit3DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
 	dFloat m_torque;
-	dFloat m_minAngle0;
-	dFloat m_maxAngle0;
-	dFloat m_minAngle1;
-	dFloat m_maxAngle1;
+	dFloat m_minYaw;
+	dFloat m_maxYaw;
+	dFloat m_minRoll;
+	dFloat m_maxRoll;
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
 

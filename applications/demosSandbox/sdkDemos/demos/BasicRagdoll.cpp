@@ -261,8 +261,8 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 
 		dCustomRagdollMotor* const joint = new dCustomRagdollMotor (pinAndPivotInGlobalSpace, bone, parent);
 
-		joint->SetAngle0(-definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_minYawAngle * 3.141592f / 180.0f);
-		joint->SetAngle1(-definition.m_maxRollAngle * 3.141592f / 180.0f, definition.m_minRollAngle * 3.141592f / 180.0f);
+		joint->SetYawAngles(-definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_minYawAngle * 3.141592f / 180.0f);
+		joint->SetRollAngles(-definition.m_maxRollAngle * 3.141592f / 180.0f, definition.m_minRollAngle * 3.141592f / 180.0f);
 		joint->SetTwistAngle (definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
 	}
 
