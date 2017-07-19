@@ -101,58 +101,6 @@ void dCustom6DOF::GetAngularLimits (dVector& minAngularLimits, dVector& maxAngul
 }
 
 
-void dCustom6DOF::GetInfo (NewtonJointRecord* const info) const
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-	dFloat dist;
-
-	strcpy (info->m_descriptionType, GetTypeName());
-
-	info->m_attachBody_0 = m_body0;
-	info->m_attachBody_1 = m_body1;
-
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix (matrix0, matrix1);
-
-	dVector p0 (matrix0.m_posit);
-	dVector p1 (matrix1.m_posit);
-	dVector dp (p0 - p1);
-	for (int i = 0; i < 3; i ++) {
-		if (!((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f))) {
-			p1 += matrix1[i].Scale (dp.DotProduct3(matrix1[i]));
-		}
-	}
-
-	for (int i = 0; i < 3; i ++) {
-		if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
-			info->m_minLinearDof[i] = 0.0f;
-			info->m_maxLinearDof[i] = 0.0f;
-		} else {
-			dist = dp.DotProduct3(matrix1[i]);
-			info->m_maxLinearDof[i] = m_maxLinearLimits[i] - dist;
-			info->m_minLinearDof[i] = m_minLinearLimits[i] - dist;
-		}
-	}
-
-	dVector eulerAngles (m_pitch.GetAngle(), m_yaw.GetAngle(), m_roll.GetAngle(), 0.0f);
-	for (int i = 0; i < 3; i ++) {
-		if ((m_minAngularLimits[i] == 0.0f) && (m_maxAngularLimits[i] == 0.0f)) {
-			info->m_minAngularDof[i] = 0.0f;
-			info->m_maxAngularDof[i] = 0.0f;
-		} else {
-			info->m_maxAngularDof[i] = (m_maxAngularLimits[i] - eulerAngles[i]) * 180.0f / 3.141592f;
-			info->m_minAngularDof[i] = (m_minAngularLimits[i] - eulerAngles[i]) * 180.0f / 3.141592f;
-		}
-	}
-
-	info->m_bodiesCollisionOn = GetBodiesCollisionState();
-
-	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
-	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
-}
-
-
 void dCustom6DOF::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;

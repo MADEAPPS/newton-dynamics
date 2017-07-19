@@ -103,49 +103,6 @@ dFloat dCustomSlider::GetJointSpeed () const
 	return m_speed;
 }
 
-void dCustomSlider::GetInfo(NewtonJointRecord* const info) const
-{
-	strcpy(info->m_descriptionType, "slider");
-
-	info->m_attachBody_0 = m_body0;
-	info->m_attachBody_1 = m_body1;
-
-	if (m_limitsOn) {
-		dFloat dist;
-		dMatrix matrix0;
-		dMatrix matrix1;
-
-		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-		CalculateGlobalMatrix(matrix0, matrix1);
-		dist = (matrix0.m_posit - matrix1.m_posit).DotProduct3(matrix0.m_front);
-
-		info->m_minLinearDof[0] = m_minDist - dist;
-		info->m_maxLinearDof[0] = m_maxDist - dist;
-	} else {
-		info->m_minLinearDof[0] = -D_CUSTOM_LARGE_VALUE;
-		info->m_maxLinearDof[0] = D_CUSTOM_LARGE_VALUE;
-	}
-
-
-	info->m_minLinearDof[1] = 0.0f;
-	info->m_maxLinearDof[1] = 0.0f;;
-
-	info->m_minLinearDof[2] = 0.0f;
-	info->m_maxLinearDof[2] = 0.0f;
-
-	info->m_minAngularDof[0] = 0.0f;
-	info->m_maxAngularDof[0] = 0.0f;
-
-	info->m_minAngularDof[1] = 0.0f;
-	info->m_maxAngularDof[1] = 0.0f;
-
-	info->m_minAngularDof[2] = 0.0f;
-	info->m_maxAngularDof[2] = 0.0f;
-
-	memcpy(info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
-	memcpy(info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
-}
-
 
 void dCustomSlider::SubmitConstraints (dFloat timestep, int threadIndex)
 {

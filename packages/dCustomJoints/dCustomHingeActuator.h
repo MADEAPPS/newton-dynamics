@@ -53,7 +53,6 @@ class dCustomHingeActuator: public dCustomHinge
     CUSTOM_JOINTS_API void SetMaxForcePower(dFloat force);
 
 	protected:
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	dFloat m_angle;

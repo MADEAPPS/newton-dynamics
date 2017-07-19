@@ -32,7 +32,6 @@ class dCustomPlane3DOF: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 	
 	DECLARE_CUSTOM_JOINT(dCustomPlane3DOF, dCustomJoint)
 };
@@ -49,7 +48,6 @@ class dCustomPlane5DOF : public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo(NewtonJointRecord* const info) const;
 
 	DECLARE_CUSTOM_JOINT(dCustomPlane5DOF, dCustomJoint)
 };

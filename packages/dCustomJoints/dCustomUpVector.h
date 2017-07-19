@@ -30,7 +30,6 @@ class dCustomUpVector: public dCustomJoint
 
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 };
 
 #endif // !defined(AFX_CUSTOMUPVECTOR_H__EAE1E36C_6FDF_4D86_B4EE_855E3D1046F4_H)

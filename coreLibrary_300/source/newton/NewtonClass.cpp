@@ -59,7 +59,7 @@ void Newton::UpdatePhysicsAsync (dgFloat32 timestep)
 }
 
 
-NewtonUserJoint::NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo, dgBody* const dyn0, dgBody* const dyn1)
+NewtonUserJoint::NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, dgBody* const dyn0, dgBody* const dyn1)
 	:dgUserConstraint (world, dyn0, dyn1, 1)
 	,m_forceArray(m_jointForce)
 	,m_param(NULL)
@@ -67,7 +67,6 @@ NewtonUserJoint::NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUs
 {
 	m_maxDOF = dgUnsigned8(maxDof);
 	m_jacobianFnt = callback;
-	m_getInfoCallback = getInfo;
 
 	dgAssert (world);
 	if (m_maxDOF > DG_BILATERAL_CONTRAINT_DOF) {
@@ -258,15 +257,6 @@ dgFloat32 NewtonUserJoint::GetRowForce (dgInt32 row) const
 	return force;
 }
 
-
-void NewtonUserJoint::GetInfo (dgConstraintInfo* const info) const
-{
-	memset (info, 0, sizeof (dgConstraintInfo));
-	if (m_getInfoCallback) {
-		InitInfo (info);
-		m_getInfoCallback ((NewtonJoint*) this, (NewtonJointRecord*)info);
-	}
-}
 
 
 void NewtonUserJoint::SetUpdateFeedbackFunction (NewtonUserBilateralCallback getFeedback)

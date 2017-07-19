@@ -1157,7 +1157,7 @@ extern "C" {
 	// User defined bilateral Joint
 	//
 	// **********************************************************************************************
-	NEWTON_API NewtonJoint* NewtonConstraintCreateUserJoint (const NewtonWorld* const newtonWorld, int maxDOF, NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo, const NewtonBody* const childBody, const NewtonBody* const parentBody) ; 
+	NEWTON_API NewtonJoint* NewtonConstraintCreateUserJoint (const NewtonWorld* const newtonWorld, int maxDOF, NewtonUserBilateralCallback callback, const NewtonBody* const childBody, const NewtonBody* const parentBody) ; 
 	NEWTON_API int NewtonUserJointGetSolverModel(const NewtonJoint* const joint);
 	NEWTON_API void NewtonUserJointSetSolverModel(const NewtonJoint* const joint, int model);
 	NEWTON_API void NewtonUserJointSetFeedbackCollectorCallback (const NewtonJoint* const joint, NewtonUserBilateralCallback getFeedback);

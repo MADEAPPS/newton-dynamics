@@ -118,12 +118,6 @@ void dCustomHingeActuator::SetMaxForcePower(dFloat force)
 }
 
 
-void dCustomHingeActuator::GetInfo (NewtonJointRecord* const info) const
-{
-	dAssert (0);
-}
-
-
 void dCustomHingeActuator::SubmitConstraintsFreeDof (dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	if (m_actuatorFlag) {

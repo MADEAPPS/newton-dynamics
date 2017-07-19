@@ -7005,7 +7005,6 @@ User defined joint interface
 */
 NewtonJoint* NewtonConstraintCreateUserJoint(const NewtonWorld* const newtonWorld, int maxDOF, 
 											 NewtonUserBilateralCallback submitConstraints, 
-											 NewtonUserBilateralGetInfoCallback getInfo,
 											 const NewtonBody* const childBody, const NewtonBody* const parentBody)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -7014,7 +7013,7 @@ NewtonJoint* NewtonConstraintCreateUserJoint(const NewtonWorld* const newtonWorl
 	dgBody* const body1 = (dgBody *)parentBody;
 	dgAssert(body0);
 	dgAssert(body0 != body1);
-	return (NewtonJoint*) new (world->dgWorld::GetAllocator()) NewtonUserJoint (world, maxDOF, submitConstraints, getInfo, body0, body1);
+	return (NewtonJoint*) new (world->dgWorld::GetAllocator()) NewtonUserJoint (world, maxDOF, submitConstraints, body0, body1);
 }
 
 /*!

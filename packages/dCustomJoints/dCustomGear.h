@@ -37,7 +37,6 @@ class dCustomGear: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dFloat m_gearRatio;
 	DECLARE_CUSTOM_JOINT(dCustomGear, dCustomJoint)
@@ -54,8 +53,7 @@ class dCustomGearAndSlide: public dCustomGear
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-
+	
 	dFloat m_slideRatio;
 	DECLARE_CUSTOM_JOINT(dCustomGearAndSlide, dCustomGear)
 };
@@ -70,7 +68,6 @@ class dCustomDifferentialGear: public dCustomGear
 	CUSTOM_JOINTS_API dCustomDifferentialGear (NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	DECLARE_CUSTOM_JOINT(dCustomDifferentialGear, dCustomGear)
 

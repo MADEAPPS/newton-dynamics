@@ -31,7 +31,6 @@ class dCustomPathFollow: public dCustomJoint
 
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 //	dVector m_pathTangent;
 //	dVector m_pointOnPath;

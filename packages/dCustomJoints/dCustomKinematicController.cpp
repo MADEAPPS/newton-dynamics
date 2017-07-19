@@ -110,41 +110,6 @@ dMatrix dCustomKinematicController::GetTargetMatrix () const
 }
 
 
-void dCustomKinematicController::GetInfo (NewtonJointRecord* const info) const
-{
-	strcpy (info->m_descriptionType, GetTypeName());
-/*
-	info->m_attachBody_0 = m_body0;
-	info->m_attachBody_1 = m_body1;
-
-	info->m_minLinearDof[0] = -D_CUSTOM_LARGE_VALUE;
-	info->m_maxLinearDof[0] = D_CUSTOM_LARGE_VALUE;
-
-	info->m_minLinearDof[1] = -D_CUSTOM_LARGE_VALUE;
-	info->m_maxLinearDof[1] = D_CUSTOM_LARGE_VALUE;
-
-	info->m_minLinearDof[2] = -D_CUSTOM_LARGE_VALUE;
-	info->m_maxLinearDof[2] = D_CUSTOM_LARGE_VALUE;
-
-	info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE;
-	info->m_maxAngularDof[0] = D_CUSTOM_LARGE_VALUE;
-
-	info->m_minAngularDof[1] = 0.0f;
-	info->m_maxAngularDof[1] = 0.0f;
-
-	info->m_minAngularDof[2] = 0.0f;
-	info->m_maxAngularDof[2] = 0.0f;
-
-	info->m_bodiesCollisionOn = 1;
-
-	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
-
-	// note this is not a bug
-	memcpy (info->m_attachmenMatrix_1, &m_localMatrix0, sizeof (dMatrix));
-*/
-}
-
-
 void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	// check if this is an impulsive time step

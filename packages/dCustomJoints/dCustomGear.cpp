@@ -117,37 +117,6 @@ void dCustomGear::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 }
 
-void dCustomGear::GetInfo (NewtonJointRecord* const info) const
-{
-	strcpy (info->m_descriptionType, GetTypeName());
-
-	info->m_extraParameters[0] = m_gearRatio;
-
-	info->m_attachBody_0 = m_body0;
-	info->m_attachBody_1 = m_body1;
-
-	info->m_minLinearDof[0] = -D_CUSTOM_LARGE_VALUE;
-	info->m_maxLinearDof[0] = D_CUSTOM_LARGE_VALUE;
-
-	info->m_minLinearDof[1] = -D_CUSTOM_LARGE_VALUE;
-	info->m_maxLinearDof[1] = D_CUSTOM_LARGE_VALUE;
-
-	info->m_minLinearDof[2] = -D_CUSTOM_LARGE_VALUE;
-	info->m_maxLinearDof[2] = D_CUSTOM_LARGE_VALUE;
-
-	info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE;
-	info->m_maxAngularDof[0] =  D_CUSTOM_LARGE_VALUE;
-
-	info->m_minAngularDof[1] = -D_CUSTOM_LARGE_VALUE;;
-	info->m_maxAngularDof[1] =  D_CUSTOM_LARGE_VALUE;
-
-	info->m_minAngularDof[2] = -D_CUSTOM_LARGE_VALUE;;
-	info->m_maxAngularDof[2] =  D_CUSTOM_LARGE_VALUE;
-
-	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
-	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
-}
-
 
 dCustomGearAndSlide::dCustomGearAndSlide (dFloat gearRatio, dFloat slideRatio, const dVector& childPin, const dVector& parentPin, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomGear(2, child, parent)
@@ -185,11 +154,6 @@ void dCustomGearAndSlide::Serialize (NewtonSerializeCallback callback, void* con
 {
 	dCustomGear::Serialize (callback, userData);
 	callback (userData, &m_slideRatio, sizeof (dFloat));
-}
-
-void dCustomGearAndSlide::GetInfo (NewtonJointRecord* const info) const
-{
-	dAssert (0);
 }
 
 void dCustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
@@ -296,10 +260,6 @@ void dCustomDifferentialGear::Serialize(NewtonSerializeCallback callback, void* 
 	callback(userData, &refeBodyID, sizeof(int));
 }
 
-void dCustomDifferentialGear::GetInfo(NewtonJointRecord* const info) const
-{
-	dAssert(0);
-}
 
 
 void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)

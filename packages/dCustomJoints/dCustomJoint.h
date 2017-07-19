@@ -192,8 +192,7 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API virtual bool IsType (dCRCTYPE type) const;
 	CUSTOM_JOINTS_API virtual const char* GetTypeName() const;
 	CUSTOM_JOINTS_API virtual dCRCTYPE GetSerializeKey() const;
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
-
+	
 	// these member function are only used by the C interface or for hooking callback to customize a particular 
 	// joint without deriving a new one
 	// note: this is not a extension of a virtual function, DO NOT CALL the base class SubmitConstraints!! 
@@ -212,7 +211,6 @@ class dCustomJoint: public dCustomAlloc
 	// this are the callback needed to have transparent c++ method interfaces 
 	CUSTOM_JOINTS_API static void Destructor (const NewtonJoint* me);	
 	CUSTOM_JOINTS_API static void SubmitConstraints (const NewtonJoint* const me, dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API static void GetInfo (const NewtonJoint* const me, NewtonJointRecord* const info);
 	CUSTOM_JOINTS_API static void Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API static void Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
 

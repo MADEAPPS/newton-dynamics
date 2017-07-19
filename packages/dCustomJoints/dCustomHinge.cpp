@@ -143,47 +143,6 @@ dFloat dCustomHinge::GetFriction () const
 }
 
 
-void dCustomHinge::GetInfo (NewtonJointRecord* const info) const
-{
-	strcpy (info->m_descriptionType, GetTypeName());
-
-	info->m_attachBody_0 = m_body0;
-	info->m_attachBody_1 = m_body1;
-
-	info->m_minLinearDof[0] = 0.0f;
-	info->m_maxLinearDof[0] = 0.0f;
-
-	info->m_minLinearDof[1] = 0.0f;
-	info->m_maxLinearDof[1] = 0.0f;;
-
-	info->m_minLinearDof[2] = 0.0f;
-	info->m_maxLinearDof[2] = 0.0f;
-
-	// the joint angle can be determine by getting the angle between any two non parallel vectors
-	if (m_limitsOn) {
-		dMatrix matrix0;
-		dMatrix matrix1;
-		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-		CalculateGlobalMatrix (matrix0, matrix1);
-		dFloat angle = m_curJointAngle.GetAngle();
-		info->m_minAngularDof[0] = (m_minAngle - angle) * 180.0f / 3.141592f ;
-		info->m_maxAngularDof[0] = (m_maxAngle - angle) * 180.0f / 3.141592f ;
-	} else {
-		info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE ;
-		info->m_maxAngularDof[0] = D_CUSTOM_LARGE_VALUE ;
-	}
-
-	info->m_minAngularDof[1] = 0.0f;
-	info->m_maxAngularDof[1] = 0.0f;
-
-	info->m_minAngularDof[2] = 0.0f;
-	info->m_maxAngularDof[2] = 0.0f;
-
-	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
-	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
-}
-
-
 void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;

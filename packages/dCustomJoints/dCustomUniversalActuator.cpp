@@ -174,10 +174,6 @@ void dCustomUniversalActuator::SetMaxTorquePower1(dFloat force)
     m_maxForce1 = dAbs (force);
 }
 
-void dCustomUniversalActuator::GetInfo (NewtonJointRecord* const info) const
-{
-	dAssert (0);
-}
 
 void dCustomUniversalActuator::SubmitConstraints (dFloat timestep, int threadIndex)
 {

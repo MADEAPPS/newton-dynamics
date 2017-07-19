@@ -101,7 +101,7 @@ void dCustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const 
 	m_maxDof = maxDOF;
 	m_stiffness = 1.0f;
 	m_world	= body0 ? NewtonBodyGetWorld (body0) : NewtonBodyGetWorld (body1);
-	m_joint = NewtonConstraintCreateUserJoint (m_world, maxDOF, SubmitConstraints, GetInfo, m_body0, m_body1); 
+	m_joint = NewtonConstraintCreateUserJoint (m_world, maxDOF, SubmitConstraints, m_body0, m_body1); 
 
 	NewtonJointSetUserData (m_joint, this);
 	NewtonJointSetDestructor (m_joint, Destructor);
@@ -185,12 +185,6 @@ void dCustomJoint::SubmitConstraints (const NewtonJoint* const me, dFloat timest
 	}
 }
 
-void dCustomJoint::GetInfo (const NewtonJoint* const me, NewtonJointRecord* info)
-{
-	// get the pointer to the joint class
-	dCustomJoint* const joint = (dCustomJoint*) NewtonJointGetUserData (me);  
-	joint->GetInfo(info);
-}
 
 void dCustomJoint::Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData)
 {
@@ -290,10 +284,6 @@ void dCustomJoint::CalculateRollAngle(const dMatrix& matrix0, const dMatrix& mat
 }
 */
 
-void dCustomJoint::GetInfo (NewtonJointRecord* const info) const
-{
-	strcpy (info->m_descriptionType, GetTypeName());
-}
 
 void dCustomJoint::SetBodiesCollisionState (int state)
 {

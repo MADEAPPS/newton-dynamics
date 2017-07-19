@@ -49,14 +49,6 @@ dCustomPlane5DOF::~dCustomPlane5DOF()
 {
 }
 
-
-void dCustomPlane5DOF::GetInfo(NewtonJointRecord* const info) const
-{
-	strcpy(info->m_descriptionType, GetTypeName());
-	dAssert(0);
-}
-
-
 void dCustomPlane5DOF::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -97,15 +89,6 @@ void dCustomPlane3DOF::Serialize(NewtonSerializeCallback callback, void* const u
 dCustomPlane3DOF::~dCustomPlane3DOF()
 {
 }
-
-
-void dCustomPlane3DOF::GetInfo (NewtonJointRecord* const info) const
-{
-	strcpy (info->m_descriptionType, GetTypeName());
-	dAssert(0);
-}
-
-
 
 
 void dCustomPlane3DOF::SubmitConstraints (dFloat timestep, int threadIndex)

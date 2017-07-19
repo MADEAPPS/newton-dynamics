@@ -59,7 +59,6 @@ class dCustomUniversal: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void GetInfo (NewtonJointRecord* const info) const;
 
 	dAngularIntegration m_curJointAngle_0;
 	dAngularIntegration m_curJointAngle_1;

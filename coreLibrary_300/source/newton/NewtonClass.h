@@ -49,7 +49,7 @@ class Newton: public dgWorld
 class NewtonUserJoint: public dgUserConstraint  
 {	
 	public:
-	NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, NewtonUserBilateralGetInfoCallback getInfo, dgBody* const dyn0, dgBody* const dyn1);
+	NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, dgBody* const dyn0, dgBody* const dyn1);
 	~NewtonUserJoint ();
 
 	dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
@@ -72,13 +72,10 @@ class NewtonUserJoint: public dgUserConstraint
 	dgFloat32 CalculateZeroMotorAcceleration() const;
 	
 	void SetSpringDamperAcceleration (dgFloat32 rowStiffness, dgFloat32 springK, dgFloat32 springD);
-	void GetInfo (dgConstraintInfo* const info) const;
-
 	void SetUpdateFeedbackFunction (NewtonUserBilateralCallback getFeedback);
 
 	private:
 	NewtonUserBilateralCallback m_jacobianFnt;
-	NewtonUserBilateralGetInfoCallback m_getInfoCallback;
 
 	dgForceImpactPair* m_forceArray;
 	dgContraintDescritor* m_param;

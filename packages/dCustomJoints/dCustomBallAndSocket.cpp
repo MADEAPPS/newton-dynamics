@@ -63,12 +63,6 @@ void dCustomPointToPoint::Serialize(NewtonSerializeCallback callback, void* cons
 	dCustomJoint::Serialize (callback, userData);
 }
 
-void dCustomPointToPoint::GetInfo(NewtonJointRecord* const info) const
-{
-	dCustomJoint::GetInfo(info);
-}
-
-
 void dCustomPointToPoint::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -170,33 +164,6 @@ dCustomBallAndSocket::dCustomBallAndSocket (NewtonBody* const child, NewtonBody*
 void dCustomBallAndSocket::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize (callback, userData);
-}
-
-
-void dCustomBallAndSocket::GetInfo (NewtonJointRecord* const info) const
-{
-	strcpy (info->m_descriptionType, GetTypeName());
-
-	info->m_attachBody_0 = m_body0;
-	info->m_attachBody_1 = m_body1;
-
-	info->m_minLinearDof[0] = 0.0f;
-	info->m_maxLinearDof[0] = 0.0f;
-
-	info->m_minLinearDof[1] = 0.0f;
-	info->m_maxLinearDof[1] = 0.0f;;
-
-	info->m_minLinearDof[2] = 0.0f;
-	info->m_maxLinearDof[2] = 0.0f;
-
-	info->m_minAngularDof[0] = -D_CUSTOM_LARGE_VALUE ;
-	info->m_maxAngularDof[0] =  D_CUSTOM_LARGE_VALUE ;
-	info->m_minAngularDof[1] = -D_CUSTOM_LARGE_VALUE ;
-	info->m_maxAngularDof[1] =  D_CUSTOM_LARGE_VALUE ;
-	info->m_minAngularDof[2] = -D_CUSTOM_LARGE_VALUE ;
-	info->m_maxAngularDof[2] =  D_CUSTOM_LARGE_VALUE ;
-	memcpy (info->m_attachmenMatrix_0, &m_localMatrix0, sizeof (dMatrix));
-	memcpy (info->m_attachmenMatrix_1, &m_localMatrix1, sizeof (dMatrix));
 }
 
 
@@ -357,24 +324,6 @@ void dCustomLimitBallAndSocket::GetTwistAngle (dFloat& minAngle, dFloat& maxAngl
 }
 
 
-void dCustomLimitBallAndSocket::GetInfo (NewtonJointRecord* const info) const
-{
-	dCustomBallAndSocket::GetInfo (info);
-
-	info->m_minAngularDof[0] = m_minTwistAngle;
-	info->m_maxAngularDof[0] = m_maxTwistAngle;
-//	info->m_minAngularDof[1] = -dAcos (m_coneAngleCos);
-//	info->m_maxAngularDof[1] =  dAcos (m_coneAngleCos);
-//	info->m_minAngularDof[2] = -dAcos (m_coneAngleCos); 
-//	info->m_maxAngularDof[2] =  dAcos (m_coneAngleCos);
-
-	info->m_minAngularDof[1] = -m_coneAngle;
-	info->m_maxAngularDof[1] =  m_coneAngle;
-	info->m_minAngularDof[2] = -m_coneAngle; 
-	info->m_maxAngularDof[2] =  m_coneAngle;
-
-	strcpy (info->m_descriptionType, GetTypeName());
-}
 
 void dCustomLimitBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 {
@@ -470,20 +419,6 @@ void dCustomControlledBallAndSocket::Serialize (NewtonSerializeCallback callback
 {
 	dCustomBallAndSocket::Serialize (callback, userData);
 	dAssert (0);
-}
-
-void dCustomControlledBallAndSocket::GetInfo (NewtonJointRecord* const info) const
-{
-	dCustomBallAndSocket::GetInfo (info);
-	dAssert (0);
-//	info->m_minAngularDof[0] = m_minTwistAngle;
-//	info->m_maxAngularDof[0] = m_maxTwistAngle;
-//	info->m_minAngularDof[1] = -m_coneAngle;
-//	info->m_maxAngularDof[1] =  m_coneAngle;
-//	info->m_minAngularDof[2] = -m_coneAngle; 
-//	info->m_maxAngularDof[2] =  m_coneAngle;
-
-	strcpy (info->m_descriptionType, GetTypeName());
 }
 
 
@@ -777,22 +712,6 @@ void dCustomRagdollMotor::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) cons
 }
 
 
-void dCustomRagdollMotor::GetInfo(NewtonJointRecord* const info) const
-{
-	dCustomBallAndSocket::GetInfo(info);
-	dAssert (0);
-/*
-	info->m_minAngularDof[0] = m_minTwistAngle;
-	info->m_maxAngularDof[0] = m_maxTwistAngle;
-
-	info->m_minAngularDof[1] = -m_coneAngle;
-	info->m_maxAngularDof[1] = m_coneAngle;
-	info->m_minAngularDof[2] = -m_coneAngle;
-	info->m_maxAngularDof[2] = m_coneAngle;
-
-	strcpy(info->m_descriptionType, GetTypeName());
-*/
-}
 
 void dCustomRagdollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
 {

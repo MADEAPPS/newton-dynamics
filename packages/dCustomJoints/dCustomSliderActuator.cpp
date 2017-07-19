@@ -143,11 +143,6 @@ void dCustomSliderActuator::SetMaxForcePower(dFloat force)
 }
 
 
-void dCustomSliderActuator::GetInfo (NewtonJointRecord* const info) const
-{
-	dAssert (0);
-}
-
 void dCustomSliderActuator::SubmitConstraintsFreeDof(dFloat timestep, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	if (m_actuatorFlag) {
