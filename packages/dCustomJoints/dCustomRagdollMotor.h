@@ -42,10 +42,10 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor();
 
 	CUSTOM_JOINTS_API void SetYawAngles(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API void GetAngle0(dFloat& minAngle, dFloat& maxAngle) const;
+	CUSTOM_JOINTS_API void GetYawAngles(dFloat& minAngle, dFloat& maxAngle) const;
 
 	CUSTOM_JOINTS_API void SetRollAngles(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API void GetAngle1(dFloat& minAngle, dFloat& maxAngle) const;
+	CUSTOM_JOINTS_API void GetRollAngles(dFloat& minAngle, dFloat& maxAngle) const;
 
 	CUSTOM_JOINTS_API void SetTwistAngle(dFloat minAngle, dFloat maxAngle);
 	CUSTOM_JOINTS_API void GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const;
@@ -71,6 +71,7 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 	dFloat m_maxRoll;
 	dFloat m_minTwistAngle;
 	dFloat m_maxTwistAngle;
+	bool m_motorMode;
 
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor, dCustomBallAndSocket)
 };

@@ -22,7 +22,7 @@
 #include "HeightFieldPrimitive.h"
 #include "dCustomArcticulatedTransformManager.h"
 
-struct RAGDOLL_BONE_DEFINITION
+struct dPasiveRagDollDefinition
 {
 	char m_boneName[32];
 	char m_shapeType[32];
@@ -55,10 +55,10 @@ struct RAGDOLL_BONE_DEFINITION
 };
 
 
-static RAGDOLL_BONE_DEFINITION skeletonRagDoll[] =
+static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
 	{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 30.0f,   0.0f,  -0.0f,    0.0f,  0.0f,   0.0f,  0.0f,  0.0f,   0.0f,  0.0f}, 
-	{"Bip01_L_Thigh",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,	 -30.0f, 30.0f,  -30.0f, 30.0f, -30.0f, 30.0f, -90.0f, -90.0f,  0.0f},
+	{"Bip01_L_Thigh",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,	 -30.0f, 30.0f,  -120.0f, 120.0f, -60.0f, 60.0f,  0.0f,  -90.0f,  -0.0f},
 //	{"Bip01_L_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,   5.0f,      0.0f, -150.0f,  0.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 //	{"Bip01_L_Foot", "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,   3.0f,      0.0f,  -45.0f, 45.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 
@@ -146,7 +146,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 	}
 
 
-	NewtonCollision* MakeSphere(DemoEntity* const bodyPart, const RAGDOLL_BONE_DEFINITION& definition) const
+	NewtonCollision* MakeSphere(DemoEntity* const bodyPart, const dPasiveRagDollDefinition& definition) const
 	{
 		dVector size(0.0f);
 		dVector origin(0.0f);
@@ -159,7 +159,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 
 	}
 
-	NewtonCollision* MakeCapsule(DemoEntity* const bodyPart, const RAGDOLL_BONE_DEFINITION& definition) const
+	NewtonCollision* MakeCapsule(DemoEntity* const bodyPart, const dPasiveRagDollDefinition& definition) const
 	{
 		dVector size(0.0f);
 		dVector origin(0.0f);
@@ -212,7 +212,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 	}
 
 
-	NewtonBody* CreateRagDollBodyPart (DemoEntity* const bodyPart, const RAGDOLL_BONE_DEFINITION& definition) 
+	NewtonBody* CreateRagDollBodyPart (DemoEntity* const bodyPart, const dPasiveRagDollDefinition& definition) 
 	{
 		NewtonCollision* shape = NULL;
 		if (!strcmp (definition.m_shapeType, "sphere")) {
@@ -251,7 +251,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 	}
 
 
-	void ConnectBodyParts (NewtonBody* const bone, NewtonBody* const parent, const RAGDOLL_BONE_DEFINITION& definition) const
+	void ConnectBodyParts (NewtonBody* const bone, NewtonBody* const parent, const dPasiveRagDollDefinition& definition) const
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone, &matrix[0][0]);
@@ -261,13 +261,13 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 
 		dCustomRagdollMotor* const joint = new dCustomRagdollMotor (pinAndPivotInGlobalSpace, bone, parent);
 
-		joint->SetYawAngles(-definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_minYawAngle * 3.141592f / 180.0f);
-		joint->SetRollAngles(-definition.m_maxRollAngle * 3.141592f / 180.0f, definition.m_minRollAngle * 3.141592f / 180.0f);
-		joint->SetTwistAngle (definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+		joint->SetYawAngles(definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_maxYawAngle * 3.141592f / 180.0f);
+		joint->SetRollAngles(definition.m_minRollAngle * 3.141592f / 180.0f, definition.m_maxRollAngle * 3.141592f / 180.0f);
+		joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
 	}
 
 
-	void CreateRagDoll (const dMatrix& location, const DemoEntity* const model, RAGDOLL_BONE_DEFINITION* const definition, int defintionCount)
+	void CreateRagDoll (const dMatrix& location, const DemoEntity* const model, dPasiveRagDollDefinition* const definition, int defintionCount)
 	{
 		NewtonWorld* const world = GetWorld(); 
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
@@ -281,6 +281,11 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		dCustomArticulatedTransformController* const controller = CreateTransformController (ragDollEntity);
 
 		controller->SetCalculateLocalTransforms (true);
+
+dMatrix xxx (dYawMatrix (-90.0f * 3.141592f / 180.0f) * dPitchMatrix (30.0f * 3.141592f / 180.0f));
+dVector e0;
+dVector e1;
+xxx.GetEulerAngles(e0, e1);
 
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
@@ -481,7 +486,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 				fprintf(file, "  minTwistAngle: %f\n", minAngle * 180.0f / 3.141592f);
 				fprintf(file, "  maxTwistAngle: %f\n", maxAngle * 180.0f / 3.141592f);
 
-				ragdollJoint->GetAngle0(minAngle, maxAngle);
+				ragdollJoint->GetYawAngles(minAngle, maxAngle);
 				fprintf(file, "  coneAngle: %f\n", maxAngle * 180.0f / 3.141592f);
 			}
 
@@ -557,6 +562,29 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	// load a skeleton mesh for using as a ragdoll manager
 	DemoEntity ragDollModel(dGetIdentityMatrix(), NULL);
 	ragDollModel.LoadNGD_mesh ("skeleton.ngd", scene->GetNewton());
+
+	{
+		// prepare model for rag doll
+		DemoEntity* limb;
+		dMatrix limbMatrix;
+
+		limb = ragDollModel.Find("Bip01_L_UpperArm");
+		limbMatrix = dPitchMatrix (-40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		limb->ResetMatrix(*scene, limbMatrix);
+
+		limb = ragDollModel.Find("Bip01_R_UpperArm");
+		limbMatrix = dPitchMatrix( 40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		limb->ResetMatrix(*scene, limbMatrix);
+
+		limb = ragDollModel.Find("Bip01_L_Thigh");
+		limbMatrix = dPitchMatrix(40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		limb->ResetMatrix(*scene, limbMatrix);
+
+		limb = ragDollModel.Find("Bip01_R_Thigh");
+		limbMatrix = dPitchMatrix(-40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+		limb->ResetMatrix(*scene, limbMatrix);
+	}
+
 
 	//  create a skeletal transform controller for controlling rag doll
 	PassiveRagdollManager* const manager = new PassiveRagdollManager (scene);
