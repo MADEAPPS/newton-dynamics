@@ -132,8 +132,8 @@ void dCustomRagdollMotor::SetYawAngles(dFloat minAngle, dFloat maxAngle)
 
 void dCustomRagdollMotor::SetRollAngles(dFloat minAngle, dFloat maxAngle)
 {
-	m_minRoll = dClamp (-dAbs(minAngle), -65.0f * 3.141582f/180.0f, 65.0f * 3.141582f/180.0f);
-	m_maxRoll = dClamp ( dAbs(maxAngle), -65.0f * 3.141582f/180.0f, 65.0f * 3.141582f/180.0f);
+	m_minRoll = dClamp (-dAbs(minAngle), -70.0f * 3.141582f/180.0f, 65.0f * 3.141582f/180.0f);
+	m_maxRoll = dClamp ( dAbs(maxAngle), -70.0f * 3.141582f/180.0f, 65.0f * 3.141582f/180.0f);
 }
 
 void dCustomRagdollMotor::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
