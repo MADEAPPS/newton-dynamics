@@ -23,6 +23,9 @@
 
 
 IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor);
+IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_1dof)
+IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_2dof)
+IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_3dof)
 
 
 
@@ -65,30 +68,10 @@ NewtonBody* dCustomRagdollMotor::dSaveLoad::Load(const char* const name)
 dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
 	,m_torque(1000.0f)
-	,m_minYaw(0.0f)
-	,m_maxYaw(0.0f)
-	,m_minRoll(0.0f)
-	,m_maxRoll(0.0f)
-	,m_minTwistAngle(0.0f)
-	,m_maxTwistAngle(0.0f)
-	,m_motorMode(false)
+	,m_motorMode(0)
 {
 }
 
-/*
-dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& childPinAndPivotFrame, NewtonBody* const child, const dMatrix& parentPinAndPivotFrame, NewtonBody* const parent)
-	:dCustomBallAndSocket(childPinAndPivotFrame, parentPinAndPivotFrame, child, parent)
-	,m_torque(1000.0f)
-	,m_minAngle0(0.0f)
-	,m_maxAngle0(0.0f)
-	,m_minAngle1(0.0f)
-	,m_maxAngle1(0.0f)
-	,m_minTwistAngle(0.0f)
-	,m_maxTwistAngle(0.0f)
-	,m_motorMode(false)
-{
-}
-*/
 
 dCustomRagdollMotor::~dCustomRagdollMotor()
 {
@@ -97,26 +80,16 @@ dCustomRagdollMotor::~dCustomRagdollMotor()
 dCustomRagdollMotor::dCustomRagdollMotor(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
 	:dCustomBallAndSocket(child, parent, callback, userData)
 {
+	callback(userData, &m_motorMode, sizeof(int));
 	callback(userData, &m_torque, sizeof(dFloat));
-	callback(userData, &m_minYaw, sizeof(dFloat));
-	callback(userData, &m_maxYaw, sizeof(dFloat));
-	callback(userData, &m_minRoll, sizeof(dFloat));
-	callback(userData, &m_maxRoll, sizeof(dFloat));
-	callback(userData, &m_minTwistAngle, sizeof(dFloat));
-	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
 }
 
 void dCustomRagdollMotor::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomBallAndSocket::Serialize(callback, userData);
 
+	callback(userData, &m_motorMode, sizeof(int));
 	callback(userData, &m_torque, sizeof(dFloat));
-	callback(userData, &m_minYaw, sizeof(dFloat));
-	callback(userData, &m_maxYaw, sizeof(dFloat));
-	callback(userData, &m_minRoll, sizeof(dFloat));
-	callback(userData, &m_maxRoll, sizeof(dFloat));
-	callback(userData, &m_minTwistAngle, sizeof(dFloat));
-	callback(userData, &m_maxTwistAngle, sizeof(dFloat));
 }
 
 void dCustomRagdollMotor::SetJointTorque(dFloat torque)
@@ -124,57 +97,110 @@ void dCustomRagdollMotor::SetJointTorque(dFloat torque)
 	m_torque = dAbs(torque);
 }
 
-void dCustomRagdollMotor::SetYawAngles(dFloat minAngle, dFloat maxAngle)
-{
-	m_minYaw = dClamp (-dAbs (minAngle), -120.0f * 3.141582f/180.0f, 120.0f * 3.141582f/180.0f);
-	m_maxYaw = dClamp ( dAbs (maxAngle), -120.0f * 3.141582f/180.0f, 120.0f * 3.141582f/180.0f);
-}
-
-void dCustomRagdollMotor::SetRollAngles(dFloat minAngle, dFloat maxAngle)
-{
-	m_minRoll = dClamp (-dAbs(minAngle), -70.0f * 3.141582f/180.0f, 65.0f * 3.141582f/180.0f);
-	m_maxRoll = dClamp ( dAbs(maxAngle), -70.0f * 3.141582f/180.0f, 65.0f * 3.141582f/180.0f);
-}
-
-void dCustomRagdollMotor::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
-{
-	m_minTwistAngle = dClamp (-dAbs(minAngle), -60.0f * 3.141582f/180.0f, 60.0f * 3.141582f/180.0f);
-	m_maxTwistAngle = dClamp ( dAbs(maxAngle), -60.0f * 3.141582f/180.0f, 60.0f * 3.141582f/180.0f);
-}
 
 dFloat dCustomRagdollMotor::GetJointTorque() const
 {
 	return m_torque;
 }
 
-void dCustomRagdollMotor::GetYawAngles(dFloat& minAngle, dFloat& maxAngle) const
+void dCustomRagdollMotor::CalcutaleEulers (const dMatrix& matrix0, const dMatrix& matrix1, dFloat& twist, dFloat& roll, dFloat& yaw) const
 {
-	minAngle = m_minYaw;
-	maxAngle = m_maxYaw;
-}
+	dMatrix matrix(matrix0 * matrix1.Inverse());
 
-void dCustomRagdollMotor::GetRollAngles(dFloat& minAngle, dFloat& maxAngle) const
-{
-	minAngle = m_minRoll;
-	maxAngle = m_maxRoll;
-}
+	dAssert(matrix.m_front.m_y < 0.999f);
 
-void dCustomRagdollMotor::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
-{
-	minAngle = m_minTwistAngle;
-	maxAngle = m_maxTwistAngle;
-}
+	roll  = dAsin(matrix.m_front.m_y);
+	yaw   = dAtan2(-matrix.m_front.m_z, matrix.m_front.m_x);
+	twist = dAtan2(-matrix.m_right.m_y, matrix.m_up.m_y);
 
+	dTrace(("%f %f %f\n", twist * 180.0f / 3.1416f, roll * 180.0f / 3.1416f, yaw * 180.0f / 3.1416f));
+}
 
 
 void dCustomRagdollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
 {
+	dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
+}
+
+
+
+dCustomRagdollMotor_1dof::dCustomRagdollMotor_1dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
+	,m_twistAngle()
+{
+}
+
+dCustomRagdollMotor_1dof::dCustomRagdollMotor_1dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:dCustomRagdollMotor(child, parent, callback, userData)
+{
+	callback(userData, &m_twistAngle, sizeof(dAngleLimit));
+}
+
+void dCustomRagdollMotor_1dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dCustomRagdollMotor::Serialize(callback, userData);
+	callback(userData, &m_twistAngle, sizeof(dAngleLimit));
+}
+
+
+void dCustomRagdollMotor_1dof::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
+{
+	m_twistAngle.m_minAngle = dClamp(-dAbs(minAngle), -160.0f * 3.141582f / 180.0f, 160.0f * 3.141582f / 180.0f);
+	m_twistAngle.m_maxAngle = dClamp(dAbs(maxAngle), -160.0f * 3.141582f / 180.0f, 160.0f * 3.141582f / 180.0f);
+}
+
+void dCustomRagdollMotor_1dof::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_twistAngle.m_minAngle;
+	maxAngle = m_twistAngle.m_maxAngle;
+}
+
+
+void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dAssert (0);
+	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
+
+
+/*
+
+	// handle special case of the joint being a hinge
+	dAssert(0);
+	const dFloat yawAngle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	const dFloat rollAngle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	NewtonUserJointAddAngularRow(m_joint, yawAngle, &matrix1.m_up[0]);
+	NewtonUserJointAddAngularRow(m_joint, rollAngle, &matrix1.m_right[0]);
+
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
+	dFloat pitchAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+	if (pitchAngle > m_maxTwistAngle) {
+		pitchAngle -= m_maxTwistAngle;
+		NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix0.m_front[0]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+	}
+	else if (pitchAngle < m_minTwistAngle) {
+		pitchAngle -= m_minTwistAngle;
+		NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix0.m_front[0]);
+		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+	}
+	else {
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+		dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
+	}
+*/
+
+
+
+/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-	dAssert ((m_maxYaw - m_minYaw) >= 0.0f);
-	dAssert ((m_maxRoll - m_minRoll) >= 0.0f);
-	dAssert ((m_maxTwistAngle - m_minTwistAngle) >= 0.0f);
+	dAssert((m_maxYaw - m_minYaw) >= 0.0f);
+	dAssert((m_maxRoll - m_minRoll) >= 0.0f);
+	dAssert((m_maxTwistAngle - m_minTwistAngle) >= 0.0f);
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
@@ -184,22 +210,167 @@ void dCustomRagdollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
 	if (((m_maxYaw - m_minYaw) < 1.0e-4f) && ((m_maxRoll - m_minRoll) < 1.0e-4f)) {
 		// this is a hinge
 		Submit1DOFConstraints(matrix0, matrix1, timestep);
-	} else if ((m_maxTwistAngle - m_minTwistAngle) < 1.0e-4f) {
+	}
+	else if ((m_maxTwistAngle - m_minTwistAngle) < 1.0e-4f) {
 		// this is a universal joint
-//		Submit2DOFConstraints(matrix0, matrix1, timestep);
+		//		Submit2DOFConstraints(matrix0, matrix1, timestep);
 
-Submit2DOFConstraints(matrix0, matrix1, timestep);
-	} else {
+		Submit2DOFConstraints(matrix0, matrix1, timestep);
+	}
+	else {
 		// this is a general three dof joint
 		//Submit3DOFConstraints(matrix0, matrix1, timestep);
 
-Submit2DOFConstraints(matrix0, matrix1, timestep);
+		Submit2DOFConstraints(matrix0, matrix1, timestep);
 	}
+*/
 }
 
-void dCustomRagdollMotor::Submit3DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+
+
+
+
+
+
+
+
+
+dCustomRagdollMotor_2dof::dCustomRagdollMotor_2dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
+	,m_yawAngle()
+	,m_rollAngle()
 {
-	dAssert (0);
+}
+
+dCustomRagdollMotor_2dof::dCustomRagdollMotor_2dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:dCustomRagdollMotor(child, parent, callback, userData)
+{
+	callback(userData, &m_yawAngle, sizeof(dAngleLimit));
+	callback(userData, &m_rollAngle, sizeof(dAngleLimit));
+}
+
+void dCustomRagdollMotor_2dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dCustomRagdollMotor::Serialize(callback, userData);
+	callback(userData, &m_yawAngle, sizeof(dAngleLimit));
+	callback(userData, &m_rollAngle, sizeof(dAngleLimit));
+}
+
+
+void dCustomRagdollMotor_2dof::SetYawAngles(dFloat minAngle, dFloat maxAngle)
+{
+	m_yawAngle.m_minAngle = dClamp(-dAbs(minAngle), -120.0f * 3.141582f / 180.0f, 120.0f * 3.141582f / 180.0f);
+	m_yawAngle.m_maxAngle = dClamp(dAbs(maxAngle), -120.0f * 3.141582f / 180.0f, 120.0f * 3.141582f / 180.0f);
+}
+
+void dCustomRagdollMotor_2dof::SetRollAngles(dFloat minAngle, dFloat maxAngle)
+{
+	m_rollAngle.m_minAngle = dClamp(-dAbs(minAngle), -70.0f * 3.141582f / 180.0f, 70.0f * 3.141582f / 180.0f);
+	m_rollAngle.m_maxAngle = dClamp(dAbs(maxAngle), -70.0f * 3.141582f / 180.0f, 70.0f * 3.141582f / 180.0f);
+}
+
+
+void dCustomRagdollMotor_2dof::GetYawAngles(dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_yawAngle.m_minAngle;
+	maxAngle = m_yawAngle.m_maxAngle;
+}
+
+void dCustomRagdollMotor_2dof::GetRollAngles(dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_rollAngle.m_minAngle;
+	maxAngle = m_rollAngle.m_maxAngle;
+}
+
+
+
+
+
+
+
+
+
+dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+	:dCustomRagdollMotor(pinAndPivotFrame, child, parent)
+	,m_twistAngle()
+	,m_yawAngle()
+	,m_rollAngle()
+{
+}
+
+dCustomRagdollMotor_3dof::dCustomRagdollMotor_3dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)
+	:dCustomRagdollMotor(child, parent, callback, userData)
+{
+	callback(userData, &m_twistAngle, sizeof(dAngleLimit));
+	callback(userData, &m_yawAngle, sizeof(dAngleLimit));
+	callback(userData, &m_rollAngle, sizeof(dAngleLimit));
+}
+
+void dCustomRagdollMotor_3dof::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dCustomRagdollMotor::Serialize(callback, userData);
+	callback(userData, &m_twistAngle, sizeof(dAngleLimit));
+	callback(userData, &m_yawAngle, sizeof(dAngleLimit));
+	callback(userData, &m_rollAngle, sizeof(dAngleLimit));
+}
+
+
+void dCustomRagdollMotor_3dof::SetTwistAngle(dFloat minAngle, dFloat maxAngle)
+{
+	m_twistAngle.m_minAngle = dClamp(-dAbs(minAngle), -30.0f * 3.141582f / 180.0f, 30.0f * 3.141582f / 180.0f);
+	m_twistAngle.m_maxAngle = dClamp(dAbs(maxAngle), -30.0f * 3.141582f / 180.0f, 30.0f * 3.141582f / 180.0f);
+}
+
+void dCustomRagdollMotor_3dof::SetRollAngles(dFloat minAngle, dFloat maxAngle)
+{
+	m_rollAngle.m_minAngle = dClamp(-dAbs(minAngle), -70.0f * 3.141582f / 180.0f, 70.0f * 3.141582f / 180.0f);
+	m_rollAngle.m_maxAngle = dClamp(dAbs(maxAngle), -70.0f * 3.141582f / 180.0f, 70.0f * 3.141582f / 180.0f);
+}
+
+void dCustomRagdollMotor_3dof::SetYawAngles(dFloat minAngle, dFloat maxAngle)
+{
+	m_yawAngle.m_minAngle = dClamp(-dAbs(minAngle), -120.0f * 3.141582f / 180.0f, 120.0f * 3.141582f / 180.0f);
+	m_yawAngle.m_maxAngle = dClamp(dAbs(maxAngle), -120.0f * 3.141582f / 180.0f, 120.0f * 3.141582f / 180.0f);
+}
+
+
+
+void dCustomRagdollMotor_3dof::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_twistAngle.m_minAngle;
+	maxAngle = m_twistAngle.m_maxAngle;
+}
+
+
+void dCustomRagdollMotor_3dof::GetYawAngles(dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_yawAngle.m_minAngle;
+	maxAngle = m_yawAngle.m_maxAngle;
+}
+
+void dCustomRagdollMotor_3dof::GetRollAngles(dFloat& minAngle, dFloat& maxAngle) const
+{
+	minAngle = m_rollAngle.m_minAngle;
+	maxAngle = m_rollAngle.m_maxAngle;
+}
+
+
+void dCustomRagdollMotor_3dof::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dAssert(0);
+}
+
+void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
+
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	dFloat yawAngle;
+	dFloat rollAngle;
+	dFloat twistAngle;
+
 /*
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
@@ -236,107 +407,34 @@ void dCustomRagdollMotor::Submit3DOFConstraints(const dMatrix& matrix0, const dM
 		}
 	}
 */
-}
 
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(matrix0, matrix1);
 
-void dCustomRagdollMotor::Submit1DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
-{
-	// handle special case of the joint being a hinge
-dAssert (0);
-	const dFloat yawAngle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	const dFloat rollAngle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-	NewtonUserJointAddAngularRow(m_joint, yawAngle, &matrix1.m_up[0]);
-	NewtonUserJointAddAngularRow(m_joint, rollAngle, &matrix1.m_right[0]);
+	CalcutaleEulers(matrix0, matrix1, twistAngle, rollAngle, yawAngle);
 
-	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	dFloat pitchAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-	if (pitchAngle > m_maxTwistAngle) {
-		pitchAngle -= m_maxTwistAngle;
-		NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix0.m_front[0]);
+	NewtonUserJointAddAngularRow(m_joint, -twistAngle * 40.0f, &matrix0.m_front[0]);
+
+	if (rollAngle < m_rollAngle.m_minAngle) {
+		rollAngle -= m_rollAngle.m_minAngle;
+		NewtonUserJointAddAngularRow(m_joint, rollAngle, &matrix0.m_right[0]);
 		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-	} else if (pitchAngle < m_minTwistAngle) {
-		pitchAngle -= m_minTwistAngle;
-		NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix0.m_front[0]);
+	} else if (rollAngle > m_rollAngle.m_maxAngle) {
+		rollAngle -= m_rollAngle.m_maxAngle;
+		NewtonUserJointAddAngularRow(m_joint, rollAngle, &matrix0.m_right[0]);
 		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-	} else {
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-		dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration (m_joint);
-		NewtonUserJointSetRowAcceleration (m_joint, accel);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
-	}
-}
-
-void dCustomRagdollMotor::Submit2DOFConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
-{
-//dMatrix matrix0(matrix0__);
-//dMatrix matrix1(matrix1__);
-//matrix0 = dGetIdentityMatrix();
-//matrix1 = dGetIdentityMatrix();
-//matrix0 = matrix1  * dPitchMatrix (10.0f * 3.141592f / 180.0f) * dRollMatrix (40.0f * 3.141592f / 180.0f) * dYawMatrix (30.0f * 3.141592f / 180.0f);
-
-	 dMatrix matrix (matrix0 * matrix1.Inverse());
-
-	 dAssert (matrix.m_front.m_y < 0.999f);
-
-	 dFloat rollAngle = dAsin (matrix.m_front.m_y);
-	 dFloat yawAngle = dAtan2 (-matrix.m_front.m_z, matrix.m_front.m_x);
-	 dFloat twistAngle = dAtan2 (-matrix.m_right.m_y, matrix.m_up.m_y);
-
-	 dMatrix matrix1_1 (matrix1 * dYawMatrix (-yawAngle));
-	 dMatrix matrix1_2 (matrix1_1 * dRollMatrix (-rollAngle));
-
-	 NewtonUserJointAddAngularRow(m_joint, -twistAngle, &matrix1_2.m_front[0]);
-//dTrace (("%f (%f %f %f)"))
-
-	 if (rollAngle < m_minRoll) {
-		 dAssert (0);
-	 } else if (rollAngle > m_maxRoll) {
-//		 dAssert (0);
-	 } else if (m_motorMode) {
-	 }
-
-	 if (yawAngle < m_minYaw) {
-		 dAssert (0);
-	 } else if (yawAngle > m_maxYaw) {
-		 dAssert (0);
-	 } else if (m_motorMode) {
-	 }
-
-
-
-#if 0
-	dMatrix matrix1_1;
-	matrix1_1.m_up = matrix1.m_up;
-	matrix1_1.m_front = matrix1.m_up.CrossProduct(matrix0.m_right);
-	dAssert (matrix1_1.m_front.DotProduct3(matrix1_1.m_front) > 0.0f);
-	matrix1_1.m_front = matrix1_1.m_front.Scale(1.0f / dSqrt(matrix1_1.m_front.DotProduct3(matrix1_1.m_front)));
-	matrix1_1.m_right = matrix1_1.m_front.CrossProduct(matrix1_1.m_up);
-
-	dFloat yawAngle = -CalculateAngle(matrix1_1.m_right, matrix1.m_right, matrix1.m_up);
-
-
-
-	dFloat twistAngle = -CalculateAngle(matrix0.m_right, matrix1_1.m_right, matrix1_1.m_front);
-//	NewtonUserJointAddAngularRow(m_joint, -twistAngle, &matrix1_1.m_front[0]);
-
-
-yawAngle = -CalculateAngle(matrix1_1.m_right, matrix1.m_right, matrix1.m_up);
-	if (yawAngle < m_minYaw) {
-//		dAssert (0);
-	} else if (yawAngle > m_maxYaw) {
-//		dAssert (0);
-	} else {
-//		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1_1.m_up[0]);
-//		dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
-//		NewtonUserJointSetRowAcceleration(m_joint, accel);
-//		NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
-//		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
+	} else if (m_motorMode) {
 	}
 
-//	dFloat angle0 = -CalculateAngle(matrix0.m_front, matrix0.m_up, matrix1_1.m_front);
-#endif
+	if (yawAngle < m_yawAngle.m_minAngle) {
+		yawAngle -= m_yawAngle.m_minAngle;
+		NewtonUserJointAddAngularRow(m_joint, yawAngle, &matrix1.m_up[0]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 
+	} else if (yawAngle > m_yawAngle.m_maxAngle) {
+		yawAngle -= m_yawAngle.m_maxAngle;
+		NewtonUserJointAddAngularRow(m_joint, yawAngle, &matrix1.m_up[0]);
+		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+	} else if (m_motorMode) {
+	}
 }
-
-

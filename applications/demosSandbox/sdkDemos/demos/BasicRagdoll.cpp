@@ -22,10 +22,20 @@
 #include "HeightFieldPrimitive.h"
 #include "dCustomArcticulatedTransformManager.h"
 
+
+enum JointType
+{
+	one_dof,
+	two_dof,
+	three_dof,
+};
+
 struct dPasiveRagDollDefinition
 {
 	char m_boneName[32];
 	char m_shapeType[32];
+
+	JointType m_type;
 
 	dFloat m_shapePitch;
 	dFloat m_shapeYaw;
@@ -57,8 +67,8 @@ struct dPasiveRagDollDefinition
 
 static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
-	{"Bip01_Pelvis",	 "capsule", 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 30.0f,   0.0f,  -0.0f,    0.0f,  0.0f,   0.0f,  0.0f,  0.0f,   0.0f,  0.0f}, 
-	{"Bip01_L_Thigh",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,	 -30.0f, 30.0f,  -120.0f, 120.0f, -60.0f, 60.0f,  0.0f,  -90.0f,  -0.0f},
+	{"Bip01_Pelvis",	 "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f, 30.0f,   0.0f,  -0.0f,    0.0f,  0.0f,   0.0f,  0.0f,  0.0f,   0.0f,  0.0f}, 
+	{"Bip01_L_Thigh",    "capsule", two_dof, 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 10.0f,	 -30.0f, 30.0f,  -120.0f, 120.0f, -60.0f, 60.0f,  0.0f,  -90.0f,  -0.0f},
 //	{"Bip01_L_Calf",    "capsule", 0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,   5.0f,      0.0f, -150.0f,  0.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 //	{"Bip01_L_Foot", "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,   3.0f,      0.0f,  -45.0f, 45.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 
@@ -259,11 +269,33 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		dMatrix pinAndPivotInGlobalSpace (dPitchMatrix (definition.m_framePitch * 3.141592f / 180.0f) * dYawMatrix (definition.m_frameYaw * 3.141592f / 180.0f) * dRollMatrix (definition.m_frameRoll * 3.141592f / 180.0f));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
-		dCustomRagdollMotor* const joint = new dCustomRagdollMotor (pinAndPivotInGlobalSpace, bone, parent);
 
-		joint->SetYawAngles(definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_maxYawAngle * 3.141592f / 180.0f);
-		joint->SetRollAngles(definition.m_minRollAngle * 3.141592f / 180.0f, definition.m_maxRollAngle * 3.141592f / 180.0f);
-		joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+		switch (definition.m_type)
+		{
+			case one_dof:
+			{
+				dCustomRagdollMotor_1dof* const joint = new dCustomRagdollMotor_1dof(pinAndPivotInGlobalSpace, bone, parent);
+				joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+				break;
+			}
+
+			case two_dof:
+			{
+				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
+				joint->SetYawAngles(definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_maxYawAngle * 3.141592f / 180.0f);
+				joint->SetRollAngles(definition.m_minRollAngle * 3.141592f / 180.0f, definition.m_maxRollAngle * 3.141592f / 180.0f);
+				break;
+			}
+
+			case three_dof:
+			{
+				dCustomRagdollMotor_3dof* const joint = new dCustomRagdollMotor_3dof(pinAndPivotInGlobalSpace, bone, parent);
+				joint->SetYawAngles(definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_maxYawAngle * 3.141592f / 180.0f);
+				joint->SetRollAngles(definition.m_minRollAngle * 3.141592f / 180.0f, definition.m_maxRollAngle * 3.141592f / 180.0f);
+				joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+				break;
+			}
+		}
 	}
 
 
@@ -478,6 +510,8 @@ xxx.GetEulerAngles(e0, e1);
 			fprintf(file, "  parentEulers: %f %f %f\n", parentEuler.m_x, parentEuler.m_y, parentEuler.m_z);
 
 			if (joint->IsType(dCustomRagdollMotor::GetKeyType())) {
+				dAssert (0);
+/*
 				dFloat minAngle;
 				dFloat maxAngle;
 
@@ -488,10 +522,10 @@ xxx.GetEulerAngles(e0, e1);
 
 				ragdollJoint->GetYawAngles(minAngle, maxAngle);
 				fprintf(file, "  coneAngle: %f\n", maxAngle * 180.0f / 3.141592f);
+*/
 			}
 
 			fprintf(file, "jointEnd:\n\n");
-
 		}
 		const int bonesCount = controller->GetBoneCount();
 		for (int i = 1; i < bonesCount; i++) {
