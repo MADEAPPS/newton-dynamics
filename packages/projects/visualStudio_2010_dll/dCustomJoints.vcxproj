@@ -355,6 +355,7 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
     <ClCompile Include="..\..\dCustomJoints\dCustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPulley.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomRackAndPinion.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomRagdollMotor.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomSlider.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomSliderActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomSlidingContact.cpp" />
@@ -385,6 +386,7 @@ rem xcopy  "$(OutDir)$(TargetName).pdb" "C:\Users\julio\Downloads\camera_collisi
     <ClInclude Include="..\..\dCustomJoints\dCustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPulley.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomRackAndPinion.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomRagdollMotor.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomSlider.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomSliderActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomSlidingContact.h" />
