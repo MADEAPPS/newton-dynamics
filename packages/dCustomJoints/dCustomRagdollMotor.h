@@ -33,7 +33,23 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 		virtual const char* GetBodyUniqueName(const NewtonBody* const body) const = 0;
 
 		virtual NewtonBody* Load(const char* const name);
-		virtual void Save(const char* const name, NewtonBody* const roobody);
+		virtual void Save(const char* const name, NewtonBody* const rootbody);
+
+		private:
+		class BodyJointPair
+		{
+			public:
+			BodyJointPair(NewtonBody* const body, dCustomRagdollMotor* const joint)
+				:m_body(body)
+				,m_joint(joint)
+			{
+			}
+
+			NewtonBody* m_body;
+			dCustomRagdollMotor* m_joint;
+		};
+		
+		void GetBodyList (dList<BodyJointPair>& list, NewtonBody* const rootbody);
 	};
 
 	class dAngleLimit

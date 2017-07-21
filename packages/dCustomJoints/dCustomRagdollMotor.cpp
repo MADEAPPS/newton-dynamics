@@ -29,36 +29,6 @@ IMPLEMENT_CUSTOM_JOINT(dCustomRagdollMotor_3dof)
 
 
 
-void dCustomRagdollMotor::dSaveLoad::Save (const char* const fileName, NewtonBody* const rootbody)
-{
-return;
-/*
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-
-	FILE* const file = fopen(fileName, "wt");
-	dAssert(file);
-
-	const char* const xxx = GetBodyUniqueName (rootbody);
-
-	dTree<int, dCustomArticulatedTransformController::dSkeletonBone*> filter;
-
-	NewtonBody* const body = controller->GetBoneBody(controller->GetBone(0));
-	DemoEntity* entity = (DemoEntity*)NewtonBodyGetUserData(body);
-	fprintf(file, "nodesCount: %d\n", controller->GetBoneCount());
-	fprintf(file, "rootBone: %s\n\n", entity->GetName().GetStr());
-
-	PrintRagdollBodies(file, controller, controller->GetBone(0), 0, filter);
-	filter.RemoveAll();
-
-	fprintf(file, "jointsCount: %d\n", controller->GetBoneCount() - 1);
-	PrintRagdollJoints(file, controller, controller->GetBone(0), 0, filter);
-
-	fclose(file);
-	setlocale(LC_ALL, oldloc);
-*/
-}
-
 NewtonBody* dCustomRagdollMotor::dSaveLoad::Load(const char* const name)
 {
 	dAssert (0);
@@ -412,3 +382,175 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 	}
 }
+
+
+void dCustomRagdollMotor::dSaveLoad::GetBodyList (dList<BodyJointPair>& list, NewtonBody* const rootBody)
+{
+	NewtonBody* stackMem[256];
+	int stack = 1;
+	stackMem[0] = rootBody;
+
+	dTree<int, NewtonBody*> filter;
+
+	filter.Insert(0, rootBody);
+	list.Append (BodyJointPair (rootBody, NULL));
+	while (stack) {
+		stack--;
+		NewtonBody* const root = stackMem[stack];
+
+		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(root); joint; joint = NewtonBodyGetNextJoint(root, joint)) {
+			dCustomJoint* const cJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
+			NewtonBody* const childBody = cJoint->GetBody0();
+			NewtonBody* const parentBody = cJoint->GetBody1();
+
+			if ((root == parentBody) && cJoint->IsType(dCustomRagdollMotor::GetKeyType()) && !filter.Find(childBody) ) {
+				filter.Insert(0, childBody);
+				list.Append (BodyJointPair (childBody, (dCustomRagdollMotor*)cJoint));
+				stackMem[stack] = childBody;
+				stack ++;
+			}
+		}
+	}
+}
+
+void dCustomRagdollMotor::dSaveLoad::Save (const char* const fileName, NewtonBody* const rootbody)
+{
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
+	dList<BodyJointPair> list;
+	GetBodyList (list, rootbody);
+
+	FILE* const file = fopen(fileName, "wt");
+	dAssert(file);
+
+	fprintf(file, "nodesCount: %d\n", list.GetCount());
+	fprintf(file, "rootBone: %s\n\n", GetBodyUniqueName (rootbody));
+	for (dList<BodyJointPair>::dListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		dMatrix boneMatrix;
+		dVector euler0;
+		dVector euler1;
+		NewtonCollisionInfoRecord collisionInfo;
+		dFloat mass;
+		dFloat ixx;
+
+		BodyJointPair& pair = ptr->GetInfo(); 
+		NewtonBody* const body = pair.m_body;
+		
+		NewtonBodyGetMatrix(body, &boneMatrix[0][0]);
+		boneMatrix.GetEulerAngles(euler0, euler1);
+
+		NewtonBodyGetMass(body, &mass, &ixx, &ixx, &ixx);
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+		NewtonCollisionGetInfo(collision, &collisionInfo);
+
+		fprintf(file, "node: %s\n", GetBodyUniqueName (body));
+		fprintf(file, "  mass: %f\n", mass);
+		fprintf(file, "  position: %f %f %f\n", boneMatrix.m_posit.m_x, boneMatrix.m_posit.m_y, boneMatrix.m_posit.m_z);
+		fprintf(file, "  eulerAngles: %f %f %f\n", euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f);
+
+		switch (collisionInfo.m_collisionType) {
+		case SERIALIZE_ID_SPHERE:
+		{
+			fprintf(file, "  shapeType: sphere\n");
+			fprintf(file, "    radio: %f\n", collisionInfo.m_sphere.m_radio);
+			break;
+		}
+
+		case SERIALIZE_ID_CAPSULE:
+		{
+			fprintf(file, "  shapeType: capsule\n");
+			fprintf(file, "    radio0: %f\n", collisionInfo.m_capsule.m_radio0);
+			fprintf(file, "    radio1: %f\n", collisionInfo.m_capsule.m_radio1);
+			fprintf(file, "    height: %f\n", collisionInfo.m_capsule.m_height);
+			break;
+		}
+
+		case SERIALIZE_ID_CONVEXHULL:
+		{
+			fprintf(file, "  shapeType: convexHull\n");
+			fprintf(file, "    points: %d\n", collisionInfo.m_convexHull.m_vertexCount);
+			const int stride = collisionInfo.m_convexHull.m_vertexStrideInBytes / sizeof(dFloat);
+			const dFloat* points = collisionInfo.m_convexHull.m_vertex;
+			for (int i = 0; i < collisionInfo.m_convexHull.m_vertexCount; i++) {
+				dFloat x = points[i * stride + 0];
+				dFloat y = points[i * stride + 1];
+				dFloat z = points[i * stride + 2];
+				fprintf(file, "    convexHullPoint: %f %f %f\n", x, y, z);
+			}
+			break;
+		}
+
+		default:
+		{
+			dAssert(0);
+		}
+		}
+
+		dMatrix shapeMatrix(&collisionInfo.m_offsetMatrix[0][0]);
+		shapeMatrix.GetEulerAngles(euler0, euler1);
+		fprintf(file, "    shapeScale: %f %f %f\n", 1.0f, 1.0f, 1.0f);
+		fprintf(file, "    shapePosition: %f %f %f\n", shapeMatrix.m_posit.m_x, shapeMatrix.m_posit.m_y, shapeMatrix.m_posit.m_z);
+		fprintf(file, "    shapeEulerAngle: %f %f %f\n", euler0.m_x * 180.0f / 3.141592f, euler0.m_y * 180.0f / 3.141592f, euler0.m_z * 180.0f / 3.141592f);
+		fprintf(file, "nodeEnd:\n\n");
+	}
+
+
+	fprintf(file, "jointsCount: %d\n", list.GetCount() - 1);
+	for (dList<BodyJointPair>::dListNode* ptr = list.GetFirst()->GetNext(); ptr; ptr = ptr->GetNext()) {
+		BodyJointPair& pair = ptr->GetInfo(); 
+		NewtonBody* const body = pair.m_body;
+		dCustomRagdollMotor* const joint = pair.m_joint;
+		NewtonBody* const parentBody = joint->GetBody1();
+			
+		fprintf(file, "joint: %s\n", joint->GetTypeName());
+		fprintf(file, "  childBody: %s\n", GetBodyUniqueName (body));
+		fprintf(file, "  parentBody: %s\n", GetBodyUniqueName (parentBody));
+
+		dMatrix childMatrix (joint->GetMatrix0());
+		dMatrix parentMatrix (joint->GetMatrix1());
+
+		dVector euler;
+		dVector childEuler;
+		dVector parentEuler;
+
+		childMatrix.GetEulerAngles(childEuler, euler);
+		parentMatrix.GetEulerAngles(parentEuler, euler);
+
+		childEuler = childEuler.Scale (180.0f / 3.141592f);
+		parentEuler = parentEuler.Scale (180.0f / 3.141592f);
+
+		fprintf(file, "  childPivot: %f %f %f\n", childMatrix.m_posit.m_x, childMatrix.m_posit.m_y, childMatrix.m_posit.m_z);
+		fprintf(file, "  childEulers: %f %f %f\n", childEuler.m_x, childEuler.m_y, childEuler.m_z);
+
+		fprintf(file, "  parentPivot: %f %f %f\n", parentMatrix.m_posit.m_x, parentMatrix.m_posit.m_y, parentMatrix.m_posit.m_z);
+		fprintf(file, "  parentEulers: %f %f %f\n", parentEuler.m_x, parentEuler.m_y, parentEuler.m_z);
+
+		if (joint->IsType(dCustomRagdollMotor_1dof::GetKeyType())) {
+//			dAssert (0);
+/*
+			dFloat minAngle;
+			dFloat maxAngle;
+
+			dCustomRagdollMotor* const ragdollJoint = (dCustomRagdollMotor*) joint;
+			ragdollJoint->GetTwistAngle(minAngle, maxAngle);
+			fprintf(file, "  minTwistAngle: %f\n", minAngle * 180.0f / 3.141592f);
+			fprintf(file, "  maxTwistAngle: %f\n", maxAngle * 180.0f / 3.141592f);
+
+			ragdollJoint->GetYawAngles(minAngle, maxAngle);
+			fprintf(file, "  coneAngle: %f\n", maxAngle * 180.0f / 3.141592f);
+*/
+		} else if (joint->IsType(dCustomRagdollMotor_2dof::GetKeyType())) {
+//			dAssert (0);
+		} else if (joint->IsType(dCustomRagdollMotor_3dof::GetKeyType())) {
+//			dAssert (0);
+		}
+
+		fprintf(file, "jointEnd:\n\n");
+	}
+
+
+	fclose(file);
+	setlocale(LC_ALL, oldloc);
+}
+

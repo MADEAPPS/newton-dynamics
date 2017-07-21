@@ -32,7 +32,14 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 
 #define DECLARE_CUSTOM_JOINT(className,baseClass)																			\
 	public:																													\
-	virtual bool IsType (dCRCTYPE type) const {return m_metaData_##className.IsType(type);}									\
+	virtual bool IsType___ (dCRCTYPE type) const {return m_metaData_##className.IsType(type);}								\
+	virtual bool IsType (dCRCTYPE type) const																				\
+	{																														\
+		if (type == m_metaData_##className.m_key_##className) {																\
+			return true;																									\
+		}																													\
+		return baseClass::IsType(type);																						\
+	}																														\
 	virtual dCRCTYPE GetSerializeKey() const { return m_metaData_##className.m_key_##className;}							\
 	static dCRCTYPE GetKeyType () { return m_metaData_##className.m_key_##className; }										\
 	virtual const char* GetTypeName() const { return #className; }															\
@@ -40,7 +47,7 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 	{																														\
 		public:																												\
 		SerializeMetaData_##className(const char* const name)																\
-			:baseClass::dSerializeMetaData(name)																				\
+			:baseClass::dSerializeMetaData(name)																			\
 			,m_key_##className (dCRC64(#className))																			\
 		{																													\
 		}																													\
@@ -52,13 +59,6 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 											   NewtonDeserializeCallback callback, void* const userData)					\
 		{																													\
 			return new className (body0, body1, callback, userData);														\
-		}																													\
-		virtual bool IsType (dCRCTYPE type) const																			\
-		{																													\
-			if (type == m_key_##className) {																				\
-				return true;																								\
-			}																												\
-			return baseClass::dSerializeMetaData::IsType(type);																\
 		}																													\
 		dCRCTYPE m_key_##className;																							\
 	};																														\
