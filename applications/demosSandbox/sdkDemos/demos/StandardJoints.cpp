@@ -28,6 +28,7 @@
 #include <dCustomRackAndPinion.h>
 #include <dCustomSlidingContact.h>
 
+#define d_pi 3.141592f
 
 static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& location, const dVector& size, const dFloat mass = 1.0f)
 {
@@ -403,16 +404,13 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 
 		if (m_isLimitJoint)
 		{
-			
-			const dVector& p0 = matrix0.m_posit;
-			const dVector& p1 = matrix1.m_posit;
-
+			//const dVector& p0 = matrix0.m_posit;
+			//const dVector& p1 = matrix1.m_posit;
 			// Restrict the movement on the pivot point along all tree orthonormal direction
 			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
 			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
 			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
 			dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
-
 
 			const dVector& coneDir0 = matrix0.m_front;
 			const dVector& coneDir1 = matrix1.m_front;
@@ -689,13 +687,13 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 
 			ot = matrix1[3];
 			ob = matrix1[3];
-			ortho = dPitchMatrix(M_PI * 0.5f) * dYawMatrix(-minXAngle) * matrix1;//matrix1 * sMat4::rotationY(-minXAngle) * sMat4::rotationX(M_PI * 0.5);
+			ortho = dPitchMatrix(d_pi * 0.5f) * dYawMatrix(-minXAngle) * matrix1;//matrix1 * sMat4::rotationY(-minXAngle) * sMat4::rotationX(d_pi * 0.5);
 			float angDiff = maxXAngle - minXAngle;
-			int subdiv2 = 1 + (angDiff / M_PI * 180.0f / (360.0f / float(subdiv)));
+			int subdiv2 = 1 + (angDiff / d_pi * 180.0f / (360.0f / float(subdiv)));
 			for (i=0; i<=subdiv2; i++)
 			{
 				float t = float(i) / float(subdiv2);
-				dVector c = Vis::ToCartesian (dVector (radius, angDiff * t, M_PI * 0.5f - yAngle));
+				dVector c = Vis::ToCartesian (dVector (radius, angDiff * t, d_pi * 0.5f - yAngle));
 				dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,1); ot = nt;
 				c[2] *= -1;
 				dVector nb = ortho.TransformVector (c); Vis::Line (debugDisplay, nb, ob, 1,1,1); ob = nb;
@@ -707,13 +705,13 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 			// vis twist limit
 
 			ot = matrix1.m_posit;
-			ortho = dYawMatrix(M_PI * -0.5f) * dPitchMatrix(M_PI * -0.5f) * matrix1;//matrix1 * sMat4::rotationX(M_PI * -0.5) * sMat4::rotationY(M_PI * -0.5);
+			ortho = dYawMatrix(d_pi * -0.5f) * dPitchMatrix(d_pi * -0.5f) * matrix1;//matrix1 * sMat4::rotationX(d_pi * -0.5) * sMat4::rotationY(d_pi * -0.5);
 			angDiff = maxTAngle - minTAngle;
-			subdiv2 = 1 + (angDiff / M_PI * 180.0f / (360.f / float(subdiv)));
+			subdiv2 = 1 + (angDiff / d_pi * 180.0f / (360.f / float(subdiv)));
 			for (i=0; i<=subdiv2; i++)
 			{
 				float t = float(i) / float(subdiv2);
-				dVector c = Vis::ToCartesian (dVector (radius, angDiff * t + minTAngle, M_PI * 0.5f));
+				dVector c = Vis::ToCartesian (dVector (radius, angDiff * t + minTAngle, d_pi * 0.5f));
 				dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,0); ot = nt;
 			}	
 			Vis::Line (debugDisplay, matrix1[3], ot, 1,1,0);
@@ -793,7 +791,7 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 	NewtonBody* pickBody = 0;
 	for (int j=0; j < numArms; j++)
 	{
-		dFloat angle = dFloat(j) / dFloat(numArms) * M_PI*2.0f;
+		dFloat angle = dFloat(j) / dFloat(numArms) * d_pi*2.0f;
 		dMatrix armRotation = dPitchMatrix(angle);
 		dMatrix armTransform = armRotation * torsoMatrix;
 		
@@ -824,9 +822,9 @@ void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origi
 			}
 			if (randomness > 0.0f)
 			{
-				dMatrix rotation =  dPitchMatrix(randF(bodyIndex*3+0) * M_PI * 0.25f * randomness);
-				rotation = rotation * dYawMatrix(randF(bodyIndex*3+1) * M_PI * 0.25f * randomness);
-				rotation = rotation * dYawMatrix(randF(bodyIndex*3+2) * M_PI * 0.25f * randomness);
+				dMatrix rotation =  dPitchMatrix(randF(bodyIndex*3+0) * d_pi * 0.25f * randomness);
+				rotation = rotation * dYawMatrix(randF(bodyIndex*3+1) * d_pi * 0.25f * randomness);
+				rotation = rotation * dYawMatrix(randF(bodyIndex*3+2) * d_pi * 0.25f * randomness);
 				matrix0 = matrix0 * rotation;
 			}
 			JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
@@ -858,51 +856,44 @@ void AddJoesLimitJoint (DemoEntityManager* const scene, const dVector& origin, c
 
 
 	dMatrix localMatShoulder0 = dGetIdentityMatrix(); 
-	if (testCase == -1) localMatShoulder0 = dPitchMatrix(M_PI*-0.5f) * dYawMatrix(M_PI*-0.25f) * dRollMatrix(M_PI*-0.15f); 
+	if (testCase == -1) localMatShoulder0 = dPitchMatrix(d_pi*-0.5f) * dYawMatrix(d_pi*-0.25f) * dRollMatrix(d_pi*-0.15f); 
 	localMatShoulder0.m_posit = dVector (0.25f, 0.0f, 0.0f, 1.0f);
 
 	dMatrix localMatShoulder1 = dGetIdentityMatrix(); 
 	localMatShoulder1.m_posit = dVector (-0.5f, 0.0f, 0.0f, 1.0f);
 
-	dMatrix localMatBicep0 = dYawMatrix(M_PI*-0.5f);   
+	dMatrix localMatBicep0 = dYawMatrix(d_pi*-0.5f);   
 	localMatBicep0.m_posit = dVector (0.5f, 0.0f, 0.0f, 1.0f);
 
 	dMatrix localMatBicep1 = dGetIdentityMatrix();
 	localMatBicep1.m_posit = dVector (-0.5f, 0.0f, 0.0f, 1.0f);
-
-	
-	//NewtonBody* arm =		CreateBox (scene, origin + dVector ( 1.0f,  2.0f, 0.0f, 0.0f), dVector (1.0f,  0.2f, 0.2f, 0.0f));
-	//JoesRagdollJoint* ellbowJoint = new JoesRagdollJoint (arm, bicep, localMatBicep1, localMatBicep0, scene->GetNewton(), true);
-
-
 
 	JoesRagdollJoint* shoulderJoint = new JoesRagdollJoint (bicep, shoulder, localMatShoulder1, localMatShoulder0, scene->GetNewton(), true);
 
 	switch (testCase)
 	{
 		case 1: 
-			shoulderJoint->SetTwistSwingLimits (0.0f, M_PI*0.5, 0, 0); // just arc (hinge; robust for knees and elbows, unsure if traditional approach is better)
+			shoulderJoint->SetTwistSwingLimits (0.0f, d_pi*0.5, 0, 0); // just arc (hinge; robust for knees and elbows, unsure if traditional approach is better)
 			break;
 		case 2: 
-			shoulderJoint->SetTwistSwingLimits (M_PI*0.75, 0.0, 0, 0); // large swing cone to show robust twist (the larger the swing angle becomes, the more rotation happens around its axis: Drag bicep back and then around to see) 
+			shoulderJoint->SetTwistSwingLimits (d_pi*0.75f, 0.0f, 0.0f, 0.0f); // large swing cone to show robust twist (the larger the swing angle becomes, the more rotation happens around its axis: Drag bicep back and then around to see) 
 			break;
 		case 3: 
-			shoulderJoint->SetTwistSwingLimits (M_PI*0.25, 0.0, 0, 0); // small swing cone
+			shoulderJoint->SetTwistSwingLimits (d_pi*0.25f, 0.0f, 0.0f, 0.0f); // small swing cone
 			break;
 		case 4: 
-			shoulderJoint->SetTwistSwingLimits (0.0, 0.0, -M_PI*0.5, M_PI*0.5); // no swing (hinge, but neither practical nor robust)
+			shoulderJoint->SetTwistSwingLimits (0.0f, 0.0f, -d_pi*0.5f, d_pi*0.5f); // no swing (hinge, but neither practical nor robust)
 			break;
 		default:
-			shoulderJoint->SetTwistSwingLimits (M_PI*0.2, M_PI*0.1, -M_PI*0.5, M_PI*0.2); // natural limit
+			shoulderJoint->SetTwistSwingLimits (d_pi*0.2f, d_pi*0.1f, -d_pi*0.5f, d_pi*0.2f); // natural limit
 	}
 
 	if (testCase == -1)
 	{
 		NewtonBody* arm = CreateBox (scene, origin + dVector ( 1.0f,  2.0f, 0.0f, 0.0f), dVector (1.0f,  0.2f, 0.2f, 0.0f));
 		JoesRagdollJoint* ellbowJoint = new JoesRagdollJoint (arm, bicep, localMatBicep1, localMatBicep0, scene->GetNewton(), true);
-		ellbowJoint->SetTwistSwingLimits (0.0f, M_PI*0.4, 0, 0);
+		ellbowJoint->SetTwistSwingLimits (0.0f, d_pi*0.4f, 0.0f, 0.0f);
 	}
-
 }
 
 
@@ -1452,12 +1443,11 @@ void StandardJoints (DemoEntityManager* const scene)
 
 #if 1
 	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f,  2.5f), -1);
-	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -0.0f), 0);
-	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -2.5f), 1);
-	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -5.0f), 2);
-	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -7.5f), 3);
-	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -10.f), 4);
-	//AddJoesLimitJoint2 (scene, dVector(-40.0f, 0.0f, -10.0f));
+//	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -0.0f), 0);
+//	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -2.5f), 1);
+//	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -5.0f), 2);
+//	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -7.5f), 3);
+//	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -10.f), 4);
 #endif
 
     // place camera into position

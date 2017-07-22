@@ -2,7 +2,7 @@ nodesCount: 3
 rootBone: Bip01_Pelvis
 
 node: Bip01_Pelvis
-  mass: 0.000000
+  mass: 30.000000
   position: -10.020121 1.897650 0.000003
   eulerAngles: 90.000000 -0.000057 -180.000015
   shapeType: capsule

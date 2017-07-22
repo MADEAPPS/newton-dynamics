@@ -615,9 +615,11 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 
 	if (m_nodesOrder) {
 		for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
+			dgAssert (m_nodesOrder[i]->m_index == i);
 			dgNode* const node = m_nodesOrder[i];
 			//rowCount += jointInfoArray[node->m_joint->m_index].m_pairCount;
-			rowCount += jointInfoArray[node->m_index].m_pairCount;
+			//rowCount += jointInfoArray[node->m_index].m_pairCount;
+			rowCount += jointInfoArray[i].m_pairCount;
 			node->m_auxiliaryStart = dgInt16 (auxiliaryStart);
 			node->m_primaryStart = dgInt16 (primaryStart);
 			auxiliaryStart += node->Factorize(jointInfoArray, matrixRow);
@@ -649,9 +651,11 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 		m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 
 		for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
+			dgAssert (m_nodesOrder[i]->m_index == i);
 			const dgNode* const node = m_nodesOrder[i];
 			//const dgJointInfo* const jointInfo = &jointInfoArray[node->m_joint->m_index];
-			const dgJointInfo* const jointInfo = &jointInfoArray[node->m_index];
+			//const dgJointInfo* const jointInfo = &jointInfoArray[node->m_index];
+			const dgJointInfo* const jointInfo = &jointInfoArray[i];
 			
 			const dgInt32 m0 = node->m_swapJacobianBodiesIndex ? node->m_parent->m_index : i;
 			const dgInt32 m1 = node->m_swapJacobianBodiesIndex ? i : node->m_parent->m_index;
@@ -679,6 +683,7 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 		}
 
 		for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+			dgAssert (0);
 			const dgLoopingJoint& entry = ptr->GetInfo();
 			const dgConstraint* const joint = entry.m_joint;
 			const dgJointInfo* const jointInfo = &jointInfoArray[joint->m_index];
@@ -711,7 +716,7 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 							 JMinvM1.m_linear.CompProduct4(row_i->m_Jt.m_jacobianM1.m_linear) + JMinvM1.m_angular.CompProduct4(row_i->m_Jt.m_jacobianM1.m_angular));
 			element = element.AddHorizontal();
 
-			// I know I am doubling the matrix regularizer, but this makes the solution more robust.
+			// I know I am doubling the matrix regularize, but this makes the solution more robust.
 			dgFloat32 diagonal = element.GetScalar() + row_i->m_diagDamp;
 			matrixRow11[i] = diagonal + row_i->m_diagDamp;
 			diagDamp[i] = matrixRow11[i] * (DG_PSD_DAMP_TOL * dgFloat32 (2.0f));
