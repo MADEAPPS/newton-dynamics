@@ -79,212 +79,64 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 
 #endif
 
-	NewtonCollision* ParseCollisonShape(FILE* const file)
+
+
+	class MySaveLoad: public dCustomRagdollMotor::dSaveLoad
 	{
-		char token[256];
-		NewtonWorld* const world = GetWorld();
-		NewtonCollision* collision = NULL;
-
-		fscanf (file, "%s", token);
-
-		if (!strcmp(token, "sphere")) {
-			dFloat radio;
-			fscanf(file, "%s %f", token, &radio);
-			collision = NewtonCreateSphere(world, radio, 0, NULL);
-		} else if (!strcmp (token, "capsule")) {
-			dFloat radio0;
-			dFloat radio1;
-			dFloat height;
-			fscanf (file, "%s %f %s %f %s %f", token, &radio0, token, &radio1, token, &height);
-			collision = NewtonCreateCapsule(world, radio0, radio1, height, 0, NULL);
-		} else if (!strcmp (token, "convexHull")) {
-			dVector array[1024];
-			int pointCount;
-			fscanf (file, "%s %d", token, &pointCount);
-			for (int i = 0; i < pointCount; i ++) {
-				fscanf (file, "%s %f %f %f", token, &array[i].m_x, &array[i].m_y, &array[i].m_z);
-			}
-			collision = NewtonCreateConvexHull(world, pointCount, &array[0][0], sizeof(dVector), 1.0e-3f, 0, NULL);
-		} else {
-			dAssert (0);
+		public:
+		MySaveLoad(NewtonWorld* const world)
+			:dCustomRagdollMotor::dSaveLoad(world)
+		{
 		}
 
-		dVector scale;
-		dVector posit;
-		dVector euler;
-		fscanf (file, "%s %f %f %f", token, &scale.m_x, &scale.m_y, &scale.m_z);
-		fscanf (file, "%s %f %f %f", token, &posit.m_x, &posit.m_y, &posit.m_z);
-		fscanf (file, "%s %f %f %f", token, &euler.m_x, &euler.m_y, &euler.m_z);
-
-		euler = euler.Scale (3.141592f / 180.0f);
-		dMatrix matrix (euler.m_x, euler.m_y, euler.m_z, posit);
-		NewtonCollisionSetMatrix(collision, &matrix[0][0]);
-//NewtonCollisionSetMode(collision, 0);
-		return collision;
-	}
-
-	NewtonBody* MakeRigidBody (const dVector& posit, const dVector& euler, dFloat mass, NewtonCollision* const collision)
-	{
-		dMatrix matrix(euler.m_x, euler.m_y, euler.m_z, posit);
-		NewtonWorld* const world = GetWorld();
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-		DemoMesh* const mesh = new DemoMesh("calf", collision, "smilli.tga", "smilli.tga", "smilli.tga");
-		NewtonBody* const body = CreateSimpleSolid(scene, mesh, mass, matrix, collision, m_material);
-		mesh->Release();
-		NewtonDestroyCollision(collision);
-		return body;
-	}
-
-	void ParseRigidBody(FILE* const file, dTree<NewtonBody*, const dString>& bodyMap)
-	{
-		dVector posit(0.0f);
-		dVector euler(0.0f);
-		NewtonBody* body = NULL;
-		NewtonCollision* collision = NULL;
-		dFloat mass;
-
-		char token[256];
-		char nodeName[256];
-
-		while (!feof(file)) {
-			fscanf(file, "%s", token);
-
-			if (!strcmp(token, "node:")) {
-				fscanf(file, "%s", &nodeName);
-			} else if (!strcmp(token, "mass:")) {
-				fscanf(file, "%f", &mass);
-			} else if (!strcmp(token, "position:")) {
-				fscanf(file, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
-			} else if (!strcmp(token, "eulerAngles:")) {
-				fscanf(file, "%f %f %f", &euler.m_x, &euler.m_y, &euler.m_z);
-				euler = euler.Scale(3.141592f / 180.0f);
-			} else if (!strcmp(token, "shapeType:")) {
-				collision = ParseCollisonShape(file);
-			} else if (!strcmp(token, "nodeEnd:")) {
-				body = MakeRigidBody(posit, euler, mass, collision);
-				bodyMap.Insert(body, nodeName);
-				break;
-			} else {
-				dAssert(0);
-			}
-		}
-	}
-
-	void ParseJoint(FILE* const file, const dTree<NewtonBody*, const dString>& bodyMap)
-	{
-		char token[256];
-		char jointType[256];
-		char childName[256];
-		char parentName[256];
-
-		NewtonBody* child;
-		NewtonBody* parent;
-
-		dVector childPivot;
-		dVector parentPivot;
-		dVector childEuler;
-		dVector parentEuler;
-		dFloat coneAngle;
-		dFloat minTwistAngle;
-		dFloat maxTwistAngle;
-
-		while (!feof(file)) {
-			fscanf(file, "%s", token);
-			if (!strcmp(token, "joint:")) {
-				fscanf(file, "%s", &jointType);
-			} else if (!strcmp(token, "childBody:")) {
-				fscanf(file, "%s", childName);
-				child = bodyMap.Find(childName)->GetInfo();
-			} else if (!strcmp(token, "parentBody:")) {
-				fscanf(file, "%s", parentName);
-				parent = bodyMap.Find(parentName)->GetInfo();
-			} else if (!strcmp(token, "childPivot:")) {
-				fscanf(file, "%f %f %f", &childPivot.m_x, &childPivot.m_y, &childPivot.m_z);
-			} else if (!strcmp(token, "childEulers:")) {
-				fscanf(file, "%f %f %f", &childEuler.m_x, &childEuler.m_y, &childEuler.m_z);
-			} else if (!strcmp(token, "parentPivot:")) {
-				fscanf(file, "%f %f %f", &parentPivot.m_x, &parentPivot.m_y, &parentPivot.m_z);
-			} else if (!strcmp(token, "parentEulers:")) {
-				fscanf(file, "%f %f %f", &parentEuler.m_x, &parentEuler.m_y, &parentEuler.m_z);
-			} else if (!strcmp(token, "coneAngle:")) {
-				fscanf(file, "%f", &coneAngle);
-			} else if (!strcmp(token, "minTwistAngle:")) {
-				fscanf(file, "%f", &minTwistAngle);
-			} else if (!strcmp(token, "maxTwistAngle:")) {
-				fscanf(file, "%f", &maxTwistAngle);
-			} else if (!strcmp(token, "jointEnd:")) {
-				break;
-			} else {
-				dAssert(0);
-			}
+		const char* GetBodyUniqueName(const NewtonBody* const body) const
+		{
+			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
+			return entity->GetName().GetStr();
 		}
 
+		virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
+		{
+			dMatrix matrix;
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
-		dMatrix childBodyMatrix;
-		dMatrix parentBodyMatrix;
+			NewtonCollision* const collision = NewtonBodyGetCollision(body);
+			DemoMesh* const mesh = new DemoMesh("calf", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
-		childEuler = childEuler.Scale (3.141592f / 180.0f);
-		parentEuler = parentEuler.Scale(3.141592f / 180.0f);
+			NewtonBodyGetMatrix(body, &matrix[0][0]);
+			DemoEntity* const entity = new DemoEntity(matrix, NULL);
+			entity->SetMesh(mesh, dGetIdentityMatrix());
+			scene->Append(entity);
+			mesh->Release();
 
-		NewtonBodyGetMatrix(child, &childBodyMatrix[0][0]);
-		NewtonBodyGetMatrix(parent, &parentBodyMatrix[0][0]);
-		dMatrix childPinAndPivotInGlobalSpace (childEuler.m_x, childEuler.m_y, childEuler.m_z, childPivot);
-		dMatrix parentPinAndPivotInGlobalSpace (parentEuler.m_x, parentEuler.m_y, parentEuler.m_z, parentPivot);
+			// save the pointer to the graphic object with the body.
+			NewtonBodySetUserData(body, entity);
 
-		childPinAndPivotInGlobalSpace = childPinAndPivotInGlobalSpace * childBodyMatrix;
-		parentPinAndPivotInGlobalSpace = parentPinAndPivotInGlobalSpace * parentBodyMatrix;
+			// assign the wood id
+			//NewtonBodySetMaterialGroupID(rigidBody, materialId);
 
-dAssert(0);
-		if (!strcmp(jointType, "dCustomRagdollMotor")) {
-//			dCustomRagdollMotor* const joint = new dCustomRagdollMotor(childPinAndPivotInGlobalSpace, child, parentPinAndPivotInGlobalSpace, parent);
-//			joint->SetAngle0(-coneAngle * 3.141592f / 180.0f, coneAngle * 3.141592f / 180.0f);
-//			joint->SetAngle1(-coneAngle * 3.141592f / 180.0f, coneAngle * 3.141592f / 180.0f);
-//			joint->SetTwistAngle(minTwistAngle * 3.141592f / 180.0f, maxTwistAngle * 3.141592f / 180.0f);
+			//set continuous collision mode
+			//NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
 
-		} else {
-			dAssert(0);
+			// set a destructor for this rigid body
+			NewtonBodySetDestructorCallback(body, PhysicsBodyDestructor);
+
+			// set the transform call back function
+			NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+
+			// set the force and torque call back function
+			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 		}
-	}
-
-	NewtonBody* ParseRigidBodies(FILE* const file, NewtonBody* const parentNode)
-	{
-		char token[256];
-		char rootBodyName[256];
-
-		dTree<NewtonBody*, const dString> bodyMap;
-
-		int nodesCount;
-		fscanf(file, "%s %d", token, &nodesCount);
-		fscanf(file, "%s %s", token, rootBodyName);
-		for (int i = 0; i < nodesCount; i ++) {
-			ParseRigidBody(file, bodyMap);
-		}
-
-		int jointsCount;
-		fscanf(file, "%s %d", token, &jointsCount);
-		for (int i = 0; i < jointsCount; i++) {
-			ParseJoint(file, bodyMap);
-		}
-
-		return bodyMap.Find(rootBodyName)->GetInfo();
-	}
-
+	};
+	
 
 	NewtonBody* ParseRagdollFile(const char* const name, dCustomActiveCharacterController* const controller)
 	{
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
-		char* const oldloc = setlocale( LC_ALL, 0 );
-		setlocale( LC_ALL, "C" );
-		FILE* const file = fopen(fileName, "rt");
-		dAssert(file);
-
-		NewtonBody* const rootBone = ParseRigidBodies (file, NULL);
-
-		fclose (file);
-		setlocale (LC_ALL, oldloc);
-
+		MySaveLoad saveLoad(GetWorld());
+		NewtonBody* const rootBone = saveLoad.Load (fileName);
 		return rootBone;
 	}
 

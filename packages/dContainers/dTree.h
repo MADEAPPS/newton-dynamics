@@ -89,6 +89,12 @@ class dTree: public dContainersAlloc
 		{
 		}
 
+		dTreeNode& operator= (dTreeNode& src)
+		{
+			dAssert (0);
+			return* this;
+		}
+
 		dTreeNode* GetLeft () const
 		{
 			return (dTreeNode*) dRedBackNode::m_left;

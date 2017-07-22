@@ -69,7 +69,8 @@ static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
 	{"Bip01_Pelvis",	 "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f,  30.0f,    0.0f,  -0.0f,     0.0f,   0.0f,   0.0f,  0.0f,  0.0f,    0.0f,   0.0f}, 
 	{"Bip01_L_Thigh",    "capsule", two_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,	 -30.0f,  30.0f,  -120.0f, 120.0f, -60.0f, 60.0f,  0.0f,  -90.0f,  -0.0f},
-	{"Bip01_L_Calf",     "capsule", one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,  -150.0f,  0.0f,     0.0f,	90.0f,   0.0f, -0.0f,  0.0f,    0.0f,  90.0f}, 
+//	{"Bip01_L_Calf",     "capsule", one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,  -150.0f,  0.0f,     0.0f,	90.0f,   0.0f, -0.0f,  0.0f,    0.0f,  90.0f}, 
+
 //	{"Bip01_L_Foot", "convexhull", 0.0f, 00.0f,  0.0f, 0.0f, 0.0f, 0.00f, 0.00f, 0.00f,   3.0f,      0.0f,  -45.0f, 45.0f,		0.0f,   0.0f, -90.0f,   0.0f,   0.0f, -90.0f}, 
 
 
@@ -314,11 +315,6 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 
 		controller->SetCalculateLocalTransforms (true);
 
-dMatrix xxx (dYawMatrix (-90.0f * 3.141592f / 180.0f) * dPitchMatrix (30.0f * 3.141592f / 180.0f));
-dVector e0;
-dVector e1;
-xxx.GetEulerAngles(e0, e1);
-
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
@@ -391,25 +387,72 @@ xxx.GetEulerAngles(e0, e1);
 		return NULL;
 	}
 
+
+	class MySaveLoad: public dCustomRagdollMotor::dSaveLoad
+	{
+		public:
+		MySaveLoad(NewtonWorld* const world)
+			:dCustomRagdollMotor::dSaveLoad(world)
+		{
+		}
+
+		const char* GetBodyUniqueName(const NewtonBody* const body) const
+		{
+			DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
+			return entity->GetName().GetStr();
+		}
+
+		virtual const void InitRigiBody(const NewtonBody* const body, const char* const bodyName) const
+		{
+			dMatrix matrix;
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+
+			NewtonCollision* const collision = NewtonBodyGetCollision(body);
+			DemoMesh* const mesh = new DemoMesh("calf", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+			NewtonBodyGetMatrix(body, &matrix[0][0]);
+			DemoEntity* const entity = new DemoEntity(matrix, NULL);
+			entity->SetMesh(mesh, dGetIdentityMatrix());
+			scene->Append(entity);
+			mesh->Release();
+
+			// save the pointer to the graphic object with the body.
+			NewtonBodySetUserData(body, entity);
+
+			// assign the wood id
+			//NewtonBodySetMaterialGroupID(rigidBody, materialId);
+
+			//set continuous collision mode
+			//NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
+
+			// set a destructor for this rigid body
+			NewtonBodySetDestructorCallback(body, PhysicsBodyDestructor);
+
+			// set the transform call back function
+			NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+
+			// set the force and torque call back function
+			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+		}
+	};
+
 	void PrintRagdoll (dCustomArticulatedTransformController* const controller, const char* const name)
 	{
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
-
 		NewtonBody* const rootbody = controller->GetBoneBody(controller->GetBone(0));
 
-		class MySaveLoad: public dCustomRagdollMotor::dSaveLoad
-		{
-			const char* GetBodyUniqueName(const NewtonBody* const body) const
-			{
-				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
-				return entity->GetName().GetStr();
-			}
-		};
-
-		MySaveLoad saveLoad;
+		MySaveLoad saveLoad(GetWorld());
 		saveLoad.Save (fileName, rootbody);
+
+NewtonBody* xxx = saveLoad.Load (fileName);
+dMatrix xxxxx;
+NewtonBodyGetMatrix(xxx, &xxxxx[0][0]);
+xxxxx.m_posit.m_x += 1.0f;
+NewtonBodySetMatrixRecursive(xxx, &xxxxx[0][0]);
+
+
 	}
 
 	int m_material;
@@ -442,6 +485,9 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 
 		limb = ragDollModel.Find("Bip01_L_Thigh");
 		limbMatrix = dPitchMatrix(40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
+limbMatrix = dPitchMatrix(210.0f * 3.141592f / 180.0f);
+limbMatrix.m_posit = limb->GetCurrentMatrix().m_posit;
+
 		limb->ResetMatrix(*scene, limbMatrix);
 
 		limb = ragDollModel.Find("Bip01_R_Thigh");
