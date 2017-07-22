@@ -174,14 +174,14 @@ void dCustomRagdollMotor::dSaveLoad::Save(const char* const fileName, NewtonBody
 		fprintf(file, "  parentPivot: %f %f %f\n", parentMatrix.m_posit.m_x, parentMatrix.m_posit.m_y, parentMatrix.m_posit.m_z);
 		fprintf(file, "  parentEulers: %f %f %f\n", parentEuler.m_x, parentEuler.m_y, parentEuler.m_z);
 
-		if (joint->IsType(dCustomRagdollMotor_1dof::GetKeyType())) {
+		if (joint->IsType(dCustomRagdollMotor_1dof::GetType())) {
 			dCustomRagdollMotor_1dof* const ragdollJoint = (dCustomRagdollMotor_1dof*)joint;
 
 			ragdollJoint->GetTwistAngle(minAngle, maxAngle);
 			fprintf(file, "  minTwistAngle: %f\n", minAngle * 180.0f / 3.141592f);
 			fprintf(file, "  maxTwistAngle: %f\n", maxAngle * 180.0f / 3.141592f);
 
-		} else if (joint->IsType(dCustomRagdollMotor_2dof::GetKeyType())) {
+		} else if (joint->IsType(dCustomRagdollMotor_2dof::GetType())) {
 			dCustomRagdollMotor_2dof* const ragdollJoint = (dCustomRagdollMotor_2dof*)joint;
 
 			ragdollJoint->GetRollAngles(minAngle, maxAngle);
@@ -192,7 +192,7 @@ void dCustomRagdollMotor::dSaveLoad::Save(const char* const fileName, NewtonBody
 			fprintf(file, "  minYawAngle: %f\n", minAngle * 180.0f / 3.141592f);
 			fprintf(file, "  maxYawAngle: %f\n", maxAngle * 180.0f / 3.141592f);
 
-		} else if (joint->IsType(dCustomRagdollMotor_3dof::GetKeyType())) {
+		} else if (joint->IsType(dCustomRagdollMotor_3dof::GetType())) {
 			dCustomRagdollMotor_3dof* const ragdollJoint = (dCustomRagdollMotor_3dof*)joint;
 
 			ragdollJoint->GetTwistAngle(minAngle, maxAngle);
@@ -413,7 +413,7 @@ void dCustomRagdollMotor::dSaveLoad::GetBodyList (dList<BodyJointPair>& list, Ne
 			NewtonBody* const childBody = cJoint->GetBody0();
 			NewtonBody* const parentBody = cJoint->GetBody1();
 
-			if ((root == parentBody) && cJoint->IsType(dCustomRagdollMotor::GetKeyType()) && !filter.Find(childBody) ) {
+			if ((root == parentBody) && cJoint->IsType(dCustomRagdollMotor::GetType()) && !filter.Find(childBody) ) {
 				filter.Insert(0, childBody);
 				list.Append (BodyJointPair (childBody, (dCustomRagdollMotor*)cJoint));
 				stackMem[stack] = childBody;
@@ -422,8 +422,6 @@ void dCustomRagdollMotor::dSaveLoad::GetBodyList (dList<BodyJointPair>& list, Ne
 		}
 	}
 }
-
-
 
 
 dCustomRagdollMotor::dCustomRagdollMotor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
@@ -452,6 +450,17 @@ void dCustomRagdollMotor::Serialize(NewtonSerializeCallback callback, void* cons
 	callback(userData, &m_motorMode, sizeof(int));
 	callback(userData, &m_torque, sizeof(dFloat));
 }
+
+bool dCustomRagdollMotor::GetMode() const
+{
+	return m_motorMode ? 1 : 0;
+}
+
+void dCustomRagdollMotor::SetMode(bool ragDollOrMotor)
+{
+	m_motorMode = ragDollOrMotor ? 1 : 0;
+}
+
 
 void dCustomRagdollMotor::SetJointTorque(dFloat torque)
 {

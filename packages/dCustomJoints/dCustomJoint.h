@@ -32,7 +32,6 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 
 #define DECLARE_CUSTOM_JOINT(className,baseClass)																			\
 	public:																													\
-	virtual bool IsType___ (dCRCTYPE type) const {return m_metaData_##className.IsType(type);}								\
 	virtual bool IsType (dCRCTYPE type) const																				\
 	{																														\
 		if (type == m_metaData_##className.m_key_##className) {																\
@@ -41,7 +40,7 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 		return baseClass::IsType(type);																						\
 	}																														\
 	virtual dCRCTYPE GetSerializeKey() const { return m_metaData_##className.m_key_##className;}							\
-	static dCRCTYPE GetKeyType () { return m_metaData_##className.m_key_##className; }										\
+	static dCRCTYPE GetType () { return m_metaData_##className.m_key_##className; }										    \
 	virtual const char* GetTypeName() const { return #className; }															\
 	class SerializeMetaData_##className: public baseClass::dSerializeMetaData												\
 	{																														\

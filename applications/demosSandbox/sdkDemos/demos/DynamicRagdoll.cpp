@@ -166,13 +166,17 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 			void* const node = stackPool[stack];
 			NewtonBody* const rootBody = controller->GetBody(node);
 
-			for (NewtonJoint* joint = NewtonBodyGetFirstJoint(rootBody); joint; joint = NewtonBodyGetNextJoint(rootBody, joint)) {
-				if (!filter.Find(joint)) {
-					filter.Insert(joint);
-					dCustomJoint* const cJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
-					void* const bone = controller->AddBone(cJoint, node);
-					stackPool[stack] = bone;
-					stack ++;
+			for (NewtonJoint* newtonJoint = NewtonBodyGetFirstJoint(rootBody); newtonJoint; newtonJoint = NewtonBodyGetNextJoint(rootBody, newtonJoint)) {
+				if (!filter.Find(newtonJoint)) {
+					filter.Insert(newtonJoint);
+					dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(newtonJoint);
+					if (customJoint->IsType(dCustomRagdollMotor::GetType())) {
+						dCustomRagdollMotor* const ragDollMotor = (dCustomRagdollMotor*)customJoint;
+						ragDollMotor->SetMode(true);
+						void* const bone = controller->AddBone(customJoint, node);
+						stackPool[stack] = bone;
+						stack ++;
+					}
 				}
 			}
 		}

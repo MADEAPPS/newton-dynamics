@@ -85,6 +85,10 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 
 	CUSTOM_JOINTS_API dFloat GetJointTorque() const;
 	CUSTOM_JOINTS_API void SetJointTorque(dFloat torque);
+
+	CUSTOM_JOINTS_API bool GetMode() const;
+	CUSTOM_JOINTS_API void SetMode(bool ragDollOrMotor);
+	
 	
 	protected:
 	CUSTOM_JOINTS_API dCustomRagdollMotor(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);

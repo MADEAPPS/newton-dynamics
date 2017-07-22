@@ -1129,7 +1129,7 @@ dgInt32 dgInverseDynamics::GetJacobianDerivatives(dgJointInfo* const jointInfoAr
 	constraintParams.m_invTimestep = dgFloat32 (1.0f / timestep);
 
 	dgDynamicBody** const bodyArray = dgAlloca (dgDynamicBody*, m_nodeCount); 
-	for (dgInt32 i = 0; i < m_nodeCount - 1; i++) {
+	for (dgInt32 i = 0; i < m_nodeCount; i++) {
 		dgNode* const node = m_nodesOrder[i];
 		dgAssert(i == node->m_index);
 		bodyArray[i] = node->m_body;
@@ -1176,6 +1176,7 @@ dgInt32 dgInverseDynamics::GetJacobianDerivatives(dgJointInfo* const jointInfoAr
 			rowCount++;
 		}
 
+		dgAssert (node->m_index == j);
 		const dgInt32 m0 = node->m_swapJacobianBodiesIndex ? node->m_parent->m_index : j;
 		const dgInt32 m1 = node->m_swapJacobianBodiesIndex ? j : node->m_parent->m_index;
 
@@ -1425,9 +1426,9 @@ void dgInverseDynamics::Update (dgFloat32 timestep, dgInt32 threadIndex)
 	dgAssert((dgInt64(memoryBuffer) & 0x0f) == 0);
 	dgAssert((dgInt64(externalAccel) & 0x0f) == 0);
 	dgAssert((dgInt64(jointInfoArray) & 0x0f) == 0);
-return;
 
 	InitMassMatrix(jointInfoArray, matrixRow, memoryBuffer);
+return;
 	CalculateJointAccel(externalAccel, jointInfoArray, matrixRow, accel);
 	CalculateForce(force, accel);
 
