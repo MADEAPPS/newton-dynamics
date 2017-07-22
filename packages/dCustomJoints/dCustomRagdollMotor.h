@@ -111,6 +111,7 @@ class dCustomRagdollMotor_1dof: public dCustomRagdollMotor
 	protected:
 	CUSTOM_JOINTS_API dCustomRagdollMotor_1dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 
 	private:
 	virtual void SubmitConstraints(dFloat timestep, int threadIndex);
