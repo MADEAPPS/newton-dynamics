@@ -814,9 +814,6 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 	CalculateGlobalMatrix(matrix0, matrix1);
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
 
-	const dVector& coneDir0 = matrix0.m_front;
-	const dVector& coneDir1 = matrix1.m_front;
-
 	// do the twist
 	dQuaternion quat0(matrix0);
 	dQuaternion quat1(matrix1);
@@ -836,6 +833,8 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 
 	// select an axis for the twist. 
 	// any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
+	const dVector& coneDir0 = matrix0.m_front;
+	const dVector& coneDir1 = matrix1.m_front;
 	dFloat dot = coneDir0.DotProduct3(coneDir1);
 	if (dot > -0.999f) {
 		dVector twistAxis = coneDir0 + coneDir1;
@@ -997,8 +996,6 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 	CalculateGlobalMatrix(matrix0, matrix1);
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
 
-	const dVector& coneDir0 = matrix0.m_front;
-	const dVector& coneDir1 = matrix1.m_front;
 
 	// do the twist
 	dQuaternion quat0(matrix0);
@@ -1019,6 +1016,8 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 
 	// select an axis for the twist. 
 	// any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
+	const dVector& coneDir0 = matrix0.m_front;
+	const dVector& coneDir1 = matrix1.m_front;
 	dFloat dot = coneDir0.DotProduct3(coneDir1);
 	if (dot > -0.999f) {
 		dVector twistAxis = coneDir0 + coneDir1;
@@ -1028,6 +1027,20 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointAddAngularRow(m_joint, twistAngle, &coneDir1[0]);
 	}
 
+
+	float angle = dAcos(dClamp (dot, -1.0f, 1.0f)) - m_coneAngle;
+	if (angle > 0.0f) {
+		dVector swingAxis (coneDir0.CrossProduct(coneDir1));
+		dAssert (swingAxis.DotProduct3(swingAxis) > 0.0f);
+		swingAxis = swingAxis.Scale(1.0f / dSqrt(swingAxis.DotProduct3(swingAxis)));
+		NewtonUserJointAddAngularRow(m_joint, angle, &swingAxis[0]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		dVector sideDir (swingAxis.CrossProduct(coneDir0));
+		NewtonUserJointAddAngularRow(m_joint, 0, &sideDir[0]);
+		
+	} else {
+		dVector swingAxis = (coneDir0.CrossProduct(coneDir1));
+	}
 
 }
 
