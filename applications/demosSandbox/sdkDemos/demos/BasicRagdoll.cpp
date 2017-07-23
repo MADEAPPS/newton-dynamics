@@ -68,9 +68,10 @@ struct dPasiveRagDollDefinition
 static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
 	{"Bip01_Pelvis",	 "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f,  30.0f,    0.0f,  -0.0f,     0.0f,   0.0f,   0.0f,  0.0f,  0.0f,    0.0f,   0.0f}, 
+{"Bip01_L_Thigh",    "capsule", one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,	 -30.0f,  30.0f,  -120.0f, 120.0f, -60.0f, 60.0f,  0.0f,  -90.0f,  -0.0f},
 
-	{"Bip01_L_Thigh",    "capsule", two_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,	 -30.0f,  30.0f,  -120.0f, 120.0f, -60.0f, 60.0f,  0.0f,  -90.0f,  -0.0f},
-	{"Bip01_L_Calf",     "capsule", one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,  -150.0f,  0.0f,     0.0f,	90.0f,   0.0f, -0.0f,  0.0f,    0.0f,  90.0f}, 
+//	{"Bip01_L_Thigh",    "capsule", two_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,	 -30.0f,  30.0f,  -120.0f, 120.0f, -60.0f, 60.0f,  0.0f,  -90.0f,  -0.0f},
+//	{"Bip01_L_Calf",     "capsule", one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,  -150.0f,  0.0f,     0.0f,	90.0f,   0.0f, -0.0f,  0.0f,    0.0f,  90.0f}, 
 //	{"Bip01_L_Foot",  "convexhull", two_dof,   0.0f, 0.0f,   0.0f, 0.0f, 0.0f,  0.0f, 0.0f,  0.0f,   3.0f,      0.0f,  0.0f,   -45.0f,	45.0f,  -45.0f, 45.0f, 0.0f,   -90.0f,  -0.0f}, 
 
 //	{ "Bip01_R_Thigh",   "capsule", two_dof, 0.0f, 90.0f, 0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f, 14.0f, -30.0f, 30.0f, -120.0f, 120.0f, -60.0f, 60.0f, 0.0f, -90.0f, -0.0f },
@@ -262,7 +263,6 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		return bone;
 	}
 
-
 	void ConnectBodyParts (NewtonBody* const bone, NewtonBody* const parent, const dPasiveRagDollDefinition& definition) const
 	{
 		dMatrix matrix;
@@ -270,7 +270,6 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		
 		dMatrix pinAndPivotInGlobalSpace (dPitchMatrix (definition.m_framePitch * 3.141592f / 180.0f) * dYawMatrix (definition.m_frameYaw * 3.141592f / 180.0f) * dRollMatrix (definition.m_frameRoll * 3.141592f / 180.0f));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
-
 
 		switch (definition.m_type)
 		{
@@ -283,18 +282,20 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 
 			case two_dof:
 			{
-				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
-				joint->SetYawAngles(definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_maxYawAngle * 3.141592f / 180.0f);
-				joint->SetRollAngles(definition.m_minRollAngle * 3.141592f / 180.0f, definition.m_maxRollAngle * 3.141592f / 180.0f);
+				dAssert (0);
+//				dCustomRagdollMotor_2dof* const joint = new dCustomRagdollMotor_2dof(pinAndPivotInGlobalSpace, bone, parent);
+//				joint->SetYawAngles(definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_maxYawAngle * 3.141592f / 180.0f);
+//				joint->SetRollAngles(definition.m_minRollAngle * 3.141592f / 180.0f, definition.m_maxRollAngle * 3.141592f / 180.0f);
 				break;
 			}
 
 			case three_dof:
 			{
-				dCustomRagdollMotor_3dof* const joint = new dCustomRagdollMotor_3dof(pinAndPivotInGlobalSpace, bone, parent);
-				joint->SetYawAngles(definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_maxYawAngle * 3.141592f / 180.0f);
-				joint->SetRollAngles(definition.m_minRollAngle * 3.141592f / 180.0f, definition.m_maxRollAngle * 3.141592f / 180.0f);
-				joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
+				dAssert (0);
+//				dCustomRagdollMotor_3dof* const joint = new dCustomRagdollMotor_3dof(pinAndPivotInGlobalSpace, bone, parent);
+//				joint->SetYawAngles(definition.m_minYawAngle * 3.141592f / 180.0f, definition.m_maxYawAngle * 3.141592f / 180.0f);
+//				joint->SetRollAngles(definition.m_minRollAngle * 3.141592f / 180.0f, definition.m_maxRollAngle * 3.141592f / 180.0f);
+//				joint->SetTwistAngle(definition.m_minTwistAngle * 3.141592f / 180.0f, definition.m_maxTwistAngle * 3.141592f / 180.0f);
 				break;
 			}
 		}
@@ -320,7 +321,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		DemoEntity* const rootEntity = (DemoEntity*) ragDollEntity->Find (definition[0].m_boneName);
 		NewtonBody* const rootBone = CreateRagDollBodyPart (rootEntity, definition[0]);
 		// for debugging
-	//NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
+NewtonBodySetMassMatrix(rootBone, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		dCustomArticulatedTransformController::dSkeletonBone* const bone0 = controller->AddBone (rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling

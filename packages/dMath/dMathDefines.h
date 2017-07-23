@@ -84,6 +84,7 @@
 #define dTan(x)		dFloat (tan (dFloat(x)))
 #define dAsin(x)	dFloat (asin (dFloat(x)))
 #define dAcos(x)	dFloat (acos (dFloat(x)))
+#define	dAtan(x)	dFloat (atan (dFloat(x)))
 #define	dAtan2(x,y) dFloat (atan2 (dFloat(x), dFloat(y)))
 
 

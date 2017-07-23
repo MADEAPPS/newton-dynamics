@@ -401,25 +401,17 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		dMatrix matrix1;
 
 		CalculateGlobalMatrix(matrix0, matrix1);
+		dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
 
 		if (m_isLimitJoint)
 		{
-			//const dVector& p0 = matrix0.m_posit;
-			//const dVector& p1 = matrix1.m_posit;
-			// Restrict the movement on the pivot point along all tree orthonormal direction
-			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_front[0]);
-			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_up[0]);
-			//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix0.m_right[0]);
-			dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
-
 			const dVector& coneDir0 = matrix0.m_front;
 			const dVector& coneDir1 = matrix1.m_front;
 			float dot = coneDir0.DotProduct3(coneDir1);
 			if (dot < -0.999) return; // near the singularity pole causing a flip, should never happen
 
 			// do the twist
-
-			if (1 && m_maxTwistAngle >= m_minTwistAngle) // twist restricted?
+			if (m_maxTwistAngle >= m_minTwistAngle) // twist restricted?
 			{
 				dQuaternion quat0(matrix0), quat1(matrix1);      
 				float *q0 = (float*)&quat0;
@@ -477,8 +469,9 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 
 
 				// clamp the result to be within the arc angle
-				if (cone.m_x < m_arcAngleCos)
-					cone = dVector ( m_arcAngleCos, 0.0f, ( (cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
+				if (cone.m_x < m_arcAngleCos) {
+//					cone = dVector ( m_arcAngleCos, 0.0f, ( (cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
+				}
 				
 				// do a regular cone constraint from that
 				float angle = acos (max(-1.0f, min(1.0f, d.DotProduct3(cone)))) - m_coneAngle;
@@ -537,7 +530,6 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 
 			dVector angAcc = (errorAngVel.Scale(m_reduceError) - (angVel0 - angVel1)).Scale(invTimestep);
 
-			dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
 			// motors
 			for (int n = 0; n < 3; n++) {
 				// calculate the desired acceleration
@@ -557,8 +549,6 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 
 	void Debug(dDebugDisplay* const debugDisplay) const
 	{
-		//dCustomJoint::Debug(debugDisplay);
-
 		struct Vis
 		{
 			static void Line (dDebugDisplay* const debugDisplay, dVector p0, dVector p1, float r, float g, float b, dMatrix *frame = 0)
@@ -598,169 +588,90 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		dMatrix matrix1;
 		CalculateGlobalMatrix(matrix0, matrix1);
 
-#if 0
-		if (0 && m_isLimitJoint) // check math
-		{
-
-			const dVector& p0 = matrix0.m_posit;
-			const dVector& p1 = matrix1.m_posit;
-
-			const dVector& coneDir0 = matrix0.m_front;
-			const dVector& coneDir1 = matrix1.m_front;
-			float dot = coneDir0.DotProduct3(coneDir1);
-			if (dot < -0.999) return; // should never happen
-
-
-
-
-			// project current axis to the arc plane (y)
-			dVector d = matrix1.UnrotateVector (matrix0.m_front);
-			dVector cone = d; cone.m_y = 0; 
-			dFloat sql = cone.DotProduct3(cone);
-			cone = (sql > E) ? cone.Scale (1.0f / sqrt (sql)) : dVector(1.0f, 0.0f, 0.0f, 0.0f);
-
-
-			// clamp the result to be within the arc angle
-			if (cone.m_x < m_arcAngleCos)
-				cone = dVector ( m_arcAngleCos, 0.0f, ( (cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
-				
-			// do a regular cone constraint from that
-			Vis::Vector (debugDisplay, dVector(0,0,0,1), d, 0,1,0, &matrix1);
-			Vis::Vector (debugDisplay, dVector(0,0,0,1), cone, 0,0,1, &matrix1);
-			float angle = acos (max(-1.0f, min(1.0f, d.DotProduct3(cone)))) - m_coneAngle;
-			if (angle >= 0.0f)
-			{
-				dVector swingAxis = matrix1.RotateVector(d.CrossProduct(cone));
-				dFloat sql = swingAxis.DotProduct3(swingAxis);
-				if (sql > E) 
-				{
-					swingAxis =  swingAxis.Scale (1.0f / sqrt (sql));
-
-					Vis::Vector (debugDisplay, matrix1.m_posit, swingAxis, 1,0,0);
-					//NewtonUserJointAddAngularRow (m_joint, angle, (float*)&swingAxis);
-					//NewtonUserJointSetRowMinimumFriction (m_joint, 0.0f);
-				}
-			}
-		}
-#endif
+		dCustomBallAndSocket::Debug(debugDisplay);
 
 		// vis limits
+		int const subdiv = 16;
+		float const radius = 0.4f;
+
+		float yAngle = m_coneAngle;
+		float xAngle = m_arcAngle;
+		float minTAngle = m_minTwistAngle;
+		float maxTAngle = m_maxTwistAngle;
+
+		float minXAngle = -xAngle; 
+		float maxXAngle = xAngle; 
+		int i;
+
+		// vis swing limit
+
+		dVector ot = matrix1.m_posit;
+		dVector ob = matrix1.m_posit;
+		dMatrix ortho = dYawMatrix(M_PI * 0.5f - minXAngle) * matrix1;
+		for (i=0; i<=subdiv/4; i++)
 		{
-			
-			int const subdiv = 36;
-			float const radius = 0.4f;
-
-			float yAngle = m_coneAngle;
-			float xAngle = m_arcAngle;
-			float minTAngle = m_minTwistAngle;
-			float maxTAngle = m_maxTwistAngle;
-
-			float minXAngle = -xAngle; 
-			float maxXAngle = xAngle; 
-			int i;
-
-			// vis swing limit
-
-			dVector ot = matrix1.m_posit;
-			dVector ob = matrix1.m_posit;
-			dMatrix ortho = dYawMatrix(M_PI * 0.5f - minXAngle) * matrix1;
-			for (i=0; i<=subdiv/4; i++)
-			{
-				float t = float(i) / float(subdiv);
-				dVector c = Vis::ToCartesian (dVector (radius, M_PI * 2.0f * t, yAngle));
-				dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,1); ot = nt;
-				c[1] *= -1;
-				dVector nb = ortho.TransformVector (c); Vis::Line (debugDisplay, nb, ob, 1,1,1); ob = nb;
-			}
-
-			ot = matrix1[3];
-			ob = matrix1[3];
-			ortho = dYawMatrix(M_PI * 0.5f - maxXAngle) * matrix1;
-			for (i=subdiv/2; i>=subdiv/4; i--)
-			{
-				float t = float(i) / float(subdiv);
-				dVector c = Vis::ToCartesian (dVector (radius, M_PI * 2.0f * t, yAngle));
-				dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,1); ot = nt;
-				c[1] *= -1;
-				dVector nb = ortho.TransformVector (c); Vis::Line (debugDisplay, nb, ob, 1,1,1); ob = nb;
-			}	
-
-			ot = matrix1[3];
-			ob = matrix1[3];
-			ortho = dPitchMatrix(d_pi * 0.5f) * dYawMatrix(-minXAngle) * matrix1;//matrix1 * sMat4::rotationY(-minXAngle) * sMat4::rotationX(d_pi * 0.5);
-			float angDiff = maxXAngle - minXAngle;
-			int subdiv2 = 1 + (angDiff / d_pi * 180.0f / (360.0f / float(subdiv)));
-			for (i=0; i<=subdiv2; i++)
-			{
-				float t = float(i) / float(subdiv2);
-				dVector c = Vis::ToCartesian (dVector (radius, angDiff * t, d_pi * 0.5f - yAngle));
-				dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,1); ot = nt;
-				c[2] *= -1;
-				dVector nb = ortho.TransformVector (c); Vis::Line (debugDisplay, nb, ob, 1,1,1); ob = nb;
-			}	
-			Vis::Line (debugDisplay, matrix1.m_posit, ot, 1,1,1);
-			Vis::Line (debugDisplay, matrix1.m_posit, ob, 1,1,1);
-
-
-			// vis twist limit
-
-			ot = matrix1.m_posit;
-			ortho = dYawMatrix(d_pi * -0.5f) * dPitchMatrix(d_pi * -0.5f) * matrix1;//matrix1 * sMat4::rotationX(d_pi * -0.5) * sMat4::rotationY(d_pi * -0.5);
-			angDiff = maxTAngle - minTAngle;
-			subdiv2 = 1 + (angDiff / d_pi * 180.0f / (360.f / float(subdiv)));
-			for (i=0; i<=subdiv2; i++)
-			{
-				float t = float(i) / float(subdiv2);
-				dVector c = Vis::ToCartesian (dVector (radius, angDiff * t + minTAngle, d_pi * 0.5f));
-				dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,0); ot = nt;
-			}	
-			Vis::Line (debugDisplay, matrix1[3], ot, 1,1,0);
-
-			dQuaternion quat0(matrix0), quat1(matrix1);      
-			float *q0 = (float*)&quat0;
-			float *q1 = (float*)&quat1;
-			float twistAngle = 2.0f * atan (
-				( ( ( (q0[0] * q1[1]) + (-q0[1] * q1[0]) ) + (-q0[2] * q1[3]) ) - (-q0[3] * q1[2]) ) /
-				( ( ( (q0[0] * q1[0]) - (-q0[1] * q1[1]) ) - (-q0[2] * q1[2]) ) - (-q0[3] * q1[3]) ) );
-
-			Vis::Vector (debugDisplay, matrix1[3], matrix1.RotateVector(dVector(0,1,0).Scale(radius)), 0,1,0); // zero twist
-			Vis::Vector (debugDisplay, matrix1[3], matrix1.RotateVector(dVector(0, cos(twistAngle), sin(-twistAngle)).Scale(radius)), 1,0,0); // current twist
-			Vis::Vector (debugDisplay, matrix0[3], matrix0[0].Scale(radius), 0.5f,0.5f,1); // current pin
+			float t = float(i) / float(subdiv);
+			dVector c = Vis::ToCartesian (dVector (radius, M_PI * 2.0f * t, yAngle));
+			dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,1); ot = nt;
+			c[1] *= -1;
+			dVector nb = ortho.TransformVector (c); Vis::Line (debugDisplay, nb, ob, 1,1,1); ob = nb;
 		}
 
+		ot = matrix1[3];
+		ob = matrix1[3];
+		ortho = dYawMatrix(M_PI * 0.5f - maxXAngle) * matrix1;
+		for (i=subdiv/2; i>=subdiv/4; i--)
+		{
+			float t = float(i) / float(subdiv);
+			dVector c = Vis::ToCartesian (dVector (radius, M_PI * 2.0f * t, yAngle));
+			dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,1); ot = nt;
+			c[1] *= -1;
+			dVector nb = ortho.TransformVector (c); Vis::Line (debugDisplay, nb, ob, 1,1,1); ob = nb;
+		}	
+
+		ot = matrix1[3];
+		ob = matrix1[3];
+		ortho = dPitchMatrix(d_pi * 0.5f) * dYawMatrix(-minXAngle) * matrix1;//matrix1 * sMat4::rotationY(-minXAngle) * sMat4::rotationX(d_pi * 0.5);
+		float angDiff = maxXAngle - minXAngle;
+		int subdiv2 = 1 + (angDiff / d_pi * 180.0f / (360.0f / float(subdiv)));
+		for (i=0; i<=subdiv2; i++)
+		{
+			float t = float(i) / float(subdiv2);
+			dVector c = Vis::ToCartesian (dVector (radius, angDiff * t, d_pi * 0.5f - yAngle));
+			dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,1); ot = nt;
+			c[2] *= -1;
+			dVector nb = ortho.TransformVector (c); Vis::Line (debugDisplay, nb, ob, 1,1,1); ob = nb;
+		}	
+		Vis::Line (debugDisplay, matrix1.m_posit, ot, 1,1,1);
+		Vis::Line (debugDisplay, matrix1.m_posit, ob, 1,1,1);
 
 
+		// vis twist limit
+
+		ot = matrix1.m_posit;
+		ortho = dYawMatrix(d_pi * -0.5f) * dPitchMatrix(d_pi * -0.5f) * matrix1;//matrix1 * sMat4::rotationX(d_pi * -0.5) * sMat4::rotationY(d_pi * -0.5);
+		angDiff = maxTAngle - minTAngle;
+		subdiv2 = 1 + (angDiff / d_pi * 180.0f / (360.f / float(subdiv)));
+		for (i=0; i<=subdiv2; i++)
+		{
+			float t = float(i) / float(subdiv2);
+			dVector c = Vis::ToCartesian (dVector (radius, angDiff * t + minTAngle, d_pi * 0.5f));
+			dVector nt = ortho.TransformVector (c); Vis::Line (debugDisplay, nt, ot, 1,1,0); ot = nt;
+		}	
+		Vis::Line (debugDisplay, matrix1[3], ot, 1,1,0);
+
+		dQuaternion quat0(matrix0), quat1(matrix1);      
+		float *q0 = (float*)&quat0;
+		float *q1 = (float*)&quat1;
+		float twistAngle = 2.0f * atan (
+			( ( ( (q0[0] * q1[1]) + (-q0[1] * q1[0]) ) + (-q0[2] * q1[3]) ) - (-q0[3] * q1[2]) ) /
+			( ( ( (q0[0] * q1[0]) - (-q0[1] * q1[1]) ) - (-q0[2] * q1[2]) ) - (-q0[3] * q1[3]) ) );
+
+		Vis::Vector (debugDisplay, matrix1[3], matrix1.RotateVector(dVector(0,1,0).Scale(radius)), 0,1,0); // zero twist
+		Vis::Vector (debugDisplay, matrix1[3], matrix1.RotateVector(dVector(0, cos(twistAngle), sin(-twistAngle)).Scale(radius)), 1,0,0); // current twist
+		Vis::Vector (debugDisplay, matrix0[3], matrix0[0].Scale(radius), 0.5f,0.5f,1); // current pin
 	}
 };
-
-/*
-void AddJoesPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin, const dFloat animSpeed, const int numSegments)
-{
-    dFloat height = 1.0f;
-    dFloat width = 4.0f;
-
-    dVector size (width, height, width);
-    NewtonBody* parent = CreateBox (scene, origin + dVector (0.0f,  0.5f, 0.0f, 0.0f), size);
-	
-    for (int i=0; i < numSegments; i++)
-	{
-        dFloat height = 1.0f;
-        dFloat width = 0.5f;
-
-        dVector size (width, height, width);
-        NewtonBody* child = CreateBox (scene, origin + dVector (0.0f,  0.5f + height * dFloat(i+1), 0.0f, 0.0f), size);
-
-        dMatrix matrix0 = dGetIdentityMatrix(); matrix0.m_posit = dVector (0.0f, height*-0.5f, 0.0f, 1.0f);
-        dMatrix matrix1 = dGetIdentityMatrix(); matrix1.m_posit = dVector (0.0f, height*0.5f, 0.0f, 1.0f);
-        JoesRagdollJoint* joint = new JoesRagdollJoint (child, parent, matrix0, matrix1, scene->GetNewton());
-
-		if (animSpeed != 0.0f) {
-			joint->m_anim_speed = animSpeed, joint->m_anim_offset = dFloat(i) / dFloat(numSegments); // animated      
-	}
-
-        parent = child;
-	}
-}*/
 
 inline float randF (unsigned int time)
 {
@@ -873,7 +784,7 @@ void AddJoesLimitJoint (DemoEntityManager* const scene, const dVector& origin, c
 	switch (testCase)
 	{
 		case 1: 
-			shoulderJoint->SetTwistSwingLimits (0.0f, d_pi*0.5, 0, 0); // just arc (hinge; robust for knees and elbows, unsure if traditional approach is better)
+			shoulderJoint->SetTwistSwingLimits (0.0f, d_pi*0.5f, 0, 0); // just arc (hinge; robust for knees and elbows, unsure if traditional approach is better)
 			break;
 		case 2: 
 			shoulderJoint->SetTwistSwingLimits (d_pi*0.75f, 0.0f, 0.0f, 0.0f); // large swing cone to show robust twist (the larger the swing angle becomes, the more rotation happens around its axis: Drag bicep back and then around to see) 
@@ -897,85 +808,6 @@ void AddJoesLimitJoint (DemoEntityManager* const scene, const dVector& origin, c
 }
 
 
-
-#if 0
-void AddJoesLimitJoint2 (DemoEntityManager* const scene, const dVector& origin)
-{
-	NewtonBody* shoulder =	CreateBox (scene, origin + dVector (-0.5f,  2.0f, 0.0f, 0.0f), dVector (0.5f,  0.5f, 0.5f, 0.0f), 0);
-	NewtonBody* bicep =		CreateBox (scene, origin + dVector ( 0.0f,  2.0f, 0.0f, 0.0f), dVector (1.0f,  0.25f, 0.25f, 0.0f));
-	NewtonBody* arm =		CreateBox (scene, origin + dVector ( 1.0f,  2.0f, 0.0f, 0.0f), dVector (1.0f,  0.2f, 0.2f, 0.0f));
-
-	dMatrix localMatShoulder0 = dGetIdentityMatrix(); localMatShoulder0.m_posit = dVector (0.25f, 0.0f, 0.0f, 1.0f);
-	dMatrix localMatShoulder1 = dGetIdentityMatrix(); localMatShoulder1.m_posit = dVector (-0.5f, 0.0f, 0.0f, 1.0f);
-
-	dMatrix localMatBicep0 = dGetIdentityMatrix(); localMatBicep0.m_posit = dVector (0.5f, 0.0f, 0.0f, 1.0f);
-	dMatrix localMatBicep1 = dGetIdentityMatrix(); localMatBicep1.m_posit = dVector (-0.5f, 0.0f, 0.0f, 1.0f);
-	
-	//JoesRagdollJoint* ellbowJoint = new JoesRagdollJoint (arm, bicep, localMatBicep1, localMatBicep0, scene->GetNewton(), true);
-	//JoesRagdollJoint* shoulderJoint = new JoesRagdollJoint (bicep, shoulder, localMatShoulder1, localMatShoulder0, scene->GetNewton(), true);
-
-	dMatrix pivotBicep; NewtonBodyGetMatrix (bicep, (float*) &pivotBicep); pivotBicep = pivotBicep * localMatBicep0;
-	dMatrix pivotShoulder; NewtonBodyGetMatrix (bicep, (float*) &pivotShoulder); pivotShoulder = pivotShoulder * localMatShoulder0;
-
-	dCustomRagdollMotor* ellbowJoint = new dCustomRagdollMotor (pivotBicep, arm, bicep);
-	dCustomRagdollMotor* shoulderJoint = new dCustomRagdollMotor (pivotShoulder, bicep, shoulder);
-}
-#endif
-
-static void AddPoweredRagDoll (DemoEntityManager* const scene, const dVector& origin)
-{
-	dVector size (1.0f, 1.0f, 1.0f);
-	NewtonBody* const box0 = CreateCapule(scene, origin + dVector(0.0f, 9.0f, 0.0f, 0.0f), size);
-//	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 9.0 - size.m_y * 2.0f, 0.0f, 0.0f), size);
-//	NewtonBody* const box2 = CreateCapule(scene, origin + dVector(0.0f, 9.0 - size.m_y * 4.0f, 0.0f, 0.0f), size);
-//	NewtonBody* const box3 = CreateCapule(scene, origin + dVector(0.0f, 9.0 - size.m_y * 6.0f, 0.0f, 0.0f), size);
-
-	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
-//dMatrix pinMatrix (dGrammSchmidt (dVector (1.0f, 0.0f, 0.0f, 0.0f)));
-
-	// connect first box to the world
-	dMatrix matrix0;
-	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
-	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	dCustomControlledBallAndSocket* const joint0 = new dCustomControlledBallAndSocket (pinMatrix, box0, NULL);
-	joint0->SetAngularVelocity (2000.0f * 3.141592f / 180.0f);
-//	joint0->SetPitchAngle (-45.0f * 3.141592f / 180.0f);
-//	joint0->SetYawAngle (-85.0f * 3.141592f / 180.0f);
-//	joint0->SetRollAngle (120.0f * 3.141592f / 180.0f);
-	
-joint0->SetPitchAngle (90.0f * 3.141592f / 180.0f);	
-/*
-	// link the two boxes
-	dMatrix matrix1;
-	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
-	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	CustomControlledBallAndSocket* const joint1 = new CustomControlledBallAndSocket (pinMatrix, box0, box1);
-	joint1->SetAngularVelocity (1000.0f * 3.141592f / 180.0f);
-	joint1->SetPitchAngle (45.0f * 3.141592f / 180.0f);
-	joint1->SetYawAngle ( 30.0f * 3.141592f / 180.0f);
-	joint1->SetRollAngle (25.0f * 3.141592f / 180.0f);
-
-	// link next box
-	dMatrix matrix2;
-	NewtonBodyGetMatrix(box2, &matrix2[0][0]);
-	pinMatrix.m_posit = (matrix1.m_posit + matrix2.m_posit).Scale(0.5f);
-	CustomControlledBallAndSocket* const joint2 = new CustomControlledBallAndSocket(pinMatrix, box1, box2);
-	joint2->SetAngularVelocity(1000.0f * 3.141592f / 180.0f);
-	joint2->SetPitchAngle(45.0f * 3.141592f / 180.0f);
-	joint2->SetYawAngle(30.0f * 3.141592f / 180.0f);
-	joint2->SetRollAngle(25.0f * 3.141592f / 180.0f);
-
-	// link next box
-	dMatrix matrix3;
-	NewtonBodyGetMatrix(box3, &matrix3[0][0]);
-	pinMatrix.m_posit = (matrix2.m_posit + matrix3.m_posit).Scale(0.5f);
-	CustomControlledBallAndSocket* const joint3 = new CustomControlledBallAndSocket(pinMatrix, box2, box3);
-	joint3->SetAngularVelocity(1000.0f * 3.141592f / 180.0f);
-	joint3->SetPitchAngle(45.0f * 3.141592f / 180.0f);
-	joint3->SetYawAngle(30.0f * 3.141592f / 180.0f);
-	joint3->SetRollAngle(25.0f * 3.141592f / 180.0f);
-*/
-}
 
 void AddHinge (DemoEntityManager* const scene, const dVector& origin)
 {
@@ -1442,9 +1274,9 @@ void StandardJoints (DemoEntityManager* const scene)
 #endif
 
 #if 1
-	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f,  2.5f), -1);
+//	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f,  2.5f), -1);
 //	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -0.0f), 0);
-//	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -2.5f), 1);
+	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -2.5f), 1);
 //	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -5.0f), 2);
 //	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -7.5f), 3);
 //	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -10.f), 4);

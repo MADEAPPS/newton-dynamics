@@ -390,7 +390,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix (const dgBodyInfo* const bodyInfo
 		row->m_deltaAccel = extenalAcceleration * forceImpulseScale;
 		row->m_coordenateAccel += extenalAcceleration * forceImpulseScale;
 		dgAssert(row->m_jointFeebackForce);
-		row->m_force = row->m_jointFeebackForce[0].m_force * forceImpulseScale;
+		row->m_force = row->m_jointFeebackForce->m_force * forceImpulseScale;
 #ifdef _DEBUG
 //row->m_force = 0.0f;
 #endif
@@ -911,8 +911,8 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				dgJacobianMatrixElement* const row = &matrixRow[j + first];
 				dgFloat32 val = row->m_force;
 				dgAssert(dgCheckFloat(val));
-				row->m_jointFeebackForce[0].m_force = val;
-				row->m_jointFeebackForce[0].m_impact = row->m_maxImpact * timestepRK;
+				row->m_jointFeebackForce->m_force = val;
+				row->m_jointFeebackForce->m_impact = row->m_maxImpact * timestepRK;
 			}
 			hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);
 		}
@@ -1048,8 +1048,8 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesExperimental(const dgBo
 				dgJacobianMatrixElement* const row = &matrixRow[j + first];
 				dgFloat32 val = row->m_force;
 				dgAssert(dgCheckFloat(val));
-				row->m_jointFeebackForce[0].m_force = val;
-				row->m_jointFeebackForce[0].m_impact = row->m_maxImpact * timestepRK;
+				row->m_jointFeebackForce->m_force = val;
+				row->m_jointFeebackForce->m_impact = row->m_maxImpact * timestepRK;
 			}
 			hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);
 		}

@@ -66,7 +66,6 @@ class dgInverseDynamics
 
 	dgDynamicBody* GetBody(dgNode* const node) const;
 	dgBilateralConstraint* GetJoint(dgNode* const node) const;
-//	dgBilateralConstraint* GetParentJoint(dgNode* const node) const;
 	dgNode* GetParent (dgNode* const node) const;
 	dgNode* GetFirstChild (dgNode* const parent) const;
 	dgNode* GetNextSiblingChild (dgNode* const sibling) const;
@@ -90,7 +89,7 @@ class dgInverseDynamics
 	
 	void CalculateExternalForces (dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
 	void CalculateLoopAndExternalForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
-	void CalculateMotorsAccelerations (const dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow) const;
+	void CalculateMotorsAccelerations (dgJacobian* const velocity, const dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep) const;
 
 	dgWorld* m_world;
 	dgNode* m_skeleton;

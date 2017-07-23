@@ -503,8 +503,8 @@ dgAssert (0);
 				dgJacobianMatrixElement* const row = &matrixRow[j + first];
 				dgFloat32 val = row->m_force;
 				dgAssert(dgCheckFloat(val));
-				row->m_jointFeebackForce[0].m_force = val;
-				row->m_jointFeebackForce[0].m_impact = row->m_maxImpact * syncData->m_timestepRK;
+				row->m_jointFeebackForce->m_force = val;
+				row->m_jointFeebackForce->m_impact = row->m_maxImpact * syncData->m_timestepRK;
 			}
 			hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);
 		}

@@ -71,6 +71,7 @@ class dgBilateralConstraint: public dgConstraint
 	OnConstraintDestroy m_destructor;
 	dgFloat32 m_stiffness;
 
+	friend class dgInverseDynamics;
 	friend class dgWorldDynamicUpdate;
 };
 
