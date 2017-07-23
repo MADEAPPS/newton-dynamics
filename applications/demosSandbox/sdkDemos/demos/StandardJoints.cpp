@@ -1276,9 +1276,9 @@ void StandardJoints (DemoEntityManager* const scene)
 #if 1
 //	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f,  2.5f), -1);
 //	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -0.0f), 0);
-	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -2.5f), 1);
+//	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -2.5f), 1);
 //	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -5.0f), 2);
-//	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -7.5f), 3);
+	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -7.5f), 3);
 //	AddJoesLimitJoint (scene, dVector(-40.0f, 0.0f, -10.f), 4);
 #endif
 
