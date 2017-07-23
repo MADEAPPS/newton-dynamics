@@ -794,7 +794,7 @@ void dCustomRagdollMotor_1dof::Debug(dDebugDisplay* const debugDisplay) const
 	dVector arch[subdiv + 1];
 	debugDisplay->SetColor(this, dVector (1.0f, 1.0f, 0.0f, 0.0f));
 	for (int i = 0; i <= subdiv; i++) {
-		dVector p (matrix1.TransformVector(dYawMatrix(-angle0).RotateVector(point)));
+		dVector p (matrix1.TransformVector(dYawMatrix(angle0).RotateVector(point)));
 		arch[i] = p;
 		debugDisplay->DrawLine(this, matrix1.m_posit, p);
 		angle0 += angleStep;
@@ -862,15 +862,15 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 	float swingAngle = CalculateAngle (matrix0.m_front, planeDir, swingAxis);
 	NewtonUserJointAddAngularRow(m_joint, swingAngle, &swingAxis[0]);
 
-	swingAngle = CalculateAngle (planeDir, matrix1.m_front, matrix1.m_up);
+	swingAngle = -CalculateAngle (planeDir, matrix1.m_front, matrix1.m_up);
 	if (swingAngle < m_minTwistAngle) {
 		swingAngle = swingAngle - m_minTwistAngle;
 		NewtonUserJointAddAngularRow(m_joint, swingAngle, &matrix1.m_up[0]);
-		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 	} else if (swingAngle > m_maxTwistAngle) {
 		swingAngle = swingAngle - m_maxTwistAngle;
 		NewtonUserJointAddAngularRow(m_joint, swingAngle, &matrix1.m_up[0]);
-		NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 	} else if (m_motorMode) {
 		dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
@@ -945,13 +945,14 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 
 void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadIndex)
 {
+/*
 	dMatrix matrix0;
 	dMatrix matrix1;
 //	dFloat yawAngle;
 //	dFloat rollAngle;
 //	dFloat twistAngle;
 	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
-/*
+
 	NewtonUserJointAddAngularRow(m_joint, -twistAngle * 40.0f, &matrix0.m_front[0]);
 
 	if (rollAngle < m_rollAngle.m_minAngle) {
@@ -989,5 +990,44 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 	}
 */
+
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	CalculateGlobalMatrix(matrix0, matrix1);
+	dCustomRagdollMotor::SubmitConstraints(timestep, threadIndex);
+
+	const dVector& coneDir0 = matrix0.m_front;
+	const dVector& coneDir1 = matrix1.m_front;
+
+	// do the twist
+	dQuaternion quat0(matrix0);
+	dQuaternion quat1(matrix1);
+
+	if (quat0.DotProduct(quat1) < 0.0f) {
+		quat0.Scale(-1.0f);
+	}
+
+	// factor rotation about x axis between quat0 and quat1. 
+	// Code is an optimization of this: qt = q0.Inversed() * q1; 
+	// halfTwistAngle = atan (qt.x / qt.w);
+	dFloat* const q0 = &quat0.m_q0;
+	dFloat* const q1 = &quat1.m_q0;
+	dFloat num = (q0[0] * q1[1]) + (-q0[1] * q1[0]) + (-q0[2] * q1[3]) - (-q0[3] * q1[2]);
+	dFloat den = (q0[0] * q1[0]) - (-q0[1] * q1[1]) - (-q0[2] * q1[2]) - (-q0[3] * q1[3]);
+	dFloat twistAngle = 2.0f * dAtan2(num, den);
+
+	// select an axis for the twist. 
+	// any on the unit arc from coneDir0 to coneDir1 would do - average seemed best after some tests
+	dFloat dot = coneDir0.DotProduct3(coneDir1);
+	if (dot > -0.999f) {
+		dVector twistAxis = coneDir0 + coneDir1;
+		twistAxis = twistAxis.Scale(1.0f / dSqrt(twistAxis.DotProduct3(twistAxis)));
+		NewtonUserJointAddAngularRow(m_joint, twistAngle, &twistAxis[0]);
+	} else {
+		NewtonUserJointAddAngularRow(m_joint, twistAngle, &coneDir1[0]);
+	}
+
+
 }
 
