@@ -903,7 +903,7 @@ void dCustomRagdollMotor_2dof::Serialize(NewtonSerializeCallback callback, void*
 
 void dCustomRagdollMotor_2dof::SetConeAngle(dFloat angle)
 {
-	m_coneAngle = dMin(-dAbs(angle), -150.0f * 3.141582f / 180.0f);
+	m_coneAngle = dMin(dAbs(angle), 150.0f * 3.141582f / 180.0f);
 }
 
 dFloat dCustomRagdollMotor_2dof::GetConeAngle() const
@@ -919,68 +919,27 @@ void dCustomRagdollMotor_2dof::Debug(dDebugDisplay* const debugDisplay) const
 
 	CalculateGlobalMatrix(matrix0, matrix1);
 	dCustomRagdollMotor::Debug(debugDisplay);
-/*
-	dVector p[4];
-	dVector o[4];
 
-	dFloat length = 0.125f;
 
-	dMatrix minRollMatrix(dRollMatrix(m_rollAngle.m_minAngle));
-	dMatrix maxRollMatrix(dRollMatrix(m_rollAngle.m_maxAngle));
+	const int subdiv = 24;
+	const float radius = 0.25f;
 
-	p[0] = dVector(0.25f, 0.0f, length, 0.0f);
-	p[1] = dVector(0.25f, 0.0f, -length, 0.0f);
-	p[2] = dVector(0.25f, 0.0f, -length, 0.0f);
-	p[3] = dVector(0.25f, 0.0f, length, 0.0f);
+	dVector point(radius * dCos(m_coneAngle), radius * dSin(m_coneAngle), 0.0f, 0.0f);
+	dFloat angleStep = 3.141692f * 2.0f / subdiv;
+	dFloat angle0 = 0.0f;
 
-	o[0] = dVector(0.0f, 0.0f, length, 0.0f);
-	o[1] = dVector(0.0f, 0.0f, -length, 0.0f);
-	o[2] = dVector(0.0f, 0.0f, -length, 0.0f);
-	o[3] = dVector(0.0f, 0.0f, length, 0.0f);
-
-	p[0] = minRollMatrix.RotateVector(p[0]);
-	p[1] = minRollMatrix.RotateVector(p[1]);
-	p[2] = maxRollMatrix.RotateVector(p[2]);
-	p[3] = maxRollMatrix.RotateVector(p[3]);
-
-	debugDisplay->SetColor(this, dVector(0.0f, 0.0f, 0.5f));
-	debugDisplay->DrawLine(this, matrix1.TransformVector(o[0]), matrix1.TransformVector(o[1]));
-	for (int i = 0, i0 = 3; i < 4; i++) {
-		dVector p0 = matrix1.TransformVector(p[i0]);
-		dVector p1 = matrix1.TransformVector(p[i]);
-		debugDisplay->DrawLine(this, p0, p1);
-		debugDisplay->DrawLine(this, matrix1.TransformVector(o[i]), p1);
-		i0 = i;
+	dVector arch[subdiv + 1];
+	debugDisplay->SetColor(this, dVector(1.0f, 1.0f, 0.0f, 0.0f));
+	for (int i = 0; i <= subdiv; i++) {
+		dVector p(matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point)));
+		arch[i] = p;
+		debugDisplay->DrawLine(this, matrix1.m_posit, p);
+		angle0 += angleStep;
 	}
 
-
-	dMatrix minYawMatrix(dYawMatrix(m_yawAngle.m_minAngle));
-	dMatrix maxYawMatrix(dYawMatrix(m_yawAngle.m_maxAngle));
-	p[0] = dVector(0.25f, length, 0.0f, 0.0f);
-	p[1] = dVector(0.25f, -length, 0.0f, 0.0f);
-	p[2] = dVector(0.25f, -length, 0.0f, 0.0f);
-	p[3] = dVector(0.25f, length, 0.0f, 0.0f);
-
-	o[0] = dVector(0.0f, length, 0.0f, 0.0f);
-	o[1] = dVector(0.0f, -length, 0.0f, 0.0f);
-	o[2] = dVector(0.0f, -length, 0.0f, 0.0f);
-	o[3] = dVector(0.0f, length, 0.0f, 0.0f);
-
-	p[0] = minYawMatrix.RotateVector(p[0]);
-	p[1] = minYawMatrix.RotateVector(p[1]);
-	p[2] = maxYawMatrix.RotateVector(p[2]);
-	p[3] = maxYawMatrix.RotateVector(p[3]);
-
-	debugDisplay->SetColor(this, dVector(0.0f, 0.5f, 0.0f));
-	debugDisplay->DrawLine(this, matrix1.TransformVector(o[0]), matrix1.TransformVector(o[1]));
-	for (int i = 0, i0 = 3; i < 4; i++) {
-		dVector p0 = matrix1.TransformVector(p[i0]);
-		dVector p1 = matrix1.TransformVector(p[i]);
-		debugDisplay->DrawLine(this, p0, p1);
-		debugDisplay->DrawLine(this, matrix1.TransformVector(o[i]), p1);
-		i0 = i;
+	for (int i = 0; i < subdiv; i++) {
+		debugDisplay->DrawLine(this, arch[i], arch[i + 1]);
 	}
-*/
 }
 
 

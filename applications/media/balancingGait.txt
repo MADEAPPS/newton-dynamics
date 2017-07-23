@@ -106,6 +106,6 @@ joint: dCustomRagdollMotor_2dof
   childEulers: 0.000000 -90.000000 0.000000
   parentPivot: 0.000000 0.000000 0.398078
   parentEulers: -0.000017 -84.270622 0.000034
-  coneAngle: -149.999527
+  coneAngle: 45.000000
 jointEnd:
 
