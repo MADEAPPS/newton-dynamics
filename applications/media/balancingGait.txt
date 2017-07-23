@@ -1,8 +1,8 @@
-nodesCount: 3
+nodesCount: 2
 rootBone: Bip01_Pelvis
 
 node: Bip01_Pelvis
-  mass: 30.000000
+  mass: 0.000000
   position: -10.020121 1.897650 0.000003
   eulerAngles: 90.000000 -0.000057 -180.000015
   shapeType: capsule
@@ -27,41 +27,15 @@ node: Bip01_L_Thigh
     shapeEulerAngle: 0.000000 90.000000 0.000000
 nodeEnd:
 
-node: Bip01_L_Calf
-  mass: 10.000000
-  position: -10.050538 1.594228 0.360978
-  eulerAngles: -50.567398 -7.341220 -176.902878
-  shapeType: capsule
-    radio0: 0.050000
-    radio1: 0.050000
-    height: 0.340000
-    shapeScale: 1.000000 1.000000 1.000000
-    shapePosition: 0.000000 0.000000 0.190000
-    shapeEulerAngle: 0.000000 90.000000 0.000000
-nodeEnd:
-
-jointsCount: 2
-joint: dCustomRagdollMotor_2dof
+jointsCount: 1
+joint: dCustomRagdollMotor_1dof
   childBody: Bip01_L_Thigh
   parentBody: Bip01_Pelvis
   childPivot: 0.000000 0.000000 0.000000
   childEulers: 0.000000 -90.000000 0.000001
   parentPivot: -0.000007 0.105093 0.000000
   parentEulers: -98.871941 49.660183 83.219345
-  minRollAngle: -59.999996
-  maxRollAngle: 59.999996
-  minYawAngle: -119.999619
-  maxYawAngle: 119.999619
-jointEnd:
-
-joint: dCustomRagdollMotor_1dof
-  childBody: Bip01_L_Calf
-  parentBody: Bip01_L_Thigh
-  childPivot: 0.000000 0.000000 0.000000
-  childEulers: -0.000003 0.000002 90.000000
-  parentPivot: 0.000000 -0.000001 0.398078
-  parentEulers: -11.459159 -0.000003 90.000000
-  minTwistAngle: -150.000000
-  maxTwistAngle: 0.000000
+  minTwistAngle: -119.999992
+  maxTwistAngle: 119.999992
 jointEnd:
 

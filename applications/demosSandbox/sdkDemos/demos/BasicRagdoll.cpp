@@ -68,7 +68,7 @@ struct dPasiveRagDollDefinition
 static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
 	{"Bip01_Pelvis",	 "capsule", three_dof, 0.0f, 0.0f, -90.0f, 0.0f, 0.0f, 0.01f, 0.07f, 0.16f,  30.0f,    0.0f,  -0.0f,     0.0f,   0.0f,   0.0f,  0.0f,  0.0f,    0.0f,   0.0f}, 
-{"Bip01_L_Thigh",    "capsule", one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,	 -30.0f,  30.0f,  -120.0f, 120.0f, -60.0f, 60.0f,  0.0f,  -90.0f,  -0.0f},
+{"Bip01_L_Thigh",    "capsule", one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,	 -120.0f,  120.0f,  -120.0f, 120.0f, -60.0f, 60.0f,  0.0f,  -90.0f,  -0.0f},
 
 //	{"Bip01_L_Thigh",    "capsule", two_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  14.0f,	 -30.0f,  30.0f,  -120.0f, 120.0f, -60.0f, 60.0f,  0.0f,  -90.0f,  -0.0f},
 //	{"Bip01_L_Calf",     "capsule", one_dof,   0.0f, 90.0f,  0.0f, 0.0f, 0.0f, 0.19f, 0.05f, 0.34f,  10.0f,  -150.0f,  0.0f,     0.0f,	90.0f,   0.0f, -0.0f,  0.0f,    0.0f,  90.0f}, 
