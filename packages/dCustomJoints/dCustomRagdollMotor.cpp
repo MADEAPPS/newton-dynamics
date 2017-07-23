@@ -969,46 +969,80 @@ void dCustomRagdollMotor_1dof::GetTwistAngle(dFloat& minAngle, dFloat& maxAngle)
 
 void dCustomRagdollMotor_1dof::Debug(dDebugDisplay* const debugDisplay) const
 {
-	dCustomRagdollMotor::Debug(debugDisplay);
-/*
+
 	dMatrix matrix0;
 	dMatrix matrix1;
-
 	CalculateGlobalMatrix(matrix0, matrix1);
 
+	dCustomRagdollMotor::Debug(debugDisplay);
 
-	dVector p[4];
-	dVector o[4];
+	// vis limits
+	const int subdiv = 16;
+	const float radius = 0.25f;
 
-	dFloat length = 0.125f;
+	dVector point (radius, 0.0f, 0.0f, 0.0f);
+	dFloat angleStep = (m_twistAngle.m_maxAngle - m_twistAngle.m_minAngle) / subdiv;
+	dFloat angle0 = m_twistAngle.m_minAngle;
 
-	dMatrix minPitchMatrix(dPitchMatrix(m_twistAngle.m_minAngle));
-	dMatrix maxPitchMatrix(dPitchMatrix(m_twistAngle.m_maxAngle));
-
-	p[0] = dVector(length, 0.0f, 0.25f, 0.0f);
-	p[1] = dVector(-length, 0.0f, 0.25f, 0.0f);
-	p[2] = dVector(-length, 0.0f, 0.25f, 0.0f);
-	p[3] = dVector(length, 0.0f, 0.25f, 0.0f);
-
-	o[0] = dVector(length, 0.0f, 0.0f, 0.0f);
-	o[1] = dVector(-length, 0.0f, 0.0f, 0.0f);
-	o[2] = dVector(-length, 0.0f, 0.0f, 0.0f);
-	o[3] = dVector(length, 0.0f, 0.0f, 0.0f);
-
-	p[0] = minPitchMatrix.RotateVector(p[0]);
-	p[1] = minPitchMatrix.RotateVector(p[1]);
-	p[2] = maxPitchMatrix.RotateVector(p[2]);
-	p[3] = maxPitchMatrix.RotateVector(p[3]);
-
-	debugDisplay->SetColor(this, dVector(0.5f, 0.0f, 0.0f));
-	debugDisplay->DrawLine(this, matrix1.TransformVector(o[0]), matrix1.TransformVector(o[1]));
-	for (int i = 0, i0 = 3; i < 4; i++) {
-		dVector p0 = matrix1.TransformVector(p[i0]);
-		dVector p1 = matrix1.TransformVector(p[i]);
-		debugDisplay->DrawLine(this, p0, p1);
-		debugDisplay->DrawLine(this, matrix1.TransformVector(o[i]), p1);
-		i0 = i;
+	dVector arch[subdiv + 1];
+	debugDisplay->SetColor(this, dVector (1.0f, 1.0f, 0.0f, 0.0f));
+	for (int i = 0; i <= subdiv; i++) {
+		dVector p (matrix1.TransformVector(dYawMatrix(-angle0).RotateVector(point)));
+		arch[i] = p;
+		debugDisplay->DrawLine(this, matrix1.m_posit, p);
+		angle0 += angleStep;
 	}
+
+	for (int i = 0; i < subdiv; i++) {
+		debugDisplay->DrawLine(this, arch[i], arch[i + 1]);
+	}
+
+/*
+	// vis swing limit
+	dVector ot = matrix1.m_posit;
+	dVector ob = matrix1.m_posit;
+	//dMatrix ortho = dYawMatrix(3.141592f * 0.5f - minXAngle) * matrix1;
+	dMatrix ortho = dYawMatrix(m_twistAngle.m_minAngle) * matrix1;
+	for (int i = 0; i <= subdiv / 4; i++) {
+		float t = float(i) / float(subdiv);
+//		dVector c = vis.ToCartesian(dVector(radius, 3.141592f * 2.0f * t, yAngle));
+		dVector c = vis.ToCartesian(dVector(radius, 3.141592f * 2.0f * t, 0.0f));
+		dVector nt = ortho.TransformVector(c); 
+		vis.Line(debugDisplay, nt, ot, 1, 1, 1); 
+		ot = nt;
+		c[1] *= -1;
+		dVector nb = ortho.TransformVector(c); 
+		vis.Line(debugDisplay, nb, ob, 1, 1, 1); 
+		ob = nb;
+	}
+
+
+	ot = matrix1[3];
+	ob = matrix1[3];
+	ortho = dYawMatrix(3.141592f * 0.5f - maxXAngle) * matrix1;
+	for (i = subdiv / 2; i >= subdiv / 4; i--) {
+		float t = float(i) / float(subdiv);
+		dVector c = dVis::ToCartesian(dVector(radius, 3.141592f * 2.0f * t, yAngle));
+		dVector nt = ortho.TransformVector(c); dVis::Line(debugDisplay, nt, ot, 1, 1, 1); ot = nt;
+		c[1] *= -1;
+		dVector nb = ortho.TransformVector(c); dVis::Line(debugDisplay, nb, ob, 1, 1, 1); ob = nb;
+	}
+
+
+	ot = matrix1[3];
+	ob = matrix1[3];
+	ortho = dPitchMatrix(d_pi * 0.5f) * dYawMatrix(-minXAngle) * matrix1;//matrix1 * sMat4::rotationY(-minXAngle) * sMat4::rotationX(d_pi * 0.5);
+	float angDiff = maxXAngle - minXAngle;
+	int subdiv2 = 1 + (angDiff / d_pi * 180.0f / (360.0f / float(subdiv)));
+	for (i = 0; i <= subdiv2; i++) {
+		float t = float(i) / float(subdiv2);
+		dVector c = dVis::ToCartesian(dVector(radius, angDiff * t, d_pi * 0.5f - yAngle));
+		dVector nt = ortho.TransformVector(c); dVis::Line(debugDisplay, nt, ot, 1, 1, 1); ot = nt;
+		c[2] *= -1;
+		dVector nb = ortho.TransformVector(c); dVis::Line(debugDisplay, nb, ob, 1, 1, 1); ob = nb;
+	}
+	dVis::Line(debugDisplay, matrix1.m_posit, ot, 1, 1, 1);
+	dVis::Line(debugDisplay, matrix1.m_posit, ob, 1, 1, 1);
 */
 }
 

@@ -470,7 +470,7 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 
 				// clamp the result to be within the arc angle
 				if (cone.m_x < m_arcAngleCos) {
-//					cone = dVector ( m_arcAngleCos, 0.0f, ( (cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
+					cone = dVector ( m_arcAngleCos, 0.0f, ( (cone.m_z < 0.0f) ? -m_arcAngleSin : m_arcAngleSin));
 				}
 				
 				// do a regular cone constraint from that

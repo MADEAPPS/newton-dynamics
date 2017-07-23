@@ -56,9 +56,9 @@ joint: dCustomRagdollMotor_1dof
   childBody: Bip01_L_Calf
   parentBody: Bip01_L_Thigh
   childPivot: 0.000000 0.000000 0.000000
-  childEulers: -0.000002 -0.000003 0.000000
+  childEulers: 0.000000 -90.000000 0.000000
   parentPivot: 0.000000 -0.000001 0.398078
-  parentEulers: 0.000000 -11.459160 0.000000
+  parentEulers: 180.000046 -78.540947 -180.000031
   minTwistAngle: -5.000000
   maxTwistAngle: 140.000000
 jointEnd:
