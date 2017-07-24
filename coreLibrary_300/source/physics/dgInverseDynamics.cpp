@@ -1284,8 +1284,8 @@ dgTrace(("%d v(%f %f %f) w(%f %f %f)\n", xxx, body->m_veloc.m_x, body->m_veloc.m
 						   force1.m_angular.CompProduct4(row->m_JMinv.m_jacobianM1.m_angular));
 
 			dgFloat32 a = accel.AddHorizontal().GetScalar(); 
-			dgAssert (dgAbsf(row->m_penetrationStiffness - a) < 1.0e-1f);
-			joint->m_inverseDynamicsAcceleration[k] = a ;
+//			dgAssert (dgAbsf(row->m_penetrationStiffness - a) < 1.0e-1f);
+			joint->m_inverseDynamicsAcceleration[k] = a;
 			
 		}
 	}
