@@ -568,9 +568,8 @@ void dCustomRagdollMotor_1dof::SubmitConstraints(dFloat timestep, int threadInde
 	dVector cone (d); 
 	cone.m_y = 0;
 			
-	dFloat sql = cone.DotProduct3(cone);
-	dAssert (sql > 0.0f);
-	cone = cone.Scale(1.0f / sqrt(sql));
+	dAssert (cone.DotProduct3(cone) > 0.0f);
+	cone = cone.Scale(1.0f / dSqrt(cone.DotProduct3(cone)));
 
 	// do a regular cone constraint from that
 	dVector planeDir (matrix1.RotateVector(cone));
