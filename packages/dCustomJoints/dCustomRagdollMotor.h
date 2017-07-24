@@ -82,35 +82,6 @@ class dCustomRagdollMotor: public dCustomBallAndSocket
 };
 
 
-/*
-class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
-{
-	public:
-	CUSTOM_JOINTS_API dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent);
-
-	CUSTOM_JOINTS_API void SetTwistAngle(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API void GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const;
-
-	CUSTOM_JOINTS_API void SetYawAngles(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API void GetYawAngles(dFloat& minAngle, dFloat& maxAngle) const;
-
-	CUSTOM_JOINTS_API void SetRollAngles(dFloat minAngle, dFloat maxAngle);
-	CUSTOM_JOINTS_API void GetRollAngles(dFloat& minAngle, dFloat& maxAngle) const;
-
-	protected:
-	CUSTOM_JOINTS_API dCustomRagdollMotor_3dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
-	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
-
-	private:
-	virtual void SubmitConstraints(dFloat timestep, int threadIndex);
-
-	dAngleLimit m_twistAngle;
-	dAngleLimit m_yawAngle;
-	dAngleLimit m_rollAngle;
-	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_3dof, dCustomRagdollMotor)
-};
-*/
-
 class dCustomRagdollMotor_1dof: public dCustomRagdollMotor
 {
 	public:
@@ -152,6 +123,33 @@ class dCustomRagdollMotor_2dof: public dCustomRagdollMotor
 	dFloat m_coneAngle;
 	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_2dof, dCustomRagdollMotor)
 };
+
+
+class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
+{
+	public:
+	CUSTOM_JOINTS_API dCustomRagdollMotor_3dof(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent);
+
+	CUSTOM_JOINTS_API void SetConeAngle(dFloat angle);
+	CUSTOM_JOINTS_API dFloat GetConeAngle() const;
+
+	CUSTOM_JOINTS_API void SetTwistAngle(dFloat minAngle, dFloat maxAngle);
+	CUSTOM_JOINTS_API void GetTwistAngle(dFloat& minAngle, dFloat& maxAngle) const;
+
+	protected:
+	CUSTOM_JOINTS_API dCustomRagdollMotor_3dof(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
+
+	private:
+	virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+
+	dFloat m_coneAngle;
+	dFloat m_minTwistAngle;
+	dFloat m_maxTwistAngle;
+	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_3dof, dCustomRagdollMotor)
+};
+
 
 #endif 
 
