@@ -1056,9 +1056,18 @@ void dCustomRagdollMotor_2dof::SubmitConstraints(dFloat timestep, int threadInde
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 		} else {
-			dAssert (0);
+			dFloat accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_right[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
+
+			accel = NewtonUserJointGetRowInverseDynamicsAcceleration(m_joint);
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_up[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_torque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_torque);
 		}
 	}
-
 }
 
