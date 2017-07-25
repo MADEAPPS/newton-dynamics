@@ -99,8 +99,8 @@ extern "C" {
 	class NewtonMaterial;
 	class NewtonCollision;
 	class NewtonInverseDynamics;
-//	class NewtonInverseDynamicsNode;
 	class NewtonDeformableMeshSegment;
+	class NewtonInverseDynamicsEffector;
 	class NewtonFracturedCompoundMeshPart;
 #else
 	typedef struct NewtonMesh{} NewtonMesh;
@@ -110,8 +110,8 @@ extern "C" {
 	typedef struct NewtonMaterial{} NewtonMaterial;
 	typedef struct NewtonCollision{} NewtonCollision;
 	typedef struct NewtonInverseDynamics{} NewtonInverseDynamics;
-//	typedef struct NewtonInverseDynamicsNode {} NewtonInverseDynamicsNode;
 	typedef struct NewtonDeformableMeshSegment{} NewtonDeformableMeshSegment;
+	typedef struct NewtonInverseDynamicsEffector {} NewtonInverseDynamicsEffector;
 	typedef struct NewtonFracturedCompoundMeshPart{} NewtonFracturedCompoundMeshPart;
 #endif
 
@@ -1019,10 +1019,15 @@ extern "C" {
 	// **********************************************************************************************
 	NEWTON_API NewtonInverseDynamics* NewtonCreateInverseDynamics (const NewtonWorld* const newtonWorld);
 	NEWTON_API void NewtonInverseDynamicsDestroy (NewtonInverseDynamics* const inverseDynamics);
+
+	NEWTON_API NewtonInverseDynamicsEffector* NewtonInverseDynamicsCreateEffector(NewtonInverseDynamics* const inverseDynamics);
+	NEWTON_API void NewtonInverseDynamicsDestroyEffector(NewtonInverseDynamicsEffector* const effector);
 	
 	NEWTON_API void* NewtonInverseDynamicsGetRoot(NewtonInverseDynamics* const inverseDynamics);
 	NEWTON_API NewtonBody* NewtonInverseDynamicsGetBody(NewtonInverseDynamics* const inverseDynamics, void* const node);
 	NEWTON_API NewtonJoint* NewtonInverseDynamicsGetJoint(NewtonInverseDynamics* const inverseDynamics, void* const node);
+
+
 
 	NEWTON_API void* NewtonInverseDynamicsAddRoot(NewtonInverseDynamics* const inverseDynamics, NewtonBody* const root);
 	NEWTON_API void* NewtonInverseDynamicsAddChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode, NewtonJoint* const joint);

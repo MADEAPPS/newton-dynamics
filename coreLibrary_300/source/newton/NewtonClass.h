@@ -45,7 +45,6 @@ class Newton: public dgWorld
 };
 
 
-
 class NewtonUserJoint: public dgUserConstraint  
 {	
 	public:
@@ -74,6 +73,9 @@ class NewtonUserJoint: public dgUserConstraint
 	void SetSpringDamperAcceleration (dgFloat32 rowStiffness, dgFloat32 springK, dgFloat32 springD);
 	void SetUpdateFeedbackFunction (NewtonUserBilateralCallback getFeedback);
 
+	protected:
+	NewtonUserJoint(NewtonUserBilateralCallback callback, dgBody* const body);
+
 	private:
 	NewtonUserBilateralCallback m_jacobianFnt;
 
@@ -82,5 +84,11 @@ class NewtonUserJoint: public dgUserConstraint
 	dgInt32 m_rows;
 };
 
+
+class NewtonUserJointInverseDynamicsEffector : public NewtonUserJoint
+{
+	public:
+	NewtonUserJointInverseDynamicsEffector (NewtonInverseDynamics* const iksolver, NewtonUserBilateralCallback callback, dgBody* const body);
+};
 
 #endif

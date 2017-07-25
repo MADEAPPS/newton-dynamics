@@ -5202,6 +5202,22 @@ void NewtonInverseDynamicsDestroy(NewtonInverseDynamics* const inverseDynamics)
 	world->DestroyInverseDynamics(ik);
 }
 
+NewtonInverseDynamicsEffector* NewtonInverseDynamicsCreateEffector(NewtonInverseDynamics* const inverseDynamics)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
+
+	dgAssert(0);
+	return NULL;
+}
+
+void NewtonInverseDynamicsDestroyEffector(NewtonInverseDynamicsEffector* const effector)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgAssert(0);
+}
+
+
 void NewtonInverseDynamicsEndBuild (NewtonInverseDynamics* const inverseDynamics)
 {
 	TRACE_FUNCTION(__FUNCTION__);

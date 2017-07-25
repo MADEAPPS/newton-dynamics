@@ -59,6 +59,12 @@ void Newton::UpdatePhysicsAsync (dgFloat32 timestep)
 }
 
 
+NewtonUserJoint::NewtonUserJoint(NewtonUserBilateralCallback callback, dgBody* const body)
+	:dgUserConstraint(NULL, body, NULL, 1)
+{
+	dgAssert(0);
+}
+
 NewtonUserJoint::NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, dgBody* const dyn0, dgBody* const dyn1)
 	:dgUserConstraint (world, dyn0, dyn1, 1)
 	,m_forceArray(m_jointForce)
@@ -257,10 +263,14 @@ dgFloat32 NewtonUserJoint::GetRowForce (dgInt32 row) const
 	return force;
 }
 
-
-
 void NewtonUserJoint::SetUpdateFeedbackFunction (NewtonUserBilateralCallback getFeedback)
 {
 	dgUserConstraint::SetUpdateFeedbackFunction ((ConstraintsForceFeeback) getFeedback);
 }
 
+
+NewtonUserJointInverseDynamicsEffector::NewtonUserJointInverseDynamicsEffector(NewtonInverseDynamics* const iksolver, NewtonUserBilateralCallback callback, dgBody* const body)
+	:NewtonUserJoint(callback, body)
+{
+	dgAssert(0);
+}
