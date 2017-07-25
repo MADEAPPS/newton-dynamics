@@ -13,8 +13,8 @@
 // dCustomKinematicController.cpp: implementation of the dCustomKinematicController class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <dCustomJointLibraryStdAfx.h>
-#include <dCustomKinematicController.h>
+#include "dCustomJointLibraryStdAfx.h"
+#include "dCustomKinematicController.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

@@ -17,8 +17,8 @@
 #ifndef D_CUSTOM_CONTROLLER_MANAGER_H_
 #define D_CUSTOM_CONTROLLER_MANAGER_H_
 
-#include <dCustomJointLibraryStdAfx.h>
-#include <dCustomAlloc.h>
+#include "dCustomJointLibraryStdAfx.h"
+#include "dCustomAlloc.h"
 
 
 class dCustomControllerConvexCastPreFilter

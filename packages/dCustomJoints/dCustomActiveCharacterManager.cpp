@@ -10,8 +10,8 @@
 */
 
 //////////////////////////////////////////////////////////////////////
-#include <dCustomJointLibraryStdAfx.h>
-#include <dCustomActiveCharacterManager.h>
+#include "dCustomJointLibraryStdAfx.h"
+#include "dCustomActiveCharacterManager.h"
 
 
 dCustomActiveCharacterManager::dCustomActiveCharacterManager(NewtonWorld* const world, const char* const name)

@@ -17,9 +17,9 @@
 #ifndef D_CUSTOM_VEHICLE_CONTROLLER_MANAGER_H_
 #define D_CUSTOM_VEHICLE_CONTROLLER_MANAGER_H_
 
-#include <dCustomJointLibraryStdAfx.h>
-#include <dCustomAlloc.h>
-#include <dCustomControllerManager.h>
+#include "dCustomJointLibraryStdAfx.h"
+#include "dCustomAlloc.h"
+#include "dCustomControllerManager.h"
 
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
 

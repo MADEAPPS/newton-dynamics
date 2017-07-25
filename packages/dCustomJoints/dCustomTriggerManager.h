@@ -17,9 +17,8 @@
 #ifndef D_CUSTOM_TRIGGER_MANAGER_H_
 #define D_CUSTOM_TRIGGER_MANAGER_H_
 
-#include <dCustomJointLibraryStdAfx.h>
-#include <dCustomControllerManager.h>
-
+#include "dCustomJointLibraryStdAfx.h"
+#include "dCustomControllerManager.h"
 
 
 #define TRIGGER_PLUGIN_NAME				"__triggerManager__"

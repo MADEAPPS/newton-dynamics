@@ -13,9 +13,9 @@
 // NewtonPlayerControllerManager.h: interface for the NewtonPlayerControllerManager class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <dCustomJointLibraryStdAfx.h>
-#include <dCustomJoint.h>
-#include <dCustomTriggerManager.h>
+#include "dCustomJointLibraryStdAfx.h"
+#include "dCustomJoint.h"
+#include "dCustomTriggerManager.h"
 
 dCustomTriggerManager::dCustomTriggerManager(NewtonWorld* const world)
 	:dCustomControllerManager<dCustomTriggerController>(world, TRIGGER_PLUGIN_NAME)

@@ -10,9 +10,9 @@
 */
 
 //////////////////////////////////////////////////////////////////////
-#include <dCustomJointLibraryStdAfx.h>
-#include <dCustomJoint.h>
-#include <dCustomArcticulatedTransformManager.h>
+#include "dCustomJointLibraryStdAfx.h"
+#include "dCustomJoint.h"
+#include "dCustomArcticulatedTransformManager.h"
 
 
 dCustomArticulaledTransformManager::dCustomArticulaledTransformManager(NewtonWorld* const world, const char* const name)

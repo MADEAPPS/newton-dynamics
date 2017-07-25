@@ -15,7 +15,7 @@
 
 #include "dContainersStdAfx.h"
 #include "dContainersAlloc.h"
-#include <stdlib.h>
+
 
 // Note: this is a low level class for dTree use only
 // unpredictable result will happen if you attempt to manipulate
