@@ -173,7 +173,7 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 					if (customJoint->IsType(dCustomRagdollMotor::GetType())) {
 						dCustomRagdollMotor* const ragDollMotor = (dCustomRagdollMotor*)customJoint;
 						ragDollMotor->SetMode(true);
-						void* const bone = controller->AddBone(customJoint, node);
+						void* const bone = controller->AddBone(ragDollMotor, node);
 						stackPool[stack] = bone;
 						stack ++;
 					}

@@ -21,6 +21,7 @@
 
 #define DYNAMIC_RAGDOLL_PLUGIN_NAME	"__dynamicRagDollManager__"
 
+class dCustomRagdollMotor;
 
 // a Skeleton Transform controller is use to calculate local transform on contractions of rigid bodies and joint that form part of a hierarchical Skeleton
 class dCustomActiveCharacterController: public dCustomControllerBase
@@ -101,7 +102,7 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 
 	CUSTOM_JOINTS_API const dSkeletonBone* GetParent(const dSkeletonBone* const bone) const;
 
-	CUSTOM_JOINTS_API void LinkCycleBones(dCustomJoint*) const;
+	CUSTOM_JOINTS_API void LinkCycleBones(dCustomRagdollMotor*) const;
 
 	void SetCalculateLocalTransforms(bool val) { m_calculateLocalTransform = val; }
 	bool GetCalculateLocalTransforms() const { return m_calculateLocalTransform; }
@@ -123,10 +124,10 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 
 	CUSTOM_JOINTS_API void* GetRoot() const;
 	CUSTOM_JOINTS_API void* AddRoot(NewtonBody* const root);
-	CUSTOM_JOINTS_API void* AddBone(dCustomJoint* const childJoint, void* const parentBone);
+	CUSTOM_JOINTS_API void* AddBone(dCustomRagdollMotor* const childJoint, void* const parentBone);
 
 	CUSTOM_JOINTS_API NewtonBody* GetBody(void* const node) const;
-	CUSTOM_JOINTS_API dCustomJoint* const childJoint(void* const node) const;
+	CUSTOM_JOINTS_API dCustomRagdollMotor* const GetJoint(void* const node) const;
 
 	CUSTOM_JOINTS_API virtual void Finalize ();
 	

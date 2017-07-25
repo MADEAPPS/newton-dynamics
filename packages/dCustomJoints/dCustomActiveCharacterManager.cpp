@@ -11,6 +11,7 @@
 
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
+#include "dCustomRagdollMotor.h"
 #include "dCustomActiveCharacterManager.h"
 
 
@@ -96,10 +97,11 @@ NewtonBody* dCustomActiveCharacterController::GetBody(void* const node) const
 	return m_kinemativSolver ? NewtonInverseDynamicsGetBody (m_kinemativSolver, node) : NULL;
 }
 
-dCustomJoint* const dCustomActiveCharacterController::childJoint(void* const node) const
+dCustomRagdollMotor* const dCustomActiveCharacterController::GetJoint(void* const node) const
 {
 	NewtonJoint* const joint = m_kinemativSolver ? NewtonInverseDynamicsGetJoint (m_kinemativSolver, node) : NULL;
-	return joint ? (dCustomJoint*) NewtonJointGetUserData(joint) : NULL;
+	dAssert(!joint || ((dCustomRagdollMotor*)NewtonJointGetUserData(joint))->IsType(dCustomRagdollMotor::GetType()));
+	return joint ? (dCustomRagdollMotor*) NewtonJointGetUserData(joint) : NULL;
 }
 
 void* dCustomActiveCharacterController::AddRoot(NewtonBody* const rootBody)
@@ -117,7 +119,7 @@ void* dCustomActiveCharacterController::AddRoot(NewtonBody* const rootBody)
 	return NewtonInverseDynamicsAddRoot(m_kinemativSolver, m_body);
 }
 
-void* dCustomActiveCharacterController::AddBone(dCustomJoint* const childJoint, void* const parentBone)
+void* dCustomActiveCharacterController::AddBone(dCustomRagdollMotor* const childJoint, void* const parentBone)
 {
 	dAssert (m_kinemativSolver);
 	return NewtonInverseDynamicsAddChildNode (m_kinemativSolver, parentBone, childJoint->GetJoint());
