@@ -437,7 +437,7 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		NewtonBody* const rootbody = controller->GetBoneBody(controller->GetBone(0));
 
 		MySaveLoad saveLoad(GetWorld());
-//		saveLoad.Save (fileName, rootbody);
+		saveLoad.Save (fileName, rootbody);
 	}
 
 	int m_material;
@@ -470,7 +470,6 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 
 		limb = ragDollModel.Find("Bip01_L_Thigh");
 		limbMatrix = dPitchMatrix(40.0f * 3.141592f / 180.0f) * limb->GetCurrentMatrix();
-
 		limb->ResetMatrix(*scene, limbMatrix);
 
 		limb = ragDollModel.Find("Bip01_R_Thigh");

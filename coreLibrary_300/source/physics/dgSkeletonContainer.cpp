@@ -988,10 +988,8 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 			primaryIndex++;
 		}
 
-		dgAssert ((jointInfo->m_pairCount - primaryDof) == m_auxiliaryRowCount);
-		//const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof;
-		//for (dgInt32 j = 0; j < auxiliaryDof; j++) {
-		for (dgInt32 j = 0; j < m_auxiliaryRowCount; j++) {
+		const dgInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof;
+		for (dgInt32 j = 0; j < auxiliaryDof; j++) {
 			const dgInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
 			dgJacobianMatrixElement* const row = &matrixRow[first + index];
 			f[auxiliaryIndex + primaryCount] = dgFloat32 (0.0f);
@@ -1103,7 +1101,6 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 
 	CalculateJointAccel(jointInfoArray, internalForces, matrixRow, accel);
 	CalculateForce(force, accel);
-
 	if (m_auxiliaryRowCount) {
 		SolveAuxiliary (jointInfoArray, internalForces, matrixRow, accel, force);
 	} else {

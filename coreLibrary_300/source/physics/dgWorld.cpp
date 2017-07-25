@@ -807,8 +807,11 @@ void dgWorld::BodySetMatrix (dgBody* const body, const dgMatrix& matrix)
 		//m_broadPhase->Add (body);
 
 		dgMatrix matrix1 (body1->GetMatrix() * relMatrix);
-		body1->SetVelocity (dgVector (dgFloat32 (0.0f)));    
-		body1->SetOmega (dgVector (dgFloat32 (0.0f)));    
+		//body1->SetOmega (dgVector (dgFloat32 (0.0f)));
+		//body1->SetVelocity (dgVector (dgFloat32 (0.0f)));
+		body1->SetOmega (matrix1.RotateVector (body1->GetOmega()));
+		body1->SetVelocity (matrix1.RotateVector (body1->GetVelocity()));
+		
 		body1->SetMatrix (matrix1);
 		body1->UpdateMatrix (dgFloat32 (0.0f), 0);
 		body1->SetSleepState(false);

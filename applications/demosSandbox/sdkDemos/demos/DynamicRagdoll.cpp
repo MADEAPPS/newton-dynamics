@@ -101,7 +101,7 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
 			NewtonCollision* const collision = NewtonBodyGetCollision(body);
-			DemoMesh* const mesh = new DemoMesh("calf", collision, "smilli.tga", "smilli.tga", "smilli.tga");
+			DemoMesh* const mesh = new DemoMesh("ragdoll", collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 			NewtonBodyGetMatrix(body, &matrix[0][0]);
 			DemoEntity* const entity = new DemoEntity(matrix, NULL);
