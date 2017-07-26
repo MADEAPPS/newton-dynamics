@@ -64,6 +64,9 @@ class dgInverseDynamics
 	dgNode* AddRoot(dgDynamicBody* const rootBody);
 	dgNode* AddChild (dgBilateralConstraint* const joint, dgNode* const parent);
 
+	void AddEffector (dgBilateralConstraint* const joint, dgNode* const node);
+	void RemoveEffector (dgBilateralConstraint* const joint);
+
 	dgDynamicBody* GetBody(dgNode* const node) const;
 	dgBilateralConstraint* GetJoint(dgNode* const node) const;
 	dgNode* GetParent (dgNode* const node) const;
@@ -91,6 +94,8 @@ class dgInverseDynamics
 	void CalculateLoopAndExternalForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void CalculateMotorsAccelerations (const dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep) const;
 
+	dgList<dgBilateralConstraint*>::dgListNode* FindEffector(dgBilateralConstraint* const joint) const;
+
 	dgWorld* m_world;
 	dgNode* m_skeleton;
 	dgNode** m_nodesOrder;
@@ -103,6 +108,7 @@ class dgInverseDynamics
 	dgInverseDynamicsList::dgListNode* m_reference;
 	dgList<dgDynamicBody*> m_loopingBodies;
 	dgList<dgLoopingJoint> m_loopingJoints;
+	dgList<dgBilateralConstraint*> m_effectors;
 	dgInt16 m_nodeCount;
 	dgInt16 m_rowCount;
 	dgInt16 m_auxiliaryRowCount;

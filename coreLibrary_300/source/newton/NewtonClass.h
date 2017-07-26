@@ -88,7 +88,12 @@ class NewtonUserJoint: public dgUserConstraint
 class NewtonUserJointInverseDynamicsEffector : public NewtonUserJoint
 {
 	public:
-	NewtonUserJointInverseDynamicsEffector (NewtonInverseDynamics* const iksolver, NewtonUserBilateralCallback callback, dgBody* const body);
+	NewtonUserJointInverseDynamicsEffector (dgInverseDynamics* const invDynSolver, dgInverseDynamics::dgNode* const invDynNode, NewtonUserBilateralCallback callback);
+	~NewtonUserJointInverseDynamicsEffector();
+
+	private:
+	dgInverseDynamics* m_invDynSolver;
+	dgInverseDynamics::dgNode* m_invDynNode;
 };
 
 #endif

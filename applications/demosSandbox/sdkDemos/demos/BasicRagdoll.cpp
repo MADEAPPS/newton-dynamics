@@ -384,8 +384,9 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 	class MySaveLoad: public dCustomRagdollMotor::dSaveLoad
 	{
 		public:
-		MySaveLoad(NewtonWorld* const world)
+		MySaveLoad(NewtonWorld* const world, int materialID)
 			:dCustomRagdollMotor::dSaveLoad(world)
+			,m_material(materialID)
 		{
 		}
 
@@ -413,10 +414,10 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 			NewtonBodySetUserData(body, entity);
 
 			// assign the wood id
-			//NewtonBodySetMaterialGroupID(rigidBody, materialId);
+			NewtonBodySetMaterialGroupID(body, m_material);
 
 			//set continuous collision mode
-			//NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
+			//NewtonBodySetContinuousCollisionMode (body, continueCollisionMode);
 
 			// set a destructor for this rigid body
 			NewtonBodySetDestructorCallback(body, PhysicsBodyDestructor);
@@ -427,6 +428,8 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 			// set the force and torque call back function
 			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 		}
+
+		int m_material;
 	};
 
 	void PrintRagdoll (dCustomArticulatedTransformController* const controller, const char* const name)
@@ -434,9 +437,9 @@ class PassiveRagdollManager: public dCustomArticulaledTransformManager
 		char fileName[2048];
 		dGetWorkingFileName(name, fileName);
 
-		NewtonBody* const rootbody = controller->GetBoneBody(controller->GetBone(0));
+		controller->GetBoneBody(controller->GetBone(0));
 
-		MySaveLoad saveLoad(GetWorld());
+		MySaveLoad saveLoad(GetWorld(), m_material);
 		//saveLoad.Save (fileName, rootbody);
 	}
 
@@ -498,10 +501,10 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 		}
 	}
 
-	const int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+//	const int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 	const dVector location(origin);
 	const dVector size(0.25f, 0.25f, 0.375f, 0.0f);
-	const int count1 = 5;
+//	const int count1 = 5;
 	const dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 //	AddPrimitiveArray(scene, 10.0f, location, size, count1, count1, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 

@@ -151,5 +151,35 @@ class dCustomRagdollMotor_3dof: public dCustomRagdollMotor
 };
 
 
+class dCustomRagdollMotor_EndEffector: public dCustomJoint
+{
+	public:
+	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentPointInGlobalSpace);
+	CUSTOM_JOINTS_API virtual ~dCustomRagdollMotor_EndEffector();
+
+	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat accel);
+	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat alpha);
+
+	CUSTOM_JOINTS_API void SetTargetPosit(const dVector& posit);
+	CUSTOM_JOINTS_API void SetTargetRotation(const dQuaternion& rotation);
+	
+	CUSTOM_JOINTS_API dMatrix GetTargetMatrix() const;
+	CUSTOM_JOINTS_API void SetTargetMatrix(const dMatrix& matrix);
+
+	protected:
+	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const { dAssert(0); }
+
+	dVector m_localHandle;
+	dVector m_targetPosit;
+	dQuaternion m_targetRot;
+	dFloat m_maxLinearFriction;
+	dFloat m_maxAngularFriction;
+
+	DECLARE_CUSTOM_JOINT(dCustomRagdollMotor_EndEffector, dCustomJoint)
+};
+
+
 #endif 
 

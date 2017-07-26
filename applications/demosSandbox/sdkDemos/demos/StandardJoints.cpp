@@ -589,7 +589,7 @@ class JoesRagdollJoint: public dCustomBallAndSocket
 		CalculateGlobalMatrix(matrix0, matrix1);
 
 		dCustomBallAndSocket::Debug(debugDisplay);
-return;
+
 		// vis limits
 		int const subdiv = 16;
 		float const radius = 0.4f;

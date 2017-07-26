@@ -399,6 +399,7 @@ dgInverseDynamics::dgInverseDynamics(dgWorld* const world)
 	,m_rowArray(NULL)
 	,m_loopingBodies(world->GetAllocator())
 	,m_loopingJoints(world->GetAllocator())
+	,m_effectors(world->GetAllocator())
 	,m_nodeCount(1)
 	,m_rowCount(0)
 	,m_auxiliaryRowCount(0)
@@ -407,6 +408,12 @@ dgInverseDynamics::dgInverseDynamics(dgWorld* const world)
 
 dgInverseDynamics::~dgInverseDynamics()
 {
+	dgList<dgBilateralConstraint*>::dgListNode* ptr1 = NULL; 
+	for (dgList<dgBilateralConstraint*>::dgListNode* ptr = m_effectors.GetFirst(); ptr; ptr = ptr1) {
+		ptr1 = ptr->GetNext();
+		RemoveEffector(ptr->GetInfo());
+	}
+
 	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		dgLoopingJoint& entry = ptr->GetInfo();
 		entry.m_joint->m_isInSkeleton = false;
@@ -530,6 +537,34 @@ void dgInverseDynamics::RemoveLoopJoint(dgBilateralConstraint* const joint)
 		}
 	}
 }
+
+
+void dgInverseDynamics::AddEffector(dgBilateralConstraint* const joint, dgNode* const node)
+{
+//	dgLoopingJoint cyclicEntry(joint, index0->GetInfo(), index1->GetInfo());
+//	m_loopingJoints.Append(cyclicEntry);
+	m_effectors.Append(joint);
+}
+
+dgList<dgBilateralConstraint*>::dgListNode* dgInverseDynamics::FindEffector(dgBilateralConstraint* const joint) const
+{
+	for (dgList<dgBilateralConstraint*>::dgListNode* ptr = m_effectors.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		if (ptr->GetInfo() == joint) {
+			return ptr;
+		}
+	}
+	return NULL;
+}
+
+void dgInverseDynamics::RemoveEffector(dgBilateralConstraint* const joint)
+{
+	dgList<dgBilateralConstraint*>::dgListNode* const node = FindEffector(joint);
+	if (node) {
+		m_effectors.Remove(node);
+		delete joint;
+	}
+}
+
 
 void dgInverseDynamics::Finalize(dgInt32 loopJointsCount, dgBilateralConstraint** const loopJointArray)
 {

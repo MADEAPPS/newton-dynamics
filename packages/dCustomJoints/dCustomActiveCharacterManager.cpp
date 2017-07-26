@@ -132,6 +132,16 @@ void dCustomActiveCharacterController::Finalize ()
 	}
 }
 
+dCustomRagdollMotor_EndEffector* dCustomActiveCharacterController::AddEndEffector(void* const node)
+{
+	dAssert (m_kinemativSolver);
+
+	dMatrix matrix (dGetIdentityMatrix());
+	NewtonBody* const body = GetBody(node);
+	dCustomRagdollMotor_EndEffector* const effector = new dCustomRagdollMotor_EndEffector(m_kinemativSolver, node, matrix);
+	return effector;
+}
+
 void dCustomActiveCharacterController::PreUpdate(dFloat timestep, int threadIndex)
 {
 	//	dCustomActiveCharacterManager* const manager = (dCustomActiveCharacterManager*)GetManager();

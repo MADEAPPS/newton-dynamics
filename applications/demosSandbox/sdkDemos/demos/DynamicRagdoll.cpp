@@ -105,6 +105,7 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 
 			NewtonBodyGetMatrix(body, &matrix[0][0]);
 			DemoEntity* const entity = new DemoEntity(matrix, NULL);
+			entity->SetNameID (bodyName);
 			entity->SetMesh(mesh, dGetIdentityMatrix());
 			scene->Append(entity);
 			mesh->Release();
@@ -156,6 +157,9 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 
 		void* const rootNode = controller->AddRoot(root);
 
+		// add an end effector to the root node.
+		dCustomRagdollMotor_EndEffector* const rootEffector = controller->AddEndEffector(rootNode);
+
 		int stack = 1;
 		void* stackPool[128];
 		stackPool[0] = rootNode;
@@ -180,7 +184,7 @@ class DynamicRagdollManager: public dCustomActiveCharacterManager
 				}
 			}
 		}
-
+		
 
 		controller->Finalize();
 	}

@@ -40,6 +40,25 @@ dCustomJoint::dCustomJoint (int maxDOF, NewtonBody* const body0, NewtonBody* con
 	Init (maxDOF, body0, body1);
 }
 
+dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* const invDynNode)
+{
+	m_joint = NULL;
+	m_body1 = NULL;
+	m_maxDof = 6;
+	m_autoDestroy = 0;
+	m_stiffness = 1.0f;
+	m_body0 = NewtonInverseDynamicsGetBody (invDynSolver, invDynNode);
+	m_world = NewtonBodyGetWorld(m_body0);
+	m_joint = NewtonInverseDynamicsCreateEffector(invDynSolver, invDynNode, SubmitConstraints);
+//	m_joint = NewtonConstraintCreateUserJoint(m_world, maxDOF, SubmitConstraints, m_body0, m_body1);
+
+	NewtonJointSetUserData(m_joint, this);
+	NewtonJointSetDestructor(m_joint, Destructor);
+
+	m_userData = NULL;
+	m_userDestructor = NULL;
+}
+
 dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData)
 	:m_userData(NULL)
 	,m_body0(body0)
@@ -94,11 +113,11 @@ void dCustomJoint::Initalize(NewtonWorld* const world)
 
 void dCustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1)
 {
-	m_autoDestroy = 0;
 	m_joint = NULL;
 	m_body0 = body0;
 	m_body1 = body1;
 	m_maxDof = maxDOF;
+	m_autoDestroy = 0;
 	m_stiffness = 1.0f;
 	m_world	= body0 ? NewtonBodyGetWorld (body0) : NewtonBodyGetWorld (body1);
 	m_joint = NewtonConstraintCreateUserJoint (m_world, maxDOF, SubmitConstraints, m_body0, m_body1); 
@@ -260,29 +279,6 @@ dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, 
 	dFloat cosAngle;
 	return CalculateAngle (dir, cosDir, sinDir, sinAngle, cosAngle);
 }
-
-/*
-void dCustomJoint::CalculatePitchAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
-{
-	dAssert (0);
-	sinAngle = (matrix1.m_up * matrix0.m_up) % matrix1.m_front;
-	cosAngle = matrix1.m_up % matrix0.m_up;
-}
-
-void dCustomJoint::CalculateYawAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
-{
-	dAssert (0);
-	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_up;
-	cosAngle = matrix1.m_front % matrix0.m_front;
-}
-
-void dCustomJoint::CalculateRollAngle(const dMatrix& matrix0, const dMatrix& matrix1, dFloat& sinAngle, dFloat& cosAngle) const
-{
-	dAssert (0);
-	sinAngle = (matrix1.m_front * matrix0.m_front) % matrix1.m_right;
-	cosAngle = matrix1.m_front % matrix0.m_front;
-}
-*/
 
 
 void dCustomJoint::SetBodiesCollisionState (int state)

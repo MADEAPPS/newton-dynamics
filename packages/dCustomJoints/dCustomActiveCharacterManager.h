@@ -126,6 +126,8 @@ class dCustomActiveCharacterController: public dCustomControllerBase
 	CUSTOM_JOINTS_API void* AddRoot(NewtonBody* const root);
 	CUSTOM_JOINTS_API void* AddBone(dCustomRagdollMotor* const childJoint, void* const parentBone);
 
+	CUSTOM_JOINTS_API dCustomRagdollMotor_EndEffector* AddEndEffector(void* const node);
+
 	CUSTOM_JOINTS_API NewtonBody* GetBody(void* const node) const;
 	CUSTOM_JOINTS_API dCustomRagdollMotor* const GetJoint(void* const node) const;
 

@@ -17,5 +17,5 @@
 
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomJoint.h"
-#include "dCustomControllerManager.h""
+#include "dCustomControllerManager.h"
 

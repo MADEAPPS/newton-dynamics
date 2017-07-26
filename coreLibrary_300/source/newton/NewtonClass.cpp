@@ -61,8 +61,13 @@ void Newton::UpdatePhysicsAsync (dgFloat32 timestep)
 
 NewtonUserJoint::NewtonUserJoint(NewtonUserBilateralCallback callback, dgBody* const body)
 	:dgUserConstraint(NULL, body, NULL, 1)
+	,m_forceArray(m_jointForce)
+	,m_param(NULL)
+	,m_rows(0)
 {
-	dgAssert(0);
+	m_maxDOF = 6;
+	m_jacobianFnt = callback;
+	m_body1 = body->GetWorld()->GetSentinelBody();
 }
 
 NewtonUserJoint::NewtonUserJoint (dgWorld* const world, dgInt32 maxDof, NewtonUserBilateralCallback callback, dgBody* const dyn0, dgBody* const dyn1)
@@ -269,8 +274,15 @@ void NewtonUserJoint::SetUpdateFeedbackFunction (NewtonUserBilateralCallback get
 }
 
 
-NewtonUserJointInverseDynamicsEffector::NewtonUserJointInverseDynamicsEffector(NewtonInverseDynamics* const iksolver, NewtonUserBilateralCallback callback, dgBody* const body)
-	:NewtonUserJoint(callback, body)
+NewtonUserJointInverseDynamicsEffector::NewtonUserJointInverseDynamicsEffector(dgInverseDynamics* const invDynSolver, dgInverseDynamics::dgNode* const invDynNode, NewtonUserBilateralCallback callback)
+	:NewtonUserJoint(callback, invDynSolver->GetBody(invDynNode))
+	,m_invDynSolver(invDynSolver)
+	,m_invDynNode (invDynNode)
 {
-	dgAssert(0);
+	m_invDynSolver->AddEffector (this, m_invDynNode);
+}
+
+NewtonUserJointInverseDynamicsEffector::~NewtonUserJointInverseDynamicsEffector()
+{
+	m_invDynSolver->RemoveEffector (this);
 }

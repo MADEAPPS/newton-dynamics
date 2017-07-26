@@ -5202,16 +5202,24 @@ void NewtonInverseDynamicsDestroy(NewtonInverseDynamics* const inverseDynamics)
 	world->DestroyInverseDynamics(ik);
 }
 
-NewtonInverseDynamicsEffector* NewtonInverseDynamicsCreateEffector(NewtonInverseDynamics* const inverseDynamics)
+NewtonJoint* NewtonInverseDynamicsCreateEffector(NewtonInverseDynamics* const inverseDynamics, void* const ikNode, NewtonUserBilateralCallback callback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
 
-	dgAssert(0);
-	return NULL;
+	Newton* const world = (Newton *)ik->GetWorld();
+	dgInverseDynamics::dgNode* const node = (dgInverseDynamics::dgNode*) ikNode;
+//	Newton* const world = (Newton *)newtonWorld;
+//	dgBody* const body0 = (dgBody *)childBody;
+//	dgBody* const body1 = (dgBody *)parentBody;
+//	dgAssert(body0);
+//	dgAssert(body0 != body1);
+//	dgBody* const body0 = ik->GetBody(ik);
+//	return (NewtonJoint*) new (world->dgWorld::GetAllocator()) NewtonUserJointInverseDynamicsEffector(world, 6, callback, body0, NULL);
+	return (NewtonJoint*) new (world->dgWorld::GetAllocator()) NewtonUserJointInverseDynamicsEffector(ik, node, callback);
 }
 
-void NewtonInverseDynamicsDestroyEffector(NewtonInverseDynamicsEffector* const effector)
+void NewtonInverseDynamicsDestroyEffector(NewtonJoint* const effector)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgAssert(0);

@@ -38,6 +38,7 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API dMatrix GetTargetMatrix () const;
 
 	protected:
+	CUSTOM_JOINTS_API dCustomKinematicController(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const {dAssert (0);} 
 
@@ -48,7 +49,9 @@ class dCustomKinematicController: public dCustomJoint
 	int m_autoSlepState;
 	dFloat m_maxLinearFriction;
 	dFloat m_maxAngularFriction;
+
+	DECLARE_CUSTOM_JOINT(dCustomKinematicController, dCustomJoint)
 };
 
-#endif // !defined(AFX_CustomKinematicController_H__EAE1E36C_6FDF_4D86_B4EE_855E3D1046F4_H)
+#endif 
 
