@@ -399,7 +399,6 @@ dgInverseDynamics::dgInverseDynamics(dgWorld* const world)
 	,m_rowArray(NULL)
 	,m_loopingBodies(world->GetAllocator())
 	,m_loopingJoints(world->GetAllocator())
-	,m_effectors(world->GetAllocator())
 	,m_nodeCount(1)
 	,m_rowCount(0)
 	,m_auxiliaryRowCount(0)
@@ -408,17 +407,20 @@ dgInverseDynamics::dgInverseDynamics(dgWorld* const world)
 
 dgInverseDynamics::~dgInverseDynamics()
 {
-	dgList<dgBilateralConstraint*>::dgListNode* ptr1 = NULL; 
-	for (dgList<dgBilateralConstraint*>::dgListNode* ptr = m_effectors.GetFirst(); ptr; ptr = ptr1) {
-		ptr1 = ptr->GetNext();
-		RemoveEffector(ptr->GetInfo());
-	}
+//	dgList<dgBilateralConstraint*>::dgListNode* ptr1 = NULL; 
+//	for (dgList<dgBilateralConstraint*>::dgListNode* ptr = m_effectors.GetFirst(); ptr; ptr = ptr1) {
+//		ptr1 = ptr->GetNext();
+//		RemoveEffector(ptr->GetInfo());
+//	}
 
+	dgList<dgLoopingJoint>::dgListNode* ptr1 = NULL;
 	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		dgLoopingJoint& entry = ptr->GetInfo();
-		entry.m_joint->m_isInSkeleton = false;
+//		dgLoopingJoint& entry = ptr->GetInfo();
+		ptr1 = ptr->GetNext();
+		RemoveEffector(ptr);
 	}
-	m_loopingJoints.RemoveAll();
+	dgAssert(m_loopingJoints.GetCount() == 0);
+//	m_loopingJoints.RemoveAll();
 
 	dgMemoryAllocator* const allocator = m_world->GetAllocator();
 	if (m_nodesOrder) {
@@ -513,17 +515,17 @@ dgInverseDynamics::dgNode* dgInverseDynamics::AddChild(dgBilateralConstraint* co
 	dgNode* const node = new (allocator)dgNode(joint, parent);
 	m_nodeCount ++;
 
-	joint->m_isInSkeleton = true;
+
 	dgAssert (m_world->GetSentinelBody() != node->m_body);
 	return node;
 }
 
+/*
 void dgInverseDynamics::RemoveLoopJoint(dgBilateralConstraint* const joint)
 {
 	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		dgLoopingJoint& entry = ptr->GetInfo();
 		if (entry.m_joint == joint) {
-			joint->m_isInSkeleton = false;
 			m_loopingJoints.Remove(ptr);
 			break;
 		}
@@ -537,41 +539,49 @@ void dgInverseDynamics::RemoveLoopJoint(dgBilateralConstraint* const joint)
 		}
 	}
 }
-
+*/
 
 void dgInverseDynamics::AddEffector(dgBilateralConstraint* const joint, dgNode* const node)
 {
-//	dgLoopingJoint cyclicEntry(joint, index0->GetInfo(), index1->GetInfo());
-//	m_loopingJoints.Append(cyclicEntry);
-	m_effectors.Append(joint);
+	dgLoopingJoint cyclicEntry(joint, 0, 0);
+	m_loopingJoints.Append(cyclicEntry);
+//	m_effectors.Append(joint);
 }
 
-dgList<dgBilateralConstraint*>::dgListNode* dgInverseDynamics::FindEffector(dgBilateralConstraint* const joint) const
+
+dgList<dgInverseDynamics::dgLoopingJoint>::dgListNode* dgInverseDynamics::FindEffector(dgBilateralConstraint* const joint) const
 {
-	for (dgList<dgBilateralConstraint*>::dgListNode* ptr = m_effectors.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		if (ptr->GetInfo() == joint) {
+	for (dgList<dgLoopingJoint>::dgListNode* ptr = m_loopingJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		if (ptr->GetInfo().m_joint == joint) {
 			return ptr;
 		}
 	}
 	return NULL;
 }
 
+void dgInverseDynamics::RemoveEffector(dgList<dgLoopingJoint>::dgListNode* const node)
+{
+	dgBilateralConstraint* const joint = node->GetInfo().m_joint;
+	m_loopingJoints.Remove(node);
+	delete joint;
+}
+
+
 void dgInverseDynamics::RemoveEffector(dgBilateralConstraint* const joint)
 {
-	dgList<dgBilateralConstraint*>::dgListNode* const node = FindEffector(joint);
+	dgList<dgLoopingJoint>::dgListNode* const node = FindEffector(joint);
 	if (node) {
-		m_effectors.Remove(node);
-		delete joint;
+		RemoveEffector(node);
 	}
 }
 
 
-void dgInverseDynamics::Finalize(dgInt32 loopJointsCount, dgBilateralConstraint** const loopJointArray)
+void dgInverseDynamics::Finalize()
 {
 	dgAssert(m_nodeCount >= 1);
 
 	const dgDynamicBody* const rootBody = m_skeleton->m_body;
-	dgAssert (((rootBody->GetInvMass().m_w == dgFloat32 (0.0f)) && (m_skeleton->m_child->m_sibling == NULL)) || (m_skeleton->m_body->GetInvMass().m_w != dgFloat32 (0.0f)));
+	dgAssert (m_skeleton->m_body->GetInvMass().m_w != dgFloat32 (0.0f));
 
 	dgMemoryAllocator* const allocator = rootBody->GetWorld()->GetAllocator();
 	m_nodesOrder = (dgNode**)allocator->Malloc(m_nodeCount * sizeof (dgNode*));
@@ -579,6 +589,9 @@ void dgInverseDynamics::Finalize(dgInt32 loopJointsCount, dgBilateralConstraint*
 	dgInt32 index = 0;
 	SortGraph(m_skeleton, index);
 	dgAssert(index == m_nodeCount);
+
+	dgInt32 loopJointsCount = 0;
+	dgBilateralConstraint** const loopJointArray = NULL;
 
 	if (loopJointsCount) {
 		dgInt32 loopIndex = m_nodeCount;
@@ -594,7 +607,6 @@ void dgInverseDynamics::Finalize(dgInt32 loopJointsCount, dgBilateralConstraint*
 			dgNode* const node0 = FindNode(body0);
 			dgNode* const node1 = FindNode(body1);
 			dgAssert((node0 && !node1) || (node1 && !node0));
-			joint->m_isInSkeleton = true;
 		
 			if (node0) {
 				filter.Insert(node0->m_index, node0->m_body);
@@ -634,11 +646,6 @@ void dgInverseDynamics::Finalize(dgInt32 loopJointsCount, dgBilateralConstraint*
 	}
 }
 
-
-void dgInverseDynamics::Finalize ()
-{
-	Finalize(0, NULL);
-}
 
 void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgInt8* const memoryBuffer)
 {

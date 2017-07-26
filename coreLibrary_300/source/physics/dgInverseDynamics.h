@@ -56,8 +56,8 @@ class dgInverseDynamics
 
 	dgWorld* GetWorld() const; 
 	dgInt32 GetJointCount () const {return m_nodeCount - 1;}
-	
-	void RemoveLoopJoint(dgBilateralConstraint* const joint);  
+	//void RemoveLoopJoint(dgBilateralConstraint* const joint);  
+
 	void Finalize ();
 	
 	dgNode* GetRoot () const;
@@ -77,8 +77,7 @@ class dgInverseDynamics
 	
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
-
-	void Finalize (dgInt32 loopJoints, dgBilateralConstraint** const loopJointArray);
+	
 	DG_INLINE void CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE void CalculateJointAccel(const dgJacobian* const externalAccel, dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgForcePair* const accel) const;
 
@@ -93,8 +92,10 @@ class dgInverseDynamics
 	void CalculateExternalForces (dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const force) const;
 	void CalculateLoopAndExternalForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void CalculateMotorsAccelerations (const dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep) const;
-
-	dgList<dgBilateralConstraint*>::dgListNode* FindEffector(dgBilateralConstraint* const joint) const;
+	void RemoveEffector(dgList<dgLoopingJoint>::dgListNode* const node);
+	
+//	dgList<dgBilateralConstraint*>::dgListNode* FindEffector(dgBilateralConstraint* const joint) const;
+	dgList<dgLoopingJoint>::dgListNode* FindEffector(dgBilateralConstraint* const joint) const;
 
 	dgWorld* m_world;
 	dgNode* m_skeleton;
@@ -108,7 +109,6 @@ class dgInverseDynamics
 	dgInverseDynamicsList::dgListNode* m_reference;
 	dgList<dgDynamicBody*> m_loopingBodies;
 	dgList<dgLoopingJoint> m_loopingJoints;
-	dgList<dgBilateralConstraint*> m_effectors;
 	dgInt16 m_nodeCount;
 	dgInt16 m_rowCount;
 	dgInt16 m_auxiliaryRowCount;

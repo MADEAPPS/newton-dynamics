@@ -5209,13 +5209,6 @@ NewtonJoint* NewtonInverseDynamicsCreateEffector(NewtonInverseDynamics* const in
 
 	Newton* const world = (Newton *)ik->GetWorld();
 	dgInverseDynamics::dgNode* const node = (dgInverseDynamics::dgNode*) ikNode;
-//	Newton* const world = (Newton *)newtonWorld;
-//	dgBody* const body0 = (dgBody *)childBody;
-//	dgBody* const body1 = (dgBody *)parentBody;
-//	dgAssert(body0);
-//	dgAssert(body0 != body1);
-//	dgBody* const body0 = ik->GetBody(ik);
-//	return (NewtonJoint*) new (world->dgWorld::GetAllocator()) NewtonUserJointInverseDynamicsEffector(world, 6, callback, body0, NULL);
 	return (NewtonJoint*) new (world->dgWorld::GetAllocator()) NewtonUserJointInverseDynamicsEffector(ik, node, callback);
 }
 
