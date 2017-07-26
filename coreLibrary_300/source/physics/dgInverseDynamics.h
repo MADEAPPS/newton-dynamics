@@ -93,8 +93,6 @@ class dgInverseDynamics
 	void CalculateLoopAndExternalForces(dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, const dgForcePair* const accel, dgForcePair* const force) const;
 	void CalculateMotorsAccelerations (const dgJacobian* const externalForces, const dgJointInfo* const jointInfoArray, dgJacobianMatrixElement* const matrixRow, dgFloat32 timestep) const;
 	void RemoveEffector(dgList<dgLoopingJoint>::dgListNode* const node);
-	
-//	dgList<dgBilateralConstraint*>::dgListNode* FindEffector(dgBilateralConstraint* const joint) const;
 	dgList<dgLoopingJoint>::dgListNode* FindEffector(dgBilateralConstraint* const joint) const;
 
 	dgWorld* m_world;
@@ -107,7 +105,6 @@ class dgInverseDynamics
 	dgFloat32* m_lowerTriangularMassMatrix11;
 	dgJacobianMatrixElement** m_rowArray;
 	dgInverseDynamicsList::dgListNode* m_reference;
-	dgList<dgDynamicBody*> m_loopingBodies;
 	dgList<dgLoopingJoint> m_loopingJoints;
 	dgInt16 m_nodeCount;
 	dgInt16 m_rowCount;
